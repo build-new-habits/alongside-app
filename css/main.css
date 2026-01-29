@@ -1,0 +1,6 @@
+/* main.css - Import all styles */
+@import 'base/variables.css';
+@import 'base/reset.css';
+@import 'base/typography.css';
+@import 'layouts/app-shell.css';
+@import 'components/buttons.css';
