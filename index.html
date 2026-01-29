@@ -3,16 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#7B9E87">
+  <meta name="theme-color" content="#0F172A">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Compassionate fitness coaching that adapts to your life">
+  
   <title>Alongside</title>
+  
+  <!-- Favicon - use the square icon -->
+  <link rel="icon" type="image/png" href="assets/images/logo-icon-square.png">
+  <link rel="apple-touch-icon" href="assets/images/logo-icon-square.png">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
+  <!-- Styles -->
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -22,7 +29,7 @@
     <div id="loading" class="loading-screen">
       <div class="loading-content">
         <div class="loading-logo">
-          <span class="logo-icon">🌿</span>
+          <img src="assets/images/logo-icon-small.png" alt="Alongside" width="128" height="128">
         </div>
         <h1 class="loading-title">Alongside</h1>
         <p class="loading-subtitle">Movement that meets you where you are</p>
@@ -33,7 +40,7 @@
     <!-- Main content area -->
     <main id="main-content" class="main-content"></main>
     
-    <!-- Bottom navigation -->
+    <!-- Bottom navigation (hidden until after onboarding) -->
     <nav id="bottom-nav" class="bottom-nav hidden">
       <button class="nav-item active" data-view="today">
         <span class="nav-icon">🏠</span>
@@ -51,6 +58,14 @@
     
     <!-- Toast notifications -->
     <div id="toast-container" class="toast-container"></div>
+    
+    <!-- Feedback button (beta) -->
+    <button id="feedback-fab" class="feedback-fab hidden" aria-label="Send feedback">
+      💬
+    </button>
+    
+    <!-- Modal container -->
+    <div id="modal-container" class="modal-container hidden"></div>
     
   </div>
   
