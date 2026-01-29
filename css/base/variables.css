@@ -1,53 +1,192 @@
-/* variables.css - Design tokens */
+/* variables.css - Midnight Teal Design Tokens */
 
 :root {
-  /* Primary - Sage Green */
-  --color-primary: #7B9E87;
-  --color-primary-light: #A8C5B0;
-  --color-primary-dark: #5A7A64;
+  /* ========================================
+     COLOUR PALETTE: MIDNIGHT TEAL
+     Matched to Alongside logo colours
+     ======================================== */
   
-  /* Background */
-  --color-bg: #FAF8F5;
-  --color-bg-card: #FFFFFF;
+  /* Background layers (dark to light) */
+  --color-bg-deep: #0F172A;       /* Deepest - app background */
+  --color-bg: #1E293B;            /* Primary background */
+  --color-bg-card: #334155;       /* Cards, elevated surfaces */
+  --color-bg-hover: #3E4C63;      /* Hover states on cards */
   
   /* Text */
-  --color-text: #2D3436;
-  --color-text-secondary: #636E72;
-  --color-text-muted: #B2BEC3;
+  --color-text: #E2E8F0;          /* Primary text - off-white */
+  --color-text-secondary: #94A3B8; /* Secondary text - silver */
+  --color-text-muted: #64748B;    /* Muted text - slate */
+  --color-text-inverse: #0F172A;  /* Text on light/accent backgrounds */
   
-  /* Semantic */
-  --color-success: #27AE60;
-  --color-warning: #F39C12;
-  --color-danger: #E74C3C;
+  /* Primary Accent - Electric Teal (matched to logo) */
+  --color-primary: #2DD4BF;       /* Main accent - buttons, links */
+  --color-primary-light: #5EEAD4; /* Lighter variant */
+  --color-primary-dark: #14B8A6;  /* Darker variant - hover */
+  --color-primary-glow: rgba(45, 212, 191, 0.2); /* Glow effect */
   
-  /* Spacing */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.5rem;
-  --space-6: 2rem;
+  /* Secondary Accent - Cyan */
+  --color-secondary: #22D3EE;     /* Highlights, active states */
+  --color-secondary-light: #67E8F9;
   
-  /* Typography */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 2rem;
+  /* Semantic Colours */
+  --color-success: #34D399;       /* Positive - emerald */
+  --color-success-light: rgba(52, 211, 153, 0.15);
+  --color-warning: #FBBF24;       /* Caution - amber */
+  --color-warning-light: rgba(251, 191, 36, 0.15);
+  --color-danger: #FB7185;        /* Alert - rose */
+  --color-danger-light: rgba(251, 113, 133, 0.15);
+  --color-info: #60A5FA;          /* Info - blue */
+  --color-info-light: rgba(96, 165, 250, 0.15);
+  
+  /* Special */
+  --color-achievement: #A78BFA;   /* Violet - milestones, credits */
+  --color-rest: #818CF8;          /* Indigo - rest days */
+  
+  /* Energy/Mood Scale (10 levels) */
+  --color-scale-1: #FB7185;       /* Low energy - rose */
+  --color-scale-2: #F87171;
+  --color-scale-3: #FB923C;
+  --color-scale-4: #FBBF24;
+  --color-scale-5: #FACC15;       /* Middle */
+  --color-scale-6: #A3E635;
+  --color-scale-7: #4ADE80;
+  --color-scale-8: #34D399;
+  --color-scale-9: #2DD4BF;
+  --color-scale-10: #22D3EE;      /* High energy - cyan */
   
   /* Borders */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --color-border: #475569;        /* Default border */
+  --color-border-light: #334155;  /* Subtle border */
+  --color-border-focus: #2DD4BF;  /* Focus state */
+  
+  /* Shadows - softer for dark mode */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px var(--color-primary-glow);
+  
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+  
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Font sizes */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 2rem;       /* 32px */
+  --text-4xl: 2.5rem;     /* 40px */
+  
+  /* Font weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  
+  /* Line heights */
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+  
+  /* Letter spacing */
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+  
+  /* ========================================
+     SPACING
+     ======================================== */
+  
+  --space-1: 0.25rem;    /* 4px */
+  --space-2: 0.5rem;     /* 8px */
+  --space-3: 0.75rem;    /* 12px */
+  --space-4: 1rem;       /* 16px */
+  --space-5: 1.5rem;     /* 24px */
+  --space-6: 2rem;       /* 32px */
+  --space-7: 2.5rem;     /* 40px */
+  --space-8: 3rem;       /* 48px */
+  --space-10: 4rem;      /* 64px */
+  --space-12: 6rem;      /* 96px */
+  
+  /* ========================================
+     BORDERS & RADIUS
+     ======================================== */
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
   --radius-full: 9999px;
   
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+  /* ========================================
+     TRANSITIONS
+     ======================================== */
   
-  /* Layout */
-  --nav-height: 64px;
+  --transition-fast: 100ms ease-out;
+  --transition-normal: 200ms ease-out;
+  --transition-slow: 300ms ease-out;
+  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* ========================================
+     LAYOUT
+     ======================================== */
+  
+  --nav-height: 72px;
+  --header-height: 60px;
   --max-width: 480px;
+  --content-padding: var(--space-5);
+  
+  /* ========================================
+     Z-INDEX LAYERS
+     ======================================== */
+  
+  --z-base: 1;
+  --z-dropdown: 50;
+  --z-nav: 100;
+  --z-fab: 150;
+  --z-modal: 200;
+  --z-toast: 300;
+  --z-tooltip: 400;
+}
+
+/* ========================================
+   ACCESSIBILITY ADJUSTMENTS
+   ======================================== */
+
+/* Larger text preference */
+@media (prefers-larger-text) {
+  :root {
+    --text-xs: 0.875rem;
+    --text-sm: 1rem;
+    --text-base: 1.125rem;
+    --text-lg: 1.25rem;
+    --text-xl: 1.5rem;
+    --text-2xl: 1.75rem;
+    --text-3xl: 2.25rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0ms;
+    --transition-normal: 0ms;
+    --transition-slow: 0ms;
+    --transition-spring: 0ms;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --color-text: #FFFFFF;
+    --color-text-secondary: #E2E8F0;
+    --color-border: #94A3B8;
+    --color-primary: #5EEAD4;
+  }
 }
