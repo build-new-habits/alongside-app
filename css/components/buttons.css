@@ -1,0 +1,86 @@
+/* buttons.css - Button components */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--text-base);
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+  min-height: 48px; /* Accessibility: minimum tap target */
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--color-primary-light);
+}
+
+.btn-text {
+  background: transparent;
+  color: var(--color-primary);
+  padding: var(--space-2) var(--space-3);
+}
+
+.btn-text:hover {
+  text-decoration: underline;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn-large {
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--text-lg);
+  min-height: 56px;
+}
+
+/* Disabled state */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+```
+
+4. Commit message: `Add button components`
+5. Commit
+
+---
+
+## ✅ Checkpoint
+
+After creating these 7 files, your repo structure should look like:
+```
+alongside-app/
+├── README.md
+├── index.html
+├── css/
+│   ├── main.css
+│   ├── base/
+│   │   ├── variables.css
+│   │   ├── reset.css
+│   │   └── typography.css
+│   ├── layouts/
+│   │   └── app-shell.css
+│   └── components/
+│       └── buttons.css
