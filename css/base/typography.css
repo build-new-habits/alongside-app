@@ -1,24 +1,29 @@
-/* typography.css - Modern typography */
+/* typography.css - Typography for Midnight Teal theme */
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-family);
   font-size: var(--text-base);
-  font-weight: 400;
+  font-weight: var(--font-normal);
   color: var(--color-text);
-  background-color: var(--color-bg);
+  background-color: var(--color-bg-deep);
   letter-spacing: -0.01em;
+  line-height: var(--leading-normal);
 }
 
+/* ============================================
+   HEADINGS
+   ============================================ */
+
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  font-weight: var(--font-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
   color: var(--color-text);
+  margin-bottom: var(--space-3);
 }
 
 h1 {
   font-size: var(--text-3xl);
-  font-weight: 700;
 }
 
 h2 {
@@ -27,31 +32,88 @@ h2 {
 
 h3 {
   font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
 }
 
 h4 {
   font-size: var(--text-lg);
-  font-weight: 500;
+  font-weight: var(--font-semibold);
 }
+
+h5, h6 {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+}
+
+/* ============================================
+   PARAGRAPHS
+   ============================================ */
 
 p {
   margin-bottom: var(--space-4);
-  line-height: 1.6;
+  line-height: var(--leading-relaxed);
 }
 
 p:last-child {
   margin-bottom: 0;
 }
 
-strong {
-  font-weight: 600;
+/* Lead paragraph - larger intro text */
+.lead {
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
 }
 
-small {
+/* Small text */
+small, .small {
   font-size: var(--text-sm);
 }
 
-/* Text utilities */
+/* ============================================
+   INLINE ELEMENTS
+   ============================================ */
+
+strong, b {
+  font-weight: var(--font-semibold);
+}
+
+em, i {
+  font-style: italic;
+}
+
+/* ============================================
+   LINKS
+   ============================================ */
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-light);
+}
+
+.link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(45, 212, 191, 0.4);
+}
+
+.link:hover {
+  text-decoration-color: var(--color-primary);
+}
+
+/* ============================================
+   TEXT COLOURS
+   ============================================ */
+
+.text-primary {
+  color: var(--color-primary);
+}
+
 .text-secondary {
   color: var(--color-text-secondary);
 }
@@ -60,29 +122,145 @@ small {
   color: var(--color-text-muted);
 }
 
-.text-primary {
-  color: var(--color-primary);
+.text-success {
+  color: var(--color-success);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.text-danger {
+  color: var(--color-danger);
+}
+
+/* ============================================
+   TEXT ALIGNMENT
+   ============================================ */
+
+.text-left {
+  text-align: left;
 }
 
 .text-center {
   text-align: center;
 }
 
+.text-right {
+  text-align: right;
+}
+
+/* ============================================
+   TEXT SIZES
+   ============================================ */
+
+.text-xs {
+  font-size: var(--text-xs);
+}
+
 .text-sm {
   font-size: var(--text-sm);
+}
+
+.text-base {
+  font-size: var(--text-base);
 }
 
 .text-lg {
   font-size: var(--text-lg);
 }
 
-/* Link styles */
-a.link {
-  color: var(--color-primary);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+.text-xl {
+  font-size: var(--text-xl);
 }
 
-a.link:hover {
-  color: var(--color-primary-dark);
+.text-2xl {
+  font-size: var(--text-2xl);
+}
+
+.text-3xl {
+  font-size: var(--text-3xl);
+}
+
+/* ============================================
+   TEXT WEIGHTS
+   ============================================ */
+
+.font-normal {
+  font-weight: var(--font-normal);
+}
+
+.font-medium {
+  font-weight: var(--font-medium);
+}
+
+.font-semibold {
+  font-weight: var(--font-semibold);
+}
+
+.font-bold {
+  font-weight: var(--font-bold);
+}
+
+/* ============================================
+   SPECIAL TEXT STYLES
+   ============================================ */
+
+/* Gradient text for emphasis */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Uppercase label text */
+.label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+/* Number/stat display */
+.stat-number {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  letter-spacing: var(--tracking-tight);
+  line-height: 1;
+}
+
+/* Code/mono text */
+code, .mono {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.9em;
+  background: var(--color-bg-card);
+  padding: 0.1em 0.4em;
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================
+   LINE CLAMPING
+   ============================================ */
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
