@@ -1,19 +1,24 @@
-/* typography.css - Font styles */
+/* typography.css - Modern typography */
 
 body {
-  font-family: var(--font-family);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: var(--text-base);
+  font-weight: 400;
   color: var(--color-text);
   background-color: var(--color-bg);
+  letter-spacing: -0.01em;
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
 }
 
 h1 {
   font-size: var(--text-3xl);
+  font-weight: 700;
 }
 
 h2 {
@@ -24,10 +29,29 @@ h3 {
   font-size: var(--text-xl);
 }
 
-p {
-  margin-bottom: var(--space-4);
+h4 {
+  font-size: var(--text-lg);
+  font-weight: 500;
 }
 
+p {
+  margin-bottom: var(--space-4);
+  line-height: 1.6;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+strong {
+  font-weight: 600;
+}
+
+small {
+  font-size: var(--text-sm);
+}
+
+/* Text utilities */
 .text-secondary {
   color: var(--color-text-secondary);
 }
@@ -36,6 +60,29 @@ p {
   color: var(--color-text-muted);
 }
 
+.text-primary {
+  color: var(--color-primary);
+}
+
 .text-center {
   text-align: center;
+}
+
+.text-sm {
+  font-size: var(--text-sm);
+}
+
+.text-lg {
+  font-size: var(--text-lg);
+}
+
+/* Link styles */
+a.link {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+a.link:hover {
+  color: var(--color-primary-dark);
 }
