@@ -1,40 +1,101 @@
-/* cards.css - Card components */
+/* cards.css - Card components for Midnight Teal theme */
+
+/* ============================================
+   BASE CARD
+   ============================================ */
 
 .card {
   background: var(--color-bg-card);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
+  transition: all var(--transition-normal);
 }
 
+/* ============================================
+   CARD VARIANTS
+   ============================================ */
+
+/* Elevated card with stronger shadow */
 .card-elevated {
+  background: var(--color-bg);
   box-shadow: var(--shadow-md);
   border: none;
 }
 
+/* Interactive card (clickable) */
 .card-interactive {
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .card-interactive:hover {
+  border-color: var(--color-border);
+  background: var(--color-bg-hover);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
 }
 
 .card-interactive:active {
   transform: translateY(0);
 }
 
-/* Card sections */
+/* Selected card state */
+.card.selected {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.08);
+}
+
+/* Subtle card - minimal styling */
+.card-subtle {
+  background: transparent;
+  border: none;
+  padding: var(--space-3);
+}
+
+/* ============================================
+   CARD WITH GLOW (Premium feel)
+   ============================================ */
+
+.card-glow {
+  position: relative;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity var(--transition-normal);
+}
+
+.card-glow:hover::before {
+  opacity: 0.3;
+}
+
+/* ============================================
+   CARD SECTIONS
+   ============================================ */
+
 .card-header {
   margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.card-header:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .card-title {
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
   margin-bottom: var(--space-1);
 }
 
@@ -50,13 +111,20 @@
 .card-footer {
   margin-top: var(--space-4);
   padding-top: var(--space-3);
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-border-light);
 }
 
-/* Card variants */
+/* ============================================
+   SEMANTIC CARD VARIANTS
+   ============================================ */
+
 .card-success {
   background: var(--color-success-light);
   border-color: var(--color-success);
+}
+
+.card-success .card-title {
+  color: var(--color-success);
 }
 
 .card-warning {
@@ -64,30 +132,176 @@
   border-color: var(--color-warning);
 }
 
+.card-warning .card-title {
+  color: var(--color-warning);
+}
+
+.card-danger {
+  background: var(--color-danger-light);
+  border-color: var(--color-danger);
+}
+
+.card-danger .card-title {
+  color: var(--color-danger);
+}
+
 .card-info {
   background: var(--color-info-light);
   border-color: var(--color-info);
 }
 
-/* Coach card - special styling */
+.card-info .card-title {
+  color: var(--color-info);
+}
+
+/* ============================================
+   COACH CARD (Special styling)
+   ============================================ */
+
 .card-coach {
-  background: linear-gradient(135deg, #F8FAF9 0%, #EEF2EF 100%);
-  border: none;
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.08) 0%, rgba(34, 211, 238, 0.05) 100%);
+  border: 1px solid rgba(45, 212, 191, 0.2);
   position: relative;
-  padding-left: calc(var(--space-4) + 48px);
+  padding-left: calc(var(--space-4) + 52px);
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .card-coach::before {
-  content: '🌿';
+  content: '';
   position: absolute;
   left: var(--space-4);
-  top: var(--space-4);
-  width: 40px;
-  height: 40px;
-  background: var(--color-primary);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(45, 212, 191, 0.3);
+}
+
+/* Coach avatar placeholder */
+.card-coach .coach-avatar {
+  position: absolute;
+  left: var(--space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+}
+
+/* If coach avatar is present, hide the ::before */
+.card-coach:has(.coach-avatar)::before {
+  display: none;
+}
+
+/* ============================================
+   STAT CARD
+   ============================================ */
+
+.card-stat {
+  text-align: center;
+  padding: var(--space-5) var(--space-4);
+}
+
+.card-stat .stat-value {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  line-height: 1;
+  margin-bottom: var(--space-2);
+}
+
+.card-stat .stat-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================
+   EXERCISE CARD
+   ============================================ */
+
+.card-exercise {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.card-exercise .exercise-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.card-exercise .exercise-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-exercise .exercise-name {
+  font-weight: var(--font-semibold);
+  margin-bottom: var(--space-1);
+}
+
+.card-exercise .exercise-detail {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.card-exercise .exercise-action {
+  flex-shrink: 0;
+}
+
+/* ============================================
+   CARD GRID
+   ============================================ */
+
+.card-grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.card-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.card-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Responsive grid */
+@media (max-width: 380px) {
+  .card-grid-2,
+  .card-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   CARD LIST (Stacked cards)
+   ============================================ */
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.card-list .card {
+  margin: 0;
 }
