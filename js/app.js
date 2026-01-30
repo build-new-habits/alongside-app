@@ -691,5 +691,6 @@ const App = {
   }
 };
 
-// Start the app
+// Make App available globally and start
+window.App = App;
 document.addEventListener('DOMContentLoaded', () => App.init());
