@@ -1,0 +1,217 @@
+/* onboarding.css - Onboarding flow styles */
+
+/* ============================================
+   ONBOARDING VIEW CONTAINER
+   ============================================ */
+
+.onboarding-view {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--space-10));
+  min-height: calc(100dvh - var(--space-10));
+  padding-bottom: var(--space-6);
+}
+
+.onboarding-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+  min-height: 48px;
+}
+
+.onboarding-content {
+  flex: 1;
+}
+
+.onboarding-actions {
+  margin-top: auto;
+  padding-top: var(--space-6);
+}
+
+/* ============================================
+   PROGRESS DOTS
+   ============================================ */
+
+.progress-dots {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  transition: all var(--transition-normal);
+}
+
+.dot.active {
+  width: 24px;
+  background: var(--color-primary);
+}
+
+.dot.completed {
+  background: var(--color-primary);
+}
+
+/* ============================================
+   COACH GREETING
+   ============================================ */
+
+.coach-greeting {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.coach-avatar {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto var(--space-5);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--color-bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coach-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.coach-greeting h1 {
+  margin-bottom: var(--space-3);
+}
+
+.coach-greeting .lead {
+  color: var(--color-text-secondary);
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   WELCOME MESSAGE
+   ============================================ */
+
+.welcome-message {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.welcome-message p {
+  margin-bottom: var(--space-2);
+}
+
+.welcome-message p:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================
+   FEATURES LIST
+   ============================================ */
+
+.onboarding-features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.feature-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.feature-text {
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+
+/* ============================================
+   INPUT FIELDS
+   ============================================ */
+
+.input-group {
+  margin-bottom: var(--space-4);
+}
+
+.input-field {
+  width: 100%;
+  padding: var(--space-4);
+  font-size: var(--text-lg);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  transition: all var(--transition-normal);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-glow);
+}
+
+.input-field::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ============================================
+   GOALS GRID
+   ============================================ */
+
+.goals-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.goal-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  text-align: left;
+}
+
+.goal-option.selected {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.1);
+}
+
+.goal-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.goal-text {
+  color: var(--color-text);
+  font-weight: var(--font-medium);
+}
+
+/* ============================================
+   CENTERED MAIN CONTENT (for welcome)
+   ============================================ */
+
+.main-content.centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.main-content.centered .onboarding-view {
+  justify-content: center;
+}
