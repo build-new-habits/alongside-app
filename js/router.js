@@ -8,7 +8,7 @@ import { store } from './store.js';
 export const router = {
   
   currentView: null,
-  views: {},  // Will be populated with view modules
+  views: {},
   
   /**
    * Initialise router
@@ -40,6 +40,9 @@ export const router = {
   async navigate(viewName) {
     console.log(`Navigating to: ${viewName}`);
     
+    // IMMEDIATELY scroll to top before anything else
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    
     const mainContent = document.getElementById('main-content');
     const bottomNav = document.getElementById('bottom-nav');
     
@@ -68,18 +71,27 @@ export const router = {
         // Render the view
         mainContent.innerHTML = view.render();
         
-        // Call onMount if it exists (for attaching handlers, focusing inputs, etc.)
+        // Call onMount if it exists
         if (view.onMount) {
           view.onMount();
         }
       }
     } catch (e) {
       console.error(`Error loading view: ${viewName}`, e);
-      mainContent.innerHTML = `<div class="error">Error loading view</div>`;
+      mainContent.innerHTML = `
+        <div class="view">
+          <div class="card card-coach">
+            <p><strong>Error loading view:</strong> ${viewName}</p>
+            <p class="text-secondary">${e.message}</p>
+            <button class="btn btn-primary" onclick="router.navigate('onboarding/welcome')" style="margin-top: var(--space-4);">
+              Start Over
+            </button>
+          </div>
+        </div>
+      `;
     }
     
     this.currentView = viewName;
-    window.scrollTo({ top: 0, behavior: 'instant' });
   },
   
   /**
@@ -100,7 +112,7 @@ export const router = {
       return module;
     } catch (e) {
       console.error(`Failed to load view: ${path}`, e);
-      return null;
+      throw e;
     }
   },
   
