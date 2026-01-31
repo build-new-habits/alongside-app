@@ -305,3 +305,17 @@
 .card-list .card {
   margin: 0;
 }
+
+/* Coach message with icon */
+.coach-message-content {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.coach-icon-small {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+}
