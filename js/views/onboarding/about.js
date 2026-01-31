@@ -46,9 +46,11 @@ export function render() {
             id="user-age" 
             class="input-field"
             placeholder="e.g. 42"
+            inputmode="numeric"
             min="16"
             max="100"
             value="${age}"
+            onchange="saveAge()"
           >
         </div>
         
@@ -91,9 +93,16 @@ export function render() {
   `;
 }
 
-// Global functions for onclick handlers
+// Save age immediately when changed (fixes the disappearing age bug)
+window.saveAge = function() {
+  const ageInput = document.getElementById('user-age');
+  if (ageInput && ageInput.value) {
+    store.set('age', parseInt(ageInput.value));
+  }
+};
+
 window.setGender = function(genderId) {
-  // Save current age value before re-rendering
+  // Save current age value BEFORE re-rendering
   const ageInput = document.getElementById('user-age');
   if (ageInput && ageInput.value) {
     store.set('age', parseInt(ageInput.value));
@@ -115,9 +124,11 @@ window.setHormonalTracking = function(value) {
 };
 
 window.saveAbout = function() {
+  // Save age one more time in case they didn't blur the field
   const ageInput = document.getElementById('user-age');
-  const age = ageInput.value ? parseInt(ageInput.value) : null;
+  if (ageInput && ageInput.value) {
+    store.set('age', parseInt(ageInput.value));
+  }
   
-  store.set('age', age);
   router.navigate('onboarding/body');
 };
