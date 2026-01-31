@@ -1,5 +1,6 @@
 /**
  * equipment.js - Onboarding Step 8: Equipment selection
+ * Uses modal pop-out for each category
  */
 
 import { store } from '../../store.js';
@@ -7,31 +8,27 @@ import { EQUIPMENT_CATEGORIES, countInCategory } from '../../data/equipment.js';
 
 export const centered = false;
 
+// Track which modal is open
+let openModalId = null;
+
 export function render() {
   const selectedEquipment = store.get('equipment') || [];
   
   const categoriesHtml = EQUIPMENT_CATEGORIES.map(cat => {
     const count = countInCategory(cat.id, selectedEquipment);
+    const hasItems = count > 0;
     
     return `
-      <div class="equipment-category">
-        <button class="category-header" onclick="toggleEquipmentCategory('${cat.id}')">
-          <span class="category-icon">${cat.icon}</span>
-          <span class="category-name">${cat.name}</span>
-          <span class="category-count" id="count-${cat.id}">${count > 0 ? count : ''}</span>
-          <span class="category-chevron">▼</span>
-        </button>
-        <div class="category-items" id="category-${cat.id}">
-          ${cat.items.map(item => `
-            <button class="equipment-item ${selectedEquipment.includes(item.id) ? 'selected' : ''}"
-                    data-item="${item.id}"
-                    onclick="toggleEquipmentItem('${item.id}')">
-              <span class="item-check">${selectedEquipment.includes(item.id) ? '✓' : ''}</span>
-              <span class="item-name">${item.name}</span>
-            </button>
-          `).join('')}
+      <button class="equipment-category-card ${hasItems ? 'has-items' : ''}" 
+              onclick="openEquipmentModal('${cat.id}')">
+        <div class="category-card-icon">${cat.icon}</div>
+        <div class="category-card-content">
+          <div class="category-card-name">${cat.name}</div>
+          <div class="category-card-desc">${cat.description}</div>
         </div>
-      </div>
+        <div class="category-card-badge ${hasItems ? 'visible' : ''}">${count}</div>
+        <div class="category-card-chevron">›</div>
+      </button>
     `;
   }).join('');
   
@@ -52,41 +49,107 @@ export function render() {
       
       <div class="onboarding-content">
         <h1>What equipment do you have?</h1>
-        <p class="text-secondary">I'll only suggest exercises you can actually do.</p>
+        <p class="text-secondary">Tap each category to select your equipment. I'll only suggest exercises you can actually do.</p>
         
-        <div class="equipment-categories">
+        <div class="equipment-category-list">
           ${categoriesHtml}
         </div>
         
-        <div class="bodyweight-option" style="margin-top: var(--space-4);">
-          <button class="btn-card ${selectedEquipment.length === 0 ? 'selected' : ''}"
-                  id="bodyweight-btn"
-                  onclick="setBodyweightOnly()">
-            <span class="goal-icon">🏠</span>
-            <span class="goal-text">Just bodyweight - no equipment</span>
-          </button>
+        <div class="bodyweight-note">
+          <p class="text-sm text-muted">💡 No equipment? No problem! Bodyweight exercises are powerful and effective.</p>
         </div>
       </div>
       
       <div class="onboarding-actions">
         <button class="btn btn-primary btn-large btn-full" onclick="saveEquipment()">
-          Finish setup
+          ${selectedEquipment.length > 0 ? 'Finish setup' : 'Continue with bodyweight only'}
         </button>
-        <p class="text-sm text-secondary text-center" id="equipment-count" style="margin-top: var(--space-3);">
+        <p class="text-sm text-secondary text-center" id="equipment-total" style="margin-top: var(--space-3);">
           ${selectedEquipment.length} items selected
         </p>
+      </div>
+    </div>
+    
+    <!-- Modal container -->
+    <div id="equipment-modal" class="equipment-modal hidden" onclick="closeModalOnBackdrop(event)">
+      <div class="equipment-modal-content" onclick="event.stopPropagation()">
+        <div class="equipment-modal-header">
+          <h2 id="modal-title">Category</h2>
+          <button class="modal-close-btn" onclick="closeEquipmentModal()">✕</button>
+        </div>
+        <div class="equipment-modal-body" id="modal-items">
+          <!-- Items inserted here -->
+        </div>
+        <div class="equipment-modal-footer">
+          <button class="btn btn-primary btn-full" onclick="closeEquipmentModal()">Done</button>
+        </div>
       </div>
     </div>
   `;
 }
 
-// Global functions
-window.toggleEquipmentCategory = function(categoryId) {
-  const items = document.getElementById(`category-${categoryId}`);
-  const header = items.previousElementSibling;
+export function onMount() {
+  // Nothing special needed on mount
+}
+
+// ============================================
+// MODAL FUNCTIONS
+// ============================================
+
+window.openEquipmentModal = function(categoryId) {
+  const category = EQUIPMENT_CATEGORIES.find(c => c.id === categoryId);
+  if (!category) return;
   
-  items.classList.toggle('expanded');
-  header.classList.toggle('expanded');
+  openModalId = categoryId;
+  const selectedEquipment = store.get('equipment') || [];
+  
+  // Set modal title
+  document.getElementById('modal-title').textContent = category.name;
+  
+  // Build items HTML
+  const itemsHtml = category.items.map(item => {
+    const isSelected = selectedEquipment.includes(item.id);
+    return `
+      <button class="equipment-item-card ${isSelected ? 'selected' : ''}" 
+              data-item="${item.id}"
+              onclick="toggleEquipmentItem('${item.id}')">
+        <span class="item-checkbox">${isSelected ? '✓' : ''}</span>
+        <span class="item-name">${item.name}</span>
+      </button>
+    `;
+  }).join('');
+  
+  document.getElementById('modal-items').innerHTML = itemsHtml;
+  
+  // Show modal with animation
+  const modal = document.getElementById('equipment-modal');
+  modal.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    modal.classList.add('visible');
+  });
+  
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeEquipmentModal = function() {
+  const modal = document.getElementById('equipment-modal');
+  modal.classList.remove('visible');
+  
+  setTimeout(() => {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+    openModalId = null;
+    
+    // Update the category card to show new count
+    updateCategoryCards();
+  }, 300);
+};
+
+window.closeModalOnBackdrop = function(event) {
+  if (event.target.id === 'equipment-modal') {
+    closeEquipmentModal();
+  }
 };
 
 window.toggleEquipmentItem = function(itemId) {
@@ -101,47 +164,54 @@ window.toggleEquipmentItem = function(itemId) {
   
   store.set('equipment', equipment);
   
-  // Update item UI
-  const btn = document.querySelector(`[data-item="${itemId}"]`);
-  if (btn) {
-    btn.classList.toggle('selected');
-    btn.querySelector('.item-check').textContent = equipment.includes(itemId) ? '✓' : '';
+  // Update item UI in modal
+  const itemCard = document.querySelector(`[data-item="${itemId}"]`);
+  if (itemCard) {
+    itemCard.classList.toggle('selected');
+    const checkbox = itemCard.querySelector('.item-checkbox');
+    checkbox.textContent = equipment.includes(itemId) ? '✓' : '';
   }
   
-  // Update category counts
-  EQUIPMENT_CATEGORIES.forEach(cat => {
-    const count = countInCategory(cat.id, equipment);
-    const countEl = document.getElementById(`count-${cat.id}`);
-    if (countEl) countEl.textContent = count > 0 ? count : '';
-  });
-  
-  // Update total count
-  const totalCount = document.getElementById('equipment-count');
-  if (totalCount) totalCount.textContent = `${equipment.length} items selected`;
-  
-  // Deselect bodyweight option
-  document.getElementById('bodyweight-btn')?.classList.remove('selected');
+  // Update total count in footer
+  updateTotalCount();
 };
 
-window.setBodyweightOnly = function() {
-  store.set('equipment', []);
+function updateCategoryCards() {
+  const selectedEquipment = store.get('equipment') || [];
   
-  // Update all equipment items UI
-  document.querySelectorAll('.equipment-item').forEach(btn => {
-    btn.classList.remove('selected');
-    btn.querySelector('.item-check').textContent = '';
+  EQUIPMENT_CATEGORIES.forEach(cat => {
+    const count = countInCategory(cat.id, selectedEquipment);
+    const card = document.querySelector(`[onclick="openEquipmentModal('${cat.id}')"]`);
+    
+    if (card) {
+      const badge = card.querySelector('.category-card-badge');
+      const hasItems = count > 0;
+      
+      badge.textContent = count;
+      badge.classList.toggle('visible', hasItems);
+      card.classList.toggle('has-items', hasItems);
+    }
   });
   
-  // Update category counts
-  document.querySelectorAll('[id^="count-"]').forEach(el => el.textContent = '');
-  
-  // Select bodyweight option
-  document.getElementById('bodyweight-btn')?.classList.add('selected');
-  
-  // Update total count
-  const totalCount = document.getElementById('equipment-count');
-  if (totalCount) totalCount.textContent = '0 items selected';
-};
+  updateTotalCount();
+  updateButtonText();
+}
+
+function updateTotalCount() {
+  const selectedEquipment = store.get('equipment') || [];
+  const totalEl = document.getElementById('equipment-total');
+  if (totalEl) {
+    totalEl.textContent = `${selectedEquipment.length} items selected`;
+  }
+}
+
+function updateButtonText() {
+  const selectedEquipment = store.get('equipment') || [];
+  const btn = document.querySelector('.onboarding-actions .btn-primary');
+  if (btn) {
+    btn.textContent = selectedEquipment.length > 0 ? 'Finish setup' : 'Continue with bodyweight only';
+  }
+}
 
 window.saveEquipment = function() {
   store.completeOnboarding();
