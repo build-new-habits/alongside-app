@@ -298,7 +298,26 @@
 }
 
 /* ============================================
-   WEIGHT INPUT WITH UNIT
+   FORM SECTIONS
+   ============================================ */
+
+.form-section {
+  margin-bottom: var(--space-5);
+}
+
+.form-label {
+  display: block;
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.form-label .text-muted {
+  font-weight: var(--font-normal);
+}
+
+/* ============================================
+   WEIGHT INPUT WITH UNIT SELECTOR
    ============================================ */
 
 .input-with-unit {
@@ -320,33 +339,128 @@
   border-radius: var(--radius-lg);
   color: var(--color-text);
   cursor: pointer;
-  min-width: 70px;
+  min-width: 80px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
 }
 
 .unit-select:focus {
   outline: none;
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-glow);
 }
 
 .unit-select option {
   background: var(--color-bg-card);
   color: var(--color-text);
+  padding: var(--space-2);
 }
 
 .unit-display {
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-base);
+  font-weight: var(--font-medium);
   color: var(--color-text-secondary);
-  min-width: 50px;
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  min-width: 60px;
+  text-align: center;
 }
 
 /* ============================================
-   SUMMARY CARD
+   RADIO GROUPS
    ============================================ */
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.radio-group.horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.radio-group.horizontal .radio-option {
+  flex: 1;
+  min-width: 80px;
+  text-align: center;
+  justify-content: center;
+}
+
+.radio-option {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+}
+
+.radio-option.compact {
+  padding: var(--space-3) var(--space-4);
+}
+
+.stacked-option {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.option-label {
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.option-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ============================================
+   COACH MESSAGE CARD
+   ============================================ */
+
+.coach-message-card {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.coach-message-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+  background: var(--color-bg-card);
+}
+
+.coach-message-text {
+  flex: 1;
+}
+
+.coach-message-text p {
+  margin-bottom: var(--space-2);
+}
+
+.coach-message-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================
+   SUMMARY CARD (Complete screen)
+   ============================================ */
+
+.summary-card {
+  margin-top: var(--space-4);
+}
 
 .summary-card h3 {
   text-align: center;
   margin-bottom: var(--space-4);
+  color: var(--color-text);
 }
 
 .summary-row {
@@ -356,13 +470,26 @@
   margin-bottom: var(--space-2);
   flex-wrap: wrap;
   text-align: center;
+  line-height: var(--leading-relaxed);
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
 }
 
 .summary-label {
-  color: var(--color-text-muted);
-  font-weight: var(--font-medium);
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
 }
 
 .summary-value {
   color: var(--color-text);
+}
+
+/* ============================================
+   HIDDEN UTILITY
+   ============================================ */
+
+.hidden {
+  display: none !important;
 }
