@@ -1,0 +1,282 @@
+/* ============================================
+   EQUIPMENT MODAL STYLES
+   equipment-modal.css
+   ============================================ */
+
+/* ============================================
+   CATEGORY CARDS (Main screen)
+   ============================================ */
+
+.equipment-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.equipment-category-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-align: left;
+  width: 100%;
+}
+
+.equipment-category-card:hover {
+  border-color: var(--color-border);
+  background: var(--color-bg-hover);
+}
+
+.equipment-category-card.has-items {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.08);
+}
+
+.category-card-icon {
+  font-size: 1.75rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.equipment-category-card.has-items .category-card-icon {
+  background: rgba(45, 212, 191, 0.15);
+}
+
+.category-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.category-card-name {
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-1);
+}
+
+.category-card-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-card-badge {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: var(--color-bg-deep);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  border-radius: var(--radius-full);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all var(--transition-normal);
+}
+
+.category-card-badge.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.category-card-chevron {
+  font-size: 1.5rem;
+  color: var(--color-text-muted);
+  margin-left: var(--space-2);
+}
+
+.bodyweight-note {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+/* ============================================
+   MODAL OVERLAY
+   ============================================ */
+
+.equipment-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.equipment-modal.hidden {
+  display: none;
+}
+
+.equipment-modal.visible {
+  opacity: 1;
+}
+
+/* ============================================
+   MODAL CONTENT
+   ============================================ */
+
+.equipment-modal-content {
+  width: 100%;
+  max-width: var(--max-width);
+  max-height: 85vh;
+  background: var(--color-bg);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.equipment-modal.visible .equipment-modal-content {
+  transform: translateY(0);
+}
+
+.equipment-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.equipment-modal-header h2 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  margin: 0;
+}
+
+.modal-close-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-card);
+  border: none;
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.modal-close-btn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.equipment-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.equipment-modal-footer {
+  padding: var(--space-4) var(--space-5);
+  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   EQUIPMENT ITEMS IN MODAL
+   ============================================ */
+
+.equipment-item-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  width: 100%;
+}
+
+.equipment-item-card:hover {
+  background: var(--color-bg-hover);
+}
+
+.equipment-item-card.selected {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.1);
+}
+
+.item-checkbox {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.equipment-item-card.selected .item-checkbox {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-bg-deep);
+}
+
+.item-name {
+  color: var(--color-text);
+  font-weight: var(--font-medium);
+}
+
+/* ============================================
+   DESKTOP MODAL (centered instead of bottom)
+   ============================================ */
+
+@media (min-width: 600px) {
+  .equipment-modal {
+    align-items: center;
+    padding: var(--space-6);
+  }
+  
+  .equipment-modal-content {
+    max-height: 80vh;
+    border-radius: var(--radius-xl);
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+  }
+  
+  .equipment-modal.visible .equipment-modal-content {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
