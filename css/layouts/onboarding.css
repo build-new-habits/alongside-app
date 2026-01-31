@@ -296,3 +296,46 @@
 .text-center {
   text-align: center;
 }
+
+/* ============================================
+   WEIGHT INPUT WITH UNIT
+   ============================================ */
+
+.input-with-unit {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.input-with-unit .input-field {
+  flex: 1;
+}
+
+.unit-select {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  cursor: pointer;
+  min-width: 70px;
+}
+
+.unit-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.unit-select option {
+  background: var(--color-bg-card);
+  color: var(--color-text);
+}
+
+.unit-display {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  min-width: 50px;
+}
