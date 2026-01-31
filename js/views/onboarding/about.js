@@ -92,8 +92,15 @@ export function render() {
 }
 
 // Global functions for onclick handlers
-window.setGender = function(gender) {
-  store.set('gender', gender);
+window.setGender = function(genderId) {
+  // Save current age value before re-rendering
+  const ageInput = document.getElementById('user-age');
+  if (ageInput && ageInput.value) {
+    store.set('age', parseInt(ageInput.value));
+  }
+  
+  store.set('gender', genderId);
+  
   // Re-render to show/hide hormonal option
   router.navigate('onboarding/about');
 };
