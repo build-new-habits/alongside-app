@@ -41,8 +41,13 @@ export function render() {
         </div>
         
         <div class="welcome-message card card-coach">
-          <p>Each day, I'll check in with you and suggest movement that matches how you're feeling.</p>
-          <p>No pressure. No judgment. Just support.</p>
+          <div class="coach-message-content">
+            <img src="assets/images/logo-icon-small.png" alt="Coach" class="coach-icon-small">
+            <div>
+              <p>Each day, I'll check in with you and suggest movement that matches how you're feeling.</p>
+              <p class="text-secondary">No pressure. No judgment. Just support.</p>
+            </div>
+          </div>
         </div>
         
         <div class="summary-card card">
