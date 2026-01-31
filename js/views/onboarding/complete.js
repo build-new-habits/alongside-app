@@ -40,13 +40,11 @@ export function render() {
           <p class="lead">I've got everything I need to start helping you.</p>
         </div>
         
-        <div class="welcome-message card card-coach">
-          <div class="coach-message-content">
-            <img src="assets/images/logo-icon-small.png" alt="Coach" class="coach-icon-small">
-            <div>
-              <p>Each day, I'll check in with you and suggest movement that matches how you're feeling.</p>
-              <p class="text-secondary">No pressure. No judgment. Just support.</p>
-            </div>
+        <div class="coach-message-card card card-coach">
+          <img src="assets/images/logo-icon-small.png" alt="Coach" class="coach-message-icon">
+          <div class="coach-message-text">
+            <p>Each day, I'll check in with you and suggest movement that matches how you're feeling.</p>
+            <p class="text-muted">No pressure. No judgment. Just support.</p>
           </div>
         </div>
         
