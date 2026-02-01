@@ -8,24 +8,10 @@
 /* Layouts */
 @import 'layouts/app-shell.css';
 @import 'layouts/onboarding.css';
+@import 'layouts/onboarding-fixes.css';
 
 /* Components */
 @import 'components/buttons.css';
 @import 'components/cards.css';
-
-/* main.css - Import all styles for Alongside */
-
-/* Base */
-@import 'base/variables.css';
-@import 'base/reset.css';
-@import 'base/typography.css';
-
-/* Layouts */
-@import 'layouts/app-shell.css';
-@import 'layouts/onboarding.css';
-@import 'layouts/onboarding-fixes.css';    /* ADD THIS */
-
-/* Components */
-@import 'components/buttons.css';
-@import 'components/cards.css';
-@import 'components/equipment-modal.css';  /* ADD THIS */
+@import 'components/equipment-modal.css';  
+@import 'components/checkin.css';          
