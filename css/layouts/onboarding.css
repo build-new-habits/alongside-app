@@ -498,6 +498,7 @@
    SETTINGS PAGE
    ============================================ */
 
+/* Settings Row */
 .settings-row {
   display: flex;
   justify-content: space-between;
@@ -514,6 +515,7 @@
   color: var(--color-text);
 }
 
+/* Card List spacing */
 .card-list .card {
   margin-bottom: var(--space-3);
 }
