@@ -1,0 +1,27 @@
+/* ============================================
+   SETTINGS PAGE
+   ============================================ */
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) 0;
+}
+
+.settings-label {
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
+
+.settings-value {
+  color: var(--color-text);
+}
+
+.card-list .card {
+  margin-bottom: var(--space-3);
+}
+
+.card-list .card:last-of-type {
+  margin-bottom: 0;
+}
