@@ -513,3 +513,11 @@
 .settings-value {
   color: var(--color-text);
 }
+
+.card-list .card {
+  margin-bottom: var(--space-3);
+}
+
+.card-list .card:last-of-type {
+  margin-bottom: 0;
+}
