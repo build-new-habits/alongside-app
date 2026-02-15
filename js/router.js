@@ -8,7 +8,7 @@ import { store } from './store.js';
 export const router = {
   
   currentView: null,
-  views: {},
+  views: {},  // Will be populated with view modules
   
   /**
    * Initialise router
@@ -40,9 +40,6 @@ export const router = {
   async navigate(viewName) {
     console.log(`Navigating to: ${viewName}`);
     
-    // IMMEDIATELY scroll to top before anything else
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    
     const mainContent = document.getElementById('main-content');
     const bottomNav = document.getElementById('bottom-nav');
     
@@ -50,8 +47,11 @@ export const router = {
     mainContent.innerHTML = '';
     mainContent.className = 'main-content';
     
-    // Hide/show bottom nav
-    if (viewName.startsWith('onboarding')) {
+    // Hide/show bottom nav based on view
+    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin'];
+    const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
+    
+    if (shouldHideNav) {
       bottomNav.classList.add('hidden');
     } else {
       bottomNav.classList.remove('hidden');
@@ -71,27 +71,18 @@ export const router = {
         // Render the view
         mainContent.innerHTML = view.render();
         
-        // Call onMount if it exists
+        // Call onMount if it exists (for attaching handlers, focusing inputs, etc.)
         if (view.onMount) {
           view.onMount();
         }
       }
     } catch (e) {
       console.error(`Error loading view: ${viewName}`, e);
-      mainContent.innerHTML = `
-        <div class="view">
-          <div class="card card-coach">
-            <p><strong>Error loading view:</strong> ${viewName}</p>
-            <p class="text-secondary">${e.message}</p>
-            <button class="btn btn-primary" onclick="router.navigate('onboarding/welcome')" style="margin-top: var(--space-4);">
-              Start Over
-            </button>
-          </div>
-        </div>
-      `;
+      mainContent.innerHTML = `<div class="error">Error loading view: ${e.message}</div>`;
     }
     
     this.currentView = viewName;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
   
   /**
@@ -112,7 +103,7 @@ export const router = {
       return module;
     } catch (e) {
       console.error(`Failed to load view: ${path}`, e);
-      throw e;
+      return null;
     }
   },
   
