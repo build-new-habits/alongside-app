@@ -1,11 +1,11 @@
 /**
  * today.js - Today View
- * Shows check-in prompt or workout options after check-in
+ * Shows check-in prompt or generated workout options
  */
 
 import { store } from '../store.js';
 import { checkinData } from '../data/checkin.js';
-import { getGoalName } from '../data/goals.js';
+import { workoutGenerator } from '../data/workoutGenerator.js';
 
 export const centered = false;
 
@@ -32,7 +32,7 @@ function renderCheckinPrompt(name) {
       </div>
       
       ${burnout.level !== 'none' ? `
-        <div class="card card-warning" style="margin-bottom: var(--space-4);">
+        <div class="card card-warning">
           <div class="warning-content">
             <span class="warning-icon">💛</span>
             <p>${burnout.message}</p>
@@ -40,22 +40,19 @@ function renderCheckinPrompt(name) {
         </div>
       ` : ''}
       
-      <div class="card card-coach checkin-prompt-card">
+      <div class="card card-coach">
         <img src="assets/images/logo-icon-small.png" alt="Coach" class="coach-icon-small">
-        <div class="checkin-prompt-content">
+        <div class="coach-prompt-content">
           <p><strong>Ready to check in?</strong></p>
           <p class="text-secondary">It only takes 30 seconds, and helps me suggest the right workout for today.</p>
         </div>
       </div>
       
-      <button class="btn btn-primary btn-large btn-full" onclick="router.navigate('checkin')" style="margin-top: var(--space-4);">
+      <button class="btn btn-primary btn-large btn-full" id="start-checkin-btn" style="margin-top: var(--space-4);">
         Start Check-In
       </button>
       
-      <div class="today-summary" style="margin-top: var(--space-6);">
-        <h3>Your recent check-ins</h3>
-        ${renderRecentHistory()}
-      </div>
+      ${renderRecentHistory()}
     </div>
   `;
 }
@@ -65,35 +62,31 @@ function renderTodaysDashboard(name) {
   const intensity = store.get('todayIntensity') || 'moderate';
   const burnout = checkinData.detectBurnout();
   
-  // Build intensity message
-  const intensityMessages = {
-    recovery: "Based on how you're feeling, today is about gentle recovery.",
-    gentle: "Let's keep it light today - movement without strain.",
-    moderate: "You're ready for a solid session today.",
-    challenging: "You've got great energy - let's make the most of it!"
+  // Generate or get workouts
+  const workouts = workoutGenerator.getTodaysWorkouts();
+  
+  // Intensity display
+  const intensityDisplay = {
+    recovery: { label: 'Recovery', color: 'purple', message: 'Focus on gentle movement and rest.' },
+    gentle: { label: 'Gentle', color: 'green', message: 'Light activity without strain.' },
+    moderate: { label: 'Moderate', color: 'teal', message: 'A solid, balanced session.' },
+    challenging: { label: 'Challenging', color: 'orange', message: 'Push yourself - you\'ve got the energy!' }
   };
   
-  const intensityEmojis = {
-    recovery: '🧘',
-    gentle: '🌱',
-    moderate: '💪',
-    challenging: '🔥'
-  };
+  const display = intensityDisplay[intensity] || intensityDisplay.moderate;
   
   return `
     <div class="view">
       <div class="view-header">
         <h1>Today's Plan</h1>
-        <p class="text-secondary">${new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+        <p class="text-secondary">${formatDate(new Date())}</p>
       </div>
       
       <!-- Check-in Summary -->
       <div class="card checkin-summary-card">
         <div class="checkin-summary-header">
           <h3>Your Check-In</h3>
-          <button class="btn btn-ghost btn-small" onclick="router.navigate('checkin')">
-            Update
-          </button>
+          <button class="btn btn-ghost btn-small" id="update-checkin-btn">Update</button>
         </div>
         <div class="checkin-summary-stats">
           <div class="stat">
@@ -115,72 +108,56 @@ function renderTodaysDashboard(name) {
       </div>
       
       <!-- Coach Recommendation -->
-      <div class="card card-coach recommendation-card">
+      <div class="card card-coach">
         <img src="assets/images/logo-icon-small.png" alt="Coach" class="coach-icon-small">
         <div class="recommendation-content">
           <div class="intensity-badge ${intensity}">
-            ${intensityEmojis[intensity]} ${intensity.charAt(0).toUpperCase() + intensity.slice(1)}
+            ${getIntensityIcon(intensity)} ${display.label}
           </div>
-          <p>${intensityMessages[intensity]}</p>
+          <p>${display.message}</p>
           ${burnout.level !== 'none' ? `
-            <p class="text-sm text-muted" style="margin-top: var(--space-2);">
-              ${burnout.reasons.join('. ')}.
-            </p>
+            <p class="text-sm text-muted">${burnout.reasons.join('. ')}.</p>
           ` : ''}
         </div>
       </div>
       
-      <!-- Workout Options Placeholder -->
-      <div class="workout-options" style="margin-top: var(--space-4);">
-        <h3>Today's Options</h3>
-        <p class="text-secondary" style="margin-bottom: var(--space-4);">Choose what feels right:</p>
+      <!-- Workout Options -->
+      <div class="workout-options">
+        <h2>Today's Options</h2>
+        <p class="text-secondary">Choose what feels right:</p>
         
-        <div class="workout-option-card card">
-          <div class="option-header">
-            <span class="option-icon">💪</span>
-            <div class="option-info">
-              <h4>Strength Focus</h4>
-              <p class="text-sm text-muted">25 mins • 6 exercises</p>
-            </div>
-          </div>
-          <p class="text-sm text-secondary">Build strength with compound movements matched to your energy.</p>
-          <button class="btn btn-primary btn-full" style="margin-top: var(--space-3);" disabled>
-            Coming Soon
-          </button>
+        ${workouts.map((workout, index) => renderWorkoutCard(workout, index)).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderWorkoutCard(workout, index) {
+  return `
+    <div class="card workout-option-card" data-workout-index="${index}">
+      <div class="option-header">
+        <span class="option-icon">${workout.icon}</span>
+        <div class="option-info">
+          <h4>${workout.name}</h4>
+          <p class="text-sm text-muted">${workout.duration} mins • ${workout.exerciseCount} exercises</p>
         </div>
-        
-        <div class="workout-option-card card" style="margin-top: var(--space-3);">
-          <div class="option-header">
-            <span class="option-icon">🧘</span>
-            <div class="option-info">
-              <h4>Mobility & Recovery</h4>
-              <p class="text-sm text-muted">20 mins • 8 exercises</p>
-            </div>
-          </div>
-          <p class="text-sm text-secondary">Gentle movement to ease tension and improve flexibility.</p>
-          <button class="btn btn-secondary btn-full" style="margin-top: var(--space-3);" disabled>
-            Coming Soon
-          </button>
-        </div>
-        
-        <div class="workout-option-card card" style="margin-top: var(--space-3);">
-          <div class="option-header">
-            <span class="option-icon">❤️</span>
-            <div class="option-info">
-              <h4>Cardio Boost</h4>
-              <p class="text-sm text-muted">20 mins • 5 exercises</p>
-            </div>
-          </div>
-          <p class="text-sm text-secondary">Get your heart pumping with exercises matched to your fitness level.</p>
-          <button class="btn btn-secondary btn-full" style="margin-top: var(--space-3);" disabled>
-            Coming Soon
-          </button>
-        </div>
+        <span class="option-credits">+${workout.totalCredits} ⭐</span>
       </div>
       
-      <p class="text-sm text-muted text-center" style="margin-top: var(--space-6);">
-        Workout generation coming in the next update!
-      </p>
+      <p class="workout-rationale">${workout.rationale}</p>
+      
+      <div class="workout-exercises-preview">
+        ${workout.exercises.slice(0, 3).map(e => `
+          <span class="exercise-tag">${e.name}</span>
+        `).join('')}
+        ${workout.exercises.length > 3 ? `
+          <span class="exercise-tag more">+${workout.exercises.length - 3} more</span>
+        ` : ''}
+      </div>
+      
+      <button class="btn btn-primary btn-full workout-start-btn" data-workout-index="${index}">
+        Start Workout
+      </button>
     </div>
   `;
 }
@@ -190,19 +167,25 @@ function renderRecentHistory() {
   
   if (history.length === 0) {
     return `
-      <p class="text-sm text-muted">No check-ins yet. Start your first one above!</p>
+      <div class="card" style="margin-top: var(--space-6);">
+        <h3>Your Recent Check-Ins</h3>
+        <p class="text-sm text-muted">No check-ins yet. Start your first one above!</p>
+      </div>
     `;
   }
   
   return `
-    <div class="history-mini">
-      ${history.map(day => `
-        <div class="history-day">
-          <span class="history-date">${formatShortDate(day.date)}</span>
-          <span class="history-emoji">${checkinData.getEnergyEmoji(day.energy)}</span>
-          <span class="history-value">${day.energy}</span>
-        </div>
-      `).join('')}
+    <div class="card" style="margin-top: var(--space-6);">
+      <h3>Your Recent Check-Ins</h3>
+      <div class="history-mini">
+        ${history.map(day => `
+          <div class="history-day">
+            <span class="history-date">${formatShortDate(day.date)}</span>
+            <span class="history-emoji">${checkinData.getEnergyEmoji(day.energy)}</span>
+            <span class="history-value">${day.energy}</span>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 }
@@ -212,6 +195,14 @@ function getTimeGreeting() {
   if (hour < 12) return 'Good morning';
   if (hour < 17) return 'Good afternoon';
   return 'Good evening';
+}
+
+function formatDate(date) {
+  return date.toLocaleDateString('en-GB', { 
+    weekday: 'long', 
+    day: 'numeric', 
+    month: 'long' 
+  });
 }
 
 function formatShortDate(dateString) {
@@ -228,4 +219,44 @@ function formatShortDate(dateString) {
   }
   
   return date.toLocaleDateString('en-GB', { weekday: 'short' });
+}
+
+function getIntensityIcon(intensity) {
+  const icons = {
+    recovery: '🧘',
+    gentle: '🌱',
+    moderate: '💪',
+    challenging: '🔥'
+  };
+  return icons[intensity] || '💪';
+}
+
+export function onMount() {
+  // Start check-in button
+  const startBtn = document.getElementById('start-checkin-btn');
+  if (startBtn) {
+    startBtn.addEventListener('click', () => {
+      router.navigate('checkin');
+    });
+  }
+  
+  // Update check-in button
+  const updateBtn = document.getElementById('update-checkin-btn');
+  if (updateBtn) {
+    updateBtn.addEventListener('click', () => {
+      router.navigate('checkin');
+    });
+  }
+  
+  // Workout start buttons
+  document.querySelectorAll('.workout-start-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const index = e.target.dataset.workoutIndex;
+      const workouts = store.get('todaysWorkouts');
+      if (workouts && workouts[index]) {
+        store.set('activeWorkout', workouts[index]);
+        router.navigate('workout');
+      }
+    });
+  });
 }
