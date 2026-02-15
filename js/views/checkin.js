@@ -1,6 +1,8 @@
 /**
  * checkin.js - Daily Check-In View
  * The core daily interaction - how are you feeling today?
+ * 
+ * FIXED: Event handlers now properly attached
  */
 
 import { store } from '../store.js';
@@ -29,7 +31,7 @@ export function render() {
   // Initialize condition levels
   conditions.forEach(c => {
     if (!currentCheckin.conditionLevels[c]) {
-      currentCheckin.conditionLevels[c] = 3; // Default to low pain
+      currentCheckin.conditionLevels[c] = 1; // Default to low pain
     }
   });
   
@@ -65,7 +67,6 @@ export function render() {
             min="1" 
             max="10" 
             value="${currentCheckin.energy}"
-            oninput="updateEnergy(this.value)"
           >
           <div class="slider-labels">
             <span>Exhausted</span>
@@ -90,7 +91,6 @@ export function render() {
             min="1" 
             max="10" 
             value="${currentCheckin.mood}"
-            oninput="updateMood(this.value)"
           >
           <div class="slider-labels">
             <span>Struggling</span>
@@ -108,20 +108,17 @@ export function render() {
           <div class="sleep-hours">
             <label class="input-label">Hours</label>
             <div class="hours-adjuster">
-              <button class="btn btn-icon" onclick="adjustSleepHours(-0.5)">−</button>
+              <button type="button" class="btn-icon" id="sleep-minus">−</button>
               <span class="hours-value" id="sleep-hours-display">${currentCheckin.sleepHours}</span>
-              <button class="btn btn-icon" onclick="adjustSleepHours(0.5)">+</button>
+              <button type="button" class="btn-icon" id="sleep-plus">+</button>
             </div>
           </div>
           <div class="sleep-quality">
             <label class="input-label">Quality</label>
-            <div class="quality-options">
-              <button class="btn-pill ${currentCheckin.sleepQuality === 'poor' ? 'selected' : ''}" 
-                      onclick="setSleepQuality('poor')">Poor</button>
-              <button class="btn-pill ${currentCheckin.sleepQuality === 'okay' ? 'selected' : ''}" 
-                      onclick="setSleepQuality('okay')">Okay</button>
-              <button class="btn-pill ${currentCheckin.sleepQuality === 'good' ? 'selected' : ''}" 
-                      onclick="setSleepQuality('good')">Good</button>
+            <div class="quality-options" id="quality-buttons">
+              <button type="button" class="btn-pill ${currentCheckin.sleepQuality === 'poor' ? 'selected' : ''}" data-quality="poor">Poor</button>
+              <button type="button" class="btn-pill ${currentCheckin.sleepQuality === 'okay' ? 'selected' : ''}" data-quality="okay">Okay</button>
+              <button type="button" class="btn-pill ${currentCheckin.sleepQuality === 'good' ? 'selected' : ''}" data-quality="good">Good</button>
             </div>
           </div>
         </div>
@@ -136,30 +133,18 @@ export function render() {
           <div class="condition-checks">
             ${conditions.map(conditionId => {
               const condition = CONDITIONS.find(c => c.id === conditionId);
-              const level = currentCheckin.conditionLevels[conditionId] || 3;
+              const level = currentCheckin.conditionLevels[conditionId] || 1;
               return `
-                <div class="condition-check">
+                <div class="condition-check" data-condition="${conditionId}">
                   <div class="condition-info">
                     <span class="condition-icon">${condition?.icon || '🩹'}</span>
                     <span class="condition-name">${condition?.name || conditionId}</span>
                   </div>
                   <div class="pain-selector">
-                    <button class="pain-btn ${level <= 2 ? 'selected low' : ''}" 
-                            onclick="setConditionPain('${conditionId}', 1)">
-                      Low
-                    </button>
-                    <button class="pain-btn ${level > 2 && level <= 5 ? 'selected medium' : ''}" 
-                            onclick="setConditionPain('${conditionId}', 4)">
-                      Medium
-                    </button>
-                    <button class="pain-btn ${level > 5 && level <= 7 ? 'selected high' : ''}" 
-                            onclick="setConditionPain('${conditionId}', 6)">
-                      High
-                    </button>
-                    <button class="pain-btn ${level > 7 ? 'selected severe' : ''}" 
-                            onclick="setConditionPain('${conditionId}', 9)">
-                      Severe
-                    </button>
+                    <button type="button" class="pain-btn ${level <= 2 ? 'selected low' : ''}" data-level="1">Low</button>
+                    <button type="button" class="pain-btn ${level > 2 && level <= 5 ? 'selected medium' : ''}" data-level="4">Medium</button>
+                    <button type="button" class="pain-btn ${level > 5 && level <= 7 ? 'selected high' : ''}" data-level="6">High</button>
+                    <button type="button" class="pain-btn ${level > 7 ? 'selected severe' : ''}" data-level="9">Severe</button>
                   </div>
                 </div>
               `;
@@ -184,7 +169,6 @@ export function render() {
               min="1"
               max="45"
               value="${currentCheckin.cycleDay || ''}"
-              onchange="setCycleDay(this.value)"
             >
             <p class="text-sm text-muted">Day 1 = first day of period</p>
           </div>
@@ -200,15 +184,14 @@ export function render() {
         <textarea 
           id="checkin-notes"
           class="input-field notes-input"
-          placeholder="Sore from yesterday, feeling anxious, etc..."
-          rows="2"
-          onchange="currentCheckin.notes = this.value"
+          placeholder="Sore from yesterday, feeling anxious, big day ahead..."
+          rows="3"
         >${currentCheckin.notes}</textarea>
       </div>
       
       <!-- Submit -->
       <div class="checkin-actions">
-        <button class="btn btn-primary btn-large btn-full" onclick="submitCheckin()">
+        <button type="button" class="btn btn-primary btn-large btn-full" id="submit-checkin">
           See today's workout options
         </button>
       </div>
@@ -217,10 +200,94 @@ export function render() {
 }
 
 export function onMount() {
-  // Reset current checkin to defaults or previous values
+  // Load existing check-in if available
   const existing = checkinData.getTodaysCheckin();
   if (existing) {
-    currentCheckin = { ...existing };
+    currentCheckin = { ...currentCheckin, ...existing };
+    // Update displays
+    updateEnergyDisplay(currentCheckin.energy);
+    updateMoodDisplay(currentCheckin.mood);
+  }
+  
+  // ============================================
+  // ATTACH EVENT LISTENERS PROPERLY
+  // ============================================
+  
+  // Energy slider
+  const energySlider = document.getElementById('energy-slider');
+  if (energySlider) {
+    energySlider.addEventListener('input', (e) => {
+      const value = parseInt(e.target.value);
+      currentCheckin.energy = value;
+      updateEnergyDisplay(value);
+    });
+  }
+  
+  // Mood slider
+  const moodSlider = document.getElementById('mood-slider');
+  if (moodSlider) {
+    moodSlider.addEventListener('input', (e) => {
+      const value = parseInt(e.target.value);
+      currentCheckin.mood = value;
+      updateMoodDisplay(value);
+    });
+  }
+  
+  // Sleep hours buttons
+  const sleepMinus = document.getElementById('sleep-minus');
+  const sleepPlus = document.getElementById('sleep-plus');
+  
+  if (sleepMinus) {
+    sleepMinus.addEventListener('click', () => adjustSleepHours(-0.5));
+  }
+  if (sleepPlus) {
+    sleepPlus.addEventListener('click', () => adjustSleepHours(0.5));
+  }
+  
+  // Sleep quality buttons
+  const qualityButtons = document.getElementById('quality-buttons');
+  if (qualityButtons) {
+    qualityButtons.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-pill');
+      if (btn && btn.dataset.quality) {
+        setSleepQuality(btn.dataset.quality);
+      }
+    });
+  }
+  
+  // Pain level buttons (using event delegation)
+  const conditionChecks = document.querySelectorAll('.condition-check');
+  conditionChecks.forEach(check => {
+    check.addEventListener('click', (e) => {
+      const btn = e.target.closest('.pain-btn');
+      if (btn && btn.dataset.level) {
+        const conditionId = check.dataset.condition;
+        const level = parseInt(btn.dataset.level);
+        setConditionPain(conditionId, level, check);
+      }
+    });
+  });
+  
+  // Cycle day input
+  const cycleInput = document.getElementById('cycle-day');
+  if (cycleInput) {
+    cycleInput.addEventListener('change', (e) => {
+      currentCheckin.cycleDay = e.target.value ? parseInt(e.target.value) : null;
+    });
+  }
+  
+  // Notes textarea
+  const notesInput = document.getElementById('checkin-notes');
+  if (notesInput) {
+    notesInput.addEventListener('change', (e) => {
+      currentCheckin.notes = e.target.value;
+    });
+  }
+  
+  // Submit button
+  const submitBtn = document.getElementById('submit-checkin');
+  if (submitBtn) {
+    submitBtn.addEventListener('click', submitCheckin);
   }
 }
 
@@ -228,78 +295,68 @@ export function onMount() {
 // UPDATE FUNCTIONS
 // ============================================
 
-window.updateEnergy = function(value) {
-  currentCheckin.energy = parseInt(value);
+function updateEnergyDisplay(value) {
   const display = document.getElementById('energy-display');
   if (display) {
     display.innerHTML = `${checkinData.getEnergyEmoji(value)} ${checkinData.getEnergyLabel(value)}`;
   }
-  updateSliderTrack('energy-slider', value);
-};
+}
 
-window.updateMood = function(value) {
-  currentCheckin.mood = parseInt(value);
+function updateMoodDisplay(value) {
   const display = document.getElementById('mood-display');
   if (display) {
     display.innerHTML = `${checkinData.getMoodEmoji(value)} ${checkinData.getMoodLabel(value)}`;
   }
-  updateSliderTrack('mood-slider', value);
-};
+}
 
-window.adjustSleepHours = function(delta) {
+function adjustSleepHours(delta) {
   currentCheckin.sleepHours = Math.max(0, Math.min(14, currentCheckin.sleepHours + delta));
   const display = document.getElementById('sleep-hours-display');
   if (display) {
     display.textContent = currentCheckin.sleepHours;
   }
-};
-
-window.setSleepQuality = function(quality) {
-  currentCheckin.sleepQuality = quality;
-  document.querySelectorAll('.quality-options .btn-pill').forEach(btn => {
-    btn.classList.remove('selected');
-  });
-  event.target.classList.add('selected');
-};
-
-window.setConditionPain = function(conditionId, level) {
-  currentCheckin.conditionLevels[conditionId] = level;
-  
-  // Update UI - find the condition's pain buttons
-  const conditionCheck = event.target.closest('.condition-check');
-  if (conditionCheck) {
-    conditionCheck.querySelectorAll('.pain-btn').forEach(btn => {
-      btn.classList.remove('selected', 'low', 'medium', 'high', 'severe');
-    });
-    event.target.classList.add('selected');
-    if (level <= 2) event.target.classList.add('low');
-    else if (level <= 5) event.target.classList.add('medium');
-    else if (level <= 7) event.target.classList.add('high');
-    else event.target.classList.add('severe');
-  }
-};
-
-window.setCycleDay = function(value) {
-  currentCheckin.cycleDay = value ? parseInt(value) : null;
-};
-
-function updateSliderTrack(sliderId, value) {
-  const slider = document.getElementById(sliderId);
-  if (slider) {
-    const percent = ((value - 1) / 9) * 100;
-    slider.style.setProperty('--value-percent', `${percent}%`);
-  }
 }
 
-// ============================================
-// SUBMIT
-// ============================================
+function setSleepQuality(quality) {
+  currentCheckin.sleepQuality = quality;
+  
+  // Update button states
+  const buttons = document.querySelectorAll('#quality-buttons .btn-pill');
+  buttons.forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.quality === quality);
+  });
+}
 
-window.submitCheckin = function() {
+function setConditionPain(conditionId, level, container) {
+  currentCheckin.conditionLevels[conditionId] = level;
+  
+  // Update button states within this condition
+  const buttons = container.querySelectorAll('.pain-btn');
+  buttons.forEach(btn => {
+    btn.classList.remove('selected', 'low', 'medium', 'high', 'severe');
+    
+    const btnLevel = parseInt(btn.dataset.level);
+    if (btnLevel === level) {
+      btn.classList.add('selected');
+      if (level <= 2) btn.classList.add('low');
+      else if (level <= 5) btn.classList.add('medium');
+      else if (level <= 7) btn.classList.add('high');
+      else btn.classList.add('severe');
+    }
+  });
+}
+
+function submitCheckin() {
   // Get notes from textarea
   const notesEl = document.getElementById('checkin-notes');
   if (notesEl) {
     currentCheckin.notes = notesEl.value;
+  }
+  
+  // Get cycle day
+  const cycleEl = document.getElementById('cycle-day');
+  if (cycleEl && cycleEl.value) {
+    currentCheckin.cycleDay = parseInt(cycleEl.value);
   }
   
   // Save the check-in
@@ -311,7 +368,4 @@ window.submitCheckin = function() {
   
   // Navigate to today view to show workout options
   router.navigate('today');
-};
-
-// Make currentCheckin accessible for notes update
-window.currentCheckin = currentCheckin;
+}
