@@ -1,0 +1,129 @@
+/* ============================================
+   GLOBAL STYLES
+   css/base/global.css
+   
+   Consistent styling across ALL views
+   ============================================ */
+
+/* ============================================
+   TEAL HEADINGS - EVERYWHERE
+   This ensures visual consistency and structure
+   ============================================ */
+
+/* All h2 and h3 in views should be teal */
+.view h2,
+.view h3,
+.onboarding-view h2,
+.onboarding-view h3,
+.checkin-view h2,
+.checkin-view h3 {
+  color: var(--color-primary);
+  font-weight: var(--font-bold);
+}
+
+/* Card headings */
+.card h3 {
+  color: var(--color-primary);
+  font-weight: var(--font-bold);
+  margin-bottom: var(--space-3);
+}
+
+/* Section headers with teal */
+.section-header h2,
+.form-section .form-label {
+  color: var(--color-primary);
+}
+
+/* Summary labels (Settings, Complete screen, etc.) */
+.summary-label,
+.settings-label {
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
+
+/* ============================================
+   CONSISTENT SPACING
+   ============================================ */
+
+/* Views should have comfortable padding */
+.view {
+  padding-bottom: var(--space-8);
+}
+
+/* Cards need breathing room */
+.card {
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+}
+
+.card:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================
+   CONSISTENT BUTTON SIZING
+   Minimum tap targets for accessibility
+   ============================================ */
+
+button,
+.btn,
+.btn-card,
+.btn-pill,
+.pain-btn,
+.radio-option {
+  min-height: 48px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================
+   FORM ELEMENTS - CONSISTENT SIZING
+   ============================================ */
+
+.input-field,
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="email"],
+textarea,
+select {
+  min-height: 56px;
+  padding: var(--space-4);
+  font-size: var(--text-base);
+}
+
+/* ============================================
+   COACH CARDS - CONSISTENT STYLING
+   ============================================ */
+
+.card-coach {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.card-coach img,
+.coach-icon-small {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+  object-fit: contain;
+  background: var(--color-bg-card);
+}
+
+/* ============================================
+   VIEW HEADERS - CONSISTENT STYLING
+   ============================================ */
+
+.view-header {
+  margin-bottom: var(--space-6);
+}
+
+.view-header h1 {
+  margin-bottom: var(--space-2);
+}
+
+.view-header p {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
