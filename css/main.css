@@ -4,6 +4,7 @@
 @import 'base/variables.css';
 @import 'base/reset.css';
 @import 'base/typography.css';
+@import 'base/global.css'; 
 
 /* Layouts */
 @import 'layouts/app-shell.css';
