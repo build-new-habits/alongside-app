@@ -1,0 +1,93 @@
+/* ============================================
+   COACH CARD FIX
+   css/components/coach-fix.css
+   
+   Removes the teal box behind coach icon
+   ============================================ */
+
+/* Remove any pseudo-element backgrounds */
+.card-coach::before,
+.card-coach::after {
+  display: none !important;
+}
+
+/* Ensure coach icon has transparent background */
+.coach-icon-small,
+.card-coach img {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Coach card layout */
+.card-coach {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding: var(--space-5);
+  position: relative;
+}
+
+/* Coach icon styling */
+.coach-icon-small {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+/* Coach prompt content */
+.coach-prompt-content {
+  flex: 1;
+}
+
+.coach-prompt-content p {
+  margin: 0 0 var(--space-2);
+}
+
+.coach-prompt-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Recommendation content in Today view */
+.recommendation-content {
+  flex: 1;
+}
+
+.recommendation-content p {
+  margin: 0;
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+}
+
+/* Intensity badge */
+.intensity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  margin-bottom: var(--space-3);
+}
+
+.intensity-badge.recovery {
+  background: rgba(139, 92, 246, 0.2);
+  color: #A78BFA;
+}
+
+.intensity-badge.gentle {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ADE80;
+}
+
+.intensity-badge.moderate {
+  background: rgba(45, 212, 191, 0.2);
+  color: var(--color-primary);
+}
+
+.intensity-badge.challenging {
+  background: rgba(249, 115, 22, 0.2);
+  color: #FB923C;
+}
