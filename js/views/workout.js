@@ -11,7 +11,7 @@ export const centered = false;
 let currentExerciseIndex = 0;
 let timerInterval = null;
 let timeRemaining = 0;
-let isPaused = false;
+let timerStarted = false; // Timer doesn't start until user taps Start
 
 export function render() {
   const workout = store.get('activeWorkout');
@@ -56,6 +56,15 @@ export function render() {
           ${renderExerciseTarget(exercise)}
         </div>
         
+        <!-- YouTube Demo Link -->
+        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.name + ' exercise form')}" 
+           target="_blank" 
+           rel="noopener"
+           class="youtube-link">
+          <span class="youtube-icon">▶️</span>
+          Watch how to do this
+        </a>
+        
         <!-- Instructions -->
         <div class="exercise-instructions card">
           <h3>How to do it</h3>
@@ -85,8 +94,8 @@ export function render() {
       <!-- Action buttons -->
       <div class="workout-actions">
         ${exercise.duration ? `
-          <button class="btn btn-large btn-full ${isPaused ? 'btn-primary' : 'btn-secondary'}" id="timer-toggle-btn">
-            ${isPaused ? '▶ Resume' : '⏸ Pause'}
+          <button class="btn btn-large btn-full ${timerStarted ? 'btn-secondary' : 'btn-accent'}" id="timer-toggle-btn">
+            ${!timerStarted ? '▶ Start Timer' : (timerInterval ? '⏸ Pause' : '▶ Resume')}
           </button>
         ` : ''}
         
@@ -177,11 +186,11 @@ export function onMount() {
   
   const exercise = workout.exercises[currentExerciseIndex];
   
-  // Initialize timer if timed exercise
+  // Initialize timer value but DON'T start it automatically
   if (exercise.duration) {
     timeRemaining = exercise.duration;
     updateTimerDisplay();
-    startTimer();
+    // Timer will start when user taps "Start Timer"
   }
   
   // Exit button
@@ -192,15 +201,21 @@ export function onMount() {
     }
   });
   
-  // Timer toggle
+  // Timer toggle - Start/Pause/Resume
   document.getElementById('timer-toggle-btn')?.addEventListener('click', () => {
-    if (isPaused) {
+    if (!timerStarted) {
+      // First tap - start the timer
+      timerStarted = true;
       startTimer();
-    } else {
+    } else if (timerInterval) {
+      // Timer running - pause it
       pauseTimer();
+    } else {
+      // Timer paused - resume it
+      startTimer();
     }
-    isPaused = !isPaused;
-    router.navigate('workout'); // Re-render
+    // Re-render to update button text
+    router.navigate('workout');
   });
   
   // Complete exercise
@@ -285,7 +300,7 @@ function skipExercise() {
 function resetTimer() {
   pauseTimer();
   timeRemaining = 0;
-  isPaused = false;
+  timerStarted = false;
 }
 
 function completeWorkout() {
@@ -325,7 +340,7 @@ function cleanupWorkout() {
   pauseTimer();
   currentExerciseIndex = 0;
   timeRemaining = 0;
-  isPaused = false;
+  timerStarted = false;
   store.set('activeWorkout', null);
   store.set('workoutProgress', null);
 }
