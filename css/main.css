@@ -10,6 +10,7 @@
 @import 'layouts/app-shell.css';
 @import 'layouts/onboarding.css';
 @import 'layouts/onboarding-fixes.css';
+@import 'layouts/goal-setup.css';
 
 /* Components */
 @import 'components/buttons.css';
