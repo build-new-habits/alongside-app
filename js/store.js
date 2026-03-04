@@ -74,6 +74,7 @@ export const store = {
    * Get a value (supports dot notation: 'lifestyle.stressLevel')
    */
   get(path) {
+    if (!this.data) this.init();
     if (!path) return this.data;
     
     const keys = path.split('.');
