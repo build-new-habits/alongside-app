@@ -153,7 +153,7 @@ window.closeModalOnBackdrop = function(event) {
 };
 
 window.toggleEquipmentItem = function(itemId) {
-  const equipment = store.get('equipment') || [];
+  const equipment = [...(store.get('equipment') || [])];
   const index = equipment.indexOf(itemId);
   
   if (index > -1) {
