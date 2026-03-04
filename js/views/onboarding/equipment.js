@@ -177,7 +177,7 @@ window.toggleEquipmentItem = function(itemId) {
 };
 
 function updateCategoryCards() {
-  const selectedEquipment = store.get('equipment') || [];
+  const selectedEquipment = [...(store.get('equipment') || [])];
   
   EQUIPMENT_CATEGORIES.forEach(cat => {
     const count = countInCategory(cat.id, selectedEquipment);
