@@ -1,0 +1,295 @@
+/* ============================================
+   GOAL SETUP — css/layouts/goal-setup.css
+
+   Covers all four steps of the goal-setup view:
+     Step 1 — Primary goal grid  (.goal-grid, .goal-card)
+     Step 2 — Session commitment  (.session-options, .session-option)
+     Step 3 — Programme selection (.programme-list, .programme-card)
+     Step 4 — Confirmation        (.confirm-card, .confirm-row)
+
+   Add to main.css:
+     @import 'layouts/goal-setup.css';
+   ============================================ */
+
+
+/* ============================================
+   STEP 1 — PRIMARY GOAL GRID
+   ============================================ */
+
+.goal-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.goal-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  width: 100%;
+  text-align: left;
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.goal-card:hover,
+.goal-card:focus-visible {
+  border-color: var(--color-primary-light);
+  background: var(--color-bg-hover);
+  outline: none;
+}
+
+.goal-card.selected {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.1);
+}
+
+/* Teal dot in top-right corner for goals carried over from onboarding */
+.goal-card.onboarding-match::after {
+  content: '';
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+}
+
+.goal-card-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 36px;
+  text-align: center;
+}
+
+.goal-card-name {
+  flex: 1;
+  color: var(--color-text);
+  font-weight: var(--font-medium);
+  font-size: var(--text-base);
+}
+
+/* Small "from your goals" tag — shown on onboarding-match cards */
+.goal-card-tag {
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  font-weight: var(--font-medium);
+  background: rgba(45, 212, 191, 0.12);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+
+/* ============================================
+   STEP 2 — SESSION COMMITMENT
+   ============================================ */
+
+.session-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.session-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  width: 100%;
+  text-align: left;
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.session-option:hover,
+.session-option:focus-visible {
+  border-color: var(--color-primary-light);
+  background: var(--color-bg-hover);
+  outline: none;
+}
+
+.session-option.selected {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.1);
+}
+
+.session-option-label {
+  color: var(--color-text);
+  font-weight: var(--font-semibold);
+  font-size: var(--text-base);
+}
+
+.session-option-desc {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+
+/* ============================================
+   STEP 3 — PROGRAMME SELECTION
+   ============================================ */
+
+.programme-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.programme-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  width: 100%;
+  text-align: left;
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.programme-card:hover,
+.programme-card:focus-visible {
+  border-color: var(--color-primary-light);
+  background: var(--color-bg-hover);
+  outline: none;
+}
+
+.programme-card.selected {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.08);
+}
+
+.programme-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.programme-card-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.programme-card-titles {
+  flex: 1;
+}
+
+.programme-card-name {
+  color: var(--color-text);
+  font-weight: var(--font-bold);
+  font-size: var(--text-lg);
+  line-height: var(--leading-tight);
+}
+
+.programme-card-tagline {
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  margin-top: var(--space-1);
+}
+
+.programme-card-check {
+  color: var(--color-primary);
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  flex-shrink: 0;
+}
+
+.programme-card-desc {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+.programme-card-meta {
+  display: flex;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+}
+
+/* Phase pill row */
+.programme-phases {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.phase-pill {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-full);
+  padding: 2px var(--space-3);
+  white-space: nowrap;
+}
+
+.phase-arrow {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+
+/* ============================================
+   STEP 4 — CONFIRMATION
+   ============================================ */
+
+.confirm-icon {
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: var(--space-4);
+}
+
+.confirm-card {
+  margin-top: var(--space-5);
+}
+
+.confirm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.confirm-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.confirm-label {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  flex-shrink: 0;
+}
+
+.confirm-value {
+  color: var(--color-text);
+  font-weight: var(--font-semibold);
+  text-align: right;
+}
