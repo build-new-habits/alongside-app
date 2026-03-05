@@ -624,4 +624,685 @@ export const STRENGTH = [
     credits: 30
   }
 
+
+  ,
+
+  // ============================================
+  // KETTLEBELL EXERCISES — Batch 17a (12 items)
+  // ============================================
+
+  {
+    id: 'kettlebell-swing',
+    name: 'Kettlebell Swing',
+    category: 'strength',
+    movementPattern: 'hinge',
+    equipment: ['kettlebell'],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'hamstring', 'lower-back', 'shoulder'],
+    contraindications: ['lower-back-acute', 'hamstring-acute'],
+    energyRequired: 7,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand with feet shoulder-width apart, kettlebell on the floor between your feet',
+      'Hinge at the hip to grip the bell, then hike it back between your legs like a hike pass in football',
+      'Drive through the hips explosively to swing the bell to shoulder height',
+      'Let the bell float at the top — do not pull it up with the arms',
+      'Hinge again as it descends, absorbing the load with the hips',
+      'Complete 3 sets of 15 reps'
+    ],
+    coaching: 'This is a hip hinge, not a squat. The power comes from the hips snapping forward — not from lifting with the arms or rounding the back.',
+    why: 'The kettlebell swing builds explosive hip power, posterior chain strength, and cardiovascular capacity simultaneously. One of the most effective single exercises available.',
+    credits: 80
+  },
+
+  {
+    id: 'kettlebell-goblet-squat',
+    name: 'Kettlebell Goblet Squat',
+    category: 'strength',
+    movementPattern: 'squat',
+    equipment: ['kettlebell'],
+    equipmentOptional: ['dumbbell'],
+    affectsAreas: ['quadriceps', 'glutes', 'adductors'],
+    contraindications: ['knee-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Hold a kettlebell by the horns (sides of the handle) at chest height',
+      'Stand with feet slightly wider than hip-width, toes turned out 30 degrees',
+      'Squat down, driving the knees out over the toes',
+      'At the bottom, let the elbows press against the inner knees to open the hips',
+      'Drive through the heels to stand',
+      'Complete 3 sets of 12 reps'
+    ],
+    coaching: 'The goblet hold keeps the torso upright — the counterbalance of the weight in front naturally prevents forward lean. The best teaching squat there is.',
+    why: 'The front-loaded position forces an upright torso and deep hip crease. Improves squat mechanics and builds full lower body strength.',
+    credits: 65
+  },
+
+  {
+    id: 'kettlebell-clean',
+    name: 'Kettlebell Clean',
+    category: 'strength',
+    movementPattern: 'hinge',
+    equipment: ['kettlebell'],
+    equipmentOptional: [],
+    affectsAreas: ['full-body', 'glutes', 'hamstring', 'shoulder'],
+    contraindications: ['lower-back-acute', 'wrist-elbow-acute'],
+    energyRequired: 7,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Stand with the kettlebell between your feet',
+      'Hinge and grip the bell in one hand',
+      'Hike it back, then drive the hips forward to generate power',
+      'As the bell rises, pull the elbow back and rotate it under the bell',
+      'Catch the bell in the rack position — resting on the forearm, close to the body',
+      'Lower back to the swing hike position',
+      'Complete 5 reps each side, 3 sets'
+    ],
+    coaching: 'The clean is all about the timing of rotating under the bell. If it bangs your wrist, you are muscling it rather than rotating. Practise the swing first.',
+    why: 'The clean is the foundational kettlebell movement — used to get the bell into the rack position for presses and squats. Builds full-body power and coordination.',
+    credits: 80
+  },
+
+  {
+    id: 'kettlebell-press',
+    name: 'Kettlebell Press',
+    category: 'strength',
+    movementPattern: 'push',
+    equipment: ['kettlebell'],
+    equipmentOptional: [],
+    affectsAreas: ['shoulder', 'triceps-biceps', 'abdominals'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Stand with the kettlebell in the rack position — resting on the forearm, close to the chest',
+      'Brace the core hard',
+      'Press the bell straight up to arm extension — the arm finishes alongside the ear',
+      'Lower with control back to the rack position',
+      'Complete 5 reps each side, 3 sets'
+    ],
+    coaching: 'The single-arm press challenges core anti-rotation — the whole body must resist the tendency to lean away from the load. Stay tall.',
+    why: 'Builds shoulder strength and pressing power with an additional core stability demand that bilateral pressing does not provide.',
+    credits: 70
+  },
+
+  {
+    id: 'kettlebell-turkish-getup',
+    name: 'Turkish Get-Up',
+    category: 'strength',
+    movementPattern: 'hinge',
+    equipment: ['kettlebell'],
+    equipmentOptional: [],
+    affectsAreas: ['full-body', 'shoulder', 'abdominals', 'hip'],
+    contraindications: ['shoulder-acute', 'wrist-elbow-acute', 'lower-back-acute'],
+    energyRequired: 7,
+    duration: 180,
+    perSide: true,
+    instructions: [
+      'Lie on your back, right arm pressing the bell to the ceiling, left arm at 45 degrees',
+      'Right leg bent at 90 degrees, left leg straight',
+      'Roll to your left elbow, then left hand, as you sit up',
+      'Lift your hips off the floor into a bridge',
+      'Sweep the left leg back to a lunge position',
+      'Stand up from the lunge',
+      'Reverse the entire sequence to return to the floor — this is one rep',
+      'Complete 3 reps each side'
+    ],
+    coaching: 'Learn this without a kettlebell first — use a shoe balanced on your fist. Speed is the enemy here. Slow is controlled, controlled is safe.',
+    why: 'The Turkish get-up tests and builds shoulder stability, hip mobility, and total body coordination. Called "a full physical assessment in one movement" by strength coaches.',
+    credits: 100
+  },
+
+  {
+    id: 'kettlebell-deadlift',
+    name: 'Kettlebell Deadlift',
+    category: 'strength',
+    movementPattern: 'hinge',
+    equipment: ['kettlebell'],
+    equipmentOptional: ['dumbbell'],
+    affectsAreas: ['glutes', 'hamstring', 'lower-back'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 5,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand with the kettlebell on the floor between your feet',
+      'Hinge at the hip, keeping the back flat, and grip the bell with both hands',
+      'Drive through the heels to stand — hips and shoulders rise at the same rate',
+      'At the top, stand fully upright — do not hyperextend the lower back',
+      'Lower with control, hinging at the hip',
+      'Complete 4 sets of 8 reps'
+    ],
+    coaching: 'The kettlebell deadlift teaches the hip hinge pattern with the load held centrally — ideal for learning the movement before progressing to barbell.',
+    why: 'The deadlift is the most fundamental strength movement — picking things up from the floor. The kettlebell version is accessible for beginners.',
+    credits: 65
+  },
+
+  {
+    id: 'kettlebell-row',
+    name: 'Kettlebell Single-Arm Row',
+    category: 'strength',
+    movementPattern: 'pull',
+    equipment: ['kettlebell'],
+    equipmentOptional: ['dumbbell'],
+    affectsAreas: ['upper-back', 'triceps-biceps', 'shoulder'],
+    contraindications: ['shoulder-acute', 'lower-back-acute'],
+    energyRequired: 5,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Place your left hand and left knee on a bench or chair for support',
+      'Hold the kettlebell in your right hand, arm hanging below the shoulder',
+      'Pull the bell to your lower ribs — elbow tracking back and up, not flaring wide',
+      'Lower with control',
+      'Complete 10 reps each side, 3 sets'
+    ],
+    coaching: 'The elbow should travel back like a saw, not out like a wing. Keep the shoulder blade moving — not just the arm.',
+    why: 'The single-arm row builds back thickness and corrects the imbalances from pressing. Essential counterpart to any horizontal pressing movement.',
+    credits: 60
+  },
+
+  {
+    id: 'kettlebell-snatch',
+    name: 'Kettlebell Snatch',
+    category: 'strength',
+    movementPattern: 'hinge',
+    equipment: ['kettlebell'],
+    equipmentOptional: [],
+    affectsAreas: ['full-body', 'glutes', 'hamstring', 'shoulder'],
+    contraindications: ['shoulder-acute', 'lower-back-acute', 'wrist-elbow-acute'],
+    energyRequired: 8,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Begin like a swing — hike the bell back between the legs',
+      'Drive the hips explosively; as the bell rises, punch the arm straight up',
+      'The bell should travel close to the body and land softly overhead with the arm locked out',
+      'Rotate the wrist as the bell crests — no bang on the forearm',
+      'Lower back to swing position through a clean',
+      'Complete 5 reps each side, 3 sets'
+    ],
+    coaching: 'The snatch is a one-move equivalent of a swing and a press combined. Learn the swing and clean to a high standard before attempting this.',
+    why: 'The kettlebell snatch is one of the most demanding single exercises — ballistic power, shoulder stability, and cardiovascular endurance in one movement.',
+    credits: 100
+  },
+
+  {
+    id: 'kettlebell-halo',
+    name: 'Kettlebell Halo',
+    category: 'mobility',
+    movementPattern: 'shoulder-rotation',
+    equipment: ['kettlebell'],
+    equipmentOptional: ['dumbbell'],
+    affectsAreas: ['shoulder', 'upper-back', 'thoracic'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 3,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Hold a kettlebell upside down by the horns at chest height — "bottoms up"',
+      'Slowly circle the bell around your head in one direction — as close to the head as comfortable',
+      'Keep the core braced and the torso still throughout',
+      'Complete 5 circles clockwise, then 5 anticlockwise'
+    ],
+    coaching: 'Move slowly — the tempo of a halo determines whether it is a warm-up or a shoulder drill. Fast halos are mostly momentum. Slow halos are work.',
+    why: 'Improves shoulder girdle mobility and scapular control. Excellent as a warm-up before upper body work or as shoulder rehabilitation.',
+    credits: 35
+  },
+
+  {
+    id: 'kettlebell-windmill',
+    name: 'Kettlebell Windmill',
+    category: 'strength',
+    movementPattern: 'hinge',
+    equipment: ['kettlebell'],
+    equipmentOptional: [],
+    affectsAreas: ['shoulder', 'abdominals', 'hamstring', 'hip'],
+    contraindications: ['shoulder-acute', 'lower-back-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Press the kettlebell overhead in the right hand, arm locked',
+      'Turn both feet 45 degrees to the left',
+      'Hinge at the hip to the left, keeping the right arm vertical and your eyes on the bell',
+      'Lower the left hand down the left leg toward the floor',
+      'Return to standing by driving through the right hip',
+      'Complete 5 reps each side, 3 sets'
+    ],
+    coaching: 'Keep your eye on the bell throughout. The eyes tracking the bell keeps the shoulder packed and safe. The moment you look down, the arm tends to drift.',
+    why: 'Develops shoulder stability under load in an unusual position, hip mobility, and lateral core strength — a uniquely effective combination.',
+    credits: 80
+  },
+
+  {
+    id: 'kettlebell-figure-8',
+    name: 'Kettlebell Figure-8',
+    category: 'strength',
+    movementPattern: 'hinge',
+    equipment: ['kettlebell'],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'adductors', 'abdominals'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand with feet wider than shoulder-width, slight hip hinge',
+      'Pass the bell between your legs from one hand to the other',
+      'The path traces a figure-8 around and between your legs',
+      'Keep the back flat and the movement smooth',
+      'Complete 10 full figure-8 patterns each direction, 3 sets'
+    ],
+    coaching: 'The figure-8 exposes hip tightness and coordination limitations immediately. Move slowly at first until the pattern is grooved.',
+    why: 'Develops hip mobility, core stability, and hand-eye coordination in a unique multi-planar movement pattern.',
+    credits: 60
+  },
+
+  {
+    id: 'kettlebell-around-body-pass',
+    name: 'Around the Body Pass',
+    category: 'strength',
+    movementPattern: 'anti-rotation',
+    equipment: ['kettlebell'],
+    equipmentOptional: [],
+    affectsAreas: ['abdominals', 'glutes', 'shoulder'],
+    contraindications: [],
+    energyRequired: 4,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand tall, feet hip-width, holding the kettlebell in both hands in front',
+      'Pass the bell to one hand behind your back, then receive it in front with the other hand',
+      'Circle the bell around your body continuously',
+      'Complete 10 circles in each direction, 3 sets'
+    ],
+    coaching: 'Keep the hips still — they want to rotate with the bell. The challenge is the anti-rotation demand, not the weight.',
+    why: 'Trains the core to resist rotation under a moving load. A relatively gentle way to build rotational core strength.',
+    credits: 40
+  },
+
+  // ============================================
+  // PLYOMETRICS & POWER — Batch 17b (15 items)
+  // Component C — high energy, requires solid base
+  // All items: contraindications for lower limb acute conditions
+  // ============================================
+
+  {
+    id: 'plyo-jump-squat',
+    name: 'Jump Squat',
+    category: 'strength',
+    movementPattern: 'squat',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['quadriceps', 'glutes', 'calves'],
+    contraindications: ['knee-acute', 'ankle-foot-acute', 'lower-back-acute'],
+    energyRequired: 7,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand with feet shoulder-width apart',
+      'Lower into a squat to about 90 degrees',
+      'Explode upward as fast as possible — leave the ground completely',
+      'Land softly with bent knees — absorb the landing through the whole leg',
+      'Immediately lower into the next squat',
+      'Complete 3 sets of 10 reps with full recovery between sets'
+    ],
+    coaching: 'The landing is as important as the jump. Soft, controlled landings protect the knees and build eccentric strength. Loud landings mean poor absorption.',
+    why: 'Develops lower body power and rate of force development — the explosive quality that translates to sprinting, jumping, and change of direction.',
+    credits: 75
+  },
+
+  {
+    id: 'plyo-box-jump',
+    name: 'Box Jump',
+    category: 'strength',
+    movementPattern: 'squat',
+    equipment: [],
+    equipmentOptional: ['plyo-box'],
+    affectsAreas: ['quadriceps', 'glutes', 'calves'],
+    contraindications: ['knee-acute', 'ankle-foot-acute'],
+    energyRequired: 8,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand in front of a box or step at a height you can clear comfortably',
+      'Drop into a quarter-squat and swing the arms back',
+      'Explode upward, swinging the arms forward to generate height',
+      'Land on top of the box in a soft quarter-squat — both feet simultaneously',
+      'Step down one foot at a time — do not jump down',
+      'Rest fully between reps — 30 to 45 seconds',
+      'Complete 3 sets of 5 reps'
+    ],
+    coaching: 'Start with a low box. The goal is a safe, confident landing — not maximum height. Always step down, never jump down.',
+    why: 'Box jumps develop explosive leg power in a controlled environment. The fixed target also trains spatial awareness and jumping confidence.',
+    credits: 80
+  },
+
+  {
+    id: 'plyo-broad-jump',
+    name: 'Broad Jump',
+    category: 'strength',
+    movementPattern: 'hinge',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'hamstring', 'calves', 'quadriceps'],
+    contraindications: ['knee-acute', 'ankle-foot-acute', 'hamstring-acute'],
+    energyRequired: 8,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand with feet hip-width apart',
+      'Drop into a quarter-squat, swinging arms back',
+      'Explode forward and upward — aim for maximum horizontal distance',
+      'Land on both feet simultaneously in a soft squat position',
+      'Mark your landing and try to beat it next rep',
+      'Complete 3 sets of 5 reps with full recovery'
+    ],
+    coaching: 'The arm swing contributes significantly to distance — practise it. Drive the arms forward and up at take-off, not just up.',
+    why: 'The broad jump tests and builds horizontal power — the component most relevant to sprinting speed and athletic performance.',
+    credits: 80
+  },
+
+  {
+    id: 'plyo-burpee',
+    name: 'Burpee',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: ['shoulder-acute', 'wrist-elbow-acute', 'knee-acute', 'lower-back-acute'],
+    energyRequired: 8,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand tall',
+      'Drop into a squat and place both hands on the floor',
+      'Jump or step both feet back into a plank',
+      'Lower your chest to the floor — press back up',
+      'Jump or step both feet forward to your hands',
+      'Jump upward with arms overhead',
+      'That is one rep — complete 3 sets of 10'
+    ],
+    coaching: 'There is no shame in stepping instead of jumping — the stepping version still delivers most of the benefit with less joint stress.',
+    why: 'The burpee is one of the most comprehensive full-body conditioning exercises — strength, power, and cardiovascular demand in one movement.',
+    credits: 90
+  },
+
+  {
+    id: 'plyo-explosive-press-up',
+    name: 'Explosive Press-Up',
+    category: 'strength',
+    movementPattern: 'push',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
+    contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
+    energyRequired: 7,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Start in a high plank position',
+      'Lower to the floor with control',
+      'Press up explosively — fast enough for the hands to briefly leave the floor',
+      'Land softly and immediately lower into the next rep',
+      'Complete 3 sets of 6 to 8 reps'
+    ],
+    coaching: 'If the hands do not leave the floor, push faster. The explosive intent — even without actual leave — still trains the neuromuscular system powerfully.',
+    why: 'Develops upper body power — the pressing equivalent of the jump squat. Builds the reactive strength needed for throwing, pushing, and striking sports.',
+    credits: 80
+  },
+
+  {
+    id: 'plyo-depth-jump',
+    name: 'Depth Jump',
+    category: 'strength',
+    movementPattern: 'squat',
+    equipment: [],
+    equipmentOptional: ['plyo-box'],
+    affectsAreas: ['quadriceps', 'glutes', 'calves'],
+    contraindications: ['knee-acute', 'ankle-foot-acute'],
+    energyRequired: 8,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Stand on a box or step',
+      'Step off — do not jump off',
+      'The instant both feet contact the floor, jump as high as possible immediately',
+      'Minimise ground contact time — the quicker the better',
+      'Rest fully between reps — 45 to 60 seconds',
+      'Complete 3 sets of 5 reps'
+    ],
+    coaching: 'The depth jump develops the stretch-shortening cycle — the spring-like quality of tendons. Only attempt once standard jump squats are comfortable.',
+    why: 'One of the most effective plyometric exercises for reactive strength — the ability to absorb and immediately re-use elastic energy in the tendons.',
+    credits: 90
+  },
+
+  {
+    id: 'plyo-lateral-hop',
+    name: 'Lateral Hops',
+    category: 'strength',
+    movementPattern: 'squat',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'calves', 'ankle-foot'],
+    contraindications: ['knee-acute', 'ankle-foot-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand on your right foot',
+      'Hop laterally to the left, landing on your left foot',
+      'Absorb the landing softly and immediately hop back right',
+      'Build a rhythm — right, left, right, left',
+      'Complete 3 sets of 20 total hops',
+      'Progress to single-leg lateral hops for more challenge'
+    ],
+    coaching: 'Start with small hops and increase the width as landing control improves. Quiet landings mean good control.',
+    why: 'Develops lateral power and single-leg landing stability — essential for court sports, football, and change of direction.',
+    credits: 65
+  },
+
+  {
+    id: 'plyo-skater-jumps',
+    name: 'Skater Jumps',
+    category: 'strength',
+    movementPattern: 'squat',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'adductors', 'calves'],
+    contraindications: ['knee-acute', 'ankle-foot-acute'],
+    energyRequired: 7,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand on your right foot in a slight squat',
+      'Drive off to the left, landing on the left foot as far to the side as possible',
+      'Sweep the right foot behind the left as you land — like a speed skater',
+      'Immediately drive back to the right',
+      'Complete 3 sets of 12 total jumps'
+    ],
+    coaching: 'The trailing leg sweep helps with balance and adds hip adductor work. The bigger the lateral distance, the more demanding the single-leg landing.',
+    why: 'Develops lateral explosive power and single-leg landing mechanics. One of the best exercises for lateral sport performance.',
+    credits: 70
+  },
+
+  {
+    id: 'plyo-tuck-jump',
+    name: 'Tuck Jump',
+    category: 'strength',
+    movementPattern: 'squat',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'hip-flexor'],
+    contraindications: ['knee-acute', 'ankle-foot-acute'],
+    energyRequired: 8,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand with feet hip-width apart',
+      'Jump upward and drive both knees toward the chest at the peak',
+      'Grab the shins briefly if possible',
+      'Land softly in a quarter-squat',
+      'Immediately jump again',
+      'Complete 3 sets of 8 reps'
+    ],
+    coaching: 'The tuck jump requires both height and hip flexor speed. If the knees barely come up, work on jump squats first before adding the tuck.',
+    why: 'Develops vertical jump height and hip flexor explosive strength. Used in athletics, gymnastics, and team sport training.',
+    credits: 80
+  },
+
+  {
+    id: 'plyo-sprint-build',
+    name: 'Sprint Build-Up',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: ['hamstring-acute', 'achilles-acute'],
+    energyRequired: 7,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Find 60 to 80 metres of flat space',
+      'Begin at jogging pace',
+      'Gradually accelerate over the full distance — reaching maximum speed in the final 10 metres',
+      'The key is gradual acceleration — not a standing start sprint',
+      'Walk back to recover fully — at least 90 seconds',
+      'Complete 4 to 6 build-ups'
+    ],
+    coaching: 'Build-ups are how sprinters warm up and how recreational runners safely explore top speed. The gradual build reduces hamstring strain risk.',
+    why: 'Safely introduces maximum velocity running. Progressive acceleration allows the body to reach top speed safely — sudden standing starts are where hamstring injuries happen.',
+    credits: 60
+  },
+
+  {
+    id: 'plyo-med-ball-slam',
+    name: 'Medicine Ball Slam',
+    category: 'strength',
+    movementPattern: 'hinge',
+    equipment: ['medicine-ball'],
+    equipmentOptional: [],
+    affectsAreas: ['full-body', 'abdominals', 'shoulder'],
+    contraindications: ['lower-back-acute', 'shoulder-acute'],
+    energyRequired: 8,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand with a medicine ball held overhead',
+      'Pull the core tight, then slam the ball into the floor as hard as possible',
+      'Follow through — hinge at the hip and let the arms travel all the way down',
+      'Catch the ball on the bounce and raise it overhead immediately',
+      'Complete 3 sets of 10 reps'
+    ],
+    coaching: 'This is a power exercise — and also a stress-release exercise. Both of those are legitimate training goals.',
+    why: 'Medicine ball slams develop full-body power, particularly the downward force production used in throwing, tackling, and chopping movements.',
+    credits: 80
+  },
+
+  {
+    id: 'plyo-med-ball-chest-pass',
+    name: 'Medicine Ball Chest Pass',
+    category: 'strength',
+    movementPattern: 'push',
+    equipment: ['medicine-ball'],
+    equipmentOptional: [],
+    affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand facing a wall or partner, holding a medicine ball at chest height',
+      'Press and throw the ball explosively at the wall — like an aggressive chest pass',
+      'Catch the rebound with soft hands and immediately throw again',
+      'Complete 3 sets of 12 reps'
+    ],
+    coaching: 'The explosion comes from the chest and arms simultaneously — it is a push, not a throw. Stay close to the wall and work quickly.',
+    why: 'Develops upper body pressing power and reactive catching ability. Directly trains the force production pattern used in pushing, blocking, and throwing sports.',
+    credits: 65
+  },
+
+  {
+    id: 'plyo-single-leg-hop',
+    name: 'Single-Leg Hop for Distance',
+    category: 'strength',
+    movementPattern: 'squat',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'calves', 'quadriceps'],
+    contraindications: ['knee-acute', 'ankle-foot-acute'],
+    energyRequired: 7,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Stand on your right foot',
+      'Hop forward as far as possible, landing on the right foot',
+      'Stick the landing — absorb it fully before the next hop',
+      'Complete 5 hops in a row, then rest',
+      'Measure total distance or just focus on landing control',
+      'Complete 3 sets each side'
+    ],
+    coaching: 'Single-leg hop testing is used clinically to assess return-to-sport readiness after knee injury. It is also excellent training.',
+    why: 'The gold-standard test of single-leg power and landing control. The ability to hop for distance and stick the landing indicates robust lower limb function.',
+    credits: 75
+  },
+
+  {
+    id: 'plyo-reactive-agility',
+    name: 'Reactive Change of Direction',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body', 'glutes', 'ankle-foot'],
+    contraindications: ['knee-acute', 'ankle-foot-acute'],
+    energyRequired: 8,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Stand in athletic position — knees bent, weight on balls of feet',
+      'Have a partner point left, right, or forward randomly',
+      'Sprint 3 to 5 metres in the indicated direction, stop, return to centre',
+      'Vary the rest between signals — sometimes rapid, sometimes with a pause',
+      'Continue for 30 seconds, rest 60 seconds',
+      'Complete 5 sets'
+    ],
+    coaching: 'Without a partner, use a random timer app to determine direction or watch a bouncing ball. The unpredictability is what trains agility — not planned drills.',
+    why: 'Reactive agility — responding to unpredictable stimuli — is the actual demand of team sports. Planned agility drills train movement, not agility.',
+    credits: 75
+  },
+
+  {
+    id: 'plyo-deceleration-run',
+    name: 'Deceleration Run',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'ankle-foot'],
+    contraindications: ['knee-acute', 'hamstring-acute'],
+    energyRequired: 6,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Sprint at 80 to 90% effort for 15 metres',
+      'Stop as quickly as possible in the next 3 metres',
+      'The stopping is the training — not the sprint',
+      'Walk back, rest 30 seconds',
+      'Vary the stop — sometimes stop into a squat, sometimes pivot and change direction',
+      'Complete 8 to 10 reps'
+    ],
+    coaching: 'Most running injuries happen during deceleration, not acceleration. Practising controlled stopping builds the eccentric strength that prevents them.',
+    why: 'Deceleration strength is one of the most undertrained qualities in sport. The eccentric quad and glute demand in stopping is greater than in any running stride.',
+    credits: 65
+  }
+
 ];
