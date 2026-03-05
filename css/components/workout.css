@@ -89,6 +89,37 @@
   font-style: italic;
 }
 
+.exercise-full-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.exercise-list-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: var(--text-sm);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.exercise-list-row:last-child {
+  border-bottom: none;
+}
+
+.exercise-list-name {
+  color: var(--color-text);
+  font-weight: var(--font-medium);
+}
+
+.exercise-list-prescription {
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+  white-space: nowrap;
+}
+
 /* ============================================
    WORKOUT EXECUTION VIEW
    ============================================ */
