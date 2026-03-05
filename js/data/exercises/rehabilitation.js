@@ -2167,4 +2167,242 @@ export const REHABILITATION = [
     credits: 35
   }
 
+
+  ,
+
+  // ============================================
+  // PELVIC FLOOR REHABILITATION — Batch 11a
+  // Addresses: pelvic-floor condition
+  // Safe for all genders. Full release as important as contraction.
+  // ============================================
+
+  {
+    id: 'kegel-basic',
+    name: 'Pelvic Floor Contraction — Basic',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'acute',
+    activationTarget: 'pelvic-floor',
+    movementPattern: 'isometric',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['pelvic-floor', 'abdominals'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Sit, stand, or lie comfortably — this works in any position',
+      'Imagine you are trying to stop the flow of urine and hold in wind at the same time',
+      'Gently squeeze and lift the muscles inward and upward',
+      'Hold for 5 seconds — breathe normally, do not hold your breath',
+      'Release fully and rest for 5 seconds — the full release matters as much as the squeeze',
+      'Repeat 10 times, 3 sets per day'
+    ],
+    coaching: 'Most people hold their breath or tense their glutes and thighs instead. Check: can you still breathe freely? If not, reduce the effort.',
+    why: 'Strengthens the pelvic floor — the hammock of muscles supporting the bladder, bowel, and reproductive organs. Weak pelvic floor contributes to leakage, prolapse risk, and low back instability.',
+    credits: 15
+  },
+
+  {
+    id: 'kegel-quick-flicks',
+    name: 'Pelvic Floor Quick Flicks',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'pelvic-floor',
+    movementPattern: 'isometric',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['pelvic-floor'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Sit or stand comfortably',
+      'Perform a quick, sharp contraction of the pelvic floor — squeeze and immediately release',
+      'The movement is fast — about 1 second on, 1 second off',
+      'Complete 10 quick flicks, then rest for 10 seconds',
+      'Repeat 3 times'
+    ],
+    coaching: 'Quick flicks train the fast-twitch pelvic floor fibres — the ones that respond to a cough, sneeze, or jump. Both slow holds and quick flicks are needed.',
+    why: 'The fast-twitch pelvic floor muscles prevent leakage during sudden pressure increases. Slow holds alone do not train this.',
+    credits: 15
+  },
+
+  {
+    id: 'bridge-pelvic-floor',
+    name: 'Glute Bridge with Pelvic Floor',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'pelvic-floor',
+    movementPattern: 'hinge',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['pelvic-floor', 'glutes', 'lower-back'],
+    contraindications: [],
+    energyRequired: 3,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Lie on your back, knees bent, feet flat on the floor',
+      'On your inhale, prepare',
+      'On your exhale, gently engage your pelvic floor as you press through your feet to lift your hips',
+      'Hold the bridge at the top for 3 seconds — maintain the pelvic floor engagement',
+      'Inhale as you lower back down, releasing the pelvic floor completely',
+      'Complete 10 reps, 3 sets'
+    ],
+    coaching: 'Linking pelvic floor engagement to the exhale and the lift mirrors how the pelvic floor naturally works with breathing and movement.',
+    why: 'Integrates pelvic floor activation into a functional movement pattern — a step beyond isolated contractions toward real-world strength.',
+    credits: 30
+  },
+
+  {
+    id: 'squat-pelvic-floor',
+    name: 'Squat with Pelvic Floor Awareness',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'maintenance',
+    activationTarget: 'pelvic-floor',
+    movementPattern: 'squat',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['pelvic-floor', 'glutes', 'quadriceps'],
+    contraindications: ['knee-acute'],
+    energyRequired: 4,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand with feet shoulder-width apart, toes slightly turned out',
+      'As you lower into the squat, allow the pelvic floor to gently lengthen and release',
+      'At the bottom, pause for 1 second',
+      'As you stand up and exhale, gently engage the pelvic floor — squeeze and lift',
+      'At the top, fully release before the next rep',
+      'Complete 3 sets of 12 reps, moving slowly'
+    ],
+    coaching: 'The pelvic floor should lengthen on the way down and lift on the way up — like a lift going down as you descend and up as you rise.',
+    why: 'Trains the pelvic floor to work dynamically under load — the functional demand it faces in daily life and sport.',
+    credits: 35
+  },
+
+  // ============================================
+  // HYPERMOBILITY REHABILITATION — Batch 11b
+  // Addresses: hypermobility condition (EDS, HSD, generalised hypermobility)
+  // CRITICAL: No end-range passive stretching. All items prioritise STABILITY.
+  // ============================================
+
+  {
+    id: 'hypermobility-joint-awareness',
+    name: 'Joint Position Awareness',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'acute',
+    activationTarget: 'hypermobility',
+    movementPattern: 'proprioception',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Sit or stand in a comfortable, neutral position',
+      'Bring attention to your joints one at a time — ankles, knees, hips, spine, shoulders, wrists',
+      'For each joint, notice: is it in its neutral, mid-range position?',
+      'Gently adjust any joint that has drifted to end range — locked knees, hyperextended elbows',
+      'Hold the mid-range position with gentle muscular effort — do not lock out',
+      'Spend 5 minutes practising finding and holding neutral alignment'
+    ],
+    coaching: 'People with hypermobility often unconsciously rest in their ligaments rather than their muscles. This practice builds the habit of active mid-range holding.',
+    why: 'Proprioception — the sense of joint position — is often reduced in hypermobility. Training it is the foundation of managing hypermobile joints safely.',
+    credits: 20
+  },
+
+  {
+    id: 'hypermobility-knee-stability',
+    name: 'Knee Stability — Soft Knee Hold',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'acute',
+    activationTarget: 'hypermobility',
+    movementPattern: 'isometric',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['knee', 'quadriceps'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Stand on your right leg near a wall for balance if needed',
+      'Bend the knee to about 10 to 15 degrees — just enough so it is not locked straight',
+      'Hold this soft-knee position using your quad muscles — actively, not passively',
+      'You should feel a gentle engagement in the front of the thigh',
+      'Hold for 20 seconds, then stand normally',
+      'Repeat 5 times each side'
+    ],
+    coaching: 'This tiny bend is doing a lot. Locking the knee out is easy — holding it slightly bent with muscular control takes real work for hypermobile joints.',
+    why: 'Trains the quads to actively stabilise the knee rather than relying on the ligaments. Reduces knee hyperextension, pain, and instability.',
+    credits: 20
+  },
+
+  {
+    id: 'hypermobility-shoulder-packing',
+    name: 'Shoulder Packing',
+    category: 'rehabilitation',
+    contentType: 'activation',
+    rehabPhase: 'acute',
+    activationTarget: 'hypermobility',
+    movementPattern: 'scapular-activation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['shoulder', 'upper-back'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Sit or stand with arms relaxed at your sides',
+      'Without shrugging, gently draw your shoulder blades down and back — not hard, just engaged',
+      'Hold for 5 seconds',
+      'Release fully',
+      'Repeat 10 times',
+      'Begin to notice this position throughout the day and return to it when shoulders drift'
+    ],
+    coaching: 'Think of your shoulder blades sliding into back pockets. The movement is subtle — not a big retraction.',
+    why: 'Creates active shoulder girdle stability — essential for hypermobile shoulders that rely on passive structures and are prone to subluxation and pain.',
+    credits: 15
+  },
+
+  {
+    id: 'hypermobility-hip-stability',
+    name: 'Hip Stability in Standing',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hypermobility',
+    movementPattern: 'proprioception',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['hip', 'glutes', 'lower-back'],
+    contraindications: [],
+    energyRequired: 3,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Stand on your right leg, left foot just hovering off the floor',
+      'Check: is your hip in neutral? Avoid hiking it up or dropping it',
+      'Find the position where your pelvis is level and hips directly over the foot',
+      'Hold with gentle glute and core activation — not gripping, just engaged',
+      'Hold for 30 seconds, switch sides',
+      'Complete 3 holds each side'
+    ],
+    coaching: 'Most hypermobile people stand by hanging into the hip — ligaments taking the load. This builds the muscular alternative.',
+    why: 'Single-leg hip stability is essential for every step taken, for stairs, and for any sport. Building it reduces hip pain and the risk of joint damage over time.',
+    credits: 25
+  }
+
 ];
