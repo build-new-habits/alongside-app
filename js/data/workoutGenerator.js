@@ -17,7 +17,7 @@ import { checkinData }     from './checkin.js';
 import { programmeEngine } from './programmeEngine.js';
 import {
   getSuitableExercises,
-} from './exercises.js';
+} from './exercises/index.js';
 
 export const workoutGenerator = {
 
