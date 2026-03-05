@@ -857,6 +857,290 @@ export const REHABILITATION = [
     coaching: 'The smooth floor lets the towel slide easily. If it sticks, try socks on a wooden floor instead.',
     why: 'A low-equipment eccentric hamstring exercise that builds strength through the lengthened range — the range most prone to injury.',
     credits: 40
+  },
+
+  // ============================================
+  // CALF & ACHILLES REHABILITATION — Batch 4
+  // Addresses: calves, achilles conditions
+  // Key rule: eccentric work is the clinical standard for Achilles rehab
+  // No jumping or running while Achilles is symptomatic
+  // ============================================
+
+  {
+    id: 'seated-calf-raise',
+    name: 'Seated Calf Raise',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'acute',
+    activationTarget: 'calves',
+    movementPattern: 'calf-raise',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['calves'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Sit in a chair with feet flat on the floor, hip-width apart',
+      'Slowly raise both heels as high as you can, pressing through the balls of your feet',
+      'Hold at the top for 1 second',
+      'Lower slowly — take 3 counts to come down',
+      'Complete 3 sets of 15 reps'
+    ],
+    coaching: 'The slow lowering is where the healing happens. Do not let the heels drop quickly.',
+    why: 'Safe starting point for calf loading after acute injury — seated position removes body weight load while still working the muscle.',
+    credits: 20
+  },
+
+  {
+    id: 'standing-calf-raise-eccentric',
+    name: 'Eccentric Heel Drop',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'calves',
+    movementPattern: 'calf-raise',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['calves', 'achilles'],
+    contraindications: ['calves-acute', 'achilles-acute'],
+    energyRequired: 3,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Stand on a step with both feet, heels hanging off the edge',
+      'Rise up on both feet to the top position',
+      'Shift your weight to your right foot only',
+      'Slowly lower your right heel below the step level — take 3 to 4 seconds',
+      'Use both feet to rise back up — never lower on both',
+      'Complete 3 sets of 15 reps each side'
+    ],
+    coaching: 'The lowering phase is the entire point. Rising on two feet is just resetting — all the work is in the slow single-leg descent.',
+    why: 'Eccentric heel drops are the most evidence-backed treatment for Achilles tendinopathy. The slow lengthening under load remodels and strengthens the tendon.',
+    credits: 35
+  },
+
+  {
+    id: 'single-leg-calf-raise',
+    name: 'Single-Leg Calf Raise',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'maintenance',
+    activationTarget: 'calves',
+    movementPattern: 'calf-raise',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['calves', 'achilles'],
+    contraindications: ['calves-acute', 'achilles-acute'],
+    energyRequired: 4,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Stand near a wall for balance support',
+      'Shift your weight onto your right foot, left foot lightly lifted',
+      'Slowly rise onto the ball of your right foot as high as you can',
+      'Hold for 1 second at the top',
+      'Lower slowly — 3 counts down',
+      'Complete 3 sets of 12 reps each side'
+    ],
+    coaching: 'Full range matters — press all the way up, lower all the way down. Half reps build half the strength.',
+    why: 'Progresses from eccentric-only to full concentric and eccentric loading — the next step in returning the calf and Achilles to full strength.',
+    credits: 35
+  },
+
+  {
+    id: 'achilles-heel-drop-straight',
+    name: 'Achilles Heel Drop — Straight Knee',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'calves',
+    movementPattern: 'eccentric-control',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['achilles', 'calves'],
+    contraindications: ['achilles-acute'],
+    energyRequired: 3,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Stand on a step with the ball of your right foot on the edge, heel hanging off',
+      'Keep your right knee straight throughout',
+      'Slowly lower your heel below the step level over 4 seconds',
+      'Use your left foot to help you rise back to the start position',
+      'Complete 3 sets of 15 reps each side',
+      'This targets the gastrocnemius — the upper calf muscle'
+    ],
+    coaching: 'Some mild discomfort is expected during Achilles rehab. Sharp pain means stop. Mild ache during and after is normal at this stage.',
+    why: 'The straight-knee version targets the gastrocnemius — the larger, outer calf muscle that attaches directly to the Achilles tendon.',
+    credits: 35
+  },
+
+  {
+    id: 'achilles-heel-drop-bent',
+    name: 'Achilles Heel Drop — Bent Knee',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'calves',
+    movementPattern: 'eccentric-control',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['achilles', 'calves'],
+    contraindications: ['achilles-acute'],
+    energyRequired: 3,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Stand on a step with the ball of your right foot on the edge, heel hanging off',
+      'Bend your right knee to about 30° and keep it there throughout',
+      'Slowly lower your heel below the step level over 4 seconds',
+      'Use your left foot to help you rise back to the start',
+      'Complete 3 sets of 15 reps each side',
+      'This targets the soleus — the lower, deeper calf muscle'
+    ],
+    coaching: 'Do both the straight and bent-knee versions — they target different parts of the calf and both connect to the Achilles.',
+    why: 'The bent-knee version targets the soleus — the deeper calf muscle whose tendon blends into the Achilles. Essential for complete Achilles rehabilitation.',
+    credits: 35
+  },
+
+  {
+    id: 'standing-calf-stretch-wall',
+    name: 'Standing Calf Stretch — Wall',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'calves',
+    movementPattern: 'stretch',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['calves', 'achilles'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Stand facing a wall, hands on the wall for support',
+      'Step your right foot back about a metre, keeping it flat on the floor',
+      'Keep your back knee straight and press your back heel into the floor',
+      'Lean gently toward the wall until you feel a stretch in your right calf',
+      'Hold for 30 seconds, then switch sides',
+      'Repeat 3 times each side'
+    ],
+    coaching: 'The heel must stay flat on the floor — that is what gives the stretch. If the heel lifts, step the foot closer.',
+    why: 'Maintains calf and Achilles flexibility during rehabilitation — reduced flexibility is a significant risk factor for re-injury.',
+    credits: 20
+  },
+
+  {
+    id: 'soleus-stretch-bent-knee',
+    name: 'Soleus Stretch — Bent Knee',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'calves',
+    movementPattern: 'stretch',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['calves', 'achilles'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Stand facing a wall, hands on the wall',
+      'Step your right foot back about half a metre',
+      'Bend your right knee and sink down gently, keeping the heel flat',
+      'You should feel the stretch lower down — in the deeper calf, just above the heel',
+      'Hold for 30 seconds, then switch',
+      'Repeat 3 times each side'
+    ],
+    coaching: 'This feels different to the standard calf stretch — lower and tighter. That is the soleus. Both stretches are needed for full Achilles health.',
+    why: 'Stretches the soleus, which is commonly neglected. Tight soleus increases Achilles load during walking and running.',
+    credits: 20
+  },
+
+  {
+    id: 'ankle-alphabet',
+    name: 'Ankle Alphabet',
+    category: 'rehabilitation',
+    contentType: 'activation',
+    rehabPhase: 'acute',
+    activationTarget: 'calves',
+    movementPattern: 'ankle-mobility',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['ankle-foot', 'calves'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Sit in a chair with your right leg extended or crossed over your left knee',
+      'Using just your ankle and foot — not your whole leg — trace the letters of the alphabet',
+      'Move through the full range each letter allows',
+      'Complete the full alphabet on the right, then switch to the left'
+    ],
+    coaching: 'This looks simple but covers every direction your ankle moves. It is one of the best all-round ankle mobility exercises there is.',
+    why: 'Restores ankle range of motion and proprioception after injury — safe in the acute phase because there is no load through the joint.',
+    credits: 15
+  },
+
+  {
+    id: 'banded-ankle-dorsiflexion',
+    name: 'Banded Ankle Dorsiflexion',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'calves',
+    movementPattern: 'ankle-mobility',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['ankle-foot', 'calves', 'achilles'],
+    contraindications: ['achilles-acute'],
+    energyRequired: 2,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Anchor a resistance band around a table leg or door frame at ankle height',
+      'Loop the band around the top of your right foot, just above the toes',
+      'Step back so the band pulls your foot forward',
+      'Lunge forward slowly, bending your right knee over your right toes',
+      'Keep your right heel flat on the floor throughout',
+      'Hold for 2 seconds, step back, repeat 15 times each side'
+    ],
+    coaching: 'The band provides a small distraction to the ankle joint that helps restore range. This is a common physio technique.',
+    why: 'Improves ankle dorsiflexion range — limited dorsiflexion is linked to calf tightness, Achilles problems, knee pain, and running injuries.',
+    credits: 25
+  },
+
+  {
+    id: 'calf-foam-roll',
+    name: 'Calf Foam Roll',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'calves',
+    movementPattern: 'self-massage',
+    equipment: ['foam-roller'],
+    equipmentOptional: [],
+    affectsAreas: ['calves'],
+    contraindications: ['calves-acute'],
+    energyRequired: 2,
+    duration: 120,
+    perSide: true,
+    instructions: [
+      'Sit on the floor with your right calf resting on the foam roller',
+      'Lift your hips off the floor, supporting yourself on your hands',
+      'Slowly roll from just above the ankle to just below the back of the knee',
+      'Pause for 20 to 30 seconds on any tight or tender spots',
+      'Cross your left ankle over your right to add more pressure if needed',
+      'Roll for 60 seconds per leg'
+    ],
+    coaching: 'Roll slowly — about one inch per second. Tender spots mean the tissue needs more time there, not faster movement.',
+    why: 'Reduces calf tension and improves tissue quality — supports Achilles health and reduces injury recurrence risk.',
+    credits: 25
   }
 
 ];
