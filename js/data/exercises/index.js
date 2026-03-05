@@ -23,7 +23,7 @@ import { RECOVERY }       from './recovery.js';
 
 // Future category files — uncomment as each batch is added:
 import { REHABILITATION } from './rehabilitation.js';
-// import { MINDFULNESS }    from './mindfulness.js';
+import { MINDFULNESS }    from './mindfulness.js';
 // import { PROGRAMMES }     from './programmes.js';
 
 export const EXERCISES = [
@@ -32,7 +32,7 @@ export const EXERCISES = [
   ...CARDIO,
   ...RECOVERY,
   ...REHABILITATION,
-  // ...MINDFULNESS,
+  ...MINDFULNESS,
   // ...PROGRAMMES,
 ];
 
