@@ -190,7 +190,7 @@ function renderNoProgramme(history) {
       <div class="card card-coach">
         <p>You haven't started a programme yet.</p>
         <p class="text-secondary">Set a goal to unlock your progress dashboard and milestone tracking.</p>
-        <button class="btn btn-primary" onclick="router.navigate('goal-setup')">
+        <button class="btn btn-primary" onclick="router.navigate('onboarding/goal-setup')">
           Set a goal →
         </button>
       </div>
