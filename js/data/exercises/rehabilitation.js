@@ -5,15 +5,13 @@
  * rehabPhase: 'acute' | 'subacute' | 'maintenance'
  *
  * Batch 2: Glute activation and rehabilitation (16 items)
- * Addresses missing 'glutes' condition from conditions.js
+ * Batch 3: Hamstring rehabilitation (15 items)
  */
 
 export const REHABILITATION = [
 
   // ============================================
-  // GLUTE ACTIVATION — Batch 2
-  // Low energyRequired (1–3), safe for most conditions
-  // Used as session warm-up prepended by coach
+  // GLUTE ACTIVATION & REHABILITATION — Batch 2
   // ============================================
 
   {
@@ -174,7 +172,7 @@ export const REHABILITATION = [
     instructions: [
       'Start on hands and knees, wrists under shoulders, knees under hips',
       'Keeping your knee bent, lift your right leg out to the side',
-      'Raise until your thigh is parallel to the floor — like a dog at a fire hydrant',
+      'Raise until your thigh is parallel to the floor',
       'Keep your hips level and core engaged throughout',
       'Lower slowly and repeat',
       'Complete 15 reps each side'
@@ -320,7 +318,7 @@ export const REHABILITATION = [
       'That is one rep — complete 10 reps total, 3 sets'
     ],
     coaching: 'Hips staying perfectly still is the whole challenge. Start with tiny lifts and build range over time.',
-    why: 'Combines glute strength with the core stability needed to keep hips level during single-leg movements — bridges the gap between activation and functional strength.',
+    why: 'Combines glute strength with the core stability needed to keep hips level during single-leg movements.',
     credits: 40
   },
 
@@ -347,7 +345,7 @@ export const REHABILITATION = [
       'Step down slowly with control',
       'Complete 10 reps on the right, then 10 on the left'
     ],
-    coaching: 'The heel drive is the key — it shifts the work from quads to glutes. If your back foot pushes off, you are cheating the glutes.',
+    coaching: 'The heel drive is the key — it shifts the work from quads to glutes.',
     why: 'A functional glute strengthener that directly transfers to climbing stairs, hills, and daily movement.',
     credits: 45
   },
@@ -361,7 +359,7 @@ export const REHABILITATION = [
     activationTarget: 'glutes',
     movementPattern: 'lunge',
     equipment: [],
-    equipmentOptional: ['dumbbell', 'yoga-mat'],
+    equipmentOptional: ['dumbbell'],
     affectsAreas: ['glutes', 'hamstring', 'quadriceps'],
     contraindications: ['knee-acute'],
     energyRequired: 5,
@@ -376,7 +374,7 @@ export const REHABILITATION = [
       'Complete 10 reps each leg, 3 sets'
     ],
     coaching: 'Thinking about the front glute changes where you feel the exercise. Most people feel lunges in the quads — this cue shifts it to the glutes.',
-    why: 'Reverse lunges load the glutes more than forward lunges and are gentler on the knee — good for glute rehab at any stage.',
+    why: 'Reverse lunges load the glutes more than forward lunges and are gentler on the knee.',
     credits: 45
   },
 
@@ -404,7 +402,7 @@ export const REHABILITATION = [
       'Lower slowly and repeat',
       'Complete 15 reps each side'
     ],
-    coaching: 'This can be done anywhere — a great one for office breaks or waiting for the kettle. Even small reps add up.',
+    coaching: 'This can be done anywhere — a great one for office breaks or waiting for the kettle.',
     why: 'Strengthens the hip abductors in a functional standing position — directly relevant to walking, running, and balance.',
     credits: 25
   },
@@ -462,6 +460,403 @@ export const REHABILITATION = [
     coaching: 'The lift only needs to be a few inches. Squeezing the glute before you lift means the glute does the work, not the lower back.',
     why: 'A safe starting point for glute activation after injury — minimal load, no compression on the spine.',
     credits: 20
+  },
+
+  // ============================================
+  // HAMSTRING REHABILITATION — Batch 3
+  // Three phases: acute (pain/injury), subacute (rebuilding), maintenance (load)
+  // Key safety rule: no running, jumping or high load until pain < 3/10
+  // ============================================
+
+  {
+    id: 'hamstring-isometric-hold',
+    name: 'Hamstring Isometric Hold',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'acute',
+    activationTarget: 'hamstring',
+    movementPattern: 'isometric',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hamstring'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Sit on the edge of a chair, right foot flat on the floor',
+      'Press your right heel firmly into the floor as if trying to drag it back toward the chair',
+      'The foot does not actually move — this is an isometric contraction',
+      'Hold for 5 seconds, pressing at about 50% of your maximum effort',
+      'Release and rest for 5 seconds',
+      'Complete 10 reps, then repeat on the left side'
+    ],
+    coaching: 'Start gently — 30 to 50% effort. Isometric work is safe in the acute phase because there is no movement through the injured tissue.',
+    why: 'Isometric contractions maintain hamstring strength and reduce pain during the acute phase without stressing the injury.',
+    credits: 20
+  },
+
+  {
+    id: 'supine-hamstring-stretch',
+    name: 'Supine Hamstring Stretch',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hamstring',
+    movementPattern: 'stretch',
+    equipment: [],
+    equipmentOptional: ['yoga-mat', 'resistance-band'],
+    affectsAreas: ['hamstring'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Lie on your back, both knees bent',
+      'Lift your right leg and hold behind the thigh with both hands',
+      'Slowly straighten the knee until you feel a gentle stretch — not pain',
+      'Hold for 30 seconds, breathing normally',
+      'Bend the knee and lower the leg',
+      'Repeat 3 times each side'
+    ],
+    coaching: 'A stretch should feel like a pull, never a sharp pain. If it is sharp, bend the knee more until it is just a gentle tension.',
+    why: 'Restores hamstring length gently during the subacute phase — important for returning to normal movement patterns.',
+    credits: 25
+  },
+
+  {
+    id: 'active-straight-leg-raise',
+    name: 'Active Straight Leg Raise',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hamstring',
+    movementPattern: 'hip-flexion',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hamstring', 'hip-flexor', 'core'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 3,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Lie on your back, left knee bent and foot flat, right leg straight',
+      'Flex your right foot — toes toward the ceiling',
+      'Tighten your right quad and lift the leg to about 45°',
+      'Keep the knee locked straight throughout',
+      'Hold for 2 seconds, then lower slowly',
+      'Complete 15 reps, then switch legs'
+    ],
+    coaching: 'The quad staying tight is what protects the hamstring here. If the knee bends, the hamstring is doing more work than it should be at this stage.',
+    why: 'Builds hamstring control through a safe range — a standard progression in physiotherapy after hamstring strain.',
+    credits: 30
+  },
+
+  {
+    id: 'prone-hamstring-curl',
+    name: 'Prone Hamstring Curl',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hamstring',
+    movementPattern: 'hinge',
+    equipment: [],
+    equipmentOptional: ['resistance-band', 'yoga-mat'],
+    affectsAreas: ['hamstring'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 3,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Lie face down, legs straight, forehead resting on your hands',
+      'Slowly bend your right knee, bringing your heel toward your bottom',
+      'Move through a comfortable range — stop if you feel sharp pain',
+      'Hold at the top for 1 second',
+      'Lower slowly — take 3 counts to come down',
+      'Complete 12 reps each side, 3 sets'
+    ],
+    coaching: 'The slow lowering (eccentric phase) is where most of the rehab benefit comes from. Do not rush it.',
+    why: 'Rebuilds hamstring strength through active range of motion — the next step after isometric work.',
+    credits: 35
+  },
+
+  {
+    id: 'romanian-deadlift-rehab',
+    name: 'Romanian Deadlift — Rehab Load',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hamstring',
+    movementPattern: 'hinge',
+    equipment: [],
+    equipmentOptional: ['dumbbell'],
+    affectsAreas: ['hamstring', 'glutes', 'lower-back'],
+    contraindications: ['lower-back-acute', 'hamstring-acute'],
+    energyRequired: 4,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand with feet hip-width apart, holding light dumbbells or no weight',
+      'Hinge at your hips, pushing them back as you lower your hands toward the floor',
+      'Keep your back flat and knees soft — not locked',
+      'Lower only until you feel a gentle stretch in the hamstrings — about mid-shin',
+      'Drive hips forward to return to standing',
+      'Complete 3 sets of 10 reps at a pace that feels controlled'
+    ],
+    coaching: 'Use the lightest weight that still feels like work. This is rehab, not a strength session — range and control matter more than load.',
+    why: 'Progressive hamstring loading through a lengthened position — one of the most effective exercises for hamstring injury rehabilitation.',
+    credits: 40
+  },
+
+  {
+    id: 'nordic-curl-assisted',
+    name: 'Nordic Curl — Assisted',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'maintenance',
+    activationTarget: 'hamstring',
+    movementPattern: 'eccentric-control',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hamstring'],
+    contraindications: ['hamstring-acute', 'hamstring-subacute', 'knee-acute'],
+    energyRequired: 5,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Kneel on a mat with ankles held down by a partner, a heavy sofa, or tucked under a bar',
+      'Keeping your body straight from knees to head, slowly lower yourself forward',
+      'Use your hands to control the descent — catching yourself in a press-up position',
+      'Push back up with your hands to the starting position',
+      'Focus on making the lowering phase as slow as possible — aim for 3 to 5 seconds down',
+      'Complete 3 sets of 5 reps — quality over quantity'
+    ],
+    coaching: 'This is a hard exercise even for fit people. The hands are there to help — use them. The eccentric lowering is the goal, not the return.',
+    why: 'Nordic curls are the most evidence-backed exercise for hamstring injury prevention and rehabilitation. The eccentric loading rebuilds tendon strength.',
+    credits: 60
+  },
+
+  {
+    id: 'hamstring-bridge-curl',
+    name: 'Hamstring Bridge Curl',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hamstring',
+    movementPattern: 'hinge',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hamstring', 'glutes'],
+    contraindications: ['hamstring-acute'],
+    energyRequired: 4,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Lie on your back with heels on the seat of a chair or low surface',
+      'Press through your heels to lift your hips into a bridge',
+      'Hold the bridge position while you slowly slide your heels away from you',
+      'Extend as far as you can while keeping your hips up',
+      'Curl the heels back in to return',
+      'Complete 3 sets of 8 reps'
+    ],
+    coaching: 'This works the hamstrings from a lengthened position — which is where most hamstring injuries happen. Start small with the range.',
+    why: 'Trains the hamstrings eccentrically through a functional range, building resilience for running and jumping.',
+    credits: 45
+  },
+
+  {
+    id: 'standing-hamstring-curl-band',
+    name: 'Standing Hamstring Curl — Band',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hamstring',
+    movementPattern: 'hinge',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['hamstring'],
+    contraindications: ['hamstring-acute'],
+    energyRequired: 4,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Anchor a resistance band low to a wall or chair leg',
+      'Loop the band around your right ankle and stand facing the anchor',
+      'Stand on your left leg, slight bend in the knee',
+      'Curl your right heel toward your bottom against the band resistance',
+      'Lower slowly — take 3 counts',
+      'Complete 12 reps each side, 3 sets'
+    ],
+    coaching: 'The slow lowering is doing most of the work. A 3-second lowering builds more strength than a fast one.',
+    why: 'Builds hamstring strength through functional range in a standing position — closer to how the hamstring works in sport and daily movement.',
+    credits: 40
+  },
+
+  {
+    id: 'single-leg-deadlift-rehab',
+    name: 'Single-Leg Deadlift — Rehab',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'maintenance',
+    activationTarget: 'hamstring',
+    movementPattern: 'hinge',
+    equipment: [],
+    equipmentOptional: ['dumbbell'],
+    affectsAreas: ['hamstring', 'glutes', 'lower-back'],
+    contraindications: ['hamstring-acute', 'lower-back-acute'],
+    energyRequired: 5,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Stand on your right leg with a soft bend in the knee',
+      'Hinge forward at the hip, extending your left leg behind you for balance',
+      'Lower until your torso and left leg are roughly parallel to the floor',
+      'Keep your hips square — do not let the left hip rotate open',
+      'Drive through the right heel to return to standing',
+      'Complete 10 reps each side, 3 sets'
+    ],
+    coaching: 'Balance is hard at first — holding a wall lightly is fine. Build up to freestanding over time.',
+    why: 'Trains single-leg hamstring strength and balance together — essential for returning to running and any sport involving one-leg landing.',
+    credits: 50
+  },
+
+  {
+    id: 'hamstring-90-90-stretch',
+    name: 'Hamstring 90-90 Stretch',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hamstring',
+    movementPattern: 'stretch',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hamstring', 'lower-back'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Sit on the floor, right leg straight out in front, left leg bent to the side',
+      'Sit tall — do not let your lower back round',
+      'Hinge forward at the hip over your straight leg',
+      'Reach toward your right foot — only as far as you can with a flat back',
+      'Hold for 30 seconds, breathing deeply',
+      'Repeat 3 times each side'
+    ],
+    coaching: 'Round back means you are stretching your lower back, not your hamstring. Sit on a cushion if your back rounds immediately.',
+    why: 'Restores hamstring length with the hip in a position that closely mimics running — more functional than a lying hamstring stretch.',
+    credits: 25
+  },
+
+  {
+    id: 'hamstring-neural-floss',
+    name: 'Hamstring Neural Flossing',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hamstring',
+    movementPattern: 'stretch',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hamstring', 'sciatic-nerve'],
+    contraindications: ['hamstring-acute'],
+    energyRequired: 2,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Sit in a chair, right foot flat on the floor',
+      'Slowly straighten your right knee until you feel a gentle stretch',
+      'At the same time, look up and extend your neck slightly',
+      'Hold for just 1 second — this is not a held stretch',
+      'Bend the knee back down and drop your chin',
+      'Repeat this alternating movement rhythmically for 30 reps, then switch sides'
+    ],
+    coaching: 'This is a neural mobilisation, not a muscle stretch. The rhythmic movement flushes the sciatic nerve — it should feel releasing, not painful.',
+    why: 'Hamstring tightness is often partly neural, not just muscular. Neural flossing addresses both and is particularly useful when the hamstring feels tight but not torn.',
+    credits: 25
+  },
+
+  {
+    id: 'walking-lunge-short-stride',
+    name: 'Walking Lunge — Short Stride',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'maintenance',
+    activationTarget: 'hamstring',
+    movementPattern: 'lunge',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['hamstring', 'glutes', 'quadriceps'],
+    contraindications: ['hamstring-acute', 'knee-acute'],
+    energyRequired: 5,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand tall, feet together',
+      'Take a shorter than normal step forward with your right foot',
+      'Lower your back knee toward the floor in a controlled lunge',
+      'Push through both feet to bring your back foot forward to the next step',
+      'Keep the stride short — longer strides increase hamstring load',
+      'Complete 3 sets of 10 reps each leg, rest 60 seconds between sets'
+    ],
+    coaching: 'Short strides are deliberate here — as the hamstring heals, you can progressively lengthen them over weeks.',
+    why: 'Returns the hamstring to functional loading through normal gait patterns — a key step before returning to running.',
+    credits: 45
+  },
+
+  {
+    id: 'copenhagen-adductor',
+    name: 'Copenhagen Adductor',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'maintenance',
+    activationTarget: 'hamstring',
+    movementPattern: 'hip-abduction',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hamstring', 'adductors', 'hip'],
+    contraindications: ['hamstring-acute', 'hip-acute'],
+    energyRequired: 5,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Lie on your side, top leg resting on a bench or chair at hip height',
+      'Keep your top leg straight and supported',
+      'Lift your bottom leg up to meet the top leg',
+      'Hold for 2 seconds, then lower slowly',
+      'Complete 10 reps each side, 3 sets'
+    ],
+    coaching: 'This is harder than it looks. Start with a lower surface if needed. The adductor and hamstring work together here — both benefit.',
+    why: 'Strengthens the inner thigh and hamstring together — clinically used for groin and hamstring injury prevention in sport.',
+    credits: 50
+  },
+
+  {
+    id: 'towel-hamstring-curl',
+    name: 'Towel Hamstring Curl',
+    category: 'rehabilitation',
+    contentType: 'rehabilitation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hamstring',
+    movementPattern: 'hinge',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hamstring', 'glutes'],
+    contraindications: ['hamstring-acute'],
+    energyRequired: 3,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Lie on your back on a smooth floor with heels on a folded towel',
+      'Lift your hips into a bridge position',
+      'Keeping your hips up, slide your heels away from you by straightening your legs',
+      'Slide out as far as you can while keeping the hips up',
+      'Curl back in by bending the knees',
+      'Complete 3 sets of 8 reps'
+    ],
+    coaching: 'The smooth floor lets the towel slide easily. If it sticks, try socks on a wooden floor instead.',
+    why: 'A low-equipment eccentric hamstring exercise that builds strength through the lengthened range — the range most prone to injury.',
+    credits: 40
   }
 
 ];
