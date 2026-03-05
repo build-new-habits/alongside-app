@@ -128,7 +128,19 @@ select {
   margin: 0;
 }
 
-/* Visually hidden but available to screen readers */
+/* ============================================
+   ACCESSIBILITY UTILITIES
+   ============================================ */
+
+/**
+ * .sr-only — Visually hidden, but available to screen readers.
+ *
+ * Used on #sr-announcer in index.html to announce view changes,
+ * and anywhere else content should be read aloud but not displayed.
+ *
+ * Do NOT use display:none or visibility:hidden — those hide from
+ * screen readers too.
+ */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -139,4 +151,30 @@ select {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/**
+ * .sr-only--focusable — Same as sr-only, but becomes visible when
+ * focused. Used for skip-to-content links.
+ *
+ * Example usage (add inside <body> before #app):
+ *   <a href="#main-content" class="sr-only sr-only--focusable">
+ *     Skip to main content
+ *   </a>
+ */
+.sr-only--focusable:focus,
+.sr-only--focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: var(--space-3) var(--space-4);
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-bold);
+  border-radius: var(--radius-md);
+  z-index: var(--z-toast);
 }
