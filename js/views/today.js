@@ -146,14 +146,18 @@ function renderWorkoutCard(workout, index) {
       
       <p class="workout-rationale">${workout.rationale}</p>
       
-      <div class="workout-exercises-preview">
-        ${workout.exercises.slice(0, 3).map(e => `
-          <span class="exercise-tag">${e.name}</span>
-        `).join('')}
-        ${workout.exercises.length > 3 ? `
-          <span class="exercise-tag more">+${workout.exercises.length - 3} more</span>
-        ` : ''}
-      </div>
+    <div class="exercise-full-list">
+      ${workout.exercises.map(e => `
+        <div class="exercise-list-row">
+          <span class="exercise-list-name">${e.name}</span>
+          <span class="exercise-list-prescription">
+            ${e.duration
+              ? `${e.sets > 1 ? e.sets + ' × ' : ''}${e.duration}s`
+              : `${e.sets || 3} × ${e.reps || 10} reps`}
+          </span>
+        </div>
+      `).join('')}
+    </div>
       
       <button class="btn btn-primary btn-full workout-start-btn" data-workout-index="${index}">
         Start Workout
