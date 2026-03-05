@@ -26,6 +26,8 @@ import { REHABILITATION } from './rehabilitation.js';
 import { MINDFULNESS }    from './mindfulness.js';
 import { YOGA }           from './yoga.js';
 import { PILATES }        from './pilates.js';
+import { RUNNING }        from './running.js';
+import { SWIMMING_CYCLING } from './swimming_cycling.js';
 // import { PROGRAMMES }     from './programmes.js';
 
 export const EXERCISES = [
@@ -37,6 +39,8 @@ export const EXERCISES = [
   ...MINDFULNESS,
   ...YOGA,
   ...PILATES,
+  ...RUNNING,
+  ...SWIMMING_CYCLING,
   // ...PROGRAMMES,
 ];
 
