@@ -273,4 +273,275 @@ export const MINDFULNESS = [
     credits: 15
   }
 
+
+  ,
+
+  // ============================================
+  // SLEEP PREPARATION & EXTENDED PRACTICES — Batch 12
+  // Long-form body scan, sleep prep, extended visualisation
+  // ============================================
+
+  {
+    id: 'sleep-body-scan',
+    name: 'Sleep Body Scan',
+    category: 'mindfulness',
+    contentType: 'practice',
+    movementPattern: 'body-scan',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 1200,
+    perSide: false,
+    instructions: [
+      'Lie in bed in your sleeping position',
+      'Close your eyes and take 3 slow breaths',
+      'Bring attention to your feet — not to relax them, just to notice them',
+      'Allow your feet to feel heavy and warm',
+      'Slowly move attention upward: calves, knees, thighs, hips',
+      'Continue through the belly, chest, hands, arms, shoulders, neck, face',
+      'At each area, allow heaviness and warmth — let the body sink into the bed',
+      'If you reach the top without falling asleep, start again from the feet'
+    ],
+    coaching: 'If you fall asleep before finishing, that is success. Most people do not reach the top more than once.',
+    why: 'The body scan activates the parasympathetic nervous system and reduces the cortisol associated with pre-sleep rumination. Clinically used for insomnia.',
+    credits: 20
+  },
+
+  {
+    id: 'military-sleep-method',
+    name: 'Progressive Relaxation for Sleep',
+    category: 'mindfulness',
+    contentType: 'practice',
+    movementPattern: 'body-scan',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Lie on your back in a comfortable position',
+      'Relax your face completely — jaw, tongue, eyes, forehead — let everything go',
+      'Drop your shoulders as low as they will go, then relax your arms one at a time',
+      'Breathe out and relax your chest',
+      'Relax your legs from thighs down to feet',
+      'Now hold your mind still for 10 seconds — if thoughts come, picture a calm scene',
+      'Repeat until sleep comes'
+    ],
+    coaching: 'This takes practice. Most people who master it report being able to sleep within 2 minutes after a few weeks of daily practice.',
+    why: 'A systematic relaxation technique that removes physical and mental tension in sequence. Effective for both falling asleep and returning to sleep after waking.',
+    credits: 20
+  },
+
+  {
+    id: 'worry-time-practice',
+    name: 'Worry Time Practice',
+    category: 'mindfulness',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 600,
+    perSide: false,
+    instructions: [
+      'Sit comfortably with a notebook if you have one',
+      'Set a timer for 10 minutes',
+      'Give yourself full permission to worry — write down every concern, fear, or anxious thought',
+      'Do not try to solve anything — just list them',
+      'When the timer goes, close the notebook',
+      'For the rest of the day, when worried thoughts arise, remind yourself: they are already written down, they have their time'
+    ],
+    coaching: 'This feels counterintuitive. But containing worry to a specific time actually reduces it — the brain relaxes when it knows worries will not be forgotten.',
+    why: 'Scheduled worry time is a CBT technique shown to reduce generalised anxiety and improve sleep. It externalises the worry and gives the mind permission to rest at other times.',
+    credits: 20
+  },
+
+  {
+    id: 'mindful-walking',
+    name: 'Mindful Walking',
+    category: 'mindfulness',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 600,
+    perSide: false,
+    instructions: [
+      'Begin walking at a natural, comfortable pace',
+      'Bring full attention to the physical sensation of walking',
+      'Notice the contact of each foot with the floor, the shifting of weight, the swing of the arms',
+      'When your mind wanders to thoughts, gently return it to the sensations of walking',
+      'You can do this indoors in a small space or outdoors',
+      'Continue for 10 minutes'
+    ],
+    coaching: 'Mindful walking is a great alternative for people who struggle with seated meditation. The movement gives the mind something concrete to anchor to.',
+    why: 'Combines the physical benefits of movement with the mental benefits of mindfulness. Particularly effective for restless minds or people with ADHD.',
+    credits: 20
+  },
+
+  {
+    id: 'compassionate-self-talk',
+    name: 'Compassionate Self-Talk',
+    category: 'mindfulness',
+    contentType: 'practice',
+    movementPattern: 'visualisation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Sit quietly and bring to mind something you are struggling with — a difficulty, a mistake, a fear',
+      'Notice what you say to yourself about it — often it is harsh',
+      'Now ask: what would I say to a close friend who was experiencing exactly this?',
+      'Say those words to yourself — either silently or aloud',
+      'Place one hand on your chest and notice what shifts',
+      'Stay with this for 5 minutes'
+    ],
+    coaching: 'Self-compassion is not self-indulgence or giving up. Research consistently shows it produces better outcomes than self-criticism — more motivation, more resilience, less burnout.',
+    why: 'Self-compassion practice reduces shame, anxiety, and depression while increasing motivation. Based on the work of Dr Kristin Neff. Particularly relevant for neurodivergent adults.',
+    credits: 20
+  },
+
+  {
+    id: 'nature-visualisation',
+    name: 'Nature Visualisation',
+    category: 'mindfulness',
+    contentType: 'practice',
+    movementPattern: 'visualisation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 600,
+    perSide: false,
+    instructions: [
+      'Sit or lie comfortably, eyes closed',
+      'Bring to mind a natural setting — a forest, a beach, a mountain, a garden',
+      'Build the scene with all senses: what do you see, hear, smell, feel underfoot',
+      'Walk through this place slowly in your imagination',
+      'Notice the quality of light, the sounds, the temperature',
+      'Spend 10 minutes exploring',
+      'Return gradually, bringing the calm feeling back with you'
+    ],
+    coaching: 'Nature visualisation works even without real access to nature. The physiological effects — reduced cortisol, lowered heart rate — are measurable even from imagination alone.',
+    why: 'Exposure to natural environments reduces stress hormones and improves mood. When real nature is inaccessible, visualisation produces similar measurable effects.',
+    credits: 20
+  },
+
+  {
+    id: 'morning-intention',
+    name: 'Morning Intention Setting',
+    category: 'mindfulness',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Before checking your phone or starting the day, sit quietly for 5 minutes',
+      'Take 3 slow breaths',
+      'Ask yourself: what matters to me today?',
+      'Set one intention — not a task or a goal, but a quality of attention: be patient, be present, be curious',
+      'Hold the intention in mind for a moment',
+      'Begin the day from this place'
+    ],
+    coaching: 'An intention is different to a to-do list. It is about how you want to show up, not what you want to achieve. It takes less than 5 minutes.',
+    why: 'Morning intention setting activates the prefrontal cortex before reactive systems take over. Reduces autopilot behaviour and increases sense of agency throughout the day.',
+    credits: 15
+  },
+
+  {
+    id: 'gratitude-reflection',
+    name: 'Gratitude Reflection',
+    category: 'mindfulness',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Sit quietly, preferably at the end of the day',
+      'Bring to mind 3 specific things that happened today that you are grateful for',
+      'Be specific — not "my health" but "the warmth of the shower this morning"',
+      'For each one, spend a moment actually feeling the appreciation, not just listing it',
+      'Notice any resistance — that is normal. Stay with the feeling anyway'
+    ],
+    coaching: 'The specificity matters. Generic gratitude skims the surface. Specific, sensory details help the brain register the experience as genuinely positive.',
+    why: 'Gratitude practice reliably improves sleep quality, reduces symptoms of depression, and increases life satisfaction. Most effective when done consistently over time.',
+    credits: 15
+  },
+
+  {
+    id: 'box-breathing-extended',
+    name: 'Box Breathing — Extended Practice',
+    category: 'mindfulness',
+    contentType: 'practice',
+    movementPattern: 'breath-awareness',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 600,
+    perSide: false,
+    instructions: [
+      'Sit with your spine tall and eyes closed',
+      'Begin with a 4-4-4-4 count — in, hold, out, hold',
+      'After 5 minutes, increase to 5-5-5-5 if comfortable',
+      'Keep the breath smooth and even throughout each count',
+      'If the mind wanders, return to counting',
+      'Continue for 10 minutes total'
+    ],
+    coaching: 'The extended version deepens the calming effect. Used by emergency services and military for acute stress regulation. The hold phases are where the nervous system resets.',
+    why: 'Extended box breathing reduces cortisol, lowers blood pressure, and improves heart rate variability — all measurable markers of stress reduction. More effective than a shorter session.',
+    credits: 20
+  },
+
+  {
+    id: 'digital-detox-transition',
+    name: 'Screen-to-Calm Transition',
+    category: 'mindfulness',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 180,
+    perSide: false,
+    instructions: [
+      'After finishing work or a long period of screen time, stop completely',
+      'Place your device face down or in another room',
+      'Sit or stand and look at something in the real environment for 3 minutes — out of a window, at a plant, at a candle',
+      'Breathe slowly and let the visual field soften — you are not looking for anything, just resting the eyes',
+      'Notice any urges to check your phone — acknowledge them without acting',
+      'After 3 minutes, notice the difference in your body'
+    ],
+    coaching: 'This feels difficult at first precisely because of how over-stimulated the nervous system has become. That difficulty is the signal that it is needed.',
+    why: 'Screen time activates the sympathetic nervous system. This transition practice allows the nervous system to downregulate before the next activity — improving focus, mood, and sleep if done before bed.',
+    credits: 15
+  }
+
 ];
