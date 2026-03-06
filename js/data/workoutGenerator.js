@@ -269,17 +269,20 @@ export const workoutGenerator = {
     let totalSeconds = 0;
 
     exercises.forEach(exercise => {
+      let exerciseSeconds = 0;
       if (exercise.duration) {
         const sets = exercise.sets || 1;
         const rest = exercise.rest || 30;
-        totalSeconds += (exercise.duration * sets) + (rest * (sets - 1));
+        exerciseSeconds = (exercise.duration * sets) + (rest * (sets - 1));
       } else if (exercise.reps) {
         const sets = exercise.sets || 3;
         const reps = exercise.reps || 10;
         const rest = exercise.rest || 45;
-        totalSeconds += (reps * 4 * sets) + (rest * (sets - 1));
+        exerciseSeconds = (reps * 4 * sets) + (rest * (sets - 1));
       }
-      if (exercise.perSide) totalSeconds *= 2;
+      // perSide doubles THIS exercise only — not the running total
+      if (exercise.perSide) exerciseSeconds *= 2;
+      totalSeconds += exerciseSeconds;
     });
 
     return Math.round(totalSeconds / 60);
