@@ -481,4 +481,321 @@ export const RECOVERY = [
     credits: 20
   }
 
+
+  ,
+
+  // ============================================
+  // RECOVERY EXPANSION — Final batch (12 items)
+  // ============================================
+
+  {
+    id: 'cold-shower-protocol',
+    name: 'Cold Shower — Recovery Protocol',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 180,
+    perSide: false,
+    instructions: [
+      'Finish your normal warm shower',
+      'Turn the temperature to cold — as cold as possible',
+      'Stay under for 30 seconds initially',
+      'Build toward 2 to 3 minutes over several weeks',
+      'Focus on slow, controlled breathing throughout — do not gasp and tense',
+      'Finish cold — do not turn the warm back on'
+    ],
+    coaching: 'The breathing is the practice. The cold is just the trigger. Controlling the breath under cold stress trains the nervous system to regulate under other forms of stress too.',
+    why: 'Cold water immersion activates the sympathetic system and then the parasympathetic rebound. Regular practice builds cold tolerance, reduces muscle soreness, and improves mood via norepinephrine release.',
+    credits: 20
+  },
+
+  {
+    id: 'contrast-therapy',
+    name: 'Contrast Therapy',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: ['cardiovascular-condition'],
+    energyRequired: 2,
+    duration: 600,
+    perSide: false,
+    instructions: [
+      'Alternate between hot and cold water exposure',
+      'Hot: 3 minutes in a warm shower or bath',
+      'Cold: 1 minute in cold shower or cold water',
+      'Repeat the cycle 3 to 4 times',
+      'Always finish with cold',
+      'Use after heavy training sessions or competition'
+    ],
+    coaching: 'The alternating temperatures create a pumping effect on circulation — hot dilates blood vessels, cold constricts them. This mechanical action clears metabolic waste from muscle tissue.',
+    why: 'Contrast therapy accelerates recovery by increasing tissue blood flow via vascular oscillation. Used by professional teams post-match to reduce delayed onset muscle soreness.',
+    credits: 25
+  },
+
+  {
+    id: 'napping-protocol',
+    name: 'Recovery Nap Protocol',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 1200,
+    perSide: false,
+    instructions: [
+      'Find a dark, quiet space in the early afternoon — ideally 1 to 3pm',
+      'Set an alarm for 20 to 25 minutes',
+      'Lie down and allow sleep to come without forcing it',
+      'If sleep does not come, rest with eyes closed — the rest still has benefit',
+      'On waking, allow 5 minutes before demanding cognitive work'
+    ],
+    coaching: 'A 20-minute nap does not cause sleep inertia. A 30-minute nap often does. Keep it short — the science on this is clear.',
+    why: 'A 20-minute nap improves alertness, reaction time, and mood for 2 to 3 hours. Used deliberately by elite athletes and military. NASA studies show 26 minutes as optimal.',
+    credits: 20
+  },
+
+  {
+    id: 'hydration-protocol',
+    name: 'Hydration Protocol',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Weigh yourself before and after exercise if possible',
+      'For every kilogram of body weight lost, drink 1.5 litres of fluid',
+      'Include electrolytes in post-exercise hydration — a small amount of salt in water is sufficient',
+      'Urine colour is a reliable guide — pale yellow is optimal, dark yellow means dehydration',
+      'Drink 500ml in the 2 hours before exercise',
+      'Do not wait until you are thirsty during exercise — drink on a schedule'
+    ],
+    coaching: 'Even mild dehydration of 2% body weight reduces performance by up to 20%. Most people train and compete dehydrated without knowing it.',
+    why: 'Adequate hydration is one of the highest-return recovery and performance interventions available. The evidence base is unambiguous and the application is straightforward.',
+    credits: 15
+  },
+
+  {
+    id: 'nutrition-timing',
+    name: 'Post-Exercise Nutrition Window',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Within 30 to 60 minutes of finishing exercise, consume:',
+      'Protein: 20 to 40 grams — chicken, eggs, protein shake, Greek yogurt',
+      'Carbohydrate: 1 to 1.2 grams per kilogram of body weight — rice, banana, oats',
+      'Liquid: at least 500ml water',
+      'This window is when muscle protein synthesis is highest',
+      'A regular meal within 2 hours also works if the immediate window is missed'
+    ],
+    coaching: 'The post-exercise nutrition window is most important after hard training sessions. After an easy walk, it matters much less.',
+    why: 'Muscle protein synthesis rates are elevated for 24 to 48 hours after resistance training, but peak in the first 2 hours. Post-exercise nutrition directly supports recovery and adaptation.',
+    credits: 15
+  },
+
+  {
+    id: 'trigger-point-release-ball',
+    name: 'Trigger Point Release — Ball',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'body-scan',
+    equipment: ['massage-ball'],
+    equipmentOptional: ['tennis-ball'],
+    affectsAreas: ['full-body'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 600,
+    perSide: false,
+    instructions: [
+      'Place a massage ball or tennis ball between your body and the floor or wall',
+      'Find a tender spot — a knot or area of tightness',
+      'Apply pressure by leaning into the ball — stay on the tender spot for 30 to 60 seconds',
+      'Add slow movement — small circles or rolling',
+      'When the tenderness reduces, move to the next spot',
+      'Work: glutes, upper back, calves, and plantar fascia (foot)'
+    ],
+    coaching: 'The pressure should produce a "good pain" — uncomfortable but clearly beneficial. Avoid directly on bones or joints.',
+    why: 'Trigger point therapy releases myofascial adhesions that restrict movement and cause referred pain. A ball allows deeper pressure and more precision than a foam roller.',
+    credits: 25
+  },
+
+  {
+    id: 'elevation-recovery',
+    name: 'Leg Elevation Recovery',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['calves', 'ankle-foot'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 600,
+    perSide: false,
+    instructions: [
+      'Lie on your back and rest both legs up against a wall',
+      'Legs are raised above heart level — feet pointing to the ceiling',
+      'Remain in this position for 10 minutes',
+      'Optional: add ankle circles while elevated'
+    ],
+    coaching: 'Legs up the wall is one of the simplest and most effective recovery positions. It works purely through gravity and requires nothing.',
+    why: 'Elevating the legs above the heart reverses the pooling of blood and lymphatic fluid that accumulates from standing and training. Reduces swelling and accelerates clearance of metabolic waste.',
+    credits: 15
+  },
+
+  {
+    id: 'active-recovery-walk',
+    name: 'Active Recovery Walk',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 1800,
+    perSide: false,
+    instructions: [
+      'Walk at a genuinely easy pace for 30 minutes',
+      'This is not exercise — it is recovery',
+      'The pace should be conversational and comfortable',
+      'Ideally outdoors in a natural environment',
+      'Leave your phone in your pocket or at home if possible'
+    ],
+    coaching: 'An active recovery walk the day after hard training reduces soreness more effectively than complete rest — the gentle movement promotes circulation without adding stress.',
+    why: 'Active recovery increases blood flow to muscle tissue, accelerating the removal of metabolic by-products. The gentle locomotion also maintains movement patterns without adding training load.',
+    credits: 20
+  },
+
+  {
+    id: 'sleep-position-optimisation',
+    name: 'Sleep Position Optimisation',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['spine', 'shoulder', 'hip'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Side sleeping: place a pillow between the knees to align the hips — reduces lower back stress',
+      'Back sleeping: place a small pillow under the knees — reduces lumbar extension',
+      'Stomach sleeping: place a pillow under the pelvis — reduces lumbar compression (though side or back is preferred)',
+      'Neck: the pillow should keep the spine neutral — not pushed up or dropping down',
+      'Assess your sleeping position after waking — morning pain indicates alignment issues'
+    ],
+    coaching: 'Many chronic back and neck problems are significantly influenced by sleeping position. This is a free intervention with potentially major impact.',
+    why: 'Spinal alignment during 7 to 9 hours of sleep significantly influences musculoskeletal health. Poor sleep position creates cumulative joint stress that compounds over years.',
+    credits: 15
+  },
+
+  {
+    id: 'meditation-sleep-onset',
+    name: 'Sleep Onset Meditation',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'body-scan',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 600,
+    perSide: false,
+    instructions: [
+      'In bed, lying on your back, close your eyes',
+      'Take 10 very slow breaths — exhale twice as long as inhale',
+      'Starting at the feet, consciously relax each body part upward',
+      'Let the feet sink heavy into the mattress, then the calves, then the thighs',
+      'Allow each area to become warm and heavy',
+      'By the time you reach the face, sleep often arrives naturally',
+      'If still awake, begin again from the feet'
+    ],
+    coaching: 'If you are still awake after 20 minutes, get up and do a quiet activity until you feel sleepy — the research on this is clear. Lying awake anxiously trains the brain that bed is a place for wakefulness.',
+    why: 'The progressive relaxation approach to sleep onset reduces sleep latency (time to fall asleep) by activating the parasympathetic system and reducing physical tension that prevents sleep.',
+    credits: 20
+  },
+
+  {
+    id: 'breathing-478',
+    name: '4-7-8 Breathing',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'breath-awareness',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Sit or lie comfortably',
+      'Exhale completely through the mouth',
+      'Close the mouth and inhale through the nose for 4 counts',
+      'Hold the breath for 7 counts',
+      'Exhale completely through the mouth for 8 counts',
+      'This is one cycle — repeat 4 times',
+      'Practice twice daily for best results'
+    ],
+    coaching: 'The extended breath hold may feel uncomfortable at first. Reduce the counts proportionally if needed — the 1:1.75:2 ratio is what matters, not the absolute numbers.',
+    why: 'Developed by Dr Andrew Weil, 4-7-8 breathing produces rapid parasympathetic activation through the prolonged exhale and breath hold. Demonstrated to reduce anxiety and aid sleep onset.',
+    credits: 20
+  },
+
+  {
+    id: 'sauna-protocol',
+    name: 'Sauna Recovery Protocol',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'grounding',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body', 'cardiovascular'],
+    contraindications: ['cardiovascular-condition'],
+    energyRequired: 2,
+    duration: 1200,
+    perSide: false,
+    instructions: [
+      'Enter a sauna at 80 to 100 degrees Celsius',
+      'Stay for 15 to 20 minutes — hydrate before entering',
+      'Exit and cool down for 10 minutes in cool or cold air',
+      'Optional: cold plunge for 1 to 2 minutes between sauna sessions',
+      'Repeat 2 to 3 times',
+      'Drink 500ml water during and after',
+      'Do not use immediately after hard training — allow 30 to 60 minutes'
+    ],
+    coaching: 'Sauna exposure should feel challenging but safe. Any dizziness, nausea, or excessive discomfort means exit immediately.',
+    why: "Regular sauna use has strong evidence for cardiovascular health, growth hormone release, heat shock protein production, and mood improvement. Dr Rhonda Patrick's research is particularly comprehensive on this.",
+    credits: 30
+  }
+
 ];
