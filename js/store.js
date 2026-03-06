@@ -2,6 +2,19 @@
  * store.js - Data persistence layer
  * Handles localStorage with simple get/set API
  *
+ * v1.2 — Schema additions:
+ *   prescribedExercises  — externally prescribed exercises from physio/coach
+ *                          Empty array in v1.2; UI built in Phase 3/4.
+ *                          Added now so any user data captured in the field
+ *                          from here forwards is correctly persisted.
+ *
+ *   conditionPainScores  — today's per-condition pain scores from check-in
+ *                          { [conditionId]: 0-10 }
+ *                          Used by the 3-tier condition filter to resolve
+ *                          phase-aware condition variants (acute/subacute).
+ *                          Replaces the previous approach of storing only
+ *                          a flat conditions[] array with no pain context.
+ *
  * v1.1 — Strategic layer additions:
  *   strategicGoal   — user's primary goal with target details
  *   activeProgramme — which plan they're on + current week/phase
@@ -31,91 +44,124 @@ export const store = {
 
   /**
    * Merge saved data with defaults so new schema fields appear
-   * for users who onboarded before the strategic layer was added
+   * for users who onboarded before this version was deployed.
+   * Existing data is never overwritten — only missing keys are filled.
    */
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
     return {
       ...defaults,
       ...saved,
-      lifestyle:       { ...defaults.lifestyle,       ...(saved.lifestyle       || {}) },
-      strategicGoal:   { ...defaults.strategicGoal,   ...(saved.strategicGoal   || {}) },
-      activeProgramme: { ...defaults.activeProgramme, ...(saved.activeProgramme || {}) },
-      progressLog:     Array.isArray(saved.progressLog) ? saved.progressLog : [],
+      lifestyle:            { ...defaults.lifestyle,            ...(saved.lifestyle            || {}) },
+      strategicGoal:        { ...defaults.strategicGoal,        ...(saved.strategicGoal        || {}) },
+      activeProgramme:      { ...defaults.activeProgramme,      ...(saved.activeProgramme      || {}) },
+      progressLog:          Array.isArray(saved.progressLog)    ? saved.progressLog    : [],
+      prescribedExercises:  Array.isArray(saved.prescribedExercises) ? saved.prescribedExercises : [],
+      conditionPainScores:  (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
+                              ? saved.conditionPainScores
+                              : {},
     };
   },
 
   getDefaults() {
     return {
-      // ONBOARDING
+      // ── ONBOARDING ───────────────────────────────────────────
       onboardingComplete: false,
       onboardingStep: 1,
 
-      // PROFILE — Step 2
+      // ── PROFILE — Step 2 ─────────────────────────────────────
       name: '',
 
-      // ABOUT — Step 3
+      // ── ABOUT — Step 3 ───────────────────────────────────────
       age: null,
       gender: null,
       hormonalTracking: false,
 
-      // BODY & TARGETS — Step 4
+      // ── BODY & TARGETS — Step 4 ──────────────────────────────
       weight: null,
       weightUnit: 'kg',
       targetWeight: null,
       targetDate: null,
       targetDescription: '',
 
-      // GOALS — Step 5
-      // Flat array of goal IDs — used by exercise filter engine
+      // ── GOALS — Step 5 ───────────────────────────────────────
+      // Flat array of goal IDs — drives exercise filter engine
       goals: [],
 
-      // CONDITIONS — Step 6
+      // ── CONDITIONS — Step 6 ──────────────────────────────────
+      // Flat array of condition IDs selected during onboarding.
+      // Phase variants (acute/subacute) are derived at runtime from
+      // conditionPainScores — never stored directly.
       conditions: [],
 
-      // LIFESTYLE — Step 7
+      // Today's pain scores per condition — updated at each check-in.
+      // { [conditionId]: 0-10 }
+      // Used by getActiveConditionIds() to resolve phase variants.
+      conditionPainScores: {},
+
+      // ── LIFESTYLE — Step 7 ───────────────────────────────────
       lifestyle: {
         activityLevel: null,
         stressLevel: null,
         sleepQuality: null
       },
 
-      // EQUIPMENT — Step 8
+      // ── EQUIPMENT — Step 8 ───────────────────────────────────
       equipment: [],
 
-      // STRATEGIC GOAL
+      // ── PRESCRIBED EXERCISES ─────────────────────────────────
+      // Exercises prescribed by an external professional (physio,
+      // coach, consultant). These are surfaced in the workout view
+      // alongside coach-generated exercises when relevant.
+      //
+      // Schema (per item):
+      //   id:           string    — unique ID e.g. 'prescribed-001'
+      //   exerciseId:   string    — ID from exercises database, or null
+      //   name:         string    — display name (may differ from DB)
+      //   description:  string    — what the professional prescribed
+      //   frequency:    string    — e.g. '2x daily', 'after exercise'
+      //   prescribedBy: string    — professional's name or role
+      //   prescribedAt: string    — ISO date string
+      //   active:       boolean   — whether still in current programme
+      //
+      // UI for entering prescribed exercises: Phase 3/4.
+      // Array is empty and safe to leave empty until then.
+      prescribedExercises: [],
+
+      // ── STRATEGIC GOAL ───────────────────────────────────────
       // Richer than goals[] — drives programme selection and rationale.
       // goals[] still drives daily exercise filtering (unchanged).
       strategicGoal: {
-        primaryGoal:         null,  // goal ID e.g. 'lose-weight'
-        targetDescription:   '',    // plain text e.g. "Look great for holiday"
-        targetDate:          null,  // ISO date string
-        targetValue:         null,  // numeric e.g. 168
-        targetUnit:          null,  // 'lbs' | 'kg' | 'km' | 'miles' | null
-        weeklySessionTarget: 3,     // sessions per week commitment
-        setAt:               null   // ISO timestamp
+        primaryGoal:         null,   // goal ID e.g. 'lose-weight'
+        targetDescription:   '',     // plain text e.g. "Look great for holiday"
+        targetDate:          null,   // ISO date string
+        targetValue:         null,   // numeric e.g. 168
+        targetUnit:          null,   // 'lbs' | 'kg' | 'km' | 'miles' | null
+        weeklySessionTarget: 3,      // sessions per week commitment
+        setAt:               null    // ISO timestamp
       },
 
-      // ACTIVE PROGRAMME
+      // ── ACTIVE PROGRAMME ─────────────────────────────────────
       activeProgramme: {
-        programmeId:      null,   // e.g. 'beginner-fitness'
-        programmeName:    '',     // display name
-        startDate:        null,   // ISO date string
-        currentWeek:      1,      // 1-12
-        currentPhase:     null,   // 'build' | 'push' | 'peak' | 'recovery'
-        sessionsThisWeek: 0,      // resets each Monday
-        totalSessions:    0,      // lifetime on this programme
-        milestones:       [],     // [{ id, label, achievedAt }]
+        programmeId:      null,    // e.g. 'beginner-fitness'
+        programmeName:    '',      // display name
+        startDate:        null,    // ISO date string
+        currentWeek:      1,       // 1-12
+        currentPhase:     null,    // 'build' | 'push' | 'peak' | 'recovery'
+        sessionsThisWeek: 0,       // resets each Monday
+        totalSessions:    0,       // lifetime on this programme
+        milestones:       [],      // [{ id, label, achievedAt }]
         completed:        false,
         completedAt:      null
       },
 
-      // PROGRESS LOG — one entry per completed session, max 90
+      // ── PROGRESS LOG ─────────────────────────────────────────
+      // One entry per completed session, max 90.
       // { date, week, phase, focus, energyAtCheckin, conditionScores,
       //   durationMinutes, exerciseCount, milestoneAchieved }
       progressLog: [],
 
-      // METADATA
+      // ── METADATA ─────────────────────────────────────────────
       createdAt: null,
       updatedAt: null
     };
@@ -176,7 +222,21 @@ export const store = {
   },
 
   /**
-   * Log a completed session — called from workout-complete view
+   * Update pain scores from today's check-in.
+   * Called by checkin.js when condition pain sliders are submitted.
+   *
+   * @param {Object} painScores — { [conditionId]: 0-10 }
+   */
+  updateConditionPainScores(painScores) {
+    this.data.conditionPainScores = { ...painScores };
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+  },
+
+  /**
+   * Log a completed session — called from workout-complete view.
+   * conditionScores now stored as { [conditionId]: score } object
+   * for richer progress tracking.
    */
   logSession(sessionData) {
     const log = [...(this.data.progressLog || [])];
@@ -186,7 +246,7 @@ export const store = {
       phase:             this.data.activeProgramme?.currentPhase || null,
       focus:             sessionData.focus             || null,
       energyAtCheckin:   sessionData.energy            || null,
-      conditionScores:   sessionData.conditionScores   || [],
+      conditionScores:   sessionData.conditionScores   || {},
       durationMinutes:   sessionData.durationMinutes   || 0,
       exerciseCount:     sessionData.exerciseCount      || 0,
       milestoneAchieved: sessionData.milestoneAchieved || null
