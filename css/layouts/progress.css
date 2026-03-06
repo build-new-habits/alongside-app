@@ -1,0 +1,434 @@
+/* ============================================
+   PROGRESS DASHBOARD — css/layouts/progress.css
+
+   Covers:
+     - Progress view layout and section headings  (t2_6)
+     - Programme overview card                    (t2_6)
+     - Week dots session tracker                  (t2_6)
+     - Recent sessions list                       (t2_6)
+     - Milestones timeline                        (t2_6)
+     - Milestone card on workout-complete         (t2_5)
+     - Teal heading consistency across all views  (t2_10)
+     - Coach icon consistency                     (t2_9)
+   ============================================ */
+
+
+/* ============================================
+   TEAL HEADING CONSISTENCY — t2_10
+   All h1 headings in view-header use primary teal.
+   Section headings (.section-heading) use a softer teal.
+   This applies globally and overrides any per-view defaults.
+   ============================================ */
+
+.view-header h1 {
+  color: var(--color-primary);
+}
+
+.view-header p.text-secondary {
+  color: var(--color-text-secondary);
+  margin-top: var(--space-1);
+}
+
+.section-heading {
+  color: var(--color-primary-light);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0 0 var(--space-3) 0;
+}
+
+
+/* ============================================
+   PROGRESS VIEW LAYOUT
+   ============================================ */
+
+.progress-view {
+  padding-bottom: var(--space-10);
+}
+
+.progress-section {
+  margin-bottom: var(--space-6);
+}
+
+
+/* ============================================
+   PROGRAMME OVERVIEW CARD
+   ============================================ */
+
+.progress-overview-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.progress-meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.progress-meta-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.progress-meta-value {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  line-height: 1.2;
+  text-transform: capitalize;
+}
+
+.progress-meta-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* Progress bar */
+.progress-bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 10px;
+  background: var(--color-bg);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary-dark), var(--color-primary));
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+  min-width: 4px; /* always visible even at 0% */
+}
+
+.progress-bar-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-align: right;
+}
+
+.progress-target-hint {
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+
+/* ============================================
+   THIS WEEK — SESSION DOTS
+   ============================================ */
+
+.week-sessions-row {
+  margin-bottom: var(--space-3);
+}
+
+.week-dots {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.week-dot {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.week-dot--done {
+  background: var(--color-primary);
+  box-shadow: 0 0 8px var(--color-primary-glow);
+}
+
+.week-dot--empty {
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+}
+
+.week-sessions-label {
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.avg-energy-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.avg-energy-label {
+  font-size: var(--text-sm);
+}
+
+.avg-energy-value {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+}
+
+
+/* ============================================
+   RECENT SESSIONS LIST
+   ============================================ */
+
+.session-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.session-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.session-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.session-row-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.session-row-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.session-focus-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  text-transform: capitalize;
+  flex-shrink: 0;
+}
+
+/* Focus badge colour variants */
+.session-focus--strength { background: rgba(251, 191, 36, 0.15);  color: var(--color-warning); }
+.session-focus--mobility { background: rgba(45, 212, 191, 0.15);  color: var(--color-primary); }
+.session-focus--cardio   { background: rgba(251, 113, 133, 0.15); color: var(--color-danger);  }
+.session-focus--general  { background: rgba(148, 163, 184, 0.15); color: var(--color-text-secondary); }
+
+.session-name {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-date {
+  font-size: var(--text-xs);
+}
+
+.session-credits {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-achievement);
+  white-space: nowrap;
+}
+
+
+/* ============================================
+   MILESTONES TIMELINE
+   ============================================ */
+
+.milestone-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.milestone-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.milestone-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.milestone-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.milestone-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.milestone-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-text);
+}
+
+.milestone-date {
+  font-size: var(--text-xs);
+}
+
+
+/* ============================================
+   MILESTONE CARD — WORKOUT COMPLETE (t2_5)
+   ============================================ */
+
+.milestone-card {
+  background: linear-gradient(135deg,
+    rgba(167, 139, 250, 0.15),
+    rgba(45, 212, 191, 0.15));
+  border: 1px solid var(--color-achievement);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-5);
+  text-align: center;
+}
+
+.milestone-badge {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-2);
+  display: block;
+}
+
+.milestone-prefix {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.milestone-label {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-achievement);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.milestone-suffix {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin: 0;
+}
+
+
+/* ============================================
+   COACH ICON CONSISTENCY — t2_9
+   Ensures .coach-icon-small renders identically
+   on today.js, checkin.js, and any future view.
+   ============================================ */
+
+.coach-icon-small {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.card-coach {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.card-coach > .coach-icon-small {
+  margin-top: 2px; /* optical alignment with first line of text */
+}
+
+/* Remove any legacy teal-box coach placeholders */
+.coach-placeholder {
+  display: none !important;
+}
+
+
+/* ============================================
+   TODAY VIEW — PROGRAMME PHASE BANNER
+   Shown between check-in summary and workout options
+   when a programme is active. Soft teal card.
+   ============================================ */
+
+.phase-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.phase-banner-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.phase-banner-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.phase-banner-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.phase-banner-message {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+
+/* ============================================
+   NO-PROGRAMME STATE
+   ============================================ */
+
+.card-coach p + p {
+  margin-top: var(--space-2);
+}
