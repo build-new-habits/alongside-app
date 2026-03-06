@@ -539,4 +539,284 @@ export const YOGA = [
     credits: 60
   }
 
+
+  ,
+
+  // YOGA EXPANSION — Final 10 items
+
+  {
+    id: 'yoga-sun-salutation-b',
+    name: 'Sun Salutation B',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'yoga-flow',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['full-body', 'hip-flexor', 'hamstring'],
+    contraindications: ['knee-acute', 'lower-back-acute'],
+    energyRequired: 5,
+    duration: 180,
+    perSide: false,
+    instructions: [
+      'Mountain pose — inhale into chair pose',
+      'Exhale forward fold',
+      'Half lift, step back — exhale chaturanga',
+      'Inhale upward dog',
+      'Exhale downward dog — hold 5 breaths',
+      'Step right foot forward — warrior 1, 5 breaths',
+      'Back through vinyasa — left warrior 1, 5 breaths',
+      'Forward fold — exhale, inhale chair pose',
+      'Exhale mountain pose',
+      'Complete 3 to 5 rounds'
+    ],
+    coaching: 'Sun B is more physically demanding than Sun A because of the chair pose and warrior holds. Build to it after Sun A is comfortable.',
+    why: 'Sun Salutation B adds standing strength work — chair pose and warrior 1 — making it a more complete strength and mobility sequence than Sun A.',
+    credits: 55
+  },
+
+  {
+    id: 'yoga-yin-hip-sequence',
+    name: 'Yin Yoga — Hip Opening Sequence',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'yoga-flow',
+    equipment: [],
+    equipmentOptional: ['yoga-mat', 'yoga-blocks'],
+    affectsAreas: ['hip', 'glutes', 'adductors'],
+    contraindications: ['hip-acute'],
+    energyRequired: 1,
+    duration: 1800,
+    perSide: false,
+    instructions: [
+      'Butterfly — feet together, letting knees fall open — 3 minutes',
+      'Dragon right — deep lunge with back knee down — 3 minutes',
+      'Dragon left — 3 minutes',
+      'Sleeping swan right (yin pigeon) — 3 minutes',
+      'Sleeping swan left — 3 minutes',
+      'Wide-knee child pose — 2 minutes',
+      'Supine twist right — 2 minutes',
+      'Supine twist left — 2 minutes',
+      'Savasana — 5 minutes'
+    ],
+    coaching: 'Yin yoga targets connective tissue — fascia and ligaments — not muscles. The long holds are essential. Do not try to relax into the poses too quickly.',
+    why: 'Yin yoga works on connective tissue hydration and flexibility through long static holds — a different physiological mechanism to the dynamic stretching of most exercise.',
+    credits: 60
+  },
+
+  {
+    id: 'yoga-restorative-sequence',
+    name: 'Restorative Yoga Sequence',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'yoga-flow',
+    equipment: [],
+    equipmentOptional: ['yoga-mat', 'yoga-blocks', 'bolster'],
+    affectsAreas: ['nervous-system', 'full-body'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 1800,
+    perSide: false,
+    instructions: [
+      'Supported child pose — 5 minutes',
+      'Supported bridge — pelvis on a block, legs extended — 5 minutes',
+      'Legs up the wall — 10 minutes',
+      'Supine bound angle — feet together, bolster along spine — 5 minutes',
+      'Savasana with eye pillow — 10 minutes'
+    ],
+    coaching: 'Restorative yoga is designed to activate the parasympathetic nervous system. Do not substitute yin for restorative — they are different practices with different aims.',
+    why: 'Restorative yoga has strong evidence for reducing cortisol, improving sleep quality, and managing anxiety. The supported positions allow the body to release without effort.',
+    credits: 60
+  },
+
+  {
+    id: 'yoga-balance-series',
+    name: 'Balance Challenge Series',
+    category: 'strength',
+    contentType: 'practice',
+    movementPattern: 'yoga-pose',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['ankle-foot', 'glutes', 'abdominals'],
+    contraindications: ['ankle-foot-acute'],
+    energyRequired: 5,
+    duration: 900,
+    perSide: false,
+    instructions: [
+      'Tree pose right — 60 seconds',
+      'Tree pose left — 60 seconds',
+      'Warrior 3 right — 45 seconds',
+      'Warrior 3 left — 45 seconds',
+      'Eagle pose right — 45 seconds',
+      'Eagle pose left — 45 seconds',
+      'Half moon right — 30 seconds',
+      'Half moon left — 30 seconds',
+      'Rest in mountain pose for 5 breaths between sides'
+    ],
+    coaching: 'Focus on a fixed point at eye level — the drishti. A stable gaze creates a stable balance. Wobbling is normal and is not failure.',
+    why: 'A progressive balance challenge that develops proprioception, ankle stability, and hip stability simultaneously. Balance deteriorates with age if untrained — this directly addresses that.',
+    credits: 65
+  },
+
+  {
+    id: 'yoga-forward-fold-series',
+    name: 'Forward Fold Series',
+    category: 'mobility',
+    contentType: 'practice',
+    movementPattern: 'yoga-pose',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hamstring', 'lower-back', 'calves'],
+    contraindications: ['hamstring-acute', 'lower-back-acute'],
+    energyRequired: 3,
+    duration: 600,
+    perSide: false,
+    instructions: [
+      'Standing forward fold — hold 2 minutes',
+      'Pyramid pose right — 90 seconds',
+      'Pyramid pose left — 90 seconds',
+      'Wide-legged forward fold — 2 minutes',
+      'Seated forward fold — 2 minutes',
+      'Janu sirsasana right — 90 seconds',
+      'Janu sirsasana left — 90 seconds'
+    ],
+    coaching: 'In every forward fold, the priority is a flat back over reaching the toes. A rounded spine to reach further defeats the purpose.',
+    why: 'A dedicated posterior chain flexibility sequence addressing the hamstring, lumbar, and calf tightness that drives lower back pain in most adults.',
+    credits: 50
+  },
+
+  {
+    id: 'yoga-backbend-series',
+    name: 'Backbend Opening Series',
+    category: 'mobility',
+    contentType: 'practice',
+    movementPattern: 'yoga-pose',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['chest-pecs', 'hip-flexor', 'thoracic'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 4,
+    duration: 600,
+    perSide: false,
+    instructions: [
+      'Cat-cow warm-up — 2 minutes',
+      'Sphinx — 2 minutes',
+      'Low cobra — 60 seconds',
+      'Full cobra — 60 seconds',
+      'Locust — 45 seconds, 3 rounds',
+      'Bow — 30 seconds, 3 rounds',
+      'Camel — 30 seconds, 2 rounds',
+      'Child pose to counterpose — 2 minutes'
+    ],
+    coaching: 'The backbend series should always finish with a counterpose. Child pose or supine twist neutralises the lumbar extension and prevents post-session back tightness.',
+    why: 'Backbends develop thoracic extension and hip flexor length — the two most commonly restricted movements in people who sit for long periods.',
+    credits: 55
+  },
+
+  {
+    id: 'yoga-power-flow',
+    name: 'Power Yoga Flow — 30 Minutes',
+    category: 'strength',
+    contentType: 'practice',
+    movementPattern: 'yoga-flow',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['full-body'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 7,
+    duration: 1800,
+    perSide: false,
+    instructions: [
+      'Sun A × 3 rounds',
+      'Sun B × 3 rounds',
+      'Warrior series: 1, 2, reverse warrior, side angle',
+      'Balance series: warrior 3, half moon',
+      'Core: boat, low boat, plank holds',
+      'Cool-down: wide-leg fold, seated twist, supine twist',
+      'Savasana: 5 minutes'
+    ],
+    coaching: 'Power yoga is vinyasa at higher intensity — the transitions between poses are fast and the holds are brief. Build heat in the first 10 minutes before the harder sequences.',
+    why: 'Power yoga builds functional strength, cardiovascular fitness, and flexibility simultaneously — a genuinely complete workout for people who struggle to fit multiple training types into their week.',
+    credits: 90
+  },
+
+  {
+    id: 'yoga-pranayama',
+    name: 'Pranayama Breathing Practice',
+    category: 'mindfulness',
+    contentType: 'practice',
+    movementPattern: 'breath-awareness',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 900,
+    perSide: false,
+    instructions: [
+      'Sit with a tall spine, hands on knees',
+      'Ujjayi breath: breathe through the nose with a slight throat constriction — creating an ocean sound — 5 minutes',
+      'Nadi shodhana (alternate nostril): close right nostril, inhale left, close left, exhale right — switch sides — 5 minutes',
+      'Bhramari (humming bee): plug ears with thumbs, hum loudly on exhale — 10 rounds',
+      'Rest in natural breath for 2 minutes'
+    ],
+    coaching: 'Pranayama requires consistent practice to produce its effects. Ten minutes daily is more valuable than an hour once a week.',
+    why: 'Pranayama practices directly modulate the autonomic nervous system through breathing mechanics and vagal nerve stimulation — producing measurable reductions in cortisol and anxiety.',
+    credits: 35
+  },
+
+  {
+    id: 'yoga-chair',
+    name: 'Chair Yoga — Seated Sequence',
+    category: 'mobility',
+    contentType: 'practice',
+    movementPattern: 'yoga-pose',
+    equipment: [],
+    equipmentOptional: ['chair'],
+    affectsAreas: ['full-body', 'spine'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 600,
+    perSide: false,
+    instructions: [
+      'Seated cat-cow — 10 rounds',
+      'Seated side stretch right and left — 45 seconds each',
+      'Seated spinal twist right and left — 45 seconds each',
+      'Seated forward fold — 60 seconds',
+      'Seated figure-4 right and left — 45 seconds each',
+      'Seated mountain — tall spine, feet grounded, 5 deep breaths',
+      'Standing if able: mountain pose — 1 minute'
+    ],
+    coaching: 'Chair yoga is not a compromise. It is a specific practice that makes yoga accessible to everyone regardless of mobility level, injury, or setting.',
+    why: 'Chair yoga maintains spinal mobility, hip flexibility, and body awareness for people who cannot access floor-based practice. Evidence shows benefits for older adults and chronic pain populations.',
+    credits: 40
+  },
+
+  {
+    id: 'yoga-hip-strength',
+    name: 'Hip Strength and Stability — Yoga',
+    category: 'strength',
+    contentType: 'practice',
+    movementPattern: 'yoga-pose',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['glutes', 'hip', 'adductors'],
+    contraindications: ['hip-acute'],
+    energyRequired: 5,
+    duration: 900,
+    perSide: false,
+    instructions: [
+      'Warrior 2 right — 90 seconds, holding strong',
+      'Goddess pose — 90 seconds, deep and stable',
+      'Warrior 2 left — 90 seconds',
+      'Chair pose — 60 seconds',
+      'Low side lunge right — 60 seconds',
+      'Low side lunge left — 60 seconds',
+      'High lunge right — 60 seconds',
+      'High lunge left — 60 seconds'
+    ],
+    coaching: 'These are strength poses, not stretches — maintain full muscular engagement throughout. Warrior 2 held for 90 seconds is genuinely demanding.',
+    why: 'Hip strength yoga combines the flexibility benefits of yoga with the strength demands of held positions. Develops the hip stability that reduces injury risk in all sports.',
+    credits: 65
+  }
+
 ];
