@@ -28,6 +28,7 @@ import { YOGA }           from './yoga.js';
 import { PILATES }        from './pilates.js';
 import { RUNNING }        from './running.js';
 import { SWIMMING_CYCLING } from './swimming_cycling.js';
+import { SPORT_CONDITIONING } from './sport_conditioning.js';
 // import { PROGRAMMES }     from './programmes.js';
 
 export const EXERCISES = [
@@ -41,6 +42,7 @@ export const EXERCISES = [
   ...PILATES,
   ...RUNNING,
   ...SWIMMING_CYCLING,
+  ...SPORT_CONDITIONING,
   // ...PROGRAMMES,
 ];
 
