@@ -1305,4 +1305,1010 @@ export const STRENGTH = [
     credits: 65
   }
 
+
+  ,
+
+  // ============================================
+  // BARBELL EXERCISES — Batch 20a (10 items)
+  // ============================================
+
+  {
+    id: 'barbell-deadlift',
+    name: 'Barbell Deadlift',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'hinge',
+    equipment: ['barbell'],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'hamstring', 'lower-back', 'upper-back'],
+    contraindications: ['lower-back-acute', 'hamstring-acute'],
+    energyRequired: 8,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Stand with the bar over your mid-foot, feet hip-width apart',
+      'Hinge down and grip the bar just outside your legs',
+      'Set your back flat, chest up, hips higher than knees',
+      'Take a breath into your belly and brace your core hard',
+      'Drive through the floor — push the earth away rather than pulling the bar up',
+      'Hips and shoulders rise at the same rate',
+      'At the top, stand fully upright — squeeze the glutes',
+      'Lower with control, hinging at the hip',
+      'Complete 3 sets of 5 reps'
+    ],
+    coaching: 'The bar should travel in a straight vertical line — if it swings away from your legs at any point, the weight is too heavy or the setup is off.',
+    why: 'The deadlift is the most fundamental human strength movement — picking a heavy load from the floor. No exercise builds posterior chain strength as comprehensively.',
+    credits: 90
+  },
+
+  {
+    id: 'barbell-squat',
+    name: 'Barbell Back Squat',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'squat',
+    equipment: ['barbell', 'squat-rack'],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'lower-back', 'hamstring'],
+    contraindications: ['knee-acute', 'lower-back-acute'],
+    energyRequired: 8,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Set the bar on a rack at upper chest height',
+      'Duck under and rest the bar on the upper traps — not the neck',
+      'Grip just wider than shoulder-width, elbows pointing back and slightly down',
+      'Unrack, step back, feet shoulder-width with toes turned slightly out',
+      'Inhale, brace the core, sit back and down — knees tracking over toes',
+      'Descend until thighs are parallel to the floor or lower',
+      'Drive through the heels to stand',
+      'Complete 3 sets of 5 reps'
+    ],
+    coaching: 'The bar position on the upper traps is critical — too high on the neck creates cervical compression. Too low starts to require significant forward lean.',
+    why: 'The back squat is the primary lower body strength exercise in most training programmes. Builds quad, glute, and core strength that transfers to all athletic movement.',
+    credits: 90
+  },
+
+  {
+    id: 'barbell-bench-press',
+    name: 'Barbell Bench Press',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'push',
+    equipment: ['barbell', 'bench'],
+    equipmentOptional: [],
+    affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 7,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Lie on a bench, eyes under the bar',
+      'Grip slightly wider than shoulder-width — wrists straight over elbows',
+      'Pull the shoulder blades together and down into the bench',
+      'Lift the bar from the rack with straight arms',
+      'Lower the bar to the lower chest in a slight arc — control the descent',
+      'Drive back up — bar path slightly back toward the rack',
+      'Complete 3 sets of 5 reps with a spotter for heavy loads'
+    ],
+    coaching: 'The shoulder blade retraction is the most important setup cue — it creates a stable base and reduces shoulder impingement risk significantly.',
+    why: 'The bench press is the primary horizontal pushing strength exercise. Builds chest, shoulder, and tricep strength with a loading capacity unmatched by bodyweight pressing.',
+    credits: 80
+  },
+
+  {
+    id: 'barbell-overhead-press',
+    name: 'Barbell Overhead Press',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'push',
+    equipment: ['barbell'],
+    equipmentOptional: ['squat-rack'],
+    affectsAreas: ['shoulder', 'triceps-biceps', 'upper-back', 'abdominals'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 7,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Hold the bar at shoulder height, grip just outside shoulder-width',
+      'Elbows slightly in front of the bar — not flared wide',
+      'Take a breath and brace the core hard — the spine must not extend',
+      'Press the bar straight up, moving your head back slightly to allow the bar to pass the face',
+      'Once past the forehead, press straight up and slightly back',
+      'Lower with control to shoulder height',
+      'Complete 3 sets of 5 reps'
+    ],
+    coaching: 'The strict press allows no leg drive — if you need to use your legs, the weight is too heavy for a strict press. Move to push press instead.',
+    why: 'The overhead press builds shoulder and upper body strength in a standing, loaded position — the most functional upper body strength exercise available.',
+    credits: 80
+  },
+
+  {
+    id: 'barbell-row',
+    name: 'Barbell Bent-Over Row',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['barbell'],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'triceps-biceps', 'shoulder', 'lower-back'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 7,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Stand with the bar on the floor, grip shoulder-width or slightly wider',
+      'Hinge to about 45 degrees — back flat, bar hanging below the chest',
+      'Pull the bar to the lower ribs — elbows tracking back and up',
+      'Squeeze the shoulder blades together at the top',
+      'Lower with control — do not let the bar pull the torso forward',
+      'Complete 3 sets of 8 reps'
+    ],
+    coaching: 'The lower back must not round under load — if it does, reduce the weight or reduce the forward lean angle.',
+    why: 'The barbell row builds upper back thickness and strength — the essential counterpart to any pressing programme and a primary postural strength exercise.',
+    credits: 80
+  },
+
+  {
+    id: 'barbell-rdl',
+    name: 'Romanian Deadlift',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'hinge',
+    equipment: ['barbell'],
+    equipmentOptional: ['dumbbell'],
+    affectsAreas: ['hamstring', 'glutes', 'lower-back'],
+    contraindications: ['hamstring-acute', 'lower-back-acute'],
+    energyRequired: 7,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Stand holding a barbell at hip height, overhand grip, arms straight',
+      'Hinge at the hip — push the hips back as the bar descends',
+      'Keep the bar close to the legs throughout — it should nearly drag down the shins',
+      'Lower until you feel a strong hamstring stretch — usually mid-shin level',
+      'Do not round the lower back at the bottom',
+      'Drive the hips forward to return to standing',
+      'Complete 3 sets of 8 reps'
+    ],
+    coaching: 'The difference between an RDL and a deadlift: the RDL starts from standing and emphasises the eccentric loading of the hamstrings. The stretch at the bottom is the point.',
+    why: 'The Romanian deadlift is the primary hamstring strength exercise in most programmes — builds the eccentric hamstring strength that prevents hamstring strains in sport.',
+    credits: 80
+  },
+
+  {
+    id: 'barbell-hip-thrust',
+    name: 'Barbell Hip Thrust',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'hinge',
+    equipment: ['barbell', 'bench'],
+    equipmentOptional: ['barbell-pad'],
+    affectsAreas: ['glutes', 'hamstring'],
+    contraindications: [],
+    energyRequired: 7,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Sit on the floor with your upper back against a bench, barbell across your hips',
+      'Use a pad on the bar for comfort',
+      'Feet flat on the floor, about hip-width apart',
+      'Drive through the heels to lift the hips until the torso is parallel to the floor',
+      'Squeeze the glutes hard at the top',
+      'Lower with control — hips do not touch the floor between reps',
+      'Complete 3 sets of 10 reps'
+    ],
+    coaching: 'Keep the chin tucked at the top — looking up causes the lower back to extend instead of the glutes to contract.',
+    why: 'Research by Dr Bret Contreras consistently shows the barbell hip thrust produces greater glute activation than any other exercise. The most direct glute builder available.',
+    credits: 80
+  },
+
+  {
+    id: 'barbell-front-squat',
+    name: 'Barbell Front Squat',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'squat',
+    equipment: ['barbell', 'squat-rack'],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'upper-back', 'abdominals'],
+    contraindications: ['knee-acute', 'wrist-elbow-acute'],
+    energyRequired: 8,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Set the bar on a rack at chest height',
+      'Stand close to the bar, cross your arms and rest the bar on the front deltoids — or use a clean grip',
+      'Elbows up high — the bar should not roll forward',
+      'Unrack, step back, feet shoulder-width',
+      'Squat down with an upright torso — the front load demands vertical trunk position',
+      'Drive through the heels to stand',
+      'Complete 3 sets of 5 reps'
+    ],
+    coaching: 'The front squat demands more thoracic mobility and core strength than the back squat. Start lighter than you expect.',
+    why: 'The front-loaded position demands greater quad and core strength, greater thoracic mobility, and a more upright torso — developing different qualities than the back squat.',
+    credits: 90
+  },
+
+  {
+    id: 'barbell-good-morning',
+    name: 'Good Morning',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'hinge',
+    equipment: ['barbell'],
+    equipmentOptional: [],
+    affectsAreas: ['hamstring', 'lower-back', 'glutes'],
+    contraindications: ['lower-back-acute', 'hamstring-acute'],
+    energyRequired: 6,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Rest the bar on the upper traps as in a back squat',
+      'Feet hip-width, slight knee bend',
+      'Hinge at the hip — push the hips back as the torso drops forward',
+      'Descend until the torso is roughly parallel to the floor',
+      'Keep the back flat and the core braced throughout',
+      'Drive through the hips to return to standing',
+      'Complete 3 sets of 8 reps — start very light'
+    ],
+    coaching: 'Use much less weight than you think. The lever arm is long and the lower back load is significant. Technique before load on this one.',
+    why: 'Builds posterior chain strength with the bar on the back — teaches the hip hinge pattern under a spinal load, building the back strength needed for heavy deadlifts.',
+    credits: 75
+  },
+
+  {
+    id: 'barbell-power-clean',
+    name: 'Power Clean',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'hinge',
+    equipment: ['barbell'],
+    equipmentOptional: [],
+    affectsAreas: ['full-body', 'glutes', 'hamstring', 'upper-back'],
+    contraindications: ['lower-back-acute', 'wrist-elbow-acute', 'shoulder-acute'],
+    energyRequired: 9,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Set up as for a deadlift — bar over mid-foot, flat back, hips above knees',
+      'Pull the bar from the floor, accelerating through the legs',
+      'As the bar passes the hip, explosively drive the hips forward and shrug hard',
+      'Drop under the bar and catch it in the front rack position — elbows up',
+      'Stand to complete the rep',
+      'Lower with control and reset',
+      'Complete 4 sets of 3 reps — technique work only to start'
+    ],
+    coaching: 'The power clean is a technical lift — get coaching if possible before loading it. The hip drive and the timing of the catch are skills that need deliberate practice.',
+    why: 'The most complete expression of full-body power in a barbell lift. Used across all strength sports and team sport conditioning for developing explosive hip extension.',
+    credits: 100
+  },
+
+  // ============================================
+  // RESISTANCE BAND EXERCISES — Batch 20b (12 items)
+  // ============================================
+
+  {
+    id: 'band-pull-apart',
+    name: 'Band Pull-Apart',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder', 'chest-pecs'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 3,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Hold a resistance band with both hands at shoulder width, arms extended in front',
+      'Pull the band apart, drawing your hands out to your sides',
+      'Squeeze the shoulder blades together at the end of the movement',
+      'Control the return — do not let the band snap back',
+      'Complete 3 sets of 20 reps'
+    ],
+    coaching: 'Keep the arms straight throughout — bending the elbows turns it into an arm exercise. The movement comes from the shoulder blades.',
+    why: 'One of the most effective exercises for rear deltoid and mid-trap strength — the muscles that counteract forward posture and shoulder impingement.',
+    credits: 30
+  },
+
+  {
+    id: 'band-face-pull',
+    name: 'Band Face Pull',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 3,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Anchor a band at face height — around a door handle or post',
+      'Hold the band with both hands, step back until there is tension',
+      'Pull the band toward your face, elbows flaring out to the sides at shoulder height',
+      'At the end of the pull, externally rotate — thumbs pointing back',
+      'Control the return',
+      'Complete 3 sets of 20 reps'
+    ],
+    coaching: 'The external rotation at the end is the key part — it is what makes this a rotator cuff and rear delt exercise rather than just a row.',
+    why: 'The face pull is widely considered one of the most important shoulder health exercises — directly targets the posterior rotator cuff and combats the internal rotation dominance of most training.',
+    credits: 30
+  },
+
+  {
+    id: 'band-squat',
+    name: 'Band Squat',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'squat',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'adductors'],
+    contraindications: ['knee-acute'],
+    energyRequired: 4,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand on the middle of a resistance band, hold the ends at shoulder height',
+      'Feet shoulder-width, toes slightly out',
+      'Squat down — the band provides resistance that increases as you stand',
+      'Drive the knees out against the band on the way up',
+      'Complete 3 sets of 15 reps'
+    ],
+    coaching: 'The band provides accommodating resistance — hardest at the top where you are strongest. A different stimulus to free weights.',
+    why: 'Resistance bands provide accommodating resistance that matches the strength curve of the squat — developing lockout strength and glute activation at the top of the lift.',
+    credits: 35
+  },
+
+  {
+    id: 'band-hip-hinge',
+    name: 'Band Hip Hinge — Deadlift Pattern',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'hinge',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'hamstring', 'lower-back'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 4,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand on the middle of a band, hold the ends in each hand',
+      'Hinge at the hip — push hips back, back flat, band tight',
+      'Drive the hips forward to return to standing — squeeze the glutes at the top',
+      'The band should provide meaningful resistance through the full range',
+      'Complete 3 sets of 15 reps'
+    ],
+    coaching: 'Ideal for learning the hip hinge pattern before adding barbell load, or for training at home with no heavy equipment.',
+    why: 'Teaches and loads the hip hinge pattern with accessible equipment. Builds glute and hamstring strength in the same movement pattern as the deadlift.',
+    credits: 35
+  },
+
+  {
+    id: 'band-chest-press',
+    name: 'Band Chest Press',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'push',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 5,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Anchor the band behind you at chest height',
+      'Hold one end in each hand, step forward to create tension',
+      'Press both hands forward at chest height until arms are extended',
+      'Control the return — do not let the band pull the arms back fast',
+      'Complete 3 sets of 15 reps'
+    ],
+    coaching: 'The resistance increases as the arms extend — the hardest part is lockout, where a barbell bench press is actually easiest. Complements free weight pressing well.',
+    why: 'Provides a horizontal pressing movement accessible without a barbell or bench. The accommodating resistance is a different stimulus that complements standard pressing.',
+    credits: 35
+  },
+
+  {
+    id: 'band-row-seated',
+    name: 'Seated Band Row',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'triceps-biceps', 'shoulder'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 4,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Sit on the floor with legs extended, loop the band around both feet',
+      'Hold one end in each hand, sit tall',
+      'Pull the band to your lower ribs — elbows travelling back',
+      'Squeeze the shoulder blades at the end of the pull',
+      'Control the return',
+      'Complete 3 sets of 15 reps'
+    ],
+    coaching: 'Keep the torso upright throughout — the temptation is to lean back to help the pull. The movement should come from the arms and shoulder blades only.',
+    why: 'A fully accessible rowing exercise requiring only a band and the floor. Builds the upper back strength that counteracts desk posture and shoulder impingement.',
+    credits: 35
+  },
+
+  {
+    id: 'band-lateral-walk',
+    name: 'Band Lateral Walk',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'squat',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'hip', 'adductors'],
+    contraindications: ['knee-acute'],
+    energyRequired: 4,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Place a band around both legs just above the knees',
+      'Stand in a shallow squat position — feet hip-width, slight knee bend',
+      'Step sideways to the right, then bring the left foot in — maintaining the gap',
+      'Stay in the squat position throughout',
+      'Take 10 steps right, then 10 steps left',
+      'Complete 3 sets each way'
+    ],
+    coaching: 'The glutes should be working hard by the third or fourth step. If not, use a heavier band or widen the stance.',
+    why: 'Directly activates the glute medius — the hip abductor most responsible for knee stability and lateral movement. Used in ACL prevention protocols worldwide.',
+    credits: 35
+  },
+
+  {
+    id: 'band-standing-row',
+    name: 'Band Standing Single-Arm Row',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder', 'abdominals'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 4,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Anchor the band at waist height',
+      'Stand sideways to the anchor, hold the band in one hand',
+      'Step away until the band is taut',
+      'Pull the band to your hip — elbow travelling back',
+      'The opposite hand is free — core must resist rotation',
+      'Complete 12 reps each side, 3 sets'
+    ],
+    coaching: 'The anti-rotation demand makes this more effective for core development than a cable or dumbbell row from a supported position.',
+    why: 'A single-arm pull against a lateral anchor requires core anti-rotation — combining back strength and core stability in a functional standing pattern.',
+    credits: 40
+  },
+
+  {
+    id: 'band-bicep-curl',
+    name: 'Band Bicep Curl',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['triceps-biceps'],
+    contraindications: ['wrist-elbow-acute'],
+    energyRequired: 3,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand on the middle of a resistance band',
+      'Hold one end in each hand, palms facing forward',
+      'Curl both hands toward the shoulders — elbows stay tucked at the sides',
+      'Squeeze at the top, lower with control',
+      'Complete 3 sets of 15 reps'
+    ],
+    coaching: 'Keep the elbows pinned to the sides throughout — swinging the elbows forward turns it into a shoulder exercise.',
+    why: 'A simple, accessible bicep exercise requiring only a band. Builds elbow flexor strength for pulling movements and functional daily tasks.',
+    credits: 25
+  },
+
+  {
+    id: 'band-tricep-pushdown',
+    name: 'Band Tricep Pushdown',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'push',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['triceps-biceps'],
+    contraindications: ['wrist-elbow-acute'],
+    energyRequired: 3,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Anchor the band at head height or above',
+      'Hold both ends, elbows bent at 90 degrees, pinned to the sides',
+      'Push both hands down toward the hips until the arms are straight',
+      'Control the return — elbows stay pinned',
+      'Complete 3 sets of 15 reps'
+    ],
+    coaching: 'The elbows must not move — if they drift forward, you are using shoulder flexion rather than tricep extension.',
+    why: 'A direct tricep isolation exercise that complements pressing movements and builds elbow extension strength for pushing, throwing, and overhead sport.',
+    credits: 25
+  },
+
+  {
+    id: 'band-overhead-press',
+    name: 'Band Overhead Press',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'push',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['shoulder', 'triceps-biceps', 'abdominals'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 5,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand on the middle of a band, hold the ends at shoulder height',
+      'Press both hands overhead until the arms are straight',
+      'Lower with control to shoulder height',
+      'Keep the core braced — do not let the lower back arch',
+      'Complete 3 sets of 12 reps'
+    ],
+    coaching: 'Accommodating resistance means the band is hardest overhead where you are typically weakest in a barbell press. Develops strength at the top of the pressing range.',
+    why: 'A fully accessible overhead pressing movement requiring only a band. Builds shoulder strength and overhead stability without a barbell or machine.',
+    credits: 35
+  },
+
+  {
+    id: 'band-pallof-press',
+    name: 'Band Pallof Press',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'anti-rotation',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['abdominals', 'glutes', 'lower-back'],
+    contraindications: [],
+    energyRequired: 4,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Anchor a band at chest height',
+      'Stand sideways to the anchor, hold the band with both hands at the chest',
+      'Press both hands directly forward — arms extending in front of the chest',
+      'Hold for 2 seconds, then return to the chest',
+      'The band tries to rotate you toward the anchor — resist it completely',
+      'Complete 10 reps each side, 3 sets'
+    ],
+    coaching: 'The anti-rotation demand is highest when the arms are extended. Everything in the body is working to stay square.',
+    why: 'The Pallof press is the gold standard anti-rotation core exercise — trains the core in its primary function of resisting unwanted movement rather than creating it.',
+    credits: 40
+  }
+
+
+  ,
+
+  // ============================================
+  // DUMBBELL ISOLATION & FUNCTIONAL — Batch 21 (16 items)
+  // Fills the strength gap to ~90 items
+  // ============================================
+
+  {
+    id: 'dumbbell-romanian-deadlift',
+    name: 'Dumbbell Romanian Deadlift',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'hinge',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['hamstring', 'glutes', 'lower-back'],
+    contraindications: ['hamstring-acute', 'lower-back-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Hold a dumbbell in each hand at hip height, palms facing you',
+      'Hinge at the hip — push hips back, weights travel close to the legs',
+      'Lower until strong hamstring stretch — usually mid-shin',
+      'Keep the back flat throughout',
+      'Drive hips forward to return',
+      'Complete 3 sets of 10 reps'
+    ],
+    coaching: 'Dumbbells allow a slightly wider or narrower path than a barbell — useful if hip structure makes a barbell RDL awkward.',
+    why: 'Builds hamstring and glute strength in the hinge pattern with lighter, more accessible equipment than a barbell.',
+    credits: 65
+  },
+
+  {
+    id: 'dumbbell-step-up',
+    name: 'Dumbbell Step-Up',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'squat',
+    equipment: ['dumbbell'],
+    equipmentOptional: ['step'],
+    affectsAreas: ['quadriceps', 'glutes', 'hamstring'],
+    contraindications: ['knee-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Hold a dumbbell in each hand, stand in front of a step or box',
+      'Step up with the right foot, pressing through the heel to stand fully on top',
+      'Bring the left foot up to meet it',
+      'Step back down with control — left foot first',
+      'Complete all reps on the right before switching to the left',
+      '3 sets of 10 each side'
+    ],
+    coaching: 'Drive through the heel of the working leg — not the toe. If the heel lifts, the step is too high or the weight too heavy.',
+    why: 'A unilateral leg exercise that builds quad and glute strength while exposing and correcting strength imbalances between legs.',
+    credits: 60
+  },
+
+  {
+    id: 'dumbbell-reverse-lunge',
+    name: 'Dumbbell Reverse Lunge',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'squat',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'hamstring'],
+    contraindications: ['knee-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Hold a dumbbell in each hand, stand tall',
+      'Step backward with the right foot, lowering the right knee toward the floor',
+      'Front knee stays over the front ankle — not caving inward',
+      'Drive through the front heel to return to standing',
+      'Alternate legs or complete all reps on one side first',
+      '3 sets of 10 each side'
+    ],
+    coaching: 'The reverse lunge is safer on the knee than a forward lunge — the forces are more controllable. A good starting point for people rebuilding knee confidence.',
+    why: 'Develops unilateral lower body strength with lower knee shear force than a forward lunge. Excellent for building single-leg stability.',
+    credits: 55
+  },
+
+  {
+    id: 'dumbbell-shoulder-y-raise',
+    name: 'Dumbbell Y-Raise',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 4,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Lie face down on a bench or stand with a slight forward lean',
+      'Hold a very light dumbbell in each hand, arms hanging',
+      'Raise both arms in a Y shape — at about 30 to 45 degrees from the ears',
+      'Thumbs pointing upward at the top',
+      'Lower slowly',
+      '3 sets of 15 reps — use lighter weight than you expect'
+    ],
+    coaching: 'Most people use far too much weight for this. Lower trap activation requires a very light load and precise movement — not heavier weight and momentum.',
+    why: 'Directly trains the lower trapezius — one of the most underactive muscles in desk workers and a primary cause of shoulder impingement and neck pain.',
+    credits: 35
+  },
+
+  {
+    id: 'dumbbell-single-leg-deadlift',
+    name: 'Single-Leg Dumbbell Deadlift',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'hinge',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'hamstring', 'lower-back'],
+    contraindications: ['ankle-foot-acute', 'hamstring-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Stand on your right leg, holding a dumbbell in the left hand',
+      'Hinge forward, extending the left leg behind you for counterbalance',
+      'Lower the dumbbell toward the floor, keeping the back flat',
+      'Drive through the right heel to return to standing',
+      'Complete 8 reps each side, 3 sets'
+    ],
+    coaching: 'The balance challenge makes this harder than the weight suggests. Use a lighter dumbbell than you think and focus on hip hinge quality and balance.',
+    why: 'Combines hamstring and glute strength with single-leg balance — develops the hip stability and posterior chain strength needed for running and sport.',
+    credits: 65
+  },
+
+  {
+    id: 'dumbbell-incline-row',
+    name: 'Dumbbell Incline Row',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['dumbbell', 'bench'],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 5,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Set a bench to 45 degrees incline',
+      'Lie face down, one dumbbell in each hand hanging below the bench',
+      'Row both dumbbells to your lower ribs simultaneously',
+      'Squeeze the shoulder blades at the top',
+      'Lower with control',
+      '3 sets of 12 reps'
+    ],
+    coaching: 'The prone position prevents any cheating through body momentum — the upper back does all the work.',
+    why: 'A bilateral row that removes all postural cheating — the chest-supported position isolates the upper back muscles completely.',
+    credits: 55
+  },
+
+  {
+    id: 'dumbbell-goblet-squat-pause',
+    name: 'Paused Goblet Squat',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'squat',
+    equipment: ['dumbbell'],
+    equipmentOptional: ['kettlebell'],
+    affectsAreas: ['quadriceps', 'glutes', 'adductors'],
+    contraindications: ['knee-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Hold a dumbbell vertically at chest height with both hands',
+      'Squat down until thighs are parallel or below',
+      'Pause at the bottom for 3 seconds — stay tight, do not relax',
+      'Drive through the heels to stand',
+      '3 sets of 8 reps'
+    ],
+    coaching: 'The pause at the bottom eliminates the elastic rebound — every rep starts from a dead stop. Much harder than it sounds.',
+    why: 'Pausing removes elastic energy from the squat, requiring pure muscular strength to stand. Develops bottom-position strength and hip mobility simultaneously.',
+    credits: 60
+  },
+
+  {
+    id: 'dumbbell-floor-fly',
+    name: 'Dumbbell Floor Fly',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'push',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['chest-pecs', 'shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 5,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Lie on the floor, one dumbbell in each hand, arms extended over the chest',
+      'Lower both arms in an arc — elbows slightly bent — until the upper arms rest on the floor',
+      'Press the dumbbells back together in an arc at the top',
+      'The floor limits the range of motion — safer on the shoulder than a bench fly',
+      '3 sets of 12 reps'
+    ],
+    coaching: 'Keep a slight bend in the elbows throughout — a straight arm fly puts excessive stress on the bicep tendon at the shoulder.',
+    why: 'Develops chest strength through the fly movement pattern — wider range than pressing. The floor acts as a natural range limiter, making it shoulder-friendly.',
+    credits: 50
+  },
+
+  {
+    id: 'functional-carry-overhead',
+    name: 'Overhead Carry',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'carry',
+    equipment: ['dumbbell'],
+    equipmentOptional: ['kettlebell'],
+    affectsAreas: ['shoulder', 'abdominals', 'upper-back'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Press a dumbbell overhead in one hand, arm locked out',
+      'Walk forward for 20 to 30 metres maintaining the arm position',
+      'The core must work hard to prevent side-bending',
+      'Return and switch arms',
+      '3 sets each side'
+    ],
+    coaching: 'The overhead carry exposes shoulder weakness and core instability immediately. If the arm wavers, the weight is too heavy.',
+    why: 'Develops shoulder stability and core anti-lateral-flexion under dynamic load — a uniquely functional combination that transfers to every overhead sport and activity.',
+    credits: 60
+  },
+
+  {
+    id: 'functional-sandbag-carry',
+    name: 'Bear Hug Carry',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'carry',
+    equipment: [],
+    equipmentOptional: ['sandbag', 'dumbbell'],
+    affectsAreas: ['full-body', 'abdominals', 'upper-back'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 7,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Pick up a heavy awkward object — a loaded bag, a heavy dumbbell held at the chest, a sandbag',
+      'Hug it to the chest and walk forward for 20 to 30 metres',
+      'The irregular load demands constant core adjustment',
+      'Return and repeat',
+      '3 sets'
+    ],
+    coaching: 'The awkwardness of the load is the point — odd objects demand more from the stabilising system than any perfectly balanced barbell.',
+    why: 'Odd-object carrying builds real-world functional strength — the type used in moving house, carrying shopping, or field sport. Develops total body tension and grip endurance.',
+    credits: 70
+  },
+
+  {
+    id: 'dumbbell-zottman-curl',
+    name: 'Zottman Curl',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['triceps-biceps'],
+    contraindications: ['wrist-elbow-acute'],
+    energyRequired: 4,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Hold dumbbells with palms facing up — supinated',
+      'Curl both dumbbells to shoulder height',
+      'At the top, rotate the wrists so palms face down — pronated',
+      'Lower slowly with palms facing down — forearms working hard',
+      'At the bottom, rotate palms up again for the next rep',
+      '3 sets of 10 reps'
+    ],
+    coaching: 'The lowering phase with pronated grip develops forearm and brachioradialis strength that standard curls miss entirely.',
+    why: 'The Zottman curl trains both the bicep on the way up and the forearm and brachioradialis on the way down — more efficient than any single curl variation.',
+    credits: 35
+  },
+
+  {
+    id: 'dumbbell-pullover',
+    name: 'Dumbbell Pullover',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    equipment: ['dumbbell', 'bench'],
+    equipmentOptional: [],
+    affectsAreas: ['chest-pecs', 'upper-back', 'shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 5,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Lie across a bench — only the upper back on the bench, feet flat on the floor',
+      'Hold a single dumbbell with both hands over the chest, arms slightly bent',
+      'Lower the dumbbell in an arc behind the head — feel the chest and lats stretch',
+      'Bring it back over the chest in the same arc',
+      '3 sets of 12 reps'
+    ],
+    coaching: 'Keep a slight bend in the elbows throughout. The stretch behind the head should feel like a deep chest and lat opening — not shoulder pain.',
+    why: 'A unique exercise that trains both the chest and the lats through a long range of motion — builds thoracic mobility alongside upper body strength.',
+    credits: 50
+  },
+
+  {
+    id: 'bodyweight-pistol-squat-progression',
+    name: 'Pistol Squat Progression',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'squat',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'ankle-foot'],
+    contraindications: ['knee-acute', 'ankle-foot-acute'],
+    energyRequired: 7,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Begin with assisted: hold a pole or doorframe for balance',
+      'Stand on one leg, the other leg extended forward',
+      'Lower slowly on the standing leg — as deep as possible',
+      'Drive through the heel to stand',
+      'Progress to unassisted as strength and balance allow',
+      '3 sets of 5 each side'
+    ],
+    coaching: 'The pistol squat demands ankle mobility, hip flexibility, and single-leg strength simultaneously. Progress is slow — that is normal.',
+    why: 'One of the most demanding single-leg exercises — requires full range of motion strength through the entire lower body. A legitimate marker of functional lower body fitness.',
+    credits: 80
+  },
+
+  {
+    id: 'bodyweight-nordic-curl-progression',
+    name: 'Nordic Curl — Assisted Progression',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'hinge',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hamstring'],
+    contraindications: ['hamstring-acute'],
+    energyRequired: 7,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Kneel on a soft surface, feet anchored under something heavy or held by a partner',
+      'Arms crossed or hands ready to catch yourself',
+      'Slowly lower your body forward from the knees — maintaining a straight line from knees to head',
+      'Use your hands to catch and push back up if needed',
+      'Aim for the longest controlled lowering possible before needing the hands',
+      '3 sets of 5 reps — full recovery between sets'
+    ],
+    coaching: 'The Nordic curl is extremely demanding — most people need the hand assist for months before a full unassisted rep is possible. The assisted version still delivers major hamstring gains.',
+    why: 'The Nordic curl has the strongest evidence base of any hamstring injury prevention exercise. Eccentric hamstring strength built here directly reduces hamstring strain risk in sport.',
+    credits: 80
+  },
+
+  {
+    id: 'isometric-wall-sit',
+    name: 'Wall Sit',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'isometric',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes'],
+    contraindications: ['knee-acute'],
+    energyRequired: 5,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand with your back against a wall',
+      'Slide down until thighs are parallel to the floor — knees at 90 degrees',
+      'Feet flat, knees directly over ankles — not forward',
+      'Hold as long as possible',
+      'Build toward 60 seconds, then extend further',
+      'Complete 3 holds with equal rest'
+    ],
+    coaching: 'Wall sits are harder than they look after 30 seconds. The quads burn — that is the point. Focus on keeping the back flat on the wall.',
+    why: 'Isometric quad strength directly supports knee health and is used in patellofemoral pain rehabilitation. A simple, effective strength and endurance exercise.',
+    credits: 40
+  },
+
+  {
+    id: 'isometric-hollow-hold',
+    name: 'Hollow Body Hold',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'isometric',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['abdominals', 'hip-flexor'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Lie on your back, arms extended overhead',
+      'Press the lower back firmly into the floor',
+      'Lift shoulders, arms, and legs slightly off the floor — maintaining the lower back contact',
+      'The body forms a shallow dish or "hollow" shape',
+      'Hold for as long as lower back contact is maintained',
+      'Build toward 30 to 60 seconds, 3 sets'
+    ],
+    coaching: 'The moment the lower back arches off the floor, the position is lost. Lift the legs higher or bend the knees to reduce difficulty and maintain position.',
+    why: 'The hollow body hold is the foundation of gymnastics strength training — trains the deep abdominals to maintain spinal position against load, essential for all pressing and pulling movements.',
+    credits: 55
+  }
+
 ];
