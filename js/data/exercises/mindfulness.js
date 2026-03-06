@@ -1100,7 +1100,7 @@ export const MINDFULNESS = [
     instructions: [
       '90 minutes before bed: turn off overhead lights, switch to lamps',
       '60 minutes before: no screens — use this time for reading, light conversation, or gentle movement',
-      '30 minutes before: write tomorrow\'\2 to-do list — brain dump everything',
+      '30 minutes before: write tomorrow\'s to-do list — brain dump everything',
       '20 minutes before: warm shower or bath if possible',
       '10 minutes before: light stretching or legs-up-wall',
       'In bed: use the sleep body scan or progressive relaxation if sleep does not come within 20 minutes'
@@ -1446,7 +1446,7 @@ export const MINDFULNESS = [
     instructions: [
       'Bring to mind a situation where you have said yes when you meant no',
       'Notice what motivated it — fear of disapproval, guilt, habit',
-      'Practice the phrase: "I appreciate you asking, but I\'\2 not available for that"',
+      'Practice the phrase: "I appreciate you asking, but I\'m not available for that"',
       'Notice the resistance to saying it — where is it in the body?',
       'Breathe into the resistance',
       'Repeat the phrase until it feels less threatening'
