@@ -4,18 +4,19 @@
 @import 'base/variables.css';
 @import 'base/reset.css';
 @import 'base/typography.css';
-@import 'base/global.css'; 
+@import 'base/global.css';
 
 /* Layouts */
 @import 'layouts/app-shell.css';
 @import 'layouts/onboarding.css';
 @import 'layouts/onboarding-fixes.css';
 @import 'layouts/goal-setup.css';
+@import 'layouts/progress.css';
 
 /* Components */
 @import 'components/buttons.css';
 @import 'components/cards.css';
 @import 'components/equipment-modal.css';
 @import 'components/checkin.css';
-@import 'components/workout.css';       
-@import 'components/coach-fix.css';    
+@import 'components/workout.css';
+@import 'components/coach-fix.css';
