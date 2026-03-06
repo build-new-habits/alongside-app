@@ -397,4 +397,267 @@ export const CARDIO = [
     credits: 60
   }
 
+
+  ,
+
+  // CARDIO EXPANSION — 10 items
+
+  {
+    id: 'cardio-rowing-easy',
+    name: 'Easy Row — 20 Minutes',
+    category: 'cardio',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: ['rowing-machine'],
+    equipmentOptional: [],
+    affectsAreas: ['full-body', 'upper-back'],
+    contraindications: [],
+    energyRequired: 4,
+    duration: 1200,
+    perSide: false,
+    instructions: [
+      'Set the damper to 3 to 5 — lower than you think',
+      'Drive through the legs first — 60% of the power comes from the legs',
+      'Body rocks back slightly as the arms pull to the chest',
+      'Return: arms extend, body rocks forward, knees bend — in that order',
+      'Row for 20 minutes at a conversational pace',
+      'Aim for 24 to 26 strokes per minute'
+    ],
+    coaching: 'Most beginners use too much arm and back and not enough leg. Think of the drive sequence as a leg press — the arms and back finish the stroke.',
+    why: 'Rowing is a full-body aerobic exercise that builds both cardiovascular fitness and upper body endurance. Non-impact — excellent for people managing lower body injuries.',
+    credits: 50
+  },
+
+  {
+    id: 'cardio-rowing-intervals',
+    name: 'Rowing Intervals — 500m',
+    category: 'cardio',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: ['rowing-machine'],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 8,
+    duration: 1800,
+    perSide: false,
+    instructions: [
+      'Warm up: 5 minutes easy rowing',
+      'Row 500 metres at hard effort — note your time',
+      'Rest for 2 minutes',
+      'Repeat 5 times',
+      'Try to maintain consistent splits across all 5 reps',
+      'Cool down: 5 minutes easy'
+    ],
+    coaching: 'The 500m is the classic rowing interval. Going out too hard on rep 1 means fading significantly by rep 4 and 5. Start 5 seconds slower than target pace.',
+    why: 'Rowing intervals develop aerobic and anaerobic capacity simultaneously. The 500m distance stresses both energy systems equally.',
+    credits: 85
+  },
+
+  {
+    id: 'cardio-assault-bike',
+    name: 'Assault Bike — Interval Session',
+    category: 'cardio',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: ['exercise-bike'],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 9,
+    duration: 1200,
+    perSide: false,
+    instructions: [
+      'Warm up: 3 minutes at easy pace',
+      'Sprint at maximum effort for 10 seconds',
+      'Pedal easily for 50 seconds',
+      'Repeat 10 times',
+      'Cool down: 5 minutes easy',
+      'Total work time: 10 minutes'
+    ],
+    coaching: 'The assault bike is one of the most demanding cardio machines because arms and legs work simultaneously. Ten seconds genuinely maximum means you will be breathing hard immediately.',
+    why: 'The assault bike uses push-pull arm action alongside leg drive — creating higher cardiovascular demand than a standard bike in less time. Highly time-efficient conditioning.',
+    credits: 90
+  },
+
+  {
+    id: 'cardio-stair-climbing',
+    name: 'Stair Climbing',
+    category: 'cardio',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'quadriceps', 'calves'],
+    contraindications: ['knee-acute'],
+    energyRequired: 6,
+    duration: 1200,
+    perSide: false,
+    instructions: [
+      'Find a staircase of at least 3 flights, or a stair machine',
+      'Walk up at a steady pace — do not use the handrail unless needed for safety',
+      'Take the stairs down slowly — eccentric load is valuable',
+      'Work continuously for 20 minutes',
+      'Progress to taking stairs 2 at a time as fitness improves'
+    ],
+    coaching: 'Stair climbing is harder than walking because of the vertical component. The caloric cost per minute is significantly higher than flat walking.',
+    why: 'Stair climbing builds glute and quad strength alongside cardiovascular fitness. Accessible with no equipment and no gym — a hidden training tool available in most buildings.',
+    credits: 45
+  },
+
+  {
+    id: 'cardio-skipping',
+    name: 'Jump Rope — Conditioning',
+    category: 'cardio',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: ['jump-rope'],
+    equipmentOptional: [],
+    affectsAreas: ['calves', 'ankle-foot', 'full-body'],
+    contraindications: ['ankle-foot-acute', 'knee-acute'],
+    energyRequired: 7,
+    duration: 900,
+    perSide: false,
+    instructions: [
+      'Warm up: 2 minutes easy bouncing on the spot',
+      'Skip continuously for 1 minute',
+      'Rest for 30 seconds',
+      'Repeat 8 to 10 rounds',
+      'Progress to double-unders or crossovers as skill develops'
+    ],
+    coaching: 'Jump rope requires patience in the learning phase — missing is inevitable at first. A consistent rhythm at slow speed builds the skill that allows faster skipping.',
+    why: 'Jump rope develops coordination, calf strength, ankle stability, and cardiovascular fitness simultaneously. Used by boxing coaches as one of the most complete single conditioning tools available.',
+    credits: 70
+  },
+
+  {
+    id: 'cardio-shadow-boxing',
+    name: 'Shadow Boxing',
+    category: 'cardio',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body', 'shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 6,
+    duration: 900,
+    perSide: false,
+    instructions: [
+      'Stand in a comfortable fighting stance — non-dominant foot slightly forward',
+      'Move around the space continuously — never stand still',
+      'Throw punches in combinations: jab, cross, hook, uppercut',
+      'Add defensive movements: slip, roll, step back',
+      'Work in 3-minute rounds with 1 minute rest between',
+      'Complete 3 to 5 rounds'
+    ],
+    coaching: 'Shadow boxing is harder when you stay moving. The footwork is the conditioning — the punches are the technique. Combine both.',
+    why: 'Shadow boxing develops cardiovascular fitness, coordination, and rotational power while also providing an excellent outlet for stress and frustration.',
+    credits: 65
+  },
+
+  {
+    id: 'cardio-dance',
+    name: 'Dance Fitness — Freestyle',
+    category: 'cardio',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: [],
+    energyRequired: 6,
+    duration: 1800,
+    perSide: false,
+    instructions: [
+      'Create a playlist of upbeat music — 30 minutes',
+      'Move freely to the music — no choreography required',
+      'Stay moving throughout — the goal is sustained effort',
+      'Let the music set the intensity — fast songs, higher intensity',
+      'Allow yourself to look ridiculous'
+    ],
+    coaching: 'Dance fitness has one significant advantage over all other cardio: people actually enjoy it. Enjoyment drives consistency. Consistency drives outcomes.',
+    why: 'Dance provides equivalent cardiovascular benefit to moderate-intensity exercise while producing significantly higher rates of mood improvement and long-term adherence than conventional cardio.',
+    credits: 60
+  },
+
+  {
+    id: 'cardio-circuit-training',
+    name: 'Cardio Circuit — No Equipment',
+    category: 'cardio',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: [],
+    energyRequired: 7,
+    duration: 1200,
+    perSide: false,
+    instructions: [
+      'Complete 40 seconds of work, 20 seconds rest for each:',
+      'Jumping jacks',
+      'Mountain climbers',
+      'High knees',
+      'Squat jumps',
+      'Burpees',
+      'Sprint on the spot',
+      'Complete the circuit 3 to 4 times with 60 seconds rest between rounds'
+    ],
+    coaching: 'The 20-second rest is insufficient for full recovery — that is intentional. Work capacity builds when you operate under partial recovery conditions.',
+    why: 'A no-equipment circuit that develops cardiovascular fitness and muscular endurance simultaneously. The variety of movements maintains engagement and trains multiple movement patterns.',
+    credits: 80
+  },
+
+  {
+    id: 'cardio-nordic-walking',
+    name: 'Nordic Walking',
+    category: 'cardio',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: ['nordic-walking-poles'],
+    equipmentOptional: ['hiking-poles'],
+    affectsAreas: ['full-body', 'upper-back', 'shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 4,
+    duration: 1800,
+    perSide: false,
+    instructions: [
+      'Hold the poles loosely with the strap supporting the push',
+      'Plant the right pole as the left foot steps forward — opposite arm to leg',
+      'Push through the pole as you step — extending the arm fully behind',
+      'The poles increase the upper body involvement to 90% of all muscles',
+      'Walk for 30 minutes at a brisk pace'
+    ],
+    coaching: 'Nordic walking looks unusual but the evidence is excellent — it burns more calories than regular walking at the same pace and develops upper body strength simultaneously.',
+    why: 'Nordic walking engages the upper body through active pole planting, increasing caloric expenditure by 20 to 40% compared to regular walking while reducing knee joint load.',
+    credits: 45
+  },
+
+  {
+    id: 'cardio-hiit-session',
+    name: 'HIIT — 20 Minute Session',
+    category: 'cardio',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: ['knee-acute', 'ankle-foot-acute'],
+    energyRequired: 9,
+    duration: 1200,
+    perSide: false,
+    instructions: [
+      'Warm up: 3 minutes easy movement',
+      'Work: 40 seconds high intensity (sprinting, jump squats, burpees)',
+      'Rest: 20 seconds',
+      'Repeat 15 rounds — 15 minutes total',
+      'Cool down: 2 minutes easy walking',
+      'Use a different exercise each round if possible'
+    ],
+    coaching: 'HIIT only works if the work intervals are genuinely hard. Going at 70% effort during HIIT produces 70% of the benefit — and you might as well do steady-state cardio instead.',
+    why: 'HIIT produces cardiovascular adaptations equivalent to much longer steady-state sessions in a fraction of the time. Among the most time-efficient training formats available.',
+    credits: 90
+  }
+
 ];
