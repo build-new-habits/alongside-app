@@ -2405,4 +2405,288 @@ export const REHABILITATION = [
     credits: 25
   }
 
+
+  ,
+
+  // REHABILITATION EXPANSION — Final 10 items
+
+  {
+    id: 'rehab-knee-terminal-extension',
+    name: 'Knee Terminal Extension',
+    category: 'rehabilitation',
+    contentType: 'exercise',
+    movementPattern: 'extension',
+    rehabPhase: 'subacute',
+    activationTarget: 'knee',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'knee'],
+    contraindications: ['knee-acute'],
+    energyRequired: 3,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Anchor a resistance band at knee height and loop it behind the knee',
+      'Stand with the leg slightly bent — about 15 to 20 degrees',
+      'Extend the knee to full straight — squeeze the quad at the end',
+      'Return to slight bend slowly',
+      'Complete 3 sets of 15 reps each side'
+    ],
+    coaching: 'Terminal extension specifically targets the VMO — the inner quad muscle most affected by knee injury and most responsible for knee stability.',
+    why: 'Knee terminal extension is a core exercise in ACL and patellofemoral rehabilitation — it restores the final degrees of extension strength without loading the joint in vulnerable positions.',
+    credits: 35
+  },
+
+  {
+    id: 'rehab-shoulder-y-t-w',
+    name: 'Y-T-W Exercise',
+    category: 'rehabilitation',
+    contentType: 'exercise',
+    movementPattern: 'pull',
+    rehabPhase: 'subacute',
+    activationTarget: 'shoulder',
+    equipment: [],
+    equipmentOptional: ['resistance-band'],
+    affectsAreas: ['upper-back', 'shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 3,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Lie face down on a bench or floor',
+      'Y: raise both arms to form a Y — thumbs up — 10 reps',
+      'T: raise both arms to form a T — thumbs up — 10 reps',
+      'W: bend elbows to 90 degrees and raise, squeezing shoulder blades — 10 reps',
+      'Use a very light weight or no weight to start',
+      'Complete 3 sets of each'
+    ],
+    coaching: 'The Y-T-W directly targets the lower and middle trapezius — muscles almost universally undertrained and responsible for shoulder stability.',
+    why: 'Y-T-W is a clinical rehabilitation staple for shoulder impingement, rotator cuff issues, and postural dysfunction. Restores scapular control and stability.',
+    credits: 40
+  },
+
+  {
+    id: 'rehab-ankle-proprioception',
+    name: 'Ankle Proprioception Progression',
+    category: 'rehabilitation',
+    contentType: 'exercise',
+    movementPattern: 'balance',
+    rehabPhase: 'subacute',
+    activationTarget: 'ankle-foot',
+    equipment: [],
+    equipmentOptional: ['balance-board'],
+    affectsAreas: ['ankle-foot', 'calves'],
+    contraindications: ['ankle-foot-acute'],
+    energyRequired: 3,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Level 1: Single-leg stand on flat ground — 60 seconds each side',
+      'Level 2: Single-leg stand on a folded towel — 45 seconds',
+      'Level 3: Single-leg stand with eyes closed on flat ground — 30 seconds',
+      'Level 4: Single-leg stand on a balance board — 45 seconds',
+      'Progress levels only when the current level is fully controlled',
+      'Complete 3 sets at whatever level is currently appropriate'
+    ],
+    coaching: 'Ankle sprains damage the proprioceptive nerves as much as the ligaments. Restoring balance and proprioception prevents re-injury more than any other intervention.',
+    why: 'Proprioception training is the most important component of ankle sprain rehabilitation — people who skip this step have very high re-injury rates within the first year of return to sport.',
+    credits: 40
+  },
+
+  {
+    id: 'rehab-wrist-flexion-extension',
+    name: 'Wrist Flexion-Extension Strengthening',
+    category: 'rehabilitation',
+    contentType: 'exercise',
+    movementPattern: 'joint-rotation',
+    rehabPhase: 'subacute',
+    activationTarget: 'wrist-elbow',
+    equipment: ['dumbbell'],
+    equipmentOptional: ['resistance-band'],
+    affectsAreas: ['wrist-elbow'],
+    contraindications: ['wrist-elbow-acute'],
+    energyRequired: 2,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Sit with the forearm resting on a table, wrist over the edge',
+      'Hold a light dumbbell — 0.5 to 1kg',
+      'Flex the wrist upward — palm faces up, lift',
+      'Lower with control',
+      'Complete 3 sets of 20 reps',
+      'Then flip the forearm over for extension: palm down, raise the back of the hand'
+    ],
+    coaching: 'Start lighter than feels necessary. Wrist tendons are slow to recover and easy to re-injure with too much load too soon.',
+    why: "Wrist flexor and extensor strengthening restores the forearm strength balance disrupted by tennis elbow, golfer's elbow, and repetitive strain injuries.",
+    credits: 35
+  },
+
+  {
+    id: 'rehab-cervical-deep-flexors',
+    name: 'Deep Cervical Flexor Activation',
+    category: 'rehabilitation',
+    contentType: 'exercise',
+    movementPattern: 'isometric',
+    rehabPhase: 'acute',
+    activationTarget: 'neck',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Lie on your back, a small rolled towel under the neck',
+      'Gently nod the chin toward the chest — as if squashing a small orange under the chin',
+      'The movement is very small — 5 to 10 degrees only',
+      'Hold for 10 seconds, breathing normally',
+      'Release completely',
+      'Repeat 10 times'
+    ],
+    coaching: 'This is a subtle exercise — not a strong chin tuck. The deep cervical flexors are small and fatigue quickly. Quality of activation is everything.',
+    why: 'Deep cervical flexor weakness is present in almost all people with neck pain and headaches. This specific activation exercise is the cornerstone of neck pain rehabilitation.',
+    credits: 25
+  },
+
+  {
+    id: 'rehab-hip-flexor-strengthening',
+    name: 'Hip Flexor Strengthening',
+    category: 'rehabilitation',
+    contentType: 'exercise',
+    movementPattern: 'hip-rotation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hip',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['hip-flexor', 'abdominals'],
+    contraindications: ['hip-acute'],
+    energyRequired: 3,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Loop a resistance band around your ankle and anchor it behind you',
+      'Stand on one leg, face away from the anchor',
+      'Drive the banded knee up to hip height against the resistance',
+      'Lower with control — resist the band pulling the leg back',
+      'Complete 3 sets of 15 reps each side'
+    ],
+    coaching: 'Hip flexor weakness is often overlooked in lower back and hip pain rehabilitation. It is one of the most important muscles for gait, stair climbing, and running.',
+    why: 'Hip flexor strength — not just flexibility — is essential for healthy hip mechanics. Weakness leads to compensatory patterns that drive knee, hip, and lower back pain.',
+    credits: 40
+  },
+
+  {
+    id: 'rehab-lateral-hip-strengthening',
+    name: 'Lateral Hip Strengthening Progression',
+    category: 'rehabilitation',
+    contentType: 'exercise',
+    movementPattern: 'hip-rotation',
+    rehabPhase: 'subacute',
+    activationTarget: 'hip',
+    equipment: [],
+    equipmentOptional: ['resistance-band'],
+    affectsAreas: ['glutes', 'hip'],
+    contraindications: [],
+    energyRequired: 3,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Clamshells × 20 each side',
+      'Side-lying leg raise × 15 each side',
+      'Standing hip abduction × 15 each side',
+      'Single-leg squat touch-down × 10 each side (touch toe to floor, return)',
+      'Progress through phases as each becomes easy',
+      'Add a resistance band around the knees for additional load'
+    ],
+    coaching: 'Lateral hip strength is the foundation of lower limb health — it affects knee alignment, IT band tension, and lower back stability all at once.',
+    why: 'Lateral hip weakness is implicated in patellofemoral pain, IT band syndrome, gluteal tendinopathy, and lower back pain. A single rehabilitation series addresses all of these.',
+    credits: 50
+  },
+
+  {
+    id: 'rehab-thoracic-mobility-rehab',
+    name: 'Thoracic Mobility — Rehabilitation',
+    category: 'rehabilitation',
+    contentType: 'exercise',
+    movementPattern: 'extension',
+    rehabPhase: 'subacute',
+    activationTarget: 'thoracic',
+    equipment: [],
+    equipmentOptional: ['foam-roller', 'yoga-mat'],
+    affectsAreas: ['thoracic', 'upper-back'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Foam roller extension: 5 segments × 5 breaths each',
+      'Seated rotation: 10 each side',
+      'Thread the needle from hands and knees: 10 each side',
+      'Wall slides: 10 reps',
+      'Open book from side-lying: 10 each side',
+      'Complete daily in the early phases of rehabilitation'
+    ],
+    coaching: 'Thoracic stiffness is a primary contributor to neck pain, shoulder impingement, and lower back pain — often overlooked in rehabilitation programs that treat these in isolation.',
+    why: 'Thoracic mobility restoration is foundational for shoulder, neck, and lower back rehabilitation. Improving thoracic movement reduces compensatory demands on adjacent joints.',
+    credits: 45
+  },
+
+  {
+    id: 'rehab-breathing-rehab',
+    name: 'Breathing Retraining — Rehabilitation',
+    category: 'rehabilitation',
+    contentType: 'exercise',
+    movementPattern: 'breath-awareness',
+    rehabPhase: 'acute',
+    activationTarget: 'abdominals',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['abdominals', 'lower-back'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Lie on your back, knees bent, feet flat',
+      'Place one hand on the chest, one on the belly',
+      'Breathe in — the belly hand should rise, the chest hand should stay still',
+      'This is diaphragmatic breathing — belly breathing',
+      'If the chest rises first, the breathing pattern is inverted',
+      'Practice 10 minutes of belly-only breathing',
+      'Once established lying down, practice seated, then standing'
+    ],
+    coaching: 'Diaphragmatic breathing restores intra-abdominal pressure regulation — the foundation of core stability. Without it, all other core rehabilitation is built on unstable ground.',
+    why: 'Altered breathing patterns are found in almost all people with chronic lower back pain and postural dysfunction. Restoring diaphragmatic breathing is the first step in core rehabilitation.',
+    credits: 25
+  },
+
+  {
+    id: 'rehab-neural-flossing',
+    name: 'Neural Flossing — Sciatic Nerve',
+    category: 'rehabilitation',
+    contentType: 'exercise',
+    movementPattern: 'extension',
+    rehabPhase: 'subacute',
+    activationTarget: 'sciatica',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['hamstring', 'lower-back'],
+    contraindications: ['sciatica-acute'],
+    energyRequired: 2,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Sit upright on the edge of a chair',
+      'Extend the right leg straight, simultaneously look up',
+      'Return: bend the knee and look down',
+      'This creates a pumping action through the sciatic nerve',
+      'The movement should feel like a gentle pull — never sharp pain',
+      'Complete 10 very slow reps each side'
+    ],
+    coaching: 'Neural flossing creates movement of the nerve through its pathway — like flossing between teeth. If any movement produces sharp radiating pain, stop immediately.',
+    why: 'Neural mobilisation techniques improve nerve mobility and reduce neural tension in sciatica rehabilitation. Evidence shows superior outcomes compared to stretching alone.',
+    credits: 30
+  }
+
 ];
