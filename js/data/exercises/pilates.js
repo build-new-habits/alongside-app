@@ -537,7 +537,7 @@ export const PILATES = [
     equipment: [],
     equipmentOptional: ['yoga-mat'],
     affectsAreas: ['spine', 'thoracic', 'abdominals'],
-    contraindications: [],
+    contraindications: ['lower-back-acute', 'lower-back-subacute'],
     energyRequired: 3,
     duration: 60,
     perSide: false,
