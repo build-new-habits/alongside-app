@@ -2,10 +2,16 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
- * v1.1 — Strategic layer additions:
- *   - applyProgrammeBias()     weights exercise selection toward the current phase
- *   - getStrategicRationale()  adds a goal-connection line to each rationale
- *   - getProgrammeFocus()      nudges the 3 workout option ordering by phase bias
+ * v1.2 — Condition pain score wiring:
+ *   getUserProfile() now includes conditionPainScores from store.
+ *   getSuitableExercises() receives them via checkinData.painScores so
+ *   the 3-tier condition filter can correctly resolve phase-aware variants
+ *   (hamstring-acute, knee-subacute, etc.) based on today's pain levels.
+ *
+ * v1.1 — Strategic layer:
+ *   applyProgrammeBias()     weights exercise selection toward the current phase
+ *   getStrategicRationale()  adds a goal-connection line to each rationale
+ *   getProgrammeFocus()      nudges the 3 workout option ordering by phase bias
  *
  * IMPORTANT: Daily adaptation logic is unchanged.
  * Burnout always overrides. Energy always gates intensity.
@@ -17,7 +23,7 @@ import { checkinData }     from './checkin.js';
 import { programmeEngine } from './programmeEngine.js';
 import {
   getSuitableExercises,
-} from './exercises/index.js';
+} from './exercises.js';
 
 export const workoutGenerator = {
 
@@ -30,11 +36,20 @@ export const workoutGenerator = {
     const intensity = store.get('todayIntensity') || 'moderate';
     const burnout   = checkinData.detectBurnout();
 
-    // Get filtered exercise pool (unchanged from v1.0)
-    const suitable = getSuitableExercises(profile, checkin);
+    // Build checkin data object for the filter engine.
+    // painScores comes from store (written at check-in submission) so
+    // the filter gets phase-aware condition resolution even if the workout
+    // is regenerated later in the day without a fresh check-in.
+    const checkinForFilter = {
+      energy:       checkin?.energy        || 5,
+      recoveryMode: burnout.level === 'high',
+      painScores:   store.get('conditionPainScores') || {}
+    };
+
+    // Get filtered exercise pool (unchanged from v1.0 calling convention)
+    const suitable = getSuitableExercises(profile, checkinForFilter);
 
     // Apply programme phase bias to the pool (new in v1.1)
-    // If no programme is active this is a no-op — existing behaviour preserved
     const biasedPool = this.applyProgrammeBias(suitable);
 
     // Determine focus order based on programme phase (or default order)
@@ -53,7 +68,8 @@ export const workoutGenerator = {
   },
 
   /**
-   * Get user profile data for the filter engine
+   * Get user profile data for the filter engine.
+   * conditionPainScores is passed separately via checkinForFilter.
    */
   getUserProfile() {
     return {
@@ -65,14 +81,14 @@ export const workoutGenerator = {
   },
 
   /**
-   * Apply programme phase bias to exercise pool
-   * Adds a programmeScore to each exercise (1 = neutral, 2 = phase-preferred)
-   * pickMultiple() uses this to weight selection
-   * Returns original pool unchanged if no programme is active
+   * Apply programme phase bias to exercise pool.
+   * Adds a programmeScore to each exercise (1 = neutral, 2 = phase-preferred).
+   * pickMultiple() uses this to weight selection.
+   * Returns original pool unchanged if no programme is active.
    */
   applyProgrammeBias(exercisePool) {
     const bias = programmeEngine.getPhaseBias();
-    if (!bias) return exercisePool; // no programme — no change
+    if (!bias) return exercisePool;
 
     return exercisePool.map(ex => ({
       ...ex,
@@ -83,9 +99,9 @@ export const workoutGenerator = {
   },
 
   /**
-   * Determine the order of workout focus options
-   * Phase bias puts the programme-preferred focus first
-   * Falls back to default order (strength / mobility / cardio) if no programme
+   * Determine the order of workout focus options.
+   * Phase bias puts the programme-preferred focus first.
+   * Falls back to default order (strength / mobility / cardio) if no programme.
    */
   getWorkoutFocusOrder() {
     const bias = programmeEngine.getPhaseBias();
@@ -111,22 +127,22 @@ export const workoutGenerator = {
     const rationale = this.generateRationale(focus, intensity, burnout);
 
     return {
-      id:           `workout-${focus}-${Date.now()}`,
+      id:            `workout-${focus}-${Date.now()}`,
       focus,
-      name:         this.getWorkoutName(focus),
-      icon:         this.getWorkoutIcon(focus),
+      name:          this.getWorkoutName(focus),
+      icon:          this.getWorkoutIcon(focus),
       duration,
       exerciseCount: exercises.length,
       exercises,
       intensity,
       rationale,
-      totalCredits: exercises.reduce((sum, e) => sum + (e.credits || 30), 0)
+      totalCredits:  exercises.reduce((sum, e) => sum + (e.credits || 30), 0)
     };
   },
 
   /**
-   * Workout parameters by intensity level
-   * Burnout overrides everything — Recovery Mode
+   * Workout parameters by intensity level.
+   * Burnout overrides everything — Recovery Mode.
    */
   getWorkoutParams(intensity, burnout) {
     if (burnout.level === 'high') {
@@ -144,8 +160,8 @@ export const workoutGenerator = {
   },
 
   /**
-   * Select exercises for a workout
-   * Uses programmeScore weighting when a programme is active
+   * Select exercises for a workout.
+   * Uses programmeScore weighting when a programme is active.
    */
   selectExercises(focus, suitableExercises, params) {
     const selected = [];
@@ -214,7 +230,6 @@ export const workoutGenerator = {
   pickOne(exercises) {
     if (!exercises || exercises.length === 0) return null;
 
-    // If any exercise has a programmeScore, use weighted selection
     const hasScores = exercises.some(e => e.programmeScore);
     if (hasScores) {
       const totalWeight = exercises.reduce((s, e) => s + (e.programmeScore || 1), 0);
@@ -236,16 +251,14 @@ export const workoutGenerator = {
     const hasScores = available.some(e => e.programmeScore);
 
     if (hasScores) {
-      // Weighted shuffle
       const weighted = available.map(e => ({
-        ex: e,
+        ex:   e,
         sort: Math.random() * (e.programmeScore || 1)
       }));
       weighted.sort((a, b) => b.sort - a.sort);
       return weighted.slice(0, count).map(w => w.ex);
     }
 
-    // Standard shuffle
     return [...available].sort(() => Math.random() - 0.5).slice(0, count);
   },
 
@@ -273,7 +286,7 @@ export const workoutGenerator = {
   },
 
   /**
-   * Generate rationale — daily context lines + strategic connection line
+   * Generate rationale — daily context lines + strategic connection line.
    * Daily adaptation lines are unchanged from v1.0.
    * Strategic line is appended when a programme is active.
    */
@@ -281,7 +294,6 @@ export const workoutGenerator = {
     const checkin = checkinData.getTodaysCheckin();
     const parts   = [];
 
-    // ── Daily context (unchanged from v1.0) ──────────────────────────────
     if (checkin) {
       if (checkin.energy <= 3) {
         parts.push("Your energy is low today, so I've kept things gentle.");
@@ -309,7 +321,7 @@ export const workoutGenerator = {
       parts.push("I've adjusted for your poor sleep last night.");
     }
 
-    // ── Strategic connection line (new in v1.1) ───────────────────────────
+    // Strategic connection line (v1.1)
     const strategicLine = programmeEngine.getStrategicRationale(focus);
     if (strategicLine) parts.push(strategicLine);
 
