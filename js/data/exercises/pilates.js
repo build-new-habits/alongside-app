@@ -470,4 +470,198 @@ export const PILATES = [
     credits: 90
   }
 
+
+  ,
+
+  // PILATES EXPANSION — Final 7 items
+
+  {
+    id: 'pilates-roll-down-standing',
+    name: 'Standing Roll-Down',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'pilates-move',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['spine', 'hamstring'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 2,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Stand tall, feet hip-width apart',
+      'Nod the chin to chest, then roll down through the spine — one vertebra at a time',
+      'Arms hang heavy, knees slightly soft',
+      'Once fully down, pause and breathe',
+      'Roll back up from the tailbone — sacrum, lumbar, thoracic, cervical, head last',
+      'Complete 6 slow roll-downs'
+    ],
+    coaching: 'The slower you move, the more you feel each vertebral segment. Rushing makes this a forward fold. Slowing makes it a spinal articulation practice.',
+    why: 'Develops segmental spinal mobility and body awareness. The standing context makes spinal articulation accessible without requiring floor work.',
+    credits: 35
+  },
+
+  {
+    id: 'pilates-corkscrew',
+    name: 'Corkscrew',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pilates-move',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['abdominals', 'hip', 'spine'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 6,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Lie on your back, legs together pointing to the ceiling',
+      'Arms flat at your sides for support',
+      'Circle both legs together to the right — lower toward the floor without touching',
+      'Continue the circle down and around to the left',
+      'Return to centre at the top',
+      'Reverse direction',
+      'Complete 3 circles each direction'
+    ],
+    coaching: 'The lower back stays on the mat throughout — as soon as it lifts, the range is too large. Control is more important than size of the circle.',
+    why: 'Develops rotational core strength and hip flexor control while maintaining spinal stability — one of the most effective lateral abdominal exercises in Pilates.',
+    credits: 70
+  },
+
+  {
+    id: 'pilates-spine-twist',
+    name: 'Spine Twist',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'pilates-move',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['spine', 'thoracic', 'abdominals'],
+    contraindications: [],
+    energyRequired: 3,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Sit tall with legs extended, feet flexed',
+      'Arms extended to the sides at shoulder height',
+      'Exhale and rotate to the right — two small pulses at the end range',
+      'Inhale back to centre',
+      'Exhale and rotate left — two pulses',
+      'Complete 5 rotations each side'
+    ],
+    coaching: 'The spine should grow taller with each rotation — not collapse. Think of wringing out a towel — spiralling upward as you twist.',
+    why: 'Develops thoracic rotation mobility and oblique strength in the seated position. Directly counteracts the forward rounding and lack of rotation from desk work.',
+    credits: 35
+  },
+
+  {
+    id: 'pilates-long-stretch',
+    name: 'Long Stretch — Plank Variation',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pilates-move',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['abdominals', 'shoulder', 'glutes'],
+    contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
+    energyRequired: 5,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Begin in a high plank position',
+      'Shift forward on the toes so the shoulders move in front of the hands',
+      'Hold this extended position for 2 seconds',
+      'Push back through the hands to return to start position',
+      'Maintain a rigid plank throughout — no hips dropping',
+      'Complete 3 sets of 8 reps'
+    ],
+    coaching: 'The long stretch is used on the reformer but translates to the floor. The forward shift dramatically increases shoulder and core demand compared to a static plank.',
+    why: 'The dynamic plank shift increases the challenge to shoulder girdle stability and anti-extension core strength beyond what a static plank achieves.',
+    credits: 55
+  },
+
+  {
+    id: 'pilates-kneeling-series',
+    name: 'Kneeling Side Kick Series',
+    category: 'strength',
+    contentType: 'exercise',
+    movementPattern: 'pilates-move',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['glutes', 'hip', 'abdominals'],
+    contraindications: ['knee-acute'],
+    energyRequired: 5,
+    duration: 120,
+    perSide: true,
+    instructions: [
+      'Kneel upright, then shift weight onto the left knee',
+      'Extend the right leg out to the side — hip height',
+      'Kick the leg forward — pulse twice',
+      'Swing back — pulse twice',
+      'Keep the torso still and upright throughout',
+      'Complete 10 kicks each direction, then switch sides'
+    ],
+    coaching: 'The kneeling position removes the floor support under the side — the obliques and glute medius work harder to stabilise than in the lying side kick.',
+    why: 'The kneeling side kick challenges hip abductor strength and lateral trunk stability in a more demanding position than the lying equivalent.',
+    credits: 55
+  },
+
+  {
+    id: 'pilates-advanced-sequence',
+    name: 'Advanced Pilates Sequence — 30 Minutes',
+    category: 'strength',
+    contentType: 'practice',
+    movementPattern: 'pilates-sequence',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['full-body'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 7,
+    duration: 1800,
+    perSide: false,
+    instructions: [
+      'Hundred — full 100 counts',
+      'Roll up × 10',
+      'Leg circles both legs × 5 each direction',
+      'Rolling like a ball × 10',
+      'Series of 5 (all 5 exercises) × 3 rounds',
+      'Corkscrew × 5 each direction',
+      'Saw × 5 each side',
+      'Swan × 5',
+      'Swimming × 30 seconds',
+      'Teaser × 5',
+      'Spine stretch forward × 5',
+      'Savasana: 5 minutes'
+    ],
+    coaching: 'The advanced sequence links exercises with breath and intention — not just with physical execution. Each exercise flows from the last without losing the principles.',
+    why: 'A complete advanced Pilates session that challenges deep core stability, spinal articulation, and functional strength across the full Joseph Pilates original sequence.',
+    credits: 100
+  },
+
+  {
+    id: 'pilates-reformer-simulation',
+    name: 'Reformer-Style Pilates — Mat Adaptation',
+    category: 'strength',
+    contentType: 'practice',
+    movementPattern: 'pilates-sequence',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['full-body'],
+    contraindications: [],
+    energyRequired: 5,
+    duration: 1800,
+    perSide: false,
+    instructions: [
+      'Footwork: lie on back, band around feet, legs press out and in × 20',
+      'Long spine: band around feet, extend legs overhead while pulling handles × 8',
+      'Rowing: seated, band around feet, row sequence × 10 each variation',
+      'Long box: lie prone over a bolster, band in hands for lat pulls × 10',
+      'Side-lying leg series: band around ankle for resistance — kicks, circles × 10 each',
+      'Full plank series without band to close'
+    ],
+    coaching: 'The reformer uses spring resistance — a band approximates this well enough to capture most of the benefit on a mat. Adjust band tension to match your level.',
+    why: 'Reformer Pilates uses resistance that mat Pilates lacks — this adaptation bridges the gap, allowing mat practitioners to experience resistance-based Pilates without the equipment.',
+    credits: 80
+  }
+
 ];
