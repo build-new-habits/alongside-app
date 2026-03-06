@@ -493,4 +493,480 @@ export const MOBILITY = [
     credits: 25
   }
 
+
+  ,
+
+  // ============================================
+  // MOBILITY EXPANSION — Batch 22 (18 items)
+  // World's greatest stretch series, thoracic, ankle, wrist
+  // ============================================
+
+  {
+    id: 'worlds-greatest-stretch',
+    name: "World's Greatest Stretch",
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'yoga-pose',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hip-flexor', 'adductors', 'thoracic', 'shoulder'],
+    contraindications: ['hip-acute'],
+    energyRequired: 3,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Start in a lunge position — right foot forward, left knee on the floor',
+      'Place both hands inside the right foot',
+      'Rotate the right arm to the ceiling, following it with your eyes',
+      'Return the hand to the floor',
+      'Push your right knee out with your right elbow',
+      'Extend the right leg and reach for the toes',
+      'Return to standing and switch sides',
+      'Complete 5 full cycles each side'
+    ],
+    coaching: "This is called the world's greatest stretch because it genuinely hits more tight areas in one movement than almost anything else. Slow down through each transition.",
+    why: 'Combines hip flexor stretch, thoracic rotation, groin opening, and hamstring lengthening in one flowing sequence. Used as a warm-up by elite athletes worldwide.',
+    credits: 40
+  },
+
+  {
+    id: 'thoracic-rotation-seated',
+    name: 'Seated Thoracic Rotation',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'rotation',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['thoracic', 'spine'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Sit cross-legged or on a chair with feet flat',
+      'Cross your arms over your chest',
+      'Rotate slowly to the right as far as comfortable — do not force it',
+      'Hold for 2 seconds at the end range',
+      'Return through centre and rotate left',
+      'Complete 10 rotations each way'
+    ],
+    coaching: 'The rotation comes from the mid-back, not the lower back or hips. Keep the hips square and feel the movement in the chest area.',
+    why: 'Restores thoracic rotation range of motion — essential for driving, reaching overhead, throwing, and all rotational sport movements.',
+    credits: 25
+  },
+
+  {
+    id: 'thoracic-extension-foam-roll',
+    name: 'Thoracic Extension Over Foam Roller',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'extension',
+    equipment: ['foam-roller'],
+    equipmentOptional: [],
+    affectsAreas: ['thoracic', 'chest-pecs', 'upper-back'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      'Sit on the floor with a foam roller placed horizontally behind you',
+      'Lean back until the roller is under the mid-back — thoracic spine area',
+      'Support your head with your hands',
+      'Let your back extend over the roller, opening the chest upward',
+      'Hold for 5 breaths, then roll up one segment and repeat',
+      'Work from the mid-back to between the shoulder blades'
+    ],
+    coaching: 'Only work the thoracic spine — not the lower back. If the roller dips below the ribcage, stop.',
+    why: 'Directly restores thoracic extension mobility — the movement most lost from sitting. Essential for shoulder health, overhead movement, and upright posture.',
+    credits: 30
+  },
+
+  {
+    id: 'ankle-mobility-circles',
+    name: 'Ankle Circles and CARs',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'joint-rotation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['ankle-foot'],
+    contraindications: ['ankle-foot-acute'],
+    energyRequired: 1,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Sit with one leg crossed over the other, ankle free to move',
+      'Draw large, slow circles with the toes — maximising range in every direction',
+      'Complete 10 circles clockwise, 10 anticlockwise',
+      'Then trace the alphabet with the big toe — A through Z',
+      'Switch to the other ankle',
+      'Complete daily for best results'
+    ],
+    coaching: 'The alphabet drill exposes which ankle directions are restricted — letters that feel limited show where to focus. Do it daily, not occasionally.',
+    why: 'Ankle dorsiflexion restriction is one of the most common mobility limitations and contributes to knee pain, hip compensation, and running injury. Regular mobilisation prevents this.',
+    credits: 15
+  },
+
+  {
+    id: 'ankle-wall-dorsiflexion',
+    name: 'Ankle Dorsiflexion Drill — Wall',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'joint-rotation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['ankle-foot', 'calves'],
+    contraindications: ['ankle-foot-acute'],
+    energyRequired: 2,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Face a wall, right foot a few centimetres from the wall',
+      'Drive the right knee forward toward the wall — keeping the heel on the floor',
+      'Touch the knee to the wall while the heel stays down',
+      'If easy, move the foot further from the wall and repeat',
+      'Find the distance where the heel just barely stays down',
+      'Complete 15 reps each side, holding the end range for 1 second'
+    ],
+    coaching: 'This is a test and a drill. Measure the foot distance from the wall over weeks — improvement here will be noticeable in squat depth and running comfort.',
+    why: 'Directly develops ankle dorsiflexion range — the single most impactful mobility improvement for squatting, running, and any standing athletic movement.',
+    credits: 20
+  },
+
+  {
+    id: 'wrist-extension-floor',
+    name: 'Wrist Extension on Floor',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'joint-rotation',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['wrist-elbow'],
+    contraindications: ['wrist-elbow-acute'],
+    energyRequired: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Come to hands and knees',
+      'Turn your hands so fingers point back toward your knees',
+      'Gently rock forward onto the palms — feeling a stretch in the wrists and forearms',
+      'Pulse gently in and out of the end range',
+      'Complete 2 minutes of gentle movement'
+    ],
+    coaching: 'Wrist extension is the range most reduced by keyboard use. This simple drill is more effective than any wrist stretch done from a chair.',
+    why: 'Restores wrist extension range critical for press-ups, planks, yoga, and all pushing movements. Directly counteracts the wrist flexion position of keyboard and phone use.',
+    credits: 20
+  },
+
+  {
+    id: 'hip-90-90-stretch',
+    name: 'Hip 90-90 Stretch',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'hip-rotation',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hip', 'glutes', 'adductors'],
+    contraindications: ['knee-acute', 'hip-acute'],
+    energyRequired: 2,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Sit on the floor with both knees bent to 90 degrees — front leg with knee forward, back leg with knee to the side',
+      'Both shins are at 90 degrees to your thighs',
+      'Sit tall over the front hip — resist the urge to lean away',
+      'Hold for 60 to 90 seconds, then switch sides',
+      'Gradually work toward sitting upright with no lean'
+    ],
+    coaching: 'Most people cannot sit upright in 90-90 at first. Use a folded blanket under the front hip if it is raised off the floor.',
+    why: 'The 90-90 position simultaneously stretches both internal and external hip rotation — addressing the full range of hip mobility in one position.',
+    credits: 30
+  },
+
+  {
+    id: 'hip-flexor-sofa-stretch',
+    name: 'Couch Stretch',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'hip-rotation',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hip-flexor', 'quadriceps'],
+    contraindications: ['knee-acute'],
+    energyRequired: 2,
+    duration: 120,
+    perSide: true,
+    instructions: [
+      'Kneel facing away from a wall or sofa',
+      'Place your right shin up the wall — toes pointing up, heel toward the ceiling',
+      'Step your left foot forward so the left knee is at 90 degrees',
+      'Keep your torso upright — resist leaning forward',
+      'Hold for 60 to 120 seconds each side'
+    ],
+    coaching: 'This is intense. Work up to the full time gradually. The hip flexor and quad stretch here is deeper than any standing stretch.',
+    why: 'The couch stretch is the most effective hip flexor and quad stretch available — directly counteracts the position of prolonged sitting and is used in competitive CrossFit warm-ups.',
+    credits: 30
+  },
+
+  {
+    id: 'shoulder-cars-standing',
+    name: 'Shoulder CARs — Standing',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'joint-rotation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 2,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Stand tall, core braced, one arm at your side',
+      'Lift the arm forward and upward — as high as it will go',
+      'Continue the circle overhead and behind, moving through every plane',
+      'Circle down behind the body and back to the start',
+      'Move as slowly as possible, maximising range in every direction',
+      'Complete 3 circles forward, 3 backward each shoulder'
+    ],
+    coaching: 'CARs (Controlled Articular Rotations) are done slowly because speed hides range. The slower you go, the more honest the movement.',
+    why: 'Shoulder CARs assess and develop full joint range of motion in all directions — the most comprehensive single shoulder mobility drill available.',
+    credits: 25
+  },
+
+  {
+    id: 'spinal-cars',
+    name: 'Spinal CARs',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'rotation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['spine', 'lower-back', 'thoracic'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Stand with feet hip-width apart',
+      'Begin to draw a large circle with your head — letting each segment of the spine participate',
+      'Head leads, then neck, then thoracic, then lumbar — wave-like motion',
+      'The circle is large and three-dimensional — not just rotation',
+      'Complete 5 circles each direction, very slowly'
+    ],
+    coaching: 'Spinal CARs are meditative as well as functional. Done first thing in the morning, they reveal overnight stiffness and work through it.',
+    why: 'Develops segmental spinal mobility — each vertebra moving independently. Maintains the distributed movement capacity that keeps the spine healthy long-term.',
+    credits: 25
+  },
+
+  {
+    id: 'frog-stretch',
+    name: 'Frog Stretch',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'hip-rotation',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['adductors', 'hip'],
+    contraindications: ['hip-acute', 'knee-acute'],
+    energyRequired: 2,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Come to hands and knees, then slide both knees out to the sides',
+      'Bring the inner edges of both feet to the floor — shins parallel',
+      'Lower your hips toward the floor — you will feel an intense inner thigh stretch',
+      'Hold for 60 to 90 seconds, breathing into the stretch',
+      'Gently rock forward and back to deepen'
+    ],
+    coaching: 'The frog stretch is demanding. Place folded blankets under the knees if there is knee discomfort. Breathe through the hip tension.',
+    why: 'One of the deepest hip adductor and hip flexor stretches available. Develops the inner thigh mobility essential for deep squatting and lateral movement.',
+    credits: 25
+  },
+
+  {
+    id: 'shoulder-dislocates',
+    name: 'Shoulder Dislocates — Band',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'joint-rotation',
+    equipment: ['resistance-band'],
+    equipmentOptional: ['pvc-pipe', 'broomstick'],
+    affectsAreas: ['shoulder', 'chest-pecs', 'upper-back'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 2,
+    duration: 60,
+    perSide: false,
+    instructions: [
+      'Hold a resistance band or stick wide — wider than shoulder-width',
+      'With straight arms, raise the band from in front of the body over the head',
+      'Continue the arc behind the body as far as possible',
+      'Return over the head back to the front',
+      'Gradually narrow the grip as the range improves',
+      'Complete 10 reps each direction'
+    ],
+    coaching: 'If the arms cannot complete the full circle without bending, widen the grip. Never force range here — the shoulder is sensitive.',
+    why: 'Develops full shoulder circumduction range — used by Olympic weightlifters and gymnasts before training to ensure complete overhead mobility.',
+    credits: 25
+  },
+
+  {
+    id: 'neck-mobility',
+    name: 'Neck Mobility Routine',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'joint-rotation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder'],
+    contraindications: [],
+    energyRequired: 1,
+    duration: 120,
+    perSide: false,
+    instructions: [
+      'Sit tall, shoulders relaxed',
+      'Slowly drop the right ear toward the right shoulder — hold 5 seconds',
+      'Return through centre and drop left ear — hold 5 seconds',
+      'Turn to look over the right shoulder — hold 5 seconds',
+      'Turn to look over the left — hold 5 seconds',
+      'Chin to chest — hold 5 seconds',
+      'Look gently upward — only to comfortable range — hold 5 seconds',
+      'Complete 3 full cycles'
+    ],
+    coaching: 'Move to the edge of comfortable range, not beyond it. The neck is not a joint to force. Particularly important for people who spend long periods at a screen.',
+    why: 'Maintains cervical spine range of motion in all planes — preventing the stiffness that leads to headaches, shoulder tension, and restricted movement.',
+    credits: 15
+  },
+
+  {
+    id: 'hip-circles-standing',
+    name: 'Standing Hip Circles',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'joint-rotation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['hip', 'lower-back'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Stand on one leg, lift the other knee to hip height',
+      'Draw large circles with the raised knee — clockwise and anticlockwise',
+      'Maximise the range in every direction',
+      'Keep the standing leg slightly bent and the torso still',
+      'Complete 10 circles each direction on each leg'
+    ],
+    coaching: 'The torso staying still is the key challenge. If the torso rotates with the leg, you are not mobilising the hip — you are mobilising the lumbar spine.',
+    why: 'Develops active hip circumduction — the full range of motion needed for kicking, stepping over obstacles, and fluid lower body movement.',
+    credits: 20
+  },
+
+  {
+    id: 'prone-thoracic-rotation',
+    name: 'Prone Thoracic Rotation',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'rotation',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['thoracic', 'spine'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 2,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      'Lie on your side in the foetal position — knees together at 90 degrees',
+      'Extend both arms forward, palms stacked',
+      'Take the top arm and open it to the side — rotating the thoracic spine',
+      'Let the arm reach behind, looking to follow it',
+      'The knees stay together — only the upper body rotates',
+      'Return and repeat 10 times each side'
+    ],
+    coaching: 'Keeping the knees together isolates the rotation to the thoracic spine. The moment the knees separate, the lumbar spine takes over.',
+    why: 'A targeted thoracic rotation drill in a position that locks out the lumbar spine — ensuring the rotation happens in the correct area.',
+    credits: 25
+  },
+
+  {
+    id: 'seated-figure-4-stretch',
+    name: 'Seated Figure-4 Stretch',
+    category: 'mobility',
+    contentType: 'exercise',
+    movementPattern: 'hip-rotation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['glutes', 'hip', 'piriformis'],
+    contraindications: ['knee-acute', 'hip-acute'],
+    energyRequired: 1,
+    duration: 60,
+    perSide: true,
+    instructions: [
+      'Sit on a chair or the floor',
+      'Place the right ankle across the left knee — figure-4 position',
+      'Gently press the right knee downward with the right hand',
+      'If more stretch is needed, lean the torso forward',
+      'Hold for 45 to 60 seconds each side'
+    ],
+    coaching: 'This can be done on a chair at a desk — completely discreet. Do it at the end of any long sitting period.',
+    why: 'The most accessible deep hip rotator stretch — targets the piriformis and gluteus medius. Particularly effective for people with sciatic tension or piriformis syndrome.',
+    credits: 20
+  },
+
+  {
+    id: 'mobility-flow-5min',
+    name: 'Five-Minute Morning Mobility Flow',
+    category: 'mobility',
+    contentType: 'practice',
+    movementPattern: 'yoga-flow',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['full-body', 'spine'],
+    contraindications: [],
+    energyRequired: 2,
+    duration: 300,
+    perSide: false,
+    instructions: [
+      'Cat-cow x 10 breaths from hands and knees',
+      "Child's pose: 5 breaths",
+      'Downward dog: 5 breaths',
+      'Crescent lunge right: 3 breaths',
+      'Thoracic rotation in lunge — reach right arm to ceiling: 3 reps',
+      'Crescent lunge left: 3 breaths with rotation',
+      'Standing forward fold: 5 breaths',
+      'Slow roll up to standing'
+    ],
+    coaching: 'This five-minute flow requires no warm-up and no equipment. It is the minimum effective dose of morning movement. Do it before checking your phone.',
+    why: 'A complete morning mobility sequence that addresses spinal stiffness, hip flexor tightness, and thoracic rotation in the minimal time needed to produce real benefit.',
+    credits: 30
+  },
+
+  {
+    id: 'hip-flexor-progressive',
+    name: 'Hip Flexor Progressive Series',
+    category: 'mobility',
+    contentType: 'practice',
+    movementPattern: 'hip-rotation',
+    equipment: [],
+    equipmentOptional: ['yoga-mat'],
+    affectsAreas: ['hip-flexor', 'quadriceps', 'lower-back'],
+    contraindications: ['knee-acute'],
+    energyRequired: 3,
+    duration: 600,
+    perSide: true,
+    instructions: [
+      'Start in a kneeling lunge — right knee down, left foot forward',
+      'Hold for 30 seconds in the basic lunge position',
+      'Add a posterior pelvic tilt — tuck the tailbone under — hold 15 seconds more',
+      'Reach the right arm overhead — side stretch — 15 seconds',
+      'Rotate the torso right, opening the chest — 15 seconds',
+      'Lower to the half-kneeling position with foot elevated on a chair behind — 30 seconds',
+      'Switch sides and repeat the full sequence'
+    ],
+    coaching: 'Progress through each phase only when you feel the previous one has fully released. Rushing the sequence means not getting the benefit of any individual position.',
+    why: 'A systematic hip flexor sequence that progressively addresses all components — length, rotation, and overhead reach. More effective than any single static stretch.',
+    credits: 35
+  }
+
 ];
