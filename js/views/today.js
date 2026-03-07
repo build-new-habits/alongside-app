@@ -13,6 +13,7 @@ import { store }           from '../store.js';
 import { checkinData }     from '../data/checkin.js';
 import { workoutGenerator } from '../data/workoutGenerator.js';
 import { programmeEngine } from '../data/programmeEngine.js';
+import { getZoneStatus }   from '../data/conditions.js';
 
 export const centered = false;
 
@@ -114,6 +115,7 @@ function renderTodaysDashboard(name) {
 
       <!-- ── Programme phase banner ─────────────────────────────────────── -->
       ${renderPhaseBanner()}
+      ${renderSevereZoneMessage()}
 
       <!-- ── Coach recommendation ───────────────────────────────────────── -->
       <div class="card card-coach">
@@ -146,6 +148,78 @@ function renderTodaysDashboard(name) {
  * Reads the current phase's coaching message from programmeEngine.
  * Returns empty string if no programme is active.
  */
+
+/**
+ * Render a coach message when a body zone is severely impacted.
+ *
+ * If lower-limb AND spine are both severe → combined rest day message.
+ * Otherwise each severe zone gets a targeted message.
+ * Systemic conditions (chronic fatigue, anxiety etc) get their own message.
+ * If no severe zones → returns empty string.
+ */
+function renderSevereZoneMessage() {
+  const savedCheckin   = store.get('lastCheckin') || {};
+  const conditions     = store.get('conditions') || [];
+  const painScores     = store.get('conditionPainScores') || {};
+  const zoneStatus     = getZoneStatus(conditions, painScores);
+
+  const hasSevere = Object.values(zoneStatus).some(v => v === 'severe');
+  if (!hasSevere) return '';
+
+  // Combined severe (lower-limb + spine) → rest day message
+  if (zoneStatus.combinedSevere) {
+    return `
+      <div class="severe-zone-banner combined-rest" role="note" aria-label="Rest day recommended">
+        <span class="severe-zone-icon" aria-hidden="true">🛌</span>
+        <div class="severe-zone-body">
+          <span class="severe-zone-label">Rest day recommended</span>
+          <p class="severe-zone-message">With both your lower body and spine under significant strain, today is about rest — not exercise. Breathing, mindfulness, and a slow mindful walk if you feel up to it. That's more than enough.</p>
+        </div>
+      </div>`;
+  }
+
+  // Zone-specific messages
+  const messages = {
+    'lower-limb': {
+      icon: '🦵',
+      label: 'Lower body — take it easy today',
+      text: 'Your legs and hips need protection right now. Upper body, breathing, and gentle seated work are all still available. A slow mindful walk is an option if it feels right — no targets, no distance.'
+    },
+    'spine': {
+      icon: '🔙',
+      label: 'Spine — careful movement only',
+      text: 'With significant back pain today, we're keeping things very gentle. Upper body work in supported positions, breathing, and mindfulness are your safest options. Listen closely to what your body is telling you.'
+    },
+    'upper-limb': {
+      icon: '💪',
+      label: 'Upper body — lower body is still yours',
+      text: 'Your arms or shoulders need rest today — but your legs, core, and cardiovascular system are all available. Walking, lower body strength, and breathing work are all on the table.'
+    },
+    'systemic': {
+      icon: '💙',
+      label: 'Go gently with yourself today',
+      text: 'When the whole system is under strain, gentle is the only speed. Breathing, mindfulness, and slow movement are genuinely enough. Showing up for a few minutes is a win.'
+    },
+  };
+
+  const parts = [];
+  for (const [zone, severity] of Object.entries(zoneStatus)) {
+    if (zone === 'combinedSevere' || severity !== 'severe') continue;
+    const msg = messages[zone];
+    if (!msg) continue;
+    parts.push(`
+      <div class="severe-zone-banner" role="note" aria-label="${msg.label}">
+        <span class="severe-zone-icon" aria-hidden="true">${msg.icon}</span>
+        <div class="severe-zone-body">
+          <span class="severe-zone-label">${msg.label}</span>
+          <p class="severe-zone-message">${msg.text}</p>
+        </div>
+      </div>`);
+  }
+
+  return parts.join('\n');
+}
+
 function renderPhaseBanner() {
   const ap = store.get('activeProgramme');
   if (!ap?.programmeId || !ap?.currentPhase) return '';
