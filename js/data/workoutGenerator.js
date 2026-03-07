@@ -23,7 +23,9 @@ import { checkinData }     from './checkin.js';
 import { programmeEngine } from './programmeEngine.js';
 import {
   getSuitableExercises,
+  EXERCISES,
 } from './exercises.js';
+import { getZoneStatus } from './conditions.js';
 
 export const workoutGenerator = {
 
@@ -45,6 +47,25 @@ export const workoutGenerator = {
       recoveryMode: burnout.level === 'high',
       painScores:   store.get('conditionPainScores') || {}
     };
+
+    // ── Severe zone override (v1.3) ─────────────────────────────────────────
+    // If any body zone is at severe pain, skip the full workout pool entirely.
+    // Only breathing and mindfulness options are offered.
+    // Mood / intensity settings do not override this.
+    const zoneStatus = getZoneStatus(
+      profile.conditions || [],
+      checkinForFilter.painScores
+    );
+    const hasSevereZone = Object.entries(zoneStatus)
+      .some(([k, v]) => k !== 'combinedSevere' && v === 'severe');
+
+    if (hasSevereZone) {
+      const options = [this.generateSevereRestOptions()];
+      store.set('todaysWorkouts', options);
+      store.set('workoutsGeneratedAt', new Date().toISOString());
+      return options;
+    }
+    // ── End severe override ──────────────────────────────────────────────────
 
     // Get filtered exercise pool (unchanged from v1.0 calling convention)
     const suitable = getSuitableExercises(profile, checkinForFilter);
@@ -115,6 +136,44 @@ export const workoutGenerator = {
                   : 'mobility';
     const rest    = all.filter(f => f !== primary);
     return [primary, ...rest];
+  },
+
+  /**
+   * Build the single "Gentle Care" card shown on severe pain days.
+   *
+   * Pulls exercises directly from EXERCISES by ID so they are always
+   * present regardless of the user equipment / condition filter results.
+   * Only breathing, mindfulness, and mindful walk are included.
+   */
+  generateSevereRestOptions() {
+    const SEVERE_SAFE_IDS = [
+      'breathing-478',
+      'breathing-box',
+      'breathing-diaphragmatic',
+      'mindfulness-breath-anchor',
+      'mindfulness-body-scan',
+      'mindful-walk',
+    ];
+
+    const exercises = SEVERE_SAFE_IDS
+      .map(id => EXERCISES.find(e => e.id === id))
+      .filter(Boolean);
+
+    const duration = this.calculateDuration(exercises);
+
+    return {
+      id:              `workout-gentle-care-${Date.now()}`,
+      focus:           'recovery',
+      name:            'Gentle Care',
+      icon:            '💙',
+      duration,
+      exerciseCount:   exercises.length,
+      exercises,
+      intensity:       'recovery',
+      rationale:       'Your body is asking for rest today. These practices support recovery without loading the areas that are hurting. Showing up for this is enough.',
+      totalCredits:    exercises.reduce((sum, e) => sum + (e.credits || 20), 0),
+      isSevereRestDay: true,
+    };
   },
 
   /**
