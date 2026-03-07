@@ -43,7 +43,7 @@ export const CONDITIONS = [
   { id: 'knee',             name: 'Knee',                   icon: '🦵', area: 'lower',    hasPhase: true },
   { id: 'hip',              name: 'Hip',                    icon: '🦴', area: 'lower',    hasPhase: true },
   { id: 'ankle-foot',       name: 'Ankle / Foot',           icon: '🦶', area: 'lower',    hasPhase: true },
-  { id: 'glutes',           name: 'Glutes / Buttocks',      icon: '🍑', area: 'lower',    hasPhase: false },
+  { id: 'glutes',           name: 'Glutes / Buttocks',      icon: '🍑', area: 'lower',    hasPhase: true },
   { id: 'calves',           name: 'Calves / Lower Leg',     icon: '🦵', area: 'lower',    hasPhase: false },
   { id: 'achilles',         name: 'Achilles Tendon',        icon: '🦶', area: 'lower',    hasPhase: true },
   { id: 'shin-splints',     name: 'Shin Splints',           icon: '🦵', area: 'lower',    hasPhase: true },
@@ -97,6 +97,7 @@ export const CONDITIONS = [
 
 const PHASE_AWARE_CONDITIONS = new Set([
   'hamstring',
+  'glutes',
   'knee',
   'hip',
   'ankle-foot',
