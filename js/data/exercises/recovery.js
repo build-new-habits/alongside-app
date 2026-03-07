@@ -686,7 +686,7 @@ export const RECOVERY = [
     duration: 900,
     perSide: false,
     instructions: [
-      'Put your trainers on — that's the only target right now',
+      'Put your trainers on — that is the only target right now',
       'Step outside and start walking at whatever pace feels right',
       'No distance, no time target — 10 minutes is enough',
       'Let your eyes move: notice three things you can see',
@@ -695,8 +695,8 @@ export const RECOVERY = [
       'Pause whenever you want. Look around. Breathe.',
       'Return home before you feel tired — not after'
     ],
-    coaching: 'This isn't exercise. It's movement as medicine — gentle circulation, fresh air, and a reminder that your body still works, even on hard days. The goal is simply to have gone.',
-    why: 'Gentle walking maintains circulation and joint mobility without loading the structures that are hurting. The mindfulness element activates the parasympathetic nervous system, which supports the body's natural repair processes.',
+    coaching: 'This is not exercise. It is movement as medicine — gentle circulation, fresh air, and a reminder that your body still works, even on hard days. The goal is simply to have gone.',
+    why: 'Gentle walking maintains circulation and joint mobility without loading the structures that are hurting. The mindfulness element activates the parasympathetic nervous system, which supports the body natural repair processes.',
     credits: 30,
     coachNote: 'severe-pain-appropriate',
   },
