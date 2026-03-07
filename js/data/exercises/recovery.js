@@ -670,6 +670,37 @@ export const RECOVERY = [
     credits: 15
   },
 
+
+  {
+    id: 'mindful-walk',
+    name: 'Mindful Walk',
+    category: 'recovery',
+    contentType: 'practice',
+    movementPattern: 'locomotion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['nervous-system', 'full-body'],
+    contraindications: ['ankle-foot-acute', 'knee-acute'],
+    caution: ['lower-back-acute', 'hamstring-acute', 'glutes-acute', 'hip-acute'],
+    energyRequired: 1,
+    duration: 900,
+    perSide: false,
+    instructions: [
+      'Put your trainers on — that's the only target right now',
+      'Step outside and start walking at whatever pace feels right',
+      'No distance, no time target — 10 minutes is enough',
+      'Let your eyes move: notice three things you can see',
+      'Notice the ground beneath your feet with each step',
+      'If pain increases, slow down or stop — this is not pushing through',
+      'Pause whenever you want. Look around. Breathe.',
+      'Return home before you feel tired — not after'
+    ],
+    coaching: 'This isn't exercise. It's movement as medicine — gentle circulation, fresh air, and a reminder that your body still works, even on hard days. The goal is simply to have gone.',
+    why: 'Gentle walking maintains circulation and joint mobility without loading the structures that are hurting. The mindfulness element activates the parasympathetic nervous system, which supports the body's natural repair processes.',
+    credits: 30,
+    coachNote: 'severe-pain-appropriate',
+  },
+
   {
     id: 'active-recovery-walk',
     name: 'Active Recovery Walk',
