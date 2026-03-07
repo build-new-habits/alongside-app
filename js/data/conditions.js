@@ -39,45 +39,45 @@
 export const CONDITIONS = [
 
   // MUSCULOSKELETAL — LOWER BODY
-  { id: 'hamstring',        name: 'Hamstring',              icon: '🦵', area: 'lower',    hasPhase: true },
-  { id: 'knee',             name: 'Knee',                   icon: '🦵', area: 'lower',    hasPhase: true },
-  { id: 'hip',              name: 'Hip',                    icon: '🦴', area: 'lower',    hasPhase: true },
-  { id: 'ankle-foot',       name: 'Ankle / Foot',           icon: '🦶', area: 'lower',    hasPhase: true },
-  { id: 'glutes',           name: 'Glutes / Buttocks',      icon: '🍑', area: 'lower',    hasPhase: true },
-  { id: 'calves',           name: 'Calves / Lower Leg',     icon: '🦵', area: 'lower',    hasPhase: false },
-  { id: 'achilles',         name: 'Achilles Tendon',        icon: '🦶', area: 'lower',    hasPhase: true },
-  { id: 'shin-splints',     name: 'Shin Splints',           icon: '🦵', area: 'lower',    hasPhase: true },
-  { id: 'it-band',          name: 'IT Band',                icon: '🦵', area: 'lower',    hasPhase: false },
-  { id: 'plantar-fasciitis',name: 'Plantar Fasciitis',      icon: '🦶', area: 'lower',    hasPhase: false },
-  { id: 'sciatica',         name: 'Sciatica',               icon: '⚡', area: 'lower',    hasPhase: true },
+  { id: 'hamstring',        name: 'Hamstring',              icon: '🦵', area: 'lower',    hasPhase: true, zone: 'lower-limb' },
+  { id: 'knee',             name: 'Knee',                   icon: '🦵', area: 'lower',    hasPhase: true, zone: 'lower-limb' },
+  { id: 'hip',              name: 'Hip',                    icon: '🦴', area: 'lower',    hasPhase: true, zone: 'lower-limb' },
+  { id: 'ankle-foot',       name: 'Ankle / Foot',           icon: '🦶', area: 'lower',    hasPhase: true, zone: 'lower-limb' },
+  { id: 'glutes',           name: 'Glutes / Buttocks',      icon: '🍑', area: 'lower',    hasPhase: true, zone: 'lower-limb' },
+  { id: 'calves',           name: 'Calves / Lower Leg',     icon: '🦵', area: 'lower',    hasPhase: false, zone: 'lower-limb' },
+  { id: 'achilles',         name: 'Achilles Tendon',        icon: '🦶', area: 'lower',    hasPhase: true, zone: 'lower-limb' },
+  { id: 'shin-splints',     name: 'Shin Splints',           icon: '🦵', area: 'lower',    hasPhase: true, zone: 'lower-limb' },
+  { id: 'it-band',          name: 'IT Band',                icon: '🦵', area: 'lower',    hasPhase: false, zone: 'lower-limb' },
+  { id: 'plantar-fasciitis',name: 'Plantar Fasciitis',      icon: '🦶', area: 'lower',    hasPhase: false, zone: 'lower-limb' },
+  { id: 'sciatica',         name: 'Sciatica',               icon: '⚡', area: 'lower',    hasPhase: true, zone: 'spine' },
 
   // MUSCULOSKELETAL — BACK
-  { id: 'lower-back',       name: 'Lower Back',             icon: '🔙', area: 'back',     hasPhase: true },
-  { id: 'upper-back',       name: 'Upper Back / Neck',      icon: '🔙', area: 'back',     hasPhase: true },
+  { id: 'lower-back',       name: 'Lower Back',             icon: '🔙', area: 'back',     hasPhase: true, zone: 'spine' },
+  { id: 'upper-back',       name: 'Upper Back / Neck',      icon: '🔙', area: 'back',     hasPhase: true, zone: 'spine' },
 
   // MUSCULOSKELETAL — UPPER BODY
-  { id: 'shoulder',         name: 'Shoulder',               icon: '💪', area: 'upper',    hasPhase: true },
-  { id: 'wrist-elbow',      name: 'Wrist / Elbow',          icon: '✋', area: 'upper',    hasPhase: true },
-  { id: 'chest-pecs',       name: 'Chest / Pecs',           icon: '💪', area: 'upper',    hasPhase: false },
-  { id: 'biceps-triceps',   name: 'Biceps / Triceps',       icon: '💪', area: 'upper',    hasPhase: false },
-  { id: 'abdominals',       name: 'Abdominals / Core',      icon: '🫁', area: 'upper',    hasPhase: false },
+  { id: 'shoulder',         name: 'Shoulder',               icon: '💪', area: 'upper',    hasPhase: true, zone: 'upper-limb' },
+  { id: 'wrist-elbow',      name: 'Wrist / Elbow',          icon: '✋', area: 'upper',    hasPhase: true, zone: 'upper-limb' },
+  { id: 'chest-pecs',       name: 'Chest / Pecs',           icon: '💪', area: 'upper',    hasPhase: false, zone: 'upper-limb' },
+  { id: 'biceps-triceps',   name: 'Biceps / Triceps',       icon: '💪', area: 'upper',    hasPhase: false, zone: 'upper-limb' },
+  { id: 'abdominals',       name: 'Abdominals / Core',      icon: '🫁', area: 'upper',    hasPhase: false, zone: 'spine' },
 
   // GENERAL HEALTH
-  { id: 'chronic-fatigue',  name: 'Chronic fatigue / ME-CFS', icon: '😴', area: 'general', hasPhase: false },
-  { id: 'anxiety',          name: 'Anxiety / Stress sensitivity', icon: '😰', area: 'general', hasPhase: false },
-  { id: 'breathing',        name: 'Breathing / Asthma',     icon: '🌬️', area: 'general', hasPhase: false },
-  { id: 'fibromyalgia',     name: 'Fibromyalgia',           icon: '⚡', area: 'general', hasPhase: false },
-  { id: 'hypermobility',    name: 'Hypermobility / EDS',    icon: '🤸', area: 'general', hasPhase: false },
-  { id: 'osteoporosis',     name: 'Osteoporosis / Low bone density', icon: '🦴', area: 'general', hasPhase: false },
-  { id: 'cardiovascular-condition', name: 'Heart condition', icon: '❤️', area: 'general', hasPhase: false },
-  { id: 'pelvic-floor',     name: 'Pelvic floor',           icon: '🫁', area: 'general', hasPhase: false },
+  { id: 'chronic-fatigue',  name: 'Chronic fatigue / ME-CFS', icon: '😴', area: 'general', hasPhase: false, zone: 'systemic' },
+  { id: 'anxiety',          name: 'Anxiety / Stress sensitivity', icon: '😰', area: 'general', hasPhase: false, zone: 'systemic' },
+  { id: 'breathing',        name: 'Breathing / Asthma',     icon: '🌬️', area: 'general', hasPhase: false, zone: 'systemic' },
+  { id: 'fibromyalgia',     name: 'Fibromyalgia',           icon: '⚡', area: 'general', hasPhase: false, zone: 'systemic' },
+  { id: 'hypermobility',    name: 'Hypermobility / EDS',    icon: '🤸', area: 'general', hasPhase: false, zone: 'systemic' },
+  { id: 'osteoporosis',     name: 'Osteoporosis / Low bone density', icon: '🦴', area: 'general', hasPhase: false, zone: 'systemic' },
+  { id: 'cardiovascular-condition', name: 'Heart condition', icon: '❤️', area: 'general', hasPhase: false, zone: 'systemic' },
+  { id: 'pelvic-floor',     name: 'Pelvic floor',           icon: '🫁', area: 'general', hasPhase: false, zone: 'systemic' },
 
   // HORMONAL
-  { id: 'perimenopause',    name: 'Perimenopause symptoms', icon: '🌙', area: 'hormonal', hasPhase: false },
-  { id: 'menopause',        name: 'Menopause symptoms',     icon: '🌙', area: 'hormonal', hasPhase: false },
+  { id: 'perimenopause',    name: 'Perimenopause symptoms', icon: '🌙', area: 'hormonal', hasPhase: false, zone: 'systemic' },
+  { id: 'menopause',        name: 'Menopause symptoms',     icon: '🌙', area: 'hormonal', hasPhase: false, zone: 'systemic' },
 
   // CATCH-ALL
-  { id: 'other',            name: 'Something else',         icon: '❓', area: 'other',    hasPhase: false }
+  { id: 'other',            name: 'Something else',         icon: '❓', area: 'other',    hasPhase: false, zone: 'systemic' }
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -124,6 +124,48 @@ const PHASE_AWARE_CONDITIONS = new Set([
  *   painScores   = { hamstring: 8, knee: 2 }
  *   → returns ['hamstring', 'hamstring-acute', 'knee']
  */
+
+/**
+ * Get the severity status of each body zone for today's check-in.
+ * Used by today.js to show severe-zone coach messaging.
+ *
+ * Returns an object: { 'lower-limb': 'severe'|'moderate'|'mild'|null, ... }
+ * Zone is 'severe' if any condition in it has pain >= 7
+ * Zone is 'moderate' if any condition has pain 4-6
+ * Zone is 'mild' if any condition has pain 1-3
+ * Zone is null if no conditions in it
+ *
+ * Special: if BOTH lower-limb AND spine are severe → returns combinedSevere: true
+ *
+ * @param {string[]} conditionIds  — user's conditions
+ * @param {Object}   painScores    — { conditionId: 0-10 }
+ * @returns {Object} zoneStatus
+ */
+export function getZoneStatus(conditionIds = [], painScores = {}) {
+  const zoneMax = {};
+
+  for (const id of conditionIds) {
+    const cond = CONDITIONS.find(c => c.id === id);
+    if (!cond) continue;
+    const zone = cond.zone || 'systemic';
+    const pain = painScores[id] ?? 0;
+    if (pain === 0) continue;
+
+    const severity = pain >= 7 ? 'severe' : pain >= 4 ? 'moderate' : 'mild';
+    const order = { severe: 3, moderate: 2, mild: 1 };
+
+    if (!zoneMax[zone] || order[severity] > order[zoneMax[zone]]) {
+      zoneMax[zone] = severity;
+    }
+  }
+
+  // Flag the combined-severe case — both lower-limb and spine severe → rest day
+  const combinedSevere =
+    zoneMax['lower-limb'] === 'severe' && zoneMax['spine'] === 'severe';
+
+  return { ...zoneMax, combinedSevere };
+}
+
 export function getActiveConditionIds(conditionIds = [], painScores = {}) {
   const active = new Set(conditionIds);
 
