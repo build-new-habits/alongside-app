@@ -188,7 +188,7 @@ function renderSevereZoneMessage() {
     'spine': {
       icon: '🔙',
       label: 'Spine — careful movement only',
-      text: 'With significant back pain today, we\'re keeping things very gentle. Upper body work in supported positions, breathing, and mindfulness are your safest options. Listen closely to what your body is telling you.'
+      text: 'With significant back pain today, we are keeping things very gentle. Upper body work in supported positions, breathing, and mindfulness are your safest options. Listen closely to what your body is telling you.'
     },
     'upper-limb': {
       icon: '💪',
