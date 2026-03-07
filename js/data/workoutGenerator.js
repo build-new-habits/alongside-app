@@ -63,6 +63,7 @@ export const workoutGenerator = {
       const options = [this.generateSevereRestOptions()];
       store.set('todaysWorkouts', options);
       store.set('workoutsGeneratedAt', new Date().toISOString());
+      store.set('workoutsPainFingerprint', this.painScoreFingerprint());
       return options;
     }
     // ── End severe override ──────────────────────────────────────────────────
@@ -84,6 +85,7 @@ export const workoutGenerator = {
 
     store.set('todaysWorkouts', options);
     store.set('workoutsGeneratedAt', new Date().toISOString());
+    store.set('workoutsPainFingerprint', this.painScoreFingerprint());
 
     return options;
   },
@@ -398,10 +400,35 @@ export const workoutGenerator = {
     return { strength: '💪', mobility: '🧘', cardio: '❤️' }[focus] || '🏃';
   },
 
+  /**
+   * Returns a stable string fingerprint of the current pain scores.
+   * Used to detect when a check-in has changed pain levels since the
+   * last workout generation, so the cache can be correctly busted.
+   */
+  painScoreFingerprint() {
+    const scores = store.get('conditionPainScores') || {};
+    return Object.entries(scores)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, v]) => `${k}:${v}`)
+      .join(',');
+  },
+
   needsRegeneration() {
     const generatedAt = store.get('workoutsGeneratedAt');
     if (!generatedAt) return true;
-    return new Date(generatedAt).toDateString() !== new Date().toDateString();
+
+    // Bust cache if the date has changed
+    const dateChanged = new Date(generatedAt).toDateString() !== new Date().toDateString();
+    if (dateChanged) return true;
+
+    // Bust cache if pain scores have changed since last generation.
+    // This ensures a severe-pain check-in immediately replaces the
+    // cached workout pool rather than waiting until tomorrow.
+    const storedFingerprint = store.get('workoutsPainFingerprint') || '';
+    const currentFingerprint = this.painScoreFingerprint();
+    if (storedFingerprint !== currentFingerprint) return true;
+
+    return false;
   },
 
   getTodaysWorkouts() {
