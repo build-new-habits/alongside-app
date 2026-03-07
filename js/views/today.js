@@ -198,7 +198,7 @@ function renderWorkoutCard(workout, index) {
             <span class="exercise-list-name">${e.name}</span>
             <span class="exercise-list-prescription">
               ${e.duration
-                ? `${e.sets > 1 ? e.sets + ' × ' : ''}${e.duration}s`
+                ? `${e.sets > 1 ? e.sets + ' × ' : ''}${formatExerciseDuration(e.duration)}`
                 : `${e.sets || 3} × ${e.reps || 10} reps`}
             </span>
           </div>
@@ -239,6 +239,27 @@ function renderRecentHistory() {
       </div>
     </div>
   `;
+}
+
+
+/**
+ * Format exercise duration for display in workout cards.
+ * Shows seconds for short durations, minutes for longer ones.
+ * Both must be consistent: individual exercise times and workout total must agree.
+ *
+ * < 60s  → "45s"
+ * 60s    → "1 min"
+ * 90s    → "1m 30s"
+ * 120s   → "2 mins"
+ * 1800s  → "30 mins"
+ */
+function formatExerciseDuration(seconds) {
+  if (!seconds) return '';
+  if (seconds < 60) return `${seconds}s`;
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  if (secs === 0) return mins === 1 ? '1 min' : `${mins} mins`;
+  return `${mins}m ${secs}s`;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
