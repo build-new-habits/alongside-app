@@ -679,3 +679,102 @@
     padding: var(--space-3) var(--space-1);
   }
 }
+/* ============================================
+   AVAILABLE TIME PICKER
+   Two-row 3×2 chip grid. Optional field —
+   sits above the submit button at the end
+   of the check-in form.
+   ============================================ */
+
+.time-picker-hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-4) 0;
+  line-height: 1.5;
+}
+
+/* 3-column grid, wraps to 2 rows naturally */
+.time-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.time-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-2);
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+  min-height: 64px;
+  width: 100%;
+}
+
+.time-chip:hover {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.08);
+}
+
+.time-chip:active {
+  transform: scale(0.97);
+}
+
+.time-chip.selected {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.time-chip-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.time-chip.selected .time-chip-label {
+  color: var(--color-bg-deep);
+}
+
+.time-chip-sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.2;
+}
+
+.time-chip.selected .time-chip-sub {
+  color: var(--color-bg-deep);
+  opacity: 0.8;
+}
+
+/* Focus ring for keyboard navigation */
+.time-chip:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Clear button — appears below the grid after a selection */
+.time-clear-btn {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  padding: var(--space-2) var(--space-3);
+}
+
+.time-clear-btn:hover {
+  color: var(--color-text);
+}
+
+/* Collapse to 2-column on very narrow screens */
+@media (max-width: 340px) {
+  .time-chip-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
