@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build New Habits — Business Portfolio 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS & RESET
+═══════════════════════════════════════════ */
+:root {
+  --teal:        #1B6B6B;
+  --teal-mid:    #2A8A8A;
+  --teal-light:  #4AADAD;
+  --teal-pale:   #EAF5F5;
+  --teal-deep:   #0D4444;
+  --coral:       #E8614A;
+  --coral-pale:  #FEF0ED;
+  --amber:       #D4892A;
+  --amber-pale:  #FEF7ED;
+  --gold:        #C8A84B;
+  --dark:        #1A1F1F;
+  --mid:         #4A5555;
+  --muted:       #7A8B8B;
+  --border:      #D6E4E4;
+  --pale:        #F4F9F9;
+  --cream:       #FFFDF8;
+  --white:       #FFFFFF;
+  --serif:       'Playfair Display', Georgia, serif;
+  --sans:        'DM Sans', system-ui, sans-serif;
+  --mono:        'DM Mono', monospace;
+  --shadow-sm:   0 1px 3px rgba(27,107,107,0.08);
+  --shadow-md:   0 4px 16px rgba(27,107,107,0.12);
+  --shadow-lg:   0 12px 40px rgba(27,107,107,0.16);
+  --radius:      12px;
+  --radius-lg:   20px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--sans);color:var(--dark);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+ul,ol{list-style:none}
+h1,h2,h3,h4,h5{font-family:var(--serif);line-height:1.2;font-weight:600}
+
+/* ═══════════════════════════════════════════
+   SKIP LINK (ACCESSIBILITY)
+═══════════════════════════════════════════ */
+.skip-link{position:absolute;top:-100px;left:0;background:var(--teal);color:white;padding:12px 20px;border-radius:0 0 8px 0;font-weight:600;z-index:9999;transition:top 0.2s}
+.skip-link:focus{top:0}
+
+/* ═══════════════════════════════════════════
+   SIDEBAR NAV
+═══════════════════════════════════════════ */
+.sidebar{
+  position:fixed;top:0;left:0;width:260px;height:100vh;
+  background:var(--teal-deep);color:white;
+  display:flex;flex-direction:column;
+  z-index:100;overflow-y:auto;overflow-x:hidden;
+}
+.sidebar-logo{padding:28px 24px 16px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.sidebar-logo .brand{font-family:var(--serif);font-size:1.15rem;font-weight:800;color:white;letter-spacing:-0.01em;line-height:1.2}
+.sidebar-logo .tagline{font-size:0.72rem;color:rgba(255,255,255,0.55);margin-top:4px;font-family:var(--mono);letter-spacing:0.04em}
+.sidebar-logo .version{display:inline-block;margin-top:8px;background:var(--teal-light);color:white;font-size:0.62rem;font-family:var(--mono);padding:2px 8px;border-radius:20px;letter-spacing:0.06em}
+
+.nav-section{padding:16px 0 4px}
+.nav-label{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.12em;color:rgba(255,255,255,0.4);padding:0 20px 6px;text-transform:uppercase}
+.nav-item{display:block;padding:8px 20px;font-size:0.84rem;color:rgba(255,255,255,0.75);cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;line-height:1.3}
+.nav-item:hover,.nav-item.active{color:white;background:rgba(255,255,255,0.06);border-left-color:var(--teal-light)}
+.nav-item .nav-num{font-family:var(--mono);font-size:0.66rem;color:rgba(255,255,255,0.35);margin-right:6px}
+.nav-sub{padding-left:32px;font-size:0.79rem;color:rgba(255,255,255,0.55)}
+.nav-sub:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.04)}
+
+.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,0.1)}
+.sidebar-footer p{font-size:0.72rem;color:rgba(255,255,255,0.35);line-height:1.6}
+
+/* ═══════════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════════ */
+.main{margin-left:260px;min-height:100vh}
+
+/* ═══════════════════════════════════════════
+   COVER PAGE
+═══════════════════════════════════════════ */
+.cover{
+  min-height:100vh;
+  background:linear-gradient(135deg,var(--teal-deep) 0%,var(--teal) 45%,var(--teal-mid) 100%);
+  display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  padding:80px 80px 60px;
+  position:relative;overflow:hidden;
+}
+.cover::before{
+  content:'';position:absolute;top:-80px;right:-80px;
+  width:500px;height:500px;
+  background:radial-gradient(circle,rgba(255,255,255,0.06) 0%,transparent 70%);
+  border-radius:50%;
+}
+.cover::after{
+  content:'';position:absolute;bottom:-120px;right:100px;
+  width:700px;height:700px;
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:50%;
+}
+.cover-eyebrow{font-family:var(--mono);font-size:0.72rem;letter-spacing:0.16em;color:var(--teal-light);text-transform:uppercase;margin-bottom:20px;position:relative;z-index:1}
+.cover-title{font-family:var(--serif);font-size:4.2rem;font-weight:800;color:white;line-height:1.05;margin-bottom:12px;position:relative;z-index:1;max-width:560px}
+.cover-title em{color:var(--teal-light);font-style:italic}
+.cover-sub{font-size:1.1rem;color:rgba(255,255,255,0.7);margin-bottom:40px;position:relative;z-index:1;max-width:480px;line-height:1.65}
+.cover-meta{display:flex;gap:32px;position:relative;z-index:1;flex-wrap:wrap}
+.cover-meta-item{display:flex;flex-direction:column;gap:3px}
+.cover-meta-item .label{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.1em;color:rgba(255,255,255,0.4);text-transform:uppercase}
+.cover-meta-item .value{font-size:0.9rem;color:rgba(255,255,255,0.85);font-weight:500}
+.cover-badge{
+  position:absolute;bottom:48px;right:60px;
+  width:120px;height:120px;
+  border-radius:50%;border:2px solid rgba(255,255,255,0.2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:white;text-align:center;z-index:1;
+}
+.cover-badge .big{font-family:var(--serif);font-size:2rem;font-weight:800;line-height:1}
+.cover-badge .sm{font-size:0.65rem;font-family:var(--mono);color:rgba(255,255,255,0.6);letter-spacing:0.06em;text-transform:uppercase;margin-top:3px}
+.scroll-hint{position:absolute;bottom:28px;left:80px;display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.4);font-size:0.75rem;z-index:1}
+.scroll-hint::before{content:'';width:32px;height:1px;background:rgba(255,255,255,0.2);display:block}
+
+/* ═══════════════════════════════════════════
+   CONTENTS PAGE
+═══════════════════════════════════════════ */
+.page{padding:64px 72px;max-width:1100px}
+.page-narrow{padding:64px 72px;max-width:860px}
+
+.section-hero{margin-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.14em;color:var(--teal-mid);text-transform:uppercase;margin-bottom:10px}
+.section-title{font-family:var(--serif);font-size:2.4rem;font-weight:700;color:var(--dark);line-height:1.15}
+.section-title em{color:var(--teal);font-style:italic}
+.section-lead{font-size:1.05rem;color:var(--mid);line-height:1.7;margin-top:12px;max-width:620px}
+.divider{width:48px;height:3px;background:linear-gradient(90deg,var(--teal),var(--teal-light));border-radius:2px;margin:20px 0}
+
+.toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:32px}
+.toc-item{
+  display:flex;align-items:flex-start;gap:14px;padding:16px 20px;
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  transition:all 0.18s;cursor:pointer;
+}
+.toc-item:hover{border-color:var(--teal-light);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.toc-item:hover .toc-arrow{opacity:1;transform:translateX(0)}
+.toc-num{font-family:var(--mono);font-size:0.7rem;color:var(--muted);min-width:24px;padding-top:1px}
+.toc-text{flex:1}
+.toc-text h3{font-family:var(--sans);font-size:0.9rem;font-weight:600;color:var(--dark);line-height:1.3}
+.toc-text p{font-size:0.78rem;color:var(--muted);margin-top:2px;line-height:1.4}
+.toc-arrow{font-size:0.75rem;color:var(--teal);opacity:0;transform:translateX(-4px);transition:all 0.18s;margin-top:2px}
+.toc-tag{display:inline-block;font-family:var(--mono);font-size:0.6rem;padding:1px 7px;border-radius:10px;margin-top:4px;letter-spacing:0.04em}
+.tag-legal{background:var(--coral-pale);color:var(--coral)}
+.tag-strategic{background:var(--teal-pale);color:var(--teal)}
+.tag-financial{background:var(--amber-pale);color:var(--amber)}
+.tag-task{background:#F0F0FF;color:#5B5BBB}
+.tag-annex{background:var(--pale);color:var(--muted)}
+
+/* ═══════════════════════════════════════════
+   SECTION HEADERS
+═══════════════════════════════════════════ */
+.section-header{
+  background:linear-gradient(135deg,var(--teal-deep),var(--teal));
+  color:white;padding:48px 72px;
+  position:relative;overflow:hidden;
+}
+.section-header::after{content:'';position:absolute;right:-40px;top:50%;transform:translateY(-50%);width:200px;height:200px;border-radius:50%;border:1px solid rgba(255,255,255,0.1)}
+.section-header .sh-num{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.12em;color:var(--teal-light);text-transform:uppercase;margin-bottom:8px}
+.section-header .sh-title{font-family:var(--serif);font-size:2rem;font-weight:700;color:white;position:relative;z-index:1}
+.section-header .sh-desc{font-size:0.9rem;color:rgba(255,255,255,0.65);margin-top:8px;max-width:560px;line-height:1.6;position:relative;z-index:1}
+
+/* ═══════════════════════════════════════════
+   CARDS & COMPONENTS
+═══════════════════════════════════════════ */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;margin-bottom:20px;box-shadow:var(--shadow-sm)}
+.card-teal{border-left:4px solid var(--teal)}
+.card-coral{border-left:4px solid var(--coral)}
+.card-amber{border-left:4px solid var(--amber)}
+.card-h{font-family:var(--serif);font-size:1.1rem;font-weight:600;color:var(--dark);margin-bottom:10px}
+.card-p{font-size:0.88rem;color:var(--mid);line-height:1.7}
+
+.highlight-box{
+  background:var(--teal-pale);border:1px solid var(--border);border-radius:var(--radius);
+  padding:24px 28px;margin:24px 0;
+}
+.highlight-box.amber{background:var(--amber-pale)}
+.highlight-box.coral{background:var(--coral-pale)}
+.highlight-box h4{font-family:var(--serif);font-size:1rem;color:var(--teal-deep);margin-bottom:8px}
+.highlight-box.amber h4{color:var(--amber)}
+.highlight-box.coral h4{color:var(--coral)}
+.highlight-box p{font-size:0.86rem;color:var(--mid);line-height:1.7}
+
+.quote-block{
+  border-left:4px solid var(--teal-light);padding:20px 24px;
+  margin:24px 0;background:var(--teal-pale);border-radius:0 var(--radius) var(--radius) 0;
+}
+.quote-block p{font-family:var(--serif);font-size:1.05rem;font-style:italic;color:var(--teal-deep);line-height:1.7}
+.quote-block cite{display:block;font-family:var(--mono);font-size:0.68rem;color:var(--muted);margin-top:8px;font-style:normal;letter-spacing:0.04em}
+
+/* ═══════════════════════════════════════════
+   DATA TABLES
+═══════════════════════════════════════════ */
+.data-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:0.84rem}
+.data-table th{background:var(--teal-deep);color:white;padding:10px 14px;text-align:left;font-family:var(--mono);font-size:0.7rem;letter-spacing:0.06em;font-weight:500;text-transform:uppercase}
+.data-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--mid);vertical-align:top;line-height:1.5}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:nth-child(even) td{background:var(--pale)}
+.data-table strong{color:var(--dark)}
+.data-table .num{font-family:var(--mono);color:var(--teal)}
+
+/* ═══════════════════════════════════════════
+   TASK TRACKER
+═══════════════════════════════════════════ */
+.task-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.filter-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:white;font-size:0.78rem;cursor:pointer;font-family:var(--sans);color:var(--mid);transition:all 0.15s}
+.filter-btn.active,.filter-btn:hover{background:var(--teal);color:white;border-color:var(--teal)}
+
+.task-section{margin-bottom:32px}
+.task-section-title{
+  font-family:var(--mono);font-size:0.68rem;letter-spacing:0.1em;color:white;
+  background:var(--teal-mid);padding:7px 14px;border-radius:6px 6px 0 0;
+  text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;
+}
+.task-section-title .count{font-size:0.62rem;opacity:0.7}
+.task-list{border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden}
+.task-row{display:flex;align-items:flex-start;gap:14px;padding:13px 18px;border-bottom:1px solid var(--border);background:white;transition:background 0.12s}
+.task-row:last-child{border-bottom:none}
+.task-row:hover{background:var(--pale)}
+.task-row.done{opacity:0.55}
+.task-row.done .task-text{text-decoration:line-through;color:var(--muted)}
+.task-cb{width:18px;height:18px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;cursor:pointer;margin-top:1px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;accent-color:var(--teal)}
+input[type="checkbox"]{width:18px;height:18px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;margin-top:2px}
+.task-content{flex:1}
+.task-text{font-size:0.86rem;color:var(--dark);line-height:1.4;font-weight:500}
+.task-detail{font-size:0.78rem;color:var(--muted);line-height:1.4;margin-top:2px}
+.task-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.task-tag{font-family:var(--mono);font-size:0.62rem;padding:1px 7px;border-radius:10px;letter-spacing:0.03em}
+.tt-legal{background:var(--coral-pale);color:var(--coral)}
+.tt-tech{background:var(--teal-pale);color:var(--teal)}
+.tt-financial{background:var(--amber-pale);color:var(--amber)}
+.tt-marketing{background:#F0F0FF;color:#5B5BBB}
+.tt-operational{background:#FFF5FF;color:#9B5BBB}
+.tt-high{background:#FEE;color:#CC2222;font-weight:600}
+.tt-critical{background:#FFE;color:#AA6600;font-weight:600}
+.task-link{font-size:0.72rem;color:var(--teal-mid);font-family:var(--mono);text-decoration:underline;cursor:pointer;margin-top:2px;display:inline-block}
+
+/* ═══════════════════════════════════════════
+   LEGAL DOCS
+═══════════════════════════════════════════ */
+.legal-doc{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:40px 48px;margin-bottom:32px;box-shadow:var(--shadow-sm)}
+.legal-doc .doc-stamp{font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;margin-bottom:24px;padding:8px 12px;background:var(--pale);border-radius:6px;display:inline-block}
+.legal-doc h2{font-family:var(--serif);font-size:1.6rem;color:var(--teal-deep);margin-bottom:6px}
+.legal-doc h3{font-family:var(--sans);font-size:0.95rem;font-weight:600;color:var(--dark);margin:20px 0 8px}
+.legal-doc h4{font-family:var(--sans);font-size:0.85rem;font-weight:600;color:var(--teal-deep);margin:14px 0 6px}
+.legal-doc p{font-size:0.86rem;color:var(--mid);line-height:1.75;margin-bottom:10px}
+.legal-doc ul{padding-left:20px;margin-bottom:12px}
+.legal-doc ul li{font-size:0.86rem;color:var(--mid);line-height:1.7;list-style:disc;margin-bottom:4px}
+.legal-doc .legal-notice{background:var(--coral-pale);border-left:3px solid var(--coral);padding:12px 16px;border-radius:0 6px 6px 0;margin:16px 0;font-size:0.82rem;color:var(--coral);line-height:1.6}
+.legal-doc .legal-notice strong{color:var(--coral)}
+.legal-h{border-bottom:2px solid var(--teal-pale);padding-bottom:8px;margin-bottom:16px}
+
+/* ═══════════════════════════════════════════
+   STRATEGY BLOCKS
+═══════════════════════════════════════════ */
+.strategy-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+.strategy-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+.strategy-card .sc-num{font-family:var(--mono);font-size:0.62rem;color:var(--teal-light);letter-spacing:0.08em;margin-bottom:6px}
+.strategy-card h3{font-family:var(--serif);font-size:1rem;color:var(--dark);margin-bottom:8px}
+.strategy-card p{font-size:0.83rem;color:var(--mid);line-height:1.65}
+
+.timeline-track{margin:24px 0}
+.tl-item{display:flex;gap:20px;margin-bottom:24px;align-items:flex-start}
+.tl-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:0}
+.tl-dot{width:14px;height:14px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:3px;border:2px solid white;box-shadow:0 0 0 2px var(--teal)}
+.tl-dot.future{background:white;box-shadow:0 0 0 2px var(--border)}
+.tl-line{width:2px;flex:1;background:var(--border);min-height:20px}
+.tl-content{flex:1;padding-bottom:4px}
+.tl-date{font-family:var(--mono);font-size:0.7rem;color:var(--teal-mid);letter-spacing:0.06em;margin-bottom:3px}
+.tl-title{font-weight:600;font-size:0.92rem;color:var(--dark)}
+.tl-body{font-size:0.82rem;color:var(--mid);line-height:1.6;margin-top:4px}
+
+/* ═══════════════════════════════════════════
+   FINANCIALS
+═══════════════════════════════════════════ */
+.fin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}
+.fin-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;text-align:center}
+.fin-card .fc-label{font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px}
+.fin-card .fc-val{font-family:var(--serif);font-size:1.8rem;font-weight:700;color:var(--teal-deep)}
+.fin-card .fc-note{font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.4}
+
+/* ═══════════════════════════════════════════
+   MOAT / BADGE COMPONENTS
+═══════════════════════════════════════════ */
+.moat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.moat-card{background:var(--teal-pale);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center}
+.moat-card .mc-icon{font-size:1.6rem;margin-bottom:8px}
+.moat-card .mc-title{font-family:var(--serif);font-size:0.95rem;font-weight:700;color:var(--teal-deep);margin-bottom:6px}
+.moat-card .mc-body{font-size:0.78rem;color:var(--mid);line-height:1.55}
+
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-family:var(--mono)}
+.pill-teal{background:var(--teal-pale);color:var(--teal)}
+.pill-coral{background:var(--coral-pale);color:var(--coral)}
+.pill-amber{background:var(--amber-pale);color:var(--amber)}
+.pill-dark{background:var(--dark);color:white}
+
+/* ═══════════════════════════════════════════
+   ETHICS SECTION
+═══════════════════════════════════════════ */
+.ethics-never{background:#FFF5F5;border:1px solid #FFD6D6;border-radius:var(--radius);padding:22px 26px;margin:12px 0}
+.ethics-always{background:var(--teal-pale);border:1px solid var(--border);border-radius:var(--radius);padding:22px 26px;margin:12px 0}
+.ethics-never h4{color:#CC2222;font-family:var(--sans);font-weight:700;font-size:0.85rem;margin-bottom:10px}
+.ethics-always h4{color:var(--teal-deep);font-family:var(--sans);font-weight:700;font-size:0.85rem;margin-bottom:10px}
+.ethics-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.commitment-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.commitment-item .ci-icon{flex-shrink:0;font-size:0.8rem;margin-top:2px}
+.commitment-item .ci-text{font-size:0.83rem;color:var(--mid);line-height:1.5}
+
+/* ═══════════════════════════════════════════
+   FOUNDER PROFILE
+═══════════════════════════════════════════ */
+.founder-grid{display:grid;grid-template-columns:1fr 2fr;gap:32px;align-items:start;margin:24px 0}
+.founder-avatar{
+  width:100%;aspect-ratio:1;border-radius:var(--radius-lg);
+  background:linear-gradient(135deg,var(--teal-deep),var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:3rem;color:white;font-weight:800;
+}
+.founder-creds table{width:100%;font-size:0.84rem;border-collapse:collapse}
+.founder-creds td{padding:7px 0;border-bottom:1px solid var(--border);vertical-align:top}
+.founder-creds td:first-child{color:var(--muted);font-family:var(--mono);font-size:0.72rem;width:160px;padding-right:12px}
+.founder-creds td:last-child{color:var(--dark);line-height:1.5}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE + MISC
+═══════════════════════════════════════════ */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.inline-list li{padding:5px 0;border-bottom:1px solid var(--border);font-size:0.86rem;color:var(--mid);display:flex;align-items:flex-start;gap:8px}
+.inline-list li::before{content:'→';color:var(--teal-light);font-size:0.8rem;flex-shrink:0;margin-top:1px}
+.inline-list li:last-child{border-bottom:none}
+.status-badge{display:inline-block;padding:2px 9px;border-radius:10px;font-family:var(--mono);font-size:0.64rem;letter-spacing:0.04em}
+.sb-done{background:#E8F8EE;color:#1E7A3C}
+.sb-progress{background:var(--amber-pale);color:var(--amber)}
+.sb-planned{background:var(--pale);color:var(--muted)}
+.sb-critical{background:var(--coral-pale);color:var(--coral)}
+
+/* print-friendly */
+@media print{
+  .sidebar{display:none}
+  .main{margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- ═══════════════════════════════════════════
+     SIDEBAR NAVIGATION
+═══════════════════════════════════════════ -->
+<nav class="sidebar" aria-label="Portfolio navigation">
+  <div class="sidebar-logo">
+    <div class="brand">Build New Habits</div>
+    <div class="tagline">Alongside · Business Portfolio</div>
+    <span class="version">MARCH 2026 · V1.0</span>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Introduction</div>
+    <a href="#cover" class="nav-item"><span class="nav-num">—</span>Cover</a>
+    <a href="#contents" class="nav-item"><span class="nav-num">—</span>Contents</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Business Vision</div>
+    <a href="#s1" class="nav-item"><span class="nav-num">01</span>Executive Summary</a>
+    <a href="#s2" class="nav-item"><span class="nav-num">02</span>Vision &amp; Mission</a>
+    <a href="#s3" class="nav-item"><span class="nav-num">03</span>Founder Profile</a>
+    <a href="#s4" class="nav-item"><span class="nav-num">04</span>Market Analysis</a>
+    <a href="#s5" class="nav-item"><span class="nav-num">05</span>Competitive Strategy</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Business Plans</div>
+    <a href="#s6" class="nav-item"><span class="nav-num">06</span>Business Model</a>
+    <a href="#s7" class="nav-item"><span class="nav-num">07</span>Financial Projections</a>
+    <a href="#s8" class="nav-item"><span class="nav-num">08</span>Go-to-Market Strategy</a>
+    <a href="#s9" class="nav-item"><span class="nav-num">09</span>Product Roadmap</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Task Tracker</div>
+    <a href="#s10" class="nav-item"><span class="nav-num">10</span>Pre-Beta Task Tracker</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Legal &amp; Compliance</div>
+    <a href="#s11" class="nav-item"><span class="nav-num">11</span>Privacy Policy</a>
+    <a href="#s12" class="nav-item"><span class="nav-num">12</span>Terms of Service</a>
+    <a href="#s13" class="nav-item"><span class="nav-num">13</span>Data Consent Statement</a>
+    <a href="#s14" class="nav-item"><span class="nav-num">14</span>Ethical Commitments</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Strategies</div>
+    <a href="#s15" class="nav-item"><span class="nav-num">15</span>Community Strategy</a>
+    <a href="#s16" class="nav-item"><span class="nav-num">16</span>Content Strategy</a>
+    <a href="#s17" class="nav-item"><span class="nav-num">17</span>Founding Member Strategy</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Annex</div>
+    <a href="#ax1" class="nav-item nav-sub"><span class="nav-num">A</span>ICO Registration Guide</a>
+    <a href="#ax2" class="nav-item nav-sub"><span class="nav-num">B</span>Supabase Setup Guide</a>
+    <a href="#ax3" class="nav-item nav-sub"><span class="nav-num">C</span>Stripe Integration Guide</a>
+    <a href="#ax4" class="nav-item nav-sub"><span class="nav-num">D</span>Tech Stack GDPR Checklist</a>
+    <a href="#ax5" class="nav-item nav-sub"><span class="nav-num">E</span>Community Post Templates</a>
+    <a href="#ax6" class="nav-item nav-sub"><span class="nav-num">F</span>Evidence Base</a>
+  </div>
+
+  <div class="sidebar-footer">
+    <p>Build New Habits · Graeme Wright<br>buildnewhabits@outlook.com<br>Weston-super-Mare, Somerset</p>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════ -->
+<main class="main" id="main-content">
+
+<!-- COVER -->
+<section id="cover" class="cover" aria-label="Portfolio cover">
+  <div class="cover-eyebrow">Build New Habits · Business Portfolio</div>
+  <h1 class="cover-title">Compassionate<br><em>Digital Coaching</em><br>for Everyone<br>Fitness Forgot</h1>
+  <p class="cover-sub">The complete business portfolio for Alongside — the adaptive fitness coaching app built for neurodivergent adults, women navigating hormonal change, and anyone failed by mainstream fitness culture.</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><span class="label">Founder</span><span class="value">Graeme Wright</span></div>
+    <div class="cover-meta-item"><span class="label">Business</span><span class="value">Build New Habits</span></div>
+    <div class="cover-meta-item"><span class="label">Product</span><span class="value">Alongside App</span></div>
+    <div class="cover-meta-item"><span class="label">Version</span><span class="value">March 2026</span></div>
+    <div class="cover-meta-item"><span class="label">Status</span><span class="value">Confidential</span></div>
+  </div>
+  <div class="cover-badge" aria-label="60% MVP complete">
+    <span class="big">60%</span>
+    <span class="sm">MVP<br>Complete</span>
+  </div>
+  <div class="scroll-hint" aria-hidden="true">Scroll to begin</div>
+</section>
+
+<!-- CONTENTS -->
+<section id="contents" aria-labelledby="contents-title">
+  <div class="section-header">
+    <div class="sh-num">Table of Contents</div>
+    <h2 class="sh-title" id="contents-title">What's Inside</h2>
+    <p class="sh-desc">A complete business portfolio — from vision to legal compliance, financial projections to launch strategy.</p>
+  </div>
+  <div class="page">
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">01</span><div class="toc-text"><h3>Executive Summary</h3><p>The business at a glance — product, market, opportunity, status</p><span class="toc-tag tag-strategic">strategic</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s2" class="toc-item"><span class="toc-num">02</span><div class="toc-text"><h3>Vision &amp; Mission</h3><p>What Alongside is, why it exists, and the kerb cut principle</p><span class="toc-tag tag-strategic">strategic</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s3" class="toc-item"><span class="toc-num">03</span><div class="toc-text"><h3>Founder Profile</h3><p>Graeme Wright — experience, credentials, lived experience advantage</p><span class="toc-tag tag-strategic">strategic</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s4" class="toc-item"><span class="toc-num">04</span><div class="toc-text"><h3>Market Analysis</h3><p>UK fitness app market, addressable segments, retention crisis</p><span class="toc-tag tag-strategic">strategic</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s5" class="toc-item"><span class="toc-num">05</span><div class="toc-text"><h3>Competitive Strategy</h3><p>Competitors, competitive moat, positioning statement</p><span class="toc-tag tag-strategic">strategic</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s6" class="toc-item"><span class="toc-num">06</span><div class="toc-text"><h3>Business Model</h3><p>Freemium tiers, pricing, B2B pipeline, operating costs</p><span class="toc-tag tag-financial">financial</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s7" class="toc-item"><span class="toc-num">07</span><div class="toc-text"><h3>Financial Projections</h3><p>Three-year revenue model, conservative and optimistic scenarios</p><span class="toc-tag tag-financial">financial</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s8" class="toc-item"><span class="toc-num">08</span><div class="toc-text"><h3>Go-to-Market Strategy</h3><p>Community-first approach, channels, launch sequence</p><span class="toc-tag tag-strategic">strategic</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s9" class="toc-item"><span class="toc-num">09</span><div class="toc-text"><h3>Product Roadmap</h3><p>Build phases, April beta, public launch, B2B pipeline</p><span class="toc-tag tag-strategic">strategic</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span><div class="toc-text"><h3>Pre-Beta Task Tracker</h3><p>All tasks across legal, technical, financial, community — tickable</p><span class="toc-tag tag-task">tracker</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s11" class="toc-item"><span class="toc-num">11</span><div class="toc-text"><h3>Privacy Policy</h3><p>Full GDPR-compliant privacy policy — ready to publish</p><span class="toc-tag tag-legal">legal</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s12" class="toc-item"><span class="toc-num">12</span><div class="toc-text"><h3>Terms of Service</h3><p>Subscription terms, disclaimers, user rights — ready to publish</p><span class="toc-tag tag-legal">legal</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s13" class="toc-item"><span class="toc-num">13</span><div class="toc-text"><h3>Data Consent Statement</h3><p>In-app consent wording for health data collection (GDPR Art. 9)</p><span class="toc-tag tag-legal">legal</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s14" class="toc-item"><span class="toc-num">14</span><div class="toc-text"><h3>Ethical Commitments</h3><p>Product ethics declaration — never/always design commitments</p><span class="toc-tag tag-legal">legal</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s15" class="toc-item"><span class="toc-num">15</span><div class="toc-text"><h3>Community Strategy</h3><p>Reddit, Facebook, TikTok — trust-first community presence plan</p><span class="toc-tag tag-strategic">strategic</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s16" class="toc-item"><span class="toc-num">16</span><div class="toc-text"><h3>Content Strategy</h3><p>Content pillars, posting schedule, voice and tone guidance</p><span class="toc-tag tag-strategic">strategic</span></div><span class="toc-arrow">→</span></a>
+      <a href="#s17" class="toc-item"><span class="toc-num">17</span><div class="toc-text"><h3>Founding Member Strategy</h3><p>Friend code system, recruitment, feedback structure, conversion</p><span class="toc-tag tag-strategic">strategic</span></div><span class="toc-arrow">→</span></a>
+      <a href="#ax1" class="toc-item"><span class="toc-num">A–F</span><div class="toc-text"><h3>Annexes</h3><p>Detailed how-to guides: ICO, Supabase, Stripe, GDPR, community post templates, evidence base</p><span class="toc-tag tag-annex">reference</span></div><span class="toc-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 01: EXECUTIVE SUMMARY ═══ -->
+<section id="s1" aria-labelledby="s1-title">
+  <div class="section-header">
+    <div class="sh-num">Section 01</div>
+    <h2 class="sh-title" id="s1-title">Executive Summary</h2>
+    <p class="sh-desc">Build New Habits at a glance — who we are, what we've built, and why it matters.</p>
+  </div>
+  <div class="page">
+    <div class="fin-grid" style="margin-bottom:32px">
+      <div class="fin-card"><div class="fc-label">MVP Status</div><div class="fc-val" style="font-size:1.4rem">~60%</div><div class="fc-note">Complete · June 2026 launch</div></div>
+      <div class="fin-card"><div class="fc-label">Year 1 Revenue</div><div class="fc-val">£25K</div><div class="fc-note">Mid-point projection</div></div>
+      <div class="fin-card"><div class="fc-label">Target Market</div><div class="fc-val" style="font-size:1.3rem">200–500K</div><div class="fc-note">UK addressable users</div></div>
+      <div class="fin-card"><div class="fc-label">Beta Launch</div><div class="fc-val" style="font-size:1.3rem">Apr '26</div><div class="fc-note">Founding Member cohort</div></div>
+      <div class="fin-card"><div class="fc-label">Investment Sought</div><div class="fc-val" style="font-size:1.3rem">£0</div><div class="fc-note">Bootstrapped · lifestyle model</div></div>
+      <div class="fin-card"><div class="fc-label">Operating Costs Y1</div><div class="fc-val">~£1K</div><div class="fc-note">Excl. Stripe fees + founder time</div></div>
+    </div>
+
+    <div class="card card-teal">
+      <div class="card-h">What Build New Habits Is</div>
+      <p class="card-p">Build New Habits is a digital coaching platform designed for the people mainstream fitness apps consistently fail. Its first product, <strong>Alongside</strong>, is a fitness coaching app built around a single, research-backed premise: the 97% dropout rate in the fitness app industry is not a motivation problem. It is a design problem.</p>
+      <p class="card-p" style="margin-top:8px">Alongside adapts to how users actually feel each day. It reads energy, mood, sleep quality, and pain levels through a brief daily check-in, then generates a coaching recommendation that meets users where they are. It never shames a missed session, never punishes a bad week, and never uses streaks or social comparison to drive engagement.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h4>The Core Differentiator</h4>
+      <p>No app currently combines: daily adaptive coaching, neurodivergent-first design, burnout detection, condition safety filtering, shame-free mechanics, and transparent rationale. These features exist individually in adjacent products. No single product holds all of them simultaneously. Technology is copyable. Philosophy is not.</p>
+    </div>
+
+    <div class="two-col" style="margin-top:20px">
+      <div class="card">
+        <div class="card-h">Primary Product: Alongside</div>
+        <ul class="inline-list" style="margin-top:8px">
+          <li>Adaptive daily check-in (energy, mood, sleep, pain)</li>
+          <li>Condition-safe exercise filtering — 29 conditions</li>
+          <li>Burnout detection &amp; Recovery Mode</li>
+          <li>500+ exercises across 11 categories</li>
+          <li>Coach voice with transparent rationale</li>
+          <li>No streaks. No shame. No shame spiral.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-h">Pipeline Products</div>
+        <ul class="inline-list" style="margin-top:8px">
+          <li><strong>Student Life Hub</strong> — adaptive HE coaching B2B</li>
+          <li>Target: Weston College pilot, £5–10K/institution/yr</li>
+          <li>Same adaptive engine, different coaching domain</li>
+          <li><strong>Senior Tech Skills</strong> — digital inclusion</li>
+          <li>Grant-funded, council/Age UK partnership model</li>
+          <li>Concept stage only — Alongside first</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card card-amber" style="margin-top:8px">
+      <div class="card-h">Business Classification</div>
+      <p class="card-p">This is a deliberate, founder-led lifestyle business with genuine growth potential — not a venture-scale opportunity, and that is understood and accepted. The business does not seek external investment. Revenue is projected to reach cash-flow positive at approximately 115 paying users, achievable within the Founding Member cohort before public launch.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 02: VISION & MISSION ═══ -->
+<section id="s2" aria-labelledby="s2-title">
+  <div class="section-header">
+    <div class="sh-num">Section 02</div>
+    <h2 class="sh-title" id="s2-title">Vision &amp; Mission</h2>
+    <p class="sh-desc">Why Alongside exists and what it stands for.</p>
+  </div>
+  <div class="page-narrow">
+    <div class="section-hero">
+      <div class="eyebrow">Mission Statement</div>
+      <h2 class="section-title">Fitness coaching for people<br>fitness culture <em>forgot.</em></h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="quote-block">
+      <p>"Alongside is the fitness coaching app for people that fitness culture forgot. It listens before it prescribes. It adapts to how you actually feel today, not how a programme expects you to feel. It never shames a bad day, a skipped session, or a week away."</p>
+      <cite>— Build New Habits Positioning Statement, 2026</cite>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.15rem;margin:28px 0 14px;color:var(--dark)">The Problem We Exist to Solve</h3>
+    <p style="font-size:0.9rem;color:var(--mid);line-height:1.75;margin-bottom:12px">Mainstream fitness apps are built for a user who does not exist in the real world — someone with stable energy, consistent motivation, unlimited time, no chronic conditions, no neurodivergence, and the psychological resilience to treat a missed workout as a minor inconvenience rather than confirmation that they are fundamentally broken.</p>
+    <p style="font-size:0.9rem;color:var(--mid);line-height:1.75;margin-bottom:20px">The 97% dropout rate within 30 days is not a user failure. It is a design failure. The groups most harmed include autistic adults, people with ADHD, people in burnout, women navigating hormonal change, people with chronic conditions, shift workers, carers, and many others whose lives do not fit the "consistent routine" assumption baked into every mainstream app.</p>
+
+    <div class="card card-teal">
+      <div class="card-h">The Kerb Cut Principle</div>
+      <p class="card-p">Dropped kerbs were designed for wheelchair users but turned out to benefit parents with pushchairs, delivery drivers, cyclists, and anyone carrying heavy bags. Designing for the person who needs the most support produces solutions that work better for everyone. Designing for neurodivergent adults and people with fluctuating energy does not produce a niche product. It produces a better product, for a much larger group of people than the target audience suggests.</p>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.15rem;margin:28px 0 14px;color:var(--dark)">What Alongside Is and Is Not</h3>
+    <div class="two-col">
+      <div class="ethics-always">
+        <h4>✓ Alongside IS</h4>
+        <ul style="padding-left:0">
+          <li class="commitment-item"><span class="ci-icon">→</span><span class="ci-text">A fitness coaching app that adapts to daily reality</span></li>
+          <li class="commitment-item"><span class="ci-icon">→</span><span class="ci-text">Built on 21 peer-reviewed psychological frameworks</span></li>
+          <li class="commitment-item"><span class="ci-icon">→</span><span class="ci-text">Designed specifically for neurodivergent adults and women navigating hormonal change</span></li>
+          <li class="commitment-item"><span class="ci-icon">→</span><span class="ci-text">A safe place to arrive in any state</span></li>
+          <li class="commitment-item"><span class="ci-icon">→</span><span class="ci-text">Transparent about every recommendation it makes</span></li>
+        </ul>
+      </div>
+      <div class="ethics-never">
+        <h4>✗ Alongside IS NOT</h4>
+        <ul style="padding-left:0">
+          <li class="commitment-item"><span class="ci-icon">→</span><span class="ci-text">A mental health or clinical therapy app</span></li>
+          <li class="commitment-item"><span class="ci-icon">→</span><span class="ci-text">A calorie counting or nutrition tracker</span></li>
+          <li class="commitment-item"><span class="ci-icon">→</span><span class="ci-text">A social fitness or leaderboard platform</span></li>
+          <li class="commitment-item"><span class="ci-icon">→</span><span class="ci-text">An "AI-powered" product making claims it cannot deliver</span></li>
+          <li class="commitment-item"><span class="ci-icon">→</span><span class="ci-text">For everyone — and that honesty is a strength</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 03: FOUNDER PROFILE ═══ -->
+<section id="s3" aria-labelledby="s3-title">
+  <div class="section-header">
+    <div class="sh-num">Section 03</div>
+    <h2 class="sh-title" id="s3-title">Founder Profile</h2>
+    <p class="sh-desc">Graeme Wright — the credentials, experience, and lived reality behind Build New Habits.</p>
+  </div>
+  <div class="page-narrow">
+    <div class="founder-grid">
+      <div>
+        <div class="founder-avatar" aria-label="Graeme Wright initials">GW</div>
+        <div style="margin-top:12px">
+          <div class="pill pill-teal" style="margin-bottom:6px">Digital Coach</div>
+          <div class="pill pill-teal">Instructional Designer</div>
+          <div style="margin-top:8px"><div class="pill pill-dark">Building for his own community</div></div>
+        </div>
+      </div>
+      <div class="founder-creds">
+        <table>
+          <tr><td>Name</td><td><strong>Graeme Wright</strong></td></tr>
+          <tr><td>Location</td><td>Weston-super-Mare, Somerset</td></tr>
+          <tr><td>Current Role</td><td>Digital Coach, Weston College</td></tr>
+          <tr><td>Experience</td><td>18 years in education and coaching, including 12 years as Head of Music</td></tr>
+          <tr><td>Qualification 1</td><td>Professional Diploma in Instructional Design</td></tr>
+          <tr><td>Qualification 2</td><td>CMI Level 5 Operational Management</td></tr>
+          <tr><td>Technical Skills</td><td>Full-stack web development (HTML, CSS, JavaScript); app architecture; UX design; product specification</td></tr>
+          <tr><td>Domain Expertise</td><td>Neurodivergent learning and behaviour change; instructional scaffolding; evidence-based programme design</td></tr>
+          <tr><td>Lived Experience</td><td>ADHD; injury management (herniated disc, hamstring recovery); personal history of fitness app abandonment — building for his own community</td></tr>
+          <tr><td>Network</td><td>Somerset Innovation Hub (Alex — confirmed); Weston College (institutional pilot access); SETsquared / Exeter University (Innovation Workout graduate)</td></tr>
+          <tr><td>Contact</td><td>buildnewhabits@outlook.com</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="highlight-box" style="margin-top:24px">
+      <h4>The Founder Moat</h4>
+      <p>Graeme Wright is not building a product for a community he has studied. He is building what he personally needs and could not find. This authenticity is both a product advantage and a community trust asset. Neurodivergent communities are highly attuned to the difference between genuine lived experience and performative inclusion — and they amplify authentic products quickly.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 04: MARKET ANALYSIS ═══ -->
+<section id="s4" aria-labelledby="s4-title">
+  <div class="section-header">
+    <div class="sh-num">Section 04</div>
+    <h2 class="sh-title" id="s4-title">Market Analysis</h2>
+    <p class="sh-desc">The UK fitness app market, the retention crisis, and the underserved opportunity.</p>
+  </div>
+  <div class="page">
+    <div class="fin-grid">
+      <div class="fin-card"><div class="fc-label">UK Fitness App Market</div><div class="fc-val">£1.4B</div><div class="fc-note">Annual, 2024. Growing at 14–17% CAGR.</div></div>
+      <div class="fin-card"><div class="fc-label">Day 30 Dropout Rate</div><div class="fc-val">97%</div><div class="fc-note">Industry average. The problem we solve.</div></div>
+      <div class="fin-card"><div class="fc-label">UK ADHD Adults</div><div class="fc-val">1.5M</div><div class="fc-note">~10% actively seeking adaptive tools</div></div>
+      <div class="fin-card"><div class="fc-label">UK Women 40–60</div><div class="fc-val">8M</div><div class="fc-note">~5% seeking menopause fitness support</div></div>
+      <div class="fin-card"><div class="fc-label">UK Chronic Conditions</div><div class="fc-val">15M</div><div class="fc-note">~1% seeking adaptive guided recovery</div></div>
+      <div class="fin-card"><div class="fc-label">Overlap-Adjusted TAM</div><div class="fc-val" style="font-size:1.3rem">200–500K</div><div class="fc-note">UK addressable market</div></div>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.2rem;margin:28px 0 14px;color:var(--dark)">Why Fitness Apps Fail — And How Alongside Addresses It</h3>
+    <table class="data-table">
+      <thead><tr><th>Abandonment Reason</th><th>% of Abandonments</th><th>Alongside's Response</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Lost motivation</strong></td><td class="num">32%</td><td>No streaks, no shame, celebrate showing up in any state</td></tr>
+        <tr><td><strong>App too complicated</strong></td><td class="num">25%</td><td>One question at a time, ADHD-friendly, minimal cognitive load</td></tr>
+        <tr><td><strong>Repetitive content</strong></td><td class="num">16%</td><td>Adaptive daily sessions — never the same twice if you're not the same</td></tr>
+        <tr><td><strong>Life got in the way</strong></td><td class="num">14%</td><td>Coach validates, adapts, and welcomes you back without comment</td></tr>
+        <tr><td><strong>Technical issues</strong></td><td class="num">8%</td><td>Simple vanilla JS stack, offline-capable PWA</td></tr>
+        <tr><td><strong>Found something else</strong></td><td class="num">5%</td><td>Unique positioning with genuine emotional connection</td></tr>
+      </tbody>
+    </table>
+
+    <div class="highlight-box amber">
+      <h4>The Retention Opportunity</h4>
+      <p>If Alongside achieves 10% Day 30 retention against the industry average of 3%, that represents a 3× competitive advantage in user lifetime value. Word of mouth compounds significantly when users feel genuinely served. Neurodivergent communities amplify authentic products quickly — and that is the primary acquisition channel.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 05: COMPETITIVE STRATEGY ═══ -->
+<section id="s5" aria-labelledby="s5-title">
+  <div class="section-header">
+    <div class="sh-num">Section 05</div>
+    <h2 class="sh-title" id="s5-title">Competitive Strategy</h2>
+    <p class="sh-desc">Who we're not competing with, who we are, and why the moat is defensible.</p>
+  </div>
+  <div class="page">
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:0 0 16px;color:var(--dark)">The Actual Competition</h3>
+    <table class="data-table">
+      <thead><tr><th>App</th><th>Focus</th><th>Gap vs Alongside</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Reverse Health</strong></td><td>Menopause weight loss (nutrition-first)</td><td>No adaptive coaching, no neurodivergent design, no burnout detection</td></tr>
+        <tr><td><strong>Menovation</strong></td><td>Menopause-specific fitness</td><td>Narrowly focused; does not address neurodivergence or shame mechanics</td></tr>
+        <tr><td><strong>Health &amp; Her</strong></td><td>Menopause symptom tracking</td><td>Tracking only; no workout recommendations generated</td></tr>
+        <tr><td><strong>Freeletics</strong></td><td>AI personalisation, bodyweight training</td><td>Explicitly no-excuses, high-intensity culture — opposite of our philosophy</td></tr>
+        <tr><td><strong>ADHD wellness apps</strong></td><td>Productivity and executive function</td><td>No physical movement coaching with meaningful market presence</td></tr>
+        <tr><td><strong>Peloton, Apple Fitness+, Nike</strong></td><td>Premium content, live classes, wearables</td><td>Not our competition — different user entirely</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:28px 0 14px;color:var(--dark)">The Three-Part Moat</h3>
+    <div class="moat-grid">
+      <div class="moat-card">
+        <div class="mc-icon">🧠</div>
+        <div class="mc-title">Philosophy Moat</div>
+        <div class="mc-body">Technology is copyable. A genuine, sustained commitment to psychological safety — grounded in peer-reviewed research — is not. A large brand adding a "shame-free" feature would be immediately transparent to this community.</div>
+      </div>
+      <div class="moat-card">
+        <div class="mc-icon">🤝</div>
+        <div class="mc-title">Community Moat</div>
+        <div class="mc-body">Neurodivergent communities are highly attuned to authenticity and deeply resistant to corporate messaging. Trust earned through genuine contribution is very difficult for better-resourced competitors to replicate.</div>
+      </div>
+      <div class="moat-card">
+        <div class="mc-icon">👤</div>
+        <div class="mc-title">Founder Moat</div>
+        <div class="mc-body">Graeme Wright is building for his own community. 18 years educational experience + instructional design expertise + lived experience as the target user is an unusually strong combination at the founding stage.</div>
+      </div>
+    </div>
+
+    <div class="quote-block">
+      <p>"No app currently combines: daily adaptive coaching, neurodivergent-first design, burnout detection, condition safety filtering, shame-free mechanics, and transparent rationale. These features exist individually in adjacent products. No single product holds all of them simultaneously."</p>
+      <cite>— Build New Habits Market Differentiation Analysis, February 2026</cite>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 06: BUSINESS MODEL ═══ -->
+<section id="s6" aria-labelledby="s6-title">
+  <div class="section-header">
+    <div class="sh-num">Section 06</div>
+    <h2 class="sh-title" id="s6-title">Business Model</h2>
+    <p class="sh-desc">Freemium tiers, pricing, operating costs, and the B2B pipeline.</p>
+  </div>
+  <div class="page">
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:0 0 16px;color:var(--dark)">Subscription Tiers</h3>
+    <table class="data-table">
+      <thead><tr><th>Tier</th><th>Price</th><th>Key Features</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Free</strong></td>
+          <td class="num">£0</td>
+          <td>Daily check-in, basic 7-day progress, 1 starter programme, active minutes, prescribed exercises Level 1, weight tracking, condition story capture, 30-day history. <em>Safety features never paywalled.</em></td>
+          <td><span class="status-badge sb-done">At launch</span></td>
+        </tr>
+        <tr>
+          <td><strong>Personal</strong></td>
+          <td class="num">£9.99/mo · £89/yr</td>
+          <td>Coach personality variants, schedule intelligence, menstrual cycle adaptation, 30/90-day analytics, calorie estimates, prescribed exercises Level 2+, data export, unlimited programmes, extended history</td>
+          <td><span class="status-badge sb-progress">May 2026</span></td>
+        </tr>
+        <tr>
+          <td><strong>Founding Member</strong></td>
+          <td class="num">£49 lifetime</td>
+          <td>3 months free unlimited access, then £49 lifetime. 10 friend codes. Direct product input. Named in acknowledgements.</td>
+          <td><span class="status-badge sb-progress">April 2026</span></td>
+        </tr>
+        <tr>
+          <td><strong>B2B — Future</strong></td>
+          <td class="num">£5–10K/yr</td>
+          <td>Institutional licensing for Student Life Hub (HE/NHS). Admin dashboard. Outcome reporting. Weston College pilot pathway.</td>
+          <td><span class="status-badge sb-planned">Q3 2026+</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:28px 0 14px;color:var(--dark)">Operating Costs (Year 1)</h3>
+    <table class="data-table">
+      <thead><tr><th>Cost Item</th><th>Year 1</th><th>Year 2</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>App hosting (Supabase/Netlify)</td><td class="num">~£240</td><td class="num">~£540</td><td>Free tier covers early usage; scales to Supabase Pro (~£25/mo) at volume</td></tr>
+        <tr><td>Analytics + monitoring</td><td class="num">~£120</td><td class="num">~£240</td><td>Plausible £9/mo; Sentry free tier</td></tr>
+        <tr><td>Domain and email</td><td class="num">£60</td><td class="num">£60</td><td>Namecheap domain + Zoho Mail</td></tr>
+        <tr><td>Stripe payment processing</td><td class="num">~2.9%</td><td class="num">~2.9%</td><td>1.5% + 20p per UK transaction; variable</td></tr>
+        <tr><td>Marketing content tools</td><td class="num">£200</td><td class="num">£500</td><td>Canva Pro, basic video editing</td></tr>
+        <tr><td>Legal and accountancy</td><td class="num">£500</td><td class="num">£800</td><td>Annual accounts; Privacy Policy review; basic contracts</td></tr>
+        <tr><td>ICO registration</td><td class="num">£40</td><td class="num">£40</td><td>Annual data controller registration fee</td></tr>
+        <tr><td><strong>Total cash costs</strong></td><td class="num"><strong>~£1,160</strong></td><td class="num"><strong>~£2,180</strong></td><td>Excluding Stripe fees and founder time</td></tr>
+      </tbody>
+    </table>
+
+    <div class="highlight-box amber">
+      <h4>Cash-Flow Positive Threshold</h4>
+      <p>The business reaches cash-flow positive at approximately 115 paying users at the £89/year price point. This is achievable within the Founding Member cohort before public launch. Founder's time is absorbed by existing day job income through the build phase, with a review trigger at £50,000 annual revenue.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 07: FINANCIAL PROJECTIONS ═══ -->
+<section id="s7" aria-labelledby="s7-title">
+  <div class="section-header">
+    <div class="sh-num">Section 07</div>
+    <h2 class="sh-title" id="s7-title">Financial Projections</h2>
+    <p class="sh-desc">Three-year revenue model with conservative, mid-point, and optimistic scenarios.</p>
+  </div>
+  <div class="page">
+    <div class="card card-amber">
+      <div class="card-h">Underlying Assumptions</div>
+      <p class="card-p">Projections are built on conservative assumptions. They do not include B2B licensing revenue in Year 1 or Year 2. They assume entirely organic user acquisition with no paid advertising budget. Conversion from Free to Personal tier is modelled at 5%, in line with freemium app industry averages. Monthly churn is modelled at 5%. All figures are in GBP.</p>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:24px 0 14px;color:var(--dark)">Three-Year Revenue Projections</h3>
+    <table class="data-table">
+      <thead><tr><th>Year</th><th>Free Users</th><th>Paying Users (5%)</th><th>ARPU</th><th>Subscription Revenue</th><th>Other Revenue</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Year 1 (2026)</strong></td><td class="num">5,000</td><td class="num">250</td><td class="num">£90/yr</td><td class="num">£22,500</td><td class="num">£2,450 (50 Founding Members @ £49)</td><td class="num"><strong>£24,950</strong></td></tr>
+        <tr><td><strong>Year 2 (2027)</strong></td><td class="num">15,000</td><td class="num">1,000</td><td class="num">£95/yr</td><td class="num">£95,000</td><td class="num">—</td><td class="num"><strong>£95,000</strong></td></tr>
+        <tr><td><strong>Year 3 (2028)</strong></td><td class="num">35,000</td><td class="num">2,500</td><td class="num">£100/yr</td><td class="num">£250,000</td><td class="num">B2B pilot adds £25K+</td><td class="num"><strong>£275,000+</strong></td></tr>
+      </tbody>
+    </table>
+
+    <div class="three-col" style="margin-top:20px">
+      <div class="highlight-box">
+        <h4>Conservative Scenario</h4>
+        <p>Year 1: £15,000 (170 paying users). Slower community growth, lower organic conversion. Still reaches cash-flow positive.</p>
+      </div>
+      <div class="highlight-box amber">
+        <h4>Mid-Point Scenario</h4>
+        <p>Year 1: £24,950 (250 paying users + 50 Founding Members). Assumes normal organic growth and 5% freemium conversion.</p>
+      </div>
+      <div class="highlight-box coral">
+        <h4>Optimistic Scenario</h4>
+        <p>Year 1: £85,000 (higher conversion rate, faster organic growth, strong community word-of-mouth amplification).</p>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:28px 0 14px;color:var(--dark)">Multi-Product Portfolio Revenue (2027+)</h3>
+    <table class="data-table">
+      <thead><tr><th>Product</th><th>Model</th><th>Year 1 Target</th><th>Year 2 Target</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Alongside</strong></td><td>B2C Subscription</td><td class="num">£20–25K</td><td class="num">£50–75K</td></tr>
+        <tr><td><strong>Student Life Hub</strong></td><td>B2B Institutional Licensing</td><td class="num">—</td><td class="num">£25–50K</td></tr>
+        <tr><td><strong>Senior Tech Skills</strong></td><td>Grant Funding + Council Licensing</td><td class="num">—</td><td class="num">£10–20K</td></tr>
+        <tr><td><strong>Total Portfolio</strong></td><td>—</td><td class="num"><strong>£20–25K</strong></td><td class="num"><strong>£85–145K</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══ SECTION 08: GO-TO-MARKET STRATEGY ═══ -->
+<section id="s8" aria-labelledby="s8-title">
+  <div class="section-header">
+    <div class="sh-num">Section 08</div>
+    <h2 class="sh-title" id="s8-title">Go-to-Market Strategy</h2>
+    <p class="sh-desc">Community-first, trust-led, zero paid advertising. How Alongside reaches the people it's built for.</p>
+  </div>
+  <div class="page">
+    <div class="quote-block">
+      <p>"Lead with empathy, not features. Be helpful first, promote second. The target audience is not reachable through paid advertising. They are reachable through authentic community presence."</p>
+      <cite>— Build New Habits Go-to-Market Thesis</cite>
+    </div>
+
+    <div class="strategy-grid">
+      <div class="strategy-card">
+        <div class="sc-num">Channel 01</div>
+        <h3>Online Neurodivergent Communities</h3>
+        <p>Reddit communities (r/ADHD 1M+, r/autism, r/adhdwomen, r/laterdiagnosed, r/perimenopause, r/Menopause, r/ChronicPain, r/xxfitness) and equivalent Facebook groups. Strategy: genuine participation for 2–4 weeks before any mention of Alongside.</p>
+      </div>
+      <div class="strategy-card">
+        <div class="sc-num">Channel 02</div>
+        <h3>Short-Form Content (TikTok / Instagram)</h3>
+        <p>Content focused on the emotional and psychological realities of exercising with ADHD, burnout, or hormonal fluctuation. Lead with the human problem, not the product features. Build audience and trust before launch.</p>
+      </div>
+      <div class="strategy-card">
+        <div class="sc-num">Channel 03</div>
+        <h3>Professional Network</h3>
+        <p>Graeme's 18-year education network in further and higher education provides access to staff and student communities at scale. Weston College pilot access. LinkedIn presence in EdTech and wellbeing sectors.</p>
+      </div>
+      <div class="strategy-card">
+        <div class="sc-num">Channel 04</div>
+        <h3>Somerset Innovation Hub</h3>
+        <p>Confirmed connection: Alex at Somerset Innovation Hub. SETsquared / Exeter University network provides introductions to founders, potential early adopters, and investors in the South West.</p>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:28px 0 14px;color:var(--dark)">Launch Sequence</h3>
+    <div class="timeline-track">
+      <div class="tl-item"><div class="tl-dot-wrap"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-date">January – March 2026</div><div class="tl-title">Build MVP + Community Seeding</div><div class="tl-body">Working app built. Begin genuine community participation. Identify 5–10 people willing to have deeper conversations about the problem.</div></div></div>
+      <div class="tl-item"><div class="tl-dot-wrap"><div class="tl-dot future"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-date">April 2026</div><div class="tl-title">Founding Member Beta Launch</div><div class="tl-body">10–50 Founding Members recruited from community conversations. 3 months free access. Structured feedback cycles. Friend code sharing begins.</div></div></div>
+      <div class="tl-item"><div class="tl-dot-wrap"><div class="tl-dot future"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-date">May 2026</div><div class="tl-title">Payment Integration + First Revenue</div><div class="tl-body">Stripe subscriptions live. Founding Member lifetime pricing locked. First subscription revenue. Feedback cycle analysis and iteration.</div></div></div>
+      <div class="tl-item"><div class="tl-dot-wrap"><div class="tl-dot future"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-date">June 2026</div><div class="tl-title">Public Launch</div><div class="tl-body">Open to all. Freemium model live. Community-led word-of-mouth growth. MRR tracking begins weekly.</div></div></div>
+      <div class="tl-item"><div class="tl-dot-wrap"><div class="tl-dot future"></div></div><div class="tl-content"><div class="tl-date">Q3 2026</div><div class="tl-title">Student Life Hub Pilot Conversations</div><div class="tl-body">First institutional conversation with Weston College. B2B licensing model tested. Grant application exploration begins.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 09: PRODUCT ROADMAP ═══ -->
+<section id="s9" aria-labelledby="s9-title">
+  <div class="section-header">
+    <div class="sh-num">Section 09</div>
+    <h2 class="sh-title" id="s9-title">Product Roadmap</h2>
+    <p class="sh-desc">Build phases, current status, and the path to beta and beyond.</p>
+  </div>
+  <div class="page">
+    <table class="data-table">
+      <thead><tr><th>Component</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Onboarding flow (9 steps)</td><td><span class="status-badge sb-done">Complete</span></td><td>Full profile capture, conditions, equipment, goals, coach personality</td></tr>
+        <tr><td>Daily check-in (energy, mood, sleep, pain)</td><td><span class="status-badge sb-done">Complete</span></td><td>Mood Meter science, pain fingerprint cache</td></tr>
+        <tr><td>Workout generation engine</td><td><span class="status-badge sb-done">Complete v1.3</span></td><td>Severe zone override live. Pain cache active.</td></tr>
+        <tr><td>Exercise database</td><td><span class="status-badge sb-done">Complete</span></td><td>~500 exercises across 11 category files; 29 conditions</td></tr>
+        <tr><td>Conditions system</td><td><span class="status-badge sb-done">Complete v2</span></td><td>Zone field, getZoneStatus(), safety tier system</td></tr>
+        <tr><td>Coach voice and copywriting</td><td><span class="status-badge sb-done">Complete</span></td><td>12-document specification suite complete</td></tr>
+        <tr><td>Design system</td><td><span class="status-badge sb-done">Complete</span></td><td>CSS variables, tokens, components, WCAG 2.2 AA target</td></tr>
+        <tr><td>Workout duration cap fix</td><td><span class="status-badge sb-critical">HIGH PRIORITY</span></td><td>Currently uncapped — Phase 3 first task</td></tr>
+        <tr><td>availableTime wiring</td><td><span class="status-badge sb-progress">Phase 3</span></td><td>Check-in field → getWorkoutParams() integration</td></tr>
+        <tr><td>prescribedExercises Level 1</td><td><span class="status-badge sb-progress">Phase 3</span></td><td>Manual entry, Today view display, tick complete</td></tr>
+        <tr><td>Exercise exit routes (mild pain)</td><td><span class="status-badge sb-progress">Phase 3</span></td><td>Inline alternatives alongside each exercise card</td></tr>
+        <tr><td>Membership / paywall page</td><td><span class="status-badge sb-progress">Phase 3</span></td><td>Premium placeholder visual treatment throughout app</td></tr>
+        <tr><td>Payment integration (Stripe)</td><td><span class="status-badge sb-planned">May 2026</span></td><td>Supabase + Netlify webhook function</td></tr>
+        <tr><td>Public launch</td><td><span class="status-badge sb-planned">June 2026</span></td><td>Open to all. Freemium model live.</td></tr>
+        <tr><td>Student Life Hub pilot</td><td><span class="status-badge sb-planned">Q3 2026</span></td><td>Weston College first conversation</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══ SECTION 10: TASK TRACKER ═══ -->
+<section id="s10" aria-labelledby="s10-title">
+  <div class="section-header">
+    <div class="sh-num">Section 10</div>
+    <h2 class="sh-title" id="s10-title">Pre-Beta Task Tracker</h2>
+    <p class="sh-desc">Every task a founder of this business needs to complete before the first beta user is onboarded. Tick them off as you go.</p>
+  </div>
+  <div class="page">
+    <div class="task-filters" role="group" aria-label="Filter tasks">
+      <button class="filter-btn active" onclick="filterTasks('all')" aria-pressed="true">All Tasks</button>
+      <button class="filter-btn" onclick="filterTasks('legal')" aria-pressed="false">Legal &amp; GDPR</button>
+      <button class="filter-btn" onclick="filterTasks('tech')" aria-pressed="false">Technical</button>
+      <button class="filter-btn" onclick="filterTasks('financial')" aria-pressed="false">Financial</button>
+      <button class="filter-btn" onclick="filterTasks('marketing')" aria-pressed="false">Marketing</button>
+      <button class="filter-btn" onclick="filterTasks('operational')" aria-pressed="false">Operational</button>
+    </div>
+
+    <!-- LEGAL & COMPLIANCE -->
+    <div class="task-section" data-category="legal">
+      <div class="task-section-title">Legal &amp; GDPR Compliance <span class="count" id="cnt-legal"></span></div>
+      <div class="task-list" id="tl-legal">
+        <div class="task-row" data-cat="legal"><input type="checkbox" onchange="toggleTask(this)" aria-label="Register as sole trader with HMRC"><div class="task-content"><div class="task-text">Register as sole trader with HMRC</div><div class="task-detail">gov.uk/set-up-sole-trader · Free · ~15 minutes · Required before trading commercially</div><div class="task-meta"><span class="task-tag tt-legal">legal</span><span class="task-tag tt-high">HIGH</span></div><a href="#ax1" class="task-link">See Annex A for full instructions</a></div></div>
+        <div class="task-row" data-cat="legal"><input type="checkbox" onchange="toggleTask(this)" aria-label="Register with ICO as data controller"><div class="task-content"><div class="task-text">Register with ICO as data controller (£40/year)</div><div class="task-detail">ico.org.uk/registration · MUST be completed BEFORE any real user data is collected · Processing health data makes this a legal requirement</div><div class="task-meta"><span class="task-tag tt-legal">legal</span><span class="task-tag tt-critical">CRITICAL — MUST DO FIRST</span></div></div></div>
+        <div class="task-row" data-cat="legal"><input type="checkbox" onchange="toggleTask(this)" aria-label="Write and publish Privacy Policy"><div class="task-content"><div class="task-text">Write, review, and publish Privacy Policy</div><div class="task-detail">Use termsfeed.com generator as base, then have reviewed by a solicitor (est. £100–£200). Must explicitly name health data as special category, list all sub-processors (Supabase, Stripe, Sentry, Plausible), and list all 6 GDPR user rights.</div><div class="task-meta"><span class="task-tag tt-legal">legal</span><span class="task-tag tt-critical">CRITICAL</span></div><a href="#s11" class="task-link">See Section 11: Privacy Policy Draft</a></div></div>
+        <div class="task-row" data-cat="legal"><input type="checkbox" onchange="toggleTask(this)" aria-label="Write and publish Terms of Service"><div class="task-content"><div class="task-text">Write, review, and publish Terms of Service</div><div class="task-detail">Use termsfeed.com as base. Must state: not medical advice, subscription terms, cancellation policy, auto-renewal disclosure, Founding Member terms, refund policy.</div><div class="task-meta"><span class="task-tag tt-legal">legal</span><span class="task-tag tt-critical">CRITICAL</span></div><a href="#s12" class="task-link">See Section 12: Terms of Service Draft</a></div></div>
+        <div class="task-row" data-cat="legal"><input type="checkbox" onchange="toggleTask(this)" aria-label="Build consent screen in app"><div class="task-content"><div class="task-text">Build and test consent screen inside the app</div><div class="task-detail">Must appear before any health data is entered. Empty tick box (not pre-ticked). Links to Privacy Policy and ToS visible. Consent date/time recorded. User cannot proceed without ticking.</div><div class="task-meta"><span class="task-tag tt-legal">legal</span><span class="task-tag tt-critical">CRITICAL</span></div><a href="#s13" class="task-link">See Section 13: Consent Statement</a></div></div>
+        <div class="task-row" data-cat="legal"><input type="checkbox" onchange="toggleTask(this)" aria-label="Sign Supabase DPA"><div class="task-content"><div class="task-text">Sign Supabase Data Processing Agreement (DPA)</div><div class="task-detail">Legal Documents section in Supabase dashboard. Makes Supabase your legal data processor under UK GDPR.</div><div class="task-meta"><span class="task-tag tt-legal">legal</span><span class="task-tag tt-high">HIGH</span></div><a href="#ax2" class="task-link">See Annex B: Supabase Setup</a></div></div>
+        <div class="task-row" data-cat="legal"><input type="checkbox" onchange="toggleTask(this)" aria-label="Accept Stripe DPA"><div class="task-content"><div class="task-text">Accept Stripe Data Processing Agreement in dashboard settings</div><div class="task-detail">Stripe Dashboard → Settings → Data Processing. Legal requirement for processing UK/EU user payment data.</div><div class="task-meta"><span class="task-tag tt-legal">legal</span><span class="task-tag tt-high">HIGH</span></div><a href="#ax3" class="task-link">See Annex C: Stripe Setup</a></div></div>
+        <div class="task-row" data-cat="legal"><input type="checkbox" onchange="toggleTask(this)" aria-label="Sign Sentry DPA and configure data scrubbing"><div class="task-content"><div class="task-text">Sign Sentry DPA and configure health data scrubbing</div><div class="task-detail">Sentry account settings. Add scrubbing patterns for: condition, pain, burnout, mood, energy, diagnosis, symptom. Never log health information in error messages.</div><div class="task-meta"><span class="task-tag tt-legal">legal</span><span class="task-tag tt-high">HIGH</span></div><a href="#ax4" class="task-link">See Annex D: GDPR Checklist</a></div></div>
+        <div class="task-row" data-cat="legal"><input type="checkbox" onchange="toggleTask(this)" aria-label="Build data deletion mechanism"><div class="task-content"><div class="task-text">Build and test data deletion mechanism (Right to Erasure)</div><div class="task-detail">GDPR Article 17 — users can request deletion of all their data. Must be available in Settings. Test by creating a test account and deleting all data across Supabase tables. Write and keep a procedure document.</div><div class="task-meta"><span class="task-tag tt-legal">legal</span><span class="task-tag tt-high">HIGH</span></div></div></div>
+        <div class="task-row" data-cat="legal"><input type="checkbox" onchange="toggleTask(this)" aria-label="List sub-processors in Privacy Policy"><div class="task-content"><div class="task-text">Confirm all sub-processors are named in the Privacy Policy</div><div class="task-detail">Must include: Supabase (database, EU region), Stripe (payments), Sentry (error tracking), Plausible (anonymous analytics). Link to each provider's privacy documentation.</div><div class="task-meta"><span class="task-tag tt-legal">legal</span></div></div></div>
+        <div class="task-row" data-cat="legal"><input type="checkbox" onchange="toggleTask(this)" aria-label="Set up 72-hour breach notification process"><div class="task-content"><div class="task-text">Document breach notification process (ICO 72-hour rule)</div><div class="task-detail">Under UK GDPR you must notify ICO within 72 hours of becoming aware of a breach. Write a simple procedure: who to call, what to report, which users to notify. Keep it somewhere you can find at 2am in a crisis.</div><div class="task-meta"><span class="task-tag tt-legal">legal</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- TECHNICAL -->
+    <div class="task-section" data-category="tech">
+      <div class="task-section-title">Technical Setup <span class="count" id="cnt-tech"></span></div>
+      <div class="task-list" id="tl-tech">
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Fix workout duration cap"><div class="task-content"><div class="task-text">Fix workout duration cap in getWorkoutParams() — workoutGenerator.js</div><div class="task-detail">Currently uncapped — high-energy sessions can generate 90+ minute workouts. Add maxDuration per workout focus type. Wire availableTime parameter (Micro 10min → 2 exercises, Quick 20min → 3, Short 30min → 4, Standard 40min → 5, Long 50min → 6, Open 60+ → 7, null → intensity-derived).</div><div class="task-meta"><span class="task-tag tt-tech">technical</span><span class="task-tag tt-critical">PHASE 3 FIRST</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Create Supabase project in EU region"><div class="task-content"><div class="task-text">Create Supabase project in EU region (Ireland or Frankfurt)</div><div class="task-detail">CRITICAL: Region cannot be changed after creation. Must be EU for GDPR compliance. Go to supabase.com → New Project → select eu-west-1 (Ireland) or eu-central-1 (Frankfurt).</div><div class="task-meta"><span class="task-tag tt-tech">technical</span><span class="task-tag tt-critical">CRITICAL</span></div><a href="#ax2" class="task-link">See Annex B: Supabase Setup</a></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Enable Row-Level Security on all Supabase tables"><div class="task-content"><div class="task-text">Enable Row-Level Security (RLS) on ALL Supabase tables</div><div class="task-detail">Without RLS, any authenticated user can read all other users' health data. This is a critical security failure. Enable and test RLS on every table before any user data is written.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span><span class="task-tag tt-critical">CRITICAL</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Create Supabase user table schema"><div class="task-content"><div class="task-text">Design and create Supabase database schema</div><div class="task-detail">Tables: users, check_ins, workouts, completed_exercises, prescribed_exercises, subscriptions. Add subscription_tier field (free | personal | founding_member). One RLS policy per table.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span><span class="task-tag tt-high">HIGH</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Set up Netlify serverless webhook function"><div class="task-content"><div class="task-text">Build Netlify serverless webhook (Stripe → Supabase)</div><div class="task-detail">stripe-webhook.js function: receives Stripe events, verifies signature, updates subscription_tier in Supabase. Environment variables: SUPABASE_SERVICE_KEY + STRIPE_WEBHOOK_SECRET. Register in Stripe for 3 events: subscription.created, subscription.updated, subscription.deleted.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span><span class="task-tag tt-high">HIGH</span></div><a href="#ax3" class="task-link">See Annex C: Stripe Setup</a></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Create Sentry account in EU region"><div class="task-content"><div class="task-text">Create Sentry account with EU data storage region selected</div><div class="task-detail">CRITICAL: Region cannot be changed after account creation. Select EU region at sign-up. If you create it in the US, you must delete and start again.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span><span class="task-tag tt-critical">CRITICAL — REGION CANNOT BE CHANGED</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Add Plausible analytics script to index.html"><div class="task-content"><div class="task-text">Add Plausible Analytics script tag to index.html</div><div class="task-detail">One line in the &lt;head&gt;. No cookies, no consent banner needed. GDPR-compliant out of the box. Mention in Privacy Policy under analytics.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Set up custom domain"><div class="task-content"><div class="task-text">Buy and configure custom domain (alongside.app or buildnewhabits.co.uk)</div><div class="task-detail">Namecheap ~£6–£12/year. Enable auto-renew. Point to GitHub Pages via CNAME record. Update all service account registrations to use the new domain.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Set up professional email"><div class="task-content"><div class="task-text">Set up professional email address on custom domain</div><div class="task-detail">Zoho Mail (free tier) or Google Workspace (£5/month). hello@alongside.app or graeme@buildnewhabits.co.uk. Update all service registrations.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Configure PWA manifest and icons"><div class="task-content"><div class="task-text">Configure PWA home screen installation</div><div class="task-detail">manifest.json + 512×512 icon + one link tag in index.html. Test "Add to Home Screen" on a real iOS and Android phone.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Run full subscription flow test in Stripe sandbox"><div class="task-content"><div class="task-text">Test full subscription flow end-to-end in Stripe sandbox</div><div class="task-detail">Test: upgrade from free to personal, feature unlock confirmation, cancel subscription, revert to free tier, Founding Member code redemption, webhook delivery confirmation in Stripe dashboard.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span><span class="task-tag tt-high">HIGH</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Run WCAG accessibility audit"><div class="task-content"><div class="task-text">Run WCAG accessibility audit</div><div class="task-detail">webaim.org colour contrast checker (4.5:1 minimum ratio). Test text size (16px minimum body). Confirm tap targets are 44×44px minimum. Test with VoiceOver (iOS) and TalkBack (Android). Target: WCAG 2.2 AA compliance.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span><span class="task-tag tt-high">HIGH</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Enable 2FA on all service accounts"><div class="task-content"><div class="task-text">Enable two-factor authentication on all service accounts</div><div class="task-detail">Supabase, Stripe, Netlify, Sentry, Plausible, GitHub, domain registrar, email. No exceptions. Use an authenticator app (not SMS where avoidable).</div><div class="task-meta"><span class="task-tag tt-tech">technical</span><span class="task-tag tt-high">HIGH</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Verify no secret keys in client-side code"><div class="task-content"><div class="task-text">Audit codebase: confirm no secret keys in client-side code</div><div class="task-detail">Check for any API keys, service role keys, or credentials in JavaScript files that are visible to the browser. Supabase service role key must ONLY exist in the Netlify serverless environment, never in the client app.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span><span class="task-tag tt-critical">CRITICAL — SECURITY</span></div></div></div>
+        <div class="task-row" data-cat="tech"><input type="checkbox" onchange="toggleTask(this)" aria-label="Test data deletion dry run"><div class="task-content"><div class="task-text">Run data deletion dry run (GDPR right to erasure test)</div><div class="task-detail">Create a test user, add data across all tables, then execute the deletion procedure. Verify all data removed from: users, check_ins, workouts, prescribed_exercises, subscriptions. Write and save the procedure document.</div><div class="task-meta"><span class="task-tag tt-tech">technical</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- FINANCIAL -->
+    <div class="task-section" data-category="financial">
+      <div class="task-section-title">Financial &amp; Business Setup <span class="count" id="cnt-financial"></span></div>
+      <div class="task-list" id="tl-financial">
+        <div class="task-row" data-cat="financial"><input type="checkbox" onchange="toggleTask(this)" aria-label="Open business bank account"><div class="task-content"><div class="task-text">Open a business bank account</div><div class="task-detail">Tide, Monzo Business, or Starling Business — all free to open. Keeps business and personal finances separate (essential for sole trader accounting and tax returns).</div><div class="task-meta"><span class="task-tag tt-financial">financial</span></div></div></div>
+        <div class="task-row" data-cat="financial"><input type="checkbox" onchange="toggleTask(this)" aria-label="Set up business accounting"><div class="task-content"><div class="task-text">Set up accounting system</div><div class="task-detail">Wave (free) is sufficient for Year 1. At minimum, a spreadsheet tracking all income (Stripe payments) and expenses (subscriptions, domain, legal). Required for annual Self Assessment tax return.</div><div class="task-meta"><span class="task-tag tt-financial">financial</span></div></div></div>
+        <div class="task-row" data-cat="financial"><input type="checkbox" onchange="toggleTask(this)" aria-label="Create Stripe products and pricing"><div class="task-content"><div class="task-text">Create Stripe products and pricing plans</div><div class="task-detail">Three products: Personal Monthly £9.99, Personal Annual £89, Founding Member £49 one-time. Enable Customer Portal for self-service subscription management. Test all in sandbox first.</div><div class="task-meta"><span class="task-tag tt-financial">financial</span><span class="task-tag tt-high">HIGH</span></div><a href="#ax3" class="task-link">See Annex C: Stripe Setup</a></div></div>
+        <div class="task-row" data-cat="financial"><input type="checkbox" onchange="toggleTask(this)" aria-label="Set up auto-renewal disclosure"><div class="task-content"><div class="task-text">Add auto-renewal disclosure to payment flow</div><div class="task-detail">Required by UK Consumer Contracts Regulations. Before first charge, clearly state: "Your subscription will automatically renew at £9.99/month. You can cancel at any time from Settings." This text must appear at the point of purchase.</div><div class="task-meta"><span class="task-tag tt-financial">financial</span><span class="task-tag tt-legal">legal</span></div></div></div>
+        <div class="task-row" data-cat="financial"><input type="checkbox" onchange="toggleTask(this)" aria-label="Write refund policy"><div class="task-content"><div class="task-text">Write and publish refund policy</div><div class="task-detail">UK consumer law requires a minimum 14-day cooling off period for digital subscriptions. Policy must state: within 14 days unused = full refund, within 14 days used = pro-rata, after 14 days = no refund but can cancel. Add to Terms of Service.</div><div class="task-meta"><span class="task-tag tt-financial">financial</span><span class="task-tag tt-legal">legal</span></div></div></div>
+        <div class="task-row" data-cat="financial"><input type="checkbox" onchange="toggleTask(this)" aria-label="Build Founding Member friend code system"><div class="task-content"><div class="task-text">Build Founding Member friend code system in app</div><div class="task-detail">Each Founding Member receives 10 codes. Any user entering a code gets Founding Member pricing (£49 lifetime). Every 5 codes used, original member receives 5 more. Track in Supabase. Phase 3 development task.</div><div class="task-meta"><span class="task-tag tt-financial">financial</span><span class="task-tag tt-tech">technical</span></div></div></div>
+        <div class="task-row" data-cat="financial"><input type="checkbox" onchange="toggleTask(this)" aria-label="Set up MRR tracking"><div class="task-content"><div class="task-text">Set up weekly MRR tracking</div><div class="task-detail">Stripe dashboard + a simple spreadsheet. Track: new subscribers, churned subscribers, MRR, total free users. Review weekly from public launch. Cash-flow positive threshold: 115 paying users at £89/year.</div><div class="task-meta"><span class="task-tag tt-financial">financial</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- MARKETING -->
+    <div class="task-section" data-category="marketing">
+      <div class="task-section-title">Marketing &amp; Community <span class="count" id="cnt-marketing"></span></div>
+      <div class="task-list" id="tl-marketing">
+        <div class="task-row" data-cat="marketing"><input type="checkbox" onchange="toggleTask(this)" aria-label="Build landing page for email capture"><div class="task-content"><div class="task-text">Build and launch landing page with email capture form</div><div class="task-detail">Live at custom domain. Formspree form submitting to buildnewhabits@outlook.com. Privacy Policy + ToS in footer. Auto-reply welcome email configured. Test on mobile phone.</div><div class="task-meta"><span class="task-tag tt-marketing">marketing</span><span class="task-tag tt-high">HIGH</span></div></div></div>
+        <div class="task-row" data-cat="marketing"><input type="checkbox" onchange="toggleTask(this)" aria-label="Create Reddit account"><div class="task-content"><div class="task-text">Create Reddit account with a real, identifiable username</div><div class="task-detail">Not anonymous. People need to associate your username with genuine helpfulness over time. Join: r/ADHD, r/adhdwomen, r/autism, r/laterdiagnosed, r/perimenopause, r/Menopause, r/ChronicPain, r/xxfitness.</div><div class="task-meta"><span class="task-tag tt-marketing">marketing</span></div></div></div>
+        <div class="task-row" data-cat="marketing"><input type="checkbox" onchange="toggleTask(this)" aria-label="Complete community lurk phase"><div class="task-content"><div class="task-text">Complete 2–4 week genuine community participation phase (no promotion)</div><div class="task-detail">Answer questions. Share personal experiences. Be helpful and honest. Do not mention Alongside yet. One community per day maximum. Respond to every reply personally. Document exact words people use — this becomes your marketing language.</div><div class="task-meta"><span class="task-tag tt-marketing">marketing</span><span class="task-tag tt-high">HIGH</span></div><a href="#ax5" class="task-link">See Annex E: Community Post Templates</a></div></div>
+        <div class="task-row" data-cat="marketing"><input type="checkbox" onchange="toggleTask(this)" aria-label="Post in own professional network first"><div class="task-content"><div class="task-text">Post about Alongside in own professional network first (Weston College contacts)</div><div class="task-detail">Lowest-risk audience. Use their feedback to refine the message before posting in larger communities. Note what resonates and what confuses.</div><div class="task-meta"><span class="task-tag tt-marketing">marketing</span></div></div></div>
+        <div class="task-row" data-cat="marketing"><input type="checkbox" onchange="toggleTask(this)" aria-label="Identify 5-10 potential founding member candidates from community conversations"><div class="task-content"><div class="task-text">Identify 5–10 potential Founding Member candidates from community conversations</div><div class="task-detail">The people who write paragraphs in response to your questions. Ask: "Would you be willing to have a 20-minute chat? I'm trying to understand this properly before I build anything." These are your founding member pipeline.</div><div class="task-meta"><span class="task-tag tt-marketing">marketing</span></div></div></div>
+        <div class="task-row" data-cat="marketing"><input type="checkbox" onchange="toggleTask(this)" aria-label="Have 5+ one-to-one conversations with potential users"><div class="task-content"><div class="task-text">Have 5+ one-to-one conversations with potential users (20 minutes each)</div><div class="task-detail">Validate: does "fluctuating energy" come up unprompted? Do people describe app failure in their own words? Is psychological safety named as a need? Target: 40%+ of conversations mention fluctuating energy without prompting.</div><div class="task-meta"><span class="task-tag tt-marketing">marketing</span><span class="task-tag tt-high">HIGH</span></div></div></div>
+        <div class="task-row" data-cat="marketing"><input type="checkbox" onchange="toggleTask(this)" aria-label="Post community announcement about Alongside"><div class="task-content"><div class="task-text">Post community announcement about Alongside (only after community trust built)</div><div class="task-detail">Structure: personal story → human problem → what you built → Founding Member offer. Stay in comments for hours. Respond to every question. Post time: weekday evening 7–9pm UTC.</div><div class="task-meta"><span class="task-tag tt-marketing">marketing</span></div><a href="#ax5" class="task-link">See Annex E for post template</a></div></div>
+        <div class="task-row" data-cat="marketing"><input type="checkbox" onchange="toggleTask(this)" aria-label="Set up TikTok or Instagram content channel"><div class="task-content"><div class="task-text">Set up TikTok or Instagram content channel</div><div class="task-detail">Content pillar: "Why fitness apps fail people like us." Lead with empathy, not product features. 3–5 pieces of genuine educational/empathetic content before any product mention. Consistent posting schedule.</div><div class="task-meta"><span class="task-tag tt-marketing">marketing</span></div></div></div>
+        <div class="task-row" data-cat="marketing"><input type="checkbox" onchange="toggleTask(this)" aria-label="Follow up with Alex at Somerset Innovation Hub"><div class="task-content"><div class="task-text">Follow up with Alex at Somerset Innovation Hub for 1:1 support session</div><div class="task-detail">Confirmed connection from Innovation Workout (27 Feb 2026). Request a 1:1 to discuss: business model validation, investor/grant connections, EdTech and neurodivergent health network access.</div><div class="task-meta"><span class="task-tag tt-marketing">marketing</span></div></div></div>
+        <div class="task-row" data-cat="marketing"><input type="checkbox" onchange="toggleTask(this)" aria-label="Collect first user testimonials"><div class="task-content"><div class="task-text">Collect first user testimonials from Founding Members</div><div class="task-detail">Ask after 2–3 weeks of active use. Ask specifically: "In your own words, what's different about how this app treats you?" These testimonials become the most powerful marketing asset.</div><div class="task-meta"><span class="task-tag tt-marketing">marketing</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- OPERATIONAL -->
+    <div class="task-section" data-category="operational">
+      <div class="task-section-title">Operational &amp; Content <span class="count" id="cnt-operational"></span></div>
+      <div class="task-list" id="tl-operational">
+        <div class="task-row" data-cat="operational"><input type="checkbox" onchange="toggleTask(this)" aria-label="Write ethics and philosophy page"><div class="task-content"><div class="task-text">Develop ethics and philosophy page on website</div><div class="task-detail">Four sections: why data is collected and what for, ethical commitments and design principles, evidence base for the problems Alongside addresses, how Alongside challenges standard app-building norms. Phase 3B — after Founding Member stories are available for impact.</div><div class="task-meta"><span class="task-tag tt-operational">content</span></div><a href="#s14" class="task-link">See Section 14: Ethical Commitments</a></div></div>
+        <div class="task-row" data-cat="operational"><input type="checkbox" onchange="toggleTask(this)" aria-label="Add Privacy Policy and Terms of Service to landing page footer"><div class="task-content"><div class="task-text">Add Privacy Policy and Terms of Service links to landing page footer</div><div class="task-detail">Both documents must be linked from the landing page. Users should be able to read both before signing up for the email list. Required under GDPR even for email capture forms.</div><div class="task-meta"><span class="task-tag tt-operational">operational</span><span class="task-tag tt-legal">legal</span></div></div></div>
+        <div class="task-row" data-cat="operational"><input type="checkbox" onchange="toggleTask(this)" aria-label="Write and test welcome email auto-reply"><div class="task-content"><div class="task-text">Write and test welcome email auto-reply for email list signups</div><div class="task-detail">Warm, personal tone. What Alongside is. What to expect next. When beta will open. No sales language. Include unsubscribe link (legal requirement for commercial emails under PECR).</div><div class="task-meta"><span class="task-tag tt-operational">operational</span></div></div></div>
+        <div class="task-row" data-cat="operational"><input type="checkbox" onchange="toggleTask(this)" aria-label="Create structured Founding Member feedback system"><div class="task-content"><div class="task-text">Create structured Founding Member feedback collection system</div><div class="task-detail">Short weekly check-in (3–5 questions). What worked. What was frustrating. What they wish existed. Could be a simple Formspree form or Google Form. Review responses every Friday and identify top 3 patterns.</div><div class="task-meta"><span class="task-tag tt-operational">operational</span></div></div></div>
+        <div class="task-row" data-cat="operational"><input type="checkbox" onchange="toggleTask(this)" aria-label="Prepare grant application research"><div class="task-content"><div class="task-text">Research grant funding for neurodivergent health tech and EdTech</div><div class="task-detail">Innovate UK, Arts Council (digital culture), NIHR (health innovation), Somerset Council local enterprise funding. Target: after Alongside reaches sustainable subscription revenue and has a user data evidence base.</div><div class="task-meta"><span class="task-tag tt-operational">operational</span></div></div></div>
+        <div class="task-row" data-cat="operational"><input type="checkbox" onchange="toggleTask(this)" aria-label="Prepare Weston College Student Life Hub conversation"><div class="task-content"><div class="task-text">Prepare Weston College Student Life Hub pilot conversation</div><div class="task-detail">Only after Alongside has validated the adaptive engine (Phase 3+). Build a short briefing: what the Student Life Hub is, what the pilot would involve, what metrics we'd measure, what it costs (potentially free in exchange for data). See business plan for institutional pitch content.</div><div class="task-meta"><span class="task-tag tt-operational">operational</span></div></div></div>
+        <div class="task-row" data-cat="operational"><input type="checkbox" onchange="toggleTask(this)" aria-label="Update build tracker after Phase 3 completion"><div class="task-content"><div class="task-text">Generate Phase 3 handoff document and update Project Files</div><div class="task-detail">At end of Phase 3: generate alongside_phase3_handoff.docx. Update changelog.md and schema.md. Review which Project Files are stale and replace. Add new docs to Claude Project Files.</div><div class="task-meta"><span class="task-tag tt-operational">operational</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 11: PRIVACY POLICY ═══ -->
+<section id="s11" aria-labelledby="s11-title">
+  <div class="section-header">
+    <div class="sh-num">Section 11 — Legal</div>
+    <h2 class="sh-title" id="s11-title">Privacy Policy</h2>
+    <p class="sh-desc">Full UK GDPR-compliant privacy policy. Review with a solicitor before publishing. Replace all [BRACKETED] items with your confirmed details.</p>
+  </div>
+  <div class="page-narrow">
+    <div class="legal-doc">
+      <div class="doc-stamp">DRAFT — MUST BE REVIEWED BY A SOLICITOR BEFORE PUBLISHING · BUILD NEW HABITS · MARCH 2026</div>
+      <div class="legal-notice"><strong>Health Data Warning:</strong> Alongside collects health-related information (conditions, pain scores, mood, burnout). This is "special category data" under UK GDPR carrying the highest level of protection. This policy explicitly names and addresses this. Do not remove or weaken these clauses.</div>
+
+      <h2 class="legal-h">Privacy Policy</h2>
+      <p><strong>Business name:</strong> Build New Habits<br><strong>Product name:</strong> Alongside<br><strong>Data controller:</strong> Graeme Wright, Build New Habits<br><strong>Contact email:</strong> buildnewhabits@outlook.com<br><strong>ICO Registration number:</strong> [YOUR ICO REGISTRATION NUMBER — REQUIRED BEFORE LAUNCH]<br><strong>Last updated:</strong> [DATE]</p>
+
+      <h3>1. Who We Are</h3>
+      <p>Build New Habits is a sole trader business run by Graeme Wright, registered in England and Wales. Our product, Alongside, is a fitness coaching application designed for neurodivergent adults and people navigating hormonal change. We are registered with the Information Commissioner's Office (ICO) as a data controller under reference [ICO NUMBER].</p>
+
+      <h3>2. What Information We Collect and Why</h3>
+      <h4>Personal information</h4>
+      <p>We collect your name or chosen display name to personalise your experience. We collect your age, biological sex assigned at birth (optional), height, and weight where you choose to provide them. These are used to calculate personalised fitness parameters and, where you have enabled the calorie estimate feature, to provide approximate energy expenditure figures.</p>
+      <h4>Health and wellness information (Special Category Data)</h4>
+      <p>Alongside collects health-related information including: physical health conditions and diagnoses; pain scores by body area; energy and mood readings from daily check-ins; sleep quality data; hormonal cycle data (if you choose to enable this); burnout indicators derived from patterns in your check-in history. This information is classified as <strong>special category data</strong> under UK GDPR. It carries the highest level of data protection. We collect it only with your <strong>explicit, freely given, and informed consent</strong>, for the sole purpose of providing personalised, safe fitness coaching that accounts for your health and current state. We cannot provide safe exercise recommendations without it.</p>
+      <h4>Usage data</h4>
+      <p>We use Plausible Analytics, a privacy-first analytics provider, to collect anonymous, aggregated data about how the app is used. This data contains no personal information and no tracking cookies. It cannot be linked to an individual user.</p>
+      <h4>Technical error data</h4>
+      <p>We use Sentry for error monitoring. Sentry may collect data about technical errors within the app. We have configured Sentry to automatically scrub all health-related terms from error reports. Health information is never included in error logs.</p>
+
+      <h3>3. The Legal Basis for Processing Your Data</h3>
+      <ul>
+        <li><strong>Personal information:</strong> Contractual necessity — processing your name and account details is required to provide the service you have signed up for.</li>
+        <li><strong>Health and wellness information:</strong> Explicit consent — we collect this category of data only with your explicit consent, given through the consent screen at the start of onboarding. You may withdraw this consent at any time, which will result in the deletion of all health-related data from your account.</li>
+        <li><strong>Payment information:</strong> Contractual necessity — processing your payment is required to provide a paid subscription. Payment processing is handled entirely by Stripe. We do not store card details.</li>
+        <li><strong>Anonymous analytics:</strong> Legitimate interests — understanding how the app is used in aggregate helps us improve it. Plausible Analytics collects no personal data.</li>
+      </ul>
+
+      <h3>4. How We Store Your Data</h3>
+      <p>Your personal and health data is stored in Supabase, a cloud database provider operating data centres in the European Union (Ireland region). All data is encrypted in transit and at rest. Supabase is subject to a Data Processing Agreement with Build New Habits under which they are contractually bound to handle your data only on our instructions, to implement appropriate security measures, and to notify us of any security incident without undue delay.</p>
+      <p>Row-Level Security is enabled on all database tables, which means each user can only access their own data. No user can read another user's health information.</p>
+
+      <h3>5. Who We Share Your Data With</h3>
+      <p>We do not sell, rent, or share your personal data with third parties for marketing purposes. We never have and never will. Your data is shared only with the following service providers who process it on our behalf under formal Data Processing Agreements:</p>
+      <ul>
+        <li><strong>Supabase</strong> (database) — supabase.com · EU region · DPA in place</li>
+        <li><strong>Stripe</strong> (payment processing) — stripe.com · DPA in place</li>
+        <li><strong>Sentry</strong> (error monitoring) — sentry.io · EU region · DPA in place · health data scrubbing configured</li>
+        <li><strong>Plausible Analytics</strong> (anonymous usage statistics) — plausible.io · EU-hosted · no personal data collected</li>
+      </ul>
+
+      <h3>6. How Long We Keep Your Data</h3>
+      <p>We keep your personal and health data for as long as your account is active. If you delete your account, all personal data and health information is permanently deleted from our systems within 30 days. You may also request deletion of specific categories of data at any time without deleting your account — for example, you may request deletion of all historical check-in data while keeping your profile active.</p>
+
+      <h3>7. Your Rights Under UK GDPR</h3>
+      <p>You have the following rights in relation to your personal data:</p>
+      <ul>
+        <li><strong>Right of access:</strong> You can request a copy of all personal data we hold about you.</li>
+        <li><strong>Right to erasure:</strong> You can request that we delete all data we hold about you. You can do this from the Settings page within the app at any time.</li>
+        <li><strong>Right to correction:</strong> You can request that we correct any inaccurate data we hold about you.</li>
+        <li><strong>Right to portability:</strong> You can request a copy of your data in a portable, machine-readable format to take to another service.</li>
+        <li><strong>Right to object:</strong> You can object to our processing of your data in certain circumstances.</li>
+        <li><strong>Right to withdraw consent:</strong> You may withdraw your consent to the processing of health data at any time. This will result in the deletion of all health-related data. The app will continue to function with significantly reduced personalisation.</li>
+      </ul>
+      <p>To exercise any of these rights, contact us at buildnewhabits@outlook.com. We will respond within 30 days.</p>
+
+      <h3>8. Children</h3>
+      <p>Alongside is not designed for or marketed to children under the age of 13. We do not knowingly collect data from children. If you believe a child has provided us with personal information, contact us immediately at buildnewhabits@outlook.com and we will delete it.</p>
+
+      <h3>9. Changes to This Policy</h3>
+      <p>If we make significant changes to how we process your data, we will notify you by email or through a notice in the app at least 14 days before the change takes effect. Continued use of Alongside after that date constitutes acceptance of the updated policy.</p>
+
+      <h3>10. How to Complain</h3>
+      <p>If you are unhappy with how we have handled your data, please contact us first at buildnewhabits@outlook.com. If you remain dissatisfied, you have the right to lodge a complaint with the Information Commissioner's Office (ICO) at ico.org.uk or by calling 0303 123 1113.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 12: TERMS OF SERVICE ═══ -->
+<section id="s12" aria-labelledby="s12-title">
+  <div class="section-header">
+    <div class="sh-num">Section 12 — Legal</div>
+    <h2 class="sh-title" id="s12-title">Terms of Service</h2>
+    <p class="sh-desc">Full Terms of Service for Alongside. Review with a solicitor before publishing. Replace all [BRACKETED] items.</p>
+  </div>
+  <div class="page-narrow">
+    <div class="legal-doc">
+      <div class="doc-stamp">DRAFT — MUST BE REVIEWED BY A SOLICITOR BEFORE PUBLISHING · BUILD NEW HABITS · MARCH 2026</div>
+
+      <h2 class="legal-h">Terms of Service — Alongside App</h2>
+      <p><strong>Effective date:</strong> [DATE]<br><strong>Business:</strong> Build New Habits (Graeme Wright, sole trader)<br><strong>Contact:</strong> buildnewhabits@outlook.com</p>
+      <p>Please read these Terms of Service carefully before using Alongside. By creating an account, you agree to be bound by these Terms. If you do not agree, do not use the app.</p>
+
+      <h3>1. What Alongside Is — and Is Not</h3>
+      <p>Alongside is a fitness coaching application. It is designed to help you build a sustainable movement practice by adapting to how you feel each day. It is not a medical application. It does not provide medical advice, diagnosis, or treatment. Nothing in Alongside should be interpreted as a substitute for the advice of a qualified healthcare professional. If you have any medical concerns, consult a doctor before starting any exercise programme.</p>
+      <p>Alongside is designed to reduce the risk of harm through its condition safety filtering system, but no software system can guarantee the safety of physical exercise for every individual in every circumstance. You are responsible for your own physical safety. Stop any activity that causes pain and seek medical attention if required.</p>
+
+      <h3>2. Accounts and Eligibility</h3>
+      <p>To use Alongside, you must be at least 13 years of age. If you are under 18, you must have parental or guardian consent. You are responsible for all activity that occurs under your account. Keep your password secure and do not share your account with others.</p>
+      <p>We reserve the right to suspend or terminate accounts that violate these Terms or that we believe are being used in a way that could harm the service or other users.</p>
+
+      <h3>3. Subscriptions and Payment</h3>
+      <h4>Free tier</h4>
+      <p>Alongside is available at no charge with a free tier of features that is permanently available. Safety-critical features — including condition filtering and pain-safe exercise generation — are never paywalled.</p>
+      <h4>Personal subscription</h4>
+      <p>The Personal subscription is available at £9.99 per month or £89.00 per year. The annual plan represents a saving compared to twelve monthly payments. You may switch between monthly and annual billing at any renewal date.</p>
+      <h4>Auto-renewal</h4>
+      <p><strong>Your subscription will automatically renew at the end of each billing period unless you cancel before the renewal date.</strong> Monthly subscriptions renew each month. Annual subscriptions renew each year. You will receive an email reminder 7 days before each annual renewal. You can cancel at any time from within the app under Settings → Subscription.</p>
+      <h4>Founding Member</h4>
+      <p>The Founding Member tier is a lifetime membership available during the beta period for a one-time payment of £49. This price is locked for life: your access will never be restricted to free tier features and your price will never increase. The Founding Member tier may be discontinued for new sign-ups at any time but existing Founding Members retain lifetime access.</p>
+      <h4>Refund policy</h4>
+      <p>Under UK Consumer Contracts Regulations, you have the right to cancel and receive a full refund within 14 days of purchase, unless you have actively used the subscription during that period. If you have used the service, we will apply a pro-rata refund for unused days. After 14 days, subscriptions are non-refundable but you may cancel at any time to prevent future renewals. If a technical fault prevented you from using the service, contact us at buildnewhabits@outlook.com for a full refund.</p>
+
+      <h3>4. Your Data</h3>
+      <p>How we handle your personal and health information is described in full in our Privacy Policy, which forms part of these Terms. By agreeing to these Terms, you confirm you have read and understood the Privacy Policy.</p>
+
+      <h3>5. Intellectual Property</h3>
+      <p>All content within Alongside — including the coaching scripts, exercise library, psychological frameworks as applied, design system, and source code — is the intellectual property of Build New Habits (Graeme Wright). You may not reproduce, distribute, modify, or create derivative works from any part of Alongside without written permission.</p>
+
+      <h3>6. Limitation of Liability</h3>
+      <p>Build New Habits provides Alongside as a fitness coaching tool. We are not liable for any physical injury resulting from exercise activities, including those recommended by the app. We are not liable for loss of data, though we take reasonable steps to protect your data in accordance with our Privacy Policy. Our total liability to you for any claim arising under these Terms shall not exceed the amount you have paid us in the 12 months preceding the claim.</p>
+
+      <h3>7. Changes to These Terms</h3>
+      <p>We may update these Terms from time to time. If we make material changes, we will notify you by email at least 14 days before they take effect. Continued use of Alongside after that date constitutes acceptance of the updated Terms.</p>
+
+      <h3>8. Governing Law</h3>
+      <p>These Terms are governed by the laws of England and Wales. Any disputes shall be subject to the exclusive jurisdiction of the courts of England and Wales.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 13: CONSENT STATEMENT ═══ -->
+<section id="s13" aria-labelledby="s13-title">
+  <div class="section-header">
+    <div class="sh-num">Section 13 — Legal</div>
+    <h2 class="sh-title" id="s13-title">Data Consent Statement</h2>
+    <p class="sh-desc">The exact in-app consent wording required for GDPR Article 9 (Special Category Health Data) compliance.</p>
+  </div>
+  <div class="page-narrow">
+    <div class="legal-doc">
+      <div class="doc-stamp">IN-APP CONSENT SCREEN — IMPLEMENT EXACTLY AS WRITTEN · UK GDPR ARTICLE 9 COMPLIANCE</div>
+      <div class="legal-notice"><strong>Technical requirement:</strong> The tick box must start empty. It must not be pre-ticked. The user must not be able to proceed to any screen where health data is collected without ticking it. The date and time of consent must be recorded automatically against the user's profile in Supabase.</div>
+
+      <h2 class="legal-h">Your Health Information — Consent Screen</h2>
+
+      <div class="card card-teal" style="margin:20px 0">
+        <div class="card-h">Consent Screen Heading Text</div>
+        <p class="card-p" style="font-size:1rem;font-style:italic;color:var(--dark)">"Before we go further — a quick word about your health information."</p>
+      </div>
+
+      <h3>Main Consent Text (display in full)</h3>
+      <div style="background:var(--pale);border-radius:var(--radius);padding:24px;margin:16px 0;border:1px solid var(--border)">
+        <p style="font-size:0.9rem;color:var(--dark);line-height:1.75;margin-bottom:14px">To give you coaching that's genuinely useful and safe, Alongside will ask about your health — things like:</p>
+        <ul style="padding-left:20px;margin-bottom:14px">
+          <li style="font-size:0.88rem;color:var(--dark);line-height:1.7;list-style:disc;margin-bottom:4px">Health conditions and physical limitations</li>
+          <li style="font-size:0.88rem;color:var(--dark);line-height:1.7;list-style:disc;margin-bottom:4px">Pain levels by body area</li>
+          <li style="font-size:0.88rem;color:var(--dark);line-height:1.7;list-style:disc;margin-bottom:4px">Energy, mood, and sleep quality (via daily check-ins)</li>
+          <li style="font-size:0.88rem;color:var(--dark);line-height:1.7;list-style:disc;margin-bottom:4px">Hormonal cycle information (optional — only if you choose to share it)</li>
+        </ul>
+        <p style="font-size:0.88rem;color:var(--dark);line-height:1.75;margin-bottom:10px"><strong>Why we collect this:</strong> To make sure every exercise recommendation is physically safe for your body right now, and to adapt your coaching to how you actually feel — not how a generic programme expects you to feel.</p>
+        <p style="font-size:0.88rem;color:var(--dark);line-height:1.75;margin-bottom:10px"><strong>Who sees it:</strong> Only you, and the Alongside app. Your health information is never sold, shared with third parties, or used for advertising.</p>
+        <p style="font-size:0.88rem;color:var(--dark);line-height:1.75;margin-bottom:10px"><strong>Your control:</strong> You can delete all your health data at any time from Settings. You can update, correct, or export your data at any time. You can withdraw this consent at any time.</p>
+        <p style="font-size:0.88rem;color:var(--dark);line-height:1.75">By ticking below, you give Alongside permission to collect and use your health-related information for personalised fitness coaching, as described above and in our full <a href="/privacy" style="color:var(--teal);text-decoration:underline">Privacy Policy</a>.</p>
+      </div>
+
+      <h3>Tick Box Wording (display verbatim)</h3>
+      <div style="background:var(--white);border:2px solid var(--teal);border-radius:var(--radius);padding:20px 24px;margin:16px 0;display:flex;gap:14px;align-items:flex-start">
+        <div style="width:20px;height:20px;border:2px solid var(--border);border-radius:4px;flex-shrink:0;margin-top:2px"></div>
+        <p style="font-size:0.88rem;color:var(--dark);line-height:1.65">I understand that Alongside will collect health-related information including my conditions, pain levels, mood, and energy to provide personalised fitness coaching. I give my explicit consent for this. I can withdraw consent and delete all my data at any time from Settings. I have read the <a href="/privacy" style="color:var(--teal);text-decoration:underline">Privacy Policy</a> and <a href="/terms" style="color:var(--teal);text-decoration:underline">Terms of Service</a>.</p>
+      </div>
+
+      <h3>Consent Data to Record in Supabase</h3>
+      <p>When the user ticks the box and proceeds, record the following in their user profile:</p>
+      <ul>
+        <li>health_consent_given: true</li>
+        <li>health_consent_date: ISO 8601 timestamp</li>
+        <li>health_consent_version: "1.0" (increment if consent wording changes — users must re-consent)</li>
+        <li>terms_accepted: true</li>
+        <li>terms_version: "[TERMS VERSION DATE]"</li>
+      </ul>
+
+      <div class="legal-notice">If you materially change the consent wording or what data you collect, you must present the updated consent screen to all existing users and obtain fresh consent. Do not simply update the document — require a new tick.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 14: ETHICAL COMMITMENTS ═══ -->
+<section id="s14" aria-labelledby="s14-title">
+  <div class="section-header">
+    <div class="sh-num">Section 14 — Ethics</div>
+    <h2 class="sh-title" id="s14-title">Ethical Commitments</h2>
+    <p class="sh-desc">The product ethics declaration that defines what Alongside will never do and will always do. Not aspirational — structural.</p>
+  </div>
+  <div class="page-narrow">
+    <div class="highlight-box">
+      <h4>About This Document</h4>
+      <p>This is not a marketing statement. These are structural constraints — prohibited design patterns and required design patterns — that are embedded into the product at a code and specification level, not added as features. They cannot be switched off or overridden by business pressure.</p>
+    </div>
+
+    <div class="ethics-grid" style="margin:24px 0">
+      <div class="ethics-never">
+        <h4>✗ We Will NEVER</h4>
+        <ul style="padding-left:0">
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✗</span><span class="ci-text">Use streak mechanics that create shame on a missed day</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✗</span><span class="ci-text">Implement social comparison features or leaderboards</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✗</span><span class="ci-text">Use variable reward slot-machine mechanics to drive engagement</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✗</span><span class="ci-text">Send guilt-inducing push notifications</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✗</span><span class="ci-text">Sell or share user data with third parties for advertising</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✗</span><span class="ci-text">Say "you missed your workout" or similar shaming language</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✗</span><span class="ci-text">Use the words: lazy, excuse, should have, at least, just, perfect, behind</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✗</span><span class="ci-text">Paywall any safety-critical feature (condition filtering, pain adaptation)</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✗</span><span class="ci-text">Claim AI capabilities the app does not have</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✗</span><span class="ci-text">Dismiss or minimise the user's reported energy or mood state</span></li>
+        </ul>
+      </div>
+      <div class="ethics-always">
+        <h4>✓ We Will ALWAYS</h4>
+        <ul style="padding-left:0">
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✓</span><span class="ci-text">Validate low energy, low mood, and pain as legitimate states</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✓</span><span class="ci-text">Provide transparent rationale for every exercise recommendation</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✓</span><span class="ci-text">Respect user autonomy — always offer choices, never issue directives</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✓</span><span class="ci-text">Protect user data — local-first architecture where possible, EU hosting where not</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✓</span><span class="ci-text">Design for accessibility — WCAG 2.2 AA compliance as a minimum</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✓</span><span class="ci-text">Centre neurodivergent and women's needs — not as an afterthought, as the design brief</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✓</span><span class="ci-text">Ground every design decision in peer-reviewed psychological frameworks</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✓</span><span class="ci-text">Prioritise user wellbeing over engagement metrics</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✓</span><span class="ci-text">Be honest about what the app is, who it is for, and what it cannot do</span></li>
+          <li class="commitment-item"><span class="ci-icon" aria-hidden="true">✓</span><span class="ci-text">Welcome every user back without comment after any absence</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:24px 0 14px;color:var(--dark)">The Five Evidence-Based Frameworks</h3>
+    <table class="data-table">
+      <thead><tr><th>Framework</th><th>Source</th><th>Application in Alongside</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Self-Determination Theory</strong></td><td>Deci &amp; Ryan, 1985</td><td>User always chooses from three options; coach recommends, never commands; competence feedback recalibrates difficulty in real time</td></tr>
+        <tr><td><strong>SOLO Taxonomy</strong></td><td>Biggs &amp; Collis, 1982</td><td>Progressive skill development from single exercises through to genuine coaching literacy and autonomous movement decisions</td></tr>
+        <tr><td><strong>Mood Meter Science</strong></td><td>Marc Brackett, Yale RULER</td><td>Energy and mood captured as independent dimensions; each state combination triggers a distinct, appropriate coaching response</td></tr>
+        <tr><td><strong>Burnout Research</strong></td><td>Dr Claire Plumbly, 2024</td><td>Pattern-detection algorithm monitors trends; Recovery Mode auto-triggers before burnout lands rather than after</td></tr>
+        <tr><td><strong>Acceptance &amp; Commitment Therapy</strong></td><td>Hayes et al.</td><td>Values-based framing; validates rest as legitimate; movement connected to personal meaning rather than external performance pressure</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══ SECTION 15: COMMUNITY STRATEGY ═══ -->
+<section id="s15" aria-labelledby="s15-title">
+  <div class="section-header">
+    <div class="sh-num">Section 15</div>
+    <h2 class="sh-title" id="s15-title">Community Strategy</h2>
+    <p class="sh-desc">How Alongside builds genuine trust in the communities where its users already live.</p>
+  </div>
+  <div class="page">
+    <div class="quote-block">
+      <p>"One trusted community member recommending Alongside is worth more than any advertisement. Trust is not purchased — it is earned by showing up consistently and being genuinely useful over time."</p>
+      <cite>— Build New Habits Community Strategy</cite>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:0 0 16px;color:var(--dark)">Target Communities</h3>
+    <table class="data-table">
+      <thead><tr><th>Community</th><th>Platform</th><th>Approach</th></tr></thead>
+      <tbody>
+        <tr><td><strong>r/ADHD</strong> (1M+ members)</td><td>Reddit</td><td>Engage on burnout, executive function, exercise avoidance. Share lived experience. Never lead with product.</td></tr>
+        <tr><td><strong>r/adhdwomen</strong></td><td>Reddit</td><td>Hormonal + ADHD intersection. High engagement on energy fluctuation topics.</td></tr>
+        <tr><td><strong>r/autism</strong></td><td>Reddit</td><td>Sensory processing, routine disruption, demand avoidance. These users identify authenticity quickly.</td></tr>
+        <tr><td><strong>r/laterdiagnosed</strong></td><td>Reddit</td><td>Late-diagnosed ADHD and autism — many have history of failed fitness attempts and self-blame.</td></tr>
+        <tr><td><strong>r/perimenopause + r/Menopause</strong></td><td>Reddit</td><td>Energy fluctuation is central to both communities. High motivation to find supportive fitness approaches.</td></tr>
+        <tr><td><strong>r/ChronicPain</strong></td><td>Reddit</td><td>Exercise safety, gentle movement, pain management. Alongside's condition filtering is directly relevant.</td></tr>
+        <tr><td><strong>r/xxfitness</strong></td><td>Reddit</td><td>Women's fitness community. More mainstream but receptive to shame-free positioning.</td></tr>
+        <tr><td><strong>Facebook groups</strong></td><td>Facebook</td><td>ADHD Adults UK, Menopause Support. Older demographic, higher willingness to pay for quality.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:28px 0 14px;color:var(--dark)">Community Presence Protocol</h3>
+    <div class="strategy-grid">
+      <div class="strategy-card"><div class="sc-num">Week 1–2</div><h3>Lurk and Listen</h3><p>Read each community for 20 minutes before posting. Understand what they care about, what language they use, what frustrates them. Do not post yet.</p></div>
+      <div class="strategy-card"><div class="sc-num">Week 2–4</div><h3>Contribute Genuinely</h3><p>Answer questions. Share personal experience. Be helpful and honest. One community per day maximum. Respond to every reply personally.</p></div>
+      <div class="strategy-card"><div class="sc-num">Week 3–4</div><h3>Identify Founding Member Candidates</h3><p>The people who write paragraphs in their replies. Ask: "Would you be willing to have a 20-minute conversation?" Document exact language they use — this becomes your marketing copy.</p></div>
+      <div class="strategy-card"><div class="sc-num">Week 4–5</div><h3>Post About Alongside</h3><p>Only after genuine presence is established. Structure: personal story → human problem → what you built → Founding Member offer. Stay in comments for 3+ hours.</p></div>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:28px 0 14px;color:var(--dark)">Validation Targets</h3>
+    <table class="data-table">
+      <thead><tr><th>Signal</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td>People describe app failure in their own words (unprompted)</td><td>10+ responses across communities</td></tr>
+        <tr><td>"Fluctuating energy" or equivalent named without prompting</td><td>Mentioned by 40%+ of respondents</td></tr>
+        <tr><td>People say they wanted to continue but the app didn't help them</td><td>Majority of responses</td></tr>
+        <tr><td>Psychological safety named as a need</td><td>At least 5 people name this explicitly</td></tr>
+        <tr><td>People willing to have a deeper conversation</td><td>5+ within 4 weeks</td></tr>
+        <tr><td>People interested in shaping the product</td><td>Founding Member pipeline begins</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══ SECTION 16: CONTENT STRATEGY ═══ -->
+<section id="s16" aria-labelledby="s16-title">
+  <div class="section-header">
+    <div class="sh-num">Section 16</div>
+    <h2 class="sh-title" id="s16-title">Content Strategy</h2>
+    <p class="sh-desc">Content pillars, voice guidance, and platform strategy for organic audience growth.</p>
+  </div>
+  <div class="page">
+    <div class="strategy-grid" style="margin-bottom:24px">
+      <div class="strategy-card">
+        <div class="sc-num">Pillar 01</div>
+        <h3>"Why Fitness Apps Fail People Like Us"</h3>
+        <p>Educational content about the 97% dropout rate, shame mechanics, and neurodivergent design failures. Data-led. Empathetic. No product mention.</p>
+      </div>
+      <div class="strategy-card">
+        <div class="sc-num">Pillar 02</div>
+        <h3>Lived Experience Content</h3>
+        <p>Genuine personal stories about ADHD, burnout, injury, hormonal fluctuation, and exercise. Graeme as a relatable founder building what he personally needed.</p>
+      </div>
+      <div class="strategy-card">
+        <div class="sc-num">Pillar 03</div>
+        <h3>Evidence and Research</h3>
+        <p>Accessible explanations of Self-Determination Theory, burnout research, Mood Meter science. Position Build New Habits as a credible, evidence-led voice.</p>
+      </div>
+      <div class="strategy-card">
+        <div class="sc-num">Pillar 04</div>
+        <h3>Product Transparency</h3>
+        <p>Show how Alongside works. Explain the coach logic. Share the evidence base. Transparency is itself a marketing tool — it builds trust before users have tried the app.</p>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:0 0 14px;color:var(--dark)">Voice and Tone — Content Guide</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-h">Lead With</div>
+        <ul class="inline-list">
+          <li>"Fitness coaching for people fitness culture forgot"</li>
+          <li>"Finally, an app that doesn't make you feel worse"</li>
+          <li>"Your pace. Your way. No judgement."</li>
+          <li>The human problem, not the product features</li>
+          <li>Empathy and lived experience, not optimisation</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-h">Never Lead With</div>
+        <ul class="inline-list">
+          <li>"ADHD fitness app" — limits perceived audience</li>
+          <li>"AI-powered" — overdone and not the differentiator</li>
+          <li>Technical feature lists — leads with solutions not problems</li>
+          <li>Urgency or scarcity tactics</li>
+          <li>Any metric comparison or achievement framing</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 17: FOUNDING MEMBER STRATEGY ═══ -->
+<section id="s17" aria-labelledby="s17-title">
+  <div class="section-header">
+    <div class="sh-num">Section 17</div>
+    <h2 class="sh-title" id="s17-title">Founding Member Strategy</h2>
+    <p class="sh-desc">The friend code system, recruitment approach, feedback structure, and conversion model.</p>
+  </div>
+  <div class="page">
+    <div class="two-col">
+      <div class="card card-teal">
+        <div class="card-h">What Founding Members Get</div>
+        <ul class="inline-list">
+          <li>3 months free — full unlimited access</li>
+          <li>Option to convert to lifetime membership for £49</li>
+          <li>10 friend codes to share at the same pricing</li>
+          <li>Real input into product direction through feedback cycles</li>
+          <li>Named in acknowledgements (optional)</li>
+          <li>Direct contact with the founder</li>
+        </ul>
+      </div>
+      <div class="card card-coral">
+        <div class="card-h">What We Get From Founding Members</div>
+        <ul class="inline-list">
+          <li>Real usage data from the target audience</li>
+          <li>Weekly structured feedback (what worked, what frustrated)</li>
+          <li>Community amplification through friend codes</li>
+          <li>Testimonials for public launch</li>
+          <li>Validation that users will pay for the product</li>
+          <li>Co-investment in the product's survival</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:28px 0 14px;color:var(--dark)">Friend Code System</h3>
+    <table class="data-table">
+      <thead><tr><th>Mechanic</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td>Initial allocation</td><td>Each Founding Member receives 10 unique codes at sign-up</td></tr>
+        <tr><td>Code value</td><td>Any user entering a code gets Founding Member pricing (£49 lifetime) — the same deal the original member got</td></tr>
+        <tr><td>Bonus mechanism</td><td>Every 5 codes used by others, the original member receives 5 more codes to share</td></tr>
+        <tr><td>Viral effect</td><td>Each Founding Member can generate an unlimited number of additional Founding Members given enough sharing and amplification</td></tr>
+        <tr><td>Community incentive</td><td>Founding Members have financial and community reasons to share with people they believe would genuinely benefit — natural filter for the right audience</td></tr>
+      </tbody>
+    </table>
+
+    <div class="highlight-box">
+      <h4>Why This Works</h4>
+      <p>The friend code system creates a trusted peer-referral channel inside communities that are inherently resistant to advertising. A Founding Member sharing a code with their ADHD community is a trusted peer recommendation — vastly more effective than any paid acquisition channel. The shared pricing incentivises sharing within the right communities.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ANNEXES ═══ -->
+<section id="ax1" aria-labelledby="ax1-title">
+  <div class="section-header" style="background:linear-gradient(135deg,#2A3A3A,#3A5A5A)">
+    <div class="sh-num">Annex A</div>
+    <h2 class="sh-title" id="ax1-title">ICO &amp; HMRC Registration Guide</h2>
+    <p class="sh-desc">Step-by-step instructions for the two most critical business registrations before launch.</p>
+  </div>
+  <div class="page-narrow">
+    <div class="card card-coral">
+      <div class="card-h">⚠️ Do These Before Anything Else</div>
+      <p class="card-p">ICO registration must be completed before any real user health data is collected. HMRC registration must be completed before any commercial revenue is received. Both are legal requirements. Both are simple to do.</p>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:24px 0 14px;color:var(--dark)">A1. Register as a Sole Trader with HMRC</h3>
+    <ol style="padding-left:20px">
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6"><strong style="color:var(--dark)">Go to gov.uk/set-up-sole-trader</strong> — this is the official HMRC registration page. It is free.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">You will need your National Insurance number. Have it ready.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">Complete the online registration form. Business name: Build New Habits. Start date: [date you began receiving any income or expect to].</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">HMRC will send you a Unique Taxpayer Reference (UTR) number by post within 10 working days. Keep this — you will need it for your annual Self Assessment tax return.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">Set up a Self Assessment account at tax.service.gov.uk. Your first tax return covers the full tax year you first registered.</li>
+    </ol>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:28px 0 14px;color:var(--dark)">A2. Register with ICO as a Data Controller</h3>
+    <ol style="padding-left:20px">
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6"><strong style="color:var(--dark)">Go to ico.org.uk/registration</strong> — this is the Information Commissioner's Office data controller registration.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">Select "sole trader" as your organisation type.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">Describe your data processing activities: "Collecting health and personal information from app users to provide personalised fitness coaching recommendations."</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">The annual fee is £40. Pay by card. Keep the receipt.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">You will receive an ICO registration number immediately. <strong style="color:var(--dark)">Add this number to your Privacy Policy before publishing it.</strong></li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">Set a calendar reminder to renew annually. Non-renewal is a criminal offence.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="ax2" aria-labelledby="ax2-title">
+  <div class="section-header" style="background:linear-gradient(135deg,#2A3A3A,#3A5A5A)">
+    <div class="sh-num">Annex B</div>
+    <h2 class="sh-title" id="ax2-title">Supabase Setup Guide</h2>
+    <p class="sh-desc">EU region configuration, DPA signing, and Row-Level Security setup.</p>
+  </div>
+  <div class="page-narrow">
+    <div class="card card-coral">
+      <div class="card-h">⚠️ Region Cannot Be Changed After Creation</div>
+      <p class="card-p">You must select an EU region when creating your Supabase project. This cannot be changed after the project is created. If you get this wrong, you must delete the project and start again. Select eu-west-1 (Ireland) or eu-central-1 (Frankfurt).</p>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:24px 0 12px;color:var(--dark)">Step-by-Step Setup</h3>
+    <ol style="padding-left:20px">
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">Go to supabase.com and create a free account. Enable 2FA immediately.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">Create a New Project. <strong style="color:var(--dark)">Select eu-west-1 (Ireland) or eu-central-1 (Frankfurt) as the region.</strong> Confirm before proceeding.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">Go to Settings → Legal Documents → Data Processing Agreement. Click "Accept DPA." This makes Supabase your legal data processor under UK GDPR.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">In the SQL editor, create your tables (users, check_ins, workouts, prescribed_exercises, subscriptions).</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6"><strong style="color:var(--dark)">Enable Row-Level Security on EVERY table.</strong> In Supabase: Authentication → Policies → Enable RLS. Without this, any authenticated user can read all other users' health data. Test this before going live.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">Add a subscription_tier column to the users table: type text, default 'free', check constraint in ('free', 'personal', 'founding_member').</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:10px;line-height:1.6">Upgrade to Supabase Pro (~£25/month) when the first Founding Member is onboarded. Free tier does not include point-in-time recovery or guaranteed uptime.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="ax3" aria-labelledby="ax3-title">
+  <div class="section-header" style="background:linear-gradient(135deg,#2A3A3A,#3A5A5A)">
+    <div class="sh-num">Annex C</div>
+    <h2 class="sh-title" id="ax3-title">Stripe Integration Guide</h2>
+    <p class="sh-desc">Products, pricing, DPA, webhook, and Customer Portal setup.</p>
+  </div>
+  <div class="page-narrow">
+    <ol style="padding-left:20px">
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:12px;line-height:1.6">Create a Stripe account at stripe.com. Enable 2FA immediately.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:12px;line-height:1.6"><strong style="color:var(--dark)">Accept the DPA:</strong> Dashboard → Settings → Data Processing Agreement → Accept. Required before processing UK/EU customer data.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:12px;line-height:1.6">Create three products in the Stripe Dashboard (Products section):<br>— Personal Monthly: £9.99/month, recurring<br>— Personal Annual: £89.00/year, recurring<br>— Founding Member: £49.00, one-time</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:12px;line-height:1.6">Enable the Customer Portal: Dashboard → Settings → Billing → Customer Portal. Users can self-manage their subscriptions here. Essential for right-to-cancellation compliance.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:12px;line-height:1.6">Set up the Netlify webhook function (stripe-webhook.js). The function must: verify the Stripe signature header, parse the event type, update the subscription_tier field in Supabase accordingly. Environment variables needed: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SUPABASE_SERVICE_ROLE_KEY.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:12px;line-height:1.6">Register the webhook in Stripe: Dashboard → Developers → Webhooks → Add endpoint. Subscribe to: customer.subscription.created, customer.subscription.updated, customer.subscription.deleted.</li>
+      <li style="font-size:0.87rem;color:var(--mid);margin-bottom:12px;line-height:1.6"><strong style="color:var(--dark)">Test the complete flow in sandbox mode</strong> before going live. Use Stripe test card 4242 4242 4242 4242.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="ax4" aria-labelledby="ax4-title">
+  <div class="section-header" style="background:linear-gradient(135deg,#2A3A3A,#3A5A5A)">
+    <div class="sh-num">Annex D</div>
+    <h2 class="sh-title" id="ax4-title">Pre-Launch GDPR Security Checklist</h2>
+    <p class="sh-desc">Every compliance and security item that must be confirmed before the first Founding Member is onboarded.</p>
+  </div>
+  <div class="page-narrow">
+    <table class="data-table">
+      <thead><tr><th style="width:40px"></th><th>Task</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><input type="checkbox" aria-label="Supabase EU region confirmed"></td><td>Supabase project created in EU region (Ireland or Frankfurt)</td><td>GDPR requires EU data residency for UK/EU user data</td></tr>
+        <tr><td><input type="checkbox" aria-label="Supabase DPA signed"></td><td>Supabase DPA signed in dashboard</td><td>Makes Supabase your legal data processor under UK GDPR</td></tr>
+        <tr><td><input type="checkbox" aria-label="Supabase RLS enabled"></td><td>Row-Level Security enabled and tested on ALL tables</td><td>Without RLS, any user can read all other users' health data</td></tr>
+        <tr><td><input type="checkbox" aria-label="Stripe DPA accepted"></td><td>Stripe DPA accepted in dashboard settings</td><td>Required for processing EU/UK payment data</td></tr>
+        <tr><td><input type="checkbox" aria-label="Webhook signature verified"></td><td>Netlify webhook verifies Stripe signature in code</td><td>Prevents fake "payment succeeded" events</td></tr>
+        <tr><td><input type="checkbox" aria-label="Sentry EU region"></td><td>Sentry account created with EU data storage region selected</td><td>Cannot be changed after creation — EU required for GDPR</td></tr>
+        <tr><td><input type="checkbox" aria-label="Sentry DPA signed"></td><td>Sentry DPA signed in account settings</td><td>Sentry processes app data on your behalf under a legal agreement</td></tr>
+        <tr><td><input type="checkbox" aria-label="Sentry scrubbing configured"></td><td>Sentry data scrubbing configured with health data patterns</td><td>Health information must never appear in error logs</td></tr>
+        <tr><td><input type="checkbox" aria-label="Privacy Policy live"></td><td>Privacy Policy written, reviewed, and live on app and landing page</td><td>UK GDPR legal requirement before collecting any data</td></tr>
+        <tr><td><input type="checkbox" aria-label="Sub-processors listed"></td><td>Privacy Policy lists: Supabase, Stripe, Sentry, Plausible as sub-processors</td><td>GDPR transparency requirement</td></tr>
+        <tr><td><input type="checkbox" aria-label="Health data named as special category"></td><td>Privacy Policy explicitly identifies health data as special category</td><td>Required for lawful processing of sensitive health data</td></tr>
+        <tr><td><input type="checkbox" aria-label="Consent screen built"></td><td>Consent screen built with empty tick box, Privacy Policy and ToS links, timestamp recording</td><td>Lawful basis for special category data is explicit consent</td></tr>
+        <tr><td><input type="checkbox" aria-label="Data deletion available"></td><td>User data deletion mechanism working and tested</td><td>GDPR Article 17 — right to erasure</td></tr>
+        <tr><td><input type="checkbox" aria-label="ICO registered"></td><td>ICO data controller registration completed (£40/year)</td><td>Legal requirement for UK businesses processing personal data</td></tr>
+        <tr><td><input type="checkbox" aria-label="No secret keys in client code"></td><td>No secret API keys present in client-side JavaScript</td><td>Service role keys exposed in browser = complete data breach</td></tr>
+        <tr><td><input type="checkbox" aria-label="2FA on all accounts"></td><td>2FA enabled on all service accounts</td><td>Basic account security — required for all accounts handling user data</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="ax5" aria-labelledby="ax5-title">
+  <div class="section-header" style="background:linear-gradient(135deg,#2A3A3A,#3A5A5A)">
+    <div class="sh-num">Annex E</div>
+    <h2 class="sh-title" id="ax5-title">Community Post Templates</h2>
+    <p class="sh-desc">Ready-to-adapt post templates for Reddit and Facebook community announcements.</p>
+  </div>
+  <div class="page-narrow">
+    <div class="card card-amber">
+      <div class="card-h">⚠️ Only Use After 2–4 Weeks of Genuine Community Participation</div>
+      <p class="card-p">Do not post these on day one. Build genuine presence first. People in these communities will check your posting history. 2–4 weeks of genuinely helpful posts before any product mention is not optional — it is what makes this work.</p>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:24px 0 12px;color:var(--dark)">Template 1: ADHD / Neurodivergent Communities</h3>
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;font-size:0.87rem;color:var(--dark);line-height:1.75">
+      <p><strong>Post title:</strong> [Community name] — I built a fitness app specifically for how our energy actually works. Looking for Founding Members.</p>
+      <br>
+      <p>Hey everyone — I've been part of this community for a few weeks and I've learned a lot from the conversations here, especially the ones about exercise and motivation.</p>
+      <br>
+      <p>I want to share something I've been building. As someone with ADHD who has abandoned every fitness app I've tried, I got frustrated enough to build my own.</p>
+      <br>
+      <p>It's called Alongside. The core idea: instead of assuming you have consistent energy every day, it starts by asking how you actually feel. Energy level. Mood. Pain. Sleep. Then it builds a session that fits *today's* you — not the you who was full of motivation last Monday.</p>
+      <br>
+      <p>No streaks (because we all know what happens when we break a streak and the shame spiral starts). No "no excuses" energy. No guilt notifications. It validates rest as legitimate. It welcomes you back without comment if you disappear for two weeks.</p>
+      <br>
+      <p>I'm looking for Founding Members — people who want to test it properly and help shape it. You'd get 3 months free and full access to everything. If you want to continue after that, it's £49/year for life. You'd also get 10 friend codes to share at the same price.</p>
+      <br>
+      <p>Anyone interested? Happy to answer questions about how it actually works — or what I learned building it that might be useful even if you never use the app.</p>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;margin:24px 0 12px;color:var(--dark)">Template 2: Menopause / Women's Health Communities</h3>
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;font-size:0.87rem;color:var(--dark);line-height:1.75">
+      <p><strong>Post title:</strong> I built a fitness app that actually accounts for how your energy changes week to week — not just day to day. Would love Founding Members from this community.</p>
+      <br>
+      <p>Something that's come up in so many conversations here is the frustration of fitness apps that treat you like your energy is consistent. You know it's not. I know it's not.</p>
+      <br>
+      <p>I've spent a year building something different. Alongside is a fitness coaching app that starts with a short daily check-in — how are you feeling, what's your energy like, any pain today — and then builds a session around that. Not around where a 12-week programme says you should be. Around where *you actually are*.</p>
+      <br>
+      <p>It's designed with hormonal fluctuation in mind from the ground up. The app won't suggest an intense cardio session on a day when your body is telling you something different. And it explains *why* it's making each recommendation, so you can trust what it says.</p>
+      <br>
+      <p>I'm looking for Founding Members: 3 months free access, then £49/year for life if you want to stay. And honest feedback about what works and what doesn't — I'm still building this and your experience matters.</p>
+      <br>
+      <p>Any questions welcome.</p>
+    </div>
+  </div>
+</section>
+
+<section id="ax6" aria-labelledby="ax6-title">
+  <div class="section-header" style="background:linear-gradient(135deg,#2A3A3A,#3A5A5A)">
+    <div class="sh-num">Annex F</div>
+    <h2 class="sh-title" id="ax6-title">Evidence Base</h2>
+    <p class="sh-desc">The 21-source peer-reviewed research foundation supporting Alongside's design.</p>
+  </div>
+  <div class="page-narrow">
+    <div class="highlight-box">
+      <h4>About This Evidence Base</h4>
+      <p>21 peer-reviewed sources were synthesised in the BNH Research Report (February 2026). Five psychological frameworks are embedded directly into the product architecture. This evidence base serves two purposes: it ensures the product genuinely supports users rather than causing harm, and it is a competitive asset — competitors can copy features, but they cannot credibly copy a sustained, coherent commitment to psychological safety grounded in peer-reviewed research.</p>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Reference</th><th>Application</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Deci, E.L. &amp; Ryan, R.M. (1985).</strong> Self-Determination Theory. Springer.</td><td>Autonomy-first design — user always chooses; coach never commands. Three options, never one directive.</td></tr>
+        <tr><td><strong>Biggs, J. &amp; Collis, K. (1982).</strong> The SOLO Taxonomy. Academic Press.</td><td>Progressive difficulty and skill-building model embedded in programme engine.</td></tr>
+        <tr><td><strong>Brackett, M. (2019).</strong> Permission to Feel. Celadon Books. (Yale RULER Programme)</td><td>Energy/mood check-in design; distinct coaching responses for each energy-mood state combination.</td></tr>
+        <tr><td><strong>Plumbly, C. (2024).</strong> Burnout: How to Manage Your Nervous System. Yellow Kite. ISBN 978-1-399-73342-7</td><td>Burnout detection algorithm; Recovery Mode design; nervous system pattern monitoring.</td></tr>
+        <tr><td><strong>Hayes, S.C. et al.</strong> Acceptance and Commitment Therapy principles.</td><td>Values-based movement framing; rest validated as legitimate; movement connected to personal meaning.</td></tr>
+        <tr><td><strong>Bondaronek P. et al. (2025).</strong> UCL/Loughborough University. Fitness app shame mechanics. Published via NewAtlas.com.</td><td>Direct peer-reviewed validation that shame-based mechanics cause harm — validates the core product philosophy.</td></tr>
+        <tr><td><strong>Business of Apps (2023).</strong> Health &amp; Fitness App Benchmarks.</td><td>97% dropout within 30 days — primary business case statistic.</td></tr>
+        <tr><td><strong>Kidman et al. (2024).</strong> When and Why Adults Abandon Lifestyle Apps. JMIR.</td><td>Abandonment reasons and rates across fitness and health apps.</td></tr>
+        <tr><td><strong>CAST (2018).</strong> Universal Design for Learning Guidelines v2.2.</td><td>Neurodivergent-first design principles embedded throughout onboarding and coach UX.</td></tr>
+        <tr><td colspan="2" style="font-size:0.8rem;color:var(--muted);font-style:italic">Full 21-source list available in BNH_Research_Report_Feb2026.docx</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:var(--teal-deep);color:rgba(255,255,255,0.6);padding:40px 72px;margin-top:0">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px">
+    <div>
+      <div style="font-family:var(--serif);font-size:1.1rem;color:white;font-weight:700;margin-bottom:4px">Build New Habits</div>
+      <div style="font-size:0.78rem;font-family:var(--mono)">Alongside · Business Portfolio · March 2026</div>
+    </div>
+    <div style="text-align:right;font-size:0.78rem;font-family:var(--mono)">
+      <div>Graeme Wright · buildnewhabits@outlook.com</div>
+      <div style="margin-top:4px">Weston-super-Mare, Somerset, England</div>
+      <div style="margin-top:4px;color:rgba(255,255,255,0.35)">CONFIDENTIAL — For authorised recipients only</div>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<script>
+// ═══ TASK TRACKER LOGIC ═══
+function toggleTask(checkbox) {
+  const row = checkbox.closest('.task-row');
+  if (checkbox.checked) {
+    row.classList.add('done');
+  } else {
+    row.classList.remove('done');
+  }
+  updateCounts();
+  saveState();
+}
+
+function updateCounts() {
+  const sections = ['legal', 'tech', 'financial', 'marketing', 'operational'];
+  let totalDone = 0, totalAll = 0;
+  sections.forEach(cat => {
+    const rows = document.querySelectorAll(`.task-row[data-cat="${cat}"]`);
+    const done = document.querySelectorAll(`.task-row[data-cat="${cat}"].done`).length;
+    const el = document.getElementById(`cnt-${cat}`);
+    if (el) el.textContent = `${done}/${rows.length} done`;
+    totalDone += done;
+    totalAll += rows.length;
+  });
+}
+
+function filterTasks(category) {
+  const btns = document.querySelectorAll('.filter-btn');
+  btns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+  event.target.classList.add('active');
+  event.target.setAttribute('aria-pressed', 'true');
+
+  const sections = document.querySelectorAll('.task-section');
+  sections.forEach(section => {
+    if (category === 'all' || section.dataset.category === category) {
+      section.style.display = 'block';
+    } else {
+      section.style.display = 'none';
+    }
+  });
+}
+
+function saveState() {
+  const checkboxes = document.querySelectorAll('.task-row input[type="checkbox"]');
+  const state = {};
+  checkboxes.forEach((cb, i) => { state[i] = cb.checked; });
+  try { localStorage.setItem('bnh-portfolio-tasks', JSON.stringify(state)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const state = JSON.parse(localStorage.getItem('bnh-portfolio-tasks') || '{}');
+    const checkboxes = document.querySelectorAll('.task-row input[type="checkbox"]');
+    checkboxes.forEach((cb, i) => {
+      if (state[i]) {
+        cb.checked = true;
+        cb.closest('.task-row').classList.add('done');
+      }
+    });
+  } catch(e) {}
+}
+
+// ═══ ACTIVE NAV LINK ═══
+function updateActiveNav() {
+  const sections = document.querySelectorAll('section[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.getBoundingClientRect().top;
+    if (sectionTop <= 80) current = section.id;
+  });
+  navItems.forEach(item => {
+    item.classList.remove('active');
+    const href = item.getAttribute('href');
+    if (href && href === `#${current}`) item.classList.add('active');
+  });
+}
+
+// ═══ ANNEX D CHECKLIST ═══
+function initAnnexChecklist() {
+  const annexCheckboxes = document.querySelectorAll('#ax4 input[type="checkbox"]');
+  annexCheckboxes.forEach((cb, i) => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('bnh-annex-d') || '{}');
+      if (saved[i]) cb.checked = true;
+    } catch(e) {}
+    cb.addEventListener('change', () => {
+      try {
+        const state = JSON.parse(localStorage.getItem('bnh-annex-d') || '{}');
+        state[i] = cb.checked;
+        localStorage.setItem('bnh-annex-d', JSON.stringify(state));
+      } catch(e) {}
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadState();
+  updateCounts();
+  initAnnexChecklist();
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  updateActiveNav();
+});
+</script>
+</body>
+</html>
