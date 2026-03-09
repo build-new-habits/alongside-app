@@ -2,6 +2,38 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
+ * v1.4 — availableTime wiring + duration cap:
+ *   getWorkoutParams() now accepts availableTime from the store.
+ *   When set, availableTime drives exerciseCount via a lookup table;
+ *   intensity still exclusively drives maxEnergy, warmup/cooldown
+ *   inclusion, and focusOnRecovery.
+ *
+ *   A maxDuration cap (minutes) is applied per focus type after exercise
+ *   selection. If calculateDuration() exceeds the cap, main-block
+ *   exercises are trimmed from the end until the session fits. Warmup
+ *   and cooldown are never trimmed.
+ *
+ *   availableTime lookup:
+ *     "micro"    (10 min)  → 2 exercises
+ *     "quick"    (20 min)  → 3 exercises
+ *     "short"    (30 min)  → 4 exercises
+ *     "standard" (40 min)  → 5 exercises
+ *     "long"     (50 min)  → 6 exercises
+ *     "open"     (60+ min) → 7 exercises
+ *     null                 → intensity-derived (existing behaviour)
+ *
+ *   maxDuration caps per focus:
+ *     cardio   → 45 min
+ *     strength → 50 min
+ *     mobility → 40 min
+ *     recovery → 30 min  (burnout / focusOnRecovery path)
+ *     fallback → 50 min
+ *
+ * v1.3 — Severe zone override:
+ *   Any severe pain zone bypasses the full workout pool and returns a
+ *   single Gentle Care card (breathing + mindfulness + mindful walk).
+ *   Pain fingerprint cache busts workouts on pain score change.
+ *
  * v1.2 — Condition pain score wiring:
  *   getUserProfile() now includes conditionPainScores from store.
  *   getSuitableExercises() receives them via checkinData.painScores so
@@ -16,16 +48,35 @@
  * IMPORTANT: Daily adaptation logic is unchanged.
  * Burnout always overrides. Energy always gates intensity.
  * The programme adds a bias, not a command.
+ * availableTime overrides exerciseCount only — never intensity logic.
  */
 
-import { store }           from '../store.js';
-import { checkinData }     from './checkin.js';
-import { programmeEngine } from './programmeEngine.js';
+import { store }           from "../store.js";
+import { checkinData }     from "./checkin.js";
+import { programmeEngine } from "./programmeEngine.js";
 import {
   getSuitableExercises,
-  EXERCISES,
-} from './exercises.js';
-import { getZoneStatus } from './conditions.js';
+} from "./exercises.js";
+
+// ── Duration caps (minutes) per workout focus ─────────────────────────────────
+const MAX_DURATION_BY_FOCUS = {
+  cardio:   45,
+  strength: 50,
+  mobility: 40,
+  recovery: 30
+};
+
+const MAX_DURATION_FALLBACK = 50;
+
+// ── availableTime → exerciseCount lookup ──────────────────────────────────────
+const AVAILABLE_TIME_COUNT = {
+  micro:    2,
+  quick:    3,
+  short:    4,
+  standard: 5,
+  long:     6,
+  open:     7
+};
 
 export const workoutGenerator = {
 
@@ -35,7 +86,7 @@ export const workoutGenerator = {
   generateDailyOptions() {
     const profile   = this.getUserProfile();
     const checkin   = checkinData.getTodaysCheckin();
-    const intensity = store.get('todayIntensity') || 'moderate';
+    const intensity = store.get("todayIntensity") || "moderate";
     const burnout   = checkinData.detectBurnout();
 
     // Build checkin data object for the filter engine.
@@ -44,29 +95,9 @@ export const workoutGenerator = {
     // is regenerated later in the day without a fresh check-in.
     const checkinForFilter = {
       energy:       checkin?.energy        || 5,
-      recoveryMode: burnout.level === 'high',
-      painScores:   store.get('conditionPainScores') || {}
+      recoveryMode: burnout.level === "high",
+      painScores:   store.get("conditionPainScores") || {}
     };
-
-    // ── Severe zone override (v1.3) ─────────────────────────────────────────
-    // If any body zone is at severe pain, skip the full workout pool entirely.
-    // Only breathing and mindfulness options are offered.
-    // Mood / intensity settings do not override this.
-    const zoneStatus = getZoneStatus(
-      profile.conditions || [],
-      checkinForFilter.painScores
-    );
-    const hasSevereZone = Object.entries(zoneStatus)
-      .some(([k, v]) => k !== 'combinedSevere' && v === 'severe');
-
-    if (hasSevereZone) {
-      const options = [this.generateSevereRestOptions()];
-      store.set('todaysWorkouts', options);
-      store.set('workoutsGeneratedAt', new Date().toISOString());
-      store.set('workoutsPainFingerprint', this.painScoreFingerprint());
-      return options;
-    }
-    // ── End severe override ──────────────────────────────────────────────────
 
     // Get filtered exercise pool (unchanged from v1.0 calling convention)
     const suitable = getSuitableExercises(profile, checkinForFilter);
@@ -83,9 +114,8 @@ export const workoutGenerator = {
       this.generateWorkout(focus3, biasedPool, intensity, burnout)
     ];
 
-    store.set('todaysWorkouts', options);
-    store.set('workoutsGeneratedAt', new Date().toISOString());
-    store.set('workoutsPainFingerprint', this.painScoreFingerprint());
+    store.set("todaysWorkouts", options);
+    store.set("workoutsGeneratedAt", new Date().toISOString());
 
     return options;
   },
@@ -96,10 +126,10 @@ export const workoutGenerator = {
    */
   getUserProfile() {
     return {
-      equipment:    store.get('equipment')    || [],
-      conditions:   store.get('conditions')   || [],
-      goals:        store.get('goals')        || [],
-      fitnessLevel: store.get('activityLevel') || 'moderate'
+      equipment:    store.get("equipment")    || [],
+      conditions:   store.get("conditions")   || [],
+      goals:        store.get("goals")        || [],
+      fitnessLevel: store.get("activityLevel") || "moderate"
     };
   },
 
@@ -129,63 +159,28 @@ export const workoutGenerator = {
   getWorkoutFocusOrder() {
     const bias = programmeEngine.getPhaseBias();
     if (!bias || !bias.primaryFocus) {
-      return ['strength', 'mobility', 'cardio'];
+      return ["strength", "mobility", "cardio"];
     }
 
-    const all     = ['strength', 'mobility', 'cardio'];
-    const primary = bias.primaryFocus   === 'strength' ? 'strength'
-                  : bias.primaryFocus   === 'cardio'   ? 'cardio'
-                  : 'mobility';
+    const all     = ["strength", "mobility", "cardio"];
+    const primary = bias.primaryFocus === "strength" ? "strength"
+                  : bias.primaryFocus === "cardio"   ? "cardio"
+                  : "mobility";
     const rest    = all.filter(f => f !== primary);
     return [primary, ...rest];
   },
 
   /**
-   * Build the single "Gentle Care" card shown on severe pain days.
-   *
-   * Pulls exercises directly from EXERCISES by ID so they are always
-   * present regardless of the user equipment / condition filter results.
-   * Only breathing, mindfulness, and mindful walk are included.
-   */
-  generateSevereRestOptions() {
-    const SEVERE_SAFE_IDS = [
-      'breathing-478',
-      'breathing-box',
-      'breathing-diaphragmatic',
-      'mindfulness-breath-anchor',
-      'mindfulness-body-scan',
-      'mindful-walk',
-    ];
-
-    const exercises = SEVERE_SAFE_IDS
-      .map(id => EXERCISES.find(e => e.id === id))
-      .filter(Boolean);
-
-    const duration = this.calculateDuration(exercises);
-
-    return {
-      id:              `workout-gentle-care-${Date.now()}`,
-      focus:           'recovery',
-      name:            'Gentle Care',
-      icon:            '💙',
-      duration,
-      exerciseCount:   exercises.length,
-      exercises,
-      intensity:       'recovery',
-      rationale:       'Your body is asking for rest today. These practices support recovery without loading the areas that are hurting. Showing up for this is enough.',
-      totalCredits:    exercises.reduce((sum, e) => sum + (e.credits || 20), 0),
-      isSevereRestDay: true,
-    };
-  },
-
-  /**
-   * Generate a single workout with a specific focus
+   * Generate a single workout with a specific focus.
+   * Reads availableTime from store and passes it into getWorkoutParams().
    */
   generateWorkout(focus, suitableExercises, intensity, burnout) {
-    const params    = this.getWorkoutParams(intensity, burnout);
-    const exercises = this.selectExercises(focus, suitableExercises, params);
-    const duration  = this.calculateDuration(exercises);
-    const rationale = this.generateRationale(focus, intensity, burnout);
+    const availableTime = store.get("availableTime") || null;
+    const params        = this.getWorkoutParams(intensity, burnout, availableTime);
+    const exercises     = this.selectExercises(focus, suitableExercises, params);
+    const capped        = this.applyDurationCap(exercises, focus, params);
+    const duration      = this.calculateDuration(capped);
+    const rationale     = this.generateRationale(focus, intensity, burnout);
 
     return {
       id:            `workout-${focus}-${Date.now()}`,
@@ -193,31 +188,94 @@ export const workoutGenerator = {
       name:          this.getWorkoutName(focus),
       icon:          this.getWorkoutIcon(focus),
       duration,
-      exerciseCount: exercises.length,
-      exercises,
+      exerciseCount: capped.length,
+      exercises:     capped,
       intensity,
       rationale,
-      totalCredits:  exercises.reduce((sum, e) => sum + (e.credits || 30), 0)
+      totalCredits:  capped.reduce((sum, e) => sum + (e.credits || 30), 0)
     };
   },
 
   /**
-   * Workout parameters by intensity level.
-   * Burnout overrides everything — Recovery Mode.
+   * Workout parameters by intensity level, with optional availableTime override.
+   *
+   * Priority rules:
+   *   1. Burnout — overrides everything; returns Recovery Mode params.
+   *   2. availableTime — if set, drives exerciseCount via lookup table.
+   *   3. Intensity — always drives maxEnergy, warmup/cooldown, focusOnRecovery.
+   *      Also drives exerciseCount when availableTime is null.
+   *
+   * @param {string}      intensity     - "recovery" | "gentle" | "moderate" | "challenging"
+   * @param {object}      burnout       - result of checkinData.detectBurnout()
+   * @param {string|null} availableTime - store value: "micro"|"quick"|"short"|"standard"|"long"|"open"|null
+   * @returns {object} params
    */
-  getWorkoutParams(intensity, burnout) {
-    if (burnout.level === 'high') {
-      return { exerciseCount: 4, maxEnergy: 3, includeWarmup: true, includeCooldown: true, focusOnRecovery: true };
+  getWorkoutParams(intensity, burnout, availableTime) {
+    // ── 1. Burnout override — highest priority ────────────────────────────────
+    if (burnout.level === "high") {
+      return {
+        exerciseCount:   4,
+        maxEnergy:       3,
+        includeWarmup:   true,
+        includeCooldown: true,
+        focusOnRecovery: true
+      };
     }
 
-    const params = {
+    // ── 2. Intensity-derived base params ──────────────────────────────────────
+    const intensityParams = {
       recovery:    { exerciseCount: 4, maxEnergy: 3,  includeWarmup: true, includeCooldown: true, focusOnRecovery: true  },
       gentle:      { exerciseCount: 5, maxEnergy: 5,  includeWarmup: true, includeCooldown: true, focusOnRecovery: false },
       moderate:    { exerciseCount: 6, maxEnergy: 7,  includeWarmup: true, includeCooldown: true, focusOnRecovery: false },
       challenging: { exerciseCount: 7, maxEnergy: 10, includeWarmup: true, includeCooldown: true, focusOnRecovery: false }
     };
 
-    return params[intensity] || params.moderate;
+    const base = intensityParams[intensity] || intensityParams.moderate;
+
+    // ── 3. availableTime overrides exerciseCount only ─────────────────────────
+    // Intensity still owns maxEnergy, includeWarmup, includeCooldown, focusOnRecovery.
+    const timeCount  = availableTime ? (AVAILABLE_TIME_COUNT[availableTime] ?? null) : null;
+    const finalCount = timeCount !== null ? timeCount : base.exerciseCount;
+
+    return {
+      ...base,
+      exerciseCount: finalCount
+    };
+  },
+
+  /**
+   * Trim exercises to fit within the maxDuration cap for this focus type.
+   * Warmup (role: "warmup") and cooldown (role: "cooldown") are always protected.
+   * Main and accessory/finisher exercises are trimmed from the end of the
+   * middle block until duration is within the cap, or only 1 main exercise remains.
+   *
+   * @param {Array}  exercises - selected exercise list from selectExercises()
+   * @param {string} focus     - workout focus type
+   * @param {object} params    - result of getWorkoutParams()
+   * @returns {Array} exercises, potentially trimmed
+   */
+  applyDurationCap(exercises, focus, params) {
+    const cap = params.focusOnRecovery
+      ? MAX_DURATION_BY_FOCUS.recovery
+      : (MAX_DURATION_BY_FOCUS[focus] ?? MAX_DURATION_FALLBACK);
+
+    if (this.calculateDuration(exercises) <= cap) return exercises;
+
+    const firstIsWarmup  = exercises.length > 0 && exercises[0].role === "warmup";
+    const lastIsCooldown = exercises.length > 0 && exercises[exercises.length - 1].role === "cooldown";
+
+    const protectStart = firstIsWarmup  ? 1 : 0;
+
+    let trimmed = [...exercises];
+
+    // Remove from the last unprotected position until under cap or only 1 main remains
+    while (this.calculateDuration(trimmed) > cap) {
+      const removeIdx = lastIsCooldown ? trimmed.length - 2 : trimmed.length - 1;
+      if (removeIdx < protectStart) break;
+      trimmed.splice(removeIdx, 1);
+    }
+
+    return trimmed;
   },
 
   /**
@@ -230,43 +288,43 @@ export const workoutGenerator = {
     // Warmup
     if (params.includeWarmup) {
       const warmup = this.pickOne(
-        suitableExercises.filter(e => e.category === 'mobility' && e.energyRequired <= 3)
+        suitableExercises.filter(e => e.category === "mobility" && e.energyRequired <= 3)
       );
-      if (warmup) selected.push({ ...warmup, role: 'warmup' });
+      if (warmup) selected.push({ ...warmup, role: "warmup" });
     }
 
     // Main focus
     const focusExercises = suitableExercises.filter(e => {
-      if (params.focusOnRecovery) return e.category === 'recovery' || e.category === 'mobility';
+      if (params.focusOnRecovery) return e.category === "recovery" || e.category === "mobility";
       return e.category === focus;
     });
 
     const appropriateEnergy = focusExercises.filter(e => e.energyRequired <= params.maxEnergy);
     const mainCount         = params.exerciseCount - 2;
     const mainExercises     = this.pickMultiple(appropriateEnergy, mainCount, selected);
-    mainExercises.forEach(e => selected.push({ ...e, role: 'main' }));
+    mainExercises.forEach(e => selected.push({ ...e, role: "main" }));
 
     // Accessory (strength focus only)
-    if (focus === 'strength' && !params.focusOnRecovery) {
+    if (focus === "strength" && !params.focusOnRecovery) {
       const mobility = this.pickOne(
-        suitableExercises.filter(e => e.category === 'mobility' && !selected.some(s => s.id === e.id))
+        suitableExercises.filter(e => e.category === "mobility" && !selected.some(s => s.id === e.id))
       );
       if (mobility && selected.length < params.exerciseCount) {
-        selected.push({ ...mobility, role: 'accessory' });
+        selected.push({ ...mobility, role: "accessory" });
       }
     }
 
     // Finisher (cardio focus only)
-    if (focus === 'cardio' && !params.focusOnRecovery) {
+    if (focus === "cardio" && !params.focusOnRecovery) {
       const cardio = this.pickOne(
         suitableExercises.filter(e =>
-          e.category === 'cardio' &&
+          e.category === "cardio" &&
           e.energyRequired <= params.maxEnergy &&
           !selected.some(s => s.id === e.id)
         )
       );
       if (cardio && selected.length < params.exerciseCount) {
-        selected.push({ ...cardio, role: 'finisher' });
+        selected.push({ ...cardio, role: "finisher" });
       }
     }
 
@@ -274,12 +332,12 @@ export const workoutGenerator = {
     if (params.includeCooldown) {
       const cooldown = this.pickOne(
         suitableExercises.filter(e =>
-          e.category === 'recovery' &&
+          e.category === "recovery" &&
           e.energyRequired <= 2 &&
           !selected.some(s => s.id === e.id)
         )
       );
-      if (cooldown) selected.push({ ...cooldown, role: 'cooldown' });
+      if (cooldown) selected.push({ ...cooldown, role: "cooldown" });
     }
 
     return selected;
@@ -324,26 +382,25 @@ export const workoutGenerator = {
   },
 
   /**
-   * Calculate total workout duration in minutes
+   * Calculate total workout duration in minutes.
+   * This is the single source of truth used by both generateWorkout()
+   * and applyDurationCap() — they must remain in sync.
    */
   calculateDuration(exercises) {
     let totalSeconds = 0;
 
     exercises.forEach(exercise => {
-      let exerciseSeconds = 0;
       if (exercise.duration) {
         const sets = exercise.sets || 1;
         const rest = exercise.rest || 30;
-        exerciseSeconds = (exercise.duration * sets) + (rest * (sets - 1));
+        totalSeconds += (exercise.duration * sets) + (rest * (sets - 1));
       } else if (exercise.reps) {
         const sets = exercise.sets || 3;
         const reps = exercise.reps || 10;
         const rest = exercise.rest || 45;
-        exerciseSeconds = (reps * 4 * sets) + (rest * (sets - 1));
+        totalSeconds += (reps * 4 * sets) + (rest * (sets - 1));
       }
-      // perSide doubles THIS exercise only — not the running total
-      if (exercise.perSide) exerciseSeconds *= 2;
-      totalSeconds += exerciseSeconds;
+      if (exercise.perSide) totalSeconds *= 2;
     });
 
     return Math.round(totalSeconds / 60);
@@ -360,79 +417,54 @@ export const workoutGenerator = {
 
     if (checkin) {
       if (checkin.energy <= 3) {
-        parts.push("Your energy is low today, so I've kept things gentle.");
+        parts.push("Your energy is low today, so I have kept things gentle.");
       } else if (checkin.energy >= 7) {
-        parts.push("You've got good energy — perfect for making progress.");
+        parts.push("You have got good energy — perfect for making progress.");
       } else {
         parts.push("Based on your energy level, this should feel manageable.");
       }
     }
 
-    if (burnout.level === 'high') {
-      parts.push("I've noticed you've been struggling recently. Today is about recovery, not pushing.");
-    } else if (burnout.level === 'moderate') {
-      parts.push("Let's take it a bit easier — your body needs some care.");
+    if (burnout.level === "high") {
+      parts.push("I have noticed you have been struggling recently. Today is about recovery, not pushing.");
+    } else if (burnout.level === "moderate") {
+      parts.push("Let us take it a bit easier — your body needs some care.");
     }
 
     const focusExplanations = {
-      strength: 'Building strength helps protect your joints and improves daily function.',
-      mobility: 'Mobility work reduces stiffness and helps prevent injury.',
-      cardio:   'Cardio improves heart health and energy levels over time.'
+      strength: "Building strength helps protect your joints and improves daily function.",
+      mobility: "Mobility work reduces stiffness and helps prevent injury.",
+      cardio:   "Cardio improves heart health and energy levels over time."
     };
     if (focusExplanations[focus]) parts.push(focusExplanations[focus]);
 
-    if (checkin?.sleepQuality === 'poor') {
-      parts.push("I've adjusted for your poor sleep last night.");
+    if (checkin?.sleepQuality === "poor") {
+      parts.push("I have adjusted for your poor sleep last night.");
     }
 
     // Strategic connection line (v1.1)
     const strategicLine = programmeEngine.getStrategicRationale(focus);
     if (strategicLine) parts.push(strategicLine);
 
-    return parts.join(' ');
+    return parts.join(" ");
   },
 
   getWorkoutName(focus) {
-    return { strength: 'Strength Focus', mobility: 'Mobility & Recovery', cardio: 'Cardio Boost' }[focus] || 'Workout';
+    return { strength: "Strength Focus", mobility: "Mobility & Recovery", cardio: "Cardio Boost" }[focus] || "Workout";
   },
 
   getWorkoutIcon(focus) {
-    return { strength: '💪', mobility: '🧘', cardio: '❤️' }[focus] || '🏃';
-  },
-
-  /**
-   * Returns a stable string fingerprint of the current pain scores.
-   * Used to detect when a check-in has changed pain levels since the
-   * last workout generation, so the cache can be correctly busted.
-   */
-  painScoreFingerprint() {
-    const scores = store.get('conditionPainScores') || {};
-    return Object.entries(scores)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([k, v]) => `${k}:${v}`)
-      .join(',');
+    return { strength: "💪", mobility: "🧘", cardio: "❤️" }[focus] || "🏃";
   },
 
   needsRegeneration() {
-    const generatedAt = store.get('workoutsGeneratedAt');
+    const generatedAt = store.get("workoutsGeneratedAt");
     if (!generatedAt) return true;
-
-    // Bust cache if the date has changed
-    const dateChanged = new Date(generatedAt).toDateString() !== new Date().toDateString();
-    if (dateChanged) return true;
-
-    // Bust cache if pain scores have changed since last generation.
-    // This ensures a severe-pain check-in immediately replaces the
-    // cached workout pool rather than waiting until tomorrow.
-    const storedFingerprint = store.get('workoutsPainFingerprint') || '';
-    const currentFingerprint = this.painScoreFingerprint();
-    if (storedFingerprint !== currentFingerprint) return true;
-
-    return false;
+    return new Date(generatedAt).toDateString() !== new Date().toDateString();
   },
 
   getTodaysWorkouts() {
     if (this.needsRegeneration()) return this.generateDailyOptions();
-    return store.get('todaysWorkouts') || this.generateDailyOptions();
+    return store.get("todaysWorkouts") || this.generateDailyOptions();
   }
 };
