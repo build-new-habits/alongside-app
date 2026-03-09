@@ -2,7 +2,24 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
- * v1.4 — availableTime wiring + duration cap:
+ * v1.5 — Per-exercise duration ceiling when availableTime is set:
+ *   selectExercises() now filters out any exercise whose individual
+ *   duration exceeds 40% of the declared available window before
+ *   selection happens. This prevents a single long exercise (e.g. a
+ *   30-minute pilates sequence) from consuming the entire window.
+ *
+ *   Ceiling values (40% of window, in seconds):
+ *     micro    (10 min) -> 240s  (4 min max per exercise)
+ *     quick    (20 min) -> 480s  (8 min max per exercise)
+ *     short    (30 min) -> 720s  (12 min max per exercise)
+ *     standard (40 min) -> 960s  (16 min max per exercise)
+ *     long     (50 min) -> 1200s (20 min max per exercise)
+ *     open     (60 min) -> 1440s (24 min max per exercise)
+ *     null              -> no per-exercise ceiling applied
+ *
+ *   applyDurationCap() remains as a post-selection safety net.
+ *
+ * v1.5 — Per-exercise duration ceiling when availableTime is set:
  *   getWorkoutParams() now accepts availableTime from the store.
  *   When set, availableTime drives exerciseCount via a lookup table;
  *   intensity still exclusively drives maxEnergy, warmup/cooldown
@@ -76,6 +93,20 @@ const AVAILABLE_TIME_COUNT = {
   standard: 5,
   long:     6,
   open:     7
+};
+
+// ── availableTime → per-exercise duration ceiling (seconds) ───────────────────
+// 40% of available window. Prevents a single long exercise (e.g. a 30-minute
+// pilates sequence) from consuming the entire declared time slot.
+// Applied as a pre-selection filter in selectExercises() when availableTime is set.
+// null means no ceiling — long exercises allowed when user has no time declared.
+const AVAILABLE_TIME_MAX_EXERCISE_DURATION = {
+  micro:    240,   // 4 min
+  quick:    480,   // 8 min
+  short:    720,   // 12 min
+  standard: 960,   // 16 min
+  long:     1200,  // 20 min
+  open:     1440   // 24 min
 };
 
 export const workoutGenerator = {
@@ -177,7 +208,7 @@ export const workoutGenerator = {
   generateWorkout(focus, suitableExercises, intensity, burnout) {
     const availableTime = store.get("availableTime") || null;
     const params        = this.getWorkoutParams(intensity, burnout, availableTime);
-    const exercises     = this.selectExercises(focus, suitableExercises, params);
+    const exercises     = this.selectExercises(focus, suitableExercises, params, availableTime);
     const capped        = this.applyDurationCap(exercises, focus, params);
     const duration      = this.calculateDuration(capped);
     const rationale     = this.generateRationale(focus, intensity, burnout);
@@ -281,20 +312,34 @@ export const workoutGenerator = {
   /**
    * Select exercises for a workout.
    * Uses programmeScore weighting when a programme is active.
+   *
+   * When availableTime is set, exercises whose individual duration exceeds
+   * 40% of the declared window are excluded before any selection happens.
+   * This prevents a single long exercise filling the entire slot.
+   * applyDurationCap() remains as a post-selection safety net for total duration.
    */
-  selectExercises(focus, suitableExercises, params) {
+  selectExercises(focus, suitableExercises, params, availableTime = null) {
+    // Pre-filter: remove exercises too long for the declared window
+    const maxExDuration = availableTime
+      ? (AVAILABLE_TIME_MAX_EXERCISE_DURATION[availableTime] ?? null)
+      : null;
+
+    const pool = maxExDuration
+      ? suitableExercises.filter(e => !e.duration || e.duration <= maxExDuration)
+      : suitableExercises;
+
     const selected = [];
 
     // Warmup
     if (params.includeWarmup) {
       const warmup = this.pickOne(
-        suitableExercises.filter(e => e.category === "mobility" && e.energyRequired <= 3)
+        pool.filter(e => e.category === "mobility" && e.energyRequired <= 3)
       );
       if (warmup) selected.push({ ...warmup, role: "warmup" });
     }
 
     // Main focus
-    const focusExercises = suitableExercises.filter(e => {
+    const focusExercises = pool.filter(e => {
       if (params.focusOnRecovery) return e.category === "recovery" || e.category === "mobility";
       return e.category === focus;
     });
@@ -307,7 +352,7 @@ export const workoutGenerator = {
     // Accessory (strength focus only)
     if (focus === "strength" && !params.focusOnRecovery) {
       const mobility = this.pickOne(
-        suitableExercises.filter(e => e.category === "mobility" && !selected.some(s => s.id === e.id))
+        pool.filter(e => e.category === "mobility" && !selected.some(s => s.id === e.id))
       );
       if (mobility && selected.length < params.exerciseCount) {
         selected.push({ ...mobility, role: "accessory" });
@@ -317,7 +362,7 @@ export const workoutGenerator = {
     // Finisher (cardio focus only)
     if (focus === "cardio" && !params.focusOnRecovery) {
       const cardio = this.pickOne(
-        suitableExercises.filter(e =>
+        pool.filter(e =>
           e.category === "cardio" &&
           e.energyRequired <= params.maxEnergy &&
           !selected.some(s => s.id === e.id)
@@ -331,7 +376,7 @@ export const workoutGenerator = {
     // Cooldown
     if (params.includeCooldown) {
       const cooldown = this.pickOne(
-        suitableExercises.filter(e =>
+        pool.filter(e =>
           e.category === "recovery" &&
           e.energyRequired <= 2 &&
           !selected.some(s => s.id === e.id)
