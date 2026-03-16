@@ -15,6 +15,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'hamstring', 'lower-back'],
     contraindications: ['hamstring-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -39,6 +40,7 @@ export const STRENGTH = [
     affectsAreas: ['core', 'lower-back', 'glutes'],
     contraindications: ['glutes-acute', 'lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -64,6 +66,7 @@ export const STRENGTH = [
     affectsAreas: ['core', 'abdominals'],
     contraindications: [],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -89,6 +92,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'hip-flexor'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -114,6 +118,7 @@ export const STRENGTH = [
     affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -139,6 +144,7 @@ export const STRENGTH = [
     affectsAreas: ['upper-back', 'shoulder', 'biceps-triceps'],
     contraindications: ['shoulder-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -164,6 +170,7 @@ export const STRENGTH = [
     affectsAreas: ['hamstring', 'glutes', 'lower-back'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -189,6 +196,7 @@ export const STRENGTH = [
     affectsAreas: ['core', 'abdominals', 'shoulder'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -214,6 +222,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'hip'],
     contraindications: ['hip-acute', 'glutes-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -239,6 +248,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'hamstring'],
     contraindications: ['knee-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -269,6 +279,7 @@ export const STRENGTH = [
     affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -293,6 +304,7 @@ export const STRENGTH = [
     affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -317,6 +329,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'hip-flexor'],
     contraindications: ['knee-acute', 'hip-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -342,6 +355,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'adductors'],
     contraindications: ['knee-acute', 'hip-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -366,6 +380,7 @@ export const STRENGTH = [
     affectsAreas: ['shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -390,6 +405,7 @@ export const STRENGTH = [
     affectsAreas: ['shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -414,6 +430,7 @@ export const STRENGTH = [
     affectsAreas: ['triceps-biceps'],
     contraindications: ['wrist-elbow-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -438,6 +455,7 @@ export const STRENGTH = [
     affectsAreas: ['triceps-biceps'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -462,6 +480,7 @@ export const STRENGTH = [
     affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -486,6 +505,7 @@ export const STRENGTH = [
     affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -511,6 +531,7 @@ export const STRENGTH = [
     affectsAreas: ['abdominals', 'lower-back', 'shoulder'],
     contraindications: ['lower-back-acute', 'shoulder-acute', 'wrist-elbow-acute', 'abdominals-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -536,6 +557,7 @@ export const STRENGTH = [
     affectsAreas: ['abdominals', 'lower-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -561,6 +583,7 @@ export const STRENGTH = [
     affectsAreas: ['abdominals', 'lower-back', 'shoulder', 'triceps-biceps'],
     contraindications: ['lower-back-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -585,6 +608,7 @@ export const STRENGTH = [
     affectsAreas: ['abdominals', 'lower-back', 'glutes'],
     contraindications: ['lower-back-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -609,6 +633,7 @@ export const STRENGTH = [
     affectsAreas: ['hamstring', 'glutes', 'lower-back'],
     contraindications: ['hamstring-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -641,6 +666,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'hamstring', 'lower-back', 'shoulder'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -666,6 +692,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'adductors'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -691,6 +718,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body', 'glutes', 'hamstring', 'shoulder'],
     contraindications: ['lower-back-acute', 'wrist-elbow-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -717,6 +745,7 @@ export const STRENGTH = [
     affectsAreas: ['shoulder', 'triceps-biceps', 'abdominals'],
     contraindications: ['shoulder-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -741,6 +770,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body', 'shoulder', 'abdominals', 'hip'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute', 'lower-back-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 180,
     perSide: true,
     instructions: [
@@ -768,6 +798,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'hamstring', 'lower-back'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -793,6 +824,7 @@ export const STRENGTH = [
     affectsAreas: ['upper-back', 'triceps-biceps', 'shoulder'],
     contraindications: ['shoulder-acute', 'lower-back-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -817,6 +849,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body', 'glutes', 'hamstring', 'shoulder'],
     contraindications: ['shoulder-acute', 'lower-back-acute', 'wrist-elbow-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -842,6 +875,7 @@ export const STRENGTH = [
     affectsAreas: ['shoulder', 'upper-back', 'thoracic'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -865,6 +899,7 @@ export const STRENGTH = [
     affectsAreas: ['shoulder', 'abdominals', 'hamstring', 'hip'],
     contraindications: ['shoulder-acute', 'lower-back-acute', 'hamstring-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -890,6 +925,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'adductors', 'abdominals'],
     contraindications: ['lower-back-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -914,6 +950,7 @@ export const STRENGTH = [
     affectsAreas: ['abdominals', 'glutes', 'shoulder'],
     contraindications: ['glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -943,6 +980,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'calves'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'lower-back-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -968,6 +1006,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'calves'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -994,6 +1033,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'hamstring', 'calves', 'quadriceps'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1019,6 +1059,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute', 'knee-acute', 'lower-back-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1045,6 +1086,7 @@ export const STRENGTH = [
     affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1069,6 +1111,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'calves'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1094,6 +1137,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'calves', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1119,6 +1163,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'adductors', 'calves'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1143,6 +1188,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'hip-flexor'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1168,6 +1214,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 300,
     perSide: false,
     instructions: [
@@ -1193,6 +1240,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body', 'abdominals', 'shoulder'],
     contraindications: ['lower-back-acute', 'shoulder-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1217,6 +1265,7 @@ export const STRENGTH = [
     affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1240,6 +1289,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'calves', 'quadriceps'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1265,6 +1315,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body', 'glutes', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 300,
     perSide: false,
     instructions: [
@@ -1290,6 +1341,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'ankle-foot'],
     contraindications: ['knee-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 300,
     perSide: false,
     instructions: [
@@ -1323,6 +1375,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'hamstring', 'lower-back', 'upper-back'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1352,6 +1405,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'lower-back', 'hamstring'],
     contraindications: ['knee-acute', 'lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1380,6 +1434,7 @@ export const STRENGTH = [
     affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1407,6 +1462,7 @@ export const STRENGTH = [
     affectsAreas: ['shoulder', 'triceps-biceps', 'upper-back', 'abdominals'],
     contraindications: ['shoulder-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1434,6 +1490,7 @@ export const STRENGTH = [
     affectsAreas: ['upper-back', 'triceps-biceps', 'shoulder', 'lower-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1460,6 +1517,7 @@ export const STRENGTH = [
     affectsAreas: ['hamstring', 'glutes', 'lower-back'],
     contraindications: ['hamstring-acute', 'lower-back-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1487,6 +1545,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'hamstring'],
     contraindications: ['hamstring-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1514,6 +1573,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'upper-back', 'abdominals'],
     contraindications: ['knee-acute', 'wrist-elbow-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1541,6 +1601,7 @@ export const STRENGTH = [
     affectsAreas: ['hamstring', 'lower-back', 'glutes'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1568,6 +1629,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body', 'glutes', 'hamstring', 'upper-back'],
     contraindications: ['lower-back-acute', 'wrist-elbow-acute', 'shoulder-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1599,6 +1661,7 @@ export const STRENGTH = [
     affectsAreas: ['upper-back', 'shoulder', 'chest-pecs'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1624,6 +1687,7 @@ export const STRENGTH = [
     affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1650,6 +1714,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'adductors'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1675,6 +1740,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'hamstring', 'lower-back'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1700,6 +1766,7 @@ export const STRENGTH = [
     affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1725,6 +1792,7 @@ export const STRENGTH = [
     affectsAreas: ['upper-back', 'triceps-biceps', 'shoulder'],
     contraindications: ['lower-back-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1751,6 +1819,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'hip', 'adductors'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1777,6 +1846,7 @@ export const STRENGTH = [
     affectsAreas: ['upper-back', 'shoulder', 'abdominals'],
     contraindications: ['shoulder-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1803,6 +1873,7 @@ export const STRENGTH = [
     affectsAreas: ['triceps-biceps'],
     contraindications: ['wrist-elbow-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1828,6 +1899,7 @@ export const STRENGTH = [
     affectsAreas: ['triceps-biceps'],
     contraindications: ['wrist-elbow-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1853,6 +1925,7 @@ export const STRENGTH = [
     affectsAreas: ['shoulder', 'triceps-biceps', 'abdominals'],
     contraindications: ['shoulder-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1878,6 +1951,7 @@ export const STRENGTH = [
     affectsAreas: ['abdominals', 'glutes', 'lower-back'],
     contraindications: ['glutes-acute', 'lower-back-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1912,6 +1986,7 @@ export const STRENGTH = [
     affectsAreas: ['hamstring', 'glutes', 'lower-back'],
     contraindications: ['hamstring-acute', 'lower-back-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1938,6 +2013,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'hamstring'],
     contraindications: ['knee-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1964,6 +2040,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'hamstring'],
     contraindications: ['knee-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1990,6 +2067,7 @@ export const STRENGTH = [
     affectsAreas: ['upper-back', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -2016,6 +2094,7 @@ export const STRENGTH = [
     affectsAreas: ['glutes', 'hamstring', 'lower-back'],
     contraindications: ['ankle-foot-acute', 'hamstring-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2041,6 +2120,7 @@ export const STRENGTH = [
     affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2067,6 +2147,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'adductors'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2092,6 +2173,7 @@ export const STRENGTH = [
     affectsAreas: ['chest-pecs', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2117,6 +2199,7 @@ export const STRENGTH = [
     affectsAreas: ['shoulder', 'abdominals', 'upper-back'],
     contraindications: ['shoulder-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2142,6 +2225,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body', 'abdominals', 'upper-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2167,6 +2251,7 @@ export const STRENGTH = [
     affectsAreas: ['triceps-biceps'],
     contraindications: ['wrist-elbow-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -2193,6 +2278,7 @@ export const STRENGTH = [
     affectsAreas: ['chest-pecs', 'upper-back', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2218,6 +2304,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2244,6 +2331,7 @@ export const STRENGTH = [
     affectsAreas: ['hamstring'],
     contraindications: ['hamstring-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2271,6 +2359,7 @@ export const STRENGTH = [
     contraindications: ['knee-acute'],
     caution: ['glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2297,6 +2386,7 @@ export const STRENGTH = [
     affectsAreas: ['abdominals', 'hip-flexor'],
     contraindications: ['lower-back-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
