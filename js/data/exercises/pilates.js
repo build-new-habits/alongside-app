@@ -24,6 +24,7 @@ export const PILATES = [
     affectsAreas: ['abdominals', 'lower-back'],
     contraindications: ['lower-back-acute', 'abdominals-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -50,6 +51,7 @@ export const PILATES = [
     affectsAreas: ['abdominals', 'hamstring', 'spine'],
     contraindications: ['lower-back-acute', 'abdominals-acute', 'hamstring-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -77,6 +79,7 @@ export const PILATES = [
     affectsAreas: ['abdominals', 'hip-flexor'],
     contraindications: ['lower-back-acute', 'abdominals-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -103,6 +106,7 @@ export const PILATES = [
     affectsAreas: ['abdominals', 'hip-flexor'],
     contraindications: ['lower-back-acute', 'abdominals-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -128,6 +132,7 @@ export const PILATES = [
     affectsAreas: ['abdominals', 'hamstring', 'hip-flexor'],
     contraindications: ['lower-back-acute', 'hamstring-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -154,6 +159,7 @@ export const PILATES = [
     affectsAreas: ['abdominals'],
     contraindications: ['lower-back-acute', 'abdominals-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -180,6 +186,7 @@ export const PILATES = [
     affectsAreas: ['lower-back', 'chest-pecs', 'upper-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -206,6 +213,7 @@ export const PILATES = [
     affectsAreas: ['lower-back', 'glutes', 'hamstring', 'upper-back'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -232,6 +240,7 @@ export const PILATES = [
     affectsAreas: ['glutes', 'hip', 'adductors'],
     contraindications: ['hip-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -258,6 +267,7 @@ export const PILATES = [
     contraindications: ['lower-back-acute'],
     caution: ['hamstring-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -284,6 +294,7 @@ export const PILATES = [
     affectsAreas: ['hip', 'hip-flexor', 'glutes'],
     contraindications: ['hip-acute', 'glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -310,6 +321,7 @@ export const PILATES = [
     affectsAreas: ['abdominals', 'hip-flexor'],
     contraindications: ['lower-back-acute', 'abdominals-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -338,6 +350,7 @@ export const PILATES = [
     affectsAreas: ['glutes', 'hamstring', 'spine', 'abdominals'],
     contraindications: ['hamstring-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -364,6 +377,7 @@ export const PILATES = [
     affectsAreas: ['lower-back', 'adductors', 'hip'],
     contraindications: ['hip-acute', 'lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -390,6 +404,7 @@ export const PILATES = [
     affectsAreas: ['spine', 'hamstring', 'lower-back'],
     contraindications: ['hamstring-acute', 'lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -420,6 +435,7 @@ export const PILATES = [
     affectsAreas: ['abdominals', 'lower-back', 'glutes', 'spine'],
     contraindications: ['lower-back-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -451,6 +467,7 @@ export const PILATES = [
     affectsAreas: ['abdominals', 'lower-back', 'hip-flexor'],
     contraindications: ['lower-back-acute', 'abdominals-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -487,6 +504,7 @@ export const PILATES = [
     affectsAreas: ['spine', 'hamstring'],
     contraindications: ['lower-back-acute', 'hamstring-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -513,6 +531,7 @@ export const PILATES = [
     affectsAreas: ['abdominals', 'hip', 'spine'],
     contraindications: ['lower-back-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -540,6 +559,7 @@ export const PILATES = [
     affectsAreas: ['spine', 'thoracic', 'abdominals'],
     contraindications: ['lower-back-acute', 'lower-back-subacute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -567,6 +587,7 @@ export const PILATES = [
     contraindications: ['shoulder-acute', 'wrist-elbow-acute', 'lower-back-acute'],
     caution: ['glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -593,6 +614,7 @@ export const PILATES = [
     affectsAreas: ['glutes', 'hip', 'abdominals'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 120,
     perSide: true,
     instructions: [
@@ -619,6 +641,7 @@ export const PILATES = [
     affectsAreas: ['full-body'],
     contraindications: ['lower-back-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -651,6 +674,7 @@ export const PILATES = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
