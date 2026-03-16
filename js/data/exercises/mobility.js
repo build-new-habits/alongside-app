@@ -15,6 +15,7 @@ export const MOBILITY = [
     affectsAreas: ['hip', 'hip-flexor', 'quadriceps'],
     contraindications: ['knee-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -39,6 +40,7 @@ export const MOBILITY = [
     contraindications: [],
     caution: ['lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -63,6 +65,7 @@ export const MOBILITY = [
     contraindications: ['knee-acute'],
     caution: ['hamstring-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -87,6 +90,7 @@ export const MOBILITY = [
     contraindications: ['hip-acute', 'knee-acute', 'glutes-acute'],
     caution: [],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -110,6 +114,7 @@ export const MOBILITY = [
     affectsAreas: ['thoracic', 'upper-back'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -139,6 +144,7 @@ export const MOBILITY = [
     affectsAreas: ['hip', 'hamstring', 'hip-flexor'],
     contraindications: ['hip-acute', 'hamstring-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -163,6 +169,7 @@ export const MOBILITY = [
     affectsAreas: ['hip', 'glutes', 'adductors'],
     contraindications: ['hip-acute', 'glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -187,6 +194,7 @@ export const MOBILITY = [
     affectsAreas: ['hamstring', 'hip-flexor', 'shoulder', 'lower-back'],
     contraindications: ['lower-back-acute', 'shoulder-acute', 'hamstring-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -213,6 +221,7 @@ export const MOBILITY = [
     affectsAreas: ['adductors', 'hip', 'quadriceps'],
     contraindications: ['knee-acute', 'hip-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -238,6 +247,7 @@ export const MOBILITY = [
     affectsAreas: ['hip'],
     contraindications: ['hip-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -264,6 +274,7 @@ export const MOBILITY = [
     affectsAreas: ['ankle-foot', 'calves'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -287,6 +298,7 @@ export const MOBILITY = [
     affectsAreas: ['hip', 'ankle-foot', 'lower-back'],
     contraindications: ['knee-acute', 'hip-acute', 'lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 120,
     perSide: false,
     instructions: [
@@ -311,6 +323,7 @@ export const MOBILITY = [
     affectsAreas: ['hip-flexor', 'quadriceps'],
     contraindications: ['knee-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 120,
     perSide: true,
     instructions: [
@@ -336,6 +349,7 @@ export const MOBILITY = [
     contraindications: ['knee-acute', 'hip-acute'],
     caution: ['glutes-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 120,
     perSide: true,
     instructions: [
@@ -361,6 +375,7 @@ export const MOBILITY = [
     affectsAreas: ['thoracic', 'upper-back', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -385,6 +400,7 @@ export const MOBILITY = [
     affectsAreas: ['quadriceps', 'hip-flexor', 'knee'],
     contraindications: ['knee-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -409,6 +425,7 @@ export const MOBILITY = [
     affectsAreas: ['upper-back', 'shoulder'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -434,6 +451,7 @@ export const MOBILITY = [
     affectsAreas: ['chest-pecs', 'shoulder', 'thoracic'],
     contraindications: ['shoulder-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -458,6 +476,7 @@ export const MOBILITY = [
     affectsAreas: ['adductors', 'hip'],
     contraindications: ['hip-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -482,6 +501,7 @@ export const MOBILITY = [
     affectsAreas: ['lower-back', 'upper-back', 'spine'],
     contraindications: ['lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -516,6 +536,7 @@ export const MOBILITY = [
     affectsAreas: ['hip-flexor', 'adductors', 'thoracic', 'shoulder'],
     contraindications: ['hip-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -545,6 +566,7 @@ export const MOBILITY = [
     contraindications: ['lower-back-acute'],
     caution: ['lower-back-subacute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -571,6 +593,7 @@ export const MOBILITY = [
     affectsAreas: ['thoracic', 'chest-pecs', 'upper-back'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -597,6 +620,7 @@ export const MOBILITY = [
     affectsAreas: ['ankle-foot'],
     contraindications: ['ankle-foot-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -623,6 +647,7 @@ export const MOBILITY = [
     affectsAreas: ['ankle-foot', 'calves'],
     contraindications: ['ankle-foot-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -649,6 +674,7 @@ export const MOBILITY = [
     affectsAreas: ['wrist-elbow'],
     contraindications: ['wrist-elbow-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -675,6 +701,7 @@ export const MOBILITY = [
     contraindications: ['knee-acute', 'hip-acute'],
     caution: ['glutes-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -700,6 +727,7 @@ export const MOBILITY = [
     affectsAreas: ['hip-flexor', 'quadriceps'],
     contraindications: ['knee-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 120,
     perSide: true,
     instructions: [
@@ -725,6 +753,7 @@ export const MOBILITY = [
     affectsAreas: ['shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -751,6 +780,7 @@ export const MOBILITY = [
     affectsAreas: ['spine', 'lower-back', 'thoracic'],
     contraindications: ['lower-back-acute', 'lower-back-subacute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -776,6 +806,7 @@ export const MOBILITY = [
     affectsAreas: ['adductors', 'hip'],
     contraindications: ['hip-acute', 'knee-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 120,
     perSide: false,
     instructions: [
@@ -801,6 +832,7 @@ export const MOBILITY = [
     affectsAreas: ['shoulder', 'chest-pecs', 'upper-back'],
     contraindications: ['shoulder-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -827,6 +859,7 @@ export const MOBILITY = [
     affectsAreas: ['upper-back', 'shoulder'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 120,
     perSide: false,
     instructions: [
@@ -855,6 +888,7 @@ export const MOBILITY = [
     affectsAreas: ['hip', 'lower-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -880,6 +914,7 @@ export const MOBILITY = [
     affectsAreas: ['thoracic', 'spine'],
     contraindications: ['lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -907,6 +942,7 @@ export const MOBILITY = [
     contraindications: ['knee-acute', 'hip-acute'],
     caution: ['glutes-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -932,6 +968,7 @@ export const MOBILITY = [
     affectsAreas: ['full-body', 'spine'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -960,6 +997,7 @@ export const MOBILITY = [
     affectsAreas: ['hip-flexor', 'quadriceps', 'lower-back'],
     contraindications: ['knee-acute', 'lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 600,
     perSide: true,
     instructions: [
