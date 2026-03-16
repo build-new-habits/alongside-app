@@ -22,6 +22,7 @@ export const RECOVERY = [
     contraindications: ['knee-acute'],
     caution: ['lower-back-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -47,6 +48,7 @@ export const RECOVERY = [
     contraindications: ['lower-back-acute'],
     caution: ['lower-back-subacute', 'glutes-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -71,6 +73,7 @@ export const RECOVERY = [
     affectsAreas: ['upper-back', 'thoracic'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 120,
     perSide: false,
     instructions: [
@@ -95,6 +98,7 @@ export const RECOVERY = [
     affectsAreas: ['quadriceps'],
     contraindications: ['knee-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 120,
     perSide: true,
     instructions: [
@@ -120,6 +124,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -146,6 +151,7 @@ export const RECOVERY = [
     contraindications: [],
     caution: ['hamstring-acute', 'lower-back-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -176,6 +182,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -203,6 +210,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 240,
     perSide: false,
     instructions: [
@@ -230,6 +238,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 120,
     perSide: false,
     instructions: [
@@ -256,6 +265,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -282,6 +292,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -308,6 +319,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -336,6 +348,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 180,
     perSide: false,
     instructions: [
@@ -362,6 +375,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -388,6 +402,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -415,6 +430,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 120,
     perSide: false,
     instructions: [
@@ -443,6 +459,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -469,6 +486,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -502,6 +520,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 180,
     perSide: false,
     instructions: [
@@ -528,6 +547,7 @@ export const RECOVERY = [
     affectsAreas: ['full-body'],
     contraindications: ['cardiovascular-condition'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -554,6 +574,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -579,6 +600,7 @@ export const RECOVERY = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -605,6 +627,7 @@ export const RECOVERY = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -631,6 +654,7 @@ export const RECOVERY = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -657,6 +681,7 @@ export const RECOVERY = [
     affectsAreas: ['calves', 'ankle-foot'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -683,6 +708,7 @@ export const RECOVERY = [
     contraindications: ['ankle-foot-acute', 'knee-acute'],
     caution: ['lower-back-acute', 'hamstring-acute', 'glutes-acute', 'hip-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 900,
     perSide: false,
     instructions: [
@@ -712,6 +738,7 @@ export const RECOVERY = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -737,6 +764,7 @@ export const RECOVERY = [
     affectsAreas: ['spine', 'shoulder', 'hip'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -762,6 +790,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -789,6 +818,7 @@ export const RECOVERY = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -816,6 +846,7 @@ export const RECOVERY = [
     affectsAreas: ['full-body', 'cardiovascular'],
     contraindications: ['cardiovascular-condition'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 1200,
     perSide: false,
     instructions: [
