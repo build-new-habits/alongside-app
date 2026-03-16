@@ -7,6 +7,26 @@
  * No changes needed elsewhere in the app when new category files are added —
  * just import the new array here and spread it into EXERCISES.
  *
+ * v1.3 — fitnessLevel structural ceiling (Gap 4)
+ *   filterByFitnessLevel() applies an energyRequired ceiling based on the
+ *   user's self-reported activityLevel from onboarding.
+ *   This is a structural cap — who the person IS, not how they feel today.
+ *   The daily energy gate (filterByEnergy) still applies on top.
+ *   The lower of the two ceilings always wins.
+ *
+ *   Mapping:
+ *     sedentary   → energyRequired ≤ 5
+ *     light       → energyRequired ≤ 7
+ *     moderate    → energyRequired ≤ 8  (default)
+ *     active      → energyRequired ≤ 10 (full pool)
+ *     very-active → energyRequired ≤ 10 (full pool, bias toward ≥ 5 handled in generator)
+ *
+ * v1.3 — exerciseFeedback weighting (Gap 2)
+ *   applyFeedbackWeighting() reads exerciseFeedback from store and applies
+ *   programmeScore penalties/bonuses before workout generator selection.
+ *   Exercises with 2+ recent "too-hard" entries get score 0.5 (deprioritised).
+ *   Exercises with 2+ recent "too-easy" entries get score 1.5 (upweighted).
+ *
  * v1.2 — 3-tier condition safety system
  *   filterByConditions() now takes activeConditionIds (from conditions.js
  *   getActiveConditionIds()) rather than raw condition IDs.
@@ -46,6 +66,7 @@ import { SWIMMING_CYCLING }   from './swimming_cycling.js';
 import { SPORT_CONDITIONING } from './sport_conditioning.js';
 
 import { getActiveConditionIds } from '../conditions.js';
+import { store }                  from '../store.js';
 
 export const EXERCISES = [
   ...MOBILITY,
@@ -139,6 +160,82 @@ export function filterToRecoveryPool(exercises) {
 }
 
 /**
+ * Apply structural energyRequired ceiling based on the user's fitness level.
+ * This represents who the person IS at baseline — separate from how they feel today.
+ *
+ * The daily energy gate (filterByEnergy) applies on top of this.
+ * The lower of the two ceilings always wins.
+ *
+ * @param {Object[]} exercises  — exercise pool
+ * @param {string}   fitnessLevel — activityLevel from onboarding
+ * @returns {Object[]} filtered pool
+ */
+export function filterByFitnessLevel(exercises, fitnessLevel) {
+  const ceilings = {
+    "sedentary":   5,
+    "light":       7,
+    "moderate":    8,
+    "active":      10,
+    "very-active": 10
+  };
+
+  const ceiling = ceilings[fitnessLevel] ?? ceilings["moderate"];
+
+  // Full pool — no ceiling to apply
+  if (ceiling >= 10) return exercises;
+
+  return exercises.filter(ex => ex.energyRequired <= ceiling);
+}
+
+/**
+ * Apply feedback-based weighting to exercise pool.
+ * Reads exerciseFeedback from store and adjusts programmeScore on exercises
+ * that have received consistent too-hard or too-easy feedback recently.
+ *
+ * Looks at the last 5 feedback entries per exercise:
+ *   2+ "too-hard" entries → programmeScore 0.5 (deprioritised in pickMultiple)
+ *   2+ "too-easy" entries → programmeScore 1.5 (upweighted)
+ *   No consistent signal  → programmeScore unchanged (or 1 if unset)
+ *
+ * @param {Object[]} exercises — exercise pool (may already have programmeScore from phase bias)
+ * @returns {Object[]} exercises with feedback-adjusted programmeScore
+ */
+export function applyFeedbackWeighting(exercises) {
+  const allFeedback = store.get("exerciseFeedback") || [];
+  if (allFeedback.length === 0) return exercises;
+
+  // Build a map of exerciseId → last 5 feedback entries
+  const feedbackMap = {};
+  allFeedback.forEach(entry => {
+    if (!feedbackMap[entry.exerciseId]) feedbackMap[entry.exerciseId] = [];
+    feedbackMap[entry.exerciseId].push(entry);
+  });
+
+  // Keep only the 5 most recent entries per exercise
+  Object.keys(feedbackMap).forEach(id => {
+    feedbackMap[id] = feedbackMap[id].slice(-5);
+  });
+
+  return exercises.map(ex => {
+    const entries = feedbackMap[ex.id];
+    if (!entries || entries.length === 0) return ex;
+
+    const tooHardCount = entries.filter(e => e.feedback === "too-hard").length;
+    const tooEasyCount = entries.filter(e => e.feedback === "too-easy").length;
+
+    let feedbackScore = ex.programmeScore || 1;
+
+    if (tooHardCount >= 2) {
+      feedbackScore = Math.min(feedbackScore, 0.5);
+    } else if (tooEasyCount >= 2) {
+      feedbackScore = Math.max(feedbackScore, 1.5);
+    }
+
+    return { ...ex, programmeScore: feedbackScore };
+  });
+}
+
+/**
  * Get suitable exercises based on all user factors.
  * Primary entry point used by workoutGenerator.js.
  *
@@ -170,15 +267,25 @@ export function getSuitableExercises(userProfile, checkinData) {
   // The workout generator can deprioritise or modify them as needed
   pool = [...safe, ...caution];
 
-  // 3. Energy filter
+  // 3. Fitness level structural ceiling — who the person IS at baseline
+  //    Applied before the daily energy gate so both ceilings compound correctly
+  if (userProfile.fitnessLevel) {
+    pool = filterByFitnessLevel(pool, userProfile.fitnessLevel);
+  }
+
+  // 4. Energy filter — how they feel TODAY (lower ceiling wins)
   if (checkinData?.energy) {
     pool = filterByEnergy(pool, checkinData.energy);
   }
 
-  // 4. Recovery Mode override — burnout detection
+  // 5. Recovery Mode override — burnout detection
   if (checkinData?.recoveryMode) {
     pool = filterToRecoveryPool(pool);
   }
+
+  // 6. Apply feedback-based weighting (too-hard / too-easy history)
+  //    Adjusts programmeScore so pickMultiple() deprioritises / upweights accordingly
+  pool = applyFeedbackWeighting(pool);
 
   return pool;
 }
