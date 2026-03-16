@@ -15,6 +15,7 @@ export const CARDIO = [
     affectsAreas: ['full-body'],
     contraindications: ['knee-acute', 'ankle-foot-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -39,6 +40,7 @@ export const CARDIO = [
     affectsAreas: ['hip-flexor', 'quadriceps', 'core'],
     contraindications: ['knee-acute', 'hip-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -63,6 +65,7 @@ export const CARDIO = [
     affectsAreas: ['core', 'shoulder', 'hip-flexor'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 60,
     perSide: false,
     instructions: [
@@ -87,6 +90,7 @@ export const CARDIO = [
     affectsAreas: ['full-body'],
     contraindications: ['knee-acute', 'shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -113,6 +117,7 @@ export const CARDIO = [
     affectsAreas: ['quadriceps', 'glutes', 'calves'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 60,
     perSide: false,
     instructions: [
@@ -137,6 +142,7 @@ export const CARDIO = [
     affectsAreas: ['calves', 'full-body'],
     contraindications: ['knee-acute', 'ankle-foot-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 300,
     perSide: false,
     instructions: [
@@ -166,6 +172,7 @@ export const CARDIO = [
     affectsAreas: ['hip-flexor', 'quadriceps'],
     contraindications: ['hamstring-acute', 'lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -190,6 +197,7 @@ export const CARDIO = [
     affectsAreas: ['hip', 'quadriceps', 'calves'],
     contraindications: [],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -214,6 +222,7 @@ export const CARDIO = [
     affectsAreas: ['quadriceps', 'glutes', 'calves'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 600,
     perSide: false,
     instructions: [
@@ -238,6 +247,7 @@ export const CARDIO = [
     affectsAreas: ['full-body', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 180,
     perSide: false,
     instructions: [
@@ -262,6 +272,7 @@ export const CARDIO = [
     affectsAreas: ['quadriceps', 'glutes', 'calves'],
     contraindications: ['glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -287,6 +298,7 @@ export const CARDIO = [
     contraindications: [],
     caution: ['hamstring-acute', 'lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -311,6 +323,7 @@ export const CARDIO = [
     affectsAreas: ['full-body'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 600,
     perSide: false,
     instructions: [
@@ -335,6 +348,7 @@ export const CARDIO = [
     affectsAreas: ['full-body'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'lower-back-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 900,
     perSide: false,
     instructions: [
@@ -360,6 +374,7 @@ export const CARDIO = [
     affectsAreas: ['full-body', 'upper-back', 'lower-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -384,6 +399,7 @@ export const CARDIO = [
     affectsAreas: ['full-body'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'hamstring-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -414,6 +430,7 @@ export const CARDIO = [
     affectsAreas: ['full-body', 'upper-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -440,6 +457,7 @@ export const CARDIO = [
     affectsAreas: ['full-body'],
     contraindications: ['lower-back-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -466,6 +484,7 @@ export const CARDIO = [
     affectsAreas: ['full-body'],
     contraindications: ['shoulder-acute'],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -492,6 +511,7 @@ export const CARDIO = [
     affectsAreas: ['glutes', 'quadriceps', 'calves'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -517,6 +537,7 @@ export const CARDIO = [
     affectsAreas: ['calves', 'ankle-foot', 'full-body'],
     contraindications: ['ankle-foot-acute', 'knee-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 900,
     perSide: false,
     instructions: [
@@ -542,6 +563,7 @@ export const CARDIO = [
     affectsAreas: ['full-body', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 900,
     perSide: false,
     instructions: [
@@ -568,6 +590,7 @@ export const CARDIO = [
     affectsAreas: ['full-body'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -593,6 +616,7 @@ export const CARDIO = [
     affectsAreas: ['full-body'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -621,6 +645,7 @@ export const CARDIO = [
     affectsAreas: ['full-body', 'upper-back', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -646,6 +671,7 @@ export const CARDIO = [
     affectsAreas: ['full-body'],
     contraindications: ['knee-acute', 'ankle-foot-acute'],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 1200,
     perSide: false,
     instructions: [
