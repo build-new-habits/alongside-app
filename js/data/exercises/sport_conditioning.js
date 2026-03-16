@@ -26,6 +26,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['glutes', 'adductors', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -53,6 +54,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'glutes', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 300,
     perSide: false,
     instructions: [
@@ -82,6 +84,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'glutes'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 300,
     perSide: false,
     instructions: [
@@ -110,6 +113,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 300,
     perSide: false,
     instructions: [
@@ -136,6 +140,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['glutes', 'adductors', 'quadriceps'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 120,
     perSide: false,
     instructions: [
@@ -163,6 +168,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'ankle-foot', 'calves'],
     contraindications: ['ankle-foot-acute', 'knee-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 180,
     perSide: false,
     instructions: [
@@ -190,6 +196,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'ankle-foot'],
     contraindications: ['ankle-foot-acute', 'hamstring-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 180,
     perSide: false,
     instructions: [
@@ -217,6 +224,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'glutes'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 300,
     perSide: false,
     instructions: [
@@ -249,6 +257,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'glutes', 'calves'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 300,
     perSide: false,
     instructions: [
@@ -277,6 +286,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['hip-flexor', 'glutes', 'calves'],
     contraindications: ['glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 120,
     perSide: false,
     instructions: [
@@ -303,6 +313,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'glutes'],
     contraindications: ['hamstring-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 120,
     perSide: false,
     instructions: [
@@ -330,6 +341,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'glutes', 'hamstring'],
     contraindications: ['hamstring-acute', 'lower-back-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 300,
     perSide: false,
     instructions: [
@@ -357,6 +369,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 180,
     perSide: false,
     instructions: [
@@ -384,6 +397,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'glutes', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 300,
     perSide: false,
     instructions: [
@@ -410,6 +424,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'ankle-foot'],
     contraindications: ['hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 300,
     perSide: false,
     instructions: [
@@ -436,6 +451,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'glutes'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 300,
     perSide: false,
     instructions: [
@@ -467,6 +483,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 900,
     perSide: false,
     instructions: [
@@ -498,6 +515,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['glutes', 'hip', 'quadriceps', 'hamstring'],
     contraindications: ['hamstring-acute', 'glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -527,6 +545,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['shoulder', 'upper-back', 'rotator-cuff'],
     contraindications: [],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -556,6 +575,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 900,
     perSide: false,
     instructions: [
@@ -586,6 +606,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['hamstring', 'calves', 'hip-flexor', 'lower-back'],
     contraindications: ['hamstring-acute', 'lower-back-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -615,6 +636,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'hamstring-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 2400,
     perSide: false,
     instructions: [
@@ -648,6 +670,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 300,
     perSide: false,
     instructions: [
@@ -675,6 +698,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['glutes', 'ankle-foot', 'quadriceps'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 300,
     perSide: true,
     instructions: [
@@ -702,6 +726,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 180,
     perSide: false,
     instructions: [
@@ -728,6 +753,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['glutes', 'hamstring', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 180,
     perSide: false,
     instructions: [
@@ -754,6 +780,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['ankle-foot', 'calves', 'quadriceps'],
     contraindications: ['ankle-foot-acute', 'knee-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 180,
     perSide: false,
     instructions: [
@@ -780,6 +807,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'knee-acute', 'ankle-foot-acute'],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 300,
     perSide: false,
     instructions: [
@@ -806,6 +834,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 300,
     perSide: false,
     instructions: [
@@ -833,6 +862,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['glutes', 'adductors', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 600,
     perSide: false,
     instructions: [
@@ -867,6 +897,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['knee-acute', 'shoulder-acute', 'hamstring-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -896,6 +927,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -924,6 +956,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['knee-acute', 'ankle-foot-acute'],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 900,
     perSide: false,
     instructions: [
@@ -952,6 +985,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['knee-acute', 'shoulder-acute'],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -980,6 +1014,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute'],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -1007,6 +1042,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'knee-acute'],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -1034,6 +1070,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'knee-acute'],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -1061,6 +1098,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body', 'ankle-foot'],
     contraindications: ['ankle-foot-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 900,
     perSide: false,
     instructions: [
@@ -1088,6 +1126,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['knee-acute', 'ankle-foot-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -1114,6 +1153,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 2400,
     perSide: false,
     instructions: [
@@ -1141,6 +1181,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -1173,6 +1214,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['hip', 'adductors', 'ankle-foot'],
     contraindications: ['ankle-foot-acute', 'knee-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 180,
     perSide: false,
     instructions: [
@@ -1201,6 +1243,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['glutes', 'hamstring', 'ankle-foot'],
     contraindications: ['achilles-acute', 'knee-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 180,
     perSide: false,
     instructions: [
@@ -1228,6 +1271,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['shoulder-acute', 'lower-back-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -1256,6 +1300,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -1285,6 +1330,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['lower-back-acute', 'shoulder-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -1314,6 +1360,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['ankle-foot', 'calves', 'hip'],
     contraindications: ['ankle-foot-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 600,
     perSide: false,
     instructions: [
@@ -1342,6 +1389,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['heart-condition'],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 2400,
     perSide: false,
     instructions: [
@@ -1368,6 +1416,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['glutes', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 180,
     perSide: true,
     instructions: [
@@ -1395,6 +1444,7 @@ export const SPORT_CONDITIONING = [
     affectsAreas: ['full-body'],
     contraindications: ['knee-acute', 'ankle-foot-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 1800,
     perSide: false,
     instructions: [
