@@ -24,6 +24,7 @@ export const YOGA = [
     affectsAreas: ['hamstring', 'calves', 'shoulder', 'upper-back'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute', 'hamstring-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -49,6 +50,7 @@ export const YOGA = [
     affectsAreas: ['hip-flexor', 'quadriceps', 'shoulder'],
     contraindications: ['knee-acute', 'hip-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -75,6 +77,7 @@ export const YOGA = [
     affectsAreas: ['adductors', 'glutes', 'hip', 'shoulder'],
     contraindications: ['knee-acute', 'hip-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -101,6 +104,7 @@ export const YOGA = [
     affectsAreas: ['hamstring', 'adductors', 'spine', 'shoulder'],
     contraindications: ['lower-back-acute', 'hamstring-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -127,6 +131,7 @@ export const YOGA = [
     affectsAreas: ['quadriceps', 'glutes', 'lower-back'],
     contraindications: ['knee-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -152,6 +157,7 @@ export const YOGA = [
     affectsAreas: ['hip', 'ankle-foot', 'glutes'],
     contraindications: ['ankle-foot-acute', 'glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -176,6 +182,7 @@ export const YOGA = [
     affectsAreas: ['lower-back', 'chest-pecs', 'shoulder'],
     contraindications: ['lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -201,6 +208,7 @@ export const YOGA = [
     affectsAreas: ['hamstring', 'lower-back', 'calves'],
     contraindications: ['lower-back-acute', 'hamstring-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -249,6 +257,7 @@ export const YOGA = [
     affectsAreas: ['glutes', 'hamstring', 'adductors', 'shoulder'],
     contraindications: ['ankle-foot-acute', 'hip-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -275,6 +284,7 @@ export const YOGA = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -301,6 +311,7 @@ export const YOGA = [
     affectsAreas: ['glutes', 'hamstring', 'lower-back', 'shoulder'],
     contraindications: ['lower-back-acute', 'ankle-foot-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -326,6 +337,7 @@ export const YOGA = [
     affectsAreas: ['abdominals', 'hip-flexor'],
     contraindications: ['lower-back-acute', 'abdominals-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -351,6 +363,7 @@ export const YOGA = [
     affectsAreas: ['glutes', 'hamstring', 'chest-pecs', 'lower-back'],
     contraindications: ['hamstring-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -378,6 +391,7 @@ export const YOGA = [
     contraindications: ['knee-acute', 'hip-acute'],
     caution: ['glutes-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 120,
     perSide: true,
     instructions: [
@@ -405,6 +419,7 @@ export const YOGA = [
     contraindications: [],
     caution: ['glutes-acute', 'lower-back-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -431,6 +446,7 @@ export const YOGA = [
     contraindications: [],
     caution: ['hamstring-acute', 'lower-back-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -458,6 +474,7 @@ export const YOGA = [
     contraindications: [],
     caution: ['lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 120,
     perSide: false,
     instructions: [
@@ -488,6 +505,7 @@ export const YOGA = [
     affectsAreas: ['full-body', 'spine', 'hip'],
     contraindications: [],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 900,
     perSide: false,
     instructions: [
@@ -519,6 +537,7 @@ export const YOGA = [
     affectsAreas: ['full-body', 'nervous-system', 'hip'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 900,
     perSide: false,
     instructions: [
@@ -556,6 +575,7 @@ export const YOGA = [
     affectsAreas: ['full-body', 'hip-flexor', 'hamstring'],
     contraindications: ['knee-acute', 'lower-back-acute', 'hamstring-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 180,
     perSide: false,
     instructions: [
@@ -586,6 +606,7 @@ export const YOGA = [
     affectsAreas: ['hip', 'glutes', 'adductors'],
     contraindications: ['hip-acute', 'glutes-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -615,6 +636,7 @@ export const YOGA = [
     affectsAreas: ['nervous-system', 'full-body'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -640,6 +662,7 @@ export const YOGA = [
     affectsAreas: ['ankle-foot', 'glutes', 'abdominals'],
     contraindications: ['ankle-foot-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 900,
     perSide: false,
     instructions: [
@@ -669,6 +692,7 @@ export const YOGA = [
     affectsAreas: ['hamstring', 'lower-back', 'calves'],
     contraindications: ['hamstring-acute', 'lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -696,6 +720,7 @@ export const YOGA = [
     affectsAreas: ['chest-pecs', 'hip-flexor', 'thoracic'],
     contraindications: ['lower-back-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 600,
     perSide: false,
     instructions: [
@@ -724,6 +749,7 @@ export const YOGA = [
     affectsAreas: ['full-body'],
     contraindications: ['shoulder-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -751,6 +777,7 @@ export const YOGA = [
     affectsAreas: ['nervous-system'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 900,
     perSide: false,
     instructions: [
@@ -776,6 +803,7 @@ export const YOGA = [
     affectsAreas: ['full-body', 'spine'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -803,6 +831,7 @@ export const YOGA = [
     affectsAreas: ['glutes', 'hip', 'adductors'],
     contraindications: ['hip-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 900,
     perSide: false,
     instructions: [
