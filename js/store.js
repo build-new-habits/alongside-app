@@ -2,6 +2,13 @@
  * store.js - Data persistence layer
  * Handles localStorage with simple get/set API
  *
+ * v1.3 — Schema additions:
+ *   exerciseFeedback     — per-exercise difficulty feedback from workout view
+ *                          [{ exerciseId, feedback, date, reason }]
+ *                          "too-hard" entries deprioritise the exercise in future
+ *                          workouts; "too-easy" entries upweight it.
+ *                          Read by applyFeedbackWeighting() in exercises/index.js.
+ *
  * v1.2 — Schema additions:
  *   prescribedExercises  — externally prescribed exercises from physio/coach
  *                          Empty array in v1.2; UI built in Phase 3/4.
@@ -57,6 +64,7 @@ export const store = {
       activeProgramme:      { ...defaults.activeProgramme,      ...(saved.activeProgramme      || {}) },
       progressLog:          Array.isArray(saved.progressLog)    ? saved.progressLog    : [],
       prescribedExercises:  Array.isArray(saved.prescribedExercises) ? saved.prescribedExercises : [],
+      exerciseFeedback:     Array.isArray(saved.exerciseFeedback)    ? saved.exerciseFeedback    : [],
       conditionPainScores:  (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
                               ? saved.conditionPainScores
                               : {},
@@ -127,6 +135,21 @@ export const store = {
       // UI for entering prescribed exercises: Phase 3/4.
       // Array is empty and safe to leave empty until then.
       prescribedExercises: [],
+
+      // ── EXERCISE FEEDBACK ─────────────────────────────────────────
+      // Per-exercise difficulty feedback written from the workout view.
+      // Written on "too hard" / "too easy" button tap during a session.
+      // Read by applyFeedbackWeighting() in exercises/index.js to adjust
+      // programmeScore before workout generation.
+      //
+      // Schema (per item):
+      //   exerciseId:  string  — exercise id from the database
+      //   feedback:    string  — "too-hard" | "too-easy"
+      //   date:        string  — ISO date string of the session
+      //   reason:      string  — optional user comment (future use, "" for now)
+      //
+      // Max 200 entries kept (trimmed in store.addExerciseFeedback).
+      exerciseFeedback: [],
 
       // ── STRATEGIC GOAL ───────────────────────────────────────
       // Richer than goals[] — drives programme selection and rationale.
@@ -222,7 +245,31 @@ export const store = {
   },
 
   /**
-   * Update pain scores from today's check-in.
+   * Record difficulty feedback for an exercise.
+   * Called from workout.js when user taps "too hard" or "too easy".
+   *
+   * Keeps a maximum of 200 entries (oldest trimmed first).
+   * applyFeedbackWeighting() in exercises/index.js reads this to adjust
+   * programmeScore for future workout generation.
+   *
+   * @param {string} exerciseId — exercise id from the database
+   * @param {string} feedback   — "too-hard" | "too-easy"
+   */
+  addExerciseFeedback(exerciseId, feedback) {
+    const current = [...(this.data.exerciseFeedback || [])];
+    current.push({
+      exerciseId,
+      feedback,
+      date:   new Date().toISOString(),
+      reason: ""
+    });
+    if (current.length > 200) current.splice(0, current.length - 200);
+    this.data.exerciseFeedback = current;
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+  },
+
+  /**
    * Called by checkin.js when condition pain sliders are submitted.
    *
    * @param {Object} painScores — { [conditionId]: 0-10 }
