@@ -25,6 +25,7 @@ export const RUNNING = [
     affectsAreas: ['full-body', 'calves', 'quadriceps'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -51,6 +52,7 @@ export const RUNNING = [
     affectsAreas: ['full-body', 'calves', 'quadriceps'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -77,6 +79,7 @@ export const RUNNING = [
     affectsAreas: ['full-body', 'calves', 'quadriceps'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -102,6 +105,7 @@ export const RUNNING = [
     affectsAreas: ['full-body', 'calves', 'quadriceps'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 2100,
     perSide: false,
     instructions: [
@@ -128,6 +132,7 @@ export const RUNNING = [
     affectsAreas: ['full-body', 'calves', 'quadriceps'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 2100,
     perSide: false,
     instructions: [
@@ -153,6 +158,7 @@ export const RUNNING = [
     affectsAreas: ['full-body', 'calves', 'quadriceps'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -177,6 +183,7 @@ export const RUNNING = [
     affectsAreas: ['full-body', 'calves', 'quadriceps'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 2100,
     perSide: false,
     instructions: [
@@ -201,6 +208,7 @@ export const RUNNING = [
     affectsAreas: ['full-body', 'calves', 'quadriceps'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 2100,
     perSide: false,
     instructions: [
@@ -224,6 +232,7 @@ export const RUNNING = [
     affectsAreas: ['full-body', 'calves', 'quadriceps'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 2280,
     perSide: false,
     instructions: [
@@ -247,6 +256,7 @@ export const RUNNING = [
     affectsAreas: ['full-body', 'calves', 'quadriceps'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 2400,
     perSide: false,
     instructions: [
@@ -276,6 +286,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -301,6 +312,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -326,6 +338,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 2400,
     perSide: false,
     instructions: [
@@ -351,6 +364,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 2700,
     perSide: false,
     instructions: [
@@ -376,6 +390,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 1500,
     perSide: false,
     instructions: [
@@ -402,6 +417,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -427,6 +443,7 @@ export const RUNNING = [
     affectsAreas: ['full-body', 'glutes', 'calves'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute', 'glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 2400,
     perSide: false,
     instructions: [
@@ -453,6 +470,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 600,
     perSide: false,
     instructions: [
@@ -479,6 +497,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -505,6 +524,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 2100,
     perSide: false,
     instructions: [
@@ -535,6 +555,7 @@ export const RUNNING = [
     affectsAreas: ['hip-flexor', 'quadriceps', 'calves'],
     contraindications: ['knee-acute', 'hamstring-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -561,6 +582,7 @@ export const RUNNING = [
     affectsAreas: ['hamstring', 'calves'],
     contraindications: ['hamstring-acute', 'knee-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -586,6 +608,7 @@ export const RUNNING = [
     affectsAreas: ['hip-flexor', 'calves', 'glutes'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -612,6 +635,7 @@ export const RUNNING = [
     affectsAreas: ['hamstring', 'hip-flexor', 'calves'],
     contraindications: ['hamstring-acute', 'knee-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -638,6 +662,7 @@ export const RUNNING = [
     affectsAreas: ['glutes', 'calves', 'hamstring'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -664,6 +689,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 600,
     perSide: false,
     instructions: [
@@ -690,6 +716,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 600,
     perSide: false,
     instructions: [
@@ -720,6 +747,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -744,6 +772,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 2400,
     perSide: false,
     instructions: [
@@ -767,6 +796,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 3000,
     perSide: false,
     instructions: [
@@ -792,6 +822,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 3000,
     perSide: false,
     instructions: [
@@ -817,6 +848,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 2400,
     perSide: false,
     instructions: [
@@ -841,6 +873,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 3600,
     perSide: false,
     instructions: [
@@ -866,6 +899,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 5400,
     perSide: false,
     instructions: [
@@ -891,6 +925,7 @@ export const RUNNING = [
     affectsAreas: ['full-body'],
     contraindications: ['hamstring-acute', 'achilles-acute', 'shin-splints-acute', 'knee-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 2400,
     perSide: false,
     instructions: [
