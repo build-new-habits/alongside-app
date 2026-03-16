@@ -28,6 +28,7 @@ export const REHABILITATION = [
     contraindications: ['hip-acute'],
     caution: ['glutes-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -56,6 +57,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hip'],
     contraindications: ['hip-acute', 'glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -85,6 +87,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['hamstring-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -113,6 +116,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hamstring', 'lower-back'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -141,6 +145,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes'],
     contraindications: ['wrist-elbow-acute', 'glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -169,6 +174,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hip'],
     contraindications: ['wrist-elbow-acute', 'hip-acute', 'glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -197,6 +203,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hip'],
     contraindications: ['hip-acute', 'glutes-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -225,6 +232,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hip', 'quadriceps'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -253,6 +261,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hip', 'quadriceps'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -281,6 +290,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hamstring'],
     contraindications: ['hamstring-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -309,6 +319,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'core', 'lower-back'],
     contraindications: ['lower-back-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -337,6 +348,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'quadriceps', 'hamstring'],
     contraindications: ['knee-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -365,6 +377,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hamstring', 'quadriceps'],
     contraindications: ['knee-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -393,6 +406,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hip'],
     contraindications: ['glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -423,6 +437,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['glutes-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -450,6 +465,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hamstring'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -485,6 +501,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['hamstring-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -514,6 +531,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['hamstring-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -542,6 +560,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring', 'hip-flexor', 'core'],
     contraindications: ['lower-back-acute', 'hamstring-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -570,6 +589,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring'],
     contraindications: ['lower-back-acute', 'hamstring-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -599,6 +619,7 @@ export const REHABILITATION = [
     contraindications: ['lower-back-acute', 'hamstring-acute'],
     caution: ['glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -627,6 +648,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring'],
     contraindications: ['hamstring-acute', 'hamstring-subacute', 'knee-acute'],
     energyRequired: 5,
+    difficultyLevel: 1,
     duration: 120,
     perSide: false,
     instructions: [
@@ -655,6 +677,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring', 'glutes'],
     contraindications: ['hamstring-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -683,6 +706,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring'],
     contraindications: ['hamstring-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -712,6 +736,7 @@ export const REHABILITATION = [
     contraindications: ['hamstring-acute', 'lower-back-acute'],
     caution: ['glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -741,6 +766,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['hamstring-acute', 'lower-back-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -769,6 +795,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring', 'sciatic-nerve'],
     contraindications: ['hamstring-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -797,6 +824,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring', 'glutes', 'quadriceps'],
     contraindications: ['hamstring-acute', 'knee-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -825,6 +853,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring', 'adductors', 'hip'],
     contraindications: ['hamstring-acute', 'hip-acute'],
     energyRequired: 5,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -852,6 +881,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring', 'glutes'],
     contraindications: ['hamstring-acute', 'glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -887,6 +917,7 @@ export const REHABILITATION = [
     affectsAreas: ['calves'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -914,6 +945,7 @@ export const REHABILITATION = [
     affectsAreas: ['calves', 'achilles'],
     contraindications: ['calves-acute', 'achilles-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -942,6 +974,7 @@ export const REHABILITATION = [
     affectsAreas: ['calves', 'achilles'],
     contraindications: ['calves-acute', 'achilles-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -970,6 +1003,7 @@ export const REHABILITATION = [
     affectsAreas: ['achilles', 'calves'],
     contraindications: ['achilles-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -998,6 +1032,7 @@ export const REHABILITATION = [
     affectsAreas: ['achilles', 'calves'],
     contraindications: ['achilles-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1026,6 +1061,7 @@ export const REHABILITATION = [
     affectsAreas: ['calves', 'achilles'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1054,6 +1090,7 @@ export const REHABILITATION = [
     affectsAreas: ['calves', 'achilles'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1082,6 +1119,7 @@ export const REHABILITATION = [
     affectsAreas: ['ankle-foot', 'calves'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1108,6 +1146,7 @@ export const REHABILITATION = [
     affectsAreas: ['ankle-foot', 'calves', 'achilles'],
     contraindications: ['achilles-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1136,6 +1175,7 @@ export const REHABILITATION = [
     affectsAreas: ['calves'],
     contraindications: ['calves-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 120,
     perSide: true,
     instructions: [
@@ -1170,6 +1210,7 @@ export const REHABILITATION = [
     affectsAreas: ['quadriceps', 'knee'],
     contraindications: ['knee-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1198,6 +1239,7 @@ export const REHABILITATION = [
     affectsAreas: ['quadriceps', 'knee', 'glutes'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1226,6 +1268,7 @@ export const REHABILITATION = [
     affectsAreas: ['quadriceps', 'knee', 'glutes'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1254,6 +1297,7 @@ export const REHABILITATION = [
     affectsAreas: ['quadriceps', 'knee', 'glutes'],
     contraindications: ['glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1282,6 +1326,7 @@ export const REHABILITATION = [
     affectsAreas: ['it-band', 'quadriceps', 'hip'],
     contraindications: ['it-band-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 120,
     perSide: true,
     instructions: [
@@ -1310,6 +1355,7 @@ export const REHABILITATION = [
     affectsAreas: ['it-band', 'quadriceps', 'hip'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1338,6 +1384,7 @@ export const REHABILITATION = [
     affectsAreas: ['it-band', 'hip-flexor', 'hip'],
     contraindications: ['knee-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1366,6 +1413,7 @@ export const REHABILITATION = [
     affectsAreas: ['shin-splints', 'ankle-foot'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1394,6 +1442,7 @@ export const REHABILITATION = [
     affectsAreas: ['shin-splints', 'calves'],
     contraindications: ['shin-splints-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1422,6 +1471,7 @@ export const REHABILITATION = [
     affectsAreas: ['knee', 'ankle-foot', 'glutes'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1450,6 +1500,7 @@ export const REHABILITATION = [
     affectsAreas: ['knee'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1478,6 +1529,7 @@ export const REHABILITATION = [
     affectsAreas: ['knee', 'ankle-foot', 'glutes', 'hip'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 5,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1512,6 +1564,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1540,6 +1593,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1567,6 +1621,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1594,6 +1649,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder', 'upper-back', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1622,6 +1678,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1650,6 +1707,7 @@ export const REHABILITATION = [
     affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1678,6 +1736,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder', 'upper-back'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1706,6 +1765,7 @@ export const REHABILITATION = [
     affectsAreas: ['chest-pecs', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1734,6 +1794,7 @@ export const REHABILITATION = [
     affectsAreas: ['wrist-elbow'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1761,6 +1822,7 @@ export const REHABILITATION = [
     affectsAreas: ['wrist-elbow', 'biceps-triceps'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1789,6 +1851,7 @@ export const REHABILITATION = [
     affectsAreas: ['wrist-elbow', 'biceps-triceps'],
     contraindications: ['wrist-elbow-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1817,6 +1880,7 @@ export const REHABILITATION = [
     affectsAreas: ['wrist-elbow', 'biceps-triceps'],
     contraindications: ['wrist-elbow-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1853,6 +1917,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['lower-back-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1882,6 +1947,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['lower-back-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1910,6 +1976,7 @@ export const REHABILITATION = [
     affectsAreas: ['abdominals', 'lower-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1938,6 +2005,7 @@ export const REHABILITATION = [
     affectsAreas: ['abdominals', 'lower-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1966,6 +2034,7 @@ export const REHABILITATION = [
     affectsAreas: ['abdominals', 'lower-back'],
     contraindications: ['lower-back-acute', 'abdominals-acute'],
     energyRequired: 5,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1995,6 +2064,7 @@ export const REHABILITATION = [
     contraindications: ['lower-back-acute', 'wrist-elbow-acute'],
     caution: ['glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2023,6 +2093,7 @@ export const REHABILITATION = [
     affectsAreas: ['lower-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -2052,6 +2123,7 @@ export const REHABILITATION = [
     contraindications: ['lower-back-acute'],
     caution: ['hamstring-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2081,6 +2153,7 @@ export const REHABILITATION = [
     contraindications: ['lower-back-acute'],
     caution: ['lower-back-subacute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -2110,6 +2183,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -2138,6 +2212,7 @@ export const REHABILITATION = [
     affectsAreas: ['abdominals'],
     contraindications: ['lower-back-acute', 'abdominals-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -2166,6 +2241,7 @@ export const REHABILITATION = [
     affectsAreas: ['abdominals', 'lower-back', 'glutes'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute', 'abdominals-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -2203,6 +2279,7 @@ export const REHABILITATION = [
     affectsAreas: ['pelvic-floor', 'abdominals'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 120,
     perSide: false,
     instructions: [
@@ -2231,6 +2308,7 @@ export const REHABILITATION = [
     affectsAreas: ['pelvic-floor'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -2259,6 +2337,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['glutes-acute', 'lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2288,6 +2367,7 @@ export const REHABILITATION = [
     contraindications: ['knee-acute'],
     caution: ['glutes-acute'],
     energyRequired: 4,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2322,6 +2402,7 @@ export const REHABILITATION = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 300,
     perSide: false,
     instructions: [
@@ -2350,6 +2431,7 @@ export const REHABILITATION = [
     affectsAreas: ['knee', 'quadriceps'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -2378,6 +2460,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder', 'upper-back'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -2406,6 +2489,7 @@ export const REHABILITATION = [
     affectsAreas: ['hip', 'glutes', 'lower-back'],
     contraindications: ['glutes-acute', 'lower-back-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2439,6 +2523,7 @@ export const REHABILITATION = [
     affectsAreas: ['quadriceps', 'knee'],
     contraindications: ['knee-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
@@ -2466,6 +2551,7 @@ export const REHABILITATION = [
     affectsAreas: ['upper-back', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2494,6 +2580,7 @@ export const REHABILITATION = [
     affectsAreas: ['ankle-foot', 'calves'],
     contraindications: ['ankle-foot-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2522,6 +2609,7 @@ export const REHABILITATION = [
     affectsAreas: ['wrist-elbow'],
     contraindications: ['wrist-elbow-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2550,6 +2638,7 @@ export const REHABILITATION = [
     affectsAreas: ['upper-back', 'shoulder'],
     contraindications: [],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 60,
     perSide: false,
     instructions: [
@@ -2578,6 +2667,7 @@ export const REHABILITATION = [
     affectsAreas: ['hip-flexor', 'abdominals'],
     contraindications: ['hip-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2606,6 +2696,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2634,6 +2725,7 @@ export const REHABILITATION = [
     affectsAreas: ['thoracic', 'upper-back'],
     contraindications: [],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2663,6 +2755,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['lower-back-acute'],
     energyRequired: 1,
+    difficultyLevel: 1,
     duration: 120,
     perSide: false,
     instructions: [
@@ -2693,6 +2786,7 @@ export const REHABILITATION = [
     contraindications: ['sciatica-acute'],
     caution: ['hamstring-acute', 'lower-back-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 60,
     perSide: true,
     instructions: [
