@@ -23,6 +23,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 600,
     perSide: false,
     instructions: [
@@ -49,6 +50,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 600,
     perSide: false,
     instructions: [
@@ -74,6 +76,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body', 'calves', 'quadriceps'],
     contraindications: ['knee-acute', 'ankle-foot-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 600,
     perSide: false,
     instructions: [
@@ -99,6 +102,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 900,
     perSide: false,
     instructions: [
@@ -124,6 +128,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['upper-back', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -149,6 +154,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 600,
     perSide: false,
     instructions: [
@@ -174,6 +180,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body'],
     contraindications: ['shoulder-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -199,6 +206,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 900,
     perSide: false,
     instructions: [
@@ -223,6 +231,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body'],
     contraindications: ['shoulder-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 600,
     perSide: false,
     instructions: [
@@ -247,6 +256,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body'],
     contraindications: ['shoulder-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -272,6 +282,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -297,6 +308,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['upper-back', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 900,
     perSide: false,
     instructions: [
@@ -323,6 +335,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 5,
+    difficultyLevel: 2,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -348,6 +361,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body'],
     contraindications: ['shoulder-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 2400,
     perSide: false,
     instructions: [
@@ -373,6 +387,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['adductors', 'hip', 'calves'],
     contraindications: ['knee-acute'],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 900,
     perSide: false,
     instructions: [
@@ -403,6 +418,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['quadriceps', 'glutes', 'calves'],
     contraindications: ['glutes-acute'],
     energyRequired: 3,
+    difficultyLevel: 1,
     duration: 1800,
     perSide: false,
     instructions: [
@@ -428,6 +444,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['quadriceps', 'glutes', 'calves'],
     contraindications: ['glutes-acute'],
     energyRequired: 7,
+    difficultyLevel: 3,
     duration: 2700,
     perSide: false,
     instructions: [
@@ -453,6 +470,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['quadriceps', 'glutes', 'calves'],
     contraindications: ['glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 2400,
     perSide: false,
     instructions: [
@@ -479,6 +497,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body', 'quadriceps', 'glutes'],
     contraindications: ['glutes-acute'],
     energyRequired: 8,
+    difficultyLevel: 3,
     duration: 2700,
     perSide: false,
     instructions: [
@@ -504,6 +523,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['quadriceps', 'calves'],
     contraindications: [],
     energyRequired: 4,
+    difficultyLevel: 2,
     duration: 1200,
     perSide: false,
     instructions: [
@@ -529,6 +549,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body'],
     contraindications: [],
     energyRequired: 9,
+    difficultyLevel: 3,
     duration: 2400,
     perSide: false,
     instructions: [
@@ -554,6 +575,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['full-body', 'quadriceps', 'glutes'],
     contraindications: ['glutes-acute'],
     energyRequired: 6,
+    difficultyLevel: 2,
     duration: 5400,
     perSide: false,
     instructions: [
@@ -579,6 +601,7 @@ export const SWIMMING_CYCLING = [
     affectsAreas: ['quadriceps', 'glutes', 'calves'],
     contraindications: ['glutes-acute'],
     energyRequired: 2,
+    difficultyLevel: 1,
     duration: 1200,
     perSide: false,
     instructions: [
