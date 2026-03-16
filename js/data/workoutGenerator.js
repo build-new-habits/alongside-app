@@ -2,6 +2,29 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
+ * v1.6 — SOLO taxonomy / difficulty progression (Gap 1):
+ *   difficultyLevel (1/2/3) added to all exercises.
+ *   getPhaseBias() now returns intensityBias ('gentle'|'moderate'|'challenging').
+ *   getWorkoutParams() accepts intensityBias and applies a difficultyFloor
+ *   that rises with programme phase — additive to daily adaptation.
+ *   selectExercises() filters by difficultyLevel using the floor from params.
+ *
+ *   Phase → preferred difficulty:
+ *     Weeks 1-4  (gentle)      → prefer 1, allow 2
+ *     Weeks 5-8  (moderate)    → prefer 1-2, allow 3
+ *     Weeks 9-10 (challenging) → prefer 2-3, allow 1
+ *     Weeks 11-12 (moderate)   → prefer 1-2
+ *     No programme active      → no difficulty floor (full pool)
+ *
+ *   Burnout always overrides: difficulty floor is ignored when burnout is high.
+ *   Low energy always wins: energyRequired gate is applied first.
+ *
+ * v1.6 — Menstrual cycle adaptation (Gap 3):
+ *   getCyclePhase(cycleDay, cycleLength) returns phase string.
+ *   generateDailyOptions() reads cycleDay + hormonalTracking from store.
+ *   getWorkoutParams() accepts cyclePhase and adjusts maxEnergy + focusOnRecovery.
+ *   generateRationale() adds a cycle-aware coach line when phase is active.
+ *
  * v1.5 — Per-exercise duration ceiling when availableTime is set:
  *   selectExercises() now filters out any exercise whose individual
  *   duration exceeds 40% of the declared available window before
@@ -111,6 +134,25 @@ const AVAILABLE_TIME_MAX_EXERCISE_DURATION = {
 
 export const workoutGenerator = {
 
+  // ── Cycle phase helper ────────────────────────────────────────────────────────
+
+  /**
+   * Map cycleDay to a named phase.
+   * Returns null if hormonalTracking is off or cycleDay is invalid.
+   *
+   * @param {number|null} cycleDay    — 1-based day in cycle (from check-in)
+   * @param {number}      cycleLength — user's cycle length (default 28)
+   * @returns {"menstruation"|"follicular"|"ovulation"|"luteal"|null}
+   */
+  getCyclePhase(cycleDay, cycleLength = 28) {
+    if (!cycleDay || cycleDay < 1 || cycleDay > cycleLength) return null;
+
+    if (cycleDay <= 5)                               return "menstruation";
+    if (cycleDay <= 13)                              return "follicular";
+    if (cycleDay <= 16)                              return "ovulation";
+    return "luteal";
+  },
+
   /**
    * Generate today's 3 workout options
    */
@@ -119,6 +161,22 @@ export const workoutGenerator = {
     const checkin   = checkinData.getTodaysCheckin();
     const intensity = store.get("todayIntensity") || "moderate";
     const burnout   = checkinData.detectBurnout();
+
+    // ── Gap 3: Menstrual cycle phase ─────────────────────────────────────────
+    // Read cycleDay from today's check-in only when hormonalTracking is on.
+    // getCyclePhase() returns null when tracking is off — all downstream
+    // logic gracefully ignores a null cyclePhase.
+    const hormonalTracking = store.get("hormonalTracking") || false;
+    const cycleDay         = hormonalTracking ? (checkin?.cycleDay || null) : null;
+    const cycleLength      = store.get("cycleLength") || 28;
+    const cyclePhase       = this.getCyclePhase(cycleDay, cycleLength);
+
+    // ── Gap 1: Programme intensity bias ──────────────────────────────────────
+    // getPhaseBias() already returns intensityBias — extract it here so
+    // getWorkoutParams() can use it to set a difficulty floor.
+    const phaseBias      = programmeEngine.getPhaseBias();
+    const intensityBias  = phaseBias?.intensityBias || null;
+    const currentWeek    = store.get("activeProgramme.currentWeek") || null;
 
     // Build checkin data object for the filter engine.
     // painScores comes from store (written at check-in submission) so
@@ -130,19 +188,19 @@ export const workoutGenerator = {
       painScores:   store.get("conditionPainScores") || {}
     };
 
-    // Get filtered exercise pool (unchanged from v1.0 calling convention)
+    // Get filtered exercise pool
     const suitable = getSuitableExercises(profile, checkinForFilter);
 
-    // Apply programme phase bias to the pool (new in v1.1)
+    // Apply programme phase bias to the pool (v1.1)
     const biasedPool = this.applyProgrammeBias(suitable);
 
     // Determine focus order based on programme phase (or default order)
     const [focus1, focus2, focus3] = this.getWorkoutFocusOrder();
 
     const options = [
-      this.generateWorkout(focus1, biasedPool, intensity, burnout),
-      this.generateWorkout(focus2, biasedPool, intensity, burnout),
-      this.generateWorkout(focus3, biasedPool, intensity, burnout)
+      this.generateWorkout(focus1, biasedPool, intensity, burnout, cyclePhase, intensityBias, currentWeek),
+      this.generateWorkout(focus2, biasedPool, intensity, burnout, cyclePhase, intensityBias, currentWeek),
+      this.generateWorkout(focus3, biasedPool, intensity, burnout, cyclePhase, intensityBias, currentWeek)
     ];
 
     store.set("todaysWorkouts", options);
@@ -205,13 +263,13 @@ export const workoutGenerator = {
    * Generate a single workout with a specific focus.
    * Reads availableTime from store and passes it into getWorkoutParams().
    */
-  generateWorkout(focus, suitableExercises, intensity, burnout) {
+  generateWorkout(focus, suitableExercises, intensity, burnout, cyclePhase = null, intensityBias = null, currentWeek = null) {
     const availableTime = store.get("availableTime") || null;
-    const params        = this.getWorkoutParams(intensity, burnout, availableTime);
+    const params        = this.getWorkoutParams(intensity, burnout, availableTime, cyclePhase, intensityBias, currentWeek);
     const exercises     = this.selectExercises(focus, suitableExercises, params, availableTime);
     const capped        = this.applyDurationCap(exercises, focus, params);
     const duration      = this.calculateDuration(capped);
-    const rationale     = this.generateRationale(focus, intensity, burnout);
+    const rationale     = this.generateRationale(focus, intensity, burnout, cyclePhase);
 
     return {
       id:            `workout-${focus}-${Date.now()}`,
@@ -228,20 +286,31 @@ export const workoutGenerator = {
   },
 
   /**
-   * Workout parameters by intensity level, with optional availableTime override.
+   * Workout parameters by intensity level, with optional overrides.
    *
-   * Priority rules:
-   *   1. Burnout — overrides everything; returns Recovery Mode params.
-   *   2. availableTime — if set, drives exerciseCount via lookup table.
-   *   3. Intensity — always drives maxEnergy, warmup/cooldown, focusOnRecovery.
-   *      Also drives exerciseCount when availableTime is null.
+   * Priority rules (highest → lowest):
+   *   1. Burnout        — overrides everything; returns Recovery Mode params.
+   *   2. cyclePhase     — menstruation reduces maxEnergy; ovulation raises it.
+   *                       Luteal and follicular are nudges, not hard overrides.
+   *   3. availableTime  — if set, drives exerciseCount via lookup table.
+   *   4. intensityBias  — programme phase sets a difficultyFloor (additive nudge).
+   *   5. Intensity      — always drives maxEnergy base, warmup/cooldown, focusOnRecovery.
    *
-   * @param {string}      intensity     - "recovery" | "gentle" | "moderate" | "challenging"
-   * @param {object}      burnout       - result of checkinData.detectBurnout()
-   * @param {string|null} availableTime - store value: "micro"|"quick"|"short"|"standard"|"long"|"open"|null
+   * difficultyFloor: minimum difficultyLevel exercises must meet.
+   *   1 = no floor (all exercises eligible)
+   *   2 = intermediate and above preferred (selectExercises filters/weights by this)
+   *   The floor is a preference signal, not a hard block — if the pool has no
+   *   exercises above the floor, the floor is ignored.
+   *
+   * @param {string}      intensity     — "recovery"|"gentle"|"moderate"|"challenging"
+   * @param {object}      burnout       — result of checkinData.detectBurnout()
+   * @param {string|null} availableTime — "micro"|"quick"|"short"|"standard"|"long"|"open"|null
+   * @param {string|null} cyclePhase    — "menstruation"|"follicular"|"ovulation"|"luteal"|null
+   * @param {string|null} intensityBias — "gentle"|"moderate"|"challenging" from programme phase
+   * @param {number|null} currentWeek   — current programme week (1-12), or null
    * @returns {object} params
    */
-  getWorkoutParams(intensity, burnout, availableTime) {
+  getWorkoutParams(intensity, burnout, availableTime, cyclePhase = null, intensityBias = null, currentWeek = null) {
     // ── 1. Burnout override — highest priority ────────────────────────────────
     if (burnout.level === "high") {
       return {
@@ -249,7 +318,8 @@ export const workoutGenerator = {
         maxEnergy:       3,
         includeWarmup:   true,
         includeCooldown: true,
-        focusOnRecovery: true
+        focusOnRecovery: true,
+        difficultyFloor: 1
       };
     }
 
@@ -261,10 +331,43 @@ export const workoutGenerator = {
       challenging: { exerciseCount: 7, maxEnergy: 10, includeWarmup: true, includeCooldown: true, focusOnRecovery: false }
     };
 
-    const base = intensityParams[intensity] || intensityParams.moderate;
+    const base = { ...( intensityParams[intensity] || intensityParams.moderate ), difficultyFloor: 1 };
 
-    // ── 3. availableTime overrides exerciseCount only ─────────────────────────
-    // Intensity still owns maxEnergy, includeWarmup, includeCooldown, focusOnRecovery.
+    // ── 3. Cycle phase modifiers — additive, never override burnout ───────────
+    // Menstruation: reduce maxEnergy, favour recovery focus
+    // Follicular: no change (normal to high energy)
+    // Ovulation: slight energy ceiling lift
+    // Luteal: modest energy reduction, no focusOnRecovery
+    if (cyclePhase === "menstruation") {
+      base.maxEnergy       = Math.min(base.maxEnergy, 5);
+      base.focusOnRecovery = true;
+    } else if (cyclePhase === "ovulation") {
+      // Peak phase — allow slightly higher energy if intensity would support it
+      base.maxEnergy = Math.min(base.maxEnergy + 1, 10);
+    } else if (cyclePhase === "luteal") {
+      base.maxEnergy = Math.min(base.maxEnergy, 7);
+    }
+    // follicular: no modifier needed
+
+    // ── 4. Programme difficulty floor — additive nudge, not hard block ────────
+    // Maps programme phase intensityBias to a difficultyFloor.
+    // The floor is used in selectExercises() to prefer higher-difficulty exercises
+    // as the programme progresses. It never forces hard exercises on tired users.
+    if (intensityBias && burnout.level !== "high") {
+      const floorByBias = {
+        "gentle":      1,
+        "moderate":    1,
+        "challenging": 2
+      };
+      base.difficultyFloor = floorByBias[intensityBias] ?? 1;
+
+      // Further refine by week within challenging phase (weeks 9-10 → prefer 2-3)
+      if (intensityBias === "challenging" && currentWeek && currentWeek >= 9) {
+        base.difficultyFloor = 2;
+      }
+    }
+
+    // ── 5. availableTime overrides exerciseCount only ─────────────────────────
     const timeCount  = availableTime ? (AVAILABLE_TIME_COUNT[availableTime] ?? null) : null;
     const finalCount = timeCount !== null ? timeCount : base.exerciseCount;
 
@@ -345,8 +448,17 @@ export const workoutGenerator = {
     });
 
     const appropriateEnergy = focusExercises.filter(e => e.energyRequired <= params.maxEnergy);
+
+    // Apply difficulty floor — prefer exercises at or above the floor level.
+    // If the floor would leave the pool empty, fall back to the full energy-filtered pool.
+    // This ensures the floor is a nudge, never a hard block.
+    const floor = params.difficultyFloor || 1;
+    const aboveFloor = floor > 1
+      ? appropriateEnergy.filter(e => (e.difficultyLevel || 1) >= floor)
+      : appropriateEnergy;
+    const mainPool = aboveFloor.length >= 2 ? aboveFloor : appropriateEnergy;
     const mainCount         = params.exerciseCount - 2;
-    const mainExercises     = this.pickMultiple(appropriateEnergy, mainCount, selected);
+    const mainExercises     = this.pickMultiple(mainPool, mainCount, selected);
     mainExercises.forEach(e => selected.push({ ...e, role: "main" }));
 
     // Accessory (strength focus only)
@@ -454,9 +566,10 @@ export const workoutGenerator = {
   /**
    * Generate rationale — daily context lines + strategic connection line.
    * Daily adaptation lines are unchanged from v1.0.
-   * Strategic line is appended when a programme is active.
+   * Cycle-aware line added when cyclePhase is active (v1.6).
+   * Strategic line is appended when a programme is active (v1.1).
    */
-  generateRationale(focus, intensity, burnout) {
+  generateRationale(focus, intensity, burnout, cyclePhase = null) {
     const checkin = checkinData.getTodaysCheckin();
     const parts   = [];
 
@@ -474,6 +587,20 @@ export const workoutGenerator = {
       parts.push("I have noticed you have been struggling recently. Today is about recovery, not pushing.");
     } else if (burnout.level === "moderate") {
       parts.push("Let us take it a bit easier — your body needs some care.");
+    }
+
+    // ── Cycle phase coach line ────────────────────────────────────────────────
+    // Only shown when hormonalTracking is on and a phase is detected.
+    // Framing is informative and non-prescriptive — explains the why.
+    if (cyclePhase) {
+      const cycleMessages = {
+        "menstruation": "You are in your menstrual phase — I have kept intensity low and focused on gentle movement. Rest is productive right now.",
+        "follicular":   "You are in your follicular phase — energy tends to build through this period. Good time for steady progress.",
+        "ovulation":    "You are around ovulation — energy is typically at its peak right now. I have reflected that in today's options.",
+        "luteal":       "You are in your luteal phase — I have kept intensity moderate. Steady, consistent effort works well here."
+      };
+      const msg = cycleMessages[cyclePhase];
+      if (msg) parts.push(msg);
     }
 
     const focusExplanations = {
