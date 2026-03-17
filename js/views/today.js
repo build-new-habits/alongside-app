@@ -392,9 +392,12 @@ function renderSevereZoneMessage() {
 // ── Prescribed Exercises ──────────────────────────────────────────────────────
 
 /**
- * Render the prescribed exercises section.
- * Shown above generated options — these are the must-dos.
- * Cards match the workout option card style.
+ * Render the prescribed exercises section as a single session card.
+ * All exercises are shown as a list inside one card — not individual cards.
+ * Tapping "Start Session" routes to prescribed-session.js.
+ *
+ * Credits: 35 per exercise, max 150 for the session.
+ * Daily reset: completedToday resets automatically at midnight on render.
  */
 function renderPrescribedSection() {
   const raw = store.get("prescribedExercises") || [];
@@ -411,13 +414,14 @@ function renderPrescribedSection() {
     return ex;
   });
 
-  // Persist any resets
   if (exercises.some((ex, i) => ex.completedToday !== raw[i].completedToday)) {
     store.set("prescribedExercises", exercises);
   }
 
-  const completedCount = exercises.filter(e => e.completedToday).length;
-  const creditsEarned  = completedCount * 100;
+  const totalCount     = exercises.length;
+  const doneCount      = exercises.filter(e => e.completedToday).length;
+  const allDone        = totalCount > 0 && doneCount === totalCount;
+  const sessionCredits = Math.min(totalCount * 35, 150);
 
   return `
     <div class="prescribed-section" id="prescribed-section">
@@ -425,15 +429,15 @@ function renderPrescribedSection() {
       <div class="prescribed-section-header">
         <div>
           <h2>Prescribed exercises</h2>
-          <p class="text-secondary text-sm">${exercises.length > 0
-            ? `${completedCount} of ${exercises.length} done today${creditsEarned > 0 ? " \xb7 +" + creditsEarned + " \u2b50 earned" : ""}`
+          <p class="text-secondary text-sm">${totalCount > 0
+            ? (allDone ? "Session complete \u2713" : `${doneCount === 0 ? totalCount + " exercises to do" : doneCount + " of " + totalCount + " done"}`)
             : "Exercises from your physio or coach"
           }</p>
         </div>
         <button
           class="btn btn-ghost btn-small"
           id="prescribed-add-btn"
-          aria-label="Add a prescribed exercise"
+          aria-label="Add prescribed exercises"
           aria-expanded="false"
           aria-controls="prescribed-add-form"
         >+ Add</button>
@@ -444,112 +448,134 @@ function renderPrescribedSection() {
           <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
           <p>If your physio, GP, or coach has given you exercises to do, add them here. They will appear at the top of your daily plan as your must-dos, and I will keep track of them each day.</p>
         </div>
-      ` : ""}
+      ` : `
+        <div class="card workout-option-card prescribed-session-card ${allDone ? "prescribed-done" : ""}">
+          <div class="option-header">
+            <span class="option-icon" aria-hidden="true">${allDone ? "\u2705" : "\ud83e\ude7a"}</span>
+            <div class="option-info">
+              <h4>${allDone ? "Prescribed session complete" : "Prescribed session"}</h4>
+              <p class="text-sm text-muted">${totalCount} exercise${totalCount !== 1 ? "s" : ""} &middot; +${sessionCredits} \u2b50</p>
+            </div>
+            <span class="option-credits" aria-label="${sessionCredits} credits for completing this session">+${sessionCredits} \u2b50</span>
+          </div>
 
-      <!-- Add exercise form (hidden by default) -->
+          <div class="prescribed-exercise-list" aria-label="Exercises in this session">
+            ${exercises.map(ex => `
+              <div class="prescribed-list-row ${ex.completedToday ? "prescribed-list-row-done" : ""}">
+                <span class="prescribed-list-tick" aria-hidden="true">${ex.completedToday ? "\u2713" : "\u25cb"}</span>
+                <span class="prescribed-list-name">${ex.name}</span>
+                ${ex.sets || ex.reps ? `<span class="prescribed-list-prescription">${ex.sets ? ex.sets + " x " : ""}${ex.reps || ""}</span>` : ""}
+              </div>
+            `).join("")}
+          </div>
+
+          ${!allDone ? `
+            <button class="btn btn-primary btn-full" id="prescribed-start-btn"
+                    aria-label="Start your prescribed exercise session">
+              Start Session
+            </button>
+          ` : `
+            <p class="prescribed-all-done">Well done \u2014 all done for today.</p>
+          `}
+
+          <button class="btn btn-ghost btn-small prescribed-manage-btn" id="prescribed-manage-btn"
+                  aria-label="Manage prescribed exercises">
+            Manage exercises
+          </button>
+        </div>
+      `}
+
+      <!-- Add / manage form (hidden by default) -->
       <div class="prescribed-add-form" id="prescribed-add-form" hidden>
         <div class="card">
-          <h3 class="prescribed-form-title">Add a prescribed exercise</h3>
-          <div class="prescribed-form-fields">
-            <div class="form-field">
-              <label for="prescribed-name" class="form-label">Exercise name <span aria-hidden="true" class="required-mark">*</span></label>
-              <input
-                type="text"
-                id="prescribed-name"
-                class="form-input"
-                placeholder="e.g. Calf raises"
-                autocomplete="off"
-                aria-required="true"
-                maxlength="100"
-              >
+          <h3 class="prescribed-form-title">Your prescribed exercises</h3>
+          <p class="text-sm text-secondary" style="margin-bottom: var(--space-4);">Add all your exercises below, then tap Save.</p>
+
+          <!-- Existing exercises with remove option -->
+          ${exercises.length > 0 ? `
+            <div class="prescribed-existing" id="prescribed-existing" aria-label="Current prescribed exercises">
+              ${exercises.map((ex, i) => `
+                <div class="prescribed-existing-row" data-index="${i}">
+                  <span class="prescribed-existing-name">${ex.name}${ex.sets || ex.reps ? " — " + (ex.sets ? ex.sets + " x " : "") + (ex.reps || "") : ""}</span>
+                  <button class="btn btn-ghost btn-xs prescribed-remove-existing"
+                          data-index="${i}"
+                          aria-label="Remove ${ex.name}">\u2715</button>
+                </div>
+              `).join("")}
             </div>
-            <div class="prescribed-form-row">
-              <div class="form-field">
-                <label for="prescribed-sets" class="form-label">Sets</label>
-                <input type="number" id="prescribed-sets" class="form-input form-input-short" placeholder="3" min="1" max="20" aria-label="Number of sets">
-              </div>
-              <div class="form-field">
-                <label for="prescribed-reps" class="form-label">Reps or hold (secs)</label>
-                <input type="text" id="prescribed-reps" class="form-input form-input-short" placeholder="10 or 30s" maxlength="20" aria-label="Repetitions or hold time in seconds">
-              </div>
-            </div>
-            <div class="form-field">
-              <label for="prescribed-notes" class="form-label">Notes</label>
-              <input
-                type="text"
-                id="prescribed-notes"
-                class="form-input"
-                placeholder="e.g. Both sides, keep back straight"
-                maxlength="200"
-                aria-label="Any notes from your physio or coach"
-              >
-            </div>
+          ` : ""}
+
+          <!-- New exercise entry rows -->
+          <div id="prescribed-new-rows">
+            ${renderNewExerciseRow(0)}
           </div>
-          <div class="prescribed-form-actions">
-            <button class="btn btn-primary" id="prescribed-save-btn">Save exercise</button>
+
+          <button class="btn btn-ghost btn-small" id="prescribed-add-another-btn"
+                  style="margin-top: var(--space-2);" aria-label="Add another exercise row">
+            + Add another exercise
+          </button>
+
+          <div class="prescribed-form-actions" style="margin-top: var(--space-5);">
+            <button class="btn btn-primary" id="prescribed-save-btn">Save</button>
             <button class="btn btn-ghost btn-small" id="prescribed-cancel-btn">Cancel</button>
           </div>
         </div>
       </div>
 
-      <!-- Exercise cards -->
-      ${exercises.length > 0 ? `
-        <div class="prescribed-list" role="list" aria-label="Prescribed exercises">
-          ${exercises.map((ex, index) => renderPrescribedItem(ex, index)).join("")}
-        </div>
-      ` : ""}
-
     </div>
   `;
 }
 
 /**
- * Render a single prescribed exercise as a card matching the workout option style.
+ * Render a single new-exercise input row.
+ * Multiple rows are added dynamically via the "+ Add another" button.
  */
-function renderPrescribedItem(ex, index) {
-  const prescription = formatPrescribedReps(ex);
-
+function renderNewExerciseRow(rowIndex) {
   return `
-    <div class="card workout-option-card prescribed-exercise-card ${ex.completedToday ? "prescribed-done" : ""}"
-         role="listitem" data-index="${index}">
-
-      <div class="option-header">
-        <span class="option-icon" aria-hidden="true">${ex.completedToday ? "\u2705" : "\ud83e\ude7a"}</span>
-        <div class="option-info">
-          <h4 class="${ex.completedToday ? "prescribed-name-done" : ""}">${ex.name}</h4>
-          ${prescription ? `<p class="text-sm text-muted">${prescription}</p>` : ""}
+    <div class="prescribed-new-row" data-row="${rowIndex}">
+      <div class="form-field" style="margin-bottom: var(--space-2);">
+        <label for="prescribed-name-${rowIndex}" class="form-label">
+          Exercise name ${rowIndex === 0 ? '<span aria-hidden="true" class="required-mark">*</span>' : ""}
+        </label>
+        <input
+          type="text"
+          id="prescribed-name-${rowIndex}"
+          class="form-input prescribed-name-input"
+          placeholder="e.g. Calf raises"
+          autocomplete="off"
+          maxlength="100"
+          ${rowIndex === 0 ? 'aria-required="true"' : ""}
+        >
+      </div>
+      <div class="prescribed-form-row">
+        <div class="form-field">
+          <label for="prescribed-sets-${rowIndex}" class="form-label">Sets</label>
+          <input type="number" id="prescribed-sets-${rowIndex}"
+                 class="form-input form-input-short prescribed-sets-input"
+                 placeholder="3" min="1" max="20">
         </div>
-        <span class="option-credits" aria-label="100 credits for completing this exercise">+100 \u2b50</span>
+        <div class="form-field">
+          <label for="prescribed-reps-${rowIndex}" class="form-label">Reps or hold</label>
+          <input type="text" id="prescribed-reps-${rowIndex}"
+                 class="form-input form-input-short prescribed-reps-input"
+                 placeholder="10 or 30s" maxlength="20">
+        </div>
       </div>
-
-      ${ex.notes ? `<p class="workout-rationale">${ex.notes}</p>` : ""}
-
-      <div class="prescribed-card-actions">
-        <button
-          class="btn ${ex.completedToday ? "btn-secondary" : "btn-primary"} btn-full prescribed-tick"
-          data-index="${index}"
-          aria-pressed="${ex.completedToday}"
-          aria-label="${ex.completedToday ? "Mark as not done" : "Mark as done"}: ${ex.name}"
-        >${ex.completedToday ? "\u2713 Done \u2014 tap to undo" : "Mark as done"}</button>
-        <button
-          class="btn btn-ghost btn-small prescribed-delete"
-          aria-label="Remove ${ex.name} from prescribed exercises"
-          data-index="${index}"
-        >Remove</button>
+      <div class="form-field">
+        <label for="prescribed-notes-${rowIndex}" class="form-label">Notes</label>
+        <input type="text" id="prescribed-notes-${rowIndex}"
+               class="form-input prescribed-notes-input"
+               placeholder="e.g. Both sides" maxlength="200">
       </div>
-
+      ${rowIndex > 0 ? `
+        <button class="btn btn-ghost btn-xs prescribed-remove-row" data-row="${rowIndex}"
+                aria-label="Remove this exercise row" style="margin-top: var(--space-1);">
+          \u2715 Remove
+        </button>
+      ` : ""}
+      ${rowIndex < 6 ? '<hr class="prescribed-row-divider">' : ""}
     </div>
   `;
-}
-
-/**
- * Format sets/reps for a prescribed exercise.
- */
-function formatPrescribedReps(ex) {
-  const sets = ex.sets ? `${ex.sets} x ` : "";
-  const reps = ex.reps || "";
-  if (!sets && !reps) return "";
-  return `${sets}${reps}`.trim();
 }
 
 
@@ -635,52 +661,14 @@ function clearAvailableTimeFromStrip() {
 // ── Prescribed exercise helpers ───────────────────────────────────────────────
 
 /**
- * Toggle completion state on a prescribed exercise.
- * Awards 100 credits on completion; deducts on un-tick.
- */
-function togglePrescribedComplete(index) {
-  const exercises = store.get("prescribedExercises") || [];
-  if (!exercises[index]) return;
-
-  const ex          = exercises[index];
-  const nowComplete = !ex.completedToday;
-
-  exercises[index] = {
-    ...ex,
-    completedToday: nowComplete,
-    completedAt:    nowComplete ? new Date().toISOString() : null
-  };
-
-  store.set("prescribedExercises", exercises);
-
-  // Credit award / deduction
-  const current = store.get("totalCredits") || 0;
-  store.set("totalCredits", Math.max(0, current + (nowComplete ? 100 : -100)));
-
-  router.navigate("today");
-}
-
-/**
  * Remove a prescribed exercise from the store.
+ * Called from the manage form's remove-existing buttons.
  */
 function deletePrescribed(index) {
   const exercises = store.get("prescribedExercises") || [];
   exercises.splice(index, 1);
   store.set("prescribedExercises", exercises);
   router.navigate("today");
-}
-
-/**
- * Clear the add-exercise form fields.
- */
-function clearPrescribedForm() {
-  ["prescribed-name", "prescribed-sets", "prescribed-reps", "prescribed-notes"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.value = "";
-      el.removeAttribute("aria-invalid");
-    }
-  });
 }
 
 // ── Mount ─────────────────────────────────────────────────────────────────────
@@ -712,71 +700,98 @@ export function onMount() {
 
   document.getElementById("time-strip-clear")?.addEventListener("click", clearAvailableTimeFromStrip);
 
-  // ── Prescribed exercises ──────────────────────────────────────────────────
-  const addBtn    = document.getElementById("prescribed-add-btn");
-  const addForm   = document.getElementById("prescribed-add-form");
-  const saveBtn   = document.getElementById("prescribed-save-btn");
-  const cancelBtn = document.getElementById("prescribed-cancel-btn");
-
-  addBtn?.addEventListener("click", () => {
-    const isOpen = !addForm.hidden;
-    addForm.hidden = isOpen;
-    addBtn.setAttribute("aria-expanded", String(!isOpen));
-    if (!isOpen) {
-      document.getElementById("prescribed-name")?.focus();
-    }
+  // ── Prescribed: Start session button ─────────────────────────────────────
+  document.getElementById("prescribed-start-btn")?.addEventListener("click", () => {
+    router.navigate("prescribed-session");
   });
 
-  cancelBtn?.addEventListener("click", () => {
+  // ── Prescribed: Open manage/add form ─────────────────────────────────────
+  const addBtn  = document.getElementById("prescribed-add-btn");
+  const addForm = document.getElementById("prescribed-add-form");
+
+  function openPrescribedForm() {
+    addForm.hidden = false;
+    addBtn.setAttribute("aria-expanded", "true");
+    document.getElementById("prescribed-name-0")?.focus();
+  }
+
+  function closePrescribedForm() {
     addForm.hidden = true;
     addBtn.setAttribute("aria-expanded", "false");
-    clearPrescribedForm();
+  }
+
+  addBtn?.addEventListener("click", () => {
+    if (addForm.hidden) { openPrescribedForm(); } else { closePrescribedForm(); }
   });
 
-  saveBtn?.addEventListener("click", () => {
-    const nameInput = document.getElementById("prescribed-name");
-    const name = nameInput?.value.trim();
-    if (!name) {
-      nameInput?.focus();
-      nameInput?.setAttribute("aria-invalid", "true");
-      return;
-    }
+  document.getElementById("prescribed-manage-btn")?.addEventListener("click", openPrescribedForm);
 
-    const sets  = document.getElementById("prescribed-sets")?.value.trim();
-    const reps  = document.getElementById("prescribed-reps")?.value.trim();
-    const notes = document.getElementById("prescribed-notes")?.value.trim();
+  // ── Prescribed: Cancel ────────────────────────────────────────────────────
+  document.getElementById("prescribed-cancel-btn")?.addEventListener("click", closePrescribedForm);
 
-    const existing = store.get("prescribedExercises") || [];
-    const newEntry = {
-      id:             "prescribed-" + Date.now(),
-      name,
-      sets:           sets ? parseInt(sets) || null : null,
-      reps:           reps || null,
-      notes:          notes || null,
-      source:         "prescribed",
-      credits:        100,
-      addedAt:        new Date().toISOString(),
-      completedToday: false,
-      completedAt:    null
-    };
-
-    store.set("prescribedExercises", [...existing, newEntry]);
+  // ── Prescribed: Remove existing exercise ─────────────────────────────────
+  document.getElementById("prescribed-existing")?.addEventListener("click", e => {
+    const btn = e.target.closest(".prescribed-remove-existing");
+    if (!btn) return;
+    const index = parseInt(btn.dataset.index);
+    const all   = store.get("prescribedExercises") || [];
+    all.splice(index, 1);
+    store.set("prescribedExercises", all);
     router.navigate("today");
   });
 
-  // Tick buttons — delegate from prescribed-list
-  document.querySelector(".prescribed-list")?.addEventListener("click", e => {
-    const tick = e.target.closest(".prescribed-tick");
-    if (tick) {
-      const index = parseInt(tick.dataset.index);
-      togglePrescribedComplete(index);
+  // ── Prescribed: Add another row ───────────────────────────────────────────
+  let rowCount = 1;
+  document.getElementById("prescribed-add-another-btn")?.addEventListener("click", () => {
+    const container = document.getElementById("prescribed-new-rows");
+    if (!container || rowCount >= 7) return;
+    const div = document.createElement("div");
+    div.innerHTML = renderNewExerciseRow(rowCount);
+    container.appendChild(div.firstElementChild);
+    document.getElementById(`prescribed-name-${rowCount}`)?.focus();
+    rowCount++;
+  });
+
+  // ── Prescribed: Remove a new row ─────────────────────────────────────────
+  document.getElementById("prescribed-new-rows")?.addEventListener("click", e => {
+    const btn = e.target.closest(".prescribed-remove-row");
+    if (!btn) return;
+    btn.closest(".prescribed-new-row")?.remove();
+  });
+
+  // ── Prescribed: Save all ─────────────────────────────────────────────────
+  document.getElementById("prescribed-save-btn")?.addEventListener("click", () => {
+    const rows    = document.querySelectorAll(".prescribed-new-row");
+    const newOnes = [];
+
+    rows.forEach(row => {
+      const rowIdx = row.dataset.row;
+      const name   = document.getElementById(`prescribed-name-${rowIdx}`)?.value.trim();
+      if (!name) return; // skip blank rows silently
+      const sets   = document.getElementById(`prescribed-sets-${rowIdx}`)?.value.trim();
+      const reps   = document.getElementById(`prescribed-reps-${rowIdx}`)?.value.trim();
+      const notes  = document.getElementById(`prescribed-notes-${rowIdx}`)?.value.trim();
+      newOnes.push({
+        id:             "prescribed-" + Date.now() + "-" + rowIdx,
+        name,
+        sets:           sets ? (parseInt(sets) || null) : null,
+        reps:           reps || null,
+        notes:          notes || null,
+        source:         "prescribed",
+        addedAt:        new Date().toISOString(),
+        completedToday: false,
+        completedAt:    null
+      });
+    });
+
+    if (newOnes.length === 0) {
+      closePrescribedForm();
       return;
     }
-    const del = e.target.closest(".prescribed-delete");
-    if (del) {
-      const index = parseInt(del.dataset.index);
-      deletePrescribed(index);
-    }
+
+    const existing = store.get("prescribedExercises") || [];
+    store.set("prescribedExercises", [...existing, ...newOnes]);
+    router.navigate("today");
   });
 
   // ── Workout start buttons ─────────────────────────────────────────────────
