@@ -2,6 +2,15 @@
  * today.js - Today View
  * Shows check-in prompt or generated workout options
  *
+ * v1.4 — prescribedExercises Level 1 display:
+ *   renderPrescribedSection() renders a separate section below workout options
+ *   when prescribedExercises.length > 0. Each exercise shows name, sets/reps,
+ *   notes, and a tick button. Ticking awards 100 credits and writes completedToday:
+ *   true + completedAt timestamp to the entry in the store array.
+ *   Add button in the section header opens an inline form: Name (required),
+ *   Sets, Reps / Hold time, Notes. Saved to prescribedExercises array in store.
+ *   Daily completion state resets at midnight (checked on render).
+ *
  * v1.3 — Two fixes:
  *
  *   (1) Per-exercise prescription display corrected.
@@ -196,6 +205,9 @@ function renderTodaysDashboard(name) {
         ${workouts.map((workout, index) => renderWorkoutCard(workout, index)).join("")}
       </div>
 
+      <!-- ── Prescribed exercises ───────────────────────────────────────── -->
+      ${renderPrescribedSection()}
+
     </div>
   `;
 }
@@ -377,6 +389,164 @@ function renderSevereZoneMessage() {
   return parts.join("\n");
 }
 
+// ── Prescribed Exercises ──────────────────────────────────────────────────────
+
+/**
+ * Render the prescribed exercises section.
+ * Visible only when prescribedExercises.length > 0 OR when the add form has
+ * been opened (handled by showAddForm flag via data attribute on the section).
+ *
+ * Daily completion state: completedToday is reset on render if completedAt
+ * is from a previous day. This ensures the tick reappears each morning without
+ * requiring a separate midnight job.
+ */
+function renderPrescribedSection() {
+  const raw = store.get("prescribedExercises") || [];
+
+  // Reset completedToday for entries completed on a previous day
+  const todayKey = new Date().toISOString().split("T")[0];
+  const exercises = raw.map(ex => {
+    if (ex.completedToday && ex.completedAt) {
+      const completedDay = ex.completedAt.split("T")[0];
+      if (completedDay !== todayKey) {
+        return { ...ex, completedToday: false, completedAt: null };
+      }
+    }
+    return ex;
+  });
+
+  // Persist any resets (no-op if nothing changed)
+  if (exercises.some((ex, i) => ex.completedToday !== raw[i].completedToday)) {
+    store.set("prescribedExercises", exercises);
+  }
+
+  const completedCount = exercises.filter(e => e.completedToday).length;
+
+  return `
+    <div class="prescribed-section" id="prescribed-section">
+      <div class="prescribed-header">
+        <div class="prescribed-header-text">
+          <h2>Your prescribed exercises</h2>
+          ${exercises.length > 0
+            ? `<p class="text-secondary text-sm">${completedCount} of ${exercises.length} done today</p>`
+            : ""
+          }
+        </div>
+        <button
+          class="btn btn-ghost btn-small"
+          id="prescribed-add-btn"
+          aria-label="Add a prescribed exercise"
+          aria-expanded="false"
+          aria-controls="prescribed-add-form"
+        >+ Add</button>
+      </div>
+
+      <div class="card card-coach prescribed-coach-note" ${exercises.length === 0 ? "" : ""}>
+        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p>${exercises.length === 0
+          ? "If your physio, GP, or coach has given you exercises to do, you can add them here. I will remind you each day and keep track of what you have completed."
+          : "Your physio has given you these — do them before or after your workout, whichever feels right."
+        }</p>
+      </div>
+
+      <!-- Add exercise form (hidden by default) -->
+      <div class="prescribed-add-form" id="prescribed-add-form" hidden>
+        <div class="card">
+          <h3 class="prescribed-form-title">Add a prescribed exercise</h3>
+          <div class="prescribed-form-fields">
+            <div class="form-field">
+              <label for="prescribed-name" class="form-label">Exercise name <span aria-hidden="true" class="required-mark">*</span></label>
+              <input
+                type="text"
+                id="prescribed-name"
+                class="form-input"
+                placeholder="e.g. Calf raises"
+                autocomplete="off"
+                aria-required="true"
+                maxlength="100"
+              >
+            </div>
+            <div class="prescribed-form-row">
+              <div class="form-field">
+                <label for="prescribed-sets" class="form-label">Sets</label>
+                <input type="number" id="prescribed-sets" class="form-input form-input-short" placeholder="3" min="1" max="20" aria-label="Number of sets">
+              </div>
+              <div class="form-field">
+                <label for="prescribed-reps" class="form-label">Reps or hold (secs)</label>
+                <input type="text" id="prescribed-reps" class="form-input form-input-short" placeholder="10 or 30s" maxlength="20" aria-label="Repetitions or hold time in seconds">
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="prescribed-notes" class="form-label">Notes</label>
+              <input
+                type="text"
+                id="prescribed-notes"
+                class="form-input"
+                placeholder="e.g. Both sides, keep back straight"
+                maxlength="200"
+                aria-label="Any notes from your physio or coach"
+              >
+            </div>
+          </div>
+          <div class="prescribed-form-actions">
+            <button class="btn btn-primary" id="prescribed-save-btn">Save exercise</button>
+            <button class="btn btn-ghost btn-small" id="prescribed-cancel-btn">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exercise list -->
+      ${exercises.length > 0 ? `
+        <div class="prescribed-list" role="list" aria-label="Prescribed exercises">
+          ${exercises.map((ex, index) => renderPrescribedItem(ex, index)).join("")}
+        </div>
+      ` : ""}
+    </div>
+  `;
+}
+
+/**
+ * Render a single prescribed exercise item.
+ */
+function renderPrescribedItem(ex, index) {
+  const prescription = formatPrescribedReps(ex);
+
+  return `
+    <div class="prescribed-item ${ex.completedToday ? "completed" : ""}" role="listitem" data-index="${index}">
+      <button
+        class="prescribed-tick"
+        id="prescribed-tick-${index}"
+        aria-label="${ex.completedToday ? "Mark " + ex.name + " as not done" : "Mark " + ex.name + " as done"}"
+        aria-pressed="${ex.completedToday}"
+        data-index="${index}"
+      >
+        <span class="tick-icon" aria-hidden="true">${ex.completedToday ? "✓" : ""}</span>
+      </button>
+      <div class="prescribed-item-body">
+        <span class="prescribed-item-name">${ex.name}</span>
+        ${prescription ? `<span class="prescribed-item-prescription">${prescription}</span>` : ""}
+        ${ex.notes ? `<span class="prescribed-item-notes">${ex.notes}</span>` : ""}
+      </div>
+      <button
+        class="btn btn-ghost btn-xs prescribed-delete"
+        aria-label="Remove ${ex.name} from prescribed exercises"
+        data-index="${index}"
+      >✕</button>
+    </div>
+  `;
+}
+
+/**
+ * Format sets/reps for a prescribed exercise.
+ * Returns an empty string if no prescription data.
+ */
+function formatPrescribedReps(ex) {
+  const sets = ex.sets ? `${ex.sets} x ` : "";
+  const reps = ex.reps || "";
+  if (!sets && !reps) return "";
+  return `${sets}${reps}`.trim();
+}
+
 function renderRecentHistory() {
   const history = checkinData.getHistory(5);
 
@@ -456,6 +626,57 @@ function clearAvailableTimeFromStrip() {
   router.navigate("today");
 }
 
+// ── Prescribed exercise helpers ───────────────────────────────────────────────
+
+/**
+ * Toggle completion state on a prescribed exercise.
+ * Awards 100 credits on completion; deducts on un-tick.
+ */
+function togglePrescribedComplete(index) {
+  const exercises = store.get("prescribedExercises") || [];
+  if (!exercises[index]) return;
+
+  const ex          = exercises[index];
+  const nowComplete = !ex.completedToday;
+
+  exercises[index] = {
+    ...ex,
+    completedToday: nowComplete,
+    completedAt:    nowComplete ? new Date().toISOString() : null
+  };
+
+  store.set("prescribedExercises", exercises);
+
+  // Credit award / deduction
+  const current = store.get("totalCredits") || 0;
+  store.set("totalCredits", Math.max(0, current + (nowComplete ? 100 : -100)));
+
+  router.navigate("today");
+}
+
+/**
+ * Remove a prescribed exercise from the store.
+ */
+function deletePrescribed(index) {
+  const exercises = store.get("prescribedExercises") || [];
+  exercises.splice(index, 1);
+  store.set("prescribedExercises", exercises);
+  router.navigate("today");
+}
+
+/**
+ * Clear the add-exercise form fields.
+ */
+function clearPrescribedForm() {
+  ["prescribed-name", "prescribed-sets", "prescribed-reps", "prescribed-notes"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.value = "";
+      el.removeAttribute("aria-invalid");
+    }
+  });
+}
+
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
@@ -484,6 +705,73 @@ export function onMount() {
   });
 
   document.getElementById("time-strip-clear")?.addEventListener("click", clearAvailableTimeFromStrip);
+
+  // ── Prescribed exercises ──────────────────────────────────────────────────
+  const addBtn    = document.getElementById("prescribed-add-btn");
+  const addForm   = document.getElementById("prescribed-add-form");
+  const saveBtn   = document.getElementById("prescribed-save-btn");
+  const cancelBtn = document.getElementById("prescribed-cancel-btn");
+
+  addBtn?.addEventListener("click", () => {
+    const isOpen = !addForm.hidden;
+    addForm.hidden = isOpen;
+    addBtn.setAttribute("aria-expanded", String(!isOpen));
+    if (!isOpen) {
+      document.getElementById("prescribed-name")?.focus();
+    }
+  });
+
+  cancelBtn?.addEventListener("click", () => {
+    addForm.hidden = true;
+    addBtn.setAttribute("aria-expanded", "false");
+    clearPrescribedForm();
+  });
+
+  saveBtn?.addEventListener("click", () => {
+    const nameInput = document.getElementById("prescribed-name");
+    const name = nameInput?.value.trim();
+    if (!name) {
+      nameInput?.focus();
+      nameInput?.setAttribute("aria-invalid", "true");
+      return;
+    }
+
+    const sets  = document.getElementById("prescribed-sets")?.value.trim();
+    const reps  = document.getElementById("prescribed-reps")?.value.trim();
+    const notes = document.getElementById("prescribed-notes")?.value.trim();
+
+    const existing = store.get("prescribedExercises") || [];
+    const newEntry = {
+      id:             "prescribed-" + Date.now(),
+      name,
+      sets:           sets ? parseInt(sets) || null : null,
+      reps:           reps || null,
+      notes:          notes || null,
+      source:         "prescribed",
+      credits:        100,
+      addedAt:        new Date().toISOString(),
+      completedToday: false,
+      completedAt:    null
+    };
+
+    store.set("prescribedExercises", [...existing, newEntry]);
+    router.navigate("today");
+  });
+
+  // Tick buttons — delegate from prescribed-list
+  document.querySelector(".prescribed-list")?.addEventListener("click", e => {
+    const tick = e.target.closest(".prescribed-tick");
+    if (tick) {
+      const index = parseInt(tick.dataset.index);
+      togglePrescribedComplete(index);
+      return;
+    }
+    const del = e.target.closest(".prescribed-delete");
+    if (del) {
+      const index = parseInt(del.dataset.index);
+      deletePrescribed(index);
+    }
+  });
 
   // ── Workout start buttons ─────────────────────────────────────────────────
   document.querySelectorAll(".workout-start-btn").forEach(btn => {
