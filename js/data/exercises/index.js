@@ -66,7 +66,7 @@ import { SWIMMING_CYCLING }   from './swimming_cycling.js';
 import { SPORT_CONDITIONING } from './sport_conditioning.js';
 
 import { getActiveConditionIds } from '../conditions.js';
-import { store }                  from '../store.js';
+import { store }                  from '../../store.js';
 
 export const EXERCISES = [
   ...MOBILITY,
