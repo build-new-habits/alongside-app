@@ -992,15 +992,16 @@
 
 /* ============================================
    PRESCRIBED EXERCISES SECTION
-   Shown on Today view below workout options
-   when prescribedExercises.length > 0.
+   Cards match workout-option-card style.
+   Section sits above generated workout options.
    ============================================ */
 
 .prescribed-section {
   margin-top: var(--space-6);
+  margin-bottom: var(--space-2);
 }
 
-.prescribed-header {
+.prescribed-section-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -1008,16 +1009,54 @@
   margin-bottom: var(--space-3);
 }
 
-.prescribed-header-text h2 {
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-  color: var(--color-text);
+.prescribed-section-header h2 {
+  color: var(--color-primary);
   margin: 0 0 var(--space-1) 0;
 }
 
-.prescribed-coach-note {
+/* Empty state coach card */
+.prescribed-empty-state {
   margin-bottom: var(--space-3);
-  font-size: var(--text-sm);
+}
+
+/* Exercise cards */
+.prescribed-exercise-card {
+  margin-top: var(--space-4);
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.prescribed-exercise-card.prescribed-done {
+  opacity: 0.65;
+}
+
+/* Strike-through on completed exercise name */
+.prescribed-name-done {
+  text-decoration: line-through;
+  color: var(--color-text-secondary) !important;
+}
+
+/* Card action row — Mark as done + Remove */
+.prescribed-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.prescribed-card-actions .btn-full {
+  flex: 1;
+}
+
+.prescribed-card-actions .prescribed-delete {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.prescribed-card-actions .prescribed-delete:hover,
+.prescribed-card-actions .prescribed-delete:focus-visible {
+  color: var(--color-danger);
 }
 
 /* ── Add form ── */
@@ -1113,105 +1152,4 @@
 .prescribed-form-actions .btn-ghost:hover {
   color: var(--color-text);
   background: rgba(255, 255, 255, 0.06);
-}
-
-/* ── Exercise list ── */
-.prescribed-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.prescribed-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  background: var(--color-bg-card);
-  border: 1.5px solid var(--color-bg-hover);
-  border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-4);
-  transition: border-color 0.2s ease, opacity 0.2s ease;
-}
-
-.prescribed-item.completed {
-  border-color: var(--color-success);
-  opacity: 0.75;
-}
-
-.prescribed-item.completed .prescribed-item-name {
-  text-decoration: line-through;
-  color: var(--color-text-secondary);
-}
-
-/* Tick button — 44px minimum touch target (WCAG 2.5.5) */
-.prescribed-tick {
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid var(--color-text-muted);
-  background: transparent;
-  color: var(--color-success);
-  font-size: var(--text-lg);
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.prescribed-tick:hover,
-.prescribed-tick:focus-visible {
-  border-color: var(--color-success);
-  background: var(--color-success-light);
-  outline: 3px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-.prescribed-item.completed .prescribed-tick {
-  background: var(--color-success-light);
-  border-color: var(--color-success);
-}
-
-.tick-icon {
-  line-height: 1;
-}
-
-.prescribed-item-body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.prescribed-item-name {
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--color-text);
-}
-
-.prescribed-item-prescription {
-  font-size: var(--text-sm);
-  color: var(--color-primary);
-  font-weight: var(--font-medium);
-}
-
-.prescribed-item-notes {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-}
-
-/* Delete button */
-.prescribed-delete {
-  flex-shrink: 0;
-  color: var(--color-text-muted);
-  min-width: 32px;
-  min-height: 44px; /* touch target */
-}
-
-.prescribed-delete:hover,
-.prescribed-delete:focus-visible {
-  color: var(--color-danger);
 }
