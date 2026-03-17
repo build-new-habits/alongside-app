@@ -1236,3 +1236,19 @@
   border-top: 1px solid var(--color-bg-hover);
   margin: var(--space-4) 0 var(--space-3);
 }
+
+/* ── Prescribed exercises shortcut in check-in submit area ── */
+.checkin-prescribed-shortcut {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+  min-height: 44px; /* WCAG touch target */
+}
+
+.checkin-prescribed-shortcut:hover,
+.checkin-prescribed-shortcut:focus-visible {
+  color: var(--color-primary);
+}
