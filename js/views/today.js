@@ -197,6 +197,9 @@ function renderTodaysDashboard(name) {
         </div>
       </div>
 
+      <!-- ── Prescribed exercises ───────────────────────────────────────── -->
+      ${renderPrescribedSection()}
+
       <!-- ── Workout options ────────────────────────────────────────────── -->
       <div class="workout-options" id="workout-options">
         <h2>Today's Options</h2>
@@ -204,9 +207,6 @@ function renderTodaysDashboard(name) {
 
         ${workouts.map((workout, index) => renderWorkoutCard(workout, index)).join("")}
       </div>
-
-      <!-- ── Prescribed exercises ───────────────────────────────────────── -->
-      ${renderPrescribedSection()}
 
     </div>
   `;
@@ -393,12 +393,8 @@ function renderSevereZoneMessage() {
 
 /**
  * Render the prescribed exercises section.
- * Visible only when prescribedExercises.length > 0 OR when the add form has
- * been opened (handled by showAddForm flag via data attribute on the section).
- *
- * Daily completion state: completedToday is reset on render if completedAt
- * is from a previous day. This ensures the tick reappears each morning without
- * requiring a separate midnight job.
+ * Shown above generated options — these are the must-dos.
+ * Cards match the workout option card style.
  */
 function renderPrescribedSection() {
   const raw = store.get("prescribedExercises") || [];
@@ -415,22 +411,24 @@ function renderPrescribedSection() {
     return ex;
   });
 
-  // Persist any resets (no-op if nothing changed)
+  // Persist any resets
   if (exercises.some((ex, i) => ex.completedToday !== raw[i].completedToday)) {
     store.set("prescribedExercises", exercises);
   }
 
   const completedCount = exercises.filter(e => e.completedToday).length;
+  const creditsEarned  = completedCount * 100;
 
   return `
     <div class="prescribed-section" id="prescribed-section">
-      <div class="prescribed-header">
-        <div class="prescribed-header-text">
-          <h2>Your prescribed exercises</h2>
-          ${exercises.length > 0
-            ? `<p class="text-secondary text-sm">${completedCount} of ${exercises.length} done today</p>`
-            : ""
-          }
+
+      <div class="prescribed-section-header">
+        <div>
+          <h2>Prescribed exercises</h2>
+          <p class="text-secondary text-sm">${exercises.length > 0
+            ? `${completedCount} of ${exercises.length} done today${creditsEarned > 0 ? " \xb7 +" + creditsEarned + " \u2b50 earned" : ""}`
+            : "Exercises from your physio or coach"
+          }</p>
         </div>
         <button
           class="btn btn-ghost btn-small"
@@ -441,13 +439,12 @@ function renderPrescribedSection() {
         >+ Add</button>
       </div>
 
-      <div class="card card-coach prescribed-coach-note" ${exercises.length === 0 ? "" : ""}>
-        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p>${exercises.length === 0
-          ? "If your physio, GP, or coach has given you exercises to do, you can add them here. I will remind you each day and keep track of what you have completed."
-          : "Your physio has given you these — do them before or after your workout, whichever feels right."
-        }</p>
-      </div>
+      ${exercises.length === 0 ? `
+        <div class="card card-coach prescribed-empty-state">
+          <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <p>If your physio, GP, or coach has given you exercises to do, add them here. They will appear at the top of your daily plan as your must-dos, and I will keep track of them each day.</p>
+        </div>
+      ` : ""}
 
       <!-- Add exercise form (hidden by default) -->
       <div class="prescribed-add-form" id="prescribed-add-form" hidden>
@@ -495,50 +492,58 @@ function renderPrescribedSection() {
         </div>
       </div>
 
-      <!-- Exercise list -->
+      <!-- Exercise cards -->
       ${exercises.length > 0 ? `
         <div class="prescribed-list" role="list" aria-label="Prescribed exercises">
           ${exercises.map((ex, index) => renderPrescribedItem(ex, index)).join("")}
         </div>
       ` : ""}
+
     </div>
   `;
 }
 
 /**
- * Render a single prescribed exercise item.
+ * Render a single prescribed exercise as a card matching the workout option style.
  */
 function renderPrescribedItem(ex, index) {
   const prescription = formatPrescribedReps(ex);
 
   return `
-    <div class="prescribed-item ${ex.completedToday ? "completed" : ""}" role="listitem" data-index="${index}">
-      <button
-        class="prescribed-tick"
-        id="prescribed-tick-${index}"
-        aria-label="${ex.completedToday ? "Mark " + ex.name + " as not done" : "Mark " + ex.name + " as done"}"
-        aria-pressed="${ex.completedToday}"
-        data-index="${index}"
-      >
-        <span class="tick-icon" aria-hidden="true">${ex.completedToday ? "✓" : ""}</span>
-      </button>
-      <div class="prescribed-item-body">
-        <span class="prescribed-item-name">${ex.name}</span>
-        ${prescription ? `<span class="prescribed-item-prescription">${prescription}</span>` : ""}
-        ${ex.notes ? `<span class="prescribed-item-notes">${ex.notes}</span>` : ""}
+    <div class="card workout-option-card prescribed-exercise-card ${ex.completedToday ? "prescribed-done" : ""}"
+         role="listitem" data-index="${index}">
+
+      <div class="option-header">
+        <span class="option-icon" aria-hidden="true">${ex.completedToday ? "\u2705" : "\ud83e\ude7a"}</span>
+        <div class="option-info">
+          <h4 class="${ex.completedToday ? "prescribed-name-done" : ""}">${ex.name}</h4>
+          ${prescription ? `<p class="text-sm text-muted">${prescription}</p>` : ""}
+        </div>
+        <span class="option-credits" aria-label="100 credits for completing this exercise">+100 \u2b50</span>
       </div>
-      <button
-        class="btn btn-ghost btn-xs prescribed-delete"
-        aria-label="Remove ${ex.name} from prescribed exercises"
-        data-index="${index}"
-      >✕</button>
+
+      ${ex.notes ? `<p class="workout-rationale">${ex.notes}</p>` : ""}
+
+      <div class="prescribed-card-actions">
+        <button
+          class="btn ${ex.completedToday ? "btn-secondary" : "btn-primary"} btn-full prescribed-tick"
+          data-index="${index}"
+          aria-pressed="${ex.completedToday}"
+          aria-label="${ex.completedToday ? "Mark as not done" : "Mark as done"}: ${ex.name}"
+        >${ex.completedToday ? "\u2713 Done \u2014 tap to undo" : "Mark as done"}</button>
+        <button
+          class="btn btn-ghost btn-small prescribed-delete"
+          aria-label="Remove ${ex.name} from prescribed exercises"
+          data-index="${index}"
+        >Remove</button>
+      </div>
+
     </div>
   `;
 }
 
 /**
  * Format sets/reps for a prescribed exercise.
- * Returns an empty string if no prescription data.
  */
 function formatPrescribedReps(ex) {
   const sets = ex.sets ? `${ex.sets} x ` : "";
@@ -546,6 +551,7 @@ function formatPrescribedReps(ex) {
   if (!sets && !reps) return "";
   return `${sets}${reps}`.trim();
 }
+
 
 function renderRecentHistory() {
   const history = checkinData.getHistory(5);
