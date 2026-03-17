@@ -720,6 +720,16 @@ export function onMount() {
     addBtn.setAttribute("aria-expanded", "false");
   }
 
+  // Auto-open if arriving from the check-in prescribed shortcut
+  if (store.get("openPrescribedFormOnLoad")) {
+    store.set("openPrescribedFormOnLoad", false);
+    // Small delay so the view has fully rendered before we try to open/scroll
+    setTimeout(() => {
+      openPrescribedForm();
+      document.getElementById("prescribed-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+  }
+
   addBtn?.addEventListener("click", () => {
     if (addForm.hidden) { openPrescribedForm(); } else { closePrescribedForm(); }
   });
