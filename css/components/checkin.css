@@ -988,3 +988,230 @@
   padding: var(--space-1) var(--space-2);
   min-height: auto;
 }
+
+
+/* ============================================
+   PRESCRIBED EXERCISES SECTION
+   Shown on Today view below workout options
+   when prescribedExercises.length > 0.
+   ============================================ */
+
+.prescribed-section {
+  margin-top: var(--space-6);
+}
+
+.prescribed-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.prescribed-header-text h2 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.prescribed-coach-note {
+  margin-bottom: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+/* ── Add form ── */
+.prescribed-add-form {
+  margin-bottom: var(--space-3);
+}
+
+.prescribed-form-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  margin: 0 0 var(--space-4) 0;
+  color: var(--color-text);
+}
+
+.prescribed-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.prescribed-form-row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.form-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+}
+
+.required-mark {
+  color: var(--color-danger);
+  margin-left: 2px;
+}
+
+.form-input {
+  background: var(--color-bg-deep);
+  border: 1.5px solid var(--color-bg-hover);
+  border-radius: var(--radius-md);
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+  font-size: var(--text-base);
+  font-family: inherit;
+  padding: var(--space-2) var(--space-3);
+  min-height: 44px;
+  transition: border-color 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-input::placeholder {
+  color: var(--color-text-muted);
+  -webkit-text-fill-color: var(--color-text-muted);
+  opacity: 1;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+}
+
+.form-input[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.form-input-short {
+  max-width: 120px;
+}
+
+.prescribed-form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Ensure ghost button text stays visible on hover within the form card */
+.prescribed-form-actions .btn-ghost {
+  color: var(--color-text-secondary);
+}
+
+.prescribed-form-actions .btn-ghost:hover {
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Exercise list ── */
+.prescribed-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.prescribed-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-bg-hover);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.prescribed-item.completed {
+  border-color: var(--color-success);
+  opacity: 0.75;
+}
+
+.prescribed-item.completed .prescribed-item-name {
+  text-decoration: line-through;
+  color: var(--color-text-secondary);
+}
+
+/* Tick button — 44px minimum touch target (WCAG 2.5.5) */
+.prescribed-tick {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--color-text-muted);
+  background: transparent;
+  color: var(--color-success);
+  font-size: var(--text-lg);
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.prescribed-tick:hover,
+.prescribed-tick:focus-visible {
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.prescribed-item.completed .prescribed-tick {
+  background: var(--color-success-light);
+  border-color: var(--color-success);
+}
+
+.tick-icon {
+  line-height: 1;
+}
+
+.prescribed-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prescribed-item-name {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-text);
+}
+
+.prescribed-item-prescription {
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  font-weight: var(--font-medium);
+}
+
+.prescribed-item-notes {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Delete button */
+.prescribed-delete {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  min-width: 32px;
+  min-height: 44px; /* touch target */
+}
+
+.prescribed-delete:hover,
+.prescribed-delete:focus-visible {
+  color: var(--color-danger);
+}
