@@ -1,0 +1,33 @@
+{
+  "name": "BNH OS — Build New Habits",
+  "short_name": "BNH OS",
+  "description": "Business operating system for Build New Habits",
+  "start_url": "/BNH-OS/",
+  "scope": "/BNH-OS/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0A1120",
+  "theme_color": "#0A1120",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "en-GB"
+}
