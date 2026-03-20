@@ -7,8 +7,10 @@
  *   each exercise card: "Not feeling this? You can skip it -- that is a
  *   valid choice." A secondary skip button is already present; this gives
  *   it a coach framing so the user understands skipping is not failure.
- *   Shown only for zones at Mild severity -- Moderate and Severe have their
- *   own messaging on the Today view before the workout starts.
+ *   Shown when any zone is Mild or Moderate -- Severe users should not be
+ *   in a workout (generator upstream handles that). The Today view moderate
+ *   banner explains the pool reduction; this nudge gives them permission to
+ *   skip individual exercises once inside the workout.
  *   getZoneStatus() is called once at render time and passed through.
  *
  * v1.1 — Difficulty feedback prompt after main/finisher exercises.
@@ -46,8 +48,10 @@ export function render() {
   const conditions = store.get('conditions') || [];
   const painScores = store.get('conditionPainScores') || {};
   const zoneStatus = getZoneStatus(conditions, painScores);
+  // Show exit route nudge for mild OR moderate zones.
+  // Severe users should not be in a workout -- generator handles that upstream.
   const hasMildZone = Object.entries(zoneStatus).some(
-    ([key, val]) => key !== 'combinedSevere' && val === 'mild'
+    ([key, val]) => key !== 'combinedSevere' && (val === 'mild' || val === 'moderate')
   );
 
   return `
