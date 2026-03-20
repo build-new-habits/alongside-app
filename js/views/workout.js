@@ -86,15 +86,16 @@ export function render() {
           ${renderExerciseTarget(exercise)}
         </div>
 
-        <!-- YouTube Demo Link -->
-        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.name + ' exercise form')}"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="youtube-link"
-           aria-label="Watch how to do ${exercise.name} on YouTube (opens in new tab)">
-          <span class="youtube-icon" aria-hidden="true">&#9654;&#65039;</span>
-          Watch how to do this
-        </a>
+        <!-- Why this exercise — shown before instructions so rationale lands first -->
+        ${exercise.why ? `
+          <div class="exercise-why">
+            <h3>Why this exercise?</h3>
+            <p>${exercise.why}</p>
+          </div>
+        ` : ''}
+
+        <!-- Exit route nudge -- shown early so user can bail before reading instructions -->
+        ${hasMildZone ? renderExitRouteNudge() : ''}
 
         <!-- Instructions -->
         <div class="exercise-instructions card">
@@ -111,16 +112,15 @@ export function render() {
           ` : ''}
         </div>
 
-        <!-- Why this exercise -->
-        ${exercise.why ? `
-          <div class="exercise-why">
-            <h3>Why this exercise?</h3>
-            <p>${exercise.why}</p>
-          </div>
-        ` : ''}
-
-        <!-- Exit route nudge -- shown when a mild pain zone is active -->
-        ${hasMildZone ? renderExitRouteNudge() : ''}
+        <!-- YouTube Demo Link — supplementary reference, below instructions -->
+        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.name + ' exercise form')}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="youtube-link"
+           aria-label="Watch how to do ${exercise.name} on YouTube (opens in new tab)">
+          <span class="youtube-icon" aria-hidden="true">&#9654;&#65039;</span>
+          Watch how to do this
+        </a>
       </div>
 
       <!-- Action buttons -->
