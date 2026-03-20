@@ -483,3 +483,78 @@
   margin: 0;
   line-height: var(--leading-relaxed);
 }
+
+/* ── Moderate zone banner (today.js) ─────────────────────────────────────────
+   Amber/warning tone -- softer than severe (red). Explains why the pool is
+   smaller. Sits between phase banner and coach card, same as severe banner.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.moderate-zone-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: var(--color-warning-light);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.moderate-zone-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.moderate-zone-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.moderate-zone-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-warning);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.moderate-zone-message {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Exercise exit route nudge (workout.js) ──────────────────────────────────
+   Inline, below exercise instructions. Shown when a mild pain zone is active.
+   Neutral tone -- informs without alarming. Skip button is already present
+   in the action bar; this gives it a coach voice so skipping feels sanctioned.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.exit-route-nudge {
+  background: rgba(96, 165, 250, 0.08);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.exit-route-nudge-body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.exit-route-nudge-text {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+.exit-route-nudge-text strong {
+  color: var(--color-info);
+  font-weight: var(--font-semibold);
+}
