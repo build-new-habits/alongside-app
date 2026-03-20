@@ -420,57 +420,6 @@
 
 <!-- ── SERVICE WORKER + PWA INSTALL ─────────────────────────── -->
 <script>
-// Register service worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/BNH-OS/sw.js', { scope: '/BNH-OS/' })
-      .then(reg => console.log('SW registered:', reg.scope))
-      .catch(err => console.log('SW registration failed:', err));
-  });
-}
-
-// PWA install prompt
-let deferredPrompt = null;
-
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  showInstallBanner();
-});
-
-window.addEventListener('appinstalled', () => {
-  deferredPrompt = null;
-  hideInstallBanner();
-  console.log('BNH OS installed as app');
-});
-
-function showInstallBanner() {
-  const banner = document.getElementById('install-banner');
-  if (banner) banner.style.display = 'flex';
-}
-
-function hideInstallBanner() {
-  const banner = document.getElementById('install-banner');
-  if (banner) banner.style.display = 'none';
-}
-
-window.triggerInstall = async function() {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  console.log('Install outcome:', outcome);
-  deferredPrompt = null;
-  hideInstallBanner();
-};
-
-window.dismissInstall = function() {
-  hideInstallBanner();
-  sessionStorage.setItem('install-dismissed', '1');
-};
-</script>
-
-<!-- ── SERVICE WORKER + PWA INSTALL ─────────────────────────── -->
-<script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/BNH-OS/sw.js', { scope: '/BNH-OS/' })
