@@ -1,1046 +1,1147 @@
-/* =============================================================
-   BNH OS — App Core
-   app.js v1.0 | Build New Habits | March 2026
-   ============================================================= */
+/**
+ * app.js - Main Application Controller
+ * Alongside - Compassionate fitness coaching
+ * Enhanced Onboarding Version
+ */
 
-import { supabase, signIn, signOut, getSession, getCurrentUser, db,
-         subscribeToActivity, subscribeToTasks, subscribeToPhases } from './supabase.js';
-
-// ── STATE ─────────────────────────────────────────────────────
-export const state = {
-  user:           null,    // current Supabase user
-  displayName:    '',      // 'Graeme' or 'Sarah'
-  view:           'home',  // active view
-  productFilter:  'all',   // product filter on Home
-  theme:          localStorage.getItem('bnh-theme') || 'dark',
-  products:       [],
-  criticalTasks:  [],
-  recentActivity: [],
-  overdueTasks:   [],
-  subscriptions:  [],      // active Supabase realtime subs
-  toasts:         [],
-};
-
-// ── USER DISPLAY NAMES ────────────────────────────────────────
-// Maps Supabase user emails to friendly names
-// UPDATE THESE to match the emails you used when creating accounts in Supabase
-const USER_NAMES = {
-  'buildnewhabits@outlook.com': 'Graeme',
-  'sarahlbrady@hotmail.com': 'Sarah',
-};
-
-// Maps Supabase user UUIDs to display names (for activity feed)
-// UPDATE THESE with the actual User UIDs from Supabase → Authentication → Users
-// This avoids needing a join to auth.users which PostgREST cannot do directly
-const USER_ID_NAMES = {
-  'REPLACE_WITH_GRAEME_UUID': 'Graeme',
-  'REPLACE_WITH_SARAH_UUID':  'Sarah',
-};
-
-// ── AVATAR COLOURS ────────────────────────────────────────────
-const AVATAR_COLOURS = {
-  'Graeme': '#0D7377',
-  'Sarah':  '#7C3AED',
-};
-
-export function getAvatarColour(name) {
-  return AVATAR_COLOURS[name] || '#64748B';
-}
-
-export function getInitials(name) {
-  return (name || '??').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-}
-
-// ── THEME ─────────────────────────────────────────────────────
-export function applyTheme(theme) {
-  state.theme = theme;
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem('bnh-theme', theme);
-}
-
-export function toggleTheme() {
-  applyTheme(state.theme === 'dark' ? 'light' : 'dark');
-  updateThemeButton();
-}
-
-function updateThemeButton() {
-  const btn = document.getElementById('theme-toggle');
-  if (!btn) return;
-  const isDark = state.theme === 'dark';
-  btn.innerHTML = isDark
-    ? '<i class="fas fa-sun" aria-hidden="true"></i><span class="sr-only">Switch to light mode</span>'
-    : '<i class="fas fa-moon" aria-hidden="true"></i><span class="sr-only">Switch to dark mode</span>';
-}
-
-// ── NAVIGATION ────────────────────────────────────────────────
-const NAV_ITEMS = [
-  { id: 'home',         label: 'Home',         icon: 'fas fa-home' },
-  { id: 'products',     label: 'Products',     icon: 'fas fa-boxes' },
-  { id: 'operations',   label: 'Operations',   icon: 'fas fa-briefcase' },
-  { id: 'meetings',     label: 'Meetings',     icon: 'fas fa-users' },
-  { id: 'docs',         label: 'Docs',         icon: 'fas fa-folder-open' },
-  { id: 'reports',      label: 'Reports',      icon: 'fas fa-file-alt' },
-];
-
-export function navigate(viewId) {
-  if (!NAV_ITEMS.find(n => n.id === viewId)) return;
-  state.view = viewId;
-
-  // Update sidebar nav
-  document.querySelectorAll('.nav-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.view === viewId);
-    el.setAttribute('aria-current', el.dataset.view === viewId ? 'page' : 'false');
-  });
-
-  // Update bottom nav
-  document.querySelectorAll('.bottom-nav-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.view === viewId);
-    el.setAttribute('aria-current', el.dataset.view === viewId ? 'page' : 'false');
-  });
-
-  // Load view
-  loadView(viewId);
-
-  // Update page title
-  const item = NAV_ITEMS.find(n => n.id === viewId);
-  const titleEl = document.getElementById('page-title');
-  if (titleEl && item) titleEl.textContent = item.label;
-
-  // Announce to screen readers
-  announce(`Navigated to ${item?.label || viewId}`);
-}
-
-async function loadView(viewId) {
-  const container = document.getElementById('view-container');
-  if (!container) return;
-
-  // Show skeleton while loading
-  container.innerHTML = buildSkeleton();
-
-  try {
-    const res  = await fetch(`views/${viewId}.html`);
-    const html = await res.text();
-    container.innerHTML = html;
-
-    // Run view-specific init
-    await initView(viewId);
-
-    // Animate cards in
-    container.querySelectorAll('.card, .stat-card, .product-card').forEach((el, i) => {
-      el.classList.add('fade-up', `fade-up-delay-${Math.min(i + 1, 4)}`);
+const App = {
+  
+  // ========================================
+  // STATE
+  // ========================================
+  
+  currentView: null,
+  user: null,
+  
+  // Temporary storage during onboarding
+  onboardingData: {
+    name: '',
+    age: null,
+    gender: null,
+    hormonalTracking: false,
+    weight: null,
+    weightUnit: 'kg',
+    targetWeight: null,
+    targetDate: null,
+    targetDescription: '',
+    goals: [],
+    conditions: [],
+    lifestyle: {
+      activityLevel: null,
+      stressLevel: null,
+      sleepQuality: null
+    },
+    equipment: []
+  },
+  
+  // ========================================
+  // DATA OPTIONS
+  // ========================================
+  
+  GOALS: [
+    { id: 'lose-weight', name: 'Lose weight', icon: '⚖️', category: 'body' },
+    { id: 'build-strength', name: 'Build strength', icon: '💪', category: 'fitness' },
+    { id: 'improve-cardio', name: 'Improve cardio fitness', icon: '❤️', category: 'fitness' },
+    { id: 'build-muscle', name: 'Build muscle', icon: '🏋️', category: 'body' },
+    { id: 'improve-flexibility', name: 'Improve flexibility', icon: '🧘', category: 'mobility' },
+    { id: 'reduce-pain', name: 'Reduce pain / manage injury', icon: '🩹', category: 'recovery' },
+    { id: 'more-energy', name: 'Have more energy', icon: '⚡', category: 'wellbeing' },
+    { id: 'reduce-stress', name: 'Reduce stress', icon: '😌', category: 'wellbeing' },
+    { id: 'sleep-better', name: 'Sleep better', icon: '😴', category: 'wellbeing' },
+    { id: 'build-habit', name: 'Build a consistent routine', icon: '📅', category: 'habit' },
+    { id: 'run-5k', name: 'Run a 5K', icon: '🏃', category: 'cardio' },
+    { id: 'feel-better', name: 'Just feel better in my body', icon: '✨', category: 'wellbeing' }
+  ],
+  
+  CONDITIONS: [
+    { id: 'lower-back', name: 'Lower Back', icon: '🔙', area: 'back' },
+    { id: 'upper-back', name: 'Upper Back / Neck', icon: '🔙', area: 'back' },
+    { id: 'shoulder', name: 'Shoulder', icon: '💪', area: 'upper' },
+    { id: 'hip', name: 'Hip', icon: '🦴', area: 'lower' },
+    { id: 'knee', name: 'Knee', icon: '🦵', area: 'lower' },
+    { id: 'ankle-foot', name: 'Ankle / Foot', icon: '🦶', area: 'lower' },
+    { id: 'wrist-elbow', name: 'Wrist / Elbow', icon: '✋', area: 'upper' },
+    { id: 'chronic-fatigue', name: 'Chronic fatigue', icon: '😴', area: 'general' },
+    { id: 'anxiety', name: 'Anxiety / stress sensitivity', icon: '😰', area: 'general' },
+    { id: 'breathing', name: 'Breathing / asthma', icon: '🌬️', area: 'general' },
+    { id: 'perimenopause', name: 'Perimenopause symptoms', icon: '🌙', area: 'hormonal' },
+    { id: 'menopause', name: 'Menopause symptoms', icon: '🌙', area: 'hormonal' }
+  ],
+  
+  EQUIPMENT_CATEGORIES: [
+    {
+      id: 'weights',
+      name: 'Free Weights',
+      icon: '🏋️',
+      items: [
+        { id: 'dumbbells-light', name: 'Light dumbbells (1-5kg)' },
+        { id: 'dumbbells-medium', name: 'Medium dumbbells (6-12kg)' },
+        { id: 'dumbbells-heavy', name: 'Heavy dumbbells (13kg+)' },
+        { id: 'kettlebell-light', name: 'Light kettlebell (4-8kg)' },
+        { id: 'kettlebell-medium', name: 'Medium kettlebell (10-16kg)' },
+        { id: 'kettlebell-heavy', name: 'Heavy kettlebell (18kg+)' },
+        { id: 'barbell', name: 'Barbell + plates' }
+      ]
+    },
+    {
+      id: 'bands',
+      name: 'Resistance Bands',
+      icon: '🎗️',
+      items: [
+        { id: 'band-light', name: 'Light resistance band' },
+        { id: 'band-medium', name: 'Medium resistance band' },
+        { id: 'band-heavy', name: 'Heavy resistance band' },
+        { id: 'mini-bands', name: 'Mini/loop bands' }
+      ]
+    },
+    {
+      id: 'cardio',
+      name: 'Cardio Equipment',
+      icon: '🚴',
+      items: [
+        { id: 'treadmill', name: 'Treadmill' },
+        { id: 'exercise-bike', name: 'Exercise bike' },
+        { id: 'rowing-machine', name: 'Rowing machine' },
+        { id: 'skipping-rope', name: 'Skipping rope' }
+      ]
+    },
+    {
+      id: 'home',
+      name: 'Home Basics',
+      icon: '🏠',
+      items: [
+        { id: 'yoga-mat', name: 'Yoga/exercise mat' },
+        { id: 'foam-roller', name: 'Foam roller' },
+        { id: 'pull-up-bar', name: 'Pull-up bar' },
+        { id: 'stability-ball', name: 'Stability/Swiss ball' },
+        { id: 'bench', name: 'Workout bench' }
+      ]
+    },
+    {
+      id: 'recovery',
+      name: 'Recovery Tools',
+      icon: '💆',
+      items: [
+        { id: 'massage-gun', name: 'Massage gun' },
+        { id: 'lacrosse-ball', name: 'Lacrosse/massage ball' },
+        { id: 'stretching-strap', name: 'Stretching strap' }
+      ]
+    }
+  ],
+  
+  // ========================================
+  // INITIALISATION
+  // ========================================
+  
+  init() {
+    console.log('🌿 Alongside starting...');
+    
+    this.user = this.loadUser();
+    
+    setTimeout(() => {
+      this.hideLoading();
+      
+      if (!this.user || !this.user.onboardingComplete) {
+        this.navigate('onboarding-welcome');
+      } else {
+        this.navigate('today');
+      }
+    }, 2000);
+    
+    this.setupNavigation();
+    console.log('🌿 Alongside ready');
+  },
+  
+  // ========================================
+  // NAVIGATION
+  // ========================================
+  
+  navigate(viewName) {
+    console.log(`Navigating to: ${viewName}`);
+    
+    const mainContent = document.getElementById('main-content');
+    const bottomNav = document.getElementById('bottom-nav');
+    
+    mainContent.innerHTML = '';
+    mainContent.className = 'main-content';
+    
+    // Hide nav during onboarding
+    if (viewName.startsWith('onboarding')) {
+      bottomNav.classList.add('hidden');
+    }
+    
+    switch (viewName) {
+      // Onboarding screens
+      case 'onboarding-welcome':
+        mainContent.classList.add('centered');
+        mainContent.innerHTML = this.renderOnboardingWelcome();
+        break;
+      case 'onboarding-name':
+        mainContent.innerHTML = this.renderOnboardingName();
+        this.focusInput('user-name');
+        break;
+      case 'onboarding-about':
+        mainContent.innerHTML = this.renderOnboardingAbout();
+        break;
+      case 'onboarding-body':
+        mainContent.innerHTML = this.renderOnboardingBody();
+        break;
+      case 'onboarding-goals':
+        mainContent.innerHTML = this.renderOnboardingGoals();
+        break;
+      case 'onboarding-conditions':
+        mainContent.innerHTML = this.renderOnboardingConditions();
+        break;
+      case 'onboarding-lifestyle':
+        mainContent.innerHTML = this.renderOnboardingLifestyle();
+        break;
+      case 'onboarding-equipment':
+        mainContent.innerHTML = this.renderOnboardingEquipment();
+        break;
+      case 'onboarding-complete':
+        mainContent.classList.add('centered');
+        mainContent.innerHTML = this.renderOnboardingComplete();
+        break;
+        
+      // Main app screens
+      case 'today':
+        mainContent.innerHTML = this.renderToday();
+        bottomNav.classList.remove('hidden');
+        this.setActiveNav('today');
+        break;
+      case 'progress':
+        mainContent.innerHTML = this.renderProgress();
+        bottomNav.classList.remove('hidden');
+        this.setActiveNav('progress');
+        break;
+      case 'settings':
+        mainContent.innerHTML = this.renderSettings();
+        bottomNav.classList.remove('hidden');
+        this.setActiveNav('settings');
+        break;
+        
+      default:
+        this.navigate('onboarding-welcome');
+    }
+    
+    this.currentView = viewName;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+  
+  hideLoading() {
+    const loading = document.getElementById('loading');
+    loading.style.opacity = '0';
+    loading.style.transition = 'opacity 0.3s ease-out';
+    setTimeout(() => loading.classList.add('hidden'), 300);
+  },
+  
+  focusInput(id) {
+    setTimeout(() => {
+      const input = document.getElementById(id);
+      if (input) input.focus();
+    }, 100);
+  },
+  
+  setupNavigation() {
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => this.navigate(item.dataset.view));
     });
-  } catch (err) {
-    container.innerHTML = buildErrorState(viewId);
-    console.error(`Failed to load view: ${viewId}`, err);
-  }
-}
-
-async function initView(viewId) {
-  switch (viewId) {
-    case 'home':       await initHome();       break;
-    case 'products':   await initProducts();   break;
-    case 'operations': await initOperations(); break;
-    case 'meetings':   await initMeetings();   break;
-    case 'docs':       await initDocs();       break;
-    case 'reports':    await initReports();    break;
-  }
-}
-
-// ── APP INIT ──────────────────────────────────────────────────
-export async function initApp() {
-  // Apply saved theme
-  applyTheme(state.theme);
-
-  // Check auth
-  const session = await getSession();
-  if (!session) {
-    showAuth();
-    return;
-  }
-
-  await bootWithSession(session);
-}
-
-async function bootWithSession(session) {
-  state.user = session.user;
-  state.displayName = USER_NAMES[session.user.email] || session.user.email;
-
-  showApp();
-  buildNav();
-  updateUserDisplay();
-  updateThemeButton();
-
-  // Load initial data
-  await Promise.all([
-    loadProducts(),
-    loadCriticalTasks(),
-    loadRecentActivity(),
-  ]);
-
-  // Start at home
-  navigate('home');
-
-  // Subscribe to real-time updates
-  setupRealtime();
-}
-
-// ── AUTH ──────────────────────────────────────────────────────
-function showAuth() {
-  document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('app-screen').style.display  = 'none';
-
-  const form = document.getElementById('auth-form');
-  if (!form) return;
-
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-    const btn   = form.querySelector('[type="submit"]');
-    const email = form.querySelector('#auth-email').value.trim();
-    const pass  = form.querySelector('#auth-password').value;
-    const errEl = document.getElementById('auth-error');
-
-    btn.disabled = true;
-    btn.textContent = 'Signing in…';
-    errEl.textContent = '';
-
-    try {
-      const { session } = await signIn(email, pass);
-      await bootWithSession(session);
-    } catch (err) {
-      errEl.textContent = 'Incorrect email or password. Please try again.';
-      btn.disabled   = false;
-      btn.textContent = 'Sign in';
-    }
-  });
-}
-
-function showApp() {
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('app-screen').style.display  = 'grid';
-}
-
-export async function handleSignOut() {
-  // Clean up subscriptions
-  state.subscriptions.forEach(sub => sub.unsubscribe());
-  state.subscriptions = [];
-
-  await signOut();
-  showAuth();
-  showToast('Signed out successfully');
-}
-
-// ── NAV BUILDER ───────────────────────────────────────────────
-function buildNav() {
-  // Sidebar nav
-  const sidebarNav = document.getElementById('sidebar-nav');
-  if (sidebarNav) {
-    sidebarNav.innerHTML = NAV_ITEMS.map(item => `
-      <button
-        class="nav-item"
-        data-view="${item.id}"
-        aria-label="${item.label}"
-        aria-current="false"
-        onclick="window.App.navigate('${item.id}')"
-      >
-        <i class="${item.icon}" aria-hidden="true"></i>
-        <span>${item.label}</span>
-      </button>
-    `).join('');
-  }
-
-  // Bottom nav (mobile)
-  const bottomNav = document.getElementById('bottom-nav');
-  if (bottomNav) {
-    // Show only first 6 items (all of them)
-    bottomNav.innerHTML = NAV_ITEMS.map(item => `
-      <button
-        class="bottom-nav-item"
-        data-view="${item.id}"
-        aria-label="${item.label}"
-        aria-current="false"
-        onclick="window.App.navigate('${item.id}')"
-      >
-        <i class="${item.icon} bottom-nav-icon" aria-hidden="true"></i>
-        <span>${item.label}</span>
-      </button>
-    `).join('');
-  }
-}
-
-// ── USER DISPLAY ──────────────────────────────────────────────
-function updateUserDisplay() {
-  const avatarEls = document.querySelectorAll('.sidebar-avatar');
-  const nameEls   = document.querySelectorAll('.sidebar-user-name');
-  const roleEls   = document.querySelectorAll('.sidebar-user-role');
-
-  avatarEls.forEach(el => {
-    el.textContent    = getInitials(state.displayName);
-    el.style.background = getAvatarColour(state.displayName);
-  });
-  nameEls.forEach(el => el.textContent = state.displayName);
-  roleEls.forEach(el => el.style.display = 'none');
-}
-
-// ── DATA LOADERS ──────────────────────────────────────────────
-async function loadProducts() {
-  try {
-    state.products = await db.getProducts();
-  } catch (err) {
-    console.error('Failed to load products', err);
-    state.products = [];
-  }
-}
-
-async function loadCriticalTasks() {
-  try {
-    state.criticalTasks = await db.getCriticalTasks();
-    updateCriticalBadge();
-  } catch (err) {
-    console.error('Failed to load critical tasks', err);
-  }
-}
-
-async function loadRecentActivity() {
-  try {
-    state.recentActivity = await db.getRecentActivity(8);
-  } catch (err) {
-    console.error('Failed to load activity', err);
-  }
-}
-
-function updateCriticalBadge() {
-  const count = state.criticalTasks.length;
-  document.querySelectorAll('.nav-badge.critical, .bottom-nav-badge').forEach(el => {
-    el.textContent    = count;
-    el.style.display  = count > 0 ? 'inline-block' : 'none';
-  });
-}
-
-// ── REAL-TIME ─────────────────────────────────────────────────
-function setupRealtime() {
-  const actSub = subscribeToActivity(item => {
-    state.recentActivity.unshift(item);
-    state.recentActivity = state.recentActivity.slice(0, 8);
-    refreshActivityFeed();
-  });
-
-  const taskSub = subscribeToTasks(payload => {
-    if (payload.eventType === 'UPDATE' && payload.new.status === 'complete') {
-      loadCriticalTasks(); // refresh critical count
-    }
-  });
-
-  const phaseSub = subscribeToPhases(updatedPhase => {
-    if (updatedPhase.status === 'complete') {
-      handlePhaseComplete(updatedPhase);
-    }
-  });
-
-  state.subscriptions.push(actSub, taskSub, phaseSub);
-}
-
-// ── VIEW INITIALISERS ─────────────────────────────────────────
-async function initHome() {
-  renderProductFilterStrip();
-  await renderCriticalSection();
-  await renderPhaseProgressStrip();
-  await renderWorkstreamCards();
-  renderActivityFeed();
-  await renderOutstandingTasks();
-}
-
-async function initProducts() {
-  renderProductCards();
-}
-
-async function initOperations() {
-  renderOperationsWorkstreams();
-}
-
-async function initMeetings() {
-  renderMeetingsList();
-}
-
-async function initDocs() {
-  renderDocsLibrary();
-}
-
-async function initReports() {
-  renderReportsList();
-}
-
-// ── PRODUCT FILTER STRIP ──────────────────────────────────────
-function renderProductFilterStrip() {
-  const el = document.getElementById('product-filter-strip');
-  if (!el) return;
-
-  const products = [
-    { id: 'all',      name: 'All',              colour: null },
-    { id: 'move',     name: 'Move',             colour: '#0D7377' },
-    { id: 'athlete',  name: 'Athlete',          colour: '#7C3AED' },
-    { id: 'life',     name: 'Life',             colour: '#059669' },
-    { id: 'compass',  name: 'Compass',          colour: '#EA580C' },
-    { id: 'savvy',    name: 'Savvy',            colour: '#0284C7' },
-  ];
-
-  el.innerHTML = products.map(p => `
-    <button
-      class="product-filter-btn ${state.productFilter === p.id ? 'active' : ''}"
-      onclick="window.App.setProductFilter('${p.id}')"
-      aria-pressed="${state.productFilter === p.id}"
-      aria-label="Filter by ${p.id === 'all' ? 'all products' : 'Alongside: ' + p.name}"
-    >
-      ${p.colour ? `<span style="width:7px;height:7px;border-radius:50%;background:${p.colour};flex-shrink:0" aria-hidden="true"></span>` : ''}
-      ${p.id === 'all' ? 'All' : p.name}
-    </button>
-  `).join('');
-}
-
-export function setProductFilter(filterId) {
-  state.productFilter = filterId;
-  renderProductFilterStrip();
-  renderCriticalSection();
-  renderPhaseProgressStrip();
-  renderWorkstreamCards();
-  renderActivityFeed();
-  renderOutstandingTasks();
-}
-
-// ── CRITICAL SECTION ─────────────────────────────────────────
-async function renderCriticalSection() {
-  const el = document.getElementById('critical-section');
-  if (!el) return;
-
-  const tasks = state.criticalTasks;
-  if (!tasks.length) { el.style.display = 'none'; return; }
-
-  el.style.display = 'block';
-  el.innerHTML = `
-    <div class="critical-section" role="region" aria-label="Critical items">
-      <div class="critical-header" aria-hidden="true">
-        <i class="fas fa-exclamation-triangle"></i>
-        <span style="font-size:var(--text-sm);font-weight:var(--weight-bold)">
-          ${tasks.length} Critical Item${tasks.length > 1 ? 's' : ''}
-        </span>
-      </div>
-      ${tasks.map(t => `
-        <div class="critical-item">
-          <i class="fas fa-arrow-right" style="font-size:10px;flex-shrink:0" aria-hidden="true"></i>
-          <span style="flex:1">${escHtml(t.title)}</span>
-          <span class="badge badge-critical">${t.due_date ? formatDate(t.due_date) : 'No date'}</span>
-        </div>
-      `).join('')}
-    </div>
-  `;
-}
-
-// ── ACTIVITY FEED ─────────────────────────────────────────────
-function renderActivityFeed() {
-  const el = document.getElementById('activity-feed');
-  if (!el) return;
-
-  if (!state.recentActivity.length) {
-    el.innerHTML = `<div class="empty-state">
-      <div class="empty-state-icon"><i class="fas fa-history"></i></div>
-      <div class="empty-state-title">No activity yet</div>
-      <div class="empty-state-body">Actions by you and Sarah will appear here in real time.</div>
-    </div>`;
-    return;
-  }
-
-  el.innerHTML = state.recentActivity.map(item => {
-    // Resolve display name from user_id using the USER_ID_NAMES map
-    // (avoids needing a join to auth.users which is not directly accessible)
-    const name = USER_ID_NAMES[item.user_id] || state.displayName || 'Team';
-    const colour = getAvatarColour(name);
-    const initials = getInitials(name);
+  },
+  
+  setActiveNav(viewName) {
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.view === viewName);
+    });
+  },
+  
+  // ========================================
+  // ONBOARDING SCREENS
+  // ========================================
+  
+  renderOnboardingWelcome() {
     return `
-      <div class="activity-item" role="listitem">
-        <div class="activity-avatar" style="background:${colour}" aria-hidden="true">${initials}</div>
-        <div class="activity-content">
-          <div class="activity-text">
-            <strong>${escHtml(name)}</strong> ${formatAction(item.action)}
-            <em>${escHtml(item.entity_title || '')}</em>
-          </div>
-          <div class="activity-meta">
-            <time datetime="${item.created_at}">${timeAgo(item.created_at)}</time>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function refreshActivityFeed() {
-  if (state.view === 'home') renderActivityFeed();
-}
-
-// ── OUTSTANDING TASKS ─────────────────────────────────────────
-async function renderOutstandingTasks() {
-  const el = document.getElementById('outstanding-tasks');
-  if (!el) return;
-
-  try {
-    const tasks = await db.getOverdueTasks();
-    if (!tasks.length) {
-      el.innerHTML = `<div class="empty-state" style="padding:var(--space-6)">
-        <div class="empty-state-icon"><i class="fas fa-check-circle" style="color:var(--phase-complete)"></i></div>
-        <div class="empty-state-title">All clear</div>
-      </div>`;
-      return;
-    }
-
-    el.innerHTML = `<div role="list">` + tasks.slice(0, 10).map(t => `
-      <div class="task-row" role="listitem">
-        <input
-          type="checkbox"
-          class="checkbox-wrap"
-          aria-label="Complete: ${escHtml(t.title)}"
-          onchange="window.App.completeTask('${t.id}', this)"
-          style="width:18px;height:18px;min-width:18px;min-height:18px;flex-shrink:0;margin-top:2px"
-        >
-        <div style="flex:1;min-width:0">
-          <div class="task-text">${escHtml(t.title)}</div>
-          <div class="task-meta">
-            ${t.workstreams?.products?.name
-              ? `<span class="badge badge-info" style="font-size:9px">${escHtml(t.workstreams.products.name)}</span>`
-              : ''}
-            ${t.workstreams?.name
-              ? `<span style="font-size:var(--text-xs);color:var(--text-muted)">${escHtml(t.workstreams.name)}</span>`
-              : ''}
-            ${t.due_date
-              ? `<span class="badge badge-critical" style="font-size:9px">Due ${formatDate(t.due_date)}</span>`
-              : ''}
-          </div>
-        </div>
-      </div>
-    `).join('') + `</div>`;
-  } catch (err) {
-    console.error('Failed to render outstanding tasks', err);
-  }
-}
-
-// ── PHASE PROGRESS STRIP ──────────────────────────────────────
-async function renderPhaseProgressStrip() {
-  const el = document.getElementById('phase-progress-strip');
-  if (!el) return;
-
-  try {
-    // Get Move phases (primary product)
-    const moveProduct = state.products.find(p => p.slug === 'move');
-    if (!moveProduct) return;
-
-    const phases = await db.getPhases(moveProduct.id);
-
-    el.innerHTML = `
-      <div class="phase-timeline" role="list" aria-label="Alongside: Move phase progress">
-        ${phases.map(p => `
-          <button
-            class="phase-pill ${p.status}"
-            role="listitem"
-            onclick="window.App.navigate('products')"
-            aria-label="Phase ${p.phase_number}: ${p.name} — ${p.status}"
-            title="${p.name}"
-          >
-            ${p.status === 'complete'
-              ? '<i class="fas fa-check" aria-hidden="true"></i>'
-              : `<span aria-hidden="true" style="font-size:10px;font-weight:700">${p.phase_number}</span>`
-            }
-            <span class="truncate" style="max-width:120px">Ph${p.phase_number}: ${escHtml(p.name)}</span>
-          </button>
-        `).join('')}
-      </div>
-    `;
-  } catch (err) {
-    console.error('Failed to render phase strip', err);
-  }
-}
-
-// ── WORKSTREAM PROGRESS CARDS ─────────────────────────────────
-async function renderWorkstreamCards() {
-  const el = document.getElementById('workstream-cards');
-  if (!el) return;
-  el.innerHTML = buildSkeleton(3);
-
-  try {
-    const moveProduct = state.products.find(p => p.slug === 'move');
-    if (!moveProduct) return;
-
-    const workstreams = await db.getWorkstreams(moveProduct.id);
-
-    const cardsHtml = await Promise.all(workstreams.map(async ws => {
-      const tasks = await db.getTasks(ws.id);
-      const total = tasks.length;
-      const done  = tasks.filter(t => t.status === 'complete').length;
-      const pct   = total ? Math.round((done / total) * 100) : 0;
-      const next  = tasks.find(t => t.status !== 'complete');
-
-      return `
-        <div class="stat-card card-interactive fade-up"
-             onclick="window.App.navigate('operations')"
-             role="button"
-             tabindex="0"
-             aria-label="${ws.name} workstream: ${pct}% complete"
-             onkeydown="if(event.key==='Enter'||event.key===' ')window.App.navigate('operations')">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-2)">
-            <div class="stat-label">${escHtml(ws.name)}</div>
-            <div style="font-size:var(--text-xl);font-weight:var(--weight-bold);color:${pct===100?'var(--phase-complete)':'var(--text-primary)'};font-family:var(--font-display);line-height:1">${pct}%</div>
-          </div>
-          <div class="progress-bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="${ws.name} progress">
-            <div class="progress-bar-fill ${pct===100?'complete':''}" style="width:${pct}%"></div>
-          </div>
-          ${next ? `<div class="stat-sub truncate">Next: ${escHtml(next.title)}</div>` : '<div class="stat-sub" style="color:var(--phase-complete)">All complete</div>'}
-        </div>
-      `;
-    }));
-
-    el.innerHTML = cardsHtml.join('');
-  } catch (err) {
-    el.innerHTML = '';
-    console.error('Failed to render workstream cards', err);
-  }
-}
-
-// ── PRODUCT CARDS ─────────────────────────────────────────────
-function renderProductCards() {
-  const el = document.getElementById('product-cards-grid');
-  if (!el) return;
-
-  const PRODUCT_META = {
-    'move':    { colour: '#0D7377', icon: 'fas fa-running',    tagline: 'Adaptive fitness coaching app' },
-    'athlete': { colour: '#7C3AED', icon: 'fas fa-medal',      tagline: 'Serious performer tier' },
-    'life':    { colour: '#059669', icon: 'fas fa-graduation-cap', tagline: 'Student independence coaching' },
-    'compass': { colour: '#EA580C', icon: 'fas fa-compass',    tagline: 'Over 60s digital skills' },
-    'savvy':   { colour: '#0284C7', icon: 'fas fa-star',       tagline: 'Under 16s digital capability' },
-  };
-
-  if (!state.products.length) {
-    el.innerHTML = `<div class="empty-state">
-      <div class="empty-state-icon"><i class="fas fa-boxes"></i></div>
-      <div class="empty-state-title">No products yet</div>
-    </div>`;
-    return;
-  }
-
-  el.innerHTML = state.products.map((p, i) => {
-    const meta = PRODUCT_META[p.slug] || { colour: '#64748B', icon: 'fas fa-box', tagline: '' };
-    return `
-      <div class="card product-card card-interactive fade-up fade-up-delay-${Math.min(i+1,4)}"
-           style="--product-color:${meta.colour}"
-           onclick="window.App.openProduct('${p.id}')"
-           role="button" tabindex="0"
-           aria-label="Alongside: ${p.name} — ${p.status}"
-           onkeydown="if(event.key==='Enter'||event.key===' ')window.App.openProduct('${p.id}')">
-        <div class="card-body" style="padding-left:calc(var(--space-5) + 4px)">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-3);margin-bottom:var(--space-3)">
-            <div style="width:40px;height:40px;border-radius:var(--radius-md);background:${meta.colour}18;display:flex;align-items:center;justify-content:center;color:${meta.colour};font-size:18px;flex-shrink:0">
-              <i class="${meta.icon}" aria-hidden="true"></i>
+      <div class="onboarding-view">
+        <div class="onboarding-content">
+          <div class="coach-greeting">
+            <div class="coach-avatar">
+              <img src="assets/images/logo-icon-small.png" alt="Coach" width="80" height="80">
             </div>
-            <span class="badge badge-${p.status}">${p.status}</span>
+            <h1>Welcome to Alongside</h1>
+            <p class="lead">I'm here to help you build movement habits that actually stick.</p>
           </div>
-          <div style="font-size:var(--text-md);font-weight:var(--weight-bold);color:var(--text-primary);margin-bottom:var(--space-1)">
-            Alongside: ${escHtml(p.name)}
+          
+          <div class="welcome-message card card-coach">
+            <p>No streaks. No shame. No "no pain, no gain."</p>
+            <p>Just movement that adapts to your energy, your body, and your life.</p>
           </div>
-          <div style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:var(--space-4)">
-            ${escHtml(meta.tagline)}
+          
+          <div class="onboarding-features">
+            <div class="feature">
+              <span class="feature-icon">🎯</span>
+              <span class="feature-text">Workouts that fit your actual schedule</span>
+            </div>
+            <div class="feature">
+              <span class="feature-icon">💚</span>
+              <span class="feature-text">Adapts when energy is low</span>
+            </div>
+            <div class="feature">
+              <span class="feature-icon">🛡️</span>
+              <span class="feature-text">Respects injuries and conditions</span>
+            </div>
           </div>
-          <div style="font-size:var(--text-xs);color:var(--text-muted)">
-            ${escHtml(p.description || '')}
-          </div>
+        </div>
+        
+        <div class="onboarding-actions">
+          <button class="btn btn-primary btn-large btn-full" onclick="App.navigate('onboarding-name')">
+            Let's get started
+          </button>
+          <p class="text-sm text-secondary text-center" style="margin-top: var(--space-4);">
+            Takes about 3-4 minutes
+          </p>
         </div>
       </div>
     `;
-  }).join('');
-}
-
-export function openProduct(productId) {
-  // Navigate to products view and highlight this product
-  navigate('products');
-  // TODO: scroll to and expand the selected product
-}
-
-// ── TASK COMPLETION ───────────────────────────────────────────
-export async function completeTask(taskId, checkboxEl) {
-  try {
-    const task = await db.completeTask(taskId, state.user.id);
-
-    // Log activity
-    await db.logActivity(state.user.id, 'task_complete', 'task', taskId, task.title);
-
-    // Celebrate
-    triggerTaskConfetti(checkboxEl);
-
-    // Refresh outstanding tasks
-    await renderOutstandingTasks();
-
-    showToast(`Task complete — great work, ${state.displayName}`);
-
-    // Check if this completes a phase
-    checkPhaseCompletion(task.phase_id);
-
-  } catch (err) {
-    console.error('Failed to complete task', err);
-    if (checkboxEl) checkboxEl.checked = false;
-    showToast('Something went wrong. Please try again.', 'error');
-  }
-}
-
-async function checkPhaseCompletion(phaseId) {
-  if (!phaseId) return;
-  try {
-    const tasks = await supabase
-      .from('tasks')
-      .select('status')
-      .eq('phase_id', phaseId);
-
-    const all  = tasks.data || [];
-    const done = all.filter(t => t.status === 'complete');
-
-    if (all.length > 0 && all.length === done.length) {
-      // All tasks in phase are complete — mark phase complete
-      const phase = await db.updatePhaseStatus(phaseId, 'complete', state.user.id);
-      handlePhaseComplete(phase);
-    }
-  } catch (err) {
-    console.error('Phase completion check failed', err);
-  }
-}
-
-// ── PHASE COMPLETION ──────────────────────────────────────────
-function handlePhaseComplete(phase) {
-  // Find the phase card on screen
-  const phaseCard = document.querySelector(`[data-phase-id="${phase.id}"]`);
-
-  // Fire the stamp animation
-  if (phaseCard) {
-    const stamp = phaseCard.querySelector('.stamp');
-    if (stamp) {
-      stamp.textContent = 'Complete';
-      stamp.classList.add('animate');
-    }
-    phaseCard.classList.add('just-completed');
-  }
-
-  // Full-screen confetti
-  triggerPhaseConfetti();
-
-  // Log activity
-  db.logActivity(state.user.id, 'phase_complete', 'phase', phase.id,
-    `Phase ${phase.phase_number}: ${phase.name}`);
-
-  // Offer report generation
-  showToast(`Phase complete! Generate the report?`, 'phase', phase.id);
-
-  showModal('phase-complete-modal', { phase });
-}
-
-// ── QUICK-ADD TASK ────────────────────────────────────────────
-export function showQuickAdd() {
-  const overlay = document.getElementById('quick-add-overlay');
-  if (overlay) {
-    overlay.classList.add('open');
-    overlay.querySelector('#quick-add-title')?.focus();
-  }
-}
-
-export function closeQuickAdd() {
-  const overlay = document.getElementById('quick-add-overlay');
-  if (overlay) overlay.classList.remove('open');
-}
-
-export async function submitQuickAdd(e) {
-  if (e) e.preventDefault();
-  const title = document.getElementById('quick-add-title')?.value.trim();
-  if (!title) return;
-
-  const workstreamId = document.getElementById('quick-add-workstream')?.value;
-  const dueDate      = document.getElementById('quick-add-due')?.value;
-  const isCritical   = document.getElementById('quick-add-critical')?.checked;
-
-  try {
-    const task = await db.createTask({
-      title,
-      workstream_id: workstreamId || null,
-      due_date:      dueDate || null,
-      is_critical:   isCritical || false,
-      status:        'pending',
-    });
-
-    await db.logActivity(state.user.id, 'task_added', 'task', task.id, task.title);
-
-    closeQuickAdd();
-    showToast('Task added');
-
-    if (isCritical) loadCriticalTasks();
-    if (state.view === 'home') renderOutstandingTasks();
-
-  } catch (err) {
-    console.error('Failed to create task', err);
-    showToast('Failed to add task', 'error');
-  }
-}
-
-// ── CELEBRATIONS ─────────────────────────────────────────────
-function triggerTaskConfetti(fromEl) {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (typeof confetti !== 'function') return;
-
-  const rect   = fromEl?.getBoundingClientRect();
-  const origin = rect
-    ? { x: rect.left / window.innerWidth, y: rect.top / window.innerHeight }
-    : { x: 0.5, y: 0.6 };
-
-  confetti({
-    particleCount: 45,
-    spread: 60,
-    origin,
-    colors: ['#0D7377', '#2DD4BF', '#7C3AED', '#F8FAFC', '#EA580C'],
-    scalar: 0.8,
-    ticks: 150,
-  });
-}
-
-function triggerPhaseConfetti() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (typeof confetti !== 'function') return;
-
-  const duration = 3000;
-  const end      = Date.now() + duration;
-
-  const frame = () => {
-    confetti({
-      particleCount: 6,
-      angle: 60,
-      spread: 55,
-      origin: { x: 0 },
-      colors: ['#0D7377', '#2DD4BF', '#7C3AED'],
-    });
-    confetti({
-      particleCount: 6,
-      angle: 120,
-      spread: 55,
-      origin: { x: 1 },
-      colors: ['#0D7377', '#2DD4BF', '#EA580C'],
-    });
-
-    if (Date.now() < end) requestAnimationFrame(frame);
-  };
-  frame();
-}
-
-// ── TOAST ─────────────────────────────────────────────────────
-export function showToast(message, type = 'success', phaseId = null) {
-  const id       = Date.now();
-  const container = document.getElementById('toast-container');
-  if (!container) return;
-
-  const icon = type === 'error'   ? 'fa-exclamation-circle'
-             : type === 'phase'   ? 'fa-certificate'
-             : 'fa-check-circle';
-
-  const actionHtml = (type === 'phase' && phaseId)
-    ? `<button onclick="window.App.generatePhaseReport('${phaseId}')"
-               style="margin-left:auto;background:var(--teal-600);color:white;border:none;border-radius:var(--radius-md);padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;min-height:var(--min-touch)">
-         Generate report
-       </button>`
-    : '';
-
-  const toast = document.createElement('div');
-  toast.className   = 'toast';
-  toast.id          = `toast-${id}`;
-  toast.setAttribute('role', 'status');
-  toast.setAttribute('aria-live', 'polite');
-  toast.innerHTML = `
-    <i class="fas ${icon}" aria-hidden="true"
-       style="color:${type==='error'?'var(--critical-text)':type==='phase'?'gold':'var(--teal-400)'}"></i>
-    <span style="flex:1">${escHtml(message)}</span>
-    ${actionHtml}
-  `;
-
-  container.appendChild(toast);
-
-  const timeout = type === 'phase' ? 6000 : 3000;
-  setTimeout(() => { toast.remove(); }, timeout);
-}
-
-// ── MODAL ─────────────────────────────────────────────────────
-export function showModal(modalId, data = {}) {
-  const overlay = document.getElementById(modalId + '-overlay');
-  if (!overlay) return;
-
-  // Populate dynamic content if needed
-  if (data.phase) {
-    const nameEl = overlay.querySelector('[data-modal-phase-name]');
-    if (nameEl) nameEl.textContent = `Phase ${data.phase.phase_number}: ${data.phase.name}`;
-  }
-
-  overlay.classList.add('open');
-  overlay.querySelector('[data-modal-primary]')?.focus();
-
-  // Trap focus
-  trapFocus(overlay);
-}
-
-export function closeModal(modalId) {
-  const overlay = document.getElementById(modalId + '-overlay');
-  if (overlay) overlay.classList.remove('open');
-}
-
-// ── REPORT GENERATION ─────────────────────────────────────────
-export async function generatePhaseReport(phaseId) {
-  showToast('Generating report…');
-  try {
-    // Gather phase data
-    const phases  = await supabase.from('phases').select('*').eq('id', phaseId).single();
-    const phase   = phases.data;
-    const tasks   = await db.getTasksByPhase(phaseId);
-    const notes   = await supabase.from('notes').select('*').eq('phase_id', phaseId);
-    const docs    = await supabase.from('documents').select('*').eq('phase_id', phaseId);
-
-    const reportData = {
-      phase,
-      tasks: tasks,
-      notes: notes.data || [],
-      docs:  docs.data  || [],
-      generatedAt: new Date().toISOString(),
-      generatedBy: state.displayName,
-    };
-
-    // Save to Supabase
-    const report = await db.saveReport({
-      type:         'phase_completion',
-      title:        `Phase ${phase.phase_number}: ${phase.name} — Completion Report`,
-      product_id:   phase.product_id,
-      phase_id:     phaseId,
-      generated_by: state.user.id,
-      data:         reportData,
-    });
-
-    // Mark phase as report generated
-    await supabase.from('phases').update({ report_generated: true }).eq('id', phaseId);
-
-    showToast('Report saved — view in Reports');
-    navigate('reports');
-
-  } catch (err) {
-    console.error('Report generation failed', err);
-    showToast('Report generation failed', 'error');
-  }
-}
-
-// ── ACCESSIBILITY HELPERS ─────────────────────────────────────
-function announce(message) {
-  let liveEl = document.getElementById('aria-live-region');
-  if (!liveEl) {
-    liveEl = document.createElement('div');
-    liveEl.id = 'aria-live-region';
-    liveEl.setAttribute('aria-live', 'polite');
-    liveEl.setAttribute('aria-atomic', 'true');
-    liveEl.className = 'sr-only';
-    document.body.appendChild(liveEl);
-  }
-  liveEl.textContent = '';
-  requestAnimationFrame(() => { liveEl.textContent = message; });
-}
-
-function trapFocus(element) {
-  const focusable = element.querySelectorAll(
-    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-  );
-  const first = focusable[0];
-  const last  = focusable[focusable.length - 1];
-
-  element.addEventListener('keydown', function handler(e) {
-    if (e.key !== 'Tab') return;
-    if (e.shiftKey) {
-      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-    } else {
-      if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
-    }
-    if (!element.classList.contains('open')) element.removeEventListener('keydown', handler);
-  });
-}
-
-// ── UTILITY HELPERS ───────────────────────────────────────────
-export function escHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-export function formatDate(dateStr) {
-  if (!dateStr) return '';
-  return new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
-export function formatDateShort(dateStr) {
-  if (!dateStr) return '';
-  return new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-}
-
-export function timeAgo(isoStr) {
-  const diff  = Date.now() - new Date(isoStr).getTime();
-  const mins  = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days  = Math.floor(diff / 86400000);
-  if (mins  <  1) return 'just now';
-  if (mins  < 60) return `${mins}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  return `${days}d ago`;
-}
-
-function formatAction(action) {
-  const map = {
-    'task_complete':  'completed',
-    'task_added':     'added task',
-    'note_added':     'added a note on',
-    'doc_linked':     'linked a document to',
-    'phase_complete': 'completed',
-    'meeting_added':  'logged a meeting:',
-  };
-  return map[action] || action;
-}
-
-function buildSkeleton(count = 4) {
-  return Array.from({ length: count }, () => `
-    <div class="card" style="padding:var(--space-5)">
-      <div class="skeleton" style="height:12px;width:40%;margin-bottom:var(--space-3)"></div>
-      <div class="skeleton" style="height:20px;width:60%;margin-bottom:var(--space-4)"></div>
-      <div class="skeleton" style="height:6px;width:100%"></div>
-    </div>
-  `).join('');
-}
-
-function buildErrorState(viewId) {
-  return `
-    <div class="empty-state">
-      <div class="empty-state-icon"><i class="fas fa-exclamation-circle"></i></div>
-      <div class="empty-state-title">Failed to load ${viewId}</div>
-      <div class="empty-state-body">Check your connection and try again.</div>
-      <button class="btn btn-primary" onclick="window.App.navigate('${viewId}')" style="margin-top:var(--space-4)">
-        Retry
+  },
+  
+  renderOnboardingName() {
+    return `
+      <div class="onboarding-view">
+        <div class="onboarding-header">
+          <button class="btn btn-ghost" onclick="App.navigate('onboarding-welcome')">← Back</button>
+          <div class="progress-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+        
+        <div class="onboarding-content">
+          <h1>What should I call you?</h1>
+          <p class="text-secondary">Just your first name is fine.</p>
+          
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="user-name" 
+              class="input-field"
+              placeholder="Your name"
+              autocomplete="given-name"
+              value="${this.onboardingData.name}"
+              onkeypress="if(event.key === 'Enter') App.saveName()"
+            >
+          </div>
+        </div>
+        
+        <div class="onboarding-actions">
+          <button class="btn btn-primary btn-large btn-full" onclick="App.saveName()">
+            Continue
+          </button>
+        </div>
+      </div>
+    `;
+  },
+  
+  renderOnboardingAbout() {
+    const genderOptions = [
+      { id: 'female', label: 'Female' },
+      { id: 'male', label: 'Male' },
+      { id: 'non-binary', label: 'Non-binary' },
+      { id: 'prefer-not', label: 'Prefer not to say' }
+    ];
+    
+    const showHormonalOption = ['female', 'non-binary'].includes(this.onboardingData.gender);
+    
+    return `
+      <div class="onboarding-view">
+        <div class="onboarding-header">
+          <button class="btn btn-ghost" onclick="App.navigate('onboarding-name')">← Back</button>
+          <div class="progress-dots">
+            <span class="dot completed"></span>
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+        
+        <div class="onboarding-content">
+          <h1>A bit about you, ${this.onboardingData.name}</h1>
+          <p class="text-secondary">This helps me personalise your experience.</p>
+          
+          <div class="form-section">
+            <label class="form-label">Your age</label>
+            <input 
+              type="number" 
+              id="user-age" 
+              class="input-field"
+              placeholder="e.g. 42"
+              min="16"
+              max="100"
+              value="${this.onboardingData.age || ''}"
+              onchange="App.onboardingData.age = parseInt(this.value)"
+            >
+          </div>
+          
+          <div class="form-section">
+            <label class="form-label">Gender</label>
+            <div class="radio-group">
+              ${genderOptions.map(opt => `
+                <button class="btn-card radio-option ${this.onboardingData.gender === opt.id ? 'selected' : ''}"
+                        onclick="App.setGender('${opt.id}')">
+                  ${opt.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div id="hormonal-option" class="form-section ${showHormonalOption ? '' : 'hidden'}">
+            <label class="form-label">Would you like cycle-aware recommendations?</label>
+            <p class="text-sm text-muted" style="margin-bottom: var(--space-3);">
+              This helps me adapt workouts to your energy patterns throughout the month.
+            </p>
+            <div class="radio-group">
+              <button class="btn-card radio-option ${this.onboardingData.hormonalTracking === true ? 'selected' : ''}"
+                      onclick="App.setHormonalTracking(true)">
+                Yes, that would help
+              </button>
+              <button class="btn-card radio-option ${this.onboardingData.hormonalTracking === false ? 'selected' : ''}"
+                      onclick="App.setHormonalTracking(false)">
+                No thanks
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="onboarding-actions">
+          <button class="btn btn-primary btn-large btn-full" onclick="App.saveAbout()">
+            Continue
+          </button>
+        </div>
+      </div>
+    `;
+  },
+  
+  renderOnboardingBody() {
+    const hasWeightGoal = this.onboardingData.goals.includes('lose-weight');
+    
+    return `
+      <div class="onboarding-view">
+        <div class="onboarding-header">
+          <button class="btn btn-ghost" onclick="App.navigate('onboarding-about')">← Back</button>
+          <div class="progress-dots">
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+        
+        <div class="onboarding-content">
+          <h1>Your body & targets</h1>
+          <p class="text-secondary">Optional, but helps me track your progress.</p>
+          
+          <div class="form-section">
+            <label class="form-label">Current weight</label>
+            <div class="input-with-unit">
+              <input 
+                type="number" 
+                id="user-weight" 
+                class="input-field"
+                placeholder="e.g. 75"
+                min="30"
+                max="300"
+                step="0.1"
+                value="${this.onboardingData.weight || ''}"
+                onchange="App.onboardingData.weight = parseFloat(this.value)"
+              >
+              <select id="weight-unit" class="unit-select" onchange="App.onboardingData.weightUnit = this.value">
+                <option value="kg" ${this.onboardingData.weightUnit === 'kg' ? 'selected' : ''}>kg</option>
+                <option value="lbs" ${this.onboardingData.weightUnit === 'lbs' ? 'selected' : ''}>lbs</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <label class="form-label">Target weight <span class="text-muted">(optional)</span></label>
+            <div class="input-with-unit">
+              <input 
+                type="number" 
+                id="user-target-weight" 
+                class="input-field"
+                placeholder="e.g. 70"
+                min="30"
+                max="300"
+                step="0.1"
+                value="${this.onboardingData.targetWeight || ''}"
+                onchange="App.onboardingData.targetWeight = parseFloat(this.value)"
+              >
+              <span class="unit-display">${this.onboardingData.weightUnit}</span>
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <label class="form-label">Got a target date or event? <span class="text-muted">(optional)</span></label>
+            <input 
+              type="text" 
+              id="target-description" 
+              class="input-field"
+              placeholder="e.g. Holiday in April, Wedding in June"
+              value="${this.onboardingData.targetDescription || ''}"
+              onchange="App.onboardingData.targetDescription = this.value"
+            >
+            <input 
+              type="date" 
+              id="target-date" 
+              class="input-field"
+              style="margin-top: var(--space-2);"
+              value="${this.onboardingData.targetDate || ''}"
+              onchange="App.onboardingData.targetDate = this.value"
+              min="${new Date().toISOString().split('T')[0]}"
+            >
+          </div>
+        </div>
+        
+        <div class="onboarding-actions">
+          <button class="btn btn-primary btn-large btn-full" onclick="App.saveBody()">
+            Continue
+          </button>
+          <button class="btn btn-ghost btn-full" onclick="App.saveBody()" style="margin-top: var(--space-2);">
+            Skip for now
+          </button>
+        </div>
+      </div>
+    `;
+  },
+  
+  renderOnboardingGoals() {
+    const goalsHtml = this.GOALS.map(goal => `
+      <button class="btn-card goal-option ${this.onboardingData.goals.includes(goal.id) ? 'selected' : ''}" 
+              data-goal="${goal.id}" 
+              onclick="App.toggleGoal('${goal.id}')">
+        <span class="goal-icon">${goal.icon}</span>
+        <span class="goal-text">${goal.name}</span>
       </button>
-    </div>
-  `;
-}
-
-// Stub renderers for views not yet built (filled in later sessions)
-function renderOperationsWorkstreams() {}
-function renderMeetingsList() {}
-function renderDocsLibrary() {}
-function renderReportsList() {}
-
-// ── EXPOSE TO WINDOW (for inline handlers) ────────────────────
-window.App = {
-  navigate, setProductFilter, openProduct, completeTask,
-  showQuickAdd, closeQuickAdd, submitQuickAdd,
-  showModal, closeModal, generatePhaseReport,
-  toggleTheme, handleSignOut, escHtml, formatDate,
+    `).join('');
+    
+    return `
+      <div class="onboarding-view">
+        <div class="onboarding-header">
+          <button class="btn btn-ghost" onclick="App.navigate('onboarding-body')">← Back</button>
+          <div class="progress-dots">
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+        
+        <div class="onboarding-content">
+          <h1>What brings you here?</h1>
+          <p class="text-secondary">Select all that apply. You can change these anytime.</p>
+          
+          <div class="goals-grid">
+            ${goalsHtml}
+          </div>
+        </div>
+        
+        <div class="onboarding-actions">
+          <button class="btn btn-primary btn-large btn-full" 
+                  onclick="App.saveGoals()" 
+                  id="goals-continue-btn"
+                  ${this.onboardingData.goals.length === 0 ? 'disabled' : ''}>
+            Continue
+          </button>
+          <p class="text-sm text-secondary text-center" style="margin-top: var(--space-3);">
+            ${this.onboardingData.goals.length} selected
+          </p>
+        </div>
+      </div>
+    `;
+  },
+  
+  renderOnboardingConditions() {
+    const conditionsHtml = this.CONDITIONS.map(condition => `
+      <button class="btn-card condition-option ${this.onboardingData.conditions.includes(condition.id) ? 'selected' : ''}" 
+              data-condition="${condition.id}" 
+              onclick="App.toggleCondition('${condition.id}')">
+        <span class="condition-icon">${condition.icon}</span>
+        <span class="condition-text">${condition.name}</span>
+      </button>
+    `).join('');
+    
+    return `
+      <div class="onboarding-view">
+        <div class="onboarding-header">
+          <button class="btn btn-ghost" onclick="App.navigate('onboarding-goals')">← Back</button>
+          <div class="progress-dots">
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+        
+        <div class="onboarding-content">
+          <h1>Anything I should know about?</h1>
+          <p class="text-secondary">I'll adapt exercises to protect these areas.</p>
+          
+          <div class="conditions-grid">
+            ${conditionsHtml}
+          </div>
+          
+          <p class="text-sm text-muted" style="margin-top: var(--space-4);">
+            💡 It's okay to skip this - you can add conditions later in Settings.
+          </p>
+        </div>
+        
+        <div class="onboarding-actions">
+          <button class="btn btn-primary btn-large btn-full" onclick="App.saveConditions()">
+            ${this.onboardingData.conditions.length > 0 ? 'Continue' : 'Skip for now'}
+          </button>
+        </div>
+      </div>
+    `;
+  },
+  
+  renderOnboardingLifestyle() {
+    const activityLevels = [
+      { id: 'sedentary', label: 'Sedentary', desc: 'Little or no exercise, desk job' },
+      { id: 'light', label: 'Lightly active', desc: 'Light exercise 1-2 days/week' },
+      { id: 'moderate', label: 'Moderately active', desc: 'Exercise 3-4 days/week' },
+      { id: 'active', label: 'Very active', desc: 'Hard exercise 5-6 days/week' }
+    ];
+    
+    const stressLevels = [
+      { id: 'low', label: 'Low', desc: 'Life feels pretty manageable' },
+      { id: 'moderate', label: 'Moderate', desc: 'Some stress but coping okay' },
+      { id: 'high', label: 'High', desc: 'Feeling quite stressed regularly' }
+    ];
+    
+    const sleepQualities = [
+      { id: 'good', label: 'Good', desc: 'Usually sleep well' },
+      { id: 'okay', label: 'Okay', desc: 'Some good nights, some bad' },
+      { id: 'poor', label: 'Poor', desc: 'Often struggle with sleep' }
+    ];
+    
+    return `
+      <div class="onboarding-view">
+        <div class="onboarding-header">
+          <button class="btn btn-ghost" onclick="App.navigate('onboarding-conditions')">← Back</button>
+          <div class="progress-dots">
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot active"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+        
+        <div class="onboarding-content">
+          <h1>Your lifestyle</h1>
+          <p class="text-secondary">This helps me match workouts to your energy.</p>
+          
+          <div class="form-section">
+            <label class="form-label">Current activity level</label>
+            <div class="radio-group stacked">
+              ${activityLevels.map(level => `
+                <button class="btn-card radio-option ${this.onboardingData.lifestyle.activityLevel === level.id ? 'selected' : ''}"
+                        onclick="App.setLifestyle('activityLevel', '${level.id}')">
+                  <span class="option-label">${level.label}</span>
+                  <span class="option-desc">${level.desc}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <label class="form-label">Stress level lately</label>
+            <div class="radio-group horizontal">
+              ${stressLevels.map(level => `
+                <button class="btn-card radio-option compact ${this.onboardingData.lifestyle.stressLevel === level.id ? 'selected' : ''}"
+                        onclick="App.setLifestyle('stressLevel', '${level.id}')">
+                  ${level.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div class="form-section">
+            <label class="form-label">Sleep quality</label>
+            <div class="radio-group horizontal">
+              ${sleepQualities.map(level => `
+                <button class="btn-card radio-option compact ${this.onboardingData.lifestyle.sleepQuality === level.id ? 'selected' : ''}"
+                        onclick="App.setLifestyle('sleepQuality', '${level.id}')">
+                  ${level.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+        
+        <div class="onboarding-actions">
+          <button class="btn btn-primary btn-large btn-full" onclick="App.saveLifestyle()">
+            Continue
+          </button>
+        </div>
+      </div>
+    `;
+  },
+  
+  renderOnboardingEquipment() {
+    return `
+      <div class="onboarding-view">
+        <div class="onboarding-header">
+          <button class="btn btn-ghost" onclick="App.navigate('onboarding-lifestyle')">← Back</button>
+          <div class="progress-dots">
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot completed"></span>
+            <span class="dot active"></span>
+          </div>
+        </div>
+        
+        <div class="onboarding-content">
+          <h1>What equipment do you have?</h1>
+          <p class="text-secondary">I'll only suggest exercises you can actually do.</p>
+          
+          <div class="equipment-categories">
+            ${this.EQUIPMENT_CATEGORIES.map(cat => `
+              <div class="equipment-category">
+                <button class="category-header" onclick="App.toggleEquipmentCategory('${cat.id}')">
+                  <span class="category-icon">${cat.icon}</span>
+                  <span class="category-name">${cat.name}</span>
+                  <span class="category-count">${this.countEquipmentInCategory(cat.id)}</span>
+                  <span class="category-chevron">▼</span>
+                </button>
+                <div class="category-items" id="category-${cat.id}">
+                  ${cat.items.map(item => `
+                    <button class="equipment-item ${this.onboardingData.equipment.includes(item.id) ? 'selected' : ''}"
+                            onclick="App.toggleEquipmentItem('${item.id}')">
+                      <span class="item-check">${this.onboardingData.equipment.includes(item.id) ? '✓' : ''}</span>
+                      <span class="item-name">${item.name}</span>
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="bodyweight-option">
+            <button class="btn-card ${this.onboardingData.equipment.length === 0 ? 'selected' : ''}"
+                    onclick="App.setBodyweightOnly()">
+              <span class="goal-icon">🏠</span>
+              <span class="goal-text">Just bodyweight - no equipment</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="onboarding-actions">
+          <button class="btn btn-primary btn-large btn-full" onclick="App.saveEquipment()">
+            Finish setup
+          </button>
+          <p class="text-sm text-secondary text-center" style="margin-top: var(--space-3);">
+            ${this.onboardingData.equipment.length} items selected
+          </p>
+        </div>
+      </div>
+    `;
+  },
+  
+  renderOnboardingComplete() {
+    const targetText = this.user.targetDescription 
+      ? `${this.user.targetDescription}${this.user.targetDate ? ` (${this.formatDate(this.user.targetDate)})` : ''}`
+      : this.user.targetWeight 
+        ? `Reach ${this.user.targetWeight}${this.user.weightUnit}${this.user.targetDate ? ` by ${this.formatDate(this.user.targetDate)}` : ''}`
+        : 'No specific target set';
+    
+    return `
+      <div class="onboarding-view">
+        <div class="onboarding-content">
+          <div class="coach-greeting">
+            <div class="completion-icon">🎉</div>
+            <h1>You're all set, ${this.user.name}!</h1>
+            <p class="lead">I've got everything I need to start helping you.</p>
+          </div>
+          
+          <div class="welcome-message card card-coach">
+            <p>Each day, I'll check in with you and suggest movement that matches how you're feeling.</p>
+            <p>No pressure. No judgment. Just support.</p>
+          </div>
+          
+          <div class="summary-card card">
+            <h3>Your profile</h3>
+            <div class="summary-row">
+              <span class="summary-label">Age:</span>
+              <span class="summary-value">${this.user.age || 'Not set'}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Current weight:</span>
+              <span class="summary-value">${this.user.weight ? this.user.weight + this.user.weightUnit : 'Not set'}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Target:</span>
+              <span class="summary-value">${targetText}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Goals:</span>
+              <span class="summary-value">${this.user.goals.map(g => this.GOALS.find(x => x.id === g)?.name).join(', ') || 'None'}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Equipment:</span>
+              <span class="summary-value">${this.user.equipment.length > 0 ? this.user.equipment.length + ' items' : 'Bodyweight only'}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="onboarding-actions">
+          <button class="btn btn-primary btn-large btn-full" onclick="App.startApp()">
+            Let's go!
+          </button>
+        </div>
+      </div>
+    `;
+  },
+  
+  // ========================================
+  // MAIN APP SCREENS (Placeholders)
+  // ========================================
+  
+  renderToday() {
+    const greeting = this.getTimeGreeting();
+    
+    return `
+      <div class="view">
+        <div class="view-header">
+          <h1>${greeting}, ${this.user?.name || 'there'} 👋</h1>
+          <p class="text-secondary">Let's check in and see what feels right today.</p>
+        </div>
+        
+        <div class="card card-coach">
+          <p><strong>Daily check-in coming soon!</strong></p>
+          <p class="text-secondary">This is where you'll tell me how you're feeling, and I'll suggest workouts that match your energy.</p>
+        </div>
+        
+        <div class="card" style="margin-top: var(--space-4);">
+          <h3>Your profile summary</h3>
+          <p class="text-sm text-secondary">Age: ${this.user?.age || 'Not set'}</p>
+          <p class="text-sm text-secondary">Weight: ${this.user?.weight ? this.user.weight + this.user.weightUnit : 'Not set'}</p>
+          <p class="text-sm text-secondary">Goals: ${this.user?.goals?.length || 0} selected</p>
+          <p class="text-sm text-secondary">Conditions: ${this.user?.conditions?.length || 0} tracked</p>
+          <p class="text-sm text-secondary">Equipment: ${this.user?.equipment?.length || 0} items</p>
+        </div>
+      </div>
+    `;
+  },
+  
+  renderProgress() {
+    return `
+      <div class="view">
+        <div class="view-header">
+          <h1>Your Progress</h1>
+          <p class="text-secondary">Coming soon...</p>
+        </div>
+        <div class="card">
+          <p class="text-secondary">Progress tracking will appear here once you start working out.</p>
+        </div>
+      </div>
+    `;
+  },
+  
+  renderSettings() {
+    return `
+      <div class="view">
+        <div class="view-header">
+          <h1>Settings</h1>
+        </div>
+        
+        <div class="card-list">
+          <div class="card">
+            <h3>Profile</h3>
+            <p class="text-secondary">Name: ${this.user?.name || 'Not set'}</p>
+            <p class="text-secondary">Age: ${this.user?.age || 'Not set'}</p>
+            <p class="text-secondary">Gender: ${this.user?.gender || 'Not set'}</p>
+            <p class="text-secondary">Weight: ${this.user?.weight ? this.user.weight + this.user.weightUnit : 'Not set'}</p>
+          </div>
+          
+          <div class="card">
+            <h3>Goals</h3>
+            <p class="text-secondary">${this.user?.goals?.map(g => this.GOALS.find(x => x.id === g)?.name).join(', ') || 'None set'}</p>
+          </div>
+          
+          <div class="card">
+            <h3>Conditions</h3>
+            <p class="text-secondary">${this.user?.conditions?.map(c => this.CONDITIONS.find(x => x.id === c)?.name).join(', ') || 'None'}</p>
+          </div>
+          
+          <div class="card">
+            <h3>Equipment</h3>
+            <p class="text-secondary">${this.user?.equipment?.length > 0 ? this.user.equipment.length + ' items' : 'Bodyweight only'}</p>
+          </div>
+          
+          <button class="btn btn-danger btn-full" onclick="App.resetApp()" style="margin-top: var(--space-4);">
+            Reset App (Start Over)
+          </button>
+        </div>
+      </div>
+    `;
+  },
+  
+  // ========================================
+  // ONBOARDING ACTIONS
+  // ========================================
+  
+  saveName() {
+    const input = document.getElementById('user-name');
+    const name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    this.onboardingData.name = name;
+    this.navigate('onboarding-about');
+  },
+  
+  setGender(gender) {
+    this.onboardingData.gender = gender;
+    // Re-render to show/hide hormonal option
+    this.navigate('onboarding-about');
+  },
+  
+  setHormonalTracking(value) {
+    this.onboardingData.hormonalTracking = value;
+    // Update UI
+    document.querySelectorAll('#hormonal-option .radio-option').forEach(btn => {
+      btn.classList.remove('selected');
+    });
+    event.target.classList.add('selected');
+  },
+  
+  saveAbout() {
+    const age = document.getElementById('user-age').value;
+    this.onboardingData.age = age ? parseInt(age) : null;
+    this.navigate('onboarding-body');
+  },
+  
+  saveBody() {
+    // Values already saved via onchange
+    this.navigate('onboarding-goals');
+  },
+  
+  toggleGoal(goalId) {
+    const index = this.onboardingData.goals.indexOf(goalId);
+    if (index > -1) {
+      this.onboardingData.goals.splice(index, 1);
+    } else {
+      this.onboardingData.goals.push(goalId);
+    }
+    
+    // Update UI
+    const btn = document.querySelector(`[data-goal="${goalId}"]`);
+    if (btn) btn.classList.toggle('selected');
+    
+    const continueBtn = document.getElementById('goals-continue-btn');
+    if (continueBtn) continueBtn.disabled = this.onboardingData.goals.length === 0;
+    
+    const countText = document.querySelector('.onboarding-actions .text-secondary');
+    if (countText) countText.textContent = `${this.onboardingData.goals.length} selected`;
+  },
+  
+  saveGoals() {
+    if (this.onboardingData.goals.length === 0) return;
+    this.navigate('onboarding-conditions');
+  },
+  
+  toggleCondition(conditionId) {
+    const index = this.onboardingData.conditions.indexOf(conditionId);
+    if (index > -1) {
+      this.onboardingData.conditions.splice(index, 1);
+    } else {
+      this.onboardingData.conditions.push(conditionId);
+    }
+    
+    const btn = document.querySelector(`[data-condition="${conditionId}"]`);
+    if (btn) btn.classList.toggle('selected');
+    
+    const continueBtn = document.querySelector('.onboarding-actions .btn-primary');
+    if (continueBtn) {
+      continueBtn.textContent = this.onboardingData.conditions.length > 0 ? 'Continue' : 'Skip for now';
+    }
+  },
+  
+  saveConditions() {
+    this.navigate('onboarding-lifestyle');
+  },
+  
+  setLifestyle(field, value) {
+    this.onboardingData.lifestyle[field] = value;
+    // Update UI - re-render section
+    const section = event.target.closest('.form-section');
+    section.querySelectorAll('.radio-option').forEach(btn => btn.classList.remove('selected'));
+    event.target.classList.add('selected');
+  },
+  
+  saveLifestyle() {
+    this.navigate('onboarding-equipment');
+  },
+  
+  toggleEquipmentCategory(categoryId) {
+    const items = document.getElementById(`category-${categoryId}`);
+    if (items) {
+      items.classList.toggle('expanded');
+      const header = items.previousElementSibling;
+      header.classList.toggle('expanded');
+    }
+  },
+  
+  countEquipmentInCategory(categoryId) {
+    const category = this.EQUIPMENT_CATEGORIES.find(c => c.id === categoryId);
+    if (!category) return 0;
+    return category.items.filter(item => this.onboardingData.equipment.includes(item.id)).length;
+  },
+  
+  toggleEquipmentItem(itemId) {
+    const index = this.onboardingData.equipment.indexOf(itemId);
+    if (index > -1) {
+      this.onboardingData.equipment.splice(index, 1);
+    } else {
+      this.onboardingData.equipment.push(itemId);
+    }
+    
+    // Update UI
+    const btn = document.querySelector(`[onclick="App.toggleEquipmentItem('${itemId}')"]`);
+    if (btn) {
+      btn.classList.toggle('selected');
+      btn.querySelector('.item-check').textContent = this.onboardingData.equipment.includes(itemId) ? '✓' : '';
+    }
+    
+    // Update category count
+    this.EQUIPMENT_CATEGORIES.forEach(cat => {
+      const countEl = document.querySelector(`[onclick="App.toggleEquipmentCategory('${cat.id}')"] .category-count`);
+      if (countEl) countEl.textContent = this.countEquipmentInCategory(cat.id);
+    });
+    
+    // Update total count
+    const totalCount = document.querySelector('.onboarding-actions .text-secondary');
+    if (totalCount) totalCount.textContent = `${this.onboardingData.equipment.length} items selected`;
+    
+    // Deselect bodyweight-only option
+    document.querySelector('.bodyweight-option .btn-card')?.classList.remove('selected');
+  },
+  
+  setBodyweightOnly() {
+    this.onboardingData.equipment = [];
+    // Update all equipment items UI
+    document.querySelectorAll('.equipment-item').forEach(btn => {
+      btn.classList.remove('selected');
+      btn.querySelector('.item-check').textContent = '';
+    });
+    // Update category counts
+    document.querySelectorAll('.category-count').forEach(el => el.textContent = '0');
+    // Select bodyweight option
+    document.querySelector('.bodyweight-option .btn-card')?.classList.add('selected');
+    // Update total count
+    const totalCount = document.querySelector('.onboarding-actions .text-secondary');
+    if (totalCount) totalCount.textContent = `0 items selected`;
+  },
+  
+  saveEquipment() {
+    // Create user profile
+    this.user = {
+      id: 'user_' + Date.now(),
+      name: this.onboardingData.name,
+      age: this.onboardingData.age,
+      gender: this.onboardingData.gender,
+      hormonalTracking: this.onboardingData.hormonalTracking,
+      weight: this.onboardingData.weight,
+      weightUnit: this.onboardingData.weightUnit,
+      targetWeight: this.onboardingData.targetWeight,
+      targetDate: this.onboardingData.targetDate,
+      targetDescription: this.onboardingData.targetDescription,
+      goals: this.onboardingData.goals,
+      conditions: this.onboardingData.conditions,
+      lifestyle: this.onboardingData.lifestyle,
+      equipment: this.onboardingData.equipment,
+      onboardingComplete: true,
+      createdAt: new Date().toISOString()
+    };
+    
+    this.saveUser();
+    this.navigate('onboarding-complete');
+  },
+  
+  startApp() {
+    document.getElementById('bottom-nav').classList.remove('hidden');
+    this.navigate('today');
+  },
+  
+  // ========================================
+  // UTILITIES
+  // ========================================
+  
+  loadUser() {
+    try {
+      const data = localStorage.getItem('alongside_user');
+      return data ? JSON.parse(data) : null;
+    } catch (e) {
+      console.error('Error loading user:', e);
+      return null;
+    }
+  },
+  
+  saveUser() {
+    try {
+      localStorage.setItem('alongside_user', JSON.stringify(this.user));
+    } catch (e) {
+      console.error('Error saving user:', e);
+    }
+  },
+  
+  resetApp() {
+    if (confirm('This will delete all your data and start fresh. Are you sure?')) {
+      localStorage.removeItem('alongside_user');
+      this.user = null;
+      this.onboardingData = {
+        name: '', age: null, gender: null, hormonalTracking: false,
+        weight: null, weightUnit: 'kg', targetWeight: null, targetDate: null, targetDescription: '',
+        goals: [], conditions: [], lifestyle: { activityLevel: null, stressLevel: null, sleepQuality: null },
+        equipment: []
+      };
+      document.getElementById('bottom-nav').classList.add('hidden');
+      this.navigate('onboarding-welcome');
+    }
+  },
+  
+  getTimeGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  },
+  
+  formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
 };
 
-// ── BOOT ──────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', initApp);
+// Make App available globally and start
+window.App = App;
+document.addEventListener('DOMContentLoaded', () => App.init());
