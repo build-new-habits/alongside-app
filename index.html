@@ -1,477 +1,84 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="BNH OS — Build New Habits Business Operating System">
-  <meta name="theme-color" content="#0A1120">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0F172A">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>BNH OS — Build New Habits</title>
+  <meta name="description" content="Compassionate fitness coaching that adapts to your life">
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="BNH OS">
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <title>Alongside</title>
 
-  <!-- PWA manifest -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="BNH OS">
-  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" href="assets/images/logo-icon-square.png">
+  <link rel="apple-touch-icon" href="assets/images/logo-icon-square.png">
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- BNH OS Styles -->
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="css/animations.css">
-
-  <!-- Confetti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js" defer></script>
+  <link rel="stylesheet" href="css/main.css">
 </head>
-
 <body>
+  <div id="app" class="app-container">
 
-<!-- ═══════════════════════════════════════════════════════════
-     AUTH SCREEN
-════════════════════════════════════════════════════════════ -->
-<div id="auth-screen" class="auth-screen" role="main">
-  <div class="auth-card" role="region" aria-label="Sign in to BNH OS">
-
-    <!-- Logo -->
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px">
-      <div style="width:40px;height:40px;background:var(--teal-600);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:white;font-size:13px;letter-spacing:-0.02em;flex-shrink:0">
-        BNH
-      </div>
-      <div>
-        <div style="font-size:var(--text-lg);font-weight:var(--weight-bold);color:white;line-height:1">BNH OS</div>
-        <div style="font-size:10px;font-family:var(--font-mono);color:var(--slate-400);letter-spacing:0.05em">Build New Habits</div>
-      </div>
+    <!--
+      Screen reader live region.
+      Visually hidden — announces view changes to assistive technology.
+      router.js writes to this after every navigation.
+    -->
+    <div
+      id="sr-announcer"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only">
     </div>
 
-    <h1 style="font-size:var(--text-xl);color:white;margin-bottom:8px">Welcome back</h1>
-    <p style="font-size:var(--text-sm);color:var(--slate-400);margin-bottom:28px">
-      Sign in to access your business operating system.
-    </p>
-
-    <!-- Form -->
-    <form id="auth-form" novalidate>
-      <div class="form-group" style="margin-bottom:var(--space-4)">
-        <label class="form-label" for="auth-email"
-               style="color:var(--slate-300)">Email address</label>
-        <input
-          class="inp"
-          type="email"
-          id="auth-email"
-          name="email"
-          autocomplete="email"
-          required
-          placeholder="you@buildnewhabits.co.uk"
-          style="background:var(--navy-600);border-color:rgba(255,255,255,0.1);color:white"
-          aria-describedby="auth-error"
-        >
-      </div>
-
-      <div class="form-group" style="margin-bottom:var(--space-6)">
-        <label class="form-label" for="auth-password"
-               style="color:var(--slate-300)">Password</label>
-        <div style="position:relative">
-          <input
-            class="inp"
-            type="password"
-            id="auth-password"
-            name="password"
-            autocomplete="current-password"
-            required
-            placeholder="••••••••"
-            style="background:var(--navy-600);border-color:rgba(255,255,255,0.1);color:white;padding-right:44px"
-          >
-          <button
-            type="button"
-            id="toggle-password"
-            style="position:absolute;right:0;top:0;width:44px;height:44px;background:none;border:none;color:var(--slate-400);cursor:pointer;display:flex;align-items:center;justify-content:center"
-            aria-label="Show password"
-            onclick="
-              const inp = document.getElementById('auth-password');
-              const isPass = inp.type === 'password';
-              inp.type = isPass ? 'text' : 'password';
-              this.setAttribute('aria-label', isPass ? 'Hide password' : 'Show password');
-              this.innerHTML = isPass
-                ? '<i class=\'fas fa-eye-slash\' aria-hidden=\'true\'></i>'
-                : '<i class=\'fas fa-eye\' aria-hidden=\'true\'></i>';
-            "
-          >
-            <i class="fas fa-eye" aria-hidden="true"></i>
-          </button>
+    <!-- Loading screen -->
+    <div id="loading" class="loading-screen">
+      <div class="loading-content">
+        <div class="loading-logo">
+          <img src="assets/images/logo-icon-small.png" alt="Alongside" width="128" height="128">
         </div>
+        <h1 class="loading-title">Alongside</h1>
+        <p class="loading-subtitle">Movement that meets you where you are</p>
+        <div class="loading-spinner"></div>
       </div>
+    </div>
 
-      <!-- Error -->
-      <div id="auth-error"
-           role="alert"
-           aria-live="assertive"
-           style="font-size:var(--text-sm);color:#FCA5A5;margin-bottom:var(--space-4);min-height:20px">
-      </div>
+    <!-- Main content area -->
+    <main id="main-content" class="main-content" tabindex="-1"></main>
 
-      <button
-        type="submit"
-        class="btn btn-primary"
-        style="width:100%;font-size:var(--text-md)"
-      >
-        Sign in
+    <!-- Bottom navigation (hidden until after onboarding) -->
+    <nav id="bottom-nav" class="bottom-nav hidden" aria-label="Main navigation">
+      <button class="nav-item active" data-view="today">
+        <span class="nav-icon" aria-hidden="true">🏠</span>
+        <span class="nav-label">Today</span>
       </button>
-    </form>
-
-    <p style="font-size:11px;color:var(--slate-400);text-align:center;margin-top:var(--space-6);line-height:1.6">
-      Build New Habits &bull; Private &bull; Authenticated<br>
-      Access restricted to Graeme &amp; Sarah Wright
-    </p>
-  </div>
-</div>
-
-
-<!-- ═══════════════════════════════════════════════════════════
-     APP SCREEN
-════════════════════════════════════════════════════════════ -->
-<div id="app-screen" class="app-shell" style="display:none">
-
-  <!-- ── SIDEBAR (tablet/desktop) ──────────────────────────── -->
-  <aside class="sidebar no-print" role="navigation" aria-label="Main navigation">
-
-    <!-- Logo -->
-    <div class="sidebar-logo">
-      <div class="sidebar-logo-mark" aria-hidden="true">BNH</div>
-      <div class="sidebar-logo-text">
-        <div class="sidebar-logo-title">BNH OS</div>
-        <div class="sidebar-logo-sub">Build New Habits</div>
-      </div>
-    </div>
-
-    <!-- User -->
-    <div class="sidebar-user" aria-label="Current user">
-      <div class="sidebar-avatar" aria-hidden="true"></div>
-      <div class="sidebar-user-info">
-        <div class="sidebar-user-name"></div>
-      </div>
-    </div>
-
-    <!-- Nav -->
-    <nav id="sidebar-nav" class="sidebar-nav" aria-label="Site sections">
-      <!-- Built by app.js -->
+      <button class="nav-item" data-view="progress">
+        <span class="nav-icon" aria-hidden="true">📊</span>
+        <span class="nav-label">Progress</span>
+      </button>
+      <button class="nav-item" data-view="settings">
+        <span class="nav-icon" aria-hidden="true">⚙️</span>
+        <span class="nav-label">Settings</span>
+      </button>
     </nav>
 
-    <!-- Footer -->
-    <div class="sidebar-footer">
-      <button
-        id="theme-toggle"
-        class="btn btn-ghost btn-icon"
-        onclick="window.App.toggleTheme()"
-        aria-label="Toggle colour theme"
-        title="Toggle theme"
-      >
-        <i class="fas fa-sun" aria-hidden="true"></i>
-      </button>
-      <button
-        class="btn btn-ghost btn-icon"
-        onclick="window.App.handleSignOut()"
-        aria-label="Sign out"
-        title="Sign out"
-      >
-        <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
-      </button>
-    </div>
-  </aside>
+    <!-- Toast notifications -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
 
-  <!-- ── MAIN AREA ──────────────────────────────────────────── -->
-  <div style="display:flex;flex-direction:column;overflow:hidden;grid-column:2;grid-row:1">
-
-    <!-- Header -->
-    <header class="main-header no-print" role="banner">
-      <h1 id="page-title" class="page-title">Home</h1>
-
-      <div style="display:flex;align-items:center;gap:var(--space-3)">
-        <!-- Live indicator -->
-        <div style="display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;color:var(--teal-400)"
-             aria-label="Live sync active" title="Real-time sync active">
-          <span style="width:6px;height:6px;border-radius:50%;background:var(--teal-400);animation:livePulse 2s ease-in-out infinite" aria-hidden="true"></span>
-          LIVE
-        </div>
-
-        <!-- Theme toggle (mobile) -->
-        <button
-          class="btn btn-ghost btn-icon"
-          onclick="window.App.toggleTheme()"
-          aria-label="Toggle colour theme"
-          style="display:none"
-          id="theme-toggle-mobile"
-        >
-          <i class="fas fa-sun" aria-hidden="true"></i>
-        </button>
-
-        <!-- User chip (mobile) -->
-        <div class="sidebar-avatar"
-             style="width:32px;height:32px;font-size:11px"
-             aria-hidden="true">
-        </div>
-      </div>
-    </header>
-
-    <!-- View container -->
-    <main id="view-container" class="main-content" role="main" aria-live="polite">
-      <!-- Views loaded dynamically by app.js -->
-    </main>
-  </div>
-
-  <!-- ── BOTTOM NAV (mobile) ────────────────────────────────── -->
-  <nav id="bottom-nav"
-       class="bottom-nav no-print"
-       role="navigation"
-       aria-label="Main navigation">
-    <!-- Built by app.js -->
-  </nav>
-
-  <!-- ── QUICK-ADD FAB ──────────────────────────────────────── -->
-  <button
-    class="fab no-print"
-    onclick="window.App.showQuickAdd()"
-    aria-label="Add a task"
-    aria-haspopup="dialog"
-    id="fab-add"
-  >
-    <i class="fas fa-plus" aria-hidden="true"></i>
-  </button>
-
-  <!-- ── QUICK-ADD MODAL ────────────────────────────────────── -->
-  <div id="quick-add-overlay"
-       class="modal-overlay"
-       role="dialog"
-       aria-modal="true"
-       aria-labelledby="quick-add-heading"
-       onclick="if(event.target===this)window.App.closeQuickAdd()">
-    <div class="modal">
-      <div class="modal-header">
-        <h2 id="quick-add-heading" style="font-size:var(--text-md)">Add Task</h2>
-        <button class="btn btn-ghost btn-icon"
-                onclick="window.App.closeQuickAdd()"
-                aria-label="Close add task dialog">
-          <i class="fas fa-times" aria-hidden="true"></i>
-        </button>
-      </div>
-      <form class="modal-body" onsubmit="window.App.submitQuickAdd(event)">
-        <div class="form-group" style="margin-bottom:var(--space-4)">
-          <label class="form-label" for="quick-add-title">Task</label>
-          <input class="inp" type="text" id="quick-add-title"
-                 placeholder="What needs doing?" autocomplete="off" required>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-4)">
-          <div class="form-group">
-            <label class="form-label" for="quick-add-workstream">Workstream</label>
-            <select class="inp" id="quick-add-workstream">
-              <option value="">— Select —</option>
-              <optgroup label="Alongside: Move">
-                <option value="">Build</option>
-                <option value="">Business</option>
-                <option value="">Community</option>
-                <option value="">Marketing</option>
-              </optgroup>
-              <optgroup label="Operations">
-                <option value="">Legal &amp; Setup</option>
-                <option value="">IP &amp; Insurance</option>
-                <option value="">Partnerships</option>
-              </optgroup>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="quick-add-due">Due date</label>
-            <input class="inp" type="date" id="quick-add-due">
-          </div>
-        </div>
-        <div class="checkbox-wrap" style="margin-bottom:var(--space-6)">
-          <input type="checkbox" id="quick-add-critical">
-          <label for="quick-add-critical" style="font-size:var(--text-sm);color:var(--text-secondary)">
-            Mark as critical
-          </label>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%" data-modal-primary>
-          Add task
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ── PHASE COMPLETE MODAL ───────────────────────────────── -->
-  <div id="phase-complete-modal-overlay"
-       class="modal-overlay"
-       role="dialog"
-       aria-modal="true"
-       aria-labelledby="phase-complete-heading"
-       onclick="if(event.target===this)window.App.closeModal('phase-complete-modal')">
-    <div class="modal">
-      <div class="modal-body" style="text-align:center;padding:var(--space-8)">
-        <div style="font-size:3rem;margin-bottom:var(--space-4)" aria-hidden="true">🎉</div>
-        <h2 id="phase-complete-heading" style="font-size:var(--text-xl);margin-bottom:var(--space-2)">
-          Phase Complete!
-        </h2>
-        <p style="color:var(--text-muted);margin-bottom:var(--space-6)" data-modal-phase-name></p>
-        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
-          <button class="btn btn-primary"
-                  style="width:100%"
-                  data-modal-primary
-                  onclick="window.App.generatePhaseReport(currentPhaseId);window.App.closeModal('phase-complete-modal')">
-            <i class="fas fa-file-alt" aria-hidden="true"></i>
-            Generate completion report
-          </button>
-          <button class="btn btn-secondary"
-                  style="width:100%"
-                  onclick="window.App.closeModal('phase-complete-modal')">
-            Maybe later
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── TOAST CONTAINER ───────────────────────────────────── -->
-  <div id="toast-container" class="toast-container no-print" aria-live="polite" aria-atomic="false">
-    <!-- Toasts injected by app.js -->
-  </div>
-
-  <!-- ── ARIA LIVE REGION (navigation announcements) ──────── -->
-  <div id="aria-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
-
-</div><!-- end #app-screen -->
-
-
-<!-- ── LIVE PULSE ANIMATION ──────────────────────────────────── -->
-<style>
-@keyframes livePulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
-}
-</style>
-
-<!-- ── PWA INSTALL BANNER ───────────────────────────────────── -->
-<div id="install-banner"
-     style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;
-            background:var(--navy-700);border-top:1px solid rgba(13,115,119,0.4);
-            padding:12px 20px;align-items:center;gap:12px;
-            box-shadow:0 -4px 20px rgba(0,0,0,0.4)"
-     role="banner" aria-label="Install BNH OS as an app">
-  <div style="width:36px;height:36px;background:var(--teal-600);border-radius:8px;
-              display:flex;align-items:center;justify-content:center;
-              font-weight:900;color:white;font-size:11px;flex-shrink:0">BNH</div>
-  <div style="flex:1;min-width:0">
-    <div style="font-size:13px;font-weight:600;color:var(--slate-100)">Install BNH OS</div>
-    <div style="font-size:11px;color:var(--slate-400)">Add to your home screen for quick access</div>
-  </div>
-  <button onclick="window.triggerInstall()"
-          style="background:var(--teal-600);color:white;border:none;border-radius:8px;
-                 padding:0 16px;height:44px;font-size:13px;font-weight:600;
-                 cursor:pointer;white-space:nowrap;flex-shrink:0"
-          aria-label="Install BNH OS as an app">
-    Install
-  </button>
-  <button onclick="window.dismissInstall()"
-          style="background:none;border:none;color:var(--slate-400);
-                 cursor:pointer;padding:0;width:44px;height:44px;
-                 display:flex;align-items:center;justify-content:center;flex-shrink:0"
-          aria-label="Dismiss install prompt">
-    <i class="fas fa-times"></i>
-  </button>
-</div>
-
-<!-- iOS install instructions (shown on Safari where beforeinstallprompt is unavailable) -->
-<div id="ios-install-banner"
-     style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;
-            background:var(--navy-700);border-top:1px solid rgba(13,115,119,0.4);
-            padding:16px 20px;box-shadow:0 -4px 20px rgba(0,0,0,0.4)"
-     role="banner" aria-label="Install BNH OS on iOS">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-    <div style="font-size:13px;font-weight:600;color:var(--slate-100)">Install BNH OS on your iPhone</div>
-    <button onclick="document.getElementById('ios-install-banner').style.display='none';sessionStorage.setItem('ios-dismissed','1')"
-            style="background:none;border:none;color:var(--slate-400);cursor:pointer;
-                   width:44px;height:44px;display:flex;align-items:center;justify-content:center"
-            aria-label="Dismiss">
-      <i class="fas fa-times"></i>
+    <!-- Feedback button (beta) -->
+    <button id="feedback-fab" class="feedback-fab hidden" aria-label="Send feedback">
+      <span aria-hidden="true">💬</span>
     </button>
+
+    <!-- Modal container -->
+    <div id="modal-container" class="modal-container hidden"></div>
+
   </div>
-  <ol style="font-size:12px;color:var(--slate-300);padding-left:18px;margin:0;line-height:2">
-    <li>Tap the <strong style="color:white">Share</strong> button at the bottom of Safari <span style="color:var(--teal-400)">&#9650;</span></li>
-    <li>Scroll down and tap <strong style="color:white">Add to Home Screen</strong></li>
-    <li>Tap <strong style="color:white">Add</strong> in the top right</li>
-  </ol>
-</div>
 
-<!-- ── SERVICE WORKER + PWA INSTALL ─────────────────────────── -->
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/BNH-OS/sw.js', { scope: '/BNH-OS/' })
-      .catch(err => console.log('SW failed:', err));
-  });
-}
-
-let deferredPrompt = null;
-
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const banner = document.getElementById('install-banner');
-  if (banner && !sessionStorage.getItem('install-dismissed')) banner.style.display = 'flex';
-});
-
-window.addEventListener('appinstalled', () => {
-  deferredPrompt = null;
-  const banner = document.getElementById('install-banner');
-  if (banner) banner.style.display = 'none';
-});
-
-window.triggerInstall = async function() {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  const banner = document.getElementById('install-banner');
-  if (banner) banner.style.display = 'none';
-};
-
-window.dismissInstall = function() {
-  sessionStorage.setItem('install-dismissed', '1');
-  const banner = document.getElementById('install-banner');
-  if (banner) banner.style.display = 'none';
-};
-
-// iOS Safari detection — show manual instructions
-const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-const isInStandaloneMode = window.navigator.standalone;
-if (isIOS && !isInStandaloneMode && !sessionStorage.getItem('ios-dismissed')) {
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      const b = document.getElementById('ios-install-banner');
-      if (b) b.style.display = 'block';
-    }, 3000); // Show after 3 seconds so it doesn't interrupt login
-  });
-}
-</script>
-
-<!-- ── APP ───────────────────────────────────────────────────── -->
-<script type="module" src="js/app.js"></script>
-
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
