@@ -111,6 +111,17 @@ function renderTodaysDashboard(name) {
         <p class="text-secondary">${formatDate(new Date())}</p>
       </div>
 
+      <!-- ── Coach recommendation — first thing after header ───────────── -->
+      <div class="card card-coach">
+        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <div class="recommendation-content">
+          ${buildCoachMessage(todaysCheckin, intensity, burnout)}
+          <div class="intensity-badge ${intensity}" aria-label="Today's intensity: ${display.label}">
+            ${getIntensityIcon(intensity)} ${display.label}
+          </div>
+        </div>
+      </div>
+
       <!-- ── Check-in summary ───────────────────────────────────────────── -->
       <div class="card checkin-summary-card">
         <div class="checkin-summary-header">
@@ -167,17 +178,6 @@ function renderTodaysDashboard(name) {
       <!-- ── Programme phase banner ─────────────────────────────────────── -->
       ${renderPhaseBanner()}
       ${renderSevereZoneMessage()}
-
-      <!-- ── Coach recommendation ───────────────────────────────────────── -->
-      <div class="card card-coach">
-        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <div class="recommendation-content">
-          ${buildCoachMessage(todaysCheckin, intensity, burnout)}
-          <div class="intensity-badge ${intensity}" aria-label="Today's intensity: ${display.label}">
-            ${getIntensityIcon(intensity)} ${display.label}
-          </div>
-        </div>
-      </div>
 
       <!-- ── Session options ────────────────────────────────────────────── -->
       <div class="workout-options" id="workout-options">
