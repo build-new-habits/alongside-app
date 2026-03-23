@@ -2,39 +2,23 @@
  * today.js - Today View
  * Shows check-in prompt or generated workout options
  *
- * v1.5 — Moderate pain zone messaging:
- *   renderModerateZoneMessage() added alongside renderSevereZoneMessage().
- *   When any body zone is Moderate (pain 4-6), a coach banner explains why
- *   the exercise pool is smaller. Previously silent — user saw fewer options
- *   with no explanation. Rendered between phase banner and coach card.
- *   Uses warning colour token (amber) to distinguish from severe (danger/red).
- *   Both functions share the same zone/condition read from store.
+ * v1.6 — Human coach message:
+ *   buildCoachMessage() assembles a contextual paragraph from check-in
+ *   components: energy acknowledgement, mood (if notable), condition
+ *   response (if pain >= 3), adaptation statement, and invitation.
+ *   The assembled message sits above the intensity badge, which is
+ *   retained as a quick visual summary.
+ *   renderModerateZoneMessage() removed — moderate pain is now handled
+ *   inside the coach message naturally. Severe zone banner retained for
+ *   visual urgency on high-pain days.
+ *   workout.js "Why this exercise" section also updated (logo added).
  *
- * v1.4 — prescribedExercises Level 1 display (see session 2 handoff)
- *
+ * v1.5 — Moderate pain zone messaging.
+ * v1.4 — prescribedExercises Level 1 display.
  * v1.3 — Two fixes:
- *
  *   (1) Per-exercise prescription display corrected.
- *       Previously showed raw duration field only (e.g. "1m 30s"), which
- *       did not match what calculateDuration() counts in the header total.
- *       Now shows the full prescription that the total is based on:
- *         - perSide exercises: "1m 30s - each side"
- *         - sets > 1: "3 x 1m 30s"
- *         - both: "3 x 1m 30s - each side"
- *         - reps-based: "3 x 10 reps" (unchanged)
- *       The header total and the per-exercise lines now count the same thing.
- *
- *   (2) availableTime quick-change strip added to the check-in summary card.
- *       Users can update their available time mid-day without re-doing the
- *       full check-in. Tapping a chip writes the new value to the store,
- *       clears the workout cache, and regenerates workouts immediately.
- *       The strip also shows the current selection so the user knows what
- *       the generator is using.
- *
- * v1.2 — Programme phase banner:
- *   When a programme is active, a soft teal banner is shown between the
- *   check-in summary and workout options. It shows the current phase name
- *   and the phase coaching message from the programme template.
+ *   (2) availableTime quick-change strip added.
+ * v1.2 — Programme phase banner.
  */
 
 import { store }            from "../store.js";
@@ -90,7 +74,7 @@ function renderCheckinPrompt(name) {
         <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div class="coach-prompt-content">
           <p><strong>Ready to check in?</strong></p>
-          <p class="text-secondary">It only takes 30 seconds, and helps me suggest the right workout for today.</p>
+          <p class="text-secondary">It only takes 30 seconds, and helps me suggest the right session for today.</p>
         </div>
       </div>
 
@@ -174,7 +158,7 @@ function renderTodaysDashboard(name) {
             `).join("")}
           </div>
           ${!availableTime
-            ? `<p class="available-time-note">Not set — using your energy level to decide workout length.</p>`
+            ? `<p class="available-time-note">Not set — using your energy level to decide session length.</p>`
             : ""
           }
         </div>
@@ -183,26 +167,22 @@ function renderTodaysDashboard(name) {
       <!-- ── Programme phase banner ─────────────────────────────────────── -->
       ${renderPhaseBanner()}
       ${renderSevereZoneMessage()}
-      ${renderModerateZoneMessage()}
 
       <!-- ── Coach recommendation ───────────────────────────────────────── -->
       <div class="card card-coach">
         <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div class="recommendation-content">
+          ${buildCoachMessage(todaysCheckin, intensity, burnout)}
           <div class="intensity-badge ${intensity}" aria-label="Today's intensity: ${display.label}">
             ${getIntensityIcon(intensity)} ${display.label}
           </div>
-          <p>${display.message}</p>
-          ${burnout.level !== "none" ? `
-            <p class="text-sm text-muted">${burnout.reasons.join(". ")}.</p>
-          ` : ""}
         </div>
       </div>
 
-      <!-- ── Workout options ────────────────────────────────────────────── -->
+      <!-- ── Session options ────────────────────────────────────────────── -->
       <div class="workout-options" id="workout-options">
-        <h2>Today's Options</h2>
-        <p class="text-secondary">Choose what feels right:</p>
+        <h2>Choose your session</h2>
+        <p class="text-secondary">Pick whatever feels right for today:</p>
 
         ${workouts.map((workout, index) => renderWorkoutCard(workout, index)).join("")}
       </div>
@@ -212,14 +192,107 @@ function renderTodaysDashboard(name) {
 }
 
 /**
+ * Assemble a human coach message from check-in components.
+ *
+ * Structure (all components conditional except energy and invitation):
+ *   1. Energy acknowledgement — always present
+ *   2. Mood acknowledgement   — only if mood is notable (<=4 or >=9)
+ *   3. Condition response     — only if any pain score is 3+
+ *   4. Adaptation statement   — always present, based on combined factors
+ *   5. Invitation             — always closes with choice framing
+ *
+ * The assembled message sits above the intensity badge, which is
+ * retained as a quick visual summary below.
+ *
+ * Moderate pain is absorbed here — no separate amber banner.
+ * Severe zone still has its own banner above this card.
+ *
+ * Voice: Steady (default). coachStyle variant wiring is Phase 4.
+ */
+function buildCoachMessage(checkin, intensity, burnout) {
+  const energy     = checkin?.energy     || 5;
+  const mood       = checkin?.mood       || 5;
+  const conditions = store.get("conditions") || [];
+  const painScores = store.get("conditionPainScores") || {};
+
+  const parts = [];
+
+  // ── Component 1: Energy acknowledgement ──────────────────────────────────
+  if (energy <= 2) {
+    parts.push("You are running very low today.");
+  } else if (energy <= 4) {
+    parts.push("Energy is a bit down today.");
+  } else if (energy <= 6) {
+    parts.push("Moderate energy — that is workable.");
+  } else if (energy <= 8) {
+    parts.push("Good energy today.");
+  } else {
+    parts.push("You are feeling strong today.");
+  }
+
+  // ── Component 2: Mood acknowledgement (only if notable) ──────────────────
+  if (mood <= 2) {
+    parts.push("I hear that things are tough right now.");
+  } else if (mood <= 4) {
+    parts.push("Sounds like a harder day emotionally.");
+  } else if (mood >= 9) {
+    parts.push("Great to hear you are feeling good.");
+  }
+  // mood 5-8: no comment — neutral or positive but unremarkable
+
+  // ── Component 3: Condition response (if pain is 3+) ──────────────────────
+  const highestPain = conditions.reduce((max, id) => {
+    return Math.max(max, painScores[id] || 0);
+  }, 0);
+
+  if (highestPain >= 7) {
+    parts.push("Your condition is significant today — I will be very careful with your options.");
+  } else if (highestPain >= 5) {
+    parts.push("Your body needs some care today, so I have adjusted your options to protect you.");
+  } else if (highestPain >= 3) {
+    parts.push("I am keeping an eye on how you are feeling physically.");
+  }
+
+  // ── Component 4: Adaptation statement ────────────────────────────────────
+  if (burnout.level !== "none") {
+    parts.push("You have been running low for a few days. Today is about recovery — not performance. Gentle movement is genuinely enough.");
+  } else if (intensity === "recovery") {
+    parts.push("Today is a recovery day. Gentle movement and rest is the right call.");
+  } else if (energy <= 4 && highestPain >= 5) {
+    parts.push("I have kept things light — your energy and your body both need gentle today.");
+  } else if (energy <= 4) {
+    parts.push("I have kept things gentle to match your energy.");
+  } else if (highestPain >= 5) {
+    parts.push("I have adapted your options to work around what your body needs right now.");
+  } else if (intensity === "challenging") {
+    parts.push("You have the energy for something solid today — I have put together options that will work for it.");
+  } else {
+    parts.push("I have put together some good options for today.");
+  }
+
+  // ── Component 5: Invitation ───────────────────────────────────────────────
+  parts.push("Take a look below and choose what feels right.");
+
+  // ── Assemble ──────────────────────────────────────────────────────────────
+  // Observation lines as one paragraph, invitation as a softer second line.
+  const observation = parts.slice(0, -1).join(" ");
+  const invitation  = parts[parts.length - 1];
+
+  return `
+    <p class="coach-message-observation">${observation}</p>
+    <p class="coach-message-invite text-secondary">${invitation}</p>
+  `;
+}
+
+/**
  * Render a single workout option card.
  *
  * Per-exercise prescription (v1.3):
  * The display now matches what calculateDuration() counted in the header total.
- *   - duration + perSide:        "1m 30s - each side"
- *   - duration + sets > 1:       "3 x 1m 30s"
- *   - duration + sets > 1 + perSide: "3 x 1m 30s - each side"
- *   - reps-based:                "3 x 10 reps" (unchanged)
+ *   - duration + perSide:              "1m 30s - each side"
+ *   - duration + sets > 1:             "3 x 1m 30s"
+ *   - duration + sets > 1 + perSide:   "3 x 1m 30s - each side"
+ *   - reps-based:                      "3 x 10 reps" (unchanged)
  */
 function renderWorkoutCard(workout, index) {
   return `
@@ -246,7 +319,7 @@ function renderWorkoutCard(workout, index) {
 
       <button class="btn btn-primary btn-full workout-start-btn" data-workout-index="${index}"
               aria-label="Start ${workout.name}">
-        Start Workout
+        Start Session
       </button>
     </div>
   `;
@@ -254,28 +327,16 @@ function renderWorkoutCard(workout, index) {
 
 /**
  * Format the exercise prescription shown in the workout card list.
- * Must reflect exactly what calculateDuration() counts so the per-exercise
- * display and the header total agree.
- *
- * Duration-based exercises:
- *   sets=1, perSide=false  -> "1m 30s"
- *   sets=1, perSide=true   -> "1m 30s - each side"
- *   sets=3, perSide=false  -> "3 x 1m 30s"
- *   sets=3, perSide=true   -> "3 x 1m 30s - each side"
- *
- * Reps-based exercises:
- *   "3 x 10 reps"  (unchanged from v1.2)
  */
 function formatPrescription(exercise) {
   if (exercise.duration) {
-    const sets     = exercise.sets || 1;
-    const timeStr  = formatExerciseDuration(exercise.duration);
-    const setsStr  = sets > 1 ? `${sets} x ` : "";
-    const sideStr  = exercise.perSide ? " - each side" : "";
+    const sets    = exercise.sets || 1;
+    const timeStr = formatExerciseDuration(exercise.duration);
+    const setsStr = sets > 1 ? `${sets} x ` : "";
+    const sideStr = exercise.perSide ? " - each side" : "";
     return `${setsStr}${timeStr}${sideStr}`;
   }
 
-  // Reps-based
   const sets = exercise.sets || 3;
   const reps = exercise.reps || 10;
   return `${sets} x ${reps} reps`;
@@ -283,10 +344,6 @@ function formatPrescription(exercise) {
 
 /**
  * Format exercise duration for display.
- * < 60s  -> "45s"
- * 60s    -> "1 min"
- * 90s    -> "1m 30s"
- * 120s   -> "2 mins"
  */
 function formatExerciseDuration(seconds) {
   if (!seconds) return "";
@@ -327,6 +384,8 @@ function renderPhaseBanner() {
 
 /**
  * Render a coach message when a body zone is severely impacted.
+ * Moderate pain is now handled inside buildCoachMessage() above.
+ * This function covers severe only — retained for visual urgency.
  */
 function renderSevereZoneMessage() {
   const conditions = store.get("conditions") || [];
@@ -381,61 +440,6 @@ function renderSevereZoneMessage() {
         <div class="severe-zone-body">
           <span class="severe-zone-label">${msg.label}</span>
           <p class="severe-zone-message">${msg.text}</p>
-        </div>
-      </div>`);
-  }
-
-  return parts.join("\n");
-}
-
-/**
- * Render a coach message when a body zone is at moderate pain level (4-6).
- * Explains WHY the exercise pool is smaller -- previously silent shrinkage.
- * Uses warning (amber) styling to distinguish from severe (danger/red).
- * Only shown when no severe zone is active for the same zone -- severe takes priority.
- */
-function renderModerateZoneMessage() {
-  const conditions = store.get("conditions") || [];
-  const painScores = store.get("conditionPainScores") || {};
-  const zoneStatus = getZoneStatus(conditions, painScores);
-
-  const messages = {
-    "lower-limb": {
-      icon:  "🦵",
-      label: "Lower body needs some care today",
-      text:  "Your legs or hips are reporting some pain, so I have removed exercises that could aggravate them. You will see fewer lower body options than usual -- that is intentional. Everything shown is safe to try."
-    },
-    "spine": {
-      icon:  "🔙",
-      label: "Back or neck -- I have adapted your options",
-      text:  "With some back or neck pain today, I have taken the higher-load spinal exercises out of your options. What remains is still effective -- just kinder on your spine right now."
-    },
-    "upper-limb": {
-      icon:  "💪",
-      label: "Arms or shoulders -- options adjusted",
-      text:  "There is some pain in your arms or shoulders today, so I have reduced the upper body load in your options. Lower body, core, and cardio are all still available to you."
-    },
-    "systemic": {
-      icon:  "💙",
-      label: "Keeping things manageable today",
-      text:  "Your body is working through something today, so I have kept the intensity lower across all your options. Everything here is chosen to support you rather than push you."
-    }
-  };
-
-  const parts = [];
-
-  for (const [zone, severity] of Object.entries(zoneStatus)) {
-    if (zone === "combinedSevere") continue;
-    // Only show moderate banner -- severe zones have their own banner above
-    if (severity !== "moderate") continue;
-    const msg = messages[zone];
-    if (!msg) continue;
-    parts.push(`
-      <div class="moderate-zone-banner" role="note" aria-label="${msg.label}">
-        <span class="moderate-zone-icon" aria-hidden="true">${msg.icon}</span>
-        <div class="moderate-zone-body">
-          <span class="moderate-zone-label">${msg.label}</span>
-          <p class="moderate-zone-message">${msg.text}</p>
         </div>
       </div>`);
   }
@@ -505,14 +509,9 @@ function getIntensityIcon(intensity) {
 
 // ── availableTime quick-change logic ──────────────────────────────────────────
 
-/**
- * Update availableTime from the Today view strip.
- * Writes to store, clears the workout cache, then triggers re-render
- * by navigating to the same view (router re-renders on navigate).
- */
 function setAvailableTimeFromStrip(value) {
   store.set("availableTime", value);
-  store.set("workoutsGeneratedAt", null); // bust cache -> regenerate
+  store.set("workoutsGeneratedAt", null);
   router.navigate("today");
 }
 
@@ -538,10 +537,9 @@ export function onMount() {
     const chip = e.target.closest(".time-strip-chip");
     if (!chip?.dataset.time) return;
 
-    const value = chip.dataset.time;
+    const value        = chip.dataset.time;
     const currentValue = store.get("availableTime");
 
-    // Tapping an already-selected chip clears it
     if (value === currentValue) {
       clearAvailableTimeFromStrip();
     } else {
@@ -551,7 +549,7 @@ export function onMount() {
 
   document.getElementById("time-strip-clear")?.addEventListener("click", clearAvailableTimeFromStrip);
 
-  // ── Workout start buttons ─────────────────────────────────────────────────
+  // ── Session start buttons ─────────────────────────────────────────────────
   document.querySelectorAll(".workout-start-btn").forEach(btn => {
     btn.addEventListener("click", e => {
       const index   = parseInt(e.currentTarget.dataset.workoutIndex);
