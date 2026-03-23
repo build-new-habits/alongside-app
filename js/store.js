@@ -9,6 +9,15 @@
  *                          workouts; "too-easy" entries upweight it.
  *                          Read by applyFeedbackWeighting() in exercises/index.js.
  *
+ * v1.4 — Schema addition:
+ *   coachStyle — user preference for coach communication style.
+ *                "steady" | "energetic" | "minimal" | "nurturing"
+ *                Default: "steady". Set in Settings view.
+ *                Read by coach voice functions to select tone variants.
+ *
+ * v1.3 — Schema additions:
+ *   exerciseFeedback — per-exercise difficulty feedback from workout view.
+ *
  * v1.2 — Schema additions:
  *   prescribedExercises  — externally prescribed exercises from physio/coach
  *                          Empty array in v1.2; UI built in Phase 3/4.
@@ -65,9 +74,10 @@ export const store = {
       progressLog:          Array.isArray(saved.progressLog)    ? saved.progressLog    : [],
       prescribedExercises:  Array.isArray(saved.prescribedExercises) ? saved.prescribedExercises : [],
       exerciseFeedback:     Array.isArray(saved.exerciseFeedback)    ? saved.exerciseFeedback    : [],
-      conditionPainScores:  (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
+     conditionPainScores:  (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
                               ? saved.conditionPainScores
                               : {},
+      coachStyle:           saved.coachStyle || "steady",
     };
   },
 
@@ -114,8 +124,16 @@ export const store = {
         sleepQuality: null
       },
 
-      // ── EQUIPMENT — Step 8 ───────────────────────────────────
+     // ── EQUIPMENT — Step 8 ───────────────────────────────────
       equipment: [],
+
+      // ── COACH STYLE ──────────────────────────────────────────
+      // How the coach communicates. Set in Settings view.
+      // "steady"    — calm, consistent, supportive
+      // "energetic" — upbeat, motivating, enthusiastic
+      // "minimal"   — short, direct, no fluff
+      // "nurturing" — warm, gentle, emotionally attentive
+      coachStyle: "steady",
 
       // ── PRESCRIBED EXERCISES ─────────────────────────────────
       // Exercises prescribed by an external professional (physio,
