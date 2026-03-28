@@ -484,365 +484,247 @@
   line-height: var(--leading-relaxed);
 }
 
-/* ── Moderate zone banner (today.js) ─────────────────────────────────────────
-   Amber/warning tone -- softer than severe (red). Explains why the pool is
-   smaller. Sits between phase banner and coach card, same as severe banner.
-   ─────────────────────────────────────────────────────────────────────────── */
-
-.moderate-zone-banner {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-  background: var(--color-warning-light);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  margin-bottom: var(--space-3);
-}
-
-.moderate-zone-icon {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.moderate-zone-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.moderate-zone-label {
-  font-size: var(--text-xs);
-  font-weight: var(--font-semibold);
-  color: var(--color-warning);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.moderate-zone-message {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  margin: 0;
-  line-height: var(--leading-relaxed);
-}
-
-/* ── Exercise exit route nudge (workout.js) ──────────────────────────────────
-   Inline, below exercise instructions. Shown when a mild pain zone is active.
-   Neutral tone -- informs without alarming. Skip button is already present
-   in the action bar; this gives it a coach voice so skipping feels sanctioned.
-   ─────────────────────────────────────────────────────────────────────────── */
-
-.exit-route-nudge {
-  background: rgba(96, 165, 250, 0.08);
-  border: 1px solid rgba(96, 165, 250, 0.2);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-  margin-top: var(--space-3);
-}
-
-.exit-route-nudge-body {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
-}
-
-.exit-route-nudge-text {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  margin: 0;
-  line-height: var(--leading-relaxed);
-}
-
-.exit-route-nudge-text strong {
-  color: var(--color-info);
-  font-weight: var(--font-semibold);
-}
 
 /* ============================================
-   SETTINGS VIEW — S3-4
-   Tabbed layout: Profile / Conditions / Equipment
-   coachStyle selector, equipment chip grid.
+   SETTINGS VIEW — CONDITIONS TAB
    ============================================ */
 
-
-/* ── Settings view wrapper ───────────────────────────────────────────────── */
-
-.settings-view {
-  padding-bottom: var(--space-16);
-}
-
-
-/* ── Tab bar ─────────────────────────────────────────────────────────────── */
-
-.settings-tabs {
-  display: flex;
-  gap: 0;
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--space-1);
-  margin-bottom: var(--space-5);
-  border: 1px solid var(--color-border);
-}
-
-.settings-tab {
-  flex: 1;
-  padding: var(--space-2) var(--space-3);
-  border: none;
-  border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--color-text-secondary);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-  min-height: 44px;
-}
-
-.settings-tab.active {
-  background: var(--color-primary);
-  color: var(--color-bg);
-  font-weight: var(--font-semibold);
-}
-
-.settings-tab:not(.active):hover {
-  background: rgba(var(--color-primary-rgb, 20, 184, 166), 0.08);
-  color: var(--color-text);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .settings-tab {
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-}
-
-
-/* ── Tab panel ───────────────────────────────────────────────────────────── */
-
-.settings-tab-panel {
-  min-height: 200px;
-}
-
-
-/* ── Profile card ────────────────────────────────────────────────────────── */
-
-.settings-profile-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.settings-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--color-border);
-  gap: var(--space-4);
-}
-
-.settings-row:last-child {
-  border-bottom: none;
-}
-
-.settings-label {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-
-.settings-value {
-  font-size: var(--text-sm);
-  color: var(--color-text);
-  font-weight: var(--font-medium);
-  text-align: right;
-}
-
-
-/* ── Coach style selector ────────────────────────────────────────────────── */
-
-.settings-coach-intro {
-  font-size: var(--text-sm);
+.settings-conditions-intro {
   margin-bottom: var(--space-4);
-}
-
-.coach-style-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-  margin-bottom: var(--space-6);
-}
-
-.coach-style-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
-  padding: var(--space-4);
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  text-align: left;
-  min-height: 44px;
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.coach-style-card.selected {
-  border-color: var(--color-primary);
-  background: rgba(var(--color-primary-rgb, 20, 184, 166), 0.06);
-}
-
-.coach-style-card:not(.selected):hover {
-  border-color: var(--color-primary-light);
-}
-
-.coach-style-icon {
-  font-size: var(--text-xl);
-  line-height: 1;
-}
-
-.coach-style-label {
   font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: var(--color-text);
 }
 
-.coach-style-desc {
-  font-size: var(--text-xs);
-  color: var(--color-text-secondary);
-  line-height: var(--leading-relaxed);
-}
-
-.coach-style-card.selected .coach-style-label {
-  color: var(--color-primary);
-}
-
-
-/* ── Conditions tab ──────────────────────────────────────────────────────── */
-
+/* Individual condition card */
 .conditions-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  padding: 0;
-}
-
-.condition-settings-row {
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  font-size: var(--text-sm);
-  color: var(--color-text);
-}
-
-.condition-settings-row:last-child {
-  border-bottom: none;
-}
-
-.settings-conditions-note {
-  margin-top: var(--space-3);
-  color: var(--color-text-muted);
-}
-
-
-/* ── Equipment tab ───────────────────────────────────────────────────────── */
-
-.settings-equipment-intro {
-  font-size: var(--text-sm);
+  gap: var(--space-3);
   margin-bottom: var(--space-4);
 }
 
-.equipment-settings-category {
-  margin-bottom: var(--space-6);
+.condition-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  transition: opacity 0.2s ease;
 }
 
-.equipment-category-heading {
+.condition-card--paused {
+  opacity: 0.6;
+}
+
+/* Header row: icon + name + action buttons */
+.condition-card-header {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: var(--color-text);
-  margin: 0 0 var(--space-3) 0;
+  min-height: 44px;
 }
 
-.equipment-cat-count {
-  margin-left: auto;
+.condition-card-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.condition-card-name {
+  flex: 1;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.condition-paused-badge {
   font-size: var(--text-xs);
   font-weight: var(--font-medium);
-  color: var(--color-primary);
-  background: rgba(var(--color-primary-rgb, 20, 184, 166), 0.1);
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  background: var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
 }
 
-.equipment-chip-grid {
+.condition-card-actions {
+  display: flex;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Text-only action buttons */
+.btn-text {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  color: var(--color-teal);
+  padding: var(--space-2) var(--space-2);
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: var(--radius-sm);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.btn-text:hover,
+.btn-text:focus-visible {
+  color: var(--color-teal-dark, var(--color-teal));
+  background: rgba(var(--color-teal-rgb, 20, 184, 166), 0.08);
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+  text-decoration: none;
+}
+
+.btn-text--danger {
+  color: #ef4444;
+}
+
+.btn-text--danger:hover,
+.btn-text--danger:focus-visible {
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.08);
+  outline-color: #ef4444;
+}
+
+/* Inline remove confirmation */
+.condition-remove-confirm {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-md);
+}
+
+.condition-remove-confirm p {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.condition-confirm-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.btn-sm {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  min-height: 44px;
+}
+
+/* Story panel */
+.condition-story-panel {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.condition-story-panel.hidden {
+  display: none;
+}
+
+.condition-story-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.condition-story-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-1);
+}
+
+.condition-story-input {
+  width: 100%;
+  padding: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  min-height: 44px;
+  font-family: inherit;
+}
+
+.condition-story-input:focus {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+  border-color: var(--color-teal);
+}
+
+.condition-story-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Add condition zone */
+.condition-add-zone {
+  margin-top: var(--space-4);
+}
+
+.condition-add-picker {
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.condition-add-picker.hidden {
+  display: none;
+}
+
+.condition-picker-group {
+  margin-bottom: var(--space-4);
+}
+
+.condition-picker-group:last-child {
+  margin-bottom: 0;
+}
+
+.condition-picker-area-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.condition-picker-chips {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-.equipment-chip {
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-size: var(--text-xs);
-  cursor: pointer;
-  min-height: 44px;
+.condition-picker-chip {
   display: inline-flex;
   align-items: center;
-  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
-}
-
-.equipment-chip.selected {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-bg);
-  font-weight: var(--font-medium);
-}
-
-.equipment-chip:not(.selected):hover {
-  border-color: var(--color-primary-light);
-}
-
-
-/* ── Reset zone ──────────────────────────────────────────────────────────── */
-
-.settings-reset-zone {
-  margin-top: var(--space-8);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--color-border);
-}
-
-/* ── Coach message typography (today.js buildCoachMessage) ──────────────── */
-
-.coach-message-observation {
-  margin: 0 0 var(--space-2) 0;
-  color: var(--color-text);
-  line-height: var(--leading-relaxed);
-}
-
-.coach-message-invite {
-  margin: 0 0 var(--space-3) 0;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full, 999px);
+  cursor: pointer;
+  min-height: 44px;
+  font-family: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-/* ── Exercise why card (workout.js) ──────────────────────────────────────── */
-
-.exercise-why-card {
-  margin-bottom: var(--space-4);
-}
-
-.exercise-why-content h3 {
-  margin: 0 0 var(--space-2) 0;
-  font-size: var(--text-base);
-}
-
-.exercise-why-content p {
-  margin: 0;
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  line-height: var(--leading-relaxed);
+.condition-picker-chip:hover,
+.condition-picker-chip:focus-visible {
+  background: rgba(var(--color-teal-rgb, 20, 184, 166), 0.08);
+  border-color: var(--color-teal);
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
 }
