@@ -134,31 +134,141 @@ function renderActiveTab() {
 
 // ── Profile tab ───────────────────────────────────────────────────────────────
 
+const AGE_BANDS = [
+  { id: "under-18",   label: "Under 18"         },
+  { id: "18-24",      label: "18 - 24"           },
+  { id: "25-34",      label: "25 - 34"           },
+  { id: "35-44",      label: "35 - 44"           },
+  { id: "45-54",      label: "45 - 54"           },
+  { id: "55-64",      label: "55 - 64"           },
+  { id: "65+",        label: "65 and over"       },
+  { id: "prefer-not", label: "Prefer not to say" }
+];
+
+const GENDER_OPTIONS = [
+  { id: "female",     label: "Female"            },
+  { id: "male",       label: "Male"              },
+  { id: "non-binary", label: "Non-binary"        },
+  { id: "prefer-not", label: "Prefer not to say" }
+];
+
 function renderProfileTab() {
-  const name       = store.get("name")       || "Not set";
-  const age        = store.get("age");
-  const gender     = store.get("gender");
-  const weight     = store.get("weight");
-  const weightUnit = store.get("weightUnit") || "kg";
-  const coachStyle = store.get("coachStyle") || "steady";
+  const name             = store.get("name")             || "";
+  const ageBand          = store.get("ageBand");
+  const gender           = store.get("gender");
+  const weight           = store.get("weight");
+  const weightUnit       = store.get("weightUnit")       || "kg";
+  const hormonalTracking = store.get("hormonalTracking");
+  const coachStyle       = store.get("coachStyle")       || "steady";
+  const showHormonal     = ["female", "non-binary"].includes(gender);
 
   return `
     <section aria-labelledby="profile-heading">
 
-      <!-- Profile details — read only -->
       <h2 id="profile-heading" class="section-heading">Your profile</h2>
-      <div class="card settings-profile-card">
-        ${settingsRow("Name",   name)}
-        ${settingsRow("Age",    age    ? `${age}`                      : "Not set")}
-        ${settingsRow("Gender", gender ? formatGender(gender)          : "Not set")}
-        ${settingsRow("Weight", weight ? `${weight}${weightUnit}`      : "Not set")}
+
+      <!-- Name -->
+      <div class="profile-field-group">
+        <label class="profile-field-label" for="profile-name">Name</label>
+        <input
+          type="text"
+          id="profile-name"
+          class="profile-field-input"
+          value="${name}"
+          placeholder="Your name"
+          autocomplete="given-name"
+          data-profile-field="name"
+          aria-label="Your name"
+        >
       </div>
 
-      <!-- Coach style selector -->
+      <!-- Age band -->
+      <div class="profile-field-group">
+        <label class="profile-field-label" id="profile-age-label">Age group</label>
+        <div class="chip-group chip-group--wrap" role="group" aria-labelledby="profile-age-label">
+          ${AGE_BANDS.map(band => `
+            <button
+              class="chip chip--sm ${ageBand === band.id ? "selected" : ""}"
+              data-profile-ageband="${band.id}"
+              aria-pressed="${ageBand === band.id}"
+            >${band.label}</button>
+          `).join("")}
+        </div>
+      </div>
+
+      <!-- Gender -->
+      <div class="profile-field-group">
+        <label class="profile-field-label" id="profile-gender-label">Gender</label>
+        <div class="chip-group chip-group--wrap" role="group" aria-labelledby="profile-gender-label">
+          ${GENDER_OPTIONS.map(opt => `
+            <button
+              class="chip chip--sm ${gender === opt.id ? "selected" : ""}"
+              data-profile-gender="${opt.id}"
+              aria-pressed="${gender === opt.id}"
+            >${opt.label}</button>
+          `).join("")}
+        </div>
+      </div>
+
+      <!-- Hormonal tracking — shown for female / non-binary -->
+      ${showHormonal ? `
+        <div class="profile-field-group">
+          <label class="profile-field-label" id="profile-hormonal-label">
+            Cycle-aware recommendations
+          </label>
+          <p class="text-secondary profile-field-hint">
+            Adapts sessions to your energy patterns throughout the month.
+          </p>
+          <div class="chip-group" role="group" aria-labelledby="profile-hormonal-label">
+            <button
+              class="chip chip--sm ${hormonalTracking === true  ? "selected" : ""}"
+              data-profile-hormonal="true"
+              aria-pressed="${hormonalTracking === true}"
+            >On</button>
+            <button
+              class="chip chip--sm ${hormonalTracking === false ? "selected" : ""}"
+              data-profile-hormonal="false"
+              aria-pressed="${hormonalTracking === false}"
+            >Off</button>
+          </div>
+        </div>
+      ` : ""}
+
+      <!-- Weight -->
+      <div class="profile-field-group">
+        <label class="profile-field-label" for="profile-weight">Weight (optional)</label>
+        <div class="profile-weight-row">
+          <input
+            type="number"
+            id="profile-weight"
+            class="profile-field-input profile-weight-input"
+            value="${weight || ""}"
+            placeholder="e.g. 75"
+            inputmode="decimal"
+            min="20"
+            max="300"
+            data-profile-field="weight"
+            aria-label="Your weight"
+          >
+          <div class="chip-group profile-unit-chips" role="group" aria-label="Weight unit">
+            <button
+              class="chip chip--sm ${weightUnit === "kg"  ? "selected" : ""}"
+              data-profile-unit="kg"
+              aria-pressed="${weightUnit === "kg"}"
+            >kg</button>
+            <button
+              class="chip chip--sm ${weightUnit === "lbs" ? "selected" : ""}"
+              data-profile-unit="lbs"
+              aria-pressed="${weightUnit === "lbs"}"
+            >lbs</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coach style -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Coach style</h2>
       <p class="text-secondary settings-coach-intro">
-        Choose how your coach communicates with you.
-        You can change this any time.
+        Choose how your coach communicates with you. You can change this any time.
       </p>
 
       <div class="coach-style-grid" role="radiogroup" aria-label="Coach communication style">
@@ -458,6 +568,19 @@ function formatGender(gender) {
 // ── Re-render helpers (used by event handlers) ────────────────────────────────
 
 /**
+ * Re-render only the profile tab panel content and re-wire it.
+ * Used when gender changes to show/hide the hormonal tracking option.
+ */
+function rerenderProfilePanel() {
+  const panel = document.getElementById("settings-tab-panel");
+  if (!panel) return;
+  panel.innerHTML = renderProfileTab();
+  wirePanel();
+  panel.setAttribute("tabindex", "-1");
+  panel.focus();
+}
+
+/**
  * Re-render only the conditions tab panel content and re-wire it.
  * Used by all conditions interactions to avoid a full view reload.
  */
@@ -508,6 +631,69 @@ function switchTab(tabName) {
  * Called after initial mount and after every tab switch.
  */
 function wirePanel() {
+
+  // ── Profile tab wiring ────────────────────────────────────────────────────
+
+  // Name + weight — save on blur
+  document.querySelectorAll("[data-profile-field]").forEach(input => {
+    input.addEventListener("blur", () => {
+      const field = input.dataset.profileField;
+      if (field === "name") {
+        store.set("name", input.value.trim());
+      } else if (field === "weight") {
+        const val = parseFloat(input.value);
+        store.set("weight", isNaN(val) ? null : val);
+      }
+    });
+  });
+
+  // Age band chips
+  document.querySelectorAll("[data-profile-ageband]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const band = btn.dataset.profileAgeband;
+      store.set("ageBand", band);
+      document.querySelectorAll("[data-profile-ageband]").forEach(b => {
+        const sel = b.dataset.profileAgeband === band;
+        b.classList.toggle("selected", sel);
+        b.setAttribute("aria-pressed", sel);
+      });
+    });
+  });
+
+  // Gender chips — re-render panel to show/hide hormonal option
+  document.querySelectorAll("[data-profile-gender]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const genderId = btn.dataset.profileGender;
+      store.set("gender", genderId);
+      rerenderProfilePanel();
+    });
+  });
+
+  // Hormonal tracking chips
+  document.querySelectorAll("[data-profile-hormonal]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const val = btn.dataset.profileHormonal === "true";
+      store.set("hormonalTracking", val);
+      document.querySelectorAll("[data-profile-hormonal]").forEach(b => {
+        const sel = b.dataset.profileHormonal === String(val);
+        b.classList.toggle("selected", sel);
+        b.setAttribute("aria-pressed", sel);
+      });
+    });
+  });
+
+  // Weight unit chips
+  document.querySelectorAll("[data-profile-unit]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const unit = btn.dataset.profileUnit;
+      store.set("weightUnit", unit);
+      document.querySelectorAll("[data-profile-unit]").forEach(b => {
+        const sel = b.dataset.profileUnit === unit;
+        b.classList.toggle("selected", sel);
+        b.setAttribute("aria-pressed", sel);
+      });
+    });
+  });
   // Coach style cards
   document.querySelectorAll(".coach-style-card").forEach(card => {
     card.addEventListener("click", () => {
