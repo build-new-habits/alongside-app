@@ -2,39 +2,15 @@
  * store.js - Data persistence layer
  * Handles localStorage with simple get/set API
  *
- * v1.3 — Schema additions:
- *   exerciseFeedback     — per-exercise difficulty feedback from workout view
- *                          [{ exerciseId, feedback, date, reason }]
- *                          "too-hard" entries deprioritise the exercise in future
- *                          workouts; "too-easy" entries upweight it.
- *                          Read by applyFeedbackWeighting() in exercises/index.js.
+ * v1.5 — Condition management additions:
+ *   conditionStatus   — { [conditionId]: 'active' | 'paused' }
+ *                       Allows conditions to be suspended from workout
+ *                       filtering without deleting them from history.
+ *   conditionStories  — { [conditionId]: { howLong, whatHelps, professional } }
+ *                       Optional user-authored context per condition.
+ *                       Not used by generator -- for user reference only.
  *
- * v1.4 — Schema addition:
- *   coachStyle — user preference for coach communication style.
- *                "steady" | "energetic" | "minimal" | "nurturing"
- *                Default: "steady". Set in Settings view.
- *                Read by coach voice functions to select tone variants.
- *
- * v1.3 — Schema additions:
- *   exerciseFeedback — per-exercise difficulty feedback from workout view.
- *
- * v1.2 — Schema additions:
- *   prescribedExercises  — externally prescribed exercises from physio/coach
- *                          Empty array in v1.2; UI built in Phase 3/4.
- *                          Added now so any user data captured in the field
- *                          from here forwards is correctly persisted.
- *
- *   conditionPainScores  — today's per-condition pain scores from check-in
- *                          { [conditionId]: 0-10 }
- *                          Used by the 3-tier condition filter to resolve
- *                          phase-aware condition variants (acute/subacute).
- *                          Replaces the previous approach of storing only
- *                          a flat conditions[] array with no pain context.
- *
- * v1.1 — Strategic layer additions:
- *   strategicGoal   — user's primary goal with target details
- *   activeProgramme — which plan they're on + current week/phase
- *   progressLog     — session history for the progress dashboard
+ * v1.4 — coachStyle scalar string added to getDefaults() and mergeWithDefaults().
  */
 
 export const store = {
@@ -73,11 +49,15 @@ export const store = {
       activeProgramme:      { ...defaults.activeProgramme,      ...(saved.activeProgramme      || {}) },
       progressLog:          Array.isArray(saved.progressLog)    ? saved.progressLog    : [],
       prescribedExercises:  Array.isArray(saved.prescribedExercises) ? saved.prescribedExercises : [],
-      exerciseFeedback:     Array.isArray(saved.exerciseFeedback)    ? saved.exerciseFeedback    : [],
-     conditionPainScores:  (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
+      conditionPainScores:  (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
                               ? saved.conditionPainScores
                               : {},
-      coachStyle:           saved.coachStyle || "steady",
+      conditionStatus:      (saved.conditionStatus && typeof saved.conditionStatus === 'object')
+                              ? saved.conditionStatus
+                              : {},
+      conditionStories:     (saved.conditionStories && typeof saved.conditionStories === 'object')
+                              ? saved.conditionStories
+                              : {},
     };
   },
 
@@ -117,6 +97,26 @@ export const store = {
       // Used by getActiveConditionIds() to resolve phase variants.
       conditionPainScores: {},
 
+      // ── CONDITION STATUS ─────────────────────────────────────
+      // Per-condition active/paused state managed from Settings.
+      // Pausing a condition suspends its effect on workout filtering
+      // without removing it from the conditions[] history.
+      // { [conditionId]: 'active' | 'paused' }
+      // Defaults to 'active' for any condition not present in this map.
+      conditionStatus: {},
+
+      // ── CONDITION STORIES ────────────────────────────────────
+      // Optional context the user adds about each condition.
+      // Captured in Settings > Conditions tab.
+      // Not used by the workout generator — purely for user reference
+      // and future coach personalisation.
+      // Schema (per entry):
+      //   howLong:      string  — e.g. "About 6 months"
+      //   whatHelps:    string  — e.g. "Heat, gentle movement"
+      //   professional: string  — e.g. "Physio at Taunton MSK"
+      // { [conditionId]: { howLong, whatHelps, professional } }
+      conditionStories: {},
+
       // ── LIFESTYLE — Step 7 ───────────────────────────────────
       lifestyle: {
         activityLevel: null,
@@ -124,16 +124,8 @@ export const store = {
         sleepQuality: null
       },
 
-     // ── EQUIPMENT — Step 8 ───────────────────────────────────
+      // ── EQUIPMENT — Step 8 ───────────────────────────────────
       equipment: [],
-
-      // ── COACH STYLE ──────────────────────────────────────────
-      // How the coach communicates. Set in Settings view.
-      // "steady"    — calm, consistent, supportive
-      // "energetic" — upbeat, motivating, enthusiastic
-      // "minimal"   — short, direct, no fluff
-      // "nurturing" — warm, gentle, emotionally attentive
-      coachStyle: "steady",
 
       // ── PRESCRIBED EXERCISES ─────────────────────────────────
       // Exercises prescribed by an external professional (physio,
@@ -153,21 +145,6 @@ export const store = {
       // UI for entering prescribed exercises: Phase 3/4.
       // Array is empty and safe to leave empty until then.
       prescribedExercises: [],
-
-      // ── EXERCISE FEEDBACK ─────────────────────────────────────────
-      // Per-exercise difficulty feedback written from the workout view.
-      // Written on "too hard" / "too easy" button tap during a session.
-      // Read by applyFeedbackWeighting() in exercises/index.js to adjust
-      // programmeScore before workout generation.
-      //
-      // Schema (per item):
-      //   exerciseId:  string  — exercise id from the database
-      //   feedback:    string  — "too-hard" | "too-easy"
-      //   date:        string  — ISO date string of the session
-      //   reason:      string  — optional user comment (future use, "" for now)
-      //
-      // Max 200 entries kept (trimmed in store.addExerciseFeedback).
-      exerciseFeedback: [],
 
       // ── STRATEGIC GOAL ───────────────────────────────────────
       // Richer than goals[] — drives programme selection and rationale.
@@ -263,31 +240,7 @@ export const store = {
   },
 
   /**
-   * Record difficulty feedback for an exercise.
-   * Called from workout.js when user taps "too hard" or "too easy".
-   *
-   * Keeps a maximum of 200 entries (oldest trimmed first).
-   * applyFeedbackWeighting() in exercises/index.js reads this to adjust
-   * programmeScore for future workout generation.
-   *
-   * @param {string} exerciseId — exercise id from the database
-   * @param {string} feedback   — "too-hard" | "too-easy"
-   */
-  addExerciseFeedback(exerciseId, feedback) {
-    const current = [...(this.data.exerciseFeedback || [])];
-    current.push({
-      exerciseId,
-      feedback,
-      date:   new Date().toISOString(),
-      reason: ""
-    });
-    if (current.length > 200) current.splice(0, current.length - 200);
-    this.data.exerciseFeedback = current;
-    this.data.updatedAt = new Date().toISOString();
-    this.save();
-  },
-
-  /**
+   * Update pain scores from today's check-in.
    * Called by checkin.js when condition pain sliders are submitted.
    *
    * @param {Object} painScores — { [conditionId]: 0-10 }
