@@ -13,15 +13,15 @@
   --color-bg-hover: #3E4C63;      /* Hover states on cards */
   
   /* Text */
-  --color-text: #E2E8F0;          /* Primary text - off-white */
-  --color-text-secondary: #94A3B8; /* Secondary text - silver */
-  --color-text-muted: #64748B;    /* Muted text - slate */
+  --color-text: #E2E8F0;          /* Primary text - off-white     contrast: 11.87 on BG, 8.40 on BG_CARD */
+  --color-text-secondary: #A8B8CC; /* Secondary text               contrast: 5.12 on BG_CARD, 7.23 on BG — was #94A3B8 (failed 4.04 on BG_CARD) */
+  --color-text-muted: #A0B0C0;    /* Muted text                   contrast: 4.67 on BG_CARD, 6.59 on BG — was #64748B (failed 2.18 on BG_CARD) */
   --color-text-inverse: #0F172A;  /* Text on light/accent backgrounds */
   
   /* Primary Accent - Electric Teal (matched to logo) */
   --color-primary: #2DD4BF;       /* Main accent - buttons, links */
   --color-primary-light: #5EEAD4; /* Lighter variant */
-  --color-primary-dark: #14B8A6;  /* Darker variant - hover */
+  --color-primary-dark: #2DD4BF;  /* Hover/active — kept same as primary; #14B8A6 failed 4.16 on BG_CARD */
   --color-primary-glow: rgba(45, 212, 191, 0.2); /* Glow effect */
   
   /* Secondary Accent - Cyan */
@@ -71,9 +71,9 @@
   
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
-  /* Font sizes */
-  --text-xs: 0.75rem;     /* 12px */
-  --text-sm: 0.875rem;    /* 14px */
+  /* Font sizes — minimum xs 13px for readability on health app */
+  --text-xs: 0.8125rem;   /* 13px — was 12px */
+  --text-sm: 0.9375rem;   /* 15px — was 14px */
   --text-base: 1rem;      /* 16px */
   --text-lg: 1.125rem;    /* 18px */
   --text-xl: 1.25rem;     /* 20px */
