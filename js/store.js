@@ -2,15 +2,15 @@
  * store.js - Data persistence layer
  * Handles localStorage with simple get/set API
  *
- * v1.5 — Condition management additions:
- *   conditionStatus   — { [conditionId]: 'active' | 'paused' }
- *                       Allows conditions to be suspended from workout
- *                       filtering without deleting them from history.
- *   conditionStories  — { [conditionId]: { howLong, whatHelps, professional } }
- *                       Optional user-authored context per condition.
- *                       Not used by generator -- for user reference only.
+ * v1.6 — ageBand replaces numeric age field:
+ *   ageBand  — '18-24' | '25-34' | '35-44' | '45-54' | '55-64' | '65+' |
+ *              'under-18' | 'prefer-not'
+ *   age      — retained as legacy field; not used in new code.
+ *   mergeWithDefaults() migrates existing numeric age to band silently.
+ *   customConditionNames added for 'other' condition naming.
  *
- * v1.4 — coachStyle scalar string added to getDefaults() and mergeWithDefaults().
+ * v1.5 — conditionStatus, conditionStories, customConditionNames.
+ * v1.4 — coachStyle scalar string.
  */
 
 export const store = {
@@ -41,9 +41,26 @@ export const store = {
    */
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
+
+    // ── ageBand migration ────────────────────────────────────────────────────
+    // If saved data has a numeric age but no ageBand, derive the band.
+    // This runs once — after which ageBand is set and age is ignored.
+    let ageBand = saved.ageBand || null;
+    if (!ageBand && saved.age) {
+      const a = parseInt(saved.age);
+      if      (a < 18)  ageBand = "under-18";
+      else if (a < 25)  ageBand = "18-24";
+      else if (a < 35)  ageBand = "25-34";
+      else if (a < 45)  ageBand = "35-44";
+      else if (a < 55)  ageBand = "45-54";
+      else if (a < 65)  ageBand = "55-64";
+      else              ageBand = "65+";
+    }
+
     return {
       ...defaults,
       ...saved,
+      ageBand,
       lifestyle:            { ...defaults.lifestyle,            ...(saved.lifestyle            || {}) },
       strategicGoal:        { ...defaults.strategicGoal,        ...(saved.strategicGoal        || {}) },
       activeProgramme:      { ...defaults.activeProgramme,      ...(saved.activeProgramme      || {}) },
@@ -74,7 +91,11 @@ export const store = {
       name: '',
 
       // ── ABOUT — Step 3 ───────────────────────────────────────
-      age: null,
+      // ageBand replaces the previous numeric age field (v1.6).
+      // age is retained for migration only — do not use in new code.
+      // Migration in mergeWithDefaults() converts numeric age to band.
+      ageBand: null,   // '18-24' | '25-34' | '35-44' | '45-54' | '55-64' | '65+' | 'under-18' | 'prefer-not'
+      age: null,       // legacy — kept so old data is not lost on merge
       gender: null,
       hormonalTracking: false,
 
