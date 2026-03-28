@@ -58,6 +58,9 @@ export const store = {
       conditionStories:     (saved.conditionStories && typeof saved.conditionStories === 'object')
                               ? saved.conditionStories
                               : {},
+      customConditionNames: (saved.customConditionNames && typeof saved.customConditionNames === 'object')
+                              ? saved.customConditionNames
+                              : {},
     };
   },
 
@@ -116,6 +119,13 @@ export const store = {
       //   professional: string  — e.g. "Physio at Taunton MSK"
       // { [conditionId]: { howLong, whatHelps, professional } }
       conditionStories: {},
+
+      // ── CUSTOM CONDITION NAMES ───────────────────────────────
+      // For catch-all conditions (e.g. 'other') where the user
+      // specifies their own name. Displayed instead of the default
+      // condition name throughout the app.
+      // { [conditionId]: string }
+      customConditionNames: {},
 
       // ── LIFESTYLE — Step 7 ───────────────────────────────────
       lifestyle: {
