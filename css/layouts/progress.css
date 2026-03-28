@@ -728,3 +728,247 @@
   outline: 2px solid var(--color-teal);
   outline-offset: 2px;
 }
+
+
+/* ============================================
+   SETTINGS VIEW — TAB BAR
+   Added S3-5 (was missing from project file copy)
+   ============================================ */
+
+.settings-view {
+  padding-bottom: var(--space-10);
+}
+
+.settings-tabs {
+  display: flex;
+  gap: 0;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-1);
+  margin-bottom: var(--space-5);
+}
+
+.settings-tab {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  font-family: inherit;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.settings-tab.active,
+.settings-tab[aria-selected="true"] {
+  background: var(--color-bg);
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
+
+.settings-tab:hover:not(.active) {
+  color: var(--color-text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.settings-tab:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.settings-tab-panel {
+  outline: none;
+}
+
+
+/* ============================================
+   SETTINGS VIEW — PROFILE TAB
+   ============================================ */
+
+.settings-profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-light);
+  min-height: 44px;
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: var(--font-medium);
+}
+
+.settings-value {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  text-align: right;
+}
+
+.settings-coach-intro {
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-4);
+}
+
+
+/* ============================================
+   SETTINGS VIEW — COACH STYLE SELECTOR
+   ============================================ */
+
+.coach-style-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.coach-style-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  min-height: 44px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.coach-style-card.selected,
+.coach-style-card[aria-checked="true"] {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.08);
+}
+
+.coach-style-card:hover:not(.selected) {
+  border-color: var(--color-border);
+  background: var(--color-bg-hover);
+}
+
+.coach-style-card:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.coach-style-icon {
+  font-size: 1.25rem;
+}
+
+.coach-style-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.coach-style-desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug, 1.4);
+}
+
+.coach-style-card.selected .coach-style-label,
+.coach-style-card[aria-checked="true"] .coach-style-label {
+  color: var(--color-primary);
+}
+
+
+/* ============================================
+   SETTINGS VIEW — EQUIPMENT TAB
+   ============================================ */
+
+.settings-equipment-intro {
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-4);
+}
+
+.equipment-settings-category {
+  margin-bottom: var(--space-5);
+}
+
+.equipment-category-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-3);
+}
+
+.equipment-cat-count {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.12);
+  border-radius: var(--radius-full);
+  padding: 2px 8px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.equipment-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.equipment-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.equipment-chip.selected,
+.equipment-chip[aria-pressed="true"] {
+  background: rgba(45, 212, 191, 0.12);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: var(--font-medium);
+}
+
+.equipment-chip:hover:not(.selected) {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.equipment-chip:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.settings-reset-zone {
+  margin-top: var(--space-8);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border-light);
+}
