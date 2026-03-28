@@ -1,33 +1,25 @@
 /**
  * settings.js - Settings view
  *
+ * v1.1 — Conditions tab full rebuild:
+ *   Add condition  — chip picker from full CONDITIONS list, grouped by area.
+ *                    Conditions already active are shown as selected and excluded
+ *                    from the add list so duplicates are impossible.
+ *   Remove         — tap remove, confirm in an inline confirmation step.
+ *                    Health data: no accidental deletes.
+ *   Pause / resume — soft-disable without removing. Paused conditions are
+ *                    shown greyed out with a "Resume" button. They remain in
+ *                    conditions[] but conditionStatus[id] = "paused" signals
+ *                    the generator to skip them (generator wire: Phase 3B).
+ *   Story fields   — how long / what helps / professional involved.
+ *                    Collapsed per condition, expand on tap.
+ *                    Writes to conditionStories[id] in store on blur.
+ *
  * v1.0 — Tabbed layout: Profile / Conditions / Equipment.
- *   Three tabs replace the previous single-scroll card list.
- *   Tab state is held in a module-level variable (activeTab) and
- *   re-rendered on tab switch without a full router.navigate() call --
- *   this avoids the scroll-to-top and re-announce overhead for what
- *   is essentially a within-view state change.
- *
- *   Profile tab:
- *     Read-only display of name, age, gender, weight.
- *     coachStyle selector -- four options rendered as selectable cards.
- *     Selecting a style writes to store immediately (no save button needed).
- *
- *   Conditions tab:
- *     Read-only list of active conditions.
- *     "No conditions" graceful fallback.
- *     Story capture (how long, what helps, professional) deferred to Phase 3B.
- *
- *   Equipment tab:
- *     Full equipment chip selector by category.
- *     Chips toggle on/off and write to store on each tap.
- *     Mirrors the onboarding equipment step but live-editable.
- *
- *   Reset app button retained at bottom of all tabs.
  */
 
 import { store } from "../store.js";
-import { getConditionName } from "../data/conditions.js";
+import { CONDITIONS, getConditionName } from "../data/conditions.js";
 import { EQUIPMENT_CATEGORIES } from "../data/equipment.js";
 
 export const centered = false;
@@ -35,6 +27,14 @@ export const centered = false;
 // ── Tab state ─────────────────────────────────────────────────────────────────
 // Held at module level so switching tabs re-renders without losing scroll pos.
 let activeTab = "profile";
+
+// ── Conditions tab state ──────────────────────────────────────────────────────
+// Tracks which condition story panel is currently expanded (one at a time).
+let expandedStoryId = null;
+// Tracks which condition is pending removal confirmation.
+let pendingRemoveId = null;
+// Whether the "add condition" picker is open.
+let addPickerOpen = false;
 
 // ── Coach style definitions ───────────────────────────────────────────────────
 const COACH_STYLES = [
@@ -184,32 +184,188 @@ function renderProfileTab() {
 // ── Conditions tab ────────────────────────────────────────────────────────────
 
 function renderConditionsTab() {
-  const conditions = store.get("conditions") || [];
+  const conditions   = store.get("conditions")       || [];
+  const statuses     = store.get("conditionStatus")  || {};
+  const stories      = store.get("conditionStories") || {};
+
+  // Group CONDITIONS by area for the add picker
+  const AREA_LABELS = {
+    lower:    "Lower body",
+    back:     "Back",
+    upper:    "Upper body",
+    general:  "General health",
+    hormonal: "Hormonal",
+    other:    "Other"
+  };
 
   return `
     <section aria-labelledby="conditions-heading">
       <h2 id="conditions-heading" class="section-heading">Your conditions</h2>
 
+      <p class="text-secondary settings-conditions-intro">
+        These are used to adapt your sessions. Pausing a condition keeps it
+        saved but stops it affecting your workouts temporarily.
+      </p>
+
+      <!-- ── Active conditions list ──────────────────────────────────── -->
       ${conditions.length === 0 ? `
         <div class="card">
-          <p class="text-secondary">No conditions recorded.</p>
-          <p class="text-secondary" style="margin-top: var(--space-2);">
-            If your circumstances change, you can add conditions here in a future update.
-          </p>
+          <p class="text-secondary">No conditions recorded yet.</p>
         </div>
       ` : `
-        <div class="card conditions-list">
-          ${conditions.map(id => `
-            <div class="condition-settings-row">
-              <span class="condition-settings-name">${getConditionName(id)}</span>
-            </div>
-          `).join("")}
+        <div class="conditions-list" aria-label="Your conditions">
+          ${conditions.map(id => {
+            const cond        = CONDITIONS.find(c => c.id === id);
+            const name        = cond ? cond.name : id;
+            const icon        = cond ? cond.icon : "❓";
+            const status      = statuses[id] || "active";
+            const isPaused    = status === "paused";
+            const story       = stories[id] || {};
+            const isExpanded  = expandedStoryId === id;
+            const isPending   = pendingRemoveId === id;
+
+            return `
+              <div class="condition-card ${isPaused ? "condition-card--paused" : ""}"
+                   data-condition-id="${id}">
+
+                <!-- ── Header row ────────────────────────────────── -->
+                <div class="condition-card-header">
+                  <span class="condition-card-icon" aria-hidden="true">${icon}</span>
+                  <span class="condition-card-name">${name}${isPaused ? ' <span class="condition-paused-badge">Paused</span>' : ""}</span>
+                  <div class="condition-card-actions">
+                    <button
+                      class="btn-text condition-pause-btn"
+                      data-condition-id="${id}"
+                      aria-label="${isPaused ? "Resume" : "Pause"} ${name}"
+                    >${isPaused ? "Resume" : "Pause"}</button>
+                    <button
+                      class="btn-text condition-story-btn"
+                      data-condition-id="${id}"
+                      aria-expanded="${isExpanded}"
+                      aria-controls="story-${id}"
+                    >${isExpanded ? "Less" : "About this"}</button>
+                    <button
+                      class="btn-text btn-text--danger condition-remove-btn"
+                      data-condition-id="${id}"
+                      aria-label="Remove ${name}"
+                    >Remove</button>
+                  </div>
+                </div>
+
+                <!-- ── Remove confirmation ───────────────────────── -->
+                ${isPending ? `
+                  <div class="condition-remove-confirm" role="alert">
+                    <p>Remove <strong>${name}</strong>? This will stop it affecting your sessions.</p>
+                    <div class="condition-confirm-actions">
+                      <button class="btn btn-danger btn-sm condition-remove-confirm-btn"
+                              data-condition-id="${id}">Yes, remove</button>
+                      <button class="btn btn-secondary btn-sm condition-remove-cancel-btn"
+                              data-condition-id="${id}">Cancel</button>
+                    </div>
+                  </div>
+                ` : ""}
+
+                <!-- ── Story panel ───────────────────────────────── -->
+                <div
+                  id="story-${id}"
+                  class="condition-story-panel ${isExpanded ? "" : "hidden"}"
+                  aria-hidden="${!isExpanded}"
+                >
+                  <div class="condition-story-fields">
+                    <label class="condition-story-label" for="story-howlong-${id}">
+                      How long have you had this?
+                    </label>
+                    <input
+                      type="text"
+                      id="story-howlong-${id}"
+                      class="condition-story-input"
+                      placeholder="e.g. About 6 months"
+                      value="${story.howLong || ""}"
+                      data-condition-id="${id}"
+                      data-field="howLong"
+                      aria-label="How long you have had ${name}"
+                    >
+
+                    <label class="condition-story-label" for="story-helps-${id}">
+                      What tends to help?
+                    </label>
+                    <input
+                      type="text"
+                      id="story-helps-${id}"
+                      class="condition-story-input"
+                      placeholder="e.g. Heat, gentle movement, rest"
+                      value="${story.whatHelps || ""}"
+                      data-condition-id="${id}"
+                      data-field="whatHelps"
+                      aria-label="What helps with ${name}"
+                    >
+
+                    <label class="condition-story-label" for="story-professional-${id}">
+                      Professional involved (optional)
+                    </label>
+                    <input
+                      type="text"
+                      id="story-professional-${id}"
+                      class="condition-story-input"
+                      placeholder="e.g. Physio, GP, consultant"
+                      value="${story.professional || ""}"
+                      data-condition-id="${id}"
+                      data-field="professional"
+                      aria-label="Professional involved with ${name}"
+                    >
+                  </div>
+                </div>
+
+              </div>
+            `;
+          }).join("")}
         </div>
-        <p class="text-secondary text-sm settings-conditions-note">
-          Pain levels are updated each day at check-in. Your conditions list can be
-          edited in a future update.
-        </p>
       `}
+
+      <!-- ── Add condition ────────────────────────────────────────────── -->
+      <div class="condition-add-zone">
+        <button
+          class="btn btn-secondary btn-full condition-add-toggle-btn"
+          aria-expanded="${addPickerOpen}"
+          aria-controls="condition-add-picker"
+        >
+          ${addPickerOpen ? "Cancel" : "+ Add a condition"}
+        </button>
+
+        <div
+          id="condition-add-picker"
+          class="condition-add-picker ${addPickerOpen ? "" : "hidden"}"
+          aria-hidden="${!addPickerOpen}"
+        >
+          <p class="text-secondary text-sm" style="margin-bottom: var(--space-3);">
+            Tap a condition to add it to your profile.
+          </p>
+
+          ${Object.entries(AREA_LABELS).map(([area, label]) => {
+            const available = CONDITIONS.filter(c =>
+              c.area === area && !conditions.includes(c.id)
+            );
+            if (available.length === 0) return "";
+            return `
+              <div class="condition-picker-group">
+                <h3 class="condition-picker-area-label">${label}</h3>
+                <div class="condition-picker-chips" role="group" aria-label="Add ${label} condition">
+                  ${available.map(c => `
+                    <button
+                      class="condition-picker-chip"
+                      data-add-condition-id="${c.id}"
+                      aria-label="Add ${c.name}"
+                    >
+                      <span aria-hidden="true">${c.icon}</span> ${c.name}
+                    </button>
+                  `).join("")}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+
     </section>
   `;
 }
@@ -278,10 +434,32 @@ function formatGender(gender) {
 // ── Re-render helpers (used by event handlers) ────────────────────────────────
 
 /**
+ * Re-render only the conditions tab panel content and re-wire it.
+ * Used by all conditions interactions to avoid a full view reload.
+ */
+function rerenderConditionsPanel() {
+  const panel = document.getElementById("settings-tab-panel");
+  if (!panel) return;
+  panel.innerHTML = renderConditionsTab();
+  wirePanel();
+  // Restore focus to the panel for keyboard users
+  panel.setAttribute("tabindex", "-1");
+  panel.focus();
+}
+
+/**
  * Switch to a different tab and re-render the panel in place.
  * Updates ARIA attributes on the tab buttons as well.
+ * Resets conditions tab local state on tab switch to avoid stale UI.
  */
 function switchTab(tabName) {
+  // Reset conditions tab state when leaving / entering
+  if (tabName !== "conditions") {
+    expandedStoryId = null;
+    pendingRemoveId = null;
+    addPickerOpen   = false;
+  }
+
   activeTab = tabName;
 
   // Update tab button ARIA and active class
@@ -311,11 +489,7 @@ function wirePanel() {
     card.addEventListener("click", () => {
       const style = card.dataset.style;
       if (!style) return;
-
-      // Write to store
       store.set("coachStyle", style);
-
-      // Update UI: toggle selected class and aria-checked on all cards
       document.querySelectorAll(".coach-style-card").forEach(c => {
         const isSelected = c.dataset.style === style;
         c.classList.toggle("selected", isSelected);
@@ -329,21 +503,113 @@ function wirePanel() {
     chip.addEventListener("click", () => {
       const id = chip.dataset.equipmentId;
       if (!id) return;
-
-      const current  = store.get("equipment") || [];
+      const current    = store.get("equipment") || [];
       const isSelected = current.includes(id);
-      const updated  = isSelected
+      const updated    = isSelected
         ? current.filter(e => e !== id)
         : [...current, id];
-
       store.set("equipment", updated);
-
-      // Toggle this chip
       chip.classList.toggle("selected", !isSelected);
       chip.setAttribute("aria-pressed", !isSelected);
-
-      // Update the category count badge
       updateCategoryCount(chip);
+    });
+  });
+
+  // ── Conditions tab wiring ──────────────────────────────────────────────────
+
+  // Pause / resume
+  document.querySelectorAll(".condition-pause-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id      = btn.dataset.conditionId;
+      if (!id) return;
+      const current = store.get("conditionStatus") || {};
+      const isPaused = (current[id] || "active") === "paused";
+      const updated  = { ...current, [id]: isPaused ? "active" : "paused" };
+      store.set("conditionStatus", updated);
+      rerenderConditionsPanel();
+    });
+  });
+
+  // Story expand / collapse
+  document.querySelectorAll(".condition-story-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.conditionId;
+      if (!id) return;
+      expandedStoryId = expandedStoryId === id ? null : id;
+      rerenderConditionsPanel();
+    });
+  });
+
+  // Story field autosave on blur
+  document.querySelectorAll(".condition-story-input").forEach(input => {
+    input.addEventListener("blur", () => {
+      const id    = input.dataset.conditionId;
+      const field = input.dataset.field;
+      if (!id || !field) return;
+      const current = store.get("conditionStories") || {};
+      const entry   = { ...(current[id] || {}), [field]: input.value.trim() };
+      store.set("conditionStories", { ...current, [id]: entry });
+    });
+  });
+
+  // Remove — show confirmation
+  document.querySelectorAll(".condition-remove-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.conditionId;
+      if (!id) return;
+      pendingRemoveId = pendingRemoveId === id ? null : id;
+      rerenderConditionsPanel();
+    });
+  });
+
+  // Remove — confirm
+  document.querySelectorAll(".condition-remove-confirm-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.conditionId;
+      if (!id) return;
+      // Remove from conditions array
+      const conditions = store.get("conditions") || [];
+      store.set("conditions", conditions.filter(c => c !== id));
+      // Clean up status and story entries
+      const statuses = { ...(store.get("conditionStatus") || {}) };
+      delete statuses[id];
+      store.set("conditionStatus", statuses);
+      const stories = { ...(store.get("conditionStories") || {}) };
+      delete stories[id];
+      store.set("conditionStories", stories);
+      // Also remove any pain score for this condition
+      const painScores = { ...(store.get("conditionPainScores") || {}) };
+      delete painScores[id];
+      store.set("conditionPainScores", painScores);
+      pendingRemoveId = null;
+      rerenderConditionsPanel();
+    });
+  });
+
+  // Remove — cancel
+  document.querySelectorAll(".condition-remove-cancel-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      pendingRemoveId = null;
+      rerenderConditionsPanel();
+    });
+  });
+
+  // Add picker toggle
+  document.querySelector(".condition-add-toggle-btn")?.addEventListener("click", () => {
+    addPickerOpen = !addPickerOpen;
+    rerenderConditionsPanel();
+  });
+
+  // Add condition chip
+  document.querySelectorAll(".condition-picker-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const id = chip.dataset.addConditionId;
+      if (!id) return;
+      const conditions = store.get("conditions") || [];
+      if (conditions.includes(id)) return;
+      store.set("conditions", [...conditions, id]);
+      addPickerOpen = false;
+      rerenderConditionsPanel();
     });
   });
 }
