@@ -184,9 +184,10 @@ function renderProfileTab() {
 // ── Conditions tab ────────────────────────────────────────────────────────────
 
 function renderConditionsTab() {
-  const conditions   = store.get("conditions")       || [];
-  const statuses     = store.get("conditionStatus")  || {};
-  const stories      = store.get("conditionStories") || {};
+  const conditions   = store.get("conditions")            || [];
+  const statuses     = store.get("conditionStatus")       || {};
+  const stories      = store.get("conditionStories")      || {};
+  const customNames  = store.get("customConditionNames")  || {};
 
   // Group CONDITIONS by area for the add picker
   const AREA_LABELS = {
@@ -197,6 +198,201 @@ function renderConditionsTab() {
     hormonal: "Hormonal",
     other:    "Other"
   };
+
+  return `
+    <section aria-labelledby="conditions-heading">
+      <h2 id="conditions-heading" class="section-heading">Your conditions</h2>
+
+      <p class="text-secondary settings-conditions-intro">
+        These are used to adapt your sessions. Pausing a condition keeps it
+        saved but stops it affecting your workouts temporarily.
+      </p>
+
+      <!-- ── Active conditions list ──────────────────────────────────── -->
+      ${conditions.length === 0 ? `
+        <div class="card">
+          <p class="text-secondary">No conditions recorded yet.</p>
+        </div>
+      ` : `
+        <div class="conditions-list" aria-label="Your conditions">
+          ${conditions.map(id => {
+            const cond        = CONDITIONS.find(c => c.id === id);
+            const defaultName = cond ? cond.name : id;
+            const icon        = cond ? cond.icon : "?";
+            const isOther     = id === "other";
+            // Use custom name if set, otherwise default
+            const displayName = (isOther && customNames[id]) ? customNames[id] : defaultName;
+            const status      = statuses[id] || "active";
+            const isPaused    = status === "paused";
+            const story       = stories[id] || {};
+            const isExpanded  = expandedStoryId === id;
+            const isPending   = pendingRemoveId === id;
+
+            return `
+              <div class="condition-card ${isPaused ? "condition-card--paused" : ""}"
+                   data-condition-id="${id}">
+
+                <!-- ── Header row ────────────────────────────────── -->
+                <div class="condition-card-header">
+                  <span class="condition-card-icon" aria-hidden="true">${icon}</span>
+                  <span class="condition-card-name">
+                    ${displayName}
+                    ${isPaused ? '<span class="condition-paused-badge">Paused</span>' : ""}
+                  </span>
+                  <div class="condition-card-actions">
+                    <button
+                      class="btn-text condition-pause-btn"
+                      data-condition-id="${id}"
+                      aria-label="${isPaused ? "Resume" : "Pause"} ${displayName}"
+                    >${isPaused ? "Resume" : "Pause"}</button>
+                    <button
+                      class="btn-text condition-story-btn"
+                      data-condition-id="${id}"
+                      aria-expanded="${isExpanded}"
+                      aria-controls="story-${id}"
+                    >${isExpanded ? "Less" : "About this"}</button>
+                    <button
+                      class="btn-text btn-text--danger condition-remove-btn"
+                      data-condition-id="${id}"
+                      aria-label="Remove ${displayName}"
+                    >Remove</button>
+                  </div>
+                </div>
+
+                <!-- ── Remove confirmation ───────────────────────── -->
+                ${isPending ? `
+                  <div class="condition-remove-confirm" role="alert">
+                    <p>Remove <strong>${displayName}</strong>? This will stop it affecting your sessions.</p>
+                    <div class="condition-confirm-actions">
+                      <button class="btn btn-danger btn-sm condition-remove-confirm-btn"
+                              data-condition-id="${id}">Yes, remove</button>
+                      <button class="btn btn-secondary btn-sm condition-remove-cancel-btn"
+                              data-condition-id="${id}">Cancel</button>
+                    </div>
+                  </div>
+                ` : ""}
+
+                <!-- ── Story panel ───────────────────────────────── -->
+                <div
+                  id="story-${id}"
+                  class="condition-story-panel ${isExpanded ? "" : "hidden"}"
+                  aria-hidden="${!isExpanded}"
+                >
+                  <div class="condition-story-fields">
+
+                    ${isOther ? `
+                      <label class="condition-story-label" for="story-customname-${id}">
+                        What is this condition?
+                      </label>
+                      <input
+                        type="text"
+                        id="story-customname-${id}"
+                        class="condition-story-input"
+                        placeholder="e.g. Fibromyalgia, hip replacement recovery"
+                        value="${customNames[id] || ""}"
+                        data-condition-id="${id}"
+                        data-field="customName"
+                        aria-label="Name your condition"
+                      >
+                    ` : ""}
+
+                    <label class="condition-story-label" for="story-howlong-${id}">
+                      How long have you had this?
+                    </label>
+                    <input
+                      type="text"
+                      id="story-howlong-${id}"
+                      class="condition-story-input"
+                      placeholder="e.g. About 6 months"
+                      value="${story.howLong || ""}"
+                      data-condition-id="${id}"
+                      data-field="howLong"
+                      aria-label="How long you have had ${displayName}"
+                    >
+
+                    <label class="condition-story-label" for="story-helps-${id}">
+                      What tends to help?
+                    </label>
+                    <input
+                      type="text"
+                      id="story-helps-${id}"
+                      class="condition-story-input"
+                      placeholder="e.g. Heat, gentle movement, rest"
+                      value="${story.whatHelps || ""}"
+                      data-condition-id="${id}"
+                      data-field="whatHelps"
+                      aria-label="What helps with ${displayName}"
+                    >
+
+                    <label class="condition-story-label" for="story-professional-${id}">
+                      Professional involved (optional)
+                    </label>
+                    <input
+                      type="text"
+                      id="story-professional-${id}"
+                      class="condition-story-input"
+                      placeholder="e.g. Physio, GP, consultant"
+                      value="${story.professional || ""}"
+                      data-condition-id="${id}"
+                      data-field="professional"
+                      aria-label="Professional involved with ${displayName}"
+                    >
+                  </div>
+                </div>
+
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `}
+
+      <!-- ── Add condition ────────────────────────────────────────────── -->
+      <div class="condition-add-zone">
+        <button
+          class="btn btn-secondary btn-full condition-add-toggle-btn"
+          aria-expanded="${addPickerOpen}"
+          aria-controls="condition-add-picker"
+        >
+          ${addPickerOpen ? "Cancel" : "+ Add a condition"}
+        </button>
+
+        <div
+          id="condition-add-picker"
+          class="condition-add-picker ${addPickerOpen ? "" : "hidden"}"
+          aria-hidden="${!addPickerOpen}"
+        >
+          <p class="text-secondary text-sm" style="margin-bottom: var(--space-3);">
+            Tap a condition to add it to your profile.
+          </p>
+
+          ${Object.entries(AREA_LABELS).map(([area, label]) => {
+            const available = CONDITIONS.filter(c =>
+              c.area === area && !conditions.includes(c.id)
+            );
+            if (available.length === 0) return "";
+            return `
+              <div class="condition-picker-group">
+                <h3 class="condition-picker-area-label">${label}</h3>
+                <div class="condition-picker-chips" role="group" aria-label="Add ${label} condition">
+                  ${available.map(c => `
+                    <button
+                      class="condition-picker-chip"
+                      data-add-condition-id="${c.id}"
+                      aria-label="Add ${c.name}"
+                    >
+                      <span aria-hidden="true">${c.icon}</span> ${c.name}
+                    </button>
+                  `).join("")}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+
+    </section>
+  `;
+}
 
   return `
     <section aria-labelledby="conditions-heading">
@@ -546,9 +742,23 @@ function wirePanel() {
       const id    = input.dataset.conditionId;
       const field = input.dataset.field;
       if (!id || !field) return;
-      const current = store.get("conditionStories") || {};
-      const entry   = { ...(current[id] || {}), [field]: input.value.trim() };
-      store.set("conditionStories", { ...current, [id]: entry });
+
+      if (field === "customName") {
+        // Write to customConditionNames, not conditionStories
+        const current = store.get("customConditionNames") || {};
+        store.set("customConditionNames", { ...current, [id]: input.value.trim() });
+        // Update the displayed name in the card header without full re-render
+        const nameEl = input.closest(".condition-card")?.querySelector(".condition-card-name");
+        if (nameEl) {
+          const badge = nameEl.querySelector(".condition-paused-badge");
+          nameEl.textContent = input.value.trim() || "Something else";
+          if (badge) nameEl.appendChild(badge);
+        }
+      } else {
+        const current = store.get("conditionStories") || {};
+        const entry   = { ...(current[id] || {}), [field]: input.value.trim() };
+        store.set("conditionStories", { ...current, [id]: entry });
+      }
     });
   });
 
@@ -570,13 +780,16 @@ function wirePanel() {
       // Remove from conditions array
       const conditions = store.get("conditions") || [];
       store.set("conditions", conditions.filter(c => c !== id));
-      // Clean up status and story entries
+      // Clean up status, story, and custom name entries
       const statuses = { ...(store.get("conditionStatus") || {}) };
       delete statuses[id];
       store.set("conditionStatus", statuses);
       const stories = { ...(store.get("conditionStories") || {}) };
       delete stories[id];
       store.set("conditionStories", stories);
+      const customNames = { ...(store.get("customConditionNames") || {}) };
+      delete customNames[id];
+      store.set("customConditionNames", customNames);
       // Also remove any pain score for this condition
       const painScores = { ...(store.get("conditionPainScores") || {}) };
       delete painScores[id];
