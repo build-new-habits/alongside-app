@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#0F172A">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="Compassionate fitness coaching that adapts to your life">
 
   <title>Alongside</title>
 
-  <link rel="icon" type="image/png" href="assets/images/logo-icon-square.png">
-  <link rel="apple-touch-icon" href="assets/images/logo-icon-square.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="assets/images/logo-icon-192.png">
+  <link rel="apple-touch-icon" href="assets/images/logo-icon-180.png">
+  <meta name="apple-mobile-web-app-title" content="Alongside">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,8 +27,10 @@
 
     <!--
       Screen reader live region.
-      Visually hidden — announces view changes to assistive technology.
-      router.js writes to this after every navigation.
+      Visually hidden — announces view changes to assistive technology
+      (VoiceOver on iOS/macOS, TalkBack on Android, NVDA/JAWS on Windows).
+      router.js writes a human-readable view name here after every navigate().
+      aria-atomic="true" means the whole text is read, not just the changed part.
     -->
     <div
       id="sr-announcer"
@@ -43,35 +48,49 @@
         </div>
         <h1 class="loading-title">Alongside</h1>
         <p class="loading-subtitle">Movement that meets you where you are</p>
-        <div class="loading-spinner"></div>
+        <div class="loading-spinner" aria-hidden="true"></div>
       </div>
     </div>
 
-    <!-- Main content area — tabindex="-1" allows programmatic focus from router for screen readers -->
+    <!--
+      Main content area.
+      tabindex="-1" allows router.js to programmatically move focus here
+      after each navigation, without making it part of the keyboard tab order.
+    -->
     <main id="main-content" class="main-content" tabindex="-1"></main>
 
-    <!-- Bottom navigation (hidden until after onboarding) -->
+    <!-- Bottom navigation -->
     <nav id="bottom-nav" class="bottom-nav hidden" aria-label="Main navigation">
-      <button class="nav-item active" data-view="today">
-        <span class="nav-icon" aria-hidden="true">&#127968;</span>
+      <button class="nav-item active" data-view="today" aria-label="Today">
+        <span class="nav-icon" aria-hidden="true">🏠</span>
         <span class="nav-label">Today</span>
       </button>
-      <button class="nav-item" data-view="progress">
-        <span class="nav-icon" aria-hidden="true">&#128202;</span>
+      <button class="nav-item" data-view="progress" aria-label="Progress">
+        <span class="nav-icon" aria-hidden="true">📊</span>
         <span class="nav-label">Progress</span>
       </button>
-      <button class="nav-item" data-view="settings">
-        <span class="nav-icon" aria-hidden="true">&#9881;&#65039;</span>
+      <button class="nav-item" data-view="settings" aria-label="Settings">
+        <span class="nav-icon" aria-hidden="true">⚙️</span>
         <span class="nav-label">Settings</span>
       </button>
     </nav>
 
-    <!-- Toast notifications -->
-    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+    <!--
+      Toast notifications.
+      aria-live="polite" means screen readers announce toasts
+      without interrupting whatever they're currently reading.
+      aria-atomic="false" means only new toasts are read, not the whole container.
+    -->
+    <div
+      id="toast-container"
+      class="toast-container"
+      aria-live="polite"
+      aria-atomic="false">
+    </div>
 
-    <!-- Feedback button (beta) -->
+    <!-- Feedback button -->
     <button id="feedback-fab" class="feedback-fab hidden" aria-label="Send feedback">
-      <span aria-hidden="true">&#128172;</span>
+      <span aria-hidden="true">💬</span>
     </button>
 
     <!-- Modal container -->
