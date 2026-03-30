@@ -514,12 +514,20 @@
   opacity: 0.6;
 }
 
-/* Header row: icon + name + action buttons */
+/* Condition card: two-row layout for mobile
+   Row 1: icon + name
+   Row 2: action buttons aligned left beneath name */
 .condition-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.condition-card-top {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 44px;
+  min-height: 32px;
 }
 
 .condition-card-icon {
@@ -531,7 +539,7 @@
   flex: 1;
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  color: var(--color-text-primary);
+  color: var(--color-text);
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -550,9 +558,9 @@
 .condition-card-actions {
   display: flex;
   gap: var(--space-1);
-  flex-shrink: 0;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  align-items: center;
+  padding-left: calc(1.1rem + var(--space-2)); /* align under name, past icon */
 }
 
 /* Text-only action buttons */
