@@ -1093,3 +1093,22 @@
   font-size: var(--text-sm);
   min-height: 44px;
 }
+
+
+/* ============================================
+   SETTINGS — INSTALL APP CARD
+   ============================================ */
+
+.install-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.install-card-text {
+  font-size: var(--text-sm);
+}
+
+.install-card-hint {
+  line-height: var(--leading-relaxed);
+}
