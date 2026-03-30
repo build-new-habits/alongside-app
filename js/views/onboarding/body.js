@@ -33,7 +33,10 @@ export function render() {
       
       <div class="onboarding-content">
         <h1>Your body & targets</h1>
-        <p class="text-secondary">Optional, but helps me track your progress.</p>
+        <div class="onboarding-coach-line">
+          <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <p class="onboarding-coach-text">This is completely optional. If you have a weight or a target in mind, I can factor it in. If not, that's absolutely fine — we can focus on how you feel instead. There are no wrong answers here.</p>
+        </div>
         
         <div class="form-section">
           <label class="form-label">Current weight</label>
