@@ -36,7 +36,10 @@ export function render() {
       
       <div class="onboarding-content">
         <h1>What brings you here?</h1>
-        <p class="text-secondary">Select all that apply. You can change these anytime.</p>
+        <div class="onboarding-coach-line">
+          <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <p class="onboarding-coach-text">What matters most to you right now? There's no right answer — just whatever feels true today. I'll lean your sessions in that direction, and you can always change your mind. This is your plan, not mine.</p>
+        </div>
         
         <div class="goals-grid">
           ${goalsHtml}
