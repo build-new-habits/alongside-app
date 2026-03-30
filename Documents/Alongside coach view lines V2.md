@@ -1,5 +1,5 @@
 # Alongside — Coach View Lines
-## Full Draft v2.0 | March 2026
+## Full Draft v2.1 | March 2026
 
 ---
 
@@ -41,12 +41,12 @@ Minimal, and Nurturing variants for each line.
 >
 > You can change or delete anything at any time.
 
-**Button:** Start
-
-**Below button (small, muted text):**
+**Consent line (above button, small muted text):**
 By tapping Start you agree to our Privacy Policy and Terms of Service.
 
 **Read more link:** Your data and how we use it →
+
+**Button:** Start
 
 ---
 
@@ -130,7 +130,7 @@ By tapping Start you agree to our Privacy Policy and Terms of Service.
 
 ### Today — pre check-in, morning
 *5 variants — rotate so users never see the same line two mornings running.*
-*Selection: pseudo-random based on day of week + session count.*
+*Selection: (dayOfYear + totalSessions) % 5*
 
 **Variant A**
 > Good morning. Before I put your session together, I'd like to know how
@@ -138,8 +138,8 @@ By tapping Start you agree to our Privacy Policy and Terms of Service.
 > everything I suggest much more useful.
 
 **Variant B**
-> Morning. I can't plan well without knowing how you're doing — that's
-> just honest. Check in with me and I'll take it from there.
+> Good morning. A quick check-in helps me understand where you are today —
+> it makes everything I suggest much more relevant. Ready when you are.
 
 **Variant C**
 > Good morning. How's the body today? A minute with me now means a session
@@ -163,8 +163,8 @@ By tapping Start you agree to our Privacy Policy and Terms of Service.
 > something that matches where you are right now.
 
 **Variant B**
-> Afternoon. Midday can go any number of ways — tell me how yours has
-> been and I'll suggest something that fits.
+> Good afternoon. Midday can go any number of ways — tell me how yours
+> has been and I'll suggest something that fits.
 
 **Variant C**
 > Good afternoon. Before I plan anything for you, I want to know how
@@ -188,11 +188,11 @@ By tapping Start you agree to our Privacy Policy and Terms of Service.
 > of day. Tell me how you're feeling and I'll find the right fit.
 
 **Variant B**
-> Evening. I know the end of the day can be complicated — energy, time,
-> motivation. Tell me what you've got and I'll work with it.
+> Good evening. I know the end of the day can be complicated — energy,
+> time, motivation. Tell me what you've got and I'll work with it.
 
 **Variant C**
-> Good evening. There's still time to move today if you want to. Check
+> Good evening. There's still time to move today if you'd like to. Check
 > in with me and we'll see what feels right.
 
 **Variant D**
@@ -200,13 +200,13 @@ By tapping Start you agree to our Privacy Policy and Terms of Service.
 > else. Check in and I'll take it from there.
 
 **Variant E**
-> Good evening. No pressure — just check in and see what I suggest.
-> You can always decide it's a rest day. That's a valid choice too.
+> Good evening. No pressure — check in and see what I suggest. You can
+> always decide it's a rest day. That's a valid choice too.
 
 ---
 
 ### Today — post check-in, high energy, no pain
-*5 variants — assembled by buildCoachMessage(), these are the opening lines*
+*5 variants*
 
 **Variant A**
 > You're feeling strong today. I've put together three options that match
@@ -259,7 +259,7 @@ By tapping Start you agree to our Privacy Policy and Terms of Service.
 ---
 
 ### Today — post check-in, pain present
-*3 variants — pain context is too specific for many variations*
+*3 variants*
 
 **Variant A**
 > I can see things are harder today with [condition]. I've taken that
@@ -294,22 +294,17 @@ By tapping Start you agree to our Privacy Policy and Terms of Service.
 ---
 
 ### Progress — 1-2 sessions logged
-*[STATIC — handled by buildProgressCoachMessage()]*
-Already written. Template:
-> "You have completed [N] session[s] so far. Every session is data I can
-> use — keep going and I'll start to see what works for you."
+*Handled by buildProgressCoachMessage() in progress.js*
 
 ---
 
 ### Progress — 3+ sessions, energy data available
-*[DYNAMIC — handled by buildProgressCoachMessage()]*
-Already written. Reads energy trend and programme phase.
+*Handled by buildProgressCoachMessage() in progress.js*
 
 ---
 
 ### Progress — week target hit
-*Injected when sessionsThisWeek >= weeklyTarget*
-*3 variants*
+*3 variants — injected when sessionsThisWeek >= weeklyTarget*
 
 **Variant A**
 > You've hit your session target for the week. I want you to notice that
@@ -363,7 +358,7 @@ Already written. Reads energy trend and programme phase.
 
 ---
 
-### Workout — session start (pre-exercise)
+### Workout — session start
 *3 variants — shown above the exercise list*
 
 **Variant A**
@@ -377,17 +372,6 @@ Already written. Reads energy trend and programme phase.
 **Variant C**
 > Here's what I've put together for you. It's designed to feel manageable,
 > not overwhelming. Start when you're ready.
-
----
-
-### Workout — exercise "why" card
-*Already handled by card-coach pattern in workout.js*
-*3 variants per exercise category — to be written in Phase 4 content pass*
-
----
-
-### Workout — exit nudge (mild/moderate zone)
-*Already handled by exit route logic in workout.js*
 
 ---
 ---
@@ -463,16 +447,14 @@ Already written. Reads energy trend and programme phase.
 ---
 ---
 
-## PHASE 3B / FUTURE — PREMIUM FEATURES
+## PHASE 3B / FUTURE — PREMIUM WEATHER FEATURE
 
-### Weather-aware greeting (Premium)
-*Requires Geolocation API + weather API call.*
-*These are aspirational scripts — not yet wired.*
+*Requires: Geolocation API + OpenWeatherMap API + Netlify function proxy + premium flag.*
 
 **Sunny / warm:**
-> Good [morning/afternoon]. The sun's out and it's a decent temperature.
-> I'm wondering if we could do something outdoors today — but tell me
-> how you're feeling first and we'll see.
+> Good [morning/afternoon]. The sun's out and it's warm — I'm wondering
+> if we could do something outdoors today. Tell me how you're feeling
+> first and we'll see.
 
 **Overcast / cool:**
 > Good [morning/afternoon]. Not the most inspiring weather out there,
@@ -492,34 +474,28 @@ Already written. Reads energy trend and programme phase.
 
 ## IMPLEMENTATION NOTES
 
-**Variation selection logic (for high-frequency screens):**
-Suggested approach: `(dayOfYear + totalSessions) % variantCount`
-This gives a consistent variant per day that shifts as sessions accumulate,
-so the same line never repeats on consecutive days.
+**Variation selection logic:**
+`(dayOfYear + totalSessions) % variantCount`
+Consistent per day, shifts as sessions accumulate.
+Same line never appears on consecutive days.
 
-**Dynamic vs static:**
-- STATIC lines: same for every user at that screen
-- DYNAMIC lines: assembled from store data (energy, conditions, week, phase)
-- VARIANT lines: one of N options selected by rotation logic
-
-**coachStyle variants:**
-All lines above are Steady voice. Phase 4 will add:
-- Energetic: brighter, more affirming, more words
-- Minimal: shorter, direct, no fluff
-- Nurturing: softer, more emotionally attuned, more validation
-
-**Weather integration:**
-Flagged for Phase 3B. Requires: user permission for geolocation,
-OpenWeatherMap API key (free tier sufficient), Netlify function to
-proxy the API call (keeps key server-side), premium flag check.
-
-**Lines NOT yet wired into code:**
-- Settings tab coach lines (Profile / Conditions / Equipment)
+**Lines still to wire into code:**
+- Settings tab coach lines (all three tabs)
 - Today pre-check-in variants (currently single static line)
 - Workout start variants
-- Workout complete variants (currently single line)
+- Workout complete variants
 - Prescribed session variants
 - Progress week-target variants
+- Welcome / consent screen (Screen 0) — new view needed
 
-Next code session: wire all static settings lines and welcome/consent
-screen first, then extend Today view with variant rotation logic.
+**coachStyle variants:**
+All lines above are Steady. Phase 4 adds Energetic / Minimal / Nurturing.
+
+**Weather integration:**
+Phase 3B. Flag for premium infrastructure session.
+
+**v2.1 changes from v2.0:**
+- Consent line moved above Start button
+- Morning Variant B softened (was blunt)
+- Afternoon Variant B — "Good afternoon" added for consistency
+- Evening Variant C — "if you'd like to" softened from "if you want to"
