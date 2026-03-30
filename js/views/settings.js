@@ -350,9 +350,6 @@ function renderConditionsTab() {
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">These are the conditions I'm working around. You're in control of this list — add something new, pause one if things improve, or remove it if it's no longer relevant. I'll adapt as soon as anything changes. You don't need to explain yourself.</p>
       </div>
-        These are used to adapt your sessions. Pausing a condition keeps it
-        saved but stops it affecting your workouts temporarily.
-      </p>
 
       <!-- ── Active conditions list ──────────────────────────────────── -->
       ${conditions.length === 0 ? `
@@ -378,13 +375,15 @@ function renderConditionsTab() {
               <div class="condition-card ${isPaused ? "condition-card--paused" : ""}"
                    data-condition-id="${id}">
 
-                <!-- ── Header row ────────────────────────────────── -->
+                <!-- ── Header: two rows ──────────────────────────── -->
                 <div class="condition-card-header">
-                  <span class="condition-card-icon" aria-hidden="true">${icon}</span>
-                  <span class="condition-card-name">
-                    ${displayName}
-                    ${isPaused ? '<span class="condition-paused-badge">Paused</span>' : ""}
-                  </span>
+                  <div class="condition-card-top">
+                    <span class="condition-card-icon" aria-hidden="true">${icon}</span>
+                    <span class="condition-card-name">
+                      ${displayName}
+                      ${isPaused ? '<span class="condition-paused-badge">Paused</span>' : ""}
+                    </span>
+                  </div>
                   <div class="condition-card-actions">
                     <button
                       class="btn-text condition-pause-btn"
