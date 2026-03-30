@@ -1,45 +1,49 @@
 /**
- * name.js - Onboarding Step 2: Name input
+ * name.js - Onboarding Step 1: Name input
+ *
+ * v1.1 — Coach line added above input field.
  */
 
-import { store } from '../../store.js';
+import { store } from "../../store.js";
 
 export const centered = false;
 
 export function render() {
-  const name = store.get('name') || '';
-  
+  const name = store.get("name") || "";
+
   return `
     <div class="onboarding-view">
       <div class="onboarding-header">
-        <button class="btn btn-ghost" onclick="router.navigate('onboarding/welcome')">← Back</button>
-        <div class="progress-dots">
-          <span class="dot active"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
+        <button class="btn btn-ghost" onclick="router.navigate('onboarding/welcome')"
+                aria-label="Back">Back</button>
+        <div class="progress-dots" aria-label="Step 1 of 7">
+          <span class="dot active"    aria-hidden="true"></span>
+          <span class="dot"           aria-hidden="true"></span>
+          <span class="dot"           aria-hidden="true"></span>
+          <span class="dot"           aria-hidden="true"></span>
+          <span class="dot"           aria-hidden="true"></span>
+          <span class="dot"           aria-hidden="true"></span>
+          <span class="dot"           aria-hidden="true"></span>
         </div>
       </div>
-      
+
       <div class="onboarding-content">
-        <h1>What should I call you?</h1>
-        <p class="text-secondary">Just your first name is fine.</p>
-        
+        <h1>Your name</h1>
+        ${coachLine("Let's start with the most important thing. What should I call you?")}
+
         <div class="input-group">
-          <input 
-            type="text" 
-            id="user-name" 
+          <input
+            type="text"
+            id="user-name"
             class="input-field"
             placeholder="Your name"
             autocomplete="given-name"
             value="${name}"
+            aria-label="Your first name"
           >
         </div>
       </div>
-      
+
       <div class="onboarding-actions">
         <button class="btn btn-primary btn-large btn-full" onclick="saveName()">
           Continue
@@ -50,29 +54,35 @@ export function render() {
 }
 
 export function onMount() {
-  // Focus the input
   setTimeout(() => {
-    const input = document.getElementById('user-name');
+    const input = document.getElementById("user-name");
     if (input) input.focus();
   }, 100);
-  
-  // Handle Enter key
-  document.getElementById('user-name').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') saveName();
+
+  document.getElementById("user-name")?.addEventListener("keypress", e => {
+    if (e.key === "Enter") saveName();
   });
 }
 
-// Make save function available globally
 window.saveName = function() {
-  const input = document.getElementById('user-name');
-  const name = input.value.trim();
-  
+  const input = document.getElementById("user-name");
+  const name  = input?.value.trim();
+
   if (!name) {
-    input.focus();
-    input.classList.add('error');
+    input?.focus();
+    input?.classList.add("error");
     return;
   }
-  
-  store.set('name', name);
-  router.navigate('onboarding/about');
+
+  store.set("name", name);
+  router.navigate("onboarding/about");
 };
+
+function coachLine(text) {
+  return `
+    <div class="onboarding-coach-line">
+      <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <p class="onboarding-coach-text">${text}</p>
+    </div>
+  `;
+}
