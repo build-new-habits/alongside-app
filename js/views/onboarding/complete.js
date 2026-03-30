@@ -14,7 +14,20 @@ export const centered = true;
 
 export function render() {
   const name            = store.get('name');
-  const age             = store.get('age');
+  const ageBand         = store.get('ageBand');
+
+  // Format age band for display
+  const AGE_BAND_LABELS = {
+    'under-18':   'Under 18',
+    '18-24':      '18 - 24',
+    '25-34':      '25 - 34',
+    '35-44':      '35 - 44',
+    '45-54':      '45 - 54',
+    '55-64':      '55 - 64',
+    '65+':        '65 and over',
+    'prefer-not': 'Prefer not to say'
+  };
+  const ageBandLabel = ageBand ? (AGE_BAND_LABELS[ageBand] || ageBand) : 'Not set';
   const weight          = store.get('weight');
   const weightUnit      = store.get('weightUnit') || 'kg';
   const targetWeight    = store.get('targetWeight');
@@ -56,8 +69,8 @@ export function render() {
         <div class="summary-card card">
           <h3>Your profile</h3>
           <div class="summary-row">
-            <span class="summary-label">Age:</span>
-            <span class="summary-value">${age || 'Not set'}</span>
+            <span class="summary-label">Age group:</span>
+            <span class="summary-value">${ageBandLabel}</span>
           </div>
           <div class="summary-row">
             <span class="summary-label">Current weight:</span>
