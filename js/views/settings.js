@@ -114,7 +114,13 @@ export function render() {
 
       <!-- ── Reset — always visible ───────────────────────────────────────── -->
       <div class="settings-reset-zone">
-        <button class="btn btn-danger btn-full" id="reset-app-btn">
+        <button class="btn btn-text-link btn-full" id="privacy-btn"
+                onclick="router.navigate('privacy')"
+                aria-label="Read Privacy Policy and Terms of Service">
+          Privacy Policy &amp; Terms of Service
+        </button>
+        <button class="btn btn-danger btn-full" id="reset-app-btn"
+                style="margin-top: var(--space-3);">
           Reset App (Start Over)
         </button>
       </div>
@@ -167,7 +173,10 @@ function renderProfileTab() {
 
       <h2 id="profile-heading" class="section-heading">Your profile</h2>
 
-      <!-- Name -->
+      <div class="card card-coach settings-coach-card">
+        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="coach-message-text">This is your profile. You can update anything here and I'll adjust straight away. Your circumstances change — your profile should too. Nothing here is permanent and nothing here is wrong.</p>
+      </div>
       <div class="profile-field-group">
         <label class="profile-field-label" for="profile-name">Name</label>
         <input
@@ -337,7 +346,10 @@ function renderConditionsTab() {
     <section aria-labelledby="conditions-heading">
       <h2 id="conditions-heading" class="section-heading">Your conditions</h2>
 
-      <p class="text-secondary settings-conditions-intro">
+      <div class="card card-coach settings-coach-card">
+        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="coach-message-text">These are the conditions I'm working around. You're in control of this list — add something new, pause one if things improve, or remove it if it's no longer relevant. I'll adapt as soon as anything changes. You don't need to explain yourself.</p>
+      </div>
         These are used to adapt your sessions. Pausing a condition keeps it
         saved but stops it affecting your workouts temporarily.
       </p>
@@ -536,9 +548,11 @@ function renderEquipmentTab() {
   return `
     <section aria-labelledby="equipment-heading">
       <h2 id="equipment-heading" class="section-heading">Your equipment</h2>
-      <p class="text-secondary settings-equipment-intro">
-        Tap to add or remove. Changes take effect on your next workout.
-      </p>
+
+      <div class="card card-coach settings-coach-card">
+        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="coach-message-text">Tell me what's available and I'll build around it. If your kit changes — new purchase, moved house, different space — update this and your next session will reflect it immediately.</p>
+      </div>
 
       ${EQUIPMENT_CATEGORIES.map(cat => {
         const selectedInCat = cat.items.filter(item => selected.includes(item.id)).length;
