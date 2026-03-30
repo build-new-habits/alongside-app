@@ -87,6 +87,12 @@ export const store = {
       onboardingComplete: false,
       onboardingStep: 1,
 
+      // ── CONSENT ──────────────────────────────────────────────
+      // Recorded when user taps Start on the welcome screen.
+      // consentAt is the GDPR audit timestamp.
+      consentGiven: false,
+      consentAt: null,
+
       // ── PROFILE — Step 2 ─────────────────────────────────────
       name: '',
 
