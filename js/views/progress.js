@@ -258,7 +258,7 @@ function renderProgressCoachCard(history, stats, name) {
   const message = buildProgressCoachMessage(history, stats, name);
   return `
     <div class="card card-coach" role="note" aria-label="Coach summary">
-      <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
       <div class="coach-message-content">
         <p class="coach-message-text">${message}</p>
       </div>
