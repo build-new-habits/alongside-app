@@ -524,3 +524,135 @@
 .card-list .card:last-of-type {
   margin-bottom: 0;
 }
+
+/* ============================================
+   WELCOME / CONSENT SCREEN
+   ============================================ */
+
+.onboarding-welcome {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.onboarding-welcome-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: var(--space-8);
+}
+
+.welcome-coach-icon {
+  margin-bottom: var(--space-5);
+}
+
+.welcome-coach-img {
+  border-radius: var(--radius-xl);
+  display: block;
+}
+
+.welcome-heading {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  margin-bottom: var(--space-5);
+}
+
+.welcome-coach-text {
+  text-align: left;
+  max-width: 100%;
+  margin-bottom: var(--space-5);
+}
+
+.welcome-coach-text p {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-3);
+}
+
+.welcome-coach-text p:last-child {
+  margin-bottom: 0;
+}
+
+.welcome-pillars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  margin-bottom: var(--space-5);
+}
+
+.welcome-pillar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px;
+}
+
+.welcome-pillar-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.welcome-pillar-text {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-align: left;
+  line-height: var(--leading-normal);
+}
+
+/* Consent text above Start button */
+.welcome-consent-text {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-bottom: var(--space-3);
+  line-height: var(--leading-relaxed);
+}
+
+/* Inline link button — used in consent text */
+.btn-inline-link {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.btn-inline-link:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ============================================
+   ONBOARDING COACH LINE
+   Appears below h1 on each onboarding step
+   ============================================ */
+
+.onboarding-coach-line {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.onboarding-coach-text {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
