@@ -36,7 +36,10 @@ export function render() {
       
       <div class="onboarding-content">
         <h1>Anything I should know about?</h1>
-        <p class="text-secondary">I'll adapt exercises to protect these areas.</p>
+        <div class="onboarding-coach-line">
+          <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <p class="onboarding-coach-text">If there's anything going on with your body that I should know about, tell me here. I won't avoid movement — I'll make sure what I suggest works with where you are, not against it. Nothing here will surprise me. I've seen it all.</p>
+        </div>
         
         <div class="conditions-grid">
           ${conditionsHtml}
