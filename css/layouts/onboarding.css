@@ -656,3 +656,89 @@
   line-height: var(--leading-relaxed);
   margin: 0;
 }
+
+
+/* ============================================
+   COACH VOICE — VISUAL DISTINCTION
+   Teal left border makes coach voice read as
+   a distinct presence, not just body text.
+   Applied to: onboarding coach lines,
+   welcome coach text, card-coach blocks.
+   ============================================ */
+
+.onboarding-coach-line {
+  border-left: 3px solid var(--color-primary);
+  background: rgba(45, 212, 191, 0.06);
+}
+
+.welcome-coach-text {
+  border-left: 3px solid var(--color-primary);
+  padding-left: var(--space-4);
+  background: rgba(45, 212, 191, 0.06);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+  padding-right: var(--space-3);
+}
+
+
+/* ============================================
+   CONDITIONS ONBOARDING — GROUPED CHIPS
+   ============================================ */
+
+.conditions-group {
+  margin-bottom: var(--space-5);
+}
+
+.conditions-group-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-3);
+}
+
+.conditions-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.condition-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.condition-chip.selected,
+.condition-chip[aria-pressed="true"] {
+  background: rgba(45, 212, 191, 0.12);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: var(--font-medium);
+}
+
+.condition-chip:hover:not(.selected) {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.condition-chip:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
