@@ -87,7 +87,7 @@ function renderCheckinPrompt(name) {
       ` : ""}
 
       <div class="card card-coach">
-        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div class="coach-prompt-content">
           <p>${coachMsg}</p>
         </div>
@@ -229,7 +229,7 @@ function renderTodaysDashboard(name) {
 
       <!-- ── Coach recommendation ───────────────────────────────────────── -->
       <div class="card card-coach">
-        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div class="recommendation-content">
           <div class="intensity-badge ${intensity}" aria-label="Today's intensity: ${display.label}">
             ${getIntensityIcon(intensity)} ${display.label}
