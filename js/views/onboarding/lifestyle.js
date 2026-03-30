@@ -48,7 +48,10 @@ export function render() {
       
       <div class="onboarding-content">
         <h1>Your lifestyle</h1>
-        <p class="text-secondary">This helps me match workouts to your energy.</p>
+        <div class="onboarding-coach-line">
+          <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <p class="onboarding-coach-text">A sense of your day-to-day helps me understand what you're working with — not just physically, but everything around it. Life doesn't stop for exercise, so I try to fit around life instead.</p>
+        </div>
         
         <div class="form-section">
           <label class="form-label">Current activity level</label>
