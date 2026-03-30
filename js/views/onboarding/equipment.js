@@ -49,7 +49,10 @@ export function render() {
       
       <div class="onboarding-content">
         <h1>What equipment do you have?</h1>
-        <p class="text-secondary">Tap each category to select your equipment. I'll only suggest exercises you can actually do.</p>
+        <div class="onboarding-coach-line">
+          <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <p class="onboarding-coach-text">Tell me what you have available and I'll build around it. A clear floor is enough. If you have more, great — I'll use it. But I'll never assume you have things you don't.</p>
+        </div>
         
         <div class="equipment-category-list">
           ${categoriesHtml}
@@ -153,7 +156,7 @@ window.closeModalOnBackdrop = function(event) {
 };
 
 window.toggleEquipmentItem = function(itemId) {
-  const equipment = [...(store.get('equipment') || [])];
+  const equipment = store.get('equipment') || [];
   const index = equipment.indexOf(itemId);
   
   if (index > -1) {
@@ -177,7 +180,7 @@ window.toggleEquipmentItem = function(itemId) {
 };
 
 function updateCategoryCards() {
-  const selectedEquipment = [...(store.get('equipment') || [])];
+  const selectedEquipment = store.get('equipment') || [];
   
   EQUIPMENT_CATEGORIES.forEach(cat => {
     const count = countInCategory(cat.id, selectedEquipment);
