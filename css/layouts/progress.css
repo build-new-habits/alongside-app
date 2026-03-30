@@ -1112,3 +1112,101 @@
 .install-card-hint {
   line-height: var(--leading-relaxed);
 }
+
+
+/* ============================================
+   PRIVACY VIEW
+   ============================================ */
+
+.privacy-view {
+  padding-bottom: var(--space-10);
+}
+
+.privacy-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.privacy-header h1 {
+  flex: 1;
+  margin: 0;
+}
+
+.privacy-back-btn {
+  flex-shrink: 0;
+}
+
+.privacy-section {
+  margin-bottom: var(--space-4);
+}
+
+.privacy-heading {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+}
+
+.privacy-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.privacy-list li {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  padding-left: var(--space-5);
+  position: relative;
+}
+
+.privacy-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 6px;
+  height: 6px;
+  background: var(--color-primary);
+  border-radius: 50%;
+}
+
+
+/* ============================================
+   SETTINGS — COACH CARDS IN TABS
+   ============================================ */
+
+.settings-coach-card {
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+/* Privacy link in settings reset zone */
+.btn-text-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-family: inherit;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: var(--space-2) 0;
+  min-height: 44px;
+  width: 100%;
+}
+
+.btn-text-link:hover,
+.btn-text-link:focus-visible {
+  color: var(--color-text-secondary);
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
