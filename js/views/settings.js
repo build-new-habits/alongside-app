@@ -174,7 +174,7 @@ function renderProfileTab() {
       <h2 id="profile-heading" class="section-heading">Your profile</h2>
 
       <div class="card card-coach settings-coach-card">
-        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">This is your profile. You can update anything here and I'll adjust straight away. Your circumstances change — your profile should too. Nothing here is permanent and nothing here is wrong.</p>
       </div>
       <div class="profile-field-group">
@@ -347,7 +347,7 @@ function renderConditionsTab() {
       <h2 id="conditions-heading" class="section-heading">Your conditions</h2>
 
       <div class="card card-coach settings-coach-card">
-        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">These are the conditions I'm working around. You're in control of this list — add something new, pause one if things improve, or remove it if it's no longer relevant. I'll adapt as soon as anything changes. You don't need to explain yourself.</p>
       </div>
         These are used to adapt your sessions. Pausing a condition keeps it
@@ -550,7 +550,7 @@ function renderEquipmentTab() {
       <h2 id="equipment-heading" class="section-heading">Your equipment</h2>
 
       <div class="card card-coach settings-coach-card">
-        <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">Tell me what's available and I'll build around it. If your kit changes — new purchase, moved house, different space — update this and your next session will reflect it immediately.</p>
       </div>
 
