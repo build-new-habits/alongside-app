@@ -54,7 +54,10 @@ export function render() {
 
       <div class="onboarding-content">
         <h1>A bit about you${name ? ", " + name : ""}</h1>
-        <p class="text-secondary">This helps me personalise your experience.</p>
+        <div class="onboarding-coach-line">
+          <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <p class="onboarding-coach-text">A little context helps me a lot. I use this to shape the kind of sessions I suggest — nothing else. Your stage of life shapes how your body responds to movement, and I want to get that right for you.</p>
+        </div>
 
         <!-- Age band -->
         <div class="form-section">
