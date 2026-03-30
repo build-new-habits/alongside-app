@@ -20,7 +20,6 @@ const VIEW_NAMES = {
   'checkin':                 'Daily Check-In',
   'workout':                 'Workout',
   'workout-complete':        'Workout Complete',
-  'prescribed-session':      'Prescribed Session',
   'onboarding/welcome':      'Welcome to Alongside',
   'onboarding/name':         'Your Name',
   'onboarding/about':        'About You',
@@ -31,6 +30,8 @@ const VIEW_NAMES = {
   'onboarding/equipment':    'Your Equipment',
   'onboarding/complete':     'Profile Complete',
   'onboarding/goal-setup':   'Build Your Plan',
+  'onboarding/privacy':      'Privacy and Terms',
+  'privacy':                 'Privacy and Terms',
 };
 
 export const router = {
@@ -77,7 +78,7 @@ export const router = {
     mainContent.className = 'main-content';
 
     // Hide/show bottom nav
-    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin', 'prescribed-session'];
+    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin'];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
     if (shouldHideNav) {
