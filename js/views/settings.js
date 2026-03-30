@@ -265,6 +265,30 @@ function renderProfileTab() {
         </div>
       </div>
 
+      <!-- Install app — shown only when installable and not yet installed -->
+      ${!isPWAInstalled() ? `
+        <div class="profile-field-group" id="install-app-zone">
+          <h2 class="section-heading" style="margin-top: var(--space-6);">Add to home screen</h2>
+          <div class="card install-card">
+            <p class="text-secondary install-card-text">
+              Install Alongside as an app for the best experience.
+              Your logo, no browser chrome, works offline.
+            </p>
+            ${isPWAInstallable() ? `
+              <button class="btn btn-primary btn-full" id="install-app-btn"
+                      aria-label="Install Alongside as an app">
+                Install Alongside
+              </button>
+            ` : `
+              <p class="text-secondary text-sm install-card-hint">
+                On iPhone: tap the Share button in Safari, then "Add to Home Screen".<br>
+                On Android: open the browser menu and tap "Add to Home Screen".
+              </p>
+            `}
+          </div>
+        </div>
+      ` : ""}
+
       <!-- Coach style -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Coach style</h2>
       <p class="text-secondary settings-coach-intro">
@@ -725,7 +749,20 @@ function wirePanel() {
     });
   });
 
-  // ── Conditions tab wiring ──────────────────────────────────────────────────
+  // Install app button
+  document.getElementById("install-app-btn")?.addEventListener("click", () => {
+    if (window.triggerPWAInstall) window.triggerPWAInstall();
+  });
+
+  // If install prompt arrives while settings is open, re-render to show button
+  document.addEventListener("pwa-installable", () => {
+    if (activeTab === "profile") rerenderProfilePanel();
+  }, { once: true });
+
+  // If app gets installed while settings is open, re-render to hide the zone
+  document.addEventListener("pwa-installed", () => {
+    if (activeTab === "profile") rerenderProfilePanel();
+  }, { once: true });
 
   // Pause / resume
   document.querySelectorAll(".condition-pause-btn").forEach(btn => {
