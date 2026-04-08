@@ -32,6 +32,7 @@ const VIEW_NAMES = {
   'onboarding/goal-setup':   'Build Your Plan',
   'onboarding/privacy':      'Privacy and Terms',
   'privacy':                 'Privacy and Terms',
+  'gym-programme':           'My Gym Programme',
 };
 
 export const router = {
