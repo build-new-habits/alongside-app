@@ -2,15 +2,23 @@
  * store.js - Data persistence layer
  * Handles localStorage with simple get/set API
  *
- * v1.6 — ageBand replaces numeric age field:
- *   ageBand  — '18-24' | '25-34' | '35-44' | '45-54' | '55-64' | '65+' |
- *              'under-18' | 'prefer-not'
- *   age      — retained as legacy field; not used in new code.
- *   mergeWithDefaults() migrates existing numeric age to band silently.
- *   customConditionNames added for 'other' condition naming.
+ * v1.2 — Schema additions:
+ *   prescribedExercises  — externally prescribed exercises from physio/coach
+ *                          Empty array in v1.2; UI built in Phase 3/4.
+ *                          Added now so any user data captured in the field
+ *                          from here forwards is correctly persisted.
  *
- * v1.5 — conditionStatus, conditionStories, customConditionNames.
- * v1.4 — coachStyle scalar string.
+ *   conditionPainScores  — today's per-condition pain scores from check-in
+ *                          { [conditionId]: 0-10 }
+ *                          Used by the 3-tier condition filter to resolve
+ *                          phase-aware condition variants (acute/subacute).
+ *                          Replaces the previous approach of storing only
+ *                          a flat conditions[] array with no pain context.
+ *
+ * v1.1 — Strategic layer additions:
+ *   strategicGoal   — user's primary goal with target details
+ *   activeProgramme — which plan they're on + current week/phase
+ *   progressLog     — session history for the progress dashboard
  */
 
 export const store = {
@@ -41,26 +49,9 @@ export const store = {
    */
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
-
-    // ── ageBand migration ────────────────────────────────────────────────────
-    // If saved data has a numeric age but no ageBand, derive the band.
-    // This runs once — after which ageBand is set and age is ignored.
-    let ageBand = saved.ageBand || null;
-    if (!ageBand && saved.age) {
-      const a = parseInt(saved.age);
-      if      (a < 18)  ageBand = "under-18";
-      else if (a < 25)  ageBand = "18-24";
-      else if (a < 35)  ageBand = "25-34";
-      else if (a < 45)  ageBand = "35-44";
-      else if (a < 55)  ageBand = "45-54";
-      else if (a < 65)  ageBand = "55-64";
-      else              ageBand = "65+";
-    }
-
     return {
       ...defaults,
       ...saved,
-      ageBand,
       lifestyle:            { ...defaults.lifestyle,            ...(saved.lifestyle            || {}) },
       strategicGoal:        { ...defaults.strategicGoal,        ...(saved.strategicGoal        || {}) },
       activeProgramme:      { ...defaults.activeProgramme,      ...(saved.activeProgramme      || {}) },
@@ -68,15 +59,6 @@ export const store = {
       prescribedExercises:  Array.isArray(saved.prescribedExercises) ? saved.prescribedExercises : [],
       conditionPainScores:  (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
                               ? saved.conditionPainScores
-                              : {},
-      conditionStatus:      (saved.conditionStatus && typeof saved.conditionStatus === 'object')
-                              ? saved.conditionStatus
-                              : {},
-      conditionStories:     (saved.conditionStories && typeof saved.conditionStories === 'object')
-                              ? saved.conditionStories
-                              : {},
-      customConditionNames: (saved.customConditionNames && typeof saved.customConditionNames === 'object')
-                              ? saved.customConditionNames
                               : {},
     };
   },
@@ -87,21 +69,11 @@ export const store = {
       onboardingComplete: false,
       onboardingStep: 1,
 
-      // ── CONSENT ──────────────────────────────────────────────
-      // Recorded when user taps Start on the welcome screen.
-      // consentAt is the GDPR audit timestamp.
-      consentGiven: false,
-      consentAt: null,
-
       // ── PROFILE — Step 2 ─────────────────────────────────────
       name: '',
 
       // ── ABOUT — Step 3 ───────────────────────────────────────
-      // ageBand replaces the previous numeric age field (v1.6).
-      // age is retained for migration only — do not use in new code.
-      // Migration in mergeWithDefaults() converts numeric age to band.
-      ageBand: null,   // '18-24' | '25-34' | '35-44' | '45-54' | '55-64' | '65+' | 'under-18' | 'prefer-not'
-      age: null,       // legacy — kept so old data is not lost on merge
+      age: null,
       gender: null,
       hormonalTracking: false,
 
@@ -126,33 +98,6 @@ export const store = {
       // { [conditionId]: 0-10 }
       // Used by getActiveConditionIds() to resolve phase variants.
       conditionPainScores: {},
-
-      // ── CONDITION STATUS ─────────────────────────────────────
-      // Per-condition active/paused state managed from Settings.
-      // Pausing a condition suspends its effect on workout filtering
-      // without removing it from the conditions[] history.
-      // { [conditionId]: 'active' | 'paused' }
-      // Defaults to 'active' for any condition not present in this map.
-      conditionStatus: {},
-
-      // ── CONDITION STORIES ────────────────────────────────────
-      // Optional context the user adds about each condition.
-      // Captured in Settings > Conditions tab.
-      // Not used by the workout generator — purely for user reference
-      // and future coach personalisation.
-      // Schema (per entry):
-      //   howLong:      string  — e.g. "About 6 months"
-      //   whatHelps:    string  — e.g. "Heat, gentle movement"
-      //   professional: string  — e.g. "Physio at Taunton MSK"
-      // { [conditionId]: { howLong, whatHelps, professional } }
-      conditionStories: {},
-
-      // ── CUSTOM CONDITION NAMES ───────────────────────────────
-      // For catch-all conditions (e.g. 'other') where the user
-      // specifies their own name. Displayed instead of the default
-      // condition name throughout the app.
-      // { [conditionId]: string }
-      customConditionNames: {},
 
       // ── LIFESTYLE — Step 7 ───────────────────────────────────
       lifestyle: {
@@ -215,6 +160,10 @@ export const store = {
       // { date, week, phase, focus, energyAtCheckin, conditionScores,
       //   durationMinutes, exerciseCount, milestoneAchieved }
       progressLog: [],
+
+      // ── GYM PROGRAMME ────────────────────────────────────────
+      gymProgrammeSession: "A",
+      gymProgrammeWeek:    1,
 
       // ── METADATA ─────────────────────────────────────────────
       createdAt: null,
