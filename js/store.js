@@ -57,6 +57,7 @@ export const store = {
       activeProgramme:      { ...defaults.activeProgramme,      ...(saved.activeProgramme      || {}) },
       progressLog:          Array.isArray(saved.progressLog)    ? saved.progressLog    : [],
       prescribedExercises:  Array.isArray(saved.prescribedExercises) ? saved.prescribedExercises : [],
+      activityLog:          Array.isArray(saved.activityLog)    ? saved.activityLog    : [],
       conditionPainScores:  (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
                               ? saved.conditionPainScores
                               : {},
@@ -164,6 +165,17 @@ export const store = {
       // ── GYM PROGRAMME ────────────────────────────────────────
       gymProgrammeSession: "A",
       gymProgrammeWeek:    1,
+
+      // ── ACTIVITY LOG ─────────────────────────────────────────
+      // Every completed activity writes one entry here regardless
+      // of path (coach-recommended, self-directed, quiet).
+      // Schema per entry: id, date, type, name, energyBefore,
+      // energyAfter, feel, painChange, note, source, completedAt
+      activityLog: [],
+
+      // Holds the in-progress activity entry during a session.
+      // Written by intention.js, updated by reflect.js.
+      currentActivityEntry: null,
 
       // ── METADATA ─────────────────────────────────────────────
       createdAt: null,
