@@ -753,3 +753,149 @@
   color: var(--color-text);
   margin-bottom: var(--space-2);
 }
+
+
+/* ============================================
+   GYM PROGRAMME — EXERCISE GUIDE & LOG
+   ============================================ */
+
+.gym-exercise-summary {
+  display: grid;
+  grid-template-columns: 1fr 40px 80px 60px 50px;
+  gap: var(--space-2);
+  align-items: start;
+}
+
+.gym-exercise-actions {
+  display: flex;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  padding-left: 0;
+  flex-wrap: wrap;
+}
+
+.gym-guide-btn,
+.gym-log-btn {
+  font-size: var(--text-xs);
+  min-height: 36px;
+  min-width: 44px;
+  padding: var(--space-1) var(--space-2);
+}
+
+/* Guide panel */
+.gym-guide-panel {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-light);
+  margin-top: var(--space-2);
+}
+
+.gym-guide-panel.hidden {
+  display: none;
+}
+
+.gym-guide-description {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-3);
+}
+
+.gym-guide-cues {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-3) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.gym-guide-cues li {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  padding-left: var(--space-4);
+  position: relative;
+}
+
+.gym-guide-cues li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 6px;
+  height: 6px;
+  background: var(--color-primary);
+  border-radius: 50%;
+}
+
+.gym-youtube-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: var(--space-2) 0;
+  min-height: 44px;
+}
+
+.gym-youtube-link:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Log panel */
+.gym-log-panel {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-light);
+  margin-top: var(--space-2);
+}
+
+.gym-log-panel.hidden {
+  display: none;
+}
+
+.gym-log-label {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-medium);
+  margin-bottom: var(--space-2);
+}
+
+.gym-log-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.gym-log-input {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.gym-log-input:focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+}
+
+.gym-log-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.gym-exercise-lastlog {
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  font-weight: var(--font-medium);
+}
