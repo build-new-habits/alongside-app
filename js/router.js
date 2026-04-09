@@ -33,6 +33,8 @@ const VIEW_NAMES = {
   'onboarding/privacy':      'Privacy and Terms',
   'privacy':                 'Privacy and Terms',
   'gym-programme':           'My Gym Programme',
+  'intention':               'What would you like to do today?',
+  'reflect':                 'How was that?',
 };
 
 export const router = {
