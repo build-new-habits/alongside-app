@@ -595,8 +595,8 @@ function renderPostSession(session) {
           <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
           <p class="coach-message-text">That is a session in the books. I will remember what you told me and use it next time. Well done.</p>
         </div>
-        <button class="btn btn-secondary btn-full" onclick="router.navigate('settings')">
-          Back to Settings
+        <button class="btn btn-primary btn-full" onclick="router.navigate('today')">
+          Back to Today
         </button>
       </div>`;
   }
