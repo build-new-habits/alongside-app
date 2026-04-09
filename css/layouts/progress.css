@@ -1747,3 +1747,204 @@
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
 }
+
+
+/* ============================================
+   INTENTION VIEW
+   ============================================ */
+
+.intention-view { padding-bottom: var(--space-10); }
+
+.intention-coach-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.intention-paths {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.intention-path {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  min-height: 72px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  width: 100%;
+}
+
+.intention-path.selected,
+.intention-path[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.06);
+}
+
+.intention-path:hover:not(.selected) {
+  border-color: var(--color-border);
+  background: var(--color-bg-hover);
+}
+
+.intention-path:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.intention-path-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.intention-path-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.intention-path-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.intention-path.selected .intention-path-label,
+.intention-path[aria-pressed="true"] .intention-path-label {
+  color: var(--color-primary);
+}
+
+.intention-path-sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Activity selector */
+.intention-activity-selector {
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.intention-selector-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.intention-activity-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.intention-activity-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.intention-activity-chip.selected,
+.intention-activity-chip[aria-pressed="true"] {
+  background: rgba(45, 212, 191, 0.12);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: var(--font-medium);
+}
+
+.intention-activity-chip:hover:not(.selected) {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.intention-activity-chip:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.intention-name-field { margin-top: var(--space-3); }
+
+
+/* ============================================
+   REFLECT VIEW
+   ============================================ */
+
+.reflect-view { padding-bottom: var(--space-10); }
+
+.reflect-coach-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.reflect-section {
+  margin-bottom: var(--space-5);
+}
+
+.reflect-section-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.reflect-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.reflect-wellbeing-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.reflect-invitation {
+  font-style: normal;
+}
+
+.reflect-textarea {
+  width: 100%;
+  padding: var(--space-3);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  resize: vertical;
+  line-height: var(--leading-relaxed);
+}
+
+.reflect-textarea:focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+}
+
+.reflect-textarea::placeholder { color: var(--color-text-muted); }
