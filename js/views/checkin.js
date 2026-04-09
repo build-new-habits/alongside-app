@@ -272,13 +272,6 @@ export function render() {
         <button type="button" class="btn btn-primary btn-large btn-full" id="submit-checkin">
           See today's workout options
         </button>
-
-        <!-- Prescribed exercises shortcut — non-intrusive reminder -->
-        <button type="button" class="btn btn-ghost btn-small checkin-prescribed-shortcut"
-                id="checkin-prescribed-btn"
-                aria-label="Add or manage your prescribed exercises before submitting">
-          🩺 Add prescribed exercises first
-        </button>
       </div>
 
     </div>
@@ -352,14 +345,6 @@ export function onMount() {
 
   // ── Submit ──────────────────────────────────────────────────────────────
   document.getElementById("submit-checkin")?.addEventListener("click", submitCheckin);
-
-  // ── Prescribed exercises shortcut ────────────────────────────────────────
-  // Saves the check-in first so no progress is lost, then navigates to Today
-  // and signals the prescribed form to open automatically.
-  document.getElementById("checkin-prescribed-btn")?.addEventListener("click", () => {
-    submitCheckin();
-    store.set("openPrescribedFormOnLoad", true);
-  });
 }
 
 // ── Display update helpers ────────────────────────────────────────────────────
@@ -473,6 +458,6 @@ function submitCheckin() {
   const intensity = checkinData.getSuggestedIntensity(currentCheckin);
   store.set("todayIntensity", intensity);
 
-  // Navigate to today view
-  router.navigate("today");
+  // Navigate to intention screen — user chooses their path from there
+  router.navigate("intention");
 }
