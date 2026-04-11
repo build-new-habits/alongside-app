@@ -2,6 +2,20 @@
  * store.js - Data persistence layer
  * Handles localStorage with simple get/set API
  *
+ * v1.7 — checkInNotification schema (S3-6):
+ *   Opted-in check-in reminder. Entirely user-initiated.
+ *   Never shown without explicit opt-in. No shame-based framing permitted.
+ *   Fields:
+ *     enabled           — false by default; user must toggle on
+ *     time              — "HH:MM" 24hr string; null until user sets one
+ *     permissionGranted — true only after browser Notification API confirms
+ *
+ *   Distinguished in code and comments from prohibited shame-based notification
+ *   patterns. This feature: warm, single type, user-set time, user-revocable.
+ *   Prohibited patterns: streak reminders, guilt framing, re-prompting on deny.
+ *
+ * v1.6 — ageBand, conditionStatus/Stories/Names, consentGiven/At
+ *
  * v1.2 — Schema additions:
  *   prescribedExercises  — externally prescribed exercises from physio/coach
  *                          Empty array in v1.2; UI built in Phase 3/4.
@@ -61,6 +75,9 @@ export const store = {
       conditionPainScores:  (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
                               ? saved.conditionPainScores
                               : {},
+      checkInNotification:  (saved.checkInNotification && typeof saved.checkInNotification === 'object')
+                              ? { ...this.getDefaults().checkInNotification, ...saved.checkInNotification }
+                              : this.getDefaults().checkInNotification,
     };
   },
 
@@ -176,6 +193,16 @@ export const store = {
       // Holds the in-progress activity entry during a session.
       // Written by intention.js, updated by reflect.js.
       currentActivityEntry: null,
+
+      // ── CHECK-IN NOTIFICATION ────────────────────────────────
+      // Opted-in reminder only. User must explicitly enable.
+      // PERMITTED: warm tone, user-set time, single type, user-revocable.
+      // PROHIBITED: streak framing, guilt framing, re-prompting after deny.
+      checkInNotification: {
+        enabled:           false,  // false until user toggles on
+        time:              null,   // "HH:MM" 24hr string; null until set
+        permissionGranted: false   // true only after browser API confirms
+      },
 
       // ── METADATA ─────────────────────────────────────────────
       createdAt: null,
