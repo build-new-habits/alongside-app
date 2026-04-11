@@ -35,6 +35,7 @@ const VIEW_NAMES = {
   'gym-programme':           'My Gym Programme',
   'intention':               'What would you like to do today?',
   'reflect':                 'How was that?',
+  'prescribed-session':      'Prescribed Exercises',
 };
 
 export const router = {
@@ -81,7 +82,7 @@ export const router = {
     mainContent.className = 'main-content';
 
     // Hide/show bottom nav
-    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin'];
+    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin', 'prescribed-session'];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
     if (shouldHideNav) {
