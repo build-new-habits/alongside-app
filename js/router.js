@@ -36,6 +36,7 @@ const VIEW_NAMES = {
   'intention':               'What would you like to do today?',
   'reflect':                 'How was that?',
   'prescribed-session':      'Prescribed Exercises',
+  'prescribed':              'My Prescribed Exercises',
 };
 
 export const router = {
