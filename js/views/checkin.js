@@ -486,10 +486,13 @@ function submitCheckin() {
 
 /**
  * Save the check-in exactly as submitCheckin() does, then navigate to
- * Today with a flag that tells today.js to auto-open the prescribed form.
+ * the dedicated prescribed exercises view.
+ *
+ * The openPrescribedForm flag signals prescribed.js to auto-open the
+ * add form on mount -- useful when the user arrives with a new exercise
+ * to log. If they just want to start their session, they ignore the form.
  *
  * This is the ADHD-aware shortcut confirmed in S3-2 design.
- * The flag is consumed once by today.js onMount and then cleared.
  */
 function submitCheckinToPrescribed() {
   const notesEl = document.getElementById("checkin-notes");
@@ -505,8 +508,9 @@ function submitCheckinToPrescribed() {
   const intensity = checkinData.getSuggestedIntensity(currentCheckin);
   store.set("todayIntensity", intensity);
 
-  // Signal today.js to open the prescribed form immediately on mount.
-  store.set("openPrescribedForm", true);
-
-  router.navigate("today");
+  // Navigate directly to the prescribed view.
+  // openPrescribedForm flag is NOT set here by default -- the user is going
+  // to their exercises, not necessarily adding a new one.
+  // If they need to add, the "+ Add prescribed exercise" button is prominent.
+  router.navigate("prescribed");
 }
