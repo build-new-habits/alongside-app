@@ -1,6 +1,16 @@
 /**
  * settings.js - Settings view
  *
+ * v1.3 — Check-in notification (S3-6):
+ *   Opted-in reminder added to Profile tab.
+ *   Toggle shows time picker only when enabled.
+ *   Requests browser Notification permission on enable.
+ *   If denied: calm explanation shown, no automatic re-prompt.
+ *   Scheduling: setInterval polling every 60s checks against user's chosen time.
+ *   Single notification type only. Warm tone. User-revocable.
+ *   PROHIBITED patterns (never implemented here): streak framing, guilt framing,
+ *   re-prompting after denial, multiple notification types.
+ *
  * v1.0 — Tabbed layout: Profile / Conditions / Equipment.
  *   Three tabs replace the previous single-scroll card list.
  *   Tab state is held in a module-level variable (activeTab) and
@@ -189,6 +199,10 @@ function renderProfileTab() {
         `).join("")}
       </div>
 
+      <!-- Check-in reminder -->
+      <h2 class="section-heading" style="margin-top: var(--space-6);">Check-in reminder</h2>
+      ${renderNotificationSection()}
+
     </section>
   `;
 }
@@ -266,6 +280,84 @@ function renderEquipmentTab() {
   `;
 }
 
+// ── Notification section ──────────────────────────────────────────────────────
+
+/**
+ * Render the check-in notification toggle and time picker.
+ *
+ * PERMITTED: warm tone, single type, user-set time, user-revocable.
+ * PROHIBITED: streak framing, guilt framing, re-prompting after denial,
+ *             multiple notification types, automatic scheduling changes.
+ *
+ * Two states:
+ *   enabled=false  — toggle only; time picker hidden.
+ *   enabled=true   — toggle + time picker; permission status shown if denied.
+ *
+ * Permission is requested via browser Notification API when the user
+ * first enables the toggle. If denied, a calm explanation is shown
+ * and permissionGranted remains false. We never re-prompt automatically.
+ */
+function renderNotificationSection() {
+  const notif   = store.get("checkInNotification") || { enabled: false, time: null, permissionGranted: false };
+  const enabled = !!notif.enabled;
+  const denied  = enabled && !notif.permissionGranted && "Notification" in window && Notification.permission === "denied";
+
+  return `
+    <div class="card notification-card">
+      <div class="notification-toggle-row">
+        <div class="notification-toggle-label">
+          <span class="notification-label-text">Daily check-in reminder</span>
+          <span class="notification-label-sub text-sm text-muted">
+            A gentle nudge at the time you choose
+          </span>
+        </div>
+        <label class="toggle-switch" aria-label="Enable daily check-in reminder">
+          <input
+            type="checkbox"
+            id="notif-toggle"
+            role="switch"
+            aria-checked="${enabled}"
+            ${enabled ? "checked" : ""}
+          >
+          <span class="toggle-track" aria-hidden="true"></span>
+        </label>
+      </div>
+
+      ${enabled ? `
+        <div class="notification-time-row" id="notif-time-row">
+          <label class="form-label" for="notif-time">Remind me at</label>
+          <input
+            type="time"
+            id="notif-time"
+            class="form-input notif-time-input"
+            value="${notif.time || "08:00"}"
+            aria-label="Check-in reminder time"
+          >
+        </div>
+
+        ${denied ? `
+          <div class="notification-denied-banner" role="alert">
+            <p class="text-sm">
+              Your device has blocked notifications for this app.
+              To receive reminders, go to your browser or device settings
+              and allow notifications for this site.
+            </p>
+          </div>
+        ` : (!notif.permissionGranted && "Notification" in window && Notification.permission !== "granted") ? `
+          <p class="text-sm text-muted notification-permission-note">
+            Your browser will ask for permission to show notifications.
+          </p>
+        ` : ""}
+      ` : `
+        <p class="text-sm text-muted" style="margin-top: var(--space-3);">
+          Turn on to set a daily reminder to check in. You can change or
+          turn off the reminder any time.
+        </p>
+      `}
+    </div>
+  `;
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function settingsRow(label, value) {
@@ -336,6 +428,9 @@ function wirePanel() {
     });
   });
 
+  // Notification toggle and time picker
+  wireNotificationControls();
+
   // Equipment chips
   document.querySelectorAll(".equipment-chip").forEach(chip => {
     chip.addEventListener("click", () => {
@@ -386,6 +481,182 @@ function updateCategoryCount(chip) {
   }
 }
 
+// ── Notification wiring ───────────────────────────────────────────────────────
+
+/**
+ * Wire the notification toggle and time picker.
+ * Called from wirePanel() on every profile tab render.
+ *
+ * Toggle on:
+ *   1. Request browser Notification permission.
+ *   2. If granted: save enabled=true, permissionGranted=true, re-render section.
+ *   3. If denied:  save enabled=true, permissionGranted=false, re-render section
+ *      (section shows a calm explanation — no re-prompt, no guilt framing).
+ *   4. If unavailable ("Notification" not in window): save enabled=false,
+ *      show a gentle "not supported" message.
+ *
+ * Toggle off:
+ *   Save enabled=false. Scheduling loop will stop on next tick.
+ *
+ * Time picker change:
+ *   Saves new time to store. Scheduling loop reads from store each tick.
+ */
+function wireNotificationControls() {
+  const toggle   = document.getElementById("notif-toggle");
+  const timeInput = document.getElementById("notif-time");
+
+  if (toggle) {
+    toggle.addEventListener("change", async () => {
+      const wantsEnabled = toggle.checked;
+
+      if (!wantsEnabled) {
+        // User turned it off — save and re-render section
+        saveNotificationState({ enabled: false, time: null, permissionGranted: false });
+        rerenderNotificationSection();
+        return;
+      }
+
+      // Browser notifications not supported
+      if (!("Notification" in window)) {
+        saveNotificationState({ enabled: false, time: null, permissionGranted: false });
+        rerenderNotificationSection();
+        return;
+      }
+
+      // Already granted — just enable
+      if (Notification.permission === "granted") {
+        const currentTime = store.get("checkInNotification.time") || "08:00";
+        saveNotificationState({ enabled: true, time: currentTime, permissionGranted: true });
+        rerenderNotificationSection();
+        startNotificationScheduler();
+        return;
+      }
+
+      // Request permission — ONLY done when user explicitly toggles on.
+      // We never re-prompt automatically (prohibited pattern).
+      const permission = await Notification.requestPermission();
+      const granted    = permission === "granted";
+      const currentTime = store.get("checkInNotification.time") || "08:00";
+
+      saveNotificationState({ enabled: true, time: currentTime, permissionGranted: granted });
+      rerenderNotificationSection();
+
+      if (granted) {
+        startNotificationScheduler();
+      }
+      // If denied: section re-renders with calm explanation. No further action.
+    });
+  }
+
+  if (timeInput) {
+    timeInput.addEventListener("change", () => {
+      const newTime = timeInput.value;
+      if (!newTime) return;
+      store.set("checkInNotification.time", newTime);
+      // Scheduler reads from store each tick — no restart needed.
+    });
+  }
+}
+
+function saveNotificationState(state) {
+  store.set("checkInNotification", {
+    enabled:           state.enabled,
+    time:              state.time,
+    permissionGranted: state.permissionGranted
+  });
+}
+
+/**
+ * Re-render only the notification card within the current profile tab.
+ * Avoids a full tab switch which would reset scroll position.
+ */
+function rerenderNotificationSection() {
+  const card = document.querySelector(".notification-card");
+  if (card) {
+    const section = card.closest(".card");
+    if (section) {
+      // Replace just the card content by re-rendering the notification section
+      const wrapper = card.parentElement;
+      if (wrapper) {
+        wrapper.innerHTML = renderNotificationSection();
+        // Re-wire the new elements
+        wireNotificationControls();
+      }
+    }
+  }
+}
+
+// ── Notification scheduler ────────────────────────────────────────────────────
+
+/**
+ * Scheduling approach: setInterval every 60 seconds.
+ * On each tick, reads the user's chosen time from store and compares
+ * to the current HH:MM. Fires a notification if they match and one
+ * has not already been sent this minute.
+ *
+ * Single type only. Warm, non-urgent message. No streak framing.
+ * No guilt framing. No urgency language.
+ *
+ * The interval is stored on window so it can be cleared if the user
+ * disables the feature while the app is open.
+ *
+ * PROHIBITED messages (never use):
+ *   - "You haven't checked in yet!"
+ *   - "Don't break your streak!"
+ *   - "You missed yesterday."
+ *   - Any language implying failure or obligation.
+ */
+let _notifSchedulerInterval  = null;
+let _notifLastFiredMinute    = null;
+
+const NOTIFICATION_MESSAGES = [
+  { title: "Alongside", body: "Ready when you are. A quick check-in takes less than a minute." },
+  { title: "Alongside", body: "How are you feeling today? Your coach is here whenever suits you." },
+  { title: "Alongside", body: "Just a gentle nudge. Come check in whenever you're ready." },
+  { title: "Alongside", body: "Your check-in is waiting. No rush -- take it at your own pace." },
+  { title: "Alongside", body: "A moment to check in whenever suits you today." }
+];
+
+function startNotificationScheduler() {
+  // Clear any existing interval to avoid duplicates
+  if (_notifSchedulerInterval) {
+    clearInterval(_notifSchedulerInterval);
+  }
+
+  _notifSchedulerInterval = setInterval(() => {
+    const notif = store.get("checkInNotification");
+    if (!notif?.enabled || !notif?.permissionGranted || !notif?.time) return;
+    if (Notification.permission !== "granted") return;
+
+    const now    = new Date();
+    const hh     = String(now.getHours()).padStart(2, "0");
+    const mm     = String(now.getMinutes()).padStart(2, "0");
+    const nowHHMM = hh + ":" + mm;
+
+    // Only fire once per minute — track the last minute we fired
+    if (nowHHMM === notif.time && _notifLastFiredMinute !== nowHHMM) {
+      _notifLastFiredMinute = nowHHMM;
+
+      // Pick a message variant using the day of year so it rotates daily
+      const now2   = new Date();
+      const start  = new Date(now2.getFullYear(), 0, 0);
+      const dayIdx = Math.floor((now2 - start) / 86400000) % NOTIFICATION_MESSAGES.length;
+      const msg    = NOTIFICATION_MESSAGES[dayIdx];
+
+      // eslint-disable-next-line no-new
+      new Notification(msg.title, {
+        body: msg.body,
+        icon: "assets/images/logo-icon-192.png",
+        tag:  "alongside-checkin",  // replaces previous if still showing
+        renotify: false
+      });
+    }
+  }, 60000); // check every 60 seconds
+
+  // Store interval reference globally so app.js can clear it on reset if needed
+  window._alongsideNotifInterval = _notifSchedulerInterval;
+}
+
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
@@ -399,6 +670,12 @@ export function onMount() {
 
   // Wire panel elements on initial load
   wirePanel();
+
+  // If notification is already enabled and permission granted, resume scheduler
+  const notif = store.get("checkInNotification");
+  if (notif?.enabled && notif?.permissionGranted) {
+    startNotificationScheduler();
+  }
 
   // Reset app
   document.getElementById("reset-app-btn")?.addEventListener("click", () => {
