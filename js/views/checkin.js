@@ -272,6 +272,18 @@ export function render() {
         <button type="button" class="btn btn-primary btn-large btn-full" id="submit-checkin">
           See today's workout options
         </button>
+
+        <!--
+          ADHD-aware shortcut: user may come to check in specifically to do
+          their prescribed exercises, not a generated workout. This button
+          saves the check-in and navigates directly to the prescribed section
+          on the Today view, with the add-form pre-opened.
+          Confirmed design: S3-2 session (16-19 March 2026).
+        -->
+        <button type="button" class="btn btn-ghost btn-full" id="prescribed-shortcut-btn"
+                style="margin-top: var(--space-3);">
+          I have prescribed exercises to do
+        </button>
       </div>
 
     </div>
@@ -345,6 +357,14 @@ export function onMount() {
 
   // ── Submit ──────────────────────────────────────────────────────────────
   document.getElementById("submit-checkin")?.addEventListener("click", submitCheckin);
+
+  // ── Prescribed exercises shortcut ────────────────────────────────────────
+  // Saves check-in data exactly as submitCheckin() does, then navigates
+  // to Today with a flag that auto-opens the prescribed add-form.
+  // Rationale: neurodivergent users often come to the app with a specific
+  // task in mind. Making them wait through workout generation before seeing
+  // prescribed exercises creates friction. This shortcut eliminates that barrier.
+  document.getElementById("prescribed-shortcut-btn")?.addEventListener("click", submitCheckinToPrescribed);
 }
 
 // ── Display update helpers ────────────────────────────────────────────────────
@@ -460,4 +480,33 @@ function submitCheckin() {
 
   // Navigate to intention screen — user chooses their path from there
   router.navigate("intention");
+}
+
+// ── Prescribed shortcut submit ────────────────────────────────────────────────
+
+/**
+ * Save the check-in exactly as submitCheckin() does, then navigate to
+ * Today with a flag that tells today.js to auto-open the prescribed form.
+ *
+ * This is the ADHD-aware shortcut confirmed in S3-2 design.
+ * The flag is consumed once by today.js onMount and then cleared.
+ */
+function submitCheckinToPrescribed() {
+  const notesEl = document.getElementById("checkin-notes");
+  if (notesEl) currentCheckin.notes = notesEl.value;
+
+  const cycleEl = document.getElementById("cycle-day");
+  if (cycleEl?.value) currentCheckin.cycleDay = parseInt(cycleEl.value);
+
+  store.updateConditionPainScores({ ...currentCheckin.conditionLevels });
+  store.set("availableTime", selectedAvailableTime);
+  checkinData.saveCheckin(currentCheckin);
+
+  const intensity = checkinData.getSuggestedIntensity(currentCheckin);
+  store.set("todayIntensity", intensity);
+
+  // Signal today.js to open the prescribed form immediately on mount.
+  store.set("openPrescribedForm", true);
+
+  router.navigate("today");
 }
