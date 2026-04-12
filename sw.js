@@ -9,7 +9,7 @@
  * Old caches are deleted on activate so users always get the latest shell.
  */
 
-const CACHE_NAME = "alongside-v3";
+const CACHE_NAME = "alongside-v4";
 
 const SHELL_URLS = [
   "/alongside-app/",
@@ -60,6 +60,18 @@ const SHELL_URLS = [
   "/alongside-app/assets/images/logo-icon-192.png",
   "/alongside-app/assets/images/logo-icon-512.png"
 ];
+
+// ── Message handler ───────────────────────────────────────────────────────────
+// app.js posts { type: "SKIP_WAITING" } when the user taps "Update now".
+// This tells the waiting SW to activate immediately rather than waiting
+// for all tabs to close. Combined with clients.claim() in activate,
+// the new version takes effect without the user needing to close the app.
+
+self.addEventListener("message", event => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
 
 // ── Install — cache the app shell ────────────────────────────────────────────
 
