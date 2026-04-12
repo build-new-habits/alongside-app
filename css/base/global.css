@@ -199,3 +199,128 @@ select {
   border-radius: var(--radius-md);
   z-index: var(--z-toast);
 }
+
+/* ============================================
+   TEXT-TO-SPEECH — COACH CARD SPEAKER BUTTON
+   ============================================ */
+
+/**
+ * Speaker button injected by tts.js into .card-coach elements.
+ * Positioned absolute top-right within the card (card gets
+ * position:relative via JS when button is mounted).
+ *
+ * 44×44px tap target (WCAG 2.2 minimum).
+ * Teal to match coach card accent. Ghost on dark card background.
+ */
+.tts-btn {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.tts-btn:hover,
+.tts-btn:focus-visible {
+  background: var(--color-primary-glow);
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.tts-btn--playing {
+  background: var(--color-primary);
+  color: var(--color-bg-deep);
+}
+
+.tts-btn--playing:hover {
+  background: var(--color-primary-light);
+  color: var(--color-bg-deep);
+}
+
+.tts-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+  display: block;
+}
+
+/* Pulse animation when playing — respects reduced motion */
+@keyframes tts-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+.tts-icon--playing {
+  animation: tts-pulse 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tts-icon--playing {
+    animation: none;
+  }
+}
+
+/* ============================================
+   SETTINGS — SPEECH RATE SELECTOR
+   ============================================ */
+
+.speech-rate-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.speech-rate-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2);
+  min-height: 72px;
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.speech-rate-btn.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.speech-rate-btn:hover,
+.speech-rate-btn:focus-visible {
+  border-color: var(--color-primary);
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.speech-rate-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.speech-rate-desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: var(--leading-tight);
+}
+
+.speech-rate-btn.selected .speech-rate-label {
+  color: var(--color-primary);
+}
