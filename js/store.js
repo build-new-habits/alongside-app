@@ -78,6 +78,7 @@ export const store = {
       checkInNotification:  (saved.checkInNotification && typeof saved.checkInNotification === 'object')
                               ? { ...this.getDefaults().checkInNotification, ...saved.checkInNotification }
                               : this.getDefaults().checkInNotification,
+      speechRate: (typeof saved.speechRate === "number") ? saved.speechRate : 0.9,
     };
   },
 
@@ -193,6 +194,12 @@ export const store = {
       // Holds the in-progress activity entry during a session.
       // Written by intention.js, updated by reflect.js.
       currentActivityEntry: null,
+
+      // ── TEXT-TO-SPEECH ────────────────────────────────────────
+      // Coach card read-aloud feature. User-initiated only.
+      // Rate: 0.75 = slow, 0.9 = normal, 1.2 = fast.
+      // Never autoplays. Persists across sessions.
+      speechRate: 0.9,
 
       // ── CHECK-IN NOTIFICATION ────────────────────────────────
       // Opted-in reminder only. User must explicitly enable.
