@@ -231,6 +231,7 @@ function renderTodaysDashboard(name) {
       ${renderPhaseBanner()}
       ${renderSevereZoneMessage()}
       ${renderModerateZoneMessage()}
+      ${renderGymConditionCard()}
 
       <!-- ── Coach recommendation ───────────────────────────────────────── -->
       <div class="card card-coach">
@@ -332,6 +333,88 @@ function formatExerciseDuration(seconds) {
   const secs = seconds % 60;
   if (secs === 0) return mins === 1 ? "1 min" : `${mins} mins`;
   return `${mins}m ${secs}s`;
+}
+
+/**
+ * Gym condition awareness card.
+ *
+ * Appears on Today view when the user has an active musculoskeletal
+ * condition affecting a gym-relevant zone AND today's pain score for
+ * that zone is 3 or above (mild to severe).
+ *
+ * Design intent: "Behaviour is communication." The card notices and names
+ * what the body is reporting. It does not prohibit — it invites awareness.
+ * Warm, specific, non-alarming. Renders above workout options.
+ *
+ * Gym-relevant zones and their condition IDs:
+ *   lower-limb: knees, hips, ankles, calves, hamstrings, quads
+ *   spine:      lower-back, upper-back, neck
+ *   upper-limb: shoulders, rotator-cuff, elbows, wrists
+ */
+function renderGymConditionCard() {
+  const conditions = store.get("conditions") || [];
+  const painScores = store.get("conditionPainScores") || {};
+
+  // Gym-relevant condition IDs mapped to zone and display name
+  const GYM_CONDITIONS = {
+    "knee-pain":        { zone: "lower-limb", label: "knees",          guidance: "Avoid deep knee flexion and heavy leg press. Box squats and leg extensions at partial range are usually fine. Notice any sharp pain and stop if it arrives." },
+    "hip-pain":         { zone: "lower-limb", label: "hips",           guidance: "Favour unilateral work with controlled range. Hip hinges are often manageable -- monitor how your hip responds in the first set and adjust from there." },
+    "hamstring":        { zone: "lower-limb", label: "hamstrings",      guidance: "Avoid maximal loaded lengthening today. Romanian deadlifts at reduced range and load are an option. Warm up slowly and notice any pulling sensation." },
+    "lower-back":       { zone: "spine",      label: "lower back",      guidance: "Avoid axial loading under fatigue -- heavy squats and deadlifts carry more risk today. Upper body, machine work, and supported positions are safer choices." },
+    "upper-back":       { zone: "spine",      label: "upper back",      guidance: "Rows and pulling movements may aggravate this. Pressing from a supported position is usually fine. Notice any increase in stiffness between sets." },
+    "shoulder-pain":    { zone: "upper-limb", label: "shoulders",       guidance: "Overhead pressing is higher risk today. Horizontal pressing at reduced load and cables in pain-free range are reasonable. Stop if you feel impingement." },
+    "rotator-cuff":     { zone: "upper-limb", label: "rotator cuff",    guidance: "Internal rotation under load is the main thing to watch. Avoid behind-the-neck movements entirely. Cables and light isolation work in supported range are safer." },
+    "elbow-pain":       { zone: "upper-limb", label: "elbows",          guidance: "Gripping under load may aggravate this. Bicep curls and tricep extensions often irritate elbow issues -- lighter load and fewer reps than usual today." },
+    "wrist-pain":       { zone: "upper-limb", label: "wrists",          guidance: "Avoid wrist extension under load. Push-up variations and barbell pressing carry more risk. Dumbbells with neutral grip and machine work are preferable today." },
+    "neck-pain":        { zone: "spine",      label: "neck",            guidance: "Avoid any exercise that requires bracing your neck against resistance. Upper traps, shrugs, and overhead work may aggravate this. Keep your head in a neutral position throughout." }
+  };
+
+  // Find flagged conditions: active + pain score >= 3
+  const flagged = conditions
+    .filter(id => GYM_CONDITIONS[id] && (painScores[id] || 0) >= 3)
+    .map(id => ({ id, ...GYM_CONDITIONS[id], score: painScores[id] || 0 }));
+
+  if (flagged.length === 0) return "";
+
+  // Severity label for the score
+  function severityLabel(score) {
+    if (score >= 7) return "high";
+    if (score >= 4) return "moderate";
+    return "mild";
+  }
+
+  const items = flagged.map(f => `
+    <div class="gym-condition-item">
+      <p class="gym-condition-flag">
+        <strong>${f.label.charAt(0).toUpperCase() + f.label.slice(1)}</strong>
+        is flagged at ${severityLabel(f.score)} today.
+      </p>
+      <p class="gym-condition-guidance text-sm">${f.guidance}</p>
+    </div>
+  `).join("");
+
+  const zoneCount  = new Set(flagged.map(f => f.zone)).size;
+  const headingText = flagged.length === 1
+    ? "One thing to be aware of in your session today"
+    : zoneCount > 1
+      ? "A few things to be aware of across your session today"
+      : "A couple of things to be aware of today";
+
+  return `
+    <div class="card gym-condition-card" role="note" aria-label="Gym session awareness">
+      <div class="card-coach">
+        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <div class="gym-condition-content">
+          <h3>${headingText}</h3>
+          ${items}
+          <p class="gym-condition-footer text-sm text-muted">
+            These are observations, not rules. You know your body.
+            Notice how it responds and adjust as you go.
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 /**
