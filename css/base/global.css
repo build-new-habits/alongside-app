@@ -133,7 +133,25 @@ select {
    ============================================ */
 
 /**
- * .sr-only — Visually hidden, but available to screen readers.
+ * :focus-visible — keyboard and AT focus indicator.
+ *
+ * Uses :focus-visible (not :focus) so the outline only appears for
+ * keyboard navigation, not mouse clicks. This satisfies WCAG 2.2
+ * Success Criterion 2.4.11 (Focus Appearance).
+ *
+ * 3px solid teal with 2px offset gives a clear, brand-consistent
+ * indicator that passes 3:1 contrast against both dark backgrounds.
+ * outline-offset keeps it visually separated from the element border.
+ */
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Remove default outline for mouse users while preserving it for keyboard */
+:focus:not(:focus-visible) {
+  outline: none;
+}
  *
  * Used on #sr-announcer in index.html to announce view changes,
  * and anywhere else content should be read aloud but not displayed.
