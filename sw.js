@@ -9,7 +9,7 @@
  * Old caches are deleted on activate so users always get the latest shell.
  */
 
-const CACHE_NAME = "alongside-v4";
+const CACHE_NAME = "alongside-v5";
 
 const SHELL_URLS = [
   "/alongside-app/",
