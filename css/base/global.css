@@ -324,3 +324,32 @@ select {
 .speech-rate-btn.selected .speech-rate-label {
   color: var(--color-primary);
 }
+
+/* ============================================
+   EXERCISE INSTRUCTIONS CARD — TTS HEADER
+   ============================================ */
+
+/**
+ * Instructions header: heading left, speaker button right.
+ * Uses flex row so the h3 and button sit on the same baseline.
+ * The card already has position:relative from .card styles.
+ */
+.instructions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.instructions-header h3 {
+  margin-bottom: 0;
+}
+
+/**
+ * Override tts-btn positioning for the instructions context.
+ * Here it sits inline in the header row rather than absolute.
+ */
+.instructions-header .tts-btn {
+  position: static;
+  flex-shrink: 0;
+}
