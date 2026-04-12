@@ -1,6 +1,12 @@
 /**
  * settings.js - Settings view
  *
+ * v1.4 — App version display and update check button (S3-6):
+ *   "Check for updates" button added to the reset zone (always visible,
+ *   not inside a tab). Calls window.App.checkForUpdate() which triggers
+ *   a service worker update check. Result shown inline below the button.
+ *   Version string displayed from window.App.version (set in app.js).
+ *
  * v1.3 — Check-in notification (S3-6):
  *   Opted-in reminder added to Profile tab.
  *   Toggle shows time picker only when enabled.
@@ -129,10 +135,28 @@ export function render() {
                 aria-label="Open my gym programme">
           My Gym Programme
         </button>
+
+        <!-- ── App version and update check ─────────────────────────────── -->
+        <div class="settings-update-zone" style="margin-top: var(--space-5);">
+          <div class="settings-version-row">
+            <span class="text-sm text-muted">Version</span>
+            <span class="text-sm text-muted" id="settings-version-label">
+              ${(typeof window !== "undefined" && window.App?.version) ? window.App.version : ""}
+            </span>
+          </div>
+          <button class="btn btn-ghost btn-full" id="check-update-btn"
+                  style="margin-top: var(--space-2);"
+                  aria-label="Check for app updates">
+            Check for updates
+          </button>
+          <p id="update-check-status" class="update-check-status text-sm"
+             aria-live="polite" style="margin-top: var(--space-2); min-height: 1.4em;"></p>
+        </div>
+
         <button class="btn btn-text-link btn-full" id="privacy-btn"
                 onclick="router.navigate('privacy')"
                 aria-label="Read Privacy Policy and Terms of Service"
-                style="margin-top: var(--space-2);">
+                style="margin-top: var(--space-4);">
           Privacy Policy &amp; Terms of Service
         </button>
         <button class="btn btn-danger btn-full" id="reset-app-btn"
@@ -676,6 +700,26 @@ export function onMount() {
   if (notif?.enabled && notif?.permissionGranted) {
     startNotificationScheduler();
   }
+
+  // Check for updates
+  document.getElementById("check-update-btn")?.addEventListener("click", async () => {
+    const btn = document.getElementById("check-update-btn");
+    const statusEl = document.getElementById("update-check-status");
+
+    if (btn) {
+      btn.textContent = "Checking...";
+      btn.disabled    = true;
+    }
+    if (statusEl) statusEl.textContent = "";
+
+    const result = await window.App?.checkForUpdate?.() || "unavailable";
+    window.App?.showUpdateCheckResult?.(result);
+
+    if (btn) {
+      btn.textContent = "Check for updates";
+      btn.disabled    = false;
+    }
+  });
 
   // Reset app
   document.getElementById("reset-app-btn")?.addEventListener("click", () => {
