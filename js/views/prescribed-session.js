@@ -1,0 +1,342 @@
+/**
+ * prescribed-session.js - Prescribed Exercise Session View
+ *
+ * Walks through prescribed exercises one by one, matching the workout
+ * execution pattern. Supports timer-based exercises (hold durations)
+ * using the same timer logic as workout.js.
+ *
+ * Credit award: 35 credits per exercise, capped at 150 total.
+ * On completion: writes to totalCredits, sets lastWorkoutCredits and
+ * lastWorkoutName so the existing workout-complete view can be reused.
+ *
+ * Route: 'prescribed-session'
+ * Nav: hidden (same as workout view)
+ */
+
+import { store } from "../store.js";
+
+export const centered = false;
+
+// ── Credit constants ──────────────────────────────────────────────────────────
+const CREDITS_PER_EXERCISE = 35;
+const CREDITS_MAX          = 150;
+
+// ── Session state ─────────────────────────────────────────────────────────────
+let currentIndex  = 0;
+let timerInterval = null;
+let timeRemaining = 0;
+let timerStarted  = false;
+
+export function render() {
+  const exercises = store.get("prescribedExercises") || [];
+  const active    = exercises.filter(e => !e.completedToday);
+
+  if (active.length === 0) {
+    return renderAlreadyDone();
+  }
+
+  const ex           = active[currentIndex];
+  const isLast       = currentIndex >= active.length - 1;
+  const progress     = (currentIndex / active.length) * 100;
+  const holdSecs     = parseHoldSeconds(ex.reps);
+  const hasTimer     = holdSecs !== null;
+
+  return `
+    <div class="view workout-view">
+
+      <!-- Header -->
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="ps-exit-btn" aria-label="Exit prescribed session">
+          ✕ Exit
+        </button>
+        <div class="workout-progress-info" aria-label="Exercise ${currentIndex + 1} of ${active.length}">
+          <span>${currentIndex + 1} of ${active.length}</span>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="workout-progress-bar" role="progressbar"
+           aria-valuenow="${Math.round(progress)}" aria-valuemin="0" aria-valuemax="100"
+           aria-label="Session progress">
+        <div class="workout-progress-fill" style="width: ${progress}%"></div>
+      </div>
+
+      <!-- Exercise display -->
+      <div class="exercise-display">
+        <div class="exercise-role-badge main" aria-label="Prescribed exercise">
+          🩺 Prescribed
+        </div>
+
+        <h1 class="exercise-name">${ex.name}</h1>
+
+        <div class="exercise-meta">
+          ${ex.sets ? `<span class="meta-tag">${ex.sets} sets</span>` : ""}
+          ${ex.reps ? `<span class="meta-tag">${ex.reps}</span>` : ""}
+          <span class="meta-tag">+${creditsForIndex(currentIndex, active.length)} ⭐</span>
+        </div>
+
+        <!-- Timer (hold-based exercises only) -->
+        ${hasTimer ? `
+          <div class="exercise-target">
+            <div class="timer-display">
+              <div class="timer-circle">
+                <span class="timer-value" id="ps-timer-display">${formatTime(timeRemaining || holdSecs)}</span>
+                <span class="timer-label">${ex.sets > 1 ? "Set 1 of " + ex.sets : "Hold"}</span>
+              </div>
+            </div>
+          </div>
+        ` : ex.reps ? `
+          <div class="exercise-target">
+            <div class="reps-display">
+              <div class="reps-info">
+                <span class="reps-value">${ex.sets || 3} × ${ex.reps}</span>
+                <span class="reps-label">sets × reps</span>
+              </div>
+            </div>
+          </div>
+        ` : ""}
+
+        <!-- Notes -->
+        ${ex.notes ? `
+          <div class="exercise-instructions card">
+            <h3>Notes from your physio</h3>
+            <p>${ex.notes}</p>
+          </div>
+        ` : ""}
+      </div>
+
+      <!-- Actions -->
+      <div class="workout-actions">
+        ${hasTimer ? `
+          <button class="btn btn-large btn-full ${timerStarted ? "btn-secondary" : "btn-accent"}"
+                  id="ps-timer-btn" aria-live="polite">
+            ${!timerStarted ? "▶ Start Timer" : (timerInterval ? "⏸ Pause" : "▶ Resume")}
+          </button>
+        ` : ""}
+
+        <button class="btn btn-primary btn-large btn-full" id="ps-complete-btn">
+          ${isLast ? "🎉 Complete Session" : "Next Exercise →"}
+        </button>
+
+        <button class="btn btn-ghost btn-small" id="ps-skip-btn">
+          Skip this one
+        </button>
+      </div>
+
+    </div>
+  `;
+}
+
+function renderAlreadyDone() {
+  return `
+    <div class="view">
+      <div class="card card-coach" style="margin-top: var(--space-8);">
+        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <div>
+          <h2>All done!</h2>
+          <p>You have already completed all your prescribed exercises today. See you tomorrow.</p>
+          <button class="btn btn-primary" id="ps-back-btn" style="margin-top: var(--space-4);">
+            Back to choices
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/**
+ * Parse a hold time in seconds from a reps/hold string.
+ * Returns null if the string describes reps rather than a hold.
+ * Examples:
+ *   "30s"    → 30
+ *   "45 sec" → 45
+ *   "2 min"  → 120
+ *   "10"     → null  (assume reps)
+ *   "10 reps"→ null
+ */
+function parseHoldSeconds(str) {
+  if (!str) return null;
+  const lower = str.toLowerCase().trim();
+
+  // Match patterns like "30s", "30 sec", "30 seconds"
+  const secMatch = lower.match(/^(\d+)\s*s(?:ec(?:onds?)?)?$/);
+  if (secMatch) return parseInt(secMatch[1]);
+
+  // Match "2 min", "2 minutes"
+  const minMatch = lower.match(/^(\d+)\s*min(?:utes?)?$/);
+  if (minMatch) return parseInt(minMatch[1]) * 60;
+
+  return null;
+}
+
+/**
+ * Credits for completing an exercise at this index.
+ * Total for the session: min(count × 35, 150).
+ * Split as evenly as possible across exercises.
+ */
+function creditsForIndex(index, total) {
+  const sessionTotal = Math.min(total * CREDITS_PER_EXERCISE, CREDITS_MAX);
+  const base         = Math.floor(sessionTotal / total);
+  const remainder    = sessionTotal - (base * total);
+  // Give the remainder to the last exercise
+  return index === total - 1 ? base + remainder : base;
+}
+
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
+
+// ── Mount ─────────────────────────────────────────────────────────────────────
+
+export function onMount() {
+  const exercises = store.get("prescribedExercises") || [];
+  const active    = exercises.filter(e => !e.completedToday);
+
+  // Already-done state
+  document.getElementById("ps-back-btn")?.addEventListener("click", () => {
+    router.navigate("intention");
+  });
+
+  if (active.length === 0) return;
+
+  const ex       = active[currentIndex];
+  const holdSecs = parseHoldSeconds(ex.reps);
+
+  // Initialise timer display
+  if (holdSecs) {
+    timeRemaining = timeRemaining || holdSecs;
+    updateTimerDisplay();
+  }
+
+  // Exit
+  document.getElementById("ps-exit-btn")?.addEventListener("click", () => {
+    if (confirm("Exit session? Progress on this session will be lost.")) {
+      cleanupSession();
+      router.navigate("intention");
+    }
+  });
+
+  // Timer toggle
+  document.getElementById("ps-timer-btn")?.addEventListener("click", () => {
+    if (!timerStarted) {
+      timerStarted = true;
+      startTimer();
+    } else if (timerInterval) {
+      pauseTimer();
+    } else {
+      startTimer();
+    }
+    router.navigate("prescribed-session");
+  });
+
+  // Complete exercise
+  document.getElementById("ps-complete-btn")?.addEventListener("click", () => {
+    completeExercise(active);
+  });
+
+  // Skip
+  document.getElementById("ps-skip-btn")?.addEventListener("click", () => {
+    advanceSession(active);
+  });
+}
+
+// ── Timer ─────────────────────────────────────────────────────────────────────
+
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (timeRemaining > 0) {
+      timeRemaining--;
+      updateTimerDisplay();
+    } else {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById("ps-timer-display");
+  if (el) el.textContent = formatTime(timeRemaining);
+}
+
+function resetTimer() {
+  pauseTimer();
+  timeRemaining = 0;
+  timerStarted  = false;
+}
+
+// ── Exercise flow ─────────────────────────────────────────────────────────────
+
+function completeExercise(active) {
+  const ex      = active[currentIndex];
+  const credits = creditsForIndex(currentIndex, active.length);
+
+  // Mark this exercise as completed in the store
+  const all = store.get("prescribedExercises") || [];
+  const globalIndex = all.findIndex(e => e.id === ex.id);
+  if (globalIndex !== -1) {
+    all[globalIndex] = {
+      ...all[globalIndex],
+      completedToday: true,
+      completedAt:    new Date().toISOString()
+    };
+    store.set("prescribedExercises", all);
+  }
+
+  // Accumulate credits in session progress
+  const progress = store.get("prescribedSessionProgress") || [];
+  progress.push({ exerciseId: ex.id, credits });
+  store.set("prescribedSessionProgress", progress);
+
+  advanceSession(active);
+}
+
+function advanceSession(active) {
+  if (currentIndex >= active.length - 1) {
+    completeSession(active);
+  } else {
+    currentIndex++;
+    resetTimer();
+    router.navigate("prescribed-session");
+  }
+}
+
+function completeSession(active) {
+  const progress     = store.get("prescribedSessionProgress") || [];
+  const creditsEarned = Math.min(
+    progress.reduce((sum, e) => sum + (e.credits || 0), 0),
+    CREDITS_MAX
+  );
+
+  // Award credits
+  const total = (store.get("totalCredits") || 0) + creditsEarned;
+  store.set("totalCredits", total);
+
+  // Set up completion screen
+  store.set("lastWorkoutCredits", creditsEarned);
+  store.set("lastWorkoutName",    "Prescribed Session");
+
+  cleanupSession();
+  router.navigate("workout-complete");
+}
+
+function cleanupSession() {
+  pauseTimer();
+  currentIndex  = 0;
+  timeRemaining = 0;
+  timerStarted  = false;
+  store.set("prescribedSessionProgress", null);
+}
