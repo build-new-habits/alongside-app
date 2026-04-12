@@ -73,15 +73,22 @@ export function render() {
         </a>
 
         <!-- Instructions -->
-        <div class="exercise-instructions card">
-          <h3>How to do it</h3>
+        <div class="exercise-instructions card" id="exercise-instructions-card">
+          <div class="instructions-header">
+            <h3>How to do it</h3>
+            <button class="tts-btn" id="instructions-tts-btn"
+                    aria-label="Listen to instructions"
+                    type="button">
+              <span class="tts-icon" aria-hidden="true">&#128266;</span>
+            </button>
+          </div>
           <ol class="instruction-list">
             ${exercise.instructions.map(inst => `<li>${inst}</li>`).join('')}
           </ol>
 
           ${exercise.coaching ? `
             <div class="coaching-tip">
-              <span class="tip-icon" aria-hidden="true">💡</span>
+              <span class="tip-icon" aria-hidden="true">&#128161;</span>
               <p>${exercise.coaching}</p>
             </div>
           ` : ''}
@@ -223,6 +230,34 @@ export function onMount() {
   // Skip exercise
   document.getElementById('skip-exercise-btn')?.addEventListener('click', () => {
     skipExercise();
+  });
+
+  // Instructions TTS button
+  // Reads the exercise instructions and coaching tip aloud.
+  // Uses window.tts if available (mounted by router after navigation).
+  // Falls back to direct speechSynthesis if tts module not yet available.
+  document.getElementById('instructions-tts-btn')?.addEventListener('click', () => {
+    const btn = document.getElementById('instructions-tts-btn');
+    const card = document.getElementById('exercise-instructions-card');
+    if (!card) return;
+
+    // Build text: numbered instructions + coaching tip if present
+    const steps = exercise.instructions
+      .map((inst, i) => (i + 1) + ". " + inst)
+      .join(". ");
+    const tip = exercise.coaching ? " Coaching tip: " + exercise.coaching : "";
+    const fullText = steps + tip;
+
+    if (window.tts) {
+      // Use tts module so rate setting is respected and state is managed
+      window.tts.speak(fullText, btn);
+    } else if ("speechSynthesis" in window) {
+      // Direct fallback
+      window.speechSynthesis.cancel();
+      const utt = new SpeechSynthesisUtterance(fullText);
+      utt.rate = (typeof store !== "undefined" ? store.get("speechRate") : null) || 0.9;
+      window.speechSynthesis.speak(utt);
+    }
   });
 }
 
