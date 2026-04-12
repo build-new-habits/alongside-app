@@ -223,6 +223,10 @@ function renderProfileTab() {
         `).join("")}
       </div>
 
+      <!-- Coach voice speed -->
+      <h2 class="section-heading" style="margin-top: var(--space-6);">Coach voice speed</h2>
+      ${renderSpeechRateSection()}
+
       <!-- Check-in reminder -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Check-in reminder</h2>
       ${renderNotificationSection()}
@@ -301,6 +305,47 @@ function renderEquipmentTab() {
       }).join("")}
 
     </section>
+  `;
+}
+
+// ── Speech rate section ───────────────────────────────────────────────────────
+
+/**
+ * Render speed selector for coach card text-to-speech.
+ * Three options: Slow / Normal / Fast.
+ * Selection writes to store immediately. Takes effect on next tap of
+ * a speaker button — no page reload needed.
+ */
+function renderSpeechRateSection() {
+  const currentRate = store.get("speechRate") || 0.9;
+
+  const rates = [
+    { value: 0.75, label: "Slow",   description: "More time to process" },
+    { value: 0.9,  label: "Normal", description: "Default" },
+    { value: 1.2,  label: "Fast",   description: "Quick and efficient" }
+  ];
+
+  return `
+    <div class="card speech-rate-card">
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
+        Sets the speed of the read-aloud feature on coach cards.
+        Tap the speaker icon on any coach message to listen.
+      </p>
+      <div class="speech-rate-grid" role="radiogroup" aria-label="Coach voice speed">
+        ${rates.map(r => `
+          <button
+            class="speech-rate-btn ${currentRate === r.value ? "selected" : ""}"
+            role="radio"
+            aria-checked="${currentRate === r.value}"
+            data-rate="${r.value}"
+            aria-label="${r.label}: ${r.description}"
+          >
+            <span class="speech-rate-label">${r.label}</span>
+            <span class="speech-rate-desc">${r.description}</span>
+          </button>
+        `).join("")}
+      </div>
+    </div>
   `;
 }
 
@@ -448,6 +493,20 @@ function wirePanel() {
         const isSelected = c.dataset.style === style;
         c.classList.toggle("selected", isSelected);
         c.setAttribute("aria-checked", isSelected);
+      });
+    });
+  });
+
+  // Speech rate buttons
+  document.querySelectorAll(".speech-rate-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const rate = parseFloat(btn.dataset.rate);
+      if (isNaN(rate)) return;
+      store.set("speechRate", rate);
+      document.querySelectorAll(".speech-rate-btn").forEach(b => {
+        const isSelected = parseFloat(b.dataset.rate) === rate;
+        b.classList.toggle("selected", isSelected);
+        b.setAttribute("aria-checked", isSelected);
       });
     });
   });
