@@ -10,6 +10,7 @@
  */
 
 import { store } from './store.js';
+import { tts }   from './tts.js';
 
 // Human-readable names announced to screen readers on navigation.
 // Keys match the viewName strings passed to router.navigate().
@@ -116,11 +117,16 @@ export const router = {
     this.currentView = viewName;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    // Stop any playing speech when navigating away
+    tts.stop();
+
     // ── Accessibility ──────────────────────────────────────────────────────
-    // Announce the new view name to screen readers, then move focus to the
-    // top of the content area so keyboard/AT users start at the right place.
     this.announceNavigation(viewName);
     this.moveFocusToContent();
+
+    // Mount TTS speaker buttons on coach cards in the new view
+    // Small delay to ensure the view has fully rendered
+    setTimeout(() => tts.mountButtons(), 150);
     // ──────────────────────────────────────────────────────────────────────
   },
 
