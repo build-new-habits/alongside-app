@@ -52,7 +52,7 @@ export const router = {
     this.hideLoading();
 
     if (store.isOnboardingComplete()) {
-      this.navigate('today');
+      this.navigate('intention');
     } else {
       this.navigate('onboarding/welcome');
     }
@@ -227,11 +227,16 @@ export const router = {
   },
 
   /**
-   * Highlight the active nav item
+   * Highlight the active nav item.
+   * 'intention' is the home screen — it maps to the Today nav button
+   * (data-view="intention"). 'today' (coach workout view) also highlights
+   * the Today button since it is a sub-path of the Today journey.
    */
   setActiveNav(viewName) {
+    // Treat coach workout view as part of the Today/intention journey
+    const navKey = viewName === 'today' ? 'intention' : viewName;
     document.querySelectorAll('.nav-item').forEach(item => {
-      item.classList.toggle('active', item.dataset.view === viewName);
+      item.classList.toggle('active', item.dataset.view === navKey);
     });
   }
 };
