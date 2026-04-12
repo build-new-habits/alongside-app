@@ -194,3 +194,7 @@ export const tts = {
     setTimeout(() => { el.textContent = message; }, 50);
   }
 };
+
+// Make tts available globally so workout.js and other views can access it
+// without needing to import the module directly.
+window.tts = tts;
