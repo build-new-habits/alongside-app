@@ -1,4 +1,4 @@
-=/**
+/**
  * sw.js - Alongside Service Worker
  *
  * Strategy: Cache-first for the app shell (HTML, CSS, JS, fonts, icons).
@@ -9,7 +9,7 @@
  * Old caches are deleted on activate so users always get the latest shell.
  */
 
-const CACHE_NAME = "alongside-v12";
+const CACHE_NAME = "alongside-v13";
 
 const SHELL_URLS = [
   "/alongside-app/",
