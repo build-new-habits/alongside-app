@@ -9,8 +9,9 @@
  *     so screen reader users land at the top of the new view
  */
 
-import { store } from './store.js';
-import { tts }   from './tts.js';
+import { store }       from './store.js';
+import { tts }         from './tts.js';
+import { checkinData } from './data/checkin.js';
 
 // Human-readable names announced to screen readers on navigation.
 // Keys match the viewName strings passed to router.navigate().
@@ -53,7 +54,14 @@ export const router = {
     this.hideLoading();
 
     if (store.isOnboardingComplete()) {
-      this.navigate('intention');
+      // If the user has not checked in today, take them straight to check-in.
+      // After submitting, checkin.js navigates to intention (the choice screen).
+      // This ensures mood and energy are captured before any activity is chosen.
+      if (!checkinData.hasCheckedInToday()) {
+        this.navigate('checkin');
+      } else {
+        this.navigate('intention');
+      }
     } else {
       this.navigate('onboarding/welcome');
     }
