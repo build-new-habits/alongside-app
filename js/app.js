@@ -97,10 +97,25 @@ async function registerServiceWorker() {
 async function checkForUpdate() {
   if (!("serviceWorker" in navigator)) return "unavailable";
 
-  const reg = _swRegistration || await navigator.serviceWorker.getRegistration("/alongside-app/");
-  if (!reg) return "unavailable";
-
   try {
+    // Use the stored registration first.
+    // Fall back to getRegistration() with no argument — matches the current page scope.
+    // Do NOT use a hardcoded path like "/alongside-app/" — this fails on installed PWA
+    // on mobile where the scope resolution differs from desktop browser context.
+    let reg = _swRegistration;
+
+    if (!reg) {
+      reg = await navigator.serviceWorker.getRegistration();
+    }
+
+    if (!reg) {
+      // Last resort: grab any registration for this origin
+      const regs = await navigator.serviceWorker.getRegistrations();
+      reg = regs?.[0] || null;
+    }
+
+    if (!reg) return "unavailable";
+
     await reg.update();
 
     // After update(), if a new SW is waiting, show the banner
@@ -205,7 +220,7 @@ function showUpdateCheckResult(result) {
   const messages = {
     updated:     "A new version is ready. Tap \"Update now\" in the banner above.",
     current:     "You are on the latest version.",
-    unavailable: "Could not check for updates. Make sure you are connected to the internet."
+    unavailable: "Could not check for updates. Try closing and reopening the app, then check again."
   };
 
   statusEl.textContent = messages[result] || "";
