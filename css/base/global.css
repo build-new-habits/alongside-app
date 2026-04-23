@@ -353,3 +353,88 @@ select {
   position: static;
   flex-shrink: 0;
 }
+
+/* ============================================
+   GYM PROGRAMME — CARDIO BLOCK
+   ============================================ */
+
+.gym-cardio-card {
+  margin-bottom: var(--space-4);
+}
+
+.gym-cardio-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.gym-cardio-target {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  background: var(--color-primary-glow);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+}
+
+.gym-cardio-previous {
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.gym-cardio-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.gym-difficulty-chips {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.gym-difficulty-chip {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-2) var(--space-2);
+  font-size: var(--text-sm);
+  min-height: 44px;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.gym-difficulty-chip.selected,
+.gym-difficulty-chip[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
+
+/* ============================================
+   GYM PROGRAMME — WEEK PROGRESSION
+   ============================================ */
+
+.gym-week-prompt {
+  border: 2px solid var(--color-primary);
+  margin-bottom: var(--space-4);
+}
+
+/* ============================================
+   GYM PROGRAMME — ADAPTATION CHOICE
+   ============================================ */
+
+.gym-adaptation-card {
+  border: 1.5px solid var(--color-warning);
+  margin-bottom: var(--space-4);
+}
