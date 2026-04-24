@@ -116,6 +116,14 @@ export function render() {
           id="tab-equipment"
           data-tab="equipment"
         >Equipment</button>
+        <button
+          class="settings-tab ${activeTab === "library" ? "active" : ""}"
+          role="tab"
+          aria-selected="${activeTab === "library"}"
+          aria-controls="settings-tab-panel"
+          id="tab-library"
+          data-tab="library"
+        >Library</button>
       </div>
 
       <!-- ── Tab panel ────────────────────────────────────────────────────── -->
@@ -175,6 +183,7 @@ function renderActiveTab() {
   if (activeTab === "profile")    return renderProfileTab();
   if (activeTab === "conditions") return renderConditionsTab();
   if (activeTab === "equipment")  return renderEquipmentTab();
+  if (activeTab === "library")    return renderLibraryTab();
   return "";
 }
 
@@ -303,6 +312,122 @@ function renderEquipmentTab() {
           </div>
         `;
       }).join("")}
+
+    </section>
+  `;
+}
+
+// ── Library tab ───────────────────────────────────────────────────────────────
+
+/**
+ * The Library tab is the activity menu for users who want direct access
+ * to any session type without going through the coach proposal.
+ *
+ * Three sections:
+ *   Guided Sessions   — Tier 1, coach-led content. Tap to go straight in.
+ *   Programmes        — Multi-session structured plans.
+ *   Log an Activity   — Tier 2, universal logging. Tap to open activity-log.
+ */
+function renderLibraryTab() {
+  const GUIDED = [
+    { label: "Breathing practice",   icon: "\uD83C\uDF2C", target: "quiet-session",  quietMode: "breathing", available: true  },
+    { label: "Journaling",           icon: "\uD83D\uDCDD", target: "quiet-session",  quietMode: "journal",   available: true  },
+    { label: "Mindful movement",     icon: "\uD83C\uDF3F", target: "quiet-session",  quietMode: "mindful",   available: true  },
+    { label: "Rest day",             icon: "\uD83D\uDECC", target: "quiet-session",  quietMode: "rest",      available: true  },
+    { label: "Yoga / Pilates",       icon: "\uD83E\uDDD8", target: "yoga-session",   quietMode: null,        available: false, comingSoon: true },
+    { label: "Core session",         icon: "\uD83D\uDCAA", target: "core-session",   quietMode: null,        available: false, comingSoon: true },
+    { label: "Home workout",         icon: "\uD83C\uDFE0", target: "home-workout",   quietMode: null,        available: false, comingSoon: true },
+    { label: "Running session",      icon: "\uD83C\uDFC3", target: "running-session",quietMode: null,        available: false, comingSoon: true },
+    { label: "Walk / Couch to 5K",  icon: "\uD83D\uDEB6", target: "walk-programme", quietMode: null,        available: false, comingSoon: true },
+  ];
+
+  const PROGRAMMES = [
+    { label: "My gym programme",       icon: "\uD83C\uDFCB", target: "gym-programme", available: true  },
+    { label: "My prescribed exercises",icon: "\uD83E\uDE7A", target: "prescribed",     available: true  },
+  ];
+
+  const LOG_ACTIVITIES = [
+    { group: "Cardio",        items: [
+      { label: "Run",             icon: "\uD83C\uDFC3", id: "run"    },
+      { label: "Walk",            icon: "\uD83D\uDEB6", id: "walk"   },
+      { label: "Cycle",           icon: "\uD83D\uDEB4", id: "cycle"  },
+      { label: "Swim",            icon: "\uD83C\uDFCA", id: "swim"   },
+      { label: "Row",             icon: "\uD83D\uDEA3", id: "row"    },
+    ]},
+    { group: "Classes",       items: [
+      { label: "Body Balance",    icon: "\uD83E\uDDD8", id: "body-balance" },
+      { label: "Spin / cycle",    icon: "\uD83D\uDEB4", id: "spin"         },
+      { label: "Boxing",          icon: "\uD83E\uDD4A", id: "boxing"       },
+      { label: "HIIT / circuits", icon: "\uD83D\uDD25", id: "hiit"         },
+      { label: "Body Combat",     icon: "\uD83E\uDD4A", id: "body-combat"  },
+      { label: "Other class",     icon: "\uD83C\uDFE5", id: "class"        },
+    ]},
+    { group: "Sport",         items: [
+      { label: "Tennis",          icon: "\uD83C\uDFBE", id: "tennis"   },
+      { label: "Football",        icon: "\u26BD",       id: "football" },
+      { label: "Golf",            icon: "\u26F3",       id: "golf"     },
+      { label: "Other sport",     icon: "\uD83C\uDFC6", id: "sport"    },
+    ]},
+    { group: "Outdoor",       items: [
+      { label: "Hike",            icon: "\u26F0",       id: "hike"           },
+      { label: "Outdoor cycle",   icon: "\uD83D\uDEB4", id: "outdoor-cycle"  },
+      { label: "Other outdoor",   icon: "\uD83C\uDF32", id: "outdoor"        },
+    ]},
+  ];
+
+  return `
+    <section class="settings-section library-section" aria-label="Library">
+
+      <!-- Guided Sessions -->
+      <h2 class="section-heading">Guided Sessions</h2>
+      <p class="text-sm text-muted" style="margin-bottom:var(--space-4);">
+        The coach leads. Tap any session to go straight in.
+      </p>
+      <div class="library-grid">
+        ${GUIDED.map(item => `
+          <button class="library-card ${!item.available ? "library-card--soon" : ""}"
+                  ${item.available ? `data-target="${item.target}" data-quiet="${item.quietMode || ""}"` : ""}
+                  aria-label="${item.label}${item.comingSoon ? " — coming soon" : ""}"
+                  ${!item.available ? "disabled aria-disabled=\"true\"" : ""}>
+            <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
+            <span class="library-card-label">${item.label}</span>
+            ${item.comingSoon ? `<span class="library-soon-badge">Soon</span>` : ""}
+          </button>
+        `).join("")}
+      </div>
+
+      <!-- Programmes -->
+      <h2 class="section-heading" style="margin-top:var(--space-6);">Programmes</h2>
+      <div class="library-grid">
+        ${PROGRAMMES.map(item => `
+          <button class="library-card"
+                  data-target="${item.target}"
+                  aria-label="${item.label}">
+            <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
+            <span class="library-card-label">${item.label}</span>
+          </button>
+        `).join("")}
+      </div>
+
+      <!-- Log an Activity -->
+      <h2 class="section-heading" style="margin-top:var(--space-6);">Log an Activity</h2>
+      <p class="text-sm text-muted" style="margin-bottom:var(--space-4);">
+        You know what you are doing. Log it and the coach will reflect on it with you.
+      </p>
+      ${LOG_ACTIVITIES.map(group => `
+        <h3 class="library-group-heading">${group.group}</h3>
+        <div class="library-grid library-grid--compact">
+          ${group.items.map(item => `
+            <button class="library-card library-card--compact"
+                    data-target="activity-log"
+                    data-activity="${item.id}"
+                    aria-label="Log ${item.label}">
+              <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
+              <span class="library-card-label">${item.label}</span>
+            </button>
+          `).join("")}
+        </div>
+      `).join("")}
 
     </section>
   `;
@@ -494,6 +619,18 @@ function wirePanel() {
         c.classList.toggle("selected", isSelected);
         c.setAttribute("aria-checked", isSelected);
       });
+    });
+  });
+
+  // Library cards
+  document.querySelectorAll(".library-card[data-target]").forEach(card => {
+    card.addEventListener("click", () => {
+      const target    = card.dataset.target;
+      const quietMode = card.dataset.quiet || null;
+      const activity  = card.dataset.activity || null;
+      if (quietMode)  store.set("quietMode", quietMode);
+      if (activity)   store.set("logActivityType", activity);
+      router.navigate(target);
     });
   });
 
@@ -743,6 +880,13 @@ function startNotificationScheduler() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // If navigated here with a specific tab request (e.g. from coach proposal Library button)
+  const requestedTab = store.get("settingsTab");
+  if (requestedTab && requestedTab !== activeTab) {
+    store.set("settingsTab", null);
+    activeTab = requestedTab;
+  }
+
   // Tab switching
   document.querySelectorAll(".settings-tab").forEach(tab => {
     tab.addEventListener("click", () => {
