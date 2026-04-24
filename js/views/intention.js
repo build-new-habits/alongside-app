@@ -116,16 +116,6 @@ export function render() {
           </div>
         </button>
 
-        <button class="intention-path ${selectedPath === "prescribed" ? "selected" : ""}"
-                data-path="prescribed"
-                aria-pressed="${selectedPath === "prescribed"}">
-          <span class="intention-path-icon" aria-hidden="true">\uD83E\uDE7A</span>
-          <div class="intention-path-text">
-            <span class="intention-path-label">My prescribed exercises</span>
-            <span class="intention-path-sub">From your physio or consultant</span>
-          </div>
-        </button>
-
       </div>
 
       <!-- Path B: activity type selector -->
@@ -190,16 +180,14 @@ export function render() {
 }
 
 function canContinue() {
-  if (selectedPath === "coach")      return true;
-  if (selectedPath === "prescribed") return true;
+  if (selectedPath === "coach") return true;
   if (selectedPath === "self"  && selectedActivity) return true;
   if (selectedPath === "quiet" && selectedQuiet)    return true;
   return false;
 }
 
 function getContinueLabel() {
-  if (selectedPath === "coach")      return "See what you suggest";
-  if (selectedPath === "prescribed") return "Go to my prescribed exercises";
+  if (selectedPath === "coach") return "See what you suggest";
   if (selectedPath === "self") {
     const act = ACTIVITIES.find(a => a.id === selectedActivity);
     return "Let's go \u2014 " + (act?.label || "activity");
@@ -220,15 +208,12 @@ function logAndNavigate() {
   const entry = {
     id:            new Date().toISOString() + "_" + Math.random().toString(36).slice(2, 6),
     date:          new Date().toISOString().split("T")[0],
-    type:          selectedPath === "coach"      ? "coach-session" :
-                   selectedPath === "prescribed" ? "prescribed-session" :
-                   selectedPath === "quiet"      ? selectedQuiet :
+    type:          selectedPath === "coach" ? "coach-session" :
+                   selectedPath === "quiet" ? selectedQuiet :
                    selectedActivity,
     name:          activityName.trim() || null,
     energyBefore:  checkin.energy || null,
-    source:        selectedPath === "coach"      ? "coach-recommended" :
-                   selectedPath === "prescribed" ? "prescribed" :
-                   "self-directed",
+    source:        selectedPath === "coach" ? "coach-recommended" : "self-directed",
     sessionStart:  new Date().toISOString(),
   };
   store.set("activityLog", [...log, entry]);
@@ -237,10 +222,6 @@ function logAndNavigate() {
   // Navigate
   if (selectedPath === "coach") {
     router.navigate("today");
-    return;
-  }
-  if (selectedPath === "prescribed") {
-    router.navigate("prescribed");
     return;
   }
   if (selectedPath === "self") {
@@ -254,11 +235,10 @@ function logAndNavigate() {
     return;
   }
   if (selectedPath === "quiet") {
-    if (selectedQuiet === "journal" || selectedQuiet === "rest" || selectedQuiet === "breathing") {
-      router.navigate("reflect");
-      return;
-    }
-    router.navigate("reflect");
+    // Store the mode so quiet-session.js knows which experience to render
+    store.set("quietMode", selectedQuiet || "breathing");
+    router.navigate("quiet-session");
+    return;
   }
 }
 
