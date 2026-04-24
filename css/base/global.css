@@ -438,3 +438,269 @@ select {
   border: 1.5px solid var(--color-warning);
   margin-bottom: var(--space-4);
 }
+
+/* ============================================
+   QUIET SESSION — SHARED
+   ============================================ */
+
+.quiet-session-view {
+  padding-bottom: var(--space-8);
+}
+
+.quiet-session-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.quiet-session-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.quiet-coach-card {
+  margin-bottom: var(--space-4);
+}
+
+.quiet-progress-bar {
+  height: 4px;
+  background: var(--color-bg);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.quiet-progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+}
+
+.quiet-difficulty-chips,
+.quiet-breathing-list { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.quiet-difficulty-chips { flex-direction: row; flex-wrap: wrap; }
+
+.quiet-difficulty-chip {
+  flex: 1; min-width: 0;
+  padding: var(--space-2);
+  font-size: var(--text-sm);
+  min-height: 44px;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.quiet-difficulty-chip.selected,
+.quiet-difficulty-chip[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
+
+.quiet-complete-actions { margin-top: var(--space-5); }
+
+.quiet-difficulty-card { margin-top: var(--space-4); }
+
+/* ============================================
+   QUIET SESSION — BREATHING
+   ============================================ */
+
+.quiet-breathing-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.quiet-breathing-card:hover,
+.quiet-breathing-card:focus-visible {
+  border-color: var(--color-primary);
+}
+
+.quiet-breathing-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.quiet-breathing-icon { font-size: 1.8rem; }
+
+.quiet-breathing-why {
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* Timer */
+.quiet-breathing-session { text-align: center; }
+
+.quiet-round-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.quiet-round-progress .quiet-progress-bar { flex: 1; }
+
+.quiet-timer-wrap {
+  display: flex;
+  justify-content: center;
+  margin: var(--space-4) 0;
+}
+
+.quiet-timer-circle {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 6px solid var(--phase-colour, var(--color-primary));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.4s ease;
+  background: var(--color-bg-card);
+  box-shadow: 0 0 32px rgba(45, 212, 191, 0.12);
+}
+
+.quiet-timer-phase {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-1);
+}
+
+.quiet-timer-seconds {
+  font-size: 3.5rem;
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.quiet-phase-dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.quiet-phase-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background 0.3s ease;
+}
+
+.quiet-phase-dot.active {
+  background: var(--dot-colour, var(--color-primary));
+  transform: scale(1.3);
+}
+
+/* ============================================
+   QUIET SESSION — JOURNAL
+   ============================================ */
+
+.quiet-journal-card { margin-top: var(--space-4); }
+
+.quiet-journal-prompt {
+  font-size: var(--text-base);
+  font-style: italic;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+  line-height: var(--leading-relaxed);
+}
+
+.quiet-journal-textarea {
+  width: 100%;
+  min-height: 120px;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  padding: var(--space-3);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.quiet-journal-textarea:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+}
+
+/* ============================================
+   QUIET SESSION — MINDFUL
+   ============================================ */
+
+.quiet-duration-selector {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.quiet-duration-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4) var(--space-2);
+  min-height: 80px;
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.quiet-duration-btn.selected,
+.quiet-duration-btn[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.quiet-duration-mins {
+  font-size: 2rem;
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.quiet-duration-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+.quiet-duration-btn.selected .quiet-duration-mins,
+.quiet-duration-btn[aria-pressed="true"] .quiet-duration-mins {
+  color: var(--color-primary);
+}
+
+.quiet-mindful-timer {
+  text-align: center;
+  margin: var(--space-6) 0 var(--space-4);
+}
+
+.quiet-mindful-clock {
+  font-size: 4rem;
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
