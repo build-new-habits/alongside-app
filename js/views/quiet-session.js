@@ -1,0 +1,805 @@
+/**
+ * quiet-session.js - Something Quieter View
+ *
+ * v1.0 (S4-1, April 2026)
+ *
+ * Three modes, selected by quietMode in store before navigation:
+ *   "breathing"  — 5 structured breathing exercises with visual phase timers
+ *   "journal"    — coach-selected prompts based on check-in, free text, stored privately
+ *   "mindful"    — 5/10/15 min guided mindful movement from mindfulness exercise database
+ *   "rest"       — single warm coach acknowledgement, no activity required
+ *
+ * Route: quiet-session
+ * Nav: hidden (session view)
+ *
+ * Credits: 20 per breathing or mindful exercise completed. Journaling: 15. Rest: 10.
+ */
+
+import { store } from "../store.js";
+
+export const centered = false;
+
+// ── Breathing exercises ───────────────────────────────────────────────────────
+
+const BREATHING_EXERCISES = [
+  {
+    id: "box",
+    name: "Box Breathing",
+    icon: "\uD83D\uDFE6",
+    coachIntro: "Box breathing is used by military, surgeons, and athletes to bring the nervous system back into balance quickly. It works by equalising the four phases of breath, which activates the parasympathetic system and quiets the stress response. Four seconds each way.",
+    why: "Four equal sides of four seconds each. In, hold, out, hold. The symmetry itself is the mechanism.",
+    phases: [
+      { label: "Breathe in", seconds: 4, colour: "var(--color-primary)" },
+      { label: "Hold", seconds: 4, colour: "var(--color-warning)" },
+      { label: "Breathe out", seconds: 4, colour: "var(--color-text-secondary)" },
+      { label: "Hold", seconds: 4, colour: "var(--color-warning)" }
+    ],
+    rounds: 6,
+    credits: 20
+  },
+  {
+    id: "478",
+    name: "4-7-8 Breathing",
+    icon: "\uD83C\uDF19",
+    coachIntro: "The 4-7-8 technique was developed by Dr Andrew Weil as a portable tool for anxiety and sleep. The extended hold and long exhale activate the vagus nerve and drop your heart rate measurably within a few cycles. It feels unusual at first. Stick with it.",
+    why: "The 7-second hold and 8-second exhale are longer than comfort usually allows. That discomfort is where the benefit lives.",
+    phases: [
+      { label: "Breathe in", seconds: 4, colour: "var(--color-primary)" },
+      { label: "Hold", seconds: 7, colour: "var(--color-warning)" },
+      { label: "Breathe out", seconds: 8, colour: "var(--color-text-secondary)" }
+    ],
+    rounds: 4,
+    credits: 20
+  },
+  {
+    id: "sigh",
+    name: "Physiological Sigh",
+    icon: "\uD83D\uDCA8",
+    coachIntro: "The physiological sigh is the fastest known method to reduce acute stress. Stanford neuroscientist Andrew Huberman has documented this. It is what your body does automatically when it is overwhelmed. Two inhales through the nose, followed by a long slow exhale through the mouth. One to three cycles is enough.",
+    why: "The double inhale fully inflates the lungs and deflates the air sacs. The long exhale dumps CO2, the signal your nervous system reads as stress. One breath can shift your state.",
+    phases: [
+      { label: "First inhale (nose)", seconds: 2, colour: "var(--color-primary)" },
+      { label: "Second inhale (nose)", seconds: 1, colour: "var(--color-primary)" },
+      { label: "Long exhale (mouth)", seconds: 8, colour: "var(--color-text-secondary)" }
+    ],
+    rounds: 5,
+    credits: 20
+  },
+  {
+    id: "resonance",
+    name: "Resonance Breathing",
+    icon: "\uD83C\uDF00",
+    coachIntro: "Resonance breathing sits at 5.5 breaths per minute, which is the rate that maximises heart rate variability in most people. HRV is one of the strongest markers of nervous system health and recovery. This rate also appears in ancient practices across traditions without those traditions knowing the mechanism. Six breaths per minute is close enough. Breathe in for five and a half seconds, out for five and a half.",
+    why: "This is the frequency at which your cardiovascular, respiratory, and nervous systems synchronise. Ten minutes here creates measurable recovery effects.",
+    phases: [
+      { label: "Breathe in", seconds: 5, colour: "var(--color-primary)" },
+      { label: "Breathe out", seconds: 6, colour: "var(--color-text-secondary)" }
+    ],
+    rounds: 10,
+    credits: 20
+  },
+  {
+    id: "extended-exhale",
+    name: "Extended Exhale",
+    icon: "\uD83C\uDF43",
+    coachIntro: "The simplest and most accessible of all breathing techniques. The exhale is the braking system of the nervous system. Inhale activates. Exhale calms. Double the exhale, you double the calming signal. No special training needed. You can do this in a meeting, on a bus, or before a difficult conversation.",
+    why: "Inhale for four, exhale for eight. The ratio matters more than the exact numbers. Just make the out breath longer than the in breath.",
+    phases: [
+      { label: "Breathe in", seconds: 4, colour: "var(--color-primary)" },
+      { label: "Breathe out slowly", seconds: 8, colour: "var(--color-text-secondary)" }
+    ],
+    rounds: 8,
+    credits: 20
+  }
+];
+
+// ── Journaling prompts ────────────────────────────────────────────────────────
+
+const JOURNAL_PROMPTS = {
+  low: [
+    "What does your body need most right now? Not what you think you should need. What does it actually need?",
+    "What are you carrying today that isn't yours to carry?",
+    "If rest were something you deserved rather than something you had to earn, what would today look like?",
+    "What is one small thing that felt okay this week, even if everything else was hard?",
+    "What would you say to a friend who was feeling exactly how you feel right now?"
+  ],
+  moderate: [
+    "What has been on your mind that you have not yet put into words?",
+    "Where in your body do you feel today? What does that sensation want you to know?",
+    "What is one thing you want to acknowledge about this week, positive or otherwise?",
+    "What would make tomorrow feel slightly better than today?",
+    "What are you grateful for that you have not recently said out loud?"
+  ],
+  high: [
+    "What do you want to build on from this week? What is working that you want more of?",
+    "What felt good recently that you have not properly acknowledged?",
+    "What is one thing you have learned about yourself in the last week?",
+    "Where is your energy pointing right now? What does it want to move toward?",
+    "What would you do if you knew you had enough energy and time?"
+  ]
+};
+
+// ── Mindfulness exercises (from database) ─────────────────────────────────────
+
+const MINDFUL_SESSIONS = {
+  5: [
+    { id: "breath-awareness", name: "Breath Awareness", duration: 180,
+      instruction: "Sit comfortably and close your eyes. Simply notice the breath moving in and out. When the mind wanders, return to the breath without judgement. That returning is the practice.",
+      coaching: "There is no goal here except to notice. Every time you return to the breath, you have done it right." },
+    { id: "body-scan-short", name: "Short Body Scan", duration: 120,
+      instruction: "Start at the top of your head and slowly move your attention down through your body. Scalp, forehead, jaw, neck, shoulders, chest, arms, belly, lower back, hips, legs, feet. Notice without trying to change anything.",
+      coaching: "Sensation, temperature, tension, ease. Just notice what is there." }
+  ],
+  10: [
+    { id: "breath-awareness-10", name: "Breath Awareness", duration: 360,
+      instruction: "Settle into your seat and close your eyes. Place one hand on your chest and one on your belly. Notice which moves more. Let your attention rest on the physical sensation of breath. When thoughts come, acknowledge them and return.",
+      coaching: "Each return is a repetition. This is the exercise. There is no such thing as a bad meditation session, only a session." },
+    { id: "noting-practice", name: "Noting Practice", duration: 300,
+      instruction: "Rest attention on the breath. When something else arises, briefly name it: thinking, sound, feeling. After naming it, return to the breath. Keep the labels simple and non-judgemental.",
+      coaching: "Noting creates a tiny gap between experience and reaction. That gap is where calm lives." }
+  ],
+  15: [
+    { id: "body-scan-full", name: "Full Body Scan", duration: 600,
+      instruction: "Lie down if you can. Begin at the top of your head and move your attention slowly down through the entire body. Spend at least thirty seconds in each region. Scalp, face, jaw, throat, shoulders, upper arms, forearms, hands, chest, upper back, belly, lower back, hips, glutes, thighs, knees, calves, feet, toes. Notice, do not fix.",
+      coaching: "If you fall asleep, that was what your body needed. If you stay awake, that is the practice." },
+    { id: "open-awareness", name: "Open Awareness", duration: 600,
+      instruction: "Sit comfortably and let your attention open outward. Allow sounds, sensations, thoughts, and feelings to arise and pass without following any of them. You are the sky. Everything else is weather.",
+      coaching: "If the mind is very active, return to breath awareness first, then expand when it settles." }
+  ]
+};
+
+// ── View state ────────────────────────────────────────────────────────────────
+
+let mode              = "breathing";   // "breathing" | "journal" | "mindful" | "rest"
+let selectedBreathing = null;          // breathing exercise id
+let breathingPhase    = 0;             // current phase index
+let breathingRound    = 0;             // current round
+let breathingInterval = null;          // setInterval handle
+let phaseSecondsLeft  = 0;             // seconds remaining in current phase
+let breathingComplete  = false;        // finished all rounds
+
+let mindfulDuration   = 10;            // 5 | 10 | 15
+let mindfulStep       = 0;             // current exercise index in session
+let mindfulTimer      = null;          // setInterval handle
+let mindfulSecondsLeft = 0;
+let mindfulComplete   = false;
+
+let journalText       = "";
+let journalPrompts    = [];
+let journalSaved      = false;
+
+// ── Render ────────────────────────────────────────────────────────────────────
+
+export function render() {
+  mode = store.get("quietMode") || "breathing";
+
+  return `
+    <div class="view quiet-session-view">
+      <div class="quiet-session-header">
+        <button class="btn btn-ghost btn-small quiet-back-btn" id="quiet-back-btn"
+                aria-label="Back to choices">
+          &larr; Back
+        </button>
+        <h1 class="quiet-session-title">${getModeTitle()}</h1>
+      </div>
+
+      <div id="quiet-session-content">
+        ${renderMode()}
+      </div>
+    </div>
+  `;
+}
+
+function getModeTitle() {
+  const titles = {
+    breathing: "Breathing Practice",
+    journal:   "Journal",
+    mindful:   "Mindful Movement",
+    rest:      "Rest"
+  };
+  return titles[mode] || "Something Quieter";
+}
+
+function renderMode() {
+  if (mode === "breathing")  return renderBreathingMode();
+  if (mode === "journal")    return renderJournalMode();
+  if (mode === "mindful")    return renderMindfulMode();
+  if (mode === "rest")       return renderRestMode();
+  return renderBreathingMode();
+}
+
+// ── Breathing mode ────────────────────────────────────────────────────────────
+
+function renderBreathingMode() {
+  if (!selectedBreathing) return renderBreathingSelector();
+  const ex = BREATHING_EXERCISES.find(e => e.id === selectedBreathing);
+  if (!ex) return renderBreathingSelector();
+  if (breathingComplete) return renderBreathingComplete(ex);
+  return renderBreathingSession(ex);
+}
+
+function renderBreathingSelector() {
+  return `
+    <div class="card card-coach quiet-coach-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <p>Choose a breathing practice. Each one does something slightly different.
+           Start with Box Breathing if you are not sure.</p>
+      </div>
+    </div>
+
+    <div class="quiet-breathing-list" role="list">
+      ${BREATHING_EXERCISES.map(ex => `
+        <button class="card quiet-breathing-card" data-breathing-id="${ex.id}"
+                role="listitem" aria-label="Start ${ex.name}">
+          <div class="quiet-breathing-card-header">
+            <span class="quiet-breathing-icon" aria-hidden="true">${ex.icon}</span>
+            <div>
+              <h3>${ex.name}</h3>
+              <p class="text-sm text-muted">${ex.rounds} rounds
+                &middot; ${Math.round(ex.phases.reduce((t,p) => t + p.seconds, 0) * ex.rounds / 60)} mins
+              </p>
+            </div>
+          </div>
+          <p class="text-sm quiet-breathing-why">${ex.why}</p>
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderBreathingSession(ex) {
+  const phase         = ex.phases[breathingPhase];
+  const totalSeconds  = ex.phases.reduce((t, p) => t + p.seconds, 0);
+  const roundProgress = Math.round(((breathingRound) / ex.rounds) * 100);
+
+  return `
+    <div class="card card-coach quiet-coach-card" style="margin-bottom:var(--space-4);">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <h3>${ex.name}</h3>
+        <p class="text-sm">${ex.coachIntro}</p>
+      </div>
+    </div>
+
+    <div class="quiet-breathing-session">
+
+      <!-- Progress -->
+      <div class="quiet-round-progress">
+        <span class="text-sm text-muted">Round ${breathingRound + 1} of ${ex.rounds}</span>
+        <div class="quiet-progress-bar" role="progressbar"
+             aria-valuenow="${roundProgress}" aria-valuemin="0" aria-valuemax="100">
+          <div class="quiet-progress-fill" style="width:${roundProgress}%"></div>
+        </div>
+      </div>
+
+      <!-- Visual timer circle -->
+      <div class="quiet-timer-wrap">
+        <div class="quiet-timer-circle" id="quiet-timer-circle"
+             style="--phase-colour: ${phase.colour};"
+             aria-live="polite" aria-atomic="true">
+          <div class="quiet-timer-phase" id="quiet-phase-label">${phase.label}</div>
+          <div class="quiet-timer-seconds" id="quiet-timer-seconds"
+               aria-label="${phaseSecondsLeft} seconds">${phaseSecondsLeft}</div>
+        </div>
+      </div>
+
+      <!-- Phase indicators -->
+      <div class="quiet-phase-dots" aria-hidden="true">
+        ${ex.phases.map((p, i) => `
+          <div class="quiet-phase-dot ${i === breathingPhase ? "active" : ""}"
+               style="${i === breathingPhase ? "--dot-colour:" + p.colour : ""}">
+          </div>
+        `).join("")}
+      </div>
+
+      <button class="btn btn-danger btn-full" id="quiet-stop-breathing-btn"
+              style="margin-top:var(--space-6);">
+        Stop session
+      </button>
+    </div>
+  `;
+}
+
+function renderBreathingComplete(ex) {
+  return `
+    <div class="card card-coach quiet-coach-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <h3>That is done.</h3>
+        <p>You completed ${ex.rounds} rounds of ${ex.name}. Give yourself a moment
+           before you move on. Notice how you feel compared to when you started.</p>
+      </div>
+    </div>
+
+    <div class="quiet-complete-actions">
+      <button class="btn btn-ghost btn-full" id="quiet-try-another-btn">
+        Try another exercise
+      </button>
+      <button class="btn btn-primary btn-full" id="quiet-breathing-done-btn"
+              style="margin-top:var(--space-3);">
+        Done for now
+      </button>
+    </div>
+
+    <div class="card quiet-difficulty-card" style="margin-top:var(--space-5);">
+      <p class="text-sm" style="margin-bottom:var(--space-3);">How did that feel?</p>
+      <div class="quiet-difficulty-chips" role="group" aria-label="Difficulty rating">
+        ${["Very easy", "Easy", "Manageable", "Challenging", "Very challenging"].map((label, i) => `
+          <button class="quiet-difficulty-chip" data-difficulty="${i + 1}"
+                  aria-pressed="false" aria-label="${label}">
+            ${label}
+          </button>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+// ── Journal mode ──────────────────────────────────────────────────────────────
+
+function renderJournalMode() {
+  if (journalPrompts.length === 0) journalPrompts = selectJournalPrompts();
+  if (journalSaved) return renderJournalSaved();
+
+  return `
+    <div class="card card-coach quiet-coach-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <p>Writing things down externalises what is inside. You do not need to write
+           well, or write much. Just write honestly. Whatever you put here stays private
+           and is only ever used to remember what you wrote.</p>
+      </div>
+    </div>
+
+    ${journalPrompts.map((prompt, i) => `
+      <div class="card quiet-journal-card" style="margin-top:var(--space-4);">
+        <p class="quiet-journal-prompt">${prompt}</p>
+        <textarea
+          class="quiet-journal-textarea"
+          id="journal-textarea-${i}"
+          rows="5"
+          placeholder="Write freely. There is no wrong answer."
+          aria-label="Journal response to: ${prompt}"
+        >${journalText}</textarea>
+      </div>
+    `).join("")}
+
+    <button class="btn btn-primary btn-full" id="quiet-journal-save-btn"
+            style="margin-top:var(--space-4);">
+      Save and finish
+    </button>
+    <button class="btn btn-ghost btn-full" id="quiet-journal-skip-btn"
+            style="margin-top:var(--space-3);">
+      I'd rather not write today
+    </button>
+  `;
+}
+
+function renderJournalSaved() {
+  return `
+    <div class="card card-coach quiet-coach-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <h3>Saved.</h3>
+        <p>That is yours. It will be here if you want to come back to it. Well done
+           for taking the time.</p>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full quiet-back-btn"
+            style="margin-top:var(--space-5);">
+      Back to choices
+    </button>
+  `;
+}
+
+function selectJournalPrompts() {
+  const checkin = store.get("checkinHistory") || {};
+  const todayKey = new Date().toISOString().split("T")[0];
+  const today = checkin[todayKey] || {};
+  const energy = today.energy || 5;
+
+  let pool;
+  if (energy <= 3)      pool = JOURNAL_PROMPTS.low;
+  else if (energy <= 6) pool = JOURNAL_PROMPTS.moderate;
+  else                  pool = JOURNAL_PROMPTS.high;
+
+  // Pick 2 non-repeating prompts using day of year for rotation
+  const start = new Date(new Date().getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((new Date() - start) / 86400000);
+  const idx1 = dayOfYear % pool.length;
+  const idx2 = (dayOfYear + 2) % pool.length;
+  return [pool[idx1], pool[idx2 === idx1 ? (idx2 + 1) % pool.length : idx2]];
+}
+
+function saveJournalEntry() {
+  const entries = {};
+  journalPrompts.forEach((prompt, i) => {
+    const el = document.getElementById("journal-textarea-" + i);
+    if (el?.value?.trim()) entries["prompt_" + i] = { prompt, response: el.value.trim() };
+  });
+
+  const todayKey = new Date().toISOString().split("T")[0];
+  const existing = store.get("journalEntries") || {};
+  existing[todayKey] = { entries, savedAt: new Date().toISOString() };
+  store.set("journalEntries", existing);
+
+  journalSaved = true;
+  rerender();
+}
+
+// ── Mindful mode ──────────────────────────────────────────────────────────────
+
+function renderMindfulMode() {
+  const session = MINDFUL_SESSIONS[mindfulDuration];
+  const step    = session?.[mindfulStep];
+
+  if (!step) return renderMindfulSelector();
+  if (mindfulComplete) return renderMindfulComplete();
+  return renderMindfulSession(step, session);
+}
+
+function renderMindfulSelector() {
+  return `
+    <div class="card card-coach quiet-coach-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <p>How long do you have? Each session guides you through one or two
+           practices with a timer. All you need is somewhere comfortable to sit
+           or lie down.</p>
+      </div>
+    </div>
+
+    <div class="quiet-duration-selector" role="group" aria-label="Session length">
+      ${[5, 10, 15].map(mins => `
+        <button class="quiet-duration-btn ${mindfulDuration === mins ? "selected" : ""}"
+                data-duration="${mins}"
+                aria-pressed="${mindfulDuration === mins}">
+          <span class="quiet-duration-mins">${mins}</span>
+          <span class="quiet-duration-label">minutes</span>
+        </button>
+      `).join("")}
+    </div>
+
+    <button class="btn btn-primary btn-large btn-full" id="quiet-mindful-start-btn"
+            style="margin-top:var(--space-5);">
+      Begin ${mindfulDuration}-minute session
+    </button>
+  `;
+}
+
+function renderMindfulSession(step, session) {
+  const totalSteps   = session.length;
+  const progressPct  = Math.round((mindfulStep / totalSteps) * 100);
+  const timeDisplay  = formatTime(mindfulSecondsLeft);
+
+  return `
+    <div class="card card-coach quiet-coach-card" style="margin-bottom:var(--space-4);">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <h3>${step.name}</h3>
+        <p class="text-sm">${step.instruction}</p>
+        ${step.coaching ? `
+          <p class="text-sm text-muted" style="margin-top:var(--space-3);">
+            ${step.coaching}
+          </p>
+        ` : ""}
+      </div>
+    </div>
+
+    <div class="quiet-mindful-timer">
+      <div class="quiet-mindful-clock" aria-live="polite"
+           aria-label="${timeDisplay} remaining">
+        <span id="quiet-mindful-time">${timeDisplay}</span>
+      </div>
+      <p class="text-sm text-muted" style="margin-top:var(--space-2);">remaining</p>
+    </div>
+
+    <div class="quiet-progress-bar" style="margin-top:var(--space-4);"
+         role="progressbar" aria-valuenow="${progressPct}" aria-valuemin="0" aria-valuemax="100">
+      <div class="quiet-progress-fill" style="width:${progressPct}%"></div>
+    </div>
+
+    <button class="btn btn-danger btn-full" id="quiet-mindful-stop-btn"
+            style="margin-top:var(--space-6);">
+      End session early
+    </button>
+  `;
+}
+
+function renderMindfulComplete() {
+  return `
+    <div class="card card-coach quiet-coach-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <h3>Session complete.</h3>
+        <p>You gave yourself ${mindfulDuration} minutes. That is not nothing. Notice what
+           is different, even slightly, from when you started.</p>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-full quiet-back-btn"
+            style="margin-top:var(--space-5);">
+      Back to choices
+    </button>
+  `;
+}
+
+// ── Rest mode ─────────────────────────────────────────────────────────────────
+
+function renderRestMode() {
+  const checkin = store.get("checkinHistory") || {};
+  const todayKey = new Date().toISOString().split("T")[0];
+  const today = checkin[todayKey] || {};
+  const energy = today.energy || 5;
+
+  let coachLine;
+  if (energy <= 3) {
+    coachLine = "Your body is asking for rest today. That is not failure. Rest is what makes the training work. You made the right call.";
+  } else if (energy <= 6) {
+    coachLine = "Rest days are part of the programme, not a break from it. Adaptation happens when you are not training. Enjoy the stillness.";
+  } else {
+    coachLine = "High energy and choosing rest takes a different kind of discipline. If your body needs it, this is the right choice. If you want to move later, we will be here.";
+  }
+
+  return `
+    <div class="card card-coach quiet-coach-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <h3>Rest day.</h3>
+        <p>${coachLine}</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:var(--space-5);">
+      <p class="text-sm text-muted">
+        If you want gentle movement later, breathing practice or a short mindful
+        session are always here. No pressure either way.
+      </p>
+    </div>
+
+    <button class="btn btn-ghost btn-full quiet-back-btn"
+            style="margin-top:var(--space-5);">
+      Back to choices
+    </button>
+  `;
+}
+
+// ── Timer logic ───────────────────────────────────────────────────────────────
+
+function startBreathing(exerciseId) {
+  const ex = BREATHING_EXERCISES.find(e => e.id === exerciseId);
+  if (!ex) return;
+
+  selectedBreathing  = exerciseId;
+  breathingPhase     = 0;
+  breathingRound     = 0;
+  breathingComplete  = false;
+  phaseSecondsLeft   = ex.phases[0].seconds;
+
+  rerender();
+
+  breathingInterval = setInterval(() => {
+    phaseSecondsLeft--;
+
+    const secondsEl = document.getElementById("quiet-timer-seconds");
+    const phaseEl   = document.getElementById("quiet-phase-label");
+    const circleEl  = document.getElementById("quiet-timer-circle");
+
+    if (secondsEl) secondsEl.textContent = phaseSecondsLeft;
+
+    if (phaseSecondsLeft <= 0) {
+      breathingPhase++;
+
+      if (breathingPhase >= ex.phases.length) {
+        breathingPhase = 0;
+        breathingRound++;
+      }
+
+      if (breathingRound >= ex.rounds) {
+        clearInterval(breathingInterval);
+        breathingComplete = true;
+        logSession("breathing", ex.name, ex.credits);
+        rerender();
+        return;
+      }
+
+      const nextPhase = ex.phases[breathingPhase];
+      phaseSecondsLeft = nextPhase.seconds;
+
+      if (phaseEl)   phaseEl.textContent = nextPhase.label;
+      if (circleEl)  circleEl.style.setProperty("--phase-colour", nextPhase.colour);
+      if (secondsEl) secondsEl.textContent = phaseSecondsLeft;
+
+      // Update phase dots
+      document.querySelectorAll(".quiet-phase-dot").forEach((dot, i) => {
+        dot.classList.toggle("active", i === breathingPhase);
+        if (i === breathingPhase) dot.style.setProperty("--dot-colour", nextPhase.colour);
+      });
+
+      // Update round counter
+      const roundEl = document.querySelector(".quiet-round-progress .text-sm");
+      if (roundEl) roundEl.textContent = "Round " + (breathingRound + 1) + " of " + ex.rounds;
+    }
+  }, 1000);
+}
+
+function stopBreathing() {
+  if (breathingInterval) clearInterval(breathingInterval);
+  breathingInterval = null;
+  selectedBreathing = null;
+  breathingComplete = false;
+  breathingRound    = 0;
+  breathingPhase    = 0;
+  rerender();
+}
+
+function startMindfulSession() {
+  const session = MINDFUL_SESSIONS[mindfulDuration];
+  if (!session?.length) return;
+
+  mindfulStep      = 0;
+  mindfulComplete  = false;
+  mindfulSecondsLeft = session[0].duration;
+
+  rerender();
+  runMindfulStep(session);
+}
+
+function runMindfulStep(session) {
+  if (mindfulTimer) clearInterval(mindfulTimer);
+
+  mindfulTimer = setInterval(() => {
+    mindfulSecondsLeft--;
+
+    const timeEl = document.getElementById("quiet-mindful-time");
+    if (timeEl) timeEl.textContent = formatTime(mindfulSecondsLeft);
+
+    if (mindfulSecondsLeft <= 0) {
+      clearInterval(mindfulTimer);
+      mindfulStep++;
+
+      if (mindfulStep >= session.length) {
+        mindfulComplete = true;
+        logSession("mindful", mindfulDuration + " min mindful session", 20);
+        rerender();
+        return;
+      }
+
+      mindfulSecondsLeft = session[mindfulStep].duration;
+      rerender();
+      runMindfulStep(session);
+    }
+  }, 1000);
+}
+
+function stopMindful() {
+  if (mindfulTimer) clearInterval(mindfulTimer);
+  mindfulTimer    = null;
+  mindfulComplete = false;
+  mindfulStep     = 0;
+  rerender();
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return m + ":" + String(s).padStart(2, "0");
+}
+
+// ── Session logging ───────────────────────────────────────────────────────────
+
+function logSession(type, name, credits) {
+  const existing = store.get("activityLog") || [];
+  existing.push({
+    id:        "quiet-" + Date.now(),
+    type,
+    name,
+    source:    "quiet-session",
+    credits,
+    duration:  null,
+    loggedAt:  new Date().toISOString()
+  });
+  store.set("activityLog", existing);
+
+  const current = store.get("totalCredits") || 0;
+  store.set("totalCredits", current + credits);
+  store.set("lastWorkoutCredits", credits);
+  store.set("lastWorkoutName", name);
+}
+
+// ── Mount ─────────────────────────────────────────────────────────────────────
+
+export function onMount() {
+  mode = store.get("quietMode") || "breathing";
+
+  // Back buttons
+  document.querySelectorAll(".quiet-back-btn, #quiet-back-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      cleanup();
+      router.navigate("intention");
+    });
+  });
+
+  // Breathing: select exercise
+  document.querySelectorAll(".quiet-breathing-card").forEach(card => {
+    card.addEventListener("click", () => {
+      startBreathing(card.dataset.breathingId);
+    });
+  });
+
+  // Breathing: stop
+  document.getElementById("quiet-stop-breathing-btn")?.addEventListener("click", stopBreathing);
+
+  // Breathing: try another
+  document.getElementById("quiet-try-another-btn")?.addEventListener("click", () => {
+    selectedBreathing = null;
+    breathingComplete = false;
+    rerender();
+  });
+
+  // Breathing: done
+  document.getElementById("quiet-breathing-done-btn")?.addEventListener("click", () => {
+    cleanup();
+    router.navigate("intention");
+  });
+
+  // Breathing: difficulty chips
+  document.querySelectorAll(".quiet-difficulty-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll(".quiet-difficulty-chip").forEach(c => {
+        c.classList.toggle("selected", c === chip);
+        c.setAttribute("aria-pressed", c === chip);
+      });
+    });
+  });
+
+  // Journal: save
+  document.getElementById("quiet-journal-save-btn")?.addEventListener("click", saveJournalEntry);
+
+  // Journal: skip
+  document.getElementById("quiet-journal-skip-btn")?.addEventListener("click", () => {
+    cleanup();
+    router.navigate("intention");
+  });
+
+  // Mindful: duration selector
+  document.querySelectorAll(".quiet-duration-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      mindfulDuration = parseInt(btn.dataset.duration);
+      document.querySelectorAll(".quiet-duration-btn").forEach(b => {
+        b.classList.toggle("selected", b === btn);
+        b.setAttribute("aria-pressed", b === btn);
+      });
+      const startBtn = document.getElementById("quiet-mindful-start-btn");
+      if (startBtn) startBtn.textContent = "Begin " + mindfulDuration + "-minute session";
+    });
+  });
+
+  // Mindful: start
+  document.getElementById("quiet-mindful-start-btn")?.addEventListener("click", startMindfulSession);
+
+  // Mindful: stop
+  document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
+}
+
+function cleanup() {
+  if (breathingInterval) clearInterval(breathingInterval);
+  if (mindfulTimer)      clearInterval(mindfulTimer);
+  breathingInterval  = null;
+  mindfulTimer       = null;
+  selectedBreathing  = null;
+  breathingComplete  = false;
+  mindfulComplete    = false;
+  mindfulStep        = 0;
+  journalSaved       = false;
+  journalPrompts     = [];
+}
+
+function rerender() {
+  const content = document.getElementById("quiet-session-content");
+  if (content) {
+    content.innerHTML = renderMode();
+    onMount();
+  }
+}
