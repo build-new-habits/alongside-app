@@ -479,7 +479,7 @@ function submitCheckin() {
   store.set("todayIntensity", intensity);
 
   // Navigate to intention screen — user chooses their path from there
-  router.navigate("intention");
+  router.navigate("coach-proposal");
 }
 
 // ── Prescribed shortcut submit ────────────────────────────────────────────────
