@@ -40,6 +40,9 @@ const VIEW_NAMES = {
   'prescribed-session':      'Prescribed Exercises',
   'prescribed':              'My Prescribed Exercises',
   'quiet-session':           'Something Quieter',
+  'coach-proposal':          'Your Session',
+  'activity-log':            'Log an Activity',
+  'yoga-session':            'Yoga and Pilates',
 };
 
 export const router = {
@@ -55,13 +58,12 @@ export const router = {
     this.hideLoading();
 
     if (store.isOnboardingComplete()) {
-      // If the user has not checked in today, take them straight to check-in.
-      // After submitting, checkin.js navigates to intention (the choice screen).
-      // This ensures mood and energy are captured before any activity is chosen.
       if (!checkinData.hasCheckedInToday()) {
         this.navigate('checkin');
       } else {
-        this.navigate('intention');
+        // Coach proposal is the primary post-checkin experience.
+        // Intention screen is now the fallback (accessed via Library or "I'll decide myself").
+        this.navigate('coach-proposal');
       }
     } else {
       this.navigate('onboarding/welcome');
@@ -93,7 +95,7 @@ export const router = {
     mainContent.className = 'main-content';
 
     // Hide/show bottom nav
-    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin', 'prescribed-session', 'quiet-session'];
+    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin', 'prescribed-session', 'quiet-session', 'coach-proposal'];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
     if (shouldHideNav) {
@@ -241,15 +243,11 @@ export const router = {
     });
   },
 
-  /**
-   * Highlight the active nav item.
-   * 'intention' is the home screen — it maps to the Today nav button
-   * (data-view="intention"). 'today' (coach workout view) also highlights
-   * the Today button since it is a sub-path of the Today journey.
-   */
   setActiveNav(viewName) {
-    // Treat coach workout view as part of the Today/intention journey
-    const navKey = viewName === 'today' ? 'intention' : viewName;
+    // coach-proposal is the home screen — maps to the Today nav button.
+    // intention and today (coach workout view) also highlight Today.
+    const homeViews = ['coach-proposal', 'intention', 'today'];
+    const navKey = homeViews.includes(viewName) ? 'coach-proposal' : viewName;
     document.querySelectorAll('.nav-item').forEach(item => {
       item.classList.toggle('active', item.dataset.view === navKey);
     });
