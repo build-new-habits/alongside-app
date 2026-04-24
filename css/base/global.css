@@ -704,3 +704,203 @@ select {
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
+
+/* ============================================
+   COACH PROPOSAL SCREEN
+   ============================================ */
+
+.coach-proposal-view {
+  padding-bottom: var(--space-8);
+}
+
+.coach-proposal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.proposal-back-btn,
+.proposal-library-btn {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  min-height: 44px;
+  padding: 0 var(--space-2);
+}
+
+.proposal-library-btn {
+  color: var(--color-primary);
+}
+
+.coach-proposal-card {
+  margin-bottom: var(--space-5);
+}
+
+.coach-proposal-content { flex: 1; }
+
+.coach-proposal-thinking {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+}
+
+.coach-proposal-description {
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-3);
+}
+
+.coach-proposal-rationale {
+  font-style: italic;
+  margin-bottom: var(--space-3);
+}
+
+.coach-proposal-meta {
+  margin-top: var(--space-2);
+}
+
+.coach-proposal-duration {
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
+
+/* Branch chips */
+.coach-branch-chips {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.coach-branch-chip {
+  width: 100%;
+  min-height: 52px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  font-size: var(--text-base);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.coach-branch-chip:hover,
+.coach-branch-chip:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+/* Activity pick grid */
+.coach-activity-pick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.coach-activity-pick-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 80px;
+  padding: var(--space-3);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.coach-activity-pick-btn:hover,
+.coach-activity-pick-btn:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.coach-activity-pick-btn span:first-child { font-size: 1.6rem; }
+
+/* ============================================
+   LIBRARY TAB (SETTINGS)
+   ============================================ */
+
+.library-section { padding-top: var(--space-2); }
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.library-grid--compact {
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.library-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 80px;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.library-card:hover:not(:disabled),
+.library-card:focus-visible:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.library-card--compact {
+  min-height: 64px;
+  padding: var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.library-card--soon {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.library-card-icon { font-size: 1.5rem; }
+.library-card--compact .library-card-icon { font-size: 1.2rem; }
+.library-card-label { text-align: center; line-height: var(--leading-tight); }
+
+.library-soon-badge {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-2);
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+}
+
+.library-group-heading {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: var(--space-4) 0 var(--space-2);
+}
