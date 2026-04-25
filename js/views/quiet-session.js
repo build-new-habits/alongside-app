@@ -171,7 +171,7 @@ let journalSaved      = false;
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
-  mode = store.get("quietMode") || "breathing";
+  mode = store.get("quietMode") || "selector";
 
   return `
     <div class="view quiet-session-view">
@@ -192,6 +192,7 @@ export function render() {
 
 function getModeTitle() {
   const titles = {
+    selector:  "Something Quieter",
     breathing: "Breathing Practice",
     journal:   "Journal",
     mindful:   "Mindful Movement",
@@ -200,7 +201,75 @@ function getModeTitle() {
   return titles[mode] || "Something Quieter";
 }
 
+// ── Mode selector — shown when no mode is set ─────────────────────────────────
+
+function renderModeSelector() {
+  return `
+    <div class="card card-coach quiet-coach-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <p>What feels right today? Each of these works differently.
+           Take a moment to notice what you actually need.</p>
+      </div>
+    </div>
+
+    <div class="quiet-mode-menu" role="list">
+
+      <button class="quiet-mode-card" data-mode="breathing" role="listitem"
+              aria-label="Breathing practice">
+        <div class="quiet-mode-card-left">
+          <span class="quiet-mode-icon" aria-hidden="true">\uD83C\uDF2C</span>
+          <div>
+            <h3>Breathing</h3>
+            <p class="text-sm text-muted">Calm your nervous system. Five techniques, guided timers.</p>
+          </div>
+        </div>
+        <span class="quiet-mode-arrow" aria-hidden="true">&rsaquo;</span>
+      </button>
+
+      <button class="quiet-mode-card" data-mode="mindful" role="listitem"
+              aria-label="Mindful movement">
+        <div class="quiet-mode-card-left">
+          <span class="quiet-mode-icon" aria-hidden="true">\uD83C\uDF3F</span>
+          <div>
+            <h3>Mindful Movement</h3>
+            <p class="text-sm text-muted">5, 10, or 15 minutes. Guided practice with timer.</p>
+          </div>
+        </div>
+        <span class="quiet-mode-arrow" aria-hidden="true">&rsaquo;</span>
+      </button>
+
+      <button class="quiet-mode-card" data-mode="journal" role="listitem"
+              aria-label="Journaling">
+        <div class="quiet-mode-card-left">
+          <span class="quiet-mode-icon" aria-hidden="true">\uD83D\uDCDD</span>
+          <div>
+            <h3>Journaling</h3>
+            <p class="text-sm text-muted">Two prompts chosen for how you are feeling today.</p>
+          </div>
+        </div>
+        <span class="quiet-mode-arrow" aria-hidden="true">&rsaquo;</span>
+      </button>
+
+      <button class="quiet-mode-card" data-mode="rest" role="listitem"
+              aria-label="Rest day">
+        <div class="quiet-mode-card-left">
+          <span class="quiet-mode-icon" aria-hidden="true">\uD83D\uDECC</span>
+          <div>
+            <h3>Rest</h3>
+            <p class="text-sm text-muted">A coach acknowledgement. Nothing more required.</p>
+          </div>
+        </div>
+        <span class="quiet-mode-arrow" aria-hidden="true">&rsaquo;</span>
+      </button>
+
+    </div>
+  `;
+}
+
 function renderMode() {
+  // No mode set — show the selector menu first
+  if (!mode || mode === "selector") return renderModeSelector();
   if (mode === "breathing")  return renderBreathingMode();
   if (mode === "journal")    return renderJournalMode();
   if (mode === "mindful")    return renderMindfulMode();
@@ -638,11 +707,20 @@ function startMindfulSession() {
   const session = MINDFUL_SESSIONS[mindfulDuration];
   if (!session?.length) return;
 
-  mindfulStep      = 0;
-  mindfulComplete  = false;
+  mindfulStep        = 0;
+  mindfulComplete    = false;
   mindfulSecondsLeft = session[0].duration;
 
-  rerender();
+  // Render the session view DIRECTLY into the content div without calling
+  // rerender() — rerender() triggers onMount() which calls cleanup() and
+  // kills the timer before it gets a chance to run.
+  const content = document.getElementById("quiet-session-content");
+  if (content) {
+    content.innerHTML = renderMindfulSession(session[0], session);
+    // Wire only the stop button — do not call full onMount()
+    document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
+  }
+
   runMindfulStep(session);
 }
 
@@ -652,6 +730,7 @@ function runMindfulStep(session) {
   mindfulTimer = setInterval(() => {
     mindfulSecondsLeft--;
 
+    // Update only the time display — do not rerender the whole view
     const timeEl = document.getElementById("quiet-mindful-time");
     if (timeEl) timeEl.textContent = formatTime(mindfulSecondsLeft);
 
@@ -662,12 +741,18 @@ function runMindfulStep(session) {
       if (mindfulStep >= session.length) {
         mindfulComplete = true;
         logSession("mindful", mindfulDuration + " min mindful session", 20);
+        // Safe to rerender here — session is complete, no timer to protect
         rerender();
         return;
       }
 
+      // Advance to next step: render directly, then start timer
       mindfulSecondsLeft = session[mindfulStep].duration;
-      rerender();
+      const content = document.getElementById("quiet-session-content");
+      if (content) {
+        content.innerHTML = renderMindfulSession(session[mindfulStep], session);
+        document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
+      }
       runMindfulStep(session);
     }
   }, 1000);
@@ -711,13 +796,31 @@ function logSession(type, name, credits) {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
-  mode = store.get("quietMode") || "breathing";
+  mode = store.get("quietMode") || "selector";
+
+  // ── Mode selector cards ───────────────────────────────────────────────────
+  document.querySelectorAll(".quiet-mode-card").forEach(card => {
+    card.addEventListener("click", () => {
+      mode = card.dataset.mode;
+      store.set("quietMode", mode);
+      rerender();
+    });
+  });
 
   // Back buttons
   document.querySelectorAll(".quiet-back-btn, #quiet-back-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      cleanup();
-      router.navigate("intention");
+      // If in a mode, go back to the selector. If at selector, go to intention.
+      if (mode && mode !== "selector") {
+        mode = "selector";
+        store.set("quietMode", null);
+        cleanup();
+        rerender();
+      } else {
+        cleanup();
+        store.set("quietMode", null);
+        router.navigate("intention");
+      }
     });
   });
 
