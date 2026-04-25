@@ -130,9 +130,67 @@ function buildProposal(preferShorter = false) {
   // ── Build the reflection sentence ────────────────────────────────────────
   const reflection = buildReflection(recentLog, daysSinceLast, goal);
 
-  // ── Decision logic ───────────────────────────────────────────────────────
+  // ── Safety layer — must run before preference logic ─────────────────────
+  // Neurodivergent users may follow the coach as their primary guide.
+  // We have a responsibility to prevent overtraining.
+  //
+  // Rules:
+  //   3+ consecutive training days → coach must suggest rest or quiet today
+  //   2 consecutive heavy sessions (gym/run) → suggest lower intensity
+  //   7 sessions in 7 days → flag recovery regardless of energy
+  //
+  // "Training day" = any activityLog entry that is NOT breathing/journal/rest/mindful.
+  const last7        = activityLog.slice(-7);
+  const last7Types   = last7.map(e => e.type || e.source || "");
+  const isTraining   = t => !["breathing", "journal", "rest", "mindful", "quiet"].includes(t);
+  const isHeavy      = t => ["gym", "coach-session", "gym-programme", "run", "hiit", "boxing"].includes(t);
 
-  // 1. Severe override
+  // Count consecutive training days ending today
+  let consecutiveDays = 0;
+  for (let i = last7.length - 1; i >= 0; i--) {
+    const entry = last7[i];
+    const daysAgo = Math.floor((Date.now() - new Date(entry.loggedAt)) / 86400000);
+    if (daysAgo <= consecutiveDays + 1 && isTraining(last7Types[i])) {
+      consecutiveDays++;
+    } else {
+      break;
+    }
+  }
+
+  const consecutiveHeavy = last7Types.slice(-2).every(isHeavy);
+  const totalThisWeek    = last7.filter(e => {
+    const d = Math.floor((Date.now() - new Date(e.loggedAt)) / 86400000);
+    return d < 7 && isTraining(e.type || e.source || "");
+  }).length;
+
+  // Hard override: 3+ consecutive days must rest
+  if (consecutiveDays >= 3) {
+    const reflection = buildReflection(recentLog, daysSinceLast, goal);
+    return makeProposal({
+      type: "quiet", target: "quiet-session", quietMode: "rest",
+      duration: 15,
+      reflection,
+      proposal: "You have trained for " + consecutiveDays + " days in a row. Today needs to be a rest day. This is not optional — it is where adaptation actually happens. Your body builds back stronger during recovery, not during effort.",
+      rationale: "Consecutive training days without rest increase injury risk and reduce performance gains. Recovery is part of the programme."
+    });
+  }
+
+  // Soft flag: 2 consecutive heavy sessions → steer toward lower intensity
+  const heavyOverride = consecutiveHeavy && energy < 8;
+
+  // 7 sessions in 7 days — very high volume flag
+  if (totalThisWeek >= 6) {
+    const reflection = buildReflection(recentLog, daysSinceLast, goal);
+    return makeProposal({
+      type: "quiet", target: "quiet-session", quietMode: "mindful",
+      duration: 20,
+      reflection,
+      proposal: "You have been very active this week — six or more sessions in seven days. Today I want to suggest something restorative rather than another training session. Your body needs this.",
+      rationale: "High weekly volume without adequate recovery limits progress and increases overuse risk."
+    });
+  }
+
+  // ── Decision logic continues (preference + variety) ──────────────────────
   if (highPain || energy <= 2) {
     return makeProposal({
       type: "quiet", target: "quiet-session", quietMode: "breathing",
@@ -178,7 +236,7 @@ function buildProposal(preferShorter = false) {
   const options = [
     {
       type: "gym", available: hasGymProg,
-      score: prefScore("gym") + (gymCount < 3 ? 2 : 0) + (energy >= 6 ? 1 : 0),
+      score: prefScore("gym") + (gymCount < 3 ? 2 : 0) + (energy >= 6 ? 1 : 0) - (heavyOverride ? 3 : 0),
       proposal: "I thought we'd continue your gym programme today. Session " + gymSession + " of Week " + gymWeek + ". Your cardio warmup, the main session, and your prescribed work built in.",
       rationale: energy >= 7 ? "Your energy is good. Make the most of it." : "Steady progress on the programme is what builds the result.",
       duration: Math.min(timeBudget, 45), target: "gym-programme", quietMode: null
