@@ -40,6 +40,31 @@ const GUIDE = {
     youtube: "glute bridge hold tutorial"
   },
 
+  "Dumbbell hip thrust": {
+    description: "Sit on the floor with your upper back against a bench, dumbbells across your hips. Feet flat on the floor, hip-width apart. Drive your hips up until your body forms a straight line from knees to shoulders. Squeeze your glutes hard at the top for a full second. Lower with control.",
+    cues: ["Drive through your heels, not your toes", "Chin tucked — do not hyperextend your neck at the top", "1-second hard squeeze at the top. That squeeze is where the shape comes from", "Both glutes should work equally — if one is doing more, it will show"],
+    youtube: "dumbbell hip thrust technique glute shape"
+  },
+  "Smith machine hip thrust": {
+    description: "Use a pad on the bar to protect your hips. Set up with your upper back on a bench, bar across your hip crease. Feet flat, hip-width. Drive the hips up explosively, lower slowly. The Smith machine removes the balance challenge and lets you focus entirely on the glute contraction.",
+    cues: ["Bar stays across the hip crease throughout — not the stomach, not the thighs", "Squeeze at the top. Hard. Hold for a full second.", "Lower in 3 seconds — the eccentric is where muscle is built", "If you feel it in your lower back, your hips are not high enough at the top"],
+    youtube: "Smith machine hip thrust technique"
+  },
+  "Cable face pull": {
+    description: "Set the cable at head height or just above. Use a rope attachment. Pull toward your face with your elbows high and wide — finishing with your hands either side of your head, palms facing forward. The movement is horizontal, not down.",
+    cues: ["Elbows must stay higher than your hands throughout", "Do not pull the rope down to your chest — that is a different exercise", "Stand tall. No forward lean.", "This corrects the rounded shoulder pattern. Do it every session."],
+    youtube: "cable face pull correct technique posture"
+  },
+  "Wall angels": {
+    description: "Stand with your entire back flat against a wall — head, upper back, and lower back all in contact. Place your arms in a W shape, elbows bent at 90 degrees, backs of hands touching the wall. Slowly slide your arms up into a Y shape overhead, maintaining wall contact throughout. Slide back down to W. This is harder than it looks.",
+    cues: ["If your lower back comes off the wall, your hip flexors are tight — this is useful information", "If your hands cannot reach the wall in the Y position, stop where you can maintain contact", "Move extremely slowly — 4 seconds up, 4 seconds down", "You may feel this in your thoracic spine. That is correct."],
+    youtube: "wall angels thoracic mobility posture"
+  },
+  "Couch stretch": {
+    description: "Kneel facing away from a bench. Place one shin up on the bench behind you, foot near the top. The other foot is flat on the floor in front. From this position, tuck your pelvis under and squeeze the glute of the rear leg. Hold without arching your lower back.",
+    cues: ["The key is the pelvic tuck — without it this is just a quad stretch", "Squeeze the rear glute hard. This is what releases the hip flexor.", "You should feel a deep stretch in the front of the rear hip", "Left leg is the priority — tight hip flexors on the left contribute to your right-side overload"],
+    youtube: "couch stretch hip flexor mobility anterior pelvic tilt"
+  },
   "Side-lying hip abduction": {
     description: "Lie on your side. Bottom knee bent for stability, top leg straight and angled slightly behind your body (behind the line of your glutes). Lift the top leg in a straight controlled line, pause at the top, lower slowly. Do not let the pelvis roll back.",
     cues: ["Keep your top leg slightly behind your hip — not directly up", "Control the lowering — 3 seconds down", "No hip rolling — pelvis stays stacked", "Feel this in the outer glute, not the hip flexor"],
@@ -228,7 +253,7 @@ const PROGRAMME = {
       title: "Session A",
       subtitle: "Glute Activation & Posterior Chain Foundation",
       duration: "45-50 mins",
-      coachLine: "This session is about waking things up, not testing limits. Everything here activates the posterior chain without loading your SI joint asymmetrically. It will feel lighter than you expect — that is correct. If anything produces sharp or radiating pain, stop that exercise immediately. Dull muscular effort is fine. Sharp or radiating is not.",
+      coachLine: "This session activates the posterior chain and starts addressing the three things we are working on together: glute shape, a firmer midsection, and better posture. The hip thrust at the end of the main section is your most important exercise for glute shape. The face pull directly counters the hunching pattern. Both will feel light at first — that is correct. Build the pattern before you build the weight.",
       exercises: [
         { id: "wu1", section: "warmup",  name: "Cat-cow",                               sets: 2, reps: "10 slow",       tempo: "Controlled", rest: "-"   },
         { id: "wu2", section: "warmup",  name: "Glute bridge hold",                     sets: 2, reps: "30s hold",      tempo: "Static",     rest: "30s", duration: 30 },
@@ -243,6 +268,8 @@ const PROGRAMME = {
         { id: "m4",  section: "main",    name: "Seated cable row",                      sets: 3, reps: "12",            tempo: "2-1-2",      rest: "60s", recommended: "Comfortable weight with full control", logWeight: true },
         { id: "m5",  section: "main",    name: "Pallof press",                          sets: 3, reps: "10 each side",  tempo: "2-2-2",      rest: "60s", recommended: "Light cable — this is core work not arm work", logWeight: true },
         { id: "m6",  section: "main",    name: "Dead bug",                              sets: 3, reps: "8 each side",   tempo: "Slow",       rest: "45s" },
+        { id: "m7",  section: "main",    name: "Dumbbell hip thrust",                   sets: 3, reps: "12",            tempo: "2-1-2",      rest: "75s", recommended: "Start with 10kg dumbbells across hips. Progress to barbell on Smith machine when comfortable.", logWeight: true, note: "Drive through the heel. Squeeze hard at the top for 1 second. This is your primary glute shaping exercise." },
+        { id: "m8",  section: "main",    name: "Cable face pull",                       sets: 3, reps: "15",            tempo: "2-1-2",      rest: "45s", recommended: "Light cable at head height. Elbows high and wide.", logWeight: true, note: "Pulls the shoulders back and opens the chest. Directly counters the hunching pattern." },
         { id: "cd1", section: "cooldown",name: "Pigeon pose — right side priority",     sets: 1, reps: "90s each side", tempo: "Hold",       rest: "-",   duration: 90, note: "Do not skip this" },
         { id: "cd2", section: "cooldown",name: "Supine hamstring stretch",              sets: 1, reps: "60s each side", tempo: "Hold",       rest: "-",   duration: 60 },
         { id: "cd3", section: "cooldown",name: "Child's pose",                          sets: 1, reps: "60s",           tempo: "Hold",       rest: "-",   duration: 60 },
@@ -255,6 +282,7 @@ const PROGRAMME = {
       duration: "45-50 mins",
       coachLine: "Session B gives your lower back and glutes 48 hours of recovery while you keep building. Upper body today. If anything produces sharp pain, stop that exercise. Muscular effort and mild discomfort are part of the work.",
       exercises: [
+        { id: "wu0", section: "warmup",  name: "Wall angels",                           sets: 2, reps: "10 slow",        tempo: "Very slow",  rest: "-",   note: "Stand with back flat against wall. Arms at 90 degrees. Slide arms up without losing back contact. This resets your thoracic spine." },
         { id: "wu1", section: "warmup",  name: "Band pull-aparts",                      sets: 2, reps: "15",            tempo: "Controlled", rest: "-"   },
         { id: "wu2", section: "warmup",  name: "Thoracic rotation (seated)",            sets: 2, reps: "10 each side",  tempo: "Slow",       rest: "-"   },
         { id: "wu3", section: "warmup",  name: "Cat-cow",                               sets: 1, reps: "8",             tempo: "Slow",       rest: "-"   },
@@ -283,6 +311,7 @@ const PROGRAMME = {
         { id: "px5", section: "warmup",  name: "Single-leg sit-to-stand",               sets: 3, reps: "10 each side", tempo: "3-1-1",      rest: "60s", note: "Left leg will feel harder. That is correct." },
         { id: "wu3", section: "warmup",  name: "Hip flexor stretch (kneeling)",         sets: 2, reps: "45s each side", tempo: "Hold",       rest: "-",   duration: 45 },
         { id: "wu4", section: "warmup",  name: "Banded clamshell — right side priority",sets: 2, reps: "15",            tempo: "2-1-2",      rest: "30s" },
+        { id: "m0",  section: "main",    name: "Smith machine hip thrust",              sets: 4, reps: "10",            tempo: "2-1-2",      rest: "90s", recommended: "Bar across hips on a pad. Start conservative. This is the primary glute builder.", logWeight: true, note: "Feet flat, chin tucked. Drive the hips up until body is a straight line from knee to shoulder. Squeeze hard at the top." },
         { id: "m1",  section: "main",    name: "Goblet squat",                          sets: 3, reps: "10",            tempo: "3-1-2",      rest: "75s", recommended: "12kg dumbbell or kettlebell", logWeight: true },
         { id: "m2",  section: "main",    name: "Single-leg press — right leg",          sets: 3, reps: "10 each side",  tempo: "3-1-2",      rest: "60s", recommended: "Lighter than your bilateral press — start conservative", logWeight: true },
         { id: "m3",  section: "main",    name: "Romanian deadlift",                     sets: 3, reps: "10",            tempo: "3-0-2",      rest: "75s", recommended: "2 x 12kg (small step up from Session A)", logWeight: true },
@@ -311,6 +340,7 @@ const PROGRAMME = {
         { id: "m1",  section: "main",    name: "Dead bug",                              sets: 3, reps: "8 each side",   tempo: "Slow",       rest: "45s" },
         { id: "m2",  section: "main",    name: "Pallof press",                          sets: 3, reps: "10 each side",  tempo: "2-2-2",      rest: "60s", recommended: "Light cable", logWeight: true },
         { id: "m3",  section: "main",    name: "Half-kneeling cable chop",              sets: 3, reps: "10 each side",  tempo: "2-1-2",      rest: "60s", recommended: "Light-moderate cable", logWeight: true },
+        { id: "cd0", section: "cooldown",name: "Couch stretch — left leg priority",      sets: 1, reps: "90s each side", tempo: "Hold",       rest: "-",   duration: 90, note: "Kneeling, back foot up on a bench behind you. Squeeze the glute of the rear leg and tuck the pelvis under. This is the most important hip flexor stretch for your posture." },
         { id: "cd1", section: "cooldown",name: "Pigeon pose — right side priority",     sets: 1, reps: "90s each side", tempo: "Hold",       rest: "-",   duration: 90 },
         { id: "cd2", section: "cooldown",name: "Child\'s pose",                          sets: 1, reps: "60s",           tempo: "Hold",       rest: "-",   duration: 60 },
       ]
