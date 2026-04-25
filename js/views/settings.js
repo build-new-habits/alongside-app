@@ -414,6 +414,15 @@ function renderLibraryTab() {
       <p class="text-sm text-muted" style="margin-bottom:var(--space-4);">
         You know what you are doing. Log it and the coach will reflect on it with you.
       </p>
+
+      <!-- Movement Identity -->
+      <h2 class="section-heading" style="margin-top:var(--space-6);">My movement identity</h2>
+      <p class="text-sm text-muted" style="margin-bottom:var(--space-4);">
+        Tell the coach what kind of movement feels most like you.
+        This shapes what the coach suggests first each day.
+        You can change it any time, for example if you join a gym.
+      </p>
+      ${renderMovementIdentity()}
       ${LOG_ACTIVITIES.map(group => `
         <h3 class="library-group-heading">${group.group}</h3>
         <div class="library-grid library-grid--compact">
@@ -430,6 +439,42 @@ function renderLibraryTab() {
       `).join("")}
 
     </section>
+  `;
+}
+
+// ── Movement identity ─────────────────────────────────────────────────────────
+
+function renderMovementIdentity() {
+  const current = store.get("movementIdentity") || null;
+
+  const IDENTITIES = [
+    { id: "gym",     label: "Gym / weights",   icon: "\uD83C\uDFCB" },
+    { id: "yoga",    label: "Yoga / pilates",   icon: "\uD83E\uDDD8" },
+    { id: "running", label: "Running",           icon: "\uD83C\uDFC3" },
+    { id: "walking", label: "Walking",           icon: "\uD83D\uDEB6" },
+    { id: "swimming",label: "Swimming",          icon: "\uD83C\uDFCA" },
+    { id: "classes", label: "Classes",           icon: "\uD83C\uDFE5" },
+    { id: "mixed",   label: "A mix of things",  icon: "\u2728"       },
+  ];
+
+  return `
+    <div class="library-grid" role="group" aria-label="Movement identity">
+      ${IDENTITIES.map(item => `
+        <button class="library-card ${current === item.id ? "library-card--selected" : ""}"
+                data-identity="${item.id}"
+                aria-pressed="${current === item.id}"
+                aria-label="${item.label}">
+          <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
+          <span class="library-card-label">${item.label}</span>
+        </button>
+      `).join("")}
+    </div>
+    ${current ? `
+      <p class="text-sm text-muted" style="margin-top:var(--space-2);">
+        The coach will lean toward ${IDENTITIES.find(i => i.id === current)?.label || current} suggestions.
+        Your actual activity history will refine this over time.
+      </p>
+    ` : ""}
   `;
 }
 
@@ -619,6 +664,21 @@ function wirePanel() {
         c.classList.toggle("selected", isSelected);
         c.setAttribute("aria-checked", isSelected);
       });
+    });
+  });
+
+  // Movement identity chips
+  document.querySelectorAll("[data-identity]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.identity;
+      store.set("movementIdentity", id);
+      document.querySelectorAll("[data-identity]").forEach(b => {
+        const isSelected = b.dataset.identity === id;
+        b.classList.toggle("library-card--selected", isSelected);
+        b.setAttribute("aria-pressed", isSelected);
+      });
+      // Update the confirmation text
+      const note = btn.closest(".library-section")?.querySelector(".text-muted:last-of-type");
     });
   });
 
