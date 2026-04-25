@@ -83,6 +83,15 @@ const COACH_STYLES = [
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
+  // Check if a specific tab was requested (e.g. Library from coach proposal).
+  // Must be read here in render() — not just in onMount() — so the initial
+  // HTML paint shows the correct tab panel without a flash of the wrong content.
+  const requestedTab = store.get("settingsTab");
+  if (requestedTab) {
+    activeTab = requestedTab;
+    // Do not clear here — onMount() will clear it after confirming
+  }
+
   return `
     <div class="view settings-view">
 
@@ -940,11 +949,15 @@ function startNotificationScheduler() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
-  // If navigated here with a specific tab request (e.g. from coach proposal Library button)
+  // If navigated here with a specific tab request (e.g. from coach proposal Library button),
+  // call switchTab() properly so the panel re-renders — not just setting activeTab variable.
   const requestedTab = store.get("settingsTab");
-  if (requestedTab && requestedTab !== activeTab) {
+  if (requestedTab) {
     store.set("settingsTab", null);
-    activeTab = requestedTab;
+    if (requestedTab !== activeTab) {
+      activeTab = requestedTab;
+      // Panel will render correctly below via wirePanel() reading activeTab
+    }
   }
 
   // Tab switching
