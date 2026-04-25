@@ -52,239 +52,279 @@ let branchChoice    = null;        // "mind" | "different" | "shorter" | "quiete
 
 /**
  * Build a proposal object from all available store data.
- * Returns { type, label, description, rationale, duration, target, quietMode }
  *
- * type: "gym" | "prescribed" | "quiet" | "walk" | "yoga" | "home" | "cardio"
- * label: short name shown in "I'm thinking..."
- * description: one paragraph, coach voice, plain English — NOT a list
- * rationale: the "because..." sentence shown below the description
- * duration: number (minutes)
- * target: router target on acceptance
- * quietMode: if type is "quiet", which mode
+ * The coach speaks in four parts:
+ *   1. Greeting     — time-aware, personal
+ *   2. Reflection   — what you have done recently, drawn from activityLog
+ *   3. Goal mention — brief, specific, not repeated every day
+ *   4. Proposal     — "So I thought today..." — the actual suggestion
+ *   5. Invitation   — "Unless you had something else in mind?"
+ *
+ * Decision logic:
+ *   1. Severe override (high pain or very low energy) → rest/breathing
+ *   2. movementIdentity + activityPreferences weight the options
+ *   3. Variety enforcement — avoid repeating yesterday's proposal type
+ *   4. Energy-aware routing — low energy steers away from high-intensity
+ *   5. Goal-aware routing — weight loss steers toward cardio variety
+ *   6. Recent session analysis — avoid repeating same pattern 3+ days
+ *   7. No unconditional defaults — gym is not assumed
+ *
+ * @param {boolean} preferShorter - build a shorter version of the same logic
+ * @returns {{ greeting, reflection, proposal, rationale, duration, target, quietMode }}
  */
 function buildProposal(preferShorter = false) {
-  const name          = store.get("name") || "you";
-  const checkin       = latestCheckin();
-  const energy        = checkin.energy    || 5;
-  const mood          = checkin.mood      || 5;
-  const sleep         = checkin.sleep     || 7;
-  const conditions    = store.get("conditions")         || [];
-  const painScores    = store.get("conditionPainScores") || {};
-  const activityLog   = store.get("activityLog")         || [];
-  const prescribed    = (store.get("prescribedExercises") || []).filter(e => !e.completedToday);
-  const availableTime = store.get("availableTime")       || null;
-  const goal          = store.get("strategicGoal")       || {};
-  const gymWeek       = store.get("gymProgrammeWeek")    || 1;
-  const gymSession    = store.get("gymProgrammeSession") || "A";
+  // ── Read all available data ──────────────────────────────────────────────
+  const name           = (store.get("name") || "").split(" ")[0] || "";
+  const checkin        = latestCheckin();
+  const energy         = checkin.energy || 5;
+  const mood           = checkin.mood   || 5;
+  const sleep          = checkin.sleep  || 7;
+  const conditions     = store.get("conditions")         || [];
+  const painScores     = store.get("conditionPainScores") || {};
+  const activityLog    = store.get("activityLog")         || [];
+  const prescribed     = (store.get("prescribedExercises") || []).filter(e => !e.completedToday);
+  const availableTime  = store.get("availableTime")       || null;
+  const goal           = store.get("strategicGoal")       || {};
+  const gymWeek        = store.get("gymProgrammeWeek")    || 1;
+  const gymSession     = store.get("gymProgrammeSession") || "A";
+  const prefs          = store.get("activityPreferences") || {};
+  const identity       = store.get("movementIdentity")    || null;
+  const lastType       = store.get("lastProposalType")    || null;
+  const lastDate       = store.get("lastProposalDate")    || null;
+  const gymProgramme   = store.get("gymProgrammeWeek");   // null if not started
 
-  const recentLog     = activityLog.slice(-5);
-  const lastSession   = recentLog[recentLog.length - 1] || null;
-  const daysSinceLast = lastSession
+  // Time budget
+  const TIME_MAP      = { micro: 15, quick: 20, short: 30, standard: 40, long: 50, open: 60 };
+  let timeBudget      = availableTime ? (TIME_MAP[availableTime] || 40) : 40;
+  if (preferShorter)  timeBudget = Math.max(15, Math.round(timeBudget * 0.6));
+
+  // Recent activity analysis
+  const recentLog      = activityLog.slice(-7);
+  const lastSession    = recentLog[recentLog.length - 1] || null;
+  const daysSinceLast  = lastSession
     ? Math.floor((Date.now() - new Date(lastSession.loggedAt)) / 86400000)
     : 99;
 
-  const recentTypes   = recentLog.map(e => e.type || "");
-  const gymCountRecent = recentTypes.filter(t => t === "gym" || t === "coach-session").length;
+  const recentTypes    = recentLog.map(e => e.type || e.source || "");
+  const gymCount       = recentTypes.filter(t => ["gym", "coach-session", "gym-programme"].includes(t)).length;
+  const cardioCount    = recentTypes.filter(t => ["run", "cycle", "swim", "cardio", "row"].includes(t)).length;
+  const quietCount     = recentTypes.filter(t => ["breathing", "journal", "mindful", "rest"].includes(t)).length;
+  const classCount     = recentTypes.filter(t => ["class", "boxing", "spin", "body-balance", "hiit"].includes(t)).length;
 
-  const highPain      = conditions.some(id => (painScores[id] || 0) >= 7);
-  const moderatePain  = conditions.some(id => (painScores[id] || 0) >= 4);
-  const hasPrescribed = prescribed.length > 0;
+  const highPain       = conditions.some(id => (painScores[id] || 0) >= 7);
+  const moderatePain   = conditions.some(id => (painScores[id] || 0) >= 4);
+  const hasPrescribed  = prescribed.length > 0;
+  const hasGymProg     = !!gymProgramme;
 
-  // ── Time budget ──────────────────────────────────────────────────────────────
-  const TIME_MAP = {
-    "micro":    15,
-    "quick":    20,
-    "short":    30,
-    "standard": 40,
-    "long":     50,
-    "open":     60
-  };
-  let timeBudget = availableTime ? (TIME_MAP[availableTime] || 40) : 40;
-  if (preferShorter) timeBudget = Math.max(15, Math.round(timeBudget * 0.6));
+  // Is today the same day as the last proposal?
+  const todayKey       = new Date().toISOString().split("T")[0];
+  const isRepeatDay    = lastDate === todayKey;
 
-  // ── Decision logic ───────────────────────────────────────────────────────────
+  // Preference score helper: how much does the user lean toward a type?
+  function prefScore(type) {
+    const base = prefs[type] || 0;
+    const identityBonus = identity === type ? 3 : 0;
+    return base + identityBonus;
+  }
 
-  // Severe state: override everything
+  // ── Build the reflection sentence ────────────────────────────────────────
+  const reflection = buildReflection(recentLog, daysSinceLast, goal);
+
+  // ── Decision logic ───────────────────────────────────────────────────────
+
+  // 1. Severe override
   if (highPain || energy <= 2) {
-    return {
-      type: "quiet",
-      label: "something gentle",
-      description: "Today is a day for rest and recovery. Your body is telling you something important and the most supportive thing I can offer right now is space, not a workout. A short breathing practice or a few minutes of stillness is the plan.",
+    return makeProposal({
+      type: "quiet", target: "quiet-session", quietMode: "breathing",
+      duration: Math.min(timeBudget, 15),
+      reflection,
+      proposal: "I think today calls for something gentle. A short breathing practice or a few minutes of stillness.",
       rationale: energy <= 2
-        ? "Your energy is very low today. Pushing through won't serve you."
-        : "Your pain levels are elevated. Movement is not off the table, but intensity is.",
-      duration: 10,
-      target: "quiet-session",
-      quietMode: "breathing"
-    };
+        ? "Your energy is very low. Rest and breath work are the right response."
+        : "Your pain levels are elevated. Gentle is the most supportive thing I can offer today."
+    });
   }
 
-  // Prescribed exercises due and energy is okay
-  if (hasPrescribed && energy >= 4 && !moderatePain) {
-    const baseDur = Math.min(timeBudget, 35);
-    return {
-      type: "prescribed",
-      label: "your prescribed exercises",
-      description: "I think today is a good day to work through your prescribed exercises. Your physio gave you these for a reason, and consistency with them is what makes the difference over time. I will walk you through each one in order.",
-      rationale: "You have " + prescribed.length + " prescribed exercise" + (prescribed.length > 1 ? "s" : "") + " outstanding today. Your energy is good enough to do them properly.",
-      duration: baseDur,
-      target: "prescribed",
-      quietMode: null
-    };
+  // 2. Prescribed exercises — only propose if not repeatedly refusing them
+  const prescribedAccepts = prefs["prescribed"] || 0;
+  const prescribedRefused = (prefs["prescribed_declined"] || 0);
+  const prescribedRatio   = prescribedAccepts / Math.max(1, prescribedAccepts + prescribedRefused);
+  if (hasPrescribed && energy >= 4 && !moderatePain && prescribedRatio >= 0.3 && !isRepeatDay) {
+    return makeProposal({
+      type: "prescribed", target: "prescribed", quietMode: null,
+      duration: Math.min(timeBudget, 30),
+      reflection,
+      proposal: "I thought we could work through your prescribed exercises today. Your physio gave you these for a reason, and consistency is what makes them work.",
+      rationale: prescribed.length + " prescribed exercise" + (prescribed.length > 1 ? "s" : "") + " outstanding. Your energy is good enough to do them properly."
+    });
   }
 
-  // Low energy but not severe: suggest quiet or gentle movement
+  // 3. Very low energy but not severe — quiet or gentle
   if (energy <= 3) {
-    if (mood <= 3 || sleep <= 5) {
-      return {
-        type: "quiet",
-        label: "something quieter today",
-        description: "Looking at how you are feeling, I think a gentle session makes more sense than a workout. I was thinking a short mindful practice or some breathing work, something that meets you where you are without asking more than you have.",
-        rationale: "Low energy, " + (sleep <= 5 ? "disrupted sleep" : "lower mood") + " — this is a recovery day, not a training day.",
+    const quietPref = prefScore("quiet");
+    if (mood <= 3 || sleep <= 5 || quietPref > prefScore("gym")) {
+      return makeProposal({
+        type: "quiet", target: "quiet-session", quietMode: "mindful",
         duration: Math.min(timeBudget, 20),
-        target: "quiet-session",
-        quietMode: "mindful"
-      };
+        reflection,
+        proposal: "I was thinking something quieter today. A gentle mindful practice, or some breathing work. Something that meets you where you are.",
+        rationale: sleep <= 5 ? "Disrupted sleep." : "Lower energy and mood. This is a recovery moment, not a training moment."
+      });
     }
-
-    // Low energy but mood and sleep are okay — gentle movement
-    return {
-      type: "walk",
-      label: "something gentle to start",
-      description: "Your energy is lower today, but that does not mean doing nothing. I think a gentle walk or some light movement would actually help more than staying still. Movement generates the energy it costs, especially on days like this.",
-      rationale: "Lower energy often responds better to gentle movement than to rest. A short session is better than skipping.",
-      duration: Math.min(timeBudget, 25),
-      target: "quiet-session",
-      quietMode: "mindful"
-    };
   }
 
-  // Good energy, too many gym sessions recently — suggest variety
-  if (energy >= 6 && gymCountRecent >= 3) {
-    return {
-      type: "yoga",
-      label: "a yoga or recovery session",
-      description: "You have had several good training sessions recently. Rather than loading the same movement patterns again, I think today is a good opportunity for something that supports recovery and mobility. A yoga or stretch-focused session would complement what you have been doing.",
-      rationale: "Three or more gym-type sessions in the last five. Your body will adapt faster with some contrast.",
-      duration: Math.min(timeBudget, 40),
-      target: "yoga-session",
-      quietMode: null
-    };
-  }
+  // 4. Movement identity + preference weighting
+  // Score each option and pick the highest that isn't a repeat
+  const options = [
+    {
+      type: "gym", available: hasGymProg,
+      score: prefScore("gym") + (gymCount < 3 ? 2 : 0) + (energy >= 6 ? 1 : 0),
+      proposal: "I thought we'd continue your gym programme today. Session " + gymSession + " of Week " + gymWeek + ". Your cardio warmup, the main session, and your prescribed work built in.",
+      rationale: energy >= 7 ? "Your energy is good. Make the most of it." : "Steady progress on the programme is what builds the result.",
+      duration: Math.min(timeBudget, 45), target: "gym-programme", quietMode: null
+    },
+    {
+      type: "yoga", available: true,
+      score: prefScore("yoga") + (gymCount >= 3 ? 3 : 0) + (energy <= 5 ? 1 : 0),
+      proposal: "I thought a yoga or mobility session would serve you well today. Something that supports recovery while still moving your body intentionally.",
+      rationale: gymCount >= 3 ? "You have had several demanding sessions recently. Contrast helps." : "Mobility work complements your other training.",
+      duration: Math.min(timeBudget, 35), target: "quiet-session", quietMode: "mindful"
+    },
+    {
+      type: "quiet", available: true,
+      score: prefScore("quiet") + (energy <= 4 ? 2 : 0) + (quietCount < 1 ? 1 : 0),
+      proposal: "I thought something quieter today. A breathing practice or a few minutes of reflection. Not every day needs to be a training day.",
+      rationale: "Balance between effort and recovery is where progress lives.",
+      duration: Math.min(timeBudget, 20), target: "quiet-session", quietMode: "breathing"
+    },
+    {
+      type: "run", available: true,
+      score: prefScore("run") + (cardioCount < 1 ? 2 : 0),
+      proposal: "I thought a run today. Even a short one. Cardiovascular work at this stage of your goals makes a real difference.",
+      rationale: "No cardio recently. Your goal includes body composition change.",
+      duration: Math.min(timeBudget, 35), target: "activity-log", quietMode: null
+    },
+    {
+      type: "walk", available: true,
+      score: prefScore("walk") + (energy <= 4 ? 1 : 0) + (daysSinceLast >= 3 ? 1 : 0),
+      proposal: "I thought a walk today. Not nothing, but not a demand either. Movement that generates the energy it costs.",
+      rationale: energy <= 4 ? "Lower energy responds well to gentle sustained movement." : "A good complement to your recent sessions.",
+      duration: Math.min(timeBudget, 40), target: "activity-log", quietMode: null
+    }
+  ];
 
-  // Missed several days — ease back in
-  if (daysSinceLast >= 4 && energy >= 4) {
-    return {
-      type: "gym",
-      label: "a return session",
-      description: "It has been a few days since your last session. Rather than diving straight into a full programme, I think a moderate gym session is the right re-entry point. Enough to get back into it without overdoing the return.",
-      rationale: "Four or more days since your last session. Easing back in is smarter than catching up.",
-      duration: Math.min(timeBudget, 45),
-      target: "gym-programme",
-      quietMode: null
-    };
-  }
+  // Filter available, penalise yesterday's type, sort by score
+  const ranked = options
+    .filter(o => o.available)
+    .map(o => ({
+      ...o,
+      finalScore: o.score - (o.type === lastType && isRepeatDay ? 5 : 0)
+    }))
+    .sort((a, b) => b.finalScore - a.finalScore);
 
-  // Goal is weight / leanness and no recent cardio
-  const hasWeightGoal  = goal.primaryGoal === "lose-weight" || goal.primaryGoal === "body-composition";
-  const recentCardio   = recentTypes.filter(t => t === "cardio" || t === "run" || t === "cycle" || t === "swim").length;
-  if (hasWeightGoal && recentCardio === 0 && energy >= 5) {
-    return {
-      type: "cardio",
-      label: "a cardio session today",
-      description: "Given your goal and recent activity, I think some cardiovascular work would serve you well today. The gym cardio block, a run, or a cycle would all work. The key is sustained effort for at least twenty minutes.",
-      rationale: "No cardio in your recent sessions, and your goal includes body composition change. Cardio consistency matters here.",
-      duration: Math.min(timeBudget, 40),
-      target: "gym-programme",
-      quietMode: null
-    };
-  }
+  const chosen = ranked[0];
 
-  // Default: gym programme, next session
-  return {
-    type: "gym",
-    label: "your gym programme",
-    description: "I think today is a good day to continue your gym programme. Session " + gymSession + " of Week " + gymWeek + " is next. The session includes your warmup cardio, the main programme, and your prescribed exercises are built in. About " + Math.min(timeBudget, 45) + " minutes in total.",
-    rationale: energy >= 7
-      ? "Your energy is good today. Make the most of it."
-      : "Steady progress on the programme is what builds the result.",
-    duration: Math.min(timeBudget, 45),
-    target: "gym-programme",
-    quietMode: null
-  };
+  return makeProposal({
+    type: chosen.type, target: chosen.target, quietMode: chosen.quietMode,
+    duration: chosen.duration, reflection,
+    proposal: chosen.proposal, rationale: chosen.rationale
+  });
 }
 
 /**
- * Build an alternative proposal — genuinely different from the current one.
+ * Build the reflection sentence from recent activity log.
+ * Reads the last 3 entries and constructs a plain-English summary.
+ * Varies based on recency and what was done.
+ */
+function buildReflection(recentLog, daysSinceLast, goal) {
+  if (recentLog.length === 0) {
+    return "This looks like an early session, so I am working from your goals and how you are feeling today.";
+  }
+
+  if (daysSinceLast >= 5) {
+    return "It has been " + daysSinceLast + " days since your last session. Welcome back.";
+  }
+
+  if (daysSinceLast === 0) {
+    return "You have already been active today.";
+  }
+
+  // Describe the last 1-3 sessions in plain English
+  const last = recentLog[recentLog.length - 1];
+  const prev = recentLog[recentLog.length - 2] || null;
+
+  const lastLabel = activityLabel(last.type || last.source || "session");
+  const prevLabel = prev ? activityLabel(prev.type || prev.source || "session") : null;
+
+  const dayWord = daysSinceLast === 1 ? "yesterday" : daysSinceLast + " days ago";
+
+  // Goal reference — vary day of week to avoid repetition
+  const dayOfWeek = new Date().getDay();
+  const mentionGoal = goal.targetDescription && dayOfWeek % 3 === 1;
+
+  let reflection = "We had a " + lastLabel + " " + dayWord + ".";
+
+  if (prev && prev.type !== last.type) {
+    reflection = "We have had a " + prevLabel + " and a " + lastLabel + " in the last few sessions.";
+  }
+
+  if (mentionGoal) {
+    reflection += " Keeping your goal in mind \u2014 " + goal.targetDescription + ".";
+  }
+
+  return reflection;
+}
+
+function activityLabel(type) {
+  const labels = {
+    "gym": "gym session", "coach-session": "gym session", "gym-programme": "gym session",
+    "run": "run", "walk": "walk", "swim": "swim", "cycle": "cycle",
+    "yoga": "yoga session", "pilates": "pilates session",
+    "breathing": "breathing practice", "journal": "journaling session",
+    "mindful": "mindful movement session", "rest": "rest day",
+    "class": "class", "boxing": "boxing session", "spin": "spin class",
+    "body-balance": "Body Balance class", "hiit": "HIIT session",
+    "prescribed": "prescribed exercises", "quiet": "quiet session"
+  };
+  return labels[type] || type.replace(/-/g, " ");
+}
+
+function makeProposal({ type, target, quietMode, duration, reflection, proposal, rationale }) {
+  return { type, target, quietMode, duration, reflection, proposal, rationale };
+}
+
+/**
+ * Build an alternative proposal — genuinely different from current.
  */
 function buildAlternativeProposal() {
-  const current       = currentProposal;
-  const energy        = latestCheckin().energy || 5;
-  const prescribed    = (store.get("prescribedExercises") || []).filter(e => !e.completedToday);
-  const gymWeek       = store.get("gymProgrammeWeek") || 1;
-  const gymSession    = store.get("gymProgrammeSession") || "A";
-  const availableTime = store.get("availableTime") || null;
-  const TIME_MAP      = { micro: 15, quick: 20, short: 30, standard: 40, long: 50, open: 60 };
-  const timeBudget    = availableTime ? (TIME_MAP[availableTime] || 40) : 40;
+  const current    = currentProposal;
+  const timeBudget = 30;
 
-  // Suggest the opposite of current
-  if (current.type === "gym") {
-    return {
-      type: "quiet",
-      label: "something quieter instead",
-      description: "How about this instead: skip the gym programme today and do something that nourishes rather than demands. A breathing session, some journaling, or a short mindful movement practice. Different kind of good.",
-      rationale: "Sometimes the most useful thing is contrast.",
-      duration: Math.min(timeBudget, 20),
-      target: "quiet-session",
-      quietMode: "breathing"
-    };
-  }
+  const alternatives = {
+    "gym":       { type: "quiet",      target: "quiet-session",  quietMode: "breathing", duration: 20,
+                   proposal: "How about something quieter instead. A breathing practice or a short mindful session.",
+                   rationale: "Sometimes contrast is the right choice." },
+    "quiet":     { type: "gym",        target: "gym-programme",  quietMode: null,         duration: 35,
+                   proposal: "How about continuing your gym programme after all. You might have more in you than you think.",
+                   rationale: "Movement often generates the energy it costs." },
+    "yoga":      { type: "gym",        target: "gym-programme",  quietMode: null,         duration: 40,
+                   proposal: "How about the gym programme instead. A different kind of movement that will complement your recent sessions.",
+                   rationale: "Strength work supports mobility over time." },
+    "run":       { type: "walk",       target: "activity-log",   quietMode: null,         duration: 30,
+                   proposal: "How about a walk instead. Same outdoor time, less intensity, still moving.",
+                   rationale: "Lower-intensity movement has its own benefits." },
+    "walk":      { type: "quiet",      target: "quiet-session",  quietMode: "mindful",   duration: 15,
+                   proposal: "How about a short mindful session instead. Fifteen minutes of stillness.",
+                   rationale: "Rest is movement of a different kind." },
+    "prescribed":{ type: "gym",        target: "gym-programme",  quietMode: null,         duration: 45,
+                   proposal: "How about the full gym session. Your prescribed work is already built into the warmup.",
+                   rationale: "More complete session, same prescribed work included." }
+  };
 
-  if (current.type === "quiet" || current.type === "walk") {
-    return {
-      type: "gym",
-      label: "your gym programme after all",
-      description: "Actually — how about continuing your gym programme? Session " + gymSession + " of Week " + gymWeek + ". You might find you have more in you than you think, and even a shorter version of the session is worth doing.",
-      rationale: "Movement often generates the energy it costs. Worth trying.",
-      duration: Math.min(timeBudget, 35),
-      target: "gym-programme",
-      quietMode: null
-    };
-  }
-
-  if (current.type === "prescribed") {
-    return {
-      type: "gym",
-      label: "the full gym session with prescribed built in",
-      description: "Rather than just the prescribed exercises on their own, how about the full gym session? Your prescribed work is already built into the programme warmup, so you get both.",
-      rationale: "More complete session, same prescribed work included.",
-      duration: Math.min(timeBudget, 45),
-      target: "gym-programme",
-      quietMode: null
-    };
-  }
-
-  if (current.type === "yoga") {
-    return {
-      type: "home",
-      label: "a home bodyweight workout",
-      description: "Instead of yoga, how about a home bodyweight session? No equipment, good mix of strength and mobility, about thirty minutes. Enough contrast from your recent gym sessions without needing any kit.",
-      rationale: "Different movement pattern, similar recovery benefit.",
-      duration: Math.min(timeBudget, 30),
-      target: "quiet-session",
-      quietMode: "mindful"
-    };
-  }
-
-  // Fallback
+  const alt = alternatives[current.type] || alternatives["quiet"];
   return {
-    type: "quiet",
-    label: "a breathing practice",
-    description: "How about just a short breathing practice? Five minutes of box breathing or the physiological sigh. Quick, effective, and genuinely useful however you are feeling.",
-    rationale: "Sometimes less is more.",
-    duration: 10,
-    target: "quiet-session",
-    quietMode: "breathing"
+    ...alt,
+    reflection: current.reflection  // keep the same reflection
   };
 }
 
@@ -335,10 +375,9 @@ function renderProposal(name) {
     <div class="card card-coach coach-proposal-card">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
       <div class="coach-proposal-content">
-        <p class="coach-proposal-thinking">
-          ${getGreeting(name)}, I'm thinking ${p.label} today.
-        </p>
-        <p class="coach-proposal-description">${p.description}</p>
+        <p class="coach-proposal-greeting">${getGreeting(name)}.</p>
+        <p class="coach-proposal-reflection">${p.reflection}</p>
+        <p class="coach-proposal-suggestion">${p.proposal}</p>
         <p class="coach-proposal-rationale text-sm text-muted">${p.rationale}</p>
         <div class="coach-proposal-meta">
           <span class="coach-proposal-duration">&#8987; About ${p.duration} minutes</span>
@@ -353,7 +392,7 @@ function renderProposal(name) {
       </button>
       <button class="btn btn-ghost btn-full" id="proposal-else-btn"
               style="margin-top: var(--space-3);">
-        Something else
+        Unless you had something else in mind
       </button>
     </div>
   `;
@@ -477,12 +516,23 @@ function getGreeting(name) {
 
 function navigateToProposal(proposal) {
   if (proposal.quietMode) store.set("quietMode", proposal.quietMode);
+
+  // Record accepted proposal type for preference learning
+  const prefs = store.get("activityPreferences") || {};
+  prefs[proposal.type] = (prefs[proposal.type] || 0) + 1;
+  store.set("activityPreferences", prefs);
+
+  // Track last proposal type for variety enforcement
+  const todayKey = new Date().toISOString().split("T")[0];
+  store.set("lastProposalType", proposal.type);
+  store.set("lastProposalDate", todayKey);
+
   store.set("coachProposalAccepted", {
     type: proposal.type,
-    label: proposal.label,
     duration: proposal.duration,
     acceptedAt: new Date().toISOString()
   });
+
   router.navigate(proposal.target);
 }
 
@@ -508,6 +558,12 @@ export function onMount() {
 
   // ── Something else ────────────────────────────────────────────────────────
   document.getElementById("proposal-else-btn")?.addEventListener("click", () => {
+    // Record that user declined this proposal type — softly reduces its future weight
+    const prefs = store.get("activityPreferences") || {};
+    const declineKey = (currentProposal?.type || "unknown") + "_declined";
+    prefs[declineKey] = (prefs[declineKey] || 0) + 1;
+    store.set("activityPreferences", prefs);
+
     proposalState = "branching";
     rerender();
   });
