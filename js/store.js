@@ -79,6 +79,12 @@ export const store = {
                               ? { ...this.getDefaults().checkInNotification, ...saved.checkInNotification }
                               : this.getDefaults().checkInNotification,
       speechRate: (typeof saved.speechRate === "number") ? saved.speechRate : 0.9,
+      activityPreferences: (saved.activityPreferences && typeof saved.activityPreferences === "object")
+                             ? saved.activityPreferences
+                             : {},
+      movementIdentity:    saved.movementIdentity || null,
+      lastProposalType:    saved.lastProposalType || null,
+      lastProposalDate:    saved.lastProposalDate || null,
     };
   },
 
@@ -200,6 +206,29 @@ export const store = {
       // Rate: 0.75 = slow, 0.9 = normal, 1.2 = fast.
       // Never autoplays. Persists across sessions.
       speechRate: 0.9,
+
+      // ── ACTIVITY PREFERENCES ──────────────────────────────────
+      // Lightweight preference signal built from accepted proposals.
+      // Keys are proposal type strings (e.g. "gym", "yoga", "quiet").
+      // Values are acceptance counts. Incremented in coach-proposal.js.
+      // Never resets — represents lifetime preference signal.
+      activityPreferences: {},
+
+      // ── MOVEMENT IDENTITY ─────────────────────────────────────
+      // User's self-declared movement identity. Set in Settings Library
+      // tab or inferred from activity history after 14+ sessions.
+      // Used as the prior before enough activity data exists, and to
+      // retip the scales when the user changes their primary activity
+      // (e.g. joins a gym mid-use).
+      // Values: "gym" | "yoga" | "running" | "walking" | "swimming"
+      //         | "classes" | "mixed" | null
+      movementIdentity: null,
+
+      // ── COACH PROPOSAL ────────────────────────────────────────
+      // Tracks the last proposal made to avoid identical repetition.
+      // { type, date } — cleared on new day.
+      lastProposalType: null,
+      lastProposalDate: null,
 
       // ── CHECK-IN NOTIFICATION ────────────────────────────────
       // Opted-in reminder only. User must explicitly enable.
