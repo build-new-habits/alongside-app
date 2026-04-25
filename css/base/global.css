@@ -937,3 +937,61 @@ select {
   color: var(--color-primary);
   font-weight: var(--font-semibold);
 }
+
+/* ============================================
+   QUIET SESSION — MODE SELECTOR MENU
+   ============================================ */
+
+.quiet-mode-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.quiet-mode-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  min-height: 72px;
+}
+
+.quiet-mode-card:hover,
+.quiet-mode-card:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.quiet-mode-card-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.quiet-mode-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.quiet-mode-card h3 {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.quiet-mode-arrow {
+  font-size: 1.5rem;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  margin-left: var(--space-3);
+}
