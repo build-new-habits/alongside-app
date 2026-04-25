@@ -911,6 +911,13 @@ function buildAdaptedSession(session) {
 
 let showingAdaptedSession = false;
 
+// Phase execution state
+let gymPhase         = null;
+let gymPhaseExIndex  = 0;
+let gymPhaseTimer    = null;
+let gymPhaseTimeSec  = 0;
+let gymPhaseStarted  = false;
+
 function renderAdaptationChoice(session) {
   const adaptation = buildAdaptedSession(session);
   if (!adaptation.adapted) return ""; // No adaptation needed
@@ -996,18 +1003,306 @@ export function render() {
         `).join("")}
       </div>
 
-      ${postSessionState ? renderPostSession(session) : renderSessionCards(session)}
-
-      ${allDone && !postSessionState ? `
-        <button class="btn btn-primary btn-full gym-finish-btn"
-                style="margin-top: var(--space-4);">
-          Finish session
-        </button>
-      ` : ""}
+      ${postSessionState
+          ? renderPostSession(session)
+          : gymPhase
+            ? renderPhaseExecution(session)
+            : renderSessionOverview(session, allDone)}
 
     </div>
   `;
 }
+
+// -- Phase execution rendering ------------------------------------------------
+
+function renderSessionOverview(session, allDone) {
+  const warmup   = session.exercises.filter(e => e.section === "warmup");
+  const main     = session.exercises.filter(e => e.section === "main");
+  const cooldown = session.exercises.filter(e => e.section === "cooldown");
+
+  return `
+    <div class="gym-session-overview">
+      <div class="card card-coach gym-coach-line" style="margin-bottom:var(--space-4);">
+        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <div>
+          <p>${session.coachLine || "Here is what I have planned for today. Take a look, then tap Start when you are ready."}</p>
+        </div>
+      </div>
+      <div class="gym-overview-sections">
+        <div class="gym-overview-section">
+          <h3 class="gym-overview-heading">Warmup <span class="gym-overview-count">${warmup.length} exercises</span></h3>
+          <ul class="gym-overview-list">
+            ${warmup.map(e => "<li>" + e.name + " <span class=\"text-muted\">" + (e.sets ? e.sets + " sets" : "") + " " + (e.reps || "") + "</span></li>").join("")}
+          </ul>
+        </div>
+        <div class="gym-overview-section">
+          <h3 class="gym-overview-heading">Main <span class="gym-overview-count">${main.length} exercises</span></h3>
+          <ul class="gym-overview-list">
+            ${main.map(e => "<li>" + e.name + " <span class=\"text-muted\">" + (e.sets ? e.sets + " sets" : "") + " " + (e.reps || "") + "</span></li>").join("")}
+          </ul>
+        </div>
+        <div class="gym-overview-section">
+          <h3 class="gym-overview-heading">Cooldown <span class="gym-overview-count">${cooldown.length} exercises</span></h3>
+          <ul class="gym-overview-list">
+            ${cooldown.map(e => "<li>" + e.name + " <span class=\"text-muted\">" + (e.reps || "") + "</span></li>").join("")}
+          </ul>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-large btn-full gym-start-session-btn"
+              style="margin-top:var(--space-5);">
+        Start Session
+      </button>
+      ${allDone ? `<p class="text-sm text-muted" style="margin-top:var(--space-3);text-align:center;">All exercises completed today.</p>` : ""}
+    </div>
+  `;
+}
+
+function renderPhaseExecution(session) {
+  if (gymPhase === "intro") return renderPhaseIntro(session);
+  const exercises = getPhaseExercises(session, gymPhase);
+  if (!exercises.length) { advancePhase(session); return ""; }
+  const ex       = exercises[gymPhaseExIndex];
+  if (!ex) return "";
+  const isLast   = gymPhaseExIndex >= exercises.length - 1;
+  const progress = Math.round((gymPhaseExIndex / exercises.length) * 100);
+  const PHASE_LABELS = { warmup: "Warmup", main: "Main Session", cooldown: "Cooldown" };
+  const phaseLabel = PHASE_LABELS[gymPhase] || gymPhase;
+
+  return `
+    <div class="gym-phase-execution">
+      <div class="gym-phase-header">
+        <span class="gym-phase-label">${phaseLabel}</span>
+        <span class="gym-phase-progress text-sm text-muted">${gymPhaseExIndex + 1} of ${exercises.length}</span>
+      </div>
+      <div class="workout-progress-bar" role="progressbar"
+           aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">
+        <div class="workout-progress-fill" style="width:${progress}%"></div>
+      </div>
+      <div class="gym-phase-exercise card" style="margin-top:var(--space-4);">
+        ${ex.note ? `<div class="gym-phase-safety-banner" role="note">Note: ${ex.note}</div>` : ""}
+        <h2 class="gym-phase-exercise-name">${ex.name}</h2>
+        <div class="gym-phase-prescription">
+          ${ex.sets ? `<span class="gym-phase-pill">${ex.sets} sets</span>` : ""}
+          ${ex.reps ? `<span class="gym-phase-pill">${ex.reps}</span>` : ""}
+          ${ex.tempo ? `<span class="gym-phase-pill">${ex.tempo}</span>` : ""}
+          ${ex.rest && ex.rest !== "-" ? `<span class="gym-phase-pill">${ex.rest} rest</span>` : ""}
+        </div>
+        ${ex.duration ? `
+          <div class="gym-phase-timer" id="gym-phase-timer-wrap" style="margin:var(--space-4) 0;">
+            <div class="quiet-timer-circle" style="--phase-colour:var(--color-primary);margin:0 auto;">
+              <div class="quiet-timer-phase" id="gym-phase-timer-label">
+                ${gymPhaseStarted ? "Hold" : "Tap to start"}
+              </div>
+              <div class="quiet-timer-seconds" id="gym-phase-timer-display">
+                ${formatTimeSec(gymPhaseTimeSec || ex.duration)}
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" id="gym-phase-timer-btn"
+                    style="margin-top:var(--space-4);">
+              ${!gymPhaseStarted ? "Start Timer" : (gymPhaseTimer ? "Pause" : "Resume")}
+            </button>
+          </div>
+        ` : ""}
+        ${renderExerciseGuide(ex)}
+        ${ex.logWeight ? `
+          <div class="gym-phase-weight-log" style="margin-top:var(--space-4);">
+            <label class="form-label" for="gym-phase-weight-input">Weight used (kg)</label>
+            <div class="gym-weight-row">
+              <input type="number" id="gym-phase-weight-input" class="form-input"
+                     placeholder="${ex.recommended || "kg"}" inputmode="decimal" step="0.5" min="0">
+              <button class="btn btn-ghost btn-small" id="gym-phase-weight-save-btn">Save</button>
+            </div>
+          </div>
+        ` : ""}
+      </div>
+      <div class="gym-phase-actions" style="margin-top:var(--space-4);">
+        <button class="btn btn-primary btn-large btn-full" id="gym-phase-next-btn">
+          ${isLast ? getNextPhaseLabel(session) : "Done — Next"}
+        </button>
+        <button class="btn btn-ghost btn-small" id="gym-phase-skip-btn"
+                style="margin-top:var(--space-2);">
+          Skip this exercise
+        </button>
+        <button class="btn btn-ghost btn-small" id="gym-phase-exit-btn"
+                style="margin-top:var(--space-1);">
+          Exit session
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderPhaseIntro(session) {
+  const warmup   = session.exercises.filter(e => e.section === "warmup");
+  const main     = session.exercises.filter(e => e.section === "main");
+  const cooldown = session.exercises.filter(e => e.section === "cooldown");
+  const conditions = store.get("conditions") || [];
+  const painScores = store.get("conditionPainScores") || {};
+  const flagged = conditions.filter(id => (painScores[id] || 0) >= 3);
+
+  return `
+    <div class="gym-phase-intro">
+      <div class="card card-coach" style="margin-bottom:var(--space-4);">
+        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <div>
+          <h3>Today's session</h3>
+          <p>${session.coachLine || "I will guide you through each section. Take each exercise at your own pace."}</p>
+        </div>
+      </div>
+      <div class="gym-intro-plan card">
+        <h3>What we are doing today</h3>
+        <div class="gym-intro-sections">
+          <div class="gym-intro-section">
+            <div>
+              <span class="gym-intro-label">Warmup</span>
+              <span class="text-sm text-muted"> — ${warmup.length} exercises</span>
+            </div>
+          </div>
+          <div class="gym-intro-section">
+            <div>
+              <span class="gym-intro-label">Main session</span>
+              <span class="text-sm text-muted"> — ${main.length} exercises</span>
+            </div>
+          </div>
+          <div class="gym-intro-section">
+            <div>
+              <span class="gym-intro-label">Cooldown</span>
+              <span class="text-sm text-muted"> — ${cooldown.length} exercises</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:var(--space-4);">
+        <p class="text-sm text-muted">
+          During each exercise: discomfort is normal. Sharp or shooting pain is a
+          signal to stop. If something feels wrong, skip it and note it.
+        </p>
+        ${flagged.length > 0 ? `
+          <p class="text-sm text-muted" style="margin-top:var(--space-2);">
+            You have active conditions. I will show relevant notes at each exercise.
+          </p>
+        ` : ""}
+      </div>
+      <button class="btn btn-primary btn-large btn-full" id="gym-intro-start-btn"
+              style="margin-top:var(--space-5);">
+        Let's go
+      </button>
+      <button class="btn btn-ghost btn-full" id="gym-intro-back-btn"
+              style="margin-top:var(--space-3);">
+        Back to overview
+      </button>
+    </div>
+  `;
+}
+
+function renderExerciseGuide(ex) {
+  const guide = EXERCISE_GUIDE[ex.name];
+  if (!guide) return "";
+  return `
+    <div class="gym-phase-guide" style="margin-top:var(--space-4);">
+      ${guide.description ? `<p class="text-sm" style="margin-bottom:var(--space-3);">${guide.description}</p>` : ""}
+      ${guide.cues && guide.cues.length ? `
+        <ul class="gym-phase-cues">
+          ${guide.cues.map(cue => `<li class="text-sm">${cue}</li>`).join("")}
+        </ul>
+      ` : ""}
+      ${guide.youtube ? `
+        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(guide.youtube)}"
+           target="_blank" rel="noopener noreferrer" class="youtube-link" style="margin-top:var(--space-3);">
+          Watch how to do this
+        </a>
+      ` : ""}
+    </div>
+  `;
+}
+
+function getPhaseExercises(session, phase) {
+  return session.exercises.filter(e => e.section === phase);
+}
+
+function getNextPhaseLabel(session) {
+  const phases = ["warmup", "main", "cooldown"];
+  const currentIdx = phases.indexOf(gymPhase);
+  for (let i = currentIdx + 1; i < phases.length; i++) {
+    if (getPhaseExercises(session, phases[i]).length > 0) {
+      const labels = { warmup: "Start Warmup", main: "Start Main Session", cooldown: "Start Cooldown" };
+      return labels[phases[i]] || "Next";
+    }
+  }
+  return "Finish Session";
+}
+
+function advancePhase(session) {
+  const phases = ["warmup", "main", "cooldown"];
+  const currentIdx = phases.indexOf(gymPhase);
+  for (let i = currentIdx + 1; i < phases.length; i++) {
+    if (getPhaseExercises(session, phases[i]).length > 0) {
+      gymPhase = phases[i];
+      gymPhaseExIndex = 0;
+      gymPhaseStarted = false;
+      gymPhaseTimeSec = 0;
+      stopPhaseTimer();
+      rerender();
+      return;
+    }
+  }
+  gymPhase = null;
+  gymPhaseExIndex = 0;
+  stopPhaseTimer();
+  markSessionComplete(session);
+}
+
+function markSessionComplete(session) {
+  const allIds = session.exercises.map(e => e.id);
+  completedIds = new Set(allIds);
+  store.set("gymCompletedExercises_" + activeSessionId, allIds);
+  postSessionState = "intel";
+  const log = store.get("activityLog") || [];
+  log.push({
+    id: "gym-" + Date.now(), type: "gym-programme",
+    name: "Gym Session " + activeSessionId, source: "gym-programme",
+    credits: 50, loggedAt: new Date().toISOString()
+  });
+  store.set("activityLog", log);
+  store.set("totalCredits", (store.get("totalCredits") || 0) + 50);
+  rerender();
+}
+
+function startPhaseTimer(duration) {
+  if (gymPhaseTimer) clearInterval(gymPhaseTimer);
+  gymPhaseTimeSec = gymPhaseTimeSec > 0 ? gymPhaseTimeSec : duration;
+  gymPhaseStarted = true;
+  gymPhaseTimer = setInterval(() => {
+    gymPhaseTimeSec--;
+    const el = document.getElementById("gym-phase-timer-display");
+    if (el) el.textContent = formatTimeSec(gymPhaseTimeSec);
+    if (gymPhaseTimeSec <= 0) {
+      clearInterval(gymPhaseTimer);
+      gymPhaseTimer = null;
+      if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
+      const label = document.getElementById("gym-phase-timer-label");
+      if (label) label.textContent = "Done";
+    }
+  }, 1000);
+}
+
+function pausePhaseTimer() {
+  if (gymPhaseTimer) { clearInterval(gymPhaseTimer); gymPhaseTimer = null; }
+}
+
+function stopPhaseTimer() {
+  if (gymPhaseTimer) clearInterval(gymPhaseTimer);
+  gymPhaseTimer = null;
+  gymPhaseTimeSec = 0;
+  gymPhaseStarted = false;
+}
+
+function formatTimeSec(s) {
+  const m = Math.floor(s / 60);
+  return m + ":" + String(s % 60).padStart(2, "0");
+}
+
+
 
 // ── Timer helpers ─────────────────────────────────────────────────────────────
 
@@ -1223,6 +1518,125 @@ function wireEvents() {
       return;
     }
 
+    // ── Phase execution handlers ─────────────────────────────
+    const startSessionBtn = e.target.closest(".gym-start-session-btn");
+    if (startSessionBtn) {
+      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
+      gymPhase        = "intro";
+      gymPhaseExIndex = 0;
+      gymPhaseStarted = false;
+      gymPhaseTimeSec = 0;
+      rerender();
+      return;
+    }
+
+    const introStartBtn = e.target.closest("#gym-intro-start-btn");
+    if (introStartBtn) {
+      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
+      // Find first non-empty phase
+      for (const phase of ["warmup", "main", "cooldown"]) {
+        if (getPhaseExercises(session, phase).length > 0) {
+          gymPhase        = phase;
+          gymPhaseExIndex = 0;
+          gymPhaseStarted = false;
+          gymPhaseTimeSec = 0;
+          rerender();
+          return;
+        }
+      }
+      return;
+    }
+
+    const introBackBtn = e.target.closest("#gym-intro-back-btn");
+    if (introBackBtn) {
+      gymPhase = null;
+      rerender();
+      return;
+    }
+
+    const phaseNextBtn = e.target.closest("#gym-phase-next-btn");
+    if (phaseNextBtn) {
+      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
+      const exercises = getPhaseExercises(session, gymPhase);
+      stopPhaseTimer();
+
+      // Save weight if entered
+      const wInput = document.getElementById("gym-phase-weight-input");
+      if (wInput && wInput.value) {
+        const ex = exercises[gymPhaseExIndex];
+        if (ex) store.set("gymLog_" + activeSessionId + "_" + ex.name, wInput.value);
+      }
+
+      if (gymPhaseExIndex >= exercises.length - 1) {
+        advancePhase(session);
+      } else {
+        gymPhaseExIndex++;
+        gymPhaseStarted = false;
+        gymPhaseTimeSec = 0;
+        rerender();
+      }
+      return;
+    }
+
+    const phaseSkipBtn = e.target.closest("#gym-phase-skip-btn");
+    if (phaseSkipBtn) {
+      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
+      const exercises = getPhaseExercises(session, gymPhase);
+      stopPhaseTimer();
+      if (gymPhaseExIndex >= exercises.length - 1) {
+        advancePhase(session);
+      } else {
+        gymPhaseExIndex++;
+        gymPhaseStarted = false;
+        gymPhaseTimeSec = 0;
+        rerender();
+      }
+      return;
+    }
+
+    const phaseExitBtn = e.target.closest("#gym-phase-exit-btn");
+    if (phaseExitBtn) {
+      if (confirm("Exit session? Your progress will be saved.")) {
+        stopPhaseTimer();
+        gymPhase        = null;
+        gymPhaseExIndex = 0;
+        rerender();
+      }
+      return;
+    }
+
+    const phaseTimerBtn = e.target.closest("#gym-phase-timer-btn");
+    if (phaseTimerBtn) {
+      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
+      const exercises = getPhaseExercises(session, gymPhase);
+      const ex = exercises[gymPhaseExIndex];
+      if (!ex) return;
+      if (!gymPhaseStarted) {
+        startPhaseTimer(ex.duration);
+      } else if (gymPhaseTimer) {
+        pausePhaseTimer();
+      } else {
+        startPhaseTimer(ex.duration);
+      }
+      // Update button text only
+      phaseTimerBtn.textContent = gymPhaseTimer ? "Pause" : (!gymPhaseStarted ? "Start Timer" : "Resume");
+      return;
+    }
+
+    const weightSaveBtn = e.target.closest("#gym-phase-weight-save-btn");
+    if (weightSaveBtn) {
+      const wInput = document.getElementById("gym-phase-weight-input");
+      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
+      const exercises = getPhaseExercises(session, gymPhase);
+      const ex = exercises[gymPhaseExIndex];
+      if (ex && wInput && wInput.value) {
+        store.set("gymLog_" + activeSessionId + "_" + ex.name, wInput.value);
+        weightSaveBtn.textContent = "Saved";
+        setTimeout(() => { weightSaveBtn.textContent = "Save"; }, 1500);
+      }
+      return;
+    }
+
     // ── Intel done ────────────────────────────────────────────
     const intelDoneBtn = e.target.closest("#gym-intel-done-btn");
     if (intelDoneBtn) {
@@ -1267,6 +1681,7 @@ export function onMount() {
   postSessionState      = null;
   intelAnswers          = {};
   showingAdaptedSession = false;
+  // Do NOT reset gymPhase here — it persists across rerenders during a session
   if (activeTimerId) clearInterval(activeTimerId);
   wireEvents();
 }
