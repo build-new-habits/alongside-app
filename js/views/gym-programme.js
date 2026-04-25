@@ -771,17 +771,21 @@ function renderCardioBlock(sessionId) {
           </div>
         </div>
         <div class="form-field">
-          <label class="form-label">How did it feel?</label>
-          <div class="gym-difficulty-chips" role="group" aria-label="Difficulty rating">
-            ${difficultyLabels.map((label, i) => `
-              <button type="button"
-                      class="gym-difficulty-chip"
-                      data-difficulty="${i + 1}"
-                      aria-pressed="false"
-                      aria-label="${label}">
-                ${label}
-              </button>
-            `).join("")}
+          <label class="form-label" for="cardio-feel-slider">
+            How did it feel?
+            <span id="cardio-feel-label" class="cardio-feel-label text-muted"> — Manageable</span>
+          </label>
+          <input type="range" id="cardio-feel-slider"
+                 class="cardio-feel-slider"
+                 min="1" max="5" step="1" value="3"
+                 aria-label="How did cardio feel, 1 very easy to 5 very hard"
+                 aria-valuetext="Manageable">
+          <div class="cardio-feel-scale" aria-hidden="true">
+            <span>Very easy</span>
+            <span>Easy</span>
+            <span>Manageable</span>
+            <span>Hard</span>
+            <span>Very hard</span>
           </div>
         </div>
         <button type="button" class="btn btn-ghost btn-full" id="gym-cardio-save-btn"
@@ -798,8 +802,8 @@ function saveCardioLog(sessionId) {
   const level      = document.getElementById("cardio-level")?.value;
   const time       = document.getElementById("cardio-time")?.value;
   const calories   = document.getElementById("cardio-calories")?.value;
-  const activeChip = document.querySelector(".gym-difficulty-chip[aria-pressed=\"true\"]");
-  const difficulty = activeChip ? parseInt(activeChip.dataset.difficulty) : null;
+  const slider     = document.getElementById("cardio-feel-slider");
+  const difficulty = slider ? parseInt(slider.value) : null;
 
   if (!level && !time && !calories) return; // Nothing entered
 
@@ -947,6 +951,7 @@ let gymPhaseExIndex  = 0;
 let gymPhaseTimer    = null;
 let gymPhaseTimeSec  = 0;
 let gymPhaseStarted  = false;
+let cardioModalOpen  = false;  // portable cardio log modal
 
 function renderAdaptationChoice(session) {
   const adaptation = buildAdaptedSession(session);
@@ -1019,8 +1024,6 @@ export function render() {
         const prompt = getWeekProgressionPrompt(activeWeek, PROGRAMME.weeks);
         return prompt ? renderWeekProgressionCard(prompt) : "";
       })()}
-
-      ${renderCardioBlock(activeSessionId)}
 
       ${renderAdaptationChoice(session)}
 
@@ -1127,7 +1130,9 @@ function renderPhaseExecution(session) {
                 ${formatTimeSec(gymPhaseTimeSec || ex.duration)}
               </div>
             </div>
-            <button class="btn btn-primary btn-full" id="gym-phase-timer-btn"
+            <button class="btn btn-primary btn-full"
+                    data-action="phase-timer"
+                    data-duration="${ex.duration}"
                     style="margin-top:var(--space-4);">
               ${!gymPhaseStarted ? "Start Timer" : (gymPhaseTimer ? "Pause" : "Resume")}
             </button>
@@ -1140,24 +1145,37 @@ function renderPhaseExecution(session) {
             <div class="gym-weight-row">
               <input type="number" id="gym-phase-weight-input" class="form-input"
                      placeholder="${ex.recommended || "kg"}" inputmode="decimal" step="0.5" min="0">
-              <button class="btn btn-ghost btn-small" id="gym-phase-weight-save-btn">Save</button>
+              <button class="btn btn-ghost btn-small" data-action="weight-save">Save</button>
             </div>
           </div>
         ` : ""}
       </div>
       <div class="gym-phase-actions" style="margin-top:var(--space-4);">
-        <button class="btn btn-primary btn-large btn-full" id="gym-phase-next-btn">
+        <button class="btn btn-primary btn-large btn-full" data-action="phase-next">
           ${isLast ? getNextPhaseLabel(session) : "Done — Next"}
         </button>
-        <button class="btn btn-ghost btn-small" id="gym-phase-skip-btn"
-                style="margin-top:var(--space-2);">
-          Skip this exercise
-        </button>
-        <button class="btn btn-ghost btn-small" id="gym-phase-exit-btn"
-                style="margin-top:var(--space-1);">
-          Exit session
-        </button>
+        <div class="gym-phase-secondary-actions">
+          <button class="btn btn-ghost btn-small" data-action="phase-skip">
+            Skip exercise
+          </button>
+          <button class="btn btn-ghost btn-small" data-action="cardio-add">
+            + Log cardio
+          </button>
+          <button class="btn btn-ghost btn-small" data-action="phase-exit">
+            Exit
+          </button>
+        </div>
       </div>
+
+      ${cardioModalOpen ? `
+        <div class="gym-cardio-modal card" style="margin-top:var(--space-4);">
+          <div class="gym-cardio-modal-header">
+            <h3>Cardio log</h3>
+            <button class="btn btn-ghost btn-small" data-action="cardio-close">Close</button>
+          </div>
+          ${renderCardioBlock(activeSessionId)}
+        </div>
+      ` : ""}
     </div>
   `;
 }
@@ -1202,23 +1220,37 @@ function renderPhaseIntro(session) {
           </div>
         </div>
       </div>
-      <div class="card" style="margin-top:var(--space-4);">
-        <p class="text-sm text-muted">
-          During each exercise: discomfort is normal. Sharp or shooting pain is a
-          signal to stop. If something feels wrong, skip it and note it.
+      ${flagged.length > 0 ? `
+        <div class="gym-rag-section" style="margin-top:var(--space-4);">
+          ${flagged.map(id => {
+            const score = painScores[id] || 0;
+            const label = score >= 7 ? "High" : score >= 4 ? "Moderate" : "Low";
+            const ragClass = score >= 7 ? "rag-red" : score >= 4 ? "rag-amber" : "rag-green";
+            const condName = id.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+            return `
+              <div class="gym-rag-box ${ragClass}" role="note">
+                <span class="gym-rag-badge">${label} risk</span>
+                <span class="gym-rag-condition">${condName}</span>
+                <p class="gym-rag-note">I will show relevant notes at each exercise. Listen carefully.</p>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      ` : ""}
+      <div class="card gym-safety-note" style="margin-top:var(--space-3);">
+        <p class="text-sm">
+          Discomfort is normal. Sharp or shooting pain is a signal to stop.
+          If something feels wrong, skip it and note it for next time.
         </p>
-        ${flagged.length > 0 ? `
-          <p class="text-sm text-muted" style="margin-top:var(--space-2);">
-            You have active conditions. I will show relevant notes at each exercise.
-          </p>
-        ` : ""}
       </div>
-      <button class="btn btn-primary btn-large btn-full" id="gym-intro-start-btn"
-              style="margin-top:var(--space-5);">
+      <button class="btn btn-primary btn-large btn-full gym-intro-start-btn"
+              style="margin-top:var(--space-5);"
+              data-action="intro-start">
         Let's go
       </button>
-      <button class="btn btn-ghost btn-full" id="gym-intro-back-btn"
-              style="margin-top:var(--space-3);">
+      <button class="btn btn-ghost btn-full gym-intro-back-btn"
+              style="margin-top:var(--space-3);"
+              data-action="intro-back">
         Back to overview
       </button>
     </div>
@@ -1375,6 +1407,22 @@ function rerender() {
   if (main) {
     main.innerHTML = render();
     wireEvents();
+    wireSliders();
+  }
+}
+
+function wireSliders() {
+  // Cardio feel slider — updates label in real time
+  const FEEL_LABELS = ["Very easy", "Easy", "Manageable", "Hard", "Very hard"];
+  const slider = document.getElementById("cardio-feel-slider");
+  const label  = document.getElementById("cardio-feel-label");
+  if (slider && label) {
+    slider.addEventListener("input", () => {
+      const val = parseInt(slider.value) - 1;
+      const text = FEEL_LABELS[val] || "Manageable";
+      label.textContent = " — " + text;
+      slider.setAttribute("aria-valuetext", text);
+    });
   }
 }
 
@@ -1507,14 +1555,7 @@ function wireEvents() {
     }
 
     // ── Cardio difficulty chips ───────────────────────────────
-    const diffChip = e.target.closest(".gym-difficulty-chip");
-    if (diffChip) {
-      document.querySelectorAll(".gym-difficulty-chip").forEach(c => {
-        c.classList.toggle("selected", c === diffChip);
-        c.setAttribute("aria-pressed", c === diffChip);
-      });
-      return;
-    }
+    // Cardio feel slider — handled via input event in wireSliders()
 
     // ── Week advance ──────────────────────────────────────────
     const weekAdvanceBtn = e.target.closest("#gym-week-advance-btn");
@@ -1560,7 +1601,7 @@ function wireEvents() {
       return;
     }
 
-    const introStartBtn = e.target.closest("#gym-intro-start-btn");
+    const introStartBtn = e.target.closest("[data-action='intro-start']");
     if (introStartBtn) {
       const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
       // Find first non-empty phase
@@ -1577,14 +1618,14 @@ function wireEvents() {
       return;
     }
 
-    const introBackBtn = e.target.closest("#gym-intro-back-btn");
+    const introBackBtn = e.target.closest("[data-action='intro-back']");
     if (introBackBtn) {
       gymPhase = null;
       rerender();
       return;
     }
 
-    const phaseNextBtn = e.target.closest("#gym-phase-next-btn");
+    const phaseNextBtn = e.target.closest("[data-action='phase-next']");
     if (phaseNextBtn) {
       const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
       const exercises = getPhaseExercises(session, gymPhase);
@@ -1608,7 +1649,21 @@ function wireEvents() {
       return;
     }
 
-    const phaseSkipBtn = e.target.closest("#gym-phase-skip-btn");
+    const cardioAddBtn = e.target.closest("[data-action='cardio-add']");
+    if (cardioAddBtn) {
+      cardioModalOpen = !cardioModalOpen;
+      rerender();
+      return;
+    }
+
+    const cardioCloseBtn = e.target.closest("[data-action='cardio-close']");
+    if (cardioCloseBtn) {
+      cardioModalOpen = false;
+      rerender();
+      return;
+    }
+
+    const phaseSkipBtn = e.target.closest("[data-action='phase-skip']");
     if (phaseSkipBtn) {
       const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
       const exercises = getPhaseExercises(session, gymPhase);
@@ -1624,7 +1679,7 @@ function wireEvents() {
       return;
     }
 
-    const phaseExitBtn = e.target.closest("#gym-phase-exit-btn");
+    const phaseExitBtn = e.target.closest("[data-action='phase-exit']");
     if (phaseExitBtn) {
       if (confirm("Exit session? Your progress will be saved.")) {
         stopPhaseTimer();
@@ -1635,7 +1690,7 @@ function wireEvents() {
       return;
     }
 
-    const phaseTimerBtn = e.target.closest("#gym-phase-timer-btn");
+    const phaseTimerBtn = e.target.closest("[data-action='phase-timer']");
     if (phaseTimerBtn) {
       const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
       const exercises = getPhaseExercises(session, gymPhase);
@@ -1653,7 +1708,7 @@ function wireEvents() {
       return;
     }
 
-    const weightSaveBtn = e.target.closest("#gym-phase-weight-save-btn");
+    const weightSaveBtn = e.target.closest("[data-action='weight-save']");
     if (weightSaveBtn) {
       const wInput = document.getElementById("gym-phase-weight-input");
       const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
