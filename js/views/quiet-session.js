@@ -420,18 +420,22 @@ function renderJournalMode() {
       </div>
     </div>
 
-    ${journalPrompts.map((prompt, i) => `
+    ${journalPrompts.map((p, i) => {
+      const promptText = typeof p === "object" ? p.prompt : p;
+      const subText    = typeof p === "object" && p.sub ? p.sub : "";
+      return `
       <div class="card quiet-journal-card" style="margin-top:var(--space-4);">
-        <p class="quiet-journal-prompt">${prompt}</p>
+        <p class="quiet-journal-prompt">${promptText}</p>
+        ${subText ? `<p class="quiet-journal-sub">${subText}</p>` : ""}
         <textarea
           class="quiet-journal-textarea"
           id="journal-textarea-${i}"
           rows="5"
           placeholder="Write freely. There is no wrong answer."
-          aria-label="Journal response to: ${prompt}"
+          aria-label="Journal response"
         >${journalText}</textarea>
       </div>
-    `).join("")}
+    `; }).join("")}
 
     <button class="btn btn-primary btn-full" id="quiet-journal-save-btn"
             style="margin-top:var(--space-4);">
@@ -555,12 +559,12 @@ function renderMindfulSession(step, session) {
       </div>
     </div>
 
-    <div class="quiet-mindful-timer">
-      <div class="quiet-mindful-clock" aria-live="polite"
+    <div class="quiet-mindful-timer" style="text-align:center;padding:var(--space-6) 0;">
+      <div class="quiet-timer-circle" aria-live="polite"
            aria-label="${timeDisplay} remaining">
-        <span id="quiet-mindful-time">${timeDisplay}</span>
+        <span class="quiet-timer-label">Time remaining</span>
+        <span id="quiet-mindful-time" class="quiet-timer-digits">${timeDisplay}</span>
       </div>
-      <p class="text-sm text-muted" style="margin-top:var(--space-2);">remaining</p>
     </div>
 
     <div class="quiet-progress-bar" style="margin-top:var(--space-4);"
