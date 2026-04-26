@@ -74,16 +74,11 @@ export function render() {
     <div class="view intention-view">
 
       <div class="view-header">
-        <h1>Today</h1>
+        <h1>What would you like to do?</h1>
       </div>
 
-      <!-- Coach line -->
-      <div class="card card-coach intention-coach-card">
-        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p class="coach-message-text">${buildCoachLine()}</p>
-      </div>
-
-      <!-- Path selector -->
+      <!-- Path selector — three clean cards, no coach preamble -->
+      <!-- The coach speaks on the coach-proposal screen. Here: clarity only. -->
       <div class="intention-paths" role="group" aria-label="What would you like to do today?">
 
         <button class="intention-path ${selectedPath === "coach" ? "selected" : ""}"
