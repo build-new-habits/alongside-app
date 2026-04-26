@@ -95,7 +95,7 @@ export const router = {
     mainContent.className = 'main-content';
 
     // Hide/show bottom nav
-    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin', 'prescribed-session', 'quiet-session', 'coach-proposal'];
+    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'prescribed-session'];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
     if (shouldHideNav) {
