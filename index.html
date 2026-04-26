@@ -62,10 +62,44 @@
           <img src="assets/images/logo-icon-192.png" alt="Alongside" width="128" height="128">
         </div>
         <h1 class="loading-title">Alongside</h1>
-        <p class="loading-subtitle">Movement that meets you where you are</p>
+        <p class="loading-message" id="loading-message" aria-live="polite">
+          Movement that meets you where you are
+        </p>
         <div class="loading-spinner" aria-hidden="true"></div>
       </div>
     </div>
+
+    <script>
+      // Rotate coach messages on the loading screen.
+      // Research-grounded, coach voice, never motivational-poster generic.
+      const LOADING_MESSAGES = [
+        "Research suggests that how we move in the morning shapes our mood for the next four hours.",
+        "Even five minutes of movement changes the chemistry of how you feel.",
+        "Consistency is not the same as intensity. Showing up quietly is enough.",
+        "Your nervous system adapts to what you do most often. Every session matters.",
+        "Rest is not the absence of progress. It is where adaptation happens.",
+        "The body keeps the score \u2014 movement helps it release it.",
+        "There is no such thing as a workout that was too short to count.",
+        "How you feel before a session rarely predicts how you feel after it.",
+        "Movement is not a punishment for what you ate. It is a gift to how you feel.",
+        "The goal is not the perfect session. The goal is the next one.",
+        "Your energy after movement is almost always higher than before it.",
+        "Breathing is the one thing you do every moment. It is worth doing well.",
+        "You do not need to earn rest. Rest is part of the programme.",
+        "The body responds to what it is asked to do, not what it is told to do.",
+        "Showing up on a low day is worth more than any high-energy session.",
+        "Progress is not linear. Neither is life. The pattern matters more than any single day.",
+        "The most effective workout is the one that fits today, not the one that fitted last week.",
+        "You know your body better than any algorithm. Trust that.",
+        "Pain is information. Movement is one of the best ways to read it.",
+        "A five-minute walk is not a consolation prize. It is a real thing."
+      ];
+      const el = document.getElementById("loading-message");
+      if (el) {
+        const idx = (new Date().getMinutes() + new Date().getSeconds()) % LOADING_MESSAGES.length;
+        el.textContent = LOADING_MESSAGES[idx];
+      }
+    </script>
 
     <!--
       Main content area.
