@@ -82,6 +82,18 @@ const COACH_STYLES = [
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
+function showSaveToast(message) {
+  // Remove any existing toast
+  document.querySelector(".settings-save-toast")?.remove();
+  const toast = document.createElement("div");
+  toast.className = "settings-save-toast";
+  toast.textContent = message || "Saved";
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "polite");
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2100);
+}
+
 export function render() {
   // Check if a specific tab was requested (e.g. Library from coach proposal).
   // Must be read here in render() — not just in onMount() — so the initial
@@ -263,6 +275,33 @@ function renderProfileTab() {
           </div>
         </div>
 
+        ${(gender === "female" || gender === "non-binary") ? `
+          <div class="settings-field">
+            <label class="settings-field-label">Hormonal tracking</label>
+            <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">
+              The coach adapts sessions to your cycle or hormonal changes if you opt in.
+            </p>
+            <div class="settings-chip-row" role="group" aria-label="Hormonal tracking">
+              <button class="settings-chip ${store.get("hormonalTracking") === "cycle" ? "selected" : ""}"
+                      data-hormonal="cycle" aria-pressed="${store.get("hormonalTracking") === "cycle"}">
+                Menstrual cycle
+              </button>
+              <button class="settings-chip ${store.get("hormonalTracking") === "perimenopause" ? "selected" : ""}"
+                      data-hormonal="perimenopause" aria-pressed="${store.get("hormonalTracking") === "perimenopause"}">
+                Perimenopause
+              </button>
+              <button class="settings-chip ${store.get("hormonalTracking") === "menopause" ? "selected" : ""}"
+                      data-hormonal="menopause" aria-pressed="${store.get("hormonalTracking") === "menopause"}">
+                Menopause
+              </button>
+              <button class="settings-chip ${!store.get("hormonalTracking") ? "selected" : ""}"
+                      data-hormonal="" aria-pressed="${!store.get("hormonalTracking")}">
+                Prefer not to say
+              </button>
+            </div>
+          </div>
+        ` : ""}
+
         <div class="settings-field">
           <label class="settings-field-label" for="profile-weight">Weight</label>
           <div class="settings-weight-row">
@@ -305,6 +344,27 @@ function renderProfileTab() {
       <!-- Coach voice speed -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Coach voice speed</h2>
       ${renderSpeechRateSection()}
+
+      <!-- Appearance -->
+      <h2 class="section-heading" style="margin-top:var(--space-6);">Appearance</h2>
+      <div class="card">
+        <div class="settings-field" style="border-bottom:none;">
+          <label class="settings-field-label">Theme</label>
+          <div class="settings-chip-row" role="group" aria-label="App theme">
+            <button class="settings-chip ${!store.get("lightMode") ? "selected" : ""}"
+                    data-theme="dark" aria-pressed="${!store.get("lightMode")}">
+              Dark (default)
+            </button>
+            <button class="settings-chip ${store.get("lightMode") ? "selected" : ""}"
+                    data-theme="light" aria-pressed="${store.get("lightMode")}">
+              Light
+            </button>
+          </div>
+          <p class="text-sm text-muted" style="margin-top:var(--space-2);">
+            Dark mode is the default. Light mode matches what some gym apps use.
+          </p>
+        </div>
+      </div>
 
       <!-- Check-in reminder -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Check-in reminder</h2>
@@ -430,8 +490,8 @@ function renderMyMovementTab() {
       </p>
       <div class="movement-identity-grid" role="group" aria-label="Movement identity">
         ${IDENTITIES.map(item => `
-          <button class="movement-identity-tile ${identity === item.id ? "selected" : ""}"
-                  data-identity="${item.id}" aria-pressed="${identity === item.id}">
+          <button class="movement-identity-tile ${identities.includes(item.id) ? "selected" : ""}"
+                  data-identity="${item.id}" aria-pressed="${identities.includes(item.id)}">
             <span class="movement-tile-icon" aria-hidden="true">${item.icon}</span>
             <span class="movement-tile-label">${item.label}</span>
           </button>
@@ -642,32 +702,27 @@ function renderMovementIdentity() {
  */
 function renderSpeechRateSection() {
   const currentRate = store.get("speechRate") || 0.9;
-
-  const rates = [
-    { value: 0.75, label: "Slow",   description: "More time to process" },
-    { value: 0.9,  label: "Normal", description: "Default" },
-    { value: 1.2,  label: "Fast",   description: "Quick and efficient" }
-  ];
+  const sliderVal = currentRate <= 0.8 ? 1 : currentRate <= 1.0 ? 2 : 3;
+  const rateLabel = ["Slow","Normal","Fast"][sliderVal - 1];
 
   return `
     <div class="card speech-rate-card">
-      <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
+      <p class="text-sm text-muted" style="margin-bottom:var(--space-4);">
         Sets the speed of the read-aloud feature on coach cards.
         Tap the speaker icon on any coach message to listen.
       </p>
-      <div class="speech-rate-grid" role="radiogroup" aria-label="Coach voice speed">
-        ${rates.map(r => `
-          <button
-            class="speech-rate-btn ${currentRate === r.value ? "selected" : ""}"
-            role="radio"
-            aria-checked="${currentRate === r.value}"
-            data-rate="${r.value}"
-            aria-label="${r.label}: ${r.description}"
-          >
-            <span class="speech-rate-label">${r.label}</span>
-            <span class="speech-rate-desc">${r.description}</span>
-          </button>
-        `).join("")}
+      <label class="form-label" for="speech-rate-slider">
+        Speed: <span id="speech-rate-label" style="color:var(--color-primary);font-weight:700;">${rateLabel}</span>
+      </label>
+      <input type="range" id="speech-rate-slider"
+             class="checkin-slider"
+             min="1" max="3" step="1"
+             value="${sliderVal}"
+             aria-label="Coach voice speed, 1 slow to 3 fast"
+             aria-valuetext="${rateLabel}"
+             style="margin-top:var(--space-3);">
+      <div class="checkin-slider-ends" aria-hidden="true">
+        <span>Slow</span><span></span><span>Fast</span>
       </div>
     </div>
   `;
@@ -823,7 +878,9 @@ function wirePanel() {
 
   // ── Profile name ──────────────────────────────────────────────────────────
   document.getElementById("profile-name")?.addEventListener("blur", e => {
-    store.set("name", e.target.value.trim());
+    const val = e.target.value.trim();
+    store.set("name", val);
+    if (val) showSaveToast("Name saved");
   });
 
   // ── Age band chips ─────────────────────────────────────────────────────────
@@ -854,6 +911,19 @@ function wirePanel() {
     if (!isNaN(val)) store.set("weight", val);
   });
 
+  // Hormonal tracking chips
+  document.querySelectorAll("[data-hormonal]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const val = btn.dataset.hormonal || null;
+      store.set("hormonalTracking", val || null);
+      document.querySelectorAll("[data-hormonal]").forEach(b => {
+        const sel = b.dataset.hormonal === (val || "");
+        b.classList.toggle("selected", sel);
+        b.setAttribute("aria-pressed", sel);
+      });
+    });
+  });
+
   // ── Weight unit toggle ─────────────────────────────────────────────────────
   document.querySelectorAll("[data-unit]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -861,6 +931,21 @@ function wirePanel() {
       document.querySelectorAll("[data-unit]").forEach(b => {
         b.classList.toggle("selected", b === btn);
       });
+    });
+  });
+
+  // ── Theme toggle ──────────────────────────────────────────────────────────
+  document.querySelectorAll("[data-theme]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const isLight = btn.dataset.theme === "light";
+      store.set("lightMode", isLight);
+      document.documentElement.classList.toggle("light-mode", isLight);
+      document.querySelectorAll("[data-theme]").forEach(b => {
+        const sel = b.dataset.theme === (isLight ? "light" : "dark");
+        b.classList.toggle("selected", sel);
+        b.setAttribute("aria-pressed", sel);
+      });
+      showSaveToast("Theme updated");
     });
   });
 
@@ -904,10 +989,21 @@ function wirePanel() {
     btn.addEventListener("click", () => {
       const preset = FACILITY_PRESETS.find(p => p.id === btn.dataset.facility);
       if (!preset) return;
-      store.set("equipment", [...preset.equipment]);
-      // Briefly show confirmation
-      btn.textContent = "Applied";
-      setTimeout(() => switchTab("equipment"), 800);
+      // Merge with existing equipment (additive, not replacing)
+      const existing  = new Set(store.get("equipment") || []);
+      preset.equipment.forEach(e => existing.add(e));
+      store.set("equipment", [...existing]);
+      // Toggle selected state visually
+      btn.classList.toggle("selected");
+      const isSelected = btn.classList.contains("selected");
+      btn.setAttribute("aria-pressed", isSelected);
+      // Show brief confirmation
+      const orig = btn.querySelector(".facility-preset-label")?.textContent;
+      const labelEl = btn.querySelector(".facility-preset-label");
+      if (labelEl) {
+        labelEl.textContent = isSelected ? "Applied" : orig;
+        if (isSelected) setTimeout(() => { labelEl.textContent = orig || ""; }, 1500);
+      }
     });
   });
 
@@ -930,7 +1026,7 @@ function wirePanel() {
   });
 
   // Library cards
-  document.querySelectorAll(".library-card[data-target]").forEach(card => {
+  document.querySelectorAll(".library-tile[data-target]").forEach(card => {
     card.addEventListener("click", () => {
       const target    = card.dataset.target;
       const quietMode = card.dataset.quiet || null;
@@ -942,6 +1038,20 @@ function wirePanel() {
   });
 
   // Speech rate buttons
+  // Speech rate slider
+  const speechSlider = document.getElementById("speech-rate-slider");
+  const speechLabelEl = document.getElementById("speech-rate-label");
+  if (speechSlider) {
+    const RATES = { 1: 0.75, 2: 0.9, 3: 1.2 };
+    const LABELS = { 1: "Slow", 2: "Normal", 3: "Fast" };
+    speechSlider.addEventListener("input", () => {
+      const val = parseInt(speechSlider.value);
+      store.set("speechRate", RATES[val]);
+      if (speechLabelEl) speechLabelEl.textContent = LABELS[val];
+      speechSlider.setAttribute("aria-valuetext", LABELS[val]);
+    });
+  }
+
   document.querySelectorAll(".speech-rate-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const rate = parseFloat(btn.dataset.rate);
