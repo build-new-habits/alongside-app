@@ -199,23 +199,84 @@ function renderActiveTab() {
 // ── Profile tab ───────────────────────────────────────────────────────────────
 
 function renderProfileTab() {
-  const name       = store.get("name")       || "Not set";
-  const age        = store.get("age");
-  const gender     = store.get("gender");
-  const weight     = store.get("weight");
+  const name       = store.get("name")       || "";
+  const ageBand    = store.get("ageBand")    || "";
+  const gender     = store.get("gender")     || "";
+  const weight     = store.get("weight")     || "";
   const weightUnit = store.get("weightUnit") || "kg";
   const coachStyle = store.get("coachStyle") || "steady";
+
+  const AGE_BANDS = [
+    { id: "under-18",   label: "Under 18" },
+    { id: "18-24",      label: "18-24" },
+    { id: "25-34",      label: "25-34" },
+    { id: "35-44",      label: "35-44" },
+    { id: "45-54",      label: "45-54" },
+    { id: "55-64",      label: "55-64" },
+    { id: "65-plus",    label: "65+" },
+    { id: "prefer-not", label: "Prefer not to say" }
+  ];
+
+  const GENDERS = [
+    { id: "male",        label: "Male" },
+    { id: "female",      label: "Female" },
+    { id: "non-binary",  label: "Non-binary" },
+    { id: "prefer-not",  label: "Prefer not to say" }
+  ];
 
   return `
     <section aria-labelledby="profile-heading">
 
-      <!-- Profile details — read only -->
       <h2 id="profile-heading" class="section-heading">Your profile</h2>
-      <div class="card settings-profile-card">
-        ${settingsRow("Name",   name)}
-        ${settingsRow("Age",    age    ? `${age}`                      : "Not set")}
-        ${settingsRow("Gender", gender ? formatGender(gender)          : "Not set")}
-        ${settingsRow("Weight", weight ? `${weight}${weightUnit}`      : "Not set")}
+      <div class="card settings-edit-card">
+
+        <div class="settings-field">
+          <label class="settings-field-label" for="profile-name">Name</label>
+          <input type="text" id="profile-name" class="settings-field-input"
+                 value="${name}" placeholder="Your name"
+                 aria-label="Your name">
+        </div>
+
+        <div class="settings-field">
+          <label class="settings-field-label">Age band</label>
+          <div class="settings-chip-row" role="group" aria-label="Age band">
+            ${AGE_BANDS.map(b => `
+              <button class="settings-chip ${ageBand === b.id ? "selected" : ""}"
+                      data-age-band="${b.id}"
+                      aria-pressed="${ageBand === b.id}">
+                ${b.label}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="settings-field">
+          <label class="settings-field-label">Gender</label>
+          <div class="settings-chip-row" role="group" aria-label="Gender">
+            ${GENDERS.map(g => `
+              <button class="settings-chip ${gender === g.id ? "selected" : ""}"
+                      data-gender="${g.id}"
+                      aria-pressed="${gender === g.id}">
+                ${g.label}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="settings-field">
+          <label class="settings-field-label" for="profile-weight">Weight</label>
+          <div class="settings-weight-row">
+            <input type="number" id="profile-weight" class="settings-field-input settings-weight-input"
+                   value="${weight}" placeholder="e.g. 80"
+                   inputmode="decimal" min="0" max="300"
+                   aria-label="Body weight">
+            <div class="settings-unit-toggle" role="group" aria-label="Weight unit">
+              <button class="settings-unit-btn ${weightUnit === "kg" ? "selected" : ""}" data-unit="kg">kg</button>
+              <button class="settings-unit-btn ${weightUnit === "lbs" ? "selected" : ""}" data-unit="lbs">lbs</button>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- Coach style selector -->
@@ -257,31 +318,72 @@ function renderProfileTab() {
 
 function renderConditionsTab() {
   const conditions = store.get("conditions") || [];
+  const conditionStatus = store.get("conditionStatus") || {};
+
+  // All available conditions for adding
+  const ALL_CONDITION_IDS = [
+    "knee-pain", "hip-pain", "hamstring", "lower-back", "upper-back",
+    "shoulder-pain", "rotator-cuff", "elbow-pain", "wrist-pain", "neck-pain",
+    "plantar-fasciitis", "achilles", "it-band", "shin-splints",
+    "anxiety", "depression", "fatigue", "fibromyalgia",
+    "pcos", "endometriosis", "menopause",
+    "adhd", "autism", "dyspraxia",
+    "asthma", "heart-condition", "diabetes-type-2",
+    "other"
+  ];
+
+  const available = ALL_CONDITION_IDS.filter(id => !conditions.includes(id));
 
   return `
     <section aria-labelledby="conditions-heading">
       <h2 id="conditions-heading" class="section-heading">Your conditions</h2>
+      <p class="text-secondary" style="margin-bottom:var(--space-4);">
+        These are shared with the coach to adapt your sessions. Pain levels
+        are updated each day at check-in.
+      </p>
 
-      ${conditions.length === 0 ? `
-        <div class="card">
-          <p class="text-secondary">No conditions recorded.</p>
-          <p class="text-secondary" style="margin-top: var(--space-2);">
-            If your circumstances change, you can add conditions here in a future update.
-          </p>
+      ${conditions.length > 0 ? `
+        <div class="card conditions-list" style="margin-bottom:var(--space-4);">
+          ${conditions.map(id => {
+            const paused = conditionStatus[id] === "paused";
+            return `
+              <div class="condition-settings-row">
+                <span class="condition-settings-name ${paused ? "condition-paused" : ""}">
+                  ${getConditionName(id)}
+                  ${paused ? '<span class="condition-paused-badge">Paused</span>' : ""}
+                </span>
+                <div class="condition-settings-actions">
+                  <button class="btn btn-ghost btn-xs condition-pause-btn"
+                          data-condition-id="${id}"
+                          aria-label="${paused ? "Resume" : "Pause"} ${getConditionName(id)}">
+                    ${paused ? "Resume" : "Pause"}
+                  </button>
+                  <button class="btn btn-ghost btn-xs condition-remove-btn"
+                          data-condition-id="${id}"
+                          aria-label="Remove ${getConditionName(id)}">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join("")}
         </div>
       ` : `
-        <div class="card conditions-list">
-          ${conditions.map(id => `
-            <div class="condition-settings-row">
-              <span class="condition-settings-name">${getConditionName(id)}</span>
-            </div>
-          `).join("")}
+        <div class="card" style="margin-bottom:var(--space-4);">
+          <p class="text-secondary">No conditions recorded yet.</p>
         </div>
-        <p class="text-secondary text-sm settings-conditions-note">
-          Pain levels are updated each day at check-in. Your conditions list can be
-          edited in a future update.
-        </p>
       `}
+
+      <h3 class="section-heading" style="margin-top:var(--space-5);">Add a condition</h3>
+      <div class="conditions-add-grid">
+        ${available.map(id => `
+          <button class="condition-add-chip" data-add-condition="${id}"
+                  aria-label="Add ${getConditionName(id)}">
+            + ${getConditionName(id)}
+          </button>
+        `).join("")}
+      </div>
+
     </section>
   `;
 }
@@ -673,6 +775,84 @@ function wirePanel() {
         c.classList.toggle("selected", isSelected);
         c.setAttribute("aria-checked", isSelected);
       });
+    });
+  });
+
+  // ── Profile name ──────────────────────────────────────────────────────────
+  document.getElementById("profile-name")?.addEventListener("blur", e => {
+    store.set("name", e.target.value.trim());
+  });
+
+  // ── Age band chips ─────────────────────────────────────────────────────────
+  document.querySelectorAll("[data-age-band]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      store.set("ageBand", btn.dataset.ageBand);
+      document.querySelectorAll("[data-age-band]").forEach(b => {
+        b.classList.toggle("selected", b === btn);
+        b.setAttribute("aria-pressed", b === btn);
+      });
+    });
+  });
+
+  // ── Gender chips ───────────────────────────────────────────────────────────
+  document.querySelectorAll("[data-gender]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      store.set("gender", btn.dataset.gender);
+      document.querySelectorAll("[data-gender]").forEach(b => {
+        b.classList.toggle("selected", b === btn);
+        b.setAttribute("aria-pressed", b === btn);
+      });
+    });
+  });
+
+  // ── Weight input ───────────────────────────────────────────────────────────
+  document.getElementById("profile-weight")?.addEventListener("blur", e => {
+    const val = parseFloat(e.target.value);
+    if (!isNaN(val)) store.set("weight", val);
+  });
+
+  // ── Weight unit toggle ─────────────────────────────────────────────────────
+  document.querySelectorAll("[data-unit]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      store.set("weightUnit", btn.dataset.unit);
+      document.querySelectorAll("[data-unit]").forEach(b => {
+        b.classList.toggle("selected", b === btn);
+      });
+    });
+  });
+
+  // ── Conditions: pause/resume ───────────────────────────────────────────────
+  document.querySelectorAll(".condition-pause-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.conditionId;
+      const status = store.get("conditionStatus") || {};
+      status[id] = status[id] === "paused" ? "active" : "paused";
+      store.set("conditionStatus", status);
+      switchTab("conditions");
+    });
+  });
+
+  // ── Conditions: remove ─────────────────────────────────────────────────────
+  document.querySelectorAll(".condition-remove-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.conditionId;
+      if (!confirm("Remove " + id.replace(/-/g, " ") + " from your conditions?")) return;
+      const conditions = (store.get("conditions") || []).filter(c => c !== id);
+      store.set("conditions", conditions);
+      switchTab("conditions");
+    });
+  });
+
+  // ── Conditions: add ────────────────────────────────────────────────────────
+  document.querySelectorAll("[data-add-condition]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.addCondition;
+      const conditions = store.get("conditions") || [];
+      if (!conditions.includes(id)) {
+        conditions.push(id);
+        store.set("conditions", conditions);
+      }
+      switchTab("conditions");
     });
   });
 
