@@ -216,7 +216,7 @@ function logAndNavigate() {
 
   // Navigate
   if (selectedPath === "coach") {
-    router.navigate("today");
+    router.navigate("coach-proposal");
     return;
   }
   if (selectedPath === "self") {
