@@ -2005,3 +2005,39 @@ html.light-mode .settings-field-input {
   border-color: var(--color-primary);
   background: var(--color-primary-glow);
 }
+
+/* ============================================
+   QUIET SESSION — DOMINANT TIMER DISPLAY
+   ============================================ */
+
+.quiet-timer-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 5px solid var(--color-primary);
+  margin: 0 auto;
+  background: var(--color-bg-card);
+  box-shadow: 0 0 40px rgba(45, 212, 191, 0.15);
+}
+
+.quiet-timer-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.quiet-timer-digits {
+  font-size: 4rem;
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
