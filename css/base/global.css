@@ -668,3 +668,119 @@
   border-top: 1px solid var(--color-border);
   padding-top: var(--space-5);
 }
+
+
+/* ============================================
+   COACH PROPOSAL — BRANCH CHIPS (MISSING)
+   ============================================ */
+
+.coach-branch-chips {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.coach-branch-chip {
+  width: 100%;
+  min-height: 64px;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  color: var(--color-text);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+}
+
+.coach-branch-chip:hover,
+.coach-branch-chip:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+  color: var(--color-primary);
+  transform: translateX(3px);
+}
+
+/* ============================================
+   ACTIVITY LOG VIEW
+   ============================================ */
+
+.activity-log-view { padding-bottom: var(--space-8); }
+
+.activity-group-heading {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: var(--space-5) 0 var(--space-3);
+}
+
+.activity-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.activity-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 72px;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.activity-type-card:hover,
+.activity-type-card:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+  color: var(--color-primary);
+}
+
+.activity-type-card span:first-child { font-size: 1.4rem; }
+
+.activity-log-selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+}
+
+.activity-log-type {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+}
+
+.activity-duration-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+/* ============================================
+   CONSISTENT NAV — ensure always visible
+   ============================================ */
+
+/* Bottom nav is always shown for main views.
+   Only hidden for onboarding and active workout sessions.
+   This overrides any view-specific hiding. */
+.app-nav {
+  display: flex;
+}
