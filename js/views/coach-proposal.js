@@ -433,9 +433,9 @@ function renderProposal(name) {
     <div class="card card-coach coach-proposal-card">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
       <div class="coach-proposal-content">
-        <p class="coach-proposal-greeting">${getGreeting(name)}.</p>
+        <p class="coach-proposal-greeting" style="font-size:1.6rem;line-height:1.2;">${getGreeting(name)}.</p>
         <p class="coach-proposal-reflection">${p.reflection}</p>
-        <p class="coach-proposal-suggestion">${p.proposal}</p>
+        <p class="coach-proposal-suggestion" style="font-size:1.15rem;line-height:1.6;">${p.proposal}</p>
         <p class="coach-proposal-rationale text-sm text-muted">${p.rationale}</p>
         <div class="coach-proposal-meta">
           <span class="coach-proposal-duration">&#8987; About ${p.duration} minutes</span>
