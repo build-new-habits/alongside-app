@@ -1,25 +1,21 @@
 /**
  * progress.js - Progress View
  *
- * v2.0 (S4-1, April 2026) — Full rebuild
+ * v3.0 (S4-1b, April 2026) — Numbers-first redesign
  *
- * Sections:
- *   1. Coach summary card — personal, pattern-aware, 7-day window
- *   2. This week — days active, sessions by type, vs weekly target
- *   3. Coach sessions — workouts from coach-recommended path
- *   4. Prescribed exercises — physiotherapy protocol sessions
- *   5. Gym sessions — gym-programme completions with session ID
- *   6. Other activities — runs, walks, swims, classes, etc.
- *   7. Mindful moments — breathing, journaling, mindful movement, rest
- *   8. Check-ins — 7-day mood/energy/sleep history as a visual chart
- *   9. Patterns — coach observations from 14+ days of data
+ * Layout:
+ *   1. Coach summary — personal, pattern-aware. Always first.
+ *   2. This week — stat ring + five key numbers
+ *   3. Check-in streak — 7-day visual dots
+ *   4. Activity breakdown — five stat tiles, shown only if data exists
+ *   5. Coach patterns — observations after 7+ sessions
+ *   6. Body changes — shown only if user has opted in
  *
- * Sections are only shown if they have data.
- * No streaks. No streak language anywhere.
- * Consistency metric: daysActiveLast30, weeklyConsistencyScore.
- *
- * Route: progress
- * Nav: shown
+ * Design principles:
+ *   - Numbers first. Lists last (or never).
+ *   - No activity log dump. No "Gym session — Yesterday" x13.
+ *   - Coach speaks in plain English, not data labels.
+ *   - No streaks. Consistency = daysActiveLast30.
  */
 
 import { store } from "../store.js";
@@ -28,187 +24,132 @@ export const centered = false;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function todayKey() {
-  return new Date().toISOString().split("T")[0];
-}
-
-function daysAgo(isoString) {
-  return Math.floor((Date.now() - new Date(isoString)) / 86400000);
+function daysAgo(iso) {
+  if (!iso) return 999;
+  return Math.floor((Date.now() - new Date(iso)) / 86400000);
 }
 
 function weekStart() {
   const d = new Date();
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  d.setDate(diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
+  const diff = d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1);
+  const ws = new Date(d.setDate(diff));
+  ws.setHours(0, 0, 0, 0);
+  return ws;
 }
 
-function isThisWeek(isoString) {
-  return new Date(isoString) >= weekStart();
+function isThisWeek(iso) {
+  return iso && new Date(iso) >= weekStart();
 }
 
-function formatDate(isoString) {
-  const d = new Date(isoString);
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return days[d.getDay()] + " " + d.getDate() + " " + months[d.getMonth()];
+function isLast7Days(iso) {
+  return iso && daysAgo(iso) < 7;
 }
 
-function activityLabel(type) {
-  const labels = {
-    "gym": "Gym session", "coach-session": "Coach session",
-    "gym-programme": "Gym programme", "prescribed": "Prescribed exercises",
-    "prescribed-session": "Prescribed exercises",
-    "run": "Run", "walk": "Walk", "swim": "Swim", "cycle": "Cycle",
-    "row": "Row", "yoga": "Yoga", "pilates": "Pilates",
-    "breathing": "Breathing practice", "journal": "Journaling",
-    "mindful": "Mindful movement", "rest": "Rest day",
-    "quiet": "Quiet session", "quiet-session": "Quiet session",
-    "class": "Class", "boxing": "Boxing", "spin": "Spin class",
-    "body-balance": "Body Balance", "hiit": "HIIT", "hike": "Hike",
-    "outdoor-cycle": "Outdoor cycle", "tennis": "Tennis",
-    "football": "Football", "golf": "Golf"
-  };
-  return labels[type] || type.replace(/-/g, " ");
+function isLast30Days(iso) {
+  return iso && daysAgo(iso) < 30;
 }
 
-function feelIcon(feel) {
-  const icons = {
-    "strong": "&#128170;", "great": "&#128170;",
-    "right": "&#128077;", "loved": "&#10084;",
-    "managed": "&#128522;", "struggled": "&#128533;",
-    "hard": "&#128533;", "tough": "&#128533;"
-  };
-  return icons[feel] || "";
+function getLog() {
+  return store.get("activityLog") || [];
 }
 
-// ── Data aggregation ──────────────────────────────────────────────────────────
-
-function getActivityLog() {
-  return (store.get("activityLog") || []).slice().reverse(); // most recent first
-}
-
-function getCheckinHistory() {
+function getCheckins() {
   const history = store.get("checkinHistory") || {};
   return Object.entries(history)
     .sort((a, b) => b[0].localeCompare(a[0]))
-    .slice(0, 14); // last 14 days
+    .slice(0, 14);
 }
 
-function getWeeklyTarget() {
-  return store.get("strategicGoal")?.weeklySessionTarget || 3;
-}
-
-function getDaysActiveLast30() {
-  const log = store.get("activityLog") || [];
-  const activeDays = new Set(
-    log
-      .filter(e => daysAgo(e.loggedAt || e.completedAt || e.sessionStart) < 30)
-      .filter(e => !["rest"].includes(e.type))
-      .map(e => (e.loggedAt || e.completedAt || "").split("T")[0])
-  );
-  return activeDays.size;
-}
-
-function getWeeklyConsistencyScore() {
-  const log = store.get("activityLog") || [];
-  const ws = weekStart();
-  const sessionsThisWeek = log.filter(e => {
-    const d = new Date(e.loggedAt || e.completedAt || e.sessionStart);
-    return d >= ws && !["rest"].includes(e.type);
-  }).length;
-  const target = getWeeklyTarget();
-  return Math.min(1, sessionsThisWeek / target);
+function isTrainingType(type) {
+  return !["breathing", "journal", "rest", "mindful", "quiet", "quiet-session"].includes(type || "");
 }
 
 // ── Coach summary ─────────────────────────────────────────────────────────────
 
-function buildProgressCoachMessage(log, checkins) {
+function buildCoachMessage(log, checkins) {
   const name       = (store.get("name") || "").split(" ")[0] || "";
-  const last7      = log.filter(e => daysAgo(e.loggedAt || e.completedAt || e.sessionStart) < 7);
-  const last14     = log.filter(e => daysAgo(e.loggedAt || e.completedAt || e.sessionStart) < 14);
-  const thisWeek   = log.filter(e => isThisWeek(e.loggedAt || e.completedAt || e.sessionStart));
-  const target     = getWeeklyTarget();
-  const daysActive = getDaysActiveLast30();
+  const namePrefix = name ? name + ". " : "";
+  const last7      = log.filter(e => isLast7Days(e.loggedAt || e.completedAt));
+  const last30     = log.filter(e => isLast30Days(e.loggedAt || e.completedAt));
 
   if (log.length === 0) {
-    return "Your progress will build here as we work together. I will tell you what I am noticing — not numbers for their own sake, but patterns that actually mean something. Complete a few sessions and I will have something useful to say.";
+    return "Your progress builds here as we work together. Complete a few sessions and I will start noticing patterns.";
   }
 
   if (log.length < 3) {
-    return "You are just getting started. That is exactly the right place to be. I am watching what works for you and will start noticing patterns once we have a bit more to go on.";
+    return namePrefix + "You are just getting started. That is exactly the right place to be. Keep showing up.";
   }
+
+  const trainingDays = new Set(
+    last30.filter(e => isTrainingType(e.type || e.source))
+          .map(e => (e.loggedAt || e.completedAt || "").split("T")[0])
+  ).size;
+
+  const thisWeekSessions = last7.filter(e => isThisWeek(e.loggedAt || e.completedAt) && isTrainingType(e.type)).length;
+  const target = store.get("strategicGoal")?.weeklySessionTarget || 3;
+  const hitTarget = thisWeekSessions >= target;
+
+  const quietCount   = last7.filter(e => !isTrainingType(e.type || e.source)).length;
+  const trainingCount = last7.filter(e => isTrainingType(e.type || e.source)).length;
 
   // Energy pattern
-  const energyBefores = last7.filter(e => e.energyBefore).map(e => e.energyBefore);
-  const energyAfters  = last7.filter(e => e.energyAfter).map(e => e.energyAfter);
-  const avgBefore = energyBefores.length ? energyBefores.reduce((a, b) => a + b, 0) / energyBefores.length : null;
-  const avgAfter  = energyAfters.length  ? energyAfters.reduce((a, b) => a + b, 0)  / energyAfters.length  : null;
-  const energyRise = avgBefore && avgAfter && avgAfter > avgBefore + 0.5;
-
-  // Consistency
-  const consistencyScore = getWeeklyConsistencyScore();
-  const hitTarget = thisWeek.filter(e => e.type !== "rest").length >= target;
-
-  // Quiet / recovery presence
-  const quietCount = last7.filter(e => ["breathing", "journal", "mindful", "rest", "quiet", "quiet-session"].includes(e.type)).length;
-  const gymCount   = last7.filter(e => ["gym", "gym-programme", "coach-session"].includes(e.type)).length;
+  const energyPairs = last7.filter(e => e.energyBefore && e.energyAfter);
+  const energyRises = energyPairs.filter(e => e.energyAfter > e.energyBefore).length;
+  const energyPattern = energyPairs.length >= 3 && energyRises / energyPairs.length >= 0.6;
 
   if (hitTarget) {
-    return "You have hit your session target for this week" + (name ? ", " + name : "") + ". I want you to notice that — not because targets are the point, but because consistency is. " + (energyRise ? "Your energy has consistently been higher after movement than before it this week. That pattern is worth holding onto." : "Keep going.");
+    return namePrefix + "You have hit your session target for this week. I want you to notice that \u2014 not because targets are the point, but because consistency is. Keep going.";
+  }
+  if (energyPattern) {
+    return namePrefix + "Your energy after sessions has been higher than before them this week, consistently. Movement is generating the energy it costs. That is worth holding onto.";
+  }
+  if (trainingCount >= 4 && quietCount === 0) {
+    return namePrefix + "All training, no recovery this week. Rest and quiet sessions are where adaptation happens. Consider adding something restorative.";
+  }
+  if (trainingDays >= 15) {
+    return namePrefix + "Active on " + trainingDays + " of the last 30 days. That level of consistency builds something lasting.";
+  }
+  if (last7.length === 0) {
+    return namePrefix + "Nothing logged in the last 7 days. No pressure \u2014 but I am here when you are ready.";
   }
 
-  if (energyRise && last7.length >= 3) {
-    return "Something I have noticed this week: your energy after sessions has been higher than before them, reliably. That is not a coincidence. Movement is generating the energy it costs. That is worth knowing.";
-  }
-
-  if (gymCount >= 3 && quietCount === 0) {
-    return "Three or more training sessions this week with no recovery work in the mix. I want to flag that — not to slow you down, but because rest and quiet sessions are where adaptation actually happens. Consider adding something restorative.";
-  }
-
-  if (daysActive >= 15) {
-    return "You have been active on " + daysActive + " of the last 30 days. That is real consistency — the kind that builds something lasting rather than something that peaks and fades.";
-  }
-
-  const lastEntry = last7[0];
-  if (lastEntry) {
-    const dayWord = daysAgo(lastEntry.loggedAt || lastEntry.completedAt || lastEntry.sessionStart) === 0
-      ? "today" : daysAgo(lastEntry.loggedAt || lastEntry.completedAt || lastEntry.sessionStart) === 1
-      ? "yesterday" : daysAgo(lastEntry.loggedAt || lastEntry.completedAt || lastEntry.sessionStart) + " days ago";
-    return "Your last session was " + dayWord + ". " + (thisWeek.filter(e => e.type !== "rest").length >= 2 ? "Good work this week." : "Keep building the pattern.");
-  }
-
-  return "Progress takes shape over time. Keep showing up and I will keep noticing what is working.";
+  return namePrefix + "You have had " + last7.length + " session" + (last7.length !== 1 ? "s" : "") + " in the last week. Keep building the pattern.";
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
-  const log       = getActivityLog();
-  const checkins  = getCheckinHistory();
-  const thisWeek  = log.filter(e => isThisWeek(e.loggedAt || e.completedAt || e.sessionStart));
-  const target    = getWeeklyTarget();
-  const score     = getWeeklyConsistencyScore();
-  const daysActive = getDaysActiveLast30();
+  const log      = getLog();
+  const checkins = getCheckins();
 
-  // Categorise log entries
-  const coachSessions     = log.filter(e => e.source === "coach-recommended" || e.type === "coach-session");
-  const prescribedSessions = log.filter(e => ["prescribed", "prescribed-session"].includes(e.type) || e.source === "prescribed");
-  const gymSessions       = log.filter(e => ["gym", "gym-programme"].includes(e.type) && e.source !== "coach-recommended");
-  const otherActivities   = log.filter(e =>
-    !["breathing", "journal", "mindful", "rest", "quiet", "quiet-session",
-      "prescribed", "prescribed-session", "coach-session",
-      "gym", "gym-programme"].includes(e.type) &&
+  // Categorise
+  const thisWeekLog   = log.filter(e => isThisWeek(e.loggedAt || e.completedAt));
+  const last7Log      = log.filter(e => isLast7Days(e.loggedAt || e.completedAt));
+  const last30Log     = log.filter(e => isLast30Days(e.loggedAt || e.completedAt));
+  const checkinCount7 = checkins.filter(([date]) => daysAgo(date) < 7).length;
+
+  // Stat counts
+  const coachCount    = last30Log.filter(e => e.source === "coach-recommended" || e.type === "coach-session").length;
+  const prescribedCount = last30Log.filter(e => ["prescribed","prescribed-session"].includes(e.type) || e.source === "prescribed").length;
+  const gymCount      = last30Log.filter(e => ["gym","gym-programme"].includes(e.type) && e.source !== "coach-recommended").length;
+  const otherCount    = last30Log.filter(e =>
+    isTrainingType(e.type) &&
+    !["gym","gym-programme","coach-session","prescribed","prescribed-session"].includes(e.type) &&
     e.source !== "coach-recommended" && e.source !== "prescribed"
-  );
-  const mindfulMoments    = log.filter(e =>
-    ["breathing", "journal", "mindful", "rest", "quiet", "quiet-session"].includes(e.type)
-  );
+  ).length;
+  const mindfulCount  = last30Log.filter(e => !isTrainingType(e.type || e.source)).length;
 
-  const coachMessage = buildProgressCoachMessage(log, checkins);
+  const thisWeekTraining = thisWeekLog.filter(e => isTrainingType(e.type || e.source)).length;
+  const target           = store.get("strategicGoal")?.weeklySessionTarget || 3;
+  const pct              = Math.min(100, Math.round((thisWeekTraining / target) * 100));
+
+  const daysActive30     = new Set(
+    last30Log.filter(e => isTrainingType(e.type || e.source))
+             .map(e => (e.loggedAt || e.completedAt || "").split("T")[0])
+  ).size;
+
+  const showBody = store.get("trackBodyChanges");
+  const coachMessage = buildCoachMessage(log, checkins);
 
   return `
     <div class="view progress-view">
@@ -217,274 +158,265 @@ export function render() {
         <h1>Progress</h1>
       </div>
 
-      <!-- ── Coach summary ────────────────────────────────────────────── -->
-      <div class="card card-coach progress-coach-card">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p class="coach-message-text">${coachMessage}</p>
-      </div>
-
-      <!-- ── This week ──────────────────────────────────────────────────── -->
-      ${renderThisWeek(thisWeek, target, score, daysActive)}
-
-      <!-- ── Check-ins ─────────────────────────────────────────────────── -->
-      ${checkins.length > 0 ? renderCheckins(checkins) : ""}
-
-      <!-- ── Coach sessions ────────────────────────────────────────────── -->
-      ${coachSessions.length > 0 ? renderSection("Coach Sessions", coachSessions, "&#127919;") : ""}
-
-      <!-- ── Prescribed exercises ──────────────────────────────────────── -->
-      ${prescribedSessions.length > 0 ? renderSection("Prescribed Exercises", prescribedSessions, "&#129338;") : ""}
-
-      <!-- ── Gym sessions ───────────────────────────────────────────────── -->
-      ${gymSessions.length > 0 ? renderSection("Gym Sessions", gymSessions, "&#127947;") : ""}
-
-      <!-- ── Other activities ───────────────────────────────────────────── -->
-      ${otherActivities.length > 0 ? renderSection("Other Activities", otherActivities, "&#127939;") : ""}
-
-      <!-- ── Mindful moments ────────────────────────────────────────────── -->
-      ${mindfulMoments.length > 0 ? renderSection("Mindful Moments", mindfulMoments, "&#127807;") : ""}
-
-      <!-- ── Patterns ───────────────────────────────────────────────────── -->
-      ${log.length >= 7 ? renderPatterns(log) : ""}
-
-      <!-- ── Empty state ────────────────────────────────────────────────── -->
-      ${log.length === 0 ? renderEmpty() : ""}
-
-    </div>
-  `;
-}
-
-// ── This week ─────────────────────────────────────────────────────────────────
-
-function renderThisWeek(thisWeek, target, score, daysActive) {
-  const activeSessions = thisWeek.filter(e => e.type !== "rest");
-  const sessionCount   = activeSessions.length;
-  const pct            = Math.min(100, Math.round(score * 100));
-
-  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const ws   = weekStart();
-
-  // Build day dots — which days this week had activity
-  const activeDaySet = new Set(
-    activeSessions.map(e => {
-      const d = new Date(e.loggedAt || e.completedAt || e.sessionStart);
-      return d.getDay() === 0 ? 6 : d.getDay() - 1; // 0=Mon
-    })
-  );
-
-  return `
-    <div class="card progress-week-card">
-      <div class="progress-week-header">
-        <h3>This week</h3>
-        <span class="progress-week-count">${sessionCount} of ${target} sessions</span>
-      </div>
-
-      <div class="progress-week-dots" role="group" aria-label="Days active this week">
-        ${DAYS.map((day, i) => `
-          <div class="progress-day-dot ${activeDaySet.has(i) ? "active" : ""}"
-               aria-label="${day}${activeDaySet.has(i) ? ", active" : ""}">
-            <span class="progress-day-label">${day}</span>
-            <div class="progress-day-circle ${activeDaySet.has(i) ? "active" : ""}"></div>
-          </div>
-        `).join("")}
-      </div>
-
-      <div class="progress-week-bar-wrap">
-        <div class="progress-week-bar" role="progressbar"
-             aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"
-             aria-label="Weekly target ${pct}% complete">
-          <div class="progress-week-bar-fill" style="width:${pct}%"></div>
+      <!-- 1. Coach summary -->
+      <div class="progress-coach-card">
+        <div class="progress-coach-inner">
+          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
+          <p class="progress-coach-text">${coachMessage}</p>
         </div>
       </div>
 
-      <div class="progress-week-meta">
-        <span class="text-sm text-muted">Active ${daysActive} of last 30 days</span>
-        ${sessionCount >= target
-          ? `<span class="progress-target-hit text-sm">Target reached</span>`
-          : `<span class="text-sm text-muted">${target - sessionCount} to go</span>`}
+      <!-- 2. This week ring + stats -->
+      <div class="card progress-week-card">
+        <div class="progress-week-top">
+          <div class="progress-ring-wrap" aria-label="This week: ${thisWeekTraining} of ${target} sessions">
+            <svg class="progress-ring" viewBox="0 0 80 80" aria-hidden="true">
+              <circle class="progress-ring-track" cx="40" cy="40" r="32"/>
+              <circle class="progress-ring-fill" cx="40" cy="40" r="32"
+                      stroke-dasharray="${2 * Math.PI * 32}"
+                      stroke-dashoffset="${2 * Math.PI * 32 * (1 - pct / 100)}"
+                      transform="rotate(-90 40 40)"/>
+            </svg>
+            <div class="progress-ring-label">
+              <span class="progress-ring-num">${thisWeekTraining}</span>
+              <span class="progress-ring-of">of ${target}</span>
+            </div>
+          </div>
+          <div class="progress-week-stats">
+            <div class="progress-stat-row">
+              <span class="progress-stat-label">Sessions this week</span>
+              <span class="progress-stat-value">${thisWeekTraining}</span>
+            </div>
+            <div class="progress-stat-row">
+              <span class="progress-stat-label">Active days (30 days)</span>
+              <span class="progress-stat-value">${daysActive30}</span>
+            </div>
+            <div class="progress-stat-row">
+              <span class="progress-stat-label">Check-ins (7 days)</span>
+              <span class="progress-stat-value">${checkinCount7} / 7</span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- 3. Check-in dots -->
+      ${checkins.length > 0 ? renderCheckinDots(checkins) : ""}
+
+      <!-- 4. Activity breakdown — 30 days -->
+      ${log.length > 0 ? renderStatTiles(coachCount, prescribedCount, gymCount, otherCount, mindfulCount) : ""}
+
+      <!-- 5. Patterns -->
+      ${log.length >= 7 ? renderPatterns(log) : ""}
+
+      <!-- 6. Body changes (opt-in) -->
+      ${showBody ? renderBodyChanges() : renderBodyOptIn()}
+
+      <!-- Empty state -->
+      ${log.length === 0 ? `
+        <div class="card" style="margin-top:var(--space-4);text-align:center;">
+          <p class="text-muted" style="padding:var(--space-4) 0;">
+            Nothing logged yet. Complete a session and it will appear here.
+          </p>
+        </div>
+      ` : ""}
+
     </div>
   `;
 }
 
-// ── Check-ins ─────────────────────────────────────────────────────────────────
+// ── Check-in dots ─────────────────────────────────────────────────────────────
 
-function renderCheckins(checkins) {
+function renderCheckinDots(checkins) {
+  const DAYS = ["M","T","W","T","F","S","S"];
+  const ws = weekStart();
+
+  // Which days this week had a check-in
+  const checkinDays = new Set(
+    checkins
+      .filter(([date]) => daysAgo(date) < 7)
+      .map(([date]) => new Date(date).getDay())
+  );
+
+  // Energy trend — last 7 days average
+  const recent = checkins.slice(0, 7);
+  const avgEnergy = recent.length
+    ? Math.round(recent.reduce((sum, [, d]) => sum + (d.energy || 0), 0) / recent.length * 10) / 10
+    : null;
+  const avgMood = recent.length
+    ? Math.round(recent.reduce((sum, [, d]) => sum + (d.mood || 0), 0) / recent.length * 10) / 10
+    : null;
+
   return `
     <div class="card progress-checkins-card">
-      <h3>Check-ins</h3>
-      <p class="text-sm text-muted" style="margin-bottom:var(--space-4);">
-        Last ${Math.min(checkins.length, 7)} days
-      </p>
+      <div class="progress-checkins-header">
+        <h3>Check-ins this week</h3>
+        <span class="progress-checkin-count">${checkinDays.size} / 7</span>
+      </div>
 
-      <div class="progress-checkin-chart" role="list" aria-label="Check-in history">
-        ${checkins.slice(0, 7).reverse().map(([date, data]) => {
-          const energy = data.energy || 0;
-          const mood   = data.mood   || 0;
-          const sleep  = data.sleep  || 0;
-          const d      = new Date(date);
-          const days   = ["S", "M", "T", "W", "T", "F", "S"];
-          const dayLabel = days[d.getDay()];
-
+      <div class="progress-dot-row" role="group" aria-label="Check-in days this week">
+        ${DAYS.map((day, i) => {
+          // i=0 is Mon in our layout; getDay() 0=Sun,1=Mon...
+          const dayNum = i === 6 ? 0 : i + 1;
+          const active = checkinDays.has(dayNum);
           return `
-            <div class="progress-checkin-col" role="listitem"
-                 aria-label="${formatDate(date)}: energy ${energy}, mood ${mood}">
-              <div class="progress-checkin-bars">
-                <div class="progress-checkin-bar energy"
-                     style="height:${Math.max(4, energy * 10)}%"
-                     aria-hidden="true" title="Energy ${energy}"></div>
-                <div class="progress-checkin-bar mood"
-                     style="height:${Math.max(4, mood * 10)}%"
-                     aria-hidden="true" title="Mood ${mood}"></div>
-              </div>
-              <span class="progress-checkin-day">${dayLabel}</span>
+            <div class="progress-dot-col" aria-label="${day}${active ? ", checked in" : ""}">
+              <div class="progress-dot-circle ${active ? "active" : ""}" aria-hidden="true"></div>
+              <span class="progress-dot-day">${day}</span>
             </div>
           `;
         }).join("")}
       </div>
 
-      <div class="progress-checkin-legend">
-        <span class="progress-legend-dot energy"></span><span class="text-sm text-muted">Energy</span>
-        <span class="progress-legend-dot mood" style="margin-left:var(--space-4);"></span><span class="text-sm text-muted">Mood</span>
-      </div>
-    </div>
-  `;
-}
-
-// ── Activity section ──────────────────────────────────────────────────────────
-
-function renderSection(title, entries, icon) {
-  const recent = entries.slice(0, 10); // max 10 per section
-
-  return `
-    <div class="card progress-section-card">
-      <h3 class="progress-section-heading">
-        <span aria-hidden="true">${icon}</span> ${title}
-        <span class="progress-section-count">${entries.length}</span>
-      </h3>
-
-      <ul class="progress-activity-list" aria-label="${title}">
-        ${recent.map(entry => renderActivityEntry(entry)).join("")}
-      </ul>
-
-      ${entries.length > 10 ? `
-        <p class="text-sm text-muted" style="margin-top:var(--space-3);">
-          Showing 10 most recent of ${entries.length} total.
-        </p>
+      ${avgEnergy !== null ? `
+        <div class="progress-checkin-avgs">
+          <div class="progress-avg-pill">
+            <span>Avg energy</span>
+            <strong>${avgEnergy}/10</strong>
+          </div>
+          <div class="progress-avg-pill">
+            <span>Avg mood</span>
+            <strong>${avgMood}/10</strong>
+          </div>
+        </div>
       ` : ""}
     </div>
   `;
 }
 
-function renderActivityEntry(entry) {
-  const date     = entry.loggedAt || entry.completedAt || entry.sessionStart || "";
-  const dateStr  = date ? formatDate(date) : "";
-  const dAgo     = date ? daysAgo(date) : null;
-  const dayStr   = dAgo === 0 ? "Today" : dAgo === 1 ? "Yesterday" : dateStr;
-  const label    = entry.name || activityLabel(entry.type || entry.source || "");
-  const feel     = entry.feel ? feelIcon(entry.feel) : "";
-  const duration = entry.duration ? entry.duration + " min" : "";
-  const thisWeekEntry = date && isThisWeek(date);
+// ── Stat tiles ────────────────────────────────────────────────────────────────
+
+function renderStatTiles(coach, prescribed, gym, other, mindful) {
+  const tiles = [
+    { label: "Coach sessions",     value: coach,      icon: "\uD83C\uDFAF", show: true  },
+    { label: "Prescribed",        value: prescribed,  icon: "\uD83E\uDE7A", show: true  },
+    { label: "Gym sessions",      value: gym,         icon: "\uD83C\uDFCB", show: true  },
+    { label: "Own activities",    value: other,       icon: "\uD83C\uDFC3", show: true  },
+    { label: "Mindful moments",   value: mindful,     icon: "\uD83C\uDF3F", show: true  },
+  ].filter(t => t.show);
+
+  const total = coach + prescribed + gym + other + mindful;
 
   return `
-    <li class="progress-activity-entry ${thisWeekEntry ? "this-week" : ""}">
-      <div class="progress-activity-main">
-        <span class="progress-activity-label">${label}</span>
-        ${feel ? `<span class="progress-activity-feel" aria-hidden="true">${feel}</span>` : ""}
+    <div class="card progress-tiles-card">
+      <div class="progress-tiles-header">
+        <h3>Last 30 days</h3>
+        <span class="progress-tiles-total">${total} total</span>
       </div>
-      <div class="progress-activity-meta">
-        ${duration ? `<span class="text-sm text-muted">${duration}</span>` : ""}
-        <span class="text-sm text-muted">${dayStr}</span>
+      <div class="progress-tiles-grid">
+        ${tiles.map(tile => `
+          <div class="progress-tile ${tile.value === 0 ? "progress-tile--empty" : ""}">
+            <span class="progress-tile-icon" aria-hidden="true">${tile.icon}</span>
+            <span class="progress-tile-value">${tile.value}</span>
+            <span class="progress-tile-label">${tile.label}</span>
+          </div>
+        `).join("")}
       </div>
-      ${entry.painChange && entry.painChange !== "none" ? `
-        <span class="progress-pain-tag progress-pain-tag--${entry.painChange} text-sm">
-          Pain: ${entry.painChange}
-        </span>
-      ` : ""}
-    </li>
+    </div>
   `;
 }
 
 // ── Patterns ──────────────────────────────────────────────────────────────────
 
 function renderPatterns(log) {
-  const patterns = detectPatterns(log);
+  const last14 = log.filter(e => daysAgo(e.loggedAt || e.completedAt) < 14);
+  const patterns = [];
+
+  const energyPairs = last14.filter(e => e.energyBefore && e.energyAfter);
+  if (energyPairs.length >= 3) {
+    const rises = energyPairs.filter(e => e.energyAfter > e.energyBefore).length;
+    const pct = Math.round((rises / energyPairs.length) * 100);
+    if (pct >= 60) patterns.push("Your energy after sessions has been higher than before them " + pct + "% of the time recently.");
+  }
+
+  const painEntries = last14.filter(e => e.painChange);
+  const painBetter  = painEntries.filter(e => e.painChange === "better").length;
+  const painWorse   = painEntries.filter(e => ["worse","sharp"].includes(e.painChange)).length;
+  if (painBetter >= 2 && painBetter > painWorse) {
+    patterns.push("Movement has been leaving you in less pain than before it, more often than not.");
+  }
+  if (painWorse >= 2) {
+    patterns.push("Pain has been worse after some sessions. Worth noting for your next check-in.");
+  }
+
+  const quietCount  = last14.filter(e => !isTrainingType(e.type || e.source)).length;
+  const activeCount = last14.filter(e => isTrainingType(e.type || e.source)).length;
+  if (activeCount >= 6 && quietCount === 0) {
+    patterns.push("All training, no recovery in two weeks. Rest is part of the programme.");
+  }
+  if (quietCount >= 3 && activeCount >= 3) {
+    patterns.push("You are balancing active sessions with recovery. That balance is what makes training sustainable.");
+  }
+
   if (!patterns.length) return "";
 
   return `
     <div class="card progress-patterns-card">
-      <div class="card-coach" style="margin-bottom:var(--space-4);">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <div>
-          <h3>What I am noticing</h3>
-        </div>
+      <div class="progress-patterns-coach">
+        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
+        <h3>What I am noticing</h3>
       </div>
-      <ul class="progress-patterns-list">
-        ${patterns.map(p => `
-          <li class="progress-pattern-item">
-            <p class="text-sm">${p}</p>
-          </li>
-        `).join("")}
-      </ul>
+      ${patterns.slice(0, 3).map(p => `
+        <p class="progress-pattern-item">${p}</p>
+      `).join("")}
     </div>
   `;
 }
 
-function detectPatterns(log) {
-  const patterns = [];
-  const last14   = log.filter(e => daysAgo(e.loggedAt || e.completedAt || e.sessionStart) < 14);
+// ── Body changes ──────────────────────────────────────────────────────────────
 
-  // Energy pattern
-  const energyPairs = last14.filter(e => e.energyBefore && e.energyAfter);
-  if (energyPairs.length >= 3) {
-    const rises = energyPairs.filter(e => e.energyAfter > e.energyBefore).length;
-    const pct   = Math.round((rises / energyPairs.length) * 100);
-    if (pct >= 60) {
-      patterns.push("Your energy after sessions has been higher than before them " + pct + "% of the time recently. Movement is generating the energy it costs for you.");
-    }
-  }
+function renderBodyChanges() {
+  const entries = store.get("bodyLog") || [];
+  const latest  = entries[entries.length - 1];
+  const first   = entries[0];
 
-  // Pain pattern
-  const painEntries = last14.filter(e => e.painChange);
-  const painBetter  = painEntries.filter(e => e.painChange === "better").length;
-  const painWorse   = painEntries.filter(e => e.painChange === "worse" || e.painChange === "sharp").length;
-  if (painBetter > painWorse && painBetter >= 2) {
-    patterns.push("Movement has been leaving you in less pain than before it more often than not recently. That is an important signal worth paying attention to.");
-  }
-  if (painWorse >= 2) {
-    patterns.push("Pain has been worse after some sessions recently. This is worth noting for your next check-in. If it continues, consider mentioning it to a professional.");
-  }
+  const weightUnit = store.get("weightUnit") || "kg";
+  const weightDiff = latest && first && latest.weight && first.weight
+    ? (latest.weight - first.weight).toFixed(1)
+    : null;
 
-  // Quiet ratio
-  const quietCount = last14.filter(e => ["breathing", "journal", "mindful", "rest"].includes(e.type)).length;
-  const activeCount = last14.filter(e => !["breathing", "journal", "mindful", "rest"].includes(e.type)).length;
-  if (activeCount >= 6 && quietCount === 0) {
-    patterns.push("All training, no recovery in the last two weeks. Rest and quiet sessions are part of the programme — your body adapts during recovery, not during effort.");
-  }
-  if (quietCount >= 3 && activeCount >= 3) {
-    patterns.push("You have been balancing active sessions with recovery and quieter practices. That balance is what makes the training sustainable.");
-  }
-
-  // Consistency
-  const daysWithActivity = new Set(
-    last14.filter(e => e.type !== "rest")
-      .map(e => (e.loggedAt || e.completedAt || "").split("T")[0])
-  ).size;
-  if (daysWithActivity >= 8) {
-    patterns.push("Active on " + daysWithActivity + " of the last 14 days. That level of consistency is uncommon and is exactly what produces lasting change.");
-  }
-
-  return patterns.slice(0, 3); // max 3 patterns shown
+  return `
+    <div class="card progress-body-card">
+      <h3>Body changes</h3>
+      ${latest ? `
+        <div class="progress-body-stats">
+          ${latest.weight ? `
+            <div class="progress-body-stat">
+              <span class="progress-body-value">${latest.weight}${weightUnit}</span>
+              <span class="progress-body-label">Current weight</span>
+              ${weightDiff !== null ? `
+                <span class="progress-body-change ${parseFloat(weightDiff) < 0 ? "down" : "up"}">
+                  ${parseFloat(weightDiff) > 0 ? "+" : ""}${weightDiff}${weightUnit}
+                </span>
+              ` : ""}
+            </div>
+          ` : ""}
+        </div>
+        <button class="btn btn-ghost btn-small" id="progress-log-weight-btn"
+                style="margin-top:var(--space-3);">
+          + Log today
+        </button>
+      ` : `
+        <p class="text-muted text-sm" style="margin-bottom:var(--space-3);">
+          No entries yet. Log your weight and the coach will track changes over time.
+        </p>
+        <button class="btn btn-ghost btn-small" id="progress-log-weight-btn">
+          + Log today
+        </button>
+      `}
+    </div>
+  `;
 }
 
-// ── Empty state ───────────────────────────────────────────────────────────────
-
-function renderEmpty() {
+function renderBodyOptIn() {
   return `
-    <div class="card" style="margin-top:var(--space-4);">
-      <p class="text-sm text-muted" style="text-align:center; padding:var(--space-4) 0;">
-        Nothing logged yet. Complete a session or check in and it will appear here.
+    <div class="card progress-body-optin">
+      <p class="text-sm text-muted">
+        Want to track weight or body changes over time?
       </p>
+      <button class="btn btn-ghost btn-small" id="progress-body-optin-btn"
+              style="margin-top:var(--space-3);">
+        Turn on body tracking
+      </button>
     </div>
   `;
 }
@@ -492,5 +424,21 @@ function renderEmpty() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
-  // Progress is read-only — no interactive elements to wire
+  // Body opt-in
+  document.getElementById("progress-body-optin-btn")?.addEventListener("click", () => {
+    store.set("trackBodyChanges", true);
+    const main = document.getElementById("main-content");
+    if (main) { main.innerHTML = render(); onMount(); }
+  });
+
+  // Log weight
+  document.getElementById("progress-log-weight-btn")?.addEventListener("click", () => {
+    const weight = prompt("Enter your weight (" + (store.get("weightUnit") || "kg") + "):");
+    if (!weight || isNaN(parseFloat(weight))) return;
+    const bodyLog = store.get("bodyLog") || [];
+    bodyLog.push({ weight: parseFloat(weight), loggedAt: new Date().toISOString() });
+    store.set("bodyLog", bodyLog);
+    const main = document.getElementById("main-content");
+    if (main) { main.innerHTML = render(); onMount(); }
+  });
 }
