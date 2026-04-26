@@ -1563,3 +1563,445 @@
   font-size: var(--text-xl);
   color: var(--color-text);
 }
+
+/* ============================================
+   YOGA SESSION
+   ============================================ */
+
+.yoga-view { padding-bottom: var(--space-8); }
+.yoga-coach-card { margin-bottom: var(--space-5); }
+
+/* Focus grid */
+.yoga-focus-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.yoga-focus-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 88px;
+  padding: var(--space-4) var(--space-3);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.yoga-focus-card.selected,
+.yoga-focus-card[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.yoga-focus-card:hover:not(.selected):not([aria-pressed="true"]) {
+  border-color: var(--color-primary);
+}
+
+.yoga-focus-icon { font-size: 1.8rem; }
+
+.yoga-focus-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  text-align: center;
+}
+
+.yoga-focus-card.selected .yoga-focus-label,
+.yoga-focus-card[aria-pressed="true"] .yoga-focus-label {
+  color: var(--color-primary);
+}
+
+/* Duration grid */
+.yoga-duration-grid {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.yoga-duration-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 96px;
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.yoga-duration-card.selected,
+.yoga-duration-card[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.yoga-duration-num {
+  font-size: 2.5rem;
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.yoga-duration-unit {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.yoga-duration-poses {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+/* Sequence preview */
+.yoga-sequence-preview { margin-bottom: var(--space-4); }
+.yoga-sequence-preview h3 { margin-bottom: var(--space-3); }
+
+.yoga-pose-list {
+  padding-left: var(--space-5);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.yoga-pose-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.yoga-pose-list li:last-child { border-bottom: none; }
+.yoga-pose-time { color: var(--color-text-muted); font-size: var(--text-xs); }
+
+/* Session execution */
+.yoga-session-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.yoga-session-step {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.yoga-progress-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.yoga-progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+}
+
+/* Pose card */
+.yoga-pose-card { margin-bottom: var(--space-4); }
+
+.yoga-pose-name {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+}
+
+.yoga-pose-coaching {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-4);
+}
+
+/* Timer */
+.yoga-timer-block { text-align: center; }
+
+.yoga-timer-circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 5px solid var(--phase-colour, var(--color-primary));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  background: var(--color-bg-card);
+  box-shadow: 0 0 28px rgba(45, 212, 191, 0.1);
+}
+
+.yoga-timer-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-1);
+}
+
+.yoga-timer-seconds {
+  font-size: 3rem;
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Instructions */
+.yoga-instructions {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-3);
+}
+
+.yoga-instructions-summary {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  cursor: pointer;
+  list-style: none;
+  padding: var(--space-2) 0;
+}
+
+.yoga-instructions-summary::-webkit-details-marker { display: none; }
+
+.yoga-instructions-list {
+  padding-left: var(--space-5);
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.yoga-instructions-list li {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* Loading screen message */
+.loading-message {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  max-width: 280px;
+  line-height: var(--leading-relaxed);
+  margin: var(--space-3) auto var(--space-4);
+  font-style: italic;
+}
+
+/* ============================================
+   LIGHT MODE THEME
+   Applied when <html class="light-mode">
+   Default: dark. User toggle in Settings.
+   ============================================ */
+
+html.light-mode {
+  --color-bg:          #f8fafc;
+  --color-bg-card:     #ffffff;
+  --color-bg-surface:  #f1f5f9;
+  --color-border:      #e2e8f0;
+  --color-text:        #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted:  #64748b;
+  /* Primary teal stays consistent */
+  --color-primary:         #0d9488;
+  --color-primary-glow:    rgba(13, 148, 136, 0.08);
+}
+
+html.light-mode .card {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+}
+
+html.light-mode .app-nav,
+html.light-mode .bottom-nav {
+  background: rgba(255,255,255,0.95);
+  border-top-color: #e2e8f0;
+}
+
+html.light-mode .checkin-slider {
+  background: #e2e8f0;
+}
+
+html.light-mode .settings-field-input {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+/* ============================================
+   QUIET SESSION MODE SELECTOR — PROPER CARDS
+   ============================================ */
+
+.quiet-mode-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.quiet-mode-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: 72px;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+
+.quiet-mode-card:hover,
+.quiet-mode-card:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+  transform: translateX(3px);
+}
+
+.quiet-mode-card-left {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 3px;
+}
+
+.quiet-mode-card-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+}
+
+.quiet-mode-card-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.quiet-mode-card-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.quiet-mode-card-chevron {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/* Journaling — dark textarea always */
+.quiet-journal-textarea {
+  width: 100%;
+  min-height: 120px;
+  background: var(--color-bg) !important;
+  color: var(--color-text) !important;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  font-family: inherit;
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.quiet-journal-textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.quiet-journal-textarea:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+}
+
+/* Journaling prompt text - larger, more inviting */
+.quiet-journal-prompt {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-2);
+}
+
+.quiet-journal-sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-bottom: var(--space-3);
+}
+
+/* ============================================
+   SETTINGS — SAVE CONFIRMATION
+   ============================================ */
+
+.settings-save-toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-primary);
+  color: #000;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-full);
+  z-index: 9999;
+  pointer-events: none;
+  animation: toast-fade 2s ease forwards;
+}
+
+@keyframes toast-fade {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  15%  { opacity: 1; transform: translateX(-50%) translateY(0);   }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ============================================
+   PROGRESS — TILE GRID OVERFLOW FIX
+   ============================================ */
+
+.progress-tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+  overflow: visible;
+}
+
+/* On very narrow screens, wrap to 2+3 */
+@media (max-width: 360px) {
+  .progress-tiles-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Facility preset selected state */
+.facility-preset-card.selected,
+.facility-preset-card[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
