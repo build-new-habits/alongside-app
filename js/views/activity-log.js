@@ -226,14 +226,13 @@ export function onMount() {
   });
 
   // Done / cancel
-  document.getElementById("activity-done-btn")?.addEventListener("click", () => {
+  function goBack() {
     logSaved = false; selectedType = null;
-    router.navigate("intention");
-  });
-  document.getElementById("activity-cancel-btn")?.addEventListener("click", () => {
-    logSaved = false; selectedType = null;
-    router.navigate("intention");
-  });
+    const prev = localStorage.getItem("alongside_previousView") || "settings";
+    router.navigate(prev);
+  }
+  document.getElementById("activity-done-btn")?.addEventListener("click", goBack);
+  document.getElementById("activity-cancel-btn")?.addEventListener("click", goBack);
 }
 
 function rerender() {
