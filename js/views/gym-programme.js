@@ -1258,7 +1258,7 @@ function renderPhaseIntro(session) {
 }
 
 function renderExerciseGuide(ex) {
-  const guide = EXERCISE_GUIDE[ex.name];
+  const guide = GUIDE[ex.name] || GUIDE[ex.name.replace(/ \(.*\)/, "")] || null;
   if (!guide) return "";
   return `
     <div class="gym-phase-guide" style="margin-top:var(--space-4);">
