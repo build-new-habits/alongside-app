@@ -126,7 +126,14 @@ export const router = {
     }
 
     this.currentView = viewName;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to top instantly on every navigation.
+    // Both window and main-content are scrolled — whichever is the
+    // scrolling container depends on the CSS layout.
+    window.scrollTo(0, 0);
+    const mc = document.getElementById('main-content');
+    if (mc) mc.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
 
     // Stop any playing speech when navigating away
     tts.stop();
