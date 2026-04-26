@@ -101,7 +101,7 @@ export function render() {
   const requestedTab = store.get("settingsTab");
   if (requestedTab) {
     activeTab = requestedTab;
-    // Do not clear here — onMount() will clear it after confirming
+    store.set("settingsTab", null);  // Clear immediately — prevents stale tab on re-render
   }
 
   return `
@@ -318,6 +318,17 @@ function renderProfileTab() {
 
       </div>
 
+      <!-- Profile save button -->
+      <div style="margin-top:var(--space-4);">
+        <button class="btn btn-primary btn-full" id="profile-save-btn">
+          Save profile
+        </button>
+        <p class="text-xs text-muted" id="profile-save-confirm"
+           style="text-align:center;margin-top:var(--space-2);opacity:0;transition:opacity 0.3s;">
+          Changes saved
+        </p>
+      </div>
+
       <!-- Coach style selector -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Coach style</h2>
       <p class="text-secondary settings-coach-intro">
@@ -344,27 +355,6 @@ function renderProfileTab() {
       <!-- Coach voice speed -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Coach voice speed</h2>
       ${renderSpeechRateSection()}
-
-      <!-- Appearance -->
-      <h2 class="section-heading" style="margin-top:var(--space-6);">Appearance</h2>
-      <div class="card">
-        <div class="settings-field" style="border-bottom:none;">
-          <label class="settings-field-label">Theme</label>
-          <div class="settings-chip-row" role="group" aria-label="App theme">
-            <button class="settings-chip ${!store.get("lightMode") ? "selected" : ""}"
-                    data-theme="dark" aria-pressed="${!store.get("lightMode")}">
-              Dark (default)
-            </button>
-            <button class="settings-chip ${store.get("lightMode") ? "selected" : ""}"
-                    data-theme="light" aria-pressed="${store.get("lightMode")}">
-              Light
-            </button>
-          </div>
-          <p class="text-sm text-muted" style="margin-top:var(--space-2);">
-            Dark mode is the default. Light mode matches what some gym apps use.
-          </p>
-        </div>
-      </div>
 
       <!-- Check-in reminder -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Check-in reminder</h2>
@@ -469,7 +459,7 @@ const FACILITY_PRESETS = [
 
 function renderMyMovementTab() {
   const selected = store.get("equipment") || [];
-  const identity = store.get("movementIdentity") || null;
+  const identities = store.get("movementIdentities") || (store.get("movementIdentity") ? [store.get("movementIdentity")] : []);
 
   const IDENTITIES = [
     { id: "gym",     label: "Gym",      icon: "\uD83C\uDFCB" },
@@ -702,8 +692,11 @@ function renderMovementIdentity() {
  */
 function renderSpeechRateSection() {
   const currentRate = store.get("speechRate") || 0.9;
-  const sliderVal = currentRate <= 0.8 ? 1 : currentRate <= 1.0 ? 2 : 3;
-  const rateLabel = ["Slow","Normal","Fast"][sliderVal - 1];
+  // Map rate (0.6 to 1.5) to slider position (1-10)
+  const sliderVal = Math.round(((currentRate - 0.6) / (1.5 - 0.6)) * 9) + 1;
+  const clampedVal = Math.max(1, Math.min(10, sliderVal));
+  const speedPct = Math.round(((clampedVal - 1) / 9) * 100);
+  const rateLabel = speedPct < 20 ? "Slow" : speedPct < 45 ? "Measured" : speedPct < 65 ? "Normal" : speedPct < 85 ? "Brisk" : "Fast";
 
   return `
     <div class="card speech-rate-card">
@@ -716,13 +709,13 @@ function renderSpeechRateSection() {
       </label>
       <input type="range" id="speech-rate-slider"
              class="checkin-slider"
-             min="1" max="3" step="1"
+             min="1" max="10" step="1"
              value="${sliderVal}"
-             aria-label="Coach voice speed, 1 slow to 3 fast"
+             aria-label="Coach voice speed, 1 slowest to 10 fastest"
              aria-valuetext="${rateLabel}"
              style="margin-top:var(--space-3);">
       <div class="checkin-slider-ends" aria-hidden="true">
-        <span>Slow</span><span></span><span>Fast</span>
+        <span>Slow</span><span>Fast</span>
       </div>
     </div>
   `;
@@ -877,10 +870,32 @@ function wirePanel() {
   });
 
   // ── Profile name ──────────────────────────────────────────────────────────
+  // Profile fields auto-capture on interaction but Save button commits
+  // and rerenders (so gender change shows/hides hormonal section)
+  document.getElementById("profile-save-btn")?.addEventListener("click", () => {
+    // Commit name
+    const nameEl = document.getElementById("profile-name");
+    if (nameEl) store.set("name", nameEl.value.trim());
+    // Commit weight
+    const weightEl = document.getElementById("profile-weight");
+    if (weightEl) {
+      const w = parseFloat(weightEl.value);
+      if (!isNaN(w)) store.set("weight", w);
+    }
+    // Show confirmation
+    const confirmEl = document.getElementById("profile-save-confirm");
+    if (confirmEl) {
+      confirmEl.style.opacity = "1";
+      setTimeout(() => { confirmEl.style.opacity = "0"; }, 2000);
+    }
+    showSaveToast("Profile saved");
+    // Rerender profile tab to update hormonal section visibility
+    switchTab("profile");
+  });
+
   document.getElementById("profile-name")?.addEventListener("blur", e => {
-    const val = e.target.value.trim();
-    store.set("name", val);
-    if (val) showSaveToast("Name saved");
+    // No auto-save — wait for Save button
+    // Just prevent loss if user leaves without saving
   });
 
   // ── Age band chips ─────────────────────────────────────────────────────────
@@ -1042,13 +1057,15 @@ function wirePanel() {
   const speechSlider = document.getElementById("speech-rate-slider");
   const speechLabelEl = document.getElementById("speech-rate-label");
   if (speechSlider) {
-    const RATES = { 1: 0.75, 2: 0.9, 3: 1.2 };
-    const LABELS = { 1: "Slow", 2: "Normal", 3: "Fast" };
     speechSlider.addEventListener("input", () => {
       const val = parseInt(speechSlider.value);
-      store.set("speechRate", RATES[val]);
-      if (speechLabelEl) speechLabelEl.textContent = LABELS[val];
-      speechSlider.setAttribute("aria-valuetext", LABELS[val]);
+      // Map 1-10 to 0.6-1.5
+      const rate = 0.6 + ((val - 1) / 9) * (1.5 - 0.6);
+      store.set("speechRate", parseFloat(rate.toFixed(2)));
+      const pct = Math.round(((val - 1) / 9) * 100);
+      const label = pct < 20 ? "Slow" : pct < 45 ? "Measured" : pct < 65 ? "Normal" : pct < 85 ? "Brisk" : "Fast";
+      if (speechLabelEl) speechLabelEl.textContent = label;
+      speechSlider.setAttribute("aria-valuetext", label);
     });
   }
 
