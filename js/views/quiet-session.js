@@ -97,28 +97,27 @@ const BREATHING_EXERCISES = [
 
 const JOURNAL_PROMPTS = {
   low: [
-    "What does your body need most right now? Not what you think you should need. What does it actually need?",
-    "What are you carrying today that isn't yours to carry?",
-    "If rest were something you deserved rather than something you had to earn, what would today look like?",
-    "What is one small thing that felt okay this week, even if everything else was hard?",
-    "What would you say to a friend who was feeling exactly how you feel right now?"
+    { prompt: "Step to a window or look outside if you can. What is one thing you can actually see right now?", sub: "A cloud, a branch, light on a wall. Just describe it simply." },
+    { prompt: "What did your body do today without being asked? Breathing, heartbeat, keeping going. What does that feel like to notice?", sub: "Write freely. There is no wrong answer." },
+    { prompt: "If how you are feeling right now had a colour or texture, what would it be?", sub: "Do not explain it. Just describe it." },
+    { prompt: "What is one small thing that happened today that you almost missed?", sub: "It does not have to be significant. The smallest things often carry the most." },
+    { prompt: "What would you say to a friend feeling exactly how you feel right now?", sub: "Write that. Then notice whether you would say it to yourself." }
   ],
   moderate: [
-    "What has been on your mind that you have not yet put into words?",
-    "Where in your body do you feel today? What does that sensation want you to know?",
-    "What is one thing you want to acknowledge about this week, positive or otherwise?",
-    "What would make tomorrow feel slightly better than today?",
-    "What are you grateful for that you have not recently said out loud?"
+    { prompt: "Go to a window or outside for a moment. What is happening in the world just beyond your walls?", sub: "A bird, the wind moving something, someone passing. What do you actually see?" },
+    { prompt: "Nature moves in cycles: seasons, tides, growth and rest. Where are you in a cycle right now?", sub: "Not where you think you should be. Where you actually are." },
+    { prompt: "What felt good recently that you have not properly acknowledged?", sub: "Write it down. Noticing something is not the same as boasting about it." },
+    { prompt: "If you stood still outside for five minutes, what would you notice that you normally walk past?", sub: "You do not have to go outside. Just imagine it clearly." },
+    { prompt: "Where is your attention pointing today? What does it seem to want to move toward?", sub: "Follow that thread for a few lines." }
   ],
   high: [
-    "What do you want to build on from this week? What is working that you want more of?",
-    "What felt good recently that you have not properly acknowledged?",
-    "What is one thing you have learned about yourself in the last week?",
-    "Where is your energy pointing right now? What does it want to move toward?",
-    "What would you do if you knew you had enough energy and time?"
+    { prompt: "Think about something in the natural world you find genuinely remarkable. The way worms create soil. How bees navigate. How water finds its level. Write about it.", sub: "What makes it remarkable to you?" },
+    { prompt: "Good energy is worth examining, not just spending. What is making things feel lighter today?", sub: "Name it specifically if you can." },
+    { prompt: "What is one thing you want to build, make, or contribute to the actual world?", sub: "It can be small. A conversation, a habit, a kindness. Write about it as if it already happened." },
+    { prompt: "Everything in nature works in balance: worms create soil, soil feeds plants, plants feed bees, bees pollinate food. What part of your world feels balanced right now? What is out of balance?", sub: "Write honestly." },
+    { prompt: "If you looked back at this period of your life in ten years, what would you want to have paid more attention to?", sub: "Write what comes. It does not need to be profound." }
   ]
 };
-
 // ── Mindfulness exercises (from database) ─────────────────────────────────────
 
 const MINDFUL_SESSIONS = {
@@ -540,7 +539,7 @@ function renderMindfulSelector() {
 function renderMindfulSession(step, session) {
   const totalSteps   = session.length;
   const progressPct  = Math.round((mindfulStep / totalSteps) * 100);
-  const timeDisplay  = formatTime(mindfulSecondsLeft);
+  const timeDisplay  = formatTime(mindfulSecondsLeft > 0 ? mindfulSecondsLeft : (step.duration || 180));
 
   return `
     <div class="card card-coach quiet-coach-card" style="margin-bottom:var(--space-4);">
@@ -707,9 +706,12 @@ function startMindfulSession() {
   const session = MINDFUL_SESSIONS[mindfulDuration];
   if (!session?.length) return;
 
+  // Reset all state before starting
+  if (mindfulTimer) clearInterval(mindfulTimer);
+  mindfulTimer       = null;
   mindfulStep        = 0;
   mindfulComplete    = false;
-  mindfulSecondsLeft = session[0].duration;
+  mindfulSecondsLeft = session[0].duration || 180;  // Always positive
 
   // Render the session view DIRECTLY into the content div without calling
   // rerender() — rerender() triggers onMount() which calls cleanup() and
@@ -819,7 +821,7 @@ export function onMount() {
       } else {
         cleanup();
         store.set("quietMode", null);
-        router.navigate("intention");
+        router.navigate("coach-proposal");
       }
     });
   });
@@ -844,7 +846,7 @@ export function onMount() {
   // Breathing: done
   document.getElementById("quiet-breathing-done-btn")?.addEventListener("click", () => {
     cleanup();
-    router.navigate("intention");
+    router.navigate("coach-proposal");
   });
 
   // Breathing: difficulty chips
@@ -863,7 +865,7 @@ export function onMount() {
   // Journal: skip
   document.getElementById("quiet-journal-skip-btn")?.addEventListener("click", () => {
     cleanup();
-    router.navigate("intention");
+    router.navigate("coach-proposal");
   });
 
   // Mindful: duration selector
