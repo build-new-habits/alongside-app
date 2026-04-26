@@ -90,6 +90,15 @@ export const router = {
     const mainContent = document.getElementById('main-content');
     const bottomNav   = document.getElementById('bottom-nav');
 
+    // Track previous view for Back button navigation
+    try {
+      const currentView = localStorage.getItem('alongside_currentView');
+      if (currentView && currentView !== viewName) {
+        localStorage.setItem('alongside_previousView', currentView);
+      }
+      localStorage.setItem('alongside_currentView', viewName);
+    } catch(e) {}
+
     // Clear current content
     mainContent.innerHTML = '';
     mainContent.className = 'main-content';
