@@ -38,7 +38,14 @@ const TIME_OPTIONS = [
   { value: "open",     label: "Open",     sub: "60+ min" }
 ];
 
-// Temporary state during check-in (reset each time view mounts)
+// ── Step state ────────────────────────────────────────────────────────────────
+// Check-in is now a conversational step flow:
+//   0 = energy, 1 = mood, 2 = sleep, 3 = conditions (skipped if none),
+//   4 = time, 5 = done (submits and navigates)
+// Each step fills the viewport. Coach responds between steps.
+
+let checkinStep = 0;
+
 let currentCheckin = {
   energy: 5,
   mood: 5,
@@ -49,404 +56,484 @@ let currentCheckin = {
   notes: ""
 };
 
-// availableTime lives separately from currentCheckin — it is stored at the
-// top level of the store rather than inside lastCheckin, so it can be read
-// by the workout generator without requiring a fresh check-in object.
 let selectedAvailableTime = null;
 
+// Coach response lines between steps — personalised to what was just entered
+function getCoachBridge(fromStep, value) {
+  if (fromStep === 0) { // energy bridge
+    if (value >= 8) return "Good energy. Let's see what else is going on.";
+    if (value >= 6) return "Solid. How about your mood?";
+    if (value >= 4) return "Okay, I hear that. How's your mood sitting alongside that?";
+    return "That's low. I want to understand the full picture.";
+  }
+  if (fromStep === 1) { // mood bridge
+    if (value >= 8) return "Good. And sleep — how was last night?";
+    if (value >= 5) return "Alright. Last question — how did you sleep?";
+    return "Understood. Sleep affects everything — tell me about last night.";
+  }
+  return "";
+}
+
+function getCoachSummary() {
+  const e = currentCheckin.energy;
+  const m = currentCheckin.mood;
+  const s = currentCheckin.sleepHours;
+  const time = selectedAvailableTime;
+  const timeLabel = { micro: "10 minutes", quick: "20 minutes", short: "30 minutes",
+                      standard: "40 minutes", long: "50 minutes", open: "an hour or more" };
+
+  let summary = "";
+  if (e >= 7 && m >= 7) summary = "Good energy, good mood";
+  else if (e >= 7) summary = "Good energy";
+  else if (m >= 7) summary = "Good mood";
+  else if (e <= 3 || m <= 3) summary = "A harder day";
+  else summary = "A moderate day";
+
+  if (s >= 8) summary += ", well rested.";
+  else if (s >= 6) summary += ", " + s + " hours sleep.";
+  else summary += ", lighter sleep than usual.";
+
+  if (time) summary += " You have " + (timeLabel[time] || time) + " today.";
+
+  summary += " I'll have something ready for you.";
+  return summary;
+}
+
 export function render() {
-  const name             = store.get("name") || "there";
-  const conditions       = store.get("conditions") || [];
-  const hormonalTracking = store.get("hormonalTracking");
-  const burnout          = checkinData.detectBurnout();
-
-  // Seed condition levels from last saved scores (so sliders remember state)
-  const savedPainScores = store.get("conditionPainScores") || {};
-  conditions.forEach(c => {
-    if (!currentCheckin.conditionLevels[c]) {
-      currentCheckin.conditionLevels[c] = savedPainScores[c] || 1;
-    }
-  });
-
-  // Restore availableTime selection from store on re-mount
+  // Restore existing check-in if already saved today
+  const existing = checkinData.getTodaysCheckin();
+  if (existing) {
+    currentCheckin = { ...currentCheckin, ...existing };
+  }
   selectedAvailableTime = store.get("availableTime") || null;
 
-  return `
-    <div class="view checkin-view">
+  const conditions = store.get("conditions") || [];
+  const name = (store.get("name") || "").split(" ")[0] || "there";
 
-      <div class="view-header">
-        <h1>Hey ${name} 👋</h1>
-        <p class="text-secondary">Let's see how you're doing today.</p>
+  // Build step list dynamically based on conditions
+  // Steps: 0=energy, 1=mood, 2=sleep, 3=conditions (if any), 4=time, 5=summary
+  const steps = [0, 1, 2];
+  if (conditions.length > 0) steps.push(3);
+  steps.push(4, 5);
+
+  const currentStepId = steps[Math.min(checkinStep, steps.length - 1)];
+
+  return renderStep(currentStepId, name, conditions);
+}
+
+function renderStep(stepId, name, conditions) {
+  const totalSteps = conditions.length > 0 ? 6 : 5;
+  const stepNum    = checkinStep + 1;
+
+  const header = `
+    <div class="checkin-step-header">
+      <div class="checkin-progress-dots" role="progressbar"
+           aria-valuenow="${checkinStep}" aria-valuemin="0" aria-valuemax="${totalSteps}"
+           aria-label="Check-in step ${stepNum} of ${totalSteps}">
+        ${Array.from({ length: totalSteps }, (_, i) => `
+          <div class="checkin-dot ${i < stepNum ? "done" : i === checkinStep ? "current" : ""}"
+               aria-hidden="true"></div>
+        `).join("")}
       </div>
+    </div>
+  `;
 
-      ${burnout.message ? `
-        <div class="card card-warning" role="note">
-          <div class="warning-content">
-            <span class="warning-icon" aria-hidden="true">💛</span>
-            <p>${burnout.message}</p>
+  if (stepId === 0) return renderEnergyStep(header, name);
+  if (stepId === 1) return renderMoodStep(header);
+  if (stepId === 2) return renderSleepStep(header);
+  if (stepId === 3) return renderConditionsStep(header, conditions);
+  if (stepId === 4) return renderTimeStep(header);
+  if (stepId === 5) return renderSummaryStep(header);
+  return renderEnergyStep(header, name);
+}
+
+// ── Step renderers ────────────────────────────────────────────────────────────
+
+function renderEnergyStep(header, name) {
+  const val   = currentCheckin.energy;
+  const emoji = checkinData.getEnergyEmoji(val);
+  const label = checkinData.getEnergyLabel(val);
+  const hour  = new Date().getHours();
+  const greeting = hour < 12 ? "Morning" : hour < 17 ? "Afternoon" : "Evening";
+
+  return `
+    <div class="view checkin-step-view">
+      ${header}
+      <div class="checkin-step-body">
+        <div class="checkin-coach-line">
+          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
+          <p>${greeting} ${name}. How's your energy today?</p>
+        </div>
+
+        <div class="checkin-slider-block">
+          <div class="checkin-value-display" aria-live="polite" aria-atomic="true">
+            <span class="checkin-value-emoji" id="energy-emoji" aria-hidden="true">${emoji}</span>
+            <span class="checkin-value-number" id="energy-number">${val}</span>
+            <span class="checkin-value-label" id="energy-label">${label}</span>
           </div>
-        </div>
-      ` : ""}
 
-      <!-- ── Energy ─────────────────────────────────────────────────────── -->
-      <div class="checkin-section">
-        <div class="section-header">
-          <h2>Energy Level</h2>
-          <span class="section-value" id="energy-display" aria-live="polite">
-            ${checkinData.getEnergyEmoji(currentCheckin.energy)} ${checkinData.getEnergyLabel(currentCheckin.energy)}
-          </span>
-        </div>
-        <div class="slider-container">
-          <input
-            type="range"
-            id="energy-slider"
-            class="checkin-slider"
-            min="1"
-            max="10"
-            value="${currentCheckin.energy}"
-            aria-label="Energy level, 1 exhausted to 10 energised"
-          >
-          <div class="slider-labels" aria-hidden="true">
+          <input type="range" id="energy-slider"
+                 class="checkin-slider"
+                 min="1" max="10"
+                 value="${val}"
+                 aria-label="Energy level, 1 exhausted to 10 energised"
+                 aria-valuetext="${label}">
+
+          <div class="checkin-slider-ends" aria-hidden="true">
             <span>Exhausted</span>
             <span>Energised</span>
           </div>
         </div>
       </div>
 
-      <!-- ── Mood ───────────────────────────────────────────────────────── -->
-      <div class="checkin-section">
-        <div class="section-header">
-          <h2>Mood</h2>
-          <span class="section-value" id="mood-display" aria-live="polite">
-            ${checkinData.getMoodEmoji(currentCheckin.mood)} ${checkinData.getMoodLabel(currentCheckin.mood)}
-          </span>
+      <div class="checkin-step-actions">
+        <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn"
+                aria-label="Continue to mood">
+          Next
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderMoodStep(header) {
+  const val   = currentCheckin.mood;
+  const emoji = checkinData.getMoodEmoji(val);
+  const label = checkinData.getMoodLabel(val);
+  const bridge = getCoachBridge(0, currentCheckin.energy);
+
+  return `
+    <div class="view checkin-step-view">
+      ${header}
+      <div class="checkin-step-body">
+        <div class="checkin-coach-line">
+          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
+          <p>${bridge}</p>
         </div>
-        <div class="slider-container">
-          <input
-            type="range"
-            id="mood-slider"
-            class="checkin-slider"
-            min="1"
-            max="10"
-            value="${currentCheckin.mood}"
-            aria-label="Mood, 1 struggling to 10 great"
-          >
-          <div class="slider-labels" aria-hidden="true">
+
+        <div class="checkin-slider-block">
+          <p class="checkin-question">How's your mood?</p>
+          <div class="checkin-value-display" aria-live="polite" aria-atomic="true">
+            <span class="checkin-value-emoji" id="mood-emoji" aria-hidden="true">${emoji}</span>
+            <span class="checkin-value-number" id="mood-number">${val}</span>
+            <span class="checkin-value-label" id="mood-label">${label}</span>
+          </div>
+
+          <input type="range" id="mood-slider"
+                 class="checkin-slider"
+                 min="1" max="10"
+                 value="${val}"
+                 aria-label="Mood, 1 struggling to 10 great"
+                 aria-valuetext="${label}">
+
+          <div class="checkin-slider-ends" aria-hidden="true">
             <span>Struggling</span>
             <span>Great</span>
           </div>
         </div>
       </div>
 
-      <!-- ── Sleep ──────────────────────────────────────────────────────── -->
-      <div class="checkin-section">
-        <div class="section-header">
-          <h2>Sleep Last Night</h2>
+      <div class="checkin-step-actions">
+        <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">Next</button>
+        <button class="btn btn-ghost btn-small" id="checkin-back-btn" style="margin-top:var(--space-2);">&larr; Back</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderSleepStep(header) {
+  const bridge = getCoachBridge(1, currentCheckin.mood);
+
+  return `
+    <div class="view checkin-step-view">
+      ${header}
+      <div class="checkin-step-body">
+        <div class="checkin-coach-line">
+          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
+          <p>${bridge}</p>
         </div>
-        <div class="sleep-inputs">
-          <div class="sleep-hours">
-            <label class="input-label" id="sleep-hours-label">Hours</label>
-            <div class="hours-adjuster" role="group" aria-labelledby="sleep-hours-label">
-              <button type="button" class="btn-icon" id="sleep-minus" aria-label="Decrease sleep hours">−</button>
-              <span class="hours-value" id="sleep-hours-display" aria-live="polite">${currentCheckin.sleepHours}</span>
-              <button type="button" class="btn-icon" id="sleep-plus" aria-label="Increase sleep hours">+</button>
+
+        <div class="checkin-sleep-block">
+          <p class="checkin-question">How long did you sleep?</p>
+
+          <div class="checkin-sleep-adjuster">
+            <button type="button" class="checkin-sleep-btn" id="sleep-minus"
+                    aria-label="Decrease sleep hours">&#8722;</button>
+            <div class="checkin-sleep-display" aria-live="polite" aria-label="${currentCheckin.sleepHours} hours">
+              <span class="checkin-sleep-number" id="sleep-hours-display">${currentCheckin.sleepHours}</span>
+              <span class="checkin-sleep-unit">hours</span>
             </div>
+            <button type="button" class="checkin-sleep-btn" id="sleep-plus"
+                    aria-label="Increase sleep hours">&#43;</button>
           </div>
-          <div class="sleep-quality">
-            <label class="input-label" id="sleep-quality-label">Quality</label>
-            <div class="quality-options" id="quality-buttons" role="group" aria-labelledby="sleep-quality-label">
-              <button type="button" class="btn-pill ${currentCheckin.sleepQuality === "poor" ? "selected" : ""}" data-quality="poor" aria-pressed="${currentCheckin.sleepQuality === "poor"}">Poor</button>
-              <button type="button" class="btn-pill ${currentCheckin.sleepQuality === "okay" ? "selected" : ""}" data-quality="okay" aria-pressed="${currentCheckin.sleepQuality === "okay"}">Okay</button>
-              <button type="button" class="btn-pill ${currentCheckin.sleepQuality === "good" ? "selected" : ""}" data-quality="good" aria-pressed="${currentCheckin.sleepQuality === "good"}">Good</button>
+
+          <div class="checkin-sleep-quality">
+            <p class="checkin-question-sub">How was the quality?</p>
+            <div class="checkin-quality-chips" role="group" aria-label="Sleep quality">
+              ${["Poor", "Okay", "Good"].map(q => `
+                <button type="button"
+                        class="checkin-quality-chip ${currentCheckin.sleepQuality === q.toLowerCase() ? "selected" : ""}"
+                        data-quality="${q.toLowerCase()}"
+                        aria-pressed="${currentCheckin.sleepQuality === q.toLowerCase()}">
+                  ${q}
+                </button>
+              `).join("")}
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── Condition Pain Levels ──────────────────────────────────────── -->
-      ${conditions.length > 0 ? `
-        <div class="checkin-section">
-          <div class="section-header">
-            <h2>How's the pain today?</h2>
-          </div>
-          <div class="condition-checks">
-            ${conditions.map(conditionId => {
-              const condition = CONDITIONS.find(c => c.id === conditionId);
-              const level     = currentCheckin.conditionLevels[conditionId] || 1;
-              return `
-                <div class="condition-check" data-condition="${conditionId}">
-                  <div class="condition-info">
-                    <span class="condition-icon" aria-hidden="true">${condition?.icon || "🩹"}</span>
-                    <span class="condition-name">${condition?.name || conditionId}</span>
-                  </div>
-                  <div class="pain-selector" role="group" aria-label="Pain level for ${condition?.name || conditionId}">
-                    <button type="button" class="pain-btn ${level <= 2 ? "selected low" : ""}"    data-level="1" aria-pressed="${level <= 2}">None</button>
-                    <button type="button" class="pain-btn ${level > 2 && level <= 5 ? "selected medium" : ""}" data-level="4" aria-pressed="${level > 2 && level <= 5}">Mild</button>
-                    <button type="button" class="pain-btn ${level > 5 && level <= 7 ? "selected high" : ""}"   data-level="6" aria-pressed="${level > 5 && level <= 7}">Moderate</button>
-                    <button type="button" class="pain-btn ${level > 7 ? "selected severe" : ""}"  data-level="9" aria-pressed="${level > 7}">Severe</button>
-                  </div>
+      <div class="checkin-step-actions">
+        <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">Next</button>
+        <button class="btn btn-ghost btn-small" id="checkin-back-btn" style="margin-top:var(--space-2);">&larr; Back</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderConditionsStep(header, conditions) {
+  return `
+    <div class="view checkin-step-view">
+      ${header}
+      <div class="checkin-step-body">
+        <div class="checkin-coach-line">
+          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
+          <p>One more thing. How's the pain today?</p>
+        </div>
+
+        <div class="checkin-conditions-block">
+          ${conditions.map(conditionId => {
+            const condition = CONDITIONS.find(c => c.id === conditionId);
+            const level = currentCheckin.conditionLevels[conditionId] || 1;
+            return `
+              <div class="checkin-condition-row" data-condition="${conditionId}">
+                <p class="checkin-condition-name">
+                  <span aria-hidden="true">${condition?.icon || ""}</span>
+                  ${condition?.name || conditionId}
+                </p>
+                <div class="checkin-pain-chips" role="group"
+                     aria-label="Pain level for ${condition?.name || conditionId}">
+                  <button class="checkin-pain-chip ${level <= 2 ? "selected low" : ""}" data-level="1" aria-pressed="${level <= 2}">None</button>
+                  <button class="checkin-pain-chip ${level > 2 && level <= 5 ? "selected mild" : ""}" data-level="4" aria-pressed="${level > 2 && level <= 5}">Mild</button>
+                  <button class="checkin-pain-chip ${level > 5 && level <= 7 ? "selected moderate" : ""}" data-level="6" aria-pressed="${level > 5 && level <= 7}">Moderate</button>
+                  <button class="checkin-pain-chip ${level > 7 ? "selected severe" : ""}" data-level="9" aria-pressed="${level > 7}">Severe</button>
                 </div>
-              `;
-            }).join("")}
-          </div>
+              </div>
+            `;
+          }).join("")}
         </div>
-      ` : ""}
-
-      <!-- ── Hormonal Cycle ─────────────────────────────────────────────── -->
-      ${hormonalTracking ? `
-        <div class="checkin-section">
-          <div class="section-header">
-            <h2>Cycle Day</h2>
-            <span class="text-muted">(optional)</span>
-          </div>
-          <div class="cycle-input">
-            <input
-              type="number"
-              id="cycle-day"
-              class="input-field cycle-day-input"
-              placeholder="Day of cycle"
-              min="1"
-              max="45"
-              value="${currentCheckin.cycleDay || ""}"
-              aria-label="Day of menstrual cycle, day 1 is first day of period"
-            >
-            <p class="text-sm text-muted">Day 1 = first day of period</p>
-          </div>
-        </div>
-      ` : ""}
-
-      <!-- ── Notes ─────────────────────────────────────────────────────── -->
-      <div class="checkin-section">
-        <div class="section-header">
-          <h2>Anything else?</h2>
-          <span class="text-muted">(optional)</span>
-        </div>
-        <textarea
-          id="checkin-notes"
-          class="input-field notes-input"
-          placeholder="Sore from yesterday, feeling anxious, big day ahead…"
-          rows="3"
-          aria-label="Optional notes about how you're feeling"
-        >${currentCheckin.notes}</textarea>
       </div>
 
-      <!-- ── Available Time ─────────────────────────────────────────────── -->
-      <div class="checkin-section">
-        <div class="section-header">
-          <h2>How much time do you have today?</h2>
-          <span class="text-muted">(optional)</span>
+      <div class="checkin-step-actions">
+        <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">Next</button>
+        <button class="btn btn-ghost btn-small" id="checkin-back-btn" style="margin-top:var(--space-2);">&larr; Back</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderTimeStep(header) {
+  return `
+    <div class="view checkin-step-view">
+      ${header}
+      <div class="checkin-step-body">
+        <div class="checkin-coach-line">
+          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
+          <p>Last one. How much time do you have today?</p>
         </div>
-        <p class="time-picker-hint">I will tailor how many exercises you get. If you skip this, I will use your energy level to decide.</p>
-        <div
-          class="time-chip-grid"
-          id="time-chip-grid"
-          role="group"
-          aria-label="Available workout time today"
-        >
+
+        <div class="checkin-time-grid" role="group" aria-label="Available time today">
           ${TIME_OPTIONS.map(opt => `
-            <button
-              type="button"
-              class="time-chip ${selectedAvailableTime === opt.value ? "selected" : ""}"
-              data-time="${opt.value}"
-              aria-pressed="${selectedAvailableTime === opt.value}"
-            >
-              <span class="time-chip-label">${opt.label}</span>
-              <span class="time-chip-sub">${opt.sub}</span>
+            <button type="button"
+                    class="checkin-time-card ${selectedAvailableTime === opt.value ? "selected" : ""}"
+                    data-time="${opt.value}"
+                    aria-pressed="${selectedAvailableTime === opt.value}">
+              <span class="checkin-time-label">${opt.label}</span>
+              <span class="checkin-time-sub">${opt.sub}</span>
             </button>
           `).join("")}
         </div>
-        ${selectedAvailableTime ? `
-          <button
-            type="button"
-            class="btn btn-ghost btn-sm time-clear-btn"
-            id="time-clear-btn"
-            aria-label="Clear time selection"
-          >
-            Clear selection
-          </button>
-        ` : ""}
+        <p class="text-sm text-muted" style="margin-top:var(--space-3);">
+          Skip this and I'll use your energy level to decide.
+        </p>
       </div>
 
-      <!-- ── Submit ────────────────────────────────────────────────────── -->
-      <div class="checkin-actions">
-        <button type="button" class="btn btn-primary btn-large btn-full" id="submit-checkin">
-          See today's workout options
-        </button>
+      <div class="checkin-step-actions">
+        <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">Done</button>
+        <button class="btn btn-ghost btn-small" id="checkin-back-btn" style="margin-top:var(--space-2);">&larr; Back</button>
+      </div>
+    </div>
+  `;
+}
 
-        <!--
-          ADHD-aware shortcut: user may come to check in specifically to do
-          their prescribed exercises, not a generated workout. This button
-          saves the check-in and navigates directly to the prescribed section
-          on the Today view, with the add-form pre-opened.
-          Confirmed design: S3-2 session (16-19 March 2026).
-        -->
-        <button type="button" class="btn btn-ghost btn-full" id="prescribed-shortcut-btn"
-                style="margin-top: var(--space-3);">
+function renderSummaryStep(header) {
+  const summary = getCoachSummary();
+  return `
+    <div class="view checkin-step-view">
+      ${header}
+      <div class="checkin-step-body checkin-summary-body">
+        <div class="checkin-summary-coach card card-coach">
+          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <p>${summary}</p>
+        </div>
+      </div>
+
+      <div class="checkin-step-actions">
+        <button class="btn btn-primary btn-large btn-full" id="checkin-submit-btn">
+          See what I'm thinking &rarr;
+        </button>
+        <button class="btn btn-ghost btn-full" id="prescribed-shortcut-btn"
+                style="margin-top:var(--space-3);">
           I have prescribed exercises to do
         </button>
       </div>
-
     </div>
   `;
 }
 
 export function onMount() {
-  // Restore existing check-in if one was already saved today
+  const conditions = store.get("conditions") || [];
+
+  // Restore existing check-in
   const existing = checkinData.getTodaysCheckin();
-  if (existing) {
-    currentCheckin = { ...currentCheckin, ...existing };
-    updateEnergyDisplay(currentCheckin.energy);
-    updateMoodDisplay(currentCheckin.mood);
-  }
+  if (existing) currentCheckin = { ...currentCheckin, ...existing };
 
   // ── Energy slider ───────────────────────────────────────────────────────
-  document.getElementById("energy-slider")?.addEventListener("input", e => {
-    const value = parseInt(e.target.value);
-    currentCheckin.energy = value;
-    updateEnergyDisplay(value);
-  });
+  const energySlider = document.getElementById("energy-slider");
+  if (energySlider) {
+    energySlider.addEventListener("input", e => {
+      const val = parseInt(e.target.value);
+      currentCheckin.energy = val;
+      const emoji = checkinData.getEnergyEmoji(val);
+      const label = checkinData.getEnergyLabel(val);
+      const emojiEl = document.getElementById("energy-emoji");
+      const numEl   = document.getElementById("energy-number");
+      const labEl   = document.getElementById("energy-label");
+      if (emojiEl) emojiEl.textContent = emoji;
+      if (numEl)   numEl.textContent   = val;
+      if (labEl)   labEl.textContent   = label;
+      energySlider.setAttribute("aria-valuetext", label);
+    });
+  }
 
   // ── Mood slider ─────────────────────────────────────────────────────────
-  document.getElementById("mood-slider")?.addEventListener("input", e => {
-    const value = parseInt(e.target.value);
-    currentCheckin.mood = value;
-    updateMoodDisplay(value);
+  const moodSlider = document.getElementById("mood-slider");
+  if (moodSlider) {
+    moodSlider.addEventListener("input", e => {
+      const val = parseInt(e.target.value);
+      currentCheckin.mood = val;
+      const emoji = checkinData.getMoodEmoji(val);
+      const label = checkinData.getMoodLabel(val);
+      const emojiEl = document.getElementById("mood-emoji");
+      const numEl   = document.getElementById("mood-number");
+      const labEl   = document.getElementById("mood-label");
+      if (emojiEl) emojiEl.textContent = emoji;
+      if (numEl)   numEl.textContent   = val;
+      if (labEl)   labEl.textContent   = label;
+      moodSlider.setAttribute("aria-valuetext", label);
+    });
+  }
+
+  // ── Sleep ────────────────────────────────────────────────────────────────
+  document.getElementById("sleep-minus")?.addEventListener("click", () => {
+    currentCheckin.sleepHours = Math.max(0, currentCheckin.sleepHours - 0.5);
+    const el = document.getElementById("sleep-hours-display");
+    if (el) el.textContent = currentCheckin.sleepHours;
+  });
+  document.getElementById("sleep-plus")?.addEventListener("click", () => {
+    currentCheckin.sleepHours = Math.min(14, currentCheckin.sleepHours + 0.5);
+    const el = document.getElementById("sleep-hours-display");
+    if (el) el.textContent = currentCheckin.sleepHours;
   });
 
-  // ── Sleep hours ─────────────────────────────────────────────────────────
-  document.getElementById("sleep-minus")?.addEventListener("click", () => adjustSleepHours(-0.5));
-  document.getElementById("sleep-plus")?.addEventListener("click",  () => adjustSleepHours(0.5));
-
-  // ── Sleep quality buttons ───────────────────────────────────────────────
-  document.getElementById("quality-buttons")?.addEventListener("click", e => {
-    const btn = e.target.closest(".btn-pill");
-    if (btn?.dataset.quality) setSleepQuality(btn.dataset.quality);
-  });
-
-  // ── Pain buttons (event delegation per condition row) ───────────────────
-  document.querySelectorAll(".condition-check").forEach(check => {
-    check.addEventListener("click", e => {
-      const btn = e.target.closest(".pain-btn");
-      if (btn?.dataset.level) {
-        const conditionId = check.dataset.condition;
-        const level       = parseInt(btn.dataset.level);
-        setConditionPain(conditionId, level, check);
-      }
+  // ── Sleep quality chips ──────────────────────────────────────────────────
+  document.querySelectorAll(".checkin-quality-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      currentCheckin.sleepQuality = chip.dataset.quality;
+      document.querySelectorAll(".checkin-quality-chip").forEach(c => {
+        c.classList.toggle("selected", c === chip);
+        c.setAttribute("aria-pressed", c === chip);
+      });
     });
   });
 
-  // ── Cycle day ───────────────────────────────────────────────────────────
-  document.getElementById("cycle-day")?.addEventListener("change", e => {
-    currentCheckin.cycleDay = e.target.value ? parseInt(e.target.value) : null;
+  // ── Pain chips ───────────────────────────────────────────────────────────
+  document.querySelectorAll(".checkin-condition-row").forEach(row => {
+    row.querySelectorAll(".checkin-pain-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const condId = row.dataset.condition;
+        const level  = parseInt(chip.dataset.level);
+        currentCheckin.conditionLevels[condId] = level;
+        row.querySelectorAll(".checkin-pain-chip").forEach(c => {
+          const selected = c === chip;
+          c.classList.toggle("selected", selected);
+          c.setAttribute("aria-pressed", selected);
+          // Update colour class
+          c.classList.remove("low", "mild", "moderate", "severe");
+          if (selected) {
+            if      (level <= 2) c.classList.add("low");
+            else if (level <= 5) c.classList.add("mild");
+            else if (level <= 7) c.classList.add("moderate");
+            else                 c.classList.add("severe");
+          }
+        });
+      });
+    });
   });
 
-  // ── Notes ───────────────────────────────────────────────────────────────
-  document.getElementById("checkin-notes")?.addEventListener("change", e => {
-    currentCheckin.notes = e.target.value;
+  // ── Time cards ───────────────────────────────────────────────────────────
+  document.querySelectorAll(".checkin-time-card").forEach(card => {
+    card.addEventListener("click", () => {
+      selectedAvailableTime = selectedAvailableTime === card.dataset.time ? null : card.dataset.time;
+      document.querySelectorAll(".checkin-time-card").forEach(c => {
+        const sel = c.dataset.time === selectedAvailableTime;
+        c.classList.toggle("selected", sel);
+        c.setAttribute("aria-pressed", sel);
+      });
+    });
   });
 
-  // ── Available time chips ─────────────────────────────────────────────────
-  document.getElementById("time-chip-grid")?.addEventListener("click", e => {
-    const chip = e.target.closest(".time-chip");
-    if (chip?.dataset.time) setAvailableTime(chip.dataset.time);
+  // ── Next button ──────────────────────────────────────────────────────────
+  document.getElementById("checkin-next-btn")?.addEventListener("click", () => {
+    const conditionsExist = conditions.length > 0;
+    const maxStep = conditionsExist ? 5 : 4;
+    checkinStep = Math.min(checkinStep + 1, maxStep);
+    rerenderCheckin();
   });
 
-  // Clear button — rendered inline only when a selection exists.
-  // Use event delegation on the section so it survives without re-render.
-  document.getElementById("time-clear-btn")?.addEventListener("click", clearAvailableTime);
+  // ── Back button ──────────────────────────────────────────────────────────
+  document.getElementById("checkin-back-btn")?.addEventListener("click", () => {
+    checkinStep = Math.max(0, checkinStep - 1);
+    rerenderCheckin();
+  });
 
-  // ── Submit ──────────────────────────────────────────────────────────────
-  document.getElementById("submit-checkin")?.addEventListener("click", submitCheckin);
-
-  // ── Prescribed exercises shortcut ────────────────────────────────────────
-  // Saves check-in data exactly as submitCheckin() does, then navigates
-  // to Today with a flag that auto-opens the prescribed add-form.
-  // Rationale: neurodivergent users often come to the app with a specific
-  // task in mind. Making them wait through workout generation before seeing
-  // prescribed exercises creates friction. This shortcut eliminates that barrier.
+  // ── Final submit ─────────────────────────────────────────────────────────
+  document.getElementById("checkin-submit-btn")?.addEventListener("click", submitCheckin);
   document.getElementById("prescribed-shortcut-btn")?.addEventListener("click", submitCheckinToPrescribed);
 }
 
-// ── Display update helpers ────────────────────────────────────────────────────
+function rerenderCheckin() {
+  const conditions = store.get("conditions") || [];
+  const name = (store.get("name") || "").split(" ")[0] || "there";
+  const main = document.getElementById("main-content");
+  if (main) {
+    main.innerHTML = render();
+    onMount();
+    // Scroll to top of main
+    main.scrollTop = 0;
+  }
+}
+
+// ── Display update helpers (kept for compatibility) ────────────────────────
 
 function updateEnergyDisplay(value) {
   const el = document.getElementById("energy-display");
-  if (el) el.innerHTML = `${checkinData.getEnergyEmoji(value)} ${checkinData.getEnergyLabel(value)}`;
+  if (el) el.innerHTML = checkinData.getEnergyEmoji(value) + " " + checkinData.getEnergyLabel(value);
 }
 
 function updateMoodDisplay(value) {
   const el = document.getElementById("mood-display");
-  if (el) el.innerHTML = `${checkinData.getMoodEmoji(value)} ${checkinData.getMoodLabel(value)}`;
-}
-
-function adjustSleepHours(delta) {
-  currentCheckin.sleepHours = Math.max(0, Math.min(14, currentCheckin.sleepHours + delta));
-  const el = document.getElementById("sleep-hours-display");
-  if (el) el.textContent = currentCheckin.sleepHours;
-}
-
-function setSleepQuality(quality) {
-  currentCheckin.sleepQuality = quality;
-  document.querySelectorAll("#quality-buttons .btn-pill").forEach(btn => {
-    const selected = btn.dataset.quality === quality;
-    btn.classList.toggle("selected", selected);
-    btn.setAttribute("aria-pressed", selected);
-  });
-}
-
-function setConditionPain(conditionId, level, container) {
-  currentCheckin.conditionLevels[conditionId] = level;
-
-  container.querySelectorAll(".pain-btn").forEach(btn => {
-    btn.classList.remove("selected", "low", "medium", "high", "severe");
-    btn.setAttribute("aria-pressed", "false");
-
-    if (parseInt(btn.dataset.level) === level) {
-      btn.classList.add("selected");
-      btn.setAttribute("aria-pressed", "true");
-      if      (level <= 2) btn.classList.add("low");
-      else if (level <= 5) btn.classList.add("medium");
-      else if (level <= 7) btn.classList.add("high");
-      else                 btn.classList.add("severe");
-    }
-  });
-}
-
-// ── Available time helpers ────────────────────────────────────────────────────
-
-function setAvailableTime(value) {
-  selectedAvailableTime = value;
-
-  // Update chip selected states
-  document.querySelectorAll("#time-chip-grid .time-chip").forEach(chip => {
-    const isSelected = chip.dataset.time === value;
-    chip.classList.toggle("selected", isSelected);
-    chip.setAttribute("aria-pressed", isSelected);
-  });
-
-  // Show the clear button if it is not already present
-  const section = document.getElementById("time-chip-grid")?.closest(".checkin-section");
-  if (section && !document.getElementById("time-clear-btn")) {
-    const clearBtn = document.createElement("button");
-    clearBtn.type        = "button";
-    clearBtn.id          = "time-clear-btn";
-    clearBtn.className   = "btn btn-ghost btn-sm time-clear-btn";
-    clearBtn.setAttribute("aria-label", "Clear time selection");
-    clearBtn.textContent = "Clear selection";
-    clearBtn.addEventListener("click", clearAvailableTime);
-    section.appendChild(clearBtn);
-  }
-}
-
-function clearAvailableTime() {
-  selectedAvailableTime = null;
-
-  document.querySelectorAll("#time-chip-grid .time-chip").forEach(chip => {
-    chip.classList.remove("selected");
-    chip.setAttribute("aria-pressed", "false");
-  });
-
-  document.getElementById("time-clear-btn")?.remove();
+  if (el) el.innerHTML = checkinData.getMoodEmoji(value) + " " + checkinData.getMoodLabel(value);
 }
 
 // ── Submit ────────────────────────────────────────────────────────────────────
@@ -479,7 +566,7 @@ function submitCheckin() {
   store.set("todayIntensity", intensity);
 
   // Navigate to intention screen — user chooses their path from there
-  router.navigate("coach-proposal");
+  router.navigate("intention");
 }
 
 // ── Prescribed shortcut submit ────────────────────────────────────────────────
