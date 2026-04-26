@@ -1022,3 +1022,245 @@
   color: var(--color-primary);
   background: var(--color-primary-glow);
 }
+
+/* ============================================
+   SETTINGS — MY MOVEMENT TAB
+   ============================================ */
+
+.section-subheading {
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+/* Movement identity tiles */
+.movement-identity-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.movement-identity-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 68px;
+  padding: var(--space-2);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.movement-identity-tile.selected,
+.movement-identity-tile[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.movement-tile-icon { font-size: 1.4rem; }
+
+.movement-tile-label {
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.movement-identity-tile.selected .movement-tile-label {
+  color: var(--color-primary);
+}
+
+/* Facility presets */
+.facility-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.facility-preset-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  min-height: 80px;
+}
+
+.facility-preset-card:hover,
+.facility-preset-card:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.facility-preset-icon { font-size: 1.5rem; }
+
+.facility-preset-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+}
+
+.facility-preset-desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* Equipment details — native <details> element */
+.equipment-detail-block {
+  margin-top: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.equipment-detail-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  cursor: pointer;
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  list-style: none;
+  background: var(--color-bg-card);
+}
+
+.equipment-detail-summary::-webkit-details-marker { display: none; }
+
+.equipment-count-badge {
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+  background: var(--color-primary-glow);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.equipment-detail-block > :not(summary) {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+/* ============================================
+   SETTINGS — LIBRARY TAB TILES
+   ============================================ */
+
+.library-section-block {
+  margin-bottom: var(--space-6);
+}
+
+.library-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.library-section-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+
+.library-section-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.library-section-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.library-group-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: var(--space-4) 0 var(--space-2) 0;
+}
+
+/* Tile grid */
+.library-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.library-tile-grid--compact {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.library-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 76px;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.library-tile:hover:not(:disabled),
+.library-tile:focus-visible:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.library-tile--soon {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.library-tile--compact {
+  min-height: 60px;
+  padding: var(--space-2);
+}
+
+.library-tile-icon { font-size: 1.4rem; }
+.library-tile--compact .library-tile-icon { font-size: 1.1rem; }
+
+.library-tile-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.library-tile:hover:not(:disabled) .library-tile-label,
+.library-tile:focus-visible:not(:disabled) .library-tile-label {
+  color: var(--color-primary);
+}
+
+.library-tile-soon {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  font-size: 9px;
+  font-weight: var(--font-bold);
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  padding: 1px 5px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
