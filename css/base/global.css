@@ -146,3 +146,525 @@
   color: var(--color-text-muted);
   padding: 0 var(--space-1);
 }
+
+/* ============================================
+   CHECKIN — CONVERSATIONAL STEP FLOW
+   Premium redesign. One question at a time.
+   ============================================ */
+
+.checkin-step-view {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 80px); /* full height minus nav */
+  padding-bottom: var(--space-6);
+}
+
+/* Progress dots */
+.checkin-step-header {
+  padding: var(--space-4) 0 var(--space-6);
+}
+
+.checkin-progress-dots {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.checkin-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: all 0.3s ease;
+}
+
+.checkin-dot.done {
+  background: var(--color-primary);
+  opacity: 0.5;
+}
+
+.checkin-dot.current {
+  background: var(--color-primary);
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* Body */
+.checkin-step-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Coach line — minimal, not a card */
+.checkin-coach-line {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.coach-icon-xs {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.checkin-coach-line p {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+/* Question text */
+.checkin-question {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.checkin-question-sub {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-3) 0;
+}
+
+/* Slider block */
+.checkin-slider-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Value display */
+.checkin-value-display {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.checkin-value-emoji {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.checkin-value-number {
+  font-size: 4rem;
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.checkin-value-label {
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-semibold);
+}
+
+/* Slider styling — premium large thumb */
+.checkin-slider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  outline: none;
+}
+
+.checkin-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  border: 3px solid var(--color-bg-card);
+  box-shadow: 0 0 0 2px var(--color-primary), 0 4px 12px rgba(45, 212, 191, 0.3);
+  transition: box-shadow 0.2s ease;
+}
+
+.checkin-slider::-webkit-slider-thumb:active {
+  box-shadow: 0 0 0 4px var(--color-primary), 0 4px 16px rgba(45, 212, 191, 0.4);
+}
+
+.checkin-slider::-moz-range-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  cursor: pointer;
+  border: 3px solid var(--color-bg-card);
+}
+
+.checkin-slider:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 6px;
+}
+
+.checkin-slider-ends {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* Sleep adjuster */
+.checkin-sleep-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.checkin-sleep-adjuster {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.checkin-sleep-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.checkin-sleep-btn:hover,
+.checkin-sleep-btn:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.checkin-sleep-display {
+  flex: 1;
+  text-align: center;
+}
+
+.checkin-sleep-number {
+  display: block;
+  font-size: 4rem;
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.checkin-sleep-unit {
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
+}
+
+/* Sleep quality chips */
+.checkin-sleep-quality {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.checkin-quality-chips {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.checkin-quality-chip {
+  flex: 1;
+  min-height: 48px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-card);
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.checkin-quality-chip.selected,
+.checkin-quality-chip[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+  color: var(--color-primary);
+}
+
+/* Condition pain chips */
+.checkin-conditions-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.checkin-condition-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.checkin-condition-name {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.checkin-pain-chips {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.checkin-pain-chip {
+  flex: 1;
+  min-height: 44px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-card);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.checkin-pain-chip.selected.low      { border-color: #22c55e; background: rgba(34,197,94,0.1);  color: #22c55e; }
+.checkin-pain-chip.selected.mild     { border-color: #f59e0b; background: rgba(245,158,11,0.1); color: #f59e0b; }
+.checkin-pain-chip.selected.moderate { border-color: #f97316; background: rgba(249,115,22,0.1); color: #f97316; }
+.checkin-pain-chip.selected.severe   { border-color: #ef4444; background: rgba(239,68,68,0.1);  color: #ef4444; }
+
+/* Time grid */
+.checkin-time-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.checkin-time-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  padding: var(--space-3);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-card);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  gap: var(--space-1);
+}
+
+.checkin-time-card.selected,
+.checkin-time-card[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.checkin-time-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+}
+
+.checkin-time-sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.checkin-time-card.selected .checkin-time-label,
+.checkin-time-card[aria-pressed="true"] .checkin-time-label {
+  color: var(--color-primary);
+}
+
+/* Summary step */
+.checkin-summary-body {
+  justify-content: center;
+}
+
+.checkin-summary-coach {
+  margin-top: var(--space-6);
+}
+
+/* Step actions — pinned to bottom */
+.checkin-step-actions {
+  padding-top: var(--space-5);
+  margin-top: auto;
+}
+
+/* ============================================
+   INTENTION — THREE CLEAN CARDS
+   ============================================ */
+
+.intention-view .view-header h1 {
+  font-size: var(--text-2xl);
+}
+
+.intention-paths {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.intention-path {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  text-align: left;
+  min-height: 72px;
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+.intention-path:hover,
+.intention-path:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+  transform: translateX(2px);
+}
+
+.intention-path.selected,
+.intention-path[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+}
+
+.intention-path-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.intention-path-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.intention-path-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+}
+
+.intention-path-sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.intention-path:hover .intention-path-label,
+.intention-path.selected .intention-path-label {
+  color: var(--color-primary);
+}
+
+.intention-coach-card {
+  margin-bottom: var(--space-4);
+}
+
+/* Intention activity grid */
+.intention-activity-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.intention-activity-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  min-height: 52px;
+  background: var(--color-bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.intention-activity-chip.selected,
+.intention-activity-chip[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-glow);
+  color: var(--color-primary);
+}
+
+/* ============================================
+   COACH PROPOSAL — REFINED TYPOGRAPHY
+   ============================================ */
+
+.coach-proposal-view .view {
+  padding-bottom: var(--space-8);
+}
+
+.coach-proposal-card {
+  border: none;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+.coach-proposal-greeting {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  line-height: var(--leading-tight);
+}
+
+.coach-proposal-reflection {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-4);
+}
+
+.coach-proposal-suggestion {
+  font-size: var(--text-lg);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-3);
+}
+
+.coach-proposal-rationale {
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: var(--text-sm);
+}
+
+.coach-proposal-duration {
+  display: inline-block;
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  background: var(--color-primary-glow);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+}
+
+.coach-proposal-actions {
+  margin-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-5);
+}
