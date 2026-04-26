@@ -61,7 +61,14 @@ function getCheckins() {
 }
 
 function isTrainingType(type) {
-  return !["breathing", "journal", "rest", "mindful", "quiet", "quiet-session"].includes(type || "");
+  // Mindful moments (short, restorative) are NOT sessions in the ring.
+  // Everything else — gym, yoga, prescribed, run, swim, class, walking, etc — counts.
+  const mindfulOnly = ["breathing", "journal", "rest", "quiet", "quiet-session"];
+  return !mindfulOnly.includes(type || "");
+}
+
+function isMindfulType(type) {
+  return ["breathing", "journal", "rest", "mindful", "quiet", "quiet-session"].includes(type || "");
 }
 
 // ── Coach summary ─────────────────────────────────────────────────────────────
@@ -137,7 +144,7 @@ export function render() {
     !["gym","gym-programme","coach-session","prescribed","prescribed-session"].includes(e.type) &&
     e.source !== "coach-recommended" && e.source !== "prescribed"
   ).length;
-  const mindfulCount  = last30Log.filter(e => !isTrainingType(e.type || e.source)).length;
+  const mindfulCount  = last30Log.filter(e => isMindfulType(e.type || e.source)).length;
 
   const thisWeekTraining = thisWeekLog.filter(e => isTrainingType(e.type || e.source)).length;
   const target           = store.get("strategicGoal")?.weeklySessionTarget || 3;
@@ -169,7 +176,7 @@ export function render() {
       <!-- 2. This week ring + stats -->
       <div class="card progress-week-card">
         <div class="progress-week-top">
-          <div class="progress-ring-wrap" aria-label="This week: ${thisWeekTraining} of ${target} sessions">
+          <div class="progress-ring-wrap" aria-label="This week: ${thisWeekTraining} of ${target} active sessions">
             <svg class="progress-ring" viewBox="0 0 80 80" aria-hidden="true">
               <circle class="progress-ring-track" cx="40" cy="40" r="32"/>
               <circle class="progress-ring-fill" cx="40" cy="40" r="32"
@@ -184,7 +191,7 @@ export function render() {
           </div>
           <div class="progress-week-stats">
             <div class="progress-stat-row">
-              <span class="progress-stat-label">Sessions this week</span>
+              <span class="progress-stat-label">Active sessions this week</span>
               <span class="progress-stat-value">${thisWeekTraining}</span>
             </div>
             <div class="progress-stat-row">
