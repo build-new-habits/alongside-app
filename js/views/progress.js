@@ -74,54 +74,92 @@ function isMindfulType(type) {
 // ── Coach summary ─────────────────────────────────────────────────────────────
 
 function buildCoachMessage(log, checkins) {
-  const name       = (store.get("name") || "").split(" ")[0] || "";
-  const namePrefix = name ? name + ". " : "";
-  const last7      = log.filter(e => isLast7Days(e.loggedAt || e.completedAt));
-  const last30     = log.filter(e => isLast30Days(e.loggedAt || e.completedAt));
+  const name         = (store.get("name") || "").split(" ")[0] || "";
+  const namePrefix   = name ? name + ". " : "";
+  const goal         = store.get("strategicGoal") || {};
+  const goalDesc     = goal.targetDescription || "";
 
-  if (log.length === 0) {
-    return "Your progress builds here as we work together. Complete a few sessions and I will start noticing patterns.";
-  }
+  const last7  = log.filter(e => isLast7Days(e.loggedAt || e.completedAt));
+  const last14 = log.filter(e => daysAgo(e.loggedAt || e.completedAt) < 14);
+  const last30 = log.filter(e => isLast30Days(e.loggedAt || e.completedAt));
 
-  if (log.length < 3) {
-    return namePrefix + "You are just getting started. That is exactly the right place to be. Keep showing up.";
-  }
-
-  const trainingDays = new Set(
-    last30.filter(e => isTrainingType(e.type || e.source))
+  const activeDays14 = new Set(
+    last14.filter(e => isTrainingType(e.type || e.source))
           .map(e => (e.loggedAt || e.completedAt || "").split("T")[0])
   ).size;
 
-  const thisWeekSessions = last7.filter(e => isThisWeek(e.loggedAt || e.completedAt) && isTrainingType(e.type)).length;
   const target = store.get("strategicGoal")?.weeklySessionTarget || 3;
-  const hitTarget = thisWeekSessions >= target;
+  const thisWeek = last7.filter(e => isThisWeek(e.loggedAt || e.completedAt));
+  const thisWeekActive = thisWeek.filter(e => isTrainingType(e.type || e.source)).length;
+  const hitTarget = thisWeekActive >= target;
 
-  const quietCount   = last7.filter(e => !isTrainingType(e.type || e.source)).length;
-  const trainingCount = last7.filter(e => isTrainingType(e.type || e.source)).length;
-
-  // Energy pattern
-  const energyPairs = last7.filter(e => e.energyBefore && e.energyAfter);
+  const energyPairs = last14.filter(e => e.energyBefore && e.energyAfter);
   const energyRises = energyPairs.filter(e => e.energyAfter > e.energyBefore).length;
   const energyPattern = energyPairs.length >= 3 && energyRises / energyPairs.length >= 0.6;
 
-  if (hitTarget) {
-    return namePrefix + "You have hit your session target for this week. I want you to notice that \u2014 not because targets are the point, but because consistency is. Keep going.";
-  }
-  if (energyPattern) {
-    return namePrefix + "Your energy after sessions has been higher than before them this week, consistently. Movement is generating the energy it costs. That is worth holding onto.";
-  }
-  if (trainingCount >= 4 && quietCount === 0) {
-    return namePrefix + "All training, no recovery this week. Rest and quiet sessions are where adaptation happens. Consider adding something restorative.";
-  }
-  if (trainingDays >= 15) {
-    return namePrefix + "Active on " + trainingDays + " of the last 30 days. That level of consistency builds something lasting.";
-  }
-  if (last7.length === 0) {
-    return namePrefix + "Nothing logged in the last 7 days. No pressure \u2014 but I am here when you are ready.";
+  const quietCount   = last7.filter(e => isMindfulType(e.type || e.source)).length;
+  const trainingCount = last7.filter(e => isTrainingType(e.type || e.source)).length;
+
+  const checkinCount7 = checkins.filter(([date]) => daysAgo(date) < 7).length;
+  const avgEnergy7    = checkins.slice(0, 7).reduce((sum, [, d]) => sum + (d.energy || 0), 0) /
+                        Math.max(1, checkins.slice(0, 7).length);
+
+  // ── Empty / just starting ──────────────────────────────────────────────────
+  if (log.length === 0) {
+    return "Your progress builds here as we work together. What you log, I notice. What I notice, I will tell you honestly. Not numbers for their own sake — patterns that actually mean something.";
   }
 
-  return namePrefix + "You have had " + last7.length + " session" + (last7.length !== 1 ? "s" : "") + " in the last week. Keep building the pattern.";
+  if (log.length < 3) {
+    return namePrefix + "You are in the early days. The research on habit formation is clear: the first two weeks are the hardest, and you are in them. Every session you complete right now is doing more than the session itself — it is building the neural pattern that makes the next one easier.";
+  }
+
+  // ── Specific pattern: energy rises after movement ─────────────────────────
+  if (energyPattern) {
+    const pct = Math.round((energyRises / energyPairs.length) * 100);
+    const goalLine = goalDesc ? " This matters for your goal — " + goalDesc + " — because sustainable energy is what makes sustained effort possible." : "";
+    return namePrefix + "Something consistent is happening. Your energy after sessions has been higher than before them " + pct + "% of the time over the last two weeks. That is not a coincidence. Movement is generating the energy it costs." + goalLine + " The body is remarkable in this way — it responds to being asked.";
+  }
+
+  // ── Weekly target reached ─────────────────────────────────────────────────
+  if (hitTarget) {
+    const consistencyLine = activeDays14 >= 8
+      ? " You have been active on " + activeDays14 + " of the last 14 days. That kind of consistency is unusual. Most people intend to do this. You are actually doing it."
+      : "";
+    return namePrefix + "You have reached your session target for this week." + consistencyLine + " I want to name that directly, because it matters. Not because targets are the point — they are not. But because showing up consistently is how change happens, and you are showing up." + (goalDesc ? " That is how " + goalDesc + " becomes real." : "");
+  }
+
+  // ── Good check-in consistency ─────────────────────────────────────────────
+  if (checkinCount7 >= 5 && avgEnergy7 >= 6.5) {
+    return namePrefix + "You have checked in " + checkinCount7 + " times this week, with an average energy of " + avgEnergy7.toFixed(1) + " out of 10. That is a meaningful signal — not just about fitness, but about how you are engaging with your own wellbeing. Paying attention is the first act of change.";
+  }
+
+  // ── Training without recovery ─────────────────────────────────────────────
+  if (trainingCount >= 4 && quietCount === 0) {
+    return namePrefix + "You have been training hard this week with no recovery work. I want to flag something the research is clear about: adaptation happens during rest, not during effort. The session is the stimulus. Sleep, stillness, and recovery are where your body actually changes." + (goalDesc ? " For " + goalDesc + ", recovery is not optional." : "");
+  }
+
+  // ── Good balance of training and recovery ─────────────────────────────────
+  if (quietCount >= 2 && trainingCount >= 2) {
+    return namePrefix + "You have been balancing active sessions with quieter practices this week. That balance is not accidental — it is exactly what a sustainable approach looks like. Movement and stillness are not opposites. They are partners. The research on long-term behaviour change consistently shows that people who include recovery and reflection sustain their practice far longer than those who only train.";
+  }
+
+  // ── Long-term consistency recognition ────────────────────────────────────
+  if (activeDays14 >= 8) {
+    return namePrefix + "You have been active on " + activeDays14 + " of the last 14 days. I want you to sit with that for a moment. That level of consistency is genuinely uncommon — not because people do not want it, but because life makes it hard. You are building something real here." + (goalDesc ? " And that foundation is exactly what " + goalDesc + " requires." : "");
+  }
+
+  // ── Nothing logged recently ───────────────────────────────────────────────
+  if (last7.length === 0 && log.length > 0) {
+    return namePrefix + "Nothing logged in the last 7 days. I am not going to tell you that is fine if you know it is not. But I will tell you that a gap is just a gap — it does not erase what came before, and it does not predict what comes next. The pattern you built is still there. It is waiting.";
+  }
+
+  // ── Default: reflect recent count with context ────────────────────────────
+  const n = last7.length;
+  return namePrefix + "You have had " + n + " session" + (n !== 1 ? "s" : "") + " in the last week." +
+    (goalDesc ? " That is progress toward " + goalDesc + "." : " Keep building the pattern.") +
+    " What you do consistently matters more than what you do occasionally. That is not motivation — it is how biology works.";
 }
+
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
