@@ -105,6 +105,21 @@ function buildProposal(preferShorter = false) {
     ? Math.floor((Date.now() - new Date(lastSession.loggedAt)) / 86400000)
     : 99;
 
+  const todayStr       = new Date().toISOString().split("T")[0];
+
+  // What has actually been logged TODAY (not just recent)
+  const todayLog       = activityLog.filter(e => {
+    const ts = e.loggedAt || e.completedAt || e.sessionStart || "";
+    return ts.startsWith(todayStr);
+  });
+  const todayTypes     = todayLog.map(e => e.type || e.source || "");
+  const gymTodayDone   = todayTypes.some(t => ["gym", "coach-session", "gym-programme"].includes(t));
+  const cardioTodayDone = todayTypes.some(t => ["run", "cycle", "swim", "row", "outdoor-cycle"].includes(t));
+  const activeTodayCount = todayLog.filter(e => {
+    const t = e.type || e.source || "";
+    return !["breathing", "journal", "rest", "mindful", "quiet", "quiet-session"].includes(t);
+  }).length;
+
   const recentTypes    = recentLog.map(e => e.type || e.source || "");
   const gymCount       = recentTypes.filter(t => ["gym", "coach-session", "gym-programme"].includes(t)).length;
   const cardioCount    = recentTypes.filter(t => ["run", "cycle", "swim", "cardio", "row"].includes(t)).length;
@@ -128,7 +143,7 @@ function buildProposal(preferShorter = false) {
   }
 
   // ── Build the reflection sentence ────────────────────────────────────────
-  const reflection = buildReflection(recentLog, daysSinceLast, goal);
+  const reflection = buildReflection(recentLog, daysSinceLast, goal, gymTodayDone, activeTodayCount);
 
   // ── Safety layer — must run before preference logic ─────────────────────
   // Neurodivergent users may follow the coach as their primary guide.
@@ -165,7 +180,7 @@ function buildProposal(preferShorter = false) {
 
   // Hard override: 3+ consecutive days must rest
   if (consecutiveDays >= 3) {
-    const reflection = buildReflection(recentLog, daysSinceLast, goal);
+    const reflection = buildReflection(recentLog, daysSinceLast, goal, gymTodayDone, activeTodayCount);
     return makeProposal({
       type: "quiet", target: "quiet-session", quietMode: "rest",
       duration: 15,
@@ -180,7 +195,7 @@ function buildProposal(preferShorter = false) {
 
   // 7 sessions in 7 days — very high volume flag
   if (totalThisWeek >= 6) {
-    const reflection = buildReflection(recentLog, daysSinceLast, goal);
+    const reflection = buildReflection(recentLog, daysSinceLast, goal, gymTodayDone, activeTodayCount);
     return makeProposal({
       type: "quiet", target: "quiet-session", quietMode: "mindful",
       duration: 20,
@@ -235,8 +250,8 @@ function buildProposal(preferShorter = false) {
   // Score each option and pick the highest that isn't a repeat
   const options = [
     {
-      type: "gym", available: hasGymProg,
-      score: prefScore("gym") + (gymCount < 3 ? 2 : 0) + (energy >= 6 ? 1 : 0) - (heavyOverride ? 3 : 0),
+      type: "gym", available: hasGymProg && !gymTodayDone,
+      score: prefScore("gym") + (gymCount < 3 ? 2 : 0) + (energy >= 6 ? 1 : 0) - (heavyOverride ? 3 : 0) - (gymTodayDone ? 100 : 0),
       proposal: "I thought we'd continue your gym programme today. Session " + gymSession + " of Week " + gymWeek + ". Your cardio warmup, the main session, and your prescribed work built in.",
       rationale: energy >= 7 ? "Your energy is good. Make the most of it." : "Steady progress on the programme is what builds the result.",
       duration: Math.min(timeBudget, 45), target: "gym-programme", quietMode: null
@@ -294,7 +309,7 @@ function buildProposal(preferShorter = false) {
  * Reads the last 3 entries and constructs a plain-English summary.
  * Varies based on recency and what was done.
  */
-function buildReflection(recentLog, daysSinceLast, goal) {
+function buildReflection(recentLog, daysSinceLast, goal, gymTodayDone, activeTodayCount) {
   if (recentLog.length === 0) {
     return "This looks like an early session, so I am working from your goals and how you are feeling today.";
   }
@@ -304,6 +319,12 @@ function buildReflection(recentLog, daysSinceLast, goal) {
   }
 
   if (daysSinceLast === 0) {
+    if (gymTodayDone) {
+      return "You have already done a gym session today.";
+    }
+    if (activeTodayCount > 0) {
+      return "You have already been active today. I am looking at what would complement that.";
+    }
     return "You have already been active today.";
   }
 
