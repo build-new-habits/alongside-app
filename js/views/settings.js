@@ -124,7 +124,7 @@ export function render() {
           aria-controls="settings-tab-panel"
           id="tab-equipment"
           data-tab="equipment"
-        >Equipment</button>
+        >My Movement</button>
         <button
           class="settings-tab ${activeTab === "library" ? "active" : ""}"
           role="tab"
@@ -191,7 +191,7 @@ export function render() {
 function renderActiveTab() {
   if (activeTab === "profile")    return renderProfileTab();
   if (activeTab === "conditions") return renderConditionsTab();
-  if (activeTab === "equipment")  return renderEquipmentTab();
+  if (activeTab === "equipment")  return renderMyMovementTab();
   if (activeTab === "library")    return renderLibraryTab();
   return "";
 }
@@ -390,170 +390,213 @@ function renderConditionsTab() {
 
 // ── Equipment tab ─────────────────────────────────────────────────────────────
 
-function renderEquipmentTab() {
+// -- My Movement tab ----------------------------------------------------------
+
+const FACILITY_PRESETS = [
+  { id: "gym",       label: "Commercial gym",      icon: "\uD83C\uDFCB", desc: "Nuffield, PureGym, or similar",
+    equipment: ["dumbbells-light","dumbbells-medium","dumbbells-heavy","barbell","ez-curl-bar",
+                "kettlebell-light","kettlebell-medium","band-light","band-medium","band-heavy","mini-bands",
+                "treadmill","exercise-bike","rowing-machine","elliptical","stair-climber",
+                "cable-machine","smith-machine","pull-up-bar","bench-flat","bench-incline",
+                "yoga-mat","foam-roller"] },
+  { id: "home",      label: "Home setup",           icon: "\uD83C\uDFE0", desc: "Limited equipment at home",
+    equipment: ["dumbbells-light","dumbbells-medium","band-light","band-medium","mini-bands","yoga-mat","foam-roller"] },
+  { id: "bodyweight",label: "No equipment",         icon: "\uD83E\uDD38", desc: "Bodyweight only, anywhere",
+    equipment: [] },
+  { id: "studio",    label: "Yoga / pilates studio",icon: "\uD83E\uDDD8", desc: "Mat-based studio",
+    equipment: ["yoga-mat","band-light","band-medium","foam-roller"] }
+];
+
+function renderMyMovementTab() {
   const selected = store.get("equipment") || [];
+  const identity = store.get("movementIdentity") || null;
+
+  const IDENTITIES = [
+    { id: "gym",     label: "Gym",      icon: "\uD83C\uDFCB" },
+    { id: "yoga",    label: "Yoga",     icon: "\uD83E\uDDD8" },
+    { id: "running", label: "Running",  icon: "\uD83C\uDFC3" },
+    { id: "walking", label: "Walking",  icon: "\uD83D\uDEB6" },
+    { id: "swimming",label: "Swimming", icon: "\uD83C\uDFCA" },
+    { id: "classes", label: "Classes",  icon: "\uD83C\uDFE5" },
+    { id: "mixed",   label: "Mixed",    icon: "\u2728"        }
+  ];
 
   return `
-    <section aria-labelledby="equipment-heading">
-      <h2 id="equipment-heading" class="section-heading">Your equipment</h2>
-      <p class="text-secondary settings-equipment-intro">
-        Tap to add or remove. Changes take effect on your next workout.
-      </p>
+    <section aria-labelledby="movement-heading">
+      <h2 id="movement-heading" class="section-heading">My Movement</h2>
 
-      ${EQUIPMENT_CATEGORIES.map(cat => {
-        const selectedInCat = cat.items.filter(item => selected.includes(item.id)).length;
-        return `
-          <div class="equipment-settings-category">
-            <h3 class="equipment-category-heading">
-              <span aria-hidden="true">${cat.icon}</span>
-              ${cat.name}
-              ${selectedInCat > 0 ? `<span class="equipment-cat-count">${selectedInCat} selected</span>` : ""}
-            </h3>
-            <div class="equipment-chip-grid" role="group" aria-label="${cat.name} equipment">
-              ${cat.items.map(item => `
-                <button
-                  class="equipment-chip ${selected.includes(item.id) ? "selected" : ""}"
-                  data-equipment-id="${item.id}"
-                  aria-pressed="${selected.includes(item.id)}"
-                >
-                  ${item.name}
-                </button>
-              `).join("")}
+      <p class="text-secondary" style="margin-bottom:var(--space-3);">
+        What kind of movement feels most like you?
+      </p>
+      <div class="movement-identity-grid" role="group" aria-label="Movement identity">
+        ${IDENTITIES.map(item => `
+          <button class="movement-identity-tile ${identity === item.id ? "selected" : ""}"
+                  data-identity="${item.id}" aria-pressed="${identity === item.id}">
+            <span class="movement-tile-icon" aria-hidden="true">${item.icon}</span>
+            <span class="movement-tile-label">${item.label}</span>
+          </button>
+        `).join("")}
+      </div>
+
+      <h3 class="section-subheading" style="margin-top:var(--space-6);">Where do you train?</h3>
+      <p class="text-secondary text-sm" style="margin-bottom:var(--space-3);">
+        Choose your facility to pre-fill equipment. Adjust below as needed.
+      </p>
+      <div class="facility-preset-grid" role="group" aria-label="Training facility">
+        ${FACILITY_PRESETS.map(p => `
+          <button class="facility-preset-card" data-facility="${p.id}"
+                  aria-label="${p.label}: ${p.desc}">
+            <span class="facility-preset-icon" aria-hidden="true">${p.icon}</span>
+            <span class="facility-preset-label">${p.label}</span>
+            <span class="facility-preset-desc">${p.desc}</span>
+          </button>
+        `).join("")}
+      </div>
+
+      <details class="equipment-detail-block" open>
+        <summary class="equipment-detail-summary">
+          Equipment detail
+          <span class="equipment-count-badge">${selected.length} selected</span>
+        </summary>
+        <p class="text-secondary text-sm" style="margin:var(--space-3) 0;">
+          Tap to add or remove. Changes take effect on your next workout.
+        </p>
+        ${EQUIPMENT_CATEGORIES.map(cat => {
+          const n = cat.items.filter(i => selected.includes(i.id)).length;
+          return `
+            <div class="equipment-settings-category">
+              <h4 class="equipment-category-heading">
+                <span aria-hidden="true">${cat.icon}</span> ${cat.name}
+                ${n > 0 ? "<span class=\"equipment-cat-count\">" + n + "</span>" : ""}
+              </h4>
+              <div class="equipment-chip-grid" role="group" aria-label="${cat.name}">
+                ${cat.items.map(item => `
+                  <button class="equipment-chip ${selected.includes(item.id) ? "selected" : ""}"
+                          data-equipment-id="${item.id}"
+                          aria-pressed="${selected.includes(item.id)}">
+                    ${item.name}
+                  </button>
+                `).join("")}
+              </div>
             </div>
-          </div>
-        `;
-      }).join("")}
+          `;
+        }).join("")}
+      </details>
 
     </section>
   `;
 }
 
-// ── Library tab ───────────────────────────────────────────────────────────────
 
-/**
- * The Library tab is the activity menu for users who want direct access
- * to any session type without going through the coach proposal.
- *
- * Three sections:
- *   Guided Sessions   — Tier 1, coach-led content. Tap to go straight in.
- *   Programmes        — Multi-session structured plans.
- *   Log an Activity   — Tier 2, universal logging. Tap to open activity-log.
- */
 function renderLibraryTab() {
-  const GUIDED = [
-    { label: "Breathing practice",   icon: "\uD83C\uDF2C", target: "quiet-session",  quietMode: "breathing", available: true  },
-    { label: "Journaling",           icon: "\uD83D\uDCDD", target: "quiet-session",  quietMode: "journal",   available: true  },
-    { label: "Mindful movement",     icon: "\uD83C\uDF3F", target: "quiet-session",  quietMode: "mindful",   available: true  },
-    { label: "Rest day",             icon: "\uD83D\uDECC", target: "quiet-session",  quietMode: "rest",      available: true  },
-    { label: "Yoga / Pilates",       icon: "\uD83E\uDDD8", target: "yoga-session",   quietMode: null,        available: false, comingSoon: true },
-    { label: "Core session",         icon: "\uD83D\uDCAA", target: "core-session",   quietMode: null,        available: false, comingSoon: true },
-    { label: "Home workout",         icon: "\uD83C\uDFE0", target: "home-workout",   quietMode: null,        available: false, comingSoon: true },
-    { label: "Running session",      icon: "\uD83C\uDFC3", target: "running-session",quietMode: null,        available: false, comingSoon: true },
-    { label: "Walk / Couch to 5K",  icon: "\uD83D\uDEB6", target: "walk-programme", quietMode: null,        available: false, comingSoon: true },
+  const SECTIONS = [
+    {
+      title: "Guided Sessions", icon: "\uD83C\uDF1F",
+      desc: "The coach leads. Tap any to start.",
+      items: [
+        { label: "Breathing",        icon: "\uD83C\uDF2C", target: "quiet-session",  quiet: "breathing", ok: true  },
+        { label: "Mindful Movement", icon: "\uD83C\uDF3F", target: "quiet-session",  quiet: "mindful",   ok: true  },
+        { label: "Journaling",       icon: "\uD83D\uDCDD", target: "quiet-session",  quiet: "journal",   ok: true  },
+        { label: "Rest day",         icon: "\uD83D\uDECC", target: "quiet-session",  quiet: "rest",      ok: true  },
+        { label: "Yoga / Pilates",   icon: "\uD83E\uDDD8", target: "yoga-session",   quiet: null,        ok: false },
+        { label: "Core session",     icon: "\uD83D\uDCAA", target: "core-session",   quiet: null,        ok: false },
+        { label: "Home workout",     icon: "\uD83C\uDFE0", target: "home-workout",   quiet: null,        ok: false },
+        { label: "Running session",  icon: "\uD83C\uDFC3", target: "running-session",quiet: null,        ok: false },
+        { label: "Walk / C25K",      icon: "\uD83D\uDEB6", target: "walk-programme", quiet: null,        ok: false }
+      ]
+    },
+    {
+      title: "Programmes", icon: "\uD83D\uDCCB",
+      desc: "Structured multi-week plans.",
+      items: [
+        { label: "My Gym Programme",     icon: "\uD83C\uDFCB", target: "gym-programme", quiet: null, ok: true },
+        { label: "Prescribed Exercises", icon: "\uD83E\uDE7A", target: "prescribed",     quiet: null, ok: true }
+      ]
+    }
   ];
 
-  const PROGRAMMES = [
-    { label: "My gym programme",       icon: "\uD83C\uDFCB", target: "gym-programme", available: true  },
-    { label: "My prescribed exercises",icon: "\uD83E\uDE7A", target: "prescribed",     available: true  },
-  ];
-
-  const LOG_ACTIVITIES = [
-    { group: "Cardio",        items: [
-      { label: "Run",             icon: "\uD83C\uDFC3", id: "run"    },
-      { label: "Walk",            icon: "\uD83D\uDEB6", id: "walk"   },
-      { label: "Cycle",           icon: "\uD83D\uDEB4", id: "cycle"  },
-      { label: "Swim",            icon: "\uD83C\uDFCA", id: "swim"   },
-      { label: "Row",             icon: "\uD83D\uDEA3", id: "row"    },
+  const LOG_GROUPS = [
+    { group: "Cardio", items: [
+      { label: "Run",    icon: "\uD83C\uDFC3", id: "run"    },
+      { label: "Walk",   icon: "\uD83D\uDEB6", id: "walk"   },
+      { label: "Cycle",  icon: "\uD83D\uDEB4", id: "cycle"  },
+      { label: "Swim",   icon: "\uD83C\uDFCA", id: "swim"   },
+      { label: "Row",    icon: "\uD83D\uDEA3", id: "row"    }
     ]},
-    { group: "Classes",       items: [
-      { label: "Body Balance",    icon: "\uD83E\uDDD8", id: "body-balance" },
-      { label: "Spin / cycle",    icon: "\uD83D\uDEB4", id: "spin"         },
-      { label: "Boxing",          icon: "\uD83E\uDD4A", id: "boxing"       },
-      { label: "HIIT / circuits", icon: "\uD83D\uDD25", id: "hiit"         },
-      { label: "Body Combat",     icon: "\uD83E\uDD4A", id: "body-combat"  },
-      { label: "Other class",     icon: "\uD83C\uDFE5", id: "class"        },
+    { group: "Classes", items: [
+      { label: "Body Balance", icon: "\uD83E\uDDD8", id: "body-balance" },
+      { label: "Spin",         icon: "\uD83D\uDEB4", id: "spin"         },
+      { label: "Boxing",       icon: "\uD83E\uDD4A", id: "boxing"       },
+      { label: "HIIT",         icon: "\uD83D\uDD25", id: "hiit"         },
+      { label: "Other class",  icon: "\uD83C\uDFE5", id: "class"        }
     ]},
-    { group: "Sport",         items: [
-      { label: "Tennis",          icon: "\uD83C\uDFBE", id: "tennis"   },
-      { label: "Football",        icon: "\u26BD",       id: "football" },
-      { label: "Golf",            icon: "\u26F3",       id: "golf"     },
-      { label: "Other sport",     icon: "\uD83C\uDFC6", id: "sport"    },
+    { group: "Sport", items: [
+      { label: "Tennis",   icon: "\uD83C\uDFBE", id: "tennis"   },
+      { label: "Football", icon: "\u26BD",        id: "football" },
+      { label: "Golf",     icon: "\u26F3",        id: "golf"     },
+      { label: "Sport",    icon: "\uD83C\uDFC6", id: "sport"    }
     ]},
-    { group: "Outdoor",       items: [
-      { label: "Hike",            icon: "\u26F0",       id: "hike"           },
-      { label: "Outdoor cycle",   icon: "\uD83D\uDEB4", id: "outdoor-cycle"  },
-      { label: "Other outdoor",   icon: "\uD83C\uDF32", id: "outdoor"        },
-    ]},
+    { group: "Outdoor", items: [
+      { label: "Hike",          icon: "\u26F0",        id: "hike"          },
+      { label: "Outdoor cycle", icon: "\uD83D\uDEB4", id: "outdoor-cycle" },
+      { label: "Outdoor",       icon: "\uD83C\uDF32", id: "outdoor"       }
+    ]}
   ];
 
   return `
-    <section class="settings-section library-section" aria-label="Library">
+    <section aria-label="Library">
 
-      <!-- Guided Sessions -->
-      <h2 class="section-heading">Guided Sessions</h2>
-      <p class="text-sm text-muted" style="margin-bottom:var(--space-4);">
-        The coach leads. Tap any session to go straight in.
-      </p>
-      <div class="library-grid">
-        ${GUIDED.map(item => `
-          <button class="library-card ${!item.available ? "library-card--soon" : ""}"
-                  ${item.available ? `data-target="${item.target}" data-quiet="${item.quietMode || ""}"` : ""}
-                  aria-label="${item.label}${item.comingSoon ? " — coming soon" : ""}"
-                  ${!item.available ? "disabled aria-disabled=\"true\"" : ""}>
-            <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
-            <span class="library-card-label">${item.label}</span>
-            ${item.comingSoon ? `<span class="library-soon-badge">Soon</span>` : ""}
-          </button>
-        `).join("")}
-      </div>
-
-      <!-- Programmes -->
-      <h2 class="section-heading" style="margin-top:var(--space-6);">Programmes</h2>
-      <div class="library-grid">
-        ${PROGRAMMES.map(item => `
-          <button class="library-card"
-                  data-target="${item.target}"
-                  aria-label="${item.label}">
-            <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
-            <span class="library-card-label">${item.label}</span>
-          </button>
-        `).join("")}
-      </div>
-
-      <!-- Log an Activity -->
-      <h2 class="section-heading" style="margin-top:var(--space-6);">Log an Activity</h2>
-      <p class="text-sm text-muted" style="margin-bottom:var(--space-4);">
-        You know what you are doing. Log it and the coach will reflect on it with you.
-      </p>
-
-      <!-- Movement Identity -->
-      <h2 class="section-heading" style="margin-top:var(--space-6);">My movement identity</h2>
-      <p class="text-sm text-muted" style="margin-bottom:var(--space-4);">
-        Tell the coach what kind of movement feels most like you.
-        This shapes what the coach suggests first each day.
-        You can change it any time, for example if you join a gym.
-      </p>
-      ${renderMovementIdentity()}
-      ${LOG_ACTIVITIES.map(group => `
-        <h3 class="library-group-heading">${group.group}</h3>
-        <div class="library-grid library-grid--compact">
-          ${group.items.map(item => `
-            <button class="library-card library-card--compact"
-                    data-target="activity-log"
-                    data-activity="${item.id}"
-                    aria-label="Log ${item.label}">
-              <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
-              <span class="library-card-label">${item.label}</span>
-            </button>
-          `).join("")}
+      ${SECTIONS.map(section => `
+        <div class="library-section-block">
+          <div class="library-section-header">
+            <span class="library-section-icon" aria-hidden="true">${section.icon}</span>
+            <div>
+              <h2 class="library-section-title">${section.title}</h2>
+              <p class="library-section-desc">${section.desc}</p>
+            </div>
+          </div>
+          <div class="library-tile-grid">
+            ${section.items.map(item => `
+              <button class="library-tile ${!item.ok ? "library-tile--soon" : ""}"
+                      ${item.ok ? `data-target="${item.target}" data-quiet="${item.quiet || ""}"` : ""}
+                      aria-label="${item.label}${!item.ok ? ", coming soon" : ""}"
+                      ${!item.ok ? 'disabled aria-disabled="true"' : ""}>
+                <span class="library-tile-icon" aria-hidden="true">${item.icon}</span>
+                <span class="library-tile-label">${item.label}</span>
+                ${!item.ok ? '<span class="library-tile-soon">Soon</span>' : ""}
+              </button>
+            `).join("")}
+          </div>
         </div>
       `).join("")}
 
+      <div class="library-section-block">
+        <div class="library-section-header">
+          <span class="library-section-icon" aria-hidden="true">\uD83D\uDCDD</span>
+          <div>
+            <h2 class="library-section-title">Log an Activity</h2>
+            <p class="library-section-desc">You know what you did. Log it and the coach will reflect.</p>
+          </div>
+        </div>
+        ${LOG_GROUPS.map(group => `
+          <h3 class="library-group-label">${group.group}</h3>
+          <div class="library-tile-grid library-tile-grid--compact">
+            ${group.items.map(item => `
+              <button class="library-tile library-tile--compact"
+                      data-target="activity-log" data-activity="${item.id}"
+                      aria-label="Log ${item.label}">
+                <span class="library-tile-icon" aria-hidden="true">${item.icon}</span>
+                <span class="library-tile-label">${item.label}</span>
+              </button>
+            `).join("")}
+          </div>
+        `).join("")}
+      </div>
+
     </section>
   `;
 }
 
-// ── Movement identity ─────────────────────────────────────────────────────────
 
 function renderMovementIdentity() {
   const current = store.get("movementIdentity") || null;
@@ -855,6 +898,21 @@ function wirePanel() {
       switchTab("conditions");
     });
   });
+
+  // ── Facility presets ──────────────────────────────────────────────────────
+  document.querySelectorAll("[data-facility]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const preset = FACILITY_PRESETS.find(p => p.id === btn.dataset.facility);
+      if (!preset) return;
+      store.set("equipment", [...preset.equipment]);
+      // Briefly show confirmation
+      btn.textContent = "Applied";
+      setTimeout(() => switchTab("equipment"), 800);
+    });
+  });
+
+  // ── Equipment expand/collapse ──────────────────────────────────────────────
+  // Using <details> element — native expand/collapse, no JS needed
 
   // Movement identity chips
   document.querySelectorAll("[data-identity]").forEach(btn => {
