@@ -2,6 +2,39 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
+ * v1.7 — Goal-aware session bias + core guarantee + weight safeguarding:
+ *
+ *   getGoalProfile()
+ *     Reads primaryGoal and goals[] from store. Returns a structured object
+ *     { primaryGoal, wantsWeightLoss, wantsCardio, wantsStrength, wantsMobility }
+ *     used by bias and rationale logic throughout generation.
+ *
+ *   applyGoalBias(pool, focusOrder, goalProfile)
+ *     Adjusts workout focus order and pool weighting by goal.
+ *     Weight-loss and body-composition users: cardio surfaced first,
+ *     higher-MET exercises weighted up (goalScore boosted).
+ *     Improve-cardio users: same cardio-first ordering.
+ *     Build-strength users: strength first, as before.
+ *     Additive — never overrides burnout or cycle phase.
+ *
+ *   applyCoreGuarantee(exercises, pool)
+ *     After selection, checks whether any exercise touches the confirmed
+ *     core area list. If not, swaps one main exercise for the highest-
+ *     scored core-affecting exercise available in the pool.
+ *     Silent. Always on. For every user, every session.
+ *     Core areas: core, abdominals, lower-back, glutes, hip-flexor,
+ *     hamstring, adductors, hip-abductors, pelvic-floor.
+ *
+ *   validateWeightTarget()
+ *     Reads weight, targetWeight, targetDate from store.
+ *     Returns a coach message string if implied rate exceeds ~1 kg/week.
+ *     Returns null if target is safe or insufficient data.
+ *     Used by UI to surface a warm, non-blocking intervention.
+ *
+ *   generateRationale() extended:
+ *     Goal-aware lines added — weight-loss users see a coach line
+ *     connecting today's session to their goal.
+ *
  * v1.6 — SOLO taxonomy / difficulty progression (Gap 1):
  *   difficultyLevel (1/2/3) added to all exercises.
  *   getPhaseBias() now returns intensityBias ('gentle'|'moderate'|'challenging').
@@ -132,6 +165,20 @@ const AVAILABLE_TIME_MAX_EXERCISE_DURATION = {
   open:     1440   // 24 min
 };
 
+// ── Core area affectsAreas values ────────────────────────────────────────────
+// Every session should touch at least one of these. applyCoreGuarantee()
+// enforces this silently after exercise selection.
+const CORE_AREAS = new Set([
+  "core", "abdominals", "lower-back", "glutes",
+  "hip-flexor", "hamstring", "adductors", "hip-abductors", "pelvic-floor"
+]);
+
+// Goals that shift session bias toward higher-MET / cardio work
+const WEIGHT_LOSS_GOALS = new Set(["lose-weight", "feel-better"]);
+const CARDIO_GOALS      = new Set(["improve-cardio", "run-5k", "more-energy"]);
+const STRENGTH_GOALS    = new Set(["build-strength", "build-muscle"]);
+const MOBILITY_GOALS    = new Set(["improve-flexibility", "reduce-pain", "reduce-stress"]);
+
 export const workoutGenerator = {
 
   // ── Cycle phase helper ────────────────────────────────────────────────────────
@@ -153,14 +200,158 @@ export const workoutGenerator = {
     return "luteal";
   },
 
+  // ── Goal profile ──────────────────────────────────────────────────────────────
+
+  /**
+   * Read goal state from store and return a structured profile.
+   * Used by applyGoalBias() and generateRationale().
+   *
+   * @returns {{ primaryGoal: string|null, wantsWeightLoss: boolean,
+   *             wantsCardio: boolean, wantsStrength: boolean, wantsMobility: boolean }}
+   */
+  getGoalProfile() {
+    const goals       = store.get("goals") || [];
+    const primaryGoal = store.get("goal.primaryGoal") || goals[0] || null;
+    const goalSet     = new Set(goals);
+
+    return {
+      primaryGoal,
+      wantsWeightLoss: goals.some(g => WEIGHT_LOSS_GOALS.has(g)),
+      wantsCardio:     goals.some(g => CARDIO_GOALS.has(g)),
+      wantsStrength:   goals.some(g => STRENGTH_GOALS.has(g)),
+      wantsMobility:   goals.some(g => MOBILITY_GOALS.has(g)),
+      goalSet
+    };
+  },
+
+  // ── Goal-aware session bias ───────────────────────────────────────────────────
+
+  /**
+   * Adjust focus order and pool scoring based on user goals.
+   * Weight-loss / cardio goals: cardio first, higher-MET exercises boosted.
+   * Strength goals: strength first (if not already from programme bias).
+   * Mobility goals: mobility surfaced alongside recovery.
+   * Additive to programme bias — never overrides burnout.
+   *
+   * @param {Array}  pool        — exercise pool (may already have programmeScore)
+   * @param {Array}  focusOrder  — ["strength","mobility","cardio"] or programme-ordered
+   * @param {object} goalProfile — result of getGoalProfile()
+   * @returns {{ pool: Array, focusOrder: Array }}
+   */
+  applyGoalBias(pool, focusOrder, goalProfile) {
+    let order = [...focusOrder];
+    let biasedPool = pool;
+
+    if (goalProfile.wantsWeightLoss || goalProfile.wantsCardio) {
+      // Cardio to front if not already there
+      order = ["cardio", ...order.filter(f => f !== "cardio")];
+
+      // Boost higher-MET exercises in the pool
+      biasedPool = pool.map(ex => ({
+        ...ex,
+        programmeScore: (ex.programmeScore || 1) + (ex.energyRequired >= 6 ? 1 : 0)
+      }));
+    } else if (goalProfile.wantsStrength && order[0] !== "strength") {
+      order = ["strength", ...order.filter(f => f !== "strength")];
+    } else if (goalProfile.wantsMobility && !goalProfile.wantsStrength && !goalProfile.wantsCardio) {
+      order = ["mobility", ...order.filter(f => f !== "mobility")];
+    }
+
+    return { pool: biasedPool, focusOrder: order };
+  },
+
+  // ── Core guarantee ────────────────────────────────────────────────────────────
+
+  /**
+   * Ensure every session touches the core/carrier chain.
+   * If no selected exercise has an affectsAreas value in CORE_AREAS,
+   * replaces one main-role exercise with the best core-affecting exercise
+   * available in the pool.
+   * Warmup and cooldown are never replaced.
+   * Silent — no UI signal. Always runs for every user.
+   *
+   * @param {Array} exercises — selected exercises from selectExercises()
+   * @param {Array} pool      — full suitable exercise pool
+   * @returns {Array}         — exercises, possibly with one swap applied
+   */
+  applyCoreGuarantee(exercises, pool) {
+    const hasCore = exercises.some(ex =>
+      (ex.affectsAreas || []).some(area => CORE_AREAS.has(area))
+    );
+    if (hasCore) return exercises;
+
+    // Find the best core-affecting exercise not already selected
+    const selectedIds = new Set(exercises.map(e => e.id));
+    const coreOptions = pool
+      .filter(ex =>
+        !selectedIds.has(ex.id) &&
+        (ex.affectsAreas || []).some(area => CORE_AREAS.has(area))
+      )
+      .sort((a, b) => (b.programmeScore || 1) - (a.programmeScore || 1));
+
+    if (!coreOptions.length) return exercises;
+
+    const replacement = { ...coreOptions[0], role: "main" };
+
+    // Replace the last main-role exercise (never warmup or cooldown)
+    const lastMainIdx = exercises.map(e => e.role).lastIndexOf("main");
+    if (lastMainIdx === -1) return exercises;
+
+    const result = [...exercises];
+    result[lastMainIdx] = replacement;
+    return result;
+  },
+
+  // ── Weight target safeguarding ────────────────────────────────────────────────
+
+  /**
+   * Validate the user's weight target against a safe rate of change.
+   * Safe rate: ~0.5-1 kg per week (1-2 lbs).
+   * Returns a warm coach message string if the target is unsafe.
+   * Returns null if the target is safe, or if data is insufficient to check.
+   *
+   * @returns {string|null}
+   */
+  validateWeightTarget() {
+    const currentWeight = store.get("weight");
+    const targetWeight  = store.get("targetWeight");
+    const targetDate    = store.get("targetDate") ||
+                          store.get("goal.targetDate");
+
+    if (!currentWeight || !targetWeight || !targetDate) return null;
+
+    const current = parseFloat(currentWeight);
+    const target  = parseFloat(targetWeight);
+    if (isNaN(current) || isNaN(target)) return null;
+
+    const weightDiff = Math.abs(current - target);
+    if (weightDiff < 0.5) return null; // Already at or near target
+
+    const today      = new Date();
+    const end        = new Date(targetDate);
+    const msPerWeek  = 7 * 24 * 60 * 60 * 1000;
+    const weeksLeft  = (end - today) / msPerWeek;
+
+    if (weeksLeft <= 0) return null; // Date already passed — no intervention
+
+    const kgPerWeek = weightDiff / weeksLeft;
+
+    if (kgPerWeek <= 1.0) return null; // Safe rate — no message needed
+
+    return "That is a meaningful goal and I want to help you get there. That timeline concerns me a little though — a pace of around 0.5 to 1 kg a week tends to be more sustainable and kinder to your body. Want to adjust the date, or keep the goal open-ended for now?";
+  },
+
+  // ── Daily options ─────────────────────────────────────────────────────────────
+
   /**
    * Generate today's 3 workout options
    */
   generateDailyOptions() {
-    const profile   = this.getUserProfile();
-    const checkin   = checkinData.getTodaysCheckin();
-    const intensity = store.get("todayIntensity") || "moderate";
-    const burnout   = checkinData.detectBurnout();
+    const profile     = this.getUserProfile();
+    const checkin     = checkinData.getTodaysCheckin();
+    const intensity   = store.get("todayIntensity") || "moderate";
+    const burnout     = checkinData.detectBurnout();
+    const goalProfile = this.getGoalProfile();
 
     // ── Gap 3: Menstrual cycle phase ─────────────────────────────────────────
     // Read cycleDay from today's check-in only when hormonalTracking is on.
@@ -195,12 +386,20 @@ export const workoutGenerator = {
     const biasedPool = this.applyProgrammeBias(suitable);
 
     // Determine focus order based on programme phase (or default order)
-    const [focus1, focus2, focus3] = this.getWorkoutFocusOrder();
+    const rawFocusOrder = this.getWorkoutFocusOrder();
+
+    // v1.7: Apply goal bias — adjusts focus order and pool MET weighting.
+    // Only applied when burnout is not high (burnout overrides everything).
+    const { pool: goalPool, focusOrder: goalFocusOrder } = burnout.level === "high"
+      ? { pool: biasedPool, focusOrder: rawFocusOrder }
+      : this.applyGoalBias(biasedPool, rawFocusOrder, goalProfile);
+
+    const [focus1, focus2, focus3] = goalFocusOrder;
 
     const options = [
-      this.generateWorkout(focus1, biasedPool, intensity, burnout, cyclePhase, intensityBias, currentWeek),
-      this.generateWorkout(focus2, biasedPool, intensity, burnout, cyclePhase, intensityBias, currentWeek),
-      this.generateWorkout(focus3, biasedPool, intensity, burnout, cyclePhase, intensityBias, currentWeek)
+      this.generateWorkout(focus1, goalPool, intensity, burnout, cyclePhase, intensityBias, currentWeek, goalProfile),
+      this.generateWorkout(focus2, goalPool, intensity, burnout, cyclePhase, intensityBias, currentWeek, goalProfile),
+      this.generateWorkout(focus3, goalPool, intensity, burnout, cyclePhase, intensityBias, currentWeek, goalProfile)
     ];
 
     store.set("todaysWorkouts", options);
@@ -263,13 +462,18 @@ export const workoutGenerator = {
    * Generate a single workout with a specific focus.
    * Reads availableTime from store and passes it into getWorkoutParams().
    */
-  generateWorkout(focus, suitableExercises, intensity, burnout, cyclePhase = null, intensityBias = null, currentWeek = null) {
+  generateWorkout(focus, suitableExercises, intensity, burnout, cyclePhase = null, intensityBias = null, currentWeek = null, goalProfile = null) {
     const availableTime = store.get("availableTime") || null;
     const params        = this.getWorkoutParams(intensity, burnout, availableTime, cyclePhase, intensityBias, currentWeek);
-    const exercises     = this.selectExercises(focus, suitableExercises, params, availableTime);
+    const raw           = this.selectExercises(focus, suitableExercises, params, availableTime);
+
+    // v1.7: Core guarantee — ensure every session touches the core/carrier chain.
+    // Silent swap of one main exercise if nothing in the selection does.
+    const exercises     = this.applyCoreGuarantee(raw, suitableExercises);
+
     const capped        = this.applyDurationCap(exercises, focus, params);
     const duration      = this.calculateDuration(capped);
-    const rationale     = this.generateRationale(focus, intensity, burnout, cyclePhase);
+    const rationale     = this.generateRationale(focus, intensity, burnout, cyclePhase, goalProfile);
 
     return {
       id:            `workout-${focus}-${Date.now()}`,
@@ -569,7 +773,7 @@ export const workoutGenerator = {
    * Cycle-aware line added when cyclePhase is active (v1.6).
    * Strategic line is appended when a programme is active (v1.1).
    */
-  generateRationale(focus, intensity, burnout, cyclePhase = null) {
+  generateRationale(focus, intensity, burnout, cyclePhase = null, goalProfile = null) {
     const checkin = checkinData.getTodaysCheckin();
     const parts   = [];
 
@@ -590,8 +794,6 @@ export const workoutGenerator = {
     }
 
     // ── Cycle phase coach line ────────────────────────────────────────────────
-    // Only shown when hormonalTracking is on and a phase is detected.
-    // Framing is informative and non-prescriptive — explains the why.
     if (cyclePhase) {
       const cycleMessages = {
         "menstruation": "You are in your menstrual phase — I have kept intensity low and focused on gentle movement. Rest is productive right now.",
@@ -601,6 +803,21 @@ export const workoutGenerator = {
       };
       const msg = cycleMessages[cyclePhase];
       if (msg) parts.push(msg);
+    }
+
+    // ── Goal-aware coach line (v1.7) ──────────────────────────────────────────
+    // Connects today's session to the user's stated goal.
+    // Only shown when not in burnout recovery mode.
+    if (goalProfile && burnout.level !== "high") {
+      if (goalProfile.wantsWeightLoss && focus === "cardio") {
+        parts.push("Cardio is one of the most effective tools for your weight goal — I have made sure today's session works hard for you.");
+      } else if (goalProfile.wantsWeightLoss && focus === "strength") {
+        parts.push("Strength work builds the muscle that keeps your metabolism working for you — this session supports your weight goal even without being a cardio session.");
+      } else if (goalProfile.wantsCardio && focus === "cardio") {
+        parts.push("This is exactly what builds the cardiovascular fitness you are working towards.");
+      } else if (goalProfile.wantsStrength && focus === "strength") {
+        parts.push("Every session like this one moves you closer to the strength you are building.");
+      }
     }
 
     const focusExplanations = {
