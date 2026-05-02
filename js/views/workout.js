@@ -72,35 +72,44 @@ export function render() {
           Watch how to do this
         </a>
 
-        <!-- Instructions -->
-        <div class="exercise-instructions card" id="exercise-instructions-card">
-          <div class="instructions-header">
-            <h3>How to do it</h3>
-            <button class="tts-btn" id="instructions-tts-btn"
-                    aria-label="Listen to instructions"
-                    type="button">
-              <span class="tts-icon" aria-hidden="true">&#128266;</span>
-            </button>
-          </div>
-          <ol class="instruction-list">
-            ${exercise.instructions.map(inst => `<li>${inst}</li>`).join('')}
-          </ol>
+        <!-- Exercise card - universal three-section structure -->
+        <!-- Works identically for gym, mindfulness, yoga, mobility, rehab, pilates -->
+        <div class="exercise-instructions card" role="region" aria-label="Exercise guidance for ${exercise.name}">
 
+          <!-- Section 1: How to get there -->
+          ${exercise.instructions && exercise.instructions.length > 0 ? `
+            <span class="exercise-section-label" id="section-setup-${currentExerciseIndex}">
+              How to get there
+            </span>
+            <ul class="exercise-section-list" aria-labelledby="section-setup-${currentExerciseIndex}">
+              ${exercise.instructions.map(inst => `<li>${inst}</li>`).join('')}
+            </ul>
+          ` : ''}
+
+          <!-- Section 2: What to focus on (coaching cues) -->
           ${exercise.coaching ? `
-            <div class="coaching-tip">
-              <span class="tip-icon" aria-hidden="true">&#128161;</span>
+            <hr class="exercise-section-divider" aria-hidden="true">
+            <span class="exercise-section-label" id="section-focus-${currentExerciseIndex}">
+              What to focus on
+            </span>
+            <div class="coaching-tip" aria-labelledby="section-focus-${currentExerciseIndex}">
+              <span class="tip-icon" aria-hidden="true">💡</span>
               <p>${exercise.coaching}</p>
             </div>
           ` : ''}
-        </div>
 
-        <!-- Why this exercise -->
-        ${exercise.why ? `
-          <div class="exercise-why">
-            <h3>Why this exercise?</h3>
-            <p>${exercise.why}</p>
-          </div>
-        ` : ''}
+          <!-- Section 3: Why this helps -->
+          ${exercise.why ? `
+            <hr class="exercise-section-divider" aria-hidden="true">
+            <span class="exercise-section-label" id="section-why-${currentExerciseIndex}">
+              Why this helps
+            </span>
+            <p class="exercise-why-text" aria-labelledby="section-why-${currentExerciseIndex}">
+              ${exercise.why}
+            </p>
+          ` : ''}
+
+        </div>
       </div>
 
       <!-- Action buttons -->
@@ -127,15 +136,11 @@ function renderNoWorkout() {
   return `
     <div class="view">
       <div class="card card-coach">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <div>
-          <h2>No workout selected</h2>
-          <p>Go back to Today and choose a workout option.</p>
-          <button class="btn btn-primary" onclick="router.navigate('intention')"
-                  style="margin-top: var(--space-4);">
-            Back to choices
-          </button>
-        </div>
+        <h2>No workout selected</h2>
+        <p>Go back to Today and choose a workout option.</p>
+        <button class="btn btn-primary" onclick="router.navigate('today')">
+          Back to Today
+        </button>
       </div>
     </div>
   `;
@@ -230,34 +235,6 @@ export function onMount() {
   // Skip exercise
   document.getElementById('skip-exercise-btn')?.addEventListener('click', () => {
     skipExercise();
-  });
-
-  // Instructions TTS button
-  // Reads the exercise instructions and coaching tip aloud.
-  // Uses window.tts if available (mounted by router after navigation).
-  // Falls back to direct speechSynthesis if tts module not yet available.
-  document.getElementById('instructions-tts-btn')?.addEventListener('click', () => {
-    const btn = document.getElementById('instructions-tts-btn');
-    const card = document.getElementById('exercise-instructions-card');
-    if (!card) return;
-
-    // Build text: numbered instructions + coaching tip if present
-    const steps = exercise.instructions
-      .map((inst, i) => (i + 1) + ". " + inst)
-      .join(". ");
-    const tip = exercise.coaching ? " Coaching tip: " + exercise.coaching : "";
-    const fullText = steps + tip;
-
-    if (window.tts) {
-      // Use tts module so rate setting is respected and state is managed
-      window.tts.speak(fullText, btn);
-    } else if ("speechSynthesis" in window) {
-      // Direct fallback
-      window.speechSynthesis.cancel();
-      const utt = new SpeechSynthesisUtterance(fullText);
-      utt.rate = (typeof store !== "undefined" ? store.get("speechRate") : null) || 0.9;
-      window.speechSynthesis.speak(utt);
-    }
   });
 }
 
