@@ -1,6 +1,6 @@
 {
-  "name": "Alongside",
-  "short_name": "Alongside",
+  "name": "Alongside: Move",
+  "short_name": "Move",
   "description": "Movement that meets you where you are",
   "start_url": "/alongside-app/",
   "scope": "/alongside-app/",
