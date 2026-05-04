@@ -41,6 +41,53 @@ import { store } from "../store.js";
 
 export const centered = false;
 
+// ── Activity Type Labels ───────────────────────────────────────────────────────
+// Authoritative label map — use everywhere activity types are displayed
+
+const ACTIVITY_LABELS = {
+  // Gym/strength
+  'gym': 'gym session',
+  'gym-programme': 'gym session',
+  'coach-session': 'gym session',
+  'strength': 'strength work',
+  
+  // Cardio
+  'run': 'run',
+  'walk': 'walk',
+  'swim': 'swim',
+  'cycle': 'cycle',
+  'cardio': 'cardio session',
+  'row': 'rowing session',
+  'hiking': 'hike',
+  
+  // Classes
+  'boxing': 'boxing session',
+  'spin': 'spin class',
+  'hiit': 'HIIT session',
+  'body-balance': 'Body Balance class',
+  'class': 'class',
+  
+  // Gentle/mindful
+  'yoga': 'yoga session',
+  'pilates': 'pilates session',
+  'tai-chi': 'tai chi session',
+  'stretching': 'stretching session',
+  'mobility': 'mobility work',
+  'mindful': 'mindful movement',
+  
+  // Recovery/quiet
+  'breathing': 'mindfulness practice',
+  'meditation': 'meditation',
+  'journal': 'journaling',
+  'quiet': 'quiet session',
+  'rest': 'rest day',
+  'recovery': 'recovery work',
+  
+  // User-logged
+  'prescribed': 'prescribed exercises',
+  'custom': 'movement'
+};
+
 // ── State ─────────────────────────────────────────────────────────────────────
 
 let proposalState   = "proposal";  // "proposal" | "branching" | "revised" | "activity-pick"
@@ -55,13 +102,12 @@ let branchChoice    = null;        // "mind" | "different" | "shorter" | "quiete
  *
  * The coach speaks in four parts:
  *   1. Greeting     — time-aware, personal
- *   2. Reflection   — what you have done recently, drawn from activityLog
- *   3. Goal mention — brief, specific, not repeated every day
+ *   2. Reflection   — what you have done recently, drawn from activityLog (48h lookback, activity types)
+ *   3. Constraint   — if applicable (pain, low energy), state it plainly
  *   4. Proposal     — "So I thought today..." — the actual suggestion
- *   5. Invitation   — "Unless you had something else in mind?"
  *
  * Decision logic:
- *   1. Severe override (high pain or very low energy) → rest/breathing
+ *   1. Severe override (high pain ≥7) → disable "Let's go", explain why, offer adapted alternatives
  *   2. movementIdentity + activityPreferences weight the options
  *   3. Variety enforcement — avoid repeating yesterday's proposal type
  *   4. Energy-aware routing — low energy steers away from high-intensity
@@ -70,7 +116,7 @@ let branchChoice    = null;        // "mind" | "different" | "shorter" | "quiete
  *   7. No unconditional defaults — gym is not assumed
  *
  * @param {boolean} preferShorter - build a shorter version of the same logic
- * @returns {{ greeting, reflection, proposal, rationale, duration, target, quietMode }}
+ * @returns {{ greeting, reflection, constraint, proposal, rationale, duration, target, quietMode, severePainOverride, disabledOption }}
  */
 function buildProposal(preferShorter = false) {
   // ── Read all available data ──────────────────────────────────────────────
@@ -105,21 +151,6 @@ function buildProposal(preferShorter = false) {
     ? Math.floor((Date.now() - new Date(lastSession.loggedAt)) / 86400000)
     : 99;
 
-  const todayStr       = new Date().toISOString().split("T")[0];
-
-  // What has actually been logged TODAY (not just recent)
-  const todayLog       = activityLog.filter(e => {
-    const ts = e.loggedAt || e.completedAt || e.sessionStart || "";
-    return ts.startsWith(todayStr);
-  });
-  const todayTypes     = todayLog.map(e => e.type || e.source || "");
-  const gymTodayDone   = todayTypes.some(t => ["gym", "coach-session", "gym-programme"].includes(t));
-  const cardioTodayDone = todayTypes.some(t => ["run", "cycle", "swim", "row", "outdoor-cycle"].includes(t));
-  const activeTodayCount = todayLog.filter(e => {
-    const t = e.type || e.source || "";
-    return !["breathing", "journal", "rest", "mindful", "quiet", "quiet-session"].includes(t);
-  }).length;
-
   const recentTypes    = recentLog.map(e => e.type || e.source || "");
   const gymCount       = recentTypes.filter(t => ["gym", "coach-session", "gym-programme"].includes(t)).length;
   const cardioCount    = recentTypes.filter(t => ["run", "cycle", "swim", "cardio", "row"].includes(t)).length;
@@ -143,10 +174,48 @@ function buildProposal(preferShorter = false) {
   }
 
   // ── Build the reflection sentence ────────────────────────────────────────
-  const reflection = buildReflection(recentLog, daysSinceLast, goal, gymTodayDone, activeTodayCount);
+  const settings = store.get("settings") || {};
+  const reflectionSettings = settings.reflection || {};
+  const lookbackHours = reflectionSettings.lookbackHours || 48;
+  const coachPersonality = store.get("coachPersonality") || "steady";
+  
+  const reflection = buildReflection(activityLog, lookbackHours, coachPersonality);
 
-  // ── Safety layer — must run before preference logic ─────────────────────
-  // Neurodivergent users may follow the coach as their primary guide.
+  // ── Safety layer — severe pain override (must run before preference logic) ─
+  // If pain is severe (≥7), disable the "Let's go" option and explain why.
+  // This builds psychological safety while maintaining user agency.
+  
+  const severePainZones = conditions.filter(id => (painScores[id] || 0) >= 7);
+  const hasSeverePain = severePainZones.length > 0;
+  
+  let constraintMessage = null;
+  if (hasSeverePain) {
+    const worstZoneId = severePainZones[0];
+    const painLevel = painScores[worstZoneId] || 7;
+    const conditionName = conditions.find(c => c.id || c === worstZoneId)?.name || "this area";
+    
+    const variants = {
+      steady: `Your ${conditionName} is very sore today (pain ${painLevel}/10). High-intensity movement could cause serious injury, so I've adjusted your options to avoid that risk.`,
+      energetic: `Your ${conditionName} is very sore today (pain ${painLevel}/10). No intense lower body work today. We need to protect that.`,
+      nurturing: `Your ${conditionName} is very sore today. Moving hard could hurt you. I care about your healing more than your consistency.`,
+      minimal: `${conditionName} very sore (${painLevel}/10). Can't do high intensity.`
+    };
+    constraintMessage = variants[coachPersonality] || variants.steady;
+  } else if (moderatePain) {
+    const modZoneId = conditions.find(id => (painScores[id] || 0) >= 4);
+    const painLevel = painScores[modZoneId] || 5;
+    const conditionName = conditions.find(c => c.id || c === modZoneId)?.name || "this area";
+    
+    const variants = {
+      steady: `Your ${conditionName} is sore today (pain ${painLevel}/10). I can work around that.`,
+      energetic: `Your ${conditionName} is sore today — pain ${painLevel}/10. We need to work around that.`,
+      nurturing: `Your ${conditionName} is sore today. I want to help you move in a way that respects that.`,
+      minimal: `${conditionName} sore (${painLevel}/10). Need to protect.`
+    };
+    constraintMessage = variants[coachPersonality] || variants.steady;
+  }
+
+  // ── Safety layer — Neurodivergent users may follow the coach as their primary guide ─
   // We have a responsibility to prevent overtraining.
   //
   // Rules:
@@ -180,11 +249,11 @@ function buildProposal(preferShorter = false) {
 
   // Hard override: 3+ consecutive days must rest
   if (consecutiveDays >= 3) {
-    const reflection = buildReflection(recentLog, daysSinceLast, goal, gymTodayDone, activeTodayCount);
     return makeProposal({
       type: "quiet", target: "quiet-session", quietMode: "rest",
       duration: 15,
       reflection,
+      constraint: null,
       proposal: "You have trained for " + consecutiveDays + " days in a row. Today needs to be a rest day. This is not optional — it is where adaptation actually happens. Your body builds back stronger during recovery, not during effort.",
       rationale: "Consecutive training days without rest increase injury risk and reduce performance gains. Recovery is part of the programme."
     });
@@ -195,11 +264,11 @@ function buildProposal(preferShorter = false) {
 
   // 7 sessions in 7 days — very high volume flag
   if (totalThisWeek >= 6) {
-    const reflection = buildReflection(recentLog, daysSinceLast, goal, gymTodayDone, activeTodayCount);
     return makeProposal({
       type: "quiet", target: "quiet-session", quietMode: "mindful",
       duration: 20,
       reflection,
+      constraint: null,
       proposal: "You have been very active this week — six or more sessions in seven days. Today I want to suggest something restorative rather than another training session. Your body needs this.",
       rationale: "High weekly volume without adequate recovery limits progress and increases overuse risk."
     });
@@ -250,8 +319,8 @@ function buildProposal(preferShorter = false) {
   // Score each option and pick the highest that isn't a repeat
   const options = [
     {
-      type: "gym", available: hasGymProg && !gymTodayDone,
-      score: prefScore("gym") + (gymCount < 3 ? 2 : 0) + (energy >= 6 ? 1 : 0) - (heavyOverride ? 3 : 0) - (gymTodayDone ? 100 : 0),
+      type: "gym", available: hasGymProg,
+      score: prefScore("gym") + (gymCount < 3 ? 2 : 0) + (energy >= 6 ? 1 : 0) - (heavyOverride ? 3 : 0),
       proposal: "I thought we'd continue your gym programme today. Session " + gymSession + " of Week " + gymWeek + ". Your cardio warmup, the main session, and your prescribed work built in.",
       rationale: energy >= 7 ? "Your energy is good. Make the most of it." : "Steady progress on the programme is what builds the result.",
       duration: Math.min(timeBudget, 45), target: "gym-programme", quietMode: null
@@ -309,49 +378,108 @@ function buildProposal(preferShorter = false) {
  * Reads the last 3 entries and constructs a plain-English summary.
  * Varies based on recency and what was done.
  */
-function buildReflection(recentLog, daysSinceLast, goal, gymTodayDone, activeTodayCount) {
-  if (recentLog.length === 0) {
-    return "This looks like an early session, so I am working from your goals and how you are feeling today.";
+/**
+ * buildReflection(activityLog, lookbackHours, coachPersonality)
+ * 
+ * Returns a plain-English reflection of recent activity.
+ * Uses activity TYPE not counts. Names are specific.
+ * Acknowledges the timeframe to show the coach is paying attention.
+ * 
+ * If no activity in window → clean slate (no shame)
+ * If activity → witness what happened without judgment
+ */
+function buildReflection(activityLog, lookbackHours = 48, coachPersonality = "steady") {
+  const cutoffTime = Date.now() - (lookbackHours * 3600000);
+  
+  // Filter activities within the lookback window
+  const relevantActivities = (activityLog || []).filter(a => {
+    const completedAt = new Date(a.completedAt || a.loggedAt || Date.now()).getTime();
+    return completedAt >= cutoffTime;
+  });
+
+  // If no recent activity, clean slate
+  if (relevantActivities.length === 0) {
+    const variants = {
+      steady: "You're here today, and that's what matters.",
+      energetic: "You're here. Let's do this.",
+      nurturing: "You're here now. That's enough.",
+      minimal: "You're here today."
+    };
+    return variants[coachPersonality] || variants.steady;
   }
 
-  if (daysSinceLast >= 5) {
-    return "It has been " + daysSinceLast + " days since your last session. Welcome back.";
+  // Count unique activity types (not raw count)
+  const typeSet = new Set();
+  relevantActivities.forEach(a => {
+    const type = a.type || a.source || "movement";
+    typeSet.add(ACTIVITY_LABELS[type] || type);
+  });
+
+  const uniqueTypes = Array.from(typeSet);
+
+  // Build time reference based on lookback hours
+  let timeRef = "";
+  if (lookbackHours === 24) {
+    timeRef = "today";
+  } else if (lookbackHours === 48) {
+    const dayAgo = new Date(Date.now() - 24 * 3600000);
+    const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayAgo.getDay()];
+    timeRef = `since ${dayName}`;
+  } else if (lookbackHours === 72) {
+    timeRef = "in the last 3 days";
+  } else if (lookbackHours === 168) {
+    timeRef = "over the past week";
+  } else {
+    timeRef = `in the last ${Math.round(lookbackHours / 24)} days`;
   }
 
-  if (daysSinceLast === 0) {
-    if (gymTodayDone) {
-      return "You have already done a gym session today.";
-    }
-    if (activeTodayCount > 0) {
-      return "You have already been active today. I am looking at what would complement that.";
-    }
-    return "You have already been active today.";
+  // Build natural sentence with activity types
+  let sentence = "";
+  if (uniqueTypes.length === 1) {
+    const variants = {
+      steady: `You've shown up for ${uniqueTypes[0]} ${timeRef}.`,
+      energetic: `You've been showing up for ${uniqueTypes[0]} ${timeRef}.`,
+      nurturing: `You've cared for yourself with ${uniqueTypes[0]} ${timeRef}.`,
+      minimal: `${uniqueTypes[0]} ${timeRef}.`
+    };
+    sentence = variants[coachPersonality] || variants.steady;
+  } else if (uniqueTypes.length === 2) {
+    const variants = {
+      steady: `You've shown up for ${uniqueTypes[0]} and ${uniqueTypes[1]} ${timeRef}.`,
+      energetic: `You've been showing up for ${uniqueTypes[0]} and ${uniqueTypes[1]} ${timeRef}.`,
+      nurturing: `You've cared for yourself with ${uniqueTypes[0]} and ${uniqueTypes[1]} ${timeRef}.`,
+      minimal: `${uniqueTypes[0]} and ${uniqueTypes[1]} ${timeRef}.`
+    };
+    sentence = variants[coachPersonality] || variants.steady;
+  } else {
+    // 3+: "gym work, yoga, and mindfulness"
+    const allButLast = uniqueTypes.slice(0, -1).join(", ");
+    const last = uniqueTypes[uniqueTypes.length - 1];
+    const variants = {
+      steady: `You've shown up for ${allButLast}, and ${last} ${timeRef}.`,
+      energetic: `You've been showing up for ${allButLast}, and ${last} ${timeRef}.`,
+      nurturing: `You've cared for yourself with ${allButLast}, and ${last} ${timeRef}.`,
+      minimal: `${allButLast}, and ${last} ${timeRef}.`
+    };
+    sentence = variants[coachPersonality] || variants.steady;
   }
 
-  // Describe the last 1-3 sessions in plain English
-  const last = recentLog[recentLog.length - 1];
-  const prev = recentLog[recentLog.length - 2] || null;
-
-  const lastLabel = activityLabel(last.type || last.source || "session");
-  const prevLabel = prev ? activityLabel(prev.type || prev.source || "session") : null;
-
-  const dayWord = daysSinceLast === 1 ? "yesterday" : daysSinceLast + " days ago";
-
-  // Goal reference — vary day of week to avoid repetition
+  // Optional: add a validating phrase (but only occasionally to avoid repetition)
   const dayOfWeek = new Date().getDay();
-  const mentionGoal = goal.targetDescription && dayOfWeek % 3 === 1;
+  const addValidation = dayOfWeek % 3 === 0; // ~33% of the time
 
-  let reflection = "We had a " + lastLabel + " " + dayWord + ".";
-
-  if (prev && prev.type !== last.type) {
-    reflection = "We have had a " + prevLabel + " and a " + lastLabel + " in the last few sessions.";
+  if (addValidation) {
+    const variants = {
+      steady: " That takes planning.",
+      energetic: " That's dedication.",
+      nurturing: " That matters.",
+      minimal: ""
+    };
+    const validation = variants[coachPersonality] || variants.steady;
+    if (validation) sentence += validation;
   }
 
-  if (mentionGoal) {
-    reflection += " Keeping your goal in mind \u2014 " + goal.targetDescription + ".";
-  }
-
-  return reflection;
+  return sentence;
 }
 
 function activityLabel(type) {
@@ -368,8 +496,8 @@ function activityLabel(type) {
   return labels[type] || type.replace(/-/g, " ");
 }
 
-function makeProposal({ type, target, quietMode, duration, reflection, proposal, rationale }) {
-  return { type, target, quietMode, duration, reflection, proposal, rationale };
+function makeProposal({ type, target, quietMode, duration, reflection, constraint, proposal, rationale, severePainOverride = false, disabledOption = null }) {
+  return { type, target, quietMode, duration, reflection, constraint, proposal, rationale, severePainOverride, disabledOption };
 }
 
 /**
@@ -450,28 +578,50 @@ export function render() {
 
 function renderProposal(name) {
   const p = currentProposal;
+  const helperText = p.severePainOverride 
+    ? "Not available today — protecting your " + (p.affectedZone || "affected area")
+    : null;
+  
   return `
     <div class="card card-coach coach-proposal-card">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
       <div class="coach-proposal-content">
-        <p class="coach-proposal-greeting" style="font-size:1.6rem;line-height:1.2;">${getGreeting(name)}.</p>
+        <p class="coach-proposal-greeting">${getGreeting(name)}.</p>
         <p class="coach-proposal-reflection">${p.reflection}</p>
-        <p class="coach-proposal-suggestion" style="font-size:1.15rem;line-height:1.6;">${p.proposal}</p>
+        ${p.constraint ? `<p class="coach-proposal-constraint">${p.constraint}</p>` : ""}
+        <p class="coach-proposal-suggestion">${p.proposal}</p>
         <p class="coach-proposal-rationale text-sm text-muted">${p.rationale}</p>
         <div class="coach-proposal-meta">
-          <span class="coach-proposal-duration">&#8987; About ${p.duration} minutes</span>
+          <span class="coach-proposal-duration">⏱ About ${p.duration} minutes</span>
         </div>
       </div>
     </div>
 
     <div class="coach-proposal-actions">
-      <button class="btn btn-primary btn-large btn-full" id="proposal-accept-btn"
-              aria-label="Accept proposal and start session">
-        Let's go
+      <button class="btn btn-primary btn-large btn-full" 
+              id="proposal-accept-btn"
+              ${p.severePainOverride ? 'disabled' : ''}
+              aria-label="Let's go with your ${p.proposal ? p.proposal.split(' ')[0].toLowerCase() : 'plan'}">
+        Let's go with your plan
       </button>
-      <button class="btn btn-ghost btn-full" id="proposal-else-btn"
-              style="margin-top: var(--space-3);">
-        Unless you had something else in mind
+      ${p.severePainOverride && helperText ? `
+        <p class="text-xs text-error" style="margin-top: var(--space-2); text-align: center;">
+          ${helperText}
+        </p>
+      ` : ''}
+      
+      <button class="btn btn-primary btn-large btn-full" 
+              id="proposal-adjust-btn"
+              style="margin-top: var(--space-3);"
+              aria-label="Adjust for today's conditions">
+        Adjust for today
+      </button>
+      
+      <button class="btn btn-ghost btn-full" 
+              id="proposal-else-btn"
+              style="margin-top: var(--space-3);"
+              aria-label="Something else entirely">
+        Something else entirely
       </button>
     </div>
   `;
@@ -632,6 +782,14 @@ export function onMount() {
 
   // ── Accept proposal ───────────────────────────────────────────────────────
   document.getElementById("proposal-accept-btn")?.addEventListener("click", () => {
+    navigateToProposal(currentProposal);
+  });
+
+  // ── Adjust for today ──────────────────────────────────────────────────────
+  document.getElementById("proposal-adjust-btn")?.addEventListener("click", () => {
+    // For now, load the same proposal but mark that it's adjusted
+    // In the future, this will rebuild the proposal constrained by pain/energy
+    store.set("proposalAdjusted", true);
     navigateToProposal(currentProposal);
   });
 
