@@ -1,0 +1,196 @@
+/* ============================================
+   COACH PROPOSAL REDESIGN CSS
+   css/components/coach-proposal.css
+   
+   Styles for the redesigned coach proposal screen:
+   - Activity history reflection
+   - Constraint messaging (pain, energy)
+   - Severe pain override UI
+   - Three-button architecture
+   ============================================ */
+
+/* ============================================
+   COACH PROPOSAL CARD
+   ============================================ */
+
+.coach-proposal-card {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding: var(--space-5);
+  margin-bottom: var(--space-6);
+  border: 1px solid var(--color-border-light);
+  background: var(--color-bg-card);
+}
+
+.coach-proposal-card img {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.coach-proposal-content {
+  flex: 1;
+}
+
+/* ============================================
+   PROPOSAL TEXT HIERARCHY
+   ============================================ */
+
+.coach-proposal-greeting {
+  font-weight: var(--font-bold);
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+}
+
+.coach-proposal-reflection {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-3);
+  color: var(--color-text);
+}
+
+/* ============================================
+   CONSTRAINT MESSAGE (Pain, Energy, etc.)
+   ============================================ */
+
+.coach-proposal-constraint {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: rgba(239, 68, 68, 0.1);  /* Light red */
+  color: #EF4444;
+  border-left: 3px solid #EF4444;
+}
+
+/* ============================================
+   PROPOSAL & RATIONALE
+   ============================================ */
+
+.coach-proposal-suggestion {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-3);
+  font-weight: var(--font-medium);
+  color: var(--color-text);
+}
+
+.coach-proposal-rationale {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-bottom: var(--space-3);
+}
+
+/* ============================================
+   META INFORMATION
+   ============================================ */
+
+.coach-proposal-meta {
+  display: flex;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.coach-proposal-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-bg);
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
+
+/* ============================================
+   ACTION BUTTONS - THREE OPTION ARCHITECTURE
+   ============================================ */
+
+.coach-proposal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+#proposal-accept-btn {
+  /* "Let's go with your plan" — primary action */
+  background: var(--color-primary);
+  color: white;
+  font-weight: var(--font-semibold);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#proposal-accept-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+#proposal-accept-btn:disabled {
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#proposal-adjust-btn {
+  /* "Adjust for today" — secondary primary action */
+  background: var(--color-primary);
+  color: white;
+  font-weight: var(--font-semibold);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#proposal-adjust-btn:hover {
+  opacity: 0.9;
+}
+
+#proposal-else-btn {
+  /* "Something else entirely" — tertiary action */
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#proposal-else-btn:hover {
+  background: var(--color-bg);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ============================================
+   SEVERE PAIN OVERRIDE HELPER TEXT
+   ============================================ */
+
+.text-error {
+  color: #EF4444;
+  font-weight: var(--font-medium);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 380px) {
+  .coach-proposal-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .coach-proposal-card img {
+    width: 48px;
+    height: 48px;
+  }
+}
