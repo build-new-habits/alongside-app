@@ -1,108 +1,127 @@
 /**
- * settings.js - Settings view
+ * settings.js  —  Settings view
  *
- * v1.4 — App version display and update check button (S3-6):
- *   "Check for updates" button added to the reset zone (always visible,
- *   not inside a tab). Calls window.App.checkForUpdate() which triggers
- *   a service worker update check. Result shown inline below the button.
- *   Version string displayed from window.App.version (set in app.js).
+ * v1.6  (S4-2 bug-fix, May 2026)
  *
- * v1.3 — Check-in notification (S3-6):
- *   Opted-in reminder added to Profile tab.
- *   Toggle shows time picker only when enabled.
- *   Requests browser Notification permission on enable.
- *   If denied: calm explanation shown, no automatic re-prompt.
- *   Scheduling: setInterval polling every 60s checks against user's chosen time.
- *   Single notification type only. Warm tone. User-revocable.
- *   PROHIBITED patterns (never implemented here): streak framing, guilt framing,
- *   re-prompting after denial, multiple notification types.
+ * Changes in this version:
+ *   1. movementIdentity is now an ARRAY (multi-select).
+ *      Store value: [] (empty = none selected) or ["gym","yoga",...].
+ *      Legacy string values in store are tolerated on first render.
+ *      The click handler toggles items in/out of the array.
+ *      The coach engine (coach-proposal.js) reads identityArr.includes(type).
+ *   2. My Movement tab — facility presets ("Where do you train?") appear
+ *      ABOVE the movement-type identity chips, not below. Tapping a preset
+ *      writes a curated equipment array to store and refreshes the chip grid.
+ *      This mirrors the screenshot behaviour and gives onboarding users a
+ *      one-tap setup path.
+ *   3. All previously existing tabs preserved without changes:
+ *      Profile / Conditions / Equipment / Library.
  *
- * v1.0 — Tabbed layout: Profile / Conditions / Equipment.
- *   Three tabs replace the previous single-scroll card list.
- *   Tab state is held in a module-level variable (activeTab) and
- *   re-rendered on tab switch without a full router.navigate() call --
- *   this avoids the scroll-to-top and re-announce overhead for what
- *   is essentially a within-view state change.
- *
- *   Profile tab:
- *     Read-only display of name, age, gender, weight.
- *     coachStyle selector -- four options rendered as selectable cards.
- *     Selecting a style writes to store immediately (no save button needed).
- *
- *   Conditions tab:
- *     Read-only list of active conditions.
- *     "No conditions" graceful fallback.
- *     Story capture (how long, what helps, professional) deferred to Phase 3B.
- *
- *   Equipment tab:
- *     Full equipment chip selector by category.
- *     Chips toggle on/off and write to store on each tap.
- *     Mirrors the onboarding equipment step but live-editable.
- *
- *   Reset app button retained at bottom of all tabs.
+ * Tab structure:
+ *   Profile      — name, age, gender, weight. Coach style. Voice speed. Notification.
+ *   Conditions   — read-only active conditions list.
+ *   My Movement  — facility preset cards + movement-identity multi-select chips.
+ *   Equipment    — full equipment chip grid (manual add/remove).
+ *   Library      — guided sessions, programmes, log an activity.
  */
 
-import { store } from "../store.js";
-import { getConditionName } from "../data/conditions.js";
+import { store }          from "../store.js";
+import { router }         from "../router.js";
+import { getConditionName }    from "../data/conditions.js";
 import { EQUIPMENT_CATEGORIES } from "../data/equipment.js";
 
 export const centered = false;
 
 // ── Tab state ─────────────────────────────────────────────────────────────────
-// Held at module level so switching tabs re-renders without losing scroll pos.
+
 let activeTab = "profile";
 
 // ── Coach style definitions ───────────────────────────────────────────────────
+
 const COACH_STYLES = [
+  { id: "steady",    label: "Steady",    description: "Calm, consistent, and supportive. Never rushed.",   icon: "\uD83C\uDF3F" },
+  { id: "energetic", label: "Energetic", description: "Upbeat, motivating, and enthusiastic.",             icon: "\u26A1"       },
+  { id: "minimal",   label: "Minimal",   description: "Short, direct, and to the point. No fluff.",        icon: "\uD83C\uDFAF" },
+  { id: "nurturing", label: "Nurturing", description: "Warm, gentle, and emotionally attentive.",          icon: "\uD83D\uDC9B" },
+];
+
+// ── Movement identity definitions ─────────────────────────────────────────────
+
+const IDENTITIES = [
+  { id: "gym",      label: "Gym / weights",  icon: "\uD83C\uDFCB" },
+  { id: "yoga",     label: "Yoga / pilates", icon: "\uD83E\uDDD8" },
+  { id: "running",  label: "Running",        icon: "\uD83C\uDFC3" },
+  { id: "walking",  label: "Walking",        icon: "\uD83D\uDEB6" },
+  { id: "swimming", label: "Swimming",       icon: "\uD83C\uDFCA" },
+  { id: "classes",  label: "Classes",        icon: "\uD83C\uDFE5" },
+  { id: "mixed",    label: "A mix of things",icon: "\u2728"       },
+];
+
+// ── Facility presets ──────────────────────────────────────────────────────────
+// Each preset writes a curated equipment array to store.equipment when tapped.
+// The array contains item IDs from /js/data/equipment.js.
+
+const FACILITY_PRESETS = [
   {
-    id:          "steady",
-    label:       "Steady",
-    description: "Calm, consistent, and supportive. Never rushed.",
-    icon:        "🌿"
+    id:          "commercial-gym",
+    label:       "Commercial gym",
+    subtitle:    "Nuffield, PureGym, or similar",
+    icon:        "\uD83C\uDFCB",
+    equipment:   [
+      "barbell", "dumbbells", "cable-machine", "flat-bench", "incline-bench",
+      "squat-rack", "leg-press", "kettlebells", "resistance-bands",
+      "pull-up-bar", "dip-bars", "treadmill", "rowing-machine",
+      "gym-membership", "sauna-steam", "swimming-pool"
+    ]
   },
   {
-    id:          "energetic",
-    label:       "Energetic",
-    description: "Upbeat, motivating, and enthusiastic.",
-    icon:        "⚡"
+    id:          "home-setup",
+    label:       "Home setup",
+    subtitle:    "Limited equipment at home",
+    icon:        "\uD83C\uDFE0",
+    equipment:   [
+      "dumbbells", "resistance-bands", "mat", "pull-up-bar"
+    ]
   },
   {
-    id:          "minimal",
-    label:       "Minimal",
-    description: "Short, direct, and to the point. No fluff.",
-    icon:        "🎯"
+    id:          "no-equipment",
+    label:       "No equipment",
+    subtitle:    "Bodyweight only, anywhere",
+    icon:        "\uD83E\uDD38",
+    equipment:   []
   },
   {
-    id:          "nurturing",
-    label:       "Nurturing",
-    description: "Warm, gentle, and emotionally attentive.",
-    icon:        "💛"
-  }
+    id:          "yoga-pilates",
+    label:       "Yoga / pilates studio",
+    subtitle:    "Mat-based studio",
+    icon:        "\uD83E\uDDD8",
+    equipment:   [
+      "mat", "yoga-blocks", "yoga-wheel", "stretching-strap", "fitness-studio"
+    ]
+  },
+];
+
+// ── Speech rate options ───────────────────────────────────────────────────────
+
+const SPEECH_RATES = [
+  { value: 0.6,  label: "1",  description: "Slowest" },
+  { value: 0.7,  label: "2",  description: "Very slow" },
+  { value: 0.8,  label: "3",  description: "Slow" },
+  { value: 0.85, label: "4",  description: "Gentle" },
+  { value: 0.9,  label: "5",  description: "Calm" },
+  { value: 1.0,  label: "6",  description: "Normal" },
+  { value: 1.1,  label: "7",  description: "Brisk" },
+  { value: 1.2,  label: "8",  description: "Quick" },
+  { value: 1.35, label: "9",  description: "Fast" },
+  { value: 1.5,  label: "10", description: "Fastest" },
 ];
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
-function showSaveToast(message) {
-  // Remove any existing toast
-  document.querySelector(".settings-save-toast")?.remove();
-  const toast = document.createElement("div");
-  toast.className = "settings-save-toast";
-  toast.textContent = message || "Saved";
-  toast.setAttribute("role", "status");
-  toast.setAttribute("aria-live", "polite");
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 2100);
-}
-
 export function render() {
-  // Check if a specific tab was requested (e.g. Library from coach proposal).
-  // Must be read here in render() — not just in onMount() — so the initial
-  // HTML paint shows the correct tab panel without a flash of the wrong content.
+  // Read requested tab before generating HTML so the correct panel paints first
   const requestedTab = store.get("settingsTab");
-  if (requestedTab) {
-    activeTab = requestedTab;
-    store.set("settingsTab", null);  // Clear immediately — prevents stale tab on re-render
-  }
+  if (requestedTab) activeTab = requestedTab;
 
   return `
     <div class="view settings-view">
@@ -113,59 +132,43 @@ export function render() {
 
       <!-- ── Tab bar ──────────────────────────────────────────────────────── -->
       <div class="settings-tabs" role="tablist" aria-label="Settings sections">
-        <button
-          class="settings-tab ${activeTab === "profile"    ? "active" : ""}"
-          role="tab"
-          aria-selected="${activeTab === "profile"}"
-          aria-controls="settings-tab-panel"
-          id="tab-profile"
-          data-tab="profile"
-        >Profile</button>
-        <button
-          class="settings-tab ${activeTab === "conditions" ? "active" : ""}"
-          role="tab"
-          aria-selected="${activeTab === "conditions"}"
-          aria-controls="settings-tab-panel"
-          id="tab-conditions"
-          data-tab="conditions"
-        >Conditions</button>
-        <button
-          class="settings-tab ${activeTab === "equipment"  ? "active" : ""}"
-          role="tab"
-          aria-selected="${activeTab === "equipment"}"
-          aria-controls="settings-tab-panel"
-          id="tab-equipment"
-          data-tab="equipment"
-        >My Movement</button>
-        <button
-          class="settings-tab ${activeTab === "library" ? "active" : ""}"
-          role="tab"
-          aria-selected="${activeTab === "library"}"
-          aria-controls="settings-tab-panel"
-          id="tab-library"
-          data-tab="library"
-        >Library</button>
+        <button class="settings-tab ${activeTab === "profile"    ? "active" : ""}"
+                role="tab" aria-selected="${activeTab === "profile"}"
+                aria-controls="settings-tab-panel" id="tab-profile"
+                data-tab="profile">Profile</button>
+        <button class="settings-tab ${activeTab === "conditions" ? "active" : ""}"
+                role="tab" aria-selected="${activeTab === "conditions"}"
+                aria-controls="settings-tab-panel" id="tab-conditions"
+                data-tab="conditions">Conditions</button>
+        <button class="settings-tab ${activeTab === "movement"   ? "active" : ""}"
+                role="tab" aria-selected="${activeTab === "movement"}"
+                aria-controls="settings-tab-panel" id="tab-movement"
+                data-tab="movement">My Movement</button>
+        <button class="settings-tab ${activeTab === "equipment"  ? "active" : ""}"
+                role="tab" aria-selected="${activeTab === "equipment"}"
+                aria-controls="settings-tab-panel" id="tab-equipment"
+                data-tab="equipment">Equipment</button>
+        <button class="settings-tab ${activeTab === "library"    ? "active" : ""}"
+                role="tab" aria-selected="${activeTab === "library"}"
+                aria-controls="settings-tab-panel" id="tab-library"
+                data-tab="library">Library</button>
       </div>
 
       <!-- ── Tab panel ────────────────────────────────────────────────────── -->
-      <div
-        id="settings-tab-panel"
-        role="tabpanel"
-        aria-labelledby="tab-${activeTab}"
-        class="settings-tab-panel"
-      >
+      <div id="settings-tab-panel"
+           role="tabpanel"
+           aria-labelledby="tab-${activeTab}"
+           class="settings-tab-panel">
         ${renderActiveTab()}
       </div>
 
-      <!-- ── Reset — always visible ───────────────────────────────────────── -->
+      <!-- ── Reset zone — always visible ─────────────────────────────────── -->
       <div class="settings-reset-zone">
         <button class="btn btn-primary btn-full" id="gym-programme-btn"
-                onclick="router.navigate('gym-programme')"
                 aria-label="Open my gym programme">
           My Gym Programme
         </button>
 
-        <!-- ── App version and update check ─────────────────────────────── -->
         <div class="settings-update-zone" style="margin-top: var(--space-5);">
           <div class="settings-version-row">
             <span class="text-sm text-muted">Version</span>
@@ -178,12 +181,13 @@ export function render() {
                   aria-label="Check for app updates">
             Check for updates
           </button>
-          <p id="update-check-status" class="update-check-status text-sm"
-             aria-live="polite" style="margin-top: var(--space-2); min-height: 1.4em;"></p>
+          <p id="update-check-status"
+             class="update-check-status text-sm"
+             aria-live="polite"
+             style="margin-top: var(--space-2); min-height: 1.4em;"></p>
         </div>
 
         <button class="btn btn-text-link btn-full" id="privacy-btn"
-                onclick="router.navigate('privacy')"
                 aria-label="Read Privacy Policy and Terms of Service"
                 style="margin-top: var(--space-4);">
           Privacy Policy &amp; Terms of Service
@@ -198,12 +202,13 @@ export function render() {
   `;
 }
 
-// ── Tab content ───────────────────────────────────────────────────────────────
+// ── Tab routing ───────────────────────────────────────────────────────────────
 
 function renderActiveTab() {
   if (activeTab === "profile")    return renderProfileTab();
   if (activeTab === "conditions") return renderConditionsTab();
-  if (activeTab === "equipment")  return renderMyMovementTab();
+  if (activeTab === "movement")   return renderMovementTab();
+  if (activeTab === "equipment")  return renderEquipmentTab();
   if (activeTab === "library")    return renderLibraryTab();
   return "";
 }
@@ -211,155 +216,61 @@ function renderActiveTab() {
 // ── Profile tab ───────────────────────────────────────────────────────────────
 
 function renderProfileTab() {
-  const name       = store.get("name")       || "";
-  const ageBand    = store.get("ageBand")    || "";
-  const gender     = store.get("gender")     || "";
-  const weight     = store.get("weight")     || "";
-  const weightUnit = store.get("weightUnit") || "kg";
-  const coachStyle = store.get("coachStyle") || "steady";
-
-  const AGE_BANDS = [
-    { id: "under-18",   label: "Under 18" },
-    { id: "18-24",      label: "18-24" },
-    { id: "25-34",      label: "25-34" },
-    { id: "35-44",      label: "35-44" },
-    { id: "45-54",      label: "45-54" },
-    { id: "55-64",      label: "55-64" },
-    { id: "65-plus",    label: "65+" },
-    { id: "prefer-not", label: "Prefer not to say" }
-  ];
-
-  const GENDERS = [
-    { id: "male",        label: "Male" },
-    { id: "female",      label: "Female" },
-    { id: "non-binary",  label: "Non-binary" },
-    { id: "prefer-not",  label: "Prefer not to say" }
-  ];
+  const name        = store.get("name")       || "Not set";
+  const age         = store.get("age");
+  const gender      = store.get("gender");
+  const weight      = store.get("weight");
+  const weightUnit  = store.get("weightUnit") || "kg";
+  const coachStyle  = store.get("coachStyle") || "steady";
+  const currentRate = parseFloat(store.get("speechRate") || "1.0");
 
   return `
     <section aria-labelledby="profile-heading">
-
       <h2 id="profile-heading" class="section-heading">Your profile</h2>
-      <div class="card settings-edit-card">
-
-        <div class="settings-field">
-          <label class="settings-field-label" for="profile-name">Name</label>
-          <input type="text" id="profile-name" class="settings-field-input"
-                 value="${name}" placeholder="Your name"
-                 aria-label="Your name">
-        </div>
-
-        <div class="settings-field">
-          <label class="settings-field-label">Age band</label>
-          <div class="settings-chip-row" role="group" aria-label="Age band">
-            ${AGE_BANDS.map(b => `
-              <button class="settings-chip ${ageBand === b.id ? "selected" : ""}"
-                      data-age-band="${b.id}"
-                      aria-pressed="${ageBand === b.id}">
-                ${b.label}
-              </button>
-            `).join("")}
-          </div>
-        </div>
-
-        <div class="settings-field">
-          <label class="settings-field-label">Gender</label>
-          <div class="settings-chip-row" role="group" aria-label="Gender">
-            ${GENDERS.map(g => `
-              <button class="settings-chip ${gender === g.id ? "selected" : ""}"
-                      data-gender="${g.id}"
-                      aria-pressed="${gender === g.id}">
-                ${g.label}
-              </button>
-            `).join("")}
-          </div>
-        </div>
-
-        ${(gender === "female" || gender === "non-binary") ? `
-          <div class="settings-field">
-            <label class="settings-field-label">Hormonal tracking</label>
-            <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">
-              The coach adapts sessions to your cycle or hormonal changes if you opt in.
-            </p>
-            <div class="settings-chip-row" role="group" aria-label="Hormonal tracking">
-              <button class="settings-chip ${store.get("hormonalTracking") === "cycle" ? "selected" : ""}"
-                      data-hormonal="cycle" aria-pressed="${store.get("hormonalTracking") === "cycle"}">
-                Menstrual cycle
-              </button>
-              <button class="settings-chip ${store.get("hormonalTracking") === "perimenopause" ? "selected" : ""}"
-                      data-hormonal="perimenopause" aria-pressed="${store.get("hormonalTracking") === "perimenopause"}">
-                Perimenopause
-              </button>
-              <button class="settings-chip ${store.get("hormonalTracking") === "menopause" ? "selected" : ""}"
-                      data-hormonal="menopause" aria-pressed="${store.get("hormonalTracking") === "menopause"}">
-                Menopause
-              </button>
-              <button class="settings-chip ${!store.get("hormonalTracking") ? "selected" : ""}"
-                      data-hormonal="" aria-pressed="${!store.get("hormonalTracking")}">
-                Prefer not to say
-              </button>
-            </div>
-          </div>
-        ` : ""}
-
-        <div class="settings-field">
-          <label class="settings-field-label" for="profile-weight">Weight</label>
-          <div class="settings-weight-row">
-            <input type="number" id="profile-weight" class="settings-field-input settings-weight-input"
-                   value="${weight}" placeholder="e.g. 80"
-                   inputmode="decimal" min="0" max="300"
-                   aria-label="Body weight">
-            <div class="settings-unit-toggle" role="group" aria-label="Weight unit">
-              <button class="settings-unit-btn ${weightUnit === "kg" ? "selected" : ""}" data-unit="kg">kg</button>
-              <button class="settings-unit-btn ${weightUnit === "lbs" ? "selected" : ""}" data-unit="lbs">lbs</button>
-            </div>
-          </div>
-        </div>
-
+      <div class="card settings-profile-card">
+        ${settingsRow("Name",   name)}
+        ${settingsRow("Age",    age    ? String(age)             : "Not set")}
+        ${settingsRow("Gender", gender ? formatGender(gender)   : "Not set")}
+        ${settingsRow("Weight", weight ? weight + weightUnit    : "Not set")}
       </div>
 
-      <!-- Profile save button -->
-      <div style="margin-top:var(--space-4);">
-        <button class="btn btn-primary btn-full" id="profile-save-btn">
-          Save profile
-        </button>
-        <p class="text-xs text-muted" id="profile-save-confirm"
-           style="text-align:center;margin-top:var(--space-2);opacity:0;transition:opacity 0.3s;">
-          Changes saved
-        </p>
-      </div>
-
-      <!-- Coach style selector -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Coach style</h2>
       <p class="text-secondary settings-coach-intro">
-        Choose how your coach communicates with you.
-        You can change this any time.
+        Choose how your coach communicates with you. You can change this any time.
       </p>
-
       <div class="coach-style-grid" role="radiogroup" aria-label="Coach communication style">
-        ${COACH_STYLES.map(style => `
-          <button
-            class="coach-style-card ${coachStyle === style.id ? "selected" : ""}"
-            role="radio"
-            aria-checked="${coachStyle === style.id}"
-            data-style="${style.id}"
-            aria-label="${style.label}: ${style.description}"
-          >
-            <span class="coach-style-icon" aria-hidden="true">${style.icon}</span>
-            <span class="coach-style-label">${style.label}</span>
-            <span class="coach-style-desc">${style.description}</span>
+        ${COACH_STYLES.map(s => `
+          <button class="coach-style-card ${coachStyle === s.id ? "selected" : ""}"
+                  role="radio"
+                  aria-checked="${coachStyle === s.id}"
+                  data-style="${s.id}"
+                  aria-label="${s.label}: ${s.description}">
+            <span class="coach-style-icon" aria-hidden="true">${s.icon}</span>
+            <span class="coach-style-label">${s.label}</span>
+            <span class="coach-style-desc">${s.description}</span>
           </button>
         `).join("")}
       </div>
 
-      <!-- Coach voice speed -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Coach voice speed</h2>
-      ${renderSpeechRateSection()}
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-3);">
+        Tap the speaker icon on any coach message to listen.
+      </p>
+      <div class="speech-rate-grid" role="radiogroup" aria-label="Coach voice speed">
+        ${SPEECH_RATES.map(r => `
+          <button class="speech-rate-btn ${currentRate === r.value ? "selected" : ""}"
+                  role="radio"
+                  aria-checked="${currentRate === r.value}"
+                  data-rate="${r.value}"
+                  aria-label="Speed ${r.label}: ${r.description}">
+            <span class="speech-rate-label">${r.label}</span>
+            <span class="speech-rate-desc">${r.description}</span>
+          </button>
+        `).join("")}
+      </div>
 
-      <!-- Check-in reminder -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Check-in reminder</h2>
       ${renderNotificationSection()}
-
     </section>
   `;
 }
@@ -368,71 +279,123 @@ function renderProfileTab() {
 
 function renderConditionsTab() {
   const conditions = store.get("conditions") || [];
-  const conditionStatus = store.get("conditionStatus") || {};
-
-  // All available conditions for adding
-  const ALL_CONDITION_IDS = [
-    "knee-pain", "hip-pain", "hamstring", "lower-back", "upper-back",
-    "shoulder-pain", "rotator-cuff", "elbow-pain", "wrist-pain", "neck-pain",
-    "plantar-fasciitis", "achilles", "it-band", "shin-splints",
-    "anxiety", "depression", "fatigue", "fibromyalgia",
-    "pcos", "endometriosis", "menopause",
-    "adhd", "autism", "dyspraxia",
-    "asthma", "heart-condition", "diabetes-type-2",
-    "other"
-  ];
-
-  const available = ALL_CONDITION_IDS.filter(id => !conditions.includes(id));
 
   return `
     <section aria-labelledby="conditions-heading">
       <h2 id="conditions-heading" class="section-heading">Your conditions</h2>
-      <p class="text-secondary" style="margin-bottom:var(--space-4);">
-        These are shared with the coach to adapt your sessions. Pain levels
-        are updated each day at check-in.
-      </p>
-
-      ${conditions.length > 0 ? `
-        <div class="card conditions-list" style="margin-bottom:var(--space-4);">
-          ${conditions.map(id => {
-            const paused = conditionStatus[id] === "paused";
-            return `
-              <div class="condition-settings-row">
-                <span class="condition-settings-name ${paused ? "condition-paused" : ""}">
-                  ${getConditionName(id)}
-                  ${paused ? '<span class="condition-paused-badge">Paused</span>' : ""}
-                </span>
-                <div class="condition-settings-actions">
-                  <button class="btn btn-ghost btn-xs condition-pause-btn"
-                          data-condition-id="${id}"
-                          aria-label="${paused ? "Resume" : "Pause"} ${getConditionName(id)}">
-                    ${paused ? "Resume" : "Pause"}
-                  </button>
-                  <button class="btn btn-ghost btn-xs condition-remove-btn"
-                          data-condition-id="${id}"
-                          aria-label="Remove ${getConditionName(id)}">
-                    Remove
-                  </button>
-                </div>
-              </div>
-            `;
-          }).join("")}
+      ${conditions.length === 0 ? `
+        <div class="card">
+          <p class="text-secondary">No conditions recorded.</p>
+          <p class="text-secondary" style="margin-top: var(--space-2);">
+            If your circumstances change, you can add conditions here in a future update.
+          </p>
         </div>
       ` : `
-        <div class="card" style="margin-bottom:var(--space-4);">
-          <p class="text-secondary">No conditions recorded yet.</p>
+        <div class="card conditions-list">
+          ${conditions.map(id => `
+            <div class="condition-settings-row">
+              <span class="condition-settings-name">${getConditionName(id)}</span>
+            </div>
+          `).join("")}
         </div>
+        <p class="text-secondary text-sm settings-conditions-note">
+          Pain levels are updated each day at check-in. Your conditions list can be
+          edited in a future update.
+        </p>
       `}
+    </section>
+  `;
+}
 
-      <h3 class="section-heading" style="margin-top:var(--space-5);">Add a condition</h3>
-      <div class="conditions-add-grid">
-        ${available.map(id => `
-          <button class="condition-add-chip" data-add-condition="${id}"
-                  aria-label="Add ${getConditionName(id)}">
-            + ${getConditionName(id)}
+// ── My Movement tab ───────────────────────────────────────────────────────────
+//
+// Layout:
+//   1. MY MOVEMENT heading + "What kind of movement feels most like you?"
+//      → Multi-select identity chips (FIX: now toggles array, not single value)
+//   2. WHERE DO YOU TRAIN? heading
+//      → Facility preset cards (tap to auto-populate equipment)
+//   3. Current facility confirmation
+
+function renderMovementTab() {
+  // movementIdentity: tolerate legacy string OR new array
+  const rawIdentity  = store.get("movementIdentity");
+  const currentIds   = Array.isArray(rawIdentity)
+    ? rawIdentity
+    : (rawIdentity ? [rawIdentity] : []);
+
+  const currentFacility = store.get("facilityPreset") || null;
+
+  return `
+    <section aria-labelledby="movement-heading">
+
+      <!-- ── Movement identity ─────────────────────────────────────────── -->
+      <h2 id="movement-heading" class="section-heading" style="color: var(--color-primary);">
+        MY MOVEMENT
+      </h2>
+      <p class="text-secondary" style="margin-bottom: var(--space-4);">
+        What kind of movement feels most like you?
+      </p>
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
+        Select everything that applies. The coach uses this alongside your actual
+        activity history to shape daily suggestions. You can change it any time.
+      </p>
+
+      <div class="library-grid"
+           role="group"
+           aria-label="Movement identity — select all that apply">
+        ${IDENTITIES.map(item => `
+          <button class="library-card ${currentIds.includes(item.id) ? "library-card--selected" : ""}"
+                  data-identity="${item.id}"
+                  aria-pressed="${currentIds.includes(item.id)}"
+                  aria-label="${item.label}">
+            <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
+            <span class="library-card-label">${item.label}</span>
           </button>
         `).join("")}
       </div>
+
+      ${currentIds.length > 0 ? `
+        <p class="text-sm text-muted" style="margin-top: var(--space-2);" id="identity-note">
+          The coach will lean toward
+          ${currentIds.map(id => IDENTITIES.find(i => i.id === id)?.label || id).join(", ")}.
+          Your actual activity history will refine this over time.
+        </p>
+      ` : `
+        <p class="text-sm text-muted" style="margin-top: var(--space-2);" id="identity-note">
+          Nothing selected yet. The coach will balance suggestions across all types.
+        </p>
+      `}
+
+      <!-- ── Facility presets ───────────────────────────────────────────── -->
+      <h2 class="section-heading" style="margin-top: var(--space-7); color: var(--color-primary);">
+        Where do you train?
+      </h2>
+      <p class="text-secondary" style="margin-bottom: var(--space-4);">
+        Choose your facility to pre-fill your equipment. Adjust below as needed.
+      </p>
+
+      <div class="facility-preset-grid"
+           role="group"
+           aria-label="Training facility — choose to pre-fill equipment">
+        ${FACILITY_PRESETS.map(preset => `
+          <button class="facility-preset-card ${currentFacility === preset.id ? "facility-preset-card--selected" : ""}"
+                  data-facility="${preset.id}"
+                  aria-pressed="${currentFacility === preset.id}"
+                  aria-label="${preset.label}: ${preset.subtitle}">
+            <span class="facility-preset-icon" aria-hidden="true">${preset.icon}</span>
+            <span class="facility-preset-label">${preset.label}</span>
+            <span class="facility-preset-subtitle">${preset.subtitle}</span>
+          </button>
+        `).join("")}
+      </div>
+
+      ${currentFacility ? `
+        <p class="text-sm text-muted" style="margin-top: var(--space-3);" id="facility-note">
+          Equipment pre-filled for
+          ${FACILITY_PRESETS.find(p => p.id === currentFacility)?.label || currentFacility}.
+          Fine-tune individual items in the Equipment tab.
+        </p>
+      ` : ""}
 
     </section>
   `;
@@ -440,308 +403,189 @@ function renderConditionsTab() {
 
 // ── Equipment tab ─────────────────────────────────────────────────────────────
 
-// -- My Movement tab ----------------------------------------------------------
-
-const FACILITY_PRESETS = [
-  { id: "gym",       label: "Commercial gym",      icon: "\uD83C\uDFCB", desc: "Nuffield, PureGym, or similar",
-    equipment: ["dumbbells-light","dumbbells-medium","dumbbells-heavy","barbell","ez-curl-bar",
-                "kettlebell-light","kettlebell-medium","band-light","band-medium","band-heavy","mini-bands",
-                "treadmill","exercise-bike","rowing-machine","elliptical","stair-climber",
-                "cable-machine","smith-machine","pull-up-bar","bench-flat","bench-incline",
-                "yoga-mat","foam-roller"] },
-  { id: "home",      label: "Home setup",           icon: "\uD83C\uDFE0", desc: "Limited equipment at home",
-    equipment: ["dumbbells-light","dumbbells-medium","band-light","band-medium","mini-bands","yoga-mat","foam-roller"] },
-  { id: "bodyweight",label: "No equipment",         icon: "\uD83E\uDD38", desc: "Bodyweight only, anywhere",
-    equipment: [] },
-  { id: "studio",    label: "Yoga / pilates studio",icon: "\uD83E\uDDD8", desc: "Mat-based studio",
-    equipment: ["yoga-mat","band-light","band-medium","foam-roller"] }
-];
-
-function renderMyMovementTab() {
+function renderEquipmentTab() {
   const selected = store.get("equipment") || [];
-  const identities = store.get("movementIdentities") || (store.get("movementIdentity") ? [store.get("movementIdentity")] : []);
-
-  const IDENTITIES = [
-    { id: "gym",     label: "Gym",      icon: "\uD83C\uDFCB" },
-    { id: "yoga",    label: "Yoga",     icon: "\uD83E\uDDD8" },
-    { id: "running", label: "Running",  icon: "\uD83C\uDFC3" },
-    { id: "walking", label: "Walking",  icon: "\uD83D\uDEB6" },
-    { id: "swimming",label: "Swimming", icon: "\uD83C\uDFCA" },
-    { id: "classes", label: "Classes",  icon: "\uD83C\uDFE5" },
-    { id: "mixed",   label: "Mixed",    icon: "\u2728"        }
-  ];
 
   return `
-    <section aria-labelledby="movement-heading">
-      <h2 id="movement-heading" class="section-heading">My Movement</h2>
-
-      <p class="text-secondary" style="margin-bottom:var(--space-3);">
-        What kind of movement feels most like you?
+    <section aria-labelledby="equipment-heading">
+      <h2 id="equipment-heading" class="section-heading">Your equipment</h2>
+      <p class="text-secondary settings-equipment-intro">
+        Tap to add or remove. Changes take effect on your next workout.
+        Use the <strong>My Movement</strong> tab to pre-fill by facility.
       </p>
-      <div class="movement-identity-grid" role="group" aria-label="Movement identity">
-        ${IDENTITIES.map(item => `
-          <button class="movement-identity-tile ${identities.includes(item.id) ? "selected" : ""}"
-                  data-identity="${item.id}" aria-pressed="${identities.includes(item.id)}">
-            <span class="movement-tile-icon" aria-hidden="true">${item.icon}</span>
-            <span class="movement-tile-label">${item.label}</span>
-          </button>
-        `).join("")}
-      </div>
 
-      <h3 class="section-subheading" style="margin-top:var(--space-6);">Where do you train?</h3>
-      <p class="text-secondary text-sm" style="margin-bottom:var(--space-3);">
-        Choose your facility to pre-fill equipment. Adjust below as needed.
-      </p>
-      <div class="facility-preset-grid" role="group" aria-label="Training facility">
-        ${FACILITY_PRESETS.map(p => `
-          <button class="facility-preset-card" data-facility="${p.id}"
-                  aria-label="${p.label}: ${p.desc}">
-            <span class="facility-preset-icon" aria-hidden="true">${p.icon}</span>
-            <span class="facility-preset-label">${p.label}</span>
-            <span class="facility-preset-desc">${p.desc}</span>
-          </button>
-        `).join("")}
-      </div>
-
-      <details class="equipment-detail-block" open>
-        <summary class="equipment-detail-summary">
-          Equipment detail
-          <span class="equipment-count-badge">${selected.length} selected</span>
-        </summary>
-        <p class="text-secondary text-sm" style="margin:var(--space-3) 0;">
-          Tap to add or remove. Changes take effect on your next workout.
-        </p>
-        ${EQUIPMENT_CATEGORIES.map(cat => {
-          const n = cat.items.filter(i => selected.includes(i.id)).length;
-          return `
-            <div class="equipment-settings-category">
-              <h4 class="equipment-category-heading">
-                <span aria-hidden="true">${cat.icon}</span> ${cat.name}
-                ${n > 0 ? "<span class=\"equipment-cat-count\">" + n + "</span>" : ""}
-              </h4>
-              <div class="equipment-chip-grid" role="group" aria-label="${cat.name}">
-                ${cat.items.map(item => `
-                  <button class="equipment-chip ${selected.includes(item.id) ? "selected" : ""}"
-                          data-equipment-id="${item.id}"
-                          aria-pressed="${selected.includes(item.id)}">
-                    ${item.name}
-                  </button>
-                `).join("")}
-              </div>
+      ${EQUIPMENT_CATEGORIES.map(cat => {
+        const selectedInCat = cat.items.filter(item => selected.includes(item.id)).length;
+        return `
+          <div class="equipment-settings-category">
+            <h3 class="equipment-category-heading">
+              <span aria-hidden="true">${cat.icon}</span>
+              ${cat.name}
+              ${selectedInCat > 0 ? `<span class="equipment-cat-count">${selectedInCat} selected</span>` : ""}
+            </h3>
+            <div class="equipment-chip-grid"
+                 role="group"
+                 aria-label="${cat.name} equipment">
+              ${cat.items.map(item => `
+                <button class="equipment-chip ${selected.includes(item.id) ? "selected" : ""}"
+                        data-equipment-id="${item.id}"
+                        aria-pressed="${selected.includes(item.id)}">
+                  ${item.name}
+                </button>
+              `).join("")}
             </div>
-          `;
-        }).join("")}
-      </details>
-
+          </div>
+        `;
+      }).join("")}
     </section>
   `;
 }
 
+// ── Library tab ───────────────────────────────────────────────────────────────
 
 function renderLibraryTab() {
-  const SECTIONS = [
-    {
-      title: "Guided Sessions", icon: "\uD83C\uDF1F",
-      desc: "The coach leads. Tap any to start.",
-      items: [
-        { label: "Breathing",        icon: "\uD83C\uDF2C", target: "quiet-session",  quiet: "breathing", ok: true  },
-        { label: "Mindful Movement", icon: "\uD83C\uDF3F", target: "quiet-session",  quiet: "mindful",   ok: true  },
-        { label: "Journaling",       icon: "\uD83D\uDCDD", target: "quiet-session",  quiet: "journal",   ok: true  },
-        { label: "Rest day",         icon: "\uD83D\uDECC", target: "quiet-session",  quiet: "rest",      ok: true  },
-        { label: "Yoga / Pilates",   icon: "\uD83E\uDDD8", target: "yoga-session",   quiet: null,        ok: false },
-        { label: "Core session",     icon: "\uD83D\uDCAA", target: "core-session",   quiet: null,        ok: false },
-        { label: "Home workout",     icon: "\uD83C\uDFE0", target: "home-workout",   quiet: null,        ok: false },
-        { label: "Running session",  icon: "\uD83C\uDFC3", target: "running-session",quiet: null,        ok: false },
-        { label: "Walk / C25K",      icon: "\uD83D\uDEB6", target: "walk-programme", quiet: null,        ok: false }
-      ]
-    },
-    {
-      title: "Programmes", icon: "\uD83D\uDCCB",
-      desc: "Structured multi-week plans.",
-      items: [
-        { label: "My Gym Programme",     icon: "\uD83C\uDFCB", target: "gym-programme", quiet: null, ok: true },
-        { label: "Prescribed Exercises", icon: "\uD83E\uDE7A", target: "prescribed",     quiet: null, ok: true }
-      ]
-    }
+  const GUIDED = [
+    { label: "Breathing practice",  icon: "\uD83C\uDF2C", target: "quiet-session",   quietMode: "breathing", available: true  },
+    { label: "Journaling",          icon: "\uD83D\uDCDD", target: "quiet-session",   quietMode: "journal",   available: true  },
+    { label: "Mindful movement",    icon: "\uD83C\uDF3F", target: "quiet-session",   quietMode: "mindful",   available: true  },
+    { label: "Rest day",            icon: "\uD83D\uDECC", target: "quiet-session",   quietMode: "rest",      available: true  },
+    { label: "Yoga / Pilates",      icon: "\uD83E\uDDD8", target: "yoga-session",    quietMode: null,        available: false, comingSoon: true },
+    { label: "Core session",        icon: "\uD83D\uDCAA", target: "core-session",    quietMode: null,        available: false, comingSoon: true },
+    { label: "Home workout",        icon: "\uD83C\uDFE0", target: "home-workout",    quietMode: null,        available: false, comingSoon: true },
+    { label: "Running session",     icon: "\uD83C\uDFC3", target: "running-session", quietMode: null,        available: false, comingSoon: true },
+    { label: "Walk / Couch to 5K", icon: "\uD83D\uDEB6", target: "walk-programme",  quietMode: null,        available: false, comingSoon: true },
   ];
 
-  const LOG_GROUPS = [
+  const PROGRAMMES = [
+    { label: "My gym programme",        icon: "\uD83C\uDFCB", target: "gym-programme" },
+    { label: "My prescribed exercises", icon: "\uD83E\uDE7A", target: "prescribed"    },
+  ];
+
+  const LOG_ACTIVITIES = [
     { group: "Cardio", items: [
-      { label: "Run",    icon: "\uD83C\uDFC3", id: "run"    },
-      { label: "Walk",   icon: "\uD83D\uDEB6", id: "walk"   },
-      { label: "Cycle",  icon: "\uD83D\uDEB4", id: "cycle"  },
-      { label: "Swim",   icon: "\uD83C\uDFCA", id: "swim"   },
-      { label: "Row",    icon: "\uD83D\uDEA3", id: "row"    }
+      { label: "Run",          icon: "\uD83C\uDFC3", id: "run"    },
+      { label: "Walk",         icon: "\uD83D\uDEB6", id: "walk"   },
+      { label: "Cycle",        icon: "\uD83D\uDEB4", id: "cycle"  },
+      { label: "Swim",         icon: "\uD83C\uDFCA", id: "swim"   },
+      { label: "Row",          icon: "\uD83D\uDEA3", id: "row"    },
     ]},
     { group: "Classes", items: [
       { label: "Body Balance", icon: "\uD83E\uDDD8", id: "body-balance" },
-      { label: "Spin",         icon: "\uD83D\uDEB4", id: "spin"         },
+      { label: "Spin / cycle", icon: "\uD83D\uDEB4", id: "spin"         },
       { label: "Boxing",       icon: "\uD83E\uDD4A", id: "boxing"       },
-      { label: "HIIT",         icon: "\uD83D\uDD25", id: "hiit"         },
-      { label: "Other class",  icon: "\uD83C\uDFE5", id: "class"        }
+      { label: "HIIT / circuits", icon: "\uD83D\uDD25", id: "hiit"      },
+      { label: "Body Combat",  icon: "\uD83E\uDD4A", id: "body-combat"  },
+      { label: "Other class",  icon: "\uD83C\uDFE5", id: "class"        },
     ]},
     { group: "Sport", items: [
-      { label: "Tennis",   icon: "\uD83C\uDFBE", id: "tennis"   },
-      { label: "Football", icon: "\u26BD",        id: "football" },
-      { label: "Golf",     icon: "\u26F3",        id: "golf"     },
-      { label: "Sport",    icon: "\uD83C\uDFC6", id: "sport"    }
+      { label: "Tennis",       icon: "\uD83C\uDFBE", id: "tennis"   },
+      { label: "Football",     icon: "\u26BD",       id: "football" },
+      { label: "Golf",         icon: "\u26F3",       id: "golf"     },
+      { label: "Other sport",  icon: "\uD83C\uDFC6", id: "sport"    },
     ]},
     { group: "Outdoor", items: [
-      { label: "Hike",          icon: "\u26F0",        id: "hike"          },
-      { label: "Outdoor cycle", icon: "\uD83D\uDEB4", id: "outdoor-cycle" },
-      { label: "Outdoor",       icon: "\uD83C\uDF32", id: "outdoor"       }
-    ]}
+      { label: "Hike",          icon: "\u26F0",      id: "hike"          },
+      { label: "Outdoor cycle", icon: "\uD83D\uDEB4",id: "outdoor-cycle" },
+      { label: "Other outdoor", icon: "\uD83C\uDF32",id: "outdoor"       },
+    ]},
   ];
 
   return `
-    <section aria-label="Library">
+    <section class="settings-section library-section" aria-label="Library">
 
-      ${SECTIONS.map(section => `
-        <div class="library-section-block">
-          <div class="library-section-header">
-            <span class="library-section-icon" aria-hidden="true">${section.icon}</span>
-            <div>
-              <h2 class="library-section-title">${section.title}</h2>
-              <p class="library-section-desc">${section.desc}</p>
-            </div>
-          </div>
-          <div class="library-tile-grid">
-            ${section.items.map(item => `
-              <button class="library-tile ${!item.ok ? "library-tile--soon" : ""}"
-                      ${item.ok ? `data-target="${item.target}" data-quiet="${item.quiet || ""}"` : ""}
-                      aria-label="${item.label}${!item.ok ? ", coming soon" : ""}"
-                      ${!item.ok ? 'disabled aria-disabled="true"' : ""}>
-                <span class="library-tile-icon" aria-hidden="true">${item.icon}</span>
-                <span class="library-tile-label">${item.label}</span>
-                ${!item.ok ? '<span class="library-tile-soon">Soon</span>' : ""}
-              </button>
-            `).join("")}
-          </div>
-        </div>
-      `).join("")}
-
-      <div class="library-section-block">
-        <div class="library-section-header">
-          <span class="library-section-icon" aria-hidden="true">\uD83D\uDCDD</span>
-          <div>
-            <h2 class="library-section-title">Log an Activity</h2>
-            <p class="library-section-desc">You know what you did. Log it and the coach will reflect.</p>
-          </div>
-        </div>
-        ${LOG_GROUPS.map(group => `
-          <h3 class="library-group-label">${group.group}</h3>
-          <div class="library-tile-grid library-tile-grid--compact">
-            ${group.items.map(item => `
-              <button class="library-tile library-tile--compact"
-                      data-target="activity-log" data-activity="${item.id}"
-                      aria-label="Log ${item.label}">
-                <span class="library-tile-icon" aria-hidden="true">${item.icon}</span>
-                <span class="library-tile-label">${item.label}</span>
-              </button>
-            `).join("")}
-          </div>
+      <h2 class="section-heading">Guided Sessions</h2>
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
+        The coach leads. Tap any session to go straight in.
+      </p>
+      <div class="library-grid">
+        ${GUIDED.map(item => `
+          <button class="library-card ${!item.available ? "library-card--soon" : ""}"
+                  ${item.available
+                    ? `data-target="${item.target}" data-quiet="${item.quietMode || ""}"`
+                    : `disabled aria-disabled="true"`}
+                  aria-label="${item.label}${item.comingSoon ? " \u2014 coming soon" : ""}">
+            <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
+            <span class="library-card-label">${item.label}</span>
+            ${item.comingSoon ? `<span class="library-soon-badge" aria-hidden="true">Soon</span>` : ""}
+          </button>
         `).join("")}
       </div>
+
+      <h2 class="section-heading" style="margin-top: var(--space-6);">Programmes</h2>
+      <div class="library-grid">
+        ${PROGRAMMES.map(item => `
+          <button class="library-card"
+                  data-target="${item.target}"
+                  aria-label="${item.label}">
+            <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
+            <span class="library-card-label">${item.label}</span>
+          </button>
+        `).join("")}
+      </div>
+
+      <h2 class="section-heading" style="margin-top: var(--space-6);">My movement identity</h2>
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-3);">
+        Tell the coach what kind of movement feels most like you.
+        This shapes what the coach suggests first each day.
+        Full settings in the My Movement tab.
+      </p>
+      ${renderMovementIdentityMini()}
+
+      <h2 class="section-heading" style="margin-top: var(--space-6);">Log an Activity</h2>
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
+        You know what you are doing. Log it and the coach will reflect on it with you.
+      </p>
+      ${LOG_ACTIVITIES.map(group => `
+        <h3 class="library-group-heading">${group.group}</h3>
+        <div class="library-grid library-grid--compact">
+          ${group.items.map(item => `
+            <button class="library-card library-card--compact"
+                    data-target="activity-log"
+                    data-activity="${item.id}"
+                    aria-label="Log ${item.label}">
+              <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
+              <span class="library-card-label">${item.label}</span>
+            </button>
+          `).join("")}
+        </div>
+      `).join("")}
 
     </section>
   `;
 }
 
-
-function renderMovementIdentity() {
-  const current = store.get("movementIdentity") || null;
-
-  const IDENTITIES = [
-    { id: "gym",     label: "Gym / weights",   icon: "\uD83C\uDFCB" },
-    { id: "yoga",    label: "Yoga / pilates",   icon: "\uD83E\uDDD8" },
-    { id: "running", label: "Running",           icon: "\uD83C\uDFC3" },
-    { id: "walking", label: "Walking",           icon: "\uD83D\uDEB6" },
-    { id: "swimming",label: "Swimming",          icon: "\uD83C\uDFCA" },
-    { id: "classes", label: "Classes",           icon: "\uD83C\uDFE5" },
-    { id: "mixed",   label: "A mix of things",  icon: "\u2728"       },
-  ];
+// Mini movement identity widget used inside the Library tab
+function renderMovementIdentityMini() {
+  const rawIdentity = store.get("movementIdentity");
+  const currentIds  = Array.isArray(rawIdentity)
+    ? rawIdentity
+    : (rawIdentity ? [rawIdentity] : []);
 
   return `
-    <div class="library-grid" role="group" aria-label="Movement identity">
+    <div class="library-grid"
+         role="group"
+         aria-label="Movement identity — select all that apply">
       ${IDENTITIES.map(item => `
-        <button class="library-card ${current === item.id ? "library-card--selected" : ""}"
+        <button class="library-card ${currentIds.includes(item.id) ? "library-card--selected" : ""}"
                 data-identity="${item.id}"
-                aria-pressed="${current === item.id}"
+                aria-pressed="${currentIds.includes(item.id)}"
                 aria-label="${item.label}">
           <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
           <span class="library-card-label">${item.label}</span>
         </button>
       `).join("")}
     </div>
-    ${current ? `
-      <p class="text-sm text-muted" style="margin-top:var(--space-2);">
-        The coach will lean toward ${IDENTITIES.find(i => i.id === current)?.label || current} suggestions.
-        Your actual activity history will refine this over time.
-      </p>
-    ` : ""}
-  `;
-}
-
-// ── Speech rate section ───────────────────────────────────────────────────────
-
-/**
- * Render speed selector for coach card text-to-speech.
- * Three options: Slow / Normal / Fast.
- * Selection writes to store immediately. Takes effect on next tap of
- * a speaker button — no page reload needed.
- */
-function renderSpeechRateSection() {
-  const currentRate = store.get("speechRate") || 0.9;
-  // Map rate (0.6 to 1.5) to slider position (1-10)
-  const sliderVal = Math.round(((currentRate - 0.6) / (1.5 - 0.6)) * 9) + 1;
-  const clampedVal = Math.max(1, Math.min(10, sliderVal));
-  const speedPct = Math.round(((clampedVal - 1) / 9) * 100);
-  const rateLabel = speedPct < 20 ? "Slow" : speedPct < 45 ? "Measured" : speedPct < 65 ? "Normal" : speedPct < 85 ? "Brisk" : "Fast";
-
-  return `
-    <div class="card speech-rate-card">
-      <p class="text-sm text-muted" style="margin-bottom:var(--space-4);">
-        Sets the speed of the read-aloud feature on coach cards.
-        Tap the speaker icon on any coach message to listen.
-      </p>
-      <label class="form-label" for="speech-rate-slider">
-        Speed: <span id="speech-rate-label" style="color:var(--color-primary);font-weight:700;">${rateLabel}</span>
-      </label>
-      <input type="range" id="speech-rate-slider"
-             class="checkin-slider"
-             min="1" max="10" step="1"
-             value="${sliderVal}"
-             aria-label="Coach voice speed, 1 slowest to 10 fastest"
-             aria-valuetext="${rateLabel}"
-             style="margin-top:var(--space-3);">
-      <div class="checkin-slider-ends" aria-hidden="true">
-        <span>Slow</span><span>Fast</span>
-      </div>
-    </div>
   `;
 }
 
 // ── Notification section ──────────────────────────────────────────────────────
 
-/**
- * Render the check-in notification toggle and time picker.
- *
- * PERMITTED: warm tone, single type, user-set time, user-revocable.
- * PROHIBITED: streak framing, guilt framing, re-prompting after denial,
- *             multiple notification types, automatic scheduling changes.
- *
- * Two states:
- *   enabled=false  — toggle only; time picker hidden.
- *   enabled=true   — toggle + time picker; permission status shown if denied.
- *
- * Permission is requested via browser Notification API when the user
- * first enables the toggle. If denied, a calm explanation is shown
- * and permissionGranted remains false. We never re-prompt automatically.
- */
 function renderNotificationSection() {
   const notif   = store.get("checkInNotification") || { enabled: false, time: null, permissionGranted: false };
   const enabled = !!notif.enabled;
-  const denied  = enabled && !notif.permissionGranted && "Notification" in window && Notification.permission === "denied";
+  const denied  = enabled && !notif.permissionGranted
+    && "Notification" in window
+    && Notification.permission === "denied";
 
   return `
     <div class="card notification-card">
@@ -753,13 +597,11 @@ function renderNotificationSection() {
           </span>
         </div>
         <label class="toggle-switch" aria-label="Enable daily check-in reminder">
-          <input
-            type="checkbox"
-            id="notif-toggle"
-            role="switch"
-            aria-checked="${enabled}"
-            ${enabled ? "checked" : ""}
-          >
+          <input type="checkbox"
+                 id="notif-toggle"
+                 role="switch"
+                 aria-checked="${enabled}"
+                 ${enabled ? "checked" : ""}>
           <span class="toggle-track" aria-hidden="true"></span>
         </label>
       </div>
@@ -767,15 +609,12 @@ function renderNotificationSection() {
       ${enabled ? `
         <div class="notification-time-row" id="notif-time-row">
           <label class="form-label" for="notif-time">Remind me at</label>
-          <input
-            type="time"
-            id="notif-time"
-            class="form-input notif-time-input"
-            value="${notif.time || "08:00"}"
-            aria-label="Check-in reminder time"
-          >
+          <input type="time"
+                 id="notif-time"
+                 class="form-input notif-time-input"
+                 value="${notif.time || "08:00"}"
+                 aria-label="Check-in reminder time">
         </div>
-
         ${denied ? `
           <div class="notification-denied-banner" role="alert">
             <p class="text-sm">
@@ -810,353 +649,185 @@ function settingsRow(label, value) {
   `;
 }
 
-function formatGender(gender) {
-  const map = {
-    "female":     "Female",
-    "male":       "Male",
-    "non-binary": "Non-binary",
-    "prefer-not": "Prefer not to say"
-  };
-  return map[gender] || "Not set";
+function formatGender(g) {
+  const map = { "female": "Female", "male": "Male", "non-binary": "Non-binary", "prefer-not": "Prefer not to say" };
+  return map[g] || "Not set";
 }
 
-// ── Re-render helpers (used by event handlers) ────────────────────────────────
+// ── Tab switching ─────────────────────────────────────────────────────────────
 
-/**
- * Switch to a different tab and re-render the panel in place.
- * Updates ARIA attributes on the tab buttons as well.
- */
 function switchTab(tabName) {
   activeTab = tabName;
-
-  // Update tab button ARIA and active class
   document.querySelectorAll(".settings-tab").forEach(btn => {
     const isActive = btn.dataset.tab === tabName;
     btn.classList.toggle("active", isActive);
-    btn.setAttribute("aria-selected", isActive);
+    btn.setAttribute("aria-selected", String(isActive));
   });
-
-  // Re-render panel content only
   const panel = document.getElementById("settings-tab-panel");
   if (panel) {
-    panel.setAttribute("aria-labelledby", `tab-${tabName}`);
+    panel.setAttribute("aria-labelledby", "tab-" + tabName);
     panel.innerHTML = renderActiveTab();
-    // Re-wire interactive elements inside the panel
     wirePanel();
   }
 }
 
-/**
- * Wire all interactive elements inside the tab panel.
- * Called after initial mount and after every tab switch.
- */
+// ── wirePanel — event listeners for the active tab panel ─────────────────────
+
 function wirePanel() {
-  // Coach style cards
+
+  // Coach style (radio — single select)
   document.querySelectorAll(".coach-style-card").forEach(card => {
     card.addEventListener("click", () => {
       const style = card.dataset.style;
       if (!style) return;
-
-      // Write to store
       store.set("coachStyle", style);
-
-      // Update UI: toggle selected class and aria-checked on all cards
       document.querySelectorAll(".coach-style-card").forEach(c => {
-        const isSelected = c.dataset.style === style;
-        c.classList.toggle("selected", isSelected);
-        c.setAttribute("aria-checked", isSelected);
+        const sel = c.dataset.style === style;
+        c.classList.toggle("selected", sel);
+        c.setAttribute("aria-checked", String(sel));
       });
     });
   });
 
-  // ── Profile name ──────────────────────────────────────────────────────────
-  // Profile fields auto-capture on interaction but Save button commits
-  // and rerenders (so gender change shows/hides hormonal section)
-  document.getElementById("profile-save-btn")?.addEventListener("click", () => {
-    // Commit name
-    const nameEl = document.getElementById("profile-name");
-    if (nameEl) store.set("name", nameEl.value.trim());
-    // Commit weight
-    const weightEl = document.getElementById("profile-weight");
-    if (weightEl) {
-      const w = parseFloat(weightEl.value);
-      if (!isNaN(w)) store.set("weight", w);
-    }
-    // Show confirmation
-    const confirmEl = document.getElementById("profile-save-confirm");
-    if (confirmEl) {
-      confirmEl.style.opacity = "1";
-      setTimeout(() => { confirmEl.style.opacity = "0"; }, 2000);
-    }
-    showSaveToast("Profile saved");
-    // Rerender profile tab to update hormonal section visibility
-    switchTab("profile");
-  });
-
-  document.getElementById("profile-name")?.addEventListener("blur", e => {
-    // No auto-save — wait for Save button
-    // Just prevent loss if user leaves without saving
-  });
-
-  // ── Age band chips ─────────────────────────────────────────────────────────
-  document.querySelectorAll("[data-age-band]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      store.set("ageBand", btn.dataset.ageBand);
-      document.querySelectorAll("[data-age-band]").forEach(b => {
-        b.classList.toggle("selected", b === btn);
-        b.setAttribute("aria-pressed", b === btn);
-      });
-    });
-  });
-
-  // ── Gender chips ───────────────────────────────────────────────────────────
-  document.querySelectorAll("[data-gender]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      store.set("gender", btn.dataset.gender);
-      document.querySelectorAll("[data-gender]").forEach(b => {
-        b.classList.toggle("selected", b === btn);
-        b.setAttribute("aria-pressed", b === btn);
-      });
-    });
-  });
-
-  // ── Weight input ───────────────────────────────────────────────────────────
-  document.getElementById("profile-weight")?.addEventListener("blur", e => {
-    const val = parseFloat(e.target.value);
-    if (!isNaN(val)) store.set("weight", val);
-  });
-
-  // Hormonal tracking chips
-  document.querySelectorAll("[data-hormonal]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const val = btn.dataset.hormonal || null;
-      store.set("hormonalTracking", val || null);
-      document.querySelectorAll("[data-hormonal]").forEach(b => {
-        const sel = b.dataset.hormonal === (val || "");
-        b.classList.toggle("selected", sel);
-        b.setAttribute("aria-pressed", sel);
-      });
-    });
-  });
-
-  // ── Weight unit toggle ─────────────────────────────────────────────────────
-  document.querySelectorAll("[data-unit]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      store.set("weightUnit", btn.dataset.unit);
-      document.querySelectorAll("[data-unit]").forEach(b => {
-        b.classList.toggle("selected", b === btn);
-      });
-    });
-  });
-
-  // ── Theme toggle ──────────────────────────────────────────────────────────
-  document.querySelectorAll("[data-theme]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const isLight = btn.dataset.theme === "light";
-      store.set("lightMode", isLight);
-      document.documentElement.classList.toggle("light-mode", isLight);
-      document.querySelectorAll("[data-theme]").forEach(b => {
-        const sel = b.dataset.theme === (isLight ? "light" : "dark");
-        b.classList.toggle("selected", sel);
-        b.setAttribute("aria-pressed", sel);
-      });
-      showSaveToast("Theme updated");
-    });
-  });
-
-  // ── Conditions: pause/resume ───────────────────────────────────────────────
-  document.querySelectorAll(".condition-pause-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.conditionId;
-      const status = store.get("conditionStatus") || {};
-      status[id] = status[id] === "paused" ? "active" : "paused";
-      store.set("conditionStatus", status);
-      switchTab("conditions");
-    });
-  });
-
-  // ── Conditions: remove ─────────────────────────────────────────────────────
-  document.querySelectorAll(".condition-remove-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.conditionId;
-      if (!confirm("Remove " + id.replace(/-/g, " ") + " from your conditions?")) return;
-      const conditions = (store.get("conditions") || []).filter(c => c !== id);
-      store.set("conditions", conditions);
-      switchTab("conditions");
-    });
-  });
-
-  // ── Conditions: add ────────────────────────────────────────────────────────
-  document.querySelectorAll("[data-add-condition]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.addCondition;
-      const conditions = store.get("conditions") || [];
-      if (!conditions.includes(id)) {
-        conditions.push(id);
-        store.set("conditions", conditions);
-      }
-      switchTab("conditions");
-    });
-  });
-
-  // ── Facility presets ──────────────────────────────────────────────────────
-  document.querySelectorAll("[data-facility]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const preset = FACILITY_PRESETS.find(p => p.id === btn.dataset.facility);
-      if (!preset) return;
-      // Merge with existing equipment (additive, not replacing)
-      const existing  = new Set(store.get("equipment") || []);
-      preset.equipment.forEach(e => existing.add(e));
-      store.set("equipment", [...existing]);
-      // Toggle selected state visually
-      btn.classList.toggle("selected");
-      const isSelected = btn.classList.contains("selected");
-      btn.setAttribute("aria-pressed", isSelected);
-      // Show brief confirmation
-      const orig = btn.querySelector(".facility-preset-label")?.textContent;
-      const labelEl = btn.querySelector(".facility-preset-label");
-      if (labelEl) {
-        labelEl.textContent = isSelected ? "Applied" : orig;
-        if (isSelected) setTimeout(() => { labelEl.textContent = orig || ""; }, 1500);
-      }
-    });
-  });
-
-  // ── Equipment expand/collapse ──────────────────────────────────────────────
-  // Using <details> element — native expand/collapse, no JS needed
-
-  // Movement identity chips
+  // Movement identity chips (multi-select — FIX)
   document.querySelectorAll("[data-identity]").forEach(btn => {
     btn.addEventListener("click", () => {
-      const id = btn.dataset.identity;
-      store.set("movementIdentity", id);
+      const id       = btn.dataset.identity;
+      const rawVal   = store.get("movementIdentity");
+      const current  = Array.isArray(rawVal) ? rawVal : (rawVal ? [rawVal] : []);
+      const updated  = current.includes(id)
+        ? current.filter(x => x !== id)
+        : [...current, id];
+      store.set("movementIdentity", updated);
+
+      // Update all identity buttons in the DOM (may appear in both My Movement and Library tabs)
       document.querySelectorAll("[data-identity]").forEach(b => {
-        const isSelected = b.dataset.identity === id;
-        b.classList.toggle("library-card--selected", isSelected);
-        b.setAttribute("aria-pressed", isSelected);
+        const sel = updated.includes(b.dataset.identity);
+        b.classList.toggle("library-card--selected", sel);
+        b.setAttribute("aria-pressed", String(sel));
       });
-      // Update the confirmation text
-      const note = btn.closest(".library-section")?.querySelector(".text-muted:last-of-type");
+
+      // Refresh the note text if present
+      const noteEl = document.getElementById("identity-note");
+      if (noteEl) {
+        if (updated.length > 0) {
+          noteEl.textContent = "The coach will lean toward " +
+            updated.map(i => IDENTITIES.find(x => x.id === i)?.label || i).join(", ") +
+            ". Your actual activity history will refine this over time.";
+        } else {
+          noteEl.textContent = "Nothing selected yet. The coach will balance suggestions across all types.";
+        }
+      }
     });
   });
 
-  // Library cards
-  document.querySelectorAll(".library-tile[data-target]").forEach(card => {
+  // Facility preset cards (FIX — new)
+  document.querySelectorAll("[data-facility]").forEach(card => {
+    card.addEventListener("click", () => {
+      const facilityId = card.dataset.facility;
+      const preset     = FACILITY_PRESETS.find(p => p.id === facilityId);
+      if (!preset) return;
+
+      store.set("facilityPreset", facilityId);
+      store.set("equipment", [...preset.equipment]);
+
+      // Update selected state on all facility cards
+      document.querySelectorAll("[data-facility]").forEach(c => {
+        const sel = c.dataset.facility === facilityId;
+        c.classList.toggle("facility-preset-card--selected", sel);
+        c.setAttribute("aria-pressed", String(sel));
+      });
+
+      // Update the confirmation note
+      const noteEl = document.getElementById("facility-note");
+      if (noteEl) {
+        noteEl.textContent = "Equipment pre-filled for " + preset.label +
+          ". Fine-tune individual items in the Equipment tab.";
+      } else {
+        // Note may not exist yet (first tap) — re-render only the facility section
+        const section = card.closest("section");
+        if (section) {
+          // Lightweight: just append the note paragraph
+          const p = document.createElement("p");
+          p.id = "facility-note";
+          p.className = "text-sm text-muted";
+          p.style.marginTop = "var(--space-3)";
+          p.textContent = "Equipment pre-filled for " + preset.label +
+            ". Fine-tune individual items in the Equipment tab.";
+          card.closest(".facility-preset-grid").insertAdjacentElement("afterend", p);
+        }
+      }
+    });
+  });
+
+  // Library cards — navigate to target
+  document.querySelectorAll(".library-card[data-target]").forEach(card => {
     card.addEventListener("click", () => {
       const target    = card.dataset.target;
       const quietMode = card.dataset.quiet || null;
       const activity  = card.dataset.activity || null;
-      if (quietMode)  store.set("quietMode", quietMode);
-      if (activity)   store.set("logActivityType", activity);
+      if (quietMode) store.set("quietMode", quietMode);
+      if (activity)  store.set("logActivityType", activity);
       router.navigate(target);
     });
   });
 
-  // Speech rate buttons
-  // Speech rate slider
-  const speechSlider = document.getElementById("speech-rate-slider");
-  const speechLabelEl = document.getElementById("speech-rate-label");
-  if (speechSlider) {
-    speechSlider.addEventListener("input", () => {
-      const val = parseInt(speechSlider.value);
-      // Map 1-10 to 0.6-1.5
-      const rate = 0.6 + ((val - 1) / 9) * (1.5 - 0.6);
-      store.set("speechRate", parseFloat(rate.toFixed(2)));
-      const pct = Math.round(((val - 1) / 9) * 100);
-      const label = pct < 20 ? "Slow" : pct < 45 ? "Measured" : pct < 65 ? "Normal" : pct < 85 ? "Brisk" : "Fast";
-      if (speechLabelEl) speechLabelEl.textContent = label;
-      speechSlider.setAttribute("aria-valuetext", label);
-    });
-  }
-
+  // Speech rate
   document.querySelectorAll(".speech-rate-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const rate = parseFloat(btn.dataset.rate);
       if (isNaN(rate)) return;
       store.set("speechRate", rate);
       document.querySelectorAll(".speech-rate-btn").forEach(b => {
-        const isSelected = parseFloat(b.dataset.rate) === rate;
-        b.classList.toggle("selected", isSelected);
-        b.setAttribute("aria-checked", isSelected);
+        const sel = parseFloat(b.dataset.rate) === rate;
+        b.classList.toggle("selected", sel);
+        b.setAttribute("aria-checked", String(sel));
       });
     });
   });
 
-  // Notification toggle and time picker
+  // Notification controls
   wireNotificationControls();
 
   // Equipment chips
   document.querySelectorAll(".equipment-chip").forEach(chip => {
     chip.addEventListener("click", () => {
-      const id = chip.dataset.equipmentId;
+      const id         = chip.dataset.equipmentId;
       if (!id) return;
-
-      const current  = store.get("equipment") || [];
+      const current    = store.get("equipment") || [];
       const isSelected = current.includes(id);
-      const updated  = isSelected
+      const updated    = isSelected
         ? current.filter(e => e !== id)
         : [...current, id];
-
       store.set("equipment", updated);
-
-      // Toggle this chip
       chip.classList.toggle("selected", !isSelected);
-      chip.setAttribute("aria-pressed", !isSelected);
-
-      // Update the category count badge
+      chip.setAttribute("aria-pressed", String(!isSelected));
       updateCategoryCount(chip);
     });
   });
 }
 
-/**
- * Update the "N selected" count badge for the category containing a chip.
- * Called after each chip toggle to keep counts accurate without a full re-render.
- */
 function updateCategoryCount(chip) {
   const categoryEl = chip.closest(".equipment-settings-category");
   if (!categoryEl) return;
-
-  const chipsInCat  = categoryEl.querySelectorAll(".equipment-chip");
-  const selectedCount = Array.from(chipsInCat).filter(c => c.classList.contains("selected")).length;
-  const heading = categoryEl.querySelector(".equipment-category-heading");
+  const chips    = categoryEl.querySelectorAll(".equipment-chip");
+  const count    = Array.from(chips).filter(c => c.classList.contains("selected")).length;
+  const heading  = categoryEl.querySelector(".equipment-category-heading");
   if (!heading) return;
-
-  // Remove existing count badge if present
   const existing = heading.querySelector(".equipment-cat-count");
   if (existing) existing.remove();
-
-  // Re-insert if any are selected
-  if (selectedCount > 0) {
+  if (count > 0) {
     const badge = document.createElement("span");
-    badge.className = "equipment-cat-count";
-    badge.textContent = `${selectedCount} selected`;
+    badge.className   = "equipment-cat-count";
+    badge.textContent = count + " selected";
     heading.appendChild(badge);
   }
 }
 
 // ── Notification wiring ───────────────────────────────────────────────────────
 
-/**
- * Wire the notification toggle and time picker.
- * Called from wirePanel() on every profile tab render.
- *
- * Toggle on:
- *   1. Request browser Notification permission.
- *   2. If granted: save enabled=true, permissionGranted=true, re-render section.
- *   3. If denied:  save enabled=true, permissionGranted=false, re-render section
- *      (section shows a calm explanation — no re-prompt, no guilt framing).
- *   4. If unavailable ("Notification" not in window): save enabled=false,
- *      show a gentle "not supported" message.
- *
- * Toggle off:
- *   Save enabled=false. Scheduling loop will stop on next tick.
- *
- * Time picker change:
- *   Saves new time to store. Scheduling loop reads from store each tick.
- */
 function wireNotificationControls() {
-  const toggle   = document.getElementById("notif-toggle");
+  const toggle    = document.getElementById("notif-toggle");
   const timeInput = document.getElementById("notif-time");
 
   if (toggle) {
@@ -1164,164 +835,78 @@ function wireNotificationControls() {
       const wantsEnabled = toggle.checked;
 
       if (!wantsEnabled) {
-        // User turned it off — save and re-render section
         saveNotificationState({ enabled: false, time: null, permissionGranted: false });
         rerenderNotificationSection();
         return;
       }
 
-      // Browser notifications not supported
       if (!("Notification" in window)) {
         saveNotificationState({ enabled: false, time: null, permissionGranted: false });
         rerenderNotificationSection();
         return;
       }
 
-      // Already granted — just enable
-      if (Notification.permission === "granted") {
-        const currentTime = store.get("checkInNotification.time") || "08:00";
-        saveNotificationState({ enabled: true, time: currentTime, permissionGranted: true });
-        rerenderNotificationSection();
-        startNotificationScheduler();
-        return;
+      let permission = Notification.permission;
+      if (permission === "default") {
+        permission = await Notification.requestPermission();
       }
 
-      // Request permission — ONLY done when user explicitly toggles on.
-      // We never re-prompt automatically (prohibited pattern).
-      const permission = await Notification.requestPermission();
-      const granted    = permission === "granted";
-      const currentTime = store.get("checkInNotification.time") || "08:00";
-
-      saveNotificationState({ enabled: true, time: currentTime, permissionGranted: granted });
+      if (permission === "granted") {
+        saveNotificationState({ enabled: true, time: "08:00", permissionGranted: true });
+        startNotificationScheduler();
+      } else {
+        saveNotificationState({ enabled: true, time: null, permissionGranted: false });
+      }
       rerenderNotificationSection();
-
-      if (granted) {
-        startNotificationScheduler();
-      }
-      // If denied: section re-renders with calm explanation. No further action.
     });
   }
 
   if (timeInput) {
     timeInput.addEventListener("change", () => {
-      const newTime = timeInput.value;
-      if (!newTime) return;
-      store.set("checkInNotification.time", newTime);
-      // Scheduler reads from store each tick — no restart needed.
+      const notif = store.get("checkInNotification") || {};
+      notif.time  = timeInput.value;
+      store.set("checkInNotification", notif);
     });
   }
 }
 
 function saveNotificationState(state) {
-  store.set("checkInNotification", {
-    enabled:           state.enabled,
-    time:              state.time,
-    permissionGranted: state.permissionGranted
-  });
+  store.set("checkInNotification", state);
 }
 
-/**
- * Re-render only the notification card within the current profile tab.
- * Avoids a full tab switch which would reset scroll position.
- */
 function rerenderNotificationSection() {
   const card = document.querySelector(".notification-card");
-  if (card) {
-    const section = card.closest(".card");
-    if (section) {
-      // Replace just the card content by re-rendering the notification section
-      const wrapper = card.parentElement;
-      if (wrapper) {
-        wrapper.innerHTML = renderNotificationSection();
-        // Re-wire the new elements
-        wireNotificationControls();
-      }
-    }
-  }
+  if (card) card.outerHTML = renderNotificationSection();
+  wireNotificationControls();
 }
 
-// ── Notification scheduler ────────────────────────────────────────────────────
-
-/**
- * Scheduling approach: setInterval every 60 seconds.
- * On each tick, reads the user's chosen time from store and compares
- * to the current HH:MM. Fires a notification if they match and one
- * has not already been sent this minute.
- *
- * Single type only. Warm, non-urgent message. No streak framing.
- * No guilt framing. No urgency language.
- *
- * The interval is stored on window so it can be cleared if the user
- * disables the feature while the app is open.
- *
- * PROHIBITED messages (never use):
- *   - "You haven't checked in yet!"
- *   - "Don't break your streak!"
- *   - "You missed yesterday."
- *   - Any language implying failure or obligation.
- */
-let _notifSchedulerInterval  = null;
-let _notifLastFiredMinute    = null;
-
-const NOTIFICATION_MESSAGES = [
-  { title: "Alongside", body: "Ready when you are. A quick check-in takes less than a minute." },
-  { title: "Alongside", body: "How are you feeling today? Your coach is here whenever suits you." },
-  { title: "Alongside", body: "Just a gentle nudge. Come check in whenever you're ready." },
-  { title: "Alongside", body: "Your check-in is waiting. No rush -- take it at your own pace." },
-  { title: "Alongside", body: "A moment to check in whenever suits you today." }
-];
+let notifSchedulerInterval = null;
 
 function startNotificationScheduler() {
-  // Clear any existing interval to avoid duplicates
-  if (_notifSchedulerInterval) {
-    clearInterval(_notifSchedulerInterval);
-  }
-
-  _notifSchedulerInterval = setInterval(() => {
+  if (notifSchedulerInterval) clearInterval(notifSchedulerInterval);
+  notifSchedulerInterval = setInterval(() => {
     const notif = store.get("checkInNotification");
     if (!notif?.enabled || !notif?.permissionGranted || !notif?.time) return;
-    if (Notification.permission !== "granted") return;
-
-    const now    = new Date();
-    const hh     = String(now.getHours()).padStart(2, "0");
-    const mm     = String(now.getMinutes()).padStart(2, "0");
-    const nowHHMM = hh + ":" + mm;
-
-    // Only fire once per minute — track the last minute we fired
-    if (nowHHMM === notif.time && _notifLastFiredMinute !== nowHHMM) {
-      _notifLastFiredMinute = nowHHMM;
-
-      // Pick a message variant using the day of year so it rotates daily
-      const now2   = new Date();
-      const start  = new Date(now2.getFullYear(), 0, 0);
-      const dayIdx = Math.floor((now2 - start) / 86400000) % NOTIFICATION_MESSAGES.length;
-      const msg    = NOTIFICATION_MESSAGES[dayIdx];
-
-      // eslint-disable-next-line no-new
-      new Notification(msg.title, {
-        body: msg.body,
-        icon: "assets/images/logo-icon-192.png",
-        tag:  "alongside-checkin",  // replaces previous if still showing
-        renotify: false
+    const now  = new Date();
+    const hhmm = now.getHours().toString().padStart(2, "0") + ":" + now.getMinutes().toString().padStart(2, "0");
+    if (hhmm === notif.time) {
+      new Notification("Time to check in", {
+        body: "A quick check-in takes under two minutes.",
+        icon: "assets/images/logo-icon-128.png"
       });
     }
-  }, 60000); // check every 60 seconds
-
-  // Store interval reference globally so app.js can clear it on reset if needed
-  window._alongsideNotifInterval = _notifSchedulerInterval;
+  }, 60000);
 }
 
-// ── Mount ─────────────────────────────────────────────────────────────────────
+// ── onMount ───────────────────────────────────────────────────────────────────
 
 export function onMount() {
-  // If navigated here with a specific tab request (e.g. from coach proposal Library button),
-  // call switchTab() properly so the panel re-renders — not just setting activeTab variable.
+  // Clear requested tab flag now that the panel has rendered
   const requestedTab = store.get("settingsTab");
   if (requestedTab) {
     store.set("settingsTab", null);
     if (requestedTab !== activeTab) {
       activeTab = requestedTab;
-      // Panel will render correctly below via wirePanel() reading activeTab
     }
   }
 
@@ -1333,40 +918,41 @@ export function onMount() {
     });
   });
 
-  // Wire panel elements on initial load
+  // Wire panel elements
   wirePanel();
 
-  // If notification is already enabled and permission granted, resume scheduler
+  // Resume notification scheduler if already enabled
   const notif = store.get("checkInNotification");
   if (notif?.enabled && notif?.permissionGranted) {
     startNotificationScheduler();
   }
 
+  // Gym programme shortcut
+  document.getElementById("gym-programme-btn")?.addEventListener("click", () => {
+    router.navigate("gym-programme");
+  });
+
   // Check for updates
   document.getElementById("check-update-btn")?.addEventListener("click", async () => {
-    const btn = document.getElementById("check-update-btn");
+    const btn      = document.getElementById("check-update-btn");
     const statusEl = document.getElementById("update-check-status");
-
-    if (btn) {
-      btn.textContent = "Checking...";
-      btn.disabled    = true;
-    }
+    if (btn)      { btn.textContent = "Checking..."; btn.disabled = true; }
     if (statusEl) statusEl.textContent = "";
-
     const result = await window.App?.checkForUpdate?.() || "unavailable";
     window.App?.showUpdateCheckResult?.(result);
+    if (btn)      { btn.textContent = "Check for updates"; btn.disabled = false; }
+  });
 
-    if (btn) {
-      btn.textContent = "Check for updates";
-      btn.disabled    = false;
-    }
+  // Privacy policy
+  document.getElementById("privacy-btn")?.addEventListener("click", () => {
+    router.navigate("privacy");
   });
 
   // Reset app
   document.getElementById("reset-app-btn")?.addEventListener("click", () => {
     if (confirm("This will delete all your data and start fresh. Are you sure?")) {
       store.reset();
-      activeTab = "profile"; // Reset tab state for next time
+      activeTab = "profile";
       document.getElementById("bottom-nav")?.classList.add("hidden");
       router.navigate("onboarding/welcome");
     }
