@@ -1,27 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * alongside-v33  (S4-2 bug-fix session, May 2026)
+ * alongside-v34  (S4-2 bug-fix session, May 2026)
  *
- * What changed:
- *   - coach-proposal.js v1.1  (NaN date fix, movementIdentity array fix, first-use path)
- *   - settings.js v1.6        (My Movement tab, facility presets, multi-select identity)
- *
- * Strategy: Cache-first for the app shell (HTML, CSS, JS, assets).
- * All user data lives in localStorage. The app works fully offline after first load.
- *
- * IMPORTANT — temp-file-then-rename pattern:
- *   Always write sw.js atomically. Non-atomic writes have emptied this file before.
- *   Never stream directly into sw.js in the GitHub web editor — paste the full
- *   content into a scratch file, verify it, then replace.
- *
- * Cache versioning:
- *   Bump CACHE_NAME on every deployment that changes any cached file.
- *   Old caches are deleted on activate. Users get the new shell without
- *   needing to close the app — skipWaiting() is called on install.
+ * What changed from v33:
+ *   - css/components/settings-library.css  (NEW — library-card, facility-preset,
+ *     library-grid, settings-tab 5-up, speech-rate-grid, toggle-switch,
+ *     notification-card, coach-style-card, section-heading)
+ *   - css/main.css  (updated — adds settings-library.css import)
  */
 
-const CACHE_NAME = "alongside-v33";
+const CACHE_NAME = "alongside-v34";
 
 const SHELL_URLS = [
 
@@ -32,6 +21,21 @@ const SHELL_URLS = [
 
   // ── CSS ────────────────────────────────────────────────────────────────────
   "/alongside-app/css/main.css",
+  "/alongside-app/css/base/variables.css",
+  "/alongside-app/css/base/reset.css",
+  "/alongside-app/css/base/typography.css",
+  "/alongside-app/css/base/global.css",
+  "/alongside-app/css/layouts/app-shell.css",
+  "/alongside-app/css/layouts/onboarding.css",
+  "/alongside-app/css/layouts/goal-setup.css",
+  "/alongside-app/css/layouts/progress.css",
+  "/alongside-app/css/components/buttons.css",
+  "/alongside-app/css/components/cards.css",
+  "/alongside-app/css/components/equipment-modal.css",
+  "/alongside-app/css/components/checkin.css",
+  "/alongside-app/css/components/workout.css",
+  "/alongside-app/css/components/coach-fix.css",
+  "/alongside-app/css/components/settings-library.css",
 
   // ── Core JS ───────────────────────────────────────────────────────────────
   "/alongside-app/js/app.js",
@@ -102,10 +106,6 @@ const SHELL_URLS = [
 ];
 
 // ── Message handler ───────────────────────────────────────────────────────────
-// app.js posts { type: "SKIP_WAITING" } when the user taps "Update now".
-// This tells the waiting SW to activate immediately rather than waiting
-// for all tabs to close. Combined with clients.claim() in activate,
-// the new version takes effect without the user needing to close the app.
 
 self.addEventListener("message", event => {
   if (event.data && event.data.type === "SKIP_WAITING") {
@@ -113,13 +113,11 @@ self.addEventListener("message", event => {
   }
 });
 
-// ── Install — cache the app shell ────────────────────────────────────────────
+// ── Install ───────────────────────────────────────────────────────────────────
 
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      // Cache what we can — do not fail install if individual files 404.
-      // This is intentional: a missing optional view should not block the SW.
       return Promise.allSettled(
         SHELL_URLS.map(url =>
           cache.add(url).catch(() => {
@@ -127,14 +125,11 @@ self.addEventListener("install", event => {
           })
         )
       );
-    }).then(() => {
-      // Take control immediately — do not wait for the old SW to retire.
-      return self.skipWaiting();
-    })
+    }).then(() => self.skipWaiting())
   );
 });
 
-// ── Activate — delete old caches ─────────────────────────────────────────────
+// ── Activate ──────────────────────────────────────────────────────────────────
 
 self.addEventListener("activate", event => {
   event.waitUntil(
@@ -147,32 +142,23 @@ self.addEventListener("activate", event => {
             return caches.delete(key);
           })
       )
-    ).then(() => {
-      // Claim all open clients so the new SW takes effect without a reload.
-      return self.clients.claim();
-    })
+    ).then(() => self.clients.claim())
   );
 });
 
-// ── Fetch — cache-first for shell, network for everything else ────────────────
+// ── Fetch ─────────────────────────────────────────────────────────────────────
 
 self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
 
-  // Only handle GET requests
   if (event.request.method !== "GET") return;
-
-  // Only handle same-origin requests
-  // External resources (fonts, analytics) are allowed to fail gracefully
   if (url.origin !== self.location.origin) return;
 
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
 
-      // Not in cache — fetch from network and cache the response for next time
       return fetch(event.request).then(response => {
-        // Only cache valid same-origin basic responses
         if (!response || response.status !== 200 || response.type !== "basic") {
           return response;
         }
@@ -182,12 +168,9 @@ self.addEventListener("fetch", event => {
         });
         return response;
       }).catch(() => {
-        // Offline and not in cache — return the app shell for navigation requests
-        // so the SPA router can handle the route client-side
         if (event.request.mode === "navigate") {
           return caches.match("/alongside-app/index.html");
         }
-        // For non-navigation requests (JS modules etc) just fail silently
       });
     })
   );
