@@ -9,9 +9,8 @@
  *     so screen reader users land at the top of the new view
  */
 
-import { store }       from './store.js';
-import { tts }         from './tts.js';
-import { checkinData } from './data/checkin.js';
+import { store } from './store.js';
+import { tts }   from './tts.js';
 
 // Human-readable names announced to screen readers on navigation.
 // Keys match the viewName strings passed to router.navigate().
@@ -39,10 +38,7 @@ const VIEW_NAMES = {
   'reflect':                 'How was that?',
   'prescribed-session':      'Prescribed Exercises',
   'prescribed':              'My Prescribed Exercises',
-  'quiet-session':           'Something Quieter',
-  'coach-proposal':          'Your Session',
-  'activity-log':            'Log an Activity',
-  'yoga-session':            'Yoga and Pilates',
+  'morning-session':         'Morning Session',
 };
 
 export const router = {
@@ -58,13 +54,7 @@ export const router = {
     this.hideLoading();
 
     if (store.isOnboardingComplete()) {
-      if (!checkinData.hasCheckedInToday()) {
-        this.navigate('checkin');
-      } else {
-        // Coach proposal is the primary post-checkin experience.
-        // Intention screen is now the fallback (accessed via Library or "I'll decide myself").
-        this.navigate('coach-proposal');
-      }
+      this.navigate('intention');
     } else {
       this.navigate('onboarding/welcome');
     }
@@ -90,21 +80,12 @@ export const router = {
     const mainContent = document.getElementById('main-content');
     const bottomNav   = document.getElementById('bottom-nav');
 
-    // Track previous view for Back button navigation
-    try {
-      const currentView = localStorage.getItem('alongside_currentView');
-      if (currentView && currentView !== viewName) {
-        localStorage.setItem('alongside_previousView', currentView);
-      }
-      localStorage.setItem('alongside_currentView', viewName);
-    } catch(e) {}
-
     // Clear current content
     mainContent.innerHTML = '';
     mainContent.className = 'main-content';
 
     // Hide/show bottom nav
-    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'prescribed-session'];
+    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin', 'prescribed-session', 'morning-session'];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
     if (shouldHideNav) {
@@ -135,14 +116,7 @@ export const router = {
     }
 
     this.currentView = viewName;
-    // Scroll to top instantly on every navigation.
-    // Both window and main-content are scrolled — whichever is the
-    // scrolling container depends on the CSS layout.
-    window.scrollTo(0, 0);
-    const mc = document.getElementById('main-content');
-    if (mc) mc.scrollTop = 0;
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Stop any playing speech when navigating away
     tts.stop();
@@ -259,11 +233,15 @@ export const router = {
     });
   },
 
+  /**
+   * Highlight the active nav item.
+   * 'intention' is the home screen — it maps to the Today nav button
+   * (data-view="intention"). 'today' (coach workout view) also highlights
+   * the Today button since it is a sub-path of the Today journey.
+   */
   setActiveNav(viewName) {
-    // coach-proposal is the home screen — maps to the Today nav button.
-    // intention and today (coach workout view) also highlight Today.
-    const homeViews = ['coach-proposal', 'intention', 'today'];
-    const navKey = homeViews.includes(viewName) ? 'coach-proposal' : viewName;
+    // Treat coach workout view as part of the Today/intention journey
+    const navKey = viewName === 'today' ? 'intention' : viewName;
     document.querySelectorAll('.nav-item').forEach(item => {
       item.classList.toggle('active', item.dataset.view === navKey);
     });
