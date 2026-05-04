@@ -1,16 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * alongside-v34  (S4-2 bug-fix session, May 2026)
+ * alongside-v35  (May 2026)
  *
- * What changed from v33:
- *   - css/components/settings-library.css  (NEW — library-card, facility-preset,
- *     library-grid, settings-tab 5-up, speech-rate-grid, toggle-switch,
- *     notification-card, coach-style-card, section-heading)
- *   - css/main.css  (updated — adds settings-library.css import)
+ * What changed from v34:
+ *   - css/components/settings-library.css v1.1
+ *     Added .btn.btn-primary colour fix — text was
+ *     invisible (teal-on-teal) on Start Timer / Pause
+ *     buttons due to global.css cascade override.
+ *     #0F172A on #2DD4BF = 8.9:1 contrast (WCAG AAA).
  */
 
-const CACHE_NAME = "alongside-v34";
+const CACHE_NAME = "alongside-v35";
 
 const SHELL_URLS = [
 
