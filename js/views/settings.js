@@ -1,49 +1,22 @@
 /**
  * settings.js - Settings view
  *
- * v1.5 — Morning Programme button added to programme zone (S4-3):
- *   Morning Session and Gym Programme buttons grouped together under
- *   a "My Programmes" heading in the reset zone.
+ * 8 May 2026 v1
  *
- * v1.4 — App version display and update check button (S3-6):
- *   "Check for updates" button added to the reset zone (always visible,
- *   not inside a tab). Calls window.App.checkForUpdate() which triggers
- *   a service worker update check. Result shown inline below the button.
- *   Version string displayed from window.App.version (set in app.js).
+ * v2.0 — Library tab + My Movement + 10-level voice speed slider:
+ *   Fourth tab added: Library.
+ *   Library contains:
+ *     - My Movement identity selector (7 options, writes to store.movementIdentity)
+ *     - Log an Activity grid (16 options, grouped, navigates to activity-log)
+ *     - Guided Sessions section (links to yoga-session, quiet-session etc.)
+ *     - Programmes section (gym programme, prescribed exercises)
+ *   Voice speed restored to 10-level slider (0.5–1.5 rate, maps to 10 steps).
+ *   activeTab reads store.get("settingsTab") on render so Library can be
+ *   deep-linked from coach-proposal's Library button.
  *
- * v1.3 — Check-in notification (S3-6):
- *   Opted-in reminder added to Profile tab.
- *   Toggle shows time picker only when enabled.
- *   Requests browser Notification permission on enable.
- *   If denied: calm explanation shown, no automatic re-prompt.
- *   Scheduling: setInterval polling every 60s checks against user's chosen time.
- *   Single notification type only. Warm tone. User-revocable.
- *   PROHIBITED patterns (never implemented here): streak framing, guilt framing,
- *   re-prompting after denial, multiple notification types.
- *
- * v1.0 — Tabbed layout: Profile / Conditions / Equipment.
- *   Three tabs replace the previous single-scroll card list.
- *   Tab state is held in a module-level variable (activeTab) and
- *   re-rendered on tab switch without a full router.navigate() call --
- *   this avoids the scroll-to-top and re-announce overhead for what
- *   is essentially a within-view state change.
- *
- *   Profile tab:
- *     Read-only display of name, age, gender, weight.
- *     coachStyle selector -- four options rendered as selectable cards.
- *     Selecting a style writes to store immediately (no save button needed).
- *
- *   Conditions tab:
- *     Read-only list of active conditions.
- *     "No conditions" graceful fallback.
- *     Story capture (how long, what helps, professional) deferred to Phase 3B.
- *
- *   Equipment tab:
- *     Full equipment chip selector by category.
- *     Chips toggle on/off and write to store on each tap.
- *     Mirrors the onboarding equipment step but live-editable.
- *
- *   Reset app button retained at bottom of all tabs.
+ * v1.4 — App version display and update check button (S3-6)
+ * v1.3 — Check-in notification (S3-6)
+ * v1.0 — Tabbed layout: Profile / Conditions / Equipment
  */
 
 import { store } from "../store.js";
@@ -53,40 +26,99 @@ import { EQUIPMENT_CATEGORIES } from "../data/equipment.js";
 export const centered = false;
 
 // ── Tab state ─────────────────────────────────────────────────────────────────
-// Held at module level so switching tabs re-renders without losing scroll pos.
 let activeTab = "profile";
 
 // ── Coach style definitions ───────────────────────────────────────────────────
 const COACH_STYLES = [
+  { id: "steady",    label: "Steady",    description: "Calm, consistent, and supportive. Never rushed.",    icon: "🌿" },
+  { id: "energetic", label: "Energetic", description: "Upbeat, motivating, and enthusiastic.",              icon: "⚡" },
+  { id: "minimal",   label: "Minimal",   description: "Short, direct, and to the point. No fluff.",         icon: "🎯" },
+  { id: "nurturing", label: "Nurturing", description: "Warm, gentle, and emotionally attentive.",           icon: "💛" }
+];
+
+// ── Movement identity definitions ─────────────────────────────────────────────
+const MOVEMENT_IDENTITIES = [
+  { id: "gym",      label: "Gym / weights",  icon: "🏋" },
+  { id: "yoga",     label: "Yoga / pilates", icon: "🧘" },
+  { id: "running",  label: "Running",        icon: "🏃" },
+  { id: "walking",  label: "Walking",        icon: "🚶" },
+  { id: "swimming", label: "Swimming",       icon: "🏊" },
+  { id: "classes",  label: "Classes",        icon: "🏥" },
+  { id: "mixed",    label: "A mix of things",icon: "✨" },
+];
+
+// ── Activity log options ───────────────────────────────────────────────────────
+const LOG_ACTIVITIES = [
   {
-    id:          "steady",
-    label:       "Steady",
-    description: "Calm, consistent, and supportive. Never rushed.",
-    icon:        "🌿"
+    group: "Cardio",
+    items: [
+      { id: "run",    label: "Run",    icon: "🏃" },
+      { id: "walk",   label: "Walk",   icon: "🚶" },
+      { id: "cycle",  label: "Cycle",  icon: "🚴" },
+      { id: "swim",   label: "Swim",   icon: "🏊" },
+      { id: "row",    label: "Row",    icon: "🚣" },
+      { id: "hiking", label: "Hike",   icon: "🥾" },
+    ]
   },
   {
-    id:          "energetic",
-    label:       "Energetic",
-    description: "Upbeat, motivating, and enthusiastic.",
-    icon:        "⚡"
+    group: "Classes and sessions",
+    items: [
+      { id: "boxing",       label: "Boxing",       icon: "🥊" },
+      { id: "spin",         label: "Spin",         icon: "🚴" },
+      { id: "hiit",         label: "HIIT",         icon: "⚡" },
+      { id: "body-balance", label: "Body Balance", icon: "🧘" },
+      { id: "class",        label: "Other class",  icon: "🏥" },
+    ]
   },
   {
-    id:          "minimal",
-    label:       "Minimal",
-    description: "Short, direct, and to the point. No fluff.",
-    icon:        "🎯"
-  },
-  {
-    id:          "nurturing",
-    label:       "Nurturing",
-    description: "Warm, gentle, and emotionally attentive.",
-    icon:        "💛"
+    group: "Mindful and gentle",
+    items: [
+      { id: "yoga",    label: "Yoga",        icon: "🧘" },
+      { id: "pilates", label: "Pilates",     icon: "🧘" },
+      { id: "tai-chi", label: "Tai chi",     icon: "🌿" },
+      { id: "mindful", label: "Mindful walk",icon: "🌿" },
+      { id: "custom",  label: "Something else", icon: "❔" },
+    ]
   }
 ];
+
+// ── Voice speed — 10 levels ───────────────────────────────────────────────────
+// Maps slider positions 1–10 to speech rate values 0.5–1.5
+// Position 4 = rate 0.83 ≈ Slow, Position 6 = rate 1.0 = Normal, Position 9 = rate 1.33 ≈ Fast
+const SPEED_MIN  = 0.5;
+const SPEED_MAX  = 1.5;
+const SPEED_STEPS = 10;
+
+function rateToPosition(rate) {
+  const pos = Math.round(((rate - SPEED_MIN) / (SPEED_MAX - SPEED_MIN)) * (SPEED_STEPS - 1)) + 1;
+  return Math.max(1, Math.min(SPEED_STEPS, pos));
+}
+
+function positionToRate(pos) {
+  const rate = SPEED_MIN + ((pos - 1) / (SPEED_STEPS - 1)) * (SPEED_MAX - SPEED_MIN);
+  return Math.round(rate * 100) / 100;
+}
+
+function speedLabel(rate) {
+  if (rate <= 0.6)  return "Very slow";
+  if (rate <= 0.75) return "Slow";
+  if (rate <= 0.9)  return "Steady";
+  if (rate <= 1.05) return "Normal";
+  if (rate <= 1.2)  return "Brisk";
+  if (rate <= 1.35) return "Fast";
+  return "Very fast";
+}
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
+  // Read deep-link tab from store (set by coach-proposal Library button)
+  const requestedTab = store.get("settingsTab");
+  if (requestedTab) {
+    activeTab = requestedTab;
+    store.set("settingsTab", null);
+  }
+
   return `
     <div class="view settings-view">
 
@@ -97,7 +129,7 @@ export function render() {
       <!-- ── Tab bar ──────────────────────────────────────────────────────── -->
       <div class="settings-tabs" role="tablist" aria-label="Settings sections">
         <button
-          class="settings-tab ${activeTab === "profile"    ? "active" : ""}"
+          class="settings-tab ${activeTab === "profile" ? "active" : ""}"
           role="tab"
           aria-selected="${activeTab === "profile"}"
           aria-controls="settings-tab-panel"
@@ -113,13 +145,21 @@ export function render() {
           data-tab="conditions"
         >Conditions</button>
         <button
-          class="settings-tab ${activeTab === "equipment"  ? "active" : ""}"
+          class="settings-tab ${activeTab === "equipment" ? "active" : ""}"
           role="tab"
           aria-selected="${activeTab === "equipment"}"
           aria-controls="settings-tab-panel"
           id="tab-equipment"
           data-tab="equipment"
         >Equipment</button>
+        <button
+          class="settings-tab ${activeTab === "library" ? "active" : ""}"
+          role="tab"
+          aria-selected="${activeTab === "library"}"
+          aria-controls="settings-tab-panel"
+          id="tab-library"
+          data-tab="library"
+        >Library</button>
       </div>
 
       <!-- ── Tab panel ────────────────────────────────────────────────────── -->
@@ -132,26 +172,11 @@ export function render() {
         ${renderActiveTab()}
       </div>
 
-      <!-- ── Programmes — always visible ─────────────────────────────────── -->
+      <!-- ── Reset — always visible ───────────────────────────────────────── -->
       <div class="settings-reset-zone">
 
-        <h2 class="section-heading" style="margin-bottom: var(--space-3);">
-          My Programmes
-        </h2>
-
-        <button class="btn btn-primary btn-full" id="morning-session-btn"
-                aria-label="Open my morning programme">
-          🌅 Morning Programme
-        </button>
-
-        <button class="btn btn-primary btn-full" id="gym-programme-btn"
-                style="margin-top: var(--space-3);"
-                aria-label="Open my gym programme">
-          🏋️ My Gym Programme
-        </button>
-
         <!-- ── App version and update check ─────────────────────────────── -->
-        <div class="settings-update-zone" style="margin-top: var(--space-5);">
+        <div class="settings-update-zone">
           <div class="settings-version-row">
             <span class="text-sm text-muted">Version</span>
             <span class="text-sm text-muted" id="settings-version-label">
@@ -189,6 +214,7 @@ function renderActiveTab() {
   if (activeTab === "profile")    return renderProfileTab();
   if (activeTab === "conditions") return renderConditionsTab();
   if (activeTab === "equipment")  return renderEquipmentTab();
+  if (activeTab === "library")    return renderLibraryTab();
   return "";
 }
 
@@ -205,22 +231,19 @@ function renderProfileTab() {
   return `
     <section aria-labelledby="profile-heading">
 
-      <!-- Profile details — read only -->
       <h2 id="profile-heading" class="section-heading">Your profile</h2>
       <div class="card settings-profile-card">
         ${settingsRow("Name",   name)}
-        ${settingsRow("Age",    age    ? `${age}`                      : "Not set")}
-        ${settingsRow("Gender", gender ? formatGender(gender)          : "Not set")}
-        ${settingsRow("Weight", weight ? `${weight}${weightUnit}`      : "Not set")}
+        ${settingsRow("Age",    age    ? String(age)               : "Not set")}
+        ${settingsRow("Gender", gender ? formatGender(gender)      : "Not set")}
+        ${settingsRow("Weight", weight ? `${weight}${weightUnit}`  : "Not set")}
       </div>
 
-      <!-- Coach style selector -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Coach style</h2>
       <p class="text-secondary settings-coach-intro">
         Choose how your coach communicates with you.
         You can change this any time.
       </p>
-
       <div class="coach-style-grid" role="radiogroup" aria-label="Coach communication style">
         ${COACH_STYLES.map(style => `
           <button
@@ -237,11 +260,9 @@ function renderProfileTab() {
         `).join("")}
       </div>
 
-      <!-- Coach voice speed -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Coach voice speed</h2>
       ${renderSpeechRateSection()}
 
-      <!-- Check-in reminder -->
       <h2 class="section-heading" style="margin-top: var(--space-6);">Check-in reminder</h2>
       ${renderNotificationSection()}
 
@@ -322,22 +343,134 @@ function renderEquipmentTab() {
   `;
 }
 
-// ── Speech rate section ───────────────────────────────────────────────────────
+// ── Library tab ───────────────────────────────────────────────────────────────
 
-/**
- * Render speed selector for coach card text-to-speech.
- * Three options: Slow / Normal / Fast.
- * Selection writes to store immediately. Takes effect on next tap of
- * a speaker button — no page reload needed.
- */
+function renderLibraryTab() {
+  return `
+    <section aria-labelledby="library-heading">
+      <h2 id="library-heading" class="section-heading">My movement</h2>
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
+        Tell the coach what kind of movement feels most like you.
+        This shapes what the coach suggests first each day.
+        You can change it any time.
+      </p>
+      ${renderMovementIdentity()}
+
+      <h2 class="section-heading" style="margin-top: var(--space-6);">Guided sessions</h2>
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
+        Start a guided session whenever you want — no check-in needed.
+      </p>
+      <div class="library-grid">
+
+        <button class="library-card"
+                data-navigate="gym-programme"
+                aria-label="My gym programme">
+          <span class="library-card-icon" aria-hidden="true">🏋</span>
+          <span class="library-card-label">Gym programme</span>
+        </button>
+
+        <button class="library-card"
+                data-navigate="prescribed"
+                aria-label="My prescribed exercises">
+          <span class="library-card-icon" aria-hidden="true">🩺</span>
+          <span class="library-card-label">Prescribed exercises</span>
+        </button>
+
+        <button class="library-card"
+                data-navigate="yoga-session"
+                aria-label="Yoga or pilates session">
+          <span class="library-card-icon" aria-hidden="true">🧘</span>
+          <span class="library-card-label">Yoga / Pilates</span>
+        </button>
+
+        <button class="library-card"
+                data-quiet="breathing"
+                data-navigate="quiet-session"
+                aria-label="Breathing practice">
+          <span class="library-card-icon" aria-hidden="true">🌬</span>
+          <span class="library-card-label">Breathing</span>
+        </button>
+
+        <button class="library-card"
+                data-quiet="journal"
+                data-navigate="quiet-session"
+                aria-label="Journaling session">
+          <span class="library-card-icon" aria-hidden="true">📝</span>
+          <span class="library-card-label">Journal</span>
+        </button>
+
+        <button class="library-card"
+                data-quiet="mindful"
+                data-navigate="quiet-session"
+                aria-label="Mindful movement">
+          <span class="library-card-icon" aria-hidden="true">🌿</span>
+          <span class="library-card-label">Mindful movement</span>
+        </button>
+
+        <button class="library-card"
+                data-navigate="coach-proposal"
+                aria-label="Ask the coach to recommend a session">
+          <span class="library-card-icon" aria-hidden="true">🤝</span>
+          <span class="library-card-label">Coach recommends</span>
+        </button>
+
+      </div>
+
+      <h2 class="section-heading" style="margin-top: var(--space-6);">Log an activity</h2>
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
+        Done something? Log it and the coach will reflect on it with you.
+      </p>
+
+      ${LOG_ACTIVITIES.map(group => `
+        <h3 class="library-group-heading">${group.group}</h3>
+        <div class="library-grid library-grid--compact">
+          ${group.items.map(item => `
+            <button class="library-card library-card--compact"
+                    data-log-activity="${item.id}"
+                    aria-label="Log ${item.label}">
+              <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
+              <span class="library-card-label">${item.label}</span>
+            </button>
+          `).join("")}
+        </div>
+      `).join("")}
+
+    </section>
+  `;
+}
+
+// ── Movement identity ─────────────────────────────────────────────────────────
+
+function renderMovementIdentity() {
+  const current = store.get("movementIdentity") || null;
+
+  return `
+    <div class="library-grid" role="group" aria-label="My movement identity">
+      ${MOVEMENT_IDENTITIES.map(item => `
+        <button class="library-card ${current === item.id ? "library-card--selected" : ""}"
+                data-identity="${item.id}"
+                aria-pressed="${current === item.id}"
+                aria-label="${item.label}">
+          <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
+          <span class="library-card-label">${item.label}</span>
+        </button>
+      `).join("")}
+    </div>
+    ${current ? `
+      <p class="text-sm text-muted" style="margin-top: var(--space-2);">
+        The coach will lean toward ${MOVEMENT_IDENTITIES.find(i => i.id === current)?.label || current} suggestions.
+        Your activity history will refine this over time.
+      </p>
+    ` : ""}
+  `;
+}
+
+// ── Voice speed — 10-level slider ─────────────────────────────────────────────
+
 function renderSpeechRateSection() {
   const currentRate = store.get("speechRate") || 0.9;
-
-  const rates = [
-    { value: 0.75, label: "Slow",   description: "More time to process" },
-    { value: 0.9,  label: "Normal", description: "Default" },
-    { value: 1.2,  label: "Fast",   description: "Quick and efficient" }
-  ];
+  const currentPos  = rateToPosition(currentRate);
+  const label       = speedLabel(currentRate);
 
   return `
     <div class="card speech-rate-card">
@@ -345,19 +478,38 @@ function renderSpeechRateSection() {
         Sets the speed of the read-aloud feature on coach cards.
         Tap the speaker icon on any coach message to listen.
       </p>
-      <div class="speech-rate-grid" role="radiogroup" aria-label="Coach voice speed">
-        ${rates.map(r => `
-          <button
-            class="speech-rate-btn ${currentRate === r.value ? "selected" : ""}"
-            role="radio"
-            aria-checked="${currentRate === r.value}"
-            data-rate="${r.value}"
-            aria-label="${r.label}: ${r.description}"
-          >
-            <span class="speech-rate-label">${r.label}</span>
-            <span class="speech-rate-desc">${r.description}</span>
-          </button>
-        `).join("")}
+
+      <div class="speech-rate-slider-wrap">
+        <div class="speech-rate-value-row">
+          <span class="speech-rate-current-label" id="speech-rate-label"
+                aria-live="polite" aria-atomic="true">
+            ${label}
+          </span>
+          <span class="speech-rate-position text-sm text-muted" id="speech-rate-position"
+                aria-hidden="true">
+            ${currentPos} / ${SPEED_STEPS}
+          </span>
+        </div>
+
+        <input
+          type="range"
+          id="speech-rate-slider"
+          class="checkin-slider"
+          min="1"
+          max="${SPEED_STEPS}"
+          step="1"
+          value="${currentPos}"
+          aria-label="Coach voice speed, ${currentPos} of ${SPEED_STEPS}, ${label}"
+          aria-valuemin="1"
+          aria-valuemax="${SPEED_STEPS}"
+          aria-valuenow="${currentPos}"
+          aria-valuetext="${label}"
+        >
+
+        <div class="checkin-slider-ends" aria-hidden="true">
+          <span>Slower</span>
+          <span>Faster</span>
+        </div>
       </div>
     </div>
   `;
@@ -365,21 +517,6 @@ function renderSpeechRateSection() {
 
 // ── Notification section ──────────────────────────────────────────────────────
 
-/**
- * Render the check-in notification toggle and time picker.
- *
- * PERMITTED: warm tone, single type, user-set time, user-revocable.
- * PROHIBITED: streak framing, guilt framing, re-prompting after denial,
- *             multiple notification types, automatic scheduling changes.
- *
- * Two states:
- *   enabled=false  — toggle only; time picker hidden.
- *   enabled=true   — toggle + time picker; permission status shown if denied.
- *
- * Permission is requested via browser Notification API when the user
- * first enables the toggle. If denied, a calm explanation is shown
- * and permissionGranted remains false. We never re-prompt automatically.
- */
 function renderNotificationSection() {
   const notif   = store.get("checkInNotification") || { enabled: false, time: null, permissionGranted: false };
   const enabled = !!notif.enabled;
@@ -462,47 +599,35 @@ function formatGender(gender) {
   return map[gender] || "Not set";
 }
 
-// ── Re-render helpers (used by event handlers) ────────────────────────────────
+// ── Re-render helpers ─────────────────────────────────────────────────────────
 
-/**
- * Switch to a different tab and re-render the panel in place.
- * Updates ARIA attributes on the tab buttons as well.
- */
 function switchTab(tabName) {
   activeTab = tabName;
 
-  // Update tab button ARIA and active class
   document.querySelectorAll(".settings-tab").forEach(btn => {
     const isActive = btn.dataset.tab === tabName;
     btn.classList.toggle("active", isActive);
     btn.setAttribute("aria-selected", isActive);
   });
 
-  // Re-render panel content only
   const panel = document.getElementById("settings-tab-panel");
   if (panel) {
     panel.setAttribute("aria-labelledby", `tab-${tabName}`);
     panel.innerHTML = renderActiveTab();
-    // Re-wire interactive elements inside the panel
     wirePanel();
   }
 }
 
-/**
- * Wire all interactive elements inside the tab panel.
- * Called after initial mount and after every tab switch.
- */
+// ── Wire all interactive elements ─────────────────────────────────────────────
+
 function wirePanel() {
-  // Coach style cards
+
+  // ── Coach style cards ──────────────────────────────────────────────────────
   document.querySelectorAll(".coach-style-card").forEach(card => {
     card.addEventListener("click", () => {
       const style = card.dataset.style;
       if (!style) return;
-
-      // Write to store
       store.set("coachStyle", style);
-
-      // Update UI: toggle selected class and aria-checked on all cards
       document.querySelectorAll(".coach-style-card").forEach(c => {
         const isSelected = c.dataset.style === style;
         c.classList.toggle("selected", isSelected);
@@ -511,68 +636,107 @@ function wirePanel() {
     });
   });
 
-  // Speech rate buttons
-  document.querySelectorAll(".speech-rate-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const rate = parseFloat(btn.dataset.rate);
-      if (isNaN(rate)) return;
-      store.set("speechRate", rate);
-      document.querySelectorAll(".speech-rate-btn").forEach(b => {
-        const isSelected = parseFloat(b.dataset.rate) === rate;
-        b.classList.toggle("selected", isSelected);
-        b.setAttribute("aria-checked", isSelected);
-      });
-    });
-  });
+  // ── Speech rate slider ─────────────────────────────────────────────────────
+  const slider = document.getElementById("speech-rate-slider");
+  if (slider) {
+    slider.addEventListener("input", () => {
+      const pos   = parseInt(slider.value);
+      const rate  = positionToRate(pos);
+      const label = speedLabel(rate);
 
-  // Notification toggle and time picker
+      store.set("speechRate", rate);
+
+      const labelEl = document.getElementById("speech-rate-label");
+      const posEl   = document.getElementById("speech-rate-position");
+      if (labelEl) labelEl.textContent = label;
+      if (posEl)   posEl.textContent   = `${pos} / ${SPEED_STEPS}`;
+
+      slider.setAttribute("aria-valuenow",  pos);
+      slider.setAttribute("aria-valuetext", label);
+    });
+  }
+
+  // ── Notification controls ──────────────────────────────────────────────────
   wireNotificationControls();
 
-  // Equipment chips
+  // ── Equipment chips ────────────────────────────────────────────────────────
   document.querySelectorAll(".equipment-chip").forEach(chip => {
     chip.addEventListener("click", () => {
       const id = chip.dataset.equipmentId;
       if (!id) return;
-
-      const current  = store.get("equipment") || [];
+      const current   = store.get("equipment") || [];
       const isSelected = current.includes(id);
-      const updated  = isSelected
-        ? current.filter(e => e !== id)
-        : [...current, id];
-
+      const updated   = isSelected ? current.filter(e => e !== id) : [...current, id];
       store.set("equipment", updated);
-
-      // Toggle this chip
       chip.classList.toggle("selected", !isSelected);
       chip.setAttribute("aria-pressed", !isSelected);
-
-      // Update the category count badge
       updateCategoryCount(chip);
+    });
+  });
+
+  // ── Movement identity ──────────────────────────────────────────────────────
+  document.querySelectorAll("[data-identity]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.identity;
+      if (!id) return;
+      store.set("movementIdentity", id);
+      document.querySelectorAll("[data-identity]").forEach(b => {
+        const isSelected = b.dataset.identity === id;
+        b.classList.toggle("library-card--selected", isSelected);
+        b.setAttribute("aria-pressed", isSelected);
+      });
+      // Update the description text below the grid
+      const identitySection = btn.closest("section");
+      if (identitySection) {
+        const existing = identitySection.querySelector(".movement-identity-note");
+        if (existing) existing.remove();
+        const identity = MOVEMENT_IDENTITIES.find(i => i.id === id);
+        if (identity) {
+          const note = document.createElement("p");
+          note.className = "text-sm text-muted movement-identity-note";
+          note.style.marginTop = "var(--space-2)";
+          note.textContent = `The coach will lean toward ${identity.label} suggestions. Your activity history will refine this over time.`;
+          btn.closest(".library-grid").after(note);
+        }
+      }
+    });
+  });
+
+  // ── Library navigation cards ───────────────────────────────────────────────
+  document.querySelectorAll("[data-navigate]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target    = btn.dataset.navigate;
+      const quietMode = btn.dataset.quiet || null;
+      if (!target) return;
+      if (quietMode) store.set("quietMode", quietMode);
+      router.navigate(target);
+    });
+  });
+
+  // ── Log activity cards ─────────────────────────────────────────────────────
+  document.querySelectorAll("[data-log-activity]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const activityId = btn.dataset.logActivity;
+      if (!activityId) return;
+      // Write a pending activity log entry so activity-log.js or reflect.js can pick it up
+      store.set("pendingLogActivity", activityId);
+      router.navigate("reflect");
     });
   });
 }
 
-/**
- * Update the "N selected" count badge for the category containing a chip.
- * Called after each chip toggle to keep counts accurate without a full re-render.
- */
 function updateCategoryCount(chip) {
   const categoryEl = chip.closest(".equipment-settings-category");
   if (!categoryEl) return;
-
-  const chipsInCat  = categoryEl.querySelectorAll(".equipment-chip");
+  const chipsInCat    = categoryEl.querySelectorAll(".equipment-chip");
   const selectedCount = Array.from(chipsInCat).filter(c => c.classList.contains("selected")).length;
-  const heading = categoryEl.querySelector(".equipment-category-heading");
+  const heading       = categoryEl.querySelector(".equipment-category-heading");
   if (!heading) return;
-
-  // Remove existing count badge if present
   const existing = heading.querySelector(".equipment-cat-count");
   if (existing) existing.remove();
-
-  // Re-insert if any are selected
   if (selectedCount > 0) {
     const badge = document.createElement("span");
-    badge.className = "equipment-cat-count";
+    badge.className   = "equipment-cat-count";
     badge.textContent = `${selectedCount} selected`;
     heading.appendChild(badge);
   }
@@ -580,26 +744,8 @@ function updateCategoryCount(chip) {
 
 // ── Notification wiring ───────────────────────────────────────────────────────
 
-/**
- * Wire the notification toggle and time picker.
- * Called from wirePanel() on every profile tab render.
- *
- * Toggle on:
- *   1. Request browser Notification permission.
- *   2. If granted: save enabled=true, permissionGranted=true, re-render section.
- *   3. If denied:  save enabled=true, permissionGranted=false, re-render section
- *      (section shows a calm explanation — no re-prompt, no guilt framing).
- *   4. If unavailable ("Notification" not in window): save enabled=false,
- *      show a gentle "not supported" message.
- *
- * Toggle off:
- *   Save enabled=false. Scheduling loop will stop on next tick.
- *
- * Time picker change:
- *   Saves new time to store. Scheduling loop reads from store each tick.
- */
 function wireNotificationControls() {
-  const toggle   = document.getElementById("notif-toggle");
+  const toggle    = document.getElementById("notif-toggle");
   const timeInput = document.getElementById("notif-time");
 
   if (toggle) {
@@ -607,20 +753,17 @@ function wireNotificationControls() {
       const wantsEnabled = toggle.checked;
 
       if (!wantsEnabled) {
-        // User turned it off — save and re-render section
         saveNotificationState({ enabled: false, time: null, permissionGranted: false });
         rerenderNotificationSection();
         return;
       }
 
-      // Browser notifications not supported
       if (!("Notification" in window)) {
         saveNotificationState({ enabled: false, time: null, permissionGranted: false });
         rerenderNotificationSection();
         return;
       }
 
-      // Already granted — just enable
       if (Notification.permission === "granted") {
         const currentTime = store.get("checkInNotification.time") || "08:00";
         saveNotificationState({ enabled: true, time: currentTime, permissionGranted: true });
@@ -629,19 +772,12 @@ function wireNotificationControls() {
         return;
       }
 
-      // Request permission — ONLY done when user explicitly toggles on.
-      // We never re-prompt automatically (prohibited pattern).
-      const permission = await Notification.requestPermission();
-      const granted    = permission === "granted";
+      const permission  = await Notification.requestPermission();
+      const granted     = permission === "granted";
       const currentTime = store.get("checkInNotification.time") || "08:00";
-
       saveNotificationState({ enabled: true, time: currentTime, permissionGranted: granted });
       rerenderNotificationSection();
-
-      if (granted) {
-        startNotificationScheduler();
-      }
-      // If denied: section re-renders with calm explanation. No further action.
+      if (granted) startNotificationScheduler();
     });
   }
 
@@ -650,7 +786,6 @@ function wireNotificationControls() {
       const newTime = timeInput.value;
       if (!newTime) return;
       store.set("checkInNotification.time", newTime);
-      // Scheduler reads from store each tick — no restart needed.
     });
   }
 }
@@ -663,94 +798,57 @@ function saveNotificationState(state) {
   });
 }
 
-/**
- * Re-render only the notification card within the current profile tab.
- * Avoids a full tab switch which would reset scroll position.
- */
 function rerenderNotificationSection() {
   const card = document.querySelector(".notification-card");
   if (card) {
-    const section = card.closest(".card");
-    if (section) {
-      // Replace just the card content by re-rendering the notification section
-      const wrapper = card.parentElement;
-      if (wrapper) {
-        wrapper.innerHTML = renderNotificationSection();
-        // Re-wire the new elements
-        wireNotificationControls();
-      }
+    const wrapper = card.parentElement;
+    if (wrapper) {
+      wrapper.innerHTML = renderNotificationSection();
+      wireNotificationControls();
     }
   }
 }
 
 // ── Notification scheduler ────────────────────────────────────────────────────
 
-/**
- * Scheduling approach: setInterval every 60 seconds.
- * On each tick, reads the user's chosen time from store and compares
- * to the current HH:MM. Fires a notification if they match and one
- * has not already been sent this minute.
- *
- * Single type only. Warm, non-urgent message. No streak framing.
- * No guilt framing. No urgency language.
- *
- * The interval is stored on window so it can be cleared if the user
- * disables the feature while the app is open.
- *
- * PROHIBITED messages (never use):
- *   - "You haven't checked in yet!"
- *   - "Don't break your streak!"
- *   - "You missed yesterday."
- *   - Any language implying failure or obligation.
- */
-let _notifSchedulerInterval  = null;
-let _notifLastFiredMinute    = null;
+let _notifSchedulerInterval = null;
+let _notifLastFiredMinute   = null;
 
 const NOTIFICATION_MESSAGES = [
   { title: "Alongside", body: "Ready when you are. A quick check-in takes less than a minute." },
   { title: "Alongside", body: "How are you feeling today? Your coach is here whenever suits you." },
   { title: "Alongside", body: "Just a gentle nudge. Come check in whenever you're ready." },
-  { title: "Alongside", body: "Your check-in is waiting. No rush -- take it at your own pace." },
+  { title: "Alongside", body: "Your check-in is waiting. No rush — take it at your own pace." },
   { title: "Alongside", body: "A moment to check in whenever suits you today." }
 ];
 
 function startNotificationScheduler() {
-  // Clear any existing interval to avoid duplicates
-  if (_notifSchedulerInterval) {
-    clearInterval(_notifSchedulerInterval);
-  }
+  if (_notifSchedulerInterval) clearInterval(_notifSchedulerInterval);
 
   _notifSchedulerInterval = setInterval(() => {
     const notif = store.get("checkInNotification");
     if (!notif?.enabled || !notif?.permissionGranted || !notif?.time) return;
     if (Notification.permission !== "granted") return;
 
-    const now    = new Date();
-    const hh     = String(now.getHours()).padStart(2, "0");
-    const mm     = String(now.getMinutes()).padStart(2, "0");
+    const now     = new Date();
+    const hh      = String(now.getHours()).padStart(2, "0");
+    const mm      = String(now.getMinutes()).padStart(2, "0");
     const nowHHMM = hh + ":" + mm;
 
-    // Only fire once per minute — track the last minute we fired
     if (nowHHMM === notif.time && _notifLastFiredMinute !== nowHHMM) {
       _notifLastFiredMinute = nowHHMM;
-
-      // Pick a message variant using the day of year so it rotates daily
-      const now2   = new Date();
-      const start  = new Date(now2.getFullYear(), 0, 0);
-      const dayIdx = Math.floor((now2 - start) / 86400000) % NOTIFICATION_MESSAGES.length;
+      const start  = new Date(now.getFullYear(), 0, 0);
+      const dayIdx = Math.floor((now - start) / 86400000) % NOTIFICATION_MESSAGES.length;
       const msg    = NOTIFICATION_MESSAGES[dayIdx];
-
-      // eslint-disable-next-line no-new
       new Notification(msg.title, {
-        body: msg.body,
-        icon: "assets/images/logo-icon-192.png",
-        tag:  "alongside-checkin",  // replaces previous if still showing
+        body:     msg.body,
+        icon:     "assets/images/logo-icon-192.png",
+        tag:      "alongside-checkin",
         renotify: false
       });
     }
-  }, 60000); // check every 60 seconds
+  }, 60000);
 
-  // Store interval reference globally so app.js can clear it on reset if needed
   window._alongsideNotifInterval = _notifSchedulerInterval;
 }
 
@@ -768,47 +866,28 @@ export function onMount() {
   // Wire panel elements on initial load
   wirePanel();
 
-  // If notification is already enabled and permission granted, resume scheduler
+  // Resume notification scheduler if already enabled
   const notif = store.get("checkInNotification");
   if (notif?.enabled && notif?.permissionGranted) {
     startNotificationScheduler();
   }
 
-  // Morning Programme button
-  document.getElementById("morning-session-btn")?.addEventListener("click", () => {
-    router.navigate("morning-session");
-  });
-
-  // Gym Programme button
-  document.getElementById("gym-programme-btn")?.addEventListener("click", () => {
-    router.navigate("gym-programme");
-  });
-
   // Check for updates
   document.getElementById("check-update-btn")?.addEventListener("click", async () => {
-    const btn = document.getElementById("check-update-btn");
+    const btn      = document.getElementById("check-update-btn");
     const statusEl = document.getElementById("update-check-status");
-
-    if (btn) {
-      btn.textContent = "Checking...";
-      btn.disabled    = true;
-    }
-    if (statusEl) statusEl.textContent = "";
-
+    if (btn)      { btn.textContent = "Checking..."; btn.disabled = true; }
+    if (statusEl)   statusEl.textContent = "";
     const result = await window.App?.checkForUpdate?.() || "unavailable";
     window.App?.showUpdateCheckResult?.(result);
-
-    if (btn) {
-      btn.textContent = "Check for updates";
-      btn.disabled    = false;
-    }
+    if (btn) { btn.textContent = "Check for updates"; btn.disabled = false; }
   });
 
   // Reset app
   document.getElementById("reset-app-btn")?.addEventListener("click", () => {
     if (confirm("This will delete all your data and start fresh. Are you sure?")) {
       store.reset();
-      activeTab = "profile"; // Reset tab state for next time
+      activeTab = "profile";
       document.getElementById("bottom-nav")?.classList.add("hidden");
       router.navigate("onboarding/welcome");
     }
