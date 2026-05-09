@@ -2,7 +2,17 @@
  * router.js - View navigation
  * Handles routing between different screens
  *
- * Accessibility additions (March 2026):
+ * 9 May 2026 v1
+ *
+ * v1.1 — Check-in as front door:
+ *   On app launch (after onboarding), router checks whether the user
+ *   has checked in today before deciding where to go.
+ *   - Not checked in today → checkin view
+ *   - Already checked in today → intention view
+ *   This ensures coach-proposal always has today's data to work from.
+ *   The check uses lastCheckin.date compared to today's YYYY-MM-DD string.
+ *
+ * v1.0 — Accessibility additions (March 2026):
  *   - VIEW_NAMES map provides human-readable labels for screen reader announcements
  *   - announceNavigation() writes to #sr-announcer after every navigate()
  *   - moveFocusToContent() moves keyboard focus to #main-content after render
@@ -13,7 +23,6 @@ import { store } from './store.js';
 import { tts }   from './tts.js';
 
 // Human-readable names announced to screen readers on navigation.
-// Keys match the viewName strings passed to router.navigate().
 const VIEW_NAMES = {
   'today':                   'Today',
   'progress':                'Your Progress',
@@ -35,10 +44,13 @@ const VIEW_NAMES = {
   'privacy':                 'Privacy and Terms',
   'gym-programme':           'My Gym Programme',
   'intention':               'What would you like to do today?',
+  'coach-proposal':          'Your coach has a suggestion',
   'reflect':                 'How was that?',
   'prescribed-session':      'Prescribed Exercises',
   'prescribed':              'My Prescribed Exercises',
   'morning-session':         'Morning Session',
+  'quiet-session':           'Quiet Session',
+  'yoga-session':            'Yoga and Pilates',
 };
 
 export const router = {
@@ -47,19 +59,36 @@ export const router = {
   views: {},
 
   /**
-   * Initialise router — determine starting view
+   * Initialise router — determine starting view.
+   *
+   * Flow after onboarding:
+   *   1. Has user checked in today?
+   *      Yes → intention (they've already shared how they are)
+   *      No  → checkin  (coach needs today's data before proposing anything)
    */
   init() {
     this.setupNavigation();
     this.hideLoading();
 
     if (store.isOnboardingComplete()) {
-      this.navigate('intention');
+      const checkedInToday = this._hasCheckedInToday();
+      this.navigate(checkedInToday ? 'intention' : 'checkin');
     } else {
       this.navigate('onboarding/welcome');
     }
 
     console.log('🧭 Router initialised');
+  },
+
+  /**
+   * Returns true if the user has a lastCheckin entry dated today.
+   * Uses YYYY-MM-DD comparison so "today" is correct regardless of time.
+   */
+  _hasCheckedInToday() {
+    const lastCheckin = store.get('lastCheckin');
+    if (!lastCheckin?.date) return false;
+    const today = new Date().toISOString().split('T')[0];
+    return lastCheckin.date === today;
   },
 
   /**
@@ -80,12 +109,15 @@ export const router = {
     const mainContent = document.getElementById('main-content');
     const bottomNav   = document.getElementById('bottom-nav');
 
-    // Clear current content
     mainContent.innerHTML = '';
     mainContent.className = 'main-content';
 
-    // Hide/show bottom nav
-    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin', 'prescribed-session', 'morning-session'];
+    // Hide bottom nav during focused flows
+    const hideNavViews = [
+      'onboarding', 'workout', 'workout-complete',
+      'checkin', 'prescribed-session', 'morning-session',
+      'quiet-session', 'yoga-session', 'coach-proposal'
+    ];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
     if (shouldHideNav) {
@@ -95,7 +127,6 @@ export const router = {
       this.setActiveNav(viewName);
     }
 
-    // Load and render the view
     try {
       const view = await this.loadView(viewName);
 
@@ -103,9 +134,7 @@ export const router = {
         if (view.centered) {
           mainContent.classList.add('centered');
         }
-
         mainContent.innerHTML = view.render();
-
         if (view.onMount) {
           view.onMount();
         }
@@ -118,37 +147,23 @@ export const router = {
     this.currentView = viewName;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Stop any playing speech when navigating away
     tts.stop();
 
-    // ── Accessibility ──────────────────────────────────────────────────────
     this.announceNavigation(viewName);
     this.moveFocusToContent();
 
-    // Mount TTS speaker buttons on coach cards in the new view
-    // Small delay to ensure the view has fully rendered
     setTimeout(() => tts.mountButtons(), 150);
-    // ──────────────────────────────────────────────────────────────────────
   },
 
   /**
    * Write the human-readable view name to #sr-announcer.
-   *
-   * Screen readers (VoiceOver, TalkBack, NVDA) watch this element because
-   * it has aria-live="polite" and will read its content aloud.
-   *
-   * We clear the text first so that navigating to the same view twice
-   * still triggers a new announcement (live regions only fire on change).
-   *
-   * The 50ms delay lets the DOM settle before the announcement fires,
-   * preventing it from being swallowed by the render cycle.
+   * Screen readers watch this element (aria-live="polite") and announce it.
+   * Text is cleared first so navigating to the same view twice still fires.
    */
   announceNavigation(viewName) {
     const announcer = document.getElementById('sr-announcer');
     if (!announcer) return;
-
     const label = VIEW_NAMES[viewName] || this.formatViewName(viewName);
-
     announcer.textContent = '';
     setTimeout(() => {
       announcer.textContent = label;
@@ -156,7 +171,7 @@ export const router = {
   },
 
   /**
-   * Fallback formatter for views not listed in VIEW_NAMES.
+   * Fallback formatter for views not in VIEW_NAMES.
    * 'onboarding/some-view' → 'Some View'
    */
   formatViewName(viewName) {
@@ -169,16 +184,8 @@ export const router = {
 
   /**
    * Move keyboard focus to #main-content after navigation.
-   *
-   * #main-content has tabindex="-1" in index.html, which means:
-   *   - It CAN receive focus programmatically (this call)
-   *   - It does NOT appear in the normal Tab key order
-   *
-   * preventScroll:true stops the browser jumping position — we already
-   * handle scrolling with window.scrollTo() above.
-   *
-   * The 100ms delay gives the view render time to complete so that
-   * screen readers read the new content, not the blank state.
+   * #main-content has tabindex="-1" — receives focus programmatically
+   * but is not in the normal Tab order.
    */
   moveFocusToContent() {
     setTimeout(() => {
@@ -194,9 +201,7 @@ export const router = {
     if (this.views[viewName]) {
       return this.views[viewName];
     }
-
     const path = `./views/${viewName}.js`;
-
     try {
       const module = await import(path);
       this.views[viewName] = module;
@@ -235,13 +240,12 @@ export const router = {
 
   /**
    * Highlight the active nav item.
-   * 'intention' is the home screen — it maps to the Today nav button
-   * (data-view="intention"). 'today' (coach workout view) also highlights
-   * the Today button since it is a sub-path of the Today journey.
+   * Both 'intention' and 'checkin' map to the Today nav button.
+   * 'today' (coach workout view) also highlights Today.
    */
   setActiveNav(viewName) {
-    // Treat coach workout view as part of the Today/intention journey
-    const navKey = viewName === 'today' ? 'intention' : viewName;
+    const todayViews = ['intention', 'today', 'checkin', 'coach-proposal'];
+    const navKey = todayViews.includes(viewName) ? 'intention' : viewName;
     document.querySelectorAll('.nav-item').forEach(item => {
       item.classList.toggle('active', item.dataset.view === navKey);
     });
