@@ -2683,62 +2683,187 @@
 
 
 /* ============================================================
-   SETTINGS — CONDITIONS ADD GRID
+   WALK SESSION VIEW
+   9 May 2026 v1
+   Append to bottom of css/progress.css
    ============================================================ */
 
-.condition-settings-row {
+.walk-session-view {
+  padding-bottom: var(--space-10);
+}
+
+/* ── Walk type selector — 2x2 grid ─────────────────────────── */
+
+.ws-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.ws-type-card {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-2);
-  padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--color-border-light);
-  min-height: 44px;
-}
-
-.condition-settings-row:last-child {
-  border-bottom: none;
-}
-
-.condition-settings-icon {
-  font-size: 1.1rem;
-  flex-shrink: 0;
-}
-
-.condition-settings-name {
-  flex: 1;
-  font-size: var(--text-sm);
-  color: var(--color-text);
-}
-
-.condition-add-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
-}
-
-.condition-add-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-4);
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
-  font-family: inherit;
-  color: var(--color-text-secondary);
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  min-height: 44px;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  min-height: 120px;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.condition-add-btn:hover {
+.ws-type-card:hover {
   border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.05);
+}
+
+.ws-type-card:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.ws-type-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.ws-type-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
   color: var(--color-text);
 }
 
-.condition-add-btn:focus-visible {
+.ws-type-desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Duration selector — 2x2 grid ──────────────────────────── */
+
+.ws-duration-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.ws-duration-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-5) var(--space-3);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  min-height: 96px;
+  text-align: center;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.ws-duration-card:hover {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.05);
+}
+
+.ws-duration-card:focus-visible {
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
+}
+
+.ws-duration-label {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+}
+
+.ws-duration-desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* ── Active walk — main timer ───────────────────────────────── */
+
+.ws-timer-block {
+  text-align: center;
+  padding: var(--space-8) 0 var(--space-6);
+}
+
+.ws-timer-value {
+  font-size: 5rem;
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.ws-timer-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Prompt card — appears mid-walk ────────────────────────── */
+
+.ws-prompt-card {
+  border: 1px solid var(--color-primary);
+  background: rgba(45, 212, 191, 0.06);
+  padding: var(--space-5);
+  animation: ws-prompt-in 0.3s ease;
+}
+
+.ws-prompt-card--cooldown {
+  border-color: var(--color-warning, #F59E0B);
+  background: rgba(245, 158, 11, 0.06);
+}
+
+@keyframes ws-prompt-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ws-prompt-text {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-4);
+}
+
+.ws-prompt-dismiss {
+  width: 100%;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  min-height: 44px;
+  border-radius: var(--radius-md);
+}
+
+.ws-prompt-dismiss:hover,
+.ws-prompt-dismiss:focus-visible {
+  background: rgba(45, 212, 191, 0.08);
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* ── Between-prompt card (coach holding message) ────────────── */
+
+.ws-active-card {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Controls ───────────────────────────────────────────────── */
+
+.ws-controls {
+  margin-top: var(--space-6);
 }
