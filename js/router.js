@@ -51,6 +51,7 @@ const VIEW_NAMES = {
   'morning-session':         'Morning Session',
   'quiet-session':           'Quiet Session',
   'yoga-session':            'Yoga and Pilates',
+  'core-session':            'Core Session',
 };
 
 export const router = {
@@ -116,7 +117,7 @@ export const router = {
     const hideNavViews = [
       'onboarding', 'workout', 'workout-complete',
       'checkin', 'prescribed-session', 'morning-session',
-      'quiet-session', 'yoga-session', 'coach-proposal'
+      'quiet-session', 'yoga-session', 'coach-proposal', 'core-session'
     ];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
