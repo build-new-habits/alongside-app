@@ -2270,3 +2270,153 @@
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
 }
+
+/* ============================================================
+   CORE SESSION VIEW
+   9 May 2026 v1
+   Append to bottom of css/progress.css (or global.css)
+   ============================================================ */
+
+.core-session-view {
+  padding-bottom: var(--space-10);
+}
+
+/* ── Focus selector grid — 2x2 ──────────────────────────────── */
+
+.cs-focus-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.cs-focus-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  min-height: 120px;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.cs-focus-card:hover {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.05);
+}
+
+.cs-focus-card:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.cs-focus-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.cs-focus-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.cs-focus-desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Duration selector — 3 column ───────────────────────────── */
+
+.cs-duration-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.cs-duration-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-2);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  min-height: 96px;
+  text-align: center;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.cs-duration-card:hover {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.05);
+}
+
+.cs-duration-card:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.cs-duration-label {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+}
+
+.cs-duration-desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.cs-duration-count {
+  margin-top: var(--space-1);
+}
+
+/* ── "Why this exercise?" expandable ────────────────────────── */
+
+.cs-why-details {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.cs-why-details summary {
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.cs-why-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.cs-why-details summary::before {
+  content: "+ ";
+  color: var(--color-primary);
+  font-weight: var(--font-bold);
+  margin-right: var(--space-1);
+}
+
+.cs-why-details[open] summary::before {
+  content: "- ";
+}
+
+.cs-why-details:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
