@@ -1,10 +1,18 @@
 /**
  * intention.js - Intention Screen
  *
+ * 9 May 2026 v1
+ *
+ * v1.1 — Coach path routes to coach-proposal (not today):
+ *   "Suggest something for me" now navigates to coach-proposal.js
+ *   which reads today's lastCheckin data and builds a personalised
+ *   proposal. Previously routed to today.js (old coach view) which
+ *   had no check-in data and produced generic suggestions.
+ *
  * v1.0 — Sits between check-in and activity.
  *   Reads check-in energy from store, responds with a dynamic
  *   coach line, then offers three paths:
- *     A — Coach recommends (current Today experience)
+ *     A — Coach recommends (coach-proposal — reads today's check-in)
  *     B — I know what I'm doing (activity type selection)
  *     C — Something quieter (mindfulness, journal, rest)
  *
@@ -38,22 +46,21 @@ const QUIET_OPTIONS = [
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-let selectedPath     = null;   // "coach" | "self" | "quiet"
-let selectedActivity = null;   // activity id from ACTIVITIES
-let selectedQuiet    = null;   // quiet option id
-let activityName     = "";     // free text name for class/other
+let selectedPath     = null;
+let selectedActivity = null;
+let selectedQuiet    = null;
+let activityName     = "";
 
 // ── Coach line ────────────────────────────────────────────────────────────────
 
 function buildCoachLine() {
-  const checkin   = store.get("lastCheckin") || {};
-  const energy    = checkin.energy    || store.get("todayEnergy") || 5;
-  const conditions = store.get("conditions") || [];
+  const checkin    = store.get("lastCheckin") || {};
+  const energy     = checkin.energy    || store.get("todayEnergy") || 5;
+  const conditions = store.get("conditions")        || [];
   const painScores = store.get("conditionPainScores") || {};
-  const hasPain   = conditions.some(id => (painScores[id] || 0) >= 3);
-  const name      = store.get("name") || "";
-
-  const greeting  = name ? name + ". " : "";
+  const hasPain    = conditions.some(id => (painScores[id] || 0) >= 3);
+  const name       = store.get("name") || "";
+  const greeting   = name ? name + ". " : "";
 
   if (hasPain) {
     return greeting + "I can see things are a bit harder today. I've got options that work with that. What feels right?";
@@ -74,11 +81,16 @@ export function render() {
     <div class="view intention-view">
 
       <div class="view-header">
-        <h1>What would you like to do?</h1>
+        <h1>Today</h1>
       </div>
 
-      <!-- Path selector — three clean cards, no coach preamble -->
-      <!-- The coach speaks on the coach-proposal screen. Here: clarity only. -->
+      <!-- Coach line -->
+      <div class="card card-coach intention-coach-card">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="coach-message-text">${buildCoachLine()}</p>
+      </div>
+
+      <!-- Path selector -->
       <div class="intention-paths" role="group" aria-label="What would you like to do today?">
 
         <button class="intention-path ${selectedPath === "coach" ? "selected" : ""}"
@@ -94,78 +106,46 @@ export function render() {
         <button class="intention-path ${selectedPath === "self" ? "selected" : ""}"
                 data-path="self"
                 aria-pressed="${selectedPath === "self"}">
-          <span class="intention-path-icon" aria-hidden="true">\uD83C\uDFCB</span>
+          <span class="intention-path-icon" aria-hidden="true">\uD83D\uDCAA</span>
           <div class="intention-path-text">
-            <span class="intention-path-label">I know what I'm doing</span>
-            <span class="intention-path-sub">Gym, run, class, swim, walk\u2026</span>
+            <span class="intention-path-label">I know what I want to do</span>
+            <span class="intention-path-sub">Pick your activity and go</span>
           </div>
         </button>
 
         <button class="intention-path ${selectedPath === "quiet" ? "selected" : ""}"
                 data-path="quiet"
                 aria-pressed="${selectedPath === "quiet"}">
-          <span class="intention-path-icon" aria-hidden="true">\uD83C\uDF3F</span>
+          <span class="intention-path-icon" aria-hidden="true">\uD83C\uDF43</span>
           <div class="intention-path-text">
-            <span class="intention-path-label">Something quieter</span>
-            <span class="intention-path-sub">Mindfulness, journaling, rest</span>
+            <span class="intention-path-label">Something quieter today</span>
+            <span class="intention-path-sub">Mindfulness, journaling, or rest</span>
+          </div>
+        </button>
+
+        <button class="intention-path ${selectedPath === "prescribed" ? "selected" : ""}"
+                data-path="prescribed"
+                aria-pressed="${selectedPath === "prescribed"}">
+          <span class="intention-path-icon" aria-hidden="true">\uD83E\uDE7A</span>
+          <div class="intention-path-text">
+            <span class="intention-path-label">My prescribed exercises</span>
+            <span class="intention-path-sub">From your physio or specialist</span>
           </div>
         </button>
 
       </div>
 
-      <!-- Path B: activity type selector -->
-      ${selectedPath === "self" ? `
-        <div class="intention-activity-selector" id="activity-selector">
-          <p class="intention-selector-label">What are you doing?</p>
-          <div class="intention-activity-grid" role="group" aria-label="Activity type">
-            ${ACTIVITIES.map(a => `
-              <button class="intention-activity-chip ${selectedActivity === a.id ? "selected" : ""}"
-                      data-activity="${a.id}"
-                      aria-pressed="${selectedActivity === a.id}">
-                <span aria-hidden="true">${a.icon}</span>
-                ${a.label}
-              </button>
-            `).join("")}
-          </div>
+      <!-- Sub-options for Path B (self) -->
+      ${selectedPath === "self" ? renderSelfOptions() : ""}
 
-          ${selectedActivity && ACTIVITIES.find(a => a.id === selectedActivity)?.hasName ? `
-            <div class="intention-name-field">
-              <label class="profile-field-label" for="activity-name-input">
-                What's it called?
-              </label>
-              <input type="text"
-                     id="activity-name-input"
-                     class="profile-field-input"
-                     placeholder="${selectedActivity === "class" ? "e.g. Body Balance, Conditioning workshop" : "e.g. Morning swim"}"
-                     value="${activityName}"
-                     aria-label="Activity name">
-            </div>
-          ` : ""}
-        </div>
-      ` : ""}
-
-      <!-- Path C: quiet options -->
-      ${selectedPath === "quiet" ? `
-        <div class="intention-activity-selector" id="quiet-selector">
-          <p class="intention-selector-label">What feels right?</p>
-          <div class="intention-activity-grid" role="group" aria-label="Quiet option">
-            ${QUIET_OPTIONS.map(q => `
-              <button class="intention-activity-chip ${selectedQuiet === q.id ? "selected" : ""}"
-                      data-quiet="${q.id}"
-                      aria-pressed="${selectedQuiet === q.id}">
-                <span aria-hidden="true">${q.icon}</span>
-                ${q.label}
-              </button>
-            `).join("")}
-          </div>
-        </div>
-      ` : ""}
+      <!-- Sub-options for Path C (quiet) -->
+      ${selectedPath === "quiet" ? renderQuietOptions() : ""}
 
       <!-- Continue button — shown when a valid selection is made -->
       ${canContinue() ? `
-        <button class="btn btn-primary btn-large btn-full intention-continue-btn"
+        <button class="btn btn-primary btn-full intention-continue"
                 id="intention-continue"
-                style="margin-top: var(--space-5);">
+                style="margin-top: var(--space-6);">
           ${getContinueLabel()}
         </button>
       ` : ""}
@@ -174,15 +154,69 @@ export function render() {
   `;
 }
 
+// ── Sub-option renderers ──────────────────────────────────────────────────────
+
+function renderSelfOptions() {
+  return `
+    <div class="intention-sub-options" aria-label="Choose your activity">
+      <p class="text-sm text-muted intention-sub-label">What are you doing?</p>
+      <div class="intention-activity-grid" role="group" aria-label="Activity type">
+        ${ACTIVITIES.map(act => `
+          <button class="intention-activity-chip ${selectedActivity === act.id ? "selected" : ""}"
+                  data-activity="${act.id}"
+                  aria-pressed="${selectedActivity === act.id}"
+                  aria-label="${act.label}">
+            <span aria-hidden="true">${act.icon}</span>
+            ${act.label}
+          </button>
+        `).join("")}
+      </div>
+      ${selectedActivity && ACTIVITIES.find(a => a.id === selectedActivity)?.hasName ? `
+        <label class="form-label" for="activity-name-input"
+               style="margin-top: var(--space-3);">
+          Give it a name (optional)
+        </label>
+        <input type="text" id="activity-name-input" class="form-input"
+               placeholder="e.g. Spin class, Body Balance"
+               value="${activityName}"
+               aria-label="Activity name">
+      ` : ""}
+    </div>
+  `;
+}
+
+function renderQuietOptions() {
+  return `
+    <div class="intention-sub-options" aria-label="Choose a quiet option">
+      <p class="text-sm text-muted intention-sub-label">What feels right?</p>
+      <div class="intention-activity-grid" role="group" aria-label="Quiet option">
+        ${QUIET_OPTIONS.map(q => `
+          <button class="intention-activity-chip ${selectedQuiet === q.id ? "selected" : ""}"
+                  data-quiet="${q.id}"
+                  aria-pressed="${selectedQuiet === q.id}"
+                  aria-label="${q.label}">
+            <span aria-hidden="true">${q.icon}</span>
+            ${q.label}
+          </button>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+// ── Can continue? ─────────────────────────────────────────────────────────────
+
 function canContinue() {
-  if (selectedPath === "coach") return true;
-  if (selectedPath === "self"  && selectedActivity) return true;
-  if (selectedPath === "quiet" && selectedQuiet)    return true;
+  if (selectedPath === "coach")      return true;
+  if (selectedPath === "prescribed") return true;
+  if (selectedPath === "self")       return !!selectedActivity;
+  if (selectedPath === "quiet")      return !!selectedQuiet;
   return false;
 }
 
 function getContinueLabel() {
-  if (selectedPath === "coach") return "See what you suggest";
+  if (selectedPath === "coach")      return "See what you suggest";
+  if (selectedPath === "prescribed") return "Go to my prescribed exercises";
   if (selectedPath === "self") {
     const act = ACTIVITIES.find(a => a.id === selectedActivity);
     return "Let's go \u2014 " + (act?.label || "activity");
@@ -197,42 +231,72 @@ function getContinueLabel() {
 // ── Navigation ────────────────────────────────────────────────────────────────
 
 function logAndNavigate() {
-  // Save activity log entry
-  const log = store.get("activityLog") || [];
+  // Write activity log entry so the session is tracked from the start
+  const log     = store.get("activityLog") || [];
   const checkin = store.get("lastCheckin") || {};
-  const entry = {
-    id:            new Date().toISOString() + "_" + Math.random().toString(36).slice(2, 6),
-    date:          new Date().toISOString().split("T")[0],
-    type:          selectedPath === "coach" ? "coach-session" :
-                   selectedPath === "quiet" ? selectedQuiet :
-                   selectedActivity,
-    name:          activityName.trim() || null,
-    energyBefore:  checkin.energy || null,
-    source:        selectedPath === "coach" ? "coach-recommended" : "self-directed",
-    sessionStart:  new Date().toISOString(),
+  const entry   = {
+    id:           new Date().toISOString() + "_" + Math.random().toString(36).slice(2, 6),
+    date:         new Date().toISOString().split("T")[0],
+    type:         selectedPath === "coach"      ? "coach-session"      :
+                  selectedPath === "prescribed" ? "prescribed-session" :
+                  selectedPath === "quiet"      ? selectedQuiet        :
+                  selectedActivity,
+    name:         activityName.trim() || null,
+    energyBefore: checkin.energy || null,
+    source:       selectedPath === "coach"      ? "coach-recommended" :
+                  selectedPath === "prescribed" ? "prescribed"        :
+                  "self-directed",
+    sessionStart: new Date().toISOString(),
   };
   store.set("activityLog", [...log, entry]);
   store.set("currentActivityEntry", entry);
 
-  // Navigate
+  // ── Route ─────────────────────────────────────────────────────────────────
+
+  // Coach path → coach-proposal (reads today's lastCheckin data)
+  // Previously routed to "today" which had no check-in context.
   if (selectedPath === "coach") {
     router.navigate("coach-proposal");
     return;
   }
+
+  if (selectedPath === "prescribed") {
+    router.navigate("prescribed");
+    return;
+  }
+
   if (selectedPath === "self") {
     if (selectedActivity === "gym") {
       router.navigate("gym-programme");
       return;
     }
-    // Other self-directed activities — activity in progress view (Phase 4)
-    // For now, navigate to reflect directly with a timer option
+    if (selectedActivity === "yoga") {
+      router.navigate("yoga-session");
+      return;
+    }
+    // Other self-directed activities — reflect for now (activity-in-progress Phase 5)
     router.navigate("reflect");
     return;
   }
+
   if (selectedPath === "quiet") {
-    // Store the mode so quiet-session.js knows which experience to render
-    store.set("quietMode", selectedQuiet || "breathing");
-    router.navigate("quiet-session");
+    if (selectedQuiet === "journal") {
+      store.set("quietMode", "journal");
+      router.navigate("quiet-session");
+      return;
+    }
+    if (selectedQuiet === "breathing") {
+      store.set("quietMode", "breathing");
+      router.navigate("quiet-session");
+      return;
+    }
+    if (selectedQuiet === "mindfulness") {
+      store.set("quietMode", "mindful");
+      router.navigate("quiet-session");
+      return;
+    }
+    // Rest day — go to reflect
+    router.navigate("reflect");
     return;
   }
 }
@@ -248,7 +312,7 @@ export function onMount() {
     // Path selection
     const pathBtn = e.target.closest(".intention-path");
     if (pathBtn) {
-      const path = pathBtn.dataset.path;
+      const path   = pathBtn.dataset.path;
       selectedPath     = path;
       selectedActivity = null;
       selectedQuiet    = null;
@@ -277,7 +341,6 @@ export function onMount() {
     // Continue
     const continueBtn = e.target.closest("#intention-continue");
     if (continueBtn) {
-      // Capture activity name if present
       const nameInput = document.getElementById("activity-name-input");
       if (nameInput) activityName = nameInput.value.trim();
       logAndNavigate();
