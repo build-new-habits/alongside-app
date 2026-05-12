@@ -1,7 +1,7 @@
 /**
  * settings.js - Settings view
  *
- * 8 May 2026 v2
+ * 13 May 2026 v1
  *
  * v2.1 — Editable profile, facility presets, add/remove conditions, Morning Routine:
  *   Profile tab: inline edit for name, age, gender, weight.
@@ -82,39 +82,61 @@ const LOG_ACTIVITIES = [
 ];
 
 // ── Facility presets ──────────────────────────────────────────────────────────
+// ── Facility presets — correct IDs from equipment.js ─────────────────────────
+// IDs verified against EQUIPMENT_CATEGORIES in js/data/equipment.js
+// Full gym fills both equipment[] (gym) and gymEquipment[] store keys.
+// Home setup fills homeEquipment[] store key separately.
+
 const FACILITY_PRESETS = [
   {
     id:    "gym-full",
     label: "Full gym",
-    icon:  "🏋",
+    icon:  "\uD83C\uDFCB",
+    scope: "gym",   // writes to gymEquipment
     fills: [
-      "barbell", "dumbbells", "bench", "cable-machine", "leg-press",
-      "pull-up-bar", "resistance-bands", "kettlebell", "foam-roller",
+      "dumbbells-light", "dumbbells-medium", "dumbbells-heavy", "adjustable-dumbbells",
+      "kettlebell-light", "kettlebell-medium", "kettlebell-heavy",
+      "barbell", "ez-curl-bar",
+      "band-light", "band-medium", "band-heavy",
+      "treadmill", "exercise-bike", "rowing-machine", "elliptical",
+      "bench-flat", "bench-adjustable",
+      "pull-up-bar", "dip-station",
+      "stability-ball", "ab-wheel",
+      "foam-roller", "massage-gun",
       "gym-membership"
+    ]
+  },
+  {
+    id:    "home-setup",
+    label: "Home setup",
+    icon:  "\uD83C\uDFE0",
+    scope: "home",  // writes to homeEquipment
+    fills: [
+      "dumbbells-light", "dumbbells-medium",
+      "band-light", "band-medium",
+      "yoga-mat", "pull-up-bar",
+      "bench-adjustable", "foam-roller"
     ]
   },
   {
     id:    "swimming-pool",
     label: "Swimming pool",
-    icon:  "🏊",
+    icon:  "\uD83C\uDFCA",
+    scope: "gym",
     fills: ["swimming-pool"]
   },
   {
     id:    "fitness-studio",
     label: "Fitness studio",
-    icon:  "🏥",
-    fills: ["fitness-studio", "yoga-mat", "resistance-bands"]
-  },
-  {
-    id:    "home-setup",
-    label: "Home setup",
-    icon:  "🏠",
-    fills: ["dumbbells", "resistance-bands", "yoga-mat", "foam-roller", "pull-up-bar"]
+    icon:  "\uD83C\uDFE5",
+    scope: "gym",
+    fills: ["fitness-studio", "yoga-mat", "band-light", "band-medium", "step-platform"]
   },
   {
     id:    "no-equipment",
     label: "No equipment",
-    icon:  "🚶",
+    icon:  "\uD83D\uDEB6",
+    scope: "home",
     fills: []
   }
 ];
@@ -385,10 +407,28 @@ function renderEquipmentTab() {
       <h2 id="equipment-heading" class="section-heading">Your equipment</h2>
 
       <p class="text-secondary text-sm settings-equipment-intro">
-        Tap your setup to auto-fill common equipment, then adjust individually below.
+        Tap your setup to auto-fill. Gym and home equipment are kept separate
+        so the coach knows what you have where.
       </p>
-      <div class="facility-preset-grid" role="group" aria-label="Choose your setup type">
-        ${FACILITY_PRESETS.map(preset => `
+
+      <h3 class="section-heading" style="font-size: var(--text-xs); margin-bottom: var(--space-2);">
+        At the gym or facility
+      </h3>
+      <div class="facility-preset-grid" role="group" aria-label="Choose your gym or facility">
+        ${FACILITY_PRESETS.filter(p => p.scope === "gym").map(preset => `
+          <button class="facility-preset-btn" data-preset="${preset.id}"
+                  aria-label="${preset.label} — auto-fill equipment">
+            <span class="facility-preset-icon" aria-hidden="true">${preset.icon}</span>
+            <span class="facility-preset-label">${preset.label}</span>
+          </button>
+        `).join("")}
+      </div>
+
+      <h3 class="section-heading" style="font-size: var(--text-xs); margin: var(--space-4) 0 var(--space-2);">
+        At home
+      </h3>
+      <div class="facility-preset-grid" role="group" aria-label="Choose your home setup">
+        ${FACILITY_PRESETS.filter(p => p.scope === "home").map(preset => `
           <button class="facility-preset-btn" data-preset="${preset.id}"
                   aria-label="${preset.label} — auto-fill equipment">
             <span class="facility-preset-icon" aria-hidden="true">${preset.icon}</span>
@@ -790,8 +830,23 @@ function wirePanel() {
     btn.addEventListener("click", () => {
       const preset = FACILITY_PRESETS.find(p => p.id === btn.dataset.preset);
       if (!preset) return;
-      const current = store.get("equipment") || [];
-      store.set("equipment", Array.from(new Set([...current, ...preset.fills])));
+
+      // Write to the correct store key based on scope
+      // "gym" scope → gymEquipment (what I have at the gym)
+      // "home" scope → homeEquipment (what I have at home)
+      // Also always write to equipment[] for backward compatibility
+      if (preset.scope === "home") {
+        const current = store.get("homeEquipment") || [];
+        store.set("homeEquipment", Array.from(new Set([...current, ...preset.fills])));
+      } else {
+        const current = store.get("gymEquipment") || [];
+        store.set("gymEquipment", Array.from(new Set([...current, ...preset.fills])));
+      }
+      // Keep equipment[] in sync (union of both)
+      const gym  = store.get("gymEquipment")  || [];
+      const home = store.get("homeEquipment") || [];
+      store.set("equipment", Array.from(new Set([...gym, ...home])));
+
       document.querySelectorAll(".facility-preset-btn").forEach(b =>
         b.classList.remove("selected")
       );
