@@ -2,7 +2,7 @@
  * sw.js - Alongside Service Worker
  *
  * 9 May 2026 v1
- * Cache version: alongside-v33
+ * Cache version: alongside-v34
  *
  * Bumped from alongside-v17. Changes since last version:
  *   - settings.js rebuilt (Library tab, My Movement, facility presets,
@@ -24,7 +24,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v33";
+const CACHE_NAME = "alongside-v34";
 
 const SHELL_URLS = [
 
