@@ -2539,3 +2539,125 @@
 }
 
 .ws-controls { margin-top: var(--space-6); }
+
+
+/* ============================================================
+   PROGRESS — Activity breakdown tiles (Last 30 days)
+   13 May 2026 v1
+   Fix: "MINDFUL MOMENTS" label overflowing tile width
+   ============================================================ */
+
+/* Activity type tiles in the last-30-days breakdown */
+.activity-breakdown-grid {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: var(--space-1);
+  scrollbar-width: none;
+}
+
+.activity-breakdown-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.activity-breakdown-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  min-width: 64px;
+  flex-shrink: 0;
+}
+
+.activity-breakdown-tile--active {
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.2);
+}
+
+.activity-breakdown-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.activity-breakdown-count {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.activity-breakdown-tile--active .activity-breakdown-count {
+  color: var(--color-primary);
+}
+
+/* Key fix: wrap and constrain label text so long labels like
+   "MINDFUL MOMENTS" break across two lines rather than overflowing */
+.activity-breakdown-label {
+  font-size: 9px;
+  font-weight: var(--font-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 60px;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+
+/* ============================================================
+   COACH PROPOSAL — Location-first flow
+   13 May 2026 v1
+   ============================================================ */
+
+.coach-location-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.coach-location-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  min-height: 80px;
+  text-align: center;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.coach-location-btn:hover {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.05);
+}
+
+.coach-location-btn:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.coach-location-btn span:first-child {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.coach-location-btn-sub {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
