@@ -1,6 +1,16 @@
 /**
  * coach-proposal.js - Coach Proposal Screen
  *
+ * 13 May 2026 v1
+ *
+ * Fixes:
+ *   - S1: renderRevised used p.label/p.description (undefined). Fixed to p.proposal/p.rationale.
+ *   - S1: "Something else entirely" now uses location-first branching:
+ *         Where are you? (Home/Gym/Outdoors/Pool) -> What do you fancy? -> revised proposal or navigate
+ *   - S4: daysSinceLast now reads completedAt||sessionStart||date (not loggedAt which did not exist).
+ *         This fixes the coach always thinking gym was recent.
+ *   - Burnout thresholds updated: <24h recovery, 24-48h gentle-first, 48-72h normal, 72h+ full.
+ *
  * v1.0 (S4-1, April 2026)
  *
  * The coach arrives with a plan. Not a menu. Not cards.
@@ -90,7 +100,7 @@ const ACTIVITY_LABELS = {
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-let proposalState   = "proposal";  // "proposal" | "branching" | "revised" | "activity-pick"
+let proposalState   = "proposal";  // "proposal" | "branching" | "location" | "home-options" | "gym-options" | "outdoor-options" | "revised" | "activity-pick"
 let currentProposal = null;        // the active proposal object
 let revisedProposal = null;        // the alternative proposal
 let branchChoice    = null;        // "mind" | "different" | "shorter" | "quieter"
@@ -147,8 +157,11 @@ function buildProposal(preferShorter = false) {
   // Recent activity analysis
   const recentLog      = activityLog.slice(-7);
   const lastSession    = recentLog[recentLog.length - 1] || null;
-  const daysSinceLast  = lastSession
-    ? Math.floor((Date.now() - new Date(lastSession.loggedAt)) / 86400000)
+  const lastSessionDate = lastSession
+    ? new Date(lastSession.completedAt || lastSession.sessionStart || lastSession.date || 0)
+    : null;
+  const daysSinceLast  = lastSessionDate
+    ? Math.floor((Date.now() - lastSessionDate.getTime()) / 86400000)
     : 99;
 
   const recentTypes    = recentLog.map(e => e.type || e.source || "");
@@ -233,7 +246,8 @@ function buildProposal(preferShorter = false) {
   let consecutiveDays = 0;
   for (let i = last7.length - 1; i >= 0; i--) {
     const entry = last7[i];
-    const daysAgo = Math.floor((Date.now() - new Date(entry.loggedAt)) / 86400000);
+    const entryDate = new Date(entry.completedAt || entry.sessionStart || entry.date || 0);
+    const daysAgo = Math.floor((Date.now() - entryDate.getTime()) / 86400000);
     if (daysAgo <= consecutiveDays + 1 && isTraining(last7Types[i])) {
       consecutiveDays++;
     } else {
@@ -243,7 +257,7 @@ function buildProposal(preferShorter = false) {
 
   const consecutiveHeavy = last7Types.slice(-2).every(isHeavy);
   const totalThisWeek    = last7.filter(e => {
-    const d = Math.floor((Date.now() - new Date(e.loggedAt)) / 86400000);
+    const d = Math.floor((Date.now() - new Date(e.completedAt || e.sessionStart || e.date || 0).getTime()) / 86400000);
     return d < 7 && isTraining(e.type || e.source || "");
   }).length;
 
@@ -566,10 +580,14 @@ export function render() {
 
       <!-- ── Coach proposal ──────────────────────────────────────────────── -->
       <div id="proposal-body">
-        ${proposalState === "proposal"   ? renderProposal(name)  : ""}
-        ${proposalState === "branching"  ? renderBranching()     : ""}
-        ${proposalState === "revised"    ? renderRevised(name)   : ""}
-        ${proposalState === "activity-pick" ? renderActivityPick() : ""}
+        ${proposalState === "proposal"      ? renderProposal(name)    : ""}
+        ${proposalState === "branching"     ? renderBranching()       : ""}
+        ${proposalState === "location"      ? renderLocationPicker()  : ""}
+        ${proposalState === "home-options"  ? renderHomeOptions()     : ""}
+        ${proposalState === "gym-options"   ? renderGymOptions()      : ""}
+        ${proposalState === "outdoor-options" ? renderOutdoorOptions() : ""}
+        ${proposalState === "revised"       ? renderRevised(name)     : ""}
+        ${proposalState === "activity-pick" ? renderActivityPick()    : ""}
       </div>
 
     </div>
@@ -627,6 +645,42 @@ function renderProposal(name) {
   `;
 }
 
+// ── Location-first "Something else entirely" flow ─────────────────────────────
+
+let selectedLocation = null;
+
+const LOCATIONS = [
+  { id: "home",     label: "At home",       icon: "\uD83C\uDFE0" },
+  { id: "gym",      label: "At the gym",    icon: "\uD83C\uDFCB" },
+  { id: "outdoors", label: "Outdoors",      icon: "\uD83C\uDF33" },
+  { id: "pool",     label: "Swimming pool", icon: "\uD83C\uDFCA" },
+];
+
+const HOME_OPTIONS = [
+  { id: "home-mixed",    label: "Mixed workout", icon: "\u2728",        description: "Coach builds a range of things" },
+  { id: "home-core",     label: "Core",          icon: "\uD83E\uDDD8",  description: "Choose intensity below" },
+  { id: "home-hiit",     label: "HIIT",          icon: "\u26A1",        description: "Choose intensity below" },
+  { id: "home-strength", label: "Strength",      icon: "\uD83D\uDCAA",  description: "Bodyweight or home equipment" },
+  { id: "home-cardio",   label: "Cardio",        icon: "\uD83C\uDFC3",  description: "Raise the heart rate" },
+  { id: "home-mobility", label: "Mobility",      icon: "\uD83C\uDF3F",  description: "Open and unlock the body" },
+];
+
+const GYM_OPTIONS = [
+  { id: "gym-programme", label: "My programme",   icon: "\uD83C\uDFCB", target: "gym-programme"  },
+  { id: "gym-core",      label: "Core",           icon: "\uD83E\uDDD8", target: "core-session"   },
+  { id: "gym-cardio",    label: "Cardio",         icon: "\uD83C\uDFC3", target: "activity-log"   },
+  { id: "gym-upper",     label: "Upper body",     icon: "\uD83D\uDCAA", target: "gym-programme"  },
+  { id: "gym-lower",     label: "Lower body",     icon: "\uD83E\uDDB5", target: "gym-programme"  },
+  { id: "gym-strength",  label: "Strength",       icon: "\uD83D\uDD25", target: "gym-programme"  },
+];
+
+const OUTDOOR_OPTIONS = [
+  { id: "run",     label: "Run",   icon: "\uD83C\uDFC3", target: "activity-log"  },
+  { id: "walk",    label: "Walk",  icon: "\uD83D\uDEB6", target: "walk-session"  },
+  { id: "cycle",   label: "Cycle", icon: "\uD83D\uDEB4", target: "activity-log"  },
+  { id: "hiking",  label: "Hike",  icon: "\uD83E\uDD7E", target: "activity-log"  },
+];
+
 function renderBranching() {
   return `
     <div class="card card-coach coach-proposal-card">
@@ -637,81 +691,162 @@ function renderBranching() {
     </div>
 
     <div class="coach-branch-chips" role="group" aria-label="What would you prefer?">
-      <button class="coach-branch-chip" data-branch="mind"
-              aria-pressed="false">
-        I had something in mind
+      <button class="coach-branch-chip" data-branch="location" aria-pressed="false">
+        I want something different
       </button>
-      <button class="coach-branch-chip" data-branch="different"
-              aria-pressed="false">
-        Suggest something different
-      </button>
-      <button class="coach-branch-chip" data-branch="shorter"
-              aria-pressed="false">
+      <button class="coach-branch-chip" data-branch="shorter" aria-pressed="false">
         Something shorter
       </button>
-      <button class="coach-branch-chip" data-branch="quieter"
-              aria-pressed="false">
+      <button class="coach-branch-chip" data-branch="quieter" aria-pressed="false">
         Something quieter
+      </button>
+      <button class="coach-branch-chip" data-branch="mind" aria-pressed="false">
+        I had something specific in mind
       </button>
     </div>
 
     <button class="btn btn-ghost btn-full" id="proposal-back-to-proposal-btn"
             style="margin-top: var(--space-4);">
-      &larr; Back to the suggestion
+      \u2190 Back to the suggestion
     </button>
   `;
 }
 
-function renderRevised(name) {
-  const p = revisedProposal || currentProposal;
+function renderLocationPicker() {
   return `
     <div class="card card-coach coach-proposal-card">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-      <div class="coach-proposal-content">
-        <p class="coach-proposal-thinking">
-          How about this instead &mdash; ${p.label}.
-        </p>
-        <p class="coach-proposal-description">${p.description}</p>
-        <p class="coach-proposal-rationale text-sm text-muted">${p.rationale}</p>
-        <div class="coach-proposal-meta">
-          <span class="coach-proposal-duration">&#8987; About ${p.duration} minutes</span>
-        </div>
-      </div>
+      <div><p>Where are you right now?</p></div>
     </div>
 
-    <div class="coach-proposal-actions">
-      <button class="btn btn-primary btn-large btn-full" id="proposal-accept-revised-btn"
-              aria-label="Accept revised proposal">
-        Let's go
-      </button>
-      <button class="btn btn-ghost btn-full" id="proposal-else-btn"
-              style="margin-top: var(--space-3);">
-        Still not quite right
-      </button>
+    <div class="coach-location-grid" role="group" aria-label="Choose your location">
+      ${LOCATIONS.map(loc => `
+        <button class="coach-location-btn" data-location="${loc.id}"
+                aria-label="${loc.label}">
+          <span aria-hidden="true">${loc.icon}</span>
+          <span>${loc.label}</span>
+        </button>
+      `).join("")}
     </div>
+
+    <button class="btn btn-ghost btn-full" id="proposal-back-to-branching-btn"
+            style="margin-top: var(--space-4);">
+      \u2190 Back
+    </button>
   `;
 }
 
-const ACTIVITY_PICKS = [
-  { id: "gym",         label: "Gym session",         icon: "\uD83C\uDFCB", target: "gym-programme",  quietMode: null },
-  { id: "prescribed",  label: "Prescribed exercises", icon: "\uD83E\uDE7A", target: "prescribed",     quietMode: null },
-  { id: "yoga",        label: "Yoga / Pilates",       icon: "\uD83E\uDDD8", target: "yoga-session",   quietMode: null },
-  { id: "breathing",   label: "Breathing practice",   icon: "\uD83C\uDF2C", target: "quiet-session",  quietMode: "breathing" },
-  { id: "journal",     label: "Journaling",           icon: "\uD83D\uDCDD", target: "quiet-session",  quietMode: "journal" },
-  { id: "mindful",     label: "Mindful movement",     icon: "\uD83C\uDF3F", target: "quiet-session",  quietMode: "mindful" },
-  { id: "walk",        label: "Walk",                 icon: "\uD83D\uDEB6", target: "activity-log",   quietMode: null },
-  { id: "run",         label: "Run",                  icon: "\uD83C\uDFC3", target: "activity-log",   quietMode: null },
-  { id: "swim",        label: "Swim",                 icon: "\uD83C\uDFCA", target: "activity-log",   quietMode: null },
-  { id: "class",       label: "A class",              icon: "\uD83C\uDFE5", target: "activity-log",   quietMode: null },
-];
+function renderHomeOptions() {
+  return `
+    <div class="card card-coach coach-proposal-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div><p>What do you fancy at home?</p></div>
+    </div>
+
+    <div class="coach-location-grid" role="group" aria-label="Home workout type">
+      ${HOME_OPTIONS.map(opt => `
+        <button class="coach-location-btn" data-home-option="${opt.id}"
+                aria-label="${opt.label}: ${opt.description}">
+          <span aria-hidden="true">${opt.icon}</span>
+          <span>${opt.label}</span>
+          <span class="coach-location-btn-sub">${opt.description}</span>
+        </button>
+      `).join("")}
+    </div>
+
+    <button class="btn btn-ghost btn-full" id="proposal-back-to-location-btn"
+            style="margin-top: var(--space-4);">
+      \u2190 Back
+    </button>
+  `;
+}
+
+function renderGymOptions() {
+  return `
+    <div class="card card-coach coach-proposal-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div><p>What are you going to do at the gym?</p></div>
+    </div>
+
+    <div class="coach-location-grid" role="group" aria-label="Gym session type">
+      ${GYM_OPTIONS.map(opt => `
+        <button class="coach-location-btn" data-gym-option="${opt.id}"
+                data-target="${opt.target}"
+                aria-label="${opt.label}">
+          <span aria-hidden="true">${opt.icon}</span>
+          <span>${opt.label}</span>
+        </button>
+      `).join("")}
+    </div>
+
+    <button class="btn btn-ghost btn-full" id="proposal-back-to-location-btn"
+            style="margin-top: var(--space-4);">
+      \u2190 Back
+    </button>
+  `;
+}
+
+function renderOutdoorOptions() {
+  return `
+    <div class="card card-coach coach-proposal-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div><p>What do you fancy outdoors?</p></div>
+    </div>
+
+    <div class="coach-location-grid" role="group" aria-label="Outdoor activity type">
+      ${OUTDOOR_OPTIONS.map(opt => `
+        <button class="coach-location-btn" data-target="${opt.target}"
+                data-activity="${opt.id}"
+                aria-label="${opt.label}">
+          <span aria-hidden="true">${opt.icon}</span>
+          <span>${opt.label}</span>
+        </button>
+      `).join("")}
+    </div>
+
+    <button class="btn btn-ghost btn-full" id="proposal-back-to-location-btn"
+            style="margin-top: var(--space-4);">
+      \u2190 Back
+    </button>
+  `;
+}
+
+function buildHomeProposal(optionId) {
+  const energy    = latestCheckin().energy || 5;
+  const homeEquip = store.get("homeEquipment") || store.get("equipment") || [];
+  const hasWeights = homeEquip.some(e => e.startsWith("dumbbells") || e.startsWith("kettlebell") || e === "barbell");
+
+  const proposals = {
+    "home-mixed":    { type: "home-workout", target: "core-session",  duration: 30,
+                       proposal: "A mixed home workout \u2014 mobility to open up, a cardio burst, then core to finish. All bodyweight" + (hasWeights ? ", with your home weights available if you want to add load." : "."),
+                       rationale: "A varied session keeps things interesting and hits different systems." },
+    "home-core":     { type: "core",         target: "core-session",  duration: 20,
+                       proposal: "A focused core session. Stability first, then strength, finishing with some breath work.",
+                       rationale: "Core work is always available, needs no equipment, and pays off in everything else you do." },
+    "home-hiit":     { type: "hiit",         target: "core-session",  duration: energy >= 6 ? 25 : 15,
+                       proposal: energy >= 6 ? "A 25-minute HIIT circuit. Work intervals, short rest, high effort. All bodyweight." : "A lighter 15-minute HIIT session \u2014 shorter intervals, more rest. Right for your energy level today.",
+                       rationale: energy >= 6 ? "Good energy today \u2014 use it." : "Adapted for your energy level." },
+    "home-strength": { type: "strength",     target: "core-session",  duration: 30,
+                       proposal: hasWeights ? "A strength session using your home weights. Push, pull, hinge, squat." : "A bodyweight strength session. Harder than it looks when done properly.",
+                       rationale: hasWeights ? "You have equipment \u2014 let us use it." : "Bodyweight strength builds genuine functional capacity." },
+    "home-cardio":   { type: "cardio",       target: "walk-session",  duration: 20,
+                       proposal: "A cardio session at home or around the block. Whatever keeps the heart rate up.",
+                       rationale: "Cardiovascular work does not need a gym." },
+    "home-mobility": { type: "mobility",     target: "core-session",  duration: 20,
+                       proposal: "A mobility session \u2014 hip openers, thoracic rotation, shoulder work. Moving the parts that usually get ignored.",
+                       rationale: "Mobility is training. It is not a warmup." }
+  };
+
+  const chosen = proposals[optionId] || proposals["home-mixed"];
+  return { ...chosen, quietMode: null, reflection: currentProposal?.reflection || "",
+           constraint: null, severePainOverride: false, disabledOption: null };
+}
 
 function renderActivityPick() {
   return `
     <div class="card card-coach coach-proposal-card">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-      <div>
-        <p>What did you have in mind?</p>
-      </div>
+      <div><p>What did you have in mind?</p></div>
     </div>
 
     <div class="coach-activity-pick-grid" role="group" aria-label="Choose an activity">
@@ -729,7 +864,7 @@ function renderActivityPick() {
 
     <button class="btn btn-ghost btn-full" id="proposal-back-to-branching-btn"
             style="margin-top: var(--space-4);">
-      &larr; Back
+      \u2190 Back
     </button>
   `;
 }
@@ -836,6 +971,12 @@ export function onMount() {
         rerender();
         return;
       }
+
+      if (branchChoice === "location") {
+        proposalState = "location";
+        rerender();
+        return;
+      }
     });
   });
 
@@ -848,6 +989,58 @@ export function onMount() {
   document.getElementById("proposal-back-to-branching-btn")?.addEventListener("click", () => {
     proposalState = "branching";
     rerender();
+  });
+
+  document.getElementById("proposal-back-to-location-btn")?.addEventListener("click", () => {
+    proposalState = "location";
+    rerender();
+  });
+
+  // ── Location picker ───────────────────────────────────────────────────────
+  document.querySelectorAll(".coach-location-btn[data-location]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedLocation = btn.dataset.location;
+      if (selectedLocation === "home")     { proposalState = "home-options";    rerender(); return; }
+      if (selectedLocation === "gym")      { proposalState = "gym-options";     rerender(); return; }
+      if (selectedLocation === "outdoors") { proposalState = "outdoor-options"; rerender(); return; }
+      if (selectedLocation === "pool") {
+        // Pool — go straight to activity log for swim
+        store.set("coachProposalAccepted", { type: "swim", duration: 30, acceptedAt: new Date().toISOString() });
+        cleanup();
+        router.navigate("activity-log");
+      }
+    });
+  });
+
+  // ── Home options ──────────────────────────────────────────────────────────
+  document.querySelectorAll(".coach-location-btn[data-home-option]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const optionId  = btn.dataset.homeOption;
+      revisedProposal = buildHomeProposal(optionId);
+      proposalState   = "revised";
+      rerender();
+    });
+  });
+
+  // ── Gym options ───────────────────────────────────────────────────────────
+  document.querySelectorAll(".coach-location-btn[data-gym-option]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.target;
+      store.set("coachProposalAccepted", { type: btn.dataset.gymOption, duration: 45, acceptedAt: new Date().toISOString() });
+      cleanup();
+      router.navigate(target);
+    });
+  });
+
+  // ── Outdoor options ───────────────────────────────────────────────────────
+  document.querySelectorAll(".coach-location-btn[data-activity]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target   = btn.dataset.target;
+      const activity = btn.dataset.activity;
+      store.set("coachProposalAccepted", { type: activity, duration: 30, acceptedAt: new Date().toISOString() });
+      cleanup();
+      router.navigate(target);
+    });
   });
 
   // ── Accept revised ────────────────────────────────────────────────────────
@@ -874,19 +1067,24 @@ export function onMount() {
 }
 
 function cleanup() {
-  proposalState   = "proposal";
-  currentProposal = null;
-  revisedProposal = null;
-  branchChoice    = null;
+  proposalState    = "proposal";
+  currentProposal  = null;
+  revisedProposal  = null;
+  branchChoice     = null;
+  selectedLocation = null;
 }
 
 function rerender() {
   const body = document.getElementById("proposal-body");
   if (!body) return;
   const name = (store.get("name") || "").split(" ")[0] || "there";
-  if (proposalState === "proposal")      body.innerHTML = renderProposal(name);
-  if (proposalState === "branching")     body.innerHTML = renderBranching();
-  if (proposalState === "revised")       body.innerHTML = renderRevised(name);
-  if (proposalState === "activity-pick") body.innerHTML = renderActivityPick();
+  if (proposalState === "proposal")        body.innerHTML = renderProposal(name);
+  if (proposalState === "branching")       body.innerHTML = renderBranching();
+  if (proposalState === "location")        body.innerHTML = renderLocationPicker();
+  if (proposalState === "home-options")    body.innerHTML = renderHomeOptions();
+  if (proposalState === "gym-options")     body.innerHTML = renderGymOptions();
+  if (proposalState === "outdoor-options") body.innerHTML = renderOutdoorOptions();
+  if (proposalState === "revised")         body.innerHTML = renderRevised(name);
+  if (proposalState === "activity-pick")   body.innerHTML = renderActivityPick();
   onMount();
 }
