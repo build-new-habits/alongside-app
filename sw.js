@@ -1,20 +1,20 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 14 May 2026 v4
+ * 13 May 2026 v4
  * Cache version: alongside-v39
  *
- * v39 changes (14 May 2026):
+ * v39 changes (13 May 2026):
  *   - coach-proposal.js: consecutive days counter fixed
  *     now uses completed-only entries; proper day-by-day chain check
  *     "started" entries (tap and back out) no longer count as training
  *
- * v38 changes (14 May 2026):
+ * v38 changes (13 May 2026):
  *   - coach-proposal.js: buildReflection() rewritten for natural language
  *     ("you trained yesterday" not "gym session since Tuesday")
  *     activity log now filters on status:"completed" only
  *
- * v37 changes (14 May 2026):
+ * v37 changes (13 May 2026):
  *   - intention.js: single-tap navigation (no Continue button for most paths)
  *     coach/prescribed navigate immediately; self/quiet navigate on chip tap
  *     class/other still show name field + Continue
