@@ -394,103 +394,208 @@ function buildProposal(preferShorter = false) {
  */
 /**
  * buildReflection(activityLog, lookbackHours, coachPersonality)
- * 
- * Returns a plain-English reflection of recent activity.
- * Uses activity TYPE not counts. Names are specific.
- * Acknowledges the timeframe to show the coach is paying attention.
- * 
- * If no activity in window → clean slate (no shame)
- * If activity → witness what happened without judgment
+ *
+ * 14 May 2026 v1 — Rewritten for natural language
+ *
+ * Design principles:
+ *   1. Time references use human language, not day names when recent.
+ *      "yesterday" not "since Tuesday". "earlier this week" not "since Monday".
+ *   2. Activity labels are verb-led, not noun-led.
+ *      "you trained" / "you went to the gym" not "gym session".
+ *   3. Multiple activities are listed naturally.
+ *      "you trained and went for a walk" not "gym session and walk since Tuesday".
+ *   4. Validation is specific to what happened, not randomly inserted.
+ *   5. Single activity = shorter sentence. Multiple = slightly richer.
+ *   6. The sentence ends — it does not trail into the proposal.
  */
 function buildReflection(activityLog, lookbackHours = 48, coachPersonality = "steady") {
   const cutoffTime = Date.now() - (lookbackHours * 3600000);
-  
-  // Filter activities within the lookback window
+
+  // Only count completed sessions — not just started ones
   const relevantActivities = (activityLog || []).filter(a => {
-    const completedAt = new Date(a.completedAt || a.loggedAt || Date.now()).getTime();
-    return completedAt >= cutoffTime;
+    if (a.status && a.status !== "completed") return false;
+    const ts = new Date(a.completedAt || a.sessionStart || a.date || 0).getTime();
+    return ts >= cutoffTime;
   });
 
-  // If no recent activity, clean slate
+  // ── No recent activity ─────────────────────────────────────────────────────
   if (relevantActivities.length === 0) {
     const variants = {
-      steady: "You're here today, and that's what matters.",
-      energetic: "You're here. Let's do this.",
-      nurturing: "You're here now. That's enough.",
-      minimal: "You're here today."
+      steady:    "You're here today, and that's what matters.",
+      energetic: "You're here. Let's make it count.",
+      nurturing: "You're here now. That's enough to start.",
+      minimal:   "You're here today."
     };
     return variants[coachPersonality] || variants.steady;
   }
 
-  // Count unique activity types (not raw count)
-  const typeSet = new Set();
+  // ── Build unique activity verb phrases ─────────────────────────────────────
+  // Maps activity type → natural verb phrase ("went to the gym", "went for a run")
+  const VERB_PHRASES = {
+    "gym":             "trained at the gym",
+    "gym-programme":   "trained at the gym",
+    "coach-session":   "trained",
+    "strength":        "did some strength work",
+    "home-workout":    "worked out at home",
+    "home-mixed":      "worked out at home",
+    "home-core":       "did some core work",
+    "home-hiit":       "did a HIIT session",
+    "home-strength":   "did some strength work",
+    "home-cardio":     "got some cardio in",
+    "home-mobility":   "worked on your mobility",
+    "run":             "went for a run",
+    "walk":            "went for a walk",
+    "swim":            "went for a swim",
+    "cycle":           "went for a ride",
+    "row":             "got a rowing session in",
+    "hiking":          "went for a hike",
+    "boxing":          "did some boxing",
+    "spin":            "did a spin class",
+    "hiit":            "did a HIIT session",
+    "body-balance":    "did Body Balance",
+    "class":           "went to a class",
+    "yoga":            "did some yoga",
+    "pilates":         "did some pilates",
+    "yoga-session":    "did some yoga",
+    "tai-chi":         "did some tai chi",
+    "stretching":      "did some stretching",
+    "mobility":        "worked on your mobility",
+    "mindful":         "had a mindful movement session",
+    "mindfulness":     "had a mindful moment",
+    "breathing":       "did some breathing practice",
+    "meditation":      "meditated",
+    "journal":         "spent time journaling",
+    "quiet":           "had some quiet time",
+    "rest":            "took a rest day",
+    "recovery":        "did some recovery work",
+    "prescribed":      "did your prescribed exercises",
+    "prescribed-session": "did your prescribed exercises",
+    "core":            "did some core work",
+    "core-session":    "did some core work",
+    "walk-session":    "went for a walk",
+  };
+
+  const phraseSet = new Set();
   relevantActivities.forEach(a => {
     const type = a.type || a.source || "movement";
-    typeSet.add(ACTIVITY_LABELS[type] || type);
+    const phrase = VERB_PHRASES[type] || "moved";
+    phraseSet.add(phrase);
   });
 
-  const uniqueTypes = Array.from(typeSet);
+  const phrases = Array.from(phraseSet);
 
-  // Build time reference based on lookback hours
-  let timeRef = "";
-  if (lookbackHours === 24) {
-    timeRef = "today";
-  } else if (lookbackHours === 48) {
-    const dayAgo = new Date(Date.now() - 24 * 3600000);
-    const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayAgo.getDay()];
-    timeRef = `since ${dayName}`;
-  } else if (lookbackHours === 72) {
-    timeRef = "in the last 3 days";
-  } else if (lookbackHours === 168) {
-    timeRef = "over the past week";
+  // ── Build time reference — human, not robotic ──────────────────────────────
+  // Rules:
+  //   activities from today only → "earlier today" or "today"
+  //   all within 36 hours but not all today → "yesterday"
+  //   within 48-72 hours, mixed → "in the last couple of days"
+  //   older → "earlier this week" / "over the past week"
+
+  const now       = Date.now();
+  const todayStart = new Date().setHours(0, 0, 0, 0);
+  const yesterdayStart = todayStart - 86400000;
+
+  const allToday     = relevantActivities.every(a => {
+    const ts = new Date(a.completedAt || a.sessionStart || a.date || 0).getTime();
+    return ts >= todayStart;
+  });
+  const anyYesterday = relevantActivities.some(a => {
+    const ts = new Date(a.completedAt || a.sessionStart || a.date || 0).getTime();
+    return ts >= yesterdayStart && ts < todayStart;
+  });
+  const oldestTs = Math.min(...relevantActivities.map(a =>
+    new Date(a.completedAt || a.sessionStart || a.date || 0).getTime()
+  ));
+  const oldestDaysAgo = (now - oldestTs) / 86400000;
+
+  let timeRef;
+  if (allToday)                             timeRef = "earlier today";
+  else if (anyYesterday && oldestDaysAgo < 2) timeRef = "yesterday";
+  else if (oldestDaysAgo < 3)               timeRef = "in the last couple of days";
+  else if (oldestDaysAgo < 7)               timeRef = "earlier this week";
+  else                                       timeRef = "over the past week";
+
+  // ── Compose the sentence ───────────────────────────────────────────────────
+  // Pattern: "You [verb phrase] [timeRef]." — then an optional second sentence.
+
+  let activityPart;
+  if (phrases.length === 1) {
+    activityPart = phrases[0];
+  } else if (phrases.length === 2) {
+    activityPart = `${phrases[0]} and ${phrases[1]}`;
   } else {
-    timeRef = `in the last ${Math.round(lookbackHours / 24)} days`;
+    const allButLast = phrases.slice(0, -1).join(", ");
+    activityPart     = `${allButLast}, and ${phrases[phrases.length - 1]}`;
   }
 
-  // Build natural sentence with activity types
-  let sentence = "";
-  if (uniqueTypes.length === 1) {
-    const variants = {
-      steady: `You've shown up for ${uniqueTypes[0]} ${timeRef}.`,
-      energetic: `You've been showing up for ${uniqueTypes[0]} ${timeRef}.`,
-      nurturing: `You've cared for yourself with ${uniqueTypes[0]} ${timeRef}.`,
-      minimal: `${uniqueTypes[0]} ${timeRef}.`
-    };
-    sentence = variants[coachPersonality] || variants.steady;
-  } else if (uniqueTypes.length === 2) {
-    const variants = {
-      steady: `You've shown up for ${uniqueTypes[0]} and ${uniqueTypes[1]} ${timeRef}.`,
-      energetic: `You've been showing up for ${uniqueTypes[0]} and ${uniqueTypes[1]} ${timeRef}.`,
-      nurturing: `You've cared for yourself with ${uniqueTypes[0]} and ${uniqueTypes[1]} ${timeRef}.`,
-      minimal: `${uniqueTypes[0]} and ${uniqueTypes[1]} ${timeRef}.`
-    };
-    sentence = variants[coachPersonality] || variants.steady;
-  } else {
-    // 3+: "gym work, yoga, and mindfulness"
-    const allButLast = uniqueTypes.slice(0, -1).join(", ");
-    const last = uniqueTypes[uniqueTypes.length - 1];
-    const variants = {
-      steady: `You've shown up for ${allButLast}, and ${last} ${timeRef}.`,
-      energetic: `You've been showing up for ${allButLast}, and ${last} ${timeRef}.`,
-      nurturing: `You've cared for yourself with ${allButLast}, and ${last} ${timeRef}.`,
-      minimal: `${allButLast}, and ${last} ${timeRef}.`
-    };
-    sentence = variants[coachPersonality] || variants.steady;
-  }
+  // Lead sentence
+  let sentence = `You ${activityPart} ${timeRef}.`;
 
-  // Optional: add a validating phrase (but only occasionally to avoid repetition)
-  const dayOfWeek = new Date().getDay();
-  const addValidation = dayOfWeek % 3 === 0; // ~33% of the time
+  // ── Second sentence — specific, not formulaic ──────────────────────────────
+  // Only added when it adds meaning. Varies by what was done and personality.
+  // Rules:
+  //   Rest day detected → acknowledge it specifically
+  //   3+ days consecutive activity → acknowledge the run
+  //   Recovery / gentle work → acknowledge that too
+  //   Otherwise → add personality-appropriate follow-on sparingly
 
-  if (addValidation) {
-    const variants = {
-      steady: " That takes planning.",
-      energetic: " That's dedication.",
-      nurturing: " That matters.",
-      minimal: ""
+  const hasRest     = phrases.some(p => p.includes("rest day"));
+  const hasRecovery = phrases.some(p => p.includes("recovery") || p.includes("mobility"));
+  const hasTraining = phrases.some(p =>
+    p.includes("gym") || p.includes("trained") || p.includes("HIIT") || p.includes("strength")
+  );
+
+  // Check consecutive days
+  const daysWithActivity = new Set(
+    relevantActivities.map(a =>
+      new Date(a.completedAt || a.sessionStart || a.date || 0).toISOString().split("T")[0]
+    )
+  );
+  const consecutiveDays = daysWithActivity.size;
+
+  if (hasRest && phrases.length === 1) {
+    // Rest day is the only thing — validate that specifically
+    const restVariants = {
+      steady:    "Rest is part of the programme, not a break from it.",
+      energetic: "Smart move. Recovery is where gains are made.",
+      nurturing: "Your body needed that.",
+      minimal:   ""
     };
-    const validation = variants[coachPersonality] || variants.steady;
-    if (validation) sentence += validation;
+    const v = restVariants[coachPersonality];
+    if (v) sentence += " " + v;
+
+  } else if (consecutiveDays >= 3 && hasTraining) {
+    // Three or more training days — acknowledge the consistency
+    const streakVariants = {
+      steady:    "You have trained for ${consecutiveDays} days running. Today's session will build on that.",
+      energetic: "${consecutiveDays} days in a row. Keep that going.",
+      nurturing: "${consecutiveDays} days of showing up. That is a practice.",
+      minimal:   ""
+    };
+    const v = (streakVariants[coachPersonality] || "").replace("${consecutiveDays}", consecutiveDays);
+    if (v) sentence += " " + v;
+
+  } else if (hasRecovery && hasTraining) {
+    // Mixed training and recovery — smart programming
+    const recoveryVariants = {
+      steady:    "Good balance of effort and recovery.",
+      energetic: "Hard work and smart recovery. That is how it is done.",
+      nurturing: "You have been taking care of yourself as well as working hard.",
+      minimal:   ""
+    };
+    const v = recoveryVariants[coachPersonality];
+    if (v) sentence += " " + v;
+
+  } else if (phrases.length >= 2 && coachPersonality !== "minimal") {
+    // Multiple different activities — acknowledge variety naturally
+    const varietyVariants = {
+      steady:    "Good variety.",
+      energetic: "Mixing it up. That is how you build well-rounded fitness.",
+      nurturing: "You have been exploring different kinds of movement.",
+      minimal:   ""
+    };
+    const v = varietyVariants[coachPersonality];
+    if (v) sentence += " " + v;
   }
 
   return sentence;
