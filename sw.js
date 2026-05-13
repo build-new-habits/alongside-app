@@ -2,7 +2,12 @@
  * sw.js - Alongside Service Worker
  *
  * 14 May 2026 v4
- * Cache version: alongside-v38
+ * Cache version: alongside-v39
+ *
+ * v39 changes (14 May 2026):
+ *   - coach-proposal.js: consecutive days counter fixed
+ *     now uses completed-only entries; proper day-by-day chain check
+ *     "started" entries (tap and back out) no longer count as training
  *
  * v38 changes (14 May 2026):
  *   - coach-proposal.js: buildReflection() rewritten for natural language
@@ -48,7 +53,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v38";
+const CACHE_NAME = "alongside-v39";
 
 const SHELL_URLS = [
 
