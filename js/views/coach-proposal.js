@@ -236,29 +236,58 @@ function buildProposal(preferShorter = false) {
   //   2 consecutive heavy sessions (gym/run) → suggest lower intensity
   //   7 sessions in 7 days → flag recovery regardless of energy
   //
-  // "Training day" = any activityLog entry that is NOT breathing/journal/rest/mindful.
-  const last7        = activityLog.slice(-7);
-  const last7Types   = last7.map(e => e.type || e.source || "");
-  const isTraining   = t => !["breathing", "journal", "rest", "mindful", "quiet"].includes(t);
-  const isHeavy      = t => ["gym", "coach-session", "gym-programme", "run", "hiit", "boxing"].includes(t);
+  // "Training day" = any COMPLETED activityLog entry that is NOT breathing/journal/rest/mindful.
+  // Only status:"completed" entries count — "started" entries (from tapping then backing out) do not.
+  //
+  // Consecutive day logic: group completed training entries by calendar date,
+  // then walk backwards from today checking for an unbroken daily chain.
+  // A gap of even one day resets the count to zero.
 
-  // Count consecutive training days ending today
+  const isTraining = t => !["breathing", "journal", "rest", "mindful", "quiet"].includes(t);
+  const isHeavy    = t => ["gym", "coach-session", "gym-programme", "run", "hiit", "boxing"].includes(t);
+
+  // Filter to completed training entries only — within last 14 days for efficiency
+  const cutoff14 = Date.now() - (14 * 86400000);
+  const completedTraining = (activityLog || []).filter(e => {
+    if (e.status && e.status !== "completed") return false;  // exclude started-only
+    const ts = new Date(e.completedAt || e.sessionStart || e.date || 0).getTime();
+    if (ts < cutoff14) return false;
+    return isTraining(e.type || e.source || "");
+  });
+
+  // Group by calendar date (YYYY-MM-DD)
+  const trainingDateSet = new Set(
+    completedTraining.map(e =>
+      new Date(e.completedAt || e.sessionStart || e.date || 0).toISOString().split("T")[0]
+    )
+  );
+
+  // Walk backwards from today counting unbroken consecutive training days
+  // Stop as soon as we hit a day with no training
   let consecutiveDays = 0;
-  for (let i = last7.length - 1; i >= 0; i--) {
-    const entry = last7[i];
-    const entryDate = new Date(entry.completedAt || entry.sessionStart || entry.date || 0);
-    const daysAgo = Math.floor((Date.now() - entryDate.getTime()) / 86400000);
-    if (daysAgo <= consecutiveDays + 1 && isTraining(last7Types[i])) {
+  const todayStr = new Date().toISOString().split("T")[0];
+  for (let d = 0; d <= 14; d++) {
+    const checkDate = new Date(Date.now() - d * 86400000).toISOString().split("T")[0];
+    if (trainingDateSet.has(checkDate)) {
       consecutiveDays++;
+    } else if (d === 0) {
+      // No training today yet — that's fine, keep checking yesterday etc.
+      // Do not increment but do not break either
     } else {
+      // Gap found — chain is broken
       break;
     }
   }
 
-  const consecutiveHeavy = last7Types.slice(-2).every(isHeavy);
-  const totalThisWeek    = last7.filter(e => {
-    const d = Math.floor((Date.now() - new Date(e.completedAt || e.sessionStart || e.date || 0).getTime()) / 86400000);
-    return d < 7 && isTraining(e.type || e.source || "");
+  // Last 2 completed heavy sessions (for heavy session override)
+  const last2Heavy = completedTraining.filter(e => isHeavy(e.type || e.source || "")).slice(-2);
+  const consecutiveHeavy = last2Heavy.length === 2;
+
+  // Total completed training sessions in last 7 days
+  const cutoff7 = Date.now() - (7 * 86400000);
+  const totalThisWeek = completedTraining.filter(e => {
+    const ts = new Date(e.completedAt || e.sessionStart || e.date || 0).getTime();
+    return ts >= cutoff7;
   }).length;
 
   // Hard override: 3+ consecutive days must rest
