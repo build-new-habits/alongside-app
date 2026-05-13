@@ -309,3 +309,39 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+/* ============================================
+   13 May 2026 v1 — Text visibility fix
+   The ::before hover overlay covers bare text nodes inside btn-primary
+   when the hover state is stuck (common on mobile after touch).
+   Fix: ensure all direct text content of btn-primary is above the overlay.
+   This adds a pseudo-element-safe stacking context without requiring
+   every button to wrap its text in <span>.
+   ============================================ */
+
+/* Ensure btn-primary text is always rendered above the ::before overlay */
+.btn-primary {
+  isolation: isolate;
+}
+
+.btn-primary::before {
+  z-index: 0;
+}
+
+/* Any direct child elements (including text nodes via this selector trick) */
+.btn-primary > *,
+.btn-primary span,
+.btn-primary svg {
+  position: relative;
+  z-index: 1;
+}
+
+/* Force text colour on all btn-primary children — prevents inheritance issues */
+.btn-primary,
+.btn-primary * {
+  color: var(--color-text-inverse);
+}
+
+/* Secondary button active/pressed state on mobile — prevent stuck hover */
+.btn-secondary:active {
+  background: rgba(45, 212, 191, 0.12);
+}
