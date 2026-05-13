@@ -541,20 +541,12 @@ function renderLibraryTab() {
       <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
         Done something? Log it and the coach will reflect on it with you.
       </p>
-
-      ${LOG_ACTIVITIES.map(group => `
-        <h3 class="library-group-heading">${group.group}</h3>
-        <div class="library-grid library-grid--compact">
-          ${group.items.map(item => `
-            <button class="library-card library-card--compact"
-                    data-log-activity="${item.id}"
-                    aria-label="Log ${item.label}">
-              <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
-              <span class="library-card-label">${item.label}</span>
-            </button>
-          `).join("")}
-        </div>
-      `).join("")}
+      <button class="library-card" style="width: 100%; flex-direction: row; gap: var(--space-3); justify-content: flex-start; padding: var(--space-4);"
+              data-log-activity="open"
+              aria-label="Log an activity">
+        <span class="library-card-icon" aria-hidden="true">➕</span>
+        <span class="library-card-label" style="font-size: var(--text-sm);">Log what you did</span>
+      </button>
 
     </section>
   `;
@@ -907,13 +899,12 @@ function wirePanel() {
     });
   });
 
-  // Library: log activity
+  // Library: log activity — navigate to activity-log view
+  // activity-log.js is the single source of truth for logging activities
+  // It shows the full category list and handles the log entry itself
   document.querySelectorAll("[data-log-activity]").forEach(btn => {
     btn.addEventListener("click", () => {
-      const activityId = btn.dataset.logActivity;
-      if (!activityId) return;
-      store.set("pendingLogActivity", activityId);
-      router.navigate("reflect");
+      router.navigate("activity-log");
     });
   });
 }
