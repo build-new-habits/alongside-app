@@ -1,3 +1,4 @@
+// 13 May 2026 v1 — navigate to intention not today; btn text visibility fix
 /**
  * gym-programme.js - Gym Programme View
  *
@@ -38,57 +39,6 @@ const GUIDE = {
     description: "Lie on your back, knees bent, feet flat. Press through your heels to lift your hips until your body forms a straight line from shoulders to knees. Hold.",
     cues: ["Squeeze your glutes at the top — don't just lift", "Keep your ribs down — don't arch your lower back", "Press through your heels, not your toes"],
     youtube: "glute bridge hold tutorial"
-  },
-
-  "Dumbbell hip thrust": {
-    description: "Sit on the floor with your upper back against a bench, dumbbells across your hips. Feet flat on the floor, hip-width apart. Drive your hips up until your body forms a straight line from knees to shoulders. Squeeze your glutes hard at the top for a full second. Lower with control.",
-    cues: ["Drive through your heels, not your toes", "Chin tucked — do not hyperextend your neck at the top", "1-second hard squeeze at the top. That squeeze is where the shape comes from", "Both glutes should work equally — if one is doing more, it will show"],
-    youtube: "dumbbell hip thrust technique glute shape"
-  },
-  "Smith machine hip thrust": {
-    description: "Use a pad on the bar to protect your hips. Set up with your upper back on a bench, bar across your hip crease. Feet flat, hip-width. Drive the hips up explosively, lower slowly. The Smith machine removes the balance challenge and lets you focus entirely on the glute contraction.",
-    cues: ["Bar stays across the hip crease throughout — not the stomach, not the thighs", "Squeeze at the top. Hard. Hold for a full second.", "Lower in 3 seconds — the eccentric is where muscle is built", "If you feel it in your lower back, your hips are not high enough at the top"],
-    youtube: "Smith machine hip thrust technique"
-  },
-  "Cable face pull": {
-    description: "Set the cable at head height or just above. Use a rope attachment. Pull toward your face with your elbows high and wide — finishing with your hands either side of your head, palms facing forward. The movement is horizontal, not down.",
-    cues: ["Elbows must stay higher than your hands throughout", "Do not pull the rope down to your chest — that is a different exercise", "Stand tall. No forward lean.", "This corrects the rounded shoulder pattern. Do it every session."],
-    youtube: "cable face pull correct technique posture"
-  },
-  "Wall angels": {
-    description: "Stand with your entire back flat against a wall — head, upper back, and lower back all in contact. Place your arms in a W shape, elbows bent at 90 degrees, backs of hands touching the wall. Slowly slide your arms up into a Y shape overhead, maintaining wall contact throughout. Slide back down to W. This is harder than it looks.",
-    cues: ["If your lower back comes off the wall, your hip flexors are tight — this is useful information", "If your hands cannot reach the wall in the Y position, stop where you can maintain contact", "Move extremely slowly — 4 seconds up, 4 seconds down", "You may feel this in your thoracic spine. That is correct."],
-    youtube: "wall angels thoracic mobility posture"
-  },
-  "Couch stretch": {
-    description: "Kneel facing away from a bench. Place one shin up on the bench behind you, foot near the top. The other foot is flat on the floor in front. From this position, tuck your pelvis under and squeeze the glute of the rear leg. Hold without arching your lower back.",
-    cues: ["The key is the pelvic tuck — without it this is just a quad stretch", "Squeeze the rear glute hard. This is what releases the hip flexor.", "You should feel a deep stretch in the front of the rear hip", "Left leg is the priority — tight hip flexors on the left contribute to your right-side overload"],
-    youtube: "couch stretch hip flexor mobility anterior pelvic tilt"
-  },
-  "Side-lying hip abduction": {
-    description: "Lie on your side. Bottom knee bent for stability, top leg straight and angled slightly behind your body (behind the line of your glutes). Lift the top leg in a straight controlled line, pause at the top, lower slowly. Do not let the pelvis roll back.",
-    cues: ["Keep your top leg slightly behind your hip — not directly up", "Control the lowering — 3 seconds down", "No hip rolling — pelvis stays stacked", "Feel this in the outer glute, not the hip flexor"],
-    youtube: "side lying hip abduction glute med technique"
-  },
-  "Single-leg sit-to-stand": {
-    description: "Stand in front of a chair or bench. Lift one foot slightly off the floor. Slowly lower yourself to sitting using only the standing leg, touch the chair lightly with the back of your thigh, then stand back up. Right and left legs done separately.",
-    cues: ["Lower slowly — 3 to 4 seconds down", "Touch and go — do not sit fully and rest", "Keep your knee tracking over your foot, not caving in", "Left leg will feel harder — that is expected and correct"],
-    youtube: "single leg sit to stand eccentric quad control"
-  },
-  "Lateral step-down": {
-    description: "Stand side-on to a step with your standing foot on the step edge. Slowly lower your non-standing leg by bending the standing knee, until your heel nearly touches the floor. Return to standing. Keep the pelvis level throughout.",
-    cues: ["This is eccentric knee control — slow is the point", "Do not let your standing knee cave inward", "Keep your pelvis level — the non-standing side must not drop", "Left leg on the step will expose the weakness — work through it"],
-    youtube: "lateral step down eccentric VMO control physio"
-  },
-  "Prone hip extension — straight leg": {
-    description: "Lie face down with legs straight. Keep your leg completely straight and squeeze your glute to lift the leg 1 to 2 inches off the floor. Hold for 2 seconds. Lower in full control. Do not arch your lower back — the lift is small.",
-    cues: ["The movement is tiny — 1 to 2 inches maximum", "Squeeze the glute before you lift — the squeeze starts the movement", "Keep your hip pressed into the floor — no twisting", "Both legs done separately. Left will feel noticeably weaker."],
-    youtube: "prone hip extension glute max activation physio"
-  },
-  "Prone hip extension — bent knee": {
-    description: "Lie face down. Bend your knee to 90 degrees. Squeeze your glute to lift your knee 1 to 2 inches off the floor. Hold 2 seconds. Lower in control. The bent knee removes the hamstring from the movement, isolating the glute max more directly.",
-    cues: ["Knee bent to 90 degrees throughout", "Glute squeeze initiates — do not use your lower back to lift", "Same tiny range as straight-leg version", "This isolates your glute max more directly than the straight-leg version"],
-    youtube: "prone bent knee hip extension glute max isolation"
   },
   "Single-leg glute bridge — right side": {
     description: "Same as a glute bridge but extend your left leg straight out. Press through your right heel only. Keep your pelvis level — don't let the left side drop.",
@@ -253,13 +203,11 @@ const PROGRAMME = {
       title: "Session A",
       subtitle: "Glute Activation & Posterior Chain Foundation",
       duration: "45-50 mins",
-      coachLine: "This session activates the posterior chain and starts addressing the three things we are working on together: glute shape, a firmer midsection, and better posture. The hip thrust at the end of the main section is your most important exercise for glute shape. The face pull directly counters the hunching pattern. Both will feel light at first — that is correct. Build the pattern before you build the weight.",
+      coachLine: "This session is about waking things up, not testing limits. Everything here activates the posterior chain without loading your SI joint asymmetrically. It will feel lighter than you expect — that is correct. If anything produces sharp or radiating pain, stop that exercise immediately. Dull muscular effort is fine. Sharp or radiating is not.",
       exercises: [
         { id: "wu1", section: "warmup",  name: "Cat-cow",                               sets: 2, reps: "10 slow",       tempo: "Controlled", rest: "-"   },
         { id: "wu2", section: "warmup",  name: "Glute bridge hold",                     sets: 2, reps: "30s hold",      tempo: "Static",     rest: "30s", duration: 30 },
         { id: "wu3", section: "warmup",  name: "Single-leg glute bridge — right side",  sets: 3, reps: "10",            tempo: "2-1-2",      rest: "45s", note: "Physio exercise" },
-        { id: "px1", section: "warmup",  name: "Side-lying hip abduction",              sets: 3, reps: "10 each side", tempo: "2-2-3",      rest: "45s", note: "Left side is primary focus" },
-        { id: "px2", section: "warmup",  name: "Prone hip extension — straight leg",    sets: 3, reps: "10 each leg",  tempo: "2-2-3",      rest: "45s", note: "1-2 inches only. Both legs." },
         { id: "wu4", section: "warmup",  name: "Hip 90/90 stretch",                     sets: 2, reps: "60s each side", tempo: "Hold",       rest: "-",   duration: 60 },
         { id: "wu5", section: "warmup",  name: "World's greatest stretch",              sets: 2, reps: "5 each side",   tempo: "Slow",       rest: "-"   },
         { id: "m1",  section: "main",    name: "Cable pull-through",                    sets: 3, reps: "12",            tempo: "3-1-2",      rest: "60s", recommended: "Light weight — focus on the hip hinge pattern", logWeight: true },
@@ -268,8 +216,6 @@ const PROGRAMME = {
         { id: "m4",  section: "main",    name: "Seated cable row",                      sets: 3, reps: "12",            tempo: "2-1-2",      rest: "60s", recommended: "Comfortable weight with full control", logWeight: true },
         { id: "m5",  section: "main",    name: "Pallof press",                          sets: 3, reps: "10 each side",  tempo: "2-2-2",      rest: "60s", recommended: "Light cable — this is core work not arm work", logWeight: true },
         { id: "m6",  section: "main",    name: "Dead bug",                              sets: 3, reps: "8 each side",   tempo: "Slow",       rest: "45s" },
-        { id: "m7",  section: "main",    name: "Dumbbell hip thrust",                   sets: 3, reps: "12",            tempo: "2-1-2",      rest: "75s", recommended: "Start with 10kg dumbbells across hips. Progress to barbell on Smith machine when comfortable.", logWeight: true, note: "Drive through the heel. Squeeze hard at the top for 1 second. This is your primary glute shaping exercise." },
-        { id: "m8",  section: "main",    name: "Cable face pull",                       sets: 3, reps: "15",            tempo: "2-1-2",      rest: "45s", recommended: "Light cable at head height. Elbows high and wide.", logWeight: true, note: "Pulls the shoulders back and opens the chest. Directly counters the hunching pattern." },
         { id: "cd1", section: "cooldown",name: "Pigeon pose — right side priority",     sets: 1, reps: "90s each side", tempo: "Hold",       rest: "-",   duration: 90, note: "Do not skip this" },
         { id: "cd2", section: "cooldown",name: "Supine hamstring stretch",              sets: 1, reps: "60s each side", tempo: "Hold",       rest: "-",   duration: 60 },
         { id: "cd3", section: "cooldown",name: "Child's pose",                          sets: 1, reps: "60s",           tempo: "Hold",       rest: "-",   duration: 60 },
@@ -282,7 +228,6 @@ const PROGRAMME = {
       duration: "45-50 mins",
       coachLine: "Session B gives your lower back and glutes 48 hours of recovery while you keep building. Upper body today. If anything produces sharp pain, stop that exercise. Muscular effort and mild discomfort are part of the work.",
       exercises: [
-        { id: "wu0", section: "warmup",  name: "Wall angels",                           sets: 2, reps: "10 slow",        tempo: "Very slow",  rest: "-",   note: "Stand with back flat against wall. Arms at 90 degrees. Slide arms up without losing back contact. This resets your thoracic spine." },
         { id: "wu1", section: "warmup",  name: "Band pull-aparts",                      sets: 2, reps: "15",            tempo: "Controlled", rest: "-"   },
         { id: "wu2", section: "warmup",  name: "Thoracic rotation (seated)",            sets: 2, reps: "10 each side",  tempo: "Slow",       rest: "-"   },
         { id: "wu3", section: "warmup",  name: "Cat-cow",                               sets: 1, reps: "8",             tempo: "Slow",       rest: "-"   },
@@ -306,12 +251,8 @@ const PROGRAMME = {
       exercises: [
         { id: "wu1", section: "warmup",  name: "Glute bridge — 3s hold",               sets: 2, reps: "10",            tempo: "1-3-1",      rest: "30s" },
         { id: "wu2", section: "warmup",  name: "Single-leg glute bridge — right side",  sets: 2, reps: "8",             tempo: "2-1-2",      rest: "45s", note: "Physio exercise — activation only" },
-        { id: "px3", section: "warmup",  name: "Prone hip extension — bent knee",       sets: 3, reps: "10 each leg",  tempo: "2-2-3",      rest: "45s", note: "Isolates glute max. Left leg priority." },
-        { id: "px4", section: "warmup",  name: "Lateral step-down",                     sets: 3, reps: "10 each side", tempo: "Slow 4s",    rest: "45s", note: "Left leg on step. Control the descent." },
-        { id: "px5", section: "warmup",  name: "Single-leg sit-to-stand",               sets: 3, reps: "10 each side", tempo: "3-1-1",      rest: "60s", note: "Left leg will feel harder. That is correct." },
         { id: "wu3", section: "warmup",  name: "Hip flexor stretch (kneeling)",         sets: 2, reps: "45s each side", tempo: "Hold",       rest: "-",   duration: 45 },
         { id: "wu4", section: "warmup",  name: "Banded clamshell — right side priority",sets: 2, reps: "15",            tempo: "2-1-2",      rest: "30s" },
-        { id: "m0",  section: "main",    name: "Smith machine hip thrust",              sets: 4, reps: "10",            tempo: "2-1-2",      rest: "90s", recommended: "Bar across hips on a pad. Start conservative. This is the primary glute builder.", logWeight: true, note: "Feet flat, chin tucked. Drive the hips up until body is a straight line from knee to shoulder. Squeeze hard at the top." },
         { id: "m1",  section: "main",    name: "Goblet squat",                          sets: 3, reps: "10",            tempo: "3-1-2",      rest: "75s", recommended: "12kg dumbbell or kettlebell", logWeight: true },
         { id: "m2",  section: "main",    name: "Single-leg press — right leg",          sets: 3, reps: "10 each side",  tempo: "3-1-2",      rest: "60s", recommended: "Lighter than your bilateral press — start conservative", logWeight: true },
         { id: "m3",  section: "main",    name: "Romanian deadlift",                     sets: 3, reps: "10",            tempo: "3-0-2",      rest: "75s", recommended: "2 x 12kg (small step up from Session A)", logWeight: true },
@@ -322,27 +263,6 @@ const PROGRAMME = {
         { id: "cd2", section: "cooldown",name: "Lying figure-4 stretch",                sets: 1, reps: "60s each side", tempo: "Hold",       rest: "-",   duration: 60 },
         { id: "cd3", section: "cooldown",name: "Supine hamstring stretch",              sets: 1, reps: "90s each side", tempo: "Hold",       rest: "-",   duration: 90 },
         { id: "cd4", section: "cooldown",name: "Child's pose",                          sets: 1, reps: "90s",           tempo: "Hold",       rest: "-",   duration: 90 },
-      ]
-    }
-,
-    {
-      id: "D",
-      title: "Session D",
-      subtitle: "Cardio + Core (Optional 4th Session)",
-      duration: "35-45 mins",
-      coachLine: "This is your optional fourth session. Cross-trainer or bike to build your aerobic base, followed by core and stabiliser work. No heavy loading today. This session accelerates your body composition change without adding recovery debt.",
-      exercises: [
-        { id: "wu1", section: "warmup",  name: "Hip 90/90 stretch",                     sets: 2, reps: "60s each side", tempo: "Hold",       rest: "-",   duration: 60 },
-        { id: "wu2", section: "warmup",  name: "Cat-cow",                               sets: 2, reps: "10 slow",       tempo: "Controlled", rest: "-"   },
-        { id: "px1", section: "main",    name: "Side-lying hip abduction",              sets: 3, reps: "10 each side", tempo: "2-2-3",      rest: "45s", note: "Left side focus" },
-        { id: "px2", section: "main",    name: "Prone hip extension — straight leg",    sets: 3, reps: "10 each leg",  tempo: "2-2-3",      rest: "45s", note: "Both legs" },
-        { id: "px3", section: "main",    name: "Prone hip extension — bent knee",       sets: 3, reps: "10 each leg",  tempo: "2-2-3",      rest: "45s", note: "Left leg priority" },
-        { id: "m1",  section: "main",    name: "Dead bug",                              sets: 3, reps: "8 each side",   tempo: "Slow",       rest: "45s" },
-        { id: "m2",  section: "main",    name: "Pallof press",                          sets: 3, reps: "10 each side",  tempo: "2-2-2",      rest: "60s", recommended: "Light cable", logWeight: true },
-        { id: "m3",  section: "main",    name: "Half-kneeling cable chop",              sets: 3, reps: "10 each side",  tempo: "2-1-2",      rest: "60s", recommended: "Light-moderate cable", logWeight: true },
-        { id: "cd0", section: "cooldown",name: "Couch stretch — left leg priority",      sets: 1, reps: "90s each side", tempo: "Hold",       rest: "-",   duration: 90, note: "Kneeling, back foot up on a bench behind you. Squeeze the glute of the rear leg and tuck the pelvis under. This is the most important hip flexor stretch for your posture." },
-        { id: "cd1", section: "cooldown",name: "Pigeon pose — right side priority",     sets: 1, reps: "90s each side", tempo: "Hold",       rest: "-",   duration: 90 },
-        { id: "cd2", section: "cooldown",name: "Child\'s pose",                          sets: 1, reps: "60s",           tempo: "Hold",       rest: "-",   duration: 60 },
       ]
     }
   ]
@@ -525,7 +445,7 @@ function renderExerciseCard(ex, sessionId) {
           ` : ""}
 
           <!-- Done button -->
-          <button class="btn ${isDone ? "btn-secondary" : "btn-primary"} btn-full gym-done-btn"
+          <button class="btn ${isDone ? "btn-secondary" : "btn-primary"} btn-full gym-done-btn" style="position: relative; z-index: 0;"
                   data-exercise-id="${ex.id}"
                   data-session="${sessionId}"
                   data-exercise="${ex.name}">
@@ -541,14 +461,6 @@ function renderExerciseCard(ex, sessionId) {
 // ── Section group renderer ────────────────────────────────────────────────────
 
 function renderSessionCards(session) {
-  // Use adapted exercises if user has chosen adaptation
-  if (showingAdaptedSession) {
-    const adaptation = buildAdaptedSession(session);
-    if (adaptation.adapted) {
-      session = { ...session, exercises: adaptation.exercises };
-    }
-  }
-
   const sections = [
     { key: "warmup",   label: "Warm-up"     },
     { key: "main",     label: "Main session" },
@@ -684,7 +596,7 @@ function renderPostSession(session) {
           <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
           <p class="coach-message-text">That is a session in the books. I will remember what you told me and use it next time. Well done.</p>
         </div>
-        <button class="btn btn-primary btn-full" onclick="router.navigate('today')">
+        <button class="btn btn-primary btn-full" onclick="router.navigate('intention')">
           Back to Today
         </button>
       </div>`;
@@ -694,295 +606,6 @@ function renderPostSession(session) {
 }
 
 // ── Main render ───────────────────────────────────────────────────────────────
-
-
-// ── Cardio logging ────────────────────────────────────────────────────────────
-
-/**
- * Render the cardio block at the top of each session.
- * User logs: equipment (cross-trainer, bike, treadmill, rowing, stairmaster,
- * ski erg, assault bike, swimming, other), level/tension, time (free entry),
- * calories, and how it felt (difficulty 1-5).
- *
- * Recalled from previous session of the same type for progress comparison.
- * Calorie-as-proxy logic: same level + more calories = moved up earlier = improved fitness.
- */
-function renderCardioBlock(sessionId) {
-  const cardioKey  = "gymCardio_" + sessionId;
-  const lastCardio = store.get(cardioKey) || null;
-
-  const difficultyLabels = ["Very easy", "Easy", "Manageable", "Hard", "Very hard"];
-
-  return `
-    <div class="card gym-cardio-card" id="gym-cardio-block">
-      <div class="gym-cardio-header">
-        <h3>Cardio</h3>
-      </div>
-      <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
-        Log your cardio to track progress over time.
-      </p>
-
-      ${lastCardio ? `
-        <div class="gym-cardio-previous">
-          <p class="text-sm text-muted">Last time: ${lastCardio.equipment || "—"},
-            level ${lastCardio.level || "—"},
-            ${lastCardio.time || "—"} mins,
-            ${lastCardio.calories || "—"} cal,
-            felt: ${difficultyLabels[(lastCardio.difficulty || 3) - 1]}
-          </p>
-        </div>
-      ` : ""}
-
-      <div class="gym-cardio-fields">
-        <div class="gym-cardio-row">
-          <div class="form-field">
-            <label class="form-label" for="cardio-equipment">Equipment</label>
-            <select id="cardio-equipment" class="form-input" style="min-height:48px;">
-              <option value="cross-trainer"  ${lastCardio?.equipment === "cross-trainer"  ? "selected" : ""}>Cross-trainer</option>
-              <option value="bike"           ${lastCardio?.equipment === "bike"           ? "selected" : ""}>Bike</option>
-              <option value="treadmill"      ${lastCardio?.equipment === "treadmill"      ? "selected" : ""}>Treadmill</option>
-              <option value="rowing"         ${lastCardio?.equipment === "rowing"         ? "selected" : ""}>Rowing machine</option>
-              <option value="stairmaster"    ${lastCardio?.equipment === "stairmaster"    ? "selected" : ""}>StairMaster</option>
-              <option value="ski-erg"        ${lastCardio?.equipment === "ski-erg"        ? "selected" : ""}>Ski erg</option>
-              <option value="assault-bike"   ${lastCardio?.equipment === "assault-bike"   ? "selected" : ""}>Assault bike</option>
-              <option value="swimming"       ${lastCardio?.equipment === "swimming"       ? "selected" : ""}>Swimming</option>
-              <option value="other"          ${lastCardio?.equipment === "other"          ? "selected" : ""}>Other</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label class="form-label" for="cardio-level">Level / Tension</label>
-            <input type="number" id="cardio-level" class="form-input"
-                   placeholder="${lastCardio?.level || "e.g. 8"}" min="1" max="25"
-                   inputmode="numeric" value="${lastCardio?.level || ""}">
-          </div>
-        </div>
-        <div class="gym-cardio-row">
-          <div class="form-field">
-            <label class="form-label" for="cardio-time">Time (mins)</label>
-            <input type="number" id="cardio-time" class="form-input"
-                   placeholder="${lastCardio?.time || "e.g. 15"}" min="1" max="120"
-                   inputmode="numeric" value="">
-          </div>
-          <div class="form-field">
-            <label class="form-label" for="cardio-calories">Calories</label>
-            <input type="number" id="cardio-calories" class="form-input"
-                   placeholder="${lastCardio?.calories || "e.g. 120"}" min="0" max="999"
-                   inputmode="numeric" value="">
-          </div>
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="cardio-feel-slider">
-            How did it feel?
-            <span id="cardio-feel-label" class="cardio-feel-label text-muted"> — Manageable</span>
-          </label>
-          <input type="range" id="cardio-feel-slider"
-                 class="cardio-feel-slider"
-                 min="1" max="5" step="1" value="3"
-                 aria-label="How did cardio feel, 1 very easy to 5 very hard"
-                 aria-valuetext="Manageable">
-          <div class="cardio-feel-scale" aria-hidden="true">
-            <span>Very easy</span>
-            <span>Easy</span>
-            <span>Manageable</span>
-            <span>Hard</span>
-            <span>Very hard</span>
-          </div>
-        </div>
-        <button type="button" class="btn btn-ghost btn-full" id="gym-cardio-save-btn"
-                style="margin-top: var(--space-3);">
-          Save cardio log
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-function saveCardioLog(sessionId) {
-  const equipment  = document.getElementById("cardio-equipment")?.value;
-  const level      = document.getElementById("cardio-level")?.value;
-  const time       = document.getElementById("cardio-time")?.value;
-  const calories   = document.getElementById("cardio-calories")?.value;
-  const slider     = document.getElementById("cardio-feel-slider");
-  const difficulty = slider ? parseInt(slider.value) : null;
-
-  if (!level && !time && !calories) return; // Nothing entered
-
-  const cardioKey = "gymCardio_" + sessionId;
-  const existing  = store.get(cardioKey) || {};
-
-  store.set(cardioKey, {
-    ...existing,
-    equipment:  equipment  || existing.equipment  || null,
-    level:      level      ? parseInt(level)      : existing.level,
-    time:       time       ? parseInt(time)       : null,
-    calories:   calories   ? parseInt(calories)   : null,
-    difficulty: difficulty || existing.difficulty || null,
-    loggedAt:   new Date().toISOString()
-  });
-
-  // Visual confirmation
-  const btn = document.getElementById("gym-cardio-save-btn");
-  if (btn) {
-    btn.textContent = "Saved";
-    btn.disabled = true;
-    setTimeout(() => {
-      btn.textContent = "Update cardio log";
-      btn.disabled = false;
-    }, 2000);
-  }
-}
-
-// ── Week progression ──────────────────────────────────────────────────────────
-
-/**
- * Check if a new week has started (Monday) and return a prompt if so.
- * User can advance to next week or stay on current week.
- *
- * Monday is week start. If today is Monday and the last session was
- * logged before today, offer the week advance prompt.
- */
-function getWeekProgressionPrompt(currentWeek, totalWeeks) {
-  if (currentWeek >= totalWeeks) return null;
-
-  const today       = new Date();
-  const dayOfWeek   = today.getDay(); // 0 = Sunday, 1 = Monday
-  if (dayOfWeek !== 1) return null;   // Only prompt on Monday
-
-  const lastAdvanced = store.get("gymWeekLastAdvanced") || null;
-  const todayKey     = today.toISOString().split("T")[0];
-  if (lastAdvanced === todayKey) return null; // Already prompted today
-
-  return {
-    currentWeek,
-    nextWeek: currentWeek + 1,
-    totalWeeks
-  };
-}
-
-function renderWeekProgressionCard(prompt) {
-  return `
-    <div class="card gym-week-prompt" role="dialog" aria-label="New week">
-      <div class="card-coach">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <div>
-          <h3>Week ${prompt.currentWeek} is done</h3>
-          <p>It is Monday. You have completed Week ${prompt.currentWeek} of ${prompt.totalWeeks}.
-             Would you like to move to Week ${prompt.nextWeek}, or repeat this week?</p>
-          <p class="text-sm text-muted" style="margin-top:var(--space-2);">
-            If last week felt too easy, move on. If you want to consolidate, stay.
-            Either choice is the right one.
-          </p>
-        </div>
-      </div>
-      <div style="display:flex;gap:var(--space-3);margin-top:var(--space-4);">
-        <button class="btn btn-primary" style="flex:1;" id="gym-week-advance-btn">
-          Move to Week ${prompt.nextWeek}
-        </button>
-        <button class="btn btn-ghost" style="flex:1;" id="gym-week-stay-btn">
-          Stay on Week ${prompt.currentWeek}
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-// ── Session adaptation ────────────────────────────────────────────────────────
-
-/**
- * Build an adapted session based on today\'s energy and conditions.
- * Returns { adapted: boolean, reason: string, exercises: [...] }
- *
- * Adaptation rules:
- *   - Low energy (<=3): reduce sets by 1, remove last main exercise, keep all physio
- *   - Moderate pain zone: remove single-leg loaded exercises
- *   - High energy with no conditions: full session
- *
- * User always sees both options and chooses. Never forced into adaptation.
- */
-function buildAdaptedSession(session) {
-  const energy     = store.get("todayIntensity") || "moderate";
-  const conditions = store.get("conditions") || [];
-  const painScores = store.get("conditionPainScores") || {};
-  const checkin    = (store.get("checkinHistory") || {})[new Date().toISOString().split("T")[0]] || {};
-  const energyScore = checkin.energy || 5;
-
-  const reasons = [];
-  let adapted = [...session.exercises];
-
-  if (energyScore <= 3) {
-    // Reduce sets on main exercises (not warmup/cooldown/physio)
-    adapted = adapted.map(ex => {
-      if (ex.section === "main" && ex.sets > 2 && !ex.note?.includes("Physio")) {
-        return { ...ex, sets: ex.sets - 1, adaptedNote: "Sets reduced — energy low today" };
-      }
-      return ex;
-    });
-    // Remove last main exercise
-    const lastMainIdx = adapted.map((e, i) => e.section === "main" ? i : -1).filter(i => i >= 0).pop();
-    if (lastMainIdx !== undefined) adapted.splice(lastMainIdx, 1);
-    reasons.push("Your energy is low today. Sets reduced on main exercises. Last main exercise removed.");
-  }
-
-  const hasLowerLimbPain = conditions.some(id => (painScores[id] || 0) >= 6 &&
-    ["knee-pain", "hip-pain", "hamstring"].includes(id));
-
-  if (hasLowerLimbPain) {
-    adapted = adapted.filter(ex =>
-      !ex.name.includes("split squat") &&
-      !ex.name.includes("Single-leg press") &&
-      !ex.name.includes("Lateral step-down")
-    );
-    reasons.push("Lower limb is flagged. Single-leg loaded exercises removed. Everything else is safe to proceed.");
-  }
-
-  const isAdapted = reasons.length > 0;
-  return {
-    adapted: isAdapted,
-    reason: reasons.join(" "),
-    exercises: adapted
-  };
-}
-
-let showingAdaptedSession = false;
-
-// Phase execution state
-let gymPhase         = null;
-let gymPhaseExIndex  = 0;
-let gymPhaseTimer    = null;
-let gymPhaseTimeSec  = 0;
-let gymPhaseStarted  = false;
-let cardioModalOpen  = false;  // portable cardio log modal
-
-function renderAdaptationChoice(session) {
-  const adaptation = buildAdaptedSession(session);
-  if (!adaptation.adapted) return ""; // No adaptation needed
-
-  return `
-    <div class="card gym-adaptation-card" id="gym-adaptation-card">
-      <div class="card-coach">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <div>
-          <h3>Two options for today</h3>
-          <p class="text-sm" style="margin-top:var(--space-2);">${adaptation.reason}</p>
-          <p class="text-sm text-muted" style="margin-top:var(--space-2);">
-            You know your body. If you want to push through the normal session, do it.
-            If today calls for the adapted version, that is equally valid.
-          </p>
-        </div>
-      </div>
-      <div style="display:flex;gap:var(--space-3);margin-top:var(--space-4);">
-        <button class="btn btn-ghost" style="flex:1;" id="gym-full-session-btn"
-                aria-pressed="${!showingAdaptedSession}">
-          Normal session
-        </button>
-        <button class="btn btn-primary" style="flex:1;" id="gym-adapted-session-btn"
-                aria-pressed="${showingAdaptedSession}">
-          Adapted session
-        </button>
-      </div>
-    </div>
-  `;
-}
 
 export function render() {
   activeSessionId = store.get("gymProgrammeSession") || "A";
@@ -1020,13 +643,6 @@ export function render() {
 
       ${buildConditionCard()}
 
-      ${(() => {
-        const prompt = getWeekProgressionPrompt(activeWeek, PROGRAMME.weeks);
-        return prompt ? renderWeekProgressionCard(prompt) : "";
-      })()}
-
-      ${renderAdaptationChoice(session)}
-
       <div class="gym-session-tabs" role="tablist" aria-label="Session">
         ${PROGRAMME.sessions.map(s => `
           <button class="gym-session-tab ${s.id === activeSessionId ? "active" : ""}"
@@ -1036,335 +652,18 @@ export function render() {
         `).join("")}
       </div>
 
-      ${postSessionState
-          ? renderPostSession(session)
-          : gymPhase
-            ? renderPhaseExecution(session)
-            : renderSessionOverview(session, allDone)}
+      ${postSessionState ? renderPostSession(session) : renderSessionCards(session)}
 
-    </div>
-  `;
-}
-
-// -- Phase execution rendering ------------------------------------------------
-
-function renderSessionOverview(session, allDone) {
-  const warmup   = session.exercises.filter(e => e.section === "warmup");
-  const main     = session.exercises.filter(e => e.section === "main");
-  const cooldown = session.exercises.filter(e => e.section === "cooldown");
-
-  return `
-    <div class="gym-session-overview">
-      <div class="card card-coach gym-coach-line" style="margin-bottom:var(--space-4);">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <div>
-          <p>${session.coachLine || "Here is what I have planned for today. Take a look, then tap Start when you are ready."}</p>
-        </div>
-      </div>
-      <div class="gym-overview-sections">
-        <div class="gym-overview-section">
-          <h3 class="gym-overview-heading">Warmup <span class="gym-overview-count">${warmup.length} exercises</span></h3>
-          <ul class="gym-overview-list">
-            ${warmup.map(e => "<li>" + e.name + " <span class=\"text-muted\">" + (e.sets ? e.sets + " sets" : "") + " " + (e.reps || "") + "</span></li>").join("")}
-          </ul>
-        </div>
-        <div class="gym-overview-section">
-          <h3 class="gym-overview-heading">Main <span class="gym-overview-count">${main.length} exercises</span></h3>
-          <ul class="gym-overview-list">
-            ${main.map(e => "<li>" + e.name + " <span class=\"text-muted\">" + (e.sets ? e.sets + " sets" : "") + " " + (e.reps || "") + "</span></li>").join("")}
-          </ul>
-        </div>
-        <div class="gym-overview-section">
-          <h3 class="gym-overview-heading">Cooldown <span class="gym-overview-count">${cooldown.length} exercises</span></h3>
-          <ul class="gym-overview-list">
-            ${cooldown.map(e => "<li>" + e.name + " <span class=\"text-muted\">" + (e.reps || "") + "</span></li>").join("")}
-          </ul>
-        </div>
-      </div>
-      <button class="btn btn-primary btn-large btn-full gym-start-session-btn"
-              style="margin-top:var(--space-5);">
-        Start Session
-      </button>
-      ${allDone ? `<p class="text-sm text-muted" style="margin-top:var(--space-3);text-align:center;">All exercises completed today.</p>` : ""}
-    </div>
-  `;
-}
-
-function renderPhaseExecution(session) {
-  if (gymPhase === "intro") return renderPhaseIntro(session);
-  const exercises = getPhaseExercises(session, gymPhase);
-  if (!exercises.length) { advancePhase(session); return ""; }
-  const ex       = exercises[gymPhaseExIndex];
-  if (!ex) return "";
-  const isLast   = gymPhaseExIndex >= exercises.length - 1;
-  const progress = Math.round((gymPhaseExIndex / exercises.length) * 100);
-  const PHASE_LABELS = { warmup: "Warmup", main: "Main Session", cooldown: "Cooldown" };
-  const phaseLabel = PHASE_LABELS[gymPhase] || gymPhase;
-
-  return `
-    <div class="gym-phase-execution">
-      <div class="gym-phase-header">
-        <span class="gym-phase-label">${phaseLabel}</span>
-        <span class="gym-phase-progress text-sm text-muted">${gymPhaseExIndex + 1} of ${exercises.length}</span>
-      </div>
-      <div class="workout-progress-bar" role="progressbar"
-           aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">
-        <div class="workout-progress-fill" style="width:${progress}%"></div>
-      </div>
-      <div class="gym-phase-exercise card" style="margin-top:var(--space-4);">
-        ${ex.note ? `<div class="gym-phase-safety-banner" role="note">Note: ${ex.note}</div>` : ""}
-        <h2 class="gym-phase-exercise-name">${ex.name}</h2>
-        <div class="gym-phase-prescription">
-          ${ex.sets ? `<span class="gym-phase-pill">${ex.sets} sets</span>` : ""}
-          ${ex.reps ? `<span class="gym-phase-pill">${ex.reps}</span>` : ""}
-          ${ex.tempo ? `<span class="gym-phase-pill">${ex.tempo}</span>` : ""}
-          ${ex.rest && ex.rest !== "-" ? `<span class="gym-phase-pill">${ex.rest} rest</span>` : ""}
-        </div>
-        ${ex.duration ? `
-          <div class="gym-phase-timer" id="gym-phase-timer-wrap" style="margin:var(--space-4) 0;">
-            <div class="quiet-timer-circle" style="--phase-colour:var(--color-primary);margin:0 auto;">
-              <div class="quiet-timer-phase" id="gym-phase-timer-label">
-                ${gymPhaseStarted ? "Hold" : "Tap to start"}
-              </div>
-              <div class="quiet-timer-seconds" id="gym-phase-timer-display">
-                ${formatTimeSec(gymPhaseTimeSec || ex.duration)}
-              </div>
-            </div>
-            <button class="btn btn-primary btn-full"
-                    data-action="phase-timer"
-                    data-duration="${ex.duration}"
-                    style="margin-top:var(--space-4);">
-              ${!gymPhaseStarted ? "Start Timer" : (gymPhaseTimer ? "Pause" : "Resume")}
-            </button>
-          </div>
-        ` : ""}
-        ${renderExerciseGuide(ex)}
-        ${ex.logWeight ? `
-          <div class="gym-phase-weight-log" style="margin-top:var(--space-4);">
-            <label class="form-label" for="gym-phase-weight-input">Weight used (kg)</label>
-            <div class="gym-weight-row">
-              <input type="number" id="gym-phase-weight-input" class="form-input"
-                     placeholder="${ex.recommended || "kg"}" inputmode="decimal" step="0.5" min="0">
-              <button class="btn btn-ghost btn-small" data-action="weight-save">Save</button>
-            </div>
-          </div>
-        ` : ""}
-      </div>
-      <div class="gym-phase-actions" style="margin-top:var(--space-4);">
-        <button class="btn btn-primary btn-large btn-full" data-action="phase-next">
-          ${isLast ? getNextPhaseLabel(session) : "Done — Next"}
+      ${allDone && !postSessionState ? `
+        <button class="btn btn-primary btn-full gym-finish-btn"
+                style="margin-top: var(--space-4);">
+          Finish session
         </button>
-        <div class="gym-phase-secondary-actions">
-          <button class="btn btn-ghost btn-small" data-action="phase-skip">
-            Skip exercise
-          </button>
-          <button class="btn btn-ghost btn-small" data-action="cardio-add">
-            + Log cardio
-          </button>
-          <button class="btn btn-ghost btn-small" data-action="phase-exit">
-            Exit
-          </button>
-        </div>
-      </div>
-
-      ${cardioModalOpen ? `
-        <div class="gym-cardio-modal card" style="margin-top:var(--space-4);">
-          <div class="gym-cardio-modal-header">
-            <h3>Cardio log</h3>
-            <button class="btn btn-ghost btn-small" data-action="cardio-close">Close</button>
-          </div>
-          ${renderCardioBlock(activeSessionId)}
-        </div>
       ` : ""}
+
     </div>
   `;
 }
-
-function renderPhaseIntro(session) {
-  const warmup   = session.exercises.filter(e => e.section === "warmup");
-  const main     = session.exercises.filter(e => e.section === "main");
-  const cooldown = session.exercises.filter(e => e.section === "cooldown");
-  const conditions = store.get("conditions") || [];
-  const painScores = store.get("conditionPainScores") || {};
-  const flagged = conditions.filter(id => (painScores[id] || 0) >= 3);
-
-  return `
-    <div class="gym-phase-intro">
-      <div class="card card-coach" style="margin-bottom:var(--space-4);">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <div>
-          <h3>Today's session</h3>
-          <p>${session.coachLine || "I will guide you through each section. Take each exercise at your own pace."}</p>
-        </div>
-      </div>
-      <div class="gym-intro-plan card">
-        <h3>What we are doing today</h3>
-        <div class="gym-intro-sections">
-          <div class="gym-intro-section">
-            <div>
-              <span class="gym-intro-label">Warmup</span>
-              <span class="text-sm text-muted"> — ${warmup.length} exercises</span>
-            </div>
-          </div>
-          <div class="gym-intro-section">
-            <div>
-              <span class="gym-intro-label">Main session</span>
-              <span class="text-sm text-muted"> — ${main.length} exercises</span>
-            </div>
-          </div>
-          <div class="gym-intro-section">
-            <div>
-              <span class="gym-intro-label">Cooldown</span>
-              <span class="text-sm text-muted"> — ${cooldown.length} exercises</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      ${flagged.length > 0 ? `
-        <div class="gym-rag-section" style="margin-top:var(--space-4);">
-          ${flagged.map(id => {
-            const score = painScores[id] || 0;
-            const label = score >= 7 ? "High" : score >= 4 ? "Moderate" : "Low";
-            const ragClass = score >= 7 ? "rag-red" : score >= 4 ? "rag-amber" : "rag-green";
-            const condName = id.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-            return `
-              <div class="gym-rag-box ${ragClass}" role="note">
-                <span class="gym-rag-badge">${label} risk</span>
-                <span class="gym-rag-condition">${condName}</span>
-                <p class="gym-rag-note">I will show relevant notes at each exercise. Listen carefully.</p>
-              </div>
-            `;
-          }).join("")}
-        </div>
-      ` : ""}
-      <div class="card gym-safety-note" style="margin-top:var(--space-3);">
-        <p class="text-sm">
-          Discomfort is normal. Sharp or shooting pain is a signal to stop.
-          If something feels wrong, skip it and note it for next time.
-        </p>
-      </div>
-      <button class="btn btn-primary btn-large btn-full gym-intro-start-btn"
-              style="margin-top:var(--space-5);"
-              data-action="intro-start">
-        Let's go
-      </button>
-      <button class="btn btn-ghost btn-full gym-intro-back-btn"
-              style="margin-top:var(--space-3);"
-              data-action="intro-back">
-        Back to overview
-      </button>
-    </div>
-  `;
-}
-
-function renderExerciseGuide(ex) {
-  const guide = GUIDE[ex.name] || GUIDE[ex.name.replace(/ \(.*\)/, "")] || null;
-  if (!guide) return "";
-  return `
-    <div class="gym-phase-guide" style="margin-top:var(--space-4);">
-      ${guide.description ? `<p class="text-sm" style="margin-bottom:var(--space-3);">${guide.description}</p>` : ""}
-      ${guide.cues && guide.cues.length ? `
-        <ul class="gym-phase-cues">
-          ${guide.cues.map(cue => `<li class="text-sm">${cue}</li>`).join("")}
-        </ul>
-      ` : ""}
-      ${guide.youtube ? `
-        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(guide.youtube)}"
-           target="_blank" rel="noopener noreferrer" class="youtube-link" style="margin-top:var(--space-3);">
-          Watch how to do this
-        </a>
-      ` : ""}
-    </div>
-  `;
-}
-
-function getPhaseExercises(session, phase) {
-  return session.exercises.filter(e => e.section === phase);
-}
-
-function getNextPhaseLabel(session) {
-  const phases = ["warmup", "main", "cooldown"];
-  const currentIdx = phases.indexOf(gymPhase);
-  for (let i = currentIdx + 1; i < phases.length; i++) {
-    if (getPhaseExercises(session, phases[i]).length > 0) {
-      const labels = { warmup: "Start Warmup", main: "Start Main Session", cooldown: "Start Cooldown" };
-      return labels[phases[i]] || "Next";
-    }
-  }
-  return "Finish Session";
-}
-
-function advancePhase(session) {
-  const phases = ["warmup", "main", "cooldown"];
-  const currentIdx = phases.indexOf(gymPhase);
-  for (let i = currentIdx + 1; i < phases.length; i++) {
-    if (getPhaseExercises(session, phases[i]).length > 0) {
-      gymPhase = phases[i];
-      gymPhaseExIndex = 0;
-      gymPhaseStarted = false;
-      gymPhaseTimeSec = 0;
-      stopPhaseTimer();
-      rerender();
-      return;
-    }
-  }
-  gymPhase = null;
-  gymPhaseExIndex = 0;
-  stopPhaseTimer();
-  markSessionComplete(session);
-}
-
-function markSessionComplete(session) {
-  const allIds = session.exercises.map(e => e.id);
-  completedIds = new Set(allIds);
-  store.set("gymCompletedExercises_" + activeSessionId, allIds);
-  postSessionState = "intel";
-  const log = store.get("activityLog") || [];
-  log.push({
-    id: "gym-" + Date.now(), type: "gym-programme",
-    name: "Gym Session " + activeSessionId, source: "gym-programme",
-    credits: 50, loggedAt: new Date().toISOString()
-  });
-  store.set("activityLog", log);
-  store.set("totalCredits", (store.get("totalCredits") || 0) + 50);
-  rerender();
-}
-
-function startPhaseTimer(duration) {
-  if (gymPhaseTimer) clearInterval(gymPhaseTimer);
-  gymPhaseTimeSec = gymPhaseTimeSec > 0 ? gymPhaseTimeSec : duration;
-  gymPhaseStarted = true;
-  gymPhaseTimer = setInterval(() => {
-    gymPhaseTimeSec--;
-    const el = document.getElementById("gym-phase-timer-display");
-    if (el) el.textContent = formatTimeSec(gymPhaseTimeSec);
-    if (gymPhaseTimeSec <= 0) {
-      clearInterval(gymPhaseTimer);
-      gymPhaseTimer = null;
-      if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
-      const label = document.getElementById("gym-phase-timer-label");
-      if (label) label.textContent = "Done";
-    }
-  }, 1000);
-}
-
-function pausePhaseTimer() {
-  if (gymPhaseTimer) { clearInterval(gymPhaseTimer); gymPhaseTimer = null; }
-}
-
-function stopPhaseTimer() {
-  if (gymPhaseTimer) clearInterval(gymPhaseTimer);
-  gymPhaseTimer = null;
-  gymPhaseTimeSec = 0;
-  gymPhaseStarted = false;
-}
-
-function formatTimeSec(s) {
-  const m = Math.floor(s / 60);
-  return m + ":" + String(s % 60).padStart(2, "0");
-}
-
-
 
 // ── Timer helpers ─────────────────────────────────────────────────────────────
 
@@ -1407,22 +706,6 @@ function rerender() {
   if (main) {
     main.innerHTML = render();
     wireEvents();
-    wireSliders();
-  }
-}
-
-function wireSliders() {
-  // Cardio feel slider — updates label in real time
-  const FEEL_LABELS = ["Very easy", "Easy", "Manageable", "Hard", "Very hard"];
-  const slider = document.getElementById("cardio-feel-slider");
-  const label  = document.getElementById("cardio-feel-label");
-  if (slider && label) {
-    slider.addEventListener("input", () => {
-      const val = parseInt(slider.value) - 1;
-      const text = FEEL_LABELS[val] || "Manageable";
-      label.textContent = " — " + text;
-      slider.setAttribute("aria-valuetext", text);
-    });
   }
 }
 
@@ -1547,181 +830,6 @@ function wireEvents() {
       return;
     }
 
-    // ── Cardio log save ───────────────────────────────────────
-    const cardioSaveBtn = e.target.closest("#gym-cardio-save-btn");
-    if (cardioSaveBtn) {
-      saveCardioLog(activeSessionId);
-      return;
-    }
-
-    // ── Cardio difficulty chips ───────────────────────────────
-    // Cardio feel slider — handled via input event in wireSliders()
-
-    // ── Week advance ──────────────────────────────────────────
-    const weekAdvanceBtn = e.target.closest("#gym-week-advance-btn");
-    if (weekAdvanceBtn) {
-      const currentWeek = store.get("gymProgrammeWeek") || 1;
-      store.set("gymProgrammeWeek", currentWeek + 1);
-      store.set("gymWeekLastAdvanced", new Date().toISOString().split("T")[0]);
-      rerender();
-      return;
-    }
-
-    const weekStayBtn = e.target.closest("#gym-week-stay-btn");
-    if (weekStayBtn) {
-      store.set("gymWeekLastAdvanced", new Date().toISOString().split("T")[0]);
-      rerender();
-      return;
-    }
-
-    // ── Adaptation choice ─────────────────────────────────────
-    const fullSessionBtn = e.target.closest("#gym-full-session-btn");
-    if (fullSessionBtn) {
-      showingAdaptedSession = false;
-      rerender();
-      return;
-    }
-
-    const adaptedSessionBtn = e.target.closest("#gym-adapted-session-btn");
-    if (adaptedSessionBtn) {
-      showingAdaptedSession = true;
-      rerender();
-      return;
-    }
-
-    // ── Phase execution handlers ─────────────────────────────
-    const startSessionBtn = e.target.closest(".gym-start-session-btn");
-    if (startSessionBtn) {
-      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
-      gymPhase        = "intro";
-      gymPhaseExIndex = 0;
-      gymPhaseStarted = false;
-      gymPhaseTimeSec = 0;
-      rerender();
-      return;
-    }
-
-    const introStartBtn = e.target.closest("[data-action='intro-start']");
-    if (introStartBtn) {
-      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
-      // Find first non-empty phase
-      for (const phase of ["warmup", "main", "cooldown"]) {
-        if (getPhaseExercises(session, phase).length > 0) {
-          gymPhase        = phase;
-          gymPhaseExIndex = 0;
-          gymPhaseStarted = false;
-          gymPhaseTimeSec = 0;
-          rerender();
-          return;
-        }
-      }
-      return;
-    }
-
-    const introBackBtn = e.target.closest("[data-action='intro-back']");
-    if (introBackBtn) {
-      gymPhase = null;
-      rerender();
-      return;
-    }
-
-    const phaseNextBtn = e.target.closest("[data-action='phase-next']");
-    if (phaseNextBtn) {
-      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
-      const exercises = getPhaseExercises(session, gymPhase);
-      stopPhaseTimer();
-
-      // Save weight if entered
-      const wInput = document.getElementById("gym-phase-weight-input");
-      if (wInput && wInput.value) {
-        const ex = exercises[gymPhaseExIndex];
-        if (ex) store.set("gymLog_" + activeSessionId + "_" + ex.name, wInput.value);
-      }
-
-      if (gymPhaseExIndex >= exercises.length - 1) {
-        advancePhase(session);
-      } else {
-        gymPhaseExIndex++;
-        gymPhaseStarted = false;
-        gymPhaseTimeSec = 0;
-        rerender();
-      }
-      return;
-    }
-
-    const cardioAddBtn = e.target.closest("[data-action='cardio-add']");
-    if (cardioAddBtn) {
-      cardioModalOpen = !cardioModalOpen;
-      rerender();
-      return;
-    }
-
-    const cardioCloseBtn = e.target.closest("[data-action='cardio-close']");
-    if (cardioCloseBtn) {
-      cardioModalOpen = false;
-      rerender();
-      return;
-    }
-
-    const phaseSkipBtn = e.target.closest("[data-action='phase-skip']");
-    if (phaseSkipBtn) {
-      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
-      const exercises = getPhaseExercises(session, gymPhase);
-      stopPhaseTimer();
-      if (gymPhaseExIndex >= exercises.length - 1) {
-        advancePhase(session);
-      } else {
-        gymPhaseExIndex++;
-        gymPhaseStarted = false;
-        gymPhaseTimeSec = 0;
-        rerender();
-      }
-      return;
-    }
-
-    const phaseExitBtn = e.target.closest("[data-action='phase-exit']");
-    if (phaseExitBtn) {
-      if (confirm("Exit session? Your progress will be saved.")) {
-        stopPhaseTimer();
-        gymPhase        = null;
-        gymPhaseExIndex = 0;
-        rerender();
-      }
-      return;
-    }
-
-    const phaseTimerBtn = e.target.closest("[data-action='phase-timer']");
-    if (phaseTimerBtn) {
-      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
-      const exercises = getPhaseExercises(session, gymPhase);
-      const ex = exercises[gymPhaseExIndex];
-      if (!ex) return;
-      if (!gymPhaseStarted) {
-        startPhaseTimer(ex.duration);
-      } else if (gymPhaseTimer) {
-        pausePhaseTimer();
-      } else {
-        startPhaseTimer(ex.duration);
-      }
-      // Update button text only
-      phaseTimerBtn.textContent = gymPhaseTimer ? "Pause" : (!gymPhaseStarted ? "Start Timer" : "Resume");
-      return;
-    }
-
-    const weightSaveBtn = e.target.closest("[data-action='weight-save']");
-    if (weightSaveBtn) {
-      const wInput = document.getElementById("gym-phase-weight-input");
-      const session = PROGRAMME.sessions.find(s => s.id === activeSessionId) || PROGRAMME.sessions[0];
-      const exercises = getPhaseExercises(session, gymPhase);
-      const ex = exercises[gymPhaseExIndex];
-      if (ex && wInput && wInput.value) {
-        store.set("gymLog_" + activeSessionId + "_" + ex.name, wInput.value);
-        weightSaveBtn.textContent = "Saved";
-        setTimeout(() => { weightSaveBtn.textContent = "Save"; }, 1500);
-      }
-      return;
-    }
-
     // ── Intel done ────────────────────────────────────────────
     const intelDoneBtn = e.target.closest("#gym-intel-done-btn");
     if (intelDoneBtn) {
@@ -1763,10 +871,8 @@ function wireEvents() {
 }
 
 export function onMount() {
-  postSessionState      = null;
-  intelAnswers          = {};
-  showingAdaptedSession = false;
-  // Do NOT reset gymPhase here — it persists across rerenders during a session
+  postSessionState = null;
+  intelAnswers     = {};
   if (activeTimerId) clearInterval(activeTimerId);
   wireEvents();
 }
