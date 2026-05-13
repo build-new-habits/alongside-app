@@ -1,19 +1,43 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 9 May 2026 v1
+ * 14 May 2026 v4
  * Cache version: alongside-v38
  *
- * Bumped from alongside-v17. Changes since last version:
- *   - settings.js rebuilt (Library tab, My Movement, facility presets,
- *     editable profile, conditions add/remove, 10-level voice speed)
- *   - router.js rebuilt (check-in as front door, new views registered)
- *   - intention.js rebuilt (coach path → coach-proposal)
- *   - prescribed-session.js rebuilt (weight history, card redesign)
- *   - core-session.js added (new view)
- *   - walk-session.js added (new view)
- *   - js/views/coach-proposal.js (live from S4-1/S4-2)
- *   - js/views/checkin.js (live from S4-1)
+ * v38 changes (14 May 2026):
+ *   - coach-proposal.js: buildReflection() rewritten for natural language
+ *     ("you trained yesterday" not "gym session since Tuesday")
+ *     activity log now filters on status:"completed" only
+ *
+ * v37 changes (14 May 2026):
+ *   - intention.js: single-tap navigation (no Continue button for most paths)
+ *     coach/prescribed navigate immediately; self/quiet navigate on chip tap
+ *     class/other still show name field + Continue
+ *   - buttons.css: removed ::before hover overlay; replaced with brightness filter
+ *     fixes invisible text on mobile touch/hover stuck state
+ *   - settings.js: Log an Activity navigates to activity-log view (not inline grid)
+ *
+ * v36 changes (13 May 2026):
+ *   - gym-programme.js: navigate to intention not today after session completes
+ *   - buttons.css: initial text visibility fix (superseded by v37)
+ *
+ * v35 changes (13 May 2026):
+ *   - goal-setup.js: navigate to checkin not today after onboarding
+ *   - yoga-session.js: moved to js/views/ (was incorrectly in js/data/)
+ *     correct import paths for js/views/ location
+ *   - onboarding/about.js: age field saves on oninput not just onchange
+ *
+ * v33–v34 changes (9 May 2026):
+ *   - settings.js: Library tab, My Movement, facility presets (correct IDs),
+ *     editable profile, conditions add/remove, 10-level voice speed slider,
+ *     home vs gym equipment separation
+ *   - router.js: check-in as front door; all new session views registered
+ *   - intention.js: coach path routes to coach-proposal
+ *   - prescribed-session.js: weight history, exercise card redesign
+ *   - core-session.js: new guided core session view
+ *   - walk-session.js: new coached walk session with noticing prompts
+ *   - coach-proposal.js: undefined bug fixed; location-first "something else" flow;
+ *     date field fixed (completedAt not loggedAt)
  *
  * Strategy: Cache-first for the app shell (HTML, CSS, JS, assets).
  * All user data lives in localStorage — no network requests for data.
