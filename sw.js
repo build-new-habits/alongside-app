@@ -2,7 +2,14 @@
  * sw.js - Alongside Service Worker
  *
  * 13 May 2026 v4
- * Cache version: alongside-v39
+ * Cache version: alongside-v40
+ *
+ * v40 changes (13 May 2026):
+ *   - coach-proposal.js: status filter fixed — old entries without status field
+ *     were incorrectly excluded. Fix: only exclude status:"started" explicitly.
+ *     This was causing "6+ sessions this week" when progress showed 3.
+ *   - progress.css: activity breakdown grid overflow fix for mobile.
+ *     Parent card now clips overflow. Tiles fixed width. Today dot amber/yellow.
  *
  * v39 changes (13 May 2026):
  *   - coach-proposal.js: consecutive days counter fixed
@@ -53,7 +60,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v39";
+const CACHE_NAME = "alongside-v40";
 
 const SHELL_URLS = [
 
