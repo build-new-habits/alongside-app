@@ -249,7 +249,7 @@ function buildProposal(preferShorter = false) {
   // Filter to completed training entries only — within last 14 days for efficiency
   const cutoff14 = Date.now() - (14 * 86400000);
   const completedTraining = (activityLog || []).filter(e => {
-    if (e.status && e.status !== "completed") return false;  // exclude started-only
+    if (e.status === "started") return false;  // exclude started-only; entries with no status field are legacy completed sessions
     const ts = new Date(e.completedAt || e.sessionStart || e.date || 0).getTime();
     if (ts < cutoff14) return false;
     return isTraining(e.type || e.source || "");
@@ -424,7 +424,7 @@ function buildProposal(preferShorter = false) {
 /**
  * buildReflection(activityLog, lookbackHours, coachPersonality)
  *
- * 14 May 2026 v1 — Rewritten for natural language
+ * 13 May 2026 v1 — Rewritten for natural language
  *
  * Design principles:
  *   1. Time references use human language, not day names when recent.
