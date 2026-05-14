@@ -2547,14 +2547,24 @@
    Fix: "MINDFUL MOMENTS" label overflowing tile width
    ============================================================ */
 
-/* Activity type tiles in the last-30-days breakdown */
+/* Activity type tiles in the last-30-days breakdown
+   13 May 2026 v2 — mobile overflow fix, today dot highlight
+   Layout: horizontal scroll on all screen sizes. Tiles are fixed width
+   and flex-shrink:0 so they never compress. The parent card must
+   also have overflow:hidden to contain the scroll region correctly.
+   On narrow mobile the card padding was allowing tiles to overflow
+   the visible viewport — fixed by constraining parent width. */
+
 .activity-breakdown-grid {
   display: flex;
   gap: var(--space-2);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: var(--space-1);
+  padding-bottom: var(--space-2);
   scrollbar-width: none;
+  /* Force scroll to stay inside the card on narrow viewports */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .activity-breakdown-grid::-webkit-scrollbar {
@@ -2569,8 +2579,11 @@
   padding: var(--space-3) var(--space-2);
   background: var(--color-bg);
   border-radius: var(--radius-md);
-  min-width: 64px;
+  /* Fixed width — never compress, always scroll */
+  min-width: 62px;
+  max-width: 62px;
   flex-shrink: 0;
+  flex-grow: 0;
 }
 
 .activity-breakdown-tile--active {
@@ -2578,13 +2591,32 @@
   border: 1px solid rgba(45, 212, 191, 0.2);
 }
 
+/* Today's dot in the check-in week row — amber/yellow highlight */
+.week-dot--today {
+  background: var(--color-warning);
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+}
+
+/* Today label beneath the dot */
+.week-day-label--today {
+  color: var(--color-warning);
+  font-weight: var(--font-semibold);
+}
+
+/* The card wrapping .activity-breakdown-grid must clip overflow
+   so the horizontal scroll stays inside the card, not the viewport */
+.activity-breakdown-card,
+.card:has(.activity-breakdown-grid) {
+  overflow: hidden;
+}
+
 .activity-breakdown-icon {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   line-height: 1;
 }
 
 .activity-breakdown-count {
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
   font-weight: var(--font-bold);
   color: var(--color-text);
   line-height: 1;
@@ -2594,19 +2626,19 @@
   color: var(--color-primary);
 }
 
-/* Key fix: wrap and constrain label text so long labels like
-   "MINDFUL MOMENTS" break across two lines rather than overflowing */
+/* Label: constrained width, two-line wrap for "MINDFUL MOMENTS" */
 .activity-breakdown-label {
-  font-size: 9px;
+  font-size: 8px;
   font-weight: var(--font-semibold);
   color: var(--color-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   text-align: center;
   line-height: 1.2;
-  max-width: 60px;
+  width: 54px;
   word-break: break-word;
-  hyphens: auto;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 
