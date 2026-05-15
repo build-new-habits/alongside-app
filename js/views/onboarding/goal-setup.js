@@ -1,9 +1,13 @@
 /**
  * goal-setup.js — Strategic goal and programme selection
  *
+ * 14 May 2026 v1
+ *
+ * v1.1 — navigate to checkin not today (today.js no longer exists)
+ *
  * This view runs immediately after onboarding/complete.
  * The user picks their primary goal, commits to a weekly session count,
- * and chooses a programme. Then they go to today.
+ * and chooses a programme.
  *
  * Route: onboarding/goal-setup
  * File location: js/views/onboarding/goal-setup.js
@@ -320,7 +324,7 @@ window.goalSetupConfirm = function() {
   if (success) {
     // Show bottom nav and go to today
     document.getElementById('bottom-nav')?.classList.remove('hidden');
-    router.navigate('today');
+    router.navigate('checkin');
   } else {
     showError('Could not start programme — please try again');
   }
@@ -329,7 +333,7 @@ window.goalSetupConfirm = function() {
 window.goalSetupSkip = function() {
   // User skips goal setup — go straight to today without a programme
   document.getElementById('bottom-nav')?.classList.remove('hidden');
-  router.navigate('today');
+  router.navigate('checkin');
 };
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
