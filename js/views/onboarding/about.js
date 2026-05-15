@@ -1,113 +1,95 @@
 /**
- * about.js - Onboarding Step 3: Age band, gender, hormonal tracking
+ * about.js - Onboarding Step 3: Age, gender, hormonal tracking
  *
- * v1.1 — Age band chips replace numeric age input (store v1.6).
- *   Eight bands: under-18 through 65+, plus prefer-not-to-say.
- *   Numeric age field removed — no DOB collected, no stale data.
- *   Privacy benefit: age band is less identifying than exact age.
+ * 14 May 2026 v1
+ *
+ * v1.1 — oninput added to age field so value saves as user types,
+ *         not only on blur. Prevents "Not set" in Settings when user
+ *         types age and taps Next without tapping elsewhere first.
  */
 
-import { store } from "../../store.js";
+import { store } from '../../store.js';
 
 export const centered = false;
 
-const AGE_BANDS = [
-  { id: "under-18",   label: "Under 18"        },
-  { id: "18-24",      label: "18 - 24"          },
-  { id: "25-34",      label: "25 - 34"          },
-  { id: "35-44",      label: "35 - 44"          },
-  { id: "45-54",      label: "45 - 54"          },
-  { id: "55-64",      label: "55 - 64"          },
-  { id: "65+",        label: "65 and over"      },
-  { id: "prefer-not", label: "Prefer not to say"}
-];
-
 const GENDER_OPTIONS = [
-  { id: "female",     label: "Female"            },
-  { id: "male",       label: "Male"              },
-  { id: "non-binary", label: "Non-binary"        },
-  { id: "prefer-not", label: "Prefer not to say" }
+  { id: 'female', label: 'Female' },
+  { id: 'male', label: 'Male' },
+  { id: 'non-binary', label: 'Non-binary' },
+  { id: 'prefer-not', label: 'Prefer not to say' }
 ];
 
 export function render() {
-  const name             = store.get("name")             || "";
-  const ageBand          = store.get("ageBand");
-  const gender           = store.get("gender");
-  const hormonalTracking = store.get("hormonalTracking");
-  const showHormonalOption = ["female", "non-binary"].includes(gender);
-
+  const name = store.get('name') || '';
+  const age = store.get('age') || '';
+  const gender = store.get('gender');
+  const hormonalTracking = store.get('hormonalTracking');
+  const showHormonalOption = ['female', 'non-binary'].includes(gender);
+  
   return `
     <div class="onboarding-view">
       <div class="onboarding-header">
-        <button class="btn btn-ghost" onclick="router.navigate('onboarding/name')"
-                aria-label="Back to name step">Back</button>
-        <div class="progress-dots" aria-label="Step 2 of 7">
-          <span class="dot completed" aria-hidden="true"></span>
-          <span class="dot active"    aria-hidden="true"></span>
-          <span class="dot"           aria-hidden="true"></span>
-          <span class="dot"           aria-hidden="true"></span>
-          <span class="dot"           aria-hidden="true"></span>
-          <span class="dot"           aria-hidden="true"></span>
-          <span class="dot"           aria-hidden="true"></span>
+        <button class="btn btn-ghost" onclick="router.navigate('onboarding/name')">← Back</button>
+        <div class="progress-dots">
+          <span class="dot completed"></span>
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
         </div>
       </div>
-
+      
       <div class="onboarding-content">
-        <h1>A bit about you${name ? ", " + name : ""}</h1>
-        <div class="onboarding-coach-line">
-          <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
-          <p class="onboarding-coach-text">A little context helps me a lot. I use this to shape the kind of sessions I suggest — nothing else. Your stage of life shapes how your body responds to movement, and I want to get that right for you.</p>
-        </div>
-
-        <!-- Age band -->
+        <h1>A bit about you, ${name}</h1>
+        <p class="text-secondary">This helps me personalise your experience.</p>
+        
         <div class="form-section">
-          <label class="form-label" id="age-band-label">Your age group</label>
-          <div class="chip-group" role="group" aria-labelledby="age-band-label">
-            ${AGE_BANDS.map(band => `
-              <button
-                class="chip ${ageBand === band.id ? "selected" : ""}"
-                onclick="setAgeBand('${band.id}')"
-                aria-pressed="${ageBand === band.id}"
-              >${band.label}</button>
-            `).join("")}
-          </div>
+          <label class="form-label">Your age</label>
+          <input 
+            type="number" 
+            id="user-age" 
+            class="input-field"
+            placeholder="e.g. 42"
+            inputmode="numeric"
+            min="16"
+            max="100"
+            value="${age}"
+            oninput="saveAge()" onchange="saveAge()"
+          >
         </div>
-
-        <!-- Gender -->
+        
         <div class="form-section">
-          <label class="form-label" id="gender-label">Gender</label>
-          <div class="chip-group" role="group" aria-labelledby="gender-label">
+          <label class="form-label">Gender</label>
+          <div class="radio-group">
             ${GENDER_OPTIONS.map(opt => `
-              <button
-                class="chip ${gender === opt.id ? "selected" : ""}"
-                onclick="setGender('${opt.id}')"
-                aria-pressed="${gender === opt.id}"
-              >${opt.label}</button>
-            `).join("")}
+              <button class="btn-card radio-option ${gender === opt.id ? 'selected' : ''}"
+                      onclick="setGender('${opt.id}')">
+                ${opt.label}
+              </button>
+            `).join('')}
           </div>
         </div>
-
-        <!-- Hormonal tracking -->
-        <div id="hormonal-option" class="form-section ${showHormonalOption ? "" : "hidden"}">
+        
+        <div id="hormonal-option" class="form-section ${showHormonalOption ? '' : 'hidden'}">
           <label class="form-label">Would you like cycle-aware recommendations?</label>
-          <p class="text-sm text-secondary" style="margin-bottom: var(--space-3);">
-            This helps me adapt sessions to your energy patterns throughout the month.
+          <p class="text-sm text-muted" style="margin-bottom: var(--space-3);">
+            This helps me adapt workouts to your energy patterns throughout the month.
           </p>
-          <div class="chip-group" role="group" aria-label="Cycle-aware recommendations">
-            <button
-              class="chip ${hormonalTracking === true  ? "selected" : ""}"
-              onclick="setHormonalTracking(true)"
-              aria-pressed="${hormonalTracking === true}"
-            >Yes, that would help</button>
-            <button
-              class="chip ${hormonalTracking === false ? "selected" : ""}"
-              onclick="setHormonalTracking(false)"
-              aria-pressed="${hormonalTracking === false}"
-            >No thanks</button>
+          <div class="radio-group">
+            <button class="btn-card radio-option ${hormonalTracking === true ? 'selected' : ''}"
+                    onclick="setHormonalTracking(true)">
+              Yes, that would help
+            </button>
+            <button class="btn-card radio-option ${hormonalTracking === false ? 'selected' : ''}"
+                    onclick="setHormonalTracking(false)">
+              No thanks
+            </button>
           </div>
         </div>
       </div>
-
+      
       <div class="onboarding-actions">
         <button class="btn btn-primary btn-large btn-full" onclick="saveAbout()">
           Continue
@@ -117,30 +99,42 @@ export function render() {
   `;
 }
 
-window.setAgeBand = function(bandId) {
-  store.set("ageBand", bandId);
-  document.querySelectorAll("[onclick^='setAgeBand']").forEach(btn => {
-    const isSelected = btn.getAttribute("onclick") === "setAgeBand('" + bandId + "')";
-    btn.classList.toggle("selected", isSelected);
-    btn.setAttribute("aria-pressed", isSelected);
-  });
+// Save age immediately when changed (fixes the disappearing age bug)
+window.saveAge = function() {
+  const ageInput = document.getElementById('user-age');
+  if (ageInput && ageInput.value) {
+    store.set('age', parseInt(ageInput.value));
+  }
 };
 
 window.setGender = function(genderId) {
-  store.set("gender", genderId);
-  router.navigate("onboarding/about");
+  // Save current age value BEFORE re-rendering
+  const ageInput = document.getElementById('user-age');
+  if (ageInput && ageInput.value) {
+    store.set('age', parseInt(ageInput.value));
+  }
+  
+  store.set('gender', genderId);
+  
+  // Re-render to show/hide hormonal option
+  router.navigate('onboarding/about');
 };
 
 window.setHormonalTracking = function(value) {
-  store.set("hormonalTracking", value);
-  document.querySelectorAll("#hormonal-option .chip").forEach(btn => {
-    btn.classList.remove("selected");
-    btn.setAttribute("aria-pressed", "false");
+  store.set('hormonalTracking', value);
+  // Update UI without full re-render
+  document.querySelectorAll('#hormonal-option .radio-option').forEach(btn => {
+    btn.classList.remove('selected');
   });
-  event.target.classList.add("selected");
-  event.target.setAttribute("aria-pressed", "true");
+  event.target.classList.add('selected');
 };
 
 window.saveAbout = function() {
-  router.navigate("onboarding/body");
+  // Save age one more time in case they didn't blur the field
+  const ageInput = document.getElementById('user-age');
+  if (ageInput && ageInput.value) {
+    store.set('age', parseInt(ageInput.value));
+  }
+  
+  router.navigate('onboarding/body');
 };
