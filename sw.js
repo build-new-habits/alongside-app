@@ -2,7 +2,15 @@
  * sw.js - Alongside Service Worker
  *
  * 13 May 2026 v4
- * Cache version: alongside-v40
+ * Cache version: alongside-v41
+ *
+ * v41 changes (14 May 2026):
+ *   - yoga-session.js: new file at js/views/ (was never deployed)
+ *     6 focus types, 3 durations, condition-aware, hold timers
+ *   - goal-setup.js: new file at js/views/onboarding/
+ *     navigate to checkin not today after programme selection
+ *   - onboarding/about.js: new file at js/views/onboarding/
+ *     oninput added to age field so age saves before Next is tapped
  *
  * v40 changes (13 May 2026):
  *   - coach-proposal.js: status filter fixed — old entries without status field
@@ -60,7 +68,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v40";
+const CACHE_NAME = "alongside-v41";
 
 const SHELL_URLS = [
 
