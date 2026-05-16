@@ -2,7 +2,17 @@
  * sw.js - Alongside Service Worker
  *
  * 13 May 2026 v4
- * Cache version: alongside-v41
+ * Cache version: alongside-v42
+ *
+ * v42 changes (14 May 2026):
+ *   NS-3: Return-visit abbreviated check-in
+ *     router.js: second visit same day sets returnVisit:true, goes to intention
+ *     intention.js: shows "anything changed?" soft prompt on return visit
+ *     checkin-mini.js: new 3-question check-in (energy + mood + pain only)
+ *   NS-4: running-session.js — easy / intervals / long run
+ *     3 run types, 4 durations, condition-aware, vibration prompts, warmup/cooldown
+ *   NS-5: swim-session.js — stroke selector, steady/intervals, 4 durations
+ *         cycle-session.js — road/indoor/turbo, steady/intervals/tempo, 4 durations
  *
  * v41 changes (14 May 2026):
  *   - yoga-session.js: new file at js/views/ (was never deployed)
@@ -68,7 +78,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v41";
+const CACHE_NAME = "alongside-v42";
 
 const SHELL_URLS = [
 
@@ -105,6 +115,10 @@ const SHELL_URLS = [
   "/alongside-app/js/views/gym-programme.js",
   "/alongside-app/js/views/quiet-session.js",
   "/alongside-app/js/views/yoga-session.js",
+  "/alongside-app/js/views/running-session.js",
+  "/alongside-app/js/views/swim-session.js",
+  "/alongside-app/js/views/cycle-session.js",
+  "/alongside-app/js/views/checkin-mini.js",
   "/alongside-app/js/views/core-session.js",
   "/alongside-app/js/views/walk-session.js",
   "/alongside-app/js/views/morning-session.js",
