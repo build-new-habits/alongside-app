@@ -1,7 +1,16 @@
 /**
  * intention.js - Intention Screen
  *
- * 14 May 2026 v1
+ * 13 May 2026 v1
+ *
+ * v1.3 — Return-visit abbreviated check-in prompt (NS-3):
+ *   If store.returnVisit is true (set by router on second+ visit today),
+ *   a soft coach card appears above the paths: "Anything changed since
+ *   this morning?" with two options:
+ *     "No, I'm good" — dismisses the card, proceeds normally
+ *     "Yes, tell the coach" — navigates to checkin-mini (3 questions only)
+ *   Once dismissed, the card does not appear again in this session
+ *   (returnVisit is cleared from store).
  *
  * v1.2 — Single-tap navigation (no Continue button for most paths):
  *   - coach path: tap → navigate to coach-proposal immediately
@@ -44,6 +53,7 @@ const QUIET_OPTIONS = [
 // ── State ─────────────────────────────────────────────────────────────────────
 
 let selectedPath     = null;
+let returnPromptDismissed = false;  // tracks if user dismissed the "anything changed?" card
 let selectedActivity = null;
 let selectedQuiet    = null;
 let activityName     = "";
@@ -84,6 +94,7 @@ function needsName(activityId) {
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
+  const isReturnVisit = store.get("returnVisit") === true;
   return `
     <div class="view intention-view">
 
@@ -96,6 +107,27 @@ export function render() {
              class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">${buildCoachLine()}</p>
       </div>
+
+      <!-- Return-visit prompt — shown on second+ visit same day -->
+      ${isReturnVisit && !returnPromptDismissed ? `
+        <div class="card card-coach intention-return-card" role="status">
+          <img src="assets/images/logo-icon-192.png" alt=""
+               class="coach-icon-small" aria-hidden="true">
+          <div class="intention-return-body">
+            <p class="coach-message-text">Anything changed since this morning?</p>
+            <div class="intention-return-actions">
+              <button class="btn btn-ghost btn-sm intention-return-no"
+                      aria-label="No, nothing has changed, proceed to activity">
+                No, I'm good
+              </button>
+              <button class="btn btn-secondary btn-sm intention-return-yes"
+                      aria-label="Yes, update the coach on how I'm feeling">
+                Yes, tell the coach
+              </button>
+            </div>
+          </div>
+        </div>
+      ` : ""}
 
       <!-- Main paths — all navigate immediately except "self" which expands -->
       <div class="intention-paths" role="group" aria-label="What would you like to do today?">
@@ -275,6 +307,21 @@ export function onMount() {
   if (!view) return;
 
   view.addEventListener("click", e => {
+
+    // ── Return-visit prompt ───────────────────────────────────────────────────
+    if (e.target.closest(".intention-return-no")) {
+      returnPromptDismissed = true;
+      store.set("returnVisit", false);
+      rerender();
+      return;
+    }
+
+    if (e.target.closest(".intention-return-yes")) {
+      store.set("returnVisit", false);
+      router.navigate("checkin-mini");
+      return;
+    }
+
 
     // ── Path tap ──────────────────────────────────────────────────────────────
     const pathBtn = e.target.closest(".intention-path");
