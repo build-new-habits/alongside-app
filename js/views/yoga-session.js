@@ -1,7 +1,7 @@
 /**
  * yoga-session.js - Guided Yoga and Pilates Session
  *
- * 13 May 2026 v1
+ * 16 May 2026 v1
  *
  * v1.1 — Correct import paths for js/views/ location:
  *   ../store.js (not ./store.js)
