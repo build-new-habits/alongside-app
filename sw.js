@@ -2,7 +2,17 @@
  * sw.js - Alongside Service Worker
  *
  * 13 May 2026 v4
- * Cache version: alongside-v42
+ * Cache version: alongside-v43
+ *
+ * v43 changes (14 May 2026):
+ *   - coach-proposal.js: routing fixes throughout
+ *     yoga proposal → yoga-session (was quiet-session/mindful)
+ *     run proposal → running-session (was activity-log)
+ *     walk proposal → walk-session (was activity-log)
+ *     yoga alternative → yoga-session (was gym-programme)
+ *     outdoor run → running-session, outdoor cycle → cycle-session
+ *   - coach-proposal.js: "and that's what matters" removed
+ *     no-activity reflection now reads "You're here today."
  *
  * v42 changes (14 May 2026):
  *   NS-3: Return-visit abbreviated check-in
@@ -78,7 +88,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v42";
+const CACHE_NAME = "alongside-v43";
 
 const SHELL_URLS = [
 
