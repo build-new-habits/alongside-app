@@ -1,7 +1,14 @@
 /**
  * running-session.js - Guided Running Session
  *
- * 14 May 2026 v1
+ * 16 May 2026 v1
+ *
+ * v1.1 (16 May 2026):
+ *   - Warmup end → running transition card added (replaces "Keep going.")
+ *   - Zone-awareness prompt tier added (heart rate / talk test prompts)
+ *   - Phase transition cards for warmup→run, run→cooldown
+ *   - "Keep going." default card replaced with contextual coach message
+ *   - reflect.js after session routes to Progress not Today
  *
  * Three run types, four durations. Condition-aware pacing cues.
  * Vibration API prompts at timed intervals during the run.
@@ -89,6 +96,7 @@ const DURATIONS = [
 const PROMPTS = {
   easy: [
     { text: "Check your pace. Can you hold a conversation? If yes, you are running correctly.", action: "On it" },
+    { text: "Zone 2 check — if you are breathing hard enough that talking is difficult, you have crossed into a zone where this run has a time limit. Slow down and you can run much longer, and get better results from it.", action: "Slowing slightly" },
     { text: "Relax your shoulders. Drop them away from your ears. Unclench your hands.", action: "Relaxed" },
     { text: "Notice your breathing. It should be rhythmic and controlled — not gasping.", action: "Breathing well" },
     { text: "How do your feet feel on the ground? Light and quick, not heavy and plodding.", action: "Light feet" },
@@ -99,6 +107,7 @@ const PROMPTS = {
   ],
   intervals: [
     { text: "Work phase coming up in 30 seconds. Build to about 80% effort — hard but sustainable.", action: "Ready" },
+    { text: "The effort you just pushed through is zone 4 — uncomfortable and intentionally limited. Now recover fully. Partial recovery defeats the purpose of intervals.", action: "Recovering fully" },
     { text: "Recovery now. Slow right down. This is active recovery, not rest.", action: "Recovering" },
     { text: "Next effort in 30 seconds. Controlled breathing during the recovery.", action: "Ready" },
     { text: "Push the effort now. 80-85% — uncomfortable but not maximal.", action: "Working" },
@@ -109,6 +118,7 @@ const PROMPTS = {
   ],
   long: [
     { text: "The pace should feel almost embarrassingly slow. That is correct. Trust the process.", action: "Trusting it" },
+    { text: "Zone check: long runs only work if they stay easy. If you have drifted into breathing harder than a sentence at a time, the adaptation you are after is not happening. Drop the pace.", action: "Dropping pace" },
     { text: "Long runs teach your body to use fat as fuel. This cannot happen if you go too fast.", action: "Keep easy" },
     { text: "Check in with how you feel. Not the time, not the distance — how do you feel?", action: "I noticed" },
     { text: "Relax everything above the waist. Tension there costs energy.", action: "Relaxed" },
@@ -306,10 +316,35 @@ function renderRunning() {
               <p class="coach-message-text">${rt?.coachOpening || ""}</p>
               ${condNote ? `<p class="text-sm text-muted" style="margin-top: var(--space-3);">${condNote}</p>` : ""}
             </div>
+          ` : inWarmup ? `
+            <div>
+              <p class="coach-message-text" style="font-weight: var(--font-semibold);">
+                Warm-up walk
+              </p>
+              <p class="text-secondary text-sm" style="margin-top: var(--space-2);">
+                Walk briskly for 2 minutes. Let the legs wake up and the heart rate rise gently before you run. The first two minutes of running always feel harder than the rest — a proper warm-up changes that.
+              </p>
+            </div>
+          ` : inCooldown ? `
+            <div>
+              <p class="coach-message-text" style="font-weight: var(--font-semibold);">
+                Cooling down
+              </p>
+              <p class="text-secondary text-sm" style="margin-top: var(--space-2);">
+                Ease down to a walk now. Let the heart rate settle gradually before you stop completely. Do not just halt — the cool-down walk is part of the session.
+              </p>
+            </div>
           ` : `
-            <p class="text-secondary text-sm" style="text-align: center;">
-              ${inWarmup ? "Walk briskly for the first 2 minutes." : inCooldown ? "Ease down to a walk." : "Keep going."}
-            </p>
+            <div>
+              <p class="coach-message-text" style="font-weight: var(--font-semibold);">
+                Running now
+              </p>
+              <p class="text-secondary text-sm" style="margin-top: var(--space-2);">
+                You have ${formatMMSS(Math.max(0, selectedMins * 60 - elapsed))} left. Settle into your pace. I will check in with you as you go.
+                ${selectedType === "easy" ? " Conversational pace — if talking is hard, slow down." : ""}
+                ${selectedType === "long" ? " Almost embarrassingly slow is exactly right." : ""}
+              </p>
+            </div>
           `}
         </div>
       `}
@@ -406,11 +441,17 @@ function startSession() {
       bar.style.width = `${pct}%`;
     }
 
-    // Warmup ends at WARMUP_SECS
+    // Warmup ends at WARMUP_SECS — show transition prompt
     if (inWarmup && elapsed >= WARMUP_SECS) {
       inWarmup = false;
-      activePrompt = null;
-      rerender();
+      firePrompt({
+        text: "Time to run. " + (selectedType === "easy"
+          ? "Easy pace — you should be able to speak a sentence without gasping. If you cannot, slow down. You have " + formatMMSS(selectedMins * 60 - elapsed) + " ahead of you."
+          : selectedType === "long"
+          ? "Long run pace now — almost too slow feels about right. You have " + formatMMSS(selectedMins * 60 - elapsed) + " ahead. Settle in."
+          : "First effort coming in 5 minutes. For now, settle into an easy jog."),
+        action: "Running now"
+      });
     }
 
     // Cooldown triggers at COOLDOWN_SECS before end
