@@ -1,4 +1,14 @@
 /**
+ * reflect.js
+ *
+ * 16 May 2026 v1
+ *
+ * v1.1 — finish button routes to progress not today
+ *   After completing reflection, user sees their Progress page
+ *   so the session is visible in context of their data.
+ *   today.js no longer exists as a view.
+ */
+/**
  * reflect.js - Reflect Screen
  *
  * v1.0 — "So, how was that?" moment.
@@ -272,7 +282,7 @@ export function onMount() {
     // Finish (summary screen)
     const finishBtn = e.target.closest("#reflect-finish-btn");
     if (finishBtn) {
-      router.navigate("today");
+      router.navigate("progress");
     }
   });
 }
