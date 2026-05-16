@@ -11,6 +11,14 @@
  *         This fixes the coach always thinking gym was recent.
  *   - Burnout thresholds updated: <24h recovery, 24-48h gentle-first, 48-72h normal, 72h+ full.
  *
+ * 14 May 2026 v1 — routing fixes:
+ *   yoga proposal target: quiet-session/mindful → yoga-session
+ *   run proposal target: activity-log → running-session
+ *   walk proposal target: activity-log → walk-session
+ *   yoga alternative target: gym-programme → yoga-session
+ *   run alternative target: activity-log → walk-session (gentler alternative)
+ *   Removed "and that's what matters" from no-activity reflection line
+ *
  * v1.0 (S4-1, April 2026)
  *
  * The coach arrives with a plan. Not a menu. Not cards.
@@ -373,7 +381,7 @@ function buildProposal(preferShorter = false) {
       score: prefScore("yoga") + (gymCount >= 3 ? 3 : 0) + (energy <= 5 ? 1 : 0),
       proposal: "I thought a yoga or mobility session would serve you well today. Something that supports recovery while still moving your body intentionally.",
       rationale: gymCount >= 3 ? "You have had several demanding sessions recently. Contrast helps." : "Mobility work complements your other training.",
-      duration: Math.min(timeBudget, 35), target: "quiet-session", quietMode: "mindful"
+      duration: Math.min(timeBudget, 35), target: "yoga-session", quietMode: null
     },
     {
       type: "quiet", available: true,
@@ -387,14 +395,14 @@ function buildProposal(preferShorter = false) {
       score: prefScore("run") + (cardioCount < 1 ? 2 : 0),
       proposal: "I thought a run today. Even a short one. Cardiovascular work at this stage of your goals makes a real difference.",
       rationale: "No cardio recently. Your goal includes body composition change.",
-      duration: Math.min(timeBudget, 35), target: "activity-log", quietMode: null
+      duration: Math.min(timeBudget, 35), target: "running-session", quietMode: null
     },
     {
       type: "walk", available: true,
       score: prefScore("walk") + (energy <= 4 ? 1 : 0) + (daysSinceLast >= 3 ? 1 : 0),
       proposal: "I thought a walk today. Not nothing, but not a demand either. Movement that generates the energy it costs.",
       rationale: energy <= 4 ? "Lower energy responds well to gentle sustained movement." : "A good complement to your recent sessions.",
-      duration: Math.min(timeBudget, 40), target: "activity-log", quietMode: null
+      duration: Math.min(timeBudget, 40), target: "walk-session", quietMode: null
     }
   ];
 
@@ -450,7 +458,7 @@ function buildReflection(activityLog, lookbackHours = 48, coachPersonality = "st
   // ── No recent activity ─────────────────────────────────────────────────────
   if (relevantActivities.length === 0) {
     const variants = {
-      steady:    "You're here today, and that's what matters.",
+      steady:    "You're here today.",
       energetic: "You're here. Let's make it count.",
       nurturing: "You're here now. That's enough to start.",
       minimal:   "You're here today."
@@ -662,10 +670,10 @@ function buildAlternativeProposal() {
     "quiet":     { type: "gym",        target: "gym-programme",  quietMode: null,         duration: 35,
                    proposal: "How about continuing your gym programme after all. You might have more in you than you think.",
                    rationale: "Movement often generates the energy it costs." },
-    "yoga":      { type: "gym",        target: "gym-programme",  quietMode: null,         duration: 40,
+    "yoga":      { type: "yoga",       target: "yoga-session",   quietMode: null,         duration: 35,
                    proposal: "How about the gym programme instead. A different kind of movement that will complement your recent sessions.",
                    rationale: "Strength work supports mobility over time." },
-    "run":       { type: "walk",       target: "activity-log",   quietMode: null,         duration: 30,
+    "run":       { type: "walk",       target: "walk-session",   quietMode: null,         duration: 30,
                    proposal: "How about a walk instead. Same outdoor time, less intensity, still moving.",
                    rationale: "Lower-intensity movement has its own benefits." },
     "walk":      { type: "quiet",      target: "quiet-session",  quietMode: "mindful",   duration: 15,
@@ -809,10 +817,10 @@ const GYM_OPTIONS = [
 ];
 
 const OUTDOOR_OPTIONS = [
-  { id: "run",     label: "Run",   icon: "\uD83C\uDFC3", target: "activity-log"  },
-  { id: "walk",    label: "Walk",  icon: "\uD83D\uDEB6", target: "walk-session"  },
-  { id: "cycle",   label: "Cycle", icon: "\uD83D\uDEB4", target: "activity-log"  },
-  { id: "hiking",  label: "Hike",  icon: "\uD83E\uDD7E", target: "activity-log"  },
+  { id: "run",     label: "Run",   icon: "\uD83C\uDFC3", target: "running-session" },
+  { id: "walk",    label: "Walk",  icon: "\uD83D\uDEB6", target: "walk-session"    },
+  { id: "cycle",   label: "Cycle", icon: "\uD83D\uDEB4", target: "cycle-session"   },
+  { id: "hiking",  label: "Hike",  icon: "\uD83E\uDD7E", target: "activity-log"    },
 ];
 
 function renderBranching() {
