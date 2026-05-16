@@ -2,7 +2,15 @@
  * sw.js - Alongside Service Worker
  *
  * 13 May 2026 v4
- * Cache version: alongside-v43
+ * Cache version: alongside-v44
+ *
+ * v44 changes (16 May 2026):
+ *   - running-session.js: warmup-to-run transition card added
+ *     (replaces "Keep going." with contextual coach message per phase)
+ *   - running-session.js: zone-awareness prompts added to all run types
+ *     (talk test explanations, zone 2 / zone 4 context)
+ *   - running-session.js: cooldown transition card added
+ *   - running-session.js: "Running now" card shows time remaining + type cue
  *
  * v43 changes (14 May 2026):
  *   - coach-proposal.js: routing fixes throughout
@@ -88,7 +96,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v43";
+const CACHE_NAME = "alongside-v44";
 
 const SHELL_URLS = [
 
