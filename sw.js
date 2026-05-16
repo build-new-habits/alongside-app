@@ -2,7 +2,12 @@
  * sw.js - Alongside Service Worker
  *
  * 13 May 2026 v4
- * Cache version: alongside-v44
+ * Cache version: alongside-v45
+ *
+ * v45 changes (16 May 2026):
+ *   - reflect.js: finish button routes to progress not today
+ *     (today.js no longer exists — was causing black screen after any session)
+ *   - yoga-session.js: date header corrected to 16 May 2026
  *
  * v44 changes (16 May 2026):
  *   - running-session.js: warmup-to-run transition card added
@@ -96,7 +101,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v44";
+const CACHE_NAME = "alongside-v45";
 
 const SHELL_URLS = [
 
