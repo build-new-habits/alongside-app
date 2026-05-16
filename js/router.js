@@ -2,21 +2,21 @@
  * router.js - View navigation
  * Handles routing between different screens
  *
- * 9 May 2026 v1
+ * 14 May 2026 v1
  *
- * v1.1 — Check-in as front door:
- *   On app launch (after onboarding), router checks whether the user
- *   has checked in today before deciding where to go.
- *   - Not checked in today → checkin view
- *   - Already checked in today → intention view
- *   This ensures coach-proposal always has today's data to work from.
- *   The check uses lastCheckin.date compared to today's YYYY-MM-DD string.
+ * v1.2 — Return-visit abbreviated check-in (NS-3):
+ *   Second and subsequent visits same day no longer force a full check-in.
+ *   Instead the user lands on intention with a soft coach prompt.
+ *   The intention screen detects this and shows "anything changed?" UI.
+ *   New route: checkin-mini — a 3-question abbreviated check-in
+ *   (energy + mood + pain only, no sleep, no conditions).
+ *   Store key returnVisit: true signals to intention.js to show the prompt.
  *
- * v1.0 — Accessibility additions (March 2026):
- *   - VIEW_NAMES map provides human-readable labels for screen reader announcements
- *   - announceNavigation() writes to #sr-announcer after every navigate()
- *   - moveFocusToContent() moves keyboard focus to #main-content after render
- *     so screen reader users land at the top of the new view
+ * v1.1 — Check-in as front door (9 May 2026):
+ *   On app launch, router checks whether the user has checked in today.
+ *   Not checked in today → checkin. Already checked in → intention.
+ *
+ * v1.0 — Accessibility additions (March 2026)
  */
 
 import { store } from './store.js';
@@ -53,6 +53,10 @@ const VIEW_NAMES = {
   'yoga-session':            'Yoga and Pilates',
   'core-session':            'Core Session',
   'walk-session':            'Walk Session',
+  'running-session':         'Running Session',
+  'swim-session':            'Swim Session',
+  'cycle-session':           'Cycle Session',
+  'checkin-mini':            'Quick check-in',
 };
 
 export const router = {
@@ -74,12 +78,21 @@ export const router = {
 
     if (store.isOnboardingComplete()) {
       const checkedInToday = this._hasCheckedInToday();
-      this.navigate(checkedInToday ? 'intention' : 'checkin');
+      if (!checkedInToday) {
+        // First visit today — full check-in required
+        store.set('returnVisit', false);
+        this.navigate('checkin');
+      } else {
+        // Return visit same day — go to intention with soft prompt
+        // intention.js reads store.get('returnVisit') to show "anything changed?"
+        store.set('returnVisit', true);
+        this.navigate('intention');
+      }
     } else {
       this.navigate('onboarding/welcome');
     }
 
-    console.log('🧭 Router initialised');
+    console.log('\uD83E\uDDED Router initialised');
   },
 
   /**
@@ -118,7 +131,8 @@ export const router = {
     const hideNavViews = [
       'onboarding', 'workout', 'workout-complete',
       'checkin', 'prescribed-session', 'morning-session',
-      'quiet-session', 'yoga-session', 'coach-proposal', 'core-session', 'walk-session'
+      'quiet-session', 'yoga-session', 'coach-proposal', 'core-session', 'walk-session',
+      'running-session', 'swim-session', 'cycle-session', 'checkin-mini'
     ];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
