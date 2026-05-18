@@ -652,7 +652,7 @@ function renderFacilitySubScreen(facilityId) {
                         data-equipment="${item.id}"
                         data-scope="${facility.scope}"
                         aria-pressed="${currentItems.includes(item.id)}">
-                  ${item.label}
+                  ${item.name}
                 </button>
               `).join("")}
             </div>
@@ -761,11 +761,11 @@ function renderLibraryTab() {
 // ── Movement identity ─────────────────────────────────────────────────────────
 
 function renderMovementIdentity() {
-  const current = store.get("movementIdentity") || null;
+  const current = (() => { const v = store.get("movementIdentity"); return Array.isArray(v) ? v : (v ? [v] : []); })();
   return `
     <div class="library-grid" role="group" aria-label="My movement identity">
       ${MOVEMENT_IDENTITIES.map(item => `
-        <button class="library-card ${current === item.id ? "library-card--selected" : ""}"
+        <button class="library-card ${current.includes(item.id) ? "library-card--selected" : ""}"
                 data-identity="${item.id}"
                 aria-pressed="${current === item.id}"
                 aria-label="${item.label}">
