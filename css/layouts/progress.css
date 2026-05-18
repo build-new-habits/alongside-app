@@ -2980,3 +2980,92 @@
   border: 1px solid var(--color-border);
   padding: var(--space-4);
 }
+
+
+/* ============================================================
+   BODY CHANGES — Multi-metric log
+   16 May 2026 v2
+   ============================================================ */
+
+.progress-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.progress-body-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+.progress-body-metric-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: var(--font-semibold);
+}
+
+.progress-body-metric-value {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.progress-body-metric-diff {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+}
+
+.progress-body-metric-diff.baseline { color: var(--color-text-muted); }
+.progress-body-metric-diff.down     { color: #22c55e; }
+.progress-body-metric-diff.up       { color: var(--color-warning); }
+.progress-body-metric-diff.same     { color: var(--color-text-muted); }
+
+/* Body log form */
+.progress-body-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: var(--space-1);
+}
+
+.progress-body-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.progress-body-form-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-medium);
+}
+
+.progress-body-input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.progress-body-input:focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+}
