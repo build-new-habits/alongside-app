@@ -2,7 +2,15 @@
  * sw.js - Alongside Service Worker
  *
  * 13 May 2026 v4
- * Cache version: alongside-v48
+ * Cache version: alongside-v49
+ *
+ * v49 changes (16 May 2026):
+ *   - settings.js: rerenderEquipment function was missing — crash fixed
+ *   - progress.js: body changes expanded to full multi-metric log
+ *     weight, waist, chest, hips, arms (L/R), thighs (L/R), neck, body fat %
+ *     all optional, first entry = baseline, delta shown against baseline
+ *   - store.js: measurementUnit field added ('cm' default)
+ *   - progress.css: body metrics grid and form styles added
  *
  * v48 changes (16 May 2026):
  *   - progress.js: renderCheckinDots rewritten (three-state calendar week)
@@ -122,7 +130,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v48";
+const CACHE_NAME = "alongside-v49";
 
 const SHELL_URLS = [
 
