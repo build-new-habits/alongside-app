@@ -2,7 +2,14 @@
  * sw.js - Alongside Service Worker
  *
  * 18 May 2026 v1
- * Cache version: alongside-v52
+ * Cache version: alongside-v53
+ *
+ * v53 changes (18 May 2026):
+ *   - core-session.js: overview phase added between duration and intro
+ *     Shows all exercises as expandable cards before session starts
+ *     Same pattern as gym-programme — can reorder by equipment access
+ *   - progress.css: avg energy/mood "(4 days)" now on own line below label
+ *   - progress.css: core-overview-badge style added
  *
  * v52 changes (18 May 2026):
  *   NS-2 — Library as dedicated page:
@@ -150,7 +157,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v52";
+const CACHE_NAME = "alongside-v53";
 
 const SHELL_URLS = [
 
