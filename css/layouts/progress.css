@@ -3069,3 +3069,10 @@
   outline-offset: 2px;
   border-color: var(--color-primary);
 }
+
+/* Average basis label — small, muted, inline with "Avg energy" */
+.progress-avg-basis {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-normal);
+}
