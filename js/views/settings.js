@@ -907,6 +907,23 @@ function rerenderTab() {
   }
 }
 
+function rerenderEquipment() {
+  // Re-render the entire equipment tab panel
+  // Used when switching between facility landing and sub-screens
+  const panel = document.getElementById("panel-equipment")
+             || document.getElementById("panel-equipment-sub");
+  if (!panel) return;
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = equipmentScreen === "facilities"
+    ? renderEquipmentTab()
+    : renderFacilitySubScreen(equipmentScreen);
+  const newPanel = wrapper.querySelector("section");
+  if (newPanel) {
+    panel.replaceWith(newPanel);
+    onMount();
+  }
+}
+
 function rerenderEquipmentChips() {
   const section  = document.getElementById("equipment-chip-section");
   if (!section) return;
