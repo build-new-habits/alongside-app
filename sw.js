@@ -1,8 +1,22 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 13 May 2026 v4
- * Cache version: alongside-v50
+ * 18 May 2026 v1
+ * Cache version: alongside-v52
+ *
+ * v52 changes (18 May 2026):
+ *   NS-2 — Library as dedicated page:
+ *   library.js: new view — landing (Start a session / Log what I did)
+ *     Guided sessions: 10 categories with sub-screens per category
+ *     Log activity: 5 groups with activity chips routing to activity-log
+ *   settings.js: Library tab now navigates to library route
+ *     My Movement multi-select fixed (array not string, aria-pressed fixed)
+ *   router.js: library route added
+ *   progress.css: Library page styles added
+ *
+ * v51 changes (18 May 2026):
+ *   - All file headers corrected to 18 May 2026 v1
+ *   - NS-2 session files (see below)
  *
  * v50 changes (16 May 2026):
  *   - settings.js: equipment sub-screen undefined fix (cat.label→cat.name, item.label→item.name)
@@ -136,7 +150,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v50";
+const CACHE_NAME = "alongside-v52";
 
 const SHELL_URLS = [
 
@@ -177,6 +191,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/swim-session.js",
   "/alongside-app/js/views/cycle-session.js",
   "/alongside-app/js/views/checkin-mini.js",
+  "/alongside-app/js/views/library.js",
   "/alongside-app/js/views/core-session.js",
   "/alongside-app/js/views/walk-session.js",
   "/alongside-app/js/views/morning-session.js",
