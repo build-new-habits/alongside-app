@@ -2,7 +2,12 @@
  * sw.js - Alongside Service Worker
  *
  * 13 May 2026 v4
- * Cache version: alongside-v47
+ * Cache version: alongside-v48
+ *
+ * v48 changes (16 May 2026):
+ *   - progress.js: renderCheckinDots rewritten (three-state calendar week)
+ *     "4/7" replaced with "4 of 5 days" (days elapsed not total 7)
+ *   - progress.js: weight log replaced with inline form (no window.prompt())
  *
  * v47 changes (16 May 2026):
  *   NS-1 — Equipment architecture:
@@ -117,7 +122,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v47";
+const CACHE_NAME = "alongside-v48";
 
 const SHELL_URLS = [
 
