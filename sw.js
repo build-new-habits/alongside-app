@@ -2,7 +2,13 @@
  * sw.js - Alongside Service Worker
  *
  * 13 May 2026 v4
- * Cache version: alongside-v49
+ * Cache version: alongside-v50
+ *
+ * v50 changes (16 May 2026):
+ *   - settings.js: equipment sub-screen undefined fix (cat.label→cat.name, item.label→item.name)
+ *   - settings.js: My Movement multi-select fixed (was still writing single string)
+ *   - progress.js: avg energy/mood now shows day count e.g. "Avg energy (1 day)"
+ *   - progress.css: .progress-avg-basis style added
  *
  * v49 changes (16 May 2026):
  *   - settings.js: rerenderEquipment function was missing — crash fixed
@@ -130,7 +136,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v49";
+const CACHE_NAME = "alongside-v50";
 
 const SHELL_URLS = [
 
