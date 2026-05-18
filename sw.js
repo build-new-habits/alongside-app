@@ -2,7 +2,23 @@
  * sw.js - Alongside Service Worker
  *
  * 13 May 2026 v4
- * Cache version: alongside-v45
+ * Cache version: alongside-v47
+ *
+ * v47 changes (16 May 2026):
+ *   NS-1 — Equipment architecture:
+ *   store.js: homeEquipment[], gymEquipment[], equipmentByLocation{},
+ *     movementIdentity[] (multi-select), userTier, totalCredits,
+ *     returnVisit, exercisePreferences{}, coachStyle added
+ *   settings.js: equipment tab rebuilt — facility-only landing,
+ *     per-facility sub-screen with individual chip picker,
+ *     preset toggle with deselect, multi-select home equipment
+ *   My Movement: now multi-select (array not string)
+ *   progress.css: equipment facility card styles added
+ *
+ * v46 changes (16 May 2026):
+ *   - progress.css: three-state check-in dots (today/done/missed/future)
+ *     plus progress-tile-label CSS to fix Mindful Moments overflow
+ *   - gym-programme.js: Do not skip note gets amber warning class
  *
  * v45 changes (16 May 2026):
  *   - reflect.js: finish button routes to progress not today
@@ -101,7 +117,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v45";
+const CACHE_NAME = "alongside-v47";
 
 const SHELL_URLS = [
 
