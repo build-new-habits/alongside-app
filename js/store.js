@@ -105,6 +105,7 @@ export const store = {
 
       // Tier, credits, preferences
       userTier:            saved.userTier            || 'free',
+      measurementUnit:     saved.measurementUnit     || 'cm',
       totalCredits:        typeof saved.totalCredits === 'number' ? saved.totalCredits : 0,
       exercisePreferences: (saved.exercisePreferences && typeof saved.exercisePreferences === 'object')
                              ? saved.exercisePreferences
@@ -130,6 +131,7 @@ export const store = {
       // ── BODY & TARGETS — Step 4 ──────────────────────────────
       weight: null,
       weightUnit: 'kg',
+      measurementUnit: 'cm',  // 'cm' | 'in' — for waist, arms, etc.
       targetWeight: null,
       targetDate: null,
       targetDescription: '',
