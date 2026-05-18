@@ -433,66 +433,124 @@ function renderPatterns(log) {
 }
 
 // ── Body changes ──────────────────────────────────────────────────────────────
-// 16 May 2026 v1 — inline weight form replaces window.prompt()
+// 16 May 2026 v2 — multi-metric body log
+// Metrics: weight, waist, chest, hips, left arm, right arm, left thigh, right thigh, neck
+// Each metric is fully optional and independent.
+// First entry for each metric becomes its baseline — shown as delta thereafter.
+// Units: weight uses store.weightUnit (kg/lbs); all measurements in cm or inches
+//        depending on store.measurementUnit ('cm' default).
+
+const BODY_METRICS = [
+  { id: "weight",      label: "Weight",       unit: null,   icon: "\u2696\uFE0F",  genders: ["all"] },
+  { id: "waist",       label: "Waist",        unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
+  { id: "chest",       label: "Chest",        unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
+  { id: "hips",        label: "Hips",         unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
+  { id: "arm-l",       label: "Left arm",     unit: "meas", icon: "\uD83D\uDCAA",  genders: ["all"] },
+  { id: "arm-r",       label: "Right arm",    unit: "meas", icon: "\uD83D\uDCAA",  genders: ["all"] },
+  { id: "thigh-l",     label: "Left thigh",   unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
+  { id: "thigh-r",     label: "Right thigh",  unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
+  { id: "neck",        label: "Neck",         unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
+  { id: "body-fat",    label: "Body fat %",   unit: "%",    icon: "\uD83D\uDCCA",  genders: ["all"] },
+];
+
+// bodyLog entries: { loggedAt, weight?, waist?, chest?, hips?, arm-l?, arm-r?,
+//                    thigh-l?, thigh-r?, neck?, body-fat? }
+// First entry per metric = baseline. Delta shown against that baseline.
+
+function getBodyBaseline() {
+  const entries = store.get("bodyLog") || [];
+  const baseline = {};
+  if (entries.length === 0) return baseline;
+  const first = entries[0];
+  BODY_METRICS.forEach(m => {
+    if (first[m.id] !== undefined) baseline[m.id] = first[m.id];
+  });
+  return baseline;
+}
 
 function renderBodyChanges() {
-  const entries    = store.get("bodyLog") || [];
-  const latest     = entries[entries.length - 1];
-  const first      = entries[0];
-  const weightUnit = store.get("weightUnit") || "kg";
-  const weightDiff = latest && first && latest.weight && first.weight
-    ? (latest.weight - first.weight).toFixed(1)
-    : null;
+  const entries      = store.get("bodyLog") || [];
+  const latest       = entries.length > 0 ? entries[entries.length - 1] : null;
+  const baseline     = getBodyBaseline();
+  const weightUnit   = store.get("weightUnit")      || "kg";
+  const measUnit     = store.get("measurementUnit") || "cm";
+  const showLogForm  = false;  // toggled by JS
+
+  const hasAnyData = latest && BODY_METRICS.some(m => latest[m.id] !== undefined);
 
   return `
     <div class="card progress-body-card">
       <h3>Body changes</h3>
-      ${latest ? `
-        <div class="progress-body-stats">
-          ${latest.weight ? `
-            <div class="progress-body-stat">
-              <span class="progress-body-value">${latest.weight}${weightUnit}</span>
-              <span class="progress-body-label">Current weight</span>
-              ${weightDiff !== null ? `
-                <span class="progress-body-change ${parseFloat(weightDiff) < 0 ? "down" : "up"}">
-                  ${parseFloat(weightDiff) > 0 ? "+" : ""}${weightDiff}${weightUnit}
-                </span>
-              ` : ""}
-            </div>
-          ` : ""}
+
+      ${hasAnyData ? `
+        <!-- Current metrics grid -->
+        <div class="progress-body-grid">
+          ${BODY_METRICS.map(m => {
+            const val  = latest[m.id];
+            if (val === undefined) return "";
+            const base = baseline[m.id];
+            const diff = base !== undefined ? (val - base) : null;
+            const unit = m.unit === "meas" ? measUnit : m.unit === null ? weightUnit : m.unit;
+            const diffStr = diff !== null
+              ? (diff > 0 ? "+" : "") + diff.toFixed(1) + unit
+              : "Baseline";
+            const diffClass = diff === null ? "baseline"
+                            : diff < 0 ? "down" : diff > 0 ? "up" : "same";
+            return `
+              <div class="progress-body-metric">
+                <span class="progress-body-metric-label">${m.label}</span>
+                <span class="progress-body-metric-value">${val}${unit}</span>
+                <span class="progress-body-metric-diff ${diffClass}">${diffStr}</span>
+              </div>
+            `;
+          }).join("")}
         </div>
+        <p class="text-xs text-muted" style="margin-top: var(--space-2);">
+          Changes shown against your first recorded entry (baseline).
+        </p>
       ` : `
-        <p class="text-muted text-sm" style="margin-bottom:var(--space-3);">
-          No entries yet. Log your weight and the coach will track changes over time.
+        <p class="text-muted text-sm" style="margin-bottom: var(--space-3);">
+          Log any measurements you want to track. Your first entry becomes your baseline.
+          All fields are optional — track what matters to you.
         </p>
       `}
 
-      <!-- Inline weight form — replaces window.prompt() -->
-      <div class="progress-weight-form" id="progress-weight-form" style="display: none;">
-        <div class="ps-weight-row" style="margin-top: var(--space-3);">
-          <label class="form-label" for="progress-weight-input">
-            Weight (${weightUnit})
-          </label>
+      <!-- Inline log form -->
+      <div class="progress-body-form" id="progress-body-form" style="display: none;">
+        <p class="text-sm" style="margin: var(--space-3) 0 var(--space-2); font-weight: var(--font-semibold);">
+          Log today’s measurements
+        </p>
+        <p class="text-xs text-muted" style="margin-bottom: var(--space-3);">
+          Leave any field blank to skip it. Units: weight in ${weightUnit}, measurements in ${measUnit}.
+        </p>
+        <div class="progress-body-form-grid">
+          ${BODY_METRICS.map(m => {
+            const unit = m.unit === "meas" ? measUnit : m.unit === null ? weightUnit : m.unit;
+            const lastVal = latest?.[m.id] || "";
+            return `
+              <div class="progress-body-form-row">
+                <label class="progress-body-form-label" for="body-input-${m.id}">
+                  ${m.icon} ${m.label} (${unit})
+                </label>
+                <input type="number"
+                       id="body-input-${m.id}"
+                       class="form-input progress-body-input"
+                       placeholder="${lastVal || "—"}"
+                       min="0" step="0.1"
+                       data-metric="${m.id}"
+                       aria-label="${m.label} in ${unit}">
+              </div>
+            `;
+          }).join("")}
         </div>
-        <div class="ps-weight-row">
-          <input type="number"
-                 id="progress-weight-input"
-                 class="form-input ps-weight-input"
-                 placeholder="${latest?.weight || "0"}"
-                 min="0" step="0.1"
-                 aria-label="Your weight in ${weightUnit}">
-          <button class="btn btn-primary btn-sm" id="progress-weight-save"
-                  aria-label="Save weight">
-            Save
-          </button>
-          <button class="btn btn-ghost btn-sm" id="progress-weight-cancel">
-            Cancel
-          </button>
+        <div style="display: flex; gap: var(--space-2); margin-top: var(--space-4);">
+          <button class="btn btn-primary btn-full" id="progress-body-save">Save entry</button>
+          <button class="btn btn-ghost" id="progress-body-cancel">Cancel</button>
         </div>
       </div>
 
       <button class="btn btn-ghost btn-small" id="progress-log-weight-btn"
-              style="margin-top:var(--space-3);">
+              style="margin-top: var(--space-3);">
         + Log today
       </button>
     </div>
@@ -523,42 +581,39 @@ export function onMount() {
     if (main) { main.innerHTML = render(); onMount(); }
   });
 
-  // Log weight — show inline form
+  // Log body metrics — show inline form
   document.getElementById("progress-log-weight-btn")?.addEventListener("click", () => {
-    const form = document.getElementById("progress-weight-form");
+    const form = document.getElementById("progress-body-form");
     const btn  = document.getElementById("progress-log-weight-btn");
     if (form) { form.style.display = "block"; }
     if (btn)  { btn.style.display  = "none";  }
-    document.getElementById("progress-weight-input")?.focus();
+    document.getElementById("body-input-weight")?.focus();
   });
 
-  // Cancel weight form
-  document.getElementById("progress-weight-cancel")?.addEventListener("click", () => {
-    const form = document.getElementById("progress-weight-form");
+  // Cancel body form
+  document.getElementById("progress-body-cancel")?.addEventListener("click", () => {
+    const form = document.getElementById("progress-body-form");
     const btn  = document.getElementById("progress-log-weight-btn");
     if (form) { form.style.display = "none";  }
     if (btn)  { btn.style.display  = "block"; }
   });
 
-  // Save weight — inline form
-  document.getElementById("progress-weight-save")?.addEventListener("click", () => {
-    const input  = document.getElementById("progress-weight-input");
-    const weight = parseFloat(input?.value);
-    if (!weight || isNaN(weight) || weight <= 0) {
-      input?.focus();
-      return;
-    }
+  // Save body metrics entry
+  document.getElementById("progress-body-save")?.addEventListener("click", () => {
+    const entry = { loggedAt: new Date().toISOString() };
+    let hasAny  = false;
+    document.querySelectorAll(".progress-body-input[data-metric]").forEach(input => {
+      const val = parseFloat(input.value);
+      if (!isNaN(val) && val > 0) {
+        entry[input.dataset.metric] = val;
+        hasAny = true;
+      }
+    });
+    if (!hasAny) return;
     const bodyLog = store.get("bodyLog") || [];
-    bodyLog.push({ weight, loggedAt: new Date().toISOString() });
+    bodyLog.push(entry);
     store.set("bodyLog", bodyLog);
     const main = document.getElementById("main-content");
     if (main) { main.innerHTML = render(); onMount(); }
-  });
-
-  // Allow Enter key to save weight
-  document.getElementById("progress-weight-input")?.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      document.getElementById("progress-weight-save")?.click();
-    }
   });
 }
