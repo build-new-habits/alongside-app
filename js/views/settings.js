@@ -1,7 +1,7 @@
 /**
  * settings.js - Settings view
  *
- * 13 May 2026 v1
+ * 18 May 2026 v1
  *
  * v2.1 — Editable profile, facility presets, add/remove conditions, Morning Routine:
  *   Profile tab: inline edit for name, age, gender, weight.
@@ -677,81 +677,26 @@ function renderFacilitySubScreen(facilityId) {
 
 
 function renderLibraryTab() {
+  // Library is now a dedicated page (library.js / route: "library")
+  // This tab navigates there rather than rendering inline
   return `
     <section aria-labelledby="library-heading">
 
       <h2 id="library-heading" class="section-heading">My movement</h2>
       <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
         Tell the coach what kind of movement feels most like you.
-        This shapes what the coach suggests first each day. You can change it any time.
+        This shapes what the coach suggests first each day.
       </p>
       ${renderMovementIdentity()}
 
-      <h2 class="section-heading" style="margin-top: var(--space-6);">Guided sessions</h2>
+      <h2 class="section-heading" style="margin-top: var(--space-6);">Library</h2>
       <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
-        Start a session whenever you want — no check-in needed.
+        Sessions, programmes, and activity logging — all in one place.
       </p>
-      <div class="library-grid">
 
-        <button class="library-card" data-navigate="gym-programme"
-                aria-label="My gym programme">
-          <span class="library-card-icon" aria-hidden="true">🏋</span>
-          <span class="library-card-label">Gym programme</span>
-        </button>
-
-        <button class="library-card" data-navigate="morning-session"
-                aria-label="My morning routine">
-          <span class="library-card-icon" aria-hidden="true">🌅</span>
-          <span class="library-card-label">Morning routine</span>
-        </button>
-
-        <button class="library-card" data-navigate="prescribed"
-                aria-label="My prescribed exercises">
-          <span class="library-card-icon" aria-hidden="true">🩺</span>
-          <span class="library-card-label">Prescribed exercises</span>
-        </button>
-
-        <button class="library-card" data-navigate="yoga-session"
-                aria-label="Yoga or pilates session">
-          <span class="library-card-icon" aria-hidden="true">🧘</span>
-          <span class="library-card-label">Yoga / Pilates</span>
-        </button>
-
-        <button class="library-card" data-quiet="breathing" data-navigate="quiet-session"
-                aria-label="Breathing practice">
-          <span class="library-card-icon" aria-hidden="true">🌬</span>
-          <span class="library-card-label">Breathing</span>
-        </button>
-
-        <button class="library-card" data-quiet="journal" data-navigate="quiet-session"
-                aria-label="Journaling session">
-          <span class="library-card-icon" aria-hidden="true">📝</span>
-          <span class="library-card-label">Journal</span>
-        </button>
-
-        <button class="library-card" data-quiet="mindful" data-navigate="quiet-session"
-                aria-label="Mindful movement">
-          <span class="library-card-icon" aria-hidden="true">🌿</span>
-          <span class="library-card-label">Mindful movement</span>
-        </button>
-
-        <button class="library-card" data-navigate="coach-proposal"
-                aria-label="Ask the coach to recommend a session">
-          <span class="library-card-icon" aria-hidden="true">🤝</span>
-          <span class="library-card-label">Coach recommends</span>
-        </button>
-
-      </div>
-
-      <h2 class="section-heading" style="margin-top: var(--space-6);">Log an activity</h2>
-      <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
-        Done something? Log it and the coach will reflect on it with you.
-      </p>
-      <button class="library-card" style="width: 100%; flex-direction: row; gap: var(--space-3); justify-content: flex-start; padding: var(--space-4);"
-              data-log-activity="open"
-              aria-label="Log an activity">
-        <span class="library-card-icon" aria-hidden="true">➕</span>
-        <span class="library-card-label" style="font-size: var(--text-sm);">Log what you did</span>
+      <button class="btn btn-primary btn-full btn-large" id="open-library-btn"
+              aria-label="Open the Library">
+        Open Library →
       </button>
 
     </section>
@@ -761,22 +706,32 @@ function renderLibraryTab() {
 // ── Movement identity ─────────────────────────────────────────────────────────
 
 function renderMovementIdentity() {
-  const current = (() => { const v = store.get("movementIdentity"); return Array.isArray(v) ? v : (v ? [v] : []); })();
+  const current = (() => {
+    const v = store.get("movementIdentity");
+    return Array.isArray(v) ? v : (v ? [v] : []);
+  })();
+  const selectedLabels = MOVEMENT_IDENTITIES
+    .filter(i => current.includes(i.id))
+    .map(i => i.label);
   return `
     <div class="library-grid" role="group" aria-label="My movement identity">
       ${MOVEMENT_IDENTITIES.map(item => `
         <button class="library-card ${current.includes(item.id) ? "library-card--selected" : ""}"
                 data-identity="${item.id}"
-                aria-pressed="${current === item.id}"
-                aria-label="${item.label}">
+                aria-pressed="${current.includes(item.id)}"
+                aria-label="${item.label}${current.includes(item.id) ? ", selected" : ""}">
           <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
           <span class="library-card-label">${item.label}</span>
         </button>
       `).join("")}
     </div>
-    ${current ? `
+    ${selectedLabels.length > 0 ? `
       <p class="text-sm text-muted movement-identity-note" style="margin-top: var(--space-2);">
-        The coach will lean toward ${MOVEMENT_IDENTITIES.find(i => i.id === current)?.label || current} suggestions.
+        The coach will lean toward
+        ${selectedLabels.length === 1
+          ? selectedLabels[0]
+          : selectedLabels.slice(0, -1).join(", ") + " and " + selectedLabels[selectedLabels.length - 1]}
+        suggestions, favouring whichever you have done least recently.
         Your activity history refines this over time.
       </p>
     ` : ""}
@@ -1139,31 +1094,50 @@ function wirePanel() {
     });
   });
 
-  // Library: movement identity
+  // Library: movement identity — multi-select, writes array
   document.querySelectorAll("[data-identity]").forEach(btn => {
     btn.addEventListener("click", () => {
-      const id = btn.dataset.identity;
+      const id       = btn.dataset.identity;
       if (!id) return;
-      store.set("movementIdentity", id);
+      const existing = (() => {
+        const v = store.get("movementIdentity");
+        return Array.isArray(v) ? v : (v ? [v] : []);
+      })();
+      const updated  = existing.includes(id)
+        ? existing.filter(x => x !== id)
+        : [...existing, id];
+      store.set("movementIdentity", updated);
+      // Update button states
       document.querySelectorAll("[data-identity]").forEach(b => {
-        const isSel = b.dataset.identity === id;
+        const isSel = updated.includes(b.dataset.identity);
         b.classList.toggle("library-card--selected", isSel);
         b.setAttribute("aria-pressed", isSel);
       });
+      // Update note text
       const grid = document.querySelector(".library-grid[aria-label='My movement identity']");
       if (grid) {
-        const existing = grid.nextElementSibling;
-        if (existing?.classList.contains("movement-identity-note")) existing.remove();
-        const identity = MOVEMENT_IDENTITIES.find(i => i.id === id);
-        if (identity) {
+        const existing2 = grid.nextElementSibling;
+        if (existing2?.classList.contains("movement-identity-note")) existing2.remove();
+        if (updated.length > 0) {
+          const labels = MOVEMENT_IDENTITIES
+            .filter(i => updated.includes(i.id))
+            .map(i => i.label);
+          const labelStr = labels.length === 1
+            ? labels[0]
+            : labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1];
           const note = document.createElement("p");
-          note.className   = "text-sm text-muted movement-identity-note";
+          note.className       = "text-sm text-muted movement-identity-note";
           note.style.marginTop = "var(--space-2)";
-          note.textContent = `The coach will lean toward ${identity.label} suggestions. Your activity history refines this over time.`;
+          note.textContent = `The coach will lean toward ${labelStr} suggestions, favouring whichever you have done least recently.`;
           grid.after(note);
         }
       }
     });
+  });
+
+  // Library tab: open Library page
+  document.getElementById("open-library-btn")?.addEventListener("click", () => {
+    router.navigate("library");
   });
 
   // Library: log activity — navigate to activity-log view
