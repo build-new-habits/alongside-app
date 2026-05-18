@@ -340,11 +340,11 @@ function renderCheckinDots(checkins) {
       ${avgEnergy !== null ? `
         <div class="progress-checkin-avgs">
           <div class="progress-avg-pill">
-            <span>Avg energy</span>
+            <span>Avg energy <span class="progress-avg-basis">(${recent.length} day${recent.length !== 1 ? "s" : ""})</span></span>
             <strong>${avgEnergy}/10</strong>
           </div>
           <div class="progress-avg-pill">
-            <span>Avg mood</span>
+            <span>Avg mood <span class="progress-avg-basis">(${recent.length} day${recent.length !== 1 ? "s" : ""})</span></span>
             <strong>${avgMood}/10</strong>
           </div>
         </div>
