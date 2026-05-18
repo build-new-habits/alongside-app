@@ -3070,11 +3070,19 @@
   border-color: var(--color-primary);
 }
 
-/* Average basis label — small, muted, inline with "Avg energy" */
+/* Average basis label — "(4 days)" sits on its own line below "Avg energy" */
+.progress-avg-pill span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
 .progress-avg-basis {
+  display: block;
   font-size: var(--text-xs);
   color: var(--color-text-muted);
   font-weight: var(--font-normal);
+  line-height: 1.2;
 }
 
 
@@ -3250,4 +3258,18 @@
   font-size: var(--text-xs);
   color: var(--color-text-muted);
   line-height: 1.2;
+}
+
+/* Core session overview badge */
+.core-overview-badge {
+  background: rgba(45, 212, 191, 0.12);
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  margin-bottom: var(--space-1);
 }
