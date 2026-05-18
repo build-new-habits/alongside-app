@@ -2,7 +2,9 @@
  * router.js - View navigation
  * Handles routing between different screens
  *
- * 14 May 2026 v1
+ * 18 May 2026 v2
+ *
+ * v1.3 — NS-2: library route added
  *
  * v1.2 — Return-visit abbreviated check-in (NS-3):
  *   Second and subsequent visits same day no longer force a full check-in.
@@ -53,6 +55,7 @@ const VIEW_NAMES = {
   'yoga-session':            'Yoga and Pilates',
   'core-session':            'Core Session',
   'walk-session':            'Walk Session',
+  'library':                 'Library',
   'running-session':         'Running Session',
   'swim-session':            'Swim Session',
   'cycle-session':           'Cycle Session',
