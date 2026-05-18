@@ -1,4 +1,4 @@
-// 13 May 2026 v1 — navigate to intention not today; btn text visibility fix
+// 16 May 2026 v1 — Do not skip note gets amber warning class
 /**
  * gym-programme.js - Gym Programme View
  *
@@ -362,7 +362,7 @@ function renderExerciseCard(ex, sessionId) {
         <div class="gym-card-left">
           <span class="gym-card-section">${sectionLabel}</span>
           <span class="gym-card-name">${ex.name}</span>
-          ${ex.note ? `<span class="gym-card-note">${ex.note}</span>` : ""}
+          ${ex.note ? `<span class="gym-card-note${ex.note.toLowerCase().includes("do not skip") ? " gym-card-note--warning" : ""}">${ex.note}</span>` : ""}
           ${lastLog  ? `<span class="gym-card-lastlog">Last: ${lastLog}</span>` : ""}
         </div>
 
@@ -445,7 +445,7 @@ function renderExerciseCard(ex, sessionId) {
           ` : ""}
 
           <!-- Done button -->
-          <button class="btn ${isDone ? "btn-secondary" : "btn-primary"} btn-full gym-done-btn" style="position: relative; z-index: 0;"
+          <button class="btn ${isDone ? "btn-secondary" : "btn-primary"} btn-full gym-done-btn"
                   data-exercise-id="${ex.id}"
                   data-session="${sessionId}"
                   data-exercise="${ex.name}">
@@ -596,7 +596,7 @@ function renderPostSession(session) {
           <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
           <p class="coach-message-text">That is a session in the books. I will remember what you told me and use it next time. Well done.</p>
         </div>
-        <button class="btn btn-primary btn-full" onclick="router.navigate('intention')">
+        <button class="btn btn-primary btn-full" onclick="router.navigate('today')">
           Back to Today
         </button>
       </div>`;
