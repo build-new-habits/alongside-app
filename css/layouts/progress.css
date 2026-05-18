@@ -2693,3 +2693,290 @@
   color: var(--color-text-muted);
   line-height: 1.3;
 }
+
+
+/* ============================================================
+   PROGRESS TILES — Stat tile grid
+   16 May 2026 v1
+   Fixes: Mindful Moments label overflow on narrow screens
+   ============================================================ */
+
+.progress-tiles-card {
+  margin-bottom: var(--space-4);
+}
+
+.progress-tiles-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-4);
+}
+
+.progress-tiles-total {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.progress-tiles-grid {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: var(--space-1);
+}
+
+.progress-tiles-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.progress-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+  min-width: 64px;
+  max-width: 64px;
+  flex-shrink: 0;
+}
+
+.progress-tile--empty {
+  opacity: 0.5;
+}
+
+.progress-tile-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.progress-tile-value {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.progress-tile--empty .progress-tile-value {
+  color: var(--color-text-muted);
+}
+
+/* Key fix: label wraps within tile width, never overflows.
+   "Mindful moments" becomes two lines at small sizes.
+   max-width matches tile width minus padding. */
+.progress-tile-label {
+  font-size: 8px;
+  font-weight: var(--font-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-align: center;
+  line-height: 1.2;
+  width: 56px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  hyphens: auto;
+}
+
+
+/* ============================================================
+   CHECK-IN DOT ROW — Three-state calendar week
+   16 May 2026 v1
+   States: done (teal), today (bright teal + glow), missed (muted),
+           future (empty border only)
+   Replaces two-state active/inactive approach.
+   ============================================================ */
+
+.progress-dot-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+
+.progress-dot-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.progress-dot-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Checked in on a past day */
+.progress-dot-circle.active,
+.progress-dot-circle--done {
+  background: var(--color-primary);
+  box-shadow: 0 0 6px var(--color-primary-glow);
+}
+
+/* Today — brightest, most prominent */
+.progress-dot-circle--today {
+  background: var(--color-primary);
+  box-shadow: 0 0 12px var(--color-primary-glow), 0 0 4px var(--color-primary);
+  border: 2px solid var(--color-primary-light);
+}
+
+/* Past day missed — muted teal, not accusatory */
+.progress-dot-circle--missed {
+  background: rgba(45, 212, 191, 0.08);
+  border: 2px solid rgba(45, 212, 191, 0.15);
+}
+
+/* Future day — neutral empty border */
+.progress-dot-circle--future {
+  background: transparent;
+  border: 2px solid var(--color-border);
+}
+
+.progress-dot-day {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  font-weight: var(--font-medium);
+}
+
+/* Today day label gets teal */
+.progress-dot-day--today {
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
+
+/* Check-in count — replaces "4/7" */
+.progress-checkin-days-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+}
+
+.progress-checkin-days-label strong {
+  color: var(--color-text);
+  font-weight: var(--font-semibold);
+}
+
+
+/* ============================================================
+   GYM CARD — Do not skip flag: amber warning
+   16 May 2026 v1
+   ============================================================ */
+
+.gym-card-note--warning {
+  color: var(--color-warning) !important;
+  font-weight: var(--font-semibold);
+}
+
+
+/* ============================================================
+   SETTINGS — EQUIPMENT FACILITY CARDS (NS-1)
+   16 May 2026 v1
+   Two-screen equipment flow: facility landing + per-facility sub-screen
+   ============================================================ */
+
+.equipment-facility-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.equipment-facility-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  min-height: 88px;
+  text-align: center;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.equipment-facility-card:hover {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.05);
+}
+
+.equipment-facility-card:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.equipment-facility-card--active {
+  border-color: var(--color-primary);
+  background: rgba(45, 212, 191, 0.08);
+}
+
+.equipment-facility-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.equipment-facility-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.equipment-facility-card--active .equipment-facility-label {
+  color: var(--color-primary);
+}
+
+.equipment-facility-check {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  font-weight: var(--font-bold);
+  background: rgba(45, 212, 191, 0.15);
+  border-radius: var(--radius-full);
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sub-screen header */
+.equipment-sub-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.equipment-sub-back {
+  flex-shrink: 0;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.equipment-sub-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  margin: 0;
+}
+
+/* Preset toggle card */
+.equipment-preset-toggle {
+  border: 1px solid var(--color-border);
+  padding: var(--space-4);
+}
