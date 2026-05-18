@@ -1,7 +1,7 @@
 /**
  * core-session.js - Guided Core Session
  *
- * 9 May 2026 v1
+ * 18 May 2026 v2
  *
  * Four focus types, three durations. Draws from strength and rehabilitation
  * exercise databases. Condition-aware — automatically avoids exercises
@@ -33,7 +33,7 @@ import { store } from "../store.js";
 export const centered = false;
 
 // ── Session state ─────────────────────────────────────────────────────────────
-let phase         = "focus";    // "focus" | "duration" | "intro" | "session" | "rest" | "done"
+let phase         = "focus";    // "focus" | "duration" | "overview" | "intro" | "session" | "rest" | "done"
 let selectedFocus = null;
 let selectedMins  = null;
 let sessionQueue  = [];
@@ -466,6 +466,7 @@ function buildConditionNote() {
 export function render() {
   if (phase === "focus")    return renderFocusSelector();
   if (phase === "duration") return renderDurationSelector();
+  if (phase === "overview") return renderSessionOverview();
   if (phase === "intro")    return renderSessionIntro();
   if (phase === "session")  return renderExercise();
   if (phase === "rest")     return renderRest();
@@ -545,7 +546,81 @@ function renderDurationSelector() {
   `;
 }
 
-// ── Phase 3: Session intro card ───────────────────────────────────────────────
+// ── Phase 3: Session overview — all exercises visible before starting ────────────
+
+function renderSessionOverview() {
+  const focus    = FOCUS_TYPES.find(f => f.id === selectedFocus);
+  const condNote = buildConditionNote();
+
+  return `
+    <div class="view core-session-view">
+
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="cs-back-btn" aria-label="Back to duration">
+          ← Back
+        </button>
+        <span class="workout-header-title">${focus?.label || "Core"} — ${selectedMins} min</span>
+      </div>
+
+      <div class="card card-coach" style="margin-bottom: var(--space-4);">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <div>
+          <p class="coach-message-text">${focus?.coachIntro || ""}</p>
+          ${condNote ? `<p class="text-sm text-muted" style="margin-top: var(--space-3);">${condNote}</p>` : ""}
+          <p class="text-sm text-muted" style="margin-top: var(--space-3);">
+            ${sessionQueue.length} exercises. You can review them all below before starting.
+            Do them in any order that suits your equipment.
+          </p>
+        </div>
+      </div>
+
+      <!-- Exercise list — expandable cards, same pattern as gym programme -->
+      <div class="gym-exercises-list" role="list">
+        ${sessionQueue.map((ex, i) => `
+          <div class="card gym-exercise-card" role="listitem">
+            <button class="gym-exercise-header" data-ex-index="${i}"
+                    aria-expanded="false"
+                    aria-controls="core-ex-detail-${i}"
+                    aria-label="${ex.name}: ${ex.sets || ""} sets${ex.reps ? ", " + ex.reps : ""}${ex.holdSeconds > 0 ? ", " + ex.holdSeconds + "s hold" : ""}">
+              <div class="gym-exercise-header-left">
+                <span class="exercise-role-badge core-overview-badge" aria-hidden="true">
+                  ${focus?.label || "Core"}
+                </span>
+                <div class="gym-card-meta-row">
+                  ${ex.sets ? `<span class="meta-tag">${ex.sets} sets</span>` : ""}
+                  ${ex.reps ? `<span class="meta-tag">${ex.reps}</span>` : ""}
+                  ${ex.holdSeconds > 0 ? `<span class="meta-tag">${ex.holdSeconds}s hold</span>` : ""}
+                  ${ex.rest > 0 ? `<span class="meta-tag">rest ${ex.rest}s</span>` : ""}
+                  ${ex.tempo ? `<span class="meta-tag">${ex.tempo}</span>` : ""}
+                </div>
+                <h3 class="gym-exercise-name">${ex.name}</h3>
+              </div>
+              <span class="gym-card-chevron" aria-hidden="true">▼</span>
+            </button>
+
+            <div class="gym-exercise-detail" id="core-ex-detail-${i}" hidden>
+              ${ex.cue ? `<p class="exercise-cue">${ex.cue}</p>` : ""}
+              ${ex.why ? `
+                <div class="exercise-why">
+                  <p class="exercise-why-label">Why this exercise</p>
+                  <p class="exercise-why-text">${ex.why}</p>
+                </div>
+              ` : ""}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+
+      <button class="btn btn-primary btn-large btn-full" id="cs-start-btn"
+              style="margin-top: var(--space-6);">
+        Let’s go
+      </button>
+
+    </div>
+  `;
+}
+
+// ── Phase 4: Session intro card (brief, shown after Let's go) ────────────────────
 
 function renderSessionIntro() {
   const focus       = FOCUS_TYPES.find(f => f.id === selectedFocus);
