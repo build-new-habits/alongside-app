@@ -1,7 +1,7 @@
 /**
  * running-session.js - Guided Running Session
  *
- * 16 May 2026 v1
+ * 19 May 2026 v1
  *
  * v1.1 (16 May 2026):
  *   - Warmup end → running transition card added (replaces "Keep going.")
@@ -39,7 +39,7 @@ import { store } from "../store.js";
 export const centered = false;
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let phase          = "type";
+let phase          = "type";  // "type" | "duration" | "overview" | "running" | "done"
 let selectedType   = null;
 let selectedMins   = null;
 let sessionTimer   = null;
@@ -203,6 +203,7 @@ function buildConditionNote() {
 export function render() {
   if (phase === "type")     return renderTypeSelector();
   if (phase === "duration") return renderDurationSelector();
+  if (phase === "overview") return renderRunOverview();
   if (phase === "running")  return renderRunning();
   if (phase === "done")     return renderDone();
   return renderTypeSelector();
@@ -235,6 +236,52 @@ function renderTypeSelector() {
           </button>
         `).join("")}
       </div>
+    </div>
+  `;
+}
+
+// ── Run overview ──────────────────────────────────────────────────────────────
+
+function renderRunOverview() {
+  const rt      = RUN_TYPES.find(t => t.id === selectedType);
+  const prompts = PROMPTS[selectedType] || PROMPTS.easy;
+
+  return `
+    <div class="view walk-session-view">
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="rs-back-btn" aria-label="Back">\u2190 Back</button>
+        <span class="workout-header-title">${rt?.label || "Run"} \u2014 ${selectedMins} min</span>
+      </div>
+
+      <div class="card card-coach" style="margin-bottom: var(--space-4);">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="coach-message-text">${rt?.coachOpening || "Your run is ready."}</p>
+        <p class="text-sm text-muted" style="margin-top: var(--space-2);">
+          2-minute warm-up walk to start. I will prompt you ${prompts.length} times during the run.
+          Cooldown walk in the final 3 minutes.
+        </p>
+      </div>
+
+      <div class="card" style="padding: var(--space-4);">
+        <h3 style="font-size: var(--text-sm); color: var(--color-primary); margin-bottom: var(--space-3);">
+          What I will prompt you with
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+          ${prompts.slice(0, 4).map(p => `
+            <div style="border-left: 2px solid var(--color-border); padding-left: var(--space-3);">
+              <p class="text-sm text-secondary">${p.text}</p>
+            </div>
+          `).join("")}
+          ${prompts.length > 4 ? `
+            <p class="text-xs text-muted">+ ${prompts.length - 4} more prompts during your run</p>
+          ` : ""}
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-large btn-full" id="rs-start-btn"
+              style="margin-top: var(--space-6);">
+        Let\u2019s go
+      </button>
     </div>
   `;
 }
@@ -553,7 +600,8 @@ function rerender() {
 export function onMount() {
   document.getElementById("rs-back-btn")?.addEventListener("click", () => {
     if (phase === "type")     { resetSession(); router.navigate("intention"); }
-    else if (phase === "duration") { phase = "type"; rerender(); }
+    else if (phase === "duration") { phase = "type";     rerender(); }
+    else if (phase === "overview") { phase = "duration"; rerender(); }
   });
 
   document.getElementById("rs-exit-btn")?.addEventListener("click", () => {
@@ -571,12 +619,15 @@ export function onMount() {
   document.querySelectorAll(".ws-duration-card").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedMins = parseInt(btn.dataset.mins);
-      phase        = "running";
+      phase        = "overview";
       rerender();
     });
   });
 
-  document.getElementById("rs-start-btn")?.addEventListener("click", startSession);
+  document.getElementById("rs-start-btn")?.addEventListener("click", () => {
+    if (phase === "overview") { phase = "running"; rerender(); }
+    else startSession();
+  });
 
   document.getElementById("rs-pause-btn")?.addEventListener("click", pauseSession);
 
