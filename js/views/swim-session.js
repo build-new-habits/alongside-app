@@ -1,7 +1,7 @@
 /**
  * swim-session.js - Guided Swim Session
  *
- * 14 May 2026 v1
+ * 19 May 2026 v1
  *
  * Stroke selector, session type (steady or intervals), 4 durations.
  * Timed session with timed coaching prompts. Condition-aware.
@@ -20,7 +20,7 @@ import { store } from "../store.js";
 export const centered = false;
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let phase          = "stroke";
+let phase          = "stroke";  // "stroke" | "type" | "duration" | "overview" | "swimming" | "done"
 let selectedStroke = null;
 let selectedType   = null;
 let selectedMins   = null;
@@ -96,6 +96,7 @@ export function render() {
   if (phase === "stroke")   return renderStrokeSelector();
   if (phase === "type")     return renderTypeSelector();
   if (phase === "duration") return renderDurationSelector();
+  if (phase === "overview") return renderSwimOverview();
   if (phase === "swimming") return renderSwimming();
   if (phase === "done")     return renderDone();
   return renderStrokeSelector();
@@ -167,6 +168,38 @@ function renderDurationSelector() {
         `).join("")}
       </div>
     </div>`;
+}
+
+function renderSwimOverview() {
+  const stroke = STROKES.find(s => s.id === selectedStroke);
+  const stype  = SESSION_TYPES.find(t => t.id === selectedType);
+  const prompts = PROMPTS[selectedType] || PROMPTS.steady;
+  return `
+    <div class="view walk-session-view">
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="ss-back-btn" aria-label="Back">\u2190 Back</button>
+        <span class="workout-header-title">${stroke?.label || "Swim"} \u2014 ${selectedMins} min</span>
+      </div>
+      <div class="card card-coach" style="margin-bottom: var(--space-4);">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="coach-message-text">${stype?.label || "Swim"} session. ${selectedMins} minutes. I will check in with prompts as you swim.</p>
+        <p class="text-sm text-muted" style="margin-top: var(--space-2);">
+          ${prompts.length} prompts during your session. You can dismiss each one to continue.
+        </p>
+      </div>
+      <div class="card" style="padding: var(--space-4);">
+        <h3 style="font-size: var(--text-sm); color: var(--color-primary); margin-bottom: var(--space-3);">What I will prompt you with</h3>
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+          ${prompts.slice(0, 4).map(p => `
+            <div style="border-left: 2px solid var(--color-border); padding-left: var(--space-3);">
+              <p class="text-sm text-secondary">${p.text}</p>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+      <button class="btn btn-primary btn-large btn-full" id="ss-start-swim-btn" style="margin-top: var(--space-6);">Let\u2019s go</button>
+    </div>
+  `;
 }
 
 function renderSwimming() {
@@ -304,6 +337,7 @@ export function onMount() {
     if (phase === "stroke")   { resetSession(); router.navigate("intention"); }
     else if (phase === "type")     { phase = "stroke";   rerender(); }
     else if (phase === "duration") { phase = "type";     rerender(); }
+    else if (phase === "overview") { phase = "duration"; rerender(); }
   });
   document.getElementById("ss-exit-btn")?.addEventListener("click", () => {
     if (confirm("End this swim?")) endSession();
@@ -315,9 +349,10 @@ export function onMount() {
     btn.addEventListener("click", () => { selectedType = btn.dataset.sessionType; phase = "duration"; rerender(); });
   });
   document.querySelectorAll(".ws-duration-card").forEach(btn => {
-    btn.addEventListener("click", () => { selectedMins = parseInt(btn.dataset.mins); phase = "swimming"; rerender(); });
+    btn.addEventListener("click", () => { selectedMins = parseInt(btn.dataset.mins); phase = "overview"; rerender(); });
   });
   document.getElementById("ss-start-btn")?.addEventListener("click", startSession);
+  document.getElementById("ss-start-swim-btn")?.addEventListener("click", () => { phase = "swimming"; rerender(); });
   document.getElementById("ss-pause-btn")?.addEventListener("click", () => { paused = !paused; rerender(); });
   document.getElementById("ss-prompt-dismiss")?.addEventListener("click", () => {
     creditsEarned += 10; activePrompt = null; rerender();
