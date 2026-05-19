@@ -2,7 +2,7 @@
  * router.js - View navigation
  * Handles routing between different screens
  *
- * 18 May 2026 v2
+ * 19 May 2026 v1
  *
  * v1.3 — NS-2: library route added
  *
@@ -95,6 +95,22 @@ export const router = {
       this.navigate('onboarding/welcome');
     }
 
+    // Intercept browser back gesture (device swipe back / hardware back button)
+    // Without this, back gesture reloads the app and triggers a full re-checkin
+    window.addEventListener("popstate", (e) => {
+      // When back is pressed, navigate to previous view if we know it,
+      // otherwise go to intention screen (safe fallback)
+      const previousView = e.state?.view;
+      if (previousView) {
+        // Navigate without pushing another history entry
+        this._navigateWithoutHistory(previousView);
+      } else {
+        // Fallback — go to intention or checkin based on check-in state
+        const target = this._hasCheckedInToday() ? "intention" : "checkin";
+        this._navigateWithoutHistory(target);
+      }
+    });
+
     console.log('\uD83E\uDDED Router initialised');
   },
 
@@ -102,6 +118,26 @@ export const router = {
    * Returns true if the user has a lastCheckin entry dated today.
    * Uses YYYY-MM-DD comparison so "today" is correct regardless of time.
    */
+  // Navigate without pushing to history — used by popstate handler
+  // Prevents infinite history stack growth on back gesture
+  _navigateWithoutHistory(viewName) {
+    if (!viewName) return;
+    const main = document.getElementById("main-content");
+    if (!main) return;
+    this.setActiveNav(viewName);
+    this._hideNavForViews(viewName);
+    import(`./views/${viewName}.js`)
+      .then(mod => {
+        main.innerHTML = mod.render ? mod.render() : "";
+        if (mod.onMount) mod.onMount();
+        this.announceNavigation(viewName);
+        this.moveFocusToContent();
+      })
+      .catch(() => {
+        // View not found — stay where we are
+      });
+  },
+
   _hasCheckedInToday() {
     const lastCheckin = store.get('lastCheckin');
     if (!lastCheckin?.date) return false;
