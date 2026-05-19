@@ -2,7 +2,16 @@
  * sw.js - Alongside Service Worker
  *
  * 18 May 2026 v1
- * Cache version: alongside-v54
+ * Cache version: alongside-v55
+ *
+ * v55 changes (19 May 2026):
+ *   S2b — Exit confirmation dialog added to all 7 session views:
+ *   gym-programme.js, core-session.js, yoga-session.js,
+ *   walk-session.js, running-session.js, swim-session.js, cycle-session.js
+ *   Coach-voiced overlay card replaces browser confirm() throughout.
+ *   Stay = resumes session. Exit = saves partial entry, routes to reflect.
+ *   progress.css: session-exit-overlay styles added
+ *   alongside_design_fix_spec_19may2026_v1.docx: redrafted spec
  *
  * v54 changes (19 May 2026):
  *   - yoga-session.js: crash fixed (unsafe pose ref at mount root)
@@ -168,7 +177,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v54";
+const CACHE_NAME = "alongside-v55";
 
 const SHELL_URLS = [
 
