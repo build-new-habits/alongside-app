@@ -2,7 +2,18 @@
  * sw.js - Alongside Service Worker
  *
  * 18 May 2026 v1
- * Cache version: alongside-v53
+ * Cache version: alongside-v54
+ *
+ * v54 changes (19 May 2026):
+ *   - yoga-session.js: crash fixed (unsafe pose ref at mount root)
+ *     overview phase added — all poses visible before starting
+ *   - router.js: history.pushState on navigate(); popstate listener
+ *     intercepts device back gesture — prevents app reload + re-checkin
+ *   - walk-session.js: overview phase added (prompts preview)
+ *   - running-session.js: overview phase added (prompts preview)
+ *   - swim-session.js: overview phase added (prompts preview)
+ *   - cycle-session.js: overview phase added (prompts preview)
+ *   - core-session.js: overview phase added (exercise list, expandable)
  *
  * v53 changes (18 May 2026):
  *   - core-session.js: overview phase added between duration and intro
@@ -157,7 +168,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v53";
+const CACHE_NAME = "alongside-v54";
 
 const SHELL_URLS = [
 
