@@ -1,7 +1,7 @@
 /**
  * swim-session.js - Guided Swim Session
  *
- * 19 May 2026 v1
+ * 19 May 2026 v2
  *
  * Stroke selector, session type (steady or intervals), 4 durations.
  * Timed session with timed coaching prompts. Condition-aware.
@@ -327,6 +327,70 @@ function resetSession() {
   sessionStarted = false; promptIndex = 0; activePrompt = null; creditsEarned = 0;
 }
 
+// ── Exit confirmation overlay ──────────────────────────────────────────────
+// Shown when user taps Exit during an active session.
+// Replaces browser confirm() with a coach-voiced in-app card.
+
+function showExitConfirm() {
+  // Pause any running timer
+  if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+
+  const overlay = document.createElement("div");
+  overlay.className = "session-exit-overlay";
+  overlay.id        = "session-exit-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", "Exit session confirmation");
+  overlay.innerHTML = `
+    <div class="session-exit-card">
+      <div class="session-exit-coach-row">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="session-exit-coach-text">
+          Hold on — if you leave now this swim won’t be saved. Are you sure?
+        </p>
+      </div>
+      <div class="session-exit-actions">
+        <button class="btn btn-primary btn-full" id="exit-confirm-stay"
+                aria-label="Stay in session">
+          Stay in session
+        </button>
+        <button class="btn btn-ghost btn-full" id="exit-confirm-leave"
+                aria-label="Exit and save progress so far">
+          Exit and save progress
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Stay — remove overlay and resume
+  document.getElementById("exit-confirm-stay").addEventListener("click", () => {
+    overlay.remove();
+  });
+
+  // Leave — save partial entry and navigate to reflect
+  document.getElementById("exit-confirm-leave").addEventListener("click", () => {
+    overlay.remove();
+    savePartialSession();
+    resetSession();
+    router.navigate("reflect");
+  });
+}
+
+function savePartialSession() {
+  const log   = store.get("activityLog") || [];
+  const entry = store.get("currentActivityEntry");
+  if (entry) {
+    entry.sessionEnd    = new Date().toISOString();
+    entry.status        = "partial";
+    entry.durationMins  = typeof elapsed !== "undefined" ? Math.floor(elapsed / 60) : null;
+    entry.creditsEarned = typeof creditsEarned !== "undefined" ? creditsEarned : 0;
+    store.set("activityLog", [...log, entry]);
+  }
+}
+
+
 function rerender() {
   const main = document.getElementById("main-content");
   if (main) { main.innerHTML = render(); onMount(); }
@@ -339,9 +403,7 @@ export function onMount() {
     else if (phase === "duration") { phase = "type";     rerender(); }
     else if (phase === "overview") { phase = "duration"; rerender(); }
   });
-  document.getElementById("ss-exit-btn")?.addEventListener("click", () => {
-    if (confirm("End this swim?")) endSession();
-  });
+  document.getElementById("ss-exit-btn")?.addEventListener("click", showExitConfirm);
   document.querySelectorAll("[data-stroke]").forEach(btn => {
     btn.addEventListener("click", () => { selectedStroke = btn.dataset.stroke; phase = "type"; rerender(); });
   });
