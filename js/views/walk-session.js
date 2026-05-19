@@ -1,7 +1,7 @@
 /**
  * walk-session.js - Coached Walk Session
  *
- * 9 May 2026 v1
+ * 19 May 2026 v1
  *
  * A coached walking session with noticing prompts delivered at intervals.
  * Not an exercise sequence — a single timed walk with the coach appearing
@@ -38,7 +38,7 @@ import { store } from "../store.js";
 export const centered = false;
 
 // ── Session state ─────────────────────────────────────────────────────────────
-let phase          = "type";     // "type" | "duration" | "walking" | "done"
+let phase          = "type";     // "type" | "duration" | "overview" | "walking" | "done"
 let selectedType   = null;
 let selectedMins   = null;
 let sessionTimer   = null;       // counts total elapsed seconds
@@ -193,6 +193,7 @@ function buildConditionNote() {
 export function render() {
   if (phase === "type")     return renderTypeSelector();
   if (phase === "duration") return renderDurationSelector();
+  if (phase === "overview") return renderWalkOverview();
   if (phase === "walking")  return renderWalking();
   if (phase === "done")     return renderDone();
   return renderTypeSelector();
@@ -236,6 +237,52 @@ function renderTypeSelector() {
 }
 
 // ── Duration selector ─────────────────────────────────────────────────────────
+
+// ── Walk overview ─────────────────────────────────────────────────────────────
+
+function renderWalkOverview() {
+  const wt      = WALK_TYPES.find(t => t.id === selectedType);
+  const prompts = PROMPTS[selectedType] || PROMPTS.gentle;
+
+  return `
+    <div class="view walk-session-view">
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="ws-back-btn" aria-label="Back">\u2190 Back</button>
+        <span class="workout-header-title">${wt?.label || "Walk"} \u2014 ${selectedMins} min</span>
+      </div>
+
+      <div class="card card-coach" style="margin-bottom: var(--space-4);">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="coach-message-text">${wt?.coachOpening || "Your walk is ready."}</p>
+        <p class="text-sm text-muted" style="margin-top: var(--space-2);">
+          I will check in with ${prompts.length} prompts along the way.
+          There is a 2-minute warm-up walk to start and a cooldown in the final 3 minutes.
+        </p>
+      </div>
+
+      <div class="card" style="padding: var(--space-4);">
+        <h3 style="font-size: var(--text-sm); color: var(--color-primary); margin-bottom: var(--space-3);">
+          What I will prompt you with
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+          ${prompts.slice(0, 5).map(p => `
+            <div style="border-left: 2px solid var(--color-border); padding-left: var(--space-3);">
+              <p class="text-sm text-secondary">${p.text}</p>
+            </div>
+          `).join("")}
+          ${prompts.length > 5 ? `
+            <p class="text-xs text-muted">+ ${prompts.length - 5} more prompts during your walk</p>
+          ` : ""}
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-large btn-full" id="ws-start-btn"
+              style="margin-top: var(--space-6);">
+        Let\u2019s go
+      </button>
+    </div>
+  `;
+}
 
 function renderDurationSelector() {
   const wt = WALK_TYPES.find(t => t.id === selectedType);
