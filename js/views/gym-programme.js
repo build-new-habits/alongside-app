@@ -1,4 +1,4 @@
-// 16 May 2026 v1 — Do not skip note gets amber warning class
+// 19 May 2026 v1 — Do not skip note gets amber warning class
 /**
  * gym-programme.js - Gym Programme View
  *
@@ -625,7 +625,7 @@ export function render() {
     <div class="view gym-programme-view">
 
       <div class="view-header gym-programme-header">
-        <button class="btn btn-ghost" onclick="router.navigate('settings')"
+        <button class="btn btn-ghost" id="gym-back-btn"
                 aria-label="Back to Settings">Back</button>
         <h1>My Programme</h1>
       </div>
@@ -870,9 +870,77 @@ function wireEvents() {
   });
 }
 
+
+// ── Exit confirmation overlay ──────────────────────────────────────────────
+// Shown when user taps Back during an active gym session.
+// Coach-voiced in-app card replaces browser confirm().
+
+function showExitConfirm() {
+  if (activeTimerId) { clearInterval(activeTimerId); activeTimerId = null; }
+  const overlay = document.createElement("div");
+  overlay.className = "session-exit-overlay";
+  overlay.id        = "session-exit-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", "Exit session confirmation");
+  overlay.innerHTML = `
+    <div class="session-exit-card">
+      <div class="session-exit-coach-row">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="session-exit-coach-text">
+          Hold on — you have exercises in progress. If you leave now your session
+          won’t be logged. Want to save what you have done so far?
+        </p>
+      </div>
+      <div class="session-exit-actions">
+        <button class="btn btn-primary btn-full" id="exit-confirm-stay"
+                aria-label="Stay in session">
+          Stay in session
+        </button>
+        <button class="btn btn-ghost btn-full" id="exit-confirm-leave"
+                aria-label="Exit and save exercises completed so far">
+          Exit and save progress
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  document.getElementById("exit-confirm-stay").addEventListener("click", () => {
+    overlay.remove();
+  });
+
+  document.getElementById("exit-confirm-leave").addEventListener("click", () => {
+    overlay.remove();
+    savePartialGymSession();
+    router.navigate("reflect");
+  });
+}
+
+function savePartialGymSession() {
+  const log   = store.get("activityLog") || [];
+  const entry = store.get("currentActivityEntry");
+  if (entry) {
+    entry.sessionEnd      = new Date().toISOString();
+    entry.status          = "partial";
+    entry.exercisesDone   = completedIds.size;
+    entry.creditsEarned   = 0;
+    store.set("activityLog", [...log, entry]);
+  }
+}
+
 export function onMount() {
   postSessionState = null;
   intelAnswers     = {};
   if (activeTimerId) clearInterval(activeTimerId);
   wireEvents();
+
+  // Back button: if exercises started, show confirmation; else go straight back
+  document.getElementById("gym-back-btn")?.addEventListener("click", () => {
+    if (completedIds.size > 0) {
+      showExitConfirm();
+    } else {
+      router.navigate("settings");
+    }
+  });
 }
