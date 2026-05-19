@@ -1,7 +1,7 @@
 /**
  * yoga-session.js - Guided Yoga and Pilates Session
  *
- * 16 May 2026 v1
+ * 19 May 2026 v1
  *
  * v1.1 — Correct import paths for js/views/ location:
  *   ../store.js (not ./store.js)
@@ -23,7 +23,7 @@ import { store } from "../store.js";
 export const centered = false;
 
 // ── Session state ─────────────────────────────────────────────────────────────
-let phase         = "focus";    // "focus" | "duration" | "session" | "rest" | "done"
+let phase         = "focus";    // "focus" | "duration" | "overview" | "session" | "rest" | "done"
 let selectedFocus = null;
 let selectedMins  = null;
 let sessionQueue  = [];
@@ -260,6 +260,7 @@ function buildSession(focusId, durationMins) {
 export function render() {
   if (phase === "focus")    return renderFocusSelector();
   if (phase === "duration") return renderDurationSelector();
+  if (phase === "overview") return renderSessionOverview();
   if (phase === "session")  return renderPose();
   if (phase === "rest")     return renderRest();
   if (phase === "done")     return renderDone();
@@ -299,6 +300,61 @@ function renderFocusSelector() {
 }
 
 // ── Duration selector ─────────────────────────────────────────────────────────
+
+// ── Session overview — all poses visible before starting ─────────────────────
+
+function renderSessionOverview() {
+  const focus = FOCUS_TYPES.find(f => f.id === selectedFocus);
+
+  return `
+    <div class="view yoga-session-view">
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="ys-back-btn" aria-label="Back to duration">
+          \u2190 Back
+        </button>
+        <span class="workout-header-title">${focus?.label || "Yoga"} \u2014 ${selectedMins} min</span>
+      </div>
+
+      <div class="card card-coach" style="margin-bottom: var(--space-4);">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="coach-message-text">${focus?.coachIntro || "Your session is ready."}</p>
+        <p class="text-sm text-muted" style="margin-top: var(--space-2);">
+          ${sessionQueue.length} poses. Work through them in order, or take your time with any that feel right to linger on.
+        </p>
+      </div>
+
+      <div class="gym-exercises-list" role="list">
+        ${sessionQueue.map((pose, i) => `
+          <div class="card gym-exercise-card" role="listitem">
+            <button class="gym-exercise-header" data-pose-index="${i}"
+                    aria-expanded="false"
+                    aria-controls="yoga-pose-detail-${i}"
+                    aria-label="${pose.name}: hold ${pose.holdSeconds || 0}s">
+              <div class="gym-exercise-header-left">
+                <span class="core-overview-badge" aria-hidden="true">${focus?.label || "Yoga"}</span>
+                <div class="gym-card-meta-row">
+                  ${pose.holdSeconds > 0 ? `<span class="meta-tag">${pose.holdSeconds}s hold</span>` : ""}
+                  ${pose.rest > 0 ? `<span class="meta-tag">rest ${pose.rest}s</span>` : ""}
+                </div>
+                <h3 class="gym-exercise-name">${pose.name}</h3>
+              </div>
+              <span class="gym-card-chevron" aria-hidden="true">\u25BC</span>
+            </button>
+            <div class="gym-exercise-detail" id="yoga-pose-detail-${i}" hidden>
+              ${pose.description ? `<p class="exercise-cue">${pose.description}</p>` : ""}
+              ${pose.cue ? `<p class="exercise-cue">${pose.cue}</p>` : ""}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+
+      <button class="btn btn-primary btn-large btn-full" id="ys-start-btn"
+              style="margin-top: var(--space-6);">
+        Let\u2019s go
+      </button>
+    </div>
+  `;
+}
 
 function renderDurationSelector() {
   const focus = FOCUS_TYPES.find(f => f.id === selectedFocus);
@@ -600,7 +656,8 @@ function rerender() {
 export function onMount() {
   document.getElementById("ys-back-btn")?.addEventListener("click", () => {
     if (phase === "focus")    { resetSession(); router.navigate("intention"); }
-    else if (phase === "duration") { phase = "focus"; rerender(); }
+    else if (phase === "duration") { phase = "focus";    rerender(); }
+    else if (phase === "overview") { phase = "duration"; rerender(); }
   });
 
   document.getElementById("ys-exit-btn")?.addEventListener("click", () => {
@@ -618,6 +675,26 @@ export function onMount() {
     });
   });
 
+  // Overview: expand pose cards
+  document.querySelectorAll(".gym-exercise-header[data-pose-index]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx    = btn.dataset.poseIndex;
+      const detail = document.getElementById(`yoga-pose-detail-${idx}`);
+      if (!detail) return;
+      const isOpen = !detail.hidden;
+      detail.hidden = isOpen;
+      btn.setAttribute("aria-expanded", !isOpen);
+      const chevron = btn.querySelector(".gym-card-chevron");
+      if (chevron) chevron.style.transform = isOpen ? "" : "rotate(180deg)";
+    });
+  });
+
+  // Overview: start session
+  document.getElementById("ys-start-btn")?.addEventListener("click", () => {
+    phase = "session";
+    rerender();
+  });
+
   document.querySelectorAll(".cs-duration-card").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedMins = parseInt(btn.dataset.mins);
@@ -625,14 +702,13 @@ export function onMount() {
       currentIndex = 0;
       creditsEarned = 0;
       timeRemaining = 0;
-      phase = "session";
+      phase = "overview";
       rerender();
     });
   });
 
-  const pose = sessionQueue[currentIndex];
-
   document.getElementById("ys-timer-btn")?.addEventListener("click", () => {
+    const pose = sessionQueue[currentIndex];
     if (!timerRunning) startHoldTimer(pose?.holdSeconds || 30);
     else pauseHoldTimer();
     const btn = document.getElementById("ys-timer-btn");
