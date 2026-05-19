@@ -3273,3 +3273,50 @@
   display: inline-block;
   margin-bottom: var(--space-1);
 }
+
+
+/* ============================================================
+   SESSION EXIT CONFIRMATION CARD
+   19 May 2026 v1
+   Appears when user taps Exit during an active session.
+   Coach-voiced, overlays current content, two options.
+   ============================================================ */
+
+.session-exit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  z-index: 200;
+  padding: var(--space-4);
+  box-sizing: border-box;
+}
+
+.session-exit-card {
+  width: 100%;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-xl, var(--radius-lg));
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+}
+
+.session-exit-coach-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.session-exit-coach-text {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  flex: 1;
+}
+
+.session-exit-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
