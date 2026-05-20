@@ -15,6 +15,7 @@
 
 import { store }         from "../store.js";
 import { getZoneStatus } from "../data/conditions.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
 
@@ -928,19 +929,34 @@ function savePartialGymSession() {
     store.set("activityLog", [...log, entry]);
   }
 }
-
+ 
 export function onMount() {
   postSessionState = null;
   intelAnswers     = {};
   if (activeTimerId) clearInterval(activeTimerId);
-  wireEvents();
-
-  // Back button: if exercises started, show confirmation; else go straight back
-  document.getElementById("gym-back-btn")?.addEventListener("click", () => {
-    if (completedIds.size > 0) {
-      showExitConfirm();
-    } else {
-      router.navigate("settings");
+ 
+  // Guard against accidental back gesture during active session
+  mountSessionGuard({
+    isActive: () => !postSessionState,
+    label:    "gym session",
+    onExit:   () => {
+      // Save partial progress  mark as partial in activityLog
+      const log     = store.get("activityLog") || [];
+      const elapsed = Math.round((Date.now() - (_sessionStartTime || Date.now())) / 60000);
+      log.push({
+        type:        "gym-programme",
+        status:      "partial",
+        session:     activeSessionId,
+        durationMins: elapsed || null,
+        completedAt: new Date().toISOString(),
+        source:      "gym-programme"
+      });
+      store.set("activityLog", log);
+      if (activeTimerId) clearInterval(activeTimerId);
+      dismountSessionGuard();
+      router.navigate("reflect");
     }
   });
+ 
+  wireEvents();
 }
