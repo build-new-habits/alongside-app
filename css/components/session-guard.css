@@ -1,0 +1,94 @@
+/**
+ * session-guard.css - Back gesture confirmation dialog
+ *
+ * 20 May 2026 v1
+ *
+ * Add to index.html: <link rel="stylesheet" href="css/components/session-guard.css">
+ *
+ * The guard card slides up from the bottom of the screen  consistent with
+ * the coach card pattern used elsewhere in the app. It sits above a backdrop
+ * that dims the session content beneath.
+ *
+ * Touch targets: both buttons are min 48px height (exceeds WCAG 44px minimum).
+ * Focus: Stay button receives focus on open (safer default  prevents accidental exit).
+ * Contrast: text uses --color-text-primary on --color-surface (verified AA).
+ */
+
+/*  Backdrop  */
+
+.session-guard-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 199;
+  animation: session-guard-fade-in 0.15s ease-out;
+}
+
+/*  Dialog container  */
+
+#session-guard-card {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none; /* backdrop and dialog handle their own clicks */
+}
+
+.session-guard-dialog {
+  position: relative;
+  z-index: 201;
+  width: 100%;
+  padding: var(--space-4) var(--space-4) var(--space-6);
+  background: var(--color-surface, #1a1a2e);
+  border-top-left-radius: var(--radius-lg, 16px);
+  border-top-right-radius: var(--radius-lg, 16px);
+  pointer-events: all;
+  animation: session-guard-slide-up 0.2s ease-out;
+}
+
+/*  Coach message card  */
+
+.session-guard-coach-card {
+  margin-bottom: var(--space-4);
+}
+
+.session-guard-message {
+  font-size: var(--text-base, 1rem);
+  color: var(--color-text-primary, #f0f0f0);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/*  Buttons  */
+
+.session-guard-actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.session-guard-stay,
+.session-guard-exit {
+  min-height: 48px; /* WCAG 2.2 AA  exceeds 44px minimum */
+}
+
+/*  Animations  */
+
+@keyframes session-guard-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes session-guard-slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/*  Reduced motion  */
+
+@media (prefers-reduced-motion: reduce) {
+  .session-guard-backdrop,
+  .session-guard-dialog {
+    animation: none;
+  }
+}
