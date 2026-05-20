@@ -1,7 +1,14 @@
 /**
  * app.js - Application entry point
  *
- * v1.2 — Service worker update detection (S3-6):
+ * 20 May 2026 v1
+ *
+ * v1.3  Version string format updated (20 May 2026):
+ *   APP_VERSION now uses the same DD Mon YYYY vN format as all other files.
+ *   Must be updated on every deploy. Settings displays this string so users
+ *   and testers can confirm which build they are running.
+ *
+ * v1.2  Service worker update detection (S3-6):
  *   When a new service worker is found (i.e. a new version has been deployed
  *   to GitHub), the app shows a non-intrusive update banner at the top of
  *   the screen. The user taps "Update now" to reload and get the new version.
@@ -19,18 +26,20 @@
  *   Manual check: window.App.checkForUpdate() is exposed globally so the
  *   Settings "Check for updates" button can trigger it on demand.
  *
- * v1.1 — SW registration added (Phase 3)
+ * v1.1  SW registration added (Phase 3)
  */
 
 import { store } from './store.js';
 import { router } from './router.js';
 
-// ── App version string ────────────────────────────────────────────────────────
-// Update this string with each deployment so the Settings screen can display it.
-// Format: YYYY-MM-DD or a short human label.
-const APP_VERSION = "11 Apr 2026";
+//  App version string 
+// MUST be updated on every deploy.
+// Format: DD Mon YYYY vN  (e.g. "20 May 2026 v1", "20 May 2026 v2")
+// This string is displayed in Settings so users and testers can confirm
+// exactly which build they are running.
+const APP_VERSION = "20 May 2026 v1";
 
-// ── SW registration and update detection ──────────────────────────────────────
+//  SW registration and update detection 
 
 let _swRegistration = null;
 
@@ -60,25 +69,20 @@ async function registerServiceWorker() {
     _swRegistration = reg;
     console.log("SW registered, scope:", reg.scope);
 
-    // ── Detect updates on this page load ─────────────────────────────────────
-    // "updatefound" fires when the browser finds a new SW version.
+    //  Detect updates on this page load 
     reg.addEventListener("updatefound", () => {
       const newWorker = reg.installing;
       if (!newWorker) return;
 
       newWorker.addEventListener("statechange", () => {
-        // "installed" + an existing active SW = update waiting to activate
         if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
           showUpdateBanner();
         }
       });
     });
 
-    // ── Detect if we just reloaded after an update ────────────────────────────
-    // If the SW controller changed (new SW took over), the page will have
-    // reloaded. Nothing needed here — the new code is already running.
+    //  Detect if we just reloaded after an update 
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      // SW took over — safe to reload to pick up new cached files
       window.location.reload();
     });
 
@@ -98,10 +102,6 @@ async function checkForUpdate() {
   if (!("serviceWorker" in navigator)) return "unavailable";
 
   try {
-    // Use the stored registration first.
-    // Fall back to getRegistration() with no argument — matches the current page scope.
-    // Do NOT use a hardcoded path like "/alongside-app/" — this fails on installed PWA
-    // on mobile where the scope resolution differs from desktop browser context.
     let reg = _swRegistration;
 
     if (!reg) {
@@ -109,7 +109,6 @@ async function checkForUpdate() {
     }
 
     if (!reg) {
-      // Last resort: grab any registration for this origin
       const regs = await navigator.serviceWorker.getRegistrations();
       reg = regs?.[0] || null;
     }
@@ -118,7 +117,6 @@ async function checkForUpdate() {
 
     await reg.update();
 
-    // After update(), if a new SW is waiting, show the banner
     if (reg.waiting) {
       showUpdateBanner();
       return "updated";
@@ -138,30 +136,24 @@ async function checkForUpdate() {
 function applyUpdate() {
   const reg = _swRegistration;
   if (reg?.waiting) {
-    // Post message to SW — sw.js listens for this and calls skipWaiting()
     reg.waiting.postMessage({ type: "SKIP_WAITING" });
   } else {
-    // No waiting SW — just reload to pick up cached changes
     window.location.reload();
   }
 }
 
-// ── Update banner ─────────────────────────────────────────────────────────────
+//  Update banner 
 
 /**
  * Show a non-intrusive update banner at the top of the app.
  *
  * Design intent:
- *   - Informative, not alarming. The user is not doing anything wrong.
+ *   - Informative, not alarming.
  *   - Gives the user control. "Update now" or dismiss.
  *   - Accessible: role="alert" so screen readers announce it immediately.
  *   - Does not interrupt mid-session. The banner floats above content.
- *
- * The banner inserts itself above #main-content and removes itself on
- * dismiss or after applying the update.
  */
 function showUpdateBanner() {
-  // Only show once
   if (document.getElementById("update-banner")) return;
 
   const banner = document.createElement("div");
@@ -188,8 +180,7 @@ function showUpdateBanner() {
     </div>
   `;
 
-  // Insert before main content
-  const app = document.getElementById("app");
+  const app  = document.getElementById("app");
   const main = document.getElementById("main-content");
   if (app && main) {
     app.insertBefore(banner, main);
@@ -209,8 +200,6 @@ function showUpdateBanner() {
 
 /**
  * Show the result of a manual update check in the Settings view.
- * Called by the Settings button after checkForUpdate() resolves.
- *
  * @param {"updated"|"current"|"unavailable"} result
  */
 function showUpdateCheckResult(result) {
@@ -227,7 +216,7 @@ function showUpdateCheckResult(result) {
   statusEl.className   = "update-check-status update-check-status--" + result;
 }
 
-// ── App ───────────────────────────────────────────────────────────────────────
+//  App 
 
 const App = {
   store,
@@ -242,15 +231,12 @@ const App = {
     console.log("Alongside ready");
   },
 
-  // Exposed globally for Settings button and debugging
   checkForUpdate,
   showUpdateCheckResult,
   applyUpdate,
   showUpdateBanner
 };
 
-// Make App available globally
 window.App = App;
 
-// Start when DOM is ready
 document.addEventListener("DOMContentLoaded", () => App.init());
