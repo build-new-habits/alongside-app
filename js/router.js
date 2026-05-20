@@ -2,23 +2,34 @@
  * router.js - View navigation
  * Handles routing between different screens
  *
- * 19 May 2026 v1
+ * 20 May 2026 v1
  *
- * v1.3 — NS-2: library route added
+ * v1.4  Back gesture history stack fix (20 May 2026):
+ *   navigate() now calls history.pushState({ view: viewName }) on every
+ *   navigation so the browser has a real history stack to traverse.
+ *   The popstate handler can then read e.state.view and go to the correct
+ *   previous screen rather than always falling back to check-in.
+ *   init() uses history.replaceState for the launch screen so there is
+ *   always at least one entry in the stack.
+ *   Onboarding and check-in screens are excluded from pushState  the user
+ *   should not be able to swipe back into onboarding or the check-in form
+ *   from inside the app.
  *
- * v1.2 — Return-visit abbreviated check-in (NS-3):
+ * v1.3  NS-2: library route added
+ *
+ * v1.2  Return-visit abbreviated check-in (NS-3):
  *   Second and subsequent visits same day no longer force a full check-in.
  *   Instead the user lands on intention with a soft coach prompt.
  *   The intention screen detects this and shows "anything changed?" UI.
- *   New route: checkin-mini — a 3-question abbreviated check-in
+ *   New route: checkin-mini  a 3-question abbreviated check-in
  *   (energy + mood + pain only, no sleep, no conditions).
  *   Store key returnVisit: true signals to intention.js to show the prompt.
  *
- * v1.1 — Check-in as front door (9 May 2026):
+ * v1.1  Check-in as front door (9 May 2026):
  *   On app launch, router checks whether the user has checked in today.
- *   Not checked in today → checkin. Already checked in → intention.
+ *   Not checked in today  checkin. Already checked in  intention.
  *
- * v1.0 — Accessibility additions (March 2026)
+ * v1.0  Accessibility additions (March 2026)
  */
 
 import { store } from './store.js';
@@ -62,18 +73,40 @@ const VIEW_NAMES = {
   'checkin-mini':            'Quick check-in',
 };
 
+// Views that should NOT be pushed onto the history stack.
+// The user must not be able to swipe back into onboarding or the check-in
+// form once they have moved past them. Checkin-mini is also excluded 
+// it is a transient overlay, not a destination.
+const NO_PUSH_VIEWS = [
+  'onboarding/welcome',
+  'onboarding/name',
+  'onboarding/about',
+  'onboarding/body',
+  'onboarding/goals',
+  'onboarding/conditions',
+  'onboarding/lifestyle',
+  'onboarding/equipment',
+  'onboarding/complete',
+  'onboarding/goal-setup',
+  'onboarding/privacy',
+  'checkin',
+  'checkin-mini',
+];
+
 export const router = {
 
   currentView: null,
   views: {},
+  // Track whether the first navigation has been done (uses replaceState not pushState)
+  _firstNav: true,
 
   /**
-   * Initialise router — determine starting view.
+   * Initialise router  determine starting view.
    *
    * Flow after onboarding:
    *   1. Has user checked in today?
-   *      Yes → intention (they've already shared how they are)
-   *      No  → checkin  (coach needs today's data before proposing anything)
+   *      Yes  intention (they have already shared how they are)
+   *      No   checkin  (coach needs today's data before proposing anything)
    */
   init() {
     this.setupNavigation();
@@ -82,12 +115,9 @@ export const router = {
     if (store.isOnboardingComplete()) {
       const checkedInToday = this._hasCheckedInToday();
       if (!checkedInToday) {
-        // First visit today — full check-in required
         store.set('returnVisit', false);
         this.navigate('checkin');
       } else {
-        // Return visit same day — go to intention with soft prompt
-        // intention.js reads store.get('returnVisit') to show "anything changed?"
         store.set('returnVisit', true);
         this.navigate('intention');
       }
@@ -95,17 +125,16 @@ export const router = {
       this.navigate('onboarding/welcome');
     }
 
-    // Intercept browser back gesture (device swipe back / hardware back button)
-    // Without this, back gesture reloads the app and triggers a full re-checkin
+    // Intercept device back gesture (iOS swipe left, Android back button/gesture).
+    // With pushState wired up in navigate(), e.state.view will now contain the
+    // previous view name  so back goes to the actual previous screen.
     window.addEventListener("popstate", (e) => {
-      // When back is pressed, navigate to previous view if we know it,
-      // otherwise go to intention screen (safe fallback)
       const previousView = e.state?.view;
       if (previousView) {
-        // Navigate without pushing another history entry
         this._navigateWithoutHistory(previousView);
       } else {
-        // Fallback — go to intention or checkin based on check-in state
+        // No state  app was opened fresh or history exhausted.
+        // Route to intention if checked in today, otherwise check-in.
         const target = this._hasCheckedInToday() ? "intention" : "checkin";
         this._navigateWithoutHistory(target);
       }
@@ -118,26 +147,6 @@ export const router = {
    * Returns true if the user has a lastCheckin entry dated today.
    * Uses YYYY-MM-DD comparison so "today" is correct regardless of time.
    */
-  // Navigate without pushing to history — used by popstate handler
-  // Prevents infinite history stack growth on back gesture
-  _navigateWithoutHistory(viewName) {
-    if (!viewName) return;
-    const main = document.getElementById("main-content");
-    if (!main) return;
-    this.setActiveNav(viewName);
-    this._hideNavForViews(viewName);
-    import(`./views/${viewName}.js`)
-      .then(mod => {
-        main.innerHTML = mod.render ? mod.render() : "";
-        if (mod.onMount) mod.onMount();
-        this.announceNavigation(viewName);
-        this.moveFocusToContent();
-      })
-      .catch(() => {
-        // View not found — stay where we are
-      });
-  },
-
   _hasCheckedInToday() {
     const lastCheckin = store.get('lastCheckin');
     if (!lastCheckin?.date) return false;
@@ -154,8 +163,17 @@ export const router = {
 
   /**
    * Navigate to a view by name.
-   * After rendering, announces the new view to screen readers
-   * and moves keyboard focus to the main content area.
+   *
+   * Pushes a history entry for every view except onboarding and check-in
+   * screens (see NO_PUSH_VIEWS). This gives the browser a real history stack
+   * so the device back gesture travels to the previous screen rather than
+   * always falling back to check-in.
+   *
+   * The very first navigation on launch uses replaceState so there is always
+   * at least one entry in the stack without creating a phantom entry before it.
+   *
+   * After rendering: announces the new view to screen readers and moves
+   * keyboard focus to the main content area.
    */
   async navigate(viewName) {
     console.log(`Navigating to: ${viewName}`);
@@ -165,6 +183,25 @@ export const router = {
 
     mainContent.innerHTML = '';
     mainContent.className = 'main-content';
+
+    //  History stack 
+    // Excluded views (onboarding, check-in) use replaceState so they do not
+    // accumulate in the back stack. All other views push a new entry.
+    const shouldPush = !NO_PUSH_VIEWS.includes(viewName)
+      && !viewName.startsWith('onboarding/');
+
+    if (this._firstNav) {
+      // Always replaceState on the very first navigation  ensures the stack
+      // starts clean with one entry rather than an empty state beneath it.
+      history.replaceState({ view: viewName }, "", window.location.href);
+      this._firstNav = false;
+    } else if (shouldPush) {
+      history.pushState({ view: viewName }, "", window.location.href);
+    } else {
+      // Onboarding / check-in  replace current entry, no back into these
+      history.replaceState({ view: viewName }, "", window.location.href);
+    }
+    // 
 
     // Hide bottom nav during focused flows
     const hideNavViews = [
@@ -211,6 +248,51 @@ export const router = {
   },
 
   /**
+   * Navigate without pushing to history  used by the popstate handler.
+   * Prevents infinite history stack growth when the user presses back.
+   */
+  _navigateWithoutHistory(viewName) {
+    if (!viewName) return;
+    const main = document.getElementById("main-content");
+    if (!main) return;
+    this.setActiveNav(viewName);
+    this._hideNavForViews(viewName);
+    import(`./views/${viewName}.js`)
+      .then(mod => {
+        main.innerHTML = mod.render ? mod.render() : "";
+        if (mod.onMount) mod.onMount();
+        this.currentView = viewName;
+        this.announceNavigation(viewName);
+        this.moveFocusToContent();
+        setTimeout(() => tts.mountButtons(), 150);
+      })
+      .catch(() => {
+        // View not found  stay on current screen
+      });
+  },
+
+  /**
+   * Hide or show the bottom nav for a given view.
+   * Used by _navigateWithoutHistory which bypasses the main nav logic.
+   */
+  _hideNavForViews(viewName) {
+    const bottomNav = document.getElementById('bottom-nav');
+    if (!bottomNav) return;
+    const hideNavViews = [
+      'onboarding', 'workout', 'workout-complete',
+      'checkin', 'prescribed-session', 'morning-session',
+      'quiet-session', 'yoga-session', 'coach-proposal', 'core-session', 'walk-session',
+      'running-session', 'swim-session', 'cycle-session', 'checkin-mini'
+    ];
+    const shouldHide = hideNavViews.some(v => viewName.startsWith(v));
+    if (shouldHide) {
+      bottomNav.classList.add('hidden');
+    } else {
+      bottomNav.classList.remove('hidden');
+    }
+  },
+
+  /**
    * Write the human-readable view name to #sr-announcer.
    * Screen readers watch this element (aria-live="polite") and announce it.
    * Text is cleared first so navigating to the same view twice still fires.
@@ -227,7 +309,7 @@ export const router = {
 
   /**
    * Fallback formatter for views not in VIEW_NAMES.
-   * 'onboarding/some-view' → 'Some View'
+   * 'onboarding/some-view'  'Some View'
    */
   formatViewName(viewName) {
     const last = viewName.split('/').pop();
@@ -239,7 +321,7 @@ export const router = {
 
   /**
    * Move keyboard focus to #main-content after navigation.
-   * #main-content has tabindex="-1" — receives focus programmatically
+   * #main-content has tabindex="-1"  receives focus programmatically
    * but is not in the normal Tab order.
    */
   moveFocusToContent() {
