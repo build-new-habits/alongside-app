@@ -20,6 +20,7 @@ import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 export const centered = false;
 
 // ── State ─────────────────────────────────────────────────────────────────────
+let _sessionStartTime = Date.now();
 let activeSessionId  = "A";
 let completedIds     = new Set();   // exercise safeIds marked done this visit
 let expandedId       = null;        // which card is currently expanded
@@ -713,6 +714,7 @@ function rerender() {
 // ── Events ────────────────────────────────────────────────────────────────────
 
 function wireEvents() {
+  _sessionStartTime = Date.now();
   const view = document.querySelector(".gym-programme-view");
   if (!view) return;
 
