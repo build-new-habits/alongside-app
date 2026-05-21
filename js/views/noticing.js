@@ -138,24 +138,28 @@ export function render() {
   return `
     <div class="view noticing-view">
 
-      <div class="noticing-header">
-        <h1 class="noticing-title">Noticing</h1>
-        ${name ? `<p class="noticing-greeting text-secondary">Good to see you${name ? ", " + name : ""}.</p>` : ""}
+      <!-- Screen-reader page title — visually hidden, matches nav label -->
+      <h1 class="sr-only">Noticing</h1>
+
+      <div class="view-header">
+        <p class="text-secondary" style="margin: 0;">
+          Good to see you${name ? ", " + name : ""}.
+        </p>
       </div>
 
       <!-- ── This Week ────────────────────────────────────────── -->
       <section class="noticing-section" aria-labelledby="this-week-heading">
-        <h2 class="noticing-section-heading" id="this-week-heading">This week</h2>
+        <h2 class="section-label" id="this-week-heading"
+            style="color: var(--color-primary); font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-3);">
+          This week
+        </h2>
 
-        <div class="card noticing-weekly-card ${journaledThisWeek ? "noticing-weekly-card--done" : ""}">
-          <div class="noticing-weekly-theme text-xs text-muted">${weekData.theme}</div>
-          <p class="noticing-weekly-prompt">${weekData.prompt}</p>
+        <div class="card" style="margin-bottom: var(--space-2);">
+          <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">${weekData.theme}</p>
+          <p style="font-size: var(--text-base); line-height: 1.6; margin-bottom: var(--space-4);">${weekData.prompt}</p>
           ${journaledThisWeek
-            ? `<p class="noticing-weekly-done text-sm text-muted" aria-label="Reflected this week">
-                You've reflected this week.
-               </p>`
-            : `<button class="btn btn-primary btn-full noticing-weekly-btn"
-                       id="noticing-reflect-btn"
+            ? `<p class="text-sm text-muted">You've reflected this week.</p>`
+            : `<button class="btn btn-primary btn-full" id="noticing-reflect-btn"
                        aria-label="Reflect on this week's prompt">
                 Reflect on this
                </button>`
@@ -165,28 +169,33 @@ export function render() {
 
       <!-- ── Anytime ──────────────────────────────────────────── -->
       <section class="noticing-section" aria-labelledby="anytime-heading">
-        <h2 class="noticing-section-heading" id="anytime-heading">Anytime</h2>
+        <h2 class="section-label" id="anytime-heading"
+            style="color: var(--color-primary); font-size: var(--text-lg); font-weight: var(--font-semibold); margin: var(--space-5) 0 var(--space-3);">
+          Anytime
+        </h2>
 
-        <div class="noticing-tiles" role="list">
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
 
-          <button class="noticing-tile" id="noticing-breathe-btn"
-                  role="listitem" aria-label="Breathing exercises">
-            <span class="noticing-tile-icon" aria-hidden="true">🌬️</span>
-            <div class="noticing-tile-body">
-              <span class="noticing-tile-title">Breathing</span>
-              <span class="noticing-tile-desc">Five types. Any duration.</span>
+          <button class="card" id="noticing-breathe-btn"
+                  style="display: flex; align-items: center; gap: var(--space-4); text-align: left; width: 100%; cursor: pointer; background: var(--color-surface);"
+                  aria-label="Breathing exercises — five types, any duration">
+            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">🌬️</span>
+            <div style="flex: 1; min-width: 0;">
+              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Breathing</p>
+              <p class="text-secondary" style="font-size: var(--text-sm);">Five types. Any duration.</p>
             </div>
-            <span class="noticing-tile-arrow" aria-hidden="true">›</span>
+            <span style="color: var(--color-primary); font-size: 1.25rem;" aria-hidden="true">›</span>
           </button>
 
-          <button class="noticing-tile" id="noticing-journal-btn"
-                  role="listitem" aria-label="Journal and reflect">
-            <span class="noticing-tile-icon" aria-hidden="true">📝</span>
-            <div class="noticing-tile-body">
-              <span class="noticing-tile-title">Journal and reflect</span>
-              <span class="noticing-tile-desc">Guided prompt or free writing.</span>
+          <button class="card" id="noticing-journal-btn"
+                  style="display: flex; align-items: center; gap: var(--space-4); text-align: left; width: 100%; cursor: pointer; background: var(--color-surface);"
+                  aria-label="Journal and reflect — guided prompt or free writing">
+            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">📝</span>
+            <div style="flex: 1; min-width: 0;">
+              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Journal and reflect</p>
+              <p class="text-secondary" style="font-size: var(--text-sm);">Guided prompt or free writing.</p>
             </div>
-            <span class="noticing-tile-arrow" aria-hidden="true">›</span>
+            <span style="color: var(--color-primary); font-size: 1.25rem;" aria-hidden="true">›</span>
           </button>
 
         </div>
@@ -194,24 +203,28 @@ export function render() {
 
       <!-- ── Your Reflections ─────────────────────────────────── -->
       ${totalEntries > 0 ? `
-        <section class="noticing-section" aria-labelledby="reflections-heading">
-          <div class="noticing-section-header-row">
-            <h2 class="noticing-section-heading" id="reflections-heading">Your reflections</h2>
+        <section class="noticing-section" aria-labelledby="reflections-heading"
+                 style="margin-top: var(--space-5);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);">
+            <h2 class="section-label" id="reflections-heading"
+                style="color: var(--color-primary); font-size: var(--text-lg); font-weight: var(--font-semibold);">
+              Your reflections
+            </h2>
             ${totalEntries > 3
               ? `<span class="text-sm text-muted">${totalEntries} entries</span>`
               : ""}
           </div>
 
-          <div class="noticing-entries" role="list">
+          <div style="display: flex; flex-direction: column; gap: var(--space-2);">
             ${recentEntries.map(entry => `
-              <div class="noticing-entry card" role="listitem">
-                <div class="noticing-entry-meta">
-                  <span class="noticing-entry-date text-xs text-muted">${formatDate(entry.createdAt)}</span>
+              <div class="card" role="article">
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                  <span class="text-xs text-muted">${formatDate(entry.createdAt)}</span>
                   ${entry.category
-                    ? `<span class="noticing-entry-tag text-xs">${entry.category}</span>`
+                    ? `<span class="text-xs text-muted" style="background: var(--color-surface-raised, rgba(255,255,255,0.06)); padding: 2px 8px; border-radius: 10px;">${entry.category}</span>`
                     : ""}
                 </div>
-                <p class="noticing-entry-body">${
+                <p class="text-secondary" style="font-size: var(--text-sm); line-height: 1.6;">${
                   entry.body.length > 120
                     ? entry.body.slice(0, 120) + "…"
                     : entry.body
@@ -221,11 +234,9 @@ export function render() {
           </div>
         </section>
       ` : `
-        <section class="noticing-section noticing-empty">
-          <p class="text-secondary text-sm">
-            Your reflections will appear here after your first journal entry.
-          </p>
-        </section>
+        <p class="text-secondary text-sm" style="margin-top: var(--space-5);">
+          Your reflections will appear here after your first journal entry.
+        </p>
       `}
 
     </div>
