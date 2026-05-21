@@ -167,6 +167,12 @@ function _hideCard() {
   const card     = document.getElementById("session-guard-card");
   if (backdrop) backdrop.remove();
   if (card)     card.remove();
+  // Re-arm the guard: push a fresh history entry so the next
+  // back gesture is intercepted again. Without this, "Stay"
+  // consumes the guard entry and the next gesture falls through.
+  if (_guardActive) {
+    history.pushState({ sessionGuard: true }, "");
+  }
 }
 
 function _handleExitSave() {
@@ -299,4 +305,20 @@ export function showExitCard({ onSave, onDiscard, label = "session" }) {
 
   // Focus Stay button
   requestAnimationFrame(() => card.querySelector("#sg-stay-btn")?.focus());
+}
+
+// ── rearmGuard — call after every rerender() inside a session view ────────────
+//
+// Each rerender() replaces the DOM and re-calls onMount(), which re-calls
+// mountSessionGuard(). But if the guard is already active, mountSessionGuard()
+// calls dismountSessionGuard() first, resetting the history stack to one entry.
+// Call rearmGuard() at the END of every rerender() to keep the stack topped up.
+//
+// Usage: import { rearmGuard } from "../session-guard.js";
+//        Call at the end of every rerender() function in session views.
+
+export function rearmGuard() {
+  if (_guardActive) {
+    history.pushState({ sessionGuard: true }, "");
+  }
 }
