@@ -1,13 +1,10 @@
 /**
  * progress.js - Progress View
  *
- * 16 May 2026 v1
- *
- * v3.1 — NS-1 / bug fixes:
- *   - renderCheckinDots: three-state calendar week (today/done/missed/future)
- *     "4 / 7" replaced with "4 of 5 days" (days elapsed, not always 7)
- *   - renderBodyChanges: weight prompt() replaced with inline form
- *     No more browser dialog — proper in-app input
+ * v3.1 (21 May 2026) — getLog() filters ghost partial entries
+ *           Entries without completedAt and durationMins < 2 are excluded.
+ *           Fixes: partial sessions from "Exit without saving" appearing
+ *           in Progress as real sessions.
  *
  * v3.0 (S4-1b, April 2026) — Numbers-first redesign
  *
@@ -58,7 +55,19 @@ function isLast30Days(iso) {
 }
 
 function getLog() {
-  return store.get("activityLog") || [];
+  // Filter out ghost partial entries — sessions that were opened then
+  // discarded ("Exit without saving") or abandoned before any real work.
+  // A real entry has either:
+  //   (a) completedAt set (session finished or reflect was completed), OR
+  //   (b) durationMins >= 2 (at least 2 minutes elapsed in-session)
+  // Entries without completedAt AND with durationMins < 2 (or missing) are
+  // optimistic writes from session start that were never cleaned up.
+  const raw = store.get("activityLog") || [];
+  return raw.filter(e => {
+    if (e.completedAt) return true;           // completed normally via reflect
+    if ((e.durationMins || 0) >= 2) return true; // partial but meaningful time
+    return false;                              // ghost entry — discard
+  });
 }
 
 function getCheckins() {
@@ -69,6 +78,8 @@ function getCheckins() {
 }
 
 function isTrainingType(type) {
+  // Mindful moments (short, restorative) are NOT sessions in the ring.
+  // Everything else — gym, yoga, prescribed, run, swim, class, walking, etc — counts.
   const mindfulOnly = ["breathing", "journal", "rest", "quiet", "quiet-session"];
   return !mindfulOnly.includes(type || "");
 }
@@ -103,58 +114,67 @@ function buildCoachMessage(log, checkins) {
   const energyRises = energyPairs.filter(e => e.energyAfter > e.energyBefore).length;
   const energyPattern = energyPairs.length >= 3 && energyRises / energyPairs.length >= 0.6;
 
-  const quietCount    = last7.filter(e => isMindfulType(e.type || e.source)).length;
+  const quietCount   = last7.filter(e => isMindfulType(e.type || e.source)).length;
   const trainingCount = last7.filter(e => isTrainingType(e.type || e.source)).length;
 
   const checkinCount7 = checkins.filter(([date]) => daysAgo(date) < 7).length;
   const avgEnergy7    = checkins.slice(0, 7).reduce((sum, [, d]) => sum + (d.energy || 0), 0) /
                         Math.max(1, checkins.slice(0, 7).length);
 
+  // ── Empty / just starting ──────────────────────────────────────────────────
   if (log.length === 0) {
-    return "Your progress builds here as we work together. What you log, I notice. What I notice, I will tell you honestly. Not numbers for their own sake \u2014 patterns that actually mean something.";
+    return "Your progress builds here as we work together. What you log, I notice. What I notice, I will tell you honestly. Not numbers for their own sake — patterns that actually mean something.";
   }
 
   if (log.length < 3) {
-    return namePrefix + "You are in the early days. The research on habit formation is clear: the first two weeks are the hardest, and you are in them. Every session you complete right now is doing more than the session itself \u2014 it is building the neural pattern that makes the next one easier.";
+    return namePrefix + "You are in the early days. The research on habit formation is clear: the first two weeks are the hardest, and you are in them. Every session you complete right now is doing more than the session itself — it is building the neural pattern that makes the next one easier.";
   }
 
+  // ── Specific pattern: energy rises after movement ─────────────────────────
   if (energyPattern) {
     const pct = Math.round((energyRises / energyPairs.length) * 100);
-    const goalLine = goalDesc ? " This matters for your goal \u2014 " + goalDesc + " \u2014 because sustainable energy is what makes sustained effort possible." : "";
-    return namePrefix + "Something consistent is happening. Your energy after sessions has been higher than before them " + pct + "% of the time over the last two weeks. That is not a coincidence. Movement is generating the energy it costs." + goalLine + " The body is remarkable in this way \u2014 it responds to being asked.";
+    const goalLine = goalDesc ? " This matters for your goal — " + goalDesc + " — because sustainable energy is what makes sustained effort possible." : "";
+    return namePrefix + "Something consistent is happening. Your energy after sessions has been higher than before them " + pct + "% of the time over the last two weeks. That is not a coincidence. Movement is generating the energy it costs." + goalLine + " The body is remarkable in this way — it responds to being asked.";
   }
 
+  // ── Weekly target reached ─────────────────────────────────────────────────
   if (hitTarget) {
     const consistencyLine = activeDays14 >= 8
       ? " You have been active on " + activeDays14 + " of the last 14 days. That kind of consistency is unusual. Most people intend to do this. You are actually doing it."
       : "";
-    return namePrefix + "You have reached your session target for this week." + consistencyLine + " I want to name that directly, because it matters. Not because targets are the point \u2014 they are not. But because showing up consistently is how change happens, and you are showing up." + (goalDesc ? " That is how " + goalDesc + " becomes real." : "");
+    return namePrefix + "You have reached your session target for this week." + consistencyLine + " I want to name that directly, because it matters. Not because targets are the point — they are not. But because showing up consistently is how change happens, and you are showing up." + (goalDesc ? " That is how " + goalDesc + " becomes real." : "");
   }
 
+  // ── Good check-in consistency ─────────────────────────────────────────────
   if (checkinCount7 >= 5 && avgEnergy7 >= 6.5) {
-    return namePrefix + "You have checked in " + checkinCount7 + " times this week, with an average energy of " + avgEnergy7.toFixed(1) + " out of 10. That is a meaningful signal \u2014 not just about fitness, but about how you are engaging with your own wellbeing. Paying attention is the first act of change.";
+    return namePrefix + "You have checked in " + checkinCount7 + " times this week, with an average energy of " + avgEnergy7.toFixed(1) + " out of 10. That is a meaningful signal — not just about fitness, but about how you are engaging with your own wellbeing. Paying attention is the first act of change.";
   }
 
+  // ── Training without recovery ─────────────────────────────────────────────
   if (trainingCount >= 4 && quietCount === 0) {
     return namePrefix + "You have been training hard this week with no recovery work. I want to flag something the research is clear about: adaptation happens during rest, not during effort. The session is the stimulus. Sleep, stillness, and recovery are where your body actually changes." + (goalDesc ? " For " + goalDesc + ", recovery is not optional." : "");
   }
 
+  // ── Good balance of training and recovery ─────────────────────────────────
   if (quietCount >= 2 && trainingCount >= 2) {
-    return namePrefix + "You have been balancing active sessions with quieter practices this week. That balance is not accidental \u2014 it is exactly what a sustainable approach looks like. Movement and stillness are not opposites. They are partners. The research on long-term behaviour change consistently shows that people who include recovery and reflection sustain their practice far longer than those who only train.";
+    return namePrefix + "You have been balancing active sessions with quieter practices this week. That balance is not accidental — it is exactly what a sustainable approach looks like. Movement and stillness are not opposites. They are partners. The research on long-term behaviour change consistently shows that people who include recovery and reflection sustain their practice far longer than those who only train.";
   }
 
+  // ── Long-term consistency recognition ────────────────────────────────────
   if (activeDays14 >= 8) {
-    return namePrefix + "You have been active on " + activeDays14 + " of the last 14 days. I want you to sit with that for a moment. That level of consistency is genuinely uncommon \u2014 not because people do not want it, but because life makes it hard. You are building something real here." + (goalDesc ? " And that foundation is exactly what " + goalDesc + " requires." : "");
+    return namePrefix + "You have been active on " + activeDays14 + " of the last 14 days. I want you to sit with that for a moment. That level of consistency is genuinely uncommon — not because people do not want it, but because life makes it hard. You are building something real here." + (goalDesc ? " And that foundation is exactly what " + goalDesc + " requires." : "");
   }
 
+  // ── Nothing logged recently ───────────────────────────────────────────────
   if (last7.length === 0 && log.length > 0) {
-    return namePrefix + "Nothing logged in the last 7 days. I am not going to tell you that is fine if you know it is not. But I will tell you that a gap is just a gap \u2014 it does not erase what came before, and it does not predict what comes next. The pattern you built is still there. It is waiting.";
+    return namePrefix + "Nothing logged in the last 7 days. I am not going to tell you that is fine if you know it is not. But I will tell you that a gap is just a gap — it does not erase what came before, and it does not predict what comes next. The pattern you built is still there. It is waiting.";
   }
 
+  // ── Default: reflect recent count with context ────────────────────────────
   const n = last7.length;
   return namePrefix + "You have had " + n + " session" + (n !== 1 ? "s" : "") + " in the last week." +
     (goalDesc ? " That is progress toward " + goalDesc + "." : " Keep building the pattern.") +
-    " What you do consistently matters more than what you do occasionally. That is not motivation \u2014 it is how biology works.";
+    " What you do consistently matters more than what you do occasionally. That is not motivation — it is how biology works.";
 }
 
 
@@ -164,31 +184,33 @@ export function render() {
   const log      = getLog();
   const checkins = getCheckins();
 
+  // Categorise
   const thisWeekLog   = log.filter(e => isThisWeek(e.loggedAt || e.completedAt));
   const last7Log      = log.filter(e => isLast7Days(e.loggedAt || e.completedAt));
   const last30Log     = log.filter(e => isLast30Days(e.loggedAt || e.completedAt));
   const checkinCount7 = checkins.filter(([date]) => daysAgo(date) < 7).length;
 
-  const coachCount      = last30Log.filter(e => e.source === "coach-recommended" || e.type === "coach-session").length;
+  // Stat counts
+  const coachCount    = last30Log.filter(e => e.source === "coach-recommended" || e.type === "coach-session").length;
   const prescribedCount = last30Log.filter(e => ["prescribed","prescribed-session"].includes(e.type) || e.source === "prescribed").length;
-  const gymCount        = last30Log.filter(e => ["gym","gym-programme"].includes(e.type) && e.source !== "coach-recommended").length;
-  const otherCount      = last30Log.filter(e =>
+  const gymCount      = last30Log.filter(e => ["gym","gym-programme"].includes(e.type) && e.source !== "coach-recommended").length;
+  const otherCount    = last30Log.filter(e =>
     isTrainingType(e.type) &&
     !["gym","gym-programme","coach-session","prescribed","prescribed-session"].includes(e.type) &&
     e.source !== "coach-recommended" && e.source !== "prescribed"
   ).length;
-  const mindfulCount    = last30Log.filter(e => isMindfulType(e.type || e.source)).length;
+  const mindfulCount  = last30Log.filter(e => isMindfulType(e.type || e.source)).length;
 
   const thisWeekTraining = thisWeekLog.filter(e => isTrainingType(e.type || e.source)).length;
   const target           = store.get("strategicGoal")?.weeklySessionTarget || 3;
   const pct              = Math.min(100, Math.round((thisWeekTraining / target) * 100));
 
-  const daysActive30 = new Set(
+  const daysActive30     = new Set(
     last30Log.filter(e => isTrainingType(e.type || e.source))
              .map(e => (e.loggedAt || e.completedAt || "").split("T")[0])
   ).size;
 
-  const showBody     = store.get("trackBodyChanges");
+  const showBody = store.get("trackBodyChanges");
   const coachMessage = buildCoachMessage(log, checkins);
 
   return `
@@ -265,73 +287,43 @@ export function render() {
 }
 
 // ── Check-in dots ─────────────────────────────────────────────────────────────
-// 16 May 2026 v1 — Three-state calendar week:
-//   today (bright teal), done (teal), missed (muted), future (empty border)
-//   "4 / 7" replaced with "4 of 5 days" (days elapsed in week, not always 7)
 
 function renderCheckinDots(checkins) {
-  const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
+  const DAYS = ["M","T","W","T","F","S","S"];
+  const ws = weekStart();
 
-  const now      = new Date();
-  const todayStr = now.toISOString().split("T")[0];
-  const ws       = weekStart();
-
-  // Which dates this week had a check-in
-  const checkinDates = new Set(
+  // Which days this week had a check-in
+  const checkinDays = new Set(
     checkins
-      .filter(([date]) => new Date(date) >= ws)
-      .map(([date]) => date)
+      .filter(([date]) => daysAgo(date) < 7)
+      .map(([date]) => new Date(date).getDay())
   );
 
-  // Days elapsed in this week (Mon=1 through today)
-  const todayDayNum    = now.getDay();  // 0=Sun
-  const todayIndexInWk = todayDayNum === 0 ? 6 : todayDayNum - 1;  // 0=Mon
-  const daysElapsed    = todayIndexInWk + 1;
-
-  const checkinThisWeek = checkinDates.size;
-
-  const recent    = checkins.slice(0, 7);
+  // Energy trend — last 7 days average
+  const recent = checkins.slice(0, 7);
   const avgEnergy = recent.length
-    ? Math.round(recent.reduce((s, [, d]) => s + (d.energy || 0), 0) / recent.length * 10) / 10
+    ? Math.round(recent.reduce((sum, [, d]) => sum + (d.energy || 0), 0) / recent.length * 10) / 10
     : null;
   const avgMood = recent.length
-    ? Math.round(recent.reduce((s, [, d]) => s + (d.mood || 0), 0) / recent.length * 10) / 10
+    ? Math.round(recent.reduce((sum, [, d]) => sum + (d.mood || 0), 0) / recent.length * 10) / 10
     : null;
 
   return `
     <div class="card progress-checkins-card">
       <div class="progress-checkins-header">
         <h3>Check-ins this week</h3>
-        <span class="progress-checkin-count">${checkinThisWeek} of ${daysElapsed} day${daysElapsed !== 1 ? "s" : ""}</span>
+        <span class="progress-checkin-count">${checkinDays.size} / 7</span>
       </div>
 
       <div class="progress-dot-row" role="group" aria-label="Check-in days this week">
-        ${DAY_LABELS.map((label, i) => {
-          const dayOffset  = i - todayIndexInWk;
-          const dayDate    = new Date(now);
-          dayDate.setDate(now.getDate() + dayOffset);
-          const dayStr     = dayDate.toISOString().split("T")[0];
-          const isToday    = dayStr === todayStr;
-          const isFuture   = dayOffset > 0;
-          const isPast     = dayOffset < 0;
-          const hasCheckin = checkinDates.has(dayStr);
-
-          const dotClass = isToday    ? "progress-dot-circle--today"
-                         : hasCheckin ? "progress-dot-circle--done"
-                         : isPast     ? "progress-dot-circle--missed"
-                         :              "progress-dot-circle--future";
-
-          const labelClass = isToday ? "progress-dot-day--today" : "";
-
-          const ariaLabel = isToday    ? `${label}, today${hasCheckin ? ", checked in" : ", not checked in yet"}`
-                          : hasCheckin ? `${label}, checked in`
-                          : isFuture   ? `${label}, upcoming`
-                          :              `${label}, no check-in`;
-
+        ${DAYS.map((day, i) => {
+          // i=0 is Mon in our layout; getDay() 0=Sun,1=Mon...
+          const dayNum = i === 6 ? 0 : i + 1;
+          const active = checkinDays.has(dayNum);
           return `
-            <div class="progress-dot-col" aria-label="${ariaLabel}">
-              <div class="progress-dot-circle ${dotClass}" aria-hidden="true"></div>
-              <span class="progress-dot-day ${labelClass}">${label}</span>
+            <div class="progress-dot-col" aria-label="${day}${active ? ", checked in" : ""}">
+              <div class="progress-dot-circle ${active ? "active" : ""}" aria-hidden="true"></div>
+              <span class="progress-dot-day">${day}</span>
             </div>
           `;
         }).join("")}
@@ -340,11 +332,11 @@ function renderCheckinDots(checkins) {
       ${avgEnergy !== null ? `
         <div class="progress-checkin-avgs">
           <div class="progress-avg-pill">
-            <span>Avg energy <span class="progress-avg-basis">(${recent.length} day${recent.length !== 1 ? "s" : ""})</span></span>
+            <span>Avg energy</span>
             <strong>${avgEnergy}/10</strong>
           </div>
           <div class="progress-avg-pill">
-            <span>Avg mood <span class="progress-avg-basis">(${recent.length} day${recent.length !== 1 ? "s" : ""})</span></span>
+            <span>Avg mood</span>
             <strong>${avgMood}/10</strong>
           </div>
         </div>
@@ -357,11 +349,11 @@ function renderCheckinDots(checkins) {
 
 function renderStatTiles(coach, prescribed, gym, other, mindful) {
   const tiles = [
-    { label: "Coach sessions",  value: coach,      icon: "\uD83C\uDFAF", show: true },
-    { label: "Prescribed",      value: prescribed, icon: "\uD83E\uDE7A", show: true },
-    { label: "Gym sessions",    value: gym,        icon: "\uD83C\uDFCB", show: true },
-    { label: "Own activities",  value: other,      icon: "\uD83C\uDFC3", show: true },
-    { label: "Mindful moments", value: mindful,    icon: "\uD83C\uDF3F", show: true },
+    { label: "Coach sessions",     value: coach,      icon: "\uD83C\uDFAF", show: true  },
+    { label: "Prescribed",        value: prescribed,  icon: "\uD83E\uDE7A", show: true  },
+    { label: "Gym sessions",      value: gym,         icon: "\uD83C\uDFCB", show: true  },
+    { label: "Own activities",    value: other,       icon: "\uD83C\uDFC3", show: true  },
+    { label: "Mindful moments",   value: mindful,     icon: "\uD83C\uDF3F", show: true  },
   ].filter(t => t.show);
 
   const total = coach + prescribed + gym + other + mindful;
@@ -433,126 +425,46 @@ function renderPatterns(log) {
 }
 
 // ── Body changes ──────────────────────────────────────────────────────────────
-// 16 May 2026 v2 — multi-metric body log
-// Metrics: weight, waist, chest, hips, left arm, right arm, left thigh, right thigh, neck
-// Each metric is fully optional and independent.
-// First entry for each metric becomes its baseline — shown as delta thereafter.
-// Units: weight uses store.weightUnit (kg/lbs); all measurements in cm or inches
-//        depending on store.measurementUnit ('cm' default).
-
-const BODY_METRICS = [
-  { id: "weight",      label: "Weight",       unit: null,   icon: "\u2696\uFE0F",  genders: ["all"] },
-  { id: "waist",       label: "Waist",        unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
-  { id: "chest",       label: "Chest",        unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
-  { id: "hips",        label: "Hips",         unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
-  { id: "arm-l",       label: "Left arm",     unit: "meas", icon: "\uD83D\uDCAA",  genders: ["all"] },
-  { id: "arm-r",       label: "Right arm",    unit: "meas", icon: "\uD83D\uDCAA",  genders: ["all"] },
-  { id: "thigh-l",     label: "Left thigh",   unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
-  { id: "thigh-r",     label: "Right thigh",  unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
-  { id: "neck",        label: "Neck",         unit: "meas", icon: "\uD83D\uDCCF",  genders: ["all"] },
-  { id: "body-fat",    label: "Body fat %",   unit: "%",    icon: "\uD83D\uDCCA",  genders: ["all"] },
-];
-
-// bodyLog entries: { loggedAt, weight?, waist?, chest?, hips?, arm-l?, arm-r?,
-//                    thigh-l?, thigh-r?, neck?, body-fat? }
-// First entry per metric = baseline. Delta shown against that baseline.
-
-function getBodyBaseline() {
-  const entries = store.get("bodyLog") || [];
-  const baseline = {};
-  if (entries.length === 0) return baseline;
-  const first = entries[0];
-  BODY_METRICS.forEach(m => {
-    if (first[m.id] !== undefined) baseline[m.id] = first[m.id];
-  });
-  return baseline;
-}
 
 function renderBodyChanges() {
-  const entries      = store.get("bodyLog") || [];
-  const latest       = entries.length > 0 ? entries[entries.length - 1] : null;
-  const baseline     = getBodyBaseline();
-  const weightUnit   = store.get("weightUnit")      || "kg";
-  const measUnit     = store.get("measurementUnit") || "cm";
-  const showLogForm  = false;  // toggled by JS
+  const entries = store.get("bodyLog") || [];
+  const latest  = entries[entries.length - 1];
+  const first   = entries[0];
 
-  const hasAnyData = latest && BODY_METRICS.some(m => latest[m.id] !== undefined);
+  const weightUnit = store.get("weightUnit") || "kg";
+  const weightDiff = latest && first && latest.weight && first.weight
+    ? (latest.weight - first.weight).toFixed(1)
+    : null;
 
   return `
     <div class="card progress-body-card">
       <h3>Body changes</h3>
-
-      ${hasAnyData ? `
-        <!-- Current metrics grid -->
-        <div class="progress-body-grid">
-          ${BODY_METRICS.map(m => {
-            const val  = latest[m.id];
-            if (val === undefined) return "";
-            const base = baseline[m.id];
-            const diff = base !== undefined ? (val - base) : null;
-            const unit = m.unit === "meas" ? measUnit : m.unit === null ? weightUnit : m.unit;
-            const diffStr = diff !== null
-              ? (diff > 0 ? "+" : "") + diff.toFixed(1) + unit
-              : "Baseline";
-            const diffClass = diff === null ? "baseline"
-                            : diff < 0 ? "down" : diff > 0 ? "up" : "same";
-            return `
-              <div class="progress-body-metric">
-                <span class="progress-body-metric-label">${m.label}</span>
-                <span class="progress-body-metric-value">${val}${unit}</span>
-                <span class="progress-body-metric-diff ${diffClass}">${diffStr}</span>
-              </div>
-            `;
-          }).join("")}
+      ${latest ? `
+        <div class="progress-body-stats">
+          ${latest.weight ? `
+            <div class="progress-body-stat">
+              <span class="progress-body-value">${latest.weight}${weightUnit}</span>
+              <span class="progress-body-label">Current weight</span>
+              ${weightDiff !== null ? `
+                <span class="progress-body-change ${parseFloat(weightDiff) < 0 ? "down" : "up"}">
+                  ${parseFloat(weightDiff) > 0 ? "+" : ""}${weightDiff}${weightUnit}
+                </span>
+              ` : ""}
+            </div>
+          ` : ""}
         </div>
-        <p class="text-xs text-muted" style="margin-top: var(--space-2);">
-          Changes shown against your first recorded entry (baseline).
-        </p>
+        <button class="btn btn-ghost btn-small" id="progress-log-weight-btn"
+                style="margin-top:var(--space-3);">
+          + Log today
+        </button>
       ` : `
-        <p class="text-muted text-sm" style="margin-bottom: var(--space-3);">
-          Log any measurements you want to track. Your first entry becomes your baseline.
-          All fields are optional — track what matters to you.
+        <p class="text-muted text-sm" style="margin-bottom:var(--space-3);">
+          No entries yet. Log your weight and the coach will track changes over time.
         </p>
+        <button class="btn btn-ghost btn-small" id="progress-log-weight-btn">
+          + Log today
+        </button>
       `}
-
-      <!-- Inline log form -->
-      <div class="progress-body-form" id="progress-body-form" style="display: none;">
-        <p class="text-sm" style="margin: var(--space-3) 0 var(--space-2); font-weight: var(--font-semibold);">
-          Log today’s measurements
-        </p>
-        <p class="text-xs text-muted" style="margin-bottom: var(--space-3);">
-          Leave any field blank to skip it. Units: weight in ${weightUnit}, measurements in ${measUnit}.
-        </p>
-        <div class="progress-body-form-grid">
-          ${BODY_METRICS.map(m => {
-            const unit = m.unit === "meas" ? measUnit : m.unit === null ? weightUnit : m.unit;
-            const lastVal = latest?.[m.id] || "";
-            return `
-              <div class="progress-body-form-row">
-                <label class="progress-body-form-label" for="body-input-${m.id}">
-                  ${m.icon} ${m.label} (${unit})
-                </label>
-                <input type="number"
-                       id="body-input-${m.id}"
-                       class="form-input progress-body-input"
-                       placeholder="${lastVal || "—"}"
-                       min="0" step="0.1"
-                       data-metric="${m.id}"
-                       aria-label="${m.label} in ${unit}">
-              </div>
-            `;
-          }).join("")}
-        </div>
-        <div style="display: flex; gap: var(--space-2); margin-top: var(--space-4);">
-          <button class="btn btn-primary btn-full" id="progress-body-save">Save entry</button>
-          <button class="btn btn-ghost" id="progress-body-cancel">Cancel</button>
-        </div>
-      </div>
-
-      <button class="btn btn-ghost btn-small" id="progress-log-weight-btn"
-              style="margin-top: var(--space-3);">
-        + Log today
-      </button>
     </div>
   `;
 }
@@ -581,37 +493,12 @@ export function onMount() {
     if (main) { main.innerHTML = render(); onMount(); }
   });
 
-  // Log body metrics — show inline form
+  // Log weight
   document.getElementById("progress-log-weight-btn")?.addEventListener("click", () => {
-    const form = document.getElementById("progress-body-form");
-    const btn  = document.getElementById("progress-log-weight-btn");
-    if (form) { form.style.display = "block"; }
-    if (btn)  { btn.style.display  = "none";  }
-    document.getElementById("body-input-weight")?.focus();
-  });
-
-  // Cancel body form
-  document.getElementById("progress-body-cancel")?.addEventListener("click", () => {
-    const form = document.getElementById("progress-body-form");
-    const btn  = document.getElementById("progress-log-weight-btn");
-    if (form) { form.style.display = "none";  }
-    if (btn)  { btn.style.display  = "block"; }
-  });
-
-  // Save body metrics entry
-  document.getElementById("progress-body-save")?.addEventListener("click", () => {
-    const entry = { loggedAt: new Date().toISOString() };
-    let hasAny  = false;
-    document.querySelectorAll(".progress-body-input[data-metric]").forEach(input => {
-      const val = parseFloat(input.value);
-      if (!isNaN(val) && val > 0) {
-        entry[input.dataset.metric] = val;
-        hasAny = true;
-      }
-    });
-    if (!hasAny) return;
+    const weight = prompt("Enter your weight (" + (store.get("weightUnit") || "kg") + "):");
+    if (!weight || isNaN(parseFloat(weight))) return;
     const bodyLog = store.get("bodyLog") || [];
-    bodyLog.push(entry);
+    bodyLog.push({ weight: parseFloat(weight), loggedAt: new Date().toISOString() });
     store.set("bodyLog", bodyLog);
     const main = document.getElementById("main-content");
     if (main) { main.innerHTML = render(); onMount(); }
