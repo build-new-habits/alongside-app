@@ -1,7 +1,7 @@
 /**
  * gym-programme.js - Gym Programme View
  *
- * 21 May 2026 v1 — showExitCard (3 options), skip per exercise,
+ * 21 May 2026 v2 — showExitCard (3 options), skip per exercise,
  *                   finish gate shows after 1+ done, rearmGuard on rerender.
  *
  * v2.0 — Full card redesign.
@@ -622,6 +622,19 @@ function renderPostSession(session) {
 // ── Main render ───────────────────────────────────────────────────────────────
 
 export function render() {
+  // ── Generated session fallback ─────────────────────────────────────────────
+  // When the session builder has built a session, use it instead of the
+  // hardcoded PROGRAMME. usingGeneratedSession is set by session-builder-ui.js
+  // before navigating here. Cleared on session complete or back.
+  const useGenerated = store.get("usingGeneratedSession") || false;
+  const generated    = useGenerated ? store.get("generatedSession") : null;
+  const genSession   = generated?.session || null;
+
+  if (useGenerated && genSession) {
+    return renderGeneratedSession(genSession);
+  }
+
+  // ── Standard programme (Graeme's rehab programme) ─────────────────────────
   activeSessionId = store.get("gymProgrammeSession") || "A";
   const activeWeek = store.get("gymProgrammeWeek") || 1;
   const session = PROGRAMME.sessions.find(s => s.id === activeSessionId)
@@ -665,6 +678,45 @@ export function render() {
                   data-session="${s.id}">${s.title}</button>
         `).join("")}
       </div>
+
+      ${postSessionState ? renderPostSession(session) : renderSessionCards(session)}
+
+      ${!postSessionState && completedIds.size > 0 ? `
+        <button class="btn btn-primary btn-full gym-finish-btn"
+                style="margin-top: var(--space-4);">
+          Finish session${!allDone ? " (" + completedIds.size + " of " + session.exercises.length + " done)" : ""}
+        </button>
+      ` : ""}
+
+    </div>
+  `;
+}
+
+// ── Generated session renderer ─────────────────────────────────────────────────
+// Renders a coach-built session from session-builder.js in the same card
+// format as the hardcoded programme. Uses renderSessionCards() unchanged.
+
+function renderGeneratedSession(session) {
+  // Use session.id as the activeSessionId so exercise completion tracking works
+  activeSessionId = session.id;
+
+  const stored = store.get("gymCompletedExercises_" + activeSessionId);
+  if (stored && Array.isArray(stored)) {
+    completedIds = new Set(stored);
+  }
+
+  const allDone = session.exercises.every(e => completedIds.has(e.id));
+
+  return `
+    <div class="view gym-programme-view">
+
+      <div class="view-header gym-programme-header">
+        <button class="btn btn-ghost" id="gym-back-btn"
+                aria-label="Back">Back</button>
+        <h1>${session.title}</h1>
+      </div>
+
+      ${buildConditionCard()}
 
       ${postSessionState ? renderPostSession(session) : renderSessionCards(session)}
 
