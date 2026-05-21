@@ -2,7 +2,10 @@
  * sw.js - Alongside Service Worker
  *
  * 20 May 2026 v5
- * Cache version: alongside-v61
+ * Cache version: alongside-v63
+ *
+ * v63 changes (21 May 2026)
+ * - router title fix; noticing routing; textarea layout; duration cards
  *
  * v61 changes (21 May 2026)
  * - Noticing Hub; breathing; journal; session builder; store schema
@@ -104,7 +107,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v62";
+const CACHE_NAME = "alongside-v63";
 
 const SHELL_URLS = [
 
