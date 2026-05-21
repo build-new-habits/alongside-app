@@ -1,8 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 20 May 2026 v3
- * Cache version: alongside-v60
+ * 20 May 2026 v4
+ * Cache version: alongside-v61
+ *
+ * v61 changes (21 May 2026)
+ * - Noticing Hub; breathing; journal; session builder; store schema
  *
  * alongside-v60 — Exit without saving; Progress ghost entry filter
  *
@@ -101,7 +104,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v60";
+const CACHE_NAME = "alongside-v61";
 
 const SHELL_URLS = [
 
