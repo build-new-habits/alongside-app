@@ -649,6 +649,35 @@ export function buildSession({ sessionType, durationMins, equipmentOverride }) {
   const counts         = EXERCISE_COUNT[durationMins] || EXERCISE_COUNT[30];
   const conditionNote  = buildConditionNote(sessionType);
 
+  // ── Prescribed exercises injection ──────────────────────────────────────────
+  // Active prescribed exercises are included in every session, regardless of
+  // session type. They are placed in the warmup or main section depending on
+  // their nature. The coach names them explicitly in the coach line.
+  // The engine never removes or overrides prescribed exercises.
+
+  const prescribed = (store.get("prescribedExercises") || [])
+    .filter(ex => ex.active !== false)
+    .map(ex => ({
+      id:          ex.id,
+      name:        ex.name,
+      section:     "main",    // default; could be made smarter later
+      category:    "prescribed",
+      sets:        ex.sets        || 3,
+      reps:        ex.reps        || ex.hold || "As prescribed",
+      tempo:       "As prescribed",
+      rest:        "As needed",
+      description: ex.description || ex.notes || "As prescribed by your specialist.",
+      cues:        ex.notes ? [ex.notes] : ["Follow your specialist's guidance for this exercise"],
+      youtube:     null,
+      equipment:   [],
+      contraindications: [],
+      difficultyLevel: 1,
+      isPrescribed:    true,
+      prescribedBy:    ex.prescribedBy || null
+    }));
+
+  const hasPrescribed = prescribed.length > 0;
+
   function selectFromCategories(categories, section, count) {
     const candidates = EXERCISE_POOL.filter(ex => {
       if (ex.section !== section) return false;
@@ -688,9 +717,17 @@ export function buildSession({ sessionType, durationMins, equipmentOverride }) {
     return selected.slice(0, count);
   }
 
-  const warmupExercises   = selectFromCategories(type.warmupCategories,   "warmup",   counts.warmup);
-  const mainExercises     = selectFromCategories(type.mainCategories,     "main",     counts.main);
-  const cooldownExercises = selectFromCategories(type.cooldownCategories, "cooldown", counts.cooldown);
+  // Reduce main slot count to make room for prescribed exercises
+  const prescribedCount = prescribed.length;
+  const adjustedCounts  = {
+    warmup:   counts.warmup,
+    main:     Math.max(1, counts.main - prescribedCount),
+    cooldown: counts.cooldown
+  };
+
+  const warmupExercises   = selectFromCategories(type.warmupCategories,   "warmup",   adjustedCounts.warmup);
+  const mainExercises     = [...prescribed, ...selectFromCategories(type.mainCategories, "main", adjustedCounts.main)];
+  const cooldownExercises = selectFromCategories(type.cooldownCategories, "cooldown", adjustedCounts.cooldown);
 
   // If equipment mismatch is severe, add a coach note
   let equipNote = null;
@@ -698,12 +735,23 @@ export function buildSession({ sessionType, durationMins, equipmentOverride }) {
     equipNote = "With your equipment today I've built the best session I can. Some categories have limited options — focus on the movements you have.";
   }
 
+  // Build prescribed note for coach line
+  let prescribedNote = null;
+  if (hasPrescribed) {
+    const prescribers = [...new Set(prescribed.map(p => p.prescribedBy).filter(Boolean))];
+    if (prescribers.length > 0) {
+      prescribedNote = `I've included your prescribed exercises from ${prescribers.join(" and ")}. Do these as written — they are not mine to change.`;
+    } else {
+      prescribedNote = `I've included your prescribed exercises at the start of the main session. Do these as written.`;
+    }
+  }
+
   const coachLine = generateCoachLine(
     sessionType,
     durationMins,
     Array.from(conditionSet),
     userEquipment,
-    conditionNote || equipNote
+    [conditionNote, equipNote, prescribedNote].filter(Boolean).join(" ") || null
   );
 
   // Calculate estimated duration
