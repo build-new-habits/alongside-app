@@ -177,7 +177,7 @@
  * activation without requiring all tabs to close.
  */
 
-const CACHE_NAME = "alongside-v55";
+const CACHE_NAME = "alongside-v56";
 
 const SHELL_URLS = [
 
