@@ -34,6 +34,7 @@
  */
 
 import { store } from "../store.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
 
@@ -552,6 +553,7 @@ function endSession() {
 }
 
 function resetSession() {
+  dismountSessionGuard();
   if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
   phase          = "type";
   selectedType   = null;
@@ -574,6 +576,11 @@ function formatMMSS(seconds) {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  mountSessionGuard({
+    isActive: () => phase === "walking" && sessionStarted,
+    label:    "walk",
+    onExit:   () => { dismountSessionGuard(); resetSession(); router.navigate("reflect"); }
+  });
 
   // Back / exit
   document.getElementById("ws-back-btn")?.addEventListener("click", () => {
