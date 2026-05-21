@@ -45,7 +45,7 @@ const VIEW_NAMES = {
   'noticing':                'Noticing',
   'breathing-session':       'Breathing',
   'journal-entry':           'Journal and Reflect',
-  'session-builder':         'Build a Session',
+  'session-builder-ui':      'Build a Session',
 };
 
 export const router = {
