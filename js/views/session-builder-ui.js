@@ -28,7 +28,7 @@
 
 import { store }                          from "../store.js";
 import { router }                         from "../router.js";
-import { SESSION_TYPES, buildSession }    from "../session-builder.js";
+import { SESSION_TYPES, buildSession }    from "../session-builder-engine.js";
 
 export const centered = false;
 
@@ -100,18 +100,25 @@ function renderTypePicker() {
         </p>
       </div>
 
-      <div class="sb-type-grid" role="group" aria-label="Choose session type">
+      <div style="display: flex; flex-direction: column; gap: var(--space-3);"
+           role="group" aria-label="Choose session type">
         ${SESSION_TYPES.map(t => {
           const locked = !premium && t.id !== "full";
           return `
-            <button class="sb-type-tile ${locked ? "sb-type-tile--locked" : ""}"
+            <button class="card sb-type-tile"
                     data-type="${t.id}"
-                    ${locked ? 'aria-label="' + t.label + ' — Personal tier" aria-disabled="true"' : 'aria-label="' + t.label + '"'}
-                    ${locked ? 'disabled' : ''}>
-              <span class="sb-type-icon" aria-hidden="true">${t.icon}</span>
-              <span class="sb-type-label">${t.label}</span>
-              <span class="sb-type-desc text-xs text-muted">${t.description}</span>
-              ${locked ? '<span class="sb-lock-badge" aria-hidden="true">Personal</span>' : ""}
+                    ${locked ? "disabled" : ""}
+                    style="display: flex; align-items: center; gap: var(--space-4); text-align: left; width: 100%; cursor: ${locked ? "default" : "pointer"}; opacity: ${locked ? "0.45" : "1"}; background: var(--color-surface);"
+                    aria-label="${t.label}${locked ? " — Personal tier" : ""}">
+              <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">${t.icon}</span>
+              <div style="flex: 1; min-width: 0;">
+                <p style="font-size: var(--text-base); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">${t.label}</p>
+                <p class="text-secondary" style="font-size: var(--text-sm);">${t.description}</p>
+              </div>
+              ${locked
+                ? '<span style="font-size: var(--text-xs); color: var(--color-primary); flex-shrink: 0;">Personal</span>'
+                : '<span style="color: var(--color-primary); font-size: 1.25rem; flex-shrink: 0;" aria-hidden="true">›</span>'
+              }
             </button>
           `;
         }).join("")}
