@@ -280,18 +280,18 @@ function renderPicker() {
         </p>
       </div>
 
-      <div class="bs-type-list" role="list">
+      <div style="display: flex; flex-direction: column; gap: var(--space-3);">
         ${TYPES.map(t => `
-          <button class="bs-type-card" data-type="${t.id}"
-                  role="listitem"
+          <button class="card bs-type-card" data-type="${t.id}"
+                  style="display: flex; align-items: flex-start; gap: var(--space-4); text-align: left; width: 100%; cursor: pointer; background: var(--color-surface);"
                   aria-label="${t.label}: ${t.tagline}">
-            <span class="bs-type-icon" aria-hidden="true">${t.icon}</span>
-            <div class="bs-type-body">
-              <span class="bs-type-label">${t.label}</span>
-              <span class="bs-type-tagline text-sm text-muted">${t.tagline}</span>
-              <span class="bs-type-desc text-xs text-muted">${t.description}</span>
+            <span style="font-size: 1.75rem; flex-shrink: 0; line-height: 1.2; margin-top: 2px;" aria-hidden="true">${t.icon}</span>
+            <div style="flex: 1; min-width: 0;">
+              <p style="font-size: var(--text-base); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">${t.label}</p>
+              <p class="text-secondary" style="font-size: var(--text-sm); margin-bottom: var(--space-1);">${t.tagline}</p>
+              <p class="text-muted" style="font-size: var(--text-xs);">${t.description}</p>
             </div>
-            <span class="bs-type-arrow" aria-hidden="true">›</span>
+            <span style="color: var(--color-primary); font-size: 1.25rem; flex-shrink: 0; margin-top: 2px;" aria-hidden="true">›</span>
           </button>
         `).join("")}
       </div>
