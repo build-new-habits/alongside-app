@@ -148,10 +148,11 @@ export const router = {
    * Uses YYYY-MM-DD comparison so "today" is correct regardless of time.
    */
   _hasCheckedInToday() {
-    const lastCheckin = store.get('lastCheckin');
-    if (!lastCheckin?.date) return false;
+    // checkin.js saves to checkinHistory keyed by YYYY-MM-DD via checkinData.saveCheckin()
+    // lastCheckin is a legacy key that is not reliably written -- read history instead
     const today = new Date().toISOString().split('T')[0];
-    return lastCheckin.date === today;
+    const history = store.get('checkinHistory') || {};
+    return !!history[today];
   },
 
   /**
