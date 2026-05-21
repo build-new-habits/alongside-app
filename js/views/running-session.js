@@ -35,6 +35,7 @@
  */
 
 import { store } from "../store.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
 
@@ -570,6 +571,7 @@ function endSession() {
 }
 
 function resetSession() {
+  dismountSessionGuard();
   if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
   phase          = "type";
   selectedType   = null;
@@ -662,6 +664,11 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  mountSessionGuard({
+    isActive: () => phase === "running",
+    label:    "run",
+    onExit:   () => { dismountSessionGuard(); resetSession(); router.navigate("reflect"); }
+  });
   document.getElementById("rs-back-btn")?.addEventListener("click", () => {
     if (phase === "type")     { resetSession(); router.navigate("intention"); }
     else if (phase === "duration") { phase = "type";     rerender(); }
@@ -669,7 +676,7 @@ export function onMount() {
   });
 
   document.getElementById("rs-exit-btn")?.addEventListener("click", () => {
-    if (confirm("End this run? Time so far will be saved.")) endSession();
+    showExitConfirm();
   });
 
   document.querySelectorAll(".ws-type-card").forEach(btn => {
