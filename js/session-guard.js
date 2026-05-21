@@ -197,3 +197,106 @@ function _handleExitDiscard() {
   // Navigate back to today without triggering reflect
   router.navigate("today");
 }
+
+// ── showExitCard — shared function for tap-based exit buttons ─────────────────
+//
+// Call this from any session view's "Exit" or "Back" button tap handler
+// INSTEAD of confirm() or a custom inline card.
+//
+// Usage:
+//   import { showExitCard } from "../session-guard.js";
+//
+//   document.getElementById("ps-exit-btn")?.addEventListener("click", () => {
+//     showExitCard({
+//       onSave:    () => { savePartial(); router.navigate("reflect"); },
+//       onDiscard: () => { cleanupSession(); router.navigate("today"); },
+//     });
+//   });
+//
+// @param {object} opts
+// @param {function} opts.onSave    - Called on "Exit and save progress"
+// @param {function} opts.onDiscard - Called on "Exit without saving"
+// @param {string} [opts.label]     - Optional label override for ARIA
+
+export function showExitCard({ onSave, onDiscard, label = "session" }) {
+  // If the gesture guard's card is already visible, don't double-show
+  if (document.getElementById("session-guard-card")) return;
+
+  const backdrop = document.createElement("div");
+  backdrop.id = "session-guard-backdrop";
+  backdrop.className = "sg-backdrop";
+  backdrop.setAttribute("aria-hidden", "true");
+
+  const card = document.createElement("div");
+  card.id = "session-guard-card";
+  card.className = "sg-card";
+  card.setAttribute("role", "dialog");
+  card.setAttribute("aria-modal", "true");
+  card.setAttribute("aria-label", `Leave ${label}?`);
+  card.setAttribute("aria-describedby", "sg-coach-text");
+
+  card.innerHTML = `
+    <div class="sg-coach-row">
+      <img
+        src="assets/images/logo-icon-128.png"
+        alt=""
+        class="sg-coach-icon"
+        aria-hidden="true"
+        width="36"
+        height="36"
+      >
+      <p id="sg-coach-text" class="sg-coach-text">
+        Hold on &mdash; if you leave now this session won&rsquo;t be saved. Are you sure?
+      </p>
+    </div>
+    <button id="sg-stay-btn" class="btn btn-primary btn-large btn-full sg-btn">
+      Stay in session
+    </button>
+    <button id="sg-exit-save-btn" class="btn btn-ghost btn-large btn-full sg-btn sg-exit-save">
+      Exit and save progress
+    </button>
+    <button id="sg-exit-discard-btn" class="btn btn-ghost btn-large btn-full sg-btn sg-exit-discard">
+      Exit without saving
+    </button>
+  `;
+
+  function dismiss() {
+    backdrop.remove();
+    card.remove();
+  }
+
+  backdrop.addEventListener("click", dismiss);
+
+  document.getElementById && (() => {})(); // flush before appending
+  document.body.appendChild(backdrop);
+  document.body.appendChild(card);
+
+  card.querySelector("#sg-stay-btn").addEventListener("click", dismiss);
+
+  card.querySelector("#sg-exit-save-btn").addEventListener("click", () => {
+    dismiss();
+    if (onSave) onSave();
+  });
+
+  card.querySelector("#sg-exit-discard-btn").addEventListener("click", () => {
+    dismiss();
+    // Clean up ghost activityLog entry
+    const log   = store.get("activityLog") || [];
+    const entry = store.get("currentActivityEntry");
+    if (entry) {
+      const cleaned = log.filter(e => !(e.id === entry.id && !e.completedAt));
+      store.set("activityLog", cleaned);
+      store.set("currentActivityEntry", null);
+    }
+    if (onDiscard) onDiscard();
+  });
+
+  // Escape key dismisses
+  function onKey(e) {
+    if (e.key === "Escape") { dismiss(); document.removeEventListener("keydown", onKey); }
+  }
+  document.addEventListener("keydown", onKey);
+
+  // Focus Stay button
+  requestAnimationFrame(() => card.querySelector("#sg-stay-btn")?.focus());
+}
