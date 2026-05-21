@@ -2,7 +2,9 @@
  * sw.js - Alongside Service Worker
  *
  * 20 May 2026 v3
- * Cache version: alongside-v59
+ * Cache version: alongside-v60
+ *
+ * alongside-v60 — Exit without saving; Progress ghost entry filter
  *
  * v58 changes (20 May 2026):
  * - session-guard.js: replaced with correct file (patch instructions
@@ -99,7 +101,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v59";
+const CACHE_NAME = "alongside-v60";
 
 const SHELL_URLS = [
 
