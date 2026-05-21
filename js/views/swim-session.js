@@ -16,6 +16,7 @@
  */
 
 import { store } from "../store.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
 
@@ -321,6 +322,7 @@ function endSession() {
 }
 
 function resetSession() {
+  dismountSessionGuard();
   if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
   phase = "stroke"; selectedStroke = null; selectedType = null;
   selectedMins = null; elapsed = 0; paused = false;
@@ -397,6 +399,11 @@ function rerender() {
 }
 
 export function onMount() {
+  mountSessionGuard({
+    isActive: () => phase === "swimming" && sessionStarted,
+    label:    "swim",
+    onExit:   () => { dismountSessionGuard(); resetSession(); router.navigate("reflect"); }
+  });
   document.getElementById("ss-back-btn")?.addEventListener("click", () => {
     if (phase === "stroke")   { resetSession(); router.navigate("intention"); }
     else if (phase === "type")     { phase = "stroke";   rerender(); }
