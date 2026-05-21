@@ -1,5 +1,7 @@
 /**
- * js/views/session-builder-ui.js - Session Builder UI
+ * js/views/session-builder.js - Session Builder UI
+ *
+ * (Renamed from session-builder-ui.js so router can load it as "session-builder" route.
  *
  * 21 May 2026 v1
  *
@@ -26,7 +28,7 @@
 
 import { store }                          from "../store.js";
 import { router }                         from "../router.js";
-import { SESSION_TYPES, buildSession }    from "../session-builder.js";
+import { SESSION_TYPES, buildSession }    from "../session-builder-engine.js";
 
 export const centered = false;
 
