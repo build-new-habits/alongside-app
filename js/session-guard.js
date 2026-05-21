@@ -1,157 +1,199 @@
 /**
- * session-guard.js - Back gesture confirmation for active sessions
+ * js/session-guard.js - Session Back Gesture Guard
  *
- * 20 May 2026 v1
+ * 21 May 2026 v1
  *
- * Intercepts the device back gesture (iOS swipe left, Android back button)
- * during active workout sessions. Without this, the user loses session
- * progress silently when they accidentally trigger back.
+ * Shared utility imported by all 7 session views.
+ * Intercepts device back gesture (iOS swipe left, Android back button)
+ * during an active session and shows a coach-voiced confirmation card.
  *
- * Usage  add one call at the top of onMount() in any session view:
+ * CHANGELOG
+ * 21 May 2026 v1 — Added third exit option: "Exit without saving".
+ *                  Cleans up currentActivityEntry from store without
+ *                  writing to activityLog. No reflect screen. Clean exit.
+ *                  WCAG: all three options meet 44px minimum touch target.
+ * 20 May 2026 v1 — Initial implementation. mountSessionGuard(),
+ *                  dismountSessionGuard(). Shared across all 7 session views.
+ *                  role=dialog, aria-modal=true, focus management, Escape key.
+ *
+ * USAGE (in any session view)
  *
  *   import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
  *
- *   export function onMount() {
- *     mountSessionGuard({
- *       isActive: () => !postSessionState,   // true while session is running
- *       onExit:   savePartialAndNavigate,    // called when user confirms exit
- *       label:    "gym session"              // used in coach message
- *     });
- *     // ... rest of onMount
- *   }
+ *   // In onMount():
+ *   mountSessionGuard({
+ *     isActive: () => phase === "session" || phase === "rest",
+ *     onExit:   saveAndExit,   // called when user chooses "Exit and save progress"
+ *     label:    "gym session", // used in coach copy
+ *   });
  *
- *   // In your cleanup() function:
+ *   // In resetSession():
  *   dismountSessionGuard();
  *
- * How it works:
- *   1. mountSessionGuard() adds a popstate listener.
- *   2. When back is pressed and isActive() is true, it pushes a replacement
- *      history entry (preventing navigation) and shows the confirmation card.
- *   3. "Stay in session" removes the card. Session continues.
- *   4. "Exit and save progress" calls onExit(), which the session file
- *      provides  typically writes a partial activityLog entry then navigates
- *      to reflect.js or intention.
- *   5. If isActive() is false (post-session screens) back proceeds normally.
- *
- * WCAG 2.2 AA:
- *   - Dialog has role="dialog", aria-modal="true", aria-label
- *   - Focus moves to the Stay button on open
- *   - Both buttons are minimum 44px touch target
- *   - Dismissed with either button or Escape key
+ * The onExit callback is responsible for writing a partial activityLog
+ * entry and then navigating to reflect.js. session-guard.js does not
+ * navigate — it hands control back to the session view.
  */
 
-let _guardHandler  = null;
-let _keyHandler    = null;
-let _guardOptions  = null;
+import { store }  from "./store.js";
+import { router } from "./router.js";
+
+// ── Internal state ─────────────────────────────────────────────────────────────
+
+let _isActive      = null;  // () => boolean — true when session is in progress
+let _onExit        = null;  // () => void    — called on "Exit and save progress"
+let _label         = "";    // human-readable session label for ARIA
+let _popHandler    = null;  // reference to the popstate listener for cleanup
+let _keyHandler    = null;  // reference to the keydown listener for cleanup
+let _guardActive   = false; // prevents double-mounting
+
+// ── Public API ─────────────────────────────────────────────────────────────────
 
 /**
- * Mount the back gesture guard on a session view.
+ * Mount the session guard. Call in onMount() of the session view.
  *
- * @param {object} options
- * @param {function} options.isActive  - returns true while session is running
- * @param {function} options.onExit    - called when user confirms exit
- * @param {string}   options.label     - human label for coach message e.g. "gym session"
+ * @param {object} opts
+ * @param {function} opts.isActive - Returns true when session is running
+ * @param {function} opts.onExit   - Called when user chooses "Exit and save progress"
+ * @param {string}  [opts.label]  - Human label for ARIA e.g. "gym session"
  */
 export function mountSessionGuard({ isActive, onExit, label = "session" }) {
-  // Clean up any previous guard
-  dismountSessionGuard();
+  if (_guardActive) dismountSessionGuard();
 
-  _guardOptions = { isActive, onExit, label };
+  _isActive    = isActive;
+  _onExit      = onExit;
+  _label       = label;
+  _guardActive = true;
 
-  _guardHandler = (e) => {
-    if (!_guardOptions) return;
-    if (!_guardOptions.isActive()) return; // Post-session  allow back normally
+  // Push a history entry so we have something to intercept.
+  // The router already pushed one when navigating here.
+  // We push a second so popstate fires once before leaving the session.
+  history.pushState({ sessionGuard: true }, "");
 
-    // Prevent navigation by pushing a replacement entry
-    history.pushState({ view: "session-guard" }, "", window.location.href);
-
-    // Show confirmation card
-    _showGuardCard(_guardOptions.label, _guardOptions.onExit);
+  _popHandler = (e) => {
+    if (!_isActive || !_isActive()) return; // session not running — let it pass
+    // Re-push so the guard stays in place until user makes a choice
+    history.pushState({ sessionGuard: true }, "");
+    _showCard();
   };
 
-  window.addEventListener("popstate", _guardHandler);
-
-  // Escape key dismisses if card is open
   _keyHandler = (e) => {
-    if (e.key === "Escape") _dismissGuardCard();
+    if (e.key === "Escape") _hideCard();
   };
-  window.addEventListener("keydown", _keyHandler);
+
+  window.addEventListener("popstate",  _popHandler);
+  window.addEventListener("keydown",   _keyHandler);
 }
 
 /**
- * Dismount  call in session cleanup() to prevent stale listeners.
+ * Dismount the session guard. Call in resetSession() of the session view.
+ * Also call when session completes normally (no guard needed after finish).
  */
 export function dismountSessionGuard() {
-  if (_guardHandler) {
-    window.removeEventListener("popstate", _guardHandler);
-    _guardHandler = null;
-  }
-  if (_keyHandler) {
-    window.removeEventListener("keydown", _keyHandler);
-    _keyHandler = null;
-  }
-  _guardOptions = null;
-  _dismissGuardCard();
+  if (_popHandler) window.removeEventListener("popstate",  _popHandler);
+  if (_keyHandler) window.removeEventListener("keydown",   _keyHandler);
+  _hideCard();
+  _isActive    = null;
+  _onExit      = null;
+  _label       = "";
+  _popHandler  = null;
+  _keyHandler  = null;
+  _guardActive = false;
 }
 
-//  Card rendering 
+// ── Card rendering ─────────────────────────────────────────────────────────────
 
-function _showGuardCard(label, onExit) {
-  // Only one card at a time
-  if (document.getElementById("session-guard-card")) return;
+function _showCard() {
+  if (document.getElementById("session-guard-card")) return; // already shown
 
+  // Backdrop
+  const backdrop = document.createElement("div");
+  backdrop.id = "session-guard-backdrop";
+  backdrop.className = "sg-backdrop";
+  backdrop.setAttribute("aria-hidden", "true");
+  backdrop.addEventListener("click", _hideCard);
+
+  // Card
   const card = document.createElement("div");
   card.id = "session-guard-card";
+  card.className = "sg-card";
   card.setAttribute("role", "dialog");
   card.setAttribute("aria-modal", "true");
-  card.setAttribute("aria-label", "Leave session confirmation");
+  card.setAttribute("aria-label", `Leave ${_label}?`);
+  card.setAttribute("aria-describedby", "sg-coach-text");
+
   card.innerHTML = `
-    <div class="session-guard-backdrop" id="session-guard-backdrop"></div>
-    <div class="session-guard-dialog">
-      <div class="card card-coach session-guard-coach-card">
-        <p class="session-guard-message">
-          Hold on -- if you leave now, this ${label} won't be saved. Are you sure?
-        </p>
-      </div>
-      <div class="session-guard-actions">
-        <button class="btn btn-primary btn-full session-guard-stay"
-                id="session-guard-stay"
-                aria-label="Stay in session">
-          Stay in session
-        </button>
-        <button class="btn btn-ghost btn-full session-guard-exit"
-                id="session-guard-exit"
-                style="margin-top: var(--space-3);"
-                aria-label="Exit and save progress so far">
-          Exit and save progress
-        </button>
-      </div>
+    <div class="sg-coach-row">
+      <img
+        src="assets/images/logo-icon-128.png"
+        alt=""
+        class="sg-coach-icon"
+        aria-hidden="true"
+        width="36"
+        height="36"
+      >
+      <p id="sg-coach-text" class="sg-coach-text">
+        Hold on &mdash; if you leave now this session won&rsquo;t be saved. Are you sure?
+      </p>
     </div>
+    <button id="sg-stay-btn" class="btn btn-primary btn-large btn-full sg-btn">
+      Stay in session
+    </button>
+    <button id="sg-exit-save-btn" class="btn btn-ghost btn-large btn-full sg-btn sg-exit-save">
+      Exit and save progress
+    </button>
+    <button id="sg-exit-discard-btn" class="btn btn-ghost btn-large btn-full sg-btn sg-exit-discard">
+      Exit without saving
+    </button>
   `;
 
+  document.body.appendChild(backdrop);
   document.body.appendChild(card);
 
-  // Focus the Stay button  safest default for accessibility
-  setTimeout(() => {
-    document.getElementById("session-guard-stay")?.focus();
-  }, 50);
+  // Wire buttons
+  document.getElementById("sg-stay-btn").addEventListener("click", _hideCard);
+  document.getElementById("sg-exit-save-btn").addEventListener("click", _handleExitSave);
+  document.getElementById("sg-exit-discard-btn").addEventListener("click", _handleExitDiscard);
 
-  document.getElementById("session-guard-stay")?.addEventListener("click", () => {
-    _dismissGuardCard();
-  });
-
-  document.getElementById("session-guard-exit")?.addEventListener("click", () => {
-    _dismissGuardCard();
-    dismountSessionGuard();
-    if (typeof onExit === "function") onExit();
-  });
-
-  document.getElementById("session-guard-backdrop")?.addEventListener("click", () => {
-    _dismissGuardCard();
+  // Move focus to Stay button (keeps user in session by default)
+  requestAnimationFrame(() => {
+    const stayBtn = document.getElementById("sg-stay-btn");
+    if (stayBtn) stayBtn.focus();
   });
 }
 
-function _dismissGuardCard() {
-  const card = document.getElementById("session-guard-card");
-  if (card) card.remove();
+function _hideCard() {
+  const backdrop = document.getElementById("session-guard-backdrop");
+  const card     = document.getElementById("session-guard-card");
+  if (backdrop) backdrop.remove();
+  if (card)     card.remove();
+}
+
+function _handleExitSave() {
+  _hideCard();
+  dismountSessionGuard();
+  // onExit is responsible for writing partial activityLog entry + navigating to reflect
+  if (_onExit) _onExit();
+}
+
+function _handleExitDiscard() {
+  _hideCard();
+  dismountSessionGuard();
+
+  // Discard: remove currentActivityEntry from store without writing to activityLog.
+  // The entry was written to activityLog optimistically when the session started
+  // (in intention.js). We need to remove it.
+  const log   = store.get("activityLog") || [];
+  const entry = store.get("currentActivityEntry");
+
+  if (entry && log.length > 0) {
+    // Remove the entry if it has no completedAt (i.e. session was never finished)
+    const cleaned = log.filter(e => !(e.id === entry.id && !e.completedAt));
+    store.set("activityLog", cleaned);
+  }
+
+  store.set("currentActivityEntry", null);
+
+  // Navigate back to today without triggering reflect
+  router.navigate("today");
 }
