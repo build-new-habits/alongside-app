@@ -1,5 +1,5 @@
 /**
- * js/session-builder.js - Generative Session Engine
+ * js/session-builder-engine.js - Generative Session Engine
  *
  * 21 May 2026 v1
  *
