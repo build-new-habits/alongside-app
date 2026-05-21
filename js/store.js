@@ -1,19 +1,9 @@
 /**
  * store.js - Data persistence layer
+ *
+ * 21 May 2026 v1 — journalEntries, noticingWeekInCycle, noticingLastTriggered,
+ *                   generatedSession schema added for Noticing Hub + Session Builder.
  * Handles localStorage with simple get/set API
- *
- * 16 May 2026 v1
- *
- * v1.8 — NS-1 equipment architecture + supporting fields:
- *   homeEquipment[]       — equipment available at home
- *   gymEquipment[]        — equipment available at gym/facility
- *   equipmentByLocation{} — per-location equipment map (future-proof)
- *   movementIdentity[]    — multi-select (was single value)
- *   returnVisit           — flag for second+ visit same day (router.js)
- *   exercisePreferences{} — skip/dislike preference signals per exercise
- *   coachStyle            — coach personality ('nurturing' default)
- *   userTier              — 'free' | 'personal' | 'athlete'
- *   totalCredits          — impact credits balance
  *
  * v1.7 — checkInNotification schema (S3-6):
  *   Opted-in check-in reminder. Entirely user-initiated.
@@ -85,6 +75,10 @@ export const store = {
       progressLog:          Array.isArray(saved.progressLog)    ? saved.progressLog    : [],
       prescribedExercises:  Array.isArray(saved.prescribedExercises) ? saved.prescribedExercises : [],
       activityLog:          Array.isArray(saved.activityLog)    ? saved.activityLog    : [],
+      journalEntries:       Array.isArray(saved.journalEntries)  ? saved.journalEntries  : [],
+      noticingWeekInCycle:  saved.noticingWeekInCycle  || 1,
+      noticingLastTriggered: saved.noticingLastTriggered || null,
+      generatedSession:     saved.generatedSession || { session: null, builtAt: null, inputs: {} },
       conditionPainScores:  (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
                               ? saved.conditionPainScores
                               : {},
@@ -92,25 +86,12 @@ export const store = {
                               ? { ...this.getDefaults().checkInNotification, ...saved.checkInNotification }
                               : this.getDefaults().checkInNotification,
       speechRate: (typeof saved.speechRate === "number") ? saved.speechRate : 0.9,
-
-      // NS-1 equipment architecture
-      homeEquipment:       Array.isArray(saved.homeEquipment)       ? saved.homeEquipment       : [],
-      gymEquipment:        Array.isArray(saved.gymEquipment)        ? saved.gymEquipment        : [],
-      equipmentByLocation: (saved.equipmentByLocation && typeof saved.equipmentByLocation === 'object')
-                             ? saved.equipmentByLocation
+      activityPreferences: (saved.activityPreferences && typeof saved.activityPreferences === "object")
+                             ? saved.activityPreferences
                              : {},
-      movementIdentity:    Array.isArray(saved.movementIdentity)
-                             ? saved.movementIdentity
-                             : (saved.movementIdentity ? [saved.movementIdentity] : []),  // migrate single string
-
-      // Tier, credits, preferences
-      userTier:            saved.userTier            || 'free',
-      measurementUnit:     saved.measurementUnit     || 'cm',
-      totalCredits:        typeof saved.totalCredits === 'number' ? saved.totalCredits : 0,
-      exercisePreferences: (saved.exercisePreferences && typeof saved.exercisePreferences === 'object')
-                             ? saved.exercisePreferences
-                             : {},
-      returnVisit:         false,  // always reset on fresh load
+      movementIdentity:    saved.movementIdentity || null,
+      lastProposalType:    saved.lastProposalType || null,
+      lastProposalDate:    saved.lastProposalDate || null,
     };
   },
 
@@ -131,7 +112,6 @@ export const store = {
       // ── BODY & TARGETS — Step 4 ──────────────────────────────
       weight: null,
       weightUnit: 'kg',
-      measurementUnit: 'cm',  // 'cm' | 'in' — for waist, arms, etc.
       targetWeight: null,
       targetDate: null,
       targetDescription: '',
@@ -159,24 +139,7 @@ export const store = {
       },
 
       // ── EQUIPMENT — Step 8 ───────────────────────────────────
-      // equipment[] is kept as the union of home + gym for backward compatibility.
-      // homeEquipment[] and gymEquipment[] are the canonical sources of truth.
-      // equipmentByLocation{} maps location IDs to their equipment arrays —
-      // used by coach-proposal and workout generator to read context-correct kit.
-      equipment:           [],
-      homeEquipment:       [],
-      gymEquipment:        [],
-      equipmentByLocation: {
-        // e.g. { home: [...], gym: [...], pool: [], studio: [] }
-      },
-
-      // ── MOVEMENT IDENTITY ────────────────────────────────────
-      // Multi-select array (was single string movementIdentity).
-      // Coach rotates suggestions toward whichever type has been
-      // done least recently from the selected set.
-      // Values: 'gym' | 'yoga-pilates' | 'running' | 'walking' |
-      //         'swimming' | 'classes' | 'mix'
-      movementIdentity: [],
+      equipment: [],
 
       // ── PRESCRIBED EXERCISES ─────────────────────────────────
       // Exercises prescribed by an external professional (physio,
@@ -251,6 +214,29 @@ export const store = {
       // Never autoplays. Persists across sessions.
       speechRate: 0.9,
 
+      // ── ACTIVITY PREFERENCES ──────────────────────────────────
+      // Lightweight preference signal built from accepted proposals.
+      // Keys are proposal type strings (e.g. "gym", "yoga", "quiet").
+      // Values are acceptance counts. Incremented in coach-proposal.js.
+      // Never resets — represents lifetime preference signal.
+      activityPreferences: {},
+
+      // ── MOVEMENT IDENTITY ─────────────────────────────────────
+      // User's self-declared movement identity. Set in Settings Library
+      // tab or inferred from activity history after 14+ sessions.
+      // Used as the prior before enough activity data exists, and to
+      // retip the scales when the user changes their primary activity
+      // (e.g. joins a gym mid-use).
+      // Values: "gym" | "yoga" | "running" | "walking" | "swimming"
+      //         | "classes" | "mixed" | null
+      movementIdentity: null,
+
+      // ── COACH PROPOSAL ────────────────────────────────────────
+      // Tracks the last proposal made to avoid identical repetition.
+      // { type, date } — cleared on new day.
+      lastProposalType: null,
+      lastProposalDate: null,
+
       // ── CHECK-IN NOTIFICATION ────────────────────────────────
       // Opted-in reminder only. User must explicitly enable.
       // PERMITTED: warm tone, user-set time, single type, user-revocable.
@@ -261,31 +247,36 @@ export const store = {
         permissionGranted: false   // true only after browser API confirms
       },
 
-      // ── COACH + TIER ─────────────────────────────────────────
-      // coachStyle: set during onboarding or Settings > Profile.
-      // 'nurturing' is the default and the only style on Free tier.
-      coachStyle: 'nurturing',
+      // ── NOTICING HUB ─────────────────────────────────────────
+      // Journal entries — all saved reflections.
+      // Schema per entry:
+      //   id:          string  — ISO timestamp + random suffix
+      //   date:        string  — ISO date e.g. "2026-05-21"
+      //   type:        string  — "guided" | "free" | "weekly-noticing"
+      //   prompt:      string  — the prompt shown (guided only)
+      //   category:    string  — prompt category e.g. "movement", "nature"
+      //   body:        string  — the user's written content
+      //   tags:        array   — auto-tags derived from body
+      //   createdAt:   string  — ISO timestamp
+      journalEntries: [],
 
-      // userTier: set by auth.js on subscription verification.
-      // 'free' until Supabase auth is live.
-      userTier: 'free',
+      // 6-week Noticing reflection cycle tracker.
+      // Resets when 6 weeks are complete (starts again at week 1).
+      noticingWeekInCycle:   1,      // 1-6
+      noticingLastTriggered: null,   // ISO date — prevents duplicate triggers
 
-      // ── CREDITS ──────────────────────────────────────────────
-      totalCredits:       0,
-      lastWorkoutCredits: 0,
-      lastWorkoutName:    null,
-
-      // ── RETURN VISIT ─────────────────────────────────────────
-      // Set by router.js on second+ open same day.
-      // Read by intention.js to show "anything changed?" prompt.
-      returnVisit: false,
-
-      // ── EXERCISE PREFERENCES ─────────────────────────────────
-      // Per-exercise skip/dislike signals.
-      // Written by skip flow (two-step: unavailable vs preference).
-      // Read by workoutGenerator to filter or reduce frequency.
-      // Schema: { [exerciseId]: { preference: 'avoid'|'less', setAt, source: 'user' } }
-      exercisePreferences: {},
+      // ── SESSION BUILDER ──────────────────────────────────────
+      // Holds a coach-generated session object produced by session-builder.js.
+      // Read by gym-programme.js when no hardcoded PROGRAMME is active.
+      // Schema:
+      //   session:  object  — full session object matching PROGRAMME.sessions[0]
+      //   builtAt:  string  — ISO timestamp
+      //   inputs:   object  — { sessionType, durationMins, equipment, conditions }
+      generatedSession: {
+        session:  null,
+        builtAt:  null,
+        inputs:   {}
+      },
 
       // ── METADATA ─────────────────────────────────────────────
       createdAt: null,
