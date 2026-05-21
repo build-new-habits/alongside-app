@@ -1,8 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 21 May 2026 v6
- * Cache version: alongside-v66
+ * 21 May 2026 v7
+ * Cache version: alongside-v67
+ *
+ * v67 changes (21 May 2026)
+ * - changed the route name in router.js from "session-builder" to "session-builder-ui", and update the two places that navigate to it.
  *
  * v66 changes (21 May 2026)
  * - wiring the session builder end-to-end
@@ -116,7 +119,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v66";
+const CACHE_NAME = "alongside-v67";
 
 const SHELL_URLS = [
 
