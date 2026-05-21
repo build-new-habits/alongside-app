@@ -1,8 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 21 May 2026 v4
- * Cache version: alongside-v64
+ * 21 May 2026 v5
+ * Cache version: alongside-v65
+ * 
+ * v65 changes (21 May 2026)
+ * - changes the screen-reader (sr) display
  *
  * v64 changes (21 May 2026)
  * - quiet-session back routing; noticing return route
@@ -110,7 +113,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v64";
+const CACHE_NAME = "alongside-v65";
 
 const SHELL_URLS = [
 
