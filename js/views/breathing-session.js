@@ -321,12 +321,17 @@ function renderDuration() {
         How long would you like to practice?
       </p>
 
-      <div class="bs-duration-grid" role="group" aria-label="Choose duration">
+      <div style="display: flex; flex-direction: column; gap: var(--space-3);"
+           role="group" aria-label="Choose duration">
         ${DURATIONS.map(d => `
-          <button class="bs-duration-btn" data-mins="${d.mins}"
+          <button class="card bs-duration-btn" data-mins="${d.mins}"
+                  style="display: flex; align-items: center; justify-content: space-between; text-align: left; width: 100%; cursor: pointer;"
                   aria-label="${d.label}: ${d.desc}">
-            <span class="bs-duration-label">${d.label}</span>
-            <span class="bs-duration-desc text-xs text-muted">${d.desc}</span>
+            <div>
+              <span style="font-size: var(--text-lg); font-weight: var(--font-semibold);">${d.label}</span>
+              <span class="text-secondary" style="font-size: var(--text-sm); margin-left: var(--space-2);">${d.desc}</span>
+            </div>
+            ${d.mins === 5 ? '<span style="font-size: var(--text-xs); color: var(--color-primary);">Recommended</span>' : ""}
           </button>
         `).join("")}
       </div>
