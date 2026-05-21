@@ -160,6 +160,10 @@ export const router = {
     setTimeout(() => {
       announcer.textContent = label;
     }, 50);
+
+    // Keep document.title as "Alongside" always — prevents the PWA
+    // standalone chrome from showing the view name in the top bar.
+    document.title = "Alongside";
   },
 
   /**
