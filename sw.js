@@ -1,9 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 20 May 2026 v2
- * Cache version: alongside-v58
- * Previously alongside-v57
+ * 20 May 2026 v3
+ * Cache version: alongside-v59
+ *
+ * v58 changes (20 May 2026):
+ * - session-guard.js: replaced with correct file (patch instructions
+ *   file was accidentally uploaded instead)
+ * - router.js: _hasCheckedInToday fixed (reads checkinHistory not lastCheckin)
  *
  * v58 fixes gym-programme issues and having to re-check-in each time the user uses the app
  *
@@ -95,7 +99,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v58";
+const CACHE_NAME = "alongside-v59";
 
 const SHELL_URLS = [
 
