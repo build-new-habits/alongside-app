@@ -247,14 +247,19 @@ export function render() {
 
 export function onMount() {
   document.getElementById("noticing-reflect-btn")?.addEventListener("click", () => {
+    // Weekly noticing reflection — use journal-entry with weekly prompt pre-loaded
     router.navigate("journal-entry");
   });
 
   document.getElementById("noticing-breathe-btn")?.addEventListener("click", () => {
-    router.navigate("breathing-session");
+    // Route to existing quiet-session breathing — fully working, consistent UI
+    store.set("quietMode", "breathing");
+    router.navigate("quiet-session");
   });
 
   document.getElementById("noticing-journal-btn")?.addEventListener("click", () => {
-    router.navigate("journal-entry");
+    // Route to existing quiet-session journal — fully working, consistent UI
+    store.set("quietMode", "journal");
+    router.navigate("quiet-session");
   });
 }
