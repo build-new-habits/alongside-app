@@ -103,22 +103,25 @@ function renderTypePicker() {
       <div style="display: flex; flex-direction: column; gap: var(--space-3);"
            role="group" aria-label="Choose session type">
         ${SESSION_TYPES.map(t => {
-          const locked = !premium && t.id !== "full";
+          const locked  = !premium && t.id !== "full";
+          const cursor  = locked ? "default" : "pointer";
+          const opacity = locked ? "0.45" : "1";
+          const ariaLabel = locked ? t.label + " — Personal tier" : t.label;
+          const badge = locked
+            ? "<span style='font-size:var(--text-xs);color:var(--color-primary);flex-shrink:0;'>Personal</span>"
+            : "<span style='color:var(--color-primary);font-size:1.25rem;flex-shrink:0;' aria-hidden='true'>›</span>";
           return `
             <button class="card sb-type-tile"
                     data-type="${t.id}"
                     ${locked ? "disabled" : ""}
-                    style="display: flex; align-items: center; gap: var(--space-4); text-align: left; width: 100%; cursor: ${locked ? "default" : "pointer"}; opacity: ${locked ? "0.45" : "1"}; background: var(--color-surface);"
-                    aria-label="${t.label}${locked ? " — Personal tier" : ""}">
-              <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">${t.icon}</span>
-              <div style="flex: 1; min-width: 0;">
-                <p style="font-size: var(--text-base); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">${t.label}</p>
-                <p class="text-secondary" style="font-size: var(--text-sm);">${t.description}</p>
+                    style="display:flex;align-items:center;gap:var(--space-4);text-align:left;width:100%;cursor:${cursor};opacity:${opacity};background:var(--color-surface);"
+                    aria-label="${ariaLabel}">
+              <span style="font-size:2rem;flex-shrink:0;line-height:1;" aria-hidden="true">${t.icon}</span>
+              <div style="flex:1;min-width:0;">
+                <p style="font-size:var(--text-base);font-weight:var(--font-semibold);margin-bottom:var(--space-1);">${t.label}</p>
+                <p class="text-secondary" style="font-size:var(--text-sm);">${t.description}</p>
               </div>
-              ${locked
-                ? '<span style="font-size: var(--text-xs); color: var(--color-primary); flex-shrink: 0;">Personal</span>'
-                : '<span style="color: var(--color-primary); font-size: 1.25rem; flex-shrink: 0;" aria-hidden="true">›</span>'
-              }
+              ${badge}
             </button>
           `;
         }).join("")}
