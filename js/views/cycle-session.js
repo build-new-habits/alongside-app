@@ -16,6 +16,7 @@
  */
 
 import { store } from "../store.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
 
@@ -332,6 +333,7 @@ function endSession() {
 }
 
 function resetSession() {
+  dismountSessionGuard();
   if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
   phase = "ride-type"; selectedRide = null; selectedType = null;
   selectedMins = null; elapsed = 0; paused = false;
@@ -408,6 +410,11 @@ function rerender() {
 }
 
 export function onMount() {
+  mountSessionGuard({
+    isActive: () => phase === "cycling" && sessionStarted,
+    label:    "cycle session",
+    onExit:   () => { dismountSessionGuard(); resetSession(); router.navigate("reflect"); }
+  });
   document.getElementById("cs-back-btn")?.addEventListener("click", () => {
     if (phase === "ride-type") { resetSession(); router.navigate("intention"); }
     else if (phase === "type")     { phase = "ride-type"; rerender(); }
