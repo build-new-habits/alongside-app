@@ -28,7 +28,7 @@
 
 import { store }                          from "../store.js";
 import { router }                         from "../router.js";
-import { SESSION_TYPES, buildSession }    from "../session-builder-engine.js";
+import { SESSION_TYPES, buildSession }    from "../session-builder.js";
 
 export const centered = false;
 
