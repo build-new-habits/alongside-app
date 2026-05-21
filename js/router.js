@@ -84,6 +84,11 @@ export const router = {
   async navigate(viewName) {
     console.log(`Navigating to: ${viewName}`);
 
+    // Set title immediately — before render, before announcements.
+    // Prevents browser chrome (Edge, Chrome desktop) from picking up
+    // the sr-announcer text or any intermediate DOM state as the page title.
+    document.title = "Alongside";
+
     const mainContent = document.getElementById('main-content');
     const bottomNav   = document.getElementById('bottom-nav');
 
@@ -159,6 +164,8 @@ export const router = {
     announcer.textContent = '';
     setTimeout(() => {
       announcer.textContent = label;
+      // Re-assert title after the timeout in case any async render reset it
+      document.title = "Alongside";
     }, 50);
 
     // Keep document.title as "Alongside" always — prevents the PWA
