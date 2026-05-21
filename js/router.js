@@ -1,41 +1,22 @@
 /**
  * router.js - View navigation
+ *
+ * 21 May 2026 v1 — Added noticing, breathing-session, journal-entry,
+ *                   session-builder routes.
  * Handles routing between different screens
  *
- * 20 May 2026 v1
- *
- * v1.4  Back gesture history stack fix (20 May 2026):
- *   navigate() now calls history.pushState({ view: viewName }) on every
- *   navigation so the browser has a real history stack to traverse.
- *   The popstate handler can then read e.state.view and go to the correct
- *   previous screen rather than always falling back to check-in.
- *   init() uses history.replaceState for the launch screen so there is
- *   always at least one entry in the stack.
- *   Onboarding and check-in screens are excluded from pushState  the user
- *   should not be able to swipe back into onboarding or the check-in form
- *   from inside the app.
- *
- * v1.3  NS-2: library route added
- *
- * v1.2  Return-visit abbreviated check-in (NS-3):
- *   Second and subsequent visits same day no longer force a full check-in.
- *   Instead the user lands on intention with a soft coach prompt.
- *   The intention screen detects this and shows "anything changed?" UI.
- *   New route: checkin-mini  a 3-question abbreviated check-in
- *   (energy + mood + pain only, no sleep, no conditions).
- *   Store key returnVisit: true signals to intention.js to show the prompt.
- *
- * v1.1  Check-in as front door (9 May 2026):
- *   On app launch, router checks whether the user has checked in today.
- *   Not checked in today  checkin. Already checked in  intention.
- *
- * v1.0  Accessibility additions (March 2026)
+ * Accessibility additions (March 2026):
+ *   - VIEW_NAMES map provides human-readable labels for screen reader announcements
+ *   - announceNavigation() writes to #sr-announcer after every navigate()
+ *   - moveFocusToContent() moves keyboard focus to #main-content after render
+ *     so screen reader users land at the top of the new view
  */
 
 import { store } from './store.js';
 import { tts }   from './tts.js';
 
 // Human-readable names announced to screen readers on navigation.
+// Keys match the viewName strings passed to router.navigate().
 const VIEW_NAMES = {
   'today':                   'Today',
   'progress':                'Your Progress',
@@ -57,102 +38,35 @@ const VIEW_NAMES = {
   'privacy':                 'Privacy and Terms',
   'gym-programme':           'My Gym Programme',
   'intention':               'What would you like to do today?',
-  'coach-proposal':          'Your coach has a suggestion',
   'reflect':                 'How was that?',
   'prescribed-session':      'Prescribed Exercises',
   'prescribed':              'My Prescribed Exercises',
   'morning-session':         'Morning Session',
-  'quiet-session':           'Quiet Session',
-  'yoga-session':            'Yoga and Pilates',
-  'core-session':            'Core Session',
-  'walk-session':            'Walk Session',
-  'library':                 'Library',
-  'running-session':         'Running Session',
-  'swim-session':            'Swim Session',
-  'cycle-session':           'Cycle Session',
-  'checkin-mini':            'Quick check-in',
+  'noticing':                'Noticing',
+  'breathing-session':       'Breathing',
+  'journal-entry':           'Journal and Reflect',
+  'session-builder':         'Build a Session',
 };
-
-// Views that should NOT be pushed onto the history stack.
-// The user must not be able to swipe back into onboarding or the check-in
-// form once they have moved past them. Checkin-mini is also excluded 
-// it is a transient overlay, not a destination.
-const NO_PUSH_VIEWS = [
-  'onboarding/welcome',
-  'onboarding/name',
-  'onboarding/about',
-  'onboarding/body',
-  'onboarding/goals',
-  'onboarding/conditions',
-  'onboarding/lifestyle',
-  'onboarding/equipment',
-  'onboarding/complete',
-  'onboarding/goal-setup',
-  'onboarding/privacy',
-  'checkin',
-  'checkin-mini',
-];
 
 export const router = {
 
   currentView: null,
   views: {},
-  // Track whether the first navigation has been done (uses replaceState not pushState)
-  _firstNav: true,
 
   /**
-   * Initialise router  determine starting view.
-   *
-   * Flow after onboarding:
-   *   1. Has user checked in today?
-   *      Yes  intention (they have already shared how they are)
-   *      No   checkin  (coach needs today's data before proposing anything)
+   * Initialise router — determine starting view
    */
   init() {
     this.setupNavigation();
     this.hideLoading();
 
     if (store.isOnboardingComplete()) {
-      const checkedInToday = this._hasCheckedInToday();
-      if (!checkedInToday) {
-        store.set('returnVisit', false);
-        this.navigate('checkin');
-      } else {
-        store.set('returnVisit', true);
-        this.navigate('intention');
-      }
+      this.navigate('intention');
     } else {
       this.navigate('onboarding/welcome');
     }
 
-    // Intercept device back gesture (iOS swipe left, Android back button/gesture).
-    // With pushState wired up in navigate(), e.state.view will now contain the
-    // previous view name  so back goes to the actual previous screen.
-    window.addEventListener("popstate", (e) => {
-      const previousView = e.state?.view;
-      if (previousView) {
-        this._navigateWithoutHistory(previousView);
-      } else {
-        // No state  app was opened fresh or history exhausted.
-        // Route to intention if checked in today, otherwise check-in.
-        const target = this._hasCheckedInToday() ? "intention" : "checkin";
-        this._navigateWithoutHistory(target);
-      }
-    });
-
-    console.log('\uD83E\uDDED Router initialised');
-  },
-
-  /**
-   * Returns true if the user has a lastCheckin entry dated today.
-   * Uses YYYY-MM-DD comparison so "today" is correct regardless of time.
-   */
-  _hasCheckedInToday() {
-    // checkin.js saves to checkinHistory keyed by YYYY-MM-DD via checkinData.saveCheckin()
-    // lastCheckin is a legacy key that is not reliably written -- read history instead
-    const today = new Date().toISOString().split('T')[0];
-    const history = store.get('checkinHistory') || {};
-    return !!history[today];
+    console.log('🧭 Router initialised');
   },
 
   /**
@@ -164,17 +78,8 @@ export const router = {
 
   /**
    * Navigate to a view by name.
-   *
-   * Pushes a history entry for every view except onboarding and check-in
-   * screens (see NO_PUSH_VIEWS). This gives the browser a real history stack
-   * so the device back gesture travels to the previous screen rather than
-   * always falling back to check-in.
-   *
-   * The very first navigation on launch uses replaceState so there is always
-   * at least one entry in the stack without creating a phantom entry before it.
-   *
-   * After rendering: announces the new view to screen readers and moves
-   * keyboard focus to the main content area.
+   * After rendering, announces the new view to screen readers
+   * and moves keyboard focus to the main content area.
    */
   async navigate(viewName) {
     console.log(`Navigating to: ${viewName}`);
@@ -182,35 +87,12 @@ export const router = {
     const mainContent = document.getElementById('main-content');
     const bottomNav   = document.getElementById('bottom-nav');
 
+    // Clear current content
     mainContent.innerHTML = '';
     mainContent.className = 'main-content';
 
-    //  History stack 
-    // Excluded views (onboarding, check-in) use replaceState so they do not
-    // accumulate in the back stack. All other views push a new entry.
-    const shouldPush = !NO_PUSH_VIEWS.includes(viewName)
-      && !viewName.startsWith('onboarding/');
-
-    if (this._firstNav) {
-      // Always replaceState on the very first navigation  ensures the stack
-      // starts clean with one entry rather than an empty state beneath it.
-      history.replaceState({ view: viewName }, "", window.location.href);
-      this._firstNav = false;
-    } else if (shouldPush) {
-      history.pushState({ view: viewName }, "", window.location.href);
-    } else {
-      // Onboarding / check-in  replace current entry, no back into these
-      history.replaceState({ view: viewName }, "", window.location.href);
-    }
-    // 
-
-    // Hide bottom nav during focused flows
-    const hideNavViews = [
-      'onboarding', 'workout', 'workout-complete',
-      'checkin', 'prescribed-session', 'morning-session',
-      'quiet-session', 'yoga-session', 'coach-proposal', 'core-session', 'walk-session',
-      'running-session', 'swim-session', 'cycle-session', 'checkin-mini'
-    ];
+    // Hide/show bottom nav
+    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin', 'prescribed-session', 'morning-session'];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
     if (shouldHideNav) {
@@ -220,6 +102,7 @@ export const router = {
       this.setActiveNav(viewName);
     }
 
+    // Load and render the view
     try {
       const view = await this.loadView(viewName);
 
@@ -227,7 +110,9 @@ export const router = {
         if (view.centered) {
           mainContent.classList.add('centered');
         }
+
         mainContent.innerHTML = view.render();
+
         if (view.onMount) {
           view.onMount();
         }
@@ -240,68 +125,37 @@ export const router = {
     this.currentView = viewName;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    // Stop any playing speech when navigating away
     tts.stop();
 
+    // ── Accessibility ──────────────────────────────────────────────────────
     this.announceNavigation(viewName);
     this.moveFocusToContent();
 
+    // Mount TTS speaker buttons on coach cards in the new view
+    // Small delay to ensure the view has fully rendered
     setTimeout(() => tts.mountButtons(), 150);
-  },
-
-  /**
-   * Navigate without pushing to history  used by the popstate handler.
-   * Prevents infinite history stack growth when the user presses back.
-   */
-  _navigateWithoutHistory(viewName) {
-    if (!viewName) return;
-    const main = document.getElementById("main-content");
-    if (!main) return;
-    this.setActiveNav(viewName);
-    this._hideNavForViews(viewName);
-    import(`./views/${viewName}.js`)
-      .then(mod => {
-        main.innerHTML = mod.render ? mod.render() : "";
-        if (mod.onMount) mod.onMount();
-        this.currentView = viewName;
-        this.announceNavigation(viewName);
-        this.moveFocusToContent();
-        setTimeout(() => tts.mountButtons(), 150);
-      })
-      .catch(() => {
-        // View not found  stay on current screen
-      });
-  },
-
-  /**
-   * Hide or show the bottom nav for a given view.
-   * Used by _navigateWithoutHistory which bypasses the main nav logic.
-   */
-  _hideNavForViews(viewName) {
-    const bottomNav = document.getElementById('bottom-nav');
-    if (!bottomNav) return;
-    const hideNavViews = [
-      'onboarding', 'workout', 'workout-complete',
-      'checkin', 'prescribed-session', 'morning-session',
-      'quiet-session', 'yoga-session', 'coach-proposal', 'core-session', 'walk-session',
-      'running-session', 'swim-session', 'cycle-session', 'checkin-mini'
-    ];
-    const shouldHide = hideNavViews.some(v => viewName.startsWith(v));
-    if (shouldHide) {
-      bottomNav.classList.add('hidden');
-    } else {
-      bottomNav.classList.remove('hidden');
-    }
+    // ──────────────────────────────────────────────────────────────────────
   },
 
   /**
    * Write the human-readable view name to #sr-announcer.
-   * Screen readers watch this element (aria-live="polite") and announce it.
-   * Text is cleared first so navigating to the same view twice still fires.
+   *
+   * Screen readers (VoiceOver, TalkBack, NVDA) watch this element because
+   * it has aria-live="polite" and will read its content aloud.
+   *
+   * We clear the text first so that navigating to the same view twice
+   * still triggers a new announcement (live regions only fire on change).
+   *
+   * The 50ms delay lets the DOM settle before the announcement fires,
+   * preventing it from being swallowed by the render cycle.
    */
   announceNavigation(viewName) {
     const announcer = document.getElementById('sr-announcer');
     if (!announcer) return;
+
     const label = VIEW_NAMES[viewName] || this.formatViewName(viewName);
+
     announcer.textContent = '';
     setTimeout(() => {
       announcer.textContent = label;
@@ -309,8 +163,8 @@ export const router = {
   },
 
   /**
-   * Fallback formatter for views not in VIEW_NAMES.
-   * 'onboarding/some-view'  'Some View'
+   * Fallback formatter for views not listed in VIEW_NAMES.
+   * 'onboarding/some-view' → 'Some View'
    */
   formatViewName(viewName) {
     const last = viewName.split('/').pop();
@@ -322,8 +176,16 @@ export const router = {
 
   /**
    * Move keyboard focus to #main-content after navigation.
-   * #main-content has tabindex="-1"  receives focus programmatically
-   * but is not in the normal Tab order.
+   *
+   * #main-content has tabindex="-1" in index.html, which means:
+   *   - It CAN receive focus programmatically (this call)
+   *   - It does NOT appear in the normal Tab key order
+   *
+   * preventScroll:true stops the browser jumping position — we already
+   * handle scrolling with window.scrollTo() above.
+   *
+   * The 100ms delay gives the view render time to complete so that
+   * screen readers read the new content, not the blank state.
    */
   moveFocusToContent() {
     setTimeout(() => {
@@ -339,7 +201,9 @@ export const router = {
     if (this.views[viewName]) {
       return this.views[viewName];
     }
+
     const path = `./views/${viewName}.js`;
+
     try {
       const module = await import(path);
       this.views[viewName] = module;
@@ -378,12 +242,13 @@ export const router = {
 
   /**
    * Highlight the active nav item.
-   * Both 'intention' and 'checkin' map to the Today nav button.
-   * 'today' (coach workout view) also highlights Today.
+   * 'intention' is the home screen — it maps to the Today nav button
+   * (data-view="intention"). 'today' (coach workout view) also highlights
+   * the Today button since it is a sub-path of the Today journey.
    */
   setActiveNav(viewName) {
-    const todayViews = ['intention', 'today', 'checkin', 'coach-proposal'];
-    const navKey = todayViews.includes(viewName) ? 'intention' : viewName;
+    // Treat coach workout view as part of the Today/intention journey
+    const navKey = viewName === 'today' ? 'intention' : viewName;
     document.querySelectorAll('.nav-item').forEach(item => {
       item.classList.toggle('active', item.dataset.view === navKey);
     });
