@@ -356,13 +356,14 @@ function renderGuided() {
         </div>
       </div>
 
-      <div class="je-write-area">
-        <label class="sr-only" for="je-textarea">Your reflection</label>
+      <div style="margin-top: var(--space-4);">
+        <label for="je-textarea" style="display: block; font-size: var(--text-sm); color: var(--color-text-secondary); margin-bottom: var(--space-2);">
+          Your reflection
+        </label>
         <textarea
           id="je-textarea"
-          class="je-textarea"
+          style="width: 100%; min-height: 180px; padding: var(--space-3); font-size: 16px; font-family: inherit; background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); border-radius: var(--radius-md, 8px); resize: vertical; box-sizing: border-box;"
           placeholder="Write whatever comes to mind. There is no right answer."
-          rows="10"
           aria-label="Your reflection"
           aria-describedby="je-privacy-note"
         >${bodyText}</textarea>
@@ -371,7 +372,7 @@ function renderGuided() {
         </p>
       </div>
 
-      <div class="je-actions">
+      <div style="margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3);">
         <button class="btn btn-primary btn-large btn-full" id="je-save-btn"
                 aria-label="Save reflection">
           Save
@@ -396,13 +397,11 @@ function renderFree() {
         <span class="workout-header-title">Write freely</span>
       </div>
 
-      <div class="je-write-area" style="margin-top: var(--space-4);">
-        <label class="sr-only" for="je-textarea">Your writing</label>
+      <div style="margin-top: var(--space-4);">
         <textarea
           id="je-textarea"
-          class="je-textarea je-textarea--free"
+          style="width: 100%; min-height: 240px; padding: var(--space-3); font-size: 16px; font-family: inherit; background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); border-radius: var(--radius-md, 8px); resize: vertical; box-sizing: border-box;"
           placeholder="Whatever's on your mind."
-          rows="14"
           aria-label="Your writing"
           aria-describedby="je-privacy-note-free"
         >${bodyText}</textarea>
@@ -411,7 +410,7 @@ function renderFree() {
         </p>
       </div>
 
-      <div class="je-actions">
+      <div style="margin-top: var(--space-4);">
         <button class="btn btn-primary btn-large btn-full" id="je-save-btn"
                 aria-label="Save entry">
           Save
