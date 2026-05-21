@@ -29,6 +29,7 @@
  */
 
 import { store } from "../store.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
 
@@ -950,6 +951,7 @@ function finaliseSession() {
 }
 
 function resetSession() {
+  dismountSessionGuard();
   phase         = "focus";
   selectedFocus = null;
   selectedMins  = null;
@@ -1037,6 +1039,11 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  mountSessionGuard({
+    isActive: () => phase === "session" || phase === "rest",
+    label:    "core session",
+    onExit:   () => { dismountSessionGuard(); resetSession(); router.navigate("reflect"); }
+  });
 
   // Back / Exit
   document.getElementById("cs-back-btn")?.addEventListener("click", () => {
