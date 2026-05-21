@@ -252,14 +252,16 @@ export function onMount() {
   });
 
   document.getElementById("noticing-breathe-btn")?.addEventListener("click", () => {
-    // Route to existing quiet-session breathing — fully working, consistent UI
     store.set("quietMode", "breathing");
+    store.set("quietReturnRoute", "noticing");
+    store.set("quietLaunchedDirect", true);
     router.navigate("quiet-session");
   });
 
   document.getElementById("noticing-journal-btn")?.addEventListener("click", () => {
-    // Route to existing quiet-session journal — fully working, consistent UI
     store.set("quietMode", "journal");
+    store.set("quietReturnRoute", "noticing");
+    store.set("quietLaunchedDirect", true);
     router.navigate("quiet-session");
   });
 }
