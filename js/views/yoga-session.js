@@ -19,6 +19,7 @@
  */
 
 import { store } from "../store.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
 
@@ -633,6 +634,7 @@ function finaliseSession() {
 }
 
 function resetSession() {
+  dismountSessionGuard();
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   if (restInterval)  { clearInterval(restInterval);  restInterval  = null; }
   phase         = "focus";
@@ -717,6 +719,11 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  mountSessionGuard({
+    isActive: () => phase === "session" || phase === "rest",
+    label:    "yoga session",
+    onExit:   () => { dismountSessionGuard(); resetSession(); router.navigate("reflect"); }
+  });
   document.getElementById("ys-back-btn")?.addEventListener("click", () => {
     if (phase === "focus")    { resetSession(); router.navigate("intention"); }
     else if (phase === "duration") { phase = "focus";    rerender(); }
