@@ -1,8 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 20 May 2026 v1
- * Cache version: alongside-v57
+ * 20 May 2026 v2
+ * Cache version: alongside-v58
+ * Previously alongside-v57
+ *
+ * v58 fixes gym-programme issues and having to re-check-in each time the user uses the app
  *
  * v57 changes (20 May 2026):
  *   Back gesture and version display fixes:
@@ -92,7 +95,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v57";
+const CACHE_NAME = "alongside-v58";
 
 const SHELL_URLS = [
 
