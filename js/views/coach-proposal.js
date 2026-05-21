@@ -820,7 +820,7 @@ export function onMount() {
       if (branchChoice === "build") {
         store.set("sessionBuilderReturnRoute", "coach-proposal");
         cleanup();
-        router.navigate("session-builder");
+        router.navigate("session-builder-ui");
         return;
       }
 
