@@ -302,24 +302,30 @@ function renderModeSelect() {
         </p>
       </div>
 
-      <div class="je-mode-tiles" role="list">
-        <button class="noticing-tile" id="je-guided-btn" role="listitem" aria-label="Get a prompt">
-          <span class="noticing-tile-icon" aria-hidden="true">💬</span>
-          <div class="noticing-tile-body">
-            <span class="noticing-tile-title">Get a prompt</span>
-            <span class="noticing-tile-desc">The coach picks one based on today.</span>
+      <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+
+        <button class="card" id="je-guided-btn"
+                style="display: flex; align-items: center; gap: var(--space-4); text-align: left; width: 100%; cursor: pointer; background: var(--color-surface);"
+                aria-label="Get a prompt — the coach picks one based on today">
+          <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">💬</span>
+          <div style="flex: 1; min-width: 0;">
+            <p style="font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Get a prompt</p>
+            <p class="text-secondary" style="font-size: var(--text-sm);">The coach picks one based on today.</p>
           </div>
-          <span class="noticing-tile-arrow" aria-hidden="true">›</span>
+          <span style="color: var(--color-primary); font-size: 1.25rem;" aria-hidden="true">›</span>
         </button>
 
-        <button class="noticing-tile" id="je-free-btn" role="listitem" aria-label="Write freely">
-          <span class="noticing-tile-icon" aria-hidden="true">✏️</span>
-          <div class="noticing-tile-body">
-            <span class="noticing-tile-title">Write freely</span>
-            <span class="noticing-tile-desc">Blank canvas. No prompt needed.</span>
+        <button class="card" id="je-free-btn"
+                style="display: flex; align-items: center; gap: var(--space-4); text-align: left; width: 100%; cursor: pointer; background: var(--color-surface);"
+                aria-label="Write freely — blank canvas, no prompt needed">
+          <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">✏️</span>
+          <div style="flex: 1; min-width: 0;">
+            <p style="font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Write freely</p>
+            <p class="text-secondary" style="font-size: var(--text-sm);">Blank canvas. No prompt needed.</p>
           </div>
-          <span class="noticing-tile-arrow" aria-hidden="true">›</span>
+          <span style="color: var(--color-primary); font-size: 1.25rem;" aria-hidden="true">›</span>
         </button>
+
       </div>
 
     </div>
