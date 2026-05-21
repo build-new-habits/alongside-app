@@ -1,155 +1,157 @@
 /**
- * session-guard-patch.js
+ * session-guard.js - Back gesture confirmation for active sessions
  *
  * 20 May 2026 v1
  *
- * HOW TO APPLY THIS PATCH
- * =======================
+ * Intercepts the device back gesture (iOS swipe left, Android back button)
+ * during active workout sessions. Without this, the user loses session
+ * progress silently when they accidentally trigger back.
  *
- * STEP 1  Add session-guard.js to your repo
- *   Copy session-guard.js to: js/session-guard.js
- *   (Same level as store.js, router.js, tts.js)
- *
- * STEP 2  Add session-guard.css to your repo
- *   Copy session-guard.css to: css/components/session-guard.css
- *
- * STEP 3  Add the CSS link to index.html
- *   Inside <head>, after your other component CSS links, add:
- *   <link rel="stylesheet" href="css/components/session-guard.css">
- *
- * STEP 4  Patch gym-programme.js (copy-paste replacements below)
- *   See Section A below.
- *
- * STEP 5  Patch all other session files (copy-paste for each)
- *   See Section B below. The same two changes apply to every file.
- *
- * STEP 6  Bump sw.js
- *   Update CACHE_NAME version after all files are saved.
- *
- * =====================================================================
- * SECTION A  gym-programme.js patches
- * =====================================================================
- *
- * CHANGE 1: Add this import at the top of gym-programme.js
- * (after the existing import lines  around line 16)
+ * Usage  add one call at the top of onMount() in any session view:
  *
  *   import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
  *
+ *   export function onMount() {
+ *     mountSessionGuard({
+ *       isActive: () => !postSessionState,   // true while session is running
+ *       onExit:   savePartialAndNavigate,    // called when user confirms exit
+ *       label:    "gym session"              // used in coach message
+ *     });
+ *     // ... rest of onMount
+ *   }
  *
- * CHANGE 2: Replace the entire onMount() function
- * (currently lines 872-877  the last 6 lines of the file)
- * with this:
+ *   // In your cleanup() function:
+ *   dismountSessionGuard();
+ *
+ * How it works:
+ *   1. mountSessionGuard() adds a popstate listener.
+ *   2. When back is pressed and isActive() is true, it pushes a replacement
+ *      history entry (preventing navigation) and shows the confirmation card.
+ *   3. "Stay in session" removes the card. Session continues.
+ *   4. "Exit and save progress" calls onExit(), which the session file
+ *      provides  typically writes a partial activityLog entry then navigates
+ *      to reflect.js or intention.
+ *   5. If isActive() is false (post-session screens) back proceeds normally.
+ *
+ * WCAG 2.2 AA:
+ *   - Dialog has role="dialog", aria-modal="true", aria-label
+ *   - Focus moves to the Stay button on open
+ *   - Both buttons are minimum 44px touch target
+ *   - Dismissed with either button or Escape key
  */
 
-//  GYM-PROGRAMME.JS  replacement onMount() 
+let _guardHandler  = null;
+let _keyHandler    = null;
+let _guardOptions  = null;
 
-export function onMount() {
-  postSessionState = null;
-  intelAnswers     = {};
-  if (activeTimerId) clearInterval(activeTimerId);
+/**
+ * Mount the back gesture guard on a session view.
+ *
+ * @param {object} options
+ * @param {function} options.isActive  - returns true while session is running
+ * @param {function} options.onExit    - called when user confirms exit
+ * @param {string}   options.label     - human label for coach message e.g. "gym session"
+ */
+export function mountSessionGuard({ isActive, onExit, label = "session" }) {
+  // Clean up any previous guard
+  dismountSessionGuard();
 
-  // Guard against accidental back gesture during active session
-  mountSessionGuard({
-    isActive: () => !postSessionState,
-    label:    "gym session",
-    onExit:   () => {
-      // Save partial progress  mark as partial in activityLog
-      const log     = store.get("activityLog") || [];
-      const elapsed = Math.round((Date.now() - (_sessionStartTime || Date.now())) / 60000);
-      log.push({
-        type:        "gym-programme",
-        status:      "partial",
-        session:     activeSessionId,
-        durationMins: elapsed || null,
-        completedAt: new Date().toISOString(),
-        source:      "gym-programme"
-      });
-      store.set("activityLog", log);
-      if (activeTimerId) clearInterval(activeTimerId);
-      dismountSessionGuard();
-      router.navigate("reflect");
-    }
-  });
+  _guardOptions = { isActive, onExit, label };
 
-  wireEvents();
+  _guardHandler = (e) => {
+    if (!_guardOptions) return;
+    if (!_guardOptions.isActive()) return; // Post-session  allow back normally
+
+    // Prevent navigation by pushing a replacement entry
+    history.pushState({ view: "session-guard" }, "", window.location.href);
+
+    // Show confirmation card
+    _showGuardCard(_guardOptions.label, _guardOptions.onExit);
+  };
+
+  window.addEventListener("popstate", _guardHandler);
+
+  // Escape key dismisses if card is open
+  _keyHandler = (e) => {
+    if (e.key === "Escape") _dismissGuardCard();
+  };
+  window.addEventListener("keydown", _keyHandler);
 }
 
 /**
- * NOTE: also add this line near the top of gym-programme.js,
- * alongside the other module-level let declarations (around line 21):
- *
- *   let _sessionStartTime = Date.now();
- *
- * And reset it at the start of wireEvents() by adding this line
- * at the top of the wireEvents() function body:
- *
- *   _sessionStartTime = Date.now();
- *
- * This gives the partial log entry an accurate duration.
- * If you prefer not to add this now, the onExit above already
- * handles the null case gracefully (durationMins will be null).
+ * Dismount  call in session cleanup() to prevent stale listeners.
  */
+export function dismountSessionGuard() {
+  if (_guardHandler) {
+    window.removeEventListener("popstate", _guardHandler);
+    _guardHandler = null;
+  }
+  if (_keyHandler) {
+    window.removeEventListener("keydown", _keyHandler);
+    _keyHandler = null;
+  }
+  _guardOptions = null;
+  _dismissGuardCard();
+}
 
-// =====================================================================
-// SECTION B  patch for all other 6 session files
-// =====================================================================
-//
-// Apply these TWO changes to each of:
-//   core-session.js
-//   yoga-session.js
-//   walk-session.js
-//   running-session.js
-//   swim-session.js
-//   cycle-session.js
-//
-// CHANGE 1: Add this import at the top of each file
-// (after the existing import lines):
-//
-//   import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
-//
-//
-// CHANGE 2: Add these lines at the START of the onMount() function body,
-// before any existing code in onMount():
-//
-//   mountSessionGuard({
-//     isActive: () => true,   // these sessions have no post-session state yet
-//     label:    "session",    // replace with e.g. "yoga session", "run", "walk"
-//     onExit:   () => {
-//       dismountSessionGuard();
-//       router.navigate("reflect");
-//     }
-//   });
-//
-//
-// CHANGE 3 (if the file has a cleanup() function):
-// Add this line at the start of cleanup():
-//
-//   dismountSessionGuard();
-//
-//
-//  Per-file label values 
-//
-//   core-session.js      label: "core session"
-//   yoga-session.js      label: "yoga session"
-//   walk-session.js      label: "walk"
-//   running-session.js   label: "run"
-//   swim-session.js      label: "swim"
-//   cycle-session.js     label: "cycle session"
-//
-// 
-//
-// EXAMPLE  what the patched onMount() looks like in yoga-session.js:
-//
-//   export function onMount() {
-//     mountSessionGuard({
-//       isActive: () => true,
-//       label:    "yoga session",
-//       onExit:   () => {
-//         dismountSessionGuard();
-//         router.navigate("reflect");
-//       }
-//     });
-//     // ... rest of existing onMount code unchanged
-//   }
-//
-//
+//  Card rendering 
+
+function _showGuardCard(label, onExit) {
+  // Only one card at a time
+  if (document.getElementById("session-guard-card")) return;
+
+  const card = document.createElement("div");
+  card.id = "session-guard-card";
+  card.setAttribute("role", "dialog");
+  card.setAttribute("aria-modal", "true");
+  card.setAttribute("aria-label", "Leave session confirmation");
+  card.innerHTML = `
+    <div class="session-guard-backdrop" id="session-guard-backdrop"></div>
+    <div class="session-guard-dialog">
+      <div class="card card-coach session-guard-coach-card">
+        <p class="session-guard-message">
+          Hold on -- if you leave now, this ${label} won't be saved. Are you sure?
+        </p>
+      </div>
+      <div class="session-guard-actions">
+        <button class="btn btn-primary btn-full session-guard-stay"
+                id="session-guard-stay"
+                aria-label="Stay in session">
+          Stay in session
+        </button>
+        <button class="btn btn-ghost btn-full session-guard-exit"
+                id="session-guard-exit"
+                style="margin-top: var(--space-3);"
+                aria-label="Exit and save progress so far">
+          Exit and save progress
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(card);
+
+  // Focus the Stay button  safest default for accessibility
+  setTimeout(() => {
+    document.getElementById("session-guard-stay")?.focus();
+  }, 50);
+
+  document.getElementById("session-guard-stay")?.addEventListener("click", () => {
+    _dismissGuardCard();
+  });
+
+  document.getElementById("session-guard-exit")?.addEventListener("click", () => {
+    _dismissGuardCard();
+    dismountSessionGuard();
+    if (typeof onExit === "function") onExit();
+  });
+
+  document.getElementById("session-guard-backdrop")?.addEventListener("click", () => {
+    _dismissGuardCard();
+  });
+}
+
+function _dismissGuardCard() {
+  const card = document.getElementById("session-guard-card");
+  if (card) card.remove();
+}
