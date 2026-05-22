@@ -1,11 +1,6 @@
 /**
  * coach-proposal.js - Coach Proposal Screen
  *
- * 21 May 2026 v1
- * 22 May 2026 v1 — localDateKey() replaces UTC date string. Fixes early-morning
- *                   date mismatch for UTC+N timezone users. — "Build me a session" branch chip added.
- *                   Routes to session-builder via "build" branchChoice.
- *
  * v1.0 (S4-1, April 2026)
  *
  * The coach arrives with a plan. Not a menu. Not cards.
@@ -43,16 +38,6 @@
  */
 
 import { store } from "../store.js";
-
-// Local date string YYYY-MM-DD — never UTC, so early-morning check-in
-// works correctly for users in UTC+N timezones.
-function localDateKey() {
-  const d    = new Date();
-  const yyyy = d.getFullYear();
-  const mm   = String(d.getMonth() + 1).padStart(2, "0");
-  const dd   = String(d.getDate()).padStart(2, "0");
-  return yyyy + "-" + mm + "-" + dd;
-}
 
 export const centered = false;
 
@@ -108,7 +93,7 @@ const ACTIVITY_LABELS = {
 let proposalState   = "proposal";  // "proposal" | "branching" | "revised" | "activity-pick"
 let currentProposal = null;        // the active proposal object
 let revisedProposal = null;        // the alternative proposal
-let branchChoice    = null;        // "mind" | "build" | "different" | "shorter" | "quieter"
+let branchChoice    = null;        // "mind" | "different" | "shorter" | "quieter"
 
 // ── Proposal engine ───────────────────────────────────────────────────────────
 
@@ -155,7 +140,7 @@ function buildProposal(preferShorter = false) {
   const gymProgramme   = store.get("gymProgrammeWeek");   // null if not started
 
   // Time budget
-  const TIME_MAP      = { micro: 15, quick: 20, short: 30, standard: 40, long: 50, open: 60 };
+  const TIME_MAP      = { micro: 10, quick: 20, short: 30, standard: 40, long: 50, open: 60 };
   let timeBudget      = availableTime ? (TIME_MAP[availableTime] || 40) : 40;
   if (preferShorter)  timeBudget = Math.max(15, Math.round(timeBudget * 0.6));
 
@@ -178,7 +163,7 @@ function buildProposal(preferShorter = false) {
   const hasGymProg     = !!gymProgramme;
 
   // Is today the same day as the last proposal?
-  const todayKey       = localDateKey();
+  const todayKey       = new Date().toISOString().split("T")[0];
   const isRepeatDay    = lastDate === todayKey;
 
   // Preference score helper: how much does the user lean toward a type?
@@ -520,25 +505,34 @@ function makeProposal({ type, target, quietMode, duration, reflection, constrain
  */
 function buildAlternativeProposal() {
   const current    = currentProposal;
-  const timeBudget = 30;
+  // Read actual available time — do not hardcode
+  const availableTime = store.get("availableTime") || null;
+  const TIME_MAP_ALT  = { micro: 10, quick: 20, short: 30, standard: 40, long: 50, open: 60 };
+  const timeBudget    = availableTime ? (TIME_MAP_ALT[availableTime] || 30) : 30;
 
   const alternatives = {
-    "gym":       { type: "quiet",      target: "quiet-session",  quietMode: "breathing", duration: 20,
+    "gym":       { type: "quiet",      target: "quiet-session",  quietMode: "breathing",
+                   duration: Math.min(timeBudget, 20),
                    proposal: "How about something quieter instead. A breathing practice or a short mindful session.",
                    rationale: "Sometimes contrast is the right choice." },
-    "quiet":     { type: "gym",        target: "gym-programme",  quietMode: null,         duration: 35,
+    "quiet":     { type: "gym",        target: "gym-programme",  quietMode: null,
+                   duration: Math.min(timeBudget, 35),
                    proposal: "How about continuing your gym programme after all. You might have more in you than you think.",
                    rationale: "Movement often generates the energy it costs." },
-    "yoga":      { type: "gym",        target: "gym-programme",  quietMode: null,         duration: 40,
+    "yoga":      { type: "gym",        target: "gym-programme",  quietMode: null,
+                   duration: Math.min(timeBudget, 40),
                    proposal: "How about the gym programme instead. A different kind of movement that will complement your recent sessions.",
                    rationale: "Strength work supports mobility over time." },
-    "run":       { type: "walk",       target: "activity-log",   quietMode: null,         duration: 30,
+    "run":       { type: "walk",       target: "activity-log",   quietMode: null,
+                   duration: Math.min(timeBudget, 30),
                    proposal: "How about a walk instead. Same outdoor time, less intensity, still moving.",
                    rationale: "Lower-intensity movement has its own benefits." },
-    "walk":      { type: "quiet",      target: "quiet-session",  quietMode: "mindful",   duration: 15,
+    "walk":      { type: "quiet",      target: "quiet-session",  quietMode: "mindful",
+                   duration: Math.min(timeBudget, 15),
                    proposal: "How about a short mindful session instead. Fifteen minutes of stillness.",
                    rationale: "Rest is movement of a different kind." },
-    "prescribed":{ type: "gym",        target: "gym-programme",  quietMode: null,         duration: 45,
+    "prescribed":{ type: "gym",        target: "gym-programme",  quietMode: null,
+                   duration: Math.min(timeBudget, 45),
                    proposal: "How about the full gym session. Your prescribed work is already built into the warmup.",
                    rationale: "More complete session, same prescribed work included." }
   };
@@ -552,7 +546,7 @@ function buildAlternativeProposal() {
 
 function latestCheckin() {
   const history = store.get("checkinHistory") || {};
-  const todayKey = localDateKey();
+  const todayKey = new Date().toISOString().split("T")[0];
   return history[todayKey] || store.get("lastCheckin") || {};
 }
 
@@ -655,10 +649,6 @@ function renderBranching() {
       <button class="coach-branch-chip" data-branch="mind"
               aria-pressed="false">
         I had something in mind
-      </button>
-      <button class="coach-branch-chip" data-branch="build"
-              aria-pressed="false">
-        Build me a session
       </button>
       <button class="coach-branch-chip" data-branch="different"
               aria-pressed="false">
@@ -771,7 +761,7 @@ function navigateToProposal(proposal) {
   store.set("activityPreferences", prefs);
 
   // Track last proposal type for variety enforcement
-  const todayKey = localDateKey();
+  const todayKey = new Date().toISOString().split("T")[0];
   store.set("lastProposalType", proposal.type);
   store.set("lastProposalDate", todayKey);
 
@@ -828,13 +818,6 @@ export function onMount() {
   document.querySelectorAll(".coach-branch-chip").forEach(chip => {
     chip.addEventListener("click", () => {
       branchChoice = chip.dataset.branch;
-
-      if (branchChoice === "build") {
-        store.set("sessionBuilderReturnRoute", "coach-proposal");
-        cleanup();
-        router.navigate("session-builder-ui");
-        return;
-      }
 
       if (branchChoice === "quieter") {
         store.set("quietMode", "mindful");
