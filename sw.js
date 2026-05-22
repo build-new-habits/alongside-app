@@ -2,7 +2,7 @@
  * sw.js - Alongside Service Worker
  *
  * 22 May 2026 v6
- * Cache version: alongside-v82
+ * Cache version: alongside-v83
  *
  * v82 changes (22 May 2026)
  * - weekly plan built to support personalised gym sessions
@@ -140,7 +140,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v82";
+const CACHE_NAME = "alongside-v83";
 
 const SHELL_URLS = [
 
