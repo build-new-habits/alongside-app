@@ -780,7 +780,7 @@ export function onMount() {
   // ── Header navigation ─────────────────────────────────────────────────────
   document.getElementById("proposal-back-btn")?.addEventListener("click", () => {
     cleanup();
-    router.navigate("checkin");
+    router.back();
   });
 
   document.getElementById("proposal-library-btn")?.addEventListener("click", () => {
