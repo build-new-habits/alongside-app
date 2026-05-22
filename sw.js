@@ -1,8 +1,8 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 22 May 2026 v3
- * Cache version: alongside-v75
+ * 22 May 2026 v4
+ * Cache version: alongside-v76
  *
  * v75 changes (22 May 2026)
  * - Adds knowledge for the coach to understand location and activity type like games.
@@ -134,7 +134,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v75";
+const CACHE_NAME = "alongside-v76";
 
 const SHELL_URLS = [
 
