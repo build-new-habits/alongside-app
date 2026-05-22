@@ -1,8 +1,9 @@
 /**
  * router.js - View navigation
  *
- * 21 May 2026 v1 — Added noticing, breathing-session, journal-entry,
- *                   session-builder routes.
+ * 22 May 2026 v1 — Navigation stack added. router.back() replaces all
+ *                   hardcoded Back destinations. Every Back button calls
+ *                   router.back() — no destination logic needed.
  * Handles routing between different screens
  *
  * Accessibility additions (March 2026):
@@ -42,16 +43,24 @@ const VIEW_NAMES = {
   'prescribed-session':      'Prescribed Exercises',
   'prescribed':              'My Prescribed Exercises',
   'morning-session':         'Morning Session',
-  'noticing':                'Noticing',
-  'breathing-session':       'Breathing',
-  'journal-entry':           'Journal and Reflect',
-  'session-builder-ui':      'Build a Session',
 };
 
 export const router = {
 
   currentView: null,
   views: {},
+  _history: [],
+
+  /**
+   * Go back to the previous view in the navigation stack.
+   * Every Back button in the app calls router.back() — no hardcoded destinations.
+   * Complete/Save/Done actions use router.navigate() directly to Progress.
+   */
+  back() {
+    this._history.pop(); // remove current
+    const previous = this._history.pop(); // get the one before
+    this.navigate(previous || "intention");
+  },
 
   /**
    * Initialise router — determine starting view
@@ -84,10 +93,16 @@ export const router = {
   async navigate(viewName) {
     console.log(`Navigating to: ${viewName}`);
 
-    // Set title immediately — before render, before announcements.
-    // Prevents browser chrome (Edge, Chrome desktop) from picking up
-    // the sr-announcer text or any intermediate DOM state as the page title.
-    document.title = "Alongside";
+    // Push to navigation stack — powers router.back()
+    // Never stack onboarding views or duplicate consecutive entries
+    const isOnboarding = viewName.startsWith("onboarding");
+    const isDuplicate  = this._history.length > 0 &&
+                         this._history[this._history.length - 1] === viewName;
+    if (!isOnboarding && !isDuplicate) {
+      this._history.push(viewName);
+      // Cap stack at 20 to prevent memory growth
+      if (this._history.length > 20) this._history.shift();
+    }
 
     const mainContent = document.getElementById('main-content');
     const bottomNav   = document.getElementById('bottom-nav');
@@ -164,13 +179,7 @@ export const router = {
     announcer.textContent = '';
     setTimeout(() => {
       announcer.textContent = label;
-      // Re-assert title after the timeout in case any async render reset it
-      document.title = "Alongside";
     }, 50);
-
-    // Keep document.title as "Alongside" always — prevents the PWA
-    // standalone chrome from showing the view name in the top bar.
-    document.title = "Alongside";
   },
 
   /**
