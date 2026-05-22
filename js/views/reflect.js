@@ -272,9 +272,8 @@ export function onMount() {
     // Finish (summary screen)
     const finishBtn = e.target.closest("#reflect-finish-btn");
     if (finishBtn) {
-      const returnRoute = store.get("reflectReturnRoute") || "today";
-      store.set("reflectReturnRoute", null);
-      router.navigate(returnRoute);
+      // Reflect is always a "Done" action — land on Progress.
+      router.navigate("progress");
     }
   });
 }
