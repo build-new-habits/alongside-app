@@ -1,6 +1,15 @@
 /**
  * store.js - Data persistence layer
  *
+ * 22 May 2026 v3 --- userTier + tier methods added (S4-3):
+ *   userTier: "personal" | "athlete" | "free"
+ *   Default: "personal" --- all features unlocked for development and beta testing.
+ *   Switch to "free" via the dev panel (triple-tap version in Settings) to test gating.
+ *   isPremium(), isAthlete(), getUserTier(), setTier() added as store methods.
+ *   These are the single source of truth for all tier checks in every view.
+ *   Views must call store.isPremium() --- never hard-code tier logic.
+ *   Stripe/Supabase will write userTier when auth is live (Phase F, August 2026).
+ *
  * 22 May 2026 v2 --- weeklyPlan schema added (S4-3):
  *   weeklyPlanEnabled      --- master toggle (default false)
  *   weeklyPlan             --- seven day slots keyed by day name
@@ -116,6 +125,8 @@ export const store = {
       weeklyPlan:            mergedWeeklyPlan,
       weeklyPlanSetAt:       saved.weeklyPlanSetAt       || null,
       weeklyPlanPromptShown: saved.weeklyPlanPromptShown || false,
+      // Tier: preserve saved value or default to "personal"
+      userTier: ["free", "personal", "athlete"].includes(saved.userTier) ? saved.userTier : "personal",
     };
   },
 
@@ -351,6 +362,14 @@ export const store = {
       weeklyPlanSetAt:       null,
       weeklyPlanPromptShown: false,
 
+      // ------ TIER ----------------------------------------------------
+      // "free" | "personal" | "athlete"
+      // Default: "personal" for development and beta testing.
+      // Stripe sets this when live (Phase F). Dev panel in Settings
+      // (triple-tap version number) lets you switch tiers at any time.
+      // Never gate safety-critical features regardless of tier.
+      userTier: "personal",
+
       // ------ METADATA ---------------------------------------------------------------------------------------------------------------------------------------
       createdAt: null,
       updatedAt: null
@@ -445,5 +464,45 @@ export const store = {
     this.data.progressLog = log;
     this.data.updatedAt = new Date().toISOString();
     this.save();
+  },
+
+  // ---- Tier methods --------------------------------------------------
+  // Single source of truth for all tier checks across every view.
+  // Views import store and call store.isPremium(), store.isAthlete() etc.
+  // Never duplicate this logic in views.
+
+  getUserTier() {
+    if (!this.data) this.init();
+    return this.data.userTier || "personal";
+  },
+
+  isPremium() {
+    const tier = this.getUserTier();
+    return tier === "personal" || tier === "athlete";
+  },
+
+  isAthlete() {
+    return this.getUserTier() === "athlete";
+  },
+
+  isFree() {
+    return this.getUserTier() === "free";
+  },
+
+  /**
+   * Set the user tier. Called by Stripe webhook handler (live) or
+   * the dev panel (testing). Persists immediately.
+   * @param {"free"|"personal"|"athlete"} tier
+   */
+  setTier(tier) {
+    const valid = ["free", "personal", "athlete"];
+    if (!valid.includes(tier)) {
+      console.warn("store.setTier: invalid tier", tier);
+      return;
+    }
+    this.data.userTier = tier;
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+    console.log("Tier set to:", tier);
   }
 };
