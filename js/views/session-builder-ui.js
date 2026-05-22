@@ -28,7 +28,7 @@
 
 import { store }                          from "../store.js";
 import { router }                         from "../router.js";
-import { SESSION_TYPES, buildSession }    from "../session-builder.js";
+import { SESSION_TYPES, buildSession }    from "../session-builder-engine.js";
 
 export const centered = false;
 
@@ -156,18 +156,30 @@ function renderDurationPicker() {
         <p class="coach-message-text">How long have you got today?</p>
       </div>
 
-      <div class="sb-duration-grid" role="group" aria-label="Choose duration">
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);"
+           role="group" aria-label="Choose duration">
         ${DURATIONS.map(d => {
-          const locked = !premium && d.mins !== 30;
+          const locked  = !premium && d.mins !== 30;
+          const opacity = locked ? "0.45" : "1";
+          const cursor  = locked ? "default" : "pointer";
+          const recLabel = (!locked && d.mins === 30)
+            ? "<span style='font-size:var(--text-xs);color:var(--color-primary);flex-shrink:0;'>Recommended</span>"
+            : "";
+          const lockLabel = locked
+            ? "<span style='font-size:var(--text-xs);color:var(--color-primary);flex-shrink:0;'>Personal</span>"
+            : "";
+          const ariaLabel = d.label + ": " + d.desc + (locked ? " — Personal tier" : "");
           return `
-            <button class="sb-duration-btn ${locked ? "sb-duration-btn--locked" : ""} ${d.mins === 30 ? "sb-duration-btn--recommended" : ""}"
+            <button class="card sb-duration-btn"
                     data-mins="${d.mins}"
                     ${locked ? "disabled" : ""}
-                    aria-label="${d.label}: ${d.desc}${locked ? " — Personal tier" : ""}">
-              <span class="sb-duration-label">${d.label}</span>
-              <span class="sb-duration-desc text-xs text-muted">${d.desc}</span>
-              ${!locked && d.mins === 30 ? '<span class="sb-recommended text-xs">Recommended</span>' : ""}
-              ${locked ? '<span class="sb-lock-badge" aria-hidden="true">Personal</span>' : ""}
+                    style="display:flex;align-items:center;justify-content:space-between;text-align:left;width:100%;cursor:${cursor};opacity:${opacity};background:var(--color-surface);"
+                    aria-label="${ariaLabel}">
+              <div>
+                <span style="font-size:var(--text-lg);font-weight:var(--font-semibold);">${d.label}</span>
+                <span class="text-secondary" style="font-size:var(--text-sm);margin-left:var(--space-2);">${d.desc}</span>
+              </div>
+              ${recLabel}${lockLabel}
             </button>
           `;
         }).join("")}
@@ -200,17 +212,22 @@ function renderEquipmentCheck() {
         </p>
       </div>
 
-      <div class="sb-equipment-list" role="group" aria-label="Equipment available today">
-        ${EQUIPMENT_OPTIONS.map(opt => `
-          <label class="sb-equipment-item">
-            <input type="checkbox"
-                   class="sb-equipment-check"
-                   data-equipment="${opt.id}"
-                   ${equipSet.has(opt.id) ? "checked" : ""}
-                   aria-label="${opt.label}">
-            <span class="sb-equipment-label">${opt.label}</span>
-          </label>
-        `).join("")}
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);"
+           role="group" aria-label="Equipment available today">
+        ${EQUIPMENT_OPTIONS.map(opt => {
+          const checked = equipSet.has(opt.id);
+          return `
+            <label style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-surface);border-radius:var(--radius-md,8px);cursor:pointer;border:1px solid ${checked ? "var(--color-primary)" : "transparent"};">
+              <input type="checkbox"
+                     class="sb-equipment-check"
+                     data-equipment="${opt.id}"
+                     ${checked ? "checked" : ""}
+                     style="width:20px;height:20px;accent-color:var(--color-primary);flex-shrink:0;cursor:pointer;"
+                     aria-label="${opt.label}">
+              <span style="font-size:var(--text-base);">${opt.label}</span>
+            </label>
+          `;
+        }).join("")}
       </div>
 
       <button class="btn btn-primary btn-large btn-full" id="sb-build-btn"
