@@ -2,7 +2,10 @@
  * sw.js - Alongside Service Worker
  *
  * 22 May 2026 v6
- * Cache version: alongside-v81
+ * Cache version: alongside-v82
+ *
+ * v82 changes (22 May 2026)
+ * - weekly plan built to support personalised gym sessions
  *
  * v77 changes (22 May 2026)
  * - Gym session opens a three-option sub-screen Founder's Gym Programme; Build a session; Morning Cardio & Core
@@ -137,7 +140,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v81";
+const CACHE_NAME = "alongside-v82";
 
 const SHELL_URLS = [
 
