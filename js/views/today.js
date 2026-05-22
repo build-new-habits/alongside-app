@@ -207,7 +207,7 @@ function renderTodaysDashboard(name) {
               : ""
             }
           </div>
-          <div class="time-strip-chips" id="time-strip-chips" role="group" aria-label="Change available workout time">
+          <div class="time-strip-chips" id="time-strip-chips" role="group" aria-label="Change available workout time" style="display:flex;flex-wrap:wrap;gap:var(--space-2);">
             ${TIME_OPTIONS.map(opt => `
               <button
                 type="button"
@@ -273,11 +273,13 @@ function renderWorkoutCard(workout, index) {
 
       <p class="workout-rationale">${workout.rationale}</p>
 
-      <div class="exercise-full-list" aria-label="Exercise list">
+      <div class="exercise-full-list" aria-label="Exercise list"
+           style="display:flex;flex-direction:column;gap:var(--space-2);margin:var(--space-4) 0;">
         ${workout.exercises.map(e => `
-          <div class="exercise-list-row">
+          <div class="exercise-list-row"
+               style="display:flex;justify-content:space-between;align-items:baseline;padding:var(--space-1) 0;border-bottom:1px solid rgba(255,255,255,0.05);">
             <span class="exercise-list-name">${e.name}</span>
-            <span class="exercise-list-prescription">${formatPrescription(e)}</span>
+            <span class="exercise-list-prescription" style="color:var(--color-text-secondary);font-size:var(--text-sm);flex-shrink:0;margin-left:var(--space-3);">${formatPrescription(e)}</span>
           </div>
         `).join("")}
       </div>
@@ -360,7 +362,7 @@ function renderGymConditionCard() {
     "knee-pain":        { zone: "lower-limb", label: "knees",          guidance: "Avoid deep knee flexion and heavy leg press. Box squats and leg extensions at partial range are usually fine. Notice any sharp pain and stop if it arrives." },
     "hip-pain":         { zone: "lower-limb", label: "hips",           guidance: "Favour unilateral work with controlled range. Hip hinges are often manageable -- monitor how your hip responds in the first set and adjust from there." },
     "hamstring":        { zone: "lower-limb", label: "hamstrings",      guidance: "Avoid maximal loaded lengthening today. Romanian deadlifts at reduced range and load are an option. Warm up slowly and notice any pulling sensation." },
-    "lower-back":       { zone: "spine",      label: "lower back",      guidance: "Avoid axial loading under fatigue -- heavy squats and deadlifts carry more risk today. Upper body, machine work, and supported positions are safer choices." },
+    "lower-back":       { zone: "spine",      label: "lower back",      guidance: "Avoid loading your spine under fatigue — heavy squats and deadlifts (exercises where weight presses down through your spine) carry more risk today. Upper body work, machines, and exercises where you can sit or lie down are safer choices." },
     "upper-back":       { zone: "spine",      label: "upper back",      guidance: "Rows and pulling movements may aggravate this. Pressing from a supported position is usually fine. Notice any increase in stiffness between sets." },
     "shoulder-pain":    { zone: "upper-limb", label: "shoulders",       guidance: "Overhead pressing is higher risk today. Horizontal pressing at reduced load and cables in pain-free range are reasonable. Stop if you feel impingement." },
     "rotator-cuff":     { zone: "upper-limb", label: "rotator cuff",    guidance: "Internal rotation under load is the main thing to watch. Avoid behind-the-neck movements entirely. Cables and light isolation work in supported range are safer." },
@@ -380,12 +382,13 @@ function renderGymConditionCard() {
   function severityLabel(score) {
     if (score >= 7) return "high";
     if (score >= 4) return "moderate";
-    return "mild";
+    if (score >= 1) return "mild";
+    return "low";
   }
 
   const items = flagged.map(f => `
-    <div class="gym-condition-item">
-      <p class="gym-condition-flag">
+    <div class="gym-condition-item" style="margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <p class="gym-condition-flag" style="margin-bottom: var(--space-2);">
         <strong>${f.label.charAt(0).toUpperCase() + f.label.slice(1)}</strong>
         is flagged at ${severityLabel(f.score)} today.
       </p>
@@ -551,7 +554,8 @@ function renderModerateZoneMessage() {
     const msg = messages[zone];
     if (!msg) continue;
     parts.push(`
-      <div class="moderate-zone-banner" role="note" aria-label="${msg.label}">
+      <div class="moderate-zone-banner" role="note" aria-label="${msg.label}"
+           style="margin-bottom: var(--space-4);">
         <span class="moderate-zone-icon" aria-hidden="true">${msg.icon}</span>
         <div class="moderate-zone-body">
           <span class="moderate-zone-label">${msg.label}</span>
