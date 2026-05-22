@@ -231,6 +231,12 @@ export const store = {
       //         | "classes" | "mixed" | null
       movementIdentity: null,
 
+      // ── SESSION LOCATION ─────────────────────────────────────
+      // Set at check-in. Used by coach proposal to tailor suggestions.
+      // "home" | "gym" | "outdoors" | null (not specified)
+      // Cleared at next day's check-in. Weekly plan overrides this.
+      sessionLocation: null,
+
       // ── COACH PROPOSAL ────────────────────────────────────────
       // Tracks the last proposal made to avoid identical repetition.
       // { type, date } — cleared on new day.
