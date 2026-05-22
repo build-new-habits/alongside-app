@@ -1,20 +1,22 @@
 /**
  * settings.js - Settings view
  *
- * 18 May 2026 v1
+ * 22 May 2026 v1 --- My Week tab added (S4-3):
+ *   Fifth tab: "My Week" --- weekly plan builder.
+ *   7-day grid (Mon-Sun), each day configurable with type, session type,
+ *   duration, activity name (class type), and notification time.
+ *   Free tier: toggle locked with upgrade prompt after 4th session.
+ *   Personal tier: full access --- create, edit, save, toggle on/off.
+ *   Save writes weeklyPlan, weeklyPlanSetAt, weeklyPlanEnabled to store.
+ *   Day config is an inline modal-style panel below the grid.
  *
- * v2.1 — Editable profile, facility presets, add/remove conditions, Morning Routine:
- *   Profile tab: inline edit for name, age, gender, weight.
- *   Equipment tab: Facility Presets at top — tap to auto-fill matching equipment.
- *   Conditions tab: add from full list + remove existing.
- *   Library: Morning Routine card added under Guided Sessions.
- *   Voice speed: 10-level slider (0.5–1.5 range).
- *   Library tab deep-link: reads store.get("settingsTab") on render.
+ * 18 May 2026 v1 --- Editable profile, facility presets, add/remove conditions,
+ *   Morning Routine. Library tab deep-link. Voice speed 10-level slider.
  *
- * v2.0 — Library tab + My Movement + 10-level voice speed slider
- * v1.4 — App version display and update check button (S3-6)
- * v1.3 — Check-in notification (S3-6)
- * v1.0 — Tabbed layout: Profile / Conditions / Equipment
+ * v2.0 --- Library tab + My Movement + 10-level voice speed slider
+ * v1.4 --- App version display and update check button (S3-6)
+ * v1.3 --- Check-in notification (S3-6)
+ * v1.0 --- Tabbed layout: Profile / Conditions / Equipment
  */
 
 import { store }                        from "../store.js";
@@ -23,248 +25,151 @@ import { EQUIPMENT_CATEGORIES }         from "../data/equipment.js";
 
 export const centered = false;
 
-// ── Tab state ─────────────────────────────────────────────────────────────────
+// -- Tab state ----------------------------------------------------------------
 let activeTab    = "profile";
 let editingField = null;
 
-// ── Coach styles ──────────────────────────────────────────────────────────────
+// -- Coach styles -------------------------------------------------------------
 const COACH_STYLES = [
-  { id: "steady",    label: "Steady",    description: "Calm, consistent, and supportive. Never rushed.",    icon: "🌿" },
-  { id: "energetic", label: "Energetic", description: "Upbeat, motivating, and enthusiastic.",              icon: "⚡" },
-  { id: "minimal",   label: "Minimal",   description: "Short, direct, and to the point. No fluff.",         icon: "🎯" },
-  { id: "nurturing", label: "Nurturing", description: "Warm, gentle, and emotionally attentive.",           icon: "💛" }
+  { id: "steady",    label: "Steady",    description: "Calm, consistent, and supportive. Never rushed.",    icon: "&#127807;" },
+  { id: "energetic", label: "Energetic", description: "Upbeat, motivating, and enthusiastic.",              icon: "&#9889;" },
+  { id: "minimal",   label: "Minimal",   description: "Short, direct, and to the point. No fluff.",         icon: "&#127919;" },
+  { id: "nurturing", label: "Nurturing", description: "Warm, gentle, and emotionally attentive.",           icon: "&#128155;" }
 ];
 
-// ── Movement identities ───────────────────────────────────────────────────────
+// -- Movement identities ------------------------------------------------------
 const MOVEMENT_IDENTITIES = [
-  { id: "gym",      label: "Gym / weights",  icon: "🏋" },
-  { id: "yoga",     label: "Yoga / pilates", icon: "🧘" },
-  { id: "running",  label: "Running",        icon: "🏃" },
-  { id: "walking",  label: "Walking",        icon: "🚶" },
-  { id: "swimming", label: "Swimming",       icon: "🏊" },
-  { id: "classes",  label: "Classes",        icon: "🏥" },
-  { id: "mixed",    label: "A mix of things",icon: "✨" },
+  { id: "gym",      label: "Gym / weights",   icon: "&#127947;" },
+  { id: "yoga",     label: "Yoga / pilates",  icon: "&#129368;" },
+  { id: "running",  label: "Running",         icon: "&#127939;" },
+  { id: "walking",  label: "Walking",         icon: "&#128694;" },
+  { id: "swimming", label: "Swimming",        icon: "&#127946;" },
+  { id: "classes",  label: "Classes",         icon: "&#127973;" },
+  { id: "mixed",    label: "A mix of things", icon: "&#10024;" },
 ];
 
-// ── Log activity groups ───────────────────────────────────────────────────────
-const LOG_ACTIVITIES = [
-  {
-    group: "Cardio",
-    items: [
-      { id: "run",    label: "Run",    icon: "🏃" },
-      { id: "walk",   label: "Walk",   icon: "🚶" },
-      { id: "cycle",  label: "Cycle",  icon: "🚴" },
-      { id: "swim",   label: "Swim",   icon: "🏊" },
-      { id: "row",    label: "Row",    icon: "🚣" },
-      { id: "hiking", label: "Hike",   icon: "🥾" },
-    ]
-  },
-  {
-    group: "Classes and sessions",
-    items: [
-      { id: "boxing",       label: "Boxing",       icon: "🥊" },
-      { id: "spin",         label: "Spin",         icon: "🚴" },
-      { id: "hiit",         label: "HIIT",         icon: "⚡" },
-      { id: "body-balance", label: "Body Balance", icon: "🧘" },
-      { id: "class",        label: "Other class",  icon: "🏥" },
-    ]
-  },
-  {
-    group: "Mindful and gentle",
-    items: [
-      { id: "yoga",    label: "Yoga",          icon: "🧘" },
-      { id: "pilates", label: "Pilates",       icon: "🧘" },
-      { id: "tai-chi", label: "Tai chi",       icon: "🌿" },
-      { id: "mindful", label: "Mindful walk",  icon: "🌿" },
-      { id: "custom",  label: "Something else",icon: "❔" },
-    ]
-  }
+// -- Weekly plan constants ----------------------------------------------------
+const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+const DAY_LABELS = {
+  monday: "Monday", tuesday: "Tuesday", wednesday: "Wednesday",
+  thursday: "Thursday", friday: "Friday", saturday: "Saturday", sunday: "Sunday"
+};
+
+const DAY_TYPES = [
+  { id: "open",     label: "No plan",       desc: "Coach decides based on check-in",        icon: "&#8212;" },
+  { id: "gym",      label: "Gym session",   desc: "Strength, cardio, or full body",          icon: "&#127947;" },
+  { id: "rest",     label: "Rest day",      desc: "No movement planned",                     icon: "&#128564;" },
+  { id: "recovery", label: "Recovery",      desc: "Light movement -- walk, swim, yoga",      icon: "&#127807;" },
+  { id: "class",    label: "Class planned", desc: "Yoga, Body Balance, tennis, or similar",  icon: "&#129368;" },
 ];
 
-// ── Facility presets ──────────────────────────────────────────────────────────
-
-// ── Equipment tab state ───────────────────────────────────────────────────────
-let equipmentScreen = "facilities";  // "facilities" | facility-id (e.g. "home", "gym-full")
-
-// Facility definitions — each has a scope and an equipment subset
-const FACILITY_DEFS = [
-  {
-    id:          "gym-full",
-    label:       "Full gym",
-    icon:        "\uD83C\uDFCB",
-    scope:       "gym",
-    description: "Fully-equipped gym — weights, machines, cardio",
-    equipment:   [
-      "dumbbells-light", "dumbbells-medium", "dumbbells-heavy", "adjustable-dumbbells",
-      "kettlebell-light", "kettlebell-medium", "kettlebell-heavy",
-      "barbell", "ez-curl-bar",
-      "band-light", "band-medium", "band-heavy",
-      "treadmill", "exercise-bike", "rowing-machine", "elliptical",
-      "bench-flat", "bench-adjustable",
-      "pull-up-bar", "dip-station",
-      "stability-ball", "ab-wheel",
-      "foam-roller", "massage-gun",
-      "gym-membership"
-    ]
-  },
-  {
-    id:          "swimming-pool",
-    label:       "Swimming pool",
-    icon:        "\uD83C\uDFCA",
-    scope:       "gym",
-    description: "Pool access — lane swimming, aqua fitness",
-    equipment:   ["swimming-pool"]
-  },
-  {
-    id:          "fitness-studio",
-    label:       "Fitness studio",
-    icon:        "\uD83C\uDFE5",
-    scope:       "gym",
-    description: "Studio classes — yoga, pilates, spin, circuits",
-    equipment:   ["fitness-studio", "yoga-mat", "band-light", "band-medium", "step-platform"]
-  },
-  {
-    id:          "home",
-    label:       "Home setup",
-    icon:        "\uD83C\uDFE0",
-    scope:       "home",
-    description: "What you have at home",
-    equipment:   []  // home is fully customisable — no preset fill
-  },
-  {
-    id:          "no-equipment",
-    label:       "Bodyweight only",
-    icon:        "\uD83D\uDEB6",
-    scope:       "home",
-    description: "No equipment — floor space is enough",
-    equipment:   []
-  },
+const SESSION_TYPES = [
+  { id: "upper",    label: "Upper Body" },
+  { id: "lower",    label: "Lower Body" },
+  { id: "full",     label: "Full Body" },
+  { id: "core",     label: "Core & Stability" },
+  { id: "cardio",   label: "Cardio" },
+  { id: "hiit",     label: "HIIT" },
+  { id: "mobility", label: "Mobility" },
 ];
 
-// Get the equipment list currently stored for a given facility scope
-function getEquipmentForScope(scope) {
-  if (scope === "home") return store.get("homeEquipment") || [];
-  return store.get("gymEquipment") || [];
+const DURATION_OPTIONS = [20, 30, 45, 60, 75, 90];
+
+// Weekly plan local edit state (not saved until "Save my week")
+let weeklyPlanDraft = null;
+let configuringDay  = null;  // day name being configured, or null
+
+function initDraft() {
+  const saved = store.get("weeklyPlan") || {};
+  const defaultSlot = {
+    type: "open", sessionType: null, durationMins: null,
+    label: null, notificationEnabled: false, notificationTime: null, activityName: null
+  };
+  const draft = {};
+  DAYS.forEach(day => {
+    draft[day] = { ...defaultSlot, ...(saved[day] || {}) };
+  });
+  weeklyPlanDraft = draft;
 }
 
-// Save equipment list for a given scope — keeps union in equipment[]
+function isPremium() {
+  return store.get("isPremium") || store.get("tier") === "personal" || store.get("tier") === "athlete" || false;
+}
+
+// -- Equipment tab state ------------------------------------------------------
+let equipmentScreen = "facilities";
+
+const FACILITY_DEFS = [
+  {
+    id: "gym-full", label: "Full gym", icon: "&#127947;", scope: "gym",
+    description: "Fully-equipped gym -- weights, machines, cardio",
+    equipment: [
+      "dumbbells-light","dumbbells-medium","dumbbells-heavy","adjustable-dumbbells",
+      "kettlebell-light","kettlebell-medium","kettlebell-heavy",
+      "barbell","ez-curl-bar",
+      "band-light","band-medium","band-heavy",
+      "treadmill","exercise-bike","rowing-machine","elliptical",
+      "bench-flat","bench-adjustable",
+      "pull-up-bar","dip-station",
+      "stability-ball","ab-wheel",
+      "foam-roller","massage-gun","gym-membership"
+    ]
+  },
+  { id: "swimming-pool",  label: "Swimming pool",  icon: "&#127946;", scope: "gym",  description: "Pool access -- lane swimming, aqua fitness", equipment: ["swimming-pool"] },
+  { id: "fitness-studio", label: "Fitness studio", icon: "&#127973;", scope: "gym",  description: "Studio classes -- yoga, pilates, spin, circuits", equipment: ["fitness-studio","yoga-mat","band-light","band-medium","step-platform"] },
+  { id: "home",           label: "Home setup",     icon: "&#127968;", scope: "home", description: "What you have at home", equipment: [] },
+  { id: "no-equipment",   label: "Bodyweight only",icon: "&#128694;", scope: "home", description: "No equipment -- floor space is enough", equipment: [] },
+];
+
+const FACILITY_PRESETS = [
+  { id: "gym-full",      label: "Full gym",      icon: "&#127947;", scope: "gym",  fills: ["dumbbells-light","dumbbells-medium","dumbbells-heavy","adjustable-dumbbells","kettlebell-light","kettlebell-medium","kettlebell-heavy","barbell","ez-curl-bar","band-light","band-medium","band-heavy","treadmill","exercise-bike","rowing-machine","elliptical","bench-flat","bench-adjustable","pull-up-bar","dip-station","stability-ball","ab-wheel","foam-roller","massage-gun","gym-membership"] },
+  { id: "home-setup",    label: "Home setup",    icon: "&#127968;", scope: "home", fills: ["dumbbells-light","dumbbells-medium","band-light","band-medium","yoga-mat","pull-up-bar","bench-adjustable","foam-roller"] },
+  { id: "swimming-pool", label: "Swimming pool", icon: "&#127946;", scope: "gym",  fills: ["swimming-pool"] },
+  { id: "fitness-studio",label: "Fitness studio",icon: "&#127973;", scope: "gym",  fills: ["fitness-studio","yoga-mat","band-light","band-medium","step-platform"] },
+  { id: "no-equipment",  label: "No equipment",  icon: "&#128694;", scope: "home", fills: [] }
+];
+
+function getEquipmentForScope(scope) {
+  return scope === "home" ? (store.get("homeEquipment") || []) : (store.get("gymEquipment") || []);
+}
+
 function saveEquipmentForScope(scope, items) {
-  if (scope === "home") {
-    store.set("homeEquipment", items);
-  } else {
-    store.set("gymEquipment", items);
-  }
+  if (scope === "home") store.set("homeEquipment", items);
+  else                  store.set("gymEquipment",  items);
   const gym  = store.get("gymEquipment")  || [];
   const home = store.get("homeEquipment") || [];
   store.set("equipment", Array.from(new Set([...gym, ...home])));
 }
 
-// Check if a facility is currently "active" (has any equipment from its preset)
 function isFacilityActive(facility) {
-  if (facility.equipment.length === 0) {
-    // bodyweight or home — active if scope has any items
-    const items = getEquipmentForScope(facility.scope);
-    return items.length >= 0 && store.get(facility.scope === "home" ? "homeEquipment" : "gymEquipment") !== null;
-  }
+  if (facility.equipment.length === 0) return false;
   const current = getEquipmentForScope(facility.scope);
   return facility.equipment.some(eq => current.includes(eq));
 }
 
-// Toggle a facility — if active remove its equipment, if inactive add it
 function toggleFacility(facilityId) {
   const facility = FACILITY_DEFS.find(f => f.id === facilityId);
   if (!facility) return;
-  const current = getEquipmentForScope(facility.scope);
-  const isActive = facility.equipment.length > 0
-    ? facility.equipment.some(eq => current.includes(eq))
-    : false;
-
+  const current  = getEquipmentForScope(facility.scope);
+  const isActive = facility.equipment.length > 0 && facility.equipment.some(eq => current.includes(eq));
   if (isActive && facility.equipment.length > 0) {
-    // Deselect — remove this facility's equipment
-    // Only remove items that were in this preset, not all gym equipment
-    const updated = current.filter(eq => !facility.equipment.includes(eq));
-    saveEquipmentForScope(facility.scope, updated);
+    saveEquipmentForScope(facility.scope, current.filter(eq => !facility.equipment.includes(eq)));
   } else if (!isActive && facility.equipment.length > 0) {
-    // Select — add preset equipment
-    const updated = Array.from(new Set([...current, ...facility.equipment]));
-    saveEquipmentForScope(facility.scope, updated);
+    saveEquipmentForScope(facility.scope, Array.from(new Set([...current, ...facility.equipment])));
   }
 }
 
-// ── Facility presets — correct IDs from equipment.js ─────────────────────────
-// IDs verified against EQUIPMENT_CATEGORIES in js/data/equipment.js
-// Full gym fills both equipment[] (gym) and gymEquipment[] store keys.
-// Home setup fills homeEquipment[] store key separately.
-
-const FACILITY_PRESETS = [
-  {
-    id:    "gym-full",
-    label: "Full gym",
-    icon:  "\uD83C\uDFCB",
-    scope: "gym",   // writes to gymEquipment
-    fills: [
-      "dumbbells-light", "dumbbells-medium", "dumbbells-heavy", "adjustable-dumbbells",
-      "kettlebell-light", "kettlebell-medium", "kettlebell-heavy",
-      "barbell", "ez-curl-bar",
-      "band-light", "band-medium", "band-heavy",
-      "treadmill", "exercise-bike", "rowing-machine", "elliptical",
-      "bench-flat", "bench-adjustable",
-      "pull-up-bar", "dip-station",
-      "stability-ball", "ab-wheel",
-      "foam-roller", "massage-gun",
-      "gym-membership"
-    ]
-  },
-  {
-    id:    "home-setup",
-    label: "Home setup",
-    icon:  "\uD83C\uDFE0",
-    scope: "home",  // writes to homeEquipment
-    fills: [
-      "dumbbells-light", "dumbbells-medium",
-      "band-light", "band-medium",
-      "yoga-mat", "pull-up-bar",
-      "bench-adjustable", "foam-roller"
-    ]
-  },
-  {
-    id:    "swimming-pool",
-    label: "Swimming pool",
-    icon:  "\uD83C\uDFCA",
-    scope: "gym",
-    fills: ["swimming-pool"]
-  },
-  {
-    id:    "fitness-studio",
-    label: "Fitness studio",
-    icon:  "\uD83C\uDFE5",
-    scope: "gym",
-    fills: ["fitness-studio", "yoga-mat", "band-light", "band-medium", "step-platform"]
-  },
-  {
-    id:    "no-equipment",
-    label: "No equipment",
-    icon:  "\uD83D\uDEB6",
-    scope: "home",
-    fills: []
-  }
-];
-
-// ── Voice speed — 10 levels ───────────────────────────────────────────────────
-const SPEED_MIN   = 0.5;
-const SPEED_MAX   = 1.5;
-const SPEED_STEPS = 10;
+// -- Voice speed --------------------------------------------------------------
+const SPEED_MIN = 0.5, SPEED_MAX = 1.5, SPEED_STEPS = 10;
 
 function rateToPosition(rate) {
-  const pos = Math.round(((rate - SPEED_MIN) / (SPEED_MAX - SPEED_MIN)) * (SPEED_STEPS - 1)) + 1;
-  return Math.max(1, Math.min(SPEED_STEPS, pos));
+  return Math.max(1, Math.min(SPEED_STEPS,
+    Math.round(((rate - SPEED_MIN) / (SPEED_MAX - SPEED_MIN)) * (SPEED_STEPS - 1)) + 1));
 }
-
 function positionToRate(pos) {
-  const rate = SPEED_MIN + ((pos - 1) / (SPEED_STEPS - 1)) * (SPEED_MAX - SPEED_MIN);
-  return Math.round(rate * 100) / 100;
+  return Math.round((SPEED_MIN + ((pos - 1) / (SPEED_STEPS - 1)) * (SPEED_MAX - SPEED_MIN)) * 100) / 100;
 }
-
 function speedLabel(rate) {
   if (rate <= 0.6)  return "Very slow";
   if (rate <= 0.75) return "Slow";
@@ -275,7 +180,7 @@ function speedLabel(rate) {
   return "Very fast";
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
+// -- Render -------------------------------------------------------------------
 
 export function render() {
   const requestedTab = store.get("settingsTab");
@@ -295,20 +200,29 @@ export function render() {
       <div class="settings-tabs" role="tablist" aria-label="Settings sections">
         <button class="settings-tab ${activeTab === "profile"    ? "active" : ""}"
                 role="tab" aria-selected="${activeTab === "profile"}"
-                aria-controls="settings-tab-panel" id="tab-profile" data-tab="profile"
-        >Profile</button>
+                aria-controls="settings-tab-panel" id="tab-profile" data-tab="profile">
+          Profile
+        </button>
         <button class="settings-tab ${activeTab === "conditions" ? "active" : ""}"
                 role="tab" aria-selected="${activeTab === "conditions"}"
-                aria-controls="settings-tab-panel" id="tab-conditions" data-tab="conditions"
-        >Conditions</button>
+                aria-controls="settings-tab-panel" id="tab-conditions" data-tab="conditions">
+          Conditions
+        </button>
         <button class="settings-tab ${activeTab === "equipment"  ? "active" : ""}"
                 role="tab" aria-selected="${activeTab === "equipment"}"
-                aria-controls="settings-tab-panel" id="tab-equipment" data-tab="equipment"
-        >Equipment</button>
+                aria-controls="settings-tab-panel" id="tab-equipment" data-tab="equipment">
+          Equipment
+        </button>
         <button class="settings-tab ${activeTab === "library"    ? "active" : ""}"
                 role="tab" aria-selected="${activeTab === "library"}"
-                aria-controls="settings-tab-panel" id="tab-library" data-tab="library"
-        >Library</button>
+                aria-controls="settings-tab-panel" id="tab-library" data-tab="library">
+          Library
+        </button>
+        <button class="settings-tab ${activeTab === "myweek"     ? "active" : ""}"
+                role="tab" aria-selected="${activeTab === "myweek"}"
+                aria-controls="settings-tab-panel" id="tab-myweek" data-tab="myweek">
+          My Week
+        </button>
       </div>
 
       <div id="settings-tab-panel" role="tabpanel"
@@ -348,17 +262,18 @@ export function render() {
   `;
 }
 
-// ── Tab content ───────────────────────────────────────────────────────────────
+// -- Tab content --------------------------------------------------------------
 
 function renderActiveTab() {
   if (activeTab === "profile")    return renderProfileTab();
   if (activeTab === "conditions") return renderConditionsTab();
   if (activeTab === "equipment")  return renderEquipmentTab();
   if (activeTab === "library")    return renderLibraryTab();
+  if (activeTab === "myweek")     return renderMyWeekTab();
   return "";
 }
 
-// ── Profile tab ───────────────────────────────────────────────────────────────
+// -- Profile tab --------------------------------------------------------------
 
 function renderProfileTab() {
   const name       = store.get("name")       || "";
@@ -414,13 +329,12 @@ function renderProfileTab() {
 
   return `
     <section aria-labelledby="profile-heading">
-
       <h2 id="profile-heading" class="section-heading">Your profile</h2>
       <div class="card settings-profile-card" id="profile-card">
         ${editableRow("name",   "Name",   name   || "Not set", "text")}
         ${editableRow("age",    "Age",    age    ? String(age) : "Not set", "number", 'min="1" max="120"')}
         ${editableRow("gender", "Gender", formatGender(gender), "text")}
-        ${editableRow("weight", "Weight", weight ? `${weight}${weightUnit}` : "Not set", "number", 'min="1" max="500" step="0.1"')}
+        ${editableRow("weight", "Weight", weight ? weight + weightUnit : "Not set", "number", 'min="1" max="500" step="0.1"')}
       </div>
 
       <h2 class="section-heading" style="margin-top: var(--space-6);">Coach style</h2>
@@ -445,12 +359,11 @@ function renderProfileTab() {
 
       <h2 class="section-heading" style="margin-top: var(--space-6);">Check-in reminder</h2>
       ${renderNotificationSection()}
-
     </section>
   `;
 }
 
-// ── Conditions tab ────────────────────────────────────────────────────────────
+// -- Conditions tab -----------------------------------------------------------
 
 function renderConditionsTab() {
   const conditions = store.get("conditions") || [];
@@ -506,12 +419,9 @@ function renderConditionsTab() {
   `;
 }
 
-// ── Equipment tab ─────────────────────────────────────────────────────────────
+// -- Equipment tab ------------------------------------------------------------
 
 function renderEquipmentTab() {
-  // Two-screen equipment flow:
-  //   Screen 1 (facilities): Shows all facilities as tappable cards.
-  //   Screen 2 (sub-screen): Shows equipment picker for a specific facility.
   if (equipmentScreen !== "facilities") {
     return renderFacilitySubScreen(equipmentScreen);
   }
@@ -530,40 +440,34 @@ function renderEquipmentTab() {
         </p>
       </div>
 
-      <!-- Gym and facilities -->
-      <h3 class="section-heading" style="margin-bottom: var(--space-3);">
-        At the gym or facility
-      </h3>
+      <h3 class="section-heading" style="margin-bottom: var(--space-3);">At the gym or facility</h3>
       <div class="equipment-facility-grid">
         ${gymFacilities.map(f => {
           const active = isFacilityActive(f);
           return `
             <button class="equipment-facility-card ${active ? "equipment-facility-card--active" : ""}"
                     data-facility="${f.id}"
-                    aria-label="${f.label}: ${f.description}. ${active ? "Active — tap to manage or deselect" : "Tap to add"}">
+                    aria-label="${f.label}: ${f.description}. ${active ? "Active" : "Tap to add"}">
               <span class="equipment-facility-icon" aria-hidden="true">${f.icon}</span>
               <span class="equipment-facility-label">${f.label}</span>
-              ${active ? `<span class="equipment-facility-check" aria-hidden="true">\u2713</span>` : ""}
+              ${active ? `<span class="equipment-facility-check" aria-hidden="true">&#10003;</span>` : ""}
             </button>
           `;
         }).join("")}
       </div>
 
-      <!-- Home -->
-      <h3 class="section-heading" style="margin: var(--space-5) 0 var(--space-3);">
-        At home
-      </h3>
+      <h3 class="section-heading" style="margin: var(--space-5) 0 var(--space-3);">At home</h3>
       <div class="equipment-facility-grid">
         ${homeFacilities.map(f => {
           const homeItems = store.get("homeEquipment") || [];
-          const active = homeItems.length > 0 || f.id === "no-equipment";
+          const active = homeItems.length > 0;
           return `
-            <button class="equipment-facility-card ${f.id !== "no-equipment" && homeItems.length > 0 ? "equipment-facility-card--active" : ""}"
+            <button class="equipment-facility-card ${f.id !== "no-equipment" && active ? "equipment-facility-card--active" : ""}"
                     data-facility="${f.id}"
                     aria-label="${f.label}: ${f.description}">
               <span class="equipment-facility-icon" aria-hidden="true">${f.icon}</span>
               <span class="equipment-facility-label">${f.label}</span>
-              ${f.id !== "no-equipment" && homeItems.length > 0 ? `<span class="equipment-facility-check" aria-hidden="true">\u2713</span>` : ""}
+              ${f.id !== "no-equipment" && active ? `<span class="equipment-facility-check" aria-hidden="true">&#10003;</span>` : ""}
             </button>
           `;
         }).join("")}
@@ -572,13 +476,6 @@ function renderEquipmentTab() {
       <p class="text-xs text-muted" style="margin-top: var(--space-4);">
         Tap any location to see and edit the equipment available there.
       </p>
-
-      <div class="settings-reset-zone">
-        <button class="btn btn-ghost btn-full" id="settings-reset-btn"
-                style="color: var(--color-danger);">
-          Reset App (Start Over)
-        </button>
-      </div>
     </section>
   `;
 }
@@ -591,18 +488,12 @@ function renderFacilitySubScreen(facilityId) {
   const isPreset     = facility.equipment.length > 0;
   const presetActive = isPreset && facility.equipment.some(eq => currentItems.includes(eq));
 
-  // For home facility — show the full EQUIPMENT_CATEGORIES picker
-  // For gym facilities with presets — show what's in the preset, toggle individual items
-  // Get the relevant categories from the equipment data
-  const relevantIds = new Set(facility.scope === "home" ? currentItems : [...facility.equipment, ...currentItems]);
-
   return `
     <section class="settings-tab-panel" id="panel-equipment-sub" role="tabpanel">
-
       <div class="equipment-sub-header">
         <button class="btn btn-ghost equipment-sub-back" id="equip-back-btn"
                 aria-label="Back to locations">
-          \u2190 Back
+          &larr; Back
         </button>
         <h2 class="equipment-sub-title">${facility.icon} ${facility.label}</h2>
       </div>
@@ -612,16 +503,13 @@ function renderFacilitySubScreen(facilityId) {
       </p>
 
       ${isPreset ? `
-        <!-- Preset toggle for gym/pool/studio -->
         <div class="equipment-preset-toggle card" style="margin-bottom: var(--space-4);">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
               <p class="text-sm" style="font-weight: var(--font-semibold);">
                 Use ${facility.label} preset
               </p>
-              <p class="text-xs text-muted">
-                Auto-fills ${facility.equipment.length} items
-              </p>
+              <p class="text-xs text-muted">Auto-fills ${facility.equipment.length} items</p>
             </div>
             <button class="btn ${presetActive ? "btn-secondary" : "btn-primary"} btn-sm"
                     id="equip-preset-toggle"
@@ -633,7 +521,6 @@ function renderFacilitySubScreen(facilityId) {
         </div>
       ` : ""}
 
-      <!-- Individual equipment chips from relevant categories -->
       ${EQUIPMENT_CATEGORIES.map(cat => {
         const catItems = cat.items.filter(item =>
           facility.scope === "home" || facility.equipment.includes(item.id) || currentItems.includes(item.id)
@@ -659,29 +546,15 @@ function renderFacilitySubScreen(facilityId) {
           </div>
         `;
       }).join("")}
-
-      ${facility.scope === "home" && currentItems.length === 0 ? `
-        <div class="card" style="text-align: center; padding: var(--space-6);">
-          <p class="text-secondary">
-            No home equipment yet. Tap items above to add them.
-          </p>
-          <p class="text-sm text-muted" style="margin-top: var(--space-2);">
-            A clear floor is enough. I will never assume you have something you have not told me about.
-          </p>
-        </div>
-      ` : ""}
-
     </section>
   `;
 }
 
+// -- Library tab --------------------------------------------------------------
 
 function renderLibraryTab() {
-  // Library is now a dedicated page (library.js / route: "library")
-  // This tab navigates there rather than rendering inline
   return `
     <section aria-labelledby="library-heading">
-
       <h2 id="library-heading" class="section-heading">My movement</h2>
       <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
         Tell the coach what kind of movement feels most like you.
@@ -691,28 +564,252 @@ function renderLibraryTab() {
 
       <h2 class="section-heading" style="margin-top: var(--space-6);">Library</h2>
       <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
-        Sessions, programmes, and activity logging — all in one place.
+        Sessions, programmes, and activity logging -- all in one place.
       </p>
-
       <button class="btn btn-primary btn-full btn-large" id="open-library-btn"
               aria-label="Open the Library">
-        Open Library →
+        Open Library &rarr;
       </button>
-
     </section>
   `;
 }
 
-// ── Movement identity ─────────────────────────────────────────────────────────
+// -- My Week tab --------------------------------------------------------------
+
+function renderMyWeekTab() {
+  if (!weeklyPlanDraft) initDraft();
+  const premium = isPremium();
+  const enabled = store.get("weeklyPlanEnabled") || false;
+
+  return `
+    <section aria-labelledby="myweek-heading">
+      <h2 id="myweek-heading" class="section-heading">My Week</h2>
+
+      ${!premium ? `
+        <!-- Free tier: locked -->
+        <div class="card settings-coach-card" style="margin-bottom: var(--space-4);">
+          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <p class="text-sm">
+            Did you know you can plan your whole week in advance? I will use your
+            plan as a starting point each day and adapt around how you are feeling.
+          </p>
+        </div>
+        <div class="card" style="text-align:center; padding:var(--space-6);">
+          <p class="text-secondary" style="margin-bottom:var(--space-3);">
+            Weekly planning is available on the Personal plan.
+          </p>
+          <button class="btn btn-primary" id="upgrade-prompt-btn"
+                  aria-label="Upgrade to Personal plan">
+            Upgrade to Personal
+          </button>
+        </div>
+      ` : `
+        <!-- Personal tier: full access -->
+        <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
+          Set a movement type for each day. I will use this as my starting point
+          and adapt around your check-in each morning.
+        </p>
+
+        <!-- Master toggle -->
+        <div class="card" style="margin-bottom:var(--space-4);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <p class="text-sm" style="font-weight:var(--font-semibold);">
+                Use my weekly plan
+              </p>
+              <p class="text-xs text-muted">
+                ${enabled ? "Plan is active -- I am reading it each day" : "Off -- I will decide fresh each day"}
+              </p>
+            </div>
+            <label class="toggle-switch" aria-label="Enable weekly plan">
+              <input type="checkbox" id="weekly-plan-toggle" role="switch"
+                     aria-checked="${enabled}" ${enabled ? "checked" : ""}>
+              <span class="toggle-track" aria-hidden="true"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 7-day grid -->
+        <div class="weekly-plan-grid" role="list" aria-label="Weekly plan days">
+          ${DAYS.map(day => renderDayCard(day)).join("")}
+        </div>
+
+        <!-- Day config panel (shown inline when a day is tapped) -->
+        ${configuringDay ? renderDayConfig(configuringDay) : ""}
+
+        <!-- Save button -->
+        <button class="btn btn-primary btn-full btn-large" id="save-week-btn"
+                style="margin-top:var(--space-5);"
+                aria-label="Save weekly plan">
+          Save my week
+        </button>
+
+        ${store.get("weeklyPlanSetAt") ? `
+          <p class="text-xs text-muted" style="text-align:center;margin-top:var(--space-2);">
+            Last saved ${formatRelativeDate(store.get("weeklyPlanSetAt"))}
+          </p>
+        ` : ""}
+      `}
+    </section>
+  `;
+}
+
+function renderDayCard(day) {
+  const slot    = weeklyPlanDraft?.[day] || { type: "open" };
+  const typeObj = DAY_TYPES.find(t => t.id === slot.type) || DAY_TYPES[0];
+  const isConfiguring = configuringDay === day;
+  const label   = slot.label || (slot.type === "gym" && slot.sessionType
+    ? SESSION_TYPES.find(s => s.id === slot.sessionType)?.label || typeObj.label
+    : typeObj.label);
+
+  return `
+    <div class="weekly-plan-day-card ${isConfiguring ? "weekly-plan-day-card--active" : ""}"
+         role="listitem">
+      <button class="weekly-plan-day-btn"
+              data-day="${day}"
+              aria-expanded="${isConfiguring}"
+              aria-label="Configure ${DAY_LABELS[day]}: currently ${label}">
+        <div class="weekly-plan-day-info">
+          <span class="weekly-plan-day-name">${DAY_LABELS[day]}</span>
+          <span class="weekly-plan-day-type ${slot.type !== "open" ? "weekly-plan-day-type--set" : ""}">
+            ${label}
+          </span>
+        </div>
+        <span class="weekly-plan-day-chevron" aria-hidden="true">${isConfiguring ? "&#8593;" : "&#8595;"}</span>
+      </button>
+    </div>
+  `;
+}
+
+function renderDayConfig(day) {
+  const slot = weeklyPlanDraft?.[day] || { type: "open" };
+
+  return `
+    <div class="weekly-plan-config-panel card" id="day-config-panel"
+         aria-label="Configure ${DAY_LABELS[day]}">
+      <h3 class="section-heading" style="font-size:var(--text-base);margin-bottom:var(--space-3);">
+        ${DAY_LABELS[day]}
+      </h3>
+
+      <!-- Type picker -->
+      <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">
+        What is planned?
+      </p>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-4);"
+           role="group" aria-label="Day type">
+        ${DAY_TYPES.map(t => `
+          <button class="weekly-plan-type-btn ${slot.type === t.id ? "weekly-plan-type-btn--selected" : ""}"
+                  data-day-type="${t.id}"
+                  aria-pressed="${slot.type === t.id}"
+                  style="display:flex;align-items:center;gap:var(--space-3);
+                         padding:var(--space-3) var(--space-3);border-radius:var(--radius-md,8px);
+                         text-align:left;cursor:pointer;width:100%;
+                         background:${slot.type === t.id ? "rgba(20,184,166,0.12)" : "var(--color-surface-2,rgba(255,255,255,0.04))"};
+                         border:1.5px solid ${slot.type === t.id ? "var(--color-primary)" : "transparent"};">
+            <div style="flex:1;">
+              <p style="font-size:var(--text-sm);font-weight:var(--font-semibold);
+                        color:${slot.type === t.id ? "var(--color-primary)" : "var(--color-text)"};margin:0 0 2px;">
+                ${t.label}
+              </p>
+              <p style="font-size:var(--text-xs);color:var(--color-text-secondary);margin:0;">
+                ${t.desc}
+              </p>
+            </div>
+            ${slot.type === t.id ? `<span style="color:var(--color-primary);" aria-hidden="true">&#10003;</span>` : ""}
+          </button>
+        `).join("")}
+      </div>
+
+      <!-- Gym: session type + duration -->
+      ${slot.type === "gym" ? `
+        <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">Session focus</p>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
+             role="group" aria-label="Session type">
+          ${SESSION_TYPES.map(s => `
+            <button class="chip ${slot.sessionType === s.id ? "chip--selected" : ""}"
+                    data-session-type="${s.id}"
+                    aria-pressed="${slot.sessionType === s.id}"
+                    style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
+                           font-size:var(--text-sm);cursor:pointer;
+                           background:${slot.sessionType === s.id ? "rgba(20,184,166,0.15)" : "var(--color-surface-2,rgba(255,255,255,0.06))"};
+                           border:1.5px solid ${slot.sessionType === s.id ? "var(--color-primary)" : "transparent"};">
+              ${s.label}
+            </button>
+          `).join("")}
+        </div>
+
+        <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">Target duration</p>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
+             role="group" aria-label="Session duration">
+          <button class="chip ${!slot.durationMins ? "chip--selected" : ""}"
+                  data-duration="null"
+                  aria-pressed="${!slot.durationMins}"
+                  style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
+                         font-size:var(--text-sm);cursor:pointer;
+                         background:${!slot.durationMins ? "rgba(20,184,166,0.15)" : "var(--color-surface-2,rgba(255,255,255,0.06))"};
+                         border:1.5px solid ${!slot.durationMins ? "var(--color-primary)" : "transparent"};">
+            Coach decides
+          </button>
+          ${DURATION_OPTIONS.map(d => `
+            <button class="chip ${slot.durationMins === d ? "chip--selected" : ""}"
+                    data-duration="${d}"
+                    aria-pressed="${slot.durationMins === d}"
+                    style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
+                           font-size:var(--text-sm);cursor:pointer;
+                           background:${slot.durationMins === d ? "rgba(20,184,166,0.15)" : "var(--color-surface-2,rgba(255,255,255,0.06))"};
+                           border:1.5px solid ${slot.durationMins === d ? "var(--color-primary)" : "transparent"};">
+              ${d} min
+            </button>
+          `).join("")}
+        </div>
+      ` : ""}
+
+      <!-- Class: activity name -->
+      ${slot.type === "class" ? `
+        <div style="margin-bottom:var(--space-4);">
+          <label class="form-label" for="class-activity-name"
+                 style="display:block;font-size:var(--text-sm);
+                        color:var(--color-text-secondary);margin-bottom:var(--space-2);">
+            Activity name (optional)
+          </label>
+          <input type="text" id="class-activity-name" class="form-input"
+                 placeholder="e.g. Body Balance, Tennis, Aqua Aerobics"
+                 value="${slot.activityName || ""}"
+                 aria-label="Class or activity name">
+        </div>
+      ` : ""}
+
+      <!-- Done -->
+      <button class="btn btn-primary btn-full" id="day-config-done-btn"
+              aria-label="Done configuring ${DAY_LABELS[day]}">
+        Done
+      </button>
+    </div>
+  `;
+}
+
+function formatRelativeDate(isoString) {
+  if (!isoString) return "";
+  try {
+    const d    = new Date(isoString);
+    const now  = new Date();
+    const diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
+    if (diff === 0) return "today";
+    if (diff === 1) return "yesterday";
+    return diff + " days ago";
+  } catch (e) {
+    return "";
+  }
+}
+
+// -- Movement identity --------------------------------------------------------
 
 function renderMovementIdentity() {
   const current = (() => {
     const v = store.get("movementIdentity");
     return Array.isArray(v) ? v : (v ? [v] : []);
   })();
-  const selectedLabels = MOVEMENT_IDENTITIES
-    .filter(i => current.includes(i.id))
-    .map(i => i.label);
+  const selectedLabels = MOVEMENT_IDENTITIES.filter(i => current.includes(i.id)).map(i => i.label);
   return `
     <div class="library-grid" role="group" aria-label="My movement identity">
       ${MOVEMENT_IDENTITIES.map(item => `
@@ -731,14 +828,13 @@ function renderMovementIdentity() {
         ${selectedLabels.length === 1
           ? selectedLabels[0]
           : selectedLabels.slice(0, -1).join(", ") + " and " + selectedLabels[selectedLabels.length - 1]}
-        suggestions, favouring whichever you have done least recently.
-        Your activity history refines this over time.
+        suggestions.
       </p>
     ` : ""}
   `;
 }
 
-// ── Voice speed — 10-level slider ─────────────────────────────────────────────
+// -- Voice speed --------------------------------------------------------------
 
 function renderSpeechRateSection() {
   const currentRate = store.get("speechRate") || 0.9;
@@ -749,7 +845,6 @@ function renderSpeechRateSection() {
     <div class="card speech-rate-card">
       <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
         Sets the speed of the read-aloud feature on coach cards.
-        Tap the speaker icon on any coach message to listen.
       </p>
       <div class="speech-rate-slider-wrap">
         <div class="speech-rate-value-row">
@@ -772,7 +867,7 @@ function renderSpeechRateSection() {
   `;
 }
 
-// ── Notification section ──────────────────────────────────────────────────────
+// -- Notification section -----------------------------------------------------
 
 function renderNotificationSection() {
   const notif   = store.get("checkInNotification") || { enabled: false, time: null, permissionGranted: false };
@@ -786,9 +881,7 @@ function renderNotificationSection() {
       <div class="notification-toggle-row">
         <div class="notification-toggle-label">
           <span class="notification-label-text">Daily check-in reminder</span>
-          <span class="notification-label-sub text-sm text-muted">
-            A gentle nudge at the time you choose
-          </span>
+          <span class="notification-label-sub text-sm text-muted">A gentle nudge at the time you choose</span>
         </div>
         <label class="toggle-switch" aria-label="Enable daily check-in reminder">
           <input type="checkbox" id="notif-toggle" role="switch"
@@ -796,7 +889,6 @@ function renderNotificationSection() {
           <span class="toggle-track" aria-hidden="true"></span>
         </label>
       </div>
-
       ${enabled ? `
         <div class="notification-time-row" id="notif-time-row">
           <label class="form-label" for="notif-time">Remind me at</label>
@@ -807,8 +899,7 @@ function renderNotificationSection() {
           <div class="notification-denied-banner" role="alert">
             <p class="text-sm">
               Your device has blocked notifications for this app.
-              To receive reminders, go to your browser or device settings
-              and allow notifications for this site.
+              To receive reminders, go to your browser settings and allow notifications.
             </p>
           </div>
         ` : (!notif.permissionGranted && "Notification" in window && Notification.permission !== "granted") ? `
@@ -818,29 +909,24 @@ function renderNotificationSection() {
         ` : ""}
       ` : `
         <p class="text-sm text-muted" style="margin-top: var(--space-3);">
-          Turn on to set a daily reminder to check in. You can change or
-          turn off the reminder any time.
+          Turn on to set a daily reminder to check in.
         </p>
       `}
     </div>
   `;
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// -- Helpers ------------------------------------------------------------------
 
 function formatGender(gender) {
-  const map = {
-    "female":     "Female",
-    "male":       "Male",
-    "non-binary": "Non-binary",
-    "prefer-not": "Prefer not to say"
-  };
+  const map = { "female": "Female", "male": "Male", "non-binary": "Non-binary", "prefer-not": "Prefer not to say" };
   return map[gender] || "";
 }
 
 function switchTab(tabName) {
-  activeTab    = tabName;
-  editingField = null;
+  activeTab      = tabName;
+  editingField   = null;
+  configuringDay = null;
   document.querySelectorAll(".settings-tab").forEach(btn => {
     const isActive = btn.dataset.tab === tabName;
     btn.classList.toggle("active", isActive);
@@ -848,7 +934,7 @@ function switchTab(tabName) {
   });
   const panel = document.getElementById("settings-tab-panel");
   if (panel) {
-    panel.setAttribute("aria-labelledby", `tab-${tabName}`);
+    panel.setAttribute("aria-labelledby", "tab-" + tabName);
     panel.innerHTML = renderActiveTab();
     wirePanel();
   }
@@ -863,58 +949,29 @@ function rerenderTab() {
 }
 
 function rerenderEquipment() {
-  // Re-render the entire equipment tab panel
-  // Used when switching between facility landing and sub-screens
-  const panel = document.getElementById("panel-equipment")
-             || document.getElementById("panel-equipment-sub");
+  const panel = document.getElementById("panel-equipment") || document.getElementById("panel-equipment-sub");
   if (!panel) return;
   const wrapper = document.createElement("div");
-  wrapper.innerHTML = equipmentScreen === "facilities"
-    ? renderEquipmentTab()
-    : renderFacilitySubScreen(equipmentScreen);
+  wrapper.innerHTML = equipmentScreen === "facilities" ? renderEquipmentTab() : renderFacilitySubScreen(equipmentScreen);
   const newPanel = wrapper.querySelector("section");
-  if (newPanel) {
-    panel.replaceWith(newPanel);
-    onMount();
+  if (newPanel) { panel.replaceWith(newPanel); onMount(); }
+}
+
+function rerenderMyWeek() {
+  const panel = document.getElementById("settings-tab-panel");
+  if (panel) {
+    panel.innerHTML = renderMyWeekTab();
+    wirePanel();
   }
 }
 
-function rerenderEquipmentChips() {
-  const section  = document.getElementById("equipment-chip-section");
-  if (!section) return;
-  const selected = store.get("equipment") || [];
-  section.querySelectorAll(".equipment-chip").forEach(chip => {
-    const id         = chip.dataset.equipmentId;
-    const isSelected = selected.includes(id);
-    chip.classList.toggle("selected", isSelected);
-    chip.setAttribute("aria-pressed", isSelected);
-  });
-  // Update all category count badges
-  section.querySelectorAll(".equipment-settings-category").forEach(catEl => {
-    const chips      = catEl.querySelectorAll(".equipment-chip");
-    const count      = Array.from(chips).filter(c => c.classList.contains("selected")).length;
-    const heading    = catEl.querySelector(".equipment-category-heading");
-    const badge      = heading?.querySelector(".equipment-cat-count");
-    if (badge) badge.remove();
-    if (count > 0 && heading) {
-      const b = document.createElement("span");
-      b.className   = "equipment-cat-count";
-      b.textContent = `${count} selected`;
-      heading.appendChild(b);
-    }
-  });
-}
-
-// ── Wire all panel elements ───────────────────────────────────────────────────
+// -- Wire all panel elements --------------------------------------------------
 
 function wirePanel() {
 
   // Profile: open edit
   document.querySelectorAll(".profile-edit-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      editingField = btn.dataset.field;
-      rerenderTab();
-    });
+    btn.addEventListener("click", () => { editingField = btn.dataset.field; rerenderTab(); });
   });
 
   // Profile: save
@@ -932,8 +989,7 @@ function wirePanel() {
 
   // Profile: cancel
   document.getElementById("profile-cancel-btn")?.addEventListener("click", () => {
-    editingField = null;
-    rerenderTab();
+    editingField = null; rerenderTab();
   });
 
   // Coach style
@@ -943,14 +999,13 @@ function wirePanel() {
       if (!style) return;
       store.set("coachStyle", style);
       document.querySelectorAll(".coach-style-card").forEach(c => {
-        const isSel = c.dataset.style === style;
-        c.classList.toggle("selected", isSel);
-        c.setAttribute("aria-checked", isSel);
+        c.classList.toggle("selected", c.dataset.style === style);
+        c.setAttribute("aria-checked", c.dataset.style === style);
       });
     });
   });
 
-  // Voice speed slider
+  // Voice speed
   const slider = document.getElementById("speech-rate-slider");
   if (slider) {
     slider.addEventListener("input", () => {
@@ -961,19 +1016,19 @@ function wirePanel() {
       const labelEl = document.getElementById("speech-rate-label");
       const posEl   = document.getElementById("speech-rate-position");
       if (labelEl) labelEl.textContent = label;
-      if (posEl)   posEl.textContent   = `${pos} / ${SPEED_STEPS}`;
+      if (posEl)   posEl.textContent   = pos + " / " + SPEED_STEPS;
       slider.setAttribute("aria-valuenow",  pos);
       slider.setAttribute("aria-valuetext", label);
     });
   }
 
-  // Notification controls
+  // Notification
   wireNotificationControls();
 
   // Conditions: add
   document.querySelectorAll(".condition-add-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      const id = btn.dataset.conditionId;
+      const id      = btn.dataset.conditionId;
       if (!id) return;
       const current = store.get("conditions") || [];
       if (!current.includes(id)) store.set("conditions", [...current, id]);
@@ -986,104 +1041,43 @@ function wirePanel() {
     btn.addEventListener("click", () => {
       const id = btn.dataset.conditionId;
       if (!id) return;
-      const current = store.get("conditions") || [];
-      store.set("conditions", current.filter(c => c !== id));
-      const painScores = store.get("conditionPainScores") || {};
-      delete painScores[id];
-      store.set("conditionPainScores", painScores);
+      store.set("conditions", (store.get("conditions") || []).filter(c => c !== id));
+      const scores = store.get("conditionPainScores") || {};
+      delete scores[id];
+      store.set("conditionPainScores", scores);
       rerenderTab();
     });
   });
 
-  // Equipment: back button in sub-screen
+  // Equipment: back
   document.getElementById("equip-back-btn")?.addEventListener("click", () => {
-    equipmentScreen = "facilities";
-    rerenderEquipment();
+    equipmentScreen = "facilities"; rerenderEquipment();
   });
 
-  // Equipment: facility card tap — open sub-screen
+  // Equipment: facility card
   document.querySelectorAll(".equipment-facility-card[data-facility]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      equipmentScreen = btn.dataset.facility;
-      rerenderEquipment();
-    });
+    btn.addEventListener("click", () => { equipmentScreen = btn.dataset.facility; rerenderEquipment(); });
   });
 
-  // Equipment: preset toggle in sub-screen
-  document.getElementById("equip-preset-toggle")?.addEventListener("click", (e) => {
-    const facilityId = e.currentTarget.dataset.facility;
-    toggleFacility(facilityId);
-    rerenderEquipment();
+  // Equipment: preset toggle
+  document.getElementById("equip-preset-toggle")?.addEventListener("click", e => {
+    toggleFacility(e.currentTarget.dataset.facility); rerenderEquipment();
   });
 
-  // Equipment: individual chip toggle in sub-screen
+  // Equipment: chip toggle
   document.querySelectorAll(".equipment-chip[data-equipment]").forEach(chip => {
     chip.addEventListener("click", () => {
       const id      = chip.dataset.equipment;
       const scope   = chip.dataset.scope;
       const current = getEquipmentForScope(scope);
-      const updated = current.includes(id)
-        ? current.filter(x => x !== id)
-        : [...current, id];
+      const updated = current.includes(id) ? current.filter(x => x !== id) : [...current, id];
       saveEquipmentForScope(scope, updated);
-      // Update chip state without full rerender
       chip.classList.toggle("selected", updated.includes(id));
       chip.setAttribute("aria-pressed", updated.includes(id));
-      // Update category count
-      const catEl   = chip.closest(".equipment-settings-category");
-      const countEl = catEl?.querySelector(".equipment-cat-count");
-      if (countEl) {
-        const newCount = Array.from(catEl.querySelectorAll(".equipment-chip.selected")).length;
-        countEl.textContent = newCount > 0 ? `${newCount} selected` : "";
-      }
     });
   });
 
-  // Equipment: facility presets (legacy — kept for backward compat)
-  document.querySelectorAll(".facility-preset-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const preset = FACILITY_PRESETS.find(p => p.id === btn.dataset.preset);
-      if (!preset) return;
-
-      // Write to the correct store key based on scope
-      // "gym" scope → gymEquipment (what I have at the gym)
-      // "home" scope → homeEquipment (what I have at home)
-      // Also always write to equipment[] for backward compatibility
-      if (preset.scope === "home") {
-        const current = store.get("homeEquipment") || [];
-        store.set("homeEquipment", Array.from(new Set([...current, ...preset.fills])));
-      } else {
-        const current = store.get("gymEquipment") || [];
-        store.set("gymEquipment", Array.from(new Set([...current, ...preset.fills])));
-      }
-      // Keep equipment[] in sync (union of both)
-      const gym  = store.get("gymEquipment")  || [];
-      const home = store.get("homeEquipment") || [];
-      store.set("equipment", Array.from(new Set([...gym, ...home])));
-
-      document.querySelectorAll(".facility-preset-btn").forEach(b =>
-        b.classList.remove("selected")
-      );
-      btn.classList.add("selected");
-      rerenderEquipmentChips();
-    });
-  });
-
-  // Equipment: individual chips
-  document.querySelectorAll(".equipment-chip").forEach(chip => {
-    chip.addEventListener("click", () => {
-      const id = chip.dataset.equipmentId;
-      if (!id) return;
-      const current    = store.get("equipment") || [];
-      const isSelected = current.includes(id);
-      store.set("equipment", isSelected ? current.filter(e => e !== id) : [...current, id]);
-      chip.classList.toggle("selected", !isSelected);
-      chip.setAttribute("aria-pressed", !isSelected);
-      updateCategoryCount(chip);
-    });
-  });
-
-  // Library: navigation cards
+  // Library: navigation
   document.querySelectorAll("[data-navigate]").forEach(btn => {
     btn.addEventListener("click", () => {
       const target    = btn.dataset.navigate;
@@ -1094,7 +1088,7 @@ function wirePanel() {
     });
   });
 
-  // Library: movement identity — multi-select, writes array
+  // Library: movement identity
   document.querySelectorAll("[data-identity]").forEach(btn => {
     btn.addEventListener("click", () => {
       const id       = btn.dataset.identity;
@@ -1103,71 +1097,131 @@ function wirePanel() {
         const v = store.get("movementIdentity");
         return Array.isArray(v) ? v : (v ? [v] : []);
       })();
-      const updated  = existing.includes(id)
-        ? existing.filter(x => x !== id)
-        : [...existing, id];
+      const updated = existing.includes(id) ? existing.filter(x => x !== id) : [...existing, id];
       store.set("movementIdentity", updated);
-      // Update button states
       document.querySelectorAll("[data-identity]").forEach(b => {
-        const isSel = updated.includes(b.dataset.identity);
-        b.classList.toggle("library-card--selected", isSel);
-        b.setAttribute("aria-pressed", isSel);
+        b.classList.toggle("library-card--selected", updated.includes(b.dataset.identity));
+        b.setAttribute("aria-pressed", updated.includes(b.dataset.identity));
       });
-      // Update note text
-      const grid = document.querySelector(".library-grid[aria-label='My movement identity']");
-      if (grid) {
-        const existing2 = grid.nextElementSibling;
-        if (existing2?.classList.contains("movement-identity-note")) existing2.remove();
-        if (updated.length > 0) {
-          const labels = MOVEMENT_IDENTITIES
-            .filter(i => updated.includes(i.id))
-            .map(i => i.label);
-          const labelStr = labels.length === 1
-            ? labels[0]
-            : labels.slice(0, -1).join(", ") + " and " + labels[labels.length - 1];
-          const note = document.createElement("p");
-          note.className       = "text-sm text-muted movement-identity-note";
-          note.style.marginTop = "var(--space-2)";
-          note.textContent = `The coach will lean toward ${labelStr} suggestions, favouring whichever you have done least recently.`;
-          grid.after(note);
-        }
-      }
     });
   });
 
-  // Library tab: open Library page
+  // Library: open Library page
   document.getElementById("open-library-btn")?.addEventListener("click", () => {
     router.navigate("library");
   });
 
-  // Library: log activity — navigate to activity-log view
-  // activity-log.js is the single source of truth for logging activities
-  // It shows the full category list and handles the log entry itself
-  document.querySelectorAll("[data-log-activity]").forEach(btn => {
+  // ------ My Week wiring ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  // Master toggle
+  document.getElementById("weekly-plan-toggle")?.addEventListener("change", e => {
+    store.set("weeklyPlanEnabled", e.target.checked);
+    rerenderMyWeek();
+  });
+
+  // Day card button -- open/close config panel
+  document.querySelectorAll(".weekly-plan-day-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      router.navigate("activity-log");
+      const day = btn.dataset.day;
+      configuringDay = configuringDay === day ? null : day;
+      rerenderMyWeek();
     });
+  });
+
+  // Day type selection
+  document.querySelectorAll("[data-day-type]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (!configuringDay) return;
+      const type = btn.dataset.dayType;
+      weeklyPlanDraft[configuringDay] = {
+        ...weeklyPlanDraft[configuringDay],
+        type,
+        // Clear gym/class specific fields when type changes
+        sessionType:  type === "gym"   ? (weeklyPlanDraft[configuringDay].sessionType  || null) : null,
+        durationMins: type === "gym"   ? (weeklyPlanDraft[configuringDay].durationMins || null) : null,
+        activityName: type === "class" ? (weeklyPlanDraft[configuringDay].activityName || null) : null,
+        label:        null,
+      };
+      rerenderMyWeek();
+    });
+  });
+
+  // Session type chips (gym days)
+  document.querySelectorAll("[data-session-type]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (!configuringDay) return;
+      weeklyPlanDraft[configuringDay].sessionType = btn.dataset.sessionType;
+      rerenderMyWeek();
+    });
+  });
+
+  // Duration chips (gym days)
+  document.querySelectorAll("[data-duration]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (!configuringDay) return;
+      const raw = btn.dataset.duration;
+      weeklyPlanDraft[configuringDay].durationMins = raw === "null" ? null : parseInt(raw);
+      rerenderMyWeek();
+    });
+  });
+
+  // Class activity name input -- save on blur
+  document.getElementById("class-activity-name")?.addEventListener("blur", e => {
+    if (!configuringDay) return;
+    weeklyPlanDraft[configuringDay].activityName = e.target.value.trim() || null;
+  });
+
+  // Day config Done
+  document.getElementById("day-config-done-btn")?.addEventListener("click", () => {
+    // Capture class name from input if still focused
+    const nameInput = document.getElementById("class-activity-name");
+    if (nameInput && configuringDay) {
+      weeklyPlanDraft[configuringDay].activityName = nameInput.value.trim() || null;
+    }
+    configuringDay = null;
+    rerenderMyWeek();
+  });
+
+  // Save my week
+  document.getElementById("save-week-btn")?.addEventListener("click", () => {
+    // Capture any open class name input before saving
+    const nameInput = document.getElementById("class-activity-name");
+    if (nameInput && configuringDay) {
+      weeklyPlanDraft[configuringDay].activityName = nameInput.value.trim() || null;
+    }
+
+    store.set("weeklyPlan", { ...weeklyPlanDraft });
+    store.set("weeklyPlanSetAt", new Date().toISOString());
+
+    // Auto-enable on first save if toggle is currently off
+    if (!store.get("weeklyPlanEnabled")) {
+      store.set("weeklyPlanEnabled", true);
+    }
+
+    configuringDay = null;
+    rerenderMyWeek();
+
+    // Confirmation message
+    const panel = document.getElementById("settings-tab-panel");
+    if (panel) {
+      const msg = document.createElement("div");
+      msg.setAttribute("role", "status");
+      msg.setAttribute("aria-live", "polite");
+      msg.className = "save-confirmation";
+      msg.style.cssText = "text-align:center;padding:var(--space-3);color:var(--color-primary);font-size:var(--text-sm);";
+      msg.textContent = "Your week is saved. I'll use this as my starting point each day.";
+      panel.appendChild(msg);
+      setTimeout(() => msg.remove(), 3000);
+    }
+  });
+
+  // Upgrade prompt
+  document.getElementById("upgrade-prompt-btn")?.addEventListener("click", () => {
+    router.navigate("upgrade");
   });
 }
 
-function updateCategoryCount(chip) {
-  const catEl = chip.closest(".equipment-settings-category");
-  if (!catEl) return;
-  const count   = Array.from(catEl.querySelectorAll(".equipment-chip"))
-                       .filter(c => c.classList.contains("selected")).length;
-  const heading = catEl.querySelector(".equipment-category-heading");
-  if (!heading) return;
-  const existing = heading.querySelector(".equipment-cat-count");
-  if (existing) existing.remove();
-  if (count > 0) {
-    const badge = document.createElement("span");
-    badge.className   = "equipment-cat-count";
-    badge.textContent = `${count} selected`;
-    heading.appendChild(badge);
-  }
-}
-
-// ── Notification wiring ───────────────────────────────────────────────────────
+// -- Notification wiring ------------------------------------------------------
 
 function wireNotificationControls() {
   const toggle    = document.getElementById("notif-toggle");
@@ -1210,9 +1264,7 @@ function wireNotificationControls() {
 }
 
 function saveNotificationState(state) {
-  store.set("checkInNotification", {
-    enabled: state.enabled, time: state.time, permissionGranted: state.permissionGranted
-  });
+  store.set("checkInNotification", { enabled: state.enabled, time: state.time, permissionGranted: state.permissionGranted });
 }
 
 function rerenderNotificationSection() {
@@ -1223,7 +1275,7 @@ function rerenderNotificationSection() {
   }
 }
 
-// ── Notification scheduler ────────────────────────────────────────────────────
+// -- Notification scheduler ---------------------------------------------------
 
 let _notifSchedulerInterval = null;
 let _notifLastFiredMinute   = null;
@@ -1232,7 +1284,7 @@ const NOTIFICATION_MESSAGES = [
   { title: "Alongside", body: "Ready when you are. A quick check-in takes less than a minute." },
   { title: "Alongside", body: "How are you feeling today? Your coach is here whenever suits you." },
   { title: "Alongside", body: "Just a gentle nudge. Come check in whenever you are ready." },
-  { title: "Alongside", body: "Your check-in is waiting. No rush — take it at your own pace." },
+  { title: "Alongside", body: "Your check-in is waiting. No rush -- take it at your own pace." },
   { title: "Alongside", body: "A moment to check in whenever suits you today." }
 ];
 
@@ -1245,7 +1297,7 @@ function startNotificationScheduler() {
     const now     = new Date();
     const hh      = String(now.getHours()).padStart(2, "0");
     const mm      = String(now.getMinutes()).padStart(2, "0");
-    const nowHHMM = `${hh}:${mm}`;
+    const nowHHMM = hh + ":" + mm;
     if (nowHHMM === notif.time && _notifLastFiredMinute !== nowHHMM) {
       _notifLastFiredMinute = nowHHMM;
       const start  = new Date(now.getFullYear(), 0, 0);
@@ -1260,7 +1312,7 @@ function startNotificationScheduler() {
   window._alongsideNotifInterval = _notifSchedulerInterval;
 }
 
-// ── Mount ─────────────────────────────────────────────────────────────────────
+// -- Mount --------------------------------------------------------------------
 
 export function onMount() {
   document.querySelectorAll(".settings-tab").forEach(tab => {
@@ -1288,8 +1340,10 @@ export function onMount() {
   document.getElementById("reset-app-btn")?.addEventListener("click", () => {
     if (confirm("This will delete all your data and start fresh. Are you sure?")) {
       store.reset();
-      activeTab    = "profile";
-      editingField = null;
+      activeTab      = "profile";
+      editingField   = null;
+      configuringDay = null;
+      weeklyPlanDraft = null;
       document.getElementById("bottom-nav")?.classList.add("hidden");
       router.navigate("onboarding/welcome");
     }
