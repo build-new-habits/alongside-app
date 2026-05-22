@@ -88,9 +88,10 @@ export function render() {
             type="date" 
             id="target-date" 
             class="input-field"
-            style="margin-top: var(--space-2);"
+            style="margin-top: var(--space-2); min-height: 52px; color-scheme: dark; color: var(--color-text); font-size: var(--text-base); padding: var(--space-3);"
             value="${targetDate}"
             min="${today}"
+            aria-label="Target date"
           >
         </div>
       </div>
