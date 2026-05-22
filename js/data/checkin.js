@@ -1,5 +1,9 @@
 /**
  * checkin.js - Check-in data management
+ *
+ * 22 May 2026 v1 — getTodayKey() and getHistory() now use local date
+ *                   instead of UTC. Fixes early-morning check-in skip
+ *                   for users in UTC+N timezones (e.g. BST = UTC+1).
  * Handles check-in history, patterns, and burnout detection
  */
 
@@ -11,7 +15,13 @@ export const checkinData = {
    * Get today's date as YYYY-MM-DD string
    */
   getTodayKey() {
-    return new Date().toISOString().split('T')[0];
+    // Use local date, not UTC — avoids wrong date for users in UTC+N timezones
+    // when the app is used in the early hours before midnight UTC.
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm   = String(d.getMonth() + 1).padStart(2, "0");
+    const dd   = String(d.getDate()).padStart(2, "0");
+    return yyyy + "-" + mm + "-" + dd;
   },
   
   /**
@@ -62,7 +72,10 @@ export const checkinData = {
     for (let i = 0; i < days; i++) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      const key = date.toISOString().split('T')[0];
+      const yyyy = date.getFullYear();
+      const mm   = String(date.getMonth() + 1).padStart(2, "0");
+      const dd   = String(date.getDate()).padStart(2, "0");
+      const key  = yyyy + "-" + mm + "-" + dd;
       
       if (history[key]) {
         result.push({ date: key, ...history[key] });
