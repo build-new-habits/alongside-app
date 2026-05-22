@@ -29,6 +29,13 @@ import { CONDITIONS } from "../data/conditions.js";
 export const centered = false;
 
 // ── availableTime options — label / sublabel / store value ───────────────────
+const LOCATION_OPTIONS = [
+  { value: "home",     label: "At home",   icon: "🏠", desc: "Home equipment, bodyweight, or outdoors nearby" },
+  { value: "gym",      label: "At the gym", icon: "🏋", desc: "Gym equipment, machines, pool" },
+  { value: "outdoors", label: "Outside",   icon: "🌳", desc: "Run, walk, cycle, sport, or nature" },
+  { value: "skip",     label: "Not sure",  icon: "🤷", desc: "Coach will decide based on your history" }
+];
+
 const TIME_OPTIONS = [
   { value: "micro",    label: "Micro",    sub: "10 min" },
   { value: "quick",    label: "Quick",    sub: "20 min" },
@@ -44,8 +51,9 @@ const TIME_OPTIONS = [
 //   4 = time, 5 = done (submits and navigates)
 // Each step fills the viewport. Coach responds between steps.
 
-let checkinStep       = 0;
-let showNewConditions = false;  // true when user taps "Anything New?"
+let checkinStep        = 0;
+let showNewConditions  = false;   // true when user taps "Anything New?"
+let selectedLocation   = null;    // "home" | "gym" | "outdoors" | "skip"
 
 let currentCheckin = {
   energy: 5,
@@ -107,15 +115,24 @@ export function render() {
     currentCheckin = { ...currentCheckin, ...existing };
   }
   selectedAvailableTime = store.get("availableTime") || null;
+  selectedLocation      = null; // reset each check-in
 
   const conditions = store.get("conditions") || [];
   const name = (store.get("name") || "").split(" ")[0] || "there";
 
   // Build step list dynamically based on conditions
   // Steps: 0=energy, 1=mood, 2=sleep, 3=conditions (if any), 4=time, 5=summary
+  // Show location step only when no weekly plan covers today
+  const weeklyPlanEnabled = store.get("weeklyPlanEnabled") || false;
+  const todayDayName = new Date().toLocaleDateString("en-GB", { weekday: "long" }).toLowerCase();
+  const todayPlan = store.get("weeklyPlan")?.[todayDayName];
+  const hasPlannedLocation = weeklyPlanEnabled && todayPlan && todayPlan.type !== "open";
+
   const steps = [0, 1, 2];
   if (conditions.length > 0) steps.push(3);
-  steps.push(4, 5);
+  steps.push(4);
+  if (!hasPlannedLocation) steps.push(7); // location step
+  steps.push(5);
 
   const currentStepId = steps[Math.min(checkinStep, steps.length - 1)];
 
@@ -144,6 +161,7 @@ function renderStep(stepId, name, conditions) {
   if (stepId === 2) return renderSleepStep(header);
   if (stepId === 3) return renderConditionsStep(header, conditions);
   if (stepId === 4) return renderTimeStep(header);
+  if (stepId === 7) return renderLocationStep(header);
   if (stepId === 5) return renderSummaryStep(header);
   return renderEnergyStep(header, name);
 }
@@ -453,6 +471,51 @@ function renderNewConditionsStep(header) {
   `;
 }
 
+function renderLocationStep(header) {
+  return `
+    <div class="view checkin-step-view">
+      ${header}
+      <div class="checkin-step-body">
+        <div class="checkin-coach-line">
+          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
+          <p>One last thing. Where are you planning to move today?</p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-top:var(--space-4);">
+          ${LOCATION_OPTIONS.map(opt => {
+            const isSelected = selectedLocation === opt.value;
+            return `
+              <button class="card checkin-location-btn"
+                      data-location="${opt.value}"
+                      style="display:flex;align-items:center;gap:var(--space-4);text-align:left;width:100%;cursor:pointer;
+                             background:${isSelected ? "var(--color-primary-muted, rgba(20,184,166,0.12))" : "var(--color-surface)"};
+                             border:2px solid ${isSelected ? "var(--color-primary)" : "transparent"};"
+                      aria-pressed="${isSelected}"
+                      aria-label="${opt.label}: ${opt.desc}">
+                <span style="font-size:1.75rem;flex-shrink:0;line-height:1;" aria-hidden="true">${opt.icon}</span>
+                <div style="flex:1;min-width:0;">
+                  <p style="font-size:var(--text-base);font-weight:var(--font-semibold);margin-bottom:var(--space-1);">${opt.label}</p>
+                  <p class="text-secondary" style="font-size:var(--text-sm);">${opt.desc}</p>
+                </div>
+                ${isSelected ? '<span style="color:var(--color-primary);font-size:1.25rem;flex-shrink:0;" aria-hidden="true">✓</span>' : ""}
+              </button>
+            `;
+          }).join("")}
+        </div>
+      </div>
+
+      <div class="checkin-step-actions">
+        <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn"
+                ${!selectedLocation ? "disabled" : ""}>
+          ${selectedLocation ? "Done" : "Choose where you are heading"}
+        </button>
+        <button class="btn btn-ghost btn-small" id="checkin-back-btn"
+                style="margin-top:var(--space-2);">&larr; Back</button>
+      </div>
+    </div>
+  `;
+}
+
 function renderSummaryStep(header) {
   const summary = getCoachSummary();
   return `
@@ -595,6 +658,28 @@ export function onMount() {
     rerenderCheckin();
   });
 
+  // ── Location selection ────────────────────────────────────────────────────
+  document.querySelectorAll(".checkin-location-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedLocation = btn.dataset.location;
+      // Update button states immediately without full rerender
+      document.querySelectorAll(".checkin-location-btn").forEach(b => {
+        const isSel = b.dataset.location === selectedLocation;
+        b.style.background = isSel
+          ? "var(--color-primary-muted, rgba(20,184,166,0.12))"
+          : "var(--color-surface)";
+        b.style.borderColor = isSel ? "var(--color-primary)" : "transparent";
+        b.setAttribute("aria-pressed", isSel);
+      });
+      // Enable the Done button
+      const nextBtn = document.getElementById("checkin-next-btn");
+      if (nextBtn) {
+        nextBtn.disabled = false;
+        nextBtn.textContent = "Done";
+      }
+    });
+  });
+
   // ── Anything New? — inline expand on conditions step ────────────────────
   document.getElementById("checkin-new-conditions-btn")?.addEventListener("click", () => {
     showNewConditions = true;
@@ -670,6 +755,12 @@ function submitCheckin() {
   // can read it via store.get("availableTime") without needing today's
   // check-in object. Null is a valid value — means "use intensity default".
   store.set("availableTime", selectedAvailableTime);
+
+  // Save session location — coach proposal reads this to tailor suggestions
+  // "skip" means user didn't specify — coach uses history instead
+  if (selectedLocation && selectedLocation !== "skip") {
+    store.set("sessionLocation", selectedLocation);
+  }
 
   // Save the full check-in record
   checkinData.saveCheckin(currentCheckin);
