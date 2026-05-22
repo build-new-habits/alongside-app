@@ -697,7 +697,7 @@ function renderRevised(name) {
 }
 
 const ACTIVITY_PICKS = [
-  { id: "gym",         label: "Gym session",         icon: "\uD83C\uDFCB", target: "gym-programme",  quietMode: null },
+  { id: "gym",         label: "Gym session",         icon: "\uD83C\uDFCB", target: "gym-sub",        quietMode: null },
   { id: "prescribed",  label: "Prescribed exercises", icon: "\uD83E\uDE7A", target: "prescribed",     quietMode: null },
   { id: "yoga",        label: "Yoga / Pilates",       icon: "\uD83E\uDDD8", target: "yoga-session",   quietMode: null },
   { id: "breathing",   label: "Breathing practice",   icon: "\uD83C\uDF2C", target: "quiet-session",  quietMode: "breathing" },
@@ -941,7 +941,14 @@ export function onMount() {
     btn.addEventListener("click", () => {
       const target    = btn.dataset.target;
       const quietMode = btn.dataset.quiet || null;
-      if (quietMode)  store.set("quietMode", quietMode);
+      if (target === "gym-sub") {
+        proposalState = "gym-sub";
+        const body = document.getElementById("proposal-body");
+        if (body) body.innerHTML = renderGymSub();
+        onMount();
+        return;
+      }
+      if (quietMode) store.set("quietMode", quietMode);
       store.set("coachProposalAccepted", {
         type: btn.dataset.activity,
         label: btn.querySelector("span:last-child")?.textContent || "",
@@ -951,6 +958,45 @@ export function onMount() {
       cleanup();
       router.navigate(target);
     });
+  });
+
+  // ── Gym sub-screen ─────────────────────────────────────────────────────────
+  document.querySelectorAll(".gym-sub-option-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const optId = btn.dataset.gymOption;
+      const opt   = GYM_OPTIONS.find(o => o.id === optId);
+      if (!opt) return;
+      if (opt.explainer) {
+        gymExplainerTarget = opt.target;
+        proposalState = "gym-explainer";
+        const body = document.getElementById("proposal-body");
+        if (body) body.innerHTML = renderGymExplainer();
+        onMount();
+      } else {
+        cleanup();
+        router.navigate(opt.target);
+      }
+    });
+  });
+
+  document.getElementById("gym-explainer-start-btn")?.addEventListener("click", (e) => {
+    const target = e.currentTarget.dataset.target;
+    cleanup();
+    router.navigate(target);
+  });
+
+  document.getElementById("proposal-back-to-gym-sub-btn")?.addEventListener("click", () => {
+    proposalState = "gym-sub";
+    const body = document.getElementById("proposal-body");
+    if (body) body.innerHTML = renderGymSub();
+    onMount();
+  });
+
+  document.getElementById("proposal-back-to-pick-btn")?.addEventListener("click", () => {
+    proposalState = "activity-pick";
+    const body = document.getElementById("proposal-body");
+    if (body) body.innerHTML = renderActivityPick();
+    onMount();
   });
 }
 
@@ -969,5 +1015,7 @@ function rerender() {
   if (proposalState === "branching")     body.innerHTML = renderBranching();
   if (proposalState === "revised")       body.innerHTML = renderRevised(name);
   if (proposalState === "activity-pick") body.innerHTML = renderActivityPick();
+  if (proposalState === "gym-sub")       body.innerHTML = renderGymSub();
+  if (proposalState === "gym-explainer") body.innerHTML = renderGymExplainer();
   onMount();
 }
