@@ -1,6 +1,10 @@
 /**
  * coach-proposal.js - Coach Proposal Screen
  *
+ * 22 May 2026 v2 — Gym session routes through gym-sub screen.
+ *                   openGymSub store flag opens directly in gym-sub state.
+ *                   Gym sub wiring complete in onMount().
+ *
  * v1.0 (S4-1, April 2026)
  *
  * The coach arrives with a plan. Not a menu. Not cards.
@@ -546,7 +550,13 @@ function latestCheckin() {
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
-  if (!currentProposal) currentProposal = buildProposal();
+  // If arriving from "Gym session" in I Know What I'm Doing,
+  // open directly in gym sub-screen state
+  if (store.get("openGymSub")) {
+    store.set("openGymSub", false);
+    proposalState = "gym-sub";
+  }
+  if (!currentProposal && proposalState === "proposal") currentProposal = buildProposal();
   const name = (store.get("name") || "").split(" ")[0] || "there";
 
   return `
