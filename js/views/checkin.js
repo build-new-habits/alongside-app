@@ -54,6 +54,7 @@ const TIME_OPTIONS = [
 let checkinStep        = 0;
 let showNewConditions  = false;   // true when user taps "Anything New?"
 let selectedLocation   = null;    // "home" | "gym" | "outdoors" | "skip"
+let checkinSteps       = [];      // built in render(), read in onMount()
 
 let currentCheckin = {
   energy: 5,
@@ -128,11 +129,12 @@ export function render() {
   const todayPlan = store.get("weeklyPlan")?.[todayDayName];
   const hasPlannedLocation = weeklyPlanEnabled && todayPlan && todayPlan.type !== "open";
 
-  const steps = [0, 1, 2];
-  if (conditions.length > 0) steps.push(3);
-  steps.push(4);
-  if (!hasPlannedLocation) steps.push(7); // location step
-  steps.push(5);
+  checkinSteps = [0, 1, 2];
+  if (conditions.length > 0) checkinSteps.push(3);
+  checkinSteps.push(4);
+  if (!hasPlannedLocation) checkinSteps.push(7); // location step
+  checkinSteps.push(5);
+  const steps = checkinSteps; // local alias for readability
 
   const currentStepId = steps[Math.min(checkinStep, steps.length - 1)];
 
@@ -483,21 +485,23 @@ function renderLocationStep(header) {
 
         <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-top:var(--space-4);">
           ${LOCATION_OPTIONS.map(opt => {
-            const isSelected = selectedLocation === opt.value;
+            const isSel = selectedLocation === opt.value;
             return `
-              <button class="card checkin-location-btn"
+              <button class="checkin-location-btn"
                       data-location="${opt.value}"
-                      style="display:flex;align-items:center;gap:var(--space-4);text-align:left;width:100%;cursor:pointer;
-                             background:${isSelected ? "var(--color-primary-muted, rgba(20,184,166,0.12))" : "var(--color-surface)"};
-                             border:2px solid ${isSelected ? "var(--color-primary)" : "transparent"};"
-                      aria-pressed="${isSelected}"
+                      style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);
+                             border-radius:var(--radius-lg,12px);text-align:left;width:100%;cursor:pointer;
+                             background:${isSel ? "rgba(20,184,166,0.15)" : "var(--color-surface)"};
+                             border:2px solid ${isSel ? "var(--color-primary)" : "rgba(255,255,255,0.08)"};"
+                      aria-pressed="${isSel}"
                       aria-label="${opt.label}: ${opt.desc}">
-                <span style="font-size:1.75rem;flex-shrink:0;line-height:1;" aria-hidden="true">${opt.icon}</span>
+                <span style="font-size:1.5rem;flex-shrink:0;line-height:1;" aria-hidden="true">${opt.icon}</span>
                 <div style="flex:1;min-width:0;">
-                  <p style="font-size:var(--text-base);font-weight:var(--font-semibold);margin-bottom:var(--space-1);">${opt.label}</p>
-                  <p class="text-secondary" style="font-size:var(--text-sm);">${opt.desc}</p>
+                  <p style="font-size:var(--text-base);font-weight:var(--font-semibold);
+                             color:${isSel ? "var(--color-primary)" : "var(--color-text)"};">${opt.label}</p>
+                  <p style="font-size:var(--text-sm);color:var(--color-text-secondary);margin-top:2px;">${opt.desc}</p>
                 </div>
-                ${isSelected ? '<span style="color:var(--color-primary);font-size:1.25rem;flex-shrink:0;" aria-hidden="true">✓</span>' : ""}
+                ${isSel ? `<span style="color:var(--color-primary);font-size:1.1rem;flex-shrink:0;" aria-hidden="true">✓</span>` : ""}
               </button>
             `;
           }).join("")}
@@ -645,9 +649,9 @@ export function onMount() {
 
   // ── Next button ──────────────────────────────────────────────────────────
   document.getElementById("checkin-next-btn")?.addEventListener("click", () => {
-    const conditionsExist = conditions.length > 0;
-    const maxStep = conditionsExist ? 5 : 4;
-    checkinStep = Math.min(checkinStep + 1, maxStep);
+    // Drive from steps array so location step (7) is correctly included
+    const maxStepIndex = checkinSteps.length - 1;
+    checkinStep = Math.min(checkinStep + 1, maxStepIndex);
     rerenderCheckin();
   });
 
