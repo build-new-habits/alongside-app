@@ -1,8 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 21 May 2026 v10
+ * 22 May 2026 v1
  * Cache version: alongside-v69
+ *
+ * v70 changes (22 May 2026)
+ * - fixing check-in state to read the correct local date
  *
  * v69 changes (21 May 2026)
  * - Session builder with day saving functions
@@ -125,7 +128,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v69";
+const CACHE_NAME = "alongside-v70";
 
 const SHELL_URLS = [
 
