@@ -250,15 +250,15 @@ function logAndNavigate() {
     }
     // Other self-directed activities — activity in progress view (Phase 4)
     // For now, navigate to reflect directly with a timer option
-    store.set("reflectReturnRoute", "progress"); router.navigate("reflect");
+    router.navigate("reflect");
     return;
   }
   if (selectedPath === "quiet") {
     if (selectedQuiet === "journal" || selectedQuiet === "rest" || selectedQuiet === "breathing") {
-      store.set("reflectReturnRoute", "progress"); router.navigate("reflect");
+      router.navigate("reflect");
       return;
     }
-    store.set("reflectReturnRoute", "progress"); router.navigate("reflect");
+    router.navigate("reflect");
   }
 }
 
