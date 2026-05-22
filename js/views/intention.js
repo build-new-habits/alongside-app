@@ -1,6 +1,9 @@
 /**
  * intention.js - Intention Screen
  *
+ * 22 May 2026 v1 — Gym session routes via coach-proposal gym-sub screen
+ *                   instead of navigating directly to gym-programme.
+ *
  * v1.0 — Sits between check-in and activity.
  *   Reads check-in energy from store, responds with a dynamic
  *   coach line, then offers three paths:
