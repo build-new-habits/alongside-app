@@ -972,7 +972,7 @@ export function onMount() {
       store.set("activityLog", log);
       if (activeTimerId) clearInterval(activeTimerId);
       dismountSessionGuard();
-      router.navigate("reflect");
+      store.set("reflectReturnRoute", "progress"); router.navigate("reflect");
     }
   });
   // Back button — show exit confirm if session in progress
@@ -1000,7 +1000,7 @@ export function onMount() {
           store.set("activityLog", log);
           if (activeTimerId) clearInterval(activeTimerId);
           dismountSessionGuard();
-          router.navigate("reflect");
+          store.set("reflectReturnRoute", "progress"); router.navigate("reflect");
         },
         onDiscard: () => {
           if (activeTimerId) clearInterval(activeTimerId);
@@ -1010,7 +1010,7 @@ export function onMount() {
       });
     } else {
       dismountSessionGuard();
-      router.navigate("settings");
+      router.navigate("today");
     }
   });
 
