@@ -1,10 +1,6 @@
 /**
  * prescribed-session.js - Prescribed Exercise Session View
  *
- * 21 May 2026 v1 — Exit button now uses showExitCard() from session-guard.js.
- *                   Replaces native confirm() dialog. Three options:
- *                   Stay / Exit and save progress / Exit without saving.
- *
  * Walks through prescribed exercises one by one, matching the workout
  * execution pattern. Supports timer-based exercises (hold durations)
  * using the same timer logic as workout.js.
@@ -17,8 +13,7 @@
  * Nav: hidden (same as workout view)
  */
 
-import { store }        from "../store.js";
-import { showExitCard } from "../session-guard.js";
+import { store } from "../store.js";
 
 export const centered = false;
 
@@ -203,7 +198,7 @@ export function onMount() {
 
   // Already-done state
   document.getElementById("ps-back-btn")?.addEventListener("click", () => {
-    router.navigate("intention");
+    router.back();
   });
 
   if (active.length === 0) return;
@@ -219,11 +214,10 @@ export function onMount() {
 
   // Exit
   document.getElementById("ps-exit-btn")?.addEventListener("click", () => {
-    showExitCard({
-      onSave:    () => { cleanupSession(); router.navigate("reflect"); },
-      onDiscard: () => { cleanupSession(); router.navigate("today"); },
-      label:     "prescribed session",
-    });
+    if (confirm("Exit session? Progress on this session will be lost.")) {
+      cleanupSession();
+      router.back();
+    }
   });
 
   // Timer toggle
