@@ -115,9 +115,7 @@ export function render() {
   // Steps: 0=energy, 1=mood, 2=sleep, 3=conditions (if any), 4=time, 5=summary
   const steps = [0, 1, 2];
   if (conditions.length > 0) steps.push(3);
-  steps.push(4);
-  if (showNewConditions) steps.push(6); // "Anything New?" step
-  steps.push(5);
+  steps.push(4, 5);
 
   const currentStepId = steps[Math.min(checkinStep, steps.length - 1)];
 
@@ -146,7 +144,6 @@ function renderStep(stepId, name, conditions) {
   if (stepId === 2) return renderSleepStep(header);
   if (stepId === 3) return renderConditionsStep(header, conditions);
   if (stepId === 4) return renderTimeStep(header);
-  if (stepId === 6) return renderNewConditionsStep(header);
   if (stepId === 5) return renderSummaryStep(header);
   return renderEnergyStep(header, name);
 }
@@ -328,6 +325,30 @@ function renderConditionsStep(header, conditions) {
         </div>
       </div>
 
+      <!-- Anything new inline panel -->
+      ${showNewConditions ? `
+        <div style="margin-top:var(--space-5);padding-top:var(--space-4);border-top:1px solid rgba(255,255,255,0.08);">
+          <p class="text-sm text-muted" style="margin-bottom:var(--space-3);">
+            Tap anything new. It will appear above with the pain sliders.
+          </p>
+          <div class="condition-add-grid" role="group" aria-label="Add a new condition">
+            ${CONDITIONS.filter(c => !conditions.includes(c.id)).map(cond => `
+              <button class="condition-add-btn"
+                      data-new-condition="${cond.id}"
+                      aria-label="Add ${cond.name}">
+                <span aria-hidden="true">${cond.icon}</span>
+                ${cond.name}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      ` : `
+        <button class="btn btn-ghost btn-full" id="checkin-new-conditions-btn"
+                style="margin-top:var(--space-4);">
+          Anything new to add? +
+        </button>
+      `}
+
       <div class="checkin-step-actions">
         <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">Next</button>
         <button class="btn btn-ghost btn-small" id="checkin-back-btn" style="margin-top:var(--space-2);">&larr; Back</button>
@@ -364,10 +385,6 @@ function renderTimeStep(header) {
 
       <div class="checkin-step-actions">
         <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">Done</button>
-        <button class="btn btn-ghost btn-full" id="checkin-new-conditions-btn"
-                style="margin-top:var(--space-2);">
-          Anything new to add? +
-        </button>
         <button class="btn btn-ghost btn-small" id="checkin-back-btn" style="margin-top:var(--space-2);">&larr; Back</button>
       </div>
     </div>
@@ -574,44 +591,31 @@ export function onMount() {
   // ── Back button ──────────────────────────────────────────────────────────
   document.getElementById("checkin-back-btn")?.addEventListener("click", () => {
     checkinStep = Math.max(0, checkinStep - 1);
+    showNewConditions = false;
     rerenderCheckin();
   });
 
-  // ── Anything New? button ──────────────────────────────────────────────────
+  // ── Anything New? — inline expand on conditions step ────────────────────
   document.getElementById("checkin-new-conditions-btn")?.addEventListener("click", () => {
     showNewConditions = true;
-    currentCheckin.newConditions = currentCheckin.newConditions || [];
-    checkinStep++;
     rerenderCheckin();
   });
 
-  // ── New condition add/remove in step 6 ───────────────────────────────────
+  // ── Add new condition inline — adds to store + pain sliders immediately ──
   document.querySelectorAll("[data-new-condition]").forEach(btn => {
     btn.addEventListener("click", () => {
       const id      = btn.dataset.newCondition;
       const current = store.get("conditions") || [];
-      const newList = currentCheckin.newConditions || [];
-
-      if (newList.includes(id)) {
-        // Remove from new list
-        currentCheckin.newConditions = newList.filter(x => x !== id);
-      } else {
-        // Add to both store.conditions and newConditions tracking list
-        currentCheckin.newConditions = [...newList, id];
-        if (!current.includes(id)) {
-          store.set("conditions", [...current, id]);
-        }
+      if (!current.includes(id)) {
+        store.set("conditions", [...current, id]);
+        // Initialise pain score at 0 so slider shows
+        const scores = store.get("conditionPainScores") || {};
+        scores[id] = 0;
+        store.set("conditionPainScores", scores);
+        currentCheckin.conditionLevels = currentCheckin.conditionLevels || {};
+        currentCheckin.conditionLevels[id] = 0;
       }
-      rerenderCheckin();
-    });
-  });
-
-  document.querySelectorAll(".checkin-remove-new-condition").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id      = btn.dataset.id;
-      const current = store.get("conditions") || [];
-      currentCheckin.newConditions = (currentCheckin.newConditions || []).filter(x => x !== id);
-      store.set("conditions", current.filter(x => x !== id));
+      // Re-render so the new condition appears in the pain sliders above
       rerenderCheckin();
     });
   });
