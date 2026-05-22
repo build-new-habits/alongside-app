@@ -1,10 +1,8 @@
 /**
  * progress.js - Progress View
  *
- * v3.1 (21 May 2026) — getLog() filters ghost partial entries
- *           Entries without completedAt and durationMins < 2 are excluded.
- *           Fixes: partial sessions from "Exit without saving" appearing
- *           in Progress as real sessions.
+ * 22 May 2026 v1 — gymCount includes morning-session + coach-session types;
+ *                   tile renamed "Gym & programmes".
  *
  * v3.0 (S4-1b, April 2026) — Numbers-first redesign
  *
@@ -55,19 +53,7 @@ function isLast30Days(iso) {
 }
 
 function getLog() {
-  // Filter out ghost partial entries — sessions that were opened then
-  // discarded ("Exit without saving") or abandoned before any real work.
-  // A real entry has either:
-  //   (a) completedAt set (session finished or reflect was completed), OR
-  //   (b) durationMins >= 2 (at least 2 minutes elapsed in-session)
-  // Entries without completedAt AND with durationMins < 2 (or missing) are
-  // optimistic writes from session start that were never cleaned up.
-  const raw = store.get("activityLog") || [];
-  return raw.filter(e => {
-    if (e.completedAt) return true;           // completed normally via reflect
-    if ((e.durationMins || 0) >= 2) return true; // partial but meaningful time
-    return false;                              // ghost entry — discard
-  });
+  return store.get("activityLog") || [];
 }
 
 function getCheckins() {
@@ -193,10 +179,10 @@ export function render() {
   // Stat counts
   const coachCount    = last30Log.filter(e => e.source === "coach-recommended" || e.type === "coach-session").length;
   const prescribedCount = last30Log.filter(e => ["prescribed","prescribed-session"].includes(e.type) || e.source === "prescribed").length;
-  const gymCount      = last30Log.filter(e => ["gym","gym-programme"].includes(e.type) && e.source !== "coach-recommended").length;
+  const gymCount      = last30Log.filter(e => ["gym","gym-programme","morning-session","coach-session"].includes(e.type) && e.source !== "coach-recommended").length;
   const otherCount    = last30Log.filter(e =>
     isTrainingType(e.type) &&
-    !["gym","gym-programme","coach-session","prescribed","prescribed-session"].includes(e.type) &&
+    !["gym","gym-programme","morning-session","coach-session","prescribed","prescribed-session"].includes(e.type) &&
     e.source !== "coach-recommended" && e.source !== "prescribed"
   ).length;
   const mindfulCount  = last30Log.filter(e => isMindfulType(e.type || e.source)).length;
@@ -351,7 +337,7 @@ function renderStatTiles(coach, prescribed, gym, other, mindful) {
   const tiles = [
     { label: "Coach sessions",     value: coach,      icon: "\uD83C\uDFAF", show: true  },
     { label: "Prescribed",        value: prescribed,  icon: "\uD83E\uDE7A", show: true  },
-    { label: "Gym sessions",      value: gym,         icon: "\uD83C\uDFCB", show: true  },
+    { label: "Gym & programmes",   value: gym,         icon: "\uD83C\uDFCB", show: true  },
     { label: "Own activities",    value: other,       icon: "\uD83C\uDFC3", show: true  },
     { label: "Mindful moments",   value: mindful,     icon: "\uD83C\uDF3F", show: true  },
   ].filter(t => t.show);
