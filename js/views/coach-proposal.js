@@ -505,34 +505,27 @@ function makeProposal({ type, target, quietMode, duration, reflection, constrain
  */
 function buildAlternativeProposal() {
   const current    = currentProposal;
-  // Read actual available time — do not hardcode
   const availableTime = store.get("availableTime") || null;
   const TIME_MAP_ALT  = { micro: 10, quick: 20, short: 30, standard: 40, long: 50, open: 60 };
   const timeBudget    = availableTime ? (TIME_MAP_ALT[availableTime] || 30) : 30;
 
   const alternatives = {
-    "gym":       { type: "quiet",      target: "quiet-session",  quietMode: "breathing",
-                   duration: Math.min(timeBudget, 20),
+    "gym":       { type: "quiet",      target: "quiet-session",  quietMode: "breathing", duration: 20,
                    proposal: "How about something quieter instead. A breathing practice or a short mindful session.",
                    rationale: "Sometimes contrast is the right choice." },
-    "quiet":     { type: "gym",        target: "gym-programme",  quietMode: null,
-                   duration: Math.min(timeBudget, 35),
+    "quiet":     { type: "gym",        target: "gym-programme",  quietMode: null,         duration: 35,
                    proposal: "How about continuing your gym programme after all. You might have more in you than you think.",
                    rationale: "Movement often generates the energy it costs." },
-    "yoga":      { type: "gym",        target: "gym-programme",  quietMode: null,
-                   duration: Math.min(timeBudget, 40),
+    "yoga":      { type: "gym",        target: "gym-programme",  quietMode: null,         duration: 40,
                    proposal: "How about the gym programme instead. A different kind of movement that will complement your recent sessions.",
                    rationale: "Strength work supports mobility over time." },
-    "run":       { type: "walk",       target: "activity-log",   quietMode: null,
-                   duration: Math.min(timeBudget, 30),
+    "run":       { type: "walk",       target: "activity-log",   quietMode: null,         duration: 30,
                    proposal: "How about a walk instead. Same outdoor time, less intensity, still moving.",
                    rationale: "Lower-intensity movement has its own benefits." },
-    "walk":      { type: "quiet",      target: "quiet-session",  quietMode: "mindful",
-                   duration: Math.min(timeBudget, 15),
+    "walk":      { type: "quiet",      target: "quiet-session",  quietMode: "mindful",   duration: 15,
                    proposal: "How about a short mindful session instead. Fifteen minutes of stillness.",
                    rationale: "Rest is movement of a different kind." },
-    "prescribed":{ type: "gym",        target: "gym-programme",  quietMode: null,
-                   duration: Math.min(timeBudget, 45),
+    "prescribed":{ type: "gym",        target: "gym-programme",  quietMode: null,         duration: 45,
                    proposal: "How about the full gym session. Your prescribed work is already built into the warmup.",
                    rationale: "More complete session, same prescribed work included." }
   };
@@ -578,7 +571,9 @@ export function render() {
         ${proposalState === "proposal"   ? renderProposal(name)  : ""}
         ${proposalState === "branching"  ? renderBranching()     : ""}
         ${proposalState === "revised"    ? renderRevised(name)   : ""}
-        ${proposalState === "activity-pick" ? renderActivityPick() : ""}
+        ${proposalState === "activity-pick"  ? renderActivityPick()  : ""}
+        ${proposalState === "gym-sub"        ? renderGymSub()        : ""}
+        ${proposalState === "gym-explainer"  ? renderGymExplainer()  : ""}
       </div>
 
     </div>
@@ -714,6 +709,83 @@ const ACTIVITY_PICKS = [
   { id: "class",       label: "A class",              icon: "\uD83C\uDFE5", target: "activity-log",   quietMode: null },
 ];
 
+// GYM_OPTIONS — shown when user taps "Gym session"
+let gymExplainerTarget = null;
+
+const GYM_OPTIONS = [
+  {
+    id:      "founders-gym",
+    label:   "Founder's Gym Programme",
+    icon:    String.fromCodePoint(0x1F3CB),
+    target:  "gym-programme",
+    tagline: "Graeme's own rehabilitation and strength programme",
+    explainer: "This programme was built for Graeme Wright, founder of Alongside. It started as a post-injury rehabilitation plan and became a strength and conditioning programme built around real conditions, real equipment, and a real training history. Use it as a starting point, or as inspiration to build your own."
+  },
+  {
+    id:      "build-session",
+    label:   "Build a session",
+    icon:    String.fromCodePoint(0x26A1),
+    target:  "session-builder-ui",
+    tagline: "Coach builds a session around your equipment today",
+    explainer: null
+  },
+  {
+    id:      "founders-cardio",
+    label:   "Morning Cardio & Core",
+    icon:    String.fromCodePoint(0x1F305),
+    target:  "morning-session",
+    tagline: "Graeme's six-week morning programme",
+    explainer: "This is the morning programme Graeme built to create a consistent movement habit. Six weeks, three sessions a week: one at home and two at the gym. Cardio, upper body, and core in around 45 minutes. Condition-aware, progressive, and built around a real schedule."
+  }
+];
+
+function renderGymSub() {
+  return `
+    <div class="card card-coach coach-proposal-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div><p>Which kind of gym session?</p></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-top:var(--space-2);">
+      ${GYM_OPTIONS.map(opt => `
+        <button class="card gym-sub-option-btn" data-gym-option="${opt.id}"
+                style="display:flex;align-items:center;gap:var(--space-4);text-align:left;width:100%;cursor:pointer;background:var(--color-surface);"
+                aria-label="${opt.label}">
+          <span style="font-size:1.75rem;flex-shrink:0;line-height:1;" aria-hidden="true">${opt.icon}</span>
+          <div style="flex:1;min-width:0;">
+            <p style="font-size:var(--text-base);font-weight:var(--font-semibold);margin-bottom:var(--space-1);">${opt.label}</p>
+            <p class="text-secondary" style="font-size:var(--text-sm);">${opt.tagline}</p>
+          </div>
+          <span style="color:var(--color-primary);font-size:1.25rem;flex-shrink:0;" aria-hidden="true">›</span>
+        </button>
+      `).join("")}
+    </div>
+
+    <button class="btn btn-ghost btn-full" id="proposal-back-to-pick-btn"
+            style="margin-top:var(--space-4);">&larr; Back</button>
+  `;
+}
+
+function renderGymExplainer() {
+  const opt = GYM_OPTIONS.find(o => o.target === gymExplainerTarget);
+  if (!opt) return renderGymSub();
+  return `
+    <div class="card card-coach coach-proposal-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <h3 style="color:var(--color-primary);margin-bottom:var(--space-2);">${opt.label}</h3>
+        <p class="coach-message-text">${opt.explainer}</p>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-large btn-full" id="gym-explainer-start-btn"
+            data-target="${opt.target}" style="margin-top:var(--space-5);">
+      Start session →
+    </button>
+    <button class="btn btn-ghost btn-full" id="proposal-back-to-gym-sub-btn"
+            style="margin-top:var(--space-3);">&larr; Back</button>
+  `;
+}
+
 function renderActivityPick() {
   return `
     <div class="card card-coach coach-proposal-card">
@@ -780,7 +852,7 @@ export function onMount() {
   // ── Header navigation ─────────────────────────────────────────────────────
   document.getElementById("proposal-back-btn")?.addEventListener("click", () => {
     cleanup();
-    router.back();
+    router.navigate("checkin");
   });
 
   document.getElementById("proposal-library-btn")?.addEventListener("click", () => {
