@@ -1,7 +1,9 @@
 /**
  * coach-proposal.js - Coach Proposal Screen
  *
- * 21 May 2026 v1 — "Build me a session" branch chip added.
+ * 21 May 2026 v1
+ * 22 May 2026 v1 — localDateKey() replaces UTC date string. Fixes early-morning
+ *                   date mismatch for UTC+N timezone users. — "Build me a session" branch chip added.
  *                   Routes to session-builder via "build" branchChoice.
  *
  * v1.0 (S4-1, April 2026)
@@ -41,6 +43,16 @@
  */
 
 import { store } from "../store.js";
+
+// Local date string YYYY-MM-DD — never UTC, so early-morning check-in
+// works correctly for users in UTC+N timezones.
+function localDateKey() {
+  const d    = new Date();
+  const yyyy = d.getFullYear();
+  const mm   = String(d.getMonth() + 1).padStart(2, "0");
+  const dd   = String(d.getDate()).padStart(2, "0");
+  return yyyy + "-" + mm + "-" + dd;
+}
 
 export const centered = false;
 
@@ -166,7 +178,7 @@ function buildProposal(preferShorter = false) {
   const hasGymProg     = !!gymProgramme;
 
   // Is today the same day as the last proposal?
-  const todayKey       = new Date().toISOString().split("T")[0];
+  const todayKey       = localDateKey();
   const isRepeatDay    = lastDate === todayKey;
 
   // Preference score helper: how much does the user lean toward a type?
@@ -540,7 +552,7 @@ function buildAlternativeProposal() {
 
 function latestCheckin() {
   const history = store.get("checkinHistory") || {};
-  const todayKey = new Date().toISOString().split("T")[0];
+  const todayKey = localDateKey();
   return history[todayKey] || store.get("lastCheckin") || {};
 }
 
@@ -759,7 +771,7 @@ function navigateToProposal(proposal) {
   store.set("activityPreferences", prefs);
 
   // Track last proposal type for variety enforcement
-  const todayKey = new Date().toISOString().split("T")[0];
+  const todayKey = localDateKey();
   store.set("lastProposalType", proposal.type);
   store.set("lastProposalDate", todayKey);
 
