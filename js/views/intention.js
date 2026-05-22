@@ -245,7 +245,9 @@ function logAndNavigate() {
   }
   if (selectedPath === "self") {
     if (selectedActivity === "gym") {
-      router.navigate("gym-programme");
+      // Open gym sub-screen inside coach-proposal rather than going direct
+      store.set("openGymSub", true);
+      router.navigate("coach-proposal");
       return;
     }
     // Other self-directed activities — activity in progress view (Phase 4)
