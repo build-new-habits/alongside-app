@@ -198,7 +198,7 @@ const GUIDE = {
 // ── Programme data ────────────────────────────────────────────────────────────
 
 const PROGRAMME = {
-  name: "Core Strength & Posterior Chain Recovery",
+  name: "Founder's Gym Programme",
   weeks: 6,
   sessions: [
     {
@@ -711,8 +711,8 @@ function renderGeneratedSession(session) {
     <div class="view gym-programme-view">
 
       <div class="view-header gym-programme-header">
-        <button class="btn btn-ghost" id="gym-back-btn"
-                aria-label="Back">Back</button>
+        <button class="btn btn-ghost" id="gym-generated-back-btn"
+                aria-label="Back to session preview">Back</button>
         <h1>${session.title}</h1>
       </div>
 
@@ -976,6 +976,12 @@ export function onMount() {
     }
   });
   // Back button — show exit confirm if session in progress
+  // Generated session back — clears flag, returns to session builder
+  document.getElementById("gym-generated-back-btn")?.addEventListener("click", () => {
+    store.set("usingGeneratedSession", false);
+    router.navigate("session-builder-ui");
+  });
+
   document.getElementById("gym-back-btn")?.addEventListener("click", () => {
     if (!postSessionState && completedIds.size > 0) {
       showExitCard({
