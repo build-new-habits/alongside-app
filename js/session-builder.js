@@ -686,9 +686,15 @@ export function buildSession({ sessionType, durationMins, equipmentOverride }) {
       if (ex.equipment && ex.equipment.length > 0) {
         if (!ex.equipment.every(e => equipSet.has(e))) return false;
       }
-      // Condition check
+      // Condition check — only filter on acute/subacute pain levels.
+      // Base condition IDs (no suffix) do not filter exercises — the user
+      // has a condition but may have no pain today. Only pain score >= 4
+      // (subacute) or >= 7 (acute) triggers exercise exclusion.
       if (ex.contraindications && ex.contraindications.length > 0) {
-        if (ex.contraindications.some(c => conditionSet.has(c))) return false;
+        const acuteContraindicated = ex.contraindications.some(c =>
+          (c.endsWith("-acute") || c.endsWith("-subacute")) && conditionSet.has(c)
+        );
+        if (acuteContraindicated) return false;
       }
       return true;
     });
