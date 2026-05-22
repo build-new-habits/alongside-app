@@ -44,7 +44,8 @@ const TIME_OPTIONS = [
 //   4 = time, 5 = done (submits and navigates)
 // Each step fills the viewport. Coach responds between steps.
 
-let checkinStep = 0;
+let checkinStep       = 0;
+let showNewConditions = false;  // true when user taps "Anything New?"
 
 let currentCheckin = {
   energy: 5,
@@ -114,7 +115,9 @@ export function render() {
   // Steps: 0=energy, 1=mood, 2=sleep, 3=conditions (if any), 4=time, 5=summary
   const steps = [0, 1, 2];
   if (conditions.length > 0) steps.push(3);
-  steps.push(4, 5);
+  steps.push(4);
+  if (showNewConditions) steps.push(6); // "Anything New?" step
+  steps.push(5);
 
   const currentStepId = steps[Math.min(checkinStep, steps.length - 1)];
 
@@ -143,6 +146,7 @@ function renderStep(stepId, name, conditions) {
   if (stepId === 2) return renderSleepStep(header);
   if (stepId === 3) return renderConditionsStep(header, conditions);
   if (stepId === 4) return renderTimeStep(header);
+  if (stepId === 6) return renderNewConditionsStep(header);
   if (stepId === 5) return renderSummaryStep(header);
   return renderEnergyStep(header, name);
 }
@@ -313,10 +317,10 @@ function renderConditionsStep(header, conditions) {
                 </p>
                 <div class="checkin-pain-chips" role="group"
                      aria-label="Pain level for ${condition?.name || conditionId}">
-                  <button class="checkin-pain-chip ${level <= 2 ? "selected low" : ""}" data-level="1" aria-pressed="${level <= 2}">None</button>
-                  <button class="checkin-pain-chip ${level > 2 && level <= 5 ? "selected mild" : ""}" data-level="4" aria-pressed="${level > 2 && level <= 5}">Mild</button>
-                  <button class="checkin-pain-chip ${level > 5 && level <= 7 ? "selected moderate" : ""}" data-level="6" aria-pressed="${level > 5 && level <= 7}">Moderate</button>
-                  <button class="checkin-pain-chip ${level > 7 ? "selected severe" : ""}" data-level="9" aria-pressed="${level > 7}">Severe</button>
+                  <button class="checkin-pain-chip ${level <= 0 ? "selected low" : ""}" data-level="0" aria-pressed="${level <= 0}">None</button>
+                  <button class="checkin-pain-chip ${level > 0 && level <= 3 ? "selected mild" : ""}" data-level="3" aria-pressed="${level > 0 && level <= 3}">Mild</button>
+                  <button class="checkin-pain-chip ${level > 3 && level <= 6 ? "selected moderate" : ""}" data-level="6" aria-pressed="${level > 3 && level <= 6}">Moderate</button>
+                  <button class="checkin-pain-chip ${level > 6 ? "selected severe" : ""}" data-level="8" aria-pressed="${level > 6}">Severe</button>
                 </div>
               </div>
             `;
@@ -360,7 +364,73 @@ function renderTimeStep(header) {
 
       <div class="checkin-step-actions">
         <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">Done</button>
+        <button class="btn btn-ghost btn-full" id="checkin-new-conditions-btn"
+                style="margin-top:var(--space-2);">
+          Anything new to add? +
+        </button>
         <button class="btn btn-ghost btn-small" id="checkin-back-btn" style="margin-top:var(--space-2);">&larr; Back</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderNewConditionsStep(header) {
+  const allConditions  = CONDITIONS;
+  const existing       = store.get("conditions") || [];
+  const available      = allConditions.filter(c => !existing.includes(c.id));
+  const newlyAdded     = currentCheckin.newConditions || [];
+
+  return `
+    <div class="view checkin-step-view">
+      ${header}
+      <div class="checkin-step-body">
+        <div class="checkin-coach-line">
+          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
+          <p>Anything new going on? Add it here and I will factor it in from today.</p>
+        </div>
+
+        ${newlyAdded.length > 0 ? `
+          <div style="margin-bottom: var(--space-4);">
+            <p class="text-sm text-muted" style="margin-bottom: var(--space-2);">Added this check-in:</p>
+            ${newlyAdded.map(id => {
+              const cond = CONDITIONS.find(c => c.id === id);
+              return `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+                  <span>${cond?.icon || ""} ${cond?.name || id}</span>
+                  <button class="btn-text btn-text--danger checkin-remove-new-condition"
+                          data-id="${id}" aria-label="Remove ${cond?.name || id}">Remove</button>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        ` : ""}
+
+        ${available.length > 0 ? `
+          <p class="text-sm text-muted" style="margin-bottom: var(--space-3);">
+            Tap anything that applies today:
+          </p>
+          <div class="condition-add-grid" role="group" aria-label="Add a condition">
+            ${available.map(cond => `
+              <button class="condition-add-btn ${newlyAdded.includes(cond.id) ? "selected" : ""}"
+                      data-new-condition="${cond.id}"
+                      aria-pressed="${newlyAdded.includes(cond.id)}"
+                      aria-label="Add ${cond.name}">
+                <span aria-hidden="true">${cond.icon}</span>
+                ${cond.name}
+              </button>
+            `).join("")}
+          </div>
+        ` : `
+          <p class="text-secondary text-sm">All conditions are already recorded.</p>
+        `}
+      </div>
+
+      <div class="checkin-step-actions">
+        <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">
+          ${newlyAdded.length > 0 ? "Save and continue" : "Continue"}
+        </button>
+        <button class="btn btn-ghost btn-small" id="checkin-back-btn"
+                style="margin-top:var(--space-2);">&larr; Back</button>
       </div>
     </div>
   `;
@@ -505,6 +575,45 @@ export function onMount() {
   document.getElementById("checkin-back-btn")?.addEventListener("click", () => {
     checkinStep = Math.max(0, checkinStep - 1);
     rerenderCheckin();
+  });
+
+  // ── Anything New? button ──────────────────────────────────────────────────
+  document.getElementById("checkin-new-conditions-btn")?.addEventListener("click", () => {
+    showNewConditions = true;
+    currentCheckin.newConditions = currentCheckin.newConditions || [];
+    checkinStep++;
+    rerenderCheckin();
+  });
+
+  // ── New condition add/remove in step 6 ───────────────────────────────────
+  document.querySelectorAll("[data-new-condition]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id      = btn.dataset.newCondition;
+      const current = store.get("conditions") || [];
+      const newList = currentCheckin.newConditions || [];
+
+      if (newList.includes(id)) {
+        // Remove from new list
+        currentCheckin.newConditions = newList.filter(x => x !== id);
+      } else {
+        // Add to both store.conditions and newConditions tracking list
+        currentCheckin.newConditions = [...newList, id];
+        if (!current.includes(id)) {
+          store.set("conditions", [...current, id]);
+        }
+      }
+      rerenderCheckin();
+    });
+  });
+
+  document.querySelectorAll(".checkin-remove-new-condition").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id      = btn.dataset.id;
+      const current = store.get("conditions") || [];
+      currentCheckin.newConditions = (currentCheckin.newConditions || []).filter(x => x !== id);
+      store.set("conditions", current.filter(x => x !== id));
+      rerenderCheckin();
+    });
   });
 
   // ── Final submit ─────────────────────────────────────────────────────────
