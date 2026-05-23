@@ -1,21 +1,22 @@
 /**
- * progress.js - 22 May 2026 v1 (S4-3): label wrap fix, font-size inline
- *
  * progress.js - Progress View
  *
- * v3.0 (S4-1b, April 2026) --- Numbers-first redesign
+ * 22 May 2026 v1 — gymCount includes morning-session + coach-session types;
+ *                   tile renamed "Gym & programmes".
+ *
+ * v3.0 (S4-1b, April 2026) — Numbers-first redesign
  *
  * Layout:
- *   1. Coach summary --- personal, pattern-aware. Always first.
- *   2. This week --- stat ring + five key numbers
- *   3. Check-in streak --- 7-day visual dots
- *   4. Activity breakdown --- five stat tiles, shown only if data exists
- *   5. Coach patterns --- observations after 7+ sessions
- *   6. Body changes --- shown only if user has opted in
+ *   1. Coach summary — personal, pattern-aware. Always first.
+ *   2. This week — stat ring + five key numbers
+ *   3. Check-in streak — 7-day visual dots
+ *   4. Activity breakdown — five stat tiles, shown only if data exists
+ *   5. Coach patterns — observations after 7+ sessions
+ *   6. Body changes — shown only if user has opted in
  *
  * Design principles:
  *   - Numbers first. Lists last (or never).
- *   - No activity log dump. No "Gym session --- Yesterday" x13.
+ *   - No activity log dump. No "Gym session — Yesterday" x13.
  *   - Coach speaks in plain English, not data labels.
  *   - No streaks. Consistency = daysActiveLast30.
  */
@@ -24,7 +25,7 @@ import { store } from "../store.js";
 
 export const centered = false;
 
-// ------ Helpers ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function daysAgo(iso) {
   if (!iso) return 999;
@@ -64,7 +65,7 @@ function getCheckins() {
 
 function isTrainingType(type) {
   // Mindful moments (short, restorative) are NOT sessions in the ring.
-  // Everything else --- gym, yoga, prescribed, run, swim, class, walking, etc --- counts.
+  // Everything else — gym, yoga, prescribed, run, swim, class, walking, etc — counts.
   const mindfulOnly = ["breathing", "journal", "rest", "quiet", "quiet-session"];
   return !mindfulOnly.includes(type || "");
 }
@@ -73,7 +74,7 @@ function isMindfulType(type) {
   return ["breathing", "journal", "rest", "mindful", "quiet", "quiet-session"].includes(type || "");
 }
 
-// ------ Coach summary ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Coach summary ─────────────────────────────────────────────────────────────
 
 function buildCoachMessage(log, checkins) {
   const name         = (store.get("name") || "").split(" ")[0] || "";
@@ -106,64 +107,64 @@ function buildCoachMessage(log, checkins) {
   const avgEnergy7    = checkins.slice(0, 7).reduce((sum, [, d]) => sum + (d.energy || 0), 0) /
                         Math.max(1, checkins.slice(0, 7).length);
 
-  // ------ Empty / just starting ------------------------------------------------------------------------------------------------------------------------------------------------------
+  // ── Empty / just starting ──────────────────────────────────────────────────
   if (log.length === 0) {
-    return "Your progress builds here as we work together. What you log, I notice. What I notice, I will tell you honestly. Not numbers for their own sake --- patterns that actually mean something.";
+    return "Your progress builds here as we work together. What you log, I notice. What I notice, I will tell you honestly. Not numbers for their own sake — patterns that actually mean something.";
   }
 
   if (log.length < 3) {
-    return namePrefix + "You are in the early days. The research on habit formation is clear: the first two weeks are the hardest, and you are in them. Every session you complete right now is doing more than the session itself --- it is building the neural pattern that makes the next one easier.";
+    return namePrefix + "You are in the early days. The research on habit formation is clear: the first two weeks are the hardest, and you are in them. Every session you complete right now is doing more than the session itself — it is building the neural pattern that makes the next one easier.";
   }
 
-  // ------ Specific pattern: energy rises after movement ---------------------------------------------------------------------------
+  // ── Specific pattern: energy rises after movement ─────────────────────────
   if (energyPattern) {
     const pct = Math.round((energyRises / energyPairs.length) * 100);
-    const goalLine = goalDesc ? " This matters for your goal --- " + goalDesc + " --- because sustainable energy is what makes sustained effort possible." : "";
-    return namePrefix + "Something consistent is happening. Your energy after sessions has been higher than before them " + pct + "% of the time over the last two weeks. That is not a coincidence. Movement is generating the energy it costs." + goalLine + " The body is remarkable in this way --- it responds to being asked.";
+    const goalLine = goalDesc ? " This matters for your goal — " + goalDesc + " — because sustainable energy is what makes sustained effort possible." : "";
+    return namePrefix + "Something consistent is happening. Your energy after sessions has been higher than before them " + pct + "% of the time over the last two weeks. That is not a coincidence. Movement is generating the energy it costs." + goalLine + " The body is remarkable in this way — it responds to being asked.";
   }
 
-  // ------ Weekly target reached ---------------------------------------------------------------------------------------------------------------------------------------------------
+  // ── Weekly target reached ─────────────────────────────────────────────────
   if (hitTarget) {
     const consistencyLine = activeDays14 >= 8
       ? " You have been active on " + activeDays14 + " of the last 14 days. That kind of consistency is unusual. Most people intend to do this. You are actually doing it."
       : "";
-    return namePrefix + "You have reached your session target for this week." + consistencyLine + " I want to name that directly, because it matters. Not because targets are the point --- they are not. But because showing up consistently is how change happens, and you are showing up." + (goalDesc ? " That is how " + goalDesc + " becomes real." : "");
+    return namePrefix + "You have reached your session target for this week." + consistencyLine + " I want to name that directly, because it matters. Not because targets are the point — they are not. But because showing up consistently is how change happens, and you are showing up." + (goalDesc ? " That is how " + goalDesc + " becomes real." : "");
   }
 
-  // ------ Good check-in consistency ---------------------------------------------------------------------------------------------------------------------------------------
+  // ── Good check-in consistency ─────────────────────────────────────────────
   if (checkinCount7 >= 5 && avgEnergy7 >= 6.5) {
-    return namePrefix + "You have checked in " + checkinCount7 + " times this week, with an average energy of " + avgEnergy7.toFixed(1) + " out of 10. That is a meaningful signal --- not just about fitness, but about how you are engaging with your own wellbeing. Paying attention is the first act of change.";
+    return namePrefix + "You have checked in " + checkinCount7 + " times this week, with an average energy of " + avgEnergy7.toFixed(1) + " out of 10. That is a meaningful signal — not just about fitness, but about how you are engaging with your own wellbeing. Paying attention is the first act of change.";
   }
 
-  // ------ Training without recovery ---------------------------------------------------------------------------------------------------------------------------------------
+  // ── Training without recovery ─────────────────────────────────────────────
   if (trainingCount >= 4 && quietCount === 0) {
     return namePrefix + "You have been training hard this week with no recovery work. I want to flag something the research is clear about: adaptation happens during rest, not during effort. The session is the stimulus. Sleep, stillness, and recovery are where your body actually changes." + (goalDesc ? " For " + goalDesc + ", recovery is not optional." : "");
   }
 
-  // ------ Good balance of training and recovery ---------------------------------------------------------------------------------------------------
+  // ── Good balance of training and recovery ─────────────────────────────────
   if (quietCount >= 2 && trainingCount >= 2) {
-    return namePrefix + "You have been balancing active sessions with quieter practices this week. That balance is not accidental --- it is exactly what a sustainable approach looks like. Movement and stillness are not opposites. They are partners. The research on long-term behaviour change consistently shows that people who include recovery and reflection sustain their practice far longer than those who only train.";
+    return namePrefix + "You have been balancing active sessions with quieter practices this week. That balance is not accidental — it is exactly what a sustainable approach looks like. Movement and stillness are not opposites. They are partners. The research on long-term behaviour change consistently shows that people who include recovery and reflection sustain their practice far longer than those who only train.";
   }
 
-  // ------ Long-term consistency recognition ------------------------------------------------------------------------------------------------------------
+  // ── Long-term consistency recognition ────────────────────────────────────
   if (activeDays14 >= 8) {
-    return namePrefix + "You have been active on " + activeDays14 + " of the last 14 days. I want you to sit with that for a moment. That level of consistency is genuinely uncommon --- not because people do not want it, but because life makes it hard. You are building something real here." + (goalDesc ? " And that foundation is exactly what " + goalDesc + " requires." : "");
+    return namePrefix + "You have been active on " + activeDays14 + " of the last 14 days. I want you to sit with that for a moment. That level of consistency is genuinely uncommon — not because people do not want it, but because life makes it hard. You are building something real here." + (goalDesc ? " And that foundation is exactly what " + goalDesc + " requires." : "");
   }
 
-  // ------ Nothing logged recently ---------------------------------------------------------------------------------------------------------------------------------------------
+  // ── Nothing logged recently ───────────────────────────────────────────────
   if (last7.length === 0 && log.length > 0) {
-    return namePrefix + "Nothing logged in the last 7 days. I am not going to tell you that is fine if you know it is not. But I will tell you that a gap is just a gap --- it does not erase what came before, and it does not predict what comes next. The pattern you built is still there. It is waiting.";
+    return namePrefix + "Nothing logged in the last 7 days. I am not going to tell you that is fine if you know it is not. But I will tell you that a gap is just a gap — it does not erase what came before, and it does not predict what comes next. The pattern you built is still there. It is waiting.";
   }
 
-  // ------ Default: reflect recent count with context ------------------------------------------------------------------------------------
+  // ── Default: reflect recent count with context ────────────────────────────
   const n = last7.length;
   return namePrefix + "You have had " + n + " session" + (n !== 1 ? "s" : "") + " in the last week." +
     (goalDesc ? " That is progress toward " + goalDesc + "." : " Keep building the pattern.") +
-    " What you do consistently matters more than what you do occasionally. That is not motivation --- it is how biology works.";
+    " What you do consistently matters more than what you do occasionally. That is not motivation — it is how biology works.";
 }
 
 
-// ------ Render ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
   const log      = getLog();
@@ -178,10 +179,10 @@ export function render() {
   // Stat counts
   const coachCount    = last30Log.filter(e => e.source === "coach-recommended" || e.type === "coach-session").length;
   const prescribedCount = last30Log.filter(e => ["prescribed","prescribed-session"].includes(e.type) || e.source === "prescribed").length;
-  const gymCount      = last30Log.filter(e => ["gym","gym-programme"].includes(e.type) && e.source !== "coach-recommended").length;
+  const gymCount      = last30Log.filter(e => ["gym","gym-programme","morning-session","coach-session"].includes(e.type) && e.source !== "coach-recommended").length;
   const otherCount    = last30Log.filter(e =>
     isTrainingType(e.type) &&
-    !["gym","gym-programme","coach-session","prescribed","prescribed-session"].includes(e.type) &&
+    !["gym","gym-programme","morning-session","coach-session","prescribed","prescribed-session"].includes(e.type) &&
     e.source !== "coach-recommended" && e.source !== "prescribed"
   ).length;
   const mindfulCount  = last30Log.filter(e => isMindfulType(e.type || e.source)).length;
@@ -249,7 +250,7 @@ export function render() {
       <!-- 3. Check-in dots -->
       ${checkins.length > 0 ? renderCheckinDots(checkins) : ""}
 
-      <!-- 4. Activity breakdown --- 30 days -->
+      <!-- 4. Activity breakdown — 30 days -->
       ${log.length > 0 ? renderStatTiles(coachCount, prescribedCount, gymCount, otherCount, mindfulCount) : ""}
 
       <!-- 5. Patterns -->
@@ -271,7 +272,7 @@ export function render() {
   `;
 }
 
-// ------ Check-in dots ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Check-in dots ─────────────────────────────────────────────────────────────
 
 function renderCheckinDots(checkins) {
   const DAYS = ["M","T","W","T","F","S","S"];
@@ -284,7 +285,7 @@ function renderCheckinDots(checkins) {
       .map(([date]) => new Date(date).getDay())
   );
 
-  // Energy trend --- last 7 days average
+  // Energy trend — last 7 days average
   const recent = checkins.slice(0, 7);
   const avgEnergy = recent.length
     ? Math.round(recent.reduce((sum, [, d]) => sum + (d.energy || 0), 0) / recent.length * 10) / 10
@@ -330,13 +331,13 @@ function renderCheckinDots(checkins) {
   `;
 }
 
-// ------ Stat tiles ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Stat tiles ────────────────────────────────────────────────────────────────
 
 function renderStatTiles(coach, prescribed, gym, other, mindful) {
   const tiles = [
     { label: "Coach sessions",     value: coach,      icon: "\uD83C\uDFAF", show: true  },
     { label: "Prescribed",        value: prescribed,  icon: "\uD83E\uDE7A", show: true  },
-    { label: "Gym & Prog.",       value: gym,         icon: "\uD83C\uDFCB", show: true  },
+    { label: "Gym & programmes",   value: gym,         icon: "\uD83C\uDFCB", show: true  },
     { label: "Own activities",    value: other,       icon: "\uD83C\uDFC3", show: true  },
     { label: "Mindful moments",   value: mindful,     icon: "\uD83C\uDF3F", show: true  },
   ].filter(t => t.show);
@@ -354,7 +355,7 @@ function renderStatTiles(coach, prescribed, gym, other, mindful) {
           <div class="progress-tile ${tile.value === 0 ? "progress-tile--empty" : ""}">
             <span class="progress-tile-icon" aria-hidden="true">${tile.icon}</span>
             <span class="progress-tile-value">${tile.value}</span>
-            <span class="progress-tile-label" style="font-size:10px;line-height:1.2;">${tile.label}</span>
+            <span class="progress-tile-label">${tile.label}</span>
           </div>
         `).join("")}
       </div>
@@ -362,7 +363,7 @@ function renderStatTiles(coach, prescribed, gym, other, mindful) {
   `;
 }
 
-// ------ Patterns ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Patterns ──────────────────────────────────────────────────────────────────
 
 function renderPatterns(log) {
   const last14 = log.filter(e => daysAgo(e.loggedAt || e.completedAt) < 14);
@@ -409,7 +410,7 @@ function renderPatterns(log) {
   `;
 }
 
-// ------ Body changes ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Body changes ──────────────────────────────────────────────────────────────
 
 function renderBodyChanges() {
   const entries = store.get("bodyLog") || [];
@@ -468,7 +469,7 @@ function renderBodyOptIn() {
   `;
 }
 
-// ------ Mount ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
   // Body opt-in
