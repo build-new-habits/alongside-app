@@ -1,9 +1,7 @@
 /**
  * reflect.js - Reflect Screen
  *
- * 22 May 2026 v1 (S4-3): "Back to Today" -> "Done". Finish routes to progress.
- *
- * v1.0 --- "So, how was that?" moment.
+ * v1.0 — "So, how was that?" moment.
  *   Triggered after any activity completes.
  *   Reads currentActivityEntry from store to personalise the coach question.
  *   Two stages:
@@ -17,14 +15,14 @@ import { store } from "../store.js";
 
 export const centered = false;
 
-// ------ State ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── State ─────────────────────────────────────────────────────────────────────
 
 let stage      = "reflect";   // "reflect" | "summary"
 let feelAnswer = null;
 let painAnswer = null;
 let openText   = "";
 
-// ------ Coach question variants ---------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Coach question variants ───────────────────────────────────────────────────
 
 const QUESTIONS = {
   "gym":            "So, how was that? I want to know what it actually felt like in there.",
@@ -71,7 +69,7 @@ const WELLBEING_INVITATIONS = [
   "What did you notice about yourself today?",
 ];
 
-// ------ Summary builder ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Summary builder ───────────────────────────────────────────────────────────
 
 function buildSummary(entry, feel, pain) {
   const log       = store.get("activityLog") || [];
@@ -115,7 +113,7 @@ function buildSummary(entry, feel, pain) {
   return "Done. I've noted how today went and I'll use it next time.";
 }
 
-// ------ Render ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
   const entry      = store.get("currentActivityEntry") || {};
@@ -127,7 +125,7 @@ export function render() {
   const question   = QUESTIONS[type] || QUESTIONS["other"];
   const feelOpts   = FEEL_OPTIONS[type] || FEEL_OPTIONS["coach-session"];
 
-  // Wellbeing invitation --- rotates by day
+  // Wellbeing invitation — rotates by day
   const dayIdx     = new Date().getDay();
   const weekNum    = store.get("gymProgrammeWeek") || 1;
   const invitation = WELLBEING_INVITATIONS[(dayIdx + weekNum) % WELLBEING_INVITATIONS.length];
@@ -145,7 +143,7 @@ export function render() {
         </div>
         <button class="btn btn-primary btn-large btn-full" id="reflect-finish-btn"
                 style="margin-top: var(--space-4);">
-          Done
+          Back to Today
         </button>
       </div>`;
   }
@@ -220,7 +218,7 @@ export function render() {
   `;
 }
 
-// ------ Mount ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
   stage      = "reflect";
@@ -274,6 +272,7 @@ export function onMount() {
     // Finish (summary screen)
     const finishBtn = e.target.closest("#reflect-finish-btn");
     if (finishBtn) {
+      // Reflect is always a "Done" action — land on Progress.
       router.navigate("progress");
     }
   });
