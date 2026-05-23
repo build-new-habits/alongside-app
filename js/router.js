@@ -1,58 +1,48 @@
 /**
  * router.js - View navigation
  *
- * 22 May 2026 v2 --- Device back gesture fix (S4-3):
- *   pushState() called on every navigate() so the browser history stack
- *   is never empty. popstate listener intercepts device swipe-back and
- *   Android back button, calls router.back() instead of exiting the app.
- *   Added missing VIEW_NAMES entries for new routes.
- *
- * 22 May 2026 v1 --- Navigation stack added. router.back() replaces all
- *   hardcoded Back destinations.
+ * 22 May 2026 v1 — Navigation stack added. router.back() replaces all
+ *                   hardcoded Back destinations. Every Back button calls
+ *                   router.back() — no destination logic needed.
+ * Handles routing between different screens
  *
  * Accessibility additions (March 2026):
  *   - VIEW_NAMES map provides human-readable labels for screen reader announcements
  *   - announceNavigation() writes to #sr-announcer after every navigate()
  *   - moveFocusToContent() moves keyboard focus to #main-content after render
+ *     so screen reader users land at the top of the new view
  */
 
-import { store } from "./store.js";
-import { tts }   from "./tts.js";
+import { store } from './store.js';
+import { tts }   from './tts.js';
 
+// Human-readable names announced to screen readers on navigation.
+// Keys match the viewName strings passed to router.navigate().
 const VIEW_NAMES = {
-  "today":                   "Today",
-  "progress":                "Your Progress",
-  "settings":                "Settings",
-  "checkin":                 "Daily Check-In",
-  "intention":               "What would you like to do today?",
-  "coach-proposal":          "Your Coach",
-  "workout":                 "Workout",
-  "workout-complete":        "Workout Complete",
-  "reflect":                 "How was that?",
-  "prescribed":              "My Prescribed Exercises",
-  "prescribed-session":      "Prescribed Exercises",
-  "gym-programme":           "My Gym Programme",
-  "morning-session":         "Morning Session",
-  "quiet-session":           "Quiet Session",
-  "yoga-session":            "Yoga Session",
-  "session-builder":         "Build a Session",
-  "session-builder-ui":      "Build a Session",
-  "library":                 "Library",
-  "activity-log":            "Log an Activity",
-  "noticing-hub":            "Noticing Hub",
-  "upgrade":                 "Personal Plan",
-  "privacy":                 "Privacy and Terms",
-  "onboarding/welcome":      "Welcome to Alongside",
-  "onboarding/name":         "Your Name",
-  "onboarding/about":        "About You",
-  "onboarding/body":         "Body and Targets",
-  "onboarding/goals":        "Your Goals",
-  "onboarding/conditions":   "Your Conditions",
-  "onboarding/lifestyle":    "Your Lifestyle",
-  "onboarding/equipment":    "Your Equipment",
-  "onboarding/complete":     "Profile Complete",
-  "onboarding/goal-setup":   "Build Your Plan",
-  "onboarding/privacy":      "Privacy and Terms",
+  'today':                   'Today',
+  'progress':                'Your Progress',
+  'settings':                'Settings',
+  'checkin':                 'Daily Check-In',
+  'workout':                 'Workout',
+  'workout-complete':        'Workout Complete',
+  'onboarding/welcome':      'Welcome to Alongside',
+  'onboarding/name':         'Your Name',
+  'onboarding/about':        'About You',
+  'onboarding/body':         'Body and Targets',
+  'onboarding/goals':        'Your Goals',
+  'onboarding/conditions':   'Your Conditions',
+  'onboarding/lifestyle':    'Your Lifestyle',
+  'onboarding/equipment':    'Your Equipment',
+  'onboarding/complete':     'Profile Complete',
+  'onboarding/goal-setup':   'Build Your Plan',
+  'onboarding/privacy':      'Privacy and Terms',
+  'privacy':                 'Privacy and Terms',
+  'gym-programme':           'My Gym Programme',
+  'intention':               'What would you like to do today?',
+  'reflect':                 'How was that?',
+  'prescribed-session':      'Prescribed Exercises',
+  'prescribed':              'My Prescribed Exercises',
+  'morning-session':         'Morning Session',
 };
 
 export const router = {
@@ -60,176 +50,230 @@ export const router = {
   currentView: null,
   views: {},
   _history: [],
-  _popstateWired: false,
 
+  /**
+   * Go back to the previous view in the navigation stack.
+   * Every Back button in the app calls router.back() — no hardcoded destinations.
+   * Complete/Save/Done actions use router.navigate() directly to Progress.
+   */
   back() {
-    this._history.pop();
-    const previous = this._history.pop();
+    this._history.pop(); // remove current
+    const previous = this._history.pop(); // get the one before
     this.navigate(previous || "intention");
   },
 
+  /**
+   * Initialise router — determine starting view
+   */
   init() {
     this.setupNavigation();
-    this.setupPopstate();
     this.hideLoading();
 
     if (store.isOnboardingComplete()) {
-      this.navigate("intention");
+      this.navigate('intention');
     } else {
-      this.navigate("onboarding/welcome");
+      this.navigate('onboarding/welcome');
     }
 
-    console.log("Router initialised");
+    console.log('🧭 Router initialised');
   },
 
   /**
-   * Wire the browser popstate event to router.back().
-   * This intercepts device swipe-back (iOS) and Android hardware back button.
-   *
-   * Strategy: push a dummy state on every navigate() so the browser
-   * always has somewhere to "go back" to. When popstate fires, we catch
-   * it, re-push the state (so the stack stays non-empty), and call
-   * router.back() ourselves.
-   *
-   * This prevents the PWA from exiting when the user swipes or taps back.
+   * Register a view module (for pre-loading, if needed)
    */
-  setupPopstate() {
-    if (this._popstateWired) return;
-    this._popstateWired = true;
-
-    // Seed the browser history so there is always a state to pop to
-    window.history.pushState({ alongside: true }, "", window.location.href);
-
-    window.addEventListener("popstate", (e) => {
-      // Re-push immediately so the stack never empties
-      window.history.pushState({ alongside: true }, "", window.location.href);
-      // Now handle in-app back navigation
-      this.back();
-    });
-  },
-
   register(name, viewModule) {
     this.views[name] = viewModule;
   },
 
+  /**
+   * Navigate to a view by name.
+   * After rendering, announces the new view to screen readers
+   * and moves keyboard focus to the main content area.
+   */
   async navigate(viewName) {
-    console.log("Navigating to: " + viewName);
+    console.log(`Navigating to: ${viewName}`);
 
-    // Push to in-app navigation stack
+    // Push to navigation stack — powers router.back()
+    // Never stack onboarding views or duplicate consecutive entries
     const isOnboarding = viewName.startsWith("onboarding");
     const isDuplicate  = this._history.length > 0 &&
                          this._history[this._history.length - 1] === viewName;
     if (!isOnboarding && !isDuplicate) {
       this._history.push(viewName);
+      // Cap stack at 20 to prevent memory growth
       if (this._history.length > 20) this._history.shift();
     }
 
-    // Push browser history state so popstate can fire on back gesture
-    window.history.pushState({ alongside: true, view: viewName }, "", window.location.href);
+    const mainContent = document.getElementById('main-content');
+    const bottomNav   = document.getElementById('bottom-nav');
 
-    const mainContent = document.getElementById("main-content");
-    const bottomNav   = document.getElementById("bottom-nav");
+    // Clear current content
+    mainContent.innerHTML = '';
+    mainContent.className = 'main-content';
 
-    mainContent.innerHTML = "";
-    mainContent.className = "main-content";
-
-    const hideNavViews = [
-      "onboarding", "workout", "workout-complete", "checkin",
-      "prescribed-session", "morning-session", "quiet-session",
-      "yoga-session", "coach-proposal"
-    ];
+    // Hide/show bottom nav
+    const hideNavViews = ['onboarding', 'workout', 'workout-complete', 'checkin', 'prescribed-session', 'morning-session'];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
     if (shouldHideNav) {
-      bottomNav.classList.add("hidden");
+      bottomNav.classList.add('hidden');
     } else {
-      bottomNav.classList.remove("hidden");
+      bottomNav.classList.remove('hidden');
       this.setActiveNav(viewName);
     }
 
+    // Load and render the view
     try {
       const view = await this.loadView(viewName);
+
       if (view) {
-        if (view.centered) mainContent.classList.add("centered");
+        if (view.centered) {
+          mainContent.classList.add('centered');
+        }
+
         mainContent.innerHTML = view.render();
-        if (view.onMount) view.onMount();
+
+        if (view.onMount) {
+          view.onMount();
+        }
       }
     } catch (e) {
-      console.error("Error loading view: " + viewName, e);
-      mainContent.innerHTML = "<div class=\"error\">Error loading view: " + e.message + "</div>";
+      console.error(`Error loading view: ${viewName}`, e);
+      mainContent.innerHTML = `<div class="error">Error loading view: ${e.message}</div>`;
     }
 
     this.currentView = viewName;
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    // Stop any playing speech when navigating away
     tts.stop();
+
+    // ── Accessibility ──────────────────────────────────────────────────────
     this.announceNavigation(viewName);
     this.moveFocusToContent();
+
+    // Mount TTS speaker buttons on coach cards in the new view
+    // Small delay to ensure the view has fully rendered
     setTimeout(() => tts.mountButtons(), 150);
+    // ──────────────────────────────────────────────────────────────────────
   },
 
+  /**
+   * Write the human-readable view name to #sr-announcer.
+   *
+   * Screen readers (VoiceOver, TalkBack, NVDA) watch this element because
+   * it has aria-live="polite" and will read its content aloud.
+   *
+   * We clear the text first so that navigating to the same view twice
+   * still triggers a new announcement (live regions only fire on change).
+   *
+   * The 50ms delay lets the DOM settle before the announcement fires,
+   * preventing it from being swallowed by the render cycle.
+   */
   announceNavigation(viewName) {
-    const announcer = document.getElementById("sr-announcer");
+    const announcer = document.getElementById('sr-announcer');
     if (!announcer) return;
+
     const label = VIEW_NAMES[viewName] || this.formatViewName(viewName);
-    announcer.textContent = "";
-    setTimeout(() => { announcer.textContent = label; }, 50);
+
+    announcer.textContent = '';
+    setTimeout(() => {
+      announcer.textContent = label;
+    }, 50);
   },
 
+  /**
+   * Fallback formatter for views not listed in VIEW_NAMES.
+   * 'onboarding/some-view' → 'Some View'
+   */
   formatViewName(viewName) {
-    const last = viewName.split("/").pop();
+    const last = viewName.split('/').pop();
     return last
-      .split("-")
+      .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+      .join(' ');
   },
 
+  /**
+   * Move keyboard focus to #main-content after navigation.
+   *
+   * #main-content has tabindex="-1" in index.html, which means:
+   *   - It CAN receive focus programmatically (this call)
+   *   - It does NOT appear in the normal Tab key order
+   *
+   * preventScroll:true stops the browser jumping position — we already
+   * handle scrolling with window.scrollTo() above.
+   *
+   * The 100ms delay gives the view render time to complete so that
+   * screen readers read the new content, not the blank state.
+   */
   moveFocusToContent() {
     setTimeout(() => {
-      const mainContent = document.getElementById("main-content");
+      const mainContent = document.getElementById('main-content');
       if (mainContent) mainContent.focus({ preventScroll: true });
     }, 100);
   },
 
+  /**
+   * Dynamically load a view module by name
+   */
   async loadView(viewName) {
-    if (this.views[viewName]) return this.views[viewName];
-    const path = "./views/" + viewName + ".js";
+    if (this.views[viewName]) {
+      return this.views[viewName];
+    }
+
+    const path = `./views/${viewName}.js`;
+
     try {
       const module = await import(path);
       this.views[viewName] = module;
       return module;
     } catch (e) {
-      console.error("Failed to load view: " + path, e);
+      console.error(`Failed to load view: ${path}`, e);
       return null;
     }
   },
 
+  /**
+   * Hide the loading screen after initial render
+   */
   hideLoading() {
     setTimeout(() => {
-      const loading = document.getElementById("loading");
+      const loading = document.getElementById('loading');
       if (loading) {
-        loading.style.opacity = "0";
-        loading.style.transition = "opacity 0.3s ease-out";
-        setTimeout(() => loading.classList.add("hidden"), 300);
+        loading.style.opacity = '0';
+        loading.style.transition = 'opacity 0.3s ease-out';
+        setTimeout(() => loading.classList.add('hidden'), 300);
       }
     }, 1500);
   },
 
+  /**
+   * Wire up bottom navigation click handlers
+   */
   setupNavigation() {
-    document.querySelectorAll(".nav-item").forEach(item => {
-      item.addEventListener("click", () => {
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
         const view = item.dataset.view;
         if (view) this.navigate(view);
       });
     });
   },
 
+  /**
+   * Highlight the active nav item.
+   * 'intention' is the home screen — it maps to the Today nav button
+   * (data-view="intention"). 'today' (coach workout view) also highlights
+   * the Today button since it is a sub-path of the Today journey.
+   */
   setActiveNav(viewName) {
-    const navKey = (viewName === "today" || viewName === "coach-proposal") ? "intention" : viewName;
-    document.querySelectorAll(".nav-item").forEach(item => {
-      item.classList.toggle("active", item.dataset.view === navKey);
+    // Treat coach workout view as part of the Today/intention journey
+    const navKey = viewName === 'today' ? 'intention' : viewName;
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.view === navKey);
     });
   }
 };
 
+// Make router available globally for onclick handlers in view templates
 window.router = router;
