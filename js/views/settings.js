@@ -1,11 +1,6 @@
 /**
  * settings.js - Settings view
  *
- * 22 May 2026 v2 --- My Week redesign + tab scroll + UNDEFINED fix (S4-3):
- *   My Week: expandable day cards with on/off toggle, max 3 focuses.
- *   Tabs: horizontal scroll (flex overflow-x:auto, flex-shrink:0 per tab).
- *   Equipment sub-screen: cat.label -> cat.name (was showing UNDEFINED).
- *
  * 22 May 2026 v1 --- My Week tab added (S4-3):
  *   Fifth tab: "My Week" --- weekly plan builder.
  *   7-day grid (Mon-Sun), each day configurable with type, session type,
@@ -202,38 +197,30 @@ export function render() {
         <h1>Settings</h1>
       </div>
 
-      <div class="settings-tabs" role="tablist" aria-label="Settings sections"
-           style="display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;
-                  scrollbar-width:none;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);
-                  padding-bottom:0;margin-bottom:0;">
+      <div class="settings-tabs" role="tablist" aria-label="Settings sections">
         <button class="settings-tab ${activeTab === "profile"    ? "active" : ""}"
                 role="tab" aria-selected="${activeTab === "profile"}"
-                aria-controls="settings-tab-panel" id="tab-profile" data-tab="profile"
-                style="flex-shrink:0;">
+                aria-controls="settings-tab-panel" id="tab-profile" data-tab="profile">
           Profile
         </button>
         <button class="settings-tab ${activeTab === "conditions" ? "active" : ""}"
                 role="tab" aria-selected="${activeTab === "conditions"}"
-                aria-controls="settings-tab-panel" id="tab-conditions" data-tab="conditions"
-                style="flex-shrink:0;">
+                aria-controls="settings-tab-panel" id="tab-conditions" data-tab="conditions">
           Conditions
         </button>
         <button class="settings-tab ${activeTab === "equipment"  ? "active" : ""}"
                 role="tab" aria-selected="${activeTab === "equipment"}"
-                aria-controls="settings-tab-panel" id="tab-equipment" data-tab="equipment"
-                style="flex-shrink:0;">
+                aria-controls="settings-tab-panel" id="tab-equipment" data-tab="equipment">
           Equipment
         </button>
         <button class="settings-tab ${activeTab === "library"    ? "active" : ""}"
                 role="tab" aria-selected="${activeTab === "library"}"
-                aria-controls="settings-tab-panel" id="tab-library" data-tab="library"
-                style="flex-shrink:0;">
+                aria-controls="settings-tab-panel" id="tab-library" data-tab="library">
           Library
         </button>
         <button class="settings-tab ${activeTab === "myweek"     ? "active" : ""}"
                 role="tab" aria-selected="${activeTab === "myweek"}"
-                aria-controls="settings-tab-panel" id="tab-myweek" data-tab="myweek"
-                style="flex-shrink:0;">
+                aria-controls="settings-tab-panel" id="tab-myweek" data-tab="myweek">
           My Week
         </button>
       </div>
@@ -543,7 +530,7 @@ function renderFacilitySubScreen(facilityId) {
         return `
           <div class="equipment-settings-category">
             <div class="equipment-category-heading">
-              <span>${cat.icon} ${cat.name}</span>
+              <span>${cat.icon} ${cat.label}</span>
               ${catCount > 0 ? `<span class="equipment-cat-count">${catCount} selected</span>` : ""}
             </div>
             <div class="equipment-chip-grid">
@@ -599,11 +586,12 @@ function renderMyWeekTab() {
       <h2 id="myweek-heading" class="section-heading">My Week</h2>
 
       ${!premium ? `
+        <!-- Free tier: locked -->
         <div class="card settings-coach-card" style="margin-bottom: var(--space-4);">
           <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
           <p class="text-sm">
-            Plan your whole week in advance. I will use it as a starting point
-            each day and adapt around how you are feeling.
+            Did you know you can plan your whole week in advance? I will use your
+            plan as a starting point each day and adapt around how you are feeling.
           </p>
         </div>
         <div class="card" style="text-align:center; padding:var(--space-6);">
@@ -616,20 +604,21 @@ function renderMyWeekTab() {
           </button>
         </div>
       ` : `
-        <p class="text-sm text-muted" style="margin-bottom: var(--space-3);">
-          Set a focus for each day. I use this as a starting point and adapt
-          around your check-in each morning. You can set up to 3 focuses per day.
+        <!-- Personal tier: full access -->
+        <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
+          Set a movement type for each day. I will use this as my starting point
+          and adapt around your check-in each morning.
         </p>
 
         <!-- Master toggle -->
-        <div class="card" style="margin-bottom:var(--space-4);padding:var(--space-4);">
+        <div class="card" style="margin-bottom:var(--space-4);">
           <div style="display:flex;justify-content:space-between;align-items:center;">
             <div>
-              <p style="font-size:var(--text-sm);font-weight:var(--font-semibold);margin:0 0 2px;">
+              <p class="text-sm" style="font-weight:var(--font-semibold);">
                 Use my weekly plan
               </p>
-              <p class="text-xs text-muted" style="margin:0;">
-                ${enabled ? "Active -- I read this each morning" : "Off -- I decide fresh each day"}
+              <p class="text-xs text-muted">
+                ${enabled ? "Plan is active -- I am reading it each day" : "Off -- I will decide fresh each day"}
               </p>
             </div>
             <label class="toggle-switch" aria-label="Enable weekly plan">
@@ -640,10 +629,13 @@ function renderMyWeekTab() {
           </div>
         </div>
 
-        <!-- 7-day expandable cards -->
-        <div role="list" aria-label="Weekly plan days" style="display:flex;flex-direction:column;gap:var(--space-2);">
+        <!-- 7-day grid -->
+        <div class="weekly-plan-grid" role="list" aria-label="Weekly plan days">
           ${DAYS.map(day => renderDayCard(day)).join("")}
         </div>
+
+        <!-- Day config panel (shown inline when a day is tapped) -->
+        ${configuringDay ? renderDayConfig(configuringDay) : ""}
 
         <!-- Save button -->
         <button class="btn btn-primary btn-full btn-large" id="save-week-btn"
@@ -662,192 +654,155 @@ function renderMyWeekTab() {
   `;
 }
 
-function getDayFocusLabel(slot) {
-  if (!slot || slot.type === "open") return null;
-  if (slot.type === "rest")     return "Rest day";
-  if (slot.type === "recovery") return "Recovery";
-  if (slot.type === "class")    return slot.activityName ? slot.activityName : "Class";
-  if (slot.type === "gym") {
-    if (slot.sessionType && SESSION_TYPE_LABELS?.[slot.sessionType]) {
-      return SESSION_TYPE_LABELS[slot.sessionType];
-    }
-    return "Gym session";
-  }
-  return null;
-}
-
-// Max focuses per day (gym = 1, rest = 1, recovery = 1, class = 1)
-// The "focuses" concept maps to session type chips within gym days
-// For non-gym days it is always a single selection
-const MAX_GYM_FOCUSES = 3;
-
 function renderDayCard(day) {
-  const slot          = weeklyPlanDraft?.[day] || { type: "open" };
-  const isOpen        = slot.type === "open";
+  const slot    = weeklyPlanDraft?.[day] || { type: "open" };
+  const typeObj = DAY_TYPES.find(t => t.id === slot.type) || DAY_TYPES[0];
   const isConfiguring = configuringDay === day;
-  const enabled       = store.get("weeklyPlanEnabled") || false;
-
-  // Build the summary label shown on the collapsed card
-  const focusLabel = getDayFocusLabel(slot);
-  const typeColor  = !isOpen ? "var(--color-primary)" : "var(--color-text-secondary)";
-
-  // Day-level on/off: slot has its own notificationEnabled used for
-  // day-level active toggle (separate from notification time).
-  // We repurpose this as "day active" -- if off, coach ignores this day.
-  const dayActive = slot.dayActive !== false; // default true
+  const label   = slot.label || (slot.type === "gym" && slot.sessionType
+    ? SESSION_TYPES.find(s => s.id === slot.sessionType)?.label || typeObj.label
+    : typeObj.label);
 
   return `
-    <div class="card" role="listitem"
-         style="padding:0;overflow:hidden;border:1.5px solid ${isConfiguring ? "var(--color-primary)" : "rgba(255,255,255,0.06)"};">
-
-      <!-- Collapsed row -->
-      <div style="display:flex;align-items:center;gap:var(--space-3);
-                  padding:var(--space-3) var(--space-4);">
-
-        <!-- Day on/off toggle -->
-        <label class="toggle-switch toggle-switch--sm"
-               aria-label="Enable ${DAY_LABELS[day]} plan"
-               style="flex-shrink:0;">
-          <input type="checkbox" class="day-active-toggle"
-                 data-day="${day}"
-                 role="switch"
-                 aria-checked="${dayActive}"
-                 ${dayActive ? "checked" : ""}
-                 style="width:16px;height:16px;">
-          <span class="toggle-track toggle-track--sm" aria-hidden="true"></span>
-        </label>
-
-        <!-- Tap to expand -->
-        <button class="weekly-plan-day-btn"
-                data-day="${day}"
-                aria-expanded="${isConfiguring}"
-                style="flex:1;display:flex;align-items:center;justify-content:space-between;
-                       background:none;border:none;cursor:pointer;padding:0;
-                       opacity:${dayActive ? "1" : "0.45"};">
-          <div style="text-align:left;">
-            <p style="font-size:var(--text-sm);font-weight:var(--font-semibold);
-                      color:var(--color-text);margin:0 0 2px;">${DAY_LABELS[day]}</p>
-            <p style="font-size:var(--text-xs);color:${typeColor};margin:0;">
-              ${focusLabel || "No plan set"}
-            </p>
-          </div>
-          <span style="color:var(--color-text-secondary);font-size:var(--text-sm);"
-                aria-hidden="true">${isConfiguring ? "&#8593;" : "&#8595;"}</span>
-        </button>
-      </div>
-
-      <!-- Expanded config panel -->
-      ${isConfiguring ? `
-        <div style="border-top:1px solid rgba(255,255,255,0.08);padding:var(--space-4);"
-             id="day-config-panel-${day}">
-
-          <!-- Day type selector -->
-          <p class="text-xs text-muted" style="margin-bottom:var(--space-2);">What is planned?</p>
-          <div style="display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-4);"
-               role="group" aria-label="Day type for ${DAY_LABELS[day]}">
-            ${DAY_TYPES.map(t => `
-              <button class="weekly-plan-type-btn"
-                      data-day-type="${t.id}"
-                      aria-pressed="${slot.type === t.id}"
-                      style="display:flex;align-items:center;gap:var(--space-3);
-                             padding:var(--space-2) var(--space-3);border-radius:var(--radius-md,8px);
-                             text-align:left;cursor:pointer;width:100%;
-                             background:${slot.type === t.id ? "rgba(20,184,166,0.12)" : "rgba(255,255,255,0.03)"};
-                             border:1.5px solid ${slot.type === t.id ? "var(--color-primary)" : "rgba(255,255,255,0.08)"};">
-                <div style="flex:1;">
-                  <p style="font-size:var(--text-sm);font-weight:var(--font-semibold);
-                            color:${slot.type === t.id ? "var(--color-primary)" : "var(--color-text)"};
-                            margin:0 0 1px;">${t.label}</p>
-                  <p style="font-size:var(--text-xs);color:var(--color-text-secondary);margin:0;">
-                    ${t.desc}
-                  </p>
-                </div>
-                ${slot.type === t.id ? `<span style="color:var(--color-primary);font-size:var(--text-sm);" aria-hidden="true">&#10003;</span>` : ""}
-              </button>
-            `).join("")}
-          </div>
-
-          <!-- Gym: session focus (max 3) -->
-          ${slot.type === "gym" ? `
-            <p class="text-xs text-muted" style="margin-bottom:var(--space-2);">
-              Session focus
-              <span style="color:var(--color-text-secondary);"> -- choose up to 3</span>
-            </p>
-            <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
-                 role="group" aria-label="Session focus (max 3)">
-              ${(() => {
-                const selected = Array.isArray(slot.sessionTypes) ? slot.sessionTypes : (slot.sessionType ? [slot.sessionType] : []);
-                return SESSION_TYPES.map(s => {
-                  const isSel  = selected.includes(s.id);
-                  const isMax  = !isSel && selected.length >= MAX_GYM_FOCUSES;
-                  return `
-                    <button class="chip ${isSel ? "chip--selected" : ""}"
-                            data-session-type="${s.id}"
-                            aria-pressed="${isSel}"
-                            ${isMax ? "disabled" : ""}
-                            style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
-                                   font-size:var(--text-sm);cursor:${isMax ? "default" : "pointer"};
-                                   opacity:${isMax ? "0.4" : "1"};
-                                   background:${isSel ? "rgba(20,184,166,0.15)" : "rgba(255,255,255,0.06)"};
-                                   border:1.5px solid ${isSel ? "var(--color-primary)" : "transparent"};">
-                      ${s.label}
-                    </button>
-                  `;
-                }).join("");
-              })()}
-            </div>
-
-            <!-- Duration -->
-            <p class="text-xs text-muted" style="margin-bottom:var(--space-2);">Target duration</p>
-            <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
-                 role="group" aria-label="Target duration">
-              <button class="chip ${!slot.durationMins ? "chip--selected" : ""}"
-                      data-duration="null" aria-pressed="${!slot.durationMins}"
-                      style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
-                             font-size:var(--text-sm);cursor:pointer;
-                             background:${!slot.durationMins ? "rgba(20,184,166,0.15)" : "rgba(255,255,255,0.06)"};
-                             border:1.5px solid ${!slot.durationMins ? "var(--color-primary)" : "transparent"};">
-                Coach decides
-              </button>
-              ${DURATION_OPTIONS.map(d => `
-                <button class="chip ${slot.durationMins === d ? "chip--selected" : ""}"
-                        data-duration="${d}" aria-pressed="${slot.durationMins === d}"
-                        style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
-                               font-size:var(--text-sm);cursor:pointer;
-                               background:${slot.durationMins === d ? "rgba(20,184,166,0.15)" : "rgba(255,255,255,0.06)"};
-                               border:1.5px solid ${slot.durationMins === d ? "var(--color-primary)" : "transparent"};">
-                  ${d} min
-                </button>
-              `).join("")}
-            </div>
-          ` : ""}
-
-          <!-- Class: activity name -->
-          ${slot.type === "class" ? `
-            <div style="margin-bottom:var(--space-4);">
-              <label style="display:block;font-size:var(--text-xs);color:var(--color-text-secondary);
-                            margin-bottom:var(--space-2);" for="class-activity-name">
-                Activity name (optional)
-              </label>
-              <input type="text" id="class-activity-name" class="form-input"
-                     placeholder="e.g. Body Balance, Tennis, Aqua Aerobics"
-                     value="${slot.activityName || ""}"
-                     aria-label="Class or activity name">
-            </div>
-          ` : ""}
-
-          <button class="btn btn-primary btn-full btn-sm" id="day-config-done-btn"
-                  aria-label="Done configuring ${DAY_LABELS[day]}">
-            Done
-          </button>
+    <div class="weekly-plan-day-card ${isConfiguring ? "weekly-plan-day-card--active" : ""}"
+         role="listitem">
+      <button class="weekly-plan-day-btn"
+              data-day="${day}"
+              aria-expanded="${isConfiguring}"
+              aria-label="Configure ${DAY_LABELS[day]}: currently ${label}">
+        <div class="weekly-plan-day-info">
+          <span class="weekly-plan-day-name">${DAY_LABELS[day]}</span>
+          <span class="weekly-plan-day-type ${slot.type !== "open" ? "weekly-plan-day-type--set" : ""}">
+            ${label}
+          </span>
         </div>
-      ` : ""}
+        <span class="weekly-plan-day-chevron" aria-hidden="true">${isConfiguring ? "&#8593;" : "&#8595;"}</span>
+      </button>
     </div>
   `;
 }
 
+function renderDayConfig(day) {
+  const slot = weeklyPlanDraft?.[day] || { type: "open" };
 
-// -- Wire all panel elements --------------------------------------------------
+  return `
+    <div class="weekly-plan-config-panel card" id="day-config-panel"
+         aria-label="Configure ${DAY_LABELS[day]}">
+      <h3 class="section-heading" style="font-size:var(--text-base);margin-bottom:var(--space-3);">
+        ${DAY_LABELS[day]}
+      </h3>
+
+      <!-- Type picker -->
+      <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">
+        What is planned?
+      </p>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-4);"
+           role="group" aria-label="Day type">
+        ${DAY_TYPES.map(t => `
+          <button class="weekly-plan-type-btn ${slot.type === t.id ? "weekly-plan-type-btn--selected" : ""}"
+                  data-day-type="${t.id}"
+                  aria-pressed="${slot.type === t.id}"
+                  style="display:flex;align-items:center;gap:var(--space-3);
+                         padding:var(--space-3) var(--space-3);border-radius:var(--radius-md,8px);
+                         text-align:left;cursor:pointer;width:100%;
+                         background:${slot.type === t.id ? "rgba(20,184,166,0.12)" : "var(--color-surface-2,rgba(255,255,255,0.04))"};
+                         border:1.5px solid ${slot.type === t.id ? "var(--color-primary)" : "transparent"};">
+            <div style="flex:1;">
+              <p style="font-size:var(--text-sm);font-weight:var(--font-semibold);
+                        color:${slot.type === t.id ? "var(--color-primary)" : "var(--color-text)"};margin:0 0 2px;">
+                ${t.label}
+              </p>
+              <p style="font-size:var(--text-xs);color:var(--color-text-secondary);margin:0;">
+                ${t.desc}
+              </p>
+            </div>
+            ${slot.type === t.id ? `<span style="color:var(--color-primary);" aria-hidden="true">&#10003;</span>` : ""}
+          </button>
+        `).join("")}
+      </div>
+
+      <!-- Gym: session type + duration -->
+      ${slot.type === "gym" ? `
+        <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">Session focus</p>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
+             role="group" aria-label="Session type">
+          ${SESSION_TYPES.map(s => `
+            <button class="chip ${slot.sessionType === s.id ? "chip--selected" : ""}"
+                    data-session-type="${s.id}"
+                    aria-pressed="${slot.sessionType === s.id}"
+                    style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
+                           font-size:var(--text-sm);cursor:pointer;
+                           background:${slot.sessionType === s.id ? "rgba(20,184,166,0.15)" : "var(--color-surface-2,rgba(255,255,255,0.06))"};
+                           border:1.5px solid ${slot.sessionType === s.id ? "var(--color-primary)" : "transparent"};">
+              ${s.label}
+            </button>
+          `).join("")}
+        </div>
+
+        <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">Target duration</p>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
+             role="group" aria-label="Session duration">
+          <button class="chip ${!slot.durationMins ? "chip--selected" : ""}"
+                  data-duration="null"
+                  aria-pressed="${!slot.durationMins}"
+                  style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
+                         font-size:var(--text-sm);cursor:pointer;
+                         background:${!slot.durationMins ? "rgba(20,184,166,0.15)" : "var(--color-surface-2,rgba(255,255,255,0.06))"};
+                         border:1.5px solid ${!slot.durationMins ? "var(--color-primary)" : "transparent"};">
+            Coach decides
+          </button>
+          ${DURATION_OPTIONS.map(d => `
+            <button class="chip ${slot.durationMins === d ? "chip--selected" : ""}"
+                    data-duration="${d}"
+                    aria-pressed="${slot.durationMins === d}"
+                    style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
+                           font-size:var(--text-sm);cursor:pointer;
+                           background:${slot.durationMins === d ? "rgba(20,184,166,0.15)" : "var(--color-surface-2,rgba(255,255,255,0.06))"};
+                           border:1.5px solid ${slot.durationMins === d ? "var(--color-primary)" : "transparent"};">
+              ${d} min
+            </button>
+          `).join("")}
+        </div>
+      ` : ""}
+
+      <!-- Class: activity name -->
+      ${slot.type === "class" ? `
+        <div style="margin-bottom:var(--space-4);">
+          <label class="form-label" for="class-activity-name"
+                 style="display:block;font-size:var(--text-sm);
+                        color:var(--color-text-secondary);margin-bottom:var(--space-2);">
+            Activity name (optional)
+          </label>
+          <input type="text" id="class-activity-name" class="form-input"
+                 placeholder="e.g. Body Balance, Tennis, Aqua Aerobics"
+                 value="${slot.activityName || ""}"
+                 aria-label="Class or activity name">
+        </div>
+      ` : ""}
+
+      <!-- Done -->
+      <button class="btn btn-primary btn-full" id="day-config-done-btn"
+              aria-label="Done configuring ${DAY_LABELS[day]}">
+        Done
+      </button>
+    </div>
+  `;
+}
+
+function formatRelativeDate(isoString) {
+  if (!isoString) return "";
+  try {
+    const d    = new Date(isoString);
+    const now  = new Date();
+    const diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
+    if (diff === 0) return "today";
+    if (diff === 1) return "yesterday";
+    return diff + " days ago";
+  } catch (e) {
+    return "";
+  }
+}
+
+// -- Movement identity --------------------------------------------------------
 
 function renderMovementIdentity() {
   const current = (() => {
@@ -879,10 +834,13 @@ function renderMovementIdentity() {
   `;
 }
 
+// -- Voice speed --------------------------------------------------------------
+
 function renderSpeechRateSection() {
   const currentRate = store.get("speechRate") || 0.9;
   const currentPos  = rateToPosition(currentRate);
   const label       = speedLabel(currentRate);
+
   return `
     <div class="card speech-rate-card">
       <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
@@ -909,12 +867,15 @@ function renderSpeechRateSection() {
   `;
 }
 
+// -- Notification section -----------------------------------------------------
+
 function renderNotificationSection() {
   const notif   = store.get("checkInNotification") || { enabled: false, time: null, permissionGranted: false };
   const enabled = !!notif.enabled;
   const denied  = enabled && !notif.permissionGranted
                   && "Notification" in window
                   && Notification.permission === "denied";
+
   return `
     <div class="card notification-card">
       <div class="notification-toggle-row">
@@ -955,123 +916,11 @@ function renderNotificationSection() {
   `;
 }
 
-function renderDayConfig(day) {
-  const slot = weeklyPlanDraft?.[day] || { type: "open" };
-  const selected = Array.isArray(slot.sessionTypes) ? slot.sessionTypes : (slot.sessionType ? [slot.sessionType] : []);
+// -- Helpers ------------------------------------------------------------------
 
-  return `
-    <div class="weekly-plan-config-panel card" id="day-config-panel-${day}"
-         aria-label="Configure ${DAY_LABELS[day]}">
-      <h3 class="section-heading" style="font-size:var(--text-base);margin-bottom:var(--space-3);">
-        ${DAY_LABELS[day]}
-      </h3>
-
-      <p class="text-xs text-muted" style="margin-bottom:var(--space-2);">What is planned?</p>
-      <div style="display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-4);"
-           role="group" aria-label="Day type for ${DAY_LABELS[day]}">
-        ${DAY_TYPES.map(t => `
-          <button class="weekly-plan-type-btn"
-                  data-day-type="${t.id}"
-                  aria-pressed="${slot.type === t.id}"
-                  style="display:flex;align-items:center;gap:var(--space-3);
-                         padding:var(--space-2) var(--space-3);border-radius:var(--radius-md,8px);
-                         text-align:left;cursor:pointer;width:100%;
-                         background:${slot.type === t.id ? "rgba(20,184,166,0.12)" : "rgba(255,255,255,0.03)"};
-                         border:1.5px solid ${slot.type === t.id ? "var(--color-primary)" : "rgba(255,255,255,0.08)"};">
-            <div style="flex:1;">
-              <p style="font-size:var(--text-sm);font-weight:var(--font-semibold);
-                        color:${slot.type === t.id ? "var(--color-primary)" : "var(--color-text)"};
-                        margin:0 0 1px;">${t.label}</p>
-              <p style="font-size:var(--text-xs);color:var(--color-text-secondary);margin:0;">${t.desc}</p>
-            </div>
-            ${slot.type === t.id ? `<span style="color:var(--color-primary);font-size:var(--text-sm);" aria-hidden="true">&#10003;</span>` : ""}
-          </button>
-        `).join("")}
-      </div>
-
-      ${slot.type === "gym" ? `
-        <p class="text-xs text-muted" style="margin-bottom:var(--space-2);">
-          Session focus <span style="color:var(--color-text-secondary);"> -- choose up to 3</span>
-        </p>
-        <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
-             role="group" aria-label="Session focus (max 3)">
-          ${SESSION_TYPES.map(s => {
-            const isSel = selected.includes(s.id);
-            const isMax = !isSel && selected.length >= MAX_GYM_FOCUSES;
-            return `
-              <button class="chip ${isSel ? "chip--selected" : ""}"
-                      data-session-type="${s.id}"
-                      aria-pressed="${isSel}"
-                      ${isMax ? "disabled" : ""}
-                      style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
-                             font-size:var(--text-sm);cursor:${isMax ? "default" : "pointer"};
-                             opacity:${isMax ? "0.4" : "1"};
-                             background:${isSel ? "rgba(20,184,166,0.15)" : "rgba(255,255,255,0.06)"};
-                             border:1.5px solid ${isSel ? "var(--color-primary)" : "transparent"};">
-                ${s.label}
-              </button>
-            `;
-          }).join("")}
-        </div>
-
-        <p class="text-xs text-muted" style="margin-bottom:var(--space-2);">Target duration</p>
-        <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
-             role="group" aria-label="Target duration">
-          <button class="chip ${!slot.durationMins ? "chip--selected" : ""}"
-                  data-duration="null" aria-pressed="${!slot.durationMins}"
-                  style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
-                         font-size:var(--text-sm);cursor:pointer;
-                         background:${!slot.durationMins ? "rgba(20,184,166,0.15)" : "rgba(255,255,255,0.06)"};
-                         border:1.5px solid ${!slot.durationMins ? "var(--color-primary)" : "transparent"};">
-            Coach decides
-          </button>
-          ${DURATION_OPTIONS.map(d => `
-            <button class="chip ${slot.durationMins === d ? "chip--selected" : ""}"
-                    data-duration="${d}" aria-pressed="${slot.durationMins === d}"
-                    style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
-                           font-size:var(--text-sm);cursor:pointer;
-                           background:${slot.durationMins === d ? "rgba(20,184,166,0.15)" : "rgba(255,255,255,0.06)"};
-                           border:1.5px solid ${slot.durationMins === d ? "var(--color-primary)" : "transparent"};">
-              ${d} min
-            </button>
-          `).join("")}
-        </div>
-      ` : ""}
-
-      ${slot.type === "class" ? `
-        <div style="margin-bottom:var(--space-4);">
-          <label style="display:block;font-size:var(--text-xs);color:var(--color-text-secondary);
-                        margin-bottom:var(--space-2);" for="class-activity-name">
-            Activity name (optional)
-          </label>
-          <input type="text" id="class-activity-name" class="form-input"
-                 placeholder="e.g. Body Balance, Tennis, Aqua Aerobics"
-                 value="${slot.activityName || ""}"
-                 aria-label="Class or activity name">
-        </div>
-      ` : ""}
-
-      <button class="btn btn-primary btn-full btn-sm" id="day-config-done-btn"
-              aria-label="Done configuring ${DAY_LABELS[day]}">
-        Done
-      </button>
-    </div>
-  `;
-}
-
-
-function formatRelativeDate(isoString) {
-  if (!isoString) return "";
-  try {
-    const d    = new Date(isoString);
-    const now  = new Date();
-    const diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
-    if (diff === 0) return "today";
-    if (diff === 1) return "yesterday";
-    return diff + " days ago";
-  } catch (e) {
-    return "";
-  }
+function formatGender(gender) {
+  const map = { "female": "Female", "male": "Male", "non-binary": "Non-binary", "prefer-not": "Prefer not to say" };
+  return map[gender] || "";
 }
 
 function switchTab(tabName) {
@@ -1091,18 +940,12 @@ function switchTab(tabName) {
   }
 }
 
-
-function formatGender(gender) {
-  const map = {
-    "female": "Female", "male": "Male",
-    "non-binary": "Non-binary", "prefer-not": "Prefer not to say"
-  };
-  return map[gender] || "";
-}
-
 function rerenderTab() {
   const panel = document.getElementById("settings-tab-panel");
-  if (panel) { panel.innerHTML = renderActiveTab(); wirePanel(); }
+  if (panel) {
+    panel.innerHTML = renderActiveTab();
+    wirePanel();
+  }
 }
 
 function rerenderEquipment() {
@@ -1116,8 +959,13 @@ function rerenderEquipment() {
 
 function rerenderMyWeek() {
   const panel = document.getElementById("settings-tab-panel");
-  if (panel) { panel.innerHTML = renderMyWeekTab(); wirePanel(); }
+  if (panel) {
+    panel.innerHTML = renderMyWeekTab();
+    wirePanel();
+  }
 }
+
+// -- Wire all panel elements --------------------------------------------------
 
 function wirePanel() {
 
@@ -1263,19 +1111,7 @@ function wirePanel() {
     router.navigate("library");
   });
 
-  // ---- My Week wiring -------------------------------------------------------
-
-  // Day on/off toggles
-  document.querySelectorAll(".day-active-toggle").forEach(toggle => {
-    toggle.addEventListener("change", e => {
-      e.stopPropagation();
-      const day = toggle.dataset.day;
-      if (!weeklyPlanDraft || !weeklyPlanDraft[day]) return;
-      weeklyPlanDraft[day].dayActive = toggle.checked;
-      const btn = toggle.closest("div")?.nextElementSibling;
-      if (btn) btn.style.opacity = toggle.checked ? "1" : "0.45";
-    });
-  });
+  // ------ My Week wiring ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   // Master toggle
   document.getElementById("weekly-plan-toggle")?.addEventListener("change", e => {
@@ -1300,33 +1136,21 @@ function wirePanel() {
       weeklyPlanDraft[configuringDay] = {
         ...weeklyPlanDraft[configuringDay],
         type,
-        sessionTypes: type === "gym" ? (weeklyPlanDraft[configuringDay].sessionTypes || []) : [],
-        sessionType:  type === "gym" ? (weeklyPlanDraft[configuringDay].sessionType || null) : null,
-        durationMins: type === "gym" ? (weeklyPlanDraft[configuringDay].durationMins || null) : null,
+        // Clear gym/class specific fields when type changes
+        sessionType:  type === "gym"   ? (weeklyPlanDraft[configuringDay].sessionType  || null) : null,
+        durationMins: type === "gym"   ? (weeklyPlanDraft[configuringDay].durationMins || null) : null,
         activityName: type === "class" ? (weeklyPlanDraft[configuringDay].activityName || null) : null,
-        label: null,
+        label:        null,
       };
       rerenderMyWeek();
     });
   });
 
-  // Session focus chips (gym) -- multi-select up to MAX_GYM_FOCUSES
+  // Session type chips (gym days)
   document.querySelectorAll("[data-session-type]").forEach(btn => {
     btn.addEventListener("click", () => {
       if (!configuringDay) return;
-      const id       = btn.dataset.sessionType;
-      const slot     = weeklyPlanDraft[configuringDay];
-      const existing = Array.isArray(slot.sessionTypes) ? slot.sessionTypes : (slot.sessionType ? [slot.sessionType] : []);
-      let updated;
-      if (existing.includes(id)) {
-        updated = existing.filter(x => x !== id);
-      } else if (existing.length < MAX_GYM_FOCUSES) {
-        updated = [...existing, id];
-      } else {
-        return;
-      }
-      weeklyPlanDraft[configuringDay].sessionTypes = updated;
-      weeklyPlanDraft[configuringDay].sessionType  = updated[0] || null;
+      weeklyPlanDraft[configuringDay].sessionType = btn.dataset.sessionType;
       rerenderMyWeek();
     });
   });
@@ -1341,7 +1165,7 @@ function wirePanel() {
     });
   });
 
-  // Class activity name
+  // Class activity name input -- save on blur
   document.getElementById("class-activity-name")?.addEventListener("blur", e => {
     if (!configuringDay) return;
     weeklyPlanDraft[configuringDay].activityName = e.target.value.trim() || null;
@@ -1349,6 +1173,7 @@ function wirePanel() {
 
   // Day config Done
   document.getElementById("day-config-done-btn")?.addEventListener("click", () => {
+    // Capture class name from input if still focused
     const nameInput = document.getElementById("class-activity-name");
     if (nameInput && configuringDay) {
       weeklyPlanDraft[configuringDay].activityName = nameInput.value.trim() || null;
@@ -1359,24 +1184,34 @@ function wirePanel() {
 
   // Save my week
   document.getElementById("save-week-btn")?.addEventListener("click", () => {
+    // Capture any open class name input before saving
     const nameInput = document.getElementById("class-activity-name");
     if (nameInput && configuringDay) {
       weeklyPlanDraft[configuringDay].activityName = nameInput.value.trim() || null;
     }
+
     store.set("weeklyPlan", { ...weeklyPlanDraft });
     store.set("weeklyPlanSetAt", new Date().toISOString());
-    if (!store.get("weeklyPlanEnabled")) store.set("weeklyPlanEnabled", true);
+
+    // Auto-enable on first save if toggle is currently off
+    if (!store.get("weeklyPlanEnabled")) {
+      store.set("weeklyPlanEnabled", true);
+    }
+
     configuringDay = null;
     rerenderMyWeek();
+
+    // Confirmation message
     const panel = document.getElementById("settings-tab-panel");
     if (panel) {
       const msg = document.createElement("div");
       msg.setAttribute("role", "status");
       msg.setAttribute("aria-live", "polite");
+      msg.className = "save-confirmation";
       msg.style.cssText = "text-align:center;padding:var(--space-3);color:var(--color-primary);font-size:var(--text-sm);";
-      msg.textContent = "Your week is saved.";
+      msg.textContent = "Your week is saved. I'll use this as my starting point each day.";
       panel.appendChild(msg);
-      setTimeout(() => msg.remove(), 2500);
+      setTimeout(() => msg.remove(), 3000);
     }
   });
 
