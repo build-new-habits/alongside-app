@@ -19,7 +19,7 @@ export function render() {
   return `
     <div class="onboarding-view">
       <div class="onboarding-header">
-        <button class="btn btn-ghost" onclick="router.navigate('onboarding/about')">← Back</button>
+        <button class="btn btn-ghost" onclick="router.navigate('onboarding/about')">--- Back</button>
         <div class="progress-dots">
           <span class="dot completed"></span>
           <span class="dot completed"></span>
@@ -35,7 +35,7 @@ export function render() {
         <h1>Your body & targets</h1>
         <div class="onboarding-coach-line">
           <img src="assets/images/logo-icon-small.png" alt="" class="coach-icon-small" aria-hidden="true">
-          <p class="onboarding-coach-text">This is completely optional. If you have a weight or a target in mind, I can factor it in. If not, that's absolutely fine — we can focus on how you feel instead. There are no wrong answers here.</p>
+          <p class="onboarding-coach-text">This is completely optional. If you have a weight or a target in mind, I can factor it in. If not, that's absolutely fine --- we can focus on how you feel instead. There are no wrong answers here.</p>
         </div>
         
         <div class="form-section">
@@ -88,10 +88,9 @@ export function render() {
             type="date" 
             id="target-date" 
             class="input-field"
-            style="margin-top: var(--space-2); min-height: 52px; color-scheme: dark; color: var(--color-text); font-size: var(--text-base); padding: var(--space-3);"
+            style="margin-top: var(--space-2);"
             value="${targetDate}"
             min="${today}"
-            aria-label="Target date"
           >
         </div>
       </div>
