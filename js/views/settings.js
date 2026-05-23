@@ -94,7 +94,7 @@ function initDraft() {
 }
 
 function isPremium() {
-  return store.isPremium();
+  return store.get("isPremium") || store.get("tier") === "personal" || store.get("tier") === "athlete" || false;
 }
 
 // -- Equipment tab state ------------------------------------------------------
@@ -1347,98 +1347,5 @@ export function onMount() {
       document.getElementById("bottom-nav")?.classList.add("hidden");
       router.navigate("onboarding/welcome");
     }
-  });
-
-  // Dev panel: triple-tap version label to open tier switcher
-  // Available in all builds. Stripe will write userTier when live.
-  let versionTapCount = 0;
-  let versionTapTimer = null;
-  const versionLabel = document.getElementById("settings-version-label");
-  if (versionLabel) {
-    versionLabel.style.cursor = "pointer";
-    versionLabel.addEventListener("click", () => {
-      versionTapCount++;
-      clearTimeout(versionTapTimer);
-      versionTapTimer = setTimeout(() => { versionTapCount = 0; }, 800);
-      if (versionTapCount >= 3) {
-        versionTapCount = 0;
-        showDevPanel();
-      }
-    });
-  }
-}
-
-function showDevPanel() {
-  const existing = document.getElementById("dev-tier-panel");
-  if (existing) { existing.remove(); return; }
-
-  const current = store.getUserTier();
-  const panel = document.createElement("div");
-  panel.id = "dev-tier-panel";
-  panel.setAttribute("role", "dialog");
-  panel.setAttribute("aria-label", "Developer tier switcher");
-  panel.style.cssText = [
-    "position:fixed;bottom:0;left:0;right:0;z-index:9999;",
-    "background:var(--color-surface);border-top:2px solid var(--color-primary);",
-    "padding:var(--space-5);box-shadow:0 -4px 24px rgba(0,0,0,0.4);"
-  ].join("");
-
-  panel.innerHTML = `
-    <p style="font-size:var(--text-xs);color:var(--color-primary);
-              letter-spacing:0.08em;font-weight:var(--font-semibold);
-              margin-bottom:var(--space-3);">DEV -- TIER SWITCHER</p>
-    <p style="font-size:var(--text-sm);color:var(--color-text-secondary);
-              margin-bottom:var(--space-4);">
-      Current tier: <strong style="color:var(--color-text);">${current}</strong>.
-      Changes take effect immediately and persist.
-    </p>
-    <div style="display:flex;flex-direction:column;gap:var(--space-2);">
-      ${["free", "personal", "athlete"].map(tier => `
-        <button class="btn ${current === tier ? "btn-primary" : "btn-ghost"}"
-                data-dev-tier="${tier}"
-                style="text-align:left;justify-content:flex-start;"
-                aria-pressed="${current === tier}">
-          ${tier === "free" ? "Free -- gated features locked" : ""}
-          ${tier === "personal" ? "Personal -- all core features unlocked" : ""}
-          ${tier === "athlete" ? "Athlete -- all features including athlete tier" : ""}
-          ${current === tier ? " (active)" : ""}
-        </button>
-      `).join("")}
-    </div>
-    <button class="btn btn-ghost btn-full" id="dev-panel-close"
-            style="margin-top:var(--space-4);">Close</button>
-  `;
-
-  document.body.appendChild(panel);
-
-  panel.querySelectorAll("[data-dev-tier]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const tier = btn.dataset.devTier;
-      store.setTier(tier);
-      panel.remove();
-      // Rerender settings so My Week and Coach Style reflect new tier
-      const tabPanel = document.getElementById("settings-tab-panel");
-      if (tabPanel) {
-        tabPanel.innerHTML = renderActiveTab();
-        wirePanel();
-      }
-      // Brief confirmation
-      const toast = document.createElement("div");
-      toast.setAttribute("role", "status");
-      toast.setAttribute("aria-live", "polite");
-      toast.style.cssText = [
-        "position:fixed;bottom:var(--space-6);left:50%;transform:translateX(-50%);",
-        "background:var(--color-primary);color:#0f172a;padding:var(--space-2) var(--space-4);",
-        "border-radius:var(--radius-full);font-size:var(--text-sm);",
-        "font-weight:var(--font-semibold);z-index:9999;white-space:nowrap;"
-      ].join("");
-      toast.textContent = "Tier: " + tier;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2000);
-    });
-  });
-
-  document.getElementById("dev-panel-close")?.addEventListener("click", () => {
-    panel.remove();
   });
 }
