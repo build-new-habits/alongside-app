@@ -319,7 +319,7 @@ function handleCoachPath() {
 
 function commitAndNavigateToCoach() {
   logActivityEntry();
-  router.navigate("today");
+  router.navigate("coach-proposal");
 }
 
 function logActivityEntry() {
