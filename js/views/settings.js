@@ -1060,6 +1060,38 @@ function renderDayConfig(day) {
 }
 
 
+function formatRelativeDate(isoString) {
+  if (!isoString) return "";
+  try {
+    const d    = new Date(isoString);
+    const now  = new Date();
+    const diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
+    if (diff === 0) return "today";
+    if (diff === 1) return "yesterday";
+    return diff + " days ago";
+  } catch (e) {
+    return "";
+  }
+}
+
+function switchTab(tabName) {
+  activeTab      = tabName;
+  editingField   = null;
+  configuringDay = null;
+  document.querySelectorAll(".settings-tab").forEach(btn => {
+    const isActive = btn.dataset.tab === tabName;
+    btn.classList.toggle("active", isActive);
+    btn.setAttribute("aria-selected", isActive);
+  });
+  const panel = document.getElementById("settings-tab-panel");
+  if (panel) {
+    panel.setAttribute("aria-labelledby", "tab-" + tabName);
+    panel.innerHTML = renderActiveTab();
+    wirePanel();
+  }
+}
+
+
 function formatGender(gender) {
   const map = {
     "female": "Female", "male": "Male",
