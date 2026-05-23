@@ -1,8 +1,8 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 23 May 2026 v2
- * Cache version: alongside-v86
+ * 23 May 2026 v3
+ * Cache version: alongside-v87
  *
  * v86 changes (23 May 2026)
  * - Cosmetic Fixes
@@ -143,7 +143,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v86";
+const CACHE_NAME = "alongside-v87";
 
 const SHELL_URLS = [
 
