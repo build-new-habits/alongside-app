@@ -1,8 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 23 May 2026 v1
- * Cache version: alongside-v84
+ * 23 May 2026 v2
+ * Cache version: alongside-v85
+ *
+ * v85 changes (23 May 2026)
+ * - Cosmetic Fixes
  *
  * v82 changes (22 May 2026)
  * - weekly plan built to support personalised gym sessions
@@ -140,7 +143,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v84";
+const CACHE_NAME = "alongside-v85";
 
 const SHELL_URLS = [
 
