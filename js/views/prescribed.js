@@ -1,14 +1,12 @@
 /**
  * prescribed.js - Prescribed Exercises View
  *
- * 22 May 2026 v1 (S4-3): Back buttons use router.back() not hardcoded intention.
- *
- * v1.0 --- Dedicated full view for exercises prescribed by an external
+ * v1.0 — Dedicated full view for exercises prescribed by an external
  *   professional (physiotherapist, consultant, GP, specialist).
  *
  *   This is a separate space from coach-recommended workouts.
  *   The coach acknowledges this is not their territory and speaks
- *   accordingly --- supportive, not directive.
+ *   accordingly — supportive, not directive.
  *
  *   Contains:
  *     - Coach card (warm, condition-aware, acknowledges external origin)
@@ -27,14 +25,14 @@ import { store } from "../store.js";
 
 export const centered = false;
 
-// ------ Credit constants (must match prescribed-session.js) ---------------------------------------------------------------------
+// ── Credit constants (must match prescribed-session.js) ───────────────────────
 const CREDITS_PER_EXERCISE = 35;
 const CREDITS_MAX          = 150;
 
-// ------ View state ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── View state ────────────────────────────────────────────────────────────────
 let showAddForm = false;
 
-// ------ Coach lines ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Coach lines ───────────────────────────────────────────────────────────────
 
 /**
  * Returns a coach line appropriate to the prescribed context.
@@ -68,7 +66,7 @@ function buildCoachLine(exercises, energy) {
   return "These are your prescribed exercises. I'll keep them here, separate from everything else. Your professional knows your situation -- I'm just here to help you show up for them.";
 }
 
-// ------ Render ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
   const exercises  = store.get("prescribedExercises") || [];
@@ -82,7 +80,7 @@ export function render() {
   return `
     <div class="view prescribed-view">
 
-      <!-- ------ Header with back link ------------------------------------------------------------------------------------------------------------------------------ -->
+      <!-- ── Header with back link ────────────────────────────────────────── -->
       <div class="view-header prescribed-view-header">
         <button class="btn btn-ghost btn-small prescribed-back-top"
                 id="prescribed-back-top"
@@ -92,19 +90,19 @@ export function render() {
         <h1>Prescribed Exercises</h1>
       </div>
 
-      <!-- ------ Coach card --------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+      <!-- ── Coach card ───────────────────────────────────────────────────── -->
       <div class="card card-coach">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">${coachLine}</p>
       </div>
 
-      <!-- ------ Exercise list ------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+      <!-- ── Exercise list ────────────────────────────────────────────────── -->
       ${exercises.length === 0
         ? renderEmptyState()
         : renderExerciseList(active, done, creditsAvail)
       }
 
-      <!-- ------ Add exercise form ------------------------------------------------------------------------------------------------------------------------------------------ -->
+      <!-- ── Add exercise form ────────────────────────────────────────────── -->
       <div class="prescribed-add-section" style="margin-top: var(--space-5);">
         <button class="btn btn-ghost btn-full" id="px-toggle-form-btn"
                 aria-expanded="${showAddForm}"
@@ -117,7 +115,7 @@ export function render() {
         </div>
       </div>
 
-      <!-- ------ Bottom back button --------------------------------------------------------------------------------------------------------------------------------------- -->
+      <!-- ── Bottom back button ───────────────────────────────────────────── -->
       <div style="margin-top: var(--space-6); margin-bottom: var(--space-4);">
         <button class="btn btn-ghost btn-full" id="prescribed-back-bottom"
                 aria-label="Back to choices">
@@ -129,7 +127,7 @@ export function render() {
   `;
 }
 
-// ------ Empty state ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Empty state ───────────────────────────────────────────────────────────────
 
 function renderEmptyState() {
   return `
@@ -142,7 +140,7 @@ function renderEmptyState() {
   `;
 }
 
-// ------ Exercise list ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Exercise list ─────────────────────────────────────────────────────────────
 
 function renderExerciseList(active, done, creditsAvail) {
   return `
@@ -311,7 +309,7 @@ function getWeekStart(date) {
   return d;
 }
 
-// ------ Add form ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Add form ──────────────────────────────────────────────────────────────────
 
 function renderAddForm() {
   return `
@@ -393,10 +391,10 @@ function renderAddForm() {
   `;
 }
 
-// ------ Mount ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
-  // ------ Auto-open form from checkin shortcut ---------------------------------------------------------------------------------------------------------
+  // ── Auto-open form from checkin shortcut ───────────────────────────────────
   // checkin.js shortcut sets this flag. Consume once then clear.
   const shouldAutoOpen = store.get("openPrescribedForm");
   if (shouldAutoOpen) {
@@ -406,32 +404,32 @@ export function onMount() {
     return; // rerender calls onMount again
   }
 
-  // ------ Back buttons ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // ── Back buttons ──────────────────────────────────────────────────────────
   document.getElementById("prescribed-back-top")?.addEventListener("click", () => {
-    router.back();
+    router.navigate("intention");
   });
   document.getElementById("prescribed-back-bottom")?.addEventListener("click", () => {
-    router.back();
+    router.navigate("intention");
   });
 
-  // ------ Start session ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // ── Start session ─────────────────────────────────────────────────────────
   document.getElementById("px-start-session-btn")?.addEventListener("click", () => {
     router.navigate("prescribed-session");
   });
 
-  // ------ Toggle add form ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // ── Toggle add form ───────────────────────────────────────────────────────
   document.getElementById("px-toggle-form-btn")?.addEventListener("click", () => {
     showAddForm = !showAddForm;
     rerender();
   });
 
-  // ------ Form submission ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // ── Form submission ───────────────────────────────────────────────────────
   document.getElementById("px-add-form")?.addEventListener("submit", e => {
     e.preventDefault();
     saveExercise();
   });
 
-  // ------ Remove exercise ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // ── Remove exercise ───────────────────────────────────────────────────────
   document.querySelectorAll(".prescribed-remove-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.dataset.exerciseId;
@@ -441,7 +439,7 @@ export function onMount() {
   });
 }
 
-// ------ Actions ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Actions ───────────────────────────────────────────────────────────────────
 
 function saveExercise() {
   const nameEl         = document.getElementById("px-name");
@@ -488,7 +486,7 @@ function saveExercise() {
 
 /**
  * Remove a prescribed exercise after confirmation.
- * Health data --- always confirms before deleting.
+ * Health data — always confirms before deleting.
  */
 function removeExercise(id) {
   const exercises = store.get("prescribedExercises") || [];
