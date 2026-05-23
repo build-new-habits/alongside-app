@@ -849,6 +849,33 @@ function renderDayCard(day) {
 
 // -- Wire all panel elements --------------------------------------------------
 
+function formatGender(gender) {
+  const map = {
+    "female": "Female", "male": "Male",
+    "non-binary": "Non-binary", "prefer-not": "Prefer not to say"
+  };
+  return map[gender] || "";
+}
+
+function rerenderTab() {
+  const panel = document.getElementById("settings-tab-panel");
+  if (panel) { panel.innerHTML = renderActiveTab(); wirePanel(); }
+}
+
+function rerenderEquipment() {
+  const panel = document.getElementById("panel-equipment") || document.getElementById("panel-equipment-sub");
+  if (!panel) return;
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = equipmentScreen === "facilities" ? renderEquipmentTab() : renderFacilitySubScreen(equipmentScreen);
+  const newPanel = wrapper.querySelector("section");
+  if (newPanel) { panel.replaceWith(newPanel); onMount(); }
+}
+
+function rerenderMyWeek() {
+  const panel = document.getElementById("settings-tab-panel");
+  if (panel) { panel.innerHTML = renderMyWeekTab(); wirePanel(); }
+}
+
 function wirePanel() {
 
   // Profile: open edit
