@@ -1,16 +1,17 @@
 /**
  * quiet-session.js - Something Quieter View
  *
- * 22 May 2026 v1 (S4-3): All navigate("intention") calls replaced with
- *   quietReturnRoute pattern so Back goes to the correct previous view.
+ * 21 May 2026 v1 — Back button reads quietReturnRoute from store.
+ *                   quietLaunchedDirect flag skips selector when
+ *                   navigated from Noticing or other views directly.
  *
  * v1.0 (S4-1, April 2026)
  *
  * Three modes, selected by quietMode in store before navigation:
- *   "breathing"  --- 5 structured breathing exercises with visual phase timers
- *   "journal"    --- coach-selected prompts based on check-in, free text, stored privately
- *   "mindful"    --- 5/10/15 min guided mindful movement from mindfulness exercise database
- *   "rest"       --- single warm coach acknowledgement, no activity required
+ *   "breathing"  — 5 structured breathing exercises with visual phase timers
+ *   "journal"    — coach-selected prompts based on check-in, free text, stored privately
+ *   "mindful"    — 5/10/15 min guided mindful movement from mindfulness exercise database
+ *   "rest"       — single warm coach acknowledgement, no activity required
  *
  * Route: quiet-session
  * Nav: hidden (session view)
@@ -22,7 +23,7 @@ import { store } from "../store.js";
 
 export const centered = false;
 
-// ------ Breathing exercises ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Breathing exercises ───────────────────────────────────────────────────────
 
 const BREATHING_EXERCISES = [
   {
@@ -96,7 +97,7 @@ const BREATHING_EXERCISES = [
   }
 ];
 
-// ------ Journaling prompts ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Journaling prompts ────────────────────────────────────────────────────────
 
 const JOURNAL_PROMPTS = {
   low: [
@@ -122,7 +123,7 @@ const JOURNAL_PROMPTS = {
   ]
 };
 
-// ------ Mindfulness exercises (from database) ---------------------------------------------------------------------------------------------------------------
+// ── Mindfulness exercises (from database) ─────────────────────────────────────
 
 const MINDFUL_SESSIONS = {
   5: [
@@ -151,7 +152,7 @@ const MINDFUL_SESSIONS = {
   ]
 };
 
-// ------ View state ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── View state ────────────────────────────────────────────────────────────────
 
 let mode              = "breathing";   // "breathing" | "journal" | "mindful" | "rest"
 let selectedBreathing = null;          // breathing exercise id
@@ -171,7 +172,7 @@ let journalText       = "";
 let journalPrompts    = [];
 let journalSaved      = false;
 
-// ------ Render ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
   mode = store.get("quietMode") || "selector";
@@ -204,7 +205,7 @@ function getModeTitle() {
   return titles[mode] || "Something Quieter";
 }
 
-// ------ Mode selector --- shown when no mode is set ---------------------------------------------------------------------------------------------------
+// ── Mode selector — shown when no mode is set ─────────────────────────────────
 
 function renderModeSelector() {
   return `
@@ -271,7 +272,7 @@ function renderModeSelector() {
 }
 
 function renderMode() {
-  // No mode set --- show the selector menu first
+  // No mode set — show the selector menu first
   if (!mode || mode === "selector") return renderModeSelector();
   if (mode === "breathing")  return renderBreathingMode();
   if (mode === "journal")    return renderJournalMode();
@@ -280,7 +281,7 @@ function renderMode() {
   return renderBreathingMode();
 }
 
-// ------ Breathing mode ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Breathing mode ────────────────────────────────────────────────────────────
 
 function renderBreathingMode() {
   if (!selectedBreathing) return renderBreathingSelector();
@@ -408,7 +409,7 @@ function renderBreathingComplete(ex) {
   `;
 }
 
-// ------ Journal mode ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Journal mode ──────────────────────────────────────────────────────────────
 
 function renderJournalMode() {
   if (journalPrompts.length === 0) journalPrompts = selectJournalPrompts();
@@ -500,7 +501,7 @@ function saveJournalEntry() {
   rerender();
 }
 
-// ------ Mindful mode ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Mindful mode ──────────────────────────────────────────────────────────────
 
 function renderMindfulMode() {
   const session = MINDFUL_SESSIONS[mindfulDuration];
@@ -597,7 +598,7 @@ function renderMindfulComplete() {
   `;
 }
 
-// ------ Rest mode ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Rest mode ─────────────────────────────────────────────────────────────────
 
 function renderRestMode() {
   const checkin = store.get("checkinHistory") || {};
@@ -637,7 +638,7 @@ function renderRestMode() {
   `;
 }
 
-// ------ Timer logic ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Timer logic ───────────────────────────────────────────────────────────────
 
 function startBreathing(exerciseId) {
   const ex = BREATHING_EXERCISES.find(e => e.id === exerciseId);
@@ -715,12 +716,12 @@ function startMindfulSession() {
   mindfulSecondsLeft = session[0].duration;
 
   // Render the session view DIRECTLY into the content div without calling
-  // rerender() --- rerender() triggers onMount() which calls cleanup() and
+  // rerender() — rerender() triggers onMount() which calls cleanup() and
   // kills the timer before it gets a chance to run.
   const content = document.getElementById("quiet-session-content");
   if (content) {
     content.innerHTML = renderMindfulSession(session[0], session);
-    // Wire only the stop button --- do not call full onMount()
+    // Wire only the stop button — do not call full onMount()
     document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
   }
 
@@ -733,7 +734,7 @@ function runMindfulStep(session) {
   mindfulTimer = setInterval(() => {
     mindfulSecondsLeft--;
 
-    // Update only the time display --- do not rerender the whole view
+    // Update only the time display — do not rerender the whole view
     const timeEl = document.getElementById("quiet-mindful-time");
     if (timeEl) timeEl.textContent = formatTime(mindfulSecondsLeft);
 
@@ -744,7 +745,7 @@ function runMindfulStep(session) {
       if (mindfulStep >= session.length) {
         mindfulComplete = true;
         logSession("mindful", mindfulDuration + " min mindful session", 20);
-        // Safe to rerender here --- session is complete, no timer to protect
+        // Safe to rerender here — session is complete, no timer to protect
         rerender();
         return;
       }
@@ -775,7 +776,7 @@ function formatTime(seconds) {
   return m + ":" + String(s).padStart(2, "0");
 }
 
-// ------ Session logging ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Session logging ───────────────────────────────────────────────────────────
 
 function logSession(type, name, credits) {
   const existing = store.get("activityLog") || [];
@@ -796,12 +797,12 @@ function logSession(type, name, credits) {
   store.set("lastWorkoutName", name);
 }
 
-// ------ Mount ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
   mode = store.get("quietMode") || "selector";
 
-  // ------ Mode selector cards ---------------------------------------------------------------------------------------------------------------------------------------------------------
+  // ── Mode selector cards ───────────────────────────────────────────────────
   document.querySelectorAll(".quiet-mode-card").forEach(card => {
     card.addEventListener("click", () => {
       mode = card.dataset.mode;
@@ -813,14 +814,28 @@ export function onMount() {
   // Back buttons
   document.querySelectorAll(".quiet-back-btn, #quiet-back-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      // If in a mode, go back to the selector. If at selector, go to intention.
+      // If in a mode that was pre-set (came from Noticing or elsewhere),
+      // go directly back to the return route — do not show the selector.
+      // quietReturnRoute is set by the caller before navigating here.
+      const returnRoute = store.get("quietReturnRoute") || "intention";
+
       if (mode && mode !== "selector") {
-        mode = "selector";
-        store.set("quietMode", null);
-        cleanup();
-        rerender();
+        // Were we launched directly into a mode (e.g. from Noticing)?
+        // If so, Back goes straight to the return route, not the selector.
+        const launchedDirectly = store.get("quietLaunchedDirect") || false;
+        if (launchedDirectly) {
+          cleanup();
+          store.set("quietMode", null);
+          store.set("quietReturnRoute", null);
+          store.set("quietLaunchedDirect", false);
+          router.navigate(returnRoute);
+        } else {
+          mode = "selector";
+          store.set("quietMode", null);
+          cleanup();
+          rerender();
+        }
       } else {
-        const returnRoute = store.get("quietReturnRoute") || "intention";
         cleanup();
         store.set("quietMode", null);
         store.set("quietReturnRoute", null);
