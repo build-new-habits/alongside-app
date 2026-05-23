@@ -849,6 +849,217 @@ function renderDayCard(day) {
 
 // -- Wire all panel elements --------------------------------------------------
 
+function renderMovementIdentity() {
+  const current = (() => {
+    const v = store.get("movementIdentity");
+    return Array.isArray(v) ? v : (v ? [v] : []);
+  })();
+  const selectedLabels = MOVEMENT_IDENTITIES.filter(i => current.includes(i.id)).map(i => i.label);
+  return `
+    <div class="library-grid" role="group" aria-label="My movement identity">
+      ${MOVEMENT_IDENTITIES.map(item => `
+        <button class="library-card ${current.includes(item.id) ? "library-card--selected" : ""}"
+                data-identity="${item.id}"
+                aria-pressed="${current.includes(item.id)}"
+                aria-label="${item.label}${current.includes(item.id) ? ", selected" : ""}">
+          <span class="library-card-icon" aria-hidden="true">${item.icon}</span>
+          <span class="library-card-label">${item.label}</span>
+        </button>
+      `).join("")}
+    </div>
+    ${selectedLabels.length > 0 ? `
+      <p class="text-sm text-muted movement-identity-note" style="margin-top: var(--space-2);">
+        The coach will lean toward
+        ${selectedLabels.length === 1
+          ? selectedLabels[0]
+          : selectedLabels.slice(0, -1).join(", ") + " and " + selectedLabels[selectedLabels.length - 1]}
+        suggestions.
+      </p>
+    ` : ""}
+  `;
+}
+
+function renderSpeechRateSection() {
+  const currentRate = store.get("speechRate") || 0.9;
+  const currentPos  = rateToPosition(currentRate);
+  const label       = speedLabel(currentRate);
+  return `
+    <div class="card speech-rate-card">
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
+        Sets the speed of the read-aloud feature on coach cards.
+      </p>
+      <div class="speech-rate-slider-wrap">
+        <div class="speech-rate-value-row">
+          <span class="speech-rate-current-label" id="speech-rate-label"
+                aria-live="polite" aria-atomic="true">${label}</span>
+          <span class="text-sm text-muted" id="speech-rate-position"
+                aria-hidden="true">${currentPos} / ${SPEED_STEPS}</span>
+        </div>
+        <input type="range" id="speech-rate-slider" class="checkin-slider"
+               min="1" max="${SPEED_STEPS}" step="1" value="${currentPos}"
+               aria-label="Coach voice speed"
+               aria-valuemin="1" aria-valuemax="${SPEED_STEPS}"
+               aria-valuenow="${currentPos}" aria-valuetext="${label}">
+        <div class="checkin-slider-ends" aria-hidden="true">
+          <span>Slower</span>
+          <span>Faster</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderNotificationSection() {
+  const notif   = store.get("checkInNotification") || { enabled: false, time: null, permissionGranted: false };
+  const enabled = !!notif.enabled;
+  const denied  = enabled && !notif.permissionGranted
+                  && "Notification" in window
+                  && Notification.permission === "denied";
+  return `
+    <div class="card notification-card">
+      <div class="notification-toggle-row">
+        <div class="notification-toggle-label">
+          <span class="notification-label-text">Daily check-in reminder</span>
+          <span class="notification-label-sub text-sm text-muted">A gentle nudge at the time you choose</span>
+        </div>
+        <label class="toggle-switch" aria-label="Enable daily check-in reminder">
+          <input type="checkbox" id="notif-toggle" role="switch"
+                 aria-checked="${enabled}" ${enabled ? "checked" : ""}>
+          <span class="toggle-track" aria-hidden="true"></span>
+        </label>
+      </div>
+      ${enabled ? `
+        <div class="notification-time-row" id="notif-time-row">
+          <label class="form-label" for="notif-time">Remind me at</label>
+          <input type="time" id="notif-time" class="form-input notif-time-input"
+                 value="${notif.time || "08:00"}" aria-label="Check-in reminder time">
+        </div>
+        ${denied ? `
+          <div class="notification-denied-banner" role="alert">
+            <p class="text-sm">
+              Your device has blocked notifications for this app.
+              To receive reminders, go to your browser settings and allow notifications.
+            </p>
+          </div>
+        ` : (!notif.permissionGranted && "Notification" in window && Notification.permission !== "granted") ? `
+          <p class="text-sm text-muted notification-permission-note">
+            Your browser will ask for permission to show notifications.
+          </p>
+        ` : ""}
+      ` : `
+        <p class="text-sm text-muted" style="margin-top: var(--space-3);">
+          Turn on to set a daily reminder to check in.
+        </p>
+      `}
+    </div>
+  `;
+}
+
+function renderDayConfig(day) {
+  const slot = weeklyPlanDraft?.[day] || { type: "open" };
+  const selected = Array.isArray(slot.sessionTypes) ? slot.sessionTypes : (slot.sessionType ? [slot.sessionType] : []);
+
+  return `
+    <div class="weekly-plan-config-panel card" id="day-config-panel-${day}"
+         aria-label="Configure ${DAY_LABELS[day]}">
+      <h3 class="section-heading" style="font-size:var(--text-base);margin-bottom:var(--space-3);">
+        ${DAY_LABELS[day]}
+      </h3>
+
+      <p class="text-xs text-muted" style="margin-bottom:var(--space-2);">What is planned?</p>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-4);"
+           role="group" aria-label="Day type for ${DAY_LABELS[day]}">
+        ${DAY_TYPES.map(t => `
+          <button class="weekly-plan-type-btn"
+                  data-day-type="${t.id}"
+                  aria-pressed="${slot.type === t.id}"
+                  style="display:flex;align-items:center;gap:var(--space-3);
+                         padding:var(--space-2) var(--space-3);border-radius:var(--radius-md,8px);
+                         text-align:left;cursor:pointer;width:100%;
+                         background:${slot.type === t.id ? "rgba(20,184,166,0.12)" : "rgba(255,255,255,0.03)"};
+                         border:1.5px solid ${slot.type === t.id ? "var(--color-primary)" : "rgba(255,255,255,0.08)"};">
+            <div style="flex:1;">
+              <p style="font-size:var(--text-sm);font-weight:var(--font-semibold);
+                        color:${slot.type === t.id ? "var(--color-primary)" : "var(--color-text)"};
+                        margin:0 0 1px;">${t.label}</p>
+              <p style="font-size:var(--text-xs);color:var(--color-text-secondary);margin:0;">${t.desc}</p>
+            </div>
+            ${slot.type === t.id ? `<span style="color:var(--color-primary);font-size:var(--text-sm);" aria-hidden="true">&#10003;</span>` : ""}
+          </button>
+        `).join("")}
+      </div>
+
+      ${slot.type === "gym" ? `
+        <p class="text-xs text-muted" style="margin-bottom:var(--space-2);">
+          Session focus <span style="color:var(--color-text-secondary);"> -- choose up to 3</span>
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
+             role="group" aria-label="Session focus (max 3)">
+          ${SESSION_TYPES.map(s => {
+            const isSel = selected.includes(s.id);
+            const isMax = !isSel && selected.length >= MAX_GYM_FOCUSES;
+            return `
+              <button class="chip ${isSel ? "chip--selected" : ""}"
+                      data-session-type="${s.id}"
+                      aria-pressed="${isSel}"
+                      ${isMax ? "disabled" : ""}
+                      style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
+                             font-size:var(--text-sm);cursor:${isMax ? "default" : "pointer"};
+                             opacity:${isMax ? "0.4" : "1"};
+                             background:${isSel ? "rgba(20,184,166,0.15)" : "rgba(255,255,255,0.06)"};
+                             border:1.5px solid ${isSel ? "var(--color-primary)" : "transparent"};">
+                ${s.label}
+              </button>
+            `;
+          }).join("")}
+        </div>
+
+        <p class="text-xs text-muted" style="margin-bottom:var(--space-2);">Target duration</p>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
+             role="group" aria-label="Target duration">
+          <button class="chip ${!slot.durationMins ? "chip--selected" : ""}"
+                  data-duration="null" aria-pressed="${!slot.durationMins}"
+                  style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
+                         font-size:var(--text-sm);cursor:pointer;
+                         background:${!slot.durationMins ? "rgba(20,184,166,0.15)" : "rgba(255,255,255,0.06)"};
+                         border:1.5px solid ${!slot.durationMins ? "var(--color-primary)" : "transparent"};">
+            Coach decides
+          </button>
+          ${DURATION_OPTIONS.map(d => `
+            <button class="chip ${slot.durationMins === d ? "chip--selected" : ""}"
+                    data-duration="${d}" aria-pressed="${slot.durationMins === d}"
+                    style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
+                           font-size:var(--text-sm);cursor:pointer;
+                           background:${slot.durationMins === d ? "rgba(20,184,166,0.15)" : "rgba(255,255,255,0.06)"};
+                           border:1.5px solid ${slot.durationMins === d ? "var(--color-primary)" : "transparent"};">
+              ${d} min
+            </button>
+          `).join("")}
+        </div>
+      ` : ""}
+
+      ${slot.type === "class" ? `
+        <div style="margin-bottom:var(--space-4);">
+          <label style="display:block;font-size:var(--text-xs);color:var(--color-text-secondary);
+                        margin-bottom:var(--space-2);" for="class-activity-name">
+            Activity name (optional)
+          </label>
+          <input type="text" id="class-activity-name" class="form-input"
+                 placeholder="e.g. Body Balance, Tennis, Aqua Aerobics"
+                 value="${slot.activityName || ""}"
+                 aria-label="Class or activity name">
+        </div>
+      ` : ""}
+
+      <button class="btn btn-primary btn-full btn-sm" id="day-config-done-btn"
+              aria-label="Done configuring ${DAY_LABELS[day]}">
+        Done
+      </button>
+    </div>
+  `;
+}
+
+
 function formatGender(gender) {
   const map = {
     "female": "Female", "male": "Male",
