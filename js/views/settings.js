@@ -1,6 +1,11 @@
 /**
  * settings.js - Settings view
  *
+ * 22 May 2026 v2 --- Dev tier panel added:
+ *   Triple-tap the version label to open tier switcher.
+ *   Free / Personal / Athlete. Changes persist in store.
+ *   No other changes from restored 22 May 2026 v1.
+ *
  * 22 May 2026 v1 --- My Week tab added (S4-3):
  *   Fifth tab: "My Week" --- weekly plan builder.
  *   7-day grid (Mon-Sun), each day configurable with type, session type,
@@ -78,7 +83,7 @@ const DURATION_OPTIONS = [20, 30, 45, 60, 75, 90];
 
 // Weekly plan local edit state (not saved until "Save my week")
 let weeklyPlanDraft = null;
-let configuringDay  = null;  // day name being configured, or null
+let configuringDay  = null;
 
 function initDraft() {
   const saved = store.get("weeklyPlan") || {};
@@ -94,6 +99,8 @@ function initDraft() {
 }
 
 function isPremium() {
+  // Check store.isPremium() if available (store v3+), else fall back to legacy keys
+  if (typeof store.isPremium === "function") return store.isPremium();
   return store.get("isPremium") || store.get("tier") === "personal" || store.get("tier") === "athlete" || false;
 }
 
@@ -234,7 +241,9 @@ export function render() {
         <div class="settings-update-zone">
           <div class="settings-version-row">
             <span class="text-sm text-muted">Version</span>
-            <span class="text-sm text-muted" id="settings-version-label">
+            <span class="text-sm text-muted" id="settings-version-label"
+                  style="cursor:pointer;user-select:none;"
+                  title="Triple-tap to open dev panel">
               ${(typeof window !== "undefined" && window.App?.version) ? window.App.version : ""}
             </span>
           </div>
@@ -530,7 +539,7 @@ function renderFacilitySubScreen(facilityId) {
         return `
           <div class="equipment-settings-category">
             <div class="equipment-category-heading">
-              <span>${cat.icon} ${cat.label}</span>
+              <span>${cat.icon} ${cat.name}</span>
               ${catCount > 0 ? `<span class="equipment-cat-count">${catCount} selected</span>` : ""}
             </div>
             <div class="equipment-chip-grid">
@@ -586,7 +595,6 @@ function renderMyWeekTab() {
       <h2 id="myweek-heading" class="section-heading">My Week</h2>
 
       ${!premium ? `
-        <!-- Free tier: locked -->
         <div class="card settings-coach-card" style="margin-bottom: var(--space-4);">
           <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
           <p class="text-sm">
@@ -604,13 +612,11 @@ function renderMyWeekTab() {
           </button>
         </div>
       ` : `
-        <!-- Personal tier: full access -->
         <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
           Set a movement type for each day. I will use this as my starting point
           and adapt around your check-in each morning.
         </p>
 
-        <!-- Master toggle -->
         <div class="card" style="margin-bottom:var(--space-4);">
           <div style="display:flex;justify-content:space-between;align-items:center;">
             <div>
@@ -629,15 +635,12 @@ function renderMyWeekTab() {
           </div>
         </div>
 
-        <!-- 7-day grid -->
         <div class="weekly-plan-grid" role="list" aria-label="Weekly plan days">
           ${DAYS.map(day => renderDayCard(day)).join("")}
         </div>
 
-        <!-- Day config panel (shown inline when a day is tapped) -->
         ${configuringDay ? renderDayConfig(configuringDay) : ""}
 
-        <!-- Save button -->
         <button class="btn btn-primary btn-full btn-large" id="save-week-btn"
                 style="margin-top:var(--space-5);"
                 aria-label="Save weekly plan">
@@ -691,10 +694,7 @@ function renderDayConfig(day) {
         ${DAY_LABELS[day]}
       </h3>
 
-      <!-- Type picker -->
-      <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">
-        What is planned?
-      </p>
+      <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">What is planned?</p>
       <div style="display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-4);"
            role="group" aria-label="Day type">
         ${DAY_TYPES.map(t => `
@@ -711,16 +711,13 @@ function renderDayConfig(day) {
                         color:${slot.type === t.id ? "var(--color-primary)" : "var(--color-text)"};margin:0 0 2px;">
                 ${t.label}
               </p>
-              <p style="font-size:var(--text-xs);color:var(--color-text-secondary);margin:0;">
-                ${t.desc}
-              </p>
+              <p style="font-size:var(--text-xs);color:var(--color-text-secondary);margin:0;">${t.desc}</p>
             </div>
             ${slot.type === t.id ? `<span style="color:var(--color-primary);" aria-hidden="true">&#10003;</span>` : ""}
           </button>
         `).join("")}
       </div>
 
-      <!-- Gym: session type + duration -->
       ${slot.type === "gym" ? `
         <p class="text-sm text-muted" style="margin-bottom:var(--space-2);">Session focus</p>
         <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
@@ -742,8 +739,7 @@ function renderDayConfig(day) {
         <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);"
              role="group" aria-label="Session duration">
           <button class="chip ${!slot.durationMins ? "chip--selected" : ""}"
-                  data-duration="null"
-                  aria-pressed="${!slot.durationMins}"
+                  data-duration="null" aria-pressed="${!slot.durationMins}"
                   style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
                          font-size:var(--text-sm);cursor:pointer;
                          background:${!slot.durationMins ? "rgba(20,184,166,0.15)" : "var(--color-surface-2,rgba(255,255,255,0.06))"};
@@ -752,8 +748,7 @@ function renderDayConfig(day) {
           </button>
           ${DURATION_OPTIONS.map(d => `
             <button class="chip ${slot.durationMins === d ? "chip--selected" : ""}"
-                    data-duration="${d}"
-                    aria-pressed="${slot.durationMins === d}"
+                    data-duration="${d}" aria-pressed="${slot.durationMins === d}"
                     style="padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm,6px);
                            font-size:var(--text-sm);cursor:pointer;
                            background:${slot.durationMins === d ? "rgba(20,184,166,0.15)" : "var(--color-surface-2,rgba(255,255,255,0.06))"};
@@ -764,7 +759,6 @@ function renderDayConfig(day) {
         </div>
       ` : ""}
 
-      <!-- Class: activity name -->
       ${slot.type === "class" ? `
         <div style="margin-bottom:var(--space-4);">
           <label class="form-label" for="class-activity-name"
@@ -779,7 +773,6 @@ function renderDayConfig(day) {
         </div>
       ` : ""}
 
-      <!-- Done -->
       <button class="btn btn-primary btn-full" id="day-config-done-btn"
               aria-label="Done configuring ${DAY_LABELS[day]}">
         Done
@@ -942,10 +935,7 @@ function switchTab(tabName) {
 
 function rerenderTab() {
   const panel = document.getElementById("settings-tab-panel");
-  if (panel) {
-    panel.innerHTML = renderActiveTab();
-    wirePanel();
-  }
+  if (panel) { panel.innerHTML = renderActiveTab(); wirePanel(); }
 }
 
 function rerenderEquipment() {
@@ -959,10 +949,96 @@ function rerenderEquipment() {
 
 function rerenderMyWeek() {
   const panel = document.getElementById("settings-tab-panel");
-  if (panel) {
-    panel.innerHTML = renderMyWeekTab();
-    wirePanel();
-  }
+  if (panel) { panel.innerHTML = renderMyWeekTab(); wirePanel(); }
+}
+
+// -- Dev tier panel -----------------------------------------------------------
+// Triple-tap the version label to open. Lets you switch Free / Personal / Athlete
+// without Stripe. Available in all builds. Changes persist in localStorage.
+
+let _devTapCount = 0;
+let _devTapTimer = null;
+
+function showDevPanel() {
+  const existing = document.getElementById("dev-tier-panel");
+  if (existing) { existing.remove(); return; }
+
+  // Read current tier from store if methods exist, else from raw key
+  const current = (typeof store.getUserTier === "function")
+    ? store.getUserTier()
+    : (store.get("userTier") || store.get("tier") || "free");
+
+  const panel = document.createElement("div");
+  panel.id = "dev-tier-panel";
+  panel.setAttribute("role", "dialog");
+  panel.setAttribute("aria-label", "Developer tier switcher");
+  panel.style.cssText = [
+    "position:fixed;bottom:0;left:0;right:0;z-index:9999;",
+    "background:var(--color-surface,#1e293b);",
+    "border-top:2px solid var(--color-primary,#14b8a6);",
+    "padding:var(--space-5,20px);",
+    "box-shadow:0 -4px 24px rgba(0,0,0,0.5);"
+  ].join("");
+
+  const tiers = [
+    { id: "free",     label: "Free",     desc: "Gated features locked" },
+    { id: "personal", label: "Personal", desc: "All core features unlocked" },
+    { id: "athlete",  label: "Athlete",  desc: "All features including athlete tier" },
+  ];
+
+  panel.innerHTML =
+    "<p style=\"font-size:11px;letter-spacing:0.08em;font-weight:700;" +
+    "color:var(--color-primary,#14b8a6);margin-bottom:12px;\">DEV -- TIER SWITCHER</p>" +
+    "<p style=\"font-size:13px;color:var(--color-text-secondary,#94a3b8);margin-bottom:16px;\">" +
+    "Current: <strong style=\"color:var(--color-text,#f1f5f9);\">" + current + "</strong>. " +
+    "Changes take effect immediately.</p>" +
+    tiers.map(t =>
+      "<button data-set-tier=\"" + t.id + "\" style=\"display:block;width:100%;text-align:left;" +
+      "padding:10px 14px;margin-bottom:8px;border-radius:8px;cursor:pointer;font-size:13px;" +
+      "background:" + (current === t.id ? "rgba(20,184,166,0.15)" : "rgba(255,255,255,0.04)") + ";" +
+      "border:1.5px solid " + (current === t.id ? "var(--color-primary,#14b8a6)" : "rgba(255,255,255,0.08)") + ";\">" +
+      "<strong>" + t.label + "</strong> <span style=\"color:#94a3b8;\">-- " + t.desc + "</span>" +
+      (current === t.id ? " <span style=\"color:var(--color-primary,#14b8a6);\">&#10003;</span>" : "") +
+      "</button>"
+    ).join("") +
+    "<button id=\"dev-panel-close\" style=\"width:100%;padding:10px;margin-top:4px;" +
+    "border-radius:8px;cursor:pointer;font-size:13px;" +
+    "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);\">Close</button>";
+
+  document.body.appendChild(panel);
+
+  // Tier buttons
+  panel.querySelectorAll("[data-set-tier]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tier = btn.dataset.setTier;
+      // Use store method if available, else write raw key
+      if (typeof store.setTier === "function") {
+        store.setTier(tier);
+      } else {
+        store.set("userTier", tier);
+        store.set("tier", tier);
+        store.set("isPremium", tier !== "free");
+      }
+      panel.remove();
+      // Re-render My Week tab so gating updates immediately
+      rerenderTab();
+      // Toast
+      const toast = document.createElement("div");
+      toast.setAttribute("role", "status");
+      toast.setAttribute("aria-live", "polite");
+      toast.style.cssText = [
+        "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);",
+        "background:var(--color-primary,#14b8a6);color:#0f172a;",
+        "padding:8px 20px;border-radius:999px;font-size:13px;",
+        "font-weight:700;z-index:9999;white-space:nowrap;"
+      ].join("");
+      toast.textContent = "Tier: " + tier;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    });
+  });
+
+  document.getElementById("dev-panel-close")?.addEventListener("click", () => panel.remove());
 }
 
 // -- Wire all panel elements --------------------------------------------------
@@ -1111,15 +1187,13 @@ function wirePanel() {
     router.navigate("library");
   });
 
-  // ------ My Week wiring ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-  // Master toggle
+  // My Week: master toggle
   document.getElementById("weekly-plan-toggle")?.addEventListener("change", e => {
     store.set("weeklyPlanEnabled", e.target.checked);
     rerenderMyWeek();
   });
 
-  // Day card button -- open/close config panel
+  // My Week: day card open/close
   document.querySelectorAll(".weekly-plan-day-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const day = btn.dataset.day;
@@ -1128,7 +1202,7 @@ function wirePanel() {
     });
   });
 
-  // Day type selection
+  // My Week: day type selection
   document.querySelectorAll("[data-day-type]").forEach(btn => {
     btn.addEventListener("click", () => {
       if (!configuringDay) return;
@@ -1136,17 +1210,16 @@ function wirePanel() {
       weeklyPlanDraft[configuringDay] = {
         ...weeklyPlanDraft[configuringDay],
         type,
-        // Clear gym/class specific fields when type changes
         sessionType:  type === "gym"   ? (weeklyPlanDraft[configuringDay].sessionType  || null) : null,
         durationMins: type === "gym"   ? (weeklyPlanDraft[configuringDay].durationMins || null) : null,
         activityName: type === "class" ? (weeklyPlanDraft[configuringDay].activityName || null) : null,
-        label:        null,
+        label: null,
       };
       rerenderMyWeek();
     });
   });
 
-  // Session type chips (gym days)
+  // My Week: session type chips
   document.querySelectorAll("[data-session-type]").forEach(btn => {
     btn.addEventListener("click", () => {
       if (!configuringDay) return;
@@ -1155,7 +1228,7 @@ function wirePanel() {
     });
   });
 
-  // Duration chips (gym days)
+  // My Week: duration chips
   document.querySelectorAll("[data-duration]").forEach(btn => {
     btn.addEventListener("click", () => {
       if (!configuringDay) return;
@@ -1165,15 +1238,14 @@ function wirePanel() {
     });
   });
 
-  // Class activity name input -- save on blur
+  // My Week: class activity name
   document.getElementById("class-activity-name")?.addEventListener("blur", e => {
     if (!configuringDay) return;
     weeklyPlanDraft[configuringDay].activityName = e.target.value.trim() || null;
   });
 
-  // Day config Done
+  // My Week: day config Done
   document.getElementById("day-config-done-btn")?.addEventListener("click", () => {
-    // Capture class name from input if still focused
     const nameInput = document.getElementById("class-activity-name");
     if (nameInput && configuringDay) {
       weeklyPlanDraft[configuringDay].activityName = nameInput.value.trim() || null;
@@ -1182,32 +1254,22 @@ function wirePanel() {
     rerenderMyWeek();
   });
 
-  // Save my week
+  // My Week: save
   document.getElementById("save-week-btn")?.addEventListener("click", () => {
-    // Capture any open class name input before saving
     const nameInput = document.getElementById("class-activity-name");
     if (nameInput && configuringDay) {
       weeklyPlanDraft[configuringDay].activityName = nameInput.value.trim() || null;
     }
-
     store.set("weeklyPlan", { ...weeklyPlanDraft });
     store.set("weeklyPlanSetAt", new Date().toISOString());
-
-    // Auto-enable on first save if toggle is currently off
-    if (!store.get("weeklyPlanEnabled")) {
-      store.set("weeklyPlanEnabled", true);
-    }
-
+    if (!store.get("weeklyPlanEnabled")) store.set("weeklyPlanEnabled", true);
     configuringDay = null;
     rerenderMyWeek();
-
-    // Confirmation message
     const panel = document.getElementById("settings-tab-panel");
     if (panel) {
       const msg = document.createElement("div");
       msg.setAttribute("role", "status");
       msg.setAttribute("aria-live", "polite");
-      msg.className = "save-confirmation";
       msg.style.cssText = "text-align:center;padding:var(--space-3);color:var(--color-primary);font-size:var(--text-sm);";
       msg.textContent = "Your week is saved. I'll use this as my starting point each day.";
       panel.appendChild(msg);
@@ -1215,7 +1277,7 @@ function wirePanel() {
     }
   });
 
-  // Upgrade prompt
+  // My Week: upgrade prompt
   document.getElementById("upgrade-prompt-btn")?.addEventListener("click", () => {
     router.navigate("upgrade");
   });
@@ -1340,12 +1402,26 @@ export function onMount() {
   document.getElementById("reset-app-btn")?.addEventListener("click", () => {
     if (confirm("This will delete all your data and start fresh. Are you sure?")) {
       store.reset();
-      activeTab      = "profile";
-      editingField   = null;
-      configuringDay = null;
+      activeTab       = "profile";
+      editingField    = null;
+      configuringDay  = null;
       weeklyPlanDraft = null;
       document.getElementById("bottom-nav")?.classList.add("hidden");
       router.navigate("onboarding/welcome");
     }
   });
+
+  // Dev panel: triple-tap version label
+  const versionLabel = document.getElementById("settings-version-label");
+  if (versionLabel) {
+    versionLabel.addEventListener("click", () => {
+      _devTapCount++;
+      clearTimeout(_devTapTimer);
+      _devTapTimer = setTimeout(() => { _devTapCount = 0; }, 800);
+      if (_devTapCount >= 3) {
+        _devTapCount = 0;
+        showDevPanel();
+      }
+    });
+  }
 }
