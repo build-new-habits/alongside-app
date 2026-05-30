@@ -1,0 +1,268 @@
+/*
+ * css/components/weekly-plan.css
+ * 30 May 2026 v1
+ *
+ * Styles for the My Week tab redesign in settings.js.
+ * Three-column table layout: Day / Focus / On toggle.
+ * Inline config panel expands beneath tapped row.
+ * Per-day dimming when toggled off.
+ */
+
+/* ── Table header ──────────────────────────────────────────────────────────── */
+
+.weekly-plan-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+
+.weekly-plan-table-header {
+  display: grid;
+  grid-template-columns: 90px 1fr 52px;
+  padding: var(--space-2) var(--space-3);
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: var(--text-xs, 11px);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text-secondary, #94a3b8);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.weekly-plan-table-header span:last-child {
+  text-align: center;
+}
+
+/* ── Row wrap (holds the row + optional config panel) ──────────────────────── */
+
+.weekly-plan-row-wrap {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.weekly-plan-row-wrap:last-child {
+  border-bottom: none;
+}
+
+/* ── The three-column row ──────────────────────────────────────────────────── */
+
+.weekly-plan-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 52px;
+  align-items: center;
+  min-height: 52px;
+  background: var(--color-surface, #1e293b);
+  transition: background 0.15s ease, opacity 0.2s ease;
+}
+
+.weekly-plan-row--off {
+  opacity: 0.4;
+}
+
+.weekly-plan-row--open {
+  background: rgba(20, 184, 166, 0.06);
+  border-bottom: 1px solid rgba(20, 184, 166, 0.2);
+}
+
+/* ── Col 1: Day name button ────────────────────────────────────────────────── */
+
+.weekly-plan-row-day {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: var(--space-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.week-day-name {
+  font-size: var(--text-sm, 14px);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text, #f1f5f9);
+}
+
+/* ── Col 2: Focus summary button ───────────────────────────────────────────── */
+
+.weekly-plan-row-focus {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: var(--space-2) var(--space-2);
+  background: none;
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  text-align: left;
+}
+
+.week-focus-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.week-focus-line {
+  font-size: var(--text-xs, 12px);
+  color: var(--color-primary, #14b8a6);
+  line-height: 1.4;
+}
+
+.week-focus-none {
+  font-size: var(--text-xs, 12px);
+  color: var(--color-text-secondary, #94a3b8);
+  font-style: italic;
+}
+
+/* ── Col 3: Per-day toggle ──────────────────────────────────────────────────── */
+
+.weekly-plan-row-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--space-2);
+}
+
+/* Small toggle variant */
+.toggle-switch--sm .toggle-track {
+  width: 36px;
+  height: 20px;
+}
+
+.toggle-switch--sm .toggle-track::after {
+  width: 14px;
+  height: 14px;
+  top: 3px;
+  left: 3px;
+}
+
+.toggle-switch--sm input:checked + .toggle-track::after {
+  transform: translateX(16px);
+}
+
+/* ── Config panel (opens inline below row) ──────────────────────────────────── */
+
+.weekly-plan-config-panel {
+  padding: var(--space-4);
+  background: var(--color-surface-2, rgba(255, 255, 255, 0.03));
+  border-top: 1px solid rgba(20, 184, 166, 0.15);
+}
+
+.config-section-label {
+  font-size: var(--text-sm, 13px);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text-secondary, #94a3b8);
+  margin-bottom: var(--space-2);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.config-label-hint {
+  font-size: var(--text-xs, 11px);
+  font-weight: var(--font-normal, 400);
+  color: var(--color-text-secondary, #94a3b8);
+  opacity: 0.7;
+}
+
+/* ── Day type list ──────────────────────────────────────────────────────────── */
+
+.day-type-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.day-type-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md, 8px);
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  background: var(--color-surface-2, rgba(255, 255, 255, 0.04));
+  border: 1.5px solid transparent;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.day-type-btn--selected {
+  background: rgba(20, 184, 166, 0.12);
+  border-color: var(--color-primary, #14b8a6);
+}
+
+.day-type-btn-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.day-type-btn-label {
+  display: block;
+  font-size: var(--text-sm, 13px);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text, #f1f5f9);
+  margin-bottom: 1px;
+}
+
+.day-type-btn--selected .day-type-btn-label {
+  color: var(--color-primary, #14b8a6);
+}
+
+.day-type-btn-desc {
+  display: block;
+  font-size: var(--text-xs, 11px);
+  color: var(--color-text-secondary, #94a3b8);
+}
+
+.day-type-btn-check {
+  color: var(--color-primary, #14b8a6);
+  font-size: var(--text-base, 14px);
+  flex-shrink: 0;
+}
+
+/* ── Focus chips (multi-select) ─────────────────────────────────────────────── */
+
+.focus-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.focus-chip {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm, 6px);
+  font-size: var(--text-sm, 13px);
+  cursor: pointer;
+  background: var(--color-surface-2, rgba(255, 255, 255, 0.06));
+  border: 1.5px solid transparent;
+  color: var(--color-text, #f1f5f9);
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.focus-chip--selected {
+  background: rgba(20, 184, 166, 0.15);
+  border-color: var(--color-primary, #14b8a6);
+  color: var(--color-primary, #14b8a6);
+}
+
+/* High contrast / forced-colors support */
+@media (forced-colors: active) {
+  .focus-chip--selected {
+    border-color: Highlight;
+    color: Highlight;
+  }
+  .weekly-plan-row--off {
+    opacity: 1;
+    border: 2px dashed GrayText;
+  }
+}
