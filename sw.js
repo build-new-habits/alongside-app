@@ -1,8 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 23 May 2026 v3
- * Cache version: alongside-v92
+ * 30 May 2026 v1
+ * Cache version: alongside-v93
+ *
+ * v93 changes (30 May 2026)
+ * - Daily flow redesign: today.js rebuilt as Act 1 greeting screen;
+ *   coach-reflection.js new view (post check-in pattern reflection + A/B/C/D);
+ *   checkin.js routes to coach-reflection after submit;
+ *   router.js updated (nav always visible on today/reflection/proposal,
+ *   new VIEW_NAMES, init navigates to today not intention);
+ *   coach-reflection.js added to SHELL_URLS
  *
  * v86 changes (23 May 2026)
  * - Cosmetic Fixes
@@ -143,7 +151,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v92";
+const CACHE_NAME = "alongside-v93";
 
 const SHELL_URLS = [
 
@@ -168,6 +176,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/checkin-mini.js",
   "/alongside-app/js/views/intention.js",
   "/alongside-app/js/views/coach-proposal.js",
+  "/alongside-app/js/views/coach-reflection.js",
   "/alongside-app/js/views/workout.js",
   "/alongside-app/js/views/workout-complete.js",
   "/alongside-app/js/views/progress.js",
