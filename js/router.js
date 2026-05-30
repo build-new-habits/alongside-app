@@ -1,6 +1,13 @@
 /**
  * router.js - View navigation
  *
+ * 30 May 2026 v1 --- Daily flow redesign:
+ *   coach-reflection added to VIEW_NAMES.
+ *   noticing added to VIEW_NAMES.
+ *   intention and coach-proposal removed from hideNavViews (nav always visible).
+ *   setActiveNav: coach-reflection maps to Today tab.
+ *   init() now navigates to "today" (Act 1 greeting) instead of "intention".
+ *
  * 22 May 2026 v2 --- Device back gesture fix (S4-3):
  *   pushState() called on every navigate() so the browser history stack
  *   is never empty. popstate listener intercepts device swipe-back and
@@ -21,6 +28,7 @@ import { tts }   from "./tts.js";
 
 const VIEW_NAMES = {
   "today":                   "Today",
+  "coach-reflection":        "Your Session",
   "progress":                "Your Progress",
   "settings":                "Settings",
   "checkin":                 "Daily Check-In",
@@ -39,9 +47,11 @@ const VIEW_NAMES = {
   "session-builder-ui":      "Build a Session",
   "library":                 "Library",
   "activity-log":            "Log an Activity",
+  "noticing":                "Noticing",
   "noticing-hub":            "Noticing Hub",
   "upgrade":                 "Personal Plan",
   "privacy":                 "Privacy and Terms",
+  "checkin-mini":            "Quick Check-In",
   "onboarding/welcome":      "Welcome to Alongside",
   "onboarding/name":         "Your Name",
   "onboarding/about":        "About You",
@@ -65,7 +75,7 @@ export const router = {
   back() {
     this._history.pop();
     const previous = this._history.pop();
-    this.navigate(previous || "intention");
+    this.navigate(previous || "today");
   },
 
   init() {
@@ -74,7 +84,7 @@ export const router = {
     this.hideLoading();
 
     if (store.isOnboardingComplete()) {
-      this.navigate("intention");
+      this.navigate("today");
     } else {
       this.navigate("onboarding/welcome");
     }
@@ -100,7 +110,7 @@ export const router = {
     // Seed the browser history so there is always a state to pop to
     window.history.pushState({ alongside: true }, "", window.location.href);
 
-    window.addEventListener("popstate", (e) => {
+    window.addEventListener("popstate", () => {
       // Re-push immediately so the stack never empties
       window.history.pushState({ alongside: true }, "", window.location.href);
       // Now handle in-app back navigation
@@ -133,10 +143,13 @@ export const router = {
     mainContent.innerHTML = "";
     mainContent.className = "main-content";
 
+    // Nav is hidden only during focused flows.
+    // intention, coach-proposal, and coach-reflection all show nav now --
+    // the user can always reach Progress, Noticing, or Settings.
     const hideNavViews = [
       "onboarding", "workout", "workout-complete", "checkin",
       "prescribed-session", "morning-session", "quiet-session",
-      "yoga-session", "coach-proposal", "intention"
+      "yoga-session"
     ];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
@@ -224,8 +237,15 @@ export const router = {
     });
   },
 
+  /**
+   * Highlight the active nav item.
+   * today, coach-reflection, coach-proposal and intention all map to
+   * the Today button (data-view="intention") since they are all part
+   * of the Today flow.
+   */
   setActiveNav(viewName) {
-    const navKey = (viewName === "today" || viewName === "coach-proposal") ? "intention" : viewName;
+    const todayViews = ["today", "coach-reflection", "coach-proposal", "intention"];
+    const navKey = todayViews.includes(viewName) ? "intention" : viewName;
     document.querySelectorAll(".nav-item").forEach(item => {
       item.classList.toggle("active", item.dataset.view === navKey);
     });
