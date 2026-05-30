@@ -1,7 +1,14 @@
 /**
  * coach-reflection.js - Post Check-In Pattern Reflection
  *
- * 30 May 2026 v1
+ * 30 May 2026 v2
+ *
+ * v2 -- Bug fixes:
+ *   Options now use intention-path CSS classes (same as intention screen).
+ *   Event wiring moved from delegated outer listener to direct button listeners
+ *   attached in wireOptions() so rerender() correctly re-attaches after DOM rebuild.
+ *   Second-session "No, all good" now calls wireOptions() not onMount().
+ *   B-path picker uses direct listeners, no rerender needed for chip selection.
  *
  * Act 3 of the daily flow. Sits between check-in and session selection.
  *
@@ -419,21 +426,22 @@ function renderSecondSessionPrompt() {
   if (miniState === "asked") {
     // User said something has changed -- route to mini check-in
     return `
-      <div class="reflection-options" role="group" aria-label="What has changed?">
-        <p class="reflection-options-label">What has changed?</p>
+      <div class="intention-paths" role="group" aria-label="What has changed?">
 
-        <button class="reflection-option-btn"
-                id="mini-energy-shifted"
+        <button class="intention-path" id="mini-energy-shifted"
                 aria-label="My energy has shifted">
-          <span class="reflection-option-icon" aria-hidden="true">&#9889;</span>
-          <span>My energy has shifted</span>
+          <span class="intention-path-icon" aria-hidden="true">&#9889;</span>
+          <div class="intention-path-text">
+            <span class="intention-path-label">My energy has shifted</span>
+          </div>
         </button>
 
-        <button class="reflection-option-btn"
-                id="mini-pain-flagged"
+        <button class="intention-path" id="mini-pain-flagged"
                 aria-label="I have pain to flag">
-          <span class="reflection-option-icon" aria-hidden="true">&#128681;</span>
-          <span>I have pain to flag</span>
+          <span class="intention-path-icon" aria-hidden="true">&#128681;</span>
+          <div class="intention-path-text">
+            <span class="intention-path-label">I have pain to flag</span>
+          </div>
         </button>
 
         <button class="btn btn-ghost btn-full"
@@ -473,41 +481,30 @@ function renderSecondSessionPrompt() {
  */
 function renderOptions(reflection) {
   return `
-    <div class="reflection-options" role="group"
-         aria-label="What would you like to do today?">
+    <div class="intention-paths" id="reflection-options"
+         role="group" aria-label="What would you like to do today?">
 
-      <p class="reflection-options-label">What would you like to do?</p>
-
-      <!-- A: Suggest something for me -->
-      <button class="reflection-option-btn"
-              id="option-a"
+      <button class="intention-path" id="option-a"
               aria-label="Let the coach suggest something">
-        <span class="reflection-option-icon" aria-hidden="true">&#127919;</span>
-        <div class="reflection-option-text">
-          <span class="reflection-option-label">Suggest something for me</span>
-          <span class="reflection-option-sub">Coach recommends based on today</span>
+        <span class="intention-path-icon" aria-hidden="true">&#127919;</span>
+        <div class="intention-path-text">
+          <span class="intention-path-label">Suggest something for me</span>
+          <span class="intention-path-sub">Coach recommends based on today</span>
         </div>
       </button>
 
-      <!-- B: I have something in mind -->
-      <button class="reflection-option-btn"
-              id="option-b"
+      <button class="intention-path" id="option-b"
               aria-label="I have something in mind">
-        <span class="reflection-option-icon" aria-hidden="true">&#127947;</span>
-        <div class="reflection-option-text">
-          <span class="reflection-option-label">I have something in mind</span>
-          <span class="reflection-option-sub">Gym, run, walk, swim, class...</span>
+        <span class="intention-path-icon" aria-hidden="true">&#127947;</span>
+        <div class="intention-path-text">
+          <span class="intention-path-label">I have something in mind</span>
+          <span class="intention-path-sub">Gym, run, walk, swim, class...</span>
         </div>
       </button>
 
-      <!-- B expanded: activity picker -->
-      ${selectedActivity !== null ? "" : ""}
-      <div id="b-activity-picker" class="b-activity-picker"
-           style="display:none;"
-           role="group" aria-label="What are you doing?">
-        <p class="reflection-options-label" style="margin-top:var(--space-3);">
-          What are you doing?
-        </p>
+      <div id="b-activity-picker" class="intention-activity-selector"
+           style="display:none;" role="group" aria-label="What are you doing?">
+        <p class="intention-selector-label">What are you doing?</p>
         <div class="intention-activity-grid">
           ${B_ACTIVITIES.map(a => `
             <button class="intention-activity-chip ${selectedActivity === a.id ? "selected" : ""}"
@@ -521,32 +518,27 @@ function renderOptions(reflection) {
         ${selectedActivity ? `
           <button class="btn btn-primary btn-full"
                   id="option-b-confirm"
-                  style="margin-top:var(--space-3);"
-                  aria-label="Let's go - ${B_ACTIVITIES.find(a => a.id === selectedActivity)?.label || "activity"}">
+                  style="margin-top:var(--space-3);">
             Let's go &rarr;
           </button>
         ` : ""}
       </div>
 
-      <!-- C: My plans -->
-      <button class="reflection-option-btn"
-              id="option-c"
-              aria-label="My plans - prescribed exercises, gym plan, weekly routine">
-        <span class="reflection-option-icon" aria-hidden="true">&#128203;</span>
-        <div class="reflection-option-text">
-          <span class="reflection-option-label">My plans</span>
-          <span class="reflection-option-sub">Prescribed exercises, gym plan, weekly routine</span>
+      <button class="intention-path" id="option-c"
+              aria-label="My plans">
+        <span class="intention-path-icon" aria-hidden="true">&#128203;</span>
+        <div class="intention-path-text">
+          <span class="intention-path-label">My plans</span>
+          <span class="intention-path-sub">Prescribed exercises, gym plan, weekly routine</span>
         </div>
       </button>
 
-      <!-- D: Noticing -->
-      <button class="reflection-option-btn"
-              id="option-d"
-              aria-label="Noticing - walk, reflection, rest">
-        <span class="reflection-option-icon" aria-hidden="true">&#127807;</span>
-        <div class="reflection-option-text">
-          <span class="reflection-option-label">Noticing</span>
-          <span class="reflection-option-sub">A walk, reflection, breathing, or rest</span>
+      <button class="intention-path" id="option-d"
+              aria-label="Noticing">
+        <span class="intention-path-icon" aria-hidden="true">&#127807;</span>
+        <div class="intention-path-text">
+          <span class="intention-path-label">Noticing</span>
+          <span class="intention-path-sub">A walk, reflection, breathing, or rest</span>
         </div>
       </button>
 
@@ -567,80 +559,87 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
-  const view = document.querySelector(".coach-reflection-view");
-  if (!view) return;
+  wireOptions();
+  wireSecondSession();
+}
 
-  // ── Option A: Suggest something for me ───────────────────────────────────
+/**
+ * Wire the A/B/C/D option buttons.
+ * Called from onMount() and after any rerender that rebuilds the options.
+ * Uses direct getElementById listeners so they survive DOM replacement.
+ */
+function wireOptions() {
+  // A: Suggest something for me
   document.getElementById("option-a")?.addEventListener("click", () => {
-    // Store proposal bias hint for coach-proposal to read
     const reflection = buildReflection();
-    if (reflection.proposalBias) {
-      store.set("proposalBias", reflection.proposalBias);
-    } else {
-      store.set("proposalBias", null);
-    }
+    store.set("proposalBias", reflection.proposalBias || null);
     router.navigate("coach-proposal");
   });
 
-  // ── Option B: I have something in mind ───────────────────────────────────
+  // B: I have something in mind -- toggle picker visibility
   document.getElementById("option-b")?.addEventListener("click", () => {
     const picker = document.getElementById("b-activity-picker");
-    if (picker) {
-      picker.style.display = picker.style.display === "none" ? "block" : "none";
-    }
+    if (!picker) return;
+    const isOpen = picker.style.display !== "none";
+    picker.style.display = isOpen ? "none" : "block";
   });
 
-  view.addEventListener("click", e => {
-    // B activity chip selection
-    const chip = e.target.closest("[data-b-activity]");
-    if (chip) {
+  // B: activity chip selection (direct listeners, no rerender)
+  document.querySelectorAll("[data-b-activity]").forEach(chip => {
+    chip.addEventListener("click", () => {
       selectedActivity = chip.dataset.bActivity;
-      // Update chip states
-      view.querySelectorAll("[data-b-activity]").forEach(c => {
+      document.querySelectorAll("[data-b-activity]").forEach(c => {
         const sel = c.dataset.bActivity === selectedActivity;
         c.classList.toggle("selected", sel);
         c.setAttribute("aria-pressed", sel);
       });
-      // Show confirm button if not present
-      if (!document.getElementById("option-b-confirm")) {
-        rerender();
-        // Reopen picker after rerender
-        const picker = document.getElementById("b-activity-picker");
-        if (picker) picker.style.display = "block";
+      // Inject confirm button if not already there
+      const picker = document.getElementById("b-activity-picker");
+      if (picker && !document.getElementById("option-b-confirm")) {
+        const act = B_ACTIVITIES.find(a => a.id === selectedActivity);
+        const btn = document.createElement("button");
+        btn.id = "option-b-confirm";
+        btn.className = "btn btn-primary btn-full";
+        btn.style.marginTop = "var(--space-3)";
+        btn.textContent = "Let's go →";
+        btn.setAttribute("aria-label", "Let's go - " + (act?.label || "activity"));
+        picker.appendChild(btn);
+        btn.addEventListener("click", logAndNavigateB);
       }
-      return;
-    }
-
-    // B confirm
-    const bConfirm = e.target.closest("#option-b-confirm");
-    if (bConfirm && selectedActivity) {
-      logAndNavigateB();
-      return;
-    }
+    });
   });
 
-  // ── Option C: My plans ────────────────────────────────────────────────────
+  // B: confirm (already in DOM if selectedActivity was set before rerender)
+  document.getElementById("option-b-confirm")?.addEventListener("click", logAndNavigateB);
+
+  // C: My plans
   document.getElementById("option-c")?.addEventListener("click", () => {
     router.navigate("prescribed");
   });
 
-  // ── Option D: Noticing ────────────────────────────────────────────────────
+  // D: Noticing
   document.getElementById("option-d")?.addEventListener("click", () => {
     router.navigate("noticing");
   });
+}
 
-  // ── Second session: mini prompt ───────────────────────────────────────────
+/**
+ * Wire the second-session mini-prompt buttons.
+ * Called from onMount() after every render.
+ */
+function wireSecondSession() {
   document.getElementById("mini-no-btn")?.addEventListener("click", () => {
-    // Nothing changed -- show options directly
     miniState = null;
-    const todayLog = getTodayLog();
+    // Replace the second-session card with A/B/C/D options inline
     const reflection = buildReflection();
-    const optionsEl = document.createElement("div");
-    optionsEl.innerHTML = renderOptions(reflection);
-    // Replace the second-session card with the options
-    const secondCard = view.querySelector(".card[role='region']");
-    if (secondCard) secondCard.replaceWith(...optionsEl.children);
-    onMount();
+    const view = document.querySelector(".coach-reflection-view");
+    const secondCard = view?.querySelector(".card[role='region']");
+    if (secondCard) {
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = renderOptions(reflection);
+      secondCard.replaceWith(wrapper.firstElementChild);
+      wireOptions();
+    }
   });
 
   document.getElementById("mini-yes-btn")?.addEventListener("click", () => {
