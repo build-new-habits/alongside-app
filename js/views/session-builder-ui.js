@@ -1,5 +1,15 @@
 /**
- * js/views/session-builder.js - Session Builder UI
+ * js/views/session-builder-ui.js - Session Builder UI
+ *
+ * 01 Jun 2026 v1
+ *
+ * v1 -- Equipment screen visual feedback fix:
+ *   Checkbox change listener now immediately updates the parent label's
+ *   border colour so the user sees instant visual confirmation of their
+ *   selection. Previously the border was set once at render time and
+ *   never changed -- taps appeared to do nothing.
+ *   Each label now carries a data-equipment attribute matching its
+ *   checkbox so the JS can target it directly without DOM traversal.
  *
  * (Renamed from session-builder-ui.js so router can load it as "session-builder" route.
  *
@@ -10,8 +20,8 @@
  *   2. Choose duration (15 / 30 / 45 / 60 min)
  *   3. Equipment check (pre-filled from settings, overridable this session)
  *   4. Loading state with coach line
- *   5. Session preview — coach rationale + exercise overview
- *   6. "Let's go" → gym-programme.js renders the generated session
+ *   5. Session preview -- coach rationale + exercise overview
+ *   6. "Let's go" -> gym-programme.js renders the generated session
  *
  * Tier gating:
  *   Free: "Balanced Full-Body" only. Duration fixed at 30 min.
@@ -81,14 +91,13 @@ export function render() {
 
 function renderTypePicker() {
   const premium = isPremium();
-  const types   = premium ? SESSION_TYPES : SESSION_TYPES.filter(t => t.id === "full");
 
   return `
     <div class="view session-builder-view">
 
       <div class="workout-header">
         <button class="btn btn-ghost" id="sb-back-btn" aria-label="Go back">
-          ← Back
+          &larr; Back
         </button>
         <span class="workout-header-title">Build a session</span>
       </div>
@@ -106,10 +115,10 @@ function renderTypePicker() {
           const locked  = !premium && t.id !== "full";
           const cursor  = locked ? "default" : "pointer";
           const opacity = locked ? "0.45" : "1";
-          const ariaLabel = locked ? t.label + " — Personal tier" : t.label;
+          const ariaLabel = locked ? t.label + " -- Personal tier" : t.label;
           const badge = locked
             ? "<span style='font-size:var(--text-xs);color:var(--color-primary);flex-shrink:0;'>Personal</span>"
-            : "<span style='color:var(--color-primary);font-size:1.25rem;flex-shrink:0;' aria-hidden='true'>›</span>";
+            : "<span style='color:var(--color-primary);font-size:1.25rem;flex-shrink:0;' aria-hidden='true'>&#8250;</span>";
           return `
             <button class="card sb-type-tile"
                     data-type="${t.id}"
@@ -146,7 +155,7 @@ function renderDurationPicker() {
 
       <div class="workout-header">
         <button class="btn btn-ghost" id="sb-back-btn" aria-label="Back to session type">
-          ← Back
+          &larr; Back
         </button>
         <span class="workout-header-title">${type?.label || "Build a session"}</span>
       </div>
@@ -168,7 +177,7 @@ function renderDurationPicker() {
           const lockLabel = locked
             ? "<span style='font-size:var(--text-xs);color:var(--color-primary);flex-shrink:0;'>Personal</span>"
             : "";
-          const ariaLabel = d.label + ": " + d.desc + (locked ? " — Personal tier" : "");
+          const ariaLabel = d.label + ": " + d.desc + (locked ? " -- Personal tier" : "");
           return `
             <button class="card sb-duration-btn"
                     data-mins="${d.mins}"
@@ -199,7 +208,7 @@ function renderEquipmentCheck() {
 
       <div class="workout-header">
         <button class="btn btn-ghost" id="sb-back-btn" aria-label="Back to duration">
-          ← Back
+          &larr; Back
         </button>
         <span class="workout-header-title">Equipment today</span>
       </div>
@@ -207,8 +216,8 @@ function renderEquipmentCheck() {
       <div class="card card-coach" style="margin-bottom: var(--space-4);">
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">
-          Here's what I think you have access to today. Untick anything you don't — I'll adjust the session.
-          Changes here don't affect your saved settings.
+          Here's what I think you have access to today. Untick anything you don't have --
+          I'll adjust the session. Changes here don't affect your saved settings.
         </p>
       </div>
 
@@ -217,7 +226,15 @@ function renderEquipmentCheck() {
         ${EQUIPMENT_OPTIONS.map(opt => {
           const checked = equipSet.has(opt.id);
           return `
-            <label style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-surface);border-radius:var(--radius-md,8px);cursor:pointer;border:1px solid ${checked ? "var(--color-primary)" : "transparent"};">
+            <label class="sb-equipment-label"
+                   data-equipment="${opt.id}"
+                   style="display:flex;align-items:center;gap:var(--space-3);
+                          padding:var(--space-3) var(--space-4);
+                          background:var(--color-surface);
+                          border-radius:var(--radius-md,8px);
+                          cursor:pointer;
+                          border:2px solid ${checked ? "var(--color-primary)" : "transparent"};
+                          transition:border-color 0.15s ease;">
               <input type="checkbox"
                      class="sb-equipment-check"
                      data-equipment="${opt.id}"
@@ -247,7 +264,7 @@ function renderLoading() {
         <div class="card card-coach">
           <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
           <p class="coach-message-text" aria-live="polite" aria-busy="true">
-            Building your ${type?.label?.toLowerCase() || "session"} — one moment.
+            Building your ${type?.label?.toLowerCase() || "session"} -- one moment.
           </p>
         </div>
         <div class="sb-loading-spinner" aria-hidden="true"></div>
@@ -259,7 +276,7 @@ function renderLoading() {
 function renderPreview() {
   if (!builtSession) return renderLoading();
 
-  const type = SESSION_TYPES.find(t => t.id === selectedType);
+  const type     = SESSION_TYPES.find(t => t.id === selectedType);
   const warmup   = builtSession.exercises.filter(e => e.section === "warmup");
   const main     = builtSession.exercises.filter(e => e.section === "main");
   const cooldown = builtSession.exercises.filter(e => e.section === "cooldown");
@@ -269,7 +286,7 @@ function renderPreview() {
 
       <div class="workout-header">
         <button class="btn btn-ghost" id="sb-back-btn" aria-label="Build a different session">
-          ← Different session
+          &larr; Different session
         </button>
         <span class="workout-header-title">${builtSession.title}</span>
       </div>
@@ -279,12 +296,11 @@ function renderPreview() {
         <div>
           <p class="coach-message-text">${builtSession.coachLine}</p>
           <p class="text-sm text-muted" style="margin-top: var(--space-2);">
-            ${builtSession.duration} &nbsp;·&nbsp; ${builtSession.exercises.length} exercises
+            ${builtSession.duration} &nbsp;&middot;&nbsp; ${builtSession.exercises.length} exercises
           </p>
         </div>
       </div>
 
-      <!-- Exercise overview — all visible before committing -->
       <div class="sb-exercise-list" role="list">
 
         ${warmup.length > 0 ? `
@@ -370,7 +386,6 @@ function triggerBuild() {
     });
 
     if (!builtSession) {
-      // Fallback — should not happen
       router.navigate("today");
       return;
     }
@@ -392,7 +407,7 @@ function resetState() {
 
 export function onMount() {
 
-  // Back button behaviour varies by phase
+  // Back button
   document.getElementById("sb-back-btn")?.addEventListener("click", () => {
     if (phase === "type") {
       resetState();
@@ -432,7 +447,7 @@ export function onMount() {
     btn.addEventListener("click", () => {
       selectedDuration = parseInt(btn.dataset.mins);
       if (isPremium()) {
-        phase            = "equipment";
+        phase             = "equipment";
         equipmentOverride = [...(store.get("equipment") || [])];
       } else {
         selectedDuration  = 30;
@@ -443,9 +458,18 @@ export function onMount() {
     });
   });
 
-  // Equipment toggles
+  // Equipment toggles -- fix: update label border immediately on change
   document.querySelectorAll(".sb-equipment-check").forEach(cb => {
     cb.addEventListener("change", () => {
+      // Update this label's border colour immediately for visual feedback
+      const equipId = cb.dataset.equipment;
+      const label   = document.querySelector(`.sb-equipment-label[data-equipment="${equipId}"]`);
+      if (label) {
+        label.style.borderColor = cb.checked
+          ? "var(--color-primary)"
+          : "transparent";
+      }
+
       // Rebuild override from current checkbox state
       const checked = Array.from(
         document.querySelectorAll(".sb-equipment-check:checked")
@@ -456,7 +480,6 @@ export function onMount() {
 
   // Build button
   document.getElementById("sb-build-btn")?.addEventListener("click", () => {
-    // Capture final equipment state
     const checked = Array.from(
       document.querySelectorAll(".sb-equipment-check:checked")
     ).map(c => c.dataset.equipment);
@@ -464,10 +487,8 @@ export function onMount() {
     triggerBuild();
   });
 
-  // Let's go — navigate to gym-programme which reads generatedSession
+  // Let's go
   document.getElementById("sb-go-btn")?.addEventListener("click", () => {
-    // gym-programme.js will read store.get("generatedSession").session
-    // and render it in place of the hardcoded PROGRAMME
     store.set("usingGeneratedSession", true);
     router.navigate("gym-programme");
   });
