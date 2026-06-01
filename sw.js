@@ -2,7 +2,10 @@
  * sw.js - Alongside Service Worker
  *
  * 30 May 2026 v3
- * Cache version: alongside-v95
+ * Cache version: alongside-v96
+ *
+ * v96 onwards (1st June 2026)
+ * - fixes to flow of checkin based on videoed experience.
  *
  * v93 changes (30 May 2026)
  * - Daily flow redesign: today.js rebuilt as Act 1 greeting screen;
@@ -151,7 +154,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v95";
+const CACHE_NAME = "alongside-v96";
 
 const SHELL_URLS = [
 
