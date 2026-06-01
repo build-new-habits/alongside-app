@@ -2,11 +2,14 @@
  * sw.js - Alongside Service Worker
  *
  * 01 June 2026 v2
- * Cache version: alongside-v97
+ * Cache version: alongside-v98
  *
  * v96 onwards (1st June 2026)
  * - fixes to flow of checkin based on videoed experience.
  * Sleep pre-fill in check-in; morning programme auto-detects week and slot on first render
+ * reflect.js improved coach acknowledgement; 
+ * morning-session routes to reflect, cardio options as visual cards, progress counter enlarged; 
+ * coach-proposal gym sub-screen distinguishes programme vs generative routes
  *
  * v93 changes (30 May 2026)
  * - Daily flow redesign: today.js rebuilt as Act 1 greeting screen;
@@ -155,7 +158,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v97";
+const CACHE_NAME = "alongside-v98";
 
 const SHELL_URLS = [
 
