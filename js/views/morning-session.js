@@ -1,6 +1,13 @@
 /**
  * morning-session.js - Morning Session View
  *
+ * 01 Jun 2026 v1
+ *
+ * v1 -- Auto-detect week and slot on first render:
+ *   render() now initialises selectedWeek and selectedSlot before the
+ *   first paint so the select screen arrives pre-populated. Previously
+ *   onMount() set these AFTER render() had already produced a blank picker.
+ *
  * Executes the six-week beach-fit morning programme.
  * Three slot types: mon (home), wed (gym), sat (gym).
  *
@@ -157,6 +164,10 @@ function logActivity(session, durationMins) {
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
+  // Initialise from store before first paint (onMount runs after render)
+  if (!selectedWeek) selectedWeek = store.get("morningProgrammeWeek") || 1;
+  if (!selectedSlot) selectedSlot = getTodaySlot();
+
   if (viewState === "select")   return renderSelect();
   if (viewState === "overview") return renderOverview();
   if (viewState === "session")  return renderSession();
@@ -169,10 +180,6 @@ export function render() {
 function renderSelect() {
   const autoSlot = getTodaySlot();
   const name     = (store.get("name") || "").split(" ")[0] || "";
-
-  // Auto-advance if slot is unambiguous and week is set
-  const storedWeek = store.get("morningProgrammeWeek") || 1;
-  selectedWeek = storedWeek;
 
   return `
     <div class="view">
