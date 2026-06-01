@@ -1,6 +1,12 @@
 /**
  * coach-reflection.js - Post Check-In Pattern Reflection
  *
+ * 01 Jun 2026 v1
+ *
+ * v1 -- View header added:
+ *   "Your Session" h1 added to render() for clear screen orientation.
+ *   Matches pattern of all other views with nav visible.
+ *
  * 30 May 2026 v2
  *
  * v2 -- Bug fixes:
@@ -402,6 +408,10 @@ export function render() {
 
   return `
     <div class="view coach-reflection-view">
+
+      <div class="view-header">
+        <h1>Your Session</h1>
+      </div>
 
       <!-- Coach reflection card -->
       <div class="card card-coach" role="region" aria-label="Your coach">
