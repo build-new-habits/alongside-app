@@ -1,6 +1,8 @@
 /**
  * coach-proposal.js - Coach Proposal Screen
  *
+ * 01 June 2026 v1
+ *
  * 22 May 2026 v3 --- Weekly plan wiring added (S4-3):
  *   render() reads weeklyPlanEnabled + today's day slot before building proposal.
  *   If plan is enabled and today has a non-open type, branches immediately:
@@ -667,6 +669,21 @@ const GYM_OPTIONS = [
 ];
 
 function renderGymSub() {
+  const PROGRAMME_BG     = "rgba(20,184,166,0.06)";
+  const GENERATE_BG      = "rgba(99,102,241,0.06)";
+  const PROGRAMME_BORDER = "rgba(20,184,166,0.3)";
+  const GENERATE_BORDER  = "rgba(99,102,241,0.3)";
+
+  function optStyle(opt) {
+    const isProgramme = opt.id !== "build-session";
+    return {
+      bg:     isProgramme ? PROGRAMME_BG     : GENERATE_BG,
+      border: isProgramme ? PROGRAMME_BORDER : GENERATE_BORDER,
+      tag:    isProgramme ? "Your programme"  : "Build for today",
+      tagCol: isProgramme ? "var(--color-primary)" : "#818cf8",
+    };
+  }
+
   return `
     <div class="card card-coach coach-proposal-card">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
@@ -674,19 +691,37 @@ function renderGymSub() {
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-top:var(--space-2);">
-      ${GYM_OPTIONS.map(opt => `
-        <button class="card gym-sub-option-btn" data-gym-option="${opt.id}"
-                style="display:flex;align-items:center;gap:var(--space-4);
-                       text-align:left;width:100%;cursor:pointer;background:var(--color-surface);"
-                aria-label="${opt.label}">
-          <div style="flex:1;min-width:0;">
-            <p style="font-size:var(--text-base);font-weight:var(--font-semibold);
-                      margin-bottom:var(--space-1);">${opt.label}</p>
-            <p class="text-secondary" style="font-size:var(--text-sm);">${opt.tagline}</p>
-          </div>
-          <span style="color:var(--color-primary);font-size:1.25rem;flex-shrink:0;" aria-hidden="true">&#8250;</span>
-        </button>
-      `).join("")}
+      ${GYM_OPTIONS.map(opt => {
+        const s = optStyle(opt);
+        return `
+          <button class="gym-sub-option-btn" data-gym-option="${opt.id}"
+                  style="display:flex;align-items:flex-start;gap:var(--space-4);
+                         text-align:left;width:100%;cursor:pointer;
+                         background:${s.bg};
+                         border:1.5px solid ${s.border};
+                         border-radius:var(--radius-lg,12px);
+                         padding:var(--space-4);"
+                  aria-label="${opt.label}">
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-1);">
+                <p style="font-size:var(--text-base);font-weight:var(--font-semibold);margin:0;">
+                  ${opt.label}
+                </p>
+                <span style="font-size:var(--text-xs);color:${s.tagCol};
+                             border:1px solid ${s.tagCol};border-radius:999px;
+                             padding:1px 8px;flex-shrink:0;white-space:nowrap;">
+                  ${s.tag}
+                </span>
+              </div>
+              <p style="font-size:var(--text-sm);color:var(--color-text-secondary);margin:0;">
+                ${opt.tagline}
+              </p>
+            </div>
+            <span style="color:var(--color-primary);font-size:1.25rem;flex-shrink:0;margin-top:2px;"
+                  aria-hidden="true">&#8250;</span>
+          </button>
+        `;
+      }).join("")}
     </div>
 
     <button class="btn btn-ghost btn-full" id="proposal-back-to-pick-btn"
