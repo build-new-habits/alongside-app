@@ -1,32 +1,22 @@
 /**
  * checkin.js - Daily Check-In View
  *
+ * 01 Jun 2026 v1
+ *
+ * v1 -- Sleep pre-fill:
+ *   On first check-in of the day, sleepHours and sleepQuality are
+ *   pre-filled from yesterday's check-in rather than defaulting to
+ *   7 hours / "okay". User corrects if wrong rather than starting blank.
+ *   Pre-fill only applies when no today check-in exists yet -- the
+ *   update path (returning to check-in mid-day) is unaffected.
+ *
  * 30 May 2026 v1
  *
  * v1.4 -- Route change:
  *   submitCheckin() now navigates to coach-reflection instead of intention.
- *   This is the Act 2 -> Act 3 handoff in the new daily flow.
- *   One line change from intention -> coach-reflection.
  *
- * v1.3 — availableTime picker:
- *   Added a segmented chip picker at the end of the check-in form
- *   (before the submit button) so users can declare how much time
- *   they have today. Optional — defaults to null if not selected,
- *   which preserves intensity-derived exerciseCount behaviour.
- *
- *   Values: "micro" | "quick" | "short" | "standard" | "long" | "open"
- *   Stored at store key "availableTime" (top-level, not inside lastCheckin).
- *   Written in submitCheckin() alongside conditionPainScores.
- *   Read by workoutGenerator.js v1.4 getWorkoutParams().
- *
- *   The picker restores its state on re-mount from the store so the
- *   selection persists if the user navigates away and returns.
- *
- * v1.2 — Pain score wiring:
- *   submitCheckin() now calls store.updateConditionPainScores(conditionLevels)
- *   so the 3-tier condition filter in exercises/index.js receives today's
- *   pain levels and can correctly resolve phase-aware condition variants
- *   (e.g. hamstring-acute vs hamstring-subacute).
+ * v1.3 -- availableTime picker added.
+ * v1.2 -- Pain score wiring added.
  */
 
 import { store } from "../store.js";
@@ -35,7 +25,6 @@ import { CONDITIONS } from "../data/conditions.js";
 
 export const centered = false;
 
-// ── availableTime options — label / sublabel / store value ───────────────────
 const TIME_OPTIONS = [
   { value: "micro",    label: "Micro",    sub: "10 min" },
   { value: "quick",    label: "Quick",    sub: "20 min" },
@@ -44,12 +33,6 @@ const TIME_OPTIONS = [
   { value: "long",     label: "Long",     sub: "50 min" },
   { value: "open",     label: "Open",     sub: "60+ min" }
 ];
-
-// ── Step state ────────────────────────────────────────────────────────────────
-// Check-in is now a conversational step flow:
-//   0 = energy, 1 = mood, 2 = sleep, 3 = conditions (skipped if none),
-//   4 = time, 5 = done (submits and navigates)
-// Each step fills the viewport. Coach responds between steps.
 
 let checkinStep = 0;
 
@@ -65,18 +48,17 @@ let currentCheckin = {
 
 let selectedAvailableTime = null;
 
-// Coach response lines between steps — personalised to what was just entered
 function getCoachBridge(fromStep, value) {
-  if (fromStep === 0) { // energy bridge
+  if (fromStep === 0) {
     if (value >= 8) return "Good energy. Let's see what else is going on.";
     if (value >= 6) return "Solid. How about your mood?";
     if (value >= 4) return "Okay, I hear that. How's your mood sitting alongside that?";
     return "That's low. I want to understand the full picture.";
   }
-  if (fromStep === 1) { // mood bridge
-    if (value >= 8) return "Good. And sleep — how was last night?";
-    if (value >= 5) return "Alright. Last question — how did you sleep?";
-    return "Understood. Sleep affects everything — tell me about last night.";
+  if (fromStep === 1) {
+    if (value >= 8) return "Good. And sleep -- how was last night?";
+    if (value >= 5) return "Alright. Last question -- how did you sleep?";
+    return "Understood. Sleep affects everything -- tell me about last night.";
   }
   return "";
 }
@@ -101,30 +83,36 @@ function getCoachSummary() {
   else summary += ", lighter sleep than usual.";
 
   if (time) summary += " You have " + (timeLabel[time] || time) + " today.";
-
   summary += " I'll have something ready for you.";
   return summary;
 }
 
 export function render() {
-  // Restore existing check-in if already saved today
   const existing = checkinData.getTodaysCheckin();
+
   if (existing) {
+    // Returning to update today's check-in -- restore exactly what was saved
     currentCheckin = { ...currentCheckin, ...existing };
+  } else {
+    // First check-in of the day -- pre-fill sleep from yesterday if available
+    const history = checkinData.getHistory(1) || [];
+    const yesterday = history[0] || null;
+    if (yesterday && typeof yesterday.sleepHours === "number") {
+      currentCheckin.sleepHours   = yesterday.sleepHours;
+      currentCheckin.sleepQuality = yesterday.sleepQuality || "okay";
+    }
   }
+
   selectedAvailableTime = store.get("availableTime") || null;
 
   const conditions = store.get("conditions") || [];
   const name = (store.get("name") || "").split(" ")[0] || "there";
 
-  // Build step list dynamically based on conditions
-  // Steps: 0=energy, 1=mood, 2=sleep, 3=conditions (if any), 4=time, 5=summary
   const steps = [0, 1, 2];
   if (conditions.length > 0) steps.push(3);
   steps.push(4, 5);
 
   const currentStepId = steps[Math.min(checkinStep, steps.length - 1)];
-
   return renderStep(currentStepId, name, conditions);
 }
 
@@ -154,8 +142,6 @@ function renderStep(stepId, name, conditions) {
   return renderEnergyStep(header, name);
 }
 
-// ── Step renderers ────────────────────────────────────────────────────────────
-
 function renderEnergyStep(header, name) {
   const val   = currentCheckin.energy;
   const emoji = checkinData.getEnergyEmoji(val);
@@ -171,42 +157,33 @@ function renderEnergyStep(header, name) {
           <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
           <p>${greeting} ${name}. How's your energy today?</p>
         </div>
-
         <div class="checkin-slider-block">
           <div class="checkin-value-display" aria-live="polite" aria-atomic="true">
             <span class="checkin-value-emoji" id="energy-emoji" aria-hidden="true">${emoji}</span>
             <span class="checkin-value-number" id="energy-number">${val}</span>
             <span class="checkin-value-label" id="energy-label">${label}</span>
           </div>
-
-          <input type="range" id="energy-slider"
-                 class="checkin-slider"
-                 min="1" max="10"
-                 value="${val}"
+          <input type="range" id="energy-slider" class="checkin-slider"
+                 min="1" max="10" value="${val}"
                  aria-label="Energy level, 1 exhausted to 10 energised"
                  aria-valuetext="${label}">
-
           <div class="checkin-slider-ends" aria-hidden="true">
-            <span>Exhausted</span>
-            <span>Energised</span>
+            <span>Exhausted</span><span>Energised</span>
           </div>
         </div>
       </div>
-
       <div class="checkin-step-actions">
         <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn"
-                aria-label="Continue to mood">
-          Next
-        </button>
+                aria-label="Continue to mood">Next</button>
       </div>
     </div>
   `;
 }
 
 function renderMoodStep(header) {
-  const val   = currentCheckin.mood;
-  const emoji = checkinData.getMoodEmoji(val);
-  const label = checkinData.getMoodLabel(val);
+  const val    = currentCheckin.mood;
+  const emoji  = checkinData.getMoodEmoji(val);
+  const label  = checkinData.getMoodLabel(val);
   const bridge = getCoachBridge(0, currentCheckin.energy);
 
   return `
@@ -217,7 +194,6 @@ function renderMoodStep(header) {
           <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
           <p>${bridge}</p>
         </div>
-
         <div class="checkin-slider-block">
           <p class="checkin-question">How's your mood?</p>
           <div class="checkin-value-display" aria-live="polite" aria-atomic="true">
@@ -225,24 +201,19 @@ function renderMoodStep(header) {
             <span class="checkin-value-number" id="mood-number">${val}</span>
             <span class="checkin-value-label" id="mood-label">${label}</span>
           </div>
-
-          <input type="range" id="mood-slider"
-                 class="checkin-slider"
-                 min="1" max="10"
-                 value="${val}"
+          <input type="range" id="mood-slider" class="checkin-slider"
+                 min="1" max="10" value="${val}"
                  aria-label="Mood, 1 struggling to 10 great"
                  aria-valuetext="${label}">
-
           <div class="checkin-slider-ends" aria-hidden="true">
-            <span>Struggling</span>
-            <span>Great</span>
+            <span>Struggling</span><span>Great</span>
           </div>
         </div>
       </div>
-
       <div class="checkin-step-actions">
         <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">Next</button>
-        <button class="btn btn-ghost btn-small" id="checkin-back-btn" style="margin-top:var(--space-2);">&larr; Back</button>
+        <button class="btn btn-ghost btn-small" id="checkin-back-btn"
+                style="margin-top:var(--space-2);">&larr; Back</button>
       </div>
     </div>
   `;
@@ -251,29 +222,35 @@ function renderMoodStep(header) {
 function renderSleepStep(header) {
   const bridge = getCoachBridge(1, currentCheckin.mood);
 
+  // Check if values were pre-filled from yesterday
+  const existing  = checkinData.getTodaysCheckin();
+  const history   = checkinData.getHistory(1) || [];
+  const prefilled = !existing && history[0]?.sleepHours;
+  const coachLine = prefilled
+    ? bridge + " I've pre-filled this from yesterday -- adjust if needed."
+    : bridge;
+
   return `
     <div class="view checkin-step-view">
       ${header}
       <div class="checkin-step-body">
         <div class="checkin-coach-line">
           <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
-          <p>${bridge}</p>
+          <p>${coachLine}</p>
         </div>
-
         <div class="checkin-sleep-block">
           <p class="checkin-question">How long did you sleep?</p>
-
           <div class="checkin-sleep-adjuster">
             <button type="button" class="checkin-sleep-btn" id="sleep-minus"
                     aria-label="Decrease sleep hours">&#8722;</button>
-            <div class="checkin-sleep-display" aria-live="polite" aria-label="${currentCheckin.sleepHours} hours">
+            <div class="checkin-sleep-display"
+                 aria-live="polite" aria-label="${currentCheckin.sleepHours} hours">
               <span class="checkin-sleep-number" id="sleep-hours-display">${currentCheckin.sleepHours}</span>
               <span class="checkin-sleep-unit">hours</span>
             </div>
             <button type="button" class="checkin-sleep-btn" id="sleep-plus"
                     aria-label="Increase sleep hours">&#43;</button>
           </div>
-
           <div class="checkin-sleep-quality">
             <p class="checkin-question-sub">How was the quality?</p>
             <div class="checkin-quality-chips" role="group" aria-label="Sleep quality">
@@ -289,10 +266,10 @@ function renderSleepStep(header) {
           </div>
         </div>
       </div>
-
       <div class="checkin-step-actions">
         <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">Next</button>
-        <button class="btn btn-ghost btn-small" id="checkin-back-btn" style="margin-top:var(--space-2);">&larr; Back</button>
+        <button class="btn btn-ghost btn-small" id="checkin-back-btn"
+                style="margin-top:var(--space-2);">&larr; Back</button>
       </div>
     </div>
   `;
@@ -307,7 +284,6 @@ function renderConditionsStep(header, conditions) {
           <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
           <p>One more thing. How's the pain today?</p>
         </div>
-
         <div class="checkin-conditions-block">
           ${conditions.map(conditionId => {
             const condition = CONDITIONS.find(c => c.id === conditionId);
@@ -320,20 +296,24 @@ function renderConditionsStep(header, conditions) {
                 </p>
                 <div class="checkin-pain-chips" role="group"
                      aria-label="Pain level for ${condition?.name || conditionId}">
-                  <button class="checkin-pain-chip ${level <= 2 ? "selected low" : ""}" data-level="1" aria-pressed="${level <= 2}">None</button>
-                  <button class="checkin-pain-chip ${level > 2 && level <= 5 ? "selected mild" : ""}" data-level="4" aria-pressed="${level > 2 && level <= 5}">Mild</button>
-                  <button class="checkin-pain-chip ${level > 5 && level <= 7 ? "selected moderate" : ""}" data-level="6" aria-pressed="${level > 5 && level <= 7}">Moderate</button>
-                  <button class="checkin-pain-chip ${level > 7 ? "selected severe" : ""}" data-level="9" aria-pressed="${level > 7}">Severe</button>
+                  <button class="checkin-pain-chip ${level <= 2 ? "selected low" : ""}"
+                          data-level="1" aria-pressed="${level <= 2}">None</button>
+                  <button class="checkin-pain-chip ${level > 2 && level <= 5 ? "selected mild" : ""}"
+                          data-level="4" aria-pressed="${level > 2 && level <= 5}">Mild</button>
+                  <button class="checkin-pain-chip ${level > 5 && level <= 7 ? "selected moderate" : ""}"
+                          data-level="6" aria-pressed="${level > 5 && level <= 7}">Moderate</button>
+                  <button class="checkin-pain-chip ${level > 7 ? "selected severe" : ""}"
+                          data-level="9" aria-pressed="${level > 7}">Severe</button>
                 </div>
               </div>
             `;
           }).join("")}
         </div>
       </div>
-
       <div class="checkin-step-actions">
         <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">Next</button>
-        <button class="btn btn-ghost btn-small" id="checkin-back-btn" style="margin-top:var(--space-2);">&larr; Back</button>
+        <button class="btn btn-ghost btn-small" id="checkin-back-btn"
+                style="margin-top:var(--space-2);">&larr; Back</button>
       </div>
     </div>
   `;
@@ -348,7 +328,6 @@ function renderTimeStep(header) {
           <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
           <p>Last one. How much time do you have today?</p>
         </div>
-
         <div class="checkin-time-grid" role="group" aria-label="Available time today">
           ${TIME_OPTIONS.map(opt => `
             <button type="button"
@@ -364,10 +343,10 @@ function renderTimeStep(header) {
           Skip this and I'll use your energy level to decide.
         </p>
       </div>
-
       <div class="checkin-step-actions">
         <button class="btn btn-primary btn-large btn-full" id="checkin-next-btn">Done</button>
-        <button class="btn btn-ghost btn-small" id="checkin-back-btn" style="margin-top:var(--space-2);">&larr; Back</button>
+        <button class="btn btn-ghost btn-small" id="checkin-back-btn"
+                style="margin-top:var(--space-2);">&larr; Back</button>
       </div>
     </div>
   `;
@@ -384,7 +363,6 @@ function renderSummaryStep(header) {
           <p>${summary}</p>
         </div>
       </div>
-
       <div class="checkin-step-actions">
         <button class="btn btn-primary btn-large btn-full" id="checkin-submit-btn">
           See what I'm thinking &rarr;
@@ -401,11 +379,9 @@ function renderSummaryStep(header) {
 export function onMount() {
   const conditions = store.get("conditions") || [];
 
-  // Restore existing check-in
   const existing = checkinData.getTodaysCheckin();
   if (existing) currentCheckin = { ...currentCheckin, ...existing };
 
-  // ── Energy slider ───────────────────────────────────────────────────────
   const energySlider = document.getElementById("energy-slider");
   if (energySlider) {
     energySlider.addEventListener("input", e => {
@@ -423,7 +399,6 @@ export function onMount() {
     });
   }
 
-  // ── Mood slider ─────────────────────────────────────────────────────────
   const moodSlider = document.getElementById("mood-slider");
   if (moodSlider) {
     moodSlider.addEventListener("input", e => {
@@ -441,7 +416,6 @@ export function onMount() {
     });
   }
 
-  // ── Sleep ────────────────────────────────────────────────────────────────
   document.getElementById("sleep-minus")?.addEventListener("click", () => {
     currentCheckin.sleepHours = Math.max(0, currentCheckin.sleepHours - 0.5);
     const el = document.getElementById("sleep-hours-display");
@@ -453,7 +427,6 @@ export function onMount() {
     if (el) el.textContent = currentCheckin.sleepHours;
   });
 
-  // ── Sleep quality chips ──────────────────────────────────────────────────
   document.querySelectorAll(".checkin-quality-chip").forEach(chip => {
     chip.addEventListener("click", () => {
       currentCheckin.sleepQuality = chip.dataset.quality;
@@ -464,7 +437,6 @@ export function onMount() {
     });
   });
 
-  // ── Pain chips ───────────────────────────────────────────────────────────
   document.querySelectorAll(".checkin-condition-row").forEach(row => {
     row.querySelectorAll(".checkin-pain-chip").forEach(chip => {
       chip.addEventListener("click", () => {
@@ -475,7 +447,6 @@ export function onMount() {
           const selected = c === chip;
           c.classList.toggle("selected", selected);
           c.setAttribute("aria-pressed", selected);
-          // Update colour class
           c.classList.remove("low", "mild", "moderate", "severe");
           if (selected) {
             if      (level <= 2) c.classList.add("low");
@@ -488,7 +459,6 @@ export function onMount() {
     });
   });
 
-  // ── Time cards ───────────────────────────────────────────────────────────
   document.querySelectorAll(".checkin-time-card").forEach(card => {
     card.addEventListener("click", () => {
       selectedAvailableTime = selectedAvailableTime === card.dataset.time ? null : card.dataset.time;
@@ -500,7 +470,6 @@ export function onMount() {
     });
   });
 
-  // ── Next button ──────────────────────────────────────────────────────────
   document.getElementById("checkin-next-btn")?.addEventListener("click", () => {
     const conditionsExist = conditions.length > 0;
     const maxStep = conditionsExist ? 5 : 4;
@@ -508,86 +477,41 @@ export function onMount() {
     rerenderCheckin();
   });
 
-  // ── Back button ──────────────────────────────────────────────────────────
   document.getElementById("checkin-back-btn")?.addEventListener("click", () => {
     checkinStep = Math.max(0, checkinStep - 1);
     rerenderCheckin();
   });
 
-  // ── Final submit ─────────────────────────────────────────────────────────
   document.getElementById("checkin-submit-btn")?.addEventListener("click", submitCheckin);
   document.getElementById("prescribed-shortcut-btn")?.addEventListener("click", submitCheckinToPrescribed);
 }
 
 function rerenderCheckin() {
-  const conditions = store.get("conditions") || [];
-  const name = (store.get("name") || "").split(" ")[0] || "there";
   const main = document.getElementById("main-content");
   if (main) {
     main.innerHTML = render();
     onMount();
-    // Scroll to top of main
     main.scrollTop = 0;
   }
 }
 
-// ── Display update helpers (kept for compatibility) ────────────────────────
-
-function updateEnergyDisplay(value) {
-  const el = document.getElementById("energy-display");
-  if (el) el.innerHTML = checkinData.getEnergyEmoji(value) + " " + checkinData.getEnergyLabel(value);
-}
-
-function updateMoodDisplay(value) {
-  const el = document.getElementById("mood-display");
-  if (el) el.innerHTML = checkinData.getMoodEmoji(value) + " " + checkinData.getMoodLabel(value);
-}
-
-// ── Submit ────────────────────────────────────────────────────────────────────
-
 function submitCheckin() {
-  // Capture latest values from DOM
   const notesEl = document.getElementById("checkin-notes");
   if (notesEl) currentCheckin.notes = notesEl.value;
 
   const cycleEl = document.getElementById("cycle-day");
   if (cycleEl?.value) currentCheckin.cycleDay = parseInt(cycleEl.value);
 
-  // ── Wire pain scores to store ─────────────────────────────────────────
-  // Persists today's per-condition pain so getSuitableExercises() can
-  // resolve phase-aware contraindications on mid-day regeneration.
-  // conditionLevels uses numeric values (1=none, 4=mild, 6=moderate, 9=severe).
   store.updateConditionPainScores({ ...currentCheckin.conditionLevels });
-
-  // ── Wire availableTime to store ───────────────────────────────────────
-  // Stored at the top level (not inside lastCheckin) so workoutGenerator
-  // can read it via store.get("availableTime") without needing today's
-  // check-in object. Null is a valid value — means "use intensity default".
   store.set("availableTime", selectedAvailableTime);
-
-  // Save the full check-in record
   checkinData.saveCheckin(currentCheckin);
 
-  // Determine workout intensity
   const intensity = checkinData.getSuggestedIntensity(currentCheckin);
   store.set("todayIntensity", intensity);
 
-  // Navigate to intention screen — user chooses their path from there
   router.navigate("coach-reflection");
 }
 
-// ── Prescribed shortcut submit ────────────────────────────────────────────────
-
-/**
- * Save the check-in exactly as submitCheckin() does, then navigate to
- * the dedicated prescribed exercises view.
- *
- * The openPrescribedForm flag signals prescribed.js to auto-open the
- * add form on mount -- useful when the user arrives with a new exercise
- * to log. If they just want to start their session, they ignore the form.
- *
- * This is the ADHD-aware shortcut confirmed in S3-2 design.
- */
 function submitCheckinToPrescribed() {
   const notesEl = document.getElementById("checkin-notes");
   if (notesEl) currentCheckin.notes = notesEl.value;
@@ -602,9 +526,5 @@ function submitCheckinToPrescribed() {
   const intensity = checkinData.getSuggestedIntensity(currentCheckin);
   store.set("todayIntensity", intensity);
 
-  // Navigate directly to the prescribed view.
-  // openPrescribedForm flag is NOT set here by default -- the user is going
-  // to their exercises, not necessarily adding a new one.
-  // If they need to add, the "+ Add prescribed exercise" button is prominent.
   router.navigate("prescribed");
 }
