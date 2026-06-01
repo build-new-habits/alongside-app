@@ -1,7 +1,13 @@
 /**
  * morning-session.js - Morning Session View
  *
- * 01 Jun 2026 v1
+ * 01 Jun 2026 v2
+ *
+ * v2 -- Session completion and UX fixes:
+ *   logActivity(): type changed to "morning-session"; sets currentActivityEntry.
+ *   renderCardioCard(): options styled as visual cards with play icon.
+ *   renderSession(): progress counter enlarged, teal, semibold.
+ *   ms-log-btn: routes to reflect instead of intention.
  *
  * v1 -- Auto-detect week and slot on first render:
  *   render() now initialises selectedWeek and selectedSlot before the
@@ -145,7 +151,7 @@ function logActivity(session, durationMins) {
   const entry = {
     id:          new Date().toISOString() + "-" + Math.random().toString(36).slice(2, 7),
     date:        new Date().toISOString().split("T")[0],
-    type:        "coach-session",
+    type:         "morning-session",
     name:        session.title,
     duration:    durationMins,
     energyBefore: store.get("checkin.energy") || null,
@@ -159,6 +165,8 @@ function logActivity(session, durationMins) {
   // Cap at 90 entries
   while (log.length > 90) log.shift();
   store.set("activityLog", log);
+  // Set currentActivityEntry so reflect.js can personalise its question
+  store.set("currentActivityEntry", entry);
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -407,7 +415,10 @@ function renderSession() {
         <button class="btn btn-ghost" id="ms-exit-btn" aria-label="Exit morning session">
           ✕ Exit
         </button>
-        <div class="workout-progress-info" aria-label="Step ${current} of ${total}">
+        <div class="workout-progress-info"
+             aria-label="Step ${current} of ${total}"
+             style="font-size:var(--text-lg);font-weight:var(--font-semibold);
+                    color:var(--color-primary);">
           ${current} of ${total}
         </div>
       </div>
@@ -504,11 +515,21 @@ function renderCardioCard(session) {
         </div>
       ` : ""}
 
-      <div class="card" style="margin: var(--space-4) 0;">
-        <p style="font-weight: 600; margin-bottom: var(--space-3);">Choose one:</p>
-        <ul style="padding-left: var(--space-4); line-height: 2;">
-          ${options.map(opt => `<li>${opt}</li>`).join("")}
-        </ul>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);margin:var(--space-4) 0;"
+           role="group" aria-label="Choose your cardio for today">
+        <p style="font-size:var(--text-sm);color:var(--color-text-secondary);
+                  margin-bottom:var(--space-1);">Choose one and go do it:</p>
+        ${options.map(opt => `
+          <div class="card"
+               style="display:flex;align-items:center;gap:var(--space-3);
+                      padding:var(--space-3) var(--space-4);
+                      border:1.5px solid rgba(255,255,255,0.08);
+                      border-radius:var(--radius-md,8px);">
+            <span style="color:var(--color-primary);font-size:1.1rem;flex-shrink:0;"
+                  aria-hidden="true">&#9654;</span>
+            <span style="font-size:var(--text-sm);">${opt}</span>
+          </div>
+        `).join("")}
       </div>
 
       <div class="card card-coach">
@@ -938,7 +959,8 @@ function handleClick(e) {
     completedBlocks = new Set();
     sessionStart   = null;
     postFeel       = null;
-    window.router.navigate("intention");
+    // Route to reflect.js for post-session acknowledgement
+    window.router.navigate("reflect");
     return;
   }
 }
