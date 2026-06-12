@@ -1,15 +1,25 @@
 /**
  * intention.js - Intention Screen
  *
- * 22 May 2026 v1 — Gym session routes via coach-proposal gym-sub screen
+ * 12 Jun 2026 v1 (S4-4 P1) - Return-visit trigger added:
+ *   If 2+ hours have passed since lastCheckin.timestamp and the user
+ *   has not yet done a return-visit update today (returnVisit flag),
+ *   a coach prompt offers "Yes, tell the coach" / "No, all good".
+ *   "Yes" navigates to checkin-mini. "No" dismisses for the day.
+ *
+ *   lastCheckin.timestamp fallback: stamped here on first render of the
+ *   day if missing (interim measure - see light-touch follow-up note;
+ *   checkin.js should write this directly at submission in a future pass).
+ *
+ * 22 May 2026 v1 - Gym session routes via coach-proposal gym-sub screen
  *                   instead of navigating directly to gym-programme.
  *
- * v1.0 — Sits between check-in and activity.
+ * v1.0 - Sits between check-in and activity.
  *   Reads check-in energy from store, responds with a dynamic
  *   coach line, then offers three paths:
- *     A — Coach recommends (current Today experience)
- *     B — I know what I'm doing (activity type selection)
- *     C — Something quieter (mindfulness, journal, rest)
+ *     A - Coach recommends (current Today experience)
+ *     B - I know what I'm doing (activity type selection)
+ *     C - Something quieter (mindfulness, journal, rest)
  *
  *   Path B shows an activity type selector and optional name input.
  *   All paths write an activityLog entry to store on navigation.
@@ -19,7 +29,11 @@ import { store } from "../store.js";
 
 export const centered = false;
 
-// ── Activity types for Path B ─────────────────────────────────────────────────
+// -- Constants ----------------------------------------------------------------
+
+const RETURN_VISIT_THRESHOLD_MS = 2 * 60 * 60 * 1000; // 2 hours
+
+// -- Activity types for Path B -------------------------------------------------
 
 const ACTIVITIES = [
   { id: "gym",         label: "Gym session",       icon: "\uD83C\uDFCB", hasName: false },
@@ -39,14 +53,57 @@ const QUIET_OPTIONS = [
   { id: "breathing",   label: "Breathing practice",  icon: "\uD83C\uDF2C\uFE0F" },
 ];
 
-// ── State ─────────────────────────────────────────────────────────────────────
+// -- State ---------------------------------------------------------------------
 
 let selectedPath     = null;   // "coach" | "self" | "quiet"
 let selectedActivity = null;   // activity id from ACTIVITIES
 let selectedQuiet    = null;   // quiet option id
 let activityName     = "";     // free text name for class/other
+let returnVisitDismissedThisRender = false; // local-only, avoids re-prompt after "No"
 
-// ── Coach line ────────────────────────────────────────────────────────────────
+// -- Return-visit detection ---------------------------------------------------
+
+/**
+ * Ensure lastCheckin.timestamp is set for today's check-in.
+ * Interim fallback - see file header. Only stamps if a check-in has
+ * happened today (lastCheckin.date matches today) and timestamp is null.
+ */
+function ensureCheckinTimestamp() {
+  const checkin = store.get("lastCheckin") || {};
+  if (!checkin.date) return;
+  const today = new Date().toDateString();
+  if (checkin.date !== today) return;
+  if (checkin.timestamp) return;
+
+  store.set("lastCheckin.timestamp", new Date().toISOString());
+}
+
+/**
+ * Returns true if 2+ hours have passed since check-in and the user
+ * hasn't already dismissed or completed a return-visit update today.
+ */
+function shouldOfferReturnVisit() {
+  if (returnVisitDismissedThisRender) return false;
+
+  const checkin = store.get("lastCheckin") || {};
+  if (!checkin.timestamp) return false;
+
+  const elapsed = Date.now() - new Date(checkin.timestamp).getTime();
+  if (elapsed < RETURN_VISIT_THRESHOLD_MS) return false;
+
+  // returnVisit === false means either not yet offered, or already
+  // actioned (mini check-in completed clears it back to false too).
+  // We use a separate "offered" marker via returnVisit:
+  //   undefined/false -> not yet handled this window -> show prompt
+  //   "dismissed"      -> user said "No, all good" -> don't re-show
+  //   true             -> user tapped "Yes" (set just before navigating)
+  const state = store.get("returnVisit");
+  if (state === "dismissed") return false;
+
+  return true;
+}
+
+// -- Coach line ----------------------------------------------------------------
 
 function buildCoachLine() {
   const checkin   = store.get("lastCheckin") || {};
@@ -70,7 +127,7 @@ function buildCoachLine() {
   return greeting + "Your energy is lower today. That's fine \u2014 there's something here for wherever you are. What feels right?";
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
+// -- Render --------------------------------------------------------------------
 
 export function render() {
   return `
@@ -79,6 +136,27 @@ export function render() {
       <div class="view-header">
         <h1>Today</h1>
       </div>
+
+      <!-- Return-visit prompt -->
+      ${shouldOfferReturnVisit() ? `
+        <div class="card card-coach intention-coach-card" id="return-visit-card">
+          <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <div>
+            <p class="coach-message-text">
+              It's been a little while since you checked in. Want to give me
+              a quick update on how you're doing now?
+            </p>
+            <div class="intention-return-visit-actions">
+              <button class="btn btn-secondary" id="return-visit-no">
+                No, all good
+              </button>
+              <button class="btn btn-primary" id="return-visit-yes">
+                Yes, tell the coach
+              </button>
+            </div>
+          </div>
+        </div>
+      ` : ""}
 
       <!-- Coach line -->
       <div class="card card-coach intention-coach-card">
@@ -179,7 +257,7 @@ export function render() {
         </div>
       ` : ""}
 
-      <!-- Continue button — shown when a valid selection is made -->
+      <!-- Continue button - shown when a valid selection is made -->
       ${canContinue() ? `
         <button class="btn btn-primary btn-large btn-full intention-continue-btn"
                 id="intention-continue"
@@ -214,7 +292,7 @@ function getContinueLabel() {
   return "Continue";
 }
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// -- Navigation ----------------------------------------------------------------
 
 function logAndNavigate() {
   // Save activity log entry
@@ -253,7 +331,7 @@ function logAndNavigate() {
       router.navigate("coach-proposal");
       return;
     }
-    // Other self-directed activities — activity in progress view (Phase 4)
+    // Other self-directed activities - activity in progress view (Phase 4)
     // For now, navigate to reflect directly with a timer option
     router.navigate("reflect");
     return;
@@ -267,11 +345,25 @@ function logAndNavigate() {
   }
 }
 
-// ── Mount ─────────────────────────────────────────────────────────────────────
+// -- Mount ---------------------------------------------------------------------
 
 export function onMount() {
+  ensureCheckinTimestamp();
+
   const view = document.querySelector(".intention-view");
   if (!view) return;
+
+  // Return-visit prompt actions
+  document.getElementById("return-visit-yes")?.addEventListener("click", () => {
+    store.set("returnVisit", true);
+    router.navigate("checkin-mini");
+  });
+
+  document.getElementById("return-visit-no")?.addEventListener("click", () => {
+    store.set("returnVisit", "dismissed");
+    returnVisitDismissedThisRender = true;
+    rerender();
+  });
 
   view.addEventListener("click", e => {
 
