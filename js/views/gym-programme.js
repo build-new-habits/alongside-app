@@ -1,10 +1,18 @@
 /**
  * gym-programme.js - Gym Programme View
  *
- * 21 May 2026 v2 — showExitCard (3 options), skip per exercise,
+ * 12 Jun 2026 v1 (S4-4 P3) - Back button pass:
+ *   Replaced inline onclick="router.navigate('today')" on the
+ *   post-session "done" screen with a proper id + event listener
+ *   (gym-done-back-btn). Target unchanged - this screen already
+ *   includes its own intel/wellbeing reflection steps, so returning
+ *   to Today afterwards is correct. Back/Exit elsewhere in this file
+ *   already used router.back() and "reflect" correctly.
+ *
+ * 21 May 2026 v2 - showExitCard (3 options), skip per exercise,
  *                   finish gate shows after 1+ done, rearmGuard on rerender.
  *
- * v2.0 — Full card redesign.
+ * v2.0 - Full card redesign.
  *   - No table. Exercises shown as vertical card list.
  *   - Each card: name, sets/reps/tempo/rest, coach weight recommendation,
  *     editable target weight/time, expand for description + cues + YouTube,
@@ -21,7 +29,7 @@ import { mountSessionGuard, dismountSessionGuard, showExitCard, rearmGuard } fro
 
 export const centered = false;
 
-// ── State ─────────────────────────────────────────────────────────────────────
+// -- State ---------------------------------------------------------------------
 let activeSessionId  = "A";
 let completedIds     = new Set();   // exercise safeIds marked done this visit
 let expandedId       = null;        // which card is currently expanded
@@ -31,81 +39,81 @@ let timerRemaining   = 0;
 let postSessionState = null;        // null | "intel" | "wellbeing" | "done"
 let intelAnswers     = {};          // { exerciseName: { feel, pain } }
 
-// ── Exercise guide library ────────────────────────────────────────────────────
+// -- Exercise guide library ----------------------------------------------------
 const GUIDE = {
   "Cat-cow": {
     description: "Start on hands and knees, wrists under shoulders, knees under hips. Breathe in as you drop your belly toward the floor and lift your head and tailbone. Breathe out as you round your back toward the ceiling and tuck your chin and tailbone.",
-    cues: ["Move with your breath — don't rush", "Feel the whole spine moving, not just the neck", "Keep your arms straight throughout"],
+    cues: ["Move with your breath - don't rush", "Feel the whole spine moving, not just the neck", "Keep your arms straight throughout"],
     youtube: "cat cow stretch lower back mobility"
   },
   "Glute bridge hold": {
     description: "Lie on your back, knees bent, feet flat. Press through your heels to lift your hips until your body forms a straight line from shoulders to knees. Hold.",
-    cues: ["Squeeze your glutes at the top — don't just lift", "Keep your ribs down — don't arch your lower back", "Press through your heels, not your toes"],
+    cues: ["Squeeze your glutes at the top - don't just lift", "Keep your ribs down - don't arch your lower back", "Press through your heels, not your toes"],
     youtube: "glute bridge hold tutorial"
   },
-  "Single-leg glute bridge — right side": {
-    description: "Same as a glute bridge but extend your left leg straight out. Press through your right heel only. Keep your pelvis level — don't let the left side drop.",
-    cues: ["Right heel drives into the floor", "Keep your hips square — both sides lift equally", "This is your physio exercise — do it exactly as prescribed"],
+  "Single-leg glute bridge - right side": {
+    description: "Same as a glute bridge but extend your left leg straight out. Press through your right heel only. Keep your pelvis level - don't let the left side drop.",
+    cues: ["Right heel drives into the floor", "Keep your hips square - both sides lift equally", "This is your physio exercise - do it exactly as prescribed"],
     youtube: "single leg glute bridge technique"
   },
   "Hip 90/90 stretch": {
-    description: "Sit with both legs bent at 90 degrees — one leg in front, one to the side. Sit tall and lean gently forward over the front shin. Switch sides.",
-    cues: ["Sit as tall as you can before leaning forward", "The stretch is in the outer hip of the front leg", "Let gravity do the work — don't force it"],
+    description: "Sit with both legs bent at 90 degrees - one leg in front, one to the side. Sit tall and lean gently forward over the front shin. Switch sides.",
+    cues: ["Sit as tall as you can before leaning forward", "The stretch is in the outer hip of the front leg", "Let gravity do the work - don't force it"],
     youtube: "90 90 hip stretch piriformis"
   },
   "World's greatest stretch": {
     description: "From a lunge with your right foot forward, place your right hand on the floor beside your foot. Rotate your left arm up toward the ceiling. Return and repeat. Alternate sides.",
-    cues: ["Keep your back knee off the floor", "Let the rotation come from your mid-back", "Move slowly — this is a warm-up"],
+    cues: ["Keep your back knee off the floor", "Let the rotation come from your mid-back", "Move slowly - this is a warm-up"],
     youtube: "world's greatest stretch warm up"
   },
   "Cable pull-through": {
     description: "Set a cable to the lowest position with a rope attachment. Stand facing away. Hinge at your hips to let the rope pull back between your legs, then drive your hips forward to stand. Your back stays flat throughout.",
-    cues: ["Push your hips back — not your knees forward", "Keep your chest up and back flat", "The power comes from your glutes driving forward", "Start light until the movement feels natural"],
+    cues: ["Push your hips back - not your knees forward", "Keep your chest up and back flat", "The power comes from your glutes driving forward", "Start light until the movement feels natural"],
     youtube: "cable pull through hip hinge tutorial"
   },
-  "Leg press — feet high and wide": {
+  "Leg press - feet high and wide": {
     description: "Sit in the leg press machine. Place your feet high on the platform and wider than shoulder-width, toes slightly turned out. Lower slowly, then press back. High and wide foot position increases glute activation.",
-    cues: ["Keep your lower back pressed into the seat", "Don't lock your knees at the top", "Control the lowering — 3 seconds down"],
+    cues: ["Keep your lower back pressed into the seat", "Don't lock your knees at the top", "Control the lowering - 3 seconds down"],
     youtube: "leg press high wide feet glute activation"
   },
   "Romanian deadlift": {
     description: "Stand holding dumbbells in front of your thighs. With a slight bend in your knees, hinge at your hips and lower the dumbbells down your legs until you feel a strong hamstring stretch. Drive your hips forward to return. Back stays flat throughout.",
-    cues: ["Push your hips back as if someone has a rope around them", "Keep the dumbbells close to your legs", "Stop when your back starts to round — don't chase the floor", "Feel the hamstring stretch — that is the point"],
+    cues: ["Push your hips back as if someone has a rope around them", "Keep the dumbbells close to your legs", "Stop when your back starts to round - don't chase the floor", "Feel the hamstring stretch - that is the point"],
     youtube: "romanian deadlift dumbbell tutorial beginners"
   },
   "Seated cable row": {
     description: "Sit at the cable row machine, knees slightly bent. Hold the handle and sit tall. Pull to your lower chest, squeezing your shoulder blades together. Return slowly.",
-    cues: ["Sit tall — don't lean back to get the weight moving", "Lead with your elbows, not your hands", "Squeeze the shoulder blades at the end", "Control the return — 2-3 seconds"],
+    cues: ["Sit tall - don't lean back to get the weight moving", "Lead with your elbows, not your hands", "Squeeze the shoulder blades at the end", "Control the return - 2-3 seconds"],
     youtube: "seated cable row proper form"
   },
   "Pallof press": {
-    description: "Set a cable at chest height. Stand side-on. Hold the handle at your chest with both hands. Press it straight out, hold 2 seconds, bring it back. The cable tries to rotate you — resist it. Switch sides.",
+    description: "Set a cable at chest height. Stand side-on. Hold the handle at your chest with both hands. Press it straight out, hold 2 seconds, bring it back. The cable tries to rotate you - resist it. Switch sides.",
     cues: ["Stand tall, feet shoulder-width apart", "Don't let your body rotate toward the machine", "The harder you resist, the more your core works"],
     youtube: "pallof press anti rotation core cable"
   },
   "Dead bug": {
     description: "Lie on your back, arms toward the ceiling, knees at 90 degrees in the air. Slowly lower your right arm and left leg toward the floor at the same time. Return and repeat on the other side. Lower back stays pressed to the floor throughout.",
-    cues: ["Lower back stays flat on the floor — always", "Move slowly — control over speed", "Breathe out as you lower the arm and leg", "Reduce range of motion if your back lifts"],
+    cues: ["Lower back stays flat on the floor - always", "Move slowly - control over speed", "Breathe out as you lower the arm and leg", "Reduce range of motion if your back lifts"],
     youtube: "dead bug exercise core stability"
   },
   "Dead bug (progressed)": {
     description: "Same as dead bug but fully extend opposite arm and leg toward the floor simultaneously. Lower back must not lift at any point.",
-    cues: ["Lower back on the floor — no exceptions", "Breathe out as you extend", "Pause 1 second at full extension before returning"],
+    cues: ["Lower back on the floor - no exceptions", "Breathe out as you extend", "Pause 1 second at full extension before returning"],
     youtube: "dead bug progression full extension core"
   },
-  "Pigeon pose — right side priority": {
+  "Pigeon pose - right side priority": {
     description: "From hands and knees, bring your right knee forward toward your right hand, right foot toward your left hand. Extend your left leg behind you. Sink your hips toward the floor. Deep stretch in your right glute.",
-    cues: ["Square your hips to the floor", "Don't collapse to one side — stay centred", "Breathe out to release the hip further", "Right side gets the longer hold every time"],
+    cues: ["Square your hips to the floor", "Don't collapse to one side - stay centred", "Breathe out to release the hip further", "Right side gets the longer hold every time"],
     youtube: "pigeon pose piriformis stretch"
   },
   "Supine hamstring stretch": {
     description: "Lie on your back. Lift one leg and hold behind the thigh or use a strap. Keep the other leg flat. Gently straighten the raised leg until you feel a stretch in the back of the thigh.",
-    cues: ["Keep the floor leg flat", "Don't pull aggressively — sustained is more effective", "Keep your lower back on the floor"],
+    cues: ["Keep the floor leg flat", "Don't pull aggressively - sustained is more effective", "Keep your lower back on the floor"],
     youtube: "supine hamstring stretch lying down"
   },
   "Child's pose": {
     description: "Kneel, sit your hips back toward your heels, reach your arms forward along the floor. Rest your forehead down. Breathe slowly.",
-    cues: ["This is pure rest — let gravity do everything", "Widen your knees if your hips are tight", "Each breath out, let the lower back soften"],
+    cues: ["This is pure rest - let gravity do everything", "Widen your knees if your hips are tight", "Each breath out, let the lower back soften"],
     youtube: "child's pose yoga lower back relief"
   },
   "Band pull-aparts": {
@@ -115,22 +123,22 @@ const GUIDE = {
   },
   "Thoracic rotation (seated)": {
     description: "Sit on a bench, arms crossed over your chest. Keeping your hips still, rotate your upper body to one side as far as comfortable, then the other. Movement from your mid-back.",
-    cues: ["Keep your hips facing forward", "Let your head follow the rotation", "Gentle — this is mobility work"],
+    cues: ["Keep your hips facing forward", "Let your head follow the rotation", "Gentle - this is mobility work"],
     youtube: "seated thoracic rotation mobility"
   },
   "Chest-supported dumbbell row": {
-    description: "Set an incline bench to 45 degrees. Lie face-down with dumbbells hanging toward the floor. Row up toward your hips by driving elbows back. Chest stays on the bench — this protects your back.",
-    cues: ["Chest on the bench throughout", "Drive your elbows back and up", "Squeeze shoulder blades at the top", "Lower slowly — 3 seconds down"],
+    description: "Set an incline bench to 45 degrees. Lie face-down with dumbbells hanging toward the floor. Row up toward your hips by driving elbows back. Chest stays on the bench - this protects your back.",
+    cues: ["Chest on the bench throughout", "Drive your elbows back and up", "Squeeze shoulder blades at the top", "Lower slowly - 3 seconds down"],
     youtube: "chest supported dumbbell row technique"
   },
   "Incline dumbbell press": {
     description: "Set a bench to 30-45 degrees. Lie on it with dumbbells at shoulder height, elbows at 45 degrees. Press up and slightly together, then lower slowly.",
-    cues: ["Keep your feet flat on the floor", "Don't flare your elbows wide — 45 degrees is enough", "Control the lowering — 3 seconds down"],
+    cues: ["Keep your feet flat on the floor", "Don't flare your elbows wide - 45 degrees is enough", "Control the lowering - 3 seconds down"],
     youtube: "incline dumbbell press chest technique"
   },
   "Lat pulldown (wide grip)": {
     description: "Sit at the lat pulldown machine, thighs under the pad. Take a wide grip. Pull the bar down to your upper chest by driving your elbows down and back. Return slowly.",
-    cues: ["Lean back slightly — 10-15 degrees, no more", "Drive your elbows down toward your hips", "Don't pull the bar behind your neck", "Control the return"],
+    cues: ["Lean back slightly - 10-15 degrees, no more", "Drive your elbows down toward your hips", "Don't pull the bar behind your neck", "Control the return"],
     youtube: "lat pulldown wide grip proper form"
   },
   "Dumbbell lateral raise": {
@@ -145,47 +153,47 @@ const GUIDE = {
   },
   "Doorway chest stretch": {
     description: "Stand in a doorway, one forearm on the frame at shoulder height, elbow at 90 degrees. Step through until you feel a stretch across your chest. Hold, then switch.",
-    cues: ["Keep your arm at shoulder height — not above", "Step forward gently", "Breathe into the stretch"],
+    cues: ["Keep your arm at shoulder height - not above", "Step forward gently", "Breathe into the stretch"],
     youtube: "doorway chest stretch pec flexibility"
   },
   "Thread the needle": {
     description: "Start on hands and knees. Slide one arm under your body along the floor, rotating your upper back and dropping that shoulder. Hold, then return. Both sides.",
-    cues: ["The arm slides — don't push", "Keep your hips still", "Let your head rest on the floor"],
+    cues: ["The arm slides - don't push", "Keep your hips still", "Let your head rest on the floor"],
     youtube: "thread the needle thoracic stretch"
   },
-  "Glute bridge — 3s hold": {
+  "Glute bridge - 3s hold": {
     description: "Same as a glute bridge but hold for 3 full seconds at the top squeezing your glutes hard, then lower. The hold is what activates the glute most.",
-    cues: ["Count the 3 seconds — don't rush", "Squeeze hard at the top", "Lower under control"],
+    cues: ["Count the 3 seconds - don't rush", "Squeeze hard at the top", "Lower under control"],
     youtube: "glute bridge isometric hold"
   },
   "Hip flexor stretch (kneeling)": {
     description: "Kneel on one knee, other foot forward. Shift your weight forward until you feel a stretch in the front of the rear hip. Torso upright.",
-    cues: ["Squeeze the rear glute to deepen the stretch", "Front knee over ankle — not past toes", "Tuck your pelvis slightly"],
+    cues: ["Squeeze the rear glute to deepen the stretch", "Front knee over ankle - not past toes", "Tuck your pelvis slightly"],
     youtube: "kneeling hip flexor stretch technique"
   },
-  "Banded clamshell — right side priority": {
+  "Banded clamshell - right side priority": {
     description: "Band just above knees. Lie on your side, knees bent at 45 degrees. Rotate your top knee up like a clamshell opening, keeping feet together. Right side first.",
-    cues: ["Keep hips stacked — don't roll back", "Movement from the outer hip, not the back", "Slow on the way down"],
+    cues: ["Keep hips stacked - don't roll back", "Movement from the outer hip, not the back", "Slow on the way down"],
     youtube: "clamshell exercise glute medius band"
   },
   "Goblet squat": {
     description: "Hold a dumbbell or kettlebell vertically at your chest. Feet shoulder-width, toes slightly out. Squat down keeping your chest up and heels on the floor. Drive through your heels to return.",
-    cues: ["Keep the weight close to your chest", "Elbows inside your knees at the bottom", "Chest up — if your back rounds, squat less deep", "Push your knees out over your toes"],
+    cues: ["Keep the weight close to your chest", "Elbows inside your knees at the bottom", "Chest up - if your back rounds, squat less deep", "Push your knees out over your toes"],
     youtube: "goblet squat technique beginners"
   },
-  "Single-leg press — right leg": {
+  "Single-leg press - right leg": {
     description: "Sit in the leg press machine. Place only one foot on the platform, centred. Press with that leg alone. Do all reps one side then switch. Start lighter than you'd expect.",
-    cues: ["Lower back pressed into the seat", "Don't lock the knee at the top", "Right leg will likely feel weaker than left — that is what we are fixing"],
+    cues: ["Lower back pressed into the seat", "Don't lock the knee at the top", "Right leg will likely feel weaker than left - that is what we are fixing"],
     youtube: "single leg press technique machine"
   },
   "Bulgarian split squat": {
     description: "Stand a metre in front of a bench. Rear foot on the bench. Lower until your front thigh is roughly parallel to the floor, then drive back up through your front heel.",
-    cues: ["Front knee over your ankle", "Torso can lean slightly forward", "3 seconds down", "Bodyweight only this week — the balance is the challenge"],
+    cues: ["Front knee over your ankle", "Torso can lean slightly forward", "3 seconds down", "Bodyweight only this week - the balance is the challenge"],
     youtube: "bulgarian split squat tutorial beginners"
   },
-  "Cable kickback — right side": {
+  "Cable kickback - right side": {
     description: "Set cable to lowest position with ankle strap on right ankle. Face the machine and hold for balance. Drive your right leg straight back until your glute is fully contracted. Return slowly. Right side only.",
-    cues: ["Upper body stays still", "Squeeze the glute hard at the top", "Controlled movement — no swinging", "Right side only for this exercise"],
+    cues: ["Upper body stays still", "Squeeze the glute hard at the top", "Controlled movement - no swinging", "Right side only for this exercise"],
     youtube: "cable glute kickback ankle strap technique"
   },
   "Lying figure-4 stretch": {
@@ -195,7 +203,7 @@ const GUIDE = {
   }
 };
 
-// ── Programme data ────────────────────────────────────────────────────────────
+// -- Programme data ------------------------------------------------------------
 
 const PROGRAMME = {
   name: "Founder's Gym Programme",
@@ -206,20 +214,20 @@ const PROGRAMME = {
       title: "Session A",
       subtitle: "Glute Activation & Posterior Chain Foundation",
       duration: "45-50 mins",
-      coachLine: "This session is about waking things up, not testing limits. Everything here activates the posterior chain without loading your SI joint asymmetrically. It will feel lighter than you expect — that is correct. If anything produces sharp or radiating pain, stop that exercise immediately. Dull muscular effort is fine. Sharp or radiating is not.",
+      coachLine: "This session is about waking things up, not testing limits. Everything here activates the posterior chain without loading your SI joint asymmetrically. It will feel lighter than you expect - that is correct. If anything produces sharp or radiating pain, stop that exercise immediately. Dull muscular effort is fine. Sharp or radiating is not.",
       exercises: [
         { id: "wu1", section: "warmup",  name: "Cat-cow",                               sets: 2, reps: "10 slow",       tempo: "Controlled", rest: "-"   },
         { id: "wu2", section: "warmup",  name: "Glute bridge hold",                     sets: 2, reps: "30s hold",      tempo: "Static",     rest: "30s", duration: 30 },
-        { id: "wu3", section: "warmup",  name: "Single-leg glute bridge — right side",  sets: 3, reps: "10",            tempo: "2-1-2",      rest: "45s", note: "Physio exercise" },
+        { id: "wu3", section: "warmup",  name: "Single-leg glute bridge - right side",  sets: 3, reps: "10",            tempo: "2-1-2",      rest: "45s", note: "Physio exercise" },
         { id: "wu4", section: "warmup",  name: "Hip 90/90 stretch",                     sets: 2, reps: "60s each side", tempo: "Hold",       rest: "-",   duration: 60 },
         { id: "wu5", section: "warmup",  name: "World's greatest stretch",              sets: 2, reps: "5 each side",   tempo: "Slow",       rest: "-"   },
-        { id: "m1",  section: "main",    name: "Cable pull-through",                    sets: 3, reps: "12",            tempo: "3-1-2",      rest: "60s", recommended: "Light weight — focus on the hip hinge pattern", logWeight: true },
-        { id: "m2",  section: "main",    name: "Leg press — feet high and wide",        sets: 3, reps: "12",            tempo: "3-1-2",      rest: "75s", recommended: "Moderate weight — last 2 reps challenging", logWeight: true },
+        { id: "m1",  section: "main",    name: "Cable pull-through",                    sets: 3, reps: "12",            tempo: "3-1-2",      rest: "60s", recommended: "Light weight - focus on the hip hinge pattern", logWeight: true },
+        { id: "m2",  section: "main",    name: "Leg press - feet high and wide",        sets: 3, reps: "12",            tempo: "3-1-2",      rest: "75s", recommended: "Moderate weight - last 2 reps challenging", logWeight: true },
         { id: "m3",  section: "main",    name: "Romanian deadlift",                     sets: 3, reps: "10",            tempo: "3-0-2",      rest: "75s", recommended: "2 x 10kg", logWeight: true },
         { id: "m4",  section: "main",    name: "Seated cable row",                      sets: 3, reps: "12",            tempo: "2-1-2",      rest: "60s", recommended: "Comfortable weight with full control", logWeight: true },
-        { id: "m5",  section: "main",    name: "Pallof press",                          sets: 3, reps: "10 each side",  tempo: "2-2-2",      rest: "60s", recommended: "Light cable — this is core work not arm work", logWeight: true },
+        { id: "m5",  section: "main",    name: "Pallof press",                          sets: 3, reps: "10 each side",  tempo: "2-2-2",      rest: "60s", recommended: "Light cable - this is core work not arm work", logWeight: true },
         { id: "m6",  section: "main",    name: "Dead bug",                              sets: 3, reps: "8 each side",   tempo: "Slow",       rest: "45s" },
-        { id: "cd1", section: "cooldown",name: "Pigeon pose — right side priority",     sets: 1, reps: "90s each side", tempo: "Hold",       rest: "-",   duration: 90, note: "Do not skip this" },
+        { id: "cd1", section: "cooldown",name: "Pigeon pose - right side priority",     sets: 1, reps: "90s each side", tempo: "Hold",       rest: "-",   duration: 90, note: "Do not skip this" },
         { id: "cd2", section: "cooldown",name: "Supine hamstring stretch",              sets: 1, reps: "60s each side", tempo: "Hold",       rest: "-",   duration: 60 },
         { id: "cd3", section: "cooldown",name: "Child's pose",                          sets: 1, reps: "60s",           tempo: "Hold",       rest: "-",   duration: 60 },
       ]
@@ -234,15 +242,15 @@ const PROGRAMME = {
         { id: "wu1", section: "warmup",  name: "Band pull-aparts",                      sets: 2, reps: "15",            tempo: "Controlled", rest: "-"   },
         { id: "wu2", section: "warmup",  name: "Thoracic rotation (seated)",            sets: 2, reps: "10 each side",  tempo: "Slow",       rest: "-"   },
         { id: "wu3", section: "warmup",  name: "Cat-cow",                               sets: 1, reps: "8",             tempo: "Slow",       rest: "-"   },
-        { id: "m1",  section: "main",    name: "Chest-supported dumbbell row",          sets: 4, reps: "10",            tempo: "2-1-3",      rest: "75s", recommended: "Moderate dumbbells — last 2 reps should challenge you", logWeight: true },
+        { id: "m1",  section: "main",    name: "Chest-supported dumbbell row",          sets: 4, reps: "10",            tempo: "2-1-3",      rest: "75s", recommended: "Moderate dumbbells - last 2 reps should challenge you", logWeight: true },
         { id: "m2",  section: "main",    name: "Incline dumbbell press",                sets: 3, reps: "10",            tempo: "3-1-2",      rest: "75s", recommended: "Light-moderate dumbbells", logWeight: true },
         { id: "m3",  section: "main",    name: "Lat pulldown (wide grip)",              sets: 3, reps: "12",            tempo: "2-1-3",      rest: "60s", recommended: "Comfortable weight with full range", logWeight: true },
-        { id: "m4",  section: "main",    name: "Dumbbell lateral raise",               sets: 3, reps: "15",            tempo: "2-0-3",      rest: "45s", recommended: "Light dumbbells — go lighter than you think", logWeight: true },
+        { id: "m4",  section: "main",    name: "Dumbbell lateral raise",               sets: 3, reps: "15",            tempo: "2-0-3",      rest: "45s", recommended: "Light dumbbells - go lighter than you think", logWeight: true },
         { id: "m5",  section: "main",    name: "Pallof press",                          sets: 3, reps: "10 each side",  tempo: "2-2-2",      rest: "60s", recommended: "Light cable", logWeight: true },
         { id: "m6",  section: "main",    name: "Half-kneeling cable chop",              sets: 3, reps: "10 each side",  tempo: "2-1-2",      rest: "60s", recommended: "Light-moderate cable", logWeight: true },
         { id: "cd1", section: "cooldown",name: "Doorway chest stretch",                 sets: 1, reps: "45s each side", tempo: "Hold",       rest: "-",   duration: 45 },
         { id: "cd2", section: "cooldown",name: "Thread the needle",                     sets: 1, reps: "8 each side",   tempo: "Slow",       rest: "-"   },
-        { id: "cd3", section: "cooldown",name: "Pigeon pose — right side priority",     sets: 1, reps: "60s each side", tempo: "Hold",       rest: "-",   duration: 60 },
+        { id: "cd3", section: "cooldown",name: "Pigeon pose - right side priority",     sets: 1, reps: "60s each side", tempo: "Hold",       rest: "-",   duration: 60 },
       ]
     },
     {
@@ -250,19 +258,19 @@ const PROGRAMME = {
       title: "Session C",
       subtitle: "Lower Body Strength & Single-Leg Progression",
       duration: "50-55 mins",
-      coachLine: "The most demanding session of the week. Single-leg work appears here for the first time. If your right glute or SI joint objects to anything, step back to the bilateral version — that is good listening, not failure. Sharp or radiating pain means stop. Dull muscular effort means carry on.",
+      coachLine: "The most demanding session of the week. Single-leg work appears here for the first time. If your right glute or SI joint objects to anything, step back to the bilateral version - that is good listening, not failure. Sharp or radiating pain means stop. Dull muscular effort means carry on.",
       exercises: [
-        { id: "wu1", section: "warmup",  name: "Glute bridge — 3s hold",               sets: 2, reps: "10",            tempo: "1-3-1",      rest: "30s" },
-        { id: "wu2", section: "warmup",  name: "Single-leg glute bridge — right side",  sets: 2, reps: "8",             tempo: "2-1-2",      rest: "45s", note: "Physio exercise — activation only" },
+        { id: "wu1", section: "warmup",  name: "Glute bridge - 3s hold",               sets: 2, reps: "10",            tempo: "1-3-1",      rest: "30s" },
+        { id: "wu2", section: "warmup",  name: "Single-leg glute bridge - right side",  sets: 2, reps: "8",             tempo: "2-1-2",      rest: "45s", note: "Physio exercise - activation only" },
         { id: "wu3", section: "warmup",  name: "Hip flexor stretch (kneeling)",         sets: 2, reps: "45s each side", tempo: "Hold",       rest: "-",   duration: 45 },
-        { id: "wu4", section: "warmup",  name: "Banded clamshell — right side priority",sets: 2, reps: "15",            tempo: "2-1-2",      rest: "30s" },
+        { id: "wu4", section: "warmup",  name: "Banded clamshell - right side priority",sets: 2, reps: "15",            tempo: "2-1-2",      rest: "30s" },
         { id: "m1",  section: "main",    name: "Goblet squat",                          sets: 3, reps: "10",            tempo: "3-1-2",      rest: "75s", recommended: "12kg dumbbell or kettlebell", logWeight: true },
-        { id: "m2",  section: "main",    name: "Single-leg press — right leg",          sets: 3, reps: "10 each side",  tempo: "3-1-2",      rest: "60s", recommended: "Lighter than your bilateral press — start conservative", logWeight: true },
+        { id: "m2",  section: "main",    name: "Single-leg press - right leg",          sets: 3, reps: "10 each side",  tempo: "3-1-2",      rest: "60s", recommended: "Lighter than your bilateral press - start conservative", logWeight: true },
         { id: "m3",  section: "main",    name: "Romanian deadlift",                     sets: 3, reps: "10",            tempo: "3-0-2",      rest: "75s", recommended: "2 x 12kg (small step up from Session A)", logWeight: true },
         { id: "m4",  section: "main",    name: "Bulgarian split squat",                 sets: 3, reps: "8 each side",   tempo: "3-1-2",      rest: "75s", recommended: "Bodyweight only this week" },
-        { id: "m5",  section: "main",    name: "Cable kickback — right side",           sets: 3, reps: "12",            tempo: "2-1-2",      rest: "45s", recommended: "Light cable — feel the glute, not the hip flexor", logWeight: true },
+        { id: "m5",  section: "main",    name: "Cable kickback - right side",           sets: 3, reps: "12",            tempo: "2-1-2",      rest: "45s", recommended: "Light cable - feel the glute, not the hip flexor", logWeight: true },
         { id: "m6",  section: "main",    name: "Dead bug (progressed)",                 sets: 3, reps: "8 each side",   tempo: "Slow",       rest: "45s" },
-        { id: "cd1", section: "cooldown",name: "Pigeon pose — right side priority",     sets: 1, reps: "2 mins right / 90s left", tempo: "Hold", rest: "-", duration: 120, note: "Longest pigeon of the week" },
+        { id: "cd1", section: "cooldown",name: "Pigeon pose - right side priority",     sets: 1, reps: "2 mins right / 90s left", tempo: "Hold", rest: "-", duration: 120, note: "Longest pigeon of the week" },
         { id: "cd2", section: "cooldown",name: "Lying figure-4 stretch",                sets: 1, reps: "60s each side", tempo: "Hold",       rest: "-",   duration: 60 },
         { id: "cd3", section: "cooldown",name: "Supine hamstring stretch",              sets: 1, reps: "90s each side", tempo: "Hold",       rest: "-",   duration: 90 },
         { id: "cd4", section: "cooldown",name: "Child's pose",                          sets: 1, reps: "90s",           tempo: "Hold",       rest: "-",   duration: 90 },
@@ -271,7 +279,7 @@ const PROGRAMME = {
   ]
 };
 
-// ── Condition awareness ───────────────────────────────────────────────────────
+// -- Condition awareness -------------------------------------------------------
 
 const ZONE_MESSAGES = {
   "lower-limb": {
@@ -321,7 +329,7 @@ function buildConditionCard() {
     </div>`;
 }
 
-// ── Log helpers ───────────────────────────────────────────────────────────────
+// -- Log helpers ---------------------------------------------------------------
 
 function logKey(sessionId, exerciseName) {
   return "gymLog_" + sessionId + "_" + exerciseName.replace(/[^a-zA-Z0-9]/g, "_");
@@ -340,7 +348,7 @@ function getLastIntel(sessionId, exerciseName) {
   return store.get(intelKey(sessionId, exerciseName)) || null;
 }
 
-// ── Exercise card renderer ────────────────────────────────────────────────────
+// -- Exercise card renderer ----------------------------------------------------
 
 function renderExerciseCard(ex, sessionId) {
   const guide      = GUIDE[ex.name] || GUIDE[ex.name.replace(/ \(.*\)/, "")] || null;
@@ -357,7 +365,7 @@ function renderExerciseCard(ex, sessionId) {
          data-exercise-id="${ex.id}"
          id="gymcard-${safeId}">
 
-      <!-- ── Tap target: summary row ──────────────────────────── -->
+      <!-- -- Tap target: summary row ---------------------------- -->
       <button class="gym-card-summary" data-expand="${ex.id}"
               aria-expanded="${isExpanded}"
               aria-label="${ex.name}${isDone ? ", completed" : ""}">
@@ -376,12 +384,12 @@ function renderExerciseCard(ex, sessionId) {
             ${ex.tempo !== "-" ? `<span class="gym-stat gym-stat--tempo">${ex.tempo}</span>` : ""}
             ${ex.rest  !== "-" ? `<span class="gym-stat"><small>rest</small> ${ex.rest}</span>` : ""}
           </div>
-          <span class="gym-card-chevron" aria-hidden="true">${isExpanded ? "▲" : "▼"}</span>
-          ${isDone ? `<span class="gym-card-done-badge" aria-label="Done">✓</span>` : ""}
+          <span class="gym-card-chevron" aria-hidden="true">${isExpanded ? "\u25B2" : "\u25BC"}</span>
+          ${isDone ? `<span class="gym-card-done-badge" aria-label="Done">\u2713</span>` : ""}
         </div>
       </button>
 
-      <!-- ── Expanded panel ────────────────────────────────────── -->
+      <!-- -- Expanded panel -------------------------------------- -->
       ${isExpanded ? `
         <div class="gym-card-panel" id="panel-${safeId}">
 
@@ -426,7 +434,7 @@ function renderExerciseCard(ex, sessionId) {
                       data-duration="${ex.duration}"
                       id="timer-btn-${safeId}"
                       aria-label="Start timer for ${ex.name}">
-                ▶ Start Timer
+                \u25B6 Start Timer
               </button>
             </div>
           ` : ""}
@@ -442,7 +450,7 @@ function renderExerciseCard(ex, sessionId) {
                  target="_blank" rel="noopener noreferrer"
                  class="gym-youtube-link"
                  aria-label="Watch ${ex.name} demonstration on YouTube (opens in new tab)">
-                ▶ Watch a demonstration
+                \u25B6 Watch a demonstration
               </a>
             </div>
           ` : ""}
@@ -452,7 +460,7 @@ function renderExerciseCard(ex, sessionId) {
                   data-exercise-id="${ex.id}"
                   data-session="${sessionId}"
                   data-exercise="${ex.name}">
-            ${isDone ? "✓ Marked as done" : "Done — next exercise"}
+            ${isDone ? "\u2713 Marked as done" : "Done - next exercise"}
           </button>
           ${!isDone ? `
             <div class="gym-skip-row">
@@ -472,7 +480,7 @@ function renderExerciseCard(ex, sessionId) {
   `;
 }
 
-// ── Section group renderer ────────────────────────────────────────────────────
+// -- Section group renderer ----------------------------------------------------
 
 function renderSessionCards(session) {
   const sections = [
@@ -526,7 +534,7 @@ function renderSessionCards(session) {
   `;
 }
 
-// ── Post-session flow ─────────────────────────────────────────────────────────
+// -- Post-session flow ---------------------------------------------------------
 
 const WELLBEING_PROMPTS = [
   "How do you feel about yourself after that?",
@@ -544,7 +552,7 @@ function renderPostSession(session) {
       <div class="gym-post-session" id="gym-post-intel">
         <div class="card card-coach gym-coach-line">
           <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-          <p class="coach-message-text">Session done. Before you go — how did each exercise feel? This helps me adapt things for next time.</p>
+          <p class="coach-message-text">Session done. Before you go - how did each exercise feel? This helps me adapt things for next time.</p>
         </div>
         ${mainExs.map(e => `
           <div class="gym-intel-card card">
@@ -568,7 +576,7 @@ function renderPostSession(session) {
           </div>
         `).join("")}
         <button class="btn btn-primary btn-full" id="gym-intel-done-btn">
-          Done — one more thing
+          Done - one more thing
         </button>
       </div>`;
   }
@@ -610,7 +618,7 @@ function renderPostSession(session) {
           <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
           <p class="coach-message-text">That is a session in the books. I will remember what you told me and use it next time. Well done.</p>
         </div>
-        <button class="btn btn-primary btn-full" onclick="router.navigate('today')">
+        <button class="btn btn-primary btn-full" id="gym-done-back-btn">
           Back to Today
         </button>
       </div>`;
@@ -619,10 +627,10 @@ function renderPostSession(session) {
   return "";
 }
 
-// ── Main render ───────────────────────────────────────────────────────────────
+// -- Main render ---------------------------------------------------------------
 
 export function render() {
-  // ── Generated session fallback ─────────────────────────────────────────────
+  // -- Generated session fallback ---------------------------------------------
   // When the session builder has built a session, use it instead of the
   // hardcoded PROGRAMME. usingGeneratedSession is set by session-builder-ui.js
   // before navigating here. Cleared on session complete or back.
@@ -634,7 +642,7 @@ export function render() {
     return renderGeneratedSession(genSession);
   }
 
-  // ── Standard programme (Graeme's rehab programme) ─────────────────────────
+  // -- Standard programme (Graeme's rehab programme) -------------------------
   activeSessionId = store.get("gymProgrammeSession") || "A";
   const activeWeek = store.get("gymProgrammeWeek") || 1;
   const session = PROGRAMME.sessions.find(s => s.id === activeSessionId)
@@ -692,7 +700,7 @@ export function render() {
   `;
 }
 
-// ── Generated session renderer ─────────────────────────────────────────────────
+// -- Generated session renderer -------------------------------------------------
 // Renders a coach-built session from session-builder.js in the same card
 // format as the hardcoded programme. Uses renderSessionCards() unchanged.
 
@@ -731,7 +739,7 @@ function renderGeneratedSession(session) {
   `;
 }
 
-// ── Timer helpers ─────────────────────────────────────────────────────────────
+// -- Timer helpers -------------------------------------------------------------
 
 function formatTime(seconds) {
   const m = Math.floor(seconds / 60);
@@ -758,7 +766,7 @@ function startTimer(exerciseId, duration, safeId) {
     }
   }, 1000);
 
-  if (btn) btn.textContent = "⏱ " + formatTime(timerRemaining);
+  if (btn) btn.textContent = "\u23F1 " + formatTime(timerRemaining);
 }
 
 function rerender() {
@@ -776,7 +784,7 @@ function rerender() {
   }
 }
 
-// ── Events ────────────────────────────────────────────────────────────────────
+// -- Events --------------------------------------------------------------------
 
 function wireEvents() {
   const view = document.querySelector(".gym-programme-view");
@@ -784,7 +792,7 @@ function wireEvents() {
 
   view.addEventListener("click", e => {
 
-    // ── Session tab ──────────────────────────────────────────
+    // -- Session tab ------------------------------------------
     const tab = e.target.closest(".gym-session-tab");
     if (tab) {
       const sid = tab.dataset.session;
@@ -798,7 +806,7 @@ function wireEvents() {
       return;
     }
 
-    // ── Exercise card expand/collapse ─────────────────────────
+    // -- Exercise card expand/collapse -------------------------
     const expandBtn = e.target.closest(".gym-card-summary");
     if (expandBtn) {
       const eid = expandBtn.dataset.expand;
@@ -812,7 +820,7 @@ function wireEvents() {
       return;
     }
 
-    // ── Timer button ─────────────────────────────────────────
+    // -- Timer button -----------------------------------------
     const timerBtn = e.target.closest(".gym-timer-btn");
     if (timerBtn) {
       const eid      = timerBtn.dataset.exerciseId;
@@ -821,14 +829,14 @@ function wireEvents() {
       if (activeTimerId && timerExerciseId === eid) {
         clearInterval(activeTimerId);
         activeTimerId = null;
-        timerBtn.textContent = "▶ Resume";
+        timerBtn.textContent = "\u25B6 Resume";
       } else {
         startTimer(eid, timerRemaining > 0 && timerExerciseId === eid ? timerRemaining : duration, safeId);
       }
       return;
     }
 
-    // ── Save log button ───────────────────────────────────────
+    // -- Save log button ---------------------------------------
     const saveBtn = e.target.closest(".gym-save-btn");
     if (saveBtn) {
       const inputId  = saveBtn.dataset.input;
@@ -839,12 +847,12 @@ function wireEvents() {
       const value = input.value.trim();
       if (!value) return;
       saveLog(sid, exName, value);
-      saveBtn.textContent = "Saved ✓";
+      saveBtn.textContent = "Saved \u2713";
       setTimeout(() => { saveBtn.textContent = "Save"; }, 1500);
       return;
     }
 
-    // ── Done button ───────────────────────────────────────────
+    // -- Done button -------------------------------------------
     const doneBtn = e.target.closest(".gym-done-btn");
     if (doneBtn) {
       const eid    = doneBtn.dataset.exerciseId;
@@ -870,7 +878,7 @@ function wireEvents() {
       return;
     }
 
-    // ── Finish session button ─────────────────────────────────
+    // -- Finish session button ---------------------------------
     const skipBtn = e.target.closest(".gym-skip-btn");
     if (skipBtn) {
       const eid    = skipBtn.dataset.exerciseId;
@@ -893,7 +901,7 @@ function wireEvents() {
       return;
     }
 
-    // ── Intel chips ───────────────────────────────────────────
+    // -- Intel chips -------------------------------------------
     const intelChip = e.target.closest(".gym-intel-chip");
     if (intelChip) {
       const exName = intelChip.dataset.exercise;
@@ -910,7 +918,7 @@ function wireEvents() {
       return;
     }
 
-    // ── Intel done ────────────────────────────────────────────
+    // -- Intel done --------------------------------------------
     const intelDoneBtn = e.target.closest("#gym-intel-done-btn");
     if (intelDoneBtn) {
       // Save intel to store
@@ -922,7 +930,7 @@ function wireEvents() {
       return;
     }
 
-    // ── Wellbeing save ────────────────────────────────────────
+    // -- Wellbeing save ----------------------------------------
     const wellbeingSave = e.target.closest("#gym-wellbeing-save-btn");
     if (wellbeingSave) {
       const textarea = document.getElementById("gym-wellbeing-input");
@@ -938,7 +946,7 @@ function wireEvents() {
       return;
     }
 
-    // ── Wellbeing skip ────────────────────────────────────────
+    // -- Wellbeing skip ----------------------------------------
     const wellbeingSkip = e.target.closest("#gym-wellbeing-skip-btn");
     if (wellbeingSkip) {
       completedIds = new Set();
@@ -954,6 +962,12 @@ export function onMount() {
   postSessionState = null;
   intelAnswers     = {};
   if (activeTimerId) clearInterval(activeTimerId);
+
+  // Post-session "done" screen - reflection already happened via the
+  // intel/wellbeing steps, so this returns straight to Today.
+  document.getElementById("gym-done-back-btn")?.addEventListener("click", () => {
+    router.navigate("today");
+  });
 
   mountSessionGuard({
     isActive: () => !postSessionState && completedIds.size > 0,
@@ -975,8 +989,8 @@ export function onMount() {
       router.navigate("reflect");
     }
   });
-  // Back button — show exit confirm if session in progress
-  // Generated session back — clears flag, returns to session builder
+  // Back button - show exit confirm if session in progress
+  // Generated session back - clears flag, returns to session builder
   document.getElementById("gym-generated-back-btn")?.addEventListener("click", () => {
     store.set("usingGeneratedSession", false);
     router.navigate("session-builder-ui");
