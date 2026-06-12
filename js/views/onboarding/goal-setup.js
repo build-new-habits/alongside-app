@@ -1,9 +1,20 @@
 /**
- * goal-setup.js — Strategic goal and programme selection
+ * goal-setup.js - Strategic goal and programme selection
+ *
+ * 12 Jun 2026 v1 (S4-4 P4) - validateWeightTarget() added:
+ *   On the confirm step, if the user's goal is "lose-weight" and both
+ *   targetWeight and targetDate are set, checks whether the time
+ *   remaining until targetDate is below a 12-week sensible minimum
+ *   (we have no starting-weight field to compute an actual kg/week
+ *   rate, so this is a general timeline sanity check, not a clinical
+ *   calculation). If the timeline looks too tight, shows a warm coach
+ *   message offering to change the date (inline date picker, no
+ *   navigation to other views) or continue with it as a stretch goal.
+ *   Pre-beta safety compliance item.
  *
  * 14 May 2026 v1
  *
- * v1.1 — navigate to checkin not today (today.js no longer exists)
+ * v1.1 - navigate to checkin not today (today.js no longer exists)
  *
  * This view runs immediately after onboarding/complete.
  * The user picks their primary goal, commits to a weekly session count,
@@ -21,11 +32,61 @@ import { GOALS }           from '../../data/goals.js';
 
 export const centered = false;
 
-// Local state for this view — does not persist until confirmation
+// Local state for this view - does not persist until confirmation
 let selectedGoalId       = null;
 let selectedSessions     = 3;
 let selectedProgrammeId  = null;
 let currentStep          = 1; // 1 = goal, 2 = sessions, 3 = programme, 4 = confirm
+let weightWarningAcknowledged = false; // user tapped "I understand, continue"
+let weightWarningEditingDate  = false; // user tapped "Change my date"
+
+// Minimum sensible timeframe for any weight-loss target, regardless of
+// amount. We do not have a starting/current weight in the schema, so we
+// cannot compute an actual kg-per-week rate. This floor reflects general
+// safe-loss guidance (roughly 0.5-1kg/week) and catches targets set for
+// dates that are implausibly soon for ANY healthy amount of weight loss.
+const MIN_WEEKS_FOR_WEIGHT_TARGET = 12;
+
+/**
+ * Returns a warning object if the user's weight-loss target date looks
+ * unsafe given the time available, or null if there is nothing to flag.
+ *
+ * We deliberately do not attempt to estimate or state a rate (kg/week)
+ * since we have no starting weight to compare against - the message
+ * stays general and coach-toned rather than clinical.
+ */
+function validateWeightTarget() {
+  if (selectedGoalId !== "lose-weight") return null;
+
+  const targetWeight = store.get("targetWeight");
+  const targetDate   = store.get("targetDate");
+  if (!targetWeight || !targetDate) return null;
+
+  const now      = new Date();
+  const target   = new Date(targetDate);
+  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  const weeksAvailable = (target.getTime() - now.getTime()) / msPerWeek;
+
+  if (weeksAvailable <= 0) {
+    return {
+      heading: "That target date has already passed",
+      message: "Looks like the date you set is in the past now. Want to choose a new one before we build your plan around it?",
+      showDateEditor: weightWarningEditingDate
+    };
+  }
+
+  if (weeksAvailable < MIN_WEEKS_FOR_WEIGHT_TARGET) {
+    return {
+      heading: "Let's make sure this timeline feels right",
+      message: "That gives us " + Math.round(weeksAvailable) + " week" + (Math.round(weeksAvailable) === 1 ? "" : "s") +
+               " to work with. Sustainable weight loss usually takes longer than that, and rushing it tends to backfire. " +
+               "I would rather build you a plan that actually sticks. You can adjust the date, or continue if you would like to keep it as a stretch goal we revisit.",
+      showDateEditor: weightWarningEditingDate
+    };
+  }
+
+  return null;
+}
 
 export function render() {
   // Pre-select from onboarding goals if possible
@@ -66,10 +127,10 @@ export function render() {
 }
 
 export function onMount() {
-  // nothing — all handlers are window.* globals
+  // nothing - all handlers are window.* globals
 }
 
-// ─── STEP RENDERER ───────────────────────────────────────────────────────────
+// --- STEP RENDERER -----------------------------------------------------------
 
 function renderStep(name) {
   switch (currentStep) {
@@ -88,22 +149,22 @@ function renderActions() {
         Start my programme
       </button>
       <button class="btn btn-ghost" onclick="goalSetupBack()" style="margin-top: 8px; width: 100%;">
-        ← Change something
+        \u2190 Change something
       </button>
     `;
   }
   const isFirstStep = currentStep === 1;
   const isLastStep  = currentStep === 3;
   return `
-    ${!isFirstStep ? `<button class="btn btn-ghost" onclick="goalSetupBack()" style="margin-bottom:8px;width:100%">← Back</button>` : ''}
+    ${!isFirstStep ? `<button class="btn btn-ghost" onclick="goalSetupBack()" style="margin-bottom:8px;width:100%">\u2190 Back</button>` : ''}
     <button class="btn btn-primary btn-large btn-full" onclick="goalSetupNext()" id="goal-setup-next-btn">
-      ${isLastStep ? 'Review my plan →' : 'Continue →'}
+      ${isLastStep ? 'Review my plan \u2192' : 'Continue \u2192'}
     </button>
     ${isFirstStep ? `<button class="btn btn-ghost" style="margin-top:8px;width:100%" onclick="goalSetupSkip()">Skip for now</button>` : ''}
   `;
 }
 
-// ─── STEP 1 — Primary goal ───────────────────────────────────────────────────
+// --- STEP 1 - Primary goal ---------------------------------------------------
 
 function renderGoalStep(name) {
   const goals = GOALS;
@@ -129,19 +190,19 @@ function renderGoalStep(name) {
   `;
 }
 
-// ─── STEP 2 — Weekly session commitment ──────────────────────────────────────
+// --- STEP 2 - Weekly session commitment --------------------------------------
 
 function renderSessionsStep(name) {
   const options = [
     { value: 2, label: '2 sessions',  desc: 'Steady and sustainable'   },
     { value: 3, label: '3 sessions',  desc: 'The sweet spot for most people' },
-    { value: 4, label: '4 sessions',  desc: 'Committed — with room to adapt' },
-    { value: 5, label: '5 sessions',  desc: 'Ambitious — listen to your body' }
+    { value: 4, label: '4 sessions',  desc: 'Committed - with room to adapt' },
+    { value: 5, label: '5 sessions',  desc: 'Ambitious - listen to your body' }
   ];
 
   return `
     <h1>How often can you realistically move each week?</h1>
-    <p class="text-secondary">Be honest with yourself — this sets your weekly target. You can always do more on good weeks.</p>
+    <p class="text-secondary">Be honest with yourself - this sets your weekly target. You can always do more on good weeks.</p>
 
     <div class="session-options" role="group" aria-label="Weekly session commitment">
       ${options.map(o => `
@@ -156,12 +217,12 @@ function renderSessionsStep(name) {
     </div>
 
     <p class="text-sm text-muted" style="margin-top: var(--space-4); text-align: center;">
-      💡 3 sessions a week is the evidence-backed minimum for building a lasting habit
+      \uD83D\uDCA1 3 sessions a week is the evidence-backed minimum for building a lasting habit
     </p>
   `;
 }
 
-// ─── STEP 3 — Programme selection ────────────────────────────────────────────
+// --- STEP 3 - Programme selection --------------------------------------------
 
 function renderProgrammeStep() {
   const onboardingGoals  = store.get('goals') || [];
@@ -189,18 +250,18 @@ function renderProgrammeStep() {
               <div class="programme-card-name">${p.name}</div>
               <div class="programme-card-tagline">${p.tagline}</div>
             </div>
-            ${selectedProgrammeId === p.id ? '<span class="programme-card-check" aria-hidden="true">✓</span>' : ''}
+            ${selectedProgrammeId === p.id ? '<span class="programme-card-check" aria-hidden="true">\u2713</span>' : ''}
           </div>
           <p class="programme-card-desc">${p.description}</p>
           <div class="programme-card-meta">
             <span>12 weeks</span>
-            <span>·</span>
+            <span>\u00B7</span>
             <span>${p.weeklySessions} sessions/week target</span>
           </div>
           <div class="programme-phases">
             ${p.phases.map(ph => `
               <div class="phase-pill">${ph.label}</div>
-            `).join('<span class="phase-arrow">→</span>')}
+            `).join('<span class="phase-arrow">\u2192</span>')}
           </div>
         </button>
       `).join('')}
@@ -208,7 +269,7 @@ function renderProgrammeStep() {
   `;
 }
 
-// ─── STEP 4 — Confirm ────────────────────────────────────────────────────────
+// --- STEP 4 - Confirm --------------------------------------------------------
 
 function renderConfirmStep(name) {
   const programme  = PROGRAMMES.find(p => p.id === selectedProgrammeId);
@@ -222,15 +283,50 @@ function renderConfirmStep(name) {
     if (targetDate) targetText += ` (${formatDate(targetDate)})`;
   }
 
+  const weightWarning = !weightWarningAcknowledged ? validateWeightTarget() : null;
+
   return `
-    <div class="confirm-icon">🎯</div>
+    <div class="confirm-icon">\uD83C\uDFAF</div>
     <h1>Here's your plan, ${name}</h1>
     <p class="text-secondary">This is what we're building toward. Every session connects to this.</p>
+
+    ${weightWarning ? `
+    <div class="coach-message-card card card-coach" style="margin-bottom: var(--space-4);" id="weight-warning-card">
+      <img src="assets/images/logo-icon-small.png" alt="Coach" class="coach-message-icon">
+      <div class="coach-message-text">
+        <p style="font-weight: 600;">${weightWarning.heading}</p>
+        <p style="margin-top: var(--space-2);">${weightWarning.message}</p>
+        ${weightWarning.showDateEditor ? `
+          <div style="margin-top: var(--space-3);">
+            <label class="profile-field-label" for="weight-target-date-input">
+              New target date
+            </label>
+            <input type="date" id="weight-target-date-input" class="profile-field-input"
+                   value="${targetDate}"
+                   min="${new Date().toISOString().split("T")[0]}">
+            <button class="btn btn-primary btn-small" style="margin-top: var(--space-2);"
+                    onclick="goalSetupSaveWeightTargetDate()">
+              Save new date
+            </button>
+          </div>
+        ` : `
+        <div style="display: flex; gap: var(--space-2); margin-top: var(--space-3); flex-wrap: wrap;">
+          <button class="btn btn-secondary btn-small" onclick="goalSetupEditWeightTarget()">
+            Change my date
+          </button>
+          <button class="btn btn-ghost btn-small" onclick="goalSetupAcknowledgeWeightWarning()">
+            Keep it as a stretch goal
+          </button>
+        </div>
+        `}
+      </div>
+    </div>
+    ` : ""}
 
     <div class="confirm-card card">
       <div class="confirm-row">
         <span class="confirm-label">Primary goal</span>
-        <span class="confirm-value">${goal ? goal.icon + ' ' + goal.name : '—'}</span>
+        <span class="confirm-value">${goal ? goal.icon + ' ' + goal.name : '-'}</span>
       </div>
       ${targetText ? `
       <div class="confirm-row">
@@ -239,7 +335,7 @@ function renderConfirmStep(name) {
       </div>` : ''}
       <div class="confirm-row">
         <span class="confirm-label">Programme</span>
-        <span class="confirm-value">${programme ? programme.icon + ' ' + programme.name : '—'}</span>
+        <span class="confirm-value">${programme ? programme.icon + ' ' + programme.name : '-'}</span>
       </div>
       <div class="confirm-row">
         <span class="confirm-label">Duration</span>
@@ -254,14 +350,14 @@ function renderConfirmStep(name) {
     <div class="coach-message-card card card-coach" style="margin-top: var(--space-4);">
       <img src="assets/images/logo-icon-small.png" alt="Coach" class="coach-message-icon">
       <div class="coach-message-text">
-        <p>${programme ? programme.phases[0].coachMessage : 'Let\'s get started.'}</p>
+        <p>${programme ? programme.phases[0].coachMessage : "Let's get started."}</p>
         <p class="text-muted" style="margin-top: var(--space-2);">Your first session sets the habit. Let's go.</p>
       </div>
     </div>
   `;
 }
 
-// ─── GLOBAL EVENT HANDLERS ───────────────────────────────────────────────────
+// --- GLOBAL EVENT HANDLERS ---------------------------------------------------
 
 window.goalSetupSelectGoal = function(goalId) {
   selectedGoalId = goalId;
@@ -302,7 +398,7 @@ window.goalSetupBack = function() {
 
 window.goalSetupConfirm = function() {
   if (!selectedProgrammeId || !selectedGoalId) {
-    showError('Something went wrong — please go back and check your selections');
+    showError('Something went wrong - please go back and check your selections');
     return;
   }
 
@@ -326,17 +422,37 @@ window.goalSetupConfirm = function() {
     document.getElementById('bottom-nav')?.classList.remove('hidden');
     router.navigate('checkin');
   } else {
-    showError('Could not start programme — please try again');
+    showError('Could not start programme - please try again');
   }
 };
 
 window.goalSetupSkip = function() {
-  // User skips goal setup — go straight to today without a programme
+  // User skips goal setup -- go straight to today without a programme
   document.getElementById('bottom-nav')?.classList.remove('hidden');
   router.navigate('checkin');
 };
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
+window.goalSetupEditWeightTarget = function() {
+  weightWarningEditingDate = true;
+  refreshContent();
+};
+
+window.goalSetupSaveWeightTargetDate = function() {
+  const input = document.getElementById("weight-target-date-input");
+  if (input && input.value) {
+    store.set("targetDate", input.value);
+  }
+  weightWarningEditingDate = false;
+  refreshContent();
+};
+
+window.goalSetupAcknowledgeWeightWarning = function() {
+  weightWarningAcknowledged = true;
+  weightWarningEditingDate  = false;
+  refreshContent();
+};
+
+// --- HELPERS -----------------------------------------------------------------
 
 function refreshContent() {
   const name    = store.get('name') || 'there';
