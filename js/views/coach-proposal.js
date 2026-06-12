@@ -1,6 +1,14 @@
 /**
  * coach-proposal.js - Coach Proposal Screen
  *
+ * 12 Jun 2026 v1 (S4-4 P2) -- sessionLocation wiring:
+ *   buildProposal() reads store.sessionLocation and applies a scoring
+ *   bias to the gym/yoga/quiet/run/walk options: "gym" location boosts
+ *   gym, "home" location penalises gym and slightly favours yoga/quiet,
+ *   "outside" favours run/walk and penalises gym. Weekly plan branch
+ *   (getTodayPlan) is unaffected -- per-day location in weeklyPlan
+ *   continues to override sessionLocation as before.
+ *
  * 01 June 2026 v1
  *
  * 22 May 2026 v3 --- Weekly plan wiring added (S4-3):
@@ -97,6 +105,7 @@ function buildProposal(preferShorter = false) {
   const lastType       = store.get("lastProposalType")    || null;
   const lastDate       = store.get("lastProposalDate")    || null;
   const gymProgramme   = store.get("gymProgrammeWeek");
+  const sessionLocation = store.get("sessionLocation")    || null;
 
   const TIME_MAP  = { micro: 10, quick: 20, short: 30, standard: 40, long: 50, open: 60 };
   let timeBudget  = availableTime ? (TIME_MAP[availableTime] || 40) : 40;
@@ -193,38 +202,51 @@ function buildProposal(preferShorter = false) {
     });
   }
 
+  const locationBias = (type) => {
+    if (sessionLocation === "gym") {
+      if (type === "gym") return 3;
+    } else if (sessionLocation === "home") {
+      if (type === "gym") return -3;
+      if (type === "yoga" || type === "quiet") return 1;
+    } else if (sessionLocation === "outside") {
+      if (type === "run" || type === "walk") return 2;
+      if (type === "gym") return -2;
+    }
+    return 0;
+  };
+
   const options = [
     {
       type: "gym", available: hasGymProg,
-      score: prefScore("gym") + (gymCount < 3 ? 2 : 0) + (energy >= 6 ? 1 : 0) - (heavyOverride ? 3 : 0),
+      score: prefScore("gym") + (gymCount < 3 ? 2 : 0) + (energy >= 6 ? 1 : 0) - (heavyOverride ? 3 : 0) + locationBias("gym"),
       proposal: "I thought we'd continue your gym programme today. Session " + gymSession + " of Week " + gymWeek + ".",
       rationale: energy >= 7 ? "Your energy is good. Make the most of it." : "Steady progress on the programme is what builds the result.",
       duration: Math.min(timeBudget, 45), target: "gym-programme", quietMode: null
     },
     {
       type: "yoga", available: true,
-      score: prefScore("yoga") + (gymCount >= 3 ? 3 : 0) + (energy <= 5 ? 1 : 0),
+      score: prefScore("yoga") + (gymCount >= 3 ? 3 : 0) + (energy <= 5 ? 1 : 0) + locationBias("yoga"),
       proposal: "I thought a yoga or mobility session would serve you well today.",
       rationale: gymCount >= 3 ? "Several demanding sessions recently. Contrast helps." : "Mobility work complements your other training.",
       duration: Math.min(timeBudget, 35), target: "quiet-session", quietMode: "mindful"
     },
     {
       type: "quiet", available: true,
-      score: prefScore("quiet") + (energy <= 4 ? 2 : 0) + (quietCount < 1 ? 1 : 0),
+      score: prefScore("quiet") + (energy <= 4 ? 2 : 0) + (quietCount < 1 ? 1 : 0) + locationBias("quiet"),
       proposal: "I thought something quieter today. Not every day needs to be a training day.",
       rationale: "Balance between effort and recovery is where progress lives.",
       duration: Math.min(timeBudget, 20), target: "quiet-session", quietMode: "breathing"
     },
     {
       type: "run", available: true,
-      score: prefScore("run") + (cardioCount < 1 ? 2 : 0),
+      score: prefScore("run") + (cardioCount < 1 ? 2 : 0) + locationBias("run"),
       proposal: "I thought a run today. Cardiovascular work at this stage of your goals makes a real difference.",
       rationale: "No cardio recently.",
       duration: Math.min(timeBudget, 35), target: "activity-log", quietMode: null
     },
     {
       type: "walk", available: true,
-      score: prefScore("walk") + (energy <= 4 ? 1 : 0) + (daysSinceLast >= 3 ? 1 : 0),
+      score: prefScore("walk") + (energy <= 4 ? 1 : 0) + (daysSinceLast >= 3 ? 1 : 0) + locationBias("walk"),
       proposal: "I thought a walk today. Movement that generates the energy it costs.",
       rationale: energy <= 4 ? "Lower energy responds well to gentle sustained movement." : "A good complement to your recent sessions.",
       duration: Math.min(timeBudget, 40), target: "activity-log", quietMode: null
