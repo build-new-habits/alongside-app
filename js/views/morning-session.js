@@ -1,6 +1,13 @@
 /**
  * morning-session.js - Morning Session View
  *
+ * 12 Jun 2026 v1 (S4-4 P3) - Back button pass:
+ *   ms-back-btn (select screen "Today" button) and ms-exit-btn
+ *   (mid-session exit confirm) now call router.back() instead of
+ *   hardcoded window.router.navigate("intention") - both return to
+ *   whatever page the user actually came from. ms-log-btn already
+ *   correctly routes to "reflect" and is unchanged.
+ *
  * 01 Jun 2026 v2
  *
  * v2 -- Session completion and UX fixes:
@@ -21,15 +28,15 @@
  *   1. Week + slot selector (if not pre-set)
  *   2. Cardio routing card (options based on pain scores)
  *   3. Overview (all blocks listed before starting)
- *   4. Session execution — one exercise at a time:
- *        Warm-up → Cardio reminder → Upper body → Core → Cool-down
+ *   4. Session execution - one exercise at a time:
+ *        Warm-up \u2192 Cardio reminder \u2192 Upper body \u2192 Core \u2192 Cool-down
  *   5. Post-session: feel tap + coach closing line
  *   6. Activity logged to activityLog
  *
  * Pain routing:
- *   getZoneStatus("lower-limb") or ("spine") >= "moderate" → flare options
- *   energy <= 3 → fatigue options
- *   otherwise → clear options
+ *   getZoneStatus("lower-limb") or ("spine") >= "moderate" \u2192 flare options
+ *   energy <= 3 \u2192 fatigue options
+ *   otherwise \u2192 clear options
  *
  * Route: morning-session
  * Nav: hidden (same as workout, gym-programme)
@@ -46,7 +53,7 @@ import {
 
 export const centered = false;
 
-// ── Module state ──────────────────────────────────────────────────────────────
+// -- Module state --------------------------------------------------------------
 let selectedWeek    = 1;
 let selectedSlot    = null;     // "mon" | "wed" | "sat"
 let viewState       = "select"; // "select" | "overview" | "session" | "done"
@@ -71,12 +78,12 @@ const BLOCK_LABELS = {
 
 // Slot display names
 const SLOT_LABELS = {
-  mon: "Monday — Home",
-  wed: "Wednesday — Gym",
-  sat: "Saturday — Gym"
+  mon: "Monday - Home",
+  wed: "Wednesday - Gym",
+  sat: "Saturday - Gym"
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// -- Helpers -------------------------------------------------------------------
 
 function formatTime(seconds) {
   const m = Math.floor(seconds / 60);
@@ -107,7 +114,7 @@ function getCardioRouteLabel(route) {
 
 function getBlockExercises(session) {
   // Returns an array of exercise objects for the current block.
-  // Cardio block is special — one descriptive card.
+  // Cardio block is special - one descriptive card.
   if (currentBlock === "warmup")   return session.cooldown ? [] : []; // handled below
   if (currentBlock === "upper")    return session.upper    || [];
   if (currentBlock === "core")     return session.core     || [];
@@ -169,7 +176,7 @@ function logActivity(session, durationMins) {
   store.set("currentActivityEntry", entry);
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
+// -- Render --------------------------------------------------------------------
 
 export function render() {
   // Initialise from store before first paint (onMount runs after render)
@@ -183,7 +190,7 @@ export function render() {
   return renderSelect();
 }
 
-// ── 1. Select: week + slot ────────────────────────────────────────────────────
+// -- 1. Select: week + slot ----------------------------------------------------
 
 function renderSelect() {
   const autoSlot = getTodaySlot();
@@ -195,7 +202,7 @@ function renderSelect() {
       <!-- Header -->
       <div class="workout-header">
         <button class="btn btn-ghost" id="ms-back-btn" aria-label="Back to today">
-          ← Today
+          \u2190 Today
         </button>
         <span class="workout-progress-info">Morning Programme</span>
       </div>
@@ -235,7 +242,7 @@ function renderSelect() {
                     data-slot="${slot}"
                     aria-pressed="${selectedSlot === slot}">
               <span class="ms-slot-label">${SLOT_LABELS[slot]}</span>
-              <span class="ms-slot-location">${slot === "mon" ? "🏠 Home" : "🏋️ Gym"}</span>
+              <span class="ms-slot-location">${slot === "mon" ? "\uD83C\uDFE0 Home" : "\uD83C\uDFCB\uFE0F Gym"}</span>
               ${autoSlot === slot ? '<span class="ms-slot-today-badge">Today</span>' : ""}
             </button>
           `).join("")}
@@ -246,7 +253,7 @@ function renderSelect() {
                 style="margin-top: var(--space-6);"
                 ${!selectedSlot ? "disabled" : ""}
                 aria-disabled="${!selectedSlot}">
-          See session overview →
+          See session overview \u2192
         </button>
 
       </div>
@@ -254,7 +261,7 @@ function renderSelect() {
   `;
 }
 
-// ── 2. Overview ───────────────────────────────────────────────────────────────
+// -- 2. Overview ---------------------------------------------------------------
 
 function renderOverview() {
   const session    = getMorningSession(selectedWeek, selectedSlot);
@@ -274,7 +281,7 @@ function renderOverview() {
       <!-- Header -->
       <div class="workout-header">
         <button class="btn btn-ghost" id="ms-back-to-select" aria-label="Back to session select">
-          ← Back
+          \u2190 Back
         </button>
         <span class="workout-progress-info">${session.title}</span>
       </div>
@@ -283,7 +290,7 @@ function renderOverview() {
 
         <!-- Phase badge -->
         <div class="ms-phase-badge">
-          <span class="ms-phase-label">Week ${selectedWeek} — ${phaseInfo.phase}</span>
+          <span class="ms-phase-label">Week ${selectedWeek} - ${phaseInfo.phase}</span>
           <span class="ms-duration-label">${session.duration}</span>
         </div>
 
@@ -310,7 +317,7 @@ function renderOverview() {
         <!-- Warm-up -->
         <div class="ms-overview-block">
           <div class="ms-overview-block-header">
-            <span class="ms-block-icon" aria-hidden="true">🔥</span>
+            <span class="ms-block-icon" aria-hidden="true">\uD83D\uDD25</span>
             <span class="ms-block-title">Warm-up</span>
             <span class="ms-block-meta">5 mins</span>
           </div>
@@ -320,7 +327,7 @@ function renderOverview() {
         <!-- Cardio -->
         <div class="ms-overview-block">
           <div class="ms-overview-block-header">
-            <span class="ms-block-icon" aria-hidden="true">🏃</span>
+            <span class="ms-block-icon" aria-hidden="true">\uD83C\uDFC3</span>
             <span class="ms-block-title">Cardio</span>
             <span class="ms-block-meta">${session.cardio.duration}</span>
           </div>
@@ -334,12 +341,12 @@ function renderOverview() {
         ${(session.upper || []).length > 0 ? `
           <div class="ms-overview-block">
             <div class="ms-overview-block-header">
-              <span class="ms-block-icon" aria-hidden="true">💪</span>
+              <span class="ms-block-icon" aria-hidden="true">\uD83D\uDCAA</span>
               <span class="ms-block-title">Upper Body</span>
               <span class="ms-block-meta">${session.upper.length} exercises</span>
             </div>
             <ul class="ms-overview-list">
-              ${session.upper.map(e => `<li>${e.name} <span class="ms-ex-meta">${e.sets > 0 ? e.sets + " × " + e.reps : e.reps}</span></li>`).join("")}
+              ${session.upper.map(e => `<li>${e.name} <span class="ms-ex-meta">${e.sets > 0 ? e.sets + " \u00D7 " + e.reps : e.reps}</span></li>`).join("")}
             </ul>
           </div>
         ` : ""}
@@ -348,12 +355,12 @@ function renderOverview() {
         ${(session.core || []).length > 0 ? `
           <div class="ms-overview-block">
             <div class="ms-overview-block-header">
-              <span class="ms-block-icon" aria-hidden="true">🎯</span>
+              <span class="ms-block-icon" aria-hidden="true">\uD83C\uDFAF</span>
               <span class="ms-block-title">Core Finisher</span>
               <span class="ms-block-meta">${session.core.length} exercises</span>
             </div>
             <ul class="ms-overview-list">
-              ${session.core.map(e => `<li>${e.name} <span class="ms-ex-meta">${e.sets > 0 ? e.sets + " × " + e.reps : e.reps}</span></li>`).join("")}
+              ${session.core.map(e => `<li>${e.name} <span class="ms-ex-meta">${e.sets > 0 ? e.sets + " \u00D7 " + e.reps : e.reps}</span></li>`).join("")}
             </ul>
           </div>
         ` : ""}
@@ -361,7 +368,7 @@ function renderOverview() {
         <!-- Cool-down -->
         <div class="ms-overview-block">
           <div class="ms-overview-block-header">
-            <span class="ms-block-icon" aria-hidden="true">🌊</span>
+            <span class="ms-block-icon" aria-hidden="true">\uD83C\uDF0A</span>
             <span class="ms-block-title">Cool-down</span>
             <span class="ms-block-meta">${(session.cooldown || []).length} stretches</span>
           </div>
@@ -372,7 +379,7 @@ function renderOverview() {
         <button class="btn btn-primary btn-large btn-full"
                 id="ms-begin-btn"
                 style="margin-top: var(--space-6);">
-          Start session →
+          Start session \u2192
         </button>
 
       </div>
@@ -380,7 +387,7 @@ function renderOverview() {
   `;
 }
 
-// ── 3. Session execution ──────────────────────────────────────────────────────
+// -- 3. Session execution ------------------------------------------------------
 
 function renderSession() {
   const session = getMorningSession(selectedWeek, selectedSlot);
@@ -400,7 +407,7 @@ function renderSession() {
     const blockArr = getBlockArray(session, currentBlock);
     const ex = blockArr[currentIndex];
     if (!ex) {
-      // Block exhausted — should not happen but guard it
+      // Block exhausted - should not happen but guard it
       content = `<div class="card"><p>Block complete.</p></div>`;
     } else {
       content = renderExerciseCard(ex, session);
@@ -413,7 +420,7 @@ function renderSession() {
       <!-- Header -->
       <div class="workout-header">
         <button class="btn btn-ghost" id="ms-exit-btn" aria-label="Exit morning session">
-          ✕ Exit
+          \u2715 Exit
         </button>
         <div class="workout-progress-info"
              aria-label="Step ${current} of ${total}"
@@ -435,7 +442,7 @@ function renderSession() {
         ${BLOCK_ORDER.map(b => `
           <span class="ms-block-pip ${b === currentBlock ? "active" : completedBlocks.has(b) ? "done" : ""}"
                 aria-label="${BLOCK_LABELS[b]} ${b === currentBlock ? "(current)" : completedBlocks.has(b) ? "(done)" : ""}">
-            ${completedBlocks.has(b) ? "✓" : BLOCK_LABELS[b].charAt(0)}
+            ${completedBlocks.has(b) ? "\u2713" : BLOCK_LABELS[b].charAt(0)}
           </span>
         `).join("")}
         <span class="ms-block-current-label">${BLOCK_LABELS[currentBlock]}</span>
@@ -452,7 +459,7 @@ function renderWarmupCard(session) {
     <div class="exercise-display" style="padding: var(--space-5) var(--space-4);">
 
       <div class="exercise-role-badge warmup" aria-label="Warm-up">
-        🔥 Warm-up
+        \uD83D\uDD25 Warm-up
       </div>
 
       <h1 class="exercise-name">5-Minute Warm-Up</h1>
@@ -460,12 +467,12 @@ function renderWarmupCard(session) {
       <div class="card" style="margin: var(--space-4) 0;">
         <p style="margin-bottom: var(--space-3);">Move through these before loading anything:</p>
         <ul style="padding-left: var(--space-4); line-height: 1.8;">
-          <li>March on the spot — 60 seconds, swing the arms</li>
-          <li>Hip circles — 10 each direction</li>
-          <li>Arm circles — 10 forward, 10 back</li>
-          <li>Shoulder rolls — 10 slow</li>
-          <li>Ankle rotations — 10 each foot</li>
-          <li>Gentle torso rotation — 10 each side</li>
+          <li>March on the spot - 60 seconds, swing the arms</li>
+          <li>Hip circles - 10 each direction</li>
+          <li>Arm circles - 10 forward, 10 back</li>
+          <li>Shoulder rolls - 10 slow</li>
+          <li>Ankle rotations - 10 each foot</li>
+          <li>Gentle torso rotation - 10 each side</li>
         </ul>
       </div>
 
@@ -478,7 +485,7 @@ function renderWarmupCard(session) {
 
       <div class="workout-actions" style="margin-top: var(--space-5);">
         <button class="btn btn-primary btn-large btn-full" id="ms-next-btn">
-          Warm-up done → Cardio
+          Warm-up done \u2192 Cardio
         </button>
       </div>
 
@@ -495,7 +502,7 @@ function renderCardioCard(session) {
     <div class="exercise-display" style="padding: var(--space-5) var(--space-4);">
 
       <div class="exercise-role-badge cardio" aria-label="Cardio block">
-        🏃 Cardio
+        \uD83C\uDFC3 Cardio
       </div>
 
       <h1 class="exercise-name">Cardio Block</h1>
@@ -507,10 +514,10 @@ function renderCardioCard(session) {
 
       ${!allClear ? `
         <div class="ms-routing-notice" role="alert" aria-live="polite">
-          <span class="ms-routing-icon" aria-hidden="true">${route === "flare" ? "⚠️" : "💙"}</span>
+          <span class="ms-routing-icon" aria-hidden="true">${route === "flare" ? "\u26A0\uFE0F" : "\uD83D\uDC99"}</span>
           <p>${route === "flare"
             ? "I can see some pain flagged in your check-in. I have adjusted your cardio options to protect those areas."
-            : "Energy is low today. I have given you gentler options — moving is still the right call."
+            : "Energy is low today. I have given you gentler options - moving is still the right call."
           }</p>
         </div>
       ` : ""}
@@ -541,7 +548,7 @@ function renderCardioCard(session) {
 
       <div class="workout-actions" style="margin-top: var(--space-5);">
         <button class="btn btn-primary btn-large btn-full" id="ms-next-btn">
-          Cardio done → Upper Body
+          Cardio done \u2192 Upper Body
         </button>
         ${(session.core || []).length === 0 && (session.upper || []).length === 0 ? `
           <button class="btn btn-ghost btn-small" id="ms-skip-to-cooldown">
@@ -563,19 +570,19 @@ function renderExerciseCard(ex, session) {
 
   // Next block label for button
   const blockIndex = BLOCK_ORDER.indexOf(currentBlock);
-  let nextLabel = "Next exercise →";
+  let nextLabel = "Next exercise \u2192";
   if (isLast) {
     const nextBlock = BLOCK_ORDER[blockIndex + 1];
     nextLabel = nextBlock
-      ? `${BLOCK_LABELS[currentBlock]} done → ${BLOCK_LABELS[nextBlock]}`
-      : "Finish session 🎉";
+      ? `${BLOCK_LABELS[currentBlock]} done \u2192 ${BLOCK_LABELS[nextBlock]}`
+      : "Finish session \uD83C\uDF89";
   }
 
   return `
     <div class="exercise-display" style="padding: var(--space-5) var(--space-4);">
 
       <div class="exercise-role-badge ${currentBlock}" aria-label="${BLOCK_LABELS[currentBlock]}">
-        ${currentIndex + 1} of ${blockLen} — ${BLOCK_LABELS[currentBlock]}
+        ${currentIndex + 1} of ${blockLen} - ${BLOCK_LABELS[currentBlock]}
       </div>
 
       <h1 class="exercise-name">${ex.name}</h1>
@@ -610,7 +617,7 @@ function renderExerciseCard(ex, session) {
                 data-duration="${ex.duration}"
                 id="ms-timer-btn"
                 aria-label="Start hold timer for ${ex.name}">
-          ▶ Start Timer
+          \u25B6 Start Timer
         </button>
       ` : ""}
 
@@ -627,7 +634,7 @@ function renderExerciseCard(ex, session) {
                target="_blank" rel="noopener noreferrer"
                class="gym-youtube-link"
                aria-label="Watch ${ex.name} demonstration on YouTube (opens in new tab)">
-              ▶ Watch a demonstration
+              \u25B6 Watch a demonstration
             </a>
           </div>
         </details>
@@ -647,7 +654,7 @@ function renderExerciseCard(ex, session) {
   `;
 }
 
-// ── 4. Done ───────────────────────────────────────────────────────────────────
+// -- 4. Done -------------------------------------------------------------------
 
 function renderDone() {
   const session  = getMorningSession(selectedWeek, selectedSlot);
@@ -656,17 +663,17 @@ function renderDone() {
     : null;
 
   const FEEL_OPTIONS = [
-    { value: "strong",    label: "Strong 💪" },
-    { value: "right",     label: "Just right ✓" },
-    { value: "tough",     label: "Tough but done 🔥" },
-    { value: "struggled", label: "Struggled today 💙" }
+    { value: "strong",    label: "Strong \uD83D\uDCAA" },
+    { value: "right",     label: "Just right \u2713" },
+    { value: "tough",     label: "Tough but done \uD83D\uDD25" },
+    { value: "struggled", label: "Struggled today \uD83D\uDC99" }
   ];
 
   // Build closing coach line
   const week = selectedWeek;
   let closingLine = "Session done. That is the habit building.";
-  if (week <= 2) closingLine = "First steps of the programme complete. The water and the movement will do their work — give it a few days.";
-  else if (week <= 4) closingLine = "Building week. You are stronger than you were in Week 1 — you might not feel it yet but the body keeps score.";
+  if (week <= 2) closingLine = "First steps of the programme complete. The water and the movement will do their work - give it a few days.";
+  else if (week <= 4) closingLine = "Building week. You are stronger than you were in Week 1 - you might not feel it yet but the body keeps score.";
   else closingLine = "Challenge week done. You are six weeks of consistent mornings into this. That is not nothing.";
 
   return `
@@ -710,8 +717,8 @@ function renderDone() {
 
       <!-- Water reminder -->
       <div class="ms-water-reminder" role="note">
-        <span aria-hidden="true">💧</span>
-        <p>Remember — 2.5 litres of water today. Start now if you have not already.</p>
+        <span aria-hidden="true">\uD83D\uDCA7</span>
+        <p>Remember - 2.5 litres of water today. Start now if you have not already.</p>
       </div>
 
       <!-- Log and return -->
@@ -725,7 +732,7 @@ function renderDone() {
   `;
 }
 
-// ── Rerender ──────────────────────────────────────────────────────────────────
+// -- Rerender ------------------------------------------------------------------
 
 function rerender() {
   const el = document.getElementById("main-content");
@@ -734,7 +741,7 @@ function rerender() {
   wireEvents();
 }
 
-// ── Navigation logic ──────────────────────────────────────────────────────────
+// -- Navigation logic ----------------------------------------------------------
 
 function advance(session) {
   // Move to the next exercise or next block
@@ -764,7 +771,7 @@ function advance(session) {
     return;
   }
 
-  // Block exhausted — mark done and move to next
+  // Block exhausted - mark done and move to next
   completedBlocks.add(currentBlock);
   const blockIndex = BLOCK_ORDER.indexOf(currentBlock);
 
@@ -785,7 +792,7 @@ function advance(session) {
   viewState = "done";
 }
 
-// ── Events ────────────────────────────────────────────────────────────────────
+// -- Events --------------------------------------------------------------------
 
 function wireEvents() {
   const el = document.getElementById("main-content");
@@ -797,30 +804,30 @@ function wireEvents() {
 function handleClick(e) {
   const session = getMorningSession(selectedWeek, selectedSlot);
 
-  // ── Back to today ──────────────────────────────────────────────────────────
+  // -- Back to today (literal previous page) -------------------------------
   if (e.target.closest("#ms-back-btn")) {
     if (timerInterval) clearInterval(timerInterval);
-    window.router.navigate("intention");
+    router.back();
     return;
   }
 
-  // ── Back to select ─────────────────────────────────────────────────────────
+  // -- Back to select ---------------------------------------------------------
   if (e.target.closest("#ms-back-to-select")) {
     viewState = "select";
     rerender();
     return;
   }
 
-  // ── Exit session ───────────────────────────────────────────────────────────
+  // -- Exit session (literal previous page) ----------------------------------
   if (e.target.closest("#ms-exit-btn")) {
     if (timerInterval) clearInterval(timerInterval);
     if (confirm("Exit the session? Progress will not be saved.")) {
-      window.router.navigate("intention");
+      router.back();
     }
     return;
   }
 
-  // ── Week selector ──────────────────────────────────────────────────────────
+  // -- Week selector ----------------------------------------------------------
   const weekBtn = e.target.closest(".ms-week-btn");
   if (weekBtn) {
     selectedWeek = parseInt(weekBtn.dataset.week);
@@ -829,7 +836,7 @@ function handleClick(e) {
     return;
   }
 
-  // ── Slot selector ──────────────────────────────────────────────────────────
+  // -- Slot selector ----------------------------------------------------------
   const slotBtn = e.target.closest(".ms-slot-btn");
   if (slotBtn) {
     selectedSlot = slotBtn.dataset.slot;
@@ -837,7 +844,7 @@ function handleClick(e) {
     return;
   }
 
-  // ── Start (overview) ───────────────────────────────────────────────────────
+  // -- Start (overview) -------------------------------------------------------
   if (e.target.closest("#ms-start-btn")) {
     if (!selectedSlot) return;
     viewState = "overview";
@@ -845,7 +852,7 @@ function handleClick(e) {
     return;
   }
 
-  // ── Begin session ──────────────────────────────────────────────────────────
+  // -- Begin session ----------------------------------------------------------
   if (e.target.closest("#ms-begin-btn")) {
     viewState    = "session";
     currentBlock = "warmup";
@@ -856,7 +863,7 @@ function handleClick(e) {
     return;
   }
 
-  // ── Next / skip ────────────────────────────────────────────────────────────
+  // -- Next / skip ------------------------------------------------------------
   if (e.target.closest("#ms-next-btn") || e.target.closest("#ms-skip-btn")) {
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     timerRemaining = 0;
@@ -880,7 +887,7 @@ function handleClick(e) {
     return;
   }
 
-  // ── Skip to cooldown ───────────────────────────────────────────────────────
+  // -- Skip to cooldown -------------------------------------------------------
   if (e.target.closest("#ms-skip-to-cooldown")) {
     completedBlocks.add("warmup");
     completedBlocks.add("cardio");
@@ -892,7 +899,7 @@ function handleClick(e) {
     return;
   }
 
-  // ── Timer ──────────────────────────────────────────────────────────────────
+  // -- Timer ------------------------------------------------------------------
   const timerBtn = e.target.closest(".ms-timer-btn");
   if (timerBtn) {
     const duration = parseInt(timerBtn.dataset.duration);
@@ -902,12 +909,12 @@ function handleClick(e) {
       clearInterval(timerInterval);
       timerInterval = null;
       timerRunning  = false;
-      timerBtn.textContent = "▶ Resume";
+      timerBtn.textContent = "\u25B6 Resume";
     } else {
       // Start or resume
       if (timerRemaining <= 0) timerRemaining = duration;
       timerRunning = true;
-      timerBtn.textContent = "⏸ Pause";
+      timerBtn.textContent = "\u23F8 Pause";
 
       timerInterval = setInterval(() => {
         timerRemaining--;
@@ -921,18 +928,18 @@ function handleClick(e) {
           timerInterval = null;
           timerRunning  = false;
           if (display) {
-            display.textContent = "Done ✓";
+            display.textContent = "Done \u2713";
             display.setAttribute("aria-label", "Timer complete");
           }
           const btn = document.getElementById("ms-timer-btn");
-          if (btn) btn.textContent = "✓ Complete";
+          if (btn) btn.textContent = "\u2713 Complete";
         }
       }, 1000);
     }
     return;
   }
 
-  // ── Feel tap (done screen) ─────────────────────────────────────────────────
+  // -- Feel tap (done screen) -------------------------------------------------
   const feelBtn = e.target.closest(".ms-feel-btn");
   if (feelBtn) {
     postFeel = feelBtn.dataset.feel;
@@ -944,7 +951,7 @@ function handleClick(e) {
     return;
   }
 
-  // ── Log and finish ─────────────────────────────────────────────────────────
+  // -- Log and finish ---------------------------------------------------------
   if (e.target.closest("#ms-log-btn")) {
     if (session) {
       const duration = sessionStart
@@ -965,7 +972,7 @@ function handleClick(e) {
   }
 }
 
-// ── Lifecycle ─────────────────────────────────────────────────────────────────
+// -- Lifecycle -----------------------------------------------------------------
 
 export function onMount() {
   // Reset session state on fresh mount
