@@ -2,15 +2,28 @@
  * workout.js - Workout Execution View
  * Displays exercises one by one with timer/counter
  *
+ * 12 Jun 2026 v1 (S4-4 P3) - Back button pass:
+ *   exit-workout-btn now calls router.back() instead of hardcoded
+ *   router.navigate("today") - returns to whatever page the user was
+ *   actually on before starting the workout.
+ *   completeWorkout() now navigates to "reflect" (matching
+ *   gym-programme.js and morning-session.js) instead of
+ *   "workout-complete" directly, so every session ends with a
+ *   reflection step before landing on progress.
+ *   renderNoWorkout() fallback button now uses a proper event
+ *   listener with router.back() instead of an inline onclick to
+ *   "today".
+ *   Converted to double-quoted strings throughout.
+ *
  * Changes (t2_5 / t2_7):
  *   - Import programmeEngine
  *   - completeWorkout() calls programmeEngine.recordSession(workout.focus)
- *   - Resulting milestone (or null) stored as 'lastMilestone' for workout-complete.js
+ *   - Resulting milestone (or null) stored as "lastMilestone" for workout-complete.js
  */
 
-import { store } from '../store.js';
-import { checkinData } from '../data/checkin.js';
-import { programmeEngine } from '../data/programmeEngine.js';
+import { store } from "../store.js";
+import { checkinData } from "../data/checkin.js";
+import { programmeEngine } from "../data/programmeEngine.js";
 
 export const centered = false;
 
@@ -20,7 +33,7 @@ let timeRemaining = 0;
 let timerStarted = false; // Timer doesn't start until user taps Start
 
 export function render() {
-  const workout = store.get('activeWorkout');
+  const workout = store.get("activeWorkout");
 
   if (!workout) {
     return renderNoWorkout();
@@ -34,7 +47,7 @@ export function render() {
     <div class="view workout-view">
       <!-- Header with progress -->
       <div class="workout-header">
-        <button class="btn btn-ghost" id="exit-workout-btn" aria-label="Exit workout">✕ Exit</button>
+        <button class="btn btn-ghost" id="exit-workout-btn" aria-label="Exit workout">\u2715 Exit</button>
         <div class="workout-progress-info" aria-label="Exercise ${currentExerciseIndex + 1} of ${workout.exercises.length}">
           <span>${currentExerciseIndex + 1} of ${workout.exercises.length}</span>
         </div>
@@ -52,9 +65,9 @@ export function render() {
         <h1 class="exercise-name">${exercise.name}</h1>
 
         <div class="exercise-meta">
-          ${exercise.perSide ? '<span class="meta-tag">Each side</span>' : ''}
+          ${exercise.perSide ? "<span class=\"meta-tag\">Each side</span>" : ""}
           <span class="meta-tag">${exercise.category}</span>
-          <span class="meta-tag">+${exercise.credits} ⭐</span>
+          <span class="meta-tag">+${exercise.credits} \u2B50</span>
         </div>
 
         <!-- Timer or Reps display -->
@@ -63,12 +76,12 @@ export function render() {
         </div>
 
         <!-- YouTube Demo Link -->
-        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.name + ' exercise form')}"
+        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.name + " exercise form")}"
            target="_blank"
            rel="noopener noreferrer"
            class="youtube-link"
            aria-label="Watch how to do ${exercise.name} on YouTube (opens in new tab)">
-          <span class="youtube-icon" aria-hidden="true">▶️</span>
+          <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
           Watch how to do this
         </a>
 
@@ -82,9 +95,9 @@ export function render() {
               How to get there
             </span>
             <ul class="exercise-section-list" aria-labelledby="section-setup-${currentExerciseIndex}">
-              ${exercise.instructions.map(inst => `<li>${inst}</li>`).join('')}
+              ${exercise.instructions.map(inst => `<li>${inst}</li>`).join("")}
             </ul>
-          ` : ''}
+          ` : ""}
 
           <!-- Section 2: What to focus on (coaching cues) -->
           ${exercise.coaching ? `
@@ -93,10 +106,10 @@ export function render() {
               What to focus on
             </span>
             <div class="coaching-tip" aria-labelledby="section-focus-${currentExerciseIndex}">
-              <span class="tip-icon" aria-hidden="true">💡</span>
+              <span class="tip-icon" aria-hidden="true">\uD83D\uDCA1</span>
               <p>${exercise.coaching}</p>
             </div>
-          ` : ''}
+          ` : ""}
 
           <!-- Section 3: Why this helps -->
           ${exercise.why ? `
@@ -107,7 +120,7 @@ export function render() {
             <p class="exercise-why-text" aria-labelledby="section-why-${currentExerciseIndex}">
               ${exercise.why}
             </p>
-          ` : ''}
+          ` : ""}
 
         </div>
       </div>
@@ -115,13 +128,13 @@ export function render() {
       <!-- Action buttons -->
       <div class="workout-actions">
         ${exercise.duration ? `
-          <button class="btn btn-large btn-full ${timerStarted ? 'btn-secondary' : 'btn-accent'}" id="timer-toggle-btn" aria-live="polite">
-            ${!timerStarted ? '▶ Start Timer' : (timerInterval ? '⏸ Pause' : '▶ Resume')}
+          <button class="btn btn-large btn-full ${timerStarted ? "btn-secondary" : "btn-accent"}" id="timer-toggle-btn" aria-live="polite">
+            ${!timerStarted ? "\u25B6 Start Timer" : (timerInterval ? "\u23F8 Pause" : "\u25B6 Resume")}
           </button>
-        ` : ''}
+        ` : ""}
 
         <button class="btn btn-primary btn-large btn-full" id="complete-exercise-btn">
-          ${isLastExercise ? '🎉 Complete Workout' : 'Next Exercise →'}
+          ${isLastExercise ? "\uD83C\uDF89 Complete Workout" : "Next Exercise \u2192"}
         </button>
 
         <button class="btn btn-ghost btn-small" id="skip-exercise-btn">
@@ -137,9 +150,9 @@ function renderNoWorkout() {
     <div class="view">
       <div class="card card-coach">
         <h2>No workout selected</h2>
-        <p>Go back to Today and choose a workout option.</p>
-        <button class="btn btn-primary" onclick="router.navigate('today')">
-          Back to Today
+        <p>Go back to choose a workout option.</p>
+        <button class="btn btn-primary" id="no-workout-back-btn">
+          Back
         </button>
       </div>
     </div>
@@ -153,7 +166,7 @@ function renderExerciseTarget(exercise) {
       <div class="timer-display">
         <div class="timer-circle">
           <span class="timer-value" id="timer-display">${formatTime(timeRemaining || exercise.duration)}</span>
-          <span class="timer-label">${sets > 1 ? `Set 1 of ${sets}` : 'Hold'}</span>
+          <span class="timer-label">${sets > 1 ? `Set 1 of ${sets}` : "Hold"}</span>
         </div>
       </div>
     `;
@@ -163,40 +176,47 @@ function renderExerciseTarget(exercise) {
     return `
       <div class="reps-display">
         <div class="reps-info">
-          <span class="reps-value">${sets} × ${reps}</span>
-          <span class="reps-label">sets × reps</span>
+          <span class="reps-value">${sets} \u00D7 ${reps}</span>
+          <span class="reps-label">sets \u00D7 reps</span>
         </div>
         ${exercise.rest ? `
           <div class="rest-info">
             <span class="rest-value">${exercise.rest}s</span>
             <span class="rest-label">rest between sets</span>
           </div>
-        ` : ''}
+        ` : ""}
       </div>
     `;
   }
-  return '<p>Complete this exercise at your own pace.</p>';
+  return "<p>Complete this exercise at your own pace.</p>";
 }
 
 function formatTime(seconds) {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 function formatRole(role) {
   const roles = {
-    warmup:   '🔥 Warm Up',
-    main:     '💪 Main',
-    accessory:'🎯 Accessory',
-    finisher: '🏁 Finisher',
-    cooldown: '🧘 Cool Down'
+    warmup:   "\uD83D\uDD25 Warm Up",
+    main:     "\uD83D\uDCAA Main",
+    accessory:"\uD83C\uDFAF Accessory",
+    finisher: "\uD83C\uDFC1 Finisher",
+    cooldown: "\uD83E\uDDD8 Cool Down"
   };
   return roles[role] || role;
 }
 
 export function onMount() {
-  const workout = store.get('activeWorkout');
+  const workout = store.get("activeWorkout");
+
+  // No-workout fallback - Back uses router.back(), not a hardcoded
+  // destination, so it returns to wherever the user actually came from.
+  document.getElementById("no-workout-back-btn")?.addEventListener("click", () => {
+    router.back();
+  });
+
   if (!workout) return;
 
   const exercise = workout.exercises[currentExerciseIndex];
@@ -206,16 +226,17 @@ export function onMount() {
     updateTimerDisplay();
   }
 
-  // Exit button
-  document.getElementById('exit-workout-btn')?.addEventListener('click', () => {
-    if (confirm('Exit workout? Your progress on this workout will be lost.')) {
+  // Exit button - returns to wherever the user was before this workout,
+  // not a hardcoded destination.
+  document.getElementById("exit-workout-btn")?.addEventListener("click", () => {
+    if (confirm("Exit workout? Your progress on this workout will be lost.")) {
       cleanupWorkout();
-      router.navigate('today');
+      router.back();
     }
   });
 
   // Timer toggle
-  document.getElementById('timer-toggle-btn')?.addEventListener('click', () => {
+  document.getElementById("timer-toggle-btn")?.addEventListener("click", () => {
     if (!timerStarted) {
       timerStarted = true;
       startTimer();
@@ -224,16 +245,16 @@ export function onMount() {
     } else {
       startTimer();
     }
-    router.navigate('workout');
+    router.navigate("workout");
   });
 
   // Complete exercise
-  document.getElementById('complete-exercise-btn')?.addEventListener('click', () => {
+  document.getElementById("complete-exercise-btn")?.addEventListener("click", () => {
     completeExercise();
   });
 
   // Skip exercise
-  document.getElementById('skip-exercise-btn')?.addEventListener('click', () => {
+  document.getElementById("skip-exercise-btn")?.addEventListener("click", () => {
     skipExercise();
   });
 }
@@ -246,7 +267,7 @@ function startTimer() {
       updateTimerDisplay();
     } else {
       clearInterval(timerInterval);
-      if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+      if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
     }
   }, 1000);
 }
@@ -259,40 +280,40 @@ function pauseTimer() {
 }
 
 function updateTimerDisplay() {
-  const display = document.getElementById('timer-display');
+  const display = document.getElementById("timer-display");
   if (display) display.textContent = formatTime(timeRemaining);
 }
 
 function completeExercise() {
-  const workout = store.get('activeWorkout');
+  const workout = store.get("activeWorkout");
   const exercise = workout.exercises[currentExerciseIndex];
 
-  const completed = store.get('workoutProgress') || [];
+  const completed = store.get("workoutProgress") || [];
   completed.push({
     exerciseId:  exercise.id,
     credits:     exercise.credits,
     completedAt: new Date().toISOString()
   });
-  store.set('workoutProgress', completed);
+  store.set("workoutProgress", completed);
 
   if (currentExerciseIndex >= workout.exercises.length - 1) {
     completeWorkout();
   } else {
     currentExerciseIndex++;
     resetTimer();
-    router.navigate('workout');
+    router.navigate("workout");
   }
 }
 
 function skipExercise() {
-  const workout = store.get('activeWorkout');
+  const workout = store.get("activeWorkout");
 
   if (currentExerciseIndex >= workout.exercises.length - 1) {
     completeWorkout();
   } else {
     currentExerciseIndex++;
     resetTimer();
-    router.navigate('workout');
+    router.navigate("workout");
   }
 }
 
@@ -303,16 +324,16 @@ function resetTimer() {
 }
 
 function completeWorkout() {
-  const workout  = store.get('activeWorkout');
-  const progress = store.get('workoutProgress') || [];
+  const workout  = store.get("activeWorkout");
+  const progress = store.get("workoutProgress") || [];
 
   // Credits
   const creditsEarned = progress.reduce((sum, e) => sum + (e.credits || 0), 0);
-  const totalCredits  = (store.get('totalCredits') || 0) + creditsEarned;
-  store.set('totalCredits', totalCredits);
+  const totalCredits  = (store.get("totalCredits") || 0) + creditsEarned;
+  store.set("totalCredits", totalCredits);
 
   // Workout history
-  const history = store.get('workoutHistory') || [];
+  const history = store.get("workoutHistory") || [];
   history.push({
     workoutId:          workout.id,
     name:               workout.name,
@@ -322,20 +343,22 @@ function completeWorkout() {
     totalExercises:     workout.exercises.length,
     creditsEarned
   });
-  store.set('workoutHistory', history);
+  store.set("workoutHistory", history);
 
-  // ── t2_5: Record session with programme engine ──────────────────────────
+  // -- t2_5: Record session with programme engine --------------------------
   // recordSession returns a milestone object if one was just earned, or null.
   const milestone = programmeEngine.recordSession(workout.focus || null);
-  store.set('lastMilestone', milestone || null);
-  // ────────────────────────────────────────────────────────────────────────
+  store.set("lastMilestone", milestone || null);
+  // --------------------------------------------------------------------------
 
-  // Stash data for the completion screen
-  store.set('lastWorkoutCredits', creditsEarned);
-  store.set('lastWorkoutName',    workout.name);
+  // Stash data for the completion screen / reflection step
+  store.set("lastWorkoutCredits", creditsEarned);
+  store.set("lastWorkoutName",    workout.name);
 
   cleanupWorkout();
-  router.navigate('workout-complete');
+  // Route through reflect.js for post-session reflection, then on to
+  // progress - matches gym-programme.js and morning-session.js.
+  router.navigate("reflect");
 }
 
 function cleanupWorkout() {
@@ -343,6 +366,6 @@ function cleanupWorkout() {
   currentExerciseIndex = 0;
   timeRemaining = 0;
   timerStarted  = false;
-  store.set('activeWorkout',   null);
-  store.set('workoutProgress', null);
+  store.set("activeWorkout",   null);
+  store.set("workoutProgress", null);
 }
