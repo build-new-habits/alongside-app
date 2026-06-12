@@ -1,6 +1,12 @@
 /**
  * store.js - Data persistence layer
  *
+ * 12 Jun 2026 v2 — S4-4 addition: lastCheckin.timestamp (ISO string | null).
+ *   Anchors the 2-hour return-visit trigger in intention.js (checkin-mini
+ *   wiring). Stamped by intention.js on first render of the day as an
+ *   interim measure until checkin.js writes it directly at submission
+ *   (see light-touch follow-up note). Schema bumped to 1.5 — see schema.md.
+ *
  * 12 Jun 2026 v1 — Consolidated schema pass. Adds all fields required for:
  *   - S4-5 (moodAfter replaces energyAfter on activityLog entries)
  *   - S4-6 (isEvent, eventName on activityLog entries)
@@ -130,7 +136,8 @@ export const store = {
                         ...saved.lastCheckin,
                         feelingWord:     saved.lastCheckin.feelingWord     ?? null,
                         feelingQuadrant: saved.lastCheckin.feelingQuadrant ?? null,
-                        unwell:          saved.lastCheckin.unwell          ?? false
+                        unwell:          saved.lastCheckin.unwell          ?? false,
+                        timestamp:       saved.lastCheckin.timestamp       ?? null
                       }
                     : defaults.lastCheckin,
 
@@ -423,7 +430,8 @@ export const store = {
       lastCheckin: {
         feelingWord: null,
         feelingQuadrant: null,
-        unwell: false
+        unwell: false,
+        timestamp: null
       },
 
       // ── CHECK-IN HISTORY (F1, F3, F6) ─────────────────────────
