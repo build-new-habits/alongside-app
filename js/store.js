@@ -1,9 +1,23 @@
 /**
  * store.js - Data persistence layer
  *
- * 21 May 2026 v1 — journalEntries, noticingWeekInCycle, noticingLastTriggered,
- *                   generatedSession schema added for Noticing Hub + Session Builder.
- * Handles localStorage with simple get/set API
+ * 12 Jun 2026 v1 — Consolidated schema pass. Adds all fields required for:
+ *   - S4-5 (moodAfter replaces energyAfter on activityLog entries)
+ *   - S4-6 (isEvent, eventName on activityLog entries)
+ *   - S4-WP (Weekly Plan — weeklyPlan object)
+ *   - S4-8 (event reminders — handled via activityLog entries + sw.js, no new top-level field)
+ *   - Wellbeing & Long-Horizon spec Section 5 (10 Jun 2026 v2):
+ *       lastCheckin.feelingWord/feelingQuadrant/unwell, checkinHistory entry additions,
+ *       safeguarding, weeklyReview, weightLog, waterLog, waterSettings, coachOffers,
+ *       unwellMode, foodPrompts, strategicGoal.planPresentedAt/measurementsOptIn
+ *   - Guided Practice Library spec (10 Jun 2026 v1): practiceHistory (minimal —
+ *       confirm shape in build session, no explicit delta given in source spec)
+ *
+ * This is a single consolidated pass per the touch-once rule. No further
+ * sessions should add fields to store.js individually — confirm against this
+ * file's version header before any future schema change.
+ *
+ * ---- PRIOR HISTORY ----
  *
  * v1.7 — checkInNotification schema (S3-6):
  *   Opted-in check-in reminder. Entirely user-initiated.
@@ -36,6 +50,11 @@
  *   strategicGoal   — user's primary goal with target details
  *   activeProgramme — which plan they're on + current week/phase
  *   progressLog     — session history for the progress dashboard
+ *
+ * 21 May 2026 v1 — journalEntries, noticingWeekInCycle, noticingLastTriggered,
+ *                   generatedSession schema added for Noticing Hub + Session Builder.
+ *
+ * Handles localStorage with simple get/set API
  */
 
 export const store = {
@@ -70,7 +89,13 @@ export const store = {
       ...defaults,
       ...saved,
       lifestyle:            { ...defaults.lifestyle,            ...(saved.lifestyle            || {}) },
-      strategicGoal:        { ...defaults.strategicGoal,        ...(saved.strategicGoal        || {}) },
+      strategicGoal:        {
+                              ...defaults.strategicGoal,
+                              ...(saved.strategicGoal || {}),
+                              measurementsOptIn: Array.isArray(saved.strategicGoal?.measurementsOptIn)
+                                                    ? saved.strategicGoal.measurementsOptIn
+                                                    : []
+                            },
       activeProgramme:      { ...defaults.activeProgramme,      ...(saved.activeProgramme      || {}) },
       progressLog:          Array.isArray(saved.progressLog)    ? saved.progressLog    : [],
       prescribedExercises:  Array.isArray(saved.prescribedExercises) ? saved.prescribedExercises : [],
@@ -83,8 +108,8 @@ export const store = {
                               ? saved.conditionPainScores
                               : {},
       checkInNotification:  (saved.checkInNotification && typeof saved.checkInNotification === 'object')
-                              ? { ...this.getDefaults().checkInNotification, ...saved.checkInNotification }
-                              : this.getDefaults().checkInNotification,
+                              ? { ...defaults.checkInNotification, ...saved.checkInNotification }
+                              : defaults.checkInNotification,
       speechRate: (typeof saved.speechRate === "number") ? saved.speechRate : 0.9,
       activityPreferences: (saved.activityPreferences && typeof saved.activityPreferences === "object")
                              ? saved.activityPreferences
@@ -92,6 +117,68 @@ export const store = {
       movementIdentity:    saved.movementIdentity || null,
       lastProposalType:    saved.lastProposalType || null,
       lastProposalDate:    saved.lastProposalDate || null,
+
+      // ── S4-WP — Weekly Plan ──────────────────────────────────
+      weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
+                    ? { ...defaults.weeklyPlan, ...saved.weeklyPlan }
+                    : defaults.weeklyPlan,
+
+      // ── Wellbeing & Long-Horizon — lastCheckin additions ─────
+      lastCheckin: (saved.lastCheckin && typeof saved.lastCheckin === 'object')
+                    ? {
+                        ...defaults.lastCheckin,
+                        ...saved.lastCheckin,
+                        feelingWord:     saved.lastCheckin.feelingWord     ?? null,
+                        feelingQuadrant: saved.lastCheckin.feelingQuadrant ?? null,
+                        unwell:          saved.lastCheckin.unwell          ?? false
+                      }
+                    : defaults.lastCheckin,
+
+      // checkinHistory entries gain feelingWord, feelingQuadrant, contextNote.
+      // Existing entries are left as-is (mergeWithDefaults does not rewrite
+      // history); new entries are written with the full shape by checkin.js.
+      checkinHistory: Array.isArray(saved.checkinHistory) ? saved.checkinHistory : [],
+
+      // ── Wellbeing & Long-Horizon — top level additions ───────
+      safeguarding: (saved.safeguarding && typeof saved.safeguarding === 'object')
+                       ? { ...defaults.safeguarding, ...saved.safeguarding }
+                       : defaults.safeguarding,
+
+      weeklyReview: (saved.weeklyReview && typeof saved.weeklyReview === 'object')
+                       ? { ...defaults.weeklyReview, ...saved.weeklyReview }
+                       : defaults.weeklyReview,
+
+      weightLog: Array.isArray(saved.weightLog) ? saved.weightLog : [],
+
+      waterLog: Array.isArray(saved.waterLog) ? saved.waterLog : [],
+
+      waterSettings: (saved.waterSettings && typeof saved.waterSettings === 'object')
+                        ? { ...defaults.waterSettings, ...saved.waterSettings }
+                        : defaults.waterSettings,
+
+      coachOffers: (saved.coachOffers && typeof saved.coachOffers === 'object')
+                      ? {
+                          shown:    { ...(saved.coachOffers.shown    || {}) },
+                          declined: { ...(saved.coachOffers.declined || {}) }
+                        }
+                      : defaults.coachOffers,
+
+      unwellMode: (saved.unwellMode && typeof saved.unwellMode === 'object')
+                     ? { ...defaults.unwellMode, ...saved.unwellMode }
+                     : defaults.unwellMode,
+
+      foodPrompts: (saved.foodPrompts && typeof saved.foodPrompts === 'object')
+                      ? {
+                          lastBalanceAt:  Array.isArray(saved.foodPrompts.lastBalanceAt) ? saved.foodPrompts.lastBalanceAt : [],
+                          lastEducationAt: saved.foodPrompts.lastEducationAt ?? null
+                        }
+                      : defaults.foodPrompts,
+
+      // ── Guided Practice Library — minimal usage tracking ─────
+      // Shape not specified in source spec. Confirm in build session.
+      practiceHistory: (saved.practiceHistory && typeof saved.practiceHistory === 'object')
+                          ? { ...defaults.practiceHistory, ...saved.practiceHistory }
+                          : defaults.practiceHistory,
     };
   },
 
@@ -170,7 +257,11 @@ export const store = {
         targetValue:         null,   // numeric e.g. 168
         targetUnit:          null,   // 'lbs' | 'kg' | 'km' | 'miles' | null
         weeklySessionTarget: 3,      // sessions per week commitment
-        setAt:               null    // ISO timestamp
+        setAt:               null,   // ISO timestamp
+
+        // — Wellbeing & Long-Horizon F9 —
+        planPresentedAt:     null,   // ISO timestamp — when detailed plan card first shown
+        measurementsOptIn:   []      // array of measurement type strings user opted into
       },
 
       // ── ACTIVE PROGRAMME ─────────────────────────────────────
@@ -200,8 +291,16 @@ export const store = {
       // ── ACTIVITY LOG ─────────────────────────────────────────
       // Every completed activity writes one entry here regardless
       // of path (coach-recommended, self-directed, quiet).
-      // Schema per entry: id, date, type, name, energyBefore,
-      // energyAfter, feel, painChange, note, source, completedAt
+      //
+      // Schema per entry:
+      //   id, date, type, name, energyBefore, feel, painChange, note,
+      //   source, completedAt, durationMins
+      //
+      //   moodAfter:  integer 1-10 | null  — S4-5. Replaces energyAfter.
+      //   isEvent:    boolean              — S4-6. True for logged
+      //                                       games/sport/events.
+      //   eventName:  string | null        — S4-6. Display name for
+      //                                       the event when isEvent true.
       activityLog: [],
 
       // Holds the in-progress activity entry during a session.
@@ -282,6 +381,137 @@ export const store = {
         session:  null,
         builtAt:  null,
         inputs:   {}
+      },
+
+      // ── WEEKLY PLAN (S4-WP) ───────────────────────────────────
+      // User's intent-only plan for the week, set in My Week (Settings).
+      // The coach generates the actual session on the day using
+      // sessionType + durationMins; days not set fall back to normal
+      // coach-proposal rules.
+      //
+      // Schema:
+      //   days: {
+      //     monday..sunday: {
+      //       sessionType:  string | null  — 'gym' | 'rest' | 'recovery' | 'class' | null
+      //       durationMins: number | null
+      //       location:     string | null  — 'home' | 'gym' | 'outside' | null
+      //       classFocus:   array           — up to 3 session focuses (gym days)
+      //       enabled:      boolean         — on/off toggle for the day
+      //     }
+      //   }
+      //   updatedAt: string | null — ISO timestamp, last edited
+      weeklyPlan: {
+        days: {
+          monday:    { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
+          tuesday:   { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
+          wednesday: { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
+          thursday:  { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
+          friday:    { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
+          saturday:  { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
+          sunday:    { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false }
+        },
+        updatedAt: null
+      },
+
+      // ── LAST CHECK-IN (Wellbeing & Long-Horizon F1, F2, F7) ───
+      // Snapshot of the most recent check-in. Existing fields preserved;
+      // additions below are new in this pass.
+      //
+      //   feelingWord:     string | null — chosen word from quadrant set
+      //   feelingQuadrant: string | null — 'lowLow' | 'lowHigh' | 'highLow' | 'highHigh'
+      //   unwell:          boolean       — true if unwell mode entered at this check-in
+      lastCheckin: {
+        feelingWord: null,
+        feelingQuadrant: null,
+        unwell: false
+      },
+
+      // ── CHECK-IN HISTORY (F1, F3, F6) ─────────────────────────
+      // Each entry gains feelingWord, feelingQuadrant, contextNote
+      // alongside existing check-in fields. Written by checkin.js.
+      // contextNote: string | null — re-entry note after 4+ day gap
+      checkinHistory: [],
+
+      // ── SAFEGUARDING (F2) ─────────────────────────────────────
+      // Adult safeguarding signal layer. Tracks last time a signal
+      // word triggered a signposting response, to avoid repetition.
+      safeguarding: {
+        lastSignpostedAt: null   // ISO timestamp | null
+      },
+
+      // ── WEEKLY REVIEW (F3) ─────────────────────────────────────
+      // Narrative-gated weekly report. Generated on first check-in
+      // on/after Monday. Reading the narrative unlocks the data
+      // layer (line graphs) until the next reporting point.
+      weeklyReview: {
+        periodStart:  null,   // ISO date — start of reporting period
+        periodEnd:    null,   // ISO date — end of reporting period
+        generatedAt:  null,   // ISO timestamp
+        narrative:    null,   // string — generated narrative text
+        readAt:       null,   // ISO timestamp | null — set when user confirms read
+        dataUnlocked: false   // boolean — true once readAt is set, until next period
+      },
+
+      // ── WEIGHT LOG (F3) ────────────────────────────────────────
+      // Weekly weight entries. { date, value }. Capped at 104 (2 years).
+      weightLog: [],
+
+      // ── WATER LOG (F3, F4) ─────────────────────────────────────
+      // Daily water intake. { date, ml }. One entry per day. Capped at 90.
+      waterLog: [],
+
+      // ── WATER SETTINGS (F4, F5) ────────────────────────────────
+      waterSettings: {
+        dailyTargetMl:    2000,
+        remindersEnabled: false,
+        reminderCount:    2,
+        windowStart:      9,    // hour, 24hr
+        windowEnd:        21    // hour, 24hr
+      },
+
+      // ── COACH OFFERS (F5) ──────────────────────────────────────
+      // Tracks coach-initiated settings conversations (e.g. water
+      // reminders offer). Each offer shown at most once; a decline
+      // is never re-pitched.
+      //
+      //   shown:    { [offerId]: ISO timestamp }
+      //   declined: { [offerId]: ISO timestamp }
+      coachOffers: {
+        shown: {},
+        declined: {}
+      },
+
+      // ── UNWELL MODE (F7) ────────────────────────────────────────
+      // Kind-to-posture model. kind values:
+      //   'body' | 'sensory' | 'mind' | 'depleted' | 'unspecified'
+      unwellMode: {
+        active:           false,
+        kind:             null,   // see kind values above
+        startedAt:        null,   // ISO timestamp
+        recoveryStartedAt: null,  // ISO timestamp | null
+        daysHeld:         0,      // number of days unwell mode has been active
+        kindAtRecovery:   null    // kind value captured when recovery began
+      },
+
+      // ── FOOD PROMPTS (F8) ────────────────────────────────────────
+      // Behaviour-level food prompt boundaries. No calorie figures,
+      // no macro guidance, no restriction-based content.
+      foodPrompts: {
+        lastBalanceAt:   [],    // array of ISO timestamps
+        lastEducationAt: null   // ISO timestamp | null — hunger/thirst education cadence
+      },
+
+      // ── PRACTICE HISTORY (Guided Practice Library) ───────────────
+      // Minimal usage tracking for the Practice Library (Noticing Hub,
+      // coach proposal, background audio surfaces). Shape not specified
+      // in source spec — confirm/extend in build session before relying
+      // on this field.
+      //
+      //   lastPlayed:  { [practiceId]: ISO timestamp }
+      //   favourites:  array of practiceId strings
+      practiceHistory: {
+        lastPlayed: {},
+        favourites: []
       },
 
       // ── METADATA ─────────────────────────────────────────────
