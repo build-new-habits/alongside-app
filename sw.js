@@ -1,8 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 June 2026 v3
+ * Cache version: alongside-v99
+ *
+ * v99 (12 June 2026, S4-4)
+ * - checkin-mini.js wired (return-visit trigger, pain chips, location update);
+ *   intention.js stamps lastCheckin.timestamp fallback; coach-proposal
+ *   sessionLocation bias; back/exit buttons now use router.back() across
+ *   workout.js, prescribed-session.js, morning-session.js, gym-programme.js;
+ *   goal-setup.js validateWeightTarget() warm timeline check.
+ *
  * 01 June 2026 v2
- * Cache version: alongside-v98
  *
  * v96 onwards (1st June 2026)
  * - fixes to flow of checkin based on videoed experience.
@@ -158,7 +167,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v98";
+const CACHE_NAME = "alongside-v99";
 
 const SHELL_URLS = [
 
