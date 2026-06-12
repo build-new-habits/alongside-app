@@ -1,15 +1,22 @@
 /**
  * prescribed-session.js - Prescribed Exercise Session View
  *
+ * 12 Jun 2026 v1 (S4-4 P3) - Back button pass:
+ *   completeSession() now navigates to "reflect" instead of
+ *   "workout-complete", matching gym-programme.js, morning-session.js,
+ *   and workout.js - every session ends with a reflection step before
+ *   landing on progress. Back/Exit already used router.back() correctly
+ *   and are unchanged.
+ *
  * Walks through prescribed exercises one by one, matching the workout
  * execution pattern. Supports timer-based exercises (hold durations)
  * using the same timer logic as workout.js.
  *
  * Credit award: 35 credits per exercise, capped at 150 total.
  * On completion: writes to totalCredits, sets lastWorkoutCredits and
- * lastWorkoutName so the existing workout-complete view can be reused.
+ * lastWorkoutName for the reflection / completion screens to read.
  *
- * Route: 'prescribed-session'
+ * Route: "prescribed-session"
  * Nav: hidden (same as workout view)
  */
 
@@ -17,11 +24,11 @@ import { store } from "../store.js";
 
 export const centered = false;
 
-// ── Credit constants ──────────────────────────────────────────────────────────
+// -- Credit constants ----------------------------------------------------------
 const CREDITS_PER_EXERCISE = 35;
 const CREDITS_MAX          = 150;
 
-// ── Session state ─────────────────────────────────────────────────────────────
+// -- Session state ---------------------------------------------------------------
 let currentIndex  = 0;
 let timerInterval = null;
 let timeRemaining = 0;
@@ -47,7 +54,7 @@ export function render() {
       <!-- Header -->
       <div class="workout-header">
         <button class="btn btn-ghost" id="ps-exit-btn" aria-label="Exit prescribed session">
-          ✕ Exit
+          \u2715 Exit
         </button>
         <div class="workout-progress-info" aria-label="Exercise ${currentIndex + 1} of ${active.length}">
           <span>${currentIndex + 1} of ${active.length}</span>
@@ -64,7 +71,7 @@ export function render() {
       <!-- Exercise display -->
       <div class="exercise-display">
         <div class="exercise-role-badge main" aria-label="Prescribed exercise">
-          🩺 Prescribed
+          \uD83E\uDE7A Prescribed
         </div>
 
         <h1 class="exercise-name">${ex.name}</h1>
@@ -72,7 +79,7 @@ export function render() {
         <div class="exercise-meta">
           ${ex.sets ? `<span class="meta-tag">${ex.sets} sets</span>` : ""}
           ${ex.reps ? `<span class="meta-tag">${ex.reps}</span>` : ""}
-          <span class="meta-tag">+${creditsForIndex(currentIndex, active.length)} ⭐</span>
+          <span class="meta-tag">+${creditsForIndex(currentIndex, active.length)} \u2B50</span>
         </div>
 
         <!-- Timer (hold-based exercises only) -->
@@ -89,8 +96,8 @@ export function render() {
           <div class="exercise-target">
             <div class="reps-display">
               <div class="reps-info">
-                <span class="reps-value">${ex.sets || 3} × ${ex.reps}</span>
-                <span class="reps-label">sets × reps</span>
+                <span class="reps-value">${ex.sets || 3} \u00D7 ${ex.reps}</span>
+                <span class="reps-label">sets \u00D7 reps</span>
               </div>
             </div>
           </div>
@@ -110,12 +117,12 @@ export function render() {
         ${hasTimer ? `
           <button class="btn btn-large btn-full ${timerStarted ? "btn-secondary" : "btn-accent"}"
                   id="ps-timer-btn" aria-live="polite">
-            ${!timerStarted ? "▶ Start Timer" : (timerInterval ? "⏸ Pause" : "▶ Resume")}
+            ${!timerStarted ? "\u25B6 Start Timer" : (timerInterval ? "\u23F8 Pause" : "\u25B6 Resume")}
           </button>
         ` : ""}
 
         <button class="btn btn-primary btn-large btn-full" id="ps-complete-btn">
-          ${isLast ? "🎉 Complete Session" : "Next Exercise →"}
+          ${isLast ? "\uD83C\uDF89 Complete Session" : "Next Exercise \u2192"}
         </button>
 
         <button class="btn btn-ghost btn-small" id="ps-skip-btn">
@@ -144,17 +151,17 @@ function renderAlreadyDone() {
   `;
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// -- Helpers -----------------------------------------------------------------------
 
 /**
  * Parse a hold time in seconds from a reps/hold string.
  * Returns null if the string describes reps rather than a hold.
  * Examples:
- *   "30s"    → 30
- *   "45 sec" → 45
- *   "2 min"  → 120
- *   "10"     → null  (assume reps)
- *   "10 reps"→ null
+ *   "30s"    -> 30
+ *   "45 sec" -> 45
+ *   "2 min"  -> 120
+ *   "10"     -> null  (assume reps)
+ *   "10 reps"-> null
  */
 function parseHoldSeconds(str) {
   if (!str) return null;
@@ -173,7 +180,7 @@ function parseHoldSeconds(str) {
 
 /**
  * Credits for completing an exercise at this index.
- * Total for the session: min(count × 35, 150).
+ * Total for the session: min(count x 35, 150).
  * Split as evenly as possible across exercises.
  */
 function creditsForIndex(index, total) {
@@ -190,13 +197,13 @@ function formatTime(seconds) {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-// ── Mount ─────────────────────────────────────────────────────────────────────
+// -- Mount -----------------------------------------------------------------------
 
 export function onMount() {
   const exercises = store.get("prescribedExercises") || [];
   const active    = exercises.filter(e => !e.completedToday);
 
-  // Already-done state
+  // Already-done state - literal back to wherever the user came from
   document.getElementById("ps-back-btn")?.addEventListener("click", () => {
     router.back();
   });
@@ -212,7 +219,7 @@ export function onMount() {
     updateTimerDisplay();
   }
 
-  // Exit
+  // Exit - literal back to wherever the user came from
   document.getElementById("ps-exit-btn")?.addEventListener("click", () => {
     if (confirm("Exit session? Progress on this session will be lost.")) {
       cleanupSession();
@@ -244,7 +251,7 @@ export function onMount() {
   });
 }
 
-// ── Timer ─────────────────────────────────────────────────────────────────────
+// -- Timer -----------------------------------------------------------------------
 
 function startTimer() {
   if (timerInterval) clearInterval(timerInterval);
@@ -278,7 +285,7 @@ function resetTimer() {
   timerStarted  = false;
 }
 
-// ── Exercise flow ─────────────────────────────────────────────────────────────
+// -- Exercise flow -----------------------------------------------------------------
 
 function completeExercise(active) {
   const ex      = active[currentIndex];
@@ -325,12 +332,14 @@ function completeSession(active) {
   const total = (store.get("totalCredits") || 0) + creditsEarned;
   store.set("totalCredits", total);
 
-  // Set up completion screen
+  // Stash data for the reflection / completion screens
   store.set("lastWorkoutCredits", creditsEarned);
   store.set("lastWorkoutName",    "Prescribed Session");
 
   cleanupSession();
-  router.navigate("workout-complete");
+  // Route through reflect.js for post-session reflection, then on to
+  // progress - matches gym-programme.js, morning-session.js, workout.js.
+  router.navigate("reflect");
 }
 
 function cleanupSession() {
