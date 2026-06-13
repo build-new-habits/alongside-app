@@ -1,15 +1,18 @@
 /**
  * intention.js - Intention Screen
  *
+ * 13 Jun 2026 v2 - Light-touch fix (S4-4 follow-up): removed the
+ *   lastCheckin.timestamp fallback (ensureCheckinTimestamp()). checkin.js
+ *   v2 now stamps this field directly at submission, which is the
+ *   correct, permanent location per schema.md v1.5/v1.6 Section 2. The
+ *   return-visit trigger below is unaffected - it just reads the field,
+ *   which is now always reliably set by checkin.js.
+ *
  * 12 Jun 2026 v1 (S4-4 P1) - Return-visit trigger added:
  *   If 2+ hours have passed since lastCheckin.timestamp and the user
  *   has not yet done a return-visit update today (returnVisit flag),
  *   a coach prompt offers "Yes, tell the coach" / "No, all good".
  *   "Yes" navigates to checkin-mini. "No" dismisses for the day.
- *
- *   lastCheckin.timestamp fallback: stamped here on first render of the
- *   day if missing (interim measure - see light-touch follow-up note;
- *   checkin.js should write this directly at submission in a future pass).
  *
  * 22 May 2026 v1 - Gym session routes via coach-proposal gym-sub screen
  *                   instead of navigating directly to gym-programme.
@@ -62,21 +65,6 @@ let activityName     = "";     // free text name for class/other
 let returnVisitDismissedThisRender = false; // local-only, avoids re-prompt after "No"
 
 // -- Return-visit detection ---------------------------------------------------
-
-/**
- * Ensure lastCheckin.timestamp is set for today's check-in.
- * Interim fallback - see file header. Only stamps if a check-in has
- * happened today (lastCheckin.date matches today) and timestamp is null.
- */
-function ensureCheckinTimestamp() {
-  const checkin = store.get("lastCheckin") || {};
-  if (!checkin.date) return;
-  const today = new Date().toDateString();
-  if (checkin.date !== today) return;
-  if (checkin.timestamp) return;
-
-  store.set("lastCheckin.timestamp", new Date().toISOString());
-}
 
 /**
  * Returns true if 2+ hours have passed since check-in and the user
@@ -348,8 +336,6 @@ function logAndNavigate() {
 // -- Mount ---------------------------------------------------------------------
 
 export function onMount() {
-  ensureCheckinTimestamp();
-
   const view = document.querySelector(".intention-view");
   if (!view) return;
 
