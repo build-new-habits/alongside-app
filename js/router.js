@@ -1,6 +1,23 @@
 /**
  * router.js - View navigation
  *
+ * 12 Jun 2026 v2 (S4-4 Step 0) - Route pre-registration:
+ *   Added VIEW_NAMES entries for the entire S4 remaining queue, ahead
+ *   of the view files being built (weekly-plan, breathing-session,
+ *   noticing-reflection, journal-entry). loadView() already handles a
+ *   missing view file gracefully (logs an error, returns null,
+ *   navigate() simply renders nothing) - so these entries are safe to
+ *   add now and mean router.js does not need to be revisited when each
+ *   view is built. journal-entry and breathing-session added to
+ *   hideNavViews (focused flows, matching quiet-session/yoga-session
+ *   pattern). weekly-plan and noticing-reflection left nav-visible
+ *   (settings/hub-style screens).
+ *
+ *   NOTE: "noticing" and "noticing-hub" both already exist in
+ *   VIEW_NAMES with similar labels - possible duplicate/legacy entry,
+ *   not resolved here (out of scope for Step 0). Flag for whichever
+ *   session next touches the Noticing Hub.
+ *
  * 30 May 2026 v1 --- Daily flow redesign:
  *   coach-reflection added to VIEW_NAMES.
  *   noticing added to VIEW_NAMES.
@@ -52,6 +69,13 @@ const VIEW_NAMES = {
   "upgrade":                 "Personal Plan",
   "privacy":                 "Privacy and Terms",
   "checkin-mini":            "Quick Check-In",
+
+  // -- S4 remaining queue (pre-registered S4-4 Step 0, 12 Jun 2026) --
+  "weekly-plan":             "My Week",
+  "breathing-session":       "Breathing",
+  "noticing-reflection":     "Noticing...",
+  "journal-entry":           "Journal",
+
   "onboarding/welcome":      "Welcome to Alongside",
   "onboarding/name":         "Your Name",
   "onboarding/about":        "About You",
@@ -149,7 +173,7 @@ export const router = {
     const hideNavViews = [
       "onboarding", "workout", "workout-complete", "checkin",
       "prescribed-session", "morning-session", "quiet-session",
-      "yoga-session"
+      "yoga-session", "breathing-session", "journal-entry"
     ];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
