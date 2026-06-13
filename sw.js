@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 June 2026 v4
+ * Cache version: alongside-v100
+ *
+ * v100 (13 June 2026, S4-WP prep + S4-5)
+ * - schema v1.6: weeklyPlan.days per-day type/activityName/label fields
+ *   added (store.js v3); reflect.js captures moodAfter (replaces
+ *   energyAfter); checkin.js stamps lastCheckin.timestamp at submission
+ *   (light-touch fix), intention.js fallback removed.
+ *
  * 12 June 2026 v3
  * Cache version: alongside-v99
  *
@@ -167,7 +176,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v99";
+const CACHE_NAME = "alongside-v100";
 
 const SHELL_URLS = [
 
