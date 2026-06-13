@@ -1,6 +1,16 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 13 Jun 2026 v1 (S4-5) - moodAfter capture:
+ *   Added a compact mood-after slider (1-10) to the wellbeing section,
+ *   pre-filled from lastCheckin.mood (today's pre-session mood) so it's
+ *   a quick adjustment rather than a cold start - same pattern as the
+ *   sleep pre-fill in checkin.js. Written to activityLog as moodAfter
+ *   (replaces the previously hardcoded energyAfter: null - see schema.md
+ *   v1.5/v1.6 Section 12 migration note). buildSummary() can now also
+ *   reference the mood shift (moodAfter vs lastCheckin.mood) for a more
+ *   specific coach line when the change is notable.
+ *
  * 01 Jun 2026 v1
  *
  * v1 -- Coach acknowledgement improvements:
@@ -24,14 +34,11 @@ import { store } from "../store.js";
 
 export const centered = false;
 
-// -- State -------------------------------------------------------------------------
-
-let stage      = "reflect";   // "reflect" | "summary"
+let stage      = "reflect";
 let feelAnswer = null;
 let painAnswer = null;
 let openText   = "";
-
-// -- Coach question variants -------------------------------------------------------
+let moodAfter  = null;
 
 const QUESTIONS = {
   "gym":            "So, how was that? I want to know what it actually felt like in there.",
@@ -80,9 +87,12 @@ const WELLBEING_INVITATIONS = [
   "What did you notice about yourself today?",
 ];
 
-// -- Summary builder ---------------------------------------------------------------
+const MOOD_LABELS = [
+  "", "Struggling", "Low", "Low", "Okay",
+  "Okay", "Good", "Good", "Great", "Great", "Fantastic"
+];
 
-function buildSummary(entry, feel, pain) {
+function buildSummary(entry, feel, pain, moodAfterValue) {
   const log       = store.get("activityLog") || [];
   const thisWeek  = log.filter(e => {
     const d = new Date(e.date);
@@ -97,12 +107,15 @@ function buildSummary(entry, feel, pain) {
   const name         = entry?.name;
   const duration     = entry?.duration || null;
 
-  // Duration reference -- used in several lines below
   const durRef = duration && duration >= 10
     ? duration + " minutes"
     : null;
 
-  // Pain improving -- always leads if present
+  const moodBefore = store.get("lastCheckin")?.mood || null;
+  const moodLift   = (typeof moodAfterValue === "number" && typeof moodBefore === "number")
+    ? moodAfterValue - moodBefore
+    : null;
+
   if (pain === "better") {
     return "I noticed things felt better today than usual. That is worth paying attention to -- your body is responding.";
   }
@@ -110,7 +123,10 @@ function buildSummary(entry, feel, pain) {
     return "Things were harder today and you showed up anyway. I have noted that. We will factor it in next time.";
   }
 
-  // Session-type specific lines
+  if (moodLift !== null && moodLift >= 3) {
+    return "Your mood has shifted since this morning -- that is exactly the kind of thing worth noticing. I will remember that this works for you.";
+  }
+
   if (type === "rest") {
     return "Rest noted. Your body will use it. See you next time.";
   }
@@ -154,7 +170,6 @@ function buildSummary(entry, feel, pain) {
     }
   }
 
-  // Feel-based general lines
   if (feel === "strong") {
     return sessionCount >= 3
       ? "That is " + sessionCount + " sessions this week. You are building something real here."
@@ -164,15 +179,12 @@ function buildSummary(entry, feel, pain) {
     return "Hard sessions count just as much as easy ones. You finished it. That is what matters.";
   }
 
-  // Session count line
   if (sessionCount >= 3) {
     return "That is " + sessionCount + " sessions this week. Consistency is exactly how this works.";
   }
 
   return "Done. I have noted how today went and I will use it next time.";
 }
-
-// -- Render -----------------------------------------------------------------------
 
 export function render() {
   const entry      = store.get("currentActivityEntry") || {};
@@ -184,13 +196,12 @@ export function render() {
   const question   = QUESTIONS[type] || QUESTIONS["other"];
   const feelOpts   = FEEL_OPTIONS[type] || FEEL_OPTIONS["coach-session"];
 
-  // Wellbeing invitation -- rotates by day
   const dayIdx     = new Date().getDay();
   const weekNum    = store.get("gymProgrammeWeek") || 1;
   const invitation = WELLBEING_INVITATIONS[(dayIdx + weekNum) % WELLBEING_INVITATIONS.length];
 
   if (stage === "summary") {
-    const summary = buildSummary(entry, feelAnswer, painAnswer);
+    const summary = buildSummary(entry, feelAnswer, painAnswer, moodAfter);
     return `
       <div class="view reflect-view">
         <div class="view-header">
@@ -214,13 +225,11 @@ export function render() {
         <h1>${name ? name : "How was that?"}</h1>
       </div>
 
-      <!-- Coach question -->
       <div class="card card-coach reflect-coach-card">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">${question}</p>
       </div>
 
-      <!-- Feel chips -->
       <div class="reflect-section">
         <p class="reflect-section-label">How did it feel?</p>
         <div class="reflect-chips" role="group" aria-label="How it felt">
@@ -234,7 +243,6 @@ export function render() {
         </div>
       </div>
 
-      <!-- Pain check if conditions present -->
       ${hasConds ? `
         <div class="reflect-section">
           <p class="reflect-section-label">Any pain or discomfort?</p>
@@ -250,7 +258,23 @@ export function render() {
         </div>
       ` : ""}
 
-      <!-- Wellbeing invitation -->
+      <div class="reflect-section">
+        <p class="reflect-section-label">How's your mood right now?</p>
+        <div class="reflect-mood-slider-block">
+          <div class="reflect-mood-display" aria-live="polite" aria-atomic="true">
+            <span class="reflect-mood-number" id="reflect-mood-number">${moodAfter}</span>
+            <span class="reflect-mood-label" id="reflect-mood-label">${MOOD_LABELS[moodAfter] || "Okay"}</span>
+          </div>
+          <input type="range" id="reflect-mood-slider" class="checkin-slider"
+                 min="1" max="10" value="${moodAfter}"
+                 aria-label="Mood right now, 1 struggling to 10 fantastic"
+                 aria-valuetext="${MOOD_LABELS[moodAfter] || "Okay"}">
+          <div class="checkin-slider-ends" aria-hidden="true">
+            <span>Struggling</span><span>Fantastic</span>
+          </div>
+        </div>
+      </div>
+
       <div class="reflect-section">
         <div class="card card-coach reflect-wellbeing-card">
           <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
@@ -263,7 +287,6 @@ export function render() {
                   aria-label="Your reflection">${openText}</textarea>
       </div>
 
-      <!-- Done -->
       <button class="btn btn-primary btn-large btn-full" id="reflect-done-btn"
               style="margin-top: var(--space-4);">
         Done
@@ -277,20 +300,32 @@ export function render() {
   `;
 }
 
-// -- Mount -------------------------------------------------------------------------
-
 export function onMount() {
   stage      = "reflect";
   feelAnswer = null;
   painAnswer = null;
   openText   = "";
 
+  const checkin = store.get("lastCheckin") || {};
+  moodAfter = (typeof checkin.mood === "number") ? checkin.mood : 5;
+
   const view = document.querySelector(".reflect-view");
   if (!view) return;
 
+  const moodSlider = document.getElementById("reflect-mood-slider");
+  if (moodSlider) {
+    moodSlider.addEventListener("input", e => {
+      moodAfter = parseInt(e.target.value);
+      const numEl = document.getElementById("reflect-mood-number");
+      const labEl = document.getElementById("reflect-mood-label");
+      if (numEl) numEl.textContent = moodAfter;
+      if (labEl) labEl.textContent = MOOD_LABELS[moodAfter] || "Okay";
+      moodSlider.setAttribute("aria-valuetext", MOOD_LABELS[moodAfter] || "Okay");
+    });
+  }
+
   view.addEventListener("click", e => {
 
-    // Feel chip
     const feelChip = e.target.closest("[data-feel]");
     if (feelChip) {
       feelAnswer = feelChip.dataset.feel;
@@ -302,7 +337,6 @@ export function onMount() {
       return;
     }
 
-    // Pain chip
     const painChip = e.target.closest("[data-pain]");
     if (painChip) {
       painAnswer = painChip.dataset.pain;
@@ -314,15 +348,12 @@ export function onMount() {
       return;
     }
 
-    // Done
     const doneBtn = e.target.closest("#reflect-done-btn");
     if (doneBtn) { saveAndSummarise(); return; }
 
-    // Skip
     const skipBtn = e.target.closest("#reflect-skip-btn");
     if (skipBtn) { saveAndSummarise(); return; }
 
-    // Finish (summary screen)
     const finishBtn = e.target.closest("#reflect-finish-btn");
     if (finishBtn) {
       router.navigate("progress");
@@ -334,7 +365,6 @@ function saveAndSummarise() {
   const textarea = document.getElementById("reflect-open-text");
   openText = textarea?.value.trim() || "";
 
-  // Write reflect data back to the current activity log entry
   const log = store.get("activityLog") || [];
   const entry = store.get("currentActivityEntry");
   if (entry && log.length > 0) {
@@ -345,9 +375,10 @@ function saveAndSummarise() {
         feel:        feelAnswer,
         painChange:  painAnswer,
         note:        openText || null,
-        energyAfter: null,
+        moodAfter:   moodAfter,
         completedAt: new Date().toISOString(),
       };
+      delete log[idx].energyAfter;
       store.set("activityLog", log);
     }
   }
