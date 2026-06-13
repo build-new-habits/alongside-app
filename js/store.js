@@ -1,17 +1,27 @@
 /**
  * store.js - Data persistence layer
  *
- * 12 Jun 2026 v2 — S4-4 addition: lastCheckin.timestamp (ISO string | null).
+ * 13 Jun 2026 v3 - Weekly Plan shape finalised (S4-WP prep, schema 1.6).
+ *   Per-day additions to weeklyPlan.days (additive, no renames): type
+ *   ('workout'|'rest'|'recovery'|'event'|'open'), activityName (event
+ *   days), label (any day, optional nickname). durationMins now also
+ *   used for event days as an estimated duration. mergeWithDefaults()
+ *   updated to fill these new per-day fields for users with a
+ *   pre-v1.6 saved plan. See schema.md Section 13 for full detail and
+ *   the deferred-from-21-May-spec notes (notifications, separate
+ *   enable/setup tracking).
+ *
+ * 12 Jun 2026 v2 - S4-4 addition: lastCheckin.timestamp (ISO string | null).
  *   Anchors the 2-hour return-visit trigger in intention.js (checkin-mini
  *   wiring). Stamped by intention.js on first render of the day as an
  *   interim measure until checkin.js writes it directly at submission
- *   (see light-touch follow-up note). Schema bumped to 1.5 — see schema.md.
+ *   (see light-touch follow-up note). Schema bumped to 1.5 - see schema.md.
  *
- * 12 Jun 2026 v1 — Consolidated schema pass. Adds all fields required for:
+ * 12 Jun 2026 v1 - Consolidated schema pass. Adds all fields required for:
  *   - S4-5 (moodAfter replaces energyAfter on activityLog entries)
  *   - S4-6 (isEvent, eventName on activityLog entries)
- *   - S4-WP (Weekly Plan — weeklyPlan object)
- *   - S4-8 (event reminders — handled via activityLog entries + sw.js, no new top-level field)
+ *   - S4-WP (Weekly Plan - weeklyPlan object)
+ *   - S4-8 (event reminders - handled via activityLog entries + sw.js, no new top-level field)
  *   - Wellbeing & Long-Horizon spec Section 5 (10 Jun 2026 v2):
  *       lastCheckin.feelingWord/feelingQuadrant/unwell, checkinHistory entry additions,
  *       safeguarding, weeklyReview, weightLog, waterLog, waterSettings, coachOffers,
@@ -124,9 +134,27 @@ export const store = {
       lastProposalType:    saved.lastProposalType || null,
       lastProposalDate:    saved.lastProposalDate || null,
 
-      // ── S4-WP — Weekly Plan ──────────────────────────────────
+      // ── S4-WP - Weekly Plan (v1.6 per-day field additions) ────
+      // Each saved day is merged against the default day shape so
+      // existing users who saved a plan before v1.6 (type,
+      // activityName, label added) get those fields filled with
+      // their defaults rather than being undefined.
       weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
-                    ? { ...defaults.weeklyPlan, ...saved.weeklyPlan }
+                    ? {
+                        ...defaults.weeklyPlan,
+                        ...saved.weeklyPlan,
+                        days: (saved.weeklyPlan.days && typeof saved.weeklyPlan.days === 'object')
+                                ? Object.fromEntries(
+                                    Object.keys(defaults.weeklyPlan.days).map(day => [
+                                      day,
+                                      {
+                                        ...defaults.weeklyPlan.days[day],
+                                        ...(saved.weeklyPlan.days[day] || {})
+                                      }
+                                    ])
+                                  )
+                                : defaults.weeklyPlan.days
+                      }
                     : defaults.weeklyPlan,
 
       // ── Wellbeing & Long-Horizon — lastCheckin additions ─────
@@ -390,32 +418,41 @@ export const store = {
         inputs:   {}
       },
 
-      // ── WEEKLY PLAN (S4-WP) ───────────────────────────────────
+      // ── WEEKLY PLAN (S4-WP, finalised v1.6) ──────────────────
       // User's intent-only plan for the week, set in My Week (Settings).
-      // The coach generates the actual session on the day using
-      // sessionType + durationMins; days not set fall back to normal
-      // coach-proposal rules.
+      // "type" drives the coach's posture for the day; sessionType +
+      // durationMins feed the session builder on workout days. Days
+      // with type "open" or enabled: false fall back to normal
+      // coach-proposal rules - the plan never locks the user in, and
+      // daily adaptation (energy, pain, burnout) always takes
+      // precedence over the plan on the day.
       //
-      // Schema:
-      //   days: {
-      //     monday..sunday: {
-      //       sessionType:  string | null  — 'gym' | 'rest' | 'recovery' | 'class' | null
-      //       durationMins: number | null
-      //       location:     string | null  — 'home' | 'gym' | 'outside' | null
-      //       classFocus:   array           — up to 3 session focuses (gym days)
-      //       enabled:      boolean         — on/off toggle for the day
-      //     }
-      //   }
+      // Schema (per day):
+      //   type:         string         — 'workout' | 'rest' | 'recovery' | 'event' | 'open'
+      //   sessionType:  string | null  — session builder type id, e.g. 'lower'/'upper'/'full'. workout only.
+      //   durationMins: number | null  — target (workout) or estimated (event) duration in minutes
+      //   location:     string | null  — 'home' | 'gym' | 'outside' | null — overrides check-in sessionLocation for the day
+      //   classFocus:   array           — up to 3 session focuses, workout only
+      //   activityName: string | null  — event only, e.g. "Tennis", "5-a-side football"
+      //   label:        string | null  — optional user-facing nickname for any day, e.g. "Leg day"
+      //   enabled:      boolean         — on/off toggle for the day
+      //
       //   updatedAt: string | null — ISO timestamp, last edited
+      //
+      // Deferred from 21 May 2026 spec (not added): per-day notifications
+      // (notificationEnabled/notificationTime - would duplicate
+      // checkInNotification/event-reminder work), and a separate
+      // weeklyPlanEnabled/weeklyPlanSetAt/weeklyPlanPromptShown layer
+      // (updatedAt + per-day enabled already cover this).
       weeklyPlan: {
         days: {
-          monday:    { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
-          tuesday:   { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
-          wednesday: { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
-          thursday:  { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
-          friday:    { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
-          saturday:  { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false },
-          sunday:    { sessionType: null, durationMins: null, location: null, classFocus: [], enabled: false }
+          monday:    { type: "open", sessionType: null, durationMins: null, location: null, classFocus: [], activityName: null, label: null, enabled: false },
+          tuesday:   { type: "open", sessionType: null, durationMins: null, location: null, classFocus: [], activityName: null, label: null, enabled: false },
+          wednesday: { type: "open", sessionType: null, durationMins: null, location: null, classFocus: [], activityName: null, label: null, enabled: false },
+          thursday:  { type: "open", sessionType: null, durationMins: null, location: null, classFocus: [], activityName: null, label: null, enabled: false },
+          friday:    { type: "open", sessionType: null, durationMins: null, location: null, classFocus: [], activityName: null, label: null, enabled: false },
+          saturday:  { type: "open", sessionType: null, durationMins: null, location: null, classFocus: [], activityName: null, label: null, enabled: false },
+          sunday:    { type: "open", sessionType: null, durationMins: null, location: null, classFocus: [], activityName: null, label: null, enabled: false }
         },
         updatedAt: null
       },
