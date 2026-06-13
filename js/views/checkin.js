@@ -1,6 +1,19 @@
 /**
  * checkin.js - Daily Check-In View
  *
+ * 13 Jun 2026 v2 - Light-touch fix (S4-4 follow-up):
+ *   lastCheckin.timestamp is now stamped here, at the actual point of
+ *   check-in submission (submitCheckin() and submitCheckinToPrescribed()),
+ *   immediately after checkinData.saveCheckin(). This is the correct,
+ *   permanent location for this field per schema.md v1.5/v1.6 Section 2.
+ *
+ *   The interim fallback in intention.js (which stamped this field on
+ *   first render of the day if missing) is now removable - see
+ *   intention.js for the corresponding removal, scheduled for the next
+ *   session that touches that file. Until intention.js is updated, its
+ *   fallback is harmless (it only stamps if timestamp is still null,
+ *   which will no longer happen for check-ins submitted via this file).
+ *
  * 01 Jun 2026 v1
  *
  * v1 -- Sleep pre-fill:
@@ -91,10 +104,8 @@ export function render() {
   const existing = checkinData.getTodaysCheckin();
 
   if (existing) {
-    // Returning to update today's check-in -- restore exactly what was saved
     currentCheckin = { ...currentCheckin, ...existing };
   } else {
-    // First check-in of the day -- pre-fill sleep from yesterday if available
     const history = checkinData.getHistory(1) || [];
     const yesterday = history[0] || null;
     if (yesterday && typeof yesterday.sleepHours === "number") {
@@ -222,7 +233,6 @@ function renderMoodStep(header) {
 function renderSleepStep(header) {
   const bridge = getCoachBridge(1, currentCheckin.mood);
 
-  // Check if values were pre-filled from yesterday
   const existing  = checkinData.getTodaysCheckin();
   const history   = checkinData.getHistory(1) || [];
   const prefilled = !existing && history[0]?.sleepHours;
@@ -495,6 +505,17 @@ function rerenderCheckin() {
   }
 }
 
+/**
+ * Stamp lastCheckin.timestamp with the current moment. Called from both
+ * submit paths immediately after checkinData.saveCheckin(), so the
+ * timestamp always reflects the actual submission time regardless of
+ * which button was used. See schema.md v1.5/v1.6 Section 2 and the S4-4
+ * light-touch follow-up note.
+ */
+function stampCheckinTimestamp() {
+  store.set("lastCheckin.timestamp", new Date().toISOString());
+}
+
 function submitCheckin() {
   const notesEl = document.getElementById("checkin-notes");
   if (notesEl) currentCheckin.notes = notesEl.value;
@@ -505,6 +526,7 @@ function submitCheckin() {
   store.updateConditionPainScores({ ...currentCheckin.conditionLevels });
   store.set("availableTime", selectedAvailableTime);
   checkinData.saveCheckin(currentCheckin);
+  stampCheckinTimestamp();
 
   const intensity = checkinData.getSuggestedIntensity(currentCheckin);
   store.set("todayIntensity", intensity);
@@ -522,6 +544,7 @@ function submitCheckinToPrescribed() {
   store.updateConditionPainScores({ ...currentCheckin.conditionLevels });
   store.set("availableTime", selectedAvailableTime);
   checkinData.saveCheckin(currentCheckin);
+  stampCheckinTimestamp();
 
   const intensity = checkinData.getSuggestedIntensity(currentCheckin);
   store.set("todayIntensity", intensity);
