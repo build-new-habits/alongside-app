@@ -1,6 +1,22 @@
 /**
  * settings.js - Settings view
  *
+ * 14 Jun 2026 v2 --- My Week tab simplified (S4-WP):
+ *   The full My Week builder (day grid, day type picker, focus chips,
+ *   duration, save) has moved to the new weekly-plan.js view, built
+ *   against the finalised v1.6 weeklyPlan.days shape (store.js v3).
+ *   The previous inline implementation here was built against an
+ *   earlier, pre-v1.6 draft schema (flat weeklyPlan[day], sessionFocus[],
+ *   weeklyPlanEnabled/weeklyPlanSetAt -- none of which exist in store.js
+ *   v3) and has been removed in full: DAYS, DAY_LABELS, DAY_TYPES,
+ *   FOCUS_OPTIONS, DURATION_OPTIONS, weeklyPlanDraft, configuringDay,
+ *   initDraft(), isPremium(), renderDayRow(), renderDayConfig(),
+ *   formatRelativeDate(), rerenderMyWeek(), and all related wirePanel
+ *   handlers.
+ *   The "My Week" tab is now a single entry card that navigates to the
+ *   "weekly-plan" route (pre-registered in router.js v2). Tier gating
+ *   (Free vs Personal/Athlete) is handled inside weekly-plan.js itself.
+ *
  * 30 May 2026 v1 --- My Week tab redesign:
  *   Three-column table layout (Day / Focus / per-day toggle).
  *   Inline config panel expands beneath tapped row, pushing days below down.
@@ -61,95 +77,6 @@ const MOVEMENT_IDENTITIES = [
   { id: "classes",  label: "Classes",         icon: "&#127973;" },
   { id: "mixed",    label: "A mix of things", icon: "&#10024;" },
 ];
-
-// -- Weekly plan constants ----------------------------------------------------
-const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-
-const DAY_LABELS = {
-  monday: "Monday", tuesday: "Tuesday", wednesday: "Wednesday",
-  thursday: "Thursday", friday: "Friday", saturday: "Saturday", sunday: "Sunday"
-};
-
-const DAY_TYPES = [
-  { id: "open",     label: "No plan",        desc: "Coach decides based on check-in",              icon: "&#8212;" },
-  { id: "gym",      label: "Gym session",    desc: "Strength, cardio, or full body",               icon: "&#127947;" },
-  { id: "run",      label: "Run",            desc: "Easy, intervals, long slow, or hills",         icon: "&#127939;" },
-  { id: "rest",     label: "Rest day",       desc: "No movement planned",                          icon: "&#128564;" },
-  { id: "recovery", label: "Recovery",       desc: "Light movement -- walk, swim, yoga",           icon: "&#127807;" },
-  { id: "class",    label: "Class / match",  desc: "Yoga, Body Balance, tennis, sport, or similar", icon: "&#129368;" },
-];
-
-// Focus options per day type -- multi-select, all types except rest get options
-const FOCUS_OPTIONS = {
-  "gym": [
-    { id: "upper",    label: "Upper Body" },
-    { id: "lower",    label: "Lower Body" },
-    { id: "full",     label: "Full Body" },
-    { id: "core",     label: "Core & Stability" },
-    { id: "cardio",   label: "Cardio" },
-    { id: "hiit",     label: "HIIT" },
-    { id: "mobility", label: "Mobility" },
-  ],
-  "run": [
-    { id: "easy",      label: "Easy run" },
-    { id: "intervals", label: "Intervals" },
-    { id: "long",      label: "Long slow run" },
-    { id: "hills",     label: "Hills" },
-  ],
-  "recovery": [
-    { id: "walk",        label: "Walk" },
-    { id: "yoga",        label: "Yoga" },
-    { id: "mobility",    label: "Mobility" },
-    { id: "mindfulness", label: "Mindfulness" },
-    { id: "swim",        label: "Swim" },
-  ],
-  "class": [
-    { id: "strength",    label: "Strength" },
-    { id: "cardio",      label: "Cardio" },
-    { id: "flexibility", label: "Flexibility" },
-    { id: "mindfulness", label: "Mindfulness" },
-    { id: "technique",   label: "Technique" },
-    { id: "endurance",   label: "Endurance" },
-    { id: "match",       label: "Match / competition" },
-  ],
-  "open": [
-    { id: "strength",    label: "Strength" },
-    { id: "cardio",      label: "Cardio" },
-    { id: "flexibility", label: "Flexibility" },
-    { id: "mindfulness", label: "Mindfulness" },
-    { id: "endurance",   label: "Endurance" },
-  ],
-  "rest": [],
-};
-
-const DURATION_OPTIONS = [20, 30, 45, 60, 75, 90];
-
-// Weekly plan local edit state (not saved until "Save my week")
-let weeklyPlanDraft = null;
-let configuringDay  = null;
-
-function initDraft() {
-  const saved = store.get("weeklyPlan") || {};
-  const defaultSlot = {
-    type: "open", sessionFocus: [], durationMins: null,
-    label: null, enabled: true, activityName: null
-  };
-  const draft = {};
-  DAYS.forEach(day => {
-    draft[day] = { ...defaultSlot, ...(saved[day] || {}) };
-    // Migrate legacy sessionType -> sessionFocus
-    if (!Array.isArray(draft[day].sessionFocus)) {
-      draft[day].sessionFocus = draft[day].sessionType ? [draft[day].sessionType] : [];
-    }
-    if (typeof draft[day].enabled !== "boolean") draft[day].enabled = true;
-  });
-  weeklyPlanDraft = draft;
-}
-
-function isPremium() {
-  if (typeof store.isPremium === "function") return store.isPremium();
-  return store.get("isPremium") || store.get("tier") === "personal" || store.get("tier") === "athlete" || false;
-}
 
 // -- Equipment tab state ------------------------------------------------------
 let equipmentScreen = "facilities";
@@ -630,229 +557,31 @@ function renderLibraryTab() {
   `;
 }
 
-// -- My Week tab --------------------------------------------------------------
+// -- My Week tab ----------------------------------------------------------------
+// Simplified entry card -- the full builder lives in weekly-plan.js
+// (route "weekly-plan", pre-registered in router.js v2). Tier gating is
+// handled there.
 
 function renderMyWeekTab() {
-  if (!weeklyPlanDraft) initDraft();
-  const premium = isPremium();
-  const enabled = store.get("weeklyPlanEnabled") || false;
-
   return `
     <section aria-labelledby="myweek-heading">
       <h2 id="myweek-heading" class="section-heading">My Week</h2>
 
-      ${!premium ? `
-        <div class="card settings-coach-card" style="margin-bottom: var(--space-4);">
-          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-          <p class="text-sm">
-            Did you know you can plan your whole week in advance? I will use your
-            plan as a starting point each day and adapt around how you are feeling.
-          </p>
-        </div>
-        <div class="card" style="text-align:center; padding:var(--space-6);">
-          <p class="text-secondary" style="margin-bottom:var(--space-3);">
-            Weekly planning is available on the Personal plan.
-          </p>
-          <button class="btn btn-primary" id="upgrade-prompt-btn"
-                  aria-label="Upgrade to Personal plan">
-            Upgrade to Personal
-          </button>
-        </div>
-      ` : `
-        <p class="text-sm text-muted" style="margin-bottom: var(--space-4);">
-          Set a movement type for each day. I will use this as my starting point
-          and adapt around your check-in each morning.
+      <div class="card settings-coach-card" style="margin-bottom: var(--space-4);">
+        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="text-sm">
+          Plan what each day of your week looks like -- workouts, rest, recovery,
+          classes, or events. I will use it as my starting point each day and
+          adapt around how you are feeling when the day comes.
         </p>
+      </div>
 
-        <!-- Master toggle -->
-        <div class="card" style="margin-bottom:var(--space-4);">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <p class="text-sm" style="font-weight:var(--font-semibold);">
-                Use my weekly plan
-              </p>
-              <p class="text-xs text-muted">
-                ${enabled ? "Plan is active -- I am reading it each day" : "Off -- I will decide fresh each day"}
-              </p>
-            </div>
-            <label class="toggle-switch" aria-label="Enable weekly plan">
-              <input type="checkbox" id="weekly-plan-toggle" role="switch"
-                     aria-checked="${enabled}" ${enabled ? "checked" : ""}>
-              <span class="toggle-track" aria-hidden="true"></span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Three-column table -->
-        <div class="weekly-plan-table" role="list" aria-label="Weekly plan days">
-          <div class="weekly-plan-table-header" aria-hidden="true">
-            <span>Day</span>
-            <span>Focus</span>
-            <span>On</span>
-          </div>
-          ${DAYS.map(day => renderDayRow(day)).join("")}
-        </div>
-
-        <button class="btn btn-primary btn-full btn-large" id="save-week-btn"
-                style="margin-top:var(--space-5);"
-                aria-label="Save weekly plan">
-          Save my week
-        </button>
-
-        ${store.get("weeklyPlanSetAt") ? `
-          <p class="text-xs text-muted" style="text-align:center;margin-top:var(--space-2);">
-            Last saved ${formatRelativeDate(store.get("weeklyPlanSetAt"))}
-          </p>
-        ` : ""}
-      `}
+      <button class="btn btn-primary btn-full btn-large" id="open-myweek-btn"
+              aria-label="Open My Week">
+        Open My Week &rarr;
+      </button>
     </section>
   `;
-}
-
-// -- Day row (three-column table) ---------------------------------------------
-
-function renderDayRow(day) {
-  const slot         = weeklyPlanDraft?.[day] || { type: "open", enabled: true, sessionFocus: [] };
-  const dayEnabled   = slot.enabled !== false;
-  const isConfiguring = configuringDay === day;
-  const focusOptions = FOCUS_OPTIONS[slot.type] || [];
-  const focusLabels  = (slot.sessionFocus || [])
-    .map(id => focusOptions.find(f => f.id === id)?.label)
-    .filter(Boolean);
-
-  const focusSummary = focusLabels.length > 0
-    ? focusLabels.map(l => `<span class="week-focus-line">${l}</span>`).join("")
-    : `<span class="week-focus-none">${slot.type === "rest" ? "Rest" : "Any"}</span>`;
-
-  return `
-    <div class="weekly-plan-row-wrap" role="listitem">
-      <div class="weekly-plan-row ${!dayEnabled ? "weekly-plan-row--off" : ""} ${isConfiguring ? "weekly-plan-row--open" : ""}">
-
-        <!-- Col 1: Day name -->
-        <button class="weekly-plan-row-day"
-                data-day="${day}"
-                aria-expanded="${isConfiguring}"
-                aria-label="${DAY_LABELS[day]}: tap to configure">
-          <span class="week-day-name">${DAY_LABELS[day]}</span>
-        </button>
-
-        <!-- Col 2: Focus summary -->
-        <button class="weekly-plan-row-focus"
-                data-day="${day}"
-                aria-label="Focus: ${focusLabels.join(", ") || "any"}. Tap to change.">
-          <span class="week-focus-stack">${focusSummary}</span>
-        </button>
-
-        <!-- Col 3: Per-day toggle -->
-        <div class="weekly-plan-row-toggle">
-          <label class="toggle-switch toggle-switch--sm"
-                 aria-label="${dayEnabled ? "Disable" : "Enable"} ${DAY_LABELS[day]}">
-            <input type="checkbox"
-                   class="weekly-day-toggle"
-                   data-day="${day}"
-                   role="switch"
-                   aria-checked="${dayEnabled}"
-                   ${dayEnabled ? "checked" : ""}>
-            <span class="toggle-track" aria-hidden="true"></span>
-          </label>
-        </div>
-
-      </div>
-      ${isConfiguring ? renderDayConfig(day) : ""}
-    </div>
-  `;
-}
-
-// -- Day config panel (opens inline below the row) ----------------------------
-
-function renderDayConfig(day) {
-  const slot         = weeklyPlanDraft?.[day] || { type: "open", sessionFocus: [], enabled: true };
-  const currentFocus = slot.sessionFocus || [];
-  const focusOptions = FOCUS_OPTIONS[slot.type] || [];
-
-  return `
-    <div class="weekly-plan-config-panel" id="day-config-panel-${day}"
-         aria-label="Configure ${DAY_LABELS[day]}">
-
-      <p class="config-section-label">What is planned?</p>
-      <div class="day-type-list" role="group" aria-label="Day type">
-        ${DAY_TYPES.map(t => `
-          <button class="day-type-btn ${slot.type === t.id ? "day-type-btn--selected" : ""}"
-                  data-day-type="${t.id}"
-                  aria-pressed="${slot.type === t.id}">
-            <div class="day-type-btn-text">
-              <span class="day-type-btn-label">${t.label}</span>
-              <span class="day-type-btn-desc">${t.desc}</span>
-            </div>
-            ${slot.type === t.id ? `<span class="day-type-btn-check" aria-hidden="true">&#10003;</span>` : ""}
-          </button>
-        `).join("")}
-      </div>
-
-      ${focusOptions.length > 0 ? `
-        <p class="config-section-label" style="margin-top:var(--space-4);">
-          Focus
-          <span class="config-label-hint">choose as many as you like</span>
-        </p>
-        <div class="focus-chip-grid" role="group" aria-label="Session focus">
-          ${focusOptions.map(f => `
-            <button class="focus-chip ${currentFocus.includes(f.id) ? "focus-chip--selected" : ""}"
-                    data-focus="${f.id}"
-                    aria-pressed="${currentFocus.includes(f.id)}">
-              ${f.label}
-            </button>
-          `).join("")}
-        </div>
-      ` : ""}
-
-      ${slot.type !== "rest" ? `
-        <p class="config-section-label" style="margin-top:var(--space-4);">Target duration</p>
-        <div class="focus-chip-grid" role="group" aria-label="Session duration">
-          <button class="focus-chip ${!slot.durationMins ? "focus-chip--selected" : ""}"
-                  data-duration="null" aria-pressed="${!slot.durationMins}">
-            Coach decides
-          </button>
-          ${DURATION_OPTIONS.map(d => `
-            <button class="focus-chip ${slot.durationMins === d ? "focus-chip--selected" : ""}"
-                    data-duration="${d}" aria-pressed="${slot.durationMins === d}">
-              ${d} min
-            </button>
-          `).join("")}
-        </div>
-      ` : ""}
-
-      ${slot.type === "class" ? `
-        <p class="config-section-label" style="margin-top:var(--space-4);">
-          Activity name
-          <span class="config-label-hint">optional</span>
-        </p>
-        <input type="text" id="class-activity-name" class="form-input"
-               placeholder="e.g. Body Balance, Tennis, Aqua Aerobics"
-               value="${slot.activityName || ""}"
-               aria-label="Class or activity name">
-      ` : ""}
-
-      <button class="btn btn-primary btn-full" id="day-config-done-btn"
-              style="margin-top:var(--space-4);"
-              aria-label="Done configuring ${DAY_LABELS[day]}">
-        Done
-      </button>
-    </div>
-  `;
-}
-
-function formatRelativeDate(isoString) {
-  if (!isoString) return "";
-  try {
-    const d    = new Date(isoString);
-    const now  = new Date();
-    const diff = Math.floor((now - d) / (1000 * 60 * 60 * 24));
-    if (diff === 0) return "today";
-    if (diff === 1) return "yesterday";
-    return diff + " days ago";
-  } catch (e) {
-    return "";
-  }
 }
 
 // -- Movement identity --------------------------------------------------------
@@ -979,7 +708,6 @@ function formatGender(gender) {
 function switchTab(tabName) {
   activeTab      = tabName;
   editingField   = null;
-  configuringDay = null;
   document.querySelectorAll(".settings-tab").forEach(btn => {
     const isActive = btn.dataset.tab === tabName;
     btn.classList.toggle("active", isActive);
@@ -1005,11 +733,6 @@ function rerenderEquipment() {
   wrapper.innerHTML = equipmentScreen === "facilities" ? renderEquipmentTab() : renderFacilitySubScreen(equipmentScreen);
   const newPanel = wrapper.querySelector("section");
   if (newPanel) { panel.replaceWith(newPanel); onMount(); }
-}
-
-function rerenderMyWeek() {
-  const panel = document.getElementById("settings-tab-panel");
-  if (panel) { panel.innerHTML = renderMyWeekTab(); wirePanel(); }
 }
 
 // -- Dev tier panel -----------------------------------------------------------
@@ -1240,117 +963,9 @@ function wirePanel() {
     router.navigate("library");
   });
 
-  // My Week: master toggle
-  document.getElementById("weekly-plan-toggle")?.addEventListener("change", e => {
-    store.set("weeklyPlanEnabled", e.target.checked);
-    rerenderMyWeek();
-  });
-
-  // My Week: row tap to open/close config (day name cell or focus cell)
-  document.querySelectorAll(".weekly-plan-row-day, .weekly-plan-row-focus").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const day = btn.dataset.day;
-      configuringDay = configuringDay === day ? null : day;
-      rerenderMyWeek();
-    });
-  });
-
-  // My Week: per-day enabled toggle
-  document.querySelectorAll(".weekly-day-toggle").forEach(input => {
-    input.addEventListener("change", () => {
-      const day = input.dataset.day;
-      if (!day || !weeklyPlanDraft[day]) return;
-      weeklyPlanDraft[day].enabled = input.checked;
-      rerenderMyWeek();
-    });
-  });
-
-  // My Week: day type selection
-  document.querySelectorAll("[data-day-type]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (!configuringDay) return;
-      const type = btn.dataset.dayType;
-      weeklyPlanDraft[configuringDay] = {
-        ...weeklyPlanDraft[configuringDay],
-        type,
-        sessionFocus: [],
-        durationMins: type === "rest" ? null : (weeklyPlanDraft[configuringDay].durationMins || null),
-        activityName: type === "class" ? (weeklyPlanDraft[configuringDay].activityName || null) : null,
-        label: null,
-      };
-      rerenderMyWeek();
-    });
-  });
-
-  // My Week: focus chips -- multi-select, update without full rerender
-  document.querySelectorAll("[data-focus]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (!configuringDay) return;
-      const id      = btn.dataset.focus;
-      const current = weeklyPlanDraft[configuringDay].sessionFocus || [];
-      const updated = current.includes(id) ? current.filter(x => x !== id) : [...current, id];
-      weeklyPlanDraft[configuringDay].sessionFocus = updated;
-      btn.classList.toggle("focus-chip--selected", updated.includes(id));
-      btn.setAttribute("aria-pressed", updated.includes(id));
-    });
-  });
-
-  // My Week: duration chips
-  document.querySelectorAll("[data-duration]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (!configuringDay) return;
-      const raw = btn.dataset.duration;
-      weeklyPlanDraft[configuringDay].durationMins = raw === "null" ? null : parseInt(raw);
-      document.querySelectorAll("[data-duration]").forEach(b => {
-        const sel = b.dataset.duration === raw;
-        b.classList.toggle("focus-chip--selected", sel);
-        b.setAttribute("aria-pressed", sel);
-      });
-    });
-  });
-
-  // My Week: class activity name
-  document.getElementById("class-activity-name")?.addEventListener("blur", e => {
-    if (!configuringDay) return;
-    weeklyPlanDraft[configuringDay].activityName = e.target.value.trim() || null;
-  });
-
-  // My Week: day config Done
-  document.getElementById("day-config-done-btn")?.addEventListener("click", () => {
-    const nameInput = document.getElementById("class-activity-name");
-    if (nameInput && configuringDay) {
-      weeklyPlanDraft[configuringDay].activityName = nameInput.value.trim() || null;
-    }
-    configuringDay = null;
-    rerenderMyWeek();
-  });
-
-  // My Week: save
-  document.getElementById("save-week-btn")?.addEventListener("click", () => {
-    const nameInput = document.getElementById("class-activity-name");
-    if (nameInput && configuringDay) {
-      weeklyPlanDraft[configuringDay].activityName = nameInput.value.trim() || null;
-    }
-    store.set("weeklyPlan", { ...weeklyPlanDraft });
-    store.set("weeklyPlanSetAt", new Date().toISOString());
-    if (!store.get("weeklyPlanEnabled")) store.set("weeklyPlanEnabled", true);
-    configuringDay = null;
-    rerenderMyWeek();
-    const panel = document.getElementById("settings-tab-panel");
-    if (panel) {
-      const msg = document.createElement("div");
-      msg.setAttribute("role", "status");
-      msg.setAttribute("aria-live", "polite");
-      msg.style.cssText = "text-align:center;padding:var(--space-3);color:var(--color-primary);font-size:var(--text-sm);";
-      msg.textContent = "Your week is saved. I'll use this as my starting point each day.";
-      panel.appendChild(msg);
-      setTimeout(() => msg.remove(), 3000);
-    }
-  });
-
-  // My Week: upgrade prompt
-  document.getElementById("upgrade-prompt-btn")?.addEventListener("click", () => {
-    router.navigate("upgrade");
+  // My Week: open the My Week view
+  document.getElementById("open-myweek-btn")?.addEventListener("click", () => {
+    router.navigate("weekly-plan");
   });
 }
 
@@ -1475,8 +1090,6 @@ export function onMount() {
       store.reset();
       activeTab       = "profile";
       editingField    = null;
-      configuringDay  = null;
-      weeklyPlanDraft = null;
       document.getElementById("bottom-nav")?.classList.add("hidden");
       router.navigate("onboarding/welcome");
     }
