@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 14 June 2026 v5
+ * Cache version: alongside-v101
+ *
+ * v101 (14 June 2026, S4-WP)
+ * - weekly-plan.js new view added (My Week day grid + day configuration,
+ *   built against schema v1.6 weeklyPlan.days); settings.js My Week tab
+ *   simplified to an entry card navigating to the "weekly-plan" route.
+ *   weekly-plan.js added to SHELL_URLS.
+ *
  * 13 June 2026 v4
  * Cache version: alongside-v100
  *
@@ -176,7 +185,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v100";
+const CACHE_NAME = "alongside-v101";
 
 const SHELL_URLS = [
 
@@ -207,6 +216,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/workout-complete.js",
   "/alongside-app/js/views/progress.js",
   "/alongside-app/js/views/settings.js",
+  "/alongside-app/js/views/weekly-plan.js",
   "/alongside-app/js/views/reflect.js",
   "/alongside-app/js/views/about.js",
   "/alongside-app/js/views/privacy.js",
