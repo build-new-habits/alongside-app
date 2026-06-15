@@ -1,8 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 15 June 2026 v7
- * Cache version: alongside-v103
+ * 15 June 2026 v8
+ * Cache version: alongside-v104
+ *
+ * v104 (15 June 2026, S4-6)
+ * - intention.js v3: game/sport logging flow. Path B (self-directed,
+ *   non-gym) now captures a duration (chip picker, default 30 min) and
+ *   tags named class/other entries as isEvent/eventName. No schema
+ *   changes; reflect.js unchanged (fields pass through saveAndSummarise).
+ *   intention.js is in SHELL_URLS so the cache version bumps regardless.
  *
  * v103 (15 June 2026, S4-NH-SCHEMA)
  * - store.js v4: Noticing Hub schema pass. Two new additive objects --
@@ -201,7 +208,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v103";
+const CACHE_NAME = "alongside-v104";
 
 const SHELL_URLS = [
 
