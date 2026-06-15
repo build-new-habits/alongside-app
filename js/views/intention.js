@@ -1,6 +1,17 @@
 /**
  * intention.js - Intention Screen
  *
+ * 15 Jun 2026 v4 (S4-9/10) - "Something quieter > Breathing practice" now
+ *   routes to breathing-session.js (the fully built 5-type/all-duration
+ *   player) instead of straight to reflect.js, which previously did
+ *   nothing breathing-related at all. No activityLog entry is written
+ *   here for this case -- breathing-session.js logs its own entry on
+ *   completion/exit and returns to "noticing", matching its existing
+ *   behaviour from the Noticing tab. The other three quiet options
+ *   (journal/rest/mindfulness) are unchanged -- journal and mindfulness
+ *   have their own known gaps, flagged separately (S4-13/14 and the
+ *   quiet-session.js mindful fix respectively), out of scope here.
+ *
  * 15 Jun 2026 v3 (S4-6) - Game/sport logging flow:
  *   Path B (self-directed activities, non-gym) now shows a duration chip
  *   picker (15/30/45/60/90+ min, default 30 -- "pre-fill, let them adjust"
@@ -392,6 +403,20 @@ function logAndNavigate() {
     return;
   }
   if (selectedPath === "quiet") {
+    // S4-9/10: "Breathing practice" now goes to the real breathing player.
+    // breathing-session.js logs its own activityLog entry on completion/
+    // exit and returns to "noticing" -- the placeholder entry written
+    // above (type: "breathing", source: "self-directed", never completed)
+    // would otherwise sit orphaned in activityLog, so we don't write it
+    // for this case. The other quiet options are unchanged.
+    if (selectedQuiet === "breathing") {
+      // Remove the placeholder entry just pushed for this selection.
+      const trimmedLog = store.get("activityLog") || [];
+      store.set("activityLog", trimmedLog.filter(e => e.id !== entry.id));
+      store.set("currentActivityEntry", null);
+      router.navigate("breathing-session");
+      return;
+    }
     if (selectedQuiet === "journal" || selectedQuiet === "rest" || selectedQuiet === "breathing") {
       router.navigate("reflect");
       return;
