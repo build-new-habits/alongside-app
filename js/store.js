@@ -1,6 +1,25 @@
 /**
  * store.js - Data persistence layer
  *
+ * 15 Jun 2026 v4 - Noticing Hub schema pass (S4-NH-SCHEMA), ahead of
+ *   S4-9/10 through S4-15/16 (breathing, weekly noticing reflection,
+ *   journal entry form, Settings wellbeing layer). Two new additive
+ *   top-level objects:
+ *     journalSettings      - autoTagging (bool), categoryPrefs (string[],
+ *                             defaults to the 5 "always" categories for
+ *                             every user; Premium adds from 7 "optional"
+ *                             categories via Settings in S4-15/16; the 2
+ *                             "triggered" categories - grief, joy - are
+ *                             never part of this list, the coach surfaces
+ *                             them itself based on check-in patterns)
+ *     noticingPreferences  - schedule ('automatic' | day name), time
+ *                             (HH:MM | null) - weekly reflection scheduling
+ *   journalEntries, noticingWeekInCycle, noticingLastTriggered (all added
+ *   21 May 2026 v1) and practiceHistory (Section 16) are unchanged in
+ *   shape but now fully documented - see schema.md v1.7 Section 18.
+ *   "Week 6 unlocks after 2 weeks of regular use" is derived from
+ *   checkinHistory at read time, not stored - no new field for this.
+ *
  * 13 Jun 2026 v3 - Weekly Plan shape finalised (S4-WP prep, schema 1.6).
  *   Per-day additions to weeklyPlan.days (additive, no renames): type
  *   ('workout'|'rest'|'recovery'|'event'|'open'), activityName (event
@@ -119,6 +138,22 @@ export const store = {
       journalEntries:       Array.isArray(saved.journalEntries)  ? saved.journalEntries  : [],
       noticingWeekInCycle:  saved.noticingWeekInCycle  || 1,
       noticingLastTriggered: saved.noticingLastTriggered || null,
+
+      // ── Noticing Hub schema pass (v1.7, S4-NH-SCHEMA) ─────────
+      journalSettings: (saved.journalSettings && typeof saved.journalSettings === 'object')
+                          ? {
+                              ...defaults.journalSettings,
+                              ...saved.journalSettings,
+                              categoryPrefs: Array.isArray(saved.journalSettings.categoryPrefs)
+                                               ? saved.journalSettings.categoryPrefs
+                                               : defaults.journalSettings.categoryPrefs
+                            }
+                          : defaults.journalSettings,
+
+      noticingPreferences: (saved.noticingPreferences && typeof saved.noticingPreferences === 'object')
+                              ? { ...defaults.noticingPreferences, ...saved.noticingPreferences }
+                              : defaults.noticingPreferences,
+
       generatedSession:     saved.generatedSession || { session: null, builtAt: null, inputs: {} },
       conditionPainScores:  (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
                               ? saved.conditionPainScores
@@ -405,6 +440,37 @@ export const store = {
       noticingWeekInCycle:   1,      // 1-6
       noticingLastTriggered: null,   // ISO date — prevents duplicate triggers
 
+      // ── JOURNAL SETTINGS (added v1.7, S4-NH-SCHEMA) ───────────
+      // Settings > Wellbeing > Journal Tags / Categories (S4-15/16).
+      //   autoTagging   — when true, auto-tag keyword matching (schema.md
+      //                   18.3) runs on save and writes into the single
+      //                   `tags` array on each journal entry. When false,
+      //                   tags is user-only.
+      //   categoryPrefs — which of the 14 journal categories (schema.md
+      //                   18.1) appear in the prompt queue. Default is the
+      //                   5 "always" categories for every user (Free and
+      //                   Premium). Premium adds from the 7 "optional"
+      //                   categories via Settings, one or a few at a time —
+      //                   not all-or-nothing. The 2 "triggered" categories
+      //                   (grief, joy) are never in this list; the coach
+      //                   surfaces those itself from check-in patterns.
+      journalSettings: {
+        autoTagging:   true,
+        categoryPrefs: ['life', 'movement', 'environment', 'nature', 'health']
+      },
+
+      // ── NOTICING PREFERENCES (added v1.7, S4-NH-SCHEMA) ───────
+      // Settings > Wellbeing > Weekly Reflection (S4-15/16). Read by the
+      // weekly reflection trigger (S4-11/12).
+      //   schedule — 'automatic' (first check-in of the week, prompt the
+      //              following day) | 'monday'..'sunday' (a fixed day).
+      //   time     — 'HH:MM' | null. Ignored when schedule is 'automatic';
+      //              defaults to '10:00' if null when schedule is a day name.
+      noticingPreferences: {
+        schedule: 'automatic',
+        time: null
+      },
+
       // ── SESSION BUILDER ──────────────────────────────────────
       // Holds a coach-generated session object produced by session-builder.js.
       // Read by gym-programme.js when no hardcoded PROGRAMME is active.
@@ -423,9 +489,10 @@ export const store = {
       // "type" drives the coach's posture for the day; sessionType +
       // durationMins feed the session builder on workout days. Days
       // with type "open" or enabled: false fall back to normal
-      // coach-proposal rules - the plan never locks the user in, and
-      // daily adaptation (energy, pain, burnout) always takes
-      // precedence over the plan on the day.
+      // coach-proposal rules. No pre-built sessions are stored - this
+      // is the user's stated weekly intent; daily check-in and coach
+      // adaptation (energy, pain, burnout) always take precedence on
+      // the day, exactly as for any other day.
       //
       // Schema (per day):
       //   type:         string         — 'workout' | 'rest' | 'recovery' | 'event' | 'open'
@@ -595,7 +662,7 @@ export const store = {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.data));
     } catch (e) {
-      console.error('Store: Error saving data', e);
+      console.error('Store: Error loading data', e);
     }
   },
 
