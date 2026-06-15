@@ -1,17 +1,41 @@
 /**
  * quiet-session.js - Something Quieter View
  *
- * 21 May 2026 v1 — Back button reads quietReturnRoute from store.
+ * 15 Jun 2026 v2 (S4-9/10 follow-on fix) - Mindful movement selector bug:
+ *   renderMindfulMode() checked `if (!step) return renderMindfulSelector()`,
+ *   but step = MINDFUL_SESSIONS[mindfulDuration][mindfulStep] is always
+ *   truthy with the default mindfulDuration=10, mindfulStep=0 - so the
+ *   duration-selector screen (renderMindfulSelector) was dead code and
+ *   mindful mode opened straight into a session view frozen at "0:00"
+ *   with no timer running, in every entry path. Fixed with a new
+ *   `mindfulStarted` boolean (default false), set true in
+ *   startMindfulSession() and reset in stopMindful()/cleanup(). Mindful
+ *   mode now correctly shows the duration picker first. No other logic
+ *   changed.
+ *
+ *   This makes mindful movement safe to launch directly from noticing.js
+ *   (S4-9/10) via quietMode: "mindful" - the journal-mode path is NOT
+ *   used by noticing.js (separate data-shape issue, flagged for S4-13/14)
+ *   and breathing now routes to breathing-session.js instead of this
+ *   file's breathing mode.
+ *
+ * 21 May 2026 v1 - Back button reads quietReturnRoute from store.
  *                   quietLaunchedDirect flag skips selector when
  *                   navigated from Noticing or other views directly.
  *
  * v1.0 (S4-1, April 2026)
  *
  * Three modes, selected by quietMode in store before navigation:
- *   "breathing"  — 5 structured breathing exercises with visual phase timers
- *   "journal"    — coach-selected prompts based on check-in, free text, stored privately
- *   "mindful"    — 5/10/15 min guided mindful movement from mindfulness exercise database
- *   "rest"       — single warm coach acknowledgement, no activity required
+ *   "breathing"  - 5 structured breathing exercises with visual phase timers
+ *                   (superseded by breathing-session.js, S4-9/10 - not
+ *                   routed to from noticing.js or intention.js any more,
+ *                   kept here for now, not removed)
+ *   "journal"    - coach-selected prompts based on check-in, free text, stored privately
+ *                   (NOT routed to from noticing.js - journalEntries shape
+ *                   here predates the S4-NH-SCHEMA array shape and would
+ *                   corrupt it. S4-13/14 to replace properly.)
+ *   "mindful"    - 5/10/15 min guided mindful movement from mindfulness exercise database
+ *   "rest"       - single warm coach acknowledgement, no activity required
  *
  * Route: quiet-session
  * Nav: hidden (session view)
@@ -163,6 +187,7 @@ let phaseSecondsLeft  = 0;             // seconds remaining in current phase
 let breathingComplete  = false;        // finished all rounds
 
 let mindfulDuration   = 10;            // 5 | 10 | 15
+let mindfulStarted    = false;         // S4-9/10 fix: gates selector vs session view
 let mindfulStep       = 0;             // current exercise index in session
 let mindfulTimer      = null;          // setInterval handle
 let mindfulSecondsLeft = 0;
@@ -507,7 +532,9 @@ function renderMindfulMode() {
   const session = MINDFUL_SESSIONS[mindfulDuration];
   const step    = session?.[mindfulStep];
 
-  if (!step) return renderMindfulSelector();
+  // S4-9/10 fix: gate on mindfulStarted, not on `step` (which is always
+  // truthy at the default mindfulDuration/mindfulStep — see header note).
+  if (!mindfulStarted || !step) return renderMindfulSelector();
   if (mindfulComplete) return renderMindfulComplete();
   return renderMindfulSession(step, session);
 }
@@ -711,6 +738,7 @@ function startMindfulSession() {
   const session = MINDFUL_SESSIONS[mindfulDuration];
   if (!session?.length) return;
 
+  mindfulStarted     = true;
   mindfulStep        = 0;
   mindfulComplete    = false;
   mindfulSecondsLeft = session[0].duration;
@@ -765,6 +793,7 @@ function runMindfulStep(session) {
 function stopMindful() {
   if (mindfulTimer) clearInterval(mindfulTimer);
   mindfulTimer    = null;
+  mindfulStarted  = false;
   mindfulComplete = false;
   mindfulStep     = 0;
   rerender();
@@ -922,6 +951,7 @@ function cleanup() {
   mindfulTimer       = null;
   selectedBreathing  = null;
   breathingComplete  = false;
+  mindfulStarted     = false;
   mindfulComplete    = false;
   mindfulStep        = 0;
   journalSaved       = false;
