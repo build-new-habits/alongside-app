@@ -1,6 +1,39 @@
 /**
  * coach-proposal.js - Coach Proposal Screen
  *
+ * 14 Jun 2026 v4 (S4-WP2) -- Weekly plan realigned to schema v1.6:
+ *   getTodayPlan() rewritten -- reads weeklyPlan.days[day] (was flat
+ *   weeklyPlan[day]) and gates on weeklyPlan.updatedAt !== null &&
+ *   plan.enabled (was the non-existent top-level weeklyPlanEnabled,
+ *   per schema v1.6's deliberate deferral of that layer). type "open"
+ *   or enabled:false both fall back to normal buildProposal(), exactly
+ *   as for an unconfigured day.
+ *   Day types renamed throughout to match v1.6: "gym" -> "workout",
+ *   "class" -> "event". Renderers renamed renderWeeklyPlanGym ->
+ *   renderWeeklyPlanWorkout, renderWeeklyPlanClass -> renderWeeklyPlanEvent.
+ *   proposalState values "weekly-plan-gym"/"weekly-plan-class" ->
+ *   "weekly-plan-workout"/"weekly-plan-event".
+ *   renderWeeklyPlanWorkout now also reflects classFocus (additional
+ *   focus tags) and location (home/gym/outside) per the Day Type
+ *   Behaviour table (schema.md Section 13) -- previously only label/
+ *   sessionType/durationMins were used.
+ *   renderWeeklyPlanEvent now references durationMins/location when
+ *   framing the day, per the same table -- previously activityName only.
+ *   Weekly-plan button handlers (~lines 917-934 in the prior version)
+ *   renamed weekly-gym-* -> weekly-workout-*, weekly-class-log-btn ->
+ *   weekly-event-log-btn, and now also pass plan.location and
+ *   plan.classFocus through as weeklyPlanLocation/weeklyPlanClassFocus
+ *   (same transient hand-off convention as the existing
+ *   weeklyPlanSessionType/weeklyPlanDuration, for session-builder.js to
+ *   consume when that file is next touched).
+ *   Bug fix while making this code live: the old "weekly-gym-go-btn"
+ *   handler called router.navigate("gym-sub") -- not a registered route
+ *   -- immediately followed by a second navigate to "coach-proposal"
+ *   with openGymSub=true. The dead first navigate call is removed; the
+ *   handler now just sets openGymSub and re-enters coach-proposal,
+ *   matching the existing "I know what I'm doing" gym-sub pattern used
+ *   at the top of render().
+ *
  * 12 Jun 2026 v1 (S4-4 P2) -- sessionLocation wiring:
  *   buildProposal() reads store.sessionLocation and applies a scoring
  *   bias to the gym/yoga/quiet/run/walk options: "gym" location boosts
@@ -50,16 +83,22 @@ const ACTIVITY_LABELS = {
   "prescribed": "prescribed exercises", "custom": "movement"
 };
 
-// -- Session type labels (for weekly plan gym days) ---------------------------
+// -- Session type labels (for weekly plan workout days) -----------------------
 
 const SESSION_TYPE_LABELS = {
   upper: "Upper Body", lower: "Lower Body", full: "Full Body",
   core: "Core & Stability", cardio: "Cardio", hiit: "HIIT", mobility: "Mobility"
 };
 
+// -- Location labels (for weekly plan workout/event days) ----------------------
+
+const LOCATION_LABELS = {
+  home: "at home", gym: "at the gym", outside: "outside"
+};
+
 // -- State --------------------------------------------------------------------
 
-let proposalState   = "proposal";  // "proposal" | "branching" | "revised" | "activity-pick" | "gym-sub" | "gym-explainer" | "weekly-plan-gym" | "weekly-plan-rest" | "weekly-plan-recovery" | "weekly-plan-class"
+let proposalState   = "proposal";  // "proposal" | "branching" | "revised" | "activity-pick" | "gym-sub" | "gym-explainer" | "weekly-plan-workout" | "weekly-plan-rest" | "weekly-plan-recovery" | "weekly-plan-event"
 let currentProposal = null;
 let revisedProposal = null;
 let branchChoice    = null;
@@ -67,21 +106,39 @@ let gymExplainerTarget = null;
 
 // -- Weekly plan helpers ------------------------------------------------------
 
+// Schema v1.6 (schema.md Section 13): weeklyPlan.updatedAt is null until
+// the user has saved a plan at least once -- that, plus each day's own
+// `enabled` flag, is the whole "is the plan active" signal (the separate
+// weeklyPlanEnabled/weeklyPlanSetAt layer proposed in the 21 May spec was
+// deliberately deferred, not added, in v1.6). A day with type "open" or
+// enabled:false is treated identically -- both fall back to normal
+// coach-proposal rules below.
 function getTodayPlan() {
-  const enabled = store.get("weeklyPlanEnabled");
-  if (!enabled) return null;
+  const weeklyPlan = store.get("weeklyPlan");
+  if (!weeklyPlan || !weeklyPlan.updatedAt) return null;
   const day  = new Date().toLocaleDateString("en-GB", { weekday: "long" }).toLowerCase();
-  const plan = store.get("weeklyPlan")?.[day];
-  if (!plan || plan.type === "open") return null;
+  const plan = weeklyPlan.days?.[day];
+  if (!plan || !plan.enabled || plan.type === "open") return null;
   return plan;
 }
 
-function getGymDayLabel(plan) {
+// Builds the "Your plan today is ___" label for workout days from
+// sessionType + classFocus (schema v1.6: both feed the session builder
+// as a same-day selection would). plan.label, if the user set one,
+// always wins -- it is their own framing for the day.
+function getWorkoutDayLabel(plan) {
   if (plan.label) return plan.label;
+
+  const parts = [];
   if (plan.sessionType && SESSION_TYPE_LABELS[plan.sessionType]) {
-    return SESSION_TYPE_LABELS[plan.sessionType];
+    parts.push(SESSION_TYPE_LABELS[plan.sessionType]);
   }
-  return "Gym session";
+  (plan.classFocus || []).forEach(id => {
+    const focusLabel = SESSION_TYPE_LABELS[id];
+    if (focusLabel && !parts.includes(focusLabel)) parts.push(focusLabel);
+  });
+
+  return parts.length > 0 ? parts.join(" + ") : "Workout";
 }
 
 // -- Proposal engine ----------------------------------------------------------
@@ -360,10 +417,10 @@ export function render() {
   if (proposalState === "proposal") {
     const plan = getTodayPlan();
     if (plan) {
-      if (plan.type === "gym")      proposalState = "weekly-plan-gym";
+      if (plan.type === "workout")  proposalState = "weekly-plan-workout";
       if (plan.type === "rest")     proposalState = "weekly-plan-rest";
       if (plan.type === "recovery") proposalState = "weekly-plan-recovery";
-      if (plan.type === "class")    proposalState = "weekly-plan-class";
+      if (plan.type === "event")    proposalState = "weekly-plan-event";
     }
   }
 
@@ -395,10 +452,10 @@ export function render() {
         ${proposalState === "activity-pick"         ? renderActivityPick()          : ""}
         ${proposalState === "gym-sub"               ? renderGymSub()               : ""}
         ${proposalState === "gym-explainer"         ? renderGymExplainer()          : ""}
-        ${proposalState === "weekly-plan-gym"       ? renderWeeklyPlanGym(name)     : ""}
+        ${proposalState === "weekly-plan-workout"   ? renderWeeklyPlanWorkout(name) : ""}
         ${proposalState === "weekly-plan-rest"      ? renderWeeklyPlanRest(name)    : ""}
         ${proposalState === "weekly-plan-recovery"  ? renderWeeklyPlanRecovery(name): ""}
-        ${proposalState === "weekly-plan-class"     ? renderWeeklyPlanClass(name)   : ""}
+        ${proposalState === "weekly-plan-event"     ? renderWeeklyPlanEvent(name)   : ""}
       </div>
 
     </div>
@@ -407,10 +464,12 @@ export function render() {
 
 // -- Weekly plan renderers ----------------------------------------------------
 
-function renderWeeklyPlanGym(name) {
+function renderWeeklyPlanWorkout(name) {
   const plan  = getTodayPlan() || {};
-  const label = getGymDayLabel(plan);
-  const dur   = plan.durationMins ? plan.durationMins + " minutes" : "as long as feels right";
+  const label = getWorkoutDayLabel(plan);
+  const locationPhrase = (plan.location && LOCATION_LABELS[plan.location])
+    ? " " + LOCATION_LABELS[plan.location]
+    : "";
 
   return `
     <div class="card card-coach coach-proposal-card">
@@ -418,7 +477,7 @@ function renderWeeklyPlanGym(name) {
       <div class="coach-proposal-content">
         <p class="coach-proposal-greeting">${getGreeting(name)}.</p>
         <p class="coach-proposal-suggestion">
-          Your plan today is ${label}. Ready when you are.
+          Your plan today is ${label}${locationPhrase}. Ready when you are.
         </p>
         <p class="coach-proposal-rationale text-sm text-muted">
           ${plan.durationMins ? "Target: " + plan.durationMins + " minutes." : "Duration is yours to choose today."}
@@ -428,11 +487,11 @@ function renderWeeklyPlanGym(name) {
     </div>
 
     <div class="coach-proposal-actions">
-      <button class="btn btn-primary btn-large btn-full" id="weekly-gym-go-btn"
+      <button class="btn btn-primary btn-large btn-full" id="weekly-workout-go-btn"
               aria-label="Start ${label}">
         Let's do it
       </button>
-      <button class="btn btn-primary btn-large btn-full" id="weekly-gym-adjust-btn"
+      <button class="btn btn-primary btn-large btn-full" id="weekly-workout-adjust-btn"
               style="margin-top:var(--space-3);"
               aria-label="Adjust session for today">
         Adjust for today
@@ -537,11 +596,16 @@ function renderWeeklyPlanRecovery(name) {
   `;
 }
 
-function renderWeeklyPlanClass(name) {
+function renderWeeklyPlanEvent(name) {
   const plan         = getTodayPlan() || {};
-  const activityName = plan.activityName || null;
-  const coachLine    = activityName
-    ? "You have " + activityName + " today. Enjoy it. Come back and log it when you're done."
+  const activityName = plan.activityName || plan.label || null;
+  const durationPhrase = plan.durationMins ? " for about " + plan.durationMins + " minutes" : "";
+  const locationPhrase = (plan.location && LOCATION_LABELS[plan.location])
+    ? " " + LOCATION_LABELS[plan.location]
+    : "";
+
+  const coachLine = activityName
+    ? "You've got " + activityName + " planned today" + locationPhrase + durationPhrase + ". Enjoy it -- come back and log it when you're done."
     : "You have something planned today. Come back and log it when you're done.";
 
   return `
@@ -557,9 +621,9 @@ function renderWeeklyPlanClass(name) {
     </div>
 
     <div class="coach-proposal-actions">
-      <button class="btn btn-primary btn-large btn-full" id="weekly-class-log-btn"
-              aria-label="Log my class">
-        Log my class
+      <button class="btn btn-primary btn-large btn-full" id="weekly-event-log-btn"
+              aria-label="Log my activity">
+        Log it
       </button>
       <button class="btn btn-ghost btn-full" id="proposal-else-btn"
               style="margin-top:var(--space-3);">
@@ -872,10 +936,10 @@ export function onMount() {
     // Return to whichever state we came from --- re-read plan
     const plan = getTodayPlan();
     if (plan) {
-      if (plan.type === "gym")      proposalState = "weekly-plan-gym";
+      if (plan.type === "workout")       proposalState = "weekly-plan-workout";
       else if (plan.type === "rest")     proposalState = "weekly-plan-rest";
       else if (plan.type === "recovery") proposalState = "weekly-plan-recovery";
-      else if (plan.type === "class")    proposalState = "weekly-plan-class";
+      else if (plan.type === "event")    proposalState = "weekly-plan-event";
       else proposalState = "proposal";
     } else {
       proposalState = "proposal";
@@ -934,29 +998,35 @@ export function onMount() {
     proposalState = "activity-pick"; rerender();
   });
 
-  // Weekly plan --- gym day
-  document.getElementById("weekly-gym-go-btn")?.addEventListener("click", () => {
+  // Weekly plan --- workout day
+  document.getElementById("weekly-workout-go-btn")?.addEventListener("click", () => {
     const plan = getTodayPlan() || {};
-    if (plan.sessionType) store.set("weeklyPlanSessionType", plan.sessionType);
+    if (plan.sessionType)  store.set("weeklyPlanSessionType", plan.sessionType);
     if (plan.durationMins) store.set("weeklyPlanDuration", plan.durationMins);
-    cleanup(); router.navigate("gym-sub");
-    // Immediately open gym sub-screen
-    store.set("openGymSub", true); router.navigate("coach-proposal");
+    if (plan.location)     store.set("weeklyPlanLocation", plan.location);
+    if (plan.classFocus && plan.classFocus.length) store.set("weeklyPlanClassFocus", plan.classFocus);
+    cleanup();
+    // "I know what I'm doing" -- open gym sub-screen directly, same
+    // pattern as the proposal-accept path for the gym activity pick.
+    store.set("openGymSub", true);
+    router.navigate("coach-proposal");
   });
-  document.getElementById("weekly-gym-adjust-btn")?.addEventListener("click", () => {
+  document.getElementById("weekly-workout-adjust-btn")?.addEventListener("click", () => {
     // Go to session builder with pre-filled values from plan
     const plan = getTodayPlan() || {};
-    if (plan.sessionType) store.set("weeklyPlanSessionType", plan.sessionType);
+    if (plan.sessionType)  store.set("weeklyPlanSessionType", plan.sessionType);
     if (plan.durationMins) store.set("weeklyPlanDuration", plan.durationMins);
+    if (plan.location)     store.set("weeklyPlanLocation", plan.location);
+    if (plan.classFocus && plan.classFocus.length) store.set("weeklyPlanClassFocus", plan.classFocus);
     cleanup(); router.navigate("session-builder-ui");
   });
 
-  // Weekly plan --- class day
-  document.getElementById("weekly-class-log-btn")?.addEventListener("click", () => {
+  // Weekly plan --- event day
+  document.getElementById("weekly-event-log-btn")?.addEventListener("click", () => {
     const plan = getTodayPlan() || {};
     store.set("activityLogPrefill", {
       isEvent: true,
-      eventName: plan.activityName || null,
+      eventName: plan.activityName || plan.label || null,
       type: "class"
     });
     cleanup(); router.navigate("activity-log");
@@ -991,9 +1061,9 @@ function rerender() {
   if (proposalState === "activity-pick")        body.innerHTML = renderActivityPick();
   if (proposalState === "gym-sub")              body.innerHTML = renderGymSub();
   if (proposalState === "gym-explainer")        body.innerHTML = renderGymExplainer();
-  if (proposalState === "weekly-plan-gym")      body.innerHTML = renderWeeklyPlanGym(name);
+  if (proposalState === "weekly-plan-workout")  body.innerHTML = renderWeeklyPlanWorkout(name);
   if (proposalState === "weekly-plan-rest")     body.innerHTML = renderWeeklyPlanRest(name);
   if (proposalState === "weekly-plan-recovery") body.innerHTML = renderWeeklyPlanRecovery(name);
-  if (proposalState === "weekly-plan-class")    body.innerHTML = renderWeeklyPlanClass(name);
+  if (proposalState === "weekly-plan-event")    body.innerHTML = renderWeeklyPlanEvent(name);
   onMount();
 }
