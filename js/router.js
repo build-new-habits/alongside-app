@@ -1,6 +1,11 @@
 /**
  * router.js - View navigation
  *
+ * 15 Jun 2026 v3 (S4-9/10) - Removed the dead "noticing-hub" VIEW_NAMES
+ *   entry flagged on 12 Jun. The live bottom-nav button (index.html)
+ *   uses data-view="noticing", which has its own entry; "noticing-hub"
+ *   was never navigated to from anywhere and was a leftover/duplicate.
+ *
  * 12 Jun 2026 v2 (S4-4 Step 0) - Route pre-registration:
  *   Added VIEW_NAMES entries for the entire S4 remaining queue, ahead
  *   of the view files being built (weekly-plan, breathing-session,
@@ -13,10 +18,9 @@
  *   pattern). weekly-plan and noticing-reflection left nav-visible
  *   (settings/hub-style screens).
  *
- *   NOTE: "noticing" and "noticing-hub" both already exist in
- *   VIEW_NAMES with similar labels - possible duplicate/legacy entry,
- *   not resolved here (out of scope for Step 0). Flag for whichever
- *   session next touches the Noticing Hub.
+ *   NOTE (resolved 15 Jun 2026, see above): "noticing" and "noticing-hub"
+ *   both existed in VIEW_NAMES with similar labels - this was the
+ *   flagged duplicate/legacy entry, now removed.
  *
  * 30 May 2026 v1 --- Daily flow redesign:
  *   coach-reflection added to VIEW_NAMES.
@@ -65,7 +69,6 @@ const VIEW_NAMES = {
   "library":                 "Library",
   "activity-log":            "Log an Activity",
   "noticing":                "Noticing",
-  "noticing-hub":            "Noticing Hub",
   "upgrade":                 "Personal Plan",
   "privacy":                 "Privacy and Terms",
   "checkin-mini":            "Quick Check-In",
