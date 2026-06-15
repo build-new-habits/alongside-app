@@ -1,8 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 14 June 2026 v6
- * Cache version: alongside-v102
+ * 15 June 2026 v7
+ * Cache version: alongside-v103
+ *
+ * v103 (15 June 2026, S4-NH-SCHEMA)
+ * - store.js v4: Noticing Hub schema pass. Two new additive objects --
+ *   journalSettings (autoTagging, categoryPrefs) and noticingPreferences
+ *   (schedule, time) -- ahead of S4-9/10 through S4-15/16. schema.md
+ *   bumped to v1.7 (new Section 18). No view files changed; store.js is
+ *   in SHELL_URLS so the cache version bumps regardless.
  *
  * v102 (14 June 2026, S4-WP2)
  * - coach-proposal.js realigned to schema v1.6: getTodayPlan() now reads
@@ -194,7 +201,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v102";
+const CACHE_NAME = "alongside-v103";
 
 const SHELL_URLS = [
 
