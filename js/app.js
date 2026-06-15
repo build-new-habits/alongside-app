@@ -1,7 +1,14 @@
 /**
  * app.js - Application entry point
  *
- * 20 May 2026 v1
+ * 15 Jun 2026 v2
+ *
+ * v2  APP_VERSION bumped (S4-9/10). The header comment says this must be
+ *   updated on every deploy; it had stayed at "20 May 2026 v1" through
+ *   roughly ten deploys since (sw.js cache alongside-v94 through v104).
+ *   No other changes -- bumping now so Settings' build string is
+ *   meaningful again going forward. Future sessions: bump this string
+ *   alongside the sw.js cache version whenever any file changes.
  *
  * v1.3  Version string format updated (20 May 2026):
  *   APP_VERSION now uses the same DD Mon YYYY vN format as all other files.
@@ -37,7 +44,7 @@ import { router } from './router.js';
 // Format: DD Mon YYYY vN  (e.g. "20 May 2026 v1", "20 May 2026 v2")
 // This string is displayed in Settings so users and testers can confirm
 // exactly which build they are running.
-const APP_VERSION = "20 May 2026 v1";
+const APP_VERSION = "15 Jun 2026 v2";
 
 //  SW registration and update detection 
 
