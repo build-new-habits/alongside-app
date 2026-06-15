@@ -1,8 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 14 June 2026 v5
- * Cache version: alongside-v101
+ * 14 June 2026 v6
+ * Cache version: alongside-v102
+ *
+ * v102 (14 June 2026, S4-WP2)
+ * - coach-proposal.js realigned to schema v1.6: getTodayPlan() now reads
+ *   weeklyPlan.days[day] and gates on weeklyPlan.updatedAt + per-day
+ *   enabled (weeklyPlanEnabled removed, never existed in store.js v3);
+ *   weekly-plan day types renamed gym->workout, class->event throughout
+ *   (renderers, proposalState values, button ids); workout/event
+ *   renderers now reflect classFocus/location/durationMins per schema.md
+ *   Section 13. No new files -- coach-proposal.js already in SHELL_URLS.
  *
  * v101 (14 June 2026, S4-WP)
  * - weekly-plan.js new view added (My Week day grid + day configuration,
@@ -185,7 +194,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v101";
+const CACHE_NAME = "alongside-v102";
 
 const SHELL_URLS = [
 
