@@ -1,6 +1,27 @@
 /**
  * js/views/noticing.js - Noticing Hub Landing View
  *
+ * 15 Jun 2026 v2 (S4-9/10) - Activated the Noticing tab properly:
+ *   - Breathing card now navigates to breathing-session.js (the fully
+ *     built 5-type/all-duration player) instead of quiet-session.js's
+ *     "breathing" mode, which is one-dimensional (fixed rounds, no
+ *     duration choice) and is being superseded, not removed.
+ *   - NEW: Mindful Movement card, launched via quiet-session.js's
+ *     "mindful" mode (quietMode/quietReturnRoute/quietLaunchedDirect),
+ *     now safe to use after the mindfulStarted fix in quiet-session.js
+ *     v2 (the duration-selector screen was previously dead code).
+ *   - "Journal and reflect" card and the "This Week > Reflect on this"
+ *     button both previously routed to "journal-entry", which does not
+ *     exist (S4-13/14) -- a dead tap. Also, quiet-session.js's journal
+ *     mode writes journalEntries as a date-keyed object, which would be
+ *     silently discarded by store.mergeWithDefaults()'s Array.isArray
+ *     check against the S4-NH-SCHEMA array shape -- a real data-loss
+ *     risk. Both are now warm "on its way" treatments: the weekly prompt
+ *     and the journal card are still shown (reflection value, coach
+ *     transparency about what's coming) but neither is a tap target
+ *     that goes anywhere, until S4-13/14 builds journal-entry.js
+ *     properly against the array schema.
+ *
  * 21 May 2026 v1
  *
  * The Noticing Hub is the wellbeing layer of Alongside: Move.
@@ -8,7 +29,7 @@
  *
  * Structure:
  *   - This Week: weekly reflection prompt (6-week rotation)
- *   - Anytime: Breathing / Journal / Your Reflections
+ *   - Anytime: Breathing / Mindful Movement / Journal (coming soon)
  *
  * Route: "noticing"
  * Nav: visible (fourth tab)
@@ -103,16 +124,6 @@ function getCurrentWeekPrompt() {
   };
 }
 
-function hasJournaledThisWeek() {
-  const entries  = store.get("journalEntries") || [];
-  const weekAgo  = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-  return entries.some(e =>
-    e.type === "weekly-noticing" &&
-    new Date(e.createdAt) > weekAgo
-  );
-}
-
 function getRecentEntries(limit = 3) {
   const entries = store.get("journalEntries") || [];
   return [...entries]
@@ -131,7 +142,6 @@ function formatDate(iso) {
 export function render() {
   const name          = store.get("name") || "";
   const weekData      = getCurrentWeekPrompt();
-  const journaledThisWeek = hasJournaledThisWeek();
   const recentEntries = getRecentEntries(3);
   const totalEntries  = (store.get("journalEntries") || []).length;
 
@@ -156,14 +166,10 @@ export function render() {
 
         <div class="card" style="margin-bottom: var(--space-2);">
           <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">${weekData.theme}</p>
-          <p style="font-size: var(--text-base); line-height: 1.6; margin-bottom: var(--space-4);">${weekData.prompt}</p>
-          ${journaledThisWeek
-            ? `<p class="text-sm text-muted">You've reflected this week.</p>`
-            : `<button class="btn btn-primary btn-full" id="noticing-reflect-btn"
-                       aria-label="Reflect on this week's prompt">
-                Reflect on this
-               </button>`
-          }
+          <p style="font-size: var(--text-base); line-height: 1.6; margin-bottom: var(--space-2);">${weekData.prompt}</p>
+          <p class="text-sm text-muted" style="margin-bottom: 0;">
+            Something to sit with this week. A place to write this down properly is on its way.
+          </p>
         </div>
       </section>
 
@@ -187,16 +193,26 @@ export function render() {
             <span style="color: var(--color-primary); font-size: 1.25rem;" aria-hidden="true">›</span>
           </button>
 
-          <button class="card" id="noticing-journal-btn"
+          <button class="card" id="noticing-mindful-btn"
                   style="display: flex; align-items: center; gap: var(--space-4); text-align: left; width: 100%; cursor: pointer; background: var(--color-surface);"
-                  aria-label="Journal and reflect — guided prompt or free writing">
-            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">📝</span>
+                  aria-label="Mindful movement — five, ten, or fifteen minute guided sessions">
+            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">🌿</span>
             <div style="flex: 1; min-width: 0;">
-              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Journal and reflect</p>
-              <p class="text-secondary" style="font-size: var(--text-sm);">Guided prompt or free writing.</p>
+              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Mindful movement</p>
+              <p class="text-secondary" style="font-size: var(--text-sm);">5, 10, or 15 minutes. Guided, with a timer.</p>
             </div>
             <span style="color: var(--color-primary); font-size: 1.25rem;" aria-hidden="true">›</span>
           </button>
+
+          <div class="card"
+               style="display: flex; align-items: center; gap: var(--space-4); background: var(--color-surface); opacity: 0.75;"
+               aria-label="Journal and reflect — on its way">
+            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">📝</span>
+            <div style="flex: 1; min-width: 0;">
+              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Journal and reflect</p>
+              <p class="text-secondary" style="font-size: var(--text-sm);">Guided prompts and free writing — on its way.</p>
+            </div>
+          </div>
 
         </div>
       </section>
@@ -246,20 +262,12 @@ export function render() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
-  document.getElementById("noticing-reflect-btn")?.addEventListener("click", () => {
-    // Weekly noticing reflection — use journal-entry with weekly prompt pre-loaded
-    router.navigate("journal-entry");
-  });
-
   document.getElementById("noticing-breathe-btn")?.addEventListener("click", () => {
-    store.set("quietMode", "breathing");
-    store.set("quietReturnRoute", "noticing");
-    store.set("quietLaunchedDirect", true);
-    router.navigate("quiet-session");
+    router.navigate("breathing-session");
   });
 
-  document.getElementById("noticing-journal-btn")?.addEventListener("click", () => {
-    store.set("quietMode", "journal");
+  document.getElementById("noticing-mindful-btn")?.addEventListener("click", () => {
+    store.set("quietMode", "mindful");
     store.set("quietReturnRoute", "noticing");
     store.set("quietLaunchedDirect", true);
     router.navigate("quiet-session");
