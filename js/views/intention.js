@@ -1,6 +1,29 @@
 /**
  * intention.js - Intention Screen
  *
+ * 15 Jun 2026 v3 (S4-6) - Game/sport logging flow:
+ *   Path B (self-directed activities, non-gym) now shows a duration chip
+ *   picker (15/30/45/60/90+ min, default 30 -- "pre-fill, let them adjust"
+ *   pattern, same as sleep/mood elsewhere) once an activity is selected.
+ *   logAndNavigate() writes this onto the new activityLog entry as
+ *   `duration` -- matching the field name already used by reflect.js's
+ *   buildSummary() and morning-session.js's logActivity(), NOT the
+ *   `durationMins` name in schema.md (pre-existing doc/code mismatch,
+ *   flagged for a future tidy-up, not fixed here).
+ *
+ *   Entries also gain `isEvent` / `eventName` (schema.md Section 12,
+ *   added v1.4): true/set only for the "class" and "other" activity
+ *   types when a name has been entered -- those are the only Path B
+ *   types with a free-text name field, and a named activity is the
+ *   natural definition of an "event" here. "Training vs match" is left
+ *   to the free-text name itself (e.g. "Tennis match" vs "Tennis
+ *   practice") rather than a separate UI step.
+ *
+ *   reflect.js needs no changes -- saveAndSummarise() spreads the
+ *   original entry, so duration/isEvent/eventName pass through untouched
+ *   and durRef in buildSummary() now picks up real values for these
+ *   entries.
+ *
  * 13 Jun 2026 v2 - Light-touch fix (S4-4 follow-up): removed the
  *   lastCheckin.timestamp fallback (ensureCheckinTimestamp()). checkin.js
  *   v2 now stamps this field directly at submission, which is the
@@ -36,6 +59,8 @@ export const centered = false;
 
 const RETURN_VISIT_THRESHOLD_MS = 2 * 60 * 60 * 1000; // 2 hours
 
+const DEFAULT_DURATION = 30; // minutes
+
 // -- Activity types for Path B -------------------------------------------------
 
 const ACTIVITIES = [
@@ -47,6 +72,20 @@ const ACTIVITIES = [
   { id: "class",       label: "Class / workshop",   icon: "\uD83E\uDDD8", hasName: true  },
   { id: "yoga",        label: "Yoga / Pilates",     icon: "\uD83E\uDDD8", hasName: false },
   { id: "other",       label: "Something else",     icon: "\u2754",       hasName: true  },
+];
+
+// -- Duration options for Path B (non-gym) -------------------------------------
+// "How long are you planning?" -- written to the activityLog entry as
+// `duration` (matches reflect.js buildSummary() / morning-session.js
+// logActivity(), not schema.md's `durationMins`). Default 30 -- pre-filled,
+// adjustable, same pattern as sleep/mood pre-fills elsewhere.
+
+const DURATION_OPTIONS = [
+  { v: 15, l: "15 min"   },
+  { v: 30, l: "30 min"   },
+  { v: 45, l: "45 min"   },
+  { v: 60, l: "1 hour"   },
+  { v: 90, l: "1.5 hrs+" },
 ];
 
 const QUIET_OPTIONS = [
@@ -62,6 +101,7 @@ let selectedPath     = null;   // "coach" | "self" | "quiet"
 let selectedActivity = null;   // activity id from ACTIVITIES
 let selectedQuiet    = null;   // quiet option id
 let activityName     = "";     // free text name for class/other
+let selectedDuration = DEFAULT_DURATION; // minutes, Path B non-gym only
 let returnVisitDismissedThisRender = false; // local-only, avoids re-prompt after "No"
 
 // -- Return-visit detection ---------------------------------------------------
@@ -225,6 +265,21 @@ export function render() {
                      aria-label="Activity name">
             </div>
           ` : ""}
+
+          ${selectedActivity && selectedActivity !== "gym" ? `
+            <div class="intention-duration-field">
+              <p class="intention-selector-label">How long are you planning?</p>
+              <div class="reflect-chips" role="group" aria-label="Duration">
+                ${DURATION_OPTIONS.map(o => `
+                  <button class="chip ${selectedDuration === o.v ? "selected" : ""}"
+                          data-duration="${o.v}"
+                          aria-pressed="${selectedDuration === o.v}">
+                    ${o.l}
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+          ` : ""}
         </div>
       ` : ""}
 
@@ -286,6 +341,14 @@ function logAndNavigate() {
   // Save activity log entry
   const log = store.get("activityLog") || [];
   const checkin = store.get("lastCheckin") || {};
+
+  const act          = ACTIVITIES.find(a => a.id === selectedActivity);
+  const trimmedName  = activityName.trim();
+  // isEvent/eventName (schema.md Section 12, added v1.4, S4-6): only the
+  // "class" and "other" Path B types have a free-text name field, and a
+  // named activity is the natural definition of an "event" here.
+  const isNamedEvent = selectedPath === "self" && act?.hasName && trimmedName.length > 0;
+
   const entry = {
     id:            new Date().toISOString() + "_" + Math.random().toString(36).slice(2, 6),
     date:          new Date().toISOString().split("T")[0],
@@ -293,12 +356,16 @@ function logAndNavigate() {
                    selectedPath === "prescribed" ? "prescribed-session" :
                    selectedPath === "quiet"      ? selectedQuiet :
                    selectedActivity,
-    name:          activityName.trim() || null,
+    name:          trimmedName || null,
     energyBefore:  checkin.energy || null,
     source:        selectedPath === "coach"      ? "coach-recommended" :
                    selectedPath === "prescribed" ? "prescribed" :
                    "self-directed",
     sessionStart:  new Date().toISOString(),
+    // -- S4-6 additions (Path B, non-gym only) --
+    duration:      (selectedPath === "self" && selectedActivity !== "gym") ? selectedDuration : null,
+    isEvent:       isNamedEvent,
+    eventName:     isNamedEvent ? trimmedName : null,
   };
   store.set("activityLog", [...log, entry]);
   store.set("currentActivityEntry", entry);
@@ -361,6 +428,7 @@ export function onMount() {
       selectedActivity = null;
       selectedQuiet    = null;
       activityName     = "";
+      selectedDuration = DEFAULT_DURATION;
       rerender();
       return;
     }
@@ -370,7 +438,20 @@ export function onMount() {
     if (activityChip) {
       selectedActivity = activityChip.dataset.activity;
       activityName     = "";
+      selectedDuration = DEFAULT_DURATION;
       rerender();
+      return;
+    }
+
+    // Duration chip
+    const durationChip = e.target.closest("[data-duration]");
+    if (durationChip) {
+      selectedDuration = parseInt(durationChip.dataset.duration, 10);
+      view.querySelectorAll("[data-duration]").forEach(c => {
+        const sel = parseInt(c.dataset.duration, 10) === selectedDuration;
+        c.classList.toggle("selected", sel);
+        c.setAttribute("aria-pressed", sel);
+      });
       return;
     }
 
