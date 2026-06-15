@@ -1,8 +1,37 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 15 June 2026 v8
- * Cache version: alongside-v104
+ * 15 June 2026 v9
+ * Cache version: alongside-v105
+ *
+ * v105 (15 June 2026, S4-9/10)
+ * - Activated the Noticing Hub. noticing.js v2: Breathing card now routes
+ *   to breathing-session.js (5 types, all durations) instead of
+ *   quiet-session.js's one-dimensional "breathing" mode; new Mindful
+ *   Movement card routes to quiet-session.js's "mindful" mode (5/10/15
+ *   min); Journal card and "This Week > Reflect on this" both replaced
+ *   with warm "on its way" treatments -- both previously routed to a
+ *   non-existent "journal-entry" view (dead tap), and quiet-session.js's
+ *   journal mode writes journalEntries in a pre-S4-NH-SCHEMA shape that
+ *   mergeWithDefaults() would silently discard (data-loss risk), so
+ *   neither is wired up until S4-13/14.
+ * - quiet-session.js v2: fixed a pre-existing bug where the mindful
+ *   movement duration selector was dead code (renderMindfulMode's
+ *   `!step` check was always false at the defaults) -- mindful mode
+ *   opened straight into a frozen "0:00" session in every entry path.
+ *   New `mindfulStarted` flag gates this correctly. This is what makes
+ *   the new Mindful Movement card above safe to ship.
+ * - intention.js v4: "Something quieter > Breathing practice" now routes
+ *   to breathing-session.js instead of reflect.js (previously did
+ *   nothing breathing-related). No placeholder activityLog entry is
+ *   written for this path -- breathing-session.js logs its own entry.
+ * - router.js v3: removed the dead "noticing-hub" VIEW_NAMES entry
+ *   (duplicate of "noticing", never navigated to).
+ * - app.js v2: APP_VERSION bumped (was stale at "20 May 2026 v1" through
+ *   ~10 deploys, v94-v104).
+ * - noticing.js and breathing-session.js added to SHELL_URLS (both
+ *   existed since 21 May 2026 but were not precached -- worked online via
+ *   dynamic import, would have failed offline).
  *
  * v104 (15 June 2026, S4-6)
  * - intention.js v3: game/sport logging flow. Path B (self-directed,
@@ -208,7 +237,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v104";
+const CACHE_NAME = "alongside-v105";
 
 const SHELL_URLS = [
 
@@ -245,12 +274,14 @@ const SHELL_URLS = [
   "/alongside-app/js/views/privacy.js",
   "/alongside-app/js/views/goal-setup.js",
   "/alongside-app/js/views/library.js",
+  "/alongside-app/js/views/noticing.js",
 
   //  Views -- session types 
   "/alongside-app/js/views/prescribed.js",
   "/alongside-app/js/views/prescribed-session.js",
   "/alongside-app/js/views/gym-programme.js",
   "/alongside-app/js/views/quiet-session.js",
+  "/alongside-app/js/views/breathing-session.js",
   "/alongside-app/js/views/morning-session.js",
   "/alongside-app/js/views/core-session.js",
   "/alongside-app/js/views/yoga-session.js",
