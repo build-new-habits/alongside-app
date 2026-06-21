@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * alongside-v110 (21 Jun 2026, S4-13/14) — journal-entry.js v1 (new);
+ *   noticing.js v3: journal card wired, mindful desc updated to 5/10/15/20 min;
+ *   router.js v7: journal-entry in VIEW_NAMES + hideNavViews
+ *
  * alongside-v109 (21 Jun 2026) — router.js v6: checkin-mini added to hideNavViews
  *
  * alongside-v108 (21 Jun 2026) — router.js v5: onUnmount called synchronously in popstate handler; quiet-session.js v3: total countdown, correct durations, 20-min option
@@ -250,7 +254,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v109";
+const CACHE_NAME = "alongside-v110";
 
 const SHELL_URLS = [
 
@@ -291,6 +295,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/goal-setup.js",
   "/alongside-app/js/views/library.js",
   "/alongside-app/js/views/noticing.js",
+  "/alongside-app/js/views/journal-entry.js",
 
   //  Views -- session types 
   "/alongside-app/js/views/prescribed.js",
