@@ -1,6 +1,8 @@
 /**
  * router.js - View navigation
  *
+ * 21 Jun 2026 v6: checkin-mini added to hideNavViews
+ *
  * 21 Jun 2026 v5 (S4-CSS-NOTICING back-gesture fix):
  *   onUnmount() now called in the popstate handler as well as in navigate().
  *   The v4 hook in navigate() fires too late for the back gesture path —
@@ -189,7 +191,7 @@ export const router = {
     const hideNavViews = [
       "onboarding", "workout", "workout-complete", "checkin",
       "prescribed-session", "morning-session", "quiet-session",
-      "yoga-session", "breathing-session"
+      "yoga-session", "breathing-session", "checkin-mini"
     ];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
