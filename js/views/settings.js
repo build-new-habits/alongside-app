@@ -1,52 +1,28 @@
 /**
  * settings.js - Settings view
  *
- * 14 Jun 2026 v2 --- My Week tab simplified (S4-WP):
- *   The full My Week builder (day grid, day type picker, focus chips,
- *   duration, save) has moved to the new weekly-plan.js view, built
- *   against the finalised v1.6 weeklyPlan.days shape (store.js v3).
- *   The previous inline implementation here was built against an
- *   earlier, pre-v1.6 draft schema (flat weeklyPlan[day], sessionFocus[],
- *   weeklyPlanEnabled/weeklyPlanSetAt -- none of which exist in store.js
- *   v3) and has been removed in full: DAYS, DAY_LABELS, DAY_TYPES,
- *   FOCUS_OPTIONS, DURATION_OPTIONS, weeklyPlanDraft, configuringDay,
- *   initDraft(), isPremium(), renderDayRow(), renderDayConfig(),
- *   formatRelativeDate(), rerenderMyWeek(), and all related wirePanel
- *   handlers.
- *   The "My Week" tab is now a single entry card that navigates to the
- *   "weekly-plan" route (pre-registered in router.js v2). Tier gating
- *   (Free vs Personal/Athlete) is handled inside weekly-plan.js itself.
+ * 21 Jun 2026 v3 (S4-15/16) — Wellbeing tab added:
+ *   New sixth tab "Wellbeing" covering:
+ *   1. Auto-tagging toggle (journalSettings.autoTagging) — all users.
+ *      When on, journal entries are keyword-tagged on save. When off,
+ *      tags is empty and user-only.
+ *   2. Weekly reflection schedule (noticingPreferences.schedule + time)
+ *      — all users. 'automatic' (default) fires on first check-in of
+ *      the calendar week; any day name fires on that day at the chosen
+ *      time (defaults to 10:00 if not set).
+ *   3. Journal categories (journalSettings.categoryPrefs) — tier gated:
+ *      Free: read-only display of the 5 always categories (life, movement,
+ *      environment, nature, health). Personal+: can add from the 7 optional
+ *      categories (relationships, work, creativity, sleep, body, gratitude,
+ *      growth) one at a time. The 2 triggered categories (grief, joy) are
+ *      never shown here — the coach surfaces them from check-in patterns.
+ *   No schema changes — all fields were added in store.js v4 (S4-NH-SCHEMA).
  *
- * 30 May 2026 v1 --- My Week tab redesign:
- *   Three-column table layout (Day / Focus / per-day toggle).
- *   Inline config panel expands beneath tapped row, pushing days below down.
- *   Focus options renamed from "Session focus", broadened to all day types.
- *   Focus is now multi-select for all day types (not just gym).
- *   Run added as a day type with its own focus options.
- *   Per-day on/off toggle (row visually dimmed when off, not collapsed).
- *   Master plan toggle retained at top.
- *   sessionType replaced by sessionFocus[] in draft schema.
- *
- * 22 May 2026 v2 --- Dev tier panel added:
- *   Triple-tap the version label to open tier switcher.
- *   Free / Personal / Athlete. Changes persist in store.
- *   No other changes from restored 22 May 2026 v1.
- *
- * 22 May 2026 v1 --- My Week tab added (S4-3):
- *   Fifth tab: "My Week" --- weekly plan builder.
- *   7-day grid (Mon-Sun), each day configurable with type, focus,
- *   duration, activity name (class type).
- *   Free tier: toggle locked with upgrade prompt.
- *   Personal tier: full access --- create, edit, save, toggle on/off.
- *   Save writes weeklyPlan, weeklyPlanSetAt, weeklyPlanEnabled to store.
- *
- * 18 May 2026 v1 --- Editable profile, facility presets, add/remove conditions,
- *   Morning Routine. Library tab deep-link. Voice speed 10-level slider.
- *
- * v2.0 --- Library tab + My Movement + 10-level voice speed slider
- * v1.4 --- App version display and update check button (S3-6)
- * v1.3 --- Check-in notification (S3-6)
- * v1.0 --- Tabbed layout: Profile / Conditions / Equipment
+ * 14 Jun 2026 v2 --- My Week tab simplified (S4-WP).
+ * 30 May 2026 v1 --- My Week tab redesign.
+ * 22 May 2026 v2 --- Dev tier panel added.
+ * 22 May 2026 v1 --- My Week tab added (S4-3).
+ * 18 May 2026 v1 --- Editable profile, facility presets, conditions, Library.
  */
 
 import { store }                        from "../store.js";
@@ -76,6 +52,39 @@ const MOVEMENT_IDENTITIES = [
   { id: "swimming", label: "Swimming",        icon: "&#127946;" },
   { id: "classes",  label: "Classes",         icon: "&#127973;" },
   { id: "mixed",    label: "A mix of things", icon: "&#10024;" },
+];
+
+// -- Journal categories -------------------------------------------------------
+
+const JOURNAL_CATEGORIES_ALWAYS = [
+  { id: "life",        label: "Life",        desc: "Day-to-day thoughts, priorities, what's on your mind" },
+  { id: "movement",    label: "Movement",    desc: "Your relationship with physical activity" },
+  { id: "environment", label: "Environment", desc: "The spaces you move and live in" },
+  { id: "nature",      label: "Nature",      desc: "The world around you — weather, seasons, outdoor spaces" },
+  { id: "health",      label: "Health",      desc: "Rest, recovery, how your body is doing" },
+];
+
+const JOURNAL_CATEGORIES_OPTIONAL = [
+  { id: "relationships", label: "Relationships", desc: "People in your life, connection, support" },
+  { id: "work",          label: "Work",          desc: "Your working life and what it costs or gives you" },
+  { id: "creativity",    label: "Creativity",    desc: "Making things, play, what you do for yourself" },
+  { id: "sleep",         label: "Sleep",         desc: "Rest quality, what disrupts or helps it" },
+  { id: "body",          label: "Body",          desc: "Gratitude for what your body does, relationship with it" },
+  { id: "gratitude",     label: "Gratitude",     desc: "What went right, who helped, what you appreciate" },
+  { id: "growth",        label: "Growth",        desc: "What you're learning, where you're changing" },
+];
+
+// -- Noticing schedule --------------------------------------------------------
+
+const SCHEDULE_OPTIONS = [
+  { id: "automatic", label: "First check-in of the week", desc: "Prompt appears the day after your first check-in each week" },
+  { id: "monday",    label: "Monday",    desc: "" },
+  { id: "tuesday",   label: "Tuesday",   desc: "" },
+  { id: "wednesday", label: "Wednesday", desc: "" },
+  { id: "thursday",  label: "Thursday",  desc: "" },
+  { id: "friday",    label: "Friday",    desc: "" },
+  { id: "saturday",  label: "Saturday",  desc: "" },
+  { id: "sunday",    label: "Sunday",    desc: "" },
 ];
 
 // -- Equipment tab state ------------------------------------------------------
@@ -161,6 +170,14 @@ function speedLabel(rate) {
   return "Very fast";
 }
 
+// -- Tier helpers -------------------------------------------------------------
+
+function isPremium() {
+  if (typeof store.isPremium === "function") return store.isPremium();
+  const tier = store.get("userTier") || store.get("tier") || "free";
+  return tier !== "free";
+}
+
 // -- Render -------------------------------------------------------------------
 
 export function render() {
@@ -203,6 +220,11 @@ export function render() {
                 role="tab" aria-selected="${activeTab === "myweek"}"
                 aria-controls="settings-tab-panel" id="tab-myweek" data-tab="myweek">
           My Week
+        </button>
+        <button class="settings-tab ${activeTab === "wellbeing"  ? "active" : ""}"
+                role="tab" aria-selected="${activeTab === "wellbeing"}"
+                aria-controls="settings-tab-panel" id="tab-wellbeing" data-tab="wellbeing">
+          Wellbeing
         </button>
       </div>
 
@@ -253,6 +275,7 @@ function renderActiveTab() {
   if (activeTab === "equipment")  return renderEquipmentTab();
   if (activeTab === "library")    return renderLibraryTab();
   if (activeTab === "myweek")     return renderMyWeekTab();
+  if (activeTab === "wellbeing")  return renderWellbeingTab();
   return "";
 }
 
@@ -557,10 +580,7 @@ function renderLibraryTab() {
   `;
 }
 
-// -- My Week tab ----------------------------------------------------------------
-// Simplified entry card -- the full builder lives in weekly-plan.js
-// (route "weekly-plan", pre-registered in router.js v2). Tier gating is
-// handled there.
+// -- My Week tab --------------------------------------------------------------
 
 function renderMyWeekTab() {
   return `
@@ -580,6 +600,165 @@ function renderMyWeekTab() {
               aria-label="Open My Week">
         Open My Week &rarr;
       </button>
+    </section>
+  `;
+}
+
+// -- Wellbeing tab ------------------------------------------------------------
+
+function renderWellbeingTab() {
+  const premium       = isPremium();
+  const autoTagging   = store.get("journalSettings.autoTagging") !== false; // default true
+  const categoryPrefs = store.get("journalSettings.categoryPrefs") ||
+                        ["life", "movement", "environment", "nature", "health"];
+  const schedule      = store.get("noticingPreferences.schedule") || "automatic";
+  const scheduleTime  = store.get("noticingPreferences.time") || "10:00";
+
+  return `
+    <section aria-labelledby="wellbeing-heading">
+      <h2 id="wellbeing-heading" class="section-heading">Wellbeing</h2>
+
+      <!-- ── Journal tags ──────────────────────────────────────── -->
+      <h3 class="section-heading"
+          style="font-size: var(--text-sm); margin: var(--space-2) 0 var(--space-3);">
+        Journal auto-tagging
+      </h3>
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;
+                    gap: var(--space-4);">
+          <div style="flex: 1; min-width: 0;">
+            <p class="text-sm" style="font-weight: var(--font-semibold); margin-bottom: var(--space-1);">
+              Auto-tag journal entries
+            </p>
+            <p class="text-sm text-muted">
+              When on, the coach adds keyword tags to your entries automatically.
+              You can always remove tags manually.
+            </p>
+          </div>
+          <label class="toggle-switch" aria-label="Enable auto-tagging">
+            <input type="checkbox" id="wellbeing-autotag-toggle" role="switch"
+                   aria-checked="${autoTagging}" ${autoTagging ? "checked" : ""}>
+            <span class="toggle-track" aria-hidden="true"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- ── Journal categories ────────────────────────────────── -->
+      <h3 class="section-heading"
+          style="font-size: var(--text-sm); margin: var(--space-5) 0 var(--space-2);">
+        Journal categories
+      </h3>
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-3);">
+        These categories shape which prompts the coach offers in guided journalling.
+      </p>
+
+      <!-- Always-on categories (all users) -->
+      <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">
+        Always included
+      </p>
+      <div class="equipment-chip-grid" style="margin-bottom: var(--space-4);"
+           role="group" aria-label="Always included journal categories">
+        ${JOURNAL_CATEGORIES_ALWAYS.map(cat => `
+          <button class="equipment-chip selected"
+                  style="cursor: default; opacity: 0.8;"
+                  aria-pressed="true"
+                  aria-label="${cat.label} — always included"
+                  title="${cat.desc}"
+                  disabled>
+            ${cat.label}
+          </button>
+        `).join("")}
+      </div>
+
+      <!-- Optional categories (Premium only) -->
+      ${premium ? `
+        <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">
+          Optional — tap to add or remove
+        </p>
+        <div class="equipment-chip-grid" style="margin-bottom: var(--space-2);"
+             role="group" aria-label="Optional journal categories">
+          ${JOURNAL_CATEGORIES_OPTIONAL.map(cat => {
+            const active = categoryPrefs.includes(cat.id);
+            return `
+              <button class="equipment-chip wellbeing-category-chip ${active ? "selected" : ""}"
+                      data-category="${cat.id}"
+                      aria-pressed="${active}"
+                      aria-label="${cat.label}${active ? ", active" : ", tap to add"}"
+                      title="${cat.desc}">
+                ${cat.label}
+              </button>
+            `;
+          }).join("")}
+        </div>
+        <p class="text-xs text-muted">
+          Add categories that matter to you. The coach introduces them gradually,
+          not all at once.
+        </p>
+      ` : `
+        <div class="card" style="margin-bottom: var(--space-2);">
+          <p class="text-sm text-muted">
+            Seven additional categories — relationships, work, creativity, sleep,
+            body, gratitude, and growth — are available on the Personal plan.
+          </p>
+          <button class="btn btn-ghost btn-small" id="wellbeing-upgrade-btn"
+                  style="margin-top: var(--space-3);"
+                  aria-label="Upgrade to Personal plan">
+            Upgrade to Personal &rarr;
+          </button>
+        </div>
+      `}
+
+      <!-- ── Weekly reflection schedule ────────────────────────── -->
+      <h3 class="section-heading"
+          style="font-size: var(--text-sm); margin: var(--space-6) 0 var(--space-2);">
+        Weekly reflection
+      </h3>
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-3);">
+        When should your weekly noticing prompt appear?
+      </p>
+
+      <div class="card" style="padding: var(--space-1) 0;">
+        ${SCHEDULE_OPTIONS.map(opt => `
+          <label class="wellbeing-schedule-row"
+                 style="display: flex; align-items: center; gap: var(--space-3);
+                        padding: var(--space-3) var(--space-4); cursor: pointer;">
+            <input type="radio" name="noticing-schedule" value="${opt.id}"
+                   id="schedule-${opt.id}"
+                   ${schedule === opt.id ? "checked" : ""}
+                   aria-label="${opt.label}${opt.desc ? ": " + opt.desc : ""}"
+                   class="wellbeing-schedule-radio">
+            <span style="flex: 1;">
+              <span class="text-sm" style="font-weight: ${schedule === opt.id ? "var(--font-semibold)" : "normal"};">
+                ${opt.label}
+              </span>
+              ${opt.desc
+                ? `<span class="text-xs text-muted" style="display: block; margin-top: 2px;">${opt.desc}</span>`
+                : ""}
+            </span>
+          </label>
+        `).join("")}
+      </div>
+
+      <!-- Time picker — only shown when a specific day is selected -->
+      ${schedule !== "automatic" ? `
+        <div class="card" style="margin-top: var(--space-3);">
+          <label class="form-label" for="wellbeing-schedule-time"
+                 style="font-size: var(--text-sm); font-weight: var(--font-semibold);
+                        display: block; margin-bottom: var(--space-2);">
+            Time
+          </label>
+          <input type="time" id="wellbeing-schedule-time"
+                 class="form-input"
+                 value="${scheduleTime}"
+                 aria-label="Reflection reminder time"
+                 style="width: 100%; box-sizing: border-box;">
+          <p class="text-xs text-muted" style="margin-top: var(--space-2);">
+            The reflection prompt will appear in the Noticing tab on
+            ${schedule.charAt(0).toUpperCase() + schedule.slice(1)}s at this time.
+          </p>
+        </div>
+      ` : ""}
+
     </section>
   `;
 }
@@ -735,6 +914,14 @@ function rerenderEquipment() {
   if (newPanel) { panel.replaceWith(newPanel); onMount(); }
 }
 
+function rerenderWellbeing() {
+  const panel = document.getElementById("settings-tab-panel");
+  if (panel && activeTab === "wellbeing") {
+    panel.innerHTML = renderWellbeingTab();
+    wireWellbeingPanel();
+  }
+}
+
 // -- Dev tier panel -----------------------------------------------------------
 
 let _devTapCount = 0;
@@ -815,6 +1002,64 @@ function showDevPanel() {
   });
 
   document.getElementById("dev-panel-close")?.addEventListener("click", () => panel.remove());
+}
+
+// -- Wellbeing panel wiring ---------------------------------------------------
+
+function wireWellbeingPanel() {
+
+  // Auto-tagging toggle
+  const autotagToggle = document.getElementById("wellbeing-autotag-toggle");
+  if (autotagToggle) {
+    autotagToggle.addEventListener("change", () => {
+      store.set("journalSettings.autoTagging", autotagToggle.checked);
+    });
+  }
+
+  // Optional category chips (Premium only)
+  document.querySelectorAll(".wellbeing-category-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const catId  = chip.dataset.category;
+      if (!catId) return;
+      const always = JOURNAL_CATEGORIES_ALWAYS.map(c => c.id);
+      const current = store.get("journalSettings.categoryPrefs") || [...always];
+      const updated = current.includes(catId)
+        ? current.filter(id => id !== catId)
+        : [...current, catId];
+      // Never remove an always-on category
+      const safe = [...new Set([...always, ...updated.filter(id => !always.includes(id))])];
+      // But do allow optional ones to be toggled
+      const final = safe.filter(id => always.includes(id) || updated.includes(id));
+      store.set("journalSettings.categoryPrefs", final);
+      chip.classList.toggle("selected", final.includes(catId));
+      chip.setAttribute("aria-pressed", final.includes(catId));
+    });
+  });
+
+  // Schedule radio buttons
+  document.querySelectorAll(".wellbeing-schedule-radio").forEach(radio => {
+    radio.addEventListener("change", () => {
+      if (!radio.checked) return;
+      store.set("noticingPreferences.schedule", radio.value);
+      // Rerender to show/hide time picker
+      rerenderWellbeing();
+    });
+  });
+
+  // Time picker
+  const timePicker = document.getElementById("wellbeing-schedule-time");
+  if (timePicker) {
+    timePicker.addEventListener("change", () => {
+      if (timePicker.value) {
+        store.set("noticingPreferences.time", timePicker.value);
+      }
+    });
+  }
+
+  // Upgrade button (Free tier)
+  document.getElementById("wellbeing-upgrade-btn")?.addEventListener("click", () => {
+    router.navigate("upgrade");
+  });
 }
 
 // -- Wire all panel elements --------------------------------------------------
@@ -967,6 +1212,9 @@ function wirePanel() {
   document.getElementById("open-myweek-btn")?.addEventListener("click", () => {
     router.navigate("weekly-plan");
   });
+
+  // Wellbeing tab
+  if (activeTab === "wellbeing") wireWellbeingPanel();
 }
 
 // -- Notification wiring ------------------------------------------------------
