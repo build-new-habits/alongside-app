@@ -1,6 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * alongside-v111 (21 Jun 2026, S4-15/16) — settings.js v3: Wellbeing tab added
+ *   (auto-tagging toggle, journal categories, weekly reflection schedule)
+ *
  * alongside-v110 (21 Jun 2026, S4-13/14) — journal-entry.js v1 (new);
  *   noticing.js v3: journal card wired, mindful desc updated to 5/10/15/20 min;
  *   router.js v7: journal-entry in VIEW_NAMES + hideNavViews
@@ -254,7 +257,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v110";
+const CACHE_NAME = "alongside-v111";
 
 const SHELL_URLS = [
 
