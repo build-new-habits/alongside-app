@@ -1,17 +1,16 @@
 /* main.css - Import all styles for Alongside */
+/* 21 Jun 2026 v2 (S4-CSS-NOTICING) — added breathing-session, quiet-session, noticing imports */
 
 /* Base */
 @import 'base/variables.css';
 @import 'base/reset.css';
 @import 'base/typography.css';
 @import 'base/global.css';
-
 /* Layouts */
 @import 'layouts/app-shell.css';
 @import 'layouts/onboarding.css';
 @import 'layouts/goal-setup.css';
 @import 'layouts/progress.css';
-
 /* Components */
 @import 'components/buttons.css';
 @import 'components/cards.css';
@@ -21,3 +20,6 @@
 @import 'components/coach-fix.css';
 @import 'components/morning-session.css';
 @import 'components/weekly-plan.css';
+@import 'components/breathing-session.css';
+@import 'components/quiet-session.css';
+@import 'components/noticing.css';
