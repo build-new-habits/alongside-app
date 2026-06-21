@@ -1,6 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * alongside-v113 (21 Jun 2026) — coach-reflection.js v3: double path card bug fixed,
+ *   second-session card dismissal fixed, location interstitial added to Option A
+ *
  * alongside-v112 (21 Jun 2026) — settings.js v4: scrollable tab strip, age→ageBand chip picker
  *
  * alongside-v111 (21 Jun 2026, S4-15/16) — settings.js v3: Wellbeing tab added
@@ -259,7 +262,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v112";
+const CACHE_NAME = "alongside-v113";
 
 const SHELL_URLS = [
 
