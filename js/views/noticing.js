@@ -1,36 +1,31 @@
 /**
  * js/views/noticing.js - Noticing Hub Landing View
  *
+ * 21 Jun 2026 v3 (S4-13/14):
+ *   - Journal card wired to "journal-entry" route. Removes the "on its
+ *     way" placeholder. Card is now a tappable button matching the
+ *     breathing and mindful movement cards.
+ *   - "This week" prompt card gains a "Write about this" button that
+ *     navigates to journal-entry and pre-selects the weekly-noticing
+ *     type by setting a store flag (journalEntryType).
+ *   - Mindful movement description updated: "5, 10, 15, or 20 minutes"
+ *     (was "5, 10, or 15 minutes" — quiet-session.js v3 added the 20-min
+ *     option with correctly-summing exercise durations).
+ *   - "Your reflections" section now active for all users (was already
+ *     built in v2 but only visible when entries existed — no change
+ *     needed, this renders automatically from journalEntries array).
+ *
  * 15 Jun 2026 v2 (S4-9/10) - Activated the Noticing tab properly:
- *   - Breathing card now navigates to breathing-session.js (the fully
- *     built 5-type/all-duration player) instead of quiet-session.js's
- *     "breathing" mode, which is one-dimensional (fixed rounds, no
- *     duration choice) and is being superseded, not removed.
+ *   - Breathing card now navigates to breathing-session.js.
  *   - NEW: Mindful Movement card, launched via quiet-session.js's
- *     "mindful" mode (quietMode/quietReturnRoute/quietLaunchedDirect),
- *     now safe to use after the mindfulStarted fix in quiet-session.js
- *     v2 (the duration-selector screen was previously dead code).
+ *     "mindful" mode.
  *   - "Journal and reflect" card and the "This Week > Reflect on this"
- *     button both previously routed to "journal-entry", which does not
- *     exist (S4-13/14) -- a dead tap. Also, quiet-session.js's journal
- *     mode writes journalEntries as a date-keyed object, which would be
- *     silently discarded by store.mergeWithDefaults()'s Array.isArray
- *     check against the S4-NH-SCHEMA array shape -- a real data-loss
- *     risk. Both are now warm "on its way" treatments: the weekly prompt
- *     and the journal card are still shown (reflection value, coach
- *     transparency about what's coming) but neither is a tap target
- *     that goes anywhere, until S4-13/14 builds journal-entry.js
- *     properly against the array schema.
+ *     button both treated as warm "on its way" placeholders until
+ *     S4-13/14 builds journal-entry.js properly against the array schema.
  *
  * 21 May 2026 v1
  *
  * The Noticing Hub is the wellbeing layer of Alongside: Move.
- * It is a co-equal nav item with Today and Progress.
- *
- * Structure:
- *   - This Week: weekly reflection prompt (6-week rotation)
- *   - Anytime: Breathing / Mindful Movement / Journal (coming soon)
- *
  * Route: "noticing"
  * Nav: visible (fourth tab)
  */
@@ -41,8 +36,6 @@ import { router } from "../router.js";
 export const centered = false;
 
 // ── Weekly noticing prompt data ───────────────────────────────────────────────
-// 6-week cycle. Each week has 4 personality variants.
-// Cycle advances on the first check-in of each new week.
 
 const WEEKLY_PROMPTS = [
   {
@@ -148,7 +141,6 @@ export function render() {
   return `
     <div class="view noticing-view">
 
-      <!-- Screen-reader page title — visually hidden, matches nav label -->
       <h1 class="sr-only">Noticing</h1>
 
       <div class="view-header">
@@ -160,59 +152,84 @@ export function render() {
       <!-- ── This Week ────────────────────────────────────────── -->
       <section class="noticing-section" aria-labelledby="this-week-heading">
         <h2 class="section-label" id="this-week-heading"
-            style="color: var(--color-primary); font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-3);">
+            style="color: var(--color-primary); font-size: var(--text-lg);
+                   font-weight: var(--font-semibold); margin-bottom: var(--space-3);">
           This week
         </h2>
 
         <div class="card" style="margin-bottom: var(--space-2);">
           <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">${weekData.theme}</p>
-          <p style="font-size: var(--text-base); line-height: 1.6; margin-bottom: var(--space-2);">${weekData.prompt}</p>
-          <p class="text-sm text-muted" style="margin-bottom: 0;">
-            Something to sit with this week. A place to write this down properly is on its way.
-          </p>
+          <p style="font-size: var(--text-base); line-height: 1.6;
+                    margin-bottom: var(--space-4);">${weekData.prompt}</p>
+          <button class="btn btn-ghost btn-small" id="noticing-weekly-journal-btn"
+                  style="align-self: flex-start;"
+                  aria-label="Write about this week's prompt">
+            Write about this
+          </button>
         </div>
       </section>
 
       <!-- ── Anytime ──────────────────────────────────────────── -->
       <section class="noticing-section" aria-labelledby="anytime-heading">
         <h2 class="section-label" id="anytime-heading"
-            style="color: var(--color-primary); font-size: var(--text-lg); font-weight: var(--font-semibold); margin: var(--space-5) 0 var(--space-3);">
+            style="color: var(--color-primary); font-size: var(--text-lg);
+                   font-weight: var(--font-semibold); margin: var(--space-5) 0 var(--space-3);">
           Anytime
         </h2>
 
         <div style="display: flex; flex-direction: column; gap: var(--space-3);">
 
           <button class="card" id="noticing-breathe-btn"
-                  style="display: flex; align-items: center; gap: var(--space-4); text-align: left; width: 100%; cursor: pointer; background: var(--color-surface);"
+                  style="display: flex; align-items: center; gap: var(--space-4);
+                         text-align: left; width: 100%; cursor: pointer;
+                         background: var(--color-surface);"
                   aria-label="Breathing exercises — five types, any duration">
-            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">🌬️</span>
+            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
+                  aria-hidden="true">🌬️</span>
             <div style="flex: 1; min-width: 0;">
-              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Breathing</p>
+              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
+                        margin-bottom: var(--space-1);">Breathing</p>
               <p class="text-secondary" style="font-size: var(--text-sm);">Five types. Any duration.</p>
             </div>
-            <span style="color: var(--color-primary); font-size: 1.25rem;" aria-hidden="true">›</span>
+            <span style="color: var(--color-primary); font-size: 1.25rem;"
+                  aria-hidden="true">›</span>
           </button>
 
           <button class="card" id="noticing-mindful-btn"
-                  style="display: flex; align-items: center; gap: var(--space-4); text-align: left; width: 100%; cursor: pointer; background: var(--color-surface);"
-                  aria-label="Mindful movement — five, ten, or fifteen minute guided sessions">
-            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">🌿</span>
+                  style="display: flex; align-items: center; gap: var(--space-4);
+                         text-align: left; width: 100%; cursor: pointer;
+                         background: var(--color-surface);"
+                  aria-label="Mindful movement — five, ten, fifteen, or twenty minute guided sessions">
+            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
+                  aria-hidden="true">🌿</span>
             <div style="flex: 1; min-width: 0;">
-              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Mindful movement</p>
-              <p class="text-secondary" style="font-size: var(--text-sm);">5, 10, or 15 minutes. Guided, with a timer.</p>
+              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
+                        margin-bottom: var(--space-1);">Mindful movement</p>
+              <p class="text-secondary" style="font-size: var(--text-sm);">
+                5, 10, 15, or 20 minutes. Guided, with a timer.
+              </p>
             </div>
-            <span style="color: var(--color-primary); font-size: 1.25rem;" aria-hidden="true">›</span>
+            <span style="color: var(--color-primary); font-size: 1.25rem;"
+                  aria-hidden="true">›</span>
           </button>
 
-          <div class="card"
-               style="display: flex; align-items: center; gap: var(--space-4); background: var(--color-surface); opacity: 0.75;"
-               aria-label="Journal and reflect — on its way">
-            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">📝</span>
+          <button class="card" id="noticing-journal-btn"
+                  style="display: flex; align-items: center; gap: var(--space-4);
+                         text-align: left; width: 100%; cursor: pointer;
+                         background: var(--color-surface);"
+                  aria-label="Journal and reflect">
+            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
+                  aria-hidden="true">📝</span>
             <div style="flex: 1; min-width: 0;">
-              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Journal and reflect</p>
-              <p class="text-secondary" style="font-size: var(--text-sm);">Guided prompts and free writing — on its way.</p>
+              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
+                        margin-bottom: var(--space-1);">Journal and reflect</p>
+              <p class="text-secondary" style="font-size: var(--text-sm);">
+                Guided prompts or free writing. Stays private.
+              </p>
             </div>
-          </div>
+            <span style="color: var(--color-primary); font-size: 1.25rem;"
+                  aria-hidden="true">›</span>
+          </button>
 
         </div>
       </section>
@@ -221,9 +238,11 @@ export function render() {
       ${totalEntries > 0 ? `
         <section class="noticing-section" aria-labelledby="reflections-heading"
                  style="margin-top: var(--space-5);">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);">
+          <div style="display: flex; align-items: center; justify-content: space-between;
+                      margin-bottom: var(--space-3);">
             <h2 class="section-label" id="reflections-heading"
-                style="color: var(--color-primary); font-size: var(--text-lg); font-weight: var(--font-semibold);">
+                style="color: var(--color-primary); font-size: var(--text-lg);
+                       font-weight: var(--font-semibold);">
               Your reflections
             </h2>
             ${totalEntries > 3
@@ -234,10 +253,22 @@ export function render() {
           <div style="display: flex; flex-direction: column; gap: var(--space-2);">
             ${recentEntries.map(entry => `
               <div class="card" role="article">
-                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                <div style="display: flex; align-items: center; gap: var(--space-2);
+                            margin-bottom: var(--space-2);">
                   <span class="text-xs text-muted">${formatDate(entry.createdAt)}</span>
-                  ${entry.category
-                    ? `<span class="text-xs text-muted" style="background: var(--color-surface-raised, rgba(255,255,255,0.06)); padding: 2px 8px; border-radius: 10px;">${entry.category}</span>`
+                  ${entry.category && entry.category !== "weekly"
+                    ? `<span class="text-xs text-muted"
+                             style="background: var(--color-surface-raised, rgba(255,255,255,0.06));
+                                    padding: 2px 8px; border-radius: 10px;">
+                         ${entry.category}
+                       </span>`
+                    : ""}
+                  ${entry.type === "weekly-noticing"
+                    ? `<span class="text-xs text-muted"
+                             style="background: var(--color-surface-raised, rgba(255,255,255,0.06));
+                                    padding: 2px 8px; border-radius: 10px;">
+                         This week
+                       </span>`
                     : ""}
                 </div>
                 <p class="text-secondary" style="font-size: var(--text-sm); line-height: 1.6;">${
@@ -271,5 +302,17 @@ export function onMount() {
     store.set("quietReturnRoute", "noticing");
     store.set("quietLaunchedDirect", true);
     router.navigate("quiet-session");
+  });
+
+  // Journal card — open journal-entry on the "choose" screen
+  document.getElementById("noticing-journal-btn")?.addEventListener("click", () => {
+    store.set("journalEntryType", null); // null = show choose screen
+    router.navigate("journal-entry");
+  });
+
+  // "Write about this" on the weekly prompt — open directly on weekly type
+  document.getElementById("noticing-weekly-journal-btn")?.addEventListener("click", () => {
+    store.set("journalEntryType", "weekly-noticing");
+    router.navigate("journal-entry");
   });
 }
