@@ -1,16 +1,6 @@
 /**
  * router.js - View navigation
  *
- * 21 Jun 2026 v6: checkin-mini added to hideNavViews
- *
- * 21 Jun 2026 v5 (S4-CSS-NOTICING back-gesture fix):
- *   onUnmount() now called in the popstate handler as well as in navigate().
- *   The v4 hook in navigate() fires too late for the back gesture path —
- *   popstate -> back() -> navigate() runs async, so the interval can tick
- *   before navigate() reaches the onUnmount call. Calling it synchronously
- *   in the popstate handler stops timers immediately on gesture, before
- *   any async work begins.
- *
  * 21 Jun 2026 v4 (S4-CSS-NOTICING):
  *   onUnmount() hook added to navigate(). Before switching views, navigate()
  *   now calls this.views[this.currentView]?.onUnmount?.() if that method
@@ -19,7 +9,6 @@
  *   which calls navigate(), which now runs onUnmount() on the view being
  *   left before tearing down its DOM. breathing-session.js and
  *   quiet-session.js each implement onUnmount() to clear their intervals.
- *   breathing-session added to hideNavViews and VIEW_NAMES.
  *
  * 30 May 2026 v1 --- Daily flow redesign:
  *   coach-reflection added to VIEW_NAMES.
@@ -122,30 +111,19 @@ export const router = {
    * it, re-push the state (so the stack stays non-empty), and call
    * router.back() ourselves.
    *
-   * onUnmount is called here synchronously, before back() begins any
-   * async work — this is the earliest safe point to stop timers on a
-   * back gesture. The matching call in navigate() handles in-app
-   * navigation (tap Back / Exit buttons).
+   * This prevents the PWA from exiting when the user swipes or taps back.
    */
   setupPopstate() {
     if (this._popstateWired) return;
     this._popstateWired = true;
 
+    // Seed the browser history so there is always a state to pop to
     window.history.pushState({ alongside: true }, "", window.location.href);
 
     window.addEventListener("popstate", () => {
+      // Re-push immediately so the stack never empties
       window.history.pushState({ alongside: true }, "", window.location.href);
-
-      // Stop active timers on the current view immediately — synchronous,
-      // before the async navigate() chain begins.
-      if (this.currentView && this.views[this.currentView]?.onUnmount) {
-        try {
-          this.views[this.currentView].onUnmount();
-        } catch (e) {
-          console.warn("onUnmount error (popstate) on " + this.currentView, e);
-        }
-      }
-
+      // Now handle in-app back navigation
       this.back();
     });
   },
@@ -159,10 +137,9 @@ export const router = {
 
     /**
      * onUnmount hook — call cleanup on the outgoing view before switching.
-     * Handles in-app navigation (tap Back / Exit). The popstate handler
-     * covers the device back gesture path and calls this first, so for
-     * gesture navigation this may fire twice — onUnmount() must be safe
-     * to call more than once (clearing a null interval is a no-op).
+     * This stops active timers (breathing, mindful movement) when the
+     * device back gesture fires popstate -> back() -> navigate().
+     * Views opt in by exporting an onUnmount() function.
      */
     if (this.currentView && this.views[this.currentView]?.onUnmount) {
       try {
@@ -172,6 +149,7 @@ export const router = {
       }
     }
 
+    // Push to in-app navigation stack
     const isOnboarding = viewName.startsWith("onboarding");
     const isDuplicate  = this._history.length > 0 &&
                          this._history[this._history.length - 1] === viewName;
@@ -180,6 +158,7 @@ export const router = {
       if (this._history.length > 20) this._history.shift();
     }
 
+    // Push browser history state so popstate can fire on back gesture
     window.history.pushState({ alongside: true, view: viewName }, "", window.location.href);
 
     const mainContent = document.getElementById("main-content");
@@ -188,10 +167,13 @@ export const router = {
     mainContent.innerHTML = "";
     mainContent.className = "main-content";
 
+    // Nav is hidden only during focused flows.
+    // intention, coach-proposal, and coach-reflection all show nav now --
+    // the user can always reach Progress, Noticing, or Settings.
     const hideNavViews = [
       "onboarding", "workout", "workout-complete", "checkin",
       "prescribed-session", "morning-session", "quiet-session",
-      "yoga-session", "breathing-session", "checkin-mini"
+      "yoga-session", "breathing-session"
     ];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
@@ -279,6 +261,12 @@ export const router = {
     });
   },
 
+  /**
+   * Highlight the active nav item.
+   * today, coach-reflection, coach-proposal and intention all map to
+   * the Today button (data-view="intention") since they are all part
+   * of the Today flow.
+   */
   setActiveNav(viewName) {
     const todayViews = ["today", "coach-reflection", "coach-proposal", "intention"];
     const navKey = todayViews.includes(viewName) ? "intention" : viewName;
