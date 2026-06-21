@@ -1,21 +1,24 @@
 /*
- * css/components/noticing.css
- * Alongside: Move — Noticing Hub view styles
+ * css/components/breathing-session.css
+ * Alongside: Move — Breathing Session view styles
  *
  * 21 Jun 2026 v1 (S4-CSS-NOTICING)
  *
- * The Noticing tab is a card-based hub. Its cards use the shared .card
- * class from components/cards.css. This file handles layout and any
- * noticing-specific overrides.
+ * Covers: type picker, duration picker, live session, done screen.
+ * Classes: .breathing-view, .breathing-view--session, .bs-top-progress,
+ *          .bs-progress-fill, .bs-session-header, .bs-circle-container,
+ *          .bs-breath-circle, .bs-phase-fill, .bs-phase-info,
+ *          .bs-phase-label, .bs-phase-cue
  *
- * If noticing.js introduces component-specific class names in a future
- * session, add them here. For now this file handles spacing and layout
- * of the hub shell so the tab feels distinct from Today and Progress.
+ * NOTE: breathing-session.js references #bs-phase-fill (a vertical fill
+ * inside the breath circle) but that element is missing from renderSession().
+ * A co-ordinated JS fix is documented in the S4-CSS-NOTICING handoff.
+ * The styles for .bs-phase-fill are included here ready for that fix.
  */
 
-/* ── Hub shell ────────────────────────────────────────────────────────────── */
+/* ── Shared shell ──────────────────────────────────────────────────────────── */
 
-.noticing-view {
+.breathing-view {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -24,103 +27,127 @@
   box-sizing: border-box;
 }
 
-.noticing-header {
-  margin-bottom: var(--space-5);
+/* ── Session variant — no side padding, progress bar flush to top ─────────── */
+
+.breathing-view--session {
+  padding: 0 0 var(--space-8);
+  position: relative;
 }
 
-.noticing-title {
-  font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
-  color: var(--color-text);
-  margin: 0 0 var(--space-1);
+/* ── Top progress bar ─────────────────────────────────────────────────────── */
+
+.bs-top-progress {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-surface);
+  overflow: hidden;
+  z-index: 10;
+  /* visually hidden from view when at 0 but still accessible via aria */
 }
 
-.noticing-subtitle {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  margin: 0;
+.bs-progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  transition: width 1s linear;
+  border-radius: 0 2px 2px 0;
 }
 
-/* ── Card grid / stack ────────────────────────────────────────────────────── */
+/* ── Session header: Exit button + time remaining ─────────────────────────── */
 
-.noticing-cards {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-/* ── Individual noticing card overrides ───────────────────────────────────── */
-
-.noticing-card {
+.bs-session-header {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  min-height: 48px; /* touch target row */
 }
 
-.noticing-card:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-primary);
-}
+/* ── Breath circle ────────────────────────────────────────────────────────── */
 
-.noticing-card-icon {
-  font-size: 1.75rem;
-  flex-shrink: 0;
-  line-height: 1.2;
-}
-
-.noticing-card-body {
+.bs-circle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 1;
-  min-width: 0;
+  padding: var(--space-8) var(--space-4) var(--space-6);
 }
 
-.noticing-card-title {
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--color-text);
-  margin: 0 0 var(--space-1);
+.bs-breath-circle {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--color-primary) 30%, transparent),
+    color-mix(in srgb, var(--color-primary) 10%, transparent)
+  );
+  border: 2px solid color-mix(in srgb, var(--color-primary) 60%, transparent);
+  transform: scale(1);
+  transition: transform 4s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  /* GPU compositing — keeps animation smooth on mobile */
+  will-change: transform;
 }
 
-.noticing-card-desc {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  margin: 0;
-  line-height: 1.4;
-}
-
-.noticing-card-arrow {
-  color: var(--color-primary);
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-/* ── "On its way" / disabled card state ───────────────────────────────────── */
-
-.noticing-card--coming-soon {
-  opacity: 0.55;
-  cursor: default;
+/*
+ * .bs-phase-fill — vertical water-fill inside the circle.
+ * This element is referenced in breathing-session.js startPhase() as
+ * #bs-phase-fill but is not yet present in renderSession(). Add this
+ * element to renderSession() inside .bs-breath-circle:
+ *
+ *   <div class="bs-phase-fill" id="bs-phase-fill" aria-hidden="true"></div>
+ *
+ * The JS sets fill.style.height = pct + "%" each tick. These styles
+ * make that fill visible once the element exists.
+ */
+.bs-phase-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: color-mix(in srgb, var(--color-primary) 25%, transparent);
+  height: 100%;
+  transition: height 1s linear;
+  border-radius: 0 0 50% 50%;
   pointer-events: none;
 }
 
-.noticing-card--coming-soon .noticing-card-arrow {
-  display: none;
+/* ── Phase info: label + cue ──────────────────────────────────────────────── */
+
+.bs-phase-info {
+  text-align: center;
+  padding: 0 var(--space-5) var(--space-4);
 }
 
-.noticing-coming-tag {
-  font-size: var(--text-xs);
+.bs-phase-label {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-2);
+  line-height: 1.3;
+}
+
+.bs-phase-cue {
   color: var(--color-text-secondary);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  padding: 2px var(--space-2);
-  flex-shrink: 0;
+  font-size: var(--text-sm);
+  margin: 0;
+  min-height: 1.4em; /* prevents layout shift when cue changes */
 }
 
-/* ── Reduced motion ───────────────────────────────────────────────────────── */
+/* ── Reduced motion: disable circle scale animation ──────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .noticing-card {
+  .bs-breath-circle {
+    transition: none;
+  }
+  .bs-progress-fill {
+    transition: none;
+  }
+  .bs-phase-fill {
     transition: none;
   }
 }
