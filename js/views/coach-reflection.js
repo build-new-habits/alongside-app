@@ -1,50 +1,29 @@
 /**
  * coach-reflection.js - Post Check-In Pattern Reflection
  *
- * 01 Jun 2026 v1
+ * 21 Jun 2026 v3 (bug fixes):
+ *   - Double path card bug fixed: mini-no-btn handler now calls rerender()
+ *     instead of splicing the DOM directly. The surgical DOM replacement
+ *     was leaving stale content and double-rendering the option paths.
+ *   - Return-visit / second-session card no longer persists after dismissal
+ *     (same root cause — full rerender replaces entire view cleanly).
+ *   - Location interstitial added to Option A ("Suggest something for me").
+ *     The coach path needs to know where the user is before generating a
+ *     proposal. Shows three options: At home / At the gym / Outside.
+ *     If today's weekly plan already covers today, location is skipped
+ *     (the plan implies context). sessionLocation written to store before
+ *     navigating to coach-proposal.
  *
- * v1 -- View header added:
- *   "Your Session" h1 added to render() for clear screen orientation.
- *   Matches pattern of all other views with nav visible.
+ * 01 Jun 2026 v1
+ *   "Your Session" h1 added.
  *
  * 30 May 2026 v2
- *
- * v2 -- Bug fixes:
- *   Options now use intention-path CSS classes (same as intention screen).
- *   Event wiring moved from delegated outer listener to direct button listeners
- *   attached in wireOptions() so rerender() correctly re-attaches after DOM rebuild.
- *   Second-session "No, all good" now calls wireOptions() not onMount().
- *   B-path picker uses direct listeners, no rerender needed for chip selection.
+ *   Options use intention-path CSS classes. Event wiring moved to
+ *   wireOptions() with direct button listeners.
  *
  * Act 3 of the daily flow. Sits between check-in and session selection.
- *
- * The coach reads today's check-in against recent activityLog entries
- * and checkinHistory, identifies one relevant pattern, and speaks to it
- * before offering any proposal. This is the emotional intelligence moment --
- * the coach showing she has been paying attention to the person, not just
- * the metrics.
- *
- * After the reflection, the user is offered four paths (A/B/C/D):
- *   A -- Suggest something for me (routes to coach-proposal)
- *   B -- I have something in mind (activity chip picker)
- *   C -- My plans (prescribed, gym plan, weekly routine)
- *   D -- Noticing (walk, reflection, rest)
- *
- * Second session same day:
- *   If a check-in exists today AND an activityLog entry exists today,
- *   the screen detects this and shows a mini "has anything changed?"
- *   prompt before the A/B/C/D options, rather than routing back to
- *   the full check-in.
- *
  * Route: coach-reflection
  * Nav: visible (Today tab active)
- *
- * Data read:
- *   activityLog         -- last 14 days, completed entries
- *   conditionPainScores -- today's pain
- *   conditions          -- active condition IDs
- *   lastCheckin         -- today's energy and mood
- *   name                -- for personal address
  */
 
 import { store }       from "../store.js";
@@ -53,22 +32,28 @@ import { checkinData } from "../data/checkin.js";
 export const centered = false;
 
 // ── State ─────────────────────────────────────────────────────────────────────
-// Second-session mini prompt
-let miniState   = null;  // null | "asked" | "energy-shifted" | "pain-flagged"
 
-// B-path: I have something in mind
+let miniState        = null;   // null | "asked"
 let selectedActivity = null;
+let showLocation     = false;  // true while location interstitial is showing
 
 // ── Activity options for path B ───────────────────────────────────────────────
+
 const B_ACTIVITIES = [
-  { id: "gym",         label: "Gym session",       icon: "&#127947;" },
-  { id: "run",         label: "Run",                icon: "&#127939;" },
-  { id: "walk",        label: "Walk",               icon: "&#128694;" },
-  { id: "swim",        label: "Swim",               icon: "&#127946;" },
-  { id: "cycle",       label: "Cycle",              icon: "&#128692;" },
-  { id: "yoga",        label: "Yoga / Pilates",     icon: "&#129337;" },
-  { id: "class",       label: "Class / workshop",   icon: "&#129338;" },
-  { id: "other",       label: "Something else",     icon: "&#10067;"  },
+  { id: "gym",   label: "Gym session",   icon: "&#127947;" },
+  { id: "run",   label: "Run",           icon: "&#127939;" },
+  { id: "walk",  label: "Walk",          icon: "&#128694;" },
+  { id: "swim",  label: "Swim",          icon: "&#127946;" },
+  { id: "cycle", label: "Cycle",         icon: "&#128692;" },
+  { id: "yoga",  label: "Yoga / Pilates",icon: "&#129337;" },
+  { id: "class", label: "Class / workshop", icon: "&#129338;" },
+  { id: "other", label: "Something else",icon: "&#10067;"  },
+];
+
+const LOCATION_OPTIONS = [
+  { id: "home",    label: "At home",    icon: "&#127968;" },
+  { id: "gym",     label: "At the gym", icon: "&#127947;" },
+  { id: "outside", label: "Outside",    icon: "&#127807;" },
 ];
 
 // ── Data helpers ──────────────────────────────────────────────────────────────
@@ -81,9 +66,6 @@ function getTodayStr() {
   return new Date().toISOString().split("T")[0];
 }
 
-/**
- * Returns completed activityLog entries from the last N days (excluding today).
- */
 function getRecentLog(days) {
   const log    = store.get("activityLog") || [];
   const today  = getTodayStr();
@@ -93,67 +75,37 @@ function getRecentLog(days) {
   return log.filter(e => e.date >= cutoffStr && e.date < today);
 }
 
-/**
- * Returns activityLog entries logged today.
- */
 function getTodayLog() {
   const log   = store.get("activityLog") || [];
   const today = getTodayStr();
   return log.filter(e => e.date === today);
 }
 
-/**
- * Count consecutive training days ending yesterday.
- * Uses completed activityLog entries only.
- * A gap of one day breaks the chain.
- */
 function getConsecutiveDays() {
   const log   = store.get("activityLog") || [];
   const today = getTodayStr();
-
-  // Build a Set of unique dates with activity (excluding today)
   const activeDates = new Set(
-    log
-      .filter(e => e.date < today)
-      .map(e => e.date)
+    log.filter(e => e.date < today).map(e => e.date)
   );
-
   let count = 0;
   const cursor = new Date();
-  cursor.setDate(cursor.getDate() - 1); // start yesterday
-
+  cursor.setDate(cursor.getDate() - 1);
   while (true) {
     const dateStr = cursor.toISOString().split("T")[0];
-    if (activeDates.has(dateStr)) {
-      count++;
-      cursor.setDate(cursor.getDate() - 1);
-    } else {
-      break;
-    }
+    if (activeDates.has(dateStr)) { count++; cursor.setDate(cursor.getDate() - 1); }
+    else break;
   }
   return count;
 }
 
-/**
- * Returns the number of days since the last activity (excluding today).
- * Returns null if no activity found.
- */
 function getDaysSinceLastActivity() {
   const log   = store.get("activityLog") || [];
   const today = getTodayStr();
-  const previous = log
-    .filter(e => e.date < today)
-    .sort((a, b) => b.date.localeCompare(a.date));
+  const previous = log.filter(e => e.date < today).sort((a, b) => b.date.localeCompare(a.date));
   if (!previous.length) return null;
-  const last = new Date(previous[0].date);
-  const now  = new Date(today);
-  return Math.round((now - last) / 86400000);
+  return Math.round((new Date(today) - new Date(previous[0].date)) / 86400000);
 }
 
-/**
- * For the last N completed sessions, returns the average energy delta
- * (energyAfter - energyBefore). Returns null if insufficient data.
- */
 function getEnergyDelta(sessions) {
   const log = getRecentLog(14);
   const withBoth = log.filter(
@@ -164,86 +116,59 @@ function getEnergyDelta(sessions) {
   return sum / withBoth.length;
 }
 
-/**
- * Returns the last session where the user flagged a specific feel value
- * and mood was low (mood <= 4) at check-in, to detect the "moved despite
- * low mood and felt better" pattern.
- */
 function getLowMoodMovedWell() {
   const log = getRecentLog(7);
   return log.find(
     e => (e.feel === "strong" || e.feel === "right" || e.feel === "loved") &&
-         typeof e.energyBefore === "number" &&
-         e.energyBefore <= 4
+         typeof e.energyBefore === "number" && e.energyBefore <= 4
   ) || null;
 }
 
-/**
- * Returns the last session where painChange was "better".
- */
 function getLastPainImproved() {
-  const log = getRecentLog(7);
-  return log.find(e => e.painChange === "better") || null;
+  return getRecentLog(7).find(e => e.painChange === "better") || null;
 }
 
-/**
- * Returns true if the user has checked in on at least 6 of the last 7 days.
- */
 function hasHighCheckinConsistency() {
-  const history = checkinData.getHistory(7) || [];
-  const today   = getTodayStr();
-  const cutoff  = new Date();
+  const history   = checkinData.getHistory(7) || [];
+  const today     = getTodayStr();
+  const cutoff    = new Date();
   cutoff.setDate(cutoff.getDate() - 7);
   const cutoffStr = cutoff.toISOString().split("T")[0];
-  const count = history.filter(h => h.date >= cutoffStr && h.date < today).length;
-  return count >= 6;
+  return history.filter(h => h.date >= cutoffStr && h.date < today).length >= 6;
 }
 
-/**
- * Returns true if energy OR mood check-in has been <= 3 for 3+ of the
- * last 4 check-ins. Burnout proximity signal.
- */
 function isBurnoutRisk() {
   const history = checkinData.getHistory(4) || [];
   const today   = getTodayStr();
   const recent  = history.filter(h => h.date < today).slice(-4);
-  const lowCount = recent.filter(h => (h.energy || 5) <= 3 || (h.mood || 5) <= 3).length;
-  return lowCount >= 3;
+  return recent.filter(h => (h.energy || 5) <= 3 || (h.mood || 5) <= 3).length >= 3;
 }
 
-/**
- * Returns true if any active condition has a pain score >= 7 today.
- */
 function hasSeverePainToday() {
   const conditions = store.get("conditions") || [];
   const scores     = store.get("conditionPainScores") || {};
   return conditions.some(id => (scores[id] || 0) >= 7);
 }
 
+/**
+ * Returns true if the weekly plan covers today with a non-open type,
+ * meaning location context is already implied and the interstitial
+ * can be skipped.
+ */
+function planCoversToday() {
+  const weeklyPlan = store.get("weeklyPlan");
+  if (!weeklyPlan?.updatedAt) return false;
+  const day  = new Date().toLocaleDateString("en-GB", { weekday: "long" }).toLowerCase();
+  const plan = weeklyPlan.days?.[day];
+  return !!(plan && plan.enabled && plan.type !== "open");
+}
+
 // ── Pattern detection ─────────────────────────────────────────────────────────
 
-/**
- * buildReflection()
- *
- * Priority order (first match wins):
- *   1. Severe pain today
- *   2. Burnout risk (3+ low check-ins in last 4)
- *   3. 3+ consecutive training days
- *   4. Moved despite low energy/mood and felt positive
- *   5. Pain improved after last session
- *   6. Energy consistently higher after sessions (avg delta > 1.5)
- *   7. First session in 5+ days
- *   8. High check-in consistency (6/7 days)
- *   9. Default: warm contextual greeting from today's check-in
- *
- * Returns:
- *   { type: string, lines: string[], proposalBias: string|null }
- */
 function buildReflection() {
   const checkin     = store.get("lastCheckin") || {};
   const energy      = checkin.energy || 5;
   const mood        = checkin.mood   || 5;
-  const name        = getFirstName();
   const consecutive = getConsecutiveDays();
   const daysSince   = getDaysSinceLastActivity();
   const energyDelta = getEnergyDelta(3);
@@ -253,158 +178,107 @@ function buildReflection() {
   const burnoutRisk = isBurnoutRisk();
   const highConsist = hasHighCheckinConsistency();
 
-  // 1. Severe pain
   if (hasSevere) {
-    return {
-      type: "severe-pain",
-      lines: [
-        "Your pain is quite high today.",
-        "I am not going to suggest anything demanding.",
-        "Gentle movement, breathing, or rest are all valid options right now. What feels right?"
-      ],
-      proposalBias: "rest"
-    };
+    return { type: "severe-pain", proposalBias: "rest", lines: [
+      "Your pain is quite high today.",
+      "I am not going to suggest anything demanding.",
+      "Gentle movement, breathing, or rest are all valid options right now. What feels right?"
+    ]};
   }
 
-  // 2. Burnout risk
   if (burnoutRisk) {
-    return {
-      type: "burnout-risk",
-      lines: [
-        "Your energy and mood have been running low for a few days now.",
-        "That is not a problem to fix -- it is information worth acknowledging.",
-        "Today, I am not going to push you. What do you need?"
-      ],
-      proposalBias: "lighter"
-    };
+    return { type: "burnout-risk", proposalBias: "lighter", lines: [
+      "Your energy and mood have been running low for a few days now.",
+      "That is not a problem to fix -- it is information worth acknowledging.",
+      "Today, I am not going to push you. What do you need?"
+    ]};
   }
 
-  // 3. Consecutive training days
   if (consecutive >= 3) {
-    return {
-      type: "consecutive-days",
-      lines: [
-        consecutive + " sessions in a row.",
-        "Your consistency has been good. Your body will be carrying some accumulated load.",
-        "I was going to suggest varying the type of movement today -- not stopping, just varying. What do you think?"
-      ],
-      proposalBias: "lighter"
-    };
+    return { type: "consecutive-days", proposalBias: "lighter", lines: [
+      consecutive + " sessions in a row.",
+      "Your consistency has been good. Your body will be carrying some accumulated load.",
+      "I was going to suggest varying the type of movement today -- not stopping, just varying. What do you think?"
+    ]};
   }
 
-  // 4. Moved despite low energy/mood and came out positive
   if (lowMoodMove) {
     const dayRef = relativeDay(lowMoodMove.date);
-    return {
-      type: "mood-movement",
-      lines: [
-        "Worth noting: " + dayRef + " you came in with low energy and moved anyway.",
-        "You came out feeling " + (lowMoodMove.feel || "better") + ".",
-        "Your mood is " + (mood <= 4 ? "lower today too" : "steadier today") + ". That pattern is worth keeping in mind."
-      ],
-      proposalBias: null
-    };
+    return { type: "mood-movement", proposalBias: null, lines: [
+      "Worth noting: " + dayRef + " you came in with low energy and moved anyway.",
+      "You came out feeling " + (lowMoodMove.feel || "better") + ".",
+      "Your mood is " + (mood <= 4 ? "lower today too" : "steadier today") + ". That pattern is worth keeping in mind."
+    ]};
   }
 
-  // 5. Pain improved after movement
   if (painImproved) {
     const dayRef = relativeDay(painImproved.date);
-    return {
-      type: "pain-improved",
-      lines: [
-        dayRef.charAt(0).toUpperCase() + dayRef.slice(1) + " your pain was better by the end of your session.",
-        "That is your body giving you useful information.",
-        "We will be careful today -- but careful does not mean still."
-      ],
-      proposalBias: null
-    };
+    return { type: "pain-improved", proposalBias: null, lines: [
+      dayRef.charAt(0).toUpperCase() + dayRef.slice(1) + " your pain was better by the end of your session.",
+      "That is your body giving you useful information.",
+      "We will be careful today -- but careful does not mean still."
+    ]};
   }
 
-  // 6. Energy lift pattern
   if (energyDelta !== null && energyDelta >= 1.5) {
-    return {
-      type: "energy-lift",
-      lines: [
-        "I have noticed something across your last few sessions.",
-        "You have been coming in at a " + energy + " for energy and leaving higher almost every time.",
-        "Worth knowing. Your body responds well to movement even when you are not feeling it."
-      ],
-      proposalBias: null
-    };
+    return { type: "energy-lift", proposalBias: null, lines: [
+      "I have noticed something across your last few sessions.",
+      "You have been coming in at a " + energy + " for energy and leaving higher almost every time.",
+      "Worth knowing. Your body responds well to movement even when you are not feeling it."
+    ]};
   }
 
-  // 7. First session in 5+ days
   if (daysSince !== null && daysSince >= 5) {
-    return {
-      type: "returning",
-      lines: [
-        daysSince >= 10
-          ? "It has been a little while. Good to see you back."
-          : "A few days off. What matters is you are here now.",
-        "Let's find something that feels like a good re-entry."
-      ],
-      proposalBias: "lighter"
-    };
+    return { type: "returning", proposalBias: "lighter", lines: [
+      daysSince >= 10
+        ? "It has been a little while. Good to see you back."
+        : "A few days off. What matters is you are here now.",
+      "Let's find something that feels like a good re-entry."
+    ]};
   }
 
-  // 8. High check-in consistency
   if (highConsist) {
-    return {
-      type: "consistency",
-      lines: [
-        "You have checked in almost every day this week.",
-        "Not because I am counting -- because you have been showing up for yourself.",
-        "What would you like to do with that today?"
-      ],
-      proposalBias: null
-    };
+    return { type: "consistency", proposalBias: null, lines: [
+      "You have checked in almost every day this week.",
+      "Not because I am counting -- because you have been showing up for yourself.",
+      "What would you like to do with that today?"
+    ]};
   }
 
-  // 9. Default: warm contextual greeting
-  const defaultLines = [];
+  // Default
+  const lines = [];
   if (energy >= 7 && mood >= 7) {
-    defaultLines.push("Good energy, good mood. Let's make the most of that.");
+    lines.push("Good energy, good mood. Let's make the most of that.");
   } else if (energy >= 7) {
-    defaultLines.push("Energy is good today. Mood is sitting at a " + mood + ".");
-    defaultLines.push("I can work with that. What are you thinking?");
+    lines.push("Energy is good today. Mood is sitting at a " + mood + ".");
+    lines.push("I can work with that. What are you thinking?");
   } else if (mood >= 7) {
-    defaultLines.push("Mood is good. Energy is at a " + energy + " -- steady.");
-    defaultLines.push("What sounds right for today?");
+    lines.push("Mood is good. Energy is at a " + energy + " -- steady.");
+    lines.push("What sounds right for today?");
   } else if (energy <= 3 || mood <= 3) {
-    defaultLines.push("A harder day. That is okay -- there is something here for wherever you are.");
-    defaultLines.push("What feels manageable right now?");
+    lines.push("A harder day. That is okay -- there is something here for wherever you are.");
+    lines.push("What feels manageable right now?");
   } else {
-    defaultLines.push("A moderate day. Not your highest, not your lowest.");
-    defaultLines.push("What do you feel like doing?");
+    lines.push("A moderate day. Not your highest, not your lowest.");
+    lines.push("What do you feel like doing?");
   }
-
-  return {
-    type: "default",
-    lines: defaultLines,
-    proposalBias: energy <= 3 ? "lighter" : null
-  };
+  return { type: "default", proposalBias: energy <= 3 ? "lighter" : null, lines };
 }
 
-/**
- * Relative day label for use in reflection text.
- */
 function relativeDay(dateStr) {
   if (!dateStr) return "recently";
-  const today     = new Date();
-  const entryDate = new Date(dateStr);
-  const diffDays  = Math.round((today - entryDate) / 86400000);
+  const diffDays = Math.round((new Date() - new Date(dateStr)) / 86400000);
   if (diffDays === 1) return "yesterday";
   if (diffDays === 2) return "two days ago";
-  const dayName = entryDate.toLocaleDateString("en-GB", { weekday: "long" });
-  return "on " + dayName;
+  return "on " + new Date(dateStr).toLocaleDateString("en-GB", { weekday: "long" });
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
-  const todayLog     = getTodayLog();
+  const todayLog        = getTodayLog();
   const hasSessionToday = todayLog.length > 0;
-  const reflection   = buildReflection();
+  const reflection      = buildReflection();
 
   return `
     <div class="view coach-reflection-view">
@@ -413,7 +287,6 @@ export function render() {
         <h1>Your Session</h1>
       </div>
 
-      <!-- Coach reflection card -->
       <div class="card card-coach" role="region" aria-label="Your coach">
         <img src="assets/images/logo-icon-192.png"
              alt="" class="coach-icon-small" aria-hidden="true">
@@ -422,22 +295,46 @@ export function render() {
         </div>
       </div>
 
-      ${hasSessionToday ? renderSecondSessionPrompt() : renderOptions(reflection)}
+      ${showLocation
+        ? renderLocationInterstitial()
+        : hasSessionToday && miniState !== "dismissed"
+          ? renderSecondSessionPrompt()
+          : renderOptions(reflection)
+      }
 
     </div>
   `;
 }
 
-/**
- * Second session prompt -- shown when an activity has already been logged today.
- * Replaces the full A/B/C/D with a brief "has anything changed?" check.
- */
+function renderLocationInterstitial() {
+  return `
+    <div class="intention-paths" id="location-options"
+         role="group" aria-label="Where are you right now?">
+      <p class="intention-selector-label"
+         style="padding: 0 var(--space-1); margin-bottom: var(--space-2);">
+        Where are you right now?
+      </p>
+      ${LOCATION_OPTIONS.map(loc => `
+        <button class="intention-path" data-location="${loc.id}"
+                aria-label="${loc.label}">
+          <span class="intention-path-icon" aria-hidden="true">${loc.icon}</span>
+          <div class="intention-path-text">
+            <span class="intention-path-label">${loc.label}</span>
+          </div>
+        </button>
+      `).join("")}
+      <button class="btn btn-ghost btn-full" id="location-skip-btn"
+              style="margin-top: var(--space-2);">
+        Not sure
+      </button>
+    </div>
+  `;
+}
+
 function renderSecondSessionPrompt() {
   if (miniState === "asked") {
-    // User said something has changed -- route to mini check-in
     return `
       <div class="intention-paths" role="group" aria-label="What has changed?">
-
         <button class="intention-path" id="mini-energy-shifted"
                 aria-label="My energy has shifted">
           <span class="intention-path-icon" aria-hidden="true">&#9889;</span>
@@ -445,7 +342,6 @@ function renderSecondSessionPrompt() {
             <span class="intention-path-label">My energy has shifted</span>
           </div>
         </button>
-
         <button class="intention-path" id="mini-pain-flagged"
                 aria-label="I have pain to flag">
           <span class="intention-path-icon" aria-hidden="true">&#128681;</span>
@@ -453,9 +349,7 @@ function renderSecondSessionPrompt() {
             <span class="intention-path-label">I have pain to flag</span>
           </div>
         </button>
-
-        <button class="btn btn-ghost btn-full"
-                id="mini-no-change"
+        <button class="btn btn-ghost btn-full" id="mini-no-change"
                 style="margin-top: var(--space-3);">
           Actually, nothing has changed
         </button>
@@ -471,8 +365,7 @@ function renderSecondSessionPrompt() {
              class="coach-icon-xs" aria-hidden="true">
         <p>You have already moved today. Has anything changed since then?</p>
       </div>
-      <div class="reflection-mini-options"
-           style="display:flex;gap:var(--space-3);margin-top:var(--space-4);flex-wrap:wrap;">
+      <div style="display:flex;gap:var(--space-3);margin-top:var(--space-4);flex-wrap:wrap;">
         <button class="btn btn-primary" id="mini-yes-btn"
                 aria-label="Yes, something has changed">
           Yes, tell the coach
@@ -486,9 +379,6 @@ function renderSecondSessionPrompt() {
   `;
 }
 
-/**
- * Render the four option paths (A/B/C/D).
- */
 function renderOptions(reflection) {
   return `
     <div class="intention-paths" id="reflection-options"
@@ -526,8 +416,7 @@ function renderOptions(reflection) {
           `).join("")}
         </div>
         ${selectedActivity ? `
-          <button class="btn btn-primary btn-full"
-                  id="option-b-confirm"
+          <button class="btn btn-primary btn-full" id="option-b-confirm"
                   style="margin-top:var(--space-3);">
             Let's go &rarr;
           </button>
@@ -571,30 +460,53 @@ function rerender() {
 export function onMount() {
   wireOptions();
   wireSecondSession();
+  wireLocation();
 }
 
-/**
- * Wire the A/B/C/D option buttons.
- * Called from onMount() and after any rerender that rebuilds the options.
- * Uses direct getElementById listeners so they survive DOM replacement.
- */
-function wireOptions() {
-  // A: Suggest something for me
-  document.getElementById("option-a")?.addEventListener("click", () => {
+function wireLocation() {
+  // Location option buttons
+  document.querySelectorAll("[data-location]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      store.set("sessionLocation", btn.dataset.location);
+      showLocation = false;
+      const reflection = buildReflection();
+      store.set("proposalBias", reflection.proposalBias || null);
+      router.navigate("coach-proposal");
+    });
+  });
+
+  // "Not sure" — skip location, navigate without setting it
+  document.getElementById("location-skip-btn")?.addEventListener("click", () => {
+    store.set("sessionLocation", null);
+    showLocation = false;
     const reflection = buildReflection();
     store.set("proposalBias", reflection.proposalBias || null);
     router.navigate("coach-proposal");
   });
+}
 
-  // B: I have something in mind -- toggle picker visibility
+function wireOptions() {
+  // A: Suggest something for me — show location first (unless plan covers today)
+  document.getElementById("option-a")?.addEventListener("click", () => {
+    if (planCoversToday()) {
+      // Plan already implies context — skip location
+      const reflection = buildReflection();
+      store.set("proposalBias", reflection.proposalBias || null);
+      router.navigate("coach-proposal");
+    } else {
+      showLocation = true;
+      rerender();
+    }
+  });
+
+  // B: toggle picker
   document.getElementById("option-b")?.addEventListener("click", () => {
     const picker = document.getElementById("b-activity-picker");
     if (!picker) return;
-    const isOpen = picker.style.display !== "none";
-    picker.style.display = isOpen ? "none" : "block";
+    picker.style.display = picker.style.display !== "none" ? "none" : "block";
   });
 
-  // B: activity chip selection (direct listeners, no rerender)
+  // B: activity chips
   document.querySelectorAll("[data-b-activity]").forEach(chip => {
     chip.addEventListener("click", () => {
       selectedActivity = chip.dataset.bActivity;
@@ -603,15 +515,14 @@ function wireOptions() {
         c.classList.toggle("selected", sel);
         c.setAttribute("aria-pressed", sel);
       });
-      // Inject confirm button if not already there
       const picker = document.getElementById("b-activity-picker");
       if (picker && !document.getElementById("option-b-confirm")) {
         const act = B_ACTIVITIES.find(a => a.id === selectedActivity);
         const btn = document.createElement("button");
-        btn.id = "option-b-confirm";
+        btn.id        = "option-b-confirm";
         btn.className = "btn btn-primary btn-full";
         btn.style.marginTop = "var(--space-3)";
-        btn.textContent = "Let's go →";
+        btn.textContent = "Let's go \u2192";
         btn.setAttribute("aria-label", "Let's go - " + (act?.label || "activity"));
         picker.appendChild(btn);
         btn.addEventListener("click", logAndNavigateB);
@@ -619,7 +530,6 @@ function wireOptions() {
     });
   });
 
-  // B: confirm (already in DOM if selectedActivity was set before rerender)
   document.getElementById("option-b-confirm")?.addEventListener("click", logAndNavigateB);
 
   // C: My plans
@@ -633,23 +543,11 @@ function wireOptions() {
   });
 }
 
-/**
- * Wire the second-session mini-prompt buttons.
- * Called from onMount() after every render.
- */
 function wireSecondSession() {
+  // "No, all good" — dismiss the second-session card and show options
   document.getElementById("mini-no-btn")?.addEventListener("click", () => {
-    miniState = null;
-    // Replace the second-session card with A/B/C/D options inline
-    const reflection = buildReflection();
-    const view = document.querySelector(".coach-reflection-view");
-    const secondCard = view?.querySelector(".card[role='region']");
-    if (secondCard) {
-      const wrapper = document.createElement("div");
-      wrapper.innerHTML = renderOptions(reflection);
-      secondCard.replaceWith(wrapper.firstElementChild);
-      wireOptions();
-    }
+    miniState = "dismissed";
+    rerender();  // Full rerender — render() now shows renderOptions() cleanly
   });
 
   document.getElementById("mini-yes-btn")?.addEventListener("click", () => {
@@ -666,16 +564,21 @@ function wireSecondSession() {
   });
 
   document.getElementById("mini-no-change")?.addEventListener("click", () => {
-    miniState = null;
+    miniState = "dismissed";
     rerender();
   });
 }
 
-// ── Navigation helpers ────────────────────────────────────────────────────────
+// ── onUnmount — reset local state when navigating away ───────────────────────
 
-/**
- * Log a self-directed activity entry and navigate to the right session.
- */
+export function onUnmount() {
+  miniState        = null;
+  selectedActivity = null;
+  showLocation     = false;
+}
+
+// ── B-path navigation ─────────────────────────────────────────────────────────
+
 function logAndNavigateB() {
   if (!selectedActivity) return;
 
@@ -693,32 +596,15 @@ function logAndNavigateB() {
   store.set("activityLog", [...log, entry]);
   store.set("currentActivityEntry", entry);
 
-  // Route to appropriate session view
   if (selectedActivity === "gym") {
     store.set("openGymSub", true);
     router.navigate("coach-proposal");
     return;
   }
-  if (selectedActivity === "yoga") {
-    router.navigate("yoga-session");
-    return;
-  }
-  if (selectedActivity === "run") {
-    router.navigate("running-session");
-    return;
-  }
-  if (selectedActivity === "walk") {
-    router.navigate("walk-session");
-    return;
-  }
-  if (selectedActivity === "swim") {
-    router.navigate("swim-session");
-    return;
-  }
-  if (selectedActivity === "cycle") {
-    router.navigate("cycle-session");
-    return;
-  }
-  // Class / other / fallback -- go to reflect with duration prompt
+  if (selectedActivity === "yoga")  { router.navigate("yoga-session");    return; }
+  if (selectedActivity === "run")   { router.navigate("reflect");          return; }
+  if (selectedActivity === "walk")  { router.navigate("reflect");          return; }
+  if (selectedActivity === "swim")  { router.navigate("reflect");          return; }
+  if (selectedActivity === "cycle") { router.navigate("reflect");          return; }
   router.navigate("reflect");
 }
