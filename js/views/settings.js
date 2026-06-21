@@ -1,23 +1,17 @@
 /**
  * settings.js - Settings view
  *
- * 21 Jun 2026 v3 (S4-15/16) — Wellbeing tab added:
- *   New sixth tab "Wellbeing" covering:
- *   1. Auto-tagging toggle (journalSettings.autoTagging) — all users.
- *      When on, journal entries are keyword-tagged on save. When off,
- *      tags is empty and user-only.
- *   2. Weekly reflection schedule (noticingPreferences.schedule + time)
- *      — all users. 'automatic' (default) fires on first check-in of
- *      the calendar week; any day name fires on that day at the chosen
- *      time (defaults to 10:00 if not set).
- *   3. Journal categories (journalSettings.categoryPrefs) — tier gated:
- *      Free: read-only display of the 5 always categories (life, movement,
- *      environment, nature, health). Personal+: can add from the 7 optional
- *      categories (relationships, work, creativity, sleep, body, gratitude,
- *      growth) one at a time. The 2 triggered categories (grief, joy) are
- *      never shown here — the coach surfaces them from check-in patterns.
- *   No schema changes — all fields were added in store.js v4 (S4-NH-SCHEMA).
+ * 21 Jun 2026 v4 (tab scroll + ageBand):
+ *   - Tab strip made horizontally scrollable with a right-fade affordance
+ *     so users know more tabs exist. Active tab scrolled into view on
+ *     render. Works on all screen widths without wrapping or clipping.
+ *   - Age field replaced with Age range (store.ageBand). Chip-picker
+ *     edit pattern — same bands as onboarding/about.js. Numeric age
+ *     field removed entirely: ageBand is stable across time, drives
+ *     coach adaptations (recovery multipliers, impact level, balance
+ *     work), and does not require a birthday to stay current.
  *
+ * 21 Jun 2026 v3 (S4-15/16) — Wellbeing tab added.
  * 14 Jun 2026 v2 --- My Week tab simplified (S4-WP).
  * 30 May 2026 v1 --- My Week tab redesign.
  * 22 May 2026 v2 --- Dev tier panel added.
@@ -54,13 +48,21 @@ const MOVEMENT_IDENTITIES = [
   { id: "mixed",    label: "A mix of things", icon: "&#10024;" },
 ];
 
+// -- Age bands ----------------------------------------------------------------
+// Must match onboarding/about.js exactly so the value set there
+// displays and edits correctly here.
+const AGE_BANDS = [
+  "Under 18", "18\u201324", "25\u201334", "35\u201344",
+  "45\u201354", "55\u201364", "65+", "Prefer not to say"
+];
+
 // -- Journal categories -------------------------------------------------------
 
 const JOURNAL_CATEGORIES_ALWAYS = [
   { id: "life",        label: "Life",        desc: "Day-to-day thoughts, priorities, what's on your mind" },
   { id: "movement",    label: "Movement",    desc: "Your relationship with physical activity" },
   { id: "environment", label: "Environment", desc: "The spaces you move and live in" },
-  { id: "nature",      label: "Nature",      desc: "The world around you — weather, seasons, outdoor spaces" },
+  { id: "nature",      label: "Nature",      desc: "The world around you \u2014 weather, seasons, outdoor spaces" },
   { id: "health",      label: "Health",      desc: "Rest, recovery, how your body is doing" },
 ];
 
@@ -195,37 +197,56 @@ export function render() {
         <h1>Settings</h1>
       </div>
 
-      <div class="settings-tabs" role="tablist" aria-label="Settings sections">
-        <button class="settings-tab ${activeTab === "profile"    ? "active" : ""}"
-                role="tab" aria-selected="${activeTab === "profile"}"
-                aria-controls="settings-tab-panel" id="tab-profile" data-tab="profile">
-          Profile
-        </button>
-        <button class="settings-tab ${activeTab === "conditions" ? "active" : ""}"
-                role="tab" aria-selected="${activeTab === "conditions"}"
-                aria-controls="settings-tab-panel" id="tab-conditions" data-tab="conditions">
-          Conditions
-        </button>
-        <button class="settings-tab ${activeTab === "equipment"  ? "active" : ""}"
-                role="tab" aria-selected="${activeTab === "equipment"}"
-                aria-controls="settings-tab-panel" id="tab-equipment" data-tab="equipment">
-          Equipment
-        </button>
-        <button class="settings-tab ${activeTab === "library"    ? "active" : ""}"
-                role="tab" aria-selected="${activeTab === "library"}"
-                aria-controls="settings-tab-panel" id="tab-library" data-tab="library">
-          Library
-        </button>
-        <button class="settings-tab ${activeTab === "myweek"     ? "active" : ""}"
-                role="tab" aria-selected="${activeTab === "myweek"}"
-                aria-controls="settings-tab-panel" id="tab-myweek" data-tab="myweek">
-          My Week
-        </button>
-        <button class="settings-tab ${activeTab === "wellbeing"  ? "active" : ""}"
-                role="tab" aria-selected="${activeTab === "wellbeing"}"
-                aria-controls="settings-tab-panel" id="tab-wellbeing" data-tab="wellbeing">
-          Wellbeing
-        </button>
+      <!-- Scrollable tab strip with right-fade affordance -->
+      <div style="position: relative; margin-bottom: var(--space-1);">
+        <div class="settings-tabs" role="tablist" aria-label="Settings sections"
+             id="settings-tabs-strip"
+             style="display: flex; flex-wrap: nowrap; overflow-x: auto;
+                    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+                    gap: var(--space-2); padding-bottom: 2px;">
+          <button class="settings-tab ${activeTab === "profile"    ? "active" : ""}"
+                  role="tab" aria-selected="${activeTab === "profile"}"
+                  aria-controls="settings-tab-panel" id="tab-profile" data-tab="profile"
+                  style="flex-shrink: 0;">
+            Profile
+          </button>
+          <button class="settings-tab ${activeTab === "conditions" ? "active" : ""}"
+                  role="tab" aria-selected="${activeTab === "conditions"}"
+                  aria-controls="settings-tab-panel" id="tab-conditions" data-tab="conditions"
+                  style="flex-shrink: 0;">
+            Conditions
+          </button>
+          <button class="settings-tab ${activeTab === "equipment"  ? "active" : ""}"
+                  role="tab" aria-selected="${activeTab === "equipment"}"
+                  aria-controls="settings-tab-panel" id="tab-equipment" data-tab="equipment"
+                  style="flex-shrink: 0;">
+            Equipment
+          </button>
+          <button class="settings-tab ${activeTab === "library"    ? "active" : ""}"
+                  role="tab" aria-selected="${activeTab === "library"}"
+                  aria-controls="settings-tab-panel" id="tab-library" data-tab="library"
+                  style="flex-shrink: 0;">
+            Library
+          </button>
+          <button class="settings-tab ${activeTab === "myweek"     ? "active" : ""}"
+                  role="tab" aria-selected="${activeTab === "myweek"}"
+                  aria-controls="settings-tab-panel" id="tab-myweek" data-tab="myweek"
+                  style="flex-shrink: 0;">
+            My Week
+          </button>
+          <button class="settings-tab ${activeTab === "wellbeing"  ? "active" : ""}"
+                  role="tab" aria-selected="${activeTab === "wellbeing"}"
+                  aria-controls="settings-tab-panel" id="tab-wellbeing" data-tab="wellbeing"
+                  style="flex-shrink: 0;">
+            Wellbeing
+          </button>
+        </div>
+        <!-- Right-fade affordance: signals more tabs exist off-screen -->
+        <div aria-hidden="true"
+             style="position: absolute; right: 0; top: 0; bottom: 2px; width: 48px;
+                    background: linear-gradient(to right, transparent, var(--color-bg, #0A1120));
+                    pointer-events: none; z-index: 1;">
+        </div>
       </div>
 
       <div id="settings-tab-panel" role="tabpanel"
@@ -279,11 +300,52 @@ function renderActiveTab() {
   return "";
 }
 
+// -- Age band row -------------------------------------------------------------
+
+function renderAgeBandRow() {
+  const band = store.get("ageBand") || null;
+
+  if (editingField === "ageBand") {
+    return `
+      <div class="settings-row settings-row--editing">
+        <span class="settings-label">Age range</span>
+        <div class="profile-edit-wrap">
+          <div style="display: flex; flex-wrap: wrap; gap: var(--space-2);
+                      margin-top: var(--space-2);"
+               role="group" aria-label="Select age range">
+            ${AGE_BANDS.map(b => `
+              <button class="equipment-chip ${band === b ? "selected" : ""}"
+                      data-ageband="${b}"
+                      aria-pressed="${band === b}">
+                ${b}
+              </button>
+            `).join("")}
+          </div>
+          <div class="profile-edit-actions" style="margin-top: var(--space-3);">
+            <button class="btn btn-ghost btn-sm" id="profile-cancel-btn"
+                    aria-label="Cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="settings-row">
+      <span class="settings-label">Age range</span>
+      <div class="settings-value-wrap">
+        <span class="settings-value">${band || "Not set"}</span>
+        <button class="btn-text profile-edit-btn" data-field="ageBand"
+                aria-label="Edit age range">Edit</button>
+      </div>
+    </div>
+  `;
+}
+
 // -- Profile tab --------------------------------------------------------------
 
 function renderProfileTab() {
   const name       = store.get("name")       || "";
-  const age        = store.get("age")        || "";
   const gender     = store.get("gender")     || "";
   const weight     = store.get("weight")     || "";
   const weightUnit = store.get("weightUnit") || "kg";
@@ -338,7 +400,7 @@ function renderProfileTab() {
       <h2 id="profile-heading" class="section-heading">Your profile</h2>
       <div class="card settings-profile-card" id="profile-card">
         ${editableRow("name",   "Name",   name   || "Not set", "text")}
-        ${editableRow("age",    "Age",    age    ? String(age) : "Not set", "number", 'min="1" max="120"')}
+        ${renderAgeBandRow()}
         ${editableRow("gender", "Gender", formatGender(gender), "text")}
         ${editableRow("weight", "Weight", weight ? weight + weightUnit : "Not set", "number", 'min="1" max="500" step="0.1"')}
       </div>
@@ -608,7 +670,7 @@ function renderMyWeekTab() {
 
 function renderWellbeingTab() {
   const premium       = isPremium();
-  const autoTagging   = store.get("journalSettings.autoTagging") !== false; // default true
+  const autoTagging   = store.get("journalSettings.autoTagging") !== false;
   const categoryPrefs = store.get("journalSettings.categoryPrefs") ||
                         ["life", "movement", "environment", "nature", "health"];
   const schedule      = store.get("noticingPreferences.schedule") || "automatic";
@@ -618,7 +680,6 @@ function renderWellbeingTab() {
     <section aria-labelledby="wellbeing-heading">
       <h2 id="wellbeing-heading" class="section-heading">Wellbeing</h2>
 
-      <!-- ── Journal tags ──────────────────────────────────────── -->
       <h3 class="section-heading"
           style="font-size: var(--text-sm); margin: var(--space-2) 0 var(--space-3);">
         Journal auto-tagging
@@ -643,7 +704,6 @@ function renderWellbeingTab() {
         </div>
       </div>
 
-      <!-- ── Journal categories ────────────────────────────────── -->
       <h3 class="section-heading"
           style="font-size: var(--text-sm); margin: var(--space-5) 0 var(--space-2);">
         Journal categories
@@ -652,17 +712,14 @@ function renderWellbeingTab() {
         These categories shape which prompts the coach offers in guided journalling.
       </p>
 
-      <!-- Always-on categories (all users) -->
-      <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">
-        Always included
-      </p>
+      <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">Always included</p>
       <div class="equipment-chip-grid" style="margin-bottom: var(--space-4);"
            role="group" aria-label="Always included journal categories">
         ${JOURNAL_CATEGORIES_ALWAYS.map(cat => `
           <button class="equipment-chip selected"
                   style="cursor: default; opacity: 0.8;"
                   aria-pressed="true"
-                  aria-label="${cat.label} — always included"
+                  aria-label="${cat.label} \u2014 always included"
                   title="${cat.desc}"
                   disabled>
             ${cat.label}
@@ -670,10 +727,9 @@ function renderWellbeingTab() {
         `).join("")}
       </div>
 
-      <!-- Optional categories (Premium only) -->
       ${premium ? `
         <p class="text-xs text-muted" style="margin-bottom: var(--space-2);">
-          Optional — tap to add or remove
+          Optional \u2014 tap to add or remove
         </p>
         <div class="equipment-chip-grid" style="margin-bottom: var(--space-2);"
              role="group" aria-label="Optional journal categories">
@@ -697,8 +753,8 @@ function renderWellbeingTab() {
       ` : `
         <div class="card" style="margin-bottom: var(--space-2);">
           <p class="text-sm text-muted">
-            Seven additional categories — relationships, work, creativity, sleep,
-            body, gratitude, and growth — are available on the Personal plan.
+            Seven additional categories \u2014 relationships, work, creativity, sleep,
+            body, gratitude, and growth \u2014 are available on the Personal plan.
           </p>
           <button class="btn btn-ghost btn-small" id="wellbeing-upgrade-btn"
                   style="margin-top: var(--space-3);"
@@ -708,7 +764,6 @@ function renderWellbeingTab() {
         </div>
       `}
 
-      <!-- ── Weekly reflection schedule ────────────────────────── -->
       <h3 class="section-heading"
           style="font-size: var(--text-sm); margin: var(--space-6) 0 var(--space-2);">
         Weekly reflection
@@ -728,7 +783,8 @@ function renderWellbeingTab() {
                    aria-label="${opt.label}${opt.desc ? ": " + opt.desc : ""}"
                    class="wellbeing-schedule-radio">
             <span style="flex: 1;">
-              <span class="text-sm" style="font-weight: ${schedule === opt.id ? "var(--font-semibold)" : "normal"};">
+              <span class="text-sm"
+                    style="font-weight: ${schedule === opt.id ? "var(--font-semibold)" : "normal"};">
                 ${opt.label}
               </span>
               ${opt.desc
@@ -739,7 +795,6 @@ function renderWellbeingTab() {
         `).join("")}
       </div>
 
-      <!-- Time picker — only shown when a specific day is selected -->
       ${schedule !== "automatic" ? `
         <div class="card" style="margin-top: var(--space-3);">
           <label class="form-label" for="wellbeing-schedule-time"
@@ -892,6 +947,10 @@ function switchTab(tabName) {
     btn.classList.toggle("active", isActive);
     btn.setAttribute("aria-selected", isActive);
   });
+  // Scroll active tab into view
+  const activeBtn = document.querySelector(".settings-tab.active");
+  if (activeBtn) activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+
   const panel = document.getElementById("settings-tab-panel");
   if (panel) {
     panel.setAttribute("aria-labelledby", "tab-" + tabName);
@@ -1007,8 +1066,6 @@ function showDevPanel() {
 // -- Wellbeing panel wiring ---------------------------------------------------
 
 function wireWellbeingPanel() {
-
-  // Auto-tagging toggle
   const autotagToggle = document.getElementById("wellbeing-autotag-toggle");
   if (autotagToggle) {
     autotagToggle.addEventListener("change", () => {
@@ -1016,47 +1073,38 @@ function wireWellbeingPanel() {
     });
   }
 
-  // Optional category chips (Premium only)
   document.querySelectorAll(".wellbeing-category-chip").forEach(chip => {
     chip.addEventListener("click", () => {
       const catId  = chip.dataset.category;
       if (!catId) return;
-      const always = JOURNAL_CATEGORIES_ALWAYS.map(c => c.id);
+      const always  = JOURNAL_CATEGORIES_ALWAYS.map(c => c.id);
       const current = store.get("journalSettings.categoryPrefs") || [...always];
       const updated = current.includes(catId)
         ? current.filter(id => id !== catId)
         : [...current, catId];
-      // Never remove an always-on category
-      const safe = [...new Set([...always, ...updated.filter(id => !always.includes(id))])];
-      // But do allow optional ones to be toggled
-      const final = safe.filter(id => always.includes(id) || updated.includes(id));
+      const final = [...new Set([...always, ...updated.filter(id => !always.includes(id))])]
+        .filter(id => always.includes(id) || updated.includes(id));
       store.set("journalSettings.categoryPrefs", final);
       chip.classList.toggle("selected", final.includes(catId));
       chip.setAttribute("aria-pressed", final.includes(catId));
     });
   });
 
-  // Schedule radio buttons
   document.querySelectorAll(".wellbeing-schedule-radio").forEach(radio => {
     radio.addEventListener("change", () => {
       if (!radio.checked) return;
       store.set("noticingPreferences.schedule", radio.value);
-      // Rerender to show/hide time picker
       rerenderWellbeing();
     });
   });
 
-  // Time picker
   const timePicker = document.getElementById("wellbeing-schedule-time");
   if (timePicker) {
     timePicker.addEventListener("change", () => {
-      if (timePicker.value) {
-        store.set("noticingPreferences.time", timePicker.value);
-      }
+      if (timePicker.value) store.set("noticingPreferences.time", timePicker.value);
     });
   }
 
-  // Upgrade button (Free tier)
   document.getElementById("wellbeing-upgrade-btn")?.addEventListener("click", () => {
     router.navigate("upgrade");
   });
@@ -1066,18 +1114,26 @@ function wireWellbeingPanel() {
 
 function wirePanel() {
 
+  // Age band chips
+  document.querySelectorAll("[data-ageband]").forEach(chip => {
+    chip.addEventListener("click", () => {
+      store.set("ageBand", chip.dataset.ageband);
+      editingField = null;
+      rerenderTab();
+    });
+  });
+
   // Profile: open edit
   document.querySelectorAll(".profile-edit-btn").forEach(btn => {
     btn.addEventListener("click", () => { editingField = btn.dataset.field; rerenderTab(); });
   });
 
-  // Profile: save
+  // Profile: save (name, gender, weight only — age band uses chip handler above)
   document.getElementById("profile-save-btn")?.addEventListener("click", () => {
     const input = document.getElementById("profile-edit-input");
     if (!input || !editingField) return;
     const val = input.value.trim();
     if (editingField === "name")   store.set("name",   val || null);
-    if (editingField === "age")    store.set("age",    val ? parseInt(val) : null);
     if (editingField === "gender") store.set("gender", val || null);
     if (editingField === "weight") store.set("weight", val ? parseFloat(val) : null);
     editingField = null;
@@ -1208,7 +1264,7 @@ function wirePanel() {
     router.navigate("library");
   });
 
-  // My Week: open the My Week view
+  // My Week
   document.getElementById("open-myweek-btn")?.addEventListener("click", () => {
     router.navigate("weekly-plan");
   });
@@ -1317,6 +1373,12 @@ export function onMount() {
       if (name && name !== activeTab) switchTab(name);
     });
   });
+
+  // Scroll active tab into view on initial render
+  const activeBtn = document.querySelector(".settings-tab.active");
+  if (activeBtn) {
+    activeBtn.scrollIntoView({ behavior: "instant", block: "nearest", inline: "center" });
+  }
 
   wirePanel();
 
