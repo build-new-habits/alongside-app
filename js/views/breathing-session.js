@@ -484,3 +484,9 @@ export function onMount() {
     router.navigate("noticing");
   });
 }
+
+// Called by router.navigate() before leaving this view — stops active timers
+export function onUnmount() {
+  if (sessionInterval) { clearInterval(sessionInterval); sessionInterval = null; }
+  if (phaseInterval)   { clearInterval(phaseInterval);   phaseInterval   = null; }
+}
