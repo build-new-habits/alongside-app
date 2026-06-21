@@ -1,0 +1,439 @@
+/*
+ * css/components/quiet-session.css
+ * Alongside: Move — Quiet Session / Mindful Movement view styles
+ *
+ * 21 Jun 2026 v1 (S4-CSS-NOTICING)
+ *
+ * Covers: mode selector, breathing sub-flow (legacy path in quiet-session.js),
+ *         mindful movement (duration picker + live session), journal, rest.
+ *
+ * Classes: .quiet-session-view, .quiet-session-header, .quiet-session-title,
+ *          .quiet-back-btn, .quiet-mode-menu, .quiet-mode-card,
+ *          .quiet-mode-card-left, .quiet-mode-icon, .quiet-mode-arrow,
+ *          .quiet-breathing-list, .quiet-breathing-card,
+ *          .quiet-breathing-card-header, .quiet-breathing-icon,
+ *          .quiet-breathing-why, .quiet-breathing-session,
+ *          .quiet-round-progress, .quiet-progress-bar, .quiet-progress-fill,
+ *          .quiet-timer-wrap, .quiet-timer-circle, .quiet-timer-phase,
+ *          .quiet-timer-seconds, .quiet-phase-dots, .quiet-phase-dot,
+ *          .quiet-complete-actions, .quiet-difficulty-card,
+ *          .quiet-difficulty-chips, .quiet-difficulty-chip,
+ *          .quiet-duration-selector, .quiet-duration-btn,
+ *          .quiet-duration-mins, .quiet-duration-label,
+ *          .quiet-mindful-timer, .quiet-mindful-clock,
+ *          .quiet-journal-card, .quiet-journal-prompt, .quiet-journal-textarea,
+ *          .quiet-coach-card
+ */
+
+/* ── View shell ───────────────────────────────────────────────────────────── */
+
+.quiet-session-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-bg);
+  box-sizing: border-box;
+}
+
+/* ── Header: back button + title ─────────────────────────────────────────── */
+
+.quiet-session-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-2);
+  min-height: 56px;
+}
+
+.quiet-session-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0;
+  flex: 1;
+}
+
+/* ── Coach card within quiet session ─────────────────────────────────────── */
+
+.quiet-coach-card {
+  margin: var(--space-4) var(--space-4) var(--space-2);
+}
+
+/* ── Mode selector menu ───────────────────────────────────────────────────── */
+
+.quiet-mode-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-6);
+}
+
+.quiet-mode-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  /* 44px min touch target met via padding */
+}
+
+.quiet-mode-card:hover,
+.quiet-mode-card:focus-visible {
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.quiet-mode-card:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.quiet-mode-card-left {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.quiet-mode-icon {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.quiet-mode-card h3 {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-1);
+}
+
+.quiet-mode-arrow {
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* ── Breathing exercise selector list ─────────────────────────────────────── */
+
+.quiet-breathing-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-6);
+}
+
+.quiet-breathing-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.quiet-breathing-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.quiet-breathing-icon {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.quiet-breathing-card h3 {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-1);
+}
+
+.quiet-breathing-why {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Breathing live session ───────────────────────────────────────────────── */
+
+.quiet-breathing-session {
+  padding: 0 var(--space-4) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* Round progress row */
+.quiet-round-progress {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Shared progress bar — used in breathing rounds and mindful session */
+.quiet-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--color-surface);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.quiet-progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 3px;
+  transition: width 1s linear;
+}
+
+/* Timer circle */
+.quiet-timer-wrap {
+  padding: var(--space-6) 0 var(--space-2);
+}
+
+.quiet-timer-circle {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 3px solid var(--phase-colour, var(--color-primary));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  background: color-mix(in srgb, var(--phase-colour, var(--color-primary)) 10%, var(--color-bg));
+  transition: border-color 0.4s ease, background 0.4s ease;
+}
+
+.quiet-timer-phase {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  text-align: center;
+  padding: 0 var(--space-3);
+}
+
+.quiet-timer-seconds {
+  font-size: 3rem;
+  font-weight: var(--font-semibold);
+  color: var(--phase-colour, var(--color-primary));
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Phase indicator dots */
+.quiet-phase-dots {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) 0;
+}
+
+.quiet-phase-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.quiet-phase-dot.active {
+  background: var(--dot-colour, var(--color-primary));
+  transform: scale(1.4);
+}
+
+/* Complete actions */
+.quiet-complete-actions {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Difficulty rating */
+.quiet-difficulty-card {
+  margin: 0 var(--space-4);
+}
+
+.quiet-difficulty-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.quiet-difficulty-chip {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  min-height: 36px; /* touch target */
+}
+
+.quiet-difficulty-chip:hover,
+.quiet-difficulty-chip:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+  outline: none;
+}
+
+.quiet-difficulty-chip:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.quiet-difficulty-chip.selected,
+.quiet-difficulty-chip[aria-pressed="true"] {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-bg);
+  font-weight: var(--font-semibold);
+}
+
+/* ── Mindful movement: duration selector ─────────────────────────────────── */
+
+.quiet-duration-selector {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+.quiet-duration-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-4) var(--space-2);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  min-height: 72px; /* touch target */
+}
+
+.quiet-duration-btn:hover,
+.quiet-duration-btn:focus-visible {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.quiet-duration-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.quiet-duration-btn.selected,
+.quiet-duration-btn[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+}
+
+.quiet-duration-mins {
+  font-size: 1.75rem;
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.quiet-duration-btn.selected .quiet-duration-mins,
+.quiet-duration-btn[aria-pressed="true"] .quiet-duration-mins {
+  color: var(--color-primary);
+}
+
+.quiet-duration-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-1);
+}
+
+/* ── Mindful movement: live session timer ─────────────────────────────────── */
+
+.quiet-mindful-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-6) var(--space-4) var(--space-2);
+}
+
+.quiet-mindful-clock {
+  font-size: 3.5rem;
+  font-weight: var(--font-semibold);
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* ── Journal ───────────────────────────────────────────────────────────────── */
+
+.quiet-journal-card {
+  margin: 0 var(--space-4) var(--space-4);
+}
+
+.quiet-journal-prompt {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  font-weight: var(--font-semibold);
+  margin: 0 0 var(--space-3);
+  line-height: 1.5;
+}
+
+.quiet-journal-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  padding: var(--space-3);
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.15s ease;
+}
+
+.quiet-journal-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+.quiet-journal-textarea::placeholder {
+  color: var(--color-text-muted, var(--color-text-secondary));
+  opacity: 0.7;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .quiet-timer-circle,
+  .quiet-phase-dot,
+  .quiet-progress-fill,
+  .quiet-duration-btn,
+  .quiet-difficulty-chip {
+    transition: none;
+  }
+}
