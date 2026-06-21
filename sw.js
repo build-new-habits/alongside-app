@@ -1,6 +1,8 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * alongside-v109 (21 Jun 2026) — router.js v6: checkin-mini added to hideNavViews
+ *
  * alongside-v108 (21 Jun 2026) — router.js v5: onUnmount called synchronously in popstate handler; quiet-session.js v3: total countdown, correct durations, 20-min option
  *
  * alongside-v106 (21 Jun 2026, S4-CSS-NOTICING)
@@ -248,7 +250,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v108";
+const CACHE_NAME = "alongside-v109";
 
 const SHELL_URLS = [
 
