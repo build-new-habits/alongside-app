@@ -1,6 +1,24 @@
 /**
  * quiet-session.js - Something Quieter View
  *
+ * 21 Jun 2026 v3 (S4-CSS-NOTICING fixes)
+ *   - onUnmount() export added: called by router.navigate() before leaving
+ *     this view, clears all intervals so device back gesture stops timers.
+ *   - Mindful movement: total-session countdown replaces per-exercise
+ *     countdown. Timer counts down from the selected duration (5:00, 10:00
+ *     etc) across all exercises in sequence — label is a kept promise.
+ *   - Progress bar: now based on total elapsed time, not step index, so
+ *     it is visible and moving from the first second of the session.
+ *   - MINDFUL_SESSIONS durations corrected so each option's exercises
+ *     sum exactly to the labelled time:
+ *       5 min  = 300s  (180 + 120, unchanged)
+ *       10 min = 600s  (360 + 240, was 360+300=660)
+ *       15 min = 900s  (540 + 360, new)
+ *       20 min = 1200s (600 + 600, was the old "15 min" content)
+ *   - Duration selector now offers 5 / 10 / 15 / 20 minutes.
+ *   - Design principle: the duration label is a promise. The timer shows
+ *     exactly the time selected, nothing more.
+ *
  * 15 Jun 2026 v2 (S4-9/10 follow-on fix) - Mindful movement selector bug:
  *   renderMindfulMode() checked `if (!step) return renderMindfulSelector()`,
  *   but step = MINDFUL_SESSIONS[mindfulDuration][mindfulStep] is always
@@ -34,7 +52,7 @@
  *                   (NOT routed to from noticing.js - journalEntries shape
  *                   here predates the S4-NH-SCHEMA array shape and would
  *                   corrupt it. S4-13/14 to replace properly.)
- *   "mindful"    - 5/10/15 min guided mindful movement from mindfulness exercise database
+ *   "mindful"    - 5/10/15/20 min guided mindful movement with total countdown
  *   "rest"       - single warm coach acknowledgement, no activity required
  *
  * Route: quiet-session
@@ -147,7 +165,16 @@ const JOURNAL_PROMPTS = {
   ]
 };
 
-// ── Mindfulness exercises (from database) ─────────────────────────────────────
+// ── Mindfulness sessions ──────────────────────────────────────────────────────
+//
+// RULE: each option's exercise durations must sum exactly to (mins * 60).
+// The label is a promise. Never let actual content exceed or significantly
+// undershoot the label — it destroys trust.
+//
+// 5  min = 300s  (180 + 120)
+// 10 min = 600s  (360 + 240)
+// 15 min = 900s  (540 + 360)
+// 20 min = 1200s (600 + 600)
 
 const MINDFUL_SESSIONS = {
   5: [
@@ -162,11 +189,19 @@ const MINDFUL_SESSIONS = {
     { id: "breath-awareness-10", name: "Breath Awareness", duration: 360,
       instruction: "Settle into your seat and close your eyes. Place one hand on your chest and one on your belly. Notice which moves more. Let your attention rest on the physical sensation of breath. When thoughts come, acknowledge them and return.",
       coaching: "Each return is a repetition. This is the exercise. There is no such thing as a bad meditation session, only a session." },
-    { id: "noting-practice", name: "Noting Practice", duration: 300,
+    { id: "noting-practice", name: "Noting Practice", duration: 240,
       instruction: "Rest attention on the breath. When something else arises, briefly name it: thinking, sound, feeling. After naming it, return to the breath. Keep the labels simple and non-judgemental.",
       coaching: "Noting creates a tiny gap between experience and reaction. That gap is where calm lives." }
   ],
   15: [
+    { id: "breath-awareness-15", name: "Breath Awareness", duration: 540,
+      instruction: "Settle in and close your eyes. Let your breathing find its own rhythm — do not try to control it. Rest your attention on the sensation of air moving in and out. When thoughts arise, notice them, let them pass, and return.",
+      coaching: "A longer sit gives the mind time to settle. The first few minutes are often busiest. Stay with it." },
+    { id: "body-scan-medium", name: "Body Scan", duration: 360,
+      instruction: "Begin at the crown of your head and move your attention slowly downward. Spend time in each region — scalp, face, jaw, throat, shoulders, arms, hands, chest, belly, lower back, hips, legs, feet. Notice what is there without trying to change it.",
+      coaching: "If you find tension, breathe into it gently. You are not fixing anything. You are noticing." }
+  ],
+  20: [
     { id: "body-scan-full", name: "Full Body Scan", duration: 600,
       instruction: "Lie down if you can. Begin at the top of your head and move your attention slowly down through the entire body. Spend at least thirty seconds in each region. Scalp, face, jaw, throat, shoulders, upper arms, forearms, hands, chest, upper back, belly, lower back, hips, glutes, thighs, knees, calves, feet, toes. Notice, do not fix.",
       coaching: "If you fall asleep, that was what your body needed. If you stay awake, that is the practice." },
@@ -186,12 +221,14 @@ let breathingInterval = null;          // setInterval handle
 let phaseSecondsLeft  = 0;             // seconds remaining in current phase
 let breathingComplete  = false;        // finished all rounds
 
-let mindfulDuration   = 10;            // 5 | 10 | 15
-let mindfulStarted    = false;         // S4-9/10 fix: gates selector vs session view
-let mindfulStep       = 0;             // current exercise index in session
-let mindfulTimer      = null;          // setInterval handle
-let mindfulSecondsLeft = 0;
-let mindfulComplete   = false;
+let mindfulDuration    = 10;           // 5 | 10 | 15 | 20
+let mindfulStarted     = false;        // gates selector vs session view
+let mindfulStep        = 0;            // current exercise index in session
+let mindfulTimer       = null;         // setInterval handle
+let mindfulTotalSeconds = 0;           // total session duration in seconds
+let mindfulElapsed     = 0;            // total seconds elapsed across all exercises
+let mindfulStepElapsed = 0;            // seconds elapsed in current exercise
+let mindfulComplete    = false;
 
 let journalText       = "";
 let journalPrompts    = [];
@@ -230,7 +267,7 @@ function getModeTitle() {
   return titles[mode] || "Something Quieter";
 }
 
-// ── Mode selector — shown when no mode is set ─────────────────────────────────
+// ── Mode selector ─────────────────────────────────────────────────────────────
 
 function renderModeSelector() {
   return `
@@ -262,7 +299,7 @@ function renderModeSelector() {
           <span class="quiet-mode-icon" aria-hidden="true">\uD83C\uDF3F</span>
           <div>
             <h3>Mindful Movement</h3>
-            <p class="text-sm text-muted">5, 10, or 15 minutes. Guided practice with timer.</p>
+            <p class="text-sm text-muted">5, 10, 15, or 20 minutes. Guided practice with timer.</p>
           </div>
         </div>
         <span class="quiet-mode-arrow" aria-hidden="true">&rsaquo;</span>
@@ -297,7 +334,6 @@ function renderModeSelector() {
 }
 
 function renderMode() {
-  // No mode set — show the selector menu first
   if (!mode || mode === "selector") return renderModeSelector();
   if (mode === "breathing")  return renderBreathingMode();
   if (mode === "journal")    return renderJournalMode();
@@ -347,9 +383,8 @@ function renderBreathingSelector() {
 }
 
 function renderBreathingSession(ex) {
-  const phase         = ex.phases[breathingPhase];
-  const totalSeconds  = ex.phases.reduce((t, p) => t + p.seconds, 0);
   const roundProgress = Math.round(((breathingRound) / ex.rounds) * 100);
+  const phase = ex.phases[breathingPhase];
 
   return `
     <div class="card card-coach quiet-coach-card" style="margin-bottom:var(--space-4);">
@@ -362,7 +397,6 @@ function renderBreathingSession(ex) {
 
     <div class="quiet-breathing-session">
 
-      <!-- Progress -->
       <div class="quiet-round-progress">
         <span class="text-sm text-muted">Round ${breathingRound + 1} of ${ex.rounds}</span>
         <div class="quiet-progress-bar" role="progressbar"
@@ -371,7 +405,6 @@ function renderBreathingSession(ex) {
         </div>
       </div>
 
-      <!-- Visual timer circle -->
       <div class="quiet-timer-wrap">
         <div class="quiet-timer-circle" id="quiet-timer-circle"
              style="--phase-colour: ${phase.colour};"
@@ -382,7 +415,6 @@ function renderBreathingSession(ex) {
         </div>
       </div>
 
-      <!-- Phase indicators -->
       <div class="quiet-phase-dots" aria-hidden="true">
         ${ex.phases.map((p, i) => `
           <div class="quiet-phase-dot ${i === breathingPhase ? "active" : ""}"
@@ -502,7 +534,6 @@ function selectJournalPrompts() {
   else if (energy <= 6) pool = JOURNAL_PROMPTS.moderate;
   else                  pool = JOURNAL_PROMPTS.high;
 
-  // Pick 2 non-repeating prompts using day of year for rotation
   const start = new Date(new Date().getFullYear(), 0, 0);
   const dayOfYear = Math.floor((new Date() - start) / 86400000);
   const idx1 = dayOfYear % pool.length;
@@ -529,14 +560,12 @@ function saveJournalEntry() {
 // ── Mindful mode ──────────────────────────────────────────────────────────────
 
 function renderMindfulMode() {
+  if (!mindfulStarted) return renderMindfulSelector();
+  if (mindfulComplete) return renderMindfulComplete();
   const session = MINDFUL_SESSIONS[mindfulDuration];
   const step    = session?.[mindfulStep];
-
-  // S4-9/10 fix: gate on mindfulStarted, not on `step` (which is always
-  // truthy at the default mindfulDuration/mindfulStep — see header note).
-  if (!mindfulStarted || !step) return renderMindfulSelector();
-  if (mindfulComplete) return renderMindfulComplete();
-  return renderMindfulSession(step, session);
+  if (!step) return renderMindfulSelector();
+  return renderMindfulSession(step);
 }
 
 function renderMindfulSelector() {
@@ -545,18 +574,17 @@ function renderMindfulSelector() {
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
       <div>
         <p>How long do you have? Each session guides you through one or two
-           practices with a timer. All you need is somewhere comfortable to sit
-           or lie down.</p>
+           practices with a timer. The time you choose is exactly the time you get.</p>
       </div>
     </div>
 
     <div class="quiet-duration-selector" role="group" aria-label="Session length">
-      ${[5, 10, 15].map(mins => `
+      ${[5, 10, 15, 20].map(mins => `
         <button class="quiet-duration-btn ${mindfulDuration === mins ? "selected" : ""}"
                 data-duration="${mins}"
                 aria-pressed="${mindfulDuration === mins}">
           <span class="quiet-duration-mins">${mins}</span>
-          <span class="quiet-duration-label">minutes</span>
+          <span class="quiet-duration-label">min</span>
         </button>
       `).join("")}
     </div>
@@ -568,10 +596,13 @@ function renderMindfulSelector() {
   `;
 }
 
-function renderMindfulSession(step, session) {
-  const totalSteps   = session.length;
-  const progressPct  = Math.round((mindfulStep / totalSteps) * 100);
-  const timeDisplay  = formatTime(mindfulSecondsLeft);
+function renderMindfulSession(step) {
+  // Progress based on total elapsed time — visible from the first second
+  const progressPct = mindfulTotalSeconds > 0
+    ? Math.min(100, Math.round((mindfulElapsed / mindfulTotalSeconds) * 100))
+    : 0;
+  const timeRemaining = Math.max(0, mindfulTotalSeconds - mindfulElapsed);
+  const timeDisplay   = formatTime(timeRemaining);
 
   return `
     <div class="card card-coach quiet-coach-card" style="margin-bottom:var(--space-4);">
@@ -595,15 +626,18 @@ function renderMindfulSession(step, session) {
       <p class="text-sm text-muted" style="margin-top:var(--space-2);">remaining</p>
     </div>
 
-    <div class="quiet-progress-bar" style="margin-top:var(--space-4);"
-         role="progressbar" aria-valuenow="${progressPct}" aria-valuemin="0" aria-valuemax="100">
+    <div class="quiet-progress-bar" style="margin: var(--space-4) var(--space-4) 0;"
+         role="progressbar" aria-valuenow="${progressPct}" aria-valuemin="0" aria-valuemax="100"
+         aria-label="Session progress">
       <div class="quiet-progress-fill" style="width:${progressPct}%"></div>
     </div>
 
-    <button class="btn btn-danger btn-full" id="quiet-mindful-stop-btn"
-            style="margin-top:var(--space-6);">
-      End session early
-    </button>
+    <div style="padding: 0 var(--space-4);">
+      <button class="btn btn-danger btn-full" id="quiet-mindful-stop-btn"
+              style="margin-top:var(--space-6);">
+        End session early
+      </button>
+    </div>
   `;
 }
 
@@ -619,7 +653,7 @@ function renderMindfulComplete() {
     </div>
 
     <button class="btn btn-primary btn-full quiet-back-btn"
-            style="margin-top:var(--space-5);">
+            style="margin-top:var(--space-5); margin-left:var(--space-4); margin-right:var(--space-4);">
       Back to choices
     </button>
   `;
@@ -651,7 +685,7 @@ function renderRestMode() {
       </div>
     </div>
 
-    <div class="card" style="margin-top:var(--space-5);">
+    <div class="card" style="margin-top:var(--space-5); margin-left:var(--space-4); margin-right:var(--space-4);">
       <p class="text-sm text-muted">
         If you want gentle movement later, breathing practice or a short mindful
         session are always here. No pressure either way.
@@ -659,7 +693,7 @@ function renderRestMode() {
     </div>
 
     <button class="btn btn-ghost btn-full quiet-back-btn"
-            style="margin-top:var(--space-5);">
+            style="margin-top:var(--space-5); margin-left:var(--space-4); margin-right:var(--space-4);">
       Back to choices
     </button>
   `;
@@ -698,6 +732,7 @@ function startBreathing(exerciseId) {
 
       if (breathingRound >= ex.rounds) {
         clearInterval(breathingInterval);
+        breathingInterval = null;
         breathingComplete = true;
         logSession("breathing", ex.name, ex.credits);
         rerender();
@@ -711,13 +746,11 @@ function startBreathing(exerciseId) {
       if (circleEl)  circleEl.style.setProperty("--phase-colour", nextPhase.colour);
       if (secondsEl) secondsEl.textContent = phaseSecondsLeft;
 
-      // Update phase dots
       document.querySelectorAll(".quiet-phase-dot").forEach((dot, i) => {
         dot.classList.toggle("active", i === breathingPhase);
         if (i === breathingPhase) dot.style.setProperty("--dot-colour", nextPhase.colour);
       });
 
-      // Update round counter
       const roundEl = document.querySelector(".quiet-round-progress .text-sm");
       if (roundEl) roundEl.textContent = "Round " + (breathingRound + 1) + " of " + ex.rounds;
     }
@@ -738,64 +771,78 @@ function startMindfulSession() {
   const session = MINDFUL_SESSIONS[mindfulDuration];
   if (!session?.length) return;
 
-  mindfulStarted     = true;
-  mindfulStep        = 0;
-  mindfulComplete    = false;
-  mindfulSecondsLeft = session[0].duration;
+  mindfulStarted      = true;
+  mindfulStep         = 0;
+  mindfulComplete     = false;
+  mindfulTotalSeconds = mindfulDuration * 60;
+  mindfulElapsed      = 0;
+  mindfulStepElapsed  = 0;
 
-  // Render the session view DIRECTLY into the content div without calling
-  // rerender() — rerender() triggers onMount() which calls cleanup() and
-  // kills the timer before it gets a chance to run.
+  // Render the session view directly — avoids rerender() calling cleanup()
   const content = document.getElementById("quiet-session-content");
   if (content) {
-    content.innerHTML = renderMindfulSession(session[0], session);
-    // Wire only the stop button — do not call full onMount()
+    content.innerHTML = renderMindfulSession(session[0]);
     document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
   }
 
-  runMindfulStep(session);
+  runMindfulTimer(session);
 }
 
-function runMindfulStep(session) {
+function runMindfulTimer(session) {
   if (mindfulTimer) clearInterval(mindfulTimer);
 
   mindfulTimer = setInterval(() => {
-    mindfulSecondsLeft--;
+    mindfulElapsed++;
+    mindfulStepElapsed++;
 
-    // Update only the time display — do not rerender the whole view
+    // Update the countdown display only — no full rerender
     const timeEl = document.getElementById("quiet-mindful-time");
-    if (timeEl) timeEl.textContent = formatTime(mindfulSecondsLeft);
+    if (timeEl) {
+      timeEl.textContent = formatTime(Math.max(0, mindfulTotalSeconds - mindfulElapsed));
+    }
 
-    if (mindfulSecondsLeft <= 0) {
-      clearInterval(mindfulTimer);
+    // Update progress bar
+    const fill = document.querySelector(".quiet-progress-fill");
+    if (fill) {
+      const pct = Math.min(100, Math.round((mindfulElapsed / mindfulTotalSeconds) * 100));
+      fill.style.width = pct + "%";
+      fill.closest(".quiet-progress-bar")?.setAttribute("aria-valuenow", pct);
+    }
+
+    // Check if current step is done
+    const currentStepDuration = session[mindfulStep].duration;
+    if (mindfulStepElapsed >= currentStepDuration) {
       mindfulStep++;
+      mindfulStepElapsed = 0;
 
       if (mindfulStep >= session.length) {
+        // Session complete
+        clearInterval(mindfulTimer);
+        mindfulTimer    = null;
         mindfulComplete = true;
         logSession("mindful", mindfulDuration + " min mindful session", 20);
-        // Safe to rerender here — session is complete, no timer to protect
         rerender();
         return;
       }
 
-      // Advance to next step: render directly, then start timer
-      mindfulSecondsLeft = session[mindfulStep].duration;
+      // Advance to next step — render new instruction card only
       const content = document.getElementById("quiet-session-content");
       if (content) {
-        content.innerHTML = renderMindfulSession(session[mindfulStep], session);
+        content.innerHTML = renderMindfulSession(session[mindfulStep]);
         document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
       }
-      runMindfulStep(session);
     }
   }, 1000);
 }
 
 function stopMindful() {
   if (mindfulTimer) clearInterval(mindfulTimer);
-  mindfulTimer    = null;
-  mindfulStarted  = false;
-  mindfulComplete = false;
-  mindfulStep     = 0;
+  mindfulTimer       = null;
+  mindfulStarted     = false;
+  mindfulComplete    = false;
+  mindfulStep        = 0;
+  mindfulElapsed     = 0;
+  mindfulStepElapsed = 0;
   rerender();
 }
 
@@ -831,7 +878,6 @@ function logSession(type, name, credits) {
 export function onMount() {
   mode = store.get("quietMode") || "selector";
 
-  // ── Mode selector cards ───────────────────────────────────────────────────
   document.querySelectorAll(".quiet-mode-card").forEach(card => {
     card.addEventListener("click", () => {
       mode = card.dataset.mode;
@@ -840,17 +886,10 @@ export function onMount() {
     });
   });
 
-  // Back buttons
   document.querySelectorAll(".quiet-back-btn, #quiet-back-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      // If in a mode that was pre-set (came from Noticing or elsewhere),
-      // go directly back to the return route — do not show the selector.
-      // quietReturnRoute is set by the caller before navigating here.
       const returnRoute = store.get("quietReturnRoute") || "intention";
-
       if (mode && mode !== "selector") {
-        // Were we launched directly into a mode (e.g. from Noticing)?
-        // If so, Back goes straight to the return route, not the selector.
         const launchedDirectly = store.get("quietLaunchedDirect") || false;
         if (launchedDirectly) {
           cleanup();
@@ -874,24 +913,20 @@ export function onMount() {
     });
   });
 
-  // Breathing: select exercise
   document.querySelectorAll(".quiet-breathing-card").forEach(card => {
     card.addEventListener("click", () => {
       startBreathing(card.dataset.breathingId);
     });
   });
 
-  // Breathing: stop
   document.getElementById("quiet-stop-breathing-btn")?.addEventListener("click", stopBreathing);
 
-  // Breathing: try another
   document.getElementById("quiet-try-another-btn")?.addEventListener("click", () => {
     selectedBreathing = null;
     breathingComplete = false;
     rerender();
   });
 
-  // Breathing: done
   document.getElementById("quiet-breathing-done-btn")?.addEventListener("click", () => {
     const returnRoute = store.get("quietReturnRoute") || "intention";
     cleanup();
@@ -901,7 +936,6 @@ export function onMount() {
     router.navigate(returnRoute);
   });
 
-  // Breathing: difficulty chips
   document.querySelectorAll(".quiet-difficulty-chip").forEach(chip => {
     chip.addEventListener("click", () => {
       document.querySelectorAll(".quiet-difficulty-chip").forEach(c => {
@@ -911,10 +945,8 @@ export function onMount() {
     });
   });
 
-  // Journal: save
   document.getElementById("quiet-journal-save-btn")?.addEventListener("click", saveJournalEntry);
 
-  // Journal: skip
   document.getElementById("quiet-journal-skip-btn")?.addEventListener("click", () => {
     const returnRoute = store.get("quietReturnRoute") || "intention";
     cleanup();
@@ -924,7 +956,6 @@ export function onMount() {
     router.navigate(returnRoute);
   });
 
-  // Mindful: duration selector
   document.querySelectorAll(".quiet-duration-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       mindfulDuration = parseInt(btn.dataset.duration);
@@ -937,12 +968,11 @@ export function onMount() {
     });
   });
 
-  // Mindful: start
   document.getElementById("quiet-mindful-start-btn")?.addEventListener("click", startMindfulSession);
-
-  // Mindful: stop
   document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
 }
+
+// ── Cleanup / onUnmount ───────────────────────────────────────────────────────
 
 function cleanup() {
   if (breathingInterval) clearInterval(breathingInterval);
@@ -954,8 +984,19 @@ function cleanup() {
   mindfulStarted     = false;
   mindfulComplete    = false;
   mindfulStep        = 0;
+  mindfulElapsed     = 0;
+  mindfulStepElapsed = 0;
   journalSaved       = false;
   journalPrompts     = [];
+}
+
+/**
+ * Called by router.navigate() before leaving this view.
+ * Stops all active timers so device back gesture cannot leave
+ * breathing or mindful intervals running in the background.
+ */
+export function onUnmount() {
+  cleanup();
 }
 
 function rerender() {
@@ -964,9 +1005,4 @@ function rerender() {
     content.innerHTML = renderMode();
     onMount();
   }
-}
-
-// Called by router.navigate() before leaving this view — stops active timers
-export function onUnmount() {
-  cleanup();
 }
