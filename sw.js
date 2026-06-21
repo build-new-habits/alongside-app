@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * alongside-v106 (21 Jun 2026, S4-CSS-NOTICING)
+ *   - css/components/breathing-session.css added (new)
+ *   - css/components/quiet-session.css added (new)
+ *   - css/components/noticing.css added (new)
+ *   - css/main.css: three new @imports added
+ *   - js/router.js v4: onUnmount() hook; breathing-session in hideNavViews
+ *   - js/views/breathing-session.js: onUnmount() export added
+ *   - js/views/quiet-session.js: onUnmount() export added
+ *
  * 15 June 2026 v9
  * Cache version: alongside-v105
  *
@@ -237,7 +246,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v105";
+const CACHE_NAME = "alongside-v106";
 
 const SHELL_URLS = [
 
@@ -249,6 +258,9 @@ const SHELL_URLS = [
   "/alongside-app/css/main.css",
   "/alongside-app/css/components/session-guard.css",
   "/alongside-app/css/components/weekly-plan.css",
+  "/alongside-app/css/components/breathing-session.css",
+  "/alongside-app/css/components/quiet-session.css",
+  "/alongside-app/css/components/noticing.css",
 
   //  Core JS 
   "/alongside-app/js/app.js",
