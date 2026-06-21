@@ -1,0 +1,126 @@
+/*
+ * css/components/noticing.css
+ * Alongside: Move — Noticing Hub view styles
+ *
+ * 21 Jun 2026 v1 (S4-CSS-NOTICING)
+ *
+ * The Noticing tab is a card-based hub. Its cards use the shared .card
+ * class from components/cards.css. This file handles layout and any
+ * noticing-specific overrides.
+ *
+ * If noticing.js introduces component-specific class names in a future
+ * session, add them here. For now this file handles spacing and layout
+ * of the hub shell so the tab feels distinct from Today and Progress.
+ */
+
+/* ── Hub shell ────────────────────────────────────────────────────────────── */
+
+.noticing-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: var(--space-4) var(--space-4) var(--space-8);
+  background: var(--color-bg);
+  box-sizing: border-box;
+}
+
+.noticing-header {
+  margin-bottom: var(--space-5);
+}
+
+.noticing-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-1);
+}
+
+.noticing-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ── Card grid / stack ────────────────────────────────────────────────────── */
+
+.noticing-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── Individual noticing card overrides ───────────────────────────────────── */
+
+.noticing-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.noticing-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.noticing-card-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.noticing-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.noticing-card-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-1);
+}
+
+.noticing-card-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.noticing-card-arrow {
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* ── "On its way" / disabled card state ───────────────────────────────────── */
+
+.noticing-card--coming-soon {
+  opacity: 0.55;
+  cursor: default;
+  pointer-events: none;
+}
+
+.noticing-card--coming-soon .noticing-card-arrow {
+  display: none;
+}
+
+.noticing-coming-tag {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 2px var(--space-2);
+  flex-shrink: 0;
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .noticing-card {
+    transition: none;
+  }
+}
