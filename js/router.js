@@ -1,26 +1,14 @@
 /**
  * router.js - View navigation
  *
- * 15 Jun 2026 v3 (S4-9/10) - Removed the dead "noticing-hub" VIEW_NAMES
- *   entry flagged on 12 Jun. The live bottom-nav button (index.html)
- *   uses data-view="noticing", which has its own entry; "noticing-hub"
- *   was never navigated to from anywhere and was a leftover/duplicate.
- *
- * 12 Jun 2026 v2 (S4-4 Step 0) - Route pre-registration:
- *   Added VIEW_NAMES entries for the entire S4 remaining queue, ahead
- *   of the view files being built (weekly-plan, breathing-session,
- *   noticing-reflection, journal-entry). loadView() already handles a
- *   missing view file gracefully (logs an error, returns null,
- *   navigate() simply renders nothing) - so these entries are safe to
- *   add now and mean router.js does not need to be revisited when each
- *   view is built. journal-entry and breathing-session added to
- *   hideNavViews (focused flows, matching quiet-session/yoga-session
- *   pattern). weekly-plan and noticing-reflection left nav-visible
- *   (settings/hub-style screens).
- *
- *   NOTE (resolved 15 Jun 2026, see above): "noticing" and "noticing-hub"
- *   both existed in VIEW_NAMES with similar labels - this was the
- *   flagged duplicate/legacy entry, now removed.
+ * 21 Jun 2026 v4 (S4-CSS-NOTICING):
+ *   onUnmount() hook added to navigate(). Before switching views, navigate()
+ *   now calls this.views[this.currentView]?.onUnmount?.() if that method
+ *   exists on the outgoing view. This stops active session timers when the
+ *   device back gesture fires a popstate event — the gesture calls back()
+ *   which calls navigate(), which now runs onUnmount() on the view being
+ *   left before tearing down its DOM. breathing-session.js and
+ *   quiet-session.js each implement onUnmount() to clear their intervals.
  *
  * 30 May 2026 v1 --- Daily flow redesign:
  *   coach-reflection added to VIEW_NAMES.
@@ -69,16 +57,11 @@ const VIEW_NAMES = {
   "library":                 "Library",
   "activity-log":            "Log an Activity",
   "noticing":                "Noticing",
+  "noticing-hub":            "Noticing Hub",
   "upgrade":                 "Personal Plan",
   "privacy":                 "Privacy and Terms",
   "checkin-mini":            "Quick Check-In",
-
-  // -- S4 remaining queue (pre-registered S4-4 Step 0, 12 Jun 2026) --
-  "weekly-plan":             "My Week",
-  "breathing-session":       "Breathing",
-  "noticing-reflection":     "Noticing...",
-  "journal-entry":           "Journal",
-
+  "breathing-session":       "Breathing Practice",
   "onboarding/welcome":      "Welcome to Alongside",
   "onboarding/name":         "Your Name",
   "onboarding/about":        "About You",
@@ -152,6 +135,20 @@ export const router = {
   async navigate(viewName) {
     console.log("Navigating to: " + viewName);
 
+    /**
+     * onUnmount hook — call cleanup on the outgoing view before switching.
+     * This stops active timers (breathing, mindful movement) when the
+     * device back gesture fires popstate -> back() -> navigate().
+     * Views opt in by exporting an onUnmount() function.
+     */
+    if (this.currentView && this.views[this.currentView]?.onUnmount) {
+      try {
+        this.views[this.currentView].onUnmount();
+      } catch (e) {
+        console.warn("onUnmount error on " + this.currentView, e);
+      }
+    }
+
     // Push to in-app navigation stack
     const isOnboarding = viewName.startsWith("onboarding");
     const isDuplicate  = this._history.length > 0 &&
@@ -176,7 +173,7 @@ export const router = {
     const hideNavViews = [
       "onboarding", "workout", "workout-complete", "checkin",
       "prescribed-session", "morning-session", "quiet-session",
-      "yoga-session", "breathing-session", "journal-entry"
+      "yoga-session", "breathing-session"
     ];
     const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
 
