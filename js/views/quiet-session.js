@@ -965,3 +965,8 @@ function rerender() {
     onMount();
   }
 }
+
+// Called by router.navigate() before leaving this view — stops active timers
+export function onUnmount() {
+  cleanup();
+}
