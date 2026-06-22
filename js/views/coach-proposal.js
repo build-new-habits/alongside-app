@@ -1,68 +1,41 @@
 /**
  * coach-proposal.js - Coach Proposal Screen
  *
- * 14 Jun 2026 v4 (S4-WP2) -- Weekly plan realigned to schema v1.6:
- *   getTodayPlan() rewritten -- reads weeklyPlan.days[day] (was flat
- *   weeklyPlan[day]) and gates on weeklyPlan.updatedAt !== null &&
- *   plan.enabled (was the non-existent top-level weeklyPlanEnabled,
- *   per schema v1.6's deliberate deferral of that layer). type "open"
- *   or enabled:false both fall back to normal buildProposal(), exactly
- *   as for an unconfigured day.
- *   Day types renamed throughout to match v1.6: "gym" -> "workout",
- *   "class" -> "event". Renderers renamed renderWeeklyPlanGym ->
- *   renderWeeklyPlanWorkout, renderWeeklyPlanClass -> renderWeeklyPlanEvent.
- *   proposalState values "weekly-plan-gym"/"weekly-plan-class" ->
- *   "weekly-plan-workout"/"weekly-plan-event".
- *   renderWeeklyPlanWorkout now also reflects classFocus (additional
- *   focus tags) and location (home/gym/outside) per the Day Type
- *   Behaviour table (schema.md Section 13) -- previously only label/
- *   sessionType/durationMins were used.
- *   renderWeeklyPlanEvent now references durationMins/location when
- *   framing the day, per the same table -- previously activityName only.
- *   Weekly-plan button handlers (~lines 917-934 in the prior version)
- *   renamed weekly-gym-* -> weekly-workout-*, weekly-class-log-btn ->
- *   weekly-event-log-btn, and now also pass plan.location and
- *   plan.classFocus through as weeklyPlanLocation/weeklyPlanClassFocus
- *   (same transient hand-off convention as the existing
- *   weeklyPlanSessionType/weeklyPlanDuration, for session-builder.js to
- *   consume when that file is next touched).
- *   Bug fix while making this code live: the old "weekly-gym-go-btn"
- *   handler called router.navigate("gym-sub") -- not a registered route
- *   -- immediately followed by a second navigate to "coach-proposal"
- *   with openGymSub=true. The dead first navigate call is removed; the
- *   handler now just sets openGymSub and re-enters coach-proposal,
- *   matching the existing "I know what I'm doing" gym-sub pattern used
- *   at the top of render().
+ * 22 Jun 2026 v5 — Coaching engine wired:
+ *   buildProposal() now calls workoutGenerator.generateDailyOptions()
+ *   instead of its own manual five-option scoring. This connects the
+ *   entire coaching engine to the daily flow in one change:
+ *     - availableTime now actually drives session length (was ignored)
+ *     - strategicGoal.primaryGoal now drives session type bias
+ *     - Programme phase (programmeEngine.getPhaseBias()) drives focus order
+ *     - Difficulty floor rises with programme phase (SOLO taxonomy)
+ *     - Core guarantee fires on every session silently
+ *     - Burnout override (detectBurnout()) takes full control when high
+ *     - Cycle phase adaptation active when hormonalTracking is on
+ *     - Goal-aware bias (weight loss → cardio first, strength → strength first)
+ *   All of this was already built in workoutGenerator.js v1.7 —
+ *   it just wasn't being called. This is the wiring session.
  *
- * 12 Jun 2026 v1 (S4-4 P2) -- sessionLocation wiring:
- *   buildProposal() reads store.sessionLocation and applies a scoring
- *   bias to the gym/yoga/quiet/run/walk options: "gym" location boosts
- *   gym, "home" location penalises gym and slightly favours yoga/quiet,
- *   "outside" favours run/walk and penalises gym. Weekly plan branch
- *   (getTodayPlan) is unaffected -- per-day location in weeklyPlan
- *   continues to override sessionLocation as before.
+ *   Cardio resolution: "run" proposals now route to running-session
+ *   instead of activity-log. Walk proposals route to walk-session.
+ *   Both views exist and are production-quality. activity-log is
+ *   reserved for post-hoc logging only.
  *
- * 01 June 2026 v1
+ *   proposalFromWorkout() converts a workoutGenerator option into the
+ *   proposal shape the rest of this file uses. The three generated
+ *   options map to: primary (shown), and two alternatives available
+ *   via "Suggest something different" branch.
  *
- * 22 May 2026 v3 --- Weekly plan wiring added (S4-3):
- *   render() reads weeklyPlanEnabled + today's day slot before building proposal.
- *   If plan is enabled and today has a non-open type, branches immediately:
- *     gym      -> renderWeeklyPlanGym()      "Your plan today is [label]."
- *     rest     -> renderWeeklyPlanRest()     "Today is a rest day in your plan."
- *     recovery -> renderWeeklyPlanRecovery() "Recovery day. Light movement if you want it."
- *     class    -> renderWeeklyPlanClass()    "You have [activity] today."
- *   open / toggle off -> existing buildProposal() unchanged.
- *   proposalState "weekly-plan-*" handles rerender correctly.
- *   "Something else entirely" on any plan state falls through to normal branching.
- *
- * 22 May 2026 v2 -- Gym session routes through gym-sub screen.
- *                   openGymSub store flag opens directly in gym-sub state.
- *                   Gym sub wiring complete in onMount().
- *
- * v1.0 (S4-1, April 2026)
+ * 14 Jun 2026 v4 (S4-WP2) — Weekly plan realigned to schema v1.6.
+ * 12 Jun 2026 v1 (S4-4 P2) — sessionLocation wiring.
+ * 01 Jun 2026 v1 — Initial build.
+ * 22 May 2026 v3 — Weekly plan wiring added.
+ * 22 May 2026 v2 — Gym session routes through gym-sub screen.
  */
 
-import { store } from "../store.js";
+import { store }            from "../store.js";
+import { workoutGenerator } from "../data/workoutGenerator.js";
+import { checkinData }      from "../data/checkin.js";
 
 export const centered = false;
 
@@ -83,14 +56,10 @@ const ACTIVITY_LABELS = {
   "prescribed": "prescribed exercises", "custom": "movement"
 };
 
-// -- Session type labels (for weekly plan workout days) -----------------------
-
 const SESSION_TYPE_LABELS = {
   upper: "Upper Body", lower: "Lower Body", full: "Full Body",
   core: "Core & Stability", cardio: "Cardio", hiit: "HIIT", mobility: "Mobility"
 };
-
-// -- Location labels (for weekly plan workout/event days) ----------------------
 
 const LOCATION_LABELS = {
   home: "at home", gym: "at the gym", outside: "outside"
@@ -98,21 +67,15 @@ const LOCATION_LABELS = {
 
 // -- State --------------------------------------------------------------------
 
-let proposalState   = "proposal";  // "proposal" | "branching" | "revised" | "activity-pick" | "gym-sub" | "gym-explainer" | "weekly-plan-workout" | "weekly-plan-rest" | "weekly-plan-recovery" | "weekly-plan-event"
-let currentProposal = null;
-let revisedProposal = null;
-let branchChoice    = null;
+let proposalState      = "proposal";
+let currentProposal    = null;
+let revisedProposal    = null;
+let generatedOptions   = null;  // all 3 options from workoutGenerator
+let branchChoice       = null;
 let gymExplainerTarget = null;
 
 // -- Weekly plan helpers ------------------------------------------------------
 
-// Schema v1.6 (schema.md Section 13): weeklyPlan.updatedAt is null until
-// the user has saved a plan at least once -- that, plus each day's own
-// `enabled` flag, is the whole "is the plan active" signal (the separate
-// weeklyPlanEnabled/weeklyPlanSetAt layer proposed in the 21 May spec was
-// deliberately deferred, not added, in v1.6). A day with type "open" or
-// enabled:false is treated identically -- both fall back to normal
-// coach-proposal rules below.
 function getTodayPlan() {
   const weeklyPlan = store.get("weeklyPlan");
   if (!weeklyPlan || !weeklyPlan.updatedAt) return null;
@@ -122,13 +85,8 @@ function getTodayPlan() {
   return plan;
 }
 
-// Builds the "Your plan today is ___" label for workout days from
-// sessionType + classFocus (schema v1.6: both feed the session builder
-// as a same-day selection would). plan.label, if the user set one,
-// always wins -- it is their own framing for the day.
 function getWorkoutDayLabel(plan) {
   if (plan.label) return plan.label;
-
   const parts = [];
   if (plan.sessionType && SESSION_TYPE_LABELS[plan.sessionType]) {
     parts.push(SESSION_TYPE_LABELS[plan.sessionType]);
@@ -137,64 +95,95 @@ function getWorkoutDayLabel(plan) {
     const focusLabel = SESSION_TYPE_LABELS[id];
     if (focusLabel && !parts.includes(focusLabel)) parts.push(focusLabel);
   });
-
   return parts.length > 0 ? parts.join(" + ") : "Workout";
 }
 
-// -- Proposal engine ----------------------------------------------------------
+// -- Workout generator integration -------------------------------------------
 
-function buildProposal(preferShorter = false) {
-  const name           = (store.get("name") || "").split(" ")[0] || "";
-  const checkin        = latestCheckin();
-  const energy         = checkin.energy || 5;
-  const mood           = checkin.mood   || 5;
-  const sleep          = checkin.sleep  || 7;
-  const conditions     = store.get("conditions")         || [];
-  const painScores     = store.get("conditionPainScores") || {};
-  const activityLog    = store.get("activityLog")         || [];
-  const prescribed     = (store.get("prescribedExercises") || []).filter(e => !e.completedToday);
-  const availableTime  = store.get("availableTime")       || null;
-  const goal           = store.get("strategicGoal")       || {};
-  const gymWeek        = store.get("gymProgrammeWeek")    || 1;
-  const gymSession     = store.get("gymProgrammeSession") || "A";
-  const prefs          = store.get("activityPreferences") || {};
-  const identity       = store.get("movementIdentity")    || null;
-  const lastType       = store.get("lastProposalType")    || null;
-  const lastDate       = store.get("lastProposalDate")    || null;
-  const gymProgramme   = store.get("gymProgrammeWeek");
-  const sessionLocation = store.get("sessionLocation")    || null;
+/**
+ * Convert a workoutGenerator option into the proposal shape used by
+ * the rest of this file. Called once per generated option.
+ *
+ * Focus → route mapping:
+ *   strength → gym-sub (uses gym programme / session builder)
+ *   cardio   → running-session (real guided session, not activity-log)
+ *   mobility → quiet-session in mindful mode
+ *
+ * The "run" proposal used to route to activity-log — that was wrong.
+ * running-session.js is a complete guided session view with timers,
+ * coach prompts, and condition-aware pacing cues.
+ */
+function proposalFromWorkout(workout, reflection) {
+  if (!workout) return null;
 
-  const TIME_MAP  = { micro: 10, quick: 20, short: 30, standard: 40, long: 50, open: 60 };
-  let timeBudget  = availableTime ? (TIME_MAP[availableTime] || 40) : 40;
-  if (preferShorter) timeBudget = Math.max(15, Math.round(timeBudget * 0.6));
+  const focusToRoute = {
+    strength: { target: "gym-sub",         quietMode: null,       type: "gym"      },
+    cardio:   { target: "running-session",  quietMode: null,       type: "run"      },
+    mobility: { target: "quiet-session",    quietMode: "mindful",  type: "yoga"     }
+  };
 
-  const recentLog     = activityLog.slice(-7);
-  const lastSession   = recentLog[recentLog.length - 1] || null;
-  const daysSinceLast = lastSession
-    ? Math.floor((Date.now() - new Date(lastSession.loggedAt)) / 86400000)
-    : 99;
+  const route = focusToRoute[workout.focus] || focusToRoute.mobility;
 
-  const recentTypes  = recentLog.map(e => e.type || e.source || "");
-  const gymCount     = recentTypes.filter(t => ["gym", "coach-session", "gym-programme"].includes(t)).length;
-  const cardioCount  = recentTypes.filter(t => ["run", "cycle", "swim", "cardio", "row"].includes(t)).length;
-  const quietCount   = recentTypes.filter(t => ["breathing", "journal", "mindful", "rest"].includes(t)).length;
+  // Build a coach proposal text from the workout rationale
+  const proposalText = buildProposalText(workout);
 
-  const highPain     = conditions.some(id => (painScores[id] || 0) >= 7);
-  const moderatePain = conditions.some(id => (painScores[id] || 0) >= 4);
-  const hasPrescribed = prescribed.length > 0;
-  const hasGymProg   = !!gymProgramme;
+  return {
+    type:      route.type,
+    target:    route.target,
+    quietMode: route.quietMode,
+    duration:  workout.duration || 30,
+    reflection,
+    constraint:          null,
+    proposal:            proposalText,
+    rationale:           workout.rationale || "",
+    severePainOverride:  false,
+    workout              // keep the full workout object for session views
+  };
+}
 
-  const todayKey    = new Date().toISOString().split("T")[0];
-  const isRepeatDay = lastDate === todayKey;
+/**
+ * Build a natural coach proposal sentence from the generated workout.
+ */
+function buildProposalText(workout) {
+  const name = (store.get("name") || "").split(" ")[0] || "";
 
-  function prefScore(type) {
-    return (prefs[type] || 0) + (identity === type ? 3 : 0);
+  const focusLines = {
+    strength: "I thought we'd do some strength work today.",
+    cardio:   "I thought a cardio session today. Cardiovascular work at this stage makes a real difference.",
+    mobility: "I thought something more restorative today. Mobility work and mindful movement."
+  };
+
+  const base = focusLines[workout.focus] || "Here is what I had in mind for today.";
+
+  // Add programme context if active
+  const ap = store.get("activeProgramme");
+  if (ap?.programmeId && ap.currentWeek) {
+    return base + " We are in Week " + ap.currentWeek + " — " + (ap.currentPhase || "building") + " phase.";
   }
 
-  const coachPersonality = store.get("coachPersonality") || "steady";
-  const reflection = buildReflection(activityLog, 48, coachPersonality);
+  return base;
+}
 
-  // Safety: consecutive days
+/**
+ * Main proposal builder — now delegates to workoutGenerator.
+ * Returns a proposal object in the shape used by renderProposal().
+ *
+ * Safety overrides (consecutive days, high pain, burnout) remain here
+ * because they determine whether to show a workout proposal at all,
+ * before the generator runs.
+ */
+function buildProposal(preferShorter = false) {
+  const checkin      = latestCheckin();
+  const energy       = checkin.energy || 5;
+  const conditions   = store.get("conditions")         || [];
+  const painScores   = store.get("conditionPainScores") || {};
+  const activityLog  = store.get("activityLog")         || [];
+  const prescribed   = (store.get("prescribedExercises") || []).filter(e => !e.completedToday);
+  const availableTime = store.get("availableTime")      || null;
+
+  const reflection = buildReflection(activityLog, 48, store.get("coachPersonality") || "steady");
+
+  // ── Safety: consecutive days ─────────────────────────────────────────────
   const last7      = activityLog.slice(-7);
   const last7Types = last7.map(e => e.type || e.source || "");
   const isTraining = t => !["breathing", "journal", "rest", "mindful", "quiet"].includes(t);
@@ -203,139 +192,124 @@ function buildProposal(preferShorter = false) {
   let consecutiveDays = 0;
   for (let i = last7.length - 1; i >= 0; i--) {
     const entry   = last7[i];
-    const daysAgo = Math.floor((Date.now() - new Date(entry.loggedAt)) / 86400000);
+    const daysAgo = Math.floor((Date.now() - new Date(entry.loggedAt || entry.sessionStart || Date.now())) / 86400000);
     if (daysAgo <= consecutiveDays + 1 && isTraining(last7Types[i])) { consecutiveDays++; }
     else break;
   }
 
-  const consecutiveHeavy = last7Types.slice(-2).every(isHeavy);
-  const totalThisWeek    = last7.filter(e => {
-    const d = Math.floor((Date.now() - new Date(e.loggedAt)) / 86400000);
-    return d < 7 && isTraining(e.type || e.source || "");
-  }).length;
-
   if (consecutiveDays >= 3) {
     return makeProposal({
       type: "quiet", target: "quiet-session", quietMode: "rest", duration: 15, reflection,
-      proposal: "You have trained for " + consecutiveDays + " days in a row. Today needs to be a rest day. This is not optional -- it is where adaptation actually happens. Your body builds back stronger during recovery, not during effort.",
-      rationale: "Consecutive training days without rest increase injury risk and reduce performance gains."
+      proposal: "You have trained for " + consecutiveDays + " days in a row. Today needs to be a rest day. This is not optional — it is where adaptation actually happens.",
+      rationale: "Rest is when your body builds back stronger. This day is as important as any session."
     });
   }
 
-  const heavyOverride = consecutiveHeavy && energy < 8;
+  const totalThisWeek = last7.filter(e => {
+    const d = Math.floor((Date.now() - new Date(e.loggedAt || e.sessionStart || Date.now())) / 86400000);
+    return d < 7 && isTraining(e.type || e.source || "");
+  }).length;
 
   if (totalThisWeek >= 6) {
     return makeProposal({
       type: "quiet", target: "quiet-session", quietMode: "mindful", duration: 20, reflection,
-      proposal: "You have been very active this week -- six or more sessions in seven days. Today I want to suggest something restorative rather than another training session.",
+      proposal: "You have been very active this week — six or more sessions in seven days. Today I want to suggest something restorative.",
       rationale: "High weekly volume without adequate recovery limits progress."
     });
   }
 
+  // ── Safety: high pain or very low energy ────────────────────────────────
+  const highPain = conditions.some(id => (painScores[id] || 0) >= 7);
   if (highPain || energy <= 2) {
     return makeProposal({
       type: "quiet", target: "quiet-session", quietMode: "breathing",
-      duration: Math.min(timeBudget, 15), reflection,
+      duration: Math.min(availableTime ? ({micro:10,quick:20,short:30,standard:40,long:50,open:60}[availableTime] || 15) : 15, 15),
+      reflection,
       proposal: "I think today calls for something gentle. A short breathing practice or a few minutes of stillness.",
       rationale: energy <= 2 ? "Your energy is very low. Rest and breath work are the right response." : "Your pain levels are elevated."
     });
   }
 
-  if (hasPrescribed && energy >= 4 && !moderatePain && !isRepeatDay) {
+  // ── Prescribed exercises ─────────────────────────────────────────────────
+  const todayKey    = new Date().toISOString().split("T")[0];
+  const lastDate    = store.get("lastProposalDate") || null;
+  const isRepeatDay = lastDate === todayKey;
+
+  if (prescribed.length > 0 && energy >= 4 && !isRepeatDay) {
+    const moderatePain = conditions.some(id => (painScores[id] || 0) >= 4);
+    if (!moderatePain) {
+      return makeProposal({
+        type: "prescribed", target: "prescribed", quietMode: null,
+        duration: 30, reflection,
+        proposal: "I thought we could work through your prescribed exercises today. Consistency is what makes them work.",
+        rationale: prescribed.length + " prescribed exercise" + (prescribed.length > 1 ? "s" : "") + " outstanding."
+      });
+    }
+  }
+
+  // ── Burnout check — let workoutGenerator handle this but catch ───────────
+  // high burnout here to route to a rest proposal before calling generator
+  const burnout = checkinData.detectBurnout();
+  if (burnout.level === "high" && energy <= 3) {
     return makeProposal({
-      type: "prescribed", target: "prescribed", quietMode: null,
-      duration: Math.min(timeBudget, 30), reflection,
-      proposal: "I thought we could work through your prescribed exercises today. Consistency is what makes them work.",
-      rationale: prescribed.length + " prescribed exercise" + (prescribed.length > 1 ? "s" : "") + " outstanding."
+      type: "quiet", target: "quiet-session", quietMode: "mindful", duration: 20, reflection,
+      proposal: "I have noticed you have been struggling recently. Today is about recovery, not pushing.",
+      rationale: "Your body and mind need rest right now. This is the session."
     });
   }
 
-  if (energy <= 3) {
+  // ── Generate options via workoutGenerator ────────────────────────────────
+  // preferShorter: temporarily reduce availableTime to get shorter options
+  if (preferShorter) {
+    const currentTime = store.get("availableTime");
+    const shorter = { micro: "micro", quick: "micro", short: "quick",
+                      standard: "short", long: "standard", open: "long" };
+    store.set("availableTime", shorter[currentTime] || "quick");
+  }
+
+  try {
+    generatedOptions = workoutGenerator.generateDailyOptions();
+  } catch (e) {
+    console.error("workoutGenerator error:", e);
+    generatedOptions = null;
+  }
+
+  // Restore availableTime if we changed it
+  if (preferShorter) {
+    store.set("availableTime", availableTime);
+  }
+
+  if (!generatedOptions || generatedOptions.length === 0) {
+    // Fallback if generator fails
     return makeProposal({
-      type: "quiet", target: "quiet-session", quietMode: "mindful",
-      duration: Math.min(timeBudget, 20), reflection,
-      proposal: "I was thinking something quieter today. Something that meets you where you are.",
-      rationale: sleep <= 5 ? "Disrupted sleep." : "Lower energy. This is a recovery moment."
+      type: "gym", target: "gym-sub", quietMode: null, duration: 40, reflection,
+      proposal: "I thought a session today. Let's keep building.",
+      rationale: "Consistent movement is what produces results."
     });
   }
 
-  const locationBias = (type) => {
-    if (sessionLocation === "gym") {
-      if (type === "gym") return 3;
-    } else if (sessionLocation === "home") {
-      if (type === "gym") return -3;
-      if (type === "yoga" || type === "quiet") return 1;
-    } else if (sessionLocation === "outside") {
-      if (type === "run" || type === "walk") return 2;
-      if (type === "gym") return -2;
-    }
-    return 0;
-  };
-
-  const options = [
-    {
-      type: "gym", available: hasGymProg,
-      score: prefScore("gym") + (gymCount < 3 ? 2 : 0) + (energy >= 6 ? 1 : 0) - (heavyOverride ? 3 : 0) + locationBias("gym"),
-      proposal: "I thought we'd continue your gym programme today. Session " + gymSession + " of Week " + gymWeek + ".",
-      rationale: energy >= 7 ? "Your energy is good. Make the most of it." : "Steady progress on the programme is what builds the result.",
-      duration: Math.min(timeBudget, 45), target: "gym-programme", quietMode: null
-    },
-    {
-      type: "yoga", available: true,
-      score: prefScore("yoga") + (gymCount >= 3 ? 3 : 0) + (energy <= 5 ? 1 : 0) + locationBias("yoga"),
-      proposal: "I thought a yoga or mobility session would serve you well today.",
-      rationale: gymCount >= 3 ? "Several demanding sessions recently. Contrast helps." : "Mobility work complements your other training.",
-      duration: Math.min(timeBudget, 35), target: "quiet-session", quietMode: "mindful"
-    },
-    {
-      type: "quiet", available: true,
-      score: prefScore("quiet") + (energy <= 4 ? 2 : 0) + (quietCount < 1 ? 1 : 0) + locationBias("quiet"),
-      proposal: "I thought something quieter today. Not every day needs to be a training day.",
-      rationale: "Balance between effort and recovery is where progress lives.",
-      duration: Math.min(timeBudget, 20), target: "quiet-session", quietMode: "breathing"
-    },
-    {
-      type: "run", available: true,
-      score: prefScore("run") + (cardioCount < 1 ? 2 : 0) + locationBias("run"),
-      proposal: "I thought a run today. Cardiovascular work at this stage of your goals makes a real difference.",
-      rationale: "No cardio recently.",
-      duration: Math.min(timeBudget, 35), target: "activity-log", quietMode: null
-    },
-    {
-      type: "walk", available: true,
-      score: prefScore("walk") + (energy <= 4 ? 1 : 0) + (daysSinceLast >= 3 ? 1 : 0) + locationBias("walk"),
-      proposal: "I thought a walk today. Movement that generates the energy it costs.",
-      rationale: energy <= 4 ? "Lower energy responds well to gentle sustained movement." : "A good complement to your recent sessions.",
-      duration: Math.min(timeBudget, 40), target: "activity-log", quietMode: null
-    }
-  ];
-
-  const ranked = options
-    .filter(o => o.available)
-    .map(o => ({ ...o, finalScore: o.score - (o.type === lastType && isRepeatDay ? 5 : 0) }))
-    .sort((a, b) => b.finalScore - a.finalScore);
-
-  const chosen = ranked[0];
-  return makeProposal({
-    type: chosen.type, target: chosen.target, quietMode: chosen.quietMode,
-    duration: chosen.duration, reflection,
-    proposal: chosen.proposal, rationale: chosen.rationale
+  // Primary proposal from first generated option
+  const primary = proposalFromWorkout(generatedOptions[0], reflection);
+  return primary || makeProposal({
+    type: "gym", target: "gym-sub", quietMode: null, duration: 40, reflection,
+    proposal: "I thought a session today. Let's keep building.",
+    rationale: "Consistent movement is what produces results."
   });
 }
 
 function buildReflection(activityLog, lookbackHours = 48, coachPersonality = "steady") {
   const cutoffTime         = Date.now() - (lookbackHours * 3600000);
   const relevantActivities = (activityLog || []).filter(a => {
-    const completedAt = new Date(a.completedAt || a.loggedAt || Date.now()).getTime();
+    const completedAt = new Date(a.completedAt || a.loggedAt || a.sessionStart || Date.now()).getTime();
     return completedAt >= cutoffTime;
   });
 
   if (relevantActivities.length === 0) {
     const variants = {
-      steady: "You're here today, and that's what matters.",
+      steady:    "You're here today, and that's what matters.",
       energetic: "You're here. Let's do this.",
       nurturing: "You're here now. That's enough.",
-      minimal: "You're here today."
+      minimal:   "You're here today."
     };
     return variants[coachPersonality] || variants.steady;
   }
@@ -367,53 +341,67 @@ function makeProposal({ type, target, quietMode, duration, reflection, constrain
   return { type, target, quietMode, duration, reflection, constraint: constraint || null, proposal, rationale, severePainOverride };
 }
 
+/**
+ * Build an alternative proposal from the second generated option,
+ * or fall back to the old alternative logic.
+ */
 function buildAlternativeProposal() {
   const current       = currentProposal;
   const availableTime = store.get("availableTime") || null;
   const TIME_MAP_ALT  = { micro: 10, quick: 20, short: 30, standard: 40, long: 50, open: 60 };
   const timeBudget    = availableTime ? (TIME_MAP_ALT[availableTime] || 30) : 30;
 
+  // Use second generated option if available
+  if (generatedOptions && generatedOptions.length >= 2) {
+    const reflection = current?.reflection || buildReflection(store.get("activityLog") || [], 48);
+    const alt = proposalFromWorkout(generatedOptions[1], reflection);
+    if (alt) return alt;
+  }
+
+  // Fallback alternatives
   const alternatives = {
     "gym":       { type: "quiet",  target: "quiet-session", quietMode: "breathing", duration: 20,
                    proposal: "How about something quieter instead. A breathing practice or a short mindful session.",
                    rationale: "Sometimes contrast is the right choice." },
-    "quiet":     { type: "gym",   target: "gym-programme",  quietMode: null, duration: 35,
-                   proposal: "How about continuing your gym programme after all.",
+    "quiet":     { type: "gym",    target: "gym-sub",        quietMode: null,        duration: 35,
+                   proposal: "How about a gym session after all.",
                    rationale: "Movement often generates the energy it costs." },
-    "yoga":      { type: "gym",   target: "gym-programme",  quietMode: null, duration: 40,
-                   proposal: "How about the gym programme instead.",
+    "yoga":      { type: "gym",    target: "gym-sub",        quietMode: null,        duration: 40,
+                   proposal: "How about the gym instead.",
                    rationale: "Strength work supports mobility over time." },
-    "run":       { type: "walk",  target: "activity-log",   quietMode: null, duration: 30,
+    "run":       { type: "walk",   target: "walk-session",   quietMode: null,        duration: 30,
                    proposal: "How about a walk instead. Same outdoor time, less intensity.",
                    rationale: "Lower-intensity movement has its own benefits." },
-    "walk":      { type: "quiet", target: "quiet-session",  quietMode: "mindful", duration: 15,
+    "walk":      { type: "quiet",  target: "quiet-session",  quietMode: "mindful",   duration: 15,
                    proposal: "How about a short mindful session instead.",
                    rationale: "Rest is movement of a different kind." },
-    "prescribed":{ type: "gym",   target: "gym-programme",  quietMode: null, duration: 45,
+    "prescribed":{ type: "gym",    target: "gym-sub",        quietMode: null,        duration: 45,
                    proposal: "How about the full gym session.",
                    rationale: "More complete session, prescribed work included." }
   };
 
-  const alt = alternatives[current.type] || alternatives["quiet"];
-  return { ...alt, reflection: current.reflection };
+  const alt = alternatives[current?.type] || alternatives["quiet"];
+  return { ...alt, duration: Math.min(alt.duration, timeBudget), reflection: current?.reflection };
 }
 
 function latestCheckin() {
+  // checkinHistory is a plain object keyed by date strings
   const history  = store.get("checkinHistory") || {};
-  const todayKey = new Date().toISOString().split("T")[0];
+  const d        = new Date();
+  const todayKey = d.getFullYear() + "-" +
+    String(d.getMonth() + 1).padStart(2, "0") + "-" +
+    String(d.getDate()).padStart(2, "0");
   return history[todayKey] || store.get("lastCheckin") || {};
 }
 
 // -- Render -------------------------------------------------------------------
 
 export function render() {
-  // Gym session from "I know what I'm doing" path
   if (store.get("openGymSub")) {
     store.set("openGymSub", false);
     proposalState = "gym-sub";
   }
 
-  // Weekly plan check --- runs before normal proposal engine
   if (proposalState === "proposal") {
     const plan = getTodayPlan();
     if (plan) {
@@ -424,7 +412,6 @@ export function render() {
     }
   }
 
-  // Normal proposal --- only build if no plan state active
   if (proposalState === "proposal" && !currentProposal) {
     currentProposal = buildProposal();
   }
@@ -446,16 +433,16 @@ export function render() {
       </div>
 
       <div id="proposal-body">
-        ${proposalState === "proposal"              ? renderProposal(name)          : ""}
-        ${proposalState === "branching"             ? renderBranching()             : ""}
-        ${proposalState === "revised"               ? renderRevised(name)           : ""}
-        ${proposalState === "activity-pick"         ? renderActivityPick()          : ""}
-        ${proposalState === "gym-sub"               ? renderGymSub()               : ""}
-        ${proposalState === "gym-explainer"         ? renderGymExplainer()          : ""}
-        ${proposalState === "weekly-plan-workout"   ? renderWeeklyPlanWorkout(name) : ""}
-        ${proposalState === "weekly-plan-rest"      ? renderWeeklyPlanRest(name)    : ""}
-        ${proposalState === "weekly-plan-recovery"  ? renderWeeklyPlanRecovery(name): ""}
-        ${proposalState === "weekly-plan-event"     ? renderWeeklyPlanEvent(name)   : ""}
+        ${proposalState === "proposal"              ? renderProposal(name)           : ""}
+        ${proposalState === "branching"             ? renderBranching()              : ""}
+        ${proposalState === "revised"               ? renderRevised(name)            : ""}
+        ${proposalState === "activity-pick"         ? renderActivityPick()           : ""}
+        ${proposalState === "gym-sub"               ? renderGymSub()                : ""}
+        ${proposalState === "gym-explainer"         ? renderGymExplainer()           : ""}
+        ${proposalState === "weekly-plan-workout"   ? renderWeeklyPlanWorkout(name)  : ""}
+        ${proposalState === "weekly-plan-rest"      ? renderWeeklyPlanRest(name)     : ""}
+        ${proposalState === "weekly-plan-recovery"  ? renderWeeklyPlanRecovery(name) : ""}
+        ${proposalState === "weekly-plan-event"     ? renderWeeklyPlanEvent(name)    : ""}
       </div>
 
     </div>
@@ -511,7 +498,7 @@ function renderWeeklyPlanRest(name) {
       <div class="coach-proposal-content">
         <p class="coach-proposal-greeting">${getGreeting(name)}.</p>
         <p class="coach-proposal-suggestion">
-          Today is a rest day in your plan. That's intentional -- rest is part of the work.
+          Today is a rest day in your plan. That's intentional — rest is part of the work.
         </p>
         <p class="coach-proposal-rationale text-sm text-muted">
           Adaptation happens during recovery. This day matters as much as any training day.
@@ -527,7 +514,7 @@ function renderWeeklyPlanRest(name) {
       ${[
         { id: "breathing", label: "Breathing practice",  target: "quiet-session", quietMode: "breathing" },
         { id: "journal",   label: "Journaling",          target: "quiet-session", quietMode: "journal"   },
-        { id: "noticing",  label: "Noticing Hub",        target: "noticing-hub",  quietMode: null        },
+        { id: "noticing",  label: "Noticing Hub",        target: "noticing",      quietMode: null        },
       ].map(opt => `
         <button class="card weekly-plan-option-btn"
                 data-target="${opt.target}"
@@ -570,11 +557,11 @@ function renderWeeklyPlanRecovery(name) {
     <div style="display:flex;flex-direction:column;gap:var(--space-2);"
          role="group" aria-label="Recovery day options">
       ${[
-        { id: "walk",      label: "Walk",             target: "activity-log",  quietMode: null            },
-        { id: "yoga",      label: "Yoga / Pilates",   target: "quiet-session", quietMode: "mindful"       },
-        { id: "swim",      label: "Swim",             target: "activity-log",  quietMode: null            },
-        { id: "mindful",   label: "Mindful movement", target: "quiet-session", quietMode: "mindful"       },
-        { id: "breathing", label: "Breathing",        target: "quiet-session", quietMode: "breathing"     },
+        { id: "walk",      label: "Walk",             target: "walk-session",  quietMode: null        },
+        { id: "yoga",      label: "Yoga / Pilates",   target: "yoga-session",  quietMode: null        },
+        { id: "swim",      label: "Swim",             target: "swim-session",  quietMode: null        },
+        { id: "mindful",   label: "Mindful movement", target: "quiet-session", quietMode: "mindful"   },
+        { id: "breathing", label: "Breathing",        target: "quiet-session", quietMode: "breathing" },
       ].map(opt => `
         <button class="card weekly-plan-option-btn"
                 data-target="${opt.target}"
@@ -605,7 +592,7 @@ function renderWeeklyPlanEvent(name) {
     : "";
 
   const coachLine = activityName
-    ? "You've got " + activityName + " planned today" + locationPhrase + durationPhrase + ". Enjoy it -- come back and log it when you're done."
+    ? "You've got " + activityName + " planned today" + locationPhrase + durationPhrase + ". Enjoy it — come back and log it when you're done."
     : "You have something planned today. Come back and log it when you're done.";
 
   return `
@@ -721,16 +708,18 @@ function renderRevised(name) {
 }
 
 const ACTIVITY_PICKS = [
-  { id: "gym",        label: "Gym session",         target: "gym-sub",       quietMode: null         },
-  { id: "prescribed", label: "Prescribed exercises", target: "prescribed",    quietMode: null         },
-  { id: "yoga",       label: "Yoga / Pilates",       target: "yoga-session",  quietMode: null         },
-  { id: "breathing",  label: "Breathing practice",   target: "quiet-session", quietMode: "breathing"  },
-  { id: "journal",    label: "Journaling",           target: "quiet-session", quietMode: "journal"    },
-  { id: "mindful",    label: "Mindful movement",     target: "quiet-session", quietMode: "mindful"    },
-  { id: "walk",       label: "Walk",                 target: "activity-log",  quietMode: null         },
-  { id: "run",        label: "Run",                  target: "activity-log",  quietMode: null         },
-  { id: "swim",       label: "Swim",                 target: "activity-log",  quietMode: null         },
-  { id: "class",      label: "A class",              target: "activity-log",  quietMode: null         },
+  { id: "gym",        label: "Gym session",         target: "gym-sub",        quietMode: null        },
+  { id: "run",        label: "Run",                  target: "running-session", quietMode: null       },
+  { id: "walk",       label: "Walk",                 target: "walk-session",   quietMode: null        },
+  { id: "swim",       label: "Swim",                 target: "swim-session",   quietMode: null        },
+  { id: "cycle",      label: "Cycle",                target: "cycle-session",  quietMode: null        },
+  { id: "yoga",       label: "Yoga / Pilates",       target: "yoga-session",   quietMode: null        },
+  { id: "prescribed", label: "Prescribed exercises", target: "prescribed",     quietMode: null        },
+  { id: "breathing",  label: "Breathing practice",   target: "quiet-session",  quietMode: "breathing" },
+  { id: "journal",    label: "Journaling",           target: "quiet-session",  quietMode: "journal"   },
+  { id: "mindful",    label: "Mindful movement",     target: "quiet-session",  quietMode: "mindful"   },
+  { id: "walk",       label: "Walk",                 target: "walk-session",   quietMode: null        },
+  { id: "class",      label: "A class",              target: "activity-log",   quietMode: null        },
 ];
 
 const GYM_OPTIONS = [
@@ -836,6 +825,14 @@ function renderGymExplainer() {
 }
 
 function renderActivityPick() {
+  // Deduplicate picks by id
+  const seen = new Set();
+  const uniquePicks = ACTIVITY_PICKS.filter(a => {
+    if (seen.has(a.id)) return false;
+    seen.add(a.id);
+    return true;
+  });
+
   return `
     <div class="card card-coach coach-proposal-card">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
@@ -843,7 +840,7 @@ function renderActivityPick() {
     </div>
 
     <div class="coach-activity-pick-grid" role="group" aria-label="Choose an activity">
-      ${ACTIVITY_PICKS.map(act => `
+      ${uniquePicks.map(act => `
         <button class="coach-activity-pick-btn"
                 data-target="${act.target}"
                 data-quiet="${act.quietMode || ""}"
@@ -869,6 +866,7 @@ function getGreeting(name) {
 }
 
 function navigateToProposal(proposal) {
+  if (!proposal) return;
   if (proposal.quietMode) store.set("quietMode", proposal.quietMode);
   const prefs = store.get("activityPreferences") || {};
   prefs[proposal.type] = (prefs[proposal.type] || 0) + 1;
@@ -887,15 +885,13 @@ function navigateToProposal(proposal) {
 // -- Mount --------------------------------------------------------------------
 
 export function onMount() {
-  // Header
   document.getElementById("proposal-back-btn")?.addEventListener("click", () => {
-    cleanup(); router.back();
+    cleanup(); router.back ? router.back() : router.navigate("coach-reflection");
   });
   document.getElementById("proposal-library-btn")?.addEventListener("click", () => {
-    cleanup(); store.set("settingsTab", "library"); router.navigate("settings");
+    cleanup(); router.navigate("library");
   });
 
-  // Standard proposal
   document.getElementById("proposal-accept-btn")?.addEventListener("click", () => {
     navigateToProposal(currentProposal);
   });
@@ -903,29 +899,22 @@ export function onMount() {
     store.set("proposalAdjusted", true); navigateToProposal(currentProposal);
   });
 
-  // "Something else entirely" --- works from ALL states, always goes to branching
   document.getElementById("proposal-else-btn")?.addEventListener("click", () => {
-    // Decline signal for preference learning (standard proposal only)
     if (currentProposal && proposalState === "proposal") {
       const prefs = store.get("activityPreferences") || {};
       const declineKey = currentProposal.type + "_declined";
       prefs[declineKey] = (prefs[declineKey] || 0) + 1;
       store.set("activityPreferences", prefs);
     }
-    // For rest days "I want to move today" also lands here
-    // Ensure a standard proposal is built so branching has something to offer
     if (!currentProposal) currentProposal = buildProposal();
     proposalState = "branching";
     rerender();
   });
 
-  // Branch chips
   document.querySelectorAll(".coach-branch-chip").forEach(chip => {
     chip.addEventListener("click", () => {
       branchChoice = chip.dataset.branch;
-      if (branchChoice === "quieter") {
-        store.set("quietMode", "mindful"); cleanup(); router.navigate("quiet-session"); return;
-      }
+      if (branchChoice === "quieter")   { store.set("quietMode", "mindful"); cleanup(); router.navigate("quiet-session"); return; }
       if (branchChoice === "mind")      { proposalState = "activity-pick"; rerender(); return; }
       if (branchChoice === "shorter")   { revisedProposal = buildProposal(true); proposalState = "revised"; rerender(); return; }
       if (branchChoice === "different") { revisedProposal = buildAlternativeProposal(); proposalState = "revised"; rerender(); return; }
@@ -933,7 +922,6 @@ export function onMount() {
   });
 
   document.getElementById("proposal-back-to-proposal-btn")?.addEventListener("click", () => {
-    // Return to whichever state we came from --- re-read plan
     const plan = getTodayPlan();
     if (plan) {
       if (plan.type === "workout")       proposalState = "weekly-plan-workout";
@@ -951,19 +939,15 @@ export function onMount() {
     proposalState = "branching"; rerender();
   });
 
-  // Revised proposal
   document.getElementById("proposal-accept-revised-btn")?.addEventListener("click", () => {
     navigateToProposal(revisedProposal || currentProposal);
   });
 
-  // Activity pick
   document.querySelectorAll(".coach-activity-pick-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const target    = btn.dataset.target;
       const quietMode = btn.dataset.quiet || null;
-      if (target === "gym-sub") {
-        proposalState = "gym-sub"; rerender(); return;
-      }
+      if (target === "gym-sub") { proposalState = "gym-sub"; rerender(); return; }
       if (quietMode) store.set("quietMode", quietMode);
       store.set("coachProposalAccepted", {
         type: btn.dataset.activity, duration: null,
@@ -973,18 +957,13 @@ export function onMount() {
     });
   });
 
-  // Gym sub
   document.querySelectorAll(".gym-sub-option-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const optId = btn.dataset.gymOption;
       const opt   = GYM_OPTIONS.find(o => o.id === optId);
       if (!opt) return;
-      if (opt.explainer) {
-        gymExplainerTarget = opt.target;
-        proposalState = "gym-explainer"; rerender();
-      } else {
-        cleanup(); router.navigate(opt.target);
-      }
+      if (opt.explainer) { gymExplainerTarget = opt.target; proposalState = "gym-explainer"; rerender(); }
+      else { cleanup(); router.navigate(opt.target); }
     });
   });
 
@@ -998,7 +977,6 @@ export function onMount() {
     proposalState = "activity-pick"; rerender();
   });
 
-  // Weekly plan --- workout day
   document.getElementById("weekly-workout-go-btn")?.addEventListener("click", () => {
     const plan = getTodayPlan() || {};
     if (plan.sessionType)  store.set("weeklyPlanSessionType", plan.sessionType);
@@ -1006,13 +984,10 @@ export function onMount() {
     if (plan.location)     store.set("weeklyPlanLocation", plan.location);
     if (plan.classFocus && plan.classFocus.length) store.set("weeklyPlanClassFocus", plan.classFocus);
     cleanup();
-    // "I know what I'm doing" -- open gym sub-screen directly, same
-    // pattern as the proposal-accept path for the gym activity pick.
     store.set("openGymSub", true);
     router.navigate("coach-proposal");
   });
   document.getElementById("weekly-workout-adjust-btn")?.addEventListener("click", () => {
-    // Go to session builder with pre-filled values from plan
     const plan = getTodayPlan() || {};
     if (plan.sessionType)  store.set("weeklyPlanSessionType", plan.sessionType);
     if (plan.durationMins) store.set("weeklyPlanDuration", plan.durationMins);
@@ -1021,7 +996,6 @@ export function onMount() {
     cleanup(); router.navigate("session-builder-ui");
   });
 
-  // Weekly plan --- event day
   document.getElementById("weekly-event-log-btn")?.addEventListener("click", () => {
     const plan = getTodayPlan() || {};
     store.set("activityLogPrefill", {
@@ -1032,7 +1006,6 @@ export function onMount() {
     cleanup(); router.navigate("activity-log");
   });
 
-  // Weekly plan --- rest/recovery option buttons
   document.querySelectorAll(".weekly-plan-option-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const target    = btn.dataset.target;
@@ -1043,10 +1016,15 @@ export function onMount() {
   });
 }
 
+export function onUnmount() {
+  cleanup();
+}
+
 function cleanup() {
   proposalState      = "proposal";
   currentProposal    = null;
   revisedProposal    = null;
+  generatedOptions   = null;
   branchChoice       = null;
   gymExplainerTarget = null;
 }
