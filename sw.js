@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * alongside-v114 (22 Jun 2026) — store.js v5: checkinHistory bug fixed;
+ *   coach-proposal.js v5: workoutGenerator wired, run→running-session,
+ *   walk→walk-session, availableTime now reaches session length
+ *
  * alongside-v113 (21 Jun 2026) — coach-reflection.js v3: double path card bug fixed,
  *   second-session card dismissal fixed, location interstitial added to Option A
  *
@@ -262,7 +266,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v113";
+const CACHE_NAME = "alongside-v114";
 
 const SHELL_URLS = [
 
