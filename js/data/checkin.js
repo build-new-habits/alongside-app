@@ -1,239 +1,300 @@
 /**
- * checkin.js - Check-in data management
+ * checkin.js
+ * 23 Jun 2026 v2
  *
- * 22 May 2026 v1 — getTodayKey() and getHistory() now use local date
- *                   instead of UTC. Fixes early-morning check-in skip
- *                   for users in UTC+N timezones (e.g. BST = UTC+1).
- * Handles check-in history, patterns, and burnout detection
+ * Check-in data layer. Feeling word bank with depth progression,
+ * quadrant logic, and check-in utility functions.
+ *
+ * This is the DATA FILE — it exports word banks and utility functions.
+ * The check-in VIEW (checkin.js in views/) is a separate file that
+ * is rewritten in Build Step 8 (content gate: D2 partial).
+ *
+ * Feeling word depth levels (1-5):
+ *   Depth 1 — universal, simple, accessible to all users from session one.
+ *             Nobody is excluded by vocabulary.
+ *   Depth 2 — slightly more specific. Available from session 3.
+ *   Depth 3 — emotionally precise. Available from session 8.
+ *   Depth 4 — nuanced, somatic, or psychological language.
+ *             Available from session 16.
+ *   Depth 5 — granular emotional vocabulary. High emotional literacy.
+ *             Available from session 30.
+ *
+ * Depth progression follows mindfulPromptDepth in store (shared depth counter).
+ * In practice, most beta users will operate at depth 1-2 for their first weeks.
+ *
+ * Quadrant labels (Mood Meter model — Brackett / Yale RULER):
+ *   high-energy-pleasant   — high energy + high mood (6+/6+)
+ *   high-energy-unpleasant — high energy + low mood (6+/5-)
+ *   low-energy-pleasant    — low energy + high mood (5-/6+)
+ *   low-energy-unpleasant  — low energy + low mood (5-/5-)
+ *
+ * Threshold: energy ≤ 5 = low. energy ≥ 6 = high.
+ *            mood ≤ 5 = low (unpleasant). mood ≥ 6 = high (pleasant).
+ *
+ * Used by:
+ *   js/views/checkin.js      — word chip rendering (Step 8 rewrite)
+ *   js/views/checkin-mini.js — subset for quick check-in
+ *   coach-voice.js           — coach responds to the word, not the number
+ *   coach-proposal.js        — proposal weaves feeling word into framing
+ *   js/views/reflect.js      — post-session reflection references word
+ *
+ * WCAG 2.2 AA:
+ *   Word chips are a radiogroup. aria-pressed on each chip.
+ *   "Can't find a word today" is a visible button, equal visual weight.
+ *   Quadrant is never communicated by colour alone — label text always present.
+ *   Touch targets 44px minimum. "More words" is a disclosure button with
+ *   aria-expanded="false/true".
  */
 
-import { store } from '../store.js';
+// ─── Quadrant derivation ──────────────────────────────────────────────────────
 
-export const checkinData = {
-  
-  /**
-   * Get today's date as YYYY-MM-DD string
-   */
-  getTodayKey() {
-    // Use local date, not UTC — avoids wrong date for users in UTC+N timezones
-    // when the app is used in the early hours before midnight UTC.
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm   = String(d.getMonth() + 1).padStart(2, "0");
-    const dd   = String(d.getDate()).padStart(2, "0");
-    return yyyy + "-" + mm + "-" + dd;
-  },
-  
-  /**
-   * Check if user has completed check-in today
-   */
-  hasCheckedInToday() {
-    const history = store.get('checkinHistory') || {};
-    return !!history[this.getTodayKey()];
-  },
-  
-  /**
-   * Get today's check-in data (if exists)
-   */
-  getTodaysCheckin() {
-    const history = store.get('checkinHistory') || {};
-    return history[this.getTodayKey()] || null;
-  },
-  
-  /**
-   * Save today's check-in
-   */
-  saveCheckin(data) {
-    const history = store.get('checkinHistory') || {};
-    const today = this.getTodayKey();
-    
-    history[today] = {
-      ...data,
-      timestamp: new Date().toISOString()
-    };
-    
-    // Keep only last 30 days
-    const keys = Object.keys(history).sort().reverse();
-    if (keys.length > 30) {
-      keys.slice(30).forEach(key => delete history[key]);
-    }
-    
-    store.set('checkinHistory', history);
-    return history[today];
-  },
-  
-  /**
-   * Get check-in history for last N days
-   */
-  getHistory(days = 7) {
-    const history = store.get('checkinHistory') || {};
-    const result = [];
-    
-    for (let i = 0; i < days; i++) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      const yyyy = date.getFullYear();
-      const mm   = String(date.getMonth() + 1).padStart(2, "0");
-      const dd   = String(date.getDate()).padStart(2, "0");
-      const key  = yyyy + "-" + mm + "-" + dd;
-      
-      if (history[key]) {
-        result.push({ date: key, ...history[key] });
-      }
-    }
-    
-    return result;
-  },
-  
-  /**
-   * Analyze patterns for burnout detection
-   * Returns: { level: 'none'|'low'|'moderate'|'high', reasons: [] }
-   */
-  detectBurnout() {
-    const history = this.getHistory(7);
-    
-    if (history.length < 3) {
-      return { level: 'none', reasons: [], message: null };
-    }
-    
-    const reasons = [];
-    let score = 0;
-    
-    // Check for low energy streak (3+ days below 4)
-    const lowEnergyDays = history.filter(d => d.energy <= 4).length;
-    if (lowEnergyDays >= 3) {
-      reasons.push('Low energy for several days');
-      score += 2;
-    }
-    
-    // Check for declining energy trend
-    if (history.length >= 3) {
-      const recent = history.slice(0, 3).map(d => d.energy);
-      if (recent[0] < recent[1] && recent[1] < recent[2]) {
-        reasons.push('Energy has been declining');
-        score += 1;
-      }
-    }
-    
-    // Check for poor mood streak
-    const lowMoodDays = history.filter(d => d.mood <= 4).length;
-    if (lowMoodDays >= 3) {
-      reasons.push('Mood has been low');
-      score += 2;
-    }
-    
-    // Check for poor sleep
-    const poorSleepDays = history.filter(d => d.sleepQuality === 'poor').length;
-    if (poorSleepDays >= 3) {
-      reasons.push('Sleep has been poor');
-      score += 2;
-    }
-    
-    // Check for pain flare-up
-    const painDays = history.filter(d => {
-      if (!d.conditionLevels) return false;
-      return Object.values(d.conditionLevels).some(level => level >= 7);
-    }).length;
-    if (painDays >= 2) {
-      reasons.push('Pain levels have been high');
-      score += 2;
-    }
-    
-    // Determine level
-    let level = 'none';
-    let message = null;
-    
-    if (score >= 5) {
-      level = 'high';
-      message = "I've noticed you've been struggling. Let's focus on gentle recovery today.";
-    } else if (score >= 3) {
-      level = 'moderate';
-      message = "You've had a tough few days. I'll suggest easier options today.";
-    } else if (score >= 1) {
-      level = 'low';
-      message = "I'm keeping an eye on how you're doing. Take it easy if you need to.";
-    }
-    
-    return { level, reasons, message };
-  },
-  
-  /**
-   * Get energy emoji based on level
-   */
-  getEnergyEmoji(level) {
-    const emojis = {
-      1: '😴', 2: '🥱', 3: '😔', 4: '😐',
-      5: '🙂', 6: '😊', 7: '😀', 8: '😄',
-      9: '🤩', 10: '🔥'
-    };
-    return emojis[level] || '😐';
-  },
-  
-  /**
-   * Get energy label based on level
-   */
-  getEnergyLabel(level) {
-    if (level <= 2) return 'Exhausted';
-    if (level <= 4) return 'Low';
-    if (level <= 6) return 'Okay';
-    if (level <= 8) return 'Good';
-    return 'Energised';
-  },
-  
-  /**
-   * Get mood emoji based on level
-   */
-  getMoodEmoji(level) {
-    const emojis = {
-      1: '😢', 2: '😞', 3: '😟', 4: '😕',
-      5: '😐', 6: '🙂', 7: '😊', 8: '😄',
-      9: '😁', 10: '🥰'
-    };
-    return emojis[level] || '😐';
-  },
-  
-  /**
-   * Get mood label based on level
-   */
-  getMoodLabel(level) {
-    if (level <= 2) return 'Struggling';
-    if (level <= 4) return 'Low';
-    if (level <= 6) return 'Okay';
-    if (level <= 8) return 'Good';
-    return 'Great';
-  },
-  
-  /**
-   * Get workout intensity suggestion based on check-in
-   */
-  getSuggestedIntensity(checkin) {
-    const { energy, mood, sleepQuality } = checkin;
-    const burnout = this.detectBurnout();
-    
-    // Base score from energy (0-10 scale)
-    let score = energy;
-    
-    // Adjust for mood
-    if (mood <= 3) score -= 2;
-    else if (mood <= 5) score -= 1;
-    else if (mood >= 8) score += 1;
-    
-    // Adjust for sleep
-    if (sleepQuality === 'poor') score -= 2;
-    else if (sleepQuality === 'okay') score -= 1;
-    
-    // Adjust for burnout
-    if (burnout.level === 'high') score -= 3;
-    else if (burnout.level === 'moderate') score -= 2;
-    else if (burnout.level === 'low') score -= 1;
-    
-    // Clamp to 1-10
-    score = Math.max(1, Math.min(10, score));
-    
-    // Return intensity category
-    if (score <= 3) return 'recovery';
-    if (score <= 5) return 'gentle';
-    if (score <= 7) return 'moderate';
-    return 'challenging';
-  }
-};
+/**
+ * Derive the feeling word quadrant from energy and mood scores.
+ * Threshold: 5 and below = low. 6 and above = high.
+ *
+ * @param {number} energy — 1-10 from check-in slider
+ * @param {number} mood   — 1-10 from check-in slider
+ * @returns {string} quadrant ID
+ */
+export function getQuadrant(energy, mood) {
+  const highEnergy  = energy >= 6;
+  const highMood    = mood   >= 6;
+
+  if (highEnergy  && highMood)  return 'high-energy-pleasant';
+  if (highEnergy  && !highMood) return 'high-energy-unpleasant';
+  if (!highEnergy && highMood)  return 'low-energy-pleasant';
+  return 'low-energy-unpleasant';
+}
+
+// ─── Feeling word bank ────────────────────────────────────────────────────────
+// Each word: { word, quadrant, depth, coreWord? }
+// coreWord: true = always shown. false/absent = in "More words" expansion.
+// Ordered within each quadrant by depth, then by how commonly the word is used.
+//
+// Language sources: RULER programme (Brackett), somatic and body-based vocabulary,
+// neurodivergent community language, plain English equivalents throughout.
+// No clinical terms without a plain English word at a lower depth.
+
+export const FEELING_WORDS = [
+
+  // ── High energy, pleasant ─────────────────────────────────────────────────
+  // High energy + high mood: motivated, excited, capable. Full programme.
+
+  { word: 'ready',       quadrant: 'high-energy-pleasant', depth: 1, coreWord: true  },
+  { word: 'good',        quadrant: 'high-energy-pleasant', depth: 1, coreWord: true  },
+  { word: 'motivated',   quadrant: 'high-energy-pleasant', depth: 1, coreWord: true  },
+  { word: 'excited',     quadrant: 'high-energy-pleasant', depth: 1, coreWord: true  },
+  { word: 'happy',       quadrant: 'high-energy-pleasant', depth: 1, coreWord: true  },
+  { word: 'energised',   quadrant: 'high-energy-pleasant', depth: 1, coreWord: false },
+  { word: 'confident',   quadrant: 'high-energy-pleasant', depth: 2, coreWord: false },
+  { word: 'strong',      quadrant: 'high-energy-pleasant', depth: 2, coreWord: false },
+  { word: 'alive',       quadrant: 'high-energy-pleasant', depth: 2, coreWord: false },
+  { word: 'focused',     quadrant: 'high-energy-pleasant', depth: 2, coreWord: false },
+  { word: 'capable',     quadrant: 'high-energy-pleasant', depth: 2, coreWord: false },
+  { word: 'optimistic',  quadrant: 'high-energy-pleasant', depth: 3, coreWord: false },
+  { word: 'enthusiastic',quadrant: 'high-energy-pleasant', depth: 3, coreWord: false },
+  { word: 'determined',  quadrant: 'high-energy-pleasant', depth: 3, coreWord: false },
+  { word: 'inspired',    quadrant: 'high-energy-pleasant', depth: 3, coreWord: false },
+  { word: 'purposeful',  quadrant: 'high-energy-pleasant', depth: 4, coreWord: false },
+  { word: 'vibrant',     quadrant: 'high-energy-pleasant', depth: 4, coreWord: false },
+  { word: 'expansive',   quadrant: 'high-energy-pleasant', depth: 5, coreWord: false },
+  { word: 'joyful',      quadrant: 'high-energy-pleasant', depth: 5, coreWord: false },
+
+  // ── High energy, unpleasant ───────────────────────────────────────────────
+  // High energy + low mood: wired, tense, anxious. Stress-relief movement.
+
+  { word: 'anxious',     quadrant: 'high-energy-unpleasant', depth: 1, coreWord: true  },
+  { word: 'stressed',    quadrant: 'high-energy-unpleasant', depth: 1, coreWord: true  },
+  { word: 'tense',       quadrant: 'high-energy-unpleasant', depth: 1, coreWord: true  },
+  { word: 'frustrated',  quadrant: 'high-energy-unpleasant', depth: 1, coreWord: true  },
+  { word: 'wired',       quadrant: 'high-energy-unpleasant', depth: 1, coreWord: true  },
+  { word: 'restless',    quadrant: 'high-energy-unpleasant', depth: 2, coreWord: false },
+  { word: 'irritable',   quadrant: 'high-energy-unpleasant', depth: 2, coreWord: false },
+  { word: 'overwhelmed', quadrant: 'high-energy-unpleasant', depth: 2, coreWord: false },
+  { word: 'agitated',    quadrant: 'high-energy-unpleasant', depth: 2, coreWord: false },
+  { word: 'on edge',     quadrant: 'high-energy-unpleasant', depth: 2, coreWord: false },
+  { word: 'rushed',      quadrant: 'high-energy-unpleasant', depth: 3, coreWord: false },
+  { word: 'scattered',   quadrant: 'high-energy-unpleasant', depth: 3, coreWord: false },
+  { word: 'dysregulated',quadrant: 'high-energy-unpleasant', depth: 3, coreWord: false }, // neurodivergent community
+  { word: 'panicked',    quadrant: 'high-energy-unpleasant', depth: 3, coreWord: false },
+  { word: 'unsettled',   quadrant: 'high-energy-unpleasant', depth: 4, coreWord: false },
+  { word: 'hypervigilant',quadrant:'high-energy-unpleasant', depth: 4, coreWord: false },
+  { word: 'perseverating',quadrant:'high-energy-unpleasant', depth: 5, coreWord: false }, // ADHD community
+  { word: 'activated',   quadrant: 'high-energy-unpleasant', depth: 5, coreWord: false },
+
+  // ── Low energy, pleasant ──────────────────────────────────────────────────
+  // Low energy + high mood: calm, content, restored. Light, enjoyable movement.
+
+  { word: 'calm',        quadrant: 'low-energy-pleasant', depth: 1, coreWord: true  },
+  { word: 'okay',        quadrant: 'low-energy-pleasant', depth: 1, coreWord: true  },
+  { word: 'peaceful',    quadrant: 'low-energy-pleasant', depth: 1, coreWord: true  },
+  { word: 'content',     quadrant: 'low-energy-pleasant', depth: 1, coreWord: true  },
+  { word: 'settled',     quadrant: 'low-energy-pleasant', depth: 1, coreWord: true  },
+  { word: 'relaxed',     quadrant: 'low-energy-pleasant', depth: 2, coreWord: false },
+  { word: 'gentle',      quadrant: 'low-energy-pleasant', depth: 2, coreWord: false },
+  { word: 'grateful',    quadrant: 'low-energy-pleasant', depth: 2, coreWord: false },
+  { word: 'soft',        quadrant: 'low-energy-pleasant', depth: 2, coreWord: false },
+  { word: 'at ease',     quadrant: 'low-energy-pleasant', depth: 3, coreWord: false },
+  { word: 'restored',    quadrant: 'low-energy-pleasant', depth: 3, coreWord: false },
+  { word: 'receptive',   quadrant: 'low-energy-pleasant', depth: 3, coreWord: false },
+  { word: 'present',     quadrant: 'low-energy-pleasant', depth: 3, coreWord: false },
+  { word: 'grounded',    quadrant: 'low-energy-pleasant', depth: 4, coreWord: false },
+  { word: 'contemplative',quadrant:'low-energy-pleasant', depth: 4, coreWord: false },
+  { word: 'tender',      quadrant: 'low-energy-pleasant', depth: 4, coreWord: false },
+  { word: 'spacious',    quadrant: 'low-energy-pleasant', depth: 5, coreWord: false },
+  { word: 'equanimous',  quadrant: 'low-energy-pleasant', depth: 5, coreWord: false },
+
+  // ── Low energy, unpleasant ────────────────────────────────────────────────
+  // Low energy + low mood: drained, heavy, flat. Breathing, light mobility.
+  // Coach language explicitly validates this state.
+
+  { word: 'tired',       quadrant: 'low-energy-unpleasant', depth: 1, coreWord: true  },
+  { word: 'flat',        quadrant: 'low-energy-unpleasant', depth: 1, coreWord: true  },
+  { word: 'heavy',       quadrant: 'low-energy-unpleasant', depth: 1, coreWord: true  },
+  { word: 'drained',     quadrant: 'low-energy-unpleasant', depth: 1, coreWord: true  },
+  { word: 'sad',         quadrant: 'low-energy-unpleasant', depth: 1, coreWord: true  },
+  { word: 'foggy',       quadrant: 'low-energy-unpleasant', depth: 2, coreWord: false },
+  { word: 'low',         quadrant: 'low-energy-unpleasant', depth: 2, coreWord: false },
+  { word: 'exhausted',   quadrant: 'low-energy-unpleasant', depth: 2, coreWord: false },
+  { word: 'empty',       quadrant: 'low-energy-unpleasant', depth: 2, coreWord: false },
+  { word: 'lonely',      quadrant: 'low-energy-unpleasant', depth: 2, coreWord: false },
+  { word: 'defeated',    quadrant: 'low-energy-unpleasant', depth: 3, coreWord: false },
+  { word: 'disconnected',quadrant: 'low-energy-unpleasant', depth: 3, coreWord: false },
+  { word: 'numb',        quadrant: 'low-energy-unpleasant', depth: 3, coreWord: false }, // also in safeguarding — handled by signal-words.js
+  { word: 'depleted',    quadrant: 'low-energy-unpleasant', depth: 3, coreWord: false },
+  { word: 'withdrawn',   quadrant: 'low-energy-unpleasant', depth: 3, coreWord: false },
+  { word: 'despondent',  quadrant: 'low-energy-unpleasant', depth: 4, coreWord: false },
+  { word: 'collapsed',   quadrant: 'low-energy-unpleasant', depth: 4, coreWord: false }, // somatic/burnout language
+  { word: 'dissociated', quadrant: 'low-energy-unpleasant', depth: 4, coreWord: false }, // neurodivergent community
+  { word: 'hopeless',    quadrant: 'low-energy-unpleasant', depth: 4, coreWord: false }, // safeguarding trigger — see signal-words.js
+  { word: 'bereft',      quadrant: 'low-energy-unpleasant', depth: 5, coreWord: false },
+  { word: 'leaden',      quadrant: 'low-energy-unpleasant', depth: 5, coreWord: false }, // somatic fatigue vocabulary
+];
+
+// ─── Word access functions ────────────────────────────────────────────────────
+
+/**
+ * Get feeling words for a quadrant, filtered by the user's current depth level.
+ * Returns core words plus any non-core words up to the depth ceiling.
+ *
+ * @param {string} quadrant   — from getQuadrant()
+ * @param {number} depthLevel — 1-5, from store.mindfulPromptDepth
+ * @returns {{ core: Object[], expanded: Object[] }}
+ *   core    — always shown (coreWord: true, depth ≤ depthLevel)
+ *   expanded — shown in "More words" disclosure (coreWord: false, depth ≤ depthLevel)
+ */
+export function getWordsForQuadrant(quadrant, depthLevel = 1) {
+  const available = FEELING_WORDS.filter(
+    w => w.quadrant === quadrant && w.depth <= depthLevel
+  );
+
+  return {
+    core:     available.filter(w => w.coreWord),
+    expanded: available.filter(w => !w.coreWord),
+  };
+}
+
+/**
+ * Get a single word object by word string (case-insensitive).
+ * @param {string} word
+ * @returns {Object|null}
+ */
+export function getWordObject(word) {
+  if (!word) return null;
+  return FEELING_WORDS.find(
+    w => w.word.toLowerCase() === word.toLowerCase()
+  ) || null;
+}
+
+/**
+ * Get the quadrant for a specific feeling word.
+ * Used by coach-proposal.js when reading feelingWord from store.
+ * @param {string} word
+ * @returns {string|null} quadrant ID or null if word not found
+ */
+export function getQuadrantForWord(word) {
+  return getWordObject(word)?.quadrant || null;
+}
+
+// ─── Check-in session utilities ───────────────────────────────────────────────
+
+/**
+ * Get the coach's posture for a given quadrant.
+ * Used by coach-proposal.js and checkin.js to select appropriate
+ * coaching language and session intensity.
+ *
+ * @param {string} quadrant
+ * @returns {Object} { intensity, focus[], coachPosture }
+ */
+export function getCoachPostureForQuadrant(quadrant) {
+  const postures = {
+    'high-energy-pleasant': {
+      intensity:    'full',
+      focus:        ['strength', 'cardio', 'sport'],
+      coachPosture: 'Full programme appropriate. The only state in which higher intensity is right. Celebrate the energy.',
+    },
+    'high-energy-unpleasant': {
+      intensity:    'moderate',
+      focus:        ['cardio', 'rhythmic', 'breathwork'],
+      coachPosture: 'Stress-relief movement. Cardio and rhythmic exercise that processes the state through the body. Acknowledge the tension.',
+    },
+    'low-energy-pleasant': {
+      intensity:    'light',
+      focus:        ['mobility', 'yoga', 'breathwork', 'walking'],
+      coachPosture: 'Light, enjoyable activity. Short duration, pleasurable movement. Match the calm.',
+    },
+    'low-energy-unpleasant': {
+      intensity:    'gentle',
+      focus:        ['breathing', 'mobility', 'restoration'],
+      coachPosture: 'Breathing, light mobility only. Coach language explicitly validates the state. No pushing. Presence over performance.',
+    },
+  };
+
+  return postures[quadrant] || postures['low-energy-unpleasant'];
+}
+
+/**
+ * Determine the opening mode for the check-in conversation engine.
+ * Six modes — selected by check-in opening engine in checkin.js (Step 8).
+ * Returns the mode string for use in checkin.openingModeHistory.
+ *
+ * Modes (defined here for reference — logic lives in checkin.js view):
+ *   standard     — default; coach opens with energy question
+ *   reflection   — opens with reference to last session; uses activityLog
+ *   milestone    — opens acknowledging a milestone; uses activeProgramme.milestones
+ *   return       — opens warmly after a gap; uses checkinHistory date delta
+ *   progress     — opens referencing recent progress signal; uses journalEntries
+ *   care         — opens gently after low scores; uses checkinHistory recent mood
+ *
+ * @returns {string[]} all valid opening mode IDs
+ */
+export function getOpeningModes() {
+  return ['standard', 'reflection', 'milestone', 'return', 'progress', 'care'];
+}
+
+// ─── Burnout detection ────────────────────────────────────────────────────────
+
+/**
+ * Detect burnout pattern from check-in history.
+ * Called by coach-proposal.js buildProposal().
+ * Burnout = energy average ≤ 4 across last 5 check-ins with 3+ available.
+ *
+ * @param {Object} checkinHistory — from store.checkinHistory
+ * @returns {boolean}
+ */
+export function detectBurnout(checkinHistory) {
+  if (!checkinHistory || typeof checkinHistory !== 'object') return false;
+
+  const dates = Object.keys(checkinHistory).sort().slice(-7); // last 7 days
+  if (dates.length < 3) return false;
+
+  const last5 = dates.slice(-5);
+  const energyValues = last5
+    .map(d => checkinHistory[d]?.energy)
+    .filter(v => typeof v === 'number');
+
+  if (energyValues.length < 3) return false;
+
+  const avg = energyValues.reduce((a, b) => a + b, 0) / energyValues.length;
+  return avg <= 4;
+}
