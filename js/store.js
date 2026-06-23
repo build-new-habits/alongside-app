@@ -1,5 +1,6 @@
 /**
  * store.js - Data persistence layer
+ * 23 Jun 2026 v6
  *
  * 23 Jun 2026 v6 - Phase 5 schema pass. All 36 new fields added in a single
  *   write. Four new nested objects: onboarding{} (Beat fields — onboardingComplete
