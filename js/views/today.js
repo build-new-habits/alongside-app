@@ -1,380 +1,382 @@
 /**
- * today.js - Today View (Act 1 - Coach Greeting)
+ * today.js
+ * 23 Jun 2026 v2
  *
- * 30 May 2026 v2
+ * Daily entry point. The screen the user sees when they open the app.
+ * Hub of the daily flow: Open → Check-in → Coach Proposal → home-threshold → Session.
  *
- * v2 -- Visual fixes:
- *   Coach card spacing increased; greeting lines given breathing room.
- *   Recent strip rewritten as a single prose sentence, not stacked lines.
+ * v2 — Phase 5:
+ *   - Routes to home-threshold after proposal accepted (not directly to session)
+ *   - home-threshold.js is the threshold moment between choosing and beginning
+ *   - If home-threshold.js is not yet deployed (content gate D3), routes
+ *     directly to the session as before — graceful fallback, no breakage
+ *   - Reads lastProposalDate to detect when a proposal has just been accepted
+ *   - Reads activityLog to detect if a session was completed today
+ *     (second-session path: mini check-in, then coach-reflection)
+ *   - Week advance check on mount (Monday detection)
  *
- * Redesigned as the opening screen of the daily flow.
- * The coach speaks first -- always. She references what has happened
- * recently, what she was already thinking, then invites the check-in.
- * This is the "coach at the door" moment.
+ * v1 behaviour preserved:
+ *   - Greeting based on time of day and name
+ *   - "Check in" CTA routes to checkin.js
+ *   - Already checked in today: routes to coach-reflection (post-check-in hub)
+ *   - Session completed today: shows "good work" state with gentle options
+ *   - Nav bar visible
  *
- * Flow:
- *   Open app -> today.js (this screen)
- *     -> if no check-in today: show greeting + CTA to check in
- *     -> if checked in today:  redirect straight to coach-reflection
- *     -> if second session:    redirect straight to coach-reflection
- *        (coach-reflection handles the mini check-in prompt)
+ * Daily flow routing:
+ *   Not checked in today          → Check in → checkin.js
+ *   Checked in, no proposal yet   → checkin.js auto-routes to coach-reflection
+ *                                   → coach-proposal → today.js receives proposal
+ *   Proposal accepted             → home-threshold (or direct to session)
+ *   Session done today            → "You moved today" state
+ *   Return after session          → gentle options (noticing, breathing, library)
  *
- * Nav: always visible (Today tab active).
- *
- * Data read:
- *   activityLog      -- last 7 days for recent activity reference
- *   checkinHistory   -- frequency in last 7 days (via checkinData)
- *   name             -- for personal address
- *   conditions       -- so coach can acknowledge if relevant
- *   conditionPainScores -- pain context
+ * WCAG 2.2 AA:
+ *   Main CTA: minimum 44px touch target, descriptive aria-label.
+ *   Greeting is an <h1>. All coach text rendered as <p>.
+ *   "Already moved today" state: role="status" on coach acknowledgement.
+ *   All states have text — nothing conveyed by colour alone.
  */
 
-import { store }       from "../store.js";
-import { checkinData } from "../data/checkin.js";
+import { store }               from '../store.js';
+import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
 
-export const centered = false;
+// ─── View registration ────────────────────────────────────────────────────────
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+export function TodayView(router) {
 
-function getFirstName() {
-  return (store.get("name") || "").split(" ")[0] || "";
-}
+  // ── Mount ──────────────────────────────────────────────────────────────────
 
-function getTimeGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
-}
+  function mount(container) {
+    // Week advance check — handles Monday transition silently
+    advanceWeekIfNeeded();
 
-function formatDate(date) {
-  return date.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day:     "numeric",
-    month:   "long"
-  });
-}
+    const state = _resolveState();
 
-/**
- * Returns the number of unique days with a completed activityLog entry
- * in the last N days (not counting today).
- */
-function getDaysActiveLast(days) {
-  const log   = store.get("activityLog") || [];
-  const today = new Date().toISOString().split("T")[0];
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - days);
-  const cutoffStr = cutoff.toISOString().split("T")[0];
+    switch (state) {
+      case 'proposal-accepted':
+        // Proposal was just accepted — route to home-threshold
+        // Graceful fallback: if home-threshold not registered, go direct to session
+        _routeToThreshold();
+        return;
 
-  const dates = new Set(
-    log
-      .filter(e => e.date >= cutoffStr && e.date < today)
-      .map(e => e.date)
-  );
-  return dates.size;
-}
+      case 'session-done':
+        renderSessionDone(container);
+        break;
 
-/**
- * Returns the most recent completed activityLog entry before today,
- * or null if none exists.
- */
-function getLastActivity() {
-  const log   = store.get("activityLog") || [];
-  const today = new Date().toISOString().split("T")[0];
-  const previous = log
-    .filter(e => e.date < today)
-    .sort((a, b) => b.date.localeCompare(a.date));
-  return previous[0] || null;
-}
+      case 'checked-in':
+        // Already checked in today but no session yet — go straight to proposal hub
+        router.navigate('coach-reflection');
+        return;
 
-/**
- * Returns how many check-ins have been completed in the last 7 days.
- */
-function getCheckinCountLast7() {
-  const history = checkinData.getHistory(7) || [];
-  const today   = new Date().toISOString().split("T")[0];
-  const cutoff  = new Date();
-  cutoff.setDate(cutoff.getDate() - 7);
-  const cutoffStr = cutoff.toISOString().split("T")[0];
-  return history.filter(h => h.date >= cutoffStr && h.date < today).length;
-}
-
-/**
- * Human-readable activity type label.
- */
-function activityLabel(type) {
-  const labels = {
-    "gym":            "a gym session",
-    "gym-programme":  "a gym session",
-    "coach-session":  "a gym session",
-    "run":            "a run",
-    "walk":           "a walk",
-    "swim":           "a swim",
-    "cycle":          "a cycle",
-    "yoga":           "yoga",
-    "mindfulness":    "some mindful movement",
-    "breathing":      "a breathing practice",
-    "journal":        "some journaling",
-    "rest":           "a rest day",
-    "class":          "a class",
-    "morning-session":"a morning session",
-  };
-  return labels[type] || "a session";
-}
-
-/**
- * Relative day label: "yesterday", "two days ago", "on Thursday"
- */
-function relativeDay(dateStr) {
-  const today     = new Date();
-  const entryDate = new Date(dateStr);
-  const diffDays  = Math.round((today - entryDate) / 86400000);
-  if (diffDays === 1) return "yesterday";
-  if (diffDays === 2) return "two days ago";
-  const dayName = entryDate.toLocaleDateString("en-GB", { weekday: "long" });
-  return "on " + dayName;
-}
-
-/**
- * Build the coach greeting text.
- * Three parts:
- *   1. What she knows (recent activity + check-in frequency)
- *   2. What she was thinking (a soft pre-proposal hint)
- *   3. The invitation to check in
- *
- * Returns an array of paragraph strings.
- */
-function buildGreeting() {
-  const name          = getFirstName();
-  const greeting      = getTimeGreeting();
-  const checkinCount  = getCheckinCountLast7();
-  const lastActivity  = getLastActivity();
-  const daysActive    = getDaysActiveLast(7);
-  const hour          = new Date().getHours();
-
-  const lines = [];
-
-  // ── Line 1: greeting + recent context ────────────────────────────────────
-  if (lastActivity) {
-    const actLabel = activityLabel(lastActivity.type);
-    const dayLabel = relativeDay(lastActivity.date);
-
-    if (checkinCount >= 5) {
-      lines.push(
-        greeting + (name ? ", " + name : "") + ". " +
-        "You have checked in " + checkinCount + " times this week. " +
-        "You did " + actLabel + " " + dayLabel + "."
-      );
-    } else if (checkinCount >= 3) {
-      lines.push(
-        greeting + (name ? ", " + name : "") + ". " +
-        "You did " + actLabel + " " + dayLabel + "."
-      );
-    } else if (checkinCount === 0) {
-      lines.push(
-        greeting + (name ? ", " + name : "") + ". Good to see you."
-      );
-    } else {
-      lines.push(
-        greeting + (name ? ", " + name : "") + ". " +
-        "You did " + actLabel + " " + dayLabel + "."
-      );
+      default:
+        renderDefault(container);
+        break;
     }
-  } else {
-    // No recent activity
-    lines.push(
-      greeting + (name ? ", " + name : "") + "."
-    );
   }
 
-  // ── Line 2: what coach was already thinking ───────────────────────────────
-  if (lastActivity) {
-    const type      = lastActivity.type;
-    const feel      = lastActivity.feel;
-    const dayLabel  = relativeDay(lastActivity.date);
-    const diffDays  = Math.round(
-      (new Date() - new Date(lastActivity.date)) / 86400000
-    );
+  // ── State resolver ─────────────────────────────────────────────────────────
 
-    if (daysActive >= 3) {
-      // Multiple consecutive days -- suggest variety
-      lines.push(
-        "You have been at it a few days in a row. " +
-        "I was thinking something that lets your body recover a little today -- " +
-        "but let me hear from you first."
-      );
-    } else if (type === "gym" || type === "gym-programme" || type === "coach-session") {
-      if (diffDays === 1) {
-        lines.push(
-          "I was thinking something different today -- " +
-          "maybe a walk, some mobility work, or something lighter. " +
-          "But let me do the check-in first so I can be sure."
-        );
-      } else {
-        lines.push(
-          "I was thinking a gym session could work well for you today. " +
-          "Let me check in with you first."
-        );
+  function _resolveState() {
+    const today        = _todayString();
+    const lastProposal = store.get('lastProposalDate');
+    const lastCheckin  = store.get('lastCheckin.timestamp');
+    const activityLog  = store.get('activityLog') || [];
+
+    // Proposal accepted today (within last 10 minutes) → route to threshold
+    if (lastProposal) {
+      const proposalDate = new Date(lastProposal);
+      const minsAgo      = (Date.now() - proposalDate.getTime()) / 60000;
+      if (proposalDate.toISOString().split('T')[0] === today && minsAgo < 10) {
+        return 'proposal-accepted';
       }
-    } else if (type === "run") {
-      if (diffDays === 1) {
-        lines.push(
-          "You ran " + dayLabel + ". " +
-          "I was thinking a rest or a gentler session today -- " +
-          "but check in with me and we will see."
-        );
-      } else {
-        lines.push(
-          "I was thinking another run could work, or something different. " +
-          "Let me know how you are feeling."
-        );
-      }
-    } else if (type === "rest") {
-      lines.push(
-        "You rested " + dayLabel + ". " +
-        "I was thinking it is a good day to move. " +
-        "Check in and I will find the right thing."
-      );
-    } else {
-      lines.push(
-        "I have been thinking about what would work well for you today. " +
-        "Check in first and I will tell you what I have in mind."
-      );
     }
-  } else if (checkinCount === 0) {
-    // Brand new or lapsed user
-    lines.push(
-      "I do not have much history to go on yet. " +
-      "A check-in will help me understand what you need today."
-    );
-  } else {
-    lines.push(
-      "I have been thinking about what would work well for you today. " +
-      "Check in first and I will tell you what I have in mind."
-    );
+
+    // Session completed today
+    const sessionToday = activityLog.some(e => {
+      const ts = e.completedAt || e.loggedAt || e.date;
+      return ts && new Date(ts).toISOString().split('T')[0] === today;
+    });
+    if (sessionToday) return 'session-done';
+
+    // Checked in today
+    if (lastCheckin && new Date(lastCheckin).toISOString().split('T')[0] === today) {
+      return 'checked-in';
+    }
+
+    return 'default';
   }
 
-  // ── Line 3: invitation to check in ───────────────────────────────────────
-  lines.push(
-    "But first -- let's do the check-in."
-  );
+  // ── Route to threshold ─────────────────────────────────────────────────────
 
-  return lines;
-}
+  function _routeToThreshold() {
+    // home-threshold.js is content-gated (D3).
+    // Try to navigate to it — router will handle unknown routes.
+    // If VIEW_NAMES doesn't include 'home-threshold' yet, fall back to session.
+    const sessionRoute = store.get('lastProposalType')
+      ? _doorToRoute(store.get('lastProposalType'))
+      : null;
 
-// ── Render ────────────────────────────────────────────────────────────────────
+    // Attempt threshold — router falls back gracefully if not registered
+    try {
+      router.navigate('home-threshold');
+    } catch (e) {
+      // home-threshold not yet deployed — go direct to session
+      if (sessionRoute) {
+        router.navigate(sessionRoute);
+      } else {
+        router.navigate('coach-proposal');
+      }
+    }
+  }
 
-export function render() {
-  // If already checked in today, skip straight to coach-reflection.
-  // onMount handles this to avoid render-loop issues.
-  const hasCheckedIn = checkinData.hasCheckedInToday();
+  function _doorToRoute(doorKey) {
+    const MAP = {
+      'door-a':           null,   // route stored in generatedSession
+      'door-b':           null,
+      'door-c':           null,
+      'bypass-library':   'library',
+      'bypass-facilitate':'session-builder',
+    };
+    // For door-a/b/c, read from generatedSession
+    const generated = store.get('generatedSession');
+    if (generated?.session?.type) {
+      const TYPE_ROUTE = {
+        'workout':         'workout',
+        'gym-programme':   'gym-programme',
+        'morning-session': 'morning-session',
+        'yoga-session':    'yoga-session',
+        'walk-session':    'walk-session',
+        'running-session': 'running-session',
+        'cycle-session':   'cycle-session',
+        'swim-session':    'swim-session',
+        'core-session':    'core-session',
+        'quiet-session':   'quiet-session',
+      };
+      return TYPE_ROUTE[generated.session.type] || 'workout';
+    }
+    return MAP[doorKey] || 'workout';
+  }
 
-  const greetingLines = buildGreeting();
-  const name          = getFirstName();
+  // ── Default render (not yet checked in) ───────────────────────────────────
 
-  return `
-    <div class="view today-greeting-view">
+  function renderDefault(container) {
+    const name         = store.get('name') || '';
+    const greeting     = _buildGreeting(name);
+    const coachLine    = _buildCoachLine();
+    const weeklyTarget = store.get('strategicGoal.weeklySessionTarget') || 3;
+    const sessionCount = _sessionsThisWeek();
 
-      <div class="view-header" style="margin-bottom:var(--space-4);">
-        <h1>${formatDate(new Date())}</h1>
-      </div>
+    container.innerHTML = `
+      <div class="today-view" role="main" aria-label="Today">
 
-      <!-- Coach greeting card -->
-      <div class="card card-coach" role="region" aria-label="Your coach"
-           style="gap: var(--space-3);">
-        <img src="assets/images/logo-icon-192.png"
-             alt="" class="coach-icon-small" aria-hidden="true">
-        <div class="coach-greeting-content" style="display:flex;flex-direction:column;gap:var(--space-3);">
-          ${greetingLines.map((line, i) => `
-            <p style="margin:0;${i === greetingLines.length - 1 ? "color:var(--color-text-secondary);font-style:italic;" : ""}">
-              ${line}
-            </p>
-          `).join("")}
+        <header class="today-header">
+          <h1 class="today-greeting">${_esc(greeting)}</h1>
+          ${coachLine ? `<p class="today-coach-line">${_esc(coachLine)}</p>` : ''}
+        </header>
+
+        ${sessionCount > 0 ? `
+          <div class="today-week-count"
+               role="status"
+               aria-label="${sessionCount} of ${weeklyTarget} sessions this week">
+            <span class="today-week-count__number">${sessionCount}</span>
+            <span class="today-week-count__label">of ${weeklyTarget} this week</span>
+          </div>
+        ` : ''}
+
+        <div class="today-cta-block">
+          <button class="btn btn-primary today-checkin-btn"
+                  data-action="checkin"
+                  aria-label="Check in and get today's session">
+            Check in
+          </button>
         </div>
+
+        <div class="today-secondary-actions">
+          <button class="btn btn-ghost today-secondary-btn"
+                  data-action="noticing"
+                  aria-label="Go to the noticing hub">
+            Noticing
+          </button>
+          <button class="btn btn-ghost today-secondary-btn"
+                  data-action="library"
+                  aria-label="Open the practice library">
+            Library
+          </button>
+        </div>
+
       </div>
+    `;
 
-      ${hasCheckedIn ? `
-        <!-- Already checked in today -- offer to go straight to reflection -->
-        <button class="btn btn-primary btn-large btn-full"
-                id="today-goto-reflection-btn"
-                style="margin-top: var(--space-5);"
-                aria-label="Continue to your session">
-          Continue &rarr;
-        </button>
-        <button class="btn btn-ghost btn-full"
-                id="today-update-checkin-btn"
-                style="margin-top: var(--space-3);">
-          Update my check-in
-        </button>
-      ` : `
-        <!-- Check-in CTA -->
-        <button class="btn btn-primary btn-large btn-full"
-                id="today-checkin-btn"
-                style="margin-top: var(--space-5);"
-                aria-label="Start your daily check-in">
-          Check in &rarr;
-        </button>
-      `}
-
-      <!-- Soft recent history strip (no streaks -- days active only) -->
-      ${renderRecentStrip()}
-
-    </div>
-  `;
-}
-
-/**
- * Render a minimal recent activity strip.
- * Shows days active in last 7 days and last session type.
- * No streak language. No numbers as targets.
- */
-function renderRecentStrip() {
-  const daysActive   = getDaysActiveLast(7);
-  const lastActivity = getLastActivity();
-
-  if (!lastActivity && daysActive === 0) return "";
-
-  // Build a single prose sentence rather than stacked stat tiles
-  const parts = [];
-  if (daysActive > 0) {
-    parts.push(daysActive + " " + (daysActive === 1 ? "day active" : "days active") + " this week");
-  }
-  if (lastActivity) {
-    parts.push(activityLabel(lastActivity.type) + " " + relativeDay(lastActivity.date));
+    attachEvents(container);
   }
 
-  return `
-    <p class="today-recent-strip" aria-label="Recent activity"
-       style="margin-top:var(--space-4);font-size:var(--text-sm);
-              color:var(--color-text-secondary);text-align:center;">
-      ${parts.join(" &middot; ")}
-    </p>
-  `;
-}
+  // ── Session done render ────────────────────────────────────────────────────
 
-// ── Mount ─────────────────────────────────────────────────────────────────────
+  function renderSessionDone(container) {
+    const name     = store.get('name') || '';
+    const timeGreet = _timeGreeting();
 
-export function onMount() {
-  // If already checked in today, redirect to coach-reflection immediately.
-  // Small delay to let the render complete visually first.
-  const hasCheckedIn = checkinData.hasCheckedInToday();
+    container.innerHTML = `
+      <div class="today-view today-view--done" role="main" aria-label="Today">
 
-  if (hasCheckedIn) {
-    // Show the screen briefly then offer Continue button -- do not
-    // auto-redirect (user may have tapped Today tab intentionally).
-    document.getElementById("today-goto-reflection-btn")?.addEventListener("click", () => {
-      router.navigate("coach-reflection");
+        <header class="today-header">
+          <h1 class="today-greeting">${_esc(timeGreet)}${name ? ', ' + _esc(name) : ''}.</h1>
+          <p class="today-coach-line" role="status">
+            You moved today. That's done.
+          </p>
+        </header>
+
+        <div class="today-secondary-actions">
+          <button class="btn btn-ghost today-secondary-btn"
+                  data-action="noticing"
+                  aria-label="Go to the noticing hub">
+            Noticing
+          </button>
+          <button class="btn btn-ghost today-secondary-btn"
+                  data-action="library"
+                  aria-label="Open the practice library — breathing, meditation">
+            Library
+          </button>
+          <button class="btn btn-ghost today-secondary-btn"
+                  data-action="progress"
+                  aria-label="See your progress">
+            Progress
+          </button>
+        </div>
+
+        <div class="today-second-session">
+          <button class="btn btn-ghost today-second-session-btn"
+                  data-action="second-session"
+                  aria-label="I want to move again today">
+            I want to move again
+          </button>
+        </div>
+
+      </div>
+    `;
+
+    attachEvents(container);
+  }
+
+  // ── Events ─────────────────────────────────────────────────────────────────
+
+  function attachEvents(container) {
+    const actions = {
+      'checkin':        () => router.navigate('checkin'),
+      'noticing':       () => router.navigate('noticing'),
+      'library':        () => router.navigate('library'),
+      'progress':       () => router.navigate('progress'),
+      'second-session': () => router.navigate('checkin-mini'),
+    };
+
+    container.querySelectorAll('[data-action]').forEach(btn => {
+      const action = btn.dataset.action;
+      if (actions[action]) {
+        btn.addEventListener('click', actions[action]);
+      }
+    });
+  }
+
+  // ── Content builders ───────────────────────────────────────────────────────
+
+  function _buildGreeting(name) {
+    const timeGreet = _timeGreeting();
+    return name ? `${timeGreet}, ${name}.` : `${timeGreet}.`;
+  }
+
+  function _buildCoachLine() {
+    const activityLog    = store.get('activityLog') || [];
+    const checkinHistory = store.get('checkinHistory') || {};
+    const yesterday      = _yesterdayString();
+
+    // Reference yesterday's session if available
+    const yesterdaySessions = activityLog.filter(e => {
+      const ts = e.completedAt || e.loggedAt || e.date;
+      return ts && new Date(ts).toISOString().split('T')[0] === yesterday;
     });
 
-    document.getElementById("today-update-checkin-btn")?.addEventListener("click", () => {
-      router.navigate("checkin");
-    });
+    if (yesterdaySessions.length > 0) {
+      const type = yesterdaySessions[0].type || 'session';
+      const TYPE_LABELS = {
+        'workout':         'strength work',
+        'morning-session': 'movement',
+        'yoga-session':    'yoga',
+        'walk-session':    'a walk',
+        'running-session': 'a run',
+        'cycle-session':   'cycling',
+        'swim-session':    'swimming',
+        'core-session':    'core work',
+        'quiet-session':   'breathing',
+        'gym-programme':   'a gym session',
+      };
+      const label = TYPE_LABELS[type] || 'movement';
+      return `You did ${label} yesterday.`;
+    }
 
-    return;
+    // Check-in streak (quiet signal — not a metric, just context)
+    const recentCheckins = Object.keys(checkinHistory)
+      .filter(d => d >= _daysAgoString(7))
+      .length;
+
+    if (recentCheckins >= 5) return 'You\'ve been showing up.';
+    if (recentCheckins >= 3) return null; // no comment needed
+    if (recentCheckins === 0) return null;
+
+    return null;
   }
 
-  // Not yet checked in today -- single CTA
-  document.getElementById("today-checkin-btn")?.addEventListener("click", () => {
-    router.navigate("checkin");
-  });
+  function _timeGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Morning';
+    if (hour < 17) return 'Afternoon';
+    return 'Evening';
+  }
+
+  function _sessionsThisWeek() {
+    const activityLog = store.get('activityLog') || [];
+    const monday      = _mondayString();
+    return activityLog.filter(e => {
+      const ts = e.completedAt || e.loggedAt || e.date;
+      return ts && new Date(ts).toISOString().split('T')[0] >= monday;
+    }).length;
+  }
+
+  // ── Date helpers ───────────────────────────────────────────────────────────
+
+  function _todayString() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function _yesterdayString() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d.toISOString().split('T')[0];
+  }
+
+  function _daysAgoString(n) {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString().split('T')[0];
+  }
+
+  function _mondayString() {
+    const d    = new Date();
+    const day  = d.getDay(); // 0 = Sunday
+    const diff = day === 0 ? -6 : 1 - day; // Monday of current week
+    d.setDate(d.getDate() + diff);
+    return d.toISOString().split('T')[0];
+  }
+
+  // ── Utility ────────────────────────────────────────────────────────────────
+
+  function _esc(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  return { mount };
 }
