@@ -28,7 +28,7 @@
  *   - Lazy-loaded on first navigate, cached in viewCache
  *   - Each module exports a function matching its VIEW_NAMES entry
  *   - Function receives (router) and returns { mount(container) }
- *   - Active view mounted into #app-content
+ *   - Active view mounted into #main-content
  *   - Nav bar visibility controlled by hideNavViews list
  *
  * Back gesture handling:
@@ -37,8 +37,8 @@
  *   - Calls router.back() internally — no app restart on device back
  *
  * WCAG 2.2 AA:
- *   - Focus management: on navigate(), focus moved to #app-content
- *   - #app-content has tabindex="-1" for programmatic focus
+ *   - Focus management: on navigate(), focus moved to #main-content
+ *   - #main-content has tabindex="-1" for programmatic focus
  *   - View transitions do not cause focus trap
  *   - Nav buttons: aria-current="page" on active item
  */
@@ -251,7 +251,7 @@ export const router = {
   // ── Mount view ─────────────────────────────────────────────────────────────
 
   async _mountView(viewName) {
-    const container = document.getElementById('app-content');
+    const container = document.getElementById('main-content');
     if (!container) return;
 
     // Nav visibility
