@@ -3,15 +3,14 @@
  *
  * 24 Jun 2026 v5
  *
- * v5 — Critical fix: window.router exposed globally.
- *   All existing views (welcome.js, intention.js, checkin.js, coach-proposal.js
- *   and every other view built before Phase 5) call router.navigate() as a
- *   bare global — they do not import router. The old app.js exposed it via
- *   window.router. v3 and v4 removed this, breaking every existing view.
- *   Restored: window.router = router (line near bottom of init).
- *   Also: window.store exposed for parity — some views call store.get() directly.
+ * v5 — Critical fix: window.router and window.store set at module level,
+ *   immediately after import, before DOMContentLoaded fires.
+ *   v3 and v4 set these inside init() which runs on DOMContentLoaded —
+ *   too late for onclick attributes (e.g. welcome.js window.startOnboarding)
+ *   that fire before init() completes. Moving them to module level ensures
+ *   they are available the instant any view HTML is rendered.
  *
- * v4 — Nav visibility fix. Nav bar shown based on view mounted, not onboarding flag.
+ * v4 — Nav visibility fix. Nav shown based on view mounted, not onboarding flag.
  * v3 — Explicit first navigate + loading screen dismiss.
  * v2 — 15 Jun 2026. APP_VERSION bumped.
  * v1 — Initial.
@@ -19,6 +18,14 @@
 
 import { store } from './store.js';
 import { router } from './router.js';
+
+// ── Globals — set immediately, before anything else runs ──────────────────────
+// Every existing view calls router.navigate() and store.get() as bare globals.
+// These must be on window before any onclick handler or view code executes.
+window.router = router;
+window.store  = store;
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 const APP_VERSION = "24 Jun 2026 v5";
 
@@ -129,16 +136,12 @@ const App = {
     console.log("Alongside starting...");
     store.init();
     router.init();
-
-    // ── Expose globals that existing views depend on ──────────────────────────
-    // Every view built before Phase 5 calls router.navigate() and store.get()
-    // as bare globals. These must be on window before any view mounts.
-    window.router = router;
-    window.store  = store;
-
     registerServiceWorker();
     console.log("Alongside ready");
 
+    // Existing user: has a name in store (handles v6 schema migration edge case
+    // where onboardingComplete may have reset to false).
+    // New install: no name, no onboardingComplete → welcome screen.
     const isOnboarded    = store.get('onboardingComplete') === true;
     const hasName        = !!(store.get('name'));
     const isExistingUser = isOnboarded || hasName;
@@ -146,9 +149,11 @@ const App = {
 
     await router.navigate(firstView);
 
+    // Dismiss loading screen
     const loading = document.getElementById('loading');
     if (loading) loading.style.display = 'none';
 
+    // Show nav bar
     const nav = document.getElementById('bottom-nav');
     if (nav && NAV_VIEWS.has(firstView)) {
       nav.classList.remove('hidden');
