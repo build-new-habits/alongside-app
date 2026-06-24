@@ -1,492 +1,554 @@
 /**
- * progress.js - Progress View
+ * progress.js
+ * 23 Jun 2026 v2
  *
- * 22 May 2026 v1 — gymCount includes morning-session + coach-session types;
- *                   tile renamed "Gym & programmes".
+ * Progress view. Shows what the person has built — not as data, as narrative.
  *
- * v3.0 (S4-1b, April 2026) — Numbers-first redesign
+ * v2 — Phase 5 (P5-PG-1, P5-PG-2, P5-PG-3, P5-PG-5):
+ *   - 30-day and 90-day lookback views (Personal tier only — 7-day for Free)
+ *   - Coach observations as narrative text, not data cards
+ *   - Programme progress: missed sessions flagged, pace context, phase position
+ *   - Export: three renders — self / friend / professional
+ *   - Tier gating: 30/90 day views locked behind Personal; paywall route on tap
  *
- * Layout:
- *   1. Coach summary — personal, pattern-aware. Always first.
- *   2. This week — stat ring + five key numbers
- *   3. Check-in streak — 7-day visual dots
- *   4. Activity breakdown — five stat tiles, shown only if data exists
- *   5. Coach patterns — observations after 7+ sessions
- *   6. Body changes — shown only if user has opted in
+ * Philosophy:
+ *   Progress is not a dashboard. It is a mirror held at just the right angle.
+ *   The coach narrates what the numbers mean — not what they are.
+ *   Pattern detection is human-readable text. Never statistics.
+ *   Missed sessions are context, not failure. No red indicators.
  *
- * Design principles:
- *   - Numbers first. Lists last (or never).
- *   - No activity log dump. No "Gym session — Yesterday" x13.
- *   - Coach speaks in plain English, not data labels.
- *   - No streaks. Consistency = daysActiveLast30.
+ * Tier behaviour:
+ *   Free:     7-day view only. Coach observation: one line. Export: none.
+ *   Personal: 7 / 30 / 90 day views. Coach observations: full narrative.
+ *             Export: self / friend / professional.
+ *
+ * WCAG 2.2 AA:
+ *   Tab strip: role="tablist", each tab role="tab", aria-selected, aria-controls.
+ *   Selected tab: aria-selected="true". Non-selected: aria-selected="false".
+ *   Tab panel: role="tabpanel", aria-labelledby pointing to its tab.
+ *   Locked content: aria-disabled="true" on locked tab, role="button" on
+ *   paywall prompt, not a disabled button (disabled removes focus).
+ *   All coach narrative text rendered as <p> — not aria-hidden.
+ *   Export buttons: descriptive aria-label (what the export contains).
+ *   No colour-only meaning anywhere. Missed sessions shown with text label,
+ *   not red indicator alone.
+ *   Touch targets: minimum 44px for all interactive elements.
  */
 
-import { store } from "../store.js";
+import { store }            from '../store.js';
+import { getProgressStats } from '../data/programmeEngine.js';
+import { getGoalLabel }     from '../data/goals.js';
 
-export const centered = false;
+// ─── View registration ────────────────────────────────────────────────────────
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+export function ProgressView(router) {
 
-function daysAgo(iso) {
-  if (!iso) return 999;
-  return Math.floor((Date.now() - new Date(iso)) / 86400000);
-}
+  let activeWindow = 7; // 7 | 30 | 90
 
-function weekStart() {
-  const d = new Date();
-  const diff = d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1);
-  const ws = new Date(d.setDate(diff));
-  ws.setHours(0, 0, 0, 0);
-  return ws;
-}
+  // ── Mount ──────────────────────────────────────────────────────────────────
 
-function isThisWeek(iso) {
-  return iso && new Date(iso) >= weekStart();
-}
-
-function isLast7Days(iso) {
-  return iso && daysAgo(iso) < 7;
-}
-
-function isLast30Days(iso) {
-  return iso && daysAgo(iso) < 30;
-}
-
-function getLog() {
-  return store.get("activityLog") || [];
-}
-
-function getCheckins() {
-  const history = store.get("checkinHistory") || {};
-  return Object.entries(history)
-    .sort((a, b) => b[0].localeCompare(a[0]))
-    .slice(0, 14);
-}
-
-function isTrainingType(type) {
-  // Mindful moments (short, restorative) are NOT sessions in the ring.
-  // Everything else — gym, yoga, prescribed, run, swim, class, walking, etc — counts.
-  const mindfulOnly = ["breathing", "journal", "rest", "quiet", "quiet-session"];
-  return !mindfulOnly.includes(type || "");
-}
-
-function isMindfulType(type) {
-  return ["breathing", "journal", "rest", "mindful", "quiet", "quiet-session"].includes(type || "");
-}
-
-// ── Coach summary ─────────────────────────────────────────────────────────────
-
-function buildCoachMessage(log, checkins) {
-  const name         = (store.get("name") || "").split(" ")[0] || "";
-  const namePrefix   = name ? name + ". " : "";
-  const goal         = store.get("strategicGoal") || {};
-  const goalDesc     = goal.targetDescription || "";
-
-  const last7  = log.filter(e => isLast7Days(e.loggedAt || e.completedAt));
-  const last14 = log.filter(e => daysAgo(e.loggedAt || e.completedAt) < 14);
-  const last30 = log.filter(e => isLast30Days(e.loggedAt || e.completedAt));
-
-  const activeDays14 = new Set(
-    last14.filter(e => isTrainingType(e.type || e.source))
-          .map(e => (e.loggedAt || e.completedAt || "").split("T")[0])
-  ).size;
-
-  const target = store.get("strategicGoal")?.weeklySessionTarget || 3;
-  const thisWeek = last7.filter(e => isThisWeek(e.loggedAt || e.completedAt));
-  const thisWeekActive = thisWeek.filter(e => isTrainingType(e.type || e.source)).length;
-  const hitTarget = thisWeekActive >= target;
-
-  const energyPairs = last14.filter(e => e.energyBefore && e.energyAfter);
-  const energyRises = energyPairs.filter(e => e.energyAfter > e.energyBefore).length;
-  const energyPattern = energyPairs.length >= 3 && energyRises / energyPairs.length >= 0.6;
-
-  const quietCount   = last7.filter(e => isMindfulType(e.type || e.source)).length;
-  const trainingCount = last7.filter(e => isTrainingType(e.type || e.source)).length;
-
-  const checkinCount7 = checkins.filter(([date]) => daysAgo(date) < 7).length;
-  const avgEnergy7    = checkins.slice(0, 7).reduce((sum, [, d]) => sum + (d.energy || 0), 0) /
-                        Math.max(1, checkins.slice(0, 7).length);
-
-  // ── Empty / just starting ──────────────────────────────────────────────────
-  if (log.length === 0) {
-    return "Your progress builds here as we work together. What you log, I notice. What I notice, I will tell you honestly. Not numbers for their own sake — patterns that actually mean something.";
+  function mount(container) {
+    render(container);
   }
 
-  if (log.length < 3) {
-    return namePrefix + "You are in the early days. The research on habit formation is clear: the first two weeks are the hardest, and you are in them. Every session you complete right now is doing more than the session itself — it is building the neural pattern that makes the next one easier.";
-  }
+  // ── Render ─────────────────────────────────────────────────────────────────
 
-  // ── Specific pattern: energy rises after movement ─────────────────────────
-  if (energyPattern) {
-    const pct = Math.round((energyRises / energyPairs.length) * 100);
-    const goalLine = goalDesc ? " This matters for your goal — " + goalDesc + " — because sustainable energy is what makes sustained effort possible." : "";
-    return namePrefix + "Something consistent is happening. Your energy after sessions has been higher than before them " + pct + "% of the time over the last two weeks. That is not a coincidence. Movement is generating the energy it costs." + goalLine + " The body is remarkable in this way — it responds to being asked.";
-  }
+  function render(container) {
+    const tier  = store.get('tier') || 'free';
+    const name  = store.get('name') || '';
+    const stats = getProgressStats();
 
-  // ── Weekly target reached ─────────────────────────────────────────────────
-  if (hitTarget) {
-    const consistencyLine = activeDays14 >= 8
-      ? " You have been active on " + activeDays14 + " of the last 14 days. That kind of consistency is unusual. Most people intend to do this. You are actually doing it."
-      : "";
-    return namePrefix + "You have reached your session target for this week." + consistencyLine + " I want to name that directly, because it matters. Not because targets are the point — they are not. But because showing up consistently is how change happens, and you are showing up." + (goalDesc ? " That is how " + goalDesc + " becomes real." : "");
-  }
+    container.innerHTML = `
+      <div class="progress-view" role="main" aria-label="Your progress">
 
-  // ── Good check-in consistency ─────────────────────────────────────────────
-  if (checkinCount7 >= 5 && avgEnergy7 >= 6.5) {
-    return namePrefix + "You have checked in " + checkinCount7 + " times this week, with an average energy of " + avgEnergy7.toFixed(1) + " out of 10. That is a meaningful signal — not just about fitness, but about how you are engaging with your own wellbeing. Paying attention is the first act of change.";
-  }
+        <header class="progress-header">
+          <h1 class="progress-title">Progress</h1>
+          ${tier === 'personal' || tier === 'athlete'
+            ? renderWindowTabs(tier)
+            : ''}
+        </header>
 
-  // ── Training without recovery ─────────────────────────────────────────────
-  if (trainingCount >= 4 && quietCount === 0) {
-    return namePrefix + "You have been training hard this week with no recovery work. I want to flag something the research is clear about: adaptation happens during rest, not during effort. The session is the stimulus. Sleep, stillness, and recovery are where your body actually changes." + (goalDesc ? " For " + goalDesc + ", recovery is not optional." : "");
-  }
-
-  // ── Good balance of training and recovery ─────────────────────────────────
-  if (quietCount >= 2 && trainingCount >= 2) {
-    return namePrefix + "You have been balancing active sessions with quieter practices this week. That balance is not accidental — it is exactly what a sustainable approach looks like. Movement and stillness are not opposites. They are partners. The research on long-term behaviour change consistently shows that people who include recovery and reflection sustain their practice far longer than those who only train.";
-  }
-
-  // ── Long-term consistency recognition ────────────────────────────────────
-  if (activeDays14 >= 8) {
-    return namePrefix + "You have been active on " + activeDays14 + " of the last 14 days. I want you to sit with that for a moment. That level of consistency is genuinely uncommon — not because people do not want it, but because life makes it hard. You are building something real here." + (goalDesc ? " And that foundation is exactly what " + goalDesc + " requires." : "");
-  }
-
-  // ── Nothing logged recently ───────────────────────────────────────────────
-  if (last7.length === 0 && log.length > 0) {
-    return namePrefix + "Nothing logged in the last 7 days. I am not going to tell you that is fine if you know it is not. But I will tell you that a gap is just a gap — it does not erase what came before, and it does not predict what comes next. The pattern you built is still there. It is waiting.";
-  }
-
-  // ── Default: reflect recent count with context ────────────────────────────
-  const n = last7.length;
-  return namePrefix + "You have had " + n + " session" + (n !== 1 ? "s" : "") + " in the last week." +
-    (goalDesc ? " That is progress toward " + goalDesc + "." : " Keep building the pattern.") +
-    " What you do consistently matters more than what you do occasionally. That is not motivation — it is how biology works.";
-}
-
-
-// ── Render ────────────────────────────────────────────────────────────────────
-
-export function render() {
-  const log      = getLog();
-  const checkins = getCheckins();
-
-  // Categorise
-  const thisWeekLog   = log.filter(e => isThisWeek(e.loggedAt || e.completedAt));
-  const last7Log      = log.filter(e => isLast7Days(e.loggedAt || e.completedAt));
-  const last30Log     = log.filter(e => isLast30Days(e.loggedAt || e.completedAt));
-  const checkinCount7 = checkins.filter(([date]) => daysAgo(date) < 7).length;
-
-  // Stat counts
-  const coachCount    = last30Log.filter(e => e.source === "coach-recommended" || e.type === "coach-session").length;
-  const prescribedCount = last30Log.filter(e => ["prescribed","prescribed-session"].includes(e.type) || e.source === "prescribed").length;
-  const gymCount      = last30Log.filter(e => ["gym","gym-programme","morning-session","coach-session"].includes(e.type) && e.source !== "coach-recommended").length;
-  const otherCount    = last30Log.filter(e =>
-    isTrainingType(e.type) &&
-    !["gym","gym-programme","morning-session","coach-session","prescribed","prescribed-session"].includes(e.type) &&
-    e.source !== "coach-recommended" && e.source !== "prescribed"
-  ).length;
-  const mindfulCount  = last30Log.filter(e => isMindfulType(e.type || e.source)).length;
-
-  const thisWeekTraining = thisWeekLog.filter(e => isTrainingType(e.type || e.source)).length;
-  const target           = store.get("strategicGoal")?.weeklySessionTarget || 3;
-  const pct              = Math.min(100, Math.round((thisWeekTraining / target) * 100));
-
-  const daysActive30     = new Set(
-    last30Log.filter(e => isTrainingType(e.type || e.source))
-             .map(e => (e.loggedAt || e.completedAt || "").split("T")[0])
-  ).size;
-
-  const showBody = store.get("trackBodyChanges");
-  const coachMessage = buildCoachMessage(log, checkins);
-
-  return `
-    <div class="view progress-view">
-
-      <div class="view-header">
-        <h1>Progress</h1>
-      </div>
-
-      <!-- 1. Coach summary -->
-      <div class="progress-coach-card">
-        <div class="progress-coach-inner">
-          <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
-          <p class="progress-coach-text">${coachMessage}</p>
+        <div class="progress-body">
+          ${renderCoachNarrative(stats, tier, name)}
+          ${renderActivitySummary(tier)}
+          ${stats.hasActiveProgramme ? renderProgrammeProgress(stats) : ''}
+          ${tier === 'personal' || tier === 'athlete' ? renderExportBlock() : renderExportLocked()}
         </div>
-      </div>
 
-      <!-- 2. This week ring + stats -->
-      <div class="card progress-week-card">
-        <div class="progress-week-top">
-          <div class="progress-ring-wrap" aria-label="This week: ${thisWeekTraining} of ${target} active sessions">
-            <svg class="progress-ring" viewBox="0 0 80 80" aria-hidden="true">
-              <circle class="progress-ring-track" cx="40" cy="40" r="32"/>
-              <circle class="progress-ring-fill" cx="40" cy="40" r="32"
-                      stroke-dasharray="${2 * Math.PI * 32}"
-                      stroke-dashoffset="${2 * Math.PI * 32 * (1 - pct / 100)}"
-                      transform="rotate(-90 40 40)"/>
-            </svg>
-            <div class="progress-ring-label">
-              <span class="progress-ring-num">${thisWeekTraining}</span>
-              <span class="progress-ring-of">of ${target}</span>
-            </div>
-          </div>
-          <div class="progress-week-stats">
-            <div class="progress-stat-row">
-              <span class="progress-stat-label">Active sessions this week</span>
-              <span class="progress-stat-value">${thisWeekTraining}</span>
-            </div>
-            <div class="progress-stat-row">
-              <span class="progress-stat-label">Active days (30 days)</span>
-              <span class="progress-stat-value">${daysActive30}</span>
-            </div>
-            <div class="progress-stat-row">
-              <span class="progress-stat-label">Check-ins (7 days)</span>
-              <span class="progress-stat-value">${checkinCount7} / 7</span>
-            </div>
-          </div>
+      </div>
+    `;
+
+    attachEvents(container, tier);
+  }
+
+  // ── Window tabs (Personal only) ────────────────────────────────────────────
+
+  function renderWindowTabs(tier) {
+    return `
+      <div class="progress-tabs"
+           role="tablist"
+           aria-label="Lookback window">
+        ${[7, 30, 90].map(w => `
+          <button
+            class="progress-tab ${activeWindow === w ? 'progress-tab--active' : ''}"
+            role="tab"
+            id="tab-${w}"
+            aria-selected="${activeWindow === w ? 'true' : 'false'}"
+            aria-controls="panel-${w}"
+            data-window="${w}">
+            ${w} days
+          </button>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // ── Coach narrative ────────────────────────────────────────────────────────
+
+  function renderCoachNarrative(stats, tier, name) {
+    const activityLog  = store.get('activityLog') || [];
+    const checkinHistory = store.get('checkinHistory') || {};
+    const goals        = store.get('goals') || [];
+    const observation  = _buildObservation(activityLog, checkinHistory, stats, activeWindow, tier, name);
+
+    return `
+      <section class="progress-narrative"
+               aria-label="Coach observations"
+               id="panel-${activeWindow}"
+               role="tabpanel"
+               aria-labelledby="tab-${activeWindow}">
+        <div class="progress-narrative__text">
+          ${observation.lines.map(line => `<p>${line}</p>`).join('')}
         </div>
-      </div>
+      </section>
+    `;
+  }
 
-      <!-- 3. Check-in dots -->
-      ${checkins.length > 0 ? renderCheckinDots(checkins) : ""}
+  // ── Activity summary ───────────────────────────────────────────────────────
 
-      <!-- 4. Activity breakdown — 30 days -->
-      ${log.length > 0 ? renderStatTiles(coachCount, prescribedCount, gymCount, otherCount, mindfulCount) : ""}
+  function renderActivitySummary(tier) {
+    const activityLog = store.get('activityLog') || [];
+    const cutoff      = _cutoffDate(activeWindow);
+    const recent      = activityLog.filter(e => {
+      const ts = e.completedAt || e.loggedAt || e.date;
+      return ts && new Date(ts) >= cutoff;
+    });
 
-      <!-- 5. Patterns -->
-      ${log.length >= 7 ? renderPatterns(log) : ""}
+    const sessionCount  = recent.length;
+    const totalMins     = recent.reduce((acc, e) => acc + (e.durationMins || 0), 0);
+    const activityTypes = _countByType(recent);
 
-      <!-- 6. Body changes (opt-in) -->
-      ${showBody ? renderBodyChanges() : renderBodyOptIn()}
-
-      <!-- Empty state -->
-      ${log.length === 0 ? `
-        <div class="card" style="margin-top:var(--space-4);text-align:center;">
-          <p class="text-muted" style="padding:var(--space-4) 0;">
-            Nothing logged yet. Complete a session and it will appear here.
-          </p>
+    return `
+      <section class="progress-summary" aria-label="Activity summary for last ${activeWindow} days">
+        <div class="progress-summary__stat">
+          <span class="progress-summary__number" aria-label="${sessionCount} sessions">${sessionCount}</span>
+          <span class="progress-summary__label">sessions</span>
         </div>
-      ` : ""}
-
-    </div>
-  `;
-}
-
-// ── Check-in dots ─────────────────────────────────────────────────────────────
-
-function renderCheckinDots(checkins) {
-  const DAYS = ["M","T","W","T","F","S","S"];
-  const ws = weekStart();
-
-  // Which days this week had a check-in
-  const checkinDays = new Set(
-    checkins
-      .filter(([date]) => daysAgo(date) < 7)
-      .map(([date]) => new Date(date).getDay())
-  );
-
-  // Energy trend — last 7 days average
-  const recent = checkins.slice(0, 7);
-  const avgEnergy = recent.length
-    ? Math.round(recent.reduce((sum, [, d]) => sum + (d.energy || 0), 0) / recent.length * 10) / 10
-    : null;
-  const avgMood = recent.length
-    ? Math.round(recent.reduce((sum, [, d]) => sum + (d.mood || 0), 0) / recent.length * 10) / 10
-    : null;
-
-  return `
-    <div class="card progress-checkins-card">
-      <div class="progress-checkins-header">
-        <h3>Check-ins this week</h3>
-        <span class="progress-checkin-count">${checkinDays.size} / 7</span>
-      </div>
-
-      <div class="progress-dot-row" role="group" aria-label="Check-in days this week">
-        ${DAYS.map((day, i) => {
-          // i=0 is Mon in our layout; getDay() 0=Sun,1=Mon...
-          const dayNum = i === 6 ? 0 : i + 1;
-          const active = checkinDays.has(dayNum);
-          return `
-            <div class="progress-dot-col" aria-label="${day}${active ? ", checked in" : ""}">
-              <div class="progress-dot-circle ${active ? "active" : ""}" aria-hidden="true"></div>
-              <span class="progress-dot-day">${day}</span>
-            </div>
-          `;
-        }).join("")}
-      </div>
-
-      ${avgEnergy !== null ? `
-        <div class="progress-checkin-avgs">
-          <div class="progress-avg-pill">
-            <span>Avg energy</span>
-            <strong>${avgEnergy}/10</strong>
-          </div>
-          <div class="progress-avg-pill">
-            <span>Avg mood</span>
-            <strong>${avgMood}/10</strong>
-          </div>
+        <div class="progress-summary__stat">
+          <span class="progress-summary__number" aria-label="${totalMins} minutes total">${totalMins}</span>
+          <span class="progress-summary__label">minutes</span>
         </div>
-      ` : ""}
-    </div>
-  `;
-}
+        ${tier !== 'free' ? `
+        <div class="progress-summary__breakdown" aria-label="Session types">
+          ${Object.entries(activityTypes).slice(0, 3).map(([type, count]) => `
+            <span class="progress-summary__type">${_formatType(type)} × ${count}</span>
+          `).join('')}
+        </div>` : ''}
+      </section>
+    `;
+  }
 
-// ── Stat tiles ────────────────────────────────────────────────────────────────
+  // ── Programme progress ─────────────────────────────────────────────────────
 
-function renderStatTiles(coach, prescribed, gym, other, mindful) {
-  const tiles = [
-    { label: "Coach sessions",     value: coach,      icon: "\uD83C\uDFAF", show: true  },
-    { label: "Prescribed",        value: prescribed,  icon: "\uD83E\uDE7A", show: true  },
-    { label: "Gym & programmes",   value: gym,         icon: "\uD83C\uDFCB", show: true  },
-    { label: "Own activities",    value: other,       icon: "\uD83C\uDFC3", show: true  },
-    { label: "Mindful moments",   value: mindful,     icon: "\uD83C\uDF3F", show: true  },
-  ].filter(t => t.show);
+  function renderProgrammeProgress(stats) {
+    const missedSessions = store.get('activeProgramme.missedSessions') || [];
+    const recentMissed   = missedSessions.filter(m => {
+      const d = new Date(m.date);
+      return d >= _cutoffDate(30);
+    });
 
-  const total = coach + prescribed + gym + other + mindful;
+    return `
+      <section class="progress-programme" aria-label="Programme progress">
+        <h2 class="progress-programme__name">${stats.programmeName || 'Your programme'}</h2>
 
-  return `
-    <div class="card progress-tiles-card">
-      <div class="progress-tiles-header">
-        <h3>Last 30 days</h3>
-        <span class="progress-tiles-total">${total} total</span>
-      </div>
-      <div class="progress-tiles-grid">
-        ${tiles.map(tile => `
-          <div class="progress-tile ${tile.value === 0 ? "progress-tile--empty" : ""}">
-            <span class="progress-tile-icon" aria-hidden="true">${tile.icon}</span>
-            <span class="progress-tile-value">${tile.value}</span>
-            <span class="progress-tile-label">${tile.label}</span>
+        <div class="progress-programme__track">
+          <div class="progress-programme__bar"
+               role="progressbar"
+               aria-valuenow="${stats.percentComplete}"
+               aria-valuemin="0"
+               aria-valuemax="100"
+               aria-label="${stats.percentComplete}% through the programme">
+            <div class="progress-programme__fill"
+                 style="width: ${stats.percentComplete}%"></div>
           </div>
-        `).join("")}
-      </div>
-    </div>
-  `;
-}
-
-// ── Patterns ──────────────────────────────────────────────────────────────────
-
-function renderPatterns(log) {
-  const last14 = log.filter(e => daysAgo(e.loggedAt || e.completedAt) < 14);
-  const patterns = [];
-
-  const energyPairs = last14.filter(e => e.energyBefore && e.energyAfter);
-  if (energyPairs.length >= 3) {
-    const rises = energyPairs.filter(e => e.energyAfter > e.energyBefore).length;
-    const pct = Math.round((rises / energyPairs.length) * 100);
-    if (pct >= 60) patterns.push("Your energy after sessions has been higher than before them " + pct + "% of the time recently.");
-  }
-
-  const painEntries = last14.filter(e => e.painChange);
-  const painBetter  = painEntries.filter(e => e.painChange === "better").length;
-  const painWorse   = painEntries.filter(e => ["worse","sharp"].includes(e.painChange)).length;
-  if (painBetter >= 2 && painBetter > painWorse) {
-    patterns.push("Movement has been leaving you in less pain than before it, more often than not.");
-  }
-  if (painWorse >= 2) {
-    patterns.push("Pain has been worse after some sessions. Worth noting for your next check-in.");
-  }
-
-  const quietCount  = last14.filter(e => !isTrainingType(e.type || e.source)).length;
-  const activeCount = last14.filter(e => isTrainingType(e.type || e.source)).length;
-  if (activeCount >= 6 && quietCount === 0) {
-    patterns.push("All training, no recovery in two weeks. Rest is part of the programme.");
-  }
-  if (quietCount >= 3 && activeCount >= 3) {
-    patterns.push("You are balancing active sessions with recovery. That balance is what makes training sustainable.");
-  }
-
-  if (!patterns.length) return "";
-
-  return `
-    <div class="card progress-patterns-card">
-      <div class="progress-patterns-coach">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-xs" aria-hidden="true">
-        <h3>What I am noticing</h3>
-      </div>
-      ${patterns.slice(0, 3).map(p => `
-        <p class="progress-pattern-item">${p}</p>
-      `).join("")}
-    </div>
-  `;
-}
-
-// ── Body changes ──────────────────────────────────────────────────────────────
-
-function renderBodyChanges() {
-  const entries = store.get("bodyLog") || [];
-  const latest  = entries[entries.length - 1];
-  const first   = entries[0];
-
-  const weightUnit = store.get("weightUnit") || "kg";
-  const weightDiff = latest && first && latest.weight && first.weight
-    ? (latest.weight - first.weight).toFixed(1)
-    : null;
-
-  return `
-    <div class="card progress-body-card">
-      <h3>Body changes</h3>
-      ${latest ? `
-        <div class="progress-body-stats">
-          ${latest.weight ? `
-            <div class="progress-body-stat">
-              <span class="progress-body-value">${latest.weight}${weightUnit}</span>
-              <span class="progress-body-label">Current weight</span>
-              ${weightDiff !== null ? `
-                <span class="progress-body-change ${parseFloat(weightDiff) < 0 ? "down" : "up"}">
-                  ${parseFloat(weightDiff) > 0 ? "+" : ""}${weightDiff}${weightUnit}
-                </span>
-              ` : ""}
-            </div>
-          ` : ""}
+          <span class="progress-programme__label">
+            Week ${stats.currentWeek} of 12 — ${stats.phaseName}
+          </span>
         </div>
-        <button class="btn btn-ghost btn-small" id="progress-log-weight-btn"
-                style="margin-top:var(--space-3);">
-          + Log today
-        </button>
-      ` : `
-        <p class="text-muted text-sm" style="margin-bottom:var(--space-3);">
-          No entries yet. Log your weight and the coach will track changes over time.
-        </p>
-        <button class="btn btn-ghost btn-small" id="progress-log-weight-btn">
-          + Log today
-        </button>
-      `}
-    </div>
-  `;
-}
 
-function renderBodyOptIn() {
-  return `
-    <div class="card progress-body-optin">
-      <p class="text-sm text-muted">
-        Want to track weight or body changes over time?
-      </p>
-      <button class="btn btn-ghost btn-small" id="progress-body-optin-btn"
-              style="margin-top:var(--space-3);">
-        Turn on body tracking
-      </button>
-    </div>
-  `;
-}
+        <p class="progress-programme__phase-message">${stats.phaseMessage}</p>
 
-// ── Mount ─────────────────────────────────────────────────────────────────────
+        <div class="progress-programme__stats">
+          <span>${stats.totalSessions} sessions completed</span>
+          <span>${stats.sessionsThisWeek} of ${stats.weeklyTarget} this week</span>
+          <span>${stats.weeksRemaining} weeks remaining</span>
+        </div>
 
-export function onMount() {
-  // Body opt-in
-  document.getElementById("progress-body-optin-btn")?.addEventListener("click", () => {
-    store.set("trackBodyChanges", true);
-    const main = document.getElementById("main-content");
-    if (main) { main.innerHTML = render(); onMount(); }
-  });
+        ${recentMissed.length > 0 ? `
+          <p class="progress-programme__missed">
+            ${recentMissed.length} session${recentMissed.length !== 1 ? 's' : ''} not completed
+            in the last 30 days — that's normal. The programme adapts.
+          </p>` : ''}
 
-  // Log weight
-  document.getElementById("progress-log-weight-btn")?.addEventListener("click", () => {
-    const weight = prompt("Enter your weight (" + (store.get("weightUnit") || "kg") + "):");
-    if (!weight || isNaN(parseFloat(weight))) return;
-    const bodyLog = store.get("bodyLog") || [];
-    bodyLog.push({ weight: parseFloat(weight), loggedAt: new Date().toISOString() });
-    store.set("bodyLog", bodyLog);
-    const main = document.getElementById("main-content");
-    if (main) { main.innerHTML = render(); onMount(); }
-  });
+        ${stats.milestones.length > 0 ? `
+          <div class="progress-programme__milestones" aria-label="Milestones reached">
+            <h3 class="progress-programme__milestones-label">Milestones</h3>
+            <ul class="progress-programme__milestone-list">
+              ${stats.milestones.map(m => `
+                <li class="progress-programme__milestone">
+                  ${m.label}
+                </li>
+              `).join('')}
+            </ul>
+          </div>` : ''}
+
+      </section>
+    `;
+  }
+
+  // ── Export block ───────────────────────────────────────────────────────────
+
+  function renderExportBlock() {
+    return `
+      <section class="progress-export" aria-label="Export your progress">
+        <h2 class="progress-export__heading">Share your progress</h2>
+        <p class="progress-export__intro">Three versions — each written for a different reader.</p>
+        <div class="progress-export__buttons">
+          <button class="progress-export__btn"
+                  data-export="self"
+                  aria-label="Export for yourself — your full picture, coach voice">
+            For me
+          </button>
+          <button class="progress-export__btn"
+                  data-export="friend"
+                  aria-label="Export for a friend — plain English, no jargon">
+            For a friend
+          </button>
+          <button class="progress-export__btn"
+                  data-export="professional"
+                  aria-label="Export for a professional — structured, clinical-friendly format">
+            For a professional
+          </button>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderExportLocked() {
+    return `
+      <section class="progress-export progress-export--locked" aria-label="Export your progress">
+        <div class="progress-export__lock"
+             role="button"
+             tabindex="0"
+             aria-label="Export is a Personal feature — tap to find out more"
+             data-route="upgrade">
+          <span class="progress-export__lock-label">Export your progress</span>
+          <span class="progress-export__lock-sub">Personal feature</span>
+        </div>
+      </section>
+    `;
+  }
+
+  // ── Events ─────────────────────────────────────────────────────────────────
+
+  function attachEvents(container, tier) {
+    // Window tabs
+    container.querySelectorAll('[data-window]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeWindow = parseInt(btn.dataset.window);
+        render(container);
+        // Return focus to active tab after re-render
+        const newTab = container.querySelector(`[data-window="${activeWindow}"]`);
+        if (newTab) newTab.focus();
+      });
+    });
+
+    // Export buttons
+    container.querySelectorAll('[data-export]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.export;
+        _handleExport(type);
+      });
+    });
+
+    // Locked export tap
+    const lockedExport = container.querySelector('[data-route="upgrade"]');
+    if (lockedExport) {
+      lockedExport.addEventListener('click', () => router.navigate('upgrade'));
+      lockedExport.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          router.navigate('upgrade');
+        }
+      });
+    }
+  }
+
+  // ── Coach observation builder ──────────────────────────────────────────────
+
+  /**
+   * Build coach narrative lines for the current lookback window.
+   * Pattern detection in plain English. Never statistics.
+   *
+   * Free tier: one observation line.
+   * Personal: up to four observations, read as connected paragraphs.
+   *
+   * @returns {{ lines: string[] }}
+   */
+  function _buildObservation(activityLog, checkinHistory, stats, windowDays, tier, name) {
+    const cutoff  = _cutoffDate(windowDays);
+    const recent  = activityLog.filter(e => {
+      const ts = e.completedAt || e.loggedAt || e.date;
+      return ts && new Date(ts) >= cutoff;
+    });
+
+    const lines = [];
+    const count = recent.length;
+
+    // Line 1 — consistency observation
+    if (count === 0) {
+      lines.push('Nothing logged in this window. Whenever you\'re ready — the app is here.');
+    } else if (count === 1) {
+      lines.push('One session in this window. A start, and starts matter.');
+    } else if (count <= 4 && windowDays === 7) {
+      lines.push(`${count} sessions this week. That\'s consistent movement.`);
+    } else if (count >= 5 && windowDays === 7) {
+      lines.push(`${count} sessions this week. That\'s a lot of showing up.`);
+    } else if (windowDays === 30) {
+      lines.push(`${count} sessions in the last 30 days.${count >= 10 ? ' That\'s a real habit.' : ' Building something here.'}`);
+    } else if (windowDays === 90) {
+      lines.push(`${count} sessions over 90 days.${count >= 24 ? ' Consistency like that changes things.' : ' The foundation is forming.'}`);
+    }
+
+    if (tier === 'free' || !lines.length) return { lines: lines.length ? lines : ['Keep going.'] };
+
+    // Line 2 — energy pattern (Personal only)
+    const energyPattern = _detectEnergyPattern(checkinHistory, windowDays);
+    if (energyPattern) lines.push(energyPattern);
+
+    // Line 3 — activity type pattern (Personal only)
+    const typePattern = _detectTypePattern(recent);
+    if (typePattern) lines.push(typePattern);
+
+    // Line 4 — programme context (Personal only, if active)
+    if (stats.hasActiveProgramme) {
+      const programmeObs = _programmeObservation(stats, recent);
+      if (programmeObs) lines.push(programmeObs);
+    }
+
+    return { lines };
+  }
+
+  function _detectEnergyPattern(checkinHistory, windowDays) {
+    const cutoff = _cutoffDate(windowDays);
+    const entries = Object.entries(checkinHistory)
+      .filter(([date]) => new Date(date) >= cutoff)
+      .map(([, v]) => v);
+
+    if (entries.length < 3) return null;
+
+    const energyValues = entries.map(e => e.energy).filter(v => typeof v === 'number');
+    if (energyValues.length < 3) return null;
+
+    const avg = energyValues.reduce((a, b) => a + b, 0) / energyValues.length;
+
+    if (avg >= 7) return 'Your energy scores have been high in this window. That\'s worth noting.';
+    if (avg <= 4) return 'Energy has been low in this window. The sessions you did were worth more because of that.';
+
+    // Check for trend
+    const first = energyValues.slice(0, Math.floor(energyValues.length / 2));
+    const last  = energyValues.slice(Math.floor(energyValues.length / 2));
+    const firstAvg = first.reduce((a, b) => a + b, 0) / first.length;
+    const lastAvg  = last.reduce((a, b) => a + b, 0) / last.length;
+
+    if (lastAvg - firstAvg >= 1.5) return 'Energy has been rising through this window. The movement is doing something.';
+    if (firstAvg - lastAvg >= 1.5) return 'Energy has been lower towards the end of this window. Worth paying attention to.';
+
+    return null;
+  }
+
+  function _detectTypePattern(recent) {
+    if (recent.length < 3) return null;
+
+    const types = _countByType(recent);
+    const sorted = Object.entries(types).sort((a, b) => b[1] - a[1]);
+
+    if (!sorted.length) return null;
+
+    const [topType, topCount] = sorted[0];
+    const fraction = topCount / recent.length;
+
+    if (fraction >= 0.6) {
+      return `Most sessions in this window have been ${_formatType(topType)}. A clear lean.`;
+    }
+
+    if (sorted.length >= 3) {
+      return 'Good variety in this window — different kinds of sessions, different things asked of the body.';
+    }
+
+    return null;
+  }
+
+  function _programmeObservation(stats, recent) {
+    if (stats.percentComplete >= 90) {
+      return `Week ${stats.currentWeek} of 12 — the end is close. The habit is already built.`;
+    }
+    if (stats.currentWeek === 6 && !stats.midProgrammeGlanceShown) {
+      return 'Halfway through the programme. That\'s a real marker.';
+    }
+    if (stats.sessionsThisWeek >= stats.weeklyTarget) {
+      return `This week\'s sessions done. The programme is on track.`;
+    }
+    return null;
+  }
+
+  // ── Export handler ─────────────────────────────────────────────────────────
+
+  function _handleExport(type) {
+    const activityLog    = store.get('activityLog') || [];
+    const checkinHistory = store.get('checkinHistory') || {};
+    const goals          = store.get('goals') || [];
+    const name           = store.get('name') || 'User';
+    const stats          = getProgressStats();
+    const cutoff         = _cutoffDate(activeWindow);
+    const recent         = activityLog.filter(e => {
+      const ts = e.completedAt || e.loggedAt || e.date;
+      return ts && new Date(ts) >= cutoff;
+    });
+
+    const goalLabels = goals.map(g => getGoalLabel(g)).join(', ');
+    const text       = _buildExportText(type, name, recent, stats, goalLabels, activeWindow);
+
+    // Write to clipboard — graceful fallback to alert
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        _showExportConfirmation(type);
+      }).catch(() => {
+        _fallbackExport(text);
+      });
+    } else {
+      _fallbackExport(text);
+    }
+  }
+
+  function _buildExportText(type, name, recent, stats, goalLabels, windowDays) {
+    const date  = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    const count = recent.length;
+    const mins  = recent.reduce((acc, e) => acc + (e.durationMins || 0), 0);
+
+    if (type === 'self') {
+      return [
+        `Progress — ${date}`,
+        ``,
+        `${count} sessions in the last ${windowDays} days. ${mins} minutes of movement.`,
+        stats.hasActiveProgramme
+          ? `Programme: ${stats.programmeName} — Week ${stats.currentWeek} of 12. ${stats.percentComplete}% complete.`
+          : '',
+        goalLabels ? `Working towards: ${goalLabels}.` : '',
+        ``,
+        `Generated by Alongside.`,
+      ].filter(Boolean).join('\n');
+    }
+
+    if (type === 'friend') {
+      return [
+        `Here's what I've been up to with my movement practice:`,
+        ``,
+        `${count} sessions over the last ${windowDays} days — about ${Math.round(mins / 60)} hours of movement total.`,
+        stats.hasActiveProgramme
+          ? `I'm on week ${stats.currentWeek} of a 12-week programme called ${stats.programmeName}.`
+          : '',
+        ``,
+        `Tracking it with an app called Alongside.`,
+      ].filter(Boolean).join('\n');
+    }
+
+    if (type === 'professional') {
+      return [
+        `Movement summary for ${name}`,
+        `Generated: ${date}`,
+        `Period: last ${windowDays} days`,
+        ``,
+        `Sessions completed: ${count}`,
+        `Total duration: ${mins} minutes`,
+        stats.hasActiveProgramme
+          ? [
+              `Active programme: ${stats.programmeName}`,
+              `Programme week: ${stats.currentWeek} / 12`,
+              `Sessions this week: ${stats.sessionsThisWeek} (target: ${stats.weeklyTarget})`,
+              `Total programme sessions: ${stats.totalSessions}`,
+            ].join('\n')
+          : 'No active programme.',
+        goalLabels ? `Stated goals: ${goalLabels}` : '',
+        ``,
+        `Data source: Alongside (buildnewhabits.co.uk)`,
+        `Note: self-reported data via PWA. No medical device.`,
+      ].filter(Boolean).join('\n');
+    }
+
+    return '';
+  }
+
+  function _showExportConfirmation(type) {
+    const labels = { self: 'your version', friend: 'the friend version', professional: 'the professional version' };
+    // Announce to screen reader via existing aria-live region if present
+    const narrative = document.querySelector('.progress-narrative');
+    if (narrative) {
+      const msg = document.createElement('p');
+      msg.setAttribute('aria-live', 'polite');
+      msg.textContent = `Copied to clipboard — ${labels[type] || 'your progress'}.`;
+      msg.className = 'progress-export__confirm';
+      narrative.appendChild(msg);
+      setTimeout(() => msg.remove(), 3000);
+    }
+  }
+
+  function _fallbackExport(text) {
+    // Last resort — show in a pre block in an accessible dialog
+    alert('Copy the text below:\n\n' + text);
+  }
+
+  // ── Utilities ──────────────────────────────────────────────────────────────
+
+  function _cutoffDate(windowDays) {
+    const d = new Date();
+    d.setDate(d.getDate() - windowDays);
+    return d;
+  }
+
+  function _countByType(entries) {
+    return entries.reduce((acc, e) => {
+      const t = e.type || e.activityType || 'movement';
+      acc[t] = (acc[t] || 0) + 1;
+      return acc;
+    }, {});
+  }
+
+  function _formatType(type) {
+    const MAP = {
+      'workout':          'strength',
+      'morning-session':  'morning movement',
+      'yoga-session':     'yoga',
+      'walk-session':     'walking',
+      'running-session':  'running',
+      'cycle-session':    'cycling',
+      'swim-session':     'swimming',
+      'core-session':     'core work',
+      'quiet-session':    'breathing',
+      'gym-programme':    'gym',
+    };
+    return MAP[type] || type;
+  }
+
+  return { mount };
 }
