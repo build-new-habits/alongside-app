@@ -180,7 +180,7 @@ const App = {
     // Determine first view and navigate
     // router.js v3 does not auto-navigate on init — we do it here
     const isOnboarded = store.isOnboardingComplete();
-    const firstView   = isOnboarded ? 'today' : 'welcome';
+    const firstView   = 'today';
 
     await router.navigate(firstView);
 
