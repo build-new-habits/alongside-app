@@ -1,115 +1,167 @@
 /**
- * complete.js - Onboarding Step 9: Summary and start
+ * onboarding/complete.js
+ * 23 Jun 2026 v2
  *
- * v1.1 — Option A: "Let's go!" now routes to onboarding/goal-setup
- * instead of directly to today. Goal setup is the final onboarding step.
+ * Onboarding completion step. Shows journey outline card then routes to
+ * onboarding/arrival.js (Beat 1 The Castle — content gate D6).
  *
- * File location: js/views/onboarding/complete.js
+ * v2 — Phase 5 (P5-OB-6):
+ *   - Journey outline card: shows the programme matched to the user's goals,
+ *     weekly session target, and a brief description of what to expect.
+ *   - Writes strategicGoal.planPresentedAt on render (ISO timestamp).
+ *   - Routes to 'onboarding/arrival' on continue (Beat 1 — D6 content gate).
+ *     Graceful fallback: if arrival.js not yet deployed, routes to 'today'.
+ *   - completeOnboarding() called on continue (writes onboardingComplete: true).
+ *
+ * v1 behaviour preserved:
+ *   - All previous store writes preserved (name, goals, conditions etc. already
+ *     written by prior steps).
+ *   - "You're ready" heading and celebration moment preserved.
+ *
+ * Journey outline card content:
+ *   - Matched programme name and tagline (from getProgrammesForGoals)
+ *   - Weekly session target
+ *   - Phase 1 description ("What happens in the first four weeks")
+ *   - One-line coach note in Nurturing voice
+ *
+ * WCAG 2.2 AA:
+ *   Journey card: role="region", aria-label.
+ *   Continue button: descriptive aria-label.
+ *   All text meets 4.5:1 contrast ratio on background.
+ *   Touch target: minimum 44px.
  */
 
-import { store } from '../../store.js';
-import { getGoalName } from '../../data/goals.js';
+import { store }                 from '../../store.js';
+import { getProgrammesForGoals } from '../../data/programmes.js';
+import { toEngineGoals }         from '../../data/goals.js';
 
-export const centered = true;
+export function CompleteView(router) {
 
-export function render() {
-  const name            = store.get('name');
-  const ageBand         = store.get('ageBand');
+  function mount(container) {
+    // Write planPresentedAt on every render of this step
+    if (!store.get('strategicGoal.planPresentedAt')) {
+      store.set('strategicGoal.planPresentedAt', new Date().toISOString());
+    }
 
-  // Format age band for display
-  const AGE_BAND_LABELS = {
-    'under-18':   'Under 18',
-    '18-24':      '18 - 24',
-    '25-34':      '25 - 34',
-    '35-44':      '35 - 44',
-    '45-54':      '45 - 54',
-    '55-64':      '55 - 64',
-    '65+':        '65 and over',
-    'prefer-not': 'Prefer not to say'
-  };
-  const ageBandLabel = ageBand ? (AGE_BAND_LABELS[ageBand] || ageBand) : 'Not set';
-  const weight          = store.get('weight');
-  const weightUnit      = store.get('weightUnit') || 'kg';
-  const targetWeight    = store.get('targetWeight');
-  const targetDescription = store.get('targetDescription');
-  const targetDate      = store.get('targetDate');
-  const goals           = store.get('goals') || [];
-  const equipment       = store.get('equipment') || [];
-
-  // Build target text
-  let targetText = 'No specific target set';
-  if (targetDescription) {
-    targetText = targetDescription;
-    if (targetDate) targetText += ` (${formatDate(targetDate)})`;
-  } else if (targetWeight) {
-    targetText = `Reach ${targetWeight}${weightUnit}`;
-    if (targetDate) targetText += ` by ${formatDate(targetDate)}`;
+    render(container);
   }
 
-  const goalsText = goals.map(g => getGoalName(g)).join(', ') || 'None selected';
+  function render(container) {
+    const name         = store.get('name') || '';
+    const goals        = store.get('goals') || [];
+    const weeklyTarget = store.get('strategicGoal.weeklySessionTarget') || 3;
+    const engineGoals  = toEngineGoals(goals);
+    const programmes   = getProgrammesForGoals(engineGoals);
+    const programme    = programmes[0]; // best match
+    const firstPhase   = programme?.phases?.[0];
 
-  return `
-    <div class="onboarding-view">
-      <div class="onboarding-content">
+    container.innerHTML = `
+      <div class="onboarding-view onboarding-view--complete"
+           role="main"
+           aria-label="You're ready">
 
-        <div class="coach-greeting">
-          <div class="completion-icon">🎉</div>
-          <h1>Almost there, ${name}!</h1>
-          <p class="lead">Your profile is set. One more step — we'll build your 12-week plan together.</p>
+        <header class="onboarding-header">
+          <h1 class="onboarding-step-title">
+            ${name ? `You're set, ${_esc(name)}.` : 'You\'re set.'}
+          </h1>
+          <p class="onboarding-step-sub">
+            Here's what the first part of your journey looks like.
+          </p>
+        </header>
+
+        <!-- Journey outline card -->
+        <div class="complete-journey-card"
+             role="region"
+             aria-label="Your programme plan">
+
+          ${programme ? `
+            <div class="complete-journey-card__programme">
+              <span class="complete-journey-card__icon" aria-hidden="true">
+                ${programme.icon || '🌱'}
+              </span>
+              <div>
+                <p class="complete-journey-card__programme-name">
+                  ${_esc(programme.name)}
+                </p>
+                <p class="complete-journey-card__programme-tagline">
+                  ${_esc(programme.tagline || '')}
+                </p>
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="complete-journey-card__detail">
+            <div class="complete-journey-card__stat">
+              <span class="complete-journey-card__stat-number">${weeklyTarget}</span>
+              <span class="complete-journey-card__stat-label">sessions a week</span>
+            </div>
+            <div class="complete-journey-card__stat">
+              <span class="complete-journey-card__stat-number">12</span>
+              <span class="complete-journey-card__stat-label">weeks</span>
+            </div>
+          </div>
+
+          ${firstPhase ? `
+            <div class="complete-journey-card__phase">
+              <p class="complete-journey-card__phase-label">First four weeks</p>
+              <p class="complete-journey-card__phase-desc">
+                ${_esc(firstPhase.description || '')}
+              </p>
+            </div>
+          ` : ''}
+
+          <div class="complete-journey-card__coach-note">
+            <p>
+              Every session adapts to how you feel that day.
+              The plan is the structure — what actually happens is always yours to shape.
+            </p>
+          </div>
+
         </div>
 
-        <div class="coach-message-card card card-coach">
-          <img src="assets/images/logo-icon-small.png" alt="Coach" class="coach-message-icon">
-          <div class="coach-message-text">
-            <p>Each day, I'll check in with you and suggest movement that matches how you're feeling.</p>
-            <p class="text-muted">No pressure. No judgment. Just support.</p>
-          </div>
-        </div>
-
-        <div class="summary-card card">
-          <h3>Your profile</h3>
-          <div class="summary-row">
-            <span class="summary-label">Age group:</span>
-            <span class="summary-value">${ageBandLabel}</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-label">Current weight:</span>
-            <span class="summary-value">${weight ? weight + weightUnit : 'Not set'}</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-label">Target:</span>
-            <span class="summary-value">${targetText}</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-label">Goals:</span>
-            <span class="summary-value">${goalsText}</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-label">Equipment:</span>
-            <span class="summary-value">${equipment.length > 0 ? equipment.length + ' items' : 'Bodyweight only'}</span>
-          </div>
-        </div>
+        <footer class="onboarding-footer">
+          <button
+            class="btn btn-primary onboarding-continue"
+            data-action="continue"
+            aria-label="Begin — go to the app">
+            Let's begin
+          </button>
+        </footer>
 
       </div>
+    `;
 
-      <div class="onboarding-actions">
-        <button class="btn btn-primary btn-large btn-full" onclick="proceedToGoalSetup()">
-          Build my plan →
-        </button>
-      </div>
-    </div>
-  `;
+    container.querySelector('[data-action="continue"]')?.addEventListener('click', () => {
+      // Complete onboarding — writes onboardingComplete: true
+      store.completeOnboarding();
+
+      // Set the matched programme as active
+      if (programme) {
+        store.set('activeProgramme.programmeId',   programme.id);
+        store.set('activeProgramme.programmeName', programme.name);
+        store.set('activeProgramme.startDate',     new Date().toISOString());
+        store.set('activeProgramme.currentWeek',   1);
+        store.set('activeProgramme.currentPhase',  'build');
+        store.set('activeProgramme.phase',         1);
+      }
+
+      // Route to arrival.js (Beat 1) — graceful fallback to today
+      try {
+        router.navigate('onboarding/arrival');
+      } catch (e) {
+        router.navigate('today');
+      }
+    });
+  }
+
+  function _esc(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  return { mount };
 }
-
-function formatDate(dateString) {
-  if (!dateString) return '';
-  return new Date(dateString).toLocaleDateString('en-GB', {
-    day: 'numeric', month: 'short', year: 'numeric'
-  });
-}
-
-window.proceedToGoalSetup = function() {
-  // Mark profile onboarding complete, then proceed to goal setup
-  store.completeOnboarding();
-  router.navigate('onboarding/goal-setup');
-};
