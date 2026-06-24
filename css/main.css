@@ -1,25 +1,47 @@
-/* main.css - Import all styles for Alongside */
-/* 21 Jun 2026 v2 (S4-CSS-NOTICING) — added breathing-session, quiet-session, noticing imports */
+/* main.css
+ * 23 Jun 2026 v3
+ *
+ * v3 — Phase 5 sprint: added coach-proposal.css, session-guard.css,
+ *   settings-library.css imports. progress.css updated in place (v2).
+ *   coach-proposal.css updated in place (v2).
+ *   Content-gated imports noted below — add when content sessions complete.
+ *
+ * v2 — 21 Jun 2026 (S4-CSS-NOTICING): added breathing-session.css,
+ *   quiet-session.css, noticing.css.
+ *
+ * v1 — initial consolidated import sheet.
+ */
 
-/* Base */
+/* ── Base ─────────────────────────────────────────────────────────────── */
 @import 'base/variables.css';
 @import 'base/reset.css';
 @import 'base/typography.css';
 @import 'base/global.css';
-/* Layouts */
+
+/* ── Layouts ──────────────────────────────────────────────────────────── */
 @import 'layouts/app-shell.css';
 @import 'layouts/onboarding.css';
 @import 'layouts/goal-setup.css';
 @import 'layouts/progress.css';
-/* Components */
+
+/* ── Components ───────────────────────────────────────────────────────── */
 @import 'components/buttons.css';
 @import 'components/cards.css';
 @import 'components/equipment-modal.css';
 @import 'components/checkin.css';
 @import 'components/workout.css';
 @import 'components/coach-fix.css';
+@import 'components/coach-proposal.css';
 @import 'components/morning-session.css';
+@import 'components/session-guard.css';
+@import 'components/settings-library.css';
 @import 'components/weekly-plan.css';
 @import 'components/breathing-session.css';
 @import 'components/quiet-session.css';
 @import 'components/noticing.css';
+
+/* ── Content-gated — add when content sessions complete ───────────────── */
+/* D2: @import 'components/checkin-conversation.css'; */
+/* D3: @import 'components/home-threshold.css';       */
+/* D10: @import 'components/community-impact.css';    */
+/* D8: @import 'components/annual-reflection.css';    */
