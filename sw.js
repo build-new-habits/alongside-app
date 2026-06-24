@@ -1,6 +1,6 @@
 /**
  * sw.js
- * 24 Jun 2026 v121
+ * 24 Jun 2026 v122
  *
  * Two fixes from v115/v116:
  *   1. All SHELL_URLS now carry the correct /alongside-app/ path prefix.
@@ -33,7 +33,7 @@
  * sw.js is always the last file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v121";
+const CACHE_NAME = "alongside-v122";
 
 const SHELL_URLS = [
 
