@@ -2,6 +2,8 @@
  * sw.js
  * 23 Jun 2026 v115
  *
+ * Fixing service worker issues v116
+ *
  * Phase 5 sprint cache update. All files produced in the 23 Jun 2026
  * build sprint added to SHELL_URLS. Cache bumped from alongside-v114
  * to alongside-v115.
@@ -34,7 +36,7 @@
  *   css/components/annual-reflection.css
  */
 
-const CACHE_NAME = 'alongside-v115';
+const CACHE_NAME = 'alongside-v116';
 
 const SHELL_URLS = [
 
