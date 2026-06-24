@@ -21,6 +21,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/main.css">
+
+  <!--
+    Content-gated CSS — add these link tags when content sessions complete:
+    D2:  <link rel="stylesheet" href="css/components/checkin-conversation.css">
+    D3:  <link rel="stylesheet" href="css/components/home-threshold.css">
+    D10: <link rel="stylesheet" href="css/components/community-impact.css">
+    D8:  <link rel="stylesheet" href="css/components/annual-reflection.css">
+  -->
 </head>
 <body>
   <div id="app" class="app-container">
@@ -74,19 +82,19 @@
 
     <!-- Bottom navigation -->
     <nav id="bottom-nav" class="bottom-nav hidden" aria-label="Main navigation">
-      <button class="nav-item active" data-view="intention" aria-label="Today">
+      <button class="nav-item active" data-nav="today" aria-label="Today" aria-current="page">
         <span class="nav-icon" aria-hidden="true">🏠</span>
         <span class="nav-label">Today</span>
       </button>
-      <button class="nav-item" data-view="progress" aria-label="Progress">
+      <button class="nav-item" data-nav="progress" aria-label="Progress">
         <span class="nav-icon" aria-hidden="true">📊</span>
         <span class="nav-label">Progress</span>
       </button>
-      <button class="nav-item" data-view="noticing" aria-label="Noticing">
+      <button class="nav-item" data-nav="noticing" aria-label="Noticing">
         <span class="nav-icon" aria-hidden="true">🌿</span>
         <span class="nav-label">Noticing</span>
       </button>
-      <button class="nav-item" data-view="settings" aria-label="Settings">
+      <button class="nav-item" data-nav="settings" aria-label="Settings">
         <span class="nav-icon" aria-hidden="true">⚙️</span>
         <span class="nav-label">Settings</span>
       </button>
