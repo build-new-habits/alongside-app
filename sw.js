@@ -1,6 +1,6 @@
 /**
  * sw.js
- * 24 Jun 2026 v117
+ * 24 Jun 2026 v118
  *
  * Two fixes from v115/v116:
  *   1. All SHELL_URLS now carry the correct /alongside-app/ path prefix.
@@ -11,7 +11,8 @@
  *      allSettled() logs a warning per missing file and continues — the
  *      app always loads even if a new file hasn't arrived yet.
  *
- * alongside-v116 — path prefix wrong, addAll handler
+ * alongside-v117 — path prefix fixed, allSettled handler restored
+ * alongside-v118 (24 Jun 2026) — app.js v3: explicit first navigate + loading screen dismiss
  * alongside-v115 — Phase 5 sprint files added, path prefix wrong
  * alongside-v114 (22 Jun 2026) — store.js v5 checkinHistory bug fixed
  *
@@ -32,7 +33,7 @@
  * sw.js is always the last file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v117";
+const CACHE_NAME = "alongside-v118";
 
 const SHELL_URLS = [
 
