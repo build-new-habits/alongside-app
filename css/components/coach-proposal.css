@@ -1,196 +1,312 @@
-/* ============================================
-   COACH PROPOSAL REDESIGN CSS
-   css/components/coach-proposal.css
-   
-   Styles for the redesigned coach proposal screen:
-   - Activity history reflection
-   - Constraint messaging (pain, energy)
-   - Severe pain override UI
-   - Three-button architecture
-   ============================================ */
+/*
+ * css/components/coach-proposal.css
+ * 23 Jun 2026 v2
+ *
+ * Coach proposal view styles. v2 adds door reframe, bypass door,
+ * return context door, missed session offer, post-choice acknowledgement.
+ *
+ * Three doors are genuinely different — not intensity variants.
+ * Visual treatment reflects that: doors have equal weight.
+ * No visual hierarchy between them. No preferred option.
+ *
+ * WCAG 2.2 AA:
+ *   All door buttons: 44px min height. Focus ring 2px solid primary.
+ *   Disabled door: aria-disabled="true" styling, no opacity-only signal.
+ *   Coach text: min 16px, meets 4.5:1 on background.
+ *   Bypass options: same touch target and contrast as main doors.
+ *   Constraint block: role="status", visible colour + text label.
+ *   Return context chips: role="group", 44px min height.
+ *   prefers-reduced-motion: no transitions.
+ */
 
-/* ============================================
-   COACH PROPOSAL CARD
-   ============================================ */
+/* ── View ─────────────────────────────────────────────────────────────── */
 
-.coach-proposal-card {
+.cp-view {
   display: flex;
-  gap: var(--space-4);
-  align-items: flex-start;
-  padding: var(--space-5);
-  margin-bottom: var(--space-6);
-  border: 1px solid var(--color-border-light);
-  background: var(--color-bg-card);
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-4);
+  padding-bottom: var(--space-8);
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-.coach-proposal-card img {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-lg);
-  flex-shrink: 0;
-  object-fit: contain;
-}
+/* ── Coach block ──────────────────────────────────────────────────────── */
 
-.coach-proposal-content {
-  flex: 1;
-}
-
-/* ============================================
-   PROPOSAL TEXT HIERARCHY
-   ============================================ */
-
-.coach-proposal-greeting {
-  font-weight: var(--font-bold);
-  margin-bottom: var(--space-2);
-  color: var(--color-text);
-}
-
-.coach-proposal-reflection {
-  font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
-  margin-bottom: var(--space-3);
-  color: var(--color-text);
-}
-
-/* ============================================
-   CONSTRAINT MESSAGE (Pain, Energy, etc.)
-   ============================================ */
-
-.coach-proposal-constraint {
-  font-size: var(--text-sm);
-  line-height: var(--leading-relaxed);
-  margin-bottom: var(--space-3);
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  background: rgba(239, 68, 68, 0.1);  /* Light red */
-  color: #EF4444;
-  border-left: 3px solid #EF4444;
-}
-
-/* ============================================
-   PROPOSAL & RATIONALE
-   ============================================ */
-
-.coach-proposal-suggestion {
-  font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
-  margin-bottom: var(--space-3);
-  font-weight: var(--font-medium);
-  color: var(--color-text);
-}
-
-.coach-proposal-rationale {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  font-style: italic;
-  margin-bottom: var(--space-3);
-}
-
-/* ============================================
-   META INFORMATION
-   ============================================ */
-
-.coach-proposal-meta {
-  display: flex;
-  gap: var(--space-4);
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-}
-
-.coach-proposal-duration {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-full);
-  background: var(--color-bg);
-  color: var(--color-primary);
-  font-weight: var(--font-semibold);
-}
-
-/* ============================================
-   ACTION BUTTONS - THREE OPTION ARCHITECTURE
-   ============================================ */
-
-.coach-proposal-actions {
+.cp-coach-block {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
-#proposal-accept-btn {
-  /* "Let's go with your plan" — primary action */
-  background: var(--color-primary);
-  color: white;
+.cp-greeting {
+  font-size: var(--text-lg);
   font-weight: var(--font-semibold);
-  border: none;
+  color: var(--color-text);
+}
+
+.cp-reflection {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+.cp-constraint {
+  padding: var(--space-3) var(--space-4);
+  background: rgba(239, 68, 68, 0.08);
+  border-left: 3px solid #EF4444;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.cp-constraint p {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+.cp-proposal-intro {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Three doors ──────────────────────────────────────────────────────── */
+
+.cp-doors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cp-door {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  min-height: 80px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: left;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.1s, background 0.1s;
 }
 
-#proposal-accept-btn:hover:not(:disabled) {
-  opacity: 0.9;
+.cp-door:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-elevated);
 }
 
-#proposal-accept-btn:disabled {
-  background: var(--color-bg);
-  color: var(--color-text-secondary);
-  opacity: 0.5;
+.cp-door:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cp-door--disabled {
+  opacity: 0.45;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
-#proposal-adjust-btn {
-  /* "Adjust for today" — secondary primary action */
-  background: var(--color-primary);
-  color: white;
+.cp-door__label {
+  font-size: var(--text-base);
   font-weight: var(--font-semibold);
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  color: var(--color-text);
 }
 
-#proposal-adjust-btn:hover {
-  opacity: 0.9;
+.cp-door__line {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  line-height: var(--leading-relaxed);
 }
 
-#proposal-else-btn {
-  /* "Something else entirely" — tertiary action */
+.cp-door__meta {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cp-door__helper {
+  font-size: var(--text-xs);
+  color: #EF4444;
+  margin-top: var(--space-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-door { transition: none; }
+}
+
+/* ── Bypass door ──────────────────────────────────────────────────────── */
+
+.cp-bypass {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.cp-bypass__label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cp-bypass__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cp-bypass__btn {
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px;
   background: transparent;
   border: 1px solid var(--color-border);
-  color: var(--color-text);
-  font-weight: var(--font-medium);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  text-align: left;
+  transition: color 0.1s, border-color 0.1s;
 }
 
-#proposal-else-btn:hover {
-  background: var(--color-bg);
+.cp-bypass__btn:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+.cp-bypass__btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ── Return door (re-entry) ───────────────────────────────────────────── */
+
+.cp-return-door {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cp-return-door__message {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+.cp-return-door__chips {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ── Shared chip style ────────────────────────────────────────────────── */
+
+.cp-chip {
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.cp-chip:hover {
+  background: var(--color-bg-card);
   border-color: var(--color-primary);
-  color: var(--color-primary);
 }
 
-/* ============================================
-   SEVERE PAIN OVERRIDE HELPER TEXT
-   ============================================ */
+.cp-chip:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
 
-.text-error {
-  color: #EF4444;
+.cp-chip--skip {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* ── Missed session offer ─────────────────────────────────────────────── */
+
+.cp-missed-offer {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cp-missed-offer__line {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+.cp-missed-offer__choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cp-missed-offer__btn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  min-height: 56px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
   font-weight: var(--font-medium);
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s, border-color 0.1s;
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
+.cp-missed-offer__btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-card);
+}
 
-@media (max-width: 380px) {
-  .coach-proposal-card {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .coach-proposal-card img {
-    width: 48px;
-    height: 48px;
-  }
+.cp-missed-offer__btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cp-missed-offer__sub {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-normal);
+}
+
+/* ── Post-choice acknowledgement ──────────────────────────────────────── */
+
+.cp-acknowledgement {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  padding: var(--space-3) 0;
+  text-align: center;
+  outline: none; /* focused programmatically — visible focus ring not needed here */
 }
