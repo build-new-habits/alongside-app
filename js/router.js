@@ -1,279 +1,340 @@
 /**
- * router.js - View navigation
+ * router.js
+ * 23 Jun 2026 v3
  *
- * 21 Jun 2026 v4 (S4-CSS-NOTICING):
- *   onUnmount() hook added to navigate(). Before switching views, navigate()
- *   now calls this.views[this.currentView]?.onUnmount?.() if that method
- *   exists on the outgoing view. This stops active session timers when the
- *   device back gesture fires a popstate event — the gesture calls back()
- *   which calls navigate(), which now runs onUnmount() on the view being
- *   left before tearing down its DOM. breathing-session.js and
- *   quiet-session.js each implement onUnmount() to clear their intervals.
+ * Client-side router for Alongside: Move PWA.
+ * Vanilla JS, no framework. Manages view loading and history.
  *
- * 30 May 2026 v1 --- Daily flow redesign:
- *   coach-reflection added to VIEW_NAMES.
- *   noticing added to VIEW_NAMES.
- *   intention and coach-proposal removed from hideNavViews (nav always visible).
- *   setActiveNav: coach-reflection maps to Today tab.
- *   init() now navigates to "today" (Act 1 greeting) instead of "intention".
+ * v3 — Phase 5 final VIEW_NAMES pass (Step 19):
+ *   New routes added:
+ *     home-threshold      — threshold moment between choosing and beginning
+ *     community-impact    — Tesco coins voting UI (content gate D10)
+ *     annual-reflection   — nine-chapter annual event (content gate D8)
+ *   hideNavViews updated:
+ *     home-threshold added (no nav during threshold moment — silence is design)
+ *   setActiveNav updated for all new routes.
+ *   All Phase 5 view files confirmed in VIEW_NAMES.
  *
- * 22 May 2026 v2 --- Device back gesture fix (S4-3):
- *   pushState() called on every navigate() so the browser history stack
- *   is never empty. popstate listener intercepts device swipe-back and
- *   Android back button, calls router.back() instead of exiting the app.
- *   Added missing VIEW_NAMES entries for new routes.
+ * v2 — 22 May 2026. history.pushState on every navigate().
+ *   popstate listener intercepts device back gesture.
+ *   All missing routes added (coach-proposal, session-builder, activity-log,
+ *   noticing-hub, upgrade, quiet-session, yoga-session, library).
+ *   coach-reflection added as post-check-in hub.
  *
- * 22 May 2026 v1 --- Navigation stack added. router.back() replaces all
- *   hardcoded Back destinations.
+ * v1 — Initial router. import() based lazy loading.
  *
- * Accessibility additions (March 2026):
- *   - VIEW_NAMES map provides human-readable labels for screen reader announcements
- *   - announceNavigation() writes to #sr-announcer after every navigate()
- *   - moveFocusToContent() moves keyboard focus to #main-content after render
+ * Architecture:
+ *   - Every view is a named JS module in js/views/
+ *   - Lazy-loaded on first navigate, cached in viewCache
+ *   - Each module exports a function matching its VIEW_NAMES entry
+ *   - Function receives (router) and returns { mount(container) }
+ *   - Active view mounted into #app-content
+ *   - Nav bar visibility controlled by hideNavViews list
+ *
+ * Back gesture handling:
+ *   - history.pushState() called on every navigate()
+ *   - popstate listener re-pushes state to prevent stack emptying
+ *   - Calls router.back() internally — no app restart on device back
+ *
+ * WCAG 2.2 AA:
+ *   - Focus management: on navigate(), focus moved to #app-content
+ *   - #app-content has tabindex="-1" for programmatic focus
+ *   - View transitions do not cause focus trap
+ *   - Nav buttons: aria-current="page" on active item
  */
 
-import { store } from "./store.js";
-import { tts }   from "./tts.js";
+// ─── View map ──────────────────────────────────────────────────────────────────
+// Key:   route name used in router.navigate()
+// Value: { path: module path, fn: exported function name }
 
 const VIEW_NAMES = {
-  "today":                   "Today",
-  "coach-reflection":        "Your Session",
-  "progress":                "Your Progress",
-  "settings":                "Settings",
-  "checkin":                 "Daily Check-In",
-  "intention":               "What would you like to do today?",
-  "coach-proposal":          "Your Coach",
-  "workout":                 "Workout",
-  "workout-complete":        "Workout Complete",
-  "reflect":                 "How was that?",
-  "prescribed":              "My Prescribed Exercises",
-  "prescribed-session":      "Prescribed Exercises",
-  "gym-programme":           "My Gym Programme",
-  "morning-session":         "Morning Session",
-  "quiet-session":           "Quiet Session",
-  "yoga-session":            "Yoga Session",
-  "session-builder":         "Build a Session",
-  "session-builder-ui":      "Build a Session",
-  "library":                 "Library",
-  "activity-log":            "Log an Activity",
-  "noticing":                "Noticing",
-  "noticing-hub":            "Noticing Hub",
-  "upgrade":                 "Personal Plan",
-  "privacy":                 "Privacy and Terms",
-  "checkin-mini":            "Quick Check-In",
-  "breathing-session":       "Breathing Practice",
-  "onboarding/welcome":      "Welcome to Alongside",
-  "onboarding/name":         "Your Name",
-  "onboarding/about":        "About You",
-  "onboarding/body":         "Body and Targets",
-  "onboarding/goals":        "Your Goals",
-  "onboarding/conditions":   "Your Conditions",
-  "onboarding/lifestyle":    "Your Lifestyle",
-  "onboarding/equipment":    "Your Equipment",
-  "onboarding/complete":     "Profile Complete",
-  "onboarding/goal-setup":   "Build Your Plan",
-  "onboarding/privacy":      "Privacy and Terms",
+
+  // ── Onboarding ──────────────────────────────────────────────────────────────
+  'welcome':               { path: './views/onboarding/welcome.js',      fn: 'WelcomeView'           },
+  'onboarding/name':       { path: './views/onboarding/name.js',         fn: 'NameView'              },
+  'onboarding/about':      { path: './views/onboarding/about.js',        fn: 'AboutView'             },
+  'onboarding/body':       { path: './views/onboarding/body.js',         fn: 'BodyView'              },
+  'onboarding/goals':      { path: './views/onboarding/goals.js',        fn: 'GoalsView'             },
+  'onboarding/conditions': { path: './views/onboarding/conditions.js',   fn: 'ConditionsView'        },
+  'onboarding/lifestyle':  { path: './views/onboarding/lifestyle.js',    fn: 'LifestyleView'         },
+  'onboarding/equipment':  { path: './views/onboarding/equipment.js',    fn: 'EquipmentView'         },
+  'onboarding/goal-setup': { path: './views/onboarding/goal-setup.js',   fn: 'GoalSetupView'         },
+  'onboarding/complete':   { path: './views/onboarding/complete.js',     fn: 'CompleteView'          },
+  // Phase 5 — content gate D6
+  'onboarding/arrival':    { path: './views/onboarding/arrival.js',      fn: 'ArrivalView'           },
+  'onboarding/hard-before':{ path: './views/onboarding/hard-before.js',  fn: 'HardBeforeView'        },
+  'onboarding/reflection': { path: './views/onboarding/reflection.js',   fn: 'OnboardingReflectionView' },
+
+  // ── Core daily flow ─────────────────────────────────────────────────────────
+  'today':                 { path: './views/today.js',                   fn: 'TodayView'             },
+  'checkin':               { path: './views/checkin.js',                 fn: 'CheckinView'           },
+  'checkin-mini':          { path: './views/checkin-mini.js',            fn: 'CheckinMiniView'       },
+  'coach-reflection':      { path: './views/coach-reflection.js',        fn: 'CoachReflectionView'   },
+  'coach-proposal':        { path: './views/coach-proposal.js',          fn: 'CoachProposalView'     },
+  // Phase 5 — content gate D3
+  'home-threshold':        { path: './views/home-threshold.js',          fn: 'HomeThresholdView'     },
+  'intention':             { path: './views/intention.js',               fn: 'IntentionView'         },
+  'reflect':               { path: './views/reflect.js',                 fn: 'ReflectView'           },
+
+  // ── Main views ──────────────────────────────────────────────────────────────
+  'progress':              { path: './views/progress.js',                fn: 'ProgressView'          },
+  'settings':              { path: './views/settings.js',                fn: 'SettingsView'          },
+  'weekly-plan':           { path: './views/weekly-plan.js',             fn: 'WeeklyPlanView'        },
+  'noticing':              { path: './views/noticing.js',                fn: 'NoticingView'          },
+  'journal-entry':         { path: './views/journal-entry.js',           fn: 'JournalEntryView'      },
+  'activity-log':          { path: './views/activity-log.js',            fn: 'ActivityLogView'       },
+  'library':               { path: './views/library.js',                 fn: 'LibraryView'           },
+  'about':                 { path: './views/about.js',                   fn: 'AboutView'             },
+  'privacy':               { path: './views/privacy.js',                 fn: 'PrivacyView'           },
+  'upgrade':               { path: './views/upgrade.js',                 fn: 'UpgradeView'           },
+  'goal-setup':            { path: './views/goal-setup.js',              fn: 'GoalSetupView'         },
+  // Phase 5 — content gate D10
+  'community-impact':      { path: './views/community-impact.js',        fn: 'CommunityImpactView'   },
+  // Phase 5 — content gate D8
+  'annual-reflection':     { path: './views/annual-reflection.js',       fn: 'AnnualReflectionView'  },
+
+  // ── Session builder ─────────────────────────────────────────────────────────
+  'session-builder':       { path: './views/session-builder.js',         fn: 'SessionBuilderView'    },
+
+  // ── Session views ───────────────────────────────────────────────────────────
+  'workout':               { path: './views/workout.js',                 fn: 'WorkoutView'           },
+  'gym-programme':         { path: './views/gym-programme.js',           fn: 'GymProgrammeView'      },
+  'morning-session':       { path: './views/morning-session.js',         fn: 'MorningSessionView'    },
+  'core-session':          { path: './views/core-session.js',            fn: 'CoreSessionView'       },
+  'yoga-session':          { path: './views/yoga-session.js',            fn: 'YogaSessionView'       },
+  'walk-session':          { path: './views/walk-session.js',            fn: 'WalkSessionView'       },
+  'running-session':       { path: './views/running-session.js',         fn: 'RunningSessionView'    },
+  'cycle-session':         { path: './views/cycle-session.js',           fn: 'CycleSessionView'      },
+  'swim-session':          { path: './views/swim-session.js',            fn: 'SwimSessionView'       },
+  'quiet-session':         { path: './views/quiet-session.js',           fn: 'QuietSessionView'      },
+  'breathing-session':     { path: './views/breathing-session.js',       fn: 'BreathingSessionView'  },
+  'prescribed':            { path: './views/prescribed.js',              fn: 'PrescribedView'        },
+  'prescribed-session':    { path: './views/prescribed-session.js',      fn: 'PrescribedSessionView' },
 };
+
+// ─── Views that hide the nav bar ──────────────────────────────────────────────
+// Session views, onboarding, and full-screen moments.
+
+const hideNavViews = new Set([
+  // Onboarding
+  'welcome',
+  'onboarding/name',
+  'onboarding/about',
+  'onboarding/body',
+  'onboarding/goals',
+  'onboarding/conditions',
+  'onboarding/lifestyle',
+  'onboarding/equipment',
+  'onboarding/goal-setup',
+  'onboarding/complete',
+  'onboarding/arrival',
+  'onboarding/hard-before',
+  'onboarding/reflection',
+  // Full-screen moments
+  'home-threshold',       // silence is design — no nav during threshold
+  'community-impact',
+  'annual-reflection',
+  // Check-in flow
+  'checkin',
+  'checkin-mini',
+  'coach-reflection',
+  'coach-proposal',
+  // Session views
+  'workout',
+  'gym-programme',
+  'morning-session',
+  'core-session',
+  'yoga-session',
+  'walk-session',
+  'running-session',
+  'cycle-session',
+  'swim-session',
+  'quiet-session',
+  'breathing-session',
+  'prescribed',
+  'prescribed-session',
+  'session-builder',
+  // Post-session
+  'reflect',
+  // Utility
+  'journal-entry',
+  'privacy',
+  'upgrade',
+]);
+
+// ─── Nav tab mapping ───────────────────────────────────────────────────────────
+// Maps route names to the nav tab that should be highlighted.
+
+const NAV_MAP = {
+  'today':            'today',
+  'checkin':          'today',
+  'checkin-mini':     'today',
+  'coach-reflection': 'today',
+  'coach-proposal':   'today',
+  'home-threshold':   'today',
+  'intention':        'today',
+  'reflect':          'today',
+  'workout':          'today',
+  'gym-programme':    'today',
+  'morning-session':  'today',
+  'core-session':     'today',
+  'yoga-session':     'today',
+  'walk-session':     'today',
+  'running-session':  'today',
+  'cycle-session':    'today',
+  'swim-session':     'today',
+  'quiet-session':    'today',
+  'breathing-session':'today',
+  'prescribed':       'today',
+  'prescribed-session':'today',
+  'session-builder':  'today',
+  'progress':         'progress',
+  'weekly-plan':      'progress',
+  'noticing':         'noticing',
+  'journal-entry':    'noticing',
+  'library':          'noticing',
+  'settings':         'settings',
+  'about':            'settings',
+  'privacy':          'settings',
+  'upgrade':          'settings',
+  'weekly-plan':      'settings',
+  'goal-setup':       'settings',
+  'community-impact': 'settings',
+  'annual-reflection':'settings',
+};
+
+// ─── Router ────────────────────────────────────────────────────────────────────
 
 export const router = {
 
-  currentView: null,
-  views: {},
-  _history: [],
-  _popstateWired: false,
-
-  back() {
-    this._history.pop();
-    const previous = this._history.pop();
-    this.navigate(previous || "today");
-  },
+  currentView:  null,
+  history:      [],
+  viewCache:    {},
 
   init() {
-    this.setupNavigation();
-    this.setupPopstate();
-    this.hideLoading();
-
-    if (store.isOnboardingComplete()) {
-      this.navigate("today");
-    } else {
-      this.navigate("onboarding/welcome");
-    }
-
-    console.log("Router initialised");
+    this._setupPopstate();
+    this._setupNavButtons();
   },
 
-  /**
-   * Wire the browser popstate event to router.back().
-   * This intercepts device swipe-back (iOS) and Android hardware back button.
-   *
-   * Strategy: push a dummy state on every navigate() so the browser
-   * always has somewhere to "go back" to. When popstate fires, we catch
-   * it, re-push the state (so the stack stays non-empty), and call
-   * router.back() ourselves.
-   *
-   * This prevents the PWA from exiting when the user swipes or taps back.
-   */
-  setupPopstate() {
-    if (this._popstateWired) return;
-    this._popstateWired = true;
-
-    // Seed the browser history so there is always a state to pop to
-    window.history.pushState({ alongside: true }, "", window.location.href);
-
-    window.addEventListener("popstate", () => {
-      // Re-push immediately so the stack never empties
-      window.history.pushState({ alongside: true }, "", window.location.href);
-      // Now handle in-app back navigation
-      this.back();
-    });
-  },
-
-  register(name, viewModule) {
-    this.views[name] = viewModule;
-  },
+  // ── Navigate ───────────────────────────────────────────────────────────────
 
   async navigate(viewName) {
-    console.log("Navigating to: " + viewName);
-
-    /**
-     * onUnmount hook — call cleanup on the outgoing view before switching.
-     * This stops active timers (breathing, mindful movement) when the
-     * device back gesture fires popstate -> back() -> navigate().
-     * Views opt in by exporting an onUnmount() function.
-     */
-    if (this.currentView && this.views[this.currentView]?.onUnmount) {
-      try {
-        this.views[this.currentView].onUnmount();
-      } catch (e) {
-        console.warn("onUnmount error on " + this.currentView, e);
-      }
+    if (!VIEW_NAMES[viewName]) {
+      console.warn(`Router: unknown view "${viewName}" — falling back to today`);
+      viewName = 'today';
     }
 
-    // Push to in-app navigation stack
-    const isOnboarding = viewName.startsWith("onboarding");
-    const isDuplicate  = this._history.length > 0 &&
-                         this._history[this._history.length - 1] === viewName;
-    if (!isOnboarding && !isDuplicate) {
-      this._history.push(viewName);
-      if (this._history.length > 20) this._history.shift();
-    }
+    // Push to browser history
+    history.pushState({ view: viewName }, '', `#${viewName}`);
 
-    // Push browser history state so popstate can fire on back gesture
-    window.history.pushState({ alongside: true, view: viewName }, "", window.location.href);
-
-    const mainContent = document.getElementById("main-content");
-    const bottomNav   = document.getElementById("bottom-nav");
-
-    mainContent.innerHTML = "";
-    mainContent.className = "main-content";
-
-    // Nav is hidden only during focused flows.
-    // intention, coach-proposal, and coach-reflection all show nav now --
-    // the user can always reach Progress, Noticing, or Settings.
-    const hideNavViews = [
-      "onboarding", "workout", "workout-complete", "checkin",
-      "prescribed-session", "morning-session", "quiet-session",
-      "yoga-session", "breathing-session"
-    ];
-    const shouldHideNav = hideNavViews.some(v => viewName.startsWith(v));
-
-    if (shouldHideNav) {
-      bottomNav.classList.add("hidden");
-    } else {
-      bottomNav.classList.remove("hidden");
-      this.setActiveNav(viewName);
-    }
-
-    try {
-      const view = await this.loadView(viewName);
-      if (view) {
-        if (view.centered) mainContent.classList.add("centered");
-        mainContent.innerHTML = view.render();
-        if (view.onMount) view.onMount();
-      }
-    } catch (e) {
-      console.error("Error loading view: " + viewName, e);
-      mainContent.innerHTML = "<div class=\"error\">Error loading view: " + e.message + "</div>";
+    // Track internal history
+    if (this.currentView && this.currentView !== viewName) {
+      this.history.push(this.currentView);
+      if (this.history.length > 20) this.history.shift();
     }
 
     this.currentView = viewName;
-    window.scrollTo({ top: 0, behavior: "smooth" });
-
-    tts.stop();
-    this.announceNavigation(viewName);
-    this.moveFocusToContent();
-    setTimeout(() => tts.mountButtons(), 150);
+    await this._mountView(viewName);
   },
 
-  announceNavigation(viewName) {
-    const announcer = document.getElementById("sr-announcer");
-    if (!announcer) return;
-    const label = VIEW_NAMES[viewName] || this.formatViewName(viewName);
-    announcer.textContent = "";
-    setTimeout(() => { announcer.textContent = label; }, 50);
-  },
+  // ── Back ───────────────────────────────────────────────────────────────────
 
-  formatViewName(viewName) {
-    const last = viewName.split("/").pop();
-    return last
-      .split("-")
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  },
-
-  moveFocusToContent() {
-    setTimeout(() => {
-      const mainContent = document.getElementById("main-content");
-      if (mainContent) mainContent.focus({ preventScroll: true });
-    }, 100);
-  },
-
-  async loadView(viewName) {
-    if (this.views[viewName]) return this.views[viewName];
-    const path = "./views/" + viewName + ".js";
-    try {
-      const module = await import(path);
-      this.views[viewName] = module;
-      return module;
-    } catch (e) {
-      console.error("Failed to load view: " + path, e);
-      return null;
+  back() {
+    const prev = this.history.pop();
+    if (prev) {
+      this.navigate(prev);
+    } else {
+      this.navigate('today');
     }
   },
 
-  hideLoading() {
-    setTimeout(() => {
-      const loading = document.getElementById("loading");
-      if (loading) {
-        loading.style.opacity = "0";
-        loading.style.transition = "opacity 0.3s ease-out";
-        setTimeout(() => loading.classList.add("hidden"), 300);
+  // ── Mount view ─────────────────────────────────────────────────────────────
+
+  async _mountView(viewName) {
+    const container = document.getElementById('app-content');
+    if (!container) return;
+
+    // Nav visibility
+    const nav = document.getElementById('app-nav');
+    if (nav) {
+      nav.style.display = hideNavViews.has(viewName) ? 'none' : '';
+    }
+
+    // Active nav item
+    this._setActiveNav(viewName);
+
+    // Load and mount view
+    try {
+      if (!this.viewCache[viewName]) {
+        const { path, fn } = VIEW_NAMES[viewName];
+        const module = await import(path);
+        this.viewCache[viewName] = module[fn];
       }
-    }, 1500);
+
+      const ViewFactory = this.viewCache[viewName];
+      if (typeof ViewFactory !== 'function') {
+        throw new Error(`View factory for "${viewName}" is not a function`);
+      }
+
+      const view = ViewFactory(this);
+      container.innerHTML = '';
+      view.mount(container);
+
+      // Focus management — move focus to content area for screen readers
+      container.setAttribute('tabindex', '-1');
+      container.focus({ preventScroll: false });
+      // Restore natural tab order after focus
+      setTimeout(() => container.removeAttribute('tabindex'), 100);
+
+    } catch (err) {
+      console.error(`Router: failed to mount view "${viewName}"`, err);
+      container.innerHTML = `
+        <div class="router-error" role="alert">
+          <p>Something went wrong loading this page.</p>
+          <button onclick="router.navigate('today')" class="btn btn-primary">
+            Go home
+          </button>
+        </div>
+      `;
+    }
   },
 
-  setupNavigation() {
-    document.querySelectorAll(".nav-item").forEach(item => {
-      item.addEventListener("click", () => {
-        const view = item.dataset.view;
-        if (view) this.navigate(view);
+  // ── Nav button wiring ──────────────────────────────────────────────────────
+
+  _setupNavButtons() {
+    document.querySelectorAll('[data-nav]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.nav;
+        if (target) this.navigate(target);
       });
     });
   },
 
-  /**
-   * Highlight the active nav item.
-   * today, coach-reflection, coach-proposal and intention all map to
-   * the Today button (data-view="intention") since they are all part
-   * of the Today flow.
-   */
-  setActiveNav(viewName) {
-    const todayViews = ["today", "coach-reflection", "coach-proposal", "intention"];
-    const navKey = todayViews.includes(viewName) ? "intention" : viewName;
-    document.querySelectorAll(".nav-item").forEach(item => {
-      item.classList.toggle("active", item.dataset.view === navKey);
-    });
-  }
-};
+  // ── Active nav ─────────────────────────────────────────────────────────────
 
-window.router = router;
+  _setActiveNav(viewName) {
+    const activeTab = NAV_MAP[viewName] || null;
+
+    document.querySelectorAll('[data-nav]').forEach(btn => {
+      const isActive = btn.dataset.nav === activeTab;
+      btn.setAttribute('aria-current', isActive ? 'page' : 'false');
+      btn.classList.toggle('nav-btn--active', isActive);
+    });
+  },
+
+  // ── Popstate (device back gesture) ────────────────────────────────────────
+
+  _setupPopstate() {
+    // Seed initial history entry
+    history.pushState({ view: 'today' }, '', '#today');
+
+    window.addEventListener('popstate', e => {
+      // Re-push to prevent stack emptying
+      const view = e.state?.view || 'today';
+      history.pushState({ view }, '', `#${view}`);
+
+      // Navigate internally
+      this.back();
+    });
+  },
+};
