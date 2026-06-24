@@ -1,70 +1,36 @@
 /**
  * app.js - Application entry point
  *
- * 15 Jun 2026 v2
+ * 24 Jun 2026 v3
  *
- * v2  APP_VERSION bumped (S4-9/10). The header comment says this must be
- *   updated on every deploy; it had stayed at "20 May 2026 v1" through
- *   roughly ten deploys since (sw.js cache alongside-v94 through v104).
- *   No other changes -- bumping now so Settings' build string is
- *   meaningful again going forward. Future sessions: bump this string
- *   alongside the sw.js cache version whenever any file changes.
+ * v3 — Phase 5 fix: router.navigate() called explicitly after router.init()
+ *   to mount the first view and dismiss the loading screen. router.js v3
+ *   does not auto-navigate on init (unlike v2 which did). Without this call
+ *   the app started and registered the SW but never mounted any view,
+ *   leaving the loading spinner on screen indefinitely.
+ *   Loading screen and nav bar visibility now managed here on first navigate.
  *
- * v1.3  Version string format updated (20 May 2026):
- *   APP_VERSION now uses the same DD Mon YYYY vN format as all other files.
- *   Must be updated on every deploy. Settings displays this string so users
- *   and testers can confirm which build they are running.
+ * v2 — 15 Jun 2026. APP_VERSION bumped (S4-9/10).
  *
- * v1.2  Service worker update detection (S3-6):
- *   When a new service worker is found (i.e. a new version has been deployed
- *   to GitHub), the app shows a non-intrusive update banner at the top of
- *   the screen. The user taps "Update now" to reload and get the new version.
+ * v1.3 — Version string format updated (20 May 2026).
+ *   APP_VERSION now uses DD Mon YYYY vN format. Must be updated on every deploy.
  *
- *   Why we tell the user:
- *   Alongside is a PWA. Unlike the App Store, users do not see a version
- *   history or release notes. Without this banner, they would never know
- *   new features had arrived. The banner is honest about what is happening
- *   and gives the user control over when to reload.
+ * v1.2 — Service worker update detection (S3-6).
+ *   Update banner when new SW found. User taps "Update now" to reload.
  *
- *   The banner is dismissible. If the user is mid-session we do not force
- *   anything. The update applies automatically on their next app open anyway
- *   because skipWaiting() is called in sw.js.
- *
- *   Manual check: window.App.checkForUpdate() is exposed globally so the
- *   Settings "Check for updates" button can trigger it on demand.
- *
- * v1.1  SW registration added (Phase 3)
+ * v1.1 — SW registration added (Phase 3).
  */
 
 import { store } from './store.js';
 import { router } from './router.js';
 
-//  App version string 
-// MUST be updated on every deploy.
-// Format: DD Mon YYYY vN  (e.g. "20 May 2026 v1", "20 May 2026 v2")
-// This string is displayed in Settings so users and testers can confirm
-// exactly which build they are running.
-const APP_VERSION = "15 Jun 2026 v2";
+// App version string — update on every deploy
+const APP_VERSION = "24 Jun 2026 v3";
 
-//  SW registration and update detection 
+// SW registration and update detection
 
 let _swRegistration = null;
 
-/**
- * Register the service worker and wire up update detection.
- *
- * Update flow:
- *   1. Browser finds a new sw.js on GitHub (CACHE_NAME has changed).
- *   2. "updatefound" fires on the registration object.
- *   3. The new SW enters "installing" state.
- *   4. When it reaches "installed" (waiting to activate), we show the banner.
- *   5. User taps "Update now" -> we post "SKIP_WAITING" to the SW.
- *   6. SW calls skipWaiting(), activates, claims all clients.
- *   7. We reload the page -> user is now on the new version.
- *
- * If the user dismisses the banner, the update still applies on next open
- * because sw.js calls skipWaiting() on install regardless.
- */
 async function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
 
@@ -76,7 +42,6 @@ async function registerServiceWorker() {
     _swRegistration = reg;
     console.log("SW registered, scope:", reg.scope);
 
-    //  Detect updates on this page load 
     reg.addEventListener("updatefound", () => {
       const newWorker = reg.installing;
       if (!newWorker) return;
@@ -88,7 +53,6 @@ async function registerServiceWorker() {
       });
     });
 
-    //  Detect if we just reloaded after an update 
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       window.location.reload();
     });
@@ -98,13 +62,6 @@ async function registerServiceWorker() {
   }
 }
 
-/**
- * Manually trigger a SW update check.
- * Called by the Settings "Check for updates" button.
- * Also exposed as window.App.checkForUpdate() for debugging.
- *
- * @returns {Promise<"updated"|"current"|"unavailable">}
- */
 async function checkForUpdate() {
   if (!("serviceWorker" in navigator)) return "unavailable";
 
@@ -136,10 +93,6 @@ async function checkForUpdate() {
   }
 }
 
-/**
- * Tell the waiting service worker to activate immediately.
- * Called when the user taps "Update now" in the banner.
- */
 function applyUpdate() {
   const reg = _swRegistration;
   if (reg?.waiting) {
@@ -149,17 +102,8 @@ function applyUpdate() {
   }
 }
 
-//  Update banner 
+// Update banner
 
-/**
- * Show a non-intrusive update banner at the top of the app.
- *
- * Design intent:
- *   - Informative, not alarming.
- *   - Gives the user control. "Update now" or dismiss.
- *   - Accessible: role="alert" so screen readers announce it immediately.
- *   - Does not interrupt mid-session. The banner floats above content.
- */
 function showUpdateBanner() {
   if (document.getElementById("update-banner")) return;
 
@@ -205,10 +149,6 @@ function showUpdateBanner() {
   });
 }
 
-/**
- * Show the result of a manual update check in the Settings view.
- * @param {"updated"|"current"|"unavailable"} result
- */
 function showUpdateCheckResult(result) {
   const statusEl = document.getElementById("update-check-status");
   if (!statusEl) return;
@@ -216,26 +156,43 @@ function showUpdateCheckResult(result) {
   const messages = {
     updated:     "A new version is ready. Tap \"Update now\" in the banner above.",
     current:     "You are on the latest version.",
-    unavailable: "Could not check for updates. Try closing and reopening the app, then check again."
+    unavailable: "Could not check for updates. Try closing and reopening the app."
   };
 
   statusEl.textContent = messages[result] || "";
   statusEl.className   = "update-check-status update-check-status--" + result;
 }
 
-//  App 
+// App
 
 const App = {
   store,
   router,
   version: APP_VERSION,
 
-  init() {
+  async init() {
     console.log("Alongside starting...");
     store.init();
     router.init();
     registerServiceWorker();
     console.log("Alongside ready");
+
+    // Determine first view and navigate
+    // router.js v3 does not auto-navigate on init — we do it here
+    const isOnboarded = store.isOnboardingComplete();
+    const firstView   = isOnboarded ? 'today' : 'welcome';
+
+    await router.navigate(firstView);
+
+    // Dismiss loading screen
+    const loading = document.getElementById('loading');
+    if (loading) loading.style.display = 'none';
+
+    // Show nav bar for onboarded users
+    const nav = document.getElementById('bottom-nav');
+    if (nav && isOnboarded) {
+      nav.classList.remove('hidden');
+    }
   },
 
   checkForUpdate,
