@@ -298,3 +298,16 @@ export function detectBurnout(checkinHistory) {
   const avg = energyValues.reduce((a, b) => a + b, 0) / energyValues.length;
   return avg <= 4;
 }
+
+// Compatibility export — expected by js/views/checkin.js
+// Maps to the new named exports
+export const checkinData = {
+  FEELING_WORDS,
+  getQuadrant,
+  getWordsForQuadrant,
+  getWordObject,
+  getQuadrantForWord,
+  getCoachPostureForQuadrant,
+  getOpeningModes,
+  detectBurnout,
+};
