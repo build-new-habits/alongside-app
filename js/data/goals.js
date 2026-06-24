@@ -250,8 +250,7 @@ export const GOAL_CATEGORIES = [
 ];
 
 // ─── Flat goal list (for direct ID lookup) ────────────────────────────────────
-
-export const GOALS = GOAL_CATEGORIES.flatMap(cat => cat.goals);
+// See backward-compatible GOALS export at end of file.
 
 // ─── Utility functions ────────────────────────────────────────────────────────
 
@@ -341,3 +340,25 @@ export function goalHasTarget(goalId) {
 export function getGoalTargetType(goalId) {
   return getGoal(goalId)?.targetType || null;
 }
+
+// ─── Backward-compatible exports ──────────────────────────────────────────────
+// The existing js/views/goal-setup.js imports { GOALS } as a flat array.
+// My v2 restructured this into GOAL_CATEGORIES. Export flat GOALS array
+// so existing views continue to work without modification.
+
+// Flat array matching the original structure
+export const GOALS = GOAL_CATEGORIES.flatMap(cat =>
+  cat.goals.map(g => ({
+    id:          g.id,
+    label:       g.label,
+    icon:        g.icon,
+    engineGoalId: g.engineGoalId,
+    // Legacy fields some views may read
+    name:        g.label,
+    category:    cat.id,
+  }))
+);
+
+// Legacy getProgrammesForGoals using flat goal IDs (not engine IDs)
+// Kept for any view that calls it with raw goal IDs from store.goals[]
+export { getProgrammesForGoals } from './programmes.js';
