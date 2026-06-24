@@ -77,8 +77,6 @@ const SHELL_URLS = [
   '/js/store.js',                        // v6 this sprint
   '/js/router.js',                       // v3 this sprint
   '/js/tts.js',
-  '/js/session-guard.js',
-  '/js/session-builder.js',
 
   // ── JS: Data ──────────────────────────────────────────────────────────────
   '/js/data/signal-words.js',            // NEW this sprint
