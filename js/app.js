@@ -1,22 +1,23 @@
 /**
  * app.js - Application entry point
  *
- * 24 Jun 2026 v3
+ * 24 Jun 2026 v4
  *
- * v3 — Phase 5 fix: router.navigate() called explicitly after router.init()
- *   to mount the first view and dismiss the loading screen. router.js v3
- *   does not auto-navigate on init (unlike v2 which did). Without this call
- *   the app started and registered the SW but never mounted any view,
- *   leaving the loading spinner on screen indefinitely.
- *   Loading screen and nav bar visibility now managed here on first navigate.
+ * v4 — Nav visibility fix. Nav bar now shown based on first view mounted,
+ *   not on onboardingComplete flag. This fixes existing users whose
+ *   onboardingComplete was false after the v6 store schema migration.
+ *   Also: firstView logic simplified — routes to 'today' if onboarded OR
+ *   if store has a name (existing user), 'welcome' only for genuinely new
+ *   installs with no data at all.
+ *
+ * v3 — 24 Jun 2026. router.navigate() called explicitly after router.init()
+ *   to mount first view and dismiss loading screen.
  *
  * v2 — 15 Jun 2026. APP_VERSION bumped (S4-9/10).
  *
  * v1.3 — Version string format updated (20 May 2026).
- *   APP_VERSION now uses DD Mon YYYY vN format. Must be updated on every deploy.
  *
  * v1.2 — Service worker update detection (S3-6).
- *   Update banner when new SW found. User taps "Update now" to reload.
  *
  * v1.1 — SW registration added (Phase 3).
  */
@@ -25,7 +26,14 @@ import { store } from './store.js';
 import { router } from './router.js';
 
 // App version string — update on every deploy
-const APP_VERSION = "24 Jun 2026 v3";
+const APP_VERSION = "24 Jun 2026 v4";
+
+// Views that show the nav bar
+const NAV_VIEWS = new Set([
+  'today', 'progress', 'noticing', 'settings', 'weekly-plan',
+  'activity-log', 'library', 'upgrade', 'about', 'privacy',
+  'goal-setup', 'community-impact', 'annual-reflection',
+]);
 
 // SW registration and update detection
 
@@ -67,25 +75,15 @@ async function checkForUpdate() {
 
   try {
     let reg = _swRegistration;
-
-    if (!reg) {
-      reg = await navigator.serviceWorker.getRegistration();
-    }
-
+    if (!reg) reg = await navigator.serviceWorker.getRegistration();
     if (!reg) {
       const regs = await navigator.serviceWorker.getRegistrations();
       reg = regs?.[0] || null;
     }
-
     if (!reg) return "unavailable";
 
     await reg.update();
-
-    if (reg.waiting) {
-      showUpdateBanner();
-      return "updated";
-    }
-
+    if (reg.waiting) { showUpdateBanner(); return "updated"; }
     return "current";
   } catch (err) {
     console.error("SW update check failed:", err);
@@ -143,7 +141,6 @@ function showUpdateBanner() {
     banner.remove();
     applyUpdate();
   });
-
   document.getElementById("update-dismiss-btn")?.addEventListener("click", () => {
     banner.remove();
   });
@@ -177,10 +174,14 @@ const App = {
     registerServiceWorker();
     console.log("Alongside ready");
 
-    // Determine first view and navigate
-    // router.js v3 does not auto-navigate on init — we do it here
-    const isOnboarded = store.isOnboardingComplete();
-    const firstView   = 'today';
+    // Determine first view.
+    // An existing user is anyone with a name in the store — they go to today
+    // regardless of onboardingComplete flag (handles schema migration edge case).
+    // A genuinely new install (no name, no onboardingComplete) goes to welcome.
+    const isOnboarded   = store.get('onboardingComplete') === true;
+    const hasName       = !!(store.get('name'));
+    const isExistingUser = isOnboarded || hasName;
+    const firstView     = isExistingUser ? 'today' : 'welcome';
 
     await router.navigate(firstView);
 
@@ -188,9 +189,9 @@ const App = {
     const loading = document.getElementById('loading');
     if (loading) loading.style.display = 'none';
 
-    // Show nav bar for onboarded users
+    // Show nav bar — based on view being mounted, not onboarding flag
     const nav = document.getElementById('bottom-nav');
-    if (nav && isOnboarded) {
+    if (nav && NAV_VIEWS.has(firstView)) {
       nav.classList.remove('hidden');
     }
   },
