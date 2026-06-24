@@ -67,8 +67,6 @@ const SHELL_URLS = [
   '/css/components/coach-fix.css',
   '/css/components/coach-proposal.css', // updated v2 this sprint
   '/css/components/morning-session.css',
-  '/css/components/session-guard.css',
-  '/css/components/settings-library.css',
   '/css/components/weekly-plan.css',
   '/css/components/breathing-session.css',
   '/css/components/quiet-session.css',
