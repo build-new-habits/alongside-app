@@ -449,7 +449,7 @@ export function SettingsView(router) {
 
   function renderAboutPanel() {
     const tier = store.get('tier') || 'free';
-    const APP_VERSION = '114';
+    const APP_VERSION = '115';
 
     return `
       <div class="settings-section">
