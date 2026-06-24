@@ -147,7 +147,7 @@ export function CompleteView(router) {
 
       // Route to arrival.js (Beat 1) — graceful fallback to today
       try {
-        router.navigate('onboarding/arrival');
+        router.navigate('today');
       } catch (e) {
         router.navigate('today');
       }
