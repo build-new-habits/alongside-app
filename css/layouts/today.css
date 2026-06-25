@@ -1,0 +1,110 @@
+/*
+ * css/layouts/today.css
+ * 25 Jun 2026 v1
+ *
+ * Styles for today.js v2 — the daily entry point view.
+ * New Phase 5 layout replacing the old intention.js-based today.
+ */
+
+.today-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-4) var(--space-8);
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100%;
+}
+
+/* ── Greeting ─────────────────────────────────────────────────── */
+
+.today-greeting {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.today-coach-line {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Week count ───────────────────────────────────────────────── */
+
+.today-week-count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+.today-week-count__number {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.today-week-count__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── CTA block ────────────────────────────────────────────────── */
+
+.today-cta-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.today-checkin-btn {
+  width: 100%;
+  min-height: 56px;
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+}
+
+/* ── Secondary actions ────────────────────────────────────────── */
+
+.today-secondary-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.today-secondary-btn {
+  flex: 1;
+  min-height: 44px;
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* ── Done state ───────────────────────────────────────────────── */
+
+.today-view--done .today-greeting {
+  font-size: var(--text-2xl);
+}
+
+/* ── Second session ───────────────────────────────────────────── */
+
+.today-second-session {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.today-second-session-btn {
+  width: 100%;
+  min-height: 44px;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
