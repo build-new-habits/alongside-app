@@ -1,21 +1,21 @@
 /*
  * css/components/nav-fix.css
- * 26 Jun 2026 v1
+ * 26 Jun 2026 v2
  *
- * Forces bottom nav bar visible on mobile.
- * Addresses: nav bar absent on Android despite hidden class being removed.
+ * v2 — Nav bar layout fix. Gemini confirmed the bar renders but is truncated
+ *   and misaligned, showing only 2 of 4 tabs pushed to the left edge.
+ *   Root cause: flex container not distributing children evenly, or width
+ *   constraint from app-shell.css limiting the bar width.
  *
- * Root cause (Gemini analysis confirmed): bottom-nav uses position:fixed;bottom:0
- * but main-content height or overflow settings on mobile push it offscreen or
- * clip it. This file overrides with explicit z-index, display, and safe area
- * inset support.
+ * v1 — Initial fix attempt (display:none -> display:flex).
  *
- * Also addresses:
- *   - Back button sitting too close to Android gesture bar (safe-area-inset)
- *   - Settings tab strip: fade mask on right edge to indicate overflow
+ * Also covers:
+ *   - Safe area inset for Android gesture bar
+ *   - main-content padding so content does not hide behind nav
+ *   - Settings tab strip fade indicator
  */
 
-/* ── Force nav bar visible ────────────────────────────────────────── */
+/* ── Nav bar: force correct layout ────────────────────────────── */
 
 #bottom-nav,
 .bottom-nav {
@@ -23,46 +23,75 @@
   bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
   z-index: 9000 !important;
   display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  justify-content: space-around !important;
   padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
 }
 
+/* Each nav button takes equal space */
+#bottom-nav button,
+#bottom-nav .nav-item,
+.bottom-nav button,
+.bottom-nav .nav-item {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 56px !important;
+  padding: 8px 4px !important;
+  box-sizing: border-box !important;
+}
+
+/* Hidden state still works */
 #bottom-nav.hidden,
 .bottom-nav.hidden {
   display: none !important;
 }
 
-/* ── Main content: stop it overlapping the nav ────────────────────── */
+/* ── Main content: clear the nav bar ──────────────────────────── */
 
 #main-content,
 .main-content {
   padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
+  min-height: 100% !important;
+  box-sizing: border-box !important;
 }
 
-/* ── Back button safe area ────────────────────────────────────────── */
+/* ── Back button / action bar safe area ───────────────────────── */
 
 .checkin-step-actions,
 .onboarding-actions,
 .onboarding-footer {
-  padding-bottom: max(var(--space-4), env(safe-area-inset-bottom, 16px)) !important;
+  padding-bottom: max(var(--space-4, 16px), env(safe-area-inset-bottom, 16px)) !important;
 }
 
-/* ── Settings tab strip: fade indicator ──────────────────────────── */
+/* ── Settings tab strip: fade indicator ───────────────────────── */
 
 .settings-tabs {
-  position: relative;
+  position: relative !important;
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%) !important;
+  mask-image: linear-gradient(to right, black 85%, transparent 100%) !important;
 }
 
-.settings-tabs::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 32px;
-  background: linear-gradient(to right, transparent, var(--color-bg));
-  pointer-events: none;
+/* ── Name capitalisation ──────────────────────────────────────── */
+/* Gemini flagged "graeme" lowercase — apply text-transform where name is used */
+
+.today-greeting,
+.gp-moment__heading,
+.onboarding-step-title {
+  text-transform: capitalize;
+}
+
+/* But only the first letter — don't uppercase whole sentences */
+.today-greeting {
+  text-transform: none;
 }
