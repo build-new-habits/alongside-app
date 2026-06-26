@@ -1,21 +1,19 @@
 /**
  * sw.js
- * 26 Jun 2026 v128
+ * 26 Jun 2026 v129
  *
- * alongside-v128 (26 Jun 2026) — equipment.js v2: facility cards full card
- *   treatment, equipment sub-screen accordions + wrapping chip layout.
- *   onboarding-additions.css v3: equip-facility-card, accordion, chip-wrap styles.
- * alongside-v127 (26 Jun 2026) — onboarding-additions.css v2: .chip-group/.chip
- *   and .equipment-chip rules; fixes O3/O9 plain-text rendering.
+ * alongside-v129 (26 Jun 2026) — onboarding/frequency.js v1: new weekly
+ *   frequency selection screen. onboarding/plan-select.js v1: new plan
+ *   selection with Highly Recommended gold badge (#B8970A). complete.js v3:
+ *   pure celebration screen, programme selection moved to plan-select.
+ *   onboarding-additions.css v4: freq-card, plan-card, plan-badge styles.
+ * alongside-v128 (26 Jun 2026) — equipment.js v2: facility cards, accordions.
+ * alongside-v127 (26 Jun 2026) — onboarding-additions.css v2: chip/equipment fixes.
  * alongside-v126 (26 Jun 2026) — nav-fix.css v2: flex layout fix for nav bar.
  * alongside-v125 (26 Jun 2026) — CSS batch: today.css, settings.css,
  *   weekly-plan-v2.css, gym-programme.css, journal-entry.css,
  *   onboarding-additions.css v1.
  * alongside-v124 (25 Jun 2026) — coach-proposal.js v6: routing + availTime fix.
- * alongside-v123 (24 Jun 2026) — checkin.js data v3: backward-compat exports.
- * alongside-v122 (24 Jun 2026) — goals.js v2: GOALS flat array re-export.
- * alongside-v121 (24 Jun 2026) — router.js v4: dual-pattern detection.
- * alongside-v120 (24 Jun 2026) — app.js v5: window.router + window.store globals.
  * alongside-v119 (23 Jun 2026) — Phase 5 sprint: store.js v6, 21 files.
  * alongside-v114 (22 Jun 2026) — store.js v5 checkinHistory bug fixed.
  *
@@ -36,7 +34,7 @@
  * sw.js is always the last file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v128";
+const CACHE_NAME = "alongside-v129";
 
 const SHELL_URLS = [
 
@@ -124,6 +122,8 @@ const SHELL_URLS = [
   "/alongside-app/js/views/onboarding/conditions.js",
   "/alongside-app/js/views/onboarding/lifestyle.js",
   "/alongside-app/js/views/onboarding/equipment.js",
+  "/alongside-app/js/views/onboarding/frequency.js",
+  "/alongside-app/js/views/onboarding/plan-select.js",
   "/alongside-app/js/views/onboarding/goal-setup.js",
   "/alongside-app/js/views/onboarding/complete.js",
 
