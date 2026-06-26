@@ -1,5 +1,5 @@
 /* main.css
- * 25 Jun 2026 v5
+ * 26 Jun 2026 v6
  *
  * v5 — Added onboarding-additions.css, fixed omission from v4.
  * v4 — Phase 5 CSS: today, settings, weekly-plan-v2, gym-programme, journal-entry.
@@ -41,6 +41,7 @@
 @import 'components/noticing.css';
 @import 'components/gym-programme.css';
 @import 'components/journal-entry.css';
+@import 'components/nav-fix.css';
 
 /* Content-gated — add when content sessions complete */
 /* D2: @import 'components/checkin-conversation.css'; */
