@@ -1,6 +1,6 @@
 /**
  * sw.js
- * 24 Jun 2026 v122
+ * 25 Jun 2026 v124
  *
  * Two fixes from v115/v116:
  *   1. All SHELL_URLS now carry the correct /alongside-app/ path prefix.
@@ -33,7 +33,7 @@
  * sw.js is always the last file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v122";
+const CACHE_NAME = "alongside-v124";
 
 const SHELL_URLS = [
 
@@ -70,6 +70,12 @@ const SHELL_URLS = [
   "/alongside-app/css/components/breathing-session.css",
   "/alongside-app/css/components/quiet-session.css",
   "/alongside-app/css/components/noticing.css",
+  "/alongside-app/css/layouts/today.css",
+  "/alongside-app/css/layouts/onboarding-additions.css",
+  "/alongside-app/css/components/settings.css",
+  "/alongside-app/css/components/weekly-plan-v2.css",
+  "/alongside-app/css/components/gym-programme.css",
+  "/alongside-app/css/components/journal-entry.css",
 
   // JS: Core
   "/alongside-app/js/app.js",
