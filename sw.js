@@ -1,7 +1,11 @@
 /**
  * sw.js
- * 26 Jun 2026 v129
+ * 26 Jun 2026 v130
  *
+ * alongside-v130 (26 Jun 2026) — today.js v3: name cap fix. coach-reflection.js v4:
+ *   name cap fix. intention.js v5: name cap fix (manual patch). router.js v6:
+ *   scroll reset on every view mount. equipment.js v3: bodyweight-only
+ *   toggles in-place, no sub-screen.
  * alongside-v129 (26 Jun 2026) — onboarding/frequency.js v1: new weekly
  *   frequency selection screen. onboarding/plan-select.js v1: new plan
  *   selection with Highly Recommended gold badge (#B8970A). complete.js v3:
@@ -34,7 +38,7 @@
  * sw.js is always the last file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v129";
+const CACHE_NAME = "alongside-v130";
 
 const SHELL_URLS = [
 
