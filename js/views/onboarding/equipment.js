@@ -1,10 +1,15 @@
 /**
  * js/views/onboarding/equipment.js
- * 26 Jun 2026 v2a
+ * 26 Jun 2026 v3
+ *
+ * v3 (26 Jun 2026)
+ *   Bodyweight only: tapping the card now toggles selection state on the
+ *   facility list (no sub-screen). No equipment is written — empty array
+ *   is the correct store state for bodyweight-only users. The card shows
+ *   a teal tick and active left-border when selected, tapping again deselects.
  *
  * v2a (26 Jun 2026)
- *   Fix: wireFacilities() finish button now routes to onboarding/frequency
- *   and does NOT call store.completeOnboarding() — that is plan-select.js's job.
+ *   Fix: wireFacilities() finish button routes to onboarding/frequency.
  *
  * v2 (26 Jun 2026)
  *   Facility cards: full card treatment — elevated background, large icon,
@@ -66,8 +71,9 @@ const FACILITY_DEFS = [
 
 // ── State ────────────────────────────────────────────────────────
 
-let screen       = "facilities"; // "facilities" | facility-id string
-let openCategory = null;         // category id currently expanded, or null
+let screen            = "facilities"; // "facilities" | facility-id string
+let openCategory      = null;         // category id currently expanded, or null
+let bodyweightSelected = false;       // bodyweight-only toggle state
 
 // ── Equipment helpers ────────────────────────────────────────────
 
@@ -111,8 +117,9 @@ function totalSelected() {
 // ── Render ───────────────────────────────────────────────────────
 
 export function render() {
-  screen       = "facilities";
-  openCategory = null;
+  screen             = "facilities";
+  openCategory       = null;
+  bodyweightSelected = false;
   return renderView();
 }
 
@@ -181,6 +188,26 @@ function renderFacilityCard(f) {
   const homeItems = f.scope === "home" ? (store.get("homeEquipment") || []) : [];
   const homeActive = f.id === "home" && homeItems.length > 0;
   const isActive = active || homeActive;
+
+  // Bodyweight only — toggle card, no sub-screen
+  if (f.id === "no-equipment") {
+    const bwActive = bodyweightSelected;
+    return `
+      <button class="equip-facility-card ${bwActive ? "equip-facility-card--active" : ""}"
+              data-facility="no-equipment"
+              data-bodyweight-toggle="true"
+              role="listitem"
+              aria-pressed="${bwActive}"
+              aria-label="${f.label}. ${f.description}. ${bwActive ? "Selected." : "Tap to select."}">
+        <span class="equip-facility-icon" aria-hidden="true">${f.icon}</span>
+        <span class="equip-facility-body">
+          <span class="equip-facility-label">${f.label}</span>
+          <span class="equip-facility-desc">${f.description}</span>
+        </span>
+        ${bwActive ? `<span class="equip-facility-check" aria-hidden="true">&#10003;</span>` : `<span class="equip-facility-chevron" aria-hidden="true">&#8250;</span>`}
+      </button>
+    `;
+  }
 
   return `
     <button class="equip-facility-card ${isActive ? "equip-facility-card--active" : ""}"
@@ -332,6 +359,12 @@ function wireFacilities() {
 
   document.querySelectorAll(".equip-facility-card[data-facility]").forEach(btn => {
     btn.addEventListener("click", () => {
+      if (btn.dataset.bodyweightToggle) {
+        // Toggle bodyweight selection — no sub-screen
+        bodyweightSelected = !bodyweightSelected;
+        rerender();
+        return;
+      }
       screen       = btn.dataset.facility;
       openCategory = null;
       rerender();
