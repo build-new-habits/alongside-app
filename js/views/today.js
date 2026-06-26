@@ -1,9 +1,9 @@
 /**
  * today.js
- * 23 Jun 2026 v2
+ * 26 Jun 2026 v3
  *
- * Daily entry point. The screen the user sees when they open the app.
- * Hub of the daily flow: Open → Check-in → Coach Proposal → home-threshold → Session.
+ * v3 (26 Jun 2026): Name capitalisation fix — _cap() helper added.
+ *   _buildGreeting() and renderSessionDone() now capitalise stored name.
  *
  * v2 — Phase 5:
  *   - Routes to home-threshold after proposal accepted (not directly to session)
@@ -22,14 +22,6 @@
  *   - Session completed today: shows "good work" state with gentle options
  *   - Nav bar visible
  *
- * Daily flow routing:
- *   Not checked in today          → Check in → checkin.js
- *   Checked in, no proposal yet   → checkin.js auto-routes to coach-reflection
- *                                   → coach-proposal → today.js receives proposal
- *   Proposal accepted             → home-threshold (or direct to session)
- *   Session done today            → "You moved today" state
- *   Return after session          → gentle options (noticing, breathing, library)
- *
  * WCAG 2.2 AA:
  *   Main CTA: minimum 44px touch target, descriptive aria-label.
  *   Greeting is an <h1>. All coach text rendered as <p>.
@@ -40,41 +32,27 @@
 import { store }               from '../store.js';
 import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
 
-// ─── View registration ────────────────────────────────────────────────────────
-
 export function TodayView(router) {
 
-  // ── Mount ──────────────────────────────────────────────────────────────────
-
   function mount(container) {
-    // Week advance check — handles Monday transition silently
     advanceWeekIfNeeded();
-
     const state = _resolveState();
 
     switch (state) {
       case 'proposal-accepted':
-        // Proposal was just accepted — route to home-threshold
-        // Graceful fallback: if home-threshold not registered, go direct to session
         _routeToThreshold();
         return;
-
       case 'session-done':
         renderSessionDone(container);
         break;
-
       case 'checked-in':
-        // Already checked in today but no session yet — go straight to proposal hub
         router.navigate('coach-reflection');
         return;
-
       default:
         renderDefault(container);
         break;
     }
   }
-
-  // ── State resolver ─────────────────────────────────────────────────────────
 
   function _resolveState() {
     const today        = _todayString();
@@ -82,7 +60,6 @@ export function TodayView(router) {
     const lastCheckin  = store.get('lastCheckin.timestamp');
     const activityLog  = store.get('activityLog') || [];
 
-    // Proposal accepted today (within last 10 minutes) → route to threshold
     if (lastProposal) {
       const proposalDate = new Date(lastProposal);
       const minsAgo      = (Date.now() - proposalDate.getTime()) / 60000;
@@ -91,14 +68,12 @@ export function TodayView(router) {
       }
     }
 
-    // Session completed today
     const sessionToday = activityLog.some(e => {
       const ts = e.completedAt || e.loggedAt || e.date;
       return ts && new Date(ts).toISOString().split('T')[0] === today;
     });
     if (sessionToday) return 'session-done';
 
-    // Checked in today
     if (lastCheckin && new Date(lastCheckin).toISOString().split('T')[0] === today) {
       return 'checked-in';
     }
@@ -106,21 +81,13 @@ export function TodayView(router) {
     return 'default';
   }
 
-  // ── Route to threshold ─────────────────────────────────────────────────────
-
   function _routeToThreshold() {
-    // home-threshold.js is content-gated (D3).
-    // Try to navigate to it — router will handle unknown routes.
-    // If VIEW_NAMES doesn't include 'home-threshold' yet, fall back to session.
     const sessionRoute = store.get('lastProposalType')
       ? _doorToRoute(store.get('lastProposalType'))
       : null;
-
-    // Attempt threshold — router falls back gracefully if not registered
     try {
       router.navigate('home-threshold');
     } catch (e) {
-      // home-threshold not yet deployed — go direct to session
       if (sessionRoute) {
         router.navigate(sessionRoute);
       } else {
@@ -131,13 +98,9 @@ export function TodayView(router) {
 
   function _doorToRoute(doorKey) {
     const MAP = {
-      'door-a':           null,   // route stored in generatedSession
-      'door-b':           null,
-      'door-c':           null,
-      'bypass-library':   'library',
-      'bypass-facilitate':'session-builder',
+      'bypass-library':    'library',
+      'bypass-facilitate': 'session-builder',
     };
-    // For door-a/b/c, read from generatedSession
     const generated = store.get('generatedSession');
     if (generated?.session?.type) {
       const TYPE_ROUTE = {
@@ -156,8 +119,6 @@ export function TodayView(router) {
     }
     return MAP[doorKey] || 'workout';
   }
-
-  // ── Default render (not yet checked in) ───────────────────────────────────
 
   function renderDefault(container) {
     const name         = store.get('name') || '';
@@ -210,17 +171,15 @@ export function TodayView(router) {
     attachEvents(container);
   }
 
-  // ── Session done render ────────────────────────────────────────────────────
-
   function renderSessionDone(container) {
-    const name     = store.get('name') || '';
+    const name      = store.get('name') || '';
     const timeGreet = _timeGreeting();
 
     container.innerHTML = `
       <div class="today-view today-view--done" role="main" aria-label="Today">
 
         <header class="today-header">
-          <h1 class="today-greeting">${_esc(timeGreet)}${name ? ', ' + _esc(name) : ''}.</h1>
+          <h1 class="today-greeting">${_esc(timeGreet)}${name ? ', ' + _esc(_cap(name)) : ''}.</h1>
           <p class="today-coach-line" role="status">
             You moved today. That's done.
           </p>
@@ -258,8 +217,6 @@ export function TodayView(router) {
     attachEvents(container);
   }
 
-  // ── Events ─────────────────────────────────────────────────────────────────
-
   function attachEvents(container) {
     const actions = {
       'checkin':        () => router.navigate('checkin'),
@@ -277,11 +234,10 @@ export function TodayView(router) {
     });
   }
 
-  // ── Content builders ───────────────────────────────────────────────────────
-
   function _buildGreeting(name) {
     const timeGreet = _timeGreeting();
-    return name ? `${timeGreet}, ${name}.` : `${timeGreet}.`;
+    const capName   = _cap(name);
+    return capName ? `${timeGreet}, ${capName}.` : `${timeGreet}.`;
   }
 
   function _buildCoachLine() {
@@ -289,7 +245,6 @@ export function TodayView(router) {
     const checkinHistory = store.get('checkinHistory') || {};
     const yesterday      = _yesterdayString();
 
-    // Reference yesterday's session if available
     const yesterdaySessions = activityLog.filter(e => {
       const ts = e.completedAt || e.loggedAt || e.date;
       return ts && new Date(ts).toISOString().split('T')[0] === yesterday;
@@ -313,14 +268,11 @@ export function TodayView(router) {
       return `You did ${label} yesterday.`;
     }
 
-    // Check-in streak (quiet signal — not a metric, just context)
     const recentCheckins = Object.keys(checkinHistory)
       .filter(d => d >= _daysAgoString(7))
       .length;
 
-    if (recentCheckins >= 5) return 'You\'ve been showing up.';
-    if (recentCheckins >= 3) return null; // no comment needed
-    if (recentCheckins === 0) return null;
+    if (recentCheckins >= 5) return "You've been showing up.";
 
     return null;
   }
@@ -341,8 +293,6 @@ export function TodayView(router) {
     }).length;
   }
 
-  // ── Date helpers ───────────────────────────────────────────────────────────
-
   function _todayString() {
     return new Date().toISOString().split('T')[0];
   }
@@ -361,13 +311,16 @@ export function TodayView(router) {
 
   function _mondayString() {
     const d    = new Date();
-    const day  = d.getDay(); // 0 = Sunday
-    const diff = day === 0 ? -6 : 1 - day; // Monday of current week
+    const day  = d.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
     d.setDate(d.getDate() + diff);
     return d.toISOString().split('T')[0];
   }
 
-  // ── Utility ────────────────────────────────────────────────────────────────
+  function _cap(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
 
   function _esc(str) {
     if (!str) return '';
