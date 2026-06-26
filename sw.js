@@ -1,10 +1,12 @@
 /**
  * sw.js
- * 26 Jun 2026 v127
+ * 26 Jun 2026 v128
  *
+ * alongside-v128 (26 Jun 2026) — equipment.js v2: facility cards full card
+ *   treatment, equipment sub-screen accordions + wrapping chip layout.
+ *   onboarding-additions.css v3: equip-facility-card, accordion, chip-wrap styles.
  * alongside-v127 (26 Jun 2026) — onboarding-additions.css v2: .chip-group/.chip
- *   and .equipment-chip rules added; fixes O3 (age/gender) and O9 (equipment)
- *   plain-text rendering failures found in Gemini QA.
+ *   and .equipment-chip rules; fixes O3/O9 plain-text rendering.
  * alongside-v126 (26 Jun 2026) — nav-fix.css v2: flex layout fix for nav bar.
  * alongside-v125 (26 Jun 2026) — CSS batch: today.css, settings.css,
  *   weekly-plan-v2.css, gym-programme.css, journal-entry.css,
@@ -14,14 +16,7 @@
  * alongside-v122 (24 Jun 2026) — goals.js v2: GOALS flat array re-export.
  * alongside-v121 (24 Jun 2026) — router.js v4: dual-pattern detection.
  * alongside-v120 (24 Jun 2026) — app.js v5: window.router + window.store globals.
- * alongside-v119 (23 Jun 2026) — Phase 5 sprint: store.js v6, signal-words.js,
- *   coach-voice.js, goals.js, checkin.js data, programmes.js, programmeEngine.js,
- *   coach-proposal.js v5, today.js v2, progress.js v2, settings.js v5,
- *   weekly-plan.js v2, gym-programme.js v2, journal-entry.js v2,
- *   onboarding/goals.js v2, onboarding/lifestyle.js v2, onboarding/complete.js v2.
- * alongside-v118 (24 Jun 2026) — app.js v3: explicit first navigate.
- * alongside-v117 — path prefix fixed, allSettled handler restored.
- * alongside-v115 — Phase 5 sprint files added (path prefix wrong — do not use).
+ * alongside-v119 (23 Jun 2026) — Phase 5 sprint: store.js v6, 21 files.
  * alongside-v114 (22 Jun 2026) — store.js v5 checkinHistory bug fixed.
  *
  * Content-gated — add to SHELL_URLS when deployed:
@@ -41,7 +36,7 @@
  * sw.js is always the last file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v127";
+const CACHE_NAME = "alongside-v128";
 
 const SHELL_URLS = [
 
