@@ -1,7 +1,12 @@
 /**
  * coach-reflection.js - Post Check-In Pattern Reflection
  *
- * 21 Jun 2026 v3 (bug fixes):
+ * 26 Jun 2026 v4
+ *
+ * v4 (26 Jun 2026): Name capitalisation fix — getFirstName() now
+ *   capitalises the first character of the stored name.
+ *
+ * v3 (21 Jun 2026 bug fixes):
  *   - Double path card bug fixed: mini-no-btn handler now calls rerender()
  *     instead of splicing the DOM directly. The surgical DOM replacement
  *     was leaving stale content and double-rendering the option paths.
@@ -14,12 +19,8 @@
  *     (the plan implies context). sessionLocation written to store before
  *     navigating to coach-proposal.
  *
- * 01 Jun 2026 v1
- *   "Your Session" h1 added.
- *
- * 30 May 2026 v2
- *   Options use intention-path CSS classes. Event wiring moved to
- *   wireOptions() with direct button listeners.
+ * 01 Jun 2026 v1 — "Your Session" h1 added.
+ * 30 May 2026 v2 — Options use intention-path CSS classes.
  *
  * Act 3 of the daily flow. Sits between check-in and session selection.
  * Route: coach-reflection
@@ -33,21 +34,21 @@ export const centered = false;
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-let miniState        = null;   // null | "asked"
+let miniState        = null;
 let selectedActivity = null;
-let showLocation     = false;  // true while location interstitial is showing
+let showLocation     = false;
 
 // ── Activity options for path B ───────────────────────────────────────────────
 
 const B_ACTIVITIES = [
-  { id: "gym",   label: "Gym session",   icon: "&#127947;" },
-  { id: "run",   label: "Run",           icon: "&#127939;" },
-  { id: "walk",  label: "Walk",          icon: "&#128694;" },
-  { id: "swim",  label: "Swim",          icon: "&#127946;" },
-  { id: "cycle", label: "Cycle",         icon: "&#128692;" },
-  { id: "yoga",  label: "Yoga / Pilates",icon: "&#129337;" },
+  { id: "gym",   label: "Gym session",      icon: "&#127947;" },
+  { id: "run",   label: "Run",              icon: "&#127939;" },
+  { id: "walk",  label: "Walk",             icon: "&#128694;" },
+  { id: "swim",  label: "Swim",             icon: "&#127946;" },
+  { id: "cycle", label: "Cycle",            icon: "&#128692;" },
+  { id: "yoga",  label: "Yoga / Pilates",   icon: "&#129337;" },
   { id: "class", label: "Class / workshop", icon: "&#129338;" },
-  { id: "other", label: "Something else",icon: "&#10067;"  },
+  { id: "other", label: "Something else",   icon: "&#10067;"  },
 ];
 
 const LOCATION_OPTIONS = [
@@ -59,7 +60,8 @@ const LOCATION_OPTIONS = [
 // ── Data helpers ──────────────────────────────────────────────────────────────
 
 function getFirstName() {
-  return (store.get("name") || "").split(" ")[0] || "";
+  const raw = (store.get("name") || "").split(" ")[0] || "";
+  return raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : "";
 }
 
 function getTodayStr() {
@@ -150,11 +152,6 @@ function hasSeverePainToday() {
   return conditions.some(id => (scores[id] || 0) >= 7);
 }
 
-/**
- * Returns true if the weekly plan covers today with a non-open type,
- * meaning location context is already implied and the interstitial
- * can be skipped.
- */
 function planCoversToday() {
   const weeklyPlan = store.get("weeklyPlan");
   if (!weeklyPlan?.updatedAt) return false;
@@ -245,7 +242,6 @@ function buildReflection() {
     ]};
   }
 
-  // Default
   const lines = [];
   if (energy >= 7 && mood >= 7) {
     lines.push("Good energy, good mood. Let's make the most of that.");
@@ -445,8 +441,6 @@ function renderOptions(reflection) {
   `;
 }
 
-// ── Rerender ──────────────────────────────────────────────────────────────────
-
 function rerender() {
   const main = document.getElementById("main-content");
   if (main) {
@@ -455,8 +449,6 @@ function rerender() {
   }
 }
 
-// ── Mount ─────────────────────────────────────────────────────────────────────
-
 export function onMount() {
   wireOptions();
   wireSecondSession();
@@ -464,7 +456,6 @@ export function onMount() {
 }
 
 function wireLocation() {
-  // Location option buttons
   document.querySelectorAll("[data-location]").forEach(btn => {
     btn.addEventListener("click", () => {
       store.set("sessionLocation", btn.dataset.location);
@@ -475,7 +466,6 @@ function wireLocation() {
     });
   });
 
-  // "Not sure" — skip location, navigate without setting it
   document.getElementById("location-skip-btn")?.addEventListener("click", () => {
     store.set("sessionLocation", null);
     showLocation = false;
@@ -486,10 +476,8 @@ function wireLocation() {
 }
 
 function wireOptions() {
-  // A: Suggest something for me — show location first (unless plan covers today)
   document.getElementById("option-a")?.addEventListener("click", () => {
     if (planCoversToday()) {
-      // Plan already implies context — skip location
       const reflection = buildReflection();
       store.set("proposalBias", reflection.proposalBias || null);
       router.navigate("coach-proposal");
@@ -499,14 +487,12 @@ function wireOptions() {
     }
   });
 
-  // B: toggle picker
   document.getElementById("option-b")?.addEventListener("click", () => {
     const picker = document.getElementById("b-activity-picker");
     if (!picker) return;
     picker.style.display = picker.style.display !== "none" ? "none" : "block";
   });
 
-  // B: activity chips
   document.querySelectorAll("[data-b-activity]").forEach(chip => {
     chip.addEventListener("click", () => {
       selectedActivity = chip.dataset.bActivity;
@@ -532,22 +518,19 @@ function wireOptions() {
 
   document.getElementById("option-b-confirm")?.addEventListener("click", logAndNavigateB);
 
-  // C: My plans
   document.getElementById("option-c")?.addEventListener("click", () => {
     router.navigate("prescribed");
   });
 
-  // D: Noticing
   document.getElementById("option-d")?.addEventListener("click", () => {
     router.navigate("noticing");
   });
 }
 
 function wireSecondSession() {
-  // "No, all good" — dismiss the second-session card and show options
   document.getElementById("mini-no-btn")?.addEventListener("click", () => {
     miniState = "dismissed";
-    rerender();  // Full rerender — render() now shows renderOptions() cleanly
+    rerender();
   });
 
   document.getElementById("mini-yes-btn")?.addEventListener("click", () => {
@@ -569,15 +552,11 @@ function wireSecondSession() {
   });
 }
 
-// ── onUnmount — reset local state when navigating away ───────────────────────
-
 export function onUnmount() {
   miniState        = null;
   selectedActivity = null;
   showLocation     = false;
 }
-
-// ── B-path navigation ─────────────────────────────────────────────────────────
 
 function logAndNavigateB() {
   if (!selectedActivity) return;
@@ -601,10 +580,10 @@ function logAndNavigateB() {
     router.navigate("coach-proposal");
     return;
   }
-  if (selectedActivity === "yoga")  { router.navigate("yoga-session");    return; }
-  if (selectedActivity === "run")   { router.navigate("reflect");          return; }
-  if (selectedActivity === "walk")  { router.navigate("reflect");          return; }
-  if (selectedActivity === "swim")  { router.navigate("reflect");          return; }
-  if (selectedActivity === "cycle") { router.navigate("reflect");          return; }
+  if (selectedActivity === "yoga")  { router.navigate("yoga-session");  return; }
+  if (selectedActivity === "run")   { router.navigate("reflect");        return; }
+  if (selectedActivity === "walk")  { router.navigate("reflect");        return; }
+  if (selectedActivity === "swim")  { router.navigate("reflect");        return; }
+  if (selectedActivity === "cycle") { router.navigate("reflect");        return; }
   router.navigate("reflect");
 }
