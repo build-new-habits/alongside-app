@@ -1,6 +1,10 @@
 /**
  * js/views/onboarding/equipment.js
- * 26 Jun 2026 v2
+ * 26 Jun 2026 v2a
+ *
+ * v2a (26 Jun 2026)
+ *   Fix: wireFacilities() finish button now routes to onboarding/frequency
+ *   and does NOT call store.completeOnboarding() — that is plan-select.js's job.
  *
  * v2 (26 Jun 2026)
  *   Facility cards: full card treatment — elevated background, large icon,
@@ -335,8 +339,7 @@ function wireFacilities() {
   });
 
   document.getElementById("equip-finish-btn")?.addEventListener("click", () => {
-    store.completeOnboarding();
-    router.navigate("onboarding/complete");
+    router.navigate("onboarding/frequency");
   });
 }
 
