@@ -1,6 +1,13 @@
 /**
  * intention.js - Intention Screen
  *
+ * 26 Jun 2026 v5
+ *
+ * v5 (26 Jun 2026): Name capitalisation fix — buildCoachLine() now  
+ *   capitalises the stored name before prepending as greeting.
+ *
+ * v4 (15 Jun 2026 S4-9/10) - "Something quieter > Breathing practice" now
+ *
  * 15 Jun 2026 v4 (S4-9/10) - "Something quieter > Breathing practice" now
  *   routes to breathing-session.js (the fully built 5-type/all-duration
  *   player) instead of straight to reflect.js, which previously did
@@ -152,7 +159,8 @@ function buildCoachLine() {
   const hasPain   = conditions.some(id => (painScores[id] || 0) >= 3);
   const name      = store.get("name") || "";
 
-  const greeting  = name ? name + ". " : "";
+  const capName   = name ? name.charAt(0).toUpperCase() + name.slice(1) : "";
+  const greeting  = capName ? capName + ". " : "";
 
   if (hasPain) {
     return greeting + "I can see things are a bit harder today. I've got options that work with that. What feels right?";
