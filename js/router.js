@@ -1,20 +1,14 @@
 /**
  * router.js
- * 24 Jun 2026 v4
+ * 26 Jun 2026 v5
+ *
+ * v5 — Added onboarding/frequency and onboarding/plan-select routes.
+ *   Both added to VIEW_NAMES and hideNavViews.
+ *   No other changes from v4.
  *
  * v4 — Dual-pattern view support.
- *   The existing views (checkin.js, coach-proposal.js, intention.js etc.)
- *   use the OLD pattern: export function render() + export function onMount().
- *   The new Phase 5 views use the NEW pattern: export function XxxView(router)
- *   returning { mount(container) }.
- *   v3 only supported the new pattern — breaking every existing view.
- *   v4 detects which pattern each module uses and calls it correctly.
- *   Both patterns coexist indefinitely. Views are migrated to the new
- *   pattern only when they are rewritten for functional reasons.
- *
  *   Old pattern detection: module.render is a function.
  *   New pattern detection: module[fn] is a function.
- *
  *   viewCache now stores the whole module, not just module[fn].
  *
  * v3 — 24 Jun 2026. All Phase 5 routes. main-content ID confirmed.
@@ -25,19 +19,21 @@
 const VIEW_NAMES = {
 
   // Onboarding
-  'welcome':                { path: './views/onboarding/welcome.js',      fn: 'WelcomeView'              },
-  'onboarding/name':        { path: './views/onboarding/name.js',         fn: 'NameView'                 },
-  'onboarding/about':       { path: './views/onboarding/about.js',        fn: 'AboutView'                },
-  'onboarding/body':        { path: './views/onboarding/body.js',         fn: 'BodyView'                 },
-  'onboarding/goals':       { path: './views/onboarding/goals.js',        fn: 'GoalsView'                },
-  'onboarding/conditions':  { path: './views/onboarding/conditions.js',   fn: 'ConditionsView'           },
-  'onboarding/lifestyle':   { path: './views/onboarding/lifestyle.js',    fn: 'LifestyleView'            },
-  'onboarding/equipment':   { path: './views/onboarding/equipment.js',    fn: 'EquipmentView'            },
-  'onboarding/goal-setup':  { path: './views/onboarding/goal-setup.js',   fn: 'GoalSetupView'            },
-  'onboarding/complete':    { path: './views/onboarding/complete.js',      fn: 'CompleteView'             },
-  'onboarding/arrival':     { path: './views/onboarding/arrival.js',      fn: 'ArrivalView'              },
-  'onboarding/hard-before': { path: './views/onboarding/hard-before.js',  fn: 'HardBeforeView'           },
-  'onboarding/reflection':  { path: './views/onboarding/reflection.js',   fn: 'OnboardingReflectionView' },
+  'welcome':                   { path: './views/onboarding/welcome.js',      fn: 'WelcomeView'              },
+  'onboarding/name':           { path: './views/onboarding/name.js',         fn: 'NameView'                 },
+  'onboarding/about':          { path: './views/onboarding/about.js',        fn: 'AboutView'                },
+  'onboarding/body':           { path: './views/onboarding/body.js',         fn: 'BodyView'                 },
+  'onboarding/goals':          { path: './views/onboarding/goals.js',        fn: 'GoalsView'                },
+  'onboarding/conditions':     { path: './views/onboarding/conditions.js',   fn: 'ConditionsView'           },
+  'onboarding/lifestyle':      { path: './views/onboarding/lifestyle.js',    fn: 'LifestyleView'            },
+  'onboarding/equipment':      { path: './views/onboarding/equipment.js',    fn: 'EquipmentView'            },
+  'onboarding/frequency':      { path: './views/onboarding/frequency.js',    fn: 'FrequencyView'            },
+  'onboarding/plan-select':    { path: './views/onboarding/plan-select.js',  fn: 'PlanSelectView'           },
+  'onboarding/goal-setup':     { path: './views/onboarding/goal-setup.js',   fn: 'GoalSetupView'            },
+  'onboarding/complete':       { path: './views/onboarding/complete.js',     fn: 'CompleteView'             },
+  'onboarding/arrival':        { path: './views/onboarding/arrival.js',      fn: 'ArrivalView'              },
+  'onboarding/hard-before':    { path: './views/onboarding/hard-before.js',  fn: 'HardBeforeView'           },
+  'onboarding/reflection':     { path: './views/onboarding/reflection.js',   fn: 'OnboardingReflectionView' },
 
   // Core daily flow
   'today':             { path: './views/today.js',            fn: 'TodayView'           },
@@ -87,6 +83,7 @@ const hideNavViews = new Set([
   'welcome',
   'onboarding/name', 'onboarding/about', 'onboarding/body', 'onboarding/goals',
   'onboarding/conditions', 'onboarding/lifestyle', 'onboarding/equipment',
+  'onboarding/frequency', 'onboarding/plan-select',
   'onboarding/goal-setup', 'onboarding/complete',
   'onboarding/arrival', 'onboarding/hard-before', 'onboarding/reflection',
   'home-threshold', 'community-impact', 'annual-reflection',
