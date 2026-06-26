@@ -683,18 +683,19 @@ export function CoachProposalView(router) {
   }
 
   function _getFallbackOptions(energyScore, intensity) {
+    const availMins = _getAvailableTime() || 30;
     // Safe fallbacks when generator is unavailable
     if (energyScore <= 3 || intensity === 'gentle') {
       return [
-        { label: 'Gentle movement', type: 'morning-session', durationMins: 20 },
-        { label: 'Breathing session', type: 'quiet-session', durationMins: 15 },
-        { label: 'Short walk',  type: 'walk-session', durationMins: 20 },
+        { label: 'Gentle movement',   type: 'workout',       durationMins: Math.min(20, availMins) },
+        { label: 'Breathing session', type: 'quiet-session', durationMins: Math.min(15, availMins) },
+        { label: 'Short walk',        type: 'walk-session',  durationMins: Math.min(20, availMins) },
       ];
     }
     return [
-      { label: 'Strength session', type: 'workout', durationMins: 35 },
-      { label: 'Mobility work', type: 'yoga-session', durationMins: 25 },
-      { label: 'Breathing session', type: 'quiet-session', durationMins: 15 },
+      { label: 'Strength session',  type: 'workout',       durationMins: Math.min(35, availMins) },
+      { label: 'Mobility work',     type: 'yoga-session',  durationMins: Math.min(25, availMins) },
+      { label: 'Breathing session', type: 'quiet-session', durationMins: Math.min(15, availMins) },
     ];
   }
 
