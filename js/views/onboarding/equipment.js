@@ -1,16 +1,18 @@
 /**
- * equipment.js - Onboarding Step 8: Equipment selection
+ * js/views/onboarding/equipment.js
+ * 26 Jun 2026 v2
  *
- * 22 May 2026 v1 (S4-3):
- *   Rebuilt to match Settings > Equipment exactly.
- *   Two-level flow: facility cards -> sub-screen with chips.
- *   Facilities: Full gym / Swimming pool / Fitness studio / Home setup / Bodyweight only.
- *   Sub-screen shows equipment chips for that facility, togglable.
- *   Preset toggle available for gym/pool/studio.
- *   Back from sub-screen returns to facility list (not previous onboarding step).
- *   Back from facility list returns to onboarding/lifestyle.
- *   "Finish setup" writes equipment and navigates to onboarding/complete.
- *   Same FACILITY_DEFS and chip pattern as settings.js for consistent UX.
+ * v2 (26 Jun 2026)
+ *   Facility cards: full card treatment — elevated background, large icon,
+ *   description line, chevron right-aligned, teal left-border selected state.
+ *   Equipment sub-screen: collapsible accordions per category, first open by
+ *   default. Wrapping chip layout inside each accordion. Category header shows
+ *   selected count badge when items are chosen inside. Preset toggle stays
+ *   above accordions as a one-tap shortcut. Back/Done wiring unchanged.
+ *
+ * v1 (22 May 2026 S4-3)
+ *   Rebuilt to match Settings > Equipment. Two-level flow: facility cards ->
+ *   sub-screen with chips. Preset toggle. Same FACILITY_DEFS as settings.js.
  */
 
 import { store }             from "../../store.js";
@@ -18,12 +20,12 @@ import { EQUIPMENT_CATEGORIES } from "../../data/equipment.js";
 
 export const centered = false;
 
-// ---- Facility definitions (matches settings.js exactly) --------------------
+// ── Facility definitions (matches settings.js) ───────────────────
 
 const FACILITY_DEFS = [
   {
     id: "gym-full", label: "Full gym", icon: "&#127947;", scope: "gym",
-    description: "Fully-equipped gym -- weights, machines, cardio",
+    description: "Weights, machines, cardio — the full setup",
     equipment: [
       "dumbbells-light","dumbbells-medium","dumbbells-heavy","adjustable-dumbbells",
       "kettlebell-light","kettlebell-medium","kettlebell-heavy",
@@ -38,31 +40,32 @@ const FACILITY_DEFS = [
   },
   {
     id: "swimming-pool", label: "Swimming pool", icon: "&#127946;", scope: "gym",
-    description: "Pool access -- lane swimming, aqua fitness",
+    description: "Lane swimming or aqua fitness",
     equipment: ["swimming-pool"]
   },
   {
     id: "fitness-studio", label: "Fitness studio", icon: "&#127973;", scope: "gym",
-    description: "Studio classes -- yoga, pilates, spin, circuits",
+    description: "Yoga, pilates, spin, or circuit classes",
     equipment: ["fitness-studio","yoga-mat","band-light","band-medium","step-platform"]
   },
   {
     id: "home", label: "Home setup", icon: "&#127968;", scope: "home",
-    description: "What you have at home",
+    description: "Tell me what you have at home",
     equipment: []
   },
   {
     id: "no-equipment", label: "Bodyweight only", icon: "&#128694;", scope: "home",
-    description: "No equipment -- floor space is enough",
+    description: "Floor space is all you need",
     equipment: []
   },
 ];
 
-// ---- State ------------------------------------------------------------------
+// ── State ────────────────────────────────────────────────────────
 
-let screen = "facilities"; // "facilities" | facility-id string
+let screen       = "facilities"; // "facilities" | facility-id string
+let openCategory = null;         // category id currently expanded, or null
 
-// ---- Equipment helpers (same logic as settings.js) -------------------------
+// ── Equipment helpers ────────────────────────────────────────────
 
 function getEquipmentForScope(scope) {
   return scope === "home"
@@ -101,16 +104,16 @@ function totalSelected() {
   return (store.get("equipment") || []).length;
 }
 
-// ---- Render -----------------------------------------------------------------
+// ── Render ───────────────────────────────────────────────────────
 
 export function render() {
-  screen = "facilities";
+  screen       = "facilities";
+  openCategory = null;
   return renderView();
 }
 
 function renderView() {
-  if (screen !== "facilities") return renderSubScreen(screen);
-  return renderFacilities();
+  return screen === "facilities" ? renderFacilities() : renderSubScreen(screen);
 }
 
 function renderFacilities() {
@@ -138,67 +141,24 @@ function renderFacilities() {
       </div>
 
       <div class="onboarding-content" style="padding-bottom:var(--space-2);">
-        <h1>What equipment do you have?</h1>
+        <h1>What do you have available?</h1>
         <div class="onboarding-coach-line">
           <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
           <p class="onboarding-coach-text">
-            Tell me what you have available and I'll build around it.
-            A clear floor is enough. If you have more, great -- I'll use it.
-            But I'll never assume you have things you don't.
+            Tell me where you train and what you have.
+            I will build every session around what is actually available to you —
+            never assuming you have something you have not told me about.
           </p>
         </div>
 
-        <!-- Gym and facilities -->
-        <h3 style="font-size:var(--text-xs);letter-spacing:0.08em;font-weight:var(--font-semibold);
-                   color:var(--color-primary);text-transform:uppercase;
-                   margin:var(--space-5) 0 var(--space-3);">
-          At the gym or facility
-        </h3>
-        <div class="equipment-facility-grid">
-          ${gymFacilities.map(f => {
-            const active = isFacilityActive(f);
-            return `
-              <button class="equipment-facility-card ${active ? "equipment-facility-card--active" : ""}"
-                      data-facility="${f.id}"
-                      aria-label="${f.label}: ${f.description}. ${active ? "Active" : "Tap to add"}">
-                <span class="equipment-facility-icon" aria-hidden="true">${f.icon}</span>
-                <span class="equipment-facility-label">${f.label}</span>
-                ${active ? `<span class="equipment-facility-check" aria-hidden="true">&#10003;</span>` : ""}
-              </button>
-            `;
-          }).join("")}
+        <h3 class="equip-section-heading">At the gym or facility</h3>
+        <div class="equip-facility-list" role="list">
+          ${gymFacilities.map(f => renderFacilityCard(f)).join("")}
         </div>
 
-        <!-- Home -->
-        <h3 style="font-size:var(--text-xs);letter-spacing:0.08em;font-weight:var(--font-semibold);
-                   color:var(--color-primary);text-transform:uppercase;
-                   margin:var(--space-5) 0 var(--space-3);">
-          At home
-        </h3>
-        <div class="equipment-facility-grid">
-          ${homeFacilities.map(f => {
-            const homeItems = store.get("homeEquipment") || [];
-            const active    = f.id !== "no-equipment" && homeItems.length > 0;
-            return `
-              <button class="equipment-facility-card ${active ? "equipment-facility-card--active" : ""}"
-                      data-facility="${f.id}"
-                      aria-label="${f.label}: ${f.description}">
-                <span class="equipment-facility-icon" aria-hidden="true">${f.icon}</span>
-                <span class="equipment-facility-label">${f.label}</span>
-                ${active ? `<span class="equipment-facility-check" aria-hidden="true">&#10003;</span>` : ""}
-              </button>
-            `;
-          }).join("")}
-        </div>
-
-        <p class="text-xs text-muted" style="margin-top:var(--space-3);">
-          Tap any location to see and choose the equipment available there.
-        </p>
-
-        <div class="bodyweight-note" style="margin-top:var(--space-4);">
-          <p class="text-sm text-muted">
-            &#128161; No equipment? No problem. Bodyweight exercises are powerful and effective.
-          </p>
+        <h3 class="equip-section-heading">At home</h3>
+        <div class="equip-facility-list" role="list">
+          ${homeFacilities.map(f => renderFacilityCard(f)).join("")}
         </div>
       </div>
 
@@ -206,11 +166,30 @@ function renderFacilities() {
         <button class="btn btn-primary btn-large btn-full" id="equip-finish-btn">
           ${total > 0 ? "Finish setup" : "Continue with bodyweight only"}
         </button>
-        <p class="text-sm text-secondary text-center" style="margin-top:var(--space-3);">
-          ${total > 0 ? total + " items selected" : ""}
-        </p>
+        ${total > 0 ? `<p class="text-sm text-secondary text-center" style="margin-top:var(--space-2);">${total} items selected</p>` : ""}
       </div>
     </div>
+  `;
+}
+
+function renderFacilityCard(f) {
+  const active = isFacilityActive(f);
+  const homeItems = f.scope === "home" ? (store.get("homeEquipment") || []) : [];
+  const homeActive = f.id === "home" && homeItems.length > 0;
+  const isActive = active || homeActive;
+
+  return `
+    <button class="equip-facility-card ${isActive ? "equip-facility-card--active" : ""}"
+            data-facility="${f.id}"
+            role="listitem"
+            aria-label="${f.label}. ${f.description}. ${isActive ? "Items selected. " : ""}Tap to open.">
+      <span class="equip-facility-icon" aria-hidden="true">${f.icon}</span>
+      <span class="equip-facility-body">
+        <span class="equip-facility-label">${f.label}</span>
+        <span class="equip-facility-desc">${f.description}</span>
+      </span>
+      ${isActive ? `<span class="equip-facility-check" aria-hidden="true">&#10003;</span>` : `<span class="equip-facility-chevron" aria-hidden="true">&#8250;</span>`}
+    </button>
   `;
 }
 
@@ -221,6 +200,23 @@ function renderSubScreen(facilityId) {
   const currentItems = getEquipmentForScope(facility.scope);
   const isPreset     = facility.equipment.length > 0;
   const presetActive = isPreset && facility.equipment.some(eq => currentItems.includes(eq));
+
+  // Determine which categories have items relevant to this facility
+  const relevantCats = EQUIPMENT_CATEGORIES.map(cat => ({
+    ...cat,
+    items: cat.items.filter(item =>
+      facility.scope === "home" ||
+      facility.equipment.includes(item.id) ||
+      currentItems.includes(item.id)
+    )
+  })).filter(cat => cat.items.length > 0);
+
+  // Default: open the first category
+  if (openCategory === null && relevantCats.length > 0) {
+    openCategory = relevantCats[0].id;
+  }
+
+  const totalInFacility = currentItems.length;
 
   return `
     <div class="onboarding-view">
@@ -237,108 +233,107 @@ function renderSubScreen(facilityId) {
 
       <div class="onboarding-content">
 
-        <p class="text-sm text-secondary" style="margin-bottom:var(--space-4);">
-          ${facility.description}
-        </p>
-
         ${isPreset ? `
-          <div class="card" style="margin-bottom:var(--space-4);padding:var(--space-4);">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <div>
-                <p style="font-size:var(--text-sm);font-weight:var(--font-semibold);margin:0 0 2px;">
-                  Use ${facility.label} preset
-                </p>
-                <p class="text-xs text-muted" style="margin:0;">
-                  Auto-fills ${facility.equipment.length} items
-                </p>
-              </div>
-              <button class="btn ${presetActive ? "btn-secondary" : "btn-primary"} btn-sm"
-                      id="equip-preset-toggle"
-                      data-facility="${facility.id}"
-                      aria-pressed="${presetActive}">
-                ${presetActive ? "Remove preset" : "Add preset"}
-              </button>
+          <div class="equip-preset-card">
+            <div class="equip-preset-card__body">
+              <p class="equip-preset-card__title">Add everything from ${facility.label}</p>
+              <p class="equip-preset-card__sub">${facility.equipment.length} items in one tap</p>
             </div>
+            <button class="btn ${presetActive ? "btn-secondary" : "btn-primary"} btn-sm"
+                    id="equip-preset-toggle"
+                    data-facility="${facility.id}"
+                    aria-pressed="${presetActive}">
+              ${presetActive ? "Remove all" : "Add all"}
+            </button>
           </div>
         ` : ""}
 
-        ${EQUIPMENT_CATEGORIES.map(cat => {
-          const catItems = cat.items.filter(item =>
-            facility.scope === "home" ||
-            facility.equipment.includes(item.id) ||
-            currentItems.includes(item.id)
-          );
-          if (catItems.length === 0) return "";
-          const catCount = catItems.filter(item => currentItems.includes(item.id)).length;
-          return `
-            <div class="equipment-settings-category">
-              <div class="equipment-category-heading">
-                <span>${cat.icon} ${cat.name}</span>
-                ${catCount > 0 ? `<span class="equipment-cat-count">${catCount} selected</span>` : ""}
-              </div>
-              <div class="equipment-chip-grid">
-                ${catItems.map(item => `
-                  <button class="equipment-chip ${currentItems.includes(item.id) ? "selected" : ""}"
-                          data-equipment="${item.id}"
-                          data-scope="${facility.scope}"
-                          aria-pressed="${currentItems.includes(item.id)}">
-                    ${item.name}
-                  </button>
-                `).join("")}
-              </div>
-            </div>
-          `;
-        }).join("")}
-
-        ${facility.scope === "home" && currentItems.length === 0 ? `
-          <div class="card" style="text-align:center;padding:var(--space-6);">
-            <p class="text-secondary">No home equipment yet. Tap items above to add them.</p>
+        ${facility.scope === "home" && relevantCats.length === 0 ? `
+          <div class="card" style="text-align:center;padding:var(--space-6);margin-top:var(--space-4);">
+            <p class="text-secondary">Use the categories below to add your home equipment.</p>
             <p class="text-sm text-muted" style="margin-top:var(--space-2);">
               A clear floor is enough. I will never assume you have something you have not told me about.
             </p>
           </div>
         ` : ""}
 
+        <div class="equip-accordion-list">
+          ${relevantCats.length > 0 ? relevantCats.map(cat => {
+            const selectedInCat = cat.items.filter(item => currentItems.includes(item.id)).length;
+            const isOpen        = openCategory === cat.id;
+            return `
+              <div class="equip-accordion ${isOpen ? "equip-accordion--open" : ""}"
+                   data-cat-id="${cat.id}">
+                <button class="equip-accordion__header"
+                        data-cat-toggle="${cat.id}"
+                        aria-expanded="${isOpen}"
+                        aria-controls="equip-cat-${cat.id}">
+                  <span class="equip-accordion__heading">
+                    <span aria-hidden="true">${cat.icon}</span>
+                    ${cat.name}
+                  </span>
+                  <span class="equip-accordion__meta">
+                    ${selectedInCat > 0 ? `<span class="equip-cat-badge">${selectedInCat}</span>` : ""}
+                    <span class="equip-accordion__chevron" aria-hidden="true">&#8250;</span>
+                  </span>
+                </button>
+                <div class="equip-accordion__body" id="equip-cat-${cat.id}"
+                     ${isOpen ? "" : `style="display:none;"`}>
+                  <div class="equip-chip-wrap">
+                    ${cat.items.map(item => `
+                      <button class="equip-item-chip ${currentItems.includes(item.id) ? "equip-item-chip--selected" : ""}"
+                              data-equipment="${item.id}"
+                              data-scope="${facility.scope}"
+                              aria-pressed="${currentItems.includes(item.id)}">
+                        ${item.name}
+                      </button>
+                    `).join("")}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("") : `
+            <div class="card" style="text-align:center;padding:var(--space-6);">
+              <p class="text-secondary">No equipment categories available for this location.</p>
+            </div>
+          `}
+        </div>
+
       </div>
 
       <div class="onboarding-actions">
         <button class="btn btn-primary btn-large btn-full" id="equip-sub-done-btn">
-          Done
+          ${totalInFacility > 0 ? "Done — " + totalInFacility + " item" + (totalInFacility !== 1 ? "s" : "") + " selected" : "Done"}
         </button>
       </div>
     </div>
   `;
 }
 
-// ---- Mount ------------------------------------------------------------------
+// ── Mount ────────────────────────────────────────────────────────
 
 export function onMount() {
   wireView();
 }
 
 function wireView() {
-  if (screen === "facilities") {
-    wireFacilities();
-  } else {
-    wireSubScreen();
-  }
+  if (screen === "facilities") wireFacilities();
+  else wireSubScreen();
 }
 
 function wireFacilities() {
-  // Back to lifestyle
   document.getElementById("equip-onboard-back")?.addEventListener("click", () => {
     router.navigate("onboarding/lifestyle");
   });
 
-  // Facility card tap -- open sub-screen
-  document.querySelectorAll(".equipment-facility-card[data-facility]").forEach(btn => {
+  document.querySelectorAll(".equip-facility-card[data-facility]").forEach(btn => {
     btn.addEventListener("click", () => {
-      screen = btn.dataset.facility;
+      screen       = btn.dataset.facility;
+      openCategory = null;
       rerender();
     });
   });
 
-  // Finish setup
   document.getElementById("equip-finish-btn")?.addEventListener("click", () => {
     store.completeOnboarding();
     router.navigate("onboarding/complete");
@@ -346,9 +341,10 @@ function wireFacilities() {
 }
 
 function wireSubScreen() {
-  // Back to facility list
+  // Back
   document.getElementById("equip-sub-back")?.addEventListener("click", () => {
-    screen = "facilities";
+    screen       = "facilities";
+    openCategory = null;
     rerender();
   });
 
@@ -358,8 +354,17 @@ function wireSubScreen() {
     rerender();
   });
 
-  // Equipment chip toggle
-  document.querySelectorAll(".equipment-chip[data-equipment]").forEach(chip => {
+  // Accordion toggles
+  document.querySelectorAll("[data-cat-toggle]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const catId  = btn.dataset.catToggle;
+      openCategory = openCategory === catId ? null : catId;
+      rerender();
+    });
+  });
+
+  // Equipment chip toggles
+  document.querySelectorAll(".equip-item-chip[data-equipment]").forEach(chip => {
     chip.addEventListener("click", () => {
       const id      = chip.dataset.equipment;
       const scope   = chip.dataset.scope;
@@ -368,21 +373,14 @@ function wireSubScreen() {
         ? current.filter(x => x !== id)
         : [...current, id];
       saveEquipmentForScope(scope, updated);
-      chip.classList.toggle("selected", updated.includes(id));
-      chip.setAttribute("aria-pressed", updated.includes(id));
-      // Update category count
-      const catEl   = chip.closest(".equipment-settings-category");
-      const countEl = catEl?.querySelector(".equipment-cat-count");
-      if (countEl) {
-        const n = Array.from(catEl.querySelectorAll(".equipment-chip.selected")).length;
-        countEl.textContent = n > 0 ? n + " selected" : "";
-      }
+      rerender();
     });
   });
 
-  // Done -- return to facility list
+  // Done
   document.getElementById("equip-sub-done-btn")?.addEventListener("click", () => {
-    screen = "facilities";
+    screen       = "facilities";
+    openCategory = null;
     rerender();
   });
 }
