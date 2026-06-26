@@ -1,6 +1,9 @@
 /**
  * router.js
- * 26 Jun 2026 v5
+ * 26 Jun 2026 v6
+ *
+ * v6 — Scroll reset on every view mount: window.scrollTo(0,0) called
+ *   immediately after container.innerHTML is set, before focus management.
  *
  * v5 — Added onboarding/frequency and onboarding/plan-select routes.
  *   Both added to VIEW_NAMES and hideNavViews.
@@ -175,6 +178,7 @@ export const router = {
       if (typeof mod[fn] === 'function') {
         const view = mod[fn](this);
         container.innerHTML = '';
+        window.scrollTo(0, 0);
         view.mount(container);
 
       // ── Old pattern: module exports render() + onMount() ──────────────────
@@ -182,6 +186,7 @@ export const router = {
       //      export function onMount() { /* wire events */ }
       } else if (typeof mod.render === 'function') {
         container.innerHTML = mod.render();
+        window.scrollTo(0, 0);
         if (typeof mod.onMount === 'function') {
           mod.onMount();
         }
