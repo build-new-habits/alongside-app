@@ -1,10 +1,16 @@
 /**
  * onboarding/complete.js
- * 26 Jun 2026 v3
+ * 26 Jun 2026 v4
  *
  * Onboarding completion — pure celebration screen.
  * Programme selection and onboarding completion are now handled by
  * plan-select.js. This screen receives control after those writes.
+ *
+ * v4 (26 Jun 2026):
+ *   Routes directly to today instead of onboarding/arrival.
+ *   arrival.js is content-gated (D6) — async router.navigate() does not
+ *   throw on 404, so the v3 try/catch never fired, crashing the view.
+ *   Update to onboarding/arrival once D6 is deployed.
  *
  * v3 (26 Jun 2026):
  *   - Programme selection removed — plan-select.js owns it.
@@ -105,11 +111,9 @@ export function CompleteView(router) {
     `;
 
     container.querySelector("[data-action='continue']")?.addEventListener("click", () => {
-      try {
-        router.navigate("onboarding/arrival");
-      } catch (e) {
-        router.navigate("today");
-      }
+      // D6 content gate: route to today until arrival.js is deployed.
+      // Update to router.navigate("onboarding/arrival") after D6 complete.
+      router.navigate("today");
     });
   }
 
