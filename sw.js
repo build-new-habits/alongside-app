@@ -1,7 +1,9 @@
 /**
  * sw.js
- * 26 Jun 2026 v130
+ * 26 Jun 2026 v131
  *
+ * alongside-v131 (26 Jun 2026) — complete.js v4: routes to today instead of
+ *   onboarding/arrival (D6 content gate). Fixes crash on "Let's begin".
  * alongside-v130 (26 Jun 2026) — today.js v3: name cap fix. coach-reflection.js v4:
  *   name cap fix. intention.js v5: name cap fix (manual patch). router.js v6:
  *   scroll reset on every view mount. equipment.js v3: bodyweight-only
@@ -38,7 +40,7 @@
  * sw.js is always the last file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v130";
+const CACHE_NAME = "alongside-v131";
 
 const SHELL_URLS = [
 
