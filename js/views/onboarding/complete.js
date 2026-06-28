@@ -1,24 +1,21 @@
 /**
  * onboarding/complete.js
- * 26 Jun 2026 v4
+ * 28 Jun 2026 v5
  *
- * Onboarding completion — pure celebration screen.
- * Programme selection and onboarding completion are now handled by
- * plan-select.js. This screen receives control after those writes.
+ * v5 (28 Jun 2026):
+ *   Routes to onboarding/arrival now that D6 content is deployed
+ *   and arrival.js, hard-before.js, reflection.js are built.
+ *   Removes the D6 content gate comment — gate is cleared.
  *
  * v4 (26 Jun 2026):
  *   Routes directly to today instead of onboarding/arrival.
- *   arrival.js is content-gated (D6) — async router.navigate() does not
- *   throw on 404, so the v3 try/catch never fired, crashing the view.
- *   Update to onboarding/arrival once D6 is deployed.
+ *   arrival.js was content-gated (D6) — now resolved.
  *
  * v3 (26 Jun 2026):
  *   - Programme selection removed — plan-select.js owns it.
  *   - store.completeOnboarding() removed — called by plan-select.js on confirm.
  *   - Journey card now reads from already-written activeProgramme fields.
  *   - Back button removed — this is a terminal celebration, not revisitable.
- *   - Routes to onboarding/arrival (D6 content gate) on continue,
- *     with graceful fallback to today.
  *
  * v2 (23 Jun 2026 S4-3):
  *   - Journey outline card, planPresentedAt, routes to arrival.js.
@@ -102,7 +99,7 @@ export function CompleteView(router) {
           <button
             class="btn btn-primary btn-large btn-full"
             data-action="continue"
-            aria-label="Begin — go to the app">
+            aria-label="Continue to meet your coach">
             Let's begin
           </button>
         </div>
@@ -111,9 +108,7 @@ export function CompleteView(router) {
     `;
 
     container.querySelector("[data-action='continue']")?.addEventListener("click", () => {
-      // D6 content gate: route to today until arrival.js is deployed.
-      // Update to router.navigate("onboarding/arrival") after D6 complete.
-      router.navigate("today");
+      router.navigate("onboarding/arrival");
     });
   }
 
