@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * alongside-v133 (28 Jun 2026) — arrival.js v2, hard-before.js v2, reflection.js v2:
+ *   fix import paths for coach-voice.js and beat3-scripts.js
+ *   (were ../data/ — correct path is ../../data/ from onboarding subdirectory).
+ *
  * alongside-v132 (28 Jun 2026) — Build Step 7: arrival.js v1, hard-before.js v1,
  *   reflection.js v1 (three new onboarding files — Beat 1, 2, 3);
  *   beat3-scripts.js v1 (D6 content data file);
@@ -17,7 +21,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v132";
+const CACHE_NAME = "alongside-v133";
 
 const SHELL_URLS = [
 
