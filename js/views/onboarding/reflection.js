@@ -1,6 +1,6 @@
 /**
  * onboarding/reflection.js
- * 28 Jun 2026 v1
+ * 28 Jun 2026 v2
  *
  * Beat 3 — The Reflection.
  * Coach reflects back what the user has shared.
@@ -34,8 +34,8 @@
  */
 
 import { store } from "../../store.js";
-import { getBeat3Script } from "../data/beat3-scripts.js";
-import { getTimingRules } from "../data/coach-voice.js";
+import { getBeat3Script } from "../../data/beat3-scripts.js";
+import { getTimingRules } from "../../data/coach-voice.js";
 
 // Fallback script for users who skipped Beat 2
 const FALLBACK_SCRIPT = [
