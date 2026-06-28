@@ -1,6 +1,6 @@
 /**
  * onboarding/hard-before.js
- * 28 Jun 2026 v1
+ * 28 Jun 2026 v2
  *
  * Beat 2 — The Single Real Question.
  * Asks what has made movement hard before.
@@ -33,7 +33,7 @@
  */
 
 import { store } from "../../store.js";
-import { getChipAcknowledgement } from "../data/beat3-scripts.js";
+import { getChipAcknowledgement } from "../../data/beat3-scripts.js";
 
 // Territory definitions — chip label + ID
 // Order matters: most common/accessible territories first.
