@@ -1,6 +1,6 @@
 /**
  * onboarding/arrival.js
- * 28 Jun 2026 v1
+ * 28 Jun 2026 v2
  *
  * Beat 1 — The Castle.
  * First thing a new user sees after mechanical onboarding.
@@ -28,7 +28,7 @@
  */
 
 import { store } from "../../store.js";
-import { getTimingRules } from "../data/coach-voice.js";
+import { getTimingRules } from "../../data/coach-voice.js";
 
 export function ArrivalView(router) {
 
