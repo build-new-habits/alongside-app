@@ -1,195 +1,153 @@
 /**
- * sw.js
- * 26 Jun 2026 v131
+ * sw.js - Alongside Service Worker
  *
- * alongside-v131 (26 Jun 2026) — complete.js v4: routes to today instead of
- *   onboarding/arrival (D6 content gate). Fixes crash on "Let's begin".
- * alongside-v130 (26 Jun 2026) — today.js v3: name cap fix. coach-reflection.js v4:
- *   name cap fix. intention.js v5: name cap fix (manual patch). router.js v6:
- *   scroll reset on every view mount. equipment.js v3: bodyweight-only
- *   toggles in-place, no sub-screen.
- * alongside-v129 (26 Jun 2026) — onboarding/frequency.js v1: new weekly
- *   frequency selection screen. onboarding/plan-select.js v1: new plan
- *   selection with Highly Recommended gold badge (#B8970A). complete.js v3:
- *   pure celebration screen, programme selection moved to plan-select.
- *   onboarding-additions.css v4: freq-card, plan-card, plan-badge styles.
- * alongside-v128 (26 Jun 2026) — equipment.js v2: facility cards, accordions.
- * alongside-v127 (26 Jun 2026) — onboarding-additions.css v2: chip/equipment fixes.
- * alongside-v126 (26 Jun 2026) — nav-fix.css v2: flex layout fix for nav bar.
- * alongside-v125 (26 Jun 2026) — CSS batch: today.css, settings.css,
- *   weekly-plan-v2.css, gym-programme.css, journal-entry.css,
- *   onboarding-additions.css v1.
- * alongside-v124 (25 Jun 2026) — coach-proposal.js v6: routing + availTime fix.
- * alongside-v119 (23 Jun 2026) — Phase 5 sprint: store.js v6, 21 files.
- * alongside-v114 (22 Jun 2026) — store.js v5 checkinHistory bug fixed.
+ * alongside-v132 (28 Jun 2026) — Build Step 7: arrival.js v1, hard-before.js v1,
+ *   reflection.js v1 (three new onboarding files — Beat 1, 2, 3);
+ *   beat3-scripts.js v1 (D6 content data file);
+ *   complete.js v5 (routes to onboarding/arrival);
+ *   onboarding-additions.css v5 (arrival, hard-before, reflection styles).
  *
- * Content-gated — add to SHELL_URLS when deployed:
- *   /alongside-app/js/views/home-threshold.js          D3
- *   /alongside-app/js/views/community-impact.js        D10
- *   /alongside-app/js/views/annual-reflection.js       D8
- *   /alongside-app/js/views/onboarding/arrival.js      D6
- *   /alongside-app/js/views/onboarding/hard-before.js  D6
- *   /alongside-app/js/views/onboarding/reflection.js   D6
- *   /alongside-app/js/data/noticing-territories.js     D5
- *   /alongside-app/js/data/mindful-prompts.js          D7
- *   /alongside-app/css/components/checkin-conversation.css  D2
- *   /alongside-app/css/components/home-threshold.css   D3
- *   /alongside-app/css/components/community-impact.css D10
- *   /alongside-app/css/components/annual-reflection.css D8
+ * alongside-v131 (26 Jun 2026) — Onboarding QA fixes: equipment.js v3,
+ *   frequency.js v1, plan-select.js v1, complete.js v4, router.js v6,
+ *   today.js v3, coach-reflection.js v4, intention.js v5,
+ *   onboarding-additions.css v4.
  *
- * sw.js is always the last file deployed in any batch.
+ * alongside-v130 (26 Jun 2026) — nav-fix.css v2, css/main.css v6.
+ *
+ * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v131";
+const CACHE_NAME = "alongside-v132";
 
 const SHELL_URLS = [
 
-  // App shell
-  "/alongside-app/",
-  "/alongside-app/index.html",
-  "/alongside-app/manifest.json",
+// App shell
+"/alongside-app/",
+"/alongside-app/index.html",
 
-  // CSS: Base
-  "/alongside-app/css/main.css",
-  "/alongside-app/css/base/variables.css",
-  "/alongside-app/css/base/reset.css",
-  "/alongside-app/css/base/typography.css",
-  "/alongside-app/css/base/global.css",
+// CSS
+"/alongside-app/css/main.css",
+"/alongside-app/css/layouts/onboarding-additions.css",
+"/alongside-app/css/layouts/today.css",
+"/alongside-app/css/layouts/progress.css",
+"/alongside-app/css/components/session-guard.css",
+"/alongside-app/css/components/weekly-plan.css",
+"/alongside-app/css/components/breathing-session.css",
+"/alongside-app/css/components/quiet-session.css",
+"/alongside-app/css/components/noticing.css",
+"/alongside-app/css/components/coach-proposal.css",
+"/alongside-app/css/components/settings.css",
+"/alongside-app/css/components/weekly-plan-v2.css",
+"/alongside-app/css/components/gym-programme.css",
+"/alongside-app/css/components/journal-entry.css",
+"/alongside-app/css/components/nav-fix.css",
 
-  // CSS: Layouts
-  "/alongside-app/css/layouts/app-shell.css",
-  "/alongside-app/css/layouts/onboarding.css",
-  "/alongside-app/css/layouts/goal-setup.css",
-  "/alongside-app/css/layouts/progress.css",
-  "/alongside-app/css/layouts/today.css",
-  "/alongside-app/css/layouts/onboarding-additions.css",
+// Core JS
+"/alongside-app/js/app.js",
+"/alongside-app/js/router.js",
+"/alongside-app/js/store.js",
+"/alongside-app/js/tts.js",
+"/alongside-app/js/session-guard.js",
 
-  // CSS: Components
-  "/alongside-app/css/components/buttons.css",
-  "/alongside-app/css/components/cards.css",
-  "/alongside-app/css/components/equipment-modal.css",
-  "/alongside-app/css/components/checkin.css",
-  "/alongside-app/css/components/workout.css",
-  "/alongside-app/css/components/coach-fix.css",
-  "/alongside-app/css/components/coach-proposal.css",
-  "/alongside-app/css/components/morning-session.css",
-  "/alongside-app/css/components/session-guard.css",
-  "/alongside-app/css/components/settings-library.css",
-  "/alongside-app/css/components/weekly-plan.css",
-  "/alongside-app/css/components/breathing-session.css",
-  "/alongside-app/css/components/quiet-session.css",
-  "/alongside-app/css/components/noticing.css",
-  "/alongside-app/css/components/settings.css",
-  "/alongside-app/css/components/weekly-plan-v2.css",
-  "/alongside-app/css/components/gym-programme.css",
-  "/alongside-app/css/components/journal-entry.css",
-  "/alongside-app/css/components/nav-fix.css",
+// Views — main
+"/alongside-app/js/views/today.js",
+"/alongside-app/js/views/checkin.js",
+"/alongside-app/js/views/checkin-mini.js",
+"/alongside-app/js/views/intention.js",
+"/alongside-app/js/views/coach-proposal.js",
+"/alongside-app/js/views/coach-reflection.js",
+"/alongside-app/js/views/workout.js",
+"/alongside-app/js/views/workout-complete.js",
+"/alongside-app/js/views/progress.js",
+"/alongside-app/js/views/settings.js",
+"/alongside-app/js/views/weekly-plan.js",
+"/alongside-app/js/views/reflect.js",
+"/alongside-app/js/views/about.js",
+"/alongside-app/js/views/privacy.js",
+"/alongside-app/js/views/goal-setup.js",
+"/alongside-app/js/views/library.js",
+"/alongside-app/js/views/noticing.js",
+"/alongside-app/js/views/journal-entry.js",
+"/alongside-app/js/views/gym-programme.js",
+"/alongside-app/js/views/weekly-plan.js",
 
-  // JS: Core
-  "/alongside-app/js/app.js",
-  "/alongside-app/js/store.js",
-  "/alongside-app/js/router.js",
-  "/alongside-app/js/tts.js",
-  "/alongside-app/js/session-guard.js",
-  "/alongside-app/js/session-builder.js",
+// Views — session types
+"/alongside-app/js/views/prescribed.js",
+"/alongside-app/js/views/prescribed-session.js",
+"/alongside-app/js/views/quiet-session.js",
+"/alongside-app/js/views/breathing-session.js",
+"/alongside-app/js/views/morning-session.js",
+"/alongside-app/js/views/core-session.js",
+"/alongside-app/js/views/yoga-session.js",
+"/alongside-app/js/views/walk-session.js",
+"/alongside-app/js/views/running-session.js",
+"/alongside-app/js/views/swim-session.js",
+"/alongside-app/js/views/cycle-session.js",
 
-  // JS: Data
-  "/alongside-app/js/data/signal-words.js",
-  "/alongside-app/js/data/coach-voice.js",
-  "/alongside-app/js/data/goals.js",
-  "/alongside-app/js/data/checkin.js",
-  "/alongside-app/js/data/programmes.js",
-  "/alongside-app/js/data/programmeEngine.js",
-  "/alongside-app/js/data/conditions.js",
-  "/alongside-app/js/data/equipment.js",
-  "/alongside-app/js/data/workoutGenerator.js",
-  "/alongside-app/js/data/morning-programme.js",
+// Views — onboarding
+"/alongside-app/js/views/onboarding/welcome.js",
+"/alongside-app/js/views/onboarding/name.js",
+"/alongside-app/js/views/onboarding/about.js",
+"/alongside-app/js/views/onboarding/body.js",
+"/alongside-app/js/views/onboarding/goals.js",
+"/alongside-app/js/views/onboarding/conditions.js",
+"/alongside-app/js/views/onboarding/lifestyle.js",
+"/alongside-app/js/views/onboarding/equipment.js",
+"/alongside-app/js/views/onboarding/frequency.js",
+"/alongside-app/js/views/onboarding/plan-select.js",
+"/alongside-app/js/views/onboarding/goal-setup.js",
+"/alongside-app/js/views/onboarding/complete.js",
+"/alongside-app/js/views/onboarding/arrival.js",
+"/alongside-app/js/views/onboarding/hard-before.js",
+"/alongside-app/js/views/onboarding/reflection.js",
 
-  // JS: Data — Exercises
-  "/alongside-app/js/data/exercises/index.js",
-  "/alongside-app/js/data/exercises/cardio.js",
-  "/alongside-app/js/data/exercises/mindfulness.js",
-  "/alongside-app/js/data/exercises/mobility.js",
-  "/alongside-app/js/data/exercises/pilates.js",
-  "/alongside-app/js/data/exercises/recovery.js",
-  "/alongside-app/js/data/exercises/rehabilitation.js",
-  "/alongside-app/js/data/exercises/running.js",
-  "/alongside-app/js/data/exercises/sport_conditioning.js",
-  "/alongside-app/js/data/exercises/strength.js",
-  "/alongside-app/js/data/exercises/swimming_cycling.js",
-  "/alongside-app/js/data/exercises/yoga.js",
+// Data
+"/alongside-app/js/data/beat3-scripts.js",
+"/alongside-app/js/data/checkin.js",
+"/alongside-app/js/data/conditions.js",
+"/alongside-app/js/data/equipment.js",
+"/alongside-app/js/data/goals.js",
+"/alongside-app/js/data/workoutGenerator.js",
+"/alongside-app/js/data/programmeEngine.js",
+"/alongside-app/js/data/programmes.js",
+"/alongside-app/js/data/signal-words.js",
+"/alongside-app/js/data/coach-voice.js",
 
-  // JS: Views — Onboarding
-  "/alongside-app/js/views/onboarding/welcome.js",
-  "/alongside-app/js/views/onboarding/name.js",
-  "/alongside-app/js/views/onboarding/about.js",
-  "/alongside-app/js/views/onboarding/body.js",
-  "/alongside-app/js/views/onboarding/goals.js",
-  "/alongside-app/js/views/onboarding/conditions.js",
-  "/alongside-app/js/views/onboarding/lifestyle.js",
-  "/alongside-app/js/views/onboarding/equipment.js",
-  "/alongside-app/js/views/onboarding/frequency.js",
-  "/alongside-app/js/views/onboarding/plan-select.js",
-  "/alongside-app/js/views/onboarding/goal-setup.js",
-  "/alongside-app/js/views/onboarding/complete.js",
+// Exercise database
+"/alongside-app/js/data/exercises/index.js",
+"/alongside-app/js/data/exercises/strength.js",
+"/alongside-app/js/data/exercises/cardio.js",
+"/alongside-app/js/data/exercises/mobility.js",
+"/alongside-app/js/data/exercises/yoga.js",
+"/alongside-app/js/data/exercises/pilates.js",
+"/alongside-app/js/data/exercises/running.js",
+"/alongside-app/js/data/exercises/swimming-cycling.js",
+"/alongside-app/js/data/exercises/rehabilitation.js",
+"/alongside-app/js/data/exercises/recovery.js",
+"/alongside-app/js/data/exercises/mindfulness.js",
+"/alongside-app/js/data/exercises/sport-conditioning.js",
 
-  // JS: Views — Main
-  "/alongside-app/js/views/today.js",
-  "/alongside-app/js/views/checkin.js",
-  "/alongside-app/js/views/checkin-mini.js",
-  "/alongside-app/js/views/coach-reflection.js",
-  "/alongside-app/js/views/coach-proposal.js",
-  "/alongside-app/js/views/intention.js",
-  "/alongside-app/js/views/reflect.js",
-  "/alongside-app/js/views/progress.js",
-  "/alongside-app/js/views/settings.js",
-  "/alongside-app/js/views/weekly-plan.js",
-  "/alongside-app/js/views/noticing.js",
-  "/alongside-app/js/views/journal-entry.js",
-  "/alongside-app/js/views/activity-log.js",
-  "/alongside-app/js/views/library.js",
-  "/alongside-app/js/views/about.js",
-  "/alongside-app/js/views/privacy.js",
-  "/alongside-app/js/views/upgrade.js",
-  "/alongside-app/js/views/goal-setup.js",
-  "/alongside-app/js/views/session-builder.js",
-
-  // JS: Views — Session types
-  "/alongside-app/js/views/workout.js",
-  "/alongside-app/js/views/gym-programme.js",
-  "/alongside-app/js/views/morning-session.js",
-  "/alongside-app/js/views/core-session.js",
-  "/alongside-app/js/views/yoga-session.js",
-  "/alongside-app/js/views/walk-session.js",
-  "/alongside-app/js/views/running-session.js",
-  "/alongside-app/js/views/cycle-session.js",
-  "/alongside-app/js/views/swim-session.js",
-  "/alongside-app/js/views/quiet-session.js",
-  "/alongside-app/js/views/breathing-session.js",
-  "/alongside-app/js/views/prescribed.js",
-  "/alongside-app/js/views/prescribed-session.js",
-
-  // Assets
-  "/alongside-app/assets/images/logo-icon-192.png",
-  "/alongside-app/assets/images/logo-icon-180.png",
-  "/alongside-app/assets/images/logo-icon-128.png",
-  "/alongside-app/assets/images/logo-icon-512.png",
-  "/alongside-app/assets/images/logo-icon-small.png",
-  "/alongside-app/assets/images/logo-icon-square.png",
-  "/alongside-app/assets/images/logo-wordmark.png",
+// Assets
+"/alongside-app/assets/images/logo-icon-small.png",
+"/alongside-app/assets/images/logo-icon-square.png",
+"/alongside-app/assets/images/logo-icon-128.png",
+"/alongside-app/assets/images/logo-icon-192.png",
+"/alongside-app/assets/images/logo-icon-512.png"
 ];
 
 // Message handler
+// app.js posts { type: "SKIP_WAITING" } when the user taps "Update now".
 self.addEventListener("message", event => {
   if (event.data?.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 });
 
-// Install — allSettled so individual 404s never block the app loading
+// Install — cache the app shell
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
+      // Cache what we can — individual 404s do not fail the install
       return Promise.allSettled(
         SHELL_URLS.map(url =>
           cache.add(url).catch(() => {
