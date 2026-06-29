@@ -93,6 +93,9 @@ export function ThreadView(router) {
     _container = container;
 
     container.innerHTML = `
+      <header class="ob-header" aria-label="Alongside: Move">
+        <span class="ob-header__wordmark">Alongside: Move</span>
+      </header>
       <div class="ob-thread" role="main" aria-label="Alongside onboarding">
         <div class="ob-thread__scroll"
              id="ob-thread-scroll"
@@ -152,9 +155,11 @@ export function ThreadView(router) {
 
       case 'coach-only':
         await _showCoachBubble(step.coach);
-        if (stepId === 5) {
-          // Bridge step — auto-advance to Step 6
-          _runStep(6);
+        // Steps 1 and 5 have no user input — advance automatically.
+        // Step 1: coach opens with name question; Step 2 shows the text input.
+        // Step 5: bridge into practical questions; Step 6 follows immediately.
+        if (stepId === 1 || stepId === 5) {
+          _runStep(_nextStep(stepId));
         }
         break;
 
@@ -531,7 +536,9 @@ export function ThreadView(router) {
       parts = FALLBACK_REFLECTION;
     } else {
       const territory = store.get('onboarding.primaryTerritory');
-      const script    = getBeat3Script(territory);
+      // getBeat3Script expects string[] — wrap in array so getDominantTerritory()
+      // returns territory correctly. primaryTerritory is always a single string.
+      const script    = territory ? getBeat3Script([territory]) : null;
       parts = script ? script.parts : FALLBACK_REFLECTION;
     }
 
