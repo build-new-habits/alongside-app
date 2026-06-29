@@ -1,6 +1,8 @@
 /* main.css
- * 26 Jun 2026 v6
+ * 29 Jun 2026 v7
  *
+ * v7 — OB-THREAD. Added onboarding-thread.css and sheet-manager.css.
+ * v6 — Added nav-fix.css.
  * v5 — Added onboarding-additions.css, fixed omission from v4.
  * v4 — Phase 5 CSS: today, settings, weekly-plan-v2, gym-programme, journal-entry.
  * v3 — 23 Jun 2026. Added coach-proposal, session-guard, settings-library.
@@ -42,6 +44,10 @@
 @import 'components/gym-programme.css';
 @import 'components/journal-entry.css';
 @import 'components/nav-fix.css';
+
+/* OB-THREAD */
+@import 'components/onboarding-thread.css';
+@import 'components/sheet-manager.css';
 
 /* Content-gated — add when content sessions complete */
 /* D2: @import 'components/checkin-conversation.css'; */
