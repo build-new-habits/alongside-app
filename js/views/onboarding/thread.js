@@ -164,7 +164,6 @@ export function ThreadView(router) {
         break;
 
       case 'inline-text':
-        await _showCoachBubble(step.coach.replace('[Name]', store.get('name') || ''));
         _showTextInput(step);
         break;
 
