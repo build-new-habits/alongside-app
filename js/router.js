@@ -1,44 +1,40 @@
 /**
  * router.js
- * 26 Jun 2026 v6
+ * 29 Jun 2026 v7
+ *
+ * v7 — OB-THREAD. Added onboarding/thread route. Removed retired onboarding
+ *   routes from VIEW_NAMES and hideNavViews: arrival, hard-before, reflection,
+ *   complete, frequency, plan-select, welcome, name, about, body, lifestyle,
+ *   goal-setup (onboarding variant).
+ *   onboarding/goals, conditions, equipment kept — reused as sheet content
+ *   by sheet-manager.js (dynamically imported, not router-navigated).
+ *   First-route logic updated in app.js v6 — router.js unchanged beyond
+ *   the VIEW_NAMES and hideNavViews updates.
  *
  * v6 — Scroll reset on every view mount: window.scrollTo(0,0) called
  *   immediately after container.innerHTML is set, before focus management.
  *
  * v5 — Added onboarding/frequency and onboarding/plan-select routes.
- *   Both added to VIEW_NAMES and hideNavViews.
- *   No other changes from v4.
- *
  * v4 — Dual-pattern view support.
- *   Old pattern detection: module.render is a function.
- *   New pattern detection: module[fn] is a function.
- *   viewCache now stores the whole module, not just module[fn].
- *
- * v3 — 24 Jun 2026. All Phase 5 routes. main-content ID confirmed.
+ * v3 — 24 Jun 2026. All Phase 5 routes.
  * v2 — 22 May 2026. history.pushState, popstate, all missing routes.
  * v1 — Initial router.
  */
 
 const VIEW_NAMES = {
 
-  // Onboarding
-  'welcome':                   { path: './views/onboarding/welcome.js',      fn: 'WelcomeView'              },
-  'onboarding/name':           { path: './views/onboarding/name.js',         fn: 'NameView'                 },
-  'onboarding/about':          { path: './views/onboarding/about.js',        fn: 'AboutView'                },
-  'onboarding/body':           { path: './views/onboarding/body.js',         fn: 'BodyView'                 },
-  'onboarding/goals':          { path: './views/onboarding/goals.js',        fn: 'GoalsView'                },
-  'onboarding/conditions':     { path: './views/onboarding/conditions.js',   fn: 'ConditionsView'           },
-  'onboarding/lifestyle':      { path: './views/onboarding/lifestyle.js',    fn: 'LifestyleView'            },
-  'onboarding/equipment':      { path: './views/onboarding/equipment.js',    fn: 'EquipmentView'            },
-  'onboarding/frequency':      { path: './views/onboarding/frequency.js',    fn: 'FrequencyView'            },
-  'onboarding/plan-select':    { path: './views/onboarding/plan-select.js',  fn: 'PlanSelectView'           },
-  'onboarding/goal-setup':     { path: './views/onboarding/goal-setup.js',   fn: 'GoalSetupView'            },
-  'onboarding/complete':       { path: './views/onboarding/complete.js',     fn: 'CompleteView'             },
-  'onboarding/arrival':        { path: './views/onboarding/arrival.js',      fn: 'ArrivalView'              },
-  'onboarding/hard-before':    { path: './views/onboarding/hard-before.js',  fn: 'HardBeforeView'           },
-  'onboarding/reflection':     { path: './views/onboarding/reflection.js',   fn: 'OnboardingReflectionView' },
+  // ── Onboarding ─────────────────────────────────────────────────────────────
+  // OB-THREAD: single entry point. Replaces all previous onboarding screens.
+  'onboarding/thread':  { path: './views/onboarding/thread.js',      fn: 'ThreadView'               },
 
-  // Core daily flow
+  // Kept for sheet-manager.js dynamic imports — not router-navigated directly.
+  // Do not remove: sheet-manager.js imports these via import() not router.navigate().
+  'onboarding/goals':       { path: './views/onboarding/goals.js',       fn: 'GoalsView'        },
+  'onboarding/conditions':  { path: './views/onboarding/conditions.js',  fn: 'ConditionsView'   },
+  'onboarding/equipment':   { path: './views/onboarding/equipment.js',   fn: 'EquipmentView'    },
+  'onboarding/plan-select': { path: './views/onboarding/plan-select.js', fn: 'PlanSelectView'   },
+
+  // ── Core daily flow ────────────────────────────────────────────────────────
   'today':             { path: './views/today.js',            fn: 'TodayView'           },
   'checkin':           { path: './views/checkin.js',          fn: 'CheckinView'         },
   'checkin-mini':      { path: './views/checkin-mini.js',     fn: 'CheckinMiniView'     },
@@ -48,7 +44,7 @@ const VIEW_NAMES = {
   'intention':         { path: './views/intention.js',        fn: 'IntentionView'       },
   'reflect':           { path: './views/reflect.js',          fn: 'ReflectView'         },
 
-  // Main views
+  // ── Main views ─────────────────────────────────────────────────────────────
   'progress':          { path: './views/progress.js',         fn: 'ProgressView'        },
   'settings':          { path: './views/settings.js',         fn: 'SettingsView'        },
   'weekly-plan':       { path: './views/weekly-plan.js',      fn: 'WeeklyPlanView'      },
@@ -63,10 +59,10 @@ const VIEW_NAMES = {
   'community-impact':  { path: './views/community-impact.js', fn: 'CommunityImpactView' },
   'annual-reflection': { path: './views/annual-reflection.js',fn: 'AnnualReflectionView'},
 
-  // Session builder
+  // ── Session builder ────────────────────────────────────────────────────────
   'session-builder':   { path: './views/session-builder.js',  fn: 'SessionBuilderView'  },
 
-  // Session views
+  // ── Session views ──────────────────────────────────────────────────────────
   'workout':            { path: './views/workout.js',           fn: 'WorkoutView'           },
   'gym-programme':      { path: './views/gym-programme.js',     fn: 'GymProgrammeView'      },
   'morning-session':    { path: './views/morning-session.js',   fn: 'MorningSessionView'    },
@@ -83,12 +79,11 @@ const VIEW_NAMES = {
 };
 
 const hideNavViews = new Set([
-  'welcome',
-  'onboarding/name', 'onboarding/about', 'onboarding/body', 'onboarding/goals',
-  'onboarding/conditions', 'onboarding/lifestyle', 'onboarding/equipment',
-  'onboarding/frequency', 'onboarding/plan-select',
-  'onboarding/goal-setup', 'onboarding/complete',
-  'onboarding/arrival', 'onboarding/hard-before', 'onboarding/reflection',
+  // OB-THREAD and its sheet views
+  'onboarding/thread',
+  'onboarding/goals', 'onboarding/conditions',
+  'onboarding/equipment', 'onboarding/plan-select',
+  // Core flow (no nav)
   'home-threshold', 'community-impact', 'annual-reflection',
   'checkin', 'checkin-mini', 'coach-reflection', 'coach-proposal',
   'workout', 'gym-programme', 'morning-session', 'core-session',
@@ -118,7 +113,7 @@ export const router = {
 
   currentView: null,
   history:     [],
-  viewCache:   {},  // stores whole module, not just named export
+  viewCache:   {},
 
   init() {
     this._setupPopstate();
@@ -164,7 +159,6 @@ export const router = {
     this._setActiveNav(viewName);
 
     try {
-      // Load module if not cached
       if (!this.viewCache[viewName]) {
         const { path } = VIEW_NAMES[viewName];
         this.viewCache[viewName] = await import(path);
@@ -173,17 +167,14 @@ export const router = {
       const mod = this.viewCache[viewName];
       const { fn } = VIEW_NAMES[viewName];
 
-      // ── New pattern: module exports a named factory function ──────────────
-      // e.g. export function TodayView(router) { return { mount(container) {} } }
+      // ── New pattern ───────────────────────────────────────────────────────
       if (typeof mod[fn] === 'function') {
         const view = mod[fn](this);
         container.innerHTML = '';
         window.scrollTo(0, 0);
         view.mount(container);
 
-      // ── Old pattern: module exports render() + onMount() ──────────────────
-      // e.g. export function render() { return '<html>' }
-      //      export function onMount() { /* wire events */ }
+      // ── Old pattern ───────────────────────────────────────────────────────
       } else if (typeof mod.render === 'function') {
         container.innerHTML = mod.render();
         window.scrollTo(0, 0);
@@ -195,7 +186,6 @@ export const router = {
         throw new Error(`View factory for "${viewName}" is not a function`);
       }
 
-      // Focus management for screen readers
       container.setAttribute('tabindex', '-1');
       container.focus({ preventScroll: false });
       setTimeout(() => container.removeAttribute('tabindex'), 100);
