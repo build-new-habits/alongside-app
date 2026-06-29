@@ -1,6 +1,6 @@
 /**
  * sw.js - Alongside Service Worker
- * 29 Jun 2026 v135
+ * 29 Jun 2026 v136
  *
  * alongside-v134 (29 Jun 2026) — OB-THREAD build batch:
  *   store.js v7 (three new onboarding fields);
@@ -33,7 +33,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v135";
+const CACHE_NAME = "alongside-v136";
 
 const SHELL_URLS = [
 
