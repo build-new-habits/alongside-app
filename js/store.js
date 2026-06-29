@@ -1,6 +1,21 @@
 /**
  * store.js - Data persistence layer
- * 23 Jun 2026 v6
+ * 29 Jun 2026 v7
+ *
+ * 29 Jun 2026 v7 - OB-THREAD schema pass. Three new fields added to the
+ *   onboarding{} nested object:
+ *     onboarding.primaryTerritory  (string|null)      — written by thread.js
+ *       Step 3b (single territory selection). Read by beat3-scripts.js
+ *       getDominantTerritory(). Replaces the old pattern of inferring
+ *       dominant territory from hardBeforeSelections[0].
+ *     onboarding.threadStartedAt   (ISO string|null)  — written when
+ *       thread.js Step 1 renders. Analytics only.
+ *     onboarding.threadCompletedAt (ISO string|null)  — written when
+ *       thread.js Step 14 completes. Analytics only.
+ *   mergeWithDefaults() updated: primaryTerritory, threadStartedAt, and
+ *   threadCompletedAt picked up by the existing onboarding{} spread — no
+ *   additional explicit handling needed beyond adding to defaults.
+ *   All other fields unchanged from v6.
  *
  * 23 Jun 2026 v6 - Phase 5 schema pass. All 36 new fields added in a single
  *   write. Four new nested objects: onboarding{} (Beat fields — onboardingComplete
@@ -60,7 +75,9 @@ export const store = {
    * for users who onboarded before this version was deployed.
    * Existing data is never overwritten — only missing keys are filled.
    *
-   * v6 additions are grouped by feature area and ordered to match getDefaults().
+   * v7: primaryTerritory, threadStartedAt, threadCompletedAt are string|null
+   * fields inside onboarding{}. They are picked up safely by the existing
+   * onboarding{} spread — no additional explicit handling needed.
    */
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
@@ -69,7 +86,8 @@ export const store = {
       ...saved,
 
       // ── ONBOARDING (top-level flags stay top-level) ───────────
-      // New: onboarding{} nested object for Beat fields only.
+      // v7: primaryTerritory, threadStartedAt, threadCompletedAt
+      //     are string|null — picked up safely by the spread below.
       onboarding: (saved.onboarding && typeof saved.onboarding === 'object')
         ? {
             ...defaults.onboarding,
@@ -81,15 +99,12 @@ export const store = {
         : defaults.onboarding,
 
       // ── PROFILE ───────────────────────────────────────────────
-      // New: fitnessLevel (derived from lifestyle.activityLevel at onboarding).
       fitnessLevel: saved.fitnessLevel || null,
 
       // ── LIFESTYLE (existing spread + two new fields) ──────────
       lifestyle: {
         ...defaults.lifestyle,
         ...(saved.lifestyle || {}),
-        // exerciseHistory and returningAfter picked up by spread if present.
-        // Explicit fallbacks for safety on old installs:
         exerciseHistory: saved.lifestyle?.exerciseHistory || null,
         returningAfter:  saved.lifestyle?.returningAfter  || null
       },
@@ -101,7 +116,6 @@ export const store = {
         measurementsOptIn: Array.isArray(saved.strategicGoal?.measurementsOptIn)
           ? saved.strategicGoal.measurementsOptIn
           : [],
-        // Array fields need explicit check:
         sessionSequence: Array.isArray(saved.activeProgramme?.sessionSequence)
           ? saved.activeProgramme.sessionSequence
           : [],
@@ -110,7 +124,7 @@ export const store = {
           : []
       },
 
-      // ── STRATEGIC GOAL (existing, kept for measurementsOptIn) ─
+      // ── STRATEGIC GOAL ────────────────────────────────────────
       strategicGoal: {
         ...defaults.strategicGoal,
         ...(saved.strategicGoal || {}),
@@ -119,14 +133,13 @@ export const store = {
           : []
       },
 
-      // ── PROGRESS / ACTIVITY LOGS (existing) ──────────────────
+      // ── PROGRESS / ACTIVITY LOGS ──────────────────────────────
       progressLog:         Array.isArray(saved.progressLog)         ? saved.progressLog         : [],
       prescribedExercises: Array.isArray(saved.prescribedExercises) ? saved.prescribedExercises : [],
       activityLog:         Array.isArray(saved.activityLog)         ? saved.activityLog         : [],
       journalEntries:      Array.isArray(saved.journalEntries)       ? saved.journalEntries       : [],
 
-      // ── CHECK-IN ENGINE (new nested object — engine state only) ─
-      // Separate from lastCheckin and checkinHistory (both preserved below).
+      // ── CHECK-IN ENGINE ───────────────────────────────────────
       checkin: (saved.checkin && typeof saved.checkin === 'object')
         ? {
             ...defaults.checkin,
@@ -137,13 +150,13 @@ export const store = {
           }
         : defaults.checkin,
 
-      // ── MINDFUL PROMPT ENGINE (new top-level fields) ──────────
+      // ── MINDFUL PROMPT ENGINE ─────────────────────────────────
       mindfulPromptDepth:     typeof saved.mindfulPromptDepth === 'number'
                                 ? saved.mindfulPromptDepth
                                 : 1,
       mindfulPromptFrequency: saved.mindfulPromptFrequency || 'automatic',
 
-      // ── LAST CHECK-IN (existing) ──────────────────────────────
+      // ── LAST CHECK-IN ─────────────────────────────────────────
       lastCheckin: (saved.lastCheckin && typeof saved.lastCheckin === 'object')
         ? {
             ...defaults.lastCheckin,
@@ -155,23 +168,23 @@ export const store = {
           }
         : defaults.lastCheckin,
 
-      // ── CHECK-IN HISTORY (existing — plain object, not array) ─
+      // ── CHECK-IN HISTORY (plain object, not array) ────────────
       checkinHistory: (saved.checkinHistory
         && typeof saved.checkinHistory === 'object'
         && !Array.isArray(saved.checkinHistory))
           ? saved.checkinHistory
           : {},
 
-      // ── ABSENCE AND RETURN (new nested object) ────────────────
+      // ── ABSENCE AND RETURN ────────────────────────────────────
       absence: (saved.absence && typeof saved.absence === 'object')
         ? { ...defaults.absence, ...saved.absence }
         : defaults.absence,
 
-      // ── NOTICING HUB (existing fields) ───────────────────────
+      // ── NOTICING HUB ──────────────────────────────────────────
       noticingWeekInCycle:   saved.noticingWeekInCycle   || 1,
       noticingLastTriggered: saved.noticingLastTriggered || null,
 
-      // ── NOTICING PROGRESS (new nested object) ─────────────────
+      // ── NOTICING PROGRESS ─────────────────────────────────────
       noticingProgress: (saved.noticingProgress && typeof saved.noticingProgress === 'object')
         ? {
             ...defaults.noticingProgress,
@@ -190,7 +203,7 @@ export const store = {
           }
         : defaults.noticingProgress,
 
-      // ── JOURNAL SETTINGS (existing) ───────────────────────────
+      // ── JOURNAL SETTINGS ──────────────────────────────────────
       journalSettings: (saved.journalSettings && typeof saved.journalSettings === 'object')
         ? {
             ...defaults.journalSettings,
@@ -201,20 +214,20 @@ export const store = {
           }
         : defaults.journalSettings,
 
-      // ── NOTICING PREFERENCES (existing) ───────────────────────
+      // ── NOTICING PREFERENCES ──────────────────────────────────
       noticingPreferences: (saved.noticingPreferences && typeof saved.noticingPreferences === 'object')
         ? { ...defaults.noticingPreferences, ...saved.noticingPreferences }
         : defaults.noticingPreferences,
 
-      // ── SESSION BUILDER (existing) ────────────────────────────
+      // ── SESSION BUILDER ───────────────────────────────────────
       generatedSession: saved.generatedSession || { session: null, builtAt: null, inputs: {} },
 
-      // ── CONDITION PAIN SCORES (existing) ─────────────────────
+      // ── CONDITION PAIN SCORES ─────────────────────────────────
       conditionPainScores: (saved.conditionPainScores && typeof saved.conditionPainScores === 'object')
         ? saved.conditionPainScores
         : {},
 
-      // ── WEEKLY PLAN (existing) ────────────────────────────────
+      // ── WEEKLY PLAN ───────────────────────────────────────────
       weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
         ? {
             ...defaults.weeklyPlan,
@@ -230,12 +243,12 @@ export const store = {
           }
         : defaults.weeklyPlan,
 
-      // ── NOTIFICATIONS (existing) ──────────────────────────────
+      // ── NOTIFICATIONS ─────────────────────────────────────────
       checkInNotification: (saved.checkInNotification && typeof saved.checkInNotification === 'object')
         ? { ...defaults.checkInNotification, ...saved.checkInNotification }
         : defaults.checkInNotification,
 
-      // ── WELLBEING (existing) ──────────────────────────────────
+      // ── WELLBEING ─────────────────────────────────────────────
       safeguarding: (saved.safeguarding && typeof saved.safeguarding === 'object')
         ? { ...defaults.safeguarding, ...saved.safeguarding }
         : defaults.safeguarding,
@@ -251,13 +264,13 @@ export const store = {
         ? { ...defaults.waterSettings, ...saved.waterSettings }
         : defaults.waterSettings,
 
-      // ── WATER REMINDER (new top-level fields) ─────────────────
+      // ── WATER REMINDER ────────────────────────────────────────
       waterReminderEnabled: typeof saved.waterReminderEnabled === 'boolean'
         ? saved.waterReminderEnabled
         : false,
       lastWaterReminder: saved.lastWaterReminder || null,
 
-      // ── COACH OFFERS / UNWELL MODE / FOOD (existing) ─────────
+      // ── COACH OFFERS / UNWELL MODE / FOOD ────────────────────
       coachOffers: (saved.coachOffers && typeof saved.coachOffers === 'object')
         ? {
             shown:    { ...(saved.coachOffers.shown    || {}) },
@@ -276,22 +289,22 @@ export const store = {
           }
         : defaults.foodPrompts,
 
-      // ── COMMUNITY AND IMPACT (new nested object) ──────────────
+      // ── COMMUNITY AND IMPACT ──────────────────────────────────
       community: (saved.community && typeof saved.community === 'object')
         ? { ...defaults.community, ...saved.community }
         : defaults.community,
 
-      // ── ANNUAL REFLECTION (new nested object) ─────────────────
+      // ── ANNUAL REFLECTION ─────────────────────────────────────
       annualReflection: (saved.annualReflection && typeof saved.annualReflection === 'object')
         ? { ...defaults.annualReflection, ...saved.annualReflection }
         : defaults.annualReflection,
 
-      // ── PRACTICE HISTORY (existing) ───────────────────────────
+      // ── PRACTICE HISTORY ──────────────────────────────────────
       practiceHistory: (saved.practiceHistory && typeof saved.practiceHistory === 'object')
         ? { ...defaults.practiceHistory, ...saved.practiceHistory }
         : defaults.practiceHistory,
 
-      // ── PREFERENCES (existing) ────────────────────────────────
+      // ── PREFERENCES ───────────────────────────────────────────
       speechRate: (typeof saved.speechRate === 'number') ? saved.speechRate : 0.9,
       activityPreferences: (saved.activityPreferences && typeof saved.activityPreferences === 'object')
         ? saved.activityPreferences
@@ -300,13 +313,8 @@ export const store = {
       lastProposalType: saved.lastProposalType || null,
       lastProposalDate: saved.lastProposalDate || null,
 
-      // coachStyle: preserved if set, defaults to 'nurturing'.
-      // In beta, Nurturing voice delivers silently for all style settings.
       coachStyle: saved.coachStyle || 'nurturing',
-
-      // tier: preserved if set. 'free' | 'personal' | 'athlete'
-      // athlete is unlocked within personal — not a paid upgrade.
-      tier: saved.tier || 'free'
+      tier:       saved.tier       || 'free'
     };
   },
 
@@ -317,41 +325,46 @@ export const store = {
       onboardingComplete: false,
       onboardingStep: 1,
 
-      // ── ONBOARDING BEATS (new nested object — v6) ─────────────
-      // Beat 1: The Castle (arrival.js)
-      // Beat 2: Hard Before (hard-before.js)
-      // Beat 3: Reflection (reflection.js)
+      // ── ONBOARDING THREAD AND BEATS (nested object — v6 + v7) ─
+      // v6 original: castleShownAt, hardBeforeSelections,
+      //              hardBeforeShownAt, reflectionShownAt
+      // v7 new:      primaryTerritory, threadStartedAt,
+      //              threadCompletedAt
       onboarding: {
-        castleShownAt:       null,  // ISO string|null — written when arrival.js renders
-        hardBeforeSelections: [],   // string[]        — territory IDs selected in Beat 2
-        hardBeforeShownAt:   null,  // ISO string|null — Beat 2 timing
-        reflectionShownAt:   null   // ISO string|null — Beat 3 timing
+        // ── Thread timing (v7) ───────────────────────────────
+        threadStartedAt:     null,  // ISO string|null — written when thread.js Step 1 renders
+        threadCompletedAt:   null,  // ISO string|null — written when thread.js Step 14 completes
+
+        // ── Hard Before territory (v6 + v7) ──────────────────
+        hardBeforeSelections: [],   // string[]        — territory IDs selected in Step 3a
+        hardBeforeShownAt:   null,  // ISO string|null — Step 3a timing
+        primaryTerritory:    null,  // string|null     — single territory confirmed in Step 3b;
+                                    //                   read by beat3-scripts.js
+                                    //                   getDominantTerritory()
+
+        // ── Beat 3 reflection (v6) ────────────────────────────
+        reflectionShownAt:   null,  // ISO string|null — Step 4 timing
+
+        // ── Beat 1: The Castle (v6 — field kept for analytics) ─
+        castleShownAt:       null   // ISO string|null — arrival.js retired but field preserved
       },
 
       // ── PROFILE ───────────────────────────────────────────────
       name: '',
-
-      // ageBand replaces numeric age throughout the app.
-      // Values: "Under 18"|"18–24"|"25–34"|"35–44"|"45–54"|"55–64"|"65+"|"Prefer not to say"
-      // Used by coach engine for recovery multipliers and intensity ceilings.
       ageBand: null,
       age: null,          // DEPRECATED — kept for migration only. Do not write new values.
       gender: null,
       hormonalTracking: false,
 
-      // coachStyle: 'nurturing' | 'steady' | 'energetic' | 'minimal'
+      // coachStyle: 'nurturing'|'steady'|'energetic'|'minimal'
       // Beta: Nurturing voice delivers for all style settings silently.
       // Free tier: Nurturing locked. Personal+: all styles selectable.
       coachStyle: 'nurturing',
 
-      // tier: 'free' | 'personal' | 'athlete'
-      // Athlete is unlocked within Personal — no extra charge.
-      // Developer bypass: triple-tap version label in Settings to switch tiers.
+      // tier: 'free'|'personal'|'athlete'
+      // Athlete unlocked within Personal — no extra charge.
       tier: 'free',
 
-      // fitnessLevel: derived from lifestyle.activityLevel during onboarding.
-      // 'sedentary' | 'light' | 'moderate' | 'active' | 'very-active'
-      // Stored separately so it can be updated from Settings without re-running onboarding.
       fitnessLevel: null,
 
       // ── BODY AND TARGETS ─────────────────────────────────────
@@ -370,19 +383,15 @@ export const store = {
 
       // ── LIFESTYLE ────────────────────────────────────────────
       lifestyle: {
-        activityLevel: null,       // sedentary | light | moderate | active | very-active
-        stressLevel:   null,       // low | moderate | high | very-high
-        sleepQuality:  null,       // poor | okay | good
-        // New v6 fields:
-        exerciseHistory: null,     // 'never' | 'lapsed' | 'returning' | 'active'
-        returningAfter:  null      // 'injury' | 'illness' | 'life' | 'burnout' | null
-        //                           Only set when exerciseHistory = 'returning'
+        activityLevel:   null,  // sedentary|light|moderate|active|very-active
+        stressLevel:     null,  // low|moderate|high|very-high
+        sleepQuality:    null,  // poor|okay|good
+        exerciseHistory: null,  // 'never'|'lapsed'|'returning'|'active'
+        returningAfter:  null   // 'injury'|'illness'|'life'|'burnout'|null
       },
 
       // ── EQUIPMENT ────────────────────────────────────────────
       equipment: [],
-
-      // ── PRESCRIBED EXERCISES ─────────────────────────────────
       prescribedExercises: [],
 
       // ── STRATEGIC GOAL ───────────────────────────────────────
@@ -400,24 +409,22 @@ export const store = {
 
       // ── ACTIVE PROGRAMME ─────────────────────────────────────
       activeProgramme: {
-        // v5 fields (preserved):
-        programmeId:      null,
-        programmeName:    '',
-        startDate:        null,
-        currentWeek:      1,
-        currentPhase:     null,
-        sessionsThisWeek: 0,
-        totalSessions:    0,
-        milestones:       [],
-        completed:        false,
-        completedAt:      null,
-        // v6 new fields:
-        phase:                      1,     // int — current phase within programme (1-3)
-        weekPlan:                   null,  // object|null — session type plan for current week
-        sessionSequence:            [],    // object[] — { week, day, type, completed }
-        missedSessions:             [],    // object[] — { date, reason: 'life'|'illness'|'harder' }
-        midProgrammeGlanceShown:    false, // bool — week 6 glance shown; never repeat
-        programmeReflectionShown:   false  // bool — week 12 reflection shown; never repeat
+        programmeId:              null,
+        programmeName:            '',
+        startDate:                null,
+        currentWeek:              1,
+        currentPhase:             null,
+        sessionsThisWeek:         0,
+        totalSessions:            0,
+        milestones:               [],
+        completed:                false,
+        completedAt:              null,
+        phase:                    1,
+        weekPlan:                 null,
+        sessionSequence:          [],
+        missedSessions:           [],
+        midProgrammeGlanceShown:  false,
+        programmeReflectionShown: false
       },
 
       // ── PROGRESS LOG ─────────────────────────────────────────
@@ -433,20 +440,19 @@ export const store = {
       activityLog: [],
       currentActivityEntry: null,
 
-      // ── CHECK-IN ENGINE STATE (new nested object — v6) ────────
-      // Engine state only. lastCheckin and checkinHistory are separate (below).
+      // ── CHECK-IN ENGINE STATE ─────────────────────────────────
       checkin: {
-        lastOpeningMode:      null, // string|null — mode used in last check-in
-        openingModeHistory:   [],   // string[]    — last 7 modes; prevents patterns
-        feelingWordDepth:     1,    // int 1-5     — current vocabulary depth level
-        lastMilestoneNoticed: null  // ISO string|null — prevents duplicate milestone
+        lastOpeningMode:      null,
+        openingModeHistory:   [],
+        feelingWordDepth:     1,
+        lastMilestoneNoticed: null
       },
 
-      // ── MINDFUL PROMPT ENGINE (new top-level — v6) ────────────
-      mindfulPromptDepth:     1,           // int 1-5    — current prompt depth
-      mindfulPromptFrequency: 'automatic', // string     — automatic|session-start|mid-session|both
+      // ── MINDFUL PROMPT ENGINE ─────────────────────────────────
+      mindfulPromptDepth:     1,
+      mindfulPromptFrequency: 'automatic',
 
-      // ── LAST CHECK-IN (existing) ──────────────────────────────
+      // ── LAST CHECK-IN ─────────────────────────────────────────
       lastCheckin: {
         feelingWord:     null,
         feelingQuadrant: null,
@@ -454,17 +460,14 @@ export const store = {
         timestamp:       null
       },
 
-      // ── CHECK-IN HISTORY (existing) ───────────────────────────
-      // Plain object keyed by "YYYY-MM-DD" date strings.
-      // { "2026-06-23": { energy, mood, feelingWord, feelingQuadrant, ... } }
-      // NOT an array.
+      // ── CHECK-IN HISTORY ──────────────────────────────────────
+      // Plain object keyed by "YYYY-MM-DD". NOT an array.
       checkinHistory: {},
 
-      // ── ABSENCE AND RETURN (new nested object — v6) ───────────
-      // Separate from unwellMode. Captures context when check-in flags absence.
+      // ── ABSENCE AND RETURN ────────────────────────────────────
       absence: {
-        context:   null, // 'injury' | 'illness' | 'life' | 'burnout' | null
-        capturedAt: null // ISO string|null — when absence was logged
+        context:    null,
+        capturedAt: null
       },
 
       // ── TEXT-TO-SPEECH ────────────────────────────────────────
@@ -472,16 +475,10 @@ export const store = {
 
       // ── ACTIVITY PREFERENCES ──────────────────────────────────
       activityPreferences: {},
-
-      // ── MOVEMENT IDENTITY ─────────────────────────────────────
-      movementIdentity: null,
-
-      // ── SESSION LOCATION ──────────────────────────────────────
-      sessionLocation: null,
-
-      // ── COACH PROPOSAL ────────────────────────────────────────
-      lastProposalType: null,
-      lastProposalDate: null,
+      movementIdentity:    null,
+      sessionLocation:     null,
+      lastProposalType:    null,
+      lastProposalDate:    null,
 
       // ── CHECK-IN NOTIFICATION ────────────────────────────────
       checkInNotification: {
@@ -490,7 +487,7 @@ export const store = {
         permissionGranted: false
       },
 
-      // ── NOTICING HUB (existing fields) ───────────────────────
+      // ── NOTICING HUB ──────────────────────────────────────────
       journalEntries:        [],
       noticingWeekInCycle:   1,
       noticingLastTriggered: null,
@@ -504,22 +501,22 @@ export const store = {
       // ── NOTICING PREFERENCES ──────────────────────────────────
       noticingPreferences: {
         schedule: 'automatic',
-        time: null
+        time:     null
       },
 
-      // ── NOTICING PROGRESS (new nested object — v6) ────────────
+      // ── NOTICING PROGRESS ─────────────────────────────────────
       noticingProgress: {
-        territoriesVisited: [],  // string[]            — territory IDs visited at least once
-        seriesProgress:     {},  // { [seriesId]: int } — current step per series
-        seriesUnlockedAt:   {},  // { [seriesId]: ISO } — governs minimum-days gate
-        lastTerritoryId:    null // string|null         — prevents immediate repeat territory
+        territoriesVisited: [],
+        seriesProgress:     {},
+        seriesUnlockedAt:   {},
+        lastTerritoryId:    null
       },
 
       // ── SESSION BUILDER ───────────────────────────────────────
       generatedSession: {
-        session:  null,
-        builtAt:  null,
-        inputs:   {}
+        session: null,
+        builtAt: null,
+        inputs:  {}
       },
 
       // ── WEEKLY PLAN ───────────────────────────────────────────
@@ -551,13 +548,10 @@ export const store = {
         dataUnlocked: false
       },
 
-      // ── WEIGHT LOG ────────────────────────────────────────────
+      // ── WEIGHT AND WATER LOGS ─────────────────────────────────
       weightLog: [],
+      waterLog:  [],
 
-      // ── WATER LOG ─────────────────────────────────────────────
-      waterLog: [],
-
-      // ── WATER SETTINGS ────────────────────────────────────────
       waterSettings: {
         dailyTargetMl:    2000,
         remindersEnabled: false,
@@ -566,13 +560,12 @@ export const store = {
         windowEnd:        21
       },
 
-      // ── WATER REMINDER (new top-level — v6) ───────────────────
-      waterReminderEnabled: false, // bool         — pre-session water reminder toggle
-      lastWaterReminder:    null,  // ISO string|null — prevents repeat in same session
+      waterReminderEnabled: false,
+      lastWaterReminder:    null,
 
       // ── COACH OFFERS ──────────────────────────────────────────
       coachOffers: {
-        shown: {},
+        shown:    {},
         declined: {}
       },
 
@@ -592,28 +585,26 @@ export const store = {
         lastEducationAt: null
       },
 
-      // ── COMMUNITY AND IMPACT (new nested object — v6) ─────────
-      // Tesco coins model: 1 credit/session free; 2 credits/session Personal tier.
-      // Quarterly allocation across three permanent cause categories.
+      // ── COMMUNITY AND IMPACT ──────────────────────────────────
       community: {
-        credits:            0,    // int          — accumulated credits
-        lastCreditAt:       null, // ISO string|null — prevents duplicate credits in same session
-        quarterlyAllocation: null, // object|null  — { quarter: string, causes: { [id]: int } }
-        lastAllocationAt:   null, // ISO string|null — when last allocation was made
-        totalAllocated:     0     // int          — lifetime allocated credits
+        credits:             0,
+        lastCreditAt:        null,
+        quarterlyAllocation: null,
+        lastAllocationAt:    null,
+        totalAllocated:      0
       },
 
-      // ── ANNUAL REFLECTION (new nested object — v6) ────────────
+      // ── ANNUAL REFLECTION ─────────────────────────────────────
       annualReflection: {
-        lastGeneratedAt: null,  // ISO string|null — when last annual reflection was created
-        lastReadAt:      null,  // ISO string|null — when user last opened it
-        chaptersUnlocked: 0     // int             — chapters revealed (0-9)
+        lastGeneratedAt:  null,
+        lastReadAt:       null,
+        chaptersUnlocked: 0
       },
 
       // ── PRACTICE HISTORY ──────────────────────────────────────
       practiceHistory: {
-        lastPlayed: {},   // { [practiceId]: ISO string }
-        favourites: []    // string[] — practice IDs
+        lastPlayed: {},
+        favourites: []
       },
 
       // ── METADATA ─────────────────────────────────────────────
@@ -709,7 +700,7 @@ export const store = {
   awardCommunityCredit() {
     const today = new Date().toISOString().split('T')[0];
     const lastDate = this.data.community?.lastCreditAt?.split('T')[0];
-    if (lastDate === today) return; // already awarded today
+    if (lastDate === today) return;
 
     const creditsToAdd = this.data.tier === 'personal' || this.data.tier === 'athlete' ? 2 : 1;
     this.data.community.credits = (this.data.community.credits || 0) + creditsToAdd;
