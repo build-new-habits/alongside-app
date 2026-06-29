@@ -1,33 +1,31 @@
 /**
  * app.js - Application entry point
+ * 29 Jun 2026 v6
  *
- * 24 Jun 2026 v5
+ * v6 — OB-THREAD. First-route logic updated: new users route to
+ *   onboarding/thread instead of welcome. The welcome, name, about, body,
+ *   and lifestyle onboarding screens are retired. Existing users (hasName or
+ *   onboardingComplete) still route to today unchanged.
+ *   No other changes from v5.
  *
  * v5 — Critical fix: window.router and window.store set at module level,
  *   immediately after import, before DOMContentLoaded fires.
- *   v3 and v4 set these inside init() which runs on DOMContentLoaded —
- *   too late for onclick attributes (e.g. welcome.js window.startOnboarding)
- *   that fire before init() completes. Moving them to module level ensures
- *   they are available the instant any view HTML is rendered.
- *
- * v4 — Nav visibility fix. Nav shown based on view mounted, not onboarding flag.
+ * v4 — Nav visibility fix.
  * v3 — Explicit first navigate + loading screen dismiss.
  * v2 — 15 Jun 2026. APP_VERSION bumped.
  * v1 — Initial.
  */
 
-import { store } from './store.js';
+import { store }  from './store.js';
 import { router } from './router.js';
 
 // ── Globals — set immediately, before anything else runs ──────────────────────
-// Every existing view calls router.navigate() and store.get() as bare globals.
-// These must be on window before any onclick handler or view code executes.
 window.router = router;
 window.store  = store;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-const APP_VERSION = "24 Jun 2026 v5";
+const APP_VERSION = "29 Jun 2026 v6";
 
 const NAV_VIEWS = new Set([
   'today', 'progress', 'noticing', 'settings', 'weekly-plan',
@@ -139,13 +137,17 @@ const App = {
     registerServiceWorker();
     console.log("Alongside ready");
 
-    // Existing user: has a name in store (handles v6 schema migration edge case
-    // where onboardingComplete may have reset to false).
-    // New install: no name, no onboardingComplete → welcome screen.
+    // Routing logic:
+    //   Existing user (onboardingComplete OR has a name stored): → today
+    //   New install: → onboarding/thread
+    //
+    // The hasName check handles the edge case where a user completed the old
+    // multi-screen onboarding but onboardingComplete was reset by a schema
+    // migration. They should not see the thread again.
     const isOnboarded    = store.get('onboardingComplete') === true;
     const hasName        = !!(store.get('name'));
     const isExistingUser = isOnboarded || hasName;
-    const firstView      = isExistingUser ? 'today' : 'welcome';
+    const firstView      = isExistingUser ? 'today' : 'onboarding/thread';
 
     await router.navigate(firstView);
 
@@ -153,7 +155,7 @@ const App = {
     const loading = document.getElementById('loading');
     if (loading) loading.style.display = 'none';
 
-    // Show nav bar
+    // Show nav bar for nav views
     const nav = document.getElementById('bottom-nav');
     if (nav && NAV_VIEWS.has(firstView)) {
       nav.classList.remove('hidden');
