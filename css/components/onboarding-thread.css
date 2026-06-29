@@ -530,3 +530,31 @@
 @media (prefers-reduced-motion: reduce) {
   .ob-begin { transition: none; opacity: 1; }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   THREAD HEADER
+   "Alongside: Move" wordmark fixed at top of the thread screen.
+   Stays visible as the conversation scrolls below it.
+───────────────────────────────────────────────────────────────────────────── */
+
+.ob-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--color-dark, #0D1F1F);
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #1A2E2E;
+}
+
+.ob-header__wordmark {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary, #1B6B6B);
+  letter-spacing: 0.02em;
+}
+
+/* Adjust thread scroll top padding to account for sticky header */
+.ob-thread__scroll {
+  padding-top: 16px;
+}
