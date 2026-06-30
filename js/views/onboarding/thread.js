@@ -1,6 +1,13 @@
 /**
  * js/views/onboarding/thread.js
- * 29 Jun 2026 v5
+ * 29 Jun 2026 v6
+ *
+ * v6 — Step 11 (equipment) summary reader was reading store.sessionLocation,
+ *   a field equipment.js never writes — confirmed against the real
+ *   source, which only writes homeEquipment[], gymEquipment[], and the
+ *   combined equipment[]. There is no separate "facility name" stored
+ *   anywhere; the facility choice is implicit in which equipment IDs
+ *   ended up selected. Fixed to read only the combined list.
  *
  * v5 — Fade trigger rule corrected (S3, screenshot review). v3's fix
  *   (moving the fade call into _showCoachBubble) was still wrong: it
@@ -1009,11 +1016,16 @@ export function ThreadView(router) {
         return store.get('conditions') || [];
       }
       case 11: {
-        // Equipment: read facility (from store.lifestyle or equipment sheet output)
-        // equipment.js writes store.equipment[] (ids) — for summary we build
-        // a simple object from what's available
+        // Equipment: equipment.js (confirmed against real source) writes
+        // homeEquipment[], gymEquipment[], and the combined equipment[]
+        // — it never writes sessionLocation, which the previous version
+        // of this reader incorrectly assumed. There's no separate
+        // "facility name" stored anywhere; the facility choice is
+        // implicit in which equipment IDs ended up selected. For the
+        // summary bubble we just report the combined list — generateSummary
+        // handles an empty list as "bodyweight only" already.
         return {
-          facility:  store.get('sessionLocation') || 'At home',
+          facility:  null,
           equipment: store.get('equipment') || []
         };
       }
