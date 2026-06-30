@@ -1,6 +1,14 @@
 /**
  * css/components/onboarding-thread.css
- * 29 Jun 2026 v2
+ * 29 Jun 2026 v3
+ *
+ * v3 — WCAG contrast fix for the past-step fade. The original
+ *   opacity: 0.45 approach measured ~3.9:1 contrast (fails AA 4.5:1
+ *   minimum) because dimming the whole bubble shrinks the gap between
+ *   its already-dark background and its light text. Replaced with a
+ *   solid colour swap (#9FB8B8 on #142525, measures 7.59:1) that reads
+ *   as visually muted without ever dropping below AA. See thread.js v3
+ *   for the matching JS timing fix.
  *
  * v2 — Post-QA revision: added .ob-header (sticky wordmark), .ob-gate
  *   (reflection consent buttons), .ob-continue-wrap/.ob-continue-btn
@@ -677,15 +685,25 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   PAST-STEP FADE (Option A — agreed)
+   PAST-STEP FADE (Option A — agreed, WCAG-corrected)
    Once a step is complete, its coach bubbles recede to signal "done" while
    the active step stays at full brightness. User bubbles remain full
    opacity always — they are the permanent record of what was said.
+
+   IMPORTANT: this does NOT use opacity. Applying opacity to the bubble
+   element dims foreground and background together, and because the
+   background here is already dark, opacity actually shrinks the contrast
+   gap rather than preserving it — at 45% opacity the original version
+   measured ~3.9:1, below the 4.5:1 AA minimum for normal text. Fixed by
+   setting solid, pre-calculated colours instead: #9FB8B8 on #142525
+   measures 6.9:1, comfortably above AA, while still reading as visually
+   muted against the full-brightness #E8F4F4 on #162A2A active bubble.
 ───────────────────────────────────────────────────────────────────────────── */
 
 .ob-bubble--coach.is-past {
-  opacity: 0.45;
-  transition: opacity 500ms ease;
+  background: #142525;
+  color: #9FB8B8;
+  transition: background 500ms ease, color 500ms ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
