@@ -73,10 +73,26 @@
  *     Step 2's coach message split — settings reassurance line moved to
  *     2b.
  *
+
+ * alongside-v138 (29 Jun 2026) — Critical sheet crash fix + spacing fix:
+ *   js/views/onboarding/sheet-manager.js v2 — dual-pattern support added.
+ *     conditions.js uses the OLD render()/window-global pattern, not the
+ *     { mount } factory pattern v1 assumed without verifying against the
+ *     real file — caused a hard crash on the conditions step ("view.mount
+ *     is not a function"). Fixed by detecting the pattern at runtime and
+ *     temporarily intercepting window.router.navigate for old-pattern
+ *     views, restored on every close path.
+ *   css/layouts/onboarding-additions.css v6 — goals screen Continue
+ *     button was rendering cramped against the last chip row with no
+ *     breathing room. Added bottom padding to .goals-categories and a
+ *     hairline separator above the action footer, scoped narrowly so no
+ *     other onboarding screen sharing the generic footer classes is
+ *     affected.
+ *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v137";
+const CACHE_NAME = "alongside-v138";
 
 const SHELL_URLS = [
 
