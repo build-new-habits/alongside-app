@@ -1,8 +1,18 @@
 /*
  * css/layouts/onboarding-additions.css
- * 29 Jun 2026 v9
+ * 29 Jun 2026 v10
  *
- * v9 (29 Jun 2026)
+ * v10 (29 Jun 2026)
+ *   — THE ACTUAL BUG, finally correctly located. Every previous fix
+ *     (v6–v9) targeted spacing ABOVE the Continue button — between the
+ *     chip content and the footer. That was never what was reported.
+ *     The real gap is BELOW the button, between it and the "X selected"
+ *     hint text. Confirmed via a direct DevTools paste of the real
+ *     rendered HTML, showing <p class="onboarding-footer__hint"> — an
+ *     element with no CSS rule anywhere in this file, in any version,
+ *     across six rounds of fixes. Added margin-top directly to it.
+ *
+ * v9 (29 Jun 2026) — wrong target, kept for history.
  *   — S1, real root cause finally confirmed against onboarding.css and
  *     variables.css directly. .onboarding-footer (the element goals.js
  *     actually renders) had NO CSS rule anywhere in the codebase — it
@@ -467,6 +477,21 @@
   margin-top: var(--space-5);
   padding-top: var(--space-4);
   border-top: 1px solid var(--color-border);
+}
+
+/* v10: THE ACTUAL BUG. Every previous round (v6 through v9) fixed
+   spacing ABOVE the footer/button — between the chip content and the
+   Continue button. That was never the reported problem. The real gap
+   is BELOW the button, between it and the "X selected" hint text
+   (<p class="onboarding-footer__hint">) — confirmed directly from a
+   DevTools paste of the real rendered HTML. That element has never had
+   any CSS rule anywhere in this file, in any previous version. With no
+   margin-top of its own, it sits right against the button's bottom
+   edge with only browser/reset-stylesheet default spacing, which is
+   close to zero. Fixed at the actual element this time. */
+.onboarding-footer__hint {
+  margin-top: var(--space-2);
+  text-align: center;
 }
 
 /* ── Conditions chip grid (onboarding/conditions.js v1.1) ────────
