@@ -1,6 +1,21 @@
 /**
  * js/views/onboarding/thread.js
- * 29 Jun 2026 v2
+ * 29 Jun 2026 v3
+ *
+ * v3 — Two bugs found in screenshot review:
+ *   1. Premature fade: _markPreviousStepsPast() was called at the top of
+ *      _runStep, but Step 2's submit handler calls _runStep again
+ *      internally right after showing its own coach response — so that
+ *      bubble was fading before the user had a chance to read it. Moved
+ *      the fade call into _showCoachBubble itself, at the moment typing
+ *      begins for new content — the one correct chokepoint, since it's
+ *      the exact instant something new is about to become "current".
+ *   2. Contrast failure: the fade was implemented as opacity: 0.45 on the
+ *      whole bubble. Because the bubble background is already dark,
+ *      reducing opacity shrinks the gap between text and background
+ *      rather than preserving it — measured contrast dropped to ~3.9:1,
+ *      below the WCAG AA 4.5:1 minimum for normal text. Fixed in
+ *      onboarding-thread.css v3: solid colour swap instead of opacity.
  *
  * v2 — Post-QA revision:
  *   Step 1 fix: coach-only steps now correctly auto-advance only when
@@ -169,12 +184,6 @@ export function ThreadView(router) {
       return;
     }
 
-    // Fade the previous step's coach bubbles before the new step begins.
-    // This is the single point of control for the past/active visual
-    // hierarchy — every step transition passes through here, so no
-    // individual step handler needs to remember to call it.
-    _markPreviousStepsPast();
-
     switch (step.type) {
 
       case 'coach-only':
@@ -257,9 +266,18 @@ export function ThreadView(router) {
    * Show typing indicator, then replace with a coach bubble.
    * Supports multi-paragraph text via \n\n (renders as separate paragraphs).
    * Returns a promise that resolves when the bubble is visible.
+   *
+   * Past-bubble fade happens here, at the moment typing begins — this is
+   * the single chokepoint every step type passes through before showing
+   * new content, so it's the correct place to mark everything before it
+   * as "past". Marking it any earlier (e.g. at the top of _runStep) faded
+   * a bubble before the user had even had a chance to read it, since some
+   * steps call _runStep again internally right after showing their own
+   * response (see Step 2's submit handler).
    */
   function _showCoachBubble(text) {
     return new Promise(resolve => {
+      _markPreviousStepsPast();
       const typing = _showTyping();
 
       // Calculate a realistic typing delay based on text length
@@ -599,7 +617,6 @@ export function ThreadView(router) {
     wrap.querySelector('[data-gate="yes"]').addEventListener('click', async () => {
       lockGate();
       _showUserBubble(step.gateYesLabel);
-      await _markPreviousStepsPast();
       await _runReflectionParts(step);
     });
 
@@ -682,13 +699,15 @@ export function ThreadView(router) {
 
   /**
    * Fade all currently-visible coach bubbles to "past" opacity. Called
-   * centrally at the top of every _runStep transition, so completed steps
-   * recede automatically as the conversation moves forward — the active
-   * step is always the only one at full brightness. Also called once more
-   * inside the Step 4 gate handler, since that step contains an internal
-   * transition (gate question → reflection) that isn't a step boundary.
-   * Idempotent: only targets bubbles not already faded, so calling it
-   * twice in close succession is harmless.
+   * from inside _showCoachBubble, at the moment typing begins for new
+   * content — that's the single correct chokepoint, since it's the exact
+   * instant something new is about to become "current". Calling this any
+   * earlier (e.g. at the top of _runStep) risked fading a bubble before
+   * the user had even had a chance to read it, because some steps call
+   * _runStep again internally right after showing their own response
+   * (Step 2's submit handler is the example that surfaced this bug).
+   * Idempotent: only targets bubbles not already faded, so it's safe to
+   * call more than once without double-fading anything.
    * User bubbles are never faded — they remain the full-opacity record.
    */
   function _markPreviousStepsPast() {
