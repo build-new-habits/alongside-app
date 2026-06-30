@@ -1,6 +1,8 @@
 /* main.css
- * 29 Jun 2026 v7
+ * 29 Jun 2026 v8
  *
+ * v8 — OB-THREAD reflection gate. Added settings-reflection.css for the
+ *   new "Your reflection" report-style section in settings.js Profile panel.
  * v7 — OB-THREAD. Added onboarding-thread.css and sheet-manager.css.
  * v6 — Added nav-fix.css.
  * v5 — Added onboarding-additions.css, fixed omission from v4.
@@ -48,6 +50,7 @@
 /* OB-THREAD */
 @import 'components/onboarding-thread.css';
 @import 'components/sheet-manager.css';
+@import 'components/settings-reflection.css';
 
 /* Content-gated — add when content sessions complete */
 /* D2: @import 'components/checkin-conversation.css'; */
