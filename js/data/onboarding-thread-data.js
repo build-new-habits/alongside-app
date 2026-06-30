@@ -1,6 +1,13 @@
 /**
  * js/data/onboarding-thread-data.js
- * 29 Jun 2026 v3
+ * 29 Jun 2026 v4
+ *
+ * v4 — generateSummary('equipment', ...) corrected to match what
+ *   equipment.js (confirmed against real source) actually writes — no
+ *   facility name is ever stored, only the combined equipment[] list.
+ *   Previous version required value.facility to be truthy or it
+ *   incorrectly reported "I'll decide later." even when the user had
+ *   genuinely selected equipment.
  *
  * v3 — Added Step 2b: a single-chip "Ready to get started?" pacing beat
  *   between the name response and Hard Before. Step 2 was advancing
@@ -508,13 +515,17 @@ export function generateSummary(type, value, storeData) {
     }
 
     case 'equipment': {
-      // value: { facility: string, equipment: string[] } — passed from equipment.js
-      // If skipped: value is null.
-      if (!value || !value.facility) return "I'll decide later.";
-      const facility = value.facility;
+      // value: { facility: null, equipment: string[] } — equipment.js
+      // (confirmed against real source) never writes a facility name,
+      // only equipment IDs via the combined equipment[] store field. A
+      // genuinely skipped step passes value: null entirely (handled by
+      // the sheet skip path in thread.js, not this generator). An empty
+      // equipment[] array is a real, valid choice — bodyweight only —
+      // not a skip, so it must not be conflated with the skip message.
+      if (!value) return "I'll decide later.";
       const items = Array.isArray(value.equipment) ? value.equipment : [];
-      if (items.length === 0) return `${facility}, bodyweight only`;
-      return `${facility}, with ${items.join(', ')}`;
+      if (items.length === 0) return "Bodyweight only";
+      return `${items.length} item${items.length !== 1 ? 's' : ''} selected`;
     }
 
     case 'frequency': {
