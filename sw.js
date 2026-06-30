@@ -150,10 +150,22 @@
  *     regardless of what was added inside it. Fixed at the actual
  *     source this time.
  *
+
+ * alongside-v142 (29 Jun 2026) — Gemini QA round 1 (C1/C2): fade not
+ *   visible. Investigated via direct DevTools breakpoint and
+ *   getComputedStyle verification — confirmed every layer of the fade
+ *   mechanism (JS call sites, class application, CSS rule, deployment)
+ *   was working exactly as built. The actual cause was a design
+ *   judgement: the background colour gap between active and faded
+ *   bubbles was only 12/765, invisible at a glance despite being
+ *   technically correct.
+ *   css/components/onboarding-thread.css v4 — widened the gap to
+ *     56/765 (#0A1414), reconfirmed WCAG AA text contrast (7.42:1).
+ *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v141";
+const CACHE_NAME = "alongside-v142";
 
 const SHELL_URLS = [
 
