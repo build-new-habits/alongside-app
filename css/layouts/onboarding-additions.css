@@ -1,8 +1,18 @@
 /*
  * css/layouts/onboarding-additions.css
- * 29 Jun 2026 v8
+ * 29 Jun 2026 v9
  *
- * v8 (29 Jun 2026)
+ * v9 (29 Jun 2026)
+ *   — S1, real root cause finally confirmed against onboarding.css and
+ *     variables.css directly. .onboarding-footer (the element goals.js
+ *     actually renders) had NO CSS rule anywhere in the codebase — it
+ *     was never sticky or fixed, as v7/v8 assumed; it simply had zero
+ *     styling at all. Every previous attempt at this fix was solving a
+ *     problem that didn't exist the way it was diagnosed. Replaced with
+ *     a direct, real rule for .onboarding-footer itself, plus a sane
+ *     (not overcorrected) bottom padding on .goals-categories.
+ *
+ * v8 (29 Jun 2026) — superseded by v9, kept for history.
  *   — S1 still cramped after v7 (confirmed from screenshot review).
  *     v7 used calc(var(--space-6) * 2) for the bottom padding — but
  *     this file has no visibility into base/variables.css, so the
@@ -371,14 +381,20 @@
   flex-direction: column;
   gap: var(--space-6);
   padding: 0 var(--space-4);
-  /* v8: switched from var(--space-6) * 2 to an explicit pixel value.
-     We don't have visibility into base/variables.css, so the actual
-     resolved size of --space-6 is unknown — if it's small (e.g. 16px),
-     doubling it still wouldn't be enough clearance, which may explain
-     why this still looked cramped after v7. 96px is generous enough to
-     clear a sticky/fixed footer of any reasonable height with margin
-     to spare, and is plain CSS with no dependency on unseen tokens. */
-  padding-bottom: 96px;
+  /* v9: confirmed against the real onboarding.css — there is no
+     .onboarding-footer rule anywhere in the codebase at all. goals.js
+     renders <footer class="onboarding-footer"> but nothing styles that
+     class, so it sits in plain document flow with zero special
+     positioning — it was never sticky or fixed, which means every
+     previous attempt at this fix (v6, v7, v8) was solving a problem
+     that didn't exist the way it was diagnosed. The real .onboarding-
+     actions class (used by most other onboarding screens, though not
+     by name in goals.js's own footer markup) has padding-top: 32px
+     (--space-6) — genuinely just a modest gap by design, reading as
+     visually tight against a teal button on a dark background. 40px
+     here is enough to give clear breathing room without the previous
+     96px overcorrection, now that the actual layout is confirmed. */
+  padding-bottom: 40px;
 }
 
 .goals-category {
@@ -439,18 +455,16 @@
   line-height: 1.3;
 }
 
-/* v7: the v6 attempt at footer spacing (margin-top/padding-top on the
-   sibling .onboarding-footer) had no visible effect — confirmed from
-   screenshot review. Strong indication .onboarding-footer is position:
-   sticky or fixed (defined in onboarding.css, which this file doesn't
-   control) — a sticky/fixed footer docks to the viewport edge regardless
-   of what comes after it in document flow, so spacing on the *following*
-   element does nothing. Fixed properly: the real spacing now lives as
-   bottom padding on .goals-categories itself (above), which guarantees
-   clearance however the footer is positioned. This rule is kept as a
-   secondary safeguard in case the footer isn't sticky after all. */
-.goals-categories + .onboarding-footer {
-  margin-top: var(--space-4);
+/* v9: .onboarding-footer is the element goals.js actually renders
+   (<footer class="onboarding-footer">) — confirmed against the real
+   onboarding.css that this class has NO rule anywhere in the codebase.
+   It was never sticky/fixed; it simply had no styling at all, sitting
+   in plain document flow with only whatever default margin a bare
+   <footer> element gets from the browser. Styled directly now, giving
+   it real top spacing and a hairline separator from the chip content
+   above it — the actual fix, now that the real cause is confirmed. */
+.onboarding-footer {
+  margin-top: var(--space-5);
   padding-top: var(--space-4);
   border-top: 1px solid var(--color-border);
 }
