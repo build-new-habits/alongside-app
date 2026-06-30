@@ -1,6 +1,14 @@
 /**
  * js/data/onboarding-thread-data.js
- * 29 Jun 2026 v2
+ * 29 Jun 2026 v3
+ *
+ * v3 — Added Step 2b: a single-chip "Ready to get started?" pacing beat
+ *   between the name response and Hard Before. Step 2 was advancing
+ *   straight into 3a with zero pause — this also caused the past-step
+ *   fade to look wrong, since there was no genuine step boundary for it
+ *   to land in. Step 2's coach message split in two: the immediate
+ *   response stays on Step 2, the settings reassurance line moved to 2b
+ *   alongside the readiness check. STEP_ORDER updated to include '2b'.
  *
  * v2 — Post-QA revision: Step 4 reworked from a single auto-revealing
  *   block into a consent-gated config (gateText, gateYesLabel,
@@ -166,8 +174,30 @@ export const STEPS = {
     placeholder: 'Your first name',
     storeField: 'name',
     summaryType: 'name',
-    coach: "[Name]. Right. Good to meet you.\n\nSo — everything I'm going to ask you over the next little while, the reason I need it is so that what I build for you is actually built for you. Not something generic. Not something I'd give to anyone who walked in. Yours.\n\nOh — and if anything changes, or you want to come back and add something you skipped, it'll all be in your settings. Nothing is locked in forever.",
+    coach: "[Name]. Right. Good to meet you.\n\nSo — everything I'm going to ask you over the next little while, the reason I need it is so that what I build for you is actually built for you. Not something generic. Not something I'd give to anyone who walked in. Yours.",
     // coach line above renders after name is submitted, with [Name] replaced.
+  },
+
+  // ── Step 2b — Settings reassurance + readiness check ──────────────────────
+  // No text input. A single light-touch interaction before the conversation
+  // moves into Hard Before — the moment that was missing in the v2 build,
+  // where Step 2 advanced straight into Step 3a with no pause at all.
+  // This also gives the past-step fade (applied in _showCoachBubble) a real
+  // gap to land in, instead of firing mid-typing-indicator for the next
+  // message because the steps ran back to back.
+  '2b': {
+    id: '2b',
+    type: 'inline-chips-single',
+    storeField: null, // no data written — this is a pacing beat, not a question
+    summaryType: null,
+    coach: "Oh — and if anything changes, or you want to come back and add something you skipped, it'll all be in your settings. Nothing is locked in forever.\n\nReady to get started?",
+    chips: [
+      { id: 'ready', label: "Yes, let's go" },
+    ],
+    // Single chip, not a real choice — the point is the tap itself, the
+    // pause it creates, and the chance for the user to actually read what
+    // came before it. coachAfter intentionally omitted: 3a's own coach
+    // message follows immediately, no extra acknowledgement needed.
   },
 
   // ── Step 3a — Hard Before (multi-select) ─────────────────────────────────
@@ -405,7 +435,7 @@ export const STEPS = {
 // 4 is skipped if user chose "I'd rather not say" in 3a (goes to 5 directly).
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const STEP_ORDER = [0, 1, 2, '3a', '3b', 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+export const STEP_ORDER = [0, 1, 2, '2b', '3a', '3b', 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SUMMARY BUBBLE GENERATORS
