@@ -1,0 +1,41 @@
+/**
+ * css/components/settings-reflection.css
+ * 29 Jun 2026 v1
+ *
+ * Styles for the "Your reflection" section in settings.js Profile panel.
+ * Report-style presentation: continuous paragraphs, no staged reveal,
+ * no conversational chrome (no bubbles, no coach styling) — this is a
+ * reference document, not a re-run of the onboarding conversation.
+ *
+ * Scoped narrowly to .settings-reflection and its children so it cannot
+ * collide with existing settings panel styles.
+ *
+ * Imported by css/main.css.
+ * WCAG 2.2 AA: collapsible trigger uses aria-expanded (handled in JS);
+ * text contrast meets AA against the settings panel background.
+ */
+
+.settings-reflection {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-mid, #2C3E3E);
+}
+
+.settings-reflection__content {
+  margin-top: 16px;
+  padding: 20px;
+  border-radius: 12px;
+  background: rgba(27, 107, 107, 0.06);
+  border: 1px solid var(--color-mid, #2C3E3E);
+}
+
+.settings-reflection__para {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-text, #1A1A1A);
+  margin: 0 0 16px;
+}
+
+.settings-reflection__para:last-child {
+  margin-bottom: 0;
+}
