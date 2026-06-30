@@ -1,6 +1,39 @@
 /**
  * js/views/onboarding/equipment.js
- * 26 Jun 2026 v3
+ * 29 Jun 2026 v4
+ *
+ * v4 (29 Jun 2026) — OB-THREAD sheet compatibility fix.
+ *
+ *   ROOT CAUSE (diagnosed against the real file, not guessed): this view
+ *   has its own internal two-screen state machine (facilities list <->
+ *   equipment sub-screen) and its own rerender() function. rerender()
+ *   was hardcoded to find #main-content — the app's real top-level
+ *   container — and write the new screen's HTML there directly. When
+ *   this view is mounted inside the OB-THREAD sheet (a div appended to
+ *   document.body, NOT #main-content), the first internal re-render
+ *   (e.g. tapping a facility card to open its sub-screen) escaped the
+ *   sheet entirely and overwrote the real page underneath it. From that
+ *   point on, the user was looking at this view's own full-page layout
+ *   floating over the real app, with click handlers wired against
+ *   whichever DOM node rerender() last wrote to — explaining both why
+ *   chips appeared unresponsive (handlers detached from what was
+ *   visible) and why "Finish" landed on the wrong screen (its
+ *   router.navigate('onboarding/frequency') call was always dead code
+ *   post-OB-THREAD, just never reached/noticed before because the view
+ *   was rarely opened this way until now).
+ *
+ *   FIX: this module now exports a mountContainer(el) setter. The sheet
+ *   manager calls it before render(), passing the sheet's own content
+ *   element. rerender() uses that container if set, falling back to
+ *   #main-content for the (still-supported) standalone full-page route
+ *   this view is also reachable from. Nothing about this view's own
+ *   logic, layout, or behaviour changed — only where it re-renders to.
+ *
+ *   ALSO FIXED: the dead router.navigate('onboarding/frequency') call
+ *   in wireFacilities() replaced with a sheetDone() call when inside a
+ *   sheet (set via the same container-awareness mechanism), falling
+ *   back to the old standalone-route behaviour otherwise. See
+ *   setSheetDoneCallback() below.
  *
  * v3 (26 Jun 2026)
  *   Bodyweight only: tapping the card now toggles selection state on the
@@ -74,6 +107,42 @@ const FACILITY_DEFS = [
 let screen            = "facilities"; // "facilities" | facility-id string
 let openCategory      = null;         // category id currently expanded, or null
 let bodyweightSelected = false;       // bodyweight-only toggle state
+
+// ── v4: sheet-awareness state ─────────────────────────────────────
+// Set by the sheet manager (or left null for the standalone full-page
+// route). When set, rerender() targets this element instead of
+// #main-content, and the Finish button calls _sheetDoneCallback instead
+// of navigating to the retired onboarding/frequency route.
+let _mountContainer   = null; // HTMLElement|null — sheet's content div
+let _sheetDoneCallback = null; // function|null — called instead of navigate()
+
+/**
+ * Called by sheet-manager.js (or any host) before render(), to tell this
+ * view where it actually lives. If never called, rerender() falls back
+ * to #main-content — the original standalone full-page behaviour, still
+ * correct for onboarding/equipment as a router-navigated route outside
+ * OB-THREAD (e.g. reached from Settings > Edit equipment).
+ *
+ * @param {HTMLElement|null} container
+ */
+export function mountContainer(container) {
+  _mountContainer = container || null;
+}
+
+/**
+ * Called by sheet-manager.js to register what should happen when the
+ * user finishes this view from inside a sheet — replaces the previous
+ * hardcoded router.navigate('onboarding/frequency') call, which pointed
+ * at a route OB-THREAD retired. If never called, the Finish button falls
+ * back to calling the bare global router.navigate() directly, preserving
+ * standalone-route behaviour. Sheet-manager.js passes a callback that
+ * closes the sheet — the destination string is ignored either way.
+ *
+ * @param {function|null} callback
+ */
+export function setSheetDoneCallback(callback) {
+  _sheetDoneCallback = callback || null;
+}
 
 // ── Equipment helpers ────────────────────────────────────────────
 
@@ -354,6 +423,12 @@ function wireView() {
 
 function wireFacilities() {
   document.getElementById("equip-onboard-back")?.addEventListener("click", () => {
+    // v4: only meaningful for the standalone full-page route — inside a
+    // sheet there is no "back to lifestyle" to go to (lifestyle isn't
+    // part of OB-THREAD), so this is left as the original behaviour.
+    // If this ever needs sheet-specific handling, it should skip-out via
+    // _sheetDoneCallback the same way the Finish button does below.
+    if (_sheetDoneCallback) return; // no-op inside a sheet for now
     router.navigate("onboarding/lifestyle");
   });
 
@@ -372,7 +447,15 @@ function wireFacilities() {
   });
 
   document.getElementById("equip-finish-btn")?.addEventListener("click", () => {
-    router.navigate("onboarding/frequency");
+    // v4: route through the sheet's done callback when present — the
+    // previous hardcoded router.navigate('onboarding/frequency') pointed
+    // at a route OB-THREAD retired. Falls back to the original
+    // standalone-route navigation when this view isn't inside a sheet.
+    if (_sheetDoneCallback) {
+      _sheetDoneCallback();
+    } else {
+      router.navigate("onboarding/frequency");
+    }
   });
 }
 
@@ -422,7 +505,16 @@ function wireSubScreen() {
 }
 
 function rerender() {
-  const main = document.getElementById("main-content");
+  // v4: use the sheet's own container when this view is mounted inside
+  // one (set via mountContainer()), falling back to #main-content for
+  // the standalone full-page route. This was the actual root cause of
+  // S4/S5 — rerender() was unconditionally targeting #main-content,
+  // which escaped the sheet entirely on the first internal screen
+  // change (e.g. tapping "Full gym" to open its sub-screen), leaving
+  // the user looking at this view's own full-page layout overwriting
+  // the real app underneath, with click handlers wired against
+  // whichever DOM node was last written to.
+  const main = _mountContainer || document.getElementById("main-content");
   if (main) {
     main.innerHTML = renderView();
     wireView();
