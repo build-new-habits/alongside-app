@@ -50,10 +50,21 @@
  * alongside-v131 (26 Jun 2026) — Onboarding QA fixes.
  * alongside-v130 (26 Jun 2026) — nav-fix.css v2, css/main.css v6.
  *
+
+ * alongside-v136 (29 Jun 2026) — Two bugs from screenshot review:
+ *   js/views/onboarding/thread.js v3 — premature past-fade fixed (was
+ *     firing before the user could read their own just-shown coach
+ *     response, due to Step 2 calling _runStep internally after showing
+ *     its reply); fade call moved into _showCoachBubble at the correct
+ *     chokepoint.
+ *   css/components/onboarding-thread.css v3 — WCAG AA contrast fix for
+ *     the past-step fade; opacity-based dimming measured ~3.9:1 (fails
+ *     AA), replaced with solid colour swap measuring 7.59:1.
+ *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v135";
+const CACHE_NAME = "alongside-v136";
 
 const SHELL_URLS = [
 
