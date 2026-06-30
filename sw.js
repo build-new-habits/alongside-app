@@ -136,10 +136,24 @@
  *     directly) — it was never sticky/fixed, contrary to every previous
  *     guess. Given real, direct styling.
  *
+
+ * alongside-v141 (29 Jun 2026) — S1 REAL root cause found, after four
+ *   rounds of incorrect fixes targeting the wrong file:
+ *   css/components/sheet-manager.css v2 — .sheet-content had zero
+ *     bottom padding, designed on the assumption all sheet content uses
+ *     .sheet-footer for its action button. It doesn't: goals.js,
+ *     conditions.js, and equipment.js each bring their own in-content
+ *     button, injected directly into .sheet-content via innerHTML. Every
+ *     previous attempt to fix this in onboarding-additions.css was
+ *     styling the wrong layer — the views' own padding never mattered
+ *     because the outer scroll container had no clearance at all,
+ *     regardless of what was added inside it. Fixed at the actual
+ *     source this time.
+ *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v140";
+const CACHE_NAME = "alongside-v141";
 
 const SHELL_URLS = [
 
