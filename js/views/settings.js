@@ -1,8 +1,22 @@
 /**
  * settings.js
- * 23 Jun 2026 v5
+ * 29 Jun 2026 v6
  *
  * Settings view. User controls for profile, programme, goals, and preferences.
+ *
+ * v6 — OB-THREAD. New "Your reflection" section added to the Profile panel.
+ *   Displays the Beat 3 reflection generated at onboarding, report-style —
+ *   all five parts rendered as continuous text, no staged reveal, no
+ *   Continue taps (those belong to the conversational moment in thread.js;
+ *   here it's a reference document, read top to bottom like a report).
+ *   Reads store.onboarding.primaryTerritory and calls getBeat3Script() live
+ *   — no new schema field, no duplicated content, single source of truth
+ *   stays in beat3-scripts.js.
+ *   Section does not render at all if primaryTerritory is null (user chose
+ *   "I'd rather not say" at Hard Before — there is nothing to reflect back).
+ *   Collapsed by default behind a single "Read your reflection" button,
+ *   consistent with the existing edit-conditions / edit-equipment pattern
+ *   on this page. No read/unread state — it isn't a notification.
  *
  * v5 — Phase 5 (P5-ST-1, P5-ST-2, P5-ST-3):
  *   - Programme change: user can change active programme from Settings
@@ -16,10 +30,6 @@
  *
  * Existing tabs preserved:
  *   Profile, Conditions, Equipment, Notifications, Library, Privacy
- *
- * New tab in v5:
- *   Programme — programme change, reset, weekly target, goal change,
- *               activity level, coach style
  *
  * Developer bypass panel:
  *   Triple-tap on the version label in the About section.
@@ -37,20 +47,24 @@
  *   focus trapped within dialog, Escape closes, focus returns to trigger.
  *   Touch targets: minimum 44px.
  *   Select elements: custom styled but native semantics preserved.
+ *   Reflection block (v6): collapsible region uses aria-expanded on the
+ *   trigger button and aria-hidden on the content when collapsed.
  */
 
 import { store }          from '../store.js';
 import { GOAL_CATEGORIES, getGoalLabel } from '../data/goals.js';
 import { getProgramme, PROGRAMMES }      from '../data/programmes.js';
 import { getProgressStats }              from '../data/programmeEngine.js';
+import { getBeat3Script }                from '../data/beat3-scripts.js';
 
 // ─── View registration ────────────────────────────────────────────────────────
 
 export function SettingsView(router) {
 
-  let activeTab     = 'profile';
-  let devTapCount   = 0;
-  let devTapTimer   = null;
+  let activeTab        = 'profile';
+  let devTapCount       = 0;
+  let devTapTimer       = null;
+  let reflectionExpanded = false;
 
   const TABS = [
     { id: 'profile',     label: 'Profile'     },
@@ -194,6 +208,46 @@ export function SettingsView(router) {
                 aria-label="Save profile changes">
           Save changes
         </button>
+
+        ${renderReflectionSection()}
+      </div>
+    `;
+  }
+
+  // ── Reflection section (NEW in v6) ─────────────────────────────────────────
+  // Collapsible block. Reads primaryTerritory live, no stored read/unread
+  // state, no new schema. Renders nothing if the user has no territory set.
+
+  function renderReflectionSection() {
+    const territory = store.get('onboarding.primaryTerritory');
+    if (!territory) return '';
+
+    const script = getBeat3Script([territory]);
+    if (!script) return '';
+
+    return `
+      <div class="settings-reflection">
+        <h2 class="settings-section__heading">Your reflection</h2>
+        <p class="settings-section__sub">
+          What we shared with you when you first joined, about why
+          Alongside: Move works differently for you.
+        </p>
+
+        <button class="btn btn-secondary"
+                id="settings-reflection-toggle"
+                data-action="toggle-reflection"
+                aria-expanded="${reflectionExpanded ? 'true' : 'false'}"
+                aria-controls="settings-reflection-content"
+                aria-label="${reflectionExpanded ? 'Hide your reflection' : 'Read your reflection'}">
+          ${reflectionExpanded ? 'Hide reflection' : 'Read your reflection'}
+        </button>
+
+        <div class="settings-reflection__content"
+             id="settings-reflection-content"
+             ${reflectionExpanded ? '' : 'hidden'}
+             aria-hidden="${reflectionExpanded ? 'false' : 'true'}">
+          ${script.parts.map(part => `<p class="settings-reflection__para">${_esc(part)}</p>`).join('')}
+        </div>
       </div>
     `;
   }
@@ -614,6 +668,14 @@ export function SettingsView(router) {
         break;
       }
 
+      case 'toggle-reflection': {
+        reflectionExpanded = !reflectionExpanded;
+        render(container);
+        const toggleBtn = container.querySelector('#settings-reflection-toggle');
+        if (toggleBtn) toggleBtn.focus();
+        break;
+      }
+
       case 'save-goals': {
         const selectedGoals = [...container.querySelectorAll('[data-goal][aria-checked="true"]')]
           .map(b => b.dataset.goal);
@@ -676,7 +738,7 @@ export function SettingsView(router) {
           'This will delete everything — your profile, history, and programme. It cannot be undone.',
           () => {
             store.reset();
-            router.navigate('welcome');
+            router.navigate('onboarding/thread');
           },
           container
         );
