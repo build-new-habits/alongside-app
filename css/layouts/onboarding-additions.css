@@ -1,6 +1,15 @@
 /*
  * css/layouts/onboarding-additions.css
- * 29 Jun 2026 v7
+ * 29 Jun 2026 v8
+ *
+ * v8 (29 Jun 2026)
+ *   — S1 still cramped after v7 (confirmed from screenshot review).
+ *     v7 used calc(var(--space-6) * 2) for the bottom padding — but
+ *     this file has no visibility into base/variables.css, so the
+ *     actual resolved pixel value of --space-6 was unknown and may
+ *     have been small enough that doubling it still wasn't sufficient.
+ *     Replaced with an explicit 96px — generous, certain, no dependency
+ *     on an unseen token's actual size.
  *
  * v7 (29 Jun 2026)
  *   — S1: v6's Continue-button spacing fix had no visible effect
@@ -362,11 +371,14 @@
   flex-direction: column;
   gap: var(--space-6);
   padding: 0 var(--space-4);
-  /* v7: substantial bottom padding so the last category clears the
-     action footer regardless of whether that footer is sticky/fixed
-     (v6's sibling-spacing approach had no visible effect — see note
-     below at the .onboarding-footer rule for the full explanation). */
-  padding-bottom: calc(var(--space-6) * 2);
+  /* v8: switched from var(--space-6) * 2 to an explicit pixel value.
+     We don't have visibility into base/variables.css, so the actual
+     resolved size of --space-6 is unknown — if it's small (e.g. 16px),
+     doubling it still wouldn't be enough clearance, which may explain
+     why this still looked cramped after v7. 96px is generous enough to
+     clear a sticky/fixed footer of any reasonable height with margin
+     to spare, and is plain CSS with no dependency on unseen tokens. */
+  padding-bottom: 96px;
 }
 
 .goals-category {
