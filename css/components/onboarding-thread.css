@@ -1,6 +1,17 @@
 /**
  * css/components/onboarding-thread.css
- * 29 Jun 2026 v3
+ * 29 Jun 2026 v4
+ *
+ * v4 — Gemini QA reported the past-step fade was not visible at all
+ *   (C1/C2 FAIL). Investigated with full DevTools verification rather
+ *   than guessing: confirmed via getComputedStyle on a live faded
+ *   bubble that the JS, class application, and CSS rule were ALL
+ *   working exactly as intended (#142525/#9FB8B8, matching source
+ *   precisely). The actual issue was a design judgement, not a bug —
+ *   the background colour difference between active and faded states
+ *   was only 12/765, invisible at a glance even though technically
+ *   correct. Widened to #0A1414 (56/765 difference) while reconfirming
+ *   text contrast stays comfortably above WCAG AA (7.42:1).
  *
  * v3 — WCAG contrast fix for the past-step fade. The original
  *   opacity: 0.45 approach measured ~3.9:1 contrast (fails AA 4.5:1
@@ -701,8 +712,19 @@
 ───────────────────────────────────────────────────────────────────────────── */
 
 .ob-bubble--coach.is-past {
-  background: #142525;
-  color: #9FB8B8;
+  /* v4: confirmed via direct DevTools inspection (computed styles
+     matched the intended #142525/#9FB8B8 exactly) that the fade logic
+     was working perfectly end to end — JS, class application, and CSS
+     all correct. The actual problem: the background colour difference
+     between active (#162A2A) and past (#142525) was only 12/765 —
+     essentially invisible at a glance, which is exactly how Gemini's
+     screenshot-based QA evaluated it (correctly reporting no visible
+     fade, since there practically wasn't one). Widened to #0A1414,
+     a 56/765 difference — meaningfully darker and visually distinct —
+     while keeping text contrast at 7.42:1, comfortably above the 4.5:1
+     WCAG AA minimum verified for the previous version. */
+  background: #0A1414;
+  color: #8FA8A8;
   transition: background 500ms ease, color 500ms ease;
 }
 
