@@ -1,8 +1,21 @@
 /**
  * css/components/sheet-manager.css
- * 29 Jun 2026 v1
+ * 29 Jun 2026 v2
  *
- * Sheet manager UI.
+ * v2 — Found and fixed the REAL cause of the "cramped Continue button"
+ *   bug, after four rounds of incorrect fixes in onboarding-additions.css
+ *   (each one styling goals.js's own markup, which was never the actual
+ *   problem). This file's own .sheet-content had zero bottom padding, on
+ *   the assumption all sheet content uses .sheet-footer for its action
+ *   button. It doesn't — goals.js, conditions.js, and equipment.js are
+ *   old-pattern views injected directly into .sheet-content via
+ *   innerHTML, each bringing its own in-content action button. That
+ *   button was rendering flush against the scroll area's bottom edge
+ *   every time, no matter what padding was added inside those views'
+ *   own CSS, because the outer scroll container itself had no clearance
+ *   at all. See the full explanation at the .sheet-content rule below.
+ *
+ * v1 — Sheet manager UI.
  * 95% height bottom sheet with drag handle, overlay, and
  * slide-up / slide-down animation.
  *
@@ -129,8 +142,26 @@
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 20px 20px 0;
-  /* Bottom padding handled by sheet-footer height */
+  padding: 20px 20px 32px;
+  /* CONFIRMED ROOT CAUSE of the persistent "cramped Continue button"
+     report (multiple rounds of CSS fixes in onboarding-additions.css
+     never worked because they were the wrong layer entirely):
+     goals.js, conditions.js, and equipment.js are old-pattern views
+     whose render() output is injected directly into .sheet-content via
+     innerHTML — they are NEVER mounted into .sheet-footer. Each of
+     these views brings its own action button inside its own markup
+     (goals.js's <footer class="onboarding-footer">, equipment.js's
+     <div class="onboarding-actions">, etc.) rather than using the
+     sheet's dedicated footer area. The previous bottom padding of 0
+     ("handled by sheet-footer height") was correct only for content
+     that actually uses .sheet-footer — which none of the three reused
+     onboarding views do. That zero padding meant every reused view's
+     own Continue/Done/Finish button rendered flush against the bottom
+     edge of the scrollable area, with safe-area-inset-bottom the only
+     thing between it and the device chrome. Fixed by giving
+     .sheet-content real bottom padding so ANY content injected this
+     way — now or in future — has guaranteed clearance regardless of
+     whether it brings its own footer or relies on .sheet-footer. */
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
