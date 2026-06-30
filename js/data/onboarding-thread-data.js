@@ -1,6 +1,11 @@
 /**
  * js/data/onboarding-thread-data.js
- * 29 Jun 2026 v1
+ * 29 Jun 2026 v2
+ *
+ * v2 — Post-QA revision: Step 4 reworked from a single auto-revealing
+ *   block into a consent-gated config (gateText, gateYesLabel,
+ *   gateNoLabel, declineCoach, continueLabel — see STEPS[4]). Step 3b
+ *   coach copy updated to the locked "take your time" wording.
  *
  * OB-THREAD content file. All coach lines, step configuration, chip labels,
  * summary bubble generators, and the Hard Before short phrase map.
@@ -195,24 +200,35 @@ export const STEPS = {
     // chips: dynamically built from user's Step 3a selections — not a static list.
     storeField: 'onboarding.primaryTerritory',
     summaryType: 'primaryTerritory',
-    coach: "Which of those has been the hardest?",
+    coach: "Take your time. Choose the most important of these chosen few and I'll reflect back exactly how Alongside: Move works differently for you.",
     // No skip option. User can only select from their own Step 3a choices.
     // Auto-advance if only one territory was selected in 3a.
   },
 
-  // ── Step 4 — Beat 3 reflection (five-part sequential reveal) ─────────────
-  // No user input. Script selected from beat3-scripts.js using primaryTerritory.
-  // Parts reveal one at a time: 1800ms between parts, 400ms fade per part.
+  // ── Step 4 — Beat 3 reflection consent gate + sequential reveal ───────────
+  // Type 'reflection-gate' is a compound step handled specially by thread.js:
+  //   1. Gate question shown first — Y/N choice
+  //   2. If "Later, in settings" — coach gives the settings line, advance to Step 5
+  //   3. If "Read it now" — Part 1 reveals automatically, then a single
+  //      "Continue" tap appears under each subsequent part (no auto-advance,
+  //      no timeout — see thread.js _runSequentialReveal for the rationale:
+  //      passive disappearance is the exact failure pattern this product
+  //      promises never to repeat).
+  // Script selected from beat3-scripts.js using primaryTerritory.
   // Fallback script (FALLBACK_REFLECTION above) fires if user skipped Step 3a.
-  // Thread continues automatically after Part 5 + 1200ms pause.
-  // Writes onboarding.reflectionShownAt to store.
+  // Writes onboarding.reflectionShownAt to store (written when gate is shown,
+  // regardless of Y/N answer — it records that the moment was offered).
   4: {
     id: 4,
-    type: 'sequential-reveal',
+    type: 'reflection-gate',
     writesTo: 'onboarding.reflectionShownAt',
-    partDelayMs: 1800,
+    gateText: "Your reflection is ready. It's 5 short paragraphs — would you like to read it now, or find it in settings later?",
+    gateYesLabel: 'Read it now',
+    gateNoLabel:  'Later, in settings',
+    declineCoach: "No problem. I'll leave it in settings for you whenever you're ready.",
+    continueLabel: 'Continue',
     partFadeMs: 400,
-    autoAdvanceAfterMs: 1200,
+    autoAdvanceAfterMs: 1200, // pause after final part before advancing to Step 5
     // coach content: loaded by thread.js from beat3-scripts.js getDominantTerritory()
     // or FALLBACK_REFLECTION if primaryTerritory is null.
   },
