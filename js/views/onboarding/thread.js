@@ -1,6 +1,20 @@
 /**
  * js/views/onboarding/thread.js
- * 29 Jun 2026 v4
+ * 29 Jun 2026 v5
+ *
+ * v5 — Fade trigger rule corrected (S3, screenshot review). v3's fix
+ *   (moving the fade call into _showCoachBubble) was still wrong: it
+ *   faded the first of two back-to-back coach bubbles within the same
+ *   step whenever there was no user interaction between them — e.g. an
+ *   acknowledgement bubble immediately followed by the next question
+ *   (Step 8's conditions ack → Step 9's activity question is the
+ *   reported example). Removed the fade call from _showCoachBubble
+ *   entirely. The fade is now triggered ONLY from inside genuine
+ *   user-interaction handlers — chip taps, text submits, sheet closes,
+ *   gate answers, Continue taps — each one calling
+ *   _markPreviousStepsPast() explicitly at the exact moment the user's
+ *   action is confirmed. See the corrected doc comment on
+ *   _markPreviousStepsPast() for the full reasoning.
  *
  * v4 — Two further fixes from screenshot review:
  *   1. Name capitalisation: store.set('name', ...) now capitalises the
@@ -284,17 +298,21 @@ export function ThreadView(router) {
    * Supports multi-paragraph text via \n\n (renders as separate paragraphs).
    * Returns a promise that resolves when the bubble is visible.
    *
-   * Past-bubble fade happens here, at the moment typing begins — this is
-   * the single chokepoint every step type passes through before showing
-   * new content, so it's the correct place to mark everything before it
-   * as "past". Marking it any earlier (e.g. at the top of _runStep) faded
-   * a bubble before the user had even had a chance to read it, since some
-   * steps call _runStep again internally right after showing their own
-   * response (see Step 2's submit handler).
+   * IMPORTANT: this function does NOT trigger the past-bubble fade.
+   * Earlier versions called _markPreviousStepsPast() here, on the
+   * assumption that "about to show new coach content" was the right
+   * moment to fade what came before. That was wrong: several steps show
+   * two or more coach bubbles back to back with no user interaction
+   * between them (e.g. an acknowledgement bubble immediately followed by
+   * the next question) — calling the fade here faded the first bubble
+   * before the user had even read it, with no action of theirs causing
+   * it. The fade must only ever be triggered by genuine user interaction
+   * (a chip tap, a sheet closing, a text submit, a gate answer) — see the
+   * individual step handlers, each of which calls _markPreviousStepsPast()
+   * explicitly at the point the user actually does something.
    */
   function _showCoachBubble(text) {
     return new Promise(resolve => {
-      _markPreviousStepsPast();
       const typing = _showTyping();
 
       // Calculate a realistic typing delay based on text length
@@ -398,6 +416,9 @@ export function ThreadView(router) {
       const name = field.value.trim();
       if (!name) return;
 
+      // Genuine user action — fade everything shown before this point.
+      _markPreviousStepsPast();
+
       // Lock input
       field.disabled  = true;
       sendBtn.disabled = true;
@@ -494,6 +515,7 @@ export function ThreadView(router) {
 
     // Skip
     wrap.querySelector('[data-skip]').addEventListener('click', async () => {
+      _markPreviousStepsPast();
       _lockChips(wrap);
       _skippedHardBefore = true;
       _showUserBubble("I'd rather not say.");
@@ -505,6 +527,7 @@ export function ThreadView(router) {
     // Confirm
     confirmBtn.addEventListener('click', async () => {
       if (selected.size === 0) return;
+      _markPreviousStepsPast();
       _lockChips(wrap);
 
       const selections = Array.from(selected);
@@ -570,6 +593,7 @@ export function ThreadView(router) {
     // Single tap — no confirm button
     wrap.querySelectorAll('.ob-chip').forEach(btn => {
       btn.addEventListener('click', async () => {
+        _markPreviousStepsPast();
         _lockChips(wrap);
         const id = btn.dataset.id;
         store.set('onboarding.primaryTerritory', id);
@@ -636,12 +660,14 @@ export function ThreadView(router) {
     };
 
     wrap.querySelector('[data-gate="yes"]').addEventListener('click', async () => {
+      _markPreviousStepsPast();
       lockGate();
       _showUserBubble(step.gateYesLabel);
       await _runReflectionParts(step);
     });
 
     wrap.querySelector('[data-gate="no"]').addEventListener('click', async () => {
+      _markPreviousStepsPast();
       lockGate();
       _showUserBubble(step.gateNoLabel);
       await _showCoachBubble(step.declineCoach);
@@ -711,6 +737,11 @@ export function ThreadView(router) {
       setTimeout(() => btn.focus(), T.CHIP_APPEAR + 50);
 
       btn.addEventListener('click', () => {
+        // Genuine user action — fade the part just read. This is the one
+        // place progressive within-step fading is intentional: each
+        // reflection part recedes only once the user has actively chosen
+        // to move past it, never automatically.
+        _markPreviousStepsPast();
         wrap.classList.remove('is-visible');
         setTimeout(() => wrap.remove(), 200);
         resolve();
@@ -719,14 +750,21 @@ export function ThreadView(router) {
   }
 
   /**
-   * Fade all currently-visible coach bubbles to "past" opacity. Called
-   * from inside _showCoachBubble, at the moment typing begins for new
-   * content — that's the single correct chokepoint, since it's the exact
-   * instant something new is about to become "current". Calling this any
-   * earlier (e.g. at the top of _runStep) risked fading a bubble before
-   * the user had even had a chance to read it, because some steps call
-   * _runStep again internally right after showing their own response
-   * (Step 2's submit handler is the example that surfaced this bug).
+   * Fade all currently-visible coach bubbles to "past" opacity.
+   *
+   * RULE: call this only from inside a genuine user-interaction handler —
+   * a chip tap, a text submit, a sheet closing, a gate answer, a Continue
+   * tap — never automatically inside _showCoachBubble or at step
+   * boundaries. Earlier versions tried both of those approaches and both
+   * were wrong: calling it at the top of _runStep faded a bubble before
+   * the user had read it (some steps call _runStep again internally
+   * right after showing their own response); calling it inside
+   * _showCoachBubble faded the first of two back-to-back coach bubbles
+   * within the same step, with no user action between them at all (an
+   * acknowledgement immediately followed by the next question, for
+   * example). The only thing that should ever cause a fade is the user
+   * actually doing something — see the call sites throughout this file,
+   * each placed at the exact moment a user action is confirmed.
    * Idempotent: only targets bubbles not already faded, so it's safe to
    * call more than once without double-fading anything.
    * User bubbles are never faded — they remain the full-opacity record.
@@ -781,6 +819,11 @@ export function ThreadView(router) {
     // Chip tap — single select, immediate advance
     wrap.querySelectorAll('.ob-chip:not(.ob-chip--skip)').forEach(btn => {
       btn.addEventListener('click', async () => {
+        // Genuine user action — this is the exact moment that should
+        // fade everything shown before it (e.g. tapping "A little
+        // walking" should grey out both the conditions acknowledgement
+        // and the activity question above it, not just one or the other).
+        _markPreviousStepsPast();
         _lockChips(wrap);
         const id = btn.dataset.id;
 
@@ -807,6 +850,7 @@ export function ThreadView(router) {
     // Skip
     if (hasSkip) {
       wrap.querySelector('[data-skip]')?.addEventListener('click', async () => {
+        _markPreviousStepsPast();
         _lockChips(wrap);
         _showUserBubble(step.skipLabel);
         if (step.coachAfter?.skipped) {
@@ -862,6 +906,11 @@ export function ThreadView(router) {
   }
 
   async function _handleSheetResult(step, result) {
+    // Genuine user action — the sheet has closed because the user either
+    // completed it or explicitly skipped it. Either way, that's the
+    // moment to fade what came before.
+    _markPreviousStepsPast();
+
     if (result.skipped) {
       _showUserBubble(step.skipLabel || "I'll decide later.");
       if (step.coachAfter?.skipped) {
