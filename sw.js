@@ -61,10 +61,22 @@
  *     the past-step fade; opacity-based dimming measured ~3.9:1 (fails
  *     AA), replaced with solid colour swap measuring 7.59:1.
  *
+
+ * alongside-v137 (29 Jun 2026) — Three fixes from screenshot review:
+ *   js/views/onboarding/thread.js v4 — name capitalisation fixed at
+ *     point of entry (store.set corrects first-letter case); new Step 2b
+ *     pacing beat added to give the past-fade a genuine boundary to land
+ *     in, since Step 2 was previously advancing straight into 3a with no
+ *     pause at all.
+ *   js/data/onboarding-thread-data.js v3 — Step 2b config added
+ *     ("Ready to get started?" single-chip step); STEP_ORDER updated;
+ *     Step 2's coach message split — settings reassurance line moved to
+ *     2b.
+ *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v136";
+const CACHE_NAME = "alongside-v137";
 
 const SHELL_URLS = [
 
