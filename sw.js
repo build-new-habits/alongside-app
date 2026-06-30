@@ -108,10 +108,38 @@
  *     anywhere in the codebase — added full chip styling matching the
  *     existing visual language.
  *
+
+ * alongside-v140 (29 Jun 2026) — S1, S4, S5 root causes confirmed and
+ *   fixed against real source files (equipment.js, onboarding.css,
+ *   variables.css all read directly — no guessing this round):
+ *   js/views/onboarding/equipment.js v4 — the REAL bug behind S4/S5:
+ *     this view has its own internal multi-screen state and its own
+ *     rerender() function, hardcoded to write to #main-content. Inside
+ *     the OB-THREAD sheet, the first internal screen change (tapping
+ *     any facility card) escaped the sheet and overwrote the real app
+ *     underneath it. Two new optional exports added — mountContainer(el)
+ *     and setSheetDoneCallback(fn) — so the view can be told where it
+ *     actually lives and given a sheet-aware "finish" action instead of
+ *     its old hardcoded navigate to the retired onboarding/frequency
+ *     route.
+ *   js/views/onboarding/sheet-manager.js v3 — calls the two new hooks
+ *     on any loaded module that exports them, gated behind typeof
+ *     checks so views without them (conditions.js) are unaffected.
+ *   js/views/onboarding/thread.js v6 — Step 11 summary reader was
+ *     reading store.sessionLocation, a field equipment.js never writes;
+ *     fixed to read only the real combined equipment[] list.
+ *   js/data/onboarding-thread-data.js v4 — equipment summary generator
+ *     corrected to match — no facility name ever exists to read.
+ *   css/layouts/onboarding-additions.css v9 — S1's real cause: the
+ *     .onboarding-footer element goals.js renders had NO CSS rule
+ *     anywhere in the codebase (confirmed against onboarding.css
+ *     directly) — it was never sticky/fixed, contrary to every previous
+ *     guess. Given real, direct styling.
+ *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v139";
+const CACHE_NAME = "alongside-v140";
 
 const SHELL_URLS = [
 
