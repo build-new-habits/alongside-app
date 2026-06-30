@@ -1,6 +1,24 @@
 /**
  * js/views/onboarding/thread.js
- * 29 Jun 2026 v1
+ * 29 Jun 2026 v2
+ *
+ * v2 — Post-QA revision:
+ *   Step 1 fix: coach-only steps now correctly auto-advance only when
+ *     there is genuinely no user input in that step (was previously
+ *     firing the Step 2 coach response before the user had typed
+ *     their name — wrong order, reported in testing).
+ *   Step 4 reworked: was an unconsented, fully auto-revealing five-part
+ *     sequence — reported as overwhelming in testing. Now a consent
+ *     gate ("read it now, or find it in settings later") followed by
+ *     an actively-paced reveal — each part requires an explicit
+ *     Continue tap, never a timeout or passive auto-advance, since
+ *     silently assuming disengagement is the exact pattern this
+ *     product exists to be the antidote to.
+ *   Past-step fade added: completed steps' coach bubbles recede to 45%
+ *     opacity once the conversation moves past them, applied centrally
+ *     at the top of every _runStep call. User bubbles never fade —
+ *     they remain the permanent full-opacity record.
+ *   Header added: "Alongside: Move" sticky wordmark at top of thread.
  *
  * OB-THREAD — the complete onboarding conversational experience.
  * One screen. The coach speaks first. The relationship begins here.
@@ -151,6 +169,12 @@ export function ThreadView(router) {
       return;
     }
 
+    // Fade the previous step's coach bubbles before the new step begins.
+    // This is the single point of control for the past/active visual
+    // hierarchy — every step transition passes through here, so no
+    // individual step handler needs to remember to call it.
+    _markPreviousStepsPast();
+
     switch (step.type) {
 
       case 'coach-only':
@@ -182,8 +206,8 @@ export function ThreadView(router) {
         _showChipsPrimary(step);
         break;
 
-      case 'sequential-reveal':
-        await _runSequentialReveal(step);
+      case 'reflection-gate':
+        await _runReflectionGate(step);
         break;
 
       case 'sheet':
@@ -522,52 +546,157 @@ export function ThreadView(router) {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // STEP 4 — Sequential reveal (Beat 3 reflection)
+  // STEP 4 — Reflection gate + active sequential reveal (Beat 3)
   // ─────────────────────────────────────────────────────────────────────────
 
-  async function _runSequentialReveal(step) {
-    // Write reflectionShownAt
+  /**
+   * Resolve the Beat 3 script parts for the current user.
+   * Falls back to FALLBACK_REFLECTION if Hard Before was skipped or no
+   * territory was set.
+   */
+  function _resolveReflectionParts() {
+    if (_skippedHardBefore) return FALLBACK_REFLECTION;
+    const territory = store.get('onboarding.primaryTerritory');
+    // getBeat3Script expects string[] — wrap in array so getDominantTerritory()
+    // returns territory correctly. primaryTerritory is always a single string.
+    const script = territory ? getBeat3Script([territory]) : null;
+    return script ? script.parts : FALLBACK_REFLECTION;
+  }
+
+  /**
+   * Step 4 entry point. Shows the consent gate first. The reflection itself
+   * only begins once the user actively chooses "Read it now" — never shown
+   * unprompted, never auto-advanced past without explicit action.
+   */
+  async function _runReflectionGate(step) {
+    // Record that the reflection was offered, regardless of the answer.
     store.set('onboarding.reflectionShownAt', new Date().toISOString());
 
-    // Get script parts
-    let parts;
-    if (_skippedHardBefore) {
-      parts = FALLBACK_REFLECTION;
-    } else {
-      const territory = store.get('onboarding.primaryTerritory');
-      // getBeat3Script expects string[] — wrap in array so getDominantTerritory()
-      // returns territory correctly. primaryTerritory is always a single string.
-      const script    = territory ? getBeat3Script([territory]) : null;
-      parts = script ? script.parts : FALLBACK_REFLECTION;
-    }
+    await _showCoachBubble(step.gateText);
 
-    // Show typing indicator once before the first part
-    const typing = _showTyping();
-    const typeMs = REDUCED_MOTION ? 0 : T.TYPING_MIN;
+    const wrap = document.createElement('div');
+    wrap.className = 'ob-gate';
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Read your reflection now or later');
+    wrap.innerHTML = `
+      <div class="ob-gate__wrap">
+        <button class="ob-gate__btn ob-gate__btn--primary" data-gate="yes">
+          ${_esc(step.gateYesLabel)}
+        </button>
+        <button class="ob-gate__btn" data-gate="no">
+          ${_esc(step.gateNoLabel)}
+        </button>
+      </div>
+    `;
+    _thread.appendChild(wrap);
+    _scrollToBottom();
+    setTimeout(() => wrap.classList.add('is-visible'), T.CHIP_APPEAR);
 
-    await new Promise(resolve => setTimeout(resolve, typeMs));
-    _removeTyping(typing);
-    await new Promise(resolve => setTimeout(resolve, T.BUBBLE_DELAY));
+    const lockGate = () => {
+      wrap.querySelectorAll('.ob-gate__btn').forEach(b => { b.disabled = true; });
+    };
 
-    // Reveal parts sequentially
+    wrap.querySelector('[data-gate="yes"]').addEventListener('click', async () => {
+      lockGate();
+      _showUserBubble(step.gateYesLabel);
+      await _markPreviousStepsPast();
+      await _runReflectionParts(step);
+    });
+
+    wrap.querySelector('[data-gate="no"]').addEventListener('click', async () => {
+      lockGate();
+      _showUserBubble(step.gateNoLabel);
+      await _showCoachBubble(step.declineCoach);
+      _runStep(5);
+    });
+
+    setTimeout(() => wrap.querySelector('.ob-gate__btn').focus(), T.CHIP_APPEAR + 50);
+  }
+
+  /**
+   * Active sequential reveal. Part 1 shows automatically after the gate
+   * answer. Every subsequent part requires an explicit "Continue" tap —
+   * there is no timeout and no passive auto-advance. Going quiet and
+   * assuming disengagement is the exact pattern this product promises
+   * never to repeat, so the only way forward is the user choosing to
+   * continue, every time.
+   */
+  async function _runReflectionParts(step) {
+    const parts = _resolveReflectionParts();
+
     for (let i = 0; i < parts.length; i++) {
+      const typing = _showTyping();
+      const typeMs = REDUCED_MOTION ? 0 : T.TYPING_MIN;
+      await new Promise(resolve => setTimeout(resolve, typeMs));
+      _removeTyping(typing);
+      await new Promise(resolve => setTimeout(resolve, T.BUBBLE_DELAY));
+
       const bubble = document.createElement('div');
       bubble.className = 'ob-bubble ob-bubble--coach ob-bubble--part';
       bubble.innerHTML = _formatCoachText(parts[i]);
       _thread.appendChild(bubble);
       _scrollToBottom();
+      requestAnimationFrame(() => bubble.classList.add('is-visible'));
 
-      await new Promise(resolve => setTimeout(resolve, T.PART_FADE));
-      bubble.classList.add('is-visible');
+      const isLast = i === parts.length - 1;
 
-      if (i < parts.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, T.PART_DELAY));
+      if (!isLast) {
+        // Wait for explicit Continue tap before revealing the next part.
+        await _waitForContinue(step.continueLabel);
       }
     }
 
-    // Auto-advance after last part
-    await new Promise(resolve => setTimeout(resolve, T.AUTO_ADVANCE));
+    // Brief pause after the final part, then advance — this one is fine
+    // to be automatic since there's no further content being withheld.
+    await new Promise(resolve => setTimeout(resolve, step.autoAdvanceAfterMs || T.AUTO_ADVANCE));
     _runStep(5);
+  }
+
+  /**
+   * Show a single "Continue" button under the most recent bubble and
+   * resolve the returned promise only when the user taps it.
+   */
+  function _waitForContinue(label) {
+    return new Promise(resolve => {
+      const wrap = document.createElement('div');
+      wrap.className = 'ob-continue-wrap';
+      wrap.innerHTML = `
+        <button class="ob-continue-btn" aria-label="${_esc(label)} to the next part">
+          ${_esc(label)}
+        </button>
+      `;
+      _thread.appendChild(wrap);
+      _scrollToBottom();
+      setTimeout(() => wrap.classList.add('is-visible'), T.CHIP_APPEAR);
+
+      const btn = wrap.querySelector('.ob-continue-btn');
+      setTimeout(() => btn.focus(), T.CHIP_APPEAR + 50);
+
+      btn.addEventListener('click', () => {
+        wrap.classList.remove('is-visible');
+        setTimeout(() => wrap.remove(), 200);
+        resolve();
+      });
+    });
+  }
+
+  /**
+   * Fade all currently-visible coach bubbles to "past" opacity. Called
+   * centrally at the top of every _runStep transition, so completed steps
+   * recede automatically as the conversation moves forward — the active
+   * step is always the only one at full brightness. Also called once more
+   * inside the Step 4 gate handler, since that step contains an internal
+   * transition (gate question → reflection) that isn't a step boundary.
+   * Idempotent: only targets bubbles not already faded, so calling it
+   * twice in close succession is harmless.
+   * User bubbles are never faded — they remain the full-opacity record.
+   */
+  function _markPreviousStepsPast() {
+    return new Promise(resolve => {
+      const coachBubbles = _thread.querySelectorAll('.ob-bubble--coach:not(.is-past)');
+      coachBubbles.forEach(b => b.classList.add('is-past'));
+      setTimeout(resolve, REDUCED_MOTION ? 0 : 150);
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────
