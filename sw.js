@@ -1,6 +1,26 @@
 /**
  * sw.js - Alongside Service Worker
- * 29 Jun 2026 v136
+ * 29 Jun 2026 v135
+ *
+ * alongside-v135 (29 Jun 2026) — Reflection gate revision, post-QA:
+ *   js/views/onboarding/thread.js v2 — Step 1 auto-advance fix (name input
+ *     was firing before the question rendered); Step 4 reworked from
+ *     auto-advancing sequential reveal to an active consent-gated reveal
+ *     (Y/N gate, then explicit "Continue" tap between each part — no
+ *     timeout, no passive auto-advance); past-step fade applied centrally
+ *     at every step transition (Option A from the visual-overwhelm review).
+ *   js/data/onboarding-thread-data.js v2 — Step 4 reflection-gate config
+ *     (gate copy, decline copy, continue label); Step 3b coach copy updated
+ *     to the locked "take your time" wording.
+ *   css/components/onboarding-thread.css v2 — header wordmark styles;
+ *     reflection gate buttons; Continue-tap button; past-bubble fade.
+ *   css/components/settings-reflection.css v1 (new) — report-style
+ *     reflection block in settings.js Profile panel.
+ *   js/views/settings.js v6 — new "Your reflection" collapsible section;
+ *     reads onboarding.primaryTerritory live via getBeat3Script(), no new
+ *     schema; reset-data route fixed from retired 'welcome' to
+ *     'onboarding/thread'.
+ *   css/main.css v8 — added settings-reflection.css import.
  *
  * alongside-v134 (29 Jun 2026) — OB-THREAD build batch:
  *   store.js v7 (three new onboarding fields);
@@ -33,7 +53,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v136";
+const CACHE_NAME = "alongside-v135";
 
 const SHELL_URLS = [
 
@@ -59,6 +79,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/nav-fix.css",
   "/alongside-app/css/components/onboarding-thread.css",
   "/alongside-app/css/components/sheet-manager.css",
+  "/alongside-app/css/components/settings-reflection.css",
 
   // Core JS
   "/alongside-app/js/app.js",
