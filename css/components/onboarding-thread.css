@@ -1,6 +1,11 @@
 /**
  * css/components/onboarding-thread.css
- * 29 Jun 2026 v1
+ * 29 Jun 2026 v2
+ *
+ * v2 — Post-QA revision: added .ob-header (sticky wordmark), .ob-gate
+ *   (reflection consent buttons), .ob-continue-wrap/.ob-continue-btn
+ *   (active-pace Continue tap), and .ob-bubble--coach.is-past (the
+ *   past-step fade — Option A from the visual-overwhelm review).
  *
  * OB-THREAD conversational UI.
  * Coach bubbles (left-aligned), user bubbles (right-aligned),
@@ -557,4 +562,132 @@
 /* Adjust thread scroll top padding to account for sticky header */
 .ob-thread__scroll {
   padding-top: 16px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   REFLECTION GATE — Step 4 consent question
+   Two-button Y/N choice, same visual language as chips but styled as a
+   deliberate pair rather than a tray (only ever two options here).
+───────────────────────────────────────────────────────────────────────────── */
+
+.ob-gate {
+  align-self: stretch;
+  margin: 8px 0 4px;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.ob-gate.is-visible { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-gate { transition: none; opacity: 1; }
+}
+
+.ob-gate__wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ob-gate__btn {
+  width: 100%;
+  padding: 14px 20px;
+  min-height: 52px;
+  border-radius: 12px;
+  border: 1.5px solid var(--color-mid, #2C3E3E);
+  background: transparent;
+  color: var(--color-surface, #E8F4F4);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ob-gate__btn:hover {
+  border-color: var(--color-primary, #1B6B6B);
+  background: rgba(27, 107, 107, 0.15);
+}
+
+.ob-gate__btn:focus-visible {
+  outline: 3px solid var(--color-primary, #1B6B6B);
+  outline-offset: 2px;
+}
+
+.ob-gate__btn--primary {
+  background: var(--color-primary, #1B6B6B);
+  border-color: var(--color-primary, #1B6B6B);
+  color: #ffffff;
+}
+
+.ob-gate__btn--primary:hover { background: #155858; }
+
+.ob-gate__btn:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-gate__btn { transition: none; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SEQUENTIAL REVEAL — Continue tap
+   Quiet, low-emphasis control under each reflection part. Deliberately
+   understated — this is a pause for breath, not a decision point.
+───────────────────────────────────────────────────────────────────────────── */
+
+.ob-continue-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0 20px;
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.ob-continue-wrap.is-visible { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-continue-wrap { transition: none; opacity: 1; }
+}
+
+.ob-continue-btn {
+  padding: 10px 24px;
+  min-height: 44px;
+  border-radius: 22px;
+  border: 1.5px solid var(--color-mid, #2C3E3E);
+  background: transparent;
+  color: var(--color-muted, #6B8585);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ob-continue-btn:hover {
+  border-color: var(--color-primary, #1B6B6B);
+  color: var(--color-surface, #E8F4F4);
+  background: rgba(27, 107, 107, 0.15);
+}
+
+.ob-continue-btn:focus-visible {
+  outline: 3px solid var(--color-primary, #1B6B6B);
+  outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PAST-STEP FADE (Option A — agreed)
+   Once a step is complete, its coach bubbles recede to signal "done" while
+   the active step stays at full brightness. User bubbles remain full
+   opacity always — they are the permanent record of what was said.
+───────────────────────────────────────────────────────────────────────────── */
+
+.ob-bubble--coach.is-past {
+  opacity: 0.45;
+  transition: opacity 500ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-bubble--coach.is-past { transition: none; }
 }
