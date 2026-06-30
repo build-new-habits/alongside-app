@@ -1,6 +1,25 @@
 /**
  * js/views/onboarding/sheet-manager.js
- * 29 Jun 2026 v2
+ * 29 Jun 2026 v3
+ *
+ * v3 — Real root cause of the equipment step (S4/S5) found and fixed,
+ *   after equipment.js source was finally read directly rather than
+ *   assumed. The bug was NOT a missing/wrong navigate() intercept —
+ *   equipment.js has its OWN internal multi-screen state (facility list
+ *   <-> equipment sub-screen) and its own rerender() function, hardcoded
+ *   to write to #main-content. Mounting it inside the sheet worked for
+ *   the FIRST render only; the moment the user tapped a facility card,
+ *   rerender() escaped the sheet and overwrote the real app underneath
+ *   it — explaining both the unresponsive chips (handlers wired to a
+ *   detached/wrong DOM node) and the wrong-screen landing (the Finish
+ *   button's hardcoded router.navigate('onboarding/frequency') call,
+ *   pointing at a route OB-THREAD retired, was always going to fire
+ *   regardless of sheet context). Two new optional hooks added:
+ *   mountContainer(el) and setSheetDoneCallback(fn) — called on any
+ *   loaded module that exports them, before render() runs. equipment.js
+ *   v4 implements both. Views that don't export these (e.g.
+ *   conditions.js) are unaffected — every new call is gated behind a
+ *   typeof check.
  *
  * v2 — Critical fix: the sheet manager assumed every onboarding view used
  *   the new { mount(container) } factory pattern. conditions.js (and
@@ -195,11 +214,46 @@ export async function openSheet(viewKey, onDone, triggerEl = null) {
   if (typeof module.render === 'function') {
     // ── OLD PATTERN ──────────────────────────────────────────────────────
     // render() returns HTML directly. The view's onclick handlers call
-    // global functions (window.toggleCondition, window.saveConditions)
-    // and the bare global `router.navigate(...)`. We intercept the real
-    // window.router.navigate for the lifetime of this sheet only.
+    // global functions and/or the bare global `router.navigate(...)`.
+    //
+    // v2 (this fix): some old-pattern views — equipment.js confirmed,
+    // possibly others — have their OWN internal multi-screen state and
+    // their own internal re-render function, hardcoded to write to
+    // #main-content. That escapes the sheet entirely on the view's first
+    // internal screen change, which was the actual root cause of the
+    // equipment step appearing broken (chips unresponsive, Finish
+    // landing on the wrong screen) — confirmed against the real file,
+    // not assumed. Views that have been updated to support this call an
+    // optional mountContainer(el) export, telling them where they
+    // actually live so their own internal re-renders target the right
+    // place. Views without this export are unaffected — call is gated
+    // behind a typeof check.
+    if (typeof module.mountContainer === 'function') {
+      module.mountContainer(_content);
+    }
+
+    // Similarly, some old-pattern views have a hardcoded "finish" route
+    // that predates OB-THREAD and points at a now-retired view (e.g.
+    // equipment.js's Finish button called
+    // router.navigate('onboarding/frequency'), which router.js v7 no
+    // longer recognises). Views updated to support this call an
+    // optional setSheetDoneCallback(fn) export instead of hardcoding
+    // that navigation — we register a callback that simply closes the
+    // sheet, exactly like the window.router.navigate intercept below
+    // does for views that don't have this export yet.
+    if (typeof module.setSheetDoneCallback === 'function') {
+      module.setSheetDoneCallback(() => {
+        _close({ skipped: false, viewKey });
+      });
+    }
+
     _content.innerHTML = module.render();
 
+    // Intercept the bare global router.navigate for the lifetime of this
+    // sheet — still needed as a fallback for any navigate() call this
+    // view makes that ISN'T routed through setSheetDoneCallback (e.g.
+    // conditions.js, which has no internal sub-screens and so never
+    // needed the two fixes above).
     const realNavigate = window.router?.navigate;
     if (window.router) {
       window.router.navigate = (_destination) => {
@@ -220,6 +274,15 @@ export async function openSheet(viewKey, onDone, triggerEl = null) {
     // view never calls navigate (e.g. user dismisses via overlay/Escape).
     _oldPatternRestoreNavigate = () => {
       if (window.router && realNavigate) window.router.navigate = realNavigate;
+      // Also clear the view's own mount/callback state, if it supports
+      // them, so a stale reference to a now-destroyed sheet container
+      // can't be used if the same module is opened again later.
+      if (typeof module.mountContainer === 'function') {
+        module.mountContainer(null);
+      }
+      if (typeof module.setSheetDoneCallback === 'function') {
+        module.setSheetDoneCallback(null);
+      }
     };
 
   } else if (ViewFactory) {
