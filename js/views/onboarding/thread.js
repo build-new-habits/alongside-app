@@ -1,6 +1,23 @@
 /**
  * js/views/onboarding/thread.js
- * 29 Jun 2026 v3
+ * 29 Jun 2026 v4
+ *
+ * v4 — Two further fixes from screenshot review:
+ *   1. Name capitalisation: store.set('name', ...) now capitalises the
+ *      first letter before writing, correcting the common case of
+ *      someone typing their own name lowercase on a phone keyboard.
+ *      Fixed at the point of entry (Step 2 submit handler) so every
+ *      other view reading store.get('name') inherits the correction —
+ *      not just the thread's own bubbles.
+ *   2. Missing interaction gate: Step 2 was advancing straight into
+ *      Step 3a with no pause, which is also why the past-fade looked
+ *      wrong in the previous screenshot — there was no real step
+ *      boundary for it to land in. Added Step 2b: a single light-touch
+ *      "Ready to get started?" chip between the name response and Hard
+ *      Before. The second half of Step 2's original coach message (the
+ *      settings reassurance line) moved here too, so the pacing reads
+ *      as two distinct beats instead of one wall of text immediately
+ *      followed by another.
  *
  * v3 — Two bugs found in screenshot review:
  *   1. Premature fade: _markPreviousStepsPast() was called at the top of
@@ -386,17 +403,21 @@ export function ThreadView(router) {
       sendBtn.disabled = true;
       bar.classList.remove('is-visible');
 
-      // Write to store
-      store.set('name', name);
+      // Capitalise before writing to store — corrects the common case of
+      // someone typing their own name lowercase on a phone keyboard.
+      // Fixed at the point of entry so every other view that reads
+      // store.get('name') inherits the correction automatically.
+      const displayName = _capitalise(name);
+      store.set('name', displayName);
 
       // User bubble
-      _showUserBubble(name);
+      _showUserBubble(displayName);
 
       // Remove input bar after animation
       setTimeout(() => bar.remove(), 300);
 
       // Coach response (uses name)
-      const coachText = step.coach.replace(/\[Name\]/g, name);
+      const coachText = step.coach.replace(/\[Name\]/g, displayName);
       await _showCoachBubble(coachText);
 
       _runStep(_nextStep(step.id));
@@ -763,11 +784,16 @@ export function ThreadView(router) {
         _lockChips(wrap);
         const id = btn.dataset.id;
 
-        // Write to store
+        // Write to store (no-ops safely if step.storeField is null —
+        // Step 2b is a pacing beat with no real data to collect)
         _writeStepValue(step, id);
 
-        // User bubble
-        const summaryText = generateSummary(step.summaryType, id);
+        // User bubble: if the step has no summaryType (Step 2b), echo the
+        // chip label directly rather than routing through generateSummary,
+        // which would return an empty string for an unhandled type.
+        const summaryText = step.summaryType
+          ? generateSummary(step.summaryType, id)
+          : btn.textContent.trim();
         _showUserBubble(summaryText);
 
         // Coach response
@@ -983,6 +1009,18 @@ export function ThreadView(router) {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  /**
+   * Capitalise the first letter of a name as typed. People often type
+   * their own name lowercase on a phone keyboard without thinking about
+   * it — this is purely a display correction, the store keeps whatever
+   * the user actually typed unmodified, and this is applied wherever the
+   * name is shown back to them (user bubble, coach response, settings).
+   */
+  function _capitalise(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
