@@ -1,8 +1,19 @@
 /**
  * js/views/onboarding/sheet-manager.js
- * 29 Jun 2026 v1
+ * 29 Jun 2026 v2
  *
- * Sheet engine for the OB-THREAD conversational onboarding.
+ * v2 — Critical fix: the sheet manager assumed every onboarding view used
+ *   the new { mount(container) } factory pattern. conditions.js (and
+ *   possibly equipment.js, unconfirmed) actually uses the OLD pattern —
+ *   export function render() returning raw HTML, with onclick handlers
+ *   calling global window functions and the bare global router.navigate()
+ *   directly. This was never verified against the real file before v1
+ *   shipped, and caused a hard crash: "view.mount is not a function" the
+ *   moment a user reached the conditions step. openSheet() now detects
+ *   which pattern a module uses and handles both — see the OLD PATTERN /
+ *   NEW PATTERN branches below for the full explanation of each approach.
+ *
+ * v1 — Sheet engine for the OB-THREAD conversational onboarding.
  *
  * Mounts any existing onboarding view (goals.js, conditions.js,
  * equipment.js, plan-select.js) inside the 95% bottom sheet without
@@ -67,6 +78,14 @@ let _triggerEl    = null;  // HTMLElement — element that opened the sheet (foc
 let _doneCallback = null;  // function(result) — called on close
 let _isOpen       = false;
 
+// Old-pattern views (conditions.js) call the bare global window.router.navigate
+// directly — there is no router argument to intercept. While such a view is
+// mounted, window.router.navigate is temporarily swapped; this holds the
+// function that restores the real one. Always called in _close(), so the
+// real navigate is restored whether the view called it or the sheet was
+// dismissed another way (overlay tap, Escape).
+let _oldPatternRestoreNavigate = null;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // BUILD DOM
 // Called once on first openSheet(). Elements are reused on subsequent opens.
@@ -117,6 +136,23 @@ function _buildDOM() {
 /**
  * Open the sheet and mount the specified view.
  *
+ * Supports BOTH view patterns that exist in this codebase:
+ *
+ *   NEW pattern — goals.js, plan-select.js:
+ *     export function SomeView(router) { return { mount(container) {...} } }
+ *     Takes a router argument directly. We pass a fakeRouter whose
+ *     navigate() signals "done" — clean, no global state involved.
+ *
+ *   OLD pattern — conditions.js (and likely equipment.js, unconfirmed):
+ *     export function render() { return '<html>' }
+ *     Attaches handlers to window (window.toggleCondition, etc.) and calls
+ *     the bare global `router.navigate(...)` directly — there is no
+ *     router argument to intercept. For this pattern we temporarily
+ *     swap window.router.navigate for the duration the sheet is open,
+ *     then restore the real one on close. This is the only place in the
+ *     codebase that touches window.router this way — it exists solely
+ *     to let the old-pattern views run unmodified inside a sheet.
+ *
  * @param {string}   viewKey    — key from VIEW_MAP (e.g. 'onboarding/goals')
  * @param {function} onDone     — callback(result) where result = { skipped, data }
  * @param {HTMLElement} [triggerEl] — element to return focus to on close
@@ -153,30 +189,59 @@ export async function openSheet(viewKey, onDone, triggerEl = null) {
     return;
   }
 
-  // Resolve the view factory.
-  // goals.js exports GoalsView, plan-select.js exports PlanSelectView, etc.
-  // We find the first exported function that looks like a view factory.
+  // Detect which pattern this module uses.
   const ViewFactory = _resolveFactory(module);
-  if (!ViewFactory) {
-    console.error(`SheetManager: no view factory found in module "${viewKey}"`);
+
+  if (typeof module.render === 'function') {
+    // ── OLD PATTERN ──────────────────────────────────────────────────────
+    // render() returns HTML directly. The view's onclick handlers call
+    // global functions (window.toggleCondition, window.saveConditions)
+    // and the bare global `router.navigate(...)`. We intercept the real
+    // window.router.navigate for the lifetime of this sheet only.
+    _content.innerHTML = module.render();
+
+    const realNavigate = window.router?.navigate;
+    if (window.router) {
+      window.router.navigate = (_destination) => {
+        // Restore the real navigate immediately — the view called this
+        // because the user confirmed/skipped, so the sheet is done.
+        if (realNavigate) window.router.navigate = realNavigate;
+        _close({ skipped: false, viewKey });
+      };
+    }
+
+    // Old-pattern views sometimes export onMount() to wire up anything
+    // that isn't covered by inline onclick attributes. Call it if present.
+    if (typeof module.onMount === 'function') {
+      module.onMount();
+    }
+
+    // Store the restore function so _close() can call it even if the
+    // view never calls navigate (e.g. user dismisses via overlay/Escape).
+    _oldPatternRestoreNavigate = () => {
+      if (window.router && realNavigate) window.router.navigate = realNavigate;
+    };
+
+  } else if (ViewFactory) {
+    // ── NEW PATTERN ──────────────────────────────────────────────────────
+    const fakeRouter = {
+      navigate(_destination) {
+        _close({ skipped: false, viewKey });
+      }
+    };
+    const view = ViewFactory(fakeRouter);
+    if (typeof view.mount !== 'function') {
+      console.error(`SheetManager: view factory for "${viewKey}" did not return { mount }`);
+      _close({ skipped: true });
+      return;
+    }
+    view.mount(_content);
+
+  } else {
+    console.error(`SheetManager: no usable view pattern found in module "${viewKey}"`);
     _close({ skipped: true });
     return;
   }
-
-  // Build a fake router whose navigate() signals "done".
-  // The view calls router.navigate(destination) when the user confirms.
-  // We don't care about the destination — thread.js owns routing.
-  const fakeRouter = {
-    navigate(_destination) {
-      // The view has already written its data to store at this point.
-      // Read the relevant store field to pass back as result.data.
-      _close({ skipped: false, viewKey });
-    }
-  };
-
-  // Mount the view
-  const view = ViewFactory(fakeRouter);
-  view.mount(_content);
 
   // Open animation
   requestAnimationFrame(() => {
@@ -195,6 +260,13 @@ export async function openSheet(viewKey, onDone, triggerEl = null) {
 function _close(result) {
   if (!_isOpen) return;
   _isOpen = false;
+
+  // Always restore window.router.navigate if an old-pattern view swapped
+  // it — covers every dismissal path, not just the view's own confirm tap.
+  if (_oldPatternRestoreNavigate) {
+    _oldPatternRestoreNavigate();
+    _oldPatternRestoreNavigate = null;
+  }
 
   _overlay.classList.remove('is-open');
   _panel.classList.remove('is-open');
