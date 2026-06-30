@@ -89,10 +89,29 @@
  *     other onboarding screen sharing the generic footer classes is
  *     affected.
  *
+
+ * alongside-v139 (29 Jun 2026) — Three confirmed fixes from screenshot
+ *   review (S4 equipment tap and S5 wrong-screen-after-equipment are
+ *   real bugs but NOT included in this batch — root cause needs
+ *   equipment.js source confirmed before fixing, to avoid a third round
+ *   of guessing at an unseen file's structure):
+ *   js/views/onboarding/thread.js v5 — S3: fade trigger rule corrected
+ *     again. v3 moved the fade into _showCoachBubble, which still faded
+ *     bubbles with no user interaction between them (an acknowledgement
+ *     immediately followed by the next question, no click in between).
+ *     Removed entirely from _showCoachBubble; now triggered only from
+ *     genuine user-interaction handlers throughout the file.
+ *   css/layouts/onboarding-additions.css v7 — S1: Continue button
+ *     spacing fix that had no visible effect, replaced with bottom
+ *     padding directly on the scrollable content instead of spacing on
+ *     a likely-sticky footer. S2: conditions.js chips had zero styling
+ *     anywhere in the codebase — added full chip styling matching the
+ *     existing visual language.
+ *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v138";
+const CACHE_NAME = "alongside-v139";
 
 const SHELL_URLS = [
 
