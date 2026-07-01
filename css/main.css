@@ -1,6 +1,8 @@
 /* main.css
- * 29 Jun 2026 v8
+ * 01 Jul 2026 v9
  *
+ * v9 — Step 8 checkin.js conversational rewrite.
+ *   Uncommented D2 import: checkin-conversation.css v1 (new).
  * v8 — OB-THREAD reflection gate. Added settings-reflection.css for the
  *   new "Your reflection" report-style section in settings.js Profile panel.
  * v7 — OB-THREAD. Added onboarding-thread.css and sheet-manager.css.
@@ -52,8 +54,10 @@
 @import 'components/sheet-manager.css';
 @import 'components/settings-reflection.css';
 
+/* D2 — Check-in conversational thread */
+@import 'components/checkin-conversation.css';
+
 /* Content-gated — add when content sessions complete */
-/* D2: @import 'components/checkin-conversation.css'; */
-/* D3: @import 'components/home-threshold.css';       */
-/* D10: @import 'components/community-impact.css';    */
-/* D8: @import 'components/annual-reflection.css';    */
+/* D3:  @import 'components/home-threshold.css';       */
+/* D10: @import 'components/community-impact.css';     */
+/* D8:  @import 'components/annual-reflection.css';    */
