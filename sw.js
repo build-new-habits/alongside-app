@@ -1,142 +1,34 @@
 /**
  * sw.js - Alongside Service Worker
- * 29 Jun 2026 v135
+ * 01 Jul 2026 v143
  *
- * alongside-v135 (29 Jun 2026) — Reflection gate revision, post-QA:
- *   js/views/onboarding/thread.js v2 — Step 1 auto-advance fix (name input
- *     was firing before the question rendered); Step 4 reworked from
- *     auto-advancing sequential reveal to an active consent-gated reveal
- *     (Y/N gate, then explicit "Continue" tap between each part — no
- *     timeout, no passive auto-advance); past-step fade applied centrally
- *     at every step transition (Option A from the visual-overwhelm review).
- *   js/data/onboarding-thread-data.js v2 — Step 4 reflection-gate config
- *     (gate copy, decline copy, continue label); Step 3b coach copy updated
- *     to the locked "take your time" wording.
- *   css/components/onboarding-thread.css v2 — header wordmark styles;
- *     reflection gate buttons; Continue-tap button; past-bubble fade.
- *   css/components/settings-reflection.css v1 (new) — report-style
- *     reflection block in settings.js Profile panel.
- *   js/views/settings.js v6 — new "Your reflection" collapsible section;
- *     reads onboarding.primaryTerritory live via getBeat3Script(), no new
- *     schema; reset-data route fixed from retired 'welcome' to
- *     'onboarding/thread'.
- *   css/main.css v8 — added settings-reflection.css import.
+ * alongside-v143 (01 Jul 2026) — Step 8: checkin.js conversational
+ *   rewrite (D2 opening narratives + thread UX).
+ *   js/data/checkin-openings.js v1 (new) — D2 check-in opening content:
+ *     all six modes + Day One exception as structured data, plus
+ *     resolveOpening() resolver. Reads from store; returns { b1, b2,
+ *     mode, careMode }.
+ *   js/views/checkin.js v3 — full rewrite: conversational thread
+ *     (CheckinView factory pattern). D2 opening → energy panel → mood
+ *     panel → sleep panel → conditions panel (conditional) → time panel
+ *     → summary + action buttons. OB-THREAD fade rule preserved: bubble
+ *     fade fired only from confirmed user-interaction handlers.
+ *   css/components/checkin-conversation.css v1 (new) — thread, bubbles,
+ *     typing indicator, bottom-sliding input panels, time grid. Active /
+ *     faded bubble colours match Appendix G confirmed values.
+ *   css/main.css v9 — D2 @import uncommented.
  *
- * alongside-v134 (29 Jun 2026) — OB-THREAD build batch:
- *   store.js v7 (three new onboarding fields);
- *   js/data/onboarding-thread-data.js v1 (new — coach lines, step config,
- *     summary generators);
- *   css/components/onboarding-thread.css v1 (new — thread UI);
- *   css/components/sheet-manager.css v1 (new — 95% sheet);
- *   js/views/onboarding/sheet-manager.js v1 (new — sheet engine);
- *   js/views/onboarding/thread.js v1 (new — full 14-step conversation);
- *   js/router.js v7 (onboarding/thread route added, retired routes removed);
- *   app.js v6 (first-route logic: new users → onboarding/thread);
- *   css/main.css v7 (two new CSS imports).
- *   Retired onboarding files removed from SHELL_URLS:
- *     arrival.js, hard-before.js, reflection.js, complete.js, frequency.js,
- *     welcome.js, name.js, about.js (onboarding), body.js, lifestyle.js,
- *     goal-setup.js (onboarding variant).
- *   Retained in SHELL_URLS (reused as sheet content by sheet-manager.js):
- *     goals.js, conditions.js, equipment.js, plan-select.js.
+ * alongside-v142 (29 Jun 2026) — Gemini QA round 1 (C1/C2): fade not
+ *   visible. Investigated via direct DevTools breakpoint and
+ *   getComputedStyle verification — confirmed every layer of the fade
+ *   mechanism (JS call sites, class application, CSS rule, deployment)
+ *   was working exactly as built. The actual cause was a design
+ *   judgement: the background colour gap between active and faded
+ *   bubbles was only 12/765, invisible at a glance despite being
+ *   technically correct.
+ *   css/components/onboarding-thread.css v4 — widened the gap to
+ *     56/765 (#0A1414), reconfirmed WCAG AA text contrast (7.42:1).
  *
- * alongside-v133 (28 Jun 2026) — arrival.js v2, hard-before.js v2,
- *   reflection.js v2: fix import paths (../../data/ not ../data/).
- *
- * alongside-v132 (28 Jun 2026) — Build Step 7: arrival.js v1,
- *   hard-before.js v1, reflection.js v1, beat3-scripts.js v1,
- *   complete.js v5, onboarding-additions.css v5.
- *
- * alongside-v131 (26 Jun 2026) — Onboarding QA fixes.
- * alongside-v130 (26 Jun 2026) — nav-fix.css v2, css/main.css v6.
- *
-
- * alongside-v136 (29 Jun 2026) — Two bugs from screenshot review:
- *   js/views/onboarding/thread.js v3 — premature past-fade fixed (was
- *     firing before the user could read their own just-shown coach
- *     response, due to Step 2 calling _runStep internally after showing
- *     its reply); fade call moved into _showCoachBubble at the correct
- *     chokepoint.
- *   css/components/onboarding-thread.css v3 — WCAG AA contrast fix for
- *     the past-step fade; opacity-based dimming measured ~3.9:1 (fails
- *     AA), replaced with solid colour swap measuring 7.59:1.
- *
-
- * alongside-v137 (29 Jun 2026) — Three fixes from screenshot review:
- *   js/views/onboarding/thread.js v4 — name capitalisation fixed at
- *     point of entry (store.set corrects first-letter case); new Step 2b
- *     pacing beat added to give the past-fade a genuine boundary to land
- *     in, since Step 2 was previously advancing straight into 3a with no
- *     pause at all.
- *   js/data/onboarding-thread-data.js v3 — Step 2b config added
- *     ("Ready to get started?" single-chip step); STEP_ORDER updated;
- *     Step 2's coach message split — settings reassurance line moved to
- *     2b.
- *
-
- * alongside-v138 (29 Jun 2026) — Critical sheet crash fix + spacing fix:
- *   js/views/onboarding/sheet-manager.js v2 — dual-pattern support added.
- *     conditions.js uses the OLD render()/window-global pattern, not the
- *     { mount } factory pattern v1 assumed without verifying against the
- *     real file — caused a hard crash on the conditions step ("view.mount
- *     is not a function"). Fixed by detecting the pattern at runtime and
- *     temporarily intercepting window.router.navigate for old-pattern
- *     views, restored on every close path.
- *   css/layouts/onboarding-additions.css v6 — goals screen Continue
- *     button was rendering cramped against the last chip row with no
- *     breathing room. Added bottom padding to .goals-categories and a
- *     hairline separator above the action footer, scoped narrowly so no
- *     other onboarding screen sharing the generic footer classes is
- *     affected.
- *
-
- * alongside-v139 (29 Jun 2026) — Three confirmed fixes from screenshot
- *   review (S4 equipment tap and S5 wrong-screen-after-equipment are
- *   real bugs but NOT included in this batch — root cause needs
- *   equipment.js source confirmed before fixing, to avoid a third round
- *   of guessing at an unseen file's structure):
- *   js/views/onboarding/thread.js v5 — S3: fade trigger rule corrected
- *     again. v3 moved the fade into _showCoachBubble, which still faded
- *     bubbles with no user interaction between them (an acknowledgement
- *     immediately followed by the next question, no click in between).
- *     Removed entirely from _showCoachBubble; now triggered only from
- *     genuine user-interaction handlers throughout the file.
- *   css/layouts/onboarding-additions.css v7 — S1: Continue button
- *     spacing fix that had no visible effect, replaced with bottom
- *     padding directly on the scrollable content instead of spacing on
- *     a likely-sticky footer. S2: conditions.js chips had zero styling
- *     anywhere in the codebase — added full chip styling matching the
- *     existing visual language.
- *
-
- * alongside-v140 (29 Jun 2026) — S1, S4, S5 root causes confirmed and
- *   fixed against real source files (equipment.js, onboarding.css,
- *   variables.css all read directly — no guessing this round):
- *   js/views/onboarding/equipment.js v4 — the REAL bug behind S4/S5:
- *     this view has its own internal multi-screen state and its own
- *     rerender() function, hardcoded to write to #main-content. Inside
- *     the OB-THREAD sheet, the first internal screen change (tapping
- *     any facility card) escaped the sheet and overwrote the real app
- *     underneath it. Two new optional exports added — mountContainer(el)
- *     and setSheetDoneCallback(fn) — so the view can be told where it
- *     actually lives and given a sheet-aware "finish" action instead of
- *     its old hardcoded navigate to the retired onboarding/frequency
- *     route.
- *   js/views/onboarding/sheet-manager.js v3 — calls the two new hooks
- *     on any loaded module that exports them, gated behind typeof
- *     checks so views without them (conditions.js) are unaffected.
- *   js/views/onboarding/thread.js v6 — Step 11 summary reader was
- *     reading store.sessionLocation, a field equipment.js never writes;
- *     fixed to read only the real combined equipment[] list.
- *   js/data/onboarding-thread-data.js v4 — equipment summary generator
- *     corrected to match — no facility name ever exists to read.
- *   css/layouts/onboarding-additions.css v9 — S1's real cause: the
- *     .onboarding-footer element goals.js renders had NO CSS rule
- *     anywhere in the codebase (confirmed against onboarding.css
- *     directly) — it was never sticky/fixed, contrary to every previous
- *     guess. Given real, direct styling.
- *
-
  * alongside-v141 (29 Jun 2026) — S1 REAL root cause found, after four
  *   rounds of incorrect fixes targeting the wrong file:
  *   css/components/sheet-manager.css v2 — .sheet-content had zero
@@ -150,22 +42,58 @@
  *     regardless of what was added inside it. Fixed at the actual
  *     source this time.
  *
-
- * alongside-v142 (29 Jun 2026) — Gemini QA round 1 (C1/C2): fade not
- *   visible. Investigated via direct DevTools breakpoint and
- *   getComputedStyle verification — confirmed every layer of the fade
- *   mechanism (JS call sites, class application, CSS rule, deployment)
- *   was working exactly as built. The actual cause was a design
- *   judgement: the background colour gap between active and faded
- *   bubbles was only 12/765, invisible at a glance despite being
- *   technically correct.
- *   css/components/onboarding-thread.css v4 — widened the gap to
- *     56/765 (#0A1414), reconfirmed WCAG AA text contrast (7.42:1).
+ * alongside-v140 (29 Jun 2026) — S1, S4, S5 root causes confirmed and
+ *   fixed against real source files (equipment.js, onboarding.css,
+ *   variables.css all read directly — no guessing this round):
+ *   js/views/onboarding/equipment.js v4 — the REAL bug behind S4/S5:
+ *     this view has its own internal multi-screen state and its own
+ *     rerender() function, hardcoded to write to #main-content. Inside
+ *     the OB-THREAD sheet, the first internal screen change escaped the
+ *     sheet and overwrote the real app underneath it. mountContainer(el)
+ *     and setSheetDoneCallback(fn) added as optional exports.
+ *   js/views/onboarding/sheet-manager.js v3 — calls the two new hooks
+ *     on any loaded module that exports them.
+ *   js/views/onboarding/thread.js v6 — Step 11 summary reader fixed.
+ *   js/data/onboarding-thread-data.js v4 — equipment summary corrected.
+ *   css/layouts/onboarding-additions.css v9 — .onboarding-footer styled.
+ *
+ * alongside-v139 (29 Jun 2026) — thread.js v5 (fade trigger corrected
+ *   again); onboarding-additions.css v7 (Continue button + conditions
+ *   chips).
+ *
+ * alongside-v138 (29 Jun 2026) — sheet-manager.js v2 (dual-pattern
+ *   support; conditions.js crash fix); onboarding-additions.css v6
+ *   (goals Continue button spacing).
+ *
+ * alongside-v137 (29 Jun 2026) — thread.js v4 (name capitalisation;
+ *   Step 2b pacing beat); onboarding-thread-data.js v3 (Step 2b config).
+ *
+ * alongside-v136 (29 Jun 2026) — thread.js v3 (premature past-fade
+ *   fix); onboarding-thread.css v3 (WCAG AA contrast fix for fade).
+ *
+ * alongside-v135 (29 Jun 2026) — thread.js v2; onboarding-thread-data
+ *   v2; onboarding-thread.css v2; settings-reflection.css v1; settings
+ *   v6; main.css v8.
+ *
+ * alongside-v134 (29 Jun 2026) — OB-THREAD build batch: store.js v7,
+ *   onboarding-thread-data.js v1, onboarding-thread.css v1,
+ *   sheet-manager.css v1, sheet-manager.js v1, thread.js v1, router.js
+ *   v7, app.js v6, main.css v7. Retired onboarding files removed from
+ *   SHELL_URLS.
+ *
+ * alongside-v133 (28 Jun 2026) — arrival/hard-before/reflection import
+ *   path fixes.
+ *
+ * alongside-v132 (28 Jun 2026) — Build Step 7: arrival.js, hard-before,
+ *   reflection, beat3-scripts, complete, onboarding-additions.
+ *
+ * alongside-v131 (26 Jun 2026) — Onboarding QA fixes.
+ * alongside-v130 (26 Jun 2026) — nav-fix.css v2, main.css v6.
  *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v142";
+const CACHE_NAME = "alongside-v143";
 
 const SHELL_URLS = [
 
@@ -192,6 +120,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/onboarding-thread.css",
   "/alongside-app/css/components/sheet-manager.css",
   "/alongside-app/css/components/settings-reflection.css",
+  "/alongside-app/css/components/checkin-conversation.css",   // Step 8 — new
 
   // Core JS
   "/alongside-app/js/app.js",
@@ -247,6 +176,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/beat3-scripts.js",
   "/alongside-app/js/data/onboarding-thread-data.js",
   "/alongside-app/js/data/checkin.js",
+  "/alongside-app/js/data/checkin-openings.js",                // Step 8 — new
   "/alongside-app/js/data/conditions.js",
   "/alongside-app/js/data/equipment.js",
   "/alongside-app/js/data/goals.js",
