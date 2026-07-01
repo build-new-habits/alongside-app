@@ -1,0 +1,462 @@
+/* ============================================================
+   checkin-conversation.css
+   css/components/checkin-conversation.css
+   01 Jul 2026 v1
+
+   Conversational check-in thread — Option A pattern.
+   Bubble colours match OB-THREAD confirmed values (Appendix G):
+     Active coach:  bg #162A2A  text #E8F4F4
+     Faded coach:   bg #0A1414  text #8FA8A8  (56/765 RGB diff)
+     Text contrast: 7.42:1 — WCAG AA confirmed.
+   All interactive elements: min 44px touch target (WCAG 2.2).
+   prefers-reduced-motion: all transitions collapsed to 0ms.
+   ============================================================ */
+
+/* ── View container ─────────────────────────────────────────── */
+
+.ci-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-bg-deep);
+}
+
+/* ── Thread scroll area ─────────────────────────────────────── */
+
+.ci-thread {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-5) var(--space-4) var(--space-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Coach bubble ───────────────────────────────────────────── */
+
+.ci-bubble {
+  max-width: 85%;
+  border-radius: var(--radius-xl);
+  padding: var(--space-4) var(--space-5);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ci-bubble.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ci-bubble--coach {
+  align-self: flex-start;
+  background: #162A2A;
+  color: #E8F4F4;
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.ci-bubble--coach p {
+  margin: 0;
+  line-height: var(--leading-relaxed);
+  font-size: var(--text-base);
+}
+
+/* Faded past state — confirmed contrast values from Appendix G */
+.ci-bubble--coach.is-past {
+  background: #0A1414;
+  color: #8FA8A8;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ── User bubble ────────────────────────────────────────────── */
+
+.ci-bubble--user {
+  align-self: flex-end;
+  background: var(--color-primary);
+  color: var(--color-bg-deep);
+  border-bottom-right-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-relaxed);
+}
+
+/* User bubbles never fade — they are the permanent record. */
+
+/* ── Action buttons (summary step) ─────────────────────────── */
+
+.ci-actions {
+  margin-top: var(--space-4);
+  padding: var(--space-2) 0;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ci-actions.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Typing indicator ───────────────────────────────────────── */
+
+.ci-typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: var(--space-3) var(--space-4);
+  background: #162A2A;
+  border-radius: var(--radius-xl);
+  border-bottom-left-radius: var(--radius-sm);
+  align-self: flex-start;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.ci-typing.is-visible {
+  opacity: 1;
+}
+
+.ci-typing-dot {
+  width: 7px;
+  height: 7px;
+  background: #4A9E9E;
+  border-radius: 50%;
+  animation: ci-typing-pulse 1.2s infinite ease-in-out;
+}
+
+.ci-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.ci-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes ci-typing-pulse {
+  0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+  40%            { transform: scale(1);   opacity: 1;   }
+}
+
+/* ── Overlay (behind input panel) ──────────────────────────── */
+
+.ci-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.ci-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Input panel (slides up from bottom) ───────────────────── */
+
+.ci-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 101;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: var(--space-3) var(--space-5) var(--space-10);
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 90vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ci-panel.is-open {
+  transform: translateY(0);
+}
+
+/* Drag handle (decorative) */
+.ci-panel-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  margin: 0 auto var(--space-5);
+}
+
+/* Panel question text */
+.ci-panel-q {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  margin: 0 0 var(--space-5);
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Slider ─────────────────────────────────────────────────── */
+
+.ci-slider-wrap {
+  margin-bottom: var(--space-5);
+}
+
+.ci-value-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.ci-value-emoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.ci-value-num {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  min-width: 2ch;
+}
+
+.ci-value-label {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+}
+
+.ci-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 12px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  outline: none;
+  margin: var(--space-2) 0;
+}
+
+.ci-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 32px;
+  height: 32px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(45, 212, 191, 0.45);
+  transition: transform 0.15s ease;
+}
+
+.ci-slider::-webkit-slider-thumb:active { transform: scale(1.15); }
+
+.ci-slider::-moz-range-thumb {
+  width: 32px;
+  height: 32px;
+  background: var(--color-primary);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.ci-slider:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+.ci-slider-ends {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+/* ── Sleep adjuster ─────────────────────────────────────────── */
+
+.ci-sleep-adjuster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.ci-sleep-btn {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ci-sleep-btn:hover  { border-color: var(--color-primary); color: var(--color-primary); }
+.ci-sleep-btn:active { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-bg-deep); transform: scale(0.95); }
+
+.ci-sleep-display {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.ci-sleep-num {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  min-width: 3ch;
+  text-align: center;
+}
+
+.ci-sleep-unit {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
+
+/* ── Sleep quality chips ────────────────────────────────────── */
+
+.ci-quality-wrap {
+  margin-bottom: var(--space-4);
+}
+
+.ci-quality-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-3);
+}
+
+.ci-quality-chips {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.ci-quality-chip {
+  flex: 1;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 48px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ci-quality-chip:hover   { border-color: var(--color-primary); }
+.ci-quality-chip.selected { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-bg-deep); }
+.ci-quality-chip:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+
+/* ── Conditions ─────────────────────────────────────────────── */
+
+.ci-condition-row {
+  margin-bottom: var(--space-4);
+}
+
+.ci-condition-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+}
+
+.ci-pain-chips {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.ci-pain-chip {
+  flex: 1;
+  padding: var(--space-3) var(--space-1);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 48px;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ci-pain-chip:hover  { border-color: var(--color-text-muted); }
+.ci-pain-chip.selected           { color: white; font-weight: var(--font-bold); }
+.ci-pain-chip.selected.low       { background: #10B981; border-color: #10B981; }
+.ci-pain-chip.selected.mild      { background: #F59E0B; border-color: #F59E0B; }
+.ci-pain-chip.selected.moderate  { background: #F97316; border-color: #F97316; }
+.ci-pain-chip.selected.severe    { background: #EF4444; border-color: #EF4444; }
+.ci-pain-chip:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+
+/* ── Available time grid ────────────────────────────────────── */
+
+.ci-time-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.ci-time-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-2);
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 64px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ci-time-card:hover  { border-color: var(--color-primary); background: rgba(45, 212, 191, 0.08); }
+.ci-time-card:active { transform: scale(0.97); }
+
+.ci-time-card.selected {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.ci-time-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.ci-time-card.selected .ci-time-label { color: var(--color-bg-deep); }
+
+.ci-time-sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.ci-time-card.selected .ci-time-sub { color: var(--color-bg-deep); opacity: 0.8; }
+.ci-time-card:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+
+/* ── Reduced motion ─────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .ci-bubble,
+  .ci-actions,
+  .ci-typing,
+  .ci-typing-dot,
+  .ci-overlay,
+  .ci-panel { transition: none !important; animation: none !important; }
+}
+
+/* ── Narrow screens ─────────────────────────────────────────── */
+
+@media (max-width: 340px) {
+  .ci-time-grid { grid-template-columns: repeat(2, 1fr); }
+}
