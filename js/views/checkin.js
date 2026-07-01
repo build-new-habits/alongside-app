@@ -1,6 +1,15 @@
 /**
  * js/views/checkin.js
- * 01 Jul 2026 v3
+ * 01 Jul 2026 v4
+ *
+ * v4 — Two QA fixes (round 1):
+ *   Fade visibility: added 400ms pause after _fadePastBubbles() in all
+ *     panel confirm handlers. Panel close animation is 350ms; firing
+ *     _showUserBubble() simultaneously meant the thread was invisible
+ *     (overlay still opaque) when the fade fired, so users never saw
+ *     the faded state. Pause waits for the animation to complete first.
+ *   Pain chip colours: split classList.remove("low","mild",...) into
+ *     four separate calls. Multi-arg remove unreliable on Safari Mobile.
  *
  * v3 — Full rewrite: conversational thread (Option A, per D2 spec and
  *   Appendix E). Opens with a D2 opening narrative (B1 coach bubble,
@@ -158,6 +167,7 @@ export function CheckinView(router) {
     panel.querySelector("#ci-energy-confirm").addEventListener("click", async () => {
       _closePanel(panel);
       _fadePastBubbles();
+      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
       _showUserBubble(`${checkinData.getEnergyEmoji(_checkin.energy)} ${_checkin.energy}/10 — ${checkinData.getEnergyLabel(_checkin.energy)}`);
       await _showCoachBubble(_energyBridge(_checkin.energy));
       _showMoodPanel();
@@ -207,6 +217,7 @@ export function CheckinView(router) {
     panel.querySelector("#ci-mood-confirm").addEventListener("click", async () => {
       _closePanel(panel);
       _fadePastBubbles();
+      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
       _showUserBubble(`${checkinData.getMoodEmoji(_checkin.mood)} ${_checkin.mood}/10 — ${checkinData.getMoodLabel(_checkin.mood)}`);
       await _showCoachBubble(_moodBridge(_checkin.mood));
       _showSleepPanel();
@@ -274,6 +285,7 @@ export function CheckinView(router) {
     panel.querySelector("#ci-sleep-confirm").addEventListener("click", async () => {
       _closePanel(panel);
       _fadePastBubbles();
+      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
       _showUserBubble(`${_checkin.sleepHours} hours — ${_checkin.sleepQuality}`);
       if (_conditions.length > 0) {
         await _showCoachBubble("One more thing. How's the pain today?");
@@ -332,7 +344,10 @@ export function CheckinView(router) {
             const sel = c === chip;
             c.classList.toggle("selected", sel);
             c.setAttribute("aria-pressed", sel);
-            c.classList.remove("low","mild","moderate","severe");
+            c.classList.remove("low");
+            c.classList.remove("mild");
+            c.classList.remove("moderate");
+            c.classList.remove("severe");
             if (sel) {
               if      (level <= 2) c.classList.add("low");
               else if (level <= 5) c.classList.add("mild");
@@ -347,6 +362,7 @@ export function CheckinView(router) {
     panel.querySelector("#ci-cond-confirm").addEventListener("click", async () => {
       _closePanel(panel);
       _fadePastBubbles();
+      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
       const summary = _conditions.map(id => {
         const cond   = CONDITIONS.find(c => c.id === id);
         const level  = _checkin.conditionLevels[id] || 1;
@@ -399,6 +415,7 @@ export function CheckinView(router) {
     panel.querySelector("#ci-time-confirm").addEventListener("click", async () => {
       _closePanel(panel);
       _fadePastBubbles();
+      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
       const timeLabels = { micro: "10 minutes", quick: "20 minutes", short: "30 minutes",
                            standard: "40 minutes", long: "50 minutes", open: "60+ minutes" };
       if (_selectedTime) _showUserBubble(timeLabels[_selectedTime] || _selectedTime);
