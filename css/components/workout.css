@@ -1,6 +1,19 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   01 Jul 2026 v2
+
+   v2 — Fixed .core-session-view padding-bottom.
+     yoga-session.js (and other session views using
+     .core-session-view) use position:fixed
+     .workout-actions but the container had no
+     padding-bottom, hiding instructions and video
+     support behind the fixed button block.
+     200px clears the tallest 3-button action block
+     (Start hold + Finish practice + Skip).
+     .workout-view already had 120px — unchanged.
+
+   v1 — Original workout styles.
 
    Covers:
    - Today view workout cards
@@ -109,6 +122,13 @@
   padding-bottom: 120px; /* Space for fixed actions */
 }
 
+/* Session views using .core-session-view (yoga, core, morning etc.)
+   also use position:fixed .workout-actions. Match .workout-view pattern
+   with enough clearance for a 3-button block (200px). */
+.core-session-view {
+  padding-bottom: 200px;
+}
+
 .workout-header {
   display: flex;
   justify-content: space-between;
@@ -199,7 +219,7 @@
 .meta-tag {
   font-size: var(--text-sm);
   background: var(--color-bg);
-  color: var(--color-text);          /* was #64748B — FAIL. Now #E2E8F0 — 8.40:1 PASS */
+  color: var(--color-text);
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-md);
 }
@@ -238,7 +258,7 @@
 
 .timer-label {
   font-size: var(--text-sm);
-  color: var(--color-text);          /* was --color-text-muted (#64748B) — FAIL */
+  color: var(--color-text);
   margin-top: var(--space-1);
 }
 
@@ -266,7 +286,7 @@
 
 .reps-label {
   font-size: var(--text-sm);
-  color: var(--color-text);          /* was --color-text-muted (#64748B) — FAIL */
+  color: var(--color-text);
 }
 
 .rest-value {
@@ -278,12 +298,11 @@
 
 .rest-label {
   font-size: var(--text-sm);
-  color: var(--color-text);          /* was --color-text-muted (#64748B) — FAIL */
+  color: var(--color-text);
 }
 
 /* ============================================
    WATCH HOW TO DO THIS LINK
-   Uses deep background so red passes AA (5.24:1)
    ============================================ */
 
 .youtube-link {
@@ -291,7 +310,7 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-5);
-  background: var(--color-bg-deep);  /* #0F172A — red #FF4444 is 5.24:1 against this */
+  background: var(--color-bg-deep);
   border: 1px solid rgba(255, 68, 68, 0.4);
   border-radius: var(--radius-lg);
   color: #FF4444;
@@ -300,7 +319,7 @@
   font-weight: var(--font-semibold);
   margin-bottom: var(--space-5);
   transition: all var(--transition-fast);
-  min-height: 44px;                  /* WCAG 2.5.5 touch target */
+  min-height: 44px;
 }
 
 .youtube-link:hover,
@@ -331,16 +350,6 @@
 
 /* ============================================
    EXERCISE CARD — UNIVERSAL SECTION STRUCTURE
-   Works identically for: gym, mindfulness, yoga,
-   mobility, rehab, pilates, cardio, recovery.
-
-   Three sections, always in this order:
-     1. How to get there  (setup / entry / position)
-     2. What to focus on  (form cues / anchor / alignment)
-     3. Why this helps    (coach rationale — one sentence)
-
-   Section label colour #B8C5D6 → 5.91:1 against
-   card background #334155. WCAG AA PASS.
    ============================================ */
 
 .exercise-instructions {
@@ -349,31 +358,27 @@
   padding: var(--space-4) var(--space-5);
 }
 
-/* Section label — uppercase, subdued, clearly secondary */
 .exercise-section-label {
   display: block;
   font-size: var(--text-xs);
   font-weight: var(--font-semibold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #B8C5D6;                    /* 5.91:1 against #334155 — PASS */
+  color: #B8C5D6;
   margin-bottom: var(--space-2);
   margin-top: var(--space-4);
 }
 
-/* Remove top margin on first label in a card */
 .exercise-instructions .exercise-section-label:first-child {
   margin-top: 0;
 }
 
-/* Thin rule between sections */
 .exercise-section-divider {
   border: none;
   border-top: 1px solid var(--color-border-light);
   margin: var(--space-4) 0 0;
 }
 
-/* Bullet list — "How to get there" and "What to focus on" */
 .exercise-section-list {
   list-style: none;
   margin: 0;
@@ -385,7 +390,7 @@
   align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-2) 0;
-  color: var(--color-text);          /* #E2E8F0 — 8.40:1 PASS */
+  color: var(--color-text);
   font-size: var(--text-base);
   line-height: var(--leading-relaxed);
   border-bottom: 1px solid var(--color-border-light);
@@ -395,7 +400,6 @@
   border-bottom: none;
 }
 
-/* Bullet dot */
 .exercise-section-list li::before {
   content: "";
   display: block;
@@ -404,13 +408,12 @@
   border-radius: 50%;
   background: var(--color-primary);
   flex-shrink: 0;
-  margin-top: 0.55em;               /* Optical alignment to cap-height */
+  margin-top: 0.55em;
 }
 
-/* "Why this helps" — coach voice, single sentence, italicised */
 .exercise-why-text {
   font-size: var(--text-sm);
-  color: var(--color-text);          /* #E2E8F0 — 8.40:1 PASS */
+  color: var(--color-text);
   line-height: var(--leading-relaxed);
   font-style: italic;
   margin: 0;
@@ -418,7 +421,7 @@
 }
 
 /* ============================================
-   COACHING TIP (optional — coach cue below sections)
+   COACHING TIP
    ============================================ */
 
 .coaching-tip {
@@ -441,14 +444,12 @@
 .coaching-tip p {
   margin: 0;
   font-size: var(--text-sm);
-  color: var(--color-text);          /* #E2E8F0 — 8.40:1 PASS */
+  color: var(--color-text);
   line-height: var(--leading-relaxed);
 }
 
 /* ============================================
-   EXERCISE WHY (legacy — kept for backward compat)
-   New code should use .exercise-why-text inside
-   .exercise-instructions with .exercise-section-label
+   EXERCISE WHY (legacy)
    ============================================ */
 
 .exercise-why {
@@ -463,7 +464,7 @@
 }
 
 .exercise-why p {
-  color: var(--color-text);          /* was --color-text-secondary (#94A3B8 — FAIL) */
+  color: var(--color-text);
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
 }
@@ -497,7 +498,6 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: position;
   position: relative;
   overflow: hidden;
 }
@@ -561,14 +561,8 @@
   font-size: var(--text-lg);
 }
 
-.total-label {
-  color: var(--color-text);
-}
-
-.total-number {
-  font-weight: var(--font-bold);
-  color: var(--color-text);
-}
+.total-label { color: var(--color-text); }
+.total-number { font-weight: var(--font-bold); color: var(--color-text); }
 
 .completion-message {
   margin-bottom: var(--space-6);
@@ -623,25 +617,11 @@
     height: 200px;
   }
 
-  .timer-value {
-    font-size: 4rem;
-  }
-
-  .reps-display {
-    gap: var(--space-8);
-  }
-
-  .reps-value {
-    font-size: 4rem;
-  }
-
-  .exercise-name {
-    font-size: var(--text-3xl);
-  }
-
-  .exercise-instructions {
-    padding: var(--space-5) var(--space-6);
-  }
+  .timer-value { font-size: 4rem; }
+  .reps-display { gap: var(--space-8); }
+  .reps-value { font-size: 4rem; }
+  .exercise-name { font-size: var(--text-3xl); }
+  .exercise-instructions { padding: var(--space-5) var(--space-6); }
 
   /* Actions not fixed on desktop — inline */
   .workout-actions {
@@ -655,32 +635,19 @@
     margin-right: auto;
   }
 
-  .workout-view {
+  .workout-view,
+  .core-session-view {
     padding-bottom: var(--space-8);
   }
 
-  .credits-number {
-    font-size: 4rem;
-  }
-
-  .celebration-emoji {
-    font-size: 5rem;
-  }
+  .credits-number { font-size: 4rem; }
+  .celebration-emoji { font-size: 5rem; }
 }
 
 @media (min-width: 1024px) {
-  .workout-view {
-    max-width: 700px;
-  }
-
-  .timer-circle {
-    width: 240px;
-    height: 240px;
-  }
-
-  .timer-value {
-    font-size: 5rem;
-  }
+  .workout-view { max-width: 700px; }
+  .timer-circle { width: 240px; height: 240px; }
+  .timer-value { font-size: 5rem; }
 }
 
 /* ============================================
@@ -688,37 +655,22 @@
    ============================================ */
 
 @media (max-width: 480px) {
-  .timer-circle {
-    width: 140px;
-    height: 140px;
-  }
-
-  .timer-value {
-    font-size: var(--text-3xl);
-  }
-
-  .reps-value {
-    font-size: var(--text-3xl);
-  }
-
-  .credits-number {
-    font-size: 3rem;
-  }
+  .timer-circle { width: 140px; height: 140px; }
+  .timer-value { font-size: var(--text-3xl); }
+  .reps-value { font-size: var(--text-3xl); }
+  .credits-number { font-size: 3rem; }
 }
 
-/* ============================================================
+/* ============================================
    PRESCRIBED SESSION — Exercise card + weight history
-   9 May 2026 v1
-   Append to bottom of css/components/workout.css
-   ============================================================ */
+   01 Jul 2026 v2 (merged from appended block)
+   ============================================ */
 
-/* Prescribed badge colour */
 .exercise-role-badge.prescribed {
   background: rgba(99, 102, 241, 0.2);
   color: #818CF8;
 }
 
-/* Exercise card — full card wrapper for prescribed session */
 .exercise-card {
   margin: var(--space-4) 0;
   padding: var(--space-5);
@@ -727,27 +679,23 @@
   border: 1px solid var(--color-border);
 }
 
-/* Note line above exercise name (e.g. "1-2 inches only. Both legs.") */
 .exercise-card-note {
   margin-bottom: var(--space-2);
   color: var(--color-text-muted);
   font-size: var(--text-sm);
 }
 
-/* Exercise name in card context — teal, larger */
 .exercise-card .exercise-name {
   color: var(--color-primary);
   font-size: var(--text-xl);
   margin-bottom: var(--space-2);
 }
 
-/* Meta row — left-aligned in card */
 .exercise-card .exercise-meta {
   justify-content: flex-start;
   margin-bottom: var(--space-4);
 }
 
-/* Description paragraph */
 .exercise-description {
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
@@ -755,7 +703,6 @@
   margin-bottom: var(--space-4);
 }
 
-/* Coaching cues bullet list */
 .exercise-cues {
   list-style: none;
   padding: 0;
@@ -784,7 +731,6 @@
   border-radius: 50%;
 }
 
-/* YouTube / "Watch how to do this" button */
 .exercise-youtube-btn {
   margin-top: var(--space-3);
   margin-bottom: var(--space-2);
@@ -809,8 +755,6 @@
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
 }
-
-/* ── Weight section ─────────────────────────────────────────── */
 
 .ps-weight-section {
   border-top: 1px solid var(--color-border-light);
@@ -844,7 +788,6 @@
   border-color: var(--color-primary);
 }
 
-/* Previous weights history row */
 .ps-weight-history {
   display: flex;
   flex-direction: column;
@@ -864,199 +807,6 @@
   gap: var(--space-2);
 }
 
-/* Tappable weight chip — tap to fill input */
-.ps-weight-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--color-text);
-  cursor: pointer;
-  min-height: 44px;
-  min-width: 56px;
-  font-family: inherit;
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.ps-weight-chip:hover,
-.ps-weight-chip:focus-visible {
-  border-color: var(--color-primary);
-  background: rgba(45, 212, 191, 0.06);
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-
-.ps-weight-chip-date {
-  color: var(--color-text-muted);
-  font-size: 10px;
-  font-weight: var(--font-normal);
-}
-
-/* ============================================================
-   PRESCRIBED SESSION — Exercise card + weight history
-   9 May 2026 v1
-   Append to bottom of css/components/workout.css
-   ============================================================ */
-
-/* Prescribed badge colour */
-.exercise-role-badge.prescribed {
-  background: rgba(99, 102, 241, 0.2);
-  color: #818CF8;
-}
-
-/* Exercise card — full card wrapper for prescribed session */
-.exercise-card {
-  margin: var(--space-4) 0;
-  padding: var(--space-5);
-  background: var(--color-bg-card);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-}
-
-/* Note line above exercise name (e.g. "1-2 inches only. Both legs.") */
-.exercise-card-note {
-  margin-bottom: var(--space-2);
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-}
-
-/* Exercise name in card context — teal, larger */
-.exercise-card .exercise-name {
-  color: var(--color-primary);
-  font-size: var(--text-xl);
-  margin-bottom: var(--space-2);
-}
-
-/* Meta row — left-aligned in card */
-.exercise-card .exercise-meta {
-  justify-content: flex-start;
-  margin-bottom: var(--space-4);
-}
-
-/* Description paragraph */
-.exercise-description {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  line-height: var(--leading-relaxed);
-  margin-bottom: var(--space-4);
-}
-
-/* Coaching cues bullet list */
-.exercise-cues {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.exercise-cues li {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  line-height: var(--leading-relaxed);
-  padding-left: var(--space-4);
-  position: relative;
-}
-
-.exercise-cues li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.5em;
-  width: 6px;
-  height: 6px;
-  background: var(--color-primary);
-  border-radius: 50%;
-}
-
-/* YouTube / "Watch how to do this" button */
-.exercise-youtube-btn {
-  margin-top: var(--space-3);
-  margin-bottom: var(--space-2);
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  background: transparent;
-  border-radius: var(--radius-lg);
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.exercise-youtube-btn:hover,
-.exercise-youtube-btn:focus-visible {
-  background: rgba(45, 212, 191, 0.08);
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-
-/* ── Weight section ─────────────────────────────────────────── */
-
-.ps-weight-section {
-  border-top: 1px solid var(--color-border-light);
-  padding-top: var(--space-4);
-}
-
-.ps-weight-row {
-  display: flex;
-  gap: var(--space-2);
-  align-items: center;
-  margin-top: var(--space-2);
-  margin-bottom: var(--space-3);
-}
-
-.ps-weight-input {
-  flex: 1;
-  min-height: 44px;
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-base);
-  font-family: inherit;
-  color: var(--color-text);
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-sizing: border-box;
-}
-
-.ps-weight-input:focus {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-  border-color: var(--color-primary);
-}
-
-/* Previous weights history row */
-.ps-weight-history {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-bottom: var(--space-2);
-}
-
-.ps-weight-history-label {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  font-weight: var(--font-medium);
-}
-
-.ps-weight-history-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-/* Tappable weight chip — tap to fill input */
 .ps-weight-chip {
   display: flex;
   flex-direction: column;
