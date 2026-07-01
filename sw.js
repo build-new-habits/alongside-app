@@ -1,8 +1,8 @@
 /**
  * sw.js - Alongside Service Worker
- * 01 Jul 2026 v146
+ * 01 Jul 2026 v147
  *
- * alongside-v146 (01 Jul 2026) — Step 8: checkin.js conversational
+ * alongside-v147 (01 Jul 2026) — Step 8: checkin.js conversational
  *   rewrite (D2 opening narratives + thread UX).
  *   js/data/checkin-openings.js v1 (new) — D2 check-in opening content:
  *     all six modes + Day One exception as structured data, plus
@@ -93,7 +93,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v146";
+const CACHE_NAME = "alongside-v147";
 
 const SHELL_URLS = [
 
