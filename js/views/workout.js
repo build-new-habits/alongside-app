@@ -1,29 +1,26 @@
 /**
  * workout.js - Workout Execution View
- * Displays exercises one by one with timer/counter
+ * 01 Jul 2026 v2
  *
- * 12 Jun 2026 v1 (S4-4 P3) - Back button pass:
- *   exit-workout-btn now calls router.back() instead of hardcoded
- *   router.navigate("today") - returns to whatever page the user was
- *   actually on before starting the workout.
- *   completeWorkout() now navigates to "reflect" (matching
- *   gym-programme.js and morning-session.js) instead of
- *   "workout-complete" directly, so every session ends with a
- *   reflection step before landing on progress.
- *   renderNoWorkout() fallback button now uses a proper event
- *   listener with router.back() instead of an inline onclick to
- *   "today".
- *   Converted to double-quoted strings throughout.
+ * v2 — Fixed programmeEngine import (01 Jul 2026).
+ *   programmeEngine.js v2 refactored to individual named exports
+ *   (recordSession, getPhaseBias, etc.) — the namespace import
+ *   { programmeEngine } was never updated to match, causing a hard
+ *   SyntaxError on module load. Fixed:
+ *     import { recordSession } from "../data/programmeEngine.js"
+ *   Call site corrected: recordSession takes a sessionData object,
+ *   returns { milestoneAchieved }. Store.set("lastMilestone") now
+ *   receives result.milestoneAchieved rather than the whole result object.
  *
- * Changes (t2_5 / t2_7):
- *   - Import programmeEngine
- *   - completeWorkout() calls programmeEngine.recordSession(workout.focus)
- *   - Resulting milestone (or null) stored as "lastMilestone" for workout-complete.js
+ * v1 — 12 Jun 2026 (S4-4 P3):
+ *   Back button uses router.back(). completeWorkout() routes to "reflect".
+ *   renderNoWorkout() fallback uses event listener. Double-quoted strings.
+ *   Import programmeEngine, call recordSession on completion (t2_5/t2_7).
  */
 
-import { store } from "../store.js";
-import { checkinData } from "../data/checkin.js";
-import { programmeEngine } from "../data/programmeEngine.js";
+import { store }         from "../store.js";
+import { checkinData }   from "../data/checkin.js";
+import { recordSession } from "../data/programmeEngine.js";
 
 export const centered = false;
 
@@ -86,7 +83,6 @@ export function render() {
         </a>
 
         <!-- Exercise card - universal three-section structure -->
-        <!-- Works identically for gym, mindfulness, yoga, mobility, rehab, pilates -->
         <div class="exercise-instructions card" role="region" aria-label="Exercise guidance for ${exercise.name}">
 
           <!-- Section 1: How to get there -->
@@ -99,7 +95,7 @@ export function render() {
             </ul>
           ` : ""}
 
-          <!-- Section 2: What to focus on (coaching cues) -->
+          <!-- Section 2: What to focus on -->
           ${exercise.coaching ? `
             <hr class="exercise-section-divider" aria-hidden="true">
             <span class="exercise-section-label" id="section-focus-${currentExerciseIndex}">
@@ -199,11 +195,11 @@ function formatTime(seconds) {
 
 function formatRole(role) {
   const roles = {
-    warmup:   "\uD83D\uDD25 Warm Up",
-    main:     "\uD83D\uDCAA Main",
-    accessory:"\uD83C\uDFAF Accessory",
-    finisher: "\uD83C\uDFC1 Finisher",
-    cooldown: "\uD83E\uDDD8 Cool Down"
+    warmup:    "\uD83D\uDD25 Warm Up",
+    main:      "\uD83D\uDCAA Main",
+    accessory: "\uD83C\uDFAF Accessory",
+    finisher:  "\uD83C\uDFC1 Finisher",
+    cooldown:  "\uD83E\uDDD8 Cool Down"
   };
   return roles[role] || role;
 }
@@ -211,8 +207,6 @@ function formatRole(role) {
 export function onMount() {
   const workout = store.get("activeWorkout");
 
-  // No-workout fallback - Back uses router.back(), not a hardcoded
-  // destination, so it returns to wherever the user actually came from.
   document.getElementById("no-workout-back-btn")?.addEventListener("click", () => {
     router.back();
   });
@@ -226,8 +220,6 @@ export function onMount() {
     updateTimerDisplay();
   }
 
-  // Exit button - returns to wherever the user was before this workout,
-  // not a hardcoded destination.
   document.getElementById("exit-workout-btn")?.addEventListener("click", () => {
     if (confirm("Exit workout? Your progress on this workout will be lost.")) {
       cleanupWorkout();
@@ -235,7 +227,6 @@ export function onMount() {
     }
   });
 
-  // Timer toggle
   document.getElementById("timer-toggle-btn")?.addEventListener("click", () => {
     if (!timerStarted) {
       timerStarted = true;
@@ -248,12 +239,10 @@ export function onMount() {
     router.navigate("workout");
   });
 
-  // Complete exercise
   document.getElementById("complete-exercise-btn")?.addEventListener("click", () => {
     completeExercise();
   });
 
-  // Skip exercise
   document.getElementById("skip-exercise-btn")?.addEventListener("click", () => {
     skipExercise();
   });
@@ -345,19 +334,20 @@ function completeWorkout() {
   });
   store.set("workoutHistory", history);
 
-  // -- t2_5: Record session with programme engine --------------------------
-  // recordSession returns a milestone object if one was just earned, or null.
-  const milestone = programmeEngine.recordSession(workout.focus || null);
-  store.set("lastMilestone", milestone || null);
-  // --------------------------------------------------------------------------
+  // Record session with programme engine.
+  // recordSession() takes a sessionData object and returns { milestoneAchieved }.
+  // v1 passed workout.focus directly as the argument (wrong) and imported
+  // a non-existent namespace object — both fixed here.
+  const result    = recordSession({ focus: workout.focus || null });
+  const milestone = result.milestoneAchieved || null;
+  store.set("lastMilestone", milestone);
 
   // Stash data for the completion screen / reflection step
   store.set("lastWorkoutCredits", creditsEarned);
   store.set("lastWorkoutName",    workout.name);
 
   cleanupWorkout();
-  // Route through reflect.js for post-session reflection, then on to
-  // progress - matches gym-programme.js and morning-session.js.
+  // Route through reflect.js for post-session reflection.
   router.navigate("reflect");
 }
 
