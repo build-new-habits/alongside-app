@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Jul 2026 v149
+ * Fix: v148's changelog said js/data/feelings.js was added to SHELL_URLS,
+ *   but it was missing from the actual array — comment described an
+ *   intention that never made it into the list. Found on ground-truth
+ *   review. Added below, in the Data section next to signal-words.js
+ *   (which it wraps). Without this, feelings.js would still load fine
+ *   over network but wouldn't be precached — would fail if the PWA is
+ *   opened offline or from a stale cache.
+ *
  * 03 Jul 2026 v148
  * Adding js/data/feelings.js for word selection following mood vs energy
  *
@@ -97,7 +106,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v148";
+const CACHE_NAME = "alongside-v149";
 
 const SHELL_URLS = [
 
@@ -188,6 +197,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/programmeEngine.js",
   "/alongside-app/js/data/programmes.js",
   "/alongside-app/js/data/signal-words.js",
+  "/alongside-app/js/data/feelings.js",                        // Step 8b — new, was missing from v148
   "/alongside-app/js/data/coach-voice.js",
 
   // Exercise database
