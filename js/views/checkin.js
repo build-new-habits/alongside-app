@@ -1,6 +1,17 @@
 /**
  * js/views/checkin.js
- * 03 Jul 2026 v7
+ * 03 Jul 2026 v8
+ *
+ * v8 — Chip row overflow fix. Graeme reported (screenshot) the feeling-
+ *   word chips overflowed off-screen instead of wrapping — "confident"
+ *   was cut off at the screen edge. Cause: reusing .ci-quality-chips as
+ *   the container class in v7 inherited that class's layout, which was
+ *   built for exactly 3 short chips (Poor/Okay/Good) in one row, never
+ *   designed to wrap 6+ words. Fixed with scoped inline flex-wrap
+ *   styling on the feeling-word container only — does not touch the
+ *   shared .ci-quality-chips CSS class or checkin-conversation.css
+ *   (still not ground-truthed this session), so the sleep-quality panel
+ *   is unaffected.
  *
  * v7 — F1 (Quadrant Word Check-In) built in. New feeling-word panel
  *   inserted between mood and sleep, per alongside_wellbeing_longhorizon
@@ -318,7 +329,8 @@ export function CheckinView(router) {
     const panel = _buildPanel(`
       <p class="ci-panel-q">Is there a word for how you're feeling?</p>
       <div class="ci-quality-chips" id="ci-feeling-chips"
-           role="radiogroup" aria-label="Feeling word">
+           role="radiogroup" aria-label="Feeling word"
+           style="display:flex;flex-wrap:wrap;gap:var(--space-2);">
         ${chipsHtml(false)}
       </div>
       <button type="button" class="btn btn-ghost btn-full" id="ci-feeling-more"
