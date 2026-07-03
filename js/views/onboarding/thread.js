@@ -1,6 +1,36 @@
 /**
  * js/views/onboarding/thread.js
- * 29 Jun 2026 v6
+ * 03 Jul 2026 v7
+ *
+ * v7 — Appendix M fix, applied here for the first time. Graeme reported
+ *   the onboarding "Hard Before" chip screen scrolling to the bottom of
+ *   the container and hiding the coach's message above (screenshot).
+ *   Ground-truthed against this file and confirmed the same root cause
+ *   already found and fixed in checkin.js: _scrollToBottom() set
+ *   _thread.scrollTop = _thread.scrollHeight unconditionally after
+ *   every append — typing indicator, coach bubble, user bubble, every
+ *   chip tray, the reflection gate, the Continue button, the Begin
+ *   button. Ten call sites, all sharing the one blunt function. This
+ *   file had never had the fix applied.
+ *
+ *   Replaced _scrollToBottom() with _scrollToNewElement(el), calling
+ *   el.scrollIntoView({ block: "start" }) on the specific element just
+ *   appended — same fix, same reasoning, as checkin.js v5.
+ *
+ *   Two further fixes applied preventively, without waiting for them to
+ *   be separately reported, since they're the exact same shape as two
+ *   bugs already found and fixed in checkin.js this session:
+ *     1. Step 14 (closing → _showBeginButton) showed a coach bubble
+ *        immediately followed by the Begin button, no reading pause —
+ *        identical shape to the checkin.js summary/action-buttons bug.
+ *        Added a 400ms pause between the coach bubble resolving and the
+ *        Begin button wrap being appended.
+ *     2. Every .focus() call in this file (8 of them: name input, four
+ *        chip trays, the reflection gate, the Continue button, the
+ *        sheet-bar open button, the Begin button) lacked
+ *        { preventScroll: true } — exactly the gap that let checkin.js's
+ *        submit-button focus fight its own deliberate scroll position.
+ *        Added to all eight call sites.
  *
  * v6 — Step 11 (equipment) summary reader was reading store.sessionLocation,
  *   a field equipment.js never writes — confirmed against the real
@@ -143,7 +173,8 @@ const T = {
   INPUT_APPEAR:    REDUCED_MOTION ?   0 : 250,   // ms before input bar appears
   CHIP_APPEAR:     REDUCED_MOTION ?   0 : 200,   // ms before chip tray appears
   BEGIN_DELAY:     REDUCED_MOTION ?   0 : 600,   // ms before Begin button appears
-  SCROLL_DELAY:    REDUCED_MOTION ?   0 :  80,   // ms before scroll-to-bottom
+  READ_PAUSE:      REDUCED_MOTION ?   0 : 400,   // ms reading pause before an action block appears (v7)
+  SCROLL_DELAY:    REDUCED_MOTION ?   0 :  80,   // ms before scroll-to-new-element
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -266,6 +297,11 @@ export function ThreadView(router) {
         await _showCoachBubble(
           step.coach.replace('[name]', store.get('name') || '')
         );
+        // v7: reading pause before the Begin button appears — same shape
+        // as the checkin.js summary/action-buttons fix. Without this,
+        // the button block's own scroll-to-top yanks this final coach
+        // message out of view before it can be read.
+        await new Promise(resolve => setTimeout(resolve, T.READ_PAUSE));
         _showBeginButton(step);
         break;
 
@@ -287,7 +323,7 @@ export function ThreadView(router) {
       <span class="ob-typing__dot" aria-hidden="true"></span>
     `;
     _thread.appendChild(el);
-    _scrollToBottom();
+    _scrollToNewElement(el);
 
     setTimeout(() => el.classList.add('is-visible'), T.TYPING_SHOW);
     return el;
@@ -334,7 +370,7 @@ export function ThreadView(router) {
           bubble.className = 'ob-bubble ob-bubble--coach';
           bubble.innerHTML = _formatCoachText(text);
           _thread.appendChild(bubble);
-          _scrollToBottom();
+          _scrollToNewElement(bubble);
 
           requestAnimationFrame(() => bubble.classList.add('is-visible'));
           resolve();
@@ -362,18 +398,25 @@ export function ThreadView(router) {
     bubble.className = 'ob-bubble ob-bubble--user';
     bubble.textContent = text;
     _thread.appendChild(bubble);
-    _scrollToBottom();
+    _scrollToNewElement(bubble);
     requestAnimationFrame(() => bubble.classList.add('is-visible'));
     return bubble;
   }
 
-  // ── Scroll to bottom ───────────────────────────────────────────────────────
+  // ── Scroll to newly-appended element ──────────────────────────────────────
+  // v7 (Appendix M fix, applied to onboarding). Scrolls so the TOP of the
+  // element just appended aligns with the top of the thread's visible
+  // area — never a blind jump to container bottom. Replaces the old
+  // _scrollToBottom(), which set scrollTop = scrollHeight after every
+  // append regardless of what was new, and could hide the very content
+  // it was meant to reveal (reported: Hard Before chip screen hid the
+  // coach's question above it). See checkin.js v5 for the original fix
+  // this mirrors.
 
-  function _scrollToBottom() {
+  function _scrollToNewElement(el) {
     setTimeout(() => {
-      if (_thread) {
-        _thread.scrollTop = _thread.scrollHeight;
-      }
+      if (!el) return;
+      el.scrollIntoView({ block: 'start', behavior: REDUCED_MOTION ? 'auto' : 'smooth' });
     }, T.SCROLL_DELAY);
   }
 
@@ -457,7 +500,7 @@ export function ThreadView(router) {
     });
 
     // Focus the field
-    setTimeout(() => field.focus(), T.INPUT_APPEAR + 50);
+    setTimeout(() => field.focus({ preventScroll: true }), T.INPUT_APPEAR + 50);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -497,7 +540,7 @@ export function ThreadView(router) {
     `;
 
     _thread.appendChild(wrap);
-    _scrollToBottom();
+    _scrollToNewElement(wrap);
     setTimeout(() => wrap.classList.add('is-visible'), T.CHIP_APPEAR);
 
     const confirmBtn = wrap.querySelector('.ob-chips__confirm');
@@ -558,7 +601,7 @@ export function ThreadView(router) {
     });
 
     // Focus first chip
-    setTimeout(() => wrap.querySelector('.ob-chip')?.focus(), T.CHIP_APPEAR + 50);
+    setTimeout(() => wrap.querySelector('.ob-chip')?.focus({ preventScroll: true }), T.CHIP_APPEAR + 50);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -594,7 +637,7 @@ export function ThreadView(router) {
     `;
 
     _thread.appendChild(wrap);
-    _scrollToBottom();
+    _scrollToNewElement(wrap);
     setTimeout(() => wrap.classList.add('is-visible'), T.CHIP_APPEAR);
 
     // Single tap — no confirm button
@@ -612,7 +655,7 @@ export function ThreadView(router) {
       });
     });
 
-    setTimeout(() => wrap.querySelector('.ob-chip')?.focus(), T.CHIP_APPEAR + 50);
+    setTimeout(() => wrap.querySelector('.ob-chip')?.focus({ preventScroll: true }), T.CHIP_APPEAR + 50);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -659,7 +702,7 @@ export function ThreadView(router) {
       </div>
     `;
     _thread.appendChild(wrap);
-    _scrollToBottom();
+    _scrollToNewElement(wrap);
     setTimeout(() => wrap.classList.add('is-visible'), T.CHIP_APPEAR);
 
     const lockGate = () => {
@@ -681,7 +724,7 @@ export function ThreadView(router) {
       _runStep(5);
     });
 
-    setTimeout(() => wrap.querySelector('.ob-gate__btn').focus(), T.CHIP_APPEAR + 50);
+    setTimeout(() => wrap.querySelector('.ob-gate__btn').focus({ preventScroll: true }), T.CHIP_APPEAR + 50);
   }
 
   /**
@@ -706,7 +749,7 @@ export function ThreadView(router) {
       bubble.className = 'ob-bubble ob-bubble--coach ob-bubble--part';
       bubble.innerHTML = _formatCoachText(parts[i]);
       _thread.appendChild(bubble);
-      _scrollToBottom();
+      _scrollToNewElement(bubble);
       requestAnimationFrame(() => bubble.classList.add('is-visible'));
 
       const isLast = i === parts.length - 1;
@@ -737,11 +780,11 @@ export function ThreadView(router) {
         </button>
       `;
       _thread.appendChild(wrap);
-      _scrollToBottom();
+      _scrollToNewElement(wrap);
       setTimeout(() => wrap.classList.add('is-visible'), T.CHIP_APPEAR);
 
       const btn = wrap.querySelector('.ob-continue-btn');
-      setTimeout(() => btn.focus(), T.CHIP_APPEAR + 50);
+      setTimeout(() => btn.focus({ preventScroll: true }), T.CHIP_APPEAR + 50);
 
       btn.addEventListener('click', () => {
         // Genuine user action — fade the part just read. This is the one
@@ -820,7 +863,7 @@ export function ThreadView(router) {
     `;
 
     _thread.appendChild(wrap);
-    _scrollToBottom();
+    _scrollToNewElement(wrap);
     setTimeout(() => wrap.classList.add('is-visible'), T.CHIP_APPEAR);
 
     // Chip tap — single select, immediate advance
@@ -867,7 +910,7 @@ export function ThreadView(router) {
       });
     }
 
-    setTimeout(() => wrap.querySelector('.ob-chip')?.focus(), T.CHIP_APPEAR + 50);
+    setTimeout(() => wrap.querySelector('.ob-chip')?.focus({ preventScroll: true }), T.CHIP_APPEAR + 50);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -909,7 +952,7 @@ export function ThreadView(router) {
     });
 
     // Focus the open button
-    setTimeout(() => openBtn.focus(), T.INPUT_APPEAR + 50);
+    setTimeout(() => openBtn.focus({ preventScroll: true }), T.INPUT_APPEAR + 50);
   }
 
   async function _handleSheetResult(step, result) {
@@ -961,11 +1004,11 @@ export function ThreadView(router) {
       </button>
     `;
     _thread.appendChild(wrap);
-    _scrollToBottom();
+    _scrollToNewElement(wrap);
 
     const btn = wrap.querySelector('.ob-begin');
     setTimeout(() => btn.classList.add('is-visible'), step.beginButtonDelayMs || 600);
-    setTimeout(() => btn.focus(), (step.beginButtonDelayMs || 600) + 100);
+    setTimeout(() => btn.focus({ preventScroll: true }), (step.beginButtonDelayMs || 600) + 100);
 
     btn.addEventListener('click', () => {
       router.navigate('today');
