@@ -1,5 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
+ *
+ * 03 Jul 2026 v148
+ * Adding js/data/feelings.js for word selection following mood vs energy
+ *
  * 01 Jul 2026 v147
  *
  * alongside-v147 (01 Jul 2026) — Step 8: checkin.js conversational
@@ -93,7 +97,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v147";
+const CACHE_NAME = "alongside-v148";
 
 const SHELL_URLS = [
 
