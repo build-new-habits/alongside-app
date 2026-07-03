@@ -1,6 +1,30 @@
 /**
  * js/views/checkin.js
- * 03 Jul 2026 v6
+ * 03 Jul 2026 v7
+ *
+ * v7 — F1 (Quadrant Word Check-In) built in. New feeling-word panel
+ *   inserted between mood and sleep, per alongside_wellbeing_longhorizon
+ *   _spec_10jun2026_v2.docx Section 4 (F1/F2). Reads WORD_SETS and
+ *   getQuadrant() from new data/feelings.js. Radiogroup chip pattern,
+ *   "More words" disclosure, "Can't find a word today" skip option
+ *   (equal visual weight, no nudge). Reuses the existing .ci-quality-chip
+ *   CSS class (already live, same single-select toggle pattern as the
+ *   sleep-quality chips) rather than adding new CSS this session.
+ *   Writes feelingWord and feelingQuadrant onto _checkin — picked up
+ *   automatically by checkinData.saveCheckin() (data/checkin.js v3
+ *   already writes these fields into lastCheckin and checkinHistory;
+ *   no changes needed there).
+ *
+ *   Signal-word detection (data/feelings.js detectSignalWord(), wrapping
+ *   the existing signal-words.js) is wired but DORMANT — fires on chip
+ *   selection, logs to console for dev visibility only. No user-facing
+ *   crisis message. The Crisis & Safeguarding Policy (v6) is not yet
+ *   signed off (Appendix L, master schedule) — do not connect this to
+ *   any visible coach response until that lands.
+ *
+ *   Known follow-up, not done this session: coach-proposal.js does not
+ *   yet read feelingWord to weave into proposal copy (F1 spec asks for
+ *   this) — coach-proposal.js wasn't ground-truthed this session.
  *
  * v6 — Appendix M follow-up. v5 fixed the blind jump-to-container-bottom,
  *   but Graeme reported still missing messages specifically on the final
@@ -77,6 +101,7 @@ import { store }           from "../store.js";
 import { checkinData }     from "../data/checkin.js";
 import { resolveOpening }  from "../data/checkin-openings.js";
 import { CONDITIONS }      from "../data/conditions.js";
+import { WORD_SETS, getQuadrant, detectSignalWord } from "../data/feelings.js";
 
 export function CheckinView(router) {
 
@@ -103,6 +128,8 @@ export function CheckinView(router) {
     sleepQuality:    "okay",
     conditionLevels: {},
     notes:           "",
+    feelingWord:     null,
+    feelingQuadrant: null,
   };
   let _selectedTime = null;
 
@@ -262,11 +289,101 @@ export function CheckinView(router) {
       await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
       _showUserBubble(`${checkinData.getMoodEmoji(_checkin.mood)} ${_checkin.mood}/10 — ${checkinData.getMoodLabel(_checkin.mood)}`);
       await _showCoachBubble(_moodBridge(_checkin.mood));
-      _showSleepPanel();
+      _showFeelingWordPanel();
     });
 
     _openPanel(panel);
     setTimeout(() => slider.focus(), 350);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // FEELING WORD PANEL (F1 — Quadrant Word Check-In)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  function _showFeelingWordPanel() {
+    const quadrant = getQuadrant(_checkin.energy, _checkin.mood);
+    const words    = WORD_SETS[quadrant];
+    let expanded   = false;
+
+    function chipsHtml(showExpanded) {
+      const list = showExpanded ? [...words.core, ...words.expanded] : words.core;
+      return list.map(w => `
+        <button type="button" class="ci-quality-chip" data-word="${_esc(w)}"
+                role="radio" aria-checked="${_checkin.feelingWord === w}">
+          ${_esc(w)}
+        </button>
+      `).join("");
+    }
+
+    const panel = _buildPanel(`
+      <p class="ci-panel-q">Is there a word for how you're feeling?</p>
+      <div class="ci-quality-chips" id="ci-feeling-chips"
+           role="radiogroup" aria-label="Feeling word">
+        ${chipsHtml(false)}
+      </div>
+      <button type="button" class="btn btn-ghost btn-full" id="ci-feeling-more"
+              aria-expanded="false" style="margin-top:var(--space-3);">
+        More words
+      </button>
+      <button type="button" class="btn btn-ghost btn-full" id="ci-feeling-skip"
+              style="margin-top:var(--space-2);">
+        Can't find a word today
+      </button>
+      <button class="btn btn-primary btn-large btn-full" id="ci-feeling-confirm"
+              style="margin-top:var(--space-4);display:none;"
+              aria-label="Confirm feeling word">Next</button>
+    `);
+
+    function wireChips() {
+      panel.querySelectorAll("[data-word]").forEach(chip => {
+        chip.addEventListener("click", () => {
+          _checkin.feelingWord     = chip.dataset.word;
+          _checkin.feelingQuadrant = quadrant;
+          panel.querySelectorAll("[data-word]").forEach(c => {
+            const sel = c === chip;
+            c.classList.toggle("selected", sel);
+            c.setAttribute("aria-checked", sel);
+          });
+          panel.querySelector("#ci-feeling-confirm").style.display = "block";
+
+          // Dormant safeguarding check. Fires and logs for dev
+          // visibility only — no user-facing response until the Crisis
+          // & Safeguarding Policy (v6) is signed off. See Appendix L.
+          if (detectSignalWord(_checkin.feelingWord)) {
+            console.log("[safeguarding] signal word detected (dormant, no UI action):", _checkin.feelingWord);
+          }
+        });
+      });
+    }
+    wireChips();
+
+    panel.querySelector("#ci-feeling-more").addEventListener("click", () => {
+      expanded = !expanded;
+      const btn = panel.querySelector("#ci-feeling-more");
+      btn.setAttribute("aria-expanded", expanded);
+      btn.textContent = expanded ? "Fewer words" : "More words";
+      panel.querySelector("#ci-feeling-chips").innerHTML = chipsHtml(expanded);
+      wireChips();
+    });
+
+    panel.querySelector("#ci-feeling-skip").addEventListener("click", async () => {
+      _checkin.feelingWord     = null;
+      _checkin.feelingQuadrant = quadrant;
+      _closePanel(panel);
+      _fadePastBubbles();
+      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
+      _showSleepPanel();
+    });
+
+    panel.querySelector("#ci-feeling-confirm").addEventListener("click", async () => {
+      _closePanel(panel);
+      _fadePastBubbles();
+      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
+      _showUserBubble(_checkin.feelingWord);
+      _showSleepPanel();
+    });
+
+    _openPanel(panel);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
