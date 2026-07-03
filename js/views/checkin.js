@@ -1,6 +1,23 @@
 /**
  * js/views/checkin.js
- * 03 Jul 2026 v5
+ * 03 Jul 2026 v6
+ *
+ * v6 — Appendix M follow-up. v5 fixed the blind jump-to-container-bottom,
+ *   but Graeme reported still missing messages specifically on the final
+ *   summary bubble + action buttons screen. Two compounding causes found:
+ *     1. No reading pause between the summary bubble resolving and
+ *        _showActionButtons() firing — unlike every other bubble
+ *        transition in this file, which has a typing-indicator pause
+ *        built in. The buttons' own scroll-to-top yanked the summary
+ *        bubble out of view before it could be read.
+ *     2. document.getElementById("ci-submit-btn")?.focus() (150ms after
+ *        the buttons render) triggers the browser's default
+ *        scroll-into-view-on-focus behaviour, fighting the deliberate
+ *        scroll position set by _scrollToNewElement().
+ *   Fix: added a T.PANEL_DELAY (400ms) pause before _showActionButtons()
+ *   is called, matching the pause pattern used everywhere else in this
+ *   file. Added { preventScroll: true } to the submit-button focus call
+ *   so it no longer overrides the intentional scroll.
  *
  * v5 — Appendix M fix: check-in thread was scrolling to the bottom of the
  *   container on every new message instead of to the top of the new
@@ -445,6 +462,7 @@ export function CheckinView(router) {
                            standard: "40 minutes", long: "50 minutes", open: "60+ minutes" };
       if (_selectedTime) _showUserBubble(timeLabels[_selectedTime] || _selectedTime);
       await _showCoachBubble(_buildSummary());
+      await new Promise(r => setTimeout(r, T.PANEL_DELAY));
       _showActionButtons();
     });
 
@@ -470,7 +488,7 @@ export function CheckinView(router) {
     _thread.appendChild(wrap);
     _scrollToNewElement(wrap);
     requestAnimationFrame(() => wrap.classList.add("is-visible"));
-    setTimeout(() => document.getElementById("ci-submit-btn")?.focus(), 150);
+    setTimeout(() => document.getElementById("ci-submit-btn")?.focus({ preventScroll: true }), 150);
 
     document.getElementById("ci-submit-btn").addEventListener("click", () => { _saveAll(); router.navigate("coach-reflection"); });
     document.getElementById("ci-prescribed-btn").addEventListener("click", () => { _saveAll(); router.navigate("prescribed"); });
