@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Jul 2026 v150
+ * js/views/onboarding/thread.js v7 — Appendix M scroll fix applied to
+ *   onboarding (same root cause as checkin.js: blind scroll-to-container-
+ *   bottom on every append, replaced with scroll-to-top-of-new-element).
+ *   Also fixed preventively: Step 14 reading pause before Begin button,
+ *   preventScroll on all 8 focus() calls in this file. No new files —
+ *   thread.js path already in SHELL_URLS, cache-busted by CACHE_NAME bump.
+ *
  * 03 Jul 2026 v149
  * Fix: v148's changelog said js/data/feelings.js was added to SHELL_URLS,
  *   but it was missing from the actual array — comment described an
@@ -106,7 +114,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v149";
+const CACHE_NAME = "alongside-v150";
 
 const SHELL_URLS = [
 
