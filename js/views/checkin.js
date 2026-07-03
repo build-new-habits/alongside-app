@@ -1,6 +1,31 @@
 /**
  * js/views/checkin.js
- * 01 Jul 2026 v4
+ * 03 Jul 2026 v5
+ *
+ * v5 — Appendix M fix: check-in thread was scrolling to the bottom of the
+ *   container on every new message instead of to the top of the new
+ *   bubble. Root cause: _scrollToBottom() set _thread.scrollTop =
+ *   _thread.scrollHeight after every append (typing indicator, coach
+ *   bubble, user bubble, action buttons) — a blunt "jump to bottom"
+ *   regardless of which element was actually new.
+ *
+ *   Replaced with _scrollToNewElement(el), which calls
+ *   el.scrollIntoView({ block: "start" }) on the specific element just
+ *   appended, so the top of the new message lands at the top of the
+ *   visible thread — reaching the true bottom is now something the user
+ *   does themselves, not something the app does for them. Respects
+ *   REDUCED_MOTION (behavior: "auto" vs "smooth"), same as the rest of
+ *   this file's timing constants.
+ *
+ *   Per Graeme's decision (03 Jul 2026): the final summary bubble and
+ *   the action buttons at the end of check-in also scroll-to-top for
+ *   consistency, rather than snapping to bottom as a special case.
+ *
+ *   Confirmed no interaction with the locked D2 fade logic
+ *   (_fadePastBubbles(), Appendix E) — fade only toggles the .is-past
+ *   class on existing bubbles and has no scroll behaviour of its own;
+ *   neither function calls the other. Verified by inspection of every
+ *   call site in this file before deploying.
  *
  * v4 — Two QA fixes (round 1):
  *   Fade visibility: added 400ms pause after _fadePastBubbles() in all
@@ -443,7 +468,7 @@ export function CheckinView(router) {
       </button>
     `;
     _thread.appendChild(wrap);
-    _scrollToBottom();
+    _scrollToNewElement(wrap);
     requestAnimationFrame(() => wrap.classList.add("is-visible"));
     setTimeout(() => document.getElementById("ci-submit-btn")?.focus(), 150);
 
@@ -512,7 +537,7 @@ export function CheckinView(router) {
       <span class="ci-typing-dot" aria-hidden="true"></span>
     `;
     _thread.appendChild(el);
-    _scrollToBottom();
+    _scrollToNewElement(el);
     setTimeout(() => el.classList.add("is-visible"), T.TYPING_SHOW);
     return el;
   }
@@ -540,7 +565,7 @@ export function CheckinView(router) {
           bubble.className = "ci-bubble ci-bubble--coach";
           bubble.innerHTML = `<p>${_esc(text)}</p>`;
           _thread.appendChild(bubble);
-          _scrollToBottom();
+          _scrollToNewElement(bubble);
           requestAnimationFrame(() => bubble.classList.add("is-visible"));
           resolve();
         }, T.BUBBLE_DELAY);
@@ -553,7 +578,7 @@ export function CheckinView(router) {
     bubble.className = "ci-bubble ci-bubble--user";
     bubble.textContent = text;
     _thread.appendChild(bubble);
-    _scrollToBottom();
+    _scrollToNewElement(bubble);
     requestAnimationFrame(() => bubble.classList.add("is-visible"));
     return bubble;
   }
@@ -563,14 +588,30 @@ export function CheckinView(router) {
    * RULE: call only from inside confirmed user-interaction handlers
    * (panel confirm taps). Never automatically. User bubbles never fade.
    * Idempotent: already-faded bubbles are not targeted.
+   * Does not scroll — scroll is owned entirely by _scrollToNewElement(),
+   * called separately by whichever function appends the next element.
    */
   function _fadePastBubbles() {
     _thread.querySelectorAll(".ci-bubble--coach:not(.is-past)")
            .forEach(b => b.classList.add("is-past"));
   }
 
-  function _scrollToBottom() {
-    setTimeout(() => { if (_thread) _thread.scrollTop = _thread.scrollHeight; }, T.SCROLL_DELAY);
+  /**
+   * Scroll so the TOP of the newly-appended element aligns with the top
+   * of the thread's visible area — never a blind jump to container
+   * bottom. This is the Appendix M fix: reaching the bottom of the
+   * thread is an active choice the user makes by scrolling further,
+   * not something that happens to them automatically on every message.
+   * Used for the typing indicator, every coach bubble, every user
+   * bubble, and the final action-buttons block alike, so scroll
+   * behaviour is consistent throughout the whole check-in — including
+   * the summary bubble at the end (Graeme's decision, 03 Jul 2026).
+   */
+  function _scrollToNewElement(el) {
+    setTimeout(() => {
+      if (!el) return;
+      el.scrollIntoView({ block: "start", behavior: REDUCED_MOTION ? "auto" : "smooth" });
+    }, T.SCROLL_DELAY);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
