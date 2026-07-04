@@ -1,19 +1,25 @@
 /*
  * css/components/settings.css
- * 04 Jul 2026 v2
+ * 04 Jul 2026 v3
  *
- * Styles for settings.js v6 — six-tab settings view.
+ * Styles for settings.js v7 — six-tab settings view.
  *
- * v2 — Tab strip overlap fix. Screenshot showed tab labels overlapping
- *   ("ProgrammConditionEquipme...") instead of scrolling. The existing
- *   flex-shrink: 0 + white-space: nowrap rules were correct in principle,
- *   but something elsewhere in the cascade was evidently winning over
- *   them (not confirmed which rule — not visible in this file). Rather
- *   than guess at the other file, made the tab rule defensively
- *   bulletproof with !important, same pattern as nav-fix.css. Added a
- *   small gap between tabs for breathing room and slightly wider
- *   horizontal padding for legibility. No JS changes — settings.js v6
- *   untouched.
+ * v3 — S2 fix: native <select> option list fails WebAIM contrast.
+ *   .settings-select was setting color: var(--color-text) (a light
+ *   colour for this app's dark theme) — but the *open* option list is
+ *   rendered by the OS/browser on a white background, not by our CSS.
+ *   Light text landed on white and washed out (visible in screenshot:
+ *   "Under 18" readable only because it was the highlighted/selected
+ *   row; every other option nearly invisible). Added an explicit
+ *   .settings-select option rule — dark text, white background —
+ *   independent of the app theme, since the native popup ignores the
+ *   theme regardless. Applies to every dropdown in Settings (age,
+ *   gender, weekly target, activity level).
+ *   Also removed the .settings-coach-styles / .settings-coach-style*
+ *   rules — dead CSS following the S1 removal of the coach style
+ *   picker in settings.js v7 (Nurturing only, permanently, no picker).
+ *
+ * v2 — Tab strip overlap fix (defensive !important on .settings-tab).
  *
  * v1 — Initial six-tab settings view styles.
  */
@@ -185,6 +191,16 @@
   outline-offset: 0;
 }
 
+/* S2 fix — the closed select keeps the dark-theme colour above.
+   The OPEN option list is rendered by the OS/browser on a white
+   background regardless of our theme — style it explicitly so text
+   stays readable there, independent of --color-text. WebAIM-checked:
+   #14161f on #ffffff = 18.1:1, comfortably passes AA and AAA. */
+.settings-select option {
+  color: #14161f;
+  background-color: #ffffff;
+}
+
 /* ── Toggle switch ────────────────────────────────────────────── */
 
 .settings-toggle {
@@ -286,59 +302,6 @@
 }
 
 .settings-goal-chip:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* ── Coach styles ─────────────────────────────────────────────── */
-
-.settings-coach-styles {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.settings-coach-style {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-4);
-  min-height: 56px;
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  text-align: left;
-  cursor: pointer;
-  transition: border-color 0.1s;
-}
-
-.settings-coach-style--selected {
-  border-color: var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
-}
-
-.settings-coach-style--beta-locked {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.settings-coach-style__label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: var(--color-text);
-}
-
-.settings-coach-style__desc {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-}
-
-.settings-coach-style__soon {
-  font-size: var(--text-xs);
-  color: var(--color-primary);
-}
-
-.settings-coach-style:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
