@@ -1,8 +1,12 @@
 /*
  * css/components/settings.css
- * 04 Jul 2026 v3
+ * 04 Jul 2026 v4
  *
- * Styles for settings.js v7 — six-tab settings view.
+ * Styles for settings.js v8 — six-tab settings view.
+ *
+ * v4 — S3 fix: added .settings-goals-category / __label styles for the
+ *   grouped goals rendering in settings.js v8 (category headers above
+ *   each chip group, matching onboarding's presentation).
  *
  * v3 — S2 fix: native <select> option list fails WebAIM contrast.
  *   .settings-select was setting color: var(--color-text) (a light
@@ -273,6 +277,29 @@
   display: flex;
   gap: var(--space-3);
   flex-wrap: wrap;
+}
+
+/* ── Goals — grouped by category (S3) ────────────────────────── */
+
+.settings-goals-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.settings-goals-category {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.settings-goals-category__label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
 }
 
 /* ── Goals grid ───────────────────────────────────────────────── */
