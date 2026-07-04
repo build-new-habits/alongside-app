@@ -1,6 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Jul 2026 v151
+ * css/components/nav-fix.css v3 — root cause of the 26 Jun nav truncation
+ *   bug found and fixed: v2 forced left:0/right:0/width:100% on
+ *   #bottom-nav but never reset the transform: translateX(-50%) inherited
+ *   from app-shell.css's centring rule. The nav bar was being shifted left
+ *   by 50% of its own (now full-viewport) width, pushing roughly half of
+ *   it off-screen — matching the "only 2 tabs, pushed left" QA finding
+ *   that was never actually resolved. Added transform: none !important.
+ *   No new files — nav-fix.css path already in SHELL_URLS, cache-busted
+ *   by this CACHE_NAME bump alone.
+ *
  * 03 Jul 2026 v150
  * js/views/onboarding/thread.js v7 — Appendix M scroll fix applied to
  *   onboarding (same root cause as checkin.js: blind scroll-to-container-
@@ -114,7 +125,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v150";
+const CACHE_NAME = "alongside-v151";
 
 const SHELL_URLS = [
 
