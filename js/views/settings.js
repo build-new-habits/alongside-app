@@ -1,8 +1,49 @@
 /**
- * js/views/settings.js
- * 04 Jul 2026 v7
+ * settings.js
+ * 04 Jul 2026 v9
  *
  * Settings view. User controls for profile, programme, goals, and preferences.
+ *
+ * v9 — Back-navigation bug fix. "Edit conditions"/"Edit equipment" were
+ *   calling router.navigate('onboarding/conditions' / 'onboarding/equipment')
+ *   directly — a real navigation into a view built for onboarding, whose
+ *   Back/Done buttons are hardcoded to onboarding-sequence destinations
+ *   (conditions.js's Back button literally calls
+ *   router.navigate('onboarding/goals')). That's why Back landed on
+ *   onboarding goals instead of returning to Settings, and why the
+ *   bottom nav vanished and onboarding progress dots appeared in its
+ *   place — the view was mounting as a full onboarding page, not an
+ *   "edit" screen.
+ *   Fix: both actions now call openSheet() from
+ *   js/views/onboarding/sheet-manager.js — the exact mechanism OB-THREAD
+ *   already uses to mount these same view files inside onboarding.
+ *   sheet-manager.js temporarily intercepts the bare global
+ *   router.navigate() while a sheet is open, so conditions.js's hardcoded
+ *   Back call just closes the sheet instead of leaking through as a real
+ *   navigation. equipment.js already exports mountContainer()/
+ *   setSheetDoneCallback() for this exact purpose. No changes needed to
+ *   conditions.js, equipment.js, or sheet-manager.js — only the call site
+ *   here. onDone callback re-renders Settings so any conditions/equipment
+ *   changes made in the sheet show immediately. Nav bar now stays visible
+ *   throughout, since the route never actually changes from 'settings'.
+ *
+ * v8 — S1/S3 fixes (second round, same day).
+ *   S1: age band options were out of date. Settings still had the
+ *   pre-OB-THREAD bands (Under 18/18–24/25–34/35–44/45–54/55–64/65+).
+ *   Onboarding moved to Under 20/20s/30s/40s/50s/60s/70+ as part of the
+ *   28 Jun OB-THREAD rewrite (confirmed against
+ *   alongside_onboarding_conversation_script_28jun2026_v3). Settings
+ *   never followed — a saved ageBand from onboarding wouldn't even
+ *   match an option here. Updated to the current bands.
+ *   S3: "Your goals" was flattening GOAL_CATEGORIES with flatMap,
+ *   throwing away the category grouping onboarding uses (see
+ *   screenshot: "Feel good and have energy" / "Strength and fitness" /
+ *   "Running and cardio goals" etc.). Now renders one
+ *   .settings-goals-category block per category with its own label,
+ *   matching onboarding's presentation. Assumes cat.label exists on
+ *   GOAL_CATEGORIES entries (consistent with the .label pattern used
+ *   elsewhere in this file's own TABS array) — not confirmed against
+ *   goals.js directly, flag if it renders blank.
  *
  * v7 — S1 fix. Coach style is Nurturing only, permanently — no other
  *   styles are planned, not just "locked for beta". Removed the
@@ -67,6 +108,7 @@ import { GOAL_CATEGORIES, getGoalLabel } from '../data/goals.js';
 import { getProgramme, PROGRAMMES }      from '../data/programmes.js';
 import { getProgressStats }              from '../data/programmeEngine.js';
 import { getBeat3Script }                from '../data/beat3-scripts.js';
+import { openSheet }                     from './onboarding/sheet-manager.js';
 
 // ─── View registration ────────────────────────────────────────────────────────
 
@@ -178,7 +220,7 @@ export function SettingsView(router) {
                   id="settings-agebandsel"
                   data-field="ageBand"
                   aria-label="Your age range">
-            ${['Under 18','18–24','25–34','35–44','45–54','55–64','65+','Prefer not to say'].map(b => `
+            ${['Under 20','20s','30s','40s','50s','60s','70+','Prefer not to say'].map(b => `
               <option value="${b}" ${ageBand === b ? 'selected' : ''}>${b}</option>
             `).join('')}
           </select>
@@ -328,19 +370,24 @@ export function SettingsView(router) {
           Tap to change what you're working towards.
           Your programme won't be affected until you next review it.
         </p>
-        <div class="settings-goals-grid"
-             role="group"
-             aria-label="Select your goals">
-          ${GOAL_CATEGORIES.flatMap(cat => cat.goals).map(goal => `
-            <button
-              class="settings-goal-chip ${goals.includes(goal.id) ? 'settings-goal-chip--selected' : ''}"
-              data-goal="${goal.id}"
-              role="checkbox"
-              aria-checked="${goals.includes(goal.id) ? 'true' : 'false'}"
-              aria-label="${goal.label}">
-              <span aria-hidden="true">${goal.icon}</span>
-              ${goal.label}
-            </button>
+        <div class="settings-goals-groups" role="group" aria-label="Select your goals">
+          ${GOAL_CATEGORIES.map(cat => `
+            <div class="settings-goals-category">
+              <p class="settings-goals-category__label">${_esc(cat.label)}</p>
+              <div class="settings-goals-grid">
+                ${cat.goals.map(goal => `
+                  <button
+                    class="settings-goal-chip ${goals.includes(goal.id) ? 'settings-goal-chip--selected' : ''}"
+                    data-goal="${goal.id}"
+                    role="checkbox"
+                    aria-checked="${goals.includes(goal.id) ? 'true' : 'false'}"
+                    aria-label="${goal.label}">
+                    <span aria-hidden="true">${goal.icon}</span>
+                    ${goal.label}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
           `).join('')}
         </div>
         <button class="settings-save-btn btn btn-primary"
@@ -695,11 +742,23 @@ export function SettingsView(router) {
         break;
 
       case 'edit-conditions':
-        router.navigate('onboarding/conditions');
+        // Opens as a sheet (same mechanism onboarding uses), not a direct
+        // navigate — see settings.js v9 changelog for why. conditions.js's
+        // Back button is hardcoded to router.navigate('onboarding/goals');
+        // openSheet() intercepts that call and just closes the sheet,
+        // instead of it leaking through as a real navigation.
+        openSheet('onboarding/conditions', () => {
+          render(container); // refresh to show any updated conditions list
+        });
         break;
 
       case 'edit-equipment':
-        router.navigate('onboarding/equipment');
+        // Same fix as edit-conditions, above. equipment.js already has
+        // mountContainer()/setSheetDoneCallback() exports built for this
+        // exact sheet pattern — reused as-is, no changes to that file.
+        openSheet('onboarding/equipment', () => {
+          render(container);
+        });
         break;
 
       case 'nav-privacy':
