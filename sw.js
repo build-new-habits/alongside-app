@@ -1,6 +1,19 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Jul 2026 v154
+ * router.js v8 — S3 fix. VIEW_NAMES['goal-setup'] path corrected from
+ *   './views/goal-setup.js' to './views/onboarding/goal-setup.js' — this
+ *   was the exact 404 seen in console when tapping "Choose my programme"
+ *   / "Change programme" in Settings, which then surfaced the router's
+ *   generic error screen. Single-line path fix — fn and everything else
+ *   in that route entry unchanged. No new files — router.js path already
+ *   in SHELL_URLS, cache-busted by this CACHE_NAME bump alone.
+ *   NOT fixed here: the "onboarding/lifestyle" unknown-view console
+ *   warning (harmless fallback, but caller not yet identified), and S4
+ *   (45s Check-in → Settings lag) — still waiting on a Network-tab
+ *   capture before touching that one.
+ *
  * 04 Jul 2026 v153
  * S1/S2 Settings fixes:
  *   settings.js v7 — removed the coach style picker (Steady/Energetic/
@@ -18,9 +31,6 @@
  *     change above.
  *   No new files — both paths already in SHELL_URLS, cache-busted by
  *   this CACHE_NAME bump alone.
- *   NOT done this batch (need live router.js / more diagnosis first):
- *   S3 (goal-setup.js 404 on "Choose my programme") and S4 (45s
- *   navigation lag, Check-in → Settings).
  *
  * 04 Jul 2026 v152
  * css/components/settings.css v2 — fixed Settings tab strip overlap bug.
@@ -157,7 +167,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v153";
+const CACHE_NAME = "alongside-v154";
 
 const SHELL_URLS = [
 
@@ -208,7 +218,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/reflect.js",
   "/alongside-app/js/views/about.js",
   "/alongside-app/js/views/privacy.js",
-  "/alongside-app/js/views/goal-setup.js",
+  "/alongside-app/js/views/onboarding/goal-setup.js",
   "/alongside-app/js/views/library.js",
   "/alongside-app/js/views/noticing.js",
   "/alongside-app/js/views/journal-entry.js",
