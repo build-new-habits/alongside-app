@@ -1,173 +1,68 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Jul 2026 v156
+ * settings.js v9 — Back-navigation bug fix. "Edit conditions"/"Edit
+ *   equipment" now open via openSheet() (js/views/onboarding/
+ *   sheet-manager.js) instead of a direct router.navigate() into an
+ *   onboarding-built view. Root cause: conditions.js's Back button is
+ *   hardcoded to router.navigate('onboarding/goals') — fine inside a
+ *   sheet, where sheet-manager.js intercepts that call, but a real
+ *   navigation when reached directly from Settings, which is why Back
+ *   was landing in onboarding goals instead of Settings, and why the
+ *   bottom nav and onboarding progress dots were showing. No changes to
+ *   conditions.js, equipment.js, or sheet-manager.js — all three already
+ *   had the right infrastructure, Settings just wasn't using it. No new
+ *   files — sheet-manager.js and its view map were already fully listed
+ *   in SHELL_URLS below, cache-busted by this CACHE_NAME bump alone.
+ *   NOT done this batch: S4 (navigation lag, reported across multiple
+ *   views) — still waiting on a Network-tab capture before touching
+ *   that one, per Ground Truth Rule.
+ *
+ * 04 Jul 2026 v155
+ * S1/S3 Settings fixes (second round, same day):
+ *   settings.js v8 — S1: age band options updated to match the current
+ *     onboarding bands (Under 20/20s/30s/40s/50s/60s/70+). S3: "Your
+ *     goals" now renders grouped by category, matching onboarding.
+ *   settings.css v4 — added .settings-goals-category / __label styles.
+ *
  * 04 Jul 2026 v154
  * router.js v8 — S3 fix. VIEW_NAMES['goal-setup'] path corrected from
- *   './views/goal-setup.js' to './views/onboarding/goal-setup.js' — this
- *   was the exact 404 seen in console when tapping "Choose my programme"
- *   / "Change programme" in Settings, which then surfaced the router's
- *   generic error screen. Single-line path fix — fn and everything else
- *   in that route entry unchanged. No new files — router.js path already
- *   in SHELL_URLS, cache-busted by this CACHE_NAME bump alone.
- *   NOT fixed here: the "onboarding/lifestyle" unknown-view console
- *   warning (harmless fallback, but caller not yet identified), and S4
- *   (45s Check-in → Settings lag) — still waiting on a Network-tab
- *   capture before touching that one.
+ *   './views/goal-setup.js' to './views/onboarding/goal-setup.js'.
  *
  * 04 Jul 2026 v153
- * S1/S2 Settings fixes:
- *   settings.js v7 — removed the coach style picker (Steady/Energetic/
- *     Minimal, "After beta" locked options). Nurturing is the only coach
- *     style, permanently — not a beta restriction. Replaced with a single
- *     static line under the Programme panel. No schema change — store's
- *     coachStyle field untouched, still defaults to "nurturing".
- *   settings.css v3 — fixed WebAIM contrast failure on every dropdown's
- *     open option list (age, gender, weekly target, activity level).
- *     .settings-select was colouring options with the dark-theme text
- *     colour, which the OS-rendered white popup then displayed as
- *     near-invisible light-on-white. Added explicit dark-on-white colour
- *     for .settings-select option, independent of the app theme. Also
- *     removed now-dead .settings-coach-style* rules following the S1 JS
- *     change above.
- *   No new files — both paths already in SHELL_URLS, cache-busted by
- *   this CACHE_NAME bump alone.
+ * S1/S2 Settings fixes: settings.js v7 (coach style picker removed,
+ *   Nurturing only permanently); settings.css v3 (dropdown option
+ *   contrast fixed on all Settings dropdowns).
  *
  * 04 Jul 2026 v152
  * css/components/settings.css v2 — fixed Settings tab strip overlap bug.
- *   Tabs (Profile/Programme/Conditions/Equipment/Reminders/About) were
- *   overlapping instead of scrolling on mobile. flex-shrink: 0 and
- *   white-space: nowrap were already present and correct in principle,
- *   but something elsewhere in the cascade was evidently overriding
- *   them (not confirmed which rule). Made the tab rule defensively
- *   bulletproof with !important — same remedy pattern as nav-fix.css.
- *   No JS changes. No new files — settings.css path already in
- *   SHELL_URLS, cache-busted by this CACHE_NAME bump alone.
  *
  * 04 Jul 2026 v151
  * css/components/nav-fix.css v3 — root cause of the 26 Jun nav truncation
- *   bug found and fixed: v2 forced left:0/right:0/width:100% on
- *   #bottom-nav but never reset the transform: translateX(-50%) inherited
- *   from app-shell.css's centring rule. The nav bar was being shifted left
- *   by 50% of its own (now full-viewport) width, pushing roughly half of
- *   it off-screen — matching the "only 2 tabs, pushed left" QA finding
- *   that was never actually resolved. Added transform: none !important.
- *   No new files — nav-fix.css path already in SHELL_URLS, cache-busted
- *   by this CACHE_NAME bump alone. CONFIRMED FIXED on device 04 Jul.
+ *   bug found and fixed. CONFIRMED FIXED on device 04 Jul.
  *
  * 03 Jul 2026 v150
  * js/views/onboarding/thread.js v7 — Appendix M scroll fix applied to
- *   onboarding (same root cause as checkin.js: blind scroll-to-container-
- *   bottom on every append, replaced with scroll-to-top-of-new-element).
- *   Also fixed preventively: Step 14 reading pause before Begin button,
- *   preventScroll on all 8 focus() calls in this file. No new files —
- *   thread.js path already in SHELL_URLS, cache-busted by CACHE_NAME bump.
+ *   onboarding.
  *
  * 03 Jul 2026 v149
  * Fix: v148's changelog said js/data/feelings.js was added to SHELL_URLS,
- *   but it was missing from the actual array — comment described an
- *   intention that never made it into the list. Found on ground-truth
- *   review. Added below, in the Data section next to signal-words.js
- *   (which it wraps). Without this, feelings.js would still load fine
- *   over network but wouldn't be precached — would fail if the PWA is
- *   opened offline or from a stale cache.
+ *   but it was missing from the actual array.
  *
  * 03 Jul 2026 v148
  * Adding js/data/feelings.js for word selection following mood vs energy
  *
  * 01 Jul 2026 v147
+ * alongside-v147 — Step 8: checkin.js conversational rewrite.
  *
- * alongside-v147 (01 Jul 2026) — Step 8: checkin.js conversational
- *   rewrite (D2 opening narratives + thread UX).
- *   js/data/checkin-openings.js v1 (new) — D2 check-in opening content:
- *     all six modes + Day One exception as structured data, plus
- *     resolveOpening() resolver. Reads from store; returns { b1, b2,
- *     mode, careMode }.
- *   js/views/checkin.js v3 — full rewrite: conversational thread
- *     (CheckinView factory pattern). D2 opening → energy panel → mood
- *     panel → sleep panel → conditions panel (conditional) → time panel
- *     → summary + action buttons. OB-THREAD fade rule preserved: bubble
- *     fade fired only from confirmed user-interaction handlers.
- *   css/components/checkin-conversation.css v1 (new) — thread, bubbles,
- *     typing indicator, bottom-sliding input panels, time grid. Active /
- *     faded bubble colours match Appendix G confirmed values.
- *   css/main.css v9 — D2 @import uncommented.
- *
- * alongside-v142 (29 Jun 2026) — Gemini QA round 1 (C1/C2): fade not
- *   visible. Investigated via direct DevTools breakpoint and
- *   getComputedStyle verification — confirmed every layer of the fade
- *   mechanism (JS call sites, class application, CSS rule, deployment)
- *   was working exactly as built. The actual cause was a design
- *   judgement: the background colour gap between active and faded
- *   bubbles was only 12/765, invisible at a glance despite being
- *   technically correct.
- *   css/components/onboarding-thread.css v4 — widened the gap to
- *     56/765 (#0A1414), reconfirmed WCAG AA text contrast (7.42:1).
- *
- * alongside-v141 (29 Jun 2026) — S1 REAL root cause found, after four
- *   rounds of incorrect fixes targeting the wrong file:
- *   css/components/sheet-manager.css v2 — .sheet-content had zero
- *     bottom padding, designed on the assumption all sheet content uses
- *     .sheet-footer for its action button. It doesn't: goals.js,
- *     conditions.js, and equipment.js each bring their own in-content
- *     button, injected directly into .sheet-content via innerHTML. Every
- *     previous attempt to fix this in onboarding-additions.css was
- *     styling the wrong layer — the views' own padding never mattered
- *     because the outer scroll container had no clearance at all,
- *     regardless of what was added inside it. Fixed at the actual
- *     source this time.
- *
- * alongside-v140 (29 Jun 2026) — S1, S4, S5 root causes confirmed and
- *   fixed against real source files (equipment.js, onboarding.css,
- *   variables.css all read directly — no guessing this round):
- *   js/views/onboarding/equipment.js v4 — the REAL bug behind S4/S5:
- *     this view has its own internal multi-screen state and its own
- *     rerender() function, hardcoded to write to #main-content. Inside
- *     the OB-THREAD sheet, the first internal screen change escaped the
- *     sheet and overwrote the real app underneath it. mountContainer(el)
- *     and setSheetDoneCallback(fn) added as optional exports.
- *   js/views/onboarding/sheet-manager.js v3 — calls the two new hooks
- *     on any loaded module that exports them.
- *   js/views/onboarding/thread.js v6 — Step 11 summary reader fixed.
- *   js/data/onboarding-thread-data.js v4 — equipment summary corrected.
- *   css/layouts/onboarding-additions.css v9 — .onboarding-footer styled.
- *
- * alongside-v139 (29 Jun 2026) — thread.js v5 (fade trigger corrected
- *   again); onboarding-additions.css v7 (Continue button + conditions
- *   chips).
- *
- * alongside-v138 (29 Jun 2026) — sheet-manager.js v2 (dual-pattern
- *   support; conditions.js crash fix); onboarding-additions.css v6
- *   (goals Continue button spacing).
- *
- * alongside-v137 (29 Jun 2026) — thread.js v4 (name capitalisation;
- *   Step 2b pacing beat); onboarding-thread-data.js v3 (Step 2b config).
- *
- * alongside-v136 (29 Jun 2026) — thread.js v3 (premature past-fade
- *   fix); onboarding-thread.css v3 (WCAG AA contrast fix for fade).
- *
- * alongside-v135 (29 Jun 2026) — thread.js v2; onboarding-thread-data
- *   v2; onboarding-thread.css v2; settings-reflection.css v1; settings
- *   v6; main.css v8.
- *
- * alongside-v134 (29 Jun 2026) — OB-THREAD build batch: store.js v7,
- *   onboarding-thread-data.js v1, onboarding-thread.css v1,
- *   sheet-manager.css v1, sheet-manager.js v1, thread.js v1, router.js
- *   v7, app.js v6, main.css v7. Retired onboarding files removed from
- *   SHELL_URLS.
- *
- * alongside-v133 (28 Jun 2026) — arrival/hard-before/reflection import
- *   path fixes.
- *
- * alongside-v132 (28 Jun 2026) — Build Step 7: arrival.js, hard-before,
- *   reflection, beat3-scripts, complete, onboarding-additions.
- *
- * alongside-v131 (26 Jun 2026) — Onboarding QA fixes.
- * alongside-v130 (26 Jun 2026) — nav-fix.css v2, main.css v6.
+ * (Earlier history — alongside-v130 through v142 — unchanged, see prior
+ * versions of this file for full detail.)
  *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v154";
+const CACHE_NAME = "alongside-v156";
 
 const SHELL_URLS = [
 
