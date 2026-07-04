@@ -1,8 +1,19 @@
 /**
- * settings.js
- * 29 Jun 2026 v6
+ * js/views/settings.js
+ * 04 Jul 2026 v7
  *
  * Settings view. User controls for profile, programme, goals, and preferences.
+ *
+ * v7 — S1 fix. Coach style is Nurturing only, permanently — no other
+ *   styles are planned, not just "locked for beta". Removed the
+ *   Steady/Energetic/Minimal radiogroup and all "After beta" locked-
+ *   option UI entirely. Replaced with a single static line. store's
+ *   coachStyle field is untouched (still defaults to 'nurturing', still
+ *   read elsewhere for voice logic) — this is a UI-only removal, no
+ *   schema change. Removed the now-dead [data-coach-style] event
+ *   listener block. Flagged separately (not done here, out of scope
+ *   for Settings): audit website copy, marketing, and other Alongside
+ *   product docs for any remaining "choose your coach style" language.
  *
  * v6 — OB-THREAD. New "Your reflection" section added to the Profile panel.
  *   Displays the Beat 3 reflection generated at onboarding, report-style —
@@ -214,7 +225,7 @@ export function SettingsView(router) {
     `;
   }
 
-  // ── Reflection section (NEW in v6) ─────────────────────────────────────────
+  // ── Reflection section ──────────────────────────────────────────────────
   // Collapsible block. Reads primaryTerritory live, no stored read/unread
   // state, no new schema. Renders nothing if the user has no territory set.
 
@@ -252,14 +263,13 @@ export function SettingsView(router) {
     `;
   }
 
-  // ── Programme panel (NEW in v5) ────────────────────────────────────────────
+  // ── Programme panel ────────────────────────────────────────────────────────
 
   function renderProgrammePanel() {
     const stats        = getProgressStats();
     const goals        = store.get('goals') || [];
     const fitnessLevel = store.get('fitnessLevel') || 'moderate';
     const weeklyTarget = store.get('strategicGoal.weeklySessionTarget') || 3;
-    const coachStyle   = store.get('coachStyle') || 'nurturing';
     const tier         = store.get('tier') || 'free';
 
     return `
@@ -312,7 +322,7 @@ export function SettingsView(router) {
           </select>
         </div>
 
-        <!-- Goals (P5-ST-2) -->
+        <!-- Goals -->
         <h2 class="settings-section__heading">Your goals</h2>
         <p class="settings-section__sub">
           Tap to change what you're working towards.
@@ -339,7 +349,7 @@ export function SettingsView(router) {
           Save goals
         </button>
 
-        <!-- Activity level (P5-ST-3) -->
+        <!-- Activity level -->
         <h2 class="settings-section__heading">Activity level</h2>
         <p class="settings-section__sub">
           Update this as you get fitter — it affects the intensity ceiling for your sessions.
@@ -363,34 +373,12 @@ export function SettingsView(router) {
           Save
         </button>
 
-        <!-- Coach style -->
-        <h2 class="settings-section__heading">Coach style</h2>
+        <!-- Coach (S1 — Nurturing only, permanently. No picker.) -->
+        <h2 class="settings-section__heading">Your coach</h2>
         <p class="settings-section__sub">
-          During beta, all coaching is delivered in the Nurturing style.
-          More options coming after beta.
+          Every session is guided in a warm, nurturing style — gentle,
+          emotionally attuned, and always on your side.
         </p>
-        <div class="settings-coach-styles"
-             role="radiogroup"
-             aria-label="Coach style">
-          ${[
-            { id: 'nurturing',  label: 'Nurturing',  desc: 'Gentle, emotionally attuned, warm' },
-            { id: 'steady',     label: 'Steady',     desc: 'Calm, grounded, reassuring'        },
-            { id: 'energetic',  label: 'Energetic',  desc: 'Upbeat, motivating, enthusiastic'  },
-            { id: 'minimal',    label: 'Minimal',    desc: 'Direct, efficient, no filler'       },
-          ].map(style => `
-            <button
-              class="settings-coach-style ${coachStyle === style.id ? 'settings-coach-style--selected' : ''} ${style.id !== 'nurturing' ? 'settings-coach-style--beta-locked' : ''}"
-              role="radio"
-              aria-checked="${coachStyle === style.id ? 'true' : 'false'}"
-              ${style.id !== 'nurturing' ? 'aria-disabled="true"' : ''}
-              data-coach-style="${style.id}"
-              aria-label="${style.label}: ${style.desc}${style.id !== 'nurturing' ? ' — coming after beta' : ''}">
-              <span class="settings-coach-style__label">${style.label}</span>
-              <span class="settings-coach-style__desc">${style.desc}</span>
-              ${style.id !== 'nurturing' ? '<span class="settings-coach-style__soon">After beta</span>' : ''}
-            </button>
-          `).join('')}
-        </div>
 
       </div>
     `;
@@ -604,20 +592,6 @@ export function SettingsView(router) {
         btn.classList.toggle('settings-goal-chip--selected');
         const checked = btn.classList.contains('settings-goal-chip--selected');
         btn.setAttribute('aria-checked', checked ? 'true' : 'false');
-      });
-    });
-
-    // Coach style (Nurturing only active in beta)
-    container.querySelectorAll('[data-coach-style]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (btn.getAttribute('aria-disabled') === 'true') return;
-        const style = btn.dataset.coachStyle;
-        store.set('coachStyle', style);
-        container.querySelectorAll('[data-coach-style]').forEach(b => {
-          const isSelected = b.dataset.coachStyle === style;
-          b.setAttribute('aria-checked', isSelected ? 'true' : 'false');
-          b.classList.toggle('settings-coach-style--selected', isSelected);
-        });
       });
     });
 
