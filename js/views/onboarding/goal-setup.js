@@ -1,5 +1,5 @@
 /**
- * goal-setup.js - Strategic goal and programme selection
+ * .js/views/onboarding/goal-setup.js - Strategic goal and programme selection
  *
  * 12 Jun 2026 v1 (S4-4 P4) - validateWeightTarget() added:
  *   On the confirm step, if the user's goal is "lose-weight" and both
