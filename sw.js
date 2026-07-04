@@ -1,6 +1,21 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Jul 2026 v152
+ * css/components/settings.css v2 — fixed Settings tab strip overlap bug.
+ *   Tabs (Profile/Programme/Conditions/Equipment/Reminders/About) were
+ *   overlapping instead of scrolling on mobile. flex-shrink: 0 and
+ *   white-space: nowrap were already present and correct in principle,
+ *   but something elsewhere in the cascade was evidently overriding
+ *   them (not confirmed which rule). Made the tab rule defensively
+ *   bulletproof with !important — same remedy pattern as nav-fix.css.
+ *   No JS changes. No new files — settings.css path already in
+ *   SHELL_URLS, cache-busted by this CACHE_NAME bump alone.
+ *   Note: "My Movement" consolidation (merging Conditions/Equipment into
+ *   a facility-first tab) was considered and set aside — that's a
+ *   separate, older planned session (NS-1/NS-2 in 13 May handoff), not
+ *   done here. Six tabs unchanged.
+ *
  * 04 Jul 2026 v151
  * css/components/nav-fix.css v3 — root cause of the 26 Jun nav truncation
  *   bug found and fixed: v2 forced left:0/right:0/width:100% on
@@ -10,7 +25,7 @@
  *   it off-screen — matching the "only 2 tabs, pushed left" QA finding
  *   that was never actually resolved. Added transform: none !important.
  *   No new files — nav-fix.css path already in SHELL_URLS, cache-busted
- *   by this CACHE_NAME bump alone.
+ *   by this CACHE_NAME bump alone. CONFIRMED FIXED on device 04 Jul.
  *
  * 03 Jul 2026 v150
  * js/views/onboarding/thread.js v7 — Appendix M scroll fix applied to
@@ -125,7 +140,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v151";
+const CACHE_NAME = "alongside-v152";
 
 const SHELL_URLS = [
 
