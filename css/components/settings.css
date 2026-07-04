@@ -1,8 +1,21 @@
 /*
  * css/components/settings.css
- * 25 Jun 2026 v1
+ * 04 Jul 2026 v2
  *
- * Styles for settings.js v5 — six-tab settings view.
+ * Styles for settings.js v6 — six-tab settings view.
+ *
+ * v2 — Tab strip overlap fix. Screenshot showed tab labels overlapping
+ *   ("ProgrammConditionEquipme...") instead of scrolling. The existing
+ *   flex-shrink: 0 + white-space: nowrap rules were correct in principle,
+ *   but something elsewhere in the cascade was evidently winning over
+ *   them (not confirmed which rule — not visible in this file). Rather
+ *   than guess at the other file, made the tab rule defensively
+ *   bulletproof with !important, same pattern as nav-fix.css. Added a
+ *   small gap between tabs for breathing room and slightly wider
+ *   horizontal padding for legibility. No JS changes — settings.js v6
+ *   untouched.
+ *
+ * v1 — Initial six-tab settings view styles.
  */
 
 /* ── View ─────────────────────────────────────────────────────── */
@@ -28,7 +41,7 @@
   overflow-x: auto;
   border-bottom: 1px solid var(--color-border);
   padding: 0 var(--space-4);
-  gap: 0;
+  gap: var(--space-1);
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -36,8 +49,12 @@
 .settings-tabs::-webkit-scrollbar { display: none; }
 
 .settings-tab {
-  flex-shrink: 0;
-  padding: var(--space-3) var(--space-3);
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  min-width: max-content !important;
+  width: auto !important;
+  padding: var(--space-3) var(--space-4) !important;
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
   color: var(--color-text-muted);
@@ -45,7 +62,9 @@
   border: none;
   border-bottom: 2px solid transparent;
   cursor: pointer;
-  white-space: nowrap;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
   min-height: 44px;
   transition: color 0.1s, border-color 0.1s;
 }
