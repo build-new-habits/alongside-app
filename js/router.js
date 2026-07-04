@@ -1,6 +1,22 @@
 /**
  * router.js
- * 29 Jun 2026 v7
+ * 04 Jul 2026 v8
+ *
+ * v8 — S3 fix. VIEW_NAMES['goal-setup'] pointed to './views/goal-setup.js',
+ *   but the actual file's own header confirms it lives at
+ *   './views/onboarding/goal-setup.js' — one folder off. This was the
+ *   exact 404 in console ("GET .../js/views/goal-setup.js net::ERR_ABORTED
+ *   404") triggered by "Choose my programme" / "Change programme" in
+ *   Settings. Corrected the path. fn stays 'GoalSetupView' — the actual
+ *   file exports render()/onMount() (old pattern), which _mountView()
+ *   already falls back to correctly once the import itself succeeds, so
+ *   no other change needed here.
+ *   Separately noted, not fixed here: console also shows "Router: unknown
+ *   view 'onboarding/lifestyle' — falling back to today" — this route was
+ *   deliberately retired in v7 (OB-THREAD), so something is still calling
+ *   navigate('onboarding/lifestyle') from a stale reference. Harmless
+ *   (graceful fallback, no crash) but worth finding the caller in a future
+ *   session — not diagnosed yet, don't have the calling file.
  *
  * v7 — OB-THREAD. Added onboarding/thread route. Removed retired onboarding
  *   routes from VIEW_NAMES and hideNavViews: arrival, hard-before, reflection,
@@ -55,7 +71,7 @@ const VIEW_NAMES = {
   'about':             { path: './views/about.js',            fn: 'AboutView'           },
   'privacy':           { path: './views/privacy.js',          fn: 'PrivacyView'         },
   'upgrade':           { path: './views/upgrade.js',          fn: 'UpgradeView'         },
-  'goal-setup':        { path: './views/goal-setup.js',       fn: 'GoalSetupView'       },
+  'goal-setup':        { path: './views/onboarding/goal-setup.js', fn: 'GoalSetupView'  },
   'community-impact':  { path: './views/community-impact.js', fn: 'CommunityImpactView' },
   'annual-reflection': { path: './views/annual-reflection.js',fn: 'AnnualReflectionView'},
 
