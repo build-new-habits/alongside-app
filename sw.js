@@ -1,6 +1,27 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Jul 2026 v153
+ * S1/S2 Settings fixes:
+ *   settings.js v7 — removed the coach style picker (Steady/Energetic/
+ *     Minimal, "After beta" locked options). Nurturing is the only coach
+ *     style, permanently — not a beta restriction. Replaced with a single
+ *     static line under the Programme panel. No schema change — store's
+ *     coachStyle field untouched, still defaults to "nurturing".
+ *   settings.css v3 — fixed WebAIM contrast failure on every dropdown's
+ *     open option list (age, gender, weekly target, activity level).
+ *     .settings-select was colouring options with the dark-theme text
+ *     colour, which the OS-rendered white popup then displayed as
+ *     near-invisible light-on-white. Added explicit dark-on-white colour
+ *     for .settings-select option, independent of the app theme. Also
+ *     removed now-dead .settings-coach-style* rules following the S1 JS
+ *     change above.
+ *   No new files — both paths already in SHELL_URLS, cache-busted by
+ *   this CACHE_NAME bump alone.
+ *   NOT done this batch (need live router.js / more diagnosis first):
+ *   S3 (goal-setup.js 404 on "Choose my programme") and S4 (45s
+ *   navigation lag, Check-in → Settings).
+ *
  * 04 Jul 2026 v152
  * css/components/settings.css v2 — fixed Settings tab strip overlap bug.
  *   Tabs (Profile/Programme/Conditions/Equipment/Reminders/About) were
@@ -11,10 +32,6 @@
  *   bulletproof with !important — same remedy pattern as nav-fix.css.
  *   No JS changes. No new files — settings.css path already in
  *   SHELL_URLS, cache-busted by this CACHE_NAME bump alone.
- *   Note: "My Movement" consolidation (merging Conditions/Equipment into
- *   a facility-first tab) was considered and set aside — that's a
- *   separate, older planned session (NS-1/NS-2 in 13 May handoff), not
- *   done here. Six tabs unchanged.
  *
  * 04 Jul 2026 v151
  * css/components/nav-fix.css v3 — root cause of the 26 Jun nav truncation
@@ -140,7 +157,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v152";
+const CACHE_NAME = "alongside-v153";
 
 const SHELL_URLS = [
 
