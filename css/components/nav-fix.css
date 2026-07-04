@@ -1,11 +1,19 @@
 /*
  * css/components/nav-fix.css
- * 26 Jun 2026 v2
+ * 04 Jul 2026 v3
+ *
+ * v3 — Root cause found: app-shell.css centres .bottom-nav using
+ *   left: 50% + transform: translateX(-50%). v2 overrode left/right/width
+ *   to span full viewport but never reset transform — so the bar was still
+ *   being shifted left by 50% of its own (now full-viewport) width,
+ *   pushing ~half of it off-screen. This is why the truncation persisted
+ *   after v2 shipped. Added transform: none !important to the nav rule.
+ *   No other changes from v2.
  *
  * v2 — Nav bar layout fix. Gemini confirmed the bar renders but is truncated
  *   and misaligned, showing only 2 of 4 tabs pushed to the left edge.
- *   Root cause: flex container not distributing children evenly, or width
- *   constraint from app-shell.css limiting the bar width.
+ *   Root cause at the time was believed to be flex distribution — that fix
+ *   was necessary but not sufficient; see v3 note above for the real cause.
  *
  * v1 — Initial fix attempt (display:none -> display:flex).
  *
@@ -14,9 +22,7 @@
  *   - main-content padding so content does not hide behind nav
  *   - Settings tab strip fade indicator
  */
-
 /* ── Nav bar: force correct layout ────────────────────────────── */
-
 #bottom-nav,
 .bottom-nav {
   position: fixed !important;
@@ -25,6 +31,7 @@
   right: 0 !important;
   width: 100% !important;
   max-width: 100% !important;
+  transform: none !important;
   z-index: 9000 !important;
   display: flex !important;
   flex-direction: row !important;
@@ -34,7 +41,6 @@
   box-sizing: border-box !important;
   overflow: visible !important;
 }
-
 /* Each nav button takes equal space */
 #bottom-nav button,
 #bottom-nav .nav-item,
@@ -50,47 +56,37 @@
   padding: 8px 4px !important;
   box-sizing: border-box !important;
 }
-
 /* Hidden state still works */
 #bottom-nav.hidden,
 .bottom-nav.hidden {
   display: none !important;
 }
-
 /* ── Main content: clear the nav bar ──────────────────────────── */
-
 #main-content,
 .main-content {
   padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
   min-height: 100% !important;
   box-sizing: border-box !important;
 }
-
 /* ── Back button / action bar safe area ───────────────────────── */
-
 .checkin-step-actions,
 .onboarding-actions,
 .onboarding-footer {
   padding-bottom: max(var(--space-4, 16px), env(safe-area-inset-bottom, 16px)) !important;
 }
-
 /* ── Settings tab strip: fade indicator ───────────────────────── */
-
 .settings-tabs {
   position: relative !important;
   -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%) !important;
   mask-image: linear-gradient(to right, black 85%, transparent 100%) !important;
 }
-
 /* ── Name capitalisation ──────────────────────────────────────── */
 /* Gemini flagged "graeme" lowercase — apply text-transform where name is used */
-
 .today-greeting,
 .gp-moment__heading,
 .onboarding-step-title {
   text-transform: capitalize;
 }
-
 /* But only the first letter — don't uppercase whole sentences */
 .today-greeting {
   text-transform: none;
