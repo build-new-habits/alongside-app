@@ -1,6 +1,6 @@
 /**
  * settings.js
- * 04 Jul 2026 v10
+ * 05 Jul 2026 v10
  *
  * Settings view. User controls for profile, programme, goals, and preferences.
  *
