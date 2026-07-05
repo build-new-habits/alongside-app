@@ -1,6 +1,22 @@
 /**
  * store.js - Data persistence layer
- * 29 Jun 2026 v7
+ * 05 Jul 2026 v8
+ *
+ * 05 Jul 2026 v8 - Schema-first change for My Movement rebuild (agreed
+ *   13 May, never built — ground-truthed this session: the movement
+ *   identity selector is currently absent from the live settings.js
+ *   entirely, not merely single-select).
+ *   movementIdentity: string|null -> string[]. Was a single value
+ *   (gym|yoga|running|walking|swimming|classes|mixed); now an array so a
+ *   user can hold several at once (e.g. gym + running + walking). The
+ *   coach rotates suggestions toward whichever selected identity has
+ *   been done least recently — computed from activityLog entries by
+ *   type, not a new stored field.
+ *   mergeWithDefaults() updated: existing single-string values (from
+ *   any user who set this before today) are wrapped in a one-item array
+ *   rather than discarded, so nobody's prior selection is silently lost.
+ *   getDefaults() updated: movementIdentity: [] (was null).
+ *   All other fields unchanged from v7.
  *
  * 29 Jun 2026 v7 - OB-THREAD schema pass. Three new fields added to the
  *   onboarding{} nested object:
@@ -75,6 +91,8 @@ export const store = {
    * for users who onboarded before this version was deployed.
    * Existing data is never overwritten — only missing keys are filled.
    *
+   * v8: movementIdentity migrated from string|null to string[]. Any
+   * existing single value is wrapped, not dropped.
    * v7: primaryTerritory, threadStartedAt, threadCompletedAt are string|null
    * fields inside onboarding{}. They are picked up safely by the existing
    * onboarding{} spread — no additional explicit handling needed.
@@ -309,7 +327,14 @@ export const store = {
       activityPreferences: (saved.activityPreferences && typeof saved.activityPreferences === 'object')
         ? saved.activityPreferences
         : {},
-      movementIdentity: saved.movementIdentity || null,
+
+      // v8: movementIdentity migrated string|null -> string[]. Existing
+      // single values are wrapped, not dropped, so nobody's prior
+      // selection is silently lost on this deploy.
+      movementIdentity: Array.isArray(saved.movementIdentity)
+        ? saved.movementIdentity
+        : (saved.movementIdentity ? [saved.movementIdentity] : []),
+
       lastProposalType: saved.lastProposalType || null,
       lastProposalDate: saved.lastProposalDate || null,
 
@@ -475,7 +500,13 @@ export const store = {
 
       // ── ACTIVITY PREFERENCES ──────────────────────────────────
       activityPreferences: {},
-      movementIdentity:    null,
+
+      // v8: was string|null (single-select). Now string[] — multi-select,
+      // agreed 13 May, rebuilt 05 Jul. e.g. ['gym','running','walking'],
+      // or ['mixed'] for "a mix of things" (mutually exclusive with the
+      // named identities — see settings.js renderMovementSection()).
+      movementIdentity: [],
+
       sessionLocation:     null,
       lastProposalType:    null,
       lastProposalDate:    null,
