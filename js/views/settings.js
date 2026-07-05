@@ -1,8 +1,24 @@
 /**
  * settings.js
- * 04 Jul 2026 v9
+ * 04 Jul 2026 v10
  *
  * Settings view. User controls for profile, programme, goals, and preferences.
+ *
+ * v10 — Functional QA fix (My Week). Ground-truthed against router.js v8 and
+ *   weekly-plan.js v2: the "weekly-plan" route and its view file were both
+ *   intact and schema-correct — the ONLY thing missing was a way in. The
+ *   14 Jun (S4-WP) "simple entry card" that used to live in this file's My
+ *   Week tab was dropped somewhere across the v4–v9 Programme-panel rewrites,
+ *   not deliberately, and never replaced. Restored as a "Your week" section
+ *   in the Programme panel — placed directly after the weekly session target
+ *   field, since both concern the shape of the week rather than the
+ *   programme itself. Deliberately not styled as a bare utility link: reads
+ *   store.weeklyPlan.updatedAt and speaks to what's actually true right now
+ *   ("You haven't shaped a week yet" vs "Last shaped <date>"), consistent
+ *   with the rest of this panel's voice (Conditions/Equipment sections do
+ *   the same). No schema change — weeklyPlan already exists per schema.md
+ *   v1.6+. No changes to router.js or weekly-plan.js; both were already
+ *   correct.
  *
  * v9 — Back-navigation bug fix. "Edit conditions"/"Edit equipment" were
  *   calling router.navigate('onboarding/conditions' / 'onboarding/equipment')
@@ -101,6 +117,9 @@
  *   Select elements: custom styled but native semantics preserved.
  *   Reflection block (v6): collapsible region uses aria-expanded on the
  *   trigger button and aria-hidden on the content when collapsed.
+ *   Weekly plan section (v10): plain button + descriptive aria-label,
+ *   same pattern as Conditions/Equipment sections — no new interaction
+ *   pattern introduced.
  */
 
 import { store }          from '../store.js';
@@ -364,6 +383,17 @@ export function SettingsView(router) {
           </select>
         </div>
 
+        <!-- Your week (v10 — restored entry point into weekly-plan.js) -->
+        <h2 class="settings-section__heading">Your week</h2>
+        <p class="settings-section__sub">
+          ${renderWeeklyPlanSummary()}
+        </p>
+        <button class="btn btn-secondary"
+                data-action="open-weekly-plan"
+                aria-label="Plan your week — set an intent for each day">
+          Plan my week
+        </button>
+
         <!-- Goals -->
         <h2 class="settings-section__heading">Your goals</h2>
         <p class="settings-section__sub">
@@ -429,6 +459,22 @@ export function SettingsView(router) {
 
       </div>
     `;
+  }
+
+  // ── Weekly plan summary line ────────────────────────────────────────────
+  // Reads weeklyPlan.updatedAt live — no new schema field. Speaks to what's
+  // actually true right now rather than a generic label, consistent with
+  // the voice used elsewhere on this panel (Conditions/Equipment sections).
+
+  function renderWeeklyPlanSummary() {
+    const updatedAt = store.get('weeklyPlan.updatedAt');
+    if (!updatedAt) {
+      return `You haven't shaped a week yet — the coach will ask each day instead. Set one up and it'll use that as your starting point.`;
+    }
+    const formatted = new Date(updatedAt).toLocaleDateString('en-GB', {
+      day: 'numeric', month: 'short', year: 'numeric'
+    });
+    return `Last shaped ${_esc(formatted)}. The coach uses this as its starting point each day — you can still adjust on the day itself.`;
   }
 
   // ── Conditions panel ───────────────────────────────────────────────────────
@@ -718,6 +764,10 @@ export function SettingsView(router) {
 
       case 'choose-programme':
         router.navigate('goal-setup');
+        break;
+
+      case 'open-weekly-plan':
+        router.navigate('weekly-plan');
         break;
 
       case 'reset-programme':
