@@ -1,6 +1,28 @@
 /**
  * workout.js - Workout Execution View
- * 01 Jul 2026 v2
+ * 05 Jul 2026 v3
+ *
+ * v3 — Confirmed Critical bug fix: this view read store.get("activeWorkout"),
+ *   but coach-proposal.js's handleDoorChoice() writes the chosen session to
+ *   store.set('generatedSession', { session, builtAt, inputs }) — a
+ *   completely different key. Nothing in the codebase ever wrote to
+ *   activeWorkout. Practical effect: picking any door for a real generated
+ *   session (which, per _routeForOption()'s type/focus mismatch, is every
+ *   door — see coach-proposal.js v7 changelog) landed on
+ *   renderNoWorkout() — "No workout selected. Go back to choose a workout
+ *   option." — every single time. The core daily loop's terminal step was
+ *   a dead end, not a wrong-but-functional view.
+ *   Fixed by reading store.get('generatedSession')?.session everywhere
+ *   this file previously read store.get("activeWorkout"), and by clearing
+ *   generatedSession (back to its store.js default shape) in
+ *   cleanupWorkout() instead of setting activeWorkout to null.
+ *   Scope note: this fixes the "workout" route specifically — the generic
+ *   strength/mobility/cardio session player. walk-session.js and
+ *   yoga-session.js are separate, self-contained views with their own
+ *   type-selection screens; they were never wired to receive
+ *   generatedSession and are not touched by this fix. That's a deliberate,
+ *   separate architecture decision, not an oversight — see coach-proposal.js
+ *   v7 changelog and the master schedule for the fuller discussion.
  *
  * v2 — Fixed programmeEngine import (01 Jul 2026).
  *   programmeEngine.js v2 refactored to individual named exports
@@ -29,8 +51,13 @@ let timerInterval = null;
 let timeRemaining = 0;
 let timerStarted = false; // Timer doesn't start until user taps Start
 
+// v3 — single helper so every read point stays in sync.
+function _getWorkout() {
+  return store.get("generatedSession")?.session || null;
+}
+
 export function render() {
-  const workout = store.get("activeWorkout");
+  const workout = _getWorkout();
 
   if (!workout) {
     return renderNoWorkout();
@@ -205,7 +232,7 @@ function formatRole(role) {
 }
 
 export function onMount() {
-  const workout = store.get("activeWorkout");
+  const workout = _getWorkout();
 
   document.getElementById("no-workout-back-btn")?.addEventListener("click", () => {
     router.back();
@@ -274,7 +301,7 @@ function updateTimerDisplay() {
 }
 
 function completeExercise() {
-  const workout = store.get("activeWorkout");
+  const workout = _getWorkout();
   const exercise = workout.exercises[currentExerciseIndex];
 
   const completed = store.get("workoutProgress") || [];
@@ -295,7 +322,7 @@ function completeExercise() {
 }
 
 function skipExercise() {
-  const workout = store.get("activeWorkout");
+  const workout = _getWorkout();
 
   if (currentExerciseIndex >= workout.exercises.length - 1) {
     completeWorkout();
@@ -313,7 +340,7 @@ function resetTimer() {
 }
 
 function completeWorkout() {
-  const workout  = store.get("activeWorkout");
+  const workout  = _getWorkout();
   const progress = store.get("workoutProgress") || [];
 
   // Credits
@@ -356,6 +383,8 @@ function cleanupWorkout() {
   currentExerciseIndex = 0;
   timeRemaining = 0;
   timerStarted  = false;
-  store.set("activeWorkout",   null);
+  // v3 — clears generatedSession back to its store.js default shape,
+  // rather than setting the never-written activeWorkout to null.
+  store.set("generatedSession", { session: null, builtAt: null, inputs: {} });
   store.set("workoutProgress", null);
 }
