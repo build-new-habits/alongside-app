@@ -1,6 +1,28 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 05 Jul 2026 v158
+ * weekly-plan-v2.css v2 + weekly-plan.js v3 — two fixes found via a
+ *   device screenshot of My Week's config sheet:
+ *   1. Nav bar covering the Save button. Root cause: .wp-config-sheet
+ *      was z-index: 9000, an exact tie with nav-fix.css's #bottom-nav
+ *      (z-index: 9000 !important). On a tie between two position:fixed
+ *      stacking contexts, later DOM order wins — the nav bar sits after
+ *      the router-swapped content in the app shell, so it always won.
+ *      Raised .wp-config-sheet to 9999, matching the convention already
+ *      used by settings.css's .settings-dialog. No changes to
+ *      nav-fix.css.
+ *   2. Missing location. store.js has carried
+ *      weeklyPlan.days[day].location since 21 May specifically so "the
+ *      coach can adapt equipment selection" — but no UI ever collected
+ *      it, so a planned gym/recovery day had no way to say home vs gym
+ *      vs outside. Added a "Where?" chip row, reusing the existing
+ *      .wp-chip styling (no new CSS classes). No schema change needed.
+ *   Also flagged, not fixed: weekly-plan.css (30 May v1) appears to be
+ *   dead CSS from an earlier table-layout redesign that doesn't match
+ *   any class in the current weekly-plan.js — worth removing from
+ *   SHELL_URLS in a future cleanup pass.
+ *
  * 05 Jul 2026 v157
  * settings.js v10 — Functional QA fix (My Week). Ground-truthed against
  *   router.js v8 and weekly-plan.js v2 at the start of the Functional QA
@@ -79,7 +101,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v157";
+const CACHE_NAME = "alongside-v158";
 
 const SHELL_URLS = [
 
