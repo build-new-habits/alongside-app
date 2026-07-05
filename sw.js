@@ -1,6 +1,23 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 05 Jul 2026 v157
+ * settings.js v10 — Functional QA fix (My Week). Ground-truthed against
+ *   router.js v8 and weekly-plan.js v2 at the start of the Functional QA
+ *   session: the "weekly-plan" route and its view file were both already
+ *   correct — the only thing missing was a way in, dropped somewhere
+ *   across the v4–v9 Programme-panel rewrites and never replaced.
+ *   Restored as a "Your week" section in the Programme panel, reading
+ *   weeklyPlan.updatedAt live to state what's actually true rather than
+ *   a generic label. No schema change (weeklyPlan already exists in
+ *   store.js v7). No changes to router.js or weekly-plan.js — both
+ *   confirmed correct as-is, cache-busted by this CACHE_NAME bump alone
+ *   since both were already listed below.
+ *   NOT done this batch: My Movement rebuild (multi-select, agreed 13
+ *   May, never built) — logged as a build task, not started. S4
+ *   (navigation lag) — still waiting on a Network-tab capture, per
+ *   Ground Truth Rule.
+ *
  * 04 Jul 2026 v156
  * settings.js v9 — Back-navigation bug fix. "Edit conditions"/"Edit
  *   equipment" now open via openSheet() (js/views/onboarding/
@@ -62,7 +79,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v156";
+const CACHE_NAME = "alongside-v157";
 
 const SHELL_URLS = [
 
