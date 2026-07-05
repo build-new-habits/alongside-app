@@ -1,8 +1,17 @@
 /*
  * css/components/settings.css
- * 04 Jul 2026 v4
+ * 05 Jul 2026 v5
  *
- * Styles for settings.js v8 — six-tab settings view.
+ * Styles for settings.js v11 — six-tab settings view.
+ *
+ * v5 — My Movement rebuild. Added .settings-movement-chip /
+ *   --selected / --mixed / .settings-movement-chips / .settings-movement-
+ *   divider for the new "How you move" section (settings.js v11).
+ *   Deliberately reuses the same colour-mix(primary 15%)/border-primary
+ *   pattern already proven accessible in .settings-goal-chip--selected —
+ *   no new contrast combination introduced, so no new WebAIM check
+ *   needed. Added a :disabled state (opacity + not-allowed cursor) for
+ *   when "mixed" is active and the six specific chips are disabled.
  *
  * v4 — S3 fix: added .settings-goals-category / __label styles for the
  *   grouped goals rendering in settings.js v8 (category headers above
@@ -331,6 +340,60 @@
 .settings-goal-chip:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* ── Movement identity chips (v5 — My Movement rebuild) ──────── */
+
+.settings-movement-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.settings-movement-chip {
+  padding: var(--space-2) var(--space-3);
+  min-height: 44px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  transition: background 0.1s, border-color 0.1s, color 0.1s, opacity 0.1s;
+}
+
+/* Same colour-mix pattern as .settings-goal-chip--selected — already
+   proven accessible, no new contrast combination introduced. */
+.settings-movement-chip--selected {
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.settings-movement-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.settings-movement-chip:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.settings-movement-divider {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: var(--space-1) 0;
+}
+
+.settings-movement-chip--mixed {
+  align-self: flex-start;
 }
 
 /* ── About ────────────────────────────────────────────────────── */
