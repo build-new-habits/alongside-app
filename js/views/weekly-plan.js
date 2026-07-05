@@ -1,9 +1,23 @@
 /**
  * weekly-plan.js
- * 23 Jun 2026 v2
+ * 05 Jul 2026 v3
  *
  * Weekly plan view. The user's declared week shape.
- * v2 wires the plan into programme sequencing — the engine reads it.
+ *
+ * v3 — Location gap fix. store.js has carried weeklyPlan.days[day].location
+ *   ('home'|'gym'|'outside'|null) since 21 May, with a comment explicitly
+ *   stating it's "required so the coach can adapt equipment selection" —
+ *   but no UI ever collected it. A gym or recovery day could be configured
+ *   with a session type and duration but no way to say where it happens,
+ *   so the coach had no way to actually adapt equipment as intended.
+ *   Added a "Where?" chip row (Home / Gym / Outside) to the config sheet,
+ *   shown for gym and recovery days (the two types duration is also shown
+ *   for — class/rest/open don't need a location). Reuses the existing
+ *   .wp-chip / .wp-chip--selected styling already in weekly-plan-v2.css —
+ *   no new CSS classes needed. Read and written the same way as the
+ *   existing duration/session-type chips.
+ *   No schema change — the field was already there and already
+ *   migration-safe in store.js's mergeWithDefaults().
  *
  * v2 — Phase 5 (P5-PROG-2):
  *   - getWeekShape() called on mount — reads programme phase and merges
@@ -37,6 +51,8 @@
  *   Configuration sheet: role="dialog", aria-modal, focus trap, Escape closes.
  *   Session type chips: role="radiogroup", each chip role="radio" aria-checked.
  *   Duration chips: same pattern.
+ *   Location chips (v3): same pattern — role="radiogroup", each chip
+ *   role="radio" aria-checked, min 44px touch target via shared .wp-chip.
  *   Save button: aria-label describes what is being saved.
  *   All touch targets minimum 44px.
  */
@@ -78,6 +94,14 @@ const SESSION_TYPES = [
   { id: 'cycle',       label: 'Cycle'       },
   { id: 'core',        label: 'Core'        },
   { id: 'mindfulness', label: 'Mindfulness' },
+];
+
+// v3 — new. Matches store.js's weeklyPlan.days[day].location type:
+// 'home' | 'gym' | 'outside' | null.
+const LOCATION_OPTIONS = [
+  { id: 'home',    label: 'Home',    icon: '⌂' },
+  { id: 'gym',     label: 'Gym',     icon: '●' },
+  { id: 'outside', label: 'Outside', icon: '↝' },
 ];
 
 // ─── View registration ────────────────────────────────────────────────────────
@@ -229,6 +253,7 @@ export function WeeklyPlanView(router) {
     const duration   = slot.durationMins || 30;
     const sessionType = slot.sessionType || '';
     const activityName = slot.activityName || '';
+    const location    = slot.location || ''; // v3
 
     return `
       <div class="wp-config-sheet__backdrop"></div>
@@ -257,6 +282,28 @@ export function WeeklyPlanView(router) {
             ${TYPE_CONFIG[type]?.coachLine || ''}
           </p>
         </div>
+
+        <!-- Location (v3 — shown for gym and recovery, same days duration applies to) -->
+        ${type === 'gym' || type === 'recovery' ? `
+          <div class="wp-config-section" id="wp-location-section">
+            <p class="wp-config-section__label" id="wp-location-label">Where?</p>
+            <div class="wp-config-chips"
+                 role="radiogroup"
+                 aria-labelledby="wp-location-label">
+              ${LOCATION_OPTIONS.map(loc => `
+                <button
+                  class="wp-chip ${location === loc.id ? 'wp-chip--selected' : ''}"
+                  role="radio"
+                  aria-checked="${location === loc.id ? 'true' : 'false'}"
+                  data-location-choice="${loc.id}"
+                  aria-label="${loc.label}">
+                  <span aria-hidden="true">${loc.icon}</span>
+                  ${loc.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
 
         <!-- Duration (shown for gym and recovery) -->
         ${type === 'gym' || type === 'recovery' ? `
@@ -397,6 +444,18 @@ export function WeeklyPlanView(router) {
       });
     });
 
+    // Location chips (v3)
+    sheet.querySelectorAll('[data-location-choice]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        sheet.querySelectorAll('[data-location-choice]').forEach(b => {
+          b.setAttribute('aria-checked', 'false');
+          b.classList.remove('wp-chip--selected');
+        });
+        btn.setAttribute('aria-checked', 'true');
+        btn.classList.add('wp-chip--selected');
+      });
+    });
+
     // Duration chips
     sheet.querySelectorAll('[data-duration-choice]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -449,6 +508,9 @@ export function WeeklyPlanView(router) {
     const typeChip = sheet.querySelector('[data-type-choice][aria-checked="true"]');
     const type     = typeChip?.dataset.typeChoice || 'open';
 
+    const locationChip = sheet.querySelector('[data-location-choice][aria-checked="true"]');
+    const location     = locationChip?.dataset.locationChoice || null; // v3
+
     const durationChip = sheet.querySelector('[data-duration-choice][aria-checked="true"]');
     const duration     = durationChip ? parseInt(durationChip.dataset.durationChoice) : null;
 
@@ -460,6 +522,7 @@ export function WeeklyPlanView(router) {
     // Write to store
     const path = `weeklyPlan.days.${day}`;
     store.set(`${path}.type`,         type);
+    store.set(`${path}.location`,     location);   // v3
     store.set(`${path}.durationMins`, duration);
     store.set(`${path}.sessionType`,  sessionType);
     store.set(`${path}.activityName`, activityName);
