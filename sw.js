@@ -1,6 +1,66 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 05 Jul 2026 v162
+ * workout.js v3 — Critical bug fix, this is the "exercise generation —
+ *   selection not carrying through" item already logged in the master
+ *   schedule (v38) from a separate session. Root cause now confirmed:
+ *   coach-proposal.js writes the chosen session to store.generatedSession;
+ *   workout.js read from store.activeWorkout, a key nothing ever wrote to.
+ *   Every real generated session dead-ended at "No workout selected."
+ *   Fixed by reading generatedSession.session throughout, and clearing
+ *   generatedSession (to its store.js default shape) in cleanupWorkout()
+ *   instead of nulling activeWorkout. Deliberately scoped to the
+ *   generic "workout" route only — walk-session.js and yoga-session.js
+ *   remain self-contained, not touched. See coach-proposal.js v7
+ *   changelog and the master schedule for the fuller architecture
+ *   discussion (Option A vs B) this sits inside.
+ *
+ * 05 Jul 2026 v161
+ * workoutGenerator.js v1.8 — confirmed bug fix, found while ground-
+ *   truthing this file for the movementIdentity wiring question.
+ *   getUserProfile() read store.get("activityLevel") for fitnessLevel —
+ *   no such top-level field exists in store.js (the real field is
+ *   fitnessLevel; there's also a distinct nested lifestyle.activityLevel,
+ *   which made this an easy mix-up). Effect: fitnessLevel in the
+ *   generator's profile was always "moderate" — the Activity Level
+ *   dropdown in Settings has never changed anything about generated
+ *   sessions. Fixed to read the correct key. Already listed in
+ *   SHELL_URLS below, cache-busted by this bump alone.
+ *   ALSO FOUND, NOT YET FIXED — flagging for the next session before
+ *   any movementIdentity wiring work continues:
+ *     1. coach-proposal.js calls workoutGenerator.generateDailyOptions()
+ *        with a parameter object (energy/burnout/intensityBias/etc.) —
+ *        but the real function takes zero parameters and reads
+ *        everything itself from store/checkinData. The object is
+ *        silently discarded. Practical effect: the re-entry
+ *        gentler-start intensity override computed in coach-proposal.js
+ *        never reaches the generator — the coach's text says "starting
+ *        gently" while the actual generated session is unaffected.
+ *     2. coach-proposal.js's _routeForOption() routes by option.type —
+ *        but workoutGenerator's real output only has option.focus
+ *        (strength/mobility/cardio), never type. Type-based routing
+ *        (yoga-session, walk-session, running-session, etc.) only ever
+ *        fires on the _getFallbackOptions() path, i.e. when the real
+ *        generator is unavailable. For real generated sessions, every
+ *        door currently routes to the generic 'workout' view regardless
+ *        of the door's actual framing. This is Critical severity —
+ *        it undermines the three-doors concept itself, not just
+ *        movementIdentity.
+ *
+ * 05 Jul 2026 v160
+ * coach-proposal.js v7 — confirmed bug fix, found while ground-truthing
+ *   this file for the My Movement wiring question (not what I was
+ *   looking for, but couldn't ignore it once seen). Two functions were
+ *   pulled in via require() inside function bodies — invalid in this
+ *   browser ES module environment, no bundler. Both would throw
+ *   `require is not defined` at runtime:
+ *     - getReEntryIntensity (re-entry gentler-start path)
+ *     - applyMissedSessionAdaptation ("Stay in 12 weeks"/"Keep the same
+ *       rhythm" buttons)
+ *   Fixed by adding both to the file's existing top-level import from
+ *   programmeEngine.js. No other changes.
+ *
  * 05 Jul 2026 v159
  * settings.js v11 + settings.css v5 — My Movement rebuild (agreed 13 May,
  *   never built). Schema laid in store.js v8 earlier this session
@@ -115,7 +175,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v159";
+const CACHE_NAME = "alongside-v162";
 
 const SHELL_URLS = [
 
