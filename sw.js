@@ -1,6 +1,20 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 05 Jul 2026 v159
+ * settings.js v11 + settings.css v5 — My Movement rebuild (agreed 13 May,
+ *   never built). Schema laid in store.js v8 earlier this session
+ *   (movementIdentity: string|null -> string[], migration-safe). This
+ *   deploy adds the actual UI: a "How you move" section in the Profile
+ *   panel, six chips as true multi-select (gym/yoga/running/walking/
+ *   swimming/classes), plus a separate "A mix of things" chip that's
+ *   mutually exclusive with the six. Reuses the same colour-mix/border
+ *   pattern already proven accessible in .settings-goal-chip--selected —
+ *   no new contrast combination, no new WebAIM check needed.
+ *   NOT done this batch: coach-proposal.js's scoring logic against the
+ *   new array shape — not ground-truthed this session, flagged for next
+ *   time this file is in scope.
+ *
  * 05 Jul 2026 v158
  * weekly-plan-v2.css v2 + weekly-plan.js v3 — two fixes found via a
  *   device screenshot of My Week's config sheet:
@@ -101,7 +115,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v158";
+const CACHE_NAME = "alongside-v159";
 
 const SHELL_URLS = [
 
