@@ -1,8 +1,23 @@
 /**
  * settings.js
- * 05 Jul 2026 v10
+ * 05 Jul 2026 v11
  *
  * Settings view. User controls for profile, programme, goals, and preferences.
+ *
+ * v11 — My Movement rebuild (agreed 13 May, never built — ground-truthed
+ *   05 Jul: the selector was absent from the live UI entirely, not merely
+ *   single-select as the old note implied). Schema-first: store.js v8
+ *   changed movementIdentity from string|null to string[]. Added a "How
+ *   you move" section to the Profile panel (own heading, own Save button,
+ *   same pattern as Programme panel's per-subsection saves) — six chips
+ *   (gym/yoga/running/walking/swimming/classes) as true multi-select,
+ *   plus a separate "A mix of things" chip that's mutually exclusive with
+ *   the six: choosing it clears and disables the others (with
+ *   aria-disabled kept in sync), choosing any of the six clears it. Read
+ *   from and written to movementIdentity as an array. Placed after "Save
+ *   changes" and before the reflection section — distinct concept from
+ *   name/age/gender, deserves its own save action rather than being
+ *   bundled into the general profile save.
  *
  * v10 — Functional QA fix (My Week). Ground-truthed against router.js v8 and
  *   weekly-plan.js v2: the "weekly-plan" route and its view file were both
@@ -120,6 +135,10 @@
  *   Weekly plan section (v10): plain button + descriptive aria-label,
  *   same pattern as Conditions/Equipment sections — no new interaction
  *   pattern introduced.
+ *   Movement chips (v11): role="checkbox" with aria-checked for the six
+ *   multi-select chips, disabled + aria-disabled kept in sync when
+ *   "mixed" is active. Divider between the two groups uses
+ *   role="separator". All chips minimum 44px touch target.
  */
 
 import { store }          from '../store.js';
@@ -145,6 +164,18 @@ export function SettingsView(router) {
     { id: 'equipment',   label: 'Equipment'   },
     { id: 'notify',      label: 'Reminders'   },
     { id: 'about',       label: 'About'       },
+  ];
+
+  // v11 — My Movement rebuild. Matches store.js's movementIdentity
+  // string[] values. "mixed" is handled separately, below, since it's
+  // mutually exclusive with these six rather than a seventh peer option.
+  const MOVEMENT_IDENTITIES = [
+    { id: 'gym',      label: 'Gym',      icon: '●' },
+    { id: 'yoga',     label: 'Yoga',     icon: '◌' },
+    { id: 'running',  label: 'Running',  icon: '→' },
+    { id: 'walking',  label: 'Walking',  icon: '↝' },
+    { id: 'swimming', label: 'Swimming', icon: '≈' },
+    { id: 'classes',  label: 'Classes',  icon: '◆' },
   ];
 
   // ── Mount ──────────────────────────────────────────────────────────────────
@@ -281,8 +312,56 @@ export function SettingsView(router) {
           Save changes
         </button>
 
+        ${renderMovementSection()}
+
         ${renderReflectionSection()}
       </div>
+    `;
+  }
+
+  // ── Movement section (v11) ──────────────────────────────────────────────
+  // How you move — multi-select identity chips + mutually-exclusive
+  // "mixed" fallback. Reads/writes movementIdentity as string[].
+
+  function renderMovementSection() {
+    const movementIdentity = store.get('movementIdentity') || [];
+    const isMixed = movementIdentity.includes('mixed');
+
+    return `
+      <h2 class="settings-section__heading">How you move</h2>
+      <p class="settings-section__sub">
+        Pick everything that's part of your movement life — the coach
+        rotates suggestions toward whichever you've done least recently.
+        Or, if you'd rather not pick, tell it you do a mix of things.
+      </p>
+      <div class="settings-movement-chips" role="group" aria-label="Your movement identities">
+        ${MOVEMENT_IDENTITIES.map(m => `
+          <button
+            class="settings-movement-chip ${movementIdentity.includes(m.id) ? 'settings-movement-chip--selected' : ''}"
+            data-movement="${m.id}"
+            role="checkbox"
+            aria-checked="${movementIdentity.includes(m.id) ? 'true' : 'false'}"
+            aria-label="${m.label}"
+            ${isMixed ? 'disabled aria-disabled="true"' : ''}>
+            <span aria-hidden="true">${m.icon}</span>
+            ${m.label}
+          </button>
+        `).join('')}
+      </div>
+      <div class="settings-movement-divider" role="separator" aria-hidden="true">or</div>
+      <button
+        class="settings-movement-chip settings-movement-chip--mixed ${isMixed ? 'settings-movement-chip--selected' : ''}"
+        data-movement="mixed"
+        role="checkbox"
+        aria-checked="${isMixed ? 'true' : 'false'}"
+        aria-label="A mix of things — don't ask me to pick">
+        A mix of things
+      </button>
+      <button class="settings-save-btn btn btn-primary"
+              data-action="save-movement"
+              aria-label="Save how you move">
+        Save
+      </button>
     `;
   }
 
@@ -688,6 +767,40 @@ export function SettingsView(router) {
       });
     });
 
+    // Movement chips (v11) — six-way multi-select, mutually exclusive
+    // with the separate "mixed" option.
+    container.querySelectorAll('[data-movement]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const isMixedBtn = btn.dataset.movement === 'mixed';
+
+        if (isMixedBtn) {
+          const nowSelected = !btn.classList.contains('settings-movement-chip--selected');
+          container.querySelectorAll('[data-movement]').forEach(b => {
+            b.classList.remove('settings-movement-chip--selected');
+            b.setAttribute('aria-checked', 'false');
+            if (b.dataset.movement !== 'mixed') {
+              b.disabled = nowSelected;
+              b.setAttribute('aria-disabled', nowSelected ? 'true' : 'false');
+            }
+          });
+          if (nowSelected) {
+            btn.classList.add('settings-movement-chip--selected');
+            btn.setAttribute('aria-checked', 'true');
+          }
+        } else {
+          btn.classList.toggle('settings-movement-chip--selected');
+          const checked = btn.classList.contains('settings-movement-chip--selected');
+          btn.setAttribute('aria-checked', checked ? 'true' : 'false');
+          // Selecting any specific identity clears "mixed"
+          const mixedBtn = container.querySelector('[data-movement="mixed"]');
+          if (mixedBtn) {
+            mixedBtn.classList.remove('settings-movement-chip--selected');
+            mixedBtn.setAttribute('aria-checked', 'false');
+          }
+        }
+      });
+    });
+
     // Action buttons
     container.querySelectorAll('[data-action]').forEach(btn => {
       btn.addEventListener('click', () => handleAction(btn.dataset.action, container));
@@ -748,6 +861,14 @@ export function SettingsView(router) {
           .map(b => b.dataset.goal);
         store.set('goals', selectedGoals);
         _showToast('Goals updated', container);
+        break;
+      }
+
+      case 'save-movement': {
+        const selectedMovement = [...container.querySelectorAll('[data-movement][aria-checked="true"]')]
+          .map(b => b.dataset.movement);
+        store.set('movementIdentity', selectedMovement);
+        _showToast('How you move, updated', container);
         break;
       }
 
