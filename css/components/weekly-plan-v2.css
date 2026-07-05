@@ -1,9 +1,28 @@
 /*
  * css/components/weekly-plan-v2.css
- * 25 Jun 2026 v1
+ * 05 Jul 2026 v2
  *
- * Styles for weekly-plan.js v2 additions.
+ * v2 — Nav-bar-covers-sheet bug. .wp-config-sheet was z-index: 9000 —
+ *   an exact tie with nav-fix.css's #bottom-nav (z-index: 9000
+ *   !important). On a tie between two position:fixed stacking contexts,
+ *   whichever element sits later in DOM order wins the paint — the nav
+ *   bar lives in the persistent app shell, after the router-swapped
+ *   content, so it always won regardless of which view was open.
+ *   Raised to 9999 to clear it entirely and match the convention
+ *   already used by settings.css's .settings-dialog (also 9999) —
+ *   not a coincidence fix, an established pattern this file should
+ *   have followed from the start. No changes needed to nav-fix.css.
+ *
+ * v1 — Styles for weekly-plan.js v2 additions.
  * Extends existing weekly-plan.css.
+ *
+ * NOTE (not fixed this pass, flagging for a future cleanup session):
+ * weekly-plan.css (30 May v1) styles a table/row layout
+ * (.weekly-plan-row, .day-type-btn, .focus-chip) that doesn't match
+ * any class name in the current weekly-plan.js v2/v3 — it appears to
+ * be dead CSS left over from an earlier redesign, still being cached
+ * and served for no reason. No collision with this file's class names,
+ * so not urgent, but worth removing from SHELL_URLS at some point.
  */
 
 .weekly-plan-view {
@@ -70,7 +89,7 @@
 .wp-config-sheet {
   position: fixed;
   inset: 0;
-  z-index: 9000;
+  z-index: 9999;
 }
 
 .wp-config-sheet__backdrop {
