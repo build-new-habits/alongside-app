@@ -1,47 +1,132 @@
 /**
  * coach-proposal.js
- * 23 Jun 2026 v6
+ * 05 Jul 2026 v8
  *
- * Coach proposal view. The hub. Three doors, all genuinely right.
+ * Coach proposal view. The hub. Doors that describe categories, not
+ * pre-committed choices.
  *
- * v6 — Phase 5 door reframe (P5-CP-1, P5-CP-2, P5-CP-3):
- *   - Door framing rewritten. Three doors are genuinely different ways of
- *     being in the body today — not intensity variants of the same thing.
- *     One asks something. One works with where you are. One surprises.
- *   - Coach voice on each door. One line. A human observation, specific to today.
- *     All three lines are true. All three are invitations.
- *   - Bypass door: two flavours. Coach facilitates OR straight to library.
- *     Equal visual weight. The product trusting the person to know themselves.
- *   - Post-choice acknowledgement: one line after the choice, treats it as real.
- *     Not a confirmation. Not a summary. An acknowledgement.
- *   - Re-entry surface: compress/extend offer shown when programmeEngine flags it.
- *   - Re-entry gentler start: intensity adjusted for illness returns.
- *   - getActiveVoice() from coach-voice.js (Nurturing in beta for all settings).
+ * v8 — Door redesign (Door 1 only — Graeme's redesign brief, this session).
+ *   Root problem being fixed: the old three-doors model computed one
+ *   specific session per door and wrote coach lines implying a fully
+ *   resolved, specific choice ("this session is built for that") —
+ *   but under Option B (see coach-proposal.js v7 / master schedule
+ *   Appendix Q), the generator can only ever produce strength/mobility/
+ *   cardio sessions, so Door C's "something different" framing in
+ *   particular was promising content that could never actually arrive.
+ *
+ *   New model: doors describe categories honestly. Door 1 ("Today's
+ *   session") opens a right-slide preview panel showing the three
+ *   generated options as selectable cards — duration, exercise count,
+ *   and the existing rationale text as the "why" — with the top-ranked
+ *   option (already first in the generator's priority order) marked
+ *   "Recommended" in gold. User selects a card, taps "Start Session" to
+ *   commit, or "Not today" to back out. This is the same select-then-
+ *   commit pattern already used throughout Settings (goal chips + Save,
+ *   movement chips + Save) and My Week (day-type chips + Save) — no new
+ *   interaction pattern introduced, just a new panel shape.
+ *
+ *   Door 2 ("Your programme") and Door 3 ("Something different") are
+ *   NOT yet built to their new spec — reusing old per-option logic for
+ *   them under the new copy would be actively misleading (the old
+ *   options don't map onto "programme adherence" or "something
+ *   different" as concepts at all). Deliberately set to disabled,
+ *   reusing the exact existing disabled-door treatment (aria-disabled,
+ *   helper text) already used for the severe-pain override case. Real
+ *   behaviour change, flagged explicitly rather than silently shipped:
+ *   only one of three doors is functional until Door 2/3 are built in
+ *   their own sessions (Door 2 needs a new "uninterrupted" bypass mode
+ *   in workoutGenerator.js; Door 3 needs walk-session.js/yoga-session.js
+ *   to accept a pre-selected type — neither exists yet).
+ *
+ *   Severe-pain handling changed in spirit, not mechanism: previously
+ *   disabled the whole "Door A" when severe pain was flagged. Under the
+ *   new model, Door 1 IS the adapted-for-you door — severe pain should
+ *   show up in which of the three options gets generated (the generator
+ *   already filters exercises by pain zone), not disable the door
+ *   entirely. That old disabling behaviour is Door 2's territory now
+ *   ("serious flags" adaptation vs "uninterrupted") — deliberately not
+ *   reproduced here.
+ *
+ *   Removed as dead code: _buildDoors(), _doorALine(), _doorBLine(),
+ *   _doorCLine() — the per-door dynamic coach-line logic that assumed
+ *   one option per door. _buildAcknowledgement() trimmed to the two
+ *   bypass-door cases only, since door-a/b/c keys no longer exist and
+ *   the old three-branch version would have thrown if ever hit
+ *   (referenced proposal.doors, which no longer exists).
+ *
+ *   handleDoorChoice() simplified: now only ever called for the bypass
+ *   door (Help me build it / Take me to the library) — the generic
+ *   "look up proposal.doors.find()" branch for a/b/c routing was
+ *   removed as dead code that would have been a real bug if it had
+ *   fired (proposal.doors doesn't exist any more).
+ *
+ * v7 — Confirmed bug fix: this file uses `import` at the top (ES modules,
+ *   no bundler) but two functions were being pulled in via `require()`
+ *   inside function bodies — `getReEntryIntensity` (in buildProposal(),
+ *   re-entry gentler-start path) and `applyMissedSessionAdaptation` (in
+ *   handleMissedAdaptation(), the "Stay in 12 weeks"/"Keep the same
+ *   rhythm" buttons). `require()` does not exist in this environment —
+ *   both would throw `require is not defined` the moment they ran.
+ *   Fixed by adding both to the existing top-level import from
+ *   programmeEngine.js. No other changes.
+ *
+ * v6 — Phase 5 door reframe (P5-CP-1, P5-CP-2, P5-CP-3). Superseded by
+ *   v8's redesign above — see v6 in prior version history for the
+ *   original door-reframe detail if needed for reference.
  *
  * v5 — workoutGenerator wired. run→running-session. walk→walk-session.
  *   availableTime drives session length. Cycle phase adaptation.
  *   Burnout override. Programme phase bias.
  *
- * All existing wiring preserved exactly. Phase 5 additions are additive.
- *
  * WCAG 2.2 AA:
- *   Three door buttons: aria-label describes session type and duration.
- *   Disabled door: aria-disabled="true", helper text in aria-describedby.
- *   Bypass door: same touch target (min 44px) and contrast as primary doors.
- *   Post-choice acknowledgement: aria-live="polite" region.
- *   Focus management: after choice, focus moves to acknowledgement region.
- *   All coach text is rendered as <p> — not aria-hidden.
- *   Contrast: teal #0D9488 on white meets 4.5:1 for normal text at all sizes.
+ *   Door buttons: aria-label describes the door. Disabled doors:
+ *   aria-disabled="true", helper text in aria-describedby.
+ *   Preview panel: role="dialog", aria-modal="true", focus trapped,
+ *   Escape closes (treated as "Not today"), focus returns to the
+ *   triggering door button on close.
+ *   Preview cards: role="radio" within role="radiogroup", aria-checked,
+ *   "Recommended" conveyed via a text badge (not colour alone) and
+ *   echoed in the card's aria-label.
+ *   Start Session: disabled (not just visually) until a card is
+ *   selected — communicated via the disabled attribute, not opacity
+ *   alone.
+ *   Bypass door: same touch target (min 44px) and contrast as primary
+ *   doors. Post-choice acknowledgement: aria-live="polite" region.
+ *   All coach text rendered as <p> — not aria-hidden.
+ *   prefers-reduced-motion: panel slide transition removed.
  */
 
 import { store }             from '../store.js';
 import { getActiveVoice, getTimingRules } from '../data/coach-voice.js';
 import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
          captureReturnContext, clearReturnContext,
-         recordSession, advanceWeekIfNeeded }  from '../data/programmeEngine.js';
+         recordSession, advanceWeekIfNeeded,
+         getReEntryIntensity, applyMissedSessionAdaptation }  from '../data/programmeEngine.js';
 import { getProgramme }      from '../data/programmes.js';
 import { detectBurnout }     from '../data/checkin.js';
 import { getPrimaryEngineGoal } from '../data/goals.js';
+
+// ─── Door copy (v8 — static, honest about category vs commitment) ────────────
+
+const DOOR_COPY = {
+  'door-1': {
+    title: 'Today\u2019s session',
+    line:  'This option works around your check-in. It\u2019s what I recommend based on where you are today.',
+    enabled: true
+  },
+  'door-2': {
+    title: 'Your programme',
+    line:  'This option follows your programme with very limited adaptations. Where any major issues were flagged I\u2019ve tried to adapt it, but you can always choose \u201cuninterrupted\u201d to just follow the normal plan.',
+    enabled: false,
+    disabledReason: 'Being redesigned \u2014 check back soon.'
+  },
+  'door-3': {
+    title: 'Something different',
+    line:  'Perhaps today is one for something different. Come and have a look at some options.',
+    enabled: false,
+    disabledReason: 'Being redesigned \u2014 check back soon.'
+  }
+};
 
 // ─── View registration ────────────────────────────────────────────────────────
 
@@ -51,6 +136,11 @@ export function CoachProposalView(router) {
   let choiceMade    = false;
   let reEntryCtx    = null;
   let missedOffer   = null;
+
+  // ── Door 1 preview panel state (v8) ─────────────────────────────────────
+  let previewOpen           = false;
+  let currentPreviewOptions = [];
+  let selectedOptionId      = null;
 
   // ── Mount ──────────────────────────────────────────────────────────────────
 
@@ -100,9 +190,9 @@ export function CoachProposalView(router) {
 
         <!-- Three doors -->
         <div class="cp-doors" role="group" aria-label="Choose how you want to move today">
-          ${renderDoor(proposal.doors[0], 'door-a', proposal.severePainOverride)}
-          ${renderDoor(proposal.doors[1], 'door-b', false)}
-          ${renderDoor(proposal.doors[2], 'door-c', false)}
+          ${renderDoorFront('door-1')}
+          ${renderDoorFront('door-2')}
+          ${renderDoorFront('door-3')}
         </div>
 
         <!-- Bypass door -->
@@ -118,32 +208,195 @@ export function CoachProposalView(router) {
              style="display:none;">
         </div>
 
+        <!-- Door 1 preview panel (v8) — always in the DOM, hidden until opened -->
+        ${renderPreviewPanel()}
+
       </div>
     `;
 
     attachEvents(container);
   }
 
-  // ── Door renderer ──────────────────────────────────────────────────────────
+  // ── Door front renderer (v8) ────────────────────────────────────────────
 
-  function renderDoor(door, id, disabled) {
-    const isDisabled = disabled && door.isOriginal;
+  function renderDoorFront(key) {
+    const d = DOOR_COPY[key];
+    const isDisabled = !d.enabled;
     return `
       <button
         class="cp-door ${isDisabled ? 'cp-door--disabled' : ''}"
-        id="${id}"
+        id="${key}"
         ${isDisabled ? 'aria-disabled="true" disabled' : ''}
-        aria-label="${door.ariaLabel}"
-        ${isDisabled ? `aria-describedby="${id}-helper"` : ''}
-        data-door="${door.key}"
-        data-route="${door.route}"
-      >
-        <span class="cp-door__label">${door.label}</span>
-        <span class="cp-door__line">${door.coachLine}</span>
-        <span class="cp-door__meta">${door.meta}</span>
-        ${isDisabled ? `<span class="cp-door__helper" id="${id}-helper">${door.disabledReason}</span>` : ''}
+        aria-label="${d.title}${isDisabled ? ', ' + d.disabledReason : ''}"
+        ${isDisabled ? `aria-describedby="${key}-helper"` : ''}
+        data-door="${key}">
+        <span class="cp-door__label">${d.title}</span>
+        <span class="cp-door__line">${d.line}</span>
+        ${isDisabled ? `<span class="cp-door__helper" id="${key}-helper">${d.disabledReason}</span>` : ''}
       </button>
     `;
+  }
+
+  // ── Door 1 preview panel (v8) ────────────────────────────────────────────
+
+  function renderPreviewPanel() {
+    return `
+      <div id="cp-preview-panel"
+           class="cp-preview-panel ${previewOpen ? 'is-open' : ''}"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="cp-preview-title"
+           ${previewOpen ? '' : 'hidden'}>
+        <div class="cp-preview-panel__backdrop"></div>
+        <div class="cp-preview-panel__content">
+          <button class="cp-preview-panel__close" id="cp-preview-close" aria-label="Close">\u2715</button>
+          <h2 id="cp-preview-title" class="cp-preview-panel__title">Today\u2019s session</h2>
+          <p class="cp-preview-panel__sub">
+            Adapted for your check-in \u2014 pick the one that feels right.
+          </p>
+          <div class="cp-preview-cards" role="radiogroup" aria-label="Choose today's session">
+            ${currentPreviewOptions.map((opt, i) => renderPreviewCard(opt, i === 0)).join('')}
+          </div>
+          <div class="cp-preview-panel__actions">
+            <button class="btn btn-ghost" id="cp-preview-not-today" aria-label="Not today \u2014 close">
+              Not today
+            </button>
+            <button class="btn btn-primary" id="cp-preview-start"
+                    aria-label="Start session"
+                    ${selectedOptionId ? '' : 'disabled'}>
+              Start Session
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderPreviewCard(option, isRecommended) {
+    const selected = option.id === selectedOptionId;
+    return `
+      <button class="cp-preview-card ${selected ? 'cp-preview-card--selected' : ''} ${isRecommended ? 'cp-preview-card--recommended' : ''}"
+              role="radio"
+              aria-checked="${selected ? 'true' : 'false'}"
+              data-option-id="${option.id}"
+              aria-label="${option.name}, about ${option.duration} minutes${isRecommended ? ', recommended' : ''}">
+        ${isRecommended ? '<span class="cp-preview-card__badge">Recommended</span>' : ''}
+        <span class="cp-preview-card__name">${option.name}</span>
+        <span class="cp-preview-card__meta">${option.duration} min \u00b7 ${option.exerciseCount} exercises</span>
+        <p class="cp-preview-card__why">${option.rationale}</p>
+      </button>
+    `;
+  }
+
+  // ── Preview panel open/close (v8) ───────────────────────────────────────
+
+  function openPreviewPanel(options, container) {
+    currentPreviewOptions = options;
+    selectedOptionId      = null;
+    previewOpen           = true;
+    _rerenderPanel(container);
+    document.addEventListener('keydown', _previewKeydown);
+    _focusFirstInPanel(container);
+  }
+
+  function closePreviewPanel(container) {
+    previewOpen      = false;
+    selectedOptionId = null;
+    document.removeEventListener('keydown', _previewKeydown);
+    _rerenderPanel(container);
+    const doorBtn = container.querySelector('#door-1');
+    if (doorBtn) doorBtn.focus();
+  }
+
+  function _rerenderPanel(container) {
+    const existing = container.querySelector('#cp-preview-panel');
+    if (existing) {
+      existing.outerHTML = renderPreviewPanel();
+      attachPreviewEvents(container);
+    }
+  }
+
+  function _previewKeydown(e) {
+    if (e.key !== 'Escape') return;
+    const container = document.getElementById('main-content');
+    if (container) closePreviewPanel(container);
+  }
+
+  function _focusFirstInPanel(container) {
+    setTimeout(() => {
+      const panel = container.querySelector('#cp-preview-panel');
+      const first = panel?.querySelector('button:not([disabled])');
+      if (first) first.focus();
+    }, 50);
+  }
+
+  function attachPreviewEvents(container) {
+    const panel = container.querySelector('#cp-preview-panel');
+    if (!panel) return;
+
+    panel.querySelector('.cp-preview-panel__backdrop')?.addEventListener('click', () => closePreviewPanel(container));
+    panel.querySelector('#cp-preview-close')?.addEventListener('click', () => closePreviewPanel(container));
+    panel.querySelector('#cp-preview-not-today')?.addEventListener('click', () => closePreviewPanel(container));
+
+    panel.querySelectorAll('[data-option-id]').forEach(card => {
+      card.addEventListener('click', () => {
+        selectedOptionId = card.dataset.optionId;
+        _rerenderPanel(container);
+      });
+    });
+
+    panel.querySelector('#cp-preview-start')?.addEventListener('click', () => {
+      if (!selectedOptionId) return;
+      const chosen = currentPreviewOptions.find(o => o.id === selectedOptionId);
+      if (chosen) handlePreviewStart(chosen, container);
+    });
+
+    panel.addEventListener('keydown', _trapFocus);
+  }
+
+  function handlePreviewStart(option, container) {
+    if (choiceMade) return;
+    choiceMade = true;
+
+    store.set('lastProposalType', 'door-1');
+    store.set('lastProposalDate', new Date().toISOString());
+
+    closePreviewPanel(container);
+
+    const ackEl = container.querySelector('#cp-acknowledgement');
+    if (ackEl) {
+      ackEl.style.display = '';
+      ackEl.textContent = 'Good. Let\u2019s go.';
+      ackEl.focus();
+    }
+
+    store.set('generatedSession', {
+      session: option,
+      builtAt: new Date().toISOString(),
+      inputs:  option.inputs || {}
+    });
+
+    const timingRules = getTimingRules({ difficultTopic: false });
+    setTimeout(() => {
+      if (reEntryCtx) clearReturnContext();
+      router.navigate(_routeForOption(option));
+    }, timingRules.delayMs + 400);
+  }
+
+  function _trapFocus(e) {
+    if (e.key !== 'Tab') return;
+    const panel = document.getElementById('cp-preview-panel');
+    if (!panel) return;
+    const focusable = [...panel.querySelectorAll(
+      'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )];
+    const first = focusable[0];
+    const last  = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault(); last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault(); first.focus();
+    }
   }
 
   // ── Bypass door renderer ───────────────────────────────────────────────────
@@ -225,9 +478,15 @@ export function CoachProposalView(router) {
   // ── Events ─────────────────────────────────────────────────────────────────
 
   function attachEvents(container) {
-    // Door choices
-    container.querySelectorAll('[data-door]').forEach(btn => {
-      btn.addEventListener('click', e => {
+    // Door 1 opens the preview panel (v8)
+    container.querySelector('[data-door="door-1"]')?.addEventListener('click', () => {
+      if (choiceMade) return;
+      openPreviewPanel(proposal.options, container);
+    });
+
+    // Bypass door choices (unchanged mechanism)
+    container.querySelectorAll('[data-door="bypass-facilitate"], [data-door="bypass-library"]').forEach(btn => {
+      btn.addEventListener('click', () => {
         const doorKey = btn.dataset.door;
         const route   = btn.dataset.route;
         handleDoorChoice(doorKey, route, container);
@@ -249,20 +508,21 @@ export function CoachProposalView(router) {
         handleMissedAdaptation(choice, container);
       });
     });
+
+    // Door 1 preview panel — always present in the DOM (v8)
+    attachPreviewEvents(container);
   }
 
-  // ── Door choice handler ────────────────────────────────────────────────────
+  // ── Bypass door choice handler (v8 — simplified, bypass-only) ─────────────
 
   function handleDoorChoice(doorKey, route, container) {
     if (choiceMade) return;
     choiceMade = true;
 
-    // Write proposal state to store
     store.set('lastProposalType', doorKey);
     store.set('lastProposalDate', new Date().toISOString());
 
-    // Show post-choice acknowledgement
-    const ack = _buildAcknowledgement(doorKey, proposal);
+    const ack = _buildAcknowledgement(doorKey);
     const ackEl = container.querySelector('#cp-acknowledgement');
     if (ackEl) {
       ackEl.style.display = '';
@@ -270,26 +530,12 @@ export function CoachProposalView(router) {
       ackEl.focus();
     }
 
-    // Route after brief pause (acknowledgement reads naturally)
     const timingRules = getTimingRules({ difficultTopic: false });
     setTimeout(() => {
       if (route === 'library') {
         router.navigate('library');
       } else if (route === 'session-builder') {
         router.navigate('session-builder');
-      } else if (route) {
-        // Pass the door's session data through to the session view
-        const door = proposal.doors.find(d => d.key === doorKey);
-        if (door?.sessionData) {
-          store.set('generatedSession', {
-            session: door.sessionData,
-            builtAt: new Date().toISOString(),
-            inputs:  door.sessionData.inputs || {}
-          });
-        }
-        // Clear absence context after first post-return session choice
-        if (reEntryCtx) clearReturnContext();
-        router.navigate(route);
       }
     }, timingRules.delayMs + 400);
   }
@@ -314,9 +560,9 @@ export function CoachProposalView(router) {
     const doorsEl = container.querySelector('.cp-doors');
     if (doorsEl) {
       doorsEl.innerHTML =
-        renderDoor(proposal.doors[0], 'door-a', proposal.severePainOverride) +
-        renderDoor(proposal.doors[1], 'door-b', false) +
-        renderDoor(proposal.doors[2], 'door-c', false);
+        renderDoorFront('door-1') +
+        renderDoorFront('door-2') +
+        renderDoorFront('door-3');
       attachEvents(container);
     }
   }
@@ -324,7 +570,6 @@ export function CoachProposalView(router) {
   // ── Missed adaptation handler ──────────────────────────────────────────────
 
   function handleMissedAdaptation(choice, container) {
-    const { applyMissedSessionAdaptation } = require('../data/programmeEngine.js');
     applyMissedSessionAdaptation(choice);
 
     const offerEl = container.querySelector('.cp-missed-offer');
@@ -337,7 +582,11 @@ export function CoachProposalView(router) {
 
   /**
    * Build the full proposal object.
-   * All existing v5 logic preserved. Phase 5 door reframe applied on top.
+   * v8: returns the raw `options` array (for Door 1's preview panel) in
+   * addition to everything previous versions returned. `doors` no longer
+   * built here — door copy is now static (DOOR_COPY), not derived per
+   * option. severePainOverride retained on the object for now (unused by
+   * rendering directly) in case Door 2's build wants to reference it.
    */
   function buildProposal() {
     const voice        = getActiveVoice();
@@ -363,12 +612,15 @@ export function CoachProposalView(router) {
     // Re-entry intensity adjustment
     let effectiveIntensity = phaseBias.intensityBias;
     if (reEntryCtx?.needsGentlerStart) {
-      const { getReEntryIntensity } = require('../data/programmeEngine.js');
       effectiveIntensity = getReEntryIntensity('illness', effectiveIntensity);
     }
 
-    // Generate three options from workout generator
+    // Generate three options from workout generator — these become
+    // Door 1's preview cards (v8), already returned in priority order.
     let options = _generateOptions(energyScore, burnout, effectiveIntensity, phaseBias, availTime);
+    while (options.length < 3) {
+      options.push(_getFallbackOption(options.length));
+    }
 
     // Build greeting
     const greeting = _buildGreeting(name, feelingWord);
@@ -384,151 +636,22 @@ export function CoachProposalView(router) {
     // Build intro line
     const intro = _buildIntro(primaryGoal, feelingWord, burnout, reEntryCtx);
 
-    // Build three doors from options — genuinely different, not intensity variants
-    const doors = _buildDoors(options, energyScore, feelingWord, phaseBias,
-                              severePain, effectiveIntensity, availTime);
-
     return {
       greeting,
       reflection,
       constraint,
       intro,
-      doors,
+      options,
       severePainOverride: severePain.hasSevere,
     };
   }
 
-  // ── Door builder — Phase 5 reframe ────────────────────────────────────────
+  // ── Post-choice acknowledgement (v8 — bypass-only) ─────────────────────────
 
-  /**
-   * Build three genuinely different doors from the generated options.
-   *
-   * Philosophy:
-   *   Door A — asks something. The effort-and-reward door. Full programme intent.
-   *   Door B — meets where you are. Adapted to today's energy and feeling word.
-   *   Door C — the surprise. The coach thinks this might land differently today.
-   *            Different emotional register. Not intensity — experience.
-   *
-   * Coach voice on each: one line. Human observation. Specific to this person today.
-   * All three are true. All three are invitations. No right answer framing.
-   *
-   * @param {Array}   options          — generated workout options
-   * @param {number}  energyScore
-   * @param {string}  feelingWord
-   * @param {Object}  phaseBias
-   * @param {Object}  severePain
-   * @param {string}  effectiveIntensity
-   * @param {number}  availTime
-   * @returns {Array} three door objects
-   */
-  function _buildDoors(options, energyScore, feelingWord, phaseBias,
-                        severePain, effectiveIntensity, availTime) {
-    // Ensure we have at least three options (pad with fallbacks if needed)
-    while (options.length < 3) {
-      options.push(_getFallbackOption(options.length));
-    }
-
-    const [optA, optB, optC] = options;
-    const name = store.get('name') || '';
-
-    // Door A — asks something
-    const doorA = {
-      key:        'door-a',
-      label:      optA.label || 'Your session',
-      isOriginal: true,
-      route:      _routeForOption(optA),
-      sessionData: optA,
-      coachLine:  _doorALine(optA, feelingWord, phaseBias),
-      meta:       _metaLine(optA, availTime),
-      ariaLabel:  `${optA.label || 'Your session'} — ${_metaLine(optA, availTime)}`,
-      disabledReason: severePain.hasSevere
-        ? `Not available today — protecting your ${severePain.affectedZone}.`
-        : null,
-    };
-
-    // Door B — meets where you are
-    const doorB = {
-      key:        'door-b',
-      label:      optB.label || 'Adjust for today',
-      isOriginal: false,
-      route:      _routeForOption(optB),
-      sessionData: optB,
-      coachLine:  _doorBLine(optB, feelingWord, energyScore),
-      meta:       _metaLine(optB, availTime),
-      ariaLabel:  `${optB.label || 'Adjust for today'} — ${_metaLine(optB, availTime)}`,
-      disabledReason: null,
-    };
-
-    // Door C — the surprise
-    const doorC = {
-      key:        'door-c',
-      label:      optC.label || 'Something else entirely',
-      isOriginal: false,
-      route:      _routeForOption(optC),
-      sessionData: optC,
-      coachLine:  _doorCLine(optC, feelingWord, phaseBias),
-      meta:       _metaLine(optC, availTime),
-      ariaLabel:  `${optC.label || 'Something different'} — ${_metaLine(optC, availTime)}`,
-      disabledReason: null,
-    };
-
-    return [doorA, doorB, doorC];
-  }
-
-  // ── Door coach lines ───────────────────────────────────────────────────────
-
-  function _doorALine(option, feelingWord, phaseBias) {
-    // One line. Why this fits. Specific to today. Effort-and-reward framing.
-    const phase = phaseBias.intensityBias;
-    if (phase === 'challenging') {
-      return 'This is what the programme calls for this week. You\'re ready for it.';
-    }
-    if (feelingWord && ['energised', 'motivated', 'ready', 'strong', 'confident'].includes(feelingWord)) {
-      return 'Your energy today is a good match for this. Worth using it.';
-    }
-    return 'This fits where you are in the programme. A solid session.';
-  }
-
-  function _doorBLine(option, feelingWord, energyScore) {
-    // One line. Meets current energy. Not a consolation — a considered match.
-    if (feelingWord && ['tired', 'flat', 'heavy', 'drained', 'foggy'].includes(feelingWord)) {
-      return `${_cap(feelingWord)} is worth working with, not against. This session is built for that.`;
-    }
-    if (energyScore <= 4) {
-      return 'Lower energy today — this is shaped for it. Nothing wasted, everything intentional.';
-    }
-    return 'A session that works with where you actually are, not where a plan expects you to be.';
-  }
-
-  function _doorCLine(option, feelingWord, phaseBias) {
-    // One line. The surprise. Different experience, not just different intensity.
-    const label = (option.label || '').toLowerCase();
-    if (label.includes('breath') || label.includes('quiet') || label.includes('mindful')) {
-      return 'Sometimes the body needs stillness more than movement. This might be that day.';
-    }
-    if (label.includes('walk') || label.includes('run') || label.includes('outdoor')) {
-      return 'There\'s something different about moving through space rather than through a session.';
-    }
-    if (label.includes('yoga') || label.includes('mobil') || label.includes('stretch')) {
-      return 'The muscles have been working. This is the other side of that work.';
-    }
-    return 'Worth trying. The coach thinks this might land differently than expected today.';
-  }
-
-  // ── Post-choice acknowledgement ────────────────────────────────────────────
-
-  function _buildAcknowledgement(doorKey, proposal) {
+  function _buildAcknowledgement(doorKey) {
     // One line. Treats the choice as real. Not a confirmation or summary.
-    // Never "great choice!" — the choice was theirs. Just acknowledgement.
-    if (doorKey === 'door-a') {
-      return 'Good. Let\'s go.';
-    }
-    if (doorKey === 'door-b') {
-      return 'Noted. A session that fits today.';
-    }
-    if (doorKey === 'door-c') {
-      return 'Good call. Something a bit different.';
-    }
+    // v8: only the bypass door reaches this now — door-1's "Good. Let's
+    // go." acknowledgement is set directly in handlePreviewStart().
     if (doorKey === 'bypass-facilitate') {
       return 'Let\'s build it together.';
     }
@@ -684,27 +807,48 @@ export function CoachProposalView(router) {
 
   function _getFallbackOptions(energyScore, intensity) {
     const availMins = _getAvailableTime() || 30;
-    // Safe fallbacks when generator is unavailable
-    if (energyScore <= 3 || intensity === 'gentle') {
-      return [
-        { label: 'Gentle movement',   type: 'workout',       durationMins: Math.min(20, availMins) },
-        { label: 'Breathing session', type: 'quiet-session', durationMins: Math.min(15, availMins) },
-        { label: 'Short walk',        type: 'walk-session',  durationMins: Math.min(20, availMins) },
-      ];
-    }
-    return [
-      { label: 'Strength session',  type: 'workout',       durationMins: Math.min(35, availMins) },
-      { label: 'Mobility work',     type: 'yoga-session',  durationMins: Math.min(25, availMins) },
-      { label: 'Breathing session', type: 'quiet-session', durationMins: Math.min(15, availMins) },
-    ];
+    // v8: shape normalised to match real generator output — id, name,
+    // duration, exerciseCount, rationale — since these now feed Door 1's
+    // preview cards directly, not just old per-door coach lines.
+    const raw = (energyScore <= 3 || intensity === 'gentle')
+      ? [
+          { label: 'Gentle movement',   type: 'workout',       durationMins: Math.min(20, availMins), exerciseCount: 4 },
+          { label: 'Breathing session', type: 'quiet-session', durationMins: Math.min(15, availMins), exerciseCount: 3 },
+          { label: 'Short walk',        type: 'walk-session',  durationMins: Math.min(20, availMins), exerciseCount: 1 },
+        ]
+      : [
+          { label: 'Strength session',  type: 'workout',       durationMins: Math.min(35, availMins), exerciseCount: 6 },
+          { label: 'Mobility work',     type: 'yoga-session',  durationMins: Math.min(25, availMins), exerciseCount: 5 },
+          { label: 'Breathing session', type: 'quiet-session', durationMins: Math.min(15, availMins), exerciseCount: 3 },
+        ];
+
+    return raw.map((opt, i) => ({
+      id:            `fallback-${opt.type}-${Date.now()}-${i}`,
+      name:          opt.label,
+      type:          opt.type,
+      duration:      opt.durationMins,
+      exerciseCount: opt.exerciseCount,
+      rationale:     'A steady option for today.',
+      exercises:     []
+    }));
   }
 
   function _getFallbackOption(index) {
-    return [
-      { label: 'Mobility', type: 'yoga-session', durationMins: 20 },
-      { label: 'Breathing', type: 'quiet-session', durationMins: 15 },
-      { label: 'Short walk', type: 'walk-session', durationMins: 20 },
-    ][index] || { label: 'Movement', type: 'workout', durationMins: 20 };
+    const opt = [
+      { label: 'Mobility',  type: 'yoga-session',  durationMins: 20, exerciseCount: 4 },
+      { label: 'Breathing', type: 'quiet-session',  durationMins: 15, exerciseCount: 3 },
+      { label: 'Short walk',type: 'walk-session',   durationMins: 20, exerciseCount: 1 },
+    ][index] || { label: 'Movement', type: 'workout', durationMins: 20, exerciseCount: 4 };
+
+    return {
+      id:            `fallback-${opt.type}-${Date.now()}-${index}`,
+      name:          opt.label,
+      type:          opt.type,
+      duration:      opt.durationMins,
+      exerciseCount: opt.exerciseCount,
+      rationale:     'A steady option for today.',
+      exercises:     []
+    };
   }
 
   function _routeForOption(option) {
@@ -721,11 +865,6 @@ export function CoachProposalView(router) {
       'gym-programme':    'gym-programme',
     };
     return TYPE_TO_ROUTE[option.type] || 'workout';
-  }
-
-  function _metaLine(option, availTime) {
-    const mins = option.durationMins || availTime || 30;
-    return `About ${mins} minutes`;
   }
 
   // ── Store helpers ──────────────────────────────────────────────────────────
@@ -748,13 +887,6 @@ export function CoachProposalView(router) {
     return history[today]?.availableTime
         || store.get('lastCheckin.availableTime')
         || 30;
-  }
-
-  // ── Utilities ──────────────────────────────────────────────────────────────
-
-  function _cap(str) {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
   // ── Public interface ───────────────────────────────────────────────────────
