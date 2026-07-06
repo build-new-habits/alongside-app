@@ -1,7 +1,25 @@
 /*
  * css/components/coach-proposal.css
- * 23 Jun 2026 v2
+ * 05 Jul 2026 v3
  *
+ * v3 — Door redesign (Door 1). Added .cp-preview-panel and its children
+ *   for the new right-slide preview panel. z-index set to 9999 from the
+ *   start, matching the convention established by .settings-dialog and
+ *   this morning's weekly-plan-v2.css fix (.wp-config-sheet was
+ *   originally 9000, an exact tie with nav-fix.css's #bottom-nav —
+ *   deliberately avoiding a repeat of that here). No existing rule in
+ *   this file used z-index before this addition, so there was nothing
+ *   to collide with, but the lesson still applies going forward: any
+ *   new position:fixed element in this app should clear 9000 by a
+ *   wide margin, not just match it.
+ *   "Recommended" badge uses the existing gold token (#B8970A) — the
+ *   same one used as the personal-tier accent elsewhere in the design
+ *   system. Reused deliberately (one gold meaning "notable/preferred"
+ *   throughout the app) rather than introducing a second gold. Contrast
+ *   checked: #B8970A background / #1A1200 text = 6.6:1, clears AA (and
+ *   is close to AAA) for this badge's small text.
+ *
+ * 23 Jun 2026 v2
  * Coach proposal view styles. v2 adds door reframe, bypass door,
  * return context door, missed session offer, post-choice acknowledgement.
  *
@@ -16,6 +34,9 @@
  *   Bypass options: same touch target and contrast as main doors.
  *   Constraint block: role="status", visible colour + text label.
  *   Return context chips: role="group", 44px min height.
+ *   Preview panel (v3): role="dialog", focus trapped, Escape closes.
+ *   Preview cards: role="radio", "Recommended" conveyed via text badge
+ *   and aria-label, not colour alone.
  *   prefers-reduced-motion: no transitions.
  */
 
@@ -139,6 +160,157 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cp-door { transition: none; }
+}
+
+/* ── Door 1 preview panel (v3 — right-slide) ─────────────────────────── */
+
+.cp-preview-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cp-preview-panel__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+}
+
+.cp-preview-panel__content {
+  position: relative;
+  width: 92%;
+  max-width: 420px;
+  height: 100%;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+  padding: var(--space-6) var(--space-5) var(--space-8);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+}
+
+.cp-preview-panel.is-open .cp-preview-panel__content {
+  transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-preview-panel__content { transition: none; }
+}
+
+.cp-preview-panel__close {
+  align-self: flex-end;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+  min-width: 44px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.cp-preview-panel__close:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cp-preview-panel__title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.cp-preview-panel__sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+.cp-preview-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cp-preview-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  min-height: 44px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.1s, background 0.1s;
+}
+
+.cp-preview-card--selected {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.cp-preview-card--recommended {
+  border-color: #B8970A;
+}
+
+.cp-preview-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* "Recommended" badge — text-based, not colour-alone. Reuses the
+   existing personal-tier gold token. Contrast checked: 6.6:1. */
+.cp-preview-card__badge {
+  align-self: flex-start;
+  background: #B8970A;
+  color: #1A1200;
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.cp-preview-card__name {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.cp-preview-card__meta {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cp-preview-card__why {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-preview-card { transition: none; }
+}
+
+.cp-preview-panel__actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: var(--space-3);
 }
 
 /* ── Bypass door ──────────────────────────────────────────────────────── */
