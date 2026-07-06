@@ -1,6 +1,36 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 05 Jul 2026 v163
+ * coach-proposal.js v8 + coach-proposal.css v3 — Door redesign (Door 1
+ *   only, per Graeme's brief this session). Doors now describe
+ *   categories honestly rather than pre-committing to a specific
+ *   session the generator couldn't actually produce. Door 1 opens a
+ *   right-slide preview panel (new .cp-preview-panel, z-index 9999 from
+ *   the start) showing the 3 generated options as selectable cards,
+ *   top-ranked one gold-marked "Recommended," select-then-"Start
+ *   Session" to commit, "Not today" to back out.
+ *   REAL BEHAVIOUR CHANGE, flagged not buried: Door 2 ("Your
+ *   programme") and Door 3 ("Something different") are deliberately
+ *   disabled — reusing the existing disabled-door treatment — since
+ *   their new spec needs real new logic (Door 2: an "uninterrupted"
+ *   bypass mode in workoutGenerator.js; Door 3: pre-selection support
+ *   in walk-session.js/yoga-session.js) that doesn't exist yet. Only
+ *   one of three doors is functional until those are built.
+ *   Severe-pain handling changed in spirit: no longer disables Door 1
+ *   entirely — shows up in which option gets generated instead, since
+ *   Door 1 IS the adapted-for-you door now. The old hard-disable
+ *   behaviour is Door 2's territory when it's built.
+ *   Caught and fixed during this same build, before presenting:
+ *   accidentally dropped the _checkSeverePain/_checkModeratePain/
+ *   _buildConstraintMessage function definitions while restructuring
+ *   (still called by buildProposal() — would have thrown immediately);
+ *   and the fallback-options path (used only if workoutGenerator itself
+ *   is unavailable) didn't match the shape the new preview cards need
+ *   (no id/duration/exerciseCount/rationale) — every fallback card
+ *   would have shared the same missing id, breaking selection. Both
+ *   fixed before this file was finalised.
+ *
  * 05 Jul 2026 v162
  * workout.js v3 — Critical bug fix, this is the "exercise generation —
  *   selection not carrying through" item already logged in the master
@@ -175,7 +205,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v162";
+const CACHE_NAME = "alongside-v163";
 
 const SHELL_URLS = [
 
