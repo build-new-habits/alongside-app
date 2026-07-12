@@ -1,8 +1,22 @@
 /* ============================================================
    checkin-conversation.css
    css/components/checkin-conversation.css
-   01 Jul 2026 v1
+   10 Jul 2026 v2
 
+   v2 — checkin-mini.js styling fix. That file was rendering fully
+   unstyled since checkin.js's 01 Jul conversational rewrite (see
+   checkin-mini.js v2 changelog for the full explanation). Its sliders,
+   pain chips, and location cards now reuse .ci-slider, .ci-quality-chip,
+   and .ci-time-card directly — no new rules needed for those. The two
+   genuinely new pieces added here: .checkin-step-header / .checkin-
+   step-dots (a simple step-progress indicator with no existing
+   equivalent anywhere in the app) and .mini-pain-list / .mini-pain-row
+   layout (condition label + chip row, structurally new even though the
+   chips themselves are reused). Kept deliberately minimal — reuses the
+   same design tokens (--color-primary, --color-border, --space-*)
+   already used throughout this file rather than introducing new values.
+
+   01 Jul 2026 v1
    Conversational check-in thread — Option A pattern.
    Bubble colours match OB-THREAD confirmed values (Appendix G):
      Active coach:  bg #162A2A  text #E8F4F4
@@ -330,6 +344,7 @@
 .ci-quality-chips {
   display: flex;
   gap: var(--space-3);
+  flex-wrap: wrap;
 }
 
 .ci-quality-chip {
@@ -344,6 +359,7 @@
   cursor: pointer;
   transition: all 0.15s ease;
   min-height: 48px;
+  min-width: 44px;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -443,6 +459,71 @@
 
 .ci-time-card.selected .ci-time-sub { color: var(--color-bg-deep); opacity: 0.8; }
 .ci-time-card:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+
+/* ── checkin-mini.js: step header and progress dots (v2 — new) ─────── */
+/* No existing equivalent anywhere in the app — kept deliberately
+   minimal, same tokens as everything else in this file. */
+
+.checkin-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+.checkin-step-dots {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.checkin-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background 0.2s ease;
+}
+
+.checkin-dot.active {
+  background: var(--color-primary);
+  transform: scale(1.2);
+}
+
+.checkin-dot.done {
+  background: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkin-dot { transition: none; transform: none; }
+}
+
+/* ── checkin-mini.js: question wrap and pain list layout (v2 — new) ── */
+
+.checkin-question-wrap {
+  padding: var(--space-5) var(--space-4) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.mini-pain-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.mini-pain-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.mini-pain-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
 
 /* ── Reduced motion ─────────────────────────────────────────── */
 
