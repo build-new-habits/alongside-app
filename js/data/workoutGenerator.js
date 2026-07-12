@@ -2,6 +2,23 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
+ * 05 Jul 2026 v1.8
+ *
+ * v1.8 — Confirmed bug fix. getUserProfile() was reading
+ *   store.get("activityLevel") for fitnessLevel — but store.js has no
+ *   top-level activityLevel field. The field Settings actually writes
+ *   to (settings.js's save-fitness-level action) is fitnessLevel, a
+ *   different key entirely. There's also a *nested* lifestyle.activityLevel,
+ *   which made this an easy mix-up, but neither matched what was being
+ *   read here. Practical effect: store.get("activityLevel") always
+ *   returned undefined, so fitnessLevel in the generator's profile was
+ *   ALWAYS "moderate" — the Activity Level dropdown in Settings has
+ *   never actually changed anything about generated sessions. Fixed to
+ *   read the correct key. Not confirmed whether getSuitableExercises()
+ *   in exercises.js actually uses profile.fitnessLevel downstream — that
+ *   file hasn't been ground-truthed this session — but the read here was
+ *   wrong regardless of downstream usage.
+ *
  * v1.7 — Goal-aware session bias + core guarantee + weight safeguarding:
  *
  *   getGoalProfile()
@@ -165,7 +182,7 @@ const AVAILABLE_TIME_MAX_EXERCISE_DURATION = {
   open:     1440   // 24 min
 };
 
-// ── Core area affectsAreas values ────────────────────────────────────────────
+// ── Core area affectsAreas values ──────────────────────────────────────────────
 // Every session should touch at least one of these. applyCoreGuarantee()
 // enforces this silently after exercise selection.
 const CORE_AREAS = new Set([
@@ -181,7 +198,7 @@ const MOBILITY_GOALS    = new Set(["improve-flexibility", "reduce-pain", "reduce
 
 export const workoutGenerator = {
 
-  // ── Cycle phase helper ────────────────────────────────────────────────────────
+  // ── Cycle phase helper ──────────────────────────────────────────────────────
 
   /**
    * Map cycleDay to a named phase.
@@ -200,7 +217,7 @@ export const workoutGenerator = {
     return "luteal";
   },
 
-  // ── Goal profile ──────────────────────────────────────────────────────────────
+  // ── Goal profile ────────────────────────────────────────────────────────────
 
   /**
    * Read goal state from store and return a structured profile.
@@ -224,7 +241,7 @@ export const workoutGenerator = {
     };
   },
 
-  // ── Goal-aware session bias ───────────────────────────────────────────────────
+  // ── Goal-aware session bias ─────────────────────────────────────────────────
 
   /**
    * Adjust focus order and pool scoring based on user goals.
@@ -260,7 +277,7 @@ export const workoutGenerator = {
     return { pool: biasedPool, focusOrder: order };
   },
 
-  // ── Core guarantee ────────────────────────────────────────────────────────────
+  // ── Core guarantee ──────────────────────────────────────────────────────────
 
   /**
    * Ensure every session touches the core/carrier chain.
@@ -302,7 +319,7 @@ export const workoutGenerator = {
     return result;
   },
 
-  // ── Weight target safeguarding ────────────────────────────────────────────────
+  // ── Weight target safeguarding ──────────────────────────────────────────────
 
   /**
    * Validate the user's weight target against a safe rate of change.
@@ -341,7 +358,7 @@ export const workoutGenerator = {
     return "That is a meaningful goal and I want to help you get there. That timeline concerns me a little though — a pace of around 0.5 to 1 kg a week tends to be more sustainable and kinder to your body. Want to adjust the date, or keep the goal open-ended for now?";
   },
 
-  // ── Daily options ─────────────────────────────────────────────────────────────
+  // ── Daily options ───────────────────────────────────────────────────────────
 
   /**
    * Generate today's 3 workout options
@@ -353,7 +370,7 @@ export const workoutGenerator = {
     const burnout     = checkinData.detectBurnout();
     const goalProfile = this.getGoalProfile();
 
-    // ── Gap 3: Menstrual cycle phase ─────────────────────────────────────────
+    // ── Gap 3: Menstrual cycle phase ───────────────────────────────────────
     // Read cycleDay from today's check-in only when hormonalTracking is on.
     // getCyclePhase() returns null when tracking is off — all downstream
     // logic gracefully ignores a null cyclePhase.
@@ -362,7 +379,7 @@ export const workoutGenerator = {
     const cycleLength      = store.get("cycleLength") || 28;
     const cyclePhase       = this.getCyclePhase(cycleDay, cycleLength);
 
-    // ── Gap 1: Programme intensity bias ──────────────────────────────────────
+    // ── Gap 1: Programme intensity bias ────────────────────────────────────
     // getPhaseBias() already returns intensityBias — extract it here so
     // getWorkoutParams() can use it to set a difficulty floor.
     const phaseBias      = programmeEngine.getPhaseBias();
@@ -411,13 +428,17 @@ export const workoutGenerator = {
   /**
    * Get user profile data for the filter engine.
    * conditionPainScores is passed separately via checkinForFilter.
+   *
+   * v1.8: fitnessLevel now reads the correct store key. Was reading
+   * "activityLevel" (doesn't exist at top level — always undefined,
+   * always fell back to "moderate"). Settings writes to "fitnessLevel".
    */
   getUserProfile() {
     return {
       equipment:    store.get("equipment")    || [],
       conditions:   store.get("conditions")   || [],
       goals:        store.get("goals")        || [],
-      fitnessLevel: store.get("activityLevel") || "moderate"
+      fitnessLevel: store.get("fitnessLevel") || "moderate"
     };
   },
 
@@ -472,7 +493,7 @@ export const workoutGenerator = {
     const exercises     = this.applyCoreGuarantee(raw, suitableExercises);
 
     const capped        = this.applyDurationCap(exercises, focus, params);
-    const duration      = this.calculateDuration(capped);
+    const duration       = this.calculateDuration(capped);
     const rationale     = this.generateRationale(focus, intensity, burnout, cyclePhase, goalProfile);
 
     return {
@@ -515,7 +536,7 @@ export const workoutGenerator = {
    * @returns {object} params
    */
   getWorkoutParams(intensity, burnout, availableTime, cyclePhase = null, intensityBias = null, currentWeek = null) {
-    // ── 1. Burnout override — highest priority ────────────────────────────────
+    // ── 1. Burnout override — highest priority ──────────────────────────────
     if (burnout.level === "high") {
       return {
         exerciseCount:   4,
@@ -527,7 +548,7 @@ export const workoutGenerator = {
       };
     }
 
-    // ── 2. Intensity-derived base params ──────────────────────────────────────
+    // ── 2. Intensity-derived base params ────────────────────────────────────
     const intensityParams = {
       recovery:    { exerciseCount: 4, maxEnergy: 3,  includeWarmup: true, includeCooldown: true, focusOnRecovery: true  },
       gentle:      { exerciseCount: 5, maxEnergy: 5,  includeWarmup: true, includeCooldown: true, focusOnRecovery: false },
@@ -537,7 +558,7 @@ export const workoutGenerator = {
 
     const base = { ...( intensityParams[intensity] || intensityParams.moderate ), difficultyFloor: 1 };
 
-    // ── 3. Cycle phase modifiers — additive, never override burnout ───────────
+    // ── 3. Cycle phase modifiers — additive, never override burnout ─────────
     // Menstruation: reduce maxEnergy, favour recovery focus
     // Follicular: no change (normal to high energy)
     // Ovulation: slight energy ceiling lift
@@ -553,7 +574,7 @@ export const workoutGenerator = {
     }
     // follicular: no modifier needed
 
-    // ── 4. Programme difficulty floor — additive nudge, not hard block ────────
+    // ── 4. Programme difficulty floor — additive nudge, not hard block ──────
     // Maps programme phase intensityBias to a difficultyFloor.
     // The floor is used in selectExercises() to prefer higher-difficulty exercises
     // as the programme progresses. It never forces hard exercises on tired users.
@@ -571,7 +592,7 @@ export const workoutGenerator = {
       }
     }
 
-    // ── 5. availableTime overrides exerciseCount only ─────────────────────────
+    // ── 5. availableTime overrides exerciseCount only ────────────────────────
     const timeCount  = availableTime ? (AVAILABLE_TIME_COUNT[availableTime] ?? null) : null;
     const finalCount = timeCount !== null ? timeCount : base.exerciseCount;
 
@@ -793,7 +814,7 @@ export const workoutGenerator = {
       parts.push("Let us take it a bit easier — your body needs some care.");
     }
 
-    // ── Cycle phase coach line ────────────────────────────────────────────────
+    // ── Cycle phase coach line ──────────────────────────────────────────────
     if (cyclePhase) {
       const cycleMessages = {
         "menstruation": "You are in your menstrual phase — I have kept intensity low and focused on gentle movement. Rest is productive right now.",
@@ -805,7 +826,7 @@ export const workoutGenerator = {
       if (msg) parts.push(msg);
     }
 
-    // ── Goal-aware coach line (v1.7) ──────────────────────────────────────────
+    // ── Goal-aware coach line (v1.7) ─────────────────────────────────────────
     // Connects today's session to the user's stated goal.
     // Only shown when not in burnout recovery mode.
     if (goalProfile && burnout.level !== "high") {
