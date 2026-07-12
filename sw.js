@@ -1,6 +1,23 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 05 Jul 2026 v164
+ * coach-proposal.css v4 — CRITICAL fix, same day as v3 shipped. v3's
+ *   .cp-preview-panel set `display: flex` unconditionally, which
+ *   overrides the [hidden] attribute's browser-default `display: none`
+ *   (an author class selector beats that low-specificity UA rule). The
+ *   result: the full-screen, z-index 9999 panel and its dark backdrop
+ *   were rendered and capturing every tap from page load — not just
+ *   when Door 1 was opened. Nothing on the Today screen was visible or
+ *   clickable. Reported by Graeme within minutes of the v163 deploy as
+ *   "I can't see or choose anything." Fixed: `display` moved off the
+ *   base rule onto `.cp-preview-panel.is-open` only, matching the
+ *   already-correct pattern in weekly-plan-v2.css's .wp-config-sheet
+ *   (which never fights the hidden attribute in the first place). Same
+ *   bug category as this morning's nav-bar z-index collision — flagged
+ *   in v3's own changelog as a lesson, then walked into a variant of it
+ *   within the same session.
+ *
  * 05 Jul 2026 v163
  * coach-proposal.js v8 + coach-proposal.css v3 — Door redesign (Door 1
  *   only, per Graeme's brief this session). Doors now describe
@@ -205,7 +222,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v163";
+const CACHE_NAME = "alongside-v164";
 
 const SHELL_URLS = [
 
