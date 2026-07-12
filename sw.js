@@ -1,6 +1,35 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 10 Jul 2026 v165
+ * intention.js v6 + checkin-mini.js v2 + checkin-conversation.css v2 —
+ *   fixes for the "I want to move again" infinite loop Graeme reported
+ *   (screenshots + live files this session). Root cause: intention.js's
+ *   "coach" path wrote a fake activityLog entry and routed to "today"
+ *   instead of "coach-proposal" — today.js then saw that fake entry and
+ *   reported a session as already done, offering "move again" forever
+ *   without ever reaching the actual doors. Fixed: routes to
+ *   coach-proposal directly, writes nothing until a real session
+ *   happens. Separately: checkin-mini.js's location/pain/slider UI
+ *   (the unstyled buttons in Graeme's screenshot) has been rendering
+ *   with zero CSS since checkin.js's 01 Jul conversational rewrite —
+ *   migrated to reuse checkin-conversation.css's existing .ci-* classes
+ *   rather than left on the orphaned .checkin-*/.mini-* naming.
+ *   FLAGGED, NOT FIXED: workout.js's completeWorkout() writes to
+ *   workoutHistory but not activityLog — today.js's "session done"
+ *   detection reads activityLog, so it may still not fire correctly
+ *   after a real generated session completes even with this loop fixed.
+ *   Worth checking on device once the loop itself is confirmed resolved.
+ *
+ * ── STILL OUTSTANDING FROM BEFORE THIS SESSION — confirmed undeployed ──
+ * Ground-truthed today against Graeme's actual live files: the site was
+ * running v163, not v164 — meaning two earlier fixes never went live:
+ *   - coach-proposal.css v4 (the full-screen-blocked Critical fix)
+ *   - workoutGenerator.js v1.8 (the fitnessLevel/activityLevel fix)
+ * Both are included in this deploy batch. Deploy ALL SIX changed files
+ * together — cache-busting alone does nothing if the underlying file
+ * on GitHub was never actually replaced, which is what happened here.
+ *
  * 05 Jul 2026 v164
  * coach-proposal.css v4 — CRITICAL fix, same day as v3 shipped. v3's
  *   .cp-preview-panel set `display: flex` unconditionally, which
@@ -222,7 +251,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v164";
+const CACHE_NAME = "alongside-v165";
 
 const SHELL_URLS = [
 
