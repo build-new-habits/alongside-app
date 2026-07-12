@@ -1,14 +1,38 @@
 /**
  * intention.js - Intention Screen
  *
- * 26 Jun 2026 v5
+ * 26 Jun 2026 v6
+ *
+ * v6 — CRITICAL bug fix: the "coach" path ("Suggest something for me")
+ *   branch in logAndNavigate() wrote a fake activityLog entry
+ *   (type: "coach-session", no real session ever happened) and then
+ *   routed straight back to router.navigate("today") — never to
+ *   coach-proposal.js's doors at all. today.js's _resolveState() then
+ *   found that fake entry, decided a session was already "done" today,
+ *   and showed the "You moved today. That's done." screen with its
+ *   "I want to move again" button. Tapping that routed to checkin-mini,
+ *   which on completion routes back to intention — landing right back
+ *   on the same broken "coach" path. This was the entire loop Graeme
+ *   reported: never reaching or completing a real session, just
+ *   bouncing between check-in and "done" screens forever.
+ *   Root cause read from the file directly, not guessed: this branch
+ *   looks like a pre-coach-proposal.js leftover — every other path in
+ *   this file's history shows incremental fixes (22 May: gym routes via
+ *   coach-proposal's gym-sub screen; 15 Jun: breathing routes to the
+ *   real player) but the "coach" path itself was never updated to point
+ *   at coach-proposal.js once that became the doors hub.
+ *   Fixed: "coach" path now routes directly to coach-proposal, writes
+ *   no placeholder log entry at all — real completion should be logged
+ *   at the point a session actually finishes, not here. (Separately
+ *   flagged, not fixed in this pass: workout.js's completeWorkout()
+ *   currently writes to workoutHistory but not activityLog, so
+ *   today.js's "session done" detection may still not fire correctly
+ *   after a real generated session completes — worth checking next.)
  *
  * v5 (26 Jun 2026): Name capitalisation fix — buildCoachLine() now  
  *   capitalises the stored name before prepending as greeting.
  *
  * v4 (15 Jun 2026 S4-9/10) - "Something quieter > Breathing practice" now
- *
- * 15 Jun 2026 v4 (S4-9/10) - "Something quieter > Breathing practice" now
  *   routes to breathing-session.js (the fully built 5-type/all-duration
  *   player) instead of straight to reflect.js, which previously did
  *   nothing breathing-related at all. No activityLog entry is written
@@ -357,7 +381,21 @@ function getContinueLabel() {
 // -- Navigation ----------------------------------------------------------------
 
 function logAndNavigate() {
-  // Save activity log entry
+  // v6 CRITICAL FIX — "coach" path. This branch used to write a fake
+  // "coach-session" activityLog entry and route to "today", which made
+  // today.js think a session was already done and show "I want to move
+  // again" — without the user ever reaching coach-proposal.js's doors.
+  // No real session has happened yet at this point, so nothing is
+  // logged here — the actual session, once it finishes, is what should
+  // get recorded (see the note on workout.js in this version's
+  // changelog above — that recording currently goes to workoutHistory,
+  // not activityLog, which is a separate gap worth checking next).
+  if (selectedPath === "coach") {
+    router.navigate("coach-proposal");
+    return;
+  }
+
+  // Save activity log entry (self / quiet / prescribed paths)
   const log = store.get("activityLog") || [];
   const checkin = store.get("lastCheckin") || {};
 
@@ -371,14 +409,12 @@ function logAndNavigate() {
   const entry = {
     id:            new Date().toISOString() + "_" + Math.random().toString(36).slice(2, 6),
     date:          new Date().toISOString().split("T")[0],
-    type:          selectedPath === "coach"      ? "coach-session" :
-                   selectedPath === "prescribed" ? "prescribed-session" :
+    type:          selectedPath === "prescribed" ? "prescribed-session" :
                    selectedPath === "quiet"      ? selectedQuiet :
                    selectedActivity,
     name:          trimmedName || null,
     energyBefore:  checkin.energy || null,
-    source:        selectedPath === "coach"      ? "coach-recommended" :
-                   selectedPath === "prescribed" ? "prescribed" :
+    source:        selectedPath === "prescribed" ? "prescribed" :
                    "self-directed",
     sessionStart:  new Date().toISOString(),
     // -- S4-6 additions (Path B, non-gym only) --
@@ -390,10 +426,6 @@ function logAndNavigate() {
   store.set("currentActivityEntry", entry);
 
   // Navigate
-  if (selectedPath === "coach") {
-    router.navigate("today");
-    return;
-  }
   if (selectedPath === "prescribed") {
     router.navigate("prescribed");
     return;
