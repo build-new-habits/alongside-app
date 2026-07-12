@@ -1,6 +1,28 @@
 /**
  * checkin-mini.js - Abbreviated Return-Visit Check-In
  *
+ * 10 Jul 2026 v2
+ *
+ * v2 — Styling fix. This file's markup used .checkin-slider,
+ *   .checkin-coach-card, .mini-pain-chip, .mini-location-chip and
+ *   friends — a class naming convention with no stylesheet anywhere in
+ *   the app. checkin.js was rewritten to a conversational thread UI on
+ *   01 Jul (checkin-conversation.css, .ci-* prefix throughout) and this
+ *   file was never updated to match — it's been rendering completely
+ *   unstyled since that rewrite, five days before this fix, not
+ *   anything from the current session's work.
+ *   Migrated every input widget to reuse the equivalent already-styled
+ *   .ci-* class from checkin-conversation.css: sliders now use
+ *   .ci-slider/.ci-slider-wrap/.ci-value-row (identical structure to
+ *   checkin.js's energy/mood panels), pain chips reuse .ci-quality-chip
+ *   (same single-select toggle pattern as checkin.js's sleep-quality
+ *   chips), location chips reuse .ci-time-card/.ci-time-grid (a 3-column
+ *   icon+label card grid — already exactly 3 columns, a natural fit for
+ *   Home/Gym/Outside). Step header and dots are new to this file family
+ *   (no existing equivalent) — minimal supporting rules added to
+ *   checkin-conversation.css v2 rather than left unstyled.
+ *   No behavioural changes — same 4 steps, same store writes.
+ *
  * 12 Jun 2026 v1 (S4-4 P1)
  *
  * Triggered when a user returns to the app later in the same day
@@ -56,9 +78,9 @@ const PAIN_LEVELS = [
 ];
 
 const LOCATION_OPTIONS = [
-  { id: "home",    label: "Home",    icon: "\uD83C\uDFE0" },
-  { id: "gym",     label: "Gym",     icon: "\uD83C\uDFCB" },
-  { id: "outside", label: "Outside", icon: "\uD83C\uDF33" }
+  { id: "home",    label: "Home",    sub: "",  icon: "\uD83C\uDFE0" },
+  { id: "gym",     label: "Gym",     sub: "",  icon: "\uD83C\uDFCB" },
+  { id: "outside", label: "Outside", sub: "",  icon: "\uD83C\uDF33" }
 ];
 
 function painLevelForScore(score) {
@@ -110,20 +132,20 @@ function renderEnergy() {
           </p>
         </div>
 
-        <div class="checkin-slider-section">
-          <div class="checkin-slider-value" id="mini-energy-label"
-               aria-live="polite" aria-atomic="true">
-            ${ENERGY_LABELS[miniEnergy] || "Moderate"}
+        <div class="ci-slider-wrap">
+          <div class="ci-value-row" id="mini-energy-row" aria-live="polite" aria-atomic="true">
+            <span class="ci-value-num" id="mini-energy-num">${miniEnergy}</span>
+            <span class="ci-value-label" id="mini-energy-label">${ENERGY_LABELS[miniEnergy] || "Moderate"}</span>
           </div>
           <input type="range"
                  id="mini-energy-slider"
-                 class="checkin-slider"
+                 class="ci-slider"
                  min="1" max="10" step="1"
                  value="${miniEnergy}"
                  aria-label="Energy level, 1 to 10"
                  aria-valuenow="${miniEnergy}"
                  aria-valuetext="${ENERGY_LABELS[miniEnergy]}">
-          <div class="checkin-slider-ends" aria-hidden="true">
+          <div class="ci-slider-ends" aria-hidden="true">
             <span>Low</span>
             <span>High</span>
           </div>
@@ -160,20 +182,20 @@ function renderMood() {
           </p>
         </div>
 
-        <div class="checkin-slider-section">
-          <div class="checkin-slider-value" id="mini-mood-label"
-               aria-live="polite" aria-atomic="true">
-            ${MOOD_LABELS[miniMood] || "Okay"}
+        <div class="ci-slider-wrap">
+          <div class="ci-value-row" id="mini-mood-row" aria-live="polite" aria-atomic="true">
+            <span class="ci-value-num" id="mini-mood-num">${miniMood}</span>
+            <span class="ci-value-label" id="mini-mood-label">${MOOD_LABELS[miniMood] || "Okay"}</span>
           </div>
           <input type="range"
                  id="mini-mood-slider"
-                 class="checkin-slider"
+                 class="ci-slider"
                  min="1" max="10" step="1"
                  value="${miniMood}"
                  aria-label="Mood, 1 to 10"
                  aria-valuenow="${miniMood}"
                  aria-valuetext="${MOOD_LABELS[miniMood]}">
-          <div class="checkin-slider-ends" aria-hidden="true">
+          <div class="ci-slider-ends" aria-hidden="true">
             <span>Low</span>
             <span>Good</span>
           </div>
@@ -225,10 +247,10 @@ function renderPain() {
                   <span class="mini-pain-label">
                     ${cond?.icon || ""} ${cond?.name || id}
                   </span>
-                  <div class="mini-pain-chips" role="group"
+                  <div class="ci-quality-chips" role="group"
                        aria-label="Pain level for ${cond?.name || id}">
                     ${PAIN_LEVELS.map(level => `
-                      <button class="mini-pain-chip ${pendingLevel === level.id ? "selected" : ""}"
+                      <button class="ci-quality-chip ${pendingLevel === level.id ? "selected" : ""}"
                               data-condition="${id}"
                               data-score="${level.score}"
                               aria-pressed="${pendingLevel === level.id}">
@@ -280,13 +302,12 @@ function renderLocation() {
           </p>
         </div>
 
-        <div class="mini-location-grid" role="group" aria-label="Where are you now?">
+        <div class="ci-time-grid" role="group" aria-label="Where are you now?">
           ${LOCATION_OPTIONS.map(loc => `
-            <button class="mini-location-chip ${currentLocation === loc.id ? "selected" : ""}"
+            <button class="ci-time-card mini-location-chip ${currentLocation === loc.id ? "selected" : ""}"
                     data-location="${loc.id}"
                     aria-pressed="${currentLocation === loc.id}">
-              <span aria-hidden="true">${loc.icon}</span>
-              ${loc.label}
+              <span class="ci-time-label" aria-hidden="true">${loc.icon} ${loc.label}</span>
             </button>
           `).join("")}
         </div>
@@ -378,10 +399,10 @@ export function onMount() {
   if (energySlider) {
     energySlider.addEventListener("input", () => {
       miniEnergy = parseInt(energySlider.value);
-      const label = document.getElementById("mini-energy-label");
-      if (label) {
-        label.textContent = ENERGY_LABELS[miniEnergy] || String(miniEnergy);
-      }
+      const numEl   = document.getElementById("mini-energy-num");
+      const labelEl = document.getElementById("mini-energy-label");
+      if (numEl)   numEl.textContent   = miniEnergy;
+      if (labelEl) labelEl.textContent = ENERGY_LABELS[miniEnergy] || String(miniEnergy);
       energySlider.setAttribute("aria-valuenow", miniEnergy);
       energySlider.setAttribute("aria-valuetext", ENERGY_LABELS[miniEnergy]);
     });
@@ -392,24 +413,24 @@ export function onMount() {
   if (moodSlider) {
     moodSlider.addEventListener("input", () => {
       miniMood = parseInt(moodSlider.value);
-      const label = document.getElementById("mini-mood-label");
-      if (label) {
-        label.textContent = MOOD_LABELS[miniMood] || String(miniMood);
-      }
+      const numEl   = document.getElementById("mini-mood-num");
+      const labelEl = document.getElementById("mini-mood-label");
+      if (numEl)   numEl.textContent   = miniMood;
+      if (labelEl) labelEl.textContent = MOOD_LABELS[miniMood] || String(miniMood);
       moodSlider.setAttribute("aria-valuenow", miniMood);
       moodSlider.setAttribute("aria-valuetext", MOOD_LABELS[miniMood]);
     });
   }
 
   // Pain chips
-  document.querySelectorAll(".mini-pain-chip").forEach(chip => {
+  document.querySelectorAll(".mini-pain-row .ci-quality-chip").forEach(chip => {
     chip.addEventListener("click", () => {
       const condId = chip.dataset.condition;
       const score  = parseInt(chip.dataset.score);
       if (!condId) return;
       miniPainScores[condId] = score;
       // Update chip selection without full rerender
-      document.querySelectorAll(`.mini-pain-chip[data-condition="${condId}"]`).forEach(c => {
+      document.querySelectorAll(`.ci-quality-chip[data-condition="${condId}"]`).forEach(c => {
         const isSelected = parseInt(c.dataset.score) === score;
         c.classList.toggle("selected", isSelected);
         c.setAttribute("aria-pressed", isSelected);
