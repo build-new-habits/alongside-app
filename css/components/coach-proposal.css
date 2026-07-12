@@ -1,17 +1,27 @@
 /*
  * css/components/coach-proposal.css
- * 05 Jul 2026 v3
+ * 05 Jul 2026 v4
  *
  * v3 — Door redesign (Door 1). Added .cp-preview-panel and its children
  *   for the new right-slide preview panel. z-index set to 9999 from the
  *   start, matching the convention established by .settings-dialog and
  *   this morning's weekly-plan-v2.css fix (.wp-config-sheet was
  *   originally 9000, an exact tie with nav-fix.css's #bottom-nav —
- *   deliberately avoiding a repeat of that here). No existing rule in
- *   this file used z-index before this addition, so there was nothing
- *   to collide with, but the lesson still applies going forward: any
- *   new position:fixed element in this app should clear 9000 by a
- *   wide margin, not just match it.
+ *   deliberately avoiding a repeat of that here).
+ *   CRITICAL SELF-CAUGHT BUG, fixed same day: the first version of this
+ *   rule set `display: flex` unconditionally on .cp-preview-panel. That
+ *   overrides the [hidden] attribute's browser-default `display: none`
+ *   — an author class selector always beats that low-specificity UA
+ *   rule — so the full-screen, z-index 9999 panel and its dark backdrop
+ *   were actually rendered and capturing every tap from the moment the
+ *   page loaded, not just when opened. This is the exact same category
+ *   of bug as this morning's nav-bar z-index collision (Appendix O) —
+ *   a component's own CSS silently fighting a mechanism it depends on —
+ *   and I walked straight into a version of it while writing the fix
+ *   for something else. Corrected: `display` is now ONLY set on
+ *   `.cp-preview-panel.is-open`, matching the working pattern already
+ *   used by .wp-config-sheet (which never sets `display` on its base
+ *   rule at all, letting `[hidden]` do its job unopposed).
  *   "Recommended" badge uses the existing gold token (#B8970A) — the
  *   same one used as the personal-tier accent elsewhere in the design
  *   system. Reused deliberately (one gold meaning "notable/preferred"
@@ -168,6 +178,9 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
+}
+
+.cp-preview-panel.is-open {
   display: flex;
   justify-content: flex-end;
 }
