@@ -1,9 +1,26 @@
 /**
  * coach-proposal.js
- * 13 Jul 2026 v9
+ * 13 Jul 2026 v10
  *
  * Coach proposal view. The hub. Doors that describe categories, not
  * pre-committed choices.
+ *
+ * v10 — v9 was deployed earlier today and immediately rolled back: it
+ *   correctly diagnosed that generateDailyOptions() was never receiving
+ *   the override values it needed, but switching to a static import of
+ *   workoutGenerator.js forced that module to actually load for the
+ *   first time — and workoutGenerator.js turned out to have its own
+ *   broken import of programmeEngine.js, present since at least
+ *   workoutGenerator.js v1.1, never caught because nothing had ever
+ *   loaded it as a real ES module before. That broke the entire page
+ *   ("Something went wrong loading this page"), not just Door 1.
+ *   Content here is otherwise IDENTICAL to v9 — no changes needed on
+ *   this file's side. The fix was entirely in workoutGenerator.js
+ *   (now v1.9, see that file's changelog). This version exists only to
+ *   record that v9 was deployed, rolled back to v8, and this is the
+ *   redeploy of the same fix, now safe because its dependency is fixed.
+ *   MUST be deployed together with workoutGenerator.js v1.9 — deploying
+ *   this file alone, again, would reproduce today's outage.
  *
  * v9 — Confirmed bug fix, Session A2. _generateOptions() looked up
  *   window._workoutGenerator at runtime and, if found, called
