@@ -1,9 +1,70 @@
 /**
  * coach-proposal.js
- * 05 Jul 2026 v8
+ * 13 Jul 2026 v9
  *
  * Coach proposal view. The hub. Doors that describe categories, not
  * pre-committed choices.
+ *
+ * v9 — Confirmed bug fix, Session A2. _generateOptions() looked up
+ *   window._workoutGenerator at runtime and, if found, called
+ *   generateDailyOptions() with a parameter object (energy/burnout/
+ *   intensityBias/focusBias/availableTime). Two problems: (1) nothing in
+ *   this codebase actually sets window._workoutGenerator — no global
+ *   registration exists for it, so this lookup likely always failed and
+ *   silently fell through to _getFallbackOptions(); (2) even if it had
+ *   been found, workoutGenerator.generateDailyOptions() takes ZERO
+ *   parameters — it reads everything itself from store/checkinData. The
+ *   object was always discarded either way.
+ *
+ *   Ground-truthed against workoutGenerator.js v1.8 before fixing. Of
+ *   the five values in the discarded object, three were harmless to
+ *   lose — energy, burnout, and phase-bias focus order are already
+ *   re-derived independently inside generateDailyOptions() via the same
+ *   store/checkinData/programmeEngine calls this file uses. Only two
+ *   genuinely had nowhere else to reach the generator: the re-entry
+ *   gentler-start intensity override (effectiveIntensity, computed
+ *   below in buildProposal() via getReEntryIntensity()), and the
+ *   check-in's availableTime. The coach's re-entry text said "starting
+ *   gently" while the actual generated session was unaffected by it —
+ *   this is now fixed.
+ *
+ *   Fix: replaced the window._workoutGenerator runtime lookup with a
+ *   direct top-level import (no circular dependency — workoutGenerator.js
+ *   does not import this file). _generateOptions() now writes the
+ *   re-entry-adjusted intensity and availableTime to store immediately
+ *   before calling generateDailyOptions(), which picks them up through
+ *   its existing store-read path (store.get("todayIntensity") and
+ *   store.get("availableTime")) — no change to generateDailyOptions()'s
+ *   own contract, no parameters added there. Dropped the now-unused
+ *   burnout and phaseBias arguments from _generateOptions()'s signature
+ *   and call site — both were already dead even before this fix.
+ *
+ *   ALSO INVESTIGATED, NOT A BUG: the sw.js v161 changelog flagged
+ *   _routeForOption() as routing every real generated option to the
+ *   generic 'workout' view regardless of framing, since real output only
+ *   has option.focus, never option.type. Confirmed true, but this is
+ *   correct behaviour, not a defect — generateWorkout() only ever
+ *   produces generic exercise-list sessions shaped for workout.js
+ *   (strength/mobility/cardio focus, never a yoga/walk/run session).
+ *   Fallback options DO carry type and DO route correctly to their
+ *   specialised views already. Giving real options a genuine non-workout
+ *   type would require the generator itself to be able to produce those
+ *   session shapes — the "Option A vs B" gap already logged in the
+ *   master schedule (Appendix Q), not something fixable in
+ *   _routeForOption() alone. No change made here.
+ *
+ *   NOT INVESTIGATED, FLAGGING FOR WHOEVER NEXT TOUCHES checkin.js OR
+ *   schema.md: schema.md documents todayIntensity's value space as
+ *   "low | moderate | high", but the code (both here and in
+ *   workoutGenerator.js's intensityParams table) expects
+ *   "recovery | gentle | moderate | challenging". Writing
+ *   effectiveIntensity (already in the gentle/moderate/challenging space,
+ *   per programmeEngine's getPhaseBias()/getReEntryIntensity()) into
+ *   store.todayIntensity is internally consistent with this file and
+ *   workoutGenerator.js, but if checkin.js writes todayIntensity in the
+ *   low/moderate/high space documented in schema.md, there may be a
+ *   separate, pre-existing mismatch there — not ground-truthed this
+ *   session, checkin.js not opened.
  *
  * v8 — Door redesign (Door 1 only — Graeme's redesign brief, this session).
  *   Root problem being fixed: the old three-doors model computed one
@@ -105,6 +166,7 @@ import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
 import { getProgramme }      from '../data/programmes.js';
 import { detectBurnout }     from '../data/checkin.js';
 import { getPrimaryEngineGoal } from '../data/goals.js';
+import { workoutGenerator }  from '../data/workoutGenerator.js';   // v9 — direct import, replaces window._workoutGenerator lookup
 
 // ─── Door copy (v8 — static, honest about category vs commitment) ────────────
 
@@ -617,7 +679,9 @@ export function CoachProposalView(router) {
 
     // Generate three options from workout generator — these become
     // Door 1's preview cards (v8), already returned in priority order.
-    let options = _generateOptions(energyScore, burnout, effectiveIntensity, phaseBias, availTime);
+    // v9: effectiveIntensity and availTime are now genuinely applied —
+    // see _generateOptions().
+    let options = _generateOptions(energyScore, effectiveIntensity, availTime);
     while (options.length < 3) {
       options.push(_getFallbackOption(options.length));
     }
@@ -786,23 +850,32 @@ export function CoachProposalView(router) {
 
   // ── Option generation ──────────────────────────────────────────────────────
 
-  function _generateOptions(energyScore, burnout, intensity, phaseBias, availTime) {
-    // Import workoutGenerator dynamically to avoid circular dependency issues
+  /**
+   * v9 — REWRITTEN. Was: look up window._workoutGenerator at runtime and
+   * call it with a parameter object that the real function always
+   * discarded (it takes zero parameters). Now: direct top-level import,
+   * called with no arguments to match its real signature. The two values
+   * that genuinely needed to reach the generator — the re-entry-adjusted
+   * intensity and availableTime — are written to store immediately
+   * before the call, which is how generateDailyOptions() actually reads
+   * its inputs (store.get("todayIntensity"), store.get("availableTime")).
+   * energyScore is kept as a parameter here only because _getFallbackOptions()
+   * (the error/unavailable path) still needs it — it is not sent to the
+   * real generator, which derives energy itself from checkinData.
+   */
+  function _generateOptions(energyScore, intensity, availTime) {
     try {
-      const wg = window._workoutGenerator;
-      if (wg && typeof wg.generateDailyOptions === 'function') {
-        return wg.generateDailyOptions({
-          energy:         energyScore,
-          burnout,
-          intensityBias:  intensity,
-          focusBias:      phaseBias.focusBias,
-          availableTime:  availTime,
-        });
+      if (intensity) {
+        store.set('todayIntensity', intensity);
       }
+      if (availTime) {
+        store.set('availableTime', availTime);
+      }
+      return workoutGenerator.generateDailyOptions();
     } catch (e) {
       console.warn('coach-proposal: workoutGenerator unavailable, using fallbacks', e);
+      return _getFallbackOptions(energyScore, intensity);
     }
-    return _getFallbackOptions(energyScore, intensity);
   }
 
   function _getFallbackOptions(energyScore, intensity) {
@@ -852,6 +925,12 @@ export function CoachProposalView(router) {
   }
 
   function _routeForOption(option) {
+    // v9: confirmed via ground-truthing workoutGenerator.js this session —
+    // real generated options never carry `type` (only `focus`), so this
+    // always falls through to 'workout' for real options. That is correct:
+    // generateWorkout() only ever produces generic exercise-list sessions
+    // shaped for workout.js, regardless of focus. Fallback options DO carry
+    // type and route correctly already. See v9 changelog note above.
     const TYPE_TO_ROUTE = {
       'workout':          'workout',
       'morning-session':  'morning-session',
