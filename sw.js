@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Jul 2026 v168
+ * coach-proposal.js v11 — _buildReflection() fix. ACTIVITY_LABELS had no
+ *   entry for "coach-session", so the reflection line leaked the raw
+ *   internal type ("Since yesterday, you did coach-session"). Added an
+ *   explicit label plus a generic hyphen-to-space fallback for any
+ *   future unmapped type. See coach-proposal.js v11 changelog.
+ *
  * 13 Jul 2026 v167
  * coach-proposal.js v10 + workoutGenerator.js v1.9 — redeploy of the
  *   Session A2 fix after v166/coach-proposal.js v9 broke the entire
@@ -208,7 +215,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v167";
+const CACHE_NAME = "alongside-v168";
 
 const SHELL_URLS = [
 
@@ -249,7 +256,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/checkin.js",
   "/alongside-app/js/views/checkin-mini.js",
   "/alongside-app/js/views/intention.js",
-  "/alongside-app/js/views/coach-proposal.js",              // v10 — this deploy
+  "/alongside-app/js/views/coach-proposal.js",              // v11 — this deploy
   "/alongside-app/js/views/coach-reflection.js",
   "/alongside-app/js/views/workout.js",
   "/alongside-app/js/views/workout-complete.js",
