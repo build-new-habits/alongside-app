@@ -1,6 +1,29 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Jul 2026 v166
+ * coach-proposal.js v9 — Session A2 fix. _generateOptions() looked up
+ *   window._workoutGenerator at runtime and called generateDailyOptions()
+ *   with a parameter object (energy/burnout/intensityBias/focusBias/
+ *   availableTime) — but nothing in the codebase sets that global, and
+ *   even if found, the real function takes zero parameters and always
+ *   discarded the object. Of the five values lost, three (energy, burnout,
+ *   focus order) were already redundant — generateDailyOptions() re-derives
+ *   them itself from store/checkinData/programmeEngine. Two were not:
+ *   the re-entry gentler-start intensity override and availableTime.
+ *   Fixed: replaced the window global lookup with a direct top-level
+ *   import of workoutGenerator.js (no circular dependency exists); the
+ *   two values that matter are now written to store immediately before
+ *   calling generateDailyOptions(), which already reads them from there.
+ *   No change to generateDailyOptions()'s own signature or contract.
+ *   ALSO INVESTIGATED, NOT A BUG: _routeForOption() defaulting every real
+ *   generated option to the 'workout' route (since real output only has
+ *   `focus`, never `type`) is correct, not a defect — the generator only
+ *   ever produces workout.js-shaped sessions regardless of focus. No
+ *   change made there. Full reasoning in coach-proposal.js v9 header.
+ *   workoutGenerator.js unchanged this deploy — the fix is entirely on
+ *   the caller side.
+ *
  * 10 Jul 2026 v165
  * intention.js v6 + checkin-mini.js v2 + checkin-conversation.css v2 —
  *   fixes for the "I want to move again" infinite loop Graeme reported
@@ -103,26 +126,6 @@
  *   dropdown in Settings has never changed anything about generated
  *   sessions. Fixed to read the correct key. Already listed in
  *   SHELL_URLS below, cache-busted by this bump alone.
- *   ALSO FOUND, NOT YET FIXED — flagging for the next session before
- *   any movementIdentity wiring work continues:
- *     1. coach-proposal.js calls workoutGenerator.generateDailyOptions()
- *        with a parameter object (energy/burnout/intensityBias/etc.) —
- *        but the real function takes zero parameters and reads
- *        everything itself from store/checkinData. The object is
- *        silently discarded. Practical effect: the re-entry
- *        gentler-start intensity override computed in coach-proposal.js
- *        never reaches the generator — the coach's text says "starting
- *        gently" while the actual generated session is unaffected.
- *     2. coach-proposal.js's _routeForOption() routes by option.type —
- *        but workoutGenerator's real output only has option.focus
- *        (strength/mobility/cardio), never type. Type-based routing
- *        (yoga-session, walk-session, running-session, etc.) only ever
- *        fires on the _getFallbackOptions() path, i.e. when the real
- *        generator is unavailable. For real generated sessions, every
- *        door currently routes to the generic 'workout' view regardless
- *        of the door's actual framing. This is Critical severity —
- *        it undermines the three-doors concept itself, not just
- *        movementIdentity.
  *
  * 05 Jul 2026 v160
  * coach-proposal.js v7 — confirmed bug fix, found while ground-truthing
@@ -149,7 +152,8 @@
  *   no new contrast combination, no new WebAIM check needed.
  *   NOT done this batch: coach-proposal.js's scoring logic against the
  *   new array shape — not ground-truthed this session, flagged for next
- *   time this file is in scope.
+ *   time this file is in scope. (Still not done as of v166 — this is
+ *   Session E's scope, sequenced after Session A2.)
  *
  * 05 Jul 2026 v158
  * weekly-plan-v2.css v2 + weekly-plan.js v3 — two fixes found via a
@@ -173,85 +177,13 @@
  *   any class in the current weekly-plan.js — worth removing from
  *   SHELL_URLS in a future cleanup pass.
  *
- * 05 Jul 2026 v157
- * settings.js v10 — Functional QA fix (My Week). Ground-truthed against
- *   router.js v8 and weekly-plan.js v2 at the start of the Functional QA
- *   session: the "weekly-plan" route and its view file were both already
- *   correct — the only thing missing was a way in, dropped somewhere
- *   across the v4–v9 Programme-panel rewrites and never replaced.
- *   Restored as a "Your week" section in the Programme panel, reading
- *   weeklyPlan.updatedAt live to state what's actually true rather than
- *   a generic label. No schema change (weeklyPlan already exists in
- *   store.js v7). No changes to router.js or weekly-plan.js — both
- *   confirmed correct as-is, cache-busted by this CACHE_NAME bump alone
- *   since both were already listed below.
- *   NOT done this batch: My Movement rebuild (multi-select, agreed 13
- *   May, never built) — logged as a build task, not started. S4
- *   (navigation lag) — still waiting on a Network-tab capture, per
- *   Ground Truth Rule.
- *
- * 04 Jul 2026 v156
- * settings.js v9 — Back-navigation bug fix. "Edit conditions"/"Edit
- *   equipment" now open via openSheet() (js/views/onboarding/
- *   sheet-manager.js) instead of a direct router.navigate() into an
- *   onboarding-built view. Root cause: conditions.js's Back button is
- *   hardcoded to router.navigate('onboarding/goals') — fine inside a
- *   sheet, where sheet-manager.js intercepts that call, but a real
- *   navigation when reached directly from Settings, which is why Back
- *   was landing in onboarding goals instead of Settings, and why the
- *   bottom nav and onboarding progress dots were showing. No changes to
- *   conditions.js, equipment.js, or sheet-manager.js — all three already
- *   had the right infrastructure, Settings just wasn't using it. No new
- *   files — sheet-manager.js and its view map were already fully listed
- *   in SHELL_URLS below, cache-busted by this CACHE_NAME bump alone.
- *   NOT done this batch: S4 (navigation lag, reported across multiple
- *   views) — still waiting on a Network-tab capture before touching
- *   that one, per Ground Truth Rule.
- *
- * 04 Jul 2026 v155
- * S1/S3 Settings fixes (second round, same day):
- *   settings.js v8 — S1: age band options updated to match the current
- *     onboarding bands (Under 20/20s/30s/40s/50s/60s/70+). S3: "Your
- *     goals" now renders grouped by category, matching onboarding.
- *   settings.css v4 — added .settings-goals-category / __label styles.
- *
- * 04 Jul 2026 v154
- * router.js v8 — S3 fix. VIEW_NAMES['goal-setup'] path corrected from
- *   './views/goal-setup.js' to './views/onboarding/goal-setup.js'.
- *
- * 04 Jul 2026 v153
- * S1/S2 Settings fixes: settings.js v7 (coach style picker removed,
- *   Nurturing only permanently); settings.css v3 (dropdown option
- *   contrast fixed on all Settings dropdowns).
- *
- * 04 Jul 2026 v152
- * css/components/settings.css v2 — fixed Settings tab strip overlap bug.
- *
- * 04 Jul 2026 v151
- * css/components/nav-fix.css v3 — root cause of the 26 Jun nav truncation
- *   bug found and fixed. CONFIRMED FIXED on device 04 Jul.
- *
- * 03 Jul 2026 v150
- * js/views/onboarding/thread.js v7 — Appendix M scroll fix applied to
- *   onboarding.
- *
- * 03 Jul 2026 v149
- * Fix: v148's changelog said js/data/feelings.js was added to SHELL_URLS,
- *   but it was missing from the actual array.
- *
- * 03 Jul 2026 v148
- * Adding js/data/feelings.js for word selection following mood vs energy
- *
- * 01 Jul 2026 v147
- * alongside-v147 — Step 8: checkin.js conversational rewrite.
- *
- * (Earlier history — alongside-v130 through v142 — unchanged, see prior
+ * (Earlier history — alongside-v130 through v157 — unchanged, see prior
  * versions of this file for full detail.)
  *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v165";
+const CACHE_NAME = "alongside-v166";
 
 const SHELL_URLS = [
 
@@ -278,7 +210,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/onboarding-thread.css",
   "/alongside-app/css/components/sheet-manager.css",
   "/alongside-app/css/components/settings-reflection.css",
-  "/alongside-app/css/components/checkin-conversation.css",   // Step 8 — new
+  "/alongside-app/css/components/checkin-conversation.css",
 
   // Core JS
   "/alongside-app/js/app.js",
@@ -292,7 +224,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/checkin.js",
   "/alongside-app/js/views/checkin-mini.js",
   "/alongside-app/js/views/intention.js",
-  "/alongside-app/js/views/coach-proposal.js",
+  "/alongside-app/js/views/coach-proposal.js",              // v9 — this deploy
   "/alongside-app/js/views/coach-reflection.js",
   "/alongside-app/js/views/workout.js",
   "/alongside-app/js/views/workout-complete.js",
@@ -334,7 +266,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/beat3-scripts.js",
   "/alongside-app/js/data/onboarding-thread-data.js",
   "/alongside-app/js/data/checkin.js",
-  "/alongside-app/js/data/checkin-openings.js",                // Step 8 — new
+  "/alongside-app/js/data/checkin-openings.js",
   "/alongside-app/js/data/conditions.js",
   "/alongside-app/js/data/equipment.js",
   "/alongside-app/js/data/goals.js",
@@ -342,7 +274,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/programmeEngine.js",
   "/alongside-app/js/data/programmes.js",
   "/alongside-app/js/data/signal-words.js",
-  "/alongside-app/js/data/feelings.js",                        // Step 8b — new, was missing from v148
+  "/alongside-app/js/data/feelings.js",
   "/alongside-app/js/data/coach-voice.js",
 
   // Exercise database
