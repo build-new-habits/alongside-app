@@ -1,6 +1,18 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Jul 2026 v169
+ * coach-proposal.css v5 — the file at this path on GitHub contained
+ *   coach-proposal.js's content, not CSS (confirmed by Graeme viewing
+ *   the raw file on GitHub — its header read "* coach-proposal.js" with
+ *   that file's v8 changelog). Every .cp-* class was rendering unstyled
+ *   as a result. Restored to the genuine v4 CSS content, bumped to v5.
+ *   Not something introduced this session — a pre-existing manual
+ *   copy-paste mistake in the repo, only surfaced now because today's
+ *   other fixes were the first time anyone reached a real, working
+ *   Door 1 session to notice the styling was broken. See
+ *   coach-proposal.css v5 changelog for full detail.
+ *
  * 13 Jul 2026 v168
  * coach-proposal.js v11 — _buildReflection() fix. ACTIVITY_LABELS had no
  *   entry for "coach-session", so the reflection line leaked the raw
@@ -215,7 +227,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v168";
+const CACHE_NAME = "alongside-v169";
 
 const SHELL_URLS = [
 
