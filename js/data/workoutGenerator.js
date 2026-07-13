@@ -2,7 +2,52 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
- * 05 Jul 2026 v1.8
+ * 13 Jul 2026 v1.9
+ *
+ * v1.9 — Confirmed Critical bug fix, Session A2 follow-up. This file has
+ *   carried `import { programmeEngine } from "./programmeEngine.js";`
+ *   since at least v1.1 — but programmeEngine.js has never exported a
+ *   `programmeEngine` binding (confirmed by reading the real file this
+ *   session): it exports individual named functions only
+ *   (getPhaseBias, getReEntryContext, getMissedSessionOffer, etc.), no
+ *   default export, no bundled object. This is a SyntaxError at module
+ *   load time in a strict ES module environment — not a runtime error,
+ *   a load-time one — which means this file could never have loaded
+ *   successfully as an ES module, ever, until today.
+ *
+ *   It was never caught because nothing ever actually imported this
+ *   file via a real `import` statement before coach-proposal.js v9
+ *   (13 Jul, Session A2) — the old code used a `window._workoutGenerator`
+ *   runtime property lookup, which never triggered module resolution.
+ *   generateDailyOptions() was therefore ALWAYS running the fallback
+ *   path in coach-proposal.js, silently, this entire time. Door 1 has
+ *   likely never once shown a real generated session to a user.
+ *
+ *   Fixed: changed to `import * as programmeEngine from "./programmeEngine.js"`.
+ *   This captures the real named exports as a namespace object, so the
+ *   three existing `programmeEngine.getPhaseBias()` call sites
+ *   (applyProgrammeBias, getWorkoutFocusOrder, generateDailyOptions)
+ *   continue to work completely unchanged — getPhaseBias does exist.
+ *
+ *   SECOND bug found while fixing the first, same root cause (never
+ *   reachable before today): generateRationale() calls
+ *   `programmeEngine.getStrategicRationale(focus)` unconditionally.
+ *   getStrategicRationale does NOT exist anywhere in programmeEngine.js
+ *   — confirmed by reading the full file. It's referenced in this
+ *   file's own v1.1 changelog ("getStrategicRationale() adds a
+ *   goal-connection line to each rationale") as though it was built,
+ *   but it isn't there. Namespace imports don't error on missing
+ *   properties at import time — this would have thrown
+ *   "programmeEngine.getStrategicRationale is not a function" on every
+ *   single call to generateRationale(), i.e. every generated session,
+ *   the moment the import fix above let the module actually load.
+ *   Guarded with a typeof check rather than invented — this looks like
+ *   a planned-but-never-built feature (not something I should fabricate
+ *   a replacement for), flagging for Graeme to decide whether to build
+ *   it for real or drop the dead reference. Currently: the strategic
+ *   connection line is silently omitted from every rationale, same as
+ *   it always has been in practice (since this code path was never
+ *   reachable before today either).
  *
  * v1.8 — Confirmed bug fix. getUserProfile() was reading
  *   store.get("activityLevel") for fitnessLevel — but store.js has no
@@ -143,7 +188,7 @@
 
 import { store }           from "../store.js";
 import { checkinData }     from "./checkin.js";
-import { programmeEngine } from "./programmeEngine.js";
+import * as programmeEngine from "./programmeEngine.js";   // v1.9 — was `import { programmeEngine }`, which does not exist as a named export
 import {
   getSuitableExercises,
 } from "./exercises.js";
@@ -793,6 +838,11 @@ export const workoutGenerator = {
    * Daily adaptation lines are unchanged from v1.0.
    * Cycle-aware line added when cyclePhase is active (v1.6).
    * Strategic line is appended when a programme is active (v1.1).
+   *
+   * v1.9: strategic connection line guarded — programmeEngine.getStrategicRationale
+   * does not exist in programmeEngine.js. See v1.9 changelog above. Silently
+   * omitted rather than thrown, consistent with the "programme adds a bias,
+   * not a command" principle already stated at the top of this file.
    */
   generateRationale(focus, intensity, burnout, cyclePhase = null, goalProfile = null) {
     const checkin = checkinData.getTodaysCheckin();
@@ -852,9 +902,11 @@ export const workoutGenerator = {
       parts.push("I have adjusted for your poor sleep last night.");
     }
 
-    // Strategic connection line (v1.1)
-    const strategicLine = programmeEngine.getStrategicRationale(focus);
-    if (strategicLine) parts.push(strategicLine);
+    // Strategic connection line (v1.1) — v1.9: guarded, see changelog above.
+    if (typeof programmeEngine.getStrategicRationale === "function") {
+      const strategicLine = programmeEngine.getStrategicRationale(focus);
+      if (strategicLine) parts.push(strategicLine);
+    }
 
     return parts.join(" ");
   },
