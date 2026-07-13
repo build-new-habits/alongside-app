@@ -1,9 +1,22 @@
 /**
  * coach-proposal.js
- * 13 Jul 2026 v10
+ * 13 Jul 2026 v11
  *
  * Coach proposal view. The hub. Doors that describe categories, not
  * pre-committed choices.
+ *
+ * v11 — Confirmed bug fix. _buildReflection()'s ACTIVITY_LABELS map had
+ *   no entry for "coach-session" — an activityLog entry type this map
+ *   doesn't otherwise account for (not ground-truthed which file writes
+ *   it; flagging rather than tracing it down, since the fix here doesn't
+ *   depend on knowing the writer). Effect: the reflection line read
+ *   "Since yesterday, you did coach-session" — a raw internal type
+ *   string leaking into coach copy. Fixed two ways: (1) added an
+ *   explicit "coach-session" → "a coaching session" mapping, and (2)
+ *   added a generic fallback humaniser (hyphens → spaces) for ANY future
+ *   unmapped type, so this class of bug can't silently recur the same
+ *   way for a type nobody's added to the map yet. Not as polished as a
+ *   real label for an unknown type, but never leaks raw code again.
  *
  * v10 — v9 was deployed earlier today and immediately rolled back: it
  *   correctly diagnosed that generateDailyOptions() was never receiving
@@ -783,7 +796,14 @@ export function CoachProposalView(router) {
       'quiet-session':    'a breathing session',
       'breathing-session':'a breathing session',
       'gym-programme':    'gym work',
+      'coach-session':    'a coaching session',   // v11 — was leaking raw as "coach-session"
     };
+
+    // v11: fallback for any type not in the map above — hyphens to spaces
+    // rather than leaking the literal raw type string into coach copy.
+    function _humanizeActivityType(type) {
+      return String(type).replace(/-/g, ' ');
+    }
 
     // Deduplicate by type
     const typesSeen = new Set();
@@ -792,7 +812,7 @@ export function CoachProposalView(router) {
       const type = entry.type || entry.activityType || 'movement';
       if (!typesSeen.has(type)) {
         typesSeen.add(type);
-        uniqueTypes.push(ACTIVITY_LABELS[type] || type);
+        uniqueTypes.push(ACTIVITY_LABELS[type] || _humanizeActivityType(type));
       }
     });
 
