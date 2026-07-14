@@ -1,6 +1,22 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 14 Jul 2026 v170
+ * workout.js v4 — closed the workout.js -> activityLog gap (Session A,
+ *   items 2 & 3). completeWorkout() now pushes an activityLog entry
+ *   (date/completedAt/type:'workout'/durationMins/moodAfter/isEvent/
+ *   eventName) alongside its existing workoutHistory write. today.js's
+ *   _resolveState() needed this to detect "session-done" — confirmed
+ *   working end-to-end on device this session ("You moved today.
+ *   That's done." correctly shown after waiting out the 10-minute
+ *   proposal-accepted window). No schema change required — the entry
+ *   shape already matched store.js v8's documented activityLog fields.
+ *   Deploy-verification habit: live GitHub Pages fetch of workout.js/
+ *   today.js/sw.js returned binary/unreadable content this session —
+ *   fell back to Graeme pasting full file contents per the Ground
+ *   Truth Rule's documented fallback. Cache-bump only otherwise; no
+ *   other files changed this deploy.
+ *
  * 13 Jul 2026 v169
  * coach-proposal.css v5 — the file at this path on GitHub contained
  *   coach-proposal.js's content, not CSS (confirmed by Graeme viewing
@@ -82,152 +98,16 @@
  *   with zero CSS since checkin.js's 01 Jul conversational rewrite —
  *   migrated to reuse checkin-conversation.css's existing .ci-* classes
  *   rather than left on the orphaned .checkin-*/.mini-* naming.
- *   FLAGGED, NOT FIXED: workout.js's completeWorkout() writes to
- *   workoutHistory but not activityLog — today.js's "session done"
- *   detection reads activityLog, so it may still not fire correctly
- *   after a real generated session completes even with this loop fixed.
- *   Worth checking on device once the loop itself is confirmed resolved.
+ *   FLAGGED, NOT FIXED — resolved in v170: workout.js's completeWorkout()
+ *   wrote to workoutHistory but not activityLog.
  *
- * ── STILL OUTSTANDING FROM BEFORE THIS SESSION — confirmed undeployed ──
- * Ground-truthed today against Graeme's actual live files: the site was
- * running v163, not v164 — meaning two earlier fixes never went live:
- *   - coach-proposal.css v4 (the full-screen-blocked Critical fix)
- *   - workoutGenerator.js v1.8 (the fitnessLevel/activityLevel fix)
- * Both are included in this deploy batch. Deploy ALL SIX changed files
- * together — cache-busting alone does nothing if the underlying file
- * on GitHub was never actually replaced, which is what happened here.
- *
- * 05 Jul 2026 v164
- * coach-proposal.css v4 — CRITICAL fix, same day as v3 shipped. v3's
- *   .cp-preview-panel set `display: flex` unconditionally, which
- *   overrides the [hidden] attribute's browser-default `display: none`
- *   (an author class selector beats that low-specificity UA rule). The
- *   result: the full-screen, z-index 9999 panel and its dark backdrop
- *   were rendered and capturing every tap from page load — not just
- *   when Door 1 was opened. Nothing on the Today screen was visible or
- *   clickable. Reported by Graeme within minutes of the v163 deploy as
- *   "I can't see or choose anything." Fixed: `display` moved off the
- *   base rule onto `.cp-preview-panel.is-open` only, matching the
- *   already-correct pattern in weekly-plan-v2.css's .wp-config-sheet
- *   (which never fights the hidden attribute in the first place). Same
- *   bug category as this morning's nav-bar z-index collision — flagged
- *   in v3's own changelog as a lesson, then walked into a variant of it
- *   within the same session.
- *
- * 05 Jul 2026 v163
- * coach-proposal.js v8 + coach-proposal.css v3 — Door redesign (Door 1
- *   only, per Graeme's brief this session). Doors now describe
- *   categories honestly rather than pre-committing to a specific
- *   session the generator couldn't actually produce. Door 1 opens a
- *   right-slide preview panel (new .cp-preview-panel, z-index 9999 from
- *   the start) showing the 3 generated options as selectable cards,
- *   top-ranked one gold-marked "Recommended," select-then-"Start
- *   Session" to commit, "Not today" to back out.
- *   REAL BEHAVIOUR CHANGE, flagged not buried: Door 2 ("Your
- *   programme") and Door 3 ("Something different") are deliberately
- *   disabled — reusing the existing disabled-door treatment — since
- *   their new spec needs real new logic (Door 2: an "uninterrupted"
- *   bypass mode in workoutGenerator.js; Door 3: pre-selection support
- *   in walk-session.js/yoga-session.js) that doesn't exist yet. Only
- *   one of three doors is functional until those are built.
- *   Severe-pain handling changed in spirit: no longer disables Door 1
- *   entirely — shows up in which option gets generated instead, since
- *   Door 1 IS the adapted-for-you door now. The old hard-disable
- *   behaviour is Door 2's territory when it's built.
- *   Caught and fixed during this same build, before presenting:
- *   accidentally dropped the _checkSeverePain/_checkModeratePain/
- *   _buildConstraintMessage function definitions while restructuring
- *   (still called by buildProposal() — would have thrown immediately);
- *   and the fallback-options path (used only if workoutGenerator itself
- *   is unavailable) didn't match the shape the new preview cards need
- *   (no id/duration/exerciseCount/rationale) — every fallback card
- *   would have shared the same missing id, breaking selection. Both
- *   fixed before this file was finalised.
- *
- * 05 Jul 2026 v162
- * workout.js v3 — Critical bug fix, this is the "exercise generation —
- *   selection not carrying through" item already logged in the master
- *   schedule (v38) from a separate session. Root cause now confirmed:
- *   coach-proposal.js writes the chosen session to store.generatedSession;
- *   workout.js read from store.activeWorkout, a key nothing ever wrote to.
- *   Every real generated session dead-ended at "No workout selected."
- *   Fixed by reading generatedSession.session throughout, and clearing
- *   generatedSession (to its store.js default shape) in cleanupWorkout()
- *   instead of nulling activeWorkout. Deliberately scoped to the
- *   generic "workout" route only — walk-session.js and yoga-session.js
- *   remain self-contained, not touched. See coach-proposal.js v7
- *   changelog and the master schedule for the fuller architecture
- *   discussion (Option A vs B) this sits inside.
- *
- * 05 Jul 2026 v161
- * workoutGenerator.js v1.8 — confirmed bug fix, found while ground-
- *   truthing this file for the movementIdentity wiring question.
- *   getUserProfile() read store.get("activityLevel") for fitnessLevel —
- *   no such top-level field exists in store.js (the real field is
- *   fitnessLevel; there's also a distinct nested lifestyle.activityLevel,
- *   which made this an easy mix-up). Effect: fitnessLevel in the
- *   generator's profile was always "moderate" — the Activity Level
- *   dropdown in Settings has never changed anything about generated
- *   sessions. Fixed to read the correct key. Already listed in
- *   SHELL_URLS below, cache-busted by this bump alone.
- *
- * 05 Jul 2026 v160
- * coach-proposal.js v7 — confirmed bug fix, found while ground-truthing
- *   this file for the My Movement wiring question (not what I was
- *   looking for, but couldn't ignore it once seen). Two functions were
- *   pulled in via require() inside function bodies — invalid in this
- *   browser ES module environment, no bundler. Both would throw
- *   `require is not defined` at runtime:
- *     - getReEntryIntensity (re-entry gentler-start path)
- *     - applyMissedSessionAdaptation ("Stay in 12 weeks"/"Keep the same
- *       rhythm" buttons)
- *   Fixed by adding both to the file's existing top-level import from
- *   programmeEngine.js. No other changes.
- *
- * 05 Jul 2026 v159
- * settings.js v11 + settings.css v5 — My Movement rebuild (agreed 13 May,
- *   never built). Schema laid in store.js v8 earlier this session
- *   (movementIdentity: string|null -> string[], migration-safe). This
- *   deploy adds the actual UI: a "How you move" section in the Profile
- *   panel, six chips as true multi-select (gym/yoga/running/walking/
- *   swimming/classes), plus a separate "A mix of things" chip that's
- *   mutually exclusive with the six. Reuses the same colour-mix/border
- *   pattern already proven accessible in .settings-goal-chip--selected —
- *   no new contrast combination, no new WebAIM check needed.
- *   NOT done this batch: coach-proposal.js's scoring logic against the
- *   new array shape — not ground-truthed this session, flagged for next
- *   time this file is in scope. (Still not done as of v166 — this is
- *   Session E's scope, sequenced after Session A2.)
- *
- * 05 Jul 2026 v158
- * weekly-plan-v2.css v2 + weekly-plan.js v3 — two fixes found via a
- *   device screenshot of My Week's config sheet:
- *   1. Nav bar covering the Save button. Root cause: .wp-config-sheet
- *      was z-index: 9000, an exact tie with nav-fix.css's #bottom-nav
- *      (z-index: 9000 !important). On a tie between two position:fixed
- *      stacking contexts, later DOM order wins — the nav bar sits after
- *      the router-swapped content in the app shell, so it always won.
- *      Raised .wp-config-sheet to 9999, matching the convention already
- *      used by settings.css's .settings-dialog. No changes to
- *      nav-fix.css.
- *   2. Missing location. store.js has carried
- *      weeklyPlan.days[day].location since 21 May specifically so "the
- *      coach can adapt equipment selection" — but no UI ever collected
- *      it, so a planned gym/recovery day had no way to say home vs gym
- *      vs outside. Added a "Where?" chip row, reusing the existing
- *      .wp-chip styling (no new CSS classes). No schema change needed.
- *   Also flagged, not fixed: weekly-plan.css (30 May v1) appears to be
- *   dead CSS from an earlier table-layout redesign that doesn't match
- *   any class in the current weekly-plan.js — worth removing from
- *   SHELL_URLS in a future cleanup pass.
- *
- * (Earlier history — alongside-v130 through v157 — unchanged, see prior
+ * (Earlier history — alongside-v130 through v164 — unchanged, see prior
  * versions of this file for full detail.)
  *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v169";
+const CACHE_NAME = "alongside-v170";
 
 const SHELL_URLS = [
 
@@ -268,9 +148,9 @@ const SHELL_URLS = [
   "/alongside-app/js/views/checkin.js",
   "/alongside-app/js/views/checkin-mini.js",
   "/alongside-app/js/views/intention.js",
-  "/alongside-app/js/views/coach-proposal.js",              // v11 — this deploy
+  "/alongside-app/js/views/coach-proposal.js",
   "/alongside-app/js/views/coach-reflection.js",
-  "/alongside-app/js/views/workout.js",
+  "/alongside-app/js/views/workout.js",              // v4 — this deploy
   "/alongside-app/js/views/workout-complete.js",
   "/alongside-app/js/views/progress.js",
   "/alongside-app/js/views/settings.js",
