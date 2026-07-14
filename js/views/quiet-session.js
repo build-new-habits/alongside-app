@@ -628,4 +628,403 @@ function renderMindfulSession(step) {
 
   return `
     <div class="card card-coach quiet-coach-card" style="margin-bottom:var(--space-4);">
-      <img src="assets/images/logo-icon-128.png" alt=""
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <h3>${step.name}</h3>
+        <p class="text-sm">${step.instruction}</p>
+        ${step.coaching ? `
+          <p class="text-sm text-muted" style="margin-top:var(--space-3);">
+            ${step.coaching}
+          </p>
+        ` : ""}
+      </div>
+    </div>
+
+    <div class="quiet-mindful-timer">
+      <div class="quiet-mindful-clock" aria-live="polite"
+           aria-label="${timeDisplay} remaining">
+        <span id="quiet-mindful-time">${timeDisplay}</span>
+      </div>
+      <p class="text-sm text-muted" style="margin-top:var(--space-2);">remaining</p>
+    </div>
+
+    <div class="quiet-progress-bar" style="margin: var(--space-4) var(--space-4) 0;"
+         role="progressbar" aria-valuenow="${progressPct}" aria-valuemin="0" aria-valuemax="100"
+         aria-label="Session progress">
+      <div class="quiet-progress-fill" style="width:${progressPct}%"></div>
+    </div>
+
+    <div style="padding: 0 var(--space-4);">
+      <button class="btn btn-danger btn-full" id="quiet-mindful-stop-btn"
+              style="margin-top:var(--space-6);">
+        End session early
+      </button>
+    </div>
+  `;
+}
+
+function renderMindfulComplete() {
+  return `
+    <div class="card card-coach quiet-coach-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <h3>Session complete.</h3>
+        <p>You gave yourself ${mindfulDuration} minutes. That is not nothing. Notice what
+           is different, even slightly, from when you started.</p>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-full quiet-back-btn"
+            style="margin-top:var(--space-5); margin-left:var(--space-4); margin-right:var(--space-4);">
+      Back to choices
+    </button>
+  `;
+}
+
+// ── Rest mode ─────────────────────────────────────────────────────────────────
+
+function renderRestMode() {
+  const checkin = store.get("checkinHistory") || {};
+  const todayKey = new Date().toISOString().split("T")[0];
+  const today = checkin[todayKey] || {};
+  const energy = today.energy || 5;
+
+  let coachLine;
+  if (energy <= 3) {
+    coachLine = "Your body is asking for rest today. That is not failure. Rest is what makes the training work. You made the right call.";
+  } else if (energy <= 6) {
+    coachLine = "Rest days are part of the programme, not a break from it. Adaptation happens when you are not training. Enjoy the stillness.";
+  } else {
+    coachLine = "High energy and choosing rest takes a different kind of discipline. If your body needs it, this is the right choice. If you want to move later, we will be here.";
+  }
+
+  return `
+    <div class="card card-coach quiet-coach-card">
+      <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <h3>Rest day.</h3>
+        <p>${coachLine}</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:var(--space-5); margin-left:var(--space-4); margin-right:var(--space-4);">
+      <p class="text-sm text-muted">
+        If you want gentle movement later, breathing practice or a short mindful
+        session are always here. No pressure either way.
+      </p>
+    </div>
+
+    <button class="btn btn-ghost btn-full quiet-back-btn"
+            style="margin-top:var(--space-5); margin-left:var(--space-4); margin-right:var(--space-4);">
+      Back to choices
+    </button>
+  `;
+}
+
+// ── Timer logic ───────────────────────────────────────────────────────────────
+
+function startBreathing(exerciseId) {
+  const ex = BREATHING_EXERCISES.find(e => e.id === exerciseId);
+  if (!ex) return;
+
+  selectedBreathing  = exerciseId;
+  breathingPhase     = 0;
+  breathingRound     = 0;
+  breathingComplete  = false;
+  phaseSecondsLeft   = ex.phases[0].seconds;
+
+  rerender();
+
+  breathingInterval = setInterval(() => {
+    phaseSecondsLeft--;
+
+    const secondsEl = document.getElementById("quiet-timer-seconds");
+    const phaseEl   = document.getElementById("quiet-phase-label");
+    const circleEl  = document.getElementById("quiet-timer-circle");
+
+    if (secondsEl) secondsEl.textContent = phaseSecondsLeft;
+
+    if (phaseSecondsLeft <= 0) {
+      breathingPhase++;
+
+      if (breathingPhase >= ex.phases.length) {
+        breathingPhase = 0;
+        breathingRound++;
+      }
+
+      if (breathingRound >= ex.rounds) {
+        clearInterval(breathingInterval);
+        breathingInterval = null;
+        breathingComplete = true;
+        logSession("breathing", ex.name, ex.credits);
+        rerender();
+        return;
+      }
+
+      const nextPhase = ex.phases[breathingPhase];
+      phaseSecondsLeft = nextPhase.seconds;
+
+      if (phaseEl)   phaseEl.textContent = nextPhase.label;
+      if (circleEl)  circleEl.style.setProperty("--phase-colour", nextPhase.colour);
+      if (secondsEl) secondsEl.textContent = phaseSecondsLeft;
+
+      document.querySelectorAll(".quiet-phase-dot").forEach((dot, i) => {
+        dot.classList.toggle("active", i === breathingPhase);
+        if (i === breathingPhase) dot.style.setProperty("--dot-colour", nextPhase.colour);
+      });
+
+      const roundEl = document.querySelector(".quiet-round-progress .text-sm");
+      if (roundEl) roundEl.textContent = "Round " + (breathingRound + 1) + " of " + ex.rounds;
+    }
+  }, 1000);
+}
+
+function stopBreathing() {
+  if (breathingInterval) clearInterval(breathingInterval);
+  breathingInterval = null;
+  selectedBreathing = null;
+  breathingComplete = false;
+  breathingRound    = 0;
+  breathingPhase    = 0;
+  rerender();
+}
+
+function startMindfulSession() {
+  const session = MINDFUL_SESSIONS[mindfulDuration];
+  if (!session?.length) return;
+
+  mindfulStarted      = true;
+  mindfulStep         = 0;
+  mindfulComplete     = false;
+  mindfulTotalSeconds = mindfulDuration * 60;
+  mindfulElapsed      = 0;
+  mindfulStepElapsed  = 0;
+
+  // Render the session view directly — avoids rerender() calling cleanup()
+  const content = document.getElementById("quiet-session-content");
+  if (content) {
+    content.innerHTML = renderMindfulSession(session[0]);
+    document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
+  }
+
+  runMindfulTimer(session);
+}
+
+function runMindfulTimer(session) {
+  if (mindfulTimer) clearInterval(mindfulTimer);
+
+  mindfulTimer = setInterval(() => {
+    mindfulElapsed++;
+    mindfulStepElapsed++;
+
+    // Update the countdown display only — no full rerender
+    const timeEl = document.getElementById("quiet-mindful-time");
+    if (timeEl) {
+      timeEl.textContent = formatTime(Math.max(0, mindfulTotalSeconds - mindfulElapsed));
+    }
+
+    // Update progress bar
+    const fill = document.querySelector(".quiet-progress-fill");
+    if (fill) {
+      const pct = Math.min(100, Math.round((mindfulElapsed / mindfulTotalSeconds) * 100));
+      fill.style.width = pct + "%";
+      fill.closest(".quiet-progress-bar")?.setAttribute("aria-valuenow", pct);
+    }
+
+    // Check if current step is done
+    const currentStepDuration = session[mindfulStep].duration;
+    if (mindfulStepElapsed >= currentStepDuration) {
+      mindfulStep++;
+      mindfulStepElapsed = 0;
+
+      if (mindfulStep >= session.length) {
+        // Session complete
+        clearInterval(mindfulTimer);
+        mindfulTimer    = null;
+        mindfulComplete = true;
+        logSession("mindful", mindfulDuration + " min mindful session", 20);
+        rerender();
+        return;
+      }
+
+      // Advance to next step — render new instruction card only
+      const content = document.getElementById("quiet-session-content");
+      if (content) {
+        content.innerHTML = renderMindfulSession(session[mindfulStep]);
+        document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
+      }
+    }
+  }, 1000);
+}
+
+function stopMindful() {
+  if (mindfulTimer) clearInterval(mindfulTimer);
+  mindfulTimer       = null;
+  mindfulStarted     = false;
+  mindfulComplete    = false;
+  mindfulStep        = 0;
+  mindfulElapsed     = 0;
+  mindfulStepElapsed = 0;
+  rerender();
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return m + ":" + String(s).padStart(2, "0");
+}
+
+// ── Session logging ───────────────────────────────────────────────────────────
+
+function logSession(type, name, credits) {
+  const existing = store.get("activityLog") || [];
+  existing.push({
+    id:        "quiet-" + Date.now(),
+    type,
+    name,
+    source:    "quiet-session",
+    credits,
+    duration:  null,
+    loggedAt:  new Date().toISOString()
+  });
+  store.set("activityLog", existing);
+
+  const current = store.get("totalCredits") || 0;
+  store.set("totalCredits", current + credits);
+  store.set("lastWorkoutCredits", credits);
+  store.set("lastWorkoutName", name);
+}
+
+// ── Mount ─────────────────────────────────────────────────────────────────────
+
+export function onMount() {
+  mode = store.get("quietMode") || "selector";
+
+  document.querySelectorAll(".quiet-mode-card").forEach(card => {
+    card.addEventListener("click", () => {
+      mode = card.dataset.mode;
+      store.set("quietMode", mode);
+      rerender();
+    });
+  });
+
+  document.querySelectorAll(".quiet-back-btn, #quiet-back-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const returnRoute = store.get("quietReturnRoute") || "intention";
+      if (mode && mode !== "selector") {
+        const launchedDirectly = store.get("quietLaunchedDirect") || false;
+        if (launchedDirectly) {
+          cleanup();
+          store.set("quietMode", null);
+          store.set("quietReturnRoute", null);
+          store.set("quietLaunchedDirect", false);
+          router.navigate(returnRoute);
+        } else {
+          mode = "selector";
+          store.set("quietMode", null);
+          cleanup();
+          rerender();
+        }
+      } else {
+        cleanup();
+        store.set("quietMode", null);
+        store.set("quietReturnRoute", null);
+        store.set("quietLaunchedDirect", false);
+        router.navigate(returnRoute);
+      }
+    });
+  });
+
+  document.querySelectorAll(".quiet-breathing-card").forEach(card => {
+    card.addEventListener("click", () => {
+      startBreathing(card.dataset.breathingId);
+    });
+  });
+
+  document.getElementById("quiet-stop-breathing-btn")?.addEventListener("click", stopBreathing);
+
+  document.getElementById("quiet-try-another-btn")?.addEventListener("click", () => {
+    selectedBreathing = null;
+    breathingComplete = false;
+    rerender();
+  });
+
+  document.getElementById("quiet-breathing-done-btn")?.addEventListener("click", () => {
+    const returnRoute = store.get("quietReturnRoute") || "intention";
+    cleanup();
+    store.set("quietMode", null);
+    store.set("quietReturnRoute", null);
+    store.set("quietLaunchedDirect", false);
+    router.navigate(returnRoute);
+  });
+
+  document.querySelectorAll(".quiet-difficulty-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll(".quiet-difficulty-chip").forEach(c => {
+        c.classList.toggle("selected", c === chip);
+        c.setAttribute("aria-pressed", c === chip);
+      });
+    });
+  });
+
+  document.getElementById("quiet-journal-save-btn")?.addEventListener("click", saveJournalEntry);
+
+  document.getElementById("quiet-journal-skip-btn")?.addEventListener("click", () => {
+    const returnRoute = store.get("quietReturnRoute") || "intention";
+    cleanup();
+    store.set("quietMode", null);
+    store.set("quietReturnRoute", null);
+    store.set("quietLaunchedDirect", false);
+    router.navigate(returnRoute);
+  });
+
+  document.querySelectorAll(".quiet-duration-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      mindfulDuration = parseInt(btn.dataset.duration);
+      document.querySelectorAll(".quiet-duration-btn").forEach(b => {
+        b.classList.toggle("selected", b === btn);
+        b.setAttribute("aria-pressed", b === btn);
+      });
+      const startBtn = document.getElementById("quiet-mindful-start-btn");
+      if (startBtn) startBtn.textContent = "Begin " + mindfulDuration + "-minute session";
+    });
+  });
+
+  document.getElementById("quiet-mindful-start-btn")?.addEventListener("click", startMindfulSession);
+  document.getElementById("quiet-mindful-stop-btn")?.addEventListener("click", stopMindful);
+}
+
+// ── Cleanup / onUnmount ───────────────────────────────────────────────────────
+
+function cleanup() {
+  if (breathingInterval) clearInterval(breathingInterval);
+  if (mindfulTimer)      clearInterval(mindfulTimer);
+  breathingInterval  = null;
+  mindfulTimer       = null;
+  selectedBreathing  = null;
+  breathingComplete  = false;
+  mindfulStarted     = false;
+  mindfulComplete    = false;
+  mindfulStep        = 0;
+  mindfulElapsed     = 0;
+  mindfulStepElapsed = 0;
+  journalSaved       = false;
+  journalPrompts     = [];
+}
+
+/**
+ * Called by router.navigate() before leaving this view.
+ * Stops all active timers so device back gesture cannot leave
+ * breathing or mindful intervals running in the background.
+ */
+export function onUnmount() {
+  cleanup();
+}
+
+function rerender() {
+  const content = document.getElementById("quiet-session-content");
+  if (content) {
+    content.innerHTML = renderMode();
+    onMount();
+  }
+}
