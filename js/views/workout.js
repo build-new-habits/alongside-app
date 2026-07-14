@@ -1,6 +1,23 @@
 /**
  * workout.js - Workout Execution View
- * 05 Jul 2026 v3
+ * 14 Jul 2026 v4
+ *
+ * v4 — Closed the workout.js -> activityLog gap (Session A, item 3).
+ *   Confirmed live: completeWorkout() wrote to workoutHistory but never
+ *   to activityLog. today.js's _resolveState() reads activityLog and
+ *   checks each entry's completedAt/loggedAt/date against today's date
+ *   to decide the "session-done" state — with no activityLog entry, a
+ *   real completed session never registered as done on Today.
+ *   Fixed: completeWorkout() now also pushes an entry to activityLog
+ *   matching the shape already documented in store.js's ACTIVITY LOG
+ *   comment ({ date, type, durationMins, moodAfter, isEvent, eventName }).
+ *   type: 'workout' — matches today.js's existing TYPE_LABELS ('strength
+ *   work') and TYPE_ROUTE ('workout') maps, so no schema change was
+ *   needed and no new type value was invented.
+ *   durationMins left null — this view does not currently track total
+ *   elapsed session time; not in scope for this fix.
+ *   moodAfter, isEvent, eventName left at their schema defaults
+ *   (null/false/null) — this view has no UI to set them.
  *
  * v3 — Confirmed Critical bug fix: this view read store.get("activeWorkout"),
  *   but coach-proposal.js's handleDoorChoice() writes the chosen session to
@@ -342,6 +359,7 @@ function resetTimer() {
 function completeWorkout() {
   const workout  = _getWorkout();
   const progress = store.get("workoutProgress") || [];
+  const nowIso   = new Date().toISOString();
 
   // Credits
   const creditsEarned = progress.reduce((sum, e) => sum + (e.credits || 0), 0);
@@ -354,12 +372,29 @@ function completeWorkout() {
     workoutId:          workout.id,
     name:               workout.name,
     focus:              workout.focus,
-    completedAt:        new Date().toISOString(),
+    completedAt:        nowIso,
     exercisesCompleted: progress.length,
     totalExercises:     workout.exercises.length,
     creditsEarned
   });
   store.set("workoutHistory", history);
+
+  // v4 — activityLog entry. today.js's _resolveState() needs this to
+  // detect "session-done"; it was missing entirely before this fix.
+  // Shape matches store.js's documented activityLog entry fields.
+  // type: 'workout' matches today.js's existing TYPE_LABELS/TYPE_ROUTE
+  // maps, so no new type value or schema change was required.
+  const activityLog = store.get("activityLog") || [];
+  activityLog.push({
+    date:         nowIso,
+    completedAt:  nowIso,
+    type:         "workout",
+    durationMins: null,
+    moodAfter:    null,
+    isEvent:      false,
+    eventName:    null
+  });
+  store.set("activityLog", activityLog);
 
   // Record session with programme engine.
   // recordSession() takes a sessionData object and returns { milestoneAchieved }.
