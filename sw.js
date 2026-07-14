@@ -1,6 +1,19 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 14 Jul 2026 v172
+ * journal-entry.js v3, checkin-openings.js v2, quiet-session.js v4 —
+ *   Session B2 findings, deployed. journal-entry.js/checkin-openings.js:
+ *   Journal Privacy Rule fix (Appendix D) — removed signal detection on
+ *   journal text (write side) and the journal-content-derived Mode 5
+ *   milestone trigger that read it (read side); the latter was live and
+ *   firing in production, not dormant. quiet-session.js: added missing
+ *   `router` import — onMount()'s back-button handlers were calling
+ *   router.navigate() with no import, a live ReferenceError on the only
+ *   entry point to mindful movement (via noticing.js). Cache bump only,
+ *   so already-installed clients pick up all three corrected files
+ *   rather than continuing to serve the pre-fix cached copies.
+ *
  * 14 Jul 2026 v171
  * index.html v1 — Sentry error monitoring loader script added to <head>
  *   (Session A, item 1, DSN received and confirmed working end-to-end:
@@ -31,7 +44,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v171";
+const CACHE_NAME = "alongside-v172";
 
 const SHELL_URLS = [
 
