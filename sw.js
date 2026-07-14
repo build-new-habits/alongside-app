@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 14 Jul 2026 v171
+ * index.html v1 — Sentry error monitoring loader script added to <head>
+ *   (Session A, item 1, DSN received and confirmed working end-to-end:
+ *   Sentry Issues showed a live "Error | test-3" event, Unhandled,
+ *   after a setTimeout-wrapped throw — confirmed on device). Cache
+ *   bump only, so already-installed clients pick up the new index.html
+ *   rather than continuing to serve the pre-Sentry cached copy.
+ *
  * 14 Jul 2026 v170
  * workout.js v4 — closed the workout.js -> activityLog gap (Session A,
  *   items 2 & 3). completeWorkout() now pushes an activityLog entry
@@ -17,97 +25,13 @@
  *   Truth Rule's documented fallback. Cache-bump only otherwise; no
  *   other files changed this deploy.
  *
- * 13 Jul 2026 v169
- * coach-proposal.css v5 — the file at this path on GitHub contained
- *   coach-proposal.js's content, not CSS (confirmed by Graeme viewing
- *   the raw file on GitHub — its header read "* coach-proposal.js" with
- *   that file's v8 changelog). Every .cp-* class was rendering unstyled
- *   as a result. Restored to the genuine v4 CSS content, bumped to v5.
- *   Not something introduced this session — a pre-existing manual
- *   copy-paste mistake in the repo, only surfaced now because today's
- *   other fixes were the first time anyone reached a real, working
- *   Door 1 session to notice the styling was broken. See
- *   coach-proposal.css v5 changelog for full detail.
- *
- * 13 Jul 2026 v168
- * coach-proposal.js v11 — _buildReflection() fix. ACTIVITY_LABELS had no
- *   entry for "coach-session", so the reflection line leaked the raw
- *   internal type ("Since yesterday, you did coach-session"). Added an
- *   explicit label plus a generic hyphen-to-space fallback for any
- *   future unmapped type. See coach-proposal.js v11 changelog.
- *
- * 13 Jul 2026 v167
- * coach-proposal.js v10 + workoutGenerator.js v1.9 — redeploy of the
- *   Session A2 fix after v166/coach-proposal.js v9 broke the entire
- *   coach-proposal page and was rolled back to v165/v8 earlier today.
- *   Root cause of the outage: workoutGenerator.js has carried a broken
- *   import (`import { programmeEngine } from "./programmeEngine.js"`,
- *   which does not exist as a named export — programmeEngine.js exports
- *   individual named functions only) since at least workoutGenerator.js
- *   v1.1. This was never caught because nothing had ever actually
- *   loaded workoutGenerator.js as a real ES module before v9's static
- *   import forced it to resolve. A second, related bug surfaced at the
- *   same time: generateRationale() called a
- *   programmeEngine.getStrategicRationale() that does not exist
- *   anywhere in programmeEngine.js — would have thrown on every
- *   generated session once the import itself was fixed. Both fixed in
- *   workoutGenerator.js v1.9 (see that file's changelog for full
- *   detail). coach-proposal.js v10 is content-identical to the rolled-
- *   back v9 — the fix was entirely in workoutGenerator.js.
- *   Practical implication worth naming plainly: Door 1 has likely never
- *   once shown a real generated session to a user before this deploy —
- *   the old window._workoutGenerator lookup silently fell through to
- *   fallback options every single time, since nothing ever set that
- *   global. This deploy is the first time the real generator has ever
- *   actually run in production.
- *
- * 13 Jul 2026 v166 — DEPLOYED AND ROLLED BACK SAME DAY. See v167 above.
- * coach-proposal.js v9 — Session A2 fix. _generateOptions() looked up
- *   window._workoutGenerator at runtime and called generateDailyOptions()
- *   with a parameter object (energy/burnout/intensityBias/focusBias/
- *   availableTime) — but nothing in the codebase sets that global, and
- *   even if found, the real function takes zero parameters and always
- *   discarded the object. Of the five values lost, three (energy, burnout,
- *   focus order) were already redundant — generateDailyOptions() re-derives
- *   them itself from store/checkinData/programmeEngine. Two were not:
- *   the re-entry gentler-start intensity override and availableTime.
- *   Fixed: replaced the window global lookup with a direct top-level
- *   import of workoutGenerator.js (no circular dependency exists); the
- *   two values that matter are now written to store immediately before
- *   calling generateDailyOptions(), which already reads them from there.
- *   No change to generateDailyOptions()'s own signature or contract.
- *   ALSO INVESTIGATED, NOT A BUG: _routeForOption() defaulting every real
- *   generated option to the 'workout' route (since real output only has
- *   `focus`, never `type`) is correct, not a defect — the generator only
- *   ever produces workout.js-shaped sessions regardless of focus. No
- *   change made there. Full reasoning in coach-proposal.js v9 header.
- *   workoutGenerator.js unchanged this deploy — the fix is entirely on
- *   the caller side.
- *
- * 10 Jul 2026 v165
- * intention.js v6 + checkin-mini.js v2 + checkin-conversation.css v2 —
- *   fixes for the "I want to move again" infinite loop Graeme reported
- *   (screenshots + live files this session). Root cause: intention.js's
- *   "coach" path wrote a fake activityLog entry and routed to "today"
- *   instead of "coach-proposal" — today.js then saw that fake entry and
- *   reported a session as already done, offering "move again" forever
- *   without ever reaching the actual doors. Fixed: routes to
- *   coach-proposal directly, writes nothing until a real session
- *   happens. Separately: checkin-mini.js's location/pain/slider UI
- *   (the unstyled buttons in Graeme's screenshot) has been rendering
- *   with zero CSS since checkin.js's 01 Jul conversational rewrite —
- *   migrated to reuse checkin-conversation.css's existing .ci-* classes
- *   rather than left on the orphaned .checkin-*/.mini-* naming.
- *   FLAGGED, NOT FIXED — resolved in v170: workout.js's completeWorkout()
- *   wrote to workoutHistory but not activityLog.
- *
- * (Earlier history — alongside-v130 through v164 — unchanged, see prior
+ * (Earlier history — alongside-v130 through v169 — unchanged, see prior
  * versions of this file for full detail.)
  *
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v170";
+const CACHE_NAME = "alongside-v171";
 
 const SHELL_URLS = [
 
@@ -150,7 +74,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/intention.js",
   "/alongside-app/js/views/coach-proposal.js",
   "/alongside-app/js/views/coach-reflection.js",
-  "/alongside-app/js/views/workout.js",              // v4 — this deploy
+  "/alongside-app/js/views/workout.js",
   "/alongside-app/js/views/workout-complete.js",
   "/alongside-app/js/views/progress.js",
   "/alongside-app/js/views/settings.js",
