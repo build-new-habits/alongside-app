@@ -1,20 +1,34 @@
 /**
  * journal-entry.js
- * 23 Jun 2026 v2
+ * 14 Jul 2026 v3
  *
  * Journal entry view — the noticing hub's primary text input.
- * v2 adds signal word detection at save time (P5-JE-1).
  *
- * v2 changes:
- *   - Import detectSignals() from signal-words.js
- *   - At save: call detectSignals(text) on the entry text
- *   - Write hasProgressSignal (bool) and hasStruggleSignal (bool) to the entry
- *   - These flags are read by checkin.js opening engine:
- *       hasProgressSignal → Mode 5 (progress opening) may fire
- *       hasStruggleSignal → Mode 6 (care opening) may fire
- *   - Detection is silent — nothing shown to user, no UI change
+ * v3 — Privacy rule fix (Session B2 finding, 14 Jul 2026). Removed signal-
+ *   word detection from journal saves entirely. v2 (23 Jun) ran
+ *   detectSignals() on journal entry text and wrote hasProgressSignal /
+ *   hasStruggleSignal onto each entry — a direct violation of the Journal
+ *   Privacy Rule (master schedule Appendix D, confirmed 09 Jul 2026):
+ *   "No journal entry analysis. No signal detection in journal entries.
+ *   No monitoring of journal content. No exceptions." That rule was
+ *   confirmed after this file was last touched and nobody circled back.
+ *   Removed: the detectSignals import, the signal-detection block in
+ *   saveEntry(), and both fields from the written entry shape. Journal
+ *   entries are now written exactly as v1 behaved, plus the v2 save-flow
+ *   improvements that were unrelated to signal detection (unaffected).
+ *   NOTE — companion fix required: checkin-openings.js reportedly reads
+ *   hasProgressSignal/hasStruggleSignal from journalEntries to select
+ *   Mode 5/6 openings (per this file's own v2 docstring). That file is
+ *   not yet ground-truthed. Until it's fixed, Modes 5/6 will simply
+ *   never fire (the fields are undefined on all new entries) rather than
+ *   error — safe, but worth closing out properly, not left half-done.
+ *   Existing entries already saved with these fields under v2 are left
+ *   untouched — not retroactively stripped. They are now write-only
+ *   dead data going forward, not read by anything after this fix lands.
  *
- * v1 behaviour preserved:
+ * v2 (23 Jun 2026) — SUPERSEDED, signal detection removed in v3 above.
+ *
+ * v1 behaviour (preserved):
  *   - Free text input (the only open text input in the product)
  *   - Optional category tagging (via autoTagging in journalSettings)
  *   - Writes to store.journalEntries[]
@@ -22,18 +36,18 @@
  *
  * Entry schema (written to journalEntries[]):
  *   {
- *     id:                string   — timestamp-based ID
- *     date:              ISO string
- *     text:              string
- *     tags:              string[] — auto-detected or user-set categories
- *     hasProgressSignal: boolean  — v2: from detectSignals()
- *     hasStruggleSignal: boolean  — v2: from detectSignals()
+ *     id:      string   — timestamp-based ID
+ *     date:    ISO string
+ *     text:    string
+ *     tags:    string[] — auto-detected or user-set categories
+ *     noWords: boolean
  *   }
  *
  * Privacy note:
  *   Journal entries are stored in localStorage only.
- *   No entry text is sent anywhere. Signal detection runs locally, in-browser.
- *   This must be stated in the privacy policy.
+ *   No entry text is sent anywhere. No signal detection, no analysis,
+ *   no monitoring of journal content of any kind. This must be stated
+ *   in the privacy policy.
  *
  * WCAG 2.2 AA:
  *   Textarea: associated label via for/id. aria-required="false" (optional field).
@@ -44,8 +58,7 @@
  *   All touch targets minimum 44px.
  */
 
-import { store }           from '../store.js';
-import { detectSignals }   from '../data/signal-words.js';
+import { store } from '../store.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -214,12 +227,12 @@ export function JournalEntryView(router) {
     });
   }
 
-  // ── Save handler — v2 adds signal detection ────────────────────────────────
+  // ── Save handler ─────────────────────────────────────────────────────────
 
   /**
    * Save the journal entry.
-   * v2: detectSignals() called on text before writing.
-   * Signals written silently — no UI change on detection.
+   * v3: no signal detection of any kind runs on journal text. Privacy
+   * rule (Appendix D) — no exceptions.
    *
    * @param {string}  text
    * @param {Element} container
@@ -229,23 +242,14 @@ export function JournalEntryView(router) {
   function saveEntry(text, container, opts = {}) {
     const trimmedText = text.trim();
 
-    // ── Signal detection (v2 addition) ──────────────────────────────────────
-    // detectSignals() is fast, synchronous, and never throws.
-    // Both flags default to false for blank entries.
-    const signals = trimmedText.length > 0
-      ? detectSignals(trimmedText)
-      : { hasProgressSignal: false, hasStruggleSignal: false };
-
     // ── Build entry ──────────────────────────────────────────────────────────
     const id    = `je-${Date.now()}`;
     const entry = {
       id,
-      date:              new Date().toISOString(),
-      text:              trimmedText,
-      tags:              [...selectedCategories],
-      hasProgressSignal: signals.hasProgressSignal,  // v2
-      hasStruggleSignal: signals.hasStruggleSignal,  // v2
-      noWords:           opts.noWords || false,
+      date:    new Date().toISOString(),
+      text:    trimmedText,
+      tags:    [...selectedCategories],
+      noWords: opts.noWords || false,
     };
 
     // ── Write to store ───────────────────────────────────────────────────────
