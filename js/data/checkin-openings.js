@@ -1,10 +1,37 @@
 /**
  * js/data/checkin-openings.js
- * 01 Jul 2026 v1
+ * 14 Jul 2026 v2
  *
- * D2: Check-in Opening Narratives — data and resolver.
- * Six modes + Day One exception. Nurturing voice throughout.
- * Source: alongside_d2_checkin_openings_30jun2026_v4.md
+ * v2 — Privacy rule fix (Session B2 finding, 14 Jul 2026, companion to
+ *   journal-entry.js v3). _detectMilestone() read journalEntries directly
+ *   and used hasProgressSignal (written by journal-entry.js v2) to select
+ *   the 'journal-progress' Mode 5 opening — a coach line that speaks
+ *   directly from journal content ("Something you wrote recently has
+ *   stayed with me..."). Unlike checkin.js's feeling-word signal
+ *   detection, which is documented dormant, this one fired live on every
+ *   check-in via resolveOpening() — an active violation of the Journal
+ *   Privacy Rule (master schedule Appendix D), not a theoretical one.
+ *   The companion 'journal-struggle' branch checked e.signalWord, a field
+ *   journal-entry.js never actually wrote at any version — that half was
+ *   already permanently dead, unrelated to this fix.
+ *   Removed: the entire journal-signal block from _detectMilestone(),
+ *   the now-unused journalEntries parameter and argument, and the
+ *   now-unused `const journalEntries = store.get('journalEntries')`
+ *   read in resolveOpening(). Removed the 'journal-progress' and
+ *   'journal-struggle' entries from the PROGRESS data object — they can
+ *   no longer be triggered by anything and existed solely to serve the
+ *   logic just removed; leaving them in place as dead data referencing
+ *   journal content risked a future session re-wiring them without
+ *   realising why they'd been disconnected.
+ *   NOT touched this pass (already-dead before this fix, unrelated,
+ *   flagged for a future cleanup session): PROGRESS still contains
+ *   'return-journal', 'tone-shift', and 'difficult-feeling' entries that
+ *   were never wired to any trigger in _detectMilestone() at any point —
+ *   spec'd content that was never built out, not a privacy issue.
+ *
+ * v1 — 01 Jul 2026. D2: Check-in Opening Narratives — data and resolver.
+ *   Six modes + Day One exception. Nurturing voice throughout.
+ *   Source: alongside_d2_checkin_openings_30jun2026_v4.md
  *
  * Usage:
  *   import { resolveOpening } from '../data/checkin-openings.js';
@@ -136,7 +163,8 @@ const IMAGINARY = [
 ];
 
 // ─── Mode 5 — Journal / Progress Reframe ─────────────────────────────────────
-// Triggered only — milestones and journal signals.
+// Triggered only — milestones. Journal-content-derived triggers removed
+// in v2 (see header) — journal entries are never read by this file.
 
 const PROGRESS = {
   'seven-day-streak':   { careMode: false, b1: "Seven days in a row. Movement, noticing, or both — seven.",         b2: "I want to know how that feels from the inside, not just as a number." },
@@ -145,18 +173,13 @@ const PROGRESS = {
   'twelve-week':        { careMode: false, b1: "Twelve weeks. That's a whole chapter.",                              b2: "I'm not going to let you check in without knowing you know that." },
   'three-month':        { careMode: false, b1: "Three months. I want you to sit with that for a second.",            b2: "What do you think has actually changed?" },
   'phase-transition':   { careMode: false, b1: "You've moved into a new phase. That doesn't happen automatically — you did something to get here.", b2: "I want to know how today feels with that behind you." },
-  'journal-progress':   { careMode: false, b1: "Something you wrote recently has stayed with me. You said things were starting to feel different.", b2: "Is that still true today?" },
-  'journal-struggle':   { careMode: true,  b1: "You named something difficult in your journal. I noticed, and I've been thinking about it.", b2: "I'm not going to step over it. Where are you with it now?" },
-  'return-journal':     { careMode: true,  b1: "You wrote something before you went quiet. I've been holding onto it.",                       b2: "I want to know if it still fits, or if something's changed." },
   'visible-progress':   { careMode: false, b1: "Have you looked at how far you've come since you started? I have.",                          b2: "I want to know how today feels, knowing that." },
   'programme-complete': { careMode: false, b1: "You finished a whole programme. That's not something everyone does.",                         b2: "I'm curious how it feels to be starting something new." },
   'personal-best-long': { careMode: false, b1: "That was your longest session yet. I noticed.",                                              b2: "How does that sit with you?" },
   'personal-best-week': { careMode: false, b1: "Last week was your most active week since you started. Have you noticed that?",              b2: "I want to know how today feels coming off the back of it." },
-  'tone-shift':         { careMode: false, b1: "Something shifted in what you wrote recently. I noticed a different tone to it.",            b2: "I want to know if you felt it too, or if it crept up on you." },
   'return-positive':    { careMode: true,  b1: "Before you went quiet, things were sounding good. I held onto that.",                       b2: "I want to know how you're coming back — whether that's still true, or something happened." },
   'mood-lift-pattern':  { careMode: false, b1: "For the last few weeks, you've been finishing sessions feeling better than you started.",    b2: "Have you noticed that about yourself?" },
   'noticing-and-move':  { careMode: false, b1: "This week you moved and you noticed. Both. That combination matters more than either one alone.", b2: "I'm curious how you're feeling about that." },
-  'difficult-feeling':  { careMode: true,  b1: "Last time you named something that wasn't easy to name. I want you to know I saw that.",    b2: "How are you today?" },
 };
 
 // ─── Mode 6 — Simple Arrival ──────────────────────────────────────────────────
@@ -223,7 +246,6 @@ export function resolveOpening() {
   const historyKeys     = Object.keys(checkinHistory).sort();
   const totalCheckins   = historyKeys.length;
   const lastOpeningMode = store.get('checkin.lastOpeningMode');
-  const journalEntries  = store.get('journalEntries') || [];
 
   // ── Day One (no history yet) ───────────────────────────────────────────────
   if (totalCheckins === 0) {
@@ -245,8 +267,8 @@ export function resolveOpening() {
   // Note: abandoned-opens trigger requires store.checkin.abandonedOpens
   // (not in schema v7). See ARRIVAL_ABANDONED above. Add once schema updated.
 
-  // ── Mode 5 — Milestone / Journal (overrides base modes) ───────────────────
-  const milestone = _detectMilestone(totalCheckins, historyKeys, journalEntries);
+  // ── Mode 5 — Milestone (overrides base modes) ─────────────────────────────
+  const milestone = _detectMilestone(totalCheckins, historyKeys);
   if (milestone && PROGRESS[milestone]) {
     _writeMode('progress');
     const v = PROGRESS[milestone];
@@ -403,8 +425,11 @@ function _resolveImaginary() {
 }
 
 // ─── Milestone detection ──────────────────────────────────────────────────────
+// v2: journal-content-derived triggers removed. This function no longer
+// reads journalEntries at all — checkin-count and programme-week
+// milestones only.
 
-function _detectMilestone(totalCheckins, historyKeys, journalEntries) {
+function _detectMilestone(totalCheckins, historyKeys) {
   const last = store.get('checkin.lastMilestoneNoticed');
 
   // Checkin-count milestones (every 7)
@@ -421,17 +446,6 @@ function _detectMilestone(totalCheckins, historyKeys, journalEntries) {
     if (weeks === 8  && last !== 'eight-week')  { store.set('checkin.lastMilestoneNoticed', 'eight-week');  return 'eight-week'; }
     if (weeks === 12 && last !== 'twelve-week') { store.set('checkin.lastMilestoneNoticed', 'twelve-week'); return 'twelve-week'; }
     if (weeks === 13 && last !== 'three-month') { store.set('checkin.lastMilestoneNoticed', 'three-month'); return 'three-month'; }
-  }
-
-  // Journal signals (last 5 entries)
-  const recent = journalEntries.slice(-5);
-  if (recent.some(e => e.hasProgressSignal === false && e.signalWord) && last !== 'journal-struggle') {
-    store.set('checkin.lastMilestoneNoticed', 'journal-struggle');
-    return 'journal-struggle';
-  }
-  if (recent.some(e => e.hasProgressSignal === true) && last !== 'journal-progress') {
-    store.set('checkin.lastMilestoneNoticed', 'journal-progress');
-    return 'journal-progress';
   }
 
   return null;
