@@ -1,6 +1,27 @@
 /**
  * store.js - Data persistence layer
- * 05 Jul 2026 v8
+ * 16 Jul 2026 v9
+ *
+ * 16 Jul 2026 v9 - Empathy Transfer schema pass (S4-B3-2). Five new
+ *   top-level fields added to support the 5-stage, session-count-gated
+ *   empathy transfer prompt library (alongside_empathy_transfer_prompts_
+ *   19may2026_v1.docx), confirmed fully dormant at the schema level by
+ *   Session B3 (16 Jul):
+ *     empathyTransferStage     integer / 1  - current stage (1-5)
+ *     empathyPromptsFired      integer / 0  - total prompts fired, all time
+ *     empathyPromptsAtStage    integer / 0  - prompts fired at current stage,
+ *                                             resets to 0 on stage advance
+ *     lastEmpathyPromptSession integer / 0  - session count at last fire,
+ *                                             enforces the 3-4 session gap
+ *     empathyPromptSkips       integer / 0  - consecutive skip streak (NOT
+ *                                             lifetime total - resets to 0
+ *                                             on any non-skip response; see
+ *                                             reflect.js v2 comments for why)
+ *   mergeWithDefaults() updated: all five given explicit type-checked merge
+ *   entries, matching the pattern used for mindfulPromptDepth etc., rather
+ *   than relying on the top-level spread alone.
+ *   getDefaults() updated: all five added at their spec defaults.
+ *   All other fields unchanged from v8.
  *
  * 05 Jul 2026 v8 - Schema-first change for My Movement rebuild (agreed
  *   13 May, never built — ground-truthed this session: the movement
@@ -91,6 +112,11 @@ export const store = {
    * for users who onboarded before this version was deployed.
    * Existing data is never overwritten — only missing keys are filled.
    *
+   * v9: empathyTransferStage, empathyPromptsFired, empathyPromptsAtStage,
+   * lastEmpathyPromptSession, empathyPromptSkips are all new integer
+   * fields — every existing user gets the spec defaults (stage 1, all
+   * counters 0) since none of them can have fired a prompt that never
+   * existed.
    * v8: movementIdentity migrated from string|null to string[]. Any
    * existing single value is wrapped, not dropped.
    * v7: primaryTerritory, threadStartedAt, threadCompletedAt are string|null
@@ -173,6 +199,23 @@ export const store = {
                                 ? saved.mindfulPromptDepth
                                 : 1,
       mindfulPromptFrequency: saved.mindfulPromptFrequency || 'automatic',
+
+      // ── EMPATHY TRANSFER (new, v9) ─────────────────────────────
+      empathyTransferStage: typeof saved.empathyTransferStage === 'number'
+        ? saved.empathyTransferStage
+        : 1,
+      empathyPromptsFired: typeof saved.empathyPromptsFired === 'number'
+        ? saved.empathyPromptsFired
+        : 0,
+      empathyPromptsAtStage: typeof saved.empathyPromptsAtStage === 'number'
+        ? saved.empathyPromptsAtStage
+        : 0,
+      lastEmpathyPromptSession: typeof saved.lastEmpathyPromptSession === 'number'
+        ? saved.lastEmpathyPromptSession
+        : 0,
+      empathyPromptSkips: typeof saved.empathyPromptSkips === 'number'
+        ? saved.empathyPromptSkips
+        : 0,
 
       // ── LAST CHECK-IN ─────────────────────────────────────────
       lastCheckin: (saved.lastCheckin && typeof saved.lastCheckin === 'object')
@@ -476,6 +519,18 @@ export const store = {
       // ── MINDFUL PROMPT ENGINE ─────────────────────────────────
       mindfulPromptDepth:     1,
       mindfulPromptFrequency: 'automatic',
+
+      // ── EMPATHY TRANSFER (new, v9) ─────────────────────────────
+      // 5-stage, session-count-gated prompt system. See
+      // alongside_empathy_transfer_prompts_19may2026_v1.docx and
+      // reflect.js v2 for the full mechanic. All defaults below match
+      // the spec's "Store Schema Additions" table exactly.
+      empathyTransferStage:     1,  // integer 1-5, current stage
+      empathyPromptsFired:      0,  // integer, total prompts fired all time
+      empathyPromptsAtStage:    0,  // integer, resets to 0 on stage advance
+      lastEmpathyPromptSession: 0,  // integer, session count at last fire
+      empathyPromptSkips:       0,  // integer, consecutive skip streak —
+                                     // resets to 0 on any non-skip response
 
       // ── LAST CHECK-IN ─────────────────────────────────────────
       lastCheckin: {
