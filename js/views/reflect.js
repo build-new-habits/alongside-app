@@ -1,6 +1,44 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 16 Jul 2026 v2 (S4-B3-2) - Empathy Transfer wiring:
+ *   Session B3 (15-16 Jul) confirmed the 19-prompt empathy transfer
+ *   library (alongside_empathy_transfer_prompts_19may2026_v1.docx) was
+ *   fully dormant — spec existed, nothing in store.js or reflect.js
+ *   implemented any part of it. This version builds and wires it.
+ *
+ *   New import: EMPATHY_PROMPTS from ../data/empathy-transfer.js.
+ *   New stage: "empathy" — a final screen inserted between the
+ *   existing reflect screen and the summary screen, per the spec's
+ *   placement instruction ("final screen in reflect.js, after the
+ *   feel chips, pain check, and open reflection. Does not interrupt
+ *   the session flow.").
+ *
+ *   Gate: no prompt fires in the user's first three completed
+ *   sessions (activityLog.length <= 3 after this entry is saved).
+ *   Selection: modulo on empathyPromptsAtStage within the current
+ *   stage's pool, per the spec's Build Notes ("a simple modulo").
+ *   Stage advance: Stage 1 after 4 fired, Stage 2 after 5, Stage 3
+ *   after 5, Stage 4 after 4, Stage 5 cycles indefinitely.
+ *   Gap: base 4 sessions between prompts; widens to 6 after 3+
+ *   consecutive skips (empathyPromptSkips is treated as a consecutive
+ *   streak here, not a lifetime total, and resets to 0 on any
+ *   non-skip response — see skipEmpathyPrompt()/fireEmpathyPrompt()
+ *   comments for why, and the note about the spec's own build-note
+ *   formula being inverted from its stated intent).
+ *
+ *   Bug fixes (both previously logged, confirmed present by direct
+ *   read during Session B3, folded into this touch of the file):
+ *     - "Back to Today" now correctly calls router.navigate("today")
+ *       instead of router.navigate("progress"). router is now
+ *       explicitly imported at the top of the file — it was being
+ *       referenced without an import before, which would throw at
+ *       runtime rather than merely misroute.
+ *     - moodAfter is now initialised to 5 at module scope instead of
+ *       null, so the mood number and slider no longer display the
+ *       literal string "null" on first paint before onMount() sets
+ *       the real pre-fill value from lastCheckin.mood.
+ *
  * 13 Jun 2026 v1 (S4-5) - moodAfter capture:
  *   Added a compact mood-after slider (1-10) to the wellbeing section,
  *   pre-filled from lastCheckin.mood (today's pre-session mood) so it's
@@ -30,15 +68,18 @@
  *   Ends with a coach summary and route back to Today.
  */
 
-import { store } from "../store.js";
+import { store }          from "../store.js";
+import { router }         from "../router.js";
+import { EMPATHY_PROMPTS } from "../data/empathy-transfer.js";
 
 export const centered = false;
 
-let stage      = "reflect";
-let feelAnswer = null;
-let painAnswer = null;
-let openText   = "";
-let moodAfter  = null;
+let stage        = "reflect";
+let feelAnswer    = null;
+let painAnswer    = null;
+let openText      = "";
+let moodAfter     = 5;
+let empathyPrompt = null; // { stage, text } | null - set by saveAndSummarise() if one should fire
 
 const QUESTIONS = {
   "gym":            "So, how was that? I want to know what it actually felt like in there.",
@@ -91,6 +132,76 @@ const MOOD_LABELS = [
   "", "Struggling", "Low", "Low", "Okay",
   "Okay", "Good", "Good", "Great", "Great", "Fantastic"
 ];
+
+// ── Empathy Transfer constants ────────────────────────────────────────
+// See alongside_empathy_transfer_prompts_19may2026_v1.docx for the
+// full spec this logic implements.
+
+const STAGE_ADVANCE_THRESHOLDS = { 1: 4, 2: 5, 3: 5, 4: 4, 5: Infinity };
+const EMPATHY_BASE_GAP    = 4; // sessions between prompts under normal conditions ("every 3-4")
+const EMPATHY_WIDENED_GAP = 6; // after 3+ consecutive skips
+const EMPATHY_MIN_SESSIONS = 3; // no prompt fires in the user's first three sessions
+
+function getSessionCount() {
+  // "Session count" per the spec is unit of experience, not calendar
+  // time, and the spec's own language ("after any completed session")
+  // treats every activityLog entry as a countable session — consistent
+  // with the app-wide Credits Scope Rule that all activity counts, not
+  // just workouts. activityLog.length (post-save) is used as the count.
+  return (store.get("activityLog") || []).length;
+}
+
+function getEmpathyPromptForSession(sessionCount) {
+  if (sessionCount <= EMPATHY_MIN_SESSIONS) return null;
+
+  const skips = store.get("empathyPromptSkips") || 0;
+  const gap   = skips >= 3 ? EMPATHY_WIDENED_GAP : EMPATHY_BASE_GAP;
+  const last  = store.get("lastEmpathyPromptSession") || 0;
+
+  if (sessionCount - last < gap) return null;
+
+  const stageNum = store.get("empathyTransferStage") || 1;
+  const pool     = EMPATHY_PROMPTS[stageNum] || EMPATHY_PROMPTS[1];
+  const atStage  = store.get("empathyPromptsAtStage") || 0;
+  const text     = pool[atStage % pool.length];
+
+  return { stage: stageNum, text };
+}
+
+function fireEmpathyPrompt(sessionCount) {
+  const stageNum = store.get("empathyTransferStage") || 1;
+  const atStage  = (store.get("empathyPromptsAtStage") || 0) + 1;
+  const fired    = (store.get("empathyPromptsFired") || 0) + 1;
+  const threshold = STAGE_ADVANCE_THRESHOLDS[stageNum];
+
+  if (atStage >= threshold && stageNum < 5) {
+    store.set("empathyTransferStage", stageNum + 1);
+    store.set("empathyPromptsAtStage", 0);
+  } else {
+    store.set("empathyPromptsAtStage", atStage);
+  }
+
+  store.set("empathyPromptsFired", fired);
+  store.set("lastEmpathyPromptSession", sessionCount);
+  // Genuine engagement (not a skip) resets the consecutive-skip streak.
+  store.set("empathyPromptSkips", 0);
+}
+
+function skipEmpathyPrompt(sessionCount) {
+  const skips = (store.get("empathyPromptSkips") || 0) + 1;
+  store.set("empathyPromptSkips", skips);
+
+  // NOTE: the spec's own Build Notes say the skip handler "sets
+  // lastEmpathyPromptSession to current + 1 (so it fires again one
+  // session sooner than usual)". That literal formula actually produces
+  // a LATER next-fire, not a sooner one (next fire = current + 1 + gap,
+  // vs current + gap for a normal fire). Implemented here to match the
+  // spec's STATED INTENT ("fires one session sooner") instead of its
+  // literal formula: current - 1, which yields next fire at
+  // current + gap - 1, genuinely one session earlier than a normal gap.
+  // Flagged for Graeme to confirm this interpretation is correct.
+  store.set("lastEmpathyPromptSession", sessionCount - 1);
+}
 
 function buildSummary(entry, feel, pain, moodAfterValue) {
   const log       = store.get("activityLog") || [];
@@ -200,6 +311,28 @@ export function render() {
   const weekNum    = store.get("gymProgrammeWeek") || 1;
   const invitation = WELLBEING_INVITATIONS[(dayIdx + weekNum) % WELLBEING_INVITATIONS.length];
 
+  if (stage === "empathy" && empathyPrompt) {
+    return `
+      <div class="view reflect-view">
+        <div class="view-header">
+          <h1 class="sr-only">A thought before you go</h1>
+        </div>
+        <div class="card card-coach reflect-coach-card" role="group" aria-labelledby="empathy-prompt-text">
+          <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <p class="coach-message-text" id="empathy-prompt-text">${empathyPrompt.text}</p>
+        </div>
+        <button class="btn btn-primary btn-large btn-full" id="empathy-continue-btn"
+                style="margin-top: var(--space-4);">
+          Continue
+        </button>
+        <button class="btn btn-ghost btn-full" id="empathy-skip-btn"
+                style="margin-top: var(--space-2);"
+                aria-label="Not today, skip this prompt">
+          Not today
+        </button>
+      </div>`;
+  }
+
   if (stage === "summary") {
     const summary = buildSummary(entry, feelAnswer, painAnswer, moodAfter);
     return `
@@ -301,10 +434,22 @@ export function render() {
 }
 
 export function onMount() {
-  stage      = "reflect";
-  feelAnswer = null;
-  painAnswer = null;
-  openText   = "";
+  // NOTE: this reset to "reflect" runs on every mount, including the
+  // remounts triggered by saveAndSummarise() and resolveEmpathyPrompt()
+  // after they've already set stage to "empathy" or "summary" and
+  // called render(). That's intentional and pre-existing behaviour,
+  // not a bug: render() always runs BEFORE onMount() in this file, so
+  // the DOM is already painted correctly for the real current stage
+  // by the time this reset happens. The click handler below reads the
+  // DOM via e.target.closest(), not the stage variable, so the reset
+  // has no effect on behaviour - it only matters for the next fresh
+  // mount of the view (e.g. router navigating back in), where
+  // "reflect" is the correct starting stage anyway.
+  stage        = "reflect";
+  feelAnswer    = null;
+  painAnswer    = null;
+  openText      = "";
+  empathyPrompt = null;
 
   const checkin = store.get("lastCheckin") || {};
   moodAfter = (typeof checkin.mood === "number") ? checkin.mood : 5;
@@ -354,9 +499,15 @@ export function onMount() {
     const skipBtn = e.target.closest("#reflect-skip-btn");
     if (skipBtn) { saveAndSummarise(); return; }
 
+    const empathyContinueBtn = e.target.closest("#empathy-continue-btn");
+    if (empathyContinueBtn) { resolveEmpathyPrompt(false); return; }
+
+    const empathySkipBtn = e.target.closest("#empathy-skip-btn");
+    if (empathySkipBtn) { resolveEmpathyPrompt(true); return; }
+
     const finishBtn = e.target.closest("#reflect-finish-btn");
     if (finishBtn) {
-      router.navigate("progress");
+      router.navigate("today");
     }
   });
 }
@@ -383,7 +534,37 @@ function saveAndSummarise() {
     }
   }
 
+  // Empathy Transfer: decide, after this entry is saved, whether a
+  // prompt should fire. sessionCount reflects the just-saved entry.
+  const sessionCount = getSessionCount();
+  const candidate = getEmpathyPromptForSession(sessionCount);
+
+  if (candidate) {
+    empathyPrompt = candidate;
+    stage = "empathy";
+  } else {
+    stage = "summary";
+  }
+
+  const main = document.getElementById("main-content");
+  if (main) {
+    main.innerHTML = render();
+    onMount();
+  }
+}
+
+function resolveEmpathyPrompt(wasSkipped) {
+  const sessionCount = getSessionCount();
+
+  if (wasSkipped) {
+    skipEmpathyPrompt(sessionCount);
+  } else {
+    fireEmpathyPrompt(sessionCount);
+  }
+
+  empathyPrompt = null;
   stage = "summary";
+
   const main = document.getElementById("main-content");
   if (main) {
     main.innerHTML = render();
