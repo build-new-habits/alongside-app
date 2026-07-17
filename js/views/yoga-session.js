@@ -1,7 +1,40 @@
 /**
  * yoga-session.js - Guided Yoga and Pilates Session
  *
- * 19 May 2026 v2
+ * 16 Jul 2026 v3
+ *
+ * v3 (S4-B3-3) — Confirmed root-cause fix. finaliseSession() and
+ *   savePartialSession() were both taking the entry already sitting in
+ *   currentActivityEntry (originally written by coach-reflection.js's
+ *   phantom pre-write — see coach-reflection.js v5), mutating it, and
+ *   unconditionally APPENDING it to activityLog as a brand new array
+ *   element — never checking whether an entry already existed. Since
+ *   coach-reflection.js also always pre-wrote that same entry, every
+ *   single completed (or partially-exited) yoga session produced TWO
+ *   permanent activityLog entries, guaranteed, every time. Confirmed
+ *   on-device by reading both files together this session — this was a
+ *   same-file duplicate-append, a worse pattern than the cross-file
+ *   Gym case (workout.js / coach-reflection.js), which only double-wrote
+ *   because two separate files were each unaware of the other.
+ *
+ *   Fixed at the root: coach-reflection.js no longer pre-writes an entry
+ *   at all — currentActivityEntry is pending, in-memory data only until
+ *   genuine completion. finaliseSession() and savePartialSession() here
+ *   now build the completion fields and call the new shared
+ *   store.logActivity(), which creates exactly one entry and also
+ *   carries a dedupe guard as a backstop. currentActivityEntry is
+ *   re-set to the entry logActivity() returns, so if the user goes on to
+ *   tap "How did that feel?" (routing to reflect.js), reflect.js can
+ *   find and update this same entry by id, same as every other activity
+ *   type.
+ *
+ *   Also noted, not fixed: savePartialSession() referenced an undeclared
+ *   variable `elapsed` for durationMins on a partial exit. This file has
+ *   no running elapsed-time tracker at all (only per-pose hold timers),
+ *   so durationMins on a partial exit is left explicitly null with a
+ *   comment rather than fabricated — building a real elapsed-time
+ *   tracker is a separate, larger addition, flagged for a future session
+ *   rather than invented here.
  *
  * v1.1 — Correct import paths for js/views/ location:
  *   ../store.js (not ./store.js)
@@ -618,18 +651,39 @@ function advancePose() {
   }
 }
 
+/**
+ * v3 (S4-B3-3) — REWRITTEN. Was: took currentActivityEntry (already sitting
+ * in activityLog thanks to coach-reflection.js's old phantom pre-write),
+ * mutated it, and appended it to activityLog as a NEW element — producing
+ * two permanent entries for every single completed yoga session,
+ * confirmed on-device. Now: currentActivityEntry is pending-only data
+ * (coach-reflection.js v5 no longer pre-writes it). This function builds
+ * the completion fields and calls the shared store.logActivity(), which
+ * creates exactly one entry. currentActivityEntry is re-set to the
+ * logActivity() result so reflect.js can find and update this same entry
+ * by id if the user taps "How did that feel?" afterward.
+ */
 function finaliseSession() {
   store.set("totalCredits",       (store.get("totalCredits") || 0) + creditsEarned);
   store.set("lastWorkoutCredits", creditsEarned);
   store.set("lastWorkoutName",    "Yoga & Pilates");
-  const log   = store.get("activityLog") || [];
-  const entry = store.get("currentActivityEntry");
-  if (entry) {
-    entry.sessionEnd    = new Date().toISOString();
-    entry.status        = "completed";
-    entry.creditsEarned = creditsEarned;
-    store.set("activityLog", [...log, entry]);
+
+  const pending = store.get("currentActivityEntry");
+  const nowIso  = new Date().toISOString();
+
+  const activityEntry = store.logActivity({
+    ...(pending || { type: "yoga", source: "self-directed" }),
+    type:         "yoga",
+    sessionEnd:   nowIso,
+    completedAt:  nowIso,
+    status:       "completed",
+    creditsEarned
+  });
+
+  if (activityEntry) {
+    store.set("currentActivityEntry", activityEntry);
   }
+
   phase = "done";
 }
 
@@ -698,15 +752,33 @@ function showExitConfirm() {
   });
 }
 
+/**
+ * v3 (S4-B3-3) — REWRITTEN, same root cause and same fix pattern as
+ * finaliseSession() above. Also noted, not fixed: this function
+ * previously referenced an undeclared variable `elapsed` for
+ * durationMins. This file has no running elapsed-time tracker (only
+ * per-pose hold timers) — durationMins is left explicitly null with a
+ * comment rather than fabricated. A real elapsed-time tracker would be
+ * a separate, larger addition for a future session.
+ */
 function savePartialSession() {
-  const log   = store.get("activityLog") || [];
-  const entry = store.get("currentActivityEntry");
-  if (entry) {
-    entry.sessionEnd    = new Date().toISOString();
-    entry.status        = "partial";
-    entry.durationMins  = typeof elapsed !== "undefined" ? Math.floor(elapsed / 60) : null;
-    entry.creditsEarned = typeof creditsEarned !== "undefined" ? creditsEarned : 0;
-    store.set("activityLog", [...log, entry]);
+  const pending = store.get("currentActivityEntry");
+  const nowIso  = new Date().toISOString();
+
+  const activityEntry = store.logActivity({
+    ...(pending || { type: "yoga", source: "self-directed" }),
+    type:         "yoga",
+    sessionEnd:   nowIso,
+    completedAt:  nowIso,
+    status:       "partial",
+    // No elapsed-time tracker exists in this file — left explicitly null
+    // rather than referencing the undeclared `elapsed` the old code had.
+    durationMins: null,
+    creditsEarned: typeof creditsEarned !== "undefined" ? creditsEarned : 0
+  });
+
+  if (activityEntry) {
+    store.set("currentActivityEntry", activityEntry);
   }
 }
 
