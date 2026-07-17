@@ -1,7 +1,55 @@
 /**
  * intention.js - Intention Screen
  *
- * 26 Jun 2026 v6
+ * 17 Jul 2026 v7
+ *
+ * v7 (S4-B3-3, second file) — Confirmed this file has the exact same
+ *   phantom-write bug as coach-reflection.js v5, discovered only after
+ *   that fix was already deployed and tested — this file was not known
+ *   to exist when B3-3 began. logAndNavigate() wrote a full activityLog
+ *   entry immediately on selection, for every path (self/quiet/
+ *   prescribed), before anything started or completed. For Gym
+ *   specifically (routes to coach-proposal -> workout.js) this produces
+ *   the same guaranteed double-write workout.js v5 was built to prevent
+ *   at its end — but the phantom entry at the START was still being
+ *   written by THIS file, unaffected by any of today's other fixes,
+ *   because nobody knew this file was in the loop.
+ *
+ *   Fixed, same pattern as coach-reflection.js v5: logAndNavigate() no
+ *   longer writes to activityLog for the self/quiet/prescribed paths.
+ *   The entry is held as pending data in currentActivityEntry only.
+ *   Genuine completion is what creates it — workout.js (Gym, via
+ *   coach-proposal), or reflect.js's create-if-not-found fallback
+ *   (v3, already deployed) for everything else that routes there
+ *   directly (run/walk/swim/cycle/class/other/journal/rest/mindfulness/
+ *   prescribed-session).
+ *
+ *   The breathing special-case (added v4, deleted its own placeholder
+ *   entry before navigating) is now simplified to a no-op removal --
+ *   there's no placeholder to delete any more, since none is written.
+ *   breathing-session.js continues to log its own entry on completion,
+ *   unchanged, exactly as before.
+ *
+ *   NOT FIXED, FLAGGED FOR GRAEME AS A PRODUCT DECISION, NOT A BUG:
+ *   Yoga has no special case in this file's "self" path -- it falls
+ *   through to the generic branch and routes to router.navigate("reflect")
+ *   directly, the same as Run or Walk. It never reaches yoga-session.js
+ *   (the full pose-by-pose guided session player, fixed separately this
+ *   session as yoga-session.js v3) via this screen at all. Whether Yoga
+ *   should get the full guided-session experience here (matching what
+ *   coach-reflection.js's equivalent path does) or should stay a
+ *   simple logged activity like Run/Walk is a real product choice, not
+ *   something to decide unilaterally in a bug-fix pass -- flagged for
+ *   the master schedule, not changed here.
+ *
+ *   ALSO FLAGGED, NOT INVESTIGATED THIS SESSION: this file
+ *   (intention.js, route "intention") and coach-reflection.js (route
+ *   "coach-reflection") appear to be two separately-built, still-live
+ *   screens serving the same purpose ("what do you want to do today").
+ *   Which one is actually reached in normal daily use, whether the
+ *   other is dead code or an in-progress redesign, and what decides
+ *   between them, is unknown -- not traced this session. Worth a
+ *   dedicated investigation before either file is touched again.
  *
  * v6 — CRITICAL bug fix: the "coach" path ("Suggest something for me")
  *   branch in logAndNavigate() wrote a fake activityLog entry
@@ -28,6 +76,8 @@
  *   currently writes to workoutHistory but not activityLog, so
  *   today.js's "session done" detection may still not fire correctly
  *   after a real generated session completes — worth checking next.)
+ *   [v7 note: this was fixed for real in workout.js v4/v5, Sessions A
+ *   and B3-3 respectively.]
  *
  * v5 (26 Jun 2026): Name capitalisation fix — buildCoachLine() now  
  *   capitalises the stored name before prepending as greeting.
@@ -90,7 +140,8 @@
  *     C - Something quieter (mindfulness, journal, rest)
  *
  *   Path B shows an activity type selector and optional name input.
- *   All paths write an activityLog entry to store on navigation.
+ *   v7: paths no longer write an activityLog entry on navigation --
+ *   see v7 changelog above. Entry is created at genuine completion.
  */
 
 import { store } from "../store.js";
@@ -380,30 +431,28 @@ function getContinueLabel() {
 
 // -- Navigation ----------------------------------------------------------------
 
+/**
+ * v7 (S4-B3-3) — REWRITTEN. Was: pushed a full activityLog entry
+ * immediately on navigation, for every path (self/quiet/prescribed) —
+ * the same confirmed phantom-write bug fixed in coach-reflection.js v5,
+ * just undiscovered in this file until now. Now: the entry is held ONLY
+ * in currentActivityEntry, as pending data, for the self/quiet/
+ * prescribed paths. Nothing is written to activityLog here. Genuine
+ * completion is what creates it — workout.js (Gym, via coach-proposal),
+ * or reflect.js's create-if-not-found fallback (v3) for every other
+ * path that routes there directly. The "coach" path is unchanged from
+ * v6 — it already wrote nothing.
+ */
 function logAndNavigate() {
-  // v6 CRITICAL FIX — "coach" path. This branch used to write a fake
-  // "coach-session" activityLog entry and route to "today", which made
-  // today.js think a session was already done and show "I want to move
-  // again" — without the user ever reaching coach-proposal.js's doors.
-  // No real session has happened yet at this point, so nothing is
-  // logged here — the actual session, once it finishes, is what should
-  // get recorded (see the note on workout.js in this version's
-  // changelog above — that recording currently goes to workoutHistory,
-  // not activityLog, which is a separate gap worth checking next).
   if (selectedPath === "coach") {
     router.navigate("coach-proposal");
     return;
   }
 
-  // Save activity log entry (self / quiet / prescribed paths)
-  const log = store.get("activityLog") || [];
   const checkin = store.get("lastCheckin") || {};
 
   const act          = ACTIVITIES.find(a => a.id === selectedActivity);
   const trimmedName  = activityName.trim();
-  // isEvent/eventName (schema.md Section 12, added v1.4, S4-6): only the
-  // "class" and "other" Path B types have a free-text name field, and a
-  // named activity is the natural definition of an "event" here.
   const isNamedEvent = selectedPath === "self" && act?.hasName && trimmedName.length > 0;
 
   const entry = {
@@ -417,12 +466,12 @@ function logAndNavigate() {
     source:        selectedPath === "prescribed" ? "prescribed" :
                    "self-directed",
     sessionStart:  new Date().toISOString(),
-    // -- S4-6 additions (Path B, non-gym only) --
     duration:      (selectedPath === "self" && selectedActivity !== "gym") ? selectedDuration : null,
     isEvent:       isNamedEvent,
     eventName:     isNamedEvent ? trimmedName : null,
   };
-  store.set("activityLog", [...log, entry]);
+
+  // v7: pending only — no activityLog write here.
   store.set("currentActivityEntry", entry);
 
   // Navigate
@@ -432,33 +481,27 @@ function logAndNavigate() {
   }
   if (selectedPath === "self") {
     if (selectedActivity === "gym") {
-      // Open gym sub-screen inside coach-proposal rather than going direct
+      // Open gym sub-screen inside coach-proposal rather than going direct.
+      // workout.js v5 creates the real entry via store.logActivity() at
+      // genuine completion.
       store.set("openGymSub", true);
       router.navigate("coach-proposal");
       return;
     }
-    // Other self-directed activities - activity in progress view (Phase 4)
-    // For now, navigate to reflect directly with a timer option
+    // v7 note: Yoga has no special case here — falls through to reflect
+    // directly, same as Run/Walk/etc. See v7 changelog: flagged as a
+    // product decision (should Yoga get the full guided session here,
+    // matching coach-reflection.js's equivalent path?), not changed.
     router.navigate("reflect");
     return;
   }
   if (selectedPath === "quiet") {
-    // S4-9/10: "Breathing practice" now goes to the real breathing player.
-    // breathing-session.js logs its own activityLog entry on completion/
-    // exit and returns to "noticing" -- the placeholder entry written
-    // above (type: "breathing", source: "self-directed", never completed)
-    // would otherwise sit orphaned in activityLog, so we don't write it
-    // for this case. The other quiet options are unchanged.
+    // v7: breathing no longer needs to delete a placeholder entry —
+    // nothing was written to delete. breathing-session.js still logs
+    // its own entry on completion/exit, unchanged.
     if (selectedQuiet === "breathing") {
-      // Remove the placeholder entry just pushed for this selection.
-      const trimmedLog = store.get("activityLog") || [];
-      store.set("activityLog", trimmedLog.filter(e => e.id !== entry.id));
       store.set("currentActivityEntry", null);
       router.navigate("breathing-session");
-      return;
-    }
-    if (selectedQuiet === "journal" || selectedQuiet === "rest" || selectedQuiet === "breathing") {
-      router.navigate("reflect");
       return;
     }
     router.navigate("reflect");
