@@ -1,6 +1,31 @@
 /**
  * workout.js - Workout Execution View
- * 14 Jul 2026 v4
+ * 16 Jul 2026 v5
+ *
+ * v5 (S4-B3-3) — Two confirmed fixes, same root-cause investigation as
+ *   coach-reflection.js v5 and yoga-session.js v3:
+ *
+ *   1. Duplicate-write fix: completeWorkout() now calls the new shared
+ *      store.logActivity() instead of pushing directly to activityLog.
+ *      This is the defensive backstop for the Gym duplicate-write bug —
+ *      the actual root cause (a phantom entry written on mere activity
+ *      selection, before this file ever runs) was fixed in
+ *      coach-reflection.js v5, which no longer pre-writes an entry at
+ *      all. logActivity()'s dedupe guard is a safety net here, not the
+ *      primary fix.
+ *
+ *   2. Confirmed separate bug, found while tracing the above: this file
+ *      never set currentActivityEntry for a completed Gym workout —
+ *      only coach-reflection.js's self-directed path did that, for the
+ *      other activity types. Practical effect: reflect.js's
+ *      saveAndSummarise() looks up store.get("currentActivityEntry") to
+ *      find which log entry to update with feel/mood/pain/notes — for
+ *      Gym sessions that value was null or stale from a previous
+ *      session, so the update-in-place block silently did nothing.
+ *      Reflect answers for Gym sessions were never actually being saved.
+ *      Fixed: completeWorkout() now sets currentActivityEntry to the
+ *      entry logActivity() just created, so reflect.js can find and
+ *      update it correctly, same as every other activity type.
  *
  * v4 — Closed the workout.js -> activityLog gap (Session A, item 3).
  *   Confirmed live: completeWorkout() wrote to workoutHistory but never
@@ -379,13 +404,13 @@ function completeWorkout() {
   });
   store.set("workoutHistory", history);
 
-  // v4 — activityLog entry. today.js's _resolveState() needs this to
-  // detect "session-done"; it was missing entirely before this fix.
-  // Shape matches store.js's documented activityLog entry fields.
-  // type: 'workout' matches today.js's existing TYPE_LABELS/TYPE_ROUTE
-  // maps, so no new type value or schema change was required.
-  const activityLog = store.get("activityLog") || [];
-  activityLog.push({
+  // v5 (S4-B3-3) — uses the shared store.logActivity() write path instead
+  // of pushing to activityLog directly. Also now sets currentActivityEntry
+  // to the entry just written — this was never done for Gym before, which
+  // meant reflect.js's find-and-update-by-id logic silently found nothing
+  // and never saved feel/mood/pain answers for Gym sessions. Confirmed bug,
+  // fixed here. See v5 changelog above for full detail.
+  const activityEntry = store.logActivity({
     date:         nowIso,
     completedAt:  nowIso,
     type:         "workout",
@@ -394,7 +419,9 @@ function completeWorkout() {
     isEvent:      false,
     eventName:    null
   });
-  store.set("activityLog", activityLog);
+  if (activityEntry) {
+    store.set("currentActivityEntry", activityEntry);
+  }
 
   // Record session with programme engine.
   // recordSession() takes a sessionData object and returns { milestoneAchieved }.
