@@ -1,7 +1,30 @@
 /**
  * coach-reflection.js - Post Check-In Pattern Reflection
  *
- * 26 Jun 2026 v4
+ * 16 Jul 2026 v5
+ *
+ * v5 (S4-B3-3) — Confirmed root-cause fix for the activityLog duplicate/
+ *   phantom-write bug found in B3-2-Test. logAndNavigateB() was writing a
+ *   full activityLog entry the moment an activity TYPE WAS SELECTED —
+ *   before anything started or completed. Reproduced on-device: selecting
+ *   "Gym session" and backing out with nothing started still produced a
+ *   permanent, never-finished activityLog entry. For Gym and Yoga
+ *   specifically this then produced a SECOND entry on genuine completion
+ *   (workout.js and yoga-session.js each write their own entry with no
+ *   awareness of this one), so a single real session was logged twice.
+ *
+ *   Fixed: logAndNavigateB() no longer writes to activityLog at all.
+ *   currentActivityEntry is still set to the same pending-entry shape as
+ *   before (id, date, type, energyBefore, source, sessionStart) — it's
+ *   just held as in-memory pending data now, not written to the log.
+ *   The entry is only ever actually created in activityLog by whichever
+ *   view handles genuine completion (reflect.js, workout.js, or
+ *   yoga-session.js — all updated this session to use the new shared
+ *   store.logActivity() write path). See those files' own changelogs.
+ *
+ *   Practical effect: selecting an activity and backing out now writes
+ *   nothing. Genuine completion writes exactly one entry, for every
+ *   activity type reachable through this file.
  *
  * v4 (26 Jun 2026): Name capitalisation fix — getFirstName() now
  *   capitalises the first character of the stored name.
@@ -558,11 +581,22 @@ export function onUnmount() {
   showLocation     = false;
 }
 
+/**
+ * v5 (S4-B3-3) — REWRITTEN. Was: pushed a full activityLog entry
+ * immediately (the confirmed phantom-write bug — an entry existed for
+ * activities never started or completed). Now: this entry is held ONLY
+ * in currentActivityEntry, as pending data. Nothing is written to
+ * activityLog here. The entry is only ever actually created in the log
+ * by whichever view handles genuine completion — reflect.js (for
+ * run/walk/swim/cycle/class/other), workout.js (for gym, via
+ * coach-proposal's Door 1), or yoga-session.js (for yoga) — all of which
+ * now call the shared store.logActivity() to do that write. See those
+ * files' own v5/v5/v3 changelogs.
+ */
 function logAndNavigateB() {
   if (!selectedActivity) return;
 
-  const log     = store.get("activityLog") || [];
-  const checkin = store.get("lastCheckin")  || {};
+  const checkin = store.get("lastCheckin") || {};
   const entry   = {
     id:           new Date().toISOString() + "_" + Math.random().toString(36).slice(2, 6),
     date:         getTodayStr(),
@@ -572,7 +606,7 @@ function logAndNavigateB() {
     source:       "self-directed",
     sessionStart: new Date().toISOString(),
   };
-  store.set("activityLog", [...log, entry]);
+  // v5: no activityLog write here — pending only, until genuine completion.
   store.set("currentActivityEntry", entry);
 
   if (selectedActivity === "gym") {
