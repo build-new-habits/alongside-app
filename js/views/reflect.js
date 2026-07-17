@@ -1,6 +1,22 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 16 Jul 2026 v3 (S4-B3-3) - saveAndSummarise() create-if-not-found fix:
+ *   Companion fix to coach-reflection.js v5, workout.js v5, and
+ *   yoga-session.js v3 — all part of the same activityLog duplicate/
+ *   phantom-write investigation. coach-reflection.js no longer pre-writes
+ *   an activityLog entry on mere activity selection, which means for
+ *   self-directed activities (run/walk/swim/cycle/class/other) there is
+ *   now genuinely no existing entry for this file's find-by-id logic to
+ *   match — that's the expected, normal case now, not a failure state.
+ *   Previously, no match meant the whole update block silently did
+ *   nothing, discarding feel/mood/pain/note answers for exactly those
+ *   activity types. Now: if no match is found, an entry is created at
+ *   this point (genuine completion) via the shared store.logActivity().
+ *   Gym and Yoga are unaffected by this change — they still resolve via
+ *   the existing find-and-update path, since workout.js and
+ *   yoga-session.js now create their own entry before ever routing here.
+ *
  * 16 Jul 2026 v2 (S4-B3-2) - Empathy Transfer wiring:
  *   Session B3 (15-16 Jul) confirmed the 19-prompt empathy transfer
  *   library (alongside_empathy_transfer_prompts_19may2026_v1.docx) was
@@ -516,21 +532,39 @@ function saveAndSummarise() {
   const textarea = document.getElementById("reflect-open-text");
   openText = textarea?.value.trim() || "";
 
-  const log = store.get("activityLog") || [];
+  // v3 (S4-B3-3) — the idx === -1 branch is new. Previously this whole
+  // block only ran if an entry with a matching id already existed in the
+  // log (and only if log.length > 0, an odd extra guard removed here too)
+  // — meaning if no match was found, nothing happened at all. That was
+  // silently discarding reflect answers for exactly the activity types
+  // this branch now handles correctly: run/walk/swim/cycle/class/other,
+  // which no longer have a pre-existing log entry to find, since
+  // coach-reflection.js v5 stopped pre-writing one on mere selection.
+  // Gym and Yoga still resolve via the idx !== -1 branch unchanged, since
+  // workout.js and yoga-session.js now create their entry (via the shared
+  // store.logActivity()) before ever navigating here.
+  const log   = store.get("activityLog") || [];
   const entry = store.get("currentActivityEntry");
-  if (entry && log.length > 0) {
+
+  if (entry) {
     const idx = log.findIndex(e => e.id === entry.id);
+    const reflectFields = {
+      feel:        feelAnswer,
+      painChange:  painAnswer,
+      note:        openText || null,
+      moodAfter:   moodAfter,
+      completedAt: new Date().toISOString(),
+    };
+
     if (idx !== -1) {
-      log[idx] = {
-        ...log[idx],
-        feel:        feelAnswer,
-        painChange:  painAnswer,
-        note:        openText || null,
-        moodAfter:   moodAfter,
-        completedAt: new Date().toISOString(),
-      };
+      log[idx] = { ...log[idx], ...reflectFields };
       delete log[idx].energyAfter;
       store.set("activityLog", log);
+    } else {
+      const created = store.logActivity({ ...entry, ...reflectFields });
+      if (created) {
+        store.set("currentActivityEntry", created);
+      }
     }
   }
 
