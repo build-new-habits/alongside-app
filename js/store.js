@@ -1,6 +1,22 @@
 /**
  * store.js - Data persistence layer
- * 16 Jul 2026 v9
+ * 16 Jul 2026 v10
+ *
+ * 16 Jul 2026 v10 - logActivity() added (S4-B3-3). Confirmed on-device
+ *   duplicate/phantom-write bug in activityLog, discovered during B3-2-Test
+ *   and root-caused this session: coach-reflection.js was writing an
+ *   incomplete entry the moment an activity type was SELECTED, not when
+ *   it was completed. For Gym and Yoga specifically, this produced a
+ *   permanent orphaned phantom entry plus a second, separate entry from
+ *   genuine completion — two entries per real session, confirmed on-device.
+ *   Root cause fixed at the call sites (coach-reflection.js no longer
+ *   pre-writes; workout.js and yoga-session.js now create the entry only
+ *   at genuine completion, via this new shared function). logActivity()
+ *   is the defensive backstop: single write path, dedupe guard against
+ *   same-type entries within a short time window. See changelog entries
+ *   in coach-reflection.js, workout.js, yoga-session.js, and reflect.js
+ *   (all touched this session) for the full picture. Full details:
+ *   alongside_session_handoff (B3-3, 16 Jul).
  *
  * 16 Jul 2026 v9 - Empathy Transfer schema pass (S4-B3-2). Five new
  *   top-level fields added to support the 5-stage, session-count-gated
@@ -776,6 +792,58 @@ export const store = {
     this.data.progressLog = log;
     this.data.updatedAt = new Date().toISOString();
     this.save();
+  },
+
+  /**
+   * logActivity(entry) — the single shared write path for activityLog.
+   * 16 Jul 2026, v10 (S4-B3-3). Added to fix a confirmed duplicate/phantom-
+   * write bug: coach-reflection.js, workout.js, and yoga-session.js were
+   * each writing to activityLog directly, with no shared contract and no
+   * protection against double-firing. Root cause (phantom write on mere
+   * activity selection, before completion) is fixed at the call sites —
+   * this function is the defensive backstop, not the primary fix.
+   *
+   * Assigns an id if the entry doesn't already have one. Rejects (returns
+   * null, does not write) if an entry already exists with the same `type`
+   * and a `completedAt` within `dedupeWindowMs` (default 2 minutes) of the
+   * new entry's completedAt — this catches genuine accidental double-fires
+   * without risk of dropping two legitimately close-together but different
+   * real activities (which will differ in type, or be minutes apart).
+   *
+   * @param {object} entry — activityLog entry fields (id optional)
+   * @param {number} [dedupeWindowMs=120000]
+   * @returns {object|null} the written entry, or null if rejected as a dupe
+   */
+  logActivity(entry, dedupeWindowMs = 2 * 60 * 1000) {
+    if (!entry || !entry.type) {
+      console.error('Store: logActivity called without a type', entry);
+      return null;
+    }
+
+    const log = this.data.activityLog || [];
+    const newCompletedAt = entry.completedAt ? new Date(entry.completedAt).getTime() : Date.now();
+
+    const isDupe = log.some(e => {
+      if (e.type !== entry.type) return false;
+      if (!e.completedAt) return false;
+      const existingTime = new Date(e.completedAt).getTime();
+      return Math.abs(existingTime - newCompletedAt) < dedupeWindowMs;
+    });
+
+    if (isDupe) {
+      console.warn('Store: logActivity rejected a likely duplicate write', entry);
+      return null;
+    }
+
+    const finalEntry = {
+      id: entry.id || (new Date().toISOString() + '_' + Math.random().toString(36).slice(2, 6)),
+      ...entry
+    };
+
+    this.data.activityLog = [...log, finalEntry];
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+    return finalEntry;
   },
 
   /**
