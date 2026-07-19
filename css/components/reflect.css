@@ -1,0 +1,55 @@
+/* ============================================
+   REFLECT VIEW STYLES
+   css/components/reflect.css
+
+   19 Jul 2026 v1
+
+   New file (S4-B3-3 completion). .reflect-textarea and .reflect-chips
+   were confirmed via GitHub code search to have NO existing CSS
+   anywhere in the repo — not an override bug, a genuine gap. Browsers
+   do not inherit color/font into form elements by default, so the
+   unstyled textarea was rendering with default (near-black) text and
+   no explicit width/height on this dark theme — invisible against the
+   placeholder and cramped, exactly as reported twice (B3-2-Test and
+   the prior B3-3 session, both with annotated screenshots).
+
+   This file adds the missing rules only. .reflect-chips itself needs
+   no layout fix — it's a flex wrapper around .chip children, and .chip
+   is styled elsewhere (not touched here, out of this fix's scope).
+   ============================================ */
+
+.reflect-textarea {
+  width: 100%;
+  min-height: 120px;
+  box-sizing: border-box;
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+  font-family: inherit;
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  resize: vertical;
+  transition: border-color var(--transition-fast);
+}
+
+.reflect-textarea::placeholder {
+  color: var(--color-text-muted);
+  -webkit-text-fill-color: var(--color-text-muted);
+  opacity: 1;
+}
+
+.reflect-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+.reflect-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  width: 100%;
+}
