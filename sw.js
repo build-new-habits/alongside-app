@@ -1,6 +1,24 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 19 Jul 2026 v173
+ * S4-B3-3 completion session. Deployed together: intention.js v8 (Yoga
+ *   branch — selecting Yoga from the self-directed picker now routes to
+ *   yoga-session.js's full guided pose-by-pose experience, matching
+ *   coach-proposal.js's Door 1 equivalent path, per Graeme's decision
+ *   17 Jul); components/reflect.css (new file — .reflect-textarea and
+ *   .reflect-chips had no existing CSS anywhere in the repo, confirmed
+ *   via GitHub code search, not an override bug — fixes the contrast/
+ *   sizing issue confirmed twice on-device); main.css v10 (adds the
+ *   reflect.css import). Added reflect.css to SHELL_URLS below.
+ *   Two-screens investigation (also this session) produced no code
+ *   change — coach-reflection.js is the real daily-use "Today" screen;
+ *   intention.js is live but only reached via session-exit "back"/
+ *   "home" buttons (e.g. in yoga-session.js) — findings recorded in
+ *   the session handoff, not requiring a cache-relevant file change.
+ *   Cache bump only for the three files above; no other files changed
+ *   this deploy.
+ *
  * 14 Jul 2026 v172
  * journal-entry.js v3, checkin-openings.js v2, quiet-session.js v4 —
  *   Session B2 findings, deployed. journal-entry.js/checkin-openings.js:
@@ -44,7 +62,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v172";
+const CACHE_NAME = "alongside-v173";
 
 const SHELL_URLS = [
 
@@ -67,6 +85,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/weekly-plan-v2.css",
   "/alongside-app/css/components/gym-programme.css",
   "/alongside-app/css/components/journal-entry.css",
+  "/alongside-app/css/components/reflect.css",
   "/alongside-app/css/components/nav-fix.css",
   "/alongside-app/css/components/onboarding-thread.css",
   "/alongside-app/css/components/sheet-manager.css",
