@@ -1,7 +1,39 @@
 /**
  * intention.js - Intention Screen
  *
- * 17 Jul 2026 v7
+ * 19 Jul 2026 v8
+ *
+ * v8 (S4-B3-3 completion session) — Yoga routing decision wired, per
+ *   Graeme's decision 17 Jul (see v7 changelog below for the original
+ *   flag): selecting "Yoga / Pilates" from the self-directed picker now
+ *   routes to yoga-session.js's full guided pose-by-pose experience,
+ *   matching what coach-proposal.js's Door 1 already does when a
+ *   generated option resolves to type 'yoga-session'.
+ *
+ *   Ground-truthed coach-proposal.js's Yoga launch pattern before
+ *   copying it (per the static-import/pattern-copy standing rule):
+ *   coach-proposal.js has no Yoga-specific branch either — it just maps
+ *   option.type === 'yoga-session' to router.navigate('yoga-session')
+ *   via its generic _routeForOption() lookup table. So the correct
+ *   pattern here is equally simple: route directly to 'yoga-session',
+ *   no special payload needed beyond what's already being set.
+ *
+ *   Also ground-truthed yoga-session.js v3's entry contract:
+ *   finaliseSession()/savePartialSession() both spread whatever is in
+ *   currentActivityEntry and then unconditionally overwrite `type` to
+ *   "yoga" before calling store.logActivity(). This file already sets
+ *   currentActivityEntry with `type: selectedActivity` (i.e. "yoga")
+ *   for this path before the routing decision below, so the pending
+ *   entry contract lines up correctly with no changes needed to the
+ *   entry-building code above logAndNavigate(), and no schema changes.
+ *
+ *   Change is isolated to logAndNavigate()'s "self" path: Yoga now
+ *   checks selectedActivity === "yoga" before the generic gym check,
+ *   and routes to "yoga-session" instead of falling through to the
+ *   generic "reflect" branch used by Run/Walk/etc. Two-screens
+ *   investigation (also part of this session) is documented separately
+ *   in the session handoff, not in this file — it doesn't change any
+ *   code here.
  *
  * v7 (S4-B3-3, second file) — Confirmed this file has the exact same
  *   phantom-write bug as coach-reflection.js v5, discovered only after
@@ -30,26 +62,20 @@
  *   breathing-session.js continues to log its own entry on completion,
  *   unchanged, exactly as before.
  *
- *   NOT FIXED, FLAGGED FOR GRAEME AS A PRODUCT DECISION, NOT A BUG:
- *   Yoga has no special case in this file's "self" path -- it falls
- *   through to the generic branch and routes to router.navigate("reflect")
- *   directly, the same as Run or Walk. It never reaches yoga-session.js
- *   (the full pose-by-pose guided session player, fixed separately this
- *   session as yoga-session.js v3) via this screen at all. Whether Yoga
- *   should get the full guided-session experience here (matching what
- *   coach-reflection.js's equivalent path does) or should stay a
- *   simple logged activity like Run/Walk is a real product choice, not
- *   something to decide unilaterally in a bug-fix pass -- flagged for
- *   the master schedule, not changed here.
+ *   [v8 note: Yoga's special-case gap flagged here was resolved above.]
  *
- *   ALSO FLAGGED, NOT INVESTIGATED THIS SESSION: this file
- *   (intention.js, route "intention") and coach-reflection.js (route
- *   "coach-reflection") appear to be two separately-built, still-live
- *   screens serving the same purpose ("what do you want to do today").
- *   Which one is actually reached in normal daily use, whether the
- *   other is dead code or an in-progress redesign, and what decides
- *   between them, is unknown -- not traced this session. Worth a
- *   dedicated investigation before either file is touched again.
+ *   ALSO FLAGGED, NOT INVESTIGATED THIS SESSION [v8 note: investigated
+ *   and answered this session — see session handoff for the full
+ *   two-screens finding. Short version: intention.js is reached only
+ *   as a session-exit "back"/"home" destination (e.g. from
+ *   yoga-session.js), not from the bottom nav "Today" tab. The real
+ *   daily-use "Today" tab screen is today.js, which auto-routes to
+ *   coach-reflection.js once checked in. Neither file was touched to
+ *   change this routing — flagged only, per this session's scope
+ *   fence.]: this file (intention.js, route "intention") and
+ *   coach-reflection.js (route "coach-reflection") appear to be two
+ *   separately-built, still-live screens serving the same purpose
+ *   ("what do you want to do today").
  *
  * v6 — CRITICAL bug fix: the "coach" path ("Suggest something for me")
  *   branch in logAndNavigate() wrote a fake activityLog entry
@@ -142,6 +168,7 @@
  *   Path B shows an activity type selector and optional name input.
  *   v7: paths no longer write an activityLog entry on navigation --
  *   see v7 changelog above. Entry is created at genuine completion.
+ *   v8: Yoga now routes to the full guided session — see v8 changelog.
  */
 
 import { store } from "../store.js";
@@ -432,16 +459,9 @@ function getContinueLabel() {
 // -- Navigation ----------------------------------------------------------------
 
 /**
- * v7 (S4-B3-3) — REWRITTEN. Was: pushed a full activityLog entry
- * immediately on navigation, for every path (self/quiet/prescribed) —
- * the same confirmed phantom-write bug fixed in coach-reflection.js v5,
- * just undiscovered in this file until now. Now: the entry is held ONLY
- * in currentActivityEntry, as pending data, for the self/quiet/
- * prescribed paths. Nothing is written to activityLog here. Genuine
- * completion is what creates it — workout.js (Gym, via coach-proposal),
- * or reflect.js's create-if-not-found fallback (v3) for every other
- * path that routes there directly. The "coach" path is unchanged from
- * v6 — it already wrote nothing.
+ * v8 (S4-B3-3 completion) — Yoga branch added. See v8 changelog above
+ * for the full ground-truthing detail. Everything else in this function
+ * is unchanged from v7.
  */
 function logAndNavigate() {
   if (selectedPath === "coach") {
@@ -488,10 +508,19 @@ function logAndNavigate() {
       router.navigate("coach-proposal");
       return;
     }
-    // v7 note: Yoga has no special case here — falls through to reflect
-    // directly, same as Run/Walk/etc. See v7 changelog: flagged as a
-    // product decision (should Yoga get the full guided session here,
-    // matching coach-reflection.js's equivalent path?), not changed.
+    if (selectedActivity === "yoga") {
+      // v8: Yoga now gets the full guided pose-by-pose session, matching
+      // coach-proposal.js's Door 1 equivalent path (both ultimately land
+      // on yoga-session.js). currentActivityEntry above already carries
+      // type: "yoga", which yoga-session.js's finaliseSession()/
+      // savePartialSession() spread and then confirm as "yoga" before
+      // calling store.logActivity() — no further payload needed here.
+      router.navigate("yoga-session");
+      return;
+    }
+    // Run/Walk/Swim/Cycle/Class/Other — unchanged, routes to reflect
+    // directly. reflect.js v3's create-if-not-found fallback logs the
+    // entry at genuine completion.
     router.navigate("reflect");
     return;
   }
