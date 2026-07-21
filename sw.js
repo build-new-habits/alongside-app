@@ -1,6 +1,39 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 21 Jul 2026 v174
+ * navfix-proposalloop session. Two paired fixes deployed together:
+ *   (1) Nav escape hatch — a persistent, minimal Home icon now appears
+ *   on every hideNavViews screen (intention, coach-proposal,
+ *   coach-reflection, all session views, etc), giving a way back to
+ *   Today without the full bottom nav reappearing. Markup + inline
+ *   styling in index.html v2; visibility toggled by router.js v9's
+ *   _mountView() using the existing hideNavViews check; click wired in
+ *   app.js v7 to a new requestExit() export from session-guard.js v2.
+ *   requestExit() reuses the exact same exit-confirmation card and
+ *   per-view onExit contract as the existing back-gesture guard, so an
+ *   active session is protected identically regardless of which exit
+ *   path the user takes.
+ *   (2) Proposal-loop fix — today.js v4's _resolveState() now checks
+ *   session-done before proposal-accepted, so completing a session
+ *   within 10 minutes of accepting a proposal correctly lands on "You
+ *   moved today" instead of stranding the user back on the Coach
+ *   Proposal/threshold screen. Confirmed no regression to the genuine
+ *   "just accepted, nothing completed yet" case.
+ *   Bug found and fixed while ground-truthing (1): yoga-session.js v4 —
+ *   the session guard's onExit callback (fired on back-gesture, and now
+ *   also the new Home icon) reset the session and navigated to
+ *   reflect.js WITHOUT calling savePartialSession() first, silently
+ *   dropping partial progress on that exit path since v1. The on-screen
+ *   Exit button's own handler always called it correctly — only the
+ *   guard path was missing it. Fixed to match.
+ *   Not yet verified: whether the other 10 session view files have the
+ *   same missing-savePartialSession gap in their own guard onExit
+ *   callbacks — flagged for a future session, not checked here.
+ *   Cache bump for: index.html, app.js, router.js, session-guard.js,
+ *   yoga-session.js, today.js. All six already present in SHELL_URLS
+ *   below — no new entries required.
+ *
  * 19 Jul 2026 v173
  * S4-B3-3 completion session. Deployed together: intention.js v8 (Yoga
  *   branch — selecting Yoga from the self-directed picker now routes to
@@ -62,7 +95,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v173";
+const CACHE_NAME = "alongside-v174";
 
 const SHELL_URLS = [
 
