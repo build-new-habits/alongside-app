@@ -1,6 +1,14 @@
 /**
  * app.js - Application entry point
- * 29 Jun 2026 v6
+ * 21 Jul 2026 v7
+ *
+ * v7 — Nav escape-hatch (navfix-proposalloop session). Imports
+ *   requestExit from session-guard.js and wires it to the persistent
+ *   #hidden-nav-home-btn icon (markup in index.html v2, visibility
+ *   toggled by router.js v9). requestExit() shows the same
+ *   exit-confirmation guard as the back-gesture/Exit button during an
+ *   active session, or navigates straight to Today otherwise. No
+ *   circular import risk: session-guard.js does not import app.js.
  *
  * v6 — OB-THREAD. First-route logic updated: new users route to
  *   onboarding/thread instead of welcome. The welcome, name, about, body,
@@ -16,8 +24,9 @@
  * v1 — Initial.
  */
 
-import { store }  from './store.js';
-import { router } from './router.js';
+import { store }        from './store.js';
+import { router }       from './router.js';
+import { requestExit }  from './session-guard.js';
 
 // ── Globals — set immediately, before anything else runs ──────────────────────
 window.router = router;
@@ -25,7 +34,7 @@ window.store  = store;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-const APP_VERSION = "29 Jun 2026 v6";
+const APP_VERSION = "21 Jul 2026 v7";
 
 const NAV_VIEWS = new Set([
   'today', 'progress', 'noticing', 'settings', 'weekly-plan',
@@ -135,6 +144,12 @@ const App = {
     store.init();
     router.init();
     registerServiceWorker();
+
+    // Nav escape-hatch icon — single click handler, wired once.
+    document.getElementById('hidden-nav-home-btn')?.addEventListener('click', () => {
+      requestExit();
+    });
+
     console.log("Alongside ready");
 
     // Routing logic:
