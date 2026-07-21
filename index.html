@@ -1,8 +1,16 @@
-<!-- index.html | 14 Jul 2026 v1 -->
+<!-- index.html | 21 Jul 2026 v2 -->
 <!--
+  v2 — Persistent nav escape-hatch icon added (navfix-proposalloop
+    session). A single small Home icon, fixed top-right, shown only on
+    hideNavViews screens (toggled by router.js v9's _mountView()) and
+    wired to session-guard.js v2's requestExit() in app.js v7. Styled
+    inline here rather than in css/main.css — main.css was not
+    ground-truthed this session, so styling for this new isolated
+    element is self-contained to avoid a blind edit. Worth migrating
+    into main.css later if Graeme wants it to use the shared design
+    tokens instead.
   v1 — Sentry error monitoring wired in (Session A, item 1, DSN received).
     Loader script added to <head>, EU region confirmed (js-de.sentry-cdn.com).
-    No other changes — this is the first version-headered copy of this file.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -41,6 +49,38 @@
     src="https://js-de.sentry-cdn.com/87fc9709fbce818590bbe5dcaec01586.min.js"
     crossorigin="anonymous"
   ></script>
+
+  <!-- Nav escape-hatch icon styling — self-contained, see v2 changelog above -->
+  <style>
+    .hidden-nav-escape {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 12px);
+      right: calc(env(safe-area-inset-right, 0px) + 12px);
+      z-index: 100;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: none;
+      background: rgba(15, 23, 42, 0.55);
+      color: #fff;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+    }
+    .hidden-nav-escape:focus-visible {
+      outline: 3px solid #5EEAD4;
+      outline-offset: 2px;
+    }
+    .hidden-nav-escape.hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <div id="app" class="app-container">
@@ -134,6 +174,25 @@
     <div id="modal-container" class="modal-container hidden"></div>
 
   </div>
+
+  <!--
+    Nav escape-hatch icon. Persistent, minimal way back to Today from any
+    hideNavViews screen (intention, coach-proposal, coach-reflection, all
+    session views, etc). Placed outside #app so position:fixed is never
+    affected by a transform on an #app ancestor. Visibility toggled by
+    router.js v9's _mountView(); click wired to session-guard.js v2's
+    requestExit() in app.js v7 — routes through the same exit-confirmation
+    guard as the back-gesture and Exit button during an active session,
+    navigates straight to Today otherwise.
+  -->
+  <button
+    id="hidden-nav-home-btn"
+    class="hidden-nav-escape hidden"
+    type="button"
+    aria-label="Back to Today"
+  >
+    <span aria-hidden="true">🏠</span>
+  </button>
 
   <script type="module" src="js/app.js"></script>
 </body>
