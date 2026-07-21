@@ -1,13 +1,20 @@
 /**
  * js/session-guard.js - Session Back Gesture Guard
  *
- * 21 May 2026 v1
- *
- * Shared utility imported by all 7 session views.
- * Intercepts device back gesture (iOS swipe left, Android back button)
- * during an active session and shows a coach-voiced confirmation card.
+ * 21 Jul 2026 v2
  *
  * CHANGELOG
+ * 21 Jul 2026 v2 — Added isGuardActive() and requestExit(), exported for
+ *                  external callers (specifically the new persistent nav
+ *                  escape-hatch icon, app.js v7) that need to leave a
+ *                  hidden-nav screen. requestExit() reuses the exact same
+ *                  _showCard()/_onExit contract the back-gesture guard
+ *                  already uses, so behaviour is identical regardless of
+ *                  which exit path the user takes. If no session is
+ *                  actively running (guard not mounted, or isActive()
+ *                  false), navigates straight to Today — nothing to
+ *                  protect. No changes to existing back-gesture or
+ *                  showExitCard() behaviour.
  * 21 May 2026 v1 — Added third exit option: "Exit without saving".
  *                  Cleans up currentActivityEntry from store without
  *                  writing to activityLog. No reflect screen. Clean exit.
@@ -33,6 +40,13 @@
  * The onExit callback is responsible for writing a partial activityLog
  * entry and then navigating to reflect.js. session-guard.js does not
  * navigate — it hands control back to the session view.
+ *
+ * IMPORTANT — onExit contract (flagged 21 Jul 2026): onExit MUST write
+ * the partial activityLog entry before navigating. yoga-session.js v3's
+ * onExit did not do this (fixed in yoga-session.js v4, same session).
+ * Any other session view wiring mountSessionGuard() should be checked
+ * against this same contract — not yet verified across all 11 session
+ * view files.
  */
 
 import { store }  from "./store.js";
@@ -99,6 +113,38 @@ export function dismountSessionGuard() {
   _popHandler  = null;
   _keyHandler  = null;
   _guardActive = false;
+}
+
+/**
+ * Returns true only when a session view has the guard mounted AND
+ * currently reports itself as mid-session (isActive() true). Used by
+ * external callers — e.g. the persistent Home icon — to decide whether
+ * a confirmation is needed before leaving.
+ */
+export function isGuardActive() {
+  return _guardActive && typeof _isActive === "function" && !!_isActive();
+}
+
+/**
+ * External exit request. Call from any UI element outside the session
+ * view itself — currently: the persistent nav escape-hatch icon
+ * (app.js v7) — that wants to leave the current screen.
+ *
+ * If a session is actively running, shows the exact same confirmation
+ * card the back-gesture guard shows, and reuses the same per-view
+ * onExit callback — so behaviour is identical to the existing Exit
+ * button and back-gesture, whichever session type is active.
+ *
+ * If no session is running (guard not mounted, or mounted but not
+ * mid-session — e.g. still on a focus/duration picker screen), there is
+ * nothing to protect: navigates straight to Today.
+ */
+export function requestExit() {
+  if (isGuardActive()) {
+    _showCard();
+  } else {
+    router.navigate("today");
+  }
 }
 
 // ── Card rendering ─────────────────────────────────────────────────────────────
