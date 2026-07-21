@@ -1,6 +1,14 @@
 /**
  * router.js
- * 04 Jul 2026 v8
+ * 21 Jul 2026 v9
+ *
+ * v9 — Nav escape-hatch (navfix-proposalloop session). _mountView() now
+ *   also toggles #hidden-nav-home-btn's visibility using the exact same
+ *   hideNavViews check used for the bottom nav — no new import, no new
+ *   dependency. Click handling for the icon lives in app.js v7, not
+ *   here, specifically to avoid a circular import (session-guard.js
+ *   already imports router.js — router.js importing session-guard.js
+ *   back would create a cycle). No other change from v8.
  *
  * v8 — S3 fix. VIEW_NAMES['goal-setup'] pointed to './views/goal-setup.js',
  *   but the actual file's own header confirms it lives at
@@ -169,6 +177,18 @@ export const router = {
         nav.classList.add('hidden');
       } else {
         nav.classList.remove('hidden');
+      }
+    }
+
+    // Nav escape-hatch icon — shown exactly on the screens where the
+    // bottom nav is hidden. No import of session-guard.js here: this is
+    // pure visibility toggling, click handling lives in app.js.
+    const escapeBtn = document.getElementById('hidden-nav-home-btn');
+    if (escapeBtn) {
+      if (hideNavViews.has(viewName)) {
+        escapeBtn.classList.remove('hidden');
+      } else {
+        escapeBtn.classList.add('hidden');
       }
     }
 
