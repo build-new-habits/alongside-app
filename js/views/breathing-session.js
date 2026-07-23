@@ -1,7 +1,19 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
- * 21 May 2026 v1
+ * 23 Jul 2026 v2
+ *
+ * CHANGELOG
+ * 23 Jul 2026 v2 - BUILD-3 Section 4. This file never imported
+ *   session-guard.js, so the device back gesture during an active
+ *   session bypassed the on-screen Exit button's existing partial-save
+ *   logic (elapsed >= 30s -> logSession()) entirely - no warning, no
+ *   save. Wired mountSessionGuard() to reuse that same threshold and
+ *   function on the back-gesture path. On-screen button behaviour
+ *   (instant exit, no confirmation card) is unchanged by design - only
+ *   the back gesture, the previously-unprotected path, now shows a
+ *   confirmation.
+ * 21 May 2026 v1 - prior version.
  *
  * Five breathing types. All durations (1, 2, 3, 5, 10 minutes).
  * Guided visual + timer. Vibration API pulse on phase transitions.
@@ -20,6 +32,7 @@
 
 import { store }  from "../store.js";
 import { router } from "../router.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
 
@@ -244,6 +257,7 @@ function logSession() {
 }
 
 function resetSession() {
+  dismountSessionGuard();
   if (sessionInterval) { clearInterval(sessionInterval); sessionInterval = null; }
   if (phaseInterval)   { clearInterval(phaseInterval);   phaseInterval   = null; }
   phase        = "picker";
@@ -431,6 +445,24 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // 23 Jul 2026 v2 (BUILD-3 Section 4): this file never imported
+  // session-guard.js, so the device back gesture during an active session
+  // bypassed the on-screen Exit button's existing partial-save logic
+  // (elapsed >= 30s -> logSession()) entirely - no warning, no save.
+  // Wired here to reuse that same threshold and function on the
+  // back-gesture path. On-screen Exit button behaviour (instant exit, no
+  // confirmation card) is unchanged by design - only the back gesture,
+  // the previously-unprotected path, now shows a confirmation.
+  mountSessionGuard({
+    isActive: () => phase === "session",
+    label:    "breathing session",
+    onExit:   () => {
+      if (elapsed >= 30) logSession();
+      resetSession();
+      router.navigate("noticing");
+    }
+  });
+
   // Back button
   document.getElementById("bs-back-btn")?.addEventListener("click", () => {
     if (phase === "picker") {
