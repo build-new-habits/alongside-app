@@ -1,6 +1,37 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 23 Jul 2026 v175
+ * BUILD-3 session-view exit-guard audit fix. The gap found and fixed in
+ *   yoga-session.js v4 (21 Jul, see v174 entry below) was confirmed via
+ *   static QA to also exist in 5 more session views: core-session.js,
+ *   cycle-session.js, running-session.js, swim-session.js, walk-session.js
+ *   — each had an onExit (mountSessionGuard) callback that reset the
+ *   session and navigated to reflect.js WITHOUT calling
+ *   savePartialSession() first, silently dropping partial progress on
+ *   the device back-gesture exit path (the on-screen Exit button's own
+ *   handler always called it correctly). All 5 fixed to match
+ *   yoga-session.js v4's confirmed-working pattern exactly.
+ *   Bundled while each file was open (Section 2 Step 5, deliberate not
+ *   silent): finaliseSession()/endSession() and savePartialSession() in
+ *   all 5 files migrated from direct activityLog writes to
+ *   store.logActivity() (dedupe-guarded shared path, store.js v10).
+ *   Second bug found in core-session.js: savePartialSession() referenced
+ *   an undeclared `elapsed` variable for durationMins — this session
+ *   type has no running clock (only per-exercise hold timers), so
+ *   durationMins was silently always null. Matched yoga-session.js v4's
+ *   same fix: left explicitly null with a comment rather than fabricated.
+ *   Third bug found in walk-session.js: endSession() never set
+ *   status:"completed" at all (every other session view does) — fixed
+ *   as part of the same rewrite.
+ *   Cache bump for: core-session.js, cycle-session.js, running-session.js,
+ *   swim-session.js, walk-session.js. All five already present in
+ *   SHELL_URLS below — no new entries required.
+ *   Not yet actioned: the 4 files with no partial-save behaviour at all
+ *   (breathing-session.js, morning-session.js, prescribed-session.js,
+ *   quiet-session.js) — separate decision conversation, not a code fix,
+ *   tracked on the master schedule.
+ *
  * 21 Jul 2026 v174
  * navfix-proposalloop session. Two paired fixes deployed together:
  *   (1) Nav escape hatch — a persistent, minimal Home icon now appears
@@ -95,7 +126,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v174";
+const CACHE_NAME = "alongside-v175";
 
 const SHELL_URLS = [
 
