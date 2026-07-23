@@ -1,6 +1,21 @@
 /**
  * prescribed-session.js - Prescribed Exercise Session View
  *
+ * 23 Jul 2026 v2
+ *
+ * CHANGELOG
+ * 23 Jul 2026 v2 - BUILD-3 Section 4. This file had no partial-save
+ *   behaviour at all - exiting mid-session logged nothing to activityLog,
+ *   by explicit design (exit confirm read "Progress on this session will
+ *   be lost"), even though individual completed exercises were already
+ *   durably marked in the store. Graeme's decision: add partial-save
+ *   tracking, matching Gym/Core Session. Added savePartialSession(),
+ *   using store.logActivity() (this file had no prior direct-write
+ *   convention to stay consistent with). Wired mountSessionGuard() for
+ *   back-gesture protection, which this file never had. On-screen Exit
+ *   button updated to save partial progress before exiting, confirm text
+ *   updated to match.
+ *
  * 12 Jun 2026 v1 (S4-4 P3) - Back button pass:
  *   completeSession() now navigates to "reflect" instead of
  *   "workout-complete", matching gym-programme.js, morning-session.js,
@@ -21,6 +36,7 @@
  */
 
 import { store } from "../store.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
 
@@ -210,6 +226,21 @@ export function onMount() {
 
   if (active.length === 0) return;
 
+  // 23 Jul 2026 v2 (BUILD-3 Section 4): back-gesture protection, added
+  // where none existed before. isActive is unconditionally true here
+  // because this guard is only ever mounted past the already-done early
+  // return above - i.e. only while a real prescribed session is in
+  // progress, matching the same "mounted = active" pattern this file
+  // already used for its on-screen Exit button.
+  mountSessionGuard({
+    isActive: () => true,
+    label:    "prescribed session",
+    onExit:   () => {
+      savePartialSession();
+      router.back();
+    }
+  });
+
   const ex       = active[currentIndex];
   const holdSecs = parseHoldSeconds(ex.reps);
 
@@ -220,9 +251,12 @@ export function onMount() {
   }
 
   // Exit - literal back to wherever the user came from
+  // 23 Jul 2026 v2 (BUILD-3 Section 4): now saves partial progress
+  // (completed exercises so far) instead of discarding it unconditionally.
   document.getElementById("ps-exit-btn")?.addEventListener("click", () => {
-    if (confirm("Exit session? Progress on this session will be lost.")) {
-      cleanupSession();
+    if (confirm("Exit session? Your progress on completed exercises will be saved.")) {
+      savePartialSession();
+      dismountSessionGuard();
       router.back();
     }
   });
@@ -337,6 +371,7 @@ function completeSession(active) {
   store.set("lastWorkoutName",    "Prescribed Session");
 
   cleanupSession();
+  dismountSessionGuard();
   // Route through reflect.js for post-session reflection, then on to
   // progress - matches gym-programme.js, morning-session.js, workout.js.
   router.navigate("reflect");
@@ -348,4 +383,47 @@ function cleanupSession() {
   timeRemaining = 0;
   timerStarted  = false;
   store.set("prescribedSessionProgress", null);
+}
+
+/**
+ * 23 Jul 2026 v2 (BUILD-3 Section 4): new function. This file previously
+ * had no partial-save behaviour at all - exiting mid-session (even after
+ * completing several exercises) logged nothing, by explicit design (exit
+ * confirm read "Progress on this session will be lost"), even though the
+ * individual exercises were already durably marked completedToday in the
+ * store. Graeme's decision: add partial-save tracking, matching
+ * Gym/Core Session. Unlike morning-session.js, this file had no existing
+ * direct activityLog writer to stay consistent with (completeSession()
+ * doesn't write activityLog itself - that's left to reflect.js
+ * downstream) - so this uses store.logActivity() directly, the current
+ * shared convention, rather than a bespoke direct write.
+ */
+function savePartialSession() {
+  const progress = store.get("prescribedSessionProgress") || [];
+  if (progress.length === 0) return; // nothing completed yet - nothing to log
+
+  const creditsEarned = Math.min(
+    progress.reduce((sum, e) => sum + (e.credits || 0), 0),
+    CREDITS_MAX
+  );
+  const nowIso = new Date().toISOString();
+
+  const activityEntry = store.logActivity({
+    type:           "prescribed-session",
+    source:         "coach-recommended",
+    sessionEnd:     nowIso,
+    completedAt:    nowIso,
+    status:         "partial",
+    exercisesCount: progress.length,
+    creditsEarned
+  });
+
+  if (activityEntry) {
+    store.set("totalCredits", (store.get("totalCredits") || 0) + creditsEarned);
+    store.set("lastWorkoutCredits", creditsEarned);
+    store.set("lastWorkoutName",    "Prescribed Session");
+    store.set("currentActivityEntry", activityEntry);
+  }
+
+  cleanupSession();
 }
