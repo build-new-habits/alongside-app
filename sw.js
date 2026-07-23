@@ -1,6 +1,36 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 23 Jul 2026 v176
+ * BUILD-3 Section 4 - the 4 files with no partial-save behaviour at all.
+ *   Ground-truthed and, per Graeme's decisions this session, fixed:
+ *   breathing-session.js v2 - never imported session-guard.js, so the
+ *     back gesture bypassed the on-screen Exit button's existing
+ *     partial-save logic (elapsed >= 30s). Wired mountSessionGuard() to
+ *     reuse that same threshold. On-screen button behaviour unchanged.
+ *   morning-session.js v2 - a genuine 20-40 min, 5-block programme with
+ *     zero partial-save by explicit design ("Progress will not be
+ *     saved"). Graeme: add partial-save tracking. Added
+ *     savePartialSession(), wired mountSessionGuard(), on-screen Exit
+ *     button now saves and its confirm text was updated to match.
+ *   prescribed-session.js v2 - same all-or-nothing design as
+ *     morning-session.js. Same decision, same fix shape - added
+ *     savePartialSession() (using store.logActivity(), this file had no
+ *     prior direct-write convention to preserve), wired
+ *     mountSessionGuard().
+ *   quiet-session.js v5 - mindful mode (5-20 min) had zero exit
+ *     protection of any kind on either exit path - the most exposed of
+ *     the four. Graeme: full exit-confirm + partial-save, matching every
+ *     other session type (not just the back-gesture-only fix used
+ *     elsewhere). Rewrote stopMindful() to show the shared
+ *     showExitCard() confirmation; wired mountSessionGuard() for the
+ *     back-gesture path.
+ *   quiet-session.js's short breathing/journal exercises are unaffected
+ *   by design (completion-only, not a gap).
+ *   Cache bump for: breathing-session.js, morning-session.js,
+ *   prescribed-session.js, quiet-session.js. All four already present in
+ *   SHELL_URLS below - no new entries required.
+ *
  * 23 Jul 2026 v175
  * BUILD-3 session-view exit-guard audit fix. The gap found and fixed in
  *   yoga-session.js v4 (21 Jul, see v174 entry below) was confirmed via
@@ -126,7 +156,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v175";
+const CACHE_NAME = "alongside-v176";
 
 const SHELL_URLS = [
 
