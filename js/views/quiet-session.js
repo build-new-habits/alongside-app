@@ -1,6 +1,21 @@
 /**
  * quiet-session.js - Something Quieter View
  *
+ * 23 Jul 2026 v5
+ *
+ * CHANGELOG
+ * 23 Jul 2026 v5 - BUILD-3 Section 4. The mindful mode (5/10/15/20 min
+ *   guided timer) previously had zero exit protection of any kind - no
+ *   confirm dialog, no session-guard, no save, on either exit path (the
+ *   short breathing/journal exercises elsewhere in this file are
+ *   completion-only by design and unaffected). Graeme's decision: full
+ *   exit-confirm + partial-save, matching every other session type.
+ *   Added logPartialMindfulSession(). Rewrote stopMindful() to show the
+ *   shared showExitCard() confirmation instead of stopping instantly -
+ *   all three existing button-wiring sites pick this up automatically.
+ *   Wired mountSessionGuard() for the back-gesture path, scoped to
+ *   mode === "mindful" mid-timer only.
+ *
  * 14 Jul 2026 v4 (Session B2 finding)
  *   - Added missing `import { router } from "../router.js";`. This file
  *     is mounted via the router's old render()/onMount() pattern, which
@@ -84,6 +99,7 @@
 
 import { store }  from "../store.js";
 import { router } from "../router.js";
+import { mountSessionGuard, dismountSessionGuard, showExitCard } from "../session-guard.js";
 
 export const centered = false;
 
@@ -842,6 +858,7 @@ function runMindfulTimer(session) {
         clearInterval(mindfulTimer);
         mindfulTimer    = null;
         mindfulComplete = true;
+        dismountSessionGuard();
         logSession("mindful", mindfulDuration + " min mindful session", 20);
         rerender();
         return;
@@ -857,15 +874,42 @@ function runMindfulTimer(session) {
   }, 1000);
 }
 
+/**
+ * 23 Jul 2026 v5 (BUILD-3 Section 4): REWRITTEN. Previously stopped the
+ * session immediately with no confirmation and no save at all - the most
+ * exposed exit path in the app. Now shows the same coach-voiced
+ * confirmation card every other session type uses. Note: matching the
+ * existing convention already used by the other on-screen Exit buttons
+ * across the app (e.g. cycle-session.js/swim-session.js's own
+ * showExitConfirm()), picking "Stay in session" here does not resume the
+ * paused timer - this is a pre-existing quirk of the shared card pattern,
+ * not something introduced or fixed in this change.
+ */
 function stopMindful() {
   if (mindfulTimer) clearInterval(mindfulTimer);
-  mindfulTimer       = null;
+  mindfulTimer = null;
+
+  showExitCard({
+    label: "mindful session",
+    onSave: () => {
+      if (mindfulElapsed >= 10) logPartialMindfulSession();
+      resetMindfulState();
+      rerender();
+    },
+    onDiscard: () => {
+      resetMindfulState();
+      rerender();
+    }
+  });
+}
+
+function resetMindfulState() {
+  dismountSessionGuard();
   mindfulStarted     = false;
   mindfulComplete    = false;
   mindfulStep        = 0;
   mindfulElapsed     = 0;
   mindfulStepElapsed = 0;
-  rerender();
 }
 
 function formatTime(seconds) {
@@ -895,10 +939,58 @@ function logSession(type, name, credits) {
   store.set("lastWorkoutName", name);
 }
 
+/**
+ * 23 Jul 2026 v5 (BUILD-3 Section 4): new function. The mindful mode
+ * (5/10/15/20 min guided timer) previously had zero exit protection of
+ * any kind - no confirm dialog, no session-guard, no save, on either
+ * exit path. Graeme's decision: full exit-confirm + partial-save,
+ * matching every other session type in the app (not just the
+ * back-gesture fix pattern used elsewhere - both the on-screen Stop
+ * button and the back gesture now show the same coach-voiced
+ * confirmation card via showExitCard()/mountSessionGuard()).
+ * No credits are banked for a partial exit - unlike a genuine
+ * completion (logSession()'s flat 20 credits), nothing is earned until
+ * the full session finishes. Unlike logSession(), duration IS recorded
+ * here (logSession() deliberately omits it since a completion's length
+ * is always exactly mindfulDuration, already implied by name - that
+ * doesn't hold for a partial exit, so it's genuinely useful here).
+ */
+function logPartialMindfulSession() {
+  const existing = store.get("activityLog") || [];
+  existing.push({
+    id:           "quiet-" + Date.now(),
+    type:         "mindful",
+    name:         mindfulDuration + " min mindful session",
+    source:       "quiet-session",
+    status:       "partial",
+    credits:      0,
+    duration:     Math.round(mindfulElapsed / 60),
+    loggedAt:     new Date().toISOString(),
+    completedAt:  new Date().toISOString()
+  });
+  store.set("activityLog", existing);
+}
+
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
   mode = store.get("quietMode") || "selector";
+
+  // 23 Jul 2026 v5 (BUILD-3 Section 4): back-gesture protection for the
+  // mindful mode's active timer, added where none existed before. Scoped
+  // narrowly to mode === "mindful" mid-timer - the short breathing/
+  // journal exercises elsewhere in this same route are unaffected and
+  // remain completion-only by design (unchanged).
+  mountSessionGuard({
+    isActive: () => mode === "mindful" && mindfulStarted && !mindfulComplete,
+    label:    "mindful session",
+    onExit:   () => {
+      if (mindfulTimer) { clearInterval(mindfulTimer); mindfulTimer = null; }
+      if (mindfulElapsed >= 10) logPartialMindfulSession();
+      resetMindfulState();
+      rerender();
+    }
+  });
 
   document.querySelectorAll(".quiet-mode-card").forEach(card => {
     card.addEventListener("click", () => {
