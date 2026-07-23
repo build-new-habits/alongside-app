@@ -1,6 +1,20 @@
 /**
  * morning-session.js - Morning Session View
  *
+ * 23 Jul 2026 v2
+ *
+ * CHANGELOG
+ * 23 Jul 2026 v2 - BUILD-3 Section 4. This file had no partial-save
+ *   behaviour at all - exiting a genuine 20-40 minute, 5-block programme
+ *   mid-way logged nothing, by explicit design (exit confirm read
+ *   "Progress will not be saved"). Graeme's decision: add partial-save
+ *   tracking, matching Gym/Core Session. Added savePartialSession()
+ *   (mirrors logActivity()'s existing field conventions in this file).
+ *   Wired mountSessionGuard() for back-gesture protection, which this
+ *   file never had. On-screen Exit button updated to call
+ *   savePartialSession() before exiting, and its confirm text now
+ *   reflects that progress IS saved.
+ *
  * 12 Jun 2026 v1 (S4-4 P3) - Back button pass:
  *   ms-back-btn (select screen "Today" button) and ms-exit-btn
  *   (mid-session exit confirm) now call router.back() instead of
@@ -43,6 +57,7 @@
  */
 
 import { store }         from "../store.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { getZoneStatus } from "../data/conditions.js";
 import {
   MORNING_PROGRAMME,
@@ -173,6 +188,42 @@ function logActivity(session, durationMins) {
   while (log.length > 90) log.shift();
   store.set("activityLog", log);
   // Set currentActivityEntry so reflect.js can personalise its question
+  store.set("currentActivityEntry", entry);
+}
+
+/**
+ * 23 Jul 2026 v2 (BUILD-3 Section 4): new function. This file previously
+ * had no partial-save behaviour at all - exiting mid-programme (a genuine
+ * 20-40 minute, 5-block session) logged nothing, by explicit design (the
+ * exit confirm read "Progress will not be saved"). Graeme's decision:
+ * add partial-save tracking, matching Gym/Core Session. Mirrors
+ * logActivity()'s existing field conventions in this file (duration in
+ * minutes, not durationMins - this file predates the store.logActivity()
+ * shared function and was not migrated to it here, to avoid mixing field
+ * naming conventions within a single file).
+ */
+function savePartialSession(session) {
+  if (!session) return;
+  const durationMins = sessionStart
+    ? Math.round((Date.now() - sessionStart) / 60000)
+    : null;
+  const entry = {
+    id:           new Date().toISOString() + "-" + Math.random().toString(36).slice(2, 7),
+    date:         new Date().toISOString().split("T")[0],
+    type:         "morning-session",
+    name:         session.title,
+    duration:     durationMins,
+    status:       "partial",
+    energyBefore: store.get("checkin.energy") || null,
+    feel:         null,
+    painChange:   "none",
+    source:       "coach-recommended",
+    sessionId:    session.id
+  };
+  const log = store.get("activityLog") || [];
+  log.push(entry);
+  while (log.length > 90) log.shift();
+  store.set("activityLog", log);
   store.set("currentActivityEntry", entry);
 }
 
@@ -819,9 +870,14 @@ function handleClick(e) {
   }
 
   // -- Exit session (literal previous page) ----------------------------------
+  // 23 Jul 2026 v2 (BUILD-3 Section 4): previously discarded progress
+  // unconditionally on confirm. Now saves a partial entry first, and the
+  // confirm text reflects that.
   if (e.target.closest("#ms-exit-btn")) {
     if (timerInterval) clearInterval(timerInterval);
-    if (confirm("Exit the session? Progress will not be saved.")) {
+    if (confirm("Exit the session? Your progress so far will be saved.")) {
+      savePartialSession(session);
+      dismountSessionGuard();
       router.back();
     }
     return;
@@ -959,6 +1015,7 @@ function handleClick(e) {
         : null;
       logActivity(session, duration);
     }
+    dismountSessionGuard();
     // Reset state
     viewState      = "select";
     currentBlock   = "warmup";
@@ -993,6 +1050,27 @@ export function onMount() {
   // Pre-fill slot from today if obvious
   const todaySlot = getTodaySlot();
   selectedSlot = todaySlot;
+
+  // 23 Jul 2026 v2 (BUILD-3 Section 4): back-gesture protection + partial-
+  // save, added where none existed before. On-screen Exit button (above)
+  // now also saves via savePartialSession(), so both exit paths behave
+  // consistently.
+  mountSessionGuard({
+    isActive: () => viewState === "session",
+    label:    "morning session",
+    onExit:   () => {
+      const session = getMorningSession(selectedWeek, selectedSlot);
+      savePartialSession(session);
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      viewState       = "select";
+      currentBlock    = "warmup";
+      currentIndex    = 0;
+      completedBlocks = new Set();
+      sessionStart    = null;
+      postFeel        = null;
+      router.back();
+    }
+  });
 
   wireEvents();
 }
