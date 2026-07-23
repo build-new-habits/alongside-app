@@ -1,6 +1,19 @@
 /**
  * today.js
- * 26 Jun 2026 v3
+ * 21 Jul 2026 v4
+ *
+ * v4 (21 Jul 2026) — Proposal-loop fix (navfix-proposalloop session).
+ *   _resolveState() checked 'proposal-accepted' before 'session-done',
+ *   so completing a full session within 10 minutes of accepting a
+ *   proposal could strand the user on the Coach Proposal/threshold
+ *   screen instead of "You moved today," even though the activityLog
+ *   entry was correctly saved. Reordered: session-done (a real,
+ *   concrete completed-today signal) is now checked first, and always
+ *   wins over the 10-minute proposal-accepted window. The genuine
+ *   "just accepted, haven't started, backed out within 10 minutes with
+ *   nothing completed" case is unaffected — sessionToday is false in
+ *   that case, so it still correctly falls through to proposal-accepted.
+ *   No other logic in this file changed.
  *
  * v3 (26 Jun 2026): Name capitalisation fix — _cap() helper added.
  *   _buildGreeting() and renderSessionDone() now capitalise stored name.
@@ -60,6 +73,12 @@ export function TodayView(router) {
     const lastCheckin  = store.get('lastCheckin.timestamp');
     const activityLog  = store.get('activityLog') || [];
 
+    const sessionToday = activityLog.some(e => {
+      const ts = e.completedAt || e.loggedAt || e.date;
+      return ts && new Date(ts).toISOString().split('T')[0] === today;
+    });
+    if (sessionToday) return 'session-done';
+
     if (lastProposal) {
       const proposalDate = new Date(lastProposal);
       const minsAgo      = (Date.now() - proposalDate.getTime()) / 60000;
@@ -67,12 +86,6 @@ export function TodayView(router) {
         return 'proposal-accepted';
       }
     }
-
-    const sessionToday = activityLog.some(e => {
-      const ts = e.completedAt || e.loggedAt || e.date;
-      return ts && new Date(ts).toISOString().split('T')[0] === today;
-    });
-    if (sessionToday) return 'session-done';
 
     if (lastCheckin && new Date(lastCheckin).toISOString().split('T')[0] === today) {
       return 'checked-in';
