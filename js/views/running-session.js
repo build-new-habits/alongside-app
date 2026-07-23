@@ -1,7 +1,17 @@
 /**
  * running-session.js - Guided Running Session
  *
- * 19 May 2026 v2
+ * 23 Jul 2026 v3
+ *
+ * CHANGELOG
+ * 23 Jul 2026 v3 - BUILD-3 exit-guard audit fix. onExit (mountSessionGuard)
+ *   was navigating to reflect.js without ever calling savePartialSession()
+ *   first - the on-screen Exit button (showExitConfirm) called it
+ *   correctly, but the device back-gesture path silently dropped partial
+ *   progress. Fixed to match yoga-session.js v4's confirmed-working
+ *   pattern exactly. Bundled while the file was open: endSession() and
+ *   savePartialSession() migrated from direct activityLog writes to
+ *   store.logActivity() (dedupe-guarded shared path, store.js v10).
  *
  * v1.1 (16 May 2026):
  *   - Warmup end → running transition card added (replaces "Keep going.")
@@ -553,14 +563,23 @@ function pauseSession() {
 function endSession() {
   if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
 
-  const log   = store.get("activityLog") || [];
-  const entry = store.get("currentActivityEntry");
-  if (entry) {
-    entry.sessionEnd    = new Date().toISOString();
-    entry.status        = "completed";
-    entry.durationMins  = Math.floor(elapsed / 60);
-    entry.creditsEarned = creditsEarned;
-    store.set("activityLog", [...log, entry]);
+  // 23 Jul 2026 v3 (BUILD-3): migrated to store.logActivity(), matching
+  // yoga-session.js v4's confirmed-working pattern.
+  const pending = store.get("currentActivityEntry");
+  const nowIso  = new Date().toISOString();
+
+  const activityEntry = store.logActivity({
+    ...(pending || { type: "run", source: "self-directed" }),
+    type:          "run",
+    sessionEnd:    nowIso,
+    completedAt:   nowIso,
+    status:        "completed",
+    durationMins:  Math.floor(elapsed / 60),
+    creditsEarned
+  });
+
+  if (activityEntry) {
+    store.set("currentActivityEntry", activityEntry);
   }
 
   store.set("totalCredits",       (store.get("totalCredits") || 0) + creditsEarned);
@@ -643,15 +662,25 @@ function showExitConfirm() {
   });
 }
 
+// 23 Jul 2026 v3 (BUILD-3): migrated to store.logActivity(), matching
+// yoga-session.js v4's confirmed-working pattern. `elapsed` is a genuine
+// running counter in this file, so durationMins is computed for real.
 function savePartialSession() {
-  const log   = store.get("activityLog") || [];
-  const entry = store.get("currentActivityEntry");
-  if (entry) {
-    entry.sessionEnd    = new Date().toISOString();
-    entry.status        = "partial";
-    entry.durationMins  = typeof elapsed !== "undefined" ? Math.floor(elapsed / 60) : null;
-    entry.creditsEarned = typeof creditsEarned !== "undefined" ? creditsEarned : 0;
-    store.set("activityLog", [...log, entry]);
+  const pending = store.get("currentActivityEntry");
+  const nowIso  = new Date().toISOString();
+
+  const activityEntry = store.logActivity({
+    ...(pending || { type: "run", source: "self-directed" }),
+    type:          "run",
+    sessionEnd:    nowIso,
+    completedAt:   nowIso,
+    status:        "partial",
+    durationMins:  Math.floor(elapsed / 60),
+    creditsEarned: typeof creditsEarned !== "undefined" ? creditsEarned : 0
+  });
+
+  if (activityEntry) {
+    store.set("currentActivityEntry", activityEntry);
   }
 }
 
@@ -667,7 +696,7 @@ export function onMount() {
   mountSessionGuard({
     isActive: () => phase === "running",
     label:    "run",
-    onExit:   () => { dismountSessionGuard(); resetSession(); router.navigate("reflect"); }
+    onExit:   () => { savePartialSession(); resetSession(); router.navigate("reflect"); }
   });
   document.getElementById("rs-back-btn")?.addEventListener("click", () => {
     if (phase === "type")     { resetSession(); router.navigate("intention"); }
