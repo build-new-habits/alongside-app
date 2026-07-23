@@ -1,7 +1,22 @@
 /**
  * core-session.js - Guided Core Session
  *
- * 18 May 2026 v2
+ * 23 Jul 2026 v3
+ *
+ * CHANGELOG
+ * 23 Jul 2026 v3 — BUILD-3 exit-guard audit fix. onExit (mountSessionGuard)
+ *   was navigating to reflect.js without ever calling savePartialSession()
+ *   first — the on-screen Exit button (showExitConfirm) called it
+ *   correctly, but the device back-gesture path silently dropped partial
+ *   progress. Fixed to match yoga-session.js v4's confirmed-working
+ *   pattern exactly. Bundled while the file was open: finaliseSession()
+ *   and savePartialSession() migrated from direct activityLog writes to
+ *   store.logActivity() (dedupe-guarded shared path, store.js v10).
+ *   savePartialSession() also referenced an undeclared `elapsed` variable
+ *   for durationMins (this file has no running elapsed-time tracker,
+ *   only per-exercise hold timers) — left explicitly null with a comment,
+ *   matching yoga-session.js v4's same fix, rather than fabricated.
+ * 18 May 2026 v2 — prior version.
  *
  * Four focus types, three durations. Draws from strength and rehabilitation
  * exercise databases. Condition-aware — automatically avoids exercises
@@ -936,14 +951,23 @@ function finaliseSession() {
   store.set("lastWorkoutCredits", creditsEarned);
   store.set("lastWorkoutName",    "Core Session");
 
-  // Log to activity log
-  const log   = store.get("activityLog") || [];
-  const entry = store.get("currentActivityEntry");
-  if (entry) {
-    entry.sessionEnd      = new Date().toISOString();
-    entry.exercisesCount  = currentIndex;
-    entry.creditsEarned   = creditsEarned;
-    store.set("activityLog", [...log, entry]);
+  // 23 Jul 2026 v3 (BUILD-3): migrated to store.logActivity(), matching
+  // yoga-session.js v4's confirmed-working pattern.
+  const pending = store.get("currentActivityEntry");
+  const nowIso  = new Date().toISOString();
+
+  const activityEntry = store.logActivity({
+    ...(pending || { type: "core-session", source: "self-directed" }),
+    type:           "core-session",
+    sessionEnd:     nowIso,
+    completedAt:    nowIso,
+    status:         "completed",
+    exercisesCount: currentIndex,
+    creditsEarned
+  });
+
+  if (activityEntry) {
+    store.set("currentActivityEntry", activityEntry);
   }
 
   phase = "done";
@@ -1015,15 +1039,35 @@ function showExitConfirm() {
   });
 }
 
+/**
+ * 23 Jul 2026 v3 (BUILD-3): REWRITTEN. Two fixes bundled here —
+ * (1) migrated to store.logActivity(), matching yoga-session.js v4's
+ * confirmed-working pattern, and (2) this function previously referenced
+ * an undeclared variable `elapsed` for durationMins. Like yoga-session.js,
+ * core-session.js has no running elapsed-time tracker (only per-exercise
+ * hold timers) — durationMins is left explicitly null with a comment
+ * rather than fabricated. A real elapsed-time tracker would be a
+ * separate, larger addition for a future session.
+ */
 function savePartialSession() {
-  const log   = store.get("activityLog") || [];
-  const entry = store.get("currentActivityEntry");
-  if (entry) {
-    entry.sessionEnd    = new Date().toISOString();
-    entry.status        = "partial";
-    entry.durationMins  = typeof elapsed !== "undefined" ? Math.floor(elapsed / 60) : null;
-    entry.creditsEarned = typeof creditsEarned !== "undefined" ? creditsEarned : 0;
-    store.set("activityLog", [...log, entry]);
+  const pending = store.get("currentActivityEntry");
+  const nowIso  = new Date().toISOString();
+
+  const activityEntry = store.logActivity({
+    ...(pending || { type: "core-session", source: "self-directed" }),
+    type:           "core-session",
+    sessionEnd:     nowIso,
+    completedAt:    nowIso,
+    status:         "partial",
+    // No elapsed-time tracker exists in this file — left explicitly null
+    // rather than referencing the undeclared `elapsed` the old code had.
+    durationMins:   null,
+    exercisesCount: currentIndex,
+    creditsEarned:  typeof creditsEarned !== "undefined" ? creditsEarned : 0
+  });
+
+  if (activityEntry) {
+    store.set("currentActivityEntry", activityEntry);
   }
 }
 
@@ -1042,7 +1086,7 @@ export function onMount() {
   mountSessionGuard({
     isActive: () => phase === "session" || phase === "rest",
     label:    "core session",
-    onExit:   () => { dismountSessionGuard(); resetSession(); router.navigate("reflect"); }
+    onExit:   () => { savePartialSession(); resetSession(); router.navigate("reflect"); }
   });
 
   // Back / Exit
