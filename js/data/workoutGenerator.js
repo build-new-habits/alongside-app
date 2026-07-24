@@ -2,7 +2,40 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
- * 13 Jul 2026 v1.9
+ * 24 Jul 2026 v1.10
+ *
+ * v1.10 — BUILD-5 fix, confirmed via static analysis (24 Jul) then live
+ *   ground-truth before editing. Root cause: applyDurationCap() only ever
+ *   checked total session length against the fixed per-focus ceiling
+ *   (MAX_DURATION_BY_FOCUS) — it never referenced availableTime at all.
+ *   So someone selecting "Quick — 20 min" still got a session capped only
+ *   at the focus's 30–50 min ceiling, not their actual declared window.
+ *
+ *   Fix: added AVAILABLE_TIME_WINDOW_MINUTES, a total-session-duration
+ *   lookup (in minutes) per availableTime category. These values were
+ *   already documented in the v1.5 changelog comment below (the 40%-of-
+ *   window relationship that produces AVAILABLE_TIME_MAX_EXERCISE_DURATION)
+ *   but had never been captured as an actual constant or used anywhere.
+ *   applyDurationCap() now takes availableTime as a parameter and caps
+ *   against min(focusCap, windowMinutes) — the tighter of the two —
+ *   preserving the existing per-focus sanity ceiling for generous
+ *   availableTime values while actually respecting a short one.
+ *
+ *   Trimming mechanism unchanged and re-confirmed safe for more frequent
+ *   triggering: exercises are removed from the end of the middle block,
+ *   warmup and cooldown stay protected, loop exits once under cap or only
+ *   one main exercise remains. No adjustment needed here.
+ *
+ *   FLOOR ISSUE FOUND, NOT FIXED HERE (logged separately, out of this
+ *   session's scope per blueprint Section 2): selectExercises() computes
+ *   mainCount = params.exerciseCount - 2 (reserving 2 slots for warmup +
+ *   cooldown). For availableTime = "micro", exerciseCount is 2, so
+ *   mainCount = 0 — a Micro (10 min) session gets zero main-focus
+ *   exercises, just a warmup and a cooldown, regardless of focus type.
+ *   This is a pre-existing gap in selectExercises(), not in
+ *   applyDurationCap() (which cannot fix it — there's nothing to trim),
+ *   and touching selectExercises()'s count logic was not in this
+ *   session's file scope. Flagging for a separate fix.
  *
  * v1.9 — Confirmed Critical bug fix, Session A2 follow-up. This file has
  *   carried `import { programmeEngine } from "./programmeEngine.js";`
@@ -225,6 +258,22 @@ const AVAILABLE_TIME_MAX_EXERCISE_DURATION = {
   standard: 960,   // 16 min
   long:     1200,  // 20 min
   open:     1440   // 24 min
+};
+
+// ── availableTime → total session duration window (minutes) ──────────────────
+// BUILD-5 (24 Jul 2026): the actual declared time window, matching the labels
+// shown in checkin.js (Micro/Quick/Short/Standard/Long/Open). This is the
+// figure AVAILABLE_TIME_MAX_EXERCISE_DURATION above was always 40% of — it
+// just was never captured as its own constant or used anywhere before now.
+// Used by applyDurationCap() as the tighter of two constraints, alongside the
+// existing per-focus MAX_DURATION_BY_FOCUS ceiling.
+const AVAILABLE_TIME_WINDOW_MINUTES = {
+  micro:    10,
+  quick:    20,
+  short:    30,
+  standard: 40,
+  long:     50,
+  open:     60
 };
 
 // ── Core area affectsAreas values ──────────────────────────────────────────────
@@ -537,7 +586,7 @@ export const workoutGenerator = {
     // Silent swap of one main exercise if nothing in the selection does.
     const exercises     = this.applyCoreGuarantee(raw, suitableExercises);
 
-    const capped        = this.applyDurationCap(exercises, focus, params);
+    const capped        = this.applyDurationCap(exercises, focus, params, availableTime);
     const duration       = this.calculateDuration(capped);
     const rationale     = this.generateRationale(focus, intensity, burnout, cyclePhase, goalProfile);
 
@@ -653,15 +702,29 @@ export const workoutGenerator = {
    * Main and accessory/finisher exercises are trimmed from the end of the
    * middle block until duration is within the cap, or only 1 main exercise remains.
    *
-   * @param {Array}  exercises - selected exercise list from selectExercises()
-   * @param {string} focus     - workout focus type
-   * @param {object} params    - result of getWorkoutParams()
+   * BUILD-5 (24 Jul 2026): the cap is now the tighter of two constraints —
+   * the fixed per-focus sanity ceiling (MAX_DURATION_BY_FOCUS), and the
+   * user's actual declared availableTime window (AVAILABLE_TIME_WINDOW_MINUTES),
+   * when set. Previously this only ever checked the per-focus ceiling, so a
+   * short availableTime selection (e.g. "Quick — 20 min") was never actually
+   * enforced at the total-duration stage.
+   *
+   * @param {Array}       exercises     - selected exercise list from selectExercises()
+   * @param {string}      focus         - workout focus type
+   * @param {object}      params        - result of getWorkoutParams()
+   * @param {string|null} availableTime - "micro"|"quick"|"short"|"standard"|"long"|"open"|null
    * @returns {Array} exercises, potentially trimmed
    */
-  applyDurationCap(exercises, focus, params) {
-    const cap = params.focusOnRecovery
+  applyDurationCap(exercises, focus, params, availableTime = null) {
+    const focusCap = params.focusOnRecovery
       ? MAX_DURATION_BY_FOCUS.recovery
       : (MAX_DURATION_BY_FOCUS[focus] ?? MAX_DURATION_FALLBACK);
+
+    const windowCap = availableTime
+      ? (AVAILABLE_TIME_WINDOW_MINUTES[availableTime] ?? null)
+      : null;
+
+    const cap = windowCap !== null ? Math.min(focusCap, windowCap) : focusCap;
 
     if (this.calculateDuration(exercises) <= cap) return exercises;
 
