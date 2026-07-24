@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 24 Jul 2026 v179
+ * BUILD-5 undershoot fix cache bump for workoutGenerator.js v1.12 —
+ * duration-aware main-block fill (was: fixed exercise count regardless of
+ * how short individual exercises ran, causing "Quick" sessions to land at
+ * 9-19 min against a 20 min target). File already present in SHELL_URLS
+ * below - no new entries required, this is a cache-bust only.
+ *
  * 24 Jul 2026 v178
  * BUILD-5 follow-up cache bump for workoutGenerator.js v1.11 (exported
  * AVAILABLE_TIME_WINDOW_MINUTES) and coach-proposal.js v12 (fixed
@@ -170,7 +177,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v178";
+const CACHE_NAME = "alongside-v179";
 
 const SHELL_URLS = [
 
