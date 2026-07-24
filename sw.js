@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 24 Jul 2026 v177
+ * BUILD-5 cache bump for workoutGenerator.js v1.10 (available-time duration
+ * cap fix). File already present in SHELL_URLS below - no new entries
+ * required, this is a cache-bust only.
+ *
  * 23 Jul 2026 v176
  * BUILD-3 Section 4 - the 4 files with no partial-save behaviour at all.
  *   Ground-truthed and, per Graeme's decisions this session, fixed:
@@ -156,7 +161,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v176";
+const CACHE_NAME = "alongside-v177";
 
 const SHELL_URLS = [
 
