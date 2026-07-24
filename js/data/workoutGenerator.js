@@ -2,6 +2,21 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
+ * 24 Jul 2026 v1.11
+ *
+ * v1.11 — BUILD-5 follow-up, same session. Exported AVAILABLE_TIME_WINDOW_MINUTES
+ *   (previously a private const) so coach-proposal.js's fallback-path minutes
+ *   calculation can reuse the same numbers instead of duplicating them. No
+ *   change to any existing behaviour — this is an export addition only.
+ *   Root cause this unblocks: coach-proposal.js's _getAvailableTime() was
+ *   reading availableTime from the wrong store fields (checkinHistory /
+ *   lastCheckin, neither of which ever held it) and always fell through to
+ *   a hardcoded literal 30 — silently overwriting the correct value on every
+ *   mount of the proposal screen, before generateDailyOptions() ever ran.
+ *   That bug lived entirely in coach-proposal.js; this file's v1.10 fix was
+ *   correct throughout but could never be exercised via the real UI because
+ *   of it. See coach-proposal.js v12 changelog for the actual fix.
+ *
  * 24 Jul 2026 v1.10
  *
  * v1.10 — BUILD-5 fix, confirmed via static analysis (24 Jul) then live
@@ -266,8 +281,10 @@ const AVAILABLE_TIME_MAX_EXERCISE_DURATION = {
 // figure AVAILABLE_TIME_MAX_EXERCISE_DURATION above was always 40% of — it
 // just was never captured as its own constant or used anywhere before now.
 // Used by applyDurationCap() as the tighter of two constraints, alongside the
-// existing per-focus MAX_DURATION_BY_FOCUS ceiling.
-const AVAILABLE_TIME_WINDOW_MINUTES = {
+// existing per-focus MAX_DURATION_BY_FOCUS ceiling. Exported (v1.11) so
+// coach-proposal.js's fallback path can convert a category to minutes using
+// the same numbers, rather than a second hardcoded copy.
+export const AVAILABLE_TIME_WINDOW_MINUTES = {
   micro:    10,
   quick:    20,
   short:    30,
