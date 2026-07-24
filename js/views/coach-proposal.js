@@ -1,9 +1,36 @@
 /**
  * coach-proposal.js
- * 13 Jul 2026 v11
+ * 24 Jul 2026 v12
  *
  * Coach proposal view. The hub. Doors that describe categories, not
  * pre-committed choices.
+ *
+ * v12 — BUILD-5 follow-up (found while testing workoutGenerator.js v1.10 on-
+ *   device). _getAvailableTime() read availableTime from two store fields
+ *   that are never actually written (history[today].availableTime,
+ *   lastCheckin.availableTime) and always fell through to a hardcoded
+ *   literal 30 — a number, not one of the six valid category strings
+ *   ("micro"|"quick"|"short"|"standard"|"long"|"open"). Worse: that bad
+ *   value was then written straight back over the correct availableTime
+ *   store value on every mount, via _generateOptions() — so even a value
+ *   correctly set by check-in (or manually, for testing) was silently
+ *   clobbered before generateDailyOptions() ever ran. Practical effect:
+ *   availableTime-driven session length has never worked through the real
+ *   check-in → proposal flow, independent of anything in workoutGenerator.js.
+ *
+ *   Fixed: _getAvailableTime() now reads store.get('availableTime') directly
+ *   — the single field checkin.js actually writes, and the same field
+ *   workoutGenerator.js reads. Returns null (not a number) when nothing has
+ *   been selected, which workoutGenerator.js already treats correctly as
+ *   "no time constraint".
+ *
+ *   _getFallbackOptions() needed the OLD function's numeric-minutes return
+ *   value (for its Math.min(x, availMins) calculations) — that was the
+ *   actual reason a numeric fallback existed in the first place, overloaded
+ *   onto a function whose other call site needed a category string. Split
+ *   into a new _getAvailableTimeMinutes(), which converts the category to
+ *   minutes using workoutGenerator.js's exported AVAILABLE_TIME_WINDOW_MINUTES
+ *   (avoids a second hardcoded copy of those numbers).
  *
  * v11 — Confirmed bug fix. _buildReflection()'s ACTIVITY_LABELS map had
  *   no entry for "coach-session" — an activityLog entry type this map
@@ -196,7 +223,7 @@ import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
 import { getProgramme }      from '../data/programmes.js';
 import { detectBurnout }     from '../data/checkin.js';
 import { getPrimaryEngineGoal } from '../data/goals.js';
-import { workoutGenerator }  from '../data/workoutGenerator.js';   // v9 — direct import, replaces window._workoutGenerator lookup
+import { workoutGenerator, AVAILABLE_TIME_WINDOW_MINUTES } from '../data/workoutGenerator.js';   // v9 — direct import, replaces window._workoutGenerator lookup. v12 — added AVAILABLE_TIME_WINDOW_MINUTES.
 
 // ─── Door copy (v8 — static, honest about category vs commitment) ────────────
 
@@ -916,7 +943,7 @@ export function CoachProposalView(router) {
   }
 
   function _getFallbackOptions(energyScore, intensity) {
-    const availMins = _getAvailableTime() || 30;
+    const availMins = _getAvailableTimeMinutes();
     // v8: shape normalised to match real generator output — id, name,
     // duration, exerciseCount, rationale — since these now feed Door 1's
     // preview cards directly, not just old per-door coach lines.
@@ -998,11 +1025,32 @@ export function CoachProposalView(router) {
   }
 
   function _getAvailableTime() {
-    const history = store.get('checkinHistory') || {};
-    const today   = new Date().toISOString().split('T')[0];
-    return history[today]?.availableTime
-        || store.get('lastCheckin.availableTime')
-        || 30;
+    // v12 (24 Jul 2026) — REWRITTEN. Was reading history[today]?.availableTime
+    // and store.get('lastCheckin.availableTime') — neither field is ever
+    // written. checkin.js's _saveAll() writes availableTime ONLY to the
+    // top-level store.availableTime key (checkinData.saveCheckin() does not
+    // include it in the checkin object, and it is not one of the fields
+    // copied into lastCheckin). So this always fell through to the old
+    // hardcoded fallback of 30 — a bare number, not a valid category — which
+    // then got written straight back over the correct value by
+    // _generateOptions() on every single mount of this screen, before
+    // generateDailyOptions() ever ran. Net effect: availableTime-driven
+    // session length has never worked via the real check-in → proposal flow.
+    // Fix: read the single source of truth directly. null (not a number)
+    // when nothing has been selected yet — workoutGenerator.js already
+    // treats null as "no time constraint", which is the correct behaviour
+    // for that case.
+    return store.get('availableTime') || null;
+  }
+
+  // v12 (24 Jul 2026) — NEW. _getAvailableTime() is also used by
+  // _getFallbackOptions() (below) where a number of minutes is needed, not
+  // a category string — that mismatch is what produced the old numeric-30
+  // fallback in the first place. Kept as a separate function with its own
+  // contract rather than overloading _getAvailableTime()'s return type.
+  function _getAvailableTimeMinutes() {
+    const category = store.get('availableTime');
+    return category ? (AVAILABLE_TIME_WINDOW_MINUTES[category] ?? 30) : 30;
   }
 
   // ── Public interface ───────────────────────────────────────────────────────
