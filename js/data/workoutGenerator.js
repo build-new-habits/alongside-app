@@ -2,6 +2,34 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
+ * 24 Jul 2026 v1.12
+ *
+ * v1.12 — BUILD-5 undershoot fix, same day, found while on-device testing
+ *   v1.11 with coach-proposal.js v12's fix confirmed live. Sessions were
+ *   correctly never exceeding the declared availableTime window (v1.10's
+ *   fix), but routinely landing well under it — e.g. "Quick" (20 min)
+ *   sessions landing at 9-19 min across repeated tests. Root cause: the old
+ *   selectExercises() picked exactly `exerciseCount - 2` main exercises and
+ *   stopped, regardless of how short they turned out to be. Real exercise
+ *   data runs 60-100s for most strength/mobility items, so for "quick"
+ *   (mainCount = 1) there was only ever one main exercise — nowhere near
+ *   enough content to fill 20 minutes, no matter which one got picked.
+ *
+ *   Fixed: selectExercises()'s main-block selection is now duration-aware
+ *   when availableTime is set — fills toward getDurationCap()'s target one
+ *   exercise at a time (new shared method, extracted from applyDurationCap()
+ *   so the fill-target and the trim-ceiling can never drift apart), bounded
+ *   by a new MAIN_FILL_CEILING sanity max. mainCount is kept as a floor
+ *   (try to reach at least this many), which also resolves the previously-
+ *   flagged "micro" floor issue as a side effect — the fill loop always adds
+ *   at least 1 main exercise unconditionally, where mainCount = 0 previously
+ *   produced zero. Behaviour when availableTime is null is unchanged
+ *   (original fixed-count selection, untouched).
+ *
+ *   applyDurationCap() remains as-is and still runs afterward — now more of
+ *   a safety net for edge cases (e.g. one unusually long exercise) than the
+ *   primary mechanism, since selection now aims at the target directly.
+ *
  * 24 Jul 2026 v1.11
  *
  * v1.11 — BUILD-5 follow-up, same session. Exported AVAILABLE_TIME_WINDOW_MINUTES
@@ -260,6 +288,14 @@ const AVAILABLE_TIME_COUNT = {
   long:     6,
   open:     7
 };
+
+// Hard sanity max for selectExercises()'s duration-aware main-block fill
+// loop (BUILD-5 undershoot fix, 24 Jul 2026) — prevents a very generous
+// availableTime window from filling with an unreasonably long exercise
+// list if individual exercises happen to run short. The loop should
+// normally stop well before this on duration; this is a backstop, not
+// the primary constraint.
+const MAIN_FILL_CEILING = 6;
 
 // ── availableTime → per-exercise duration ceiling (seconds) ───────────────────
 // 40% of available window. Prevents a single long exercise (e.g. a 30-minute
@@ -714,6 +750,33 @@ export const workoutGenerator = {
   },
 
   /**
+   * Single source of truth for the total-session-duration cap: the tighter
+   * of the fixed per-focus sanity ceiling and the user's declared
+   * availableTime window, when set. Shared by applyDurationCap() (the
+   * ceiling — trims if over) and selectExercises()'s main-block fill logic
+   * (the floor — fills toward it) so both always agree on the same number.
+   * Previously this formula was duplicated in applyDurationCap() alone;
+   * extracted here (24 Jul 2026, BUILD-5 undershoot fix) before a second
+   * copy could be added and drift out of sync with the first.
+   *
+   * @param {string}      focus         - workout focus type
+   * @param {object}      params        - result of getWorkoutParams()
+   * @param {string|null} availableTime - "micro"|"quick"|"short"|"standard"|"long"|"open"|null
+   * @returns {number} cap in minutes
+   */
+  getDurationCap(focus, params, availableTime = null) {
+    const focusCap = params.focusOnRecovery
+      ? MAX_DURATION_BY_FOCUS.recovery
+      : (MAX_DURATION_BY_FOCUS[focus] ?? MAX_DURATION_FALLBACK);
+
+    const windowCap = availableTime
+      ? (AVAILABLE_TIME_WINDOW_MINUTES[availableTime] ?? null)
+      : null;
+
+    return windowCap !== null ? Math.min(focusCap, windowCap) : focusCap;
+  },
+
+  /**
    * Trim exercises to fit within the maxDuration cap for this focus type.
    * Warmup (role: "warmup") and cooldown (role: "cooldown") are always protected.
    * Main and accessory/finisher exercises are trimmed from the end of the
@@ -733,15 +796,7 @@ export const workoutGenerator = {
    * @returns {Array} exercises, potentially trimmed
    */
   applyDurationCap(exercises, focus, params, availableTime = null) {
-    const focusCap = params.focusOnRecovery
-      ? MAX_DURATION_BY_FOCUS.recovery
-      : (MAX_DURATION_BY_FOCUS[focus] ?? MAX_DURATION_FALLBACK);
-
-    const windowCap = availableTime
-      ? (AVAILABLE_TIME_WINDOW_MINUTES[availableTime] ?? null)
-      : null;
-
-    const cap = windowCap !== null ? Math.min(focusCap, windowCap) : focusCap;
+    const cap = this.getDurationCap(focus, params, availableTime);
 
     if (this.calculateDuration(exercises) <= cap) return exercises;
 
@@ -807,8 +862,46 @@ export const workoutGenerator = {
       ? appropriateEnergy.filter(e => (e.difficultyLevel || 1) >= floor)
       : appropriateEnergy;
     const mainPool = aboveFloor.length >= 2 ? aboveFloor : appropriateEnergy;
-    const mainCount         = params.exerciseCount - 2;
-    const mainExercises     = this.pickMultiple(mainPool, mainCount, selected);
+    const mainCount = params.exerciseCount - 2;
+    let mainExercises;
+
+    if (availableTime) {
+      // BUILD-5 undershoot fix (24 Jul 2026). Was: pick exactly mainCount
+      // exercises (exerciseCount - 2), full stop — regardless of how short
+      // they turned out to be. Real exercise data runs 60-100s for most
+      // strength/mobility items, so for "quick" (mainCount = 1) a session
+      // routinely landed at 9-19 min against a 20-min declared window: right
+      // direction, wrong side, and not a cache/plumbing issue like the
+      // earlier finding this session — a genuine gap in this function.
+      // This is also where the previously-flagged floor issue lived: for
+      // "micro", mainCount = 0, so zero main exercises were ever selected.
+      // Fix: fill the main block toward getDurationCap()'s target, one
+      // exercise at a time, instead of picking a fixed count up front.
+      // mainCount is kept as a floor (always try to reach at least this
+      // many, matching the original per-category "how much content is
+      // reasonable" intent) and MAIN_FILL_CEILING as a hard sanity max so a
+      // very generous window can't produce an unreasonably long list. This
+      // also guarantees at least 1 main exercise unconditionally, which
+      // resolves the "micro" floor gap as a side effect of the same fix.
+      const target = this.getDurationCap(focus, params, availableTime);
+      let remaining = mainPool.filter(e => !selected.some(s => s.id === e.id));
+      mainExercises = [];
+
+      while (remaining.length > 0 && mainExercises.length < MAIN_FILL_CEILING) {
+        const provisional = [...selected, ...mainExercises.map(e => ({ ...e, role: "main" }))];
+        const soFar = this.calculateDuration(provisional);
+        if (mainExercises.length >= Math.max(mainCount, 1) && soFar >= target) break;
+
+        const next = this.pickOne(remaining);
+        if (!next) break;
+        mainExercises.push(next);
+        remaining = remaining.filter(e => e.id !== next.id);
+      }
+    } else {
+      // Unchanged — no time declared, original fixed-count behaviour.
+      mainExercises = this.pickMultiple(mainPool, mainCount, selected);
+    }
+
     mainExercises.forEach(e => selected.push({ ...e, role: "main" }));
 
     // Accessory (strength focus only)
