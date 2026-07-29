@@ -1,6 +1,19 @@
 /**
  * router.js
- * 21 Jul 2026 v9
+ * 28 Jul 2026 v10
+ *
+ * v10 — BUILD-3 follow-on fix, found during on-device back-gesture testing.
+ *   _setupPopstate()'s handler ran on EVERY popstate event, including ones
+ *   pushed by session-guard.js's mountSessionGuard() (state shape
+ *   { sessionGuard: true }, no 'view' key). Because e.state?.view was
+ *   undefined for those, this handler silently defaulted to 'today' and
+ *   force-navigated there before session-guard.js's own listener (mounted
+ *   separately, per session view) could show its confirmation card — so a
+ *   real device back-gesture during an active session silently exited to
+ *   Today with no card, no choice, and (depending on timing) no partial
+ *   save. Fixed with a one-line early return when e.state?.sessionGuard is
+ *   true, leaving session-guard.js's own listener to handle that event
+ *   exclusively. No other change from v9.
  *
  * v9 — Nav escape-hatch (navfix-proposalloop session). _mountView() now
  *   also toggles #hidden-nav-home-btn's visibility using the exact same
@@ -260,6 +273,7 @@ export const router = {
   _setupPopstate() {
     history.pushState({ view: 'today' }, '', '#today');
     window.addEventListener('popstate', e => {
+      if (e.state?.sessionGuard) return; // let session-guard.js handle its own state — 28 Jul 2026, fixes router.js silently overriding the back-gesture exit-guard card
       const view = e.state?.view || 'today';
       history.pushState({ view }, '', `#${view}`);
       this.back();

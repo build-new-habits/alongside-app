@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 28 Jul 2026 v180
+ * router.js v10 cache bump — fixed a popstate listener collision with
+ * session-guard.js that silently defeated the back-gesture exit-guard
+ * card on every session type (router.js's own listener saw session-guard's
+ * pushed history state, found no 'view' key, defaulted to 'today', and
+ * force-navigated there before the confirmation card could show or the
+ * onExit partial-save could run). Found via real device back-gesture
+ * testing during the BUILD-3 on-device test pass. File already present
+ * in SHELL_URLS below - no new entries required, this is a cache-bust only.
+ *
  * 24 Jul 2026 v179
  * BUILD-5 undershoot fix cache bump for workoutGenerator.js v1.12 —
  * duration-aware main-block fill (was: fixed exercise count regardless of
@@ -177,7 +187,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v179";
+const CACHE_NAME = "alongside-v180";
 
 const SHELL_URLS = [
 
