@@ -1,0 +1,115 @@
+**DRAFT — FOR SOLICITOR REVIEW, NOT FOR PUBLICATION. Bracketed items in bold are placeholders still to be confirmed.**
+
+*v3 change note: Section 9 rewritten. It previously promised to delete an under-18 account on discovery, which conflicted with the Crisis **&** Safeguarding Policy**'**s retained 13–17 fallback pathway — deleting an account mid-crisis-response would cut off support at the worst possible moment. It now describes safety-before-deletion instead, and folds in the Children**'**s Code / Online Safety Act open question. No other changes from v2.*
+
+**Privacy Policy — Alongside: Move**
+
+**Business name: **Build New Habits
+**Trading status: **Sole trader (Graeme Wright). **HMRC sole-trader registration in progress — not yet complete.**
+**Product name: **Alongside: Move
+**Data controller: **Graeme Wright, trading as Build New Habits
+**Contact email: **hello@buildnewhabits.co.uk
+**ICO registration number: ****Not yet obtained. To be inserted before this policy is published — registration is planned immediately before real user data is first collected.**
+**Last updated: ****[DATE — to be set on publication]**
+
+## **1. Who We Are**
+
+Build New Habits is a sole trader business run by Graeme Wright, based in Taunton, Somerset. Our product, Alongside: Move, is a fitness coaching application designed for neurodivergent adults, people navigating burnout, and people managing hormonal change or chronic conditions.
+
+We are **not yet registered** with the Information Commissioner's Office (ICO). Registration will be completed, and this policy updated with the resulting reference number, before the app collects any data from real users.
+
+## **2. What Information We Collect and Why**
+
+### **Account information**
+
+We collect your email address to create your account and to send you a magic link for signing in. We ask for your date of birth at account creation to confirm you meet our minimum age requirement (see Section 8).
+
+### **Health and wellness information (special category data)**
+
+Alongside collects health-related information including: physical conditions you tell us about; pain location and severity; energy and mood readings from your daily check-in; sleep information; menstrual cycle phase, if you choose to provide it; and patterns we derive from this history to detect burnout. This is special category data under UK GDPR and carries the highest level of protection. We collect it only with your explicit, freely given, informed consent, and only to provide safe, personalised coaching — we cannot generate safe recommendations without it.
+
+### **Your journal and feeling-word selections**
+
+If you use the free-text journal, that text is stored so you can look back on it, but it is never scanned, matched against word lists, or used to trigger any automated response. Separately, the app offers a fixed list of feeling-words you can select and a mood history built from those selections; some feeling-word selections may trigger a fixed, pre-written signposting message pointing you toward external support. These are two different features with two different rules, and we keep that distinction firm.
+
+### **Usage data**
+
+We use Plausible Analytics, a privacy-first analytics provider, to understand aggregate usage. This collects no personal data and uses no tracking cookies.
+
+### **Technical error data**
+
+We use Sentry, hosted in the EU (Frankfurt), for error monitoring, configured to scrub health-related terms from error reports.
+
+## **3. The Legal Basis for Processing Your Data**
+
+- Account information: contractual necessity — needed to provide the service you've signed up for.
+
+- Health and wellness information: explicit consent, given at onboarding. You can withdraw this at any time, which deletes your health-related data.
+
+- Payment information: contractual necessity, processed entirely by Stripe. We never see or store your card details.
+
+- Anonymous analytics: legitimate interests — Plausible collects no personal data.
+
+## **4. How We Store Your Data**
+
+Currently, your data is stored locally on your own device (in your browser's local storage) and is not held on our servers. **We plan to migrate to Supabase, a database provider hosted in the EU, before onboarding beta or public users.** Once that migration happens, data will be encrypted in transit and at rest, and Row-Level Security will ensure you can only ever access your own data.
+
+## **5. Who We Share Your Data With**
+
+We do not sell, rent, or share your personal data for marketing purposes. Your data is shared only with the following service providers, who process it on our behalf:
+
+- Supabase (database, planned) — EU region — DPA available; formal execution in progress
+
+- Stripe (payment processing) — DPA incorporated automatically into Stripe's standard terms
+
+- Sentry (error monitoring) — EU region (Frankfurt) — health-data scrubbing configured
+
+- Plausible Analytics (anonymous usage statistics) — EU-hosted — no personal data collected
+
+- Zoho Mail (business email, account communications) — EU-hosted
+
+- Kit, formerly ConvertKit (mailing list, marketing emails only — see Section 11) — processes email address and marketing consent status only, never health or check-in data
+
+## **6. How Long We Keep Your Data**
+
+We keep your data for as long as your account is active. If you delete your account, your data is permanently deleted within 30 days. You may request deletion of specific categories of data — for example, your check-in history — without deleting your account entirely.
+
+## **7. Your Rights Under UK GDPR**
+
+- Right of access — request a copy of the data we hold about you.
+
+- Right to erasure — request deletion of your data, available directly from Settings within the app.
+
+- Right to correction — request correction of inaccurate data.
+
+- Right to portability — request your data in a portable, machine-readable format.
+
+- Right to object — object to our processing in certain circumstances.
+
+- Right to withdraw consent — withdraw consent to health data processing at any time; the app will keep working with reduced personalisation.
+
+To exercise any of these rights, contact us at hello@buildnewhabits.co.uk. We will respond within 30 days.
+
+## **8. If a Data Breach Occurs**
+
+Because Alongside uses magic-link (passwordless) sign-in, there is no password database to be exposed in a breach, which meaningfully limits what a breach could disclose. If a personal data breach nonetheless occurs and poses a risk to your rights and freedoms, we will notify the Information Commissioner's Office within 72 hours of becoming aware of it, where required by law, and will inform you directly, without undue delay, if the breach is likely to result in a high risk to you. **We are still setting up a formal incident response process and log; this commitment describes our intended approach, and we****'****d welcome confirmation this is adequate for our current stage.**
+
+## **9. Age Requirement**
+
+Alongside: Move is intended for adults aged 18 and over. We ask for your date of birth when you create an account to confirm this. **If we become aware that an account belongs to someone under 18, our first priority is their safety, not immediate deletion: the age-appropriate crisis-response pathway described in our Crisis ****&**** Safeguarding Policy remains available regardless of account status, so that closing an account never interrupts support for someone who may need it. Once it****'****s safe to do so, we will review the account and, where appropriate, close it and delete associated data, following that same policy****'****s procedure. How to balance ordinary data-minimisation practice against this safeguarding duty of care is one of the open items we****'****re taking to legal and safeguarding review — see the Safeguarding one-pager, item 7. Separately, whether a stated 18+ minimum age together with a self-declared date of birth is sufficient to take Alongside outside the scope of the ICO****'****s Age Appropriate Design Code and the Online Safety Act****'****s duties toward services children might access is also still under legal review — self-declared age alone is not necessarily treated as a strong signal for this purpose.**
+
+## **10. Marketing Communications**
+
+If you sign up to our mailing list or tick the marketing consent option when creating an account, we may send you occasional emails about new features, beta updates, and content we think you'll find useful, sent via Kit (formerly ConvertKit). In line with the Privacy and Electronic Communications Regulations (PECR), this checkbox is unticked by default and is never a condition of using the app — you can use Alongside fully without ever opting in to marketing email.
+
+You can unsubscribe at any time using the link in every marketing email, or by contacting hello@buildnewhabits.co.uk. Unsubscribing does not affect transactional emails — such as your magic sign-in link, payment receipts, or essential service updates — which we send under contractual necessity, not marketing consent, and which you cannot opt out of while your account remains active. We do not use your check-in, mood, or journal data to personalise marketing content; the Journal Privacy Rule and our general data-minimisation approach apply here too. **Open question for review: PECR includes a “soft opt-in” exception allowing marketing to existing customers about similar products without prior explicit consent, provided a clear opt-out is offered at collection and in every message. We****'****d like confirmation on whether our free-tier signup counts as the kind of prior relationship this exception is meant for, or whether we should rely on explicit opt-in only, which is our current default approach regardless.**
+
+## **11. Changes to This Policy**
+
+If we make significant changes to how we process your data, we will notify you by email or an in-app notice at least 14 days before the change takes effect.
+
+## **12. How to Complain**
+
+If you're unhappy with how we've handled your data, contact us first at hello@buildnewhabits.co.uk. If you remain dissatisfied, you can complain to the Information Commissioner's Office at ico.org.uk or on 0303 123 1113.
+
+*Build New Habits · Alongside: Move · Privacy Policy (Draft for Solicitor Review) · 23 Jul 2026 v3*

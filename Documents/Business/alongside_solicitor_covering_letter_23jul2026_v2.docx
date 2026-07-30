@@ -1,0 +1,67 @@
+**Build New Habits**
+
+Graeme Wright · Taunton, Somerset · hello@buildnewhabits.co.uk
+
+Dear [solicitor's name — to be confirmed via Alex],
+
+Thank you very much for offering your time to talk through some early-stage legal questions for my business, Build New Habits. I understand this came about through Alex at Somerset Innovation Hub, and I'm very grateful for the introduction.
+
+# **About the business**
+
+I'm building Alongside, a family of adaptive coaching apps. The first product, Alongside: Move, is a fitness coaching web app aimed at people mainstream fitness apps consistently fail — particularly neurodivergent adults, people navigating burnout, and people managing hormonal change or chronic conditions. I currently operate as a sole trader (registration with HMRC in progress); the business is not yet incorporated as a limited company.
+
+I've attached a short, plain-language Product & Data Overview alongside this letter, so you can see what the product actually does and what data it handles without needing to wade through technical documentation. I'd be very grateful if you could read that first — it should make everything below make more sense.
+
+# **Why I****'****m asking now**
+
+I'm preparing to open a closed beta in mid-to-late September 2026, with a small, invited group of testers. Before any real user data is collected, I need to register with the ICO and have my Privacy Policy and Terms of Service reviewed. I also have an unresolved safeguarding sign-off process, and an open question about intellectual property in my product's logo. I don't yet know your specific area of practice, so I've grouped my questions into three areas below — please treat this as a menu, not an expectation that you can answer all of it in one sitting.
+
+# **A. Data protection ****&**** consumer terms**
+
+- I currently plan for the product to be an 18+ service, with date of birth captured at sign-up. Is that framing itself sound, and does an 18+ minimum age remove the need to treat this as a service likely to be accessed by children under UK GDPR and the Online Safety Act, given the product isn't otherwise marketed at or designed for under-18s?
+
+- The app generates workout recommendations by filtering options against a user's daily check-in answers (energy, mood, pain, sleep, declared conditions) using rule-based logic, not a trained predictive model. Does a single, consistent response message triggered by certain check-in inputs count as “solely automated decision-making with legal or similarly significant effects” under UK GDPR Article 22, or does its low-stakes, non-individualised nature mean it falls outside that provision?
+
+- Related to the above — do you think a Data Protection Impact Assessment is required for this feature, and if so, roughly what scope would you expect it to cover?
+
+- I've attached a list of the sub-processors I use or plan to use (Supabase, Stripe, Sentry, Plausible Analytics, Zoho Mail, and Kit for mailing-list marketing emails). Is there anything unusual about that list for a UK-based health-adjacent app that I should be aware of before publishing my Privacy Policy?
+
+- Account sign-in uses a magic link (email only, no password), specifically to reduce what a future data breach could expose. Is there anything about a passwordless design that changes my data-protection obligations, positively or negatively, compared to a traditional password?
+
+- My marketing emails will use explicit, unticked-by-default opt-in consent under PECR. Does my free-tier signup count as the kind of existing-customer relationship PECR's “soft opt-in” exception is meant for, or should I rely on explicit consent only (my current default) regardless?
+
+- Alongside is designed for general fitness and wellbeing and doesn't diagnose, treat, or monitor any medical condition — I understand from MHRA guidance that this keeps it outside medical device regulation, since “general wellbeing” isn't normally a medical purpose. Could you confirm that reading is right, and flag anything in how I describe the burnout-detection or condition-filtering features that might inadvertently cross that line?
+
+# **B. Safeguarding**
+
+- I have a complete internal Crisis & Safeguarding Policy (attached, alongside a one-page summary of the seven open items it identifies) covering how the app responds if a user selects certain flagged words in a fixed-choice mood selector. I understand a general safeguarding review from you may not be the same as the named, PAPYRUS-affiliated youth-safeguarding review I understand I still need separately — could you help me understand what a general review from you could and couldn't cover?
+
+- Even with an 18+ minimum age, does the Online Safety Act's “child access assessment” duty still apply to a service like this, and if so, what would a proportionate response look like?
+
+# **C. Intellectual property / trademark**
+
+- My product family (Alongside, and sub-brands Move, Rest, Love, Learn, Life, Lead, Compass, Savvy) and the business name Build New Habits — what's involved in trademarking these in the UK, which classes would likely apply, and roughly what cost and timeline should I expect?
+
+- My current logo was generated using an AI tool (OpenAI's Sora), which has since been shut down, meaning I can no longer access my original generation records. What's the current UK legal position on copyright ownership and trademark eligibility for AI-generated imagery, and is there anything I should be doing now — before the underlying API is retired in September 2026 — to preserve evidence of how the mark was created?
+
+- If I commission a freelance designer (for example, via a platform like Fiverr) to redraw the mark as original artwork, what should that engagement contract specifically cover to give me clean, assignable ownership — particularly given the platform's own default terms may not be sufficient on their own?
+
+# **What I****'****ve attached**
+
+- Product & Data Overview (this covers everything referenced above)
+
+- Draft Privacy Policy and Terms of Service
+
+- Crisis & Safeguarding Policy, plus a one-page summary of its seven open items
+
+- IP/trademark question sheet, including the logo-ownership background
+
+Thank you again for your time — I know this covers a lot of ground, and I don't expect a full answer to all of it in one sitting. I'm very happy to prioritise whichever of the three areas is closest to your own specialism, and would welcome your steer on where to take the rest.
+
+With thanks,
+
+**Graeme Wright**
+
+Build New Habits · hello@buildnewhabits.co.uk
+
+*Build New Habits · Alongside: Move · Solicitor Covering Letter · 23 Jul 2026 v2*
