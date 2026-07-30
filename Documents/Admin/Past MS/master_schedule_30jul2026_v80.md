@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 30 Jul 2026 v81
+## 30 Jul 2026 v80
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_30jul2026_v80.md`. Remove v80 on upload.
+Supersedes `alongside_master_schedule_30jul2026_v79.md`. Remove v79 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** Core Session `currentActivityEntry` data-integrity investigation — 🟢 **Closed.** Diagnosed as never having silently failed to log (core-session isn't reachable via `intention.js`'s activity list, but `logActivity()`'s fallback always fired with real data). A genuine id-reuse bug was found and fixed instead: `core-session.js` v3→v4. The same pattern was then confirmed and fixed in `yoga-session.js` v4→v5 as a same-session follow-up. `sw.js` v181→v183 across both fixes. See Core Session Outcome section below.
+**This version's substantive changes:** **Changelog.md decision made — resume maintenance**, going forward from this session's BUILD-4 entry. Full historical backfill (Mar–Jul 2026 gap) explicitly deferred as a separate decision, not assumed. This version was also the first pushed directly to the repo from the PM chat, using the fine-grained token Graeme provided here — see Section below on how future updates will reach the repo.
 
 ---
 
@@ -26,7 +26,7 @@ Supersedes `alongside_master_schedule_30jul2026_v80.md`. Remove v80 on upload.
 ## NEXT WEEK — WB 3 Aug
 
 - [x] ~~**BUILD-4 (Schema Reconciliation)**~~ — 🟢 **Closed, 30 Jul, ahead of schedule.** `schema.md` v1.9 live in repo. See BUILD-4 Outcome section below.
-- [x] ~~**Core Session `currentActivityEntry` data-integrity investigation**~~ — 🟢 **Closed, 30 Jul.** Never silently failing to log; genuine id-reuse bug found and fixed instead, in both `core-session.js` and (follow-up, same session) `yoga-session.js`. See Core Session Outcome section below.
+- **Core Session `currentActivityEntry` data-integrity investigation — 🟢 blueprint ready, v2** (`alongside_blueprint_coresession-integrity_30jul2026_v2.md`, updated for the repo-based workflow). Investigates whether Core Session completions have ever logged real data — a genuine trust-critical open question surfaced during BUILD-3, same category as BUILD-5 and B3-3. Not yet run.
 - **Supabase schema design session** — now unblocked, BUILD-4 closed. Should factor in the BUILD-4 Appendix A follow-up (below) — worth deciding whether that follow-up runs first or alongside.
 - **BUILD-4 Appendix A follow-up (new)** — ~18 fields found via grep during BUILD-4 but not individually triaged (`totalCredits`, `lastWorkoutName`/`lastWorkoutCredits`, `quietMode`, others). Same check-both-read-and-write method as the two corrections below. Recommended before Supabase schema design, not strictly blocking.
 - BUILD-1's remaining sub-question
@@ -52,24 +52,6 @@ Captured in full in `alongside_alex_meeting_outcomes_29jul2026_v1.md`. Summary f
 **New task — LinkedIn presence.** Graeme wants a BNH business page and a personal profile, prompted by Alex's suggestion that LinkedIn plus direct email is a good channel for reaching both organisations and named individuals. Not yet scoped — Graeme has said he'll need help designing this properly. New item, no urgency attached yet, ready whenever Graeme wants to start.
 
 **Deadlines — externally confirmed.** Alex agrees on two hard deadlines: **partner group/testing community + beta start, mid-September 2026**, and **public launch, January 2027** — the latter specifically because that's when people are most active in the "new year, new fitness" mindset, a named commercial rationale from Alex rather than just an internal target. This validates the dates already on this schedule; it doesn't resolve the underlying capacity risk (solo build/business load) flagged separately in Graeme's own meeting-prep review — both remain true at once.
-
----
-
-## ✅ Core Session `currentActivityEntry` Data-Integrity Investigation: Closed, 30 Jul 2026
-
-Full trace and reasoning in the session's own record (this PM chat, or `alongside_blueprint_coresession-integrity_30jul2026_v2.md` for the original brief). Summary:
-
-**Diagnosis (code trace, no on-device pass yet — see below).** The blueprint's worry — that Core Session might never receive `currentActivityEntry` upstream and so might never have logged real completion data — was investigated by tracing every route into `core-session.js` (`library.js`, `home-threshold.js`, `today.js`, `coach-proposal.js` fallback options). **Confirmed: none of them set a pending entry.** Root structural reason: `intention.js`'s `ACTIVITIES` list doesn't include a "core" option at all — Core Session was never wired into that pattern. **But this was never actually blocking real data from being logged** — `finaliseSession()`/`savePartialSession()` both had a defensive fallback that called `store.logActivity()` with real `type`/`completedAt`/`status`/`exercisesCount`/`creditsEarned` regardless of whether a pending entry existed. So the original trust-critical worry doesn't hold: Core Session completions have been logging real data all along, just without the extra optional context fields (`sessionStart`, `energyBefore`, `duration`) that only exist when a session type is routed through `intention.js` — which core-session never was.
-
-**A real bug was found and fixed instead.** Because `core-session.js` re-sets `currentActivityEntry` to its own completion result after every write (needed for `reflect.js`'s "How did that feel?" find-by-id flow), and both functions were spreading `pending` into new writes, **two back-to-back Core Sessions not separated by an `intention.js` visit could share one `activityLog` id** — the second completion's write would inherit the first's stale `id`. `core-session.js` v3 → v4: both functions now build the entry fresh, no `pending` spread, `logActivity()` always assigns a new id.
-
-**Same bug confirmed and fixed in `yoga-session.js` as a same-session follow-up (on request).** Identical spread-pending pattern, and yoga is also reachable directly from `library.js`'s "Yoga / Pilates" card without going through `intention.js`. Fix had to be more surgical than core-session's, since yoga's `pending` *is* sometimes genuine (via `intention.js`): a pending entry carrying a `status` field is stale (every `logActivity()`-written entry has one; `intention.js`'s fresh entry never does), and is now discarded instead of spread — preserving legitimate upstream data when it exists, while still preventing id reuse. `yoga-session.js` v4 → v5.
-
-**Code shipped:** `core-session.js` v3→v4, `yoga-session.js` v4→v5, `sw.js` v181→v183 (two bumps, one per fix, both deployed last). Changelog entries added for both. No schema change.
-
-**Not yet done — logged as open:** on-device confirmation of a real completed Core Session (and ideally the back-to-back-completions scenario for both fixes) — the PM chat has no device access. Worth a quick check next time Graeme's on the phone; the fix is narrow enough that code-trace confidence is high, but "should work" is never the final gate per standing discipline.
-
-**Also logged, not investigated this session:** whether `workout.js` (gym) has the same spread-pending pattern — out of this session's scope, not checked either way.
 
 ---
 
@@ -157,7 +139,7 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 | Product — BUILD-9 (18+ age-gate) | Not yet scoped. **U18 safeguarding position genuinely open** — Alex suggested it may not be needed, unconfirmed, pending his solicitor (29 Jul). | Hold scoping until Alex/solicitor respond. | Waiting on Alex. |
 | Product — Thread scroll-bug audit | 🟢 Closed, 28 Jul. 2 of 3 files already fixed, third checked and cleared. | None. | None. |
 | Product — B3-2-Test follow-ups | 2 items remain (chip overflow, reflect.js cache-clear confirmation). | Fold into a future session. | Not booked, low priority. |
-| Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Closed, 30 Jul.** Never silently failing to log — real bug was an id-reuse risk on back-to-back completions, fixed in `core-session.js` v4 and `yoga-session.js` v5. See Core Session Outcome section above. | On-device confirmation, next time on the phone. | None hard — code-trace confidence high. |
+| Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Blueprint ready, v2, 30 Jul** (`alongside_blueprint_coresession-integrity_30jul2026_v2.md`, updated for repo-based workflow). Original finding: Core Session may never receive `currentActivityEntry` upstream, meaning completions may never have logged real data — surfaced during BUILD-3, not chased at the time. | Run session — **WB 3 Aug.** | Not booked (blueprint ready, no calendar slot confirmed). |
 | Product — BUILD-4 Appendix A follow-up | New, 30 Jul. ~18 fields found via grep during BUILD-4, not individually triaged. | Dedicated pass, same read+write check method. | Recommended before Supabase schema design, not strictly blocking. |
 | Product/Infra — Supabase schema design | Scoped in conversation 27 Jul. **Unblocked — BUILD-4 closed.** | Run — decide whether Appendix A follow-up runs first. | None hard; Appendix A recommended first. |
 | Website — Home/Products/Community/Impact | 🟢 Confirmed clean. | None unless BUILD-9 triggers a copy pass. | None. |
@@ -189,4 +171,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v81*
+*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v80*
