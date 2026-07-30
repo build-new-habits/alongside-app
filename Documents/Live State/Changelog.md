@@ -181,6 +181,12 @@ This changelog was not maintained during this window while build velocity was hi
 - Also found and fixed while here: `.session-exit-overlay`/`.session-exit-card` (the on-screen overlay's CSS, shared by all 7 files using this local-overlay pattern — core-session, yoga-session, cycle-session, running-session, swim-session, walk-session, and now workout) had no styles anywhere in the repo. Was rendering unstyled — no backdrop, no card containment. Fixed in `css/components/session-guard.css` v1 → v2, styled to match the existing `.sg-*` back-gesture card's visual language.
 - `sw.js` v183 → v184 — cache bump, deployed last.
 
+### Yoga stuck-screen bug — found and fixed during on-device testing
+
+- On-device testing (Graeme, 30 Jul, Step 3 of the test guide) surfaced a real bug: completing a real yoga session via "Finish practice" left the screen frozen on the last pose. Root cause: `yoga-session.js`'s `finaliseSession()` set `phase = "done"` but never called `rerender()` — confirmed by comparison with `core-session.js`'s equivalent function, which already had both lines. Practical effect: the genuine completion wrote correctly to `activityLog` (confirmed — `energyBefore: 7`, `creditsEarned: 120`, all correct), but the screen never advanced, so a second tap fired the same flow again, which `logActivity()`'s dedupe guard correctly rejected (working as designed, not a new bug).
+- Fixed: `yoga-session.js` v5 → v6, one line added (`rerender();`). Two other call sites of `finaliseSession()` checked and confirmed already correct — no other changes needed.
+- `sw.js` v184 → v185 — cache bump, deployed last.
+
 ---
 
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

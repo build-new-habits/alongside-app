@@ -1,9 +1,28 @@
 /**
  * yoga-session.js - Guided Yoga and Pilates Session
  *
- * 30 Jul 2026 v5
+ * 30 Jul 2026 v6
  *
- * v5 — Core Session investigation follow-up (same session, on request).
+ * v6 — On-device testing bug fix (Core Session investigation, same day,
+ *   found while Graeme was walking through Step 3 of the on-device test
+ *   guide). finaliseSession() set `phase = "done"` but never called
+ *   rerender() — so completing a real yoga session via the main "Finish
+ *   practice" button (the ys-next-btn path, advancePose() → finaliseSession()
+ *   at the last pose) left the screen frozen on the last pose, appearing
+ *   stuck. Confirmed via comparison: core-session.js's equivalent
+ *   finaliseSession() already ends with `phase = "done"; rerender();` —
+ *   yoga-session.js was missing the second line. Practical effect
+ *   confirmed on-device: Graeme, seeing no response, tapped "Finish
+ *   practice" a second time, which correctly triggered logActivity()'s
+ *   dedupe guard (working as designed) rather than writing a duplicate —
+ *   but the screen still never advanced. Fixed: one line added,
+ *   `rerender();`, after `phase = "done";`. Two other call sites of
+ *   finaliseSession() checked and confirmed unaffected: the "Skip" path
+ *   (ys-skip-btn handler) already had its own explicit rerender() call
+ *   immediately after, and the renderPose() defensive fallback returns
+ *   renderDone() HTML directly rather than calling finaliseSession()
+ *   mid-render, so neither needed this fix.
+ * 30 Jul 2026 v5 — Core Session investigation follow-up (same session, on request).
  *   Same id-reuse bug found in core-session.js also existed here:
  *   finaliseSession()/savePartialSession() spread `pending` unconditionally,
  *   so a stale already-logged currentActivityEntry (left behind when this
@@ -726,6 +745,7 @@ function finaliseSession() {
   }
 
   phase = "done";
+  rerender();
 }
 
 function resetSession() {
