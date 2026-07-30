@@ -1,12 +1,10 @@
 # Alongside: Move — Master Schedule
-## 30 Jul 2026 v80
+## 30 Jul 2026 v78
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_30jul2026_v79.md`. Remove v79 on upload.
+Supersedes `alongside_master_schedule_30jul2026_v77.md`. Remove v77 on upload.
 
-**⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
-
-**This version's substantive changes:** **Changelog.md decision made — resume maintenance**, going forward from this session's BUILD-4 entry. Full historical backfill (Mar–Jul 2026 gap) explicitly deferred as a separate decision, not assumed. This version was also the first pushed directly to the repo from the PM chat, using the fine-grained token Graeme provided here — see Section below on how future updates will reach the repo.
+**This version's substantive changes:** two build session blueprints written in the PM chat and ready to run — BUILD-4 (Schema Reconciliation) and the Core Session `currentActivityEntry` data-integrity investigation, both booked for WB 3 Aug. Confirmed no file overlap between the two (touch-once holds). Also noted: Graeme is setting up a GitHub fine-grained personal access token, scoped to the app/website repos, so future build sessions can `git clone`/commit/push directly via bash tool rather than relying solely on paste-based ground-truthing — an option, not a replacement, for the existing Ground Truth Rule.
 
 ---
 
@@ -25,10 +23,9 @@ Supersedes `alongside_master_schedule_30jul2026_v79.md`. Remove v79 on upload.
 
 ## NEXT WEEK — WB 3 Aug
 
-- [x] ~~**BUILD-4 (Schema Reconciliation)**~~ — 🟢 **Closed, 30 Jul, ahead of schedule.** `schema.md` v1.9 live in repo. See BUILD-4 Outcome section below.
-- **Core Session `currentActivityEntry` data-integrity investigation — 🟢 blueprint ready, v2** (`alongside_blueprint_coresession-integrity_30jul2026_v2.md`, updated for the repo-based workflow). Investigates whether Core Session completions have ever logged real data — a genuine trust-critical open question surfaced during BUILD-3, same category as BUILD-5 and B3-3. Not yet run.
-- **Supabase schema design session** — now unblocked, BUILD-4 closed. Should factor in the BUILD-4 Appendix A follow-up (below) — worth deciding whether that follow-up runs first or alongside.
-- **BUILD-4 Appendix A follow-up (new)** — ~18 fields found via grep during BUILD-4 but not individually triaged (`totalCredits`, `lastWorkoutName`/`lastWorkoutCredits`, `quietMode`, others). Same check-both-read-and-write method as the two corrections below. Recommended before Supabase schema design, not strictly blocking.
+- **BUILD-4 (Schema Reconciliation) — 🟢 blueprint ready** (`alongside_blueprint_BUILD-4_30jul2026_v1.md`). Field inventory already done (179 fields, 155 undocumented) — this session writes the actual schema.md v1.9 and resolves the three-competing-documents problem.
+- **Core Session `currentActivityEntry` data-integrity investigation — 🟢 blueprint ready** (`alongside_blueprint_coresession-integrity_30jul2026_v1.md`). Investigates whether Core Session completions have ever logged real data — a genuine trust-critical open question surfaced during BUILD-3, same category as BUILD-5 and B3-3.
+- **Supabase schema design session** — runs *after* BUILD-4 closes.
 - BUILD-1's remaining sub-question
 - BIZ-2, BIZ-3, INF-6, OUT-2, OUT-7
 - **Org outreach category decision** (see Alex Meeting Outcomes below) — Graeme's call on whether workplace wellbeing reps and women's health groups join the Tier list, plus the "what's in it for them" messaging pass. Blocks OUT-2–OUT-8.
@@ -52,40 +49,6 @@ Captured in full in `alongside_alex_meeting_outcomes_29jul2026_v1.md`. Summary f
 **New task — LinkedIn presence.** Graeme wants a BNH business page and a personal profile, prompted by Alex's suggestion that LinkedIn plus direct email is a good channel for reaching both organisations and named individuals. Not yet scoped — Graeme has said he'll need help designing this properly. New item, no urgency attached yet, ready whenever Graeme wants to start.
 
 **Deadlines — externally confirmed.** Alex agrees on two hard deadlines: **partner group/testing community + beta start, mid-September 2026**, and **public launch, January 2027** — the latter specifically because that's when people are most active in the "new year, new fitness" mindset, a named commercial rationale from Alex rather than just an internal target. This validates the dates already on this schedule; it doesn't resolve the underlying capacity risk (solo build/business load) flagged separately in Graeme's own meeting-prep review — both remain true at once.
-
----
-
-## ✅ BUILD-4 — Schema Reconciliation: Closed, 30 Jul 2026
-
-Full detail in `alongside_session_handoff_BUILD4_docsreorg_30jul2026_v1.md` (or the handoff pasted into this chat). Summary:
-
-**`schema.md` v1.9** written and pushed to `Documents/Live State/Schema.md`, ground-truthed directly against live `store.js` v10. Supersedes and retires `schema.md` v1.3, `schema_v1_7_15jun2026.md`, `schema_md.docx`, and the v1.5/v1.8 delta notes — **all four should be removed from project knowledge** (Claude can't do this directly; needs Graeme to delete via the UI).
-
-**Two corrections to the 28 Jul reconciliation note itself** — found by checking both read *and* write sides of each field, not inferring from one side alone:
-- `todayIntensity` — previously assumed dead. **Actually live**: written by `checkin.js` + `coach-proposal.js`, read by `workoutGenerator.js`.
-- `exerciseFeedback` — previously confirmed live (28 Jul pass). **Actually dormant**: `applyFeedbackWeighting()` reads it, but nothing writes it anywhere — no UI collects exercise-level feedback, always falls back to `[]`. This is the same "specified but never built" pattern as empathy transfer — worth remembering as a recurring failure mode, not a one-off.
-
-Also resolved: `stats` isn't a store field at all (computed local var, never persisted — false alarm). `hardBeforeSelections`/`hardBeforeShownAt` confirmed to be the existing `onboarding.*` fields, not a new pair.
-
-**Code shipped:** `workoutGenerator.js` v1.12→v1.13 (removed dead `todaysWorkouts`/`workoutsGeneratedAt` writes and the orphaned `needsRegeneration()`/`getTodaysWorkouts()` pair — confirmed uncalled anywhere). `sw.js` v180→v181, cache bump, deployed last. No behaviour change — dead code, zero live readers.
-
-**Logged, not fixed this session (touch-once):**
-- `checkin-mini.js` still writes `workoutsGeneratedAt`, now fully orphaned since its only reader was just removed.
-- `activeProgramme.measurementsOptIn` — written via a `mergeWithDefaults()` copy-paste artefact from `strategicGoal.measurementsOptIn`; not part of `activeProgramme`'s own schema.
-- `Changelog.md` confirmed stale in both repo and project knowledge (byte-identical, dated 8 Mar 2026). **Decided 30 Jul — resume maintenance.** A new entry for this session's BUILD-4 work has been added to `Documents/Live State/Changelog.md`, re-establishing the practice from here forward. **Full historical backfill for the Mar–Jul 2026 gap is explicitly not part of this decision** — that's a separate, larger job (many versions of `workoutGenerator.js`, `coach-proposal.js`, `sw.js` etc. shipped in that window without a changelog entry) and would need its own scoped session if wanted.
-
----
-
-## 📁 Repo Documents Reorganisation — 30 Jul 2026
-
-`alongside-app` repo's `Documents/` folder restructured into four folders, run in the same session as BUILD-4:
-
-- **`Live State/`** — must track live code exactly: `Schema.md` (v1.9), `Changelog.md` (**maintenance resumed 30 Jul** — see BUILD-4 outcome above), `alongside_crisis_safeguarding_policy_23jul2026_v7.docx`.
-- **`Admin/`** — `master_schedule.md` is now the **canonical live copy of this document** (see the location-change note at the top of this file). `Admin/Past MS/` holds every superseded version by date. `Admin/Templates/` holds reusable templates. This week's active blueprints/handoffs also live at `Admin/` root — **not yet backfilled with the historical archive** (dozens more exist in project knowledge back to March; a separate future job, not done this session).
-- **`Business/`** — company/legal docs kept in the repo since no other copy exists elsewhere: business plan, setup guide, one-pager, portfolio, founding document, pricing model, HMRC status, privacy policy draft, ToS draft, IP/trademark sheet, solicitor letter.
-- **`Archive/`** — stale March-2026-era architecture/spec docs and superseded handoffs. Kept, not deleted, matching the existing Cleanup Task List philosophy but for docs instead of code.
-
-**Still needs Graeme:** remove the now-superseded master-schedule versions (v68–v78) and the four retired schema docs from project knowledge — Claude can't delete project knowledge entries directly.
 
 ---
 
@@ -133,15 +96,14 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 | Product — BUILD-1 (Nav-gap fix) | 🟡 Core mechanism confirmed. Sub-question open. | Quick confirmation. | None. |
 | Product — BUILD-2 (Proposal-loop fix) | 🟢 Closed 23 Jul. | — | None. |
 | Product — BUILD-3 (Session-view audit) | 🟡 Code confirmed clean twice. Not yet on-device tested. | On-device pass, expected formality. | Needs phone only. |
-| Product — BUILD-4 (Schema Reconciliation) | 🟢 **Closed, 30 Jul.** `schema.md` v1.9 live in repo. Two corrections to the 28 Jul note itself found (`todayIntensity` live not dead, `exerciseFeedback` dormant not live). | None — see Appendix A follow-up as a new, separate item. | None. |
+| Product — BUILD-4 (Schema Reconciliation) | 🟢 **Blueprint ready, 30 Jul** (`alongside_blueprint_BUILD-4_30jul2026_v1.md`). Field inventory done (179 fields, 155 undocumented), two delta-note errors resolved, `exerciseFeedback` confirmed live. | Run session — **WB 3 Aug.** | Not booked (blueprint ready, no calendar slot confirmed). |
 | Product — BUILD-5 (available-time bug) | 🟢 Closed, confirmed on-device 24 Jul. Three fixes. | None. | None. |
 | Product — BUILD-6 | Confirmed non-crashing. Decision still open, low priority. | Graeme's call. | Not booked. |
 | Product — BUILD-9 (18+ age-gate) | Not yet scoped. **U18 safeguarding position genuinely open** — Alex suggested it may not be needed, unconfirmed, pending his solicitor (29 Jul). | Hold scoping until Alex/solicitor respond. | Waiting on Alex. |
 | Product — Thread scroll-bug audit | 🟢 Closed, 28 Jul. 2 of 3 files already fixed, third checked and cleared. | None. | None. |
 | Product — B3-2-Test follow-ups | 2 items remain (chip overflow, reflect.js cache-clear confirmation). | Fold into a future session. | Not booked, low priority. |
-| Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Blueprint ready, v2, 30 Jul** (`alongside_blueprint_coresession-integrity_30jul2026_v2.md`, updated for repo-based workflow). Original finding: Core Session may never receive `currentActivityEntry` upstream, meaning completions may never have logged real data — surfaced during BUILD-3, not chased at the time. | Run session — **WB 3 Aug.** | Not booked (blueprint ready, no calendar slot confirmed). |
-| Product — BUILD-4 Appendix A follow-up | New, 30 Jul. ~18 fields found via grep during BUILD-4, not individually triaged. | Dedicated pass, same read+write check method. | Recommended before Supabase schema design, not strictly blocking. |
-| Product/Infra — Supabase schema design | Scoped in conversation 27 Jul. **Unblocked — BUILD-4 closed.** | Run — decide whether Appendix A follow-up runs first. | None hard; Appendix A recommended first. |
+| Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Blueprint ready, 30 Jul** (`alongside_blueprint_coresession-integrity_30jul2026_v1.md`). Original finding: Core Session may never receive `currentActivityEntry` upstream, meaning completions may never have logged real data — surfaced during BUILD-3, not chased at the time. | Run session — **WB 3 Aug.** | Not booked (blueprint ready, no calendar slot confirmed). |
+| Product/Infra — Supabase schema design | Scoped in conversation 27 Jul. | Run after BUILD-4 closes. | Blocked on BUILD-4. |
 | Website — Home/Products/Community/Impact | 🟢 Confirmed clean. | None unless BUILD-9 triggers a copy pass. | None. |
 | Outreach — OUT-1 (reshaped) | Brief drafted, not yet run. | Run the session. | Blocks OUT-2–OUT-7. |
 | Outreach — org category decision | New, 29 Jul. Alex suggested workplace wellbeing reps and women's health groups; "why would they do anything?" messaging gap identified. | Graeme's decision + messaging pass. | Blocks OUT-2–OUT-8. |
@@ -150,25 +112,11 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 | Marketing — LinkedIn presence | New, unscoped, 29 Jul. BNH business page + Graeme's personal profile. | Scope whenever Graeme's ready to start. | Not booked. |
 | Infra — INF-7 (breach response process) | Reconfirmed open, 27 Jul. No procedure written. | Write short internal procedure. | Same trigger as BIZ-3. |
 | Infra — Supabase account 2FA | New, 27 Jul. | Graeme's own action. | None. |
-| Infra — GitHub fine-grained token workflow | 🟢 **Live, 30 Jul.** Token in project knowledge, 7-day expiry, already used for BUILD-4 + docs reorg. | Regenerate before expiry when needed. | None. |
-| Infra/Admin — Changelog.md maintenance | 🟢 **Decided, 30 Jul — resume.** New entry added for BUILD-4 work, re-establishing the practice. | Keep it current from every future session onward. | None. |
-| Infra/Admin — Changelog.md historical backfill (Mar–Jul gap) | New, 30 Jul. Explicitly separate from the resume decision above — not assumed as part of it. | Graeme's call whether this is worth a dedicated session. | Not booked, no urgency. |
-| Cleanup — `checkin-mini.js` orphaned `workoutsGeneratedAt` write | Logged, 30 Jul. Now fully orphaned (its only reader removed this session). | Sign-off only. | None, deliberately deferred. |
-| Cleanup — `activeProgramme.measurementsOptIn` anomaly | Logged, 30 Jul. Copy-paste artefact from `strategicGoal.measurementsOptIn` via `mergeWithDefaults()`. | Small fix, not urgent. | None, deliberately deferred. |
+| Infra — GitHub fine-grained token workflow | New, 30 Jul. Graeme setting up a repo-scoped token so build chats can `git clone`/commit/push directly via bash tool. | Set up whenever ready; use in the build chat that needs it, not pasted here. | None. |
 | Cleanup — `exercises/index.js` | Logged, 28 Jul. | Sign-off only. | None, deliberately deferred. |
-| Admin — project knowledge cleanup | New, 30 Jul. Superseded master-schedule versions (v68–v78) and 4 retired schema docs need removing from project knowledge — Claude can't delete these directly. | Graeme, via the UI, whenever convenient. | None. |
-| Admin — `Admin/` historical backfill | New, 30 Jul. Repo's `Admin/` folder has this week's blueprints/handoffs only; dozens more exist in project knowledge back to March, not yet moved. | Separate future session if wanted. | Not booked, no urgency. |
 
-*All standing rules, Stream A/C/D/E detail not listed above are unchanged from v71–v78 — see those versions for full detail.*
+*All standing rules, Stream A/C/D/E detail not listed above are unchanged from v71–v77 — see those versions for full detail.*
 
 ---
 
-## 🔑 Master Schedule → Repo Workflow — decided 30 Jul 2026
-
-Graeme provided the fine-grained GitHub token directly in the PM chat so schedule updates can be pushed straight to the repo, rather than downloaded and uploaded manually via the GitHub web UI each time. From this version forward: the PM chat, at session close, writes the new version, pushes it to `Documents/Admin/master_schedule.md`, moves the previous version into `Documents/Admin/Past MS/`, and removes the superseded copy from project knowledge search results by uploading the new snapshot over it (the old project-knowledge entries themselves still need manual deletion by Graeme — Claude can't do that directly).
-
-**Security note, worth having on record:** this token now lives in the PM chat's own conversation history, not just a build chat's. That's a wider exposure surface than the original "paste into the build chat that needs it" plan — mitigated by the same short expiry (7 days) already in place. Worth revisiting once the product's past the rapid-build phase, same as the original project-knowledge token storage trade-off already logged.
-
----
-
-*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v80*
+*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v78*

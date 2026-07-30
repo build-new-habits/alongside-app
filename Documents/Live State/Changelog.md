@@ -140,4 +140,27 @@ Initial working build.
 
 ---
 
+## ⚠️ Maintenance gap, 8 Mar 2026 – 30 Jul 2026
+
+This changelog was not maintained during this window while build velocity was high — many versions of `workoutGenerator.js`, `coach-proposal.js`, `sw.js`, and others shipped without an entry. Confirmed stale (byte-identical in repo and project knowledge) during the 30 Jul 2026 BUILD-4 session. **Decision: resume maintenance from this point forward** — see `Documents/Admin/master_schedule.md` for the decision record. Historical backfill for this gap is a separate, not-yet-scheduled decision.
+
+---
+
+## Resumed — 30 Jul 2026
+
+### BUILD-4 — Schema Reconciliation, dead code removal
+
+- `Documents/Live State/Schema.md` — new v1.9, ground-truthed directly against live `store.js` v10. Supersedes `schema.md` v1.3, `schema_v1_7_15jun2026.md`, `schema_md.docx`, and the v1.5/v1.8 delta notes.
+- Two corrections found to the 28 Jul reconciliation note's own assumptions: `todayIntensity` confirmed live (written by `checkin.js` + `coach-proposal.js`, read by `workoutGenerator.js`) — previously assumed dead. `exerciseFeedback` confirmed dormant (read by `applyFeedbackWeighting()`, nothing writes it) — previously assumed live.
+- `stats` confirmed not a store field (computed local var, never persisted) — the "specified but never built" flag was a false alarm.
+- `hardBeforeSelections`/`hardBeforeShownAt` confirmed to be the existing `onboarding.hardBeforeSelections`/`onboarding.hardBeforeShownAt` fields, not a new pair.
+- `workoutGenerator.js` v1.12 → v1.13 — removed dead `todaysWorkouts`/`workoutsGeneratedAt` writes and the orphaned `needsRegeneration()`/`getTodaysWorkouts()` function pair (confirmed uncalled anywhere).
+- `sw.js` v180 → v181 — cache bump, deployed last. No behaviour change; dead code, zero live readers.
+
+### Documents Reorganisation
+
+- `Documents/` restructured into `Live State/`, `Admin/`, `Business/`, `Archive/`. `Documents/Admin/master_schedule.md` is now the canonical Master Schedule location (was project knowledge).
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
