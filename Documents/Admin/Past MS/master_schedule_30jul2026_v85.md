@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 30 Jul 2026 v86
+## 30 Jul 2026 v85
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_30jul2026_v85.md`. Remove v85 on upload.
+Supersedes `alongside_master_schedule_30jul2026_v84.md`. Remove v84 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** A third, separate gym-related file found while testing `workout.js`'s exit-guard fix on-device — `gym-programme.js` (Graeme's real programme flow), not touched today. No exit protection of any kind (worse than `workout.js`'s pre-fix state), and doesn't write to `activityLog` at all — uses a separate `progressLog` store key via `recordSession()`. Deliberately not fixed same-session — raises a genuine open product question about intentional-vs-gap architecture. Logged as its own high-priority item needing a scoped session.
+**This version's substantive changes:** A second real bug found continuing on-device testing (yoga Route B) — `logActivity()`'s 2-minute dedupe window was silently rejecting genuinely different real completions, with the session view falsely showing success. Fixed: `store.js` v10→v11, window reduced to 10 seconds, applies to all activity types. A related, more important gap flagged but deliberately not fixed: the app never tells the user when a write is actually rejected — needs a coach-voiced message, a content decision, own scoped session.
 
 ---
 
@@ -27,7 +27,6 @@ Supersedes `alongside_master_schedule_30jul2026_v85.md`. Remove v85 on upload.
 
 - [x] ~~**BUILD-4 (Schema Reconciliation)**~~ — 🟢 **Closed, 30 Jul, ahead of schedule.** `schema.md` v1.9 live in repo. See BUILD-4 Outcome section below.
 - [x] ~~**Core Session `currentActivityEntry` data-integrity investigation**~~ — 🟢 **Closed, 30 Jul.** Never silently failing to log; genuine id-reuse bug found and fixed instead, in both `core-session.js` and (follow-up, same session) `yoga-session.js`. See Core Session Outcome section below.
-- 🟠 **`gym-programme.js` — no exit protection, doesn't write to `activityLog` (new, 30 Jul, found on-device testing).** Graeme's real programme flow ("Build Your Base, Week 4, Session A") — separate file from `workout.js` (fixed today) and `core-session.js`. Confirmed: no `mountSessionGuard()` at all (back-gesture does nothing, no "Stay" option); on-screen Exit button has no confirmation of any kind, not even a browser `confirm()` — instant silent exit; completion writes to `progressLog` via `recordSession()`, never touches `activityLog` or `store.logActivity()` at all — architecturally separate from every other session type traced today. Needs its own scoped session, not a quick patch — open product question on whether `progressLog`-only tracking is intentional (older architecture) or a real gap. See Core Session Outcome section below for full trace detail.
 - **Supabase schema design session** — now unblocked, BUILD-4 closed. Should factor in the BUILD-4 Appendix A follow-up (below) — worth deciding whether that follow-up runs first or alongside.
 - **BUILD-4 Appendix A follow-up (new)** — ~18 fields found via grep during BUILD-4 but not individually triaged (`totalCredits`, `lastWorkoutName`/`lastWorkoutCredits`, `quietMode`, others). Same check-both-read-and-write method as the two corrections below. Recommended before Supabase schema design, not strictly blocking.
 - BUILD-1's remaining sub-question
@@ -97,13 +96,6 @@ Two new UI/UX findings surfaced incidentally while testing, unrelated to the Cor
 **Dedupe window fix — found continuing on-device testing, Route B (yoga direct from Library, no Intention visit).** Two genuinely different, real yoga completions 83 seconds apart were silently rejected by `logActivity()`'s dedupe guard as a duplicate — `finaliseSession()` still showed the normal "Practice done" success screen with credits, but the completion was never actually written to `activityLog`. Root cause: the guard's 2-minute default window was built to catch near-instantaneous accidental double-fires (a double-tap, or the stuck-screen re-tap bug just fixed above) — those happen within a second or two, not two minutes. Graeme's read, which the trace confirmed: two real, distinct full-session completions of the same type within 2 minutes of each other is realistically a testing-only scenario, not something a genuine user would trigger. Fixed: `store.js` v10 → v11, `dedupeWindowMs` default reduced to 10 seconds — still comfortably covers a slow-rendering device re-tap, no longer catches genuinely different completions. No caller overrides this default, so the fix applies uniformly across every activity type (gym, core, yoga, run, walk, swim, cycle). `sw.js` v185 → v186.
 
 **Separately flagged, deliberately not fixed — silent failure on rejected writes.** When `logActivity()` rejects a write (dedupe or otherwise), the calling session view has no way of knowing and still shows its normal success screen with credits. This is a pre-existing gap across every activity type using the shared write path, not new. Needs a coach-voiced message (Nurturing tier) — a content/UX decision, not a code-only fix — so deliberately not invented on the spot. Needs its own scoped session.
-
-**A third, separate gym-related file found while testing `workout.js`'s exit-guard fix — `gym-programme.js`, not touched today, needs its own session.** Graeme's real programme flow ("Build Your Base, Week 4, Session A") turned out to be a completely different file from both `workout.js` (fixed today) and `core-session.js` — multi-exercise-card layout with individual "Done" toggles and a single "Session done" bar, rather than the one-exercise-at-a-time flow the other two use. Traced on request:
-- **No exit protection of any kind.** No `mountSessionGuard()` import at all — confirmed via grep, not present anywhere in the file. Back-gesture does nothing protective (matches Graeme's on-device report — no "Stay" option, it just exits).
-- **The on-screen Exit button is worse than `workout.js`'s pre-fix state.** No confirmation of any kind, not even a browser `confirm()` — a single-line handler: tap Exit → `router.navigate('today')` → gone instantly.
-- **Doesn't write to `activityLog` at all.** Finishing a session calls `recordSession()` (from `programmeEngine.js`), which writes to a completely different store key, `progressLog` — never calls `store.logActivity()`, never touches `activityLog`. This is architecturally separate from every other session type traced today (all of which converged on the shared `logActivity()` path via BUILD-3/B3-3).
-
-**Not fixed — this needs its own scoped session, not a same-session patch.** Unlike the other fixes today, this raises a genuine open product question: is `progressLog`-only tracking for structured programmes intentional (a deliberate, older architecture separate from the ad-hoc `activityLog` types) or a real gap that should also feed `activityLog`? That's not something to guess at and patch quietly — needs a decision first.
 
 ---
 
@@ -214,7 +206,6 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 | Product — Yoga stuck-screen bug (`finaliseSession()` missing `rerender()`) | 🟢 **Found and fixed, 30 Jul, on-device.** Real completion left the screen frozen on the last pose — data was always correct, only the screen transition was broken. Fixed `yoga-session.js` v5→v6, re-tested on-device immediately, confirmed working. | None — closed. | None. |
 | Product — Dedupe window too wide (`logActivity()`) | 🟢 **Found and fixed, 30 Jul, on-device.** Two genuine, distinct completions 83 seconds apart were silently rejected as a duplicate — screen showed false success. Reduced `dedupeWindowMs` 2min→10sec, `store.js` v10→v11. Applies to all activity types. | None — closed. | None. |
 | Product — Silent failure on rejected `logActivity()` writes | 🟠 **New, 30 Jul.** Found alongside the dedupe fix above. When a write is rejected, the session view still shows a false success screen — no indication to the user. Needs a coach-voiced message (Nurturing tier), a content/UX decision. Deliberately not fixed on the spot. | Scope a dedicated session. | Not booked, no urgency but a real trust gap. |
-| Product — `gym-programme.js`: no exit protection, no `activityLog` write | 🟠 **New, 30 Jul, found on-device testing.** Graeme's real programme flow. No `mountSessionGuard()` at all (worse than `workout.js`'s pre-fix state — Exit has zero confirmation, not even `confirm()`). Doesn't write to `activityLog` — uses `progressLog` via `recordSession()` instead, architecturally separate from everything else. | Own scoped session — needs a product decision on `progressLog` vs `activityLog` first, not a quick patch. | Not booked. High priority given this is the real programme flow, but deliberately not rushed. |
 | Admin — project knowledge cleanup | New, 30 Jul. Superseded master-schedule versions (v68–v78) and 4 retired schema docs need removing from project knowledge — Claude can't delete these directly. | Graeme, via the UI, whenever convenient. | None. |
 | Admin — `Admin/` historical backfill | New, 30 Jul. Repo's `Admin/` folder has this week's blueprints/handoffs only; dozens more exist in project knowledge back to March, not yet moved. | Separate future session if wanted. | Not booked, no urgency. |
 
@@ -230,4 +221,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v86*
+*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v85*
