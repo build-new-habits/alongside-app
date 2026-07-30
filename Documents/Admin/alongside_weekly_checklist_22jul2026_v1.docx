@@ -1,0 +1,97 @@
+**22 Jul 2026 v1**
+
+*Accessibility note: built-in heading styles, plain-text checkbox characters for manual ticking (this is a static personal checklist, not an interactive form), plain language labels, no images.*
+
+# Weekly Checklist — Path to Beta
+
+*A static, tickable version of the task inventory, organised by week. Not linked to the master schedule automatically — update the master schedule yourself from this once things are done, at whatever pace suits you.*
+
+# WB 27 Jul — Full availability
+
+**⚠ Static QA found today.js still at v3 — check this first, before anything else this week.**
+
+☐ **[BIZ-1] ****HMRC sole trader registration — **Register at gov.uk with NI number ready  ***Done when: ****registration submitted, UTR requested*
+
+☐ **[OUT-1] ****Confirm outreach categories — **Decide which category set to pursue  ***Done when: ****decision made*
+
+☐ **[BUILD-2] ****Proposal-loop fix — re-verify — **Re-check today.js on live site, not just the changelog  ***Done when: ****confirmed actually live, or re-opened if not*
+
+☐ **[BUILD-4] ****Schema reconciliation — start — **Confirm canonical schema version, plan the align-store.js session  ***Done when: ****canonical version confirmed*
+
+☐ **[INF-1] ****Supabase scoping session — **Book and hold the session  ***Done when: ****session held, build plan exists*
+
+# WB 3 Aug — Full availability
+
+☐ **[BIZ-2] ****Starling Bank account — **Apply in-app with ID + selfie  ***Done when: ****application submitted*
+
+☐ **[BIZ-3] ****ICO registration — **Verify fee, register, pay  ***Done when: ****registration number received*
+
+☐ **[INF-6] ****Kit mailing list — **Create account, build capture form  ***Done when: ****embed link ready*
+
+☐ **[OUT-2] ****White Ribbon approach — **Send the warm-version email  ***Done when: ****sent*
+
+☐ **[OUT-7] ****Beta pitch — org version — **Approve adapted pitch  ***Done when: ****approved*
+
+☐ **[BUILD-1] ****Nav-gap fix — **Build and test escape-hatch visibility  ***Done when: ****deployed and tested*
+
+☐ **[BUILD-3] ****Session-view audit — **Decide fix scope for the 5 confirmed files  ***Done when: ****fix session scoped*
+
+# WB 10 Aug — Mon–Wed full, away Thu 13/Fri 14
+
+☐ **[OUT-3] ****National org outreach — **Send to confirmed national categories  ***Done when: ****sent*
+
+☐ **[OUT-4] ****Local/regional outreach — **Somerset-first, confirmed categories  ***Done when: ****sent*
+
+☐ **[INF-2] ****Stripe account — **Create account, add 3 products  ***Done when: ****account + products created*
+
+☐ **[INF-3] ****Sentry account — **Create account  ***Done when: ****created, wired in*
+
+☐ **[WEB-1] ****Upgrade page — **Build  ***Done when: ****live*
+
+☐ **[CONT-1] ****Content audit — **Review D2/D3/D6  ***Done when: ****findings documented*
+
+# WB 17 Aug — Mon 17 only, then away (light laptop)
+
+☐ **[—] ****Monitor outreach replies — **Check inbox Monday  ***Done when: ****holding responses sent if needed*
+
+☐ **[BIZ-4] ****Insurance quotes — **Get 2–3 quotes  ***Done when: ****quotes in hand*
+
+☐ **[BIZ-5] ****Solicitor brief — **Confirm brief was sent  ***Done when: ****confirmed*
+
+# WB 24 Aug — Away all week (light laptop)
+
+☐ **[—] ****Reactive only — **Reply if laptop time allows — no new pushes  ***Done when: ****nothing dropped*
+
+# WB 31 Aug — Full availability
+
+☐ **[OUT-5] ****Non-responder follow-up — **Send the one follow-up  ***Done when: ****sent*
+
+☐ **[OUT-6] ****Individual recruitment push — **Own network, LinkedIn, local groups  ***Done when: ****target range approached*
+
+☐ **[BUILD-8] ****Device test programme — **Run full matrix  ***Done when: ****pass, no P1 bugs*
+
+☐ **[TEST-2] ****WCAG 2.2 AA audit — **Full pass, app + website  ***Done when: ****audit complete*
+
+☐ **[COMMS-1/2/3] ****Email system + welcome pack — **Review and approve drafts  ***Done when: ****approved*
+
+# WB 7 Sept — Full availability
+
+☐ **[MILE-4] ****Beta testers committed — **Finalise list  ***Done when: ****list finalised*
+
+☐ **[BIZ-8] ****Accounting method — **Decide  ***Done when: ****method chosen*
+
+☐ **[TEST-4/5] ****Install prompt + data deletion tests — **Run both  ***Done when: ****both pass*
+
+☐ **[WEB-2] ****About page — **Build  ***Done when: ****live*
+
+☐ **[INF-4/5] ****Plausible + Zoho DPA — **Confirm both  ***Done when: ****confirmed*
+
+# WB 14 Sept — Full — target window
+
+☐ **[MILE-6] ****Pre-beta opens — **Go live — free tier  ***Done when: ****live*
+
+☐ **[OUT-8] ****Survey preview — **Send to committed testers  ***Done when: ****sent*
+
+☐ **[—] ****Final QA sweep — **Last check before beta itself  ***Done when: ****complete*
+
+*Build New Habits · Weekly Checklist · 22 Jul 2026 v1*

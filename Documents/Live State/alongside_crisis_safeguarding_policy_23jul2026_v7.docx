@@ -1,0 +1,199 @@
+**Alongside — Crisis ****&**** Safeguarding Policy**
+
+**Build New Habits**
+
+**23 Jul 2026 v7**
+
+*Applies across the Alongside product family: Move, Learn, and future products.*
+
+**STATUS: DRAFT FOR REVIEW. Submitted for sign-off to legal counsel and safeguarding review. See Section 10 for the specific matters requiring confirmation before approval.**
+
+*Change note (v7, 23 Jul 2026): Section 1 updated to reflect that Alongside: Move**'**s intended minimum age is under active reconsideration and moving toward 18+. Section 9.4 updated accordingly. A new Section 10 item (7) has been added asking reviewers to confirm this fallback-pathway approach is correct. No other content has changed from v6 (02 Jul 2026).*
+
+# **1. Purpose ****&**** Scope**
+
+This policy defines how Alongside responds when a user's mood-meter selection indicates they may need support beyond what the app can provide. It applies identically across the product family; the flagged words, message, and destination contacts vary by user age, not by product.
+
+**[v7] **Alongside: Move's front-door minimum age is under active review as part of the current legal review process and is moving toward 18+, with date of birth captured at onboarding to enforce it. This section previously stated that Move was available to users aged 13 and above; that is no longer the intended design. However, because a self-declared date of birth can be inaccurate, the 13–17 detection and response pathway described in this policy is being retained as a fallback safety net rather than removed — a user who is in fact under 18, whether or not they declared that honestly, should still receive an age-appropriate response if they trigger this policy. Age band continues to be captured and used for routing purposes regardless of the front-door minimum. This change has not yet been confirmed by legal or safeguarding review — see Section 10, item 7.
+
+This policy does not cover, and Alongside does not implement: free-text analysis of journal entries, a graded clinical severity classification, machine-learning-based risk detection, or human intervention by Alongside staff in response to an individual disclosure. The reasoning for each is set out where relevant below.
+
+# **2. Detection Mechanism**
+
+The sole trigger for this policy is the selection of a flagged word from the existing mood-meter feeling-word picker. Each word in the picker is stored with a fixed quadrant and depth level (checkin.js: { word, quadrant, depth }). A word is either flagged or it is not; there is no scoring, weighting, or free-text interpretation involved in detection.
+
+Alongside's quadrant system is an adaptation of the Yale Mood Meter (Dr Marc Brackett, Yale Center for Emotional Intelligence), part of RULER, a CASEL-recognised evidence-based approach to emotional vocabulary. The word banks used in this policy are drawn from that published framework.
+
+# **3. Flagged Words, by Quadrant**
+
+*This word list is a proposal grounded in the published Yale Mood Meter vocabulary and Mind**'**s published warning-signs guidance. It requires verification against the live checkin.js word bank before implementation — see Section 10.*
+
+## **3.1 Governing rule**
+
+- Yellow (high-energy, pleasant) and Green (low-energy, pleasant) quadrants: no word is ever flagged.
+
+- Red (high-energy, unpleasant) and Blue (low-energy, unpleasant) quadrants: a limited subset of words is flagged, matched specifically to Mind's published warning signs rather than general negative emotion.
+
+## **3.2 Adult word set (18+, or age band not set to a teen band)**
+
+Yellow: excited, joyful, motivated, inspired, happy, enthusiastic, optimistic, elated — none flagged. Green: calm, relaxed, content, peaceful, serene, balanced, at ease, satisfied — none flagged. Red: angry, anxious, frustrated, fearful, stressed, panicked, irritated, tense, overwhelmed, nervous, trapped — trapped flagged directly; overwhelmed and panicked flagged only in combination with a Blue-quadrant flagged word. Blue: sad, lonely, tired, discouraged, disappointed, bored, gloomy, dejected, despair, hopeless, worthless, empty, numb, drained, trapped — hopeless, worthless, despair, empty flagged directly; trapped flagged only in combination.
+
+## **3.3 Teen word set (13–17, both Learn and Move)**
+
+**[v7] **Retained as a fallback pathway even as Move's intended minimum age moves to 18+ — see Section 1.
+
+Users earlier in the product's depth-tiering system are offered simpler, more commonly-used vocabulary. The words that carry risk significance are materially the same across age bands; what differs is the surrounding vocabulary and the response content (Section 5), not the flagged-word logic.
+
+Yellow: happy, excited, proud, good — none flagged. Green: calm, okay, relaxed, chill — none flagged. Red: angry, stressed, worried, scared, trapped — trapped flagged directly; overwhelmed combination only. Blue: sad, lonely, tired, fed up, empty, hopeless, worthless, numb, trapped — hopeless, worthless, empty, numb flagged directly; trapped combination only.
+
+## **3.4 Word placement: ‘trapped’**
+
+‘Trapped’ appears in both Red and Blue quadrants, reflecting that it is genuinely expressed in both an agitated register (wanting to escape a situation) and a resigned register (seeing no way out). Red — trapped is flagged directly, on its own selection, in the same way hopeless and worthless are flagged directly in Blue. Blue — trapped is flagged only in combination with another flagged signal, in the same way overwhelmed and panicked are treated in Red — not on its own.
+
+## **3.5 Combined-signal rule**
+
+Overwhelmed and panicked (Red) and trapped-in-Blue require a second flagged signal, selected in the same check-in or within the existing recent-history window already used elsewhere in this product (the same window logic behind checkin.openingModeHistory), before this policy's response is triggered. This remains a lookup against existing flags, not a scoring or weighting system.
+
+# **4. Response Flow**
+
+- The user selects a flagged word during check-in.
+
+- The coach's response for that check-in is replaced by the fixed message defined in Section 5, in the version appropriate to the user's age band.
+
+- The message includes two links: the website safety page (Section 6) and the health report export (Section 7). Both are always presented together.
+
+- The website page displays the contact list appropriate to the user's age band.
+
+- If the export is used, the user selects a time frame before a GP-appropriate PDF is generated. No subscription check applies to this export path.
+
+# **5. Response Content**
+
+Both versions are checked against two governing principles: the message never details a method, location, or means, and it does not imply an urgency or severity assessment the app has not made. Both are honest about the coach's own limits rather than implying a capability it does not have.
+
+## **5.1 Adult**
+
+*“I hear you, and thank you for sharing. But I have to be honest — this feels like a moment where you should talk this through with a professional. Unfortunately, I**'**m limited in how I can support here. If you want to reach out to someone, use the link below to find contact details for people who**'**ll be glad to listen. And if it would help, you can download your health report — your moods, energy patterns, and journal entries — to bring to your GP.”*
+
+## **5.2 Teen (13–17)**
+
+Drafted with reference to PAPYRUS's published guidance for talking to young people about suicide, which centres on naming these feelings as common and not shameful, offering genuine hope, and making clear the young person is not facing this alone.
+
+*“Thank you for being honest with me — that takes real strength. What you**'**re feeling isn**'**t uncommon, and it**'**s nothing to be ashamed of. But I think this is bigger than something I can help with alone, and I want you to have real support, not just me. Below is a link with people who are trained to listen and won**'**t judge you, including PAPYRUS, who specifically support people your age. You can also get a copy of how you**'**ve been feeling recently — your moods and what you**'**ve written — to show a doctor or someone you trust, if that would help.”*
+
+*This version requires formal review against PAPYRUS**'**s full published guidance and, ideally, a named youth-safeguarding reviewer**'**s confirmation — see Section 10.*
+
+# **6. Contact Directory**
+
+Contact details are maintained on the Alongside website rather than hard-coded within the app, so all products in the family reference a single, centrally-editable source. The app links out; it does not display phone numbers or service details directly.
+
+## **6.1 Adult directory**
+
+- Samaritans — 116 123, free, 24/7.
+
+- SHOUT — text 85258, 24/7 text-based support.
+
+- CALM — 0800 58 58 58 (5pm–midnight), plus webchat.
+
+- National Domestic Abuse Helpline (Refuge) — 0808 2000 247, 24/7.
+
+- Men's Advice Line (Respect) — 0808 8010 327.
+
+- Galop — 0800 999 5428, LGBT+ specific.
+
+- GP, as first point of contact for ongoing, non-emergency support.
+
+## **6.2 Teen directory (13–17)**
+
+- PAPYRUS HOPELINE247 — 0800 068 41 41, phone, text, email, and webchat; supports under-35s and concerned adults. Shown first for this age band.
+
+- Kooth — free, anonymous, NHS-partnered text-based support, ages 10–25 where commissioned in the user's area. Kooth states plainly it is not a crisis service.
+
+- Childline — confidential support for younger users.
+
+- The domestic abuse and LGBT+ services listed in 6.1 apply equally to this age band.
+
+## **6.3 Excluded from the directory**
+
+White Ribbon UK is a prevention and allyship organisation, not a crisis contact service, and is not included in this directory. It is referenced separately in Alongside's community-impact content.
+
+# **7. Health Report Export**
+
+This policy relies on the existing journal export specification (alongside_journal_export_template_spec.md), which generates a PDF record of moods, energy patterns, and journal entries suitable for sharing with a healthcare professional. Two conditions apply specifically to the export path described in this policy: the subscription tier restriction on this export is waived when accessed through this flow, consistent with Alongside's position that care-relevant content is not paywalled; and the user selects a date range before the report is generated.
+
+# **8. Scope of Alongside****'****s Responsibility**
+
+Alongside is not a trained crisis service. It does not monitor user conversations or data for the purpose of intervention, and does not disclose or escalate what a user shares to any third party, including Alongside's own staff, except where required by law. Alongside's role is limited to providing consistent, honest signposting to appropriate external services and enabling the user to produce a record of their own data to share with a professional of their choosing. Responsibility for any further action rests with the user.
+
+This position is stated in the website privacy policy and a dedicated safety information page, in addition to this document.
+
+# **9. Legal Foundation**
+
+## **9.1 UK GDPR — special category data**
+
+A flagged word selection constitutes special category data under UK GDPR Article 4(15) (data concerning health, including mental health). Processing requires both a lawful basis under Article 6 and a condition under Article 9. Explicit consent (Article 9(2)(a)) is the applicable condition: users must be clearly informed of this processing and must actively consent, separately from general acceptance of terms of service.
+
+## **9.2 UK GDPR — automated decision-making**
+
+Article 22 restricts solely automated decision-making based on special category data where the decision has a legal or similarly significant effect on the individual. This policy's automated action is the display of a single, fixed, identical message and two static links — not an individualised risk classification or a decision that varies by severity. This is a materially lower-intensity automated action than a graded or individualised response, though confirmation that it falls outside Article 22's scope, or identification of the applicable exception, requires legal sign-off.
+
+## **9.3 Online Safety Act 2023**
+
+Alongside is not a user-to-user content-sharing service in the sense targeted by the Act's core duties, which apply to platforms where content is shared between users. Alongside: Learn's multi-user family structure (parent, second parent, learner) should be assessed specifically for any shared-visibility implications, as should any future product with multi-user functionality.
+
+## **9.4 Safeguarding — under-18 users**
+
+The NSPCC's Safeguarding and Child Protection Standards for the Voluntary and Community Sector, designed for organisations working with under-18s, are the relevant reference standard for Alongside's under-18 user base.
+
+**[v7] **Alongside: Move's intended user base is moving toward 18+ only (see Section 1). This does not remove the relevance of the NSPCC standard: a 13–17 year-old may still reach the product via an inaccurate age declaration, and the response pathway in this policy is retained specifically to handle that case appropriately if it occurs. Whether a parent or guardian is notified when a user aged 13–17 triggers this policy is not resolved in this document and requires legal and safeguarding input (Section 10).
+
+## **9.5 Data handling**
+
+- Consent for this specific processing is obtained separately from general terms-of-service acceptance.
+
+- Data retention is limited to what is necessary for the stated purpose.
+
+- Whether a Data Protection Impact Assessment is required for this feature, and its scope if so, requires legal confirmation.
+
+# **10. Matters Requiring Confirmation Before Approval**
+
+- Verification of the proposed word list (Section 3) against the live application word bank.
+
+- Formal review of the teen message (Section 5.2) against PAPYRUS's full published guidance, with confirmation from a named youth-safeguarding reviewer.
+
+- Legal confirmation of the Article 22 position (Section 9.2).
+
+- Legal and safeguarding guidance on parental notification for under-18 users (Section 9.4).
+
+- Confirmation of Data Protection Impact Assessment requirements (Section 9.5).
+
+- Confirmation of Online Safety Act applicability for multi-user products (Section 9.3).
+
+**[v7] **(7) Confirmation that retaining the 13–17 detection and response pathway as a fallback safety net — while Move's front-door minimum age moves to 18+ — is the correct approach, rather than removing the teen pathway from Move entirely.
+
+# **11. References**
+
+## **Internal Documentation**
+
+alongside_journal_export_template_spec.md · alongside_checkin_opening_engine_22jun2026_v1.md · alongside_technical_blueprint_23jun2026_v1.docx
+
+## **Mood Meter / RULER**
+
+What Is the Yale Mood Meter? themoodmeter.com/understanding-the-yale-mood-meter · RULER and the Mood Meter, rulerapproach.org
+
+## **Mind**
+
+How to support someone who is feeling suicidal. mind.org.uk
+
+## **PAPYRUS**
+
+How to have difficult conversations about suicide. papyrus-uk.org · Talking to a young person about suicide (NHS Fife, reproducing PAPYRUS guidance) · HopeLine 24/7, papyrus-uk.org/help-me/hopeline-24-7
+
+## **Kooth / Domestic Abuse Services**
+
+Kooth, explore.kooth.com · National Domestic Abuse Helpline, nationaldahelpline.org.uk
+
+## **UK Data Protection Law / Safeguarding**
+
+ICO — What is special category data? ico.org.uk · ICO — What are the conditions for processing? ico.org.uk · Online Safety Act 2023, legislation.gov.uk/ukpga/2023/50 · NSPCC Learning — Safeguarding and child protection, learning.nspcc.org.uk
+
+*Build New Habits · Alongside · Crisis **&** Safeguarding Policy · 23 Jul 2026 v7 · supersedes 02 Jul 2026 v6*

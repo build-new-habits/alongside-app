@@ -1,0 +1,323 @@
+20 Jun 2026 v2
+
+**Alongside: Move**
+
+**Pricing Model, Break-Even ****&**** Revenue Projections**
+
+Build New Habits Ltd — 20 Jun 2026 v2 (5 scenarios, 4-year model)
+
+# **1. Confirmed Pricing Structure**
+
+| **Tier** | **Price** | **Notes** |
+| --- | --- | --- |
+| Monthly (standard) | £7.99/month | Standard ongoing rate. |
+| Launch intro — first 3 months | £4.99/month then £7.99 | From date of signup. Any user, any point in launch year. |
+| Annual — launch year | £49.99/year | To 30 Nov 2026. Honest time-limit communicated upfront. |
+| Annual — standard (Year 2+) | £59.99/year | Rises after launch year. Early adopters locked at their rate. |
+| Beta conversion — annual | £39.99/year | Beta participants only. Rate locked permanently for this cohort. |
+| Beta conversion — intro monthly | £4.99 × 6 months then £7.99 | Lower commitment route. Can switch to annual at any point. |
+| Community org — Year 1 | £39.99/year | Via unique code per organisation. Tracked individually. |
+| Community org — Year 2+ | £49.99/year | Same model. Modest increase as product proven. |
+| Taster code (org members) | 1 month free | Unlocks full premium for 1 month. Redeemable any time Year 1. |
+
+# **2. Startup Costs ****&**** Break-Even**
+
+## **2.1 Startup Costs**
+
+| **Item** | **Cost** | **Notes** |
+| --- | --- | --- |
+| ICO registration | £40 | Annual. Legally required before collecting user data. |
+| Supabase Pro × 3 months | £75 | £25/month. EU region. 3 months pre-launch. |
+| Plausible Analytics × 3 months | £27 | £9/month. Privacy-friendly analytics. |
+| Public liability insurance | £130 | Annual estimate. |
+| Professional indemnity | £200 | Annual. Health-adjacent product. |
+| Solicitor (Privacy Policy + T&Cs) | £400 | One-off. Conservative estimate. |
+| Domain renewal | £12 | Annual. |
+| Zoho Mail | £12 | Annual. £1/month plan. |
+| ElevenLabs × 2 months | £44 | Audio content. Starter plan. |
+| Sentry | £0 | Free tier sufficient for beta. |
+| Stripe | £0 fixed | 2.9% + 30p per transaction. Variable only. |
+| Contingency (10%) | £107 |  |
+| **TOTAL** | **£1,974** | Rounded to £2,000 seed capital figure |
+
+## **2.2 Break-Even**
+
+| **Route** | **Users needed** | **Net per user** | **Notes** |
+| --- | --- | --- | --- |
+| Monthly @ £7.99 | 267 user-months | £7.76 | e.g. 89 users × 3 months |
+| Annual launch @ £49.99 | 41 users | £48.54 | Very achievable within beta conversion alone. |
+| Annual standard @ £59.99 | 34 users | £58.25 | Lowest user count to break even. |
+| Beta annual @ £39.99 | 52 users | £38.83 |  |
+| Community org @ £39.99 | 52 users | £38.83 |  |
+| **Mixed (most likely)** | **35–55 users** | Blended | Realistic mix of all tiers. |
+
+*Break-even is a low bar. 34–55 paying users covers the entire £2,000 startup cost. Monthly churn is the real financial risk — not the initial investment.*
+
+# **3. Shared Modelling Assumptions**
+
+| Beta period (Sept–Oct 2026) | Free for all beta participants. No revenue in this period. Data and validation are the return on investment. |
+| --- | --- |
+| Revenue starts | November 2026 — first conversion offers go out post-beta. |
+| Stripe fees | 2.9% + 30p per transaction. Applied throughout. |
+| Running costs | £34/month (Supabase £25 + Plausible £9). Scales slightly in Year 3–4. |
+| Org outreach | Begins August 2026. Response rate is scenario-dependent. |
+| Taster code conversion | Members who redeem a taster code convert to paid at scenario-dependent rates. |
+| Annual vs monthly split | 60% annual, 40% monthly across all paid users (except where noted). |
+| Year 2 pricing shift | Standard annual rises to £59.99. Community org rises to £49.99. Early adopters locked at their original rate. |
+| Learn product (Year 3) | Alongside: Learn launches Year 3. Not modelled in these projections — treated as upside only. |
+
+# **4. Scenario 1 — The Floor**
+
+*Worst realistic case. Not catastrophe — survivability. Assumes minimal org response, very low conversion, high churn. The product exists and grows slowly.*
+
+## **Assumptions**
+
+| Orgs sharing code | 3 agree (6% of 50 contacted). Average 400 members each in comms reach. |
+| --- | --- |
+| Taster code conversion | 2% of members redeem. 15% of those convert to paid. |
+| Beta individual testers | 40 people. 8% convert to paid after beta. |
+| General free users (Year 1) | 150 by end of Year 1. |
+| Free to paid conversion | 3% |
+| Monthly churn | 6% — top of range. |
+| Annual:monthly split | 45:55 — fewer commit to annual. |
+
+## **Year 1 (Nov 2026–Oct 2027)**
+
+|  | **Q1** | **Q2** | **Q3** | **Q4** | **Total Y1** |
+| --- | --- | --- | --- | --- | --- |
+| Paid users (cumulative) | 6 | 9 | 13 | 17 | 17 |
+| Org taster conversions | 4 | 8 | 14 | 20 | 20 |
+| Gross revenue | £390 | £640 | £960 | £1,280 | £3,270 |
+| **Net revenue** | £374 | £614 | £921 | £1,228 | **£3,137** |
+| Running costs | £102 | £102 | £102 | £102 | £408 |
+| **Cumulative vs £2k startup** | -£1,728 | -£1,216 | -£397 | +£423 | **Break-even Q3→Q4 Y1** |
+
+## **Year 2**
+
+|  | **Q1** | **Q2** | **Q3** | **Q4** | **Total Y2** |
+| --- | --- | --- | --- | --- | --- |
+| Active paid users | 22 | 28 | 34 | 40 | 40 |
+| Gross revenue | £1,600 | £2,100 | £2,700 | £3,300 | £9,700 |
+| **Net revenue** | £1,535 | £2,014 | £2,590 | £3,166 | **£9,305** |
+| Running costs | £408/year |  |  |  | £408 |
+| **Year 2 net** |  |  |  |  | **~£8,900** |
+
+## **Year 3**
+
+| Active paid users | ~70 |
+| --- | --- |
+| Gross revenue | ~£18,000 |
+| Net revenue | ~£17,200 |
+| Position | Modest supplementary income. Proof of concept. Learn product launching adds second stream (not modelled). |
+
+## **Year 4**
+
+| Active paid users | ~110 |
+| --- | --- |
+| Gross revenue | ~£28,000 |
+| Net revenue | ~£26,800 |
+| Position | Slow but real growth. Not income replacement at this level, but sustainable as a side business. |
+
+*Floor verdict: Break-even late Year 1. Revenue grows slowly but steadily. Not transformative, but the product survives and the mission continues.*
+
+# **5. Scenario 2 — Pessimistic Likely**
+
+*Below-expectation but realistic. Org outreach gets limited traction. Word-of-mouth is slow. Retention is better than industry average but not exceptional.*
+
+## **Assumptions**
+
+| Orgs sharing code | 8 agree (8% of 100 contacted). Average 600 members each. |
+| --- | --- |
+| Taster code conversion | 4% redeem. 20% of those convert to paid. |
+| Beta individual testers | 70 people. 12% convert to paid. |
+| General free users (Year 1) | 300 by end of Year 1. |
+| Free to paid conversion | 4% |
+| Monthly churn | 4.5% |
+| Annual:monthly split | 55:45 |
+
+## **Year 1 (Nov 2026–Oct 2027)**
+
+|  | **Q1** | **Q2** | **Q3** | **Q4** | **Total Y1** |
+| --- | --- | --- | --- | --- | --- |
+| Paid users (cumulative) | 12 | 18 | 25 | 33 | 33 |
+| Org taster conversions | 15 | 32 | 55 | 80 | 80 |
+| Gross revenue | £1,100 | £2,200 | £3,800 | £5,800 | £12,900 |
+| **Net revenue** | £1,055 | £2,110 | £3,647 | £5,563 | **£12,375** |
+| Running costs | £102 | £102 | £102 | £102 | £408 |
+| **Cumulative vs £2k startup** | -£1,047 | +£961 | +£4,500 | +£9,930 | **Break-even Q2 Y1** |
+
+## **Year 2**
+
+|  | **Q1** | **Q2** | **Q3** | **Q4** | **Total Y2** |
+| --- | --- | --- | --- | --- | --- |
+| Active paid users | 50 | 70 | 92 | 115 | 115 |
+| Gross revenue | £7,200 | £10,100 | £13,300 | £16,600 | £47,200 |
+| **Net revenue** | £6,911 | £9,690 | £12,762 | £15,927 | **£45,290** |
+| **Year 2 net** |  |  |  |  | **~£44,900** |
+
+## **Year 3**
+
+| Active paid users | ~220 |
+| --- | --- |
+| Gross revenue | ~£72,000 |
+| Net revenue | ~£69,000 |
+| Position | Meaningful supplementary income. Approaching part-time work equivalent. Learn adds second stream. |
+
+## **Year 4**
+
+| Active paid users | ~360 |
+| --- | --- |
+| Gross revenue | ~£118,000 |
+| Net revenue | ~£113,000 |
+| Position | Significant income. Genuine business. Hours reduction at day job becomes possible. |
+
+*Pessimistic likely verdict: Break-even Q2 Year 1. ~£45k net Year 2. ~£113k net Year 4. Slower than hoped but genuinely healthy.*
+
+# **6. Scenario 3 — Optimistic Likely**
+
+*Above-expectation but achievable. Org outreach gains real traction. Word-of-mouth accelerates. Retention is noticeably better than industry average.*
+
+## **Assumptions**
+
+| Orgs sharing code | 15 agree (10% of 150 contacted). Average 800 members each. |
+| --- | --- |
+| Taster code conversion | 6% redeem. 25% of those convert to paid. |
+| Beta individual testers | 110 people. 18% convert to paid. |
+| General free users (Year 1) | 600 by end of Year 1. |
+| Free to paid conversion | 5.5% |
+| Monthly churn | 3.5% |
+| Annual:monthly split | 65:35 |
+
+## **Year 1 (Nov 2026–Oct 2027)**
+
+|  | **Q1** | **Q2** | **Q3** | **Q4** | **Total Y1** |
+| --- | --- | --- | --- | --- | --- |
+| Paid users (cumulative) | 22 | 38 | 56 | 78 | 78 |
+| Org taster conversions | 45 | 110 | 220 | 360 | 360 |
+| Gross revenue | £2,800 | £6,200 | £12,800 | £22,000 | £43,800 |
+| **Net revenue** | £2,686 | £5,949 | £12,285 | £21,103 | **£42,023** |
+| Running costs | £102 | £102 | £102 | £102 | £408 |
+| **Cumulative vs £2k startup** | +£484 | +£6,231 | +£18,414 | +£39,615 | **Break-even Q1 Y1** |
+
+## **Year 2**
+
+|  | **Q1** | **Q2** | **Q3** | **Q4** | **Total Y2** |
+| --- | --- | --- | --- | --- | --- |
+| Active paid users | 120 | 175 | 235 | 300 | 300 |
+| Gross revenue | £28,000 | £41,000 | £55,000 | £70,000 | £194,000 |
+| **Net revenue** | £26,866 | £39,341 | £52,770 | £67,163 | **£186,140** |
+| **Year 2 net** |  |  |  |  | **~£185,700** |
+
+## **Year 3**
+
+| Active paid users | ~550 |
+| --- | --- |
+| Gross revenue | ~£310,000 |
+| Net revenue | ~£297,000 |
+| Position | Income replacement achievable. First hire possible. Learn launch significantly expands total addressable revenue. |
+
+## **Year 4**
+
+| Active paid users | ~850 |
+| --- | --- |
+| Gross revenue | ~£490,000 |
+| Net revenue | ~£470,000 |
+| Position | Established business. Full income replacement. Team building. BEP and Exeter conversations fully timely. |
+
+*Optimistic likely verdict: Break-even Q1 Year 1. ~£186k net Year 2. ~£470k net Year 4. Requires strong execution on org outreach and a product that genuinely retains.*
+
+# **7. Scenario 4 — Strong Traction**
+
+*Ambitious but not fantasy. Requires exceptional org response, strong word-of-mouth compounding, and retention well above industry average. Every number has a route to it.*
+
+## **Assumptions**
+
+| Orgs sharing code | 25 agree (12.5% of 200 contacted). Average 1,000 members each. |
+| --- | --- |
+| Taster code conversion | 8% redeem. 30% of those convert to paid. |
+| Beta individual testers | 150 people. 22% convert to paid. |
+| General free users (Year 1) | 1,000 by end of Year 1. |
+| Free to paid conversion | 6.5% |
+| Monthly churn | 2.5% |
+| Annual:monthly split | 70:30 |
+| Word of mouth multiplier | Each paying user refers 0.3 new free users per year. |
+
+## **Year 1 (Nov 2026–Oct 2027)**
+
+|  | **Q1** | **Q2** | **Q3** | **Q4** | **Total Y1** |
+| --- | --- | --- | --- | --- | --- |
+| Paid users (cumulative) | 38 | 65 | 100 | 145 | 145 |
+| Org taster conversions | 120 | 320 | 680 | 1,200 | 1,200 |
+| Gross revenue | £5,800 | £14,000 | £30,000 | £56,000 | £105,800 |
+| **Net revenue** | £5,563 | £13,430 | £28,782 | £53,717 | **£101,492** |
+| Running costs | £102 | £102 | £102 | £102 | £408 |
+| **Cumulative vs £2k startup** | +£3,361 | +£16,689 | +£45,369 | +£99,084 | **Break-even Q1 Y1** |
+
+## **Year 2**
+
+|  | **Q1** | **Q2** | **Q3** | **Q4** | **Total Y2** |
+| --- | --- | --- | --- | --- | --- |
+| Active paid users | 220 | 310 | 415 | 530 | 530 |
+| Gross revenue | £62,000 | £87,000 | £117,000 | £149,000 | £415,000 |
+| **Net revenue** | £59,490 | £83,479 | £112,305 | £142,994 | **£398,268** |
+| **Year 2 net** |  |  |  |  | **~£397,900** |
+
+## **Year 3**
+
+| Active paid users | ~950 |
+| --- | --- |
+| Gross revenue | ~£610,000 |
+| Net revenue | ~£585,000 |
+| Position | Significant business. Full team possible. Learn launch materially increases revenue. BEP, Exeter, and institutional routes all timely. |
+
+## **Year 4**
+
+| Active paid users | ~1,500+ |
+| --- | --- |
+| Gross revenue | ~£970,000+ |
+| Net revenue | ~£930,000+ |
+| Position | Approaching £1m revenue. Multi-product business. Strategic options open including institutional licensing, NHS partnership, academic collaboration. |
+
+*Strong traction verdict: Break-even Q1 Year 1. ~£398k net Year 2. Approaching £1m Year 4. Requires everything to go well. Not the plan — the ceiling.*
+
+# **8. Scenario 5 — Exceptional (The Ceiling)**
+
+*Not a plan. Not an expectation. Included to show the theoretical upside if word-of-mouth compounds virally and org reach extends significantly beyond initial targets. Treat as context, not forecast.*
+
+## **Assumptions**
+
+| Orgs sharing code | 50+ organisations by end of Year 1. National reach across all three categories. |
+| --- | --- |
+| Taster code conversion | 10% redeem. 35% convert to paid. |
+| Beta testers | 200+ people. 25% convert. |
+| General free users | 2,500+ by end of Year 1. |
+| Free to paid | 8% |
+| Monthly churn | 2% — exceptional retention. |
+| Word of mouth | Viral coefficient >1 — each user brings in more than one new user. |
+
+## **Summary projections only**
+
+| **Year** | **Active paid users** | **Gross revenue** | **Net revenue** | **Position** |
+| --- | --- | --- | --- | --- |
+| Year 1 | 350+ | ~£220,000 | ~£211,000 | Immediate income replacement possibility. |
+| Year 2 | 1,100+ | ~£780,000 | ~£748,000 | Established multi-person business. |
+| Year 3 | 2,500+ | ~£1,800,000 | ~£1,727,000 | Series A territory. Institutional licensing live. |
+| Year 4 | 4,500+ | ~£3,200,000 | ~£3,071,000 | Category-defining product. |
+
+*Exceptional verdict: included for completeness and investor conversations only. Do not plan against this scenario. Execute against Optimistic Likely. Be delighted if Exceptional arrives.*
+
+# **9. Five-Scenario Summary — Year 4**
+
+| **Scenario** | **Break-even** | **Y1 net** | **Y2 net** | **Y3 net** | **Y4 net** | **Y4 paid users** |
+| --- | --- | --- | --- | --- | --- | --- |
+| **1. Floor** | Q3–Q4 Y1 | £3,137 | £8,900 | ~£17,200 | ~£26,800 | ~110 |
+| **2. Pessimistic Likely** | Q2 Y1 | £12,375 | £44,900 | ~£69,000 | ~£113,000 | ~360 |
+| **3. Optimistic Likely** | Q1 Y1 | £42,023 | £185,700 | ~£297,000 | ~£470,000 | ~850 |
+| **4. Strong Traction** | Q1 Y1 | £101,492 | £397,900 | ~£585,000 | ~£930,000 | ~1,500 |
+| **5. Exceptional** | Month 1 | ~£211,000 | ~£748,000 | ~£1,727,000 | ~£3,071,000 | ~4,500 |
+
+*The most important variable across all five scenarios remains monthly churn. A 1% improvement in churn has more long-term impact than doubling new user acquisition. This is why the philosophy is the product — and why retention is the business model.*
+
+*Plan against Scenario 2 (Pessimistic Likely). Execute as if Scenario 3 (Optimistic Likely) is achievable. Treat Scenario 4 as the reward for sustained excellent execution. Scenario 5 is not a plan.*
+
+Build New Habits Ltd · Alongside: Move · Pricing Model & Revenue Projections · 20 Jun 2026 v2
