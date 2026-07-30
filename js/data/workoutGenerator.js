@@ -2,6 +2,15 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
+ * 30 Jul 2026 v1.13
+ *
+ * v1.13 — BUILD-4 dead-code removal. Removed generateDailyOptions()'s
+ *   writes to todaysWorkouts/workoutsGeneratedAt (nothing live read them —
+ *   the real mechanism is generatedSession) and removed the orphaned
+ *   needsRegeneration()/getTodaysWorkouts() function pair, confirmed
+ *   uncalled from anywhere else in the app. No behaviour change — this
+ *   code was already dead. Documentation-accuracy session, not a fix.
+ *
  * 24 Jul 2026 v1.12
  *
  * v1.12 — BUILD-5 undershoot fix, same day, found while on-device testing
@@ -566,9 +575,6 @@ export const workoutGenerator = {
       this.generateWorkout(focus3, goalPool, intensity, burnout, cyclePhase, intensityBias, currentWeek, goalProfile)
     ];
 
-    store.set("todaysWorkouts", options);
-    store.set("workoutsGeneratedAt", new Date().toISOString());
-
     return options;
   },
 
@@ -1092,14 +1098,4 @@ export const workoutGenerator = {
     return { strength: "💪", mobility: "🧘", cardio: "❤️" }[focus] || "🏃";
   },
 
-  needsRegeneration() {
-    const generatedAt = store.get("workoutsGeneratedAt");
-    if (!generatedAt) return true;
-    return new Date(generatedAt).toDateString() !== new Date().toDateString();
-  },
-
-  getTodaysWorkouts() {
-    if (this.needsRegeneration()) return this.generateDailyOptions();
-    return store.get("todaysWorkouts") || this.generateDailyOptions();
-  }
 };

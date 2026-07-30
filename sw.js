@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 30 Jul 2026 v181
+ * workoutGenerator.js v1.13 cache bump — BUILD-4 dead-code removal
+ * (todaysWorkouts/workoutsGeneratedAt writes and the orphaned
+ * needsRegeneration()/getTodaysWorkouts() function pair). No behaviour
+ * change — file already present in SHELL_URLS below, cache-bust only.
+ *
  * 28 Jul 2026 v180
  * router.js v10 cache bump — fixed a popstate listener collision with
  * session-guard.js that silently defeated the back-gesture exit-guard
@@ -187,7 +193,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v180";
+const CACHE_NAME = "alongside-v181";
 
 const SHELL_URLS = [
 
