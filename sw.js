@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 30 Jul 2026 v185
+ * yoga-session.js v6 cache bump — on-device testing bug fix. finaliseSession()
+ * was missing a rerender() call after phase = "done", leaving the screen
+ * stuck on the last pose after a genuine completion. One-line fix. No
+ * schema change, no new file — yoga-session.js already present in
+ * SHELL_URLS below.
+ *
  * 30 Jul 2026 v184
  * workout.js v6 cache bump — gym exit-guard gap fix (Core Session
  * investigation follow-up, same session). mountSessionGuard() wired for
@@ -217,7 +224,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v184";
+const CACHE_NAME = "alongside-v185";
 
 const SHELL_URLS = [
 
