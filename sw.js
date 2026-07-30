@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 30 Jul 2026 v182
+ * core-session.js v4 cache bump — Core Session data-integrity
+ * investigation. Fixed an id-reuse bug: finaliseSession() and
+ * savePartialSession() were spreading a stale currentActivityEntry into
+ * new completions, so two back-to-back Core Sessions not separated by an
+ * intention.js visit could share one activityLog id. No schema change,
+ * no new file — core-session.js already present in SHELL_URLS below.
+ *
  * 30 Jul 2026 v181
  * workoutGenerator.js v1.13 cache bump — BUILD-4 dead-code removal
  * (todaysWorkouts/workoutsGeneratedAt writes and the orphaned
@@ -193,7 +201,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v181";
+const CACHE_NAME = "alongside-v182";
 
 const SHELL_URLS = [
 
