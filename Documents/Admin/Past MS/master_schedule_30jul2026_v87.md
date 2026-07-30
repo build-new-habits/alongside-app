@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 30 Jul 2026 v88
+## 30 Jul 2026 v87
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_30jul2026_v87.md`. Remove v87 on upload.
+Supersedes `alongside_master_schedule_30jul2026_v86.md`. Remove v86 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** Core Session `currentActivityEntry` investigation — **fully closed.** Full on-device test pass complete across all 7 session files, every fix confirmed, CSS visually confirmed everywhere. Nothing further outstanding from this investigation — the only open items are the two deliberately-deferred, separately-scoped ones (`gym-programme.js`, silent-failure UX gap) plus the four smaller UI findings logged along the way.
+**This version's substantive changes:** On-device test pass for `workout.js` complete — gym exit-guard (back-gesture + on-screen) and CSS render both confirmed working. Small UX finding logged: the on-screen Exit button's left-edge position may conflict with Android's edge back-gesture zone (not confirmed as a definite bug, worth a design look). Core Session investigation dashboard row updated to reflect the full completed test pass.
 
 ---
 
@@ -82,7 +82,7 @@ Fixed to match `core-session.js` v4 / `yoga-session.js` v5's confirmed pattern: 
 
 **Final code shipped this session, in full:** `core-session.js` v3→v4, `yoga-session.js` v4→v5, `workout.js` v5→v6, `css/components/session-guard.css` v1→v2, `sw.js` v181→v184 (four bumps total, each deployed last). Changelog fully updated. No schema changes.
 
-**On-device testing status, updated 30 Jul 2026 — full test pass complete, all 7 files confirmed.** Core Session basic sanity ✅, Core Session id-reuse ✅, Yoga id-reuse (both routes) ✅, gym back-gesture exit-guard ✅, gym on-screen Exit-guard ✅. CSS render (`.session-exit-*`) individually eyeballed and confirmed correct for `core-session.js`, `yoga-session.js`, `running-session.js`, `workout.js` (screenshots), and Graeme's own quick pass confirmed `walk-session.js`, `swim-session.js`, `cycle-session.js` match as well — all 7 files now visually confirmed. Two real bugs found and fixed along the way (yoga stuck-screen, dedupe window) — see below. `gym-programme.js` (a separate, untouched file) found to have its own significant gaps, logged above as its own item, not fixed. **Nothing further outstanding from this investigation.**
+**On-device testing status, updated 30 Jul 2026 — full test pass now complete for `workout.js`.** Core Session basic sanity ✅, Core Session id-reuse ✅, Yoga id-reuse (both routes) ✅, gym back-gesture exit-guard ✅, gym on-screen Exit-guard ✅, CSS render (`.session-exit-*`) ✅ confirmed for `workout.js`. Two real bugs found and fixed along the way (yoga stuck-screen, dedupe window) — see below. `gym-programme.js` (a separate, untouched file) found to have its own significant gaps, logged above as its own item, not fixed. **Not yet visually re-confirmed:** the CSS fix for the other 6 files (`core-session.js`, `yoga-session.js`, `cycle-session.js`, `running-session.js`, `swim-session.js`, `walk-session.js`) — code is identical so confidence is high, but not eyeballed individually.
 
 **Small UX finding, 30 Jul — on-screen Exit button position may conflict with Android edge back-gesture.** First attempt at testing the on-screen Exit button (tapped near the screen's left edge, where the button sits) produced the *back-gesture* guard's card instead of the on-screen button's own card — consistent with an accidental edge-swipe being registered alongside the tap. A repeat tap, more centred, correctly showed the on-screen card. Not confirmed as a definite bug (could be device/gesture-nav-specific), but worth a design look since the Exit button's left-edge position is shared across all 7 files using this pattern, not just `workout.js`.
 
@@ -193,7 +193,7 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 | Product — BUILD-9 (18+ age-gate) | Not yet scoped. **U18 safeguarding position genuinely open** — Alex suggested it may not be needed, unconfirmed, pending his solicitor (29 Jul). | Hold scoping until Alex/solicitor respond. | Waiting on Alex. |
 | Product — Thread scroll-bug audit | 🟢 Closed, 28 Jul. 2 of 3 files already fixed, third checked and cleared. | None. | None. |
 | Product — B3-2-Test follow-ups | 2 items remain (chip overflow, reflect.js cache-clear confirmation). | Fold into a future session. | Not booked, low priority. |
-| Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Fully closed, 30 Jul.** Complete on-device test pass across all 7 files — every fix confirmed working, CSS visually confirmed on all 7. Two real bugs found and fixed during testing itself (yoga stuck-screen, dedupe window too wide). `gym-programme.js` found separately broken, own item logged, not fixed. | None — fully closed. | None. |
+| Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Closed, 30 Jul, full on-device test pass complete.** All fixes confirmed working on-device: Core Session sanity, both id-reuse fixes, gym exit-guard (back-gesture + on-screen), CSS render. Two real bugs found and fixed during testing itself (yoga stuck-screen, dedupe window too wide) — see Core Session Outcome section above. `gym-programme.js` found separately broken, own item logged, not fixed. | None — closed. CSS visual spot-check for the other 6 files (not `workout.js`) still pending, low priority given identical code. | None. |
 | Product — BUILD-4 Appendix A follow-up | New, 30 Jul. ~18 fields found via grep during BUILD-4, not individually triaged. | Dedicated pass, same read+write check method. | Recommended before Supabase schema design, not strictly blocking. |
 | Product/Infra — Supabase schema design | Scoped in conversation 27 Jul. **Unblocked — BUILD-4 closed.** | Run — decide whether Appendix A follow-up runs first. | None hard; Appendix A recommended first. |
 | Website — Home/Products/Community/Impact | 🟢 Confirmed clean. | None unless BUILD-9 triggers a copy pass. | None. |
@@ -232,4 +232,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v88*
+*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v87*
