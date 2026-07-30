@@ -1,6 +1,33 @@
 /**
  * workout.js - Workout Execution View
- * 16 Jul 2026 v5
+ * 30 Jul 2026 v6
+ *
+ * v6 — Gym exit-guard gap fix (Core Session investigation follow-up, same
+ *   session). This file had NO back-gesture protection at all — no
+ *   confirmation card, no partial save. Confirmed via router.js's default
+ *   popstate handler: since this file never called mountSessionGuard(),
+ *   there was no `sessionGuard` flag in history state to intercept the
+ *   gesture, so router.back() fired instantly on device back-gesture mid-
+ *   workout, no warning, workoutProgress left orphaned in store. The
+ *   on-screen Exit button's browser confirm() ("Your progress on this
+ *   workout will be lost") was an honest, intentional discard-only path —
+ *   not itself a bug — but the back-gesture path had nothing at all,
+ *   closer to quiet-session.js's pre-fix "most exposed of the four" state
+ *   than to the 6 files BUILD-3 fixed (23 Jul), which all showed a
+ *   confirmation card, just skipped the actual save.
+ *   Fixed to match core-session.js v4/yoga-session.js v5's confirmed
+ *   pattern: mountSessionGuard() now protects the back-gesture path
+ *   (isActive: () => !!_getWorkout()); added savePartialSession(), built
+ *   fresh with no currentActivityEntry spread (same id-reuse-avoidance
+ *   discipline as this session's other fixes); added a local
+ *   showExitConfirm() coach-voiced overlay for the on-screen Exit button,
+ *   replacing the blunt confirm() and offering a genuine "save partial
+ *   progress" choice for gym for the first time; cleanupWorkout() now
+ *   also calls dismountSessionGuard().
+ *   Also found and fixed while here: .session-exit-overlay/.session-exit-
+ *   card (the on-screen overlay's CSS, shared with the 6 other files using
+ *   this same local-overlay pattern) had no styles anywhere in the repo —
+ *   was rendering unstyled. Fixed in css/components/session-guard.css v2.
  *
  * v5 (S4-B3-3) — Two confirmed fixes, same root-cause investigation as
  *   coach-reflection.js v5 and yoga-session.js v3:
@@ -85,6 +112,7 @@
 import { store }         from "../store.js";
 import { checkinData }   from "../data/checkin.js";
 import { recordSession } from "../data/programmeEngine.js";
+import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
 
@@ -289,11 +317,28 @@ export function onMount() {
     updateTimerDisplay();
   }
 
+  // 30 Jul 2026 — gym exit-guard gap fix (Core Session investigation
+  // follow-up). This file previously had NO back-gesture protection at
+  // all — no confirmation card, no partial save. The on-screen Exit
+  // button used a blunt browser confirm() that explicitly discarded
+  // progress ("Your progress on this workout will be lost"), which was
+  // an honest design choice for that path, but the back-gesture path had
+  // nothing: router.js's default popstate handler navigated away
+  // instantly with zero warning. Fixed to match the pattern already
+  // confirmed working in core-session.js v4/yoga-session.js v4 (BUILD-3,
+  // 23 Jul): mountSessionGuard() protects the back-gesture path (shows
+  // session-guard.js's own Stay/Exit-and-save/Exit-without-saving card),
+  // and the on-screen Exit button now shows this file's own two-option
+  // showExitConfirm() overlay instead of confirm(), offering a genuine
+  // "save partial progress" choice for the first time.
+  mountSessionGuard({
+    isActive: () => !!_getWorkout(),
+    onExit:   () => { savePartialSession(); cleanupWorkout(); router.navigate("reflect"); },
+    label:    "gym session"
+  });
+
   document.getElementById("exit-workout-btn")?.addEventListener("click", () => {
-    if (confirm("Exit workout? Your progress on this workout will be lost.")) {
-      cleanupWorkout();
-      router.back();
-    }
+    showExitConfirm();
   });
 
   document.getElementById("timer-toggle-btn")?.addEventListener("click", () => {
@@ -314,6 +359,54 @@ export function onMount() {
 
   document.getElementById("skip-exercise-btn")?.addEventListener("click", () => {
     skipExercise();
+  });
+}
+
+// ── Exit confirmation overlay ──────────────────────────────────────────────
+// Shown when user taps Exit during an active workout. Replaces the old
+// browser confirm() with a coach-voiced in-app card, matching
+// core-session.js/yoga-session.js's confirmed-working pattern (BUILD-3,
+// 23 Jul 2026). Added 30 Jul 2026 as part of the gym exit-guard gap fix.
+
+function showExitConfirm() {
+  const overlay = document.createElement("div");
+  overlay.className = "session-exit-overlay";
+  overlay.id        = "session-exit-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", "Exit workout confirmation");
+  overlay.innerHTML = `
+    <div class="session-exit-card">
+      <div class="session-exit-coach-row">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="session-exit-coach-text">
+          Hold on — if you leave now this session won’t be saved. Are you sure?
+        </p>
+      </div>
+      <div class="session-exit-actions">
+        <button class="btn btn-primary btn-full" id="exit-confirm-stay"
+                aria-label="Stay in workout">
+          Stay in session
+        </button>
+        <button class="btn btn-ghost btn-full" id="exit-confirm-leave"
+                aria-label="Exit and save progress so far">
+          Exit and save progress
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  document.getElementById("exit-confirm-stay").addEventListener("click", () => {
+    overlay.remove();
+  });
+
+  document.getElementById("exit-confirm-leave").addEventListener("click", () => {
+    overlay.remove();
+    savePartialSession();
+    cleanupWorkout();
+    router.navigate("reflect");
   });
 }
 
@@ -381,6 +474,42 @@ function resetTimer() {
   timerStarted  = false;
 }
 
+/**
+ * savePartialSession() — added 30 Jul 2026, gym exit-guard gap fix.
+ * Same pattern as core-session.js v4/yoga-session.js v5's partial-save
+ * functions: builds the entry fresh via store.logActivity(), no spread
+ * of a prior currentActivityEntry (avoids the id-reuse bug fixed
+ * elsewhere this session). durationMins left null, matching
+ * completeWorkout()'s existing convention — this file has no running
+ * elapsed-time tracker.
+ */
+function savePartialSession() {
+  const workout = _getWorkout();
+  if (!workout) return;
+
+  const progress       = store.get("workoutProgress") || [];
+  const creditsEarned  = progress.reduce((sum, e) => sum + (e.credits || 0), 0);
+  const nowIso         = new Date().toISOString();
+
+  const activityEntry = store.logActivity({
+    type:           "workout",
+    date:           nowIso,
+    sessionEnd:     nowIso,
+    completedAt:    nowIso,
+    status:         "partial",
+    durationMins:   null,
+    moodAfter:      null,
+    isEvent:        false,
+    eventName:      null,
+    exercisesCount: progress.length,
+    creditsEarned
+  });
+
+  if (activityEntry) {
+    store.set("currentActivityEntry", activityEntry);
+  }
+}
+
 function completeWorkout() {
   const workout  = _getWorkout();
   const progress = store.get("workoutProgress") || [];
@@ -441,6 +570,7 @@ function completeWorkout() {
 }
 
 function cleanupWorkout() {
+  dismountSessionGuard();
   pauseTimer();
   currentExerciseIndex = 0;
   timeRemaining = 0;
