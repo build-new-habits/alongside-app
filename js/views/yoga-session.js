@@ -1,9 +1,21 @@
 /**
  * yoga-session.js - Guided Yoga and Pilates Session
  *
- * 21 Jul 2026 v4
+ * 30 Jul 2026 v5
  *
- * v4 — Bug fix, discovered while ground-truthing the exit-guard contract
+ * v5 — Core Session investigation follow-up (same session, on request).
+ *   Same id-reuse bug found in core-session.js also existed here:
+ *   finaliseSession()/savePartialSession() spread `pending` unconditionally,
+ *   so a stale already-logged currentActivityEntry (left behind when this
+ *   file is entered directly from library.js's "Yoga / Pilates" card,
+ *   bypassing intention.js) could have its id reused by the next
+ *   completion. Unlike core-session, yoga's pending IS sometimes genuine
+ *   (via intention.js), so the fix distinguishes rather than always
+ *   discarding: a pending entry carrying `status` is stale (every
+ *   logActivity()-written entry has one; intention.js's fresh entry never
+ *   does) and is now discarded instead of spread. See both functions'
+ *   comments for full reasoning.
+ * 21 Jul 2026 v4 — Bug fix, discovered while ground-truthing the exit-guard contract
  *   for the nav escape-hatch session (navfix-proposalloop). The onExit
  *   callback passed to mountSessionGuard() (fired on back-gesture exit,
  *   and now also on Home-icon exit via session-guard.js v2's
@@ -683,8 +695,22 @@ function finaliseSession() {
   store.set("lastWorkoutCredits", creditsEarned);
   store.set("lastWorkoutName",    "Yoga & Pilates");
 
-  const pending = store.get("currentActivityEntry");
-  const nowIso  = new Date().toISOString();
+  // 30 Jul 2026 (Core Session investigation follow-up, logged 30 Jul, fixed
+  // same session on request): same id-reuse bug found in core-session.js
+  // exists here. Unlike core-session, yoga's `pending` IS sometimes
+  // legitimate — reachable via intention.js, which sets a fresh entry
+  // (sessionStart/energyBefore/duration/id) before navigating here. But
+  // yoga-session.js is ALSO reachable directly from library.js's "Yoga /
+  // Pilates" card (navigateToSession(), no intention.js visit), in which
+  // case `pending` is whatever THIS file's own previous completion wrote
+  // back below — stale. Distinguishing signal: intention.js's entry never
+  // sets `status`; every logActivity()-written entry always has one. So a
+  // pending entry carrying `status` is a stale leftover, not genuine
+  // upstream data — discard it entirely rather than spread it (which
+  // would reuse its id and other now-irrelevant fields).
+  const rawPending = store.get("currentActivityEntry");
+  const pending     = (rawPending && !rawPending.status) ? rawPending : null;
+  const nowIso      = new Date().toISOString();
 
   const activityEntry = store.logActivity({
     ...(pending || { type: "yoga", source: "self-directed" }),
@@ -775,10 +801,14 @@ function showExitConfirm() {
  * per-pose hold timers) — durationMins is left explicitly null with a
  * comment rather than fabricated. A real elapsed-time tracker would be
  * a separate, larger addition for a future session.
+ *
+ * 30 Jul 2026 — same stale-pending id-reuse fix as finaliseSession()
+ * above; see that function's comment for full reasoning.
  */
 function savePartialSession() {
-  const pending = store.get("currentActivityEntry");
-  const nowIso  = new Date().toISOString();
+  const rawPending = store.get("currentActivityEntry");
+  const pending     = (rawPending && !rawPending.status) ? rawPending : null;
+  const nowIso      = new Date().toISOString();
 
   const activityEntry = store.logActivity({
     ...(pending || { type: "yoga", source: "self-directed" }),

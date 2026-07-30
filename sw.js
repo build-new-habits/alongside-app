@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 30 Jul 2026 v183
+ * yoga-session.js v5 cache bump — same id-reuse fix as core-session.js
+ * v4 (this session), applied to yoga-session.js's finaliseSession() and
+ * savePartialSession(). No schema change, no new file — yoga-session.js
+ * already present in SHELL_URLS below.
+ *
  * 30 Jul 2026 v182
  * core-session.js v4 cache bump — Core Session data-integrity
  * investigation. Fixed an id-reuse bug: finaliseSession() and
@@ -201,7 +207,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v182";
+const CACHE_NAME = "alongside-v183";
 
 const SHELL_URLS = [
 

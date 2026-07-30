@@ -169,6 +169,11 @@ This changelog was not maintained during this window while build velocity was hi
 - `sw.js` v181 → v182 — cache bump, deployed last.
 - Related, not fixed this session: `yoga-session.js` has the identical spread-pending pattern and is also reachable directly from `library.js` without going through `intention.js` — same latent risk, out of this session's file scope.
 
+### Yoga id-reuse fix — same session, follow-up on request
+
+- `yoga-session.js` v4 → v5 — same id-reuse bug as `core-session.js` above, fixed. Unlike core-session, yoga's `pending` is sometimes genuine (via `intention.js`), so the fix distinguishes rather than discarding outright: a pending entry carrying `status` is stale (every `logActivity()`-written entry has one; `intention.js`'s fresh entry never does) and is now discarded instead of spread.
+- `sw.js` v182 → v183 — cache bump, deployed last.
+
 ---
 
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
