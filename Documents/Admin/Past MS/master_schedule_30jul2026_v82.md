@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 30 Jul 2026 v83
+## 30 Jul 2026 v82
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_30jul2026_v82.md`. Remove v82 on upload.
+Supersedes `alongside_master_schedule_30jul2026_v81.md`. Remove v81 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** First on-device test run, in progress. Core Session basic sanity confirmed on-device — real completion logged a genuine `activityLog` entry matching the on-screen credits exactly. Two new UI/UX findings logged (not actioned): screen styling inconsistency across Intention/Library/Coach Proposal, and location not changeable mid-flow. Remaining on-device test steps (id-reuse scenarios, gym exit-guard, CSS visual check) still to run.
+**This version's substantive changes:** Two follow-ups from the Core Session investigation, both requested and closed same session. (1) `workout.js` (gym) checked for the same spread-pending id-reuse pattern found in core/yoga — **not present**, gym builds its entry fresh already. (2) While checking, found `workout.js` had **no back-gesture exit protection at all** (worse than the BUILD-3 gap — no confirmation card, no partial save, silent instant exit) — fixed: `workout.js` v5→v6, `mountSessionGuard()` wired, `savePartialSession()` added, on-screen Exit now uses a coach-voiced overlay. That surfaced a further gap: the on-screen overlay's CSS (`.session-exit-*`) was missing entirely, affecting all 7 files using this pattern, not just workout.js — fixed in `css/components/session-guard.css` v1→v2. `sw.js` v183→v184. See Core Session Outcome section below for the full run.
 
 ---
 
@@ -82,13 +82,6 @@ Fixed to match `core-session.js` v4 / `yoga-session.js` v5's confirmed pattern: 
 **Final code shipped this session, in full:** `core-session.js` v3→v4, `yoga-session.js` v4→v5, `workout.js` v5→v6, `css/components/session-guard.css` v1→v2, `sw.js` v181→v184 (four bumps total, each deployed last). Changelog fully updated. No schema changes.
 
 **Still open — on-device confirmation** for all three JS fixes and the CSS render, plus the original id-reuse scenario, plus the newly-fixed gym back-gesture path. The PM chat has no device access. High code-trace confidence throughout, but this is the one remaining gate per standing discipline.
-
-**On-device testing, 30 Jul 2026 (Graeme, on the phone) — Core Session basic sanity confirmed.** Real completion via Library → "At home" → Core → Stability → 15 min → 4 exercises produced a genuine `activityLog` entry: `type: "core-session"`, `status: "completed"`, `exercisesCount: 4`, `creditsEarned: 80` — matches the on-screen "+80 credits earned" exactly. First direct on-device confirmation of the original diagnosis. Remaining test steps (id-reuse scenarios, gym exit-guard, CSS visual check) not yet run.
-
-Two new UI/UX findings surfaced incidentally while testing, unrelated to the Core Session fixes themselves — logged here, not actioned:
-
-- **Screen styling inconsistency.** Three different visual styles across the ways into a session: Intention screen (card-based options), Library (plain text list), Coach Proposal (different card style again, with a "RECOMMENDED" badge). Not a bug, but a real inconsistency worth a design pass at some point.
-- **Location can't be changed mid-flow.** Once inside Library's "At home" branch (or any location branch), there's no way to switch to a different location (e.g. decide to go to the gym instead) without exiting all the way back to the top of Library. Minor friction, not blocking.
 
 ---
 
@@ -193,8 +186,6 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 | Cleanup — `checkin-mini.js` orphaned `workoutsGeneratedAt` write | Logged, 30 Jul. Now fully orphaned (its only reader removed this session). | Sign-off only. | None, deliberately deferred. |
 | Cleanup — `activeProgramme.measurementsOptIn` anomaly | Logged, 30 Jul. Copy-paste artefact from `strategicGoal.measurementsOptIn` via `mergeWithDefaults()`. | Small fix, not urgent. | None, deliberately deferred. |
 | Cleanup — `exercises/index.js` | Logged, 28 Jul. | Sign-off only. | None, deliberately deferred. |
-| UI — Screen styling inconsistency (Intention / Library / Coach Proposal) | New, 30 Jul. Found during on-device testing. Three different visual styles across the ways into a session. | Design pass, not scoped. | Not booked, no urgency. |
-| UI — Location not changeable mid-flow | New, 30 Jul. Found during on-device testing. Once inside a Library location branch, can't switch location without exiting to top of Library. | Minor UX fix, not scoped. | Not booked, no urgency. |
 | Admin — project knowledge cleanup | New, 30 Jul. Superseded master-schedule versions (v68–v78) and 4 retired schema docs need removing from project knowledge — Claude can't delete these directly. | Graeme, via the UI, whenever convenient. | None. |
 | Admin — `Admin/` historical backfill | New, 30 Jul. Repo's `Admin/` folder has this week's blueprints/handoffs only; dozens more exist in project knowledge back to March, not yet moved. | Separate future session if wanted. | Not booked, no urgency. |
 
@@ -210,4 +201,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v83*
+*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v82*
