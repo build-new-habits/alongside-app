@@ -1,7 +1,12 @@
 /**
  * store.js - Data persistence layer
- * 16 Jul 2026 v10
+ * 30 Jul 2026 v11
  *
+ * 30 Jul 2026 v11 - logActivity()'s dedupeWindowMs default reduced from
+ *   2 minutes to 10 seconds. Found on-device testing yoga-session.js v6:
+ *   two genuinely different real completions 83 seconds apart were
+ *   silently rejected as a duplicate. See logActivity()'s own changelog
+ *   comment below for full reasoning. No other changes.
  * 16 Jul 2026 v10 - logActivity() added (S4-B3-3). Confirmed on-device
  *   duplicate/phantom-write bug in activityLog, discovered during B3-2-Test
  *   and root-caused this session: coach-reflection.js was writing an
@@ -805,16 +810,32 @@ export const store = {
    *
    * Assigns an id if the entry doesn't already have one. Rejects (returns
    * null, does not write) if an entry already exists with the same `type`
-   * and a `completedAt` within `dedupeWindowMs` (default 2 minutes) of the
-   * new entry's completedAt — this catches genuine accidental double-fires
-   * without risk of dropping two legitimately close-together but different
-   * real activities (which will differ in type, or be minutes apart).
+   * and a `completedAt` within `dedupeWindowMs` of the new entry's
+   * completedAt — this catches genuine accidental double-fires.
+   *
+   * 30 Jul 2026 — dedupeWindowMs default reduced from 2 minutes to 10
+   * seconds. Found on-device testing the yoga-session.js v6 fix (same
+   * day): two genuinely different, real yoga completions 83 seconds
+   * apart were rejected as a dupe — the 2-minute window was built to
+   * catch near-instantaneous accidental double-fires (a double-tap, or
+   * exactly the stuck-screen re-tap bug just fixed in yoga-session.js
+   * v6), which happen within a second or two, not two minutes. 10
+   * seconds still comfortably covers a slow-rendering device where
+   * someone taps again after a couple seconds of apparent nothing,
+   * while no longer catching two real, distinct completions as a false
+   * positive. No caller overrides this default — applies to every
+   * activity type uniformly. Separately flagged, NOT fixed here: when a
+   * write is rejected, the calling session view still shows its normal
+   * "done" success screen with credits — the person has no way to know
+   * the completion wasn't actually saved. That needs a coach-voiced
+   * message, a content/UX decision, not a code-only fix — logged on the
+   * master schedule.
    *
    * @param {object} entry — activityLog entry fields (id optional)
-   * @param {number} [dedupeWindowMs=120000]
+   * @param {number} [dedupeWindowMs=10000]
    * @returns {object|null} the written entry, or null if rejected as a dupe
    */
-  logActivity(entry, dedupeWindowMs = 2 * 60 * 1000) {
+  logActivity(entry, dedupeWindowMs = 10 * 1000) {
     if (!entry || !entry.type) {
       console.error('Store: logActivity called without a type', entry);
       return null;

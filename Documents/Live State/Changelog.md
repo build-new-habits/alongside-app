@@ -187,6 +187,13 @@ This changelog was not maintained during this window while build velocity was hi
 - Fixed: `yoga-session.js` v5 → v6, one line added (`rerender();`). Two other call sites of `finaliseSession()` checked and confirmed already correct — no other changes needed.
 - `sw.js` v184 → v185 — cache bump, deployed last.
 
+### Dedupe window fix — found continuing on-device testing, same session
+
+- Testing yoga Route B (two direct-from-Library completions, no Intention visit between them): two genuinely different, real yoga completions 83 seconds apart were silently rejected by `logActivity()`'s dedupe guard as a duplicate. `finaliseSession()` still showed the normal "Practice done" success screen with credits — the completion was never actually written, with no indication to the user.
+- Root cause: the guard's 2-minute default window was built to catch near-instantaneous accidental double-fires (a double-tap, or the stuck-screen re-tap bug just fixed above) — those happen within a second or two, not two minutes. The wide window meant any two real, distinct completions of the same type within 2 minutes got wrongly rejected.
+- Fixed: `store.js` v10 → v11, `dedupeWindowMs` default reduced from 2 minutes to 10 seconds. No caller overrides this default, so the fix applies uniformly across every activity type. `sw.js` v185 → v186 — cache bump, deployed last.
+- **Separately flagged, not fixed:** when a write is rejected, the session view still shows a false "success" screen. Needs a coach-voiced message — a content/UX decision, not a code-only fix. Logged on the master schedule as an open item.
+
 ---
 
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
