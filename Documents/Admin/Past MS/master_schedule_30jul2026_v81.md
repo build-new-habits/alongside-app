@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 30 Jul 2026 v82
+## 30 Jul 2026 v81
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_30jul2026_v81.md`. Remove v81 on upload.
+Supersedes `alongside_master_schedule_30jul2026_v80.md`. Remove v80 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** Two follow-ups from the Core Session investigation, both requested and closed same session. (1) `workout.js` (gym) checked for the same spread-pending id-reuse pattern found in core/yoga — **not present**, gym builds its entry fresh already. (2) While checking, found `workout.js` had **no back-gesture exit protection at all** (worse than the BUILD-3 gap — no confirmation card, no partial save, silent instant exit) — fixed: `workout.js` v5→v6, `mountSessionGuard()` wired, `savePartialSession()` added, on-screen Exit now uses a coach-voiced overlay. That surfaced a further gap: the on-screen overlay's CSS (`.session-exit-*`) was missing entirely, affecting all 7 files using this pattern, not just workout.js — fixed in `css/components/session-guard.css` v1→v2. `sw.js` v183→v184. See Core Session Outcome section below for the full run.
+**This version's substantive changes:** Core Session `currentActivityEntry` data-integrity investigation — 🟢 **Closed.** Diagnosed as never having silently failed to log (core-session isn't reachable via `intention.js`'s activity list, but `logActivity()`'s fallback always fired with real data). A genuine id-reuse bug was found and fixed instead: `core-session.js` v3→v4. The same pattern was then confirmed and fixed in `yoga-session.js` v4→v5 as a same-session follow-up. `sw.js` v181→v183 across both fixes. See Core Session Outcome section below.
 
 ---
 
@@ -70,18 +70,6 @@ Full trace and reasoning in the session's own record (this PM chat, or `alongsid
 **Not yet done — logged as open:** on-device confirmation of a real completed Core Session (and ideally the back-to-back-completions scenario for both fixes) — the PM chat has no device access. Worth a quick check next time Graeme's on the phone; the fix is narrow enough that code-trace confidence is high, but "should work" is never the final gate per standing discipline.
 
 **Also logged, not investigated this session:** whether `workout.js` (gym) has the same spread-pending pattern — out of this session's scope, not checked either way.
-
-**Follow-up 1, same session (on request) — `workout.js` checked.** Traced `completeWorkout()`: it builds its `activityLog` entry fully from scratch every time (`date`, `completedAt`, `type`, `durationMins`, `moodAfter`, `isEvent`, `eventName`) and never reads `currentActivityEntry` beforehand — only sets it after writing, same "so reflect.js can find it" pattern as the others. **No spread-pending bug in gym.** Clean.
-
-**Follow-up 2, same session (on request) — a different, more serious gap found while checking.** `workout.js` had **no `mountSessionGuard()` wiring at all.** Confirmed via `router.js`'s default popstate handler (only defers to session-guard state when a `sessionGuard` flag is present in history) — without it, a device back-gesture mid-workout navigated away **instantly, no confirmation card, no partial save**, `workoutProgress` left orphaned in the store. The on-screen Exit button's browser `confirm()` ("Your progress on this workout will be lost") was an honest, intentional discard-only design for that path — not itself a bug — but the back-gesture path had nothing at all. Worse than the gap BUILD-3 fixed in 6 other files (23 Jul): those all showed a confirmation card and just skipped the actual save; gym showed nothing.
-
-Fixed to match `core-session.js` v4 / `yoga-session.js` v5's confirmed pattern: `mountSessionGuard()` wired, `savePartialSession()` added (built fresh, no `currentActivityEntry` spread — same discipline as the two id-reuse fixes above), on-screen Exit now shows a coach-voiced `showExitConfirm()` overlay instead of `confirm()`, `cleanupWorkout()` now calls `dismountSessionGuard()`. `workout.js` v5 → v6.
-
-**Follow-up 3, found while fixing Follow-up 2 — missing CSS across 7 files, not just gym.** `.session-exit-overlay`/`.session-exit-card` (the on-screen overlay's own CSS — separate from `.sg-*`, which only covers the back-gesture card) had **no styles anywhere in the repo.** Affected all 7 files using this local `showExitConfirm()` pattern — `core-session.js`, `yoga-session.js`, `cycle-session.js`, `running-session.js`, `swim-session.js`, `walk-session.js` (all since BUILD-3, 23 Jul) — not a workout.js-only issue, it was rendering unstyled everywhere it existed. Fixed in `css/components/session-guard.css` v1 → v2, matching the existing `.sg-*` card's visual language exactly.
-
-**Final code shipped this session, in full:** `core-session.js` v3→v4, `yoga-session.js` v4→v5, `workout.js` v5→v6, `css/components/session-guard.css` v1→v2, `sw.js` v181→v184 (four bumps total, each deployed last). Changelog fully updated. No schema changes.
-
-**Still open — on-device confirmation** for all three JS fixes and the CSS render, plus the original id-reuse scenario, plus the newly-fixed gym back-gesture path. The PM chat has no device access. High code-trace confidence throughout, but this is the one remaining gate per standing discipline.
 
 ---
 
@@ -169,7 +157,7 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 | Product — BUILD-9 (18+ age-gate) | Not yet scoped. **U18 safeguarding position genuinely open** — Alex suggested it may not be needed, unconfirmed, pending his solicitor (29 Jul). | Hold scoping until Alex/solicitor respond. | Waiting on Alex. |
 | Product — Thread scroll-bug audit | 🟢 Closed, 28 Jul. 2 of 3 files already fixed, third checked and cleared. | None. | None. |
 | Product — B3-2-Test follow-ups | 2 items remain (chip overflow, reflect.js cache-clear confirmation). | Fold into a future session. | Not booked, low priority. |
-| Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Closed, 30 Jul, with two same-session follow-ups.** Never silently failing to log — id-reuse bug fixed in `core-session.js` v4 and `yoga-session.js` v5. `workout.js` checked (clean on this pattern) but found with a more serious, separate gap — zero back-gesture exit protection — fixed as `workout.js` v6, which also surfaced missing `.session-exit-*` CSS affecting all 7 files, fixed in `session-guard.css` v2. See Core Session Outcome section above. | On-device confirmation, next time on the phone. | None hard — code-trace confidence high throughout. |
+| Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Closed, 30 Jul.** Never silently failing to log — real bug was an id-reuse risk on back-to-back completions, fixed in `core-session.js` v4 and `yoga-session.js` v5. See Core Session Outcome section above. | On-device confirmation, next time on the phone. | None hard — code-trace confidence high. |
 | Product — BUILD-4 Appendix A follow-up | New, 30 Jul. ~18 fields found via grep during BUILD-4, not individually triaged. | Dedicated pass, same read+write check method. | Recommended before Supabase schema design, not strictly blocking. |
 | Product/Infra — Supabase schema design | Scoped in conversation 27 Jul. **Unblocked — BUILD-4 closed.** | Run — decide whether Appendix A follow-up runs first. | None hard; Appendix A recommended first. |
 | Website — Home/Products/Community/Impact | 🟢 Confirmed clean. | None unless BUILD-9 triggers a copy pass. | None. |
@@ -201,4 +189,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v82*
+*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v81*
