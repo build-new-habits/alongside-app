@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 30 Jul 2026 v184
+ * workout.js v6 cache bump — gym exit-guard gap fix (Core Session
+ * investigation follow-up, same session). mountSessionGuard() wired for
+ * the first time, savePartialSession() added, on-screen Exit now uses a
+ * coach-voiced showExitConfirm() overlay instead of confirm(). Also:
+ * css/components/session-guard.css v2 cache bump — added missing
+ * .session-exit-* styles (found unstyled across all 7 files using this
+ * local-overlay pattern, fixed for all of them via the shared stylesheet).
+ * No schema change, no new files — both already present in SHELL_URLS.
+ *
  * 30 Jul 2026 v183
  * yoga-session.js v5 cache bump — same id-reuse fix as core-session.js
  * v4 (this session), applied to yoga-session.js's finaliseSession() and
@@ -207,7 +217,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v183";
+const CACHE_NAME = "alongside-v184";
 
 const SHELL_URLS = [
 

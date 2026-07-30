@@ -174,6 +174,13 @@ This changelog was not maintained during this window while build velocity was hi
 - `yoga-session.js` v4 → v5 — same id-reuse bug as `core-session.js` above, fixed. Unlike core-session, yoga's `pending` is sometimes genuine (via `intention.js`), so the fix distinguishes rather than discarding outright: a pending entry carrying `status` is stale (every `logActivity()`-written entry has one; `intention.js`'s fresh entry never does) and is now discarded instead of spread.
 - `sw.js` v182 → v183 — cache bump, deployed last.
 
+### Gym exit-guard gap — same session, found while tracing "workout.js not checked"
+
+- Traced on request: `workout.js` had no `mountSessionGuard()` wiring at all — confirmed via `router.js`'s default popstate handler, which only defers to session-guard state when a `sessionGuard` flag is present in history. Without it, back-gesture mid-workout navigated away instantly, no confirmation, no partial save, `workoutProgress` left orphaned in store. Worse than the pattern BUILD-3 fixed elsewhere (those 6 files showed a confirmation card but skipped the save; gym showed nothing at all).
+- Fixed: `workout.js` v5 → v6. `mountSessionGuard()` wired, `savePartialSession()` added (built fresh, no `currentActivityEntry` spread, same discipline as the two id-reuse fixes above), on-screen Exit button now shows a coach-voiced `showExitConfirm()` overlay instead of a blunt `confirm()`, `cleanupWorkout()` now calls `dismountSessionGuard()`.
+- Also found and fixed while here: `.session-exit-overlay`/`.session-exit-card` (the on-screen overlay's CSS, shared by all 7 files using this local-overlay pattern — core-session, yoga-session, cycle-session, running-session, swim-session, walk-session, and now workout) had no styles anywhere in the repo. Was rendering unstyled — no backdrop, no card containment. Fixed in `css/components/session-guard.css` v1 → v2, styled to match the existing `.sg-*` back-gesture card's visual language.
+- `sw.js` v183 → v184 — cache bump, deployed last.
+
 ---
 
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

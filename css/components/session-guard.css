@@ -2,9 +2,25 @@
  * css/components/session-guard.css
  * Session back-gesture guard — confirmation card styles
  *
- * 21 May 2026 v1
+ * 30 Jul 2026 v2
  *
  * CHANGELOG
+ * 30 Jul 2026 v2 — Added .session-exit-* styles. Found missing while
+ *   fixing the gym exit-guard gap (workout.js, same session): the
+ *   on-screen Exit button's coach-voiced confirmation card (a SEPARATE
+ *   overlay from this file's own .sg-* back-gesture card, defined locally
+ *   in each session view's own showExitConfirm() function) had no CSS
+ *   anywhere in the repo. Affected all 7 files that use this pattern —
+ *   core-session.js, yoga-session.js, cycle-session.js, running-session.js,
+ *   swim-session.js, walk-session.js (all since BUILD-3, 23 Jul), and
+ *   workout.js (new this session). Was rendering as unstyled raw HTML —
+ *   no backdrop, no card containment, unclear focus boundary. Styled to
+ *   match the existing .sg-* card's visual language exactly (same
+ *   backdrop, slide-up, coach-row layout, reduced-motion support) for
+ *   consistency between the two overlays a user might see in the same
+ *   session. Buttons use the app's existing .btn/.btn-primary/.btn-ghost/
+ *   .btn-full base classes (already WCAG 2.2 AA touch-target compliant
+ *   app-wide) — no separate button sizing needed here.
  * 21 May 2026 v1 — Added .sg-exit-discard styling for third exit option
  *                  ("Exit without saving"). Visually distinct from
  *                  "Exit and save progress" — smaller, muted text, no border.
@@ -112,6 +128,62 @@
 @media (prefers-reduced-motion: reduce) {
   .sg-backdrop,
   .sg-card {
+    animation: none;
+  }
+}
+
+/* ── On-screen Exit confirmation overlay ──────────────────────────────────── */
+/* Separate from .sg-* above (which handles the back-gesture path only).
+ * This is the local showExitConfirm() card each session view renders for
+ * its own on-screen Exit/Back button tap. Two options only (Stay / Exit
+ * and save) — no "Exit without saving" here by design, matching the
+ * simpler on-screen-tap intent vs. the more cautious back-gesture path.
+ * Visual language intentionally matches .sg-* exactly. Added 30 Jul 2026. */
+
+.session-exit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 998;
+  animation: sg-fade-in 200ms ease forwards;
+}
+
+.session-exit-card {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: var(--color-surface, #1A2332);
+  border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  border-radius: 20px 20px 0 0;
+  padding: var(--space-4, 1.5rem) var(--space-4, 1.5rem) calc(var(--space-4, 1.5rem) + env(safe-area-inset-bottom));
+  animation: sg-slide-up 240ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.session-exit-coach-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 0.75rem);
+  margin-bottom: var(--space-4, 1.5rem);
+}
+
+.session-exit-coach-text {
+  font-size: var(--font-size-base, 1rem);
+  line-height: 1.5;
+  color: var(--color-text-primary, #FFFFFF);
+  margin: 0;
+}
+
+.session-exit-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-exit-overlay,
+  .session-exit-card {
     animation: none;
   }
 }
