@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 30 Jul 2026 v84
+## 30 Jul 2026 v83
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_30jul2026_v83.md`. Remove v83 on upload.
+Supersedes `alongside_master_schedule_30jul2026_v82.md`. Remove v82 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** A real bug found and fixed during on-device testing — `yoga-session.js`'s `finaliseSession()` was missing a `rerender()` call, leaving the screen frozen after a genuine yoga completion. Fixed (`yoga-session.js` v5→v6, `sw.js` v184→v185) and re-tested on-device same session, confirmed working. Yoga id-reuse route A (via Intention) also confirmed on-device. A third UI finding logged: bottom nav bar covers content with no buffer space on several screens.
+**This version's substantive changes:** First on-device test run, in progress. Core Session basic sanity confirmed on-device — real completion logged a genuine `activityLog` entry matching the on-screen credits exactly. Two new UI/UX findings logged (not actioned): screen styling inconsistency across Intention/Library/Coach Proposal, and location not changeable mid-flow. Remaining on-device test steps (id-reuse scenarios, gym exit-guard, CSS visual check) still to run.
 
 ---
 
@@ -89,9 +89,6 @@ Two new UI/UX findings surfaced incidentally while testing, unrelated to the Cor
 
 - **Screen styling inconsistency.** Three different visual styles across the ways into a session: Intention screen (card-based options), Library (plain text list), Coach Proposal (different card style again, with a "RECOMMENDED" badge). Not a bug, but a real inconsistency worth a design pass at some point.
 - **Location can't be changed mid-flow.** Once inside Library's "At home" branch (or any location branch), there's no way to switch to a different location (e.g. decide to go to the gym instead) without exiting all the way back to the top of Library. Minor friction, not blocking.
-- **Bottom nav bar covers content on multiple screens.** No buffer space above the persistent bottom nav bar — content (buttons, cards) runs right up against it or gets clipped underneath, on several screens (seen on Intention and Yoga's duration/focus pickers at minimum, likely wider than just those two). Needs a consistent bottom padding/safe-area fix across affected views.
-
-**Yoga stuck-screen bug — found and fixed during this same on-device test run.** Real bug, unrelated to any of today's earlier fixes: completing a genuine yoga session via "Finish practice" left the screen frozen on the last pose. Root cause: `yoga-session.js`'s `finaliseSession()` set `phase = "done"` but never called `rerender()` — confirmed by direct comparison with `core-session.js`'s equivalent function, which already had both lines. The completion data itself was always correct (confirmed: `energyBefore: 7`, `creditsEarned: 120` on the first genuine attempt) — only the screen transition was broken, and a second tap (understandable, since the screen looked unresponsive) correctly triggered `logActivity()`'s dedupe guard rather than writing a duplicate. Fixed: one line added (`rerender();`). `yoga-session.js` v5 → v6, `sw.js` v184 → v185. **Re-tested on-device immediately after the fix — confirmed working:** "Practice done" screen now shows correctly, `+100 credits earned` on screen matches `creditsEarned: 100` in the new activityLog entry (`id: 5k2k`).
 
 ---
 
@@ -198,8 +195,6 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 | Cleanup — `exercises/index.js` | Logged, 28 Jul. | Sign-off only. | None, deliberately deferred. |
 | UI — Screen styling inconsistency (Intention / Library / Coach Proposal) | New, 30 Jul. Found during on-device testing. Three different visual styles across the ways into a session. | Design pass, not scoped. | Not booked, no urgency. |
 | UI — Location not changeable mid-flow | New, 30 Jul. Found during on-device testing. Once inside a Library location branch, can't switch location without exiting to top of Library. | Minor UX fix, not scoped. | Not booked, no urgency. |
-| UI — Bottom nav bar covers content, no buffer | New, 30 Jul. Found during on-device testing. No padding above the persistent bottom nav on several screens (Intention, Yoga pickers at minimum) — content runs against or under it. | Consistent bottom-padding/safe-area fix across affected views, not scoped. | Not booked, no urgency. |
-| Product — Yoga stuck-screen bug (`finaliseSession()` missing `rerender()`) | 🟢 **Found and fixed, 30 Jul, on-device.** Real completion left the screen frozen on the last pose — data was always correct, only the screen transition was broken. Fixed `yoga-session.js` v5→v6, re-tested on-device immediately, confirmed working. | None — closed. | None. |
 | Admin — project knowledge cleanup | New, 30 Jul. Superseded master-schedule versions (v68–v78) and 4 retired schema docs need removing from project knowledge — Claude can't delete these directly. | Graeme, via the UI, whenever convenient. | None. |
 | Admin — `Admin/` historical backfill | New, 30 Jul. Repo's `Admin/` folder has this week's blueprints/handoffs only; dozens more exist in project knowledge back to March, not yet moved. | Separate future session if wanted. | Not booked, no urgency. |
 
@@ -215,4 +210,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v84*
+*Build New Habits · Alongside: Move · Master Schedule · 30 Jul 2026 v83*
