@@ -161,6 +161,14 @@ This changelog was not maintained during this window while build velocity was hi
 
 - `Documents/` restructured into `Live State/`, `Admin/`, `Business/`, `Archive/`. `Documents/Admin/master_schedule.md` is now the canonical Master Schedule location (was project knowledge).
 
+### Core Session `currentActivityEntry` data-integrity investigation
+
+- Diagnosis: Core Session completions were never silently failing — `logActivity()`'s fallback always fired with real data. But `core-session.js` isn't reachable via `intention.js`'s `ACTIVITIES` list (core was never wired into that pattern), so no route ever sets a genuine pending `currentActivityEntry` before entering this file.
+- Bug found and fixed: `finaliseSession()` and `savePartialSession()` were spreading `pending` (stale from the file's own previous completion, re-set into store after every write) into new writes — so two back-to-back Core Sessions not separated by an `intention.js` visit could share one `activityLog` id.
+- `core-session.js` v3 → v4 — both functions now build the entry fresh, no `pending` spread; `logActivity()` always assigns a new id. No schema change.
+- `sw.js` v181 → v182 — cache bump, deployed last.
+- Related, not fixed this session: `yoga-session.js` has the identical spread-pending pattern and is also reachable directly from `library.js` without going through `intention.js` — same latent risk, out of this session's file scope.
+
 ---
 
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

@@ -1,9 +1,28 @@
 /**
  * core-session.js - Guided Core Session
  *
- * 23 Jul 2026 v3
+ * 30 Jul 2026 v4
  *
  * CHANGELOG
+ * 30 Jul 2026 v4 — Core Session `currentActivityEntry` data-integrity
+ *   investigation. Diagnosis: no route into this file ever set a genuine
+ *   pending currentActivityEntry upstream (core-session isn't reachable
+ *   via intention.js's ACTIVITIES list at all) — completions were never
+ *   silently failing, logActivity()'s fallback always fired with real
+ *   type/completedAt/status/exercisesCount/creditsEarned. But finaliseSession()
+ *   and savePartialSession() were both spreading `pending` into the write,
+ *   which — since this file re-sets currentActivityEntry to its own
+ *   completion result after every write — meant two back-to-back Core
+ *   Sessions not separated by an intention.js visit spread the FIRST
+ *   session's stale entry (including its id) into the second, and
+ *   logActivity() honoured the reused id. Fixed: both functions now build
+ *   the entry fresh, no pending spread, so logActivity() always assigns a
+ *   new id. Full trace in alongside_blueprint_coresession-integrity_
+ *   30jul2026_v2.md's session handoff. Note: yoga-session.js has the
+ *   identical spread-pending pattern and is also reachable directly from
+ *   library.js without going through intention.js — same latent risk,
+ *   NOT fixed here (out of this session's file scope, logged for a
+ *   future targeted pass).
  * 23 Jul 2026 v3 — BUILD-3 exit-guard audit fix. onExit (mountSessionGuard)
  *   was navigating to reflect.js without ever calling savePartialSession()
  *   first — the on-screen Exit button (showExitConfirm) called it
@@ -951,14 +970,25 @@ function finaliseSession() {
   store.set("lastWorkoutCredits", creditsEarned);
   store.set("lastWorkoutName",    "Core Session");
 
-  // 23 Jul 2026 v3 (BUILD-3): migrated to store.logActivity(), matching
-  // yoga-session.js v4's confirmed-working pattern.
-  const pending = store.get("currentActivityEntry");
-  const nowIso  = new Date().toISOString();
+  // 30 Jul 2026 v4 (Core Session data-integrity investigation): stopped
+  // spreading `pending` (currentActivityEntry) into this write. Confirmed
+  // this session — no route into core-session.js ever sets a genuine
+  // pending entry upstream (core isn't in intention.js's ACTIVITIES list
+  // at all), so `pending` here was never legitimate same-session data. It
+  // was, however, whatever this file's own PREVIOUS completion wrote back
+  // (see the re-set below) — meaning two back-to-back Core Sessions not
+  // separated by an intention.js visit spread the first entry's `id` into
+  // the second, and store.logActivity() honoured `entry.id` if present,
+  // producing two real, different completions sharing one activityLog id.
+  // Fix: build the entry fresh every time, always let logActivity() assign
+  // a new id. The re-set of currentActivityEntry after the write (below)
+  // is unchanged and still needed for reflect.js's "How did that feel?"
+  // find-by-id flow.
+  const nowIso = new Date().toISOString();
 
   const activityEntry = store.logActivity({
-    ...(pending || { type: "core-session", source: "self-directed" }),
     type:           "core-session",
+    source:         "self-directed",
     sessionEnd:     nowIso,
     completedAt:    nowIso,
     status:         "completed",
@@ -1048,14 +1078,17 @@ function showExitConfirm() {
  * hold timers) — durationMins is left explicitly null with a comment
  * rather than fabricated. A real elapsed-time tracker would be a
  * separate, larger addition for a future session.
+ *
+ * 30 Jul 2026 v4 (Core Session data-integrity investigation): stopped
+ * spreading `pending` here too, same id-reuse fix and same reasoning as
+ * finaliseSession() above.
  */
 function savePartialSession() {
-  const pending = store.get("currentActivityEntry");
-  const nowIso  = new Date().toISOString();
+  const nowIso = new Date().toISOString();
 
   const activityEntry = store.logActivity({
-    ...(pending || { type: "core-session", source: "self-directed" }),
     type:           "core-session",
+    source:         "self-directed",
     sessionEnd:     nowIso,
     completedAt:    nowIso,
     status:         "partial",
