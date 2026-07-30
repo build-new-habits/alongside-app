@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 30 Jul 2026 v186
+ * store.js v11 cache bump — logActivity()'s dedupeWindowMs default
+ * reduced from 2 minutes to 10 seconds. Found on-device testing (same
+ * day): two genuinely different real yoga completions 83 seconds apart
+ * were silently rejected as a duplicate. Applies to every activity type
+ * uniformly — no caller overrides the default. No schema change, no new
+ * file — store.js already present in SHELL_URLS below.
+ *
  * 30 Jul 2026 v185
  * yoga-session.js v6 cache bump — on-device testing bug fix. finaliseSession()
  * was missing a rerender() call after phase = "done", leaving the screen
@@ -224,7 +232,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v185";
+const CACHE_NAME = "alongside-v186";
 
 const SHELL_URLS = [
 
