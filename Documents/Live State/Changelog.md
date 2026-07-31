@@ -196,4 +196,21 @@ This changelog was not maintained during this window while build velocity was hi
 
 ---
 
+## 31 Jul 2026
+
+### `gym-programme.js` — exit-guard + activity-visibility fix
+
+- Ground-truthed against live code per the 31 Jul blueprint (not just re-stating the 30 Jul finding). Confirmed three issues, one new:
+  1. No exit protection at all — neither the on-screen Exit button (instant `router.navigate('today')`, no confirmation) nor the back-gesture path (no `mountSessionGuard()` call anywhere in the file) protected an in-progress session. Same starting state `workout.js` was in before its own v6 fix, same day.
+  2. Completions wrote only to `progressLog`, never `activityLog`. `progressLog` is read by exactly one place (this file's own week-12 reflection text); `activityLog` is read by 20 files, including `today.js`'s "you moved today" detection and `progress.js`'s recent-activity observations — both invisible to completed gym-programme sessions.
+  3. **New finding, not in the original 30 Jul flag:** `reflect.js`'s save logic is gated on `store.get('currentActivityEntry')`. `gym-programme.js` never set it, so every reflect answer after a gym-programme session was either silently discarded or attached to a stale entry from an unrelated session.
+- Fixed additively, per Graeme's confirmed decision (blueprint Section 2): `recordSession()`'s `progressLog` write is unchanged. `mountSessionGuard()`/`dismountSessionGuard()` now wired (same pattern as `workout.js` v6/`core-session.js` v4/`yoga-session.js` v5), on-screen Exit shows a `showExitConfirm()` Stay/Exit-and-save overlay, `savePartialSession()` added, `store.logActivity()` called at both partial-exit and genuine completion with the result written to `currentActivityEntry`.
+- Activity type set to `"gym"`, not `"workout"` — `"gym"` is an existing key in `reflect.js`'s `QUESTIONS`/`FEEL_OPTIONS` maps, giving the tailored gym question and feel options rather than the `"other"`/`"coach-session"` fallback `"workout"` falls through to. Checked first: `today.js`/`progress.js` don't filter `activityLog` by `type` at all, so this choice only affects `reflect.js`'s question personalisation, nothing else.
+- No CSS change — reused the existing `.session-exit-*` class family from `css/components/session-guard.css` v2 (confirmed present, no conflicting rules in `gym-programme.css`).
+- `gym-programme.js` v2 → v3. `sw.js` v186 → v187 — cache bump, deployed last.
+- **Not fixed this session, logged separately:** `workout.js`'s own completions still use `type: "workout"`, which isn't a key in either `reflect.js` map and falls through to the generic fallback questions. Out of this session's file list — flag for a future small fix if it's worth a dedicated touch.
+- **On-device confirmation still required** before this can be marked closed — code review and Node-level checks only; no device available in this session.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

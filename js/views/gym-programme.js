@@ -1,9 +1,60 @@
 /**
  * gym-programme.js
- * 23 Jun 2026 v2
+ * 31 Jul 2026 v3
  *
  * Gym programme session view. Renders the generated gym session and handles
  * the mid-programme and end-of-programme moments.
+ *
+ * v3 — Exit-guard + activity-visibility fix (31 Jul 2026 blueprint,
+ *   ground-truthed against live code). Three confirmed issues fixed
+ *   together, following the pattern already proven working in
+ *   workout.js v6 (same investigation, same day):
+ *
+ *   1. No exit protection at all. Neither the on-screen Exit button
+ *      (instant router.navigate('today'), no confirmation) nor the
+ *      back-gesture path (no mountSessionGuard() call, so router.js's
+ *      default popstate just navigated away) protected an in-progress
+ *      session. Fixed: mountSessionGuard()/dismountSessionGuard() now
+ *      guard the back-gesture path; the on-screen Exit button shows a
+ *      showExitConfirm() Stay/Exit-and-save overlay instead of navigating
+ *      instantly. Reuses the existing .session-exit-* class family from
+ *      css/components/session-guard.css v2 — no CSS changes needed here.
+ *
+ *   2. Completions only wrote to progressLog, never activityLog.
+ *      progressLog is read by exactly one place in the codebase (this
+ *      file's own week-12 reflection observation text) — activityLog is
+ *      read by 20 files, including today.js ("you moved today") and
+ *      progress.js (recent-activity observations). A completed
+ *      gym-programme session was invisible to both. Fixed additively —
+ *      per Graeme's confirmed decision — recordSession()'s progressLog
+ *      write is unchanged; a store.logActivity() call now runs alongside
+ *      it at genuine completion, and at partial-exit via
+ *      savePartialSession().
+ *
+ *   3. reflect.js's save logic is gated on store.get('currentActivityEntry')
+ *      — this file never set it, so every reflect.js answer after a
+ *      gym-programme session was silently discarded (or, worse, attached
+ *      to a stale entry left over from an unrelated earlier session).
+ *      Fixed: store.logActivity()'s returned entry is now written to
+ *      currentActivityEntry at both completion and partial-exit.
+ *
+ *   Activity type deliberately set to "gym", not "workout" (workout.js's
+ *   value, copied everywhere else this pattern's been applied). "gym" is
+ *   an existing key in reflect.js's QUESTIONS/FEEL_OPTIONS maps — using
+ *   it means the post-session question ("I want to know what it actually
+ *   felt like in there") and feel options (Felt strong / About right /
+ *   Struggled) are the ones actually written for gym content, not a
+ *   fallback. "workout" isn't a key in either map, so workout.js's own
+ *   sessions fall through to the "other"/"coach-session" defaults — that
+ *   wasn't touched here (out of this session's file list, logged
+ *   separately below), but there was no reason to propagate the same gap
+ *   into a new call site when the correct key already exists and nothing
+ *   else in the codebase keys off entry.type === "workout" specifically.
+ *
+ *   Checked before making this change: today.js and progress.js's
+ *   activityLog reads don't filter by type at all (any entry counts as
+ *   "moved today" / a recent activity) — so this choice doesn't affect
+ *   either surface, only reflect.js's question personalisation.
  *
  * v2 — Phase 5 (P5-PROG-5, P5-PROG-6, P5-PROG-7):
  *   - Week 6 glance: brief mid-programme moment. Shows once. Coach pulls back,
@@ -49,6 +100,7 @@ import {
   advanceWeekIfNeeded,
 }                                   from '../data/programmeEngine.js';
 import { getActiveVoice }           from '../data/coach-voice.js';
+import { mountSessionGuard, dismountSessionGuard } from '../session-guard.js';
 
 // ─── View registration ────────────────────────────────────────────────────────
 
@@ -401,6 +453,17 @@ export function GymProgrammeView(router) {
 
     sessionStartTime = Date.now();
     currentExerciseIndex = 0;
+    sessionStarted = true;
+
+    mountSessionGuard({
+      isActive: () => sessionStarted,
+      onExit:   () => {
+        savePartialSession(container);
+        cleanupSession();
+        router.navigate('reflect');
+      },
+      label: 'gym session'
+    });
 
     container.innerHTML = `
       <div class="gp-session" role="main" aria-label="Gym session">
@@ -560,7 +623,8 @@ export function GymProgrammeView(router) {
       const currentType = store.get('gymProgrammeSession') || 'A';
       store.set('gymProgrammeSession', currentType === 'A' ? 'B' : 'A');
 
-      // Record session
+      // Record session — progressLog write, unchanged (v3 blueprint
+      // Section 2: additive fix, this stays exactly as it was).
       recordSession({
         focus:           session.focus || 'strength',
         energy:          store.get('lastCheckin.energy'),
@@ -569,13 +633,132 @@ export function GymProgrammeView(router) {
         conditionScores: store.get('conditionPainScores') || {},
       });
 
+      // v3 — shared activityLog write path, same pattern as workout.js
+      // v6/core-session.js v4/yoga-session.js v5. Makes this session
+      // visible to today.js/progress.js, and gives reflect.js a live
+      // currentActivityEntry to save feel/painChange/note/moodAfter into
+      // instead of silently discarding them.
+      const nowIso = new Date().toISOString();
+      const activityEntry = store.logActivity({
+        type:           'gym',
+        date:           nowIso,
+        completedAt:    nowIso,
+        status:         'complete',
+        durationMins,
+        exercisesCount: doneCount,
+        moodAfter:      null,
+        isEvent:        false,
+        eventName:      null,
+      });
+      if (activityEntry) {
+        store.set('currentActivityEntry', activityEntry);
+      }
+
+      cleanupSession();
       router.navigate('reflect');
     });
 
-    // Exit
+    // Exit — shows a Stay/Exit-and-save overlay instead of navigating
+    // instantly, matching workout.js v6's confirmed-working pattern.
     container.querySelector('[data-action="exit-session"]')?.addEventListener('click', () => {
-      router.navigate('today');
+      showExitConfirm(container);
     });
+  }
+
+  // ── Exit confirmation overlay ──────────────────────────────────────────────
+  // Added 31 Jul 2026 (v3). Replaces the old instant router.navigate('today')
+  // with a coach-voiced in-app card, matching workout.js v6/core-session.js
+  // v4/yoga-session.js v5's confirmed pattern. Reuses the shared
+  // .session-exit-* class family from css/components/session-guard.css v2 —
+  // no new CSS.
+
+  function showExitConfirm(container) {
+    const overlay = document.createElement('div');
+    overlay.className = 'session-exit-overlay';
+    overlay.id        = 'session-exit-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Exit gym session confirmation');
+    overlay.innerHTML = `
+      <div class="session-exit-card">
+        <div class="session-exit-coach-row">
+          <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <p class="session-exit-coach-text">
+            Hold on — if you leave now this session won't be saved. Are you sure?
+          </p>
+        </div>
+        <div class="session-exit-actions">
+          <button class="btn btn-primary btn-full" id="exit-confirm-stay"
+                  aria-label="Stay in session">
+            Stay in session
+          </button>
+          <button class="btn btn-ghost btn-full" id="exit-confirm-leave"
+                  aria-label="Exit and save progress so far">
+            Exit and save progress
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById('exit-confirm-stay').addEventListener('click', () => {
+      overlay.remove();
+    });
+
+    document.getElementById('exit-confirm-leave').addEventListener('click', () => {
+      overlay.remove();
+      savePartialSession(container);
+      cleanupSession();
+      router.navigate('reflect');
+    });
+  }
+
+  /**
+   * savePartialSession() — added 31 Jul 2026 (v3). Same pattern as
+   * workout.js v6/core-session.js v4/yoga-session.js v5's partial-save
+   * functions: builds the entry fresh via store.logActivity(), no spread
+   * of a prior currentActivityEntry (avoids the id-reuse bug fixed
+   * elsewhere in the 30 Jul Core Session investigation). Does NOT call
+   * recordSession() — a partial session shouldn't count toward
+   * programme week/milestone progress, only toward the visible activity
+   * record.
+   */
+  function savePartialSession(container) {
+    const doneCount = container
+      ? container.querySelectorAll('[aria-pressed="true"]').length
+      : 0;
+    const durationMins = sessionStartTime
+      ? Math.round((Date.now() - sessionStartTime) / 60000)
+      : null;
+    const nowIso = new Date().toISOString();
+
+    const activityEntry = store.logActivity({
+      type:           'gym',
+      date:           nowIso,
+      completedAt:    nowIso,
+      status:         'partial',
+      durationMins,
+      exercisesCount: doneCount,
+      moodAfter:      null,
+      isEvent:        false,
+      eventName:      null,
+    });
+
+    if (activityEntry) {
+      store.set('currentActivityEntry', activityEntry);
+    }
+  }
+
+  /**
+   * cleanupSession() — added 31 Jul 2026 (v3). Mirrors workout.js v6's
+   * cleanupWorkout(): dismounts the guard and resets local session state
+   * so a stale isActive() doesn't linger into the next mount.
+   */
+  function cleanupSession() {
+    dismountSessionGuard();
+    sessionStarted   = false;
+    sessionStartTime = null;
   }
 
   // ── Utilities ──────────────────────────────────────────────────────────────
