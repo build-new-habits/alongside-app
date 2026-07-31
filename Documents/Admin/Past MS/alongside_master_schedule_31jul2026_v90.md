@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 31 Jul 2026 v91
+## 31 Jul 2026 v90
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_31jul2026_v90.md`. Remove v90 on upload.
+Supersedes `alongside_master_schedule_31jul2026_v89.md`. Remove v89 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** two new blueprints written and pushed, both fully ground-truthed against live code/schema before writing — **BUILD-4 Appendix A follow-up** (18-field triage) and **Supabase schema & architecture design** (design-only, two real dependencies confirmed and scoped around: BIZ-1/DPA gating, and tier-gating not yet existing as a system — checked directly against live code, not assumed). Repo and project knowledge confirmed in sync at v90 before this update — no drift this round. **Method note, confirmed working twice now:** tracing the actual persona/code path before any device test — not after — is now the standard first step for every blueprint (this is what caught the `reflect.js` data-loss bug in `gym-programme.js` before a device was ever involved, and what caught the tier-gating gap here). Device testing remains the closing gate, not the discovery method.
+**This version's substantive changes:** `gym-programme.js` build session run, same day as the blueprint, direct via repo access (clone/edit/push, not a separate build chat). Graeme's Section 2 decision (additive `activityLog` write, `progressLog` unchanged) confirmed and implemented. All three confirmed issues fixed: exit-guard wired (`mountSessionGuard`/`dismountSessionGuard`, coach-voiced `showExitConfirm()` overlay replacing the instant navigate), `store.logActivity()` now runs alongside `recordSession()` at completion and partial-exit, `currentActivityEntry` set so `reflect.js` stops silently discarding answers. `gym-programme.js` v2→v3, `sw.js` v186→v187, `Changelog.md` updated, both pushed live and confirmed via raw GitHub fetch. **Not yet done: on-device confirmation** — no device available this session, code review and Node-level checks only. One deliberate deviation from blind pattern-copy, logged in file header and changelog: activity `type` set to `"gym"`, not `"workout"`, because `"gym"` is an existing key in `reflect.js`'s question/feel-option maps and `"workout"` isn't — flagged as a separate small follow-up for `workout.js` itself, not fixed here (out of file scope).
 
 ---
 
@@ -29,8 +29,7 @@ Supersedes `alongside_master_schedule_31jul2026_v90.md`. Remove v90 on upload.
 - [x] ~~**Core Session `currentActivityEntry` data-integrity investigation**~~ — 🟢 **Closed, 30 Jul.** Never silently failing to log; genuine id-reuse bug found and fixed instead, in both `core-session.js` and (follow-up, same session) `yoga-session.js`. See Core Session Outcome section below.
 - 🟡 **`gym-programme.js` — code complete, 31 Jul, on-device test pending** (blueprint `alongside_blueprint_gymprogramme_31jul2026_v1.md`; build run same session, direct via repo access). Graeme's Section 2 decision (additive) implemented in full: exit-guard wired, `activityLog` write added alongside unchanged `progressLog` write, `currentActivityEntry` set so `reflect.js` stops discarding answers. `gym-programme.js` v2→v3, `sw.js` v186→v187, pushed and confirmed live on GitHub. **On-device confirmation is the only remaining gate** — see BUILD-GP Outcome section below for the test checklist.
 - **Supabase schema design session** — now unblocked, BUILD-4 closed. Should factor in the BUILD-4 Appendix A follow-up (below) — worth deciding whether that follow-up runs first or alongside.
-- **BUILD-4 Appendix A follow-up — 🟢 blueprint ready, 31 Jul** (`alongside_blueprint_build4-appendixA_31jul2026_v1.md`). All 18 fields ground-truthed against live `Schema.md` v1.9 today; 6 flagged with a specific likely naming-overlap to check first (`totalCredits`/`community.credits`, `userTier`/`tier`, `todayEnergy`/`lastCheckin.energy`, and three more — see blueprint Section 2).
-- **Supabase schema & architecture design — 🟢 blueprint ready, 31 Jul** (`alongside_blueprint_supabase-schema-design_31jul2026_v1.md`). **Design-only, explicitly scoped** — not a live migration session. Two real dependencies confirmed today, not assumed: the DPA request needs BIZ-1 (HMRC) done first; tier gating doesn't exist as a system yet (checked directly — 4 scattered reads of `tier`, zero central gate mechanism anywhere in `js/`). Both logged as separate, not-yet-scoped sessions rather than silently bundled in.
+- **BUILD-4 Appendix A follow-up (new)** — ~18 fields found via grep during BUILD-4 but not individually triaged (`totalCredits`, `lastWorkoutName`/`lastWorkoutCredits`, `quietMode`, others). Same check-both-read-and-write method as the two corrections below. Recommended before Supabase schema design, not strictly blocking.
 - BUILD-1's remaining sub-question
 - BIZ-2, BIZ-3, INF-6, OUT-2, OUT-7
 - **Org outreach category decision** (see Alex Meeting Outcomes below) — Graeme's call on whether workplace wellbeing reps and women's health groups join the Tier list, plus the "what's in it for them" messaging pass. Blocks OUT-2–OUT-8.
@@ -226,9 +225,8 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 | Product — Thread scroll-bug audit | 🟢 Closed, 28 Jul. 2 of 3 files already fixed, third checked and cleared. | None. | None. |
 | Product — B3-2-Test follow-ups | 2 items remain (chip overflow, reflect.js cache-clear confirmation). | Fold into a future session. | Not booked, low priority. |
 | Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Fully closed, 30 Jul.** Complete on-device test pass across all 7 files — every fix confirmed working, CSS visually confirmed on all 7. Two real bugs found and fixed during testing itself (yoga stuck-screen, dedupe window too wide). `gym-programme.js` found separately broken, own item logged — now code-complete 31 Jul, see BUILD-GP Outcome section, on-device pending. | None — fully closed. | None. |
-| Product — BUILD-4 Appendix A follow-up | 🟢 **Blueprint ready, 31 Jul** (`alongside_blueprint_build4-appendixA_31jul2026_v1.md`). All 18 fields ground-truthed today, 6 flagged with a specific overlap to check first. | Run session. | None. |
-| Product/Infra — Supabase schema design | 🟢 **Blueprint ready, 31 Jul, design-only** (`alongside_blueprint_supabase-schema-design_31jul2026_v1.md`). Explicitly scoped to exclude live migration, DPA request, and tier-gating build — see the two dependency items below. | Run session — can run in either order relative to Appendix A, blueprint doesn't hard-require it first. | None hard; recommends reading whichever `Schema.md` version is current at session start. |
-| Product — Tier gating | 🟠 **New, 31 Jul.** Confirmed not built as a system — checked directly against live code (`tierGate`/`checkTierAccess`/`isPremium`/`hasAccess`: zero matches across `js/`; `tier` itself read in only 3 files with no gate logic). Flagged by the 27 Jul Supabase discussion as needing to exist before Supabase auth. | Needs its own scoping session — not yet written. | Blocks live Supabase auth (not the design session). |
+| Product — BUILD-4 Appendix A follow-up | New, 30 Jul. ~18 fields found via grep during BUILD-4, not individually triaged. | Dedicated pass, same read+write check method. | Recommended before Supabase schema design, not strictly blocking. |
+| Product/Infra — Supabase schema design | Scoped in conversation 27 Jul. **Unblocked — BUILD-4 closed.** | Run — decide whether Appendix A follow-up runs first. | None hard; Appendix A recommended first. |
 | Website — Home/Products/Community/Impact | 🟢 Confirmed clean. | None unless BUILD-9 triggers a copy pass. | None. |
 | Outreach — OUT-1 (reshaped) | Brief drafted, not yet run. | Run the session. | Blocks OUT-2–OUT-7. |
 | Outreach — org category decision | New, 29 Jul. Alex suggested workplace wellbeing reps and women's health groups; "why would they do anything?" messaging gap identified. | Graeme's decision + messaging pass. | Blocks OUT-2–OUT-8. |
@@ -266,4 +264,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Jul 2026 v91*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Jul 2026 v90*
