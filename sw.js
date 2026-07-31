@@ -1,6 +1,30 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Jul 2026 v187
+ * gym-programme.js v3 cache bump — exit-guard + activity-visibility fix
+ * (31 Jul blueprint, ground-truthed against live code, same pattern as
+ * workout.js v6). Three issues fixed: (1) no exit protection at all,
+ * neither on-screen Exit nor back-gesture — mountSessionGuard()/
+ * dismountSessionGuard() wired for the first time, on-screen Exit now
+ * shows a coach-voiced showExitConfirm() Stay/Exit-and-save overlay
+ * instead of navigating instantly; (2) completions only wrote to
+ * progressLog, never activityLog, making sessions invisible to
+ * today.js's "you moved today" and progress.js's recent-activity
+ * observations — fixed additively, store.logActivity() now runs
+ * alongside the existing recordSession() call, progressLog write
+ * unchanged; (3) reflect.js's save logic is gated on
+ * currentActivityEntry, which this file never set — every reflect
+ * answer after a gym-programme session was being silently discarded.
+ * Fixed: logActivity()'s returned entry now written to
+ * currentActivityEntry at both genuine completion and partial-exit.
+ * Activity type set to "gym" (not "workout") — matches an existing key
+ * in reflect.js's QUESTIONS/FEEL_OPTIONS maps, giving the correctly
+ * tailored gym question and feel options instead of a fallback. No
+ * schema change, no new file, no CSS change — gym-programme.js and
+ * css/components/session-guard.css both already present in SHELL_URLS
+ * below.
+ *
  * 30 Jul 2026 v186
  * store.js v11 cache bump — logActivity()'s dedupeWindowMs default
  * reduced from 2 minutes to 10 seconds. Found on-device testing (same
@@ -232,7 +256,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v186";
+const CACHE_NAME = "alongside-v187";
 
 const SHELL_URLS = [
 
