@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 31 Jul 2026 v92
+## 31 Jul 2026 v91
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_31jul2026_v91.md`. Remove v91 on upload.
+Supersedes `alongside_master_schedule_31jul2026_v90.md`. Remove v90 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** Personal-tier readiness sweep, prompted by Graeme reviewing a live screenshot. Three real findings, all ground-truthed against live code today: (1) **`coach-proposal.js`'s "Your programme" and "Something different" doors are permanently disabled in production** (`enabled: false`, static "Being redesigned" copy) — this was scoped as P5-CP-1 in the 23 Jun technical blueprint but has no active BUILD-x tracking; (2) **`upgrade.js` calls `store.getUserTier()`, which does not exist anywhere in `store.js`** — a live crash risk on the upgrade/membership screen, found while checking tier-gating status; (3) **the full tier-gating architecture (S4-TG, 9 May 2026) was thoroughly scoped — `js/auth.js`, `store.js` helpers, a complete feature-gating audit table — but none of it was ever built.** `js/auth.js` doesn't exist; none of `getUserTier`/`isPremium`/`isAthlete`/`lockedFeature`/`setTier` exist in `store.js`. This is a significant gap now that Personal tier is the active build focus. Also added this version: the six-week plan is now a standing section here (previously lived only in the Task Inventory doc), updated alongside everything else going forward rather than drifting separately.
+**This version's substantive changes:** two new blueprints written and pushed, both fully ground-truthed against live code/schema before writing — **BUILD-4 Appendix A follow-up** (18-field triage) and **Supabase schema & architecture design** (design-only, two real dependencies confirmed and scoped around: BIZ-1/DPA gating, and tier-gating not yet existing as a system — checked directly against live code, not assumed). Repo and project knowledge confirmed in sync at v90 before this update — no drift this round. **Method note, confirmed working twice now:** tracing the actual persona/code path before any device test — not after — is now the standard first step for every blueprint (this is what caught the `reflect.js` data-loss bug in `gym-programme.js` before a device was ever involved, and what caught the tier-gating gap here). Device testing remains the closing gate, not the discovery method.
 
 ---
 
@@ -212,25 +212,6 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 
 ---
 
-## 📅 Six-Week Plan — Standing Section (folded in 31 Jul 2026, was Task Inventory Section J only)
-
-Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintained here going forward — update this table at session close alongside everything else, rather than letting it drift separately in the Task Inventory doc. Three fixed review checkpoints, not review-after-every-session: **27 Jul (held), 31 Aug (the honest go/no-go on mid-Sept beta), 14 Sept (pre-launch)**.
-
-| Week beginning | Availability | Focus | Status |
-|---|---|---|---|
-| 27 Jul | Full | Safeguarding/HMRC start, BUILD-5, BUILD-3 | **Held.** BUILD-5 closed, BUILD-3 code-clean/on-device pending, safeguarding/HMRC still open. |
-| 3 Aug | Full | Core Session investigation, Supabase scoping, BUILD-1 sub-question | **Ahead of schedule.** Core Session closed 30 Jul (early). BUILD-4 also closed early (wasn't due till this week). Supabase design blueprint ready. Two new findings this session (tier gating, coach-proposal doors) not yet reflected in original plan — see dashboard. |
-| 10 Aug | Mon–Wed full, away Thu/Fri | Content audit (D-Audit), BUILD-4 align if time allows, national/local outreach, infra accounts, website building starts | Not yet started. BUILD-4 already closed (ahead of schedule), so this slot is now free for other priorities — worth revisiting given this week's tier-gating/coach-proposal findings. |
-| 17 Aug | Mon only, then away (light laptop) | Admin only, close loose ends | Not yet reached. |
-| 24 Aug | Away all week (light laptop) | Reactive only | Not yet reached. |
-| 31 Aug | Full | **Review checkpoint — the real one.** Full reconciliation, honest go/no-go on mid-Sept beta. Device test programme, WCAG audit, follow-up outreach. | Not yet reached. |
-| 7 Sept | Full | Final pre-beta admin/infra checks | Not yet reached. |
-| 14 Sept | Full — target window | **Review checkpoint — pre-launch.** Pre-beta opens (target). | Not yet reached — this is the target date, not a confirmed one. |
-
-**Worth flagging plainly:** the original plan didn't anticipate this week's tier-gating and coach-proposal-doors findings — both are now real candidates for the 10 Aug slot that BUILD-4 closing early has freed up. Not re-planning the whole six weeks over this, but worth a conscious decision rather than the slot silently filling with whatever comes up next.
-
----
-
 ## One-Page Dashboard — 30 Jul 2026
 
 | Stream | Current position | Immediate next action | Blocker? |
@@ -247,9 +228,7 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 | Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Fully closed, 30 Jul.** Complete on-device test pass across all 7 files — every fix confirmed working, CSS visually confirmed on all 7. Two real bugs found and fixed during testing itself (yoga stuck-screen, dedupe window too wide). `gym-programme.js` found separately broken, own item logged — now code-complete 31 Jul, see BUILD-GP Outcome section, on-device pending. | None — fully closed. | None. |
 | Product — BUILD-4 Appendix A follow-up | 🟢 **Blueprint ready, 31 Jul** (`alongside_blueprint_build4-appendixA_31jul2026_v1.md`). All 18 fields ground-truthed today, 6 flagged with a specific overlap to check first. | Run session. | None. |
 | Product/Infra — Supabase schema design | 🟢 **Blueprint ready, 31 Jul, design-only** (`alongside_blueprint_supabase-schema-design_31jul2026_v1.md`). Explicitly scoped to exclude live migration, DPA request, and tier-gating build — see the two dependency items below. | Run session — can run in either order relative to Appendix A, blueprint doesn't hard-require it first. | None hard; recommends reading whichever `Schema.md` version is current at session start. |
-| Product — Tier gating (isPremium/isAthlete/lockedFeature) | 🟠 **New, 31 Jul.** Confirmed not built as a system — checked directly against live code (`tierGate`/`checkTierAccess`/`isPremium`/`hasAccess`: zero matches across `js/`; `tier` itself read in only 3 files with no gate logic). Flagged by the 27 Jul Supabase discussion as needing to exist before Supabase auth. **A full architecture was already scoped 9 May 2026** (S4-TG: `js/auth.js`, `store.js` helpers, complete feature-audit table) but never built. | Needs its own build session — the design work is already done, this is an implementation session. | Blocks live Supabase auth (not the design session). High priority — Personal tier is the active build focus. |
-| Product — `upgrade.js` calls `store.getUserTier()`, which doesn't exist | 🔴 **New, 31 Jul, found while checking tier-gating status.** `upgrade.js`'s `render()` calls `store.getUserTier()` — confirmed absent from `store.js` entirely. Likely throws on navigation to the upgrade/membership screen. Not yet confirmed on-device (no crash report exists, but the code path is unambiguous). | Small standalone fix, or resolved automatically once the tier-gating build session (above) adds `getUserTier()` to `store.js` — check whether it's worth a quick isolated patch before then given it's a live crash risk. | None — ready to fix immediately. |
-| Product — `coach-proposal.js` doors 2/3 ("Your programme" / "Something different") permanently disabled | 🟠 **New, 31 Jul, found via screenshot review.** `DOOR_COPY` hardcodes `enabled: false` and static "Being redesigned — check back soon." copy for 2 of the app's 3 main session-entry doors. Scoped as P5-CP-1 in the 23 Jun technical blueprint ("door framing rewrite... all three doors genuinely right") but has no current BUILD-x task ID — appears to have dropped off active tracking. Live right now, visible to any real user. | Needs scoping — is this the full P5-CP-1 door-framing rewrite, or a smaller "just re-enable these two with current copy" fix? Graeme's call. | Not booked. Worth prioritising — 2 of 3 main entry points into a session are currently dead ends. |
+| Product — Tier gating | 🟠 **New, 31 Jul.** Confirmed not built as a system — checked directly against live code (`tierGate`/`checkTierAccess`/`isPremium`/`hasAccess`: zero matches across `js/`; `tier` itself read in only 3 files with no gate logic). Flagged by the 27 Jul Supabase discussion as needing to exist before Supabase auth. | Needs its own scoping session — not yet written. | Blocks live Supabase auth (not the design session). |
 | Website — Home/Products/Community/Impact | 🟢 Confirmed clean. | None unless BUILD-9 triggers a copy pass. | None. |
 | Outreach — OUT-1 (reshaped) | Brief drafted, not yet run. | Run the session. | Blocks OUT-2–OUT-7. |
 | Outreach — org category decision | New, 29 Jul. Alex suggested workplace wellbeing reps and women's health groups; "why would they do anything?" messaging gap identified. | Graeme's decision + messaging pass. | Blocks OUT-2–OUT-8. |
@@ -274,9 +253,6 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 | Product — `workout.js` activity type `"workout"` isn't a `reflect.js` question/feel-option key | New, 31 Jul, found while fixing `gym-programme.js`. `reflect.js`'s `QUESTIONS`/`FEEL_OPTIONS` maps have a `"gym"` key with tailored gym content but no `"workout"` key — `workout.js`'s own completions (`type: "workout"`) fall through to the generic `"other"`/`"coach-session"` fallback text instead. Not a data-loss bug (reflect still saves correctly) — a missed-specificity gap only. | Small fix if wanted: change `workout.js`'s `logActivity()` calls to `type: "gym"` to match, or add a `"workout"` key to `reflect.js`'s maps. Either works; not urgent. | Not booked, no urgency — logged for awareness. |
 | Admin — project knowledge cleanup | New, 30 Jul. Superseded master-schedule versions (v68–v78) and 4 retired schema docs need removing from project knowledge — Claude can't delete these directly. | Graeme, via the UI, whenever convenient. | None. |
 | Admin — `Admin/` historical backfill | New, 30 Jul. Repo's `Admin/` folder has this week's blueprints/handoffs only; dozens more exist in project knowledge back to March, not yet moved. | Separate future session if wanted. | Not booked, no urgency. |
-| Product — Wellbeing-first entry point (new design idea) | 🆕 **New, 31 Jul, Graeme's idea.** Currently, reaching Notice/Wellbeing requires going through the coach → starting an activity → backing out. Proposed: a top-level "doorway" choice (Exercise / Wellbeing) before the coach path, so non-exercise-focused users aren't routed through session-shaped UI to reach reflection/journaling. Not yet scoped — genuinely new. See PM chat discussion 31 Jul for initial thoughts. | Needs a proper design conversation — architecture question, not a quick build. | Not booked. Worth prioritising given who this serves (e.g. a low-exercise-motivation persona) — currently a real access barrier, not just a UX nicety. |
-| Product — Progress reflections (mood-delta, rest-reminder observations) | 🟡 **Partially built, confirmed 31 Jul.** `progress.js` v2 already generates real pattern observations — consistency, energy trend, activity-type, programme context (`_buildObservation()`, confirmed live). **Not yet built:** the two specific examples Graeme described — a same-session mood-entered-vs-finished delta observation, and an explicit "you've worked hard X times this week, you may need rest" overtraining-aware message. Both are natural extensions of the existing pattern, not a new system. | Small-to-medium build session, extending `_buildObservation()`'s existing pattern. | Not booked. |
-| Product — Journal export (PDF) + Supabase sync | 🟡 **Fully spec'd, confirmed 31 Jul, not built.** `alongside_journal_export_template_spec.md` is a complete, detailed PDF export design (Premium tier). Noticing Hub spec's own implementation checklist has "Plan localStorage-to-Supabase sync logic" and "Settings > Wellbeing > Storage Location (local vs Supabase)" both still unchecked. Genuinely depends on the Supabase migration (see Supabase schema design blueprint) being live first — not a standalone gap. | Sequenced after Supabase auth/migration is live, not before. | Blocked on Supabase migration, not urgent until then. |
 
 *All standing rules, Stream A/C/D/E detail not listed above are unchanged from v71–v78 — see those versions for full detail.*
 
@@ -290,4 +266,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Jul 2026 v92*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Jul 2026 v91*
