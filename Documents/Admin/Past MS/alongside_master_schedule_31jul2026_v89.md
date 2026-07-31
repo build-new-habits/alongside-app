@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 31 Jul 2026 v90
+## 31 Jul 2026 v89
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_31jul2026_v89.md`. Remove v89 on upload.
+Supersedes `alongside_master_schedule_30jul2026_v88.md`. Remove v88 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** `gym-programme.js` build session run, same day as the blueprint, direct via repo access (clone/edit/push, not a separate build chat). Graeme's Section 2 decision (additive `activityLog` write, `progressLog` unchanged) confirmed and implemented. All three confirmed issues fixed: exit-guard wired (`mountSessionGuard`/`dismountSessionGuard`, coach-voiced `showExitConfirm()` overlay replacing the instant navigate), `store.logActivity()` now runs alongside `recordSession()` at completion and partial-exit, `currentActivityEntry` set so `reflect.js` stops silently discarding answers. `gym-programme.js` v2→v3, `sw.js` v186→v187, `Changelog.md` updated, both pushed live and confirmed via raw GitHub fetch. **Not yet done: on-device confirmation** — no device available this session, code review and Node-level checks only. One deliberate deviation from blind pattern-copy, logged in file header and changelog: activity `type` set to `"gym"`, not `"workout"`, because `"gym"` is an existing key in `reflect.js`'s question/feel-option maps and `"workout"` isn't — flagged as a separate small follow-up for `workout.js` itself, not fixed here (out of file scope).
+**This version's substantive changes:** `gym-programme.js` blueprint written **with full repo access** — not just re-stating the 30 Jul finding, but actually tracing the live code. Confirmed the exit-guard gap and the `progressLog`-only write exactly as flagged, **and found a third, more serious issue not previously known**: because `gym-programme.js` never sets `currentActivityEntry`, `reflect.js`'s save logic (gated on that value) silently discards the user's reflect answers after every gym-programme session — not just a visibility gap on Home/Progress, but real user input going nowhere. Blueprint recommends an additive fix (keep `progressLog`, add `activityLog` alongside it) rather than a migration, following the exact pattern already proven working in `workout.js` v6 today. **Needs Graeme's confirmation on the recommended shape before the build session starts** — see blueprint Section 2.
 
 ---
 
@@ -27,7 +27,7 @@ Supersedes `alongside_master_schedule_31jul2026_v89.md`. Remove v89 on upload.
 
 - [x] ~~**BUILD-4 (Schema Reconciliation)**~~ — 🟢 **Closed, 30 Jul, ahead of schedule.** `schema.md` v1.9 live in repo. See BUILD-4 Outcome section below.
 - [x] ~~**Core Session `currentActivityEntry` data-integrity investigation**~~ — 🟢 **Closed, 30 Jul.** Never silently failing to log; genuine id-reuse bug found and fixed instead, in both `core-session.js` and (follow-up, same session) `yoga-session.js`. See Core Session Outcome section below.
-- 🟡 **`gym-programme.js` — code complete, 31 Jul, on-device test pending** (blueprint `alongside_blueprint_gymprogramme_31jul2026_v1.md`; build run same session, direct via repo access). Graeme's Section 2 decision (additive) implemented in full: exit-guard wired, `activityLog` write added alongside unchanged `progressLog` write, `currentActivityEntry` set so `reflect.js` stops discarding answers. `gym-programme.js` v2→v3, `sw.js` v186→v187, pushed and confirmed live on GitHub. **On-device confirmation is the only remaining gate** — see BUILD-GP Outcome section below for the test checklist.
+- 🟢 **`gym-programme.js` — blueprint ready, 31 Jul, fully ground-truthed** (`alongside_blueprint_gymprogramme_31jul2026_v1.md`). Confirmed on-code (not just the 30 Jul on-device finding): exit-guard gap, `progressLog`-isolation, and a new third issue — `reflect.js` silently discards gym-programme reflect answers since `currentActivityEntry` is never set. **Awaiting Graeme's confirmation of the recommended fix shape (additive, not migration) before the build session runs.**
 - **Supabase schema design session** — now unblocked, BUILD-4 closed. Should factor in the BUILD-4 Appendix A follow-up (below) — worth deciding whether that follow-up runs first or alongside.
 - **BUILD-4 Appendix A follow-up (new)** — ~18 fields found via grep during BUILD-4 but not individually triaged (`totalCredits`, `lastWorkoutName`/`lastWorkoutCredits`, `quietMode`, others). Same check-both-read-and-write method as the two corrections below. Recommended before Supabase schema design, not strictly blocking.
 - BUILD-1's remaining sub-question
@@ -106,37 +106,6 @@ Two new UI/UX findings surfaced incidentally while testing, unrelated to the Cor
 - **Doesn't write to `activityLog` at all.** Finishing a session calls `recordSession()` (from `programmeEngine.js`), which writes to a completely different store key, `progressLog` — never calls `store.logActivity()`, never touches `activityLog`. This is architecturally separate from every other session type traced today (all of which converged on the shared `logActivity()` path via BUILD-3/B3-3).
 
 **Not fixed — this needs its own scoped session, not a same-session patch.** Unlike the other fixes today, this raises a genuine open product question: is `progressLog`-only tracking for structured programmes intentional (a deliberate, older architecture separate from the ad-hoc `activityLog` types) or a real gap that should also feed `activityLog`? That's not something to guess at and patch quietly — needs a decision first.
-
----
-
-## 🟡 BUILD-GP — `gym-programme.js` exit-guard + activity fix: Code complete, 31 Jul 2026, on-device pending
-
-Built the same session as the blueprint above, direct via repo access (git clone with the fine-grained token, edit, `node --check`, commit, push) rather than handing off to a separate build chat. Every file version in the blueprint's table was re-confirmed live before editing — all matched exactly.
-
-**Graeme's Section 2 decision — additive, confirmed and implemented as recommended:**
-- `recordSession()`'s `progressLog` write is untouched.
-- `store.logActivity()` now runs alongside it at genuine completion (`finish-session` handler) and at partial-exit (new `savePartialSession()`), with the returned entry written to `currentActivityEntry`.
-
-**All three confirmed issues fixed:**
-1. **Exit protection** — `mountSessionGuard()`/`dismountSessionGuard()` wired for the back-gesture path; on-screen Exit now shows a coach-voiced `showExitConfirm()` Stay/Exit-and-save overlay instead of the old instant `router.navigate('today')`. Reused the existing `.session-exit-*` class family from `css/components/session-guard.css` v2 — confirmed no conflicting rules in `gym-programme.css`, no CSS file touched.
-2. **`activityLog` visibility** — completions and partial exits now write to `activityLog` as well as `progressLog`, so `today.js` ("you moved today") and `progress.js` (recent-activity observations) will pick up gym-programme sessions for the first time.
-3. **`reflect.js` silent discard** — `currentActivityEntry` is now set at both completion and partial-exit, so reflect answers (feel/painChange/note/moodAfter) save to a real, matching entry instead of being dropped or misattributed.
-
-**One deliberate deviation from blind pattern-copy, made and logged in-session, not pre-agreed with Graeme:** activity `type` set to `"gym"`, not `"workout"` (the value `workout.js` uses for the identical pattern). Reasoning: `reflect.js`'s `QUESTIONS`/`FEEL_OPTIONS` maps have a `"gym"` key with tailored content ("I want to know what it actually felt like in there" / Felt strong / About right / Struggled) — `"workout"` isn't a key in either map and falls through to generic `"other"`/`"coach-session"` defaults. Checked first that `today.js`/`progress.js` don't filter `activityLog` by `type` at all, so this only affects which reflect question fires, nothing else. Flagged as a small, non-urgent follow-up for `workout.js` itself in the open-items table below — not fixed here, out of this session's file scope.
-
-**Files changed, all pushed and confirmed live via raw GitHub fetch:**
-- `js/views/gym-programme.js` v2 → v3
-- `sw.js` v186 → v187 (deployed last, cache bump)
-- `Documents/Live State/Changelog.md` — new entry added
-
-**Verification done this session:** `node --check` passed on both changed `.js` files, non-ASCII byte scan confirmed only the pre-existing em-dash convention (no stray bytes, no smart quotes introduced), diff reviewed line-by-line before commit, raw GitHub fetch confirmed the cache-name bump and `mountSessionGuard` references are live on `main`.
-
-**Not done — the actual gate before this can close:**
-- [ ] Real gym-programme session, back-gesture exit mid-session → confirm Stay/Exit-and-save card appears, "Exit and save" saves a `status: "partial"` entry with correct `exercisesCount`.
-- [ ] Real gym-programme session, on-screen Exit button → same card, same save behaviour.
-- [ ] Real gym-programme session, genuine "Session done" completion → confirm Home says "you moved today," confirm it appears in Progress screen observations.
-- [ ] After a genuine completion, answer reflect.js's questions → confirm the *matching* `activityLog` entry (not a stale one) now has `feel`/`painChange`/`note`/`moodAfter` populated. Confirm the question text is the gym-specific one ("I want to know what it actually felt like in there"), not the generic fallback.
-- [ ] Quick regression check: Week 6 glance, Week 12 reflection, and A/B session-type alternation still work as before — none of today's changes touched that logic, but worth a glance per the blueprint's own "done" criteria.
 
 ---
 
@@ -224,7 +193,7 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 | Product — BUILD-9 (18+ age-gate) | Not yet scoped. **U18 safeguarding position genuinely open** — Alex suggested it may not be needed, unconfirmed, pending his solicitor (29 Jul). | Hold scoping until Alex/solicitor respond. | Waiting on Alex. |
 | Product — Thread scroll-bug audit | 🟢 Closed, 28 Jul. 2 of 3 files already fixed, third checked and cleared. | None. | None. |
 | Product — B3-2-Test follow-ups | 2 items remain (chip overflow, reflect.js cache-clear confirmation). | Fold into a future session. | Not booked, low priority. |
-| Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Fully closed, 30 Jul.** Complete on-device test pass across all 7 files — every fix confirmed working, CSS visually confirmed on all 7. Two real bugs found and fixed during testing itself (yoga stuck-screen, dedupe window too wide). `gym-programme.js` found separately broken, own item logged — now code-complete 31 Jul, see BUILD-GP Outcome section, on-device pending. | None — fully closed. | None. |
+| Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Fully closed, 30 Jul.** Complete on-device test pass across all 7 files — every fix confirmed working, CSS visually confirmed on all 7. Two real bugs found and fixed during testing itself (yoga stuck-screen, dedupe window too wide). `gym-programme.js` found separately broken, own item logged, not fixed. | None — fully closed. | None. |
 | Product — BUILD-4 Appendix A follow-up | New, 30 Jul. ~18 fields found via grep during BUILD-4, not individually triaged. | Dedicated pass, same read+write check method. | Recommended before Supabase schema design, not strictly blocking. |
 | Product/Infra — Supabase schema design | Scoped in conversation 27 Jul. **Unblocked — BUILD-4 closed.** | Run — decide whether Appendix A follow-up runs first. | None hard; Appendix A recommended first. |
 | Website — Home/Products/Community/Impact | 🟢 Confirmed clean. | None unless BUILD-9 triggers a copy pass. | None. |
@@ -247,8 +216,7 @@ Also resolved: `stats` isn't a store field at all (computed local var, never per
 | Product — Yoga stuck-screen bug (`finaliseSession()` missing `rerender()`) | 🟢 **Found and fixed, 30 Jul, on-device.** Real completion left the screen frozen on the last pose — data was always correct, only the screen transition was broken. Fixed `yoga-session.js` v5→v6, re-tested on-device immediately, confirmed working. | None — closed. | None. |
 | Product — Dedupe window too wide (`logActivity()`) | 🟢 **Found and fixed, 30 Jul, on-device.** Two genuine, distinct completions 83 seconds apart were silently rejected as a duplicate — screen showed false success. Reduced `dedupeWindowMs` 2min→10sec, `store.js` v10→v11. Applies to all activity types. | None — closed. | None. |
 | Product — Silent failure on rejected `logActivity()` writes | 🟠 **New, 30 Jul.** Found alongside the dedupe fix above. When a write is rejected, the session view still shows a false success screen — no indication to the user. Needs a coach-voiced message (Nurturing tier), a content/UX decision. Deliberately not fixed on the spot. | Scope a dedicated session. | Not booked, no urgency but a real trust gap. |
-| Product — `gym-programme.js`: no exit protection, no `activityLog` write, reflect answers silently lost | 🟡 **Code complete, 31 Jul** — built same session as the blueprint, direct via repo access (clone/edit/push). Section 2 decision (additive) confirmed by Graeme and implemented exactly: `progressLog` write unchanged, `store.logActivity()` now runs alongside it at completion and partial-exit, `currentActivityEntry` set. Exit-guard wired (`mountSessionGuard`/`dismountSessionGuard`, `showExitConfirm()` overlay), matching `workout.js` v6 pattern. Activity type set to `"gym"` (not `"workout"`) — deliberate, logged in file header/changelog, see follow-up row below. `gym-programme.js` v2→v3, `sw.js` v186→v187, `Changelog.md` updated — all pushed and confirmed live via raw GitHub fetch. | **On-device confirmation** — no device available during the build session, code review + `node --check` only so far. Test checklist in BUILD-GP Outcome section below. | Booked as soon as Graeme can test on-device. |
-| Product — `workout.js` activity type `"workout"` isn't a `reflect.js` question/feel-option key | New, 31 Jul, found while fixing `gym-programme.js`. `reflect.js`'s `QUESTIONS`/`FEEL_OPTIONS` maps have a `"gym"` key with tailored gym content but no `"workout"` key — `workout.js`'s own completions (`type: "workout"`) fall through to the generic `"other"`/`"coach-session"` fallback text instead. Not a data-loss bug (reflect still saves correctly) — a missed-specificity gap only. | Small fix if wanted: change `workout.js`'s `logActivity()` calls to `type: "gym"` to match, or add a `"workout"` key to `reflect.js`'s maps. Either works; not urgent. | Not booked, no urgency — logged for awareness. |
+| Product — `gym-programme.js`: no exit protection, no `activityLog` write, reflect answers silently lost | 🟢 **Blueprint ready, 31 Jul** (`alongside_blueprint_gymprogramme_31jul2026_v1.md`), fully ground-truthed against live code via repo access. Confirmed: (1) zero exit protection, worse than `workout.js`'s pre-fix state; (2) `progressLog`-only write, confirmed genuinely isolated — read by nothing else in the codebase, vs. `activityLog`'s 20 readers including Home and Progress; (3) **new finding** — `reflect.js`'s save logic is gated on `currentActivityEntry`, which `gym-programme.js` never sets, so reflect answers (feel/painChange/note/moodAfter) are silently discarded or misattributed after every gym-programme session. | **Needs Graeme's decision first** (blueprint Section 2: additive `activityLog` write alongside existing `progressLog`, recommended) — then run session, following the `workout.js` v6 pattern exactly. | Awaiting product decision, not booked. |
 | Admin — project knowledge cleanup | New, 30 Jul. Superseded master-schedule versions (v68–v78) and 4 retired schema docs need removing from project knowledge — Claude can't delete these directly. | Graeme, via the UI, whenever convenient. | None. |
 | Admin — `Admin/` historical backfill | New, 30 Jul. Repo's `Admin/` folder has this week's blueprints/handoffs only; dozens more exist in project knowledge back to March, not yet moved. | Separate future session if wanted. | Not booked, no urgency. |
 
@@ -264,4 +232,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Jul 2026 v90*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Jul 2026 v89*
