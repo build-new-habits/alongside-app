@@ -1,9 +1,28 @@
 /**
  * running-session.js - Guided Running Session
  *
- * 23 Jul 2026 v3
+ * 03 Aug 2026 v4
  *
  * CHANGELOG
+ * 03 Aug 2026 v4 - Wake Lock + resumable session pilot (blueprint
+ *   alongside_blueprint_wakelock-resume_03aug2026_v1.md). Root cause
+ *   from real on-device use: elapsed time was tick-counted, not
+ *   wall-clock-anchored, so screen-lock/backgrounding throttled the
+ *   setInterval and silently broke prompts, vibration, pause/resume,
+ *   and a refresh lost all progress. Fixed: elapsed is now computed
+ *   fresh from timestamps every tick via session-resume.js's
+ *   computeElapsedSeconds(). Session state checkpointed to store at
+ *   start/pause/resume/prompt via checkpointSession(); on cold mount,
+ *   getResumableSession() offers a coach-voiced resume-or-fresh choice
+ *   if an interrupted run is found (reuses .session-exit-* CSS as-is,
+ *   no new styles needed). Wake Lock requested on start/resume,
+ *   released on end/exit, re-requested on visibilitychange (best-effort
+ *   layer, not a substitute for the above - confirmed broken in
+ *   installed iOS PWAs until iOS 18.4, and dropped instantly on any
+ *   backgrounding regardless). Also fixed: interval-structure work/
+ *   recovery cues matched on exact equality (elapsed === at), fragile
+ *   even without backgrounding - now a >= check against
+ *   firedStructureIndices so a missed tick can't silently skip a cue.
  * 23 Jul 2026 v3 - BUILD-3 exit-guard audit fix. onExit (mountSessionGuard)
  *   was navigating to reflect.js without ever calling savePartialSession()
  *   first - the on-screen Exit button (showExitConfirm) called it
@@ -46,11 +65,12 @@
 
 import { store } from "../store.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
+import { checkpointSession, getResumableSession, clearCheckpoint, computeElapsedSeconds } from "../session-resume.js";
 
 export const centered = false;
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let phase          = "type";  // "type" | "duration" | "overview" | "running" | "done"
+let phase          = "type";  // "type" | "resume" | "duration" | "overview" | "running" | "done"
 let selectedType   = null;
 let selectedMins   = null;
 let sessionTimer   = null;
@@ -62,6 +82,16 @@ let activePrompt   = null;
 let creditsEarned  = 0;
 let inWarmup       = true;   // first 2 min = warmup walk
 let inCooldown     = false;  // last 3 min = cooldown walk
+
+// 03 Aug 2026 v4 - Wake Lock + resumable session state
+let sessionStartedAt        = null;        // epoch ms, wall-clock anchor for elapsed calc
+let totalPausedMs           = 0;
+let pausedAt                = null;        // epoch ms, set while paused
+let firedStructureIndices   = new Set();   // interval-structure cue indices already fired
+let wakeLockSentinel        = null;
+let visibilityListenerAdded = false;
+let resumeCheckDone         = false;
+let pendingResume           = null;        // checkpoint object while resume-prompt is showing
 
 const WARMUP_SECS  = 120;
 const COOLDOWN_SECS = 180;
@@ -213,11 +243,45 @@ function buildConditionNote() {
 
 export function render() {
   if (phase === "type")     return renderTypeSelector();
+  if (phase === "resume")   return renderResumePrompt();
   if (phase === "duration") return renderDurationSelector();
   if (phase === "overview") return renderRunOverview();
   if (phase === "running")  return renderRunning();
   if (phase === "done")     return renderDone();
   return renderTypeSelector();
+}
+
+// 03 Aug 2026 v4 - coach-voiced resume-or-fresh choice, shown on cold mount
+// when session-resume.js finds an interrupted run. Reuses .session-exit-*
+// CSS as-is (session-guard.css v2) - same visual language as the exit
+// confirmation card, no new styles needed.
+function renderResumePrompt() {
+  return `
+    <div class="view walk-session-view">
+      <div class="session-exit-overlay" role="dialog" aria-modal="true"
+           aria-label="Resume interrupted run">
+        <div class="session-exit-card">
+          <div class="session-exit-coach-row">
+            <img src="assets/images/logo-icon-192.png" alt=""
+                 class="coach-icon-small" aria-hidden="true">
+            <p class="session-exit-coach-text">
+              Looks like your run got interrupted. Want to pick up where you left off, or start fresh?
+            </p>
+          </div>
+          <div class="session-exit-actions">
+            <button class="btn btn-primary btn-full" id="rs-resume-btn"
+                    aria-label="Resume your run">
+              Resume run
+            </button>
+            <button class="btn btn-ghost btn-full" id="rs-start-fresh-btn"
+                    aria-label="Start a fresh run">
+              Start fresh
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderTypeSelector() {
@@ -473,19 +537,60 @@ function startSession() {
   creditsEarned  = 50;
   inWarmup       = true;
   inCooldown     = false;
+  elapsed        = 0;
 
-  const totalSecs = selectedMins * 60;
-  const rt        = RUN_TYPES.find(t => t.id === selectedType);
-  const freqSecs  = (rt?.promptFreq || 7) * 60;
-  let   nextPromptAt = freqSecs;
+  // 03 Aug 2026 v4 - wall-clock anchor, not tick-counted
+  sessionStartedAt      = Date.now();
+  totalPausedMs         = 0;
+  pausedAt              = null;
+  promptIndex           = 0;
+  firedStructureIndices = new Set();
+
+  checkpointSession("run", {
+    selectedType,
+    selectedMins,
+    startedAt:              new Date(sessionStartedAt).toISOString(),
+    totalPausedMs:          0,
+    promptIndex:            0,
+    firedStructureIndices:  [],
+    creditsEarned
+  });
+
+  requestWakeLock();
 
   // Show warmup card immediately
   activePrompt = WARMUP_PROMPT;
   rerender();
 
+  runTimer();
+}
+
+// 03 Aug 2026 v4 - extracted from startSession() so resumeSession() can
+// restart the interval without duplicating the tick logic. elapsed is
+// recomputed from timestamps every tick (session-resume.js), not
+// incremented - so a throttled/delayed tick can never drift: whenever
+// the next tick does fire, it immediately shows the true elapsed time.
+function runTimer() {
+  const totalSecs = selectedMins * 60;
+  const rt        = RUN_TYPES.find(t => t.id === selectedType);
+  const freqSecs  = (rt?.promptFreq || 7) * 60;
+
+  // On a fresh start, elapsed is 0, so this is just freqSecs. On resume,
+  // jump to the next upcoming threshold from *now* - don't replay any
+  // prompts that would have fired during the gap.
+  let nextPromptAt = elapsed > 0
+    ? (Math.floor(elapsed / freqSecs) + 1) * freqSecs
+    : freqSecs;
+
+  if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+
   sessionTimer = setInterval(() => {
     if (paused) return;
-    elapsed++;
+
+    elapsed = computeElapsedSeconds(
+      { startedAt: new Date(sessionStartedAt).toISOString(), totalPausedMs },
+      null
+    );
 
     // Update timer display without full rerender
     const timerEl = document.getElementById("rs-timer-display");
@@ -519,10 +624,19 @@ function startSession() {
     }
 
     // Interval structure prompts (if interval run)
+    // 03 Aug 2026 v4 - was exact-equality (elapsed === s.at), fragile even
+    // without backgrounding since a single missed/delayed tick skipped a
+    // cue silently. Now >= against a fired-index set, so a late tick still
+    // catches up correctly instead of dropping the cue.
     if (selectedType === "intervals") {
       const structure = INTERVAL_STRUCTURE[selectedMins] || INTERVAL_STRUCTURE[30];
-      const upcoming  = structure.find(s => s.at === elapsed);
-      if (upcoming && !inWarmup && !inCooldown) {
+      let upcomingIdx = -1;
+      for (let i = 0; i < structure.length; i++) {
+        if (elapsed >= structure[i].at && !firedStructureIndices.has(i)) { upcomingIdx = i; break; }
+      }
+      if (upcomingIdx !== -1 && !inWarmup && !inCooldown) {
+        firedStructureIndices.add(upcomingIdx);
+        const upcoming = structure[upcomingIdx];
         firePrompt({ text: upcoming.text, action: upcoming.type === "work" ? "Working" : "Recovering" });
       }
     } else if (elapsed >= nextPromptAt && elapsed < totalSecs - COOLDOWN_SECS && !activePrompt) {
@@ -541,10 +655,53 @@ function startSession() {
   }, 1000);
 }
 
+// 03 Aug 2026 v4 - now checkpoints on every prompt fire, so a resume
+// picks up from the correct promptIndex/firedStructureIndices rather
+// than replaying from the start.
 function firePrompt(prompt) {
   activePrompt = prompt;
   if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
+  checkpointSession("run", {
+    selectedType,
+    selectedMins,
+    startedAt:              new Date(sessionStartedAt).toISOString(),
+    totalPausedMs,
+    promptIndex,
+    firedStructureIndices:  Array.from(firedStructureIndices),
+    creditsEarned
+  });
   rerender();
+}
+
+// ── Wake Lock (03 Aug 2026 v4) ───────────────────────────────────────────────
+// Best-effort layer, not a substitute for the resumable-session fix above:
+// the lock is dropped instantly on backgrounding/screen-lock by the OS, and
+// was broken entirely in installed iOS PWAs until iOS 18.4. Feature-detected
+// and wrapped in try/catch - a refusal (low battery, user preference, older
+// browser) is silent by design, the resumable state protects the user either way.
+
+async function requestWakeLock() {
+  if (!("wakeLock" in navigator)) return;
+  try {
+    wakeLockSentinel = await navigator.wakeLock.request("screen");
+  } catch (err) {
+    wakeLockSentinel = null;
+  }
+}
+
+function releaseWakeLock() {
+  if (wakeLockSentinel) {
+    wakeLockSentinel.release().catch(() => {});
+    wakeLockSentinel = null;
+  }
+}
+
+// Browser drops the lock on backgrounding and won't restore it on its own -
+// re-request when the tab regains focus, if a run is still actively going.
+function handleVisibilityChange() {
+  if (document.visibilityState === "visible" && phase === "running" && !paused) {
+    requestWakeLock();
+  }
 }
 
 function dismissPrompt() {
@@ -555,13 +712,35 @@ function dismissPrompt() {
   rerender();
 }
 
+// 03 Aug 2026 v4 - tracks real pause duration (totalPausedMs) so elapsed
+// stays accurate against wall-clock time, and re-checkpoints + re-requests
+// Wake Lock on resume (both may have been dropped while paused/backgrounded).
 function pauseSession() {
   paused = !paused;
+  if (paused) {
+    pausedAt = Date.now();
+  } else {
+    if (pausedAt) {
+      totalPausedMs += Date.now() - pausedAt;
+      pausedAt = null;
+    }
+    checkpointSession("run", {
+      selectedType,
+      selectedMins,
+      startedAt:              new Date(sessionStartedAt).toISOString(),
+      totalPausedMs,
+      promptIndex,
+      firedStructureIndices:  Array.from(firedStructureIndices),
+      creditsEarned
+    });
+    requestWakeLock();
+  }
   rerender();
 }
 
 function endSession() {
   if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+  releaseWakeLock();
 
   // 23 Jul 2026 v3 (BUILD-3): migrated to store.logActivity(), matching
   // yoga-session.js v4's confirmed-working pattern.
@@ -582,6 +761,9 @@ function endSession() {
     store.set("currentActivityEntry", activityEntry);
   }
 
+  // 03 Aug 2026 v4 - genuine completion, nothing left to resume
+  clearCheckpoint();
+
   store.set("totalCredits",       (store.get("totalCredits") || 0) + creditsEarned);
   store.set("lastWorkoutCredits", creditsEarned);
   store.set("lastWorkoutName",    "Run");
@@ -592,6 +774,11 @@ function endSession() {
 function resetSession() {
   dismountSessionGuard();
   if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+  releaseWakeLock();
+  if (visibilityListenerAdded) {
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    visibilityListenerAdded = false;
+  }
   phase          = "type";
   selectedType   = null;
   selectedMins   = null;
@@ -603,6 +790,13 @@ function resetSession() {
   creditsEarned  = 0;
   inWarmup       = true;
   inCooldown     = false;
+  // 03 Aug 2026 v4
+  sessionStartedAt      = null;
+  totalPausedMs         = 0;
+  pausedAt              = null;
+  firedStructureIndices = new Set();
+  resumeCheckDone       = false;
+  pendingResume         = null;
 }
 
 function formatMMSS(seconds) {
@@ -682,6 +876,11 @@ function savePartialSession() {
   if (activityEntry) {
     store.set("currentActivityEntry", activityEntry);
   }
+
+  // 03 Aug 2026 v4 - deliberate exit-and-save; progress is already in
+  // activityLog, nothing left to offer resuming. resetSession() (always
+  // called right after this) handles releasing the Wake Lock.
+  clearCheckpoint();
 }
 
 
@@ -693,6 +892,28 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // 03 Aug 2026 v4 - visibilitychange listener persists across rerenders
+  // within this view's lifecycle; guard so it's only added once, since
+  // onMount() runs on every rerender (pause, prompt, etc), not just cold
+  // mount.
+  if (!visibilityListenerAdded) {
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    visibilityListenerAdded = true;
+  }
+
+  // 03 Aug 2026 v4 - on cold mount only (not sub-sequent rerenders),
+  // check for an interrupted run before showing the normal picker.
+  if (phase === "type" && !sessionStarted && !resumeCheckDone) {
+    resumeCheckDone = true;
+    const resumable = getResumableSession("run");
+    if (resumable) {
+      pendingResume = resumable;
+      phase = "resume";
+      rerender();
+      return;
+    }
+  }
+
   mountSessionGuard({
     isActive: () => phase === "running",
     label:    "run",
@@ -742,4 +963,50 @@ export function onMount() {
     resetSession();
     router.navigate("intention");
   });
+
+  document.getElementById("rs-resume-btn")?.addEventListener("click", resumeSession);
+  document.getElementById("rs-start-fresh-btn")?.addEventListener("click", startFreshFromResume);
+}
+
+// 03 Aug 2026 v4 - restores full session state from a checkpoint and
+// resumes the timer. elapsed is computed fresh from the checkpoint's
+// timestamps, not trusted from any stored "elapsed" value (there isn't
+// one) - this is the same computation runTimer()'s ticks use throughout.
+function resumeSession() {
+  const cp = pendingResume;
+  if (!cp) { phase = "type"; rerender(); return; }
+
+  selectedType           = cp.selectedType;
+  selectedMins            = cp.selectedMins;
+  sessionStartedAt        = new Date(cp.startedAt).getTime();
+  totalPausedMs           = cp.totalPausedMs || 0;
+  pausedAt                = null;
+  promptIndex             = cp.promptIndex || 0;
+  firedStructureIndices   = new Set(cp.firedStructureIndices || []);
+  creditsEarned           = typeof cp.creditsEarned === "number" ? cp.creditsEarned : 50;
+  sessionStarted          = true;
+  paused                  = false;
+  activePrompt            = null;
+  pendingResume           = null;
+
+  elapsed = computeElapsedSeconds(
+    { startedAt: cp.startedAt, totalPausedMs },
+    null
+  );
+
+  const totalSecs = selectedMins * 60;
+  inWarmup   = elapsed < WARMUP_SECS;
+  inCooldown = elapsed >= totalSecs - COOLDOWN_SECS;
+
+  phase = "running";
+  requestWakeLock();
+  rerender();
+  runTimer();
+}
+
+function startFreshFromResume() {
+  clearCheckpoint();
+  pendingResume = null;
+  phase = "type";
+  rerender();
 }

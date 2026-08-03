@@ -1,6 +1,30 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Aug 2026 v189
+ * running-session.js v4 + new js/session-resume.js — Wake Lock and
+ * resumable-session fix (blueprint alongside_blueprint_wakelock-resume_
+ * 03aug2026_v1.md), pilot on running-session.js. Root cause, found via
+ * real on-device use: elapsed time was tick-counted, not wall-clock-
+ * anchored, so screen-lock/backgrounding throttled the setInterval and
+ * silently broke prompts, vibration, pause/resume, and a refresh lost
+ * all progress. Fixed: elapsed now computed fresh from timestamps every
+ * tick; session state checkpointed to store at start/pause/resume/
+ * prompt; on cold mount, an interrupted run is offered back to the user
+ * via a coach-voiced resume-or-fresh choice (reuses .session-exit-* CSS
+ * as-is, no new styles). Wake Lock requested on start/resume, released
+ * on end/exit, re-requested on visibilitychange — a genuine but partial
+ * improvement, not a substitute for the above (confirmed broken in
+ * installed iOS PWAs until iOS 18.4, and dropped instantly on any
+ * backgrounding regardless of platform). Also fixed in the same file:
+ * interval-structure work/recovery cues matched on exact equality
+ * (elapsed === at), fragile even without backgrounding — now a >= check
+ * against a fired-index set. New file js/session-resume.js added to
+ * SHELL_URLS. Not yet on-device confirmed — no device available this
+ * session. Not yet wired into the other 6 session views (workout.js,
+ * yoga-session.js, walk-session.js, cycle-session.js, swim-session.js,
+ * core-session.js) — pilot only, generalise once proven.
+ *
  * 03 Aug 2026 v188
  * session-builder-ui.js v2 cache bump — userTier bug fix
  * (31 Jul blueprint, ground-truthed against live code, same pattern as
@@ -256,7 +280,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v188";
+const CACHE_NAME = "alongside-v189";
 
 const SHELL_URLS = [
 
@@ -292,6 +316,7 @@ const SHELL_URLS = [
   "/alongside-app/js/store.js",
   "/alongside-app/js/tts.js",
   "/alongside-app/js/session-guard.js",
+  "/alongside-app/js/session-resume.js",
 
   // Views — main
   "/alongside-app/js/views/today.js",
