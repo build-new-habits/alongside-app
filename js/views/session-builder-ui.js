@@ -1,7 +1,15 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
- * 01 Jun 2026 v1
+ * 03 Aug 2026 v2
+ *
+ * v2 -- Fixed isPremium()'s tier check: was reading store.get("userTier"),
+ *   a field with no writer anywhere in the app, so the check always
+ *   evaluated false and Personal-tier options rendered as locked for
+ *   every user, including paying Personal/Athlete subscribers. Found
+ *   during BUILD-4 Appendix A follow-up (03 Aug). Now reads the genuine
+ *   live field, store.get("tier"), matching settings.js/progress.js/
+ *   coach-proposal.js.
  *
  * v1 -- Equipment screen visual feedback fix:
  *   Checkbox change listener now immediately updates the parent label's
@@ -51,7 +59,7 @@ let builtSession     = null;
 
 // ── Tier check ────────────────────────────────────────────────────────────────
 function isPremium() {
-  const tier = store.get("userTier") || "free";
+  const tier = store.get("tier") || "free";
   return tier === "personal" || tier === "athlete";
 }
 
