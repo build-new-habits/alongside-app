@@ -1,21 +1,20 @@
 # Alongside: Move — Master Schedule
-## 03 Aug 2026 v99
+## 03 Aug 2026 v98
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_03aug2026_v98.md`. Remove v98 on upload.
+Supersedes `alongside_master_schedule_03aug2026_v97.md`. Remove v97 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** **Real on-device bug report from Graeme's actual run today** — four symptoms (pause wouldn't resume, refresh caused a full restart instead of resuming, prompts never fired the entire run, vibration only worked with the screen open), traced against live `running-session.js` and confirmed to be **one root cause, not four**: the app never uses the Wake Lock API anywhere, and never persists resumable session state during a run — only at exit. Confirmed the same gap exists in `workout.js` and `yoga-session.js` too (checked directly), so this is an app-wide architectural gap, not running-specific. This is the first real, first-hand on-device confirmation of any session view under actual field conditions (locked screen, pocket/armband use), not a desk-based test — worth treating as a new category of testing gap, not just one more bug. Full detail in the new section below.
+**This version's substantive changes (03 Aug):** Same-day follow-up fix for the `userTier` bug found in the BUILD-4 Appendix A session. `session-builder-ui.js`'s `isPremium()` now reads `store.get("tier")` instead of the never-written `"userTier"` — Personal-tier session-builder options should now unlock correctly for paying Personal/Athlete users. `session-builder-ui.js` v1→v2, `sw.js` v187→v188, both pushed and confirmed live via raw GitHub fetch. `Changelog.md` updated. **On-device confirmation is the only remaining gate** — no device available this session.
 
-**Process note, fixed this version:** the last several version bumps (v96–v98) stacked a new "substantive changes" paragraph on top of the previous one each time, rather than replacing it — by v98 this header had four full paragraphs and two duplicate Location notices. Condensed below into a single recent-history list. Going forward, this header should carry **only the current version's changes**, one paragraph — anything needed for continuity belongs in the dashboard or a dedicated section, not a growing stack of old summaries at the top.
+**Previous version's summary (03 Aug, earlier), retained for continuity:** Supabase schema & architecture design session run, design-only per blueprint (`alongside_blueprint_supabase-schema-design_31jul2026_v1.md`). Both dependencies (BIZ-1/DPA, tier gating) reconfirmed still open before starting. New doc: `alongside_supabase_schema_design_03aug2026_v1.md`, pushed to `Documents/Admin/`. Headline decisions: Frankfurt (`eu-central-1`) recommended for EU region; hybrid relational+JSONB table design (not full normalisation, not pure JSONB) — a handful of genuinely-queried tables (`profiles`, `activity_log`, `journal_entries`, `community_credits`) plus JSONB buckets for the long tail, grouped by `Schema.md`'s own section boundaries; the four history-shaped fields (`activityLog`/`progressLog`/`workoutHistory`/`checkinHistory`) kept as four separate concerns, not merged; RLS is `auth.uid() = user_id` everywhere except a `SECURITY DEFINER` function for the one genuinely-aggregate need (Impact Credits quarterly totals); Journal Privacy Rule flagged as needing to stay a documented client-side-only constraint, not just an absence of server code; magic-link auth confirmed with one build-session checklist item (redirect-URL allow-listing); migration strategy designed at decision level; DPA/TIA documented as a 5-item ready checklist, still gated on BIZ-1.
 
-**Recent history, condensed for continuity (full detail in `Admin/Past MS/` for each version):**
-- **v98, same-day follow-up:** `userTier` bug fixed — `session-builder-ui.js`'s `isPremium()` now reads `store.get("tier")` instead of the never-written `"userTier"`. `session-builder-ui.js` v1→v2, `sw.js` v187→v188.
-- **v97, Supabase schema & architecture design (design-only):** New doc `alongside_supabase_schema_design_03aug2026_v1.md`. Frankfurt region recommended; hybrid relational+JSONB table design; RLS via `auth.uid() = user_id` plus one `SECURITY DEFINER` function for Impact Credits aggregates; DPA/TIA documented as a ready 5-item checklist, still gated on BIZ-1.
-- **v96, BUILD-4 Appendix A follow-up:** All 18 previously-unclassified schema fields resolved — 11 live, 5 dormant, 2 dead, zero real naming-overlaps. `Schema.md` v1.9→v1.10. Found `proposalBias` (written, never read — still open) alongside the `userTier` bug (fixed above).
-- **03 Aug earlier, website session:** WCAG audit closed, `/upgrade` and `/who-its-for/` pages built, footer "Ltd" fixed, cache-busting bug fixed, comparison table ground-truth-corrected against live code (found: no difficulty-based exercise gating exists, no hardcoded programme remains, no generative programme engine exists).
+**Earlier same-day summary (BUILD-4 Appendix A follow-up), retained for continuity:** All 18 previously-unclassified schema fields individually checked (reader + writer each) — 11 confirmed live, 5 dormant, 2 dead. None of the six flagged "possible naming overlaps" turned out to be real duplicates. `Schema.md` v1.9 → v1.10, pushed and confirmed live. Two live bugs found this session, one fixed same day (above): `userTier` (fixed) and `proposalBias` (still open — written by `coach-reflection.js`, read nowhere).
 
+*(The 03 Aug website WCAG audit/upgrade-page session and earlier history are preserved in full in `Admin/Past MS/` — trimmed from this header to keep it manageable.)*
+
+---
 
 ## ⭐ THIS WEEK — WB 27 Jul
 
@@ -43,26 +42,6 @@ Supersedes `alongside_master_schedule_03aug2026_v98.md`. Remove v98 on upload.
 - **Org outreach category decision** (see Alex Meeting Outcomes below) — Graeme's call on whether workplace wellbeing reps and women's health groups join the Tier list, plus the "what's in it for them" messaging pass. Blocks OUT-2–OUT-8.
 
 *Full six-week plan: Task Inventory doc, Section J (v5).*
-
----
-
----
-
-## 🔴 Wake Lock / Resumable Session Gap — found 03 Aug 2026, real on-device use
-
-**Source: Graeme's actual run + library session today** — the first genuine field-conditions test any session view has had (phone locked/pocketed during real use), as opposed to a desk-based device test. Four symptoms reported, traced against live `running-session.js` and confirmed to share one root cause:
-
-**The gap:** the app never calls the Wake Lock API anywhere, and never persists in-progress session state to `store` during a run — only at the very end (`endSession()`) or on a deliberate exit (`savePartialSession()`, called from the exit-guard paths only). Everything else (`elapsed`, `phase`, `paused`, prompt scheduling) lives in plain module-level JS variables, driven by a single `setInterval`.
-
-**How each symptom maps back to it:**
-- **Prompts never fired** — every prompt, vibration, and phase transition (warmup→run, cooldown) is driven by that one interval. Mobile browsers throttle or suspend `setInterval` heavily once the screen locks. With the phone pocketed for most of a run, the interval barely ran.
-- **Vibration only worked with the screen open** — same interval, same cause. `firePrompt()`'s `navigator.vibrate()` call only ever executes from inside the throttled interval.
-- **Pause wouldn't resume** — the pause flag itself is a simple toggle and works fine in isolation, but it depends on that same interval to ever act on it again once the screen locks.
-- **Refresh caused a full restart** — different mechanism, same root gap. Nothing checkpoints a running session to `store` mid-run, and nothing on mount checks "was there an interrupted session?" — a refresh just wipes the in-memory state back to defaults.
-
-**Confirmed app-wide, not running-specific:** checked `workout.js` and `yoga-session.js` directly — same gap in both (no Wake Lock, no mid-session checkpoint). Running exposes it hardest since it's the activity most often done with the phone locked away, but this is architectural, not a running-only bug.
-
-**Not yet done:** no fix blueprint written yet. This needs real design thought, not a quick patch — Wake Lock has its own release-on-backgrounding lifecycle to handle correctly, and a resumable-session design needs a decision on checkpoint frequency (every tick? every prompt? a throttled interval?) and what "resume" actually looks like in the UI (silently continue, or a coach-voiced "welcome back, resuming your run" moment — the latter fits the app's voice better).
 
 ---
 
@@ -290,11 +269,10 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 
 ---
 
-## One-Page Dashboard — 03 Aug 2026
+## One-Page Dashboard — 30 Jul 2026
 
 | Stream | Current position | Immediate next action | Blocker? |
 |--------|-----------------|----------------------|----------|
-| Product — Wake Lock / resumable session gap | 🔴 **New, 03 Aug, from Graeme's real run.** Confirmed one root cause behind 4 symptoms (prompts silent, vibration screen-dependent, pause wouldn't resume, refresh lost progress) — no Wake Lock API anywhere, no mid-session checkpoint anywhere. Confirmed app-wide (checked `workout.js`, `yoga-session.js` too), not running-specific. | Needs a proper design session, not a quick patch — checkpoint frequency and resume-UX both need real decisions. Not yet blueprinted. | Not booked. High priority — this breaks the core guided-session experience under completely normal real-world conditions (phone locked during exercise). |
 | Product — BUILD-1 (Nav-gap fix) | 🟡 Core mechanism confirmed. Sub-question open. | Quick confirmation. | None. |
 | Product — BUILD-2 (Proposal-loop fix) | 🟢 Closed 23 Jul. | — | None. |
 | Product — BUILD-3 (Session-view audit) | 🟡 Code confirmed clean twice. Not yet on-device tested. | On-device pass, expected formality. | Needs phone only. |
@@ -370,4 +348,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Aug 2026 v99*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Aug 2026 v95*
