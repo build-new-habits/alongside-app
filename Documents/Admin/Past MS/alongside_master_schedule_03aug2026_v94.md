@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Aug 2026 v95
+## 03 Aug 2026 v94
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_03aug2026_v94.md`. Remove v94 on upload.
+Supersedes `alongside_master_schedule_03aug2026_v93.md`. Remove v93 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -294,8 +294,6 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 | Product — Generative/periodised multi-week programme engine | ⚪ **Confirmed not built, 03 Aug** — `alongside_generative_programme_design_note.md` explicitly scopes this to "Future Build, Target: Phase 4B or Phase 5." Website now correctly marks this "Coming soon" rather than presenting it as a live Personal-tier benefit. | No change — already correctly scoped as future work elsewhere. | Not booked, by design. |
 | Product — Hardcoded gym programme (Sessions A–C) | ⚪ **Confirmed retired, 03 Aug.** `gym-programme.js` v3 (31 Jul) reads exclusively from the session builder now — no hardcoded PROGRAMME object remains in the file. Was previously built around Graeme's own physio routine; that's gone from the live file already. Informational only — no action needed. | None. | None. |
 | Product — Coach-behaviour "remembers across time" claim (Personal tier) | 🟡 **Unverified, 03 Aug.** The website states Personal-tier coaches reference patterns over time (per the locked Phase F design decision, 09 Jul) — not checked against live code this session. Flagged, not guessed at either way. | Quick code check next session — is this actually implemented anywhere, or still just the confirmed design decision? | Not booked, low urgency — website copy isn't wrong, just unconfirmed. |
-| **Business/legal — website now states unbuilt features as current claims, by deliberate decision** | 🔴 **New, 03 Aug, explicit instruction from Graeme, not a mistake.** `/who-its-for/`'s comparison table and persona cards state exercise-level progression and periodised multi-week programmes as things Personal tier does — neither is built (see the two rows above from v94). Graeme's stated reasoning: the website becomes the accountability spec for what the app should do; easier to change the site than to have quietly under-scoped the app. **Genuinely fine today** — `/upgrade`'s checkout is still disabled, no money changes hands. **Becomes a real consumer-protection issue the moment Stripe/Supabase checkout goes live** (S-F3/S-F4) with this wording still in place — a paying Personal-tier user told they get feature X that doesn't exist is a legitimate complaint, not a style question. | Add an explicit checkpoint to the BUILD-9/beta-readiness checklist: re-verify every current-tense feature claim on `/who-its-for/` and `/upgrade/` against live code before checkout goes live, either build the gap or soften the claim. | Not booked as a task yet — needs to land on the pre-beta checklist specifically, not get lost as a general "someday" item. |
-| Website — Community page charter removed | ⚪ **Decision, 03 Aug.** "What belongs here"/"What doesn't" block removed from `community/index.html` — Graeme flagged it as confusing twice, not doing anything useful yet (there's no live community space for it to describe). Content preserved in the file's own changelog, not lost, in case it's wanted again once a real space exists. | None — informational. | None. |
 | Product — `coach-proposal.js` doors 2/3 ("Your programme" / "Something different") permanently disabled | 🟠 **New, 31 Jul, found via screenshot review.** `DOOR_COPY` hardcodes `enabled: false` and static "Being redesigned — check back soon." copy for 2 of the app's 3 main session-entry doors. Scoped as P5-CP-1 in the 23 Jun technical blueprint ("door framing rewrite... all three doors genuinely right") but has no current BUILD-x task ID — appears to have dropped off active tracking. Live right now, visible to any real user. | Needs scoping — is this the full P5-CP-1 door-framing rewrite, or a smaller "just re-enable these two with current copy" fix? Graeme's call. | Not booked. Worth prioritising — 2 of 3 main entry points into a session are currently dead ends. |
 | Website — Home/Products/Community/Impact | 🟢 Confirmed clean. | None unless BUILD-9 triggers a copy pass. | None. |
 | Outreach — OUT-1 (reshaped) | Brief drafted, not yet run. | Run the session. | Blocks OUT-2–OUT-7. |
@@ -337,4 +335,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Aug 2026 v95*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Aug 2026 v94*
