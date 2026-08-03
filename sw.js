@@ -1,8 +1,8 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 31 Jul 2026 v187
- * gym-programme.js v3 cache bump — exit-guard + activity-visibility fix
+ * 03 Aug 2026 v188
+ * session-builder-ui.js v2 cache bump — userTier bug fix
  * (31 Jul blueprint, ground-truthed against live code, same pattern as
  * workout.js v6). Three issues fixed: (1) no exit protection at all,
  * neither on-screen Exit nor back-gesture — mountSessionGuard()/
@@ -256,7 +256,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v187";
+const CACHE_NAME = "alongside-v188";
 
 const SHELL_URLS = [
 
