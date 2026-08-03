@@ -235,4 +235,17 @@ This changelog was not maintained during this window while build velocity was hi
 
 ---
 
+### Wake Lock + resumable session — pilot on running-session.js
+
+Found via Graeme's real on-device run, same day: pause wouldn't resume, a refresh caused a full restart, prompts never fired the entire run, vibration only worked with the screen open. Traced to one root cause — `elapsed` was tick-counted, not wall-clock-anchored, and nothing persisted session state during a run, only at exit.
+
+- New file `js/session-resume.js` — shared checkpoint/resume module, same pattern as `session-guard.js`. `checkpointSession()`, `getResumableSession()`, `clearCheckpoint()`, `computeElapsedSeconds()`.
+- `js/views/running-session.js` v3 → v4 — `elapsed` now computed fresh from timestamps every tick instead of incremented; checkpoints written at session start/pause/resume/each prompt; on cold mount, an interrupted run is offered back via a coach-voiced resume-or-fresh card (reuses `.session-exit-*` CSS as-is, no new styles); Wake Lock requested on start/resume, released on end/exit, re-requested on `visibilitychange`.
+- Same file, same session: interval-structure work/recovery cues fixed from exact-equality matching (`elapsed === at`, fragile even without backgrounding) to a `>=` check against a fired-index set.
+- `sw.js` v188 → v189, `js/session-resume.js` added to `SHELL_URLS`.
+- **Not yet on-device confirmed** — no device available this session. This bug was only ever found through real use, so on-device confirmation (screen-lock-mid-run, force-refresh-mid-run) is the actual test gate here, not code review.
+- **Pilot only** — `workout.js`, `yoga-session.js`, `walk-session.js`, `cycle-session.js`, `swim-session.js`, `core-session.js` not yet touched. Generalise once proven on running.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
