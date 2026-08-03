@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 03 Aug 2026 v100
+## 03 Aug 2026 v99
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_03aug2026_v99.md`. Remove v99 on upload.
+Supersedes `alongside_master_schedule_03aug2026_v98.md`. Remove v98 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** Blueprint written for the Wake Lock / resumable-session fix (v99's finding), pilot-scoped to `running-session.js`. Solution confirmed with Graeme: resumable, timestamp-anchored session state is the real fix; Wake Lock is a genuine but partial layer on top, not a substitute — confirmed via research that Wake Lock is dropped the instant the OS locks the screen and was broken entirely in installed iOS PWAs until iOS 18.4. Blueprint also folds in a related bug found during design: the interval-structure prompts' exact-equality tick matching (`elapsed === at`) is fragile independent of the backgrounding issue, fixed to a `>=`-based check in the same session. New shared module planned: `js/session-resume.js`, same pattern as `session-guard.js`, built to generalise to the other 6 session views once proven on running.
+**This version's substantive changes:** **Real on-device bug report from Graeme's actual run today** — four symptoms (pause wouldn't resume, refresh caused a full restart instead of resuming, prompts never fired the entire run, vibration only worked with the screen open), traced against live `running-session.js` and confirmed to be **one root cause, not four**: the app never uses the Wake Lock API anywhere, and never persists resumable session state during a run — only at exit. Confirmed the same gap exists in `workout.js` and `yoga-session.js` too (checked directly), so this is an app-wide architectural gap, not running-specific. This is the first real, first-hand on-device confirmation of any session view under actual field conditions (locked screen, pocket/armband use), not a desk-based test — worth treating as a new category of testing gap, not just one more bug. Full detail in the new section below.
 
 **Process note, fixed this version:** the last several version bumps (v96–v98) stacked a new "substantive changes" paragraph on top of the previous one each time, rather than replacing it — by v98 this header had four full paragraphs and two duplicate Location notices. Condensed below into a single recent-history list. Going forward, this header should carry **only the current version's changes**, one paragraph — anything needed for continuity belongs in the dashboard or a dedicated section, not a growing stack of old summaries at the top.
 
@@ -62,7 +62,7 @@ Supersedes `alongside_master_schedule_03aug2026_v99.md`. Remove v99 on upload.
 
 **Confirmed app-wide, not running-specific:** checked `workout.js` and `yoga-session.js` directly — same gap in both (no Wake Lock, no mid-session checkpoint). Running exposes it hardest since it's the activity most often done with the phone locked away, but this is architectural, not a running-only bug.
 
-**Not yet done → now blueprinted, 03 Aug:** solution confirmed with Graeme (resumable timestamp-anchored state as the primary fix, Wake Lock as a genuine-but-partial secondary layer, not a substitute). Blueprint `alongside_blueprint_wakelock-resume_03aug2026_v1.md` ready — pilot on `running-session.js`, new shared `session-resume.js` module, plus a related exact-equality prompt-matching bug fixed in the same session. Not yet run.
+**Not yet done:** no fix blueprint written yet. This needs real design thought, not a quick patch — Wake Lock has its own release-on-backgrounding lifecycle to handle correctly, and a resumable-session design needs a decision on checkpoint frequency (every tick? every prompt? a throttled interval?) and what "resume" actually looks like in the UI (silently continue, or a coach-voiced "welcome back, resuming your run" moment — the latter fits the app's voice better).
 
 ---
 
@@ -294,7 +294,7 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 
 | Stream | Current position | Immediate next action | Blocker? |
 |--------|-----------------|----------------------|----------|
-| Product — Wake Lock / resumable session gap | 🟢 **Blueprint ready, 03 Aug** (`alongside_blueprint_wakelock-resume_03aug2026_v1.md`). Pilot-scoped to `running-session.js`. Solution: timestamp-anchored resumable state (primary fix) + Wake Lock with proper lifecycle (secondary, confirmed via research it's not sufficient alone) + a related exact-equality prompt-matching bug fixed in the same session. New shared module: `session-resume.js`. | Run session. On-device confirmation is the real test here — this bug was only ever found through real use. | Not booked. High priority. |
+| Product — Wake Lock / resumable session gap | 🔴 **New, 03 Aug, from Graeme's real run.** Confirmed one root cause behind 4 symptoms (prompts silent, vibration screen-dependent, pause wouldn't resume, refresh lost progress) — no Wake Lock API anywhere, no mid-session checkpoint anywhere. Confirmed app-wide (checked `workout.js`, `yoga-session.js` too), not running-specific. | Needs a proper design session, not a quick patch — checkpoint frequency and resume-UX both need real decisions. Not yet blueprinted. | Not booked. High priority — this breaks the core guided-session experience under completely normal real-world conditions (phone locked during exercise). |
 | Product — BUILD-1 (Nav-gap fix) | 🟡 Core mechanism confirmed. Sub-question open. | Quick confirmation. | None. |
 | Product — BUILD-2 (Proposal-loop fix) | 🟢 Closed 23 Jul. | — | None. |
 | Product — BUILD-3 (Session-view audit) | 🟡 Code confirmed clean twice. Not yet on-device tested. | On-device pass, expected formality. | Needs phone only. |
@@ -370,4 +370,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Aug 2026 v100*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Aug 2026 v99*
