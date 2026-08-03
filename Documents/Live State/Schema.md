@@ -1,12 +1,17 @@
 # Alongside — Data Schema Reference
-## 30 Jul 2026 v1.9
+## 03 Aug 2026 v1.10
 
-**File:** `js/store.js` (confirmed live version: v10, 16 Jul 2026)
+**File:** `js/store.js` (confirmed live version: v11, 30 Jul 2026)
 **Storage:** `localStorage` key `alongside_user`
+
+**This version supersedes:** `schema.md` v1.9 (30 Jul 2026). **BUILD-4 Appendix A follow-up (03 Aug 2026):** all 18 previously-unclassified fields checked individually for both reader and writer, per the method BUILD-4 itself established. Appendix A is now closed — see the resolution summary immediately below and the closed table further down. Two live, user-facing bugs found in the process (not fixed this session — logged, touch-once):
+
+- **`userTier` is read once, in `js/views/session-builder-ui.js`, and never written anywhere.** The helper it feeds (`isPersonalOrAthlete()`) always evaluates `false`, so **every user — including paying Personal/Athlete subscribers — sees Personal-tier session-builder options rendered as locked.** The genuine live field is `tier` (confirmed correct in `settings.js`, `progress.js`, `coach-proposal.js`, `store.js`). This is the same tier-field confusion already flagged against `upgrade.js`'s non-existent `getUserTier()` call in the 31 Jul master-schedule note — a second, independent occurrence of the same naming mistake, with a real consequence for paying users this time, not just a crash risk.
+- **`proposalBias` is written in `coach-reflection.js` (12 sites) but read nowhere else in the codebase**, including by `coach-reflection.js` itself. The reflection logic computes a `"lighter"`/`"rest"`/`null` bias per reflection type (severe pain, burnout risk, consecutive days, returning after absence) clearly intending to influence the next generated proposal — but nothing downstream ever consumes it. Same "specified but never wired up" pattern already on record for `exerciseFeedback` and Empathy Transfer's early stages.
 
 All data lives in a single JSON object under this key. `store.js` provides typed get/set access — never manipulate `localStorage` directly. On initialisation, `mergeWithDefaults()` fills any missing keys so existing users receive new fields without data loss.
 
-**This version supersedes and retires:** `schema.md` v1.3 (8 Mar 2026), `schema_v1_7_15jun2026.md`, `schema_md.docx` (v1.4 content, 12 Jun 2026), the v1.5 delta note (12 Jun), and the v1.8 delta note (16 Jul). All content from those documents has been folded in here, ground-truthed directly against live `store.js` v10 rather than carried forward. This is now the single canonical schema document.
+*(v1.9's own history — it superseded and retired `schema.md` v1.3, `schema_v1_7_15jun2026.md`, `schema_md.docx`, and the v1.5/v1.8 delta notes — is preserved below in Schema Version History.)*
 
 ---
 
@@ -23,7 +28,8 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | 1.6 | 13 Jun 2026 | Weekly Plan shape finalised. |
 | 1.7 | 15 Jun 2026 | Noticing Hub schema pass. |
 | 1.8 | 16 Jul 2026 | Empathy Transfer schema pass: 5 new top-level fields (delta note only, never folded into a full file until now). |
-| **1.9** | **30 Jul 2026** | **Full ground-truth reconciliation (BUILD-4).** Rewritten directly against live `store.js` v10. Documents all fields actually returned by `getDefaults()`, corrects two errors inherited from v1.7 (see below), resolves the `hardBeforeSelections` naming question, resolves `stats` and `exerciseFeedback` dormancy questions, and separates out an appendix of fields used via `store.get`/`store.set` but absent from `getDefaults()`. |
+| 1.9 | 30 Jul 2026 | Full ground-truth reconciliation (BUILD-4). Rewritten directly against live `store.js` v10. Documents all fields actually returned by `getDefaults()`, corrects two errors inherited from v1.7 (see below), resolves the `hardBeforeSelections` naming question, resolves `stats` and `exerciseFeedback` dormancy questions, and separates out an appendix of fields used via `store.get`/`store.set` but absent from `getDefaults()`. |
+| **1.10** | **03 Aug 2026** | **BUILD-4 Appendix A follow-up.** All 18 previously-unclassified fields individually checked (reader + writer each) and folded into their proper sections. 11 confirmed live, 5 dormant (write-only), 2 dead. Two live bugs surfaced: `userTier` has no writer and its one reader always evaluates false, locking Personal-tier session-builder options for paying users; `proposalBias` is written but never read anywhere. Appendix A closed. |
 
 ### Corrections made in this pass
 
@@ -57,6 +63,8 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | `primaryTerritory` | `string\|null` | `null` | Single dominant territory confirmed in Step 3b. Read by `beat3-scripts.js` `getDominantTerritory()`. Replaced the old pattern of inferring dominant territory from `hardBeforeSelections[0]`. |
 | `reflectionShownAt` | `string\|null` (ISO) | `null` | Step 4 timing. |
 | `castleShownAt` | `string\|null` (ISO) | `null` | Beat 1 ("The Castle"). `arrival.js` retired but field preserved for analytics continuity. |
+| `consentGiven` | `boolean` | — *(undocumented, resolved 03 Aug)* | Written once, in `welcome.js`, at onboarding. **No reader anywhere** — recorded but never checked/enforced by any gate. Likely intended as an audit-trail record rather than a live gate, but worth confirming that's the actual intent given ToS/consent has legal weight — flagged for Graeme's awareness, not fixed here. |
+| `consentAt` | `string\|null` (ISO) | — *(undocumented, resolved 03 Aug)* | Timestamp paired with `consentGiven`, same file, same status — write-only, no reader. |
 
 ---
 
@@ -70,7 +78,7 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | `gender` | `string\|null` | `null` | |
 | `hormonalTracking` | `boolean` | `false` | Enables menstrual cycle overlay. See `cycleLength` in Appendix A — cycle length itself is never user-configurable; always defaults to 28. |
 | `coachStyle` | `string` | `'nurturing'` | `nurturing\|steady\|energetic\|minimal`. Beta: Nurturing voice delivers for all style settings silently — this is permanent product policy, not a beta-only restriction (Free tier: locked to Nurturing; Personal+: all values selectable in UI but all render as Nurturing). |
-| `tier` | `string` | `'free'` | `free\|personal\|athlete`. Athlete unlocked within Personal, no extra charge. |
+| `tier` | `string` | `'free'` | `free\|personal\|athlete`. Athlete unlocked within Personal, no extra charge. **This is the one genuine tier field** — see `userTier` bug note at the top of this document. Never write or read `userTier`; it does not exist in `getDefaults()` and has no writer anywhere. |
 | `fitnessLevel` | `string\|null` | `null` | Read by `workoutGenerator.js`'s `getUserProfile()`. Written by Settings. |
 | `weight` | `number\|null` | `null` | |
 | `weightUnit` | `'kg'\|'lbs'` | `'kg'` | |
@@ -80,8 +88,12 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | `goals` | `string[]` | `[]` | Goal IDs from `goals.js`. Drives exercise filter engine and `workoutGenerator.js`'s goal-aware bias. |
 | `conditions` | `string[]` | `[]` | Condition IDs from `conditions.js`. Base IDs only — phase variants derived at runtime. |
 | `conditionPainScores` | `object` | `{}` | Keyed by condition ID. Written at check-in submission. |
-| `equipment` | `string[]` | `[]` | Equipment IDs from `equipment.js` |
+| `equipment` | `string[]` | `[]` | Equipment IDs from `equipment.js`. **Derived, not primary input** — see below. |
+| `homeEquipment` | `string[]` | `[]` *(undocumented in `getDefaults()`)* | Live. Scope-specific onboarding input, written/read entirely within `equipment.js`. |
+| `gymEquipment` | `string[]` | `[]` *(undocumented in `getDefaults()`)* | Live. Scope-specific onboarding input, written/read entirely within `equipment.js`. |
 | `prescribedExercises` | `array` | `[]` | |
+
+**Resolved 03 Aug (was flagged as a possible naming overlap):** `homeEquipment` and `gymEquipment` are not duplicates of `equipment` — they're the two scope-specific inputs `equipment.js` collects during onboarding, which are then merged (`Array.from(new Set([...gym, ...home]))`) into the single combined `equipment` array that the rest of the app (`session-builder-ui.js` etc.) actually reads. All three are genuinely live; `equipment` is simply derived, not primary.
 
 ### `lifestyle` (nested object)
 
@@ -143,7 +155,8 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `gymProgrammeSession` | `string` | `'A'` | |
-| `gymProgrammeWeek` | `number` | `1` | |
+| `gymProgrammeWeek` | `number` | `1` | **Dormant, resolved 03 Aug.** Read once, in `reflect.js`, only as a rotation seed for picking a wellbeing-invitation line — not a real week number. **No writer anywhere**, so it always falls back to the default `1`. The genuine, actively-tracked programme week is `activeProgramme.currentWeek` (Section 3), maintained by `programmeEngine.js`. Not a naming clash — two real, distinct fields — but `gymProgrammeWeek` is dead weight, cosmetic-only, and never varies. Cleanup candidate, not fixed here. |
+| `lastMilestone` | `string\|null` | `null` *(undocumented in `getDefaults()`)* | **Resolved 03 Aug.** Live — a single-value flag set by `workout.js` on milestone achievement, read and cleared by `workout-complete.js` to show the completion-screen milestone card. Confirmed genuinely distinct from `activeProgramme.milestones` (array of programme-phase milestones reached, Section 3) and `checkin.lastMilestoneNoticed` (Section 6, tracks which streak/week milestone the coach has already surfaced in an opening line) — three separate mechanisms, no overlap. |
 
 ---
 
@@ -154,6 +167,13 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | `activityLog` | `array` | `[]` | Each entry: `{ id, date, type, durationMins, moodAfter, isEvent, eventName, completedAt, ... }`. Single write path since v10: `store.logActivity()`, with dedupe guard against same-type double-writes within 2 minutes. |
 | `currentActivityEntry` | `null` | `null` | **Under active investigation** — separate blueprint (`alongside_blueprint_coresession-integrity_30jul2026_v1.md`) is checking whether Core Session ever populates this field upstream. Out of scope for BUILD-4; do not resolve here. |
 | `generatedSession` (nested) | `object` | `{ session: null, builtAt: null, inputs: {} }` | The real "today's workout" mechanism — this is what replaced the old `todaysWorkouts`/`workoutsGeneratedAt` pattern (see corrections above). |
+| `totalCredits` | `number` | `0` *(undocumented)* | **Resolved 03 Aug — live, 21 refs.** Running lifetime total, incremented at completion by every session-type view (walk/run/yoga/swim/core/cycle/gym/quiet/breathing/prescribed). Read by `workout-complete.js` for the completion screen. Confirmed genuinely distinct from `community.credits` (Section 18) — that's the separate Impact Credits mechanism (1–2 awarded per session depending on tier, via `awardCommunityCredit()`). Incidental finding: `community.credits` is written but has **no reader anywhere** — nothing displays it. Logged, not fixed. |
+| `lastWorkoutName` | `string\|null` | `null` *(undocumented)* | **Resolved 03 Aug — live, 12 refs.** Paired with `lastWorkoutCredits`; written by every session-completion view, read by `workout-complete.js`, cleared on exit. |
+| `lastWorkoutCredits` | `number` | `0` *(undocumented)* | **Resolved 03 Aug — live, 12 refs.** See `lastWorkoutName` above; written/read/cleared together at the same call sites. |
+| `workoutProgress` | `array` | `[]` *(undocumented)* | **Resolved 03 Aug — live.** `workout.js`'s own in-progress per-exercise completion tracker, entirely self-contained (get/set/clear all within that file). Confirmed genuinely distinct from `prescribedSessionProgress` below, not a duplicate. |
+| `prescribedSessionProgress` | `array` | `[]` *(undocumented)* | **Resolved 03 Aug — live.** Same pattern as `workoutProgress`, scoped entirely within `prescribed-session.js`. |
+| `workoutHistory` | `array` | `[]` *(undocumented)* | **Resolved 03 Aug — live but write-only.** Appended by `completeWorkout()` in `workout.js` on every gym-type workout completion (`{ workoutId, name, focus, completedAt, exercisesCompleted, totalExercises, creditsEarned }`) — a genuine fourth history mechanism, distinct from `activityLog`, `progressLog`, and `activeProgramme.milestones`. **No reader anywhere confirmed** — nothing in Settings, Progress, or any history view displays it. Data is being collected with no consumer. Logged, not fixed. |
+| `usingGeneratedSession` | `boolean` | — *(undocumented)* | **Resolved 03 Aug — write-only, 1 ref.** Set `true` in `session-builder-ui.js`; no reader anywhere. |
 
 ---
 
@@ -183,6 +203,12 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 
 `availableTime`: `string|null`, undocumented in `getDefaults()` (see Appendix A). Live. `micro|quick|short|standard|long|open`. Written by `checkin.js` and `coach-proposal.js`; drives `workoutGenerator.js`'s exercise-count and duration-cap logic (BUILD-5, 24 Jul).
 
+`returnVisit`: `boolean|'dismissed'`, undocumented in `getDefaults()`. **Resolved 03 Aug — live, 11 refs.** Three-state flag (`false`/`true`/`"dismissed"`) written by `intention.js` and `checkin-mini.js`, gating whether the return-visit check-in prompt shows again today.
+
+`quietMode`: `string|null`, undocumented in `getDefaults()`. **Resolved 03 Aug — live, 10 refs.** Routing flag, not a check-in field per se — written by `library.js`/`noticing.js` before navigating into `quiet-session.js`, which reads it to select one of three quiet-session sub-modes (including the mindful/journal-mode path from S4-9/10). Cleared on exit/completion.
+
+`todayEnergy`: `number|null`, undocumented in `getDefaults()`. **Resolved 03 Aug — dead.** Read once in `intention.js` as a fallback (`checkin.energy || store.get("todayEnergy") || 5`) but **has no writer anywhere in the codebase** — the read is unreachable in practice, always falling through to the hardcoded `5`. Confirmed superseded by `lastCheckin.energy` (below), which is the field genuinely written by `checkin-mini.js` and read by `gym-programme.js`/`coach-proposal.js`. Naming remnant, safe cleanup candidate, not fixed here.
+
 ---
 
 ## 7. Mindful Prompts & Empathy Transfer
@@ -196,6 +222,7 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | `empathyPromptsAtStage` | `number` | `0` | Resets to 0 on stage advance. |
 | `lastEmpathyPromptSession` | `number` | `0` | Session count at last fire — enforces the 3–4 session gap. |
 | `empathyPromptSkips` | `number` | `0` | **Consecutive** skip streak, not lifetime total — resets to 0 on any non-skip response. |
+| `proposalBias` | `'lighter'\|'rest'\|null` | — *(undocumented, resolved 03 Aug)* | Written by `coach-reflection.js` (severe-pain → `'rest'`; burnout-risk/consecutive-days/returning → `'lighter'`; else `null`). **See the write-only finding at the top of this document** — nothing downstream reads it. |
 
 ---
 
@@ -337,34 +364,34 @@ Illness/recovery tracking. Genuinely separate from `activeProgramme.startDate` �
 
 ---
 
-## Appendix A — Fields used via `store.get`/`store.set` but absent from `getDefaults()`
+## Appendix A — Closed, 03 Aug 2026
 
-These fields are genuinely referenced in live code but have no declared default — `store.get()` returns `undefined` until something calls `store.set()` for the first time. Two of these (`todayIntensity`, `availableTime`) are documented properly above, having been actively investigated and corrected this session. `exerciseFeedback` and `cycleLength` are documented above as confirmed-dormant/always-default. The remainder below were surfaced by a full-codebase grep this session but **not individually investigated** — classifying each as live/dead/mis-named needs real per-field checking (as `todayIntensity` and `exerciseFeedback` just demonstrated: a grep hit alone doesn't tell you whether a field is functioning), which was outside this session's scope. Reference-count is a rough signal only, not a conclusion.
+All 18 fields flagged in the 30 Jul v1.9 follow-up list have been individually checked (reader and writer both, per field) and documented in their proper sections above. Summary:
 
-| Field | Approx. references | Notes |
-|-------|---------------------|-------|
-| `cycleLength` | 2 | Confirmed always falls back to default `28` — never written anywhere. Documented under Profile above. |
-| `consentAt` | 1 | Not investigated. |
-| `consentGiven` | 1 | Not investigated. |
-| `gymEquipment` | 3 | Not investigated. Possibly gym-programme-adjacent to `equipment`. |
-| `homeEquipment` | 4 | Not investigated. Possibly gym-programme-adjacent to `equipment`. |
-| `lastMilestone` | 5 | Not investigated. Possibly related to `activeProgramme.milestones` or `checkin.lastMilestoneNoticed` — worth checking for a naming overlap before assuming genuinely new. |
-| `lastWorkoutCredits` | 12 | Higher reference count — worth prioritising in a follow-up pass. |
-| `lastWorkoutName` | 12 | Higher reference count — worth prioritising in a follow-up pass. |
-| `morningProgrammeWeek` | 3 | Not investigated. Possibly related to `gymProgrammeWeek`. |
-| `prescribedSessionProgress` | 5 | Not investigated. |
-| `proposalBias` | 3 | Not investigated. |
-| `quietMode` | 10 | Higher reference count — worth prioritising in a follow-up pass. |
-| `returnVisit` | 5 | Not investigated. |
-| `todayEnergy` | 1 | Not investigated. |
-| `totalCredits` | 18 | Highest reference count of this list — likely genuinely live and significant. Possibly distinct from `community.credits`; needs checking for overlap/duplication before documenting properly. |
-| `userTier` | 1 | Not investigated. Possible naming duplicate of `tier` — worth checking before assuming a separate field. |
-| `usingGeneratedSession` | 1 | Not investigated. |
-| `workoutHistory` | 2 | Not investigated. Possible naming overlap with `activityLog` or `progressLog`. |
-| `workoutProgress` | 4 | Not investigated. |
+| Field | Resolution | Documented in |
+|-------|-----------|----------------|
+| `totalCredits` | Live | §5 Activity & Session Tracking |
+| `lastWorkoutName` | Live | §5 |
+| `lastWorkoutCredits` | Live | §5 |
+| `quietMode` | Live | §6 Check-In Engine |
+| `lastMilestone` | Live | §4 Gym Programme |
+| `prescribedSessionProgress` | Live | §5 |
+| `returnVisit` | Live | §6 |
+| `homeEquipment` | Live | §2 Profile |
+| `workoutProgress` | Live | §5 |
+| `gymEquipment` | Live | §2 |
+| `morningProgrammeWeek` | Live | Self-contained in `morning-session.js`; confirmed no overlap with `gymProgrammeWeek` |
+| `proposalBias` | **Dormant — write-only** | §7 Mindful Prompts & Empathy Transfer |
+| `cycleLength` | Dead — always default | §2 (existing v1.9 entry) |
+| `workoutHistory` | **Dormant — write-only** | §5 |
+| `consentAt` | Dormant — write-only | §1 Onboarding |
+| `consentGiven` | Dormant — write-only | §1 |
+| `todayEnergy` | **Dead — no writer** | §6 |
+| `userTier` | **Dead — no writer, live bug in one reader** | §2, see top-of-document note |
+| `usingGeneratedSession` | Dormant — write-only | §5 |
 
-**Recommendation:** a short, dedicated follow-up pass through this table (same method as the `todayIntensity`/`exerciseFeedback` corrections above — check every reader and every writer per field, don't infer from reference count alone) before the Supabase schema design session, since several of these look likely to be genuinely live and simply missing a default.
+**Net finding:** of 18 fields, 11 are genuinely live, 5 are dormant (written, never read), 2 are dead (`cycleLength` already known; `todayEnergy` newly confirmed), and one of the dead ones (`userTier`) has a live, user-facing consequence via its sole reader. No fields turned out to be pure naming duplicates once checked — every flagged "possible overlap" resolved to genuinely distinct mechanisms.
 
 ---
 
-*Build New Habits · Alongside: Move · Data Schema Reference · 30 Jul 2026 v1.9*
+*Build New Habits · Alongside: Move · Data Schema Reference · 03 Aug 2026 v1.10*
