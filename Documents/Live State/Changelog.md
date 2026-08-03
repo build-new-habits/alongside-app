@@ -213,4 +213,26 @@ This changelog was not maintained during this window while build velocity was hi
 
 ---
 
+## 03 Aug 2026
+
+### BUILD-4 Appendix A follow-up — 18-field triage
+
+- All 18 fields flagged in v1.9's Appendix A checked individually for both reader and writer, per the method BUILD-4 itself established. 11 confirmed live, 5 dormant (write-only, no reader: `proposalBias`, `workoutHistory`, `consentAt`, `consentGiven`, `usingGeneratedSession`), 2 dead (`todayEnergy`, `userTier`). None of the six flagged "possible overlaps" turned out to be real naming duplicates once checked.
+- `Documents/Live State/Schema.md` v1.9 → v1.10. Appendix A closed; all fields folded into their proper sections.
+- Two live bugs found, logged not fixed at the time (see below for the `userTier` fix, same day, follow-up): `session-builder-ui.js`'s `isPremium()` read a field with no writer; `proposalBias`, written by `coach-reflection.js`, has no reader anywhere.
+- No code files touched in this session — documentation only, per blueprint scope.
+
+### `session-builder-ui.js` — `userTier` bug fix
+
+- Same-day follow-up once the bug above was confirmed. `isPremium()` was reading `store.get("userTier")`, a field with no writer anywhere in the app — the check always evaluated `false`, so Personal-tier session-builder options rendered as locked for every user, including paying Personal/Athlete subscribers.
+- Fixed: now reads `store.get("tier")`, the genuine live field (matching `settings.js`/`progress.js`/`coach-proposal.js`).
+- `session-builder-ui.js` v1 → v2. `sw.js` v187 → v188 — cache bump, deployed last.
+- **On-device confirmation not yet done** — code review + `node --check` only. Worth a quick real-device check (switch to Personal tier via Settings' dev tier-switcher, confirm session-builder options unlock) next time a device is available.
+
+### Supabase schema & architecture design (documentation only, no code)
+
+- `Documents/Admin/alongside_supabase_schema_design_03aug2026_v1.md` — new. Design-only per blueprint: EU region (Frankfurt recommended), hybrid relational+JSONB table design, RLS policy shapes, magic-link auth confirmed, migration strategy, DPA/TIA checklist. No Supabase project created, no code touched.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
