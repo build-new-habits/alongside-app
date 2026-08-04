@@ -1,6 +1,25 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v205
+ * Phase D-2/D-3/D-4, Conditions Update — the real screen, live. New
+ * files: js/views/conditions-update.js, css/layouts/conditions-
+ * update.css (registered in main.css v11→v12), both added to
+ * SHELL_URLS. Collapsed condition cards with an unambiguous chevron
+ * affordance; severity slider reusing check-in's exact pattern;
+ * reflection field; felt-sense goal picker (3 options + skip); once a
+ * goal's set, a severity trend from checkinHistory (already existed,
+ * no new tracking); one shared "Your programme" section ("Build your
+ * own" only — coach-built/coach-recommended need real generation logic
+ * that doesn't exist yet, deliberately not shown as "coming soon"
+ * tiles); fold-in dial once a programme exists. router.js v11→v12: new
+ * 'conditions-update' route. today.js v7→v8: door now goes straight
+ * there, interim openSheet bridge removed. settings.js v11→v12: "Edit
+ * conditions" now goes to the same real screen instead of the old
+ * limited onboarding sheet. prescribed.js v1.0→v1.1: coach voice now
+ * origin-aware, speaks correctly when reached via "Build your own"
+ * rather than a genuine prescription.
+ *
  * 04 Aug 2026 v204
  * Phase D-1 (schema), Conditions Update. store.js v14→v15: new fields
  * conditionGoals (felt-sense per-condition goal, Graeme's own framing —
@@ -512,7 +531,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v204";
+const CACHE_NAME = "alongside-v205";
 
 const SHELL_URLS = [
 
@@ -524,6 +543,7 @@ const SHELL_URLS = [
   "/alongside-app/css/main.css",
   "/alongside-app/css/layouts/onboarding-additions.css",
   "/alongside-app/css/layouts/today.css",
+  "/alongside-app/css/layouts/conditions-update.css",
   "/alongside-app/css/layouts/progress.css",
   "/alongside-app/css/components/session-guard.css",
   "/alongside-app/css/components/weekly-plan.css",
@@ -554,6 +574,7 @@ const SHELL_URLS = [
 
   // Views — main
   "/alongside-app/js/views/today.js",
+  "/alongside-app/js/views/conditions-update.js",
   "/alongside-app/js/views/checkin.js",
   "/alongside-app/js/views/checkin-mini.js",
   "/alongside-app/js/views/intention.js",

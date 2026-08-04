@@ -1,4 +1,8 @@
 /* main.css
+ * 04 Aug 2026 v12
+ *
+ * v12 — Phase D-2, Home Nav & Conditions Redesign. Added
+ *   layouts/conditions-update.css for the new conditions-update.js view.
  * 19 Jul 2026 v11
  *
  * v11 — Tier-gating build (S4-TG, 9 May scope, finally implemented
@@ -33,6 +37,7 @@
 @import 'layouts/goal-setup.css';
 @import 'layouts/progress.css';
 @import 'layouts/today.css';
+@import 'layouts/conditions-update.css';
 /* Components */
 @import 'components/buttons.css';
 @import 'components/cards.css';

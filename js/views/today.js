@@ -1,5 +1,13 @@
 /**
  * today.js
+ * 04 Aug 2026 v8
+ *
+ * v8 — Conditions Update door now routes to the real screen
+ *   ('conditions-update', Phase D-2/D-3) instead of the interim
+ *   openSheet('onboarding/conditions') bridge from the previous
+ *   version — that bridge is fully superseded now, removed along with
+ *   the now-unused openSheet import.
+ *
  * 04 Aug 2026 v7
  *
  * v7 — Real bug found while scoping Phase D, fixed immediately rather
@@ -106,7 +114,6 @@
 
 import { store }               from '../store.js';
 import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
-import { openSheet }           from './onboarding/sheet-manager.js';
 
 export function TodayView(router) {
 
@@ -126,7 +133,7 @@ export function TodayView(router) {
     { id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder', requiresCheckin: true },
     { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'library', requiresCheckin: false },
     { id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing', requiresCheckin: false },
-    { id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'onboarding/conditions', requiresCheckin: false },
+    { id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'conditions-update', requiresCheckin: false },
     { id: 'progress', label: 'Progress', icon: '\uD83D\uDCCA', route: 'progress', requiresCheckin: false },
     { id: 'unsure', label: 'Unsure? Coach decides', icon: '\uD83C\uDFAF', route: 'coach-proposal', requiresCheckin: true },
   ];
@@ -278,21 +285,11 @@ export function TodayView(router) {
         const route = btn.dataset.route;
         const requiresCheckin = btn.dataset.requiresCheckin === 'true';
 
-        // Fix, 04 Aug 2026: found while scoping Phase D. This exact bug
-        // already happened once — settings.js v9's changelog documents
-        // it — routing directly to 'onboarding/conditions' mounts a
-        // real onboarding page whose Back/Continue buttons are
-        // hardcoded to onboarding-sequence destinations (Back literally
-        // calls router.navigate('onboarding/goals')), so the bottom nav
-        // vanishes and Back leads somewhere nonsensical. settings.js's
-        // fix was openSheet() from sheet-manager.js, which intercepts
-        // that hardcoded navigate() and just closes the sheet instead.
-        // Same fix applied here. This is the Conditions Update door's
-        // temporary bridge (Phase D replaces it with a real screen).
-        if (route === 'onboarding/conditions') {
-          openSheet('onboarding/conditions', () => mount(container));
-          return;
-        }
+        // Note, 04 Aug 2026: the interim openSheet('onboarding/conditions')
+        // bridge that lived here (Phase C follow-up) is superseded now
+        // that the door routes straight to the real Conditions Update
+        // screen (Phase D-2), which has its own "Add a condition" action
+        // using openSheet() internally instead.
 
         if (requiresCheckin) {
           // Route through check-in first (full the first time today,
