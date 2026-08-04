@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v203
+ * today.js v6→v7 — real bug found while scoping Phase D, fixed
+ * immediately: Conditions Update door was navigating directly to
+ * 'onboarding/conditions', the exact bottom-nav/Back-button bug
+ * settings.js v9 already found and fixed once. Same fix reused —
+ * openSheet() instead of a direct navigate(). Interim, Phase D
+ * replaces the bridge itself.
+ *
  * 04 Aug 2026 v202
  * Graeme's on-device pass on Phase C, same day — 4 real fixes.
  * (1) Real regression, found via screenshot: coach-proposal.js's v18
@@ -494,7 +502,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v202";
+const CACHE_NAME = "alongside-v203";
 
 const SHELL_URLS = [
 

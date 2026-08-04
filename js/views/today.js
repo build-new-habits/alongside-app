@@ -1,5 +1,19 @@
 /**
  * today.js
+ * 04 Aug 2026 v7
+ *
+ * v7 — Real bug found while scoping Phase D, fixed immediately rather
+ *   than left broken until Phase D lands. Conditions Update door was
+ *   calling router.navigate('onboarding/conditions') directly — the
+ *   exact bug settings.js v9 already found and fixed once (its own
+ *   changelog documents it): that view is built for onboarding, with
+ *   Back/Continue hardcoded to onboarding-sequence destinations, so a
+ *   direct navigate() there loses the bottom nav and Back leads
+ *   somewhere nonsensical. Same fix as settings.js: openSheet() from
+ *   sheet-manager.js instead, which intercepts the hardcoded
+ *   navigate() and just closes the sheet. Interim only — Phase D
+ *   replaces this bridge with a real Conditions Update screen.
+ *
  * 04 Aug 2026 v6
  *
  * v6 — Graeme's on-device pass, same day as Phase C. Session-generating
@@ -92,6 +106,7 @@
 
 import { store }               from '../store.js';
 import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
+import { openSheet }           from './onboarding/sheet-manager.js';
 
 export function TodayView(router) {
 
@@ -262,6 +277,22 @@ export function TodayView(router) {
       btn.addEventListener('click', () => {
         const route = btn.dataset.route;
         const requiresCheckin = btn.dataset.requiresCheckin === 'true';
+
+        // Fix, 04 Aug 2026: found while scoping Phase D. This exact bug
+        // already happened once — settings.js v9's changelog documents
+        // it — routing directly to 'onboarding/conditions' mounts a
+        // real onboarding page whose Back/Continue buttons are
+        // hardcoded to onboarding-sequence destinations (Back literally
+        // calls router.navigate('onboarding/goals')), so the bottom nav
+        // vanishes and Back leads somewhere nonsensical. settings.js's
+        // fix was openSheet() from sheet-manager.js, which intercepts
+        // that hardcoded navigate() and just closes the sheet instead.
+        // Same fix applied here. This is the Conditions Update door's
+        // temporary bridge (Phase D replaces it with a real screen).
+        if (route === 'onboarding/conditions') {
+          openSheet('onboarding/conditions', () => mount(container));
+          return;
+        }
 
         if (requiresCheckin) {
           // Route through check-in first (full the first time today,
