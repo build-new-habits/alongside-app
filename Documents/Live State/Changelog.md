@@ -274,4 +274,16 @@ Flagged 31 Jul as the highest-priority gap ahead of Supabase auth. Full architec
 
 ---
 
+### Home Nav & Conditions Redesign — Phase A (schema + single-source-of-truth logic fix)
+
+Blueprint: `alongside_blueprint_home-navigation-conditions_04aug2026_v1.md`. First of 4 touch-once phases. No view files touched — pure schema/logic foundation for Phases B-D.
+
+- `js/store.js` v11 → v12 — two new fields: `conditionReflections` (array, `{ conditionId, text, loggedAt }`, deliberately separate namespace from `journalEntries`, not subject to the Journal Privacy Rule) and `conditionFoldInLevel` (`'partial'|'mostly'|'all'|null`, the condition-programme fold-in dial setting). Added to both `getDefaults()` and `mergeWithDefaults()`.
+- `js/data/conditions.js` v1.2 → v1.3 — subacute severity threshold raised from `pain >= 4` to `pain >= 6` in both `getActiveConditionIds()` and `getZoneStatus()`, matching `checkin.js`'s existing Moderate boundary (`level > 5`). This is the canonical function `workoutGenerator.js` depends on for every session it generates, not just Core Sessions — widened from the original single-file (`core-session.js`) assumption in the spec after ground-truthing found the same threshold logic duplicated there, not unique to it. Confirmed with Graeme before widening scope. Acute/severe threshold (`pain >= 7`) left unchanged; a minor boundary edge case at exactly `pain == 7` (checkin.js still calls it "Moderate", this file now treats it as acute) is flagged, not fixed — out of this session's decided scope.
+- `Documents/Live State/Schema.md` v1.10 → v1.11 — new fields documented; `userTier` bug (open as of v1.10) confirmed fixed 03 Aug, marked resolved.
+- `sw.js` v191 → v192, deployed last.
+- **On-device confirmation needed before Phase B** — the threshold change affects condition-aware filtering app-wide, for every user with logged conditions.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

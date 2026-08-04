@@ -1,6 +1,24 @@
 /**
  * conditions.js — Condition definitions for onboarding and check-in
  *
+ * 04 Aug 2026 v1.3
+ *   Home Nav & Conditions Redesign, Phase A (blueprint
+ *   alongside_blueprint_home-navigation-conditions_04aug2026_v1.md).
+ *   Single-source-of-truth severity threshold fix: subacute band raised
+ *   from pain >= 4 to pain >= 6 in both getActiveConditionIds() and
+ *   getZoneStatus(), to match checkin.js's existing Moderate boundary
+ *   (level > 5). This is the canonical function workoutGenerator.js
+ *   depends on for every session, not just Core Sessions — fixing only
+ *   core-session.js's now-removed private copy of this logic (Phase B)
+ *   would have created a new mismatch instead of closing the real one.
+ *   Confirmed with Graeme before widening scope beyond the original
+ *   single-file assumption. Acute/severe threshold (pain >= 7) left
+ *   unchanged — not part of this decision. Note: this leaves a minor
+ *   boundary edge case at exactly pain == 7, where checkin.js still
+ *   labels it "Moderate" (level <= 7) but this file now treats it as
+ *   acute (pain >= 7) — flagged, not fixed, out of this session's
+ *   decided scope.
+ *
  * v1.2 — Full conditions list from spec (Doc 06b)
  *   - 16 new conditions added (hamstring, glutes, calves, chest-pecs,
  *     biceps-triceps, abdominals, it-band, achilles, shin-splints,
@@ -86,8 +104,10 @@ export const CONDITIONS = [
 // Conditions that have phase-aware exercise contraindications
 // get expanded based on the user's reported pain score today.
 //
-// pain 1–3  → safe-ish. Only base ID active.
-// pain 4–6  → subacute. Base + subacute variant active.
+// pain 1–5  → safe-ish. Only base ID active.
+// pain 6    → subacute. Base + subacute variant active. (raised from the
+//             old 4–6 band to match checkin.js's Moderate boundary,
+//             level > 5 — see conditions.js v1.3 changelog, 04 Aug 2026)
 // pain 7–10 → acute.    Base + acute variant active.
 //
 // Exercises list these variants in their contraindications[] array.
@@ -131,8 +151,9 @@ const PHASE_AWARE_CONDITIONS = new Set([
  *
  * Returns an object: { 'lower-limb': 'severe'|'moderate'|'mild'|null, ... }
  * Zone is 'severe' if any condition in it has pain >= 7
- * Zone is 'moderate' if any condition has pain 4-6
- * Zone is 'mild' if any condition has pain 1-3
+ * Zone is 'moderate' if any condition has pain 6 (matches checkin.js's
+ *   Moderate boundary, level > 5 — see 04 Aug 2026 v1.3 changelog)
+ * Zone is 'mild' if any condition has pain 1-5
  * Zone is null if no conditions in it
  *
  * Special: if BOTH lower-limb AND spine are severe → returns combinedSevere: true
@@ -151,7 +172,7 @@ export function getZoneStatus(conditionIds = [], painScores = {}) {
     const pain = painScores[id] ?? 0;
     if (pain === 0) continue;
 
-    const severity = pain >= 7 ? 'severe' : pain >= 4 ? 'moderate' : 'mild';
+    const severity = pain >= 7 ? 'severe' : pain >= 6 ? 'moderate' : 'mild';
     const order = { severe: 3, moderate: 2, mild: 1 };
 
     if (!zoneMax[zone] || order[severity] > order[zoneMax[zone]]) {
@@ -176,7 +197,7 @@ export function getActiveConditionIds(conditionIds = [], painScores = {}) {
 
     if (pain >= 7) {
       active.add(`${id}-acute`);
-    } else if (pain >= 4) {
+    } else if (pain >= 6) {
       active.add(`${id}-subacute`);
     }
     // pain 1–3: only the base ID stays — no phase variant added
