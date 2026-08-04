@@ -466,4 +466,14 @@ UX designed in conversation before any code (per the note above), then built str
 
 ---
 
+### Remove-condition fix — same day, found by Graeme after the on-device pass
+
+Real gap: there was no way to remove a condition from `conditions-update.js`. The underlying toggle-off mechanism already existed (the "Add a condition" sheet lets you untick an already-selected condition), but nothing on this screen surfaced that as a "delete" action anyone would find.
+
+- `js/views/conditions-update.js` v1 → v2 — explicit "Remove [condition]" action per expanded card, with a confirm dialog reusing `settings.js`'s existing `_confirmDestructive()` pattern (`.settings-dialog` CSS, already loaded app-wide) instead of a jarring native `confirm()`. Same minimal-cleanup approach as the existing toggle: removes the id from `conditions` only — severity history, reflections, and goal data stay in place, harmlessly orphaned, consistent with how the existing toggle already behaves.
+- `css/layouts/conditions-update.css` v1 → v2.
+- `sw.js` v205 → v206, deployed last.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
