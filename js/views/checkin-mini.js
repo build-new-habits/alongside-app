@@ -1,6 +1,19 @@
 /**
  * checkin-mini.js - Abbreviated Return-Visit Check-In
  *
+ * 04 Aug 2026 v3
+ *
+ * v3 — Severe-pain score corrected 8→9. Found while investigating a
+ *   Graeme report against the Home Nav Phase A threshold fix: this file
+ *   has always had its own private, duplicate PAIN_LEVELS definition
+ *   (same class of problem as core-session.js's private exercise pool,
+ *   just smaller) — its "Severe" chip wrote score:8 to the shared
+ *   conditionPainScores field, while checkin.js's "Severe" button
+ *   writes 9. Both cleared every existing threshold (>=6 subacute,
+ *   >=7 acute) so there was no live behavioural bug from this — purely
+ *   a single-source-of-truth inconsistency, now closed. "Moderate"
+ *   (score:6) already matched checkin.js exactly; not touched.
+ *
  * 10 Jul 2026 v2
  *
  * v2 — Styling fix. This file's markup used .checkin-slider,
@@ -74,7 +87,7 @@ const PAIN_LEVELS = [
   { id: "none",     label: "None",     score: 0, min: 0, max: 2 },
   { id: "mild",     label: "Mild",     score: 4, min: 3, max: 5 },
   { id: "moderate", label: "Moderate", score: 6, min: 6, max: 7 },
-  { id: "severe",   label: "Severe",   score: 8, min: 8, max: 10 }
+  { id: "severe",   label: "Severe",   score: 9, min: 8, max: 10 }
 ];
 
 const LOCATION_OPTIONS = [

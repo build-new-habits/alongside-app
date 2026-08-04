@@ -286,4 +286,14 @@ Blueprint: `alongside_blueprint_home-navigation-conditions_04aug2026_v1.md`. Fir
 
 ---
 
+### checkin-mini.js severity-score alignment — same day, follow-up on request
+
+While checking a report against the Phase A threshold fix, found `checkin-mini.js` has always had its own private, duplicate `PAIN_LEVELS` definition — same class of problem as `core-session.js`'s private exercise pool, just smaller. Its "Severe" chip wrote `score: 8` to `conditionPainScores`; `checkin.js`'s "Severe" button writes `9`. No live behavioural bug — both values already cleared every threshold that exists (`>= 6` subacute, `>= 7` acute) — pure single-source-of-truth cleanup, not a functional fix.
+
+- `js/views/checkin-mini.js` v2 → v3 — `PAIN_LEVELS`'s `severe` entry: `score: 8` → `score: 9`. `"Moderate"` (`score: 6`) already matched `checkin.js` exactly, not touched.
+- `sw.js` v192 → v193, deployed last.
+- Out of Phase A's original file list — logged explicitly rather than silently bundled in.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
