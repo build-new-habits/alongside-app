@@ -1,6 +1,9 @@
 /*
  * css/layouts/conditions-update.css
- * 04 Aug 2026 v1
+ * 04 Aug 2026 v2
+ *
+ * v2 — .cu-remove-condition added for the new remove-condition action
+ *   (conditions-update.js v2).
  *
  * Styles for conditions-update.js — Phase D-2, Home Nav & Conditions
  * Redesign. New file, first version.
@@ -209,6 +212,18 @@
   border-radius: var(--radius-md);
   padding: var(--space-3);
   margin: 0;
+}
+
+.cu-remove-condition {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #EF4444;
+  font-size: var(--text-xs);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: var(--space-2) 0 0;
+  margin-top: var(--space-1);
 }
 
 .cu-trend--empty {
