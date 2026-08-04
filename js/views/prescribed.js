@@ -1,6 +1,16 @@
 /**
  * prescribed.js - Prescribed Exercises View
  *
+ * 04 Aug 2026 v1.2
+ *
+ * v1.2 — New entries can now carry a conditionId, read from the new
+ *   single-use prescribedExercisesActiveCondition context flag (set
+ *   by conditions-update.js right before navigating here, cleared the
+ *   instant it's read so it can never tag a later, unrelated entry).
+ *   Each exercise card now shows a small "For: [condition]" tag when
+ *   one is set. Part of the same-day condition-programme build —
+ *   see conditionProgrammes.js.
+ *
  * 04 Aug 2026 v1.1
  *
  * v1.1 — Origin-aware coach voice (Phase D-2, decision D-2). Reached
@@ -32,6 +42,7 @@
  */
 
 import { store } from "../store.js";
+import { getConditionName } from "../data/conditions.js";
 
 export const centered = false;
 
@@ -255,6 +266,10 @@ function renderExerciseCard(ex, index, isDone) {
 
       ${ex.prescribedBy ? `
         <p class="prescribed-by text-sm text-muted">Prescribed by: ${ex.prescribedBy}</p>
+      ` : ""}
+
+      ${ex.conditionId ? `
+        <p class="prescribed-condition-tag text-sm text-muted">For: ${getConditionName(ex.conditionId)}</p>
       ` : ""}
 
       <div class="prescribed-exercise-history text-sm text-muted"
@@ -485,6 +500,15 @@ function saveExercise() {
   const notes       = notesEl?.value?.trim()        || null;
   const prescribedBy = prescribedByEl?.value?.trim() || null;
 
+  // Fix, 04 Aug 2026: single-use context flag, not sticky. Reads the
+  // condition a Conditions Update card set right before navigating
+  // here (js/views/conditions-update.js's "Build my own"), tags this
+  // one entry with it, then clears it immediately — so a later,
+  // unrelated visit to this screen from a different path never gets
+  // silently tagged with a stale condition from an earlier session.
+  const activeCondition = store.get("prescribedExercisesActiveCondition");
+  if (activeCondition) store.set("prescribedExercisesActiveCondition", null);
+
   const exercise = {
     id:             "px-" + Date.now(),
     exerciseId:     null,
@@ -495,10 +519,11 @@ function saveExercise() {
     completedToday: false,
     completedAt:    null,
     prescribedAt:   new Date().toISOString(),
-    ...(sets         !== null ? { sets }         : {}),
-    ...(reps         !== null ? { reps }         : {}),
-    ...(notes        !== null ? { notes }        : {}),
-    ...(prescribedBy !== null ? { prescribedBy } : {})
+    ...(sets            !== null ? { sets }                    : {}),
+    ...(reps            !== null ? { reps }                    : {}),
+    ...(notes           !== null ? { notes }                   : {}),
+    ...(prescribedBy    !== null ? { prescribedBy }             : {}),
+    ...(activeCondition           ? { conditionId: activeCondition } : {})
   };
 
   const existing = store.get("prescribedExercises") || [];

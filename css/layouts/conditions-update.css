@@ -1,6 +1,13 @@
 /*
  * css/layouts/conditions-update.css
- * 04 Aug 2026 v2
+ * 04 Aug 2026 v3
+ *
+ * v3 — Programme section restructured per-condition (conditions-
+ *   update.js v3): .cu-programme/.cu-programme__heading removed
+ *   (that top-level shared section is gone), replaced with
+ *   .cu-programme-inline living inside each card. New: .cu-recommend/
+ *   .cu-recommend-list/.cu-recommend-item/.cu-recommend-actions for
+ *   the "coach recommends, you select" checkbox UI.
  *
  * v2 — .cu-remove-condition added for the new remove-condition action
  *   (conditions-update.js v2).
@@ -243,21 +250,20 @@
   border-color: var(--color-primary);
 }
 
-/* ── Your programme ───────────────────────────────────────────── */
+/* ── Your programme (per-condition, 04 Aug 2026 v3) ──────────────── */
 
-.cu-programme {
-  padding-top: var(--space-4);
+.cu-programme-inline {
+  padding-top: var(--space-3);
   border-top: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
-.cu-programme__heading {
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--color-text);
-  margin: 0;
+.cu-programme-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .cu-programme__intro {
@@ -265,6 +271,57 @@
   color: var(--color-text-secondary);
   line-height: var(--leading-relaxed);
   margin: 0;
+}
+
+/* ── Coach recommends, you select ─────────────────────────────── */
+
+.cu-recommend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cu-recommend-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 280px;
+  overflow-y: auto;
+  padding: var(--space-2);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.cu-recommend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  min-height: 44px;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.cu-recommend-item:hover {
+  background: var(--color-bg-elevated);
+}
+
+.cu-recommend-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.cu-recommend-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.cu-recommend-actions .btn {
+  flex: 1;
 }
 
 .cu-foldin {
