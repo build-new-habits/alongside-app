@@ -353,4 +353,18 @@ Real point, not just a wording request: the coach needs to narrate each conditio
 
 ---
 
+### Severe pain: active Rest/Adapt choice — same day, Graeme's proposal
+
+Real feature, not a copy tweak: Graeme proposed the coach explicitly ask, when pain is Severe, whether to rest or adapt — framed around genuine informed-choice/liability reasoning, not just UX polish. Built as an actual gate, not a suggestion the app quietly overrides either way.
+
+- `js/store.js` v12 → v13 — new field `severePainChoices` (schema-first) and `recordSeverePainChoice()`. One record per date + exact severe-condition-id set: `{ date, conditionIds, choice: 'rest'|'adapt', chosenAt }`. Deliberately a log, not a single "last preference" — a changed severe set always re-prompts, and the history of what was actually chosen (not just offered) is preserved. This is what makes the liability framing real: an audit trail, not just a screen that flashed past once.
+- `js/views/coach-proposal.js` v16 → v17 — `mount()` now checks for unresolved Severe pain before building anything. If present and no matching choice recorded yet today, `render()` shows only the coach's question — *"I noted that X is Severe today. I can adapt around it, or we can call today a rest day — what would you like to do?"* — plus two buttons, no doors, no options. "Rest today" records the choice and shows a gentle Wellbeing-or-done screen, no session generated. "Adapt and continue" records the choice and proceeds to the normal proposal, still narrating the Severe condition via the existing `_buildConditionNarrative()` as confirmation. Reused existing `.cp-missed-offer` CSS classes for the choice buttons — no new CSS needed.
+- Cleanup, same pass: `_checkSeverePain()`/`severePainOverride` removed entirely from `buildProposal()`. This was flagged 04 Aug as dead placeholder code (computed, never used by rendering) for a "Severe Zone Override" feature that turned out not to exist live anywhere — now genuinely superseded by real handling, not just theoretically unused.
+- **Explicitly not decided by Claude, flagged in the code comments:** whether this interaction pattern actually reduces legal liability is a real legal question, not a UX one. Built because the design is sound on its own merits (informed choice, respects autonomy, matches "behaviour is communication") — worth Graeme raising with Alex's solicitor contact alongside the other BIZ-5/6 items already queued, not assumed correct just because it feels safer.
+- `Documents/Live State/Schema.md` v1.12 → v1.13.
+- `sw.js` v198 → v199, deployed last.
+- **Not yet on-device confirmed.** Needs a full pass: log a condition as Severe, confirm the choice screen appears and blocks the normal doors; choose Rest, confirm the gentle screen and no session; return same day, confirm no re-prompt; choose Adapt on a fresh severe set, confirm the normal proposal appears with the Severe line in the narrative.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

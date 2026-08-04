@@ -1,6 +1,21 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v199
+ * Severe pain: active Rest/Adapt choice (coach-proposal.js v17,
+ * Graeme's proposal). When Severe pain is present and no choice is
+ * recorded yet today for that exact condition set, the whole proposal
+ * screen is replaced with the coach's question and two buttons — Rest
+ * today / Adapt and continue — nothing else renders until answered.
+ * New store.js v13: severePainChoices field + recordSeverePainChoice()
+ * — a genuine audit-trail record (date, exact condition set, choice,
+ * timestamp), not just a UI state, since that's the actual point of
+ * the design. "Rest" routes to a gentle Wellbeing-or-done screen, no
+ * session generated. "Adapt" proceeds to the normal proposal as
+ * before. Cleanup: _checkSeverePain()/severePainOverride removed —
+ * dead placeholder code from a feature that never got built, now
+ * genuinely superseded rather than theoretically unused.
+ *
  * 04 Aug 2026 v198
  * coach-proposal.js v15→v16 — mixed-severity condition narrative. If
  * conditions span multiple bands the same day (e.g. one Moderate, one
@@ -412,7 +427,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v198";
+const CACHE_NAME = "alongside-v199";
 
 const SHELL_URLS = [
 
