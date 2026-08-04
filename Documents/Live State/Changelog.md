@@ -343,4 +343,14 @@ Confirmed the screenshot working ("I've noted Glutes / Buttocks as Mild today...
 
 ---
 
+### Mixed-severity condition narrative — same day, Graeme's follow-up
+
+Real point, not just a wording request: the coach needs to narrate each condition by its own state — Moderate and Mild together on the same day, both said correctly — not one tier winning and the rest going silent. Checked first rather than assumed: exercise/recommendation adaptation already does this correctly, per-condition, via `conditions.js`'s `getActiveConditionIds()` — untouched, wasn't broken. The gap was narrative-only.
+
+- `js/views/coach-proposal.js` v15 → v16 — replaced the old moderate-or-mild priority chain (`_checkMildPain`/`_checkModeratePain`/`_buildMildMessage`/`_buildConstraintMessage`, all removed) with one `_buildConditionNarrative()` that groups every logged condition by band (severe/moderate/mild) and builds a single combined, severity-ordered message. Example with two conditions in different bands: *"Your check-in flagged Lower Back (6/10) today. I've worked around that. I've noted Glutes / Buttocks as Mild — I haven't changed anything there, but keep an eye on it: if it starts feeling worse, please adapt what you're doing, or stop."*
+- **Real finding, surfaced not absorbed:** Severe pain has no rest-day override anywhere live. `severePainOverride` is computed in `buildProposal()` but never consumed by anything; an old changelog reference to a "Severe Zone Override"/`generateSevereRestOptions()` doesn't exist in current `workoutGenerator.js` — removed or superseded at some point, unclear when. Severe conditions now get their own narrative line for the first time (*"...as Severe today — I've kept things well clear of that area."*), deliberately worded to match what the app actually does (acute-tier exercise exclusion) rather than implying a full rest day that isn't real. Whether Severe should get a genuine rest-day override is flagged to Graeme as its own decision, not built here.
+- `sw.js` v197 → v198, deployed last.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

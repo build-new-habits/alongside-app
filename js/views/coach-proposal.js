@@ -1,5 +1,29 @@
 /**
  * coach-proposal.js
+ * 04 Aug 2026 v16
+ *
+ * v16 — Mixed-severity narrative, same day as v15's same-tier fix.
+ *   Graeme's real point: the coach needs to narrate each condition by
+ *   its OWN state, not an accumulated/single-tier state — if Lower Back
+ *   is Moderate and Glutes is Mild on the same day, both need saying,
+ *   correctly. Verified first (didn't assume): exercise/recommendation
+ *   adaptation already does this correctly per-condition, via
+ *   conditions.js's getActiveConditionIds() — not touched, wasn't
+ *   broken. The gap was narrative-only. Replaced the old
+ *   moderate-or-mild priority chain (_checkMildPain/_checkModeratePain/
+ *   _buildMildMessage/_buildConstraintMessage, all removed) with one
+ *   _buildConditionNarrative() that groups conditions by band
+ *   (severe/moderate/mild) and builds one combined, severity-ordered
+ *   message covering all of them. Real finding surfaced while building
+ *   this, not silently absorbed: Severe pain has no rest-day override
+ *   anywhere live (severePainOverride computed, never used; an old
+ *   changelog's "Severe Zone Override" doesn't exist in current
+ *   workoutGenerator.js). Severe now gets its own narrative line for
+ *   the first time — "I've kept things well clear of that area" —
+ *   deliberately NOT "full rest day" wording, since that isn't what
+ *   actually happens. Whether it should is flagged to Graeme as a
+ *   separate, real decision — not built here.
+ *
  * 04 Aug 2026 v15
  *
  * v15 — Multi-condition messaging, prompted by Graeme asking directly:
@@ -779,8 +803,7 @@ export function CoachProposalView(router) {
 
     // Pain override check
     const severePain   = _checkSeverePain(conditions, painScores);
-    const moderatePain = _checkModeratePain(conditions, painScores);
-    const mildPain      = _checkMildPain(conditions, painScores);
+    const conditionNarrative = _buildConditionNarrative(conditions, painScores);
 
     // Re-entry intensity adjustment
     let effectiveIntensity = phaseBias.intensityBias;
@@ -803,14 +826,11 @@ export function CoachProposalView(router) {
     // Build reflection (last 48h activity)
     const reflection = _buildReflection();
 
-    // Build constraint message — priority moderate > mild, matching
-    // severity. Severe pain has its own handling upstream (workout
-    // generation), not this message slot — unchanged, not touched here.
-    const constraint = moderatePain.hasModerate
-      ? _buildConstraintMessage(moderatePain, conditions, painScores)
-      : mildPain.hasMild
-        ? _buildMildMessage(mildPain)
-        : null;
+    // Build constraint message — one combined, severity-ordered
+    // narrative covering every logged condition by its own band
+    // (severe/moderate/mild), not just the worst tier with others
+    // silently dropped. See _buildConditionNarrative() below.
+    const constraint = conditionNarrative;
 
     // Build intro line
     const intro = _buildIntro(primaryGoal, feelingWord, burnout, reEntryCtx);
@@ -963,20 +983,6 @@ export function CoachProposalView(router) {
     return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
   }
 
-  function _checkMildPain(conditions, painScores) {
-    const mildConditions = conditions.filter(
-      id => (painScores[id] || 0) >= 3 && (painScores[id] || 0) < 6
-    );
-    return { hasMild: mildConditions.length > 0, conditions: mildConditions };
-  }
-
-  function _buildMildMessage(mildPain) {
-    const names  = mildPain.conditions.map(getConditionName);
-    const plural = names.length > 1;
-    const list   = _joinNames(names);
-    return `I've noted ${list} as Mild today. I haven\'t changed anything in the programme, but keep an eye on ${plural ? 'them' : 'it'} \u2014 if ${plural ? 'they start' : 'it starts'} feeling worse, please adapt what you\'re doing, or stop.`;
-  }
-
   function _checkSeverePain(conditions, painScores) {
     const severeConditions = conditions.filter(id => (painScores[id] || 0) >= 7);
     if (severeConditions.length === 0) return { hasSevere: false };
@@ -991,27 +997,58 @@ export function CoachProposalView(router) {
     };
   }
 
-  function _checkModeratePain(conditions, painScores) {
-    const moderateConditions = conditions.filter(
-      id => (painScores[id] || 0) >= 6 && (painScores[id] || 0) < 7
-    );
-    return { hasModerate: moderateConditions.length > 0, conditions: moderateConditions };
-  }
+  /**
+   * Combined, severity-ordered narrative covering every logged
+   * condition by its own individual band — severe, moderate, and mild
+   * can all appear in the same message, each with correct wording and
+   * pluralisation, instead of one tier winning and the rest going
+   * unmentioned. Added 04 Aug 2026 — replaces the earlier separate
+   * _checkMildPain/_checkModeratePain/_buildMildMessage/
+   * _buildConstraintMessage functions, which only ever showed one tier.
+   *
+   * Severe wording is deliberately NOT "full rest day" language —
+   * checked, and no such override actually exists live anywhere in the
+   * app (severePainOverride is computed but unused; an old changelog
+   * reference to a "Severe Zone Override" no longer exists in
+   * workoutGenerator.js). Severe conditions get the same "worked
+   * around" pattern as Moderate, just named separately — accurate to
+   * what the exercise filtering actually does (acute-tier
+   * contraindications), not an overclaim. Whether Severe should get a
+   * genuine rest-day override is a real, separate product decision,
+   * flagged to Graeme, not built here.
+   */
+  function _buildConditionNarrative(conditions, painScores) {
+    const severeIds   = conditions.filter(id => (painScores[id] || 0) >= 7);
+    const moderateIds = conditions.filter(id => {
+      const p = painScores[id] || 0;
+      return p >= 6 && p < 7;
+    });
+    const mildIds = conditions.filter(id => {
+      const p = painScores[id] || 0;
+      return p >= 3 && p < 6;
+    });
 
-  function _buildConstraintMessage(moderatePain, conditions, painScores) {
-    const ids = moderatePain.conditions;
-    if (ids.length === 1) {
-      const id        = ids[0];
-      const painLevel = painScores[id] || 6;
-      const name      = getConditionName(id);
-      return `Your check-in flagged ${name} today (${painLevel}/10). I\'ve worked around that.`;
+    const sentences = [];
+
+    if (severeIds.length > 0) {
+      const parts  = severeIds.map(id => `${getConditionName(id)} (${painScores[id]}/10)`);
+      const plural = severeIds.length > 1;
+      sentences.push(`Your check-in flagged ${_joinNames(parts)} as Severe today \u2014 I\'ve kept things well clear of ${plural ? 'those areas' : 'that area'}.`);
     }
-    // Multiple moderate conditions, 04 Aug 2026: each can carry its own
-    // score, so folded into the name itself ("X (6/10)") rather than
-    // one aggregate number that would misrepresent whichever condition
-    // it wasn't actually describing.
-    const parts = ids.map(id => `${getConditionName(id)} (${painScores[id] || 6}/10)`);
-    return `Your check-in flagged ${_joinNames(parts)} today. I\'ve worked around those.`;
+
+    if (moderateIds.length > 0) {
+      const parts  = moderateIds.map(id => `${getConditionName(id)} (${painScores[id] || 6}/10)`);
+      const plural = moderateIds.length > 1;
+      sentences.push(`Your check-in flagged ${_joinNames(parts)} today. I\'ve worked around ${plural ? 'those' : 'that'}.`);
+    }
+
+    if (mildIds.length > 0) {
+      const names  = mildIds.map(getConditionName);
+      const plural = names.length > 1;
+      sentences.push(`I\'ve noted ${_joinNames(names)} as Mild \u2014 I haven\'t changed anything there, but keep an eye on ${plural ? 'them' : 'it'}: if ${plural ? 'they start' : 'it starts'} feeling worse, please adapt what you\'re doing, or stop.`);
+    }
+
+    return sentences.length > 0 ? sentences.join(' ') : null;
   }
 
   // ── Option generation ──────────────────────────────────────────────────────
