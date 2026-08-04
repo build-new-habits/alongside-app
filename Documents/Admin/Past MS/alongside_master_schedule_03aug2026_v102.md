@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 03 Aug 2026 v103
+## 03 Aug 2026 v102
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_03aug2026_v102.md`. Remove v102 on upload.
+Supersedes `alongside_master_schedule_03aug2026_v101.md`. Remove v101 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** Two real outreach developments from Graeme, logged for the first time. (1) A meeting is now set with **BANDS CIC** — Alfie plus his members — the first actual response out of the four Tier 1 org emails sent (ADHD UK, National Autistic Society, ADHD Foundation, BANDS CIC all emailed, no replies until now). Real potential upside if it goes well: follow-on meetings with members across **Frome, Bath, Weston, and Trowbridge** — genuine multi-town reach, not just one contact. Meeting date not yet confirmed — flagged as a gap to fill in. (2) A **Canopy project connection** — a personal trainer with neurodivergent clients, potentially interested in supporting the project — surfaced through Graeme's separate Canopy course sub-project, not the direct outreach list. Nature of "supporting" (beta testing? referrals? something else?) not yet clarified.
+**This version's substantive changes:** `upgrade.js` crash fixed — genuinely this time. Worth being honest about the process failure here: this was flagged as fixed once already (31 Jul → mistakenly conflated with a *different* file's tier fix landing on the same day), and only caught on direct re-check today when Graeme asked "is that on-device-pending status true for everything you mentioned, or just running?" — a good question that surfaced a real gap. `render()` called `store.getUserTier()`, which never existed anywhere in `store.js`; fixed to `store.get("tier") || "free"`, matching every other live reader. `upgrade.js` v1→v2, `sw.js` v189→v190, confirmed live via fresh fetch, `node --check` clean, confirmed no other stray `getUserTier()` calls exist anywhere in the app.
 
 **Process note, fixed this version:** the last several version bumps (v96–v98) stacked a new "substantive changes" paragraph on top of the previous one each time, rather than replacing it — by v98 this header had four full paragraphs and two duplicate Location notices. Condensed below into a single recent-history list. Going forward, this header should carry **only the current version's changes**, one paragraph — anything needed for continuity belongs in the dashboard or a dedicated section, not a growing stack of old summaries at the top.
 
@@ -48,15 +48,7 @@ Supersedes `alongside_master_schedule_03aug2026_v102.md`. Remove v102 on upload.
 
 ---
 
-## 🌱 Outreach Developments — 03 Aug 2026
-
-**BANDS CIC — a real response, first of four Tier 1 emails.** A meeting is now set with Alfie and his members — the first actual reply out of the original four (ADHD UK, National Autistic Society, ADHD Foundation, BANDS CIC), all emailed with no response until now. **Meeting date: not yet confirmed** — get this from Graeme and update here once known, don't leave it dateless indefinitely.
-
-**Real potential upside if the meeting goes well:** follow-on meetings with BANDS members across **Frome, Bath, Weston, and Trowbridge** — genuine multi-town reach across Somerset/Wiltshire, not a single contact. Worth treating the Alfie meeting itself as the actual priority — the four-town potential is downstream of it going well, not a parallel track to chase independently yet.
-
-**Canopy connection — a personal trainer with neurodivergent clients.** Surfaced through Graeme's separate Canopy course sub-project, not the direct org-outreach list — a different channel entirely (a warm individual connection via an unrelated project, not a cold-outreach org response). Potentially interested in "supporting" — **nature of support not yet clarified** (beta testing? client referrals? something else?). Needs a conversation to actually understand what's being offered before this can be scoped as a task.
-
----
+## 🔴 Wake Lock / Resumable Session Gap — found 03 Aug 2026, real on-device use
 
 **Source: Graeme's actual run + library session today** — the first genuine field-conditions test any session view has had (phone locked/pocketed during real use), as opposed to a desk-based device test. Four symptoms reported, traced against live `running-session.js` and confirmed to share one root cause:
 
@@ -304,8 +296,6 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 
 | Stream | Current position | Immediate next action | Blocker? |
 |--------|-----------------|----------------------|----------|
-| Outreach — BANDS CIC meeting (Alfie + members) | 🟢 **New, 03 Aug.** First real response of 4 Tier 1 org emails sent. Real potential: follow-on meetings across Frome, Bath, Weston, Trowbridge if this goes well. | **Get a confirmed date from Graeme** — currently untracked without one. Prep a meeting brief once date's known, same pattern as the Alex meeting brief. | Meeting date unknown. |
-| Outreach — Canopy PT connection (neurodivergent clients) | 🟡 **New, 03 Aug.** Warm connection via the separate Canopy sub-project, not the direct outreach list. Interested in "supporting" — form unclear. | Conversation needed to understand what's actually being offered before this can be scoped. | Nature of support unclarified. |
 | Product — Wake Lock / resumable session gap | 🟡 **Code complete, 03 Aug, on-device pending.** `running-session.js` v4, new `session-resume.js`, `sw.js` v189, all pushed and confirmed live via fresh fetch. `node --check` clean. Blueprint's full scope implemented: timestamp-anchored elapsed, checkpoint/resume, coach-voiced resume card, Wake Lock lifecycle, exact-equality prompt-match fix. | **On-device test**: lock screen mid-run, force-refresh mid-run. This bug was only ever found through real use — treat this as the priority on-device test over BUILD-3's, since BUILD-3 is expected to be a formality and this genuinely isn't. | Needs a phone. |
 | Product — BUILD-1 (Nav-gap fix) | 🟡 Core mechanism confirmed. Sub-question open. | Quick confirmation. | None. |
 | Product — BUILD-2 (Proposal-loop fix) | 🟢 Closed 23 Jul. | — | None. |
@@ -382,4 +372,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Aug 2026 v103*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Aug 2026 v102*
