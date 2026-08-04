@@ -1,6 +1,25 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v195
+ * Four fixes from one round of Graeme's on-device screenshots, testing
+ * the Home Nav Phase A threshold change:
+ * (1) REAL BUG, not cosmetic: coach-proposal.js's _checkModeratePain()
+ *   had its own third private copy of the severity threshold (>=4),
+ *   never touched by Phase A. This is why Mild still showed "I've
+ *   worked around that." Fixed to >=6 && <7, matching the canonical
+ *   value in conditions.js. coach-proposal.js v12→v13.
+ * (2) checkin-conversation.css v3→v4 — .ci-pain-chip and .ci-quality-chip
+ *   overflow-wrap fixes (word-selector chips had the same class of bug
+ *   as the pain chips, different root cause — see file changelog).
+ * (3) onboarding.css v1→v2 (first version header on this file) —
+ *   .onboarding-view's min-height never subtracted --nav-height, so
+ *   Continue buttons landed under the fixed bottom nav on every
+ *   onboarding screen, not just Conditions. Real root-cause fix, not
+ *   a padding patch.
+ * (4) coach-proposal.css v5→v6 — .cp-constraint (the "flagged" message)
+ *   strengthened; Graeme reported missing it almost every time.
+ *
  * 04 Aug 2026 v194
  * checkin-conversation.css v2→v3 — .ci-pain-chip text-overflow fix,
  * found on-device by Graeme while confirming the Phase A threshold fix
@@ -352,7 +371,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v194";
+const CACHE_NAME = "alongside-v195";
 
 const SHELL_URLS = [
 

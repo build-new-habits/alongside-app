@@ -1,6 +1,12 @@
 /*
  * css/components/coach-proposal.css
- * 13 Jul 2026 v5
+ * 04 Aug 2026 v6
+ *
+ * v6 — .cp-constraint strengthened (see coach-proposal.js v13 changelog).
+ *   13% opacity background + 3px left border → 14% + full border + 4px
+ *   left border + shadow + icon + semibold body-size text. Contrast
+ *   confirmed still WCAG AA at the new opacity.
+ *
  *
  * v5 — Confirmed bug fix. The file living at this path on GitHub did not
  *   contain CSS at all — it contained a copy of coach-proposal.js's v8
@@ -105,14 +111,32 @@
 }
 
 .cp-constraint {
-  padding: var(--space-3) var(--space-4);
-  background: rgba(239, 68, 68, 0.08);
-  border-left: 3px solid #EF4444;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-left: 4px solid #EF4444;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.08);
+}
+/* fix, 04 Aug 2026: Graeme reported missing this message almost every
+   time — reasonably, it was 8% background opacity with body-text-sized
+   type, easy to skim past among everything else on this screen. Bumped
+   opacity/border/shadow and added an icon; kept the calm, non-alarming
+   colour family (this is supportive adaptation info, not an error) and
+   confirmed contrast still clears WCAG AA at the new opacity. */
+
+.cp-constraint__icon {
+  font-size: var(--text-lg);
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .cp-constraint p {
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
   color: var(--color-text);
   margin: 0;
   line-height: var(--leading-relaxed);

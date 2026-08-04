@@ -306,4 +306,16 @@ Graeme sent a screenshot while confirming the Phase A threshold fix: "Moderate" 
 
 ---
 
+### Real bug found + three UI fixes — same day, from Graeme's on-device screenshots testing the Phase A threshold change
+
+**The real one:** `coach-proposal.js`'s `_checkModeratePain()` had its own private, *third* copy of the severity threshold — `pain >= 4` — completely untouched by Phase A's fix to `conditions.js`. This is the direct cause of Mild (score 4) still showing "Your check-in flagged X today... I've worked around that." after the fix — this file never deferred to the canonical threshold in the first place, it had its own. Same class of problem as `core-session.js`'s private exercise pool and `checkin-mini.js`'s private pain scale — a third independent occurrence of the same pattern.
+
+- `js/views/coach-proposal.js` v12 → v13 — `_checkModeratePain()` threshold corrected from `>= 4` to `>= 6 && < 7`, matching `conditions.js` and `checkin.js` exactly. Not refactored to import `conditions.js`'s functions this session — a minimal, safe constant fix; this file is already staged for a bigger rework in Home Nav Phase C, better to consolidate properly then.
+- `css/components/checkin-conversation.css` v3 → v4 — two more overflow fixes. `.ci-pain-chip`'s earlier `min-width: 0` fix wasn't quite complete on its own (a single unbreakable word has nowhere to wrap without `overflow-wrap: break-word` too — added). `.ci-quality-chip` (the feeling-word selector — "energise", "confident", etc.) had the same overflow symptom but a different cause: it deliberately sets `min-width: 44px` for WCAG 2.2 touch-target compliance, so the pain-chip fix wasn't applicable — `overflow-wrap: break-word` added instead, touch target kept.
+- `css/layouts/onboarding.css` v1 → v2 (first version header on this file) — `.onboarding-view`'s `min-height` calc never subtracted `--nav-height`, so it claimed nearly full viewport height on its own, before `#main-content`'s nav-clearance padding could help — the Continue button landed under the fixed bottom nav on every onboarding screen (Conditions, Goals, Equipment, Plan Select — anything sharing this class), not just where it was spotted. Real root-cause fix, not a padding patch on top of a padding patch.
+- `css/components/coach-proposal.css` v5 → v6 — `.cp-constraint` (the "flagged" message) strengthened: 8%→14% background opacity, full border added, 4px left accent, subtle shadow, icon, body-size semibold text instead of small regular. Graeme reported missing it almost every time at the old styling. Contrast confirmed still WCAG AA.
+- `sw.js` v194 → v195, deployed last.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
