@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v206
+ * Real gap fixed, found by Graeme same day: no way to remove a
+ * condition from conditions-update.js. Added an explicit "Remove"
+ * action per card, confirm dialog reusing settings.js's existing
+ * pattern. conditions-update.js v1→v2, conditions-update.css v1→v2.
+ *
  * 04 Aug 2026 v205
  * Phase D-2/D-3/D-4, Conditions Update — the real screen, live. New
  * files: js/views/conditions-update.js, css/layouts/conditions-
@@ -531,7 +537,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v205";
+const CACHE_NAME = "alongside-v206";
 
 const SHELL_URLS = [
 

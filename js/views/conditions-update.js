@@ -1,6 +1,20 @@
 /**
  * conditions-update.js - Conditions Update
  *
+ * 04 Aug 2026 v2
+ *
+ * v2 — Real gap found by Graeme after the on-device pass: no way to
+ *   remove a condition from this screen. The underlying toggle-off
+ *   mechanism already existed (the "Add a condition" sheet lets you
+ *   untick an already-selected one), but nothing on this screen made
+ *   that discoverable as a "delete" action. Added an explicit "Remove"
+ *   action per expanded card, with a confirm dialog reusing settings.js's
+ *   _confirmDestructive() pattern (same .settings-dialog CSS, already
+ *   loaded app-wide) rather than a jarring native confirm(). Same
+ *   minimal-cleanup approach as the existing toggle: removes the id
+ *   from `conditions` only, leaves severity/reflections/goal data in
+ *   place — consistent with existing behaviour, not a new inconsistency.
+ *
  * 04 Aug 2026 v1
  *
  * New screen, Phase D-2 of the Home Nav & Conditions Redesign
@@ -172,6 +186,11 @@ export function ConditionsUpdateView(router) {
               <p class="cu-goal-skip-hint">No pressure \u2014 skip this if you're not sure yet.</p>
             `}
 
+            <button class="cu-remove-condition" data-action="remove-condition" data-condition="${id}"
+                    aria-label="Remove ${name} from your conditions">
+              Remove ${name}
+            </button>
+
           </div>
         ` : ""}
       </div>
@@ -276,6 +295,28 @@ export function ConditionsUpdateView(router) {
       });
     });
 
+    // Fix, 04 Aug 2026: found by Graeme after the on-device pass —
+    // there was no direct way to remove a condition from this screen.
+    // The underlying toggle-off mechanism already existed (the "Add a
+    // condition" sheet lets you untick an already-selected condition),
+    // but that's not a "delete" action anyone would find from here.
+    // Same minimal-cleanup approach as that existing toggle: removes
+    // the id from `conditions` only. Severity/reflections/goal data is
+    // left in place, harmlessly orphaned — consistent with how the
+    // existing toggle already behaves, not a new inconsistency.
+    container.querySelectorAll('[data-action="remove-condition"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id   = btn.dataset.condition;
+        const name = getConditionName(id);
+        _confirmRemove(name, () => {
+          const conditions = (store.get("conditions") || []).filter(c => c !== id);
+          store.set("conditions", conditions);
+          expandedIds.delete(id);
+          render(container);
+        });
+      });
+    });
+
     container.querySelector('[data-action="add-condition"]')?.addEventListener("click", () => {
       openSheet("onboarding/conditions", () => render(container));
     });
@@ -301,6 +342,61 @@ export function ConditionsUpdateView(router) {
         render(container);
       });
     });
+  }
+
+  // ── Confirm dialog (remove condition) ────────────────────────────────────
+  // Same pattern as settings.js's _confirmDestructive() — reuses that
+  // file's .settings-dialog CSS (already loaded app-wide via main.css),
+  // not reinvented, so removing a condition feels consistent with every
+  // other destructive action in the app rather than a jarring native
+  // confirm().
+
+  function _confirmRemove(name, onConfirm) {
+    const existing = document.getElementById('cu-confirm-dialog');
+    if (existing) existing.remove();
+
+    const dialog = document.createElement('div');
+    dialog.id = 'cu-confirm-dialog';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.setAttribute('aria-labelledby', 'cu-confirm-title');
+    dialog.className = 'settings-dialog';
+    dialog.innerHTML = `
+      <div class="settings-dialog__backdrop"></div>
+      <div class="settings-dialog__content">
+        <h2 class="settings-dialog__title" id="cu-confirm-title">Remove ${name}?</h2>
+        <p class="settings-dialog__message">This removes it from your conditions list. Your severity history, reflections, and any goal stay recorded, they just won't show here any more.</p>
+        <div class="settings-dialog__actions">
+          <button class="btn btn-ghost" id="cu-confirm-cancel">Cancel</button>
+          <button class="btn btn-danger" id="cu-confirm-ok">Remove</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(dialog);
+
+    const focusable = dialog.querySelectorAll('button');
+    const first = focusable[0];
+    const last  = focusable[focusable.length - 1];
+    first.focus();
+
+    dialog.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { dialog.remove(); return; }
+      if (e.key === 'Tab') {
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault(); last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault(); first.focus();
+        }
+      }
+    });
+
+    dialog.querySelector('#cu-confirm-cancel').addEventListener('click', () => dialog.remove());
+    dialog.querySelector('#cu-confirm-ok').addEventListener('click', () => {
+      dialog.remove();
+      onConfirm();
+    });
+    dialog.querySelector('.settings-dialog__backdrop').addEventListener('click', () => dialog.remove());
   }
 
   return { mount };
