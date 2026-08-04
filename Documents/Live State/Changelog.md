@@ -424,4 +424,14 @@ Seven screenshots, real findings across the board.
 
 ---
 
+### Conditions Update door bug — found while scoping Phase D, fixed immediately
+
+Real, currently-live bug, not left broken while Phase D gets built. `today.js`'s Conditions Update door was calling `router.navigate('onboarding/conditions')` directly — the exact bug `settings.js` v9 already found and fixed once (documented in that file's own changelog): `onboarding/conditions.js` is built for the onboarding sequence, with Back/Continue hardcoded to onboarding-sequence destinations (Back literally calls `router.navigate('onboarding/goals')`), so a direct navigate() there loses the bottom nav and Back leads somewhere nonsensical.
+
+- `js/views/today.js` v6 → v7 — same fix as `settings.js`: `openSheet()` from `sheet-manager.js` instead of a direct `router.navigate()`. Intercepts the hardcoded navigate() call and just closes the sheet.
+- Interim only — Phase D replaces this bridge with the real Conditions Update screen the spec describes.
+- `sw.js` v202 → v203, deployed last.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
