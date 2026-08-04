@@ -1,6 +1,38 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Aug 2026 v191
+ * Tier-gating infrastructure built (S4-TG, scoped 9 May 2026, never
+ * implemented until now). New js/auth.js: getUserTier()/isPremium()/
+ * isAthlete()/lockedFeature() using the live "tier" field (NOT
+ * "userTier" as the May spec assumed — matched what's already live
+ * across settings.js/progress.js/session-builder-ui.js/upgrade.js/
+ * coach-proposal.js instead of introducing a second field name). New
+ * css/components/tier-gating.css for the locked-feature wrapper, every
+ * variable confirmed against the current design system before use.
+ * app.js v7→v8: single initPaywallListener() call wired in init() -
+ * tapping any .locked-feature-wrap navigates straight to /upgrade
+ * (built and polished as of earlier today), not a toast - the May
+ * spec's toast plan predates that page existing.
+ *
+ * Deliberately NOT done this session: progress.js's existing working
+ * ad-hoc tier gating (30/90-day lock, export lock, tiered observation
+ * depth) left untouched - it already works, retrofitting it to route
+ * through auth.js would be pure churn. Also not implemented: several
+ * May-spec audit-table items that no longer apply - "coach style
+ * variants" was explicitly killed (Nurturing only, permanently,
+ * settings.js v7); "prescribed exercises Level 2+" - no difficulty-
+ * level concept exists anywhere in prescribed.js/prescribed-session.js;
+ * "custom programme builder"/"Athlete analytics" - no generative
+ * programme engine exists; "mindful audio prompts mid-session" - no
+ * such distinct feature found. coach-proposal.js's renderBypassDoor()
+ * has an unused `tier` parameter, found while checking - not fixed,
+ * original intent unclear, logged on the master schedule instead of
+ * guessed at. lockedFeature() itself is not yet applied to any live
+ * feature - infrastructure is real and tested (see PR notes) but no
+ * current premium feature was confirmed both real AND ungated to wrap
+ * it around.
+ *
  * 03 Aug 2026 v190
  * upgrade.js v1→v2 — crash fix. render() called store.getUserTier(),
  * which doesn't exist anywhere in store.js (confirmed via grep, same
@@ -290,7 +322,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v190";
+const CACHE_NAME = "alongside-v191";
 
 const SHELL_URLS = [
 
@@ -319,6 +351,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/sheet-manager.css",
   "/alongside-app/css/components/settings-reflection.css",
   "/alongside-app/css/components/checkin-conversation.css",
+  "/alongside-app/css/components/tier-gating.css",
 
   // Core JS
   "/alongside-app/js/app.js",
@@ -327,6 +360,7 @@ const SHELL_URLS = [
   "/alongside-app/js/tts.js",
   "/alongside-app/js/session-guard.js",
   "/alongside-app/js/session-resume.js",
+  "/alongside-app/js/auth.js",
 
   // Views — main
   "/alongside-app/js/views/today.js",

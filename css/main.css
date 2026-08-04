@@ -1,6 +1,9 @@
 /* main.css
- * 19 Jul 2026 v10
+ * 19 Jul 2026 v11
  *
+ * v11 — Tier-gating build (S4-TG, 9 May scope, finally implemented
+ *   03 Aug). Added components/tier-gating.css for js/auth.js's
+ *   lockedFeature() component.
  * v10 — S4-B3-3 completion session. Added components/reflect.css (new
  *   file — .reflect-textarea and .reflect-chips were confirmed via
  *   GitHub code search to have no existing CSS anywhere in the repo,
@@ -40,6 +43,7 @@
 @import 'components/coach-proposal.css';
 @import 'components/morning-session.css';
 @import 'components/session-guard.css';
+@import 'components/tier-gating.css';
 @import 'components/settings-library.css';
 @import 'components/settings.css';
 @import 'components/weekly-plan.css';

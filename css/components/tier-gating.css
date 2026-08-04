@@ -1,0 +1,55 @@
+/*
+ * css/components/tier-gating.css
+ * 03 Aug 2026 v1
+ *
+ * Locked-feature wrapper — used by js/auth.js's lockedFeature() helper.
+ * Every variable below confirmed against css/base/variables.css before
+ * use, not copied blindly from the 9 May spec (which predates this
+ * design system's current token names in places).
+ */
+
+.locked-feature-wrap {
+  position: relative;
+  opacity: 0.55;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+  transition: opacity 150ms ease;
+}
+
+.locked-feature-wrap:hover,
+.locked-feature-wrap:focus-visible {
+  opacity: 0.75;
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.locked-feature-inner {
+  pointer-events: none;
+  user-select: none;
+}
+
+.locked-badge {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-full);
+  pointer-events: none;
+}
+
+.locked-badge-icon {
+  font-size: 0.7rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .locked-feature-wrap {
+    transition: none;
+  }
+}
