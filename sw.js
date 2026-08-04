@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Aug 2026 v190
+ * upgrade.js v1→v2 — crash fix. render() called store.getUserTier(),
+ * which doesn't exist anywhere in store.js (confirmed via grep, same
+ * check that found the wider tier-gating gap on 31 Jul). Would have
+ * thrown the instant anyone navigated to the upgrade/membership screen.
+ * Fixed to store.get("tier") || "free", matching every other live
+ * reader (settings.js, progress.js, session-builder-ui.js's isPremium()).
+ * Not in SHELL_URLS' precache list either way — pre-existing, separate,
+ * out of scope for this fix.
+ *
  * 03 Aug 2026 v189
  * running-session.js v4 + new js/session-resume.js — Wake Lock and
  * resumable-session fix (blueprint alongside_blueprint_wakelock-resume_
@@ -280,7 +290,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v189";
+const CACHE_NAME = "alongside-v190";
 
 const SHELL_URLS = [
 
