@@ -296,4 +296,14 @@ While checking a report against the Phase A threshold fix, found `checkin-mini.j
 
 ---
 
+### .ci-pain-chip text-overflow fix — same day, found on-device
+
+Graeme sent a screenshot while confirming the Phase A threshold fix: "Moderate" text overflowing its pill, encroaching into the "Severe" chip next to it. Real, pre-existing CSS bug, unrelated to any of today's other changes — just surfaced by testing that button specifically.
+
+- `css/components/checkin-conversation.css` v2 → v3 — `.ci-pain-chip` given `min-width: 0`. Root cause: flex items default to `min-width: auto`, so a `flex: 1` chip won't shrink below the width of an unbreakable word ("Moderate") — it was overflowing instead of wrapping. Also added `line-height: 1.2` to keep two-line wrapped text readable. `.ci-pain-chips`' existing `align-items: stretch` (flex default) keeps all four chips in a row the same height either way.
+- Checked `checkin-mini.js`'s equivalent chips (`.ci-quality-chip`) for the same bug — not affected, that file already uses `flex-wrap` on the container instead of forcing four equal-width columns. No change needed there.
+- `sw.js` v193 → v194, deployed last.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
