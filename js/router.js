@@ -1,5 +1,12 @@
 /**
  * router.js
+ * 04 Aug 2026 v12
+ *
+ * v12 — New route 'conditions-update' -> conditions-update.js
+ *   (ConditionsUpdateView), Phase D-2/D-3 of the Home Nav & Conditions
+ *   Redesign. Not added to hideNavViews — this is a management screen
+ *   reached from Home, not a session flow, same treatment as 'settings'.
+ *
  * 04 Aug 2026 v11
  *
  * v11 — Phase C, Home Nav & Conditions Redesign. Fixed a real,
@@ -117,6 +124,7 @@ const VIEW_NAMES = {
   // it. import(path) would throw before ever reaching the old/new pattern
   // detection below, so this route could never have worked, on any device.
   'session-builder':   { path: './views/session-builder-ui.js',  fn: 'SessionBuilderView'  },
+  'conditions-update': { path: './views/conditions-update.js',   fn: 'ConditionsUpdateView' },
 
   // ── Session views ──────────────────────────────────────────────────────────
   'workout':            { path: './views/workout.js',           fn: 'WorkoutView'           },

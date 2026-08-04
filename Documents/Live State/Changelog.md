@@ -445,4 +445,25 @@ Both remaining decisions resolved same day they were logged (Graeme delegated D-
 
 ---
 
+### Phase D-2/D-3/D-4 — Conditions Update, the real screen
+
+UX designed in conversation before any code (per the note above), then built straight through same day — Graeme's own words: *"I have a sore hip and need support, so I have a vested interest in sorting this now."*
+
+- `js/views/conditions-update.js` (new) — one collapsed card per logged condition. Collapsed by default always, including the first time a condition is added, but with an unambiguous chevron affordance (rotates open, respects reduced-motion) plus a hover/focus background shift, so it reads as interactive before the first tap — direct response to "it needs to be really clear that it expands, not just quiet."
+  - **Severity** — slider, reusing `checkin.js`'s exact pattern and CSS classes (`.ci-slider-wrap--condition` etc.), not a new component.
+  - **Reflection** — one open text field, writes to `conditionReflections`.
+  - **Goal** — three felt-sense pills (Feel healed / Cope better day-to-day / Feel stronger, improve) + skip, writes to `conditionGoals` via the new `store.setConditionGoal()`.
+  - **Progress, combined with the goal** — once a goal is set, a severity trend shows alongside it (e.g. *"Moderate → Mild over the last 2 days"*), sourced from `checkinHistory`, which already recorded a daily snapshot of every condition's severity — no new tracking needed, confirmed before designing around it rather than assumed. Deliberately descriptive, not judgemental — no "good"/"bad" framing on a plateau, since conditions fluctuate and that would cut against the app's own "no shame" principle.
+  - **Your programme** — one shared section below the cards, not duplicated per condition. Real finding while building: `prescribedExercises` is a flat, ungrouped list in the live schema, not condition-scoped — confirmed before designing, not assumed. Only "Build your own" ships (routes into `prescribed.js`); "coach builds it"/"coach recommends, you select" need real programme-generation logic that doesn't exist yet, comparable in size to NEW-1 (Programme Curation, already logged separately) — deliberately not shown as tiles that say "coming soon," the exact pattern removed elsewhere today (door-2/door-3).
+  - **Fold-in dial** — shown once a programme exists, writes `conditionFoldInLevel`. The generator hook that reads it (Phase D-5) isn't built this pass; the setting is stored correctly regardless of when that lands.
+- `css/layouts/conditions-update.css` (new), registered in `css/main.css` v11 → v12.
+- `js/router.js` v11 → v12 — new `conditions-update` route. Not added to `hideNavViews` — management screen, not a session flow, same treatment as `settings`.
+- `js/views/today.js` v7 → v8 — Conditions Update door now routes straight to the real screen; the interim `openSheet('onboarding/conditions')` bridge (today's earlier fix) is fully superseded, removed along with the now-unused `openSheet` import.
+- `js/views/settings.js` v11 → v12 — "Edit conditions" now routes to the same real screen instead of the old limited onboarding sheet, which only ever let you toggle which conditions exist. Matches the original spec: Settings' panel is a shortcut into the same destination, not a separate UI. "Edit equipment" untouched. Known small rough edge, not a bug: `conditions-update.js`'s own Back button returns to Home rather than back to Settings specifically — no vanished nav, no nonsensical destination, unlike the bug this replaces.
+- `js/views/prescribed.js` v1.0 → v1.1 — coach voice now origin-aware. Only 2 of 4 `buildCoachLine()` branches actually referenced professional origin; those two now check the new `prescribedExercisesOrigin` field and speak correctly when reached via Conditions Update's self-build route instead of a genuine prescription. Everything else (form, session flow, credits) unchanged.
+- `sw.js` v204 → v205, deployed last, both new files added to `SHELL_URLS`.
+- **Not yet on-device confirmed.** Needs a full pass: add/expand a condition, move the severity slider, set a goal and confirm the trend appears (or the "not enough history yet" message if too new), add a reflection, tap "Build your own" and confirm the coach line reads correctly, reach the screen both from Home and from Settings.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

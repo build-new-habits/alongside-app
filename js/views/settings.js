@@ -1,8 +1,19 @@
 /**
  * settings.js
- * 05 Jul 2026 v11
+ * 04 Aug 2026 v12
  *
  * Settings view. User controls for profile, programme, goals, and preferences.
+ *
+ * v12 — "Edit conditions" now routes to the real Conditions Update
+ *   screen (conditions-update.js, Phase D-2) instead of the limited
+ *   openSheet('onboarding/conditions') bridge from v9 — that bridge
+ *   only ever let you toggle which conditions exist, nothing about
+ *   severity, goals, or a programme. Matches the original spec:
+ *   Settings' panel is a shortcut into the same destination Home's
+ *   Conditions Update door uses. "Edit equipment" untouched, still
+ *   uses openSheet() as v9 fixed it.
+ *
+ * 05 Jul 2026 v11
  *
  * v11 — My Movement rebuild (agreed 13 May, never built — ground-truthed
  *   05 Jul: the selector was absent from the live UI entirely, not merely
@@ -913,14 +924,18 @@ export function SettingsView(router) {
         break;
 
       case 'edit-conditions':
-        // Opens as a sheet (same mechanism onboarding uses), not a direct
-        // navigate — see settings.js v9 changelog for why. conditions.js's
-        // Back button is hardcoded to router.navigate('onboarding/goals');
-        // openSheet() intercepts that call and just closes the sheet,
-        // instead of it leaking through as a real navigation.
-        openSheet('onboarding/conditions', () => {
-          render(container); // refresh to show any updated conditions list
-        });
+        // Fix, 04 Aug 2026 (Phase D-2): now routes to the real Conditions
+        // Update screen (conditions-update.js) instead of the limited
+        // onboarding sheet, which only ever let you toggle which
+        // conditions exist — nothing about severity, goals, or a
+        // programme. Matches the original spec: Settings' panel is a
+        // shortcut into the same destination Home's Conditions Update
+        // door uses, not a separate UI. conditions-update.js has its own
+        // "Back" button, which returns to Home rather than back to
+        // Settings specifically — a small known rough edge, not a bug
+        // (no vanished nav, no nonsensical destination, unlike the old
+        // openSheet('onboarding/conditions') bug this replaces).
+        router.navigate('conditions-update');
         break;
 
       case 'edit-equipment':

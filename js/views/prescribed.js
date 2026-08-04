@@ -1,6 +1,16 @@
 /**
  * prescribed.js - Prescribed Exercises View
  *
+ * 04 Aug 2026 v1.1
+ *
+ * v1.1 — Origin-aware coach voice (Phase D-2, decision D-2). Reached
+ *   directly from Conditions Update's "Build your own" now (no
+ *   prescription involved), so the two coach-line branches that
+ *   assumed professional origin now check the new
+ *   prescribedExercisesOrigin field and speak differently when self-
+ *   built. Everything else unchanged — same file, same session flow,
+ *   same credits.
+ *
  * v1.0 — Dedicated full view for exercises prescribed by an external
  *   professional (physiotherapist, consultant, GP, specialist).
  *
@@ -39,15 +49,26 @@ let showAddForm = false;
  * The coach is supportive but clear that these exercises come from
  * the user's professional, not from the coach. Varies by state.
  *
+ * 04 Aug 2026 — origin-aware (Phase D-2, decision D-2). Only two
+ * branches actually reference professional origin; those two now
+ * check prescribedExercisesOrigin and speak differently when the list
+ * was self-built via Conditions Update rather than a genuine
+ * prescription. Everything else (in-progress, done-today, low-energy)
+ * was already origin-neutral, untouched.
+ *
  * @param {Array}  exercises - full prescribedExercises array
  * @param {number} energy    - today's energy score
+ * @param {string|null} origin - store.get('prescribedExercisesOrigin')
  */
-function buildCoachLine(exercises, energy) {
+function buildCoachLine(exercises, energy, origin) {
   const active = exercises.filter(e => !e.completedToday);
   const done   = exercises.filter(e => e.completedToday);
+  const isSelf = origin === "self";
 
   if (exercises.length === 0) {
-    return "If your physio or consultant has given you exercises to do, you can add them here. I'll keep them separate from your regular sessions and remind you they're here each time you check in.";
+    return isSelf
+      ? "Building your own plan for something that's going on? Add exercises here \u2014 I'll keep them separate from your regular sessions and remind you they're here each time you check in."
+      : "If your physio or consultant has given you exercises to do, you can add them here. I'll keep them separate from your regular sessions and remind you they're here each time you check in.";
   }
 
   if (done.length > 0 && active.length === 0) {
@@ -63,7 +84,9 @@ function buildCoachLine(exercises, energy) {
     return "I know your energy is low today. These exercises matter -- even a gentle run-through at low effort is better than skipping. But listen to your body and do what you can.";
   }
 
-  return "These are your prescribed exercises. I'll keep them here, separate from everything else. Your professional knows your situation -- I'm just here to help you show up for them.";
+  return isSelf
+    ? "These are the exercises you've chosen. I'll keep them here, separate from your regular sessions \u2014 you know your body best, I'm just here to help you show up for them."
+    : "These are your prescribed exercises. I'll keep them here, separate from everything else. Your professional knows your situation -- I'm just here to help you show up for them.";
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -74,7 +97,8 @@ export function render() {
   const done       = exercises.filter(e => e.completedToday);
   const checkin    = store.get("lastCheckin") || {};
   const energy     = checkin.energy || null;
-  const coachLine  = buildCoachLine(exercises, energy);
+  const origin     = store.get("prescribedExercisesOrigin");
+  const coachLine  = buildCoachLine(exercises, energy, origin);
   const creditsAvail = Math.min(active.length * CREDITS_PER_EXERCISE, CREDITS_MAX);
 
   return `
