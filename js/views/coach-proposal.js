@@ -1,9 +1,24 @@
 /**
  * coach-proposal.js
- * 24 Jul 2026 v12
+ * 04 Aug 2026 v13
  *
  * Coach proposal view. The hub. Doors that describe categories, not
  * pre-committed choices.
+ *
+ * v13 — Two fixes, found on-device (Graeme screenshot, testing the Home
+ *   Nav Phase A threshold fix). (1) _checkModeratePain() had its own
+ *   private, third copy of the severity threshold — >=4 — never touched
+ *   by Phase A's fix to js/data/conditions.js. This is why Mild (score
+ *   4) was still triggering "I've worked around that": this file never
+ *   deferred to the canonical threshold at all. Corrected to >=6 && <7,
+ *   matching conditions.js and checkin.js exactly. Not refactored to
+ *   import conditions.js's functions this session — kept as a minimal,
+ *   safe constant fix; this file is central and already staged for a
+ *   bigger rework in Home Nav Phase C, better to consolidate properly
+ *   then than mid-fix now. (2) .cp-constraint ("Your check-in flagged
+ *   X today...") strengthened — Graeme reported missing it almost every
+ *   time. See coach-proposal.css v6 changelog for the visual change;
+ *   added a small icon here.
  *
  * v12 — BUILD-5 follow-up (found while testing workoutGenerator.js v1.10 on-
  *   device). _getAvailableTime() read availableTime from two store fields
@@ -301,6 +316,7 @@ export function CoachProposalView(router) {
 
           ${proposal.constraint ? `
             <div class="cp-constraint" role="status" aria-live="polite">
+              <span class="cp-constraint__icon" aria-hidden="true">🌱</span>
               <p>${proposal.constraint}</p>
             </div>` : ''}
 
@@ -901,7 +917,7 @@ export function CoachProposalView(router) {
 
   function _checkModeratePain(conditions, painScores) {
     const moderateConditions = conditions.filter(
-      id => (painScores[id] || 0) >= 4 && (painScores[id] || 0) < 7
+      id => (painScores[id] || 0) >= 6 && (painScores[id] || 0) < 7
     );
     return { hasModerate: moderateConditions.length > 0, conditions: moderateConditions };
   }

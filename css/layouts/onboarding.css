@@ -1,4 +1,11 @@
-/* onboarding.css - Onboarding flow styles */
+/* onboarding.css - Onboarding flow styles
+   04 Aug 2026 v2
+
+   v2 — .onboarding-view's min-height fix (see rule below) — never
+   subtracted --nav-height, causing the Continue button to land under
+   the fixed bottom nav on every onboarding screen. Found via
+   screenshot, Settings > Edit conditions. No prior version header
+   existed on this file; added now. */
 
 /* ============================================
    ONBOARDING VIEW CONTAINER
@@ -7,8 +14,17 @@
 .onboarding-view {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - var(--content-padding) * 2);
-  min-height: calc(100dvh - var(--content-padding) * 2);
+  min-height: calc(100vh - var(--content-padding) * 2 - var(--nav-height));
+  min-height: calc(100dvh - var(--content-padding) * 2 - var(--nav-height));
+  /* fix, 04 Aug 2026: this never subtracted --nav-height (72px), so the
+     flex column claimed nearly full viewport height on its own, before
+     #main-content's own padding-bottom (which reserves space for the
+     fixed nav) even came into play. .onboarding-actions' Continue
+     button sits via margin-top:auto at the bottom of THIS box, so it
+     landed right at the visual viewport edge — under the nav bar —
+     without needing to scroll to see it, on every onboarding screen
+     (Conditions, Goals, Equipment, Plan Select, etc. all share this
+     class). Found via screenshot, Settings > Edit conditions. */
 }
 
 .onboarding-header {
