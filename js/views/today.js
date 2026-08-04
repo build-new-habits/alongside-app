@@ -1,8 +1,19 @@
 /**
  * today.js
- * 04 Aug 2026 v5
+ * 04 Aug 2026 v6
  *
- * v5 — Phase C, Home Nav & Conditions Redesign (blueprint
+ * v6 — Graeme's on-device pass, same day as Phase C. Session-generating
+ *   doors (Cardio/Core/Strength, Unsure? Coach decides) now route
+ *   through check-in first — full check-in if not done today, check-in-
+ *   mini if already done — before their real destination, via the new
+ *   pendingDoorRoute store field. Reaching session-builder or
+ *   coach-proposal without ever checking in defeated the whole point
+ *   of those doors adapting to "where you are today." The other four
+ *   doors (Mobility & Conditioning, Wellbeing, Conditions Update,
+ *   Progress) are informational/self-directed, not generative, and
+ *   stay ungated — worth Graeme confirming that split is what he meant.
+ *
+ * 04 Aug 2026 v5 — Phase C, Home Nav & Conditions Redesign (blueprint
  *   alongside_blueprint_home-navigation-conditions_04aug2026_v1.md).
  *   Replaced the single "Check in" CTA + gated funnel with six always-
  *   visible doors: Cardio/Core/Strength, Mobility & Conditioning,
@@ -85,13 +96,24 @@ import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
 export function TodayView(router) {
 
   // ── Six Home doors (04 Aug 2026, Phase C) ────────────────────────────────
+  // requiresCheckin: true for doors whose whole value depends on knowing
+  // today's state (energy, pain, equipment) — these route through
+  // check-in (full the first time today, check-in-mini after) before
+  // their real destination. Graeme's call, 04 Aug: reaching a session-
+  // generating screen without ever having checked in defeats the point
+  // of it adapting to "where you are today." Applied to the two doors
+  // that actually generate an adaptive session (Cardio/Core/Strength,
+  // Unsure? Coach decides) — Mobility & Conditioning currently bridges
+  // to Library (browse, not generate), Wellbeing/Conditions Update/
+  // Progress are informational or self-directed, not generative. Worth
+  // Graeme confirming this split is what he meant, not assumed settled.
   const HOME_DOORS = [
-    { id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder' },
-    { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'library' },
-    { id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing' },
-    { id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'onboarding/conditions' },
-    { id: 'progress', label: 'Progress', icon: '\uD83D\uDCCA', route: 'progress' },
-    { id: 'unsure', label: 'Unsure? Coach decides', icon: '\uD83C\uDFAF', route: 'coach-proposal' },
+    { id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder', requiresCheckin: true },
+    { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'library', requiresCheckin: false },
+    { id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing', requiresCheckin: false },
+    { id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'onboarding/conditions', requiresCheckin: false },
+    { id: 'progress', label: 'Progress', icon: '\uD83D\uDCCA', route: 'progress', requiresCheckin: false },
+    { id: 'unsure', label: 'Unsure? Coach decides', icon: '\uD83C\uDFAF', route: 'coach-proposal', requiresCheckin: true },
   ];
 
   function mount(container) {
@@ -214,6 +236,7 @@ export function TodayView(router) {
           ${HOME_DOORS.map(d => `
             <button class="today-door ${d.id === 'unsure' ? 'today-door--unsure' : ''}"
                     data-route="${d.route}"
+                    data-requires-checkin="${d.requiresCheckin}"
                     aria-label="${_esc(d.label)}">
               <span class="today-door__icon" aria-hidden="true">${d.icon}</span>
               <span class="today-door__label">${_esc(d.label)}</span>
@@ -236,7 +259,22 @@ export function TodayView(router) {
 
   function attachEvents(container) {
     container.querySelectorAll('[data-route]').forEach(btn => {
-      btn.addEventListener('click', () => router.navigate(btn.dataset.route));
+      btn.addEventListener('click', () => {
+        const route = btn.dataset.route;
+        const requiresCheckin = btn.dataset.requiresCheckin === 'true';
+
+        if (requiresCheckin) {
+          // Route through check-in first (full the first time today,
+          // check-in-mini after) — the door's real destination is
+          // remembered and picked up once check-in completes. Fix,
+          // 04 Aug 2026: reaching a session-generating screen without
+          // ever checking in defeats its whole adaptation premise.
+          store.set('pendingDoorRoute', route);
+          router.navigate(_checkedInToday() ? 'checkin-mini' : 'checkin');
+        } else {
+          router.navigate(route);
+        }
+      });
     });
 
     const actions = {

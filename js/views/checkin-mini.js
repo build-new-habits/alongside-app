@@ -1,7 +1,12 @@
 /**
  * checkin-mini.js - Abbreviated Return-Visit Check-In
  *
- * 04 Aug 2026 v4
+ * 04 Aug 2026 v5
+ *
+ * v5 — Completion now honours a pending Home-door destination
+ *   (pendingDoorRoute, store.js v14) if one was set — same fix as
+ *   checkin.js v10. Skip button explicitly clears it rather than
+ *   force-completing the door without real check-in data.
  *
  * v4 — Pain Input Redesign, same pass as checkin.js v9. Pain step
  *   converted from .ci-quality-chip (None/Mild/Moderate/Severe buttons)
@@ -409,6 +414,9 @@ export function onMount() {
   // Skip - abandon mini check-in, go to intention
   document.getElementById("mini-skip-btn")?.addEventListener("click", () => {
     store.set("returnVisit", false);
+    // Explicit opt-out of the adaptive flow — clear any pending door
+    // destination rather than force-completing it without real data.
+    store.set("pendingDoorRoute", null);
     router.navigate("intention");
   });
 
@@ -486,6 +494,17 @@ export function onMount() {
 
   // Continue from done screen
   document.getElementById("mini-continue-btn")?.addEventListener("click", () => {
-    router.navigate("intention");
+    // Fix, 04 Aug 2026: honour a pending Home-door destination if one
+    // was set (session-generating doors route through check-in-mini
+    // when already checked in today, then continue to where the
+    // person actually tapped) — falls back to the existing intention
+    // default when check-in-mini was reached some other way.
+    const pending = store.get("pendingDoorRoute");
+    if (pending) {
+      store.set("pendingDoorRoute", null);
+      router.navigate(pending);
+    } else {
+      router.navigate("intention");
+    }
   });
 }

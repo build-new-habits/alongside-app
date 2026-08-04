@@ -1,6 +1,30 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v202
+ * Graeme's on-device pass on Phase C, same day — 4 real fixes.
+ * (1) Real regression, found via screenshot: coach-proposal.js's v18
+ * auto-opened session panel (full-screen overlay) was covering the
+ * condition/severity constraint message before it could be read.
+ * Message now renders inside the panel; auto-open also gated on the
+ * re-entry banner and missed-offer being resolved first (same latent
+ * bug, not yet triggered but real). coach-proposal.js v18→v19,
+ * coach-proposal.css v7→v8.
+ * (2) The big one: session-generating Home doors (Cardio/Core/Strength,
+ * Unsure? Coach decides) now route through check-in first — full
+ * check-in if not done today, check-in-mini if already done — before
+ * their real destination, via new store.js field pendingDoorRoute.
+ * store.js v13→v14, today.js v5→v6, checkin.js v9→v10, checkin-mini.js
+ * v4→v5.
+ * (3) session-builder-ui.js v2→v3: equipment step copy now adapts —
+ * "tick anything you have" when nothing's saved in settings, instead
+ * of "untick" against an empty, all-unticked list.
+ * (4) Logged, not built this pass: cosmetic polish needed on the
+ * session-builder proposal screen (S3), and gym-programme.js lacks
+ * the guided walkthrough (timers, form cues, video links) workout.js
+ * already has (S4/S7 comparison) — both flagged on the master schedule
+ * as their own future items.
+ *
  * 04 Aug 2026 v201
  * Phase C, Home Nav & Conditions Redesign — Home screen and entry-flow
  * rebuild. today.js v4→v5: single "Check in" CTA + gated funnel
@@ -470,7 +494,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v201";
+const CACHE_NAME = "alongside-v202";
 
 const SHELL_URLS = [
 

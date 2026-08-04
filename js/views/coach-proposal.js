@@ -1,5 +1,20 @@
 /**
  * coach-proposal.js
+ * 04 Aug 2026 v19
+ *
+ * v19 — Real regression fix, found via screenshot: the session-options
+ *   panel auto-opened by Phase C (v18) is a full-screen fixed overlay
+ *   (z-index 9999) — Graeme reached this screen and completely missed
+ *   the flagged condition message sitting right behind it, covered
+ *   before he could read it. Coach message content (greeting/
+ *   reflection/constraint) now renders INSIDE the panel when it's
+ *   open, not just underneath it. Same latent bug also existed for
+ *   the re-entry banner and missed-session offer — auto-open is now
+ *   gated on both being resolved first (mount() no longer opens the
+ *   panel while either is pending; handleReturnContext()/
+ *   handleMissedAdaptation() open it themselves once resolved,
+ *   checking the other banner isn't also still pending).
+ *
  * 04 Aug 2026 v18
  *
  * v18 — Phase C, Home Nav & Conditions Redesign (blueprint
@@ -425,7 +440,19 @@ export function CoachProposalView(router) {
     // not open-then-flash. Keydown trap + initial focus wired after,
     // same setup openPreviewPanel() used to do for a later door tap —
     // that function is removed now nothing calls it post-render.
-    if (proposal) {
+    //
+    // Fix, same day: does NOT auto-open while a re-entry banner or
+    // missed-session offer is still unresolved — the panel is a
+    // full-screen overlay (z-index 9999), so auto-opening over an
+    // unresolved banner would cover it before the person could answer
+    // it, same bug as the constraint message Graeme found by
+    // screenshot. Those banners' own handlers (handleReturnContext(),
+    // handleMissedAdaptation()) open the panel themselves once resolved.
+    const hasBlockingBanner =
+      (reEntryCtx && !reEntryCtx.contextCaptured) ||
+      (missedOffer && !choiceMade);
+
+    if (proposal && !hasBlockingBanner) {
       currentPreviewOptions = proposal.options;
       selectedOptionId      = null;
       previewOpen           = true;
@@ -433,7 +460,7 @@ export function CoachProposalView(router) {
 
     render(container);
 
-    if (proposal) {
+    if (proposal && !hasBlockingBanner) {
       document.addEventListener('keydown', _previewKeydown);
       _focusFirstInPanel(container);
     }
@@ -553,20 +580,28 @@ export function CoachProposalView(router) {
         <!-- Compress/extend offer -->
         ${missedOffer && !choiceMade ? renderMissedOffer(missedOffer) : ''}
 
-        <!-- Coach message block -->
-        <div class="cp-coach-block" aria-live="polite">
-          <div class="cp-greeting">${proposal.greeting}</div>
-
-          ${proposal.reflection ? `<p class="cp-reflection">${proposal.reflection}</p>` : ''}
-
-          ${proposal.constraint ? `
-            <div class="cp-constraint" role="status" aria-live="polite">
-              <span class="cp-constraint__icon" aria-hidden="true">🌱</span>
-              <p>${proposal.constraint}</p>
-            </div>` : ''}
-
-          <p class="cp-proposal-intro">${proposal.intro}</p>
-        </div>
+        <!-- Coach message block — only rendered out here while the panel is
+             closed (waiting on re-entry/missed-offer above). Once the panel
+             is open this same content renders inside it instead — fix,
+             04 Aug 2026: the panel is a full-screen fixed overlay
+             (z-index 9999), so when it auto-opens (Phase C) anything
+             rendered out here, including the condition/severity
+             constraint message, was being covered before the person
+             could read it. Found via screenshot — Graeme reached this
+             screen and completely missed the flagged condition message
+             sitting right behind the modal. -->
+        ${!previewOpen ? `
+          <div class="cp-coach-block" aria-live="polite">
+            <div class="cp-greeting">${proposal.greeting}</div>
+            ${proposal.reflection ? `<p class="cp-reflection">${proposal.reflection}</p>` : ''}
+            ${proposal.constraint ? `
+              <div class="cp-constraint" role="status" aria-live="polite">
+                <span class="cp-constraint__icon" aria-hidden="true">🌱</span>
+                <p>${proposal.constraint}</p>
+              </div>` : ''}
+            <p class="cp-proposal-intro">${proposal.intro}</p>
+          </div>
+        ` : ''}
 
         <!-- Post-choice acknowledgement (hidden until a session is started) -->
         <div class="cp-acknowledgement"
@@ -576,10 +611,8 @@ export function CoachProposalView(router) {
              style="display:none;">
         </div>
 
-        <!-- Session options — auto-open, no door tap needed (Phase C, 04 Aug
-             2026: this screen is now only reached via Home's "Unsure? Coach
-             decides" door, so showing the recommendation immediately is the
-             whole point, not a second choice on top of the first one) -->
+        <!-- Session options — auto-open once there's no blocking banner
+             above, no door tap needed (Phase C, 04 Aug 2026) -->
         ${renderPreviewPanel()}
 
       </div>
@@ -619,6 +652,19 @@ export function CoachProposalView(router) {
         <div class="cp-preview-panel__backdrop"></div>
         <div class="cp-preview-panel__content">
           <button class="cp-preview-panel__close" id="cp-preview-close" aria-label="Close">\u2715</button>
+
+          ${proposal ? `
+            <div class="cp-coach-block cp-coach-block--in-panel" aria-live="polite">
+              <div class="cp-greeting">${proposal.greeting}</div>
+              ${proposal.reflection ? `<p class="cp-reflection">${proposal.reflection}</p>` : ''}
+              ${proposal.constraint ? `
+                <div class="cp-constraint" role="status" aria-live="polite">
+                  <span class="cp-constraint__icon" aria-hidden="true">🌱</span>
+                  <p>${proposal.constraint}</p>
+                </div>` : ''}
+            </div>
+          ` : ''}
+
           <h2 id="cp-preview-title" class="cp-preview-panel__title">Today\u2019s session</h2>
           <p class="cp-preview-panel__sub">
             Adapted for your check-in \u2014 pick the one that feels right.
@@ -850,9 +896,14 @@ export function CoachProposalView(router) {
     // fresh options too, not just the coach message).
     reEntryCtx = getReEntryContext();
     proposal   = buildProposal();
-    currentPreviewOptions = proposal.options;
-    selectedOptionId      = null;
-    previewOpen           = true;
+
+    // Only open now if there isn't also an unresolved missed-offer —
+    // same gating mount() applies, in case both banners existed together.
+    if (!(missedOffer && !choiceMade)) {
+      currentPreviewOptions = proposal.options;
+      selectedOptionId      = null;
+      previewOpen           = true;
+    }
 
     render(container);
   }
@@ -861,11 +912,19 @@ export function CoachProposalView(router) {
 
   function handleMissedAdaptation(choice, container) {
     applyMissedSessionAdaptation(choice);
-
-    const offerEl = container.querySelector('.cp-missed-offer');
-    if (offerEl) offerEl.style.display = 'none';
-
     missedOffer = null;
+
+    // Fix, 04 Aug 2026: this used to just hide the offer element in
+    // place, leaving the panel closed underneath (auto-open is gated
+    // on missedOffer being resolved — see mount()). Now that it's
+    // resolved, open the panel the same way mount() would have if
+    // there'd been nothing to resolve.
+    if (proposal && !(reEntryCtx && !reEntryCtx.contextCaptured)) {
+      currentPreviewOptions = proposal.options;
+      selectedOptionId      = null;
+      previewOpen           = true;
+    }
+    render(container);
   }
 
   // ── Proposal builder ───────────────────────────────────────────────────────

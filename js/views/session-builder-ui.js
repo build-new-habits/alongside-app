@@ -1,6 +1,16 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 04 Aug 2026 v3
+ *
+ * v3 -- Equipment step copy now adapts to whether anything's actually
+ *   saved in settings. Found via screenshot: with no saved equipment,
+ *   every checkbox correctly renders unticked, but the copy still said
+ *   "untick anything you don't have" -- confusing against an empty
+ *   list with nothing to untick. Now says "tick anything you have
+ *   today" when nothing's saved, keeping the existing "untick" framing
+ *   only when there's real saved equipment to start from.
+ *
  * 03 Aug 2026 v2
  *
  * v2 -- Fixed isPremium()'s tier check: was reading store.get("userTier"),
@@ -210,6 +220,7 @@ function renderEquipmentCheck() {
   const savedEquip   = store.get("equipment") || [];
   const currentEquip = equipmentOverride ?? savedEquip;
   const equipSet     = new Set(currentEquip);
+  const hasSavedEquipment = savedEquip.length > 0;
 
   return `
     <div class="view session-builder-view">
@@ -224,8 +235,9 @@ function renderEquipmentCheck() {
       <div class="card card-coach" style="margin-bottom: var(--space-4);">
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">
-          Here's what I think you have access to today. Untick anything you don't have --
-          I'll adjust the session. Changes here don't affect your saved settings.
+          ${hasSavedEquipment
+            ? `Here's what I think you have access to today. Untick anything you don't have &mdash; I'll adjust the session. Changes here don't affect your saved settings.`
+            : `I don't have any equipment saved for you yet. Tick anything you have today &mdash; I'll build around it. Changes here don't affect your saved settings.`}
         </p>
       </div>
 
