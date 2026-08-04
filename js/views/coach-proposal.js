@@ -1,5 +1,23 @@
 /**
  * coach-proposal.js
+ * 04 Aug 2026 v15
+ *
+ * v15 — Multi-condition messaging, prompted by Graeme asking directly:
+ *   "Glutes / Buttocks" was already dynamic per condition (getConditionName()),
+ *   but with 2+ conditions in the same severity band, both
+ *   _buildMildMessage() and _buildConstraintMessage() were silently
+ *   using conditions[0] only — real conditions were being dropped from
+ *   the message entirely (never from workout filtering, which reads
+ *   the full list separately). New shared _joinNames() gives natural
+ *   phrasing — "X", "X and Y", "X, Y, and Z" — not a raw list dump.
+ *   Moderate message with multiple conditions folds each one's own
+ *   score into its name ("X (6/10)") rather than showing one aggregate
+ *   number that would misdescribe whichever condition it wasn't
+ *   actually about. Single-condition wording unchanged from v14/v13.
+ *   Known simplification, not addressed here: if Mild and Moderate
+ *   conditions both exist on the same day, only the Moderate message
+ *   shows — Mild ones go unmentioned that day. Flagged, not built.
+ *
  * 04 Aug 2026 v14
  *
  * v14 — Pain Input Redesign, same day as v13's threshold fix. New Mild
@@ -931,6 +949,20 @@ export function CoachProposalView(router) {
   // numeric boundaries themselves are the same source of truth,
   // confirmed against conditions.js when writing this (04 Aug 2026).
 
+  // Natural-language list join for multiple condition names in one
+  // message — "X", "X and Y", or "X, Y, and Z" — rather than dumping
+  // raw names or only ever mentioning the first match. Added 04 Aug
+  // 2026 after Graeme asked directly whether multiple conditions would
+  // read naturally; previously _buildMildMessage()/_buildConstraintMessage()
+  // silently used conditions[0] only, dropping any others from the
+  // message entirely (still correctly excluded from the workout either
+  // way — this was a messaging gap, not a safety gap).
+  function _joinNames(names) {
+    if (names.length === 1) return names[0];
+    if (names.length === 2) return `${names[0]} and ${names[1]}`;
+    return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+  }
+
   function _checkMildPain(conditions, painScores) {
     const mildConditions = conditions.filter(
       id => (painScores[id] || 0) >= 3 && (painScores[id] || 0) < 6
@@ -939,9 +971,10 @@ export function CoachProposalView(router) {
   }
 
   function _buildMildMessage(mildPain) {
-    const id   = mildPain.conditions[0];
-    const name = getConditionName(id);
-    return `I've noted ${name} as Mild today. I haven\'t changed anything in the programme, but keep an eye on it \u2014 if it starts feeling worse, please adapt what you\'re doing, or stop.`;
+    const names  = mildPain.conditions.map(getConditionName);
+    const plural = names.length > 1;
+    const list   = _joinNames(names);
+    return `I've noted ${list} as Mild today. I haven\'t changed anything in the programme, but keep an eye on ${plural ? 'them' : 'it'} \u2014 if ${plural ? 'they start' : 'it starts'} feeling worse, please adapt what you\'re doing, or stop.`;
   }
 
   function _checkSeverePain(conditions, painScores) {
@@ -966,10 +999,19 @@ export function CoachProposalView(router) {
   }
 
   function _buildConstraintMessage(moderatePain, conditions, painScores) {
-    const id        = moderatePain.conditions[0];
-    const painLevel = painScores[id] || 6;
-    const name      = getConditionName(id);
-    return `Your check-in flagged ${name} today (${painLevel}/10). I\'ve worked around that.`;
+    const ids = moderatePain.conditions;
+    if (ids.length === 1) {
+      const id        = ids[0];
+      const painLevel = painScores[id] || 6;
+      const name      = getConditionName(id);
+      return `Your check-in flagged ${name} today (${painLevel}/10). I\'ve worked around that.`;
+    }
+    // Multiple moderate conditions, 04 Aug 2026: each can carry its own
+    // score, so folded into the name itself ("X (6/10)") rather than
+    // one aggregate number that would misrepresent whichever condition
+    // it wasn't actually describing.
+    const parts = ids.map(id => `${getConditionName(id)} (${painScores[id] || 6}/10)`);
+    return `Your check-in flagged ${_joinNames(parts)} today. I\'ve worked around those.`;
   }
 
   // ── Option generation ──────────────────────────────────────────────────────
