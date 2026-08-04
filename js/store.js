@@ -1,7 +1,13 @@
 /**
  * store.js - Data persistence layer
- * 04 Aug 2026 v12
+ * 04 Aug 2026 v13
  *
+ * 04 Aug 2026 v13 - New field severePainChoices + recordSeverePainChoice()
+ *   helper, for the Severe pain Rest/Adapt choice (coach-proposal.js
+ *   v17). One record per date + exact severe-condition-id set — an
+ *   active choice log, not a single "last preference" value, so a
+ *   changed severe set always re-prompts and history of what was
+ *   actually chosen is preserved.
  * 04 Aug 2026 v12 - Home Nav & Conditions Redesign, Phase A (schema-first,
  *   per blueprint alongside_blueprint_home-navigation-conditions_04aug2026_v1.md).
  *   Two new fields: conditionReflections (array — deliberately separate
@@ -325,6 +331,14 @@ export const store = {
         ? saved.conditionFoldInLevel
         : null,
 
+      // ── SEVERE PAIN CHOICE (new 04 Aug 2026, Pain Input Redesign follow-up) ──
+      // { date: 'YYYY-MM-DD', conditionIds: [...sorted], choice: 'rest'|'adapt',
+      //   chosenAt: ISO string }. An explicit, actively-made record — Graeme's
+      // framing: the coach offers rest, the user actively chooses, and that
+      // choice is logged. Keyed by date + exact severe-condition-id set, so
+      // any change re-prompts rather than silently reusing a stale choice.
+      severePainChoices: Array.isArray(saved.severePainChoices) ? saved.severePainChoices : [],
+
       // ── WEEKLY PLAN ───────────────────────────────────────────
       weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
         ? {
@@ -487,6 +501,7 @@ export const store = {
       conditionPainScores: {},
       conditionReflections: [],   // { conditionId, text, loggedAt } — NOT Journal. Deliberately distinct field/namespace so it can never inherit the Journal Privacy Rule by accident. Coach-readable by design.
       conditionFoldInLevel: null, // 'partial' | 'mostly' | 'all' | null — null = static-only, not folded into Cardio/Core/Strength sessions
+      severePainChoices: [],      // { date, conditionIds, choice: 'rest'|'adapt', chosenAt } — active choice record, see mergeWithDefaults() note
 
       // ── LIFESTYLE ────────────────────────────────────────────
       lifestyle: {
@@ -796,6 +811,24 @@ export const store = {
     this.data.conditionPainScores = { ...painScores };
     this.data.updatedAt = new Date().toISOString();
     this.save();
+  },
+
+  // Records an active severe-pain choice (04 Aug 2026, Pain Input
+  // Redesign follow-up). One record per date + exact severe-condition-id
+  // set — deliberately not a single "last choice" value, so the coach
+  // always asks fresh if the severe set changes, and history of what
+  // was actually chosen (not just what was offered) is preserved.
+  recordSeverePainChoice(conditionIds, choice) {
+    const date = new Date().toISOString().slice(0, 10);
+    const entry = {
+      date,
+      conditionIds: [...conditionIds].sort(),
+      choice,
+      chosenAt: new Date().toISOString(),
+    };
+    this.data.severePainChoices = [...(this.data.severePainChoices || []), entry];
+    this.save();
+    return entry;
   },
 
   logSession(sessionData) {

@@ -1,5 +1,32 @@
 /**
  * coach-proposal.js
+ * 04 Aug 2026 v17
+ *
+ * v17 — Severe pain: active Rest/Adapt choice, Graeme's proposal
+ *   directly. Previously Severe conditions were narrated but the app
+ *   silently decided what happened next (same acute-tier filtering as
+ *   any other exercise exclusion). Now: when Severe pain is present and
+ *   no choice has been recorded yet today for that exact condition set,
+ *   the coach asks directly — "I can adapt around it, or we can call
+ *   today a rest day — what would you like to do?" — and nothing else
+ *   renders (no doors, no options) until the person actively answers.
+ *   The choice is recorded via store.recordSeverePainChoice() (new,
+ *   store.js v13) — a genuine audit-trail entry, not just a UI state,
+ *   which is the actual point: an offered-and-actively-chosen record is
+ *   what gives the "we suggested rest" framing real weight, not the
+ *   prompt alone. "Rest" routes to a gentle Wellbeing-or-done screen,
+ *   no session generated. "Adapt" proceeds to the normal proposal,
+ *   still narrating the Severe condition via the existing
+ *   _buildConditionNarrative() as confirmation of what was chosen.
+ *   Cleanup in the same pass: _checkSeverePain()/severePainOverride
+ *   removed entirely — dead weight now genuinely superseded by real
+ *   handling, not just theoretically unused as before.
+ *   NOTE, not decided by Claude: whether this interaction pattern
+ *   actually reduces legal liability is a real legal question, not a
+ *   UX one — worth Graeme raising with Alex's solicitor contact
+ *   alongside the other BIZ-5/6 items already queued, not assumed
+ *   correct just because the pattern feels safer.
+ *
  * 04 Aug 2026 v16
  *
  * v16 — Mixed-severity narrative, same day as v15's same-tier fix.
@@ -332,6 +359,15 @@ export function CoachProposalView(router) {
   let reEntryCtx    = null;
   let missedOffer   = null;
 
+  // ── Severe pain choice state (new 04 Aug 2026) ───────────────────────────
+  // severeChoicePending: { conditionIds, painScores } while awaiting an
+  // active Rest/Adapt choice — blocks the normal doors/options entirely
+  // until resolved. severeChoiceResolved: 'rest'|'adapt'|null once known
+  // for today (either just chosen, or read back from a prior choice
+  // already recorded today for this exact severe-condition set).
+  let severeChoicePending  = null;
+  let severeChoiceResolved = null;
+
   // ── Door 1 preview panel state (v8) ─────────────────────────────────────
   let previewOpen           = false;
   let currentPreviewOptions = [];
@@ -347,11 +383,102 @@ export function CoachProposalView(router) {
     reEntryCtx  = getReEntryContext();
     missedOffer = getMissedSessionOffer();
 
-    // Build the proposal
-    proposal = buildProposal();
+    // Severe pain — active choice, not a silent decision either way.
+    // Checked before buildProposal() so a pending choice can skip
+    // building options entirely (nothing to generate yet).
+    const conditions = store.get('conditions') || [];
+    const painScores  = store.get('conditionPainScores') || {};
+    const severeIds   = conditions.filter(id => (painScores[id] || 0) >= 7);
+
+    if (severeIds.length > 0) {
+      const existing = _getTodaySevereChoice(severeIds);
+      severeChoiceResolved = existing;
+      severeChoicePending  = existing ? null : { conditionIds: severeIds, painScores };
+    } else {
+      severeChoiceResolved = null;
+      severeChoicePending  = null;
+    }
+
+    // Build the proposal — skipped while a choice is pending, or if
+    // "rest" was chosen (nothing to propose either way).
+    proposal = (!severeChoicePending && severeChoiceResolved !== 'rest')
+      ? buildProposal()
+      : null;
 
     render(container);
   }
+
+  // ── Severe pain choice: lookup, render, handling ─────────────────────────
+
+  function _getTodaySevereChoice(severeIds) {
+    const today   = new Date().toISOString().slice(0, 10);
+    const sorted  = [...severeIds].sort();
+    const history = store.get('severePainChoices') || [];
+    const match = history.find(entry =>
+      entry.date === today &&
+      Array.isArray(entry.conditionIds) &&
+      entry.conditionIds.length === sorted.length &&
+      entry.conditionIds.every((id, i) => id === sorted[i])
+    );
+    return match ? match.choice : null;
+  }
+
+  function _buildSevereChoiceLine(pending) {
+    const names  = pending.conditionIds.map(getConditionName);
+    const plural = names.length > 1;
+    return `I noted that ${_joinNames(names)} ${plural ? 'are' : 'is'} Severe today. I can adapt around ${plural ? 'them' : 'it'}, or we can call today a rest day \u2014 what would you like to do?`;
+  }
+
+  function renderSevereChoice() {
+    return `
+      <div class="cp-missed-offer" role="region" aria-label="Severe pain — choose how to proceed today">
+        <div class="cp-missed-offer__choices" role="group" aria-label="Rest or adapt">
+          <button class="cp-missed-offer__btn" data-severe-choice="rest"
+                  aria-label="Rest today — no session">
+            Rest today
+            <span class="cp-missed-offer__sub">Nothing pushed today \u2014 the right call some days</span>
+          </button>
+          <button class="cp-missed-offer__btn" data-severe-choice="adapt"
+                  aria-label="Adapt around it and continue with a session">
+            Adapt and continue
+            <span class="cp-missed-offer__sub">I'll keep well clear of the affected area</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function _buildRestDayLine() {
+    return 'Good call. Nothing pushed today \u2014 resting is progress too. If you\'d like something gentle, Wellbeing has breathing and quiet options; otherwise, that\'s it for today.';
+  }
+
+  function renderRestDayOptions() {
+    return `
+      <div class="cp-missed-offer" role="region" aria-label="Rest day options">
+        <div class="cp-missed-offer__choices" role="group" aria-label="What next">
+          <button class="cp-missed-offer__btn" data-rest-action="noticing"
+                  aria-label="Visit Wellbeing for something gentle">
+            Visit Wellbeing
+            <span class="cp-missed-offer__sub">Breathing, journalling, a moment of quiet</span>
+          </button>
+          <button class="cp-missed-offer__btn" data-rest-action="home"
+                  aria-label="That's it for today, return home">
+            That's it for today
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function handleSevereChoice(choice, container) {
+    if (!severeChoicePending) return;
+    store.recordSeverePainChoice(severeChoicePending.conditionIds, choice);
+    severeChoiceResolved = choice;
+    severeChoicePending  = null;
+    proposal = (severeChoiceResolved !== 'rest') ? buildProposal() : null;
+    render(container);
+  }
+
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -359,6 +486,36 @@ export function CoachProposalView(router) {
     const voice       = getActiveVoice();
     const name        = store.get('name') || '';
     const tier        = store.get('tier') || 'free';
+
+    // Severe pain — awaiting an active choice. No doors, no options yet;
+    // nothing to propose until Rest or Adapt is actively chosen.
+    if (severeChoicePending) {
+      container.innerHTML = `
+        <div class="cp-view" role="main" aria-label="Severe pain — choose how to proceed">
+          <div class="cp-coach-block" aria-live="polite">
+            <div class="cp-greeting">${_buildSevereChoiceLine(severeChoicePending)}</div>
+          </div>
+          ${renderSevereChoice()}
+        </div>
+      `;
+      attachSevereChoiceEvents(container);
+      return;
+    }
+
+    // Severe pain — "rest" was actively chosen (today, this exact set).
+    // No session doors; gentle alternatives only.
+    if (severeChoiceResolved === 'rest') {
+      container.innerHTML = `
+        <div class="cp-view" role="main" aria-label="Today is a rest day">
+          <div class="cp-coach-block" aria-live="polite">
+            <div class="cp-greeting">${_buildRestDayLine()}</div>
+          </div>
+          ${renderRestDayOptions()}
+        </div>
+      `;
+      attachRestDayEvents(container);
+      return;
+    }
 
     container.innerHTML = `
       <div class="cp-view" role="main" aria-label="Your coaching proposal for today">
@@ -411,6 +568,24 @@ export function CoachProposalView(router) {
     `;
 
     attachEvents(container);
+  }
+
+  function attachSevereChoiceEvents(container) {
+    container.querySelectorAll('[data-severe-choice]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        handleSevereChoice(btn.dataset.severeChoice, container);
+      });
+    });
+  }
+
+  function attachRestDayEvents(container) {
+    container.querySelectorAll('[data-rest-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.restAction;
+        if (action === 'noticing') router.navigate('noticing');
+        else router.navigate('today');
+      });
+    });
   }
 
   // ── Door front renderer (v8) ────────────────────────────────────────────
@@ -781,8 +956,13 @@ export function CoachProposalView(router) {
    * v8: returns the raw `options` array (for Door 1's preview panel) in
    * addition to everything previous versions returned. `doors` no longer
    * built here — door copy is now static (DOOR_COPY), not derived per
-   * option. severePainOverride retained on the object for now (unused by
-   * rendering directly) in case Door 2's build wants to reference it.
+   * option.
+   * v17 (04 Aug 2026): only ever called when severe pain is either
+   * absent or already actively resolved as "adapt" for today — see
+   * mount()'s severeChoicePending gating above. severePainOverride
+   * removed from the returned object; it was dead weight (computed,
+   * never used by rendering) now that severe pain has real handling
+   * upstream instead of a placeholder for a feature that never landed.
    */
   function buildProposal() {
     const voice        = getActiveVoice();
@@ -802,7 +982,6 @@ export function CoachProposalView(router) {
     const feelingWord  = store.get('lastCheckin.feelingWord');
 
     // Pain override check
-    const severePain   = _checkSeverePain(conditions, painScores);
     const conditionNarrative = _buildConditionNarrative(conditions, painScores);
 
     // Re-entry intensity adjustment
@@ -841,7 +1020,6 @@ export function CoachProposalView(router) {
       constraint,
       intro,
       options,
-      severePainOverride: severePain.hasSevere,
     };
   }
 
@@ -981,20 +1159,6 @@ export function CoachProposalView(router) {
     if (names.length === 1) return names[0];
     if (names.length === 2) return `${names[0]} and ${names[1]}`;
     return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
-  }
-
-  function _checkSeverePain(conditions, painScores) {
-    const severeConditions = conditions.filter(id => (painScores[id] || 0) >= 7);
-    if (severeConditions.length === 0) return { hasSevere: false };
-
-    const worstId    = severeConditions[0];
-    const painLevel  = painScores[worstId];
-
-    return {
-      hasSevere:     true,
-      affectedZone:  worstId,
-      painLevel,
-    };
   }
 
   /**
