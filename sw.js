@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v204
+ * Phase D-1 (schema), Conditions Update. store.js v14→v15: new fields
+ * conditionGoals (felt-sense per-condition goal, Graeme's own framing —
+ * "healed"/"cope"/"improve") and prescribedExercisesOrigin (lets
+ * prescribed.js's coach voice branch correctly by entry context). Both
+ * decisions resolved same day they were logged — see Phase D blueprint
+ * v2. Schema.md v1.13→v1.14, also catching up a v14 field
+ * (pendingDoorRoute) that was missed in Schema.md when it shipped
+ * earlier today.
+ *
  * 04 Aug 2026 v203
  * today.js v6→v7 — real bug found while scoping Phase D, fixed
  * immediately: Conditions Update door was navigating directly to
@@ -502,7 +512,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v203";
+const CACHE_NAME = "alongside-v204";
 
 const SHELL_URLS = [
 

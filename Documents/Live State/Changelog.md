@@ -434,4 +434,15 @@ Real, currently-live bug, not left broken while Phase D gets built. `today.js`'s
 
 ---
 
+### Phase D-1 — schema (Conditions Update)
+
+Both remaining decisions resolved same day they were logged (Graeme delegated D-1's design with a steer — "the aim to feel healed, or more able to cope, or improved" — and clarified-then-delegated D-2). Schema-first, per standing rule, ahead of any view code.
+
+- `js/store.js` v14 → v15 — two new fields. `conditionGoals` (keyed by condition ID: `{ goalType: 'healed'|'cope'|'improve', note, setAt }`) — felt-sense, not numeric, deliberately not reusing `strategicGoal` (single-value, general-purpose, already spoken for). New `store.setConditionGoal()` helper. `prescribedExercisesOrigin` (`'professional'|'self'|null`) — set once when `prescribedExercises` first goes empty → non-empty, lets `prescribed.js`'s `buildCoachLine()` branch its two origin-referencing lines correctly when reached via Conditions Update's self-build route instead of a genuine prescription.
+- `Documents/Live State/Schema.md` v1.13 → v1.14 — both new fields documented. Also caught and corrected: Schema.md had fallen a step behind `store.js` — `pendingDoorRoute` (shipped earlier today, Phase C follow-up) was never added to the field-reference table. Fixed in the same pass.
+- `sw.js` v203 → v204, deployed last.
+- No view code touched this phase — foundation only, per the phased file list in the Phase D blueprint. Phase D-2 (the actual Conditions Update screen) needs a UX design pass first, not just falling out of the file list — genuinely new screen surface (severity slider, reflection field, goal picker, milestones, three programme-build routes, fold-in dial control all on one screen).
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
