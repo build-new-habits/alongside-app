@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v193
+ * Small follow-up to Phase A, same day, on request. checkin-mini.js
+ * v2→v3: "Severe" pain chip score corrected 8→9 to match checkin.js's
+ * "Severe" exactly — found while checking a report against the Phase A
+ * threshold fix. checkin-mini.js had its own private, duplicate
+ * PAIN_LEVELS definition (smaller version of the core-session.js
+ * private-pool problem). No live behavioural bug — both values already
+ * cleared every existing threshold — pure single-source-of-truth
+ * cleanup. Out of the original Phase A file list; logged explicitly.
+ *
  * 04 Aug 2026 v192
  * Home Nav & Conditions Redesign, Phase A (schema + single-source-of-
  * truth logic fix — blueprint alongside_blueprint_home-navigation-
@@ -335,7 +345,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v192";
+const CACHE_NAME = "alongside-v193";
 
 const SHELL_URLS = [
 
