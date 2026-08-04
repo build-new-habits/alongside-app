@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v194
+ * checkin-conversation.css v2→v3 — .ci-pain-chip text-overflow fix,
+ * found on-device by Graeme while confirming the Phase A threshold fix
+ * (screenshot: "Moderate" overflowing into "Severe"'s pill). Classic
+ * flexbox min-width:auto issue — added min-width:0 so chips shrink and
+ * wrap instead of overflowing. CSS-only, no JS/schema change.
+ *
  * 04 Aug 2026 v193
  * Small follow-up to Phase A, same day, on request. checkin-mini.js
  * v2→v3: "Severe" pain chip score corrected 8→9 to match checkin.js's
@@ -345,7 +352,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v193";
+const CACHE_NAME = "alongside-v194";
 
 const SHELL_URLS = [
 

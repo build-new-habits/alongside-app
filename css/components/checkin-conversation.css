@@ -1,6 +1,19 @@
 /* ============================================================
    checkin-conversation.css
    css/components/checkin-conversation.css
+   04 Aug 2026 v3
+
+   v3 — .ci-pain-chip text-overflow fix, found on-device (screenshot,
+   Graeme, testing the Home Nav Phase A threshold fix). "Moderate" was
+   overflowing its pill into the neighbouring "Severe" chip instead of
+   wrapping. Root cause: flex items default to min-width:auto, so a
+   flex:1 chip won't shrink below the intrinsic width of an unbreakable
+   word. Added min-width:0 so chips can shrink and wrap to two lines;
+   .ci-pain-chips' existing align-items:stretch (flex default) keeps
+   all four chips in a row the same height either way. checkin-mini.js's
+   equivalent chips (.ci-quality-chip) already use flex-wrap on the
+   container instead and aren't affected — confirmed, not touched.
+
    10 Jul 2026 v2
 
    v2 — checkin-mini.js styling fix. That file was rendering fully
@@ -389,6 +402,12 @@
 
 .ci-pain-chip {
   flex: 1;
+  min-width: 0; /* fix, 04 Aug 2026: flex items default to min-width:auto,
+    which stops a chip shrinking below the intrinsic width of an
+    unbreakable word ("Moderate") — it was overflowing into the next
+    chip instead of wrapping. min-width:0 lets it shrink and wrap to
+    two lines properly; .ci-pain-chips' default align-items:stretch
+    keeps all four chips in a row the same height either way. */
   padding: var(--space-3) var(--space-1);
   background: var(--color-bg-card);
   border: 2px solid var(--color-border);
@@ -400,6 +419,7 @@
   transition: all 0.15s ease;
   min-height: 48px;
   text-align: center;
+  line-height: 1.2;
   -webkit-tap-highlight-color: transparent;
 }
 
