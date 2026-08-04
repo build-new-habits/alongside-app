@@ -1,7 +1,15 @@
 /**
  * store.js - Data persistence layer
- * 30 Jul 2026 v11
+ * 04 Aug 2026 v12
  *
+ * 04 Aug 2026 v12 - Home Nav & Conditions Redesign, Phase A (schema-first,
+ *   per blueprint alongside_blueprint_home-navigation-conditions_04aug2026_v1.md).
+ *   Two new fields: conditionReflections (array — deliberately separate
+ *   namespace from journalEntries, NOT subject to the Journal Privacy
+ *   Rule, coach-readable by design) and conditionFoldInLevel ('partial'|
+ *   'mostly'|'all'|null — the condition-programme fold-in dial setting).
+ *   Both added to getDefaults() and mergeWithDefaults(), same pattern as
+ *   neighbouring fields. No behaviour change to any existing field.
  * 30 Jul 2026 v11 - logActivity()'s dedupeWindowMs default reduced from
  *   2 minutes to 10 seconds. Found on-device testing yoga-session.js v6:
  *   two genuinely different real completions 83 seconds apart were
@@ -309,6 +317,14 @@ export const store = {
         ? saved.conditionPainScores
         : {},
 
+      // ── CONDITION REFLECTIONS / FOLD-IN (new 04 Aug 2026, Home Nav Phase A) ──
+      // conditionReflections: deliberately separate from journalEntries above —
+      // not Journal content, coach-readable by design. See schema.md.
+      conditionReflections: Array.isArray(saved.conditionReflections) ? saved.conditionReflections : [],
+      conditionFoldInLevel: ['partial', 'mostly', 'all'].includes(saved.conditionFoldInLevel)
+        ? saved.conditionFoldInLevel
+        : null,
+
       // ── WEEKLY PLAN ───────────────────────────────────────────
       weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
         ? {
@@ -469,6 +485,8 @@ export const store = {
       // ── CONDITIONS ───────────────────────────────────────────
       conditions: [],
       conditionPainScores: {},
+      conditionReflections: [],   // { conditionId, text, loggedAt } — NOT Journal. Deliberately distinct field/namespace so it can never inherit the Journal Privacy Rule by accident. Coach-readable by design.
+      conditionFoldInLevel: null, // 'partial' | 'mostly' | 'all' | null — null = static-only, not folded into Cardio/Core/Strength sessions
 
       // ── LIFESTYLE ────────────────────────────────────────────
       lifestyle: {

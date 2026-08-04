@@ -1,13 +1,14 @@
 # Alongside — Data Schema Reference
-## 03 Aug 2026 v1.10
+## 04 Aug 2026 v1.11
 
-**File:** `js/store.js` (confirmed live version: v11, 30 Jul 2026)
+**File:** `js/store.js` (confirmed live version: v12, 04 Aug 2026)
 **Storage:** `localStorage` key `alongside_user`
 
-**This version supersedes:** `schema.md` v1.9 (30 Jul 2026). **BUILD-4 Appendix A follow-up (03 Aug 2026):** all 18 previously-unclassified fields checked individually for both reader and writer, per the method BUILD-4 itself established. Appendix A is now closed — see the resolution summary immediately below and the closed table further down. Two live, user-facing bugs found in the process (not fixed this session — logged, touch-once):
+**This version supersedes:** `schema.md` v1.10 (03 Aug 2026). **Home Nav & Conditions Redesign, Phase A (04 Aug 2026):** two new fields added — `conditionReflections` and `conditionFoldInLevel` — schema-first, ahead of any view code that reads them (Phases B–D of `alongside_blueprint_home-navigation-conditions_04aug2026_v1.md`, not yet built). No existing fields changed or renamed. Separately in this session: `js/data/conditions.js`'s `getActiveConditionIds()`/`getZoneStatus()` subacute threshold raised from `pain >= 4` to `pain >= 6`, matching `checkin.js`'s Moderate boundary — a logic fix, not a schema change, noted here since it changes what condition-aware filtering considers "moderate" app-wide.
 
-- **`userTier` is read once, in `js/views/session-builder-ui.js`, and never written anywhere.** The helper it feeds (`isPremium()`) always evaluates `false`, so **every user — including paying Personal/Athlete subscribers — sees Personal-tier session-builder options rendered as locked.** The genuine live field is `tier` (confirmed correct in `settings.js`, `progress.js`, `coach-proposal.js`, `store.js`). This is the same tier-field confusion already flagged against `upgrade.js`'s non-existent `getUserTier()` call in the 31 Jul master-schedule note — a second, independent occurrence of the same naming mistake, with a real consequence for paying users this time, not just a crash risk.
-- **`proposalBias` is written in `coach-reflection.js` (12 sites) but read nowhere else in the codebase**, including by `coach-reflection.js` itself. The reflection logic computes a `"lighter"`/`"rest"`/`null` bias per reflection type (severe pain, burnout risk, consecutive days, returning after absence) clearly intending to influence the next generated proposal — but nothing downstream ever consumes it. Same "specified but never wired up" pattern already on record for `exerciseFeedback` and Empathy Transfer's early stages.
+**Carried forward from v1.10, still relevant:** `proposalBias` is written in `coach-reflection.js` (12 sites) but read nowhere else in the codebase, including by `coach-reflection.js` itself. The reflection logic computes a `"lighter"`/`"rest"`/`null` bias per reflection type (severe pain, burnout risk, consecutive days, returning after absence) clearly intending to influence the next generated proposal — but nothing downstream ever consumes it. Same "specified but never wired up" pattern already on record for `exerciseFeedback` and Empathy Transfer's early stages. Still open, not fixed here — out of this session's scope.
+
+**Resolved since v1.10:** `userTier` (previously flagged here as read-but-never-written, locking paying users out of session-builder options) was fixed 03 Aug — `session-builder-ui.js` v2 now reads `tier`, the genuine live field. No longer an open item.
 
 All data lives in a single JSON object under this key. `store.js` provides typed get/set access — never manipulate `localStorage` directly. On initialisation, `mergeWithDefaults()` fills any missing keys so existing users receive new fields without data loss.
 
@@ -29,7 +30,8 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | 1.7 | 15 Jun 2026 | Noticing Hub schema pass. |
 | 1.8 | 16 Jul 2026 | Empathy Transfer schema pass: 5 new top-level fields (delta note only, never folded into a full file until now). |
 | 1.9 | 30 Jul 2026 | Full ground-truth reconciliation (BUILD-4). Rewritten directly against live `store.js` v10. Documents all fields actually returned by `getDefaults()`, corrects two errors inherited from v1.7 (see below), resolves the `hardBeforeSelections` naming question, resolves `stats` and `exerciseFeedback` dormancy questions, and separates out an appendix of fields used via `store.get`/`store.set` but absent from `getDefaults()`. |
-| **1.10** | **03 Aug 2026** | **BUILD-4 Appendix A follow-up.** All 18 previously-unclassified fields individually checked (reader + writer each) and folded into their proper sections. 11 confirmed live, 5 dormant (write-only), 2 dead. Two live bugs surfaced: `userTier` has no writer and its one reader always evaluates false, locking Personal-tier session-builder options for paying users; `proposalBias` is written but never read anywhere. Appendix A closed. |
+| 1.10 | 03 Aug 2026 | BUILD-4 Appendix A follow-up. All 18 previously-unclassified fields individually checked (reader + writer each) and folded into their proper sections. 11 confirmed live, 5 dormant (write-only), 2 dead. Two live bugs surfaced: `userTier` has no writer and its one reader always evaluates false, locking Personal-tier session-builder options for paying users; `proposalBias` is written but never read anywhere. Appendix A closed. |
+| **1.11** | **04 Aug 2026** | **Home Nav & Conditions Redesign, Phase A.** Two new fields: `conditionReflections` (deliberately separate namespace from `journalEntries`, not subject to Journal Privacy Rule), `conditionFoldInLevel` (fold-in dial setting, `'partial'\|'mostly'\|'all'\|null`). `js/store.js` v11→v12. Also: `userTier` bug (flagged 1.10) confirmed fixed since 03 Aug, no longer open. |
 
 ### Corrections made in this pass
 
@@ -88,6 +90,8 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | `goals` | `string[]` | `[]` | Goal IDs from `goals.js`. Drives exercise filter engine and `workoutGenerator.js`'s goal-aware bias. |
 | `conditions` | `string[]` | `[]` | Condition IDs from `conditions.js`. Base IDs only — phase variants derived at runtime. |
 | `conditionPainScores` | `object` | `{}` | Keyed by condition ID. Written at check-in submission. |
+| `conditionReflections` | `array` | `[]` | **New, 04 Aug 2026 (Home Nav Phase A).** `{ conditionId, text, loggedAt }`. Deliberately a separate namespace from `journalEntries` below — **not** subject to the Journal Privacy Rule, coach-readable by design. Decided explicitly to avoid it silently inheriting journal privacy behaviour by accident (see `alongside_blueprint_home-navigation-conditions_04aug2026_v1.md` §3). |
+| `conditionFoldInLevel` | `string\|null` | `null` | **New, 04 Aug 2026 (Home Nav Phase A).** `'partial'\|'mostly'\|'all'\|null`. Fold-in dial setting for the condition programme — whether/how much its exercises are woven into Cardio/Core/Strength sessions vs staying static-only in Mobility & Conditioning. `null` = static-only. |
 | `equipment` | `string[]` | `[]` | Equipment IDs from `equipment.js`. **Derived, not primary input** — see below. |
 | `homeEquipment` | `string[]` | `[]` *(undocumented in `getDefaults()`)* | Live. Scope-specific onboarding input, written/read entirely within `equipment.js`. |
 | `gymEquipment` | `string[]` | `[]` *(undocumented in `getDefaults()`)* | Live. Scope-specific onboarding input, written/read entirely within `equipment.js`. |
