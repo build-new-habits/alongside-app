@@ -1,5 +1,17 @@
 /**
  * router.js
+ * 04 Aug 2026 v11
+ *
+ * v11 — Phase C, Home Nav & Conditions Redesign. Fixed a real,
+ *   previously-undiscovered bug: the 'session-builder' route pointed
+ *   at './views/session-builder.js', which does not exist — the real
+ *   view file is session-builder-ui.js (js/session-builder.js, no
+ *   "-ui" suffix, is a separate data/logic module that view imports
+ *   from, not the view itself). import(path) would have thrown before
+ *   ever reaching the old/new pattern detection — this route could
+ *   never have worked, on any device, until now. Found while wiring
+ *   Home's new "Cardio, Core & Strength" door to it.
+ *
  * 28 Jul 2026 v10
  *
  * v10 — BUILD-3 follow-on fix, found during on-device back-gesture testing.
@@ -97,7 +109,14 @@ const VIEW_NAMES = {
   'annual-reflection': { path: './views/annual-reflection.js',fn: 'AnnualReflectionView'},
 
   // ── Session builder ────────────────────────────────────────────────────────
-  'session-builder':   { path: './views/session-builder.js',  fn: 'SessionBuilderView'  },
+  // fix, 04 Aug 2026 (Phase C): path pointed at './views/session-builder.js',
+  // which does not exist — the real view file is session-builder-ui.js
+  // (js/session-builder.js, no "-ui", is a separate data/logic module this
+  // view imports from, not the view itself). This route has been broken
+  // since whenever it was written; found while wiring Home's new doors to
+  // it. import(path) would throw before ever reaching the old/new pattern
+  // detection below, so this route could never have worked, on any device.
+  'session-builder':   { path: './views/session-builder-ui.js',  fn: 'SessionBuilderView'  },
 
   // ── Session views ──────────────────────────────────────────────────────────
   'workout':            { path: './views/workout.js',           fn: 'WorkoutView'           },

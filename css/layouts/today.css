@@ -1,5 +1,18 @@
 /*
  * css/layouts/today.css
+ * 04 Aug 2026 v2
+ *
+ * v2 — Phase C, Home Nav & Conditions Redesign. New six-door grid
+ * (.today-doors/.today-door) replacing the old single CTA + secondary
+ * actions row. New .today-settings-link corner affordance (Settings
+ * now reachable directly from Home, per spec). .today-checkin-link
+ * replaces .today-checkin-btn — check-in is no longer the dominant
+ * primary action, just a modest link shown only when not yet checked
+ * in today. Old .today-cta-block/.today-checkin-btn/.today-secondary-
+ * actions/.today-secondary-btn/.today-view--done/.today-second-session
+ * rules removed — confirmed unused, today.js v5 no longer renders
+ * those classes.
+ *
  * 25 Jun 2026 v1
  *
  * Styles for today.js v2 — the daily entry point view.
@@ -14,6 +27,36 @@
   max-width: 480px;
   margin: 0 auto;
   min-height: 100%;
+  position: relative;
+}
+
+/* ── Settings corner affordance ──────────────────────────────────── */
+
+.today-settings-link {
+  position: absolute;
+  top: var(--space-6);
+  right: var(--space-4);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xl);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.today-settings-link:hover,
+.today-settings-link:focus-visible {
+  background: var(--color-bg-elevated);
+}
+
+.today-settings-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* ── Greeting ─────────────────────────────────────────────────── */
@@ -23,6 +66,7 @@
   font-weight: var(--font-bold);
   color: var(--color-text);
   margin: 0;
+  padding-right: 52px; /* clears the settings affordance */
   line-height: 1.2;
 }
 
@@ -57,54 +101,73 @@
   color: var(--color-text-muted);
 }
 
-/* ── CTA block ────────────────────────────────────────────────── */
+/* ── Six doors ────────────────────────────────────────────────── */
 
-.today-cta-block {
-  display: flex;
-  flex-direction: column;
+.today-doors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
   margin-top: var(--space-2);
 }
 
-.today-checkin-btn {
-  width: 100%;
-  min-height: 56px;
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-}
-
-/* ── Secondary actions ────────────────────────────────────────── */
-
-.today-secondary-actions {
+.today-door {
   display: flex;
-  gap: var(--space-3);
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  min-height: 100px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.today-secondary-btn {
-  flex: 1;
-  min-height: 44px;
-  font-size: var(--text-sm);
-  color: var(--color-primary);
+.today-door:hover {
   border-color: var(--color-primary);
 }
 
-/* ── Done state ───────────────────────────────────────────────── */
+.today-door:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
 
-.today-view--done .today-greeting {
+.today-door__icon {
   font-size: var(--text-2xl);
+  line-height: 1;
 }
 
-/* ── Second session ───────────────────────────────────────────── */
-
-.today-second-session {
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border);
+.today-door__label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: var(--leading-snug);
 }
 
-.today-second-session-btn {
+/* "Unsure? Coach decides" — the zero-effort door, spans both columns
+   so it reads as the deliberately different, delegate-everything
+   option rather than a seventh peer among six equal tiles. */
+.today-door--unsure {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  border-style: dashed;
+  background: var(--color-bg-elevated);
+}
+
+.today-door--unsure .today-door__icon {
+  font-size: var(--text-xl);
+}
+
+/* ── Check-in link (modest, not the primary CTA) ─────────────────── */
+
+.today-checkin-link {
   width: 100%;
   min-height: 44px;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
+  margin-top: var(--space-1);
 }

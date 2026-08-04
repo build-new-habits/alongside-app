@@ -1,8 +1,45 @@
 /**
  * today.js
- * 21 Jul 2026 v4
+ * 04 Aug 2026 v5
  *
- * v4 (21 Jul 2026) — Proposal-loop fix (navfix-proposalloop session).
+ * v5 — Phase C, Home Nav & Conditions Redesign (blueprint
+ *   alongside_blueprint_home-navigation-conditions_04aug2026_v1.md).
+ *   Replaced the single "Check in" CTA + gated funnel with six always-
+ *   visible doors: Cardio/Core/Strength, Mobility & Conditioning,
+ *   Wellbeing, Conditions Update, Progress, Unsure? Coach decides. No
+ *   forced check-in gate before doors 1-3 — matches the spec's
+ *   "zero-effort path" principle. Settings now reachable directly from
+ *   Home (corner affordance), also per spec.
+ *
+ *   Behaviour change, deliberate: the old 'checked-in' state auto-
+ *   redirected away from this screen to coach-reflection whenever a
+ *   check-in existed for today — removed. Auto-redirecting away from
+ *   Home contradicts "Home IS the doors UI"; the six doors now always
+ *   show, with the coach line reflecting check-in/session status
+ *   instead of the screen itself changing. The 'proposal-accepted'
+ *   10-minute-window state is kept as-is — still needed for the
+ *   "just tapped a door, backed out, came back" case.
+ *
+ *   Door routes, two are honest bridges pending later phases, flagged
+ *   here and in the master schedule, not silently treated as final:
+ *     - Cardio/Core/Strength -> session-builder (closest existing
+ *       match to "coach pulls from full exercise range")
+ *     - Mobility & Conditioning -> library (closest existing match;
+ *       doesn't yet pull from a Conditions Update programme, since
+ *       that's Phase D, not built)
+ *     - Conditions Update -> onboarding/conditions (existing conditions
+ *       editor) as a bridge until Phase D builds the real dedicated
+ *       screen described in the spec
+ *     - Wellbeing -> noticing, Progress -> progress, Unsure? Coach
+ *       decides -> coach-proposal: all exact matches, no bridging
+ *
+ *   Real bug found and fixed while wiring Door 1: router.js's
+ *   'session-builder' route pointed at a file that doesn't exist
+ *   (./views/session-builder.js — the real file is session-builder-
+ *   ui.js). That route could never have worked, on any device, until
+ *   this fix (router.js, same session).
+ *
+ * 21 Jul 2026 v4 — Proposal-loop fix (navfix-proposalloop session).
  *   _resolveState() checked 'proposal-accepted' before 'session-done',
  *   so completing a full session within 10 minutes of accepting a
  *   proposal could strand the user on the Coach Proposal/threshold
@@ -47,37 +84,35 @@ import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
 
 export function TodayView(router) {
 
+  // ── Six Home doors (04 Aug 2026, Phase C) ────────────────────────────────
+  const HOME_DOORS = [
+    { id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder' },
+    { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'library' },
+    { id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing' },
+    { id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'onboarding/conditions' },
+    { id: 'progress', label: 'Progress', icon: '\uD83D\uDCCA', route: 'progress' },
+    { id: 'unsure', label: 'Unsure? Coach decides', icon: '\uD83C\uDFAF', route: 'coach-proposal' },
+  ];
+
   function mount(container) {
     advanceWeekIfNeeded();
     const state = _resolveState();
 
-    switch (state) {
-      case 'proposal-accepted':
-        _routeToThreshold();
-        return;
-      case 'session-done':
-        renderSessionDone(container);
-        break;
-      case 'checked-in':
-        router.navigate('coach-reflection');
-        return;
-      default:
-        renderDefault(container);
-        break;
+    if (state === 'proposal-accepted') {
+      _routeToThreshold();
+      return;
     }
+
+    renderHome(container);
   }
 
   function _resolveState() {
     const today        = _todayString();
     const lastProposal = store.get('lastProposalDate');
-    const lastCheckin  = store.get('lastCheckin.timestamp');
-    const activityLog  = store.get('activityLog') || [];
 
-    const sessionToday = activityLog.some(e => {
-      const ts = e.completedAt || e.loggedAt || e.date;
-      return ts && new Date(ts).toISOString().split('T')[0] === today;
-    });
-    if (sessionToday) return 'session-done';
+    // Session already completed today takes priority — never route to a
+    // pending proposal if there's nothing pending.
+    if (_sessionCompletedToday()) return 'default';
 
     if (lastProposal) {
       const proposalDate = new Date(lastProposal);
@@ -87,11 +122,21 @@ export function TodayView(router) {
       }
     }
 
-    if (lastCheckin && new Date(lastCheckin).toISOString().split('T')[0] === today) {
-      return 'checked-in';
-    }
-
     return 'default';
+  }
+
+  function _sessionCompletedToday() {
+    const today       = _todayString();
+    const activityLog = store.get('activityLog') || [];
+    return activityLog.some(e => {
+      const ts = e.completedAt || e.loggedAt || e.date;
+      return ts && new Date(ts).toISOString().split('T')[0] === today;
+    });
+  }
+
+  function _checkedInToday() {
+    const lastCheckin = store.get('lastCheckin.timestamp');
+    return !!(lastCheckin && new Date(lastCheckin).toISOString().split('T')[0] === _todayString());
   }
 
   function _routeToThreshold() {
@@ -133,19 +178,27 @@ export function TodayView(router) {
     return MAP[doorKey] || 'workout';
   }
 
-  function renderDefault(container) {
-    const name         = store.get('name') || '';
-    const greeting     = _buildGreeting(name);
-    const coachLine    = _buildCoachLine();
-    const weeklyTarget = store.get('strategicGoal.weeklySessionTarget') || 3;
-    const sessionCount = _sessionsThisWeek();
+  function renderHome(container) {
+    const name          = store.get('name') || '';
+    const greeting      = _buildGreeting(name);
+    const sessionDone   = _sessionCompletedToday();
+    const coachLine     = sessionDone
+      ? "You moved today \u2014 that's done. Tap in below any time if you'd like to do more."
+      : _buildCoachLine();
+    const weeklyTarget  = store.get('strategicGoal.weeklySessionTarget') || 3;
+    const sessionCount  = _sessionsThisWeek();
 
     container.innerHTML = `
       <div class="today-view" role="main" aria-label="Today">
 
+        <button class="today-settings-link" data-action="settings"
+                aria-label="Settings">
+          <span aria-hidden="true">\u2699\uFE0F</span>
+        </button>
+
         <header class="today-header">
           <h1 class="today-greeting">${_esc(greeting)}</h1>
-          ${coachLine ? `<p class="today-coach-line">${_esc(coachLine)}</p>` : ''}
+          ${coachLine ? `<p class="today-coach-line" role="status">${_esc(coachLine)}</p>` : ''}
         </header>
 
         ${sessionCount > 0 ? `
@@ -157,72 +210,23 @@ export function TodayView(router) {
           </div>
         ` : ''}
 
-        <div class="today-cta-block">
-          <button class="btn btn-primary today-checkin-btn"
-                  data-action="checkin"
-                  aria-label="Check in and get today's session">
+        <div class="today-doors" role="group" aria-label="Choose how you want to move today">
+          ${HOME_DOORS.map(d => `
+            <button class="today-door ${d.id === 'unsure' ? 'today-door--unsure' : ''}"
+                    data-route="${d.route}"
+                    aria-label="${_esc(d.label)}">
+              <span class="today-door__icon" aria-hidden="true">${d.icon}</span>
+              <span class="today-door__label">${_esc(d.label)}</span>
+            </button>
+          `).join('')}
+        </div>
+
+        ${!_checkedInToday() ? `
+          <button class="btn btn-ghost today-checkin-link" data-action="checkin"
+                  aria-label="Check in — helps every door adapt to how you're doing today">
             Check in
           </button>
-        </div>
-
-        <div class="today-secondary-actions">
-          <button class="btn btn-ghost today-secondary-btn"
-                  data-action="noticing"
-                  aria-label="Go to the noticing hub">
-            Noticing
-          </button>
-          <button class="btn btn-ghost today-secondary-btn"
-                  data-action="library"
-                  aria-label="Open the practice library">
-            Library
-          </button>
-        </div>
-
-      </div>
-    `;
-
-    attachEvents(container);
-  }
-
-  function renderSessionDone(container) {
-    const name      = store.get('name') || '';
-    const timeGreet = _timeGreeting();
-
-    container.innerHTML = `
-      <div class="today-view today-view--done" role="main" aria-label="Today">
-
-        <header class="today-header">
-          <h1 class="today-greeting">${_esc(timeGreet)}${name ? ', ' + _esc(_cap(name)) : ''}.</h1>
-          <p class="today-coach-line" role="status">
-            You moved today. That's done.
-          </p>
-        </header>
-
-        <div class="today-secondary-actions">
-          <button class="btn btn-ghost today-secondary-btn"
-                  data-action="noticing"
-                  aria-label="Go to the noticing hub">
-            Noticing
-          </button>
-          <button class="btn btn-ghost today-secondary-btn"
-                  data-action="library"
-                  aria-label="Open the practice library — breathing, meditation">
-            Library
-          </button>
-          <button class="btn btn-ghost today-secondary-btn"
-                  data-action="progress"
-                  aria-label="See your progress">
-            Progress
-          </button>
-        </div>
-
-        <div class="today-second-session">
-          <button class="btn btn-ghost today-second-session-btn"
-                  data-action="second-session"
-                  aria-label="I want to move again today">
-            I want to move again
-          </button>
-        </div>
+        ` : ''}
 
       </div>
     `;
@@ -231,12 +235,13 @@ export function TodayView(router) {
   }
 
   function attachEvents(container) {
+    container.querySelectorAll('[data-route]').forEach(btn => {
+      btn.addEventListener('click', () => router.navigate(btn.dataset.route));
+    });
+
     const actions = {
-      'checkin':        () => router.navigate('checkin'),
-      'noticing':       () => router.navigate('noticing'),
-      'library':        () => router.navigate('library'),
-      'progress':       () => router.navigate('progress'),
-      'second-session': () => router.navigate('checkin-mini'),
+      'checkin':  () => router.navigate('checkin'),
+      'settings': () => router.navigate('settings'),
     };
 
     container.querySelectorAll('[data-action]').forEach(btn => {

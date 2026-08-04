@@ -383,4 +383,19 @@ Per `alongside_blueprint_home-navigation-conditions_04aug2026_v1.md`. The exerci
 
 ---
 
+### Phase C — Home screen and entry-flow rebuild (Home Nav & Conditions Redesign)
+
+Per `alongside_blueprint_home-navigation-conditions_04aug2026_v1.md`. The single "Check in" CTA + gated funnel is gone — Home is now the six doors themselves, not a corridor leading to them.
+
+- `js/views/today.js` v4 → v5 — full rewrite. Six always-visible doors: **Cardio, Core & Strength** (→ session-builder), **Mobility & Conditioning** (→ library), **Wellbeing** (→ noticing), **Conditions Update** (→ the existing conditions editor), **Progress** (→ progress), **Unsure? Coach decides** (→ coach-proposal). No forced check-in gate before doors 1–3, matching the spec's zero-effort principle. Settings now reachable directly from Home via a corner affordance. Deliberate behaviour change: the old auto-redirect to coach-reflection whenever a check-in existed for today is removed — auto-redirecting away from Home contradicted "Home IS the doors UI"; the coach line now reflects check-in/session status instead of the screen itself changing.
+- **Two door routes are honest bridges, flagged not hidden:** Conditions Update points at the existing conditions editor until Phase D builds the real dedicated screen the spec describes; Mobility & Conditioning points at Library until it can pull from an actual Conditions Update programme. Both logged on the master schedule, not silently treated as final.
+- **Real, previously-undiscovered bug found and fixed while wiring Door 1:** `js/router.js`'s `'session-builder'` route pointed at `./views/session-builder.js`, which doesn't exist — the real view file is `session-builder-ui.js` (`js/session-builder.js`, no "-ui" suffix, is a separate data/logic module that view imports from, not the view itself). `import(path)` would have thrown before the router's pattern-detection logic ever ran — this route could never have worked, on any device, until now. `router.js` v10 → v11.
+- `js/views/coach-proposal.js` v17 → v18 — the three-doors-plus-bypass UI removed entirely, per the blueprint's Section 0.1 decision (reduce, don't retire). `DOOR_COPY`, `renderDoorFront()`, `renderBypassDoor()`, `handleDoorChoice()` all removed, along with their now-dead callers/helpers (`_buildAcknowledgement()`, `openPreviewPanel()`). This screen is only reached via Home's "Unsure? Coach decides" door now, so the session-options panel (previously "door-1," opened by a tap) opens automatically as part of the first render — no second choice on top of the choice already made by tapping the door from Home. `handleReturnContext()` updated to do a full re-render instead of patching the now-gone `.cp-doors` element. `closePreviewPanel()` ("Not today"/backdrop/close) now navigates back to Home instead of leaving an empty coach message with nothing actionable underneath.
+- `css/layouts/today.css` v1 → v2 — new door-grid styling; old CTA/secondary-action/done-state rules removed, confirmed unused. `css/components/coach-proposal.css` v6 → v7 — `.cp-door*`/`.cp-bypass*` rule sets removed, same reasoning.
+- `sw.js` v200 → v201, deployed last.
+- **Known, not fixed this pass:** `today.js`'s and `home-threshold.js`'s `_doorToRoute()`-style fallback maps still carry `'bypass-library'`/`'bypass-facilitate'` entries from the retired bypass row — harmless (unreachable now, not broken), left alone since `home-threshold.js` wasn't in this phase's file list; touch-once discipline, not an oversight.
+- **Not yet on-device confirmed.** Needs a full pass: all six doors from Home, Settings reachable and returns cleanly, "Unsure? Coach decides" shows the recommendation immediately with no extra tap, re-entry banner still works and correctly refreshes the panel, "Not today" returns to Home cleanly.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
