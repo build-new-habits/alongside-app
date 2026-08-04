@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 04 Aug 2026 v105
+## 03 Aug 2026 v104
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_03aug2026_v104.md`. Remove v104 on upload.
+Supersedes `alongside_master_schedule_03aug2026_v103.md`. Remove v103 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** New design spec — `alongside_spec_home-navigation-conditions_04aug2026_v1.md` — a major navigation and Conditions Update redesign, worked through with Graeme over several turns and grounded in direct code tracing before any of it was written down. Confirmed via code: the current path to a specific targeted exercise is 7 taps and includes a genuine duplicate-choice bug (Library asks "Mobility," then `core-session.js` resets and asks again); `core-session.js` has its own disconnected exercise pool separate from the main database; a real Mild/Moderate/Severe severity model already exists live (`checkin.js`) and should be extended, not replaced. Three real decisions made and captured: a 6th "Unsure? Coach decides" door (zero-effort path); the new Conditions free-text field is explicitly NOT Journal content — a new, distinct, coach-readable field, decided specifically to avoid it silently inheriting the Journal Privacy Rule by accident; Yoga/Pilates content is one shared exercise pool with two doorways in (Mobility & Conditioning and Wellbeing), not duplicated content. **Planning only — no code written.** Two items explicitly flagged as needing real answers before a build session can be scoped: the Mild/Moderate/Severe threshold mismatch between `checkin.js` (Moderate starts at 6) and `core-session.js` (subacute flag starts at 4); and the "Partially/Mostly/All" fold-in dial, which needs to become an actual algorithm, not adjectives.
+**This version's substantive changes:** Tier-gating infrastructure built (S4-TG, scoped 9 May 2026, finally implemented). **Worth reading past the headline, though** — ground-truthing the 9 May spec against current live code found that reality has moved on substantially since it was written: the spec assumed a field called `userTier` that was never actually used (live code already uses `tier`, matched instead); `progress.js` already has real, working, ad-hoc tier gating that predates this session and was deliberately left untouched rather than churned; and roughly half the spec's named audit-table features either don't exist in the app at all (custom programme builder, prescribed exercise levels, mindful audio prompts) or were explicitly killed since May (multi-style coach voice — Nurturing-only is now permanent). So what actually shipped is the genuinely-missing reusable infrastructure — `js/auth.js`, `css/components/tier-gating.css`, wired into `app.js` — not a full re-implementation of a now-partially-stale spec. **`lockedFeature()` isn't yet applied to anything live** — no currently-ungated real feature was found to wrap it around. Ready for whichever premium feature genuinely needs it next.
 
 **Process note, fixed this version:** the last several version bumps (v96–v98) stacked a new "substantive changes" paragraph on top of the previous one each time, rather than replacing it — by v98 this header had four full paragraphs and two duplicate Location notices. Condensed below into a single recent-history list. Going forward, this header should carry **only the current version's changes**, one paragraph — anything needed for continuity belongs in the dashboard or a dedicated section, not a growing stack of old summaries at the top.
 
@@ -301,11 +301,10 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 
 ---
 
-## One-Page Dashboard — 04 Aug 2026
+## One-Page Dashboard — 03 Aug 2026
 
 | Stream | Current position | Immediate next action | Blocker? |
 |--------|-----------------|----------------------|----------|
-| Product — Home Navigation & Conditions redesign | 📋 **Spec written, 04 Aug** (`alongside_spec_home-navigation-conditions_04aug2026_v1.md`). Six-door home screen, Conditions Update system, shared-pool architecture principle. Real code findings backing it: 7-tap path to a targeted exercise, a genuine duplicate-choice bug, `core-session.js`'s disconnected exercise pool. Planning only. | **Two open items need real answers before a build blueprint can be written:** the Mild/Moderate/Severe threshold mismatch between `checkin.js` and `core-session.js`; the fold-in dial's actual algorithm. | Not a build session yet — needs those two decisions first. |
 | Outreach — BANDS CIC meeting (Alfie + members) | 🟢 **New, 03 Aug.** First real response of 4 Tier 1 org emails sent. Real potential: follow-on meetings across Frome, Bath, Weston, Trowbridge if this goes well. | **Get a confirmed date from Graeme** — currently untracked without one. Prep a meeting brief once date's known, same pattern as the Alex meeting brief. | Meeting date unknown. |
 | Outreach — Canopy PT connection (neurodivergent clients) | 🟡 **New, 03 Aug.** Warm connection via the separate Canopy sub-project, not the direct outreach list. Interested in "supporting" — form unclear. | Conversation needed to understand what's actually being offered before this can be scoped. | Nature of support unclarified. |
 | Product — Wake Lock / resumable session gap | 🟡 **Code complete, 03 Aug, on-device pending.** `running-session.js` v4, new `session-resume.js`, `sw.js` v189, all pushed and confirmed live via fresh fetch. `node --check` clean. Blueprint's full scope implemented: timestamp-anchored elapsed, checkpoint/resume, coach-voiced resume card, Wake Lock lifecycle, exact-equality prompt-match fix. | **On-device test**: lock screen mid-run, force-refresh mid-run. This bug was only ever found through real use — treat this as the priority on-device test over BUILD-3's, since BUILD-3 is expected to be a formality and this genuinely isn't. | Needs a phone. |
@@ -384,4 +383,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 04 Aug 2026 v105*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Aug 2026 v104*
