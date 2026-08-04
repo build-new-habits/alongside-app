@@ -1,6 +1,17 @@
 /**
  * upgrade.js - Upgrade / Membership view (stub)
  *
+ * 03 Aug 2026 v2 - Fixed crash: render() called store.getUserTier(),
+ *   which doesn't exist anywhere in store.js - confirmed via direct grep
+ *   03 Aug, found while checking tier-gating status. Every other live
+ *   reader (settings.js, progress.js, session-builder-ui.js's isPremium()
+ *   as of its own 31 Jul fix) uses store.get("tier"), which defaults to
+ *   "free" in store.js's own default shape (line 455) - matched that
+ *   pattern here rather than inventing a new one. This screen would have
+ *   thrown the instant anyone navigated to it; not yet confirmed whether
+ *   that happened in practice, no crash report exists, but the code path
+ *   was unambiguous.
+ *
  * 22 May 2026 v1 --- Stub to prevent 404. Full Stripe integration: Phase F (August 2026).
  *
  * During beta, tier switching is done via the dev panel (triple-tap version
@@ -13,7 +24,7 @@ import { store } from "../store.js";
 export const centered = false;
 
 export function render() {
-  const tier = store.getUserTier();
+  const tier = store.get("tier") || "free";
   return `
     <div class="view" style="padding:var(--space-6);">
 

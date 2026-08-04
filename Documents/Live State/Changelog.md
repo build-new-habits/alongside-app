@@ -248,4 +248,15 @@ Found via Graeme's real on-device run, same day: pause wouldn't resume, a refres
 
 ---
 
+### upgrade.js crash fix
+
+Flagged 31 Jul as a live crash risk, confirmed still present 03 Aug when directly re-checked (a separate tier-gating fix that day had actually landed in `session-builder-ui.js`, not this file — worth noting since it's easy to assume a bug's fixed once a similarly-described one is).
+
+- `js/views/upgrade.js` v1 → v2 — `render()` called `store.getUserTier()`, which doesn't exist anywhere in `store.js`. Would have thrown the instant anyone navigated to the upgrade/membership screen. Fixed to `store.get("tier") || "free"`, matching every other live reader.
+- `sw.js` v189 → v190.
+- Confirmed no other `getUserTier()` calls exist anywhere else in the app.
+- `upgrade.js` isn't in `sw.js`'s `SHELL_URLS` precache list — pre-existing, separate, left alone.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
