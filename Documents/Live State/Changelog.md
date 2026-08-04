@@ -333,4 +333,14 @@ Prompted by the chip-overflow bug above still looking "awful and unprofessional"
 
 ---
 
+### Multi-condition message fix — same day, Graeme's follow-up question
+
+Confirmed the screenshot working ("I've noted Glutes / Buttocks as Mild today...") and asked the right next question: does the condition name change per condition (yes, already dynamic), and what happens with more than one? Checked — both the Mild and Moderate messages were silently using only the first matching condition, dropping any others entirely from the message (never from workout filtering, which was unaffected — this was purely a messaging gap).
+
+- `js/views/coach-proposal.js` v14 → v15 — new shared `_joinNames()` helper for natural-language lists ("X", "X and Y", "X, Y, and Z" — Oxford comma on 3+, not a raw dump). `_buildMildMessage()` now mentions every Mild condition, pluralising "it"/"them" and "starts"/"start" correctly. `_buildConstraintMessage()` (Moderate) now mentions every Moderate condition, folding each one's own score into its name ("Glutes / Buttocks (6/10) and Lower Back (7/10)") rather than showing one number that would misdescribe whichever condition it wasn't actually about. Single-condition wording unchanged from v14.
+- **Known simplification, flagged not built:** if Mild and Moderate conditions both exist the same day, only the Moderate message shows — any Mild ones go unmentioned that day. Real, but a smaller gap than the one just fixed; logged for later.
+- `sw.js` v196 → v197, deployed last.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

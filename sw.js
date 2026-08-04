@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v197
+ * coach-proposal.js v14→v15 — multi-condition message fix, Graeme asked
+ * directly whether "Glutes / Buttocks" changes per condition (yes,
+ * already dynamic) and how 2+ conditions in the same band would read
+ * (previously: silently dropped to just the first one — real gap, now
+ * fixed with natural-language joining, "X" / "X and Y" / "X, Y, and Z").
+ *
  * 04 Aug 2026 v196
  * Pain Input Redesign — Graeme's own instinct, built same session.
  * Real problem solved at the root, not another patch: today's chip-
@@ -395,7 +402,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v196";
+const CACHE_NAME = "alongside-v197";
 
 const SHELL_URLS = [
 
