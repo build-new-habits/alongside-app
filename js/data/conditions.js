@@ -1,6 +1,20 @@
 /**
  * conditions.js — Condition definitions for onboarding and check-in
  *
+ * 04 Aug 2026 v1.4
+ *   Pain Input Redesign, same day as v1.3's threshold fix. New
+ *   getPainBand(score) — the one canonical source of pain-severity
+ *   display bands (none 0-2, mild 3-5, moderate 6-7, severe 8-10) for
+ *   check-in sliders and coach messaging. Explicitly documented as
+ *   separate from getActiveConditionIds()/getZoneStatus()'s 2-tier
+ *   subacute/acute exercise-safety system above — different purpose,
+ *   not required to align at every boundary (see that function's own
+ *   comment for the known pain==7 edge case, now genuinely reachable
+ *   via the slider rather than theoretical). Removed dead code
+ *   getPainContext() — confirmed uncalled anywhere in js/, itself a
+ *   fourth private severity-threshold duplicate, still carrying the
+ *   pre-fix pain >= 4 value. Superseded by getPainBand().
+ *
  * 04 Aug 2026 v1.3
  *   Home Nav & Conditions Redesign, Phase A (blueprint
  *   alongside_blueprint_home-navigation-conditions_04aug2026_v1.md).
@@ -276,23 +290,29 @@ export function getConditionsByArea(area) {
 }
 
 /**
- * Get the pain threshold interpretation for display
- * Used by check-in UI to show contextual guidance
+ * Canonical pain-severity band + label, for DISPLAY purposes only
+ * (check-in slider live-label, coach acknowledgment messaging).
+ *
+ * Deliberately a separate, 4-tier system from getActiveConditionIds()/
+ * getZoneStatus() above, which is a 2-tier system (subacute/acute) for
+ * exercise-contraindication filtering — a different purpose, coarser on
+ * purpose. The two systems are NOT required to align at every boundary:
+ * pain 7 displays as "Moderate" here but already gets acute-level
+ * exercise caution above (pain >= 7) — that's a deliberate, previously
+ * signed-off decision (04 Aug 2026, Home Nav Phase A), not a bug. Flag
+ * to Graeme if this should ever be unified; not touched here.
+ *
+ * Bands match what checkin.js's and checkin-mini.js's chip UIs already
+ * used before this file existed: none 0-2, mild 3-5, moderate 6-7,
+ * severe 8-10.
+ *
+ * @param {number} score — 0-10
+ * @returns {{ id: string, label: string }}
  */
-export function getPainContext(conditionId, painScore) {
-  if (painScore >= 7) return {
-    phase: 'acute',
-    message: 'Take it easy today — we\'ll keep things very gentle.',
-    colour: 'danger'
-  };
-  if (painScore >= 4) return {
-    phase: 'subacute',
-    message: 'We\'ll work around this and avoid anything that could aggravate it.',
-    colour: 'warning'
-  };
-  return {
-    phase: 'managed',
-    message: 'Noted — we\'ll keep an eye on this.',
-    colour: 'neutral'
-  };
+export function getPainBand(score) {
+  const s = score ?? 0;
+  if (s <= 2) return { id: 'none',     label: 'None' };
+  if (s <= 5) return { id: 'mild',     label: 'Mild' };
+  if (s <= 7) return { id: 'moderate', label: 'Moderate' };
+  return       { id: 'severe',   label: 'Severe' };
 }

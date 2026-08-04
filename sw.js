@@ -1,6 +1,30 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v196
+ * Pain Input Redesign — Graeme's own instinct, built same session.
+ * Real problem solved at the root, not another patch: today's chip-
+ * overflow bug (fixed twice already, v194/v195) was a symptom of a
+ * 4-button discrete pain input that was always going to fight long
+ * words in a 4-column row. Converted to sliders instead, matching the
+ * app's own existing Energy/Mood pattern.
+ * - js/data/conditions.js v1.3→v1.4: new getPainBand(score) — one
+ *   canonical source for pain-severity display bands app-wide. Dead
+ *   getPainContext() removed (a fourth private threshold duplicate,
+ *   never called, still carrying the pre-fix >=4 value).
+ * - js/views/checkin.js v8→v9, js/views/checkin-mini.js v3→v4 — both
+ *   condition-pain inputs converted from button chips to sliders (0-10),
+ *   using getPainBand() for the live label. checkin-mini's own private
+ *   PAIN_LEVELS/painLevelForScore duplicate retired.
+ * - js/views/coach-proposal.js v13→v14 — new Mild acknowledgment tier
+ *   (previously totally silent for Mild pain — a real gap, not a
+ *   nicety, given "behaviour is communication"). Existing Moderate
+ *   message also upgraded to use the condition's real display name.
+ * - css/components/checkin-conversation.css v4→v5 — new compact
+ *   condition-slider styling; .ci-pain-chip/.ci-pain-chips removed
+ *   entirely, confirmed unused, rather than patched a third time.
+ * - Documents/Live State/Schema.md v1.11→v1.12.
+ *
  * 04 Aug 2026 v195
  * Four fixes from one round of Graeme's on-device screenshots, testing
  * the Home Nav Phase A threshold change:
@@ -371,7 +395,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v195";
+const CACHE_NAME = "alongside-v196";
 
 const SHELL_URLS = [
 
