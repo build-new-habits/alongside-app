@@ -1,5 +1,29 @@
 /**
  * coach-proposal.js
+ * 04 Aug 2026 v18
+ *
+ * v18 — Phase C, Home Nav & Conditions Redesign (blueprint
+ *   alongside_blueprint_home-navigation-conditions_04aug2026_v1.md,
+ *   Section 0.1 decision: reduce, don't retire). This screen is now
+ *   only reached via Home's "Unsure? Coach decides" door. Removed
+ *   entirely: DOOR_COPY, renderDoorFront(), renderBypassDoor(),
+ *   handleDoorChoice(), _buildAcknowledgement() (its only caller),
+ *   openPreviewPanel() (its only caller was the now-removed door-1
+ *   button — panel open is set directly in mount() instead). The
+ *   three-doors-plus-bypass markup is gone from render(); the session-
+ *   options panel (previously "door-1", opened by a tap) now opens
+ *   automatically as part of the first render — no second choice on
+ *   top of the choice already made by tapping "Unsure? Coach decides"
+ *   from Home. handleReturnContext() updated to do a full re-render
+ *   instead of patching the now-gone .cp-doors element.
+ *   closePreviewPanel() ("Not today"/backdrop/close) now navigates
+ *   back to Home instead of leaving an empty coach message with
+ *   nothing actionable underneath — there's no doors screen to fall
+ *   back to any more. Unused voice/name/tier variables in render()
+ *   removed (dead since the door markup that used them is gone).
+ *   coach-proposal.css v6->v7 in the same pass: .cp-door and .cp-bypass
+ *   rule sets removed, confirmed unused.
+ *
  * 04 Aug 2026 v17
  *
  * v17 — Severe pain: active Rest/Adapt choice, Graeme's proposal
@@ -328,27 +352,15 @@ import { getPrimaryEngineGoal } from '../data/goals.js';
 import { getConditionName }  from '../data/conditions.js';
 import { workoutGenerator, AVAILABLE_TIME_WINDOW_MINUTES } from '../data/workoutGenerator.js';   // v9 — direct import, replaces window._workoutGenerator lookup. v12 — added AVAILABLE_TIME_WINDOW_MINUTES.
 
-// ─── Door copy (v8 — static, honest about category vs commitment) ────────────
-
-const DOOR_COPY = {
-  'door-1': {
-    title: 'Today\u2019s session',
-    line:  'This option works around your check-in. It\u2019s what I recommend based on where you are today.',
-    enabled: true
-  },
-  'door-2': {
-    title: 'Your programme',
-    line:  'This option follows your programme with very limited adaptations. Where any major issues were flagged I\u2019ve tried to adapt it, but you can always choose \u201cuninterrupted\u201d to just follow the normal plan.',
-    enabled: false,
-    disabledReason: 'Being redesigned \u2014 check back soon.'
-  },
-  'door-3': {
-    title: 'Something different',
-    line:  'Perhaps today is one for something different. Come and have a look at some options.',
-    enabled: false,
-    disabledReason: 'Being redesigned \u2014 check back soon.'
-  }
-};
+// DOOR_COPY, renderDoorFront(), renderBypassDoor(), handleDoorChoice(),
+// and _buildAcknowledgement() removed 04 Aug 2026 (Phase C, Home Nav &
+// Conditions Redesign). This screen is now only reached via Home's
+// "Unsure? Coach decides" door — the three-doors-plus-bypass UI those
+// functions rendered is fully superseded by Home's six direct doors
+// (Cardio/Core/Strength and Mobility & Conditioning replace the bypass
+// row; this screen itself replaces door-1). Door-2/door-3 were disabled
+// "Being redesigned" placeholders since 23 Jun, never built — genuinely
+// retired now, not just hidden.
 
 // ─── View registration ────────────────────────────────────────────────────────
 
@@ -405,7 +417,26 @@ export function CoachProposalView(router) {
       ? buildProposal()
       : null;
 
+    // Auto-open the session-options panel (Phase C, 04 Aug 2026) — this
+    // screen no longer has doors to choose between; reaching it at all
+    // (via Home's "Unsure? Coach decides") means showing the
+    // recommendation immediately, not gating it behind a second tap.
+    // State set before the first render so it opens already-visible,
+    // not open-then-flash. Keydown trap + initial focus wired after,
+    // same setup openPreviewPanel() used to do for a later door tap —
+    // that function is removed now nothing calls it post-render.
+    if (proposal) {
+      currentPreviewOptions = proposal.options;
+      selectedOptionId      = null;
+      previewOpen           = true;
+    }
+
     render(container);
+
+    if (proposal) {
+      document.addEventListener('keydown', _previewKeydown);
+      _focusFirstInPanel(container);
+    }
   }
 
   // ── Severe pain choice: lookup, render, handling ─────────────────────────
@@ -483,10 +514,6 @@ export function CoachProposalView(router) {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   function render(container) {
-    const voice       = getActiveVoice();
-    const name        = store.get('name') || '';
-    const tier        = store.get('tier') || 'free';
-
     // Severe pain — awaiting an active choice. No doors, no options yet;
     // nothing to propose until Rest or Adapt is actively chosen.
     if (severeChoicePending) {
@@ -541,19 +568,7 @@ export function CoachProposalView(router) {
           <p class="cp-proposal-intro">${proposal.intro}</p>
         </div>
 
-        <!-- Three doors -->
-        <div class="cp-doors" role="group" aria-label="Choose how you want to move today">
-          ${renderDoorFront('door-1')}
-          ${renderDoorFront('door-2')}
-          ${renderDoorFront('door-3')}
-        </div>
-
-        <!-- Bypass door -->
-        <div class="cp-bypass">
-          ${renderBypassDoor(tier)}
-        </div>
-
-        <!-- Post-choice acknowledgement (hidden until choice made) -->
+        <!-- Post-choice acknowledgement (hidden until a session is started) -->
         <div class="cp-acknowledgement"
              id="cp-acknowledgement"
              aria-live="polite"
@@ -561,7 +576,10 @@ export function CoachProposalView(router) {
              style="display:none;">
         </div>
 
-        <!-- Door 1 preview panel (v8) — always in the DOM, hidden until opened -->
+        <!-- Session options — auto-open, no door tap needed (Phase C, 04 Aug
+             2026: this screen is now only reached via Home's "Unsure? Coach
+             decides" door, so showing the recommendation immediately is the
+             whole point, not a second choice on top of the first one) -->
         ${renderPreviewPanel()}
 
       </div>
@@ -586,26 +604,6 @@ export function CoachProposalView(router) {
         else router.navigate('today');
       });
     });
-  }
-
-  // ── Door front renderer (v8) ────────────────────────────────────────────
-
-  function renderDoorFront(key) {
-    const d = DOOR_COPY[key];
-    const isDisabled = !d.enabled;
-    return `
-      <button
-        class="cp-door ${isDisabled ? 'cp-door--disabled' : ''}"
-        id="${key}"
-        ${isDisabled ? 'aria-disabled="true" disabled' : ''}
-        aria-label="${d.title}${isDisabled ? ', ' + d.disabledReason : ''}"
-        ${isDisabled ? `aria-describedby="${key}-helper"` : ''}
-        data-door="${key}">
-        <span class="cp-door__label">${d.title}</span>
-        <span class="cp-door__line">${d.line}</span>
-        ${isDisabled ? `<span class="cp-door__helper" id="${key}-helper">${d.disabledReason}</span>` : ''}
-      </button>
-    `;
   }
 
   // ── Door 1 preview panel (v8) ────────────────────────────────────────────
@@ -659,24 +657,18 @@ export function CoachProposalView(router) {
     `;
   }
 
-  // ── Preview panel open/close (v8) ───────────────────────────────────────
-
-  function openPreviewPanel(options, container) {
-    currentPreviewOptions = options;
-    selectedOptionId      = null;
-    previewOpen           = true;
-    _rerenderPanel(container);
-    document.addEventListener('keydown', _previewKeydown);
-    _focusFirstInPanel(container);
-  }
+  // ── Preview panel close (v8; open handled directly in mount(), 04 Aug 2026) ──
 
   function closePreviewPanel(container) {
+    // Phase C, 04 Aug 2026: this panel is now the only content on this
+    // screen (no doors underneath to fall back to), so closing without
+    // a selection navigates back to Home instead of leaving an empty
+    // coach message with nothing actionable. The old #door-1 focus
+    // target no longer exists.
     previewOpen      = false;
     selectedOptionId = null;
     document.removeEventListener('keydown', _previewKeydown);
-    _rerenderPanel(container);
-    const doorBtn = container.querySelector('#door-1');
-    if (doorBtn) doorBtn.focus();
+    router.navigate('today');
   }
 
   function _rerenderPanel(container) {
@@ -770,31 +762,6 @@ export function CoachProposalView(router) {
     }
   }
 
-  // ── Bypass door renderer ───────────────────────────────────────────────────
-
-  function renderBypassDoor(tier) {
-    // Two flavours:
-    // 1. Coach facilitates — person knows direction, coach helps build
-    // 2. Straight to library — person knows exactly what they want
-    return `
-      <div class="cp-bypass__label" id="cp-bypass-label">I know what I want today</div>
-      <div class="cp-bypass__options" role="group" aria-labelledby="cp-bypass-label">
-        <button class="cp-bypass__btn"
-                data-door="bypass-facilitate"
-                data-route="session-builder"
-                aria-label="Help me build it — I know the direction, coach helps shape it">
-          Help me build it
-        </button>
-        <button class="cp-bypass__btn"
-                data-door="bypass-library"
-                data-route="library"
-                aria-label="Take me to the library — I know exactly what I want">
-          Take me to the library
-        </button>
-      </div>
-    `;
-  }
-
   // ── Return door renderer ───────────────────────────────────────────────────
 
   function renderReturnDoor() {
@@ -849,21 +816,6 @@ export function CoachProposalView(router) {
   // ── Events ─────────────────────────────────────────────────────────────────
 
   function attachEvents(container) {
-    // Door 1 opens the preview panel (v8)
-    container.querySelector('[data-door="door-1"]')?.addEventListener('click', () => {
-      if (choiceMade) return;
-      openPreviewPanel(proposal.options, container);
-    });
-
-    // Bypass door choices (unchanged mechanism)
-    container.querySelectorAll('[data-door="bypass-facilitate"], [data-door="bypass-library"]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const doorKey = btn.dataset.door;
-        const route   = btn.dataset.route;
-        handleDoorChoice(doorKey, route, container);
-      });
-    });
-
     // Return context chips
     container.querySelectorAll('[data-return-context]').forEach(btn => {
       btn.addEventListener('click', e => {
@@ -884,33 +836,6 @@ export function CoachProposalView(router) {
     attachPreviewEvents(container);
   }
 
-  // ── Bypass door choice handler (v8 — simplified, bypass-only) ─────────────
-
-  function handleDoorChoice(doorKey, route, container) {
-    if (choiceMade) return;
-    choiceMade = true;
-
-    store.set('lastProposalType', doorKey);
-    store.set('lastProposalDate', new Date().toISOString());
-
-    const ack = _buildAcknowledgement(doorKey);
-    const ackEl = container.querySelector('#cp-acknowledgement');
-    if (ackEl) {
-      ackEl.style.display = '';
-      ackEl.textContent = ack;
-      ackEl.focus();
-    }
-
-    const timingRules = getTimingRules({ difficultTopic: false });
-    setTimeout(() => {
-      if (route === 'library') {
-        router.navigate('library');
-      } else if (route === 'session-builder') {
-        router.navigate('session-builder');
-      }
-    }, timingRules.delayMs + 400);
-  }
-
   // ── Return context handler ─────────────────────────────────────────────────
 
   function handleReturnContext(context, container) {
@@ -918,24 +843,18 @@ export function CoachProposalView(router) {
       captureReturnContext(context);
     }
 
-    // Dismiss return door and rebuild proposal with re-entry context applied
+    // Dismiss return door and rebuild the proposal with re-entry context
+    // applied — full re-render (Phase C, 04 Aug 2026: this used to just
+    // patch .cp-doors, which no longer exists; the re-entry context can
+    // change effectiveIntensity/options, so the auto-opened panel needs
+    // fresh options too, not just the coach message).
     reEntryCtx = getReEntryContext();
     proposal   = buildProposal();
+    currentPreviewOptions = proposal.options;
+    selectedOptionId      = null;
+    previewOpen           = true;
 
-    const returnDoorEl = container.querySelector('.cp-return-door');
-    if (returnDoorEl) {
-      returnDoorEl.style.display = 'none';
-    }
-
-    // Rebuild just the doors section with adapted proposal
-    const doorsEl = container.querySelector('.cp-doors');
-    if (doorsEl) {
-      doorsEl.innerHTML =
-        renderDoorFront('door-1') +
-        renderDoorFront('door-2') +
-        renderDoorFront('door-3');
-      attachEvents(container);
-    }
+    render(container);
   }
 
   // ── Missed adaptation handler ──────────────────────────────────────────────
@@ -1021,21 +940,6 @@ export function CoachProposalView(router) {
       intro,
       options,
     };
-  }
-
-  // ── Post-choice acknowledgement (v8 — bypass-only) ─────────────────────────
-
-  function _buildAcknowledgement(doorKey) {
-    // One line. Treats the choice as real. Not a confirmation or summary.
-    // v8: only the bypass door reaches this now — door-1's "Good. Let's
-    // go." acknowledgement is set directly in handlePreviewStart().
-    if (doorKey === 'bypass-facilitate') {
-      return 'Let\'s build it together.';
-    }
-    if (doorKey === 'bypass-library') {
-      return 'Go find what you need. I\'ll be here when you\'re done.';
-    }
-    return 'On your way.';
   }
 
   // ── Greeting ───────────────────────────────────────────────────────────────

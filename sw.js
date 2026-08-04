@@ -1,6 +1,26 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v201
+ * Phase C, Home Nav & Conditions Redesign — Home screen and entry-flow
+ * rebuild. today.js v4→v5: single "Check in" CTA + gated funnel
+ * replaced with six always-visible doors (Cardio/Core/Strength,
+ * Mobility & Conditioning, Wellbeing, Conditions Update, Progress,
+ * Unsure? Coach decides); Settings now reachable directly from Home.
+ * Two door routes are honest bridges pending later phases (Conditions
+ * Update -> existing conditions editor until Phase D; Mobility &
+ * Conditioning -> library until a real conditions-aware programme
+ * exists), flagged not hidden. Real bug found and fixed while wiring
+ * Door 1: router.js's 'session-builder' route pointed at a file that
+ * doesn't exist — could never have worked, on any device, until this
+ * fix (router.js v10→v11). coach-proposal.js v17→v18: the three-doors-
+ * plus-bypass UI removed entirely (DOOR_COPY, renderDoorFront(),
+ * renderBypassDoor(), handleDoorChoice(), and their now-dead callers/
+ * helpers) — this screen is only reached via Home's "Unsure? Coach
+ * decides" door now, so the session-options panel opens automatically
+ * on mount instead of behind a second tap. today.css v1→v2,
+ * coach-proposal.css v6→v7 — dead door/bypass CSS removed alongside.
+ *
  * 04 Aug 2026 v200
  * Phase B, Home Nav & Conditions Redesign — core-session.js pool
  * consolidation (blueprint alongside_blueprint_home-navigation-
@@ -450,7 +470,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v200";
+const CACHE_NAME = "alongside-v201";
 
 const SHELL_URLS = [
 
