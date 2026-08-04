@@ -1,6 +1,19 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v192
+ * Home Nav & Conditions Redesign, Phase A (schema + single-source-of-
+ * truth logic fix — blueprint alongside_blueprint_home-navigation-
+ * conditions_04aug2026_v1.md). store.js v11→v12: two new fields,
+ * conditionReflections and conditionFoldInLevel, both schema-first
+ * ahead of any view code that reads them (Phases B-D, not yet built).
+ * conditions.js v1.2→v1.3: subacute severity threshold raised from
+ * pain >= 4 to pain >= 6 in getActiveConditionIds()/getZoneStatus(),
+ * matching checkin.js's existing Moderate boundary — canonical fix,
+ * affects every session workoutGenerator.js generates, not just Core
+ * Sessions. No view files touched this phase; no user-visible change
+ * until Phase B (core-session.js) lands. Schema.md v1.10→v1.11.
+ *
  * 03 Aug 2026 v191
  * Tier-gating infrastructure built (S4-TG, scoped 9 May 2026, never
  * implemented until now). New js/auth.js: getUserTier()/isPremium()/
@@ -322,7 +335,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v191";
+const CACHE_NAME = "alongside-v192";
 
 const SHELL_URLS = [
 
