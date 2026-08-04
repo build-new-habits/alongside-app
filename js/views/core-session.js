@@ -1,9 +1,43 @@
 /**
  * core-session.js - Guided Core Session
  *
- * 30 Jul 2026 v4
+ * 04 Aug 2026 v5
  *
  * CHANGELOG
+ * 04 Aug 2026 v5 — Phase B, Home Nav & Conditions Redesign (blueprint
+ *   alongside_blueprint_home-navigation-conditions_04aug2026_v1.md).
+ *   Removed the private, duplicated EXERCISE_POOLS (23 exercise objects,
+ *   fully forked from the shared exercise database) — replaced with
+ *   EXERCISE_POOL_IDS, a lightweight id-reference map resolved against
+ *   the shared EXERCISES array (js/data/exercises/index.js) in
+ *   buildSession(). All 23 exercises confirmed to already exist in the
+ *   shared database; the sets/reps/holdSeconds/rest/cues/description
+ *   fields this file's renderer needs were migrated onto those shared
+ *   records, additively — no existing shared field changed. Two
+ *   genuine id-collision bugs found and fixed in the process: the
+ *   "stability" pool's classic two-limb Dead Bug and Bird Dog were
+ *   incorrectly sharing ids with a different, gentler rehab-pool
+ *   variant of each — both existed as genuinely distinct shared
+ *   records under different ids ("dead-bug"/"bird-dog" vs
+ *   "dead-bug-progression-1"/"bird-dog-rehab"), now correctly resolved.
+ *   buildSession() also rewritten: the private duplicated severity
+ *   threshold (pain >= 4 subacute — the pre-Phase-A value, never
+ *   updated) replaced with conditions.js's canonical
+ *   getActiveConditionIds()/filterByConditions(), same functions
+ *   workoutGenerator.js already uses. Selection changed from always
+ *   the first N items of a fixed-order array to a shuffle before
+ *   slicing — the "not searchable, not shuffled" gap the original
+ *   redesign spec flagged. Caution-tier exercises folded into the
+ *   available pool rather than excluded (no caution-badge UI built
+ *   this pass — logged as a reasonable future addition, not required
+ *   for consolidation). Flagged, not silently resolved: shared
+ *   "dead-bug"/"bird-dog" records' contraindications differ from what
+ *   this file previously excluded them for — real content-accuracy
+ *   question for Graeme, left as the shared data's existing values
+ *   per single-source-of-truth. End-to-end smoke-tested (Node, all 23
+ *   ids resolve with full field set; contraindication filtering
+ *   verified against a real condition/pain-score pair) before commit.
+ *
  * 30 Jul 2026 v4 — Core Session `currentActivityEntry` data-integrity
  *   investigation. Diagnosis: no route into this file ever set a genuine
  *   pending currentActivityEntry upstream (core-session isn't reachable
@@ -64,6 +98,8 @@
 
 import { store } from "../store.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
+import { EXERCISES, filterByConditions } from "../data/exercises/index.js";
+import { getActiveConditionIds } from "../data/conditions.js";
 
 export const centered = false;
 
@@ -117,305 +153,38 @@ const FOCUS_TYPES = [
   }
 ];
 
-// ── Exercise pool by focus ────────────────────────────────────────────────────
-// Each entry: { id, name, sets, reps, holdSeconds, rest, cues, description, why }
-// holdSeconds > 0 means show a countdown timer
-// rest = seconds of rest after the exercise (shown as a rest card)
+// ── Exercise pool by focus (04 Aug 2026, Phase B consolidation) ────────────────
+// Previously a private, duplicated copy of ~23 exercise objects, fully
+// forked from the shared exercise database. Confirmed during blueprinting
+// (alongside_blueprint_home-navigation-conditions_04aug2026_v1.md) that
+// every exercise here already existed in js/data/exercises/{strength,
+// mobility,rehabilitation}.js under the same or a corrected id — this is
+// now just an id-reference map, resolved against the shared EXERCISES
+// array in buildSession() below. The extra fields this file's renderer
+// needs (sets/reps/holdSeconds/rest/cues) were migrated onto those 23
+// shared records, additively — no existing shared field was changed.
+//
+// Two id corrections made during migration, not present in the old
+// private pool: the "stability" pool's classic two-limb Dead Bug and
+// Bird Dog were incorrectly sharing ids ("dead-bug-progression-1",
+// "bird-dog-rehab") with a completely different, gentler rehab-pool
+// variant of each — a genuine pre-existing bug in this file's own data,
+// found while matching against the shared database's distinct
+// "dead-bug"/"bird-dog" ids. Corrected below.
+//
+// Flagged, not silently resolved: the shared "dead-bug" and "bird-dog"
+// records' existing `contraindications` differ from what this file
+// previously excluded them for (dead-bug: was ["lower-back-acute"],
+// shared has none; bird-dog: was ["lower-back-acute","wrist-elbow-acute"],
+// shared has ["glutes-acute","lower-back-acute"]). Shared data left
+// untouched per the single-source-of-truth principle — this is a real
+// content-accuracy question for Graeme, not a code bug to guess at.
 
-const EXERCISE_POOLS = {
-
-  stability: [
-    {
-      id:          "dead-bug-progression-1",
-      name:        "Dead Bug",
-      sets:        3,
-      reps:        "8 each side",
-      holdSeconds: 0,
-      rest:        45,
-      description: "Lie on your back, arms pointing to the ceiling, knees bent to 90 degrees above your hips. Slowly lower opposite arm and leg toward the floor — keeping your lower back pressed firmly down. Return and repeat on the other side.",
-      cues:        ["Lower back stays in contact with the floor throughout", "Breathe out as you lower the limbs", "Move slowly — 3 seconds down, 3 seconds back", "If your back lifts, reduce the range of motion"],
-      why:         "The dead bug is the gold standard anti-extension exercise. It trains the core to resist spinal extension under load while the limbs move — exactly what it needs to do in real life.",
-      contraindications: ["lower-back-acute"]
-    },
-    {
-      id:          "bird-dog-rehab",
-      name:        "Bird Dog",
-      sets:        3,
-      reps:        "8 each side",
-      holdSeconds: 3,
-      rest:        45,
-      description: "On hands and knees, brace your core. Extend your right arm and left leg simultaneously, holding for 3 seconds. Return slowly. Repeat on the opposite side.",
-      cues:        ["Keep your hips level — no rotation", "Your extended arm and leg should be parallel to the floor", "Draw your belly button gently toward your spine before you move", "The 3-second hold is where the work happens"],
-      why:         "Bird dog trains the core in its anti-rotation function while also requiring hip extension and shoulder stability. One of the most complete single exercises for spinal health.",
-      contraindications: ["lower-back-acute", "wrist-elbow-acute"]
-    },
-    {
-      id:          "plank",
-      name:        "Plank",
-      sets:        3,
-      reps:        null,
-      holdSeconds: 30,
-      rest:        60,
-      description: "Forearms on the floor, elbows under shoulders. Body forms a straight line from head to heels. Hold.",
-      cues:        ["Squeeze your glutes — this protects your lower back", "Push the floor away through your forearms", "Breathe normally throughout — no breath-holding", "If hips sag, that's your stopping point"],
-      why:         "The plank is the foundational anti-extension exercise. Everything else in stability training builds on the ability to maintain a neutral spine under load.",
-      contraindications: ["lower-back-acute", "wrist-elbow-acute", "shoulder-acute"]
-    },
-    {
-      id:          "side-plank-modified",
-      name:        "Side Plank",
-      sets:        2,
-      reps:        "each side",
-      holdSeconds: 20,
-      rest:        45,
-      description: "Lie on your side. Prop yourself up on your forearm, elbow under shoulder. Lift your hips to form a straight line. Hold. Repeat on the other side.",
-      cues:        ["Hips stacked — do not let the top hip drop forward", "Modified version: keep knees down, lift from the knee", "Push the floor away through your forearm", "Breathe normally throughout"],
-      why:         "Side plank is the primary anti-lateral-flexion exercise. It trains the quadratus lumborum and obliques to resist sideways bending — a key component of the McGill Big Three for back rehabilitation.",
-      contraindications: ["lower-back-acute", "shoulder-acute"]
-    },
-    {
-      id:          "pallof-press",
-      name:        "Pallof Press",
-      sets:        3,
-      reps:        "10 each side",
-      holdSeconds: 2,
-      rest:        45,
-      description: "Stand sideways to a cable machine or anchor point with a resistance band. Hold the band at your chest. Press it straight out, hold 2 seconds, return. The force tries to rotate you — resist it.",
-      cues:        ["The resistance should be from the side, not from the front", "Feet shoulder-width apart, slight knee bend", "Do not let your body twist toward the anchor", "The hold is where the anti-rotation work happens"],
-      why:         "The Pallof press trains rotational core stability — the ability to resist twisting forces. Essential for athletes and anyone who loads the spine asymmetrically.",
-      contraindications: ["lower-back-acute"],
-      equipment:   ["resistance-bands"]
-    },
-    {
-      id:          "mcgill-curl-up",
-      name:        "McGill Curl-Up",
-      sets:        3,
-      reps:        "10",
-      holdSeconds: 8,
-      rest:        45,
-      description: "Lie on your back, one knee bent and one leg straight. Place your hands under your lower back to maintain its natural curve. Lift your head and shoulders slightly — spine stays neutral. Hold 8 seconds. Lower slowly.",
-      cues:        ["This is not a sit-up — you lift barely 2-3 inches", "Your lower back stays in its natural curve throughout", "Elbows on the floor, hands under the curve", "Hold the top position — do not crunch and release"],
-      why:         "Developed by spine researcher Stuart McGill, this activates the rectus abdominis with minimal spinal compressive force. Safer than crunches for virtually every back condition.",
-      contraindications: ["lower-back-acute"]
-    }
-  ],
-
-  strength: [
-    {
-      id:          "ab-wheel-rollout",
-      name:        "Ab Wheel Rollout",
-      sets:        3,
-      reps:        "8 to 12",
-      holdSeconds: 0,
-      rest:        60,
-      description: "Kneel on the floor with the ab wheel in front of you. Slowly roll forward until your body is close to parallel with the floor. Use your core to pull yourself back. Do not let your hips drop.",
-      cues:        ["Control the rollout — 3 seconds forward, 3 seconds back", "Protect the lower back by not rolling past parallel", "Keep the glutes engaged throughout", "Beginners: reduce the range of motion — short rolls are still effective"],
-      why:         "One of the most effective anti-extension exercises. The rollout loads the core through a significant range of motion, making it substantially more demanding than a plank.",
-      contraindications: ["lower-back-acute", "wrist-elbow-acute", "shoulder-acute"],
-      equipment:   ["ab-wheel"]
-    },
-    {
-      id:          "isometric-hollow-hold",
-      name:        "Hollow Body Hold",
-      sets:        3,
-      reps:        null,
-      holdSeconds: 20,
-      rest:        60,
-      description: "Lie on your back. Press your lower back into the floor. Lift your arms overhead and your legs off the floor. Hold the position — you should look like a shallow dish.",
-      cues:        ["Lower back must stay in contact with the floor", "Legs higher if your back lifts — reduce the lever arm", "Arms by your sides is an easier variation", "Breathe — do not hold your breath"],
-      why:         "The hollow body position is the foundation of gymnastic strength training. It maximally activates the rectus abdominis and hip flexors in an integrated pattern.",
-      contraindications: ["lower-back-acute", "hip-acute"]
-    },
-    {
-      id:          "dead-bug-progression-3",
-      name:        "Dead Bug with Weight",
-      sets:        3,
-      reps:        "6 each side",
-      holdSeconds: 0,
-      rest:        60,
-      description: "Dead bug with a light dumbbell held in each hand, arms pointing up. Lower opposite arm and leg simultaneously. The weight increases the anti-extension demand significantly.",
-      cues:        ["Lighter than you think — 2-4kg is enough", "Lower back stays in contact with the floor throughout", "Move more slowly with the added weight", "If your back lifts at all, reduce the weight or range"],
-      why:         "The weighted dead bug extends the anti-extension challenge. The additional load requires more core recruitment to maintain spinal position — a genuine strength stimulus.",
-      contraindications: ["lower-back-acute"],
-      equipment:   ["dumbbells"]
-    },
-    {
-      id:          "band-pallof-press",
-      name:        "Band Pallof Press",
-      sets:        3,
-      reps:        "12 each side",
-      holdSeconds: 2,
-      rest:        45,
-      description: "Anchor a resistance band at chest height. Stand sideways to it, hold the band at your chest. Press directly forward and hold 2 seconds. Return slowly. The band pulls you sideways — resist it with your core.",
-      cues:        ["Choose a band resistance that challenges you without pulling you off balance", "Feet shoulder-width, slight knee bend, soft hips", "Pause at full extension — that is where the anti-rotation work is", "Keep the torso square to the front throughout"],
-      why:         "Rotational core stability is undertrained in most programmes. The Pallof press directly addresses the obliques and transversus abdominis in their anti-rotation function.",
-      contraindications: ["lower-back-acute"],
-      equipment:   ["resistance-bands"]
-    },
-    {
-      id:          "glute-bridge-single-leg",
-      name:        "Single-Leg Glute Bridge",
-      sets:        3,
-      reps:        "10 each side",
-      holdSeconds: 2,
-      rest:        45,
-      description: "Lie on your back, one knee bent with foot flat. Extend the other leg straight. Drive through the planted heel to lift your hips — squeeze the glute hard at the top. Hold 2 seconds. Lower slowly.",
-      cues:        ["Level hips — the unsupported side will want to drop", "Squeeze the working glute, not just your hamstring", "The 2-second hold is where the strength develops", "Keep the core braced throughout"],
-      why:         "Single-leg bridges train hip extension and pelvic stability simultaneously. The offset load challenges rotational core control — more demanding than the bilateral version.",
-      contraindications: ["lower-back-acute", "hip-acute", "hamstring-acute"]
-    }
-  ],
-
-  mobility: [
-    {
-      id:          "thoracic-rotation",
-      name:        "Thoracic Rotation",
-      sets:        2,
-      reps:        "10 each side",
-      holdSeconds: 3,
-      rest:        30,
-      description: "Sit on the floor or a chair. Place hands behind your head. Rotate your upper back as far as you comfortably can to one side — lead with your elbow. Hold 3 seconds. Return. The lower back should not move.",
-      cues:        ["The rotation is in your upper back — thoracic spine", "Lower back stays still throughout", "Do not force the range — breathe into the rotation", "Each rep, try to go a little further"],
-      why:         "Thoracic mobility is one of the most important and undertrained movement qualities. Restrictions here force compensation from the lumbar spine and shoulders — contributing to pain in both areas.",
-      contraindications: ["upper-back-acute"]
-    },
-    {
-      id:          "hip-flexor-stretch",
-      name:        "Hip Flexor Stretch",
-      sets:        2,
-      reps:        "each side",
-      holdSeconds: 45,
-      rest:        30,
-      description: "Half-kneeling, one knee on the floor. Shift your hips forward gently until you feel a stretch in the front of the hip of the kneeling leg. Hold. Do not arch your lower back.",
-      cues:        ["Tuck your tailbone slightly — this deepens the stretch safely", "Keep your chest tall — resist the urge to lean forward", "The stretch should be in the front of the hip, not the knee", "Breathe slowly and let the muscle release"],
-      why:         "Tight hip flexors anterior tilt the pelvis and increase compressive load on the lumbar spine. Releasing them is one of the highest-return interventions for lower back health.",
-      contraindications: ["hip-acute", "knee-acute"]
-    },
-    {
-      id:          "thoracic-extension-foam-roll",
-      name:        "Thoracic Extension on Foam Roller",
-      sets:        1,
-      reps:        "5 segments",
-      holdSeconds: 10,
-      rest:        30,
-      description: "Place the foam roller perpendicular to your spine at mid-back level. Support your head with your hands. Gently extend over the roller, opening the chest toward the ceiling. Hold 10 seconds. Move the roller up one segment and repeat.",
-      cues:        ["Support your head — do not let it hang back unsupported", "Open your chest toward the ceiling — not just your head", "Keep your hips on the floor throughout", "If you feel sharp pain, move on to the next segment"],
-      why:         "Direct thoracic extension mobilisation. The foam roller applies a targeted force at each vertebral level, progressively opening the thoracic spine into extension.",
-      contraindications: ["upper-back-acute"],
-      equipment:   ["foam-roller"]
-    },
-    {
-      id:          "90-90-hip-stretch",
-      name:        "90-90 Hip Stretch",
-      sets:        2,
-      reps:        "each side",
-      holdSeconds: 60,
-      rest:        30,
-      description: "Sit on the floor with one leg in front at 90 degrees, one leg to the side at 90 degrees. Sit tall and hold the position. After 30 seconds, lean gently forward over the front shin.",
-      cues:        ["Both hips should be in contact with the floor", "Sit tall before you lean — do not collapse into the position", "The stretch should be in both hips simultaneously", "If hips cannot stay down, use a cushion under the raised hip"],
-      why:         "The 90-90 position trains hip internal and external rotation simultaneously — two of the most commonly restricted movement qualities. Improves squat depth, running efficiency, and reduces knee and back load.",
-      contraindications: ["hip-acute", "knee-acute"]
-    },
-    {
-      id:          "hip-cars",
-      name:        "Hip CARs",
-      sets:        2,
-      reps:        "5 each side",
-      holdSeconds: 0,
-      rest:        30,
-      description: "Standing on one leg, draw the biggest circle you can with your lifted knee — forward, out to the side, behind you, and back. Move slowly through the full range. The standing leg stays completely still.",
-      cues:        ["Move as slowly as possible — speed hides restriction", "Keep your upper body completely still", "The standing hip, knee, and foot stay exactly where they are", "This is exploration — find where you run out of range and breathe into it"],
-      why:         "CARs — Controlled Articular Rotations — are the most complete way to train joint health. Taking the hip through its full available range under active tension maintains and builds range, lubricates the joint, and builds body awareness.",
-      contraindications: ["hip-acute"]
-    },
-    {
-      id:          "prone-thoracic-rotation",
-      name:        "Prone Thoracic Rotation",
-      sets:        2,
-      reps:        "8 each side",
-      holdSeconds: 3,
-      rest:        30,
-      description: "Lie face down, arms out to the sides in a T-shape. Rotate one arm and shoulder up and over to the other side — your torso will follow. The hip of the rotating side will lift slightly. Hold 3 seconds. Return slowly.",
-      cues:        ["Let the movement flow from the upper back — not the neck", "The hold at end range is where the mobility work happens", "Move to the point of comfortable restriction, not through pain", "Keep the arm reaching long throughout the rotation"],
-      why:         "Opens thoracic rotation in a gravity-assisted position, making it accessible even with significant restriction. Works both the active range and the end-range stability simultaneously.",
-      contraindications: ["upper-back-acute", "shoulder-acute"]
-    }
-  ],
-
-  rehab: [
-    {
-      id:          "pelvic-tilt",
-      name:        "Pelvic Tilt",
-      sets:        2,
-      reps:        "15",
-      holdSeconds: 5,
-      rest:        30,
-      description: "Lie on your back with knees bent, feet flat on the floor. Gently flatten your lower back into the floor by tightening your abs and tilting your pelvis. Hold 5 seconds. Release.",
-      cues:        ["This is a tiny movement — no hip lifting", "Breathe normally throughout — do not hold your breath", "Tighten your abs, not your glutes", "Feel the lower back make contact with the floor"],
-      why:         "Activates the deep abdominal muscles that support the lumbar spine. The starting point for lower back rehabilitation and a safe entry into core work for anyone in pain.",
-      contraindications: []
-    },
-    {
-      id:          "glute-bridge-activation",
-      name:        "Glute Bridge",
-      sets:        3,
-      reps:        "12",
-      holdSeconds: 3,
-      rest:        45,
-      description: "Lie on your back, knees bent, feet flat. Push through both heels to lift your hips until your body forms a straight line from knees to shoulders. Squeeze the glutes at the top. Hold 3 seconds. Lower slowly.",
-      cues:        ["Drive through your heels — not your toes", "Squeeze the glutes hard at the top", "The 3-second hold is what makes this effective", "Lower slowly — do not drop your hips"],
-      why:         "Glute bridges activate the gluteus maximus and hamstrings while maintaining a safe spinal position. They reduce anterior pelvic tilt and are protective of the lower back.",
-      contraindications: ["lower-back-acute", "hamstring-acute"]
-    },
-    {
-      id:          "dead-bug-progression-1",
-      name:        "Dead Bug — Arm Only",
-      sets:        2,
-      reps:        "8 each side",
-      holdSeconds: 0,
-      rest:        30,
-      description: "Lie on your back, arms pointing to the ceiling, knees bent to 90 degrees above your hips. Slowly lower one arm overhead toward the floor — keeping your lower back pressed firmly down. Return. Alternate sides.",
-      cues:        ["Arms only in this version — legs stay still", "Lower back stays in contact with the floor throughout", "Breathe out as you lower the arm", "Move slowly — there is no benefit to speed here"],
-      why:         "The arm-only dead bug reduces the lever arm, making it accessible for people with acute back pain. It still trains the anti-extension function of the core with minimal spinal load.",
-      contraindications: []
-    },
-    {
-      id:          "clamshell-activation",
-      name:        "Clamshell",
-      sets:        2,
-      reps:        "15 each side",
-      holdSeconds: 2,
-      rest:        30,
-      description: "Lie on your side, hips and knees bent to 45 degrees. Keeping your feet together, lift your top knee as high as you can without your pelvis rolling back. Hold 2 seconds. Lower slowly.",
-      cues:        ["Your pelvis should not move — if it does, reduce the range", "The movement is from the hip, not the lower back", "Hold at the top — that is where the glute medius is working", "Place a hand on your hip to feel if it is rotating"],
-      why:         "The clamshell targets the gluteus medius — the primary stabiliser of the pelvis during walking and single-leg activities. Weakness here is a major contributor to lower back and knee pain.",
-      contraindications: ["hip-acute"]
-    },
-    {
-      id:          "diaphragmatic-breathing-core",
-      name:        "Diaphragmatic Breathing",
-      sets:        1,
-      reps:        null,
-      holdSeconds: 120,
-      rest:        0,
-      description: "Lie on your back, knees bent, one hand on your chest and one on your belly. Breathe in slowly through your nose — belly rises, chest stays still. As you breathe out, gently draw your belly button toward your spine. Continue for 2 minutes.",
-      cues:        ["The belly rises on the inhale, chest stays still", "Exhale is when the deep core engages — gently, not forcefully", "About 20% of maximum effort — this is not sucking in", "Let the breath lead, not the abdominals"],
-      why:         "Re-establishes the connection between the breath and the deep core — often disrupted by pain or inactivity. Safe for any level of back pain and deeply calming for the nervous system.",
-      contraindications: []
-    },
-    {
-      id:          "bird-dog-rehab",
-      name:        "Bird Dog",
-      sets:        2,
-      reps:        "6 each side",
-      holdSeconds: 5,
-      rest:        45,
-      description: "On hands and knees. Brace your core gently. Extend one arm and the opposite leg until both are parallel to the floor. Hold 5 seconds. Return slowly. Alternate sides.",
-      cues:        ["Keep your hips level throughout — no rotation", "Extend from the hip and shoulder, not from the spine", "Draw the belly button gently toward the spine before you move", "Return as slowly as you extended"],
-      why:         "Bird dog in its rehab version uses a longer hold at lower load. It builds the anti-rotation stability of the lumbar spine gently, making it appropriate even during a flare.",
-      contraindications: ["lower-back-acute", "wrist-elbow-acute"]
-    }
-  ]
+const EXERCISE_POOL_IDS = {
+  stability: ["dead-bug", "bird-dog", "plank", "side-plank-modified", "pallof-press", "mcgill-curl-up"],
+  strength:  ["ab-wheel-rollout", "isometric-hollow-hold", "dead-bug-progression-3", "band-pallof-press", "glute-bridge-single-leg"],
+  mobility:  ["thoracic-rotation", "hip-flexor-stretch", "thoracic-extension-foam-roll", "90-90-hip-stretch", "hip-cars", "prone-thoracic-rotation"],
+  rehab:     ["pelvic-tilt", "glute-bridge-activation", "dead-bug-progression-1", "clamshell-activation", "diaphragmatic-breathing-core", "bird-dog-rehab"]
 };
 
 // ── Duration options ──────────────────────────────────────────────────────────
@@ -432,29 +201,38 @@ const EXERCISE_COUNT = { 15: 4, 20: 5, 30: 7 };
 // ── Session builder ───────────────────────────────────────────────────────────
 
 function buildSession(focusId, durationMins) {
-  const pool        = EXERCISE_POOLS[focusId] || [];
+  const poolIds     = EXERCISE_POOL_IDS[focusId] || [];
+  const pool        = poolIds
+    .map(id => EXERCISES.find(ex => ex.id === id))
+    .filter(Boolean); // defensive — should never actually drop anything
   const conditions  = store.get("conditions")         || [];
   const painScores  = store.get("conditionPainScores") || {};
   const targetCount = EXERCISE_COUNT[durationMins]    || 5;
 
-  // Build active condition ID set including acute variants
-  const activeConditions = new Set();
-  conditions.forEach(id => {
-    activeConditions.add(id);
-    const pain = painScores[id] || 0;
-    if (pain >= 7) activeConditions.add(`${id}-acute`);
-    else if (pain >= 4) activeConditions.add(`${id}-subacute`);
-  });
+  // Single source of truth (04 Aug 2026, Phase B) — was a private,
+  // duplicated threshold here (pain >= 4 subacute, matching the
+  // pre-fix value Phase A corrected everywhere else). Now defers to
+  // conditions.js's canonical getActiveConditionIds()/filterByConditions(),
+  // same functions workoutGenerator.js already uses for every other
+  // session type. Caution-tier exercises (soft block — included but
+  // would ideally carry a modification note) are folded into the
+  // available pool rather than excluded, matching a hard-block-only
+  // policy for now; a dedicated caution-badge UI is a reasonable
+  // future addition, not built here — scope stayed to consolidation.
+  const activeConditionIds   = getActiveConditionIds(conditions, painScores);
+  const { safe, caution }    = filterByConditions(pool, activeConditionIds);
+  const available             = [...safe, ...caution];
 
-  // Filter out contraindicated exercises
-  const safe = pool.filter(ex => {
-    const contra = ex.contraindications || [];
-    return !contra.some(c => activeConditions.has(c));
-  });
+  // Variety fix (04 Aug 2026, Phase B) — was always the first N items
+  // of a fixed-order array, every time, for every user. Shuffled here
+  // instead; still bounded by targetCount.
+  const shuffled = [...available];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
 
-  // Take up to targetCount exercises
-  // Prioritise variety — do not repeat movement patterns if pool is large enough
-  return safe.slice(0, targetCount);
+  return shuffled.slice(0, targetCount);
 }
 
 // ── Coach intro for conditions ────────────────────────────────────────────────

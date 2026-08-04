@@ -1,5 +1,20 @@
 /**
  * data/exercises/rehabilitation.js
+ * 04 Aug 2026 v2
+ *
+ * v2 — Phase B, Home Nav & Conditions Redesign (core-session.js pool
+ *   consolidation). Added sets/reps/holdSeconds/rest/cues/description
+ *   fields to 10 records (clamshell-activation, glute-bridge-activation,
+ *   glute-bridge-single-leg, pelvic-tilt, diaphragmatic-breathing-core,
+ *   dead-bug-progression-3, mcgill-curl-up, side-plank-modified,
+ *   dead-bug-progression-1, bird-dog-rehab) — additive only, no
+ *   existing field changed. dead-bug-progression-1 and bird-dog-rehab
+ *   confirmed as the correct, distinct targets for core-session.js's
+ *   gentler rehab-pool variants of Dead Bug/Bird Dog, resolving an
+ *   id-collision bug that existed in core-session.js's own private
+ *   pool (see that file's v5 changelog for the full explanation).
+ *   First version header on this file; added now.
+ *
  * Rehabilitation and activation exercises — condition-specific, physio-informed
  * contentType: 'rehabilitation' or 'activation'
  * rehabPhase: 'acute' | 'subacute' | 'maintenance'
@@ -41,7 +56,18 @@ export const REHABILITATION = [
     ],
     coaching: 'Small and controlled beats big and sloppy every time. If you feel it burning in the side of your hip, it is working.',
     why: 'Activates gluteus medius — the hip stabiliser that protects your knees and lower back in every movement.',
-    credits: 25
+    credits: 25,
+    sets: 2,
+    reps: "15 each side",
+    holdSeconds: 2,
+    rest: 30,
+    description: "Lie on your side, hips and knees bent to 45 degrees. Keeping your feet together, lift your top knee as high as you can without your pelvis rolling back. Hold 2 seconds. Lower slowly.",
+    cues: [
+      "Your pelvis should not move — if it does, reduce the range",
+      "The movement is from the hip, not the lower back",
+      "Hold at the top — that is where the glute medius is working",
+      "Place a hand on your hip to feel if it is rotating"
+    ],
   },
 
   {
@@ -100,7 +126,18 @@ export const REHABILITATION = [
     ],
     coaching: 'The squeeze at the top is the whole point. If you rush past it, you are losing half the benefit.',
     why: 'Glute bridge directly activates the glutes and teaches the brain to use them — essential before any lower body workout.',
-    credits: 25
+    credits: 25,
+    sets: 3,
+    reps: "12",
+    holdSeconds: 3,
+    rest: 45,
+    description: "Lie on your back, knees bent, feet flat. Push through both heels to lift your hips until your body forms a straight line from knees to shoulders. Squeeze the glutes at the top. Hold 3 seconds. Lower slowly.",
+    cues: [
+      "Drive through your heels — not your toes",
+      "Squeeze the glutes hard at the top",
+      "The 3-second hold is what makes this effective",
+      "Lower slowly — do not drop your hips"
+    ],
   },
 
   {
@@ -129,7 +166,18 @@ export const REHABILITATION = [
     ],
     coaching: 'Hips staying level is the challenge. If they drop, go back to the two-legged version and build more strength first.',
     why: 'Single-leg work reveals and corrects side-to-side glute strength imbalances — important for runners and anyone with hip or knee pain.',
-    credits: 40
+    credits: 40,
+    sets: 3,
+    reps: "10 each side",
+    holdSeconds: 2,
+    rest: 45,
+    description: "Lie on your back, one knee bent with foot flat. Extend the other leg straight. Drive through the planted heel to lift your hips — squeeze the glute hard at the top. Hold 2 seconds. Lower slowly.",
+    cues: [
+      "Level hips — the unsupported side will want to drop",
+      "Squeeze the working glute, not just your hamstring",
+      "The 2-second hold is where the strength develops",
+      "Keep the core braced throughout"
+    ],
   },
 
   {
@@ -1930,7 +1978,18 @@ export const REHABILITATION = [
     ],
     coaching: 'This is a tiny movement — it should not involve lifting your hips. Just a gentle rocking of the pelvis.',
     why: 'Activates the deep abdominal muscles that support the lumbar spine — the starting point for all lower back rehabilitation.',
-    credits: 15
+    credits: 15,
+    sets: 2,
+    reps: "15",
+    holdSeconds: 5,
+    rest: 30,
+    description: "Lie on your back with knees bent, feet flat on the floor. Gently flatten your lower back into the floor by tightening your abs and tilting your pelvis. Hold 5 seconds. Release.",
+    cues: [
+      "This is a tiny movement — no hip lifting",
+      "Breathe normally throughout — do not hold your breath",
+      "Tighten your abs, not your glutes",
+      "Feel the lower back make contact with the floor"
+    ],
   },
 
   {
@@ -1960,7 +2019,18 @@ export const REHABILITATION = [
     ],
     coaching: 'The engagement is gentle — about 20% of maximum. If you are holding your breath or gripping hard, you are doing too much.',
     why: 'The deep core — transversus abdominis and pelvic floor — activates with the breath. This re-establishes that connection after injury or inactivity.',
-    credits: 20
+    credits: 20,
+    sets: 1,
+    reps: null,
+    holdSeconds: 120,
+    rest: 0,
+    description: "Lie on your back, knees bent, one hand on your chest and one on your belly. Breathe in slowly through your nose — belly rises, chest stays still. As you breathe out, gently draw your belly button toward your spine. Continue for 2 minutes.",
+    cues: [
+      "The belly rises on the inhale, chest stays still",
+      "Exhale is when the deep core engages — gently, not forcefully",
+      "About 20% of maximum effort — this is not sucking in",
+      "Let the breath lead, not the abdominals"
+    ],
   },
 
   {
@@ -1989,7 +2059,18 @@ export const REHABILITATION = [
     ],
     coaching: 'Arms only to start. The lower back staying flat is everything — reduce the range if it lifts.',
     why: 'Trains the anti-extension function of the core — the most important job the abs do in protecting the spine.',
-    credits: 35
+    credits: 35,
+    sets: 2,
+    reps: "8 each side",
+    holdSeconds: 0,
+    rest: 30,
+    description: "Lie on your back, arms pointing to the ceiling, knees bent to 90 degrees above your hips. Slowly lower one arm overhead toward the floor — keeping your lower back pressed firmly down. Return. Alternate sides.",
+    cues: [
+      "Arms only in this version — legs stay still",
+      "Lower back stays in contact with the floor throughout",
+      "Breathe out as you lower the arm",
+      "Move slowly — there is no benefit to speed here"
+    ],
   },
 
   {
@@ -2047,7 +2128,18 @@ export const REHABILITATION = [
     ],
     coaching: 'The opposite arm and leg combination is the full version. If the lower back lifts at all, go back to progressions 1 or 2.',
     why: 'The full dead bug pattern — opposite limb extension that directly trains the core stability needed for walking, running, and all sport.',
-    credits: 45
+    credits: 45,
+    sets: 3,
+    reps: "6 each side",
+    holdSeconds: 0,
+    rest: 60,
+    description: "Dead bug with a light dumbbell held in each hand, arms pointing up. Lower opposite arm and leg simultaneously. The weight increases the anti-extension demand significantly.",
+    cues: [
+      "Lighter than you think — 2-4kg is enough",
+      "Lower back stays in contact with the floor throughout",
+      "Move more slowly with the added weight",
+      "If your back lifts at all, reduce the weight or range"
+    ],
   },
 
   {
@@ -2077,7 +2169,18 @@ export const REHABILITATION = [
     ],
     coaching: 'Imagine a glass of water on your lower back. Do not spill it.',
     why: 'Trains the deep spinal stabilisers in a low-load, safe position. A standard first-line exercise in lower back rehabilitation worldwide.',
-    credits: 35
+    credits: 35,
+    sets: 2,
+    reps: "6 each side",
+    holdSeconds: 5,
+    rest: 45,
+    description: "On hands and knees. Brace your core gently. Extend one arm and the opposite leg until both are parallel to the floor. Hold 5 seconds. Return slowly. Alternate sides.",
+    cues: [
+      "Keep your hips level throughout — no rotation",
+      "Extend from the hip and shoulder, not from the spine",
+      "Draw the belly button gently toward the spine before you move",
+      "Return as slowly as you extended"
+    ],
   },
 
   {
@@ -2225,7 +2328,18 @@ export const REHABILITATION = [
     ],
     coaching: 'The hands under the back are not for comfort — they hold the natural spinal curve that protects the discs. Without them, this becomes a harmful crunch.',
     why: 'Developed by spine researcher Stuart McGill — activates the rectus abdominis while maintaining spinal alignment. Safer than sit-ups or crunches for most back conditions.',
-    credits: 30
+    credits: 30,
+    sets: 3,
+    reps: "10",
+    holdSeconds: 8,
+    rest: 45,
+    description: "Lie on your back, one knee bent and one leg straight. Place your hands under your lower back to maintain its natural curve. Lift your head and shoulders slightly — spine stays neutral. Hold 8 seconds. Lower slowly.",
+    cues: [
+      "This is not a sit-up — you lift barely 2-3 inches",
+      "Your lower back stays in its natural curve throughout",
+      "Elbows on the floor, hands under the curve",
+      "Hold the top position — do not crunch and release"
+    ],
   },
 
   {
@@ -2254,7 +2368,18 @@ export const REHABILITATION = [
     ],
     coaching: 'The modified version from knees is completely valid. Build the hold time before progressing to full side plank from feet.',
     why: 'Trains the lateral core — the quadratus lumborum and obliques — which resist sideways bending forces on the spine. Part of the McGill Big Three for back rehabilitation.',
-    credits: 35
+    credits: 35,
+    sets: 2,
+    reps: "each side",
+    holdSeconds: 20,
+    rest: 45,
+    description: "Lie on your side. Prop yourself up on your forearm, elbow under shoulder. Lift your hips to form a straight line. Hold. Repeat on the other side.",
+    cues: [
+      "Hips stacked — do not let the top hip drop forward",
+      "Modified version: keep knees down, lift from the knee",
+      "Push the floor away through your forearm",
+      "Breathe normally throughout"
+    ],
   }
 
 

@@ -1,6 +1,29 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v200
+ * Phase B, Home Nav & Conditions Redesign — core-session.js pool
+ * consolidation (blueprint alongside_blueprint_home-navigation-
+ * conditions_04aug2026_v1.md). Private, duplicated EXERCISE_POOLS (23
+ * exercise objects) removed, replaced with a lightweight id-reference
+ * map resolved against the shared exercise database. All 23 confirmed
+ * to already exist there; missing fields (sets/reps/holdSeconds/rest/
+ * cues/description) migrated onto those shared records additively —
+ * strength.js v1→v2, mobility.js v1→v2, rehabilitation.js v1→v2 (all
+ * three files' first-ever version headers, added now). Two genuine
+ * id-collision bugs found and fixed: core-session.js's "stability"
+ * pool had two exercises (Dead Bug, Bird Dog) incorrectly sharing ids
+ * with completely different, gentler rehab-pool variants — both now
+ * correctly resolved to their own distinct shared records. Private
+ * duplicated severity threshold (pain >= 4, the pre-Phase-A value)
+ * replaced with conditions.js's canonical getActiveConditionIds()/
+ * filterByConditions() — same functions workoutGenerator.js already
+ * uses. Selection changed from always-first-N to shuffled. Flagged not
+ * fixed: shared dead-bug/bird-dog contraindications differ from what
+ * core-session.js previously excluded them for — real content
+ * question for Graeme. End-to-end Node smoke-tested before commit,
+ * not just syntax-checked. core-session.js v4→v5.
+ *
  * 04 Aug 2026 v199
  * Severe pain: active Rest/Adapt choice (coach-proposal.js v17,
  * Graeme's proposal). When Severe pain is present and no choice is
@@ -427,7 +450,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v199";
+const CACHE_NAME = "alongside-v200";
 
 const SHELL_URLS = [
 
