@@ -1,6 +1,11 @@
 /**
  * app.js - Application entry point
- * 21 Jul 2026 v7
+ * 03 Aug 2026 v8
+ *
+ * v8 — Tier-gating build (S4-TG, 9 May scope, implemented 03 Aug). New
+ *   import initPaywallListener from auth.js, called once in init() —
+ *   wires the single delegated click/keyboard listener every
+ *   .locked-feature-wrap on the page needs. No other changes.
  *
  * v7 — Nav escape-hatch (navfix-proposalloop session). Imports
  *   requestExit from session-guard.js and wires it to the persistent
@@ -24,9 +29,10 @@
  * v1 — Initial.
  */
 
-import { store }        from './store.js';
-import { router }       from './router.js';
-import { requestExit }  from './session-guard.js';
+import { store }              from './store.js';
+import { router }             from './router.js';
+import { requestExit }        from './session-guard.js';
+import { initPaywallListener } from './auth.js';
 
 // ── Globals — set immediately, before anything else runs ──────────────────────
 window.router = router;
@@ -34,7 +40,7 @@ window.store  = store;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-const APP_VERSION = "21 Jul 2026 v7";
+const APP_VERSION = "03 Aug 2026 v8";
 
 const NAV_VIEWS = new Set([
   'today', 'progress', 'noticing', 'settings', 'weekly-plan',
@@ -149,6 +155,10 @@ const App = {
     document.getElementById('hidden-nav-home-btn')?.addEventListener('click', () => {
       requestExit();
     });
+
+    // Tier-gating (S4-TG, 03 Aug 2026) — single delegated listener for
+    // every .locked-feature-wrap on the page, present or future.
+    initPaywallListener();
 
     console.log("Alongside ready");
 

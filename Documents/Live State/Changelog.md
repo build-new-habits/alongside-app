@@ -259,4 +259,19 @@ Flagged 31 Jul as a live crash risk, confirmed still present 03 Aug when directl
 
 ---
 
+### Tier-gating infrastructure (S4-TG, 9 May 2026 scope, built 03 Aug)
+
+Flagged 31 Jul as the highest-priority gap ahead of Supabase auth. Full architecture had already been scoped 9 May but never implemented. Ground-truthed against live code before building — reality had moved on from the spec in several real ways.
+
+- New `js/auth.js` — `getUserTier()`, `isPremium()`, `isAthlete()`, `lockedFeature(html, tier, context)`, `initPaywallListener()`. Uses the live `tier` field (not `userTier`, which the May spec assumed but was never actually used anywhere).
+- New `css/components/tier-gating.css` — locked-feature wrapper styling, every variable confirmed against `css/base/variables.css` before use.
+- `js/app.js` v7 → v8 — one new import, one new call (`initPaywallListener()`) in `init()`. Tapping a locked feature navigates straight to `/upgrade` — no toast, since a real upgrade page now exists (built and polished earlier today) and the May spec's toast plan predated it.
+- **Deliberately not touched:** `progress.js`'s existing tier gating (30/90-day lock, export lock, tiered observation depth) — already working, left alone rather than churned for no functional gain.
+- **Deliberately not implemented — confirmed no longer applicable:** "coach style variants" (explicitly killed, Nurturing-only permanently, `settings.js` v7); "prescribed exercises Level 2+" (no difficulty-level concept exists in either prescribed file); "custom programme builder"/"Athlete analytics" (no generative programme engine exists); "mindful audio prompts mid-session" (no such feature found).
+- Found, not fixed: `coach-proposal.js`'s `renderBypassDoor(tier)` has an unused `tier` parameter. Original intent unclear — logged rather than guessed at.
+- `lockedFeature()` is not yet wrapped around any live feature — the infrastructure is real and syntax-verified, but no currently-ungated real feature was confirmed to exist to apply it to. Ready for whichever genuinely new premium feature needs it next.
+- `sw.js` v190 → v191, `main.css` v10 → v11.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
