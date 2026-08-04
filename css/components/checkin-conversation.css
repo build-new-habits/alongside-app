@@ -1,7 +1,18 @@
 /* ============================================================
    checkin-conversation.css
    css/components/checkin-conversation.css
-   04 Aug 2026 v3
+   04 Aug 2026 v4
+
+   v4 — Two more overflow fixes, same day, found via Graeme screenshots.
+   (1) .ci-pain-chip's v3 min-width:0 fix wasn't quite complete — a
+   single unbreakable word like "Moderate" has nowhere to wrap without
+   overflow-wrap:break-word, so it could still overflow. Added.
+   (2) .ci-quality-chip (feeling-word selector, e.g. "energise",
+   "confident") had the same underlying problem but couldn't use the
+   same min-width:0 fix — it deliberately sets min-width:44px for WCAG
+   2.2 touch-target compliance, kept as-is. Added overflow-wrap:break-word
+   there instead, which fixes the overflow without touching the
+   accessibility-required minimum.
 
    v3 — .ci-pain-chip text-overflow fix, found on-device (screenshot,
    Graeme, testing the Home Nav Phase A threshold fix). "Moderate" was
@@ -372,7 +383,16 @@
   cursor: pointer;
   transition: all 0.15s ease;
   min-height: 48px;
-  min-width: 44px;
+  min-width: 44px; /* WCAG 2.2 minimum touch target — kept, not reduced */
+  overflow-wrap: break-word; /* fix, 04 Aug 2026: unbreakable long words
+    ("energise", "confident") were overflowing past the chip's edge into
+    the next chip instead of wrapping — .ci-quality-chips' flex-wrap
+    wraps whole chips onto a new row fine, but flex:1 still computes a
+    per-chip width too narrow for a single long word with nowhere to
+    break. This lets a long word wrap mid-word within its own chip
+    rather than overflow; 44px min-width preserved for touch target. */
+  line-height: 1.2;
+  text-align: center;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -408,6 +428,10 @@
     chip instead of wrapping. min-width:0 lets it shrink and wrap to
     two lines properly; .ci-pain-chips' default align-items:stretch
     keeps all four chips in a row the same height either way. */
+  overflow-wrap: break-word; /* companion fix, same date: min-width:0 alone
+    isn't enough for a single unbreakable word like "Moderate" — there's
+    no space to wrap at, so without this it still overflows instead of
+    breaking onto a second line. */
   padding: var(--space-3) var(--space-1);
   background: var(--color-bg-card);
   border: 2px solid var(--color-border);
