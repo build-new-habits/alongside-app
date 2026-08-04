@@ -1,5 +1,17 @@
 /**
  * today.js
+ * 04 Aug 2026 v9
+ *
+ * v9 — Check-in gating now genuinely optional, not fixed. Graeme:
+ *   "today's check-in gating means you now hit check-in-mini every
+ *   single time you do a second session in a day - we should fix this
+ *   so it's optional not fixed." Session-generating doors now only
+ *   force check-in the first time today (nothing to adapt around
+ *   without it). Once checked in today, doors go straight to their
+ *   destination — check-in-mini is voluntary now, via a new "Update
+ *   check-in" link shown in place of the "Check in" link once already
+ *   checked in.
+ *
  * 04 Aug 2026 v8
  *
  * v8 — Conditions Update door now routes to the real screen
@@ -271,7 +283,12 @@ export function TodayView(router) {
                   aria-label="Check in — helps every door adapt to how you're doing today">
             Check in
           </button>
-        ` : ''}
+        ` : `
+          <button class="btn btn-ghost today-checkin-link" data-action="checkin-mini"
+                  aria-label="Update your check-in — optional, only if how you're feeling has changed">
+            Update check-in
+          </button>
+        `}
 
       </div>
     `;
@@ -292,13 +309,22 @@ export function TodayView(router) {
         // using openSheet() internally instead.
 
         if (requiresCheckin) {
-          // Route through check-in first (full the first time today,
-          // check-in-mini after) — the door's real destination is
-          // remembered and picked up once check-in completes. Fix,
-          // 04 Aug 2026: reaching a session-generating screen without
-          // ever checking in defeats its whole adaptation premise.
-          store.set('pendingDoorRoute', route);
-          router.navigate(_checkedInToday() ? 'checkin-mini' : 'checkin');
+          // Fix, 04 Aug 2026 — Graeme: "we should fix this so it's
+          // optional not fixed." Previously forced check-in-mini every
+          // single time for a second-or-later session in a day, even
+          // just to update wording. Now: only the day's FIRST check-in
+          // is a real gate (that data genuinely doesn't exist yet, so
+          // there's nothing to adapt around without it). Once checked
+          // in today, doors go straight to their destination using
+          // that existing data — check-in-mini becomes something
+          // reachable voluntarily (the "Update check-in" link below),
+          // not a forced stop between every tap and every session.
+          if (_checkedInToday()) {
+            router.navigate(route);
+          } else {
+            store.set('pendingDoorRoute', route);
+            router.navigate('checkin');
+          }
         } else {
           router.navigate(route);
         }
@@ -306,8 +332,9 @@ export function TodayView(router) {
     });
 
     const actions = {
-      'checkin':  () => router.navigate('checkin'),
-      'settings': () => router.navigate('settings'),
+      'checkin':      () => router.navigate('checkin'),
+      'checkin-mini': () => router.navigate('checkin-mini'),
+      'settings':     () => router.navigate('settings'),
     };
 
     container.querySelectorAll('[data-action]').forEach(btn => {

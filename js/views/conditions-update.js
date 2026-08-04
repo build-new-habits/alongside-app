@@ -1,6 +1,25 @@
 /**
  * conditions-update.js - Conditions Update
  *
+ * 04 Aug 2026 v3
+ *
+ * v3 — Real programme-build routes, scoped and built same day
+ *   (alongside_scoping_condition_programmes_04aug2026_v1.md).
+ *   "Your programme" moved from one shared section at the bottom into
+ *   each condition's own card — enabled by prescribedExercises now
+ *   carrying an optional conditionId (store.js v16). Three real
+ *   routes per card: "Coach builds it" (automatic, js/data/
+ *   conditionProgrammes.js, biased by the condition's severity phase
+ *   and stated goal), "Coach recommends, I'll choose" (same safe
+ *   pool, wider, presented as checkable candidates), "Build my own"
+ *   (routes into prescribed.js, now passing which condition via a
+ *   single-use context flag). Programmes are one-time, not auto-
+ *   regenerating — Graeme's confirmed instinct — "Ask the coach to
+ *   rebuild this" is a deliberate re-run, not silent drift. 8
+ *   exercises per coach-built programme, not 4-6 — Graeme: "more
+ *   substantial... we should be helping the user work towards caring
+ *   for and improving their condition."
+ *
  * 04 Aug 2026 v2
  *
  * v2 — Real gap found by Graeme after the on-device pass: no way to
@@ -33,18 +52,16 @@
  * judgemental, since conditions fluctuate and editorialising a
  * plateau as failure would cut against the app's "no shame" principle.
  *
- * "Your programme" is ONE shared section below the condition cards,
- * not duplicated per card — prescribedExercises is a flat, ungrouped
- * list in the live schema (confirmed before building, not assumed),
- * so a programme isn't actually condition-scoped today. Only "Build
- * your own" ships (routes into prescribed.js, setting
- * prescribedExercisesOrigin so its coach voice reads correctly).
- * "Coach builds it" / "coach recommends, you select" need real
- * programme-generation logic that doesn't exist yet — deliberately
- * not shown as tiles that say "coming soon"; that's the exact pattern
- * removed elsewhere today (door-2/door-3). They land later as part of
- * NEW-1 (Programme Curation), not invented here as a condition-
- * specific duplicate of that future work.
+ * "Your programme" lives inside each condition's card now (04 Aug 2026,
+ * same-day follow-up) — prescribedExercises entries carry a conditionId
+ * tag (additive, nullable; entries added the original way stay
+ * untagged and keep showing in prescribed.js unfiltered). Three real
+ * routes: "Coach builds it" (automatic, js/data/conditionProgrammes.js),
+ * "Coach recommends, I'll choose" (same safe pool, wider, presented as
+ * checkable candidates), and "Build my own" (routes into prescribed.js,
+ * setting prescribedExercisesOrigin so its coach voice reads
+ * correctly). Scoped in alongside_scoping_condition_programmes_
+ * 04aug2026_v1.md before any of this was written.
  *
  * Fold-in dial shown once a programme exists — writes
  * conditionFoldInLevel, read by workoutGenerator.js (Phase D-5, not
@@ -55,10 +72,13 @@
 import { store } from "../store.js";
 import { openSheet } from "./onboarding/sheet-manager.js";
 import { CONDITIONS, getConditionName, getPainBand } from "../data/conditions.js";
+import { buildCoachProgramme, buildRecommendedCandidates, commitProgramme } from "../data/conditionProgrammes.js";
 
 export function ConditionsUpdateView(router) {
 
   let expandedIds = new Set();
+  let recommendingIds = new Set();      // conditionIds currently showing the "coach recommends" selection UI
+  let selectedCandidates = new Map();   // conditionId -> Set of exercise ids checked in that UI
 
   function mount(container) {
     render(container);
@@ -116,7 +136,7 @@ export function ConditionsUpdateView(router) {
           <p class="cu-empty">Nothing logged yet \u2014 add a condition below whenever you're ready.</p>
         ` : `
           <div class="cu-conditions-list">
-            ${conditions.map(id => _renderCard(id, painScores, goals, reflections)).join("")}
+            ${conditions.map(id => _renderCard(id, painScores, goals, reflections, prescribed, foldIn)).join("")}
           </div>
         `}
 
@@ -124,15 +144,13 @@ export function ConditionsUpdateView(router) {
                 aria-label="Add a condition">
           + Add a condition
         </button>
-
-        ${_renderProgramme(prescribed, foldIn)}
       </div>
     `;
 
     attachEvents(container);
   }
 
-  function _renderCard(id, painScores, goals, reflections) {
+  function _renderCard(id, painScores, goals, reflections, prescribed, foldIn) {
     const cond      = CONDITIONS.find(c => c.id === id);
     const score     = painScores[id] || 0;
     const band      = getPainBand(score);
@@ -186,6 +204,8 @@ export function ConditionsUpdateView(router) {
               <p class="cu-goal-skip-hint">No pressure \u2014 skip this if you're not sure yet.</p>
             `}
 
+            ${_renderProgramme(id, name, goal, prescribed, foldIn)}
+
             <button class="cu-remove-condition" data-action="remove-condition" data-condition="${id}"
                     aria-label="Remove ${name} from your conditions">
               Remove ${name}
@@ -197,23 +217,73 @@ export function ConditionsUpdateView(router) {
     `;
   }
 
-  function _renderProgramme(prescribed, foldIn) {
+  function _renderProgramme(conditionId, name, goal, prescribed, foldIn) {
+    const mine = prescribed.filter(e => e.conditionId === conditionId);
+
+    if (recommendingIds.has(conditionId)) {
+      return _renderRecommendSelection(conditionId, name, goal);
+    }
+
+    if (mine.length === 0) {
+      return `
+        <div class="cu-programme-inline">
+          <p class="cu-field-label">Want a programme for this?</p>
+          <div class="cu-programme-options">
+            <button class="btn btn-primary" data-action="coach-build" data-condition="${conditionId}">
+              Coach builds it
+            </button>
+            <button class="btn btn-ghost" data-action="coach-recommend" data-condition="${conditionId}">
+              Coach recommends, I'll choose
+            </button>
+            <button class="btn btn-ghost" data-action="build-own" data-condition="${conditionId}">
+              Build my own
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
     return `
-      <div class="cu-programme" role="region" aria-label="Your programme">
-        <h2 class="cu-programme__heading">Your programme</h2>
-        ${prescribed.length === 0 ? `
-          <p class="cu-programme__intro">
-            Want to build your own set of exercises for what's going on? Add them here \u2014
-            sets, reps, notes, whatever's useful.
-          </p>
-          <button class="btn btn-primary" data-action="build-own">Build your own</button>
-        ` : `
-          <p class="cu-programme__intro">
-            You've got ${prescribed.length} exercise${prescribed.length === 1 ? "" : "s"} in your programme.
-          </p>
-          <button class="btn btn-ghost" data-action="view-programme">View / edit</button>
-          ${_renderFoldIn(foldIn)}
-        `}
+      <div class="cu-programme-inline">
+        <p class="cu-programme__intro">
+          ${mine.length} exercise${mine.length === 1 ? "" : "s"} in your programme for ${name}.
+        </p>
+        <button class="btn btn-ghost" data-action="view-programme" data-condition="${conditionId}">View / edit</button>
+        <button class="btn btn-ghost" data-action="coach-build" data-condition="${conditionId}">
+          Ask the coach to rebuild this
+        </button>
+        ${_renderFoldIn(foldIn)}
+      </div>
+    `;
+  }
+
+  function _renderRecommendSelection(conditionId, name, goal) {
+    const candidates = buildRecommendedCandidates(conditionId);
+    const selected    = selectedCandidates.get(conditionId) || new Set();
+
+    if (candidates.length === 0) {
+      return `<p class="cu-programme__intro">Nothing suitable turned up right now \u2014 try "Coach builds it" instead, or build your own.</p>`;
+    }
+
+    return `
+      <div class="cu-recommend" role="group" aria-label="Choose exercises for ${name}">
+        <p class="cu-field-label">Pick the ones that make sense for you \u2014 add as many as you like.</p>
+        <div class="cu-recommend-list">
+          ${candidates.map(ex => `
+            <label class="cu-recommend-item">
+              <input type="checkbox" data-candidate="${ex.id}" data-condition="${conditionId}"
+                     ${selected.has(ex.id) ? "checked" : ""}>
+              <span>${ex.name}</span>
+            </label>
+          `).join("")}
+        </div>
+        <div class="cu-recommend-actions">
+          <button class="btn btn-ghost" data-action="cancel-recommend" data-condition="${conditionId}">Cancel</button>
+          <button class="btn btn-primary" data-action="confirm-recommend" data-condition="${conditionId}"
+                  ${selected.size === 0 ? "disabled" : ""}>
+            Add ${selected.size || ""} to my programme
+          </button>
+        </div>
       </div>
     `;
   }
@@ -312,6 +382,8 @@ export function ConditionsUpdateView(router) {
           const conditions = (store.get("conditions") || []).filter(c => c !== id);
           store.set("conditions", conditions);
           expandedIds.delete(id);
+          recommendingIds.delete(id);
+          selectedCandidates.delete(id);
           render(container);
         });
       });
@@ -321,19 +393,87 @@ export function ConditionsUpdateView(router) {
       openSheet("onboarding/conditions", () => render(container));
     });
 
-    container.querySelector('[data-action="build-own"]')?.addEventListener("click", () => {
-      // Sets the origin flag only if this is genuinely the first entry —
-      // never overwrites an existing 'professional' origin. See Phase D
-      // blueprint v3, decision D-2.
-      const prescribed = store.get("prescribedExercises") || [];
-      if (prescribed.length === 0 && !store.get("prescribedExercisesOrigin")) {
-        store.set("prescribedExercisesOrigin", "self");
-      }
-      router.navigate("prescribed");
+    // "Build my own" — sets which condition new entries should be
+    // tagged with (prescribed.js reads this when constructing a new
+    // entry), plus the origin flag for its coach-voice branch (Phase
+    // D-2, decision D-2) — only if this is genuinely the first entry
+    // overall, never overwrites an existing 'professional' origin.
+    container.querySelectorAll('[data-action="build-own"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        const conditionId = btn.dataset.condition;
+        const prescribed  = store.get("prescribedExercises") || [];
+        if (prescribed.length === 0 && !store.get("prescribedExercisesOrigin")) {
+          store.set("prescribedExercisesOrigin", "self");
+        }
+        store.set("prescribedExercisesActiveCondition", conditionId);
+        router.navigate("prescribed");
+      });
     });
 
-    container.querySelector('[data-action="view-programme"]')?.addEventListener("click", () => {
-      router.navigate("prescribed");
+    container.querySelectorAll('[data-action="view-programme"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        store.set("prescribedExercisesActiveCondition", btn.dataset.condition);
+        router.navigate("prescribed");
+      });
+    });
+
+    // "Coach builds it" — automatic. Real, working generation
+    // (js/data/conditionProgrammes.js), not a placeholder. Replaces
+    // any existing programme for this condition if one already exists
+    // (commitProgramme() only touches entries tagged with this
+    // conditionId) — a fresh, deliberate rebuild, not silent drift;
+    // matches Graeme's confirmed instinct that programmes shouldn't
+    // regenerate on their own.
+    container.querySelectorAll('[data-action="coach-build"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        const conditionId = btn.dataset.condition;
+        const goals       = store.get("conditionGoals") || {};
+        const goalType    = goals[conditionId]?.goalType || null;
+        const exercises   = buildCoachProgramme(conditionId, goalType);
+        commitProgramme(conditionId, exercises, "coach");
+        render(container);
+      });
+    });
+
+    container.querySelectorAll('[data-action="coach-recommend"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        recommendingIds.add(btn.dataset.condition);
+        selectedCandidates.set(btn.dataset.condition, new Set());
+        render(container);
+      });
+    });
+
+    container.querySelectorAll('[data-action="cancel-recommend"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        recommendingIds.delete(btn.dataset.condition);
+        selectedCandidates.delete(btn.dataset.condition);
+        render(container);
+      });
+    });
+
+    container.querySelectorAll("[data-candidate]").forEach(checkbox => {
+      checkbox.addEventListener("change", () => {
+        const conditionId = checkbox.dataset.condition;
+        const exId        = checkbox.dataset.candidate;
+        const set          = selectedCandidates.get(conditionId) || new Set();
+        if (checkbox.checked) set.add(exId); else set.delete(exId);
+        selectedCandidates.set(conditionId, set);
+        render(container);
+      });
+    });
+
+    container.querySelectorAll('[data-action="confirm-recommend"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        const conditionId = btn.dataset.condition;
+        const selectedIds  = selectedCandidates.get(conditionId) || new Set();
+        if (selectedIds.size === 0) return;
+        const candidates   = buildRecommendedCandidates(conditionId);
+        const chosen       = candidates.filter(ex => selectedIds.has(ex.id));
+        commitProgramme(conditionId, chosen, "coach-recommended");
+        recommendingIds.delete(conditionId);
+        selectedCandidates.delete(conditionId);
+        render(container);
+      });
     });
 
     container.querySelectorAll("[data-foldin]").forEach(btn => {
