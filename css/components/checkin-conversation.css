@@ -1,7 +1,16 @@
 /* ============================================================
    checkin-conversation.css
    css/components/checkin-conversation.css
-   04 Aug 2026 v4
+   04 Aug 2026 v5
+
+   v5 — Pain Input Redesign. New .ci-slider-wrap--condition (compact
+   per-condition variant of the Energy/Mood slider styling, since
+   several stack in one panel) plus colour-coded .ci-value-label--none/
+   mild/moderate/severe. .ci-pain-chip/.ci-pain-chips removed entirely —
+   confirmed unused anywhere in js/ once checkin.js's slider conversion
+   landed; this is the component both of today's earlier chip-overflow
+   patches (v3, v4) were fixing, now retired rather than a third patch
+   on top of two patches.
 
    v4 — Two more overflow fixes, same day, found via Graeme screenshots.
    (1) .ci-pain-chip's v3 min-width:0 fix wasn't quite complete — a
@@ -304,6 +313,33 @@
   margin-top: var(--space-1);
 }
 
+/* ── Condition pain sliders (04 Aug 2026) ───────────────────────
+   Per-condition compact variant of .ci-slider-wrap/.ci-value-row above —
+   multiple of these stack in one panel (one per logged condition), so
+   they need less vertical weight than the single full-panel Energy/
+   Mood sliders these rules were originally built for. Replaces the old
+   4-button .ci-pain-chip row entirely (see checkin-conversation.css v3/
+   v4 changelog for that component's history — retired, not deleted,
+   in case checkin-mini.js's .ci-quality-chip pattern is ever wanted
+   back for a different input). */
+
+.ci-slider-wrap--condition {
+  margin-bottom: var(--space-3);
+}
+
+.ci-slider-wrap--condition .ci-value-row {
+  margin-bottom: var(--space-2);
+}
+
+.ci-slider-wrap--condition .ci-value-num {
+  font-size: var(--text-xl);
+}
+
+.ci-value-label--none     { color: #10B981; font-weight: var(--font-semibold); }
+.ci-value-label--mild     { color: #F59E0B; font-weight: var(--font-semibold); }
+.ci-value-label--moderate { color: #F97316; font-weight: var(--font-semibold); }
+.ci-value-label--severe   { color: #EF4444; font-weight: var(--font-semibold); }
+
 /* ── Sleep adjuster ─────────────────────────────────────────── */
 
 .ci-sleep-adjuster {
@@ -415,45 +451,11 @@
   margin: 0 0 var(--space-3);
 }
 
-.ci-pain-chips {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.ci-pain-chip {
-  flex: 1;
-  min-width: 0; /* fix, 04 Aug 2026: flex items default to min-width:auto,
-    which stops a chip shrinking below the intrinsic width of an
-    unbreakable word ("Moderate") — it was overflowing into the next
-    chip instead of wrapping. min-width:0 lets it shrink and wrap to
-    two lines properly; .ci-pain-chips' default align-items:stretch
-    keeps all four chips in a row the same height either way. */
-  overflow-wrap: break-word; /* companion fix, same date: min-width:0 alone
-    isn't enough for a single unbreakable word like "Moderate" — there's
-    no space to wrap at, so without this it still overflows instead of
-    breaking onto a second line. */
-  padding: var(--space-3) var(--space-1);
-  background: var(--color-bg-card);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  min-height: 48px;
-  text-align: center;
-  line-height: 1.2;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.ci-pain-chip:hover  { border-color: var(--color-text-muted); }
-.ci-pain-chip.selected           { color: white; font-weight: var(--font-bold); }
-.ci-pain-chip.selected.low       { background: #10B981; border-color: #10B981; }
-.ci-pain-chip.selected.mild      { background: #F59E0B; border-color: #F59E0B; }
-.ci-pain-chip.selected.moderate  { background: #F97316; border-color: #F97316; }
-.ci-pain-chip.selected.severe    { background: #EF4444; border-color: #EF4444; }
-.ci-pain-chip:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+/* .ci-pain-chip / .ci-pain-chips removed 04 Aug 2026 — the 4-button
+   discrete pain input they styled was replaced by the condition pain
+   slider above (.ci-slider-wrap--condition), part of today's Pain
+   Input Redesign. Confirmed unused anywhere in js/ before removing —
+   was purely dead weight after checkin.js's conversion. */
 
 /* ── Available time grid ────────────────────────────────────── */
 

@@ -1,6 +1,17 @@
 /**
  * checkin-mini.js - Abbreviated Return-Visit Check-In
  *
+ * 04 Aug 2026 v4
+ *
+ * v4 — Pain Input Redesign, same pass as checkin.js v9. Pain step
+ *   converted from .ci-quality-chip (None/Mild/Moderate/Severe buttons)
+ *   to per-condition sliders, matching checkin.js's new pattern exactly.
+ *   This file's own private PAIN_LEVELS/painLevelForScore — a fourth
+ *   independent duplicate of the severity-band logic, on top of the
+ *   three already found and fixed earlier today — retired in favour of
+ *   conditions.js's new canonical getPainBand(). Confirmed nothing else
+ *   in this file referenced PAIN_LEVELS after removal.
+ *
  * 04 Aug 2026 v3
  *
  * v3 — Severe-pain score corrected 8→9. Found while investigating a
@@ -58,7 +69,7 @@
  */
 
 import { store }      from "../store.js";
-import { CONDITIONS } from "../data/conditions.js";
+import { CONDITIONS, getPainBand } from "../data/conditions.js";
 
 export const centered = false;
 
@@ -81,25 +92,19 @@ const MOOD_LABELS = [
   "Okay", "Good", "Good", "Great", "Great", "Excellent"
 ];
 
-// Pain chip levels - matches checkin.js convention.
-// Stored score is the representative value written to conditionPainScores.
-const PAIN_LEVELS = [
-  { id: "none",     label: "None",     score: 0, min: 0, max: 2 },
-  { id: "mild",     label: "Mild",     score: 4, min: 3, max: 5 },
-  { id: "moderate", label: "Moderate", score: 6, min: 6, max: 7 },
-  { id: "severe",   label: "Severe",   score: 9, min: 8, max: 10 }
-];
+// Pain scoring now uses getPainBand() from conditions.js — the app's
+// one canonical band/label source (added 04 Aug 2026, Pain Input
+// Redesign). This file's own PAIN_LEVELS/painLevelForScore, a private
+// duplicate of the exact same bands, is retired below; this was the
+// fourth independent copy of pain-severity logic found in one day
+// (conditions.js's real threshold functions, core-session.js's private
+// pool filter, coach-proposal.js's _checkModeratePain, and this one).
 
 const LOCATION_OPTIONS = [
   { id: "home",    label: "Home",    sub: "",  icon: "\uD83C\uDFE0" },
   { id: "gym",     label: "Gym",     sub: "",  icon: "\uD83C\uDFCB" },
   { id: "outside", label: "Outside", sub: "",  icon: "\uD83C\uDF33" }
 ];
-
-function painLevelForScore(score) {
-  const level = PAIN_LEVELS.find(l => score >= l.min && score <= l.max);
-  return level ? level.id : "none";
-}
 
 // -- Render --------------------------------------------------------------------
 
@@ -254,22 +259,22 @@ function renderPain() {
               const cond    = CONDITIONS.find(c => c.id === id);
               const current = currentPain[id] || 0;
               const pendingScore = miniPainScores[id] !== undefined ? miniPainScores[id] : current;
-              const pendingLevel = painLevelForScore(pendingScore);
+              const band    = getPainBand(pendingScore);
               return `
-                <div class="mini-pain-row">
+                <div class="mini-pain-row" data-condition="${id}">
                   <span class="mini-pain-label">
                     ${cond?.icon || ""} ${cond?.name || id}
                   </span>
-                  <div class="ci-quality-chips" role="group"
-                       aria-label="Pain level for ${cond?.name || id}">
-                    ${PAIN_LEVELS.map(level => `
-                      <button class="ci-quality-chip ${pendingLevel === level.id ? "selected" : ""}"
-                              data-condition="${id}"
-                              data-score="${level.score}"
-                              aria-pressed="${pendingLevel === level.id}">
-                        ${level.label}
-                      </button>
-                    `).join("")}
+                  <div class="ci-slider-wrap ci-slider-wrap--condition">
+                    <div class="ci-value-row" aria-live="polite" aria-atomic="true">
+                      <span class="ci-value-num"   id="mini-pain-num-${id}">${pendingScore}</span>
+                      <span class="ci-value-label ci-value-label--${band.id}" id="mini-pain-label-${id}">${band.label}</span>
+                    </div>
+                    <input type="range" class="ci-slider mini-pain-slider"
+                           data-condition="${id}"
+                           min="0" max="10" value="${pendingScore}"
+                           aria-label="Pain level for ${cond?.name || id}, 0 none to 10 severe"
+                           aria-valuetext="${band.label}">
                   </div>
                 </div>
               `;
@@ -435,19 +440,22 @@ export function onMount() {
     });
   }
 
-  // Pain chips
-  document.querySelectorAll(".mini-pain-row .ci-quality-chip").forEach(chip => {
-    chip.addEventListener("click", () => {
-      const condId = chip.dataset.condition;
-      const score  = parseInt(chip.dataset.score);
+  // Pain sliders
+  document.querySelectorAll(".mini-pain-slider").forEach(slider => {
+    slider.addEventListener("input", () => {
+      const condId = slider.dataset.condition;
       if (!condId) return;
-      miniPainScores[condId] = score;
-      // Update chip selection without full rerender
-      document.querySelectorAll(`.ci-quality-chip[data-condition="${condId}"]`).forEach(c => {
-        const isSelected = parseInt(c.dataset.score) === score;
-        c.classList.toggle("selected", isSelected);
-        c.setAttribute("aria-pressed", isSelected);
-      });
+      const n    = parseInt(slider.value);
+      const band = getPainBand(n);
+      miniPainScores[condId] = n;
+      const numEl   = document.getElementById(`mini-pain-num-${condId}`);
+      const labelEl = document.getElementById(`mini-pain-label-${condId}`);
+      if (numEl)   numEl.textContent   = n;
+      if (labelEl) {
+        labelEl.textContent = band.label;
+        labelEl.className   = `ci-value-label ci-value-label--${band.id}`;
+      }
+      slider.setAttribute("aria-valuetext", band.label);
     });
   });
 
