@@ -1,5 +1,16 @@
 /**
  * data/exercises/strength.js
+ * 04 Aug 2026 v2
+ *
+ * v2 — Phase B, Home Nav & Conditions Redesign (core-session.js pool
+ *   consolidation). Added sets/reps/holdSeconds/rest/cues/description
+ *   fields to 7 records (dead-bug, bird-dog, plank, ab-wheel-rollout,
+ *   pallof-press, band-pallof-press, isometric-hollow-hold) — additive
+ *   only, no existing field changed. These exercises were previously
+ *   duplicated in full inside core-session.js's own private pool;
+ *   that pool now resolves ids against this file instead. First
+ *   version header on this file; added now.
+ *
  * Strength exercises — bodyweight, dumbbell, kettlebell, core
  */
 
@@ -53,7 +64,18 @@ export const STRENGTH = [
     ],
     coaching: 'Imagine a glass of water on your lower back - don\'t spill it.',
     why: 'Builds core stability and coordination without loading the spine.',
-    credits: 45
+    credits: 45,
+    sets: 3,
+    reps: "8 each side",
+    holdSeconds: 3,
+    rest: 45,
+    description: "On hands and knees, brace your core. Extend your right arm and left leg simultaneously, holding for 3 seconds. Return slowly. Repeat on the opposite side.",
+    cues: [
+      "Keep your hips level — no rotation",
+      "Your extended arm and leg should be parallel to the floor",
+      "Draw your belly button gently toward your spine before you move",
+      "The 3-second hold is where the work happens"
+    ],
   },
 
   {
@@ -79,7 +101,18 @@ export const STRENGTH = [
     ],
     coaching: 'The lower back must stay flat. Smaller movement is better than losing that contact.',
     why: 'Trains deep core stability - the foundation for all other movements.',
-    credits: 50
+    credits: 50,
+    sets: 3,
+    reps: "8 each side",
+    holdSeconds: 0,
+    rest: 45,
+    description: "Lie on your back, arms pointing to the ceiling, knees bent to 90 degrees above your hips. Slowly lower opposite arm and leg toward the floor — keeping your lower back pressed firmly down. Return and repeat on the other side.",
+    cues: [
+      "Lower back stays in contact with the floor throughout",
+      "Breathe out as you lower the limbs",
+      "Move slowly — 3 seconds down, 3 seconds back",
+      "If your back lifts, reduce the range of motion"
+    ],
   },
 
   {
@@ -209,7 +242,18 @@ export const STRENGTH = [
     ],
     coaching: 'Don\'t let your hips sag or pike up - a straight line is the goal.',
     why: 'The foundation of core stability - protects the spine in all other movements.',
-    credits: 45
+    credits: 45,
+    sets: 3,
+    reps: null,
+    holdSeconds: 30,
+    rest: 60,
+    description: "Forearms on the floor, elbows under shoulders. Body forms a straight line from head to heels. Hold.",
+    cues: [
+      "Squeeze your glutes — this protects your lower back",
+      "Push the floor away through your forearms",
+      "Breathe normally throughout — no breath-holding",
+      "If hips sag, that's your stopping point"
+    ],
   },
 
   {
@@ -544,7 +588,18 @@ export const STRENGTH = [
     ],
     coaching: 'Start with a very short range — even 20 to 30 cm forward. The range builds over weeks. Back arching means you have gone too far.',
     why: 'One of the highest-demand anti-extension core exercises. Requires and builds significant core strength and shoulder stability together.',
-    credits: 80
+    credits: 80,
+    sets: 3,
+    reps: "8 to 12",
+    holdSeconds: 0,
+    rest: 60,
+    description: "Kneel on the floor with the ab wheel in front of you. Slowly roll forward until your body is close to parallel with the floor. Use your core to pull yourself back. Do not let your hips drop.",
+    cues: [
+      "Control the rollout — 3 seconds forward, 3 seconds back",
+      "Protect the lower back by not rolling past parallel",
+      "Keep the glutes engaged throughout",
+      "Beginners: reduce the range of motion — short rolls are still effective"
+    ],
   },
 
   {
@@ -570,7 +625,18 @@ export const STRENGTH = [
     ],
     coaching: 'Your body wants to rotate toward the anchor. The whole job of your core is to stop that happening. Stay square.',
     why: 'Trains rotational core stability — the ability to resist twisting forces. Directly relevant to carrying, throwing, and almost all sport.',
-    credits: 50
+    credits: 50,
+    sets: 3,
+    reps: "10 each side",
+    holdSeconds: 2,
+    rest: 45,
+    description: "Stand sideways to a cable machine or anchor point with a resistance band. Hold the band at your chest. Press it straight out, hold 2 seconds, return. The force tries to rotate you — resist it.",
+    cues: [
+      "The resistance should be from the side, not from the front",
+      "Feet shoulder-width apart, slight knee bend",
+      "Do not let your body twist toward the anchor",
+      "The hold is where the anti-rotation work happens"
+    ],
   },
 
   {
@@ -1964,7 +2030,18 @@ export const STRENGTH = [
     ],
     coaching: 'The anti-rotation demand is highest when the arms are extended. Everything in the body is working to stay square.',
     why: 'The Pallof press is the gold standard anti-rotation core exercise — trains the core in its primary function of resisting unwanted movement rather than creating it.',
-    credits: 40
+    credits: 40,
+    sets: 3,
+    reps: "12 each side",
+    holdSeconds: 2,
+    rest: 45,
+    description: "Anchor a resistance band at chest height. Stand sideways to it, hold the band at your chest. Press directly forward and hold 2 seconds. Return slowly. The band pulls you sideways — resist it with your core.",
+    cues: [
+      "Choose a band resistance that challenges you without pulling you off balance",
+      "Feet shoulder-width, slight knee bend, soft hips",
+      "Pause at full extension — that is where the anti-rotation work is",
+      "Keep the torso square to the front throughout"
+    ],
   }
 
 
@@ -2399,7 +2476,18 @@ export const STRENGTH = [
     ],
     coaching: 'The moment the lower back arches off the floor, the position is lost. Lift the legs higher or bend the knees to reduce difficulty and maintain position.',
     why: 'The hollow body hold is the foundation of gymnastics strength training — trains the deep abdominals to maintain spinal position against load, essential for all pressing and pulling movements.',
-    credits: 55
+    credits: 55,
+    sets: 3,
+    reps: null,
+    holdSeconds: 20,
+    rest: 60,
+    description: "Lie on your back. Press your lower back into the floor. Lift your arms overhead and your legs off the floor. Hold the position — you should look like a shallow dish.",
+    cues: [
+      "Lower back must stay in contact with the floor",
+      "Legs higher if your back lifts — reduce the lever arm",
+      "Arms by your sides is an easier variation",
+      "Breathe — do not hold your breath"
+    ],
   }
 
 ];
