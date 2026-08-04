@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v198
+ * coach-proposal.js v15→v16 — mixed-severity condition narrative. If
+ * conditions span multiple bands the same day (e.g. one Moderate, one
+ * Mild), the coach now narrates each by its own state in one combined
+ * message, instead of one tier silently winning. Real finding: Severe
+ * pain has no rest-day override anywhere live (dead/unused code found)
+ * — flagged to Graeme as a separate decision, not built. Verified,
+ * unchanged: exercise/recommendation adaptation was already correctly
+ * per-condition, not aggregated — only the narrative had the gap.
+ *
  * 04 Aug 2026 v197
  * coach-proposal.js v14→v15 — multi-condition message fix, Graeme asked
  * directly whether "Glutes / Buttocks" changes per condition (yes,
@@ -402,7 +412,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v197";
+const CACHE_NAME = "alongside-v198";
 
 const SHELL_URLS = [
 
