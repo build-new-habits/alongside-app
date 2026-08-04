@@ -1,5 +1,14 @@
 /**
  * data/exercises/mobility.js
+ * 04 Aug 2026 v2
+ *
+ * v2 — Phase B, Home Nav & Conditions Redesign (core-session.js pool
+ *   consolidation). Added sets/reps/holdSeconds/rest/cues/description
+ *   fields to 6 records (thoracic-rotation, hip-flexor-stretch,
+ *   thoracic-extension-foam-roll, 90-90-hip-stretch, hip-cars,
+ *   prone-thoracic-rotation) — additive only, no existing field
+ *   changed. First version header on this file; added now.
+ *
  * Mobility exercises — stretching, joint prep, dynamic warm-up
  */
 
@@ -26,7 +35,18 @@ export const MOBILITY = [
     ],
     coaching: 'Keep your back straight - don\'t lean forward. The stretch should be in the front of your hip.',
     why: 'Tight hip flexors from sitting contribute to back pain and limit mobility.',
-    credits: 30
+    credits: 30,
+    sets: 2,
+    reps: "each side",
+    holdSeconds: 45,
+    rest: 30,
+    description: "Half-kneeling, one knee on the floor. Shift your hips forward gently until you feel a stretch in the front of the hip of the kneeling leg. Hold. Do not arch your lower back.",
+    cues: [
+      "Tuck your tailbone slightly — this deepens the stretch safely",
+      "Keep your chest tall — resist the urge to lean forward",
+      "The stretch should be in the front of the hip, not the knee",
+      "Breathe slowly and let the muscle release"
+    ],
   },
 
   {
@@ -101,7 +121,18 @@ export const MOBILITY = [
     ],
     coaching: 'If this is too intense, sit on a cushion to elevate your hips.',
     why: 'Opens internal and external hip rotation - essential for healthy hips.',
-    credits: 35
+    credits: 35,
+    sets: 2,
+    reps: "each side",
+    holdSeconds: 60,
+    rest: 30,
+    description: "Sit on the floor with one leg in front at 90 degrees, one leg to the side at 90 degrees. Sit tall and hold the position. After 30 seconds, lean gently forward over the front shin.",
+    cues: [
+      "Both hips should be in contact with the floor",
+      "Sit tall before you lean — do not collapse into the position",
+      "The stretch should be in both hips simultaneously",
+      "If hips cannot stay down, use a cushion under the raised hip"
+    ],
   },
 
   {
@@ -126,7 +157,18 @@ export const MOBILITY = [
     ],
     coaching: 'Keep your knees stacked and hips from rolling back - the movement is just in your upper back.',
     why: 'Thoracic mobility reduces neck and shoulder tension and improves posture.',
-    credits: 30
+    credits: 30,
+    sets: 2,
+    reps: "10 each side",
+    holdSeconds: 3,
+    rest: 30,
+    description: "Sit on the floor or a chair. Place hands behind your head. Rotate your upper back as far as you comfortably can to one side — lead with your elbow. Hold 3 seconds. Return. The lower back should not move.",
+    cues: [
+      "The rotation is in your upper back — thoracic spine",
+      "Lower back stays still throughout",
+      "Do not force the range — breathe into the rotation",
+      "Each rep, try to go a little further"
+    ],
   },
 
   // ============================================
@@ -261,7 +303,18 @@ export const MOBILITY = [
     ],
     coaching: 'The slower the better. You are exploring the edge of your hip\'s available range while keeping the muscles engaged throughout.',
     why: 'Controlled articular rotations maintain joint cartilage health and build active range of motion — more valuable than passive stretching for long-term hip health.',
-    credits: 35
+    credits: 35,
+    sets: 2,
+    reps: "5 each side",
+    holdSeconds: 0,
+    rest: 30,
+    description: "Standing on one leg, draw the biggest circle you can with your lifted knee — forward, out to the side, behind you, and back. Move slowly through the full range. The standing leg stays completely still.",
+    cues: [
+      "Move as slowly as possible — speed hides restriction",
+      "Keep your upper body completely still",
+      "The standing hip, knee, and foot stay exactly where they are",
+      "This is exploration — find where you run out of range and breathe into it"
+    ],
   },
 
   {
@@ -606,7 +659,18 @@ export const MOBILITY = [
     ],
     coaching: 'Only work the thoracic spine — not the lower back. If the roller dips below the ribcage, stop.',
     why: 'Directly restores thoracic extension mobility — the movement most lost from sitting. Essential for shoulder health, overhead movement, and upright posture.',
-    credits: 30
+    credits: 30,
+    sets: 1,
+    reps: "5 segments",
+    holdSeconds: 10,
+    rest: 30,
+    description: "Place the foam roller perpendicular to your spine at mid-back level. Support your head with your hands. Gently extend over the roller, opening the chest toward the ceiling. Hold 10 seconds. Move the roller up one segment and repeat.",
+    cues: [
+      "Support your head — do not let it hang back unsupported",
+      "Open your chest toward the ceiling — not just your head",
+      "Keep your hips on the floor throughout",
+      "If you feel sharp pain, move on to the next segment"
+    ],
   },
 
   {
@@ -927,7 +991,18 @@ export const MOBILITY = [
     ],
     coaching: 'Keeping the knees together isolates the rotation to the thoracic spine. The moment the knees separate, the lumbar spine takes over.',
     why: 'A targeted thoracic rotation drill in a position that locks out the lumbar spine — ensuring the rotation happens in the correct area.',
-    credits: 25
+    credits: 25,
+    sets: 2,
+    reps: "8 each side",
+    holdSeconds: 3,
+    rest: 30,
+    description: "Lie face down, arms out to the sides in a T-shape. Rotate one arm and shoulder up and over to the other side — your torso will follow. The hip of the rotating side will lift slightly. Hold 3 seconds. Return slowly.",
+    cues: [
+      "Let the movement flow from the upper back — not the neck",
+      "The hold at end range is where the mobility work happens",
+      "Move to the point of comfortable restriction, not through pain",
+      "Keep the arm reaching long throughout the rotation"
+    ],
   },
 
   {

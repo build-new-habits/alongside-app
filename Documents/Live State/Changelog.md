@@ -367,4 +367,20 @@ Real feature, not a copy tweak: Graeme proposed the coach explicitly ask, when p
 
 ---
 
+### Phase B — core-session.js pool consolidation (Home Nav & Conditions Redesign)
+
+Per `alongside_blueprint_home-navigation-conditions_04aug2026_v1.md`. The exercise-pool duplication the original redesign spec flagged as a "must not be repeated" failure — `core-session.js` had its own private, fully-forked copy of 23 exercises, separate from the shared database everything else in the app reads from.
+
+- Confirmed by direct check: all 23 exercises `core-session.js` used already existed in the shared database (`js/data/exercises/{strength,mobility,rehabilitation}.js`), under the same or (in two cases) a corrected id. Not a second content set — a stale fork of the first one.
+- `js/views/core-session.js` v4 → v5 — `EXERCISE_POOLS` (23 full duplicate objects) replaced with `EXERCISE_POOL_IDS`, a lightweight id-reference map resolved against the shared `EXERCISES` array in `buildSession()`.
+- `js/data/exercises/strength.js`, `mobility.js`, `rehabilitation.js` — all v1 → v2 (first-ever version headers added to all three). Fields `sets`/`reps`/`holdSeconds`/`rest`/`cues`/`description` migrated onto the 23 relevant shared records, purely additively — no existing field on any shared record was changed. `description` was a second, follow-up migration pass — the shared records use `instructions[]`/`coaching`, not `description`, which the renderer actually needed; caught before it could ship as a live bug, not after.
+- **Two genuine pre-existing bugs found and fixed:** `core-session.js`'s "stability" pool had a classic two-limb Dead Bug and Bird Dog incorrectly sharing ids ("dead-bug-progression-1", "bird-dog-rehab") with a completely different, gentler rehab-pool variant of each. Both variants already existed as distinct, correctly-detailed records in the shared database under their own ids (`dead-bug`/`bird-dog` vs the rehab-pool ids) — resolved by pointing each variant at its real shared id instead of the collided one.
+- `buildSession()` rewritten: the private duplicated severity threshold (`pain >= 4` subacute — the pre-Phase-A value, never updated because this file was deliberately deferred to Phase B) replaced with `conditions.js`'s canonical `getActiveConditionIds()`/`filterByConditions()` — the same functions `workoutGenerator.js` already uses for every other session type. Selection also fixed: was always the first N items of a fixed-order array for every user, every time — now shuffled before slicing. Caution-tier exercises folded into the available pool rather than excluded (no caution-badge UI built this pass — a reasonable future addition, not required for consolidation).
+- **Flagged, not silently resolved:** the shared `dead-bug`/`bird-dog` records' existing `contraindications` differ from what `core-session.js` previously excluded them for (dead-bug: was `["lower-back-acute"]`, shared has none; bird-dog: was `["lower-back-acute","wrist-elbow-acute"]`, shared has `["glutes-acute","lower-back-acute"]`). Shared data left untouched per single-source-of-truth — a real content-accuracy question for Graeme, not something to guess at.
+- **Verified end-to-end, not just syntax-checked.** Ran an actual Node smoke test resolving all 23 ids against the live shared database, confirming every required field is present, and confirming contraindication filtering against a real condition/pain-score pair (lower-back at 8/10 correctly excluded 4 of 6 stability exercises, correctly left `dead-bug` unexcluded per the flagged discrepancy above).
+- `sw.js` v199 → v200, deployed last.
+- **Not yet on-device confirmed.** Needs a full pass across all four Core Session focus types (Stability, Strength, Mobility, Rehab), each duration, and at least one run with an active condition logged to confirm filtering and variety both work as expected on a real device.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
