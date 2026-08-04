@@ -1,6 +1,18 @@
 /**
  * checkin-mini.js - Abbreviated Return-Visit Check-In
  *
+ * 04 Aug 2026 v6
+ *
+ * v6 — Skip button now honours pendingDoorRoute too, not just
+ *   completion. Graeme: "we should fix this so it's optional not
+ *   fixed." Previously skip always cleared the pending destination
+ *   and dumped to the generic 'intention' picker, meaning check-in-
+ *   mini was effectively mandatory in practice (skip didn't get you
+ *   where you wanted, so most people would just fill it in rather
+ *   than lose their place). today.js v9 also stopped forcing this
+ *   screen to appear at all after the first check-in of the day —
+ *   the two fixes together are what actually make it optional.
+ *
  * 04 Aug 2026 v5
  *
  * v5 — Completion now honours a pending Home-door destination
@@ -414,10 +426,23 @@ export function onMount() {
   // Skip - abandon mini check-in, go to intention
   document.getElementById("mini-skip-btn")?.addEventListener("click", () => {
     store.set("returnVisit", false);
-    // Explicit opt-out of the adaptive flow — clear any pending door
-    // destination rather than force-completing it without real data.
-    store.set("pendingDoorRoute", null);
-    router.navigate("intention");
+    // Fix, 04 Aug 2026 — Graeme: "we should fix this so it's optional
+    // not fixed." Previously cleared pendingDoorRoute and always
+    // dumped to the generic 'intention' picker on skip, even when the
+    // person had a specific door destination waiting — meaning
+    // check-in-mini was effectively mandatory (skip didn't actually
+    // get you where you wanted, so most people would just fill it in).
+    // Now: skipping honours the pending destination the same way
+    // completing does, using whatever check-in data already exists
+    // (today's earlier check-in, or nothing at all). Genuinely
+    // optional now — fill it in, or skip straight through.
+    const pending = store.get("pendingDoorRoute");
+    if (pending) {
+      store.set("pendingDoorRoute", null);
+      router.navigate(pending);
+    } else {
+      router.navigate("intention");
+    }
   });
 
   // Energy slider

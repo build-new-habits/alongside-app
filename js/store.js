@@ -1,5 +1,19 @@
 /**
  * store.js - Data persistence layer
+ * 04 Aug 2026 v16
+ *
+ * 04 Aug 2026 v16 - Two additions, same day as the condition-programme
+ *   build. (1) prescribedExercises entries can now carry an optional
+ *   conditionId — additive, nullable, existing entries unaffected —
+ *   so a coach-built/coach-recommended/self-built programme can be
+ *   scoped to the condition it's actually for, not one shared flat
+ *   list. No top-level schema change for this, just documented in
+ *   Schema.md (the field lives inside array entries, not getDefaults()).
+ *   (2) New top-level field prescribedExercisesActiveCondition —
+ *   single-use context flag, set by conditions-update.js's "Build my
+ *   own" right before navigating to prescribed.js, read and cleared
+ *   immediately by that file so it can never leak into an unrelated
+ *   later visit.
  * 04 Aug 2026 v15
  *
  * 04 Aug 2026 v15 - Phase D-1 (schema), Conditions Update. Two new fields:
@@ -360,6 +374,9 @@ export const store = {
       prescribedExercisesOrigin: ['professional', 'self'].includes(saved.prescribedExercisesOrigin)
         ? saved.prescribedExercisesOrigin
         : null,
+      prescribedExercisesActiveCondition: typeof saved.prescribedExercisesActiveCondition === 'string'
+        ? saved.prescribedExercisesActiveCondition
+        : null,
 
       // ── WEEKLY PLAN ───────────────────────────────────────────
       weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
@@ -529,6 +546,7 @@ export const store = {
 
       // ── PRESCRIBED EXERCISES ORIGIN ───────────────────────────
       prescribedExercisesOrigin: null, // 'professional' | 'self' | null — set once when prescribedExercises first goes empty -> non-empty; see Phase D blueprint v2, decision D-2
+      prescribedExercisesActiveCondition: null, // conditionId | null — single-use, set by conditions-update.js's "Build my own" right before navigating to prescribed.js, cleared immediately once read; tags the next-added entry with conditionId
 
       // ── LIFESTYLE ────────────────────────────────────────────
       lifestyle: {

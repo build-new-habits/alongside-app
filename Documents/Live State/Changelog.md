@@ -476,4 +476,24 @@ Real gap: there was no way to remove a condition from `conditions-update.js`. Th
 
 ---
 
+### Check-in gating made optional, and real condition-programme routes built — same conversation
+
+**Check-in gating fix.** Graeme: *"today's check-in gating means you now hit check-in-mini every single time you do a second session in a day - we should fix this so it's optional not fixed."*
+
+- `js/views/today.js` v8 → v9 — session-generating doors (Cardio/Core/Strength, Unsure? Coach decides) now only force check-in the very first time today, when there genuinely isn't any data to adapt around yet. Once checked in today, doors go straight to their destination. A new "Update check-in" link replaces the "Check in" link on Home once already checked in — voluntary, not a gate.
+- `js/views/checkin-mini.js` v5 → v6 — Skip now honours `pendingDoorRoute` the same way completing does, instead of always clearing it and dumping to the generic `intention` picker. Between this and the `today.js` change, check-in-mini is now genuinely optional rather than an unavoidable stop between every door tap and every session.
+
+**Condition-programme routes — scoped, decided, and built.** Four of Graeme's decisions, all landed: programmes are one-time, not auto-regenerating (his confirmed instinct); flat list for now, explicitly captured in code comments as a deliberate placeholder rather than lost; 8 exercises per programme, not 4–6, because *"we should be helping the user work towards caring for and improving their condition"*; and the check-in fix above.
+
+- `js/data/conditionProgrammes.js` (new) — real, tested exercise-selection logic. `buildConditionCandidates()` filters the shared exercise database by `affectsAreas` matching the condition and excludes anything contraindicated for its current phase. `buildCoachProgramme()` further filters by `rehabPhase` (matching or gentler than the condition's current severity) and biases the final 8 by goal type — "improve" leans toward more challenging options, "cope"/"healed" lean toward explicit rehab-phase matches. `buildRecommendedCandidates()` is the same safe pool, wider (16), presented as choosable rather than automatic. `commitProgramme()` writes to `prescribedExercises`, tagged with `conditionId`, replacing any existing programme for that same condition (a deliberate rebuild, not silent drift). Smoke-tested against real data before being wired into anything: lower-back at Moderate correctly returned 68 safe candidates and an 8-exercise programme of genuinely relevant rehab exercises.
+- `js/store.js` v15 → v16 — `prescribedExercises` entries can now carry an optional `conditionId` (additive, nullable). New single-use context flag `prescribedExercisesActiveCondition`.
+- `js/views/conditions-update.js` v2 → v3 — "Your programme" moved from one shared section at the bottom into each condition's own card, now that entries can be scoped. Three real routes per card: **Coach builds it** (automatic), **Coach recommends, I'll choose** (checkbox selection from the wider candidate pool), **Build my own** (routes into `prescribed.js`, passing which condition via the new context flag). "Ask the coach to rebuild this" appears once a programme exists, for a deliberate re-run.
+- `js/views/prescribed.js` v1.1 → v1.2 — reads the context flag to tag new entries with `conditionId`, clears it immediately after (single-use, can't leak into an unrelated later visit); each exercise card shows a small "For: [condition]" tag when one is set.
+- `css/layouts/conditions-update.css` v2 → v3 — programme section restyled for its new per-card home; new styling for the recommend-and-select checkbox list.
+- `Documents/Live State/Schema.md` v1.14 → v1.15.
+- `sw.js` v206 → v207, deployed last, new data file added to `SHELL_URLS`.
+- **Not yet on-device confirmed.** Needs a full pass: tap a door for the first time today (still gates on check-in), tap a second door same day (should go straight through, no forced check-in-mini), "Update check-in" link works voluntarily, all three programme routes on a real condition, "For:" tags show correctly if exercises exist for more than one condition.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

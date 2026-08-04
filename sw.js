@@ -1,6 +1,26 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v207
+ * Four fixes/builds, all from the same conversation. (1) Check-in
+ * gating now genuinely optional: today.js v9 only forces check-in the
+ * first time today; check-in-mini.js v6's Skip now honours
+ * pendingDoorRoute instead of always dumping to 'intention'. Together
+ * these mean check-in-mini no longer appears automatically for every
+ * second-or-later session in a day — it's reachable voluntarily via a
+ * new "Update check-in" link instead. (2) New js/data/
+ * conditionProgrammes.js — real, tested exercise-selection logic for
+ * condition programmes, built on data that already existed
+ * (affectsAreas, rehabPhase, contraindications). (3) store.js v15→v16:
+ * prescribedExercises entries can carry an optional conditionId;
+ * new single-use prescribedExercisesActiveCondition context flag.
+ * (4) conditions-update.js v2→v3: "Your programme" moved into each
+ * condition's own card, three real routes (Coach builds it / Coach
+ * recommends, I'll choose / Build my own), 8-exercise programmes,
+ * one-time generation not auto-regenerating. prescribed.js v1.1→v1.2:
+ * tags new entries with conditionId when set, shows a "For:" tag.
+ * conditions-update.css v2→v3.
+ *
  * 04 Aug 2026 v206
  * Real gap fixed, found by Graeme same day: no way to remove a
  * condition from conditions-update.js. Added an explicit "Remove"
@@ -537,7 +557,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v206";
+const CACHE_NAME = "alongside-v207";
 
 const SHELL_URLS = [
 
@@ -628,6 +648,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/checkin.js",
   "/alongside-app/js/data/checkin-openings.js",
   "/alongside-app/js/data/conditions.js",
+  "/alongside-app/js/data/conditionProgrammes.js",
   "/alongside-app/js/data/equipment.js",
   "/alongside-app/js/data/goals.js",
   "/alongside-app/js/data/workoutGenerator.js",
