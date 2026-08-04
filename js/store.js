@@ -1,7 +1,15 @@
 /**
  * store.js - Data persistence layer
- * 04 Aug 2026 v14
+ * 04 Aug 2026 v15
  *
+ * 04 Aug 2026 v15 - Phase D-1 (schema), Conditions Update. Two new fields:
+ *   conditionGoals (felt-sense per-condition goal — 'healed'|'cope'|
+ *   'improve' + optional note, new setConditionGoal() helper) and
+ *   prescribedExercisesOrigin ('professional'|'self'|null, lets
+ *   prescribed.js branch its coach voice correctly depending on entry
+ *   context). See Phase D blueprint v2, decisions D-1/D-2. Also caught:
+ *   Schema.md had fallen a step behind this file (pendingDoorRoute, v14,
+ *   was never documented there) — corrected in the same pass.
  * 04 Aug 2026 v14 - New field pendingDoorRoute: remembers which Home
  *   door a person tapped when that door requires check-in first
  *   (Cardio/Core/Strength, Unsure? Coach decides). Set by today.js,
@@ -337,6 +345,9 @@ export const store = {
       conditionFoldInLevel: ['partial', 'mostly', 'all'].includes(saved.conditionFoldInLevel)
         ? saved.conditionFoldInLevel
         : null,
+      conditionGoals: (saved.conditionGoals && typeof saved.conditionGoals === 'object')
+        ? saved.conditionGoals
+        : {},
 
       // ── SEVERE PAIN CHOICE (new 04 Aug 2026, Pain Input Redesign follow-up) ──
       // { date: 'YYYY-MM-DD', conditionIds: [...sorted], choice: 'rest'|'adapt',
@@ -346,6 +357,9 @@ export const store = {
       // any change re-prompts rather than silently reusing a stale choice.
       severePainChoices: Array.isArray(saved.severePainChoices) ? saved.severePainChoices : [],
       pendingDoorRoute: typeof saved.pendingDoorRoute === 'string' ? saved.pendingDoorRoute : null,
+      prescribedExercisesOrigin: ['professional', 'self'].includes(saved.prescribedExercisesOrigin)
+        ? saved.prescribedExercisesOrigin
+        : null,
 
       // ── WEEKLY PLAN ───────────────────────────────────────────
       weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
@@ -509,8 +523,12 @@ export const store = {
       conditionPainScores: {},
       conditionReflections: [],   // { conditionId, text, loggedAt } — NOT Journal. Deliberately distinct field/namespace so it can never inherit the Journal Privacy Rule by accident. Coach-readable by design.
       conditionFoldInLevel: null, // 'partial' | 'mostly' | 'all' | null — null = static-only, not folded into Cardio/Core/Strength sessions
+      conditionGoals: {},         // { [conditionId]: { goalType: 'healed'|'cope'|'improve', note, setAt } } — felt-sense, not numeric; see Phase D blueprint v2, decision D-1
       severePainChoices: [],      // { date, conditionIds, choice: 'rest'|'adapt', chosenAt } — active choice record, see mergeWithDefaults() note
       pendingDoorRoute: null,     // route name to continue to once check-in/check-in-mini completes — set by today.js when a session-generating door is tapped, cleared by checkin.js/checkin-mini.js on completion
+
+      // ── PRESCRIBED EXERCISES ORIGIN ───────────────────────────
+      prescribedExercisesOrigin: null, // 'professional' | 'self' | null — set once when prescribedExercises first goes empty -> non-empty; see Phase D blueprint v2, decision D-2
 
       // ── LIFESTYLE ────────────────────────────────────────────
       lifestyle: {
@@ -838,6 +856,20 @@ export const store = {
     this.data.severePainChoices = [...(this.data.severePainChoices || []), entry];
     this.save();
     return entry;
+  },
+
+  // Sets or clears a per-condition goal (04 Aug 2026, Phase D-1). Felt-sense,
+  // not numeric — see Phase D blueprint v2, decision D-1. goalType null
+  // clears the goal for that condition (the "not sure yet" / skip path).
+  setConditionGoal(conditionId, goalType, note = '') {
+    const goals = { ...(this.data.conditionGoals || {}) };
+    if (!goalType) {
+      delete goals[conditionId];
+    } else {
+      goals[conditionId] = { goalType, note, setAt: new Date().toISOString() };
+    }
+    this.data.conditionGoals = goals;
+    this.save();
   },
 
   logSession(sessionData) {
