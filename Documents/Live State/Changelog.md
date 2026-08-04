@@ -398,4 +398,30 @@ Per `alongside_blueprint_home-navigation-conditions_04aug2026_v1.md`. The single
 
 ---
 
+### Graeme's on-device pass on Phase C — 4 real fixes, same day
+
+Seven screenshots, real findings across the board.
+
+**1. Real regression, found via screenshot.** Phase C's auto-opened session panel is a full-screen fixed overlay (`z-index: 9999`) — Graeme reached the coach-proposal screen and completely missed the flagged condition/severity constraint message sitting right behind it, covered before he could read it.
+
+- `js/views/coach-proposal.js` v18 → v19 — coach message content (greeting/reflection/constraint) now renders *inside* the panel when it's open, not just underneath it. Same latent bug also existed for the re-entry banner and missed-session offer, not yet triggered but real: `mount()` no longer auto-opens the panel while either is unresolved; `handleReturnContext()`/`handleMissedAdaptation()` open it themselves once resolved, each checking the other banner isn't also still pending.
+- `css/components/coach-proposal.css` v7 → v8 — new `.cp-coach-block--in-panel` styling.
+
+**2. The big one — check-in now genuinely gates the doors that need it.** Graeme's point: reaching a session-generating screen without ever checking in defeats the entire premise of it adapting to "where you are today."
+
+- `js/store.js` v13 → v14 — new field `pendingDoorRoute`: remembers which Home door was tapped when it requires check-in first.
+- `js/views/today.js` v5 → v6 — Cardio/Core/Strength and Unsure? Coach decides now route through full check-in (if not done today) or check-in-mini (if already done) before their real destination. The other four doors (Mobility & Conditioning, Wellbeing, Conditions Update, Progress) stay ungated — informational/self-directed, not generative. **Flagged for Graeme to confirm** this split is what he meant, not assumed settled.
+- `js/views/checkin.js` v9 → v10, `js/views/checkin-mini.js` v4 → v5 — completion now honours `pendingDoorRoute` if set, continuing to the door's real destination instead of always landing on the generic default (`coach-reflection`/`intention`). Explicit alternate choices (prescribed exercises, skip) clear it rather than force-completing the door without real data.
+
+**3. Equipment step copy mismatch.** `js/views/session-builder-ui.js` v2 → v3 — with no equipment saved in settings, every checkbox correctly rendered unticked, but the copy still said "untick anything you don't have" — confusing against an empty list with nothing to untick. Now says "tick anything you have today" when nothing's saved, keeping the "untick" framing only when there's real saved equipment to start from.
+
+**4. Logged, not built this pass — two real gaps, properly scoped as their own future items, not squeezed in:**
+- Cosmetic polish needed on the session-builder proposal screen (and likely others) — flagged for a future dedicated pass, per Graeme's own instruction not to fix ad hoc.
+- `gym-programme.js` has no guided walkthrough — no timers, form cues, or video links, just a flat "tick when done" checklist. `workout.js` already has the full guided experience (timer, Start/Next/Skip, exercise detail). Real gap: without it, Empathy Transfer moments have nothing to attach to in gym-programme sessions. Scoped as its own future build, not attempted here.
+
+- `sw.js` v201 → v202, deployed last.
+- **Not yet on-device confirmed** — needs a full pass covering the panel-covering fix, both check-in gating paths (fresh check-in and check-in-mini), and the equipment copy in both saved/unsaved states.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

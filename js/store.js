@@ -1,7 +1,14 @@
 /**
  * store.js - Data persistence layer
- * 04 Aug 2026 v13
+ * 04 Aug 2026 v14
  *
+ * 04 Aug 2026 v14 - New field pendingDoorRoute: remembers which Home
+ *   door a person tapped when that door requires check-in first
+ *   (Cardio/Core/Strength, Unsure? Coach decides). Set by today.js,
+ *   read and cleared by checkin.js/checkin-mini.js on completion, so
+ *   the person lands where they actually meant to go instead of the
+ *   generic post-check-in default. Graeme's fix: reaching a session-
+ *   generating screen without ever checking in defeats its adaptation.
  * 04 Aug 2026 v13 - New field severePainChoices + recordSeverePainChoice()
  *   helper, for the Severe pain Rest/Adapt choice (coach-proposal.js
  *   v17). One record per date + exact severe-condition-id set — an
@@ -338,6 +345,7 @@ export const store = {
       // choice is logged. Keyed by date + exact severe-condition-id set, so
       // any change re-prompts rather than silently reusing a stale choice.
       severePainChoices: Array.isArray(saved.severePainChoices) ? saved.severePainChoices : [],
+      pendingDoorRoute: typeof saved.pendingDoorRoute === 'string' ? saved.pendingDoorRoute : null,
 
       // ── WEEKLY PLAN ───────────────────────────────────────────
       weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
@@ -502,6 +510,7 @@ export const store = {
       conditionReflections: [],   // { conditionId, text, loggedAt } — NOT Journal. Deliberately distinct field/namespace so it can never inherit the Journal Privacy Rule by accident. Coach-readable by design.
       conditionFoldInLevel: null, // 'partial' | 'mostly' | 'all' | null — null = static-only, not folded into Cardio/Core/Strength sessions
       severePainChoices: [],      // { date, conditionIds, choice: 'rest'|'adapt', chosenAt } — active choice record, see mergeWithDefaults() note
+      pendingDoorRoute: null,     // route name to continue to once check-in/check-in-mini completes — set by today.js when a session-generating door is tapped, cleared by checkin.js/checkin-mini.js on completion
 
       // ── LIFESTYLE ────────────────────────────────────────────
       lifestyle: {

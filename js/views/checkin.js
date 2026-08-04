@@ -1,6 +1,14 @@
 /**
  * js/views/checkin.js
- * 04 Aug 2026 v9
+ * 04 Aug 2026 v10
+ *
+ * v10 — Completion now honours a pending Home-door destination
+ *   (pendingDoorRoute, store.js v14) if one was set — Cardio/Core/
+ *   Strength and Unsure? Coach decides now route through this file
+ *   first when reached from Home, and completion continues to the
+ *   door's real destination instead of always landing on
+ *   coach-reflection. Falls back to the existing default when check-in
+ *   was reached some other way (e.g. Home's standalone "Check in" link).
  *
  * v9 — Pain Input Redesign. Conditions panel converted from the 4-button
  *   .ci-pain-chip row to per-condition sliders (0-10), matching the
@@ -628,8 +636,26 @@ export function CheckinView(router) {
     requestAnimationFrame(() => wrap.classList.add("is-visible"));
     setTimeout(() => document.getElementById("ci-submit-btn")?.focus({ preventScroll: true }), 150);
 
-    document.getElementById("ci-submit-btn").addEventListener("click", () => { _saveAll(); router.navigate("coach-reflection"); });
-    document.getElementById("ci-prescribed-btn").addEventListener("click", () => { _saveAll(); router.navigate("prescribed"); });
+    document.getElementById("ci-submit-btn").addEventListener("click", () => {
+      _saveAll();
+      // Fix, 04 Aug 2026: honour a pending Home-door destination if one
+      // was set (session-generating doors route through check-in first
+      // now, then continue to where the person actually tapped) —
+      // falls back to the existing coach-reflection default when check-in
+      // was reached some other way (e.g. the standalone "Check in" link).
+      const pending = store.get("pendingDoorRoute");
+      if (pending) {
+        store.set("pendingDoorRoute", null);
+        router.navigate(pending);
+      } else {
+        router.navigate("coach-reflection");
+      }
+    });
+    document.getElementById("ci-prescribed-btn").addEventListener("click", () => {
+      _saveAll();
+      store.set("pendingDoorRoute", null); // explicit alternate choice — don't also carry the door through
+      router.navigate("prescribed");
+    });
   }
 
   function _saveAll() {
