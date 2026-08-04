@@ -1,5 +1,5 @@
 # Alongside: Move — Home Nav & Conditions Redesign — Phase D Blueprint
-## 04 Aug 2026 v2
+## 04 Aug 2026 v3
 
 Build New Habits | Scopes Phase D (Conditions Update dedicated screen) of `alongside_blueprint_home-navigation-conditions_04aug2026_v1.md`. Supersedes v1 — all three open decisions now resolved (Section 2). No code written this session — blueprint only. Ground-truthed against live code (04 Aug 2026), not copied from the original blueprint's Section 6 unchanged — a lot has shipped since that was written, and three of its assumptions needed correcting.
 
@@ -90,3 +90,14 @@ Fully scoped and decided. Ready to run Phase D-1 (schema) as its own session whe
 ---
 
 *Build New Habits · Alongside: Move · Phase D Blueprint · 04 Aug 2026 v2*
+
+---
+
+## 5. UX design — resolved 04 Aug 2026, same day
+
+**Card structure:** one collapsed card per condition, always collapsed by default (including first-ever add) — but with an unambiguous chevron affordance (rotates on expand, respects reduced-motion) plus a subtle border/background shift on focus/hover, so it reads as interactive before the first tap. `aria-expanded` wired properly.
+
+**Goal + severity combined for real progression.** Graeme's question: is a one-time felt-sense goal enough, or does it need to show movement? Resolved: yes, combine with a severity trend, and it's genuinely buildable with zero new tracking — full check-in already writes a dated snapshot of every condition's severity into `checkinHistory` (has done for a while). Check-in-mini doesn't add to that history, which works in favour of a clean trend line — one reading per day. Once a goal is set, the card shows something like *"Moderate → Mild over the last 2 weeks"* sourced from that existing history. Deliberately descriptive, not judgemental — no "good"/"bad" framing, since conditions fluctuate and editorialising a plateau as failure cuts against the app's own "no shame" principle. State the shape of it, let the person draw their own conclusion.
+
+**Programme routes — ship one real option, not three tiles where two say "coming soon."** "Build your own" (`prescribed.js` + D-2's copy branch) is real and ships in D-2. "Coach builds it" / "coach recommends, you select" need actual programme-generation logic that doesn't exist yet — comparable in size to NEW-1 (Programme Curation) already logged as its own future item. Rather than inventing a condition-specific duplicate of that future work, D-2 ships with the one working option now; the three-way choice becomes real everywhere at once when NEW-1 lands.
+
