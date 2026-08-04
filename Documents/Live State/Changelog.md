@@ -318,4 +318,19 @@ Graeme sent a screenshot while confirming the Phase A threshold fix: "Moderate" 
 
 ---
 
+### Pain Input Redesign — same day, Graeme's own instinct
+
+Prompted by the chip-overflow bug above still looking "awful and unprofessional" once wrapped, plus a real product question: was Mild pain being silently ignored? Both true. Rather than patch the chip component a third time, replaced it — condition pain input now matches the app's own existing Energy/Mood slider pattern.
+
+- `js/data/conditions.js` v1.3 → v1.4 — new `getPainBand(score)`, the one canonical function for pain-severity display bands (none 0-2, mild 3-5, moderate 6-7, severe 8-10) app-wide. Removed dead code `getPainContext()` — confirmed uncalled anywhere in `js/`, itself a **fourth** independent private duplicate of severity-threshold logic found today, still carrying the pre-fix `pain >= 4` value.
+- `js/views/checkin.js` v8 → v9 — conditions panel converted from the 4-button `.ci-pain-chip` row to per-condition sliders (0-10), reusing `.ci-slider-wrap`/`.ci-value-row` exactly as Energy/Mood already do. Default for an unset condition changed from `1` to a genuine `0`, using explicit `!== undefined` checks throughout instead of `||` fallbacks, to avoid a falsy-zero bug now that real `0` values are reachable.
+- `js/views/checkin-mini.js` v3 → v4 — same conversion. This file's own private `PAIN_LEVELS`/`painLevelForScore` — the fifth occurrence, counting today's earlier `checkin-mini.js` severity-score fix as a variant of the same pattern — retired in favour of `getPainBand()`.
+- `js/views/coach-proposal.js` v13 → v14 — new Mild acknowledgment tier: `_checkMildPain()`/`_buildMildMessage()`, correctly prioritised under the existing Moderate message. Previously Mild pain produced no coach acknowledgment at all. Wording close to Graeme's own proposal: *"I've noted X as Mild today. I haven't changed anything in the programme, but keep an eye on it — if it starts feeling worse, please adapt what you're doing, or stop."* Existing Moderate message also upgraded to use `getConditionName()` for a real display name instead of the raw condition id.
+- `css/components/checkin-conversation.css` v4 → v5 — new `.ci-slider-wrap--condition` (compact multi-slider variant) and colour-coded `.ci-value-label--none/mild/moderate/severe`. `.ci-pain-chip`/`.ci-pain-chips` removed entirely — confirmed unused anywhere in `js/` once the conversion landed.
+- `Documents/Live State/Schema.md` v1.11 → v1.12 — `conditionPainScores` field note clarified (genuine 0-10 now, was 4 discrete values; no shape change, every consumer already used range comparisons).
+- `sw.js` v195 → v196, deployed last.
+- **Not yet on-device confirmed** — this touches both check-in entry points and the coach's response to them. Needs a full pass: log a condition via each slider, confirm the live label updates correctly at each band boundary, confirm Mild now shows the new acknowledgment message and Moderate still shows its own.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

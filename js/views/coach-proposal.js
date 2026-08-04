@@ -1,5 +1,23 @@
 /**
  * coach-proposal.js
+ * 04 Aug 2026 v14
+ *
+ * v14 — Pain Input Redesign, same day as v13's threshold fix. New Mild
+ *   acknowledgment tier: _checkMildPain()/_buildMildMessage(), band 3-5
+ *   matching conditions.js's canonical getPainBand(). Wired into
+ *   buildProposal() with correct priority — Moderate's existing message
+ *   wins if both are present, Mild only shows otherwise. Wording close
+ *   to Graeme's own proposal: "I've noted X as Mild today. I haven't
+ *   changed anything in the programme, but keep an eye on it — if it
+ *   starts feeling worse, please adapt what you're doing, or stop."
+ *   Previously Mild pain produced no acknowledgment at all — a real
+ *   silent-input gap, not just a missing nicety, since the coach voice
+ *   philosophy is "behaviour is communication" and this was one-way.
+ *   Also: _buildConstraintMessage() (the existing Moderate message) now
+ *   uses getConditionName() for a proper display name ("Glutes /
+ *   Buttocks") instead of the raw condition id ("glutes") — small
+ *   consistency fix, matches the new Mild message's wording style.
+ *
  * 04 Aug 2026 v13
  *
  * Coach proposal view. The hub. Doors that describe categories, not
@@ -238,6 +256,7 @@ import { getPhaseBias, getReEntryContext, getMissedSessionOffer,
 import { getProgramme }      from '../data/programmes.js';
 import { detectBurnout }     from '../data/checkin.js';
 import { getPrimaryEngineGoal } from '../data/goals.js';
+import { getConditionName }  from '../data/conditions.js';
 import { workoutGenerator, AVAILABLE_TIME_WINDOW_MINUTES } from '../data/workoutGenerator.js';   // v9 — direct import, replaces window._workoutGenerator lookup. v12 — added AVAILABLE_TIME_WINDOW_MINUTES.
 
 // ─── Door copy (v8 — static, honest about category vs commitment) ────────────
@@ -743,6 +762,7 @@ export function CoachProposalView(router) {
     // Pain override check
     const severePain   = _checkSeverePain(conditions, painScores);
     const moderatePain = _checkModeratePain(conditions, painScores);
+    const mildPain      = _checkMildPain(conditions, painScores);
 
     // Re-entry intensity adjustment
     let effectiveIntensity = phaseBias.intensityBias;
@@ -765,10 +785,14 @@ export function CoachProposalView(router) {
     // Build reflection (last 48h activity)
     const reflection = _buildReflection();
 
-    // Build constraint message if pain is moderate
+    // Build constraint message — priority moderate > mild, matching
+    // severity. Severe pain has its own handling upstream (workout
+    // generation), not this message slot — unchanged, not touched here.
     const constraint = moderatePain.hasModerate
       ? _buildConstraintMessage(moderatePain, conditions, painScores)
-      : null;
+      : mildPain.hasMild
+        ? _buildMildMessage(mildPain)
+        : null;
 
     // Build intro line
     const intro = _buildIntro(primaryGoal, feelingWord, burnout, reEntryCtx);
@@ -900,6 +924,25 @@ export function CoachProposalView(router) {
   }
 
   // ── Pain checks ────────────────────────────────────────────────────────────
+  // Bands match the canonical getPainBand() in conditions.js: mild 3-5,
+  // moderate 6-7, severe 8+. Not calling getPainBand() directly here —
+  // these three functions need simple filter/find behaviour across a
+  // list of conditions, not a single-score classification — but the
+  // numeric boundaries themselves are the same source of truth,
+  // confirmed against conditions.js when writing this (04 Aug 2026).
+
+  function _checkMildPain(conditions, painScores) {
+    const mildConditions = conditions.filter(
+      id => (painScores[id] || 0) >= 3 && (painScores[id] || 0) < 6
+    );
+    return { hasMild: mildConditions.length > 0, conditions: mildConditions };
+  }
+
+  function _buildMildMessage(mildPain) {
+    const id   = mildPain.conditions[0];
+    const name = getConditionName(id);
+    return `I've noted ${name} as Mild today. I haven\'t changed anything in the programme, but keep an eye on it \u2014 if it starts feeling worse, please adapt what you\'re doing, or stop.`;
+  }
 
   function _checkSeverePain(conditions, painScores) {
     const severeConditions = conditions.filter(id => (painScores[id] || 0) >= 7);
@@ -924,8 +967,9 @@ export function CoachProposalView(router) {
 
   function _buildConstraintMessage(moderatePain, conditions, painScores) {
     const id        = moderatePain.conditions[0];
-    const painLevel = painScores[id] || 4;
-    return `Your check-in flagged ${id} today (${painLevel}/10). I\'ve worked around that.`;
+    const painLevel = painScores[id] || 6;
+    const name      = getConditionName(id);
+    return `Your check-in flagged ${name} today (${painLevel}/10). I\'ve worked around that.`;
   }
 
   // ── Option generation ──────────────────────────────────────────────────────

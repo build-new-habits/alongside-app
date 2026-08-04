@@ -1,5 +1,20 @@
 /**
  * js/views/checkin.js
+ * 04 Aug 2026 v9
+ *
+ * v9 — Pain Input Redesign. Conditions panel converted from the 4-button
+ *   .ci-pain-chip row to per-condition sliders (0-10), matching the
+ *   existing Energy/Mood slider pattern exactly (.ci-slider-wrap,
+ *   .ci-value-row). Live label now uses conditions.js's new canonical
+ *   getPainBand(), not a locally hardcoded ternary. Default for an
+ *   unset condition changed from 1 ("None" chip's representative value)
+ *   to a genuine 0, using explicit !== undefined checks throughout
+ *   instead of `|| 1`/`|| 0` fallbacks — avoids the falsy-zero bug that
+ *   an `||` fallback would introduce with real 0 values now reachable.
+ *   Graeme's own instinct, prompted by the .ci-pain-chip text-overflow
+ *   bug looking "awful and unprofessional" once wrapped — this removes
+ *   the component that bug lived in entirely, not another patch on it.
+ *
  * 03 Jul 2026 v8
  *
  * v8 — Chip row overflow fix. Graeme reported (screenshot) the feeling-
@@ -111,7 +126,7 @@
 import { store }           from "../store.js";
 import { checkinData }     from "../data/checkin.js";
 import { resolveOpening }  from "../data/checkin-openings.js";
-import { CONDITIONS }      from "../data/conditions.js";
+import { CONDITIONS, getPainBand } from "../data/conditions.js";
 import { WORD_SETS, getQuadrant, detectSignalWord } from "../data/feelings.js";
 
 export function CheckinView(router) {
@@ -477,23 +492,27 @@ export function CheckinView(router) {
   function _showConditionsPanel() {
     const rows = _conditions.map(id => {
       const cond  = CONDITIONS.find(c => c.id === id);
-      const level = _checkin.conditionLevels[id] || 1;
+      const level = _checkin.conditionLevels[id] !== undefined ? _checkin.conditionLevels[id] : 0;
+      const band  = getPainBand(level);
       return `
         <div class="ci-condition-row" data-condition="${id}">
           <p class="ci-condition-name">
             <span aria-hidden="true">${cond?.icon || ""}</span>
             ${_esc(cond?.name || id)}
           </p>
-          <div class="ci-pain-chips" role="group"
-               aria-label="Pain level for ${_esc(cond?.name || id)}">
-            <button class="ci-pain-chip ${level <= 2 ? "selected low" : ""}"
-                    data-level="1" aria-pressed="${level <= 2}">None</button>
-            <button class="ci-pain-chip ${level > 2 && level <= 5 ? "selected mild" : ""}"
-                    data-level="4" aria-pressed="${level > 2 && level <= 5}">Mild</button>
-            <button class="ci-pain-chip ${level > 5 && level <= 7 ? "selected moderate" : ""}"
-                    data-level="6" aria-pressed="${level > 5 && level <= 7}">Moderate</button>
-            <button class="ci-pain-chip ${level > 7 ? "selected severe" : ""}"
-                    data-level="9" aria-pressed="${level > 7}">Severe</button>
+          <div class="ci-slider-wrap ci-slider-wrap--condition">
+            <div class="ci-value-row" aria-live="polite" aria-atomic="true">
+              <span class="ci-value-num"   id="ci-cond-num-${id}">${level}</span>
+              <span class="ci-value-label ci-value-label--${band.id}" id="ci-cond-label-${id}">${band.label}</span>
+            </div>
+            <input type="range" class="ci-slider" id="ci-cond-slider-${id}"
+                   data-condition="${id}"
+                   min="0" max="10" value="${level}"
+                   aria-label="Pain level for ${_esc(cond?.name || id)}, 0 none to 10 severe"
+                   aria-valuetext="${band.label}">
+            <div class="ci-slider-ends" aria-hidden="true">
+              <span>None</span><span>Severe</span>
+            </div>
           </div>
         </div>
       `;
@@ -505,28 +524,18 @@ export function CheckinView(router) {
               style="margin-top:var(--space-4);" aria-label="Confirm pain levels">Next</button>
     `);
 
-    panel.querySelectorAll(".ci-condition-row").forEach(row => {
-      row.querySelectorAll(".ci-pain-chip").forEach(chip => {
-        chip.addEventListener("click", () => {
-          const condId = row.dataset.condition;
-          const level  = parseInt(chip.dataset.level);
-          _checkin.conditionLevels[condId] = level;
-          row.querySelectorAll(".ci-pain-chip").forEach(c => {
-            const sel = c === chip;
-            c.classList.toggle("selected", sel);
-            c.setAttribute("aria-pressed", sel);
-            c.classList.remove("low");
-            c.classList.remove("mild");
-            c.classList.remove("moderate");
-            c.classList.remove("severe");
-            if (sel) {
-              if      (level <= 2) c.classList.add("low");
-              else if (level <= 5) c.classList.add("mild");
-              else if (level <= 7) c.classList.add("moderate");
-              else                 c.classList.add("severe");
-            }
-          });
-        });
+    panel.querySelectorAll(".ci-slider[data-condition]").forEach(slider => {
+      slider.addEventListener("input", () => {
+        const condId = slider.dataset.condition;
+        const n       = parseInt(slider.value);
+        const band    = getPainBand(n);
+        _checkin.conditionLevels[condId] = n;
+        const numEl   = panel.querySelector(`#ci-cond-num-${condId}`);
+        const labelEl = panel.querySelector(`#ci-cond-label-${condId}`);
+        numEl.textContent   = n;
+        labelEl.textContent = band.label;
+        labelEl.className   = `ci-value-label ci-value-label--${band.id}`;
+        slider.setAttribute("aria-valuetext", band.label);
       });
     });
 
@@ -536,9 +545,9 @@ export function CheckinView(router) {
       await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
       const summary = _conditions.map(id => {
         const cond   = CONDITIONS.find(c => c.id === id);
-        const level  = _checkin.conditionLevels[id] || 1;
-        const label  = level <= 2 ? "no pain" : level <= 5 ? "mild" : level <= 7 ? "moderate" : "severe";
-        return `${cond?.name || id}: ${label}`;
+        const level  = _checkin.conditionLevels[id] !== undefined ? _checkin.conditionLevels[id] : 0;
+        const band   = getPainBand(level);
+        return `${cond?.name || id}: ${band.label.toLowerCase()}`;
       }).join(", ");
       _showUserBubble(summary);
       await _showCoachBubble("Last one. How much time do you have today?");
