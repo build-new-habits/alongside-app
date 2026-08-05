@@ -1,5 +1,5 @@
 # Alongside: Move — Session Handoff
-## 04 Aug 2026 v1
+## 04 Aug 2026 v2
 
 Build New Habits | Closes out an unusually long single session — the full Home Nav & Conditions Redesign, on-device confirmation, and a large follow-up feedback batch. Master schedule is at v131 and remains the canonical source of truth; this document is a readable summary for picking the thread back up, not a replacement for it.
 
@@ -71,10 +71,18 @@ Not part of today's thread, but still sitting on the master schedule and worth k
 - Exercise difficulty scale migration (1–3 live vs 1–5 spec'd) — real scope, ~500 exercises across 12 files
 - No difficulty-based exercise gating exists at all (Free/Personal draw from an identical pool)
 - Several dormant/write-only fields flagged for cleanup sign-off (`gymProgrammeWeek`, `todayEnergy`, `community.credits`, `workoutHistory`, `consentGiven`)
-- `dead-bug`/`bird-dog` contraindications content discrepancy — needs Graeme's content call, not a code fix
+
+## 6. Loose threads from earlier in this session, now resolved
+
+Two items flagged mid-session, followed up on rather than left dangling:
+
+- **`dead-bug`/`bird-dog` contraindications** — resolved. Dead Bug's empty exclusions and Bird Dog's lower-back/glutes exclusions both confirmed correct; Bird Dog gets a genuine addition (`wrist-elbow-acute`) for real wrist loading nothing previously captured. `strength.js` v3.
+- **BUILD-3's on-device test** — genuinely re-examined, not just re-flagged. Found a real inconsistency in the master schedule's own tracking: one section claims all 7 relevant session files confirmed on-device, but `prescribed-session.js` isn't among them, and BUILD-3's stated scope was 11 files. Today's edit to that file didn't touch anything BUILD-3 cares about (exit-guard functions untouched), so nothing's newly broken — but its exit-guard status has apparently never actually been confirmed. **Include it explicitly in the next on-device pass.**
+
+**Still genuinely blocked, not resolvable today:** the severe pain Rest/Adapt liability question needs Alex's solicitor — an external dependency, not something either of us can close in this conversation.
 
 Full detail on every item above lives in the master schedule (`Documents/Admin/master_schedule.md`, v131) — this document is the readable summary, that's the source of truth.
 
 ---
 
-*Build New Habits · Alongside: Move · Session Handoff · 04 Aug 2026 v1*
+*Build New Habits · Alongside: Move · Session Handoff · 04 Aug 2026 v2*
