@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v210
+ * Mobility & Conditioning door wired to the real Conditions Programme.
+ * today.js v9→v10: routes to prescribed.js when a condition-tagged
+ * programme exists, falls back to Library otherwise (no change for
+ * anyone without one). Door tile shows a small "Your programme" hint
+ * when this applies. today.css v2→v3. Last open bridge from Phase C's
+ * six-door Home closed — the other one (Conditions Update) resolved
+ * when Phase D shipped.
+ *
  * 04 Aug 2026 v209
  * Graeme's two ideas for the condition-programme candidate list, both
  * real, both built. (1) One-line rationale per exercise — the `why`
@@ -588,7 +597,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v209";
+const CACHE_NAME = "alongside-v210";
 
 const SHELL_URLS = [
 

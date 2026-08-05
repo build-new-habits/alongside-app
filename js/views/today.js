@@ -1,5 +1,21 @@
 /**
  * today.js
+ * 04 Aug 2026 v10
+ *
+ * v10 — Mobility & Conditioning door now genuinely pulls in the
+ *   Conditions Update programme, per the original spec ("pulls in
+ *   whatever the Conditions Update programme has built" / "reachable
+ *   as its own programme within that door"). Checks for condition-
+ *   tagged prescribedExercises entries specifically; routes to
+ *   prescribed.js when one exists, falls back to Library exactly as
+ *   before when there's nothing to pull in — no behaviour change for
+ *   anyone without a condition programme. Door tile shows a small
+ *   "Your programme" hint when this applies, so the routing isn't
+ *   silent/surprising. Known small rough edge, not fixed: prescribed.js's
+ *   own Back button returns to the general activity picker rather than
+ *   Home when reached this way — pre-existing design on that screen,
+ *   not introduced here, low-impact enough not to warrant a fix now.
+ *
  * 04 Aug 2026 v9
  *
  * v9 — Check-in gating now genuinely optional, not fixed. Graeme:
@@ -137,10 +153,14 @@ export function TodayView(router) {
   // generating screen without ever having checked in defeats the point
   // of it adapting to "where you are today." Applied to the two doors
   // that actually generate an adaptive session (Cardio/Core/Strength,
-  // Unsure? Coach decides) — Mobility & Conditioning currently bridges
-  // to Library (browse, not generate), Wellbeing/Conditions Update/
-  // Progress are informational or self-directed, not generative. Worth
-  // Graeme confirming this split is what he meant, not assumed settled.
+  // Unsure? Coach decides) — confirmed by Graeme as the right split.
+  //
+  // Mobility & Conditioning's `route: 'library'` below is a fallback
+  // only, not the real destination — see attachEvents()'s doorId check
+  // (04 Aug 2026 follow-up): if a condition programme exists, this door
+  // routes to it (prescribed.js) instead, per the original spec
+  // ("pulls in whatever the Conditions Update programme has built").
+  // Falls back to Library when there's genuinely nothing to pull in.
   const HOME_DOORS = [
     { id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder', requiresCheckin: true },
     { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'library', requiresCheckin: false },
@@ -267,15 +287,22 @@ export function TodayView(router) {
         ` : ''}
 
         <div class="today-doors" role="group" aria-label="Choose how you want to move today">
-          ${HOME_DOORS.map(d => `
+          ${HOME_DOORS.map(d => {
+            const isMobility = d.id === 'mobility-conditioning';
+            const hasProgramme = isMobility &&
+              (store.get('prescribedExercises') || []).some(e => e.conditionId);
+            return `
             <button class="today-door ${d.id === 'unsure' ? 'today-door--unsure' : ''}"
                     data-route="${d.route}"
+                    data-door-id="${d.id}"
                     data-requires-checkin="${d.requiresCheckin}"
-                    aria-label="${_esc(d.label)}">
+                    aria-label="${_esc(d.label)}${hasProgramme ? ' — your programme' : ''}">
               <span class="today-door__icon" aria-hidden="true">${d.icon}</span>
               <span class="today-door__label">${_esc(d.label)}</span>
+              ${hasProgramme ? '<span class="today-door__hint">Your programme</span>' : ''}
             </button>
-          `).join('')}
+          `;
+          }).join('')}
         </div>
 
         ${!_checkedInToday() ? `
@@ -300,13 +327,26 @@ export function TodayView(router) {
     container.querySelectorAll('[data-route]').forEach(btn => {
       btn.addEventListener('click', () => {
         const route = btn.dataset.route;
+        const doorId = btn.dataset.doorId;
         const requiresCheckin = btn.dataset.requiresCheckin === 'true';
 
-        // Note, 04 Aug 2026: the interim openSheet('onboarding/conditions')
-        // bridge that lived here (Phase C follow-up) is superseded now
-        // that the door routes straight to the real Conditions Update
-        // screen (Phase D-2), which has its own "Add a condition" action
-        // using openSheet() internally instead.
+        // Mobility & Conditioning, 04 Aug 2026: now genuinely pulls in
+        // the Conditions Update programme when one exists, per the
+        // original spec ("Pulls in whatever the Conditions Update
+        // programme has built" / "reachable as its own programme
+        // within that door"). Checks for condition-tagged
+        // prescribedExercises entries specifically — not just any
+        // entry, since an untagged one could be an old-style physio
+        // prescription unrelated to Conditions Update. Falls back to
+        // Library exactly as before when no programme exists yet —
+        // nothing to pull in, so no behaviour change for anyone
+        // without a condition programme.
+        if (doorId === 'mobility-conditioning') {
+          const prescribed = store.get('prescribedExercises') || [];
+          const hasConditionProgramme = prescribed.some(e => e.conditionId);
+          router.navigate(hasConditionProgramme ? 'prescribed' : 'library');
+          return;
+        }
 
         if (requiresCheckin) {
           // Fix, 04 Aug 2026 — Graeme: "we should fix this so it's
