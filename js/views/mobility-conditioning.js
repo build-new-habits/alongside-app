@@ -1,6 +1,14 @@
 /**
  * mobility-conditioning.js - Mobility & Conditioning
  *
+ * 04 Aug 2026 v2
+ *
+ * v2 — Updated for conditionProgrammes.js v3's multi-condition
+ *   entries. A shared exercise now correctly appears under every
+ *   condition heading it genuinely belongs to when the programme
+ *   section is expanded, not just one — getEntryConditionIds() used
+ *   throughout instead of a direct conditionId read.
+ *
  * 04 Aug 2026 v1
  *
  * New screen, replacing the today.js smart-routing hack (Home Nav
@@ -24,6 +32,7 @@
 
 import { store } from "../store.js";
 import { getConditionName } from "../data/conditions.js";
+import { getEntryConditionIds } from "../data/conditionProgrammes.js";
 
 export function MobilityConditioningView(router) {
 
@@ -35,7 +44,7 @@ export function MobilityConditioningView(router) {
 
   function render(container) {
     const prescribed = store.get("prescribedExercises") || [];
-    const tagged      = prescribed.filter(e => e.conditionId);
+    const tagged      = prescribed.filter(e => getEntryConditionIds(e).length > 0);
 
     container.innerHTML = `
       <div class="mc-view" role="main" aria-label="Mobility and Conditioning">
@@ -87,7 +96,13 @@ export function MobilityConditioningView(router) {
 
     const byCondition = {};
     tagged.forEach(e => {
-      (byCondition[e.conditionId] ||= []).push(e);
+      // An entry can now serve more than one condition (04 Aug 2026,
+      // real exercise reuse) — it appears under each heading it
+      // genuinely belongs to, not just the first/only one, so the
+      // grouped view honestly reflects what the exercise is doing.
+      getEntryConditionIds(e).forEach(conditionId => {
+        (byCondition[conditionId] ||= []).push(e);
+      });
     });
 
     return `

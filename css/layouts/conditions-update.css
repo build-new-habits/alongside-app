@@ -1,6 +1,9 @@
 /*
  * css/layouts/conditions-update.css
- * 04 Aug 2026 v6
+ * 04 Aug 2026 v7
+ *
+ * v7 — .cu-recommend-item__reuse for the new "Already in your X
+ *   programme" annotation (conditions-update.js v7).
  *
  * v6 — Real bug found via screenshot: "Add N to my programme" was
  *   overflowing its own pill shape. Same root cause as every other
@@ -340,6 +343,12 @@
   font-size: var(--text-xs);
   color: var(--color-text-muted);
   line-height: var(--leading-snug);
+}
+
+.cu-recommend-item__reuse {
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
 }
 
 .cu-recommend-item__notkeen {
