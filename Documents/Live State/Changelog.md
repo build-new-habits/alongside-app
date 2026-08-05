@@ -623,4 +623,16 @@ Built to Graeme's confirmed design, replacing the smart-routing hack shipped ear
 
 ---
 
+### Safety fix — `prescribed-session.js` now checks contraindications in real time
+
+The most important item from Graeme's earlier feedback batch, prioritised over the cosmetic/design items ahead of it. Confirmed by direct check, not assumption: this file read zero condition or pain data at all — unlike `core-session.js` and `workoutGenerator.js`, which both check contraindications live at generation time. A programme built while a condition was Moderate could walk someone through now-contraindicated exercises after a later flare, with nothing flagging it.
+
+- `js/views/prescribed-session.js` v2 → v3 — new `_checkContraindication()`. For exercises with a real `exerciseId` (coach-built or coach-recommended entries — manually added ones have no database record to check against, and are correctly left alone rather than false-flagged), compares that exercise's `contraindications` against `getActiveConditionIds()` for today's actual state. Doesn't silently hide or block the exercise — surfaces a clear flag above it and lets the person decide, same "behaviour is communication" pattern as `coach-proposal.css`'s existing constraint message, reused visually rather than reinvented.
+- Smoke-tested against real exercise data before shipping: simulated severe pain on a condition correctly flagged an exercise with a matching contraindication; simulated mild pain on the same condition correctly did not.
+- `css/components/workout.css` v2 → v3 — `.ps-contra-flag` styling.
+- `sw.js` v216 → v217, deployed last.
+- **Not yet on-device confirmed** — this one's worth testing carefully: build a programme, note a condition's severity, bump it to Severe via Conditions Update, then re-open the session and confirm the flag appears on the right exercise.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
