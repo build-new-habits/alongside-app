@@ -516,4 +516,22 @@ Real gap: there was no way to remove a condition from `conditions-update.js`. Th
 
 ---
 
+### Rationale + dislike signal for condition-programme candidates — Graeme's two ideas, both real, both built
+
+Two questions asked in passing ("just asking") turned out to both have real, existing groundwork rather than needing anything invented from scratch.
+
+**One-line rationale per exercise.** Checked before building: every one of 461 exercises in the shared database already carries a `why` field — zero gap, zero new content authoring. Now shown directly under each exercise name in the "Coach recommends, I'll choose" candidate list.
+
+**Favourite/dislike.** Found something better than inventing a new mechanic: a full, already-approved spec exists — `alongside_exercise_skip_dislike_spec_16may2026_v1.docx` — deliberately not a rating system (its own words: "no stars, no thumbs, no scores"), just a binary signal: **Avoid entirely** or **Show less often**. Applied that exact model rather than a new one.
+
+- `js/store.js` v16 → v17 — new field `exercisePreferences` (`{ [exerciseId]: { preference: 'avoid'|'less', setAt, source } }`), matching the spec's shape exactly. New `setExercisePreference()` helper.
+- `js/data/conditionProgrammes.js` v1 → v2 — `buildConditionCandidates()` (the one function every other route in this file draws from) now excludes `'avoid'` exercises entirely. `buildCoachProgramme()` and `buildRecommendedCandidates()` both sort `'less'`-preferred exercises toward the end rather than hiding them — this is a browsing/choosing context, not a proactive suggestion, so soft de-prioritisation is the right behaviour, not exclusion. Smoke-tested against real data before wiring into the UI: an avoided exercise confirmed absent from both a real recommended-candidates call and a real coach-built programme.
+- `js/views/conditions-update.js` v4 → v5 — "Not keen on this one" appears under each candidate; tapping it reveals "Avoid entirely" / "Show less often" inline. Choosing either writes the preference and, if the exercise had just been ticked, removes it from the pending selection too — avoiding the confusing contradiction of avoiding something you'd just chosen.
+- `css/layouts/conditions-update.css` v4 → v5 — styling for the rationale line and the not-keen controls.
+- **Explicitly out of scope, noted in code comments:** the full spec also covers skipping *during* an active session (`gym-programme.js`, `prescribed-session.js`, `core-session.js`), with a "not available today" vs "not keen" distinction that doesn't apply to a browsing list the way it does mid-workout. Not built here — real, separate, larger future work.
+- `sw.js` v208 → v209, deployed last.
+- **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

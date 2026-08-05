@@ -1,6 +1,10 @@
 /*
  * css/layouts/conditions-update.css
- * 04 Aug 2026 v4
+ * 04 Aug 2026 v5
+ *
+ * v5 — New styling for the "why" rationale line and the "Not keen on
+ *   this one" / Avoid / Less often controls per candidate row
+ *   (conditions-update.js v5).
  *
  * v4 — .cu-recommend-item selection state fixed. Was invisible: no
  *   accent-color on the native checkbox, no row-level state change.
@@ -289,13 +293,85 @@
 .cu-recommend-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-  max-height: 280px;
+  gap: var(--space-2);
+  max-height: 420px;
   overflow-y: auto;
   padding: var(--space-2);
   background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+}
+
+.cu-recommend-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cu-recommend-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cu-recommend-item__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cu-recommend-item__name {
+  font-weight: var(--font-semibold);
+}
+
+.cu-recommend-item__why {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+}
+
+.cu-recommend-item__notkeen {
+  align-self: flex-start;
+  margin-left: 34px; /* roughly aligns under the label text, past the checkbox */
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: var(--space-1) 0;
+}
+
+.cu-recommend-notkeen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-left: 34px;
+  padding: var(--space-2);
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-sm);
+}
+
+.cu-recommend-notkeen__btn {
+  padding: var(--space-1) var(--space-3);
+  min-height: 36px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.cu-recommend-notkeen__cancel {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
 }
 
 .cu-recommend-item {

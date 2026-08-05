@@ -1,6 +1,19 @@
 /**
  * conditions-update.js - Conditions Update
  *
+ * 04 Aug 2026 v5
+ *
+ * v5 — Two of Graeme's ideas, both real, both built same day. (1) One-
+ *   line rationale per candidate exercise — the `why` field already
+ *   exists on every one of 461 exercises in the database (checked
+ *   before building, not assumed) — now shown directly under each
+ *   name in the "coach recommends" list, no new content needed.
+ *   (2) "Not keen on this one" per candidate, applying the already-
+ *   approved skip/dislike spec (store.js v17): reveals Avoid entirely
+ *   / Show less often, writes to exercisePreferences, and immediately
+ *   removes it from any pending selection to avoid a confusing
+ *   contradiction (ticked and avoided at once).
+ *
  * 04 Aug 2026 v4
  *
  * v4 — Real bug found immediately after shipping the "coach recommends"
@@ -90,6 +103,7 @@ export function ConditionsUpdateView(router) {
   let expandedIds = new Set();
   let recommendingIds = new Set();      // conditionIds currently showing the "coach recommends" selection UI
   let selectedCandidates = new Map();   // conditionId -> Set of exercise ids checked in that UI
+  let notKeenOpenFor = new Set();       // exercise ids currently showing the Avoid/Less-often sub-choice
 
   function mount(container) {
     render(container);
@@ -281,11 +295,25 @@ export function ConditionsUpdateView(router) {
         <p class="cu-field-label">Pick the ones that make sense for you \u2014 add as many as you like.</p>
         <div class="cu-recommend-list">
           ${candidates.map(ex => `
-            <label class="cu-recommend-item ${selected.has(ex.id) ? "is-selected" : ""}">
-              <input type="checkbox" data-candidate="${ex.id}" data-condition="${conditionId}"
-                     ${selected.has(ex.id) ? "checked" : ""}>
-              <span>${ex.name}</span>
-            </label>
+            <div class="cu-recommend-row">
+              <label class="cu-recommend-item ${selected.has(ex.id) ? "is-selected" : ""}">
+                <input type="checkbox" data-candidate="${ex.id}" data-condition="${conditionId}"
+                       ${selected.has(ex.id) ? "checked" : ""}>
+                <span class="cu-recommend-item__text">
+                  <span class="cu-recommend-item__name">${ex.name}</span>
+                  ${ex.why ? `<span class="cu-recommend-item__why">${ex.why}</span>` : ""}
+                </span>
+              </label>
+              ${notKeenOpenFor.has(ex.id) ? `
+                <div class="cu-recommend-notkeen" role="group" aria-label="How should I treat ${ex.name} in future?">
+                  <button class="cu-recommend-notkeen__btn" data-avoid-exercise="${ex.id}">Avoid entirely</button>
+                  <button class="cu-recommend-notkeen__btn" data-less-exercise="${ex.id}">Show less often</button>
+                  <button class="cu-recommend-notkeen__cancel" data-cancel-notkeen="${ex.id}">Never mind</button>
+                </div>
+              ` : `
+                <button class="cu-recommend-item__notkeen" data-notkeen="${ex.id}">Not keen on this one</button>
+              `}
+            </div>
           `).join("")}
         </div>
         <div class="cu-recommend-actions">
@@ -469,6 +497,45 @@ export function ConditionsUpdateView(router) {
         const set          = selectedCandidates.get(conditionId) || new Set();
         if (checkbox.checked) set.add(exId); else set.delete(exId);
         selectedCandidates.set(conditionId, set);
+        render(container);
+      });
+    });
+
+    // "Not keen on this one" — per alongside_exercise_skip_dislike_
+    // spec_16may2026_v1.docx §2.2. Binary signal (Avoid / Less often),
+    // not a rating. Applied here to the browsing candidate list first;
+    // the full spec's in-session Skip flow is separate future work.
+    container.querySelectorAll("[data-notkeen]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        notKeenOpenFor.add(btn.dataset.notkeen);
+        render(container);
+      });
+    });
+
+    container.querySelectorAll("[data-cancel-notkeen]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        notKeenOpenFor.delete(btn.dataset.cancelNotkeen);
+        render(container);
+      });
+    });
+
+    container.querySelectorAll("[data-avoid-exercise]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const exId = btn.dataset.avoidExercise;
+        store.setExercisePreference(exId, "avoid");
+        notKeenOpenFor.delete(exId);
+        // Also drop it from any pending selection — avoiding something
+        // you'd just ticked would be a confusing contradiction otherwise.
+        selectedCandidates.forEach(set => set.delete(exId));
+        render(container);
+      });
+    });
+
+    container.querySelectorAll("[data-less-exercise]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const exId = btn.dataset.lessExercise;
+        store.setExercisePreference(exId, "less");
+        notKeenOpenFor.delete(exId);
         render(container);
       });
     });
