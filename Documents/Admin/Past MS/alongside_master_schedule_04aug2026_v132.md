@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 04 Aug 2026 v133
+## 04 Aug 2026 v132
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_04aug2026_v132.md`. Remove v132 on upload.
+Supersedes `alongside_master_schedule_04aug2026_v131.md`. Remove v131 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** New synthesis document — `alongside_build_status_tidyup_04aug2026_v1.md` — a full read-through of this schedule's dashboard, written to answer Graeme's direct question ("where are we, what's left, what can be removed"). Not new work, a digest of everything already tracked here. Headline conclusion: the core architecture is close to done, but almost everything from the last 48 hours' work is still unconfirmed on a real device — the priority is one comprehensive on-device test session, not more building. Full detail in the document itself; this schedule remains the source of truth it was built from.
+**This version's substantive changes:** Two loose threads from earlier in this session closed out — a genuine review of what's actually left, not just a re-summary. `dead-bug`/`bird-dog` contraindications resolved, Graeme's decision with a recommendation offered first: Dead Bug's empty exclusions and Bird Dog's lower-back exclusions both confirmed correct, plus a real gap fixed — Bird Dog now also excludes for wrist/elbow, which nothing previously captured despite its hands-and-knees position putting real weight through the wrists. Separately, a genuine inconsistency was found in this document's own BUILD-3 tracking — one section claims all 7 relevant files confirmed on-device, but `prescribed-session.js` isn't among them and BUILD-3's real scope was 11 files. Checked precisely: today's edit to that file didn't touch anything BUILD-3 cares about, so nothing here is newly broken — but its exit-guard status was never actually confirmed, and that's worth knowing plainly rather than assuming coverage that doesn't exist. The severe-pain liability question remains genuinely blocked on Alex's solicitor — not something either of us could close today regardless.
 
 **Process note, fixed this version:** the last several version bumps (v96–v98) stacked a new "substantive changes" paragraph on top of the previous one each time, rather than replacing it. Condensed below into a single recent-history list. Going forward, this header should carry **only the current version's changes**, one paragraph — anything needed for continuity belongs in the dashboard or a dedicated section, not a growing stack of old summaries at the top.
 
@@ -427,4 +427,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 04 Aug 2026 v133*
+*Build New Habits · Alongside: Move · Master Schedule · 04 Aug 2026 v132*
