@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v211
+ * conditions-update.css v5→v6: "Add N to my programme" was
+ * overflowing its pill — same white-space:nowrap + flex:1 min-width
+ * bug found repeatedly today. Fixed. Likely also the real cause of a
+ * separate report (Mobility & Conditioning routing to Library instead
+ * of the programme) — if the button couldn't be tapped cleanly, the
+ * exercise may never have saved. Routing logic itself re-verified
+ * correct. Flagged for retest, not assumed fixed.
+ *
  * 04 Aug 2026 v210
  * Mobility & Conditioning door wired to the real Conditions Programme.
  * today.js v9→v10: routes to prescribed.js when a condition-tagged
@@ -597,7 +606,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v210";
+const CACHE_NAME = "alongside-v211";
 
 const SHELL_URLS = [
 
