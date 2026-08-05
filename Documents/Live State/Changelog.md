@@ -534,4 +534,16 @@ Two questions asked in passing ("just asking") turned out to both have real, exi
 
 ---
 
+### Mobility & Conditioning — real programme link, last open bridge from Phase C closed
+
+Per the original spec: "Mobility & Conditioning... pulls in whatever the Conditions Update programme has built" / "reachable as its own programme within that door." Since a real condition programme now exists (built earlier today), this door's interim Library-only bridge was genuinely out of date, not just theoretically incomplete.
+
+- `js/views/today.js` v9 → v10 — the door now checks for condition-tagged `prescribedExercises` entries specifically (not just any entry — an untagged one could be an old-style physio prescription unrelated to Conditions Update). Routes to `prescribed.js` (which already has a working "Start Session" into `prescribed-session.js`) when a programme exists; falls back to Library exactly as before when there's nothing to pull in — no behaviour change for anyone without a condition programme. The door tile shows a small "Your programme" hint when this applies, so the routing isn't silent.
+- `css/layouts/today.css` v2 → v3 — `.today-door__hint` styling.
+- **Known small rough edge, not fixed:** `prescribed.js`'s own Back button returns to the general activity picker rather than Home when reached this way — pre-existing design on that screen (not introduced here), low-impact enough not to warrant a fix in this pass.
+- `sw.js` v209 → v210, deployed last.
+- **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

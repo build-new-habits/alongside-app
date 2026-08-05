@@ -1,6 +1,9 @@
 /*
  * css/layouts/today.css
- * 04 Aug 2026 v2
+ * 04 Aug 2026 v3
+ *
+ * v3 — .today-door__hint added for the "Your programme" indicator on
+ *   Mobility & Conditioning when a condition programme exists (today.js v10).
  *
  * v2 — Phase C, Home Nav & Conditions Redesign. New six-door grid
  * (.today-doors/.today-door) replacing the old single CTA + secondary
@@ -145,6 +148,12 @@
   font-weight: var(--font-semibold);
   color: var(--color-text);
   line-height: var(--leading-snug);
+}
+
+.today-door__hint {
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
 }
 
 /* "Unsure? Coach decides" — the zero-effort door, spans both columns
