@@ -568,4 +568,18 @@ Real gap Graeme caught: "Don't we still want a library?" Once Mobility & Conditi
 
 ---
 
+### Library landing screen — real missing-styles bug, not a design decision
+
+Graeme's follow-up clarified the earlier report: Mobility & Conditioning correctly falls back to Library ("Start a session") when no condition programme exists — confirmed working as intended, not a bug. But tapping the new Library door landed on the same plain landing screen either way, which he'd hoped would look different now that it's a proper Home door.
+
+Checked before treating this as a redesign: `library.js`'s own file comment describes the landing as "two large cards," but `.library-landing-grid`/`-card`/`-icon`/`-label`/`-sub` had zero CSS anywhere in the codebase. Genuine missing-styles bug — the intended design was already specified, just never built.
+
+- `css/layouts/library.css` (new) — the two landing options ("Start a session," "Log what I did") now render as actual large, bordered, tappable cards with icon/label/subtitle, matching the app's established card language elsewhere (`.today-door`, `.cu-card`).
+- `css/main.css` v12 → v13 — new file registered.
+- Scope deliberately contained to just the landing screen, per Graeme's explicit choice — the full aesthetics audit (now 4 other confirmed screens) remains separate, future work.
+- `sw.js` v212 → v213, deployed last.
+- **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

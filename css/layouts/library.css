@@ -1,0 +1,64 @@
+/*
+ * css/layouts/library.css
+ * 04 Aug 2026 v1
+ *
+ * New file. Real bug found via screenshot, not a design decision: the
+ * landing screen's own file comment (library.js) describes "two large
+ * cards," but .library-landing-grid/-card/-icon/-label/-sub had zero
+ * CSS anywhere in the codebase — confirmed before writing this, not
+ * assumed. Rendered as unstyled default text, not the intended cards.
+ * Fixed now at Graeme's request, given Library was just promoted to a
+ * first-class Home door and its plainness became more visible as a
+ * result — a contained, single-screen fix, not the full aesthetics
+ * audit still logged separately for everything else.
+ */
+
+.library-landing-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.library-landing-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-5);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.library-landing-card:hover,
+.library-landing-card:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-bg-elevated);
+}
+
+.library-landing-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.library-landing-icon {
+  font-size: var(--text-2xl);
+  line-height: 1;
+}
+
+.library-landing-label {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+}
+
+.library-landing-sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}

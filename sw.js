@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v213
+ * New css/layouts/library.css — the Library landing screen had zero
+ * CSS anywhere despite its own file comment describing "two large
+ * cards." Real missing-styles bug, not a redesign; fixed as a
+ * contained, single-screen polish at Graeme's request now that
+ * Library is a first-class Home door. main.css v12→v13.
+ *
  * 04 Aug 2026 v212
  * Library added as its own Home door. today.js v10→v11. Real gap
  * Graeme caught: Mobility & Conditioning's smart-routing to the
@@ -613,7 +620,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v212";
+const CACHE_NAME = "alongside-v213";
 
 const SHELL_URLS = [
 
@@ -626,6 +633,7 @@ const SHELL_URLS = [
   "/alongside-app/css/layouts/onboarding-additions.css",
   "/alongside-app/css/layouts/today.css",
   "/alongside-app/css/layouts/conditions-update.css",
+  "/alongside-app/css/layouts/library.css",
   "/alongside-app/css/layouts/progress.css",
   "/alongside-app/css/components/session-guard.css",
   "/alongside-app/css/components/weekly-plan.css",
