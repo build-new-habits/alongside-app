@@ -1,6 +1,18 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v214
+ * Rest of the Library page styled — Graeme: "we need to improve the
+ * cosmetics of the library page itself." Checked every class library.js
+ * actually uses first: "Start a session"'s category grid and its
+ * per-category session sub-screen had zero CSS, same as the landing
+ * screen fixed earlier. "Log what I did" confirmed already styled
+ * (reuses settings-library.css classes) — left untouched. library.css
+ * v1→v2: added page padding, sub-header, category cards, session
+ * cards. library.js v1→v2: session-card markup restructured slightly
+ * (label+note wrapped in a text span) so the new layout works
+ * correctly — no behaviour change.
+ *
  * 04 Aug 2026 v213
  * New css/layouts/library.css — the Library landing screen had zero
  * CSS anywhere despite its own file comment describing "two large
@@ -620,7 +632,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v213";
+const CACHE_NAME = "alongside-v214";
 
 const SHELL_URLS = [
 
