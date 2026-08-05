@@ -1,5 +1,13 @@
 /**
  * router.js
+ * 04 Aug 2026 v13
+ *
+ * v13 — New route 'mobility-conditioning' -> mobility-conditioning.js
+ *   (MobilityConditioningView). Replaces the today.js smart-routing
+ *   hack (programme-or-Library) with a real landing screen, per
+ *   Graeme's design: Start a Mobility Session / My Conditions
+ *   Programme / Log an event.
+ *
  * 04 Aug 2026 v12
  *
  * v12 — New route 'conditions-update' -> conditions-update.js
@@ -125,6 +133,7 @@ const VIEW_NAMES = {
   // detection below, so this route could never have worked, on any device.
   'session-builder':   { path: './views/session-builder-ui.js',  fn: 'SessionBuilderView'  },
   'conditions-update': { path: './views/conditions-update.js',   fn: 'ConditionsUpdateView' },
+  'mobility-conditioning': { path: './views/mobility-conditioning.js', fn: 'MobilityConditioningView' },
 
   // ── Session views ──────────────────────────────────────────────────────────
   'workout':            { path: './views/workout.js',           fn: 'WorkoutView'           },

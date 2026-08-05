@@ -609,4 +609,18 @@ Graeme: "Now we need to improve the cosmetics of the library page itself." Check
 
 ---
 
+### Mobility & Conditioning's real landing page
+
+Built to Graeme's confirmed design, replacing the smart-routing hack shipped earlier today.
+
+- `js/views/mobility-conditioning.js` (new) — three cards. **Start a Mobility Session** routes to `core-session.js`, already condition-aware via Phase B's consolidated pool — genuinely adaptive, not a static list. **My Conditions Programme** collapsed by default (count + "tap to find out more"), expands to show exercises grouped by condition, a note pointing to Conditions Update for editing, and a "Start this programme" action into `prescribed-session.js`. Shows "Not created yet" with a direct link into Conditions Update when nothing exists. **Log an event** routes to Library's existing log flow.
+- `js/router.js` v12 → v13 — new `mobility-conditioning` route.
+- `js/views/today.js` v11 → v12 — door now routes straight to the new screen; the programme-or-Library smart-routing hack (and the Home tile's "Your programme" hint, now redundant) both removed.
+- `js/views/prescribed.js` v1.2 → v1.3 — "Back to choices" no longer hardcoded to the confusing `intention` screen. Real fix Graeme flagged, more relevant now that this screen's primary entry point is the new landing page — both back buttons go to Home instead.
+- New `css/layouts/mobility-conditioning.css`, `main.css` v13 → v14.
+- `sw.js` v215 → v216, deployed last.
+- **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

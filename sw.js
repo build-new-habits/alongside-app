@@ -1,6 +1,20 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v216
+ * Mobility & Conditioning's real landing page, built to Graeme's
+ * confirmed design. New js/views/mobility-conditioning.js (router.js
+ * v13): three cards — Start a Mobility Session (routes to
+ * core-session.js, already condition-aware), My Conditions Programme
+ * (collapsed by default, count + expand, "Not created" links straight
+ * into Conditions Update when empty), Log an event (Library). Replaces
+ * the today.js smart-routing hack entirely — today.js v12, "Your
+ * programme" hint removed as redundant. New css/layouts/mobility-
+ * conditioning.css, main.css v13→v14. prescribed.js v1.2→v1.3: "Back
+ * to choices" no longer hardcoded to the confusing 'intention' screen,
+ * goes to Home instead — real fix Graeme flagged, now more relevant
+ * given this screen's new primary entry point.
+ *
  * 04 Aug 2026 v215
  * Two fixes from the same message. (1) New "Update app" button in
  * Settings' About panel (settings.js v13, settings.css v6) — clears
@@ -641,7 +655,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v215";
+const CACHE_NAME = "alongside-v216";
 
 const SHELL_URLS = [
 
@@ -655,6 +669,7 @@ const SHELL_URLS = [
   "/alongside-app/css/layouts/today.css",
   "/alongside-app/css/layouts/conditions-update.css",
   "/alongside-app/css/layouts/library.css",
+  "/alongside-app/css/layouts/mobility-conditioning.css",
   "/alongside-app/css/layouts/progress.css",
   "/alongside-app/css/components/session-guard.css",
   "/alongside-app/css/components/weekly-plan.css",
@@ -686,6 +701,7 @@ const SHELL_URLS = [
   // Views — main
   "/alongside-app/js/views/today.js",
   "/alongside-app/js/views/conditions-update.js",
+  "/alongside-app/js/views/mobility-conditioning.js",
   "/alongside-app/js/views/checkin.js",
   "/alongside-app/js/views/checkin-mini.js",
   "/alongside-app/js/views/intention.js",

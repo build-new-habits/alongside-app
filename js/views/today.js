@@ -1,5 +1,14 @@
 /**
  * today.js
+ * 04 Aug 2026 v12
+ *
+ * v12 — Mobility & Conditioning routes to its own real landing screen
+ *   (mobility-conditioning.js) instead of the programme-or-Library
+ *   smart-routing hack from v10/v11, which is fully removed. That
+ *   screen handles the programme-or-not branching internally now, so
+ *   the Home door tile's "Your programme" hint (v10) is also removed —
+ *   redundant once the landing page itself shows programme state.
+ *
  * 04 Aug 2026 v11
  *
  * v11 — Library added as its own Home door, same day. Graeme: "Don't
@@ -168,12 +177,12 @@ export function TodayView(router) {
   // that actually generate an adaptive session (Cardio/Core/Strength,
   // Unsure? Coach decides) — confirmed by Graeme as the right split.
   //
-  // Mobility & Conditioning's `route: 'library'` below is a fallback
-  // only, not the real destination — see attachEvents()'s doorId check
-  // (04 Aug 2026 follow-up): if a condition programme exists, this door
-  // routes to it (prescribed.js) instead, per the original spec
-  // ("pulls in whatever the Conditions Update programme has built").
-  // Falls back to Library when there's genuinely nothing to pull in.
+  // Mobility & Conditioning routes to its own landing screen
+  // (mobility-conditioning.js, same day follow-up), which handles the
+  // programme-or-not branching internally now — Start a Mobility
+  // Session / My Conditions Programme / Log an event. Supersedes the
+  // earlier smart-routing hack that lived in attachEvents() below
+  // (programme-or-Library), which is now removed.
   //
   // Library added as its own door, same day: once Mobility &
   // Conditioning started smart-routing to the programme instead of
@@ -188,7 +197,7 @@ export function TodayView(router) {
   // counted as one of the "real" doors, exactly as before.
   const HOME_DOORS = [
     { id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder', requiresCheckin: true },
-    { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'library', requiresCheckin: false },
+    { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'mobility-conditioning', requiresCheckin: false },
     { id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing', requiresCheckin: false },
     { id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'conditions-update', requiresCheckin: false },
     { id: 'progress', label: 'Progress', icon: '\uD83D\uDCCA', route: 'progress', requiresCheckin: false },
@@ -313,22 +322,16 @@ export function TodayView(router) {
         ` : ''}
 
         <div class="today-doors" role="group" aria-label="Choose how you want to move today">
-          ${HOME_DOORS.map(d => {
-            const isMobility = d.id === 'mobility-conditioning';
-            const hasProgramme = isMobility &&
-              (store.get('prescribedExercises') || []).some(e => e.conditionId);
-            return `
+          ${HOME_DOORS.map(d => `
             <button class="today-door ${d.id === 'unsure' ? 'today-door--unsure' : ''}"
                     data-route="${d.route}"
                     data-door-id="${d.id}"
                     data-requires-checkin="${d.requiresCheckin}"
-                    aria-label="${_esc(d.label)}${hasProgramme ? ' — your programme' : ''}">
+                    aria-label="${_esc(d.label)}">
               <span class="today-door__icon" aria-hidden="true">${d.icon}</span>
               <span class="today-door__label">${_esc(d.label)}</span>
-              ${hasProgramme ? '<span class="today-door__hint">Your programme</span>' : ''}
             </button>
-          `;
-          }).join('')}
+          `).join('')}
         </div>
 
         ${!_checkedInToday() ? `
@@ -353,26 +356,7 @@ export function TodayView(router) {
     container.querySelectorAll('[data-route]').forEach(btn => {
       btn.addEventListener('click', () => {
         const route = btn.dataset.route;
-        const doorId = btn.dataset.doorId;
         const requiresCheckin = btn.dataset.requiresCheckin === 'true';
-
-        // Mobility & Conditioning, 04 Aug 2026: now genuinely pulls in
-        // the Conditions Update programme when one exists, per the
-        // original spec ("Pulls in whatever the Conditions Update
-        // programme has built" / "reachable as its own programme
-        // within that door"). Checks for condition-tagged
-        // prescribedExercises entries specifically — not just any
-        // entry, since an untagged one could be an old-style physio
-        // prescription unrelated to Conditions Update. Falls back to
-        // Library exactly as before when no programme exists yet —
-        // nothing to pull in, so no behaviour change for anyone
-        // without a condition programme.
-        if (doorId === 'mobility-conditioning') {
-          const prescribed = store.get('prescribedExercises') || [];
-          const hasConditionProgramme = prescribed.some(e => e.conditionId);
-          router.navigate(hasConditionProgramme ? 'prescribed' : 'library');
-          return;
-        }
 
         if (requiresCheckin) {
           // Fix, 04 Aug 2026 — Graeme: "we should fix this so it's

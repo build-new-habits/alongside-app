@@ -1,0 +1,161 @@
+/**
+ * mobility-conditioning.js - Mobility & Conditioning
+ *
+ * 04 Aug 2026 v1
+ *
+ * New screen, replacing the today.js smart-routing hack (Home Nav
+ * follow-up, same day). Graeme's design, confirmed before building:
+ * three options — "Start a Mobility Session" (routes to core-session.js,
+ * already condition-aware via Phase B's consolidated pool),
+ * "My Conditions Programme" (collapsed by default — count + expand,
+ * not the full inventory up front; "Not created" state links straight
+ * into Conditions Update when nothing exists yet), "Log an event"
+ * (routes to Library's existing log flow).
+ *
+ * "My Conditions Programme" deliberately renders inline here rather
+ * than always jumping to prescribed.js — Graeme: "the 'programme' menu
+ * and inventory should be collapsed and the user can open it if they
+ * want to 'find out more about your saved programme'." Expanded state
+ * lists exercises grouped by condition, plus a note pointing to
+ * Conditions Update for editing, and a "Start this programme" action
+ * into prescribed-session.js for anyone who came here specifically to
+ * do it, not just look at it.
+ */
+
+import { store } from "../store.js";
+import { getConditionName } from "../data/conditions.js";
+
+export function MobilityConditioningView(router) {
+
+  let programmeExpanded = false;
+
+  function mount(container) {
+    render(container);
+  }
+
+  function render(container) {
+    const prescribed = store.get("prescribedExercises") || [];
+    const tagged      = prescribed.filter(e => e.conditionId);
+
+    container.innerHTML = `
+      <div class="mc-view" role="main" aria-label="Mobility and Conditioning">
+        <div class="mc-header">
+          <button class="btn btn-ghost" id="mc-back-btn" aria-label="Back to Home">&larr; Back</button>
+          <span class="mc-header-title">Mobility &amp; Conditioning</span>
+        </div>
+
+        <p class="mc-coach-line">What would you like to do?</p>
+
+        <button class="mc-card" id="mc-start-session" aria-label="Start a Mobility Session">
+          <span class="mc-card__icon" aria-hidden="true">\uD83E\uDDD8</span>
+          <span class="mc-card__text">
+            <span class="mc-card__label">Start a Mobility Session</span>
+            <span class="mc-card__sub">Yoga, Pilates, stretching, warmups \u2014 adapted to how you're doing today</span>
+          </span>
+        </button>
+
+        ${_renderProgrammeCard(tagged)}
+
+        <button class="mc-card" id="mc-log-event" aria-label="Log an event">
+          <span class="mc-card__icon" aria-hidden="true">\u2795</span>
+          <span class="mc-card__text">
+            <span class="mc-card__label">Log an event</span>
+            <span class="mc-card__sub">Capture something you've already done</span>
+          </span>
+        </button>
+      </div>
+    `;
+
+    attachEvents(container);
+  }
+
+  function _renderProgrammeCard(tagged) {
+    if (tagged.length === 0) {
+      return `
+        <div class="mc-card mc-card--static" aria-label="My Conditions Programme, not created">
+          <span class="mc-card__icon" aria-hidden="true">\uD83E\uDE79</span>
+          <span class="mc-card__text">
+            <span class="mc-card__label">My Conditions Programme</span>
+            <span class="mc-card__sub">Not created yet</span>
+          </span>
+          <button class="mc-card__link" id="mc-goto-conditions-update">
+            Build one in Conditions Update
+          </button>
+        </div>
+      `;
+    }
+
+    const byCondition = {};
+    tagged.forEach(e => {
+      (byCondition[e.conditionId] ||= []).push(e);
+    });
+
+    return `
+      <div class="mc-card mc-card--static">
+        <button class="mc-programme-toggle" id="mc-programme-toggle"
+                aria-expanded="${programmeExpanded}" aria-controls="mc-programme-body">
+          <span class="mc-card__icon" aria-hidden="true">\uD83E\uDE79</span>
+          <span class="mc-card__text">
+            <span class="mc-card__label">My Conditions Programme</span>
+            <span class="mc-card__sub">${tagged.length} exercise${tagged.length === 1 ? "" : "s"} saved \u2014 tap to find out more</span>
+          </span>
+          <span class="mc-programme-toggle__chevron" aria-hidden="true">&rsaquo;</span>
+        </button>
+
+        ${programmeExpanded ? `
+          <div class="mc-programme-body" id="mc-programme-body">
+            ${Object.entries(byCondition).map(([conditionId, exercises]) => `
+              <div class="mc-programme-group">
+                <p class="mc-programme-group__heading">${getConditionName(conditionId)}</p>
+                <ul class="mc-programme-group__list">
+                  ${exercises.map(e => `<li>${e.name}</li>`).join("")}
+                </ul>
+              </div>
+            `).join("")}
+            <p class="mc-programme-edit-note">
+              Want to change what's here, your goal, or how it folds into your sessions?
+              Edit it in Conditions Update.
+            </p>
+            <div class="mc-programme-actions">
+              <button class="btn btn-ghost" id="mc-goto-conditions-update-2">Conditions Update</button>
+              <button class="btn btn-primary" id="mc-start-programme">Start this programme</button>
+            </div>
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }
+
+  function attachEvents(container) {
+    container.querySelector("#mc-back-btn")?.addEventListener("click", () => {
+      router.navigate("today");
+    });
+
+    container.querySelector("#mc-start-session")?.addEventListener("click", () => {
+      router.navigate("core-session");
+    });
+
+    container.querySelector("#mc-log-event")?.addEventListener("click", () => {
+      router.navigate("library");
+    });
+
+    container.querySelector("#mc-goto-conditions-update")?.addEventListener("click", () => {
+      router.navigate("conditions-update");
+    });
+
+    container.querySelector("#mc-goto-conditions-update-2")?.addEventListener("click", () => {
+      router.navigate("conditions-update");
+    });
+
+    container.querySelector("#mc-start-programme")?.addEventListener("click", () => {
+      router.navigate("prescribed-session");
+    });
+
+    container.querySelector("#mc-programme-toggle")?.addEventListener("click", () => {
+      programmeExpanded = !programmeExpanded;
+      render(container);
+    });
+  }
+
+  return { mount };
+}
