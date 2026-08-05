@@ -557,4 +557,15 @@ Found via screenshot: "Add N to my programme" was overflowing its own pill shape
 
 ---
 
+### Library added as its own Home door
+
+Real gap Graeme caught: "Don't we still want a library?" Once Mobility & Conditioning started smart-routing to the condition programme whenever one exists, Library lost its only path from Home in that case — genuinely unreachable, not just harder to find.
+
+- `js/views/today.js` v10 → v11 — Library added as its own door, positioned before "Unsure? Coach decides" in the grid. Library is broader than mobility/conditioning content anyway (every session type, prescribed exercises, coach recommends), so it earns a real, always-present door rather than only surfacing as Mobility & Conditioning's conditional fallback. "Unsure? Coach decides" keeps its existing distinct treatment — spans both grid columns, dashed border, sits visually underneath — not counted as one of the "real" doors, exactly as before.
+- No CSS changes needed — the 2-column grid and "Unsure?"'s full-width layout both already accommodate the extra tile automatically.
+- `sw.js` v211 → v212, deployed last.
+- **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

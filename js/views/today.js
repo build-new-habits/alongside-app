@@ -1,5 +1,18 @@
 /**
  * today.js
+ * 04 Aug 2026 v11
+ *
+ * v11 — Library added as its own Home door, same day. Graeme: "Don't
+ *   we still want a library?" Real gap — once Mobility & Conditioning
+ *   started smart-routing to the condition programme instead of
+ *   Library whenever one exists, Library became unreachable from Home
+ *   in that case. Library is broader than mobility/conditioning
+ *   content anyway (every session type, prescribed exercises, coach
+ *   recommends), so it gets its own door rather than only surfacing
+ *   as a fallback. No CSS changes needed — the 2-column grid and
+ *   "Unsure? Coach decides"'s existing full-width/underneath treatment
+ *   both accommodate the extra tile automatically.
+ *
  * 04 Aug 2026 v10
  *
  * v10 — Mobility & Conditioning door now genuinely pulls in the
@@ -145,7 +158,7 @@ import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
 
 export function TodayView(router) {
 
-  // ── Six Home doors (04 Aug 2026, Phase C) ────────────────────────────────
+  // ── Home doors (04 Aug 2026, Phase C, now 7 items) ───────────────────────
   // requiresCheckin: true for doors whose whole value depends on knowing
   // today's state (energy, pain, equipment) — these route through
   // check-in (full the first time today, check-in-mini after) before
@@ -161,12 +174,25 @@ export function TodayView(router) {
   // routes to it (prescribed.js) instead, per the original spec
   // ("pulls in whatever the Conditions Update programme has built").
   // Falls back to Library when there's genuinely nothing to pull in.
+  //
+  // Library added as its own door, same day: once Mobility &
+  // Conditioning started smart-routing to the programme instead of
+  // Library whenever one exists, Library stopped being reachable from
+  // Home at all in that case — a real discoverability regression
+  // Graeme caught. Library is broader than mobility/conditioning
+  // content anyway (every session type, prescribed exercises, coach
+  // recommends), so it earns its own door rather than only being
+  // reachable as Mobility & Conditioning's fallback. "Unsure? Coach
+  // decides" keeps its existing distinct treatment — spans both grid
+  // columns, dashed border, sits visually underneath the rest — not
+  // counted as one of the "real" doors, exactly as before.
   const HOME_DOORS = [
     { id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder', requiresCheckin: true },
     { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'library', requiresCheckin: false },
     { id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing', requiresCheckin: false },
     { id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'conditions-update', requiresCheckin: false },
     { id: 'progress', label: 'Progress', icon: '\uD83D\uDCCA', route: 'progress', requiresCheckin: false },
+    { id: 'library', label: 'Library', icon: '\uD83D\uDCDA', route: 'library', requiresCheckin: false },
     { id: 'unsure', label: 'Unsure? Coach decides', icon: '\uD83C\uDFAF', route: 'coach-proposal', requiresCheckin: true },
   ];
 
