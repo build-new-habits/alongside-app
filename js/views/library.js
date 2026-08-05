@@ -1,6 +1,15 @@
 /**
  * library.js - Library Page
  *
+ * 04 Aug 2026 v2
+ *
+ * v2 — renderGuidedSubScreen()'s session cards restructured slightly:
+ *   label + note now wrapped in a .library-session-text span, needed
+ *   so the new CSS (library.css v2) can lay out icon-left/text-stacked-
+ *   right correctly — the two spans were previously flex siblings with
+ *   nothing grouping them for that layout. No behaviour change, markup
+ *   only.
+ *
  * 18 May 2026 v1
  *
  * NS-2: Library moved from Settings tab to dedicated route.
@@ -295,8 +304,10 @@ function renderGuidedSubScreen(categoryId) {
                   ${s.quiet ? `data-quiet="${s.quiet}"` : ""}
                   aria-label="${s.label}${s.note ? ": " + s.note : ""}">
             <span class="library-session-icon" aria-hidden="true">${s.icon}</span>
-            <span class="library-session-label">${s.label}</span>
-            ${s.note ? `<span class="library-session-note">${s.note}</span>` : ""}
+            <span class="library-session-text">
+              <span class="library-session-label">${s.label}</span>
+              ${s.note ? `<span class="library-session-note">${s.note}</span>` : ""}
+            </span>
           </button>
         `).join("")}
       </div>
