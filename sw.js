@@ -1,6 +1,20 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v209
+ * Graeme's two ideas for the condition-programme candidate list, both
+ * real, both built. (1) One-line rationale per exercise — the `why`
+ * field already existed on all 461 exercises in the database, just
+ * surfaced now, no new content. (2) "Not keen on this one" — applies
+ * the already-approved alongside_exercise_skip_dislike_spec_16may2026_
+ * v1.docx (binary Avoid/Less-often signal, not a rating) to this
+ * candidate list specifically. New store.js v17 field
+ * exercisePreferences; conditionProgrammes.js v2 excludes 'avoid' and
+ * de-prioritises 'less' in both coach-built and coach-recommended
+ * results, smoke-tested before wiring into the UI. The full spec's
+ * in-session Skip flow across gym-programme.js/prescribed-session.js/
+ * core-session.js remains separate, larger future work.
+ *
  * 04 Aug 2026 v208
  * Four screenshots, three real fixes and one confirmed-not-guessed
  * finding. (1) checkin-conversation.css v5→v6: feeling-word chips were
@@ -574,7 +588,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v208";
+const CACHE_NAME = "alongside-v209";
 
 const SHELL_URLS = [
 

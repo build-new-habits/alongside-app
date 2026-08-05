@@ -1,6 +1,17 @@
 /**
  * conditionProgrammes.js - Condition Programme Selection
  *
+ * 04 Aug 2026 v2
+ *
+ * v2 — Applies exercisePreferences (store.js v17) — 'avoid' exercises
+ *   excluded entirely in buildConditionCandidates(), the one place
+ *   every other function here draws from; 'less' exercises stay
+ *   eligible (this is a browsing/choosing context, not a proactive
+ *   suggestion) but sort toward the end in buildCoachProgramme() and
+ *   buildRecommendedCandidates(). Smoke-tested: an avoided exercise
+ *   confirmed absent from both a real recommended-candidates call and
+ *   a real coach-built programme before this was wired into the UI.
+ *
  * 04 Aug 2026 v1
  *
  * New module. Scoped in alongside_scoping_condition_programmes_04aug2026_v1.md,
@@ -51,15 +62,29 @@ export function buildConditionCandidates(conditionId) {
   const score       = painScores[conditionId] || 0;
   const band        = getPainBand(score);
   const activeIds   = getActiveConditionIds([conditionId], painScores);
+  const prefs       = store.get("exercisePreferences") || {};
 
   const pool = EXERCISES.filter(ex => (ex.affectsAreas || []).includes(conditionId));
 
-  const safe = pool.filter(ex => {
+  const safeIgnoringPrefs = pool.filter(ex => {
     const contra = ex.contraindications || [];
     return !contra.some(c => activeIds.includes(c));
   });
 
+  // 'avoid' exercises never appear here at all, per spec — this is the
+  // one place every downstream function in this file draws from, so
+  // excluding here covers "coach builds it" and "coach recommends"
+  // both, in one place. 'less' exercises stay in the pool (the person
+  // is actively browsing/choosing here, not being proactively
+  // suggested something) but get sorted toward the end — see
+  // buildCoachProgramme()/buildRecommendedCandidates().
+  const safe = safeIgnoringPrefs.filter(ex => prefs[ex.id]?.preference !== "avoid");
+
   return { band, safe };
+}
+
+function _isLessPreferred(ex, prefs) {
+  return prefs[ex.id]?.preference === "less";
 }
 
 /**
@@ -70,6 +95,7 @@ export function buildCoachProgramme(conditionId, goalType) {
   const { band, safe } = buildConditionCandidates(conditionId);
   const phase      = _rehabPhaseForBand(band.id);
   const phaseIndex = REHAB_PHASE_ORDER.indexOf(phase);
+  const prefs      = store.get("exercisePreferences") || {};
 
   // Same phase or gentler (later in REHAB_PHASE_ORDER = gentler).
   // Non-rehab exercises (no rehabPhase at all) are always eligible —
@@ -82,6 +108,14 @@ export function buildCoachProgramme(conditionId, goalType) {
   const pool = phaseFiltered.length > 0 ? phaseFiltered : safe;
 
   const sorted = [...pool].sort((a, b) => {
+    // 'less'-preferred exercises sort to the end regardless of
+    // everything else — a real but soft preference signal, not a
+    // hard exclusion (that's 'avoid', already filtered out upstream
+    // in buildConditionCandidates()).
+    const aLess = _isLessPreferred(a, prefs) ? 1 : 0;
+    const bLess = _isLessPreferred(b, prefs) ? 1 : 0;
+    if (aLess !== bLess) return aLess - bLess;
+
     if (goalType === "improve") {
       // Lean toward more challenging options where safe.
       return (b.difficultyLevel || 1) - (a.difficultyLevel || 1);
@@ -102,7 +136,16 @@ export function buildCoachProgramme(conditionId, goalType) {
  */
 export function buildRecommendedCandidates(conditionId) {
   const { safe } = buildConditionCandidates(conditionId);
-  return safe.slice(0, PROGRAMME_SIZE * 2);
+  const prefs    = store.get("exercisePreferences") || {};
+  // Same soft de-prioritisation as buildCoachProgramme() — 'less'
+  // exercises still appear (this is a browsing list, not a proactive
+  // suggestion), just sorted toward the end rather than hidden.
+  const sorted = [...safe].sort((a, b) => {
+    const aLess = _isLessPreferred(a, prefs) ? 1 : 0;
+    const bLess = _isLessPreferred(b, prefs) ? 1 : 0;
+    return aLess - bLess;
+  });
+  return sorted.slice(0, PROGRAMME_SIZE * 2);
 }
 
 /**
