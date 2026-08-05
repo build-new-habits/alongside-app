@@ -1,6 +1,24 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v218
+ * Cross-condition exercise reuse — Graeme's recommendation request,
+ * refined once before building (first draft would have duplicated
+ * shared exercises rather than genuinely reusing them). conditionId
+ * (singular) replaced with conditionIds (array) on prescribedExercises
+ * entries; one exercise can now serve more than one condition as a
+ * single entry — one completion state, one credit award, shown once
+ * per condition it belongs to rather than duplicated. New
+ * getEntryConditionIds() keeps old singular-shaped entries working
+ * with no migration step. commitProgramme() reuses existing entries
+ * by exerciseId instead of duplicating; both builder functions bias
+ * toward reuse and annotate candidates so the UI can show "Already in
+ * your X programme." conditionProgrammes.js v2→v3, conditions-
+ * update.js v6→v7, mobility-conditioning.js v1→v2, prescribed.js
+ * v1.3→v1.4, conditions-update.css v6→v7. Smoke-tested against real
+ * overlapping conditions and backward compatibility before shipping.
+ * Schema.md v1.15→v1.16.
+ *
  * 04 Aug 2026 v217
  * The most important fix from today's feedback batch — prescribed-
  * session.js v2→v3: real-time contraindication check added. Was
@@ -665,7 +683,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v217";
+const CACHE_NAME = "alongside-v218";
 
 const SHELL_URLS = [
 

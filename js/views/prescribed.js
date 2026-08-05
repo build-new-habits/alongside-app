@@ -1,6 +1,16 @@
 /**
  * prescribed.js - Prescribed Exercises View
  *
+ * 04 Aug 2026 v1.4
+ *
+ * v1.4 — Updated for conditionProgrammes.js v3's multi-condition
+ *   entries. "For:" tag now reads via getEntryConditionIds() and
+ *   lists every condition an entry serves, not just one. Manual
+ *   "Build my own" additions now write conditionIds (array) instead
+ *   of the old singular conditionId — no dedup/reuse detection for
+ *   these (they're free-text, no exerciseId to match against; that
+ *   mechanism only applies to coach-built/recommended entries).
+ *
  * 04 Aug 2026 v1.3
  *
  * v1.3 — "Back to choices" no longer hardcoded to 'intention'. Real
@@ -52,6 +62,7 @@
 
 import { store } from "../store.js";
 import { getConditionName } from "../data/conditions.js";
+import { getEntryConditionIds } from "../data/conditionProgrammes.js";
 
 export const centered = false;
 
@@ -277,8 +288,8 @@ function renderExerciseCard(ex, index, isDone) {
         <p class="prescribed-by text-sm text-muted">Prescribed by: ${ex.prescribedBy}</p>
       ` : ""}
 
-      ${ex.conditionId ? `
-        <p class="prescribed-condition-tag text-sm text-muted">For: ${getConditionName(ex.conditionId)}</p>
+      ${ex.conditionId || (Array.isArray(ex.conditionIds) && ex.conditionIds.length) ? `
+        <p class="prescribed-condition-tag text-sm text-muted">For: ${getEntryConditionIds(ex).map(getConditionName).join(", ")}</p>
       ` : ""}
 
       <div class="prescribed-exercise-history text-sm text-muted"
@@ -538,7 +549,7 @@ function saveExercise() {
     ...(reps            !== null ? { reps }                    : {}),
     ...(notes           !== null ? { notes }                   : {}),
     ...(prescribedBy    !== null ? { prescribedBy }             : {}),
-    ...(activeCondition           ? { conditionId: activeCondition } : {})
+    ...(activeCondition           ? { conditionIds: [activeCondition] } : {})
   };
 
   const existing = store.get("prescribedExercises") || [];
