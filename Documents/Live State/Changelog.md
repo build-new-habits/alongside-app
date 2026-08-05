@@ -652,4 +652,18 @@ Graeme asked for a recommendation on whether the coach should reuse exercises ac
 
 ---
 
+### `dead-bug`/`bird-dog` contraindications — content decision resolved
+
+Flagged during Phase B pool consolidation, resolved now — Graeme's call, with a recommendation offered first.
+
+- **Dead Bug** — empty contraindications confirmed correct as-is. It's a standard anti-extension stabilisation exercise, commonly used specifically as a safe option during low-back issues, not one typically avoided.
+- **Bird Dog** — its lower-back/glutes exclusions also confirmed correct as-is (same anti-extension logic). But a real, separate gap was found and fixed: it puts real weight through the wrists in its hands-and-knees position, which nothing previously captured. Added `wrist-elbow-acute`.
+- `js/data/exercises/strength.js` v2 → v3.
+- Smoke-tested against the real contraindication-check logic before shipping — confirmed Bird Dog now correctly flags for severe wrist/elbow pain, Dead Bug unchanged.
+- Worth noting: this data now feeds `prescribed-session.js`'s real-time safety check directly (built earlier today), not just descriptive content — flagged to Graeme as reasoned exercise-science judgement, not a clinical sign-off, given the stakes changed.
+- `sw.js` v218 → v219, deployed last.
+- **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
