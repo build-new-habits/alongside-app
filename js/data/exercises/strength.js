@@ -1,8 +1,21 @@
 /**
  * data/exercises/strength.js
- * 04 Aug 2026 v2
+ * 04 Aug 2026 v3
  *
- * v2 — Phase B, Home Nav & Conditions Redesign (core-session.js pool
+ * v3 — Content decision, Graeme's call: Dead Bug's empty
+ *   contraindications confirmed correct as-is — it's a standard
+ *   anti-extension stabilisation exercise, commonly used specifically
+ *   as a safe option during low-back issues, not one typically
+ *   avoided. Bird Dog's lower-back/glutes exclusions also confirmed
+ *   correct as-is (same anti-extension logic), but a real gap found
+ *   and fixed: it puts real weight through the wrists (hands-and-knees
+ *   position), which nothing previously captured. Added
+ *   wrist-elbow-acute. Resolves the dead-bug/bird-dog discrepancy
+ *   flagged during Phase B pool consolidation, 04 Aug — this data now
+ *   feeds prescribed-session.js's real-time contraindication check,
+ *   not just descriptive content.
+ *
+ * 04 Aug 2026 v2 — Phase B, Home Nav & Conditions Redesign (core-session.js pool
  *   consolidation). Added sets/reps/holdSeconds/rest/cues/description
  *   fields to 7 records (dead-bug, bird-dog, plank, ab-wheel-rollout,
  *   pallof-press, band-pallof-press, isometric-hollow-hold) — additive
@@ -49,7 +62,7 @@ export const STRENGTH = [
     equipment: [],
     equipmentOptional: ['yoga-mat'],
     affectsAreas: ['core', 'lower-back', 'glutes'],
-    contraindications: ['glutes-acute', 'lower-back-acute'],
+    contraindications: ['glutes-acute', 'lower-back-acute', 'wrist-elbow-acute'],
     energyRequired: 3,
     difficultyLevel: 1,
     duration: 90,

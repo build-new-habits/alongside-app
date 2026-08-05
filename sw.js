@@ -1,6 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v219
+ * dead-bug/bird-dog contraindications discrepancy resolved — Graeme's
+ * content decision. Dead Bug's empty exclusions and Bird Dog's lower-
+ * back/glutes exclusions both confirmed correct as written; Bird Dog
+ * gets a genuine addition, wrist-elbow-acute, for the real wrist
+ * loading in its hands-and-knees position that nothing previously
+ * captured. strength.js v2→v3. Smoke-tested against the real
+ * contraindication-check logic before shipping. This data now feeds
+ * prescribed-session.js's safety check directly, not just descriptive
+ * content.
+ *
  * 04 Aug 2026 v218
  * Cross-condition exercise reuse — Graeme's recommendation request,
  * refined once before building (first draft would have duplicated
@@ -683,7 +694,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v218";
+const CACHE_NAME = "alongside-v219";
 
 const SHELL_URLS = [
 
