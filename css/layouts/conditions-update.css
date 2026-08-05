@@ -1,6 +1,11 @@
 /*
  * css/layouts/conditions-update.css
- * 04 Aug 2026 v3
+ * 04 Aug 2026 v4
+ *
+ * v4 — .cu-recommend-item selection state fixed. Was invisible: no
+ *   accent-color on the native checkbox, no row-level state change.
+ *   Added accent-color plus a .is-selected background/border, matching
+ *   the app's own pattern everywhere else selection needs to be clear.
  *
  * v3 — Programme section restructured per-condition (conditions-
  *   update.js v3): .cu-programme/.cu-programme__heading removed
@@ -297,12 +302,24 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   min-height: 44px;
   font-size: var(--text-sm);
   color: var(--color-text);
   cursor: pointer;
   border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+}
+/* fix, 04 Aug 2026: Graeme couldn't tell which exercises were
+   selected. Native checkboxes render with no explicit colour on a
+   dark theme and are easy to miss at 20px; this app's own pattern
+   everywhere else (.cu-goal-pill, .cu-foldin-btn, .today-door) is a
+   whole-row background/border change on selection, not relying on a
+   tiny native control alone. Both now applied together. */
+
+.cu-recommend-item.is-selected {
+  background: rgba(45, 212, 191, 0.15); /* --color-primary (#2DD4BF) at 15% — no --color-primary-rgb variable exists in this codebase to reference directly */
+  border-color: var(--color-primary);
 }
 
 .cu-recommend-item:hover {
@@ -310,9 +327,10 @@
 }
 
 .cu-recommend-item input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
+  accent-color: var(--color-primary);
 }
 
 .cu-recommend-actions {

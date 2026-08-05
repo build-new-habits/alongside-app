@@ -496,4 +496,24 @@ Real gap: there was no way to remove a condition from `conditions-update.js`. Th
 
 ---
 
+### Four screenshots from Graeme, same day — three real fixes, one confirmed finding
+
+**Feeling-word chip wrapping.** `css/components/checkin-conversation.css` v5 → v6 — "energised"/"motivated"/"confident" etc. were breaking across 3 ugly lines each, cramped into a 6-across flex row even after today's earlier overflow-wrap fix. Converted `.ci-quality-chips` from flex+flex-wrap to a 2-column grid — each chip gets roughly double the width, so words fit in at most 2 lines. Graeme: *"perhaps we use more lines to make it fit ok"* — more rows, not more mid-word breaks inside one cramped chip.
+
+**Invisible checkbox selection.** Real bug found immediately after shipping the "coach recommends" selection UI in the same conversation — Graeme: *"I can't tell which of these exercises I've selected."* Native checkboxes on this dark theme had no explicit colour, easy to miss at 20px, and nothing else on the row signalled state either.
+
+- `js/views/conditions-update.js` v3 → v4 — each `.cu-recommend-item` label now gets an `is-selected` class matching its checkbox.
+- `css/layouts/conditions-update.css` v3 → v4 — `accent-color` on the checkbox itself, plus a row-level background/border change on `.is-selected`, matching how every other selection control in this app already shows state (`.cu-goal-pill`, `.cu-foldin-btn`) rather than relying on the tiny native control alone.
+
+**`coach-reflection.js` confirmed obsolete — traced, not assumed.** Graeme: *"I think this page is now obsolete?"* Checked before agreeing: the four-option "Your Session" picker (Suggest something for me / I have something in mind / My plans / Noticing) was reachable from exactly one place in the entire app — `checkin.js`'s completion handler, only when no `pendingDoorRoute` was set (i.e. reached via the standalone "Check in" link, not through a Home door). Its four options substantially duplicate what Home's six doors already offer directly.
+
+- `js/views/checkin.js` v10 → v11 — that fallback now goes to `today` (Home) instead. `coach-reflection.js` itself left in place, not deleted — genuinely unreachable now, worth a proper look before removing the file outright rather than deleting it in the same pass as finding it dead.
+
+**Logged, not fixed this pass:** a full aesthetics audit — Graeme noticed the check-in bottom-sheet panel (Energy/Mood/etc. sliders) covers the coach's message at the top of the screen when it opens. Real, but "we need to do a full audit of aesthetics" is a properly scoped future session, not a piecemeal patch — logged on the master schedule as its own item.
+
+- `sw.js` v207 → v208, deployed last.
+- **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

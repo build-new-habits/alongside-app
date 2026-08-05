@@ -1,7 +1,15 @@
 /* ============================================================
    checkin-conversation.css
    css/components/checkin-conversation.css
-   04 Aug 2026 v5
+   04 Aug 2026 v6
+
+   v6 — .ci-quality-chips (feeling-word selector) converted from
+   flex+flex-wrap to a 2-column grid. Found via screenshot: "energised"/
+   "motivated"/"confident" etc. were breaking across 3 ugly lines each
+   inside a too-narrow flex:1 chip. A 2-column grid gives each chip
+   roughly double the width — Graeme: "perhaps we use more lines to
+   make it fit ok" — more rows, not more mid-word breaks inside one
+   cramped chip. .ci-quality-chip's now-meaningless flex:1 removed.
 
    v5 — Pain Input Redesign. New .ci-slider-wrap--condition (compact
    per-condition variant of the Energy/Mood slider styling, since
@@ -402,13 +410,23 @@
 }
 
 .ci-quality-chips {
-  display: flex;
-  gap: var(--space-3);
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2) var(--space-3);
 }
+/* fix, 04 Aug 2026: was display:flex + flex-wrap with flex:1 on each
+   of 6 chips — combined with the earlier overflow-wrap:break-word fix,
+   the browser kept cramming all 6 onto one row and letting long words
+   ("energised", "motivated", "confident") break awkwardly across 3
+   lines instead of properly wrapping the layout. A 2-column grid gives
+   each chip roughly double the width, so words fit in 2 lines at most
+   and the break points land at sensible places. Graeme: "perhaps we
+   use more lines to make it fit ok" — more rows, not more line-breaks
+   within one cramped chip. */
 
 .ci-quality-chip {
-  flex: 1;
+  /* flex:1 removed, 04 Aug 2026 — this is a grid item now (see
+     .ci-quality-chips above), flex properties have no effect here. */
   padding: var(--space-3) var(--space-2);
   background: var(--color-bg);
   border: 2px solid var(--color-border);

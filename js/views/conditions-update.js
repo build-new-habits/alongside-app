@@ -1,6 +1,17 @@
 /**
  * conditions-update.js - Conditions Update
  *
+ * 04 Aug 2026 v4
+ *
+ * v4 — Real bug found immediately after shipping the "coach recommends"
+ *   selection UI: Graeme couldn't tell which exercises were selected.
+ *   Native checkboxes on a dark theme with no explicit colour are easy
+ *   to miss at 20px. Each .cu-recommend-item label now gets an
+ *   is-selected class matching its checkbox state, styled the same way
+ *   every other selection control in this app already is (.cu-goal-pill,
+ *   .cu-foldin-btn) — a whole-row background/border change, not reliance
+ *   on the tiny native control alone. See conditions-update.css v4.
+ *
  * 04 Aug 2026 v3
  *
  * v3 — Real programme-build routes, scoped and built same day
@@ -270,7 +281,7 @@ export function ConditionsUpdateView(router) {
         <p class="cu-field-label">Pick the ones that make sense for you \u2014 add as many as you like.</p>
         <div class="cu-recommend-list">
           ${candidates.map(ex => `
-            <label class="cu-recommend-item">
+            <label class="cu-recommend-item ${selected.has(ex.id) ? "is-selected" : ""}">
               <input type="checkbox" data-candidate="${ex.id}" data-condition="${conditionId}"
                      ${selected.has(ex.id) ? "checked" : ""}>
               <span>${ex.name}</span>
