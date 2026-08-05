@@ -546,4 +546,15 @@ Per the original spec: "Mobility & Conditioning... pulls in whatever the Conditi
 
 ---
 
+### "Add to my programme" button overflow — real bug, likely explains a second report too
+
+Found via screenshot: "Add N to my programme" was overflowing its own pill shape — the same `white-space: nowrap` + `flex: 1`'s default `min-width: auto` bug found repeatedly today, in a button that had never been screenshotted at that specific count value before.
+
+- `css/layouts/conditions-update.css` v5 → v6 — `min-width: 0` + `white-space: normal` on `.cu-recommend-actions .btn`, same fix pattern used everywhere else this was found today. Checked the screen's other buttons for the same latent risk first — none share it (`.cu-programme-options` is a full-width column, `.cu-foldin-options` already wraps correctly).
+- **Likely explains a second, separate-looking report**: Mobility & Conditioning routing to Library instead of the condition programme just built. Re-verified the routing logic itself is correct — it only routes to the programme when a condition-tagged `prescribedExercises` entry genuinely exists. If the confirm button couldn't be tapped cleanly because of the overflow, the exercise may never have actually saved, which would fully explain the routing "failure" without there being a second bug at all. Flagged for Graeme to retest the full flow now that the button's fixed, not assumed resolved without confirmation.
+- `sw.js` v210 → v211, deployed last.
+- **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

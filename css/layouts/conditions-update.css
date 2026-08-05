@@ -1,6 +1,17 @@
 /*
  * css/layouts/conditions-update.css
- * 04 Aug 2026 v5
+ * 04 Aug 2026 v6
+ *
+ * v6 — Real bug found via screenshot: "Add N to my programme" was
+ *   overflowing its own pill shape. Same root cause as every other
+ *   text-overflow bug found today — .btn's base white-space:nowrap
+ *   plus flex:1's default min-width:auto meant it could neither shrink
+ *   nor wrap. Fixed with min-width:0 + white-space:normal, the same
+ *   pattern used everywhere else this was found. Likely also explains
+ *   Graeme's next report (routing to Library instead of his programme)
+ *   — if this button couldn't be tapped cleanly, the exercise may
+ *   never have actually saved. Flagged for Graeme to retest once this
+ *   ships, not assumed fixed without confirmation.
  *
  * v5 — New styling for the "why" rationale line and the "Not keen on
  *   this one" / Avoid / Less often controls per candidate row
@@ -416,6 +427,13 @@
 
 .cu-recommend-actions .btn {
   flex: 1;
+  min-width: 0;       /* fix, 04 Aug 2026: same root cause as every other
+    chip/button overflow found today — .btn's base white-space:nowrap
+    plus flex:1's default min-width:auto meant "Add N to my programme"
+    couldn't shrink OR wrap, so it overflowed its own pill shape. */
+  white-space: normal;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .cu-foldin {
