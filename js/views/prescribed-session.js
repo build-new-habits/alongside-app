@@ -1,9 +1,27 @@
 /**
  * prescribed-session.js - Prescribed Exercise Session View
  *
- * 23 Jul 2026 v2
+ * 04 Aug 2026 v3
  *
  * CHANGELOG
+ * 04 Aug 2026 v3 - Real safety gap found and fixed. This file read
+ *   zero condition/pain data — unlike every other session type in the
+ *   app (core-session.js, workoutGenerator.js both check
+ *   contraindications live at generation time), a prescribed programme
+ *   was static once built, with no check against today's state at all.
+ *   A flare-up after the programme was built could mean walking
+ *   through now-contraindicated exercises with nothing flagging it.
+ *   New _checkContraindication(): for exercises with a real exerciseId
+ *   (coach-built/coach-recommended, not manually added ones with no
+ *   database record to check), compares that exercise's
+ *   contraindications against getActiveConditionIds() for today.
+ *   Doesn't silently hide or block — surfaces a clear flag above the
+ *   exercise and lets the person decide, same "behaviour is
+ *   communication" pattern as coach-proposal.css's .cp-constraint,
+ *   reused visually rather than reinvented. Smoke-tested against real
+ *   exercise data before shipping: severe pain correctly flags,
+ *   mild pain correctly doesn't.
+ *
  * 23 Jul 2026 v2 - BUILD-3 Section 4. This file had no partial-save
  *   behaviour at all - exiting mid-session logged nothing to activityLog,
  *   by explicit design (exit confirm read "Progress on this session will
@@ -37,6 +55,8 @@
 
 import { store } from "../store.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
+import { getActiveConditionIds, getConditionName } from "../data/conditions.js";
+import { EXERCISES } from "../data/exercises/index.js";
 
 export const centered = false;
 
@@ -49,6 +69,36 @@ let currentIndex  = 0;
 let timerInterval = null;
 let timeRemaining = 0;
 let timerStarted  = false;
+
+// -- Real-time safety check ------------------------------------------------------
+// Real gap found and fixed 04 Aug 2026: this file previously read zero
+// condition/pain data, unlike every other session type in the app
+// (core-session.js, workoutGenerator.js both check contraindications
+// live). A programme built while a condition was Moderate could walk
+// someone through now-contraindicated exercises after a flare, with
+// nothing flagging it. This doesn't silently hide or block the
+// exercise — matches the app's "behaviour is communication" pattern,
+// same as the flagged constraint message in coach-proposal.js — it
+// surfaces the concern and lets the person decide, with a clear
+// "Skip this one" already on hand. Only checks exercises with a real
+// exerciseId (coach-built or coach-recommended entries); manually
+// added ones via "Build my own" have no database record to check
+// against and are correctly left alone, not false-flagged.
+function _checkContraindication(ex) {
+  if (!ex.exerciseId) return null;
+  const fullEx = EXERCISES.find(e => e.id === ex.exerciseId);
+  if (!fullEx || !fullEx.contraindications?.length) return null;
+
+  const conditions   = store.get("conditions") || [];
+  const painScores    = store.get("conditionPainScores") || {};
+  const activeIds     = getActiveConditionIds(conditions, painScores);
+
+  const hit = fullEx.contraindications.find(c => activeIds.includes(c));
+  if (!hit) return null;
+
+  const baseConditionId = hit.replace(/-acute$|-subacute$/, "");
+  return { conditionName: getConditionName(baseConditionId) };
+}
 
 export function render() {
   const exercises = store.get("prescribedExercises") || [];
@@ -63,6 +113,7 @@ export function render() {
   const progress     = (currentIndex / active.length) * 100;
   const holdSecs     = parseHoldSeconds(ex.reps);
   const hasTimer     = holdSecs !== null;
+  const contraFlag   = _checkContraindication(ex);
 
   return `
     <div class="view workout-view">
@@ -91,6 +142,13 @@ export function render() {
         </div>
 
         <h1 class="exercise-name">${ex.name}</h1>
+
+        ${contraFlag ? `
+          <div class="ps-contra-flag" role="status" aria-live="polite">
+            <span class="ps-contra-flag__icon" aria-hidden="true">\uD83C\uDF31</span>
+            <p>${contraFlag.conditionName} is flagged today \u2014 this one's usually best approached carefully, or skipped, when that's the case.</p>
+          </div>
+        ` : ""}
 
         <div class="exercise-meta">
           ${ex.sets ? `<span class="meta-tag">${ex.sets} sets</span>` : ""}

@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v217
+ * The most important fix from today's feedback batch — prescribed-
+ * session.js v2→v3: real-time contraindication check added. Was
+ * reading zero condition/pain data, unlike every other session type.
+ * New _checkContraindication() flags (doesn't hide/block) an exercise
+ * when its contraindications match today's active conditions, using
+ * the exact same visual pattern as coach-proposal.css's existing
+ * constraint flag. Smoke-tested against real exercise data before
+ * shipping. workout.css v2→v3 for the new .ps-contra-flag styling.
+ *
  * 04 Aug 2026 v216
  * Mobility & Conditioning's real landing page, built to Graeme's
  * confirmed design. New js/views/mobility-conditioning.js (router.js
@@ -655,7 +665,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v216";
+const CACHE_NAME = "alongside-v217";
 
 const SHELL_URLS = [
 
