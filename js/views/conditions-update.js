@@ -1,6 +1,15 @@
 /**
  * conditions-update.js - Conditions Update
  *
+ * 04 Aug 2026 v6
+ *
+ * v6 — Scroll position preserved across re-renders. Graeme: "when I'm
+ *   selecting it stays where I am for continuity." Every state change
+ *   (severity, goal, checkbox, fold-in) calls a full render(), which
+ *   was silently resetting scroll to the top each time — this
+ *   container isn't the scrolling element, window is. window.scrollY
+ *   now captured and restored around every render().
+ *
  * 04 Aug 2026 v5
  *
  * v5 — Two of Graeme's ideas, both real, both built same day. (1) One-
@@ -141,6 +150,16 @@ export function ConditionsUpdateView(router) {
   // ── Render ────────────────────────────────────────────────────────────────
 
   function render(container) {
+    // Fix, 04 Aug 2026 — Graeme: "when I'm selecting it stays where I
+    // am for continuity." Every state change here (severity slider,
+    // goal pill, reflection, checkbox, fold-in) calls a full render(),
+    // which replaces container.innerHTML and — since this container
+    // isn't itself the scrolling element, the page (window) is —
+    // silently reset scroll to the top every single time. Capture and
+    // restore window.scrollY around the re-render so interacting with
+    // a card doesn't visually yank you back to the top of the screen.
+    const scrollY = window.scrollY;
+
     const conditions   = store.get("conditions") || [];
     const painScores   = store.get("conditionPainScores") || {};
     const goals        = store.get("conditionGoals") || {};
@@ -173,6 +192,7 @@ export function ConditionsUpdateView(router) {
     `;
 
     attachEvents(container);
+    window.scrollTo(0, scrollY);
   }
 
   function _renderCard(id, painScores, goals, reflections, prescribed, foldIn) {

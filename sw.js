@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v215
+ * Two fixes from the same message. (1) New "Update app" button in
+ * Settings' About panel (settings.js v13, settings.css v6) — clears
+ * every cache directly and hard-reloads, cutting through staleness
+ * regardless of service-worker state, not just the polite existing
+ * checkForUpdate() path. (2) conditions-update.js v6 — scroll position
+ * preserved across every re-render instead of resetting to top on
+ * every selection.
+ *
  * 04 Aug 2026 v214
  * Rest of the Library page styled — Graeme: "we need to improve the
  * cosmetics of the library page itself." Checked every class library.js
@@ -632,7 +641,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v214";
+const CACHE_NAME = "alongside-v215";
 
 const SHELL_URLS = [
 

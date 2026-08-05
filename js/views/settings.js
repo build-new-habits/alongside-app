@@ -1,5 +1,18 @@
 /**
  * settings.js
+ * 04 Aug 2026 v13
+ *
+ * v13 — New "Update app" button in the About panel. Graeme: laptop was
+ *   on the latest version, phone was still showing old, unstyled
+ *   screens — real cache-staleness, not imagined. Checked sw.js's
+ *   fetch handler before building anything: pure cache-first, a stale
+ *   cached file is served without even checking the network until a
+ *   new service worker fully takes over. This button goes further than
+ *   the existing checkForUpdate()/applyUpdate() (app.js) — those only
+ *   politely ask the current SW registration to check; this also
+ *   clears every cache directly and hard-reloads regardless of SW
+ *   state, so it works even if the SW itself is what's stuck.
+ *
  * 04 Aug 2026 v12
  *
  * Settings view. User controls for profile, programme, goals, and preferences.
@@ -692,6 +705,14 @@ export function SettingsView(router) {
           <p>buildnewhabits.co.uk</p>
         </div>
 
+        <div class="settings-update-block">
+          <button class="btn btn-primary" id="settings-force-update-btn"
+                  aria-label="Force update — clears cache and reloads the latest version">
+            Update app
+          </button>
+          <p class="settings-update-status" id="settings-update-status" aria-live="polite"></p>
+        </div>
+
         <div class="settings-about-links">
           <button class="btn btn-ghost"
                   data-action="nav-privacy"
@@ -828,6 +849,45 @@ export function SettingsView(router) {
           devTapCount = 0;
           _toggleDevPanel(container);
         }
+      });
+    }
+
+    // Force update — Graeme: "It's strange that my laptop is full and
+    // latest version, but phone isn't... the Forced Update might need
+    // to cut through those issues." sw.js's fetch handler is cache-
+    // first (checked before building this, not assumed) — a stale
+    // cached file is served immediately, network is never even
+    // consulted, until a new service worker fully takes over. The
+    // existing checkForUpdate()/applyUpdate() in app.js only handle
+    // the polite path (ask the SW registration to check, apply if
+    // waiting) — this button goes further: also clears every cache
+    // directly and hard-reloads regardless of SW state, so it works
+    // even if the SW itself is what's stuck.
+    const forceUpdateBtn = container.querySelector('#settings-force-update-btn');
+    if (forceUpdateBtn) {
+      forceUpdateBtn.addEventListener('click', async () => {
+        const statusEl = container.querySelector('#settings-update-status');
+        forceUpdateBtn.disabled = true;
+        if (statusEl) statusEl.textContent = 'Checking for updates…';
+
+        try {
+          if (window.App?.checkForUpdate) {
+            await window.App.checkForUpdate();
+          }
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+          }
+          if ('serviceWorker' in navigator) {
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (reg) await reg.update();
+          }
+        } catch (err) {
+          console.error('Force update failed:', err);
+        }
+
+        if (statusEl) statusEl.textContent = 'Reloading with the latest version…';
+        setTimeout(() => window.location.reload(), 400);
       });
     }
 

@@ -594,4 +594,19 @@ Graeme: "Now we need to improve the cosmetics of the library page itself." Check
 
 ---
 
+### Force-update button + scroll-position fix
+
+**Force update.** Graeme's laptop was on the latest version while his phone kept showing old, unstyled screens — checked before building anything: `sw.js`'s fetch handler is pure cache-first, so a stale file is served without the network even being consulted until a new service worker fully takes over.
+
+- `js/views/settings.js` v12 → v13 — new "Update app" button in the About panel. Goes further than the existing `checkForUpdate()`/`applyUpdate()` in `app.js` (which only politely asks the current SW registration to check) — this also clears every cache directly and hard-reloads regardless of SW state, so it works even if the SW itself is what's stuck.
+- `css/components/settings.css` v5 → v6.
+
+**Scroll position.** Graeme: "when I'm selecting it stays where I am for continuity." Every state change in Conditions Update (severity, goal, checkbox, fold-in) calls a full `render()`, which was silently resetting scroll to the top each time.
+
+- `js/views/conditions-update.js` v5 → v6 — `window.scrollY` captured and restored around every `render()`.
+- `sw.js` v214 → v215, deployed last.
+- **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
