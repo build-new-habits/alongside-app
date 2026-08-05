@@ -582,4 +582,16 @@ Checked before treating this as a redesign: `library.js`'s own file comment desc
 
 ---
 
+### Rest of the Library page styled
+
+Graeme: "Now we need to improve the cosmetics of the library page itself." Checked every class `library.js` actually uses before touching anything, not just the one screen already fixed.
+
+- **"Start a session"'s category grid and its per-category session sub-screen** had zero CSS anywhere — same bug as the landing screen, just not yet found. `css/layouts/library.css` v1 → v2: added `.library-view` (page padding — the base `.view` class has none of its own, every other view sets it explicitly), `.library-sub-header`, `.library-category-grid`/`-card`/`-icon`/`-label`/`-sub`, `.library-session-grid`/`-card`/`-icon`/`-text`/`-label`/`-note`.
+- **"Log what I did" checked and confirmed already styled** — it reuses `.library-card`/`.library-grid` from `settings-library.css`, genuinely fine as-is. Left untouched rather than re-styled unnecessarily.
+- `js/views/library.js` v1 → v2 — session-card markup restructured slightly (label + note now wrapped in a `.library-session-text` span) so the icon-left/text-stacked-right layout works correctly; the two spans were previously flex siblings with nothing grouping them for that. No behaviour change, markup only.
+- `sw.js` v213 → v214, deployed last.
+- **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

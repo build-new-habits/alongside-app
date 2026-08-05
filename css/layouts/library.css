@@ -1,6 +1,17 @@
 /*
  * css/layouts/library.css
- * 04 Aug 2026 v1
+ * 04 Aug 2026 v2
+ *
+ * v2 — Same bug as v1, wider than first found. Checked every class
+ *   library.js actually uses, not just the landing screen originally
+ *   reported: "Start a session"'s category grid and its per-category
+ *   session sub-screen had zero CSS too. "Log what I did" confirmed
+ *   already styled (reuses .library-card/.library-grid from
+ *   settings-library.css) — left untouched, not re-styled
+ *   unnecessarily. Added .library-view (page padding — previously
+ *   relying on base .view alone, which has no padding of its own),
+ *   .library-sub-header, .library-category-*, .library-session-*.
+ *
  *
  * New file. Real bug found via screenshot, not a design decision: the
  * landing screen's own file comment (library.js) describes "two large
@@ -61,4 +72,148 @@
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
   line-height: var(--leading-relaxed);
+}
+
+/* ── Page container + sub-header (04 Aug 2026, same-day extension) ──────────
+   Same root cause as the landing cards above, wider than first thought —
+   confirmed by checking every class library.js actually uses, not just
+   the one screen originally reported. "Log what I did" turned out to
+   already be styled (it reuses .library-card/.library-grid from
+   settings-library.css) — left untouched, not re-styled unnecessarily.
+   "Start a session" and its category sub-screens had nothing at all. */
+
+.library-view {
+  padding: var(--space-6) var(--space-4) var(--space-8);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.library-sub-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.library-sub-header .btn {
+  padding-left: 0;
+}
+
+.library-sub-header h1 {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+/* ── "Start a session" category grid ─────────────────────────────────── */
+
+.library-category-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.library-category-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.library-category-card:hover,
+.library-category-card:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-bg-elevated);
+}
+
+.library-category-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.library-category-icon {
+  font-size: var(--text-xl);
+  line-height: 1;
+}
+
+.library-category-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.library-category-sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Category sub-screen (session options within a category) ────────────── */
+
+.library-session-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.library-session-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.library-session-card:hover,
+.library-session-card:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-bg-elevated);
+}
+
+.library-session-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.library-session-icon {
+  font-size: var(--text-xl);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.library-session-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.library-session-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.library-session-note {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
 }
