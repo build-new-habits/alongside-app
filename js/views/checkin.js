@@ -1,5 +1,15 @@
 /**
  * js/views/checkin.js
+ * 04 Aug 2026 v11
+ *
+ * v11 — coach-reflection.js fallback retired. Traced (not assumed):
+ *   that four-option "Your Session" picker was reached from exactly
+ *   one place in the app, this file's submit handler, only when no
+ *   pendingDoorRoute was set (i.e. reached via the standalone "Check
+ *   in" link). Its options substantially duplicate what Home's six
+ *   doors already offer directly. Graeme: "I think this page is now
+ *   obsolete?" — confirmed. Falls back to 'today' (Home) instead.
+ *
  * 04 Aug 2026 v10
  *
  * v10 — Completion now honours a pending Home-door destination
@@ -640,15 +650,26 @@ export function CheckinView(router) {
       _saveAll();
       // Fix, 04 Aug 2026: honour a pending Home-door destination if one
       // was set (session-generating doors route through check-in first
-      // now, then continue to where the person actually tapped) —
-      // falls back to the existing coach-reflection default when check-in
-      // was reached some other way (e.g. the standalone "Check in" link).
+      // now, then continue to where the person actually tapped).
+      //
+      // Second fix, same day: the old fallback (coach-reflection.js's
+      // four-option "Your Session" picker) is now confirmed dead weight
+      // for anyone reaching check-in the other way — via the standalone
+      // "Check in" link. Traced it: coach-reflection was reached from
+      // exactly one place in the whole app, this line. Its four options
+      // (Suggest something for me / I have something in mind / My
+      // plans / Noticing) substantially duplicate what Home's six doors
+      // already offer directly now. Graeme: "I think this page is now
+      // obsolete?" — confirmed, not assumed. Falls back to Home instead,
+      // where the real doors live. coach-reflection.js itself left in
+      // place, not deleted — genuinely unreachable now, worth a proper
+      // look before removing the file outright.
       const pending = store.get("pendingDoorRoute");
       if (pending) {
         store.set("pendingDoorRoute", null);
         router.navigate(pending);
       } else {
-        router.navigate("coach-reflection");
+        router.navigate("today");
       }
     });
     document.getElementById("ci-prescribed-btn").addEventListener("click", () => {

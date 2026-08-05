@@ -1,6 +1,23 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v208
+ * Four screenshots, three real fixes and one confirmed-not-guessed
+ * finding. (1) checkin-conversation.css v5→v6: feeling-word chips were
+ * breaking words across 3 lines — converted to a 2-column grid.
+ * (2) js/views/conditions-update.js v3→v4, conditions-update.css
+ * v3→v4: the new "coach recommends" checkbox selection had no visible
+ * selected state — fixed with accent-color plus a row-level
+ * .is-selected style, matching the app's own selection pattern
+ * elsewhere. (3) js/views/checkin.js v10→v11: coach-reflection.js's
+ * four-option "Your Session" picker confirmed (traced, not assumed)
+ * to be unreachable from anywhere except one fallback in this file —
+ * now retired, falls back to Home instead, where the same options
+ * already live as real doors. (4) Logged, not fixed: a full aesthetics
+ * audit is needed for the check-in bottom-sheet panel covering the
+ * coach's message at the top of the screen — flagged as its own
+ * future session, not patched piecemeal.
+ *
  * 04 Aug 2026 v207
  * Four fixes/builds, all from the same conversation. (1) Check-in
  * gating now genuinely optional: today.js v9 only forces check-in the
@@ -557,7 +574,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v207";
+const CACHE_NAME = "alongside-v208";
 
 const SHELL_URLS = [
 
