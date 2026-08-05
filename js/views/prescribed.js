@@ -1,6 +1,15 @@
 /**
  * prescribed.js - Prescribed Exercises View
  *
+ * 04 Aug 2026 v1.3
+ *
+ * v1.3 — "Back to choices" no longer hardcoded to 'intention'. Real
+ *   confusion Graeme flagged: this screen is now most commonly reached
+ *   from Mobility & Conditioning's new landing page, not the old
+ *   intention flow. Both back buttons now go to 'today' (Home) — a
+ *   safe, correct destination regardless of which entry point was
+ *   actually used, rather than guessing at one "true" origin.
+ *
  * 04 Aug 2026 v1.2
  *
  * v1.2 — New entries can now carry a conditionId, read from the new
@@ -444,11 +453,17 @@ export function onMount() {
   }
 
   // ── Back buttons ──────────────────────────────────────────────────────────
+  // Fix, 04 Aug 2026: was hardcoded to 'intention' — confusing, since
+  // this screen is now most commonly reached from Mobility &
+  // Conditioning's landing page, not the old intention flow. 'today'
+  // (Home) is always a safe, correct destination regardless of which
+  // of this screen's several entry points was actually used, rather
+  // than guessing at a single "true" origin.
   document.getElementById("prescribed-back-top")?.addEventListener("click", () => {
-    router.navigate("intention");
+    router.navigate("today");
   });
   document.getElementById("prescribed-back-bottom")?.addEventListener("click", () => {
-    router.navigate("intention");
+    router.navigate("today");
   });
 
   // ── Start session ─────────────────────────────────────────────────────────

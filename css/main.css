@@ -1,7 +1,9 @@
 /* main.css
- * 04 Aug 2026 v13
+ * 04 Aug 2026 v14
  *
- * v13 — Added layouts/library.css for the Library landing screen,
+ * v14 — Added layouts/mobility-conditioning.css for the new Mobility &
+ *   Conditioning landing screen, replacing the today.js routing hack.
+ * 04 Aug 2026 v13 — Added layouts/library.css for the Library landing screen,
  *   which had zero CSS anywhere despite its own file comment
  *   describing "two large cards" — real missing-styles bug, not a
  *   redesign, found via screenshot after Library was promoted to a
@@ -44,6 +46,7 @@
 @import 'layouts/today.css';
 @import 'layouts/conditions-update.css';
 @import 'layouts/library.css';
+@import 'layouts/mobility-conditioning.css';
 /* Components */
 @import 'components/buttons.css';
 @import 'components/cards.css';
