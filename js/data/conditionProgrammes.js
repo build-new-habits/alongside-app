@@ -1,6 +1,35 @@
 /**
  * conditionProgrammes.js - Condition Programme Selection
  *
+ * 04 Aug 2026 v3
+ *
+ * v3 — Real exercise reuse across conditions, not duplication. Graeme
+ *   asked for a recommendation on cross-condition programme
+ *   integration; first draft (tag one exercise to two conditions
+ *   separately) would have created two entries for the same physical
+ *   exercise — completing it under one condition wouldn't mark it
+ *   done under the other, credits would double-count it, it'd show
+ *   up twice in any combined view. Reworked: conditionId (singular)
+ *   replaced with conditionIds (array) on prescribedExercises entries
+ *   — one entry can now genuinely belong to more than one condition.
+ *   New getEntryConditionIds() reads both the new array shape and the
+ *   old singular shape, so existing entries keep working without a
+ *   migration step; rebuilding a programme naturally migrates them.
+ *   commitProgramme() now detects when a candidate exercise already
+ *   has an entry (matched by exerciseId, any condition) and adds this
+ *   condition to its conditionIds instead of creating a duplicate.
+ *   buildCoachProgramme()/buildRecommendedCandidates() both bias
+ *   toward reuse — an exercise already in the programme for another
+ *   condition sorts ahead of a fresh one, before slicing to
+ *   PROGRAMME_SIZE so it can actually make the cut — and annotate
+ *   each candidate with _reuseFrom for the UI to show "Already in
+ *   your X programme" rather than presenting a reused exercise as if
+ *   it just appeared from nowhere. Smoke-tested against real
+ *   overlapping conditions (glutes/hip) before shipping: reuse fired
+ *   correctly, entries correctly ended up serving both conditions
+ *   without duplication, and backward compatibility with an old
+ *   singular-conditionId entry confirmed working, including on rebuild.
+ *
  * 04 Aug 2026 v2
  *
  * v2 — Applies exercisePreferences (store.js v17) — 'avoid' exercises
@@ -40,7 +69,7 @@
 
 import { store } from "../store.js";
 import { EXERCISES } from "./exercises/index.js";
-import { getActiveConditionIds, getPainBand } from "./conditions.js";
+import { getActiveConditionIds, getPainBand, getConditionName } from "./conditions.js";
 
 export const PROGRAMME_SIZE = 8;
 
@@ -88,6 +117,22 @@ function _isLessPreferred(ex, prefs) {
 }
 
 /**
+ * Returns the names of OTHER conditions (not conditionId itself) that
+ * already have this exercise in the saved programme, or null if none.
+ * Used both to bias candidate ordering toward reuse and to let the UI
+ * show "Already in your X programme" rather than presenting a reused
+ * exercise as if it just appeared from nowhere.
+ */
+function _reuseInfo(exerciseId, conditionId) {
+  const existing = store.get("prescribedExercises") || [];
+  const entry = existing.find(e => e.exerciseId === exerciseId);
+  if (!entry) return null;
+  const otherIds = getEntryConditionIds(entry).filter(id => id !== conditionId);
+  if (otherIds.length === 0) return null;
+  return otherIds.map(id => getConditionName(id));
+}
+
+/**
  * "Coach builds it" — automatic selection, biased by the condition's
  * current phase and the person's stated goal (conditionGoals).
  */
@@ -116,6 +161,15 @@ export function buildCoachProgramme(conditionId, goalType) {
     const bLess = _isLessPreferred(b, prefs) ? 1 : 0;
     if (aLess !== bLess) return aLess - bLess;
 
+    // Reuse preference next: exercises already in the programme for
+    // another condition sort ahead of fresh ones — applied here,
+    // before slicing to PROGRAMME_SIZE, so a genuinely reusable
+    // exercise can actually make it into the built programme rather
+    // than only being reordered within a list that already excluded it.
+    const aReuse = _reuseInfo(a.id, conditionId) ? 0 : 1;
+    const bReuse = _reuseInfo(b.id, conditionId) ? 0 : 1;
+    if (aReuse !== bReuse) return aReuse - bReuse;
+
     if (goalType === "improve") {
       // Lean toward more challenging options where safe.
       return (b.difficultyLevel || 1) - (a.difficultyLevel || 1);
@@ -126,7 +180,8 @@ export function buildCoachProgramme(conditionId, goalType) {
     return aRehab(a) - aRehab(b);
   });
 
-  return sorted.slice(0, PROGRAMME_SIZE);
+  const top = sorted.slice(0, PROGRAMME_SIZE);
+  return top.map(ex => ({ ...ex, _reuseFrom: _reuseInfo(ex.id, conditionId) }));
 }
 
 /**
@@ -139,13 +194,21 @@ export function buildRecommendedCandidates(conditionId) {
   const prefs    = store.get("exercisePreferences") || {};
   // Same soft de-prioritisation as buildCoachProgramme() — 'less'
   // exercises still appear (this is a browsing list, not a proactive
-  // suggestion), just sorted toward the end rather than hidden.
+  // suggestion), just sorted toward the end rather than hidden. Reuse
+  // preference next: exercises already in the programme for another
+  // condition sort toward the front, and before slicing so a
+  // genuinely reusable one can actually make the cut.
   const sorted = [...safe].sort((a, b) => {
     const aLess = _isLessPreferred(a, prefs) ? 1 : 0;
     const bLess = _isLessPreferred(b, prefs) ? 1 : 0;
-    return aLess - bLess;
+    if (aLess !== bLess) return aLess - bLess;
+
+    const aReuse = _reuseInfo(a.id, conditionId) ? 0 : 1;
+    const bReuse = _reuseInfo(b.id, conditionId) ? 0 : 1;
+    return aReuse - bReuse;
   });
-  return sorted.slice(0, PROGRAMME_SIZE * 2);
+  const top = sorted.slice(0, PROGRAMME_SIZE * 2);
+  return top.map(ex => ({ ...ex, _reuseFrom: _reuseInfo(ex.id, conditionId) }));
 }
 
 /**
@@ -155,26 +218,83 @@ export function buildRecommendedCandidates(conditionId) {
  * one) — entries for OTHER conditions, and any untagged entries added
  * the original way, are left untouched.
  */
+/**
+ * Returns the array of condition IDs an entry belongs to, handling
+ * both shapes: the new conditionIds array, and the old single
+ * conditionId string from before this file's multi-condition support
+ * (04 Aug 2026) — existing entries are read correctly without a
+ * migration step, not silently orphaned.
+ */
+export function getEntryConditionIds(entry) {
+  if (Array.isArray(entry.conditionIds)) return entry.conditionIds;
+  if (entry.conditionId) return [entry.conditionId];
+  return [];
+}
+
+/**
+ * Writes a set of exercises into prescribedExercises for a condition.
+ *
+ * 04 Aug 2026 — reworked for real exercise reuse across conditions,
+ * not duplication. If a candidate exercise already has an entry
+ * (matched by exerciseId, regardless of which condition it was
+ * originally for), this condition is ADDED to that entry's
+ * conditionIds instead of creating a second, duplicate entry for the
+ * same physical exercise. Without this, doing the same exercise once
+ * wouldn't mark it done under both conditions, credits would double-
+ * count it, and it would show up twice in any combined view — none of
+ * which reflects what actually happened. Only genuinely new exercises
+ * (no existing entry with that exerciseId, across any condition) get
+ * a fresh entry.
+ *
+ * Rebuilding an existing programme for THIS condition (the "Ask the
+ * coach to rebuild this" action) removes conditionId from any of its
+ * old entries — deleting the entry outright only if this was the
+ * only condition it served, otherwise leaving it in place for
+ * whichever other condition still needs it.
+ */
 export function commitProgramme(conditionId, exercises, prescribedBy) {
   const existing = store.get("prescribedExercises") || [];
-  const kept     = existing.filter(e => e.conditionId !== conditionId);
 
-  const newEntries = exercises.map(ex => ({
-    id:             "px-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
-    exerciseId:     ex.id,
-    name:           ex.name,
-    description:    ex.description || "",
-    frequency:      "",
-    active:         true,
-    completedToday: false,
-    completedAt:    null,
-    prescribedAt:   new Date().toISOString(),
-    conditionId,
-    ...(ex.sets    ? { sets: ex.sets }   : {}),
-    ...(ex.reps    ? { reps: ex.reps }   : {}),
-    ...(ex.coaching ? { notes: ex.coaching } : {}),
-    prescribedBy,
-  }));
+  // Detach this condition from its previous entries — delete outright
+  // only if it was the sole condition an entry served.
+  const detached = existing
+    .map(e => {
+      const ids = getEntryConditionIds(e);
+      if (!ids.includes(conditionId)) return e;
+      const remaining = ids.filter(id => id !== conditionId);
+      return remaining.length > 0
+        ? { ...e, conditionIds: remaining, conditionId: undefined }
+        : null;
+    })
+    .filter(Boolean);
 
-  store.set("prescribedExercises", [...kept, ...newEntries]);
+  const result = [...detached];
+
+  exercises.forEach(ex => {
+    const reuse = result.find(e => e.exerciseId && e.exerciseId === ex.id);
+    if (reuse) {
+      const ids = getEntryConditionIds(reuse);
+      if (!ids.includes(conditionId)) reuse.conditionIds = [...ids, conditionId];
+      return;
+    }
+
+    result.push({
+      id:             "px-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+      exerciseId:     ex.id,
+      name:           ex.name,
+      description:    ex.description || "",
+      frequency:      "",
+      active:         true,
+      completedToday: false,
+      completedAt:    null,
+      prescribedAt:   new Date().toISOString(),
+      conditionIds:   [conditionId],
+      ...(ex.sets     ? { sets: ex.sets }      : {}),
+      ...(ex.reps     ? { reps: ex.reps }      : {}),
+      ...(ex.coaching ? { notes: ex.coaching } : {}),
+      prescribedBy,
+    });
+  });
+
+  store.set("prescribedExercises", result);
 }

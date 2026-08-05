@@ -1,6 +1,16 @@
 /**
  * conditions-update.js - Conditions Update
  *
+ * 04 Aug 2026 v7
+ *
+ * v7 — Updated for conditionProgrammes.js v3's multi-condition entries.
+ *   "mine" filter (which exercises show on this condition's card) now
+ *   uses getEntryConditionIds() instead of a direct conditionId
+ *   equality check, so a shared exercise correctly shows on every
+ *   condition's card it belongs to. Candidate rows in "Coach
+ *   recommends" now show "Already in your X programme" when a
+ *   candidate is reused from another condition.
+ *
  * 04 Aug 2026 v6
  *
  * v6 — Scroll position preserved across re-renders. Graeme: "when I'm
@@ -105,7 +115,7 @@
 import { store } from "../store.js";
 import { openSheet } from "./onboarding/sheet-manager.js";
 import { CONDITIONS, getConditionName, getPainBand } from "../data/conditions.js";
-import { buildCoachProgramme, buildRecommendedCandidates, commitProgramme } from "../data/conditionProgrammes.js";
+import { buildCoachProgramme, buildRecommendedCandidates, commitProgramme, getEntryConditionIds } from "../data/conditionProgrammes.js";
 
 export function ConditionsUpdateView(router) {
 
@@ -263,7 +273,7 @@ export function ConditionsUpdateView(router) {
   }
 
   function _renderProgramme(conditionId, name, goal, prescribed, foldIn) {
-    const mine = prescribed.filter(e => e.conditionId === conditionId);
+    const mine = prescribed.filter(e => getEntryConditionIds(e).includes(conditionId));
 
     if (recommendingIds.has(conditionId)) {
       return _renderRecommendSelection(conditionId, name, goal);
@@ -321,6 +331,7 @@ export function ConditionsUpdateView(router) {
                        ${selected.has(ex.id) ? "checked" : ""}>
                 <span class="cu-recommend-item__text">
                   <span class="cu-recommend-item__name">${ex.name}</span>
+                  ${ex._reuseFrom ? `<span class="cu-recommend-item__reuse">Already in your ${ex._reuseFrom.join(", ")} programme</span>` : ""}
                   ${ex.why ? `<span class="cu-recommend-item__why">${ex.why}</span>` : ""}
                 </span>
               </label>

@@ -635,4 +635,21 @@ The most important item from Graeme's earlier feedback batch, prioritised over t
 
 ---
 
+### Cross-condition programme integration — Graeme's recommendation, refined once before building
+
+Graeme asked for a recommendation on whether the coach should reuse exercises across conditions rather than treating each programme in total isolation. First draft (tag one exercise to two conditions as two separate entries) was reconsidered before building: it would have meant completing an exercise once wouldn't mark it done under both conditions, credits would double-count it, and it would show up twice in any combined view — duplication wearing a nicer name, not real reuse.
+
+**What got built instead:** one exercise entry can now genuinely belong to more than one condition.
+
+- `js/data/conditionProgrammes.js` v2 → v3 — `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array). New `getEntryConditionIds()` reads both the new array shape and the old singular shape, so existing entries keep working with no migration step; rebuilding a programme naturally migrates them. `commitProgramme()` now detects when a candidate exercise already has an entry anywhere (matched by `exerciseId`, any condition) and adds the new condition to its `conditionIds` instead of creating a duplicate. `buildCoachProgramme()`/`buildRecommendedCandidates()` both bias toward reuse — an exercise already in the programme for another condition sorts ahead of a fresh one, *before* slicing to `PROGRAMME_SIZE` so it can actually make the cut, not just get reordered within a list that already excluded it — and annotate each candidate with `_reuseFrom` for the UI.
+- `js/views/conditions-update.js` v6 → v7 — per-card "mine" filter and the "Coach recommends" candidate list both updated; candidates now show "Already in your X programme" when reused.
+- `js/views/mobility-conditioning.js` v1 → v2 — the expanded "My Conditions Programme" view now correctly shows a shared exercise under every condition heading it belongs to, not just one.
+- `js/views/prescribed.js` v1.3 → v1.4 — "For:" tag lists every condition an entry serves. Manual "Build my own" additions write the new array shape; no reuse-detection for these specifically (free-text entries have no `exerciseId` to match against — that mechanism only applies to coach-built/recommended entries).
+- `css/layouts/conditions-update.css` v6 → v7, `Documents/Live State/Schema.md` v1.15 → v1.16.
+- **Smoke-tested against real data before shipping, not assumed correct:** simulated two genuinely overlapping conditions (glutes/hip) — 4 exercises correctly ended up shared as single entries rather than duplicated (12 total instead of what would have been 16), and the auto-builder correctly preferred the reused ones first. Backward compatibility also confirmed: an old singular-`conditionId` entry read correctly, and rebuilding migrated it to the new shape without incident.
+- `sw.js` v217 → v218, deployed last.
+- **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
