@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v212
+ * Library added as its own Home door. today.js v10→v11. Real gap
+ * Graeme caught: Mobility & Conditioning's smart-routing to the
+ * condition programme meant Library had no direct path from Home once
+ * a programme existed. No CSS changes needed — grid and "Unsure?"'s
+ * layout both already accommodate the extra tile.
+ *
  * 04 Aug 2026 v211
  * conditions-update.css v5→v6: "Add N to my programme" was
  * overflowing its pill — same white-space:nowrap + flex:1 min-width
@@ -606,7 +613,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v211";
+const CACHE_NAME = "alongside-v212";
 
 const SHELL_URLS = [
 
