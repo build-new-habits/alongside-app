@@ -1,5 +1,15 @@
 /**
  * store.js - Data persistence layer
+ * 04 Aug 2026 v17
+ *
+ * 04 Aug 2026 v17 - New field exercisePreferences + setExercisePreference()
+ *   helper, applying the already-approved alongside_exercise_skip_
+ *   dislike_spec_16may2026_v1.docx to the condition-programme candidate
+ *   list. Binary signal only ('avoid'|'less'), not a rating — per spec
+ *   §6, no stars, no scores. First real consumer: js/data/
+ *   conditionProgrammes.js. The full spec's in-session Skip flow
+ *   (gym-programme.js/prescribed-session.js/core-session.js) remains
+ *   separate, larger future work — not attempted here.
  * 04 Aug 2026 v16
  *
  * 04 Aug 2026 v16 - Two additions, same day as the condition-programme
@@ -377,6 +387,9 @@ export const store = {
       prescribedExercisesActiveCondition: typeof saved.prescribedExercisesActiveCondition === 'string'
         ? saved.prescribedExercisesActiveCondition
         : null,
+      exercisePreferences: (saved.exercisePreferences && typeof saved.exercisePreferences === 'object')
+        ? saved.exercisePreferences
+        : {},
 
       // ── WEEKLY PLAN ───────────────────────────────────────────
       weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
@@ -547,6 +560,7 @@ export const store = {
       // ── PRESCRIBED EXERCISES ORIGIN ───────────────────────────
       prescribedExercisesOrigin: null, // 'professional' | 'self' | null — set once when prescribedExercises first goes empty -> non-empty; see Phase D blueprint v2, decision D-2
       prescribedExercisesActiveCondition: null, // conditionId | null — single-use, set by conditions-update.js's "Build my own" right before navigating to prescribed.js, cleared immediately once read; tags the next-added entry with conditionId
+      exercisePreferences: {}, // { [exerciseId]: { preference: 'avoid'|'less', setAt, source } } — per alongside_exercise_skip_dislike_spec_16may2026_v1.docx. Binary signal, not a rating (spec §6: "not a rating system... no stars, no thumbs, no scores"). First consumer: js/data/conditionProgrammes.js's candidate selection, 04 Aug 2026 — the full spec's in-session Skip flow (gym-programme.js/prescribed-session.js/core-session.js) remains separate future work.
 
       // ── LIFESTYLE ────────────────────────────────────────────
       lifestyle: {
@@ -887,6 +901,21 @@ export const store = {
       goals[conditionId] = { goalType, note, setAt: new Date().toISOString() };
     }
     this.data.conditionGoals = goals;
+    this.save();
+  },
+
+  // Sets or clears a per-exercise preference (04 Aug 2026). Binary
+  // signal per alongside_exercise_skip_dislike_spec_16may2026_v1.docx
+  // — 'avoid' (never suggest again) or 'less' (offer less often), not
+  // a rating. preference=null clears it (reversible, per spec §2.2).
+  setExercisePreference(exerciseId, preference, source = 'user') {
+    const prefs = { ...(this.data.exercisePreferences || {}) };
+    if (!preference) {
+      delete prefs[exerciseId];
+    } else {
+      prefs[exerciseId] = { preference, setAt: new Date().toISOString(), source };
+    }
+    this.data.exercisePreferences = prefs;
     this.save();
   },
 
