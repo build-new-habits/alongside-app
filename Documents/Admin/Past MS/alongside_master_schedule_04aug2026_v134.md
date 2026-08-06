@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 04 Aug 2026 v135
+## 04 Aug 2026 v134
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_04aug2026_v134.md`. Remove v134 on upload.
+Supersedes `alongside_master_schedule_04aug2026_v133.md`. Remove v133 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** New brief — `alongside_brief_comms-email-taster-codes_04aug2026_v1.md` — covering COMMS-1 through COMMS-5 (email framework, welcome pack, templates, data-personalisation mapping) plus new scope: social media content about taster codes, which wasn't in the original task list. **Important open item this surfaced:** the taster code system is fully specified at the business level (`alongside_pricing_model_20jun2026_v2.docx`, `alongside_beta_engagement_strategy_20jun2026_v1.docx`) but has **no technical implementation at all** — checked directly, the Supabase schema design only mentions "org-code cohort activity" once, in passing, never actually designed. This needs its own scoping before it can be built — see the new dashboard row.
+**This version's substantive changes:** New blueprint — `alongside_blueprint_design-consistency-audit_04aug2026_v1.md`. Scoped, not run — Graeme wants it as a proper session for later, not executed now. A quick structural pre-check first: spot-checked the two newest screens (Conditions Update, Mobility & Conditioning) for the missing-CSS pattern that's bitten repeatedly this week — both clean, both properly wired into `main.css`, both using the shared `--space-*` tokens and `.btn` classes rather than ad-hoc values. So this is genuinely a "does it feel coherent" pass, not a bug hunt in disguise. Blueprint is split into two explicit halves since they need different people: a structural consistency check any build chat can do from code, and a screenshot-based visual review that genuinely needs Graeme's own judgement — the blueprint gives a specific 3-question checklist for that half rather than open-ended "thoughts," to keep the answers usable.
 
 **Process note, fixed this version:** the last several version bumps (v96–v98) stacked a new "substantive changes" paragraph on top of the previous one each time, rather than replacing it. Condensed below into a single recent-history list. Going forward, this header should carry **only the current version's changes**, one paragraph — anything needed for continuity belongs in the dashboard or a dedicated section, not a growing stack of old summaries at the top.
 
@@ -321,8 +321,6 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 
 | Stream | Current position | Immediate next action | Blocker? |
 |--------|-----------------|----------------------|----------|
-| Product — Taster code redemption system — no technical implementation exists | 🔴 **New, 04 Aug.** Fully specified at business level (per-org codes, 1-month unlock, reversion prompt, redemption tracking for "five in the pound" decisions), but confirmed no technical design exists — the Supabase schema design only mentions it once, in passing. A pure client-side/localStorage implementation would be trivially bypassable (shareable/reusable codes, no way to enforce once-per-user redemption) — this genuinely needs server-side validation, i.e. depends on Supabase being live. | Needs its own scoping session, ideally as an explicit addition to the Supabase schema design rather than bolted on after. | Blocked on Supabase migration (which is itself blocked on BIZ-1/DPA). Not urgent yet — taster codes aren't needed until Nov 2026 per the beta strategy timeline — but shouldn't be assumed "just needs a code field," it's a real subsystem. |
-| Comms — Email systems, welcome pack, taster code comms | 🟢 **Brief ready, 04 Aug** (`alongside_brief_comms-email-taster-codes_04aug2026_v1.md`). Covers COMMS-1 through COMMS-5 plus new social media scope. Flags the Journal Privacy Rule constraint on COMMS-4 explicitly, and reuses already-drafted reversion-prompt copy rather than having it rewritten. | Run as a dedicated content/comms session — needs Graeme's own voice for the founder message and video, not something to fully delegate. | Social media scope (platforms, timing vs. outreach) needs a decision before drafting starts — flagged in the brief itself. |
 | Product — Home Navigation & Conditions redesign (spec) | 🟢 **Spec v2 complete, 04 Aug.** Superseded as an open item by the blueprint row below — see that row for current status. | — | — |
 | Outreach — BANDS CIC meeting (Alfie + members) | 🟢 **New, 03 Aug.** First real response of 4 Tier 1 org emails sent. Real potential: follow-on meetings across Frome, Bath, Weston, Trowbridge if this goes well. | **Get a confirmed date from Graeme** — currently untracked without one. Prep a meeting brief once date's known, same pattern as the Alex meeting brief. | Meeting date unknown. |
 | Outreach — Canopy PT connection (neurodivergent clients) | 🟡 **New, 03 Aug.** Warm connection via the separate Canopy sub-project, not the direct outreach list. Interested in "supporting" — form unclear. | Conversation needed to understand what's actually being offered before this can be scoped. | Nature of support unclarified. |
@@ -429,4 +427,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 04 Aug 2026 v135*
+*Build New Habits · Alongside: Move · Master Schedule · 04 Aug 2026 v134*
