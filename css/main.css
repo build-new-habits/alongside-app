@@ -1,7 +1,15 @@
 /* main.css
- * 04 Aug 2026 v14
+ * 04 Aug 2026 v15
  *
- * v14 — Added layouts/mobility-conditioning.css for the new Mobility &
+ * v15 — base/variables.css: added the missing --color-bg-elevated token
+ *   definition. Confirmed referenced 46+ times across 14 files with no
+ *   definition anywhere — every "elevated surface" app-wide (nested
+ *   cards in Settings, Conditions Update, Mobility & Conditioning,
+ *   Today's hover states, Progress, Library, journal entries,
+ *   onboarding, gym-programme) was rendering with no background at
+ *   all. Found during the Design Consistency Audit's Half A pass.
+ *   Full detail: alongside_design-audit-half-a-findings_04aug2026_v1.md.
+ * 04 Aug 2026 v14 — Added layouts/mobility-conditioning.css for the new Mobility &
  *   Conditioning landing screen, replacing the today.js routing hack.
  * 04 Aug 2026 v13 — Added layouts/library.css for the Library landing screen,
  *   which had zero CSS anywhere despite its own file comment
