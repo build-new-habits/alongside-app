@@ -1,6 +1,25 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Aug 2026 v220
+ * Design Consistency Audit, Half A (structural pass, run solo while
+ * Graeme was at the gym). Found and fixed: --color-bg-elevated was
+ * referenced 46+ times across 14 CSS files with no definition anywhere
+ * - every "elevated surface" app-wide (nested cards in Settings,
+ * Conditions Update, Mobility & Conditioning, Today, Progress, Library,
+ * journal entries, onboarding, gym-programme) was rendering with no
+ * background at all. Added to base/variables.css, matched to
+ * --color-bg-hover's tier based on a real usage site's confirmed role
+ * (hover feedback), not invented arbitrarily. main.css v14->v15. Also
+ * confirmed, not fixed (architectural/design decision, not a solo
+ * call): five-plus screens each reinvent their own "card" component
+ * from scratch rather than sharing one base - no visible bug today,
+ * flagged for a real consolidation conversation. Half B (screenshot
+ * review) not yet started - needs Graeme, and should happen after this
+ * fix since several screens now look different than when the audit was
+ * scoped this morning. Full findings:
+ * alongside_design-audit-half-a-findings_04aug2026_v1.md.
+ *
  * 04 Aug 2026 v219
  * dead-bug/bird-dog contraindications discrepancy resolved — Graeme's
  * content decision. Dead Bug's empty exclusions and Bird Dog's lower-
@@ -694,7 +713,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v219";
+const CACHE_NAME = "alongside-v220";
 
 const SHELL_URLS = [
 

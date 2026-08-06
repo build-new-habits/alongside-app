@@ -11,6 +11,16 @@
   --color-bg: #1E293B;            /* Primary background */
   --color-bg-card: #334155;       /* Cards, elevated surfaces */
   --color-bg-hover: #3E4C63;      /* Hover states on cards */
+  --color-bg-elevated: #3E4C63;   /* 04 Aug 2026 - was undefined, referenced 46+ times
+                                      across 14 files with no fallback (confirmed via
+                                      grep, not assumed) - meant every "elevated"
+                                      surface app-wide was rendering with no background
+                                      at all. Matched to --color-bg-hover's tier since
+                                      the clearest real usage found (today.css settings
+                                      link) uses it as hover feedback - same visual
+                                      role. Kept as its own token, not an alias, so it
+                                      can be differentiated later if a genuine distinct
+                                      "elevated, not hover" surface is ever needed. */
   
   /* Text */
   --color-text: #E2E8F0;          /* Primary text - off-white     contrast: 11.87 on BG, 8.40 on BG_CARD */

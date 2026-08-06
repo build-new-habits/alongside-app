@@ -666,4 +666,17 @@ Flagged during Phase B pool consolidation, resolved now — Graeme's call, with 
 
 ---
 
+### Design Consistency Audit — Half A (structural pass)
+
+Run solo while Graeme was at the gym, per the blueprint's own split (Half A is code-checkable, Half B needs his screenshots).
+
+- **Real bug found and fixed:** `--color-bg-elevated` was referenced 46+ times across 14 CSS files with no definition anywhere in the codebase — confirmed exhaustively, not assumed. Every "elevated surface" app-wide (nested cards in Settings, Conditions Update, Mobility & Conditioning, Today's hover states, Progress, Library, journal entries, onboarding, `gym-programme.js`) was rendering with no background at all.
+- Added `--color-bg-elevated: #3E4C63` to `base/variables.css`, matched to `--color-bg-hover`'s tier based on a real usage site's confirmed role, not picked arbitrarily.
+- `main.css` v14 → v15, `sw.js` v219 → v220.
+- Confirmed, not fixed: five-plus screens (`mobility-conditioning.js`, `conditions-update.js`, `coach-proposal.js`, `today.js`, `library.js`) each reinvent their own "card" component from scratch rather than sharing one base. No visible bug from this today, but it's exactly the kind of drift that produced the bug above — flagged as a real consolidation candidate, not a solo call to make.
+- Full findings: `alongside_design-audit-half-a-findings_04aug2026_v1.md`.
+- **Half B (screenshot review) not started — needs Graeme.** Should happen after this fix, not against a mental image from before it — several screens now look different than they did this morning.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
