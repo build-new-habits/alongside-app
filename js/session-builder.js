@@ -1,6 +1,33 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 05 Aug 2026 v2
+ *
+ * v2 -- Gym Session Builder Phase 1 (blueprint
+ *   alongside_blueprint_gym-session-builder-phase1_05aug2026_v2.md).
+ *   Three additions, all built to reuse selectFromCategories()'s
+ *   existing filtering (equipment, contraindications) rather than
+ *   duplicating it:
+ *   1. ALLOCATION_PRESETS -- proportional session control (Graeme:
+ *      "how much of my gym session I spent doing the different
+ *      elements"). Scales EXERCISE_COUNT per preset, with a hard
+ *      floor of 1 on warmup no matter what -- the safety rule (never
+ *      skip a warmup) holds structurally, not just by convention.
+ *   2. buildCandidatePools() -- exposes the filtered-candidate step
+ *      selectFromCategories() already did internally, now callable on
+ *      its own, wider than the auto-pick count, each item flagged
+ *      recommended:true/false so the UI can pre-check a sensible
+ *      starting selection for "coach recommends" mode while "build
+ *      your own" shows the identical list unchecked -- one function,
+ *      two presentations, not two implementations.
+ *   3. buildSessionFromSelection() -- takes exercise IDs a person
+ *      actually chose and assembles the same session shape
+ *      buildSession() produces, so gym-programme.js renders either
+ *      one identically. Same hard warmup floor as above: if a chosen
+ *      selection ends up with zero warmup exercises, one is added
+ *      automatically rather than allowing a genuinely warmup-free
+ *      session to ship.
+ *
  * 21 May 2026 v1
  *
  * Builds a bespoke gym session from four inputs:
@@ -21,6 +48,24 @@
 
 import { store } from "./store.js";
 
+// ── Allocation presets (05 Aug 2026) ──────────────────────────────────────────
+// Scales EXERCISE_COUNT's warmup/main/cooldown split. Warmup always floors at
+// 1 regardless of preset -- this is the safety rule, not a suggestion.
+export const ALLOCATION_PRESETS = [
+  { id: "balanced", label: "Balanced",        description: "The standard mix.",                     warmupMult: 1,   mainMult: 1,   cooldownMult: 1   },
+  { id: "strength", label: "Mostly strength",  description: "Less warm-up and stretching, more work.", warmupMult: 0.6, mainMult: 1.3, cooldownMult: 0.7 },
+  { id: "mobility", label: "Mostly mobility",  description: "More warm-up and stretching, less load.", warmupMult: 1.5, mainMult: 0.7, cooldownMult: 1.4 }
+];
+
+function _applyPreset(counts, presetId) {
+  const preset = ALLOCATION_PRESETS.find(p => p.id === presetId) || ALLOCATION_PRESETS[0];
+  return {
+    warmup:   Math.max(1, Math.round(counts.warmup   * preset.warmupMult)),
+    main:     Math.max(1, Math.round(counts.main     * preset.mainMult)),
+    cooldown: Math.max(1, Math.round(counts.cooldown * preset.cooldownMult))
+  };
+}
+
 // ── Session type definitions ──────────────────────────────────────────────────
 
 export const SESSION_TYPES = [
@@ -29,7 +74,7 @@ export const SESSION_TYPES = [
     label:       "Glute Focus",
     icon:        "🍑",
     description: "Hip hinge, bridges, single-leg work. Built around glute activation.",
-    warmupCategories:   ["activation", "hip-mobility"],
+    warmupCategories:   ["activation", "hip-mobility", "cardio-warmup"],
     mainCategories:     ["hip-hinge", "bridge", "single-leg", "glute-isolation"],
     cooldownCategories: ["hip-flexor-stretch", "glute-stretch", "child-pose"]
   },
@@ -38,7 +83,7 @@ export const SESSION_TYPES = [
     label:       "Upper Body",
     icon:        "💪",
     description: "Push and pull. Shoulder, chest, back, arms.",
-    warmupCategories:   ["thoracic-mobility", "shoulder-warmup", "band-warmup"],
+    warmupCategories:   ["thoracic-mobility", "shoulder-warmup", "band-warmup", "cardio-warmup"],
     mainCategories:     ["horizontal-pull", "horizontal-push", "vertical-pull", "shoulder-isolation"],
     cooldownCategories: ["chest-stretch", "lat-stretch", "thread-needle"]
   },
@@ -47,7 +92,7 @@ export const SESSION_TYPES = [
     label:       "Lower Body",
     icon:        "🦵",
     description: "Squat, hinge, single-leg. Quads, hamstrings, glutes.",
-    warmupCategories:   ["activation", "hip-mobility", "ankle-mobility"],
+    warmupCategories:   ["activation", "hip-mobility", "ankle-mobility", "cardio-warmup"],
     mainCategories:     ["squat-pattern", "hip-hinge", "single-leg", "leg-isolation"],
     cooldownCategories: ["hip-flexor-stretch", "hamstring-stretch", "figure-4"]
   },
@@ -56,7 +101,7 @@ export const SESSION_TYPES = [
     label:       "Full Body",
     icon:        "⚡",
     description: "Push, pull, squat, hinge. Every major pattern in one session.",
-    warmupCategories:   ["activation", "hip-mobility", "thoracic-mobility"],
+    warmupCategories:   ["activation", "hip-mobility", "thoracic-mobility", "cardio-warmup"],
     mainCategories:     ["squat-pattern", "hip-hinge", "horizontal-pull", "horizontal-push", "core-stability"],
     cooldownCategories: ["hip-flexor-stretch", "chest-stretch", "child-pose"]
   },
@@ -95,6 +140,37 @@ export const SESSION_TYPES = [
 //                  duration?, equipment[], contraindications[], difficultyLevel }
 
 const EXERCISE_POOL = [
+
+  // CARDIO WARMUP (05 Aug 2026) — real content for the gap Graeme flagged:
+  // no cardio-machine warmup option existed anywhere in a gym session.
+  // Deliberately gentle/low-intensity — this is a warmup, not the workout.
+  { id: "sb-cwu-01", name: "Stationary bike, easy spin", section: "warmup", category: "cardio-warmup",
+    sets: 1, tempo: "Easy, conversational pace", rest: "0s", difficultyLevel: 1, duration: 300,
+    description: "5 minutes on a stationary bike at an easy, conversational pace — enough to raise your heart rate and warm the joints, not to tire you out before the real work.",
+    cues: ["You should be able to talk normally", "Light resistance — this is a warmup, not the session", "Focus on smooth, even pedalling"],
+    youtube: "stationary bike warm up before weights",
+    equipment: ["bike"], contraindications: ["knee-acute"] },
+
+  { id: "sb-cwu-02", name: "Treadmill, easy walk", section: "warmup", category: "cardio-warmup",
+    sets: 1, tempo: "Brisk walk", rest: "0s", difficultyLevel: 1, duration: 300,
+    description: "5 minutes walking at a brisk but comfortable pace, flat or a slight incline — gets blood moving to the legs and hips before loading them.",
+    cues: ["Brisk, not a jog", "Arms swinging naturally", "Good posture, not hunched over the console"],
+    youtube: "treadmill walk warm up before gym",
+    equipment: ["treadmill"], contraindications: [] },
+
+  { id: "sb-cwu-03", name: "Cross trainer, easy pace", section: "warmup", category: "cardio-warmup",
+    sets: 1, tempo: "Easy, full range", rest: "0s", difficultyLevel: 1, duration: 300,
+    description: "5 minutes on the cross trainer at an easy pace, using the full range of motion — low-impact, warms the whole body including the arms.",
+    cues: ["Full, smooth range of motion, not short choppy steps", "Light resistance", "Let the handles move naturally with your stride"],
+    youtube: "cross trainer elliptical warm up",
+    equipment: ["cross-trainer"], contraindications: ["shoulder-acute"] },
+
+  { id: "sb-cwu-04", name: "Rowing machine, easy pace", section: "warmup", category: "cardio-warmup",
+    sets: 1, tempo: "Easy, technique-focused", rest: "0s", difficultyLevel: 1, duration: 240,
+    description: "4 minutes of easy rowing, focused on technique rather than pace — legs push, then lean back, then pull. Warms the whole posterior chain.",
+    cues: ["Legs drive first, arms pull last", "Don't rush the return", "Light resistance, focus on form"],
+    youtube: "rowing machine technique warm up",
+    equipment: ["rowing-machine"], contraindications: ["lower-back-acute", "shoulder-acute"] },
 
   // ACTIVATION
   { id: "sb-act-01", name: "Glute bridge", section: "warmup", category: "activation",
@@ -637,16 +713,156 @@ function buildConditionNote(sessionType) {
   return note || null;
 }
 
-// ── Main build function ───────────────────────────────────────────────────────
+// ── Candidate filtering (05 Aug 2026) ─────────────────────────────────────────
+// Extracted from what was previously selectFromCategories()'s inline logic so
+// buildCandidatePools() can reuse the exact same equipment/contraindication
+// rules without duplicating them -- one filter, two callers.
+function _filterCandidates(categories, section, equipSet, conditionSet) {
+  return EXERCISE_POOL.filter(ex => {
+    if (ex.section !== section) return false;
+    if (!categories.includes(ex.category)) return false;
+    // Equipment check: exercise needs no equipment, or user has it
+    if (ex.equipment && ex.equipment.length > 0) {
+      if (!ex.equipment.every(e => equipSet.has(e))) return false;
+    }
+    // Condition check — only filter on acute/subacute pain levels.
+    // Base condition IDs (no suffix) do not filter exercises — the user
+    // has a condition but may have no pain today. Only pain score >= 4
+    // (subacute) or >= 7 (acute) triggers exercise exclusion.
+    if (ex.contraindications && ex.contraindications.length > 0) {
+      const acuteContraindicated = ex.contraindications.some(c =>
+        (c.endsWith("-acute") || c.endsWith("-subacute")) && conditionSet.has(c)
+      );
+      if (acuteContraindicated) return false;
+    }
+    return true;
+  });
+}
 
-export function buildSession({ sessionType, durationMins, equipmentOverride }) {
+/**
+ * Wider-than-auto-pick candidate lists per section, for "coach
+ * recommends" / "build your own" modes. Each candidate carries
+ * recommended:true for the same picks buildSession()'s auto-select
+ * would have chosen (one per category first, deterministic order —
+ * not the same random pick every call, but a sensible, stable
+ * starting selection for the UI to pre-check), recommended:false for
+ * the rest of the wider pool. "Coach recommends" pre-checks the
+ * recommended:true items; "build your own" shows the identical list
+ * with nothing pre-checked — one function, two presentations.
+ */
+export function buildCandidatePools({ sessionType, durationMins, equipmentOverride, preset }) {
+  const type = SESSION_TYPES.find(t => t.id === sessionType);
+  if (!type) return null;
+
+  const userEquipment = equipmentOverride || store.get("equipment") || [];
+  const equipSet       = new Set(userEquipment);
+  const conditionSet   = buildActiveConditionSet();
+  const baseCounts     = EXERCISE_COUNT[durationMins] || EXERCISE_COUNT[30];
+  const counts         = _applyPreset(baseCounts, preset);
+
+  function poolFor(categories, section, count) {
+    const candidates = _filterCandidates(categories, section, equipSet, conditionSet);
+    const recommendedIds = new Set();
+    for (const cat of categories) {
+      if (recommendedIds.size >= count) break;
+      const fromCat = candidates.find(e => e.category === cat && !recommendedIds.has(e.id));
+      if (fromCat) recommendedIds.add(fromCat.id);
+    }
+    // Fill remaining recommended slots deterministically (first match),
+    // not randomly — a candidate list should be stable if shown twice.
+    for (const ex of candidates) {
+      if (recommendedIds.size >= count) break;
+      recommendedIds.add(ex.id);
+    }
+    return candidates.map(ex => ({ ...ex, recommended: recommendedIds.has(ex.id) }));
+  }
+
+  return {
+    warmup:   poolFor(type.warmupCategories,   "warmup",   counts.warmup),
+    main:     poolFor(type.mainCategories,     "main",     counts.main),
+    cooldown: poolFor(type.cooldownCategories, "cooldown", counts.cooldown)
+  };
+}
+
+/**
+ * Assembles a session from exercise IDs a person actually chose (from
+ * buildCandidatePools()'s lists), in the same shape buildSession()
+ * produces, so gym-programme.js renders either identically. Hard
+ * safety floor: if the chosen warmup selection is empty, one warmup
+ * exercise is added automatically — the safety rule (never skip a
+ * warmup) holds even in "build your own" mode, it isn't optional.
+ */
+export function buildSessionFromSelection({ sessionType, durationMins, selectedIds, equipmentOverride }) {
+  const type = SESSION_TYPES.find(t => t.id === sessionType);
+  if (!type) return null;
+
+  const userEquipment = equipmentOverride || store.get("equipment") || [];
+  const equipSet       = new Set(userEquipment);
+  const conditionSet   = buildActiveConditionSet();
+  const idSet          = new Set(selectedIds || []);
+
+  function chosenFrom(categories, section) {
+    return _filterCandidates(categories, section, equipSet, conditionSet)
+      .filter(ex => idSet.has(ex.id));
+  }
+
+  let warmupExercises   = chosenFrom(type.warmupCategories,   "warmup");
+  const mainExercises     = chosenFrom(type.mainCategories,     "main");
+  const cooldownExercises = chosenFrom(type.cooldownCategories, "cooldown");
+
+  // Safety floor — never ship a session with zero warmup, regardless
+  // of what was (or wasn't) selected.
+  if (warmupExercises.length === 0) {
+    const fallback = _filterCandidates(type.warmupCategories, "warmup", equipSet, conditionSet)[0];
+    if (fallback) warmupExercises = [fallback];
+  }
+
+  const prescribed = (store.get("prescribedExercises") || [])
+    .filter(ex => ex.active !== false)
+    .map(ex => ({
+      id: ex.id, name: ex.name, section: "main", category: "prescribed",
+      sets: ex.sets || 3, reps: ex.reps || ex.hold || "As prescribed",
+      tempo: "As prescribed", rest: "As needed",
+      description: ex.description || ex.notes || "As prescribed by your specialist.",
+      cues: ex.notes ? [ex.notes] : ["Follow your specialist's guidance for this exercise"],
+      youtube: null, equipment: [], contraindications: [], difficultyLevel: 1,
+      isPrescribed: true, prescribedBy: ex.prescribedBy || null
+    }));
+
+  const allExercises = [...warmupExercises, ...prescribed, ...mainExercises, ...cooldownExercises];
+  const estMins = Math.round(allExercises.reduce((acc, ex) => {
+    const sets = ex.sets || 3;
+    const dur  = ex.duration ? (ex.duration * sets / 60) : (sets * 1.5);
+    return acc + dur;
+  }, 0));
+  const durationStr = `${Math.max(estMins - 5, durationMins - 5)}–${Math.max(estMins + 5, durationMins + 5)} mins`;
+
+  const session = {
+    id:       `${sessionType}-${Date.now()}`,
+    title:    type.label,
+    subtitle: `Built by you today — ${durationMins} mins`,
+    duration: durationStr,
+    coachLine: "You picked this one yourself — here's what you chose.",
+    exercises: allExercises
+  };
+
+  store.set("generatedSession", {
+    session,
+    builtAt: new Date().toISOString(),
+    inputs:  { sessionType, durationMins, equipment: userEquipment, selectedIds: Array.from(idSet) }
+  });
+
+  return session;
+}
+
+export function buildSession({ sessionType, durationMins, equipmentOverride, preset }) {
   const type = SESSION_TYPES.find(t => t.id === sessionType);
   if (!type) return null;
 
   const userEquipment  = equipmentOverride || store.get("equipment") || [];
   const equipSet       = new Set(userEquipment);
   const conditionSet   = buildActiveConditionSet();
-  const counts         = EXERCISE_COUNT[durationMins] || EXERCISE_COUNT[30];
+  const counts         = _applyPreset(EXERCISE_COUNT[durationMins] || EXERCISE_COUNT[30], preset);
   const conditionNote  = buildConditionNote(sessionType);
 
   // ── Prescribed exercises injection ──────────────────────────────────────────
@@ -679,25 +895,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride }) {
   const hasPrescribed = prescribed.length > 0;
 
   function selectFromCategories(categories, section, count) {
-    const candidates = EXERCISE_POOL.filter(ex => {
-      if (ex.section !== section) return false;
-      if (!categories.includes(ex.category)) return false;
-      // Equipment check: exercise needs no equipment, or user has it
-      if (ex.equipment && ex.equipment.length > 0) {
-        if (!ex.equipment.every(e => equipSet.has(e))) return false;
-      }
-      // Condition check — only filter on acute/subacute pain levels.
-      // Base condition IDs (no suffix) do not filter exercises — the user
-      // has a condition but may have no pain today. Only pain score >= 4
-      // (subacute) or >= 7 (acute) triggers exercise exclusion.
-      if (ex.contraindications && ex.contraindications.length > 0) {
-        const acuteContraindicated = ex.contraindications.some(c =>
-          (c.endsWith("-acute") || c.endsWith("-subacute")) && conditionSet.has(c)
-        );
-        if (acuteContraindicated) return false;
-      }
-      return true;
-    });
+    const candidates = _filterCandidates(categories, section, equipSet, conditionSet);
 
     // Prioritise variety across categories — one from each category first
     const selected = [];
