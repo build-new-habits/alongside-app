@@ -1,6 +1,57 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 05 Aug 2026 v221
+ * Gym Session Builder Phase 1 (blueprint alongside_blueprint_gym-
+ * session-builder-phase1_05aug2026_v2.md), run end to end. Root cause:
+ * Library's "At the gym" Core/Upper body/Lower body/Strength cards were
+ * confirmed non-functional duplicates -- all navigated to gym-programme
+ * with no parameter, and gym-programme.js had no way to receive one.
+ * Fixed by routing into the already-working session-builder.js system
+ * instead, with Graeme's fuller vision built on top: allocation presets
+ * (Balanced/Mostly strength/Mostly mobility, warmup always floors at 1
+ * regardless), a location step ("home or gym today", asked once a
+ * session type is picked, defaults home, never sticky), and a three-
+ * route build-mode step (Coach builds it / Coach recommends, I'll
+ * choose / Build my own) mirroring conditionProgrammes.js's
+ * architecture, not its persistent-storage model. Also built: real
+ * cardio-warmup content (bike/treadmill/cross-trainer/rowing machine),
+ * genuinely missing before -- equipment options existed nowhere for
+ * this, now do, wired into Upper/Lower/Full/Glute's warmup categories.
+ * "Strength" retired from Library (never mapped to a real SESSION_TYPES
+ * id) in favour of "Glute Focus" (already existed in the engine, never
+ * surfaced). Settings' Equipment panel now shows a saved-equipment
+ * summary instead of a bare button.
+ *
+ * session-builder.js v1->v2, session-builder-ui.js v3->v4, library.js
+ * v2->v3, settings.js v13->v14.
+ *
+ * Real bug caught during testing, not shipped: an earlier edit adding
+ * cardio-warmup to Glute Focus's warmup categories accidentally deleted
+ * its entire mainCategories line in the same str_replace (old_str
+ * included it for match-uniqueness, new_str dropped it). Found by a
+ * real smoke test exercising all 7 session types, not by inspection --
+ * fixed before commit, confirmed via re-test afterward. All 7 types
+ * (including glute) now build correctly with no crashes, and the
+ * warmup safety floor confirmed firing correctly even with zero warmup
+ * exercises selected.
+ *
+ * Found, not fixed -- pre-existing content gap: lower-body main
+ * exercises (squat-pattern/hip-hinge/single-leg/leg-isolation
+ * categories) have no bodyweight-only options in the existing pool --
+ * confirmed via direct count, every tagged exercise requires equipment.
+ * A user with no equipment selecting Lower Body gets 0 main exercises.
+ * Pre-existing, not introduced by this session -- logged, not guessed
+ * at with new content.
+ *
+ * Not yet on-device confirmed -- no device available this session.
+
+Also found and fixed while touching sw.js: js/session-builder.js and
+js/views/session-builder-ui.js were never in SHELL_URLS' precache list
+at all, despite existing since 21 May -- pre-existing gap, more
+consequential now this feature is reachable directly from Library
+rather than only a buried bypass door. Added both.
+ *
  * 04 Aug 2026 v220
  * Design Consistency Audit, Half A (structural pass, run solo while
  * Graeme was at the gym). Found and fixed: --color-bg-elevated was
@@ -713,7 +764,7 @@
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v220";
+const CACHE_NAME = "alongside-v221";
 
 const SHELL_URLS = [
 
@@ -775,6 +826,8 @@ const SHELL_URLS = [
   "/alongside-app/js/views/privacy.js",
   "/alongside-app/js/views/onboarding/goal-setup.js",
   "/alongside-app/js/views/library.js",
+  "/alongside-app/js/session-builder.js",
+  "/alongside-app/js/views/session-builder-ui.js",
   "/alongside-app/js/views/noticing.js",
   "/alongside-app/js/views/journal-entry.js",
   "/alongside-app/js/views/gym-programme.js",

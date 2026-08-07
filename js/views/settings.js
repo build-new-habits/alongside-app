@@ -1,5 +1,14 @@
 /**
  * settings.js
+ * 05 Aug 2026 v14
+ *
+ * v14 — Equipment panel now shows a saved-equipment summary (Home: N
+ *   items / Gym: N items), split by scope. Previously just a bare
+ *   "Edit equipment" button with no way to glance at what was saved.
+ *   Found while investigating the gym-session location bug (05 Aug) --
+ *   directly useful for confirming onboarding wasn't rushed through
+ *   without redoing the whole edit flow.
+ *
  * 04 Aug 2026 v13
  *
  * v13 — New "Update app" button in the About panel. Graeme: laptop was
@@ -607,13 +616,34 @@ export function SettingsView(router) {
 
   // ── Equipment panel ────────────────────────────────────────────────────────
 
+  // 05 Aug 2026 -- summary of what's actually saved, split by scope. Found
+  // while investigating the gym-session location bug: this panel showed
+  // nothing but a bare "Edit equipment" button, no way to glance at what
+  // was saved without stepping through the whole edit flow again. Small,
+  // low-risk, directly useful for verifying onboarding wasn't rushed
+  // through without redoing it.
+  function _equipmentSummaryLine(scope, list) {
+    if (!list || list.length === 0) {
+      return `<p class="text-sm text-muted">${scope}: nothing saved &mdash; bodyweight only</p>`;
+    }
+    const label = list.length === 1 ? "1 item" : `${list.length} items`;
+    return `<p class="text-sm text-muted">${scope}: ${label} saved</p>`;
+  }
+
   function renderEquipmentPanel() {
+    const homeEquip = store.get('homeEquipment') || [];
+    const gymEquip   = store.get('gymEquipment')  || [];
+
     return `
       <div class="settings-section">
         <h2 class="settings-section__heading">Equipment</h2>
         <p class="settings-section__sub">
           The coach only suggests exercises that match what you have available.
         </p>
+        <div style="margin-bottom: var(--space-3);">
+          ${_equipmentSummaryLine("Home", homeEquip)}
+          ${_equipmentSummaryLine("Gym", gymEquip)}
+        </div>
         <button class="btn btn-primary"
                 data-action="edit-equipment"
                 aria-label="Edit your equipment">
