@@ -679,4 +679,26 @@ Run solo while Graeme was at the gym, per the blueprint's own split (Half A is c
 
 ---
 
+### Gym Session Builder — Phase 1
+
+Full blueprint run: `alongside_blueprint_gym-session-builder-phase1_05aug2026_v2.md`. Root cause confirmed 04 Aug: Library's "At the gym" Core/Upper body/Lower body/Strength cards all navigated to `gym-programme` with no parameter, and `gym-programme.js` had no way to receive one — all four produced the identical result regardless of which was tapped.
+
+- **Fix:** these now route into `session-builder.js`/`session-builder-ui.js` instead — the already-working generative engine — with the matching type pre-selected via `sessionBuilderPreselect` (read once, cleared, same pattern as `running-session.js`'s resume checkpoint).
+- **Allocation presets** — Balanced / Mostly strength / Mostly mobility, scaling the warmup/main/cooldown split. Warmup floors at 1 exercise regardless of preset — the safety rule holds structurally, not by convention.
+- **Location step** — "Just one more thing — where are you for this?", shown once a session type is picked, not tied to check-in. Defaults home, never sticky, one tap to switch to gym. This is the actual fix for the flat-merged-equipment bug — now reads `homeEquipment`/`gymEquipment` based on today's answer.
+- **Three build routes** — Coach builds it / Coach recommends, I'll choose / Build my own — mirroring `conditionProgrammes.js`'s architecture (not its persistent-storage model; still a one-off `generatedSession`). New `buildCandidatePools()`/`buildSessionFromSelection()` in `session-builder.js`, sharing the same equipment/contraindication filtering as the existing auto-build path rather than duplicating it.
+- **Real cardio-warmup content** — bike, treadmill, cross-trainer, rowing machine — genuinely didn't exist anywhere before. Four new exercise entries, wired into Upper/Lower/Full/Glute's warmup categories, correctly equipment-gated (confirmed via test: appears with equipment, absent without).
+- **"Strength" retired** from Library — never mapped to any real `SESSION_TYPES` id. Replaced with **"Glute Focus"**, which already existed in the engine and was never surfaced anywhere before now.
+- **Settings' Equipment panel** now shows a saved-equipment summary (Home: N items / Gym: N items) instead of a bare button.
+- **Pre-existing precache gap fixed while touching `sw.js`:** `session-builder.js`/`session-builder-ui.js` were never in the precache list at all, despite existing since May — more consequential now this path is reachable directly from Library.
+- `session-builder.js` v1→v2, `session-builder-ui.js` v3→v4, `library.js` v2→v3, `settings.js` v13→v14, `sw.js` v220→v221.
+
+**Real bug caught by testing, not shipped:** an earlier edit adding cardio-warmup to Glute Focus's warmup categories accidentally deleted its `mainCategories` line in the same replace. Found by a smoke test exercising all 7 session types — not by inspection — fixed before commit, re-confirmed working afterward.
+
+**Found, not fixed — pre-existing content gap:** lower-body main exercise categories have no bodyweight-only options in the existing pool (confirmed via direct count — every tagged exercise requires equipment). A user with no equipment selecting Lower Body currently gets 0 main exercises. Predates this session, not introduced by it. Logged, not guessed at with new content.
+
+**Not yet on-device confirmed** — no device available this session. Tested extensively via Node smoke tests against real store data (all 7 session types, the safety floor, equipment gating, the full preselect-to-build contract) — but this is exactly the category of thing (real day-to-day flow, equipment-dependent, multi-step) that's only ever fully proven through actual use.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
