@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 09 Aug 2026 v222
+ * "In Step" (Noticing Hub, Personal tier) — new js/views/in-step.js and
+ * js/data/in-step-scenarios.js added to precache, alongside noticing.js.
+ * store.js v17->v18, router.js v13->v14, noticing.js v3->v4. See
+ * Schema.md v1.17 and master schedule for full detail. Cache bump only.
+ *
  * 05 Aug 2026 v221
  * Gym Session Builder Phase 1 (blueprint alongside_blueprint_gym-
  * session-builder-phase1_05aug2026_v2.md), run end to end. Root cause:
@@ -764,7 +770,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v221";
+const CACHE_NAME = "alongside-v222";
 
 const SHELL_URLS = [
 
@@ -829,6 +835,8 @@ const SHELL_URLS = [
   "/alongside-app/js/session-builder.js",
   "/alongside-app/js/views/session-builder-ui.js",
   "/alongside-app/js/views/noticing.js",
+  "/alongside-app/js/views/in-step.js",
+  "/alongside-app/js/data/in-step-scenarios.js",
   "/alongside-app/js/views/journal-entry.js",
   "/alongside-app/js/views/gym-programme.js",
 
