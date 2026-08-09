@@ -1,7 +1,20 @@
 /**
  * store.js - Data persistence layer
- * 04 Aug 2026 v17
+ * 09 Aug 2026 v18
  *
+ * 09 Aug 2026 v18 - New field inStepProgress, for the "In Step" Noticing
+ *   Hub feature (Personal tier). Deliberately NOT named with "territory"
+ *   anywhere in it — onboarding already owns that word for an unrelated
+ *   concept (primaryTerritory/hardBeforeSelections). Shape: unlockedAt
+ *   ({ [movementId]: ISO } — gates the 3-day anti-binge cooldown between
+ *   scenarios in the same movement), scenarioIndex ({ [movementId]: int }
+ *   — cycles through js/data/in-step-scenarios.js's four-scenario pools),
+ *   completedCount ({ [movementId]: int } — display only), choiceLog
+ *   (array of { movementId, scenarioId, optionId, tag, at } — aggregate
+ *   research signal only; never read by coach logic, never surfaced to
+ *   the user per-entry, never used to change what's offered next — see
+ *   in-step.js header note). Added to getDefaults() and
+ *   mergeWithDefaults(), same pattern as noticingProgress (v7) below.
  * 04 Aug 2026 v17 - New field exercisePreferences + setExercisePreference()
  *   helper, applying the already-approved alongside_exercise_skip_
  *   dislike_spec_16may2026_v1.docx to the condition-programme candidate
@@ -337,6 +350,29 @@ export const store = {
                                 : {}
           }
         : defaults.noticingProgress,
+
+      // ── IN STEP PROGRESS ───────────────────────────────────────
+      inStepProgress: (saved.inStepProgress && typeof saved.inStepProgress === 'object')
+        ? {
+            ...defaults.inStepProgress,
+            ...saved.inStepProgress,
+            unlockedAt:     (saved.inStepProgress.unlockedAt
+                              && typeof saved.inStepProgress.unlockedAt === 'object')
+                              ? saved.inStepProgress.unlockedAt
+                              : {},
+            scenarioIndex:  (saved.inStepProgress.scenarioIndex
+                              && typeof saved.inStepProgress.scenarioIndex === 'object')
+                              ? saved.inStepProgress.scenarioIndex
+                              : {},
+            completedCount: (saved.inStepProgress.completedCount
+                              && typeof saved.inStepProgress.completedCount === 'object')
+                              ? saved.inStepProgress.completedCount
+                              : {},
+            choiceLog: Array.isArray(saved.inStepProgress.choiceLog)
+              ? saved.inStepProgress.choiceLog
+              : []
+          }
+        : defaults.inStepProgress,
 
       // ── JOURNAL SETTINGS ──────────────────────────────────────
       journalSettings: (saved.journalSettings && typeof saved.journalSettings === 'object')
@@ -709,6 +745,14 @@ export const store = {
         seriesProgress:     {},
         seriesUnlockedAt:   {},
         lastTerritoryId:    null
+      },
+
+      // ── IN STEP PROGRESS ───────────────────────────────────────
+      inStepProgress: {
+        unlockedAt:     {}, // { [movementId]: ISO } — 3-day cooldown gate
+        scenarioIndex:  {}, // { [movementId]: int } — cycles the 4-scenario pool
+        completedCount: {}, // { [movementId]: int } — display only
+        choiceLog:      []  // { movementId, scenarioId, optionId, tag, at }[] — aggregate only, see in-step.js
       },
 
       // ── SESSION BUILDER ───────────────────────────────────────

@@ -1,6 +1,12 @@
 /**
  * js/views/noticing.js - Noticing Hub Landing View
  *
+ * 09 Aug 2026 v4:
+ *   - New "In Step" card in Anytime, Personal tier. Uses auth.js's
+ *     lockedFeature() wrapper for free users (tap -> /upgrade), matching
+ *     the pattern already established elsewhere rather than inventing a
+ *     new locked-state treatment for this one card.
+ *
  * 21 Jun 2026 v3 (S4-13/14):
  *   - Journal card wired to "journal-entry" route. Removes the "on its
  *     way" placeholder. Card is now a tappable button matching the
@@ -32,6 +38,7 @@
 
 import { store }  from "../store.js";
 import { router } from "../router.js";
+import { isPremium, lockedFeature } from "../auth.js";
 
 export const centered = false;
 
@@ -231,6 +238,37 @@ export function render() {
                   aria-hidden="true">›</span>
           </button>
 
+          ${isPremium() ? `
+            <button class="card" id="noticing-in-step-btn"
+                    style="display: flex; align-items: center; gap: var(--space-4);
+                           text-align: left; width: 100%; cursor: pointer;
+                           background: var(--color-surface);"
+                    aria-label="In Step — short scenarios, three ways to respond, no right step">
+              <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
+                    aria-hidden="true">🎶</span>
+              <div style="flex: 1; min-width: 0;">
+                <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
+                          margin-bottom: var(--space-1);">In Step</p>
+                <p class="text-secondary" style="font-size: var(--text-sm);">
+                  Short scenarios. Three ways to respond. No right step.
+                </p>
+              </div>
+              <span style="color: var(--color-primary); font-size: 1.25rem;"
+                    aria-hidden="true">›</span>
+            </button>
+          ` : lockedFeature(`
+            <div class="card" style="display: flex; align-items: center; gap: var(--space-4);">
+              <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">🎶</span>
+              <div style="flex: 1; min-width: 0;">
+                <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
+                          margin-bottom: var(--space-1);">In Step</p>
+                <p class="text-secondary" style="font-size: var(--text-sm);">
+                  Short scenarios. Three ways to respond. No right step.
+                </p>
+              </div>
+            </div>
+          `, "personal", "In Step")}
+
         </div>
       </section>
 
@@ -302,6 +340,14 @@ export function onMount() {
     store.set("quietReturnRoute", "noticing");
     store.set("quietLaunchedDirect", true);
     router.navigate("quiet-session");
+  });
+
+  // In Step card — Personal tier only; free-tier renders via
+  // lockedFeature() instead, whose own delegated listener (auth.js
+  // initPaywallListener) handles the tap-to-/upgrade behaviour, so no
+  // handler is wired here for that branch.
+  document.getElementById("noticing-in-step-btn")?.addEventListener("click", () => {
+    router.navigate("in-step");
   });
 
   // Journal card — open journal-entry on the "choose" screen

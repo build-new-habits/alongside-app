@@ -1,10 +1,12 @@
 # Alongside — Data Schema Reference
-## 04 Aug 2026 v1.16
+## 09 Aug 2026 v1.17
 
-**File:** `js/store.js` (confirmed live version: v16, 04 Aug 2026 — no store.js schema change this pass, entry-shape only)
+**File:** `js/store.js` (confirmed live version: v18, 09 Aug 2026)
 **Storage:** `localStorage` key `alongside_user`
 
-**This version supersedes:** `schema.md` v1.15 (04 Aug 2026, earlier today). `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — real exercise reuse across conditions, not duplication. One entry can now genuinely serve more than one condition. Backward compatible — old singular-shaped entries still read correctly via the new `getEntryConditionIds()` helper, no migration step required. `js/data/conditionProgrammes.js` v2→v3 (not a schema file, but the reason this changed).
+**This version supersedes:** `schema.md` v1.16 (04 Aug 2026). Two catch-ups in one pass: (1) `exercisePreferences` (`store.js` v17, 04 Aug) was never documented here — added below. (2) New `inStepProgress` (`store.js` v18, 09 Aug) for the "In Step" Noticing Hub feature (Personal tier) — four-movement scenario practice extending the empathy transfer arc. Full feature spec developed in PM chat, 09 Aug 2026.
+
+**Carried forward from v1.15:** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — real exercise reuse across conditions, not duplication. One entry can now genuinely serve more than one condition. Backward compatible — old singular-shaped entries still read correctly via the new `getEntryConditionIds()` helper, no migration step required. `js/data/conditionProgrammes.js` v2→v3 (not a schema file, but the reason this changed).
 
 **Carried forward from v1.10, still relevant:** `proposalBias` is written in `coach-reflection.js` (12 sites) but read nowhere else in the codebase, including by `coach-reflection.js` itself. The reflection logic computes a `"lighter"`/`"rest"`/`null` bias per reflection type (severe pain, burnout risk, consecutive days, returning after absence) clearly intending to influence the next generated proposal — but nothing downstream ever consumes it. Same "specified but never wired up" pattern already on record for `exerciseFeedback` and Empathy Transfer's early stages. Still open, not fixed here — out of this session's scope.
 
@@ -37,6 +39,7 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | **1.14** | **04 Aug 2026** | **Phase D-1 (schema), Conditions Update.** Two new fields: `conditionGoals` (felt-sense condition-specific goal, `'healed'\|'cope'\|'improve'` + optional note, new `store.setConditionGoal()`) and `prescribedExercisesOrigin` (`'professional'\|'self'\|null`, lets `prescribed.js` branch its coach voice correctly). Also documented in the field-reference table: `pendingDoorRoute`, added earlier today (Phase C follow-up) but missed in Schema.md at the time. `js/store.js` v14→v15. |
 | **1.15** | **04 Aug 2026** | **Condition programmes, real routes built.** `prescribedExercises` entries can now carry an optional `conditionId` — additive, nullable, existing entries unaffected. New `prescribedExercisesActiveCondition` — single-use context flag, cleared the instant it's read. `js/store.js` v15→v16. New module `js/data/conditionProgrammes.js` (not a schema file, but the reason these fields exist) — real, tested exercise-selection logic for "Coach builds it"/"Coach recommends, you select," built on `affectsAreas`/`rehabPhase`/`contraindications` data that already existed. |
 | **1.16** | **04 Aug 2026** | **Cross-condition exercise reuse, not duplication.** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — one entry can now genuinely serve more than one condition, so doing the same physical exercise once correctly counts once everywhere, rather than the same exercise appearing as two separate entries with independent completion state and double credits. Backward compatible — old singular-shaped entries read correctly via new `getEntryConditionIds()`, migrate naturally on rebuild, no explicit migration step. `js/data/conditionProgrammes.js` v2→v3. Smoke-tested against real overlapping conditions before shipping. |
+| **1.17** | **09 Aug 2026** | **"In Step" (Noticing Hub, Personal tier) + drift catch-up.** New field `inStepProgress` (`unlockedAt`, `scenarioIndex`, `completedCount`, `choiceLog`) — four-movement scenario practice extending the empathy transfer arc, `js/store.js` v17→v18, new `js/data/in-step-scenarios.js` + `js/views/in-step.js`, new route `in-step`. Also documented `exercisePreferences` (`store.js` v17, 04 Aug), missed in Schema.md at the time — same drift pattern as `pendingDoorRoute` in 1.14, caught here rather than left open. |
 
 ### Corrections made in this pass
 
@@ -292,6 +295,10 @@ There is no `stats` field, live or dormant, anywhere in `store.js`. Every `stats
 `noticingPreferences` (nested object): `schedule` (`string`, `'automatic'`), `time` (`string|null`, `null`).
 
 `noticingProgress` (nested object): `territoriesVisited` (`string[]`, `[]`), `seriesProgress` (`object`, `{}`), `seriesUnlockedAt` (`object`, `{}`), `lastTerritoryId` (`string|null`, `null`).
+
+`exercisePreferences` (`object`, `{}`) — `{ [exerciseId]: { preference: 'avoid'|'less', setAt, source } }`. Binary signal, not a rating (no stars/scores). Added `store.js` v17 (04 Aug), undocumented here until now — catching up the drift. First consumer: `js/data/conditionProgrammes.js` candidate selection.
+
+`inStepProgress` (nested object) — Personal tier "In Step" feature (Noticing Hub), added `store.js` v18 (09 Aug): `unlockedAt` (`object`, `{}` — `{ [movementId]: ISO }`, gates a 3-day anti-binge cooldown between scenarios in the same movement), `scenarioIndex` (`object`, `{}` — `{ [movementId]: int }`, cycles `js/data/in-step-scenarios.js`'s four-scenario pools per movement), `completedCount` (`object`, `{}` — display only), `choiceLog` (`array`, `[]` — `{ movementId, scenarioId, optionId, tag, at }[]`, aggregate research signal only, never read by coach logic or surfaced per-entry to the user). Deliberately not named "territory" — that word is already used, unrelated, by onboarding's `primaryTerritory`/`hardBeforeSelections`.
 
 ---
 
