@@ -1,5 +1,11 @@
 /**
  * router.js
+ * 09 Aug 2026 v14
+ *
+ * v14 — New route 'in-step' -> in-step.js (InStepView). Added to
+ *   hideNavViews (activity flow, same treatment as journal-entry/
+ *   breathing-session) and NAV_MAP (active tab: noticing).
+ *
  * 04 Aug 2026 v13
  *
  * v13 — New route 'mobility-conditioning' -> mobility-conditioning.js
@@ -113,6 +119,7 @@ const VIEW_NAMES = {
   'settings':          { path: './views/settings.js',         fn: 'SettingsView'        },
   'weekly-plan':       { path: './views/weekly-plan.js',      fn: 'WeeklyPlanView'      },
   'noticing':          { path: './views/noticing.js',         fn: 'NoticingView'        },
+  'in-step':           { path: './views/in-step.js',          fn: 'InStepView'          },
   'journal-entry':     { path: './views/journal-entry.js',    fn: 'JournalEntryView'    },
   'activity-log':      { path: './views/activity-log.js',     fn: 'ActivityLogView'     },
   'library':           { path: './views/library.js',          fn: 'LibraryView'         },
@@ -163,7 +170,7 @@ const hideNavViews = new Set([
   'yoga-session', 'walk-session', 'running-session', 'cycle-session',
   'swim-session', 'quiet-session', 'breathing-session',
   'prescribed', 'prescribed-session', 'session-builder',
-  'reflect', 'journal-entry', 'privacy', 'upgrade',
+  'reflect', 'journal-entry', 'privacy', 'upgrade', 'in-step',
 ]);
 
 const NAV_MAP = {
@@ -177,6 +184,7 @@ const NAV_MAP = {
   'prescribed': 'today', 'prescribed-session': 'today', 'session-builder': 'today',
   'progress': 'progress', 'weekly-plan': 'progress',
   'noticing': 'noticing', 'journal-entry': 'noticing', 'library': 'noticing',
+  'in-step': 'noticing',
   'settings': 'settings', 'about': 'settings', 'privacy': 'settings',
   'upgrade': 'settings', 'goal-setup': 'settings',
   'community-impact': 'settings', 'annual-reflection': 'settings',
