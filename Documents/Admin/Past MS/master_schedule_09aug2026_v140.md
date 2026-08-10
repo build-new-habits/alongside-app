@@ -1,20 +1,16 @@
 # Alongside: Move — Master Schedule
-## 10 Aug 2026 v141
+## 05 Aug 2026 v139
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_09aug2026_v140.md`. Remove v140 on upload.
+Supersedes `alongside_master_schedule_05aug2026_v138.md`. Remove v138 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** **Solicitor consultation held, 10 Aug 2026** — the first legal conversation on record, and the item BIZ-5/BIZ-6/BIZ-9 have been waiting on since 24 Jul. Thirty-minute introductory call, taken by **Natalie** (Ben Cross, the original introduction via Alex, could not attend). Deliberately run as a qualification call rather than an advice call, per the prep brief written the same morning. All four areas covered: IP and trade marks; safeguarding and under-18s (worked through for Alongside: Learn); data protection and sensitive/special-category health data in the context of the ICO process; and, briefly, collaborator equity. Critically, the **Move-specific under-18 question was put directly in the final ten minutes** — framed as *"what advice or planning do I need to protect against under-18s using Move when I'm collecting sensitive personal health data,"* not as "am I covered because I've stated 18+." That framing matters and should be preserved in any follow-up. Natalie listened and took notes throughout rather than advising on the spot; she will consult colleagues and respond officially with **guidance on what to prioritise, and costs**. She holds the three timeframes (beta mid-September, soft launch first week of December, public launch January 2027), Graeme's stated inexperience, and the "minimum needed to be responsible" framing. **No substantive advice was given in the meeting and none should be recorded as if it were** — Graeme confirmed there was nothing worth noting beyond the above. The open follow-up actions are logged in the new section below.
+**This version's substantive changes:** **Gym Session Builder Phase 1 run in full**, same day it was scoped. `session-builder.js` v1→v2, `session-builder-ui.js` v3→v4, `library.js` v2→v3, `settings.js` v13→v14, `sw.js` v220→v221. Every real decision from the blueprint built: routing fix, location step (defaults home, never sticky), allocation presets with a structural warmup safety floor, three build routes mirroring `conditionProgrammes.js`'s architecture, and real cardio-warmup content that genuinely didn't exist before. Tested extensively via Node smoke tests against real store data — all 7 session types, the safety floor, equipment gating, the full Library-to-builder preselect contract — and this caught a real bug before it shipped: an earlier edit adding cardio-warmup to Glute Focus accidentally deleted its entire `mainCategories` line in the same replace, found by the test suite, fixed, re-confirmed. Also found and fixed in passing: `session-builder.js`/`session-builder-ui.js` were never in the service worker's precache list at all despite existing since May — a pre-existing gap, more consequential now this path is reachable directly from Library. One content gap found and deliberately left alone: lower-body main exercises have no bodyweight-only options anywhere in the existing pool — pre-existing, logged, not guessed at with new content. **Not yet on-device confirmed** — no device available this session.
 
-**Process note, fixed this version:** the live file was carrying **two different version numbers** — header `05 Aug 2026 v139`, footer `09 Aug 2026 v140`. The 09 Aug In Step session updated the footer and body but not the header block. The footer was the truer record (In Step is fully logged in the body), so v140 is treated as real and today's version is **v141**, not a second v140. **Both header and footer must be updated together at every session close** — checking only one has now silently drifted once.
-
-**Earlier process note, retained:** the version bumps (v96–v98) stacked a new "substantive changes" paragraph on top of the previous one each time, rather than replacing it. Condensed below into a single recent-history list. Going forward, this header should carry **only the current version's changes**, one paragraph — anything needed for continuity belongs in the dashboard or a dedicated section, not a growing stack of old summaries at the top.
+**Process note, fixed this version:** the last several version bumps (v96–v98) stacked a new "substantive changes" paragraph on top of the previous one each time, rather than replacing it. Condensed below into a single recent-history list. Going forward, this header should carry **only the current version's changes**, one paragraph — anything needed for continuity belongs in the dashboard or a dedicated section, not a growing stack of old summaries at the top.
 
 **Recent history, condensed for continuity (full detail in `Admin/Past MS/` for each version):**
-- **v140:** "In Step" (Noticing Hub, Personal tier) built and pushed — four movements, 16 scenarios, 3-day anti-binge cooldown, aggregate-only choice logging. `store.js` v18, `Schema.md` v1.17, `sw.js` v222. Not on-device confirmed. Two pre-existing bugs found and logged, not fixed.
-- **v139:** Gym Session Builder Phase 1 built in full the same day it was scoped — location step, allocation presets with a structural warmup safety floor, three build routes, real cardio-warmup content. Node smoke tests caught a real bug pre-ship (a replace that deleted Glute Focus's entire `mainCategories` line). Also fixed a pre-existing gap: `session-builder.js`/`session-builder-ui.js` were never in the service worker precache list. `sw.js` v221. Not on-device confirmed.
 - **v122:** On-device pass confirmed for today's whole body of work. Exercise rationale (already existed, now shown) and Avoid/Less-often dislike signal (applied from an already-approved spec) shipped for condition-programme candidates.
 - **v121:** Feeling-word chip wrapping and invisible checkbox selection both fixed. `coach-reflection.js`'s four-option picker confirmed genuinely obsolete and retired. Aesthetics audit now tracking two confirmed instances.
 - **v120:** Check-in gating made genuinely optional (session-generating doors only force check-in the first time today). Real condition-programme routes built — "Coach builds it" and "Coach recommends, I'll choose" join "Build my own," backed by a new tested selection module.
@@ -136,64 +132,13 @@ Captured in full in `alongside_alex_meeting_outcomes_29jul2026_v1.md`. Summary f
 
 **BIZ-9 (IP/trademark) — deprioritised.** Alex ran a logo unregistered for 20 years with no issue. Working position: don't worry about IP, especially the logo, not yet — if someone registers something similar first, the fallback is simply to change the logo. The product's actual IP (methodology, content, mechanics) is the genuinely distinct part, not the mark. Still worth a mention at the BIZ-5/6 solicitor consultation since it's a small add to an existing conversation, but no longer worth chasing separately.
 
-**U18/safeguarding — genuinely open, not resolved.** Alex suggested "potentially we don't need to worry about U18." Graeme explained the safeguarding responsibility around collecting keywords from the mood meter; Alex understood the concern and will think on it and ask his solicitor. **This is not a decision — do not treat it as one.** Directly touches BUILD-9 (18+ age-gate), BIZ-6 (safeguarding sign-off), and the Crisis & Safeguarding Policy's own open item on parental notification (Section 9.4, unconfirmed as of v7). No schedule change until Alex/solicitor respond. **[v141, 10 Aug] Partly superseded** — the question has now been put directly to a solicitor (Natalie), for both Move and Learn. Alex's "potentially we don't need to worry about U18" remains an untested instinct and should still not be read as a decision. Awaiting Natalie's written response, not Alex's.
+**U18/safeguarding — genuinely open, not resolved.** Alex suggested "potentially we don't need to worry about U18." Graeme explained the safeguarding responsibility around collecting keywords from the mood meter; Alex understood the concern and will think on it and ask his solicitor. **This is not a decision — do not treat it as one.** Directly touches BUILD-9 (18+ age-gate), BIZ-6 (safeguarding sign-off), and the Crisis & Safeguarding Policy's own open item on parental notification (Section 9.4, unconfirmed as of v7). No schedule change until Alex/solicitor respond.
 
 **Outreach — new categories suggested, plus a real gap surfaced.** Alex suggested workplaces with wellbeing reps, and women's health groups/communities, as additional outreach targets — he's thinking on this further too. He also raised the sharpest open question in the whole outreach effort: **"why would they do anything?"** — the current outreach messaging doesn't yet spell out the concrete benefit to the organisation itself. Two actions before any new-category outreach goes out: (1) Graeme's decision on whether these join the existing Tier list or run as a separate track, (2) a messaging pass answering "what's in it for them" per org type. This was already logged as "org outreach categories — undecided, blocks OUT-2–OUT-8" — still blocking, now with two named candidates and one clear open question instead of a vague undecided state.
 
 **New task — LinkedIn presence.** Graeme wants a BNH business page and a personal profile, prompted by Alex's suggestion that LinkedIn plus direct email is a good channel for reaching both organisations and named individuals. Not yet scoped — Graeme has said he'll need help designing this properly. New item, no urgency attached yet, ready whenever Graeme wants to start.
 
 **Deadlines — externally confirmed.** Alex agrees on two hard deadlines: **partner group/testing community + beta start, mid-September 2026**, and **public launch, January 2027** — the latter specifically because that's when people are most active in the "new year, new fitness" mindset, a named commercial rationale from Alex rather than just an internal target. This validates the dates already on this schedule; it doesn't resolve the underlying capacity risk (solo build/business load) flagged separately in Graeme's own meeting-prep review — both remain true at once.
-
----
-
-## ⚖️ Solicitor Consultation — Held 10 Aug 2026
-
-**Who:** Natalie, at the firm Alex introduced. Ben Cross — the named contact in Alex's 24 Jul introduction email — could not attend; Natalie took the meeting in his place. Thirty minutes, introductory.
-
-**How it was run:** deliberately as a qualification call, not an advice call — establishing what the firm can cover, what a proportionate engagement looks like, and what it costs against the £2,000 budget for this phase. Prep brief written the same morning; the six-document pack was *not* walked through in the meeting, by design.
-
-### What was covered
-
-| Area | Covered? | Note |
-|---|---|---|
-| IP and trade marks (BIZ-9) | ✅ | Covered despite being deprioritised on 29 Jul — small add to an existing conversation, as planned. |
-| Safeguarding and under-18s | ✅ | Worked through for **Alongside: Learn** (the three-user family model). |
-| Safeguarding — **Move** under-18 position | ✅ | Put directly in the final ten minutes: *"what advice or planning do I need to protect against under-18s using Move when I'm collecting sensitive personal health data."* Asked as a protection question, not a reassurance question. **Preserve this framing in the follow-up.** |
-| Data protection, sensitive/special-category health data, ICO process (BIZ-3, BIZ-5) | ✅ | Covered. |
-| Collaborator equity | 🟡 | Touched on briefly only. |
-
-### What Natalie holds
-
-- The three dates: beta mid-September 2026, soft launch first week of December 2026, public launch January 2027.
-- Graeme's stated inexperience — said openly, so the advice is pitched accordingly.
-- The **"minimum needed to be responsible"** framing (Alex's, 29 Jul).
-
-### What she will do
-
-Consult colleagues where needed, then respond officially with **guidance on what to prioritise, and costs**.
-
-### ⚠️ Recording discipline
-
-**No substantive advice was given in this meeting.** Natalie listened and took notes rather than advising on the spot, and Graeme has confirmed there is nothing further worth recording. Nothing in this section should be treated as legal advice received, or used to close any BIZ item. **Do not let a later session infer that a question was answered simply because it was asked.**
-
-### Open follow-up actions
-
-| # | Action | Why it matters |
-|---|---|---|
-| 1 | **Confirm Natalie has the six-document pack** — Product & Data Overview, covering letter, Privacy Policy draft v3, Terms of Service draft v2, Crisis & Safeguarding Policy v7, Safeguarding one-pager v2. The pack went to Alex on 24 Jul; whether it reached Natalie is unconfirmed. | She cannot write up against documents she hasn't seen. |
-| 2 | **Restate the beta-minimum vs launch-minimum split in writing**, as an explicit request for two lists rather than one combined answer. | She holds the framing verbally; the written ask is what makes it a deliverable. |
-| 3 | **Ask for a safeguarding reviewer referral** — ideally someone with a named youth-safeguarding credential (PAPYRUS-affiliated). Not raised in the meeting. | BIZ-6's three reviewer roles remain entirely unfilled — the most urgent non-build item on this schedule. |
-| 4 | **Confirm whether the Severe-pain Rest/Adapt liability question was raised.** Not mentioned in Graeme's account of the meeting; assume not covered. | Logged 04 Aug as a real legal question, not an assumption. Cheap to add to the follow-up email. |
-| 5 | Await her response on **priorities and costs** before instructing anything. | £2,000 budget for the phase; scope needs to fit it. |
-
-### What this does and doesn't unblock
-
-- 🟡 **BIZ-5** (Privacy Policy + ToS review) — moves from "no solicitor identified" to "solicitor engaged, awaiting scope and quote." Not closed.
-- 🟠 **BIZ-6** (Safeguarding sign-off) — unchanged. A general solicitor review is not the same as the named youth-safeguarding review; three reviewer roles still unfilled.
-- 🟠 **BIZ-3** (ICO registration) — unchanged, still gated on BIZ-1 (HMRC).
-- 🟡 **BIZ-9** (IP/trade marks) — raised as planned. No action pending her response.
-- 🟡 **BUILD-9** (18+ age-gate) — **still blocked**, but now on Natalie rather than Alex. Hold a little slack in the September plan: an answer requiring age assurance beyond self-declaration would add real build work close to the beta window.
-- 🟡 **Collaborator equity (Liam, Dan)** — touched on only. The structural point stands and is worth putting in the follow-up: Build New Habits is an **unincorporated sole trader**, so equity cannot be issued in any conventional sense without incorporating first. The cheaper, more urgent piece is a written collaborator agreement with an IP assignment clause, so contributions are clearly owned by the business regardless of what happens on equity later.
 
 ---
 
@@ -390,7 +335,7 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 | Product — BUILD-4 (Schema Reconciliation) | 🟢 **Closed, 30 Jul.** `schema.md` v1.9 live in repo. Two corrections to the 28 Jul note itself found (`todayIntensity` live not dead, `exerciseFeedback` dormant not live). | None — see Appendix A follow-up as a new, separate item. | None. |
 | Product — BUILD-5 (available-time bug) | 🟢 Closed, confirmed on-device 24 Jul. Three fixes. | None. | None. |
 | Product — BUILD-6 | Confirmed non-crashing. Decision still open, low priority. | Graeme's call. | Not booked. |
-| Product — BUILD-9 (18+ age-gate) | Not yet scoped. **U18 safeguarding position genuinely open.** 🟡 **Updated 10 Aug** — the Move-specific question ("what do I need to do to protect against under-18s reaching Move while collecting sensitive health data") was put directly to Natalie at the solicitor consultation. Awaiting her written response. Alex's earlier "potentially we don't need to worry about U18" is still an untested instinct, not a decision. | Hold scoping until Natalie responds. **Keep slack in the September plan** — an answer requiring age assurance beyond self-declared DOB would add real build work close to the beta window. | Waiting on Natalie (was: Alex). |
+| Product — BUILD-9 (18+ age-gate) | Not yet scoped. **U18 safeguarding position genuinely open** — Alex suggested it may not be needed, unconfirmed, pending his solicitor (29 Jul). | Hold scoping until Alex/solicitor respond. | Waiting on Alex. |
 | Product — Thread scroll-bug audit | 🟢 Closed, 28 Jul. 2 of 3 files already fixed, third checked and cleared. | None. | None. |
 | Product — B3-2-Test follow-ups | 2 items remain (chip overflow, reflect.js cache-clear confirmation). | Fold into a future session. | Not booked, low priority. |
 | Product — Core Session `currentActivityEntry` data-integrity question | 🟢 **Fully closed, 30 Jul.** Complete on-device test pass across all 7 files — every fix confirmed working, CSS visually confirmed on all 7. Two real bugs found and fixed during testing itself (yoga stuck-screen, dedupe window too wide). `gym-programme.js` found separately broken, own item logged — now code-complete 31 Jul, see BUILD-GP Outcome section, on-device pending. | None — fully closed. | None. |
@@ -415,9 +360,9 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 | Website — Home/Products/Community/Impact | 🟢 Confirmed clean. | None unless BUILD-9 triggers a copy pass. | None. |
 | Outreach — OUT-1 (reshaped) | Brief drafted, not yet run. | Run the session. | Blocks OUT-2–OUT-7. |
 | Outreach — org category decision | New, 29 Jul. Alex suggested workplace wellbeing reps and women's health groups; "why would they do anything?" messaging gap identified. | Graeme's decision + messaging pass. | Blocks OUT-2–OUT-8. |
-| Business — BIZ-9 (IP/trademark) | Deprioritised 29 Jul per Alex; still deprioritised. 🟡 **Raised at the 10 Aug solicitor consultation as planned** — no advice given yet. | Await Natalie's response. Do not chase separately. | None urgent. |
-| Business — BIZ-5 (solicitor: Privacy Policy + ToS) | 🟡 **Solicitor engaged, 10 Aug** — Natalie, 30-minute introductory call, all four areas covered. Moves from "no solicitor identified" to "awaiting scope, priorities and costs." **Not closed — no advice received yet.** See the Solicitor Consultation section above for the full record and the five follow-up actions. | Send/confirm the six-document pack; restate the beta-minimum vs launch-minimum split **in writing** as two lists, not one combined answer; ask for a safeguarding reviewer referral. | Awaiting Natalie's written response. |
-| Business — Severe pain Rest/Adapt choice liability question | 🆕 **New, 04 Aug.** Graeme's reasoning for the new Severe-pain choice feature (`coach-proposal.js` v17): an actively-chosen, recorded "rest offered, user chose to continue" pattern may reduce liability if a user is injured after choosing to adapt. The interaction and audit trail are built — whether it actually holds up legally is unverified, flagged in the code comments as a real legal question, not assumed. | 🟠 **Not confirmed raised at the 10 Aug consultation** — not mentioned in Graeme's account of the meeting, so assume not covered. Add it to the follow-up email; it's a cheap addition to an existing thread. | Awaiting Natalie. |
+| Business — BIZ-9 (IP/trademark) | Deprioritised, 29 Jul, per Alex. No urgency to register logo/IP now. | Raise briefly at BIZ-5/6 solicitor consultation only. | None urgent. |
+| Business — solicitor question framing | New, 29 Jul. Ask for beta-minimum vs launch-minimum legal requirements, not one combined answer, when Alex's solicitor responds. | Awaiting Alex/solicitor. | Awaiting Alex. |
+| Business — Severe pain Rest/Adapt choice liability question | 🆕 **New, 04 Aug.** Graeme's reasoning for the new Severe-pain choice feature (`coach-proposal.js` v17): an actively-chosen, recorded "rest offered, user chose to continue" pattern may reduce liability if a user is injured after choosing to adapt. The interaction and audit trail are built — whether it actually holds up legally is unverified, flagged in the code comments as a real legal question, not assumed. | Raise at the same BIZ-5/6 solicitor consultation as the other items above — natural fit, not a separate conversation. | Awaiting Alex/solicitor, same as the row above. |
 | Marketing — LinkedIn presence | New, unscoped, 29 Jul. BNH business page + Graeme's personal profile. | Scope whenever Graeme's ready to start. | Not booked. |
 | Infra — INF-7 (breach response process) | Reconfirmed open, 27 Jul. No procedure written. | Write short internal procedure. | Same trigger as BIZ-3. |
 | Infra — Supabase account 2FA | New, 27 Jul. | Graeme's own action. | None. |
@@ -489,4 +434,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 10 Aug 2026 v141*
+*Build New Habits · Alongside: Move · Master Schedule · 09 Aug 2026 v140*
