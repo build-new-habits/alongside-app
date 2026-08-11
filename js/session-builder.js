@@ -1,6 +1,35 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v12
+ *
+ * v12 - Persona trace findings (2.10 and 2.11). Three defects, all
+ *   found by executing live code rather than reading it.
+ *
+ *   (2.11, duplicates) A session could contain the same exercise twice
+ *   -- measured at 12% of all sessions. CON-6's per-category object
+ *   spread defeated the identity-based dedupe guard. Now guarded by id
+ *   across all three sections.
+ *
+ *   Two safety gaps, both
+ *   found by executing live code rather than reading it.
+ *
+ *   (2.11, Mum, 76, mindfulness-led) 30 entries carry no
+ *   difficultyLevel, and every read was `(ex.difficultyLevel || 1)` --
+ *   treating an untagged exercise as the EASIEST possible. Backwards
+ *   for safety. She was served Warrior III, a single-leg balance pose
+ *   and a real fall risk for her. New _difficulty() falls back to
+ *   energyRequired, which is present on all 497.
+ *
+ *   (2.10, Dad, 76, Dad, 76, frail, sedentary). The
+ *   difficulty ceiling applied to "main" only; warmups were exempt.
+ *   That was safe while warmups came from a curated 70-entry pool of
+ *   hand-written warmups, and stopped being safe at CON-6 when they
+ *   began coming from all 497 shared exercises. Traced live: a
+ *   sedentary 76-year-old was served "High Knees" as his opening
+ *   pulse-raiser. The ceiling now applies to warmups, with the safety
+ *   floor protected by relaxing rather than exempting.
+ *
  * 11 Aug 2026 v11
  *
  * v11 - CONT-1. Selection is continuity-aware. It was Math.random() over
@@ -518,11 +547,55 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
     }
   }
 
+  // PERSONA TRACE FINDING (11 Aug 2026, persona 2.10 -- Dad, 76, frail,
+  // sedentary). The difficulty ceiling used to apply to "main" only, and
+  // warmups were exempt on the reasoning that they are structurally gentle
+  // and that capping them could empty the section and break the warmup
+  // safety floor.
+  //
+  // That reasoning held while warmups came from a curated 70-entry pool
+  // where every warmup had been hand-written as a warmup. It stopped
+  // holding at CON-6, when warmups began coming from all 497 shared
+  // exercises. Traced live: a sedentary 76-year-old was served "High
+  // Knees" as his opening pulse-raiser -- inside session-categories.js's
+  // absolute warmup ceiling (difficulty 4, energy 5), but nowhere near
+  // appropriate for him, because that ceiling is fixed rather than
+  // relative to the person.
+  //
+  // The ceiling now applies to warmups too, and the floor is protected by
+  // relaxing rather than by exempting: if applying it would leave nothing,
+  // the unfiltered set is used, so the warmup safety floor cannot be
+  // starved. Cooldowns stay exempt -- they are genuinely low-demand by
+  // construction and a stretch has no meaningful difficulty ceiling.
+  // PERSONA TRACE FINDING (11 Aug 2026, persona 2.11 -- Mum, 76,
+  // mindfulness-led, low confidence). She was served Warrior III, a
+  // demanding single-leg balance pose and a genuine fall risk for her.
+  //
+  // Root cause: 30 entries carry no difficultyLevel at all, and every
+  // read in the codebase is `(ex.difficultyLevel || 1)` -- so an
+  // untagged exercise is treated as the EASIEST possible. That default
+  // is backwards for safety: an unknown difficulty should be assumed
+  // demanding until somebody says otherwise, not assumed trivial.
+  //
+  // _difficulty() inverts it, falling back to energyRequired when
+  // difficultyLevel is absent, since energy is present on all 497 and
+  // correlates well. Warrior III (energy 6) now reads as difficulty 6
+  // rather than 1 and is correctly out of reach for a sedentary user.
+  //
+  // The 30 untagged entries should still be tagged properly -- this is
+  // a safe default, not a substitute for the data.
+  const _difficulty = ex => {
+    if (typeof ex.difficultyLevel === "number") return ex.difficultyLevel;
+    if (typeof ex.energyRequired === "number")  return ex.energyRequired;
+    return 10;
+  };
+  const withinCeiling = ex => _difficulty(ex) <= ceiling;
+  const warmupPool = section === "warmup" ? matched.filter(withinCeiling) : null;
+  const useCeilingOnWarmup = warmupPool !== null && warmupPool.length > 0;
+
   return matched.filter(ex => {
-    // Difficulty ceiling. Warmups and cooldowns are exempt: they are
-    // structurally gentle already, and capping them can empty a section
-    // and break the warmup safety floor.
-    if (section === "main" && (ex.difficultyLevel || 1) > ceiling) return false;
+    if (section === "main" && !withinCeiling(ex)) return false;
+    if (section === "warmup" && useCeilingOnWarmup && !withinCeiling(ex)) return false;
     // Equipment check: exercise needs no equipment, or user has it.
     // CON-2: equipSet is now a resolved capability set, not the raw ticks.
     if (!exerciseIsAvailable(ex, equipSet)) return false;
@@ -700,8 +773,10 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // warm-up looks different when it does.
   const pulseRaiser = pulseRaiserDecision(sessionType);
 
-  function selectFromCategories(categories, section, count) {
-    const candidates = _filterCandidates(categories, section, equipSet, conditionSet);
+  function selectFromCategories(categories, section, count, alreadyChosen) {
+    const chosen = alreadyChosen || new Set();
+    const candidates = _filterCandidates(categories, section, equipSet, conditionSet)
+      .filter(ex => !chosen.has(ex.id));
 
     // Prioritise variety across categories — one from each category first
     const selected = [];
@@ -847,20 +922,22 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     for (const cat of categories) {
       if (selected.length >= count) break;
       const fromCat = candidates.filter(e => e.category === cat && !selected.includes(e));
-      const pick = pickFrom(fromCat);
+      const pick = pickFrom(fromCat.filter(e => !chosen.has(e.id)));
       if (pick) {
         selected.push(pick);
+        chosen.add(pick.id);
         usedCategories.add(cat);
       }
     }
 
     // Second pass: fill remaining slots
-    let remaining = candidates.filter(e => !selected.includes(e));
+    let remaining = candidates.filter(e => !chosen.has(e.id));
     while (selected.length < count && remaining.length > 0) {
       const pick = pickFrom(remaining);
       if (!pick) break;
       selected.push(pick);
-      remaining = remaining.filter(e => e !== pick);
+      chosen.add(pick.id);
+      remaining = remaining.filter(e => e.id !== pick.id);
     }
 
     return selected.slice(0, count);
@@ -874,9 +951,27 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     cooldown: counts.cooldown
   };
 
-  const warmupExercises   = selectFromCategories(type.warmupCategories,   "warmup",   adjustedCounts.warmup);
-  const mainExercises     = [...prescribed, ...selectFromCategories(type.mainCategories, "main", adjustedCounts.main)];
-  const cooldownExercises = selectFromCategories(type.cooldownCategories, "cooldown", adjustedCounts.cooldown);
+  // PERSONA TRACE FINDING (11 Aug 2026, persona 2.11). A session could
+  // contain the same exercise twice -- "Standing Spinal Wave" appeared
+  // twice in one traced session, and measurement put the rate at 12% of
+  // all sessions.
+  //
+  // Cause, introduced by CON-6: _filterCandidates() tags each match with
+  // the category it was selected FOR, via `matched.push({ ...ex, category,
+  // section })`. That spread creates a NEW object per category, so an
+  // exercise matching two categories (Warrior II matches both hip-mobility
+  // and shoulder-mobility) produced two distinct objects, and the
+  // `!selected.includes(e)` guard -- which compares object identity --
+  // could not see they were the same exercise. The old private pool had
+  // one object per entry, so identity comparison happened to work.
+  //
+  // alreadyChosen carries ids across all three sections, since a duplicate
+  // between warmup and main is just as wrong as one within a section.
+  const alreadyChosen = new Set(prescribed.map(p => p.exerciseId || p.id).filter(Boolean));
+
+  const warmupExercises   = selectFromCategories(type.warmupCategories,   "warmup",   adjustedCounts.warmup,   alreadyChosen);
+  const mainExercises     = [...prescribed, ...selectFromCategories(type.mainCategories, "main", adjustedCounts.main, alreadyChosen)];
+  const cooldownExercises = selectFromCategories(type.cooldownCategories, "cooldown", adjustedCounts.cooldown, alreadyChosen);
 
   // If equipment mismatch is severe, add a coach note
   let equipNote = null;
