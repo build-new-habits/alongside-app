@@ -1,6 +1,16 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v4
+ *
+ * v4 — PT-11. Difficulty ceiling applied in _filterCandidates(). This
+ *   file's private EXERCISE_POOL never filtered on fitness, so the
+ *   "Cardio, Core & Strength" door handed a sedentary beginner and a
+ *   gym-literate lifter the identical pool — the WOW-2 fix reached
+ *   workoutGenerator.js but not here. Uses the existing difficultyLevel
+ *   field, which was written on all 65 exercises and read nowhere.
+ *   Warmup/cooldown exempt so the warmup safety floor cannot be starved.
+ *
  * 10 Aug 2026 v3
  *
  * v3 -- Bodyweight-only lower-body main content added overnight (Claude,
@@ -765,10 +775,55 @@ function buildConditionNote(sessionType) {
 // Extracted from what was previously selectFromCategories()'s inline logic so
 // buildCandidatePools() can reuse the exact same equipment/contraindication
 // rules without duplicating them -- one filter, two callers.
+/**
+ * 11 Aug 2026 (PT-11, second persona trace) — difficulty ceiling.
+ *
+ * Found by re-tracing both personas against the shipped WOW-2 fix: this
+ * file has its own EXERCISE_POOL of 65, entirely separate from the
+ * 461-exercise database, and it never filtered on fitness at all. So the
+ * WOW-2 fix reached coach-proposal sessions (workoutGenerator.js) but NOT
+ * the "Cardio, Core & Strength" Home door, which routes here. A sedentary
+ * beginner and a gym-literate lifter were handed the identical pool.
+ *
+ * difficultyLevel (1-3) was already written on all 65 exercises and read
+ * nowhere — the same written-never-read pattern as exerciseFeedback and
+ * absence.capturedAt. Using the field that already exists rather than
+ * adding another.
+ *
+ * Ceilings mirror filterByFitnessLevel()'s intent on the main database,
+ * compressed to this pool's 1-3 scale. "returning" sits below moderate for
+ * the same reason it does there: capacity is there, but day one should not
+ * meet someone at their old level.
+ *
+ * NOT a pool merge. That is a real architectural job (this is the fourth
+ * parallel exercise pool in the codebase) and is logged, not attempted
+ * here — touch-once.
+ */
+const DIFFICULTY_CEILINGS = {
+  "sedentary":   1,
+  "light":       2,
+  "returning":   2,
+  "moderate":    2,
+  "active":      3,
+  "very-active": 3
+};
+
+function _difficultyCeiling() {
+  const declared = store.get("fitnessLevel")
+                || store.get("lifestyle.activityLevel")
+                || "moderate";
+  return DIFFICULTY_CEILINGS[declared] ?? DIFFICULTY_CEILINGS["moderate"];
+}
+
 function _filterCandidates(categories, section, equipSet, conditionSet) {
+  const ceiling = _difficultyCeiling();
   return EXERCISE_POOL.filter(ex => {
     if (ex.section !== section) return false;
     if (!categories.includes(ex.category)) return false;
+    // Difficulty ceiling. Warmups and cooldowns are exempt: they are
+    // structurally gentle already, and capping them can empty a section
+    // and break the warmup safety floor.
+    if (section === "main" && (ex.difficultyLevel || 1) > ceiling) return false;
     // Equipment check: exercise needs no equipment, or user has it
     if (ex.equipment && ex.equipment.length > 0) {
       if (!ex.equipment.every(e => equipSet.has(e))) return false;
