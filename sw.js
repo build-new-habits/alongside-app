@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v231
+ * CON-6 - session-builder's private 70-entry pool retired. The builder now
+ * selects from all 465 shared exercises, so every exercise it returns carries
+ * full guidance. New js/data/session-categories.js.
+ *
  * 11 Aug 2026 v230
  * All 9 cardio-warmup entries rewritten to the Exercise Entry Standard - the
  * four machine ones (bike, treadmill, cross trainer, rower) rendered with no
@@ -999,7 +1004,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v240";
+const CACHE_NAME = "alongside-v241";
 
 const SHELL_URLS = [
 
