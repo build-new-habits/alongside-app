@@ -1,6 +1,18 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v7
+ *
+ * v7 - The five pulse-raisers added in v6 were authored with
+ *   description/cues, the shape the Exercise Entry Standard retired
+ *   earlier the same day. They therefore rendered as a name and a set
+ *   count and nothing else - the PT-13 failure, self-inflicted, in
+ *   content written hours after the standard that forbids it. All five
+ *   rewritten in full to the standard: instructions, why, coaching,
+ *   watchOut. Recorded rather than quietly corrected, because the cause
+ *   was matching the surrounding file's legacy style instead of the
+ *   standard, and that will recur until CON-6 retires this pool.
+ *
  * 11 Aug 2026 v6
  *
  * v6 - PT-19. Every session now opens with a pulse-raiser unless there is
@@ -223,39 +235,100 @@ const EXERCISE_POOL = [
   // warmup at any tier — they are a main-session conditioning movement, and
   // asking someone to open with them is how a warmup becomes the reason
   // somebody stops coming.
+  //
+  // AUTHORED TO THE EXERCISE ENTRY STANDARD (v2, same day). The first pass
+  // wrote these with description/cues — the retired shape — matching the
+  // surrounding file rather than the standard set hours earlier, which meant
+  // they rendered as a name and a set count and nothing else. Exactly the
+  // PT-13 failure, self-inflicted. Rewritten in full.
 
   { id: "sb-cwu-05", name: "Marching on the spot", section: "warmup", category: "cardio-warmup",
     sets: 1, tempo: "Steady, easy", rest: "0s", difficultyLevel: 1, duration: 180,
-    description: "Three minutes marching on the spot, lifting each knee to hip height and swinging the arms. The gentlest way to raise your heart rate and warm the hips before anything else.",
-    cues: ["Knees to hip height, no higher", "Let your arms swing naturally", "You should be able to hold a conversation"],
+    instructions: [
+      "Stand tall with your feet hip-width apart, somewhere you have space to swing your arms",
+      "Lift one knee up towards hip height, then place it down and lift the other",
+      "Let your arms swing naturally in opposition, the way they would if you were walking",
+      "Keep going at a steady, even rhythm for three minutes"
+    ],
+    why: "The gentlest way to get your heart rate up and warm the hips before anything else. Cold hips are why squats and hinges feel awkward in the first few reps.",
+    coaching: "You should be able to hold a conversation the whole way through. If you could not, ease off — this is the warm-up, not the session.",
+    watchOut: [
+      "Knees going higher than hip height, which tends to make the lower back arch — hip height is plenty",
+      "Drifting into a shuffle as you tire, with the knees barely lifting at all",
+      "Holding your breath without noticing — breathe normally throughout"
+    ],
     youtube: "marching on the spot warm up beginners",
     equipment: [], contraindications: [] },
 
   { id: "sb-cwu-06", name: "Jog on the spot", section: "warmup", category: "cardio-warmup",
     sets: 1, tempo: "Easy, conversational", rest: "0s", difficultyLevel: 2, duration: 180,
-    description: "Three minutes of light jogging on the spot, landing softly on the balls of your feet. Raises the pulse and wakes up the calves and ankles.",
-    cues: ["Land softly — you should barely hear your feet", "Stay light, this is not a sprint", "Breathing faster is fine, gasping is not"],
+    instructions: [
+      "Stand with your feet hip-width apart and your weight forward on the balls of your feet",
+      "Begin jogging on the spot, lifting each foot just a few inches from the floor",
+      "Keep your elbows bent at roughly ninety degrees and let your arms swing",
+      "Stay light and continue for three minutes"
+    ],
+    why: "Raises your pulse and wakes up the calves and ankles, which is what makes the first working set feel steady rather than stiff.",
+    coaching: "Land softly enough that you can barely hear your own feet — the quieter you are, the better your ankles are absorbing the impact.",
+    watchOut: [
+      "Landing heavily or flat-footed, which sends the shock up through the knees — stay on the balls of your feet",
+      "Gasping rather than breathing faster, which means you have started too hard",
+      "Any nagging ache in the knees or shins: switch to marching instead, it does the same job"
+    ],
     youtube: "jog on the spot warm up technique",
     equipment: [], contraindications: ["knee-acute", "ankle-acute"] },
 
   { id: "sb-cwu-07", name: "Step-ups on a stair", section: "warmup", category: "cardio-warmup",
     sets: 1, tempo: "Steady, controlled", rest: "0s", difficultyLevel: 2, duration: 180,
-    description: "Three minutes stepping up and down on the bottom stair or a low step, alternating your leading leg every thirty seconds or so. Low impact, raises the pulse and warms the legs at the same time.",
-    cues: ["Whole foot on the step, not just the toes", "Change your leading leg regularly", "Steady rhythm rather than rushing"],
+    instructions: [
+      "Find the bottom stair or a low, stable step",
+      "Place your whole foot on the step, not just the toes, and step up until both feet are on it",
+      "Step back down with the same leg leading, under control",
+      "Change your leading leg every thirty seconds or so, and continue for three minutes"
+    ],
+    why: "Raises the pulse and warms the legs at the same time, with almost no impact through the joints. A good choice on a day when jogging feels like too much.",
+    coaching: "Push through the heel of the foot on the step rather than the toes, and you will feel this in the glute rather than the front of the knee.",
+    watchOut: [
+      "Only the front of the foot on the step, which puts the strain on the calf and makes the step less stable",
+      "Leading with the same leg the whole time, so one side does all the work — change regularly",
+      "Rushing and losing control on the way down; the step down should be as deliberate as the step up"
+    ],
     youtube: "step up warm up stairs low impact",
     equipment: [], contraindications: ["knee-acute"] },
 
   { id: "sb-cwu-08", name: "Jumping jacks", section: "warmup", category: "cardio-warmup",
     sets: 2, reps: "30 seconds", rest: "30s", tempo: "Steady", difficultyLevel: 3, duration: 120,
-    description: "Two rounds of thirty seconds. Jump the feet wide as the arms sweep overhead, then back together. Raises the heart rate quickly and warms the shoulders as well as the legs.",
-    cues: ["Land with soft knees, not locked out", "Full arm sweep — all the way overhead", "Step it out instead of jumping if that suits you better today"],
+    instructions: [
+      "Stand with your feet together and your arms relaxed at your sides",
+      "Jump both feet out wide as you sweep both arms out and overhead",
+      "Jump the feet back together as the arms come back down",
+      "Continue for thirty seconds, rest for thirty, then repeat once more"
+    ],
+    why: "Raises the heart rate quickly and warms the shoulders as well as the legs, which matters if there is any pressing or pulling later in the session.",
+    coaching: "Take the arms all the way overhead rather than stopping at shoulder height — the full sweep is what warms the shoulder joint.",
+    watchOut: [
+      "Landing with locked-out knees rather than soft ones, which sends the impact straight into the joint",
+      "Half-sweeping the arms as you tire, so the shoulders stop getting warmed at all",
+      "If jumping does not suit you today, step one foot out at a time instead — it does the same job with no impact"
+    ],
     youtube: "jumping jacks warm up proper form",
     equipment: [], contraindications: ["knee-acute", "ankle-acute", "lower-back-acute", "shoulder-acute"] },
 
   { id: "sb-cwu-09", name: "High knees", section: "warmup", category: "cardio-warmup",
     sets: 2, reps: "30 seconds", rest: "30s", tempo: "Quick but controlled", difficultyLevel: 4, duration: 120,
-    description: "Two rounds of thirty seconds driving the knees up towards hip height at pace, staying tall through the chest. The most demanding of the warm-up options — it raises the pulse fast.",
-    cues: ["Stay tall — do not lean back", "Land on the balls of your feet, softly", "Pace it so you could keep going for a third round if asked"],
+    instructions: [
+      "Stand tall with your feet hip-width apart and your chest lifted",
+      "Drive one knee up towards hip height at pace, then swap quickly to the other",
+      "Stay on the balls of your feet and let your arms drive in opposition",
+      "Continue for thirty seconds, rest for thirty, then repeat once more"
+    ],
+    why: "The most demanding of the warm-up options. It raises your pulse fast and switches on the hip flexors and calves, which is useful before anything explosive.",
+    coaching: "Pace it so that you could manage a third round if you were asked to — a warm-up you have to recover from is not a warm-up.",
+    watchOut: [
+      "Leaning back to get the knees higher, which loads the lower back — stay tall and accept lower knees",
+      "Heavy landings; stay on the balls of the feet and keep it quiet",
+      "Sacrificing height for speed until it becomes a shuffle, at which point it stops warming the hips"
+    ],
     youtube: "high knees warm up running drill",
     equipment: [], contraindications: ["knee-acute", "ankle-acute", "hip-acute", "lower-back-acute"] },
 
