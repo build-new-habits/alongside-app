@@ -1,6 +1,15 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 11 Aug 2026 v8
+ *
+ * v8 - CON-3b. Renders watchOut ("What to watch for") and load ("How
+ *   heavy") on the active exercise card, matching gym-programme.js v8
+ *   and workout.js v9. Deliberately NOT added to the preview list
+ *   (renderSessionPreview) - that screen is a scannable overview
+ *   before starting, and watch-outs belong at the point of doing, not
+ *   stacked twelve-deep in a list someone reads while deciding.
+ *
  * 11 Aug 2026 v7
  *
  * v7 — WOW-1 (PT-3, Persona Tracing Wave 1). Added a session-level
@@ -610,6 +619,22 @@ function renderExercise() {
               ${ex.why}
             </p>
           </details>
+        ` : ""}
+
+        ${ex.load ? `
+          <div class="exercise-load" role="region" aria-label="How heavy for this exercise">
+            <span class="exercise-section-label" id="cs-section-load">How heavy</span>
+            <p class="exercise-load-text" aria-labelledby="cs-section-load">${ex.load}</p>
+          </div>
+        ` : ""}
+
+        ${ex.watchOut && ex.watchOut.length > 0 ? `
+          <div class="exercise-watchout" role="region" aria-label="What to watch for with this exercise">
+            <span class="exercise-section-label" id="cs-section-watchout">What to watch for</span>
+            <ul class="exercise-watchout-list" aria-labelledby="cs-section-watchout">
+              ${ex.watchOut.map(item => `<li>${item}</li>`).join("")}
+            </ul>
+          </div>
         ` : ""}
 
         <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.youtube || (ex.name + " exercise form"))}"

@@ -1,5 +1,12 @@
 /**
  * workout.js - Workout Execution View
+ * 11 Aug 2026 v9
+ *
+ * v9 - CON-3b. Renders watchOut ("What to watch for") and load ("How
+ *   heavy"), the two fields added to the Exercise Entry Standard on
+ *   11 Aug. Applied identically across all four card views in one pass
+ *   so the exercise card stays consistent whichever route reaches it.
+ *
  * 11 Aug 2026 v8
  *
  * v8 — WOW-1 (PT-3, Persona Tracing Wave 1). Added a session-level
@@ -247,6 +254,30 @@ export function render() {
           ` : ""}
 
         </div>
+
+        <!-- How heavy - effort-relative only, never a weight (P4). -->
+        ${exercise.load ? `
+          <div class="exercise-load" role="region" aria-label="How heavy for this exercise">
+            <span class="exercise-section-label" id="section-load-${currentExerciseIndex}">
+              How heavy
+            </span>
+            <p class="exercise-load-text" aria-labelledby="section-load-${currentExerciseIndex}">
+              ${exercise.load}
+            </p>
+          </div>
+        ` : ""}
+
+        <!-- What to watch for. A coach noticing something, not an alert. -->
+        ${exercise.watchOut && exercise.watchOut.length > 0 ? `
+          <div class="exercise-watchout" role="region" aria-label="What to watch for with this exercise">
+            <span class="exercise-section-label" id="section-watchout-${currentExerciseIndex}">
+              What to watch for
+            </span>
+            <ul class="exercise-watchout-list" aria-labelledby="section-watchout-${currentExerciseIndex}">
+              ${exercise.watchOut.map(item => `<li>${item}</li>`).join("")}
+            </ul>
+          </div>
+        ` : ""}
       </div>
 
       <!-- Action buttons -->
