@@ -43,6 +43,13 @@ export const RECOVERY = [
     ],
     coaching: 'Place a folded blanket between your thighs and calves if kneeling is uncomfortable.',
     why: 'A deeply restorative pose that releases the lower back, hips, and shoulders gently.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 30
   },
 
@@ -70,6 +77,13 @@ export const RECOVERY = [
     ],
     coaching: 'Keep both shoulders on the floor — the knees don\'t need to reach the ground.',
     why: 'Releases tension along the entire spine and outer hips.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 30
   },
 
@@ -96,6 +110,13 @@ export const RECOVERY = [
     ],
     coaching: 'Let gravity do the work. You shouldn\'t be forcing the roller — just resting into it.',
     why: 'Releases upper back tension that accumulates from sitting, screens, and stress.',
+        watchOut: [
+      'Rolling directly over a joint or bone rather than the muscle',
+      'Pressing so hard you tense up, which stops the muscle releasing',
+      'Rushing; slow and steady is what allows anything to change',
+      'Rolling an area that is sharply painful rather than tender'
+    ],
+    load: 'Enough pressure to feel it clearly, light enough that you can still breathe normally.',
     credits: 35
   },
 
@@ -122,6 +143,13 @@ export const RECOVERY = [
     ],
     coaching: 'Roll slowly — about 1 inch per second. Fast rolling doesn\'t release the muscle.',
     why: 'Reduces quad tightness that can contribute to knee pain and limited hip mobility.',
+        watchOut: [
+      'Rolling directly over a joint or bone rather than the muscle',
+      'Pressing so hard you tense up, which stops the muscle releasing',
+      'Rushing; slow and steady is what allows anything to change',
+      'Rolling an area that is sharply painful rather than tender'
+    ],
+    load: 'Enough pressure to feel it clearly, light enough that you can still breathe normally.',
     credits: 35
   },
 
@@ -150,6 +178,12 @@ export const RECOVERY = [
     ],
     coaching: 'This is harder than it sounds at first — most of us breathe too shallow. Stick with it.',
     why: 'Activates the body\'s natural relaxation response and improves oxygen efficiency.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -176,6 +210,13 @@ export const RECOVERY = [
     ],
     coaching: 'Great for after long days on your feet or after exercise.',
     why: 'Gentle inversion that helps fluid return from legs and calms the nervous system.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 30
   },
 
@@ -211,6 +252,12 @@ export const RECOVERY = [
     ],
     coaching: 'If 4 counts feels too long, try 3. There is no wrong way to do this.',
     why: 'Box breathing slows your heart rate and tells your nervous system it is safe to relax.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -240,6 +287,12 @@ export const RECOVERY = [
     ],
     coaching: 'The long exhale is what makes this work. If 7 and 8 feel too long, halve all the numbers.',
     why: 'The extended exhale activates the rest-and-digest system, reducing anxiety and helping with sleep.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -268,6 +321,12 @@ export const RECOVERY = [
     ],
     coaching: 'This is the fastest known way to reduce stress. One or two sighs can shift your state in under a minute.',
     why: 'The double inhale fully inflates the lungs. The long exhale dumps carbon dioxide and quickly calms the body.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -296,6 +355,12 @@ export const RECOVERY = [
     ],
     coaching: 'Most of us breathe too shallow without realising. This practice resets that habit.',
     why: 'Diaphragmatic breathing reduces stress hormones and increases oxygen flow around the body.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -324,6 +389,12 @@ export const RECOVERY = [
     ],
     coaching: 'The ratio matters more than the exact count. Any exhale that is longer than the inhale will calm you down.',
     why: 'Longer exhales activate the parasympathetic nervous system — the body\'s built-in calming mechanism.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -354,6 +425,12 @@ export const RECOVERY = [
     ],
     coaching: 'This can feel awkward at first — that is completely normal. Focus on the breathing, not the hand position.',
     why: 'Balances the nervous system and improves focus. Used in yoga for thousands of years as a calming practice.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -382,6 +459,12 @@ export const RECOVERY = [
     ],
     coaching: 'This is especially useful if you feel short of breath or anxious. It gives you control over your breathing rate.',
     why: 'Pursed lip breathing slows breathing, keeps airways open longer, and is clinically used for breathing conditions including asthma.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -410,6 +493,12 @@ export const RECOVERY = [
     ],
     coaching: 'This breathing rate has been shown to produce the greatest calming effect. It takes a few minutes to settle into.',
     why: 'Six breaths per minute synchronises your heart rate, blood pressure, and nervous system — a state called heart rate variability coherence.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -439,6 +528,12 @@ export const RECOVERY = [
     ],
     coaching: 'There is no need to hum loudly. Even a very quiet hum works. It can feel a little silly at first.',
     why: 'Vibration from humming activates the vagus nerve — a direct pathway to the calming part of your nervous system.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -469,6 +564,12 @@ export const RECOVERY = [
     ],
     coaching: 'Stop immediately if you feel dizzy. This is not suitable if you are pregnant or have heart or breathing conditions.',
     why: 'The rapid breathing increases oxygen and wakes up the body — good for low-energy moments when you need a gentle boost.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -497,6 +598,12 @@ export const RECOVERY = [
     ],
     coaching: 'This takes practice. Do not worry if it feels mechanical at first — that feeling goes away.',
     why: 'Full three-part breathing maximises your lung capacity and produces a strong calming effect.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -525,6 +632,12 @@ export const RECOVERY = [
     ],
     coaching: 'Losing count is not failing — noticing that you lost count is the practice. Each time you return to 1 is a small win.',
     why: 'Gives the mind a simple anchor. Particularly useful for anxiety, racing thoughts, or difficulty settling before sleep.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   }
 
@@ -560,6 +673,12 @@ export const RECOVERY = [
     ],
     coaching: 'The breathing is the practice. The cold is just the trigger. Controlling the breath under cold stress trains the nervous system to regulate under other forms of stress too.',
     why: 'Cold water immersion activates the sympathetic system and then the parasympathetic rebound. Regular practice builds cold tolerance, reduces muscle soreness, and improves mood via norepinephrine release.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -588,6 +707,12 @@ export const RECOVERY = [
     ],
     coaching: 'The alternating temperatures create a pumping effect on circulation — hot dilates blood vessels, cold constricts them. This mechanical action clears metabolic waste from muscle tissue.',
     why: 'Contrast therapy accelerates recovery by increasing tissue blood flow via vascular oscillation. Used by professional teams post-match to reduce delayed onset muscle soreness.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 25
   },
 
@@ -615,6 +740,12 @@ export const RECOVERY = [
     ],
     coaching: 'A 20-minute nap does not cause sleep inertia. A 30-minute nap often does. Keep it short — the science on this is clear.',
     why: 'A 20-minute nap improves alertness, reaction time, and mood for 2 to 3 hours. Used deliberately by elite athletes and military. NASA studies show 26 minutes as optimal.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -643,6 +774,12 @@ export const RECOVERY = [
     ],
     coaching: 'Even mild dehydration of 2% body weight reduces performance by up to 20%. Most people train and compete dehydrated without knowing it.',
     why: 'Adequate hydration is one of the highest-return recovery and performance interventions available. The evidence base is unambiguous and the application is straightforward.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 15
   },
 
@@ -671,6 +808,12 @@ export const RECOVERY = [
     ],
     coaching: 'The post-exercise nutrition window is most important after hard training sessions. After an easy walk, it matters much less.',
     why: 'Muscle protein synthesis rates are elevated for 24 to 48 hours after resistance training, but peak in the first 2 hours. Post-exercise nutrition directly supports recovery and adaptation.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 15
   },
 
@@ -699,6 +842,12 @@ export const RECOVERY = [
     ],
     coaching: 'The pressure should produce a "good pain" — uncomfortable but clearly beneficial. Avoid directly on bones or joints.',
     why: 'Trigger point therapy releases myofascial adhesions that restrict movement and cause referred pain. A ball allows deeper pressure and more precision than a foam roller.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 25
   },
 
@@ -725,6 +874,12 @@ export const RECOVERY = [
     ],
     coaching: 'Legs up the wall is one of the simplest and most effective recovery positions. It works purely through gravity and requires nothing.',
     why: 'Elevating the legs above the heart reverses the pooling of blood and lymphatic fluid that accumulates from standing and training. Reduces swelling and accelerates clearance of metabolic waste.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 15
   },
 
@@ -757,6 +912,13 @@ export const RECOVERY = [
     ],
     coaching: 'This is not exercise. It is movement as medicine — gentle circulation, fresh air, and a reminder that your body still works, even on hard days. The goal is simply to have gone.',
     why: 'Gentle walking maintains circulation and joint mobility without loading the structures that are hurting. The mindfulness element activates the parasympathetic nervous system, which supports the body natural repair processes.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 30,
     coachNote: 'severe-pain-appropriate',
   },
@@ -785,6 +947,13 @@ export const RECOVERY = [
     ],
     coaching: 'An active recovery walk the day after hard training reduces soreness more effectively than complete rest — the gentle movement promotes circulation without adding stress.',
     why: 'Active recovery increases blood flow to muscle tissue, accelerating the removal of metabolic by-products. The gentle locomotion also maintains movement patterns without adding training load.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 20
   },
 
@@ -812,6 +981,12 @@ export const RECOVERY = [
     ],
     coaching: 'Many chronic back and neck problems are significantly influenced by sleeping position. This is a free intervention with potentially major impact.',
     why: 'Spinal alignment during 7 to 9 hours of sleep significantly influences musculoskeletal health. Poor sleep position creates cumulative joint stress that compounds over years.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 15
   },
 
@@ -841,6 +1016,12 @@ export const RECOVERY = [
     ],
     coaching: 'If you are still awake after 20 minutes, get up and do a quiet activity until you feel sleepy — the research on this is clear. Lying awake anxiously trains the brain that bed is a place for wakefulness.',
     why: 'The progressive relaxation approach to sleep onset reduces sleep latency (time to fall asleep) by activating the parasympathetic system and reducing physical tension that prevents sleep.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -870,6 +1051,12 @@ export const RECOVERY = [
     ],
     coaching: 'The extended breath hold may feel uncomfortable at first. Reduce the counts proportionally if needed — the 1:1.75:2 ratio is what matters, not the absolute numbers.',
     why: 'Developed by Dr Andrew Weil, 4-7-8 breathing produces rapid parasympathetic activation through the prolonged exhale and breath hold. Demonstrated to reduce anxiety and aid sleep onset.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -899,6 +1086,12 @@ export const RECOVERY = [
     ],
     coaching: 'Sauna exposure should feel challenging but safe. Any dizziness, nausea, or excessive discomfort means exit immediately.',
     why: "Regular sauna use has strong evidence for cardiovascular health, growth hormone release, heat shock protein production, and mood improvement. Dr Rhonda Patrick's research is particularly comprehensive on this.",
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 30
   }
 

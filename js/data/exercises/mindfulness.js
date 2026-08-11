@@ -47,6 +47,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'The mind wandering is not failure. Noticing it has wandered and returning is the practice. You can do this thousands of times in one session.',
     why: 'The foundation of mindfulness practice. Trains the attention to return to the present moment — the core skill that reduces anxiety and improves focus.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -76,6 +82,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'You are not trying to relax — you are just noticing. Relaxation often follows, but it is not the goal. Just observe.',
     why: 'Body scanning builds interoception — awareness of internal body states. Reduces dissociation, improves stress response, and helps identify where tension accumulates.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -104,6 +116,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'Directing kindness toward yourself is the hardest part for most people. Do it anyway. Even if it feels hollow at first, it works over time.',
     why: 'Loving-kindness meditation reduces self-criticism, increases compassion, and reduces symptoms of depression and anxiety — well supported by clinical research.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -132,6 +150,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'This takes about 3 minutes and works quickly. Use it when anxiety spikes, when overwhelmed, or when you cannot settle before sleep.',
     why: 'Grounds attention in the present sensory moment — directly interrupts anxiety and rumination by engaging the senses rather than thoughts.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -160,6 +184,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'The contrast between tension and release is what trains the nervous system. You are teaching your body what relaxed actually feels like.',
     why: 'PMR is one of the most clinically validated techniques for anxiety, insomnia, and chronic pain. Effective within a single session and builds with practice.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -187,6 +217,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'This is harder than breath focus for most beginners. If the mind is very active, return to breath awareness first.',
     why: 'Open monitoring meditation builds metacognitive awareness — the ability to observe thoughts without being swept up in them. Reduces rumination.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -215,6 +251,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'The place can be completely imaginary. It just needs to feel safe to you. There is no wrong answer.',
     why: 'A foundational technique in trauma-informed therapy. Creates a reliable internal resource for self-regulation — particularly useful for anxiety and hyperarousal.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -243,6 +285,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'Noting creates a tiny gap between experience and reaction. That gap is where freedom lives. The labels help the mind process rather than ruminate.',
     why: 'Noting practice is particularly effective for anxiety and ADHD — it gives the busy mind a job while training present-moment awareness.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -271,6 +319,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'This works in meetings, on public transport, or wherever you are. Nobody needs to know you are doing it.',
     why: 'A brief, discreet grounding technique for moments of acute anxiety or dissociation. Works quickly and requires no preparation.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 15
   },
 
@@ -298,6 +352,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'The exercise is deliberately simple — the simplicity is the point. Ordinary objects become extraordinary when you actually look.',
     why: 'Trains focused present-moment awareness using a concrete anchor. Useful for people who find eyes-closed meditation difficult or anxiety-provoking.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 15
   }
 
@@ -336,6 +396,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'If you fall asleep before finishing, that is success. Most people do not reach the top more than once.',
     why: 'The body scan activates the parasympathetic nervous system and reduces the cortisol associated with pre-sleep rumination. Clinically used for insomnia.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -365,6 +431,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'This takes practice. Most people who master it report being able to sleep within 2 minutes after a few weeks of daily practice.',
     why: 'A systematic relaxation technique that removes physical and mental tension in sequence. Effective for both falling asleep and returning to sleep after waking.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -393,6 +465,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'This feels counterintuitive. But containing worry to a specific time actually reduces it — the brain relaxes when it knows worries will not be forgotten.',
     why: 'Scheduled worry time is a CBT technique shown to reduce generalised anxiety and improve sleep. It externalises the worry and gives the mind permission to rest at other times.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -421,6 +499,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'Mindful walking is a great alternative for people who struggle with seated meditation. The movement gives the mind something concrete to anchor to.',
     why: 'Combines the physical benefits of movement with the mental benefits of mindfulness. Particularly effective for restless minds or people with ADHD.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -449,6 +533,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'Self-compassion is not self-indulgence or giving up. Research consistently shows it produces better outcomes than self-criticism — more motivation, more resilience, less burnout.',
     why: 'Self-compassion practice reduces shame, anxiety, and depression while increasing motivation. Based on the work of Dr Kristin Neff. Particularly relevant for neurodivergent adults.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -478,6 +568,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'Nature visualisation works even without real access to nature. The physiological effects — reduced cortisol, lowered heart rate — are measurable even from imagination alone.',
     why: 'Exposure to natural environments reduces stress hormones and improves mood. When real nature is inaccessible, visualisation produces similar measurable effects.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -506,6 +602,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'An intention is different to a to-do list. It is about how you want to show up, not what you want to achieve. It takes less than 5 minutes.',
     why: 'Morning intention setting activates the prefrontal cortex before reactive systems take over. Reduces autopilot behaviour and increases sense of agency throughout the day.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 15
   },
 
@@ -533,6 +635,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'The specificity matters. Generic gratitude skims the surface. Specific, sensory details help the brain register the experience as genuinely positive.',
     why: 'Gratitude practice reliably improves sleep quality, reduces symptoms of depression, and increases life satisfaction. Most effective when done consistently over time.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 15
   },
 
@@ -561,6 +669,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'The extended version deepens the calming effect. Used by emergency services and military for acute stress regulation. The hold phases are where the nervous system resets.',
     why: 'Extended box breathing reduces cortisol, lowers blood pressure, and improves heart rate variability — all measurable markers of stress reduction. More effective than a shorter session.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 20
   },
 
@@ -589,6 +703,12 @@ export const MINDFULNESS = [
     ],
     coaching: 'This feels difficult at first precisely because of how over-stimulated the nervous system has become. That difficulty is the signal that it is needed.',
     why: 'Screen time activates the sympathetic nervous system. This transition practice allows the nervous system to downregulate before the next activity — improving focus, mood, and sleep if done before bed.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 15
   }
 
