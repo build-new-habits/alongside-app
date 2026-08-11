@@ -1,5 +1,12 @@
 /**
  * store.js - Data persistence layer
+ * 11 Aug 2026 v23
+ *
+ * 11 Aug 2026 v23 - CONT-2. New field sessionVariety, closing the
+ *   "novelty vs predictability has no explicit preference capture" gap
+ *   the persona matrix has carried open since 05 Jul. See getDefaults()
+ *   for the full reasoning.
+ *
  * 11 Aug 2026 v22
  *
  * 11 Aug 2026 v22 - CONT-1. New field exerciseHistory, plus
@@ -505,6 +512,10 @@ export const store = {
         ? saved.exerciseHistory
         : {},
 
+      sessionVariety: ['familiar', 'balanced', 'varied'].includes(saved.sessionVariety)
+        ? saved.sessionVariety
+        : 'balanced',
+
       exercisePreferences: (saved.exercisePreferences && typeof saved.exercisePreferences === 'object')
         ? saved.exercisePreferences
         : {},
@@ -720,6 +731,26 @@ export const store = {
       // session-builder.js for continuity-aware selection and by the
       // exercise card for the flat "Last:" reference line.
       exerciseHistory: {},
+
+      // CONT-2 (11 Aug 2026). "familiar" | "balanced" | "varied".
+      //
+      // Persona 2.13 (ADHD, novelty-driven, abandons routine after ~2
+      // weeks) and persona 2.14 (autistic, predictability-seeking,
+      // dislikes surprises) are opposite motivational shapes, and the
+      // persona matrix has carried "novelty vs predictability has no
+      // explicit preference capture" as an open gap since 05 Jul.
+      //
+      // CONT-1 made that gap urgent rather than theoretical: continuity
+      // is now a real force in selection, so a single default actively
+      // serves one persona at the other's expense. Traced live, both
+      // received ~51-57% session-to-session overlap -- one treatment
+      // serving neither well.
+      //
+      // Default "balanced" because it is the honest answer when nobody
+      // has asked yet. Never inferred from behaviour: guessing that
+      // someone wants variety because they skipped a session would be
+      // exactly the kind of silent judgement this product refuses.
+      sessionVariety: 'balanced',
 
       exercisePreferences: {}, // { [exerciseId]: { preference: 'avoid'|'less', setAt, source } } — per alongside_exercise_skip_dislike_spec_16may2026_v1.docx. Binary signal, not a rating (spec §6: "not a rating system... no stars, no thumbs, no scores"). First consumer: js/data/conditionProgrammes.js's candidate selection, 04 Aug 2026 — the full spec's in-session Skip flow (gym-programme.js/prescribed-session.js/core-session.js) remains separate future work.
 
