@@ -1,6 +1,20 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v11
+ *
+ * v11 - CONT-1. Selection is continuity-aware. It was Math.random() over
+ *   the candidate pool every session, from 497 exercises, so a person met
+ *   a given movement roughly once and then not again for weeks. No
+ *   progressive overload, no skill acquisition, no familiarity -- and the
+ *   whole watchOut library was decorative, because you cannot correct a
+ *   fault you never repeat. Exercises met before and recently are now
+ *   strongly preferred, bounded by a 21-day recency window, an 8-session
+ *   mastery ceiling and a 25% novelty rate. Depends on store.js v22's
+ *   exerciseHistory, which did not exist until today: the product
+ *   recorded that a session happened and how many exercises it had, never
+ *   which ones.
+ *
  * 11 Aug 2026 v10
  *
  * v10 - CON-8. Equipment is now a preference, not only a permission.
@@ -735,15 +749,98 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     // be worse, not better.
     const preferEquipment = equipSet.size > 2;
 
+    // ── CONT-1: CONTINUITY ────────────────────────────────────────────────
+    //
+    // Selection used to be Math.random() over the candidate pool, every
+    // session, from 497 exercises. A person doing a goblet squat on Monday
+    // would very likely not meet it again for weeks.
+    //
+    // That is what an app does when it has nothing else to offer, and it
+    // breaks three things at once. There is no progressive overload,
+    // because you cannot get stronger at an exercise you meet once. There
+    // is no skill acquisition, because you cannot correct a fault you never
+    // repeat -- which made the entire watchOut library decorative. And
+    // there is no familiarity, which matters most for exactly the people
+    // this product is for: the person who is nervous about the gym needs to
+    // recognise the session, and constant novelty is exciting only for the
+    // already-confident.
+    //
+    // A coach does the opposite of variety. They give you the same four
+    // movements for several weeks and change what you do with them.
+    //
+    // So: within a category, an exercise the person has met before and
+    // recently is strongly preferred. Three deliberate limits stop that
+    // becoming a rut:
+    //
+    //   RECENCY   Familiarity decays. Past CONTINUITY_WINDOW_DAYS an
+    //             exercise is no longer an anchor, so a long absence
+    //             produces a fresh start rather than resurrecting a
+    //             programme from months ago.
+    //
+    //   MASTERY   Past MASTERY_THRESHOLD completions an exercise stops
+    //             being preferred, mirroring a coach rotating a lift out
+    //             after a block rather than running it forever.
+    //
+    //   NOVELTY   A fixed share of slots ignore history entirely, so the
+    //             database does not collapse to the handful of exercises
+    //             that happened to be picked in week one.
+    const CONTINUITY_WINDOW_DAYS = 21;
+    const MASTERY_THRESHOLD      = 8;
+    const NOVELTY_RATE           = 0.25;
+
+    function isAnchor(ex) {
+      const s = store.exerciseStats(ex.id);
+      if (!s.seen) return false;
+      if (s.n >= MASTERY_THRESHOLD) return false;
+      if (s.daysSince !== null && s.daysSince > CONTINUITY_WINDOW_DAYS) return false;
+      return true;
+    }
+
     function pickFrom(pool) {
       if (pool.length === 0) return null;
+
+      // Equipment preference (CON-8) decides WHICH pool we choose from,
+      // continuity decides which member of it.
+      //
+      // MIN_CHOICE found by simulation, not assumed: with a hard
+      // equipment filter, a category holding a single equipment-using
+      // exercise handed the same one every single session -- one
+      // exercise appeared in 24 of 24 sessions across a simulated eight
+      // weeks. Preference had quietly become compulsion. When the
+      // equipment-using pool is too thin to offer real choice, the
+      // bodyweight options come back in, which is also what a coach
+      // would do rather than repeat one movement forever.
+      const MIN_CHOICE = 3;
+      let candidates = pool;
       if (preferEquipment) {
         const withKit = pool.filter(e => (e.equipment || []).length > 0);
-        if (withKit.length > 0) {
-          return withKit[Math.floor(Math.random() * withKit.length)];
+        if (withKit.length >= MIN_CHOICE) candidates = withKit;
+      }
+
+      // Mastery escape: if every candidate here is past the ceiling and
+      // wider options exist, widen rather than repeat something the
+      // person has already worked through.
+      if (candidates !== pool && candidates.every(e => store.exerciseStats(e.id).n >= MASTERY_THRESHOLD)) {
+        candidates = pool;
+      }
+
+      if (Math.random() >= NOVELTY_RATE) {
+        const anchors = candidates.filter(isAnchor);
+        if (anchors.length > 0) {
+          // Among anchors, prefer the one met least often, so a person
+          // building familiarity across several movements does not get
+          // stuck repeating whichever one came up first.
+          const fewest = Math.min(...anchors.map(e => store.exerciseStats(e.id).n));
+          const tier = anchors.filter(e => store.exerciseStats(e.id).n === fewest);
+          return tier[Math.floor(Math.random() * tier.length)];
         }
       }
-      return pool[Math.floor(Math.random() * pool.length)];
+
+      // No anchor available, or this slot is deliberately novel: prefer
+      // something never met before over something met and dropped.
+      const unseen = candidates.filter(e => !store.exerciseStats(e.id).seen);
+      const from = unseen.length > 0 ? unseen : candidates;
+      return from[Math.floor(Math.random() * from.length)];
     }
 
     // First pass: one from each category

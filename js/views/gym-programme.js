@@ -1,5 +1,13 @@
 /**
  * gym-programme.js
+ * 11 Aug 2026 v9
+ *
+ * v9 - CONT-1. Completion now records WHICH exercises were done, not
+ *   only how many. This file wrote `exercisesCount: 3` and nothing
+ *   else, as did every other session view -- so nothing in the product
+ *   knew what a person had actually performed, and selection had no
+ *   choice but to be random over 497 exercises. One field.
+ *
  * 11 Aug 2026 v8
  *
  * v8 - CON-3b. Renders the two fields added to the Exercise Entry
@@ -981,6 +989,14 @@ export function GymProgrammeView(router) {
       status:         'complete',
       durationMins,
       exercisesCount: doneCount,
+      // CONT-1: which exercises, not only how many. store.logActivity()
+      // routes this into exerciseHistory on completion (never on a
+      // partial exit), which is what makes continuity-aware selection
+      // possible at all. Until today the product recorded a count and
+      // nothing else, so no exercise could ever become familiar.
+      exerciseIds:    [...completedExerciseIndices]
+                        .map(i => session.exercises[i]?.id)
+                        .filter(Boolean),
       moodAfter:      null,
       isEvent:        false,
       eventName:      null,

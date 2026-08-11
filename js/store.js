@@ -1,6 +1,42 @@
 /**
  * store.js - Data persistence layer
- * 11 Aug 2026 v21
+ * 11 Aug 2026 v22
+ *
+ * 11 Aug 2026 v22 - CONT-1. New field exerciseHistory, plus
+ *   recordExercises()/exerciseStats()/lastPerformance() helpers.
+ *
+ *   WHY THIS EXISTS. Until now the product recorded that a session
+ *   happened and how many exercises it contained -- activityLog entries
+ *   carry `exercisesCount: 3`, a number -- and never which exercises
+ *   they were. Nothing anywhere persisted what a person had actually
+ *   done.
+ *
+ *   That single absence is why session selection had no choice but to
+ *   be random over 497 exercises, and therefore why the product could
+ *   not support progressive overload (you cannot get stronger at an
+ *   exercise you meet once), skill acquisition (you cannot correct a
+ *   fault you never repeat, which makes the whole watchOut library
+ *   decorative), or familiarity (the nervous beginner needs to
+ *   recognise the session, and constant novelty is exciting only for
+ *   the already-confident).
+ *
+ *   exerciseHistory is a compact map keyed by exercise id:
+ *     { [exerciseId]: { n, first, last, best } }
+ *       n     - times completed, all time
+ *       first - ISO timestamp of first completion
+ *       last  - ISO timestamp of most recent completion
+ *       best  - optional { weight, reps, unit, at } performance note
+ *
+ *   Deliberately a map rather than an append-only log: selection needs
+ *   "how often, how recently" on every candidate on every build, and a
+ *   growing array would mean scanning thousands of entries per session
+ *   on a phone. The full narrative already lives in activityLog.
+ *
+ *   PRIVACY NOTE. This records movement only. It is not subject to the
+ *   Journal Privacy Rule because it contains no written reflection --
+ *   but it is per-exercise behavioural data, so it is never used to
+ *   comment on a person's consistency or decline. Locked Principle P4
+ *   applies: the app may display, the coach never interprets.
  *
  * 11 Aug 2026 v21 - PT-12, the reader-without-writer sweep. Three changes,
  *   all closing the same pattern rather than another instance of it:
@@ -465,6 +501,10 @@ export const store = {
       prescribedExercisesActiveCondition: typeof saved.prescribedExercisesActiveCondition === 'string'
         ? saved.prescribedExercisesActiveCondition
         : null,
+      exerciseHistory: (saved.exerciseHistory && typeof saved.exerciseHistory === 'object' && !Array.isArray(saved.exerciseHistory))
+        ? saved.exerciseHistory
+        : {},
+
       exercisePreferences: (saved.exercisePreferences && typeof saved.exercisePreferences === 'object')
         ? saved.exercisePreferences
         : {},
@@ -674,6 +714,13 @@ export const store = {
       exerciseFeedback: [], // { exerciseId, feedback: 'too-hard'|'too-easy', at }[]
 
       // Undeclared until v21. Written by programmeEngine.js:268, read at :242.
+      // CONT-1 (11 Aug 2026). { [exerciseId]: { n, first, last, best } }
+      // Written only by recordExercises(), which logActivity() calls
+      // automatically when a completion supplies exerciseIds. Read by
+      // session-builder.js for continuity-aware selection and by the
+      // exercise card for the flat "Last:" reference line.
+      exerciseHistory: {},
+
       exercisePreferences: {}, // { [exerciseId]: { preference: 'avoid'|'less', setAt, source } } — per alongside_exercise_skip_dislike_spec_16may2026_v1.docx. Binary signal, not a rating (spec §6: "not a rating system... no stars, no thumbs, no scores"). First consumer: js/data/conditionProgrammes.js's candidate selection, 04 Aug 2026 — the full spec's in-session Skip flow (gym-programme.js/prescribed-session.js/core-session.js) remains separate future work.
 
       // ── LIFESTYLE ────────────────────────────────────────────
@@ -1220,7 +1267,85 @@ export const store = {
     this.data.activityLog = [...log, finalEntry];
     this.data.updatedAt = new Date().toISOString();
     this.save();
+
+    // CONT-1: a completion that names its exercises also updates
+    // exerciseHistory. Single write path, so no call site can record a
+    // session without recording what was in it. Partial exits are
+    // excluded deliberately -- an abandoned session did not teach
+    // anything and must not make an exercise look familiar.
+    if (finalEntry.status !== 'partial' && Array.isArray(finalEntry.exerciseIds)) {
+      this.recordExercises(finalEntry.exerciseIds, finalEntry.performance);
+    }
+
     return finalEntry;
+  },
+
+  /**
+   * Record that a set of exercises was genuinely completed.
+   *
+   * Called automatically by logActivity() when a completion entry
+   * supplies `exerciseIds`, so call sites add one field rather than
+   * learning a second write path. Can also be called directly.
+   *
+   * Only completions should reach here. A session that was built and
+   * abandoned did not teach the person anything and must not make an
+   * exercise look familiar.
+   *
+   * @param {string[]} exerciseIds
+   * @param {Object}   [performance] optional { [exerciseId]: {weight,reps,unit} }
+   */
+  recordExercises(exerciseIds, performance) {
+    if (!Array.isArray(exerciseIds) || exerciseIds.length === 0) return;
+    const now = new Date().toISOString();
+    const history = { ...(this.data.exerciseHistory || {}) };
+
+    for (const id of exerciseIds) {
+      if (typeof id !== 'string' || !id) continue;
+      const prev = history[id] || { n: 0, first: now, last: now };
+      const entry = {
+        n:     (prev.n || 0) + 1,
+        first: prev.first || now,
+        last:  now
+      };
+      if (prev.best) entry.best = prev.best;
+
+      const perf = performance && performance[id];
+      if (perf && typeof perf.weight === 'number' && perf.weight > 0) {
+        // "best" is a flat reference the person left themselves, not a
+        // score. Nothing narrates it and nothing compares it (P4).
+        const prevWeight = prev.best && typeof prev.best.weight === 'number' ? prev.best.weight : 0;
+        if (perf.weight >= prevWeight) {
+          entry.best = { weight: perf.weight, reps: perf.reps || null, unit: perf.unit || 'kg', at: now };
+        }
+      }
+      history[id] = entry;
+    }
+
+    this.data.exerciseHistory = history;
+    this.data.updatedAt = now;
+    this.save();
+  },
+
+  /**
+   * How well does this person know this exercise?
+   * @returns {{ n:number, last:string|null, daysSince:number|null, seen:boolean }}
+   */
+  exerciseStats(exerciseId) {
+    const h = (this.data.exerciseHistory || {})[exerciseId];
+    if (!h) return { n: 0, last: null, daysSince: null, seen: false };
+    const daysSince = h.last
+      ? Math.floor((Date.now() - new Date(h.last).getTime()) / 86400000)
+      : null;
+    return { n: h.n || 0, last: h.last || null, daysSince, seen: true };
+  },
+
+  /**
+   * The flat reference line for the exercise card: what they last
+   * recorded. No verb, no framing, no comparison (P4).
+   */
+  lastPerformance(exerciseId) {
+    const h = (this.data.exerciseHistory || {})[exerciseId];
+    return h && h.best ? h.best : null;
   },
 
   /**

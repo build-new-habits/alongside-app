@@ -1,10 +1,37 @@
 # Alongside — Data Schema Reference
-## 11 Aug 2026 v1.21
+## 11 Aug 2026 v1.22
 
 **File:** `js/store.js` (confirmed live version: v21, 11 Aug 2026)
 **Storage:** `localStorage` key `alongside_user`
 
 **This version supersedes:** v1.20 (11 Aug 2026). Adds the cross-reference below to the new Exercise Entry Standard (CON-3). No `store.js` change in this pass — `store.js` remains v21.
+
+---
+
+## `exerciseHistory` — **NEW, `store.js` v22, 11 Aug 2026**
+
+`{ [exerciseId]: { n, first, last, best } }`, default `{}`.
+
+| Key | Type | Meaning |
+|---|---|---|
+| `n` | `number` | Times completed, all time |
+| `first` | ISO string | First completion |
+| `last` | ISO string | Most recent completion |
+| `best` | `{ weight, reps, unit, at }` \| absent | Optional performance note |
+
+**Why it exists.** Until this field, the product recorded that a session happened and how many exercises it contained — `activityLog` entries carry `exercisesCount: 3` — and never which exercises they were. Nothing persisted what a person had actually done.
+
+That single absence is why selection had to be `Math.random()` over 497 exercises, and therefore why there was no progressive overload (you cannot get stronger at an exercise you meet once), no skill acquisition (you cannot correct a fault you never repeat, which made the entire `watchOut` library decorative), and no familiarity (the nervous beginner needs to recognise the session).
+
+**Written by** `store.recordExercises()`, called automatically by `logActivity()` when a completion supplies `exerciseIds`. Single write path, so no call site can log a session without logging its contents. **Partial exits are excluded deliberately** — an abandoned session did not teach anything and must not make an exercise look familiar.
+
+**Read by** `session-builder.js` v11 for continuity-aware selection, via `store.exerciseStats()`.
+
+**Shape choice:** a map rather than an append-only log, because selection needs "how often, how recently" for every candidate on every build, and scanning a growing array on a phone would not hold. The full narrative already lives in `activityLog`.
+
+**P4 applies.** This is per-exercise behavioural data. `best` is a flat reference the person left themselves — nothing narrates it, nothing compares it, and it is never used to comment on consistency or decline.
+
+**Call sites supplying `exerciseIds` so far:** `gym-programme.js` v9, `workout.js` v10. `core-session.js`, `yoga-session.js` and `prescribed-session.js` do not yet — they still log a count only, so their exercises never become familiar. Outstanding.
 
 ---
 
