@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v237
+ * Persona trace round 2 - slot-weighted anchoring, difficulty ceilings raised,
+ * all 30 untagged yoga entries tagged, a new impact gate (no jumping or
+ * sprinting for sedentary/light/returning/unknown), and sessionVariety.
+ *
  * 11 Aug 2026 v236
  * Persona trace fixes - duplicate exercises within a session (12% of
  * sessions), warmup difficulty ceiling, and an unsafe difficultyLevel
@@ -1029,7 +1034,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v246";
+const CACHE_NAME = "alongside-v247";
 
 const SHELL_URLS = [
 
