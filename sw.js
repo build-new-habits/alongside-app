@@ -923,6 +923,11 @@ rather than only a buried bypass door. Added both.
  *   Truth Rule's documented fallback. Cache-bump only otherwise; no
  *   other files changed this deploy.
  *
+ * 11 Aug 2026 v228 - WOW-0: store.js v19 (new consent{}), thread.js v8
+ *   (consent gate before Step 1), privacy.js v2, onboarding-thread.css v5.
+ *   Restores the legal consent record absent since OB-THREAD. No new files
+ *   to precache - onboarding-thread.css already listed. Cache bump only.
+ *
  * 11 Aug 2026 v227 - WOW-1 (PT-3): workout.js v8, core-session.js v7,
  *   yoga-session.js v8. Session-level clocks added; all six activityLog
  *   write paths now report real elapsed minutes instead of null.
@@ -939,7 +944,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v227";
+const CACHE_NAME = "alongside-v228";
 
 const SHELL_URLS = [
 
