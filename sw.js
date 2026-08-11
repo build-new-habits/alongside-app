@@ -1,6 +1,48 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v225
+ * gym-programme.js rebuilt to genuinely match prescribed-session.js and
+ * workout.js's UX, per Graeme's direct screenshot comparison: "Screenshot
+ * 1 is flat and barely offer any interaction... They all need to be like
+ * S2&3." Confirmed precisely why: 10 Aug's fix made the why/instructions/
+ * video content actually render, but never touched the structural gap —
+ * this file was still showing every exercise as a scrollable list all at
+ * once (renderExerciseCard x N, one "Session done" button at the
+ * bottom), while prescribed-session.js/workout.js walk through one
+ * exercise per screen with a progress header, timer or big reps
+ * display, and structured guidance sections. The screens looked
+ * completely different in practice, exactly as the screenshots showed.
+ *
+ * Rebuilt renderSession()/the exercise renderer/event handling to walk
+ * one exercise at a time. Reuses the exact shared CSS classes
+ * prescribed-session.js and workout.js already use (workout-header,
+ * exercise-display, exercise-role-badge, timer-circle, reps-display,
+ * exercise-instructions, coaching-tip, youtube-link, workout-actions) —
+ * confirmed all already defined and globally loaded via workout.css, no
+ * new CSS needed — rather than gym-programme's own bespoke
+ * gp-exercise-card__* classes, so this genuinely looks like the same
+ * app now, not an approximation. parseHoldSeconds()/formatTime() copied
+ * directly from prescribed-session.js's proven implementation.
+ *
+ * Completion tracking changed from DOM-scanning aria-pressed buttons
+ * (only possible when every exercise was visible at once) to a
+ * completedExerciseIndices Set, incremented on "Next Exercise"/"Finish
+ * Session" (which now double as the completion action, same as
+ * prescribed-session.js), not on "Skip this one" — matches
+ * prescribed-session.js's skip behaviour exactly.
+ *
+ * Week 6 glance / Week 12 reflection moments, programme progression
+ * logic, A/B session alternation, activityLog/progressLog writes, and
+ * exit-guard/partial-save behaviour all unchanged — only the per-
+ * exercise walkthrough was rebuilt. gym-programme.js v4→v5.
+ *
+ * Old gp-exercise-card__* CSS rules now unused by this file, not
+ * deleted — the gp-moment glance/reflection styles in the same file are
+ * still needed. Cleanup logged as its own decision, not guessed at here.
+ *
+ * Not yet on-device confirmed.
+ *
  * 10 Aug 2026 v224
  * Two connected requests from Graeme, both fully done: (1) restore
  * YouTube search-term links across the exercise database ("so we get
@@ -887,7 +929,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v224";
+const CACHE_NAME = "alongside-v225";
 
 const SHELL_URLS = [
 

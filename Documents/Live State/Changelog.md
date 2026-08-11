@@ -735,4 +735,19 @@ Two connected requests from Graeme. "I've noticed all the exercises have lost th
 
 ---
 
+### gym-programme.js rebuilt to match prescribed-session.js's UX — 11 Aug 2026
+
+Graeme, with side-by-side screenshots: "Screenshot 1 is flat and barely offer any interaction... They all need to be like S2&3." Confirmed precisely: yesterday's fix (10 Aug) made the why/instructions/video content actually render, but never touched the real gap — this file was still a scrollable list of every exercise at once, one "Session done" button at the bottom, while `prescribed-session.js` and `workout.js` walk through one exercise per screen with a progress header, timer/reps display, and structured guidance.
+
+- Rebuilt the render/event logic to walk one exercise at a time, reusing `prescribed-session.js`'s and `workout.js`'s exact proven markup and shared CSS classes (`workout-header`, `exercise-display`, `timer-circle`, `reps-display`, `exercise-instructions`, `coaching-tip`, `youtube-link`, `workout-actions`) instead of gym-programme's own bespoke classes — confirmed all already defined and globally loaded, no new CSS needed.
+- `parseHoldSeconds()`/`formatTime()` copied directly from `prescribed-session.js` rather than reinvented.
+- Completion tracking moved from DOM-scanning (`aria-pressed` buttons, only worked when every exercise was visible at once) to a `completedExerciseIndices` Set — "Next Exercise"/"Finish Session" mark completion, "Skip this one" doesn't, matching `prescribed-session.js` exactly.
+- Week 6 glance, Week 12 reflection, programme progression, A/B alternation, activityLog/progressLog writes, exit-guard/partial-save — all unchanged, only the per-exercise walkthrough was touched.
+- Old `gp-exercise-card__*` CSS now unused by this file, deliberately not deleted (the `gp-moment` glance/reflection styles in the same file are still needed) — logged as a separate cleanup decision.
+- `gym-programme.js` v4→v5, `sw.js` v224→v225.
+
+**Not yet on-device confirmed** — this is a structural rebuild of the core session-walkthrough flow, the highest-priority thing to test next.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*
