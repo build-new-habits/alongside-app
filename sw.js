@@ -923,6 +923,10 @@ rather than only a buried bypass door. Added both.
  *   Truth Rule's documented fallback. Cache-bump only otherwise; no
  *   other files changed this deploy.
  *
+ * 11 Aug 2026 v233 - PT-4/WOW-6: store.js v20 (liftLog), gym-programme.js v6,
+ *   settings.js v15, gym-programme.css v2. Lift notes as a memory aid, off by
+ *   default. Cache bump only, no new files.
+ *
  * 11 Aug 2026 v232 - PT-1 copy audit: changing-body b2 made self-contained,
  *   escalation-trap tidied. All 19 DAY_ONE rows checked for orphan referents.
  *
@@ -959,7 +963,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v232";
+const CACHE_NAME = "alongside-v233";
 
 const SHELL_URLS = [
 
