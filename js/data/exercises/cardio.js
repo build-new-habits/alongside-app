@@ -1,5 +1,15 @@
 /**
  * data/exercises/cardio.js
+ * 11 Aug 2026 v2
+ *
+ * v2 - CON-6. Four machine warm-ups ported in from session-builder.js's
+ *   private pool (stationary bike, treadmill, cross trainer, rower). The
+ *   database had no short cardio-machine warm-up at all: every machine
+ *   entry was a twenty- or thirty-minute session, so once the session
+ *   builder started selecting from the shared database a gym user had
+ *   nothing gentle to open with. Authored to the Exercise Entry Standard,
+ *   including watchOut and load.
+ *
  * 10 Aug 2026 v1
  *
  * v1 — First version header on this file. Added tailored YouTube search
@@ -719,6 +729,148 @@ export const CARDIO = [
     coaching: 'HIIT only works if the work intervals are genuinely hard. Going at 70% effort during HIIT produces 70% of the benefit — and you might as well do steady-state cardio instead.',
     why: 'HIIT produces cardiovascular adaptations equivalent to much longer steady-state sessions in a fraction of the time. Among the most time-efficient training formats available.',
     credits: 90
+  },
+
+  // ── MACHINE WARM-UPS (11 Aug 2026, CON-6) ────────────────────────────────
+  // Ported from session-builder.js's private pool. Short by design: the
+  // duration ceiling in session-categories.js is what separates a warm-up
+  // from a session, and these sit deliberately under it.
+
+  {
+    id: 'bike-easy-spin-warmup',
+    name: 'Stationary Bike — Easy Spin',
+    youtube: 'stationary bike warm up before weights',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: ['exercise-bike'],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'hamstring', 'glutes', 'calves'],
+    contraindications: ['knee-acute'],
+    energyRequired: 3,
+    difficultyLevel: 1,
+    duration: 300,
+    perSide: false,
+    sets: 1,
+    tempo: 'Easy, conversational pace',
+    rest: '0s',
+    instructions: [
+      'Set the saddle height so your leg is almost straight at the bottom of the pedal stroke, with a slight bend in the knee',
+      'Set the resistance low — lower than feels like work',
+      'Pedal at a steady, even cadence for five minutes',
+      'Sit upright rather than hunching over the console'
+    ],
+    coaching: 'Keep the resistance light enough that your legs never burn — you are warming them up, not using them up before the session starts.',
+    why: 'Raises your heart rate and warms the knees and hips without any impact through them. Five minutes here is what makes the first squat or hinge feel smooth rather than stiff.',
+    watchOut: [
+      'Saddle too low, which crowds the knee — your leg should be nearly straight at the bottom',
+      'Resistance creeping up because it feels too easy; easy is the point',
+      'Rocking side to side in the saddle, which usually means the seat is too high'
+    ],
+    load: 'Light enough that you could hold a conversation the whole five minutes.',
+    credits: 25
+  },
+
+  {
+    id: 'treadmill-easy-walk-warmup',
+    name: 'Treadmill — Easy Walk',
+    youtube: 'treadmill walk warm up before gym',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: ['treadmill'],
+    equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'hamstring', 'glutes', 'calves', 'hip'],
+    contraindications: [],
+    energyRequired: 3,
+    difficultyLevel: 1,
+    duration: 300,
+    perSide: false,
+    sets: 1,
+    tempo: 'Brisk walk',
+    rest: '0s',
+    instructions: [
+      'Start the belt slowly and step on before bringing it up to a brisk walking pace',
+      'Set the incline flat, or at one or two percent if you want a little more',
+      'Walk for five minutes, letting your arms swing naturally at your sides',
+      'Stand tall rather than leaning on the handrails'
+    ],
+    coaching: 'Let go of the handrails — holding on changes your posture and takes most of the benefit out of the walk.',
+    why: 'Gets blood moving into the legs and hips before you load them, and the walking pattern gently mobilises the ankles and hips at the same time.',
+    watchOut: [
+      'Gripping the rails and leaning forward, which rounds the back and shortens the stride',
+      'Setting the incline steep, which turns a warm-up into a workout',
+      'Watching your feet rather than looking ahead, which pulls the neck out of line'
+    ],
+    load: 'Brisk, not a jog. You should finish warm rather than out of breath.',
+    credits: 25
+  },
+
+  {
+    id: 'cross-trainer-easy-warmup',
+    name: 'Cross Trainer — Easy Pace',
+    youtube: 'cross trainer elliptical warm up',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: ['elliptical'],
+    equipmentOptional: [],
+    affectsAreas: ['full-body', 'quadriceps', 'glutes', 'shoulder', 'upper-back'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 3,
+    difficultyLevel: 1,
+    duration: 300,
+    perSide: false,
+    sets: 1,
+    tempo: 'Easy, full range',
+    rest: '0s',
+    instructions: [
+      'Step on with both feet in the centre of the pedals and take hold of the moving handles',
+      'Set the resistance low, and start with a slow, full stride',
+      'Build to a steady, easy pace and keep going for five minutes',
+      'Let the handles move with your stride rather than pushing them separately'
+    ],
+    coaching: 'Use the whole stride rather than short choppy steps — the full range is what actually warms the hips and shoulders.',
+    why: 'Low impact and full body. It warms the shoulders and upper back as well as the legs, which matters if there is pressing or pulling later in the session.',
+    watchOut: [
+      'Short, quick steps instead of a full stride, which warms almost nothing',
+      'Holding the fixed centre bars rather than the moving handles, so the upper body does not get warmed at all',
+      'Resistance high enough that your legs start to burn; keep it easy'
+    ],
+    load: 'Light resistance. This should feel almost too easy.',
+    credits: 25
+  },
+
+  {
+    id: 'rower-easy-warmup',
+    name: 'Rowing Machine — Easy Technique',
+    youtube: 'rowing machine technique warm up',
+    category: 'cardio',
+    movementPattern: 'locomotion',
+    equipment: ['rowing-machine'],
+    equipmentOptional: [],
+    affectsAreas: ['full-body', 'upper-back', 'hamstring', 'glutes', 'calves'],
+    contraindications: ['lower-back-acute', 'shoulder-acute'],
+    energyRequired: 3,
+    difficultyLevel: 1,
+    duration: 240,
+    perSide: false,
+    sets: 1,
+    tempo: 'Easy, technique-focused',
+    rest: '0s',
+    instructions: [
+      'Sit on the machine, strap your feet in, and take hold of the handle with both hands',
+      'Start with your shins upright and your arms straight, leaning very slightly forward',
+      'Push with your legs first, then lean back, then pull the handle to your lower ribs',
+      'Reverse it on the way back — arms away, then lean forward, then bend the knees',
+      'Row at an easy pace for four minutes, thinking about the sequence rather than the speed'
+    ],
+    coaching: 'Legs first, arms last. Almost everyone pulls with the arms too early, and the order is what makes rowing feel powerful instead of awkward.',
+    why: 'Warms the whole back of the body at once — calves, hamstrings, glutes, back and shoulders — which is more than any other machine gives you in four minutes.',
+    watchOut: [
+      'Pulling with the arms before the legs have finished driving, which is the most common rowing habit and the least efficient',
+      'Rounding the back as you reach forward — hinge from the hips and keep the chest open',
+      'Rushing the return; it should take about twice as long as the pull'
+    ],
+    load: 'Light damper setting, easy pace. Technique is the point of these four minutes, not effort.',
+    credits: 25
   }
 
 ];

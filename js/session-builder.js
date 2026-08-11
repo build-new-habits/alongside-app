@@ -1,6 +1,33 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v9
+ *
+ * v9 - CON-6. The private EXERCISE_POOL is gone. _filterCandidates() now
+ *   selects from the shared 461-entry database in js/data/exercises/ via
+ *   the new js/data/session-categories.js, which maps this file's 39
+ *   fine-grained categories ("hip-hinge", "anti-rotation") onto queries
+ *   over movementPattern, category and affectsAreas -- rather than
+ *   re-tagging 461 entries with a second parallel vocabulary that would
+ *   drift from the first.
+ *
+ *   What this fixes, all at once: 61 pool entries rendered near-blank
+ *   because they were in the retired description/cues shape; 139 practice
+ *   entries and the whole yoga library were unreachable from the builder;
+ *   and every shared fix had to be written twice, with the second write
+ *   found only after a live bug (PT-11, CON-2, PT-19 all had this shape).
+ *
+ *   Section is no longer stored per entry. It was never a property of an
+ *   exercise -- a hip mobility drill is a warm-up in a Lower Body session
+ *   and main content in a Mobility session -- and storing it is why the
+ *   pool duplicated entries. It now comes from which SESSION_TYPES list a
+ *   category appeared in, with a difficulty and energy ceiling applied to
+ *   warm-ups so nothing strenuous can land there.
+ *
+ *   Four machine warm-ups the pool had and the database did not were
+ *   ported into exercises/cardio.js v2 first. Nothing was deleted before
+ *   it existed somewhere better.
+ *
  * 11 Aug 2026 v8
  *
  * v8 - All four machine cardio-warmup entries (bike, treadmill, cross
@@ -123,6 +150,8 @@
 
 import { store } from "./store.js";
 import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
+import { EXERCISES } from "./data/exercises/index.js";
+import { matchCategory } from "./data/session-categories.js";
 
 // ── Allocation presets (05 Aug 2026) ──────────────────────────────────────────
 // Scales EXERCISE_COUNT's warmup/main/cooldown split. Warmup always floors at
@@ -215,680 +244,28 @@ export const SESSION_TYPES = [
 //                  description, cues, youtube, recommended?, logWeight?,
 //                  duration?, equipment[], contraindications[], difficultyLevel }
 
-const EXERCISE_POOL = [
-
-  // CARDIO WARMUP (05 Aug 2026) — real content for the gap Graeme flagged:
-  // no cardio-machine warmup option existed anywhere in a gym session.
-  // Deliberately gentle/low-intensity — this is a warmup, not the workout.
-  { id: "sb-cwu-01", name: "Stationary bike, easy spin", section: "warmup", category: "cardio-warmup",
-    sets: 1, tempo: "Easy, conversational pace", rest: "0s", difficultyLevel: 1, duration: 300,
-    instructions: [
-      "Set the saddle height so your leg is almost straight at the bottom of the pedal stroke, with a slight bend in the knee",
-      "Set the resistance low — lower than feels like work",
-      "Pedal at a steady, even cadence for five minutes",
-      "Sit upright rather than hunching over the console"
-    ],
-    why: "Raises your heart rate and warms the knees and hips without any impact through them. Five minutes here is what makes the first squat or hinge feel smooth rather than stiff.",
-    coaching: "Keep the resistance light enough that your legs never burn — you are warming them up, not using them up before the session starts.",
-    watchOut: [
-      "Saddle too low, which crowds the knee — your leg should be nearly straight at the bottom",
-      "Resistance creeping up because it feels too easy; easy is the point",
-      "Rocking side to side in the saddle, which usually means the seat is too high"
-    ],
-    load: "Light enough that you could hold a conversation the whole five minutes.",
-    youtube: "stationary bike warm up before weights",
-    equipment: ["exercise-bike"], contraindications: ["knee-acute"] },
-
-  { id: "sb-cwu-02", name: "Treadmill, easy walk", section: "warmup", category: "cardio-warmup",
-    sets: 1, tempo: "Brisk walk", rest: "0s", difficultyLevel: 1, duration: 300,
-    instructions: [
-      "Start the belt slowly and step on before bringing it up to a brisk walking pace",
-      "Set the incline flat, or at one or two percent if you want a little more",
-      "Walk for five minutes, letting your arms swing naturally at your sides",
-      "Stand tall rather than leaning on the handrails"
-    ],
-    why: "Gets blood moving into the legs and hips before you load them, and the walking pattern gently mobilises the ankles and hips at the same time.",
-    coaching: "Let go of the handrails — holding on changes your posture and takes most of the benefit out of the walk.",
-    watchOut: [
-      "Gripping the rails and leaning forward, which rounds the back and shortens the stride",
-      "Setting the incline steep, which turns a warm-up into a workout",
-      "Watching your feet rather than looking ahead, which pulls the neck out of line"
-    ],
-    load: "Brisk, not a jog. You should finish warm rather than out of breath.",
-    youtube: "treadmill walk warm up before gym",
-    equipment: ["treadmill"], contraindications: [] },
-
-  { id: "sb-cwu-03", name: "Cross trainer, easy pace", section: "warmup", category: "cardio-warmup",
-    sets: 1, tempo: "Easy, full range", rest: "0s", difficultyLevel: 1, duration: 300,
-    instructions: [
-      "Step on with both feet in the centre of the pedals and take hold of the moving handles",
-      "Set the resistance low, and start with a slow, full stride",
-      "Build to a steady, easy pace and keep going for five minutes",
-      "Let the handles move with your stride rather than pushing them separately"
-    ],
-    why: "Low impact and full body. It warms the shoulders and upper back as well as the legs, which matters if there is pressing or pulling later in the session.",
-    coaching: "Use the whole stride rather than short choppy steps — the full range is what actually warms the hips and shoulders.",
-    watchOut: [
-      "Short, quick steps instead of a full stride, which warms almost nothing",
-      "Holding the fixed centre bars rather than the moving handles, so the upper body does not get warmed at all",
-      "Resistance high enough that your legs start to burn; keep it easy"
-    ],
-    load: "Light resistance. This should feel almost too easy.",
-    youtube: "cross trainer elliptical warm up",
-    equipment: ["elliptical"], contraindications: ["shoulder-acute"] },
-
-  // BODYWEIGHT PULSE-RAISERS (11 Aug 2026, PT-19) — the reason no home
-  // session ever opened with cardio: all four cardio-warmup entries needed a
-  // machine, so the category was structurally empty without a gym.
-  //
-  // Tiered by difficultyLevel so the pulse-raiser scales with the person
-  // rather than being one intensity. A deconditioned beginner marches; a
-  // fitter person gets jacks or high knees. Burpees are deliberately NOT a
-  // warmup at any tier — they are a main-session conditioning movement, and
-  // asking someone to open with them is how a warmup becomes the reason
-  // somebody stops coming.
-  //
-  // AUTHORED TO THE EXERCISE ENTRY STANDARD (v2, same day). The first pass
-  // wrote these with description/cues — the retired shape — matching the
-  // surrounding file rather than the standard set hours earlier, which meant
-  // they rendered as a name and a set count and nothing else. Exactly the
-  // PT-13 failure, self-inflicted. Rewritten in full.
-
-  { id: "sb-cwu-05", name: "Marching on the spot", section: "warmup", category: "cardio-warmup",
-    sets: 1, tempo: "Steady, easy", rest: "0s", difficultyLevel: 1, duration: 180,
-    instructions: [
-      "Stand tall with your feet hip-width apart, somewhere you have space to swing your arms",
-      "Lift one knee up towards hip height, then place it down and lift the other",
-      "Let your arms swing naturally in opposition, the way they would if you were walking",
-      "Keep going at a steady, even rhythm for three minutes"
-    ],
-    why: "The gentlest way to get your heart rate up and warm the hips before anything else. Cold hips are why squats and hinges feel awkward in the first few reps.",
-    coaching: "You should be able to hold a conversation the whole way through. If you could not, ease off — this is the warm-up, not the session.",
-    watchOut: [
-      "Knees going higher than hip height, which tends to make the lower back arch — hip height is plenty",
-      "Drifting into a shuffle as you tire, with the knees barely lifting at all",
-      "Holding your breath without noticing — breathe normally throughout"
-    ],
-    youtube: "marching on the spot warm up beginners",
-    equipment: [], contraindications: [] },
-
-  { id: "sb-cwu-06", name: "Jog on the spot", section: "warmup", category: "cardio-warmup",
-    sets: 1, tempo: "Easy, conversational", rest: "0s", difficultyLevel: 2, duration: 180,
-    instructions: [
-      "Stand with your feet hip-width apart and your weight forward on the balls of your feet",
-      "Begin jogging on the spot, lifting each foot just a few inches from the floor",
-      "Keep your elbows bent at roughly ninety degrees and let your arms swing",
-      "Stay light and continue for three minutes"
-    ],
-    why: "Raises your pulse and wakes up the calves and ankles, which is what makes the first working set feel steady rather than stiff.",
-    coaching: "Land softly enough that you can barely hear your own feet — the quieter you are, the better your ankles are absorbing the impact.",
-    watchOut: [
-      "Landing heavily or flat-footed, which sends the shock up through the knees — stay on the balls of your feet",
-      "Gasping rather than breathing faster, which means you have started too hard",
-      "Any nagging ache in the knees or shins: switch to marching instead, it does the same job"
-    ],
-    youtube: "jog on the spot warm up technique",
-    equipment: [], contraindications: ["knee-acute", "ankle-acute"] },
-
-  { id: "sb-cwu-07", name: "Step-ups on a stair", section: "warmup", category: "cardio-warmup",
-    sets: 1, tempo: "Steady, controlled", rest: "0s", difficultyLevel: 2, duration: 180,
-    instructions: [
-      "Find the bottom stair or a low, stable step",
-      "Place your whole foot on the step, not just the toes, and step up until both feet are on it",
-      "Step back down with the same leg leading, under control",
-      "Change your leading leg every thirty seconds or so, and continue for three minutes"
-    ],
-    why: "Raises the pulse and warms the legs at the same time, with almost no impact through the joints. A good choice on a day when jogging feels like too much.",
-    coaching: "Push through the heel of the foot on the step rather than the toes, and you will feel this in the glute rather than the front of the knee.",
-    watchOut: [
-      "Only the front of the foot on the step, which puts the strain on the calf and makes the step less stable",
-      "Leading with the same leg the whole time, so one side does all the work — change regularly",
-      "Rushing and losing control on the way down; the step down should be as deliberate as the step up"
-    ],
-    youtube: "step up warm up stairs low impact",
-    equipment: [], contraindications: ["knee-acute"] },
-
-  { id: "sb-cwu-08", name: "Jumping jacks", section: "warmup", category: "cardio-warmup",
-    sets: 2, reps: "30 seconds", rest: "30s", tempo: "Steady", difficultyLevel: 3, duration: 120,
-    instructions: [
-      "Stand with your feet together and your arms relaxed at your sides",
-      "Jump both feet out wide as you sweep both arms out and overhead",
-      "Jump the feet back together as the arms come back down",
-      "Continue for thirty seconds, rest for thirty, then repeat once more"
-    ],
-    why: "Raises the heart rate quickly and warms the shoulders as well as the legs, which matters if there is any pressing or pulling later in the session.",
-    coaching: "Take the arms all the way overhead rather than stopping at shoulder height — the full sweep is what warms the shoulder joint.",
-    watchOut: [
-      "Landing with locked-out knees rather than soft ones, which sends the impact straight into the joint",
-      "Half-sweeping the arms as you tire, so the shoulders stop getting warmed at all",
-      "If jumping does not suit you today, step one foot out at a time instead — it does the same job with no impact"
-    ],
-    youtube: "jumping jacks warm up proper form",
-    equipment: [], contraindications: ["knee-acute", "ankle-acute", "lower-back-acute", "shoulder-acute"] },
-
-  { id: "sb-cwu-09", name: "High knees", section: "warmup", category: "cardio-warmup",
-    sets: 2, reps: "30 seconds", rest: "30s", tempo: "Quick but controlled", difficultyLevel: 4, duration: 120,
-    instructions: [
-      "Stand tall with your feet hip-width apart and your chest lifted",
-      "Drive one knee up towards hip height at pace, then swap quickly to the other",
-      "Stay on the balls of your feet and let your arms drive in opposition",
-      "Continue for thirty seconds, rest for thirty, then repeat once more"
-    ],
-    why: "The most demanding of the warm-up options. It raises your pulse fast and switches on the hip flexors and calves, which is useful before anything explosive.",
-    coaching: "Pace it so that you could manage a third round if you were asked to — a warm-up you have to recover from is not a warm-up.",
-    watchOut: [
-      "Leaning back to get the knees higher, which loads the lower back — stay tall and accept lower knees",
-      "Heavy landings; stay on the balls of the feet and keep it quiet",
-      "Sacrificing height for speed until it becomes a shuffle, at which point it stops warming the hips"
-    ],
-    youtube: "high knees warm up running drill",
-    equipment: [], contraindications: ["knee-acute", "ankle-acute", "hip-acute", "lower-back-acute"] },
-
-  { id: "sb-cwu-04", name: "Rowing machine, easy pace", section: "warmup", category: "cardio-warmup",
-    sets: 1, tempo: "Easy, technique-focused", rest: "0s", difficultyLevel: 1, duration: 240,
-    instructions: [
-      "Sit on the machine, strap your feet in, and take hold of the handle with both hands",
-      "Start with your shins upright and your arms straight, leaning very slightly forward",
-      "Push with your legs first, then lean back, then pull the handle to your lower ribs",
-      "Reverse it on the way back — arms away, then lean forward, then bend the knees",
-      "Row at an easy pace for four minutes, thinking about the sequence rather than the speed"
-    ],
-    why: "Warms the whole back of the body at once — calves, hamstrings, glutes, back and shoulders — which is more than any other machine gives you in four minutes.",
-    coaching: "Legs first, arms last. Almost everyone pulls with the arms too early, and the order is what makes rowing feel powerful instead of awkward.",
-    watchOut: [
-      "Pulling with the arms before the legs have finished driving, which is the most common rowing habit and the least efficient",
-      "Rounding the back as you reach forward — hinge from the hips and keep the chest open",
-      "Rushing the return; it should take about twice as long as the pull"
-    ],
-    load: "Light damper setting, easy pace. Technique is the point of these four minutes, not effort.",
-    youtube: "rowing machine technique warm up",
-    equipment: ["rowing-machine"], contraindications: ["lower-back-acute", "shoulder-acute"] },
-
-  // ACTIVATION
-  { id: "sb-act-01", name: "Glute bridge", section: "warmup", category: "activation",
-    sets: 2, reps: "12", tempo: "2-1-2", rest: "30s", difficultyLevel: 1,
-    description: "Lie on your back, knees bent, feet flat. Drive through your heels to lift your hips until your body forms a straight line. Squeeze the glutes at the top.",
-    cues: ["Drive through your heels", "Squeeze glutes hard at the top", "Keep your core braced"],
-    youtube: "glute bridge activation technique",
-    equipment: [], contraindications: ["lower-back-acute", "hamstring-acute"] },
-
-  { id: "sb-act-02", name: "Clamshell", section: "warmup", category: "activation",
-    sets: 2, reps: "15 each side", tempo: "2-1-2", rest: "20s", difficultyLevel: 1,
-    description: "Lie on your side, knees bent at 45 degrees. Keeping feet together, rotate the top knee upward. Your pelvis should not move.",
-    cues: ["Pelvis stays completely still", "Movement from the outer hip only", "Slow on the return"],
-    youtube: "clamshell glute medius exercise",
-    equipment: [], contraindications: ["hip-acute"] },
-
-  { id: "sb-act-03", name: "Banded monster walk", section: "warmup", category: "activation",
-    sets: 2, reps: "20 steps each way", tempo: "Controlled", rest: "30s", difficultyLevel: 1,
-    description: "Band just above knees. Slight squat position. Walk sideways, keeping tension in the band and hips level.",
-    cues: ["Stay in the squat — do not stand up between steps", "Constant tension in the band", "Toes forward throughout"],
-    youtube: "banded monster walk glute activation",
-    equipment: ["resistance-bands"], contraindications: ["hip-acute", "knee-acute"] },
-
-  // HIP MOBILITY
-  { id: "sb-hip-01", name: "Hip 90/90 stretch", section: "warmup", category: "hip-mobility",
-    sets: 2, reps: "60s each side", tempo: "Hold", rest: "15s", difficultyLevel: 1, duration: 60,
-    description: "Sit with both legs bent at 90 degrees — one in front, one to the side. Sit tall and lean gently forward over the front shin.",
-    cues: ["Sit as tall as you can before leaning", "The stretch is in the outer hip of the front leg", "Let gravity do the work"],
-    youtube: "90 90 hip stretch piriformis",
-    equipment: [], contraindications: ["hip-acute", "knee-acute"] },
-
-  { id: "sb-hip-02", name: "Hip flexor stretch", section: "warmup", category: "hip-mobility",
-    sets: 2, reps: "45s each side", tempo: "Hold", rest: "15s", difficultyLevel: 1, duration: 45,
-    description: "Half-kneeling. Rear knee on the floor. Shift weight forward until you feel a stretch in the front of the rear hip.",
-    cues: ["Tuck your tailbone slightly", "Chest tall", "Squeeze the rear glute to deepen"],
-    youtube: "kneeling hip flexor stretch technique",
-    equipment: [], contraindications: ["hip-acute", "knee-acute"] },
-
-  { id: "sb-hip-03", name: "World's greatest stretch", section: "warmup", category: "hip-mobility",
-    sets: 2, reps: "5 each side", tempo: "Slow", rest: "15s", difficultyLevel: 2,
-    description: "From a lunge with right foot forward, place right hand beside foot. Rotate left arm toward ceiling. Return and repeat.",
-    cues: ["Keep the back knee off the floor", "Rotation from the mid-back", "Move slowly — this is warm-up"],
-    youtube: "world's greatest stretch warm up",
-    equipment: [], contraindications: ["lower-back-acute", "hip-acute"] },
-
-  // THORACIC MOBILITY
-  { id: "sb-thor-01", name: "Thoracic rotation", section: "warmup", category: "thoracic-mobility",
-    sets: 2, reps: "10 each side", tempo: "Slow", rest: "15s", difficultyLevel: 1,
-    description: "Sit tall. Hands behind head. Rotate upper body to one side as far as comfortable. Lower back stays still.",
-    cues: ["Movement from upper back only", "Lower back stays forward", "Breathe into the rotation"],
-    youtube: "seated thoracic rotation mobility",
-    equipment: [], contraindications: ["upper-back-acute"] },
-
-  { id: "sb-thor-02", name: "Cat-cow", section: "warmup", category: "cat-cow",
-    sets: 2, reps: "10 slow", tempo: "Breath-led", rest: "15s", difficultyLevel: 1,
-    description: "On hands and knees. Breathe in as you drop your belly and lift your head. Breathe out as you round your back and tuck your chin.",
-    cues: ["Move with your breath — do not rush", "Feel the whole spine moving", "Arms straight throughout"],
-    youtube: "cat cow stretch lower back mobility",
-    equipment: [], contraindications: [] },
-
-  // SHOULDER WARMUP
-  { id: "sb-sh-01", name: "Band pull-aparts", section: "warmup", category: "shoulder-warmup",
-    sets: 2, reps: "15", tempo: "Controlled", rest: "15s", difficultyLevel: 1,
-    description: "Hold a resistance band at chest height, arms straight. Pull the band apart by drawing hands outward until it touches your chest.",
-    cues: ["Keep arms straight", "Lead with thumbs turning outward", "Slow and controlled"],
-    youtube: "band pull aparts shoulder warm up",
-    equipment: ["resistance-bands"], contraindications: ["shoulder-acute"] },
-
-  { id: "sb-sh-02", name: "Shoulder circles", section: "warmup", category: "shoulder-warmup",
-    sets: 2, reps: "10 each direction", tempo: "Slow", rest: "0s", difficultyLevel: 1,
-    description: "Stand or sit tall. Roll both shoulders forward for 10 slow circles, then backward for 10.",
-    cues: ["Move at the shoulder, not just the arms", "Keep your neck long", "Full range of motion"],
-    youtube: "shoulder circles warm up mobility",
-    equipment: [], contraindications: ["shoulder-acute"] },
-
-  // ANKLE MOBILITY
-  { id: "sb-ank-01", name: "Ankle circles", section: "warmup", category: "ankle-mobility",
-    sets: 2, reps: "10 each direction, each foot", tempo: "Slow", rest: "0s", difficultyLevel: 1,
-    description: "Seated or standing on one leg. Draw full circles with your foot — both directions.",
-    cues: ["Move at the ankle, not the knee", "Full range of motion", "Slow and deliberate"],
-    youtube: "ankle circles mobility warm up",
-    equipment: [], contraindications: ["ankle-acute"] },
-
-  { id: "sb-ank-02", name: "Banded ankle dorsiflexion", section: "warmup", category: "ankle-mobility",
-    sets: 2, reps: "10 each foot", tempo: "Slow", rest: "0s", difficultyLevel: 1,
-    description: "Band anchored low behind you, around your ankle. Step forward. Drive your knee over your toes while keeping your heel down. Resistance improves joint mobility.",
-    cues: ["Heel stays on the floor", "Drive the knee directly over the toes", "Feel the stretch at the back of the ankle"],
-    youtube: "banded ankle dorsiflexion mobility",
-    equipment: ["resistance-bands"], contraindications: ["ankle-acute"] },
-
-  // BREATHING WARMUP
-  { id: "sb-br-01", name: "Diaphragmatic breathing", section: "warmup", category: "breathing-warmup",
-    sets: 1, reps: null, tempo: "Breath-led", rest: "0s", difficultyLevel: 1, duration: 60,
-    description: "Lie on your back, knees bent. One hand on belly, one on chest. Breathe in — belly rises, chest stays still. Breathe out — belly falls.",
-    cues: ["Belly moves first, not chest", "Exhale gently — do not force", "About 20% effort — this is not sucking in"],
-    youtube: "diaphragmatic breathing core activation",
-    equipment: [], contraindications: [] },
-
-  // HIP HINGE (MAIN)
-  { id: "sb-hh-01", name: "Romanian deadlift", section: "main", category: "hip-hinge",
-    sets: 3, reps: "10", tempo: "3-0-2", rest: "75s", difficultyLevel: 2, logWeight: true,
-    recommended: "Start at a weight where you can feel the hamstring stretch on every rep",
-    description: "Stand holding dumbbells. With slight knee bend, hinge at hips and lower the weights down your legs until you feel a hamstring stretch. Drive hips forward to return.",
-    cues: ["Push your hips back — not down", "Keep the weights close to your legs", "Stop before your back rounds", "Feel the hamstring stretch"],
-    youtube: "romanian deadlift dumbbell technique",
-    equipment: ["dumbbells"], contraindications: ["lower-back-acute", "hamstring-acute"] },
-
-  { id: "sb-hh-02", name: "Cable pull-through", section: "main", category: "hip-hinge",
-    sets: 3, reps: "12", tempo: "3-1-2", rest: "60s", difficultyLevel: 2, logWeight: true,
-    recommended: "Light weight — focus on the hip hinge pattern",
-    description: "Set cable to lowest position with a rope attachment. Stand facing away. Hinge at hips to let the rope pull back between your legs, then drive hips forward to stand.",
-    cues: ["Push hips back — not knees forward", "Back stays flat throughout", "Power from glutes driving forward"],
-    youtube: "cable pull through hip hinge tutorial",
-    equipment: ["cable-machine"], contraindications: ["lower-back-acute"] },
-
-  { id: "sb-hh-03", name: "Kettlebell swing", section: "main", category: "hip-hinge",
-    sets: 3, reps: "15", tempo: "Explosive", rest: "60s", difficultyLevel: 2, logWeight: true,
-    recommended: "Moderate weight — the swing is driven by the hips, not the arms",
-    description: "Hinge to load the hips, then drive them explosively forward to swing the bell to chest height. It should feel like a hip thrust, not an arm raise.",
-    cues: ["Hips drive the bell — arms just hold it", "Snap the hips at the top", "Back flat on the hinge", "Let the bell float at the top"],
-    youtube: "kettlebell swing technique russian hip hinge",
-    equipment: ["kettlebells"], contraindications: ["lower-back-acute", "hamstring-acute"] },
-
-  // 05 Aug 2026 — bodyweight-only lower-body main content, found missing
-  // during Gym Session Builder Phase 1 testing (confirmed: every existing
-  // squat-pattern/hip-hinge/single-leg/leg-isolation exercise required
-  // equipment; a no-equipment Lower Body session got 0 main exercises).
-  { id: "sb-hh-04", name: "Bodyweight good morning", section: "main", category: "hip-hinge",
-    sets: 3, reps: "12", tempo: "3-1-2", rest: "60s", difficultyLevel: 1,
-    description: "Hands behind your head or crossed at your chest, soft bend in the knees. Hinge forward from the hips, keeping your back flat, until you feel a stretch in your hamstrings. Return by driving your hips forward.",
-    cues: ["Hips move back, not down", "Back stays flat throughout — this is not a squat", "Feel it in the hamstrings, not the lower back"],
-    youtube: "bodyweight good morning hip hinge",
-    equipment: [], contraindications: ["lower-back-acute", "hamstring-acute"] },
-
-  // BRIDGE
-  { id: "sb-br-02", name: "Glute bridge — 3s hold", section: "main", category: "bridge",
-    sets: 3, reps: "12", tempo: "1-3-1", rest: "45s", difficultyLevel: 1,
-    description: "Standard glute bridge with a 3-second hold at the top. The hold is where the glute activation happens.",
-    cues: ["Count 3 seconds — do not rush", "Squeeze hard at the top", "Drive through heels, not toes"],
-    youtube: "glute bridge isometric hold technique",
-    equipment: [], contraindications: ["lower-back-acute", "hamstring-acute"] },
-
-  { id: "sb-br-03", name: "Hip thrust — barbell", section: "main", category: "bridge",
-    sets: 3, reps: "10", tempo: "2-1-2", rest: "90s", difficultyLevel: 3, logWeight: true,
-    recommended: "Moderate-heavy weight — this is your main glute strength movement",
-    description: "Shoulders on a bench, barbell across hips. Drive hips up until your body forms a straight line from knees to shoulders. Squeeze hard at the top.",
-    cues: ["Chin tucked — do not hyperextend the neck", "Drive hips straight up", "Squeeze the glutes hard at the top", "Control the lowering"],
-    youtube: "barbell hip thrust technique tutorial",
-    equipment: ["barbell", "bench"], contraindications: ["lower-back-acute", "hip-acute"] },
-
-  { id: "sb-br-04", name: "Single-leg glute bridge", section: "main", category: "bridge",
-    sets: 3, reps: "10 each side", tempo: "2-2-2", rest: "45s", difficultyLevel: 2,
-    description: "Lie on your back, one knee bent with foot flat. Extend the other leg straight. Drive through the planted heel to lift hips. Hold 2 seconds.",
-    cues: ["Level hips — the unsupported side will want to drop", "Squeeze the working glute", "2-second hold"],
-    youtube: "single leg glute bridge technique",
-    equipment: [], contraindications: ["lower-back-acute", "hamstring-acute"] },
-
-  // SINGLE-LEG
-  { id: "sb-sl-01", name: "Bulgarian split squat", section: "main", category: "single-leg",
-    sets: 3, reps: "8 each side", tempo: "3-1-2", rest: "75s", difficultyLevel: 3, logWeight: true,
-    recommended: "Bodyweight or light dumbbells — balance is the challenge first",
-    description: "Stand a metre in front of a bench. Rear foot on bench. Lower until front thigh is roughly parallel, then drive back up through the front heel.",
-    cues: ["Front knee over ankle", "Torso can lean forward slightly", "3 seconds down", "Balance first, then add weight"],
-    youtube: "bulgarian split squat technique beginners",
-    equipment: ["bench"], contraindications: ["knee-acute", "hip-acute"] },
-
-  { id: "sb-sl-02", name: "Step-up", section: "main", category: "single-leg",
-    sets: 3, reps: "10 each side", tempo: "2-1-2", rest: "60s", difficultyLevel: 2, logWeight: true,
-    recommended: "Bodyweight or light dumbbells",
-    description: "Stand in front of a box or step. Step up with one foot, drive through that heel to bring the other foot up. Step down slowly.",
-    cues: ["Drive through the heel of the working leg", "The other leg just follows — do not push off it", "Full control on the step down"],
-    youtube: "step up exercise dumbbell technique",
-    equipment: ["box-or-step"], contraindications: ["knee-acute", "hip-acute"] },
-
-  { id: "sb-sl-03", name: "Bodyweight reverse lunge", section: "main", category: "single-leg",
-    sets: 3, reps: "10 each side", tempo: "2-1-2", rest: "60s", difficultyLevel: 1,
-    description: "Step one foot back, lowering your back knee toward the floor. Both knees at roughly 90 degrees at the bottom. Push through your front foot to return to standing.",
-    cues: ["Front knee tracks over your foot, not past it", "Torso stays upright", "Push through the whole front foot, not just the toes"],
-    youtube: "reverse lunge bodyweight technique",
-    equipment: [], contraindications: ["knee-acute", "hip-acute"] },
-
-  // SQUAT PATTERN
-  { id: "sb-sq-01", name: "Goblet squat", section: "main", category: "squat-pattern",
-    sets: 3, reps: "10", tempo: "3-1-2", rest: "75s", difficultyLevel: 1, logWeight: true,
-    recommended: "12-16kg dumbbell or kettlebell — heavier than you think",
-    description: "Hold a dumbbell vertically at your chest. Feet shoulder-width, toes slightly out. Squat down keeping chest up and heels on the floor.",
-    cues: ["Chest up — if your back rounds, squat less deep", "Elbows inside your knees at the bottom", "Drive through your full foot"],
-    youtube: "goblet squat technique beginners",
-    equipment: ["dumbbells"], contraindications: ["knee-acute", "lower-back-acute"] },
-
-  { id: "sb-sq-02", name: "Barbell back squat", section: "main", category: "squat-pattern",
-    sets: 4, reps: "6-8", tempo: "3-1-2", rest: "120s", difficultyLevel: 3, logWeight: true,
-    recommended: "Work up to a challenging but controllable weight",
-    description: "Bar on upper back. Feet shoulder-width, toes slightly out. Squat to parallel or below, then drive through your full foot to return.",
-    cues: ["Brace your core hard before every rep", "Knees out over toes", "Chest stays up throughout", "Drive the floor away"],
-    youtube: "barbell back squat technique tutorial",
-    equipment: ["barbell", "squat-rack"], contraindications: ["lower-back-acute", "knee-acute"] },
-
-  { id: "sb-sq-03", name: "Bodyweight squat", section: "main", category: "squat-pattern",
-    sets: 3, reps: "15", tempo: "3-1-2", rest: "60s", difficultyLevel: 1,
-    description: "Feet shoulder-width, toes slightly out. Squat down keeping chest up and heels on the floor, then drive back up.",
-    cues: ["Chest up throughout", "Knees track over your toes", "Full range — go as low as feels controlled"],
-    youtube: "bodyweight squat technique",
-    equipment: [], contraindications: ["knee-acute", "lower-back-acute"] },
-
-  // HORIZONTAL PULL
-  { id: "sb-hp-01", name: "Seated cable row", section: "main", category: "horizontal-pull",
-    sets: 3, reps: "12", tempo: "2-1-3", rest: "60s", difficultyLevel: 1, logWeight: true,
-    recommended: "Comfortable weight with full control",
-    description: "Sit at cable row machine, knees slightly bent. Pull to lower chest, squeezing shoulder blades together. Return slowly.",
-    cues: ["Sit tall — do not lean back to get the weight moving", "Lead with elbows, not hands", "Squeeze shoulder blades at the end"],
-    youtube: "seated cable row proper form",
-    equipment: ["cable-machine"], contraindications: ["shoulder-acute"] },
-
-  { id: "sb-hp-02", name: "Chest-supported dumbbell row", section: "main", category: "horizontal-pull",
-    sets: 4, reps: "10", tempo: "2-1-3", rest: "75s", difficultyLevel: 2, logWeight: true,
-    recommended: "Challenging weight — the chest support eliminates back cheating",
-    description: "Set incline bench to 45 degrees. Lie face-down, dumbbells hanging. Row up toward your hips by driving elbows back. Chest stays on the bench.",
-    cues: ["Chest on the bench throughout", "Drive elbows back and up", "Squeeze shoulder blades at the top"],
-    youtube: "chest supported dumbbell row technique",
-    equipment: ["dumbbells", "bench"], contraindications: ["shoulder-acute"] },
-
-  // HORIZONTAL PUSH
-  { id: "sb-hpu-01", name: "Dumbbell bench press", section: "main", category: "horizontal-push",
-    sets: 3, reps: "10", tempo: "3-1-2", rest: "75s", difficultyLevel: 2, logWeight: true,
-    recommended: "Moderate weight — lower slowly for full stimulus",
-    description: "Lie on a bench, dumbbells at shoulder height. Press up and slightly together. Lower slowly.",
-    cues: ["Elbows at 45 degrees — not flared wide", "3 seconds down", "Keep feet flat on the floor"],
-    youtube: "dumbbell bench press technique",
-    equipment: ["dumbbells", "bench"], contraindications: ["shoulder-acute"] },
-
-  { id: "sb-hpu-02", name: "Push-up", section: "main", category: "horizontal-push",
-    sets: 3, reps: "As many as possible with good form", tempo: "2-0-2", rest: "60s", difficultyLevel: 1,
-    description: "Standard push-up. Hands shoulder-width, body in a straight line from head to heels. Lower chest to floor.",
-    cues: ["Body stays in a straight line — no hip sag", "Elbows at 45 degrees", "Lower until chest nearly touches the floor", "Full lock-out at the top"],
-    youtube: "perfect push up technique",
-    equipment: [], contraindications: ["shoulder-acute", "wrist-elbow-acute"] },
-
-  // VERTICAL PULL
-  { id: "sb-vp-01", name: "Lat pulldown", section: "main", category: "vertical-pull",
-    sets: 3, reps: "12", tempo: "2-1-3", rest: "60s", difficultyLevel: 1, logWeight: true,
-    recommended: "Comfortable weight with full range of motion",
-    description: "Sit at the lat pulldown machine, thighs under the pad. Take a wide grip. Pull the bar down to your upper chest by driving elbows down and back.",
-    cues: ["Lean back 10-15 degrees — no more", "Drive elbows toward the floor", "Control the return — 3 seconds"],
-    youtube: "lat pulldown wide grip proper form",
-    equipment: ["cable-machine"], contraindications: ["shoulder-acute"] },
-
-  // SHOULDER ISOLATION
-  { id: "sb-si-01", name: "Dumbbell lateral raise", section: "main", category: "shoulder-isolation",
-    sets: 3, reps: "15", tempo: "2-0-3", rest: "45s", difficultyLevel: 1, logWeight: true,
-    recommended: "Lighter than you think — 3 seconds down every rep",
-    description: "Stand with light dumbbells at sides. With slight elbow bend, raise both arms out to sides to shoulder height. Lower slowly.",
-    cues: ["Lead with elbows, not hands", "Do not shrug your shoulders", "Go lighter than you expect", "3 seconds down"],
-    youtube: "dumbbell lateral raise shoulder technique",
-    equipment: ["dumbbells"], contraindications: ["shoulder-acute"] },
-
-  // GLUTE ISOLATION
-  { id: "sb-gi-01", name: "Cable kickback", section: "main", category: "glute-isolation",
-    sets: 3, reps: "12 each side", tempo: "2-1-2", rest: "45s", difficultyLevel: 1, logWeight: true,
-    recommended: "Light cable — feel the glute contract, not the hip flexor",
-    description: "Ankle strap on one ankle, facing the cable machine. Drive leg straight back until glute is fully contracted. Upper body stays still.",
-    cues: ["Upper body stays still", "Squeeze hard at the top", "Controlled movement — no swinging"],
-    youtube: "cable glute kickback ankle strap technique",
-    equipment: ["cable-machine"], contraindications: ["hip-acute"] },
-
-  { id: "sb-gi-02", name: "Banded clamshell — loaded", section: "main", category: "glute-isolation",
-    sets: 3, reps: "20 each side", tempo: "2-1-2", rest: "30s", difficultyLevel: 2,
-    description: "Band just above knees. Lie on side, knees bent at 45 degrees. Rotate top knee up. Hold 1 second. Lower slowly.",
-    cues: ["Pelvis stays still", "Movement from the outer hip", "Slow on the way down"],
-    youtube: "clamshell exercise glute medius band",
-    equipment: ["resistance-bands"], contraindications: ["hip-acute"] },
-
-  // LEG ISOLATION
-  { id: "sb-li-01", name: "Leg curl", section: "main", category: "leg-isolation",
-    sets: 3, reps: "12", tempo: "2-1-2", rest: "60s", difficultyLevel: 1, logWeight: true,
-    recommended: "Moderate weight — squeeze at the end of each rep",
-    description: "Lie face down on the leg curl machine. Curl both legs toward your glutes. Lower slowly.",
-    cues: ["Hips stay pressed into the bench", "Squeeze hamstrings at the top", "Slow on the lowering"],
-    youtube: "lying leg curl machine technique",
-    equipment: ["leg-curl-machine"], contraindications: ["hamstring-acute"] },
-
-  { id: "sb-li-02", name: "Wall sit", section: "main", category: "leg-isolation",
-    sets: 3, reps: "30-45s", tempo: "Hold", rest: "45s", difficultyLevel: 1, duration: 40,
-    description: "Back flat against a wall, slide down until your knees are at roughly 90 degrees, as if sitting in an invisible chair. Hold.",
-    cues: ["Knees stay above your ankles, not out past your toes", "Keep your back flat against the wall throughout", "Breathe steadily — don't hold your breath"],
-    youtube: "wall sit exercise technique",
-    equipment: [], contraindications: ["knee-acute"] },
-
-  // ANTI-EXTENSION
-  { id: "sb-ae-01", name: "Dead bug", section: "main", category: "anti-extension",
-    sets: 3, reps: "8 each side", tempo: "Slow", rest: "45s", difficultyLevel: 1,
-    description: "Lie on your back, arms to ceiling, knees at 90 degrees. Lower opposite arm and leg toward the floor. Lower back stays pressed down throughout.",
-    cues: ["Lower back stays in contact with the floor — always", "Move slowly", "Breathe out as you lower", "Reduce range if back lifts"],
-    youtube: "dead bug exercise core stability",
-    equipment: [], contraindications: ["lower-back-acute"] },
-
-  { id: "sb-ae-02", name: "Plank", section: "main", category: "anti-extension",
-    sets: 3, reps: null, tempo: "Hold", rest: "60s", difficultyLevel: 1, duration: 30,
-    description: "Forearms on the floor, elbows under shoulders. Body in a straight line from head to heels.",
-    cues: ["Squeeze your glutes", "Push the floor away through your forearms", "Breathe normally throughout"],
-    youtube: "perfect plank technique",
-    equipment: [], contraindications: ["lower-back-acute", "shoulder-acute"] },
-
-  // ANTI-ROTATION
-  { id: "sb-ar-01", name: "Pallof press", section: "main", category: "anti-rotation",
-    sets: 3, reps: "10 each side", tempo: "2-2-2", rest: "45s", difficultyLevel: 2, logWeight: true,
-    recommended: "Light cable — this is core work, not arm work",
-    description: "Stand sideways to a cable at chest height. Hold handle at chest. Press straight out, hold 2 seconds, return. Cable tries to rotate you — resist it.",
-    cues: ["Stand tall, feet shoulder-width", "Do not let your body rotate", "The hold is where the work happens"],
-    youtube: "pallof press anti rotation core cable",
-    equipment: ["cable-machine"], contraindications: ["lower-back-acute"] },
-
-  // ANTI-LATERAL
-  { id: "sb-al-01", name: "Side plank", section: "main", category: "anti-lateral",
-    sets: 2, reps: "each side", tempo: "Hold", rest: "45s", difficultyLevel: 2, duration: 25,
-    description: "Lie on your side. Prop yourself on your forearm, elbow under shoulder. Lift your hips to form a straight line. Hold.",
-    cues: ["Hips stacked — do not let the top hip fall forward", "Push the floor away through your forearm", "Modified: keep knees down"],
-    youtube: "side plank technique form",
-    equipment: [], contraindications: ["lower-back-acute", "shoulder-acute"] },
-
-  // CONDITIONING (CARDIO)
-  { id: "sb-cd-01", name: "Kettlebell swing", section: "main", category: "conditioning",
-    sets: 4, reps: "20", tempo: "Explosive", rest: "60s", difficultyLevel: 2, logWeight: true,
-    recommended: "Moderate kettlebell — the swing is driven by the hips",
-    description: "Hip hinge to load, explosive hip drive to swing bell to chest height. This is a cardio-strength movement.",
-    cues: ["Hip drive is everything", "Arms just hold — they do not lift", "Breathe out on the drive up"],
-    youtube: "kettlebell swing cardio conditioning",
-    equipment: ["kettlebells"], contraindications: ["lower-back-acute", "hamstring-acute"] },
-
-  { id: "sb-cd-02", name: "Box step-up — alternating", section: "main", category: "conditioning",
-    sets: 3, reps: "30 total", tempo: "Steady", rest: "45s", difficultyLevel: 1,
-    description: "Step up with one foot, step down, alternate feet. Keep a steady rhythm for the full set.",
-    cues: ["Drive through the working heel", "Keep the rhythm consistent", "Arms can pump for balance"],
-    youtube: "box step up cardio conditioning",
-    equipment: ["box-or-step"], contraindications: ["knee-acute"] },
-
-  // INTERVAL
-  { id: "sb-int-01", name: "Burpee — modified", section: "main", category: "interval",
-    sets: 4, reps: null, tempo: "Max effort", rest: "60s", difficultyLevel: 2, duration: 30,
-    description: "Stand, drop hands to floor, step or jump feet back to plank, step or jump feet forward, stand and jump. Modified: step instead of jump throughout.",
-    cues: ["Choose the variation that matches your energy today", "Full plank position — do not let hips sag", "Breathe regularly throughout"],
-    youtube: "burpee modified no jump technique",
-    equipment: [], contraindications: ["lower-back-acute", "shoulder-acute", "knee-acute"] },
-
-  // HIP MOBILITY (MAIN for Mobility session)
-  { id: "sb-hm-01", name: "Hip CARs", section: "main", category: "hip-mobility",
-    sets: 2, reps: "5 each side", tempo: "Slow", rest: "30s", difficultyLevel: 2,
-    description: "Standing on one leg, draw the biggest circle possible with the lifted knee — forward, out, behind, back. Standing leg stays perfectly still.",
-    cues: ["Move as slowly as possible", "Standing hip, knee, and foot stay fixed", "Find where range runs out and breathe into it"],
-    youtube: "hip controlled articular rotation CARs",
-    equipment: [], contraindications: ["hip-acute"] },
-
-  { id: "sb-hm-02", name: "Deep squat hold", section: "main", category: "hip-mobility",
-    sets: 2, reps: null, tempo: "Hold", rest: "30s", difficultyLevel: 1, duration: 60,
-    description: "Squat as deep as you can with heels on the floor. Hold onto a support if needed. Relax into the position.",
-    cues: ["Heels down is the goal — use support if needed", "Let the hips relax into the position", "Breathe deeply and let the body open"],
-    youtube: "deep squat hold mobility hip",
-    equipment: [], contraindications: ["knee-acute", "hip-acute"] },
-
-  // THORACIC MOBILITY (MAIN)
-  { id: "sb-tm-01", name: "Thread the needle", section: "main", category: "thoracic-mobility",
-    sets: 2, reps: "8 each side", tempo: "Slow", rest: "15s", difficultyLevel: 1,
-    description: "On hands and knees. Slide one arm under your body along the floor. Your upper back rotates to follow. Hold, then return.",
-    cues: ["The arm slides — do not push", "Hips stay still", "Let the head rest on the floor"],
-    youtube: "thread the needle thoracic rotation stretch",
-    equipment: [], contraindications: ["shoulder-acute"] },
-
-  { id: "sb-tm-02", name: "Foam roller thoracic extension", section: "main", category: "thoracic-mobility",
-    sets: 1, reps: "5 segments", tempo: "10s hold", rest: "0s", difficultyLevel: 1, duration: 10,
-    description: "Foam roller perpendicular to your spine at mid-back. Support your head. Extend over the roller, opening the chest upward. Hold 10 seconds. Move up one segment. Repeat.",
-    cues: ["Support your head throughout", "Open the chest toward the ceiling", "Hips on the floor", "Move to the next segment gradually"],
-    youtube: "foam roller thoracic extension mobility",
-    equipment: ["foam-roller"], contraindications: ["upper-back-acute"] },
-
-  // SHOULDER MOBILITY (MAIN)
-  { id: "sb-sm-01", name: "Doorway chest stretch", section: "main", category: "shoulder-mobility",
-    sets: 2, reps: "45s each side", tempo: "Hold", rest: "0s", difficultyLevel: 1, duration: 45,
-    description: "Stand in a doorway, forearm on frame at shoulder height. Step through until you feel a stretch across the chest.",
-    cues: ["Arm at shoulder height — not above", "Step forward gently", "Breathe into the stretch"],
-    youtube: "doorway chest stretch pec flexibility",
-    equipment: [], contraindications: ["shoulder-acute"] },
-
-  // COOLDOWN — HIP FLEXOR STRETCH
-  { id: "sb-cool-01", name: "Hip flexor stretch", section: "cooldown", category: "hip-flexor-stretch",
-    sets: 1, reps: "60s each side", tempo: "Hold", rest: "0s", difficultyLevel: 1, duration: 60,
-    description: "Half-kneeling. Rear knee on floor. Shift weight forward until you feel a stretch in the front of the rear hip.",
-    cues: ["Tuck your tailbone", "Chest tall", "Squeeze the rear glute to deepen"],
-    youtube: "kneeling hip flexor stretch technique",
-    equipment: [], contraindications: ["hip-acute", "knee-acute"] },
-
-  // COOLDOWN — GLUTE STRETCH
-  { id: "sb-cool-02", name: "Pigeon pose", section: "cooldown", category: "glute-stretch",
-    sets: 1, reps: "90s each side", tempo: "Hold", rest: "0s", difficultyLevel: 1, duration: 90,
-    description: "From hands and knees, bring right knee forward toward right hand. Extend left leg behind. Sink hips toward floor.",
-    cues: ["Square your hips to the floor", "Stay centred — do not collapse to one side", "Breathe out to release further"],
-    youtube: "pigeon pose piriformis stretch",
-    equipment: [], contraindications: ["hip-acute", "knee-acute"] },
-
-  // COOLDOWN — CHILD'S POSE
-  { id: "sb-cool-03", name: "Child's pose", section: "cooldown", category: "child-pose",
-    sets: 1, reps: "60s", tempo: "Hold", rest: "0s", difficultyLevel: 1, duration: 60,
-    description: "Kneel, sit hips back toward heels, reach arms forward. Forehead down. Breathe slowly.",
-    cues: ["This is pure rest — let gravity do everything", "Widen your knees if hips are tight", "Each breath out, let the lower back soften"],
-    youtube: "child's pose yoga lower back relief",
-    equipment: [], contraindications: [] },
-
-  // COOLDOWN — CHEST STRETCH
-  { id: "sb-cool-04", name: "Doorway chest stretch", section: "cooldown", category: "chest-stretch",
-    sets: 1, reps: "45s each side", tempo: "Hold", rest: "0s", difficultyLevel: 1, duration: 45,
-    description: "Forearm on doorframe at shoulder height. Step through until you feel a stretch across the chest.",
-    cues: ["Arm at shoulder height", "Step forward gently", "Breathe into the stretch"],
-    youtube: "doorway chest stretch pec flexibility",
-    equipment: [], contraindications: ["shoulder-acute"] },
-
-  // COOLDOWN — LAT STRETCH
-  { id: "sb-cool-05", name: "Lat stretch — doorway or bar", section: "cooldown", category: "lat-stretch",
-    sets: 1, reps: "45s each side", tempo: "Hold", rest: "0s", difficultyLevel: 1, duration: 45,
-    description: "Hold a fixed surface at shoulder height with one hand. Turn your body away, letting the lat and shoulder stretch.",
-    cues: ["Keep the arm at shoulder height", "Rotate the body away to feel the stretch", "Do not pull — just lean"],
-    youtube: "lat stretch doorway cable machine",
-    equipment: [], contraindications: ["shoulder-acute"] },
-
-  // COOLDOWN — THREAD THE NEEDLE (cool)
-  { id: "sb-cool-06", name: "Thread the needle", section: "cooldown", category: "thread-needle",
-    sets: 1, reps: "8 each side", tempo: "Slow", rest: "0s", difficultyLevel: 1,
-    description: "On hands and knees. Slide one arm under body along the floor, rotating the upper back. Hold, then return.",
-    cues: ["The arm slides — do not push", "Hips stay still", "Rest the head on the floor"],
-    youtube: "thread the needle thoracic stretch",
-    equipment: [], contraindications: ["shoulder-acute"] },
-
-  // COOLDOWN — HAMSTRING STRETCH
-  { id: "sb-cool-07", name: "Supine hamstring stretch", section: "cooldown", category: "hamstring-stretch",
-    sets: 1, reps: "60s each side", tempo: "Hold", rest: "0s", difficultyLevel: 1, duration: 60,
-    description: "Lie on your back. Lift one leg and hold behind the thigh. Gently straighten the raised leg until you feel a stretch in the back of the thigh.",
-    cues: ["Keep the floor leg flat", "Do not pull aggressively — sustained is more effective", "Lower back on the floor"],
-    youtube: "supine hamstring stretch lying down",
-    equipment: [], contraindications: ["hamstring-acute"] },
-
-  // COOLDOWN — FIGURE-4
-  { id: "sb-cool-08", name: "Figure-4 stretch", section: "cooldown", category: "figure-4",
-    sets: 1, reps: "60s each side", tempo: "Hold", rest: "0s", difficultyLevel: 1, duration: 60,
-    description: "Lie on your back, knees bent. Cross right ankle over left thigh above the knee. Pull the left thigh toward your chest.",
-    cues: ["Lower back on the floor", "Stretch is in the right outer hip and glute", "Breathe and release with each exhale"],
-    youtube: "figure 4 stretch piriformis supine",
-    equipment: [], contraindications: ["hip-acute", "knee-acute"] },
-
-  // COOLDOWN — SUPINE ROTATION
-  { id: "sb-cool-09", name: "Supine spinal rotation", section: "cooldown", category: "supine-rotation",
-    sets: 1, reps: "8 each side", tempo: "Slow", rest: "0s", difficultyLevel: 1,
-    description: "Lie on your back, knees bent together. Let both knees fall slowly to one side as you breathe out. Arms out for balance. Hold 3 breaths, then switch.",
-    cues: ["Let the knees fall with gravity — do not force", "Shoulders stay on the floor", "Breathe into the rotation"],
-    youtube: "supine spinal rotation twist stretch",
-    equipment: [], contraindications: ["lower-back-acute"] },
-
-  // COOLDOWN — STATIC STRETCH (cardio)
-  { id: "sb-cool-10", name: "Standing quad stretch", section: "cooldown", category: "static-stretch",
-    sets: 1, reps: "45s each side", tempo: "Hold", rest: "0s", difficultyLevel: 1, duration: 45,
-    description: "Stand on one leg (hold a wall for balance). Bring the other foot up behind you and hold. Feel the stretch in the front of the thigh.",
-    cues: ["Keep the standing knee soft", "Tuck the tailbone slightly", "Knee points down — not out to the side"],
-    youtube: "standing quad stretch technique",
-    equipment: [], contraindications: ["knee-acute"] },
-
-  // COOLDOWN — BREATHING COOL
-  { id: "sb-cool-11", name: "Extended exhale breathing", section: "cooldown", category: "breathing-cool",
-    sets: 1, reps: null, tempo: "Breath-led", rest: "0s", difficultyLevel: 1, duration: 90,
-    description: "Breathe in for 4 seconds, out for 6 seconds. The longer exhale activates the parasympathetic response — your rest signal.",
-    cues: ["Inhale through your nose", "Exhale longer than the inhale", "Let each breath be slower than the last"],
-    youtube: "extended exhale breathing relaxation",
-    equipment: [], contraindications: [] },
-
-  // COOLDOWN — DEEP STRETCH (mobility)
-  { id: "sb-cool-12", name: "90-90 hip stretch", section: "cooldown", category: "deep-stretch",
-    sets: 1, reps: "90s each side", tempo: "Hold", rest: "0s", difficultyLevel: 1, duration: 90,
-    description: "Sit with both legs bent at 90 degrees — one in front, one to the side. Sit tall and hold. After 45 seconds, lean gently forward over the front shin.",
-    cues: ["Both hips in contact with the floor", "Sit tall before leaning", "Breathe out to release"],
-    youtube: "90 90 hip stretch piriformis",
-    equipment: [], contraindications: ["hip-acute", "knee-acute"] },
-
-  // LOWER MOBILITY (cardio warmup)
-  { id: "sb-lm-01", name: "Leg swings", section: "warmup", category: "lower-mobility",
-    sets: 2, reps: "15 each direction, each leg", tempo: "Controlled", rest: "0s", difficultyLevel: 1,
-    description: "Stand on one leg (hold a wall). Swing the other leg forward and back, then side to side. Controlled range — not a kick.",
-    cues: ["Swing from the hip, not the knee", "Standing leg stays still", "Gradually increase range over the set"],
-    youtube: "leg swings dynamic warm up hip mobility",
-    equipment: [], contraindications: ["hip-acute"] }
-];
+// ── EXERCISE_POOL — REMOVED 11 Aug 2026 (CON-6) ───────────────────────────────
+//
+// This file used to carry its own hardcoded pool of 70 exercises. It is gone.
+// _filterCandidates() now selects from the shared database in
+// js/data/exercises/ via session-categories.js.
+//
+// Why it had to go, recorded so it does not come back:
+//
+//   * 61 of the 70 entries were still in the retired description/cues shape
+//     and rendered as a name and a set count and nothing else, while the
+//     shared database carried instructions, why and coaching at 100%.
+//   * 139 practice entries and the entire yoga library were unreachable
+//     from the session builder for as long as this pool existed.
+//   * Three separate fixes had to be applied twice because of it -- the
+//     difficulty ceiling (PT-11), the equipment vocabulary (CON-2) and the
+//     cardio-warmup tags (PT-19) -- and each second application was found
+//     only after somebody hit the bug in the live product.
+//
+// The four machine warm-ups this pool held and the database did not
+// (stationary bike, treadmill, cross trainer, rower) were ported into
+// js/data/exercises/cardio.js v2 first, at the full Exercise Entry Standard.
+// Nothing was deleted before it existed somewhere better.
 
 // ── Time-based exercise counts ────────────────────────────────────────────────
 
@@ -1096,9 +473,27 @@ function _difficultyCeiling() {
 
 function _filterCandidates(categories, section, equipSet, conditionSet) {
   const ceiling = _difficultyCeiling();
-  return EXERCISE_POOL.filter(ex => {
-    if (ex.section !== section) return false;
-    if (!categories.includes(ex.category)) return false;
+
+  // CON-6: candidates now come from the shared 461-entry database, not from
+  // this file's own EXERCISE_POOL. Section comes from which SESSION_TYPES
+  // list the category appeared in, rather than being stored per entry --
+  // section was never really a property of an exercise, and storing it was
+  // why the pool had to duplicate hip-mobility drills to use them in two
+  // places.
+  const matched = [];
+  const seen = new Set();
+  for (const category of categories) {
+    for (const ex of matchCategory(EXERCISES, category, section)) {
+      if (seen.has(ex.id)) continue;
+      seen.add(ex.id);
+      // Tag the entry with the category and section it was selected FOR, so
+      // the selection loops below can still reason about variety across
+      // categories. Non-destructive -- the database entry is not mutated.
+      matched.push({ ...ex, category, section });
+    }
+  }
+
+  return matched.filter(ex => {
     // Difficulty ceiling. Warmups and cooldowns are exempt: they are
     // structurally gentle already, and capping them can empty a section
     // and break the warmup safety floor.
