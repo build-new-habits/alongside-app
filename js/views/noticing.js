@@ -1,6 +1,32 @@
 /**
  * js/views/noticing.js - Noticing Hub Landing View
  *
+ * 10 Aug 2026 v5:
+ *   - Fixed two real field-name-mismatch bugs in "Your reflections",
+ *     found and fixed overnight (Claude, autonomous session). Since
+ *     journal-entry.js v3's privacy rewrite (14 Jul), entries have been
+ *     written as {id, date, text, tags, noWords} -- but this file was
+ *     still reading entry.createdAt (undefined), entry.category
+ *     (undefined, real field is the tags array), entry.body (undefined,
+ *     real field is text), and entry.type === "weekly-noticing" (never
+ *     written anywhere, always false). Two consequences, both silent:
+ *     (1) getRecentEntries()'s sort compared new Date(undefined) for
+ *     every entry -- NaN vs NaN, meaning entries were never actually
+ *     sorted by recency, just left in original array order; (2) the
+ *     display itself showed blank/undefined date and body text for
+ *     every entry. Fixed both to read the real fields. Dropped the
+ *     dead "This week" badge (entry.type check, confirmed always
+ *     false, not a guess) rather than inventing a working version of
+ *     a concept that was never actually wired up.
+ *   - journalEntryType pre-select (referenced in this file's older
+ *     docblock, "New \"In Step\" card" section below) confirmed still
+ *     dormant -- journal-entry.js's v3 rewrite dropped the whole
+ *     pre-selected-screen mechanism, not just the field read. Fixing
+ *     that properly means designing what a type-specific screen should
+ *     look like, a real product decision -- not attempted tonight,
+ *     left for Graeme rather than guessed at. Master schedule note
+ *     corrected to reflect the true (larger) scope.
+ *
  * 09 Aug 2026 v4:
  *   - New "In Step" card in Anytime, Personal tier. Uses auth.js's
  *     lockedFeature() wrapper for free users (tap -> /upgrade), matching
@@ -127,7 +153,7 @@ function getCurrentWeekPrompt() {
 function getRecentEntries(limit = 3) {
   const entries = store.get("journalEntries") || [];
   return [...entries]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, limit);
 }
 
@@ -293,26 +319,19 @@ export function render() {
               <div class="card" role="article">
                 <div style="display: flex; align-items: center; gap: var(--space-2);
                             margin-bottom: var(--space-2);">
-                  <span class="text-xs text-muted">${formatDate(entry.createdAt)}</span>
-                  ${entry.category && entry.category !== "weekly"
+                  <span class="text-xs text-muted">${formatDate(entry.date)}</span>
+                  ${entry.tags && entry.tags.length > 0
                     ? `<span class="text-xs text-muted"
                              style="background: var(--color-surface-raised, rgba(255,255,255,0.06));
                                     padding: 2px 8px; border-radius: 10px;">
-                         ${entry.category}
-                       </span>`
-                    : ""}
-                  ${entry.type === "weekly-noticing"
-                    ? `<span class="text-xs text-muted"
-                             style="background: var(--color-surface-raised, rgba(255,255,255,0.06));
-                                    padding: 2px 8px; border-radius: 10px;">
-                         This week
+                         ${entry.tags[0]}
                        </span>`
                     : ""}
                 </div>
                 <p class="text-secondary" style="font-size: var(--text-sm); line-height: 1.6;">${
-                  entry.body.length > 120
-                    ? entry.body.slice(0, 120) + "…"
-                    : entry.body
+                  entry.text.length > 120
+                    ? entry.text.slice(0, 120) + "…"
+                    : entry.text
                 }</p>
               </div>
             `).join("")}
