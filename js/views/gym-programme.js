@@ -1,5 +1,49 @@
 /**
  * gym-programme.js
+ * 11 Aug 2026 v5
+ *
+ * v5 — Rebuilt the exercise walkthrough to match prescribed-session.js's
+ *   and workout.js's proven one-exercise-at-a-time pattern, per Graeme's
+ *   direct screenshot comparison: "Screenshots 2 and 3 are correct...
+ *   dynamic and engaging. Screenshot 1 is flat and barely offers any
+ *   interaction." Confirmed precisely: this file was still rendering
+ *   every exercise as a scrollable list all at once (renderExerciseCard
+ *   x N, one "Session done" button at the bottom), while
+ *   prescribed-session.js walks through one exercise per screen with a
+ *   progress header ("N of M"), a progress bar, a timer or big reps
+ *   display, structured HOW TO GET THERE / WHAT TO FOCUS ON / WHY THIS
+ *   HELPS sections, and a styled video button. v4 (10 Aug) fixed the
+ *   *content* (three field-name bugs meant instructions/why/video never
+ *   rendered) but never touched this structural gap — the screens still
+ *   looked completely different in practice, exactly as the screenshots
+ *   showed.
+ *
+ *   Rebuilt renderSession()/attachSessionEvents() to walk one exercise
+ *   at a time, reusing the exact shared CSS classes prescribed-session.js
+ *   and workout.js already use (workout-header, workout-progress-bar,
+ *   exercise-display, exercise-role-badge, exercise-meta, timer-display/
+ *   reps-display, exercise-instructions, coaching-tip, youtube-link,
+ *   workout-actions) rather than gym-programme's own bespoke
+ *   gp-exercise-card__* classes — so this genuinely looks like the same
+ *   app, not a close approximation. parseHoldSeconds()/formatTime()
+ *   copied directly from prescribed-session.js rather than reinvented,
+ *   since exercises from session-builder.js's buildSession() use the
+ *   same reps-string format ("30-45s" for holds, "12" for rep counts)
+ *   prescribed-session.js's parser already handles correctly.
+ *
+ *   Completion tracking changed from DOM-scanning aria-pressed buttons
+ *   (only possible when every exercise was visible at once) to a
+ *   completedExerciseIndices Set, incremented on "Next Exercise"/
+ *   "Finish Session" (which now double as the completion action, same
+ *   as prescribed-session.js's ps-complete-btn), not on "Skip this one"
+ *   — skipped exercises don't count toward the session's credits or
+ *   doneCount, matching prescribed-session.js's skip behaviour exactly.
+ *
+ *   gp-exercise-card__* CSS classes and the old gp-session-header/
+ *   gp-exercise-list/gp-session-footer markup are now unused by this
+ *   file — not deleted from the CSS (out of scope, a separate cleanup
+ *   decision, logged on the master schedule, not guessed at here).
+ *
  * 10 Aug 2026 v4
  *
  * v4 — Three silent field-name mismatches fixed, found auditing exercise-
@@ -85,7 +129,9 @@
  *   - Renders generatedSession from store
  *   - A/B session alternation (gymProgrammeSession)
  *   - Week advance logic (advanceWeekIfNeeded from programmeEngine)
- *   - Exercise card rendering (setup / coach cues / why this)
+ *   - One-exercise-at-a-time walkthrough (11 Aug 2026 v5) — progress
+ *     header, timer/reps display, instructions/coaching/why sections,
+ *     video link, Next/Skip — matching prescribed-session.js exactly
  *   - Session completion routing to reflect.js
  *
  * Progression logic for "Progress to harder" end option:
@@ -123,6 +169,13 @@ export function GymProgrammeView(router) {
   let sessionStarted    = false;
   let currentExerciseIndex = 0;
   let sessionStartTime  = null;
+
+  // 11 Aug 2026 v5 — one-exercise-at-a-time walkthrough state, matching
+  // prescribed-session.js's pattern exactly.
+  let timerInterval = null;
+  let timeRemaining = 0;
+  let timerStarted  = false;
+  let completedExerciseIndices = new Set();
 
   // ── Mount ──────────────────────────────────────────────────────────────────
 
@@ -467,129 +520,263 @@ export function GymProgrammeView(router) {
 
     sessionStartTime = Date.now();
     currentExerciseIndex = 0;
+    completedExerciseIndices = new Set();
     sessionStarted = true;
 
     mountSessionGuard({
       isActive: () => sessionStarted,
       onExit:   () => {
-        savePartialSession(container);
+        savePartialSession(container, session);
         cleanupSession();
         router.navigate('reflect');
       },
       label: 'gym session'
     });
 
+    renderCurrentExercise(container, session, stats, sessionType);
+  }
+
+  // ── Current-exercise renderer (11 Aug 2026 v5) ─────────────────────────────
+  // One exercise per screen, matching prescribed-session.js's and
+  // workout.js's proven pattern exactly — same shared CSS classes, not a
+  // close approximation. Header shows programme/week/session context
+  // where prescribed-session.js shows a "Prescribed" badge, since that
+  // context matters more here than it does for a standalone prescribed
+  // exercise.
+
+  function renderCurrentExercise(container, session, stats, sessionType) {
+    const exercise    = session.exercises[currentExerciseIndex];
+    const isLast      = currentExerciseIndex >= session.exercises.length - 1;
+    const progress    = (currentExerciseIndex / session.exercises.length) * 100;
+    const holdSecs    = parseHoldSeconds(exercise.reps);
+    const hasTimer    = holdSecs !== null;
+    const caution     = exercise._cautionActive;
+
     container.innerHTML = `
-      <div class="gp-session" role="main" aria-label="Gym session">
+      <div class="view workout-view">
 
-        <header class="gp-session-header">
-          <div class="gp-session-header__meta">
-            <span class="gp-session-header__programme">${_esc(stats.programmeName || '')}</span>
-            <span class="gp-session-header__week">Week ${stats.currentWeek}</span>
-            <span class="gp-session-header__type">Session ${sessionType}</span>
+        <!-- Header -->
+        <div class="workout-header">
+          <button class="btn btn-ghost" id="gp-exit-btn" aria-label="Exit gym session">
+            \u2715 Exit
+          </button>
+          <div class="workout-progress-info" aria-label="Exercise ${currentExerciseIndex + 1} of ${session.exercises.length}">
+            <span>${currentExerciseIndex + 1} of ${session.exercises.length}</span>
           </div>
-          <div class="gp-session-header__focus">${_esc(session.focus || '')}</div>
-        </header>
-
-        <!-- Exercise list -->
-        <div class="gp-exercise-list"
-             id="gp-exercise-list"
-             aria-label="Today's exercises">
-          ${session.exercises.map((ex, idx) => renderExerciseCard(ex, idx)).join('')}
         </div>
 
-        <!-- Session complete button -->
-        <div class="gp-session-footer">
-          <button class="btn btn-primary gp-finish-btn"
-                  data-action="finish-session"
-                  aria-label="Finish session and reflect">
-            Session done
+        <!-- Progress bar -->
+        <div class="workout-progress-bar" role="progressbar"
+             aria-valuenow="${Math.round(progress)}" aria-valuemin="0" aria-valuemax="100"
+             aria-label="Session progress">
+          <div class="workout-progress-fill" style="width: ${progress}%"></div>
+        </div>
+
+        <!-- Exercise display -->
+        <div class="exercise-display">
+          <div class="exercise-role-badge main" aria-label="${_esc(stats.programmeName || 'Gym programme')}">
+            \uD83C\uDFCB ${_esc(stats.programmeName || 'Your programme')} \u00B7 Week ${stats.currentWeek} \u00B7 Session ${sessionType}
+          </div>
+
+          <h1 class="exercise-name">${_esc(exercise.name)}</h1>
+
+          ${caution && exercise.modificationNote ? `
+            <div class="ps-contra-flag" role="status" aria-live="polite">
+              <span class="ps-contra-flag__icon" aria-hidden="true">\uD83C\uDF31</span>
+              <p>${_esc(exercise.modificationNote)}</p>
+            </div>
+          ` : ''}
+
+          <div class="exercise-meta">
+            <span class="meta-tag">${exercise.sets || 3} sets</span>
+            ${exercise.reps ? `<span class="meta-tag">${_esc(exercise.reps)}</span>` : ''}
+            ${exercise.rest ? `<span class="meta-tag">${_esc(exercise.rest)} rest</span>` : ''}
+          </div>
+
+          <!-- Timer (hold-based exercises) or reps display -->
+          ${hasTimer ? `
+            <div class="exercise-target">
+              <div class="timer-display">
+                <div class="timer-circle">
+                  <span class="timer-value" id="gp-timer-display">${formatTime(timeRemaining || holdSecs)}</span>
+                  <span class="timer-label">${exercise.sets > 1 ? "Set 1 of " + exercise.sets : "Hold"}</span>
+                </div>
+              </div>
+            </div>
+          ` : exercise.reps ? `
+            <div class="exercise-target">
+              <div class="reps-display">
+                <div class="reps-info">
+                  <span class="reps-value">${exercise.sets || 3} \u00D7 ${_esc(exercise.reps)}</span>
+                  <span class="reps-label">sets \u00D7 reps</span>
+                </div>
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Guidance — instructions / coaching / why, same structure and
+               same real fields as prescribed-session.js/workout.js. -->
+          ${exercise.instructions?.length || exercise.coaching || exercise.why ? `
+            <div class="exercise-instructions card" role="region" aria-label="Exercise guidance for ${_esc(exercise.name)}">
+              ${exercise.instructions && exercise.instructions.length > 0 ? `
+                <span class="exercise-section-label" id="gp-section-setup">How to get there</span>
+                <ul class="exercise-section-list" aria-labelledby="gp-section-setup">
+                  ${exercise.instructions.map(step => `<li>${_esc(step)}</li>`).join('')}
+                </ul>
+              ` : ''}
+              ${exercise.coaching ? `
+                <hr class="exercise-section-divider" aria-hidden="true">
+                <span class="exercise-section-label" id="gp-section-focus">What to focus on</span>
+                <div class="coaching-tip" aria-labelledby="gp-section-focus">
+                  <span class="tip-icon" aria-hidden="true">\uD83D\uDCA1</span>
+                  <p>${_esc(exercise.coaching)}</p>
+                </div>
+              ` : ''}
+              ${exercise.why ? `
+                <hr class="exercise-section-divider" aria-hidden="true">
+                <span class="exercise-section-label" id="gp-section-why">Why this helps</span>
+                <p class="exercise-why-text" aria-labelledby="gp-section-why">${_esc(exercise.why)}</p>
+              ` : ''}
+            </div>
+          ` : ''}
+
+          <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + ' exercise form'))}"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="youtube-link"
+             aria-label="Watch how to do ${_esc(exercise.name)} on YouTube (opens in new tab)">
+            <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
+            Watch how to do this
+          </a>
+        </div>
+
+        <!-- Actions -->
+        <div class="workout-actions">
+          ${hasTimer ? `
+            <button class="btn btn-large btn-full ${timerStarted ? 'btn-secondary' : 'btn-accent'}"
+                    id="gp-timer-btn" aria-live="polite">
+              ${!timerStarted ? '\u25B6 Start Timer' : (timerInterval ? '\u23F8 Pause' : '\u25B6 Resume')}
+            </button>
+          ` : ''}
+
+          <button class="btn btn-primary btn-large btn-full" id="gp-next-btn">
+            ${isLast ? '\uD83C\uDF89 Finish Session' : 'Next Exercise \u2192'}
           </button>
-          <button class="btn btn-ghost gp-exit-btn"
-                  data-action="exit-session"
-                  aria-label="Exit session">
-            Exit
+
+          <button class="btn btn-ghost btn-small" id="gp-skip-btn">
+            Skip this one
           </button>
         </div>
 
       </div>
     `;
 
-    attachSessionEvents(container, session, stats);
+    attachExerciseEvents(container, session, stats, sessionType);
   }
 
-  // ── Exercise card renderer ─────────────────────────────────────────────────
+  function attachExerciseEvents(container, session, stats, sessionType) {
+    const exercise = session.exercises[currentExerciseIndex];
+    const holdSecs = parseHoldSeconds(exercise.reps);
 
-  function renderExerciseCard(exercise, index) {
-    const sets    = exercise.sets    || 3;
-    const reps    = exercise.reps    || '10–12';
-    const rest    = exercise.rest    || '60s';
-    const caution = exercise._cautionActive;
+    if (holdSecs) {
+      timeRemaining = timeRemaining || holdSecs;
+      updateTimerDisplay();
+    }
 
-    return `
-      <article class="gp-exercise-card ${caution ? 'gp-exercise-card--caution' : ''}"
-               id="exercise-${index}"
-               aria-label="${_esc(exercise.name)}${caution ? ' — modification available' : ''}">
+    document.getElementById('gp-exit-btn')?.addEventListener('click', () => {
+      showExitConfirm(container, session);
+    });
 
-        <h2 class="gp-exercise-card__name">${_esc(exercise.name)}</h2>
+    document.getElementById('gp-timer-btn')?.addEventListener('click', () => {
+      if (!timerStarted) {
+        timerStarted = true;
+        startTimer();
+      } else if (timerInterval) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
+      renderCurrentExercise(container, session, stats, sessionType);
+    });
 
-        <div class="gp-exercise-card__meta" aria-label="Sets, reps and rest">
-          <span class="gp-exercise-card__chip">${sets} sets</span>
-          <span class="gp-exercise-card__chip">${reps} reps</span>
-          <span class="gp-exercise-card__chip">${rest} rest</span>
-        </div>
+    document.getElementById('gp-next-btn')?.addEventListener('click', () => {
+      completedExerciseIndices.add(currentExerciseIndex);
+      advanceOrFinish(container, session, stats, sessionType);
+    });
 
-        ${caution && exercise.modificationNote ? `
-          <div class="gp-exercise-card__caution" role="note" aria-label="Modification note">
-            ${_esc(exercise.modificationNote)}
-          </div>
-        ` : ''}
+    document.getElementById('gp-skip-btn')?.addEventListener('click', () => {
+      advanceOrFinish(container, session, stats, sessionType);
+    });
+  }
 
-        ${exercise.instructions && exercise.instructions.length > 0 ? `
-          <section class="gp-exercise-card__section" aria-labelledby="setup-${index}">
-            <h3 class="gp-exercise-card__section-label" id="setup-${index}">Setup</h3>
-            <ol class="gp-exercise-card__setup-list">
-              ${exercise.instructions.map(step => `<li>${_esc(step)}</li>`).join('')}
-            </ol>
-          </section>
-        ` : ''}
+  function advanceOrFinish(container, session, stats, sessionType) {
+    if (currentExerciseIndex >= session.exercises.length - 1) {
+      finishSession(container, session, stats);
+    } else {
+      currentExerciseIndex++;
+      resetTimer();
+      renderCurrentExercise(container, session, stats, sessionType);
+    }
+  }
 
-        ${exercise.cues && exercise.cues.length > 0 ? `
-          <section class="gp-exercise-card__section" aria-labelledby="cues-${index}">
-            <h3 class="gp-exercise-card__section-label" id="cues-${index}">Feel for</h3>
-            <ul class="gp-exercise-card__cues-list">
-              ${exercise.cues.map(cue => `<li>${_esc(cue)}</li>`).join('')}
-            </ul>
-          </section>
-        ` : ''}
+  // ── Timer (11 Aug 2026 v5, copied from prescribed-session.js's proven
+  //    pattern rather than reinvented) ────────────────────────────────────
 
-        ${exercise.why ? `
-          <section class="gp-exercise-card__section gp-exercise-card__section--why"
-                   aria-labelledby="why-${index}">
-            <h3 class="gp-exercise-card__section-label" id="why-${index}">Why this</h3>
-            <p class="gp-exercise-card__why">${_esc(exercise.why)}</p>
-          </section>
-        ` : ''}
+  function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      if (timeRemaining > 0) {
+        timeRemaining--;
+        updateTimerDisplay();
+      } else {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+      }
+    }, 1000);
+  }
 
-        ${exercise.name ? `
-          <a class="gp-exercise-card__video-link"
-             href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + ' exercise form'))}"
-             target="_blank"
-             rel="noopener noreferrer"
-             aria-label="Watch a demonstration of ${_esc(exercise.name)} (opens in new tab)">
-            Watch a demonstration
-          </a>
-        ` : ''}
+  function pauseTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
 
-        <button class="gp-exercise-card__done"
-                data-exercise-done="${index}"
-                aria-pressed="false"
-                aria-label="Mark ${_esc(exercise.name)} as done">
-          Done
-        </button>
+  function updateTimerDisplay() {
+    const el = document.getElementById('gp-timer-display');
+    if (el) el.textContent = formatTime(timeRemaining);
+  }
 
-      </article>
-    `;
+  function resetTimer() {
+    pauseTimer();
+    timeRemaining = 0;
+    timerStarted  = false;
+  }
+
+  /**
+   * Parse a hold time in seconds from a reps/hold string. Copied directly
+   * from prescribed-session.js rather than reinvented — session-builder.js's
+   * buildSession() produces the exact same string format ("30-45s" for
+   * holds, "12" for rep counts) prescribed-session.js's parser already
+   * handles correctly.
+   */
+  function parseHoldSeconds(str) {
+    if (!str) return null;
+    const lower = String(str).toLowerCase().trim();
+    const secMatch = lower.match(/^(\d+)\s*s(?:ec(?:onds?)?)?$/);
+    if (secMatch) return parseInt(secMatch[1]);
+    const rangeMatch = lower.match(/^(\d+)-(\d+)\s*s$/);
+    if (rangeMatch) return parseInt(rangeMatch[2]);
+    const minMatch = lower.match(/^(\d+)\s*min(?:utes?)?$/);
+    if (minMatch) return parseInt(minMatch[1]) * 60;
+    return null;
+  }
+
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
   function renderNoSession(container, stats) {
@@ -610,73 +797,51 @@ export function GymProgrammeView(router) {
     );
   }
 
-  // ── Session events ─────────────────────────────────────────────────────────
+  // ── Session completion (11 Aug 2026 v5) ────────────────────────────────────
+  // Extracted from the old attachSessionEvents()'s finish-session handler —
+  // logic unchanged, just called from advanceOrFinish() now instead of a
+  // single "Session done" button at the bottom of a scrollable list.
 
-  function attachSessionEvents(container, session, stats) {
-    // Exercise done buttons
-    container.querySelectorAll('[data-exercise-done]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx     = parseInt(btn.dataset.exerciseDone);
-        const isDone  = btn.getAttribute('aria-pressed') === 'true';
-        btn.setAttribute('aria-pressed', isDone ? 'false' : 'true');
-        btn.textContent = isDone ? 'Done' : 'Undone';
-        const card = container.querySelector(`#exercise-${idx}`);
-        card?.classList.toggle('gp-exercise-card--done', !isDone);
-      });
+  function finishSession(container, session, stats) {
+    const durationMins = sessionStartTime
+      ? Math.round((Date.now() - sessionStartTime) / 60000)
+      : 0;
+
+    const doneCount = completedExerciseIndices.size;
+
+    // Alternate session type A/B
+    const currentType = store.get('gymProgrammeSession') || 'A';
+    store.set('gymProgrammeSession', currentType === 'A' ? 'B' : 'A');
+
+    // Record session — progressLog write, unchanged.
+    recordSession({
+      focus:           session.focus || 'strength',
+      energy:          store.get('lastCheckin.energy'),
+      durationMinutes: durationMins,
+      exerciseCount:   doneCount,
+      conditionScores: store.get('conditionPainScores') || {},
     });
 
-    // Finish session
-    container.querySelector('[data-action="finish-session"]')?.addEventListener('click', () => {
-      const durationMins = sessionStartTime
-        ? Math.round((Date.now() - sessionStartTime) / 60000)
-        : 0;
-
-      const doneCount = container.querySelectorAll('[aria-pressed="true"]').length;
-
-      // Alternate session type A/B
-      const currentType = store.get('gymProgrammeSession') || 'A';
-      store.set('gymProgrammeSession', currentType === 'A' ? 'B' : 'A');
-
-      // Record session — progressLog write, unchanged (v3 blueprint
-      // Section 2: additive fix, this stays exactly as it was).
-      recordSession({
-        focus:           session.focus || 'strength',
-        energy:          store.get('lastCheckin.energy'),
-        durationMinutes: durationMins,
-        exerciseCount:   doneCount,
-        conditionScores: store.get('conditionPainScores') || {},
-      });
-
-      // v3 — shared activityLog write path, same pattern as workout.js
-      // v6/core-session.js v4/yoga-session.js v5. Makes this session
-      // visible to today.js/progress.js, and gives reflect.js a live
-      // currentActivityEntry to save feel/painChange/note/moodAfter into
-      // instead of silently discarding them.
-      const nowIso = new Date().toISOString();
-      const activityEntry = store.logActivity({
-        type:           'gym',
-        date:           nowIso,
-        completedAt:    nowIso,
-        status:         'complete',
-        durationMins,
-        exercisesCount: doneCount,
-        moodAfter:      null,
-        isEvent:        false,
-        eventName:      null,
-      });
-      if (activityEntry) {
-        store.set('currentActivityEntry', activityEntry);
-      }
-
-      cleanupSession();
-      router.navigate('reflect');
+    // Shared activityLog write path, same pattern as workout.js
+    // v6/core-session.js v4/yoga-session.js v5.
+    const nowIso = new Date().toISOString();
+    const activityEntry = store.logActivity({
+      type:           'gym',
+      date:           nowIso,
+      completedAt:    nowIso,
+      status:         'complete',
+      durationMins,
+      exercisesCount: doneCount,
+      moodAfter:      null,
+      isEvent:        false,
+      eventName:      null,
     });
+    if (activityEntry) {
+      store.set('currentActivityEntry', activityEntry);
+    }
 
-    // Exit — shows a Stay/Exit-and-save overlay instead of navigating
-    // instantly, matching workout.js v6's confirmed-working pattern.
-    container.querySelector('[data-action="exit-session"]')?.addEventListener('click', () => {
-      showExitConfirm(container);
-    });
+    cleanupSession();
+    router.navigate('reflect');
   }
 
   // ── Exit confirmation overlay ──────────────────────────────────────────────
@@ -686,7 +851,7 @@ export function GymProgrammeView(router) {
   // .session-exit-* class family from css/components/session-guard.css v2 —
   // no new CSS.
 
-  function showExitConfirm(container) {
+  function showExitConfirm(container, session) {
     const overlay = document.createElement('div');
     overlay.className = 'session-exit-overlay';
     overlay.id        = 'session-exit-overlay';
@@ -722,7 +887,7 @@ export function GymProgrammeView(router) {
 
     document.getElementById('exit-confirm-leave').addEventListener('click', () => {
       overlay.remove();
-      savePartialSession(container);
+      savePartialSession(container, session);
       cleanupSession();
       router.navigate('reflect');
     });
@@ -737,11 +902,14 @@ export function GymProgrammeView(router) {
    * recordSession() — a partial session shouldn't count toward
    * programme week/milestone progress, only toward the visible activity
    * record.
+   *
+   * 11 Aug 2026 v5 — doneCount now reads completedExerciseIndices.size
+   * instead of DOM-scanning aria-pressed buttons, since only one
+   * exercise is ever visible in the DOM at a time now — the old scan
+   * would have silently always returned 0 or 1 after this rebuild.
    */
-  function savePartialSession(container) {
-    const doneCount = container
-      ? container.querySelectorAll('[aria-pressed="true"]').length
-      : 0;
+  function savePartialSession(container, session) {
+    const doneCount = completedExerciseIndices.size;
     const durationMins = sessionStartTime
       ? Math.round((Date.now() - sessionStartTime) / 60000)
       : null;
@@ -771,8 +939,13 @@ export function GymProgrammeView(router) {
    */
   function cleanupSession() {
     dismountSessionGuard();
+    pauseTimer();
     sessionStarted   = false;
     sessionStartTime = null;
+    currentExerciseIndex = 0;
+    timeRemaining    = 0;
+    timerStarted     = false;
+    completedExerciseIndices = new Set();
   }
 
   // ── Utilities ──────────────────────────────────────────────────────────────
