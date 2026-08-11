@@ -1,15 +1,14 @@
 # Alongside: Move — Master Schedule
-## 11 Aug 2026 v149
+## 11 Aug 2026 v148
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_11aug2026_v148.md`. Remove v148 on upload.
+Supersedes `alongside_master_schedule_11aug2026_v147.md`. Remove v147 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** Six further build sessions since v148 — **WOW-4**, **PT-1** (+ two content refinements and a copy audit), **PT-4/WOW-6**, **PT-11**, **PT-12** — plus the **second persona trace**, now the required gate before any device pass. `sw.js` v228→v235. Twenty-two files changed across eleven sessions today, **none on-device confirmed**. Two new findings from the second trace, both significant: **PT-11**, a fourth private exercise pool that never filtered on fitness, meaning the WOW-2 fix covered only half the surface; and **PT-12**, closing the reader-without-writer pattern itself rather than another instance of it. **Recommendation on record: stop building, run the device pass.**
+**This version's substantive changes:** Three fix sessions built, verified and pushed the same day PT-W1 reported — **WOW-2** (PT-2/PT-9), **WOW-1** (PT-3) and **WOW-0** (consent). `sw.js` v225→v226→v227→v228, each a separate final commit. Nine application files plus `Schema.md`. Measured persona delta confirmed against a fresh clone of the live remote, not asserted: Tom's over-ceiling exercises 76→0 and his three-week Progress 22→87 minutes; Priya's hardest-tier availability 0→8. **Also this session: the Wow Blueprint** (`alongside_wow_blueprint_11aug2026_v1.md`) — the sequenced plan behind these sessions — and four new locked principles agreed with Graeme in conversation (§ Locked Principles below), which every future proposal must pass. **Two false statements found live in `privacy.js` and removed** ("Build New Habits Ltd", "ICO registered"). New pre-beta blocker logged: **BETA-1**, the consent gate currently links to two pages that do not exist.
 
 **Recent history, condensed for continuity (full detail in `Admin/Past MS/` for each version):**
-- **v148, first three WOW sessions + Locked Principles:** WOW-2, WOW-1, WOW-0 shipped and measured. Four Locked Principles agreed (P1–P4). Two false statements found live in `privacy.js` and removed. BETA-1 to BETA-4 logged.
 - **v147, Persona Tracing Wave 1 outcome:** brief executed same day it was written. Two 🔴 Critical findings confirmed by executing live code — a day-one check-in contradicting the user's own onboarding disclosure for 100% of users, and `fitnessLevel` having no live writer since OB-THREAD. Ten task rows PT-1 to PT-10. Three deliverables pushed to `Admin/`. Persona 2.5 confirmed as the Wave 2 candidate on evidence: the blank-slate persona surfaced both criticals first, making "least data given to the app" the selection criterion for future waves.
 
 ---
@@ -79,64 +78,6 @@ New nested `consent{ given, at, policyVersion, ageConfirmed }`. Nested rather th
 - **"ICO registered"** — it is not. Gated on BIZ-1 (HMRC), still open. The app was telling users their data sat under a registration that does not exist, on the one screen where accuracy matters most. Removed, not softened.
 
 Footer now reads "Build New Habits · Somerset, United Kingdom". `privacy.js` reframed as an explicit *summary* pointing at canonical website documents.
-
----
-
----
-
-## 🛠️ WOW Build Sessions — continued, 11 Aug 2026
-
-### WOW-4 — Nothing is a dead end 🟢 Shipped (PT-7)
-`session-builder-ui.js` v4→**v5**, `progress.js` v2→**v3**, `progress.css` v2→**v3**, `sw.js`→**v229**.
-Locked types/durations moved onto `auth.js`'s `lockedFeature()` — the HTML `disabled` attribute removed them from the tab order, so the "Personal tier" label was unreachable and tapping did nothing. Also removed `session-builder-ui.js`'s private `isPremium()` duplicate (which had already caused one real bug, the v2 `userTier`/`tier` fix). **Free Progress window 7→30 days** — coherence, not generosity: a 7-day window cannot show variability, so the free tier was the coaching removed rather than a smaller version of it. 90 days now a visible locked tab.
-
-### WOW-3 / PT-1 — The coach remembers 🟢 Shipped
-`checkin-openings.js` v2→**v3**, `sw.js`→**v230**, **v231**, **v232**.
-The territory branch matched IDs that have never existed anywhere — the retired `hard-before.js` used the same seven live IDs, so this never matched at any point in the product's life. Five of seven given purpose-written rows rather than approximated: mapping `trust-rupture` onto `past-failure` would put the failure on the person, the opposite of what they said.
-**Two follow-ups after Graeme's review:** `escalation-trap` dropped "We're not doing that" (a guarantee the app cannot keep); `hormonal-change` → **`changing-body`**, reframed after Graeme's point that bodies change at every age for a hundred reasons. That reframe also fixed a second fault — the row said *"Do you remember telling me…"* but fired on an inference from `ageBand`, so the coach claimed a disclosure that never happened. Now an observation, not a recollection, and no longer age-gated.
-**Copy audit** of all 19 rows after Graeme flagged an orphan referent. One real fault fixed, one grammatical tidy. Established for future copy work: **"one" meaning "session" is a house convention** in this file, predating today.
-
-### PT-4 / WOW-6 — Lift notes 🟢 Shipped
-`store.js` v19→**v20**, `Schema.md` v1.18→**v1.19**, `gym-programme.js` v5→**v6**, `settings.js` v14→**v15**, `gym-programme.css` v1→**v2**, `sw.js`→**v233**.
-Rescoped from analytics to a **memory aid** on Graeme's framing. Flat unnarrated `Last: 60 kg × 8` plus a weight/reps capture. Off by default; Settings → Equipment.
-**P4 enforced in code, not just intended:** `lastLift()` returns the entry only and no delta is computed anywhere, so a future caller has nothing to narrate. The test greps the rendered block for banned language. **Tier: recall free** (the coach remembering is not something to charge for, P1); analysis/trends/export Personal, **not built**.
-
-### PT-11 — Fourth exercise pool, never filtered on fitness 🟢 Shipped
-`session-builder.js` v3→**v4**, `sw.js`→**v234**.
-**Found by the second trace, not by reading.** This file carries its own 65-exercise pool, separate from the 461-exercise database, and never filtered on fitness — so WOW-2 reached `workoutGenerator.js` but **not the "Cardio, Core & Strength" Home door**. A sedentary beginner and a gym-literate lifter got the identical pool. `difficultyLevel` was written on all 65 and read nowhere. Ceiling applied using the existing field; warmup/cooldown exempt so the safety floor cannot be starved. **Pool merge logged, not attempted** — four parallel pools is architecture.
-
-### PT-12 — The reader-without-writer pattern, closed 🟢 Shipped
-`store.js` v20→**v21**, `Schema.md` v1.19→**v1.20**, `gym-programme.js` v6→**v7**, `journal-entry.js` v3→**v4**, `morning-session.js`, `intention.js`, `sw.js`→**v235**.
-Five confirmed instances made this the codebase's characteristic failure mode. Swept the remainder:
-- **`exerciseFeedback`** — read by `applyFeedbackWeighting()` since v1.3, written by nothing, so the weighting had never run on real data. New `store.logExerciseFeedback()` wired to the existing "Skip this one" — a signal already given at the point of friction, no new UI, nothing said back (P3).
-- **`journalEntryType`** — written by three call sites, read by none since the v3 privacy rewrite. Now read and cleared. **Journal Privacy Rule untouched** — prompt only.
-- **`checkin.energy`** — never written. **Three** reads in `morning-session.js`; energy silently defaulted to 5 and `energyBefore` was always null. Third site found by a failing assertion, not by reading.
-- **`todayEnergy`** — never written. Fallback retired.
-- **`exerciseFeedback` and `absence.returnCapturedAt` declared** — previously surviving only via the `...saved` spread, the exact PT-10 migration risk.
-
----
-
-## 🔬 Second Persona Trace — 11 Aug 2026
-
-Full report: `Admin/alongside_persona-wave1_second-pass_11aug2026_v1.md`.
-
-**Tom:** exercises above his ceiling **76 → 0**; Progress **22 → 87 minutes** (4 of 4 sessions counted, was 1 of 4); window 7 → 30 days; consent record none → tick + timestamp + version; day one now answers what he actually said.
-**Priya:** hardest tier available **0 → 8**; "Lower body" tap now routes instead of doing nothing; `Last: 60 kg × 8` where the app previously captured no numbers at all.
-**Unchanged and confirmed:** same-day return correct; warmup floor intact across all 21 type/preset combinations; `generic` still reachable for someone who skipped the age question.
-
-**Still not resolved for Priya:** the analysis half of PT-4. She can stop using her Notes app at the machine (the stated need) but still cannot see load move over a month (the stated desire). Different things; one is done.
-
-**Verification note worth keeping:** across today's sessions the first verification run was wrong and the code correct **five times**. Two real bugs were caught by assertions that would otherwise have shipped — `core-session.js`'s second `durationMins: null`, and `morning-session.js`'s third `checkin.energy`. The discipline that mattered was checking the source before accepting a failure.
-
----
-
-## 🛑 RECOMMENDATION ON RECORD — run the device pass next
-
-Twenty-two files across eleven sessions today, **none confirmed on a real screen**. The consent gate has never rendered. `gym-programme.js` v5–v7 remains the oldest untested item on the board.
-
-The next real risk is not a missing feature — it is that something shipped today does not render, and the longer the untested queue grows the harder attribution becomes. **Wave 2 (persona 2.5, post-cardiac) should wait until after that pass.**
-
-Device pass checklist: hard-reload past `alongside-v235`; consent gate renders and gates correctly; Tom-shaped day-one opening; a generated session; Progress minutes non-zero; locked tiles tap through; lift note saves and recalls; `gym-programme.js` one-exercise-at-a-time walkthrough.
 
 ---
 
@@ -721,4 +662,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 11 Aug 2026 v149*
+*Build New Habits · Alongside: Move · Master Schedule · 11 Aug 2026 v148*
