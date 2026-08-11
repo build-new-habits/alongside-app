@@ -715,4 +715,24 @@ Graeme: "make decisions following my previous decision behaviours and move this 
 
 ---
 
+### YouTube links restored + exercise-detail consistency audit — 10 Aug 2026
+
+Two connected requests from Graeme. "I've noticed all the exercises have lost the YouTube links using key search words rather than direct videos" + "audit all exercise UX and UI to check they all look the same... what, how, why and with support."
+
+**Part 1 — YouTube links, all 461 exercises.** Previously zero coverage across the whole main database. Traced content style per file before writing anything (`running.js` mixes technique drills with paced training sessions — 35 hand-crafted, not formula-generated). Three quality passes after the initial insert, each catching real issues: stray roman numerals ("warrior i" → "warrior 1"), duplicated words ("technique technique", "yoga yoga"), a genuine duplicate database entry for the same stretch under two ids. Confirmed via import test: 461/461, zero remaining issues.
+
+**Part 2 — the connected finding that mattered most.** All 461 exercises already had `instructions`/`coaching`/`why` at 100% coverage *before* this session — the content was always there. The "Name, what to do, mark as done" screens had silent field-name bugs, not missing content:
+- `workout.js` — regenerated a generic query instead of using each exercise's tailored term.
+- `gym-programme.js` — three mismatches in one block (`setup`/`whyThis`/`videoUrl` checking fields that never existed; real fields `instructions`/`why`/`youtube`).
+- `core-session.js` — instructions/coaching/video link never rendered despite full data coverage; separate singular/plural `.cue` bug in the overview list.
+- `prescribed-session.js` — the most concerning, zero guidance for any prescribed exercise ever. Fixed by reusing the existing safety-check's `EXERCISES` lookup — database-linked exercises now show full guidance, manually-added ones correctly show notes only.
+- `yoga-session.js` — its own separate 30-pose pool (a third exercise database, flagged not fixed) had no youtube coverage at all; added and wired up. `why` content doesn't exist in this pool — genuine authoring, left as a clean follow-up rather than rushed.
+
+**Confirmed correctly out of scope:** `walk`/`run`/`swim`/`cycle-session.js` — continuous-activity pattern, not itemized exercises, traced directly rather than assumed.
+
+- `js/data/exercises/*.js` (11 files), `workout.js` v6→v7, `gym-programme.js` v3→v4, `core-session.js` v5→v6, `prescribed-session.js` v3→v4, `yoga-session.js` v6→v7, `sw.js` v223→v224.
+- Full syntax check clean across all 16 touched files. **Not yet on-device confirmed.**
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

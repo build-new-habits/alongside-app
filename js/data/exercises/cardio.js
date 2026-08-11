@@ -1,5 +1,13 @@
 /**
  * data/exercises/cardio.js
+ * 10 Aug 2026 v1
+ *
+ * v1 — First version header on this file. Added tailored YouTube search
+ *   terms to all 26 exercises (previously zero coverage, database-wide
+ *   461-exercise pass, Graeme's direct request: "we get the most up to
+ *   date versions and avoid any issue with discontinued or old videos"
+ *   — search terms, not direct links, matching the reasoning exactly).
+ *
  * Cardio exercises — bodyweight cardio, HIIT, low-impact options
  */
 
@@ -8,6 +16,7 @@ export const CARDIO = [
   {
     id: 'jumping-jacks',
     name: 'Jumping Jacks',
+    youtube: 'jumping jacks exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: [],
@@ -33,6 +42,7 @@ export const CARDIO = [
   {
     id: 'high-knees',
     name: 'High Knees',
+    youtube: 'high knees exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: [],
@@ -58,6 +68,7 @@ export const CARDIO = [
   {
     id: 'mountain-climbers',
     name: 'Mountain Climbers',
+    youtube: 'mountain climbers exercise technique',
     category: 'cardio',
     movementPattern: 'anti-extension',
     equipment: [],
@@ -83,6 +94,7 @@ export const CARDIO = [
   {
     id: 'burpee',
     name: 'Burpee',
+    youtube: 'burpee exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: [],
@@ -110,6 +122,7 @@ export const CARDIO = [
   {
     id: 'squat-jumps',
     name: 'Squat Jumps',
+    youtube: 'squat jumps exercise technique',
     category: 'cardio',
     movementPattern: 'jump',
     equipment: [],
@@ -135,6 +148,7 @@ export const CARDIO = [
   {
     id: 'skipping-rope',
     name: 'Skipping',
+    youtube: 'skipping exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: ['skipping-rope'],
@@ -165,6 +179,7 @@ export const CARDIO = [
   {
     id: 'marching-on-spot',
     name: 'Marching on the Spot',
+    youtube: 'marching on the spot exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: [],
@@ -190,6 +205,7 @@ export const CARDIO = [
   {
     id: 'step-touch',
     name: 'Step Touch',
+    youtube: 'step touch exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: [],
@@ -215,6 +231,7 @@ export const CARDIO = [
   {
     id: 'stair-climbing',
     name: 'Stair Climbing',
+    youtube: 'stair climbing exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: [],
@@ -240,6 +257,7 @@ export const CARDIO = [
   {
     id: 'shadow-boxing',
     name: 'Shadow Boxing',
+    youtube: 'shadow boxing exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: [],
@@ -265,6 +283,7 @@ export const CARDIO = [
   {
     id: 'cycling-steady',
     name: 'Steady Cycling',
+    youtube: 'steady cycling exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: ['bicycle'],
@@ -290,6 +309,7 @@ export const CARDIO = [
   {
     id: 'brisk-walk',
     name: 'Brisk Walk',
+    youtube: 'brisk walk exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: [],
@@ -316,6 +336,7 @@ export const CARDIO = [
   {
     id: 'dance-freestyle',
     name: 'Freestyle Dance',
+    youtube: 'freestyle dance exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: [],
@@ -341,6 +362,7 @@ export const CARDIO = [
   {
     id: 'hiit-30-30',
     name: 'HIIT — 30:30 Intervals',
+    youtube: 'hiit - 3030 intervals exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: [],
@@ -367,6 +389,7 @@ export const CARDIO = [
   {
     id: 'rowing-machine',
     name: 'Rowing Machine — Steady State',
+    youtube: 'rowing machine - steady state exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: ['rowing-machine'],
@@ -392,6 +415,7 @@ export const CARDIO = [
   {
     id: 'walk-run-intervals',
     name: 'Walk-Run Intervals',
+    youtube: 'walk-run intervals exercise technique',
     category: 'cardio',
     movementPattern: 'locomotion',
     equipment: [],
@@ -422,6 +446,7 @@ export const CARDIO = [
   {
     id: 'cardio-rowing-easy',
     name: 'Easy Row — 20 Minutes',
+    youtube: 'easy row - 20 minutes exercise technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -449,6 +474,7 @@ export const CARDIO = [
   {
     id: 'cardio-rowing-intervals',
     name: 'Rowing Intervals — 500m',
+    youtube: 'rowing intervals - 500m exercise technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -476,6 +502,7 @@ export const CARDIO = [
   {
     id: 'cardio-assault-bike',
     name: 'Assault Bike — Interval Session',
+    youtube: 'assault bike - interval session exercise technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -503,6 +530,7 @@ export const CARDIO = [
   {
     id: 'cardio-stair-climbing',
     name: 'Stair Climbing',
+    youtube: 'stair climbing exercise technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -529,6 +557,7 @@ export const CARDIO = [
   {
     id: 'cardio-skipping',
     name: 'Jump Rope — Conditioning',
+    youtube: 'jump rope - conditioning exercise technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -555,6 +584,7 @@ export const CARDIO = [
   {
     id: 'cardio-shadow-boxing',
     name: 'Shadow Boxing',
+    youtube: 'shadow boxing exercise technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -582,6 +612,7 @@ export const CARDIO = [
   {
     id: 'cardio-dance',
     name: 'Dance Fitness — Freestyle',
+    youtube: 'dance fitness - freestyle exercise technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -608,6 +639,7 @@ export const CARDIO = [
   {
     id: 'cardio-circuit-training',
     name: 'Cardio Circuit — No Equipment',
+    youtube: 'cardio circuit - no equipment exercise technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -637,6 +669,7 @@ export const CARDIO = [
   {
     id: 'cardio-nordic-walking',
     name: 'Nordic Walking',
+    youtube: 'nordic walking exercise technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -663,6 +696,7 @@ export const CARDIO = [
   {
     id: 'cardio-hiit-session',
     name: 'HIIT — 20 Minute Session',
+    youtube: 'hiit - 20 minute session exercise technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',

@@ -1,5 +1,13 @@
 /**
  * data/exercises/swimming_cycling.js
+ * 10 Aug 2026 v1
+ *
+ * v1 — First version header on this file. Added tailored YouTube search
+ *   terms to all 23 exercises (previously zero coverage, database-wide
+ *   461-exercise pass, Graeme's direct request: "we get the most up to
+ *   date versions and avoid any issue with discontinued or old videos"
+ *   — search terms, not direct links, matching the reasoning exactly).
+ *
  * Swimming technique drills, sets, full sessions + Cycling sessions
  * contentType: 'exercise' for drills, 'practice' for full sessions
  *
@@ -15,6 +23,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-catch-drill',
     name: 'Freestyle Catch Drill',
+    youtube: 'freestyle catch drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'swim',
@@ -42,6 +51,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-bilateral-breathing',
     name: 'Bilateral Breathing Drill',
+    youtube: 'bilateral breathing drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'swim',
@@ -68,6 +78,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-kick-drill',
     name: 'Kick Set — Board',
+    youtube: 'kick set - board technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'swim',
@@ -94,6 +105,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-pull-buoy',
     name: 'Pull Buoy Set',
+    youtube: 'pull buoy set technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'swim',
@@ -120,6 +132,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-catch-up-drill',
     name: 'Catch-Up Drill',
+    youtube: 'catch-up drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'swim',
@@ -146,6 +159,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-fingertip-drag',
     name: 'Fingertip Drag Drill',
+    youtube: 'fingertip drag drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'swim',
@@ -172,6 +186,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-descending-intervals',
     name: 'Descending Intervals',
+    youtube: 'descending intervals technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'swim',
@@ -198,6 +213,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-easy-400',
     name: 'Easy 400 Metres',
+    youtube: 'easy 400 metres technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'swim',
@@ -223,6 +239,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-hard-200',
     name: 'Hard 200 Metres',
+    youtube: 'hard 200 metres technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'swim',
@@ -248,6 +265,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-sprint-50',
     name: 'Sprint 50 Metres × 6',
+    youtube: 'sprint 50 metres 6 technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'swim',
@@ -274,6 +292,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-medley',
     name: 'Swim, Pull, Kick Medley',
+    youtube: 'swim pull kick medley technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'swim',
@@ -300,6 +319,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-backstroke',
     name: 'Backstroke Technique',
+    youtube: 'backstroke swimming technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'swim',
@@ -327,6 +347,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-open-water-prep',
     name: 'Open Water Preparation',
+    youtube: 'open water preparation technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'swim',
@@ -353,6 +374,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-pool-endurance',
     name: 'Pool Endurance — 1500 Metres',
+    youtube: 'pool endurance - 1500 metres technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'swim',
@@ -379,6 +401,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'swim-breaststroke',
     name: 'Breaststroke Technique',
+    youtube: 'breaststroke swimming technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'swim',
@@ -410,6 +433,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'cycle-easy-spin',
     name: 'Easy Spin — 30 Minutes',
+    youtube: 'easy spin - 30 minutes technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -436,6 +460,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'cycle-tempo-45',
     name: 'Tempo Ride — 45 Minutes',
+    youtube: 'tempo ride - 45 minutes technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -462,6 +487,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'cycle-hill-simulation',
     name: 'Hill Climb Simulation',
+    youtube: 'hill climb simulation technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -489,6 +515,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'cycle-intervals',
     name: 'Cycling Interval Session',
+    youtube: 'cycling interval session technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -515,6 +542,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'cycle-cadence-drill',
     name: 'Cadence Drill — Cycling',
+    youtube: 'cadence drill - cycling technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -541,6 +569,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'cycle-sprint-intervals',
     name: 'Sprint Intervals — Cycling',
+    youtube: 'sprint intervals - cycling technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -567,6 +596,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'cycle-endurance-90',
     name: 'Endurance Ride — 90 Minutes',
+    youtube: 'endurance ride - 90 minutes technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -593,6 +623,7 @@ export const SWIMMING_CYCLING = [
   {
     id: 'cycle-recovery-spin',
     name: 'Recovery Spin — 20 Minutes',
+    youtube: 'recovery spin - 20 minutes technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'locomotion',

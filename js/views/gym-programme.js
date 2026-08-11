@@ -1,5 +1,19 @@
 /**
  * gym-programme.js
+ * 10 Aug 2026 v4
+ *
+ * v4 — Three silent field-name mismatches fixed, found auditing exercise-
+ *   detail consistency (Graeme: "some exercises still look like Name,
+ *   what to do, mark as done"). This file's "Why this" and video-link
+ *   sections had genuinely never rendered for any exercise, ever:
+ *   exercise.setup (real field: instructions), exercise.whyThis (real
+ *   field: why), exercise.videoUrl (expecting a direct link — real field
+ *   is .youtube, a search term, matching Graeme's own point about search
+ *   terms vs discontinued direct links). All three fixed, reusing
+ *   workout.js's proven pattern. The underlying data had instructions/
+ *   coaching/why at 100% coverage the whole time — this was purely a
+ *   display bug, not missing content.
+ *
  * 31 Jul 2026 v3
  *
  * Gym programme session view. Renders the generated gym session and handles
@@ -531,11 +545,11 @@ export function GymProgrammeView(router) {
           </div>
         ` : ''}
 
-        ${exercise.setup && exercise.setup.length > 0 ? `
+        ${exercise.instructions && exercise.instructions.length > 0 ? `
           <section class="gp-exercise-card__section" aria-labelledby="setup-${index}">
             <h3 class="gp-exercise-card__section-label" id="setup-${index}">Setup</h3>
             <ol class="gp-exercise-card__setup-list">
-              ${exercise.setup.map(step => `<li>${_esc(step)}</li>`).join('')}
+              ${exercise.instructions.map(step => `<li>${_esc(step)}</li>`).join('')}
             </ol>
           </section>
         ` : ''}
@@ -549,17 +563,17 @@ export function GymProgrammeView(router) {
           </section>
         ` : ''}
 
-        ${exercise.whyThis ? `
+        ${exercise.why ? `
           <section class="gp-exercise-card__section gp-exercise-card__section--why"
                    aria-labelledby="why-${index}">
             <h3 class="gp-exercise-card__section-label" id="why-${index}">Why this</h3>
-            <p class="gp-exercise-card__why">${_esc(exercise.whyThis)}</p>
+            <p class="gp-exercise-card__why">${_esc(exercise.why)}</p>
           </section>
         ` : ''}
 
-        ${exercise.videoUrl ? `
+        ${exercise.name ? `
           <a class="gp-exercise-card__video-link"
-             href="${_esc(exercise.videoUrl)}"
+             href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + ' exercise form'))}"
              target="_blank"
              rel="noopener noreferrer"
              aria-label="Watch a demonstration of ${_esc(exercise.name)} (opens in new tab)">

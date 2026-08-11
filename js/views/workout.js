@@ -1,8 +1,15 @@
 /**
  * workout.js - Workout Execution View
- * 30 Jul 2026 v6
+ * 10 Aug 2026 v7
  *
- * v6 — Gym exit-guard gap fix (Core Session investigation follow-up, same
+ * v7 — Fixed the YouTube link to use each exercise's own tailored
+ *   .youtube search term (added to all 461 exercises this same
+ *   session, none existed before) instead of regenerating a generic
+ *   "{name} exercise form" query from scratch. Found while auditing
+ *   exercise-detail consistency across every session view, per
+ *   Graeme's direct request.
+ *
+ * 30 Jul 2026 v6 — Gym exit-guard gap fix (Core Session investigation follow-up, same
  *   session). This file had NO back-gesture protection at all — no
  *   confirmation card, no partial save. Confirmed via router.js's default
  *   popstate handler: since this file never called mountSessionGuard(),
@@ -170,7 +177,7 @@ export function render() {
         </div>
 
         <!-- YouTube Demo Link -->
-        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.name + " exercise form")}"
+        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + " exercise form"))}"
            target="_blank"
            rel="noopener noreferrer"
            class="youtube-link"

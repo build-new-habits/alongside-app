@@ -1,6 +1,69 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 10 Aug 2026 v224
+ * Two connected requests from Graeme, both fully done: (1) restore
+ * YouTube search-term links across the exercise database ("so we get
+ * the most up to date versions and avoid any issue with discontinued
+ * or old videos" — search terms, not direct links); (2) audit every
+ * session view for consistent what/how/why/support display, since
+ * "some exercises still look like Name, what to do, mark as done."
+ *
+ * Part 1 — YouTube links. All 461 exercises across the main database
+ * (js/data/exercises/*.js, previously zero coverage) now have tailored
+ * search-term youtube fields. Not a blind bulk pass: traced content
+ * style per file first (running.js mixes real technique drills with
+ * paced training sessions — 35 entries hand-crafted, not formula-
+ * generated). Three quality passes run afterward, each catching real
+ * issues: stray lowercase roman numerals ("warrior i"), duplicated
+ * words ("technique technique", "yoga yoga"), one exercise with two
+ * near-duplicate database entries (flagged, not merged). Confirmed via
+ * a real import test: 461/461 loading correctly, zero gaps, zero
+ * remaining quality issues on the final pass.
+ *
+ * Part 2 — UI consistency audit, the connected finding that mattered
+ * most: all 461 exercises already had instructions/coaching/why fields
+ * at 100% coverage BEFORE this session — the what/how/why content has
+ * been sitting there ready the whole time. The "Name, what to do, mark
+ * as done" screens weren't missing content, they had silent field-name
+ * bugs in the display code:
+ *   - workout.js: regenerated a generic "{name} exercise form" query
+ *     instead of using each exercise's own tailored .youtube term.
+ *   - gym-programme.js: THREE mismatches in one block — checked
+ *     exercise.setup (real field: instructions), exercise.whyThis
+ *     (real: why), exercise.videoUrl expecting a direct link (real:
+ *     .youtube, a search term — Graeme's exact point about search
+ *     terms vs discontinued direct links, playing out as a second bug).
+ *   - core-session.js: instructions/coaching/youtube never rendered at
+ *     all despite 100% data coverage; separately, exercise.cue
+ *     (singular, never existed) should have been exercise.cues
+ *     (plural array) in the pre-session overview list.
+ *   - prescribed-session.js: the most concerning — zero guidance shown
+ *     for ANY prescribed exercise, ever, just name + sets/reps + notes.
+ *     Fixed by reusing the exact EXERCISES lookup pattern already used
+ *     for its safety check — database-linked exercises now show full
+ *     guidance, manually-added ones correctly still show notes only
+ *     (verified both paths with a direct test).
+ *   - yoga-session.js: its own private 30-pose pool (a third, separate
+ *     exercise database, flagged as a real architectural concern, not
+ *     fixed tonight) had good description/cues already but zero
+ *     youtube coverage — added to all 30, wired up display, same
+ *     singular/plural cue bug fixed. A `why` field doesn't exist in
+ *     this pool's data at all — genuine content authoring, not a
+ *     mechanical fix, deliberately left as a clean follow-up rather
+ *     than rushed at the end of a long session.
+ *
+ * Confirmed correctly OUT of scope: walk/run/swim/cycle-session.js use
+ * a continuous-activity + periodic coach-prompt pattern, not itemized
+ * exercises — Graeme's complaint doesn't apply to these, verified by
+ * tracing their actual render logic rather than assumed.
+ *
+ * js/data/exercises/*.js (11 files, 3 version-bumped, 8 given their
+ * first-ever version header), workout.js v6→v7, gym-programme.js
+ * v3→v4, core-session.js v5→v6, prescribed-session.js v3→v4,
+ * yoga-session.js v6→v7. Full syntax check clean across all 16 files.
+ * Not yet on-device confirmed.
+ *
  * 10 Aug 2026 v223
  * Overnight autonomous session (Claude, "make decisions following my
  * previous decision behaviours"). Scoped deliberately narrow: small,
@@ -824,7 +887,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v223";
+const CACHE_NAME = "alongside-v224";
 
 const SHELL_URLS = [
 
