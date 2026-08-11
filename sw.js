@@ -923,6 +923,10 @@ rather than only a buried bypass door. Added both.
  *   Truth Rule's documented fallback. Cache-bump only otherwise; no
  *   other files changed this deploy.
  *
+ * 11 Aug 2026 v227 - WOW-1 (PT-3): workout.js v8, core-session.js v7,
+ *   yoga-session.js v8. Session-level clocks added; all six activityLog
+ *   write paths now report real elapsed minutes instead of null.
+ *
  * 11 Aug 2026 v226 - WOW-2 (PT-2/PT-9): workoutGenerator.js v1.14,
  *   exercises.js + exercises/index.js v1.4, exercises/yoga.js v2.
  *   fitnessLevel now resolves from lifestyle.activityLevel (the field live
@@ -935,7 +939,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v226";
+const CACHE_NAME = "alongside-v227";
 
 const SHELL_URLS = [
 
