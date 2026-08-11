@@ -67,6 +67,10 @@ export const EQUIPMENT_IMPLIES = {
   "barbell":              ["barbell"],
   "ez-curl-bar":          ["barbell"],
   "medicine-ball":        ["medicine-ball"],
+  "cable-machine":        ["cable-machine"],
+  "leg-press-machine":    ["leg-press-machine"],
+  "leg-curl-machine":     ["leg-curl-machine"],
+  "chest-press-machine":  ["chest-press-machine"],
   "slam-ball":            ["medicine-ball"],
 
   // ── Bands ──────────────────────────────────────────────────────────────
@@ -84,6 +88,10 @@ export const EQUIPMENT_IMPLIES = {
   "outdoor-bike":   ["bicycle"],
   "air-bike":       ["exercise-bike", "bicycle"],
   "rowing-machine": ["rowing-machine"],
+  "treadmill":      ["treadmill"],
+  "elliptical":     ["elliptical"],
+  "stair-climber":  ["stair-climber"],
+  "ski-erg":        ["ski-erg"],
   "skipping-rope":  ["skipping-rope", "jump-rope"],
 
   // ── Home ───────────────────────────────────────────────────────────────
@@ -92,12 +100,21 @@ export const EQUIPMENT_IMPLIES = {
   "plyo-box":         ["bench"],
   "step-platform":    ["bench"],
   "ab-wheel":         ["ab-wheel"],
+  "plyo-box":         ["plyo-box", "bench"],
+  "bosu-ball":        ["bosu-ball", "balance-board"],
+  "balance-board":    ["balance-board"],
+  "wobble-cushion":   ["balance-board"],
 
   // ── Recovery ───────────────────────────────────────────────────────────
   "foam-roller":     ["foam-roller"],
   "lacrosse-ball":   ["massage-ball"],
   "peanut-ball":     ["massage-ball"],
   "massage-gun":     ["massage-ball"],
+
+  // ── Functional ─────────────────────────────────────────────────────────
+  "trx":          ["trx"],
+  "battle-ropes": ["battle-ropes"],
+  "sled":         ["sled"],
 
   // ── Facility ───────────────────────────────────────────────────────────
   // A gym membership implies the fixed kit a commercial gym reliably has.
@@ -114,7 +131,20 @@ export const EQUIPMENT_IMPLIES = {
     "rowing-machine",
     "exercise-bike",
     "bicycle",
-    "foam-roller"
+    "foam-roller",
+    // Added 11 Aug 2026 (CON-4). A commercial gym reliably has a cable
+    // machine and the fixed-resistance wall. Deliberately conservative:
+    // ski erg, sled, battle ropes, TRX and balance kit are NOT implied,
+    // because plenty of ordinary gyms have none of them and a person who
+    // has one can tick it directly.
+    "cable-machine",
+    "leg-press-machine",
+    "leg-curl-machine",
+    "chest-press-machine",
+    "treadmill",
+    "elliptical",
+    "stair-climber",
+    "plyo-box"
   ],
   "swimming-pool":  ["swimming-pool", "kickboard", "pull-buoy"],
   "outdoor-track":  ["agility-cones"],
