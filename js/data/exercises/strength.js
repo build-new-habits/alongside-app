@@ -1,5 +1,14 @@
 /**
  * data/exercises/strength.js
+ * 11 Aug 2026 v5
+ *
+ * v5 - watchOut and load added to both Pallof press entries, at Graeme's
+ *   request ("the one I love is a pallof press"). Neither had them, so
+ *   the exercise he uses most rendered without the two things he had
+ *   asked the product to provide. A cable version was also added in
+ *   gym.js -- two band versions existed and no cable one, despite the
+ *   cable being how it is usually done in a gym.
+ *
  * 10 Aug 2026 v4
  *
  * v4 — Added tailored YouTube search terms to all 90 exercises
@@ -666,6 +675,13 @@ export const STRENGTH = [
     ],
     coaching: 'Your body wants to rotate toward the anchor. The whole job of your core is to stop that happening. Stay square.',
     why: 'Trains rotational core stability — the ability to resist twisting forces. Directly relevant to carrying, throwing, and almost all sport.',
+    watchOut: [
+      'Your body turning towards the anchor as you press out, which means the band is too strong — step in or use a lighter one',
+      'Hips drifting round while the shoulders stay square, or the other way about; both should stay facing forward',
+      'Holding your breath during the two-second hold, which is the most common habit on this one',
+      'Standing too close to the anchor, so there is no tension and nothing to resist'
+    ],
+    load: 'Light enough that you stay completely square for every rep. Rotating is the band telling you it is too strong.',
     credits: 50,
     sets: 3,
     reps: "10 each side",
@@ -2123,6 +2139,13 @@ export const STRENGTH = [
     ],
     coaching: 'The anti-rotation demand is highest when the arms are extended. Everything in the body is working to stay square.',
     why: 'The Pallof press is the gold standard anti-rotation core exercise — trains the core in its primary function of resisting unwanted movement rather than creating it.',
+    watchOut: [
+      'Rotating towards the anchor at the point the arms straighten, which is where it is hardest and where form usually goes',
+      'Shoulders creeping up towards the ears as you press',
+      'Rushing the two-second hold, which is the part doing most of the work',
+      'Feet too close together, which makes staying square harder than it needs to be'
+    ],
+    load: 'Light enough to stay square throughout. Progress by stepping further from the anchor before reaching for a stronger band.',
     credits: 40,
     sets: 3,
     reps: "12 each side",
