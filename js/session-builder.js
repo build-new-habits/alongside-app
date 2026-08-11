@@ -1,6 +1,20 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v6
+ *
+ * v6 - PT-19. Every session now opens with a pulse-raiser unless there is
+ *   a named reason it should not, and the reason is spoken. Three
+ *   compounding causes found: (1) "cardio-warmup" was listed last of four
+ *   categories with three slots available, so the selection loop broke
+ *   before reaching it -- no generated session contained one, at home OR
+ *   in a fully-equipped gym; (2) all four cardio-warmup entries required a
+ *   machine, so the category was structurally empty without one; (3) two
+ *   of those four carried equipment tags ("bike", "cross-trainer") absent
+ *   from equipment.js's vocabulary, unreachable even in a gym. Fixed with
+ *   a reserved first warm-up slot, five tiered bodyweight pulse-raisers,
+ *   corrected tags, and a machine preference when one is available.
+ *
  * 11 Aug 2026 v5
  *
  * v5 — CON-2. Equipment matching now resolves through equipment-map.js,
@@ -144,7 +158,7 @@ export const SESSION_TYPES = [
     label:       "Core",
     icon:        "🎯",
     description: "Anti-extension, anti-rotation, anti-lateral. Real core work.",
-    warmupCategories:   ["breathing-warmup", "cat-cow"],
+    warmupCategories:   ["cardio-warmup", "breathing-warmup", "cat-cow"],
     mainCategories:     ["anti-extension", "anti-rotation", "anti-lateral"],
     cooldownCategories: ["child-pose", "supine-rotation"]
   },
@@ -183,7 +197,7 @@ const EXERCISE_POOL = [
     description: "5 minutes on a stationary bike at an easy, conversational pace — enough to raise your heart rate and warm the joints, not to tire you out before the real work.",
     cues: ["You should be able to talk normally", "Light resistance — this is a warmup, not the session", "Focus on smooth, even pedalling"],
     youtube: "stationary bike warm up before weights",
-    equipment: ["bike"], contraindications: ["knee-acute"] },
+    equipment: ["exercise-bike"], contraindications: ["knee-acute"] },
 
   { id: "sb-cwu-02", name: "Treadmill, easy walk", section: "warmup", category: "cardio-warmup",
     sets: 1, tempo: "Brisk walk", rest: "0s", difficultyLevel: 1, duration: 300,
@@ -197,7 +211,53 @@ const EXERCISE_POOL = [
     description: "5 minutes on the cross trainer at an easy pace, using the full range of motion — low-impact, warms the whole body including the arms.",
     cues: ["Full, smooth range of motion, not short choppy steps", "Light resistance", "Let the handles move naturally with your stride"],
     youtube: "cross trainer elliptical warm up",
-    equipment: ["cross-trainer"], contraindications: ["shoulder-acute"] },
+    equipment: ["elliptical"], contraindications: ["shoulder-acute"] },
+
+  // BODYWEIGHT PULSE-RAISERS (11 Aug 2026, PT-19) — the reason no home
+  // session ever opened with cardio: all four cardio-warmup entries needed a
+  // machine, so the category was structurally empty without a gym.
+  //
+  // Tiered by difficultyLevel so the pulse-raiser scales with the person
+  // rather than being one intensity. A deconditioned beginner marches; a
+  // fitter person gets jacks or high knees. Burpees are deliberately NOT a
+  // warmup at any tier — they are a main-session conditioning movement, and
+  // asking someone to open with them is how a warmup becomes the reason
+  // somebody stops coming.
+
+  { id: "sb-cwu-05", name: "Marching on the spot", section: "warmup", category: "cardio-warmup",
+    sets: 1, tempo: "Steady, easy", rest: "0s", difficultyLevel: 1, duration: 180,
+    description: "Three minutes marching on the spot, lifting each knee to hip height and swinging the arms. The gentlest way to raise your heart rate and warm the hips before anything else.",
+    cues: ["Knees to hip height, no higher", "Let your arms swing naturally", "You should be able to hold a conversation"],
+    youtube: "marching on the spot warm up beginners",
+    equipment: [], contraindications: [] },
+
+  { id: "sb-cwu-06", name: "Jog on the spot", section: "warmup", category: "cardio-warmup",
+    sets: 1, tempo: "Easy, conversational", rest: "0s", difficultyLevel: 2, duration: 180,
+    description: "Three minutes of light jogging on the spot, landing softly on the balls of your feet. Raises the pulse and wakes up the calves and ankles.",
+    cues: ["Land softly — you should barely hear your feet", "Stay light, this is not a sprint", "Breathing faster is fine, gasping is not"],
+    youtube: "jog on the spot warm up technique",
+    equipment: [], contraindications: ["knee-acute", "ankle-acute"] },
+
+  { id: "sb-cwu-07", name: "Step-ups on a stair", section: "warmup", category: "cardio-warmup",
+    sets: 1, tempo: "Steady, controlled", rest: "0s", difficultyLevel: 2, duration: 180,
+    description: "Three minutes stepping up and down on the bottom stair or a low step, alternating your leading leg every thirty seconds or so. Low impact, raises the pulse and warms the legs at the same time.",
+    cues: ["Whole foot on the step, not just the toes", "Change your leading leg regularly", "Steady rhythm rather than rushing"],
+    youtube: "step up warm up stairs low impact",
+    equipment: [], contraindications: ["knee-acute"] },
+
+  { id: "sb-cwu-08", name: "Jumping jacks", section: "warmup", category: "cardio-warmup",
+    sets: 2, reps: "30 seconds", rest: "30s", tempo: "Steady", difficultyLevel: 3, duration: 120,
+    description: "Two rounds of thirty seconds. Jump the feet wide as the arms sweep overhead, then back together. Raises the heart rate quickly and warms the shoulders as well as the legs.",
+    cues: ["Land with soft knees, not locked out", "Full arm sweep — all the way overhead", "Step it out instead of jumping if that suits you better today"],
+    youtube: "jumping jacks warm up proper form",
+    equipment: [], contraindications: ["knee-acute", "ankle-acute", "lower-back-acute", "shoulder-acute"] },
+
+  { id: "sb-cwu-09", name: "High knees", section: "warmup", category: "cardio-warmup",
+    sets: 2, reps: "30 seconds", rest: "30s", tempo: "Quick but controlled", difficultyLevel: 4, duration: 120,
+    description: "Two rounds of thirty seconds driving the knees up towards hip height at pace, staying tall through the chest. The most demanding of the warm-up options — it raises the pulse fast.",
+    cues: ["Stay tall — do not lean back", "Land on the balls of your feet, softly", "Pace it so you could keep going for a third round if asked"],
+    youtube: "high knees warm up running drill",
+    equipment: [], contraindications: ["knee-acute", "ankle-acute", "hip-acute", "lower-back-acute"] },
 
   { id: "sb-cwu-04", name: "Rowing machine, easy pace", section: "warmup", category: "cardio-warmup",
     sets: 1, tempo: "Easy, technique-focused", rest: "0s", difficultyLevel: 1, duration: 240,
@@ -743,6 +803,79 @@ function buildActiveConditionSet() {
   return active;
 }
 
+/**
+ * PULSE-RAISER RULE (11 Aug 2026, PT-19)
+ *
+ * Every session opens with something that raises the heart rate, unless
+ * there is a specific, nameable reason it should not.
+ *
+ * This inverts how warm-ups were selected until now. Previously
+ * "cardio-warmup" was one category among several in an ordered list, and
+ * the selection loop filled its slots in order and stopped. On Full Body it
+ * was listed fourth of four with three slots available, so the loop broke
+ * before ever reaching it. Traced live on 11 Aug: no generated session
+ * contained a pulse-raiser, at home OR in a gym with a treadmill and a bike
+ * ticked. Two separate causes compounded it -- all four cardio-warmup
+ * entries required a machine, and two of the four carried equipment tags
+ * ("bike", "cross-trainer") that do not exist in equipment.js's vocabulary,
+ * so they could never match even in a gym.
+ *
+ * The default is now on. Exclusion requires a reason, and the reason is
+ * spoken rather than silently applied -- Locked Principle P1: the coach
+ * never withholds what it can see. Someone who notices the warm-up looks
+ * different today should be told why, not left to wonder.
+ *
+ * Exclusions, each deliberate:
+ *
+ *   Cardio sessions   -- the whole session is a pulse-raiser. Reserving a
+ *                        slot for one inside it is redundant.
+ *   Mobility sessions -- these open with breathing by design. Range of
+ *                        motion work does not need an elevated heart rate,
+ *                        and forcing one changes what the session is.
+ *   Unwell            -- self-reported. Someone who has said they are
+ *                        unwell should not be met with a heart-rate raiser.
+ *   Acute pain (>=7)  -- consistent with the existing severe zone override.
+ *
+ * Note what is NOT an exclusion: having no equipment. That was the original
+ * cause of the gap and it is a content problem, not a rule. Five bodyweight
+ * pulse-raisers were authored alongside this, tiered by difficultyLevel so
+ * the option scales with the person rather than being one intensity.
+ *
+ * @param {string} sessionType
+ * @returns {{ include: boolean, reason: string|null }}
+ *   reason is coach-voice text for the session's opening line, or null when
+ *   included. Never a bare flag -- an exclusion the person cannot see the
+ *   reason for is exactly what this rule exists to prevent.
+ */
+export function pulseRaiserDecision(sessionType) {
+  if (sessionType === "cardio") {
+    return { include: false, reason: null };   // the session is the warm-up
+  }
+  if (sessionType === "mobility") {
+    return { include: false, reason: null };   // opens with breathing by design
+  }
+
+  const lastCheckin = store.get("lastCheckin") || {};
+  if (lastCheckin.unwell === true) {
+    return {
+      include: false,
+      reason: "You told me you are not feeling well, so I have left the heart-rate raiser out of the warm-up today. Move gently and stop whenever you need to."
+    };
+  }
+
+  const conditions = store.get("conditions")          || [];
+  const painScores = store.get("conditionPainScores") || {};
+  const acute = conditions.filter(id => (painScores[id] || 0) >= 7);
+  if (acute.length > 0) {
+    return {
+      include: false,
+      reason: "With the pain you have flagged today I have started you gently rather than raising your heart rate first. Take the warm-up slowly."
+    };
+  }
+
+  return { include: true, reason: null };
+}
+
 function buildConditionNote(sessionType) {
   const conditions = store.get("conditions")          || [];
   const painScores = store.get("conditionPainScores") || {};
@@ -1004,12 +1137,39 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
 
   const hasPrescribed = prescribed.length > 0;
 
+  // PT-19 — decided once per session, used by selectFromCategories() below
+  // and surfaced on the session object so the coach line can say why the
+  // warm-up looks different when it does.
+  const pulseRaiser = pulseRaiserDecision(sessionType);
+
   function selectFromCategories(categories, section, count) {
     const candidates = _filterCandidates(categories, section, equipSet, conditionSet);
 
     // Prioritise variety across categories — one from each category first
     const selected = [];
     const usedCategories = new Set();
+
+    // PULSE-RAISER RESERVED SLOT (PT-19). The warm-up's first slot belongs
+    // to cardio-warmup unless pulseRaiserDecision() names a reason it
+    // should not. Reserved rather than reordered: reordering the category
+    // array would only change which category gets dropped when slots run
+    // out, and the point is that this one never should. Same shape as the
+    // existing warmup floor -- a rule, not a preference.
+    if (section === "warmup" && pulseRaiser.include && count > 0) {
+      const cardio = candidates.filter(e => e.category === "cardio-warmup");
+      if (cardio.length > 0) {
+        // Prefer a machine when the person has one. Found in testing: the
+        // reserved slot picked at random, so a gym user with a treadmill,
+        // a bike and a cross trainer ticked was being handed jumping jacks
+        // -- which is exactly the complaint that started this. Bodyweight
+        // is right at home and wrong standing next to a cross trainer.
+        // Falls back to bodyweight whenever no machine is available.
+        const machine = cardio.filter(e => (e.equipment || []).length > 0);
+        const pickFrom = machine.length > 0 ? machine : cardio;
+        selected.push(pickFrom[Math.floor(Math.random() * pickFrom.length)]);
+        usedCategories.add("cardio-warmup");
+      }
+    }
 
     // First pass: one from each category
     for (const cat of categories) {
@@ -1078,12 +1238,21 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   }, 0));
   const durationStr = `${Math.max(estMins - 5, durationMins - 5)}–${Math.max(estMins + 5, durationMins + 5)} mins`;
 
+  // PT-19 — when the pulse-raiser is deliberately left out for a reason the
+  // person gave us (unwell, acute pain), say so. An exclusion applied
+  // silently is exactly what Locked Principle P1 forbids: the coach never
+  // withholds what it can see. The structural exemptions (cardio, mobility)
+  // carry no reason and add nothing here, correctly.
+  const coachLineWithWarmupNote = pulseRaiser.reason
+    ? `${coachLine} ${pulseRaiser.reason}`
+    : coachLine;
+
   const session = {
     id:       `${sessionType}-${Date.now()}`,
     title:    `${type.label}`,
     subtitle: `Built for you today — ${durationMins} mins`,
     duration: durationStr,
-    coachLine,
+    coachLine: coachLineWithWarmupNote,
     exercises: allExercises
   };
 
