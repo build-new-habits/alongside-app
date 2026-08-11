@@ -1,6 +1,14 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 11 Aug 2026 v6
+ *
+ * v6 - Duration display. Raw seconds were printed straight onto the
+ *   session preview, so a five-minute cross-trainer warm-up read "300s" -
+ *   accurate and unreadable. New formatDuration() translates anything over
+ *   ninety seconds into minutes, and leaves genuinely short holds in
+ *   seconds where that is how a person would say it.
+ *
  * 11 Aug 2026 v5
  *
  * v5 — WOW-4 (PT-7). Locked session types and durations now use auth.js's
@@ -113,6 +121,23 @@ import { isPremium, lockedFeature }        from "../auth.js";
 export const centered = false;
 
 // ── State ─────────────────────────────────────────────────────────────────────
+// ── Duration display (11 Aug 2026) ────────────────────────────────────────────
+// Raw seconds were being printed straight onto the preview list, so a
+// five-minute cross-trainer warm-up read "300s". Accurate and unreadable:
+// nobody thinks in seconds above about ninety of them. Translates to the
+// unit a person would actually say out loud, and leaves genuinely short
+// holds in seconds where that is the natural way to say it.
+function formatDuration(seconds) {
+  const s = Number(seconds);
+  if (!Number.isFinite(s) || s <= 0) return "";
+  if (s < 90) return `${s}s`;
+  const mins = s / 60;
+  if (Number.isInteger(mins)) return `${mins} min`;
+  const whole = Math.floor(mins);
+  const rem   = s - whole * 60;
+  return rem === 30 ? `${whole}\u00BD min` : `${whole} min ${rem}s`;
+}
+
 let phase             = "type";      // "type" | "location" | "duration" | "equipment" | "buildmode" | "candidates" | "loading" | "preview"
 let selectedType      = null;
 let selectedLocation  = "home";      // "home" | "gym" -- never sticky, reset on resetState()
@@ -608,7 +633,7 @@ function renderPreview() {
               <div class="sb-exercise-left">
                 <span class="sb-exercise-name">${ex.name}</span>
                 <span class="sb-exercise-meta text-xs text-muted">
-                  ${ex.sets} sets &nbsp; ${ex.reps || (ex.duration + "s")} &nbsp; ${ex.tempo}
+                  ${ex.sets} sets &nbsp; ${ex.reps || formatDuration(ex.duration)} &nbsp; ${ex.tempo}
                 </span>
               </div>
             </div>
@@ -622,7 +647,7 @@ function renderPreview() {
               <div class="sb-exercise-left">
                 <span class="sb-exercise-name">${ex.name}</span>
                 <span class="sb-exercise-meta text-xs text-muted">
-                  ${ex.sets} sets &nbsp; ${ex.reps || (ex.duration + "s")} &nbsp; ${ex.tempo}
+                  ${ex.sets} sets &nbsp; ${ex.reps || formatDuration(ex.duration)} &nbsp; ${ex.tempo}
                   ${ex.rest && ex.rest !== "0s" ? "&nbsp; rest " + ex.rest : ""}
                 </span>
               </div>
@@ -637,7 +662,7 @@ function renderPreview() {
               <div class="sb-exercise-left">
                 <span class="sb-exercise-name">${ex.name}</span>
                 <span class="sb-exercise-meta text-xs text-muted">
-                  ${ex.reps || (ex.duration + "s")} &nbsp; ${ex.tempo}
+                  ${ex.reps || formatDuration(ex.duration)} &nbsp; ${ex.tempo}
                 </span>
               </div>
             </div>
