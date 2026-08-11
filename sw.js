@@ -923,6 +923,9 @@ rather than only a buried bypass door. Added both.
  *   Truth Rule's documented fallback. Cache-bump only otherwise; no
  *   other files changed this deploy.
  *
+ * 11 Aug 2026 v232 - PT-1 copy audit: changing-body b2 made self-contained,
+ *   escalation-trap tidied. All 19 DAY_ONE rows checked for orphan referents.
+ *
  * 11 Aug 2026 v231 - PT-1 follow-up: checkin-openings.js content refinements.
  *   hormonal-change reframed to changing-body (no longer claims a disclosure
  *   that never happened, no longer age-gated to the over-50s).
@@ -956,7 +959,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v231";
+const CACHE_NAME = "alongside-v232";
 
 const SHELL_URLS = [
 
