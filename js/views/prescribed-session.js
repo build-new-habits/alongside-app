@@ -1,6 +1,13 @@
 /**
  * prescribed-session.js - Prescribed Exercise Session View
  *
+ * 11 Aug 2026 v5
+ *
+ * v5 - CON-3b. Renders watchOut ("What to watch for") and load ("How
+ *   heavy") from the linked database entry, completing the guidance
+ *   block that v4 introduced. Same fullEx lookup, same structure,
+ *   nothing new fetched.
+ *
  * 10 Aug 2026 v4
  *
  * CHANGELOG
@@ -224,6 +231,20 @@ export function render() {
                 <p class="exercise-why-text" aria-labelledby="ps-section-why">${fullEx.why}</p>
               ` : ""}
             </div>
+            ${fullEx.load ? `
+              <div class="exercise-load" role="region" aria-label="How heavy for ${ex.name}">
+                <span class="exercise-section-label" id="ps-section-load">How heavy</span>
+                <p class="exercise-load-text" aria-labelledby="ps-section-load">${fullEx.load}</p>
+              </div>
+            ` : ""}
+            ${fullEx.watchOut && fullEx.watchOut.length > 0 ? `
+              <div class="exercise-watchout" role="region" aria-label="What to watch for with ${ex.name}">
+                <span class="exercise-section-label" id="ps-section-watchout">What to watch for</span>
+                <ul class="exercise-watchout-list" aria-labelledby="ps-section-watchout">
+                  ${fullEx.watchOut.map(item => `<li>${item}</li>`).join("")}
+                </ul>
+              </div>
+            ` : ""}
             <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(fullEx.youtube || (ex.name + " exercise form"))}"
                target="_blank"
                rel="noopener noreferrer"
