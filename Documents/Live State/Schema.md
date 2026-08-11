@@ -1,10 +1,12 @@
 # Alongside — Data Schema Reference
-## 09 Aug 2026 v1.17
+## 11 Aug 2026 v1.18
 
-**File:** `js/store.js` (confirmed live version: v18, 09 Aug 2026)
+**File:** `js/store.js` (confirmed live version: v19, 11 Aug 2026)
 **Storage:** `localStorage` key `alongside_user`
 
-**This version supersedes:** `schema.md` v1.16 (04 Aug 2026). Two catch-ups in one pass: (1) `exercisePreferences` (`store.js` v17, 04 Aug) was never documented here — added below. (2) New `inStepProgress` (`store.js` v18, 09 Aug) for the "In Step" Noticing Hub feature (Personal tier) — four-movement scenario practice extending the empathy transfer arc. Full feature spec developed in PM chat, 09 Aug 2026.
+**This version supersedes:** `schema.md` v1.17 (09 Aug 2026). Adds the new nested `consent{}` object (`store.js` v19) — see Section 1. This closes a gap found by the Persona Tracing Wave 1 store audit: live onboarding had captured **no legal consent record at all** since the OB-THREAD rebuild retired `welcome.js`. Consent is now an affirmative tick with a recorded policy version, not implied consent. The age gate is built but inert pending A1.11.
+
+**Previous version note (v1.17):** superseded `schema.md` v1.16 (04 Aug 2026). Two catch-ups in one pass: (1) `exercisePreferences` (`store.js` v17, 04 Aug) was never documented here — added below. (2) New `inStepProgress` (`store.js` v18, 09 Aug) for the "In Step" Noticing Hub feature (Personal tier) — four-movement scenario practice extending the empathy transfer arc. Full feature spec developed in PM chat, 09 Aug 2026.
 
 **Carried forward from v1.15:** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — real exercise reuse across conditions, not duplication. One entry can now genuinely serve more than one condition. Backward compatible — old singular-shaped entries still read correctly via the new `getEntryConditionIds()` helper, no migration step required. `js/data/conditionProgrammes.js` v2→v3 (not a schema file, but the reason this changed).
 
@@ -61,6 +63,19 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 |-------|------|---------|-------|
 | `onboardingComplete` | `boolean` | `false` | Gates app entry |
 | `onboardingStep` | `number` | `1` | Resume position if onboarding is interrupted |
+
+### `consent` (nested object) — **NEW, `store.js` v19, 11 Aug 2026**
+
+Legal consent record. Restored after the PT-W1 store audit found it absent: `welcome.js:85-86` was the only writer of the old flat `consentGiven`/`consentAt`, and that route was retired from `router.js` VIEW_NAMES in v7. **Live onboarding captured no consent record at all between the OB-THREAD rebuild and 11 Aug 2026.**
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `consent.given` | `boolean` | `false` | Affirmative tick only — **not** implied consent. Written by `thread.js`'s consent gate |
+| `consent.at` | `string \| null` | `null` | ISO timestamp of the tick |
+| `consent.policyVersion` | `string \| null` | `null` | Which documents were agreed to (`POLICY_VERSION` in `thread.js`). Without this, any policy revision silently invalidates every existing record |
+| `consent.ageConfirmed` | `boolean \| null` | `null` | **Reserved and inert.** Age gate is built but switched off via `AGE_GATE_ENABLED` pending the ToS 13+/16+ contradiction (Stream A, A1.11) and Natalie's written advice |
+
+**Deprecated, do not write:** flat `consentGiven` / `consentAt`. Superseded by the nested object above. Nesting was chosen deliberately for the coming Supabase migration, where PT-10 flagged undeclared flat fields as a real loss risk.
 
 ### `onboarding` (nested object)
 

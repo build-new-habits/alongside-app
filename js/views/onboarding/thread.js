@@ -1,5 +1,22 @@
 /**
  * js/views/onboarding/thread.js
+ * 11 Aug 2026 v8
+ *
+ * v8 — WOW-0. Consent gate added before Step 1. Live onboarding had
+ *   captured NO legal consent record since this file superseded
+ *   welcome.js — welcome.js:85-86 was the only writer of consentGiven/
+ *   consentAt and its route left router.js VIEW_NAMES in v7. Found by the
+ *   PT-W1 store audit, not by anyone noticing.
+ *
+ *   Affirmative tick, not implied consent (Graeme, 11 Aug). Records
+ *   POLICY_VERSION so a later revision does not silently invalidate every
+ *   existing record. Skipped entirely once given, so resuming onboarding
+ *   never re-asks. Continue uses aria-disabled, never the HTML disabled
+ *   attribute — see the note at _renderConsentGate() for why.
+ *
+ *   AGE_GATE_ENABLED is present and false. Do not flip it until A1.11
+ *   (ToS 13+ vs business-doc 16+) is resolved and Natalie's advice lands.
+ *
  * 03 Jul 2026 v7
  *
  * v7 — Appendix M fix, applied here for the first time. Graeme reported
@@ -229,10 +246,135 @@ export function ThreadView(router) {
         splash.classList.remove('is-visible');
         setTimeout(() => {
           splash.remove();
-          _beginThread();
+          // 11 Aug 2026 (WOW-0): consent is a gate, not a step. It runs
+          // before Step 1 and is skipped entirely once already given, so
+          // returning mid-onboarding never re-asks.
+          if (_needsConsent()) _renderConsentGate();
+          else                 _beginThread();
         }, 400);
       }, STEPS[0].durationMs);
     });
+  }
+
+  // ── Consent gate (11 Aug 2026, WOW-0) ──────────────────────────────────────
+  //
+  // Restores the legal consent record absent from live onboarding since
+  // OB-THREAD retired welcome.js. Found by the PT-W1 store audit: nothing
+  // has written consentGiven/consentAt since router.js v7.
+  //
+  // Three deliberate differences from welcome.js's version:
+  //
+  //  1. AFFIRMATIVE TICK, not implied consent. welcome.js used "By tapping
+  //     Start you agree" under the button. Graeme's decision, 11 Aug: an
+  //     active registered choice, because implied consent leaves the
+  //     "but I didn't know" problem open.
+  //
+  //  2. aria-disabled, NOT the disabled attribute. Continue stays in the
+  //     tab order and stays announced; tapping it untickled explains what
+  //     is needed and moves focus to the checkbox. The HTML disabled
+  //     attribute removes an element from the tab order entirely, which is
+  //     exactly the PT-7 bug found in session-builder-ui.js — a keyboard
+  //     or screen-reader user gets a dead control and no explanation. Not
+  //     rebuilding that here, of all places.
+  //
+  //  3. A plain-language summary of what is being agreed to, on the page
+  //     itself, above the links. Graeme: people should not have to open a
+  //     policy document to know what they just consented to.
+  //
+  // POLICY_VERSION is recorded with the tick. Without it, any later
+  // revision silently invalidates every existing record and there is no
+  // way to tell who needs re-consent.
+  const POLICY_VERSION = '2026-08-11';
+
+  // AGE GATE — BUILT BUT INERT. Do not switch on until the ToS 13+ vs
+  // business-doc 16+ contradiction (Stream A, A1.11) is resolved AND
+  // Natalie's written advice has landed. Flipping this to true without
+  // that is worse than leaving it off: it produces an audit trail
+  // asserting an eligibility check that has no agreed rule behind it.
+  const AGE_GATE_ENABLED = false;
+
+  function _needsConsent() {
+    return store.get('consent.given') !== true;
+  }
+
+  function _renderConsentGate() {
+    _thread.innerHTML = `
+      <section class="ob-consent" role="group" aria-labelledby="ob-consent-heading">
+        <h1 class="ob-consent__heading" id="ob-consent-heading">Before we start</h1>
+
+        <div class="ob-consent__summary">
+          <h2 class="ob-consent__subheading">What you are agreeing to</h2>
+          <ul class="ob-consent__list">
+            <li>Your answers stay on your device. We do not sell them, and we do not share them with advertisers.</li>
+            <li>We use what you tell us to shape your sessions — that is the whole point of asking.</li>
+            <li>You can change or delete anything, any time, in Settings.</li>
+            <li>You can stop using Alongside whenever you like and take your data with you.</li>
+          </ul>
+          <p class="ob-consent__links">
+            The full detail is in our
+            <a href="https://buildnewhabits.co.uk/privacy/" class="ob-consent__link"
+               target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+            and
+            <a href="https://buildnewhabits.co.uk/terms/" class="ob-consent__link"
+               target="_blank" rel="noopener noreferrer">Terms of Service</a>
+            (both open in a new tab), or
+            <button type="button" class="btn-inline-link" id="ob-consent-inapp">read a summary here</button>.
+          </p>
+        </div>
+
+        <div class="ob-consent__tick">
+          <input type="checkbox" id="ob-consent-check" class="ob-consent__checkbox">
+          <label for="ob-consent-check" class="ob-consent__label">
+            I have read and agree to the Privacy Policy and Terms of Service.
+          </label>
+        </div>
+
+        <p class="ob-consent__error" id="ob-consent-error" role="status" hidden>
+          Please tick the box above to agree before continuing.
+        </p>
+
+        <button class="btn btn-primary btn-large btn-full"
+                id="ob-consent-continue"
+                aria-disabled="true"
+                aria-describedby="ob-consent-error">
+          Continue
+        </button>
+      </section>
+    `;
+
+    const check    = document.getElementById('ob-consent-check');
+    const continueBtn = document.getElementById('ob-consent-continue');
+    const error    = document.getElementById('ob-consent-error');
+
+    check?.addEventListener('change', () => {
+      const ok = check.checked;
+      continueBtn.setAttribute('aria-disabled', ok ? 'false' : 'true');
+      continueBtn.classList.toggle('is-inactive', !ok);
+      if (ok) error.hidden = true;
+    });
+    continueBtn.classList.add('is-inactive');
+
+    document.getElementById('ob-consent-inapp')?.addEventListener('click', () => {
+      router.navigate('privacy');
+    });
+
+    continueBtn?.addEventListener('click', () => {
+      if (!check?.checked) {
+        // Not a dead button: say what is needed and put focus where it is.
+        error.hidden = false;
+        check?.focus();
+        return;
+      }
+      store.set('consent.given',         true);
+      store.set('consent.at',            new Date().toISOString());
+      store.set('consent.policyVersion', POLICY_VERSION);
+      if (AGE_GATE_ENABLED) {
+        // Reserved. Nothing writes ageConfirmed while the gate is inert.
+      }
+      _beginThread();
+    });
+
+    document.getElementById('ob-consent-check')?.focus();
   }
 
   // ── Begin thread — Step 1 ──────────────────────────────────────────────────
