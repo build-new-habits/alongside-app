@@ -1,5 +1,13 @@
 /**
  * data/exercises/recovery.js
+ * 10 Aug 2026 v1
+ *
+ * v1 — First version header on this file. Added tailored YouTube search
+ *   terms to all 31 exercises (previously zero coverage, database-wide
+ *   461-exercise pass, Graeme's direct request: "we get the most up to
+ *   date versions and avoid any issue with discontinued or old videos"
+ *   — search terms, not direct links, matching the reasoning exactly).
+ *
  * Recovery exercises — yoga poses, self-massage, restorative movement
  * Breathwork — all breathwork practices (Component F, Batch 1)
  * These are the primary content served in Recovery Mode (burnout / energy ≤ 4)
@@ -14,6 +22,7 @@ export const RECOVERY = [
   {
     id: 'childs-pose',
     name: 'Child\'s Pose',
+    youtube: 'childs pose technique',
     category: 'recovery',
     movementPattern: 'stretch',
     equipment: [],
@@ -40,6 +49,7 @@ export const RECOVERY = [
   {
     id: 'supine-twist',
     name: 'Supine Spinal Twist',
+    youtube: 'supine spinal twist technique',
     category: 'recovery',
     movementPattern: 'spinal-rotation',
     equipment: [],
@@ -66,6 +76,7 @@ export const RECOVERY = [
   {
     id: 'foam-roll-upper-back',
     name: 'Foam Roll — Upper Back',
+    youtube: 'foam roll - upper back technique',
     category: 'recovery',
     movementPattern: 'self-massage',
     equipment: ['foam-roller'],
@@ -91,6 +102,7 @@ export const RECOVERY = [
   {
     id: 'foam-roll-quads',
     name: 'Foam Roll — Quads',
+    youtube: 'foam roll - quads technique',
     category: 'recovery',
     movementPattern: 'self-massage',
     equipment: ['foam-roller'],
@@ -116,6 +128,7 @@ export const RECOVERY = [
   {
     id: 'diaphragmatic-breathing',
     name: 'Diaphragmatic Breathing',
+    youtube: 'diaphragmatic breathing technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath',
@@ -143,6 +156,7 @@ export const RECOVERY = [
   {
     id: 'leg-up-wall',
     name: 'Legs Up the Wall',
+    youtube: 'legs up the wall technique',
     category: 'recovery',
     movementPattern: 'stretch',
     equipment: [],
@@ -174,6 +188,7 @@ export const RECOVERY = [
   {
     id: 'box-breathing',
     name: 'Box Breathing',
+    youtube: 'box breathing technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -202,6 +217,7 @@ export const RECOVERY = [
   {
     id: 'four-seven-eight-breathing',
     name: '4-7-8 Breathing',
+    youtube: '4-7-8 breathing technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -230,6 +246,7 @@ export const RECOVERY = [
   {
     id: 'physiological-sigh',
     name: 'Physiological Sigh',
+    youtube: 'physiological sigh technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -257,6 +274,7 @@ export const RECOVERY = [
   {
     id: 'belly-breathing',
     name: 'Belly Breathing',
+    youtube: 'belly breathing technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -284,6 +302,7 @@ export const RECOVERY = [
   {
     id: 'extended-exhale-breathing',
     name: 'Extended Exhale Breathing',
+    youtube: 'extended exhale breathing technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -311,6 +330,7 @@ export const RECOVERY = [
   {
     id: 'alternate-nostril-breathing',
     name: 'Alternate Nostril Breathing',
+    youtube: 'alternate nostril breathing technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -340,6 +360,7 @@ export const RECOVERY = [
   {
     id: 'pursed-lip-breathing',
     name: 'Pursed Lip Breathing',
+    youtube: 'pursed lip breathing technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -367,6 +388,7 @@ export const RECOVERY = [
   {
     id: 'coherent-breathing',
     name: 'Coherent Breathing',
+    youtube: 'coherent breathing technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -394,6 +416,7 @@ export const RECOVERY = [
   {
     id: 'humming-bee-breath',
     name: 'Humming Bee Breath',
+    youtube: 'humming bee breath technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -422,6 +445,7 @@ export const RECOVERY = [
   {
     id: 'energising-breath',
     name: 'Energising Breath',
+    youtube: 'energising breath technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -451,6 +475,7 @@ export const RECOVERY = [
   {
     id: 'three-part-breath',
     name: 'Three-Part Breath',
+    youtube: 'three-part breath technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -478,6 +503,7 @@ export const RECOVERY = [
   {
     id: 'breath-counting',
     name: 'Breath Counting',
+    youtube: 'breath counting technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -512,6 +538,7 @@ export const RECOVERY = [
   {
     id: 'cold-shower-protocol',
     name: 'Cold Shower — Recovery Protocol',
+    youtube: 'cold shower - recovery protocol technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -539,6 +566,7 @@ export const RECOVERY = [
   {
     id: 'contrast-therapy',
     name: 'Contrast Therapy',
+    youtube: 'contrast therapy technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -566,6 +594,7 @@ export const RECOVERY = [
   {
     id: 'napping-protocol',
     name: 'Recovery Nap Protocol',
+    youtube: 'recovery nap protocol technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -592,6 +621,7 @@ export const RECOVERY = [
   {
     id: 'hydration-protocol',
     name: 'Hydration Protocol',
+    youtube: 'hydration protocol technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -619,6 +649,7 @@ export const RECOVERY = [
   {
     id: 'nutrition-timing',
     name: 'Post-Exercise Nutrition Window',
+    youtube: 'post-exercise nutrition window technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -646,6 +677,7 @@ export const RECOVERY = [
   {
     id: 'trigger-point-release-ball',
     name: 'Trigger Point Release — Ball',
+    youtube: 'trigger point release - ball technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'body-scan',
@@ -673,6 +705,7 @@ export const RECOVERY = [
   {
     id: 'elevation-recovery',
     name: 'Leg Elevation Recovery',
+    youtube: 'leg elevation recovery technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -699,6 +732,7 @@ export const RECOVERY = [
   {
     id: 'mindful-walk',
     name: 'Mindful Walk',
+    youtube: 'mindful walk technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -730,6 +764,7 @@ export const RECOVERY = [
   {
     id: 'active-recovery-walk',
     name: 'Active Recovery Walk',
+    youtube: 'active recovery walk technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -756,6 +791,7 @@ export const RECOVERY = [
   {
     id: 'sleep-position-optimisation',
     name: 'Sleep Position Optimisation',
+    youtube: 'sleep position optimisation technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -782,6 +818,7 @@ export const RECOVERY = [
   {
     id: 'meditation-sleep-onset',
     name: 'Sleep Onset Meditation',
+    youtube: 'sleep onset meditation technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'body-scan',
@@ -810,6 +847,7 @@ export const RECOVERY = [
   {
     id: 'breathing-478',
     name: '4-7-8 Breathing',
+    youtube: '4-7-8 breathing technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -838,6 +876,7 @@ export const RECOVERY = [
   {
     id: 'sauna-protocol',
     name: 'Sauna Recovery Protocol',
+    youtube: 'sauna recovery protocol technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'grounding',

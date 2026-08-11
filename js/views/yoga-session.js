@@ -1,9 +1,24 @@
 /**
  * yoga-session.js - Guided Yoga and Pilates Session
  *
- * 30 Jul 2026 v6
+ * 10 Aug 2026 v7
  *
- * v6 — On-device testing bug fix (Core Session investigation, same day,
+ * v7 — Exercise-detail consistency audit (Graeme's direct request).
+ *   This file has its own private 30-object pose pool (a third,
+ *   separate exercise database — flagged as a real architectural
+ *   concern, not fixed tonight) with genuinely good description/cues
+ *   content already, but no youtube field existed anywhere in it. Added
+ *   tailored search terms to all 30 entries and wired up display in
+ *   both the pre-session overview and the active-session detail view.
+ *   Also fixed a second silent field-name bug, same class found
+ *   elsewhere this session: pose.cue (singular, never existed) should
+ *   have been pose.cues (plural array). NOT added tonight: a `why`
+ *   field — this pool has no rationale content at all, and writing 30
+ *   genuinely good ones is real content authoring, not a mechanical
+ *   fix — deliberately left as a clean, scoped follow-up rather than
+ *   rushed.
+ *
+ * 30 Jul 2026 v6 — On-device testing bug fix (Core Session investigation, same day,
  *   found while Graeme was walking through Step 3 of the on-device test
  *   guide). finaliseSession() set `phase = "done"` but never called
  *   rerender() — so completing a real yoga session via the main "Finish
@@ -178,132 +193,132 @@ const DURATIONS = [
 const EXERCISE_POOLS = {
 
   flexibility: [
-    { id: "yoga-downward-dog",      name: "Downward Facing Dog",    holdSeconds: 45, rest: 15,
+    { id: "yoga-downward-dog",      name: "Downward Facing Dog", youtube: "downward facing dog yoga pose tutorial",    holdSeconds: 45, rest: 15,
       description: "Press into both hands, lift hips high. Pedal the feet to warm the calves.",
       cues: ["Hands shoulder-width, feet hip-width", "Press away from the floor through your palms", "Let the head drop — no tension in the neck", "Breathe slowly and hold"] },
-    { id: "yoga-pigeon-pose",       name: "Pigeon Pose",            holdSeconds: 60, rest: 10,
+    { id: "yoga-pigeon-pose",       name: "Pigeon Pose", youtube: "pigeon pose yoga pose tutorial",            holdSeconds: 60, rest: 10,
       description: "From downward dog, bring one shin forward. Square the hips and lower. Repeat both sides.",
       cues: ["Let the hip drop toward the floor — do not force it", "Hips should be as square as possible", "If the hip is very high, place a folded blanket beneath it", "Breathe into the front of the hip"],
       contraindications: ["hip-acute", "knee-acute"] },
-    { id: "yoga-seated-forward-fold", name: "Seated Forward Fold", holdSeconds: 45, rest: 15,
+    { id: "yoga-seated-forward-fold", name: "Seated Forward Fold", youtube: "seated forward fold yoga pose tutorial", holdSeconds: 45, rest: 15,
       description: "Sit with legs extended. Fold forward from the hips — not the waist. Reach toward your feet.",
       cues: ["Fold from the hip crease, not the lower back", "Soft knees if hamstrings are tight", "Let gravity do the work — no forcing", "Each exhale, soften a little further"],
       contraindications: ["lower-back-acute", "hamstring-acute"] },
-    { id: "yoga-crescent-lunge",    name: "Crescent Lunge",         holdSeconds: 40, rest: 15,
+    { id: "yoga-crescent-lunge",    name: "Crescent Lunge", youtube: "crescent lunge yoga pose tutorial",         holdSeconds: 40, rest: 15,
       description: "Low lunge with back knee down. Sweep arms overhead. Square the hips and sink forward.",
       cues: ["Front knee stays over the ankle", "Back heel pushes away from you", "Lift the chest, do not let it collapse", "Feel the stretch through the back hip flexor"],
       contraindications: ["knee-acute"] },
-    { id: "yoga-cobra",             name: "Cobra Pose",             holdSeconds: 30, rest: 15,
+    { id: "yoga-cobra",             name: "Cobra Pose", youtube: "cobra pose yoga tutorial",             holdSeconds: 30, rest: 15,
       description: "Lie face down. Press through the hands and lift the chest. Elbows stay slightly soft.",
       cues: ["Press the pubic bone into the mat", "Shoulders away from the ears", "Elbows do not need to be straight", "Breathe into the chest"],
       contraindications: ["lower-back-acute"] },
-    { id: "yoga-bridge-pose",       name: "Bridge Pose",            holdSeconds: 40, rest: 15,
+    { id: "yoga-bridge-pose",       name: "Bridge Pose", youtube: "bridge pose yoga tutorial",            holdSeconds: 40, rest: 15,
       description: "Lie on back, knees bent. Press into both feet and lift the hips. Squeeze the glutes at the top.",
       cues: ["Push through the heels, not the toes", "Knees stay parallel — do not let them fall outward", "Interlace fingers beneath you and press the arms down", "Hold and breathe"],
       contraindications: ["lower-back-acute"] },
-    { id: "yoga-corpse-pose",       name: "Savasana",               holdSeconds: 90, rest: 0,
+    { id: "yoga-corpse-pose",       name: "Savasana", youtube: "savasana corpse pose tutorial",               holdSeconds: 90, rest: 0,
       description: "Lie completely still. Arms by your sides, palms up. Close your eyes.",
       cues: ["Release every muscle deliberately", "Let the floor support you completely", "If thoughts come, let them pass without following them", "Stay here for the full hold"] },
   ],
 
   strength: [
-    { id: "yoga-chair-pose",        name: "Chair Pose",             holdSeconds: 45, rest: 20,
+    { id: "yoga-chair-pose",        name: "Chair Pose", youtube: "chair pose yoga tutorial",             holdSeconds: 45, rest: 20,
       description: "Stand, feet together. Sit back as if into a chair. Sweep arms overhead.",
       cues: ["Weight in the heels — toes should be liftable", "Knees do not travel beyond the toes", "Chest stays lifted", "Breathe and hold — it will burn"],
       contraindications: ["knee-acute"] },
-    { id: "yoga-warrior-1",         name: "Warrior I",              holdSeconds: 40, rest: 15,
+    { id: "yoga-warrior-1",         name: "Warrior I", youtube: "warrior 1 yoga pose tutorial",              holdSeconds: 40, rest: 15,
       description: "Lunge with back foot turned out at 45 degrees. Square the hips to the front. Arms overhead.",
       cues: ["Back foot is the anchor — press it firmly down", "Front knee stays over the ankle", "Hips square to the front", "Lift the chest and breathe"],
       contraindications: ["knee-acute"] },
-    { id: "yoga-warrior-2",         name: "Warrior II",             holdSeconds: 40, rest: 15,
+    { id: "yoga-warrior-2",         name: "Warrior II", youtube: "warrior 2 yoga pose tutorial",             holdSeconds: 40, rest: 15,
       description: "Wide stance, front foot forward, back foot parallel. Bend the front knee. Arms extended.",
       cues: ["Front knee tracks over the second toe", "Back leg is strong and straight", "Arms reach in opposite directions — equal effort", "Gaze over the front hand"],
       contraindications: ["knee-acute"] },
-    { id: "yoga-warrior-3",         name: "Warrior III",            holdSeconds: 30, rest: 20,
+    { id: "yoga-warrior-3",         name: "Warrior III", youtube: "warrior 3 yoga pose tutorial",            holdSeconds: 30, rest: 20,
       description: "Balance on one leg. Tip the body forward until parallel to the floor. Arms extended.",
       cues: ["Engage the standing leg completely — no soft knee", "Hips stay square — do not let one side lift", "Arms can reach forward or back along the body", "Gaze at a fixed point on the floor"],
       contraindications: ["knee-acute", "ankle-foot-acute"] },
-    { id: "yoga-boat-pose",         name: "Boat Pose",              holdSeconds: 30, rest: 20,
+    { id: "yoga-boat-pose",         name: "Boat Pose", youtube: "boat pose yoga tutorial",              holdSeconds: 30, rest: 20,
       description: "Sit on the floor. Lift the feet and extend the legs. Balance on the sit bones. Arms forward.",
       cues: ["Spine stays long — do not collapse", "Bend the knees if needed to maintain a straight back", "Engage the core throughout", "Breathe — do not hold your breath"],
       contraindications: ["lower-back-acute"] },
   ],
 
   balance: [
-    { id: "yoga-tree-pose",         name: "Tree Pose",              holdSeconds: 45, rest: 15,
+    { id: "yoga-tree-pose",         name: "Tree Pose", youtube: "tree pose yoga tutorial",              holdSeconds: 45, rest: 15,
       description: "Stand on one leg. Place the other foot on the inner thigh or calf. Hands at heart or overhead.",
       cues: ["Standing foot presses down firmly and evenly", "Do not rest the foot on the knee joint", "Fix the gaze on a point that is not moving", "Each wobble is the balance system learning"],
       contraindications: ["ankle-foot-acute"] },
-    { id: "yoga-half-moon",         name: "Half Moon Pose",         holdSeconds: 30, rest: 20,
+    { id: "yoga-half-moon",         name: "Half Moon Pose", youtube: "half moon pose yoga tutorial",         holdSeconds: 30, rest: 20,
       description: "From triangle pose, shift weight to the front foot and lift the back leg. Arm reaches to ceiling.",
       cues: ["Use a block under the lower hand if needed", "Lifted leg is parallel to the floor", "Stack the hips", "Fix the gaze on the ceiling hand"],
       contraindications: ["ankle-foot-acute", "lower-back-acute"] },
-    { id: "yoga-warrior-3",         name: "Warrior III",            holdSeconds: 30, rest: 20,
+    { id: "yoga-warrior-3",         name: "Warrior III", youtube: "warrior 3 yoga pose tutorial",            holdSeconds: 30, rest: 20,
       description: "Balance on one leg. Tip forward to parallel. Arms extended or back along the body.",
       cues: ["Standing knee stays soft — not locked, not collapsed", "Drive the back heel away from you", "Keep the hips as square as possible", "Breathe steadily"],
       contraindications: ["knee-acute", "ankle-foot-acute"] },
-    { id: "yoga-chair-pose",        name: "Chair Pose",             holdSeconds: 40, rest: 15,
+    { id: "yoga-chair-pose",        name: "Chair Pose", youtube: "chair pose yoga tutorial",             holdSeconds: 40, rest: 15,
       description: "Sit back into an imaginary chair. Arms overhead. Hold with intention.",
       cues: ["Heels down, toes liftable", "Knees together", "Core engaged", "Hold longer than feels comfortable"],
       contraindications: ["knee-acute"] },
   ],
 
   recovery: [
-    { id: "yoga-corpse-pose",       name: "Savasana",               holdSeconds: 120, rest: 0,
+    { id: "yoga-corpse-pose",       name: "Savasana", youtube: "savasana corpse pose tutorial",               holdSeconds: 120, rest: 0,
       description: "Lie completely still. Systematic relaxation from feet to face.",
       cues: ["Release the feet, then the calves, then the thighs", "Let the belly soften completely", "Face muscles relax last", "No effort — only stillness"] },
-    { id: "yoga-bridge-pose",       name: "Gentle Bridge",          holdSeconds: 45, rest: 15,
+    { id: "yoga-bridge-pose",       name: "Gentle Bridge", youtube: "bridge pose yoga tutorial",          holdSeconds: 45, rest: 15,
       description: "Soft bridge — lift the hips gently, no strong squeeze. Just creates space in the lower back.",
       cues: ["This is passive, not powerful", "Let the hips rise naturally from the breath", "No gripping or squeezing", "Lower slowly on the exhale"],
       contraindications: ["lower-back-acute"] },
-    { id: "yoga-pigeon-pose",       name: "Supported Pigeon",       holdSeconds: 90, rest: 10,
+    { id: "yoga-pigeon-pose",       name: "Supported Pigeon", youtube: "pigeon pose yoga pose tutorial",       holdSeconds: 90, rest: 10,
       description: "Pigeon with the torso resting forward. Full surrender into the pose.",
       cues: ["Use a block or folded blanket under the hip if needed", "Forearms on the floor, forehead resting", "No efforting — this is passive opening", "Breathe slowly and deeply"],
       contraindications: ["hip-acute", "knee-acute"] },
-    { id: "yoga-cobra",             name: "Gentle Cobra",           holdSeconds: 30, rest: 15,
+    { id: "yoga-cobra",             name: "Gentle Cobra", youtube: "cobra pose yoga tutorial",           holdSeconds: 30, rest: 15,
       description: "Baby cobra — elbows remain bent, lift is small. Creates gentle opening in the chest.",
       cues: ["The lift is small — just off the mat", "No pressure in the lower back", "Breathe into the chest", "Lower on the exhale"],
       contraindications: ["lower-back-acute"] },
   ],
 
   mindful: [
-    { id: "yoga-downward-dog",      name: "Downward Facing Dog",    holdSeconds: 45, rest: 10,
+    { id: "yoga-downward-dog",      name: "Downward Facing Dog", youtube: "downward facing dog yoga pose tutorial",    holdSeconds: 45, rest: 10,
       description: "Ground through the hands. Notice the length of the spine. Breathe into the back body.",
       cues: ["What do you notice in the back of the legs?", "Is there more tension on one side?", "Let the breath move the body gently", "No fixing — just noticing"] },
-    { id: "yoga-warrior-1",         name: "Warrior I",              holdSeconds: 40, rest: 10,
+    { id: "yoga-warrior-1",         name: "Warrior I", youtube: "warrior 1 yoga pose tutorial",              holdSeconds: 40, rest: 10,
       description: "Strong and grounded. Notice where effort lives in the body right now.",
       cues: ["Where do you feel this working most?", "Is the effort effortful or can it be steady?", "Breathe and observe", "No judgment on what you find"] },
-    { id: "yoga-seated-forward-fold", name: "Seated Forward Fold", holdSeconds: 60, rest: 15,
+    { id: "yoga-seated-forward-fold", name: "Seated Forward Fold", youtube: "seated forward fold yoga pose tutorial", holdSeconds: 60, rest: 15,
       description: "Fold forward and be still. Notice the difference between where you are and where you think you should be.",
       cues: ["This is not about reaching the feet", "Where does the restriction actually live?", "Breathe into the tightest point", "Can you soften without force?"],
       contraindications: ["lower-back-acute", "hamstring-acute"] },
-    { id: "yoga-corpse-pose",       name: "Savasana",               holdSeconds: 90, rest: 0,
+    { id: "yoga-corpse-pose",       name: "Savasana", youtube: "savasana corpse pose tutorial",               holdSeconds: 90, rest: 0,
       description: "Still. Notice what the body does when effort stops completely.",
       cues: ["Where does the body want to hold on?", "Let the floor receive the weight", "Notice the breath without changing it", "Rest here completely"] },
   ],
 
   pilates: [
-    { id: "pilates-hundred",        name: "Pilates Hundred",        holdSeconds: 60, rest: 20,
+    { id: "pilates-hundred",        name: "Pilates Hundred", youtube: "pilates hundred exercise technique",        holdSeconds: 60, rest: 20,
       description: "Lie on back. Lift legs to tabletop. Lift head and shoulders. Pump the arms vigorously.",
       cues: ["Chin tucked — no neck strain", "Lower back pressed into the mat throughout", "Arms pump from the shoulder, small and controlled", "Count the pumps: 5 in, 5 out"],
       contraindications: ["lower-back-acute", "neck-cervical-acute"] },
-    { id: "pilates-roll-up",        name: "Roll Up",                holdSeconds: 0,  rest: 20,
+    { id: "pilates-roll-up",        name: "Roll Up", youtube: "pilates roll up exercise technique",                holdSeconds: 0,  rest: 20,
       description: "Lie flat. Inhale to prepare. Exhale, peel the spine off the mat vertebra by vertebra.",
       cues: ["Peel slowly — do not jerk up", "Arms reach forward throughout", "Draw the navel to the spine on the exhale", "Roll back down with the same control"],
       contraindications: ["lower-back-acute"] },
-    { id: "pilates-single-leg-stretch", name: "Single Leg Stretch", holdSeconds: 0, rest: 15,
+    { id: "pilates-single-leg-stretch", name: "Single Leg Stretch", youtube: "pilates single leg stretch technique", holdSeconds: 0, rest: 15,
       description: "Lying on back, alternate pulling one knee to the chest while extending the other leg.",
       cues: ["Head and shoulders stay lifted", "Lower back stays in contact with the mat", "Breathe rhythmically with the movement", "Control the extended leg — do not let it drop"],
       contraindications: ["lower-back-acute"] },
-    { id: "pilates-side-kick",      name: "Side Kick",              holdSeconds: 0,  rest: 20,
+    { id: "pilates-side-kick",      name: "Side Kick", youtube: "pilates side kick exercise technique",              holdSeconds: 0,  rest: 20,
       description: "Side-lying, kick the top leg forward and back in a controlled range.",
       cues: ["Pelvis stays completely still throughout", "The kick is from the hip, not the lower back", "Top hand on the floor in front for support", "Small is controlled, big is not always better"],
       contraindications: ["hip-acute"] },
-    { id: "pilates-spine-stretch",  name: "Spine Stretch Forward",  holdSeconds: 40, rest: 15,
+    { id: "pilates-spine-stretch",  name: "Spine Stretch Forward", youtube: "pilates spine stretch forward technique",  holdSeconds: 40, rest: 15,
       description: "Seated with legs extended. Round the spine forward as if over a ball.",
       cues: ["Sit on the sit bones — not behind them", "Round from the crown of the head", "Reach the hands forward along the floor", "Exhale as you round, inhale to return"],
       contraindications: ["lower-back-acute", "hamstring-acute"] },
-    { id: "yoga-bridge-pose",       name: "Pilates Bridge",         holdSeconds: 45, rest: 15,
+    { id: "yoga-bridge-pose",       name: "Pilates Bridge", youtube: "bridge pose yoga tutorial",         holdSeconds: 45, rest: 15,
       description: "Bridge with strong glute engagement. Articulate each vertebra on the way up and down.",
       cues: ["Press through both heels equally", "Peel the spine off the mat vertebra by vertebra", "Squeeze the glutes hard at the top", "Lower slowly — one vertebra at a time"],
       contraindications: ["lower-back-acute"] },
@@ -422,7 +437,15 @@ function renderSessionOverview() {
             </button>
             <div class="gym-exercise-detail" id="yoga-pose-detail-${i}" hidden>
               ${pose.description ? `<p class="exercise-cue">${pose.description}</p>` : ""}
-              ${pose.cue ? `<p class="exercise-cue">${pose.cue}</p>` : ""}
+              ${pose.cues?.length ? `<p class="exercise-cue">${pose.cues[0]}</p>` : ""}
+              <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(pose.youtube || (pose.name + " yoga pose tutorial"))}"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="youtube-link"
+                 aria-label="Watch how to do ${pose.name} on YouTube (opens in new tab)">
+                <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
+                Watch how to do this
+              </a>
             </div>
           </div>
         `).join("")}
@@ -528,6 +551,15 @@ function renderPose() {
             ${pose.cues.map(cue => `<li>${cue}</li>`).join("")}
           </ul>
         ` : ""}
+
+        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(pose.youtube || (pose.name + " yoga pose tutorial"))}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="youtube-link"
+           aria-label="Watch how to do ${pose.name} on YouTube (opens in new tab)">
+          <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
+          Watch how to do this
+        </a>
       </div>
 
       <div class="workout-actions">

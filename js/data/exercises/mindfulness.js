@@ -1,5 +1,13 @@
 /**
  * data/exercises/mindfulness.js
+ * 10 Aug 2026 v1
+ *
+ * v1 — First version header on this file. Added tailored YouTube search
+ *   terms to all 20 exercises (previously zero coverage, database-wide
+ *   461-exercise pass, Graeme's direct request: "we get the most up to
+ *   date versions and avoid any issue with discontinued or old videos"
+ *   — search terms, not direct links, matching the reasoning exactly).
+ *
  * Mindfulness practices — meditation, body scan, grounding, visualisation
  * contentType: 'practice' throughout — duration-based, no reps
  * energyRequired: 1–2 for all items
@@ -17,6 +25,7 @@ export const MINDFULNESS = [
   {
     id: 'breath-awareness-meditation',
     name: 'Breath Awareness Meditation',
+    youtube: 'breath awareness meditation guided meditation',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -44,6 +53,7 @@ export const MINDFULNESS = [
   {
     id: 'body-scan-short',
     name: 'Body Scan — Short',
+    youtube: 'body scan - short guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'body-scan',
@@ -72,6 +82,7 @@ export const MINDFULNESS = [
   {
     id: 'loving-kindness-short',
     name: 'Loving-Kindness — Short',
+    youtube: 'loving-kindness - short guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'visualisation',
@@ -99,6 +110,7 @@ export const MINDFULNESS = [
   {
     id: 'five-four-three-two-one-grounding',
     name: '5-4-3-2-1 Grounding',
+    youtube: '5-4-3-2-1 grounding guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -126,6 +138,7 @@ export const MINDFULNESS = [
   {
     id: 'progressive-muscle-relaxation',
     name: 'Progressive Muscle Relaxation',
+    youtube: 'progressive muscle relaxation guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'body-scan',
@@ -153,6 +166,7 @@ export const MINDFULNESS = [
   {
     id: 'open-awareness-meditation',
     name: 'Open Awareness Meditation',
+    youtube: 'open awareness meditation guided meditation',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -179,6 +193,7 @@ export const MINDFULNESS = [
   {
     id: 'safe-place-visualisation',
     name: 'Safe Place Visualisation',
+    youtube: 'safe place visualisation guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'visualisation',
@@ -206,6 +221,7 @@ export const MINDFULNESS = [
   {
     id: 'noting-practice',
     name: 'Noting Practice',
+    youtube: 'noting practice guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -233,6 +249,7 @@ export const MINDFULNESS = [
   {
     id: 'feet-on-floor-grounding',
     name: 'Feet on Floor Grounding',
+    youtube: 'feet on floor grounding guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -260,6 +277,7 @@ export const MINDFULNESS = [
   {
     id: 'mindful-observation',
     name: 'Mindful Object Observation',
+    youtube: 'mindful object observation guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -294,6 +312,7 @@ export const MINDFULNESS = [
   {
     id: 'sleep-body-scan',
     name: 'Sleep Body Scan',
+    youtube: 'sleep body scan guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'body-scan',
@@ -323,6 +342,7 @@ export const MINDFULNESS = [
   {
     id: 'military-sleep-method',
     name: 'Progressive Relaxation for Sleep',
+    youtube: 'progressive relaxation for sleep guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'body-scan',
@@ -351,6 +371,7 @@ export const MINDFULNESS = [
   {
     id: 'worry-time-practice',
     name: 'Worry Time Practice',
+    youtube: 'worry time practice guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -378,6 +399,7 @@ export const MINDFULNESS = [
   {
     id: 'mindful-walking',
     name: 'Mindful Walking',
+    youtube: 'mindful walking guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -405,6 +427,7 @@ export const MINDFULNESS = [
   {
     id: 'compassionate-self-talk',
     name: 'Compassionate Self-Talk',
+    youtube: 'compassionate self-talk guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'visualisation',
@@ -432,6 +455,7 @@ export const MINDFULNESS = [
   {
     id: 'nature-visualisation',
     name: 'Nature Visualisation',
+    youtube: 'nature visualisation guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'visualisation',
@@ -460,6 +484,7 @@ export const MINDFULNESS = [
   {
     id: 'morning-intention',
     name: 'Morning Intention Setting',
+    youtube: 'morning intention setting guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -487,6 +512,7 @@ export const MINDFULNESS = [
   {
     id: 'gratitude-reflection',
     name: 'Gratitude Reflection',
+    youtube: 'gratitude reflection guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'grounding',
@@ -513,6 +539,7 @@ export const MINDFULNESS = [
   {
     id: 'box-breathing-extended',
     name: 'Box Breathing — Extended Practice',
+    youtube: 'box breathing - extended practice guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -540,6 +567,7 @@ export const MINDFULNESS = [
   {
     id: 'digital-detox-transition',
     name: 'Screen-to-Calm Transition',
+    youtube: 'screen-to-calm transition guided practice',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'grounding',

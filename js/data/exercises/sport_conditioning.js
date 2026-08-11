@@ -1,5 +1,13 @@
 /**
  * data/exercises/sport_conditioning.js
+ * 10 Aug 2026 v1
+ *
+ * v1 — First version header on this file. Added tailored YouTube search
+ *   terms to all 50 exercises (previously zero coverage, database-wide
+ *   461-exercise pass, Graeme's direct request: "we get the most up to
+ *   date versions and avoid any issue with discontinued or old videos"
+ *   — search terms, not direct links, matching the reasoning exactly).
+ *
  * Sport Conditioning — Component G
  * Agility, SAQ (speed/agility/quickness), sport-specific drills
  * contentType: 'exercise' for drills, 'practice' for full sessions
@@ -17,6 +25,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-lateral-shuffle',
     name: 'Lateral Shuffle',
+    youtube: 'lateral shuffle drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -45,6 +54,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-t-drill',
     name: 'T-Drill',
+    youtube: 't-drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -75,6 +85,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-5-10-5',
     name: '5-10-5 Shuttle',
+    youtube: '5-10-5 shuttle drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -104,6 +115,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-figure-8-run',
     name: 'Figure-8 Run',
+    youtube: 'figure-8 run drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -131,6 +143,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-defensive-slide',
     name: 'Defensive Slide',
+    youtube: 'defensive slide drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -159,6 +172,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-ladder-in-out',
     name: 'Ladder In-Out',
+    youtube: 'ladder in-out drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -187,6 +201,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-ladder-ickey-shuffle',
     name: 'Ladder Ickey Shuffle',
+    youtube: 'ladder ickey shuffle drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -215,6 +230,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-pro-agility',
     name: 'Pro Agility Drill',
+    youtube: 'pro agility drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -248,6 +264,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'saq-acceleration-run',
     name: 'Acceleration Run — 10m',
+    youtube: 'acceleration run - 10m drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -277,6 +294,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'saq-wall-drive',
     name: 'Wall Drive — Sprint Mechanics',
+    youtube: 'wall drive - sprint mechanics drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -304,6 +322,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'saq-falling-start',
     name: 'Falling Start',
+    youtube: 'falling start drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -332,6 +351,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'saq-resisted-sprint',
     name: 'Resisted Sprint — Partner or Sled',
+    youtube: 'resisted sprint - partner or sled drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -360,6 +380,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'saq-cone-weave',
     name: 'Cone Weave',
+    youtube: 'cone weave drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -388,6 +409,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'saq-box-drill',
     name: 'Box Drill',
+    youtube: 'box drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -415,6 +437,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'saq-reaction-ball',
     name: 'Reaction Ball Drill',
+    youtube: 'reaction ball drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -442,6 +465,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'saq-mirror-drill',
     name: 'Mirror Drill',
+    youtube: 'mirror drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -474,6 +498,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-warmup-general',
     name: 'General Pre-Sport Warm-Up',
+    youtube: 'general pre-sport warm-up drill technique',
     category: 'mobility',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -506,6 +531,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-warmup-lower-body',
     name: 'Lower Body Activation Warm-Up',
+    youtube: 'lower body activation warm-up drill technique',
     category: 'mobility',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -536,6 +562,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-warmup-upper-body',
     name: 'Upper Body Activation Warm-Up',
+    youtube: 'upper body activation warm-up drill technique',
     category: 'mobility',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -566,6 +593,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-cooldown-general',
     name: 'General Post-Sport Cool-Down',
+    youtube: 'general post-sport cool-down drill technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'stretch',
@@ -597,6 +625,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-cooldown-running',
     name: 'Post-Run Cool-Down Routine',
+    youtube: 'post-run cool-down routine drill technique',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'stretch',
@@ -627,6 +656,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-session-football-conditioning',
     name: 'Football Conditioning Session',
+    youtube: 'football conditioning session drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -661,6 +691,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-sprint-build-up',
     name: 'Sprint Build-Up — Sport Prep',
+    youtube: 'sprint build-up - sport prep drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -689,6 +720,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-cutting-movement',
     name: 'Cutting Drill',
+    youtube: 'cutting drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -717,6 +749,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-zig-zag-run',
     name: 'Zig-Zag Run',
+    youtube: 'zig-zag run drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -744,6 +777,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-backpedal-turn',
     name: 'Backpedal and Turn Drill',
+    youtube: 'backpedal and turn drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -771,6 +805,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-dot-drill',
     name: 'Dot Drill',
+    youtube: 'dot drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -798,6 +833,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-partner-chase',
     name: 'Partner Chase Drill',
+    youtube: 'partner chase drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -825,6 +861,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-change-of-pace',
     name: 'Change of Pace Run',
+    youtube: 'change of pace run drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -853,6 +890,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-defensive-footwork',
     name: 'Defensive Footwork Circuit',
+    youtube: 'defensive footwork circuit drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -888,6 +926,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'circuit-amrap-bodyweight',
     name: 'AMRAP Bodyweight Circuit',
+    youtube: 'amrap bodyweight circuit drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -918,6 +957,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'circuit-emom-strength',
     name: 'EMOM Strength Circuit',
+    youtube: 'emom strength circuit drill technique',
     category: 'strength',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -947,6 +987,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-conditioning-tabata',
     name: 'Tabata — Sport Conditioning',
+    youtube: 'tabata - sport conditioning drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -976,6 +1017,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'power-endurance-circuit',
     name: 'Power Endurance Circuit',
+    youtube: 'power endurance circuit drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1005,6 +1047,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'repeated-sprint-ability',
     name: 'Repeated Sprint Ability (RSA)',
+    youtube: 'repeated sprint ability rsa drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1033,6 +1076,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'conditioning-beep-test',
     name: 'Beep Test Simulation',
+    youtube: 'beep test simulation drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1061,6 +1105,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'yoyo-intermittent',
     name: 'Yo-Yo Intermittent Recovery',
+    youtube: 'yo-yo intermittent recovery drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1089,6 +1134,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-speed-ladder-advanced',
     name: 'Speed Ladder — Advanced Patterns',
+    youtube: 'speed ladder - advanced patterns drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1117,6 +1163,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'conditioning-small-sided-game',
     name: 'Small-Sided Game Conditioning',
+    youtube: 'small-sided game conditioning drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1144,6 +1191,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'conditioning-max-aerobic-speed',
     name: 'Max Aerobic Speed Intervals',
+    youtube: 'max aerobic speed intervals drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1172,6 +1220,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-warmup-dynamic-full',
     name: 'Dynamic Warm-Up — Full Session',
+    youtube: 'dynamic warm-up - full session drill technique',
     category: 'mobility',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1205,6 +1254,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-carioca',
     name: 'Carioca',
+    youtube: 'carioca drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -1234,6 +1284,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-backpedal',
     name: 'Backpedal',
+    youtube: 'backpedal drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -1262,6 +1313,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'plyometric-med-ball-circuit',
     name: 'Medicine Ball Power Circuit',
+    youtube: 'medicine ball power circuit drill technique',
     category: 'strength',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1291,6 +1343,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'conditioning-10-20-30',
     name: '10-20-30 Running Protocol',
+    youtube: '10-20-30 running protocol drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1321,6 +1374,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'strength-endurance-circuit',
     name: 'Strength-Endurance Circuit',
+    youtube: 'strength-endurance circuit drill technique',
     category: 'strength',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1351,6 +1405,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'sport-specific-speed-ladder',
     name: 'Sport-Specific Ladder Warm-Up',
+    youtube: 'sport-specific ladder warm-up drill technique',
     category: 'mobility',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1380,6 +1435,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'conditioning-vo2-intervals',
     name: 'VO2 Max Intervals',
+    youtube: 'vo2 max intervals drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -1407,6 +1463,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'drill-drop-step',
     name: 'Drop Step',
+    youtube: 'drop step drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -1435,6 +1492,7 @@ export const SPORT_CONDITIONING = [
   {
     id: 'conditioning-high-low',
     name: 'High-Low Conditioning',
+    youtube: 'high-low conditioning drill technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
