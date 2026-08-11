@@ -1,5 +1,11 @@
 /*
  * css/layouts/progress.css
+ * 11 Aug 2026 v3
+ *
+ * v3 — WOW-4. Styles for .progress-tab--locked (the 90-day view on the
+ *   free tier). Opacity 0.55 matching tier-gating.css; focusable and
+ *   announced, never the HTML disabled attribute.
+ *
  * 23 Jun 2026 v2
  *
  * Progress view layout. 30/90 day view additions (P5-PG-1).
@@ -349,4 +355,31 @@
 .progress-export__lock-sub {
   font-size: var(--text-sm);
   color: var(--color-primary);
+}
+
+
+/* ─── Locked lookback tab (11 Aug 2026, WOW-4) ─────────────────────────────
+   90-day view on the free tier. Visible and tappable rather than hidden or
+   inert — routes to /upgrade via app.js's delegated data-route handler.
+   Opacity 0.55 matches tier-gating.css rather than introducing another
+   value. Never uses the HTML disabled attribute: it stays in the tab order
+   and stays announced (see PT-7). */
+
+.progress-tab--locked {
+  opacity: 0.55;
+  transition: opacity 150ms ease;
+}
+
+.progress-tab--locked:hover,
+.progress-tab--locked:focus-visible {
+  opacity: 0.8;
+}
+
+.progress-tab--locked:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-tab--locked { transition: none; }
 }

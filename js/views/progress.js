@@ -1,5 +1,16 @@
 /**
  * progress.js
+ * 11 Aug 2026 v3
+ *
+ * v3 — WOW-4 (Persona Tracing Wave 1). Free-tier lookback window lifted
+ *   from 7 days to 30. A 7-day window cannot show variability, and
+ *   "variability is information" is the product's founding principle — so
+ *   the free tier was not a smaller version of the coaching, it was the
+ *   coaching removed. Persona 2.12 saw one entry and no shape. 90 days
+ *   stays Personal, but is now shown as a visible tappable locked tab
+ *   routing to /upgrade rather than being hidden entirely — same "nothing
+ *   is a dead end" principle applied to session-builder-ui.js v5.
+ *
  * 23 Jun 2026 v2
  *
  * Progress view. Shows what the person has built — not as data, as narrative.
@@ -43,7 +54,14 @@ import { getGoalLabel }     from '../data/goals.js';
 
 export function ProgressView(router) {
 
-  let activeWindow = 7; // 7 | 30 | 90
+  // 11 Aug 2026 v3 (WOW-4) — free tier default lifted from 7 to 30 days.
+  // Not generosity: coherence. The founding principle is "variability is
+  // information", and a 7-day window is structurally incapable of showing
+  // variability. Persona 2.12 trains roughly twice a week with gaps; in any
+  // 7-day slice he saw one entry and no shape at all — which made the free
+  // tier a different product with the coaching removed, rather than a
+  // smaller version of it. Personal keeps 90 days, plus export and tools.
+  let activeWindow = 30; // 30 (free) | 30 | 90 (Personal)
 
   // ── Mount ──────────────────────────────────────────────────────────────────
 
@@ -63,9 +81,7 @@ export function ProgressView(router) {
 
         <header class="progress-header">
           <h1 class="progress-title">Progress</h1>
-          ${tier === 'personal' || tier === 'athlete'
-            ? renderWindowTabs(tier)
-            : ''}
+          ${renderWindowTabs(tier)}
         </header>
 
         <div class="progress-body">
@@ -84,21 +100,30 @@ export function ProgressView(router) {
   // ── Window tabs (Personal only) ────────────────────────────────────────────
 
   function renderWindowTabs(tier) {
+    const premium = tier === 'personal' || tier === 'athlete';
+    // Free sees 30 days by default and 90 as a visible, tappable locked
+    // option — not a hidden feature. Consistent with WOW-4's principle that
+    // nothing is a dead end: a locked control explains itself and offers a
+    // route, rather than being absent or inert.
+    const windows = premium ? [30, 90] : [30, 90];
     return `
       <div class="progress-tabs"
            role="tablist"
            aria-label="Lookback window">
-        ${[7, 30, 90].map(w => `
+        ${windows.map(w => {
+          const locked = !premium && w === 90;
+          return `
           <button
-            class="progress-tab ${activeWindow === w ? 'progress-tab--active' : ''}"
+            class="progress-tab ${activeWindow === w ? 'progress-tab--active' : ''}${locked ? ' progress-tab--locked' : ''}"
             role="tab"
             id="tab-${w}"
             aria-selected="${activeWindow === w ? 'true' : 'false'}"
             aria-controls="panel-${w}"
-            data-window="${w}">
-            ${w} days
-          </button>
-        `).join('')}
+            ${locked ? 'data-route="upgrade"' : `data-window="${w}"`}
+            aria-label="${w} days${locked ? ' \u2014 Personal plan feature, tap to learn more' : ''}">
+            ${w} days${locked ? ' \uD83D\uDD12' : ''}
+          </button>`;
+        }).join('')}
       </div>
     `;
   }
