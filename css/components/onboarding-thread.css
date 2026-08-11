@@ -1,6 +1,18 @@
 /**
  * css/components/onboarding-thread.css
- * 29 Jun 2026 v4
+ * 11 Aug 2026 v5
+ *
+ * v5 — WOW-0. Styles for the new consent gate (.ob-consent*), which runs
+ *   before Step 1. Every token below confirmed against css/base/
+ *   variables.css before use, not assumed. Accessibility notes:
+ *   - The Continue button uses aria-disabled + .is-inactive, never the
+ *     HTML disabled attribute, so it stays focusable and announced. Its
+ *     inactive state is 0.55 opacity, matching tier-gating.css's chosen
+ *     value rather than inventing a third one (see PT-7).
+ *   - Checkbox target is 24px with a 44px minimum row height, meeting
+ *     WCAG 2.2 AA SC 2.5.8 Target Size (Minimum).
+ *   - Links are underlined, not colour-only, for SC 1.4.1 Use of Colour.
+ *   - :focus-visible outlines use --color-border-focus throughout.
  *
  * v4 — Gemini QA reported the past-step fade was not visible at all
  *   (C1/C2 FAIL). Investigated with full DevTools verification rather
@@ -730,4 +742,116 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ob-bubble--coach.is-past { transition: none; }
+}
+
+
+/* ─── Consent gate (11 Aug 2026 v5, WOW-0) ─────────────────────────────── */
+
+.ob-consent {
+  padding: var(--space-6) var(--space-5) var(--space-8);
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.ob-consent__heading {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-5);
+}
+
+.ob-consent__subheading {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+}
+
+.ob-consent__summary {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.ob-consent__list {
+  margin: 0 0 var(--space-4);
+  padding-left: var(--space-5);
+}
+
+.ob-consent__list li {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+  line-height: 1.5;
+}
+
+.ob-consent__links {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Underlined, not colour-only — WCAG 2.2 AA SC 1.4.1 */
+.ob-consent__link {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.ob-consent__link:focus-visible,
+.ob-consent .btn-inline-link:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* 44px minimum row — WCAG 2.2 AA SC 2.5.8 Target Size */
+.ob-consent__tick {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: 44px;
+  margin-bottom: var(--space-3);
+}
+
+.ob-consent__checkbox {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.ob-consent__checkbox:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.ob-consent__label {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.ob-consent__error {
+  font-size: var(--text-sm);
+  color: var(--color-danger);
+  margin-bottom: var(--space-3);
+  font-weight: var(--font-medium);
+}
+
+/* Inactive, NOT disabled — stays focusable and announced. 0.55 matches
+   tier-gating.css rather than introducing a third opacity value. */
+.ob-consent__tick + .ob-consent__error + .btn.is-inactive,
+.ob-consent .btn.is-inactive {
+  opacity: 0.55;
+  transition: opacity 150ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-consent .btn.is-inactive { transition: none; }
 }

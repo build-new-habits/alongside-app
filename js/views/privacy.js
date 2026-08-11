@@ -1,9 +1,26 @@
 /**
- * privacy.js - Privacy Policy and Terms of Service
+ * privacy.js - Privacy and Terms (in-app summary)
+ * 11 Aug 2026 v2
  *
- * Shell view — content placeholder ready for full policy text.
- * Accessible from the welcome consent screen link and from Settings.
- * Returns to previous view on back tap.
+ * v2 — WOW-0. Two factual corrections and a reframe.
+ *
+ *   CORRECTION 1: the footer said "Build New Habits Ltd". The business is
+ *   an unregistered sole trader — there is no limited company. The same
+ *   error was fixed on the website on 03 Aug and missed here.
+ *
+ *   CORRECTION 2: the footer said "ICO registered". It is not. ICO
+ *   registration is gated on HMRC sole-trader registration completing
+ *   (BIZ-1, still open). Telling users their data is held under an ICO
+ *   registration that does not exist is a false statement in the one
+ *   screen where accuracy matters most. Removed, not softened.
+ *
+ *   REFRAME: this screen is now explicitly labelled a SUMMARY, with the
+ *   canonical documents on the website. Previously it read as if it were
+ *   the policy itself, which meant the consent gate would have been
+ *   pointing at a summary while asking people to agree to a document.
+ *
+ * Reached from the consent gate's "read a summary here" link and from
+ * Settings. Returns to previous view on back tap.
  */
 
 export const centered = false;
@@ -16,6 +33,28 @@ export function render() {
         <button class="btn btn-ghost privacy-back-btn" onclick="history.back()"
                 aria-label="Go back">Back</button>
         <h1>Privacy &amp; Terms</h1>
+      </div>
+
+      <div class="privacy-section card">
+        <h2 class="privacy-heading">This is a summary</h2>
+        <p class="text-secondary">
+          The plain-English version is below so you can see what you agreed to
+          without reading a legal document. The full and canonical Privacy Policy
+          and Terms of Service live on our website:
+        </p>
+        <p style="margin-top: var(--space-3);">
+          <a href="https://buildnewhabits.co.uk/privacy/"
+             style="color: var(--color-primary); text-decoration: underline;"
+             target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+          &middot;
+          <a href="https://buildnewhabits.co.uk/terms/"
+             style="color: var(--color-primary); text-decoration: underline;"
+             target="_blank" rel="noopener noreferrer">Terms of Service</a>
+        </p>
+        <p class="text-secondary text-sm" style="margin-top: var(--space-3);">
+          Both open in a new tab. If the two ever disagree, the website version is
+          the one that counts.
+        </p>
       </div>
 
       <div class="privacy-section card">
@@ -78,7 +117,7 @@ export function render() {
           Questions? Contact us at hello@buildnewhabits.co.uk
         </p>
         <p class="text-secondary text-sm text-center" style="margin-top: var(--space-2);">
-          Build New Habits Ltd &middot; Taunton, Somerset &middot; ICO registered
+          Build New Habits &middot; Somerset, United Kingdom
         </p>
       </div>
 

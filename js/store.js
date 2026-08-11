@@ -1,6 +1,15 @@
 /**
  * store.js - Data persistence layer
- * 09 Aug 2026 v18
+ * 11 Aug 2026 v19
+ *
+ * 11 Aug 2026 v19 - New nested field consent{} (given, at, policyVersion,
+ *   ageConfirmed), restoring the legal consent record that has been absent
+ *   from live onboarding since OB-THREAD retired welcome.js. See the
+ *   getDefaults() note for why it is nested, why it is an affirmative tick
+ *   rather than implied consent, and why policyVersion matters. Added to
+ *   getDefaults() and mergeWithDefaults() with an explicit guard so a real
+ *   record is never overwritten by defaults. ageConfirmed is reserved and
+ *   stays null while the age gate is inert.
  *
  * 09 Aug 2026 v18 - New field inStepProgress, for the "In Step" Noticing
  *   Hub feature (Personal tier). Deliberately NOT named with "territory"
@@ -228,6 +237,13 @@ export const store = {
               : []
           }
         : defaults.onboarding,
+
+      // ── CONSENT (v19) ─────────────────────────────────────────
+      // Never overwrite a real consent record with defaults — an existing
+      // user's timestamp and policyVersion are a legal audit trail.
+      consent: (saved.consent && typeof saved.consent === 'object')
+        ? { ...defaults.consent, ...saved.consent }
+        : defaults.consent,
 
       // ── PROFILE ───────────────────────────────────────────────
       fitnessLevel: saved.fitnessLevel || null,
@@ -531,6 +547,35 @@ export const store = {
       // ── ONBOARDING (top-level flags) ─────────────────────────
       onboardingComplete: false,
       onboardingStep: 1,
+
+      // ── CONSENT (v19, 11 Aug 2026 — WOW-0) ───────────────────
+      // Restores the legal consent record lost when OB-THREAD retired
+      // welcome.js (its store.set("consentGiven"/"consentAt") calls at
+      // welcome.js:85-86 were the ONLY writers, and that route left
+      // router.js VIEW_NAMES in v7). Live onboarding has captured no
+      // consent record at all since. Found by the PT-W1 store audit.
+      //
+      // Deliberate changes from welcome.js's version:
+      //   - Nested, not two flat top-level keys. Cleaner for the coming
+      //     Supabase migration, where PT-10 already flagged undeclared
+      //     flat fields as a real loss risk.
+      //   - given is set by an AFFIRMATIVE TICK, not by tapping a button
+      //     under a line of text. welcome.js used implied consent ("by
+      //     tapping Start you agree"); Graeme's decision, 11 Aug, is an
+      //     active registered choice — it removes the "but I didn't know"
+      //     problem.
+      //   - policyVersion records WHICH documents were agreed to. Without
+      //     it, any later revision silently invalidates every existing
+      //     record and there is no way to tell who needs re-consent.
+      consent: {
+        given:         false,  // bool — affirmative tick only
+        at:            null,   // ISO string|null
+        policyVersion: null,   // string|null — see POLICY_VERSION in thread.js
+        // Reserved. The age gate is built but INERT — see AGE_GATE_ENABLED
+        // in thread.js. Stays null until the ToS 13+/16+ contradiction
+        // (Stream A, A1.11) is resolved and Natalie's written advice lands.
+        ageConfirmed:  null    // bool|null
+      },
 
       // ── ONBOARDING THREAD AND BEATS (nested object — v6 + v7) ─
       // v6 original: castleShownAt, hardBeforeSelections,
