@@ -923,6 +923,11 @@ rather than only a buried bypass door. Added both.
  *   Truth Rule's documented fallback. Cache-bump only otherwise; no
  *   other files changed this deploy.
  *
+ * 11 Aug 2026 v235 - PT-12: store.js v21, gym-programme.js v7,
+ *   journal-entry.js v4, morning-session.js, intention.js. Reader-without-
+ *   writer sweep - exerciseFeedback given a writer, journalEntryType given a
+ *   reader, checkin.energy/todayEnergy corrected. Cache bump only.
+ *
  * 11 Aug 2026 v234 - PT-11: session-builder.js v4. Difficulty ceiling applied
  *   to its private 65-exercise pool, which never filtered on fitness. Cache
  *   bump only.
@@ -967,7 +972,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v234";
+const CACHE_NAME = "alongside-v235";
 
 const SHELL_URLS = [
 
