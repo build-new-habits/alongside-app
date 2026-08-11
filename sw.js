@@ -1,6 +1,60 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 10 Aug 2026 v223
+ * Overnight autonomous session (Claude, "make decisions following my
+ * previous decision behaviours"). Scoped deliberately narrow: small,
+ * well-evidenced, low-risk fixes that reduce untested surface area,
+ * not new speculative features piled on an already-large unconfirmed
+ * backlog — matching the pattern Graeme has repeatedly favoured
+ * (phase, defer, confirm before building more).
+ *
+ * Two real bugs found and fixed in noticing.js's "Your reflections":
+ * since journal-entry.js v3's privacy rewrite (14 Jul), entries have
+ * been written as {id, date, text, tags, noWords} — but noticing.js was
+ * still reading entry.createdAt/category/body (all undefined since 14
+ * Jul) and entry.type === "weekly-noticing" (never written anywhere,
+ * always false). Consequence: reflections showed blank date/text for
+ * every entry, AND getRecentEntries()'s sort compared new Date(undefined)
+ * — NaN vs NaN — meaning entries were never actually sorted by recency
+ * at all, just left in original array order. Both fixed to read the
+ * real fields; the dead "This week" badge (always-false type check)
+ * removed rather than a working version invented. noticing.js v4→v5.
+ *
+ * journalEntryType pre-select investigated, NOT fixed — found bigger
+ * than the master schedule's note suggested: journal-entry.js's v3
+ * rewrite dropped the entire pre-selected-screen mechanism, not just
+ * the field read. Fixing it means designing what a type-specific
+ * screen should look like — a real product decision, left for Graeme.
+ *
+ * Bodyweight-only lower-body content gap closed: session-builder.js v3,
+ * four new exercises (hip-hinge/single-leg/squat-pattern/leg-isolation),
+ * matching the exact format and safety conventions of everything
+ * already in the pool. Confirmed via test: no-equipment Lower Body went
+ * from 0 main exercises to 4. Full 7-type regression re-run clean.
+ *
+ * Real correction to a stale schedule note, not an execution: the
+ * "orphaned duplicate, safe to delete" file (exercises/index.js) is
+ * confirmed NOT orphaned — three live features (conditionProgrammes.js,
+ * core-session.js, prescribed-session.js) now import from it, all
+ * built since the old note was written. Traced precisely: it and
+ * exercises.js (workoutGenerator.js's import) are currently
+ * byte-identical in logic (diffed directly, only import-path depth
+ * differs) — a real structural risk (manual sync required forever, or
+ * silent drift) but not something to merge unilaterally overnight.
+ * Documented, neither file touched.
+ *
+ * Safety trace of the Severe-pain Rest/Adapt flow (coach-proposal.js,
+ * store.js's recordSeverePainChoice()) — read closely, no bugs found.
+ * One minor, non-urgent observation: severePainChoices has no cap
+ * (unlike activityLog's 200-entry limit) — not fixed, not urgent.
+ *
+ * Deliberately not touched, all needing real product judgment rather
+ * than a defensible autonomous call: coach-reflection.js deletion,
+ * coach-proposal.js's renderBypassDoor() unused parameter, the
+ * difficulty-scale migration, gym-programme.js's missing guided
+ * walkthrough, NEW-2 (recalibration engine), Wellbeing-first entry.
+ *
  * 09 Aug 2026 v222
  * "In Step" (Noticing Hub, Personal tier) — new js/views/in-step.js and
  * js/data/in-step-scenarios.js added to precache, alongside noticing.js.
@@ -770,7 +824,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v222";
+const CACHE_NAME = "alongside-v223";
 
 const SHELL_URLS = [
 
