@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v229
+ * Pulse-raiser entries rewritten to the Exercise Entry Standard (they had no
+ * instructions/why/coaching/watchOut and rendered near-blank), and session
+ * preview durations now read "5 min" rather than "300s".
+ *
  * 11 Aug 2026 v228
  * PT-19 - every generated session now opens with a pulse-raiser unless there
  * is a named, spoken reason it should not. Five bodyweight pulse-raisers
@@ -989,7 +994,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v238";
+const CACHE_NAME = "alongside-v239";
 
 const SHELL_URLS = [
 
