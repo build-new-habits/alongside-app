@@ -239,7 +239,15 @@ const DAY_ONE = [
   { trigger: 'return-to-fitness',  careMode: false, b1: "Do you remember telling me you're coming back to this after some time away?",                   b2: "I was wondering how it feels to be standing at that starting line again." },
   { trigger: 'injury-recovery',    careMode: true,  b1: "Do you remember telling me your body's been through something and you're rebuilding?",          b2: "I'm holding that. I was wondering how you're feeling about starting today." },
   { trigger: 'chronic-condition',  careMode: true,  b1: "Do you remember telling me about what your body's been dealing with? I haven't forgotten.",    b2: "I was wondering — how is it today, going into your first session?" },
-  { trigger: 'hormonal-change',    careMode: true,  b1: "Do you remember telling me that your body's been changing in ways that have made this harder?", b2: "I was wondering how you're feeling about it today — and what you're hoping this might give you." },
+  // 11 Aug 2026 (PT-1 follow-up) — was 'hormonal-change', age-gated, and
+  // phrased "Do you remember telling me..." for something the person had
+  // never told us: it fired on an inference from ageBand alone, so the coach
+  // claimed a disclosure that never happened. Two faults, one fix.
+  // Reframed to be true of anyone — a 22-year-old whose knee went, a new
+  // mother, someone in perimenopause, someone who can't play football any
+  // more — and written as an observation rather than a recollection, so it
+  // makes no claim about what was said and no guess about why.
+  { trigger: 'changing-body',      careMode: true,  b1: "Bodies change. Sometimes faster than we expect, and rarely at a convenient moment.",             b2: "I don't know where yours is right now, and I'm not going to guess. I was wondering what today feels like." },
   { trigger: 'long-absence',       careMode: false, b1: "Do you remember telling me it's been a while since you moved regularly?",                       b2: "I want you to know — there's no catching up needed. I was wondering how it feels to begin again." },
 
   // ── Territory rows (11 Aug 2026, PT-1) ──────────────────────────────────
@@ -251,10 +259,10 @@ const DAY_ONE = [
   // Written new rather than approximated. Voice matches the rows above:
   // b1 reflects back, b2 opens a question and never makes a statement.
   { trigger: 'trust-rupture',      careMode: false, b1: "Do you remember telling me that you've started things before and they let you down?",           b2: "I don't take that lightly. I was wondering what it's like standing at the start of another one." },
-  { trigger: 'escalation-trap',    careMode: false, b1: "Do you remember telling me that last time it moved too fast, too soon?",                        b2: "We're not doing that. I was wondering what a pace that actually worked would feel like for you." },
+  { trigger: 'escalation-trap',    careMode: false, b1: "Do you remember telling me that last time it moved too fast, too soon?",                        b2: "I was wondering what a pace that actually worked would feel like — because you'd know that better than I would." },
   { trigger: 'invisible-person',   careMode: false, b1: "Do you remember telling me you never felt like it knew you were there?",                        b2: "I know you're here. I was wondering how you're doing today — actually." },
   { trigger: 'body-story',         careMode: true,  b1: "Do you remember telling me your relationship with your body has made this complicated?",        b2: "I'm not going to ask you to explain it. I was wondering how today feels, going into your first session." },
-  { trigger: 'the-history',        careMode: true,  b1: "Do you remember telling me there's a longer history here than any of the rest of it?",          b2: "You don't have to go back into it. I was wondering how it sits with you today, before we start." },
+  { trigger: 'the-history',        careMode: true,  b1: "Do you remember telling me there's a longer history here than any of the rest of it?",          b2: "None of that needs revisiting today. I was wondering how it sits with you, standing here before the first one." },
 
   { trigger: 'generic',            careMode: false, b1: "This is the first real one.",                                                                   b2: "No history yet — just you, now. How are you today?" },
 ];
@@ -364,12 +372,13 @@ function _resolveDayOne() {
   // Age bands were also wrong: this tested '45-54'/'55-64'/'65+' against
   // AGE_CHIPS values of under-20/20s/30s/40s/50s/60s/70plus, so
   // 'hormonal-change' had never fired either. Corrected to live values.
-  // NOTE FOR GRAEME: 40s deliberately excluded. This is a fallback that
-  // fires only when someone named no territory and logged no condition, and
-  // inferring "your body's been changing in ways that have made this harder"
-  // from age alone is an assumption about a person. 50s upward is the
-  // narrower reading of the original intent; say if you want 40s included.
-  else if (['50s','60s','70plus'].includes(ageBand))  trigger = 'hormonal-change';
+  // Graeme's point, 11 Aug: bodies change at every age and for a hundred
+  // reasons, so gating this to the over-50s was both an assumption and too
+  // narrow. With the line reframed (see 'changing-body' above) it is safe
+  // for anyone, so it now fires for any known age band and sits just above
+  // 'generic' — a warmer default than "No history yet" for someone who
+  // named no territory and logged no condition.
+  else if (ageBand)  trigger = 'changing-body';
   else if (lifestyle.returningAfter === 'injury' || lifestyle.returningAfter === 'illness') trigger = 'injury-recovery';
   else if (lifestyle.exerciseHistory === 'lapsed' || lifestyle.exerciseHistory === 'returning') trigger = 'return-to-fitness';
   else if (goals.includes('feel-good'))                            trigger = 'feel-good';
