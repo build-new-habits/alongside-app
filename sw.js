@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v226
+ * CON-1/CON-2 — one exercise registry (exercises.js is now a shim over
+ * exercises/index.js) and a new equipment-map.js resolving granular user
+ * equipment ticks to the coarse tags exercises carry. 92 of 124
+ * equipment-requiring exercises were previously unreachable for every user.
+ *
  * 11 Aug 2026 v225
  * gym-programme.js rebuilt to genuinely match prescribed-session.js and
  * workout.js's UX, per Graeme's direct screenshot comparison: "Screenshot
@@ -972,7 +978,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v235";
+const CACHE_NAME = "alongside-v236";
 
 const SHELL_URLS = [
 
