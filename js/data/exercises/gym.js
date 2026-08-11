@@ -1,6 +1,11 @@
 /**
  * data/exercises/gym.js
- * 11 Aug 2026 v1
+ * 11 Aug 2026 v2
+ *
+ * v2 - Cable Pallof Press added at Graeme's request. Two band versions
+ *   existed in strength.js and no cable version did, despite the cable
+ *   being the most common way it is done in a gym and the version that
+ *   lets the resistance be adjusted properly.
  *
  * CON-4 — the gym library. Thirteenth discipline file.
  *
@@ -1191,6 +1196,52 @@ GYM.push(
       'Pulling only halfway; your chest should reach roughly level with your hands'
     ],
     load: 'Bodyweight. Adjust by walking your feet forward for harder, back for easier.',
+    credits: 50
+  }
+);
+
+// ══════════════════════════════════════════════════════════════════════
+// CABLE PALLOF PRESS (11 Aug 2026) — added at Graeme's request. Two band
+// versions existed; no cable version did, despite the cable being the
+// most common way it is done in a gym and the version that lets you
+// change the resistance properly.
+// ══════════════════════════════════════════════════════════════════════
+
+GYM.push(
+  {
+    id: 'gym-cable-pallof-press',
+    name: 'Cable Pallof Press',
+    youtube: 'cable pallof press anti rotation technique',
+    category: 'strength',
+    movementPattern: 'anti-rotation',
+    equipment: ['cable-machine'],
+    equipmentOptional: [],
+    affectsAreas: ['abdominals', 'core', 'glutes', 'shoulder'],
+    contraindications: ['lower-back-acute', 'shoulder-acute'],
+    energyRequired: 4,
+    difficultyLevel: 3,
+    duration: 240,
+    perSide: true,
+    sets: 3,
+    reps: '10 each side',
+    rest: '45s',
+    tempo: '2-2-2',
+    instructions: [
+      'Set the cable to roughly chest height and stand side-on to the machine',
+      'Take the handle in both hands and step away until there is real tension, feet shoulder-width apart',
+      'Bring your hands to the centre of your chest and brace your stomach',
+      'Press both hands straight out in front of you until your arms are almost straight',
+      'Hold for two seconds while the cable tries to turn you, then bring your hands back to your chest'
+    ],
+    coaching: 'Nothing should move except your arms. The cable is trying to rotate you the whole time, and the entire exercise is your midsection quietly refusing to let it.',
+    why: 'Trains your core to resist rotation rather than create it, which is what it spends most of its time doing in real life — carrying, reaching, twisting to look behind you. It builds a midsection that holds you steady rather than one that only looks a certain way.',
+    watchOut: [
+      'Your body turning towards the machine as you press out, which means the weight is too heavy — step in or lighten it',
+      'Hips drifting or shoulders rotating; both should stay square to the front throughout',
+      'Holding your breath during the two-second hold, which is the most common habit here — breathe steadily',
+      'Standing too close to the machine, so there is no tension and nothing to resist'
+    ],
+    load: 'Light enough that you stay completely square for all ten reps. The moment you start rotating, that is the weight telling you it is too heavy.',
     credits: 50
   }
 );
