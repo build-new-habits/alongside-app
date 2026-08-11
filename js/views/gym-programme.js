@@ -1,5 +1,17 @@
 /**
  * gym-programme.js
+ * 11 Aug 2026 v8
+ *
+ * v8 - CON-3b. Renders the two fields added to the Exercise Entry
+ *   Standard on 11 Aug: watchOut ("What to watch for") and load
+ *   ("How heavy"). Neither had a renderer anywhere in the product, in
+ *   any of the four card views, so content authored to the standard
+ *   would have been invisible - the same failure as the field-name
+ *   mismatch this file's v5 fixed, caught before authoring rather than
+ *   after. Load sits directly beneath the sets/reps target, where the
+ *   question "how heavy?" is actually asked. watchOut sits last, after
+ *   why, because it is read before the first rep and glanced at during.
+ *
  * 11 Aug 2026 v7
  *
  * v7 — PT-12. "Skip this one" now writes exerciseFeedback via
@@ -739,6 +751,25 @@ export function GymProgrammeView(router) {
                 <span class="exercise-section-label" id="gp-section-why">Why this helps</span>
                 <p class="exercise-why-text" aria-labelledby="gp-section-why">${_esc(exercise.why)}</p>
               ` : ''}
+            </div>
+          ` : ''}
+
+          <!-- How heavy - effort-relative only, never a weight. See the
+               Exercise Entry Standard and Locked Principle P4. -->
+          ${exercise.load ? `
+            <div class="exercise-load" role="region" aria-label="How heavy for ${_esc(exercise.name)}">
+              <span class="exercise-section-label" id="gp-section-load">How heavy</span>
+              <p class="exercise-load-text" aria-labelledby="gp-section-load">${_esc(exercise.load)}</p>
+            </div>
+          ` : ''}
+
+          <!-- What to watch for. A coach noticing something, not an alert. -->
+          ${exercise.watchOut && exercise.watchOut.length > 0 ? `
+            <div class="exercise-watchout" role="region" aria-label="What to watch for with ${_esc(exercise.name)}">
+              <span class="exercise-section-label" id="gp-section-watchout">What to watch for</span>
+              <ul class="exercise-watchout-list" aria-labelledby="gp-section-watchout">
+                ${exercise.watchOut.map(item => `<li>${_esc(item)}</li>`).join('')}
+              </ul>
             </div>
           ` : ''}
 

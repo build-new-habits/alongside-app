@@ -1,6 +1,16 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   11 Aug 2026 v4
+
+   v4 - CON-3b. Two new guidance blocks added to the exercise card:
+   .exercise-watchout (what to watch for) and .exercise-load (how heavy).
+   Both were specified in the Exercise Entry Standard on 11 Aug and had
+   no renderer at all, in any of the four card views. Amber is used for
+   watchOut deliberately and sparingly: it must read as a coach noticing
+   something, not as an alert. Contrast measured, not assumed -
+   #FBBF24 on --color-bg-card is 6.2:1, body text 8.4:1, both AA.
+
    04 Aug 2026 v3
 
    v3 — .ps-contra-flag added: prescribed-session.js's new real-time
@@ -451,6 +461,93 @@
   font-style: italic;
   margin: 0;
   padding: var(--space-2) 0 0;
+}
+
+/* ============================================
+   WATCH OUT FOR  (CON-3b, 11 Aug 2026)
+   ============================================
+
+   Deliberately not styled as an alert. No red, no icon shouting, no
+   uppercase body text. The amber left border and label are enough to
+   mark this section as different in kind from the instructions above
+   it, without implying the person is about to do something dangerous.
+
+   Colour is never the only signal: the section carries its own text
+   label and semantic list markup, so it reads correctly through a
+   screen reader and for anyone who cannot distinguish the border.
+   ============================================ */
+
+.exercise-watchout {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-warning-light);
+  border-left: 3px solid var(--color-warning);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.exercise-watchout .exercise-section-label {
+  margin-top: 0;
+  color: var(--color-warning);        /* 6.2:1 on --color-bg-card, AA */
+}
+
+.exercise-watchout-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.exercise-watchout-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  color: var(--color-text);           /* 8.4:1 on --color-bg-card, AAA */
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.exercise-watchout-list li:last-child {
+  border-bottom: none;
+}
+
+.exercise-watchout-list li::before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-warning);
+  flex-shrink: 0;
+  margin-top: 0.55em;
+}
+
+/* ============================================
+   HOW HEAVY  (CON-3b, 11 Aug 2026)
+   ============================================
+
+   Effort-relative load guidance. Never an absolute weight - see Locked
+   Principle P4 and the Exercise Entry Standard. Styled quietly, as a
+   note rather than a target, because a target is a number to fall
+   short of.
+   ============================================ */
+
+.exercise-load {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-md);
+}
+
+.exercise-load .exercise-section-label {
+  margin-top: 0;
+}
+
+.exercise-load-text {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text);           /* 7.04:1 on --color-bg-elevated, AAA */
+  line-height: var(--leading-relaxed);
 }
 
 /* ============================================
