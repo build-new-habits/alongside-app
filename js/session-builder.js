@@ -1,7 +1,14 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
- * 11 Aug 2026 v4
+ * 11 Aug 2026 v5
+ *
+ * v5 — CON-2. Equipment matching now resolves through equipment-map.js,
+ *   the same fix applied to filterByEquipment() in exercises/index.js.
+ *   This file's own equipSet was built straight from the user's ticked
+ *   ids, so an exercise tagged "dumbbell" never matched a user holding
+ *   "dumbbells-medium". Third instance of this file needing a fix that
+ *   was already made elsewhere — CON-6 retires its private pool entirely.
  *
  * v4 — PT-11. Difficulty ceiling applied in _filterCandidates(). This
  *   file's private EXERCISE_POOL never filtered on fitness, so the
@@ -73,6 +80,7 @@
  */
 
 import { store } from "./store.js";
+import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 
 // ── Allocation presets (05 Aug 2026) ──────────────────────────────────────────
 // Scales EXERCISE_COUNT's warmup/main/cooldown split. Warmup always floors at
@@ -824,10 +832,9 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
     // structurally gentle already, and capping them can empty a section
     // and break the warmup safety floor.
     if (section === "main" && (ex.difficultyLevel || 1) > ceiling) return false;
-    // Equipment check: exercise needs no equipment, or user has it
-    if (ex.equipment && ex.equipment.length > 0) {
-      if (!ex.equipment.every(e => equipSet.has(e))) return false;
-    }
+    // Equipment check: exercise needs no equipment, or user has it.
+    // CON-2: equipSet is now a resolved capability set, not the raw ticks.
+    if (!exerciseIsAvailable(ex, equipSet)) return false;
     // Condition check — only filter on acute/subacute pain levels.
     // Base condition IDs (no suffix) do not filter exercises — the user
     // has a condition but may have no pain today. Only pain score >= 4
@@ -858,7 +865,7 @@ export function buildCandidatePools({ sessionType, durationMins, equipmentOverri
   if (!type) return null;
 
   const userEquipment = equipmentOverride || store.get("equipment") || [];
-  const equipSet       = new Set(userEquipment);
+  const equipSet       = resolveEquipment(userEquipment);
   const conditionSet   = buildActiveConditionSet();
   const baseCounts     = EXERCISE_COUNT[durationMins] || EXERCISE_COUNT[30];
   const counts         = _applyPreset(baseCounts, preset);
@@ -900,7 +907,7 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
   if (!type) return null;
 
   const userEquipment = equipmentOverride || store.get("equipment") || [];
-  const equipSet       = new Set(userEquipment);
+  const equipSet       = resolveEquipment(userEquipment);
   const conditionSet   = buildActiveConditionSet();
   const idSet          = new Set(selectedIds || []);
 
@@ -963,7 +970,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   if (!type) return null;
 
   const userEquipment  = equipmentOverride || store.get("equipment") || [];
-  const equipSet       = new Set(userEquipment);
+  const equipSet       = resolveEquipment(userEquipment);
   const conditionSet   = buildActiveConditionSet();
   const counts         = _applyPreset(EXERCISE_COUNT[durationMins] || EXERCISE_COUNT[30], preset);
   const conditionNote  = buildConditionNote(sessionType);
