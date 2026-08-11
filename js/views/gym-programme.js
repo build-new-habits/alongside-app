@@ -1,5 +1,16 @@
 /**
  * gym-programme.js
+ * 11 Aug 2026 v6
+ *
+ * v6 — PT-4. Lift note added: a flat "Last: 60 kg \u00D7 8" reference line
+ *   plus a weight/reps capture, shown only when store.liftLogEnabled is on
+ *   (default false). A memory aid, not a scoreboard — Graeme's framing was
+ *   knowing what to set the machine to, not tracking progress. Governed by
+ *   locked principle P4: the app may display load, the coach never
+ *   interprets it. No delta, no arrow, no "best", no coach voice around the
+ *   number. See the long note at renderLiftBlock() for why the asymmetry
+ *   matters and what must not be added later.
+ *
  * 11 Aug 2026 v5
  *
  * v5 — Rebuilt the exercise walkthrough to match prescribed-session.js's
@@ -544,6 +555,86 @@ export function GymProgrammeView(router) {
   // context matters more here than it does for a standalone prescribed
   // exercise.
 
+  // ── Lift log (11 Aug 2026, PT-4) ───────────────────────────────────────────
+  //
+  // A MEMORY AID, not a scoreboard. Graeme's framing: "I want to know what
+  // weights I was lifting last week so I know what settings to add to the
+  // machines, rather than working blind."
+  //
+  // GOVERNED BY LOCKED PRINCIPLE P4 — the app may display load, the coach
+  // never interprets it. What renders is a flat, unnarrated reference line
+  // sitting in the exercise meta:  Last: 60 kg × 8
+  //
+  // Deliberately absent, and not to be added later without revisiting P4:
+  //   - any delta, arrow, colour-coding, or "up from"/"down from" wording
+  //   - any "new best", "personal best", or celebration
+  //   - any coach voice around the number at all
+  // The asymmetry is the reason. Silence on a drop is only credible if
+  // there is also silence on a rise. The moment the app cheers an increase,
+  // its silence on a decrease becomes a judgement — and a flat or falling
+  // number carries no information about whether today was a good day. It
+  // was hot. They slept badly. They came anyway, which is the harder thing.
+  //
+  // Off by default (store.liftLogEnabled). Someone who turns it on has
+  // asked for it, which is a different thing from being given it.
+
+  function renderLiftBlock(exercise) {
+    if (store.get('liftLogEnabled') !== true) return '';
+    if (!exercise?.id) return '';
+
+    const unit = store.get('weightUnit') || 'kg';
+    const last = store.lastLift(exercise.id);
+
+    // Flat reference line. No verb, no framing, no voice — a note the
+    // person left themselves.
+    const lastLine = last
+      ? `<p class="gp-lift__last">Last: ${last.weight} ${_esc(last.unit || unit)}${last.reps ? ' \u00D7 ' + last.reps : ''}</p>`
+      : `<p class="gp-lift__last gp-lift__last--empty">No note yet for this one.</p>`;
+
+    return `
+      <div class="gp-lift card" role="group" aria-label="Weight note for ${_esc(exercise.name)}">
+        ${lastLine}
+        <div class="gp-lift__row">
+          <label class="gp-lift__label" for="gp-lift-weight">Weight (${_esc(unit)})</label>
+          <input class="gp-lift__input" id="gp-lift-weight" type="number"
+                 inputmode="decimal" min="0" step="0.5"
+                 autocomplete="off"
+                 data-exercise-id="${_esc(exercise.id)}">
+          <label class="gp-lift__label" for="gp-lift-reps">Reps</label>
+          <input class="gp-lift__input" id="gp-lift-reps" type="number"
+                 inputmode="numeric" min="0" step="1"
+                 autocomplete="off">
+          <button class="btn btn-secondary gp-lift__save" id="gp-lift-save"
+                  aria-label="Save this weight as a note for next time">Save</button>
+        </div>
+        <p class="gp-lift__status" id="gp-lift-status" role="status"></p>
+      </div>
+    `;
+  }
+
+  function attachLiftEvents(exercise) {
+    const saveBtn = document.getElementById('gp-lift-save');
+    if (!saveBtn || !exercise?.id) return;
+    saveBtn.addEventListener('click', () => {
+      const w = parseFloat(document.getElementById('gp-lift-weight')?.value);
+      const r = parseInt(document.getElementById('gp-lift-reps')?.value, 10);
+      const status = document.getElementById('gp-lift-status');
+      if (isNaN(w) || w <= 0) {
+        if (status) status.textContent = 'Add a weight first.';
+        document.getElementById('gp-lift-weight')?.focus();
+        return;
+      }
+      store.logLift(exercise.id, {
+        weight: w,
+        unit:   store.get('weightUnit') || 'kg',
+        reps:   isNaN(r) ? null : r
+      });
+      // Neutral confirmation. States that it saved; says nothing about the
+      // number itself — see P4 above.
+      if (status) status.textContent = 'Noted.';
+    });
+  }
+
   function renderCurrentExercise(container, session, stats, sessionType) {
     const exercise    = session.exercises[currentExerciseIndex];
     const isLast      = currentExerciseIndex >= session.exercises.length - 1;
@@ -613,6 +704,8 @@ export function GymProgrammeView(router) {
               </div>
             </div>
           ` : ''}
+
+          ${renderLiftBlock(exercise)}
 
           <!-- Guidance — instructions / coaching / why, same structure and
                same real fields as prescribed-session.js/workout.js. -->
@@ -698,6 +791,8 @@ export function GymProgrammeView(router) {
       }
       renderCurrentExercise(container, session, stats, sessionType);
     });
+
+    attachLiftEvents(exercise);
 
     document.getElementById('gp-next-btn')?.addEventListener('click', () => {
       completedExerciseIndices.add(currentExerciseIndex);
