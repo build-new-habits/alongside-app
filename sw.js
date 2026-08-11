@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v235
+ * CONT-1 - the app now records WHICH exercises were completed, not only how
+ * many, and session selection is continuity-aware. store.js v22 adds
+ * exerciseHistory. Sessions now repeat key movements instead of handing out
+ * 497 exercises at random.
+ *
  * 11 Aug 2026 v234
  * CON-9 complete - watchOut ("What to watch for") and load ("How heavy") now
  * on all 497 exercises. Every exercise the app can hand a person carries full
@@ -1018,7 +1024,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v244";
+const CACHE_NAME = "alongside-v245";
 
 const SHELL_URLS = [
 
