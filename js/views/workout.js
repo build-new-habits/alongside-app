@@ -1,5 +1,12 @@
 /**
  * workout.js - Workout Execution View
+ * 11 Aug 2026 v10
+ *
+ * v10 - CONT-1. Completion records which exercises were done. Same
+ *   one-field change as gym-programme.js v9; see store.js v22 for why
+ *   this absence was the root of there being no progression, no skill
+ *   acquisition and no familiarity anywhere in the product.
+ *
  * 11 Aug 2026 v9
  *
  * v9 - CON-3b. Renders watchOut ("What to watch for") and load ("How
@@ -611,7 +618,10 @@ function completeWorkout() {
     durationMins: elapsedMins(),
     moodAfter:    null,
     isEvent:      false,
-    eventName:    null
+    eventName:    null,
+    // CONT-1: which exercises, not only how many. Routed into
+    // exerciseHistory by logActivity() on completion only.
+    exerciseIds:  (workout.exercises || []).map(e => e.id).filter(Boolean)
   });
   if (activityEntry) {
     store.set("currentActivityEntry", activityEntry);
