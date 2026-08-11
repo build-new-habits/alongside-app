@@ -1,5 +1,15 @@
 /**
  * journal-entry.js
+ * 11 Aug 2026 v4
+ *
+ * v4 — PT-12. Reads journalEntryType, which three call sites have been
+ *   writing since the Noticing Hub was built and nothing has ever read.
+ *   The prompt now matches where the person came from — the weekly
+ *   noticing prompt, an In Step scenario, or a direct visit — instead of
+ *   always showing the generic one. Cleared after read (single-use).
+ *   The Journal Privacy Rule is untouched: this changes the prompt only,
+ *   never what is stored or who can see it.
+ *
  * 14 Jul 2026 v3
  *
  * Journal entry view — the noticing hub's primary text input.
@@ -94,8 +104,36 @@ export function JournalEntryView(router) {
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
+  // 11 Aug 2026 (PT-12) — journalEntryType is written by noticing.js:374/380
+  // and in-step.js:307 before navigating here, and was read by nothing: the
+  // v3 privacy rewrite dropped the wiring and in-step.js:302 even documents
+  // it as dormant. Entries still saved fine; they just always landed on the
+  // generic prompt regardless of where the person came from. Read it here,
+  // and clear it after so a later direct visit is not still coloured by it.
+  const ENTRY_PROMPTS = {
+    'weekly-noticing': {
+      title:       'What did this week bring?',
+      label:       'Write anything. This is for you.',
+      placeholder: 'Something from the last few days that stayed with you.'
+    },
+    'in-step': {
+      title:       'What are you noticing?',
+      label:       'Write anything. This is for you.',
+      placeholder: 'That scenario landed somewhere. Where?'
+    }
+  };
+
   function render(container) {
     const autoTagging = store.get('journalSettings.autoTagging') !== false;
+
+    const entryType = store.get('journalEntryType');
+    const prompt    = ENTRY_PROMPTS[entryType] || {
+      title:       'What are you noticing?',
+      label:       'Write anything. This is for you.',
+      placeholder: 'Something caught your attention. What was it?'
+    };
+    // Single-use, like prescribedExercisesActiveCondition.
+    if (entryType) store.set('journalEntryType', null);
 
     container.innerHTML = `
       <div class="journal-entry-view" role="main" aria-label="New journal entry">
@@ -106,13 +144,13 @@ export function JournalEntryView(router) {
                   aria-label="Back to noticing hub">
             ← Back
           </button>
-          <h1 class="je-title">What are you noticing?</h1>
+          <h1 class="je-title">${_esc(prompt.title)}</h1>
         </header>
 
         <!-- Text input -->
         <div class="je-input-block">
           <label class="je-label" for="je-text">
-            Write anything. This is for you.
+            ${_esc(prompt.label)}
           </label>
           <textarea
             class="je-textarea"
@@ -121,7 +159,7 @@ export function JournalEntryView(router) {
             rows="8"
             aria-required="false"
             aria-label="Journal entry — write anything"
-            placeholder="Something caught your attention. What was it?"
+            placeholder="${_esc(prompt.placeholder)}"
             maxlength="5000"
           >${_esc(currentText)}</textarea>
           <div class="je-char-count"

@@ -1,6 +1,17 @@
 /**
  * store.js - Data persistence layer
- * 11 Aug 2026 v20
+ * 11 Aug 2026 v21
+ *
+ * 11 Aug 2026 v21 - PT-12, the reader-without-writer sweep. Three changes,
+ *   all closing the same pattern rather than another instance of it:
+ *   (1) new logExerciseFeedback() — exerciseFeedback has been READ by
+ *       applyFeedbackWeighting() since exercises/index.js v1.3 with nothing
+ *       ever writing it, so that weighting has never run on real data.
+ *   (2) exerciseFeedback declared in getDefaults()/mergeWithDefaults() —
+ *       it was read but never declared.
+ *   (3) absence.returnCapturedAt declared — written by programmeEngine.js
+ *       and surviving only via the ...saved spread, exactly the migration
+ *       loss risk PT-10 flagged.
  *
  * 11 Aug 2026 v20 - New fields liftLogEnabled (bool, default false) and
  *   liftLog ({ [exerciseId]: entry[] }), plus logLift()/lastLift() helpers.
@@ -295,6 +306,7 @@ export const store = {
       },
 
       // ── PROGRESS / ACTIVITY LOGS ──────────────────────────────
+      exerciseFeedback:    Array.isArray(saved.exerciseFeedback)    ? saved.exerciseFeedback    : [],
       progressLog:         Array.isArray(saved.progressLog)         ? saved.progressLog         : [],
       prescribedExercises: Array.isArray(saved.prescribedExercises) ? saved.prescribedExercises : [],
       activityLog:         Array.isArray(saved.activityLog)         ? saved.activityLog         : [],
@@ -655,6 +667,13 @@ export const store = {
       // ── PRESCRIBED EXERCISES ORIGIN ───────────────────────────
       prescribedExercisesOrigin: null, // 'professional' | 'self' | null — set once when prescribedExercises first goes empty -> non-empty; see Phase D blueprint v2, decision D-2
       prescribedExercisesActiveCondition: null, // conditionId | null — single-use, set by conditions-update.js's "Build my own" right before navigating to prescribed.js, cleared immediately once read; tags the next-added entry with conditionId
+      // Read by exercises/index.js applyFeedbackWeighting() since v1.3 and
+      // never declared here — one of the undeclared fields PT-10 flagged as
+      // a Supabase-migration loss risk. Declared v21, and given a writer
+      // (logExerciseFeedback) in the same pass.
+      exerciseFeedback: [], // { exerciseId, feedback: 'too-hard'|'too-easy', at }[]
+
+      // Undeclared until v21. Written by programmeEngine.js:268, read at :242.
       exercisePreferences: {}, // { [exerciseId]: { preference: 'avoid'|'less', setAt, source } } — per alongside_exercise_skip_dislike_spec_16may2026_v1.docx. Binary signal, not a rating (spec §6: "not a rating system... no stars, no thumbs, no scores"). First consumer: js/data/conditionProgrammes.js's candidate selection, 04 Aug 2026 — the full spec's in-session Skip flow (gym-programme.js/prescribed-session.js/core-session.js) remains separate future work.
 
       // ── LIFESTYLE ────────────────────────────────────────────
@@ -777,8 +796,13 @@ export const store = {
 
       // ── ABSENCE AND RETURN ────────────────────────────────────
       absence: {
-        context:    null,
-        capturedAt: null
+        context:          null,
+        capturedAt:       null,
+        // Undeclared until v21. Written by programmeEngine.js:268 and read
+        // at :242/:263 — it worked only via the ...saved spread, and would
+        // have been silently dropped by any migration rebuilding from
+        // defaults. Same class as PT-10's undeclared fields.
+        returnCapturedAt: null
       },
 
       // ── TEXT-TO-SPEECH ────────────────────────────────────────
@@ -1081,6 +1105,35 @@ export const store = {
     const list = (this.data.liftLog || {})[exerciseId];
     if (!Array.isArray(list) || list.length === 0) return null;
     return list[list.length - 1];
+  },
+
+  /**
+   * logExerciseFeedback(exerciseId, feedback) — PT-12, 11 Aug 2026.
+   *
+   * Writes the field applyFeedbackWeighting() (exercises/index.js:219) has
+   * been reading since v1.3 with NOTHING ever writing it — so the weighting
+   * logic has never once run on real data, always falling back to []. The
+   * response was built; the capture never was. Fifth confirmed instance of
+   * that pattern in this codebase.
+   *
+   * feedback: 'too-hard' | 'too-easy'. Binary, matching the reader's
+   * contract exactly — not a rating. Consistent with exercisePreferences
+   * (v17) and the skip/dislike spec's §6: no stars, no scores.
+   *
+   * Capped at 200 entries globally; the reader only ever looks at the last
+   * 5 per exercise.
+   */
+  logExerciseFeedback(exerciseId, feedback) {
+    if (!exerciseId) return null;
+    if (feedback !== 'too-hard' && feedback !== 'too-easy') return null;
+
+    const log = [...(this.data.exerciseFeedback || [])];
+    log.push({ exerciseId, feedback, at: new Date().toISOString() });
+    if (log.length > 200) log.splice(0, log.length - 200);
+    this.data.exerciseFeedback = log;
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+    return log[log.length - 1];
   },
 
   logSession(sessionData) {

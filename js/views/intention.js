@@ -255,7 +255,9 @@ function shouldOfferReturnVisit() {
 
 function buildCoachLine() {
   const checkin   = store.get("lastCheckin") || {};
-  const energy    = checkin.energy    || store.get("todayEnergy") || 5;
+  // 11 Aug 2026 (PT-12) — "todayEnergy" has never been written by anything;
+  // the real field is lastCheckin.energy (checkin-mini.js:389).
+  const energy    = checkin.energy    || store.get("lastCheckin.energy") || 5;
   const conditions = store.get("conditions") || [];
   const painScores = store.get("conditionPainScores") || {};
   const hasPain   = conditions.some(id => (painScores[id] || 0) >= 3);
