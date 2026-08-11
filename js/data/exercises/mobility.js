@@ -46,6 +46,13 @@ export const MOBILITY = [
     ],
     coaching: 'Keep your back straight - don\'t lean forward. The stretch should be in the front of your hip.',
     why: 'Tight hip flexors from sitting contribute to back pain and limit mobility.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 30,
     sets: 2,
     reps: "each side",
@@ -83,6 +90,13 @@ export const MOBILITY = [
     ],
     coaching: 'Move smoothly - this is about mobilising your spine, not stretching hard.',
     why: 'Gentle spinal movement reduces stiffness and warms up the back.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 30
   },
 
@@ -109,6 +123,13 @@ export const MOBILITY = [
     ],
     coaching: 'Keep your back knee off the ground for more intensity, or rest it down for easier version.',
     why: 'This single movement opens hips, thoracic spine, and hip flexors efficiently.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 40
   },
 
@@ -135,6 +156,13 @@ export const MOBILITY = [
     ],
     coaching: 'If this is too intense, sit on a cushion to elevate your hips.',
     why: 'Opens internal and external hip rotation - essential for healthy hips.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 35,
     sets: 2,
     reps: "each side",
@@ -172,6 +200,13 @@ export const MOBILITY = [
     ],
     coaching: 'Keep your knees stacked and hips from rolling back - the movement is just in your upper back.',
     why: 'Thoracic mobility reduces neck and shoulder tension and improves posture.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 30,
     sets: 2,
     reps: "10 each side",
@@ -214,6 +249,13 @@ export const MOBILITY = [
     ],
     coaching: 'This is a dynamic movement — loose and rhythmic, not forced. Think of a pendulum, not a stretch.',
     why: 'Warms up the hip joint through its sagittal plane range before exercise — reduces injury risk and improves stride length.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 25
   },
 
@@ -240,6 +282,13 @@ export const MOBILITY = [
     ],
     coaching: 'The leg crossing in front gives you the adductor stretch — the side swing gives you the abductor. Both happen in one movement.',
     why: 'Warms up the hip in the frontal plane — the direction of movement in lateral sports and change of direction.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 25
   },
 
@@ -268,6 +317,13 @@ export const MOBILITY = [
     ],
     coaching: 'Move slowly and feel each position. The hamstring stretch is in the walk-in, the hip flexor stretch is in the plank hold.',
     why: 'A full-body dynamic warm-up in one exercise — hamstrings, hip flexors, shoulders and core all in sequence.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 40
   },
 
@@ -295,6 +351,13 @@ export const MOBILITY = [
     ],
     coaching: 'Most people barely feel lateral lunges until they really sit into them. Push the hips back — not just down.',
     why: 'Opens the inner thighs and hip in the frontal plane — a range that standard squats and lunges completely miss.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 40
   },
 
@@ -323,6 +386,13 @@ export const MOBILITY = [
     ],
     coaching: 'The slower the better. You are exploring the edge of your hip\'s available range while keeping the muscles engaged throughout.',
     why: 'Controlled articular rotations maintain joint cartilage health and build active range of motion — more valuable than passive stretching for long-term hip health.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 35,
     sets: 2,
     reps: "5 each side",
@@ -359,6 +429,13 @@ export const MOBILITY = [
     ],
     coaching: 'Especially useful first thing in the morning or before any lower body exercise. 2 minutes total.',
     why: 'Warms up the ankle joint, increases synovial fluid circulation, and maintains ankle range of motion — often neglected until an injury occurs.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 15
   },
 
@@ -385,6 +462,13 @@ export const MOBILITY = [
     ],
     coaching: 'If your heels lift, place a rolled-up towel or small plates under them. The goal is heels flat over time, not immediately.',
     why: 'The deep squat is the most fundamental human resting position and a reliable indicator of lower body mobility. Building it reduces hip, knee, and ankle restriction.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 30
   },
 
@@ -411,6 +495,13 @@ export const MOBILITY = [
     ],
     coaching: 'This is intense for most people. Start with just a few seconds if needed and build from there.',
     why: 'One of the most effective hip flexor and quad stretches available. Addresses the tightness caused by prolonged sitting better than most alternatives.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 35
   },
 
@@ -439,6 +530,13 @@ export const MOBILITY = [
     ],
     coaching: 'If the hip on the bent leg does not touch the floor, place a folded blanket or cushion under it for support.',
     why: 'The most effective stretch for the piriformis and deep hip rotators — tight in almost everyone who sits. Also directly addresses sciatic nerve tension.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 35
   },
 
@@ -465,6 +563,13 @@ export const MOBILITY = [
     ],
     coaching: 'Breathe into the stretch. Each exhale can take you a little further into rotation.',
     why: 'Opens thoracic rotation in a supported position — excellent for upper back tightness, neck tension, and shoulder mobility.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 30
   },
 
@@ -491,6 +596,13 @@ export const MOBILITY = [
     ],
     coaching: 'Knees together is the cue — when the right knee drifts out, the stretch shifts from quad to hip. Both are fine, but know which you are doing.',
     why: 'Maintains quadriceps length — important for knee health, running efficiency, and reducing anterior knee pain.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 20
   },
 
@@ -518,6 +630,13 @@ export const MOBILITY = [
     ],
     coaching: 'The hand on the head is there for weight only, not traction. Pulling causes injury — just let gravity and the weight of the hand do the work.',
     why: 'The upper trapezius is the most tension-holding muscle in the body for most people — stretched by almost every desk worker and driver daily.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 20
   },
 
@@ -544,6 +663,13 @@ export const MOBILITY = [
     ],
     coaching: 'Think tall through the crown of the head as you open. Slumping forward defeats the purpose.',
     why: 'Counteracts the forward shoulder posture from screens, driving, and prolonged sitting. Simple and can be done anywhere throughout the day.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 20
   },
 
@@ -570,6 +696,13 @@ export const MOBILITY = [
     ],
     coaching: 'The further apart your feet, the deeper the stretch. Start conservative and widen over time.',
     why: 'Tight adductors contribute to groin strain, hip impingement, and movement restriction. Important for running, lateral movement, and hip health.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 20
   },
 
@@ -597,6 +730,13 @@ export const MOBILITY = [
     ],
     coaching: 'This is exploration, not performance. Move within a range that feels comfortable. Any section that does not move is telling you something.',
     why: 'Moves every segment of the spine through flexion and extension sequentially — maintaining segmental mobility that is rapidly lost with inactivity.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 25
   }
 
@@ -635,6 +775,13 @@ export const MOBILITY = [
     ],
     coaching: "This is called the world's greatest stretch because it genuinely hits more tight areas in one movement than almost anything else. Slow down through each transition.",
     why: 'Combines hip flexor stretch, thoracic rotation, groin opening, and hamstring lengthening in one flowing sequence. Used as a warm-up by elite athletes worldwide.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 40
   },
 
@@ -664,6 +811,13 @@ export const MOBILITY = [
     ],
     coaching: 'The rotation comes from the mid-back, not the lower back or hips. Keep the hips square and feel the movement in the chest area.',
     why: 'Restores thoracic rotation range of motion — essential for driving, reaching overhead, throwing, and all rotational sport movements.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 25
   },
 
@@ -692,6 +846,13 @@ export const MOBILITY = [
     ],
     coaching: 'Only work the thoracic spine — not the lower back. If the roller dips below the ribcage, stop.',
     why: 'Directly restores thoracic extension mobility — the movement most lost from sitting. Essential for shoulder health, overhead movement, and upright posture.',
+        watchOut: [
+      'Rolling directly over a joint or bone rather than the muscle',
+      'Pressing so hard you tense up, which stops the muscle releasing',
+      'Rushing; slow and steady is what allows anything to change',
+      'Rolling an area that is sharply painful rather than tender'
+    ],
+    load: 'Enough pressure to feel it clearly, light enough that you can still breathe normally.',
     credits: 30,
     sets: 1,
     reps: "5 segments",
@@ -731,6 +892,13 @@ export const MOBILITY = [
     ],
     coaching: 'The alphabet drill exposes which ankle directions are restricted — letters that feel limited show where to focus. Do it daily, not occasionally.',
     why: 'Ankle dorsiflexion restriction is one of the most common mobility limitations and contributes to knee pain, hip compensation, and running injury. Regular mobilisation prevents this.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 15
   },
 
@@ -759,6 +927,13 @@ export const MOBILITY = [
     ],
     coaching: 'This is a test and a drill. Measure the foot distance from the wall over weeks — improvement here will be noticeable in squat depth and running comfort.',
     why: 'Directly develops ankle dorsiflexion range — the single most impactful mobility improvement for squatting, running, and any standing athletic movement.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 20
   },
 
@@ -786,6 +961,13 @@ export const MOBILITY = [
     ],
     coaching: 'Wrist extension is the range most reduced by keyboard use. This simple drill is more effective than any wrist stretch done from a chair.',
     why: 'Restores wrist extension range critical for press-ups, planks, yoga, and all pushing movements. Directly counteracts the wrist flexion position of keyboard and phone use.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 20
   },
 
@@ -814,6 +996,13 @@ export const MOBILITY = [
     ],
     coaching: 'Most people cannot sit upright in 90-90 at first. Use a folded blanket under the front hip if it is raised off the floor.',
     why: 'The 90-90 position simultaneously stretches both internal and external hip rotation — addressing the full range of hip mobility in one position.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 30
   },
 
@@ -841,6 +1030,13 @@ export const MOBILITY = [
     ],
     coaching: 'This is intense. Work up to the full time gradually. The hip flexor and quad stretch here is deeper than any standing stretch.',
     why: 'The couch stretch is the most effective hip flexor and quad stretch available — directly counteracts the position of prolonged sitting and is used in competitive CrossFit warm-ups.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 30
   },
 
@@ -869,6 +1065,13 @@ export const MOBILITY = [
     ],
     coaching: 'CARs (Controlled Articular Rotations) are done slowly because speed hides range. The slower you go, the more honest the movement.',
     why: 'Shoulder CARs assess and develop full joint range of motion in all directions — the most comprehensive single shoulder mobility drill available.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 25
   },
 
@@ -896,6 +1099,13 @@ export const MOBILITY = [
     ],
     coaching: 'Spinal CARs are meditative as well as functional. Done first thing in the morning, they reveal overnight stiffness and work through it.',
     why: 'Develops segmental spinal mobility — each vertebra moving independently. Maintains the distributed movement capacity that keeps the spine healthy long-term.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 25
   },
 
@@ -923,6 +1133,13 @@ export const MOBILITY = [
     ],
     coaching: 'The frog stretch is demanding. Place folded blankets under the knees if there is knee discomfort. Breathe through the hip tension.',
     why: 'One of the deepest hip adductor and hip flexor stretches available. Develops the inner thigh mobility essential for deep squatting and lateral movement.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 25
   },
 
@@ -951,6 +1168,13 @@ export const MOBILITY = [
     ],
     coaching: 'If the arms cannot complete the full circle without bending, widen the grip. Never force range here — the shoulder is sensitive.',
     why: 'Develops full shoulder circumduction range — used by Olympic weightlifters and gymnasts before training to ensure complete overhead mobility.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 25
   },
 
@@ -981,6 +1205,13 @@ export const MOBILITY = [
     ],
     coaching: 'Move to the edge of comfortable range, not beyond it. The neck is not a joint to force. Particularly important for people who spend long periods at a screen.',
     why: 'Maintains cervical spine range of motion in all planes — preventing the stiffness that leads to headaches, shoulder tension, and restricted movement.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 15
   },
 
@@ -1008,6 +1239,13 @@ export const MOBILITY = [
     ],
     coaching: 'The torso staying still is the key challenge. If the torso rotates with the leg, you are not mobilising the hip — you are mobilising the lumbar spine.',
     why: 'Develops active hip circumduction — the full range of motion needed for kicking, stepping over obstacles, and fluid lower body movement.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 20
   },
 
@@ -1036,6 +1274,13 @@ export const MOBILITY = [
     ],
     coaching: 'Keeping the knees together isolates the rotation to the thoracic spine. The moment the knees separate, the lumbar spine takes over.',
     why: 'A targeted thoracic rotation drill in a position that locks out the lumbar spine — ensuring the rotation happens in the correct area.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 25,
     sets: 2,
     reps: "8 each side",
@@ -1075,6 +1320,13 @@ export const MOBILITY = [
     ],
     coaching: 'This can be done on a chair at a desk — completely discreet. Do it at the end of any long sitting period.',
     why: 'The most accessible deep hip rotator stretch — targets the piriformis and gluteus medius. Particularly effective for people with sciatic tension or piriformis syndrome.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 20
   },
 
@@ -1105,6 +1357,13 @@ export const MOBILITY = [
     ],
     coaching: 'This five-minute flow requires no warm-up and no equipment. It is the minimum effective dose of morning movement. Do it before checking your phone.',
     why: 'A complete morning mobility sequence that addresses spinal stiffness, hip flexor tightness, and thoracic rotation in the minimal time needed to produce real benefit.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 30
   },
 
@@ -1134,6 +1393,13 @@ export const MOBILITY = [
     ],
     coaching: 'Progress through each phase only when you feel the previous one has fully released. Rushing the sequence means not getting the benefit of any individual position.',
     why: 'A systematic hip flexor sequence that progressively addresses all components — length, rotation, and overhead reach. More effective than any single static stretch.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 35
   }
 

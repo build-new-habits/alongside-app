@@ -63,6 +63,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Small and controlled beats big and sloppy every time. If you feel it burning in the side of your hip, it is working.',
     why: 'Activates gluteus medius — the hip stabiliser that protects your knees and lower back in every movement.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25,
     sets: 2,
     reps: "15 each side",
@@ -104,6 +111,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Choose a band that makes the last 3 reps feel genuinely hard. Too easy means too light a band.',
     why: 'The resistance band increases gluteus medius activation compared to bodyweight alone — more effective for rehab and strength building.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   },
 
@@ -135,6 +149,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The squeeze at the top is the whole point. If you rush past it, you are losing half the benefit.',
     why: 'Glute bridge directly activates the glutes and teaches the brain to use them — essential before any lower body workout.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25,
     sets: 3,
     reps: "12",
@@ -176,6 +197,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Hips staying level is the challenge. If they drop, go back to the two-legged version and build more strength first.',
     why: 'Single-leg work reveals and corrects side-to-side glute strength imbalances — important for runners and anyone with hip or knee pain.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40,
     sets: 3,
     reps: "10 each side",
@@ -217,6 +245,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Think about pressing the ceiling with your heel, not just swinging the leg up. Your back should stay flat.',
     why: 'Isolates glute max with minimal load on other structures — ideal for glute rehab and activation.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -247,6 +282,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Keep your weight even through both hands. It wants to shift — resist it.',
     why: 'Works the gluteus medius from a different angle than clamshells — together they give full hip stabiliser coverage.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -277,6 +319,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Toes pointing slightly down works the glutes harder. Toes up shifts more load to the hip flexors.',
     why: 'Directly targets the gluteus medius and minimus — essential for hip stability and IT band health.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -307,6 +356,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Stay low throughout. Standing up straight makes it too easy and loses the glute engagement.',
     why: 'One of the most effective glute med exercises. Used in knee rehab, hip rehab, and as a warm-up before running and jumping.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -337,6 +393,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This looks a bit silly but it is highly effective. The diagonal step pattern works the glutes from hip flexion and abduction together.',
     why: 'Trains the glutes to stabilise the hip and knee during walking and running movements — exactly what they need to do in sport.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -367,6 +430,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The range of motion is bigger than a glute bridge because your shoulders are elevated. You will feel the difference.',
     why: 'The hip thrust produces the highest glute activation of any exercise — it is the gold standard for glute development and rehab.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40
   },
 
@@ -397,6 +467,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Hips staying perfectly still is the whole challenge. Start with tiny lifts and build range over time.',
     why: 'Combines glute strength with the core stability needed to keep hips level during single-leg movements.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40
   },
 
@@ -427,6 +504,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The heel drive is the key — it shifts the work from quads to glutes.',
     why: 'A functional glute strengthener that directly transfers to climbing stairs, hills, and daily movement.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 45
   },
 
@@ -457,6 +541,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Thinking about the front glute changes where you feel the exercise. Most people feel lunges in the quads — this cue shifts it to the glutes.',
     why: 'Reverse lunges load the glutes more than forward lunges and are gentler on the knee.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 45
   },
 
@@ -488,6 +579,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This can be done anywhere — a great one for office breaks or waiting for the kettle.',
     why: 'Strengthens the hip abductors in a functional standing position — directly relevant to walking, running, and balance.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -518,6 +616,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This is the simplest glute activation there is. It can be done sitting at a desk, lying in bed, or standing at a bus stop.',
     why: 'Isometric contractions re-establish the brain-to-muscle connection — especially useful after injury or long periods of inactivity.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 15
   },
 
@@ -548,6 +653,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The lift only needs to be a few inches. Squeezing the glute before you lift means the glute does the work, not the lower back.',
     why: 'A safe starting point for glute activation after injury — minimal load, no compression on the spine.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -585,6 +697,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Start gently — 30 to 50% effort. Isometric work is safe in the acute phase because there is no movement through the injured tissue.',
     why: 'Isometric contractions maintain hamstring strength and reduce pain during the acute phase without stressing the injury.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -616,6 +735,13 @@ export const REHABILITATION = [
     ],
     coaching: 'A stretch should feel like a pull, never a sharp pain. If it is sharp, bend the knee more until it is just a gentle tension.',
     why: 'Restores hamstring length gently during the subacute phase — important for returning to normal movement patterns.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -646,6 +772,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The quad staying tight is what protects the hamstring here. If the knee bends, the hamstring is doing more work than it should be at this stage.',
     why: 'Builds hamstring control through a safe range — a standard progression in physiotherapy after hamstring strain.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   },
 
@@ -676,6 +809,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The slow lowering (eccentric phase) is where most of the rehab benefit comes from. Do not rush it.',
     why: 'Rebuilds hamstring strength through active range of motion — the next step after isometric work.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -707,6 +847,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Use the lightest weight that still feels like work. This is rehab, not a strength session — range and control matter more than load.',
     why: 'Progressive hamstring loading through a lengthened position — one of the most effective exercises for hamstring injury rehabilitation.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40
   },
 
@@ -737,6 +884,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This is a hard exercise even for fit people. The hands are there to help — use them. The eccentric lowering is the goal, not the return.',
     why: 'Nordic curls are the most evidence-backed exercise for hamstring injury prevention and rehabilitation. The eccentric loading rebuilds tendon strength.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 60
   },
 
@@ -767,6 +921,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This works the hamstrings from a lengthened position — which is where most hamstring injuries happen. Start small with the range.',
     why: 'Trains the hamstrings eccentrically through a functional range, building resilience for running and jumping.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 45
   },
 
@@ -797,6 +958,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The slow lowering is doing most of the work. A 3-second lowering builds more strength than a fast one.',
     why: 'Builds hamstring strength through functional range in a standing position — closer to how the hamstring works in sport and daily movement.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40
   },
 
@@ -828,6 +996,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Balance is hard at first — holding a wall lightly is fine. Build up to freestanding over time.',
     why: 'Trains single-leg hamstring strength and balance together — essential for returning to running and any sport involving one-leg landing.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 50
   },
 
@@ -859,6 +1034,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Round back means you are stretching your lower back, not your hamstring. Sit on a cushion if your back rounds immediately.',
     why: 'Restores hamstring length with the hip in a position that closely mimics running — more functional than a lying hamstring stretch.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -889,6 +1071,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This is a neural mobilisation, not a muscle stretch. The rhythmic movement flushes the sciatic nerve — it should feel releasing, not painful.',
     why: 'Hamstring tightness is often partly neural, not just muscular. Neural flossing addresses both and is particularly useful when the hamstring feels tight but not torn.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -919,6 +1108,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Short strides are deliberate here — as the hamstring heals, you can progressively lengthen them over weeks.',
     why: 'Returns the hamstring to functional loading through normal gait patterns — a key step before returning to running.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 45
   },
 
@@ -948,6 +1144,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This is harder than it looks. Start with a lower surface if needed. The adductor and hamstring work together here — both benefit.',
     why: 'Strengthens the inner thigh and hamstring together — clinically used for groin and hamstring injury prevention in sport.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 50
   },
 
@@ -978,6 +1181,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The smooth floor lets the towel slide easily. If it sticks, try socks on a wooden floor instead.',
     why: 'A low-equipment eccentric hamstring exercise that builds strength through the lengthened range — the range most prone to injury.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40
   },
 
@@ -1014,6 +1224,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The slow lowering is where the healing happens. Do not let the heels drop quickly.',
     why: 'Safe starting point for calf loading after acute injury — seated position removes body weight load while still working the muscle.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -1044,6 +1261,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The lowering phase is the entire point. Rising on two feet is just resetting — all the work is in the slow single-leg descent.',
     why: 'Eccentric heel drops are the most evidence-backed treatment for Achilles tendinopathy. The slow lengthening under load remodels and strengthens the tendon.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -1074,6 +1298,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Full range matters — press all the way up, lower all the way down. Half reps build half the strength.',
     why: 'Progresses from eccentric-only to full concentric and eccentric loading — the next step in returning the calf and Achilles to full strength.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -1104,6 +1335,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Some mild discomfort is expected during Achilles rehab. Sharp pain means stop. Mild ache during and after is normal at this stage.',
     why: 'The straight-knee version targets the gastrocnemius — the larger, outer calf muscle that attaches directly to the Achilles tendon.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -1134,6 +1372,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Do both the straight and bent-knee versions — they target different parts of the calf and both connect to the Achilles.',
     why: 'The bent-knee version targets the soleus — the deeper calf muscle whose tendon blends into the Achilles. Essential for complete Achilles rehabilitation.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -1164,6 +1409,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The heel must stay flat on the floor — that is what gives the stretch. If the heel lifts, step the foot closer.',
     why: 'Maintains calf and Achilles flexibility during rehabilitation — reduced flexibility is a significant risk factor for re-injury.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -1194,6 +1446,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This feels different to the standard calf stretch — lower and tighter. That is the soleus. Both stretches are needed for full Achilles health.',
     why: 'Stretches the soleus, which is commonly neglected. Tight soleus increases Achilles load during walking and running.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -1222,6 +1481,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This looks simple but covers every direction your ankle moves. It is one of the best all-round ankle mobility exercises there is.',
     why: 'Restores ankle range of motion and proprioception after injury — safe in the acute phase because there is no load through the joint.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 15
   },
 
@@ -1252,6 +1518,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The band provides a small distraction to the ankle joint that helps restore range. This is a common physio technique.',
     why: 'Improves ankle dorsiflexion range — limited dorsiflexion is linked to calf tightness, Achilles problems, knee pain, and running injuries.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -1282,6 +1555,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Roll slowly — about one inch per second. Tender spots mean the tissue needs more time there, not faster movement.',
     why: 'Reduces calf tension and improves tissue quality — supports Achilles health and reduces injury recurrence risk.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -1318,6 +1598,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The squeeze at full extension activates the VMO — the teardrop-shaped muscle on the inner quad that stabilises the kneecap.',
     why: 'Terminal knee extensions specifically target the VMO, which is often weak in knee pain. Strengthening it improves kneecap tracking and reduces pain.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   },
 
@@ -1348,6 +1635,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The wide toe angle and outward knee push shifts load onto the VMO. This is not about depth — it is about the quad squeeze at the top.',
     why: 'The turned-out foot position preferentially loads the VMO over the outer quad, helping to rebalance the forces acting on the kneecap.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -1378,6 +1672,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Watch your knee in a mirror if possible. It should track straight — not collapsing inward. Slowing down helps keep it honest.',
     why: 'Eccentric step-downs are a benchmark test and treatment for knee pain. The slow lowering builds quad and glute control under load.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40
   },
 
@@ -1408,6 +1709,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Find the angle that produces a muscle burn but no knee pain. That is your working range — stay there.',
     why: 'Isometric quad loading reduces knee pain while building strength — safe in acute and early subacute phases when movement is painful.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   },
 
@@ -1438,6 +1746,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The IT band itself cannot be stretched — it is a thick band of connective tissue. You are releasing the muscles around it. It will be tender.',
     why: 'Reduces tension in the lateral thigh and TFL muscle, which can reduce pain along the IT band. Most effective when combined with glute strengthening.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   },
 
@@ -1468,6 +1783,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The further you lean the hips to the side, the deeper the stretch. Start gentle and increase over time.',
     why: 'One of the few effective stretches for the lateral hip and IT band region. Complements foam rolling well.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -1498,6 +1820,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The rotation is what makes this target the TFL. Without it, it is just a hip flexor stretch.',
     why: 'Releases the TFL — the muscle at the top of the IT band that is often the true source of IT band tension.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -1528,6 +1857,13 @@ export const REHABILITATION = [
     ],
     coaching: 'You will feel this in the muscle running along the outer shin. That is exactly where it should be.',
     why: 'Strengthens the tibialis anterior — the muscle most involved in shin splints. Directly addresses the source of the pain.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -1558,6 +1894,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This is a progression — only start it once the tibialis raise is pain-free. Do not push through sharp shin pain.',
     why: 'Balances strength between the calf and tibialis anterior — the imbalance between these two muscles is a primary cause of shin splints.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   },
 
@@ -1588,6 +1931,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Wobbling is the point — it means your stabilisers are working. Only hold a wall if you are about to fall.',
     why: 'Restores proprioception — the body\'s sense of joint position. Lost after any lower limb injury and essential to recover before returning to sport.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -1618,6 +1968,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This only works when the quad is completely relaxed. If the muscle is on, the kneecap is locked in place.',
     why: 'Maintains kneecap mobility during rehabilitation and recovery from surgery. A stuck kneecap contributes to pain and limits knee flexion.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -1648,6 +2005,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Distance matters less than control. A short, controlled reach is better than a long one that makes you hop or twist.',
     why: 'The Y-balance test is used clinically to assess injury risk and rehabilitation progress. As an exercise it builds the full lower limb stability needed to return to sport.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40
   },
 
@@ -1684,6 +2048,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This is a passive exercise — the arm swings like a pendulum, not an active movement. Any muscular effort defeats the purpose.',
     why: 'Creates gentle traction on the shoulder joint, reducing pain and maintaining range of motion in the acute phase when active movement is too painful.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -1713,6 +2084,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The elbow stays glued to your side. The moment it lifts, you are using the wrong muscles.',
     why: 'Strengthens the infraspinatus and teres minor — two of the four rotator cuff muscles. Weakness here is the most common cause of shoulder impingement.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   },
 
@@ -1742,6 +2120,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Same rule as external rotation — elbow stays against your side. Do both internal and external in every shoulder rehab session.',
     why: 'Strengthens the subscapularis — the rotator cuff muscle on the front of the shoulder. Balance between internal and external rotation is critical for shoulder health.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   },
 
@@ -1772,6 +2157,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The wall gives you honest feedback — any gap tells you where your mobility and control are limited.',
     why: 'Trains the lower trapezius and serratus anterior together — the muscles that control the shoulder blade and create a stable base for the shoulder joint.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   },
 
@@ -1802,6 +2194,13 @@ export const REHABILITATION = [
     ],
     coaching: 'CARs stands for Controlled Articular Rotations. Slower is better — you are exploring and building range at the same time.',
     why: 'Takes the shoulder through its full available range under active muscular control — maintains joint health and builds awareness of limitations.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   },
 
@@ -1832,6 +2231,13 @@ export const REHABILITATION = [
     ],
     coaching: 'These are small movements with low weight — the difficulty comes from volume and holding position, not from load.',
     why: 'Directly targets the lower and mid trapezius — muscles that are almost always weak in people with shoulder and neck pain from sitting.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -1862,6 +2268,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Most people have never felt this movement before. It takes a few reps to find it. If arms are bending, it is a press-up — not a scapular press-up.',
     why: 'Activates the serratus anterior — the muscle that holds the shoulder blade against the ribcage. Weakness here causes winging and shoulder impingement.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -1892,6 +2305,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Lean forward slowly — do not throw yourself into the stretch. A gentle sustained pull works better than a hard fast one.',
     why: 'Releases pec minor tightness that pulls the shoulder blade forward — one of the most common postural problems from sitting and screen use.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -1921,6 +2341,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This is a daily maintenance exercise — 2 minutes a day prevents most wrist problems from building up.',
     why: 'Maintains wrist joint health and range of motion. Particularly useful for anyone who types, uses a mouse, or does press-ups regularly.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 15
   },
 
@@ -1951,6 +2378,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Gentle and sustained is the goal. These stretches work best when held for at least 20 seconds.',
     why: 'Maintains wrist flexor and extensor length — important for preventing and managing tennis elbow, golfer\'s elbow and repetitive strain.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 15
   },
 
@@ -1981,6 +2415,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The weight of even a light object adds enough load to make this therapeutic. As strength returns, use a slightly heavier object.',
     why: 'Restores forearm rotation — commonly restricted after wrist or elbow injury. Essential for almost every upper body movement.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -2011,6 +2452,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Release completely between reps — full release is as important as the squeeze for building endurance.',
     why: 'Rebuilds grip strength after wrist or elbow injury. Grip strength is also a reliable indicator of overall upper limb health.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -2049,6 +2497,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This is a tiny movement — it should not involve lifting your hips. Just a gentle rocking of the pelvis.',
     why: 'Activates the deep abdominal muscles that support the lumbar spine — the starting point for all lower back rehabilitation.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 15,
     sets: 2,
     reps: "15",
@@ -2091,6 +2546,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The engagement is gentle — about 20% of maximum. If you are holding your breath or gripping hard, you are doing too much.',
     why: 'The deep core — transversus abdominis and pelvic floor — activates with the breath. This re-establishes that connection after injury or inactivity.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20,
     sets: 1,
     reps: null,
@@ -2132,6 +2594,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Arms only to start. The lower back staying flat is everything — reduce the range if it lifts.',
     why: 'Trains the anti-extension function of the core — the most important job the abs do in protecting the spine.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35,
     sets: 2,
     reps: "8 each side",
@@ -2173,6 +2642,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Leg only this time. Harder than it looks — the longer lever of the leg challenges the lower back more than the arm.',
     why: 'Progresses dead bug to leg extension — the pattern used in walking and running where the core must prevent the back from arching.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40
   },
 
@@ -2203,6 +2679,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The opposite arm and leg combination is the full version. If the lower back lifts at all, go back to progressions 1 or 2.',
     why: 'The full dead bug pattern — opposite limb extension that directly trains the core stability needed for walking, running, and all sport.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 45,
     sets: 3,
     reps: "6 each side",
@@ -2245,6 +2728,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Imagine a glass of water on your lower back. Do not spill it.',
     why: 'Trains the deep spinal stabilisers in a low-load, safe position. A standard first-line exercise in lower back rehabilitation worldwide.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35,
     sets: 2,
     reps: "6 each side",
@@ -2286,6 +2776,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This is a directional exercise — it helps some back conditions and not others. If it increases leg pain or makes symptoms worse, stop and see a physio.',
     why: 'McKenzie extension reduces disc pressure and is one of the most evidence-backed treatments for discogenic lower back pain and sciatica.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -2317,6 +2814,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Neural flossing should never cause sharp pain down the leg. A gentle pulling sensation is expected. If it causes sharp pain, stop.',
     why: 'Mobilises the sciatic nerve by creating a pumping action that reduces inflammation and adhesions along the nerve path.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -2348,6 +2852,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Move from your mid-back, not just your shoulders. Imagine your spine is the axis of rotation.',
     why: 'Maintains spinal rotation mobility and reduces stiffness — safe in the acute phase because it is unloaded and low range.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 15
   },
 
@@ -2379,6 +2890,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Keep your hips level — they want to shift as you lean. Resist that to get the stretch in the right place.',
     why: 'Stretches the quadratus lumborum — the deep lower back muscle that is one of the most common sources of lower back tightness and pain.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -2409,6 +2927,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The hands under the back are not for comfort — they hold the natural spinal curve that protects the discs. Without them, this becomes a harmful crunch.',
     why: 'Developed by spine researcher Stuart McGill — activates the rectus abdominis while maintaining spinal alignment. Safer than sit-ups or crunches for most back conditions.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30,
     sets: 3,
     reps: "10",
@@ -2450,6 +2975,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The modified version from knees is completely valid. Build the hold time before progressing to full side plank from feet.',
     why: 'Trains the lateral core — the quadratus lumborum and obliques — which resist sideways bending forces on the spine. Part of the McGill Big Three for back rehabilitation.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35,
     sets: 2,
     reps: "each side",
@@ -2500,6 +3032,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Most people hold their breath or tense their glutes and thighs instead. Check: can you still breathe freely? If not, reduce the effort.',
     why: 'Strengthens the pelvic floor — the hammock of muscles supporting the bladder, bowel, and reproductive organs. Weak pelvic floor contributes to leakage, prolapse risk, and low back instability.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 15
   },
 
@@ -2529,6 +3068,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Quick flicks train the fast-twitch pelvic floor fibres — the ones that respond to a cough, sneeze, or jump. Both slow holds and quick flicks are needed.',
     why: 'The fast-twitch pelvic floor muscles prevent leakage during sudden pressure increases. Slow holds alone do not train this.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 15
   },
 
@@ -2560,6 +3106,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Linking pelvic floor engagement to the exhale and the lift mirrors how the pelvic floor naturally works with breathing and movement.',
     why: 'Integrates pelvic floor activation into a functional movement pattern — a step beyond isolated contractions toward real-world strength.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   },
 
@@ -2591,6 +3144,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The pelvic floor should lengthen on the way down and lift on the way up — like a lift going down as you descend and up as you rise.',
     why: 'Trains the pelvic floor to work dynamically under load — the functional demand it faces in daily life and sport.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -2627,6 +3187,13 @@ export const REHABILITATION = [
     ],
     coaching: 'People with hypermobility often unconsciously rest in their ligaments rather than their muscles. This practice builds the habit of active mid-range holding.',
     why: 'Proprioception — the sense of joint position — is often reduced in hypermobility. Training it is the foundation of managing hypermobile joints safely.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -2657,6 +3224,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This tiny bend is doing a lot. Locking the knee out is easy — holding it slightly bent with muscular control takes real work for hypermobile joints.',
     why: 'Trains the quads to actively stabilise the knee rather than relying on the ligaments. Reduces knee hyperextension, pain, and instability.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 20
   },
 
@@ -2687,6 +3261,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Think of your shoulder blades sliding into back pockets. The movement is subtle — not a big retraction.',
     why: 'Creates active shoulder girdle stability — essential for hypermobile shoulders that rely on passive structures and are prone to subluxation and pain.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 15
   },
 
@@ -2717,6 +3298,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Most hypermobile people stand by hanging into the hip — ligaments taking the load. This builds the muscular alternative.',
     why: 'Single-leg hip stability is essential for every step taken, for stairs, and for any sport. Building it reduces hip pain and the risk of joint damage over time.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   }
 
@@ -2751,6 +3339,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Terminal extension specifically targets the VMO — the inner quad muscle most affected by knee injury and most responsible for knee stability.',
     why: 'Knee terminal extension is a core exercise in ACL and patellofemoral rehabilitation — it restores the final degrees of extension strength without loading the joint in vulnerable positions.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -2781,6 +3376,13 @@ export const REHABILITATION = [
     ],
     coaching: 'The Y-T-W directly targets the lower and middle trapezius — muscles almost universally undertrained and responsible for shoulder stability.',
     why: 'Y-T-W is a clinical rehabilitation staple for shoulder impingement, rotator cuff issues, and postural dysfunction. Restores scapular control and stability.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40
   },
 
@@ -2811,6 +3413,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Ankle sprains damage the proprioceptive nerves as much as the ligaments. Restoring balance and proprioception prevents re-injury more than any other intervention.',
     why: 'Proprioception training is the most important component of ankle sprain rehabilitation — people who skip this step have very high re-injury rates within the first year of return to sport.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40
   },
 
@@ -2841,6 +3450,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Start lighter than feels necessary. Wrist tendons are slow to recover and easy to re-injure with too much load too soon.',
     why: "Wrist flexor and extensor strengthening restores the forearm strength balance disrupted by tennis elbow, golfer's elbow, and repetitive strain injuries.",
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 35
   },
 
@@ -2871,6 +3487,13 @@ export const REHABILITATION = [
     ],
     coaching: 'This is a subtle exercise — not a strong chin tuck. The deep cervical flexors are small and fatigue quickly. Quality of activation is everything.',
     why: 'Deep cervical flexor weakness is present in almost all people with neck pain and headaches. This specific activation exercise is the cornerstone of neck pain rehabilitation.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -2900,6 +3523,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Hip flexor weakness is often overlooked in lower back and hip pain rehabilitation. It is one of the most important muscles for gait, stair climbing, and running.',
     why: 'Hip flexor strength — not just flexibility — is essential for healthy hip mechanics. Weakness leads to compensatory patterns that drive knee, hip, and lower back pain.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 40
   },
 
@@ -2931,6 +3561,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Lateral hip strength is the foundation of lower limb health — it affects knee alignment, IT band tension, and lower back stability all at once.',
     why: 'Lateral hip weakness is implicated in patellofemoral pain, IT band syndrome, gluteal tendinopathy, and lower back pain. A single rehabilitation series addresses all of these.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 50
   },
 
@@ -2961,6 +3598,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Thoracic stiffness is a primary contributor to neck pain, shoulder impingement, and lower back pain — often overlooked in rehabilitation programs that treat these in isolation.',
     why: 'Thoracic mobility restoration is foundational for shoulder, neck, and lower back rehabilitation. Improving thoracic movement reduces compensatory demands on adjacent joints.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 45
   },
 
@@ -2993,6 +3637,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Diaphragmatic breathing restores intra-abdominal pressure regulation — the foundation of core stability. Without it, all other core rehabilitation is built on unstable ground.',
     why: 'Altered breathing patterns are found in almost all people with chronic lower back pain and postural dysfunction. Restoring diaphragmatic breathing is the first step in core rehabilitation.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 25
   },
 
@@ -3024,6 +3675,13 @@ export const REHABILITATION = [
     ],
     coaching: 'Neural flossing creates movement of the nerve through its pathway — like flossing between teeth. If any movement produces sharp radiating pain, stop immediately.',
     why: 'Neural mobilisation techniques improve nerve mobility and reduce neural tension in sciatica rehabilitation. Evidence shows superior outcomes compared to stretching alone.',
+        watchOut: [
+      'Progressing to the next stage before the current one is comfortable and pain-free',
+      'Working into pain rather than up to the edge of it',
+      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
+      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+    ],
+    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
     credits: 30
   }
 
