@@ -7,6 +7,15 @@
  * No changes needed elsewhere in the app when new category files are added —
  * just import the new array here and spread it into EXERCISES.
  *
+ * 11 Aug 2026 v1.6
+ *
+ * v1.6 — CON-4. New gym.js registered: 31 entries covering cardio machines
+ *   (treadmill, cross trainer, stair climber, ski erg), conditioning (sled,
+ *   battle ropes, loaded carries), cable and machine strength, loaded core,
+ *   medicine ball, balance kit and plyometrics. Before this the database
+ *   held zero cable exercises, zero machine strength and no loaded core at
+ *   all, and seven equipment ids were tickable but carried by nothing.
+ *
  * 11 Aug 2026 v1.5
  *
  * v1.5 — CON-2. filterByEquipment() now resolves the user's ticked
@@ -85,6 +94,7 @@ import { PILATES }            from './pilates.js';
 import { RUNNING }            from './running.js';
 import { SWIMMING_CYCLING }   from './swimming_cycling.js';
 import { SPORT_CONDITIONING } from './sport_conditioning.js';
+import { GYM }               from './gym.js';
 
 import { getActiveConditionIds } from '../conditions.js';
 import { resolveEquipment, exerciseIsAvailable } from '../equipment-map.js';
@@ -102,6 +112,7 @@ export const EXERCISES = [
   ...RUNNING,
   ...SWIMMING_CYCLING,
   ...SPORT_CONDITIONING,
+  ...GYM,
 ];
 
 // ─── Filter functions ─────────────────────────────────────────────────────────

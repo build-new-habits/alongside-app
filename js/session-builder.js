@@ -1,6 +1,17 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v10
+ *
+ * v10 - CON-8. Equipment is now a preference, not only a permission.
+ *   Until now nothing ever preferred a barbell when the person was
+ *   standing next to one: equipment gated what was ALLOWED, and since
+ *   bodyweight is the large majority of the database, random selection
+ *   handed gym users sessions they could have done in their living room.
+ *   Reported twice by Graeme, and confirmed by trace both times. Within
+ *   each category, equipment-using exercises are now picked first when
+ *   the person has meaningful kit. Bodyweight fallback unchanged.
+ *
  * 11 Aug 2026 v9
  *
  * v9 - CON-6. The private EXERCISE_POOL is gone. _filterCandidates() now
@@ -704,21 +715,55 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       }
     }
 
+    // CON-8 — EQUIPMENT PREFERENCE, NOT JUST PERMISSION.
+    //
+    // Until now equipment was only ever a permission check: an exercise
+    // needing a barbell was allowed if you had one, and an exercise needing
+    // nothing was allowed always. Nothing ever PREFERRED the barbell when
+    // the person was standing next to it. Because bodyweight is the large
+    // majority of the database, random selection handed a gym user a
+    // session they could have done in their living room -- which is exactly
+    // what Graeme reported, twice.
+    //
+    // When the person has meaningful equipment available, equipment-using
+    // exercises are picked first within each category. The bodyweight
+    // fallback is untouched: if a category has no equipment option, or the
+    // person has no kit, behaviour is identical to before.
+    //
+    // Deliberately a preference and not a rule. A gym session that refused
+    // to include a press-up or a plank because they need no equipment would
+    // be worse, not better.
+    const preferEquipment = equipSet.size > 2;
+
+    function pickFrom(pool) {
+      if (pool.length === 0) return null;
+      if (preferEquipment) {
+        const withKit = pool.filter(e => (e.equipment || []).length > 0);
+        if (withKit.length > 0) {
+          return withKit[Math.floor(Math.random() * withKit.length)];
+        }
+      }
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
     // First pass: one from each category
     for (const cat of categories) {
       if (selected.length >= count) break;
       const fromCat = candidates.filter(e => e.category === cat && !selected.includes(e));
-      if (fromCat.length > 0) {
-        selected.push(fromCat[Math.floor(Math.random() * fromCat.length)]);
+      const pick = pickFrom(fromCat);
+      if (pick) {
+        selected.push(pick);
         usedCategories.add(cat);
       }
     }
 
     // Second pass: fill remaining slots
-    const remaining = candidates.filter(e => !selected.includes(e));
+    let remaining = candidates.filter(e => !selected.includes(e));
     while (selected.length < count && remaining.length > 0) {
-      const idx = Math.floor(Math.random() * remaining.length);
-      selected.push(remaining.splice(idx, 1)[0]);
+      const pick = pickFrom(remaining);
+      if (!pick) break;
+      selected.push(pick);
+      remaining = remaining.filter(e => e !== pick);
     }
 
     return selected.slice(0, count);

@@ -22,7 +22,11 @@ export const EQUIPMENT_CATEGORIES = [
       { id: 'medicine-ball', name: 'Medicine ball' },
       { id: 'slam-ball', name: 'Slam ball' },
       { id: 'ankle-weights', name: 'Ankle weights' },
-      { id: 'weighted-vest', name: 'Weighted vest' }
+      { id: 'weighted-vest', name: 'Weighted vest' },
+      { id: 'cable-machine', name: 'Cable machine' },
+      { id: 'leg-press-machine', name: 'Leg press machine' },
+      { id: 'leg-curl-machine', name: 'Leg curl machine' },
+      { id: 'chest-press-machine', name: 'Chest press machine' }
     ]
   },
   {
@@ -50,6 +54,7 @@ export const EQUIPMENT_CATEGORIES = [
       { id: 'rowing-machine', name: 'Rowing machine' },
       { id: 'elliptical', name: 'Elliptical/cross trainer' },
       { id: 'stair-climber', name: 'Stair climber' },
+      { id: 'ski-erg', name: 'Ski erg' },
       { id: 'skipping-rope', name: 'Skipping rope' },
       { id: 'outdoor-bike', name: 'Outdoor bike' },
       { id: 'air-bike', name: 'Air bike (Assault/Echo)' }
@@ -88,7 +93,8 @@ export const EQUIPMENT_CATEGORIES = [
       { id: 'speed-bag', name: 'Speed bag' },
       { id: 'boxing-gloves', name: 'Boxing gloves + pads' },
       { id: 'sandbag', name: 'Sandbag' },
-      { id: 'landmine', name: 'Landmine attachment' }
+      { id: 'landmine', name: 'Landmine attachment' },
+      { id: 'sled', name: 'Sled or prowler' }
     ]
   },
   {
