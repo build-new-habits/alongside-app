@@ -1,6 +1,21 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 11 Aug 2026 v5
+ *
+ * v5 — WOW-4 (PT-7). Locked session types and durations now use auth.js's
+ *   lockedFeature() instead of the HTML disabled attribute plus an inline
+ *   opacity:0.45. disabled removes an element from the tab order entirely,
+ *   so the "-- Personal tier" aria-label was unreachable by keyboard and
+ *   screen reader, and tapping did nothing at all — a dead end at the best
+ *   conversion moment in the product. lockedFeature() is focusable,
+ *   announced, and routes to /upgrade, matching noticing.js's In Step.
+ *   Also removed this file's private isPremium() duplicate in favour of
+ *   auth.js's — that duplicate had already caused one real bug (v2's
+ *   userTier/tier fix), which is precisely the drift auth.js exists to stop.
+ *   Third competing "locked" visual language retired; two remain, both
+ *   tappable (this one and progress.js's export lock).
+ *
  * 05 Aug 2026 v4
  *
  * v4 -- Gym Session Builder Phase 1 (blueprint
@@ -93,6 +108,7 @@
 import { store }                          from "../store.js";
 import { router }                         from "../router.js";
 import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection } from "../session-builder.js";
+import { isPremium, lockedFeature }        from "../auth.js";
 
 export const centered = false;
 
@@ -110,10 +126,11 @@ let builtSession       = null;
 let preselectChecked   = false;     // guards the store-preselect read to run once per mount
 
 // ── Tier check ────────────────────────────────────────────────────────────────
-function isPremium() {
-  const tier = store.get("tier") || "free";
-  return tier === "personal" || tier === "athlete";
-}
+// 11 Aug 2026 v5 (WOW-4/PT-7) — local isPremium() removed. This file had its
+// own copy, byte-identical in behaviour to auth.js's, which is exactly the
+// drift auth.js exists to prevent (v2 had already fixed a userTier/tier bug
+// in this very duplicate). Now imported. Single implementation, one place to
+// change if tier names ever move.
 
 // ── Duration options ──────────────────────────────────────────────────────────
 const DURATIONS = [
@@ -230,25 +247,46 @@ function renderTypePicker() {
       <div style="display: flex; flex-direction: column; gap: var(--space-3);"
            role="group" aria-label="Choose session type">
         ${SESSION_TYPES.map(t => {
-          const locked  = !premium && t.id !== "full";
-          const cursor  = locked ? "default" : "pointer";
-          const opacity = locked ? "0.45" : "1";
-          const ariaLabel = locked ? t.label + " -- Personal tier" : t.label;
-          const badge = locked
-            ? "<span style='font-size:var(--text-xs);color:var(--color-primary);flex-shrink:0;'>Personal</span>"
-            : "<span style='color:var(--color-primary);font-size:1.25rem;flex-shrink:0;' aria-hidden='true'>&#8250;</span>";
-          return `
-            <button class="card sb-type-tile"
-                    data-type="${t.id}"
-                    ${locked ? "disabled" : ""}
-                    style="display:flex;align-items:center;gap:var(--space-4);text-align:left;width:100%;cursor:${cursor};opacity:${opacity};background:var(--color-surface);"
-                    aria-label="${ariaLabel}">
+          const locked = !premium && t.id !== "full";
+
+          // Shared inner content — identical for locked and unlocked so the
+          // two states read as the same product, not two designs.
+          const inner = `
               <span style="font-size:2rem;flex-shrink:0;line-height:1;" aria-hidden="true">${t.icon}</span>
               <div style="flex:1;min-width:0;">
                 <p style="font-size:var(--text-base);font-weight:var(--font-semibold);margin-bottom:var(--space-1);">${t.label}</p>
                 <p class="text-secondary" style="font-size:var(--text-sm);">${t.description}</p>
-              </div>
-              ${badge}
+              </div>`;
+
+          // 11 Aug 2026 (WOW-4/PT-7). Locked tiles were rendered with the
+          // HTML disabled attribute, which removes them from the tab order
+          // entirely — so the aria-label explaining "Personal tier" was
+          // unreachable by keyboard and screen reader, and tapping did
+          // nothing at all. Priya (persona 2.15) taps "Lower body", wants it
+          // enough to reach for it, and the app ignores her: the single best
+          // conversion moment in the product, doing nothing.
+          //
+          // Now uses auth.js's lockedFeature(), the same treatment
+          // noticing.js already uses for In Step — focusable, announced, and
+          // tapping routes to /upgrade. A <div> is used inside, never a
+          // <button>: lockedFeature() returns role="button" and nesting one
+          // interactive control inside another is invalid.
+          if (locked) {
+            return lockedFeature(`
+            <div class="card"
+                 style="display:flex;align-items:center;gap:var(--space-4);text-align:left;width:100%;background:var(--color-surface);">
+              ${inner}
+            </div>
+          `, "personal", t.label + " session");
+          }
+
+          return `
+            <button class="card sb-type-tile"
+                    data-type="${t.id}"
+                    style="display:flex;align-items:center;gap:var(--space-4);text-align:left;width:100%;cursor:pointer;background:var(--color-surface);"
+                    aria-label="${t.label}">
+              ${inner}
+              <span style="color:var(--color-primary);font-size:1.25rem;flex-shrink:0;" aria-hidden="true">&#8250;</span>
             </button>
           `;
         }).join("")}
@@ -286,27 +324,33 @@ function renderDurationPicker() {
       <div style="display:flex;flex-direction:column;gap:var(--space-3);"
            role="group" aria-label="Choose duration">
         ${DURATIONS.map(d => {
-          const locked  = !premium && d.mins !== 30;
-          const opacity = locked ? "0.45" : "1";
-          const cursor  = locked ? "default" : "pointer";
-          const recLabel = (!locked && d.mins === 30)
-            ? "<span style='font-size:var(--text-xs);color:var(--color-primary);flex-shrink:0;'>Recommended</span>"
-            : "";
-          const lockLabel = locked
-            ? "<span style='font-size:var(--text-xs);color:var(--color-primary);flex-shrink:0;'>Personal</span>"
-            : "";
-          const ariaLabel = d.label + ": " + d.desc + (locked ? " -- Personal tier" : "");
-          return `
-            <button class="card sb-duration-btn"
-                    data-mins="${d.mins}"
-                    ${locked ? "disabled" : ""}
-                    style="display:flex;align-items:center;justify-content:space-between;text-align:left;width:100%;cursor:${cursor};opacity:${opacity};background:var(--color-surface);"
-                    aria-label="${ariaLabel}">
+          const locked = !premium && d.mins !== 30;
+          const inner = `
               <div>
                 <span style="font-size:var(--text-lg);font-weight:var(--font-semibold);">${d.label}</span>
                 <span class="text-secondary" style="font-size:var(--text-sm);margin-left:var(--space-2);">${d.desc}</span>
-              </div>
-              ${recLabel}${lockLabel}
+              </div>`;
+
+          // 11 Aug 2026 (WOW-4/PT-7) — same swap as the type picker above.
+          if (locked) {
+            return lockedFeature(`
+            <div class="card"
+                 style="display:flex;align-items:center;justify-content:space-between;text-align:left;width:100%;background:var(--color-surface);">
+              ${inner}
+            </div>
+          `, "personal", d.label + " sessions");
+          }
+
+          const recLabel = d.mins === 30
+            ? "<span style='font-size:var(--text-xs);color:var(--color-primary);flex-shrink:0;'>Recommended</span>"
+            : "";
+          return `
+            <button class="card sb-duration-btn"
+                    data-mins="${d.mins}"
+                    style="display:flex;align-items:center;justify-content:space-between;text-align:left;width:100%;cursor:pointer;background:var(--color-surface);"
+                    aria-label="${d.label}: ${d.desc}">
+              ${inner}
+              ${recLabel}
             </button>
           `;
         }).join("")}
@@ -740,7 +784,7 @@ export function onMount() {
   });
 
   // Type selection
-  document.querySelectorAll(".sb-type-tile:not([disabled])").forEach(btn => {
+  document.querySelectorAll(".sb-type-tile").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedType = btn.dataset.type;
       if (isPremium()) {
@@ -767,7 +811,7 @@ export function onMount() {
   });
 
   // Duration selection
-  document.querySelectorAll(".sb-duration-btn:not([disabled])").forEach(btn => {
+  document.querySelectorAll(".sb-duration-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedDuration = parseInt(btn.dataset.mins);
       if (isPremium()) {
