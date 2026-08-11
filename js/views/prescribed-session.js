@@ -1,9 +1,22 @@
 /**
  * prescribed-session.js - Prescribed Exercise Session View
  *
- * 04 Aug 2026 v3
+ * 10 Aug 2026 v4
  *
  * CHANGELOG
+ * 10 Aug 2026 v4 - Added full exercise guidance (exercise-detail
+ *   consistency audit, Graeme's direct request — this was the most
+ *   concerning file found, showing name + sets/reps + notes only for
+ *   every prescribed exercise, nothing else, ever). Reuses the exact
+ *   EXERCISES lookup pattern _checkContraindication() already used:
+ *   for exercises linked to the shared database via exerciseId, now
+ *   shows instructions/coaching/why plus a tailored YouTube link, all
+ *   at 100% data coverage already — this was purely a display gap, not
+ *   missing content. Manually-added prescribed exercises (no
+ *   exerciseId) correctly continue showing notes only, since there's
+ *   genuinely nothing else to show for those. Verified both paths with
+ *   a direct test before shipping.
+ *
  * 04 Aug 2026 v3 - Real safety gap found and fixed. This file read
  *   zero condition/pain data — unlike every other session type in the
  *   app (core-session.js, workoutGenerator.js both check
@@ -176,6 +189,51 @@ export function render() {
             </div>
           </div>
         ` : ""}
+
+        <!-- Full guidance (only when this prescribed exercise is linked to
+             the shared database via exerciseId — manually-added exercises
+             have no instructions/coaching/why/youtube to show, correctly
+             show notes only). Same lookup _checkContraindication() already
+             uses, same three-section structure workout.js uses. Found 10
+             Aug: this screen previously showed name + sets/reps + notes
+             only, nothing else, for every prescribed exercise regardless
+             of whether the linked database entry had full guidance
+             available — it did, at 100% coverage, just never displayed. -->
+        ${(() => {
+          const fullEx = ex.exerciseId ? EXERCISES.find(e => e.id === ex.exerciseId) : null;
+          if (!fullEx) return "";
+          return `
+            <div class="exercise-instructions card" role="region" aria-label="Exercise guidance for ${ex.name}">
+              ${fullEx.instructions && fullEx.instructions.length > 0 ? `
+                <span class="exercise-section-label" id="ps-section-setup">How to get there</span>
+                <ul class="exercise-section-list" aria-labelledby="ps-section-setup">
+                  ${fullEx.instructions.map(inst => `<li>${inst}</li>`).join("")}
+                </ul>
+              ` : ""}
+              ${fullEx.coaching ? `
+                <hr class="exercise-section-divider" aria-hidden="true">
+                <span class="exercise-section-label" id="ps-section-focus">What to focus on</span>
+                <div class="coaching-tip" aria-labelledby="ps-section-focus">
+                  <span class="tip-icon" aria-hidden="true">\uD83D\uDCA1</span>
+                  <p>${fullEx.coaching}</p>
+                </div>
+              ` : ""}
+              ${fullEx.why ? `
+                <hr class="exercise-section-divider" aria-hidden="true">
+                <span class="exercise-section-label" id="ps-section-why">Why this helps</span>
+                <p class="exercise-why-text" aria-labelledby="ps-section-why">${fullEx.why}</p>
+              ` : ""}
+            </div>
+            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(fullEx.youtube || (ex.name + " exercise form"))}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="youtube-link"
+               aria-label="Watch how to do ${ex.name} on YouTube (opens in new tab)">
+              <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
+              Watch how to do this
+            </a>
+          `;
+        })()}
 
         <!-- Notes -->
         ${ex.notes ? `

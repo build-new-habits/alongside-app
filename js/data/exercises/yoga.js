@@ -1,5 +1,13 @@
 /**
  * data/exercises/yoga.js
+ * 10 Aug 2026 v1
+ *
+ * v1 — First version header on this file. Added tailored YouTube search
+ *   terms to all 30 exercises (previously zero coverage, database-wide
+ *   461-exercise pass, Graeme's direct request: "we get the most up to
+ *   date versions and avoid any issue with discontinued or old videos"
+ *   — search terms, not direct links, matching the reasoning exactly).
+ *
  * Yoga — individual poses and full flows
  * contentType: 'exercise' for individual poses, 'practice' for full flows
  * movementPattern: 'yoga-pose' or 'yoga-flow'
@@ -16,6 +24,7 @@ export const YOGA = [
   {
     id: 'yoga-downward-dog',
     name: 'Downward Facing Dog',
+    youtube: 'downward facing dog yoga pose tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -41,6 +50,7 @@ export const YOGA = [
   {
     id: 'yoga-warrior-1',
     name: 'Warrior I',
+    youtube: 'warrior 1 yoga pose tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -67,6 +77,7 @@ export const YOGA = [
   {
     id: 'yoga-warrior-2',
     name: 'Warrior II',
+    youtube: 'warrior 2 yoga pose tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -93,6 +104,7 @@ export const YOGA = [
   {
     id: 'yoga-triangle',
     name: 'Triangle Pose',
+    youtube: 'triangle pose yoga tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -119,6 +131,7 @@ export const YOGA = [
   {
     id: 'yoga-chair-pose',
     name: 'Chair Pose',
+    youtube: 'chair pose yoga tutorial',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -144,6 +157,7 @@ export const YOGA = [
   {
     id: 'yoga-tree-pose',
     name: 'Tree Pose',
+    youtube: 'tree pose yoga tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -168,6 +182,7 @@ export const YOGA = [
   {
     id: 'yoga-cobra',
     name: 'Cobra Pose',
+    youtube: 'cobra pose yoga tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -193,6 +208,7 @@ export const YOGA = [
   {
     id: 'yoga-seated-forward-fold',
     name: 'Seated Forward Fold',
+    youtube: 'seated forward fold yoga pose tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -219,6 +235,7 @@ export const YOGA = [
   {
     id: 'yoga-crescent-lunge',
     name: 'Crescent Lunge',
+    youtube: 'crescent lunge yoga pose tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -241,6 +258,7 @@ export const YOGA = [
   {
     id: 'yoga-half-moon',
     name: 'Half Moon Pose',
+    youtube: 'half moon pose yoga tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -267,6 +285,7 @@ export const YOGA = [
   {
     id: 'yoga-corpse-pose',
     name: 'Corpse Pose (Savasana)',
+    youtube: 'corpse pose savasana yoga tutorial',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'yoga-pose',
@@ -293,6 +312,7 @@ export const YOGA = [
   {
     id: 'yoga-warrior-3',
     name: 'Warrior III',
+    youtube: 'warrior 3 yoga pose tutorial',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -318,6 +338,7 @@ export const YOGA = [
   {
     id: 'yoga-boat-pose',
     name: 'Boat Pose',
+    youtube: 'boat pose yoga tutorial',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -343,6 +364,7 @@ export const YOGA = [
   {
     id: 'yoga-bridge-pose',
     name: 'Bridge Pose',
+    youtube: 'bridge pose yoga tutorial',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -369,6 +391,7 @@ export const YOGA = [
   {
     id: 'yoga-pigeon-pose',
     name: 'Pigeon Pose',
+    youtube: 'pigeon pose yoga tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -396,6 +419,7 @@ export const YOGA = [
   {
     id: 'yoga-supine-twist',
     name: 'Supine Spinal Twist',
+    youtube: 'supine spinal twist yoga pose tutorial',
     category: 'recovery',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -422,6 +446,7 @@ export const YOGA = [
   {
     id: 'yoga-legs-up-wall',
     name: 'Legs Up the Wall',
+    youtube: 'legs up the wall yoga pose tutorial',
     category: 'recovery',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -449,6 +474,7 @@ export const YOGA = [
   {
     id: 'yoga-cat-cow-flow',
     name: 'Cat-Cow Flow',
+    youtube: 'cat-cow flow yoga pose tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -480,6 +506,7 @@ export const YOGA = [
   {
     id: 'yoga-flow-morning',
     name: 'Morning Wake-Up Flow',
+    youtube: 'morning wake-up flow yoga pose tutorial',
     category: 'mobility',
     contentType: 'practice',
     movementPattern: 'yoga-flow',
@@ -511,6 +538,7 @@ export const YOGA = [
   {
     id: 'yoga-flow-evening',
     name: 'Evening Wind-Down Flow',
+    youtube: 'evening wind-down flow yoga pose tutorial',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'yoga-flow',
@@ -548,6 +576,7 @@ export const YOGA = [
   {
     id: 'yoga-sun-salutation-b',
     name: 'Sun Salutation B',
+    youtube: 'sun salutation b yoga pose tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-flow',
@@ -578,6 +607,7 @@ export const YOGA = [
   {
     id: 'yoga-yin-hip-sequence',
     name: 'Yin Yoga — Hip Opening Sequence',
+    youtube: 'yin yoga - hip opening sequence yoga pose tutorial',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'yoga-flow',
@@ -607,6 +637,7 @@ export const YOGA = [
   {
     id: 'yoga-restorative-sequence',
     name: 'Restorative Yoga Sequence',
+    youtube: 'restorative yoga sequence yoga pose tutorial',
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'yoga-flow',
@@ -632,6 +663,7 @@ export const YOGA = [
   {
     id: 'yoga-balance-series',
     name: 'Balance Challenge Series',
+    youtube: 'balance challenge series yoga pose tutorial',
     category: 'strength',
     contentType: 'practice',
     movementPattern: 'yoga-pose',
@@ -661,6 +693,7 @@ export const YOGA = [
   {
     id: 'yoga-forward-fold-series',
     name: 'Forward Fold Series',
+    youtube: 'forward fold series yoga pose tutorial',
     category: 'mobility',
     contentType: 'practice',
     movementPattern: 'yoga-pose',
@@ -688,6 +721,7 @@ export const YOGA = [
   {
     id: 'yoga-backbend-series',
     name: 'Backbend Opening Series',
+    youtube: 'backbend opening series yoga pose tutorial',
     category: 'mobility',
     contentType: 'practice',
     movementPattern: 'yoga-pose',
@@ -716,6 +750,7 @@ export const YOGA = [
   {
     id: 'yoga-power-flow',
     name: 'Power Yoga Flow — 30 Minutes',
+    youtube: 'power yoga flow - 30 minutes yoga pose tutorial',
     category: 'strength',
     contentType: 'practice',
     movementPattern: 'yoga-flow',
@@ -743,6 +778,7 @@ export const YOGA = [
   {
     id: 'yoga-pranayama',
     name: 'Pranayama Breathing Practice',
+    youtube: 'pranayama breathing practice yoga pose tutorial',
     category: 'mindfulness',
     contentType: 'practice',
     movementPattern: 'breath-awareness',
@@ -768,6 +804,7 @@ export const YOGA = [
   {
     id: 'yoga-chair',
     name: 'Chair Yoga — Seated Sequence',
+    youtube: 'chair yoga - seated sequence yoga pose tutorial',
     category: 'mobility',
     contentType: 'practice',
     movementPattern: 'yoga-pose',
@@ -795,6 +832,7 @@ export const YOGA = [
   {
     id: 'yoga-hip-strength',
     name: 'Hip Strength and Stability — Yoga',
+    youtube: 'hip strength and stability yoga pose tutorial',
     category: 'strength',
     contentType: 'practice',
     movementPattern: 'yoga-pose',

@@ -1,5 +1,13 @@
 /**
  * data/exercises/running.js
+ * 10 Aug 2026 v1
+ *
+ * v1 — First version header on this file. Added tailored YouTube search
+ *   terms to all 35 exercises (previously zero coverage, database-wide
+ *   461-exercise pass, Graeme's direct request: "we get the most up to
+ *   date versions and avoid any issue with discontinued or old videos"
+ *   — search terms, not direct links, matching the reasoning exactly).
+ *
  * Running — C25K programme sessions, 5K performance, 10K/endurance, drills
  * contentType: 'practice' for full sessions, 'exercise' for drills
  *
@@ -17,6 +25,7 @@ export const RUNNING = [
   {
     id: 'c25k-week1',
     name: 'C25K — Week 1 Session',
+    youtube: 'couch to 5k week 1 running plan',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -44,6 +53,7 @@ export const RUNNING = [
   {
     id: 'c25k-week2',
     name: 'C25K — Week 2 Session',
+    youtube: 'couch to 5k week 2 running plan',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -71,6 +81,7 @@ export const RUNNING = [
   {
     id: 'c25k-week3',
     name: 'C25K — Week 3 Session',
+    youtube: 'couch to 5k week 3 running plan',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -97,6 +108,7 @@ export const RUNNING = [
   {
     id: 'c25k-week4',
     name: 'C25K — Week 4 Session',
+    youtube: 'couch to 5k week 4 running plan',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -124,6 +136,7 @@ export const RUNNING = [
   {
     id: 'c25k-week5-day1',
     name: 'C25K — Week 5, Session 1',
+    youtube: 'couch to 5k week 5 running plan',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -150,6 +163,7 @@ export const RUNNING = [
   {
     id: 'c25k-week5-day3',
     name: 'C25K — Week 5, Session 3 (20-Minute Run)',
+    youtube: 'couch to 5k week 5 day 3 20 minute run',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -175,6 +189,7 @@ export const RUNNING = [
   {
     id: 'c25k-week6',
     name: 'C25K — Week 6 Session',
+    youtube: 'couch to 5k week 6 running plan',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -200,6 +215,7 @@ export const RUNNING = [
   {
     id: 'c25k-week7',
     name: 'C25K — Week 7 Session (25-Minute Run)',
+    youtube: 'couch to 5k week 7 running plan',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -224,6 +240,7 @@ export const RUNNING = [
   {
     id: 'c25k-week8',
     name: 'C25K — Week 8 Session (28-Minute Run)',
+    youtube: 'couch to 5k week 8 running plan',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -248,6 +265,7 @@ export const RUNNING = [
   {
     id: 'c25k-week9',
     name: 'C25K — Week 9, Graduation Run (30 Minutes)',
+    youtube: 'couch to 5k graduation run week 9',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -278,6 +296,7 @@ export const RUNNING = [
   {
     id: 'run-easy-20',
     name: 'Easy Run — 20 Minutes',
+    youtube: 'easy run pace guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -304,6 +323,7 @@ export const RUNNING = [
   {
     id: 'run-tempo-20',
     name: 'Tempo Run — 20 Minutes',
+    youtube: 'tempo run pacing guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -330,6 +350,7 @@ export const RUNNING = [
   {
     id: 'run-intervals-400m',
     name: '400m Intervals × 6',
+    youtube: '400m interval training technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -356,6 +377,7 @@ export const RUNNING = [
   {
     id: 'run-intervals-800m',
     name: '800m Intervals × 4',
+    youtube: '800m interval training technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -382,6 +404,7 @@ export const RUNNING = [
   {
     id: 'run-fartlek-25',
     name: 'Fartlek Run — 25 Minutes',
+    youtube: 'fartlek training explained',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -409,6 +432,7 @@ export const RUNNING = [
   {
     id: 'run-progression',
     name: 'Progression Run — 30 Minutes',
+    youtube: 'progression run pacing guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -435,6 +459,7 @@ export const RUNNING = [
   {
     id: 'run-hills',
     name: 'Hill Repeat Session',
+    youtube: 'hill repeats running technique',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -462,6 +487,7 @@ export const RUNNING = [
   {
     id: 'run-strides',
     name: 'Strides',
+    youtube: 'running strides technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -489,6 +515,7 @@ export const RUNNING = [
   {
     id: 'run-parkrun',
     name: 'Parkrun Effort — 5K Race Simulation',
+    youtube: 'parkrun race pacing guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -516,6 +543,7 @@ export const RUNNING = [
   {
     id: 'run-5k-time-trial',
     name: '5K Time Trial',
+    youtube: '5k time trial pacing guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -547,6 +575,7 @@ export const RUNNING = [
   {
     id: 'run-drill-high-knees',
     name: 'High Knees',
+    youtube: 'high knees running drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -574,6 +603,7 @@ export const RUNNING = [
   {
     id: 'run-drill-butt-kicks',
     name: 'Butt Kicks',
+    youtube: 'butt kicks running drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -600,6 +630,7 @@ export const RUNNING = [
   {
     id: 'run-drill-a-skip',
     name: 'A-Skip',
+    youtube: 'a-skip running drill tutorial',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -627,6 +658,7 @@ export const RUNNING = [
   {
     id: 'run-drill-b-skip',
     name: 'B-Skip',
+    youtube: 'b-skip running drill tutorial',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -654,6 +686,7 @@ export const RUNNING = [
   {
     id: 'run-drill-bounding',
     name: 'Bounding',
+    youtube: 'bounding running drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -681,6 +714,7 @@ export const RUNNING = [
   {
     id: 'run-drill-cadence',
     name: 'Cadence Drill',
+    youtube: 'running cadence drill technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -708,6 +742,7 @@ export const RUNNING = [
   {
     id: 'run-drill-stride-outs',
     name: 'Stride-Outs',
+    youtube: 'stride outs running technique',
     category: 'cardio',
     contentType: 'exercise',
     movementPattern: 'locomotion',
@@ -739,6 +774,7 @@ export const RUNNING = [
   {
     id: 'run-easy-30',
     name: 'Easy Run — 30 Minutes',
+    youtube: 'easy run pace guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -764,6 +800,7 @@ export const RUNNING = [
   {
     id: 'run-tempo-30',
     name: 'Tempo Run — 30 Minutes',
+    youtube: 'tempo run pacing guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -788,6 +825,7 @@ export const RUNNING = [
   {
     id: 'run-intervals-1k',
     name: '1K Intervals × 5',
+    youtube: '1k interval training guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -814,6 +852,7 @@ export const RUNNING = [
   {
     id: 'run-cruise-intervals',
     name: 'Cruise Intervals',
+    youtube: 'cruise intervals running guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -840,6 +879,7 @@ export const RUNNING = [
   {
     id: 'run-marathon-pace',
     name: 'Marathon Pace Run — 40 Minutes',
+    youtube: 'marathon pace training guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -865,6 +905,7 @@ export const RUNNING = [
   {
     id: 'run-long-60',
     name: 'Long Run — 60 Minutes',
+    youtube: 'long run pacing guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -891,6 +932,7 @@ export const RUNNING = [
   {
     id: 'run-long-slow-90',
     name: 'Long Slow Run — 90 Minutes',
+    youtube: 'long slow run pacing guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',
@@ -917,6 +959,7 @@ export const RUNNING = [
   {
     id: 'run-back-to-back',
     name: 'Back-to-Back Run Days',
+    youtube: 'back to back running days training guide',
     category: 'cardio',
     contentType: 'practice',
     movementPattern: 'locomotion',

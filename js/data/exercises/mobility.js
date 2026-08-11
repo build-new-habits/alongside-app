@@ -1,6 +1,16 @@
 /**
  * data/exercises/mobility.js
- * 04 Aug 2026 v2
+ * 10 Aug 2026 v3
+ *
+ * v3 — Added tailored YouTube search terms to all 38 exercises
+ *   (previously zero coverage across the whole file, part of a
+ *   database-wide 461-exercise pass, Graeme's direct request). Also
+ *   fixed the one entry my transformation script missed on the first
+ *   pass — "World's Greatest Stretch" uses double-quoted name (has an
+ *   apostrophe), regex only matched single-quoted names. Confirmed via
+ *   the pass this is a genuine duplicate content entry (id
+ *   world-greatest-stretch vs worlds-greatest-stretch, same pose,
+ *   drifted metadata) — flagged for Graeme, not merged tonight.
  *
  * v2 — Phase B, Home Nav & Conditions Redesign (core-session.js pool
  *   consolidation). Added sets/reps/holdSeconds/rest/cues/description
@@ -17,6 +27,7 @@ export const MOBILITY = [
   {
     id: 'hip-flexor-stretch',
     name: 'Hip Flexor Stretch',
+    youtube: 'hip flexor stretch technique',
     category: 'mobility',
     movementPattern: 'stretch',
     equipment: [],
@@ -52,6 +63,7 @@ export const MOBILITY = [
   {
     id: 'cat-cow',
     name: 'Cat-Cow Stretch',
+    youtube: 'cat-cow stretch technique',
     category: 'mobility',
     movementPattern: 'spinal-flexion-extension',
     equipment: [],
@@ -77,6 +89,7 @@ export const MOBILITY = [
   {
     id: 'world-greatest-stretch',
     name: 'World\'s Greatest Stretch',
+    youtube: 'worlds greatest stretch technique',
     category: 'mobility',
     movementPattern: 'stretch',
     equipment: [],
@@ -102,6 +115,7 @@ export const MOBILITY = [
   {
     id: '90-90-hip-stretch',
     name: '90-90 Hip Stretch',
+    youtube: '90-90 hip stretch technique',
     category: 'mobility',
     movementPattern: 'hip-rotation',
     equipment: [],
@@ -138,6 +152,7 @@ export const MOBILITY = [
   {
     id: 'thoracic-rotation',
     name: 'Thoracic Rotation',
+    youtube: 'thoracic rotation technique',
     category: 'mobility',
     movementPattern: 'spinal-rotation',
     equipment: [],
@@ -179,6 +194,7 @@ export const MOBILITY = [
   {
     id: 'leg-swing-forward',
     name: 'Leg Swing — Forward and Back',
+    youtube: 'leg swing - forward and back stretch technique',
     category: 'mobility',
     movementPattern: 'hip-flexion',
     equipment: [],
@@ -204,6 +220,7 @@ export const MOBILITY = [
   {
     id: 'leg-swing-lateral',
     name: 'Leg Swing — Lateral',
+    youtube: 'leg swing - lateral stretch technique',
     category: 'mobility',
     movementPattern: 'hip-abduction',
     equipment: [],
@@ -229,6 +246,7 @@ export const MOBILITY = [
   {
     id: 'inchworm',
     name: 'Inchworm',
+    youtube: 'inchworm stretch technique',
     category: 'mobility',
     movementPattern: 'stretch',
     equipment: [],
@@ -256,6 +274,7 @@ export const MOBILITY = [
   {
     id: 'lateral-lunge-reach',
     name: 'Lateral Lunge with Reach',
+    youtube: 'lateral lunge with reach stretch technique',
     category: 'mobility',
     movementPattern: 'lunge',
     equipment: [],
@@ -282,6 +301,7 @@ export const MOBILITY = [
   {
     id: 'hip-cars',
     name: 'Hip CARs',
+    youtube: 'hip cars stretch technique',
     category: 'mobility',
     movementPattern: 'hip-rotation',
     equipment: [],
@@ -320,6 +340,7 @@ export const MOBILITY = [
   {
     id: 'ankle-circles',
     name: 'Ankle Circles',
+    youtube: 'ankle circles technique',
     category: 'mobility',
     movementPattern: 'ankle-mobility',
     equipment: [],
@@ -344,6 +365,7 @@ export const MOBILITY = [
   {
     id: 'deep-squat-hold',
     name: 'Deep Squat Hold',
+    youtube: 'deep squat hold stretch technique',
     category: 'mobility',
     movementPattern: 'squat',
     equipment: [],
@@ -369,6 +391,7 @@ export const MOBILITY = [
   {
     id: 'couch-stretch',
     name: 'Couch Stretch',
+    youtube: 'couch stretch technique',
     category: 'mobility',
     movementPattern: 'stretch',
     equipment: [],
@@ -394,6 +417,7 @@ export const MOBILITY = [
   {
     id: 'pigeon-pose',
     name: 'Pigeon Pose',
+    youtube: 'pigeon pose stretch technique',
     category: 'mobility',
     movementPattern: 'hip-rotation',
     equipment: [],
@@ -421,6 +445,7 @@ export const MOBILITY = [
   {
     id: 'thread-the-needle',
     name: 'Thread the Needle',
+    youtube: 'thread the needle stretch technique',
     category: 'mobility',
     movementPattern: 'spinal-rotation',
     equipment: [],
@@ -446,6 +471,7 @@ export const MOBILITY = [
   {
     id: 'standing-quad-stretch',
     name: 'Standing Quad Stretch',
+    youtube: 'standing quad stretch technique',
     category: 'mobility',
     movementPattern: 'stretch',
     equipment: [],
@@ -471,6 +497,7 @@ export const MOBILITY = [
   {
     id: 'upper-trap-stretch',
     name: 'Upper Trapezius Stretch',
+    youtube: 'upper trapezius stretch technique',
     category: 'mobility',
     movementPattern: 'stretch',
     equipment: [],
@@ -497,6 +524,7 @@ export const MOBILITY = [
   {
     id: 'chest-opener-arms-back',
     name: 'Chest Opener — Arms Behind',
+    youtube: 'chest opener - arms behind stretch technique',
     category: 'mobility',
     movementPattern: 'stretch',
     equipment: [],
@@ -522,6 +550,7 @@ export const MOBILITY = [
   {
     id: 'adductor-stretch-standing',
     name: 'Standing Adductor Stretch',
+    youtube: 'standing adductor stretch technique',
     category: 'mobility',
     movementPattern: 'stretch',
     equipment: [],
@@ -547,6 +576,7 @@ export const MOBILITY = [
   {
     id: 'spinal-flexion-extension-standing',
     name: 'Standing Spinal Wave',
+    youtube: 'standing spinal wave stretch technique',
     category: 'mobility',
     movementPattern: 'spinal-flexion-extension',
     equipment: [],
@@ -581,6 +611,7 @@ export const MOBILITY = [
   {
     id: 'worlds-greatest-stretch',
     name: "World's Greatest Stretch",
+    youtube: 'worlds greatest stretch yoga pose tutorial',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'yoga-pose',
@@ -610,6 +641,7 @@ export const MOBILITY = [
   {
     id: 'thoracic-rotation-seated',
     name: 'Seated Thoracic Rotation',
+    youtube: 'seated thoracic rotation technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'rotation',
@@ -638,6 +670,7 @@ export const MOBILITY = [
   {
     id: 'thoracic-extension-foam-roll',
     name: 'Thoracic Extension Over Foam Roller',
+    youtube: 'thoracic extension over foam roller stretch technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'extension',
@@ -676,6 +709,7 @@ export const MOBILITY = [
   {
     id: 'ankle-mobility-circles',
     name: 'Ankle Circles and CARs',
+    youtube: 'ankle circles and cars technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
@@ -703,6 +737,7 @@ export const MOBILITY = [
   {
     id: 'ankle-wall-dorsiflexion',
     name: 'Ankle Dorsiflexion Drill — Wall',
+    youtube: 'ankle dorsiflexion drill - wall stretch technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
@@ -730,6 +765,7 @@ export const MOBILITY = [
   {
     id: 'wrist-extension-floor',
     name: 'Wrist Extension on Floor',
+    youtube: 'wrist extension on floor stretch technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
@@ -756,6 +792,7 @@ export const MOBILITY = [
   {
     id: 'hip-90-90-stretch',
     name: 'Hip 90-90 Stretch',
+    youtube: 'hip 90-90 stretch technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'hip-rotation',
@@ -783,6 +820,7 @@ export const MOBILITY = [
   {
     id: 'hip-flexor-sofa-stretch',
     name: 'Couch Stretch',
+    youtube: 'couch stretch technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'hip-rotation',
@@ -809,6 +847,7 @@ export const MOBILITY = [
   {
     id: 'shoulder-cars-standing',
     name: 'Shoulder CARs — Standing',
+    youtube: 'shoulder cars - standing stretch technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
@@ -836,6 +875,7 @@ export const MOBILITY = [
   {
     id: 'spinal-cars',
     name: 'Spinal CARs',
+    youtube: 'spinal cars stretch technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'rotation',
@@ -862,6 +902,7 @@ export const MOBILITY = [
   {
     id: 'frog-stretch',
     name: 'Frog Stretch',
+    youtube: 'frog stretch technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'hip-rotation',
@@ -888,6 +929,7 @@ export const MOBILITY = [
   {
     id: 'shoulder-dislocates',
     name: 'Shoulder Dislocates — Band',
+    youtube: 'shoulder dislocates - band stretch technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
@@ -915,6 +957,7 @@ export const MOBILITY = [
   {
     id: 'neck-mobility',
     name: 'Neck Mobility Routine',
+    youtube: 'neck mobility routine stretch technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
@@ -944,6 +987,7 @@ export const MOBILITY = [
   {
     id: 'hip-circles-standing',
     name: 'Standing Hip Circles',
+    youtube: 'standing hip circles technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'joint-rotation',
@@ -970,6 +1014,7 @@ export const MOBILITY = [
   {
     id: 'prone-thoracic-rotation',
     name: 'Prone Thoracic Rotation',
+    youtube: 'prone thoracic rotation technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'rotation',
@@ -1008,6 +1053,7 @@ export const MOBILITY = [
   {
     id: 'seated-figure-4-stretch',
     name: 'Seated Figure-4 Stretch',
+    youtube: 'seated figure-4 stretch technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'hip-rotation',
@@ -1035,6 +1081,7 @@ export const MOBILITY = [
   {
     id: 'mobility-flow-5min',
     name: 'Five-Minute Morning Mobility Flow',
+    youtube: 'five-minute morning mobility flow stretch technique',
     category: 'mobility',
     contentType: 'practice',
     movementPattern: 'yoga-flow',
@@ -1064,6 +1111,7 @@ export const MOBILITY = [
   {
     id: 'hip-flexor-progressive',
     name: 'Hip Flexor Progressive Series',
+    youtube: 'hip flexor progressive series stretch technique',
     category: 'mobility',
     contentType: 'practice',
     movementPattern: 'hip-rotation',

@@ -1,5 +1,13 @@
 /**
  * data/exercises/pilates.js
+ * 10 Aug 2026 v1
+ *
+ * v1 — First version header on this file. Added tailored YouTube search
+ *   terms to all 24 exercises (previously zero coverage, database-wide
+ *   461-exercise pass, Graeme's direct request: "we get the most up to
+ *   date versions and avoid any issue with discontinued or old videos"
+ *   — search terms, not direct links, matching the reasoning exactly).
+ *
  * Pilates — individual moves and full sequences
  * contentType: 'exercise' for individual moves, 'practice' for sequences
  * movementPattern: 'pilates-move' or 'pilates-sequence'
@@ -16,6 +24,7 @@ export const PILATES = [
   {
     id: 'pilates-hundred',
     name: 'The Hundred',
+    youtube: 'the hundred pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -43,6 +52,7 @@ export const PILATES = [
   {
     id: 'pilates-roll-up',
     name: 'Roll-Up',
+    youtube: 'roll-up pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -71,6 +81,7 @@ export const PILATES = [
   {
     id: 'pilates-single-leg-stretch',
     name: 'Single Leg Stretch',
+    youtube: 'single leg stretch pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -98,6 +109,7 @@ export const PILATES = [
   {
     id: 'pilates-double-leg-stretch',
     name: 'Double Leg Stretch',
+    youtube: 'double leg stretch pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -124,6 +136,7 @@ export const PILATES = [
   {
     id: 'pilates-scissors',
     name: 'Scissors',
+    youtube: 'scissors pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -151,6 +164,7 @@ export const PILATES = [
   {
     id: 'pilates-criss-cross',
     name: 'Criss-Cross',
+    youtube: 'criss-cross pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -178,6 +192,7 @@ export const PILATES = [
   {
     id: 'pilates-swan',
     name: 'Swan',
+    youtube: 'swan pilates technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -205,6 +220,7 @@ export const PILATES = [
   {
     id: 'pilates-swimming',
     name: 'Swimming',
+    youtube: 'swimming pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -232,6 +248,7 @@ export const PILATES = [
   {
     id: 'pilates-side-kick',
     name: 'Side-Lying Kick Series',
+    youtube: 'side-lying kick series pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -258,6 +275,7 @@ export const PILATES = [
   {
     id: 'pilates-spine-stretch',
     name: 'Spine Stretch Forward',
+    youtube: 'spine stretch forward pilates technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -286,6 +304,7 @@ export const PILATES = [
   {
     id: 'pilates-leg-circles',
     name: 'Leg Circles',
+    youtube: 'leg circles pilates technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -313,6 +332,7 @@ export const PILATES = [
   {
     id: 'pilates-teaser-prep',
     name: 'Teaser Preparation',
+    youtube: 'teaser preparation pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -342,6 +362,7 @@ export const PILATES = [
   {
     id: 'pilates-shoulder-bridge',
     name: 'Shoulder Bridge',
+    youtube: 'shoulder bridge pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -369,6 +390,7 @@ export const PILATES = [
   {
     id: 'pilates-mermaid',
     name: 'Mermaid Stretch',
+    youtube: 'mermaid stretch pilates technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -396,6 +418,7 @@ export const PILATES = [
   {
     id: 'pilates-roll-down-wall',
     name: 'Wall Roll-Down',
+    youtube: 'wall roll-down pilates technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -427,6 +450,7 @@ export const PILATES = [
   {
     id: 'pilates-sequence-beginner',
     name: 'Pilates Beginner Sequence',
+    youtube: 'pilates beginner sequence pilates technique',
     category: 'strength',
     contentType: 'practice',
     movementPattern: 'pilates-sequence',
@@ -459,6 +483,7 @@ export const PILATES = [
   {
     id: 'pilates-sequence-core',
     name: 'Pilates Core Focus Sequence',
+    youtube: 'pilates core focus sequence pilates technique',
     category: 'strength',
     contentType: 'practice',
     movementPattern: 'pilates-sequence',
@@ -496,6 +521,7 @@ export const PILATES = [
   {
     id: 'pilates-roll-down-standing',
     name: 'Standing Roll-Down',
+    youtube: 'standing roll-down pilates technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -523,6 +549,7 @@ export const PILATES = [
   {
     id: 'pilates-corkscrew',
     name: 'Corkscrew',
+    youtube: 'corkscrew pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -551,6 +578,7 @@ export const PILATES = [
   {
     id: 'pilates-spine-twist',
     name: 'Spine Twist',
+    youtube: 'spine twist pilates technique',
     category: 'mobility',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -578,6 +606,7 @@ export const PILATES = [
   {
     id: 'pilates-long-stretch',
     name: 'Long Stretch — Plank Variation',
+    youtube: 'long stretch - plank variation pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -606,6 +635,7 @@ export const PILATES = [
   {
     id: 'pilates-kneeling-series',
     name: 'Kneeling Side Kick Series',
+    youtube: 'kneeling side kick series pilates technique',
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'pilates-move',
@@ -633,6 +663,7 @@ export const PILATES = [
   {
     id: 'pilates-advanced-sequence',
     name: 'Advanced Pilates Sequence — 30 Minutes',
+    youtube: 'advanced pilates sequence - 30 minutes pilates technique',
     category: 'strength',
     contentType: 'practice',
     movementPattern: 'pilates-sequence',
@@ -666,6 +697,7 @@ export const PILATES = [
   {
     id: 'pilates-reformer-simulation',
     name: 'Reformer-Style Pilates — Mat Adaptation',
+    youtube: 'reformer-style pilates - mat adaptation pilates technique',
     category: 'strength',
     contentType: 'practice',
     movementPattern: 'pilates-sequence',

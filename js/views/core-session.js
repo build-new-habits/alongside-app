@@ -1,9 +1,20 @@
 /**
  * core-session.js - Guided Core Session
  *
- * 04 Aug 2026 v5
+ * 10 Aug 2026 v6
  *
  * CHANGELOG
+ * 10 Aug 2026 v6 — Added missing instructions/coaching/youtube sections
+ *   (exercise-detail consistency audit, Graeme's direct request). This
+ *   file already showed description/cues/why for its fixed 23-exercise
+ *   pool (confirmed safe — every exercise it can select genuinely has
+ *   these fields, no "undefined" risk), but instructions and coaching
+ *   were never rendered despite 100% data coverage, and no video link
+ *   existed at all. Also fixed a second silent field-name bug in the
+ *   pre-session overview list: exercise.cue (singular, never existed
+ *   anywhere) should have been exercise.cues (plural array) — same
+ *   class of bug as gym-programme.js's, found in the same pass.
+ *
  * 04 Aug 2026 v5 — Phase B, Home Nav & Conditions Redesign (blueprint
  *   alongside_blueprint_home-navigation-conditions_04aug2026_v1.md).
  *   Removed the private, duplicated EXERCISE_POOLS (23 exercise objects,
@@ -412,7 +423,18 @@ function renderSessionOverview() {
             </button>
 
             <div class="gym-exercise-detail" id="core-ex-detail-${i}" hidden>
-              ${ex.cue ? `<p class="exercise-cue">${ex.cue}</p>` : ""}
+              ${ex.instructions && ex.instructions.length > 0 ? `
+                <ul class="exercise-cues" aria-label="How to get there">
+                  ${ex.instructions.map(inst => `<li>${inst}</li>`).join("")}
+                </ul>
+              ` : ""}
+              ${ex.cues?.length ? `<p class="exercise-cue">${ex.cues[0]}</p>` : ""}
+              ${ex.coaching ? `
+                <div class="coaching-tip">
+                  <span class="tip-icon" aria-hidden="true">\uD83D\uDCA1</span>
+                  <p>${ex.coaching}</p>
+                </div>
+              ` : ""}
               ${ex.why ? `
                 <div class="exercise-why">
                   <p class="exercise-why-label">Why this exercise</p>
@@ -538,10 +560,23 @@ function renderExercise() {
 
         <p class="exercise-description">${ex.description}</p>
 
+        ${ex.instructions && ex.instructions.length > 0 ? `
+          <ul class="exercise-cues" aria-label="How to get there">
+            ${ex.instructions.map(inst => `<li>${inst}</li>`).join("")}
+          </ul>
+        ` : ""}
+
         ${ex.cues?.length ? `
           <ul class="exercise-cues" aria-label="Coaching cues">
             ${ex.cues.map(cue => `<li>${cue}</li>`).join("")}
           </ul>
+        ` : ""}
+
+        ${ex.coaching ? `
+          <div class="coaching-tip">
+            <span class="tip-icon" aria-hidden="true">\uD83D\uDCA1</span>
+            <p>${ex.coaching}</p>
+          </div>
         ` : ""}
 
         ${ex.why ? `
@@ -552,6 +587,15 @@ function renderExercise() {
             </p>
           </details>
         ` : ""}
+
+        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.youtube || (ex.name + " exercise form"))}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="youtube-link"
+           aria-label="Watch how to do ${ex.name} on YouTube (opens in new tab)">
+          <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
+          Watch how to do this
+        </a>
 
       </div>
 
