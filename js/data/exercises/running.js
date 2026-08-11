@@ -1,5 +1,13 @@
 /**
  * data/exercises/running.js
+ * 11 Aug 2026 v2
+ *
+ * v2 - CON-9. watchOut and load added to all 35 entries including the full C25K programme. Written to the Exercise
+ *   Entry Standard: name the error AND its correction, describe what it
+ *   feels like rather than only what it looks like, no fear language, no
+ *   shame, and pain is always a plain stop. Load is effort-relative
+ *   throughout, never an absolute weight (Locked Principle P4).
+ *
  * 10 Aug 2026 v1
  *
  * v1 — First version header on this file. Added tailored YouTube search
@@ -47,6 +55,13 @@ export const RUNNING = [
     ],
     coaching: 'If you can hold a conversation while running, you are at the right pace. If you cannot, slow down. There is no minimum speed — only forward movement.',
     why: 'The first week of C25K introduces the run-walk pattern at the lowest ratio. Builds aerobic base and running habit without overloading tendons and joints.',
+        watchOut: [
+      'Running the run portions faster than you can repeat in the later intervals',
+      'Skipping ahead a week because one session felt easy; the weeks build tissue tolerance, not just fitness',
+      'Running through sharp pain in the shin, knee or Achilles rather than stopping',
+      'Doing sessions on back-to-back days rather than leaving a rest day between'
+    ],
+    load: 'Effort only. The running should be conversational -- if you cannot speak, you are running too fast.',
     credits: 60
   },
 
@@ -75,6 +90,13 @@ export const RUNNING = [
     ],
     coaching: 'Slightly longer run intervals than week 1. Your legs may feel heavier on the second or third run — that is normal and will pass.',
     why: 'Increases run interval duration while keeping total run time manageable. The body begins adapting to the pattern of aerobic stress and recovery.',
+        watchOut: [
+      'Running the run portions faster than you can repeat in the later intervals',
+      'Skipping ahead a week because one session felt easy; the weeks build tissue tolerance, not just fitness',
+      'Running through sharp pain in the shin, knee or Achilles rather than stopping',
+      'Doing sessions on back-to-back days rather than leaving a rest day between'
+    ],
+    load: 'Effort only. The running should be conversational -- if you cannot speak, you are running too fast.',
     credits: 60
   },
 
@@ -102,6 +124,13 @@ export const RUNNING = [
     ],
     coaching: 'The 3-minute run is the first real challenge. Break it into smaller mental chunks — run to that lamppost, then the next. The walk after is earned.',
     why: 'Introduces the first sustained 3-minute run interval — a significant step up from the 60–90 second intervals of weeks 1 and 2.',
+        watchOut: [
+      'Running the run portions faster than you can repeat in the later intervals',
+      'Skipping ahead a week because one session felt easy; the weeks build tissue tolerance, not just fitness',
+      'Running through sharp pain in the shin, knee or Achilles rather than stopping',
+      'Doing sessions on back-to-back days rather than leaving a rest day between'
+    ],
+    load: 'Effort only. The running should be conversational -- if you cannot speak, you are running too fast.',
     credits: 65
   },
 
@@ -130,6 +159,13 @@ export const RUNNING = [
     ],
     coaching: 'Week 4 is where many people struggle. If the 5-minute runs feel too much, repeat week 3 — there is no rush and no schedule to keep.',
     why: 'Builds the 5-minute continuous run — a landmark in building aerobic capacity. The body is now adapting significantly to running loads.',
+        watchOut: [
+      'Running the run portions faster than you can repeat in the later intervals',
+      'Skipping ahead a week because one session felt easy; the weeks build tissue tolerance, not just fitness',
+      'Running through sharp pain in the shin, knee or Achilles rather than stopping',
+      'Doing sessions on back-to-back days rather than leaving a rest day between'
+    ],
+    load: 'Effort only. The running should be conversational -- if you cannot speak, you are running too fast.',
     credits: 70
   },
 
@@ -157,6 +193,13 @@ export const RUNNING = [
     ],
     coaching: 'Three 5-minute runs with rest. You have already done 5 minutes — now you do it three times with breaks. Trust that.',
     why: 'Consolidates the 5-minute run as a repeatable effort — preparing for the jump to continuous running later in the week.',
+        watchOut: [
+      'Running the run portions faster than you can repeat in the later intervals',
+      'Skipping ahead a week because one session felt easy; the weeks build tissue tolerance, not just fitness',
+      'Running through sharp pain in the shin, knee or Achilles rather than stopping',
+      'Doing sessions on back-to-back days rather than leaving a rest day between'
+    ],
+    load: 'Effort only. The running should be conversational -- if you cannot speak, you are running too fast.',
     credits: 70
   },
 
@@ -183,6 +226,13 @@ export const RUNNING = [
     ],
     coaching: 'This is the biggest psychological leap in C25K. Run slower than you think you need to. You are not racing — you are building the proof that you can do it.',
     why: 'The first continuous 20-minute run. A landmark moment in every runner\'s journey — the aerobic base is now sufficient to sustain effort without walking.',
+        watchOut: [
+      'Running the run portions faster than you can repeat in the later intervals',
+      'Skipping ahead a week because one session felt easy; the weeks build tissue tolerance, not just fitness',
+      'Running through sharp pain in the shin, knee or Achilles rather than stopping',
+      'Doing sessions on back-to-back days rather than leaving a rest day between'
+    ],
+    load: 'Effort only. The running should be conversational -- if you cannot speak, you are running too fast.',
     credits: 80
   },
 
@@ -209,6 +259,13 @@ export const RUNNING = [
     ],
     coaching: 'After the 20-minute run of week 5, this session reintroduces a walk break — use it deliberately as a recovery tool, not a failure.',
     why: 'Builds total running volume while giving the legs a mid-session recovery. Sets up the push toward 25-minute continuous running.',
+        watchOut: [
+      'Running the run portions faster than you can repeat in the later intervals',
+      'Skipping ahead a week because one session felt easy; the weeks build tissue tolerance, not just fitness',
+      'Running through sharp pain in the shin, knee or Achilles rather than stopping',
+      'Doing sessions on back-to-back days rather than leaving a rest day between'
+    ],
+    load: 'Effort only. The running should be conversational -- if you cannot speak, you are running too fast.',
     credits: 75
   },
 
@@ -234,6 +291,13 @@ export const RUNNING = [
     ],
     coaching: 'You have already run 20 minutes. Five more is very achievable. The first few minutes always feel hardest — get through them and the body settles.',
     why: 'Extends continuous running to 25 minutes — building both aerobic capacity and the mental resilience to sustain sustained effort.',
+        watchOut: [
+      'Running the run portions faster than you can repeat in the later intervals',
+      'Skipping ahead a week because one session felt easy; the weeks build tissue tolerance, not just fitness',
+      'Running through sharp pain in the shin, knee or Achilles rather than stopping',
+      'Doing sessions on back-to-back days rather than leaving a rest day between'
+    ],
+    load: 'Effort only. The running should be conversational -- if you cannot speak, you are running too fast.',
     credits: 80
   },
 
@@ -259,6 +323,13 @@ export const RUNNING = [
     ],
     coaching: 'Three minutes from a 5K. You are now a runner — this is maintenance, not training.',
     why: 'The final preparation before the 30-minute graduation run. Running 28 minutes demonstrates that the aerobic base is fully established.',
+        watchOut: [
+      'Running the run portions faster than you can repeat in the later intervals',
+      'Skipping ahead a week because one session felt easy; the weeks build tissue tolerance, not just fitness',
+      'Running through sharp pain in the shin, knee or Achilles rather than stopping',
+      'Doing sessions on back-to-back days rather than leaving a rest day between'
+    ],
+    load: 'Effort only. The running should be conversational -- if you cannot speak, you are running too fast.',
     credits: 85
   },
 
@@ -285,6 +356,13 @@ export const RUNNING = [
     ],
     coaching: 'Whatever pace, whatever distance — 30 continuous minutes of running is the goal and the achievement. You started from the beginning and got here.',
     why: 'The graduation run of C25K. Running 30 minutes continuously is the evidence that a sustainable running habit has been built from scratch.',
+        watchOut: [
+      'Running the run portions faster than you can repeat in the later intervals',
+      'Skipping ahead a week because one session felt easy; the weeks build tissue tolerance, not just fitness',
+      'Running through sharp pain in the shin, knee or Achilles rather than stopping',
+      'Doing sessions on back-to-back days rather than leaving a rest day between'
+    ],
+    load: 'Effort only. The running should be conversational -- if you cannot speak, you are running too fast.',
     credits: 100
   },
 
@@ -317,6 +395,12 @@ export const RUNNING = [
     ],
     coaching: 'Easy runs should feel almost too easy. Most runners go too fast on their easy days and too slow on their hard days. Resist the temptation.',
     why: 'Easy running builds aerobic base and promotes recovery without additional stress. About 80% of all running should be at this effort level.',
+        watchOut: [
+      'Running faster than easy pace, which is the most common training mistake there is',
+      'Checking pace constantly rather than running by feel',
+      'Skipping the walk at the end and stopping dead'
+    ],
+    load: 'Easy means you could hold a full conversation. If you could not, it was not easy.',
     credits: 50
   },
 
@@ -344,6 +428,12 @@ export const RUNNING = [
     ],
     coaching: 'Tempo pace is the most misunderstood effort level. Too hard and it becomes an interval session. Too easy and it is just a run. Aim for sustained discomfort, not suffering.',
     why: 'Tempo running raises the lactate threshold — the effort level at which fatigue accumulates. Improves race pace and overall running economy.',
+        watchOut: [
+      'Starting at 5K pace rather than tempo pace, so the last third falls apart',
+      'Skipping the warm-up, which is where tempo sessions go wrong',
+      'Pushing through tightening calves'
+    ],
+    load: 'Comfortably hard. You could speak a short sentence, not a paragraph.',
     credits: 75
   },
 
@@ -371,6 +461,12 @@ export const RUNNING = [
     ],
     coaching: 'Start conservatively — if you go too hard on rep 1 you will struggle to finish 6. All 6 reps should feel approximately equal in effort.',
     why: 'Short intervals build speed and VO2 max. 400m is the classic interval distance — short enough to go hard, long enough to build aerobic capacity.',
+        watchOut: [
+      'Going too fast on the first two and fading badly',
+      'Cutting the recovery short to feel tougher',
+      'Continuing when your form has clearly deteriorated'
+    ],
+    load: 'Hard but repeatable. All six should be within a few seconds of each other.',
     credits: 90
   },
 
@@ -398,6 +494,12 @@ export const RUNNING = [
     ],
     coaching: 'Harder to pace than 400s — the temptation is to start like a 400. Hold back in the first half of each rep and let the effort build.',
     why: 'Longer intervals develop sustained speed — the ability to run fast for longer. Directly transfers to 5K and 10K performance.',
+        watchOut: [
+      'Starting faster than you can hold for the full 800',
+      'Standing still during recovery rather than jogging',
+      'Adding extra reps because you feel good; save it for next week'
+    ],
+    load: 'Hard but even. If the last one is much slower, the first was too fast.',
     credits: 90
   },
 
@@ -426,6 +528,12 @@ export const RUNNING = [
     ],
     coaching: 'Fartlek means "speed play" in Swedish. The absence of structure is the point — it trains your body to change gears and makes running fun.',
     why: 'Builds both aerobic base and speed in one session. The unstructured format also improves the ability to respond to race surges and changes of pace.',
+        watchOut: [
+      'Making every surge maximal, which turns it into an interval session',
+      'Not recovering enough between surges',
+      'Choosing surges so long the effort collapses'
+    ],
+    load: 'Vary the effort deliberately. Play is the point.',
     credits: 70
   },
 
@@ -453,6 +561,12 @@ export const RUNNING = [
     ],
     coaching: 'The key is genuine progression — not just saying you progressed. Each phase should feel like a gear change.',
     why: 'Progression runs teach the body to run efficiently when fatigued. They also build mental resilience by requiring you to push harder when tired.',
+        watchOut: [
+      'Starting too fast, leaving nowhere to progress to',
+      'Making the jumps between sections too large',
+      'Finishing flat out; the last section should be strong, not maximal'
+    ],
+    load: 'Each section a little quicker than the last, finishing strong rather than empty.',
     credits: 70
   },
 
@@ -481,6 +595,12 @@ export const RUNNING = [
     ],
     coaching: 'Hills are speed work in disguise — they force good form and build strength without the impact of flat sprinting. Your legs will know tomorrow.',
     why: 'Hill running builds leg strength, power, and cardiovascular capacity simultaneously. One of the most efficient training sessions available.',
+        watchOut: [
+      'Sprinting the first repeat and struggling from the second',
+      'Running hard down the hill, which is where the impact and the injuries are',
+      'Leaning forward from the waist rather than driving from the hips'
+    ],
+    load: 'Hard on the way up, easy jog or walk on the way down.',
     credits: 90
   },
 
@@ -509,6 +629,12 @@ export const RUNNING = [
     ],
     coaching: 'Strides are not sprints — they are smooth, controlled accelerations. Focus on form: tall posture, relaxed arms, quick feet.',
     why: 'Strides teach the neuromuscular system to run fast without accumulating fatigue. Used by elite runners as a regular session finisher to maintain speed.',
+        watchOut: [
+      'Sprinting flat out rather than building smoothly',
+      'Tensing the shoulders and jaw at speed',
+      'Doing strides cold without a warm-up'
+    ],
+    load: 'Build to around ninety percent, relaxed rather than straining.',
     credits: 50
   },
 
@@ -537,6 +663,12 @@ export const RUNNING = [
     ],
     coaching: 'A parkrun is not a race against others — it is a race against your own best. The community atmosphere makes it easier to push. Use that.',
     why: 'Race simulation trains the specific effort, pacing decisions, and psychological demands of a 5K. Nothing prepares you for racing like practising racing.',
+        watchOut: [
+      'Setting off in the crowd faster than your own pace',
+      'Racing every week rather than a few times a season',
+      'Skipping the warm-up because of the start time'
+    ],
+    load: 'Race effort. Hard, controlled, and ideally even across the distance.',
     credits: 100
   },
 
@@ -564,6 +696,12 @@ export const RUNNING = [
     ],
     coaching: 'The time trial is a data point, not a verdict. Run it every 6 to 8 weeks to track progress. Conditions vary — compare similar days.',
     why: 'A solo 5K time trial provides an honest baseline and a motivation anchor. Watching the time come down is one of the most satisfying feedback loops in running.',
+        watchOut: [
+      'Going out too fast in the first kilometre, which is the classic 5K error',
+      'Doing this without a full warm-up',
+      'Racing when already tired from the week'
+    ],
+    load: 'Maximal for the distance, evenly paced.',
     credits: 100
   },
 
@@ -597,6 +735,12 @@ export const RUNNING = [
     ],
     coaching: 'The value is in the knee drive and the quick ground contact — not the height. Focus on light, fast feet.',
     why: 'Trains hip flexor strength and quick foot turnover — two of the most important factors in running efficiency.',
+        watchOut: [
+      'Leaning back to lift the knees higher',
+      'Landing heavily',
+      'Sacrificing posture for knee height'
+    ],
+    load: 'Bodyweight only.',
     credits: 30
   },
 
@@ -624,6 +768,12 @@ export const RUNNING = [
     ],
     coaching: 'Most people do butt kicks wrong — they bring the knee forward instead of the heel back. The knee should stay under the hip.',
     why: 'Trains hamstring recovery — the phase of the running stride where the foot travels back toward the glute. Improves stride efficiency.',
+        watchOut: [
+      'Leaning forward at the waist',
+      'Kicking with the lower leg only rather than cycling the whole leg',
+      'Heavy landings'
+    ],
+    load: 'Bodyweight only.',
     credits: 30
   },
 
@@ -652,6 +802,12 @@ export const RUNNING = [
     ],
     coaching: 'The A-skip looks simple but requires coordination. Start slow and focus on the knee drive height rather than speed.',
     why: 'The A-skip is the fundamental running drill — it trains the upward drive phase of the running stride in an exaggerated, isolated form.',
+        watchOut: [
+      'Rushing so the skip becomes a run',
+      'Landing flat-footed',
+      'Losing the tall posture as you tire'
+    ],
+    load: 'Bodyweight only.',
     credits: 35
   },
 
@@ -680,6 +836,12 @@ export const RUNNING = [
     ],
     coaching: 'Harder than it looks. Do A-skips until they are comfortable before adding the B-skip extension. The pawing action is the whole point.',
     why: 'Adds the forward extension and backward pawing action to the A-skip — training the complete running stride cycle in an exaggerated, teachable form.',
+        watchOut: [
+      'Attempting this before the A-skip is comfortable',
+      'Reaching the leg out rather than cycling it through',
+      'Losing rhythm and turning it into a stumble'
+    ],
+    load: 'Bodyweight only.',
     credits: 40
   },
 
@@ -708,6 +870,12 @@ export const RUNNING = [
     ],
     coaching: 'Bounding is plyometric — it is hard on tendons and joints. Only add it when easy running is fully pain-free.',
     why: 'Develops explosive power and elasticity in the running stride. Transfers directly to speed and running economy. Used by all serious runners.',
+        watchOut: [
+      'Bounding for distance before you can land under control',
+      'Landing on a straight leg',
+      'Doing these when already tired'
+    ],
+    load: 'Bodyweight only.',
     credits: 50
   },
 
@@ -736,6 +904,12 @@ export const RUNNING = [
     ],
     coaching: 'Higher cadence does not mean running faster — it means running more efficiently. Think quick, light feet rather than bigger steps.',
     why: 'Low cadence (slow turnover) is a primary cause of overstriding and running injury. Cadence work is one of the most impactful technique changes available.',
+        watchOut: [
+      'Shortening the stride so much you stop moving forward',
+      'Tensing the upper body to hit the rhythm',
+      'Chasing a number rather than a feel'
+    ],
+    load: 'Effort only.',
     credits: 35
   },
 
@@ -764,6 +938,12 @@ export const RUNNING = [
     ],
     coaching: 'Stride-outs are not about maximum speed — they are about running fast while staying relaxed. If you feel tight, you are trying too hard.',
     why: 'Activates the fast-twitch muscle fibres before a workout or race and reinforces good running mechanics at speed.',
+        watchOut: [
+      'Accelerating too abruptly rather than building',
+      'Straining the face, jaw and shoulders',
+      'Doing these without warming up first'
+    ],
+    load: 'Build to fast and relaxed, not maximal.',
     credits: 45
   },
 
@@ -794,6 +974,12 @@ export const RUNNING = [
     ],
     coaching: 'The 30-minute easy run is the backbone of any running programme. Most training benefits come from easy running — not from pushing every session.',
     why: 'Builds aerobic base, promotes recovery, and develops running economy. The most important session in any runner\'s week.',
+        watchOut: [
+      'Drifting up to moderate pace without noticing',
+      'Running this the day after a hard session without checking how the legs feel',
+      'Ignoring a niggle because the pace is gentle'
+    ],
+    load: 'Easy means conversational throughout.',
     credits: 60
   },
 
@@ -819,6 +1005,12 @@ export const RUNNING = [
     ],
     coaching: 'A 20-minute tempo block is demanding. If the pace slips in the last 5 minutes, you started too fast. Aim for even splits or a slight negative split.',
     why: 'A longer tempo block raises the lactate threshold more significantly than shorter efforts — the primary session for improving 10K performance.',
+        watchOut: [
+      'Running the tempo section too fast and fading',
+      'Treating this as a race rather than a controlled effort',
+      'Cutting the cool-down short'
+    ],
+    load: 'Comfortably hard and even. The last five minutes should feel like the first five.',
     credits: 80
   },
 
@@ -846,6 +1038,12 @@ export const RUNNING = [
     ],
     coaching: 'The first rep always feels easy. Resist going hard too early — the fourth and fifth reps are where the session is won or lost.',
     why: '1K intervals develop the sustained speed needed for 10K racing. The slightly longer distance compared to 400s builds greater aerobic adaptation.',
+        watchOut: [
+      'Treating the first rep as a time trial',
+      'Shortening the recovery jog',
+      'Pushing on when form has gone'
+    ],
+    load: 'Hard but repeatable across all five.',
     credits: 95
   },
 
@@ -873,6 +1071,12 @@ export const RUNNING = [
     ],
     coaching: 'Cruise intervals are tempo broken into chunks — the rest makes each rep slightly faster than a continuous tempo. Used when building toward longer tempo blocks.',
     why: 'Develops lactate threshold with slightly more rest than a continuous tempo — ideal for runners building toward their first 10K or half marathon.',
+        watchOut: [
+      'Running these at interval pace rather than cruise pace',
+      'Taking longer recoveries than the session asks for',
+      'Skipping the warm-up'
+    ],
+    load: 'Comfortably hard, closer to tempo than to sprinting.',
     credits: 85
   },
 
@@ -899,6 +1103,12 @@ export const RUNNING = [
     ],
     coaching: 'If you do not know your marathon pace, use this rule: it should feel like you could hold it for 3 to 4 hours. Slower than you think.',
     why: 'Builds efficiency at race pace and familiarises the body with the metabolic demands of marathon effort.',
+        watchOut: [
+      'Running faster than goal pace because it feels easy early',
+      'Skipping fuel and fluid on the longer efforts',
+      'Ignoring a niggle at this duration'
+    ],
+    load: 'Steady and repeatable. Marathon pace should feel almost too comfortable at the start.',
     credits: 75
   },
 
@@ -926,6 +1136,12 @@ export const RUNNING = [
     ],
     coaching: 'The long run is about time on feet, not pace. It builds mental endurance as much as physical. Let your mind wander — it is part of the training.',
     why: 'The long run is the foundational session for half marathon and marathon training. Develops fat burning, mental endurance, and musculoskeletal resilience.',
+        watchOut: [
+      'Running this faster than easy pace',
+      'Setting off without water or a plan for the route',
+      'Increasing long-run distance by more than about ten percent a week'
+    ],
+    load: 'Easy and conversational throughout.',
     credits: 100
   },
 
@@ -953,6 +1169,12 @@ export const RUNNING = [
     ],
     coaching: 'Very few recreational runners do a 90-minute run. If you do it once every 2 to 3 weeks, you will be better prepared for race day than most people at the start line.',
     why: 'The 90-minute long run is the primary training stimulus for half marathon and marathon endurance. Depletes glycogen stores and forces fat adaptation.',
+        watchOut: [
+      'Running faster than easy, which turns a long run into a hard session',
+      'Going without fuel or fluid',
+      'Jumping to this distance without building up to it'
+    ],
+    load: 'Easy. The distance is the stimulus, not the pace.',
     credits: 120
   },
 
@@ -980,6 +1202,12 @@ export const RUNNING = [
     ],
     coaching: 'Running on tired legs is a specific training adaptation. It is uncomfortable and it should be. The discomfort tells you it is working.',
     why: 'Back-to-back runs simulate the fatigue of late-race miles. Used extensively in marathon training to build resilience to accumulated fatigue.',
+        watchOut: [
+      'Running the second day hard because the first felt fine',
+      'Ignoring accumulated soreness',
+      'Doing this pattern before your weekly mileage supports it'
+    ],
+    load: 'Both days easy. The point is time on tired legs, not intensity.',
     credits: 90
   }
 

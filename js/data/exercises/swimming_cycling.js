@@ -1,5 +1,13 @@
 /**
  * data/exercises/swimming_cycling.js
+ * 11 Aug 2026 v2
+ *
+ * v2 - CON-9. watchOut and load added to all 22 entries. Written to the Exercise
+ *   Entry Standard: name the error AND its correction, describe what it
+ *   feels like rather than only what it looks like, no fear language, no
+ *   shame, and pain is always a plain stop. Load is effort-relative
+ *   throughout, never an absolute weight (Locked Principle P4).
+ *
  * 10 Aug 2026 v1
  *
  * v1 — First version header on this file. Added tailored YouTube search
@@ -45,6 +53,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'The catch is where most freestyle power is lost. A good catch sets up a powerful pull — a missed catch wastes effort regardless of arm speed.',
     why: 'The catch is the most technically important phase of the freestyle stroke. Improving it is the single highest-return technique investment for most swimmers.',
+        watchOut: [
+      'Rushing the drill so it becomes ordinary swimming again',
+      'Holding the breath through the length rather than exhaling steadily into the water',
+      'Lifting the head to breathe, which drops the hips and makes everything harder'
+    ],
+    load: 'Effort only. Technique drills should feel easy; the difficulty is the precision.',
     credits: 40
   },
 
@@ -72,6 +86,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Bilateral breathing feels awkward on the weak side for most people. That awkwardness is exactly why it is worth practising — it corrects stroke imbalance.',
     why: 'Bilateral breathing develops a balanced stroke, improves body rotation on both sides, and is essential for open water swimming where waves come from either side.',
+        watchOut: [
+      'Rushing the drill so it becomes ordinary swimming again',
+      'Holding the breath through the length rather than exhaling steadily into the water',
+      'Lifting the head to breathe, which drops the hips and makes everything harder'
+    ],
+    load: 'Effort only. Technique drills should feel easy; the difficulty is the precision.',
     credits: 35
   },
 
@@ -99,6 +119,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Most people kick far too much from the knee. Think of the whole leg as a long flipper — the movement initiates at the hip.',
     why: 'Isolates the kick for focused development and reveals ankle flexibility limitations. A powerful kick reduces drag and helps with body position.',
+        watchOut: [
+      'Kicking from the knees rather than the hips',
+      'Gripping the board so hard the shoulders tense',
+      'Kicking so hard the legs are wrecked for the rest of the session'
+    ],
+    load: 'Effort only. Steady, small, fast kicks beat big slow ones.',
     credits: 40
   },
 
@@ -126,6 +152,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Many swimmers go faster with a pull buoy than without. If this is you, your kick is adding drag — the buoy is telling you where to improve.',
     why: 'Isolates the arm stroke by removing the kick, allowing focused development of pull mechanics and upper body swimming strength.',
+        watchOut: [
+      'Letting the hips sink because the legs have stopped working',
+      'Over-reaching at the front of the stroke',
+      'Using the buoy every session, which lets the kick quietly disappear'
+    ],
+    load: 'Effort only.',
     credits: 45
   },
 
@@ -153,6 +185,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Catch-up drill teaches the stroke to be long and controlled rather than frantic. Count strokes per length — the goal is fewer, not more.',
     why: 'Develops stroke length and extension — the reach phase that sets up a good catch. Most beginners shorten this phase under fatigue.',
+        watchOut: [
+      'Rushing the drill so it becomes ordinary swimming again',
+      'Holding the breath through the length rather than exhaling steadily into the water',
+      'Lifting the head to breathe, which drops the hips and makes everything harder'
+    ],
+    load: 'Effort only. Technique drills should feel easy; the difficulty is the precision.',
     credits: 35
   },
 
@@ -180,6 +218,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'This drill is entirely about the recovery — the part of the stroke above water. A high elbow recovery sets up a better entry and catch.',
     why: 'Trains the high elbow recovery that prevents shoulder impingement and sets up the forward reach. Particularly useful for swimmers with shoulder issues.',
+        watchOut: [
+      'Rushing the drill so it becomes ordinary swimming again',
+      'Holding the breath through the length rather than exhaling steadily into the water',
+      'Lifting the head to breathe, which drops the hips and makes everything harder'
+    ],
+    load: 'Effort only. Technique drills should feel easy; the difficulty is the precision.',
     credits: 35
   },
 
@@ -207,6 +251,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Descending means getting faster each rep. Starting too hard ruins the set — resist the temptation. Rep 4 should be your fastest.',
     why: 'Builds aerobic capacity, pacing awareness, and finishing speed — all essential for race swimming. Also develops the ability to accelerate when fatigued.',
+        watchOut: [
+      'Setting off faster than you can repeat across the whole set',
+      'Shortening the rest to feel tougher, which just makes every effort slower',
+      'Losing stroke length as you tire; shorter and faster is not quicker in water'
+    ],
+    load: 'Hard but repeatable. Every effort should be within a couple of seconds of the last.',
     credits: 70
   },
 
@@ -233,6 +283,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'This is the swimming equivalent of an easy run. The goal is to move through the water efficiently and enjoyably — not to work hard.',
     why: 'Builds swimming base fitness and technical consistency without fatigue. The ideal recovery session between harder swim workouts.',
+        watchOut: [
+      'Swimming faster than easy because it feels too gentle',
+      'Skipping the exhale and holding air, which raises the shoulders',
+      'Pushing on through shoulder discomfort rather than switching stroke'
+    ],
+    load: 'Easy and continuous. You should finish able to go again.',
     credits: 50
   },
 
@@ -259,6 +315,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'The 200 metre time trial reveals your current swimming fitness more honestly than a technique drill. It is uncomfortable — that is useful information.',
     why: 'A benchmark swim that tracks progress and builds race-effort tolerance. Comparing times over months is highly motivating.',
+        watchOut: [
+      'Setting off faster than you can repeat across the whole set',
+      'Shortening the rest to feel tougher, which just makes every effort slower',
+      'Losing stroke length as you tire; shorter and faster is not quicker in water'
+    ],
+    load: 'Hard but repeatable. Every effort should be within a couple of seconds of the last.',
     credits: 60
   },
 
@@ -286,6 +348,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Full rest between reps is essential — this is sprint training, not endurance. Each 50 should be close to maximum effort.',
     why: 'Develops pure swimming speed and explosive power. Builds anaerobic capacity and improves stroke mechanics at high effort.',
+        watchOut: [
+      'Setting off faster than you can repeat across the whole set',
+      'Shortening the rest to feel tougher, which just makes every effort slower',
+      'Losing stroke length as you tire; shorter and faster is not quicker in water'
+    ],
+    load: 'Hard but repeatable. Every effort should be within a couple of seconds of the last.',
     credits: 75
   },
 
@@ -313,6 +381,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'The medley format develops all elements of swimming fitness in one session. The kick set will feel hardest — that is normal.',
     why: 'A complete swim session that develops all components: full stroke, arm strength, and kick power. Efficient use of pool time.',
+        watchOut: [
+      'Setting off faster than you can repeat across the whole set',
+      'Shortening the rest to feel tougher, which just makes every effort slower',
+      'Losing stroke length as you tire; shorter and faster is not quicker in water'
+    ],
+    load: 'Hard but repeatable. Every effort should be within a couple of seconds of the last.',
     credits: 70
   },
 
@@ -341,6 +415,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Backstroke is kinder on the shoulders than freestyle for many people. Worth adding as a regular component if you have shoulder sensitivity.',
     why: 'Backstroke develops posterior shoulder strength and spinal extension — often the opposite movement to what the body does all day. Great for posture.',
+        watchOut: [
+      'Rushing the drill so it becomes ordinary swimming again',
+      'Holding the breath through the length rather than exhaling steadily into the water',
+      'Lifting the head to breathe, which drops the hips and makes everything harder'
+    ],
+    load: 'Effort only. Technique drills should feel easy; the difficulty is the precision.',
     credits: 40
   },
 
@@ -368,6 +448,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Open water feels completely different to pool swimming — no lane ropes, no walls, no clear visibility. These drills reduce the surprise.',
     why: 'Prepares for the specific challenges of open water swimming: sighting, starts, no walls, and the disorientation of swimming without visible lines.',
+        watchOut: [
+      'Practising open-water skills alone in open water; always swim with others or in a supervised area',
+      'Sighting so often it wrecks the stroke rhythm',
+      'Going into cold water without acclimatising gradually'
+    ],
+    load: 'Easy and steady. Open water is about calm, not speed.',
     credits: 60
   },
 
@@ -395,6 +481,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: '1500 metres is the Olympic distance. Most recreational swimmers can complete it in 30 to 50 minutes. Time is irrelevant — finishing is the achievement.',
     why: 'Builds the endurance base required for triathlon swimming or open water events. Reveals how technique holds up under fatigue.',
+        watchOut: [
+      'Swimming faster than easy because it feels too gentle',
+      'Skipping the exhale and holding air, which raises the shoulders',
+      'Pushing on through shoulder discomfort rather than switching stroke'
+    ],
+    load: 'Easy and continuous. You should finish able to go again.',
     credits: 100
   },
 
@@ -423,6 +515,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Breaststroke is the most technically complex stroke. The pull and kick must be sequenced correctly — simultaneous movement kills efficiency.',
     why: 'The most common recreational stroke. Correct technique dramatically reduces effort and knee stress. The glide phase is essential and most beginners rush it.',
+        watchOut: [
+      'Rushing the drill so it becomes ordinary swimming again',
+      'Holding the breath through the length rather than exhaling steadily into the water',
+      'Lifting the head to breathe, which drops the hips and makes everything harder'
+    ],
+    load: 'Effort only. Technique drills should feel easy; the difficulty is the precision.',
     credits: 40
   },
 
@@ -454,6 +552,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'An easy spin should feel uncomfortably easy. If you feel like you are working, you are in too high a gear.',
     why: 'Active recovery cycling promotes blood flow to the legs without additional stress. Used by cyclists the day after hard sessions.',
+        watchOut: [
+      'Riding harder than easy because it feels too gentle',
+      'Saddle too low, which crowds the knee',
+      'Gripping the bars and tensing the shoulders'
+    ],
+    load: 'Easy. Conversational the whole way.',
     credits: 35
   },
 
@@ -481,6 +585,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Tempo cycling is harder to judge than running because hills and wind vary effort without changing pace. Focus on sustained effort, not speed.',
     why: 'Builds cycling-specific lactate threshold — the primary physiological adaptation for cycling performance improvement.',
+        watchOut: [
+      'Starting at interval intensity and fading',
+      'Grinding a heavy gear at low cadence, which loads the knees',
+      'Skipping the warm-up before the tempo section'
+    ],
+    load: 'Comfortably hard and even throughout.',
     credits: 75
   },
 
@@ -509,6 +619,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'When standing, shift your weight forward slightly — too far back and power is lost. Use the handlebars for support, not for pulling.',
     why: 'Hill work builds leg strength, power, and climbing efficiency on the bike — essential skills for road cycling and triathlon.',
+        watchOut: [
+      'Grinding a gear so heavy the cadence collapses',
+      'Rocking the bike side to side',
+      'Standing for the whole climb rather than alternating'
+    ],
+    load: 'Hard but steady. Cadence should stay above about sixty.',
     credits: 85
   },
 
@@ -536,6 +652,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'The recovery interval must be truly easy — if you are still breathing hard when the work interval starts, you are going too hard or recovering too short.',
     why: 'High-intensity cycling intervals improve VO2 max and anaerobic capacity. Highly time-efficient — significant cardiovascular adaptation in under 30 minutes.',
+        watchOut: [
+      'Going maximal on the first interval',
+      'Coasting completely during recovery rather than spinning easy',
+      'Adding intervals because you feel good'
+    ],
+    load: 'Hard but repeatable across every interval.',
     credits: 90
   },
 
@@ -563,6 +685,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'High cadence drills feel chaotic at first. The bouncing sensation means your pedal stroke is not yet circular. Over time, it smooths out.',
     why: 'Develops neuromuscular efficiency and smooth pedal stroke — reducing energy waste and knee stress at higher cadences.',
+        watchOut: [
+      'Bouncing in the saddle at high cadence',
+      'Tensing the upper body to hold the rhythm',
+      'Chasing a number rather than smoothness'
+    ],
+    load: 'Light resistance. Smoothness is the point, not effort.',
     credits: 40
   },
 
@@ -590,6 +718,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Ten-second sprints require complete muscular commitment — not just faster pedalling but driving through the entire pedal stroke. Everything for 10 seconds.',
     why: 'Maximal sprint intervals develop peak cycling power and fast-twitch muscle recruitment. The long rest period ensures each sprint is truly maximal.',
+        watchOut: [
+      'Sprinting before a full warm-up',
+      'Cutting recovery short, which turns a power session into a hard aerobic one',
+      'Pulling hard on the bars and straining the back'
+    ],
+    load: 'Maximal for the sprint, fully recovered before the next.',
     credits: 95
   },
 
@@ -617,6 +751,12 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Anything beyond 60 minutes requires nutrition planning. Even if you do not feel hungry, your performance will drop without fuel.',
     why: 'The long ride builds aerobic base, fat-burning capacity, and saddle endurance. The foundational session for road cycling and triathlon.',
+        watchOut: [
+      'Riding harder than easy pace',
+      'Setting off without food, fluid or a repair kit',
+      'Jumping to ninety minutes without building up to it'
+    ],
+    load: 'Easy and conversational for the whole ride.',
     credits: 110
   },
 
