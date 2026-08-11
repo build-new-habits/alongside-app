@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v232
+ * CON-4/CON-8 - new gym.js (31 entries: machines, conditioning, cable and
+ * machine strength, loaded core, med ball, balance, plyo) and equipment is
+ * now a preference in selection, not only a permission. Gym sessions went
+ * from 0-1 equipment exercises out of 13 to 11 of 13.
+ *
  * 11 Aug 2026 v231
  * CON-6 - session-builder's private 70-entry pool retired. The builder now
  * selects from all 465 shared exercises, so every exercise it returns carries
@@ -1004,7 +1010,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v241";
+const CACHE_NAME = "alongside-v242";
 
 const SHELL_URLS = [
 
