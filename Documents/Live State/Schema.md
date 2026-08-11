@@ -1,5 +1,5 @@
 # Alongside — Data Schema Reference
-## 11 Aug 2026 v1.22
+## 11 Aug 2026 v1.23
 
 **File:** `js/store.js` (confirmed live version: v21, 11 Aug 2026)
 **Storage:** `localStorage` key `alongside_user`
@@ -32,6 +32,22 @@ That single absence is why selection had to be `Math.random()` over 497 exercise
 **P4 applies.** This is per-exercise behavioural data. `best` is a flat reference the person left themselves — nothing narrates it, nothing compares it, and it is never used to comment on consistency or decline.
 
 **Call sites supplying `exerciseIds` so far:** `gym-programme.js` v9, `workout.js` v10. `core-session.js`, `yoga-session.js` and `prescribed-session.js` do not yet — they still log a count only, so their exercises never become familiar. Outstanding.
+
+---
+
+## `sessionVariety` — **NEW, `store.js` v23, 11 Aug 2026**
+
+`"familiar" | "balanced" | "varied"`, default `"balanced"`.
+
+Persona 2.13 (ADHD, novelty-driven, abandons routine after ~2 weeks) and persona 2.14 (autistic, predictability-seeking) are opposite motivational shapes. The persona matrix has carried *"novelty vs predictability has no explicit preference capture"* as an open gap since 05 Jul 2026.
+
+CONT-1 made that gap urgent rather than theoretical — continuity became a real force in selection, so a single default actively serves one persona at the other's expense. Traced live, both received 51–57% session-to-session overlap: one treatment serving neither well.
+
+**Read by** `session-builder.js` v13, scaling the novelty rate (0.10 / 0.25 / 0.55).
+
+**Never inferred from behaviour.** Guessing that somebody wants variety because they skipped a session would be exactly the silent judgement this product refuses. It is asked, or it stays at the honest default.
+
+**Not yet collected in onboarding or Settings** — the field and the engine are live; the question is not. Outstanding.
 
 ---
 
