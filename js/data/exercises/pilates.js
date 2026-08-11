@@ -1,5 +1,13 @@
 /**
  * data/exercises/pilates.js
+ * 11 Aug 2026 v2
+ *
+ * v2 - CON-9. watchOut and load added to all 17 remaining entries. Written to the Exercise
+ *   Entry Standard: name the error AND its correction, describe what it
+ *   feels like rather than only what it looks like, no fear language, no
+ *   shame, and pain is always a plain stop. Load is effort-relative
+ *   throughout, never an absolute weight (Locked Principle P4).
+ *
  * 10 Aug 2026 v1
  *
  * v1 — First version header on this file. Added tailored YouTube search
@@ -46,6 +54,12 @@ export const PILATES = [
     ],
     coaching: 'Keep the lower back pressed into the mat. If it arches, bring the knees in closer or bend them more.',
     why: 'The foundational Pilates exercise — warms up the abdominal muscles and trains breath coordination with movement.',
+        watchOut: [
+      'Neck straining as you hold the head up — lower it to the mat if it aches',
+      'Lower back arching off the mat, which means the legs are too low',
+      'Holding your breath; the breathing pattern is half the exercise'
+    ],
+    load: 'Bodyweight. Progress by lowering the legs, not by adding anything.',
     credits: 50
   },
 
@@ -75,6 +89,12 @@ export const PILATES = [
     ],
     coaching: 'The rolling down is harder than rolling up for most people. Slow it down — you are articulating each vertebra.',
     why: 'A spinal articulation and core strengthening exercise. Requires and develops sequential control of each segment of the spine.',
+        watchOut: [
+      'Jerking up with momentum rather than peeling the spine off the mat one vertebra at a time',
+      'Feet lifting off the floor as you roll',
+      'Rushing the roll down, which is the harder half'
+    ],
+    load: 'Bodyweight. Bend the knees if the full version pulls on the back.',
     credits: 50
   },
 
@@ -103,6 +123,12 @@ export const PILATES = [
     ],
     coaching: 'The lower back staying on the mat is non-negotiable. If it lifts, raise the extended leg higher.',
     why: 'Builds abdominal endurance and hip flexor control — the coordination of opposite limbs trains the core in a functional pattern.',
+        watchOut: [
+      'Lower back lifting off the mat as the leg extends',
+      'Pulling on the knee with the hands rather than using the stomach',
+      'Extending the leg lower than you can keep the back flat'
+    ],
+    load: 'Bodyweight. Keep the extended leg higher if the back lifts.',
     credits: 45
   },
 
@@ -130,6 +156,12 @@ export const PILATES = [
     ],
     coaching: 'If the lower back lifts when legs extend, raise the legs higher. Progress toward a lower angle over weeks.',
     why: 'A more demanding progression from single leg stretch — extends both levers simultaneously, requiring greater core stability.',
+        watchOut: [
+      'Lower back arching as both legs extend',
+      'Rushing so momentum carries the movement',
+      'Extending too far too soon; height of the legs sets the difficulty'
+    ],
+    load: 'Bodyweight. Raise the leg angle to make it easier.',
     credits: 55
   },
 
@@ -158,6 +190,12 @@ export const PILATES = [
     ],
     coaching: 'Keep both legs as straight as your hamstrings allow. The movement is controlled and scissor-like — not a swing.',
     why: 'Targets the deep abdominals and hip flexors while stretching the hamstrings — requires precise control of both legs simultaneously.',
+        watchOut: [
+      'Bouncing the leg towards you rather than holding a steady stretch',
+      'Hips rocking side to side',
+      'Neck straining; rest the head down if needed'
+    ],
+    load: 'Bodyweight.',
     credits: 55
   },
 
@@ -186,6 +224,12 @@ export const PILATES = [
     ],
     coaching: 'The rotation comes from the waist, not just the elbow. Think of bringing your ribs toward the opposite knee, not your head.',
     why: 'The primary oblique exercise in Pilates. Builds rotational core strength that protects the spine and is essential for all twisting movements.',
+        watchOut: [
+      'Pulling the head round with the hands, which strains the neck',
+      'Rotating from the shoulders rather than the ribs',
+      'Speeding up and losing the rotation entirely'
+    ],
+    load: 'Bodyweight. Slower is harder here.',
     credits: 55
   },
 
@@ -242,6 +286,12 @@ export const PILATES = [
     ],
     coaching: 'The movement is in the limbs — the torso stays stable. This is not a back extension — the spine stays long and neutral.',
     why: 'Trains the posterior chain — glutes, hamstrings, and back extensors — in a coordinated pattern. Builds the back strength needed for upright posture.',
+        watchOut: [
+      'Over-arching the lower back to lift higher',
+      'Rushing so it becomes a flutter rather than a controlled reach',
+      'Holding the breath'
+    ],
+    load: 'Bodyweight. Lift less high and reach longer instead.',
     credits: 50
   },
 
@@ -269,6 +319,12 @@ export const PILATES = [
     ],
     coaching: 'The pelvis staying still is the whole challenge. If it rocks, reduce the swing range.',
     why: 'Trains hip mobility and stability simultaneously — the hip moves through a large range while the pelvis and core resist the movement.',
+        watchOut: [
+      'Hips rolling backwards as the leg moves; they should stay stacked',
+      'Swinging the leg with momentum',
+      'Lower back arching as the leg goes behind'
+    ],
+    load: 'Bodyweight.',
     credits: 40
   },
 
@@ -356,6 +412,12 @@ export const PILATES = [
     ],
     coaching: 'The full Teaser straightens the legs — this prep keeps them bent. Master this version before extending the legs.',
     why: 'Develops the deep abdominal strength and spinal control required for the full Teaser — one of the most demanding Pilates exercises.',
+        watchOut: [
+      'Using momentum to get up rather than rolling through the spine',
+      'Feet lifting as you roll up',
+      'Attempting the full teaser before the preparation is comfortable'
+    ],
+    load: 'Bodyweight. Progress through the stages rather than forcing the full version.',
     credits: 55
   },
 
@@ -384,6 +446,12 @@ export const PILATES = [
     ],
     coaching: 'The articulation of the spine on the way up and down is the whole exercise — not just the bridge position. Move like a wave, not a plank.',
     why: 'Develops sequential spinal articulation and posterior chain strength. Superior to a standard glute bridge for spinal mobility.',
+        watchOut: [
+      'Over-arching at the top rather than finishing level',
+      'Pushing through the toes instead of the heels',
+      'Hips dropping to one side'
+    ],
+    load: 'Bodyweight. Progress to single leg once level is easy.',
     credits: 40
   },
 
@@ -477,6 +545,12 @@ export const PILATES = [
     ],
     coaching: 'Quality of movement matters far more than quantity. If you lose form, rest and resume — do not push through with poor technique.',
     why: 'A complete beginner Pilates session that introduces the foundational movements and builds core strength, spinal mobility, and body awareness together.',
+        watchOut: [
+      'Rushing between movements rather than resetting position each time',
+      'Pushing through any movement that causes back discomfort — skip it and continue',
+      'Holding the breath during the harder movements'
+    ],
+    load: 'Bodyweight throughout.',
     credits: 80
   },
 
@@ -510,6 +584,12 @@ export const PILATES = [
     ],
     coaching: 'This is a demanding sequence — rest between exercises as needed. The rest is part of the practice.',
     why: 'A comprehensive core workout using the full Pilates abdominal series. Develops strength, endurance, and coordination throughout the core.',
+        watchOut: [
+      'Lower back lifting during the extended-leg movements',
+      'Fatigue turning control into momentum in the later movements',
+      'Continuing a movement once the back starts arching; move on instead'
+    ],
+    load: 'Bodyweight throughout.',
     credits: 90
   }
 
@@ -572,6 +652,12 @@ export const PILATES = [
     ],
     coaching: 'The lower back stays on the mat throughout — as soon as it lifts, the range is too large. Control is more important than size of the circle.',
     why: 'Develops rotational core strength and hip flexor control while maintaining spinal stability — one of the most effective lateral abdominal exercises in Pilates.',
+        watchOut: [
+      'Lower back lifting as the legs circle',
+      'Circling wider than you can control',
+      'Neck and shoulders tensing to stabilise; keep them soft'
+    ],
+    load: 'Bodyweight. Smaller circles are the way to progress into this.',
     credits: 70
   },
 
@@ -629,6 +715,12 @@ export const PILATES = [
     ],
     coaching: 'The long stretch is used on the reformer but translates to the floor. The forward shift dramatically increases shoulder and core demand compared to a static plank.',
     why: 'The dynamic plank shift increases the challenge to shoulder girdle stability and anti-extension core strength beyond what a static plank achieves.',
+        watchOut: [
+      'Hips sagging or piking',
+      'Shoulders creeping up towards the ears',
+      'Moving further than you can hold the plank line'
+    ],
+    load: 'Bodyweight.',
     credits: 55
   },
 
@@ -657,6 +749,12 @@ export const PILATES = [
     ],
     coaching: 'The kneeling position removes the floor support under the side — the obliques and glute medius work harder to stabilise than in the lying side kick.',
     why: 'The kneeling side kick challenges hip abductor strength and lateral trunk stability in a more demanding position than the lying equivalent.',
+        watchOut: [
+      'Hips rolling forwards or back; they should stay stacked',
+      'Leaning on the supporting arm rather than holding position with the trunk',
+      'Lower back arching as the leg goes behind'
+    ],
+    load: 'Bodyweight.',
     credits: 55
   },
 
@@ -691,6 +789,12 @@ export const PILATES = [
     ],
     coaching: 'The advanced sequence links exercises with breath and intention — not just with physical execution. Each exercise flows from the last without losing the principles.',
     why: 'A complete advanced Pilates session that challenges deep core stability, spinal articulation, and functional strength across the full Joseph Pilates original sequence.',
+        watchOut: [
+      'Attempting this before the beginner and core sequences are comfortable',
+      'Losing spinal control in the later movements as fatigue builds',
+      'Pushing through back discomfort rather than skipping the movement'
+    ],
+    load: 'Bodyweight throughout.',
     credits: 100
   },
 
@@ -719,6 +823,12 @@ export const PILATES = [
     ],
     coaching: 'The reformer uses spring resistance — a band approximates this well enough to capture most of the benefit on a mat. Adjust band tension to match your level.',
     why: 'Reformer Pilates uses resistance that mat Pilates lacks — this adaptation bridges the gap, allowing mat practitioners to experience resistance-based Pilates without the equipment.',
+        watchOut: [
+      'Letting the band snap back rather than controlling the return',
+      'Anchoring the band somewhere that could give way',
+      'Using a band strong enough to pull you out of position'
+    ],
+    load: 'Light band tension. Control is the whole point of the reformer style.',
     credits: 80
   }
 
