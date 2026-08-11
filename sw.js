@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v228
+ * PT-19 - every generated session now opens with a pulse-raiser unless there
+ * is a named, spoken reason it should not. Five bodyweight pulse-raisers
+ * added; two unreachable equipment tags corrected.
+ *
  * 11 Aug 2026 v227
  * CON-3b - watchOut ("What to watch for") and load ("How heavy") now render
  * on all four exercise card views. Neither field had a renderer anywhere in
@@ -984,7 +989,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v237";
+const CACHE_NAME = "alongside-v238";
 
 const SHELL_URLS = [
 
