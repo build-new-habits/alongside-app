@@ -1,5 +1,18 @@
 /**
  * data/exercises/strength.js
+ * 11 Aug 2026 v6
+ *
+ * v6 - CON-9 batch 1. watchOut and load added to all 90 entries in this
+ *   file. This was the first file done because it carries the highest
+ *   physical risk: 84 of the 90 involve external load, including every
+ *   barbell lift in the product.
+ *
+ *   Written to the Exercise Entry Standard's rules for watchOut -- name
+ *   the error AND its correction, describe what it feels like rather than
+ *   only what it looks like, no fear language, no shame, and pain is
+ *   always a plain stop. Load is effort-relative throughout; no absolute
+ *   weight appears anywhere, per Locked Principle P4.
+ *
  * 11 Aug 2026 v5
  *
  * v5 - watchOut and load added to both Pallof press entries, at Graeme's
@@ -67,6 +80,12 @@ export const STRENGTH = [
     ],
     coaching: 'Squeeze your glutes at the top - don\'t just push with your heels.',
     why: 'Activates and strengthens glutes, which support the lower back and improve movement.',
+        watchOut: [
+      'Pushing through the toes rather than the heels, which brings the hamstrings in instead of the glutes',
+      'Over-arching at the top rather than finishing level',
+      'Hips dropping to one side, which usually means one glute is doing more work'
+    ],
+    load: 'Bodyweight. Progress by holding longer at the top or moving to single leg.',
     credits: 45
   },
 
@@ -94,6 +113,12 @@ export const STRENGTH = [
     ],
     coaching: 'Imagine a glass of water on your lower back - don\'t spill it.',
     why: 'Builds core stability and coordination without loading the spine.',
+        watchOut: [
+      'Hips rotating as you reach, which is the sign to reach less far',
+      'Arching the lower back as the leg extends',
+      'Reaching high rather than long; think about length, not height'
+    ],
+    load: 'Bodyweight. Progress by slowing down, not by adding weight.',
     credits: 45,
     sets: 3,
     reps: "8 each side",
@@ -132,6 +157,12 @@ export const STRENGTH = [
     ],
     coaching: 'The lower back must stay flat. Smaller movement is better than losing that contact.',
     why: 'Trains deep core stability - the foundation for all other movements.',
+        watchOut: [
+      'Lower back lifting off the floor as the limbs extend — reduce the range until it stays down',
+      'Holding your breath; breathe out as you extend',
+      'Moving quickly, which lets momentum do the work'
+    ],
+    load: 'Bodyweight. Progress by extending further while the back stays flat.',
     credits: 50,
     sets: 3,
     reps: "8 each side",
@@ -170,6 +201,13 @@ export const STRENGTH = [
     ],
     coaching: 'The weight at your chest helps you stay upright - use it.',
     why: 'The goblet position naturally teaches good squat form and builds leg strength.',
+        watchOut: [
+      'Knees falling inward as you stand up — think about pushing them gently outwards',
+      'Heels lifting off the floor at the bottom, which usually means the ankles need more range; go shallower for now',
+      'Rounding the lower back at the bottom of the squat, so stop where your back is still flat',
+      'Elbows drifting away from your body, which pulls you forward'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that your chest stays upright throughout.',
     credits: 60
   },
 
@@ -197,6 +235,13 @@ export const STRENGTH = [
     ],
     coaching: 'Elbows at 45° protects your shoulders - not flared out wide.',
     why: 'Builds chest, shoulder and tricep strength using just your bodyweight.',
+        watchOut: [
+      'Hips sagging towards the floor or piking upwards',
+      'Elbows flaring straight out to the sides rather than at forty-five degrees',
+      'Head dropping forward before the chest does',
+      'Only going halfway down; chest to fist height is the target'
+    ],
+    load: 'Bodyweight. Progress by moving from incline to flat to decline.',
     credits: 60
   },
 
@@ -224,6 +269,13 @@ export const STRENGTH = [
     ],
     coaching: 'Think about driving your elbow to the ceiling, not curling the weight up.',
     why: 'Builds upper back strength which counteracts the forward posture from sitting.',
+        watchOut: [
+      'Rounding the lower back — set your back flat before the first rep and hold it',
+      'Shrugging the shoulder up towards the ear instead of driving the elbow back',
+      'Twisting the torso to help the weight up, which is the sign to go lighter',
+      'Rushing the lowering; it should take about twice as long as the pull'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that your back stays completely still.',
     credits: 60
   },
 
@@ -251,6 +303,13 @@ export const STRENGTH = [
     ],
     coaching: 'This is a hip hinge, not a squat - your knees stay almost straight.',
     why: 'Strengthens the posterior chain - hamstrings, glutes and back - all in one movement.',
+        watchOut: [
+      'Your back rounding as you lower — stop where your back is still flat, even if that is only halfway down',
+      'Feeling this in your lower back rather than the back of your thighs, which usually means the hips are not moving back far enough',
+      'Bending the knees to reach lower; the knees stay softly bent and still throughout',
+      'Any sharp pain in the back at any point: put the weight down and leave this one for today'
+    ],
+    load: 'Heavy enough that your hamstrings are clearly working, light enough that your back never rounds.',
     credits: 65
   },
 
@@ -278,6 +337,12 @@ export const STRENGTH = [
     ],
     coaching: 'Don\'t let your hips sag or pike up - a straight line is the goal.',
     why: 'The foundation of core stability - protects the spine in all other movements.',
+        watchOut: [
+      'Hips creeping upwards, which makes it easier without you noticing',
+      'Lower back sagging, which is the point to stop the set',
+      'Holding your breath; breathe normally throughout'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by adding weight before form is solid.',
     credits: 45,
     sets: 3,
     reps: null,
@@ -316,6 +381,12 @@ export const STRENGTH = [
     ],
     coaching: 'The movement is small - quality matters more than range. If you feel it in your hip, you\'re doing it right.',
     why: 'Activates the gluteus medius - essential for knee and hip stability.',
+        watchOut: [
+      'The pelvis rolling backwards as the knee opens; it should stay completely still',
+      'Opening further than your hip allows, which just rotates the trunk',
+      'Rushing the return'
+    ],
+    load: 'Bodyweight, or a light band once the movement is clean.',
     credits: 35
   },
 
@@ -343,6 +414,12 @@ export const STRENGTH = [
     ],
     coaching: 'Stepping back is gentler on the knee than stepping forward - good for most knee conditions.',
     why: 'Builds single-leg strength and balance with less knee stress than a forward lunge.',
+        watchOut: [
+      'Front knee travelling far past the toes',
+      'Landing heavily on the back foot rather than placing it down',
+      'Trunk falling forward as you step back'
+    ],
+    load: 'Bodyweight to start. Add weight only once you can step back and return without wobbling.',
     credits: 55
   },
 
@@ -374,6 +451,12 @@ export const STRENGTH = [
     ],
     coaching: 'A great stepping stone to floor press-ups. Lower the surface height as you get stronger.',
     why: 'Identical movement to a floor press-up but with less bodyweight load — accessible for beginners or those returning after shoulder issues.',
+        watchOut: [
+      'Hips sagging even on an incline',
+      'Elbows flaring out to the sides',
+      'Choosing a surface so high there is almost no resistance'
+    ],
+    load: 'Bodyweight. Progress by lowering the surface a little at a time.',
     credits: 40
   },
 
@@ -400,6 +483,12 @@ export const STRENGTH = [
     ],
     coaching: 'The elevated feet shift more load onto the upper chest and shoulders. Harder than a standard press-up.',
     why: 'Increases load on the upper chest and front deltoids — a useful progression once floor press-ups feel manageable.',
+        watchOut: [
+      'Hips piking upwards to reduce the load',
+      'Head dropping towards the floor first',
+      'Going to decline before flat press-ups are comfortable'
+    ],
+    load: 'Bodyweight. Progress by raising the feet gradually.',
     credits: 70
   },
 
@@ -427,6 +516,12 @@ export const STRENGTH = [
     ],
     coaching: 'Find your foot position before adding weight — too close and the front knee travels far forward, too far and you feel it in the hip flexor.',
     why: 'One of the highest-loading single-leg exercises. Builds quad and glute strength that transfers directly to sport and daily life.',
+        watchOut: [
+      'Front knee collapsing inward',
+      'Leaning forward, which turns it into a hinge',
+      'Back foot placed too close, which crowds the front knee'
+    ],
+    load: 'Bodyweight until you can complete all reps without wobbling, then add light weight.',
     credits: 75
   },
 
@@ -453,6 +548,12 @@ export const STRENGTH = [
     ],
     coaching: 'The wider stance loads the inner thigh and glutes differently to a standard squat — a useful variation for full lower body development.',
     why: 'Targets the inner thighs and glutes more than a standard squat. Good for hip stability and for people who struggle with knee tracking.',
+        watchOut: [
+      'Knees collapsing inward, which is common with a wide stance — push them out over your toes',
+      'Leaning forward as you stand, which shifts the work into the lower back',
+      'Toes not turned out enough for your hips, causing pinching at the front of the hip'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough to stay upright throughout.',
     credits: 60
   },
 
@@ -479,6 +580,12 @@ export const STRENGTH = [
     ],
     coaching: 'Lead with your elbows, not your hands. The slow lowering builds more strength than the raising.',
     why: 'Strengthens the medial deltoid — the middle of the three shoulder muscles — which gives the shoulder its rounded shape and lateral stability.',
+        watchOut: [
+      'Swinging the weights up with a bounce from the legs',
+      'Raising above shoulder height, which brings the neck and traps in',
+      'Shrugging as you lift — keep the shoulders down and lead with the elbows'
+    ],
+    load: 'Lighter than you think. These respond to control, not weight.',
     credits: 50
   },
 
@@ -505,6 +612,12 @@ export const STRENGTH = [
     ],
     coaching: 'Seated removes lower back strain — use seated if you have any lower back sensitivity.',
     why: 'The primary overhead pushing movement. Builds shoulder and tricep strength essential for pushing, reaching, and upper body balance.',
+        watchOut: [
+      'Arching the lower back to get the weight up — brace your stomach before every rep',
+      'Pressing the weights in front of your face rather than beside your ears',
+      'Any pinching at the top: reduce how far overhead you go and lighten the weight'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that your back does not arch.',
     credits: 65
   },
 
@@ -531,6 +644,12 @@ export const STRENGTH = [
     ],
     coaching: 'Elbows stay against your sides. If they swing forward, the weight is too heavy.',
     why: 'Builds bicep strength and elbow flexion capacity — important for lifting, carrying, and pulling movements.',
+        watchOut: [
+      'Elbows swinging forward, which means the weight is too heavy',
+      'Leaning back to help the weight up',
+      'Dropping the weight quickly on the way down; the lowering is where the work is'
+    ],
+    load: 'Light enough that your elbows stay pinned to your sides for every rep.',
     credits: 50
   },
 
@@ -557,6 +676,12 @@ export const STRENGTH = [
     ],
     coaching: 'Upper arms stay still and pointed up — only the forearms move. If your elbows flare wide, the weight is too heavy.',
     why: 'The only exercise that works the long head of the tricep in a stretched position — important for elbow extension strength and upper arm balance.',
+        watchOut: [
+      'Elbows flaring wide, which takes the work off the triceps',
+      'Arching the back as the weight goes behind your head',
+      'Going too heavy on a movement where the shoulder is in a vulnerable position'
+    ],
+    load: 'Lighter than you would use for most exercises. This one is about control.',
     credits: 50
   },
 
@@ -583,6 +708,12 @@ export const STRENGTH = [
     ],
     coaching: 'The floor limits range of motion and removes shoulder instability — safer than a bench for anyone with shoulder concerns.',
     why: 'A bench press alternative requiring no equipment. The floor stop prevents the shoulder from going into a vulnerable position at the bottom.',
+        watchOut: [
+      'Elbows flaring straight out to the sides rather than at forty-five degrees',
+      'Bouncing the upper arms off the floor to get the weight moving',
+      'Arching the lower back off the floor'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that your elbows stay at forty-five degrees.',
     credits: 60
   },
 
@@ -610,6 +741,12 @@ export const STRENGTH = [
     ],
     coaching: 'The table edge must be secure. Test it before loading. A dining table works well.',
     why: 'A bodyweight row that builds upper back and bicep strength with no equipment. The horizontal pull pattern is underused and counteracts the forward posture from sitting.',
+        watchOut: [
+      'Hips sagging towards the floor',
+      'Shrugging rather than driving the elbows back',
+      'Pulling only halfway; the chest should reach the edge'
+    ],
+    load: 'Bodyweight. Make it harder by walking the feet further out.',
     credits: 60
   },
 
@@ -637,6 +774,12 @@ export const STRENGTH = [
     ],
     coaching: 'Start with a very short range — even 20 to 30 cm forward. The range builds over weeks. Back arching means you have gone too far.',
     why: 'One of the highest-demand anti-extension core exercises. Requires and builds significant core strength and shoulder stability together.',
+        watchOut: [
+      'Lower back sagging as you roll out, which is the moment it stops working and starts risking something',
+      'Going further than you can control — a few inches done well is a successful rep',
+      'Pulling back with the arms rather than the stomach'
+    ],
+    load: 'Bodyweight only. Progress by rolling further, never by adding weight.',
     credits: 80,
     sets: 3,
     reps: "8 to 12",
@@ -719,6 +862,12 @@ export const STRENGTH = [
     ],
     coaching: 'Do not let the weight pull your shoulders down or your torso lean. Staying tall is the whole exercise.',
     why: 'One of the most functional strength exercises there is — heavy things need carrying. Builds grip, core, and total body strength simultaneously.',
+        watchOut: [
+      'Shoulders rounding forward as your grip tires — that is the point to stop the set',
+      'Holding your breath; breathe steadily throughout',
+      'Dropping the weights at the end rather than setting them down, which is where backs get hurt'
+    ],
+    load: 'Heavy enough that your grip is the limit, not your posture.',
     credits: 60
   },
 
@@ -745,6 +894,12 @@ export const STRENGTH = [
     ],
     coaching: 'Harder than it looks. If you are leaning toward the weight, go lighter. If you are leaning away, you are compensating — also go lighter.',
     why: 'The single-arm version adds a lateral core challenge that the two-arm carry does not — directly trains the QL and obliques against real-world load.',
+        watchOut: [
+      'Leaning away from the weight to counterbalance it, which removes the whole point',
+      'The loaded shoulder creeping up towards the ear',
+      'Rushing; walk at a normal pace rather than hurrying to finish'
+    ],
+    load: 'Heavy enough that staying upright takes real effort, light enough that you never lean.',
     credits: 60
   },
 
@@ -772,6 +927,12 @@ export const STRENGTH = [
     ],
     coaching: 'The stick is your teacher — any gap shows you where control breaks down. Most people have never felt a true hip hinge before this drill.',
     why: 'Teaches the hip hinge pattern needed for deadlifts, Romanian deadlifts and good mornings. Doing these loaded without the pattern first causes back injury.',
+        watchOut: [
+      'Squatting rather than pushing the hips back',
+      'Rounding the back at the bottom — stop where it is still flat',
+      'Bending the knees more as you go down'
+    ],
+    load: 'Bodyweight. This is a pattern to learn before it is an exercise to load.',
     credits: 30
   }
 
@@ -806,6 +967,13 @@ export const STRENGTH = [
     ],
     coaching: 'This is a hip hinge, not a squat. The power comes from the hips snapping forward — not from lifting with the arms or rounding the back.',
     why: 'The kettlebell swing builds explosive hip power, posterior chain strength, and cardiovascular capacity simultaneously. One of the most effective single exercises available.',
+        watchOut: [
+      'Squatting instead of hinging — the hips go back, not down',
+      'Lifting the bell with the arms; it should float up from the hip drive alone',
+      'Over-arching the back at the top rather than finishing tall and squeezing the backside',
+      'Any lower-back pain: stop and go back to hip hinges without weight'
+    ],
+    load: 'Heavy enough that the hips have to work, light enough that your arms stay relaxed.',
     credits: 80
   },
 
@@ -833,6 +1001,12 @@ export const STRENGTH = [
     ],
     coaching: 'The goblet hold keeps the torso upright — the counterbalance of the weight in front naturally prevents forward lean. The best teaching squat there is.',
     why: 'The front-loaded position forces an upright torso and deep hip crease. Improves squat mechanics and builds full lower body strength.',
+        watchOut: [
+      'Knees falling inward as you stand up',
+      'Elbows drifting away from the body, which pulls you forward',
+      'Heels lifting at the bottom — squat only as deep as your heels stay down'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough to stay upright.',
     credits: 65
   },
 
@@ -861,6 +1035,12 @@ export const STRENGTH = [
     ],
     coaching: 'The clean is all about the timing of rotating under the bell. If it bangs your wrist, you are muscling it rather than rotating. Practise the swing first.',
     why: 'The clean is the foundational kettlebell movement — used to get the bell into the rack position for presses and squats. Builds full-body power and coordination.',
+        watchOut: [
+      'The bell banging down onto the wrist, which means it is looping out rather than travelling close to the body',
+      'Gripping too tightly through the catch',
+      'Using the arm to lift rather than the hips'
+    ],
+    load: 'Light while you learn the catch. This is a technique lift before it is a strength lift.',
     credits: 80
   },
 
@@ -887,6 +1067,12 @@ export const STRENGTH = [
     ],
     coaching: 'The single-arm press challenges core anti-rotation — the whole body must resist the tendency to lean away from the load. Stay tall.',
     why: 'Builds shoulder strength and pressing power with an additional core stability demand that bilateral pressing does not provide.',
+        watchOut: [
+      'Arching the lower back to get the bell up',
+      'The bell drifting in front of your face rather than travelling straight up',
+      'Any pinching overhead: reduce the range and lighten the bell'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that your ribs stay down.',
     credits: 70
   },
 
@@ -916,6 +1102,12 @@ export const STRENGTH = [
     ],
     coaching: 'Learn this without a kettlebell first — use a shoe balanced on your fist. Speed is the enemy here. Slow is controlled, controlled is safe.',
     why: 'The Turkish get-up tests and builds shoulder stability, hip mobility, and total body coordination. Called "a full physical assessment in one movement" by strength coaches.',
+        watchOut: [
+      'Rushing between positions — every stage should be under full control before the next',
+      'Eyes leaving the bell during the early stages',
+      'Attempting it loaded before you can do the whole sequence with a shoe balanced on your fist'
+    ],
+    load: 'Start with no weight at all, then a very light bell. This is a skill first.',
     credits: 100
   },
 
@@ -943,6 +1135,12 @@ export const STRENGTH = [
     ],
     coaching: 'The kettlebell deadlift teaches the hip hinge pattern with the load held centrally — ideal for learning the movement before progressing to barbell.',
     why: 'The deadlift is the most fundamental strength movement — picking things up from the floor. The kettlebell version is accessible for beginners.',
+        watchOut: [
+      'Rounding the back to reach the bell — bring the bell closer or raise it on a block',
+      'Squatting down to it rather than hinging back',
+      'Yanking it off the floor rather than building tension first'
+    ],
+    load: 'Heavy enough to feel the backside and hamstrings, light enough that your back stays flat.',
     credits: 65
   },
 
@@ -969,6 +1167,12 @@ export const STRENGTH = [
     ],
     coaching: 'The elbow should travel back like a saw, not out like a wing. Keep the shoulder blade moving — not just the arm.',
     why: 'The single-arm row builds back thickness and corrects the imbalances from pressing. Essential counterpart to any horizontal pressing movement.',
+        watchOut: [
+      'Twisting the torso to help the bell up',
+      'Shrugging rather than driving the elbow back',
+      'Rounding the lower back as you tire'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that your torso stays still.',
     credits: 60
   },
 
@@ -996,6 +1200,12 @@ export const STRENGTH = [
     ],
     coaching: 'The snatch is a one-move equivalent of a swing and a press combined. Learn the swing and clean to a high standard before attempting this.',
     why: 'The kettlebell snatch is one of the most demanding single exercises — ballistic power, shoulder stability, and cardiovascular endurance in one movement.',
+        watchOut: [
+      'The bell flipping over and banging the wrist, which means it is looping rather than travelling close',
+      'Attempting this before the swing and the clean are both comfortable',
+      'Gripping hard the whole way up rather than letting the handle rotate in the hand'
+    ],
+    load: 'Light. This is the most technical kettlebell lift and weight should come last.',
     credits: 100
   },
 
@@ -1021,6 +1231,12 @@ export const STRENGTH = [
     ],
     coaching: 'Move slowly — the tempo of a halo determines whether it is a warm-up or a shoulder drill. Fast halos are mostly momentum. Slow halos are work.',
     why: 'Improves shoulder girdle mobility and scapular control. Excellent as a warm-up before upper body work or as shoulder rehabilitation.',
+        watchOut: [
+      'Letting the bell drift far from your head, which strains the shoulders',
+      'Ribs flaring and the back arching as the bell passes behind',
+      'Rushing — slow circles are the point'
+    ],
+    load: 'Light. This is a mobility movement with a weight, not a strength lift.',
     credits: 35
   },
 
@@ -1048,6 +1264,12 @@ export const STRENGTH = [
     ],
     coaching: 'Keep your eye on the bell throughout. The eyes tracking the bell keeps the shoulder packed and safe. The moment you look down, the arm tends to drift.',
     why: 'Develops shoulder stability under load in an unusual position, hip mobility, and lateral core strength — a uniquely effective combination.',
+        watchOut: [
+      'Bending sideways through the waist rather than hinging at the hip',
+      'Eyes leaving the overhead bell',
+      'Going heavy before the movement is comfortable unloaded'
+    ],
+    load: 'Very light, or none at all to begin with.',
     credits: 80
   },
 
@@ -1074,6 +1296,12 @@ export const STRENGTH = [
     ],
     coaching: 'The figure-8 exposes hip tightness and coordination limitations immediately. Move slowly at first until the pattern is grooved.',
     why: 'Develops hip mobility, core stability, and hand-eye coordination in a unique multi-planar movement pattern.',
+        watchOut: [
+      'Rounding the back as you pass the bell through',
+      'Standing too upright, which leaves no room for the bell',
+      'Passing too fast to keep control of the hand-off'
+    ],
+    load: 'Light. Control of the hand-off matters more than the weight.',
     credits: 60
   },
 
@@ -1099,6 +1327,12 @@ export const STRENGTH = [
     ],
     coaching: 'Keep the hips still — they want to rotate with the bell. The challenge is the anti-rotation demand, not the weight.',
     why: 'Trains the core to resist rotation under a moving load. A relatively gentle way to build rotational core strength.',
+        watchOut: [
+      'Twisting the hips to follow the bell — they should stay square',
+      'Leaning back as the bell passes behind',
+      'Rushing the hand-off behind your back'
+    ],
+    load: 'Light enough that your hips stay completely still.',
     credits: 40
   },
 
@@ -1132,6 +1366,12 @@ export const STRENGTH = [
     ],
     coaching: 'The landing is as important as the jump. Soft, controlled landings protect the knees and build eccentric strength. Loud landings mean poor absorption.',
     why: 'Develops lower body power and rate of force development — the explosive quality that translates to sprinting, jumping, and change of direction.',
+        watchOut: [
+      'Landing heavily; quiet landings are the whole skill',
+      'Knees collapsing inward on landing',
+      'Doing these when tired, which is when landing form goes'
+    ],
+    load: 'Bodyweight only.',
     credits: 75
   },
 
@@ -1160,6 +1400,12 @@ export const STRENGTH = [
     ],
     coaching: 'Start with a low box. The goal is a safe, confident landing — not maximum height. Always step down, never jump down.',
     why: 'Box jumps develop explosive leg power in a controlled environment. The fixed target also trains spatial awareness and jumping confidence.',
+        watchOut: [
+      'Choosing a box so high you have to tuck your knees to clear it',
+      'Jumping down rather than stepping down, which is where most box-jump injuries happen',
+      'Landing with straight legs'
+    ],
+    load: 'Bodyweight only. Progress with box height, slowly.',
     credits: 80
   },
 
@@ -1187,6 +1433,12 @@ export const STRENGTH = [
     ],
     coaching: 'The arm swing contributes significantly to distance — practise it. Drive the arms forward and up at take-off, not just up.',
     why: 'The broad jump tests and builds horizontal power — the component most relevant to sprinting speed and athletic performance.',
+        watchOut: [
+      'Landing stiff-legged rather than absorbing through the hips and knees',
+      'Reaching for distance beyond what you can land under control',
+      'Knees collapsing inward on landing'
+    ],
+    load: 'Bodyweight only.',
     credits: 80
   },
 
@@ -1215,6 +1467,12 @@ export const STRENGTH = [
     ],
     coaching: 'There is no shame in stepping instead of jumping — the stepping version still delivers most of the benefit with less joint stress.',
     why: 'The burpee is one of the most comprehensive full-body conditioning exercises — strength, power, and cardiovascular demand in one movement.',
+        watchOut: [
+      'Hips sagging in the press-up portion as you tire',
+      'Landing heavily on the jump back in',
+      'Rushing through so form disappears entirely; slower and cleaner beats faster and ragged'
+    ],
+    load: 'Bodyweight only. Reduce the number of reps before reducing the quality.',
     credits: 90
   },
 
@@ -1241,6 +1499,12 @@ export const STRENGTH = [
     ],
     coaching: 'If the hands do not leave the floor, push faster. The explosive intent — even without actual leave — still trains the neuromuscular system powerfully.',
     why: 'Develops upper body power — the pressing equivalent of the jump squat. Builds the reactive strength needed for throwing, pushing, and striking sports.',
+        watchOut: [
+      'Hips sagging on landing',
+      'Landing on locked-out elbows',
+      'Attempting these before standard press-ups are comfortable'
+    ],
+    load: 'Bodyweight only.',
     credits: 80
   },
 
@@ -1268,6 +1532,12 @@ export const STRENGTH = [
     ],
     coaching: 'The depth jump develops the stretch-shortening cycle — the spring-like quality of tendons. Only attempt once standard jump squats are comfortable.',
     why: 'One of the most effective plyometric exercises for reactive strength — the ability to absorb and immediately re-use elastic energy in the tendons.',
+        watchOut: [
+      'Stepping off from a box that is too high',
+      'Spending too long on the ground between landing and jumping',
+      'Doing these when tired; this is the most demanding plyometric there is'
+    ],
+    load: 'Bodyweight only, and only when fresh.',
     credits: 90
   },
 
@@ -1295,6 +1565,12 @@ export const STRENGTH = [
     ],
     coaching: 'Start with small hops and increase the width as landing control improves. Quiet landings mean good control.',
     why: 'Develops lateral power and single-leg landing stability — essential for court sports, football, and change of direction.',
+        watchOut: [
+      'Heavy landings',
+      'Knees caving inward',
+      'Hopping further than you can land under control'
+    ],
+    load: 'Bodyweight only.',
     credits: 65
   },
 
@@ -1321,6 +1597,12 @@ export const STRENGTH = [
     ],
     coaching: 'The trailing leg sweep helps with balance and adds hip adductor work. The bigger the lateral distance, the more demanding the single-leg landing.',
     why: 'Develops lateral explosive power and single-leg landing mechanics. One of the best exercises for lateral sport performance.',
+        watchOut: [
+      'Landing on a straight leg',
+      'Trunk collapsing towards the landing side',
+      'Going for distance before the landing is stable'
+    ],
+    load: 'Bodyweight only.',
     credits: 70
   },
 
@@ -1348,6 +1630,12 @@ export const STRENGTH = [
     ],
     coaching: 'The tuck jump requires both height and hip flexor speed. If the knees barely come up, work on jump squats first before adding the tuck.',
     why: 'Develops vertical jump height and hip flexor explosive strength. Used in athletics, gymnastics, and team sport training.',
+        watchOut: [
+      'Landing heavily with locked knees',
+      'Arching the lower back as the knees come up',
+      'Doing many reps in a row, which turns a power exercise into a conditioning one'
+    ],
+    load: 'Bodyweight only. Few reps, full recovery.',
     credits: 80
   },
 
@@ -1375,6 +1663,12 @@ export const STRENGTH = [
     ],
     coaching: 'Build-ups are how sprinters warm up and how recreational runners safely explore top speed. The gradual build reduces hamstring strain risk.',
     why: 'Safely introduces maximum velocity running. Progressive acceleration allows the body to reach top speed safely — sudden standing starts are where hamstring injuries happen.',
+        watchOut: [
+      'Going to full speed from the first stride rather than building into it',
+      'Sprinting without a proper warm-up, which is how hamstrings get pulled',
+      'Straining the neck and shoulders; stay relaxed above the waist'
+    ],
+    load: 'Effort only. Build to around eighty percent rather than flat out.',
     credits: 60
   },
 
@@ -1401,6 +1695,12 @@ export const STRENGTH = [
     ],
     coaching: 'This is a power exercise — and also a stress-release exercise. Both of those are legitimate training goals.',
     why: 'Medicine ball slams develop full-body power, particularly the downward force production used in throwing, tackling, and chopping movements.',
+        watchOut: [
+      'Rounding the back as you slam down rather than hinging at the hips',
+      'Slamming a ball that bounces, which can come back at your face — use a dead-ball if there is any doubt',
+      'Reaching so far overhead that the lower back arches'
+    ],
+    load: 'Light. Speed is the point here, and a heavy ball slows the movement down.',
     credits: 80
   },
 
@@ -1426,6 +1726,12 @@ export const STRENGTH = [
     ],
     coaching: 'The explosion comes from the chest and arms simultaneously — it is a push, not a throw. Stay close to the wall and work quickly.',
     why: 'Develops upper body pressing power and reactive catching ability. Directly trains the force production pattern used in pushing, blocking, and throwing sports.',
+        watchOut: [
+      'Standing too close to the wall to catch the rebound safely',
+      'Throwing with straight arms rather than pressing from the chest',
+      'Catching with locked elbows, which jars the joints'
+    ],
+    load: 'Light enough that the throw stays fast.',
     credits: 65
   },
 
@@ -1453,6 +1759,12 @@ export const STRENGTH = [
     ],
     coaching: 'Single-leg hop testing is used clinically to assess return-to-sport readiness after knee injury. It is also excellent training.',
     why: 'The gold-standard test of single-leg power and landing control. The ability to hop for distance and stick the landing indicates robust lower limb function.',
+        watchOut: [
+      'Landing on a straight leg',
+      'Hopping for distance before you can land and hold it still',
+      'Knee collapsing inward on landing'
+    ],
+    load: 'Bodyweight only. Land and hold before you chase distance.',
     credits: 75
   },
 
@@ -1480,6 +1792,12 @@ export const STRENGTH = [
     ],
     coaching: 'Without a partner, use a random timer app to determine direction or watch a bouncing ball. The unpredictability is what trains agility — not planned drills.',
     why: 'Reactive agility — responding to unpredictable stimuli — is the actual demand of team sports. Planned agility drills train movement, not agility.',
+        watchOut: [
+      'Planting on a straight leg when changing direction',
+      'Going at full speed before the movement pattern is comfortable',
+      'Doing these on a slippery surface'
+    ],
+    load: 'Bodyweight only.',
     credits: 75
   },
 
@@ -1507,6 +1825,12 @@ export const STRENGTH = [
     ],
     coaching: 'Most running injuries happen during deceleration, not acceleration. Practising controlled stopping builds the eccentric strength that prevents them.',
     why: 'Deceleration strength is one of the most undertrained qualities in sport. The eccentric quad and glute demand in stopping is greater than in any running stride.',
+        watchOut: [
+      'Stopping stiff-legged rather than sinking into the hips',
+      'Decelerating over too short a distance to start with',
+      'Doing these when the legs are already tired'
+    ],
+    load: 'Bodyweight only. Lengthen the stopping distance if it feels jarring.',
     credits: 65
   }
 
@@ -1545,6 +1869,13 @@ export const STRENGTH = [
     ],
     coaching: 'The bar should travel in a straight vertical line — if it swings away from your legs at any point, the weight is too heavy or the setup is off.',
     why: 'The deadlift is the most fundamental human strength movement — picking a heavy load from the floor. No exercise builds posterior chain strength as comprehensively.',
+        watchOut: [
+      'Back rounding as you set up or as you lift — reset rather than pushing through it',
+      'Hips shooting up first, leaving the back to do the work',
+      'Bar drifting away from your shins; it should travel almost touching your legs',
+      'Any back pain during or after: stop and return to lighter hinge work'
+    ],
+    load: 'Heavy enough to be demanding, light enough that your back stays flat from first rep to last.',
     credits: 90
   },
 
@@ -1575,6 +1906,13 @@ export const STRENGTH = [
     ],
     coaching: 'The bar position on the upper traps is critical — too high on the neck creates cervical compression. Too low starts to require significant forward lean.',
     why: 'The back squat is the primary lower body strength exercise in most training programmes. Builds quad, glute, and core strength that transfers to all athletic movement.',
+        watchOut: [
+      'Knees falling inward as you stand up out of the bottom',
+      'Chest dropping forward so it becomes a hinge rather than a squat',
+      'Heels lifting off the floor',
+      'Squatting without safety bars set at a height that would catch the bar'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that your form is identical on rep one and rep ten.',
     credits: 90
   },
 
@@ -1604,6 +1942,13 @@ export const STRENGTH = [
     ],
     coaching: 'The shoulder blade retraction is the most important setup cue — it creates a stable base and reduces shoulder impingement risk significantly.',
     why: 'The bench press is the primary horizontal pushing strength exercise. Builds chest, shoulder, and tricep strength with a loading capacity unmatched by bodyweight pressing.',
+        watchOut: [
+      'Bouncing the bar off the chest',
+      'Elbows flaring straight out to the sides at ninety degrees',
+      'Lifting the hips off the bench to drive the bar up',
+      'Benching heavy alone without safety bars or a spotter'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that you could complete one more if you had to.',
     credits: 80
   },
 
@@ -1633,6 +1978,12 @@ export const STRENGTH = [
     ],
     coaching: 'The strict press allows no leg drive — if you need to use your legs, the weight is too heavy for a strict press. Move to push press instead.',
     why: 'The overhead press builds shoulder and upper body strength in a standing, loaded position — the most functional upper body strength exercise available.',
+        watchOut: [
+      'Arching the lower back to get the bar up — brace the stomach and squeeze the backside first',
+      'Pressing the bar around your face rather than moving your head back and letting it travel straight',
+      'Any pinching overhead: reduce the range and lighten the bar'
+    ],
+    load: 'Heavy enough to be demanding, light enough that your ribs stay down over your hips.',
     credits: 80
   },
 
@@ -1661,6 +2012,13 @@ export const STRENGTH = [
     ],
     coaching: 'The lower back must not round under load — if it does, reduce the weight or reduce the forward lean angle.',
     why: 'The barbell row builds upper back thickness and strength — the essential counterpart to any pressing programme and a primary postural strength exercise.',
+        watchOut: [
+      'Standing up as you pull, so the torso angle changes rep to rep',
+      'Rounding the lower back — set the back flat before the first rep and hold it',
+      'Bouncing the bar off the thighs or the floor to generate momentum',
+      'Shrugging rather than driving the elbows back past your ribs'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that your torso angle never changes.',
     credits: 80
   },
 
@@ -1690,6 +2048,13 @@ export const STRENGTH = [
     ],
     coaching: 'The difference between an RDL and a deadlift: the RDL starts from standing and emphasises the eccentric loading of the hamstrings. The stretch at the bottom is the point.',
     why: 'The Romanian deadlift is the primary hamstring strength exercise in most programmes — builds the eccentric hamstring strength that prevents hamstring strains in sport.',
+        watchOut: [
+      'Your back rounding as you lower — stop where your back is still flat',
+      'Feeling this in the lower back rather than the hamstrings, which means the hips are not moving back far enough',
+      'Bar drifting away from your legs; it should brush down your thighs',
+      'Any sharp back pain: set the bar down and leave this one for today'
+    ],
+    load: 'Heavy enough that your hamstrings clearly work, light enough that your back never rounds.',
     credits: 80
   },
 
@@ -1719,6 +2084,13 @@ export const STRENGTH = [
     ],
     coaching: 'Keep the chin tucked at the top — looking up causes the lower back to extend instead of the glutes to contract.',
     why: 'Research by Dr Bret Contreras consistently shows the barbell hip thrust produces greater glute activation than any other exercise. The most direct glute builder available.',
+        watchOut: [
+      'Over-arching at the top and finishing with the lower back rather than the backside',
+      'Feet too close, so the front of the thighs take over',
+      'Chin lifting as you drive up; keep looking forward, not at the ceiling',
+      'Bar on bare hip bones without a pad, which is simply painful'
+    ],
+    load: 'Heavy enough that a two-second squeeze at the top is hard to hold.',
     credits: 80
   },
 
@@ -1748,6 +2120,13 @@ export const STRENGTH = [
     ],
     coaching: 'The front squat demands more thoracic mobility and core strength than the back squat. Start lighter than you expect.',
     why: 'The front-loaded position demands greater quad and core strength, greater thoracic mobility, and a more upright torso — developing different qualities than the back squat.',
+        watchOut: [
+      'Elbows dropping, which pulls the bar and your chest forward',
+      'Wrists taking the bar\'s weight; the shoulders should hold it, the hands only steady it',
+      'Heels lifting at the bottom',
+      'Safety bars not set at a height that would catch the bar'
+    ],
+    load: 'Lighter than a back squat. The front rack limits you before your legs do, and that is normal.',
     credits: 90
   },
 
@@ -1777,6 +2156,12 @@ export const STRENGTH = [
     ],
     coaching: 'Use much less weight than you think. The lever arm is long and the lower back load is significant. Technique before load on this one.',
     why: 'Builds posterior chain strength with the bar on the back — teaches the hip hinge pattern under a spinal load, building the back strength needed for heavy deadlifts.',
+        watchOut: [
+      'Bending the knees more as you go down, which turns it into a squat',
+      'Rounding the back at any point — this is the exercise where that matters most',
+      'Going heavier than you can control; this one rewards restraint'
+    ],
+    load: 'Much lighter than a Romanian deadlift. Start with an empty bar.',
     credits: 75
   },
 
@@ -1806,6 +2191,12 @@ export const STRENGTH = [
     ],
     coaching: 'The power clean is a technical lift — get coaching if possible before loading it. The hip drive and the timing of the catch are skills that need deliberate practice.',
     why: 'The most complete expression of full-body power in a barbell lift. Used across all strength sports and team sport conditioning for developing explosive hip extension.',
+        watchOut: [
+      'Pulling with the arms early instead of extending the hips first',
+      'Catching with straight legs and a jarred spine rather than dipping under the bar',
+      'Attempting this before the deadlift and front rack are both comfortable'
+    ],
+    load: 'Light. This is a speed and technique lift; loading it before the pattern is clean is how people get hurt.',
     credits: 100
   },
 
@@ -1837,6 +2228,12 @@ export const STRENGTH = [
     ],
     coaching: 'Keep the arms straight throughout — bending the elbows turns it into an arm exercise. The movement comes from the shoulder blades.',
     why: 'One of the most effective exercises for rear deltoid and mid-trap strength — the muscles that counteract forward posture and shoulder impingement.',
+        watchOut: [
+      'Shrugging the shoulders up as you pull',
+      'Bending the elbows, which turns it into a row',
+      'Rushing the return and letting the band snap your arms together'
+    ],
+    load: 'Light enough that your shoulders stay down and your arms stay straight.',
     credits: 30
   },
 
@@ -1865,6 +2262,12 @@ export const STRENGTH = [
     ],
     coaching: 'The external rotation at the end is the key part — it is what makes this a rotator cuff and rear delt exercise rather than just a row.',
     why: 'The face pull is widely considered one of the most important shoulder health exercises — directly targets the posterior rotator cuff and combats the internal rotation dominance of most training.',
+        watchOut: [
+      'Pulling towards the chest rather than the face',
+      'Shrugging as you pull',
+      'Letting the band drag your arms forward fast at the end of each rep'
+    ],
+    load: 'Light. This is a small-muscle exercise and heavy bands recruit the wrong things.',
     credits: 30
   },
 
@@ -1892,6 +2295,12 @@ export const STRENGTH = [
     ],
     coaching: 'The band provides accommodating resistance — hardest at the top where you are strongest. A different stimulus to free weights.',
     why: 'Resistance bands provide accommodating resistance that matches the strength curve of the squat — developing lockout strength and glute activation at the top of the lift.',
+        watchOut: [
+      'Knees collapsing inward against the band',
+      'Letting the band pull your chest forward',
+      'Squatting deeper than you can control with the band tension'
+    ],
+    load: 'A band that makes the last two reps hard while your knees still track over your toes.',
     credits: 35
   },
 
@@ -1919,6 +2328,12 @@ export const STRENGTH = [
     ],
     coaching: 'Ideal for learning the hip hinge pattern before adding barbell load, or for training at home with no heavy equipment.',
     why: 'Teaches and loads the hip hinge pattern with accessible equipment. Builds glute and hamstring strength in the same movement pattern as the deadlift.',
+        watchOut: [
+      'Squatting rather than pushing the hips back',
+      'Rounding the lower back at the bottom',
+      'Pulling with the arms; they are only hooks here'
+    ],
+    load: 'Enough tension to feel the backside working, light enough that your back stays flat.',
     credits: 35
   },
 
@@ -1946,6 +2361,12 @@ export const STRENGTH = [
     ],
     coaching: 'The resistance increases as the arms extend — the hardest part is lockout, where a barbell bench press is actually easiest. Complements free weight pressing well.',
     why: 'Provides a horizontal pressing movement accessible without a barbell or bench. The accommodating resistance is a different stimulus that complements standard pressing.',
+        watchOut: [
+      'Elbows flaring straight out to the sides',
+      'Letting the band snap your hands back rather than controlling the return',
+      'Anchor point too high or too low, so the press runs at an awkward angle'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that your elbows stay at forty-five degrees.',
     credits: 35
   },
 
@@ -1974,6 +2395,12 @@ export const STRENGTH = [
     ],
     coaching: 'Keep the torso upright throughout — the temptation is to lean back to help the pull. The movement should come from the arms and shoulder blades only.',
     why: 'A fully accessible rowing exercise requiring only a band and the floor. Builds the upper back strength that counteracts desk posture and shoulder impingement.',
+        watchOut: [
+      'Leaning back to start the pull',
+      'Rounding the back as you return',
+      'Shrugging rather than driving the elbows back'
+    ],
+    load: 'Enough tension that the last two reps are hard, light enough that you sit tall throughout.',
     credits: 35
   },
 
@@ -2002,6 +2429,12 @@ export const STRENGTH = [
     ],
     coaching: 'The glutes should be working hard by the third or fourth step. If not, use a heavier band or widen the stance.',
     why: 'Directly activates the glute medius — the hip abductor most responsible for knee stability and lateral movement. Used in ACL prevention protocols worldwide.',
+        watchOut: [
+      'Standing up tall between steps, which lets the tension off',
+      'Feet dragging rather than stepping',
+      'Knees caving inward against the band, which is the opposite of what it is for'
+    ],
+    load: 'A band you can walk against without your knees collapsing inwards.',
     credits: 35
   },
 
@@ -2030,6 +2463,12 @@ export const STRENGTH = [
     ],
     coaching: 'The anti-rotation demand makes this more effective for core development than a cable or dumbbell row from a supported position.',
     why: 'A single-arm pull against a lateral anchor requires core anti-rotation — combining back strength and core stability in a functional standing pattern.',
+        watchOut: [
+      'Twisting the torso towards the anchor as you pull',
+      'Shrugging the shoulder up',
+      'Letting the band drag you forward on the return'
+    ],
+    load: 'Enough tension to work, light enough that your torso stays square.',
     credits: 40
   },
 
@@ -2057,6 +2496,12 @@ export const STRENGTH = [
     ],
     coaching: 'Keep the elbows pinned to the sides throughout — swinging the elbows forward turns it into a shoulder exercise.',
     why: 'A simple, accessible bicep exercise requiring only a band. Builds elbow flexor strength for pulling movements and functional daily tasks.',
+        watchOut: [
+      'Elbows swinging forward away from your sides',
+      'Leaning back as the tension increases',
+      'Rushing the lowering, which is where most of the work is'
+    ],
+    load: 'Light enough that your elbows stay pinned to your sides throughout.',
     credits: 25
   },
 
@@ -2084,6 +2529,12 @@ export const STRENGTH = [
     ],
     coaching: 'The elbows must not move — if they drift forward, you are using shoulder flexion rather than tricep extension.',
     why: 'A direct tricep isolation exercise that complements pressing movements and builds elbow extension strength for pushing, throwing, and overhead sport.',
+        watchOut: [
+      'Elbows travelling forward as you push',
+      'Leaning your bodyweight over the band to force it down',
+      'Not straightening fully at the bottom, which is where the work is'
+    ],
+    load: 'Light. Small muscles respond to control, not tension.',
     credits: 25
   },
 
@@ -2111,6 +2562,12 @@ export const STRENGTH = [
     ],
     coaching: 'Accommodating resistance means the band is hardest overhead where you are typically weakest in a barbell press. Develops strength at the top of the pressing range.',
     why: 'A fully accessible overhead pressing movement requiring only a band. Builds shoulder strength and overhead stability without a barbell or machine.',
+        watchOut: [
+      'Arching the lower back to get the hands overhead',
+      'Bands drifting in front of your face rather than pressing straight up',
+      'Any pinching overhead: reduce the range'
+    ],
+    load: 'Enough tension that the last two reps are hard, light enough that your ribs stay down.',
     credits: 35
   },
 
@@ -2193,6 +2650,13 @@ export const STRENGTH = [
     ],
     coaching: 'Dumbbells allow a slightly wider or narrower path than a barbell — useful if hip structure makes a barbell RDL awkward.',
     why: 'Builds hamstring and glute strength in the hinge pattern with lighter, more accessible equipment than a barbell.',
+        watchOut: [
+      'Back rounding as you lower — stop where it is still flat',
+      'Feeling this in the lower back rather than the hamstrings',
+      'Bending the knees to reach lower; they stay softly bent and still',
+      'Any sharp back pain: put the weights down for today'
+    ],
+    load: 'Heavy enough that your hamstrings clearly work, light enough that your back never rounds.',
     credits: 65
   },
 
@@ -2221,6 +2685,12 @@ export const STRENGTH = [
     ],
     coaching: 'Drive through the heel of the working leg — not the toe. If the heel lifts, the step is too high or the weight too heavy.',
     why: 'A unilateral leg exercise that builds quad and glute strength while exposing and correcting strength imbalances between legs.',
+        watchOut: [
+      'Pushing off the trailing foot to launch yourself up, rather than driving through the foot on the step',
+      'Step too high, so the hip has to rotate to get up',
+      'Dropping down rather than lowering under control'
+    ],
+    load: 'Heavy enough to be demanding, light enough that you never push off the back foot.',
     credits: 60
   },
 
@@ -2249,6 +2719,12 @@ export const STRENGTH = [
     ],
     coaching: 'The reverse lunge is safer on the knee than a forward lunge — the forces are more controllable. A good starting point for people rebuilding knee confidence.',
     why: 'Develops unilateral lower body strength with lower knee shear force than a forward lunge. Excellent for building single-leg stability.',
+        watchOut: [
+      'Front knee travelling far past the toes',
+      'Trunk falling forward as you step back',
+      'Landing heavily on the back foot rather than placing it'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough to stay upright and balanced.',
     credits: 55
   },
 
@@ -2277,6 +2753,12 @@ export const STRENGTH = [
     ],
     coaching: 'Most people use far too much weight for this. Lower trap activation requires a very light load and precise movement — not heavier weight and momentum.',
     why: 'Directly trains the lower trapezius — one of the most underactive muscles in desk workers and a primary cause of shoulder impingement and neck pain.',
+        watchOut: [
+      'Shrugging as you raise',
+      'Arching the back to help the weights up',
+      'Going heavy on a small-muscle exercise'
+    ],
+    load: 'Very light. This one is about position, not load.',
     credits: 35
   },
 
@@ -2304,6 +2786,12 @@ export const STRENGTH = [
     ],
     coaching: 'The balance challenge makes this harder than the weight suggests. Use a lighter dumbbell than you think and focus on hip hinge quality and balance.',
     why: 'Combines hamstring and glute strength with single-leg balance — develops the hip stability and posterior chain strength needed for running and sport.',
+        watchOut: [
+      'Hips opening to the side rather than staying square to the floor',
+      'Rounding the back to reach lower',
+      'Rushing; balance needs a slow tempo'
+    ],
+    load: 'Light. Balance limits this exercise long before strength does.',
     credits: 65
   },
 
@@ -2332,6 +2820,12 @@ export const STRENGTH = [
     ],
     coaching: 'The prone position prevents any cheating through body momentum — the upper back does all the work.',
     why: 'A bilateral row that removes all postural cheating — the chest-supported position isolates the upper back muscles completely.',
+        watchOut: [
+      'Lifting the chest off the bench to help the weights up',
+      'Shrugging rather than driving the elbows back',
+      'Letting the weights drop fast at the end of each rep'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that your chest stays on the bench.',
     credits: 55
   },
 
@@ -2359,6 +2853,12 @@ export const STRENGTH = [
     ],
     coaching: 'The pause at the bottom eliminates the elastic rebound — every rep starts from a dead stop. Much harder than it sounds.',
     why: 'Pausing removes elastic energy from the squat, requiring pure muscular strength to stand. Develops bottom-position strength and hip mobility simultaneously.',
+        watchOut: [
+      'Bouncing out of the pause rather than holding it still',
+      'Chest dropping forward during the hold',
+      'Heels lifting at the bottom'
+    ],
+    load: 'Lighter than a normal goblet squat. The pause makes the same weight considerably harder.',
     credits: 60
   },
 
@@ -2386,6 +2886,12 @@ export const STRENGTH = [
     ],
     coaching: 'Keep a slight bend in the elbows throughout — a straight arm fly puts excessive stress on the bicep tendon at the shoulder.',
     why: 'Develops chest strength through the fly movement pattern — wider range than pressing. The floor acts as a natural range limiter, making it shoulder-friendly.',
+        watchOut: [
+      'Straightening the arms fully, which strains the elbow',
+      'Going too heavy on a movement with a long lever',
+      'Bouncing the upper arms off the floor'
+    ],
+    load: 'Much lighter than a press. Flyes put the shoulder in a long position and reward restraint.',
     credits: 50
   },
 
@@ -2413,6 +2919,12 @@ export const STRENGTH = [
     ],
     coaching: 'The overhead carry exposes shoulder weakness and core instability immediately. If the arm wavers, the weight is too heavy.',
     why: 'Develops shoulder stability and core anti-lateral-flexion under dynamic load — a uniquely functional combination that transfers to every overhead sport and activity.',
+        watchOut: [
+      'Ribs flaring and the back arching under the overhead load',
+      'The arm drifting forward instead of staying beside the ear',
+      'Walking before the shoulder is stable overhead'
+    ],
+    load: 'Light. Overhead carries are about position, and a heavy one just teaches a bad position.',
     credits: 60
   },
 
@@ -2440,6 +2952,12 @@ export const STRENGTH = [
     ],
     coaching: 'The awkwardness of the load is the point — odd objects demand more from the stabilising system than any perfectly balanced barbell.',
     why: 'Odd-object carrying builds real-world functional strength — the type used in moving house, carrying shopping, or field sport. Develops total body tension and grip endurance.',
+        watchOut: [
+      'Rounding the back to hold the load against the chest',
+      'Leaning back to counterbalance',
+      'Holding your breath through the walk'
+    ],
+    load: 'Heavy enough that holding the position is work, light enough that your back stays flat.',
     credits: 70
   },
 
@@ -2468,6 +2986,12 @@ export const STRENGTH = [
     ],
     coaching: 'The lowering phase with pronated grip develops forearm and brachioradialis strength that standard curls miss entirely.',
     why: 'The Zottman curl trains both the bicep on the way up and the forearm and brachioradialis on the way down — more efficient than any single curl variation.',
+        watchOut: [
+      'Rushing the rotation at the top',
+      'Elbows swinging forward',
+      'Going as heavy as a normal curl; the reverse lowering is much harder'
+    ],
+    load: 'Lighter than a standard curl, because the lowering half decides the weight.',
     credits: 35
   },
 
@@ -2495,6 +3019,12 @@ export const STRENGTH = [
     ],
     coaching: 'Keep a slight bend in the elbows throughout. The stretch behind the head should feel like a deep chest and lat opening — not shoulder pain.',
     why: 'A unique exercise that trains both the chest and the lats through a long range of motion — builds thoracic mobility alongside upper body strength.',
+        watchOut: [
+      'Ribs flaring and the back arching as the weight goes overhead',
+      'Straightening the elbows fully under load',
+      'Going deeper than your shoulders comfortably allow'
+    ],
+    load: 'Light. Shoulder position matters far more than weight on this one.',
     credits: 50
   },
 
@@ -2523,6 +3053,12 @@ export const STRENGTH = [
     ],
     coaching: 'The pistol squat demands ankle mobility, hip flexibility, and single-leg strength simultaneously. Progress is slow — that is normal.',
     why: 'One of the most demanding single-leg exercises — requires full range of motion strength through the entire lower body. A legitimate marker of functional lower body fitness.',
+        watchOut: [
+      'Skipping ahead in the progression before the current stage is comfortable',
+      'Knee collapsing inward at the bottom',
+      'Rounding the lower back to reach depth'
+    ],
+    load: 'Bodyweight. This is a progression to work through, not a lift to load.',
     credits: 80
   },
 
@@ -2551,6 +3087,12 @@ export const STRENGTH = [
     ],
     coaching: 'The Nordic curl is extremely demanding — most people need the hand assist for months before a full unassisted rep is possible. The assisted version still delivers major hamstring gains.',
     why: 'The Nordic curl has the strongest evidence base of any hamstring injury prevention exercise. Eccentric hamstring strength built here directly reduces hamstring strain risk in sport.',
+        watchOut: [
+      'Falling rather than lowering; you should control every inch',
+      'Bending at the hips to make it easier, which removes the point',
+      'Attempting the full version before the assisted stages are comfortable'
+    ],
+    load: 'Bodyweight, heavily assisted. This is one of the hardest movements there is.',
     credits: 80
   },
 
@@ -2580,6 +3122,12 @@ export const STRENGTH = [
     ],
     coaching: 'Wall sits are harder than they look after 30 seconds. The quads burn — that is the point. Focus on keeping the back flat on the wall.',
     why: 'Isometric quad strength directly supports knee health and is used in patellofemoral pain rehabilitation. A simple, effective strength and endurance exercise.',
+        watchOut: [
+      'Sliding down as you tire rather than holding position',
+      'Knees drifting past the toes',
+      'Holding your breath; breathe steadily throughout'
+    ],
+    load: 'Bodyweight. Progress by holding longer.',
     credits: 40
   },
 
@@ -2608,6 +3156,12 @@ export const STRENGTH = [
     ],
     coaching: 'The moment the lower back arches off the floor, the position is lost. Lift the legs higher or bend the knees to reduce difficulty and maintain position.',
     why: 'The hollow body hold is the foundation of gymnastics strength training — trains the deep abdominals to maintain spinal position against load, essential for all pressing and pulling movements.',
+        watchOut: [
+      'Lower back lifting off the floor, which is the point to reduce the range',
+      'Holding your breath',
+      'Extending the arms and legs further than you can keep the back flat'
+    ],
+    load: 'Bodyweight. Progress by extending further while the back stays down.',
     credits: 55,
     sets: 3,
     reps: null,
