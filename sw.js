@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v236
+ * Persona trace fixes - duplicate exercises within a session (12% of
+ * sessions), warmup difficulty ceiling, and an unsafe difficultyLevel
+ * default that treated untagged exercises as the easiest possible.
+ *
  * 11 Aug 2026 v235
  * CONT-1 - the app now records WHICH exercises were completed, not only how
  * many, and session selection is continuity-aware. store.js v22 adds
@@ -1024,7 +1029,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v245";
+const CACHE_NAME = "alongside-v246";
 
 const SHELL_URLS = [
 
