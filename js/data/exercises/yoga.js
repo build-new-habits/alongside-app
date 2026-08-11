@@ -1,5 +1,14 @@
 /**
  * data/exercises/yoga.js
+ * 11 Aug 2026 v2
+ *
+ * v2 — PT-9 (Persona Tracing Wave 1). yoga-crescent-lunge was the only
+ *   one of 461 exercises with no energyRequired. filterByFitnessLevel()
+ *   tests `ex.energyRequired <= ceiling`; `undefined <= n` is false, so
+ *   the pose was excluded for every user at every ceiling below 10 —
+ *   unreachable in the live app. Set to 3: its own coaching note says it
+ *   is more accessible than Warrior I, which is 4.
+ *
  * 10 Aug 2026 v1
  *
  * v1 — First version header on this file. Added tailored YouTube search
@@ -252,6 +261,7 @@ export const YOGA = [
     ],
     coaching: 'The back knee on the floor makes this more accessible than Warrior I. Lower the back knee any time Warrior I becomes too intense.',
     why: 'A deep hip flexor and quad stretch in a stable position. One of the most effective poses for counteracting the effects of prolonged sitting.',
+    energyRequired: 3,
     credits: 35
   },
 
