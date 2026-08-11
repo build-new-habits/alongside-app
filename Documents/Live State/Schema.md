@@ -1,10 +1,29 @@
 # Alongside — Data Schema Reference
-## 11 Aug 2026 v1.20
+## 11 Aug 2026 v1.21
 
 **File:** `js/store.js` (confirmed live version: v21, 11 Aug 2026)
 **Storage:** `localStorage` key `alongside_user`
 
-**This version supersedes:** `schema.md` v1.17 (09 Aug 2026). Adds the new nested `consent{}` object (`store.js` v19) — see Section 1. This closes a gap found by the Persona Tracing Wave 1 store audit: live onboarding had captured **no legal consent record at all** since the OB-THREAD rebuild retired `welcome.js`. Consent is now an affirmative tick with a recorded policy version, not implied consent. The age gate is built but inert pending A1.11.
+**This version supersedes:** v1.20 (11 Aug 2026). Adds the cross-reference below to the new Exercise Entry Standard (CON-3). No `store.js` change in this pass — `store.js` remains v21.
+
+---
+
+## Cross-reference — exercise content fields
+
+Static exercise entries in `js/data/exercises/*.js` are **not** store fields and are not documented here. Their canonical definition is `Documents/Live State/exercise_entry_standard.md` (11 Aug 2026 v1).
+
+Two fields were added to that standard on 11 Aug 2026:
+
+- `watchOut` — `string[]`, the failure modes and their correction. Previously absent from all 461 entries and all four private pools; had never existed.
+- `load` — `string`, effort-relative weight guidance. **Never an absolute weight**, per Locked Principle P4: an absolute target is an interpretation of load, and a benchmark with a verdict attached.
+
+Baseline at time of writing, from `Documents/Admin/Templates/validate-exercise-entries.mjs`: 461 entries, 0 carrying `watchOut`, 49 loaded exercises missing `load`/`sets`/`reps`. CON-9 backfills, equipment-requiring exercises first.
+
+**Open finding, logged not fixed:** `contentType` is written on 368 of 461 exercise entries and read nowhere in the codebase. `category` is what the engines select on. Same writer-without-reader pattern already recorded here for `proposalBias`. Retire or wire up — separate decision.
+
+---
+
+**Previous supersession note:** `schema.md` v1.17 (09 Aug 2026). Adds the new nested `consent{}` object (`store.js` v19) — see Section 1. This closes a gap found by the Persona Tracing Wave 1 store audit: live onboarding had captured **no legal consent record at all** since the OB-THREAD rebuild retired `welcome.js`. Consent is now an affirmative tick with a recorded policy version, not implied consent. The age gate is built but inert pending A1.11.
 
 **Previous version note (v1.17):** superseded `schema.md` v1.16 (04 Aug 2026). Two catch-ups in one pass: (1) `exercisePreferences` (`store.js` v17, 04 Aug) was never documented here — added below. (2) New `inStepProgress` (`store.js` v18, 09 Aug) for the "In Step" Noticing Hub feature (Personal tier) — four-movement scenario practice extending the empathy transfer arc. Full feature spec developed in PM chat, 09 Aug 2026.
 
