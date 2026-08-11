@@ -641,6 +641,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'This warm-up sequence has been developed over decades by athletic trainers. Do not skip any component — the order matters.',
     why: 'A systematic pre-sport warm-up reduces injury risk, improves neuromuscular activation, and prepares the cardiovascular system for competition effort.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 50
   },
 
@@ -672,6 +679,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'This warm-up specifically activates the glutes and hip stabilisers before loading the lower body. Particularly important for runners and footballers.',
     why: 'Glute and hip activation before lower body sport reduces ACL injury risk and improves performance quality by ensuring the primary power muscles are firing correctly.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 45
   },
 
@@ -703,6 +717,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Throwing and striking sports put exceptional demand on the rotator cuff. This warm-up is not optional — it is injury prevention.',
     why: 'Upper body sport creates shoulder impingement risk when the rotator cuff and scapular stabilisers are not activated before loading. This sequence addresses that directly.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 45
   },
 
@@ -735,6 +756,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The cool-down is not optional and it is not about flexibility. It is about returning the body to homeostasis safely and reducing next-day stiffness.',
     why: 'A structured cool-down reduces post-exercise blood pooling, removes metabolic waste from muscles, and begins the recovery process that enables the next session.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 35
   },
 
@@ -766,6 +794,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The legs most need attention after running — these target the exact muscles most stressed. Do not skip the calf and Achilles stretch.',
     why: 'Running creates cumulative tightness in the posterior chain and hip flexors. A targeted post-run stretch routine reduces the risk of overuse injury across training weeks.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 35
   },
 
@@ -1484,6 +1519,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'This is a 20-minute warm-up used by professional sports teams worldwide. Every minute of it reduces injury risk and improves performance quality.',
     why: 'A complete dynamic warm-up that progressively increases tissue temperature, activates neuromuscular pathways, and rehearses sport-specific movement patterns before loading.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 55
   },
 
@@ -1697,6 +1739,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Use this as a warm-up before any court or field sport session. The variety of patterns activates different movement systems than jogging alone.',
     why: 'A structured ladder warm-up activates fast-twitch fibres, ankle stability mechanisms, and coordination pathways that a standard jog does not reach.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 45
   },
 

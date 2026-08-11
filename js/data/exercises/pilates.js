@@ -258,6 +258,13 @@ export const PILATES = [
     ],
     coaching: 'Unlike Cobra, the Swan in Pilates emphasises extending through the full spine — feel it from the tailbone through the crown of the head.',
     why: 'Strengthens the back extensors and opens the chest — the antidote to forward flexion posture. Used in rehabilitation and performance alike.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 35
   },
 
@@ -354,6 +361,13 @@ export const PILATES = [
     ],
     coaching: 'This is a spinal articulation, not a hamstring stretch. The priority is the C-curve of the spine — not how far forward you reach.',
     why: 'Develops spinal flexion mobility and the ability to decompresses the vertebrae — important for back health and posture.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 30
   },
 
@@ -382,6 +396,13 @@ export const PILATES = [
     ],
     coaching: 'Start with small circles and increase size only as long as the pelvis stays flat. The challenge is in the stillness, not the movement.',
     why: 'Develops hip joint mobility and the core stability needed to allow movement at the hip without disturbing the spine.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 35
   },
 
@@ -480,6 +501,13 @@ export const PILATES = [
     ],
     coaching: 'The stretch travels from the outer hip all the way to the fingertips. Breathe into whichever part feels tightest.',
     why: 'Opens the lateral body and hip in a position that also stretches the inner thigh of the folded leg. A classic Pilates side-body release.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 25
   },
 
@@ -508,6 +536,13 @@ export const PILATES = [
     ],
     coaching: 'The wall gives honest feedback about which parts of the spine articulate and which do not. Move slowly.',
     why: 'A standing spinal articulation drill that improves segmental mobility and teaches awareness of the spine in a standing, functional position.',
+        watchOut: [
+      'Rolling directly over a joint or bone rather than the muscle',
+      'Pressing so hard you tense up, which stops the muscle releasing',
+      'Rushing; slow and steady is what allows anything to change',
+      'Rolling an area that is sharply painful rather than tender'
+    ],
+    load: 'Enough pressure to feel it clearly, light enough that you can still breathe normally.',
     credits: 30
   },
 
@@ -623,6 +658,13 @@ export const PILATES = [
     ],
     coaching: 'The slower you move, the more you feel each vertebral segment. Rushing makes this a forward fold. Slowing makes it a spinal articulation practice.',
     why: 'Develops segmental spinal mobility and body awareness. The standing context makes spinal articulation accessible without requiring floor work.',
+        watchOut: [
+      'Rolling directly over a joint or bone rather than the muscle',
+      'Pressing so hard you tense up, which stops the muscle releasing',
+      'Rushing; slow and steady is what allows anything to change',
+      'Rolling an area that is sharply painful rather than tender'
+    ],
+    load: 'Enough pressure to feel it clearly, light enough that you can still breathe normally.',
     credits: 35
   },
 
@@ -686,6 +728,13 @@ export const PILATES = [
     ],
     coaching: 'The spine should grow taller with each rotation — not collapse. Think of wringing out a towel — spiralling upward as you twist.',
     why: 'Develops thoracic rotation mobility and oblique strength in the seated position. Directly counteracts the forward rounding and lack of rotation from desk work.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 35
   },
 

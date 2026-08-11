@@ -61,6 +61,13 @@ export const YOGA = [
     ],
     coaching: 'Bent knees are fine. The priority is a long, flat back — not straight legs.',
     why: 'A foundational yoga pose that lengthens the entire posterior chain and builds shoulder strength. Used as a rest pose and a transition between sequences.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 30
   },
 
@@ -88,6 +95,13 @@ export const YOGA = [
     ],
     coaching: 'The back hip naturally wants to open out — gently drawing it forward is where the hip flexor stretch lives.',
     why: 'Builds lower body strength and hip flexor length simultaneously. Requires and develops focus and balance.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 35
   },
 
@@ -115,6 +129,13 @@ export const YOGA = [
     ],
     coaching: 'The front knee tracks over the little toe — not caving inward. Think of pressing the knee out against an imaginary wall.',
     why: 'Opens the inner thighs, strengthens the legs, and builds shoulder endurance. A pose that demands sustained effort and stillness.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 35
   },
 
@@ -142,6 +163,13 @@ export const YOGA = [
     ],
     coaching: 'The hamstring will limit how far you go — that is fine. The spine staying long matters more than how low the hand reaches.',
     why: 'A lateral stretch that lengthens the side body, opens the hamstrings and inner thighs, and builds stability in the supporting leg.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 35
   },
 
@@ -199,6 +227,13 @@ export const YOGA = [
     ],
     coaching: 'Wobbling is normal — it means your stabilisers are working. Holding a wall lightly is completely fine.',
     why: 'Builds single-leg balance and hip stability. The concentrated focus required is itself a mindfulness practice.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 30
   },
 
@@ -225,6 +260,13 @@ export const YOGA = [
     ],
     coaching: 'The height of the lift depends on your back flexibility — even a few centimetres is the full pose. Never force range here.',
     why: 'A gentle backbend that opens the chest and counteracts the rounded posture of sitting. Also used therapeutically for lower back pain.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 25
   },
 
@@ -252,6 +294,13 @@ export const YOGA = [
     ],
     coaching: 'A rounded back stretches the lower back, not the hamstrings. Sit on a folded blanket to tilt the pelvis forward if your lower back rounds immediately.',
     why: 'A deep hamstring and lower back stretch. Regular practice improves posterior chain flexibility essential for most physical activities.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 30
   },
 
@@ -276,6 +325,13 @@ export const YOGA = [
     coaching: 'The back knee on the floor makes this more accessible than Warrior I. Lower the back knee any time Warrior I becomes too intense.',
     why: 'A deep hip flexor and quad stretch in a stable position. One of the most effective poses for counteracting the effects of prolonged sitting.',
     energyRequired: 3,
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 35
   },
 
@@ -303,6 +359,13 @@ export const YOGA = [
     ],
     coaching: 'Use a block or thick book under the lower hand if needed — this is a genuinely hard balance pose. The block is not cheating.',
     why: 'Develops single-leg balance, hip stability, and full-body coordination. A challenging pose that builds focus alongside physical capacity.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 45
   },
 
@@ -330,6 +393,13 @@ export const YOGA = [
     ],
     coaching: 'This is the hardest pose for many people precisely because it asks you to do nothing. Resist the urge to move or plan. Just be here.',
     why: 'Savasana integrates the physical work of practice and allows the nervous system to fully downregulate. Skipping it is the most common yoga mistake.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 20
   },
 
@@ -455,6 +525,13 @@ export const YOGA = [
     ],
     coaching: 'Place a folded blanket under the right hip if it does not reach the floor. Forcing the hip down strains the knee.',
     why: 'The deepest hip opener in yoga — targets the glutes and external hip rotators directly. Most effective pose for releasing sciatic tension.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 35
   },
 
@@ -482,6 +559,13 @@ export const YOGA = [
     ],
     coaching: 'Both shoulders stay on the floor — the knees do not need to reach the ground. Let them hover if needed.',
     why: 'A restorative twist that releases tension along the entire spine. Suitable at any energy level — often used to close a yoga practice.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 25
   },
 
@@ -510,6 +594,13 @@ export const YOGA = [
     ],
     coaching: 'Slide a folded blanket under your lower back if the position feels uncomfortable. This is meant to be completely effortless.',
     why: 'A passive inversion that reverses the effects of gravity on the legs, calms the nervous system, and is among the most restorative poses in yoga.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 25
   },
 
@@ -538,6 +629,13 @@ export const YOGA = [
     ],
     coaching: 'This is the most fundamental spinal warm-up in yoga. The synchronisation of breath and movement is what makes it more than just stretching.',
     why: 'Mobilises the entire spine, warms up the core, and synchronises breath with movement — the foundational skill of yoga practice.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 25
   },
 
@@ -574,6 +672,13 @@ export const YOGA = [
     ],
     coaching: 'Move slowly — this is a wake-up, not a workout. Each pose is an invitation to notice how the body feels today.',
     why: 'A complete morning sequence that activates the body, warms up the joints, and sets a calm, intentional tone for the day.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 60
   },
 
@@ -607,6 +712,13 @@ export const YOGA = [
     ],
     coaching: 'The evening flow should feel like releasing the day from the body. No forcing, no performance — just progressively letting go.',
     why: 'A restorative sequence designed to downregulate the nervous system, release hip and lower back tension, and prepare the body and mind for sleep.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 60
   }
 
@@ -643,6 +755,13 @@ export const YOGA = [
     ],
     coaching: 'Sun B is more physically demanding than Sun A because of the chair pose and warrior holds. Build to it after Sun A is comfortable.',
     why: 'Sun Salutation B adds standing strength work — chair pose and warrior 1 — making it a more complete strength and mobility sequence than Sun A.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 55
   },
 
@@ -673,6 +792,13 @@ export const YOGA = [
     ],
     coaching: 'Yin yoga targets connective tissue — fascia and ligaments — not muscles. The long holds are essential. Do not try to relax into the poses too quickly.',
     why: 'Yin yoga works on connective tissue hydration and flexibility through long static holds — a different physiological mechanism to the dynamic stretching of most exercise.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 60
   },
 
@@ -699,6 +825,13 @@ export const YOGA = [
     ],
     coaching: 'Restorative yoga is designed to activate the parasympathetic nervous system. Do not substitute yin for restorative — they are different practices with different aims.',
     why: 'Restorative yoga has strong evidence for reducing cortisol, improving sleep quality, and managing anxiety. The supported positions allow the body to release without effort.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 60
   },
 
@@ -763,6 +896,13 @@ export const YOGA = [
     ],
     coaching: 'In every forward fold, the priority is a flat back over reaching the toes. A rounded spine to reach further defeats the purpose.',
     why: 'A dedicated posterior chain flexibility sequence addressing the hamstring, lumbar, and calf tightness that drives lower back pain in most adults.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 50
   },
 
@@ -792,6 +932,13 @@ export const YOGA = [
     ],
     coaching: 'The backbend series should always finish with a counterpose. Child pose or supine twist neutralises the lumbar extension and prevents post-session back tightness.',
     why: 'Backbends develop thoracic extension and hip flexor length — the two most commonly restricted movements in people who sit for long periods.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 55
   },
 
@@ -852,6 +999,12 @@ export const YOGA = [
     ],
     coaching: 'Pranayama requires consistent practice to produce its effects. Ten minutes daily is more valuable than an hour once a week.',
     why: 'Pranayama practices directly modulate the autonomic nervous system through breathing mechanics and vagal nerve stimulation — producing measurable reductions in cortisol and anxiety.',
+        watchOut: [
+      'Forcing the breath rather than letting it lengthen naturally',
+      'Lifting the shoulders on the in-breath instead of expanding the ribs',
+      'Continuing if you feel light-headed; return to normal breathing and rest'
+    ],
+    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
     credits: 35
   },
 
@@ -880,6 +1033,13 @@ export const YOGA = [
     ],
     coaching: 'Chair yoga is not a compromise. It is a specific practice that makes yoga accessible to everyone regardless of mobility level, injury, or setting.',
     why: 'Chair yoga maintains spinal mobility, hip flexibility, and body awareness for people who cannot access floor-based practice. Evidence shows benefits for older adults and chronic pain populations.',
+        watchOut: [
+      'Moving faster than you can control, which turns mobility work into momentum',
+      'Forcing range rather than working to the edge of what is comfortable',
+      'Holding the breath during the harder positions',
+      'Any sharp or pinching sensation: back off the range rather than pushing through'
+    ],
+    load: 'Bodyweight. Range comes from repetition over weeks, not from forcing it today.',
     credits: 40
   },
 

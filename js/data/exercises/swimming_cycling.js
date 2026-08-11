@@ -783,6 +783,13 @@ export const SWIMMING_CYCLING = [
     ],
     coaching: 'Recovery cycling is a skill. Most people go too hard. If you feel any fatigue during the session, you are doing it wrong.',
     why: 'Gentle cycling flushes metabolic waste from the legs and promotes recovery between hard sessions — significantly better than complete rest for trained athletes.',
+        watchOut: [
+      'Bouncing into the stretch rather than holding it still',
+      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
+      'Holding your breath, which makes everything tighter',
+      'Forcing the range on one side to match the other; sides are rarely equal'
+    ],
+    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
     credits: 25
   }
 
