@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v227
+ * CON-3b - watchOut ("What to watch for") and load ("How heavy") now render
+ * on all four exercise card views. Neither field had a renderer anywhere in
+ * the product, so content authored to the Exercise Entry Standard would have
+ * been invisible.
+ *
  * 11 Aug 2026 v226
  * CON-1/CON-2 — one exercise registry (exercises.js is now a shim over
  * exercises/index.js) and a new equipment-map.js resolving granular user
@@ -978,7 +984,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v236";
+const CACHE_NAME = "alongside-v237";
 
 const SHELL_URLS = [
 
