@@ -1,5 +1,15 @@
 /**
  * js/data/checkin-openings.js
+ * 11 Aug 2026 v3
+ *
+ * v3 — PT-1 (Persona Tracing Wave 1). _resolveDayOne()'s territory branch
+ *   matched against IDs that have never existed anywhere in this codebase,
+ *   so it always fell through to 'generic'. A user who selected "There's a
+ *   longer history than any of that" was answered with "No history yet."
+ *   Remapped to the seven live IDs; five given purpose-written rows rather
+ *   than approximated onto near-misses; age-band values corrected too.
+ *   See the note at the trigger map for the full reasoning.
+ *
  * 14 Jul 2026 v2
  *
  * v2 — Privacy rule fix (Session B2 finding, 14 Jul 2026, companion to
@@ -231,6 +241,21 @@ const DAY_ONE = [
   { trigger: 'chronic-condition',  careMode: true,  b1: "Do you remember telling me about what your body's been dealing with? I haven't forgotten.",    b2: "I was wondering — how is it today, going into your first session?" },
   { trigger: 'hormonal-change',    careMode: true,  b1: "Do you remember telling me that your body's been changing in ways that have made this harder?", b2: "I was wondering how you're feeling about it today — and what you're hoping this might give you." },
   { trigger: 'long-absence',       careMode: false, b1: "Do you remember telling me it's been a while since you moved regularly?",                       b2: "I want you to know — there's no catching up needed. I was wondering how it feels to begin again." },
+
+  // ── Territory rows (11 Aug 2026, PT-1) ──────────────────────────────────
+  // Five of the seven live territories had no row that fit. Mapping them onto
+  // the nearest existing trigger would have changed what the coach is saying:
+  // 'past-failure' ("you've tried before and it hasn't stuck") puts the
+  // failure on the person, which is the opposite of what someone selecting
+  // 'trust-rupture' ("I started things and they let me down") just told us.
+  // Written new rather than approximated. Voice matches the rows above:
+  // b1 reflects back, b2 opens a question and never makes a statement.
+  { trigger: 'trust-rupture',      careMode: false, b1: "Do you remember telling me that you've started things before and they let you down?",           b2: "I don't take that lightly. I was wondering what it's like standing at the start of another one." },
+  { trigger: 'escalation-trap',    careMode: false, b1: "Do you remember telling me that last time it moved too fast, too soon?",                        b2: "We're not doing that. I was wondering what a pace that actually worked would feel like for you." },
+  { trigger: 'invisible-person',   careMode: false, b1: "Do you remember telling me you never felt like it knew you were there?",                        b2: "I know you're here. I was wondering how you're doing today — actually." },
+  { trigger: 'body-story',         careMode: true,  b1: "Do you remember telling me your relationship with your body has made this complicated?",        b2: "I'm not going to ask you to explain it. I was wondering how today feels, going into your first session." },
+  { trigger: 'the-history',        careMode: true,  b1: "Do you remember telling me there's a longer history here than any of the rest of it?",          b2: "You don't have to go back into it. I was wondering how it sits with you today, before we start." },
+
   { trigger: 'generic',            careMode: false, b1: "This is the first real one.",                                                                   b2: "No history yet — just you, now. How are you today?" },
 ];
 
@@ -310,16 +335,41 @@ function _resolveDayOne() {
   const lifestyle = store.get('lifestyle') || {};
   const goals     = store.get('goals') || [];
 
+  // ── PT-1 FIX, 11 Aug 2026 ────────────────────────────────────────────────
+  // This map previously tested for 'pain', 'motivation', 'history',
+  // 'past-attempts' and similar. NONE of those IDs has ever existed. The
+  // live territory IDs come from HARD_BEFORE_CHIPS in onboarding-thread-
+  // data.js, and the retired hard-before.js used the SAME seven before it —
+  // so this branch never matched, at any point in the product's life. Every
+  // user who has ever completed onboarding fell through to 'generic' and was
+  // told "No history yet — just you, now", including the people who had just
+  // selected "There's a longer history than any of that."
+  //
+  // Confirmed by executing this function against all seven live IDs.
+  // Five now have purpose-written rows; two map to existing rows where the
+  // fit is genuine rather than approximate:
+  //   life-interruption -> time-energy  ("the thing that keeps getting in
+  //                                       the way" is the same sentiment)
+  //   wrong-fit         -> judged       ("a place where you don't quite
+  //                                       belong" is the same sentiment)
   let trigger = 'generic';
-  if (primaryT === 'pain' || primaryT === 'injury')               trigger = 'movement-pain';
-  else if (primaryT === 'social' || primaryT === 'self-conscious') trigger = 'self-consciousness';
-  else if (primaryT === 'motivation' || primaryT === 'consistency') trigger = 'motivation';
-  else if (primaryT === 'time' || primaryT === 'energy')          trigger = 'time-energy';
-  else if (primaryT === 'knowledge' || primaryT === 'direction')  trigger = 'not-knowing';
-  else if (primaryT === 'belonging' || primaryT === 'judgement')  trigger = 'judged';
-  else if (primaryT === 'history' || primaryT === 'past-attempts') trigger = 'past-failure';
-  else if (conditions.length > 0)                                  trigger = 'chronic-condition';
-  else if (['45-54','55-64','65+'].includes(ageBand))              trigger = 'hormonal-change';
+  if      (primaryT === 'trust-rupture')     trigger = 'trust-rupture';
+  else if (primaryT === 'escalation-trap')   trigger = 'escalation-trap';
+  else if (primaryT === 'life-interruption') trigger = 'time-energy';
+  else if (primaryT === 'wrong-fit')         trigger = 'judged';
+  else if (primaryT === 'invisible-person')  trigger = 'invisible-person';
+  else if (primaryT === 'body-story')        trigger = 'body-story';
+  else if (primaryT === 'the-history')       trigger = 'the-history';
+  else if (conditions.length > 0)            trigger = 'chronic-condition';
+  // Age bands were also wrong: this tested '45-54'/'55-64'/'65+' against
+  // AGE_CHIPS values of under-20/20s/30s/40s/50s/60s/70plus, so
+  // 'hormonal-change' had never fired either. Corrected to live values.
+  // NOTE FOR GRAEME: 40s deliberately excluded. This is a fallback that
+  // fires only when someone named no territory and logged no condition, and
+  // inferring "your body's been changing in ways that have made this harder"
+  // from age alone is an assumption about a person. 50s upward is the
+  // narrower reading of the original intent; say if you want 40s included.
+  else if (['50s','60s','70plus'].includes(ageBand))  trigger = 'hormonal-change';
   else if (lifestyle.returningAfter === 'injury' || lifestyle.returningAfter === 'illness') trigger = 'injury-recovery';
   else if (lifestyle.exerciseHistory === 'lapsed' || lifestyle.exerciseHistory === 'returning') trigger = 'return-to-fitness';
   else if (goals.includes('feel-good'))                            trigger = 'feel-good';
