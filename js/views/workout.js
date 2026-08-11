@@ -1,5 +1,15 @@
 /**
  * workout.js - Workout Execution View
+ * 11 Aug 2026 v8
+ *
+ * v8 — WOW-1 (PT-3, Persona Tracing Wave 1). Added a session-level
+ *   clock (sessionStartTime + elapsedMins()) and wired it into every
+ *   activityLog write. This view previously reported no duration at all,
+ *   so progress.js:138 summed the person's real sessions as 0 minutes —
+ *   the app telling someone who showed up that they hadn't. Set once at
+ *   genuine session start, cleared on reset/cleanup. Floor of 1 minute so
+ *   a real completion never reports zero.
+ *
  * 10 Aug 2026 v7
  *
  * v7 — Fixed the YouTube link to use each exercise's own tailored
@@ -127,6 +137,20 @@ let currentExerciseIndex = 0;
 let timerInterval = null;
 let timeRemaining = 0;
 let timerStarted = false; // Timer doesn't start until user taps Start
+
+// 11 Aug 2026 — WOW-1 (PT-3). Session-level elapsed time. This view had no
+// session clock, so both logActivity() calls below wrote durationMins null
+// explicitly, and progress.js:138 summed them as 0. "workout" is the type
+// coach-proposal generates by default, so this was the single largest
+// source of under-reported effort. Pattern mirrors gym-programme.js:806.
+// GUARDED SET: onMount() re-fires on every router.navigate("workout")
+// (the timer toggle does exactly that), so this must only latch once.
+let sessionStartTime = null;
+
+function elapsedMins() {
+  if (!sessionStartTime) return null;
+  return Math.max(1, Math.round((Date.now() - sessionStartTime) / 60000));
+}
 
 // v3 — single helper so every read point stays in sync.
 function _getWorkout() {
@@ -310,6 +334,9 @@ function formatRole(role) {
 
 export function onMount() {
   const workout = _getWorkout();
+
+  // Latch the session clock once, on first mount with a real workout.
+  if (workout && sessionStartTime === null) sessionStartTime = Date.now();
 
   document.getElementById("no-workout-back-btn")?.addEventListener("click", () => {
     router.back();
@@ -504,7 +531,7 @@ function savePartialSession() {
     sessionEnd:     nowIso,
     completedAt:    nowIso,
     status:         "partial",
-    durationMins:   null,
+    durationMins:   elapsedMins(),
     moodAfter:      null,
     isEvent:        false,
     eventName:      null,
@@ -550,7 +577,7 @@ function completeWorkout() {
     date:         nowIso,
     completedAt:  nowIso,
     type:         "workout",
-    durationMins: null,
+    durationMins: elapsedMins(),
     moodAfter:    null,
     isEvent:      false,
     eventName:    null
@@ -579,6 +606,7 @@ function completeWorkout() {
 function cleanupWorkout() {
   dismountSessionGuard();
   pauseTimer();
+  sessionStartTime = null;
   currentExerciseIndex = 0;
   timeRemaining = 0;
   timerStarted  = false;

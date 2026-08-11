@@ -1,6 +1,16 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 11 Aug 2026 v7
+ *
+ * v7 — WOW-1 (PT-3, Persona Tracing Wave 1). Added a session-level
+ *   clock (sessionStartTime + elapsedMins()) and wired it into every
+ *   activityLog write. This view previously reported no duration at all,
+ *   so progress.js:138 summed the person's real sessions as 0 minutes —
+ *   the app telling someone who showed up that they hadn't. Set once at
+ *   genuine session start, cleared on reset/cleanup. Floor of 1 minute so
+ *   a real completion never reports zero.
+ *
  * 10 Aug 2026 v6
  *
  * CHANGELOG
@@ -125,6 +135,20 @@ let timeRemaining = 0;
 let timerRunning  = false;
 let creditsEarned = 0;
 let restRemaining = 0;
+
+// 11 Aug 2026 — WOW-1 (PT-3). Session-level elapsed time. This view had
+// no session clock at all, so every completion wrote durationMins null/
+// absent and progress.js:138 summed it as 0 — a person's real sessions
+// read back as zero minutes. Pattern mirrors gym-programme.js:806, which
+// already does this correctly. Set once at genuine session start, cleared
+// on reset, so rest-timer re-entries into the session phase can't reset it.
+let sessionStartTime = null;
+
+function elapsedMins() {
+  if (!sessionStartTime) return null;
+  return Math.max(1, Math.round((Date.now() - sessionStartTime) / 60000));
+}
+
 let restInterval  = null;
 
 // ── Focus definitions ─────────────────────────────────────────────────────────
@@ -814,6 +838,7 @@ function finaliseSession() {
     sessionEnd:     nowIso,
     completedAt:    nowIso,
     status:         "completed",
+    durationMins:   elapsedMins(),
     exercisesCount: currentIndex,
     creditsEarned
   });
@@ -828,6 +853,7 @@ function finaliseSession() {
 
 function resetSession() {
   dismountSessionGuard();
+  sessionStartTime = null;
   phase         = "focus";
   selectedFocus = null;
   selectedMins  = null;
@@ -914,9 +940,9 @@ function savePartialSession() {
     sessionEnd:     nowIso,
     completedAt:    nowIso,
     status:         "partial",
-    // No elapsed-time tracker exists in this file — left explicitly null
-    // rather than referencing the undeclared `elapsed` the old code had.
-    durationMins:   null,
+    // 11 Aug 2026 (WOW-1): a real session clock now exists in this file,
+    // so a partial exit reports genuine elapsed time instead of null.
+    durationMins:   elapsedMins(),
     exercisesCount: currentIndex,
     creditsEarned:  typeof creditsEarned !== "undefined" ? creditsEarned : 0
   });
@@ -986,6 +1012,7 @@ export function onMount() {
     creditsEarned = 0;
     timeRemaining = 0;
     timerRunning  = false;
+    sessionStartTime = Date.now();
     phase         = "session";
     rerender();
   });
