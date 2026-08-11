@@ -247,7 +247,7 @@ const DAY_ONE = [
   // mother, someone in perimenopause, someone who can't play football any
   // more — and written as an observation rather than a recollection, so it
   // makes no claim about what was said and no guess about why.
-  { trigger: 'changing-body',      careMode: true,  b1: "Bodies change. Sometimes faster than we expect, and rarely at a convenient moment.",             b2: "I don't know where yours is right now, and I'm not going to guess. I was wondering what today feels like." },
+  { trigger: 'changing-body',      careMode: true,  b1: "Bodies change. Sometimes faster than we expect, and rarely at a convenient moment.",             b2: "I don't know what your body's been through lately, and I'm not going to guess. I was wondering what today feels like." },
   { trigger: 'long-absence',       careMode: false, b1: "Do you remember telling me it's been a while since you moved regularly?",                       b2: "I want you to know — there's no catching up needed. I was wondering how it feels to begin again." },
 
   // ── Territory rows (11 Aug 2026, PT-1) ──────────────────────────────────
@@ -259,7 +259,7 @@ const DAY_ONE = [
   // Written new rather than approximated. Voice matches the rows above:
   // b1 reflects back, b2 opens a question and never makes a statement.
   { trigger: 'trust-rupture',      careMode: false, b1: "Do you remember telling me that you've started things before and they let you down?",           b2: "I don't take that lightly. I was wondering what it's like standing at the start of another one." },
-  { trigger: 'escalation-trap',    careMode: false, b1: "Do you remember telling me that last time it moved too fast, too soon?",                        b2: "I was wondering what a pace that actually worked would feel like — because you'd know that better than I would." },
+  { trigger: 'escalation-trap',    careMode: false, b1: "Do you remember telling me that last time it moved too fast, too soon?",                        b2: "I was wondering what a pace that actually worked would feel like — you'd know better than I would." },
   { trigger: 'invisible-person',   careMode: false, b1: "Do you remember telling me you never felt like it knew you were there?",                        b2: "I know you're here. I was wondering how you're doing today — actually." },
   { trigger: 'body-story',         careMode: true,  b1: "Do you remember telling me your relationship with your body has made this complicated?",        b2: "I'm not going to ask you to explain it. I was wondering how today feels, going into your first session." },
   { trigger: 'the-history',        careMode: true,  b1: "Do you remember telling me there's a longer history here than any of the rest of it?",          b2: "None of that needs revisiting today. I was wondering how it sits with you, standing here before the first one." },
