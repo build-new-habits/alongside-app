@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v230
+ * All 9 cardio-warmup entries rewritten to the Exercise Entry Standard - the
+ * four machine ones (bike, treadmill, cross trainer, rower) rendered with no
+ * guidance at all.
+ *
  * 11 Aug 2026 v229
  * Pulse-raiser entries rewritten to the Exercise Entry Standard (they had no
  * instructions/why/coaching/watchOut and rendered near-blank), and session
@@ -994,7 +999,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v239";
+const CACHE_NAME = "alongside-v240";
 
 const SHELL_URLS = [
 
