@@ -701,4 +701,18 @@ Full blueprint run: `alongside_blueprint_gym-session-builder-phase1_05aug2026_v2
 
 ---
 
+### Overnight autonomous session — 10 Aug 2026
+
+Graeme: "make decisions following my previous decision behaviours and move this forward." Scoped deliberately narrow — small, well-evidenced fixes that reduce untested surface area, not new speculative features on top of an already-large unconfirmed backlog.
+
+- **Two real bugs fixed, `noticing.js`'s "Your reflections":** since `journal-entry.js` v3's privacy rewrite (14 Jul), entries have been written as `{date, text, tags}`, but `noticing.js` was still reading `entry.createdAt`/`category`/`body` (all undefined since 14 Jul) and `entry.type === "weekly-noticing"` (never written, always false). Reflections were showing blank date/text for every entry; `getRecentEntries()`'s sort compared `new Date(undefined)` for everything, meaning entries were never actually sorted by recency at all. Both fixed; the always-false "This week" badge removed rather than a working version guessed at. `noticing.js` v4→v5.
+- **`journalEntryType` investigated, not fixed** — found bigger than the schedule's note suggested: the v3 rewrite dropped the whole pre-selected-screen mechanism, not just a field read. A real screen-design decision, left for Graeme.
+- **Bodyweight-only lower-body content gap closed** — four new exercises across hip-hinge/single-leg/squat-pattern/leg-isolation, matching existing format and safety conventions exactly. Confirmed via test: no-equipment Lower Body went from 0 main exercises to 4. Full 7-type regression clean afterward. `session-builder.js` v2→v3.
+- **Corrected, not executed:** the "orphaned duplicate, safe to delete" note on `exercises/index.js` is stale — three live features now import from it (`conditionProgrammes.js`, `core-session.js`, `prescribed-session.js`), all built after that note was written. Diffed directly against `exercises.js`: currently byte-identical in logic, only import-path depth differs — a real structural risk (manual sync required forever) but not something to merge unilaterally overnight. Documented, neither file touched.
+- **Safety trace, Severe-pain Rest/Adapt flow** — read closely, no bugs found. One minor, non-urgent note: `severePainChoices` has no cap, unlike `activityLog`'s 200-entry limit.
+- **Deliberately not touched** (all need real product judgment, not a defensible autonomous call): `coach-reflection.js` deletion, `renderBypassDoor()`'s unused parameter, the difficulty-scale migration, `gym-programme.js`'s missing walkthrough, NEW-2, Wellbeing-first entry.
+- `sw.js` v222→v223.
+
+---
+
 *Alongside — Build New Habits — build-new-habits.github.io/alongside-app/*

@@ -1,6 +1,22 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 10 Aug 2026 v3
+ *
+ * v3 -- Bodyweight-only lower-body main content added overnight (Claude,
+ *   autonomous session, following the on-device Phase 1 finding that a
+ *   no-equipment Lower Body session produced 0 main exercises). New
+ *   entries: sb-hh-04 (Bodyweight good morning, hip-hinge), sb-sl-03
+ *   (Bodyweight reverse lunge, single-leg), sb-sq-03 (Bodyweight squat,
+ *   squat-pattern), sb-li-02 (Wall sit, leg-isolation) -- all
+ *   equipment: [], matching the existing exercise-entry format and
+ *   contraindication conventions exactly. Confirmed via test: Lower
+ *   Body with no equipment now returns 4 main exercises, was 0. Full
+ *   7-session-type regression re-run clean afterward, no crashes, no
+ *   warmup-floor violations. Deliberately scoped narrow -- only the
+ *   four categories with a confirmed real gap, not a general content
+ *   audit of the whole pool.
+ *
  * 05 Aug 2026 v2
  *
  * v2 -- Gym Session Builder Phase 1 (blueprint
@@ -294,6 +310,17 @@ const EXERCISE_POOL = [
     youtube: "kettlebell swing technique russian hip hinge",
     equipment: ["kettlebells"], contraindications: ["lower-back-acute", "hamstring-acute"] },
 
+  // 05 Aug 2026 — bodyweight-only lower-body main content, found missing
+  // during Gym Session Builder Phase 1 testing (confirmed: every existing
+  // squat-pattern/hip-hinge/single-leg/leg-isolation exercise required
+  // equipment; a no-equipment Lower Body session got 0 main exercises).
+  { id: "sb-hh-04", name: "Bodyweight good morning", section: "main", category: "hip-hinge",
+    sets: 3, reps: "12", tempo: "3-1-2", rest: "60s", difficultyLevel: 1,
+    description: "Hands behind your head or crossed at your chest, soft bend in the knees. Hinge forward from the hips, keeping your back flat, until you feel a stretch in your hamstrings. Return by driving your hips forward.",
+    cues: ["Hips move back, not down", "Back stays flat throughout — this is not a squat", "Feel it in the hamstrings, not the lower back"],
+    youtube: "bodyweight good morning hip hinge",
+    equipment: [], contraindications: ["lower-back-acute", "hamstring-acute"] },
+
   // BRIDGE
   { id: "sb-br-02", name: "Glute bridge — 3s hold", section: "main", category: "bridge",
     sets: 3, reps: "12", tempo: "1-3-1", rest: "45s", difficultyLevel: 1,
@@ -334,6 +361,13 @@ const EXERCISE_POOL = [
     youtube: "step up exercise dumbbell technique",
     equipment: ["box-or-step"], contraindications: ["knee-acute", "hip-acute"] },
 
+  { id: "sb-sl-03", name: "Bodyweight reverse lunge", section: "main", category: "single-leg",
+    sets: 3, reps: "10 each side", tempo: "2-1-2", rest: "60s", difficultyLevel: 1,
+    description: "Step one foot back, lowering your back knee toward the floor. Both knees at roughly 90 degrees at the bottom. Push through your front foot to return to standing.",
+    cues: ["Front knee tracks over your foot, not past it", "Torso stays upright", "Push through the whole front foot, not just the toes"],
+    youtube: "reverse lunge bodyweight technique",
+    equipment: [], contraindications: ["knee-acute", "hip-acute"] },
+
   // SQUAT PATTERN
   { id: "sb-sq-01", name: "Goblet squat", section: "main", category: "squat-pattern",
     sets: 3, reps: "10", tempo: "3-1-2", rest: "75s", difficultyLevel: 1, logWeight: true,
@@ -350,6 +384,13 @@ const EXERCISE_POOL = [
     cues: ["Brace your core hard before every rep", "Knees out over toes", "Chest stays up throughout", "Drive the floor away"],
     youtube: "barbell back squat technique tutorial",
     equipment: ["barbell", "squat-rack"], contraindications: ["lower-back-acute", "knee-acute"] },
+
+  { id: "sb-sq-03", name: "Bodyweight squat", section: "main", category: "squat-pattern",
+    sets: 3, reps: "15", tempo: "3-1-2", rest: "60s", difficultyLevel: 1,
+    description: "Feet shoulder-width, toes slightly out. Squat down keeping chest up and heels on the floor, then drive back up.",
+    cues: ["Chest up throughout", "Knees track over your toes", "Full range — go as low as feels controlled"],
+    youtube: "bodyweight squat technique",
+    equipment: [], contraindications: ["knee-acute", "lower-back-acute"] },
 
   // HORIZONTAL PULL
   { id: "sb-hp-01", name: "Seated cable row", section: "main", category: "horizontal-pull",
@@ -426,6 +467,13 @@ const EXERCISE_POOL = [
     cues: ["Hips stay pressed into the bench", "Squeeze hamstrings at the top", "Slow on the lowering"],
     youtube: "lying leg curl machine technique",
     equipment: ["leg-curl-machine"], contraindications: ["hamstring-acute"] },
+
+  { id: "sb-li-02", name: "Wall sit", section: "main", category: "leg-isolation",
+    sets: 3, reps: "30-45s", tempo: "Hold", rest: "45s", difficultyLevel: 1, duration: 40,
+    description: "Back flat against a wall, slide down until your knees are at roughly 90 degrees, as if sitting in an invisible chair. Hold.",
+    cues: ["Knees stay above your ankles, not out past your toes", "Keep your back flat against the wall throughout", "Breathe steadily — don't hold your breath"],
+    youtube: "wall sit exercise technique",
+    equipment: [], contraindications: ["knee-acute"] },
 
   // ANTI-EXTENSION
   { id: "sb-ae-01", name: "Dead bug", section: "main", category: "anti-extension",
