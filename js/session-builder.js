@@ -1,6 +1,38 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v13
+ *
+ * v13 - Persona trace round 2. Four changes,
+ *
+ *   (impact gate) Raising the ceilings served a frail sedentary
+ *   76-year-old Lateral Hops and sprint mechanics. Difficulty and
+ *   impact are different axes -- for a conditioned person a jump squat
+ *   IS easy, and the risk in a plyometric is landing force and fall
+ *   risk, neither of which scales with how hard it feels. Impact is now
+ *   gated separately: sedentary, light and returning users get no
+ *   jumping, bounding, sprinting or landing work. Gated on capability,
+ *   not age, deliberately.
+ *
+ *   Three further changes, all from executing live
+ *   code against the personas rather than reading it.
+ *
+ *   (2.15, fit mid-20s) Slot-weighted anchoring. CONT-1 anchored every
+ *   slot equally and got it exactly backwards: her eight most-repeated
+ *   exercises after eight weeks were three cardio warm-ups and five
+ *   accessories, not one barbell lift. Pool depth, not intent -- thin
+ *   warm-up categories repeat, deep main categories rotate. Main now
+ *   anchors hard; warm-ups and cool-downs rotate freely.
+ *
+ *   (2.15) Difficulty ceilings raised. They topped out at 3 on a 1-10
+ *   scale, leaving fourteen exercises unreachable by any user at all --
+ *   treadmill intervals, sled push, renegade rows, ab wheel, the
+ *   weighted core work written for exactly her.
+ *
+ *   (2.13/2.14) sessionVariety honoured. Novelty rate now follows the
+ *   person's stated preference rather than one default serving the
+ *   novelty-seeking and predictability-seeking personas equally badly.
+ *
  * 11 Aug 2026 v12
  *
  * v12 - Persona trace findings (2.10 and 2.11). Three defects, all
@@ -509,13 +541,26 @@ function buildConditionNote(sessionType) {
  * parallel exercise pool in the codebase) and is logged, not attempted
  * here — touch-once.
  */
+// Raised 11 Aug 2026, persona trace 2.15 (fit mid-20s, gym 4x/week,
+// wants numbers to move). The old ceilings topped out at 3 on a 1-10
+// scale, so the hardest exercise she could be served in eight weeks was
+// a 3 -- and fourteen exercises were unreachable by ANY user, including
+// treadmill intervals, sled push, renegade rows, ab wheel rollouts and
+// the weighted core work written for exactly her. Same class of defect
+// as the equipment vocabulary bug: content existing that nothing could
+// ever select.
+//
+// The lower bands are unchanged in spirit but given room now that all
+// 497 entries carry a real difficultyLevel (the 30 untagged yoga entries
+// were tagged the same day). Sedentary at 2 still excludes everything
+// demanding while allowing gentle floor and standing work.
 const DIFFICULTY_CEILINGS = {
-  "sedentary":   1,
-  "light":       2,
-  "returning":   2,
-  "moderate":    2,
-  "active":      3,
-  "very-active": 3
+  "sedentary":   2,
+  "light":       3,
+  "returning":   3,
+  "moderate":    4,
+  "active":      6,
+  "very-active": 8
 };
 
 function _difficultyCeiling() {
@@ -584,6 +629,49 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   //
   // The 30 untagged entries should still be tagged properly -- this is
   // a safe default, not a substitute for the data.
+  // ── IMPACT GATE (11 Aug 2026) ─────────────────────────────────────────
+  //
+  // Graeme's question: should some exercises be naturally avoided for
+  // certain age groups -- his 76-year-old parents are unlikely to do
+  // burpees or star jumps.
+  //
+  // Age is the wrong variable and a worse one. There are 76-year-olds who
+  // do burpees and 35-year-olds who cannot squat, so filtering on birth
+  // year is wrong in both directions -- and "we have decided what you can
+  // do because of your age" is precisely the shame architecture this
+  // product refuses. Capability is both more accurate and more dignified.
+  //
+  // But he was right that something was missing, and raising the
+  // difficulty ceilings proved it: at ceiling 2, a frail sedentary
+  // 76-year-old was served Lateral Hops and Wall Drive sprint mechanics,
+  // and a blank-slate beginner was served Explosive Press-Ups. Twenty-six
+  // of the twenty-seven impact-class exercises in the database are tagged
+  // difficulty 3 or lower.
+  //
+  // That is not mis-tagging. For a conditioned person a jump squat IS
+  // easy. Difficulty and impact are different axes: the risk in a
+  // plyometric is not that it is hard, it is landing force and fall risk,
+  // and neither scales with how hard the movement feels.
+  //
+  // So impact is gated separately from difficulty. Anyone who has told us
+  // they are sedentary, lightly active, or returning after a break does
+  // not get jumping, bounding, sprinting or landing work -- not because
+  // of their age, but because impact loading is the one thing that should
+  // be earned rather than defaulted into.
+  const IMPACT_PATTERNS = /jump|hop|bound|skater|tuck|depth|plyo|sprint|explosive|burpee|deceleration|reactive change/i;
+  const LOW_IMPACT_ONLY = new Set(["sedentary", "light", "returning"]);
+  // Unknown counts as gated, matching the same safe-default reasoning
+  // applied to untagged difficulty: someone who has told us nothing has
+  // not told us they can absorb landing forces. Persona 2.12 (blank
+  // slate, sedentary desk job, nothing to personalise against) was
+  // served a Jump Squat in her very first session on the old default.
+  const declaredLevel = store.get("fitnessLevel")
+                     || store.get("lifestyle.activityLevel")
+                     || null;
+  const impactGated = declaredLevel === null || LOW_IMPACT_ONLY.has(declaredLevel);
+  const isImpact = ex =>
+    ex.movementPattern === "jump" || IMPACT_PATTERNS.test(ex.id + " " + ex.name);
+
   const _difficulty = ex => {
     if (typeof ex.difficultyLevel === "number") return ex.difficultyLevel;
     if (typeof ex.energyRequired === "number")  return ex.energyRequired;
@@ -594,6 +682,7 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   const useCeilingOnWarmup = warmupPool !== null && warmupPool.length > 0;
 
   return matched.filter(ex => {
+    if (impactGated && isImpact(ex)) return false;
     if (section === "main" && !withinCeiling(ex)) return false;
     if (section === "warmup" && useCeilingOnWarmup && !withinCeiling(ex)) return false;
     // Equipment check: exercise needs no equipment, or user has it.
@@ -789,7 +878,11 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     // out, and the point is that this one never should. Same shape as the
     // existing warmup floor -- a rule, not a preference.
     if (section === "warmup" && pulseRaiser.include && count > 0) {
-      const cardio = candidates.filter(e => e.category === "cardio-warmup");
+      // Must respect `chosen` like every other pick. Found by regression
+      // after the duplicate fix: the reserved slot ran before the guard
+      // was consulted, so the same machine warm-up could be selected
+      // twice within one warm-up section.
+      const cardio = candidates.filter(e => e.category === "cardio-warmup" && !chosen.has(e.id));
       if (cardio.length > 0) {
         // Prefer a machine when the person has one. Found in testing: the
         // reserved slot picked at random, so a gym user with a treadmill,
@@ -799,7 +892,9 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
         // Falls back to bodyweight whenever no machine is available.
         const machine = cardio.filter(e => (e.equipment || []).length > 0);
         const pickFrom = machine.length > 0 ? machine : cardio;
-        selected.push(pickFrom[Math.floor(Math.random() * pickFrom.length)]);
+        const chosenPulse = pickFrom[Math.floor(Math.random() * pickFrom.length)];
+        selected.push(chosenPulse);
+        chosen.add(chosenPulse.id);
         usedCategories.add("cardio-warmup");
       }
     }
@@ -861,7 +956,34 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     //             that happened to be picked in week one.
     const CONTINUITY_WINDOW_DAYS = 21;
     const MASTERY_THRESHOLD      = 8;
-    const NOVELTY_RATE           = 0.25;
+
+    // CONT-2 -- the person's own answer, never inferred from behaviour.
+    const VARIETY_NOVELTY = { familiar: 0.10, balanced: 0.25, varied: 0.55 };
+    const variety = store.get("sessionVariety") || "balanced";
+    const baseNovelty = VARIETY_NOVELTY[variety] ?? VARIETY_NOVELTY.balanced;
+
+    // SLOT-WEIGHTED ANCHORING (persona trace 2.15).
+    //
+    // CONT-1 anchored every slot equally, and the result was exactly
+    // backwards. Traced over eight weeks of gym training, her top eight
+    // most-repeated exercises were three cardio warm-ups and five
+    // accessories -- not one barbell lift. Her nine barbell lifts
+    // averaged 2.7 exposures in eight weeks, nowhere near enough to
+    // progress on anything.
+    //
+    // The cause is pool depth, not intent: warm-up categories are thin so
+    // they repeat, main-lift categories are deep (32 hinge, 21 squat) so
+    // they rotate. Uniform anchoring therefore anchors the thing that
+    // does not matter and rotates the thing that does.
+    //
+    // A coach does the opposite. Your squat and your press stay for six
+    // weeks; nobody needs to master a hip flexor stretch. So the main
+    // section anchors hard and warm-ups and cool-downs rotate freely.
+    const SECTION_NOVELTY = { warmup: 0.55, main: 0.0, cooldown: 0.55 };
+    const noveltyRate = Math.min(
+      1,
+      baseNovelty + (SECTION_NOVELTY[section] ?? 0)
+    );
 
     function isAnchor(ex) {
       const s = store.exerciseStats(ex.id);
@@ -899,7 +1021,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
         candidates = pool;
       }
 
-      if (Math.random() >= NOVELTY_RATE) {
+      if (Math.random() >= noveltyRate) {
         const anchors = candidates.filter(isAnchor);
         if (anchors.length > 0) {
           // Among anchors, prefer the one met least often, so a person
