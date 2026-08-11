@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v234
+ * CON-9 complete - watchOut ("What to watch for") and load ("How heavy") now
+ * on all 497 exercises. Every exercise the app can hand a person carries full
+ * guidance: instructions, why, coaching, what to watch for and how heavy.
+ *
  * 11 Aug 2026 v233
  * Cable Pallof Press added; watchOut and load added to both band versions.
  *
@@ -1013,7 +1018,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v243";
+const CACHE_NAME = "alongside-v244";
 
 const SHELL_URLS = [
 
