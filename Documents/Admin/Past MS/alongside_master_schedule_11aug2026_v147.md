@@ -1,110 +1,14 @@
 # Alongside: Move — Master Schedule
-## 11 Aug 2026 v148
+## 11 Aug 2026 v147
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `alongside_master_schedule_11aug2026_v147.md`. Remove v147 on upload.
+Supersedes `alongside_master_schedule_11aug2026_v146.md`. Remove v146 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
-**This version's substantive changes:** Three fix sessions built, verified and pushed the same day PT-W1 reported — **WOW-2** (PT-2/PT-9), **WOW-1** (PT-3) and **WOW-0** (consent). `sw.js` v225→v226→v227→v228, each a separate final commit. Nine application files plus `Schema.md`. Measured persona delta confirmed against a fresh clone of the live remote, not asserted: Tom's over-ceiling exercises 76→0 and his three-week Progress 22→87 minutes; Priya's hardest-tier availability 0→8. **Also this session: the Wow Blueprint** (`alongside_wow_blueprint_11aug2026_v1.md`) — the sequenced plan behind these sessions — and four new locked principles agreed with Graeme in conversation (§ Locked Principles below), which every future proposal must pass. **Two false statements found live in `privacy.js` and removed** ("Build New Habits Ltd", "ICO registered"). New pre-beta blocker logged: **BETA-1**, the consent gate currently links to two pages that do not exist.
+**This version's substantive changes:** Persona Tracing Wave 1 **run and closed** — the brief logged in v146 was executed the same day, in this PM chat rather than a fresh chat (Graeme's call; the bias-reduction rationale is noted as partially unmet, see PT-W1 outcome below). Three deliverables produced and pushed to `Admin/`. **Two 🔴 Critical findings, both confirmed by executing live code, not by reading it** — a day-one check-in that contradicts the user's own onboarding disclosure for 100% of users, and `fitnessLevel` having no live writer since the OB-THREAD rebuild, meaning every user is treated as "moderate" regardless of what they answered. Eight further findings from Medium to Low. Ten new task rows added below (PT-1 to PT-10). Two of the ten are **content/decision-gated, not build-ready** — flagged explicitly rather than booked. Persona 2.5 (post-cardiac) confirmed as the Wave 2 candidate on evidence, not assumption: the blank-slate persona surfaced both criticals first, so "least data given to the app" is now the confirmed selection criterion for future waves.
 
 **Recent history, condensed for continuity (full detail in `Admin/Past MS/` for each version):**
-- **v147, Persona Tracing Wave 1 outcome:** brief executed same day it was written. Two 🔴 Critical findings confirmed by executing live code — a day-one check-in contradicting the user's own onboarding disclosure for 100% of users, and `fitnessLevel` having no live writer since OB-THREAD. Ten task rows PT-1 to PT-10. Three deliverables pushed to `Admin/`. Persona 2.5 confirmed as the Wave 2 candidate on evidence: the blank-slate persona surfaced both criticals first, making "least data given to the app" the selection criterion for future waves.
-
----
-
-## 🔒 Locked Principles — agreed 11 Aug 2026
-
-Four principles agreed with Graeme in conversation. **Every future proposal must pass all four.** They exist because the product's differentiation is a set of refusals, and refusals decay silently unless written down.
-
-**P1 — The coach never sells, and never withholds what it can see.**
-If the coach has noticed something, it says it. Free. Personal buys **tools** (choose session type, choose duration, log lifts, export, longer windows), never *deeper coaching*. The moment the coach's helpfulness becomes tier-dependent, "trust me, I've got you" becomes "I've got you up to a point," and a conditional promise is not a promise.
-
-**P2 — The coach never talks about the app. A separate, visually distinct helper layer can.**
-Graeme's Disney point, and it corrected an over-absolute position. Disney's cast members are visibly not characters; the frame holds *because* of the distinction. What would break it is Mickey discussing queue times. So the coach coaches, and a legibly different helper layer teaches the interface.
-
-**P3 — The app never teaches in the abstract. It offers at the point of friction, triggered by something the person did, never on a timer.**
-One deliberate exception: the periodic re-ask (WOW-5), which is coaching rather than teaching.
-
-**P4 — The app may display load. The coach never interprets it.**
-Graeme's point, and the most important thing agreed in the whole conversation. No commentary on the delta in either direction. No "slightly lighter today," no "up from last week," no arrows, no colour-coding, no "new best" badge. **The asymmetry is the reason:** silence on a drop is only credible if there is also silence on a rise. The moment the app cheers an increase, its silence on a decrease becomes a judgement. Celebrating is what creates the shame — you cannot have one without the other, which is why default-none is structural rather than a preference. Presentation is a flat unnarrated reference line (`Last: 60kg`) in the exercise meta, not coach voice. A Settings "Celebrations" group may sit on top, **default off** — someone who turns it on has asked for it, which is a different thing entirely.
-
-**Framing note that produced P4, worth keeping:** *"Here's what you did"* has a comparison buried in it, and the comparison has a verdict attached. Behind it sits *"here's what you failed to achieve against last time."* There are British sprinters who have not PB'd in years; it does not eradicate their progress, commitment or quality. A flat or falling number carries no information about whether today was a good day — it was hot, they slept badly, they came anyway, which is the harder thing.
-
----
-
-## 🛠️ WOW Build Sessions — 11 Aug 2026
-
-Built from `alongside_wow_blueprint_11aug2026_v1.md`. All three verified by Node assertion and confirmed on a **fresh clone of the live remote**, per standing practice. **None is on-device confirmed** — that gate remains outstanding for all three.
-
-### WOW-2 — Sessions that fit the person 🟢 Shipped (PT-2, PT-9)
-
-`workoutGenerator.js` v1.13→**v1.14**, `exercises.js` + `exercises/index.js` v1.3→**v1.4**, `exercises/yoga.js` v1→**v2**, `sw.js` v225→**v226**.
-
-`getUserProfile()` now falls through to `lifestyle.activityLevel` — the field live onboarding actually writes — with `fitnessLevel` retained as an explicit override so the Settings control still wins. Added a `returning: 6` ceiling (the fifth ACTIVITY_CHIP had no key and silently resolved to moderate). `yoga-crescent-lunge` given `energyRequired: 3`, making it reachable for the first time.
-
-**Measured delta:** Tom's pool 330→254, exercises above his ceiling **76→0**. Priya's pool 350→359, hardest tier (energyRequired 9) available **0→8**.
-
-**Note for the record:** the first verification run reported two FAILs. Both were the test's assertions being wrong, not the code — Tom's pool was +1 because Crescent Lunge became reachable, and the override test compared Tom (no equipment) against Priya's figure (six gym items). Re-run with corrected assertions rather than waved through.
-
-### WOW-1 — Stop the under-reporting of effort 🟢 Shipped (PT-3)
-
-`workout.js` v7→**v8**, `core-session.js` v6→**v7**, `yoga-session.js` v7→**v8**, `sw.js` v226→**v227**.
-
-None of the three had a session-level clock, so every completion wrote `durationMins` null or absent and `progress.js:138` summed it as zero. Added `sessionStartTime` + `elapsedMins()` to each, mirroring `gym-programme.js:806`. Latched once at genuine session start, cleared on reset — necessary because `workout.js`'s `onMount()` re-fires on every timer toggle and rest timers re-enter the session phase. One-minute floor so a real completion never reports zero.
-
-**All six `activityLog` write paths** across the three files now supply a real duration, including the three partial-exit paths that previously wrote explicit `null`.
-
-**Measured delta:** Tom's three-week Progress **22→87 minutes**, four sessions all counted.
-
-**Two things the verification caught that would otherwise have shipped wrong:** `core-session.js` had a *second* `durationMins: null` on its partial-exit path missed by the first pass, and `workout.js` needed the latch guard or the clock would reset mid-session on every timer tap.
-
-### WOW-0 — Restore the legal consent record 🟢 Shipped, ⚠️ dependencies open
-
-`store.js` v18→**v19**, `Schema.md` v1.17→**v1.18**, `thread.js` v7→**v8**, `privacy.js`→**v2**, `onboarding-thread.css` v4→**v5**, `sw.js` v227→**v228**. Schema first, per standing rule.
-
-**The gap:** live onboarding had captured **no legal consent record at all** since OB-THREAD retired `welcome.js`. `welcome.js:85-86` was the only writer of the flat `consentGiven`/`consentAt`, and that route left `router.js` VIEW_NAMES in v7. Found by the PT-W1 store audit, not by anyone noticing.
-
-New nested `consent{ given, at, policyVersion, ageConfirmed }`. Nested rather than flat for the coming Supabase migration, where PT-10 already flagged undeclared flat fields as a real loss risk. `mergeWithDefaults()` guards it so a real record is never overwritten by defaults — an existing user's timestamp is a legal audit trail.
-
-**Affirmative tick, not implied consent** (Graeme's decision). `welcome.js` used "by tapping Start you agree", which leaves the "but I didn't know" problem open.
-
-**Accessibility:** Continue uses `aria-disabled` + `.is-inactive`, **never** the HTML `disabled` attribute — that removes an element from the tab order entirely, which is exactly the PT-7 bug found in `session-builder-ui.js`. Tapping unticked shows an inline message and moves focus to the checkbox. Checkbox 24px in a 44px row (SC 2.5.8); links underlined not colour-only (SC 1.4.1); inactive opacity 0.55 matching `tier-gating.css` rather than a third value.
-
-**Age gate: built and INERT.** `AGE_GATE_ENABLED = false` in `thread.js`. **Do not flip** until A1.11 (ToS 13+ vs business-doc 16+) resolves and Natalie's written advice lands. Flipping it early is worse than leaving it off — it produces an audit trail asserting an eligibility check with no agreed rule behind it.
-
-**Two false statements found live in `privacy.js` and removed:**
-- **"Build New Habits Ltd"** — sole trader, no limited company exists. Same error fixed on the website 03 Aug and missed here.
-- **"ICO registered"** — it is not. Gated on BIZ-1 (HMRC), still open. The app was telling users their data sat under a registration that does not exist, on the one screen where accuracy matters most. Removed, not softened.
-
-Footer now reads "Build New Habits · Somerset, United Kingdom". `privacy.js` reframed as an explicit *summary* pointing at canonical website documents.
-
----
-
-## 🚦 New action points from the WOW sessions
-
-| ID | Item | Severity | Detail | Target |
-|----|------|----------|--------|--------|
-| **BETA-1** | **Consent gate links to two pages that do not exist** | 🟠 **Pre-beta blocker** | `thread.js`'s gate links to `buildnewhabits.co.uk/privacy/` and `/terms/`. Neither page has been built. **Graeme's decision, 11 Aug: acceptable as placeholders for now, wire later.** Not defensible at beta — asking someone to tick a box agreeing to documents they demonstrably cannot read is weaker than the implied consent it replaced. Drafts exist (`alongside_privacy_policy_draft_23jul2026_v3.docx`, `alongside_terms_of_service_draft_23jul2026_v2.docx`), both awaiting Natalie. In-app summary (`privacy.js` v2) is a working fallback and the gate does link to it, so nothing is broken today. | **Before beta start (mid-Sept)** |
-| **BETA-2** | **`POLICY_VERSION` must be bumped when real policies publish** | 🟠 **Pre-beta, easy to miss** | Currently `'2026-08-11'` in `thread.js`, pinned to documents that do not exist yet and have not been through Natalie. When the real policies land, this constant **must** be bumped — otherwise every beta tester's record asserts agreement to a version that was never published, and there is no way afterwards to tell who needs re-consent. One-line change, expensive to reconstruct retrospectively. | **Same session as BETA-1** |
-| **BETA-3** | **On-device confirmation of all three WOW sessions** | 🟡 | Nine files across WOW-0/1/2, none on-device confirmed. Consent gate has never been seen to render. Hard-reload past the service worker (now `alongside-v228`). Joins `gym-programme.js` v5, still the oldest outstanding test on the board. | Next device session |
-| **BETA-4** | **Age gate activation** | 🟠 | `AGE_GATE_ENABLED` false in `thread.js`. Blocked on A1.11 + Natalie. Tracked here so it is not forgotten behind a code flag. | On A1.11 resolution |
-
----
-
-## 📌 Still outstanding from PT-W1
-
-Unchanged from v147 — see that version for full evidence on each.
-
-- **PT-1** 🔴 **Decision-gated, blocking the highest-emotional-return fix.** Needs Graeme's mapping of the seven live territories to check-in openings. `the-history` → `past-failure` is obvious; `escalation-trap` and `invisible-person` likely need new content written. A code-only guess must not ship. **Offered: a drafted proposal of all seven with reasoning, to react to rather than generate cold.**
-- **PT-4** 🟠 **Decision-gated.** PB logging — beta blocker or post-beta? **Rescoped 11 Aug** from analytics to a *memory aid* on Graeme's framing ("I want to know what weights I was lifting last week so I know what settings to add to the machines, rather than working blind"). Far smaller build. **Tier split agreed:** recall in session free (that is coaching, per P1), analysis/trends/export Personal (that is a tool). Presentation must conform to P4.
-- **PT-5, PT-6, PT-8, PT-10** — logged, unchanged.
-- **PT-7 / WOW-4** — build-ready, not yet run. Includes the free-tier Progress window 7→30 days (coherence with *variability is information*, not generosity) and swapping session-builder's locked tiles onto `lockedFeature()`.
-- **WOW-5** (periodic re-ask) — spec needed. Carries the **safety edge**: condition-safety filtering only runs on conditions the app knows about, and nothing in the app ever re-asks anything. Recommended cadence 8 weeks activity/equipment, 4 weeks conditions — **unconfirmed by Graeme**.
-- **WOW-7** (helper layer) — deliberately post-beta measurement.
-- **`exerciseFeedback` capture** — build-ready, small. `applyFeedbackWeighting()` reads it, nothing writes it. Cheapest route to "the app noticed and adjusted without me telling it."
-
----
 - **v146, Persona Tracing Wave 1 brief:** logged as a new brief, sourced from the existing 17-persona QA matrix rather than inventing new personas. Wave 1: persona 2.12 (blank-slate) and 2.15 (gym-literate, run as one continuous free-to-Personal journey). Method specified simulating three weeks of realistic irregular use via direct store manipulation. Three required outputs with separate evidence standards. **Now executed — see PT-W1 below.**
 - **v145, `gym-programme.js` UX rebuild:** confirmed by Graeme's direct screenshot comparison that 10 Aug's content fix wasn't enough — the screen structure was still a flat scrollable list, not the one-exercise-at-a-time walkthrough every other guided session type uses. Rebuilt to match `prescribed-session.js`/`workout.js` exactly, reusing their proven markup and shared CSS classes. Week 6/12 moments, programme progression, A/B alternation, exit-guard all unchanged. Not yet on-device confirmed — the highest-priority test on the board.
 - **v144, YouTube links + exercise-detail consistency audit:** all 461 exercises given tailored YouTube search terms (previously zero coverage). Connected finding: `instructions`/`coaching`/`why` were already at 100% data coverage — five views had silent field-name bugs (`gym-programme.js` alone had three) meaning content never rendered despite existing. `prescribed-session.js` fixed too (was showing zero guidance for any prescribed exercise). `walk`/`run`/`swim`/`cycle-session.js` confirmed correctly out of scope. `yoga-session.js`'s private pose pool flagged as a third parallel exercise database, not merged.
@@ -662,4 +566,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 11 Aug 2026 v148*
+*Build New Habits · Alongside: Move · Master Schedule · 11 Aug 2026 v147*
