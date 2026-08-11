@@ -923,6 +923,10 @@ rather than only a buried bypass door. Added both.
  *   Truth Rule's documented fallback. Cache-bump only otherwise; no
  *   other files changed this deploy.
  *
+ * 11 Aug 2026 v230 - PT-1/WOW-3: checkin-openings.js v3. Day-one territory
+ *   and age-band trigger maps corrected to the live IDs; five purpose-written
+ *   rows added. The coach now reflects back what onboarding was told.
+ *
  * 11 Aug 2026 v229 - WOW-4 (PT-7): session-builder-ui.js v5, progress.js v3,
  *   progress.css v3. Locked controls moved onto lockedFeature(); free-tier
  *   Progress window 7 -> 30 days. Cache bump only, no new files.
@@ -948,7 +952,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v229";
+const CACHE_NAME = "alongside-v230";
 
 const SHELL_URLS = [
 
