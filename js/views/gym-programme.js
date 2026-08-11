@@ -1,5 +1,14 @@
 /**
  * gym-programme.js
+ * 11 Aug 2026 v7
+ *
+ * v7 — PT-12. "Skip this one" now writes exerciseFeedback via
+ *   store.logExerciseFeedback(). That field has been read by
+ *   applyFeedbackWeighting() since exercises/index.js v1.3 with nothing
+ *   writing it, so the weighting has never run on real data. A skip is a
+ *   signal already being given at the point of friction — no new UI, and
+ *   nothing is said back to the person about it.
+ *
  * 11 Aug 2026 v6
  *
  * v6 — PT-4. Lift note added: a flat "Last: 60 kg \u00D7 8" reference line
@@ -800,6 +809,20 @@ export function GymProgrammeView(router) {
     });
 
     document.getElementById('gp-skip-btn')?.addEventListener('click', () => {
+      // 11 Aug 2026 (PT-12) — a skip is a real signal the person gave, at
+      // the point of friction, with no new UI asked of them (locked
+      // principle P3: offer at friction, never teach in the abstract).
+      // It feeds applyFeedbackWeighting(), which has read exerciseFeedback
+      // since exercises/index.js v1.3 and has never once had data to read.
+      //
+      // Recorded as 'too-hard' rather than 'disliked' deliberately: the
+      // reader's contract is binary too-hard/too-easy, and the effect of a
+      // too-hard signal (deprioritise, programmeScore 0.5) is the right
+      // response to a skip either way. Nothing is said to the person about
+      // it — no "noted", no "we'll make that easier". The adjustment is
+      // silent, which is the whole point of it feeling like being known
+      // rather than being surveyed.
+      if (exercise?.id) store.logExerciseFeedback(exercise.id, 'too-hard');
       advanceOrFinish(container, session, stats, sessionType);
     });
   }

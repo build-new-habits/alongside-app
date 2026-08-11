@@ -1,7 +1,7 @@
 # Alongside — Data Schema Reference
-## 11 Aug 2026 v1.19
+## 11 Aug 2026 v1.20
 
-**File:** `js/store.js` (confirmed live version: v20, 11 Aug 2026)
+**File:** `js/store.js` (confirmed live version: v21, 11 Aug 2026)
 **Storage:** `localStorage` key `alongside_user`
 
 **This version supersedes:** `schema.md` v1.17 (09 Aug 2026). Adds the new nested `consent{}` object (`store.js` v19) — see Section 1. This closes a gap found by the Persona Tracing Wave 1 store audit: live onboarding had captured **no legal consent record at all** since the OB-THREAD rebuild retired `welcome.js`. Consent is now an affirmative tick with a recorded policy version, not implied consent. The age gate is built but inert pending A1.11.
@@ -63,6 +63,18 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 |-------|------|---------|-------|
 | `onboardingComplete` | `boolean` | `false` | Gates app entry |
 | `onboardingStep` | `number` | `1` | Resume position if onboarding is interrupted |
+
+### `exerciseFeedback` — **DECLARED, `store.js` v21, 11 Aug 2026**
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `exerciseFeedback` | `array` | `[]` | `{ exerciseId, feedback: 'too-hard'\|'too-easy', at }[]`. Capped 200 |
+
+**Read since `exercises/index.js` v1.3, written by nothing until now** — `applyFeedbackWeighting()` always fell back to `[]`, so that weighting had never once run on real data. Writer: `store.logExerciseFeedback()`, called from `gym-programme.js`'s "Skip this one" (a signal already given, at the point of friction — locked principle P3). Binary, not a rating, matching the reader's contract.
+
+### `absence.returnCapturedAt` — **DECLARED, `store.js` v21, 11 Aug 2026**
+
+Written by `programmeEngine.js:268`, read at `:242`/`:263`, and absent from `getDefaults()` — surviving only via the `...saved` spread. Exactly the migration loss risk PT-10 flagged.
 
 ### `liftLog` / `liftLogEnabled` — **NEW, `store.js` v20, 11 Aug 2026**
 

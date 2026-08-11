@@ -1,6 +1,13 @@
 /**
  * morning-session.js - Morning Session View
  *
+ * 11 Aug 2026 v3
+ *
+ * v3 — PT-12. Three reads of "checkin.energy" corrected to
+ *   "lastCheckin.energy". Nothing has ever written the former, so the
+ *   session's energy input silently defaulted to 5 and energyBefore was
+ *   always null on every logged entry.
+ *
  * 23 Jul 2026 v2
  *
  * CHANGELOG
@@ -109,7 +116,12 @@ function formatTime(seconds) {
 }
 
 function getCardioRoute() {
-  const energy     = store.get("checkin.energy") || 5;
+  // 11 Aug 2026 (PT-12) — "checkin.energy" is never written: store's checkin
+  // object holds lastOpeningMode/openingModeHistory/feelingWordDepth/
+  // lastMilestoneNoticed only. checkin.js's _checkin.energy is a local
+  // variable, not a store path. The real field is lastCheckin.energy
+  // (checkin-mini.js:389). This silently defaulted to 5 for everyone.
+  const energy     = store.get("lastCheckin.energy") || 5;
   const lowerZone  = getZoneStatus("lower-limb");
   const spineZone  = getZoneStatus("spine");
   const hasFlare   = lowerZone === "moderate" || lowerZone === "severe" ||
@@ -176,7 +188,7 @@ function logActivity(session, durationMins) {
     type:         "morning-session",
     name:        session.title,
     duration:    durationMins,
-    energyBefore: store.get("checkin.energy") || null,
+    energyBefore: store.get("lastCheckin.energy") || null,
     feel:        postFeel || "right",
     painChange:  "none",
     source:      "coach-recommended",
@@ -214,7 +226,7 @@ function savePartialSession(session) {
     name:         session.title,
     duration:     durationMins,
     status:       "partial",
-    energyBefore: store.get("checkin.energy") || null,
+    energyBefore: store.get("lastCheckin.energy") || null,
     feel:         null,
     painChange:   "none",
     source:       "coach-recommended",
