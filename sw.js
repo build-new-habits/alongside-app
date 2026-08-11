@@ -1,6 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v233
+ * Cable Pallof Press added; watchOut and load added to both band versions.
+ *
  * 11 Aug 2026 v232
  * CON-4/CON-8 - new gym.js (31 entries: machines, conditioning, cable and
  * machine strength, loaded core, med ball, balance, plyo) and equipment is
@@ -1010,7 +1013,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v242";
+const CACHE_NAME = "alongside-v243";
 
 const SHELL_URLS = [
 
