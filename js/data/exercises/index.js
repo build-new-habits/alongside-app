@@ -7,7 +7,19 @@
  * No changes needed elsewhere in the app when new category files are added —
  * just import the new array here and spread it into EXERCISES.
  *
- * 11 Aug 2026 v1.4
+ * 11 Aug 2026 v1.5
+ *
+ * v1.5 — CON-2. filterByEquipment() now resolves the user's ticked
+ *   equipment through equipment-map.js before comparing. equipment.js
+ *   offers 66 granular ids ("dumbbells-medium"); exercises are tagged with
+ *   22 coarse ones ("dumbbell"), and fourteen of those had no counterpart
+ *   in the vocabulary at all, so `.every(item => userEquipment.includes())`
+ *   could never be true for them. 92 of the 124 equipment-requiring
+ *   exercises were unreachable on every route for every user. Measured
+ *   after the fix: a gym-membership user goes from 337 reachable exercises
+ *   to 430. No exercise re-tagged, no stored user data migrated.
+ *   NOTE: js/data/exercises.js is now a re-export shim over this file
+ *   (CON-1), so filter changes are written once, not twice.
  *
  * v1.4 — PT-2/PT-9 (Persona Tracing Wave 1). filterByFitnessLevel()
  *   gains a "returning" ceiling (6) — the fifth ACTIVITY_CHIP option had
@@ -75,6 +87,7 @@ import { SWIMMING_CYCLING }   from './swimming_cycling.js';
 import { SPORT_CONDITIONING } from './sport_conditioning.js';
 
 import { getActiveConditionIds } from '../conditions.js';
+import { resolveEquipment, exerciseIsAvailable } from '../equipment-map.js';
 import { store }                  from '../../store.js';
 
 export const EXERCISES = [
@@ -101,10 +114,11 @@ export const EXERCISES = [
  * or if equipment array is empty (bodyweight).
  */
 export function filterByEquipment(exercises, userEquipment) {
-  return exercises.filter(exercise => {
-    if (!exercise.equipment || exercise.equipment.length === 0) return true;
-    return exercise.equipment.every(item => userEquipment.includes(item));
-  });
+  // CON-2: resolve granular ticks ("dumbbells-medium") into the coarse
+  // capability tags exercises actually carry ("dumbbell") before comparing.
+  // Bodyweight exercises still always pass, exactly as before.
+  const resolved = resolveEquipment(userEquipment || []);
+  return exercises.filter(exercise => exerciseIsAvailable(exercise, resolved));
 }
 
 /**
