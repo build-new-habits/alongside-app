@@ -1,5 +1,13 @@
 /**
  * data/exercises/sport_conditioning.js
+ * 11 Aug 2026 v2
+ *
+ * v2 - CON-9. watchOut and load added to all 43 entries. Written to the Exercise
+ *   Entry Standard: name the error AND its correction, describe what it
+ *   feels like rather than only what it looks like, no fear language, no
+ *   shame, and pain is always a plain stop. Load is effort-relative
+ *   throughout, never an absolute weight (Locked Principle P4).
+ *
  * 10 Aug 2026 v1
  *
  * v1 — First version header on this file. Added tailored YouTube search
@@ -48,6 +56,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Stay low throughout — the moment the hips rise, speed and reactivity are lost. Think of keeping your head at the same height the whole time.',
     why: 'Lateral shuffling is the primary defensive movement in most court and team sports. Develops the hip abductor and adductor strength needed for lateral speed.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 50
   },
 
@@ -79,6 +94,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Never cross your feet during the shuffle sections. Touch the cones with the hand closest to them. Time yourself — this is also a fitness test.',
     why: 'The T-drill tests and develops acceleration, lateral agility, and backpedalling — the three directional changes required in most team sports.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 75
   },
 
@@ -109,6 +131,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The change-of-direction technique matters: plant the outside foot, stay low through the turn, and drive with the opposite leg.',
     why: 'The 5-10-5 is used by every major sport league as a standard combine test. It measures short-area quickness and change-of-direction ability.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 70
   },
 
@@ -137,6 +166,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Lean into the turns rather than slowing down. The centripetal force through the outer leg is the training stimulus.',
     why: 'Develops curved running mechanics and the ability to maintain speed through direction changes — common in team sports and racket sports.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 55
   },
 
@@ -166,6 +202,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The defensive slide is slower than a shuffle but lower and wider. The wider base is what makes it effective for mirroring an opponent.',
     why: 'Develops the specific movement pattern used in individual defensive situations — maintaining position relative to an opponent while staying low and reactive.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 55
   },
 
@@ -195,6 +238,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Accuracy before speed. The ladder drills bad footwork out of existence — rushing too early means no benefit. Slow down until the pattern is grooved.',
     why: 'Develops foot speed, coordination, and rapid ground contact time — the mechanical basis of agility in all sports.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 55
   },
 
@@ -224,6 +274,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The pattern is: in-in-out, then the mirror. Saying "in-in-out" aloud helps the brain pattern it before the feet follow.',
     why: 'One of the most complex ladder drills — develops coordination, rhythm, and the ability to process movement patterns quickly under fatigue.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 60
   },
 
@@ -254,6 +311,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Low centre of gravity through the turns is everything. High hips lose time. The turns should be tight and explosive — not wide arcs.',
     why: 'The pro agility drill is the gold standard change-of-direction test in professional sport. It measures what scouts actually care about: how fast you can move laterally and stop.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 75
   },
 
@@ -288,6 +352,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The first three steps are the most important in acceleration. Drive the knees forward and up, push the ground back. You accelerate by pushing, not by leaning forward.',
     why: 'Short acceleration is the most sport-relevant speed quality — most actions in team sport happen over 10 metres or less.',
+        watchOut: [
+      'Sprinting without a thorough warm-up, which is how hamstrings get pulled',
+      'Straining the face, jaw and shoulders; stay relaxed above the waist',
+      'Taking short recoveries, which turns a speed session into a conditioning one'
+    ],
+    load: 'Maximal effort, full recovery. Speed work needs freshness.',
     credits: 65
   },
 
@@ -316,6 +386,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The wall removes balance demands and lets you focus entirely on the knee drive mechanics. This is the most transferable sprint drill there is.',
     why: 'Develops the drive phase of sprinting — the most mechanically demanding part of acceleration. Used by track athletes before every session.',
+        watchOut: [
+      'Hips sagging away from the wall',
+      'Driving the knee up without the opposite arm following',
+      'Rushing so it becomes a jog against a wall'
+    ],
+    load: 'Bodyweight only. Position first, speed second.',
     credits: 45
   },
 
@@ -345,6 +421,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The falling start teaches the forward lean of acceleration without the mechanical error of bending at the waist. Let gravity do the work.',
     why: 'Develops the instinctive forward lean of acceleration and practises explosive first-step response — the reactive sprint start used in sport.',
+        watchOut: [
+      'Sprinting without a thorough warm-up, which is how hamstrings get pulled',
+      'Straining the face, jaw and shoulders; stay relaxed above the waist',
+      'Taking short recoveries, which turns a speed session into a conditioning one'
+    ],
+    load: 'Maximal effort, full recovery. Speed work needs freshness.',
     credits: 55
   },
 
@@ -374,6 +456,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The resistance should add about 10 to 15% to normal sprint effort. More than that changes the mechanics negatively. Less than that is just a run.',
     why: 'Resisted sprinting overloads the drive phase muscles — increasing sprint power through the principle of specific overload.',
+        watchOut: [
+      'Sprinting without a thorough warm-up, which is how hamstrings get pulled',
+      'Straining the face, jaw and shoulders; stay relaxed above the waist',
+      'Taking short recoveries, which turns a speed session into a conditioning one'
+    ],
+    load: 'Maximal effort, full recovery. Speed work needs freshness.',
     credits: 75
   },
 
@@ -403,6 +491,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Eyes up, not on the cones. Looking ahead at the next cone allows faster path decisions.',
     why: 'The cone weave develops the curved running mechanics and hip mobility needed to navigate obstacles and opponents at speed.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 55
   },
 
@@ -431,6 +526,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The transitions between movements are the challenge. The ability to change movement type without losing momentum is agility.',
     why: 'Combines sprinting, lateral movement, and backpedalling in one drill — the complete movement vocabulary of team sport defence.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 65
   },
 
@@ -459,6 +561,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The point is the unpredictability. Standard balls are too predictable — the reaction ball is deliberately erratic.',
     why: 'Develops reactive speed — the ability to process visual information and respond with movement instantly. Directly relevant to racket sports and fielding.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 50
   },
 
@@ -488,6 +597,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The leader should stay low and use fakes — the mirror must not cross their feet. This is the closest thing to actual defensive situation in training.',
     why: 'Reactive agility training that mirrors the actual demands of individual defensive sport. Cannot be replicated by any cone drill because it involves genuine unpredictability.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 65
   },
 
@@ -681,6 +797,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'This is a conditioning session, not tactical training. Focus on movement quality throughout — fatigue is expected in the later drills.',
     why: 'A complete football-specific conditioning session that develops all the physical qualities the sport demands: speed, agility, lateral movement, and reactive ability.',
+        watchOut: [
+      'Form degrading in the later rounds to keep pace',
+      'Rest periods creeping longer than the session asks',
+      'Going maximal in round one, which makes every round after it slower'
+    ],
+    load: 'Hard but repeatable. The last round should look like the first.',
     credits: 120
   },
 
@@ -714,6 +836,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'This is the ideal pre-sport sprint preparation — the body reaches near-maximum velocity by the end without the injury risk of a standing-start sprint.',
     why: 'Prepares the neuromuscular system for maximum velocity running without the explosive start demands that risk hamstring strain when cold.',
+        watchOut: [
+      'Sprinting without a thorough warm-up, which is how hamstrings get pulled',
+      'Straining the face, jaw and shoulders; stay relaxed above the waist',
+      'Taking short recoveries, which turns a speed session into a conditioning one'
+    ],
+    load: 'Maximal effort, full recovery. Speed work needs freshness.',
     credits: 55
   },
 
@@ -743,6 +871,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The quality of the cut is entirely determined by the plant foot. A solid, angled plant at low body height allows maximum force transfer.',
     why: 'Cutting is the most common athletic movement in team sports and one of the most common sites of knee injury. Practising it correctly builds both performance and safety.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 70
   },
 
@@ -771,6 +906,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Approach each cone from the outside to create room for the cut. Approaching straight gives you no space to plant and turn.',
     why: 'Develops multi-directional speed and the ability to combine acceleration with quick change-of-direction — the fundamental athletic skill of most field sports.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 60
   },
 
@@ -799,6 +941,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The transition from backpedal to forward sprint is where most people lose time. Practice the rotation separately before adding the run.',
     why: 'Develops the backpedal-to-sprint transition — essential in football, rugby, and basketball for defenders tracking through balls or reacting to breaks.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 60
   },
 
@@ -827,6 +976,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Land on the ball of the foot and immediately spring to the next position. Flat-footed landings kill the drill.',
     why: 'Develops foot speed, ankle stability, and the reactive ground contact ability needed for court sports and rapid-change activities.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 55
   },
 
@@ -855,6 +1011,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Being chased produces maximum effort that no solo sprint drill can replicate. Competitive sprinting is what actually develops speed.',
     why: 'Competitive chase drills produce maximal sprint effort through the psychological drive of competition — unmatched by any solo drill for developing actual speed.',
+        watchOut: [
+      'Sprinting without a thorough warm-up, which is how hamstrings get pulled',
+      'Straining the face, jaw and shoulders; stay relaxed above the waist',
+      'Taking short recoveries, which turns a speed session into a conditioning one'
+    ],
+    load: 'Maximal effort, full recovery. Speed work needs freshness.',
     credits: 80
   },
 
@@ -884,6 +1046,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The surprise in your own body is the point. Training for sudden acceleration without predictable lead-in is how you replicate match demands.',
     why: 'Develops the ability to accelerate at unpredictable moments — the defining physical skill for forwards and wingers in team sports.',
+        watchOut: [
+      'Sprinting without a thorough warm-up, which is how hamstrings get pulled',
+      'Straining the face, jaw and shoulders; stay relaxed above the waist',
+      'Taking short recoveries, which turns a speed session into a conditioning one'
+    ],
+    load: 'Maximal effort, full recovery. Speed work needs freshness.',
     credits: 65
   },
 
@@ -912,6 +1080,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Defensive footwork is the most undertrained athletic skill in recreational sport. Most players practise attacking — defenders win games.',
     why: 'A complete defensive footwork session developing the sliding, closing out, and reactive movement that characterises quality individual defence in court sports.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 80
   }
 
@@ -951,6 +1126,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The AMRAP format is self-regulating — you go as hard as you can sustain for the full time. Pacing is a skill worth developing.',
     why: 'AMRAP circuits develop strength-endurance and cardiovascular fitness simultaneously. The time-based format is highly motivating and provides a measurable benchmark.',
+        watchOut: [
+      'Form degrading in the later rounds to keep pace',
+      'Rest periods creeping longer than the session asks',
+      'Going maximal in round one, which makes every round after it slower'
+    ],
+    load: 'Hard but repeatable. The last round should look like the first.',
     credits: 90
   },
 
@@ -981,6 +1162,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'EMOM trains you to work and then fully recover within a time constraint — exactly what team sport demands.',
     why: 'EMOM format develops work capacity within defined time windows, building the ability to produce repeated high-quality efforts — a key quality for team sport athletes.',
+        watchOut: [
+      'Letting form slip in the last rounds to stay on the clock — better to reduce reps and keep the quality',
+      'Choosing a rep count that leaves no recovery within the minute',
+      'Continuing when the movement quality has clearly gone'
+    ],
+    load: 'Choose a load you could complete cleanly for two more rounds than the session asks for.',
     credits: 80
   },
 
@@ -1011,6 +1198,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Genuine Tabata requires genuine maximum effort. The 10-second rest is deliberately insufficient for full recovery — that is the design, not a flaw.',
     why: 'The Tabata protocol, developed by Dr Izumi Tabata, is one of the most researched HIIT formats. Produces VO2 max improvements comparable to far longer moderate-intensity sessions.',
+        watchOut: [
+      'Form degrading in the later rounds to keep pace',
+      'Rest periods creeping longer than the session asks',
+      'Going maximal in round one, which makes every round after it slower'
+    ],
+    load: 'Hard but repeatable. The last round should look like the first.',
     credits: 90
   },
 
@@ -1041,6 +1234,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Power endurance means maintaining power output over repeated efforts. The goal is that rep 15 looks like rep 1. That is hard to achieve and worth pursuing.',
     why: 'Power endurance is the quality that separates fit athletes from powerful ones — the ability to repeat explosive actions throughout a match, not just in the first 10 minutes.',
+        watchOut: [
+      'Form degrading in the later rounds to keep pace',
+      'Rest periods creeping longer than the session asks',
+      'Going maximal in round one, which makes every round after it slower'
+    ],
+    load: 'Hard but repeatable. The last round should look like the first.',
     credits: 110
   },
 
@@ -1070,6 +1269,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Most people can sprint fast once. RSA tests whether you can do it repeatedly with short recovery. The drop-off between first and last sprint is the measure.',
     why: 'Repeated sprint ability is the defining physical quality of team sport — the ability to maintain near-maximal sprint speed across a full game, not just early on.',
+        watchOut: [
+      'Form degrading in the later rounds to keep pace',
+      'Rest periods creeping longer than the session asks',
+      'Going maximal in round one, which makes every round after it slower'
+    ],
+    load: 'Hard but repeatable. The last round should look like the first.',
     credits: 100
   },
 
@@ -1099,6 +1304,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The beep test is a brutal but honest measure of aerobic fitness. The final levels feel impossible — that is by design.',
     why: 'The Multi-Stage Fitness Test (beep test) is the most widely used aerobic fitness assessment in team sport. Provides a reliable VO2 max estimate and a benchmark for training.',
+        watchOut: [
+      'Setting off far ahead of the beep in the early levels and wasting energy',
+      'Attempting a maximal test without a full warm-up',
+      'Continuing past the point where turning becomes uncontrolled'
+    ],
+    load: 'Maximal for the test. Pace the early levels rather than racing them.',
     credits: 100
   },
 
@@ -1128,6 +1339,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The Yo-Yo IR1 is the most sport-specific aerobic test because the recovery period mirrors the demands of team sport better than a continuous beep test.',
     why: 'Developed by Dr Jens Bangsbo, the Yo-Yo intermittent test specifically assesses the ability to perform repeated high-intensity work with active recovery — directly reflecting team sport physiology.',
+        watchOut: [
+      'Form degrading in the later rounds to keep pace',
+      'Rest periods creeping longer than the session asks',
+      'Going maximal in round one, which makes every round after it slower'
+    ],
+    load: 'Hard but repeatable. The last round should look like the first.',
     credits: 100
   },
 
@@ -1157,6 +1374,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Advanced ladder patterns require accuracy at speed. Master each pattern slowly before adding pace. Accuracy always precedes speed.',
     why: 'Advanced ladder patterns develop complex coordination, foot speed, and the neuromuscular variety needed for unpredictable sport movements.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 65
   },
 
@@ -1185,6 +1409,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Small-sided games produce higher intensity than most formal training drills because competitive instinct drives effort that instruction cannot replicate.',
     why: 'Small-sided games are the most sport-specific conditioning tool available — developing fitness, decision-making, and technical skills simultaneously in realistic conditions.',
+        watchOut: [
+      'Playing competitively enough that the conditioning intent disappears',
+      'Uncontrolled changes of direction as fatigue builds',
+      'Playing on a surface that does not suit the footwear'
+    ],
+    load: 'Effort only. Keep the intensity high and the movements controlled.',
     credits: 100
   },
 
@@ -1214,6 +1444,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'MAS training is more sophisticated than simple interval training because it trains at the specific intensity that maximises aerobic adaptation.',
     why: 'MAS interval training is the most research-supported method for rapidly improving VO2 max and running economy in team sport athletes.',
+        watchOut: [
+      'Form degrading in the later rounds to keep pace',
+      'Rest periods creeping longer than the session asks',
+      'Going maximal in round one, which makes every round after it slower'
+    ],
+    load: 'Hard but repeatable. The last round should look like the first.',
     credits: 95
   },
 
@@ -1278,6 +1514,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The hip rotation through each crossover is the key element. Keeping the hips square defeats the purpose of the drill.',
     why: 'The carioca develops hip rotation speed and lateral coordination — movements fundamental to creating separation from opponents in most team sports.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 50
   },
 
@@ -1307,6 +1550,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Most people backpedal with their hips too high. Stay in a partial squat position — it feels awkward but is faster and more reactive.',
     why: 'The backpedal is a specific skill used by defenders in football, rugby, and basketball. Develops the posterior chain in a different movement pattern to forward running.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 45
   },
 
@@ -1337,6 +1587,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Medicine ball work develops rotational and multi-planar power that barbells cannot access. The unpredictable ball rebound also trains reactive catching.',
     why: 'Medicine ball circuits develop total body power across multiple planes — essential for throwing, striking, and contact sports where force is rarely applied in a single direction.',
+        watchOut: [
+      'Landing or catching with locked joints',
+      'Using a ball heavy enough to slow the movements down',
+      'Continuing when speed has dropped; this is a power session, not a conditioning one'
+    ],
+    load: 'Light ball. Speed is the training effect.',
     credits: 100
   },
 
@@ -1368,6 +1624,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The protocol is named backward — 10 seconds of max effort is the key interval. The preceding 30 and 20 seconds create fatigue that makes the 10-second sprint more effective.',
     why: "The 10-20-30 protocol has strong research support from Bangsbo's group — produces significant VO2 max improvements and running economy gains in a time-efficient format.",
+        watchOut: [
+      'Form degrading in the later rounds to keep pace',
+      'Rest periods creeping longer than the session asks',
+      'Going maximal in round one, which makes every round after it slower'
+    ],
+    load: 'Hard but repeatable. The last round should look like the first.',
     credits: 90
   },
 
@@ -1399,6 +1661,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Strength-endurance uses moderate loads at higher volumes. The cardiovascular demand comes from the combination of exercises rather than aerobic pacing.',
     why: 'Strength-endurance is the quality underpinning all contact sport — the ability to maintain force output repeatedly over time. Bridges the gap between pure strength and cardio training.',
+        watchOut: [
+      'Form degrading in the final rounds',
+      'Rest periods creeping longer, which changes what the session trains',
+      'Going heavy; this is an endurance circuit and the weight should reflect that'
+    ],
+    load: 'Considerably lighter than a strength session. You should finish each round tired rather than close to failing.',
     credits: 100
   },
 
@@ -1457,6 +1725,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'Genuine VO2 max intervals require sustained discomfort. The final minute of each work interval should feel very hard. If it does not, you are working below the required intensity.',
     why: 'Long intervals at VO2 max intensity produce the greatest aerobic adaptations available. Used by serious athletes across all endurance sports.',
+        watchOut: [
+      'Form degrading in the later rounds to keep pace',
+      'Rest periods creeping longer than the session asks',
+      'Going maximal in round one, which makes every round after it slower'
+    ],
+    load: 'Hard but repeatable. The last round should look like the first.',
     credits: 100
   },
 
@@ -1486,6 +1760,13 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'The drop step should look like one movement, not two. The pivot and the first step into acceleration are simultaneous.',
     why: 'The drop step is the primary first movement for a defender turning to track a player running behind them — fundamental to all chasing and recovery run situations.',
+        watchOut: [
+      'Planting on a straight leg when changing direction, which is where knees get hurt',
+      'Going full speed before the movement pattern is comfortable at half speed',
+      'Doing these on a slippery or uneven surface',
+      'Continuing when tired; agility work is where fatigue turns into injury'
+    ],
+    load: 'Bodyweight only. Quality of movement over number of reps.',
     credits: 55
   },
 
@@ -1514,6 +1795,12 @@ export const SPORT_CONDITIONING = [
     ],
     coaching: 'High-low conditioning trains the ability to recover from a sprint while still moving — a physiological demand that steady-state cardio never addresses.',
     why: 'Replicates the intermittent nature of team sport — sustained periods of moderate activity punctuated by high-intensity bursts. More sport-specific than continuous running.',
+        watchOut: [
+      'Form degrading in the later rounds to keep pace',
+      'Rest periods creeping longer than the session asks',
+      'Going maximal in round one, which makes every round after it slower'
+    ],
+    load: 'Hard but repeatable. The last round should look like the first.',
     credits: 90
   }
 

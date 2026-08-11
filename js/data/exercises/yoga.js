@@ -1,5 +1,13 @@
 /**
  * data/exercises/yoga.js
+ * 11 Aug 2026 v3
+ *
+ * v3 - CON-9. watchOut and load added to the 7 strength-category poses. Written to the Exercise
+ *   Entry Standard: name the error AND its correction, describe what it
+ *   feels like rather than only what it looks like, no fear language, no
+ *   shame, and pain is always a plain stop. Load is effort-relative
+ *   throughout, never an absolute weight (Locked Principle P4).
+ *
  * 11 Aug 2026 v2
  *
  * v2 — PT-9 (Persona Tracing Wave 1). yoga-crescent-lunge was the only
@@ -160,6 +168,12 @@ export const YOGA = [
     ],
     coaching: 'Chest naturally wants to fall forward — keep lifting it. The discomfort in the thighs is exactly the point.',
     why: 'One of yoga\'s primary strength poses. Builds quad and glute endurance that directly transfers to functional daily strength.',
+        watchOut: [
+      'Knees travelling far past the toes',
+      'Lower back over-arching as the arms lift',
+      'Weight on the toes rather than back through the heels'
+    ],
+    load: 'Bodyweight. Sit lower only as far as your heels stay down.',
     credits: 40
   },
 
@@ -342,6 +356,12 @@ export const YOGA = [
     ],
     coaching: 'The hips want to open — keep them level. A 45-degree lean with level hips is better than a fully horizontal torso with one hip open.',
     why: 'The most demanding of the Warrior poses — builds single-leg strength, glute strength, and balance simultaneously.',
+        watchOut: [
+      'Hips opening to the side rather than staying square to the floor',
+      'Rounding the back to reach further forward',
+      'Locking out the standing knee'
+    ],
+    load: 'Bodyweight. Use a wall or blocks for support while you build the balance.',
     credits: 50
   },
 
@@ -368,6 +388,12 @@ export const YOGA = [
     ],
     coaching: 'Bent knees are completely fine. The spine staying long is the priority — a round back shifts load from the core to the lower back.',
     why: 'One of yoga\'s primary abdominal strengthening poses. Builds the deep core required for spinal stability.',
+        watchOut: [
+      'Rounding the lower back, which is the point to bend the knees more',
+      'Neck straining forwards',
+      'Holding the breath'
+    ],
+    load: 'Bodyweight. Keep the knees bent and the shins parallel to the floor to begin.',
     credits: 50
   },
 
@@ -395,6 +421,12 @@ export const YOGA = [
     ],
     coaching: 'Lowering one vertebra at a time on the way down is a spinal mobility exercise in itself — do not drop.',
     why: 'A backbend, a hip opener, and a glute strengthener in one. One of the most complete single poses in yoga.',
+        watchOut: [
+      'Pushing the hips higher by arching the back rather than squeezing the glutes',
+      'Knees splaying outwards',
+      'Turning the head while in the pose, which compresses the neck'
+    ],
+    load: 'Bodyweight.',
     credits: 30
   },
 
@@ -697,6 +729,12 @@ export const YOGA = [
     ],
     coaching: 'Focus on a fixed point at eye level — the drishti. A stable gaze creates a stable balance. Wobbling is normal and is not failure.',
     why: 'A progressive balance challenge that develops proprioception, ankle stability, and hip stability simultaneously. Balance deteriorates with age if untrained — this directly addresses that.',
+        watchOut: [
+      'Rushing between poses without resetting your balance',
+      'Staring at the floor rather than fixing on a point ahead',
+      'Attempting the harder poses when tired, when balance is worst'
+    ],
+    load: 'Bodyweight. Use a wall nearby throughout.',
     credits: 65
   },
 
@@ -782,6 +820,12 @@ export const YOGA = [
     ],
     coaching: 'Power yoga is vinyasa at higher intensity — the transitions between poses are fast and the holds are brief. Build heat in the first 10 minutes before the harder sequences.',
     why: 'Power yoga builds functional strength, cardiovascular fitness, and flexibility simultaneously — a genuinely complete workout for people who struggle to fit multiple training types into their week.',
+        watchOut: [
+      'Moving faster than your breath',
+      'Skipping the modifications when a pose is not available today',
+      'Pushing into any sharp joint sensation rather than backing off'
+    ],
+    load: 'Bodyweight throughout.',
     credits: 90
   },
 
@@ -865,6 +909,12 @@ export const YOGA = [
     ],
     coaching: 'These are strength poses, not stretches — maintain full muscular engagement throughout. Warrior 2 held for 90 seconds is genuinely demanding.',
     why: 'Hip strength yoga combines the flexibility benefits of yoga with the strength demands of held positions. Develops the hip stability that reduces injury risk in all sports.',
+        watchOut: [
+      'Hips dropping or rotating during the single-leg work',
+      'Gripping with the toes rather than spreading the weight through the foot',
+      'Holding the breath during the longer holds'
+    ],
+    load: 'Bodyweight.',
     credits: 65
   }
 

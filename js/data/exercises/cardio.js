@@ -1,5 +1,13 @@
 /**
  * data/exercises/cardio.js
+ * 11 Aug 2026 v3
+ *
+ * v3 - CON-9. watchOut and load added to the 26 general cardio entries. Written to the Exercise
+ *   Entry Standard: name the error AND its correction, describe what it
+ *   feels like rather than only what it looks like, no fear language, no
+ *   shame, and pain is always a plain stop. Load is effort-relative
+ *   throughout, never an absolute weight (Locked Principle P4).
+ *
  * 11 Aug 2026 v2
  *
  * v2 - CON-6. Four machine warm-ups ported in from session-builder.js's
@@ -46,6 +54,12 @@ export const CARDIO = [
     ],
     coaching: 'Land softly each time - think quiet feet. Step out instead of jumping if your joints prefer.',
     why: 'A simple full-body warm-up that raises your heart rate quickly.',
+        watchOut: [
+      'Landing with locked-out knees rather than soft ones',
+      'Half-sweeping the arms as you tire',
+      'Step one foot out at a time instead if jumping does not suit you today'
+    ],
+    load: 'Bodyweight only.',
     credits: 40
   },
 
@@ -72,6 +86,12 @@ export const CARDIO = [
     ],
     coaching: 'Slow it down if needed - marching high knees is just as effective as running them.',
     why: 'Builds cardiovascular fitness and hip flexor strength simultaneously.',
+        watchOut: [
+      'Leaning back to get the knees higher, which loads the lower back',
+      'Heavy landings; stay light on the balls of the feet',
+      'Sacrificing height for speed until it becomes a shuffle'
+    ],
+    load: 'Bodyweight only.',
     credits: 45
   },
 
@@ -98,6 +118,12 @@ export const CARDIO = [
     ],
     coaching: 'Slow these right down if form breaks — controlled mountain climbers are more effective than fast sloppy ones.',
     why: 'Combines core stability with cardio in one efficient movement.',
+        watchOut: [
+      'Hips piking upwards as you tire',
+      'Bouncing the shoulders forward past the wrists',
+      'Rushing so the knees never really reach the chest'
+    ],
+    load: 'Bodyweight only. Slow down rather than losing the plank line.',
     credits: 60
   },
 
@@ -126,6 +152,13 @@ export const CARDIO = [
     ],
     coaching: 'Step instead of jump at any stage to reduce impact — a stepped burpee is still a burpee.',
     why: 'A full-body movement that builds strength and fitness at the same time.',
+        watchOut: [
+      'Hips sagging during the press-up portion',
+      'Landing heavily on the jump back in',
+      'Rushing until form disappears; slower and cleaner beats faster and ragged',
+      'Skip the jump and step back instead if your knees prefer it'
+    ],
+    load: 'Bodyweight only. Reduce reps before reducing quality.',
     credits: 80
   },
 
@@ -152,6 +185,12 @@ export const CARDIO = [
     ],
     coaching: 'Soft landings protect your joints — think about absorbing the landing through your whole leg.',
     why: 'Develops explosive leg power and cardiovascular fitness.',
+        watchOut: [
+      'Landing with straight legs',
+      'Knees collapsing inward on landing',
+      'Doing many in a row when tired, which is when landing form goes'
+    ],
+    load: 'Bodyweight only.',
     credits: 65
   },
 
@@ -178,6 +217,12 @@ export const CARDIO = [
     ],
     coaching: 'It takes a few sessions to get the rhythm. If you miss, just restart immediately.',
     why: 'One of the most efficient cardio exercises — improves coordination and burns calories quickly.',
+        watchOut: [
+      'Jumping far higher than the rope needs',
+      'Landing flat-footed and heavily',
+      'Tensing the shoulders; the wrists should turn the rope, not the arms'
+    ],
+    load: 'Bodyweight only.',
     credits: 70
   },
 
@@ -209,6 +254,12 @@ export const CARDIO = [
     ],
     coaching: 'This counts. Any movement that elevates your heart rate is cardio. Start here on low energy days.',
     why: 'Low-impact cardio that can be done anywhere and suits any fitness level. Elevates heart rate with minimal joint stress.',
+        watchOut: [
+      'Knees going higher than hip height, which makes the back arch',
+      'Drifting into a shuffle as you tire',
+      'Holding the breath without noticing'
+    ],
+    load: 'Bodyweight only.',
     credits: 30
   },
 
@@ -235,6 +286,12 @@ export const CARDIO = [
     ],
     coaching: 'A classic low-impact aerobic movement. Increase the step width and arm reach to raise intensity without impact.',
     why: 'Gentle lateral movement that warms up the hips and gets the heart rate up without any jumping or impact.',
+        watchOut: [
+      'Steps getting smaller until there is no movement left',
+      'Standing rigid; let the arms move with the steps',
+      'Looking down at the feet rather than ahead'
+    ],
+    load: 'Bodyweight only.',
     credits: 30
   },
 
@@ -261,6 +318,12 @@ export const CARDIO = [
     ],
     coaching: 'Stairs are surprisingly effective — even at a walking pace they demand more from the heart and legs than flat walking.',
     why: 'Combines cardio with lower body strengthening. One of the most accessible forms of moderate-intensity exercise.',
+        watchOut: [
+      'Hauling on the handrail rather than driving through the legs',
+      'Toe-only steps rather than whole-foot ones',
+      'Rushing down the stairs, which is where falls happen'
+    ],
+    load: 'Bodyweight only.',
     credits: 55
   },
 
@@ -287,6 +350,12 @@ export const CARDIO = [
     ],
     coaching: 'There are no wrong combinations. The goal is to keep moving and enjoy it. Throw harder punches to raise the intensity.',
     why: 'Full-body cardio that also improves coordination and releases tension. High enjoyment factor for people who find traditional cardio boring.',
+        watchOut: [
+      'Locking the elbows at the end of a punch',
+      'Tensing the shoulders and neck',
+      'Standing flat-footed; stay light and keep moving'
+    ],
+    load: 'Bodyweight only.',
     credits: 65
   },
 
@@ -313,6 +382,12 @@ export const CARDIO = [
     ],
     coaching: 'Steady cycling is genuinely restorative — it builds aerobic base without taxing the nervous system the way intervals do.',
     why: 'Low-impact cardiovascular exercise that builds aerobic base. Particularly good for people with lower limb conditions who cannot run.',
+        watchOut: [
+      'Saddle too low, which crowds the knee',
+      'Rocking side to side in the saddle, usually a sign the seat is too high',
+      'Gripping the bars hard and tensing the shoulders'
+    ],
+    load: 'A pace you could hold a conversation at.',
     credits: 80
   },
 
@@ -340,6 +415,12 @@ export const CARDIO = [
     ],
     coaching: 'Walking is underrated. A brisk 30-minute walk provides meaningful cardiovascular benefit and is sustainable for almost anyone.',
     why: 'Moderate-intensity walking reduces cardiovascular risk, improves mood, and supports metabolic health. The most evidence-backed low-barrier exercise there is.',
+        watchOut: [
+      'Looking down at your feet rather than ahead',
+      'Very long strides, which are less efficient than quicker shorter ones',
+      'Carrying tension in the shoulders'
+    ],
+    load: 'Brisk enough that talking is possible but not entirely comfortable.',
     credits: 35
   },
 
@@ -366,6 +447,12 @@ export const CARDIO = [
     ],
     coaching: 'This absolutely counts as exercise. Research shows dance has equivalent cardiovascular and mental health benefits to structured cardio.',
     why: 'Cardiovascular exercise disguised as fun. Improves coordination, mood, and heart health — and has a high adherence rate because people actually enjoy it.',
+        watchOut: [
+      'Pushing through a movement that twinges rather than changing it',
+      'Jumping repeatedly on a hard floor',
+      'Forgetting to warm up first because it feels like fun rather than exercise'
+    ],
+    load: 'Effort only. Move at whatever intensity suits today.',
     credits: 55
   },
 
@@ -393,6 +480,12 @@ export const CARDIO = [
     ],
     coaching: 'The 30 seconds of rest is mandatory — not optional. HIIT only works if you genuinely push during the work periods, and that requires real recovery between them.',
     why: 'High-intensity interval training produces significant cardiovascular and metabolic adaptation in a shorter time than steady-state cardio.',
+        watchOut: [
+      'Going flat out on the first round and fading badly',
+      'Standing completely still in the recovery rather than moving gently',
+      'Continuing once form has clearly gone'
+    ],
+    load: 'Hard enough that the last round is a real effort, sustainable enough that you complete it.',
     credits: 100
   },
 
@@ -419,6 +512,12 @@ export const CARDIO = [
     ],
     coaching: 'The legs do 60% of the work, the back 30%, the arms 10%. Most beginners reverse this and wonder why their back hurts.',
     why: 'The rowing machine is one of the most complete cardiovascular exercises — the only machine that works both the upper and lower body through a full range.',
+        watchOut: [
+      'Pulling with the arms before the legs have finished driving',
+      'Rounding the back as you reach forward',
+      'Rushing the return; it should take about twice as long as the pull'
+    ],
+    load: 'A pace you could hold for the full session.',
     credits: 80
   },
 
@@ -445,6 +544,12 @@ export const CARDIO = [
     ],
     coaching: 'The walking intervals are not failure — they are the whole point. This method builds running fitness while managing load on the joints.',
     why: 'The walk-run method is the safest and most evidence-backed approach for building running fitness from scratch or returning after a break.',
+        watchOut: [
+      'Running the first intervals too fast to complete the last ones',
+      'Stopping dead during the walk portions',
+      'Increasing the running portions faster than week to week'
+    ],
+    load: 'The run should feel comfortably hard, never flat out.',
     credits: 60
   }
 
@@ -478,6 +583,12 @@ export const CARDIO = [
     ],
     coaching: 'Most beginners use too much arm and back and not enough leg. Think of the drive sequence as a leg press — the arms and back finish the stroke.',
     why: 'Rowing is a full-body aerobic exercise that builds both cardiovascular fitness and upper body endurance. Non-impact — excellent for people managing lower body injuries.',
+        watchOut: [
+      'Arms pulling before the legs drive',
+      'Rounding the back at the front of the stroke',
+      'Rushing the recovery'
+    ],
+    load: 'Easy. You should be able to talk in full sentences throughout.',
     credits: 50
   },
 
@@ -506,6 +617,12 @@ export const CARDIO = [
     ],
     coaching: 'The 500m is the classic rowing interval. Going out too hard on rep 1 means fading significantly by rep 4 and 5. Start 5 seconds slower than target pace.',
     why: 'Rowing intervals develop aerobic and anaerobic capacity simultaneously. The 500m distance stresses both energy systems equally.',
+        watchOut: [
+      'Starting the first 500 far faster than you can repeat',
+      'Losing the leg-first sequence as you tire',
+      'Rounding the back on the last few strokes of each piece'
+    ],
+    load: 'Hard enough that the last interval is a struggle, controlled enough that you finish it.',
     credits: 85
   },
 
@@ -534,6 +651,12 @@ export const CARDIO = [
     ],
     coaching: 'The assault bike is one of the most demanding cardio machines because arms and legs work simultaneously. Ten seconds genuinely maximum means you will be breathing hard immediately.',
     why: 'The assault bike uses push-pull arm action alongside leg drive — creating higher cardiovascular demand than a standard bike in less time. Highly time-efficient conditioning.',
+        watchOut: [
+      'Going all out in the first interval and fading',
+      'Gripping the handles so tight the shoulders tense',
+      'Stopping completely between efforts rather than pedalling gently'
+    ],
+    load: 'Hard enough to be demanding, repeatable enough to complete every interval.',
     credits: 90
   },
 
@@ -561,6 +684,12 @@ export const CARDIO = [
     ],
     coaching: 'Stair climbing is harder than walking because of the vertical component. The caloric cost per minute is significantly higher than flat walking.',
     why: 'Stair climbing builds glute and quad strength alongside cardiovascular fitness. Accessible with no equipment and no gym — a hidden training tool available in most buildings.',
+        watchOut: [
+      'Pulling on the rail rather than driving through the legs',
+      'Short toe-only steps',
+      'Hurrying on the way down'
+    ],
+    load: 'Bodyweight only.',
     credits: 45
   },
 
@@ -588,6 +717,12 @@ export const CARDIO = [
     ],
     coaching: 'Jump rope requires patience in the learning phase — missing is inevitable at first. A consistent rhythm at slow speed builds the skill that allows faster skipping.',
     why: 'Jump rope develops coordination, calf strength, ankle stability, and cardiovascular fitness simultaneously. Used by boxing coaches as one of the most complete single conditioning tools available.',
+        watchOut: [
+      'Jumping higher than the rope requires',
+      'Landing heavily and flat-footed',
+      'Turning the rope from the shoulders rather than the wrists'
+    ],
+    load: 'Bodyweight only.',
     credits: 70
   },
 
@@ -616,6 +751,12 @@ export const CARDIO = [
     ],
     coaching: 'Shadow boxing is harder when you stay moving. The footwork is the conditioning — the punches are the technique. Combine both.',
     why: 'Shadow boxing develops cardiovascular fitness, coordination, and rotational power while also providing an excellent outlet for stress and frustration.',
+        watchOut: [
+      'Locking the elbows at full extension',
+      'Neck and shoulders tensing',
+      'Standing flat rather than staying light on the feet'
+    ],
+    load: 'Bodyweight only.',
     credits: 65
   },
 
@@ -643,6 +784,12 @@ export const CARDIO = [
     ],
     coaching: 'Dance fitness has one significant advantage over all other cardio: people actually enjoy it. Enjoyment drives consistency. Consistency drives outcomes.',
     why: 'Dance provides equivalent cardiovascular benefit to moderate-intensity exercise while producing significantly higher rates of mood improvement and long-term adherence than conventional cardio.',
+        watchOut: [
+      'Pushing through a twinge rather than changing the movement',
+      'Repeated jumping on a hard floor',
+      'Skipping the warm-up because it feels like play'
+    ],
+    load: 'Effort only.',
     credits: 60
   },
 
@@ -673,6 +820,12 @@ export const CARDIO = [
     ],
     coaching: 'The 20-second rest is insufficient for full recovery — that is intentional. Work capacity builds when you operate under partial recovery conditions.',
     why: 'A no-equipment circuit that develops cardiovascular fitness and muscular endurance simultaneously. The variety of movements maintains engagement and trains multiple movement patterns.',
+        watchOut: [
+      'Form slipping in the later rounds to keep pace',
+      'Rest periods creeping longer than planned',
+      'Continuing a movement once quality has clearly gone'
+    ],
+    load: 'Bodyweight only. Reduce reps rather than quality.',
     credits: 80
   },
 
@@ -700,6 +853,12 @@ export const CARDIO = [
     ],
     coaching: 'Nordic walking looks unusual but the evidence is excellent — it burns more calories than regular walking at the same pace and develops upper body strength simultaneously.',
     why: 'Nordic walking engages the upper body through active pole planting, increasing caloric expenditure by 20 to 40% compared to regular walking while reducing knee joint load.',
+        watchOut: [
+      'Planting the poles too far forward, which becomes braking rather than propulsion',
+      'Gripping the poles tightly rather than letting the straps take the work',
+      'Poles set at the wrong height, so the elbows never reach ninety degrees'
+    ],
+    load: 'Effort only.',
     credits: 45
   },
 
@@ -728,6 +887,12 @@ export const CARDIO = [
     ],
     coaching: 'HIIT only works if the work intervals are genuinely hard. Going at 70% effort during HIIT produces 70% of the benefit — and you might as well do steady-state cardio instead.',
     why: 'HIIT produces cardiovascular adaptations equivalent to much longer steady-state sessions in a fraction of the time. Among the most time-efficient training formats available.',
+        watchOut: [
+      'Treating every interval as maximal, which means the last ones are not',
+      'Standing still during recovery',
+      'Skipping the cool-down because the session is over'
+    ],
+    load: 'Hard but repeatable. If round one is your best round, it was too fast.',
     credits: 90
   },
 
