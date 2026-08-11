@@ -7,6 +7,15 @@
  * No changes needed elsewhere in the app when new category files are added —
  * just import the new array here and spread it into EXERCISES.
  *
+ * 11 Aug 2026 v1.4
+ *
+ * v1.4 — PT-2/PT-9 (Persona Tracing Wave 1). filterByFitnessLevel()
+ *   gains a "returning" ceiling (6) — the fifth ACTIVITY_CHIP option had
+ *   no key and silently resolved to moderate. Paired with
+ *   workoutGenerator.js v1.14, which is what finally makes any of these
+ *   ceilings reachable. NOTE: this file and js/data/exercises.js are
+ *   parallel copies of the same filters — both were changed.
+ *
  * v1.3 — fitnessLevel structural ceiling (Gap 4)
  *   filterByFitnessLevel() applies an energyRequired ceiling based on the
  *   user's self-reported activityLevel from onboarding.
@@ -176,7 +185,14 @@ export function filterByFitnessLevel(exercises, fitnessLevel) {
     "light":       7,
     "moderate":    8,
     "active":      10,
-    "very-active": 10
+    "very-active": 10,
+    // 11 Aug 2026 — "returning" is the fifth ACTIVITY_CHIP option
+    // ("Coming back after a break") written by onboarding Step 9. It had
+    // no key here, so it silently resolved to moderate via the ?? below.
+    // Set to 6: below moderate, above light. Someone returning after a
+    // break has capacity, but should not be met at their old level on
+    // day one.
+    "returning":   6
   };
 
   const ceiling = ceilings[fitnessLevel] ?? ceilings["moderate"];

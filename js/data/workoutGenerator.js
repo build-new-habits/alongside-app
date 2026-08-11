@@ -2,6 +2,16 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
+ * 11 Aug 2026 v1.14
+ *
+ * v1.14 — PT-2 (Persona Tracing Wave 1). getUserProfile()'s fitnessLevel
+ *   read now falls through to lifestyle.activityLevel, the field live
+ *   onboarding (thread.js Step 9) actually writes. "fitnessLevel" itself
+ *   has had no live writer since OB-THREAD retired lifestyle.js, so this
+ *   always resolved to "moderate" for every user regardless of their
+ *   answer. See the full note at getUserProfile(). Reader AND writer both
+ *   confirmed this time — v1.8 fixed the reader alone and said so.
+ *
  * 30 Jul 2026 v1.13
  *
  * v1.13 — BUILD-4 dead-code removal. Removed generateDailyOptions()'s
@@ -587,11 +597,38 @@ export const workoutGenerator = {
    * always fell back to "moderate"). Settings writes to "fitnessLevel".
    */
   getUserProfile() {
+    // v1.14 (11 Aug 2026, PT-2) — READER AND WRITER BOTH CONFIRMED.
+    //
+    // v1.8 fixed this read from "activityLevel" to "fitnessLevel" and
+    // explicitly did not check the write side. Persona tracing found the
+    // writer: js/views/onboarding/lifestyle.js:268 is the only place that
+    // ever set "fitnessLevel", and that route was retired from router.js
+    // VIEW_NAMES in v7 (OB-THREAD). thread.js's storeField list does not
+    // include it. So "fitnessLevel" has been null for every user who
+    // onboarded via the live thread, and this fell back to "moderate"
+    // regardless of what the person answered at Step 9.
+    //
+    // Measured effect against the live 461-exercise database:
+    //   sedentary user -> pool of 329 instead of 253 (76 exercises above
+    //                     his ceiling, i.e. sessions too hard)
+    //   active user    -> pool of 350 instead of 359 (the 9 hardest
+    //                     silently withheld, i.e. sessions too easy)
+    //
+    // Step 9 DOES ask the question and writes lifestyle.activityLevel.
+    // Read that as the source of truth. "fitnessLevel" is retained as an
+    // explicit override so the Settings > Activity Level control keeps
+    // working (settings.js:978 is its only other writer) — deliberately
+    // ordered override-first so a manual change always wins over the
+    // onboarding answer.
+    const declared = store.get("fitnessLevel")
+                  || store.get("lifestyle.activityLevel")
+                  || "moderate";
+
     return {
       equipment:    store.get("equipment")    || [],
       conditions:   store.get("conditions")   || [],
       goals:        store.get("goals")        || [],
-      fitnessLevel: store.get("fitnessLevel") || "moderate"
+      fitnessLevel: declared
     };
   },
 
