@@ -1,7 +1,7 @@
 # Alongside — Data Schema Reference
-## 11 Aug 2026 v1.18
+## 11 Aug 2026 v1.19
 
-**File:** `js/store.js` (confirmed live version: v19, 11 Aug 2026)
+**File:** `js/store.js` (confirmed live version: v20, 11 Aug 2026)
 **Storage:** `localStorage` key `alongside_user`
 
 **This version supersedes:** `schema.md` v1.17 (09 Aug 2026). Adds the new nested `consent{}` object (`store.js` v19) — see Section 1. This closes a gap found by the Persona Tracing Wave 1 store audit: live onboarding had captured **no legal consent record at all** since the OB-THREAD rebuild retired `welcome.js`. Consent is now an affirmative tick with a recorded policy version, not implied consent. The age gate is built but inert pending A1.11.
@@ -63,6 +63,21 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 |-------|------|---------|-------|
 | `onboardingComplete` | `boolean` | `false` | Gates app entry |
 | `onboardingStep` | `number` | `1` | Resume position if onboarding is interrupted |
+
+### `liftLog` / `liftLogEnabled` — **NEW, `store.js` v20, 11 Aug 2026**
+
+PT-4. A **memory aid, not analytics** — Graeme's framing: knowing what you set the machine to last week, not tracking progress.
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `liftLogEnabled` | `boolean` | `false` | Off by default. Toggled in Settings > Equipment. `logLift()` no-ops while false |
+| `liftLog` | `object` | `{}` | `{ [exerciseId]: [{ at, weight, unit, reps }] }`. Newest last, capped at 20 per exercise |
+
+**Helpers:** `store.logLift(exerciseId, { weight, unit, reps })` and `store.lastLift(exerciseId)`.
+
+**Governed by locked principle P4** — the app may display load, the coach never interprets it. `lastLift()` returns the entry only and deliberately computes no delta, so there is nothing for a caller to narrate. No arrows, no colour-coding, no "new best". *The asymmetry is the reason: silence on a drop is only credible if there is also silence on a rise.* Do not add comparison logic here without revisiting P4.
+
+**Tier:** recall in session is **free** (that is the coach remembering, and P1 says the coach never withholds what it can see). Analysis, trends and export are **Personal** — not yet built.
 
 ### `consent` (nested object) — **NEW, `store.js` v19, 11 Aug 2026**
 

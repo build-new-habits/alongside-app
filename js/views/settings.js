@@ -1,5 +1,14 @@
 /**
  * settings.js
+ * 11 Aug 2026 v15
+ *
+ * v15 — PT-4. New "Weight notes" panel, appended to the Equipment tab
+ *   rather than given its own (it is gym context, and someone with no gym
+ *   kit never opens that tab). Off by default; uses the existing generic
+ *   [data-toggle] handler so no new wiring. Copy describes it as a note to
+ *   yourself, never as tracking, progress, or personal bests — locked
+ *   principle P4.
+ *
  * 05 Aug 2026 v14
  *
  * v14 — Equipment panel now shows a saved-equipment summary (Home: N
@@ -267,7 +276,7 @@ export function SettingsView(router) {
       case 'profile':    return renderProfilePanel();
       case 'programme':  return renderProgrammePanel();
       case 'conditions': return renderConditionsPanel();
-      case 'equipment':  return renderEquipmentPanel();
+      case 'equipment':  return renderEquipmentPanel() + renderLiftLogPanel();
       case 'notify':     return renderNotifyPanel();
       case 'about':      return renderAboutPanel();
       default:           return '';
@@ -628,6 +637,47 @@ export function SettingsView(router) {
     }
     const label = list.length === 1 ? "1 item" : `${list.length} items`;
     return `<p class="text-sm text-muted">${scope}: ${label} saved</p>`;
+  }
+
+  // ── Lift note panel (11 Aug 2026, PT-4) ────────────────────────────────────
+  // Off by default. Someone who turns this on has asked for it, which is a
+  // different thing from being given it. Copy deliberately describes it as a
+  // note to yourself, never as tracking, progress, or personal bests —
+  // locked principle P4. Uses the existing generic [data-toggle] handler
+  // (attachEvents, ~line 805), so no new wiring.
+  function renderLiftLogPanel() {
+    const on = store.get('liftLogEnabled') === true;
+
+    return `
+      <div class="settings-section">
+        <h2 class="settings-section__heading">Weight notes</h2>
+        <p class="settings-section__sub">
+          For gym sessions. Jot down what you lifted so you are not guessing at
+          the machine next time.
+        </p>
+
+        <div class="settings-field settings-field--toggle">
+          <label class="settings-label" for="settings-lift-log">
+            Keep weight notes
+            <span class="settings-label__sub">Shows what you noted last time, and somewhere to add today's</span>
+          </label>
+          <button
+            class="settings-toggle ${on ? 'settings-toggle--on' : ''}"
+            id="settings-lift-log"
+            role="switch"
+            aria-checked="${on ? 'true' : 'false'}"
+            data-toggle="liftLogEnabled"
+            aria-label="Weight notes ${on ? 'on' : 'off'}">
+            <span class="settings-toggle__track" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <p class="text-sm text-muted" style="margin-top: var(--space-3);">
+          Just the number, kept for you. No streaks, no targets, and nothing
+          said about whether it went up or down.
+        </p>
+      </div>
+    `;
   }
 
   function renderEquipmentPanel() {
