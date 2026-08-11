@@ -923,6 +923,10 @@ rather than only a buried bypass door. Added both.
  *   Truth Rule's documented fallback. Cache-bump only otherwise; no
  *   other files changed this deploy.
  *
+ * 11 Aug 2026 v231 - PT-1 follow-up: checkin-openings.js content refinements.
+ *   hormonal-change reframed to changing-body (no longer claims a disclosure
+ *   that never happened, no longer age-gated to the over-50s).
+ *
  * 11 Aug 2026 v230 - PT-1/WOW-3: checkin-openings.js v3. Day-one territory
  *   and age-band trigger maps corrected to the live IDs; five purpose-written
  *   rows added. The coach now reflects back what onboarding was told.
@@ -952,7 +956,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v230";
+const CACHE_NAME = "alongside-v231";
 
 const SHELL_URLS = [
 
