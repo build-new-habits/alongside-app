@@ -1,6 +1,14 @@
 /**
  * store.js - Data persistence layer
- * 11 Aug 2026 v19
+ * 11 Aug 2026 v20
+ *
+ * 11 Aug 2026 v20 - New fields liftLogEnabled (bool, default false) and
+ *   liftLog ({ [exerciseId]: entry[] }), plus logLift()/lastLift() helpers.
+ *   PT-4, rescoped from analytics to a memory aid on Graeme's framing:
+ *   knowing what you set the machine to last week, not tracking progress.
+ *   Governed by locked principle P4 - the app may display load, the coach
+ *   never interprets it. lastLift() returns the entry only and deliberately
+ *   computes no delta, so there is nothing for a caller to narrate.
  *
  * 11 Aug 2026 v19 - New nested field consent{} (given, at, policyVersion,
  *   ageConfirmed), restoring the legal consent record that has been absent
@@ -237,6 +245,12 @@ export const store = {
               : []
           }
         : defaults.onboarding,
+
+      // ── LIFT LOG (v20) ────────────────────────────────────────
+      liftLogEnabled: typeof saved.liftLogEnabled === 'boolean' ? saved.liftLogEnabled : false,
+      liftLog: (saved.liftLog && typeof saved.liftLog === 'object' && !Array.isArray(saved.liftLog))
+        ? saved.liftLog
+        : {},
 
       // ── CONSENT (v19) ─────────────────────────────────────────
       // Never overwrite a real consent record with defaults — an existing
@@ -696,6 +710,29 @@ export const store = {
       gymProgrammeSession: 'A',
       gymProgrammeWeek:    1,
 
+      // ── LIFT LOG (v20, 11 Aug 2026 — PT-4) ───────────────────
+      // A MEMORY AID, not analytics. Graeme's framing, 11 Aug: "I want to
+      // know what weights I was lifting last week so I know what settings
+      // to add to the machines, rather than working blind." That is a note
+      // someone leaves themselves, not a scoreboard.
+      //
+      // GOVERNED BY LOCKED PRINCIPLE P4 — the app may display load, the
+      // coach never interprets it. No commentary on the delta in either
+      // direction, no arrows, no colour-coding, no "new best". The
+      // asymmetry is the reason: silence on a drop is only credible if
+      // there is also silence on a rise. Celebrating is what creates the
+      // shame — you cannot have one without the other.
+      //
+      // Off by default. Someone who turns it on has asked for it, which is
+      // a different thing from being given it.
+      liftLogEnabled: false,
+
+      // { [exerciseId]: [ { at: ISO, weight: number, unit: 'kg'|'lb',
+      //                     reps: number|null } ] }
+      // Newest last. Capped per exercise in logLift(). Keyed by exercise id
+      // rather than by session so recall works across programmes.
+      liftLog: {},
+
       // ── ACTIVITY LOG ─────────────────────────────────────────
       // Each entry: { date, type, durationMins, moodAfter (int|null),
       //               isEvent (bool), eventName (string|null), ... }
@@ -1006,6 +1043,44 @@ export const store = {
     }
     this.data.exercisePreferences = prefs;
     this.save();
+  },
+
+  /**
+   * logLift(exerciseId, { weight, unit, reps }) — PT-4, 11 Aug 2026.
+   * Appends one entry. No-ops when liftLogEnabled is false, so callers do
+   * not each need to check. Caps at 20 entries per exercise: this is a
+   * memory aid, not a training history, and the only read is the most
+   * recent one.
+   */
+  logLift(exerciseId, entry) {
+    if (!exerciseId || !entry || typeof entry.weight !== 'number') return null;
+    if (this.data.liftLogEnabled !== true) return null;
+
+    const log = { ...(this.data.liftLog || {}) };
+    const list = [...(log[exerciseId] || [])];
+    list.push({
+      at:     new Date().toISOString(),
+      weight: entry.weight,
+      unit:   entry.unit || this.data.weightUnit || 'kg',
+      reps:   typeof entry.reps === 'number' ? entry.reps : null
+    });
+    if (list.length > 20) list.splice(0, list.length - 20);
+    log[exerciseId] = list;
+    this.data.liftLog = log;
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+    return list[list.length - 1];
+  },
+
+  /**
+   * lastLift(exerciseId) — most recent entry, or null.
+   * Deliberately returns the entry only. No delta, no comparison, no
+   * "best" — see P4 and the liftLog note in getDefaults().
+   */
+  lastLift(exerciseId) {
+    const list = (this.data.liftLog || {})[exerciseId];
+    if (!Array.isArray(list) || list.length === 0) return null;
+    return list[list.length - 1];
   },
 
   logSession(sessionData) {
