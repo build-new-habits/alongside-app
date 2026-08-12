@@ -202,6 +202,31 @@ Eight personas run against live code over simulated 6–8 week periods, not read
 
 ---
 
+## 📁 Canonical documents and tools — current as of 12 Aug 2026
+
+Every artefact below is committed to `build-new-habits/alongside-app`. This index exists because several were written on 12 Aug and referenced nowhere, which is the document version of the reachability defect this session spent the day fixing.
+
+| Document | Location | Version | What it is |
+|---|---|---|---|
+| **Master schedule** | `Documents/Admin/master_schedule.md` | v150 | This document. Source of truth; wins over project knowledge on any conflict. |
+| **Schema** | `Documents/Live State/Schema.md` | v1.24 | Canonical store field reference. Ground-truthed against `store.js` v29. |
+| **Exercise Entry Standard** | `Documents/Live State/exercise_entry_standard.md` | v2 | Canonical definition of every content field on an exercise. Includes the `watchOut` rules, the effort-relative `load` rule, and the no-time-stamped-horizons rule. **Anything authored from now is written to this.** |
+| **Content consolidation blueprint** | `Documents/Admin/alongside_blueprint_content_consolidation_11aug2026_v1.md` | v1 | CON-1 to CON-9 plan. All nine now complete. |
+| **Entry validator** | `Documents/Admin/Templates/validate-exercise-entries.mjs` | v1 | Checks all 556 entries against the Entry Standard. Build-time only. |
+| **Reachability audit** | `Documents/Admin/Templates/audit-content-reachability.mjs` | v1 | Categories, exercise reachability, equipment vocabulary both ways, contraindication validity, missing view files, orphaned routes. Build-time only. |
+
+**Key code files introduced or restructured on 12 Aug** — all live, all in `js/`:
+
+`data/equipment-map.js` (equipment vocabulary resolver), `data/session-categories.js` v5 (maps the builder's 49 categories onto the shared database), `data/session-rationale.js` (the coach explaining the programme, plus the progression invitation), `data/exercises/gym.js` v3, `data/exercises/seated.js` v2, `views/community-impact.js`, `views/annual-reflection.js`.
+
+**Run before any deploy touching content, categories, equipment or routes:**
+```
+node "Documents/Admin/Templates/validate-exercise-entries.mjs"
+node "Documents/Admin/Templates/audit-content-reachability.mjs"
+```
+
+---
+
 ## 📋 New task rows — 12 Aug 2026
 
 | Task | Status | Notes | Next |
