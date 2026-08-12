@@ -1,6 +1,20 @@
 /**
  * store.js - Data persistence layer
- * 11 Aug 2026 v28
+ * 12 Aug 2026 v29
+ *
+ * 12 Aug 2026 v29 - CAP-5. capability.legPower ('full' | 'limited' |
+ *   'none'), a separate axis from standing, plus legsUsable and
+ *   legsLoadable on capabilityProfile(). An 8-week trace of a
+ *   wheelchair user found him correctly given seated work and then
+ *   handed Seated Leg Extension and Seated Hamstring Curl -- the screen
+ *   asked whether he could rise from a chair and never whether his legs
+ *   work.
+ *
+ *   NOTE: this header was corrected on 12 Aug. The file already
+ *   contained the v29 change; the header bump did not apply in the
+ *   original edit and said v28. Caught by Graeme asking whether the
+ *   documents were actually current, which is exactly the check the
+ *   "DD Mon YYYY vN header on every file" rule exists to make possible.
  *
  * 11 Aug 2026 v28 - logLift() generalised from weight-and-reps to any
  *   metric the exercise actually produces: speed, incline, resistance
