@@ -1,6 +1,14 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v15
+ *
+ * v15 - CAP-3. trainingIntent tilts main-section selection. "maintain"
+ *   prioritises carries, grip, balance, sit-to-stand and floor transfer
+ *   -- the capacities that go first and that decide independence --
+ *   rather than doing less of everything. "recover" leans on the
+ *   rehabilitation library. Prioritised, never exclusive.
+ *
  * 11 Aug 2026 v14
  *
  * v14 - CAP-1. Selection now reads store.capabilityProfile(), which
@@ -294,7 +302,7 @@ export const SESSION_TYPES = [
     icon:        "🦵",
     description: "Squat, hinge, single-leg. Quads, hamstrings, glutes.",
     warmupCategories:   ["activation", "hip-mobility", "ankle-mobility", "cardio-warmup"],
-    mainCategories:     ["squat-pattern", "hip-hinge", "single-leg", "leg-isolation"],
+    mainCategories:     ["squat-pattern", "hip-hinge", "single-leg", "leg-isolation", "loaded-carry"],
     cooldownCategories: ["hip-flexor-stretch", "hamstring-stretch", "figure-4"]
   },
   {
@@ -303,7 +311,7 @@ export const SESSION_TYPES = [
     icon:        "⚡",
     description: "Push, pull, squat, hinge. Every major pattern in one session.",
     warmupCategories:   ["activation", "hip-mobility", "thoracic-mobility", "cardio-warmup"],
-    mainCategories:     ["squat-pattern", "hip-hinge", "horizontal-pull", "horizontal-push", "core-stability"],
+    mainCategories:     ["squat-pattern", "hip-hinge", "horizontal-pull", "horizontal-push", "core-stability", "loaded-carry"],
     cooldownCategories: ["hip-flexor-stretch", "chest-stretch", "child-pose"]
   },
   {
@@ -312,7 +320,7 @@ export const SESSION_TYPES = [
     icon:        "🎯",
     description: "Anti-extension, anti-rotation, anti-lateral. Real core work.",
     warmupCategories:   ["cardio-warmup", "breathing-warmup", "cat-cow"],
-    mainCategories:     ["anti-extension", "anti-rotation", "anti-lateral"],
+    mainCategories:     ["anti-extension", "anti-rotation", "anti-lateral", "loaded-carry"],
     cooldownCategories: ["child-pose", "supine-rotation"]
   },
   {
@@ -587,6 +595,43 @@ function _difficultyCeiling() {
     : base;
 }
 
+  // ── TRAINING INTENT (CAP-3) ───────────────────────────────────────────
+//
+// "maintain" is not a diluted "improve". What is lost first is specific
+// and known, so maintenance PRIORITISES those capacities rather than
+// doing less of everything:
+//
+//   power         goes before strength -- fast matters more than heavy
+//   balance       goes early, and is the fall risk
+//   grip          predicts independence better than almost anything
+//   floor transfer decides whether somebody keeps living in their
+//                 own home
+//
+// Prioritised, never exclusive: a maintenance session still contains
+// ordinary strength and mobility work. This tilts selection, it does
+// not replace the session.
+//
+// "recover" leans on the rehabilitation library and the phase system
+// that already exists in conditionProgrammes.js.
+
+const MAINTAIN_PRIORITY = /carry|grip|hold|balance|single-leg|sit-to-stand|chair|step-up|get ?up|floor|calf raise|power|throw|slam|reach/i;
+const RECOVER_PRIORITY  = /rehab|progression|activation|isometric|controlled|range/i;
+
+function intentPriority(ex) {
+  const trainingIntent = store.get("trainingIntent") || "improve";
+  const s = ex.name + " " + (ex.id || "");
+  if (trainingIntent === "maintain") {
+    return MAINTAIN_PRIORITY.test(s) ||
+           ex.movementPattern === "carry" ||
+           ex.movementPattern === "balance" ||
+           ex.movementPattern === "proprioception";
+  }
+  if (trainingIntent === "recover") {
+    return RECOVER_PRIORITY.test(s) || ex.category === "rehabilitation";
+  }
+  return false;
+}
+
 function _filterCandidates(categories, section, equipSet, conditionSet) {
   const ceiling = _difficultyCeiling();
 
@@ -692,6 +737,7 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   // frequency is a poor proxy for capacity -- somebody can garden daily
   // and still not get off the floor unaided.
   const cap = store.capabilityProfile();
+
   const impactGated =
     (cap.asked && !cap.impactSafe) ||
     (!cap.asked && (declaredLevel === null || LOW_IMPACT_ONLY.has(declaredLevel)));
@@ -1075,6 +1121,14 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       // person has already worked through.
       if (candidates !== pool && candidates.every(e => store.exerciseStats(e.id).n >= MASTERY_THRESHOLD)) {
         candidates = pool;
+      }
+
+      // Intent tilt, applied before continuity so that a maintenance user
+      // builds familiarity WITH the capacities that matter to them rather
+      // than around them.
+      if ((store.get("trainingIntent") || "improve") !== "improve" && section === "main") {
+        const priority = candidates.filter(intentPriority);
+        if (priority.length >= 2) candidates = priority;
       }
 
       if (Math.random() >= noveltyRate) {
