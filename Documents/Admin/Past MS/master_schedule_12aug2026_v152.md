@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v153
+## 12 Aug 2026 v152
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v152.md`. Remove v152 on upload.
+Supersedes `master_schedule_12aug2026_v151.md`. Remove v151 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -71,60 +71,6 @@ The same defect appeared **eight times in eight different costumes**: content th
 
 **Fixture note:** the Node harness and persona fixtures are reusable but were built pre-capability-screen. They need `capability{}` added before the next run.
 
-## 🟢 A11Y-1 + the two logged items: ALL CLOSED, 12 Aug 2026
-
-**Target WB 10 Aug 2026. All three of DIC-1's "logged, not fixed" items are now fixed.**
-
-`css/base/variables.css` v1 → **v2**. `css/components/checkin-conversation.css` v8 → **v9**. `js/store.js` v30 → **v31**. `Documents/Live State/Schema.md` v1.25 → **v1.26**. New `tools/contrast-check.mjs`. `sw.js` v265 → v266 → **v267**, cache **alongside-v267**. Confirmed on a fresh clone.
-
-### The process lesson, which matters more than the fixes
-
-Graeme's question was *"why not?"* and two of the three answers did not survive it. **Touch-once was cited, not applied.** The rule means a file appears in one session's scope; it does not mean scope can never grow — and neither `store.js` nor `Schema.md` had been opened this session. The scope was self-declared at session start and then treated as an external constraint. **That is how a discipline rule turns into a place to put work you would rather not do.**
-
-Worth keeping alongside P5–P7 as a working note: *a build-discipline rule is a constraint on how work is done, never a reason for work not to be done. If a rule is being cited rather than applied, that is the tell.*
-
-The third item did have a real reason — it changes how every screen looks, which is Graeme's call — **but that reason was never given**. The failure was bringing a log entry instead of two costed options.
-
-### 🟢 A11Y-1 — elevated-surface contrast, fixed at the token
-
-**The measured failure:** 56 rules set `--color-bg-elevated`, and 15 put `--color-text-secondary` or `--color-text-muted` directly on it — 4.30:1 and 3.91:1 against the 4.5:1 AA floor. `--color-bg-hover` is the same value (`#3E4C63`), so **every card hover state failed the same way**. Affected chips, cards, inputs, toasts, trends and milestones across onboarding, settings, progress, gym, journal and weekly plan.
-
-**Graeme chose Option A** — lighten the text tokens rather than darken the surface:
-
-| Token | Was | Now | On elevated |
-|---|---|---|---|
-| `--color-text-secondary` | `#A8B8CC` | **`#B9C6D6`** | 4.30 → **5.01** |
-| `--color-text-muted` | `#A0B0C0` | **`#B2C0D0`** | 3.91 → **4.69** |
-
-Option B (darkening `--color-bg-elevated`) was rejected on measurement: the value needed brings it to **1.00:1 against `--color-bg-card`**, so "elevated" becomes visually identical to "card" and every raised element in the app flattens.
-
-**Stated cost, on record:** secondary and muted are now close enough to be nearly indistinguishable, so the palette carries **two** text weights rather than three. That was already the honest position — a palette that cannot support three weights on its own lightest surface at AA has two, and pretending otherwise is what produced 15 failing rules.
-
-**New permanent gate: `tools/contrast-check.mjs`.** Reads live token values out of `variables.css` rather than restating them, and asserts all three text tokens against all five surface tokens, plus five accent and boundary pairs at 3:1. Exits 1 on drift, so it can gate a commit like `schema-check.mjs`. **All pass.**
-
-### 🟢 The other two, closed
-
-- **`store.js` v31** — `set()` now lazily inits the way `get()` already did. Verified against the exact condition that threw (write before any read, no `init()`). Never reachable live because `app.js` :150 inits on boot, but an asymmetry with no reason behind it.
-- **`Schema.md` v1.26** — DOC-2. The front page said `store.js` v30 in the header and v21 four lines down. Supersedes line also repointed from v1.20 to v1.25.
-
-### 🟠 NEW — A11Y-2: light mode is unreachable, and broken
-
-Found while auditing A11Y-1's blast radius. **Nothing in any JS file or `index.html` ever adds the `light-mode` class**, and no Settings toggle exists — despite the block's own comment reading *"User toggle in Settings. Default: dark."*
-
-Worse, if it were switched on it would not work. **Six surface and text tokens are defined in the dark palette and never overridden in the light-mode block**: `--color-bg-deep`, `--color-bg-elevated`, `--color-bg-hover`, `--color-border-focus`, `--color-border-light`, `--color-text-inverse`. So an elevated surface would stay `#3E4C63` (dark slate) while text became dark:
-
-| Light-mode text on `#3E4C63` | Contrast |
-|---|---|
-| `--color-text` `#0f172a` | **2.06** |
-| `--color-text-secondary` `#334155` | **1.19** |
-| `--color-text-muted` `#64748b` | **1.82** |
-
-**Severity is low because it is unreachable** — this is dead CSS, not a live user-facing failure. But it is the P6 defect in its ninth costume: content that exists, is written to standard, and that nothing in the product can ever reach.
-
-**Decision needed, not booked:** either wire the toggle and fix the six tokens, or delete the block. Carrying ~60 lines of broken CSS that claims a feature exists is the worst of the three. **Recommend deleting it** — light mode is not on any roadmap, and a future implementation would want to start from the current palette, not a stale one. Overrule if light mode is genuinely wanted for beta.
-
----
-
 ## 🟢 DIC-1 — The drop-in coach question: SHIPPED, 12 Aug 2026
 
 **Build sequence item 1 of the tier boundary. Target WB 10 Aug 2026. Code complete and confirmed on a fresh clone of the live remote; on-device confirmation outstanding.**
@@ -167,7 +113,7 @@ The nearest existing pattern, `.cp-missed-offer__btn`, puts `--color-text-muted`
 
 `.ci-choice` therefore **recesses rather than elevates**: surface `--color-bg` (`#1E293B`) against the `--color-bg-card` (`#334155`) panel. Label 11.87:1, sub-line 7.24:1. The surface-to-panel step is only 1.41:1, under 1.4.11's 3:1 for component boundaries, so the border carries it — `--color-text-muted` measures 4.04:1 against the panel. **Hover moves the border only**; lightening the background would push the sub-line back under 4.5:1.
 
-**🟢 A11Y-1 — CLOSED same day.** Raised here, then fixed at the token once Graeme chose Option A. See the A11Y-1 section above for measurements, the rejected alternative, and the new `tools/contrast-check.mjs` gate.
+**New task row — 🟠 A11Y-1, `--color-bg-elevated` contrast sweep.** Every muted or secondary text token sitting on `bg-elevated` anywhere in the app. Not booked. This is the same shape as the design-consistency audit and probably belongs with it.
 
 ### 🟠 Logged, not fixed (touch-once)
 
@@ -1055,4 +1001,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v153*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v152*
