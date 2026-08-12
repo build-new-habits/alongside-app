@@ -104,8 +104,19 @@ export const CATEGORY_MATCHERS = {
     (ex.equipment || []).includes("resistance-band") &&
     (ex.difficultyLevel || 5) <= 4,
 
+  // Narrowed 11 Aug 2026 (RAT-1). This matched every breath and
+  // breath-awareness practice, which meant meditation and body-scan work
+  // qualified as a MOBILITY WARM-UP. A 76-year-old's session opened with
+  // five of them. Capping category dominance cut it to three, which was
+  // still three: the category itself was wrong, not just its share.
+  //
+  // A warm-up breath is short and preparatory. A twenty-minute breath
+  // awareness meditation is a practice in its own right and belongs in a
+  // Quiet session, not at the top of a mobility routine.
   "breathing-warmup": ex =>
-    pattern(ex, "breath", "breath-awareness"),
+    pattern(ex, "breath") &&
+    (ex.duration || 0) <= 300 &&
+    !/meditation|noting|awareness|scan/i.test(ex.name),
 
   "cat-cow": ex =>
     pattern(ex, "spinal-flexion-extension"),

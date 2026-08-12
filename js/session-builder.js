@@ -1,6 +1,22 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v19
+ *
+ * v19 - CAP-5. Leg function gated separately from standing. An 8-week
+ *   trace of a wheelchair user found him correctly given seated work
+ *   and then handed Seated Leg Extension and Seated Hamstring Curl.
+ *   'limited' still allows unloaded leg movement, because keeping what
+ *   function exists is worth more than protecting it into disuse.
+ *
+ * 11 Aug 2026 v18
+ *
+ * v18 - RAT-1. No category may supply more than a third of a section.
+ *   Found in the 8-week persona trace: a 76-year-old's Mobility session
+ *   opened with five breathing practices in a row, because Mobility
+ *   declares two warm-up categories for five slots and one of them
+ *   holds 21 entries.
+ *
  * 11 Aug 2026 v17
  *
  * v17 - Every session now carries a rationale. Graeme: "I'd like the
@@ -355,7 +371,11 @@ export const SESSION_TYPES = [
     label:       "Mobility",
     icon:        "🌿",
     description: "Hip, thoracic, ankle, shoulder. Active range of motion.",
-    warmupCategories:   ["breathing-warmup", "cat-cow"],
+    // Widened 11 Aug 2026 (RAT-1). Two categories for up to five slots is
+    // what forced the fill loop to drain whichever was deepest. A Mobility
+    // warm-up should open the joints it is about to work.
+    warmupCategories:   ["breathing-warmup", "cat-cow", "hip-mobility",
+                         "thoracic-mobility", "ankle-mobility"],
     mainCategories:     ["hip-mobility", "thoracic-mobility", "ankle-mobility", "shoulder-mobility"],
     cooldownCategories: ["deep-stretch"]
   }
@@ -784,6 +804,20 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   // passes every position gate deliberately, because there is nothing
   // to gate.
   const isFloor   = ex => ex.position === "floor";
+  // Any exercise whose named effect is in the legs. 'limited' leg power
+  // still allows unloaded movement -- ankle circles, gentle range work --
+  // because keeping what function exists is worth more than protecting it
+  // into disuse. Only loaded leg work is withheld.
+  const LEG_AREAS = ["quadriceps", "hamstring", "calves", "glutes",
+                     "ankle-foot", "knee", "hip", "adductors", "hip-flexor"];
+  const _needsLegs = ex => {
+    const areas = ex.affectsAreas || [];
+    return LEG_AREAS.some(a => areas.includes(a)) &&
+           !areas.includes("full-body");
+  };
+  const _loadsLegs = ex =>
+    _needsLegs(ex) && ((ex.equipment || []).length > 0 || (ex.difficultyLevel || 1) >= 3);
+
   const isBalance = ex => ex.balanceDemand === true;
   const isImpact = ex => ex.impact === true;
 
@@ -815,6 +849,18 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
     // supported work, not a gentler standing programme.
     if (cap.asked && cap.needsSeated &&
         ex.position !== "seated" && ex.position !== "any") return false;
+
+    // CAP-5. Legs are a separate axis from standing. An 8-week trace of a
+    // wheelchair user found him correctly given seated work and then
+    // handed Seated Leg Extension and Seated Hamstring Curl -- because
+    // "can you rise from a chair" and "do your legs work" are different
+    // questions and only the first was being asked.
+    //
+    // Derived from affectsAreas rather than a new tag: an exercise that
+    // works the quadriceps needs quadriceps, and the data already says so
+    // on all 518 entries.
+    if (cap.asked && !cap.legsUsable && _needsLegs(ex)) return false;
+    if (cap.asked && !cap.legsLoadable && _loadsLegs(ex)) return false;
     if (section === "main" && !withinCeiling(ex)) return false;
     if (section === "warmup" && useCeilingOnWarmup && !withinCeiling(ex)) return false;
     // Equipment check: exercise needs no equipment, or user has it.
@@ -1198,13 +1244,40 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       }
     }
 
-    // Second pass: fill remaining slots
+    // Second pass: fill remaining slots.
+    //
+    // RAT-1 (11 Aug 2026, found in the 8-week persona trace). A
+    // 76-year-old's Mobility session opened with FIVE breathing practices
+    // in a row -- Extended Exhale, Standing Spinal Wave, Pranayama,
+    // Three-Part Breath, Alternate Nostril. Not a session, a queue.
+    //
+    // Cause: Mobility declares two warm-up categories for up to five
+    // slots, and one of them ("breathing-warmup") holds 21 entries. The
+    // first pass took one per category, then the fill loop drained the
+    // deepest category for everything left.
+    //
+    // A category may now supply at most a third of a section, rounded up,
+    // and always at least two. Deep categories no longer crowd out
+    // shallow ones simply for being deep, and the constraint relaxes
+    // rather than starving a section when there is genuinely nothing
+    // else -- a short session is better than a monotonous one, but an
+    // empty one is worse than both.
+    const maxPerCategory = Math.max(2, Math.ceil(count / 3));
+    const categoryCount = {};
+    for (const e of selected) {
+      categoryCount[e.category] = (categoryCount[e.category] || 0) + 1;
+    }
+
     let remaining = candidates.filter(e => !chosen.has(e.id));
     while (selected.length < count && remaining.length > 0) {
-      const pick = pickFrom(remaining);
+      const under = remaining.filter(
+        e => (categoryCount[e.category] || 0) < maxPerCategory
+      );
+      const pick = pickFrom(under.length > 0 ? under : remaining);
       if (!pick) break;
       selected.push(pick);
       chosen.add(pick.id);
+      categoryCount[pick.category] = (categoryCount[pick.category] || 0) + 1;
       remaining = remaining.filter(e => e.id !== pick.id);
     }
 
