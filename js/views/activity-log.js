@@ -207,18 +207,28 @@ export function onMount() {
   document.getElementById("activity-save-btn")?.addEventListener("click", () => {
     if (!selectedType) return;
 
-    const log = store.get("activityLog") || [];
-    log.push({
-      id:        "act-" + Date.now(),
-      type:      selectedType,
-      name:      ACTIVITY_GROUPS.flatMap(g => g.items).find(i => i.id === selectedType)?.label || selectedType,
-      source:    "self-logged",
-      duration:  durationMins,
-      feel:      FEEL_LABELS[feelRating - 1].toLowerCase().replace(" ", "-"),
-      credits:   20,
-      loggedAt:  new Date().toISOString()
+    // PT-6 / PT-3, 12 Aug 2026. Bypassed store.logActivity(), and wrote
+    // `duration` and `loggedAt` where progress.js reads `durationMins`
+    // and `completedAt`.
+    //
+    // This is the worst place for that fault to sit: it is the screen
+    // where somebody manually logs a session they were pleased with -- a
+    // swim, a long walk, a game of football -- and Progress then counted
+    // every one of them as zero minutes. Somebody deliberately telling
+    // the app what they did, and the app not hearing it.
+    const nowIso = new Date().toISOString();
+    store.logActivity({
+      id:            "act-" + Date.now(),
+      type:          selectedType,
+      name:          ACTIVITY_GROUPS.flatMap(g => g.items).find(i => i.id === selectedType)?.label || selectedType,
+      source:        "self-logged",
+      status:        "completed",
+      durationMins:  durationMins,
+      feel:          FEEL_LABELS[feelRating - 1].toLowerCase().replace(" ", "-"),
+      creditsEarned: 20,
+      completedAt:   nowIso,
+      sessionEnd:    nowIso
     });
-    store.set("activityLog", log);
     store.set("totalCredits", (store.get("totalCredits") || 0) + 20);
 
     logSaved = true;
