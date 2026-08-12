@@ -1,5 +1,20 @@
 /**
  * workout.js - Workout Execution View
+ * 12 Aug 2026 v11
+ *
+ * v11 - LOG-1. Session notes added to the exercise card. Graeme, 12 Aug:
+ *   "Weight notes should be on. But not just weight. Time, tension,
+ *   elevation etc."
+ *
+ *   The store already recorded all nine metrics (store.js v28, 11 Aug)
+ *   and already chose fields per equipment. What was missing was reach:
+ *   the block lived inside gym-programme.js, so this view -- the main
+ *   coach-built session player -- offered no way to write anything down
+ *   at all. Now shared via js/session-log.js.
+ *
+ *   The id prefix carries the exercise index, so the Save handler cannot
+ *   write one exercise's numbers onto another as the view re-renders.
+ *
  * 11 Aug 2026 v10
  *
  * v10 - CONT-1. Completion records which exercises were done. Same
@@ -141,6 +156,7 @@
  */
 
 import { store }         from "../store.js";
+import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { checkinData }   from "../data/checkin.js";
 import { recordSession } from "../data/programmeEngine.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
@@ -285,6 +301,12 @@ export function render() {
             </ul>
           </div>
         ` : ""}
+
+        <!-- Session notes. LOG-1: this used to exist only in
+             gym-programme.js, so a coach-built session offered no way to
+             write anything down. Same block, same nine metrics, chosen
+             per equipment. Returns "" when switched off. -->
+        ${renderLogBlock(exercise, `wo-log-${currentExerciseIndex}`)}
       </div>
 
       <!-- Action buttons -->
@@ -379,6 +401,15 @@ export function onMount() {
   document.getElementById("no-workout-back-btn")?.addEventListener("click", () => {
     router.back();
   });
+
+  // LOG-1. Re-wired on every mount because the view re-renders per
+  // exercise; attachLogEvents() guards against double-binding itself.
+  // The id prefix carries the exercise index so two cards can never
+  // collide, and so the Save handler cannot write one exercise's numbers
+  // onto another.
+  if (workout?.exercises?.[currentExerciseIndex]) {
+    attachLogEvents(workout.exercises[currentExerciseIndex], `wo-log-${currentExerciseIndex}`);
+  }
 
   if (!workout) return;
 

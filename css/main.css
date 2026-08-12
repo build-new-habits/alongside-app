@@ -1,4 +1,8 @@
 /* main.css
+ * 12 Aug 2026 v17
+ *
+ * v17 - LOG-1. components/session-log.css imported.
+ *
  * 12 Aug 2026 v16
  *
  * v16 - DISP-1. components/display-preferences.css imported. Note for
@@ -90,6 +94,7 @@
 /* D2 — Check-in conversational thread */
 @import 'components/checkin-conversation.css';
 @import 'components/display-preferences.css';
+@import 'components/session-log.css';
 /* Content-gated — add when content sessions complete */
 /* D3:  @import 'components/home-threshold.css';       */
 /* D10: @import 'components/community-impact.css';     */
