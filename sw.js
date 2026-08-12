@@ -1,6 +1,28 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v281
+ * DISP-2. 110 hardcoded font-sizes across 20 stylesheets now respond to
+ * the text-size control. Each wrapped as calc(X * var(--user-text-scale,
+ * 1)) -- mathematically identity at the default, so nothing changes
+ * visually for anybody who never opens the control, and the original
+ * value stays legible in the source.
+ *
+ * DISP-1 shipped with 514 token-based sizes scaling and these 110
+ * ignoring the slider. Somebody scaling text up got most of the app
+ * larger and a scattering of labels, badges and headings stubbornly
+ * unchanged -- which is arguably worse than nothing scaling, because it
+ * looks broken rather than unsupported.
+ *
+ * Gated: verify-disp1.mjs now fails if any hardcoded font-size reappears
+ * outside variables.css.
+ *
+ * SEPARATE FINDING, not fixed here: 20-odd of those declarations are
+ * BELOW the app's own --text-xs of 13px -- 9px, 10px, 11px, 0.6rem --
+ * mostly in global.css, morning-session.css and weekly-plan-v2.css. They
+ * now scale, so somebody can enlarge them, but they are too small by
+ * default. Raised as DISP-3.
+ *
  * 12 Aug 2026 v280
  * Four items from the verified-open list, all silent failures.
  *
@@ -1384,7 +1406,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v280";
+const CACHE_NAME = "alongside-v281";
 
 const SHELL_URLS = [
 
