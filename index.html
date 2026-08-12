@@ -81,6 +81,52 @@
       display: none;
     }
   </style>
+
+  <!--
+    DISP-1 pre-paint display preferences.
+
+    This MUST be inline and MUST sit before </head>. js/display-prefs.js is
+    an ES module reached via js/app.js at the bottom of <body>, which runs
+    after first paint -- so applying preferences there alone would give
+    anyone using a larger text scale a visible jolt on every single launch.
+    The people most likely to have changed these settings are exactly the
+    people a jolt on every launch serves worst.
+
+    KEYS and DEFAULTS below are duplicated from js/display-prefs.js because
+    an inline script cannot import a module. tools/verify-disp1.mjs asserts
+    the two copies match and exits 1 on drift. Change one, change both.
+
+    Deliberately does no clamping and no validation: display-prefs.js
+    re-applies with full clamping moments later, so the only job here is to
+    get close enough, fast enough, that nothing jumps.
+  -->
+  <script>
+    (function () {
+      try {
+        var K = {
+          textScale:     "alongside-text-scale",
+          leadingScale:  "alongside-leading-scale",
+          letterSpacing: "alongside-letter-spacing",
+          underline:     "alongside-underline-links",
+          focus:         "alongside-enhanced-focus"
+        };
+        var D = {
+          textScale:     "1",
+          leadingScale:  "1",
+          letterSpacing: "0",
+          underline:     "off",
+          focus:         "off"
+        };
+        var g = function (k, d) { var v = localStorage.getItem(k); return v === null ? d : v; };
+        var r = document.documentElement;
+        r.style.setProperty("--user-text-scale",     g(K.textScale,    D.textScale));
+        r.style.setProperty("--user-leading-scale",  g(K.leadingScale, D.leadingScale));
+        r.style.setProperty("--user-letter-spacing", g(K.letterSpacing, D.letterSpacing) + "em");
+        if (g(K.underline, D.underline) === "on") r.classList.add("underline-links");
+        if (g(K.focus,     D.focus)     === "on") r.classList.add("enhanced-focus");
+      } catch (e) { /* private mode, storage disabled: defaults stand */ }
+    })();
+  </script>
 </head>
 <body>
   <div id="app" class="app-container">

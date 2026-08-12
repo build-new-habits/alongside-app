@@ -1,4 +1,31 @@
 /* variables.css - Midnight Teal Design Tokens
+   12 Aug 2026 v3
+
+   v3 - DISP-1, display preferences. Three user-controlled scales added,
+   all defaulting to the exact current values so nothing changes for
+   anyone who never opens the control.
+
+     --user-text-scale      multiplies every --text-* token
+     --user-leading-scale   multiplies every --leading-* token
+     --user-letter-spacing  inherited from :root, applied in
+                            display-preferences.css
+
+   Scaling the TOKENS rather than setting body { font-size } is the whole
+   reason this works. 514 font-size declarations in this codebase read a
+   --text-* token and 129 hardcode a value; a body-level override reaches
+   almost none of them, because components set size explicitly rather
+   than inheriting. Multiplying the tokens reaches all 514 immediately.
+   The remaining 129 are logged as DISP-2, not silently ignored.
+
+   ALSO REMOVED IN v3: an @media (prefers-larger-text) block that had
+   never matched anything. That is not a real media feature -- Media
+   Queries Level 5 defines prefers-reduced-motion, prefers-contrast,
+   prefers-color-scheme, prefers-reduced-data, forced-colors and
+   prefers-reduced-transparency, and no text-size feature. The intent
+   behind it was right and is now delivered by a control the person can
+   actually reach. Tenth instance of P6: content that exists, is correct
+   in spirit, and that nothing can ever select.
+
    12 Aug 2026 v2
 
    v2 - A11Y-1. --color-text-secondary and --color-text-muted lightened so
@@ -108,15 +135,24 @@
   
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
-  /* Font sizes — minimum xs 13px for readability on health app */
-  --text-xs: 0.8125rem;   /* 13px — was 12px */
-  --text-sm: 0.9375rem;   /* 15px — was 14px */
-  --text-base: 1rem;      /* 16px */
-  --text-lg: 1.125rem;    /* 18px */
-  --text-xl: 1.25rem;     /* 20px */
-  --text-2xl: 1.5rem;     /* 24px */
-  --text-3xl: 2rem;       /* 32px */
-  --text-4xl: 2.5rem;     /* 40px */
+  /* User-controlled scales (DISP-1). Defaults are exactly 1 / 1 / 0, so
+     the rendered result is byte-identical for anyone who never touches
+     the control. Set on :root by js/display-prefs.js and by the
+     pre-paint script in index.html. */
+  --user-text-scale: 1;
+  --user-leading-scale: 1;
+  --user-letter-spacing: 0em;
+
+  /* Font sizes — minimum xs 13px for readability on health app.
+     Base values unchanged; each now multiplied by --user-text-scale. */
+  --text-xs: calc(0.8125rem * var(--user-text-scale));   /* 13px — was 12px */
+  --text-sm: calc(0.9375rem * var(--user-text-scale));   /* 15px — was 14px */
+  --text-base: calc(1rem * var(--user-text-scale));      /* 16px */
+  --text-lg: calc(1.125rem * var(--user-text-scale));    /* 18px */
+  --text-xl: calc(1.25rem * var(--user-text-scale));     /* 20px */
+  --text-2xl: calc(1.5rem * var(--user-text-scale));     /* 24px */
+  --text-3xl: calc(2rem * var(--user-text-scale));       /* 32px */
+  --text-4xl: calc(2.5rem * var(--user-text-scale));     /* 40px */
   
   /* Font weights */
   --font-normal: 400;
@@ -124,10 +160,11 @@
   --font-semibold: 600;
   --font-bold: 700;
   
-  /* Line heights */
-  --leading-tight: 1.2;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.7;
+  /* Line heights. 83 declarations read these tokens; the 95 that hardcode
+     a number are logged as DISP-2. */
+  --leading-tight: calc(1.2 * var(--user-leading-scale));
+  --leading-normal: calc(1.5 * var(--user-leading-scale));
+  --leading-relaxed: calc(1.7 * var(--user-leading-scale));
   
   /* Letter spacing */
   --tracking-tight: -0.02em;
@@ -195,18 +232,11 @@
    ACCESSIBILITY ADJUSTMENTS
    ======================================== */
 
-/* Larger text preference */
-@media (prefers-larger-text) {
-  :root {
-    --text-xs: 0.875rem;
-    --text-sm: 1rem;
-    --text-base: 1.125rem;
-    --text-lg: 1.25rem;
-    --text-xl: 1.5rem;
-    --text-2xl: 1.75rem;
-    --text-3xl: 2.25rem;
-  }
-}
+/* Larger text: REMOVED 12 Aug 2026 (DISP-1).
+   An @media (prefers-larger-text) block stood here. That is not a real
+   media feature and the block had never matched in any browser. The
+   intent is now served by --user-text-scale above, driven by a control
+   in Settings > Display that the person can actually reach. */
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {

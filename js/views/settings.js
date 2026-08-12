@@ -1,5 +1,42 @@
 /**
  * settings.js
+ * 12 Aug 2026 v17
+ *
+ * v17 - DISP-1. New "Display" tab: text size, line spacing, letter
+ *   spacing, underline links, enhanced focus outlines.
+ *
+ *   Pattern came from The Learning Studio via DPC Hub, which Graeme
+ *   supplied. The LOGIC transferred; none of the markup or CSS did, and
+ *   that was deliberate -- that codebase has its own class names,
+ *   palette and type scale, so a port would have imported a second
+ *   design system. This uses the existing .settings-section /
+ *   .settings-field / .settings-toggle conventions so the tab reads as
+ *   the seventh peer of six, not a bolt-on.
+ *
+ *   What was worth keeping from the source: localStorage-only with a
+ *   try/catch, aria-pressed on choices, a role="status" live region on
+ *   change, reset-to-defaults, and above all text size as a SCALE FACTOR
+ *   on the design tokens rather than a body font-size override. That
+ *   last point matters more here than it did there -- 514 font-size
+ *   declarations in this codebase read a --text-* token, and a body
+ *   override would have reached almost none of them.
+ *
+ *   NOT stored in store.js, deliberately: these must be readable before
+ *   first paint by the inline script in index.html, they are
+ *   device-level rather than person-level, and they should survive a
+ *   store reset. See js/display-prefs.js for the full reasoning. The
+ *   generic [data-toggle] handler below writes to store, so these use
+ *   their own [data-disp-toggle] handler rather than being forced
+ *   through it.
+ *
+ *   Ranges are conservative at the bottom (text 90%-160%): nothing here
+ *   should let somebody shrink the app past the point where they can
+ *   find the control that fixes it.
+ *
+ *   P3 -- offered at Settings, never in onboarding and never on a timer.
+ *   Somebody eleven questions into setup does not yet know they want
+ *   wider letter spacing.
+ *
  * 11 Aug 2026 v16
  *
  * v16 - About panel now says why the product exists, condensed from
@@ -195,6 +232,10 @@ import { GOAL_CATEGORIES, getGoalLabel } from '../data/goals.js';
 import { getProgramme, PROGRAMMES }      from '../data/programmes.js';
 import { getProgressStats }              from '../data/programmeEngine.js';
 import { getBeat3Script }                from '../data/beat3-scripts.js';
+import {
+  DISPLAY_RANGES, getDisplayPref, setDisplayPref,
+  resetDisplayPrefs, formatDisplayValue
+} from '../display-prefs.js';
 import { openSheet }                     from './onboarding/sheet-manager.js';
 
 // ─── View registration ────────────────────────────────────────────────────────
@@ -212,6 +253,7 @@ export function SettingsView(router) {
     { id: 'conditions',  label: 'Conditions'  },
     { id: 'equipment',   label: 'Equipment'   },
     { id: 'notify',      label: 'Reminders'   },
+    { id: 'display',     label: 'Display'     },
     { id: 'about',       label: 'About'       },
   ];
 
@@ -285,6 +327,7 @@ export function SettingsView(router) {
       case 'conditions': return renderConditionsPanel();
       case 'equipment':  return renderEquipmentPanel() + renderLiftLogPanel();
       case 'notify':     return renderNotifyPanel();
+      case 'display':    return renderDisplayPanel();
       case 'about':      return renderAboutPanel();
       default:           return '';
     }
@@ -687,6 +730,100 @@ export function SettingsView(router) {
     `;
   }
 
+  // ── Display panel (DISP-1) ────────────────────────────────────────
+
+  function _dispSlider(name, id, label, hint, opts = {}) {
+    const r     = DISPLAY_RANGES[name];
+    const value = getDisplayPref(name);
+    const anchors = opts.anchors || null;
+
+    return `
+      <div class="disp-field">
+        <label class="disp-field__label" for="${id}">${label}</label>
+        <span class="disp-field__hint" id="${id}-hint">${hint}</span>
+        <div class="disp-slider-row">
+          ${anchors ? `<span class="disp-anchor disp-anchor--small" aria-hidden="true">${anchors[0]}</span>` : ""}
+          <input
+            type="range"
+            class="disp-slider"
+            id="${id}"
+            data-disp="${name}"
+            min="${r.min}" max="${r.max}" step="${r.step}"
+            value="${value}"
+            aria-describedby="${id}-hint"
+            aria-valuetext="${formatDisplayValue(name, value)}">
+          ${anchors ? `<span class="disp-anchor disp-anchor--large" aria-hidden="true">${anchors[1]}</span>` : ""}
+          <span class="disp-value" id="${id}-value">${formatDisplayValue(name, value)}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function _dispToggle(name, id, label, sub) {
+    const on = getDisplayPref(name) === "on";
+    return `
+      <div class="settings-field settings-field--toggle">
+        <label class="settings-label" for="${id}">
+          ${label}
+          <span class="settings-label__sub">${sub}</span>
+        </label>
+        <button
+          class="settings-toggle ${on ? "settings-toggle--on" : ""}"
+          id="${id}"
+          role="switch"
+          aria-checked="${on ? "true" : "false"}"
+          data-disp-toggle="${name}"
+          aria-label="${label} ${on ? "on" : "off"}">
+          <span class="settings-toggle__track" aria-hidden="true"></span>
+        </button>
+      </div>
+    `;
+  }
+
+  function renderDisplayPanel() {
+    return `
+      <div class="settings-section">
+        <h2 class="settings-section__heading">Display</h2>
+        <p class="settings-section__sub">
+          Change how the app looks to suit your eyes. Everything here is kept on
+          this device only \u2014 it is never sent anywhere, and it is not part of
+          your account.
+        </p>
+
+        <p id="disp-status" class="visually-hidden" role="status" aria-live="polite"></p>
+
+        ${_dispSlider("textScale", "disp-text-scale", "Text size",
+          "Makes every piece of text in the app larger or smaller.",
+          { anchors: ["A", "A"] })}
+
+        ${_dispSlider("leadingScale", "disp-leading-scale", "Line spacing",
+          "More space between lines of text. Often easier to read a long paragraph without losing your place.")}
+
+        ${_dispSlider("letterSpacing", "disp-letter-spacing", "Letter spacing",
+          "More space between individual letters. Some people find this makes words easier to separate.")}
+
+        <div class="disp-sample" aria-hidden="true">
+          <span class="disp-sample__caption">Preview</span>
+          <p class="disp-sample__body">
+            Some days ask for less, and that is still a session. Take what you need
+            from today, and we will pick it up again tomorrow.
+          </p>
+        </div>
+
+        ${_dispToggle("underline", "disp-underline", "Underline links",
+          "Adds a line under every link, so colour is not the only thing marking it")}
+
+        ${_dispToggle("focus", "disp-focus", "Stronger focus outlines",
+          "A thicker, brighter ring around whatever you have selected with a keyboard")}
+
+        <button class="btn btn-secondary" id="disp-reset" type="button"
+                style="margin-top: var(--space-4);">
+          Reset display to defaults
+        </button>
+      </div>
+    `;
+  }
+
   function renderEquipmentPanel() {
     const homeEquip = store.get('homeEquipment') || [];
     const gymEquip   = store.get('gymEquipment')  || [];
@@ -906,6 +1043,53 @@ export function SettingsView(router) {
         const value = el.type === 'checkbox' ? el.checked : el.value;
         store.set(field, el.type === 'number' ? Number(value) : value);
       });
+    });
+
+    // Display preferences (DISP-1). Separate from [data-toggle] below
+    // because these write to localStorage via display-prefs.js, not to
+    // store -- see this file's v17 header note for why.
+    const _dispAnnounce = (msg) => {
+      const el = container.querySelector('#disp-status');
+      if (el) el.textContent = msg;
+    };
+
+    container.querySelectorAll('[data-disp]').forEach(input => {
+      const name    = input.dataset.disp;
+      const readout = container.querySelector(`#${input.id}-value`);
+      // 'input' updates live so the preview moves under the finger.
+      input.addEventListener('input', () => {
+        setDisplayPref(name, input.value);
+        const text = formatDisplayValue(name, input.value);
+        if (readout) readout.textContent = text;
+        input.setAttribute('aria-valuetext', text);
+      });
+      // 'change' announces once, on release. Announcing on every 'input'
+      // would flood a screen reader with a reading per step.
+      input.addEventListener('change', () => {
+        const label = container.querySelector(`label[for="${input.id}"]`)?.textContent.trim() || name;
+        _dispAnnounce(`${label} set to ${formatDisplayValue(name, input.value)}`);
+      });
+    });
+
+    container.querySelectorAll('[data-disp-toggle]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const name = btn.dataset.dispToggle;
+        const next = getDisplayPref(name) !== 'on';
+        setDisplayPref(name, next ? 'on' : 'off');
+        btn.setAttribute('aria-checked', next ? 'true' : 'false');
+        btn.classList.toggle('settings-toggle--on', next);
+        const label = btn.getAttribute('aria-label') || '';
+        btn.setAttribute('aria-label', label.replace(next ? 'off' : 'on', next ? 'on' : 'off'));
+        _dispAnnounce(label.replace(/\s(on|off)$/, '') + (next ? ' on' : ' off'));
+      });
+    });
+
+    container.querySelector('#disp-reset')?.addEventListener('click', () => {
+      resetDisplayPrefs();
+      activeTab = 'display';
+      render(container);
+      container.querySelector('#disp-status').textContent = 'Display settings reset to defaults';
+      container.querySelector('#disp-reset')?.focus();
     });
 
     // Toggle switches
