@@ -1,6 +1,29 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v274
+ * LOG-1. Session notes. Graeme: "Weight notes should be on. But not just
+ * weight. Time, tension, elevation etc."
+ *
+ * The store already did all of it -- store.js v28 generalised logLift()
+ * to nine metrics on 11 Aug, and the field set already adapted to the
+ * equipment. What was missing was REACH and TRUTH. The block lived inside
+ * gym-programme.js, so of eleven session views exactly one offered it;
+ * and Settings called it "Weight notes -- jot down what you lifted",
+ * describing a narrower feature than existed.
+ *
+ * New js/session-log.js and css/components/session-log.css, both
+ * precached. gym-programme.js v3 -> v4 now imports rather than owns it
+ * (its private copies and its .gp-lift CSS removed, not left dead).
+ * workout.js v10 -> v11 gains it -- the main coach-built session
+ * previously offered no way to write anything down at all. settings.js
+ * v17 -> v18 renames it "Session notes" with copy naming the real
+ * metrics. main.css v16 -> v17. New tools/verify-log1.mjs.
+ *
+ * Deliberately NOT added to breathing-session.js or quiet-session.js:
+ * those are restoration, and a metrics box on a screen whose purpose is
+ * to stop measuring would contradict the product.
+ *
  * 12 Aug 2026 v273
  * C1 copy corrected. v272 rendered Graeme's supporting sentence as the
  * question itself; he meant the question as the heading with that
@@ -1256,7 +1279,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v273";
+const CACHE_NAME = "alongside-v274";
 
 const SHELL_URLS = [
 
@@ -1289,6 +1312,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/settings-reflection.css",
   "/alongside-app/css/components/checkin-conversation.css",
   "/alongside-app/css/components/display-preferences.css",
+  "/alongside-app/css/components/session-log.css",
 
   // CSS completeness, same pass. main.css @imports these, and an @import
   // from a cached stylesheet is still its own network request.
@@ -1314,6 +1338,7 @@ const SHELL_URLS = [
   "/alongside-app/js/app.js",
   "/alongside-app/js/router.js",
   "/alongside-app/js/store.js",
+  "/alongside-app/js/session-log.js",
   "/alongside-app/js/display-prefs.js",
   "/alongside-app/js/tts.js",
   "/alongside-app/js/session-guard.js",
