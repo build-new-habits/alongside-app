@@ -1,6 +1,35 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v286
+ * PT-6 / PT-3. Four views wrote straight into activityLog, bypassing
+ * store.logActivity() and losing all three of its guards: the 10-second
+ * dedupe window built after the B3-3 duplicate-write bug, the
+ * empty-partial guard added after Graeme backed out of a session and it
+ * saved anyway, and the exerciseHistory write.
+ *
+ * breathing-session.js, quiet-session.js (x2), activity-log.js,
+ * morning-session.js (x2). Single write path restored - reflect.js is
+ * the only remaining store.set("activityLog"), and it UPDATES an existing
+ * entry rather than creating one, which is correct.
+ *
+ * PT-3 AT ITS SOURCE. All four also wrote `duration` and `loggedAt` where
+ * progress.js reads `durationMins` and `completedAt`, so every mindful,
+ * breathing, morning and self-logged session counted as ZERO MINUTES.
+ * activity-log.js is the worst of those: it is the screen where somebody
+ * manually tells the app about a swim or a long walk they were pleased
+ * with, and the app then did not hear it.
+ *
+ * morning-session.js had a LOCAL function called logActivity(), which
+ * shadowed the store method and made the file read as compliant to any
+ * grep for the name. Renamed _saveMorningSession(). Its justification
+ * comment - "consistent field naming within a single file" - is marked
+ * superseded: nothing reads a file, and that was the wrong unit of
+ * consistency.
+ *
+ * New tools/verify-pt6.mjs, which fails 6 assertions on the pre-fix code
+ * and specifically checks that no view shadows logActivity() again.
+ *
  * 12 Aug 2026 v285
  * VOICE-1. Six therapy/self-help phrases removed from LIVE copy, and a
  * gate added so this stops depending on Graeme spotting them.
@@ -1516,7 +1545,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v285";
+const CACHE_NAME = "alongside-v286";
 
 const SHELL_URLS = [
 
