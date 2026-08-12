@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v246
+ * Progression is invited, never directed. The coach offers a little more only
+ * when the day suits it, invites less during a flare, and treats holding steady
+ * on a low day as the achievement. Never a number.
+ *
  * 11 Aug 2026 v245
  * The coach now explains the programme - why these exercises, together, today,
  * how they feed the person's stated goals, and what it is building towards.
@@ -1072,7 +1077,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v255";
+const CACHE_NAME = "alongside-v256";
 
 const SHELL_URLS = [
 
