@@ -232,6 +232,7 @@
  */
 
 import { store }                    from '../store.js';
+import { bodyCaution } from "../data/session-rationale.js";
 // EMP/LOG-1: the note block moved to js/session-log.js so workout.js can
 // reach it too. progressionInvitation is still used by the block, but it
 // is imported there now, not here.
@@ -801,6 +802,13 @@ export function GymProgrammeView(router) {
           </div>
 
           <!-- What to watch for. A coach noticing something, not an alert. -->
+          ${(() => {
+            // CORE-1. Fires when this exercise loads an area flagged sore today
+            // and is NOT contraindicated. Names the area, per P7.
+            const _c = bodyCaution(exercise);
+            return _c ? `<p class="exercise-caution" role="note">${_c}</p>` : "";
+          })()}
+
           ${exercise.watchOut && exercise.watchOut.length > 0 ? `
             <div class="exercise-watchout" role="region" aria-label="What to watch for with ${_esc(exercise.name)}">
               <span class="exercise-section-label" id="gp-section-watchout">What to watch for</span>

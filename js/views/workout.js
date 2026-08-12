@@ -163,6 +163,7 @@
  */
 
 import { store }         from "../store.js";
+import { bodyCaution } from "../data/session-rationale.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
 import { checkinData }   from "../data/checkin.js";
@@ -307,6 +308,15 @@ export function render() {
         ` : ""}
 
         <!-- What to watch for. A coach noticing something, not an alert. -->
+        ${(() => {
+          // CORE-1. Fires when this exercise loads an area flagged sore today
+          // and is NOT contraindicated -- contraindicated ones never reach a
+          // card. Names the area, per P7: a coach told something specific that
+          // then hedges is pretending not to know. Invitation, not instruction.
+          const _c = bodyCaution(exercise);
+          return _c ? `<p class="exercise-caution" role="note">${_c}</p>` : "";
+        })()}
+
         ${exercise.watchOut && exercise.watchOut.length > 0 ? `
           <div class="exercise-watchout" role="region" aria-label="What to watch for with this exercise">
             <span class="exercise-section-label" id="section-watchout-${currentExerciseIndex}">
