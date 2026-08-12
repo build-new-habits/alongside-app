@@ -367,6 +367,15 @@ function _distinctPatterns(exercises) {
 export function progressionInvitation(exercise) {
   if (!exercise?.id) return null;
 
+  // Warm-ups and cool-downs never get one. Found in the 8-week persona
+  // trace: Graeme was being invited to "try a little more than last
+  // time" on a five-minute treadmill warm-up walk. Adding load to a
+  // warm-up is not progress, it is a warm-up that has stopped doing its
+  // job -- and being nudged to push in the one part of the session
+  // designed to be easy quietly teaches the wrong lesson about what
+  // warming up is for.
+  if (exercise.section === "warmup" || exercise.section === "cooldown") return null;
+
   const stats = store.exerciseStats(exercise.id);
   const last  = store.lastLift ? store.lastLift(exercise.id) : null;
 
