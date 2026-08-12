@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v155
+## 12 Aug 2026 v154
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v154.md`. Remove v154 on upload.
+Supersedes `master_schedule_12aug2026_v153.md`. Remove v153 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -70,88 +70,6 @@ The same defect appeared **eight times in eight different costumes**: content th
 **Wave 2 candidate on evidence:** persona 2.5 (post-cardiac, total beginner). The blank-slate persona surfaced every critical first, so "least data given to the app" is the confirmed selection criterion.
 
 **Fixture note:** the Node harness and persona fixtures are reusable but were built pre-capability-screen. They need `capability{}` added before the next run.
-
-## 🟢 DISP-1 — Display preferences: SHIPPED, 12 Aug 2026
-
-**New Stream: Accessibility (A11Y/DISP). Target WB 10 Aug 2026. Code complete, fresh-clone verified, on-device confirmation outstanding.**
-
-New `js/display-prefs.js`, `css/components/display-preferences.css`, `tools/verify-disp1.mjs`. `css/base/variables.css` v2 → **v3**. `css/main.css` v15 → **v16**. `js/views/settings.js` v16 → **v17**. `css/base/reset.css` and `index.html` amended. `sw.js` → **v269**, cache **alongside-v269**.
-
-**Origin:** Graeme supplied DPC Hub's `settings.js` (itself adapted from The Learning Studio) and asked whether a version belonged in Alongside, noting correctly that it could not be copied verbatim.
-
-**What transferred: the logic. What did not: any markup or CSS.** That codebase has its own class names, palette and type scale; porting it would have imported a second design system. This uses the existing `.settings-section` / `.settings-field` / `.settings-toggle` conventions so Display reads as the seventh peer of six tabs rather than a bolt-on.
-
-### The five controls
-
-| Control | Mechanism |
-|---|---|
-| Text size (90–160%) | Multiplies every `--text-*` token |
-| Line spacing (90–135%) | Multiplies every `--leading-*` token |
-| Letter spacing (0–0.12em) | Inherited from `body` |
-| Underline links | `.underline-links` on `:root`; excludes `.btn` — underlined buttons read as broken, not clearer |
-| Stronger focus outlines | `.enhanced-focus`, 4px + halo, `:focus-visible` only |
-
-### Why this was cheaper than it looked
-
-**The app already honoured most of this — it just would not let anyone ask.** `prefers-reduced-motion` is handled in 44 blocks across 15 CSS files plus 3 JS views, and `prefers-contrast: high` already exists in `variables.css`. The gap was never adaptation; it was **user override**. Someone who wants calm visuals in this app but not system-wide, or who has never found their OS accessibility settings, had no route.
-
-### The decision that makes it work
-
-**Scale the tokens, not `body { font-size }`.** 514 font-size declarations read a `--text-*` token; 129 hardcode a value. A body override reaches almost none of them because components set size explicitly rather than inheriting. Multiplying the tokens reaches all 514 on day one.
-
-**🟠 DISP-2 — the remaining 129 hardcoded font-sizes** (111 CSS, 18 inline in JS views) and **95 hardcoded line-heights** will not respond to the control. Logged, not booked. Mechanical sweep.
-
-### Stored outside `store.js`, deliberately
-
-Against the single-source-of-truth argument applied everywhere else today — and the reason matters, so it is recorded rather than assumed:
-
-1. **Must be readable before first paint.** `app.js` is a module loading at the bottom of `<body>`, i.e. after paint. Applying there alone means larger text visibly jolts on every launch — and the people who set it are exactly the people that serves worst. An inline pre-paint script now sits before `</head>`.
-2. **Device-level, not person-level.** When Supabase lands, a phone-sized text scale has no business syncing to a laptop.
-3. **Should survive a store reset.** Somebody who needs larger text needs it more, not less, when everything else resets.
-
-The pre-paint script duplicates the keys and defaults because it cannot import a module. **`tools/verify-disp1.mjs` asserts the two copies match and exits 1 on drift** — that duplication is the single highest-risk thing in this build.
-
-### 🟢 Removed: `@media (prefers-larger-text)`
-
-**Not a real media feature.** Media Queries Level 5 defines `prefers-reduced-motion`, `prefers-contrast`, `prefers-color-scheme`, `prefers-reduced-data`, `forced-colors` and `prefers-reduced-transparency` — there is no text-size preference. The block had never matched in any browser. **Tenth P6 instance**, and its intent is precisely what the new control delivers for real.
-
-### 🟠 A11Y-3 — `.sr-only` was never defined — FIXED, but needs eyeballing
-
-Seven elements used `class="sr-only"`, a class with **no CSS rule anywhere in this codebase**. The two in `index.html` are empty live regions, so no visible effect. **The other five hold text written to be heard and not seen, and have therefore been visible on screen all along:**
-
-| File | Content |
-|---|---|
-| `noticing.js` :177 | `<h1>Noticing</h1>` |
-| `reflect.js` :334 | `<h1>A thought before you go</h1>` |
-| `prescribed.js` :298 | "N sessions completed this week" |
-| `onboarding/plan-select.js` :122 | "Choose your training plan" |
-| `onboarding/frequency.js` :77 | "Select number of training days per week" |
-
-Fixed by **aliasing** `.sr-only` to `.visually-hidden` in `reset.css` — one rule, no touch risk across five files, and it catches future use of the commoner name.
-
-**⚠️ GRAEME: this makes those five elements disappear from screen.** That is what the markup always asked for, but it is a visible change on five screens. If any is genuinely wanted visible, the fix is to give that one a real heading class — not to remove the rule. Worth a look on the next device pass, and note `reflect.js` is one of them — the file three persona traces have walked past.
-
-### Not done, deliberately
-
-**No preferences prompt in onboarding.** P3 — offered at the point of friction, never on a timer. Somebody eleven questions into setup does not yet know they want wider letter spacing.
-
-### Deferred by agreement
-
-| Tier | Scope | Status |
-|---|---|---|
-| **1** | This build | 🟢 Shipped |
-| **2** | Reduce-motion override (44 CSS blocks + a shared reader for the 3 JS views that capture `matchMedia` once at construction) and font choice — **Atkinson Hyperlegible** recommended over OpenDyslexic: free from the Braille Institute, designed for low vision, and does not look like an accessibility font, which matters for a product used in public. Needs adding to `sw.js` SHELL_URLS to work offline | Not booked |
-| **3** | Colour scheme — light mode and *selectable* high contrast. This is the A11Y-2 project. **Should not block beta** | Not booked |
-
-### 🔧 Verification note — a pattern now confirmed three times
-
-`tools/verify-disp1.mjs` failed four times on its first run. **Two were the harness matching text inside comments that legitimately discussed the thing under test** — a note reading *"must sit before `</head>`"* is not a `</head>`, and the v3 note explaining the removal of `prefers-larger-text` is not that block. The other two were real and expected (`sw.js` not yet written; it is last by rule).
-
-This is the same failure that produced a **false pass** earlier the same day, when a check for the live cache string matched a changelog line rather than the constant. **All three gates now strip comments before any positional or presence test.**
-
-Standing lesson, now earned twice in one day: *a naive substring match against a well-commented file will match the commentary. False passes and false failures come from the same cause.*
-
----
 
 ## 🟢 A11Y-1 + the two logged items: ALL CLOSED, 12 Aug 2026
 
@@ -1154,4 +1072,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v155*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v154*
