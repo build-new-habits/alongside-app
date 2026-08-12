@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v161
+## 12 Aug 2026 v162
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v160.md`. Remove v160 on upload.
+Supersedes `master_schedule_12aug2026_v161.md`. Remove v161 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -79,7 +79,56 @@ Graeme: *"yes, but note-and-duration only — no reps, no level."* `performanceF
 
 ---
 
-## 📝 GROUNDING MOMENTS v2 — research-grounded, 12 Aug 2026. AWAITING GRAEME'S MARKING.
+## 🟢 GM-1 — GROUNDING MOMENTS: BUILT AND SHIPPED, 12 Aug 2026
+
+**Tier boundary build sequence item 3.** New `js/data/grounding-moments.js` and `css/components/grounding-moments.css`. `js/store.js` v33 → **v34**. `Schema.md` v1.28 → **v1.29**. `js/views/workout.js` v11 → **v12**. `css/main.css` v17 → **v18**. New `tools/verify-gm1.mjs`. `sw.js` → **v276**, cache **alongside-v276**.
+
+### Graeme's steers, applied
+
+**"Let's avoid the citations and research."** No research appears anywhere in the feature. Claim, why, what to look out for. Nothing promises an outcome, physical or psychological. **The gate asserts it** — a moment containing *studies*, *evidence*, *proven* or *shown to* fails the build.
+
+**"Stick with mindful moments rather than defined muscle development."** This dissolved the attentional-focus trade-off rather than balancing it: not claiming a hypertrophy benefit means not inheriting its cost. What survived is the useful half as a **placement rule** — attention on your own body competes with attention on the movement, so moments sit *before* a set on loaded work, and alongside holds and steady-state where there is nothing to disrupt.
+
+**Correction to the record, and worth keeping.** Graeme noticed the v2 summary read as *"we need to be honest, this doesn't work as well as you hoped"* while the document itself read positively. **The document was accurate; the summary oversold the drama.** Framing design decisions as *corrections* makes them sound like failures. Watch for it.
+
+### Why no rest screen was needed
+
+The obvious blocker was that loaded-strength moments belonged in a rest gap, and `workout.js` prints `${exercise.rest}s rest between sets` as static text — there is no rest phase, screen or timer.
+
+**It turned out not to be a blocker.** Three moments read as rest-gap material only because they were *written* that way. Reworded to sit **before** a set they work on the card, and pre-set attention does not disrupt the lift, so the placement rule holds. **17 of 20 landed unchanged; the other 3 needed a rewording, not a screen.**
+
+### 🔵 NEW — REST-1: the rest gap has no UI
+
+Raised separately rather than smuggled in. Right now the app tells you "90s rest between sets" and leaves you there. That is a real gap for strength sessions.
+
+**Not booked, and it needs designing before building.** A rest timer that counts down at you is one wrong decision away from being a shame mechanic, which is exactly what this product refuses. It deserves its own conversation.
+
+### Mechanics as built
+
+**Family derived, not tagged.** From `position`, `category`, `equipment`, `balanceDemand` and `duration` — fields every exercise already carries. **No new field on 550+ entries**; a data migration to support a content feature would be the tail wagging the dog, and CON-2's equipment vocabulary work did the hard part. Seven families: hold, outdoor, machine, loaded, floor, seated, balance.
+
+**Depth gated on sessions** — contact from the start, place from ~8, beyond from ~20. *Beyond* asks more, and in week one it reads as instruction.
+
+**Silence is the common case.** Wrong family, first session, severe pain (7+, the app's existing acute threshold), inside the cadence gap, already dismissed, or simply not this session — all return null.
+
+**Dismissal is permanent, costs nothing, and is never counted as a skip.** Unlike `empathyPromptSkips`, which widens a gap, this removes an item from the pool for good. Somebody who dismisses has told us something; asking again is the nagging this product exists not to do.
+
+### 🔴 Two failures the gate caught, both real
+
+1. **Balance had no outward-directed moment.** Its only entry was inward, and the two `any` moments are self-directed by nature — so somebody for whom inward attention does not suit would have had **nothing** there. **This was Claude's own safety rule catching Claude.** `balance-place-1` added, and it doubles as the standard balance advice.
+2. **Family derivation led with a name regex**, so any exercise with "hold" in its name was misfiled regardless of shape. Now leads with the structural signal — duration without reps — with a word-boundaried name check as fallback.
+
+Simulation run as well as assertion, per the EMP-1 lesson: the hold pool is fully covered before anything repeats, and nothing appears twice running.
+
+### Still open
+
+1. **Yoga placement** — one line, since the module is shared. Not yet wired.
+2. **Interaction with In Step** — In Step is four movements, sixteen scenarios, Personal tier, deliberate. These are seconds long, free, in-exercise. Complementary or confusing?
+3. **The 20 texts still want Graeme's marking.** Built does not mean approved; changing them is a data edit with no code change.
+
+### Previous entry, retained
+
+
 
 **`Documents/Admin/alongside_grounding_moments_12aug2026_v2.md`.** v1 moved to `Archive/`.
 
@@ -1491,4 +1540,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v161*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v162*
