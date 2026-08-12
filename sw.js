@@ -1,6 +1,33 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v285
+ * VOICE-1. Six therapy/self-help phrases removed from LIVE copy, and a
+ * gate added so this stops depending on Graeme spotting them.
+ *
+ * He flagged "sits with you" in a draft. It was also live -- on the
+ * day-one opening shown to somebody who had just chosen "there's a longer
+ * history than any of that", which is the most delicate line in the
+ * product. Five more alongside it:
+ *
+ *   "I want you to sit with that"      -> "That is worth stopping on"
+ *   "How does that sit with you?"      -> "How do you feel about that?"
+ *   "how you're reflecting on that"    -> "how you feel about that"
+ *   "needs revisiting / sits with you" -> "needs going into / how you feel"
+ *   "showing up for yourself"          -> "you keep coming back"
+ *   "the first part of your journey"   -> "the first few weeks"
+ *
+ * The last is also a copy rule 10.1 breach -- "journey" is on the banned
+ * internal-terms list and had been sitting in onboarding's final screen.
+ *
+ * tools/verify-voice.mjs checks user-facing STRINGS only. Class names,
+ * function names and internal tags are not copy, and physical cues are
+ * exempt: "Sit with legs extended" is a yoga instruction and "let gravity
+ * do the work" is about not forcing a stretch. A gate that flagged those
+ * would be switched off within a week.
+ *
+ * Cache bump only.
+ *
  * 12 Aug 2026 v284
  * CORE-1. Graeme's call: allow dead-bug and bird-dog, but say something
  * when a condition is flagged.
@@ -1489,7 +1516,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v284";
+const CACHE_NAME = "alongside-v285";
 
 const SHELL_URLS = [
 
