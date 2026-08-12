@@ -1,5 +1,15 @@
 /**
  * store.js - Data persistence layer
+ * 12 Aug 2026 v31
+ *
+ * v31 - set() now lazily inits the way get() already did. get() opened
+ *   with `if (!this.data) this.init()`; set() went straight to
+ *   `this.data`, so writing before reading threw "Cannot set properties
+ *   of null". Never reachable live (app.js:150 inits on boot) but a trap
+ *   with no stated reason behind it, and the kind of asymmetry that
+ *   costs an hour the first time somebody hits it. No behaviour change
+ *   for any existing call site. Surfaced by tools/verify-dic1.mjs.
+ *
  * 12 Aug 2026 v30
  *
  * v30 - C1 fail-safe. capability.legPower declared (it was read by
@@ -1223,6 +1233,13 @@ export const store = {
 
   set(path, value) {
     if (!path) return;
+    // Mirrors get()'s lazy init above. Without it, any call site that
+    // writes before it reads throws "Cannot set properties of null" on a
+    // null this.data. app.js:150 inits on boot so this was never live,
+    // but the asymmetry was a trap rather than a design -- get() healed
+    // itself and set() did not, for no stated reason. Found by
+    // tools/verify-dic1.mjs, 12 Aug 2026.
+    if (!this.data) this.init();
     const keys = path.split('.');
     let obj = this.data;
     for (let i = 0; i < keys.length - 1; i++) {

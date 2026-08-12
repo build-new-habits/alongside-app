@@ -1,10 +1,14 @@
 # Alongside — Data Schema Reference
-## 12 Aug 2026 v1.25
+## 12 Aug 2026 v1.26
 
 **File:** `js/store.js` (confirmed live version: **v30, 12 Aug 2026**)
 **Storage:** `localStorage` key `alongside_user`
 
-**This version supersedes:** v1.20 (11 Aug 2026). Adds the cross-reference below to the new Exercise Entry Standard (CON-3). No `store.js` change in this pass — `store.js` remains v21.
+**This version supersedes:** v1.25 (12 Aug 2026).
+
+**v1.26 (12 Aug 2026)** — DOC-2. The line below previously read *"No `store.js` change in this pass — `store.js` remains v21."* That was left over from the v1.20 text and was wrong from v1.21 onward: the header two lines above already said v30, so this document contradicted itself on its own front page. Corrected, and the supersedes line now points at the version it actually supersedes rather than at v1.20.
+
+No `store.js` change in this pass either — it remains **v30**, and DIC-1 (12 Aug) deliberately introduced no new fields, writing the existing `sessionVariety` instead.
 
 ---
 
