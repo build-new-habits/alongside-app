@@ -113,6 +113,16 @@ export const EQUIPMENT_IMPLIES = {
   "bosu-ball":        ["bosu-ball", "balance-board"],
   "balance-board":    ["balance-board"],
   "wobble-cushion":   ["balance-board"],
+  // yoga-mat is deliberately never required by any exercise: a mat is
+  // comfort, not kit, and gating floor work behind owning one would
+  // exclude somebody for the sake of a tidy audit. Graeme's call,
+  // 11 Aug 2026 — "accept it as a comfort item".
+  //
+  // climbing-wall was removed from equipment.js entirely the same day.
+  // It appeared once, was used by nothing, and is a sport rather than a
+  // piece of equipment. A list that offers things the product cannot use
+  // teaches people the list is decorative.
+  //
   // Aliases added 11 Aug 2026. All three are unstable surfaces asking the
   // same thing of the ankle; writing separate content for each would be
   // three ways of saying "stand on something that moves".
@@ -172,10 +182,6 @@ export const EQUIPMENT_IMPLIES = {
   ],
   "swimming-pool":  ["swimming-pool", "kickboard", "pull-buoy"],
   "sauna-steam":    ["sauna"],
-  // climbing-wall is deliberately NOT mapped. It is a sport rather than
-  // a piece of equipment, and writing climbing content would be a
-  // different product. Recorded in UNSATISFIABLE_TAGS so the audit does
-  // not report it as a regression every run.
 
   "outdoor-track":  ["agility-cones"],
   "fitness-studio": ["yoga-mat", "foam-roller", "resistance-band"]
@@ -195,7 +201,6 @@ export const EQUIPMENT_IMPLIES = {
  * Logged for CON-4, not fixed here (touch-once).
  */
 export const UNSATISFIABLE_TAGS = [
-  "climbing-wall",
   "agility-ladder",
   "reaction-ball",
   "nordic-walking-poles"

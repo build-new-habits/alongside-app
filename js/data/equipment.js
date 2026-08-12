@@ -136,8 +136,8 @@ export const EQUIPMENT_CATEGORIES = [
       { id: 'swimming-pool', name: 'Swimming pool access' },
       { id: 'sauna-steam', name: 'Sauna/steam room' },
       { id: 'fitness-studio', name: 'Fitness studio/classes' },
-      { id: 'outdoor-track', name: 'Outdoor running track' },
-      { id: 'climbing-wall', name: 'Climbing wall' }
+      { id: 'outdoor-track', name: 'Outdoor running track' }
+
     ]
   }
 ];
