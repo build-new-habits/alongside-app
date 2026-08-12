@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v238
+ * Empty-session guard (exiting a session you never started no longer saves it)
+ * and CAP-1, a four-question capability screen measuring what a person can do
+ * rather than how often they move.
+ *
  * 11 Aug 2026 v237
  * Persona trace round 2 - slot-weighted anchoring, difficulty ceilings raised,
  * all 30 untagged yoga entries tagged, a new impact gate (no jumping or
@@ -1034,7 +1039,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v247";
+const CACHE_NAME = "alongside-v248";
 
 const SHELL_URLS = [
 
