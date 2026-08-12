@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v253
+ * Three routes pointed at view files that never existed. 'about' removed
+ * (Settings already had a panel), community-impact and annual-reflection
+ * built, and front doors added for both plus the activity log.
+ *
  * 11 Aug 2026 v252
  * Every tickable equipment id now unlocks something. 24 did not - ticking a
  * pull-up bar changed nothing. 12 entries written, the rest mapped to kit that
@@ -1108,7 +1113,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v262";
+const CACHE_NAME = "alongside-v263";
 
 const SHELL_URLS = [
 
