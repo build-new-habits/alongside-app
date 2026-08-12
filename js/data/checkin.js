@@ -248,17 +248,58 @@ export function getOpeningModes() {
 
 // ─── Burnout detection ────────────────────────────────────────────────────────
 
+/**
+ * BURN-1, 12 Aug 2026. Returns a GRADED result, not a boolean.
+ *
+ * Found by tracing the perimenopause persona -- somebody whose whole
+ * profile is unpredictable energy, and precisely who this exists for.
+ *
+ * TWO FAULTS, STACKED, and neither errored:
+ *
+ *   1. workoutGenerator.js:543 called detectBurnout() with NO ARGUMENT.
+ *      The first line returns false for a missing history, so it returned
+ *      false every time, for everybody, since the day it was written.
+ *   2. Seven places in workoutGenerator.js then read `burnout.level`.
+ *      On a boolean that is undefined, so every comparison was false --
+ *      including `recoveryMode: burnout.level === "high"`, which gates
+ *      filterToRecoveryPool() in exercises/index.js:334.
+ *
+ * So the entire recovery path was unreachable. Somebody could report a
+ * fortnight of exhaustion and the generator would build as if nothing
+ * had been said. The shape mismatch hid the missing argument and the
+ * missing argument hid the shape mismatch.
+ *
+ * Graded rather than boolean because the consumers were already written
+ * for grades -- "moderate" softens the coach line, "high" changes the
+ * exercise pool. The callers were right; the function was wrong.
+ *
+ * Defaults to reading the store when called without an argument, so a
+ * future call site cannot silently repeat fault 1.
+ *
+ * @returns {{ level: 'none'|'moderate'|'high', avgEnergy: number|null }}
+ */
 export function detectBurnout(checkinHistory) {
-  if (!checkinHistory || typeof checkinHistory !== 'object') return false;
-  const dates = Object.keys(checkinHistory).sort().slice(-7);
-  if (dates.length < 3) return false;
-  const last5 = dates.slice(-5);
-  const energyValues = last5
-    .map(d => checkinHistory[d]?.energy)
+  const history = (checkinHistory && typeof checkinHistory === 'object')
+    ? checkinHistory
+    : (store.get('checkinHistory') || {});
+
+  const none = { level: 'none', avgEnergy: null };
+  const dates = Object.keys(history).sort().slice(-7);
+  if (dates.length < 3) return none;
+
+  const energyValues = dates.slice(-5)
+    .map(d => history[d]?.energy)
     .filter(v => typeof v === 'number');
-  if (energyValues.length < 3) return false;
+  if (energyValues.length < 3) return none;
+
   const avg = energyValues.reduce((a, b) => a + b, 0) / energyValues.length;
-  return avg <= 4;
+
+  // 4 was the original boolean threshold and is kept as the outer edge, so
+  // nobody who previously registered stops registering. 'high' is the new
+  // grade the generator was already written for.
+  if (avg <= 2.5) return { level: 'high',     avgEnergy: avg };
+  if (avg <= 4)   return { level: 'moderate', avgEnergy: avg };
+  return { level: 'none', avgEnergy: avg };
 }
 
 // ─── Backward-compatible named export ─────────────────────────────────────────
