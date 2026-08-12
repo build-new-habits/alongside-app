@@ -1,5 +1,5 @@
 # Alongside — Data Schema Reference
-## 11 Aug 2026 v1.23
+## 12 Aug 2026 v1.24
 
 **File:** `js/store.js` (confirmed live version: v21, 11 Aug 2026)
 **Storage:** `localStorage` key `alongside_user`
@@ -32,6 +32,43 @@ That single absence is why selection had to be `Math.random()` over 497 exercise
 **P4 applies.** This is per-exercise behavioural data. `best` is a flat reference the person left themselves — nothing narrates it, nothing compares it, and it is never used to comment on consistency or decline.
 
 **Call sites supplying `exerciseIds` so far:** `gym-programme.js` v9, `workout.js` v10. `core-session.js`, `yoga-session.js` and `prescribed-session.js` do not yet — they still log a count only, so their exercises never become familiar. Outstanding.
+
+---
+
+## `capability` — **NEW, `store.js` v25/v29, 11–12 Aug 2026**
+
+Object, all keys default `null`.
+
+| Key | Values | Question asked |
+|---|---|---|
+| `chairRise` | `'yes'` \| `'not-easily'` \| `'no'` | Can you get up from a chair without pushing off with your hands? |
+| `floorAccess` | `'yes'` \| `'not-comfortably'` \| `'rather-not'` \| `'no'` | Can you get down to the floor and back up on your own? |
+| `bothFeet` | `'yes'` \| `'no'` | Do you currently do anything where both feet leave the ground? |
+| `balanceWorry` | `'no'` \| `'sometimes'` \| `'yes'` | Do you ever worry about losing your balance? |
+| `legPower` | `'full'` \| `'limited'` \| `'none'` | Only asked when `chairRise` is `'no'` or `'not-easily'` |
+| `askedAt` | ISO string | |
+
+**Why it exists.** Answering *"if we are not age restricting, how do we ensure the appropriate level for that user?"* The instrument was wrong, not the policy: `lifestyle.activityLevel` measures **frequency**, not **capacity**. Somebody can garden daily, answer "moderate" honestly, and still not get off the floor unaided — which under the raised difficulty ceilings meant jump squats.
+
+**Three-state, not boolean.** A yes/no pair forces a wheelchair user into a lie that also erases them. `'not easily'` and `'no'` are different answers: one is difficulty, the other is a different body.
+
+**`legPower` is a separate axis from standing (v29).** "Can you rise from a chair" and "do your legs work" are different questions — somebody recovering from a hip replacement cannot stand safely and has full leg function. Conflating them is how a well-meaning adaptation still hands a person the thing they cannot do.
+
+**Read by** `store.capabilityProfile()`, which returns `{ impactSafe, floorSafe, balanceSafe, needsSeated, legsUsable, legsLoadable, ceilingCap, asked }`. Consumed by `session-builder.js` v21. **Unasked is always treated as the cautious answer.** The screen can only ever *lower* a difficulty ceiling, never raise one.
+
+**Collected by** `js/views/onboarding/lifestyle.js` v3.
+
+---
+
+## `trainingIntent` — **NEW, `store.js` v26, 11 Aug 2026**
+
+`'improve' | 'maintain' | 'recover'`, default `'improve'`.
+
+**We do not ask about trajectory, and we never announce it.** `exerciseHistory` and repeat capability screens make direction observable, but saying "you seem to be declining" is a verdict, breaches P4, and is exactly what would make somebody delete the app. **Trajectory may change what is offered. It never changes what is said.**
+
+`'maintain'` is **not** a diluted `'improve'`. What is lost first is specific and known — power before strength, balance early, grip strength (which predicts independence better than almost anything), and floor transfer (which decides whether somebody keeps living in their own home). Maintenance *prioritises* those rather than doing less of everything.
+
+**Read by** `session-builder.js` (main-section tilt) and `session-rationale.js` (arc). **Not yet collected — no screen asks the question.** Wording proposed, awaiting confirmation. See CAP-6.
 
 ---
 
