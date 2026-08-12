@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v158
+## 12 Aug 2026 v157
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v157.md`. Remove v157 on upload.
+Supersedes `master_schedule_12aug2026_v156.md`. Remove v156 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -70,53 +70,6 @@ The same defect appeared **eight times in eight different costumes**: content th
 **Wave 2 candidate on evidence:** persona 2.5 (post-cardiac, total beginner). The blank-slate persona surfaced every critical first, so "least data given to the app" is the confirmed selection criterion.
 
 **Fixture note:** the Node harness and persona fixtures are reusable but were built pre-capability-screen. They need `capability{}` added before the next run.
-
-## 🟢 C1 SECOND HALF — the conditional leg question: SHIPPED, 12 Aug 2026
-
-**The last outstanding half of the C1 safety fix. Held all day pending Graeme's sign-off, because a question about whether somebody's legs work is the most sensitive in the product. Target WB 10 Aug 2026.**
-
-`js/views/onboarding/lifestyle.js` v3 → **v4**. `js/store.js` v32 → **v33**. `Schema.md` v1.27 → **v1.28**. New `tools/verify-c1.mjs`. `sw.js` → **v272**, cache **alongside-v272**.
-
-### The wording, as signed off
-
-> **Some exercises ask your legs to carry your weight. Can yours?**
-> Yes · A little, or on good days · No · I'd rather not say
-
-Shown **only** when `chairRise !== 'yes'`. **Optional**, by Graeme's decision.
-
-Graeme's read was the first sentence plus the three options. One amendment on delivery: as written it was a statement, so *"Yes"* had nothing to answer — a read-it-cold failure against copy rule 10.3. Completed with two words, *"Can yours?"*, keeping his sentence intact and the "why" doing its work first.
-
-**Why the middle option carries "or on good days":** the screen already promises *"Bodies have good and bad spells."* An option list that forced a permanent verdict would contradict the page it sits on.
-
-### 🔴 The hole found while making it optional
-
-**Optional is only safe if unanswered fails safe. It did not.**
-
-The question fires when `chairRise !== 'yes'` — so for **"Not easily"** as well as **"No"**. The fail-safe default only triggered on `needsSeated`, which is `chairRise === 'no' || floorAccess === 'no'`.
-
-So somebody who said getting out of a chair is **not easy**, then declined the question, fell through to `legPower: 'full'` and **was served fully loaded leg work**. That is the original C1 bug one answer to the left — and making the question optional without finding it would have opened it wider.
-
-`store.js` v33 widens the default to `needsSeated || (asked && chairRise !== 'yes')` — covering exactly the people the question is asked of. **Still gated on `asked`**, so nobody who never saw the capability screen is assumed limited; assuming limitation of everyone would be wrong and insulting, and that half of the v29 reasoning is preserved deliberately.
-
-**Standing lesson: whenever a required question is made optional, the unanswered path becomes a live code path. It has to be traced, not assumed.**
-
-### Three further failure modes, each closed
-
-| Issue | Why it mattered |
-|---|---|
-| **`'skip'` stored as `null`** | The string is TRUTHY, so `c.legPower \|\| default` would bypass the fail-safe. Matching none of full/limited/none, it would read `legsLoadable` false but **`legsUsable` TRUE by accident** |
-| **Retracting clears the answer** | Somebody who answers "No" then corrects `chairRise` to "Yes" must not leave `legPower: 'none'` on a question they can no longer see |
-| **Listener leak in `attachEvents()`** | It re-attaches to every chip on each conditional reveal and is called from inside its own handler, so the count compounded. Latent because the handler is idempotent — this change adds a second reveal trigger, so it is now guarded |
-
-### Verification
-
-`tools/verify-c1.mjs`, 13 assertions against the real `capabilityProfile()`. **Checked against the pre-fix code, where it fails 6 of them** — so it tests something real rather than passing vacuously. The failure it guards is silent by nature: nothing errors, the person is simply handed the wrong exercise.
-
-### 🟠 Process slip, recorded
-
-`git add -A` swept `sw.js` into the same commit as the source changes instead of a separate one. The cache still bumped and everything deployed together, so the outcome is correct, but the standing rule is `sw.js` **last, in its own commit**. Rewriting pushed history would be worse than the slip, so it stands with this note. Cause: reaching for `git add -A` after a documentation fix, rather than naming the files.
-
----
 
 ## 🟢 EMP-2 — Both EMP-1 "content gaps" closed: SHIPPED, 12 Aug 2026
 
@@ -1317,4 +1270,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v158*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v157*
