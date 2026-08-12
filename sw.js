@@ -1,6 +1,36 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v283
+ * YOGA-1 -- a SAFETY fix, found by chasing a stale schedule entry.
+ *
+ * yoga-session.js carried its own copy of 19 poses including their
+ * contraindications, and 16 of the 19 had diverged from the exercise
+ * database -- always toward being LESS cautious:
+ *
+ *   Downward Dog     view: knee, hip
+ *                database: shoulder, wrist/elbow, hamstring
+ *   Pilates Hundred  view: none at all
+ *                database: abdominals, lower back
+ *   Warrior 3        view: ankle/foot, knee
+ *                database: ankle/foot, glutes, hamstring, lower back
+ *
+ * Nothing failed. Sessions built, poses rendered, and somebody with an
+ * acute wrist injury was quietly offered a full weight-bearing wrist
+ * pose, because a fix applied to the database never reached this file.
+ * watchOut, present on 19 of 19 since CON-3, reached none of them.
+ *
+ * Contraindications and watchOut now resolve from the database at build
+ * time, BEFORE the safety filter runs. Sequence timing and cues stay in
+ * the view, where they belong. yoga-session.js v4 -> v5.
+ *
+ * verify-decisions.mjs's P5 check was widened first: it matched on
+ * equipment + movementPattern, which is what a strength entry looks like,
+ * so 30 pose entries walked through the check written that morning to
+ * catch them. Now matches on id + name, the weakest shared signal.
+ *
+ * New tools/verify-yoga1.mjs. Cache bump only.
+ *
  * 12 Aug 2026 v282
  * DISP-3 and LOG-4, plus a stop on DATA-1.
  *
@@ -1427,7 +1457,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v282";
+const CACHE_NAME = "alongside-v283";
 
 const SHELL_URLS = [
 
