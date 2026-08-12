@@ -1,6 +1,19 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 12 Aug 2026 v5 - EMP-2. Closes the two gaps EMP-1 raised, both of
+ *   which turned out to be code rather than content.
+ *
+ *   1. coachAdjusted added to the context, read from
+ *      generatedSession.session.rationale.adjusted (session-builder.js
+ *      v23). Date-guarded: generatedSession outlives the session it
+ *      describes, so without the check a walk today would inherit
+ *      yesterday's adjustment.
+ *   2. Stage advance now requires the next stage's own documented
+ *      session floor as well as its firing count. Firing count alone let
+ *      somebody into stage 5 around session 77 against a documented
+ *      "Sessions 85+", where every prompt gates at 85 or higher.
+ *
  * 12 Aug 2026 v4 - EMP-1. Condition-aware empathy selection.
  *
  *   The prompt used to be chosen by pool[atStage % pool.length] --
@@ -116,7 +129,7 @@ import { store }          from "../store.js";
 import { router }         from "../router.js";
 // EMPATHY_PROMPTS no longer imported: v4 moved pool access into
 // selectEmpathyPrompt(), so this view never touches the pool directly.
-import { selectEmpathyPrompt } from "../data/empathy-transfer.js";
+import { selectEmpathyPrompt, canEnterStage } from "../data/empathy-transfer.js";
 import { getTodaysCheckin, getHistory } from "../data/checkin.js";
 
 export const centered = false;
@@ -268,9 +281,21 @@ function buildEmpathyContext(sessionCount) {
   const type = (store.get("currentActivityEntry") || {}).type || "";
   const gentleSession = GENTLE_TYPES.includes(type);
 
+  // EMP-2. Did the coach visibly adapt today? Written by session-builder.js
+  // v23 onto the session it describes. Date-guarded: generatedSession
+  // outlives the session it was built for, so without this check a walk
+  // today would inherit yesterday's adjustment. Only builder-generated
+  // sessions carry it, which is correct -- those are the ones where the
+  // coach visibly adjusts.
+  const gen = store.get("generatedSession") || {};
+  const builtToday = gen.builtAt
+    && new Date(gen.builtAt).toDateString() === new Date().toDateString();
+  const coachAdjusted = Boolean(builtToday && gen.session?.rationale?.adjusted);
+
   return {
     sessionCount, struggled, lowEnergy, checkedInToday,
     returning, sustainedDifficulty, variablePattern, adjusting, gentleSession,
+    coachAdjusted,
   };
 }
 
@@ -306,7 +331,13 @@ function fireEmpathyPrompt(sessionCount) {
   const fired    = (store.get("empathyPromptsFired") || 0) + 1;
   const threshold = STAGE_ADVANCE_THRESHOLDS[stageNum];
 
-  if (atStage >= threshold && stageNum < 5) {
+  // EMP-2. Advance needs BOTH: enough prompts fired at this stage, AND
+  // the next stage's own documented session range reached. Firing count
+  // alone let somebody into stage 5 around session 77 against a
+  // documented "Sessions 85+", where every prompt is gated at 85 or
+  // higher -- ten sessions with nothing that qualifies. The floor only
+  // delays, never accelerates, so stages 2-4 are unchanged in practice.
+  if (atStage >= threshold && stageNum < 5 && canEnterStage(stageNum + 1, sessionCount)) {
     store.set("empathyTransferStage", stageNum + 1);
     store.set("empathyPromptsAtStage", 0);
   } else {
