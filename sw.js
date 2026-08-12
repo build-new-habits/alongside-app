@@ -1,6 +1,18 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v268
+ * A11Y-2. The html.light-mode block removed from css/base/global.css and
+ * archived to Documents/Archive/ with its reasoning. It was unreachable
+ * (no JS or HTML ever set the class, no Settings toggle despite the
+ * comment claiming one) and would not have worked if it had been:
+ * six tokens never overridden, so light text sat on a dark
+ * --color-bg-elevated at 1.19-2.06:1 across 56 rules. Also removes
+ * --color-bg-surface, a token defined only inside that block and read by
+ * nothing. Zero live effect - every rule was scoped under a class that
+ * has never been applied. Light mode remains wanted as a scoped beta
+ * feature; see the archive note. Cache bump only.
+ *
  * 12 Aug 2026 v267
  * A11Y-1. css/base/variables.css v1 -> v2: --color-text-secondary and
  * --color-text-muted lightened so both clear AA on --color-bg-elevated,
@@ -1158,7 +1170,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v267";
+const CACHE_NAME = "alongside-v268";
 
 const SHELL_URLS = [
 
