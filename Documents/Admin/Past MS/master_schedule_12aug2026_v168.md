@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v169
+## 12 Aug 2026 v168
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v168.md`. Remove v168 on upload.
+Supersedes `master_schedule_12aug2026_v167.md`. Remove v167 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -317,65 +317,6 @@ Graeme's plank model included that mindful practice produces more muscle definit
 3. How often? Every session is too often; these depend on being slightly unexpected.
 4. Free tier confirmed?
 5. The attentional-focus claim — Philosophy, or nowhere?
-
----
-
-## 🔴🟢 YOGA-1 — a SAFETY fix, found by chasing a stale entry. 12 Aug 2026.
-
-`js/views/yoga-session.js` v4 → **v5**. `tools/verify-decisions.mjs` P5 check widened. New `tools/verify-yoga1.mjs`. `sw.js` → **v283**, cache **alongside-v283**.
-
-### What was wrong
-
-`yoga-session.js` carried **its own copy of 19 poses**, including their contraindications. **16 of the 19 had diverged from the exercise database — always toward being less cautious.**
-
-| Pose | The view said | The database says |
-|---|---|---|
-| **Downward Dog** | knee, hip | **shoulder, wrist/elbow, hamstring** |
-| **Pilates Hundred** | *nothing at all* | abdominals, lower back |
-| **Warrior 3** | ankle/foot, knee | ankle/foot, glutes, hamstring, lower back |
-| **Chair Pose** | knee | glutes, knee, lower back |
-
-**Nothing failed.** Sessions built, poses rendered, and somebody with an acute wrist injury was quietly offered a full weight-bearing wrist pose — because a fix applied to the exercise database never reached this file.
-
-`watchOut`, present on **19 of 19** of these poses since CON-3's Exercise Entry Standard, reached **none** of them.
-
-**This is P5's defect costing safety rather than rework** — and P5 was written after three double-fixes precisely to stop it.
-
-### The fix
-
-`resolvePose()` merges each sequence entry with its database record. **Sequence timing and cues stay in the view** — the same pose is held 90 seconds in one flow and 120 in another, and that belongs to the flow. **Contraindications and `watchOut` always come from the database and cannot be narrowed by a sequence.**
-
-`buildSession()` resolves **before** it filters. Filtering first would run the safety check on the stale copy, which is the original bug.
-
-**Verified behaviourally:** `wrist-elbow-acute` now excludes Downward Dog, `abdominals-acute` excludes Pilates Hundred, `lower-back-acute` excludes Chair Pose. All three passed through before.
-
-### 🔴 The gate missed this, and was fixed first
-
-`verify-decisions.mjs`'s P5 check matched on `equipment` **plus** `movementPattern` — which is what a *strength* entry looks like. Yoga poses carry `holdSeconds` and `rest`, so **30 inline pose entries walked straight through the check written that morning to catch exactly this.**
-
-Now matches on `id` + `name`, the weakest signal every selectable thing in the product shares. **Each remaining budget is documented with its justification, because a budget without a reason is a hole.**
-
----
-
-## 🟠 CORE-1 — NEW content question, flagged not guessed
-
-`core-session.js` was migrated to shared ids correctly — it is the pattern yoga should have followed. But its own comment flags a question that was never answered:
-
-| Exercise | core-session used to exclude for | Database says |
-|---|---|---|
-| `dead-bug` | lower-back-acute | **nothing** |
-| `bird-dog` | lower-back-acute, wrist-elbow-acute | glutes-acute, lower-back-acute |
-
-So `dead-bug` is now offered to somebody with an acute lower back, and `bird-dog` to somebody with an acute wrist. **The migration was right to trust the database. The database may be wrong here.** Content decision, not code — deliberately not guessed at.
-
-## 🟠 QUIET-1 — logged, budgeted, not urgent
-
-`quiet-session.js` holds 21 inline entries: breathing **patterns** (box, 4-7-8, physiological sigh) with `coachIntro` and phase timings, plus short mindful practices. Session structure rather than database exercises, so **not** the YOGA-1 defect — but worth a proper look, since several have database counterparts.
-
-## 🟢 Database audit — clean
-
-- **`watchOut`: 526 / 526.** CON-3 held completely.
-- **63 entries carry `affectsAreas` but no contraindications.** Checked: overwhelmingly walks, breathing, cat-cow, ankle circles — where zero is defensible. **28 are rehabilitation entries**, plausible since rehab work is prescribed *for* a condition, but worth an eventual content pass. Not a bug.
 
 ---
 
@@ -1834,4 +1775,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v169*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v168*
