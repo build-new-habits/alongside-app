@@ -1,6 +1,13 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v20
+ *
+ * v20 - EQ-1. "balance-work" and "power" wired into Lower, Full, Core,
+ *   Cardio and Mobility. Traced a home user's own equipment list and
+ *   found his balance board reachable by NO session type at all, and
+ *   his jump box and skipping rope reachable only through Cardio.
+ *
  * 11 Aug 2026 v19
  *
  * v19 - CAP-5. Leg function gated separately from standing. An 8-week
@@ -336,7 +343,7 @@ export const SESSION_TYPES = [
     icon:        "🦵",
     description: "Squat, hinge, single-leg. Quads, hamstrings, glutes.",
     warmupCategories:   ["activation", "hip-mobility", "ankle-mobility", "cardio-warmup"],
-    mainCategories:     ["squat-pattern", "hip-hinge", "single-leg", "leg-isolation", "loaded-carry"],
+    mainCategories:     ["squat-pattern", "hip-hinge", "single-leg", "leg-isolation", "loaded-carry", "balance-work", "power"],
     cooldownCategories: ["hip-flexor-stretch", "hamstring-stretch", "figure-4"]
   },
   {
@@ -345,7 +352,7 @@ export const SESSION_TYPES = [
     icon:        "⚡",
     description: "Push, pull, squat, hinge. Every major pattern in one session.",
     warmupCategories:   ["activation", "hip-mobility", "thoracic-mobility", "cardio-warmup"],
-    mainCategories:     ["squat-pattern", "hip-hinge", "horizontal-pull", "horizontal-push", "core-stability", "loaded-carry"],
+    mainCategories:     ["squat-pattern", "hip-hinge", "horizontal-pull", "horizontal-push", "core-stability", "loaded-carry", "balance-work", "power"],
     cooldownCategories: ["hip-flexor-stretch", "chest-stretch", "child-pose"]
   },
   {
@@ -354,7 +361,7 @@ export const SESSION_TYPES = [
     icon:        "🎯",
     description: "Anti-extension, anti-rotation, anti-lateral. Real core work.",
     warmupCategories:   ["cardio-warmup", "breathing-warmup", "cat-cow"],
-    mainCategories:     ["anti-extension", "anti-rotation", "anti-lateral", "loaded-carry"],
+    mainCategories:     ["anti-extension", "anti-rotation", "anti-lateral", "loaded-carry", "balance-work"],
     cooldownCategories: ["child-pose", "supine-rotation"]
   },
   {
@@ -363,7 +370,7 @@ export const SESSION_TYPES = [
     icon:        "🏃",
     description: "Conditioning and cardiovascular work. No heavy loading.",
     warmupCategories:   ["lower-mobility"],
-    mainCategories:     ["conditioning", "interval"],
+    mainCategories:     ["conditioning", "interval", "power"],
     cooldownCategories: ["static-stretch", "breathing-cool"]
   },
   {
@@ -376,7 +383,7 @@ export const SESSION_TYPES = [
     // warm-up should open the joints it is about to work.
     warmupCategories:   ["breathing-warmup", "cat-cow", "hip-mobility",
                          "thoracic-mobility", "ankle-mobility"],
-    mainCategories:     ["hip-mobility", "thoracic-mobility", "ankle-mobility", "shoulder-mobility"],
+    mainCategories:     ["hip-mobility", "thoracic-mobility", "ankle-mobility", "shoulder-mobility", "balance-work"],
     cooldownCategories: ["deep-stretch"]
   }
 ];
