@@ -1,6 +1,37 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v270
+ * INF-CACHE: 25 of 98 JS modules and 15 CSS files were missing from
+ * SHELL_URLS, found while adding data/empathy-transfer.js. All added, so
+ * SHELL_URLS now covers every js and css file on disk.
+ *
+ * SEVERITY, stated accurately after checking the fetch handler rather
+ * than assumed: this is NOT "offline was broken". The handler is
+ * cache-first then network-and-cache, so an unlisted file is fetched and
+ * cached the first time it is used online. The real exposure is a route
+ * the person has never opened, opened for the first time with no signal
+ * -- tapping Upgrade in a basement gym, or a session type never tried
+ * before. Precaching makes it guaranteed rather than incidental.
+ *
+ * Three dead entries removed: swimming-cycling.js and sport-conditioning.js
+ * were listed with hyphens where the real files use underscores, so those
+ * two exercise categories never cached while appearing to; views/about.js
+ * outlived its file. allSettled meant all three failed silently.
+ *
+ * EMP-1, condition-aware empathy selection. Prompts were chosen by
+ * pool[atStage % pool.length] -- rotation -- while reflect.js held, at
+ * that exact moment, the person's answers to how the session felt,
+ * whether pain was worse, and mood after. It used none of them.
+ * data/empathy-transfer.js v1 -> v2 (prompts become objects carrying
+ * their own conditions; all 21 strings byte-identical, verified by
+ * assertion; new matcher). views/reflect.js v3 -> v4 (context builder;
+ * cadence untouched -- this changes WHICH prompt fires, never WHETHER).
+ * store.js v31 -> v32 and Schema.md v1.26 -> v1.27 for empathyLastPrompt,
+ * without which the repeat cap could never trigger. New
+ * tools/verify-empathy.mjs. No new files to cache; both changed modules
+ * were already in SHELL_URLS. Cache bump only.
+ *
  * 12 Aug 2026 v269
  * DISP-1, display preferences. New Settings > Display tab: text size,
  * line spacing, letter spacing, underline links, stronger focus outlines.
@@ -1185,7 +1216,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v269";
+const CACHE_NAME = "alongside-v270";
 
 const SHELL_URLS = [
 
@@ -1218,6 +1249,25 @@ const SHELL_URLS = [
   "/alongside-app/css/components/settings-reflection.css",
   "/alongside-app/css/components/checkin-conversation.css",
   "/alongside-app/css/components/display-preferences.css",
+
+  // CSS completeness, same pass. main.css @imports these, and an @import
+  // from a cached stylesheet is still its own network request.
+  "/alongside-app/css/base/global.css",
+  "/alongside-app/css/base/reset.css",
+  "/alongside-app/css/base/typography.css",
+  "/alongside-app/css/base/variables.css",
+  "/alongside-app/css/components/buttons.css",
+  "/alongside-app/css/components/cards.css",
+  "/alongside-app/css/components/checkin.css",
+  "/alongside-app/css/components/coach-fix.css",
+  "/alongside-app/css/components/equipment-modal.css",
+  "/alongside-app/css/components/morning-session.css",
+  "/alongside-app/css/components/settings-library.css",
+  "/alongside-app/css/components/workout.css",
+  "/alongside-app/css/layouts/app-shell.css",
+  "/alongside-app/css/layouts/goal-setup.css",
+  "/alongside-app/css/layouts/onboarding.css",
+
   "/alongside-app/css/components/tier-gating.css",
 
   // Core JS
@@ -1245,7 +1295,55 @@ const SHELL_URLS = [
   "/alongside-app/js/views/settings.js",
   "/alongside-app/js/views/weekly-plan.js",
   "/alongside-app/js/views/reflect.js",
-  "/alongside-app/js/views/about.js",
+
+  // ── PRECACHE GAP CLOSED, 12 Aug 2026 (EMP-1 / INF-CACHE) ──────────
+  // Three DEAD entries also removed in the same pass, and two of them
+  // explain part of the gap: swimming-cycling.js and
+  // sport-conditioning.js were listed with HYPHENS while the real files
+  // use underscores (swimming_cycling.js, sport_conditioning.js), so
+  // those two exercise categories have never once been precached while
+  // appearing to be. views/about.js was removed on 12 Aug and its entry
+  // outlived it. allSettled meant all three failed silently forever.
+  //
+  // Found while adding data/empathy-transfer.js: 25 of 98 JS modules
+  // were absent from this list, along with 15 CSS files. Among them the
+  // whole onboarding flow, four exercise category files from the 12 Aug
+  // CON work, session-rationale.js and upgrade.js.
+  //
+  // Accurate severity, checked rather than assumed: the fetch handler is
+  // cache-first then network-and-cache, so an unlisted file caches on
+  // first online use. This was never "offline is broken". The exposure is
+  // a route opened for the FIRST time with no signal. Precaching makes
+  // offline guaranteed instead of dependent on where somebody happened
+  // to have browsed. Install uses Promise.allSettled(), so a stale entry
+  // degrades rather than breaking install -- which is also exactly why
+  // neither the gap nor the three dead entries were ever noticed.
+  "/alongside-app/js/data/empathy-transfer.js",
+  "/alongside-app/js/data/equipment-map.js",
+  "/alongside-app/js/data/exercises.js",
+  "/alongside-app/js/data/exercises/gym.js",
+  "/alongside-app/js/data/exercises/seated.js",
+  "/alongside-app/js/data/exercises/sport_conditioning.js",
+  "/alongside-app/js/data/exercises/swimming_cycling.js",
+  "/alongside-app/js/data/morning-programme.js",
+  "/alongside-app/js/data/session-categories.js",
+  "/alongside-app/js/data/session-rationale.js",
+  "/alongside-app/js/views/activity-log.js",
+  "/alongside-app/js/views/annual-reflection.js",
+  "/alongside-app/js/views/community-impact.js",
+  "/alongside-app/js/views/home-threshold.js",
+  "/alongside-app/js/views/onboarding/about.js",
+  "/alongside-app/js/views/onboarding/arrival.js",
+  "/alongside-app/js/views/onboarding/body.js",
+  "/alongside-app/js/views/onboarding/complete.js",
+  "/alongside-app/js/views/onboarding/frequency.js",
+  "/alongside-app/js/views/onboarding/hard-before.js",
+  "/alongside-app/js/views/onboarding/lifestyle.js",
+  "/alongside-app/js/views/onboarding/name.js",
+  "/alongside-app/js/views/onboarding/reflection.js",
+  "/alongside-app/js/views/onboarding/welcome.js",
+  "/alongside-app/js/views/upgrade.js",
+
   "/alongside-app/js/views/privacy.js",
   "/alongside-app/js/views/onboarding/goal-setup.js",
   "/alongside-app/js/views/library.js",
@@ -1303,11 +1401,9 @@ const SHELL_URLS = [
   "/alongside-app/js/data/exercises/yoga.js",
   "/alongside-app/js/data/exercises/pilates.js",
   "/alongside-app/js/data/exercises/running.js",
-  "/alongside-app/js/data/exercises/swimming-cycling.js",
   "/alongside-app/js/data/exercises/rehabilitation.js",
   "/alongside-app/js/data/exercises/recovery.js",
   "/alongside-app/js/data/exercises/mindfulness.js",
-  "/alongside-app/js/data/exercises/sport-conditioning.js",
 
   // Assets
   "/alongside-app/assets/images/logo-icon-small.png",
