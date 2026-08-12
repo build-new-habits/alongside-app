@@ -36,6 +36,7 @@
 import { store }               from "../store.js";
 import { router }              from "../router.js";
 import { MOVEMENTS, getScenario } from "../data/in-step-scenarios.js";
+import { isPremium }           from "../auth.js";
 
 export const centered = false;
 
@@ -233,6 +234,44 @@ function renderResult() {
         </div>
       ` : `<div id="is-learn-why-panel" hidden></div>`}
 
+      ${!isPremium() ? `
+        <!-- THE DOOR. Destination Architecture section 9, verbatim.
+             "In Step is free, and is the best door in the product --
+             because someone who has just finished a scenario has FELT the
+             shape of the thing."
+
+             P2: this is the helper layer, not the coach. It sits OUTSIDE
+             the card-coach block above and is visibly distinct from it,
+             because P1 says the coach never sells. The coach's
+             acknowledgement finishes; then something else speaks.
+
+             P3 is not breached. This is not an interruption on a timer --
+             it is a permanent surface at the one moment the person has
+             just felt what it is for. Tier Boundary section 6: "visible
+             at all times, never triggered by our judgement of readiness."
+
+             Copy rule 10.2 -- what is it, what would it do for me, how do
+             I get it -- in that order. Deliberately soft: it fires
+             straight after something reflective, and a hard call to
+             action would break the moment. -->
+        <aside class="upgrade-door" aria-label="About the paid plan">
+          <p class="upgrade-door__text">
+            That&rsquo;s In Step \u2014 four movements, one thing at a time, each going
+            a bit deeper.
+          </p>
+          <p class="upgrade-door__text">
+            There&rsquo;s a longer version of the same idea. You pick something
+            you&rsquo;d like to get better at \u2014 being steadier, being more present,
+            noticing other people more \u2014 and I build it out over months, shaped
+            around what you&rsquo;re actually noticing rather than a fixed course.
+          </p>
+          <p class="upgrade-door__text upgrade-door__text--quiet">
+            That&rsquo;s part of the paid plan, if you ever fancy it.
+          </p>
+          <button class="upgrade-door__link" id="is-door-btn">Have a look</button>
+        </aside>
+      ` : ""}
+
       <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-5);">
         <button class="btn btn-ghost" id="is-journal-btn">
           Want to say more? Write about it.
@@ -306,6 +345,10 @@ export function onMount() {
     // directly.
     store.set("journalEntryType", null);
     router.navigate("journal-entry");
+  });
+
+  document.getElementById("is-door-btn")?.addEventListener("click", () => {
+    router.navigate("upgrade");
   });
 
   document.getElementById("is-done-btn")?.addEventListener("click", () => {

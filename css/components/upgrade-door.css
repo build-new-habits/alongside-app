@@ -1,0 +1,77 @@
+/* ============================================================
+   upgrade-door.css
+   css/components/upgrade-door.css
+   12 Aug 2026 v1
+
+   The door. Tier Boundary section 6, Destination Architecture section 9.
+
+   P2 MADE VISIBLE. This is the helper layer, and it must not look like
+   the coach. .card-coach carries the logo icon and the coach's voice;
+   this has neither, sits on a different surface, and is bordered rather
+   than filled. Somebody should be able to tell at a glance that
+   something other than the coach is speaking -- because P1 says the
+   coach never sells, and that promise is only kept if the difference is
+   visible without reading.
+
+   NOT styled as a call to action. No accent fill, no arrow, no button
+   that looks like the primary action on the screen. It fires straight
+   after something reflective, and a hard CTA would break the moment --
+   which is the whole reason In Step is the best door in the product.
+
+   Contrast, tokens as of A11Y-1:
+     text      #E2E8F0 on --color-bg-card (#334155)  8.40:1
+     quiet     #B9C6D6 on --color-bg-card            5.97:1
+     link      #2DD4BF on --color-bg-card            5.56:1
+     border    #B2C0D0 on --color-bg (#1E293B)       7.90:1
+   ============================================================ */
+
+.upgrade-door {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-md);
+}
+
+.upgrade-door__text {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  margin: 0 0 var(--space-3);
+}
+
+.upgrade-door__text:last-of-type {
+  margin-bottom: var(--space-2);
+}
+
+/* The offer line itself, quieter than the explanation above it. The
+   product being described matters more than the fact it costs money. */
+.upgrade-door__text--quiet {
+  color: var(--color-text-secondary);
+}
+
+/* A link, not a button. Copy rule 10.2's third question -- how do I get
+   it -- has to be answerable, but answering it should not shout. */
+.upgrade-door__link {
+  display: inline-block;
+  min-height: 44px;              /* WCAG 2.2 AA 2.5.8 target size */
+  padding: var(--space-2) 0;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.upgrade-door__link:hover {
+  color: var(--color-text);
+}
+
+.upgrade-door__link:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}

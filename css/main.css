@@ -1,4 +1,8 @@
 /* main.css
+ * 12 Aug 2026 v19
+ *
+ * v19 - DOOR-1. components/upgrade-door.css imported.
+ *
  * 12 Aug 2026 v18
  *
  * v18 - GM-1. components/grounding-moments.css imported.
@@ -100,6 +104,7 @@
 @import 'components/display-preferences.css';
 @import 'components/session-log.css';
 @import 'components/grounding-moments.css';
+@import 'components/upgrade-door.css';
 /* Content-gated — add when content sessions complete */
 /* D3:  @import 'components/home-threshold.css';       */
 /* D10: @import 'components/community-impact.css';     */

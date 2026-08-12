@@ -64,7 +64,10 @@
 
 import { store }  from "../store.js";
 import { router } from "../router.js";
-import { isPremium, lockedFeature } from "../auth.js";
+// In Step became free on 12 Aug 2026 (Destination Architecture sections
+// 9 and 18), and it was the only gated card on this screen -- so
+// isPremium() and lockedFeature() are no longer used here. Removed rather
+// than left as unused imports.
 
 export const centered = false;
 
@@ -264,36 +267,39 @@ export function render() {
                   aria-hidden="true">›</span>
           </button>
 
-          ${isPremium() ? `
-            <button class="card" id="noticing-in-step-btn"
-                    style="display: flex; align-items: center; gap: var(--space-4);
-                           text-align: left; width: 100%; cursor: pointer;
-                           background: var(--color-surface);"
-                    aria-label="In Step — short scenarios, three ways to respond, no right step">
-              <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
-                    aria-hidden="true">🎶</span>
-              <div style="flex: 1; min-width: 0;">
-                <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
-                          margin-bottom: var(--space-1);">In Step</p>
-                <p class="text-secondary" style="font-size: var(--text-sm);">
-                  Short scenarios. Three ways to respond. No right step.
-                </p>
-              </div>
-              <span style="color: var(--color-primary); font-size: 1.25rem;"
-                    aria-hidden="true">›</span>
-            </button>
-          ` : lockedFeature(`
-            <div class="card" style="display: flex; align-items: center; gap: var(--space-4);">
-              <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;" aria-hidden="true">🎶</span>
-              <div style="flex: 1; min-width: 0;">
-                <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
-                          margin-bottom: var(--space-1);">In Step</p>
-                <p class="text-secondary" style="font-size: var(--text-sm);">
-                  Short scenarios. Three ways to respond. No right step.
-                </p>
-              </div>
+          <!-- IN STEP IS FREE. Destination Architecture 12 Aug 2026 sections
+               9 and 18: "Free users have full access to everything in
+               Wellbeing -- In Step, the empathy arc, grounding moments,
+               journalling -- but no personal journey through it", and
+               "In Step is free, and is the best door in the product."
+
+               This was gated behind isPremium() from the 9 Aug build, when
+               In Step WAS Personal tier. The 12 Aug tier decision moved it
+               and the code did not follow, so the single best demonstration
+               of what the product is for was invisible to exactly the people
+               it was meant to reach.
+
+               The paid thing is not this. It is the long version described
+               in the door below: a destination you name, built out over
+               months. Same rule as everywhere else -- free is the session,
+               Personal is the plan. -->
+          <button class="card" id="noticing-in-step-btn"
+                  style="display: flex; align-items: center; gap: var(--space-4);
+                         text-align: left; width: 100%; cursor: pointer;
+                         background: var(--color-surface);"
+                  aria-label="In Step \u2014 short scenarios, three ways to respond, no right step">
+            <span style="font-size: 2rem; flex-shrink: 0; line-height: 1;"
+                  aria-hidden="true">\uD83C\uDFB6</span>
+            <div style="flex: 1; min-width: 0;">
+              <p style="font-size: var(--text-lg); font-weight: var(--font-semibold);
+                        margin-bottom: var(--space-1);">In Step</p>
+              <p class="text-secondary" style="font-size: var(--text-sm);">
+                Short scenarios. Three ways to respond. No right step.
+              </p>
             </div>
-          `, "personal", "In Step")}
+            <span style="color: var(--color-primary); font-size: 1.25rem;"
+                  aria-hidden="true">\u203A</span>
+          </button>
 
         </div>
       </section>
@@ -361,10 +367,9 @@ export function onMount() {
     router.navigate("quiet-session");
   });
 
-  // In Step card — Personal tier only; free-tier renders via
-  // lockedFeature() instead, whose own delegated listener (auth.js
-  // initPaywallListener) handles the tap-to-/upgrade behaviour, so no
-  // handler is wired here for that branch.
+  // In Step card. Free as of 12 Aug 2026 -- always rendered, always
+  // tappable. The paid offer now lives at the END of a scenario, in
+  // in-step.js, where the person has actually felt what it is.
   document.getElementById("noticing-in-step-btn")?.addEventListener("click", () => {
     router.navigate("in-step");
   });
