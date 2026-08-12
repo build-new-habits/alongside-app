@@ -1,6 +1,38 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v284
+ * CORE-1. Graeme's call: allow dead-bug and bird-dog, but say something
+ * when a condition is flagged.
+ *
+ * Built the P7 way rather than the generic way. "Listen to your body" on
+ * its own is exactly the hedge P7 warns against -- a coach told a
+ * specific area is sore, that knows this exercise loads it, and then says
+ * something vague, is pretending not to know.
+ *
+ * Two levels, matching P7's existing three-level model:
+ *   KNOWS SPECIFICALLY  bird-dog works the lower back -> names it
+ *   KNOWS GENERALLY     dead-bug works core/abs, not the back -> steers
+ *                       without naming, because naming an area this
+ *                       exercise does not work would be the coach
+ *                       claiming knowledge it does not have
+ *   KNOWS NOTHING       silent
+ *
+ * The first version only did the named level, which left Graeme's exact
+ * case -- sore back, doing Dead Bug -- silent.
+ *
+ * session-rationale.js gains bodyCaution() and soreAreaLoaded(), lifted
+ * out of progressionInvitation() which returned early when no previous
+ * lift was logged: a first-time exercise, when somebody is least sure,
+ * got nothing. Alias table de-duplicated so the two rules cannot drift.
+ *
+ * Rendered on workout, core-session, prescribed-session and
+ * gym-programme, beside watchOut. Styled as a note, never a warning --
+ * amber would make an ordinary sore knee look like an injury, and
+ * somebody who sees a warning every session stops reading them.
+ *
+ * New tools/verify-core1.mjs. Cache bump only.
+ *
  * 12 Aug 2026 v283
  * YOGA-1 -- a SAFETY fix, found by chasing a stale schedule entry.
  *
@@ -1457,7 +1489,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v283";
+const CACHE_NAME = "alongside-v284";
 
 const SHELL_URLS = [
 
