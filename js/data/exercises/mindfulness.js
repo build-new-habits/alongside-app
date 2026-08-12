@@ -24,6 +24,9 @@ export const MINDFULNESS = [
 
   {
     id: 'breath-awareness-meditation',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Breath Awareness Meditation',
     youtube: 'breath awareness meditation guided meditation',
     category: 'mindfulness',
@@ -58,6 +61,9 @@ export const MINDFULNESS = [
 
   {
     id: 'body-scan-short',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Body Scan — Short',
     youtube: 'body scan - short guided practice',
     category: 'mindfulness',
@@ -93,6 +99,9 @@ export const MINDFULNESS = [
 
   {
     id: 'loving-kindness-short',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Loving-Kindness — Short',
     youtube: 'loving-kindness - short guided practice',
     category: 'mindfulness',
@@ -127,6 +136,9 @@ export const MINDFULNESS = [
 
   {
     id: 'five-four-three-two-one-grounding',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: '5-4-3-2-1 Grounding',
     youtube: '5-4-3-2-1 grounding guided practice',
     category: 'mindfulness',
@@ -161,6 +173,9 @@ export const MINDFULNESS = [
 
   {
     id: 'progressive-muscle-relaxation',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Progressive Muscle Relaxation',
     youtube: 'progressive muscle relaxation guided practice',
     category: 'mindfulness',
@@ -195,6 +210,9 @@ export const MINDFULNESS = [
 
   {
     id: 'open-awareness-meditation',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Open Awareness Meditation',
     youtube: 'open awareness meditation guided meditation',
     category: 'mindfulness',
@@ -228,6 +246,9 @@ export const MINDFULNESS = [
 
   {
     id: 'safe-place-visualisation',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Safe Place Visualisation',
     youtube: 'safe place visualisation guided practice',
     category: 'mindfulness',
@@ -262,6 +283,9 @@ export const MINDFULNESS = [
 
   {
     id: 'noting-practice',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Noting Practice',
     youtube: 'noting practice guided practice',
     category: 'mindfulness',
@@ -296,6 +320,9 @@ export const MINDFULNESS = [
 
   {
     id: 'feet-on-floor-grounding',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Feet on Floor Grounding',
     youtube: 'feet on floor grounding guided practice',
     category: 'mindfulness',
@@ -330,6 +357,9 @@ export const MINDFULNESS = [
 
   {
     id: 'mindful-observation',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Mindful Object Observation',
     youtube: 'mindful object observation guided practice',
     category: 'mindfulness',
@@ -371,6 +401,9 @@ export const MINDFULNESS = [
 
   {
     id: 'sleep-body-scan',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Sleep Body Scan',
     youtube: 'sleep body scan guided practice',
     category: 'mindfulness',
@@ -407,6 +440,9 @@ export const MINDFULNESS = [
 
   {
     id: 'military-sleep-method',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Progressive Relaxation for Sleep',
     youtube: 'progressive relaxation for sleep guided practice',
     category: 'mindfulness',
@@ -442,6 +478,9 @@ export const MINDFULNESS = [
 
   {
     id: 'worry-time-practice',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Worry Time Practice',
     youtube: 'worry time practice guided practice',
     category: 'mindfulness',
@@ -476,6 +515,9 @@ export const MINDFULNESS = [
 
   {
     id: 'mindful-walking',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Mindful Walking',
     youtube: 'mindful walking guided practice',
     category: 'mindfulness',
@@ -510,6 +552,9 @@ export const MINDFULNESS = [
 
   {
     id: 'compassionate-self-talk',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Compassionate Self-Talk',
     youtube: 'compassionate self-talk guided practice',
     category: 'mindfulness',
@@ -544,6 +589,9 @@ export const MINDFULNESS = [
 
   {
     id: 'nature-visualisation',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Nature Visualisation',
     youtube: 'nature visualisation guided practice',
     category: 'mindfulness',
@@ -579,6 +627,9 @@ export const MINDFULNESS = [
 
   {
     id: 'morning-intention',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Morning Intention Setting',
     youtube: 'morning intention setting guided practice',
     category: 'mindfulness',
@@ -613,6 +664,9 @@ export const MINDFULNESS = [
 
   {
     id: 'gratitude-reflection',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Gratitude Reflection',
     youtube: 'gratitude reflection guided practice',
     category: 'mindfulness',
@@ -646,6 +700,9 @@ export const MINDFULNESS = [
 
   {
     id: 'box-breathing-extended',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Box Breathing — Extended Practice',
     youtube: 'box breathing - extended practice guided practice',
     category: 'mindfulness',
@@ -680,6 +737,9 @@ export const MINDFULNESS = [
 
   {
     id: 'digital-detox-transition',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Screen-to-Calm Transition',
     youtube: 'screen-to-calm transition guided practice',
     category: 'mindfulness',

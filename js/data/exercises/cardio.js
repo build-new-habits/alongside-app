@@ -33,6 +33,9 @@ export const CARDIO = [
 
   {
     id: 'jumping-jacks',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Jumping Jacks',
     youtube: 'jumping jacks exercise technique',
     category: 'cardio',
@@ -65,6 +68,9 @@ export const CARDIO = [
 
   {
     id: 'high-knees',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'High Knees',
     youtube: 'high knees exercise technique',
     category: 'cardio',
@@ -97,6 +103,9 @@ export const CARDIO = [
 
   {
     id: 'mountain-climbers',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Mountain Climbers',
     youtube: 'mountain climbers exercise technique',
     category: 'cardio',
@@ -129,6 +138,9 @@ export const CARDIO = [
 
   {
     id: 'burpee',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Burpee',
     youtube: 'burpee exercise technique',
     category: 'cardio',
@@ -164,6 +176,9 @@ export const CARDIO = [
 
   {
     id: 'squat-jumps',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Squat Jumps',
     youtube: 'squat jumps exercise technique',
     category: 'cardio',
@@ -196,6 +211,9 @@ export const CARDIO = [
 
   {
     id: 'skipping-rope',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Skipping',
     youtube: 'skipping exercise technique',
     category: 'cardio',
@@ -233,6 +251,9 @@ export const CARDIO = [
 
   {
     id: 'marching-on-spot',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Marching on the Spot',
     youtube: 'marching on the spot exercise technique',
     category: 'cardio',
@@ -265,6 +286,9 @@ export const CARDIO = [
 
   {
     id: 'step-touch',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Step Touch',
     youtube: 'step touch exercise technique',
     category: 'cardio',
@@ -297,6 +321,9 @@ export const CARDIO = [
 
   {
     id: 'stair-climbing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Stair Climbing',
     youtube: 'stair climbing exercise technique',
     category: 'cardio',
@@ -329,6 +356,9 @@ export const CARDIO = [
 
   {
     id: 'shadow-boxing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Shadow Boxing',
     youtube: 'shadow boxing exercise technique',
     category: 'cardio',
@@ -361,6 +391,9 @@ export const CARDIO = [
 
   {
     id: 'cycling-steady',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Steady Cycling',
     youtube: 'steady cycling exercise technique',
     category: 'cardio',
@@ -393,6 +426,9 @@ export const CARDIO = [
 
   {
     id: 'brisk-walk',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Brisk Walk',
     youtube: 'brisk walk exercise technique',
     category: 'cardio',
@@ -426,6 +462,9 @@ export const CARDIO = [
 
   {
     id: 'dance-freestyle',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Freestyle Dance',
     youtube: 'freestyle dance exercise technique',
     category: 'cardio',
@@ -458,6 +497,9 @@ export const CARDIO = [
 
   {
     id: 'hiit-30-30',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'HIIT — 30:30 Intervals',
     youtube: 'hiit - 3030 intervals exercise technique',
     category: 'cardio',
@@ -491,6 +533,9 @@ export const CARDIO = [
 
   {
     id: 'rowing-machine',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Rowing Machine — Steady State',
     youtube: 'rowing machine - steady state exercise technique',
     category: 'cardio',
@@ -523,6 +568,9 @@ export const CARDIO = [
 
   {
     id: 'walk-run-intervals',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Walk-Run Intervals',
     youtube: 'walk-run intervals exercise technique',
     category: 'cardio',
@@ -560,6 +608,9 @@ export const CARDIO = [
 
   {
     id: 'cardio-rowing-easy',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Easy Row — 20 Minutes',
     youtube: 'easy row - 20 minutes exercise technique',
     category: 'cardio',
@@ -594,6 +645,9 @@ export const CARDIO = [
 
   {
     id: 'cardio-rowing-intervals',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Rowing Intervals — 500m',
     youtube: 'rowing intervals - 500m exercise technique',
     category: 'cardio',
@@ -628,6 +682,9 @@ export const CARDIO = [
 
   {
     id: 'cardio-assault-bike',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Assault Bike — Interval Session',
     youtube: 'assault bike - interval session exercise technique',
     category: 'cardio',
@@ -662,6 +719,9 @@ export const CARDIO = [
 
   {
     id: 'cardio-stair-climbing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Stair Climbing',
     youtube: 'stair climbing exercise technique',
     category: 'cardio',
@@ -695,6 +755,9 @@ export const CARDIO = [
 
   {
     id: 'cardio-skipping',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Jump Rope — Conditioning',
     youtube: 'jump rope - conditioning exercise technique',
     category: 'cardio',
@@ -728,6 +791,9 @@ export const CARDIO = [
 
   {
     id: 'cardio-shadow-boxing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Shadow Boxing',
     youtube: 'shadow boxing exercise technique',
     category: 'cardio',
@@ -762,6 +828,9 @@ export const CARDIO = [
 
   {
     id: 'cardio-dance',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dance Fitness — Freestyle',
     youtube: 'dance fitness - freestyle exercise technique',
     category: 'cardio',
@@ -795,6 +864,9 @@ export const CARDIO = [
 
   {
     id: 'cardio-circuit-training',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cardio Circuit — No Equipment',
     youtube: 'cardio circuit - no equipment exercise technique',
     category: 'cardio',
@@ -831,6 +903,9 @@ export const CARDIO = [
 
   {
     id: 'cardio-nordic-walking',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Nordic Walking',
     youtube: 'nordic walking exercise technique',
     category: 'cardio',
@@ -864,6 +939,9 @@ export const CARDIO = [
 
   {
     id: 'cardio-hiit-session',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'HIIT — 20 Minute Session',
     youtube: 'hiit - 20 minute session exercise technique',
     category: 'cardio',
@@ -903,6 +981,9 @@ export const CARDIO = [
 
   {
     id: 'bike-easy-spin-warmup',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Stationary Bike — Easy Spin',
     youtube: 'stationary bike warm up before weights',
     category: 'cardio',
@@ -937,6 +1018,9 @@ export const CARDIO = [
 
   {
     id: 'treadmill-easy-walk-warmup',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Treadmill — Easy Walk',
     youtube: 'treadmill walk warm up before gym',
     category: 'cardio',
@@ -971,6 +1055,9 @@ export const CARDIO = [
 
   {
     id: 'cross-trainer-easy-warmup',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cross Trainer — Easy Pace',
     youtube: 'cross trainer elliptical warm up',
     category: 'cardio',
@@ -1005,6 +1092,9 @@ export const CARDIO = [
 
   {
     id: 'rower-easy-warmup',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Rowing Machine — Easy Technique',
     youtube: 'rowing machine technique warm up',
     category: 'cardio',
