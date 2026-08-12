@@ -1,5 +1,15 @@
 /**
  * gym-programme.js
+ * 11 Aug 2026 v12
+ *
+ * v12 - Progression invitation on the card, beside the note. Graeme:
+ *   "the coach invites the user to increase something at a rate they
+ *   think is right... it's invitational not directed. The coach never
+ *   says 'right, 10kg more today'." Never a number, always conditional,
+ *   and it reads the day: a flare invites less, a low-energy day
+ *   invites the same, and only a settled day on an improve intent
+ *   invites more.
+ *
  * 11 Aug 2026 v11
  *
  * v11 - In-card performance notes generalised. The block offered weight
@@ -212,6 +222,7 @@
  */
 
 import { store }                    from '../store.js';
+import { progressionInvitation } from '../data/session-rationale.js';
 import { getProgramme }             from '../data/programmes.js';
 import {
   getProgressStats,
@@ -719,9 +730,17 @@ export function GymProgrammeView(router) {
 
     const fields = _performanceFields(exercise);
 
+    // The invitation sits with the note, because this is the moment the
+    // person is deciding what to use. Invitational, never a number, and
+    // it reads the day -- a flare invites less, a low-energy day invites
+    // the same, and only a settled day invites more. See
+    // progressionInvitation() for the reasoning in full.
+    const invite = progressionInvitation(exercise);
+
     return `
       <div class="gp-lift card" role="group" aria-label="Your notes for ${_esc(exercise.name)}">
         ${_lastLine(exercise)}
+        ${invite ? `<p class="gp-lift__invite">${_esc(invite)}</p>` : ''}
         <div class="gp-lift__row">
           ${fields.map(f => `
             <label class="gp-lift__label" for="gp-perf-${f.key}">${f.label}</label>

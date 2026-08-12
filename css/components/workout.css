@@ -1,6 +1,10 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   11 Aug 2026 v7
+
+   v7 - .gp-lift__invite, the progression invitation.
+
    11 Aug 2026 v6
 
    v6 - .sb-rationale, .sb-section-why, .sb-rationale-arc.
@@ -469,6 +473,24 @@
   font-style: italic;
   margin: 0;
   padding: var(--space-2) 0 0;
+}
+
+/* ============================================
+   PROGRESSION INVITATION  (11 Aug 2026)
+   ============================================
+
+   Sits with the note, where the person is deciding what to use.
+   Styled as speech rather than instruction -- no icon, no emphasis,
+   no colour that reads as a directive. It is the coach saying
+   something, and it should be as easy to decline as to accept.
+   ============================================ */
+
+.gp-lift__invite {
+  margin: var(--space-2) 0 var(--space-3);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text);            /* 8.4:1 on card, AAA */
+  font-style: italic;
 }
 
 /* ============================================
