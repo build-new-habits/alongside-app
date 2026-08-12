@@ -30,7 +30,7 @@
 }
 
 .settings-reflection__para {
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--user-text-scale, 1));
   line-height: 1.6;
   color: var(--color-text, #1A1A1A);
   margin: 0 0 16px;

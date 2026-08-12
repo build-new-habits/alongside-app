@@ -103,7 +103,7 @@
 }
 
 .completion-icon {
-  font-size: 4rem;
+  font-size: calc(4rem * var(--user-text-scale, 1));
   margin-bottom: var(--space-4);
 }
 
@@ -157,7 +157,7 @@
 }
 
 .feature-icon {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
   flex-shrink: 0;
 }
 
@@ -245,7 +245,7 @@
 .goal-icon,
 .condition-icon,
 .equipment-icon {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
   flex-shrink: 0;
   width: 40px;
   text-align: center;
@@ -612,7 +612,7 @@
 }
 
 .welcome-pillar-icon {
-  font-size: 1.25rem;
+  font-size: calc(1.25rem * var(--user-text-scale, 1));
   flex-shrink: 0;
 }
 

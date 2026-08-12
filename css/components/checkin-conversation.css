@@ -339,7 +339,7 @@
 }
 
 .ci-value-emoji {
-  font-size: 2rem;
+  font-size: calc(2rem * var(--user-text-scale, 1));
   line-height: 1;
 }
 

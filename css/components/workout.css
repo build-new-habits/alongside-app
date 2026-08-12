@@ -90,7 +90,7 @@
 }
 
 .option-icon {
-  font-size: 2.5rem;
+  font-size: calc(2.5rem * var(--user-text-scale, 1));
   flex-shrink: 0;
 }
 
@@ -386,7 +386,7 @@
 }
 
 .youtube-icon {
-  font-size: 1.25rem;
+  font-size: calc(1.25rem * var(--user-text-scale, 1));
 }
 
 /* ============================================
@@ -689,7 +689,7 @@
 }
 
 .tip-icon {
-  font-size: 1.125rem;
+  font-size: calc(1.125rem * var(--user-text-scale, 1));
   flex-shrink: 0;
   line-height: 1.5;
 }
@@ -763,7 +763,7 @@
 }
 
 .celebration-emoji {
-  font-size: 4rem;
+  font-size: calc(4rem * var(--user-text-scale, 1));
   margin-bottom: var(--space-4);
 }
 
@@ -795,7 +795,7 @@
 
 .credits-number {
   display: block;
-  font-size: 3.5rem;
+  font-size: calc(3.5rem * var(--user-text-scale, 1));
   font-weight: var(--font-bold);
   color: var(--color-primary);
 }
@@ -870,9 +870,9 @@
     height: 200px;
   }
 
-  .timer-value { font-size: 4rem; }
+  .timer-value { font-size: calc(4rem * var(--user-text-scale, 1)); }
   .reps-display { gap: var(--space-8); }
-  .reps-value { font-size: 4rem; }
+  .reps-value { font-size: calc(4rem * var(--user-text-scale, 1)); }
   .exercise-name { font-size: var(--text-3xl); }
   .exercise-instructions { padding: var(--space-5) var(--space-6); }
 
@@ -893,14 +893,14 @@
     padding-bottom: var(--space-8);
   }
 
-  .credits-number { font-size: 4rem; }
-  .celebration-emoji { font-size: 5rem; }
+  .credits-number { font-size: calc(4rem * var(--user-text-scale, 1)); }
+  .celebration-emoji { font-size: calc(5rem * var(--user-text-scale, 1)); }
 }
 
 @media (min-width: 1024px) {
   .workout-view { max-width: 700px; }
   .timer-circle { width: 240px; height: 240px; }
-  .timer-value { font-size: 5rem; }
+  .timer-value { font-size: calc(5rem * var(--user-text-scale, 1)); }
 }
 
 /* ============================================
@@ -911,7 +911,7 @@
   .timer-circle { width: 140px; height: 140px; }
   .timer-value { font-size: var(--text-3xl); }
   .reps-value { font-size: var(--text-3xl); }
-  .credits-number { font-size: 3rem; }
+  .credits-number { font-size: calc(3rem * var(--user-text-scale, 1)); }
 }
 
 /* ============================================
@@ -1089,6 +1089,6 @@
 
 .ps-weight-chip-date {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--user-text-scale, 1));
   font-weight: var(--font-normal);
 }

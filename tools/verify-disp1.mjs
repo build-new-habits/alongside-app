@@ -123,6 +123,21 @@ check("Settings exposes the control", () => {
   ok(/role="radiogroup"/.test(setts), "one-of-three needs radiogroup, not a switch");
 });
 
+console.log("\nTEST 3c - DISP-2, the text scale actually reaches everything");
+check("no hardcoded font-size escapes the scale", () => {
+  const glob = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
+    e.isDirectory() ? glob(`${d}/${e.name}`) : (e.name.endsWith(".css") ? [`${d}/${e.name}`] : []));
+  const offenders = [];
+  for (const f of glob("css")) {
+    if (f.endsWith("variables.css")) continue;   // tokens scale already; wrapping twice would square it
+    const src = fs.readFileSync(f, "utf8");
+    const m = src.match(/font-size:\s*[0-9.]+(px|rem)(?!\s*\*)/g);
+    if (m) offenders.push(`${f} (${m.length})`);
+  }
+  ok(offenders.length === 0,
+     `these ignore the text-size control entirely:\n        ${offenders.join("\n        ")}`);
+});
+
 console.log("\nTEST 4 - stylesheet reaches the browser");
 check("display-preferences.css imported by main.css", () =>
   eq(mainC.includes("components/display-preferences.css"), true,
