@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v249
+ * Persona trace fixes - no category may fill more than a third of a section
+ * (a Mobility session opened with five breathing practices), leg function is
+ * now asked separately from standing, and 17 seated entries added to the
+ * categories that had only one candidate.
+ *
  * 11 Aug 2026 v248
  * Progression stays invitational even when the coach knows. What changes with
  * knowledge is the specificity, not the authority -- "consider taking some
@@ -1087,7 +1093,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v258";
+const CACHE_NAME = "alongside-v259";
 
 const SHELL_URLS = [
 
