@@ -7,6 +7,15 @@
  * No changes needed elsewhere in the app when new category files are added —
  * just import the new array here and spread it into EXERCISES.
  *
+ * 11 Aug 2026 v1.7
+ *
+ * v1.7 - CAP-4. New seated.js registered: 21 entries of seated cardio,
+ *   seated strength, seated core, seated lower-body work and
+ *   chair-supported standing. The seated pool was 29 entries, almost
+ *   all rehabilitation drills and gym machines, and produced a
+ *   four-exercise session for anyone who answered the capability
+ *   screen honestly.
+ *
  * 11 Aug 2026 v1.6
  *
  * v1.6 — CON-4. New gym.js registered: 31 entries covering cardio machines
@@ -95,6 +104,7 @@ import { RUNNING }            from './running.js';
 import { SWIMMING_CYCLING }   from './swimming_cycling.js';
 import { SPORT_CONDITIONING } from './sport_conditioning.js';
 import { GYM }               from './gym.js';
+import { SEATED }            from './seated.js';
 
 import { getActiveConditionIds } from '../conditions.js';
 import { resolveEquipment, exerciseIsAvailable } from '../equipment-map.js';
@@ -113,6 +123,7 @@ export const EXERCISES = [
   ...SWIMMING_CYCLING,
   ...SPORT_CONDITIONING,
   ...GYM,
+  ...SEATED,
 ];
 
 // ─── Filter functions ─────────────────────────────────────────────────────────
