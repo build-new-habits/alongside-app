@@ -1,5 +1,20 @@
 /**
  * js/views/checkin.js
+ * 11 Aug 2026 v13
+ *
+ * v13 - Pacing. The energy and mood panels opened 400ms after the last
+ *   coach bubble, which is fine for somebody who skims and wrong for
+ *   everybody else -- a panel sliding up while you are still reading is
+ *   the app taking the conversation back off you. Graeme: "The
+ *   conversation in mood and energy is too fast and I can't read what
+ *   the coach is saying. Perhaps a button to trigger the slider?" The
+ *   person now opens each panel when they are ready. No timer, no
+ *   auto-advance, no penalty for taking a while.
+ *
+ *   Paired with checkin-conversation.css v7, which gives the thread
+ *   70vh of trailing space so the newest message can actually scroll to
+ *   the top of the viewport rather than settling at the bottom.
+ *
  * 11 Aug 2026 v12
  *
  * v12 - The time question is gone. Graeme: "I get asked for time twice.
@@ -241,7 +256,38 @@ export function CheckinView(router) {
     if (opening.b2) {
       await _showCoachBubble(opening.b2);
     }
-    setTimeout(_showEnergyPanel, T.PANEL_DELAY);
+    // READY BUTTON (11 Aug 2026). Graeme: "The conversation in mood and
+    // energy is too fast and I can't read what the coach is saying.
+    // Perhaps a button to trigger the slider?"
+    //
+    // The energy panel used to open 400ms after the last coach bubble.
+    // That is fine for somebody who skims and wrong for everybody else:
+    // a panel sliding up over the thread while you are still reading is
+    // the app taking the conversation back off you.
+    //
+    // The person opens it when they are ready. No timer, no auto-advance,
+    // and no penalty for taking a while -- which for a product built for
+    // people who need a moment is the whole point.
+    _showReadyButton("I'm ready", _showEnergyPanel);
+  }
+
+  /**
+   * A single tap that advances the conversation. Removes itself on use,
+   * so the thread reads as a conversation afterwards rather than as a
+   * trail of dead buttons.
+   */
+  function _showReadyButton(label, onReady) {
+    const wrap = document.createElement("div");
+    wrap.className = "ci-ready";
+    wrap.innerHTML = `
+      <button type="button" class="btn btn-secondary ci-ready__btn">${label}</button>
+    `;
+    _thread.appendChild(wrap);
+    wrap.querySelector("button").addEventListener("click", () => {
+      wrap.remove();
+      onReady();
+    });
+    _scrollToNewElement(wrap);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -290,7 +336,7 @@ export function CheckinView(router) {
       await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
       _showUserBubble(`${checkinData.getEnergyEmoji(_checkin.energy)} ${_checkin.energy}/10 — ${checkinData.getEnergyLabel(_checkin.energy)}`);
       await _showCoachBubble(_energyBridge(_checkin.energy));
-      _showMoodPanel();
+      _showReadyButton("Next", _showMoodPanel);
     });
 
     _openPanel(panel);

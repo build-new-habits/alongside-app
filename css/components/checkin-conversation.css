@@ -1,6 +1,11 @@
 /* ============================================================
    checkin-conversation.css
    css/components/checkin-conversation.css
+   11 Aug 2026 v7
+
+   v7 - .ci-thread trailing space raised to 70vh so the newest coach
+   message can actually scroll to the top of the viewport.
+
    04 Aug 2026 v6
 
    v6 — .ci-quality-chips (feeling-word selector) converted from
@@ -81,11 +86,41 @@
 .ci-thread {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-5) var(--space-4) var(--space-16);
+
+  /* SCROLL HEADROOM (11 Aug 2026). Graeme: "The coach's conversation in
+     check-in sits at the bottom of the page, which means I can't read
+     the top of the latest message. I have to scroll back up every time.
+     I'd like to see the top of the message so I only ever scroll down."
+     _scrollToNewElement() already asks for block:"start", which is
+     correct. It could not deliver it: a browser can only scroll as far
+     as the content allows, and with a small bottom padding there was
+     nothing beneath the newest bubble to scroll against, so it settled
+     at the bottom of the range instead of rising to the top.
+     70vh of trailing space guarantees any new message can reach the
+     top of the viewport, including the last one in the thread. The
+     space is never seen -- the thread is scrolled, not read to the end. */
+  padding: var(--space-5) var(--space-4) 70vh;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   -webkit-overflow-scrolling: touch;
+}
+
+/* ── Ready button (11 Aug 2026) ─────────────────────────────────
+   Advances the conversation on a tap rather than a timer. Aligned
+   left with the coach's bubbles, because it belongs to the coach's
+   turn -- it is the person saying "go on", not answering anything. */
+
+.ci-ready {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: var(--space-2);
+}
+
+.ci-ready__btn {
+  min-height: 44px;                    /* WCAG 2.2 AA touch target */
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-full);
 }
 
 /* ── Coach bubble ───────────────────────────────────────────── */
