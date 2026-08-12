@@ -1,6 +1,10 @@
 /**
  * store.js - Data persistence layer
- * 11 Aug 2026 v26
+ * 11 Aug 2026 v27
+ *
+ * 11 Aug 2026 v27 - capability{} values are strings, not booleans, so a
+ *   wheelchair user can answer "No" rather than approximating themselves
+ *   to "not easily". Adds needsSeated to capabilityProfile().
  *
  * 11 Aug 2026 v26 - CAP-3. New trainingIntent field
  *   ('improve' | 'maintain' | 'recover'). Intent, never trajectory --
@@ -846,8 +850,26 @@ export const store = {
       // be its own kind of insult.
       trainingIntent: 'improve',
 
+      // Values are STRINGS, not booleans. Graeme, on the first draft:
+      // "someone in a wheelchair might need to say No, otherwise it
+      // causes shame or frustration at being left out again."
+      //
+      // He is right, and booleans could not carry it. "Not easily" and
+      // "No" are different answers, and forcing a wheelchair user to
+      // pick "not easily" would make them approximate themselves to fit
+      // our data model -- which is the exclusion happening again, in the
+      // schema this time.
+      //
+      //   chairRise    'yes' | 'not-easily' | 'no'
+      //   floorAccess  'yes' | 'not-comfortably' | 'rather-not' | 'no'
+      //   bothFeet     'yes' | 'no'
+      //   balanceWorry 'no'  | 'sometimes' | 'yes'
+      //
+      // "rather-not" is a legitimate answer, not a dodge -- it is the
+      // honest one for somebody who genuinely does not know, and it is
+      // treated as a no.
       capability: {
-        chairRise:    null,   // true | false | null
+        chairRise:    null,
         floorAccess:  null,
         bothFeet:     null,
         balanceWorry: null,
@@ -1501,27 +1523,35 @@ export const store = {
     // Impact needs an affirmative yes. Someone who does not currently do
     // anything with both feet off the ground should not be handed
     // plyometrics by default, whatever their age.
-    const impactSafe = c.bothFeet === true;
+    const impactSafe = c.bothFeet === 'yes';
 
     // Floor work needs floor access. Without it, half the database --
     // every supine, prone and kneeling movement -- is not merely hard
     // but unusable, and being handed it repeatedly is how somebody
     // decides the app is not for them.
-    const floorSafe = c.floorAccess !== false;
+    const floorSafe = c.floorAccess === 'yes' || c.floorAccess === null;
 
     // Balance is its own axis, not a difficulty band. Warrior III is low
     // impact and moderate difficulty and completely wrong for someone
     // worried about falling.
-    const balanceSafe = c.balanceWorry !== true;
+    const balanceSafe = c.balanceWorry === 'no' || c.balanceWorry === null;
 
     // Difficulty cap where the answers indicate genuine deconditioning.
     // Never raises a ceiling, only lowers one: the screen protects, it
     // does not promote.
     let ceilingCap = null;
-    if (c.chairRise === false) ceilingCap = 2;
-    else if (c.floorAccess === false) ceilingCap = 3;
+    if (c.chairRise === 'no' || c.chairRise === 'not-easily') ceilingCap = 2;
+    else if (c.floorAccess === 'no' || c.floorAccess === 'not-comfortably') ceilingCap = 3;
 
-    return { impactSafe, floorSafe, balanceSafe, ceilingCap, asked };
+    // Somebody who cannot rise from a chair or reach the floor needs
+    // seated and supported variants, not merely gentler standing ones.
+    // Surfaced honestly rather than silently: the database currently
+    // holds 2 chair and 8 seated entries, which is not enough to build
+    // a session from, and pretending otherwise would deliver exactly the
+    // exclusion this schema change exists to avoid. Logged as CAP-4.
+    const needsSeated = c.chairRise === 'no' || c.floorAccess === 'no';
+
+    return { impactSafe, floorSafe, balanceSafe, ceilingCap, needsSeated, asked };
   },
 
   /**
