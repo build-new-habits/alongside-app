@@ -1,5 +1,19 @@
 /**
  * js/views/checkin.js
+ * 11 Aug 2026 v12
+ *
+ * v12 - The time question is gone. Graeme: "I get asked for time twice.
+ *   It asks in the coach gym proposal stage too. It doesn't need to be
+ *   twice." Check-in is the wrong place to keep it -- asking here means
+ *   guessing at the top of the day, before you have seen what is on
+ *   offer, while asking at the point of building means answering with
+ *   the session in front of you. Same question, better moment.
+ *
+ *   availableTime is no longer written here. Consumers already handle
+ *   its absence: coach-proposal.js falls back to a default and
+ *   session-builder-ui.js asks directly. The store field stays, since
+ *   Settings may set a usual length later.
+ *
  * 04 Aug 2026 v11
  *
  * v11 — coach-reflection.js fallback retired. Traced (not assumed):
@@ -175,17 +189,10 @@ export function CheckinView(router) {
     feelingWord:     null,
     feelingQuadrant: null,
   };
+  // _selectedTime and TIME_OPTIONS removed 11 Aug 2026 with the time panel.
+  // The summary line still reads availableTime if something else has set it
+  // (Settings, or a previous session), but check-in no longer asks or writes.
   let _selectedTime = null;
-
-  // ── Available time options ──────────────────────────────────────────────────
-  const TIME_OPTIONS = [
-    { value: "micro",    label: "Micro",    sub: "10 min" },
-    { value: "quick",    label: "Quick",    sub: "20 min" },
-    { value: "short",    label: "Short",    sub: "30 min" },
-    { value: "standard", label: "Standard", sub: "40 min" },
-    { value: "long",     label: "Long",     sub: "50 min" },
-    { value: "open",     label: "Open",     sub: "60+ min" },
-  ];
 
   // ── Mount ───────────────────────────────────────────────────────────────────
 
@@ -193,7 +200,7 @@ export function CheckinView(router) {
     _container   = container;
     _conditions  = store.get("conditions") || [];
     _name        = (store.get("name") || "").split(" ")[0] || "";
-    _selectedTime = store.get("availableTime") || null;
+    _selectedTime = store.get("availableTime") || null;   // read-only now
 
     // Pre-fill from today's existing check-in or yesterday's sleep data
     const existing = checkinData.getTodaysCheckin();
@@ -495,8 +502,7 @@ export function CheckinView(router) {
         await _showCoachBubble("One more thing. How's the pain today?");
         _showConditionsPanel();
       } else {
-        await _showCoachBubble("Last one. How much time do you have today?");
-        _showTimePanel();
+        await _finishConversation();
       }
     });
 
@@ -568,61 +574,34 @@ export function CheckinView(router) {
         return `${cond?.name || id}: ${band.label.toLowerCase()}`;
       }).join(", ");
       _showUserBubble(summary);
-      await _showCoachBubble("Last one. How much time do you have today?");
-      _showTimePanel();
+      await _finishConversation();
     });
 
     _openPanel(panel);
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // TIME PANEL
+  // FINISH — was the TIME PANEL until 11 Aug 2026
+  //
+  // Graeme: "I get asked for time twice. It asks in the coach gym proposal
+  // stage too. It doesn't need to be twice."
+  //
+  // He is right, and the check-in is the wrong place to lose. Asking here
+  // means guessing at the top of the day, before you have seen what is on
+  // offer; asking at the point of building means answering with the session
+  // in front of you. Same question, better moment.
+  //
+  // availableTime is no longer written by check-in. Consumers already
+  // handle it being absent: coach-proposal.js's _getAvailableTime() falls
+  // back to a sensible default, and session-builder-ui.js asks directly.
+  // The store field stays -- Settings may set a usual length later, and
+  // removing a field that other code reads is a separate decision.
   // ─────────────────────────────────────────────────────────────────────────
 
-  function _showTimePanel() {
-    const panel = _buildPanel(`
-      <div class="ci-time-grid" role="group" aria-label="Available time today">
-        ${TIME_OPTIONS.map(opt => `
-          <button type="button"
-                  class="ci-time-card ${_selectedTime === opt.value ? "selected" : ""}"
-                  data-time="${opt.value}"
-                  aria-pressed="${_selectedTime === opt.value}">
-            <span class="ci-time-label">${opt.label}</span>
-            <span class="ci-time-sub">${opt.sub}</span>
-          </button>
-        `).join("")}
-      </div>
-      <p class="text-sm text-muted" style="margin-top:var(--space-3);text-align:center;">
-        Skip this and I'll use your energy level to decide.
-      </p>
-      <button class="btn btn-primary btn-large btn-full" id="ci-time-confirm"
-              style="margin-top:var(--space-4);" aria-label="Done">Done</button>
-    `);
-
-    panel.querySelectorAll(".ci-time-card").forEach(card => {
-      card.addEventListener("click", () => {
-        _selectedTime = _selectedTime === card.dataset.time ? null : card.dataset.time;
-        panel.querySelectorAll(".ci-time-card").forEach(c => {
-          const sel = c.dataset.time === _selectedTime;
-          c.classList.toggle("selected", sel);
-          c.setAttribute("aria-pressed", sel);
-        });
-      });
-    });
-
-    panel.querySelector("#ci-time-confirm").addEventListener("click", async () => {
-      _closePanel(panel);
-      _fadePastBubbles();
-      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
-      const timeLabels = { micro: "10 minutes", quick: "20 minutes", short: "30 minutes",
-                           standard: "40 minutes", long: "50 minutes", open: "60+ minutes" };
-      if (_selectedTime) _showUserBubble(timeLabels[_selectedTime] || _selectedTime);
-      await _showCoachBubble(_buildSummary());
-      await new Promise(r => setTimeout(r, T.PANEL_DELAY));
-      _showActionButtons();
-    });
-
-    _openPanel(panel);
+  async function _finishConversation() {
+    await _showCoachBubble(_buildSummary());
+    await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+    _showActionButtons();
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -681,7 +660,6 @@ export function CheckinView(router) {
 
   function _saveAll() {
     store.updateConditionPainScores({ ..._checkin.conditionLevels });
-    store.set("availableTime", _selectedTime);
     checkinData.saveCheckin(_checkin);
     store.set("lastCheckin.timestamp", new Date().toISOString());
     store.set("todayIntensity", checkinData.getSuggestedIntensity(_checkin));
@@ -852,7 +830,7 @@ export function CheckinView(router) {
     else if (s >= 6) line += `, ${s} hours sleep.`;
     else             line += ", lighter sleep than usual.";
 
-    if (_selectedTime) line += ` You have ${tl[_selectedTime] || _selectedTime} today.`;
+    if (_selectedTime) line += ` You have ${tl[_selectedTime] || _selectedTime} today.`;   // only if set elsewhere
     line += " I'll have something ready for you.";
     return line;
   }

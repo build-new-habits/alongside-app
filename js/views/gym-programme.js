@@ -1,5 +1,16 @@
 /**
  * gym-programme.js
+ * 11 Aug 2026 v10
+ *
+ * v10 - "Not a fan of this one" on the exercise card. The
+ *   exercisePreferences store field has existed since v17 and
+ *   conditionProgrammes.js has honoured it since 04 Aug, but nothing
+ *   in the product ever offered a way to set it. Deliberately not
+ *   stars, thumbs or a score: the product does not rank exercises and
+ *   does not ask people to. One tap says "less of this", a second
+ *   undoes it, and it writes 'less' rather than 'avoid' because "not a
+ *   fan" is not "never again".
+ *
  * 11 Aug 2026 v9
  *
  * v9 - CONT-1. Completion now records WHICH exercises were done, not
@@ -771,6 +782,21 @@ export function GymProgrammeView(router) {
             </div>
           ` : ''}
 
+          <!-- NOT A FAN (11 Aug 2026). A quiet, reversible preference, not
+               a rating. Deliberately not stars, thumbs or a score -- the
+               product does not rank exercises and does not ask people to.
+               One tap says "less of this"; a second undoes it. -->
+          <div class="exercise-preference">
+            <button type="button"
+                    class="exercise-preference__btn ${_isNotAFan(exercise.id) ? "is-set" : ""}"
+                    data-notafan="${_esc(exercise.id)}"
+                    aria-pressed="${_isNotAFan(exercise.id)}">
+              ${_isNotAFan(exercise.id)
+                ? "Noted — you'll see less of this"
+                : "Not a fan of this one"}
+            </button>
+          </div>
+
           <!-- What to watch for. A coach noticing something, not an alert. -->
           ${exercise.watchOut && exercise.watchOut.length > 0 ? `
             <div class="exercise-watchout" role="region" aria-label="What to watch for with ${_esc(exercise.name)}">
@@ -841,6 +867,14 @@ export function GymProgrammeView(router) {
     });
 
     attachLiftEvents(exercise);
+
+    // Not a fan — toggles and re-renders so the label updates in place.
+    document.querySelector('[data-notafan]')?.addEventListener('click', (e) => {
+      const id = e.currentTarget.getAttribute('data-notafan');
+      if (!id) return;
+      _toggleNotAFan(id);
+      renderCurrentExercise(container, session, stats, sessionType);
+    });
 
     document.getElementById('gp-next-btn')?.addEventListener('click', () => {
       completedExerciseIndices.add(currentExerciseIndex);
@@ -1073,6 +1107,40 @@ export function GymProgrammeView(router) {
    * exercise is ever visible in the DOM at a time now — the old scan
    * would have silently always returned 0 or 1 after this rebuild.
    */
+  /**
+   * Is this exercise already marked "not a fan"?
+   *
+   * Reads the same exercisePreferences map that conditionProgrammes.js
+   * and session-builder.js honour, so one tap here reaches both the
+   * prescribed programme and every generated session.
+   */
+  function _isNotAFan(exerciseId) {
+    const prefs = store.get("exercisePreferences") || {};
+    return prefs[exerciseId]?.preference === "less";
+  }
+
+  /**
+   * Toggle the preference. Reversible by design -- somebody who taps it
+   * on a bad day should be able to take it back on a better one, and a
+   * preference you cannot undo is a punishment.
+   *
+   * Writes 'less' rather than 'avoid': "not a fan" is not "never again".
+   * 'avoid' stays reserved for an explicit choice made elsewhere.
+   */
+  function _toggleNotAFan(exerciseId) {
+    const prefs = { ...(store.get("exercisePreferences") || {}) };
+    if (prefs[exerciseId]?.preference === "less") {
+      delete prefs[exerciseId];
+    } else {
+      prefs[exerciseId] = {
+        preference: "less",
+        setAt:      new Date().toISOString(),
+        source:     "in-session"
+      };
+    }
+    store.set("exercisePreferences", prefs);
+  }
+
   function savePartialSession(container, session) {
     const doneCount = completedExerciseIndices.size;
     const durationMins = sessionStartTime

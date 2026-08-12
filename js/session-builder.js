@@ -1,6 +1,15 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v16
+ *
+ * v16 - Exercise preferences honoured. conditionProgrammes.js has
+ *   applied these since 04 Aug and this file never has, so telling the
+ *   coach you were not a fan of something changed your prescribed
+ *   programme and did nothing to your generated sessions. 'avoid'
+ *   removes; 'less' sorts to the back rather than being removed,
+ *   because "not a fan" is not "never again".
+ *
  * 11 Aug 2026 v15
  *
  * v15 - CAP-3. trainingIntent tilts main-section selection. "maintain"
@@ -634,6 +643,7 @@ function intentPriority(ex) {
 
 function _filterCandidates(categories, section, equipSet, conditionSet) {
   const ceiling = _difficultyCeiling();
+  const prefs   = store.get("exercisePreferences") || {};
 
   // CON-6: candidates now come from the shared 461-entry database, not from
   // this file's own EXERCISE_POOL. Section comes from which SESSION_TYPES
@@ -778,6 +788,17 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   const useCeilingOnWarmup = warmupPool !== null && warmupPool.length > 0;
 
   return matched.filter(ex => {
+    // EXERCISE PREFERENCES (11 Aug 2026). conditionProgrammes.js has
+    // honoured these since 04 Aug; this file never has, so telling the
+    // coach you were not a fan of something changed your prescribed
+    // programme and did nothing at all to your generated sessions.
+    // Same two-places-to-fix pattern the private pool caused.
+    //
+    // 'avoid' removes the exercise. 'less' leaves it in the pool and is
+    // handled as a de-prioritisation at selection, not a removal --
+    // "not a fan" is not "never again", and treating it as such would
+    // quietly shrink somebody's world every time they were honest.
+    if (prefs[ex.id]?.preference === "avoid") return false;
     if (impactGated && isImpact(ex)) return false;
     if (cap.asked && !cap.floorSafe   && isFloor(ex))   return false;
     if (cap.asked && !cap.balanceSafe && isBalance(ex)) return false;
@@ -966,6 +987,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
 
   function selectFromCategories(categories, section, count, alreadyChosen) {
     const chosen = alreadyChosen || new Set();
+    const prefs  = store.get("exercisePreferences") || {};
     const candidates = _filterCandidates(categories, section, equipSet, conditionSet)
       .filter(ex => !chosen.has(ex.id));
 
@@ -1122,6 +1144,11 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       if (candidates !== pool && candidates.every(e => store.exerciseStats(e.id).n >= MASTERY_THRESHOLD)) {
         candidates = pool;
       }
+
+      // 'less' exercises sort to the back: still available when a category
+      // has nothing else, never chosen while something else exists.
+      const notLess = candidates.filter(e => prefs[e.id]?.preference !== "less");
+      if (notLess.length > 0) candidates = notLess;
 
       // Intent tilt, applied before continuity so that a maintenance user
       // builds familiarity WITH the capacities that matter to them rather
