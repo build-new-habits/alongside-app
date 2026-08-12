@@ -1,6 +1,14 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v17
+ *
+ * v17 - Every session now carries a rationale. Graeme: "I'd like the
+ *   coach to consider my goals and in the programme selected be able to
+ *   explain why this chosen exercises works... There's a set of
+ *   activities, rationale, long term programme. But it's always
+ *   explained and connected." See data/session-rationale.js.
+ *
  * 11 Aug 2026 v16
  *
  * v16 - Exercise preferences honoured. conditionProgrammes.js has
@@ -265,6 +273,7 @@ import { store } from "./store.js";
 import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 import { EXERCISES } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
+import { buildRationale } from "./data/session-rationale.js";
 
 // ── Allocation presets (05 Aug 2026) ──────────────────────────────────────────
 // Scales EXERCISE_COUNT's warmup/main/cooldown split. Warmup always floors at
@@ -1284,6 +1293,11 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     coachLine: coachLineWithWarmupNote,
     exercises: allExercises
   };
+
+  // The coach explaining its own reasoning. Attached to the session so the
+  // views render it rather than recompute it, and so it is captured with
+  // the session it describes.
+  session.rationale = buildRationale(session, { excludedReason: pulseRaiser.reason });
 
   // Store in store.js
   store.set("generatedSession", {
