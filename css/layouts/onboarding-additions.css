@@ -573,6 +573,35 @@
   padding-top: 0;
 }
 
+/* ── CAPABILITY SCREEN (CAP-1, 11 Aug 2026) ─────────────────────────────
+   Set apart from the chip groups above it so it reads as its own short
+   section rather than three more questions on a long form. Quiet, not
+   flagged: an alert treatment would make four questions about chairs and
+   floors feel like an assessment, which is exactly what the copy works
+   to avoid.
+   Contrast measured: --color-text-muted on --color-bg is 8.36:1, AAA.
+   ──────────────────────────────────────────────────────────────────── */
+
+.lifestyle-capability {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.lifestyle-capability__intro {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-muted);
+}
+
+.lifestyle-capability__note {
+  margin: var(--space-4) 0 var(--space-6);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-muted);
+}
+
 .lifestyle-group__heading {
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
