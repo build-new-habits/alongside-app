@@ -1,5 +1,51 @@
 /**
  * onboarding/lifestyle.js
+ * 11 Aug 2026 v3
+ *
+ * NOT READY FOR BETA. Verified 11 Aug 2026 by executing live code: the
+ * screen collects and stores correctly and capabilityProfile() computes
+ * correctly, but the SELECTION GATES DO NOT HOLD. Traced -- a wheelchair
+ * user answering "no" to the chair question was still served McGill
+ * Curl-Ups (floor work) and a man who cannot jump was still served Drop
+ * Steps. Two blockers, both content rather than code:
+ *
+ *   CAP-2  No exercise carries a position, impact or balance tag.
+ *          Gates match on names, and names miss. Deriving from
+ *          instructions text was tested and leaves 197 of 497 unclear
+ *          -- not good enough for a safety gate.
+ *   CAP-4  needsSeated is computed and nothing acts on it, because the
+ *          database holds 2 chair and 8 seated entries. Not enough to
+ *          build a session from.
+ *
+ * Asking somebody four careful questions and then handing them the
+ * thing they just said they cannot do is worse than not asking. This
+ * step must not reach a beta user until both are closed.
+ *
+ * v3 - CAP-1 capability screen. Four questions measuring CAPACITY,
+ *   where the questions above measure FREQUENCY. Somebody can garden
+ *   every day, answer "moderate" honestly, and still not get off the
+ *   floor unaided -- which under the raised difficulty ceilings meant
+ *   being handed jump squats.
+ *
+ *   Answers Graeme's question: if we are not filtering by age, how do we
+ *   get the level right? Every one of these is answerable honestly by a
+ *   76-year-old AND by a deconditioned 36-year-old, and together they
+ *   separate the fit 76-year-old from the frail one, which age never
+ *   can. They ask what somebody CAN do rather than inferring it from
+ *   what they are.
+ *
+ *   Answers are STRINGS. Graeme, on the first draft: "someone in a
+ *   wheelchair might need to say No, otherwise it causes shame or
+ *   frustration at being left out again." Booleans could not carry
+ *   that, and making somebody round themselves off to fit our data
+ *   model is the exclusion happening again, in the schema this time.
+ *
+ *   Placed after the activity question so it reads as refinement rather
+ *   than doubt, and framed as being about fit rather than ability --
+ *   four yes/no questions about chairs and floors can otherwise land as
+ *   an assessment of decline. Not skippable: the safety consequence is
+ *   real. Read by store.capabilityProfile().
+ *
  * 23 Jun 2026 v2
  *
  * Onboarding step: lifestyle. Captures activity level, stress, sleep,
@@ -34,6 +80,10 @@ export function LifestyleView(router) {
 
   let selections = {
     activityLevel:    null,
+    chairRise:        null,
+    floorAccess:      null,
+    bothFeet:         null,
+    balanceWorry:     null,
     stressLevel:      null,
     sleepQuality:     null,
     exerciseHistory:  null,
@@ -44,6 +94,12 @@ export function LifestyleView(router) {
     // Pre-populate from store
     const saved = store.get('lifestyle') || {};
     selections.activityLevel   = saved.activityLevel   || null;
+
+    const savedCap = store.get('capability') || {};
+    selections.chairRise    = savedCap.chairRise    || null;
+    selections.floorAccess  = savedCap.floorAccess  || null;
+    selections.bothFeet     = savedCap.bothFeet     || null;
+    selections.balanceWorry = savedCap.balanceWorry || null;
     selections.stressLevel     = saved.stressLevel     || null;
     selections.sleepQuality    = saved.sleepQuality    || null;
     selections.exerciseHistory = saved.exerciseHistory || null;
@@ -57,7 +113,11 @@ export function LifestyleView(router) {
       selections.activityLevel &&
       selections.stressLevel &&
       selections.sleepQuality &&
-      selections.exerciseHistory
+      selections.exerciseHistory &&
+      selections.chairRise &&
+      selections.floorAccess &&
+      selections.bothFeet &&
+      selections.balanceWorry
     );
 
     container.innerHTML = `
@@ -118,6 +178,83 @@ export function LifestyleView(router) {
             optional: true,
           }) : ''}
         </div>
+
+        <!-- ── CAPABILITY SCREEN (CAP-1, 11 Aug 2026) ──────────────────
+             Four questions measuring CAPACITY, where the questions above
+             measure FREQUENCY. Somebody can garden every day, answer
+             "moderate" honestly, and still not get off the floor unaided.
+
+             Placed AFTER the activity question deliberately, so it reads
+             as refinement rather than doubt, and framed as being about
+             fit rather than ability -- four yes/no questions about chairs
+             and floors can otherwise land as an assessment of decline.
+
+             Answers are strings, not booleans, so that somebody who uses
+             a wheelchair can say "No" rather than approximating
+             themselves to "Not easily". Being made to round yourself off
+             to fit a data model is the exclusion happening again.
+
+             Not skippable: the safety consequence is real.
+             ─────────────────────────────────────────────────────────── -->
+        <section class="lifestyle-capability" aria-labelledby="cap-intro-heading">
+          <h2 class="lifestyle-group__heading" id="cap-intro-heading">A few practical things</h2>
+          <p class="lifestyle-capability__intro">
+            So I don't hand you something that doesn't suit you. There are
+            no right answers here &mdash; these just tell me what to leave out.
+          </p>
+        </section>
+
+        ${_renderRadioGroup({
+          id:      'chair-rise',
+          heading: 'Can you get up from a chair without pushing off with your hands?',
+          field:   'chairRise',
+          options: [
+            { value: 'yes',        label: 'Yes'         },
+            { value: 'not-easily', label: 'Not easily'  },
+            { value: 'no',         label: 'No'          },
+          ],
+          selected: selections.chairRise,
+        })}
+
+        ${_renderRadioGroup({
+          id:      'floor-access',
+          heading: 'Can you get down to the floor and back up on your own?',
+          field:   'floorAccess',
+          options: [
+            { value: 'yes',             label: 'Yes'                    },
+            { value: 'not-comfortably', label: 'Not comfortably'        },
+            { value: 'rather-not',      label: 'I\'d rather not try'    },
+            { value: 'no',              label: 'No'                     },
+          ],
+          selected: selections.floorAccess,
+        })}
+
+        ${_renderRadioGroup({
+          id:      'both-feet',
+          heading: 'Do you currently do anything where both feet leave the ground \u2014 running, jumping, skipping?',
+          field:   'bothFeet',
+          options: [
+            { value: 'yes', label: 'Yes' },
+            { value: 'no',  label: 'No'  },
+          ],
+          selected: selections.bothFeet,
+        })}
+
+        ${_renderRadioGroup({
+          id:      'balance-worry',
+          heading: 'Do you ever worry about losing your balance?',
+          field:   'balanceWorry',
+          options: [
+            { value: 'no',        label: 'No'        },
+            { value: 'sometimes', label: 'Sometimes' },
+            { value: 'yes',       label: 'Yes'       },
+          ],
+          selected: selections.balanceWorry,
+        })}
+
+        <p class="lifestyle-capability__note">
+          You can change any of this later. Bodies have good and bad spells.
+        </p>
 
         <!-- Stress level -->
         ${_renderRadioGroup({
@@ -239,7 +376,11 @@ export function LifestyleView(router) {
           selections.activityLevel &&
           selections.stressLevel &&
           selections.sleepQuality &&
-          selections.exerciseHistory
+          selections.exerciseHistory &&
+          selections.chairRise &&
+          selections.floorAccess &&
+          selections.bothFeet &&
+          selections.balanceWorry
         );
         const continueBtn = container.querySelector('[data-action="continue"]');
         if (continueBtn) {
@@ -253,9 +394,24 @@ export function LifestyleView(router) {
         selections.activityLevel &&
         selections.stressLevel &&
         selections.sleepQuality &&
-        selections.exerciseHistory
+        selections.exerciseHistory &&
+        selections.chairRise &&
+        selections.floorAccess &&
+        selections.bothFeet &&
+        selections.balanceWorry
       );
       if (!canContinue) return;
+
+      // CAP-1 capability screen. askedAt is what capabilityProfile()
+      // reads to distinguish "answered" from "never asked" -- the latter
+      // falls back to cautious defaults everywhere.
+      store.set('capability', {
+        chairRise:    selections.chairRise,
+        floorAccess:  selections.floorAccess,
+        bothFeet:     selections.bothFeet,
+        balanceWorry: selections.balanceWorry,
+        askedAt:      new Date().toISOString(),
+      });
 
       // Write lifestyle fields
       store.set('lifestyle.activityLevel',   selections.activityLevel);
