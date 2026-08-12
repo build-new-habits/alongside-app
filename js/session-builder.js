@@ -1,6 +1,16 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 12 Aug 2026 v23
+ *
+ * v23 - EMP-2. session.rationale.adjusted now records whether the coach
+ *   VISIBLY adapted today. Empathy Transfer Stage 2 Prompt B is written
+ *   for exactly that moment and its condition was unevaluable, because
+ *   nothing anywhere recorded that an adjustment had happened. Written
+ *   onto the session rather than as a new store field: generatedSession
+ *   is already persisted, and this is a fact about one session, not a
+ *   standing property of the person. See the note at the write site.
+ *
  * 12 Aug 2026 v22
  *
  * v22 — C2/C3, third-pass persona trace.
@@ -1509,6 +1519,31 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   // views render it rather than recompute it, and so it is captured with
   // the session it describes.
   session.rationale = buildRationale(session, { excludedReason: pulseRaiser.reason });
+
+  // EMP-2. Did the coach VISIBLY adapt today? Recorded on the session
+  // itself rather than as a new top-level store field: generatedSession
+  // is already persisted, and this is a fact about one session, not a
+  // standing property of the person.
+  //
+  // Empathy Transfer Stage 2 Prompt B is written for exactly this moment
+  // -- "the coach adjusts based on what's actually going on for you, not
+  // what should be going on, not what was planned" -- and until now the
+  // condition could not be evaluated at all, because nothing recorded
+  // that an adjustment had happened.
+  //
+  // Two triggers, both meaning the person could SEE the adaptation:
+  //   1. Something was left out and explained (pulseRaiser.reason is the
+  //      coach saying so in its own words).
+  //   2. A condition was flagged at 4+ today, which constrains selection
+  //      and makes progressionInvitation() speak to the sore area by
+  //      name. 4 matches the threshold used there, not a new number.
+  //
+  // Deliberately NOT counting silent adaptation. A prompt about noticing
+  // someone else should only follow a moment the person actually
+  // witnessed, or it praises them for something invisible.
+  const _adjPain = store.get("conditionPainScores") || {};
+  const _adjFlagged = (store.get("conditions") || []).some(id => (_adjPain[id] || 0) >= 4);
+  session.rationale.adjusted = Boolean(pulseRaiser.reason) || _adjFlagged;
 
   // Store in store.js
   store.set("generatedSession", {
