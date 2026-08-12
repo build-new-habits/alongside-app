@@ -1,5 +1,26 @@
 /**
  * onboarding/lifestyle.js
+ * 12 Aug 2026 v4
+ *
+ * v4 - C1 second half. The conditional leg question, asked only of
+ *   somebody who has just said getting out of a chair is not easy or not
+ *   possible. Wording signed off by Graeme 12 Aug 2026. Optional by his
+ *   decision, which is safe ONLY because store.js v33 widened the
+ *   fail-safe to treat unanswered as 'limited' for exactly this group --
+ *   before that change, 'not-easily' plus a declined question fell
+ *   through to fully loaded leg work.
+ *
+ *   'skip' is a UI value only and is stored as null, so declining is
+ *   treated identically to not answering rather than becoming a fourth
+ *   capability state the profile does not understand.
+ *
+ *   Retracting the question clears the answer: somebody who says 'No'
+ *   then corrects chairRise to 'Yes' must not leave legPower: 'none'
+ *   behind on a question they can no longer see or change.
+ *
+ *   Also fixes a latent listener leak in attachEvents() that this change
+ *   would otherwise have made worse -- see the guard there.
+ *
  * 11 Aug 2026 v3
  *
  * CAP-2 RESOLVED 11 Aug 2026. This step was committed flagged "NOT
@@ -74,6 +95,7 @@ export function LifestyleView(router) {
   let selections = {
     activityLevel:    null,
     chairRise:        null,
+    legPower:         null,
     floorAccess:      null,
     bothFeet:         null,
     balanceWorry:     null,
@@ -90,6 +112,7 @@ export function LifestyleView(router) {
 
     const savedCap = store.get('capability') || {};
     selections.chairRise    = savedCap.chairRise    || null;
+    selections.legPower     = savedCap.legPower     || null;
     selections.floorAccess  = savedCap.floorAccess  || null;
     selections.bothFeet     = savedCap.bothFeet     || null;
     selections.balanceWorry = savedCap.balanceWorry || null;
@@ -102,6 +125,7 @@ export function LifestyleView(router) {
 
   function render(container) {
     const showReturningAfter = selections.exerciseHistory === 'returning';
+    const showLegPower = !!selections.chairRise && selections.chairRise !== 'yes';
     const canContinue = !!(
       selections.activityLevel &&
       selections.stressLevel &&
@@ -208,6 +232,28 @@ export function LifestyleView(router) {
           ],
           selected: selections.chairRise,
         })}
+
+        <!-- C1 second half. Asked only of somebody who has just said
+             getting out of a chair is not easy, or not possible. Optional
+             by Graeme's decision, which is only safe because store.js v33
+             treats unanswered as 'limited' for exactly this group. -->
+        <div id="leg-power-section"
+             aria-live="polite"
+             ${showLegPower ? '' : 'hidden'}>
+          ${showLegPower ? _renderRadioGroup({
+            id:       'leg-power',
+            heading:  'Some exercises ask your legs to carry your weight. Can yours?',
+            field:    'legPower',
+            optional: true,
+            options: [
+              { value: 'full',    label: 'Yes'                      },
+              { value: 'limited', label: 'A little, or on good days' },
+              { value: 'none',    label: 'No'                       },
+              { value: 'skip',    label: 'I\'d rather not say'      },
+            ],
+            selected: selections.legPower,
+          }) : ''}
+        </div>
 
         ${_renderRadioGroup({
           id:      'floor-access',
@@ -320,6 +366,17 @@ export function LifestyleView(router) {
 
   function attachEvents(container) {
     container.querySelectorAll('[data-field]').forEach(btn => {
+      // Idempotence guard, added 12 Aug 2026 with the C1 leg question.
+      // This function re-attaches to EVERY [data-field] chip, and it is
+      // called again from inside its own handler whenever a conditional
+      // section is revealed. Without a guard each reveal adds another
+      // listener to every chip already on screen, and since those
+      // listeners can themselves trigger a reveal the count compounds.
+      // Behaviour stayed correct only because the handler is idempotent.
+      // The C1 question adds a second reveal trigger (chairRise), which
+      // would have made a latent leak considerably less latent.
+      if (btn.dataset.wired === '1') return;
+      btn.dataset.wired = '1';
       btn.addEventListener('click', () => {
         const field = btn.dataset.field;
         const value = btn.dataset.value;
@@ -334,6 +391,41 @@ export function LifestyleView(router) {
         btn.setAttribute('aria-checked', 'true');
         btn.classList.add('lifestyle-chip--selected');
         selections[field] = value;
+
+        // C1. Reveal or retract the leg question when chairRise changes.
+        // Re-rendering the whole view would lose the person's scroll
+        // position mid-form, so this mirrors the returningAfter pattern.
+        //
+        // Retracting CLEARS the answer. Somebody who answers 'No' and then
+        // corrects chairRise to 'Yes' must not leave legPower: 'none'
+        // behind on a hidden question they can no longer see or change.
+        if (field === 'chairRise') {
+          const legSection = container.querySelector('#leg-power-section');
+          if (legSection) {
+            if (value !== 'yes') {
+              legSection.removeAttribute('hidden');
+              legSection.innerHTML = _renderRadioGroup({
+                id:       'leg-power',
+                heading:  'Some exercises ask your legs to carry your weight. Can yours?',
+                field:    'legPower',
+                optional: true,
+                options: [
+                  { value: 'full',    label: 'Yes'                      },
+                  { value: 'limited', label: 'A little, or on good days' },
+                  { value: 'none',    label: 'No'                       },
+                  { value: 'skip',    label: 'I\'d rather not say'      },
+                ],
+                selected: selections.legPower,
+              });
+              // Re-attach events for the new chips.
+              attachEvents(container);
+            } else {
+              legSection.setAttribute('hidden', '');
+              legSection.innerHTML = '';
+              selections.legPower = null;
+            }
+          }
+        }
 
         // Handle exerciseHistory → show/hide returningAfter
         if (field === 'exerciseHistory') {
@@ -400,6 +492,14 @@ export function LifestyleView(router) {
       // falls back to cautious defaults everywhere.
       store.set('capability', {
         chairRise:    selections.chairRise,
+        // C1. 'skip' is a UI answer, not a capability value. Writing it
+        // would make capabilityProfile()'s `c.legPower || default` treat
+        // the string "skip" as a real answer and skip the fail-safe
+        // entirely -- truthy, and matching none of full/limited/none, so
+        // legsLoadable would be false but legsUsable TRUE by accident.
+        // Stored as null so the widened default in store.js v33 does its
+        // job: declining is treated exactly like not answering.
+        legPower:     selections.legPower === 'skip' ? null : selections.legPower,
         floorAccess:  selections.floorAccess,
         bothFeet:     selections.bothFeet,
         balanceWorry: selections.balanceWorry,
