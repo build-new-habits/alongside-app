@@ -1,10 +1,30 @@
 # Alongside — Data Schema Reference
-## 12 Aug 2026 v1.26
+## 12 Aug 2026 v1.27
 
-**File:** `js/store.js` (confirmed live version: **v30, 12 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v32, 12 Aug 2026**)
 **Storage:** `localStorage` key `alongside_user`
 
-**This version supersedes:** v1.25 (12 Aug 2026).
+**This version supersedes:** v1.26 (12 Aug 2026).
+
+**v1.27 (12 Aug 2026)** — EMP-1. One new field, `empathyLastPrompt`. `store.js` v31 → **v32**.
+
+## `empathyLastPrompt` — **NEW, `store.js` v32, 12 Aug 2026**
+
+```
+empathyLastPrompt: { stage: number, index: number, runLength: number }
+```
+
+| Key | Meaning |
+|---|---|
+| `stage` | Stage the last-fired prompt belonged to. `0` = none yet |
+| `index` | Position within that stage's pool. `-1` = none yet, distinct from a real index of `0` |
+| `runLength` | How many times consecutively that same prompt has fired |
+
+**Why it exists.** Empathy prompts were selected by `pool[atStage % pool.length]` — pure rotation — so nothing needed to remember *which* prompt fired, only how many had. Condition-aware selection can legitimately land on the same prompt several sessions running, because the pools hold four or five prompts and somebody can genuinely struggle repeatedly. `runLength` caps that at two consecutive firings before the next-best fitting prompt is taken instead.
+
+**Written by:** `js/views/reflect.js` on fire. **Read by:** `js/data/empathy-transfer.js` during selection.
+
+**Validated as a whole object**, not field by field. A partial object is worse than none here: `runLength` would be counting a prompt that `stage`/`index` no longer identifies.
 
 **v1.26 (12 Aug 2026)** — DOC-2. The line below previously read *"No `store.js` change in this pass — `store.js` remains v21."* That was left over from the v1.20 text and was wrong from v1.21 onward: the header two lines above already said v30, so this document contradicted itself on its own front page. Corrected, and the supersedes line now points at the version it actually supersedes rather than at v1.20.
 
