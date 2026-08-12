@@ -1064,6 +1064,12 @@ rather than only a buried bypass door. Added both.
  *   Truth Rule's documented fallback. Cache-bump only otherwise; no
  *   other files changed this deploy.
  *
+ * 12 Aug 2026 v264 - C1-C4 third-pass fixes: session-builder.js v22,
+ *   store.js v30. legPower fail-safe default, contentType 'practice'
+ *   excluded from component selection, duration arithmetic corrected at
+ *   both call sites, sessions trimmed to requested duration. Cache bump
+ *   only, no new files.
+ *
  * 11 Aug 2026 v235 - PT-12: store.js v21, gym-programme.js v7,
  *   journal-entry.js v4, morning-session.js, intention.js. Reader-without-
  *   writer sweep - exerciseFeedback given a writer, journalEntryType given a
@@ -1113,7 +1119,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v263";
+const CACHE_NAME = "alongside-v264";
 
 const SHELL_URLS = [
 
