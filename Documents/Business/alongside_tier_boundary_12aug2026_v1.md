@@ -1,5 +1,5 @@
 # Alongside: Move — The Tier Boundary
-## 12 Aug 2026 v1
+## 12 Aug 2026 v2
 
 Build New Habits | Why someone pays, what they feel, and how they find out. Sits beside `alongside_experience_blueprint_22jun2026_v1.md`. That document is the map of the park; this one is the answer to *what is the ticket for*.
 
@@ -13,7 +13,23 @@ Produced from a working conversation, 12 Aug 2026. Several positions in it were 
 
 ---
 
-## 2. How we got here — three wrong answers, recorded
+## 2. Why people stay vs. why people pay — both load-bearing
+
+**These are two different jobs and conflating them was the central error in this conversation.**
+
+Three answers were proposed as *the reason someone converts* and rejected. **They are not rejected as concepts.** They are the reasons people stay, and staying is most of the business — retention and word of mouth are the only channel this product can afford. Recorded here so no future session deletes them as dead ends.
+
+| | Why people **stay** — keep and build these | Why they **pay** |
+|---|---|---|
+| **Deepening relationship** | The coach that has known you a while genuinely feels different. It is why month six beats month one | ✗ Cannot carry the tier: 97% are gone before day 30. A promise paying out in month twelve is one almost nobody lives to collect |
+| **Impact and the vote** | Real, distinctive, and worth feeling good about. Part of why someone tells a friend | ✗ Killed in one line: *"Why don't you just give them a pound? Then you've done a hundred percent."* At 5% of revenue it is a reason to feel good about paying, not a reason to pay |
+| **Transfer outward** | The empathy arc — caring for yourself becomes caring for others. Named in the Experience Blueprint as one of three things nobody else does | ✗ Not as *"this will help you carry the shopping"* — patronising, done badly by every competitor, and it assumes the app knows what a person's life demands |
+
+**The common fault in all three as conversion arguments:** they priced *feelings*. Feelings are why people stay and why they talk. **Capability is why they pay.**
+
+---
+
+## 2b. The rejected framings, specifically
 
 **Wrong answer 1: "Premium is the coach that has known you for a year."**
 Longitudinal depth as the paid tier. Killed by the market: **97% of users are gone before day 30.** A promise that pays out in month twelve is one almost nobody lives to collect, and it asks people to pay now for value that arrives later — the same deal every failing fitness app offers. Longitudinal depth is a *reward for staying*, never the reason to buy.
@@ -61,7 +77,7 @@ This is what makes the boundary honest and what makes it survive **Locked Princi
 - A real session, adapted to today: energy, pain, capability, equipment, training intent
 - Full body only. **The coach decides.** No session-type or duration selection
 - Every safety feature, permanently. Care mode. Condition-aware exclusion
-- The empathy transfer arc, and grounding moments at base frequency
+- The empathy transfer arc, grounding moments, **and In Step** — moved to free (12 Aug). In Step is a *practice*, not a journey; the paid act is naming where you are going, not access to content. This also resolves the awkward split where the empathy work straddled the paywall
 - **A record**: fourteen days of what you did
 - Lift notes and recall
 
@@ -209,4 +225,6 @@ Items 1–3 are free-tier work and make the product remarkable. Items 4–6 are 
 
 ---
 
-*Build New Habits · Alongside: Move · The Tier Boundary · 12 Aug 2026 v1*
+**v2, 12 Aug 2026** — §2 rewritten as stay vs. pay after Graeme's correction that the three rejected answers must not be filed as dead ends; In Step moved free; the drop-in coach question added to the free tier; wellbeing destinations confirmed as a paid act on the same rule as body. Companion specification: `alongside_destination_architecture_12aug2026_v1.md`.
+
+*Build New Habits · Alongside: Move · The Tier Boundary · 12 Aug 2026 v2*
