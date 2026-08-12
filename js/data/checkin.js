@@ -69,6 +69,40 @@ export function getSuggestedIntensity(checkin) {
   return 'high';
 }
 
+/**
+ * BIAS-1, 12 Aug 2026. Combine the intensity derived from energy with the
+ * bias the coach worked out from everything else.
+ *
+ * THE PROBLEM THIS FIXES. getSuggestedIntensity() above reads ONE number:
+ * check-in energy. coach-reflection.js separately works out a
+ * proposalBias from severe pain, burnout risk, several consecutive days
+ * of training, and returning after time away -- then wrote it to the
+ * store, where nothing read it. Since 03 Aug.
+ *
+ * So the coach could privately conclude that today should be lighter
+ * because somebody is in a burnout pattern, tell them so in the
+ * reflection, and then hand them exactly the session their energy score
+ * alone suggested. It knew, said it, and did not act on it -- which is
+ * the specific failure that makes a coach feel like it is not listening.
+ *
+ * A STEP DOWN, NOT A FLOOR. 'lighter' moves one notch, so somebody with
+ * high energy in a burnout pattern gets moderate rather than being
+ * dropped to low. Overriding a good day entirely because of a pattern
+ * would be the app deciding it knows better than the person in front of
+ * it, which is P7's line: confidence scales with information, authority
+ * never does.
+ *
+ * 'rest' goes to low rather than to nothing. The severe-pain path already
+ * routes to the Gentle Care card upstream of this; the job here is to
+ * make sure that anything still generated is the gentlest it can be.
+ */
+export function resolveIntensity(baseIntensity, bias) {
+  const base = ['low', 'moderate', 'high'].includes(baseIntensity) ? baseIntensity : 'moderate';
+  if (bias === 'rest')    return 'low';
+  if (bias === 'lighter') return base === 'high' ? 'moderate' : 'low';
+  return base;
+}
+
 // ─── Check-in history ─────────────────────────────────────────────────────────
 
 export function getTodaysCheckin() {
@@ -236,6 +270,7 @@ export const checkinData = {
   getHistory,
   saveCheckin,
   getSuggestedIntensity,
+  resolveIntensity,
   getEnergyEmoji,
   getEnergyLabel,
   getMoodEmoji,
