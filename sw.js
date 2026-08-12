@@ -1,6 +1,21 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v271
+ * EMP-2. Closes the two gaps EMP-1 raised, both of which turned out to be
+ * code rather than content -- EMP-1's "needs Graeme, not code" framing was
+ * wrong and is corrected in each file's own header.
+ * (1) "The coach made visible adjustments" is now evaluable:
+ * session-builder.js v22 -> v23 writes session.rationale.adjusted, and
+ * reflect.js v4 -> v5 reads it, date-guarded.
+ * (2) Stage 5's missing catch-all needed no new prompt. Every stage header
+ * in empathy-transfer.js already carried a session range and nothing read
+ * them; stage advance counted firings only, so stage 5 was entered around
+ * session 77 against a documented 85+ where every prompt gates at 85 or
+ * higher. STAGE_SESSION_FLOOR now enforces the file's own ranges.
+ * empathy-transfer.js v2 -> v3. Re-simulated over 160 sessions: stage 5
+ * entered at 89, zero fallbacks. Cache bump only.
+ *
  * 12 Aug 2026 v270
  * INF-CACHE: 25 of 98 JS modules and 15 CSS files were missing from
  * SHELL_URLS, found while adding data/empathy-transfer.js. All added, so
@@ -1216,7 +1231,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v270";
+const CACHE_NAME = "alongside-v271";
 
 const SHELL_URLS = [
 
