@@ -364,6 +364,90 @@ function _distinctPatterns(exercises) {
  * @returns {string|null} one invitational line, or null when the coach
  *          should say nothing at all
  */
+// ── CORE-1 / CAUTION-1, 12 Aug 2026 ───────────────────────────────────────
+//
+// Graeme's call on dead-bug and bird-dog: "allow both, but when conditions
+// flag we provide a listen to your body and don't push too hard message."
+//
+// Built the P7 way rather than the generic way. "Listen to your body" on
+// its own is exactly the hedge P7 warns against -- a coach that has been
+// told a specific area is sore, and knows this exercise loads it, and then
+// says something vague, is a coach pretending not to know. So the caution
+// NAMES the area and says why.
+//
+// This logic already existed inside progressionInvitation(), but that
+// function returns early when there is no previous lift logged -- so a
+// first-time exercise, which is exactly when somebody is least sure what
+// they are doing, got nothing at all. Lifted out so it can fire on its own.
+//
+// The contraindication filter still runs first and still removes anything
+// genuinely unsafe. This is the layer BELOW that: not dangerous, but worth
+// naming.
+
+// Condition ids and affectsAreas share most of their vocabulary. These are
+// the ones that do not line up by name.
+const AREA_ALIASES = {
+  "lower-back":        ["lower-back", "spine"],
+  "upper-back":        ["upper-back", "thoracic"],
+  "sciatica":          ["lower-back", "glutes", "hamstring", "piriformis"],
+  "it-band":           ["hip", "knee"],
+  "shin-splints":      ["calves", "ankle-foot"],
+  "achilles":          ["calves", "achilles", "ankle-foot"],
+  "plantar-fasciitis": ["ankle-foot", "calves"],
+  "biceps-triceps":    ["triceps-biceps"],
+  "wrist-elbow":       ["wrist-elbow"]
+};
+
+/** Which flagged-sore condition, if any, does this exercise load? */
+export function soreAreaLoaded(exercise) {
+  const conditions = store.get("conditions") || [];
+  const scores     = store.get("conditionPainScores") || {};
+  const sore       = conditions.filter(id => (scores[id] || 0) >= 4);
+  const areas      = exercise?.affectsAreas || [];
+  return sore.find(id => (AREA_ALIASES[id] || [id]).some(a => areas.includes(a))) || null;
+}
+
+/**
+ * A caution for an exercise that is allowed but loads something the person
+ * has flagged today. Returns null far more often than not -- nothing sore,
+ * or sore somewhere this exercise does not touch.
+ *
+ * Deliberately not a warning and not a barrier. P7: name what we know,
+ * leave the decision theirs.
+ */
+export function bodyCaution(exercise) {
+  // TWO LEVELS, matching P7's existing model rather than inventing a
+  // parallel one. Graeme's ask was "when conditions flag we provide a
+  // listen to your body message" -- broader than an area match, and the
+  // first version of this only did the area match.
+  //
+  // The distinction matters and is not pedantry. Dead Bug affects core
+  // and abdominals, NOT the lower back, so somebody with a sore back got
+  // nothing at all from a named-area check -- which is precisely the case
+  // he raised. But naming the lower back on an exercise that does not
+  // work it would be the coach claiming knowledge it does not have, and
+  // that erodes the times it does.
+  //
+  // So: name it when we know specifically, steer when we only know
+  // generally, say nothing when we know nothing.
+  const id = soreAreaLoaded(exercise);
+  if (id) {
+    return `Your ${_conditionLabel(id)} is sore today, and this one works it. ` +
+           `Go by how it feels rather than by how it went last time — easing off here is the useful thing to do, not a compromise.`;
+  }
+
+  // KNOWS GENERALLY. Something is sore, just not what this exercise works.
+  // No naming, because naming the wrong area would be worse than a steer.
+  const conditions = store.get("conditions") || [];
+  const scores     = store.get("conditionPainScores") || {};
+  if (conditions.some(c => (scores[c] || 0) >= 4)) {
+    return `You are carrying something sore today. This one does not work that area, ` +
+           `but go by how it feels as you move rather than pushing to a number.`;
+  }
+
+  return null;
+}
+
 export function progressionInvitation(exercise) {
   if (!exercise?.id) return null;
 
@@ -416,26 +500,14 @@ export function progressionInvitation(exercise) {
   const conditions = store.get("conditions") || [];
   const scores     = store.get("conditionPainScores") || {};
   const sore       = conditions.filter(id => (scores[id] || 0) >= 4);
-  const areas      = exercise.affectsAreas || [];
+  // `areas` removed with CORE-1 -- soreAreaLoaded() reads affectsAreas
+  // itself now, and a leftover unused local is how the next person
+  // concludes there are two matching rules here.
 
-  // Condition ids and affectsAreas share most of their vocabulary. These
-  // are the ones that do not line up by name.
-  const AREA_ALIASES = {
-    "lower-back":     ["lower-back", "spine"],
-    "upper-back":     ["upper-back", "thoracic"],
-    "sciatica":       ["lower-back", "glutes", "hamstring", "piriformis"],
-    "it-band":        ["hip", "knee"],
-    "shin-splints":   ["calves", "ankle-foot"],
-    "achilles":       ["calves", "achilles", "ankle-foot"],
-    "plantar-fasciitis": ["ankle-foot", "calves"],
-    "biceps-triceps": ["triceps-biceps"],
-    "wrist-elbow":    ["wrist-elbow"]
-  };
-
-  const loadsSoreArea = sore.find(id => {
-    const mapped = AREA_ALIASES[id] || [id];
-    return mapped.some(a => areas.includes(a));
-  });
+  // CORE-1: the alias table and this match now live at module scope as
+  // soreAreaLoaded(), so bodyCaution() and this function cannot drift
+  // apart on which conditions map to which areas.
+  const loadsSoreArea = soreAreaLoaded(exercise);
 
   if (loadsSoreArea) {
     const name = _conditionLabel(loadsSoreArea);
