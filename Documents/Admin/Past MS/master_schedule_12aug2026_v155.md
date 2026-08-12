@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v156
+## 12 Aug 2026 v155
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v155.md`. Remove v155 on upload.
+Supersedes `master_schedule_12aug2026_v154.md`. Remove v154 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -70,68 +70,6 @@ The same defect appeared **eight times in eight different costumes**: content th
 **Wave 2 candidate on evidence:** persona 2.5 (post-cardiac, total beginner). The blank-slate persona surfaced every critical first, so "least data given to the app" is the confirmed selection criterion.
 
 **Fixture note:** the Node harness and persona fixtures are reusable but were built pre-capability-screen. They need `capability{}` added before the next run.
-
-## 🟢 EMP-1 — Condition-aware empathy selection: SHIPPED, 12 Aug 2026
-
-**Tier-boundary build sequence item 2. Target WB 10 Aug 2026. Code complete, fresh-clone verified, on-device confirmation outstanding.**
-
-`js/data/empathy-transfer.js` v1 → **v2**. `js/views/reflect.js` v3 → **v4**. `js/store.js` v31 → **v32**. `Schema.md` v1.26 → **v1.27**. New `tools/verify-empathy.mjs` and `tools/precache-check.mjs`. `sw.js` → **v270**, cache **alongside-v270**.
-
-### What was actually wrong
-
-The schedule framed this as *"prompts, stages and conditions all exist; only the matcher is missing."* True, but it pointed at the wrong input.
-
-Selection was `pool[atStage % pool.length]` — rotation. **One screen earlier, `reflect.js` asks the person how the session felt (Felt strong / About right / Struggled), whether pain was worse than usual, and mood after on a 1–10.** `saveAndSummarise()` holds all three at the exact moment of selection and used none of them.
-
-Somebody could answer **"Struggled", "Worse than usual", "Struggling"** — and receive a prompt about strong energy, because it was next in the rotation.
-
-**Same fault as `sessionVariety` this morning: the app asks and does not listen.** It costs more here. A mistimed empathy prompt does not read as generic — it reads as the coach not having heard you, at the most exposed moment in the session. `reflect.js` is also the file three persona traces walked past.
-
-### Decisions
-
-| # | Decision |
-|---|---|
-| 1 | **Today's answers lead**, check-in energy second. What the person said beats what the app inferred |
-| 2 | **Fit wins, capped at two consecutive firings**, then next-best. Pools hold 4–5 prompts and somebody can genuinely struggle for a fortnight; a coach that repeats one sentence stops being heard, but one that varies itself with a poor fit is the rotation problem again |
-
-**All 21 prompt strings are byte-identical to v1**, verified by assertion during the restructure. The v1 rule holds: wording belongs to `alongside_empathy_transfer_prompts_19may2026_v1.docx`, not the code file. Only structure and metadata changed.
-
-**P4 applies and is honoured.** Selection is silent — nothing announces that the coach noticed. If it visibly softened on a hard day, its ordinary tone would become a verdict on every other day.
-
-**Cadence untouched.** Gap, skip-widening, minimum-sessions floor and stage thresholds are unchanged. This changes *which* prompt fires, never *whether* one does.
-
-### 🔴 The fault a fully passing test suite still missed
-
-**Worth reading in full, because it is the most useful thing in this section.**
-
-Every assertion passed. Then a **140-session simulation** showed only **2 of 4 prompts per stage ever firing** — stage 1 used indices [0] and [1] and never reached [2] or [3].
-
-Cause: a stable sort on score alone always returns the lowest index, so when nothing scores (most sessions — the catch-alls all score 0) the same prompt won every time and the repeat cap simply bounced between two indices forever. **That is worse than the rotation it replaced, which at least visited all four.**
-
-Fixed by rotating on `empathyPromptsAtStage` among near-equal scorers, with a tolerance of 1 so a strong fit still narrows the field. Coverage now **4 / 4 / 5 / 4 / 4**. A second, subtler case surfaced the same way (stage 3 firing 2 of 5) and drove the tolerance.
-
-**Standing lesson: assertions prove the rules you thought of. Simulating a real arc is what shows the behaviour.** Neither substitutes for the other. Test 6 in the harness now encodes it.
-
-### 🟠 Two content gaps in the source spec — need Graeme, not code
-
-1. **Stage 2 Prompt B is unmatchable.** Its trigger is *"after a session where the coach made visible adjustments (noted in the rationale card)"*. `session-rationale.js` writes nothing to store, so nothing records that an adjustment happened. It carries an explicit `note` and an empty `requires`, so it participates only as a fallback and **the gap is visible in the data rather than buried**. Fixing properly means persisting an adjustment flag — small, but a real change to a file shipped today.
-2. **Stage 5 has no catch-all.** Its four prompts gate at 85+, 90+, 95+ and 100+ sessions, but stage 5 is reached at roughly session 75. Someone can enter it with **no qualifying prompt for about ten sessions**, and the simulation shows index [0] firing four times running there because it is the only eligible one. Handled by falling back to the nearest threshold. **The real fix is one new stage 5 prompt with no session gate** — a content job, not a code one.
-
----
-
-## 🟢 INF-CACHE — 40 files missing from the precache: CLOSED, 12 Aug 2026
-
-Found while adding `empathy-transfer.js` to `SHELL_URLS`. **25 of 98 JS modules and 15 CSS files were absent.** Among them the entire onboarding flow, four exercise category files from the 12 Aug CON work, `session-rationale.js`, and `upgrade.js`.
-
-**Three dead entries also removed, and two are the more interesting half:** `swimming-cycling.js` and `sport-conditioning.js` were listed with **hyphens** where the real files use **underscores** (`swimming_cycling.js`, `sport_conditioning.js`). Those two exercise categories had never once been precached while appearing in the list to be. `views/about.js` outlived its file, deleted earlier the same day.
-
-`Promise.allSettled()` on install meant all three failed silently forever — which is precisely why nobody noticed.
-
-**Severity, stated accurately after reading the fetch handler rather than assuming.** An earlier draft of the `sw.js` note claimed a first-time user offline could not start. **That was an overclaim and was corrected before commit.** The handler is cache-first then network-and-cache, so an unlisted file caches on first online use. This was never *"offline is broken"*. The real exposure is **a route opened for the first time with no signal** — tapping Upgrade in a basement gym, or a session type never tried before. Precaching makes offline guaranteed rather than dependent on where somebody happened to have browsed.
-
-**New permanent gate: `tools/precache-check.mjs`** — walks the filesystem and compares against `SHELL_URLS` in **both** directions, because both directions failed silently. `SHELL_URLS` now covers 138 of 138 js/css files with no dead paths.
-
----
 
 ## 🟢 DISP-1 — Display preferences: SHIPPED, 12 Aug 2026
 
@@ -1216,4 +1154,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v156*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v155*
