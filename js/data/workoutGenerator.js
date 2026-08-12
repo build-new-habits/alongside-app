@@ -540,7 +540,10 @@ export const workoutGenerator = {
       store.get("todayIntensity") || "moderate",
       store.get("proposalBias")
     );
-    const burnout     = checkinData.detectBurnout();
+    // BURN-1. Was called with NO ARGUMENT, so it returned false every
+    // time for everybody -- and the seven burnout.level reads below were
+    // all comparing against undefined. The recovery path had never run.
+    const burnout     = checkinData.detectBurnout(store.get("checkinHistory") || {});
     const goalProfile = this.getGoalProfile();
 
     // ── Gap 3: Menstrual cycle phase ───────────────────────────────────────
