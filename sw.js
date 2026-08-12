@@ -1,6 +1,23 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v265
+ * DIC-1, the drop-in coach question. js/views/checkin.js v13 -> v14 (the
+ * question, its 21-day gate, and the sessionVariety write - sessionVariety
+ * was a reader without a writer, so selection has been running on a default
+ * nobody chose). css/components/checkin-conversation.css v7 -> v8 (new
+ * .ci-choice buttons; recessed rather than elevated surface, because the
+ * nearest existing pattern fails AA on its sub-line). No new files - cache
+ * bump only. No store schema change.
+ *
+ * HEADER GAP, recorded honestly rather than reconstructed: entries below
+ * stop at v253 while CACHE_NAME had reached v264. Eleven bumps during the
+ * long 12 Aug session (CON/CONT/CAP streams and the third-pass trace fixes)
+ * went in without header entries. Those changes are documented in the master
+ * schedule at v151; they are simply not itemised here, and inventing eleven
+ * entries after the fact would be worse than saying so. The counter is
+ * correct again from v265 forward.
+ *
  * 11 Aug 2026 v253
  * Three routes pointed at view files that never existed. 'about' removed
  * (Settings already had a panel), community-impact and annual-reflection
@@ -1119,7 +1136,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v264";
+const CACHE_NAME = "alongside-v265";
 
 const SHELL_URLS = [
 
