@@ -1,6 +1,24 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v278
+ * DOOR-1, and a stale-code correction that matters more than the feature.
+ *
+ * IN STEP WAS GATED BEHIND isPremium() AND SHOULD NOT HAVE BEEN. It was
+ * Personal tier in the 9 Aug build; the 12 Aug tier decision made it free
+ * (Destination Architecture sections 9 and 18) and the code never
+ * followed. So the single best demonstration of what this product is for
+ * was invisible to exactly the people it was written for. Ungated.
+ *
+ * DOOR-1: the offer from Destination Architecture section 9 now exists,
+ * verbatim, at the end of an In Step scenario -- "the best door in the
+ * product, because someone who has just finished a scenario has FELT the
+ * shape of the thing." Helper layer, visibly distinct from the coach
+ * (P1/P2), shown to free users only.
+ *
+ * noticing.js, in-step.js, new css/components/upgrade-door.css,
+ * main.css v18 -> v19.
+ *
  * 12 Aug 2026 v277
  * GM-1 completion. Grounding moments wired into yoga-session.js v3 -> v4.
  * Yoga is the natural home for these: it is already the frame, and a pose
@@ -1310,7 +1328,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v277";
+const CACHE_NAME = "alongside-v278";
 
 const SHELL_URLS = [
 
@@ -1345,6 +1363,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/display-preferences.css",
   "/alongside-app/css/components/session-log.css",
   "/alongside-app/css/components/grounding-moments.css",
+  "/alongside-app/css/components/upgrade-door.css",
 
   // CSS completeness, same pass. main.css @imports these, and an @import
   // from a cached stylesheet is still its own network request.
