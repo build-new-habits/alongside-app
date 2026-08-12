@@ -1,6 +1,27 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v282
+ * DISP-3 and LOG-4, plus a stop on DATA-1.
+ *
+ * DISP-3: 19 declarations were below the app's OWN stated minimum.
+ * variables.css says "minimum xs 13px for readability on health app" and
+ * these ran at 9px, 10px, 11px and 0.6rem -- feel-scale labels, badges,
+ * day names, durations. All readable content, none decorative. Raised to
+ * var(--text-xs) and gated, so the app's own standard is now enforced
+ * rather than merely stated.
+ *
+ * LOG-4: walk, run, cycle and swim capture distance (lengths for swim)
+ * plus a note, on their completion screens. Duration deliberately
+ * omitted -- all four run a live clock and write durationMins already,
+ * and asking somebody to type a number the app knows is what makes an
+ * app feel like paperwork. A stable synthetic id per activity means
+ * "last time you walked" is a real comparable note.
+ *
+ * DATA-1 NOT DONE, and must not be: see the schedule. contentType is
+ * read in two live places, so retiring it would make 140 standalone
+ * practices selectable as session components.
+ *
  * 12 Aug 2026 v281
  * DISP-2. 110 hardcoded font-sizes across 20 stylesheets now respond to
  * the text-size control. Each wrapped as calc(X * var(--user-text-scale,
@@ -1406,7 +1427,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v281";
+const CACHE_NAME = "alongside-v282";
 
 const SHELL_URLS = [
 
