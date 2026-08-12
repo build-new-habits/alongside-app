@@ -1812,42 +1812,31 @@
 }
 
 /* ============================================
-   LIGHT MODE THEME
-   Applied when <html class="light-mode">
-   Default: dark. User toggle in Settings.
+   LIGHT MODE THEME - REMOVED 12 Aug 2026 (A11Y-2)
+
+   The html.light-mode block that stood here has been moved to
+   Documents/Archive/alongside_light_mode_removed_css_12aug2026_v1.md,
+   which records the full CSS and the reasoning.
+
+   Short version. It was unreachable: nothing in any JS file or
+   index.html has ever added the light-mode class, and no Settings
+   toggle exists despite the block's comment claiming one. And it would
+   not have worked if it had been reachable: six surface and text
+   tokens were never overridden, including --color-bg-elevated and
+   --color-bg-hover (both #3E4C63, dark slate), so light-mode text on
+   the 56 rules using an elevated background measured 1.19-2.06:1.
+
+   Fixing the six tokens was rejected deliberately - that produces a
+   REACHABLE broken light mode instead of an unreachable one, and
+   overriding six tokens does not restyle 25 component stylesheets.
+
+   Light mode itself remains genuinely wanted, and the archive note says
+   why: dark-only causes halation for people with astigmatism, and this
+   product is built for an audience where display mode is a functional
+   matter rather than a taste one. It is a scoped feature for the beta
+   conversation, not a cleanup patch. The archive note lists the five
+   things a real implementation needs.
    ============================================ */
-
-html.light-mode {
-  --color-bg:          #f8fafc;
-  --color-bg-card:     #ffffff;
-  --color-bg-surface:  #f1f5f9;
-  --color-border:      #e2e8f0;
-  --color-text:        #0f172a;
-  --color-text-secondary: #334155;
-  --color-text-muted:  #64748b;
-  /* Primary teal stays consistent */
-  --color-primary:         #0d9488;
-  --color-primary-glow:    rgba(13, 148, 136, 0.08);
-}
-
-html.light-mode .card {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-}
-
-html.light-mode .app-nav,
-html.light-mode .bottom-nav {
-  background: rgba(255,255,255,0.95);
-  border-top-color: #e2e8f0;
-}
-
-html.light-mode .checkin-slider {
-  background: #e2e8f0;
-}
-
-html.light-mode .settings-field-input {
-  background: #f8fafc;
-  color: #0f172a;
-}
 
 /* ============================================
    QUIET SESSION MODE SELECTOR — PROPER CARDS
