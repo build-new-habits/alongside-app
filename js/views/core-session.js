@@ -127,6 +127,7 @@
  */
 
 import { store } from "../store.js";
+import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { EXERCISES, filterByConditions } from "../data/exercises/index.js";
 import { getActiveConditionIds } from "../data/conditions.js";
@@ -646,6 +647,11 @@ function renderExercise() {
           Watch how to do this
         </a>
 
+        <!-- LOG-3. Card-shaped view, so the shared block applies. Full
+             field set: core work is loaded and repped like any other
+             strength exercise, unlike yoga's gentle mode. -->
+        ${renderLogBlock(ex, `cs-log-${currentIndex}`)}
+
       </div>
 
       <div class="workout-actions">
@@ -865,6 +871,13 @@ function finaliseSession() {
     status:         "completed",
     durationMins:   elapsedMins(),
     exercisesCount: currentIndex,
+    // CONT-3, 12 Aug 2026. This view logged a COUNT and never the ids, so
+    // store.logActivity() had nothing to forward to recordExercises() and
+    // exerciseHistory never learned a single core exercise. Consequence:
+    // continuity-aware selection could not build familiarity from core
+    // work, and the drop-in coach question's 21-day window never saw it.
+    // Sliced to currentIndex because that is how many were actually done.
+    exerciseIds:    sessionQueue.slice(0, currentIndex).map(e => e.id).filter(Boolean),
     creditsEarned
   });
 
@@ -989,6 +1002,11 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // LOG-3. Re-wired per render; attachLogEvents() guards double-binding.
+  if (phase === "session" && sessionQueue[currentIndex]) {
+    attachLogEvents(sessionQueue[currentIndex], `cs-log-${currentIndex}`);
+  }
+
   mountSessionGuard({
     isActive: () => phase === "session" || phase === "rest",
     label:    "core session",

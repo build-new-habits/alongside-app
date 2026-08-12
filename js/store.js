@@ -1,5 +1,11 @@
 /**
  * store.js - Data persistence layer
+ * 12 Aug 2026 v35
+ *
+ * v35 - PT-5. logSession() removed. Zero callers; progressLog itself is
+ *   live and untouched. Its durationMinutes/durationMins split is where
+ *   PT-3's under-reported minutes began.
+ *
  * 12 Aug 2026 v34
  *
  * v34 - GM-1. New field `grounding` for grounding moments:
@@ -1505,24 +1511,18 @@ export const store = {
     return log[log.length - 1];
   },
 
-  logSession(sessionData) {
-    const log = [...(this.data.progressLog || [])];
-    log.push({
-      date:              new Date().toISOString(),
-      week:              this.data.activeProgramme?.currentWeek  || 0,
-      phase:             this.data.activeProgramme?.currentPhase || null,
-      focus:             sessionData.focus             || null,
-      energyAtCheckin:   sessionData.energy            || null,
-      conditionScores:   sessionData.conditionScores   || {},
-      durationMinutes:   sessionData.durationMinutes   || 0,
-      exerciseCount:     sessionData.exerciseCount      || 0,
-      milestoneAchieved: sessionData.milestoneAchieved || null
-    });
-    if (log.length > 90) log.splice(0, log.length - 90);
-    this.data.progressLog = log;
-    this.data.updatedAt = new Date().toISOString();
-    this.save();
-  },
+  // logSession() REMOVED 12 Aug 2026 (PT-5). Zero callers, confirmed by
+  // exhaustive search: quiet-session.js has a local function of the same
+  // name that writes elsewhere, which is what made this look alive.
+  //
+  // progressLog itself stays -- it is written by programmeEngine.js and
+  // read by gym-programme.js. Only this writer was dead.
+  //
+  // Worth recording: it wrote `durationMinutes` while logActivity()
+  // writes `durationMins`. That divergence is where PT-3's
+  // under-reported minutes began, and removing the source stops it being
+  // copied again by somebody reading store.js for a pattern to follow.
+
 
   /**
    * logActivity(entry) — the single shared write path for activityLog.
