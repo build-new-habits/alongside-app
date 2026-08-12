@@ -283,7 +283,14 @@ function _arc(exercises, intent, goals) {
   } else if (intent === "recover") {
     lines.push("Each session asks for slightly more than the last, at a pace your body sets rather than the calendar.");
   } else if (goals.includes("get-stronger") || goals.includes("build-muscle")) {
-    lines.push("The weight or the reps will go up over the coming weeks. That is the point of meeting the same lifts again.");
+    // Reworded 11 Aug 2026. The original said the weight "will go up
+    // over the coming weeks", which is a promise the coach cannot keep
+    // and, worse, a schedule the person is measured against. Graeme:
+    // the coach invites, and never moves somebody on before they are
+    // ready or in spite of where they are. The arc now describes what
+    // meeting the same lifts makes POSSIBLE, and leaves when to a
+    // per-session invitation that reads the day.
+    lines.push("Meeting the same lifts again is what makes it possible to add a little when the day suits it. I will ask, never tell.");
   }
 
   return lines.length ? lines.join(" ") : null;
@@ -300,4 +307,89 @@ function _distinctPatterns(exercises) {
   return Object.entries(counts)
     .sort((a, b) => b[1] - a[1])
     .map(([p]) => p);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// PROGRESSION INVITATION
+//
+// Graeme: "when we get there the coach invites the user to increase
+// something at a rate they think is right... 'today I want you to try going
+// a little further, but nothing extreme'... it's invitational not directed.
+// The coach never says 'right, 10kg more today'. This avoids the issue of
+// moving on before the user is ready, or in spite of where the user is at."
+//
+// Three rules follow from that, and all three are load-bearing.
+//
+// NEVER A NUMBER. The coach does not know what the person has in them
+// today, and a prescribed increment is a target to fail. "A little more"
+// is answerable honestly by somebody having a good day and somebody
+// having a bad one, and both answers are correct.
+//
+// ALWAYS CONDITIONAL. "If it feels right", "if you can". The out is built
+// into the sentence, so declining it is not a failure -- it is one of the
+// two answers the question invited.
+//
+// IT READS THE DAY. Graeme again: "It might be more fitting to drop
+// weights to protect an injury while in rehab phase, or a mild flare up.
+// It might be that to maintain the weight is an achievement given the mood
+// and energy." So a flare invites LESS, a low-energy day invites the same,
+// and only a settled day on an improve intent invites more.
+//
+// It also stays quiet. No invitation appears until the person has actually
+// met the exercise and left themselves a note, because there is nothing to
+// go up from and inventing a starting point is the directive behaviour this
+// exists to avoid.
+// ─────────────────────────────────────────────────────────────────────────
+
+/**
+ * @param {Object} exercise
+ * @returns {string|null} one invitational line, or null when the coach
+ *          should say nothing at all
+ */
+export function progressionInvitation(exercise) {
+  if (!exercise?.id) return null;
+
+  const stats = store.exerciseStats(exercise.id);
+  const last  = store.lastLift ? store.lastLift(exercise.id) : null;
+
+  // Nothing to build on yet. Say so plainly rather than inventing a
+  // starting point -- the note is the thing that makes next time useful.
+  if (!last) {
+    return stats.n >= 1
+      ? "Worth noting what you use today. It gives us something to go on next time."
+      : null;
+  }
+
+  const intent    = store.get("trainingIntent") || "improve";
+  const intensity = store.get("todayIntensity") || null;
+
+  // Pain first. It outranks everything, including a good mood and a
+  // stated intent to improve.
+  const conditions = store.get("conditions") || [];
+  const scores     = store.get("conditionPainScores") || {};
+  const flaring    = conditions.some(id => (scores[id] || 0) >= 4);
+
+  if (flaring) {
+    return "Go a little lighter than last time today. Protecting it while it settles is the work, not a step backwards.";
+  }
+
+  if (intent === "recover") {
+    return "Match last time if it feels comfortable, and go lighter if it does not. Rebuilding is not a race, and the pace is yours.";
+  }
+
+  if (intensity === "low") {
+    return "Matching last time would be a good session today. On a day like this, holding steady is the achievement.";
+  }
+
+  if (intent === "maintain") {
+    return "Same as last time is exactly right. Keeping hold of this is the whole point.";
+  }
+
+  // Settled day, improve intent, and the exercise is familiar enough that
+  // adding a little is a reasonable thing to offer.
+  if (stats.n >= 3) {
+    return "If it feels right today, try a little more than last time. Nothing dramatic -- just enough to notice.";
+  }
+
+  return "Match last time, and see how it sits. There is no hurry to add anything yet.";
 }
