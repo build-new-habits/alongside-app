@@ -98,7 +98,7 @@ export const EQUIPMENT_IMPLIES = {
   "bench-flat":       ["bench"],
   "bench-adjustable": ["bench"],
   "plyo-box":         ["bench"],
-  "step-platform":    ["bench"],
+  "step-platform":    ["bench", "step-platform"],
   "ab-wheel":         ["ab-wheel"],
   "plyo-box":         ["plyo-box", "bench"],
   "bosu-ball":        ["bosu-ball", "balance-board"],

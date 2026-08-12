@@ -1904,7 +1904,7 @@ export const SPORT_CONDITIONING = [
     equipment: [],
     equipmentOptional: ['exercise-bike', 'rowing-machine'],
     affectsAreas: ['full-body'],
-    contraindications: ['heart-condition'],
+    contraindications: ['cardiovascular-condition'],
     energyRequired: 9,
     difficultyLevel: 3,
     duration: 2400,
