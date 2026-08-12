@@ -1,6 +1,26 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v287
+ * BIAS-1. proposalBias is finally read. coach-reflection.js has computed
+ * it since 03 Aug -- 'rest' or 'lighter', from severe pain, burnout risk,
+ * consecutive training days and returning after time away -- written it
+ * to the store, and nothing consumed it. Nine days.
+ *
+ * The consequence was not a crash. The coach could privately conclude
+ * that today should be lighter because somebody is in a burnout pattern,
+ * SAY SO in the reflection, and then hand them exactly the session their
+ * energy score alone suggested. It knew, said it, and did not act on it.
+ *
+ * data/checkin.js gains resolveIntensity(), combining todayIntensity
+ * (from energy alone) with the bias. 'lighter' steps ONE notch, so a good
+ * day in a burnout pattern becomes moderate rather than being overridden
+ * to low -- P7, authority never scales. workoutGenerator.js reads the
+ * resolved value. store.js v35 -> v36 declares and validates the field,
+ * which had never been in the file at all. Schema.md v1.29 -> v1.30.
+ *
+ * New tools/verify-bias1.mjs, failing 8 assertions on the pre-fix code.
+ *
  * 12 Aug 2026 v286
  * PT-6 / PT-3. Four views wrote straight into activityLog, bypassing
  * store.logActivity() and losing all three of its guards: the 10-second
@@ -1545,7 +1565,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v286";
+const CACHE_NAME = "alongside-v287";
 
 const SHELL_URLS = [
 
