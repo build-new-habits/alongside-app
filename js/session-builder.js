@@ -1,6 +1,16 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v14
+ *
+ * v14 - CAP-1. Selection now reads store.capabilityProfile(), which
+ *   measures what a person CAN do rather than how often they move.
+ *   Three gates: impact (both feet leaving the ground), floor access,
+ *   and balance confidence -- the last being its own axis, because
+ *   Warrior III is low impact and moderate difficulty and completely
+ *   wrong for someone worried about falling. The screen can only lower
+ *   a ceiling, never raise one.
+ *
  * 11 Aug 2026 v13
  *
  * v13 - Persona trace round 2. Four changes,
@@ -564,10 +574,17 @@ const DIFFICULTY_CEILINGS = {
 };
 
 function _difficultyCeiling() {
+  // CAP-1: the capability screen can only ever LOWER the ceiling. It
+  // protects, it does not promote -- somebody answering well does not
+  // get handed harder work than their declared activity supports.
+  const capProfile = store.capabilityProfile();
   const declared = store.get("fitnessLevel")
                 || store.get("lifestyle.activityLevel")
                 || "moderate";
-  return DIFFICULTY_CEILINGS[declared] ?? DIFFICULTY_CEILINGS["moderate"];
+  const base = DIFFICULTY_CEILINGS[declared] ?? DIFFICULTY_CEILINGS["moderate"];
+  return capProfile.ceilingCap !== null
+    ? Math.min(base, capProfile.ceilingCap)
+    : base;
 }
 
 function _filterCandidates(categories, section, equipSet, conditionSet) {
@@ -658,7 +675,7 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   // not get jumping, bounding, sprinting or landing work -- not because
   // of their age, but because impact loading is the one thing that should
   // be earned rather than defaulted into.
-  const IMPACT_PATTERNS = /jump|hop|bound|skater|tuck|depth|plyo|sprint|explosive|burpee|deceleration|reactive change/i;
+  const IMPACT_PATTERNS = /jump|hop|bound|skater|tuck|depth|plyo|sprint|explosive|burpee|deceleration|reactive change|high knees|butt kicks|carioca|skip|jog|run(?!ning shoes)|agility|ladder|shuttle|box drill|dot drill|beep test|yoyo|rsa|repeated sprint/i;
   const LOW_IMPACT_ONLY = new Set(["sedentary", "light", "returning"]);
   // Unknown counts as gated, matching the same safe-default reasoning
   // applied to untagged difficulty: someone who has told us nothing has
@@ -668,7 +685,44 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   const declaredLevel = store.get("fitnessLevel")
                      || store.get("lifestyle.activityLevel")
                      || null;
-  const impactGated = declaredLevel === null || LOW_IMPACT_ONLY.has(declaredLevel);
+
+  // CAP-1. The capability screen measures what a person CAN do; the
+  // activity level measures how often they move. They answer different
+  // questions and the first one wins where they disagree, because
+  // frequency is a poor proxy for capacity -- somebody can garden daily
+  // and still not get off the floor unaided.
+  const cap = store.capabilityProfile();
+  const impactGated =
+    (cap.asked && !cap.impactSafe) ||
+    (!cap.asked && (declaredLevel === null || LOW_IMPACT_ONLY.has(declaredLevel)));
+
+  // Floor access. Without it every supine, prone and kneeling movement
+  // is not merely hard but unusable, and being handed them repeatedly is
+  // how somebody decides the app is not for them.
+  // KNOWN LIMITATION, recorded rather than hidden. These three gates
+  // match on names because the database carries no impact, floor or
+  // balance tag, and movementPattern cannot stand in for them: Depth
+  // Jump is tagged "squat", and "locomotion" covers both a treadmill
+  // walk and carioca.
+  //
+  // Name matching therefore MISSES things. Traced live: a 76-year-old
+  // who cannot jump was still served High Knees, and one who cannot get
+  // to the floor was still served a Hollow Body Hold. The patterns below
+  // are widened as far as names reliably allow, but the real fix is
+  // three boolean tags on all 497 entries -- the same lesson as the 30
+  // untagged difficulties, where a derived fallback bought time and the
+  // data was what actually solved it. Logged as CAP-2.
+  const FLOOR_PATTERNS = /supine|prone|kneel|floor|lying|dead ?bug|bird ?dog|bridge|plank|cat-?cow|child|savasana|roll|hollow|donkey|clamshell|crunch|sit-?up|superman|hip thrust|pigeon|cobra|quadruped|side-?lying|seated forward/i;
+  const isFloor = ex => FLOOR_PATTERNS.test(ex.name + " " + (ex.id || ""));
+
+  // Balance is its own axis. Warrior III is low impact and moderate
+  // difficulty and completely wrong for someone worried about falling,
+  // so no difficulty band can express this.
+  const BALANCE_PATTERNS = /single-leg|one leg|tree pose|warrior 3|warrior iii|half moon|balance|bosu|wobble|airplane|stork/i;
+  const isBalance = ex =>
+    ex.movementPattern === "balance" ||
+    ex.movementPattern === "proprioception" ||
+    BALANCE_PATTERNS.test(ex.name + " " + (ex.id || ""));
   const isImpact = ex =>
     ex.movementPattern === "jump" || IMPACT_PATTERNS.test(ex.id + " " + ex.name);
 
@@ -683,6 +737,8 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
 
   return matched.filter(ex => {
     if (impactGated && isImpact(ex)) return false;
+    if (cap.asked && !cap.floorSafe   && isFloor(ex))   return false;
+    if (cap.asked && !cap.balanceSafe && isBalance(ex)) return false;
     if (section === "main" && !withinCeiling(ex)) return false;
     if (section === "warmup" && useCeilingOnWarmup && !withinCeiling(ex)) return false;
     // Equipment check: exercise needs no equipment, or user has it.

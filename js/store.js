@@ -1,5 +1,17 @@
 /**
  * store.js - Data persistence layer
+ * 11 Aug 2026 v25
+ *
+ * 11 Aug 2026 v25 - CAP-1. New capability{} field and
+ *   capabilityProfile(), answering "if we are not age restricting, how
+ *   do we ensure the appropriate level for that user?". Four questions
+ *   measuring capacity rather than frequency. See getDefaults().
+ *
+ * 11 Aug 2026 v24 - Empty-session guard in logActivity(). Opening a
+ *   session and exiting without completing anything wrote an activity
+ *   entry. Guarded at the single write path rather than across the ten
+ *   views that share the savePartialSession() pattern.
+ *
  * 11 Aug 2026 v23
  *
  * 11 Aug 2026 v23 - CONT-2. New field sessionVariety, closing the
@@ -516,6 +528,10 @@ export const store = {
         ? saved.sessionVariety
         : 'balanced',
 
+      capability: (saved.capability && typeof saved.capability === 'object')
+        ? { ...defaults.capability, ...saved.capability }
+        : { ...defaults.capability },
+
       exercisePreferences: (saved.exercisePreferences && typeof saved.exercisePreferences === 'object')
         ? saved.exercisePreferences
         : {},
@@ -751,6 +767,45 @@ export const store = {
       // someone wants variety because they skipped a session would be
       // exactly the kind of silent judgement this product refuses.
       sessionVariety: 'balanced',
+
+      // ── CAPABILITY SCREEN (11 Aug 2026) ───────────────────────────
+      //
+      // Graeme: "If we are not age restricting (agreed), how do we
+      // ensure the appropriate level of exercise for that user? What my
+      // dad can do at 76 is I would say standard. A 76 year old doing
+      // what a 36 year old can do is very uncommon."
+      //
+      // He is right about the statistics and right that we cannot use
+      // age. The resolution is that the instrument was wrong, not the
+      // policy: "how active are you?" measures FREQUENCY, not CAPACITY.
+      // Someone can garden every day and still not get off the floor
+      // unaided, and answer "moderate" honestly -- which under the
+      // raised ceilings meant jump squats.
+      //
+      // These four questions are what a good coach establishes in the
+      // first five minutes. Every one is answerable honestly by a
+      // 76-year-old AND by a deconditioned 36-year-old, and together
+      // they separate the fit 76-year-old from the frail one, which age
+      // never can. They also ask what a person CAN do rather than
+      // inferring from what they are -- dignity as a design principle,
+      // not a workaround for it.
+      //
+      //   chairRise   - stand from a chair without using hands
+      //   floorAccess - get to the floor and back up unaided
+      //   bothFeet    - currently does anything where both feet leave
+      //                 the ground
+      //   balanceWorry- worries about losing balance
+      //
+      // null means not yet asked, and is treated as the cautious answer
+      // everywhere, consistent with how untagged difficulty and unknown
+      // activity level are handled.
+      capability: {
+        chairRise:    null,   // true | false | null
+        floorAccess:  null,
+        bothFeet:     null,
+        balanceWorry: null,
+        askedAt:      null
+      },
 
       exercisePreferences: {}, // { [exerciseId]: { preference: 'avoid'|'less', setAt, source } } — per alongside_exercise_skip_dislike_spec_16may2026_v1.docx. Binary signal, not a rating (spec §6: "not a rating system... no stars, no thumbs, no scores"). First consumer: js/data/conditionProgrammes.js's candidate selection, 04 Aug 2026 — the full spec's in-session Skip flow (gym-programme.js/prescribed-session.js/core-session.js) remains separate future work.
 
@@ -1295,6 +1350,31 @@ export const store = {
       ...entry
     };
 
+    // EMPTY-SESSION GUARD (11 Aug 2026). Graeme: "I opened a session and
+    // without completing one session at all I exited. It saved it."
+    //
+    // Ten views carry the same savePartialSession() pattern and all of
+    // them logged unconditionally, so opening a session and backing
+    // straight out wrote a record of something that never happened.
+    //
+    // That is worse than untidy now that exerciseHistory exists: a
+    // phantom entry would make exercises look familiar and skew
+    // continuity-aware selection toward movements the person never
+    // performed. It also quietly misrepresents someone's own record back
+    // to them, which is the opposite of what an honest activity log is
+    // for.
+    //
+    // Guarded here rather than in each view, so no future session type
+    // can reintroduce it. Only genuinely empty partials are dropped:
+    // three minutes of a walk is a real partial and is kept.
+    const isEmptyPartial =
+      finalEntry.status === 'partial' &&
+      !(finalEntry.exercisesCount > 0) &&
+      !(finalEntry.durationMins   >= 1) &&
+      !(finalEntry.distanceKm     > 0);
+
+    if (isEmptyPartial) return null;
+
     this.data.activityLog = [...log, finalEntry];
     this.data.updatedAt = new Date().toISOString();
     this.save();
@@ -1355,6 +1435,46 @@ export const store = {
     this.data.exerciseHistory = history;
     this.data.updatedAt = now;
     this.save();
+  },
+
+  /**
+   * Capability profile derived from the four screen answers.
+   *
+   * Returns the three gates selection needs. Each defaults to the
+   * cautious answer when unasked, matching how untagged difficulty and
+   * unknown activity level are treated: an unknown is assumed to need
+   * protecting, never assumed to be fine.
+   *
+   * @returns {{ impactSafe:boolean, floorSafe:boolean, balanceSafe:boolean, ceilingCap:number|null, asked:boolean }}
+   */
+  capabilityProfile() {
+    const c = this.data.capability || {};
+    const asked = c.askedAt !== null && c.askedAt !== undefined;
+
+    // Impact needs an affirmative yes. Someone who does not currently do
+    // anything with both feet off the ground should not be handed
+    // plyometrics by default, whatever their age.
+    const impactSafe = c.bothFeet === true;
+
+    // Floor work needs floor access. Without it, half the database --
+    // every supine, prone and kneeling movement -- is not merely hard
+    // but unusable, and being handed it repeatedly is how somebody
+    // decides the app is not for them.
+    const floorSafe = c.floorAccess !== false;
+
+    // Balance is its own axis, not a difficulty band. Warrior III is low
+    // impact and moderate difficulty and completely wrong for someone
+    // worried about falling.
+    const balanceSafe = c.balanceWorry !== true;
+
+    // Difficulty cap where the answers indicate genuine deconditioning.
+    // Never raises a ceiling, only lowers one: the screen protects, it
+    // does not promote.
+    let ceilingCap = null;
+    if (c.chairRise === false) ceilingCap = 2;
+    else if (c.floorAccess === false) ceilingCap = 3;
+
+    return { impactSafe, floorSafe, balanceSafe, ceilingCap, asked };
   },
 
   /**
