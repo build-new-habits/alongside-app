@@ -1,5 +1,11 @@
 /**
  * yoga-session.js - Guided Yoga and Pilates Session
+ * 12 Aug 2026 v3
+ *
+ * v3 - LOG-2. Session notes on the pose card, in "gentle" mode: duration
+ *   and a free note only, no reps and no level. Graeme, 12 Aug. A pose is
+ *   not a set, and "wobbled on tree pose, right side stiff" is genuinely
+ *   useful next week in a way a number is not.
  *
  * 11 Aug 2026 v8
  *
@@ -124,6 +130,7 @@
 
 import { store } from "../store.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
+import { renderLogBlock, attachLogEvents } from "../session-log.js";
 
 export const centered = false;
 
@@ -584,6 +591,12 @@ function renderPose() {
           <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
           Watch how to do this
         </a>
+
+        <!-- LOG-2. Note and duration only ("gentle" mode). A pose is not a
+             set: reps and levels would import the frame this practice
+             exists outside of. What is worth writing down is how long you
+             held it and what you noticed. -->
+        ${renderLogBlock(pose, `ys-log-${currentIndex}`, "gentle")}
       </div>
 
       <div class="workout-actions">
@@ -919,6 +932,11 @@ export function onMount() {
     label:    "yoga session",
     onExit:   () => { savePartialSession(); resetSession(); router.navigate("reflect"); }
   });
+  // LOG-2. Re-wired per render; attachLogEvents() guards double-binding.
+  if (phase === "session" && sessionQueue[currentIndex]) {
+    attachLogEvents(sessionQueue[currentIndex], `ys-log-${currentIndex}`);
+  }
+
   document.getElementById("ys-back-btn")?.addEventListener("click", () => {
     if (phase === "focus")    { resetSession(); router.navigate("intention"); }
     else if (phase === "duration") { phase = "focus";    rerender(); }
