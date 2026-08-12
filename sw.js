@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v240
+ * CAP-1/CAP-2 - capability screen in onboarding, and all 497 exercises tagged
+ * with position, impact and balanceDemand so the gates read data rather than
+ * matching on exercise names.
+ *
  * 11 Aug 2026 v239
  * CAP-3 - training intent (improve/maintain/recover) tilts selection, and all
  * six loaded carries are now reachable (nothing selected them before).
@@ -1043,7 +1048,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v249";
+const CACHE_NAME = "alongside-v250";
 
 const SHELL_URLS = [
 
