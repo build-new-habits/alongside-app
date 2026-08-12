@@ -9,11 +9,10 @@
  * entries now carry position, impact and balanceDemand tags and the
  * gates read those instead.
  *
- * CAP-4 REMAINS OPEN. The seated pool is 49 entries (29 seated plus 20
- * position-agnostic practices). A wheelchair user gets a short, real,
- * correctly-filtered session rather than a wrong one -- but four
- * exercises is not a programme. Seated and supported content is the
- * outstanding job.
+ * CAP-4 RESOLVED 11 Aug 2026. seated.js adds 21 entries and the pool
+ * is now 66. A wheelchair user answering honestly receives an
+ * eight-exercise session with cardio, strength, core and mobility --
+ * a programme, not a remainder.
  *
  * v3 - CAP-1 capability screen. Four questions measuring CAPACITY,
  *   where the questions above measure FREQUENCY. Somebody can garden
