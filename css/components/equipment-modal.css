@@ -39,7 +39,7 @@
 }
 
 .category-card-icon {
-  font-size: 1.75rem;
+  font-size: calc(1.75rem * var(--user-text-scale, 1));
   width: 48px;
   height: 48px;
   display: flex;
@@ -95,7 +95,7 @@
 }
 
 .category-card-chevron {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
   color: var(--color-text-muted);
   margin-left: var(--space-2);
 }
@@ -178,7 +178,7 @@
   border: none;
   border-radius: var(--radius-full);
   color: var(--color-text-secondary);
-  font-size: 1.25rem;
+  font-size: calc(1.25rem * var(--user-text-scale, 1));
   cursor: pointer;
   transition: all var(--transition-fast);
 }

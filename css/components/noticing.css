@@ -65,7 +65,7 @@
 }
 
 .noticing-card-icon {
-  font-size: 1.75rem;
+  font-size: calc(1.75rem * var(--user-text-scale, 1));
   flex-shrink: 0;
   line-height: 1.2;
 }
@@ -91,7 +91,7 @@
 
 .noticing-card-arrow {
   color: var(--color-primary);
-  font-size: 1.25rem;
+  font-size: calc(1.25rem * var(--user-text-scale, 1));
   flex-shrink: 0;
 }
 

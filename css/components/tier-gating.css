@@ -45,7 +45,7 @@
 }
 
 .locked-badge-icon {
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--user-text-scale, 1));
 }
 
 @media (prefers-reduced-motion: reduce) {
