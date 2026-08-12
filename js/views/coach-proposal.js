@@ -954,7 +954,14 @@ export function CoachProposalView(router) {
     const conditions   = store.get('conditions') || [];
     const goals        = store.get('goals') || [];
     const availTime    = _getAvailableTime();
-    const burnout      = detectBurnout(store.get('checkinHistory') || {});
+    // BURN-1, 12 Aug 2026. detectBurnout() now returns
+    // { level, avgEnergy } rather than a boolean -- workoutGenerator.js
+    // had seven reads of burnout.level against a boolean, so the whole
+    // recovery path was unreachable. _buildIntro() below tested this
+    // truthily, which an object always satisfies, so it is passed the
+    // grade instead.
+    const burnoutState = detectBurnout(store.get('checkinHistory') || {});
+    const burnout      = burnoutState.level !== 'none';
     const phaseBias    = getPhaseBias();
     const primaryGoal  = getPrimaryEngineGoal(goals);
     const feelingWord  = store.get('lastCheckin.feelingWord');
