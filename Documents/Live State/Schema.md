@@ -183,7 +183,13 @@ Two fields were added to that standard on 11 Aug 2026:
 
 Baseline at time of writing, from `Documents/Admin/Templates/validate-exercise-entries.mjs`: 461 entries, 0 carrying `watchOut`, 49 loaded exercises missing `load`/`sets`/`reps`. CON-9 backfills, equipment-requiring exercises first.
 
-**Open finding, logged not fixed:** `contentType` is written on 368 of 461 exercise entries and read nowhere in the codebase. `category` is what the engines select on. Same writer-without-reader pattern already recorded here for `proposalBias`. Retire or wire up — separate decision.
+**⚠️ CORRECTED 12 Aug 2026 — this finding was WRONG when acted on.** It previously read: *"`contentType` is written on 368 of 461 exercise entries and read nowhere in the codebase… Retire or wire up."*
+
+`contentType` **is** read, in two live places:
+- `session-builder.js:973` — `if (ex.contentType === "practice") return false;` excludes **140 standalone practices** from component selection
+- `session-categories.js:96` — drives the `activation` category
+
+Retiring it would make 20-minute rows and 30-minute yin sequences selectable as one of five warm-up items. The finding was true when written and invalidated by **CON-6**, which moved practices into the shared database — after which `session-builder.js` had to start reading `contentType` to keep them out. Nobody updated it. **Closed as will-not-do.**
 
 ---
 
@@ -193,7 +199,7 @@ Baseline at time of writing, from `Documents/Admin/Templates/validate-exercise-e
 
 **Carried forward from v1.15:** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — real exercise reuse across conditions, not duplication. One entry can now genuinely serve more than one condition. Backward compatible — old singular-shaped entries still read correctly via the new `getEntryConditionIds()` helper, no migration step required. `js/data/conditionProgrammes.js` v2→v3 (not a schema file, but the reason this changed).
 
-**Carried forward from v1.10, still relevant:** `proposalBias` is written in `coach-reflection.js` (12 sites) but read nowhere else in the codebase, including by `coach-reflection.js` itself. The reflection logic computes a `"lighter"`/`"rest"`/`null` bias per reflection type (severe pain, burnout risk, consecutive days, returning after absence) clearly intending to influence the next generated proposal — but nothing downstream ever consumes it. Same "specified but never wired up" pattern already on record for `exerciseFeedback` and Empathy Transfer's early stages. Still open, not fixed here — out of this session's scope.
+**✅ RESOLVED 12 Aug 2026 (BIAS-1) — see v1.30 at the top of this document.** `workoutGenerator.js` now reads it via `resolveIntensity()`. The finding as originally written, retained for the trail: `proposalBias` is written in `coach-reflection.js` (12 sites) but read nowhere else in the codebase, including by `coach-reflection.js` itself. The reflection logic computes a `"lighter"`/`"rest"`/`null` bias per reflection type (severe pain, burnout risk, consecutive days, returning after absence) clearly intending to influence the next generated proposal — but nothing downstream ever consumes it. Same "specified but never wired up" pattern already on record for `exerciseFeedback` and Empathy Transfer's early stages. Still open, not fixed here — out of this session's scope.
 
 **Resolved since v1.10:** `userTier` (previously flagged here as read-but-never-written, locking paying users out of session-builder options) was fixed 03 Aug — `session-builder-ui.js` v2 now reads `tier`, the genuine live field. No longer an open item.
 

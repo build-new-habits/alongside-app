@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v173
+## 12 Aug 2026 v172
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v172.md`. Remove v172 on upload.
+Supersedes `master_schedule_12aug2026_v171.md`. Remove v171 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -354,53 +354,6 @@ Graeme's plank model included that mindful practice produces more muscle definit
 `verify-decisions.mjs`'s P5 check matched on `equipment` **plus** `movementPattern` — which is what a *strength* entry looks like. Yoga poses carry `holdSeconds` and `rest`, so **30 inline pose entries walked straight through the check written that morning to catch exactly this.**
 
 Now matches on `id` + `name`, the weakest signal every selectable thing in the product shares. **Each remaining budget is documented with its justification, because a budget without a reason is a hole.**
-
----
-
-## 🟢 BIAS-1 — the coach's own conclusion finally reaches the session. 12 Aug 2026.
-
-`js/store.js` v35 → **v36**. `js/data/checkin.js` gains `resolveIntensity()`. `js/data/workoutGenerator.js` reads it. `Schema.md` v1.29 → **v1.30**. New `tools/verify-bias1.mjs`. `sw.js` → **v287**, cache **alongside-v287**.
-
-### What was wrong, for nine days
-
-`coach-reflection.js` has computed a `proposalBias` since **03 Aug** — `'rest'` or `'lighter'`, from **severe pain, burnout risk, consecutive training days, and returning after time away** — written it to the store, and **nothing read it.**
-
-**The consequence was not a crash.** The coach could privately conclude that today should be lighter because somebody is in a burnout pattern, **say so in the reflection**, and then hand them exactly the session their energy score alone suggested.
-
-**It knew, it said it, and it did not act on it** — which is the specific failure that makes a coach feel like it is not listening.
-
-### How it is wired
-
-`todayIntensity` comes from check-in **energy alone**. `proposalBias` carries what energy cannot see. `resolveIntensity(base, bias)` combines them rather than one silently overwriting the other:
-
-| Bias | Effect |
-|---|---|
-| `null` | unchanged |
-| `'lighter'` | **one step down** — high→moderate, moderate→low |
-| `'rest'` | low |
-
-**A step, not a floor.** Somebody with high energy in a burnout pattern gets **moderate**, not low. Overriding a good day entirely because of a pattern would be the app deciding it knows better than the person in front of it — **P7: confidence scales with information, authority never does.**
-
-### It was never declared in `store.js`
-
-It existed only because `store.set()` creates arbitrary paths. It survived reloads — verified, not assumed — but was **invisible to anyone reading `store.js` for the field list.** That is how a field carrying severe-pain and burnout signals went nine days without a reader. Now declared and validated: an invalid value resolves to `null` rather than persisting.
-
-**Fifth recorded instance of the PT-12 reader-without-writer family**, and the first where the missing half was the *reader*.
-
----
-
-## 📚 DOCS RECONCILED — 12 Aug 2026
-
-Graeme: *"update the master schedule and any other docs… I don't hear you talking about updating or reading the master schedule any more. Perhaps that's where mistakes came from."*
-
-**`Documents/Live State/Schema.md` reconciled as well as this document.** Two stale findings corrected **in place**:
-
-- **`contentType`** — *"read nowhere in the codebase… retire or wire up."* **Wrong when acted on.** Read in two live places; retiring it would break session selection. Marked corrected, closed as will-not-do.
-- **`proposalBias`** — *"read nowhere else in the codebase."* True from 03 Aug until today. Marked resolved, pointing at v1.30.
-
-`tools/schedule-drift.mjs` now reports **two** open "dead" claims, down from six, and both are verified true: `exerciseFeedback` still has no writer, and `contentType`'s entry is the one already marked corrected.
-
-**Corrections go in place, not appended.** Appending is what produced documents that contradict themselves on their own front page — the same fault as `Schema.md` v1.25 claiming store v30 in the header and v21 four lines down.
 
 ---
 
@@ -1949,7 +1902,7 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 | Product — Progress reflections (mood-delta, rest-reminder observations) | 🟡 **Partially built, confirmed 31 Jul.** `progress.js` v2 already generates real pattern observations — consistency, energy trend, activity-type, programme context (`_buildObservation()`, confirmed live). **Not yet built:** the two specific examples Graeme described — a same-session mood-entered-vs-finished delta observation, and an explicit "you've worked hard X times this week, you may need rest" overtraining-aware message. Both are natural extensions of the existing pattern, not a new system. | Small-to-medium build session, extending `_buildObservation()`'s existing pattern. | Not booked. |
 | Product — Journal export (PDF) + Supabase sync | 🟡 **Fully spec'd, confirmed 31 Jul, not built.** `alongside_journal_export_template_spec.md` is a complete, detailed PDF export design (Premium tier). Noticing Hub spec's own implementation checklist has "Plan localStorage-to-Supabase sync logic" and "Settings > Wellbeing > Storage Location (local vs Supabase)" both still unchecked. Genuinely depends on the Supabase migration (see Supabase schema design blueprint) being live first — not a standalone gap. | Sequenced after Supabase auth/migration is live, not before. | Blocked on Supabase migration, not urgent until then. |
 | Product — `session-builder-ui.js` reads non-existent `userTier` field, locks Personal-tier options for paying users | 🟢 **Found and fixed, 03 Aug.** `isPremium()` now reads `store.get("tier")` instead of the never-written `"userTier"`. `session-builder-ui.js` v1→v2, `sw.js` v187→v188, pushed and confirmed live via raw GitHub fetch. Changelog updated. | **On-device confirmation** — switch to Personal tier via Settings' dev tier-switcher, confirm session-builder options unlock. No device available this session. | Booked as soon as Graeme can test on-device. |
-| 🟢 Product — **RESOLVED 12 Aug (BIAS-1).** `workoutGenerator.js` now reads it via `resolveIntensity()`. Original finding: `proposalBias` written by `coach-reflection.js`, never read anywhere | 🟠 **New, 03 Aug**, found during BUILD-4 Appendix A follow-up. Reflection logic computes `lighter`/`rest`/`null` bias per reflection type (severe pain, burnout risk, consecutive days, returning after absence) but nothing downstream consumes it — same "specified but never wired up" pattern as `exerciseFeedback`. | Needs a decision: wire it into `coach-proposal.js`'s generation logic (the apparent original intent), or retire the write. Not scoped. | Not booked, no urgency — but a real "coach doesn't actually respond to reflection signals" gap worth being aware of. |
+| Product — `proposalBias` written by `coach-reflection.js`, never read anywhere | 🟠 **New, 03 Aug**, found during BUILD-4 Appendix A follow-up. Reflection logic computes `lighter`/`rest`/`null` bias per reflection type (severe pain, burnout risk, consecutive days, returning after absence) but nothing downstream consumes it — same "specified but never wired up" pattern as `exerciseFeedback`. | Needs a decision: wire it into `coach-proposal.js`'s generation logic (the apparent original intent), or retire the write. Not scoped. | Not booked, no urgency — but a real "coach doesn't actually respond to reflection signals" gap worth being aware of. |
 | Cleanup — `gymProgrammeWeek` dormant, no writer | 🟡 **New, 03 Aug**, found during BUILD-4 Appendix A follow-up. Read once in `reflect.js` as a cosmetic rotation seed, always defaults to `1` — real programme-week tracking is `activeProgramme.currentWeek`. | Sign-off only — safe removal candidate. | None, deliberately deferred. |
 | Cleanup — `todayEnergy` dead, no writer | 🟡 **New, 03 Aug.** Naming remnant in `intention.js`, superseded by `lastCheckin.energy`. | Sign-off only — safe removal candidate. | None, deliberately deferred. |
 | Cleanup — `community.credits` write-only, no reader | 🟡 **New, 03 Aug**, found incidentally while confirming `totalCredits` has no overlap with it (confirmed distinct — Impact Credits mechanism). Awarded via `awardCommunityCredit()` but nothing displays it anywhere. | Needs a decision: build a display (Impact page/Settings) or leave as backend-only for now. | Not booked, no urgency. |
@@ -1997,4 +1950,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v173*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v172*
