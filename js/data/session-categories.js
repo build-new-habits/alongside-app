@@ -125,10 +125,30 @@ export const CATEGORY_MATCHERS = {
   // A warm-up breath is short and preparatory. A twenty-minute breath
   // awareness meditation is a practice in its own right and belongs in a
   // Quiet session, not at the top of a mobility routine.
+  // Narrowed on 11 Aug to stop meditation qualifying as a mobility
+  // warm-up, then found by the integrity audit to match only ONE entry
+  // -- which is its own failure, since a category with one candidate
+  // serves the same exercise every session. Widened to allow any short
+  // breath practice regardless of stated duration, while still
+  // excluding the long-form meditation and body-scan work.
+  // Two narrowings and one widening, all on 11 Aug, and worth recording
+  // because the middle step was itself a defect.
+  //
+  // Originally this matched every breath and breath-awareness practice,
+  // so a 76-year-old's Mobility session opened with five of them.
+  // Narrowing to the "breath" pattern alone fixed that and created a
+  // worse problem: only ONE entry in the whole database uses "breath",
+  // so the category served the same exercise every single session.
+  // Found by the integrity audit, not by a person, which is the point
+  // of having one.
+  //
+  // Now: short breath practices of either pattern, with the duration cap
+  // doing the real work of separating a warm-up breath from a
+  // sit-down-and-settle practice.
   "breathing-warmup": ex =>
-    pattern(ex, "breath") &&
-    (ex.duration || 0) <= 300 &&
-    !/meditation|noting|awareness|scan/i.test(ex.name),
+    pattern(ex, "breath", "breath-awareness") &&
+    (ex.duration || 0) > 0 && (ex.duration || 0) <= 300 &&
+    !/meditation|body scan|noting practice|visualis|open awareness/i.test(ex.name),
 
   "cat-cow": ex =>
     pattern(ex, "spinal-flexion-extension"),

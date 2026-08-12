@@ -100,21 +100,45 @@ export const EQUIPMENT_IMPLIES = {
   "plyo-box":         ["bench"],
   "step-platform":    ["bench", "step-platform"],
   "ab-wheel":         ["ab-wheel"],
+  "pull-up-bar":      ["pull-up-bar"],
+  "pull-up-assist":   ["pull-up-bar"],
+  "dip-station":      ["dip-station"],
+  "parallettes":      ["dip-station"],
+  "gymnastic-rings":  ["gymnastic-rings", "trx"],
+  "stability-ball":   ["stability-ball"],
+  "sit-up-frame":     ["bench"],   // a decline sit-up frame IS a bench for our purposes
+  "ankle-weights":    ["ankle-weights"],
+  "weighted-vest":    ["weighted-vest"],
   "plyo-box":         ["plyo-box", "bench"],
   "bosu-ball":        ["bosu-ball", "balance-board"],
   "balance-board":    ["balance-board"],
   "wobble-cushion":   ["balance-board"],
+  // Aliases added 11 Aug 2026. All three are unstable surfaces asking the
+  // same thing of the ankle; writing separate content for each would be
+  // three ways of saying "stand on something that moves".
+  "balance-pad":      ["balance-board"],
+  "indo-board":       ["balance-board"],
+  "slackline":        ["balance-board"],
 
   // ── Recovery ───────────────────────────────────────────────────────────
   "foam-roller":     ["foam-roller"],
   "lacrosse-ball":   ["massage-ball"],
   "peanut-ball":     ["massage-ball"],
-  "massage-gun":     ["massage-ball"],
+  "massage-gun":         ["massage-ball"],
+  "percussion-massager": ["massage-ball"],
+  "yoga-wheel":          ["foam-roller"],
+  "stretching-strap":    ["stretching-strap"],
+  "yoga-blocks":         ["yoga-blocks"],
 
   // ── Functional ─────────────────────────────────────────────────────────
-  "trx":          ["trx"],
-  "battle-ropes": ["battle-ropes"],
-  "sled":         ["sled"],
+  "trx":            ["trx"],
+  "battle-ropes":   ["battle-ropes"],
+  "sled":           ["sled"],
+  "punching-bag":   ["punching-bag"],
+  "speed-bag":      ["punching-bag"],
+  "boxing-gloves":  ["punching-bag"],
+  "sandbag":        ["sandbag"],
+  "landmine":       ["landmine", "barbell"],
 
   // ── Facility ───────────────────────────────────────────────────────────
   // A gym membership implies the fixed kit a commercial gym reliably has.
@@ -147,6 +171,12 @@ export const EQUIPMENT_IMPLIES = {
     "plyo-box"
   ],
   "swimming-pool":  ["swimming-pool", "kickboard", "pull-buoy"],
+  "sauna-steam":    ["sauna"],
+  // climbing-wall is deliberately NOT mapped. It is a sport rather than
+  // a piece of equipment, and writing climbing content would be a
+  // different product. Recorded in UNSATISFIABLE_TAGS so the audit does
+  // not report it as a regression every run.
+
   "outdoor-track":  ["agility-cones"],
   "fitness-studio": ["yoga-mat", "foam-roller", "resistance-band"]
 };
@@ -165,6 +195,7 @@ export const EQUIPMENT_IMPLIES = {
  * Logged for CON-4, not fixed here (touch-once).
  */
 export const UNSATISFIABLE_TAGS = [
+  "climbing-wall",
   "agility-ladder",
   "reaction-ball",
   "nordic-walking-poles"

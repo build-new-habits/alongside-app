@@ -1582,3 +1582,322 @@ GYM.push(
     ],
     load: 'Bodyweight. A light weight held at the chest once the pattern is smooth.', credits: 45 }
 );
+
+// ══════════════════════════════════════════════════════════════════════
+// EQUIPMENT COVERAGE (11 Aug 2026)
+//
+// The integrity audit found 24 equipment ids that a person could tick
+// and that unlocked nothing at all. Ticking a pull-up bar changed
+// precisely nothing about what the app offered.
+//
+// Several were resolved by mapping -- a balance pad, an indo board and a
+// slackline all ask the ankle the same question, and writing three
+// versions of "stand on something that moves" would be padding. These
+// are the ones that genuinely needed their own content.
+// ══════════════════════════════════════════════════════════════════════
+
+GYM.push(
+  { id: 'pull-up', name: 'Pull-Up',
+    youtube: 'pull up technique progression beginners',
+    category: 'strength', movementPattern: 'pull',
+    position: 'standing', impact: false, balanceDemand: false,
+    equipment: ['pull-up-bar'], equipmentOptional: ['resistance-band'],
+    affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps', 'abdominals'],
+    contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
+    energyRequired: 7, difficultyLevel: 6, duration: 240,
+    perSide: false, sets: 3, reps: '5', rest: '90s', tempo: '2-1-3',
+    instructions: [
+      'Take an overhand grip on the bar, hands a little wider than your shoulders',
+      'Hang with your arms straight and your shoulders pulled down away from your ears',
+      'Brace your stomach and squeeze your backside so your body stops swinging',
+      'Pull until your chin clears the bar, leading with your elbows down towards your ribs',
+      'Lower all the way to straight arms over three counts'
+    ],
+    coaching: 'Start by pulling your shoulder blades down before your arms bend at all. Almost everybody who struggles with pull-ups is skipping that first inch.',
+    why: 'The clearest measure of upper-body strength relative to your own weight, and the one that transfers to almost everything you do with your arms.',
+    watchOut: [
+      'Swinging or kicking to generate momentum',
+      'Stopping short of straight arms at the bottom, which quietly removes the hardest part',
+      'Shrugging up towards the ears instead of pulling the blades down',
+      'Any sharp shoulder pain: come down and use a band or the lat pulldown instead'
+    ],
+    load: 'Bodyweight. Loop a band under your feet to take some of it off, and use a lighter band as you get stronger.', credits: 60 },
+
+  { id: 'hanging-knee-raise', name: 'Hanging Knee Raise',
+    youtube: 'hanging knee raise core technique',
+    category: 'strength', movementPattern: 'anti-extension',
+    position: 'standing', impact: false, balanceDemand: false,
+    equipment: ['pull-up-bar'], equipmentOptional: [],
+    affectsAreas: ['abdominals', 'core', 'hip-flexor', 'shoulder'],
+    contraindications: ['shoulder-acute', 'lower-back-acute'],
+    energyRequired: 6, difficultyLevel: 4, duration: 180,
+    perSide: false, sets: 3, reps: '10', rest: '60s', tempo: '2-1-3',
+    instructions: [
+      'Hang from the bar with straight arms and your shoulders pulled down',
+      'Let your legs settle so you are not swinging',
+      'Draw both knees up towards your chest, curling your hips slightly under at the top',
+      'Pause for a moment',
+      'Lower slowly over three counts until your legs hang straight again'
+    ],
+    coaching: 'Curl the hips slightly under at the top rather than just lifting the knees. That is the difference between working your stomach and working your hip flexors.',
+    why: 'Trains the front of the trunk while your whole body hangs, which also builds grip and shoulder stability at the same time.',
+    watchOut: [
+      'Swinging between reps rather than starting still',
+      'Only lifting the knees without the hips curling, which makes it a hip flexor exercise',
+      'Dropping the legs quickly at the end'
+    ],
+    load: 'Bodyweight. Progress by lowering more slowly before you consider straightening the legs.', credits: 50 },
+
+  { id: 'dips-parallel-bars', name: 'Parallel Bar Dip',
+    youtube: 'parallel bar dip technique progression',
+    category: 'strength', movementPattern: 'push',
+    position: 'standing', impact: false, balanceDemand: false,
+    equipment: ['dip-station'], equipmentOptional: ['resistance-band'],
+    affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
+    contraindications: ['shoulder-acute', 'chest-pecs-acute', 'wrist-elbow-acute'],
+    energyRequired: 7, difficultyLevel: 6, duration: 240,
+    perSide: false, sets: 3, reps: '6', rest: '90s', tempo: '3-1-2',
+    instructions: [
+      'Grip the bars and press up until your arms are straight, shoulders down',
+      'Lean your chest forward very slightly and bend your knees behind you',
+      'Lower yourself over three counts until your upper arms are roughly parallel to the floor',
+      'Stop there rather than going as deep as you can',
+      'Press back up without locking the elbows hard at the top'
+    ],
+    coaching: 'Depth is where dips go wrong. Upper arms parallel to the floor is plenty — going deeper puts the shoulder in a position it has no strength in.',
+    why: 'One of the strongest upper-body pushing exercises there is, and it builds the chest, shoulders and triceps together.',
+    watchOut: [
+      'Going too deep, which is the most common cause of shoulder trouble from dips',
+      'Shoulders rolling up towards the ears at the bottom',
+      'Dropping fast rather than lowering under control',
+      'Any pinching at the front of the shoulder: stop and use press-ups instead'
+    ],
+    load: 'Bodyweight. A band across the bars takes weight off; add weight only when six slow reps are comfortable.', credits: 60 },
+
+  { id: 'stability-ball-hamstring-curl', name: 'Stability Ball Hamstring Curl',
+    youtube: 'stability ball hamstring curl technique',
+    category: 'strength', movementPattern: 'hinge',
+    position: 'floor', impact: false, balanceDemand: false,
+    equipment: ['stability-ball'], equipmentOptional: [],
+    affectsAreas: ['hamstring', 'glutes', 'core'],
+    contraindications: ['hamstring-acute', 'lower-back-acute'],
+    energyRequired: 5, difficultyLevel: 4, duration: 180,
+    perSide: false, sets: 3, reps: '10', rest: '60s', tempo: '2-1-3',
+    instructions: [
+      'Lie on your back with both heels on top of the ball, arms out to the sides for stability',
+      'Lift your hips so your body makes a straight line from shoulders to heels',
+      'Keeping the hips up, bend your knees and draw the ball in towards your backside',
+      'Pause, then straighten your legs slowly over three counts',
+      'Lower the hips only at the very end of the set'
+    ],
+    coaching: 'The hips staying up is the whole exercise. The moment they drop, the hamstrings have handed the job to the floor.',
+    why: 'One of very few ways to work the hamstrings by bending the knee rather than hinging the hip, and it trains the glutes to hold position while they do it.',
+    watchOut: [
+      'Hips sagging as the ball comes in',
+      'Cramping in the hamstring: point the toes towards your shins and slow down',
+      'Ball rolling sideways, which usually means the arms are not helping enough'
+    ],
+    load: 'Bodyweight. Progress to one leg at a time long before adding anything.', credits: 50 },
+
+  { id: 'stability-ball-deadbug', name: 'Stability Ball Dead Bug',
+    youtube: 'stability ball dead bug core technique',
+    category: 'strength', movementPattern: 'anti-extension',
+    position: 'floor', impact: false, balanceDemand: false,
+    equipment: ['stability-ball'], equipmentOptional: [],
+    affectsAreas: ['abdominals', 'core'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 4, difficultyLevel: 3, duration: 180,
+    perSide: true, sets: 3, reps: '8 each side', rest: '45s', tempo: '3-1-3',
+    instructions: [
+      'Lie on your back and hold the ball up between your hands and knees',
+      'Press your hands into the ball and your knees into the ball at the same time',
+      'Keeping that pressure, lower your opposite arm and leg slowly towards the floor',
+      'Go only as far as your lower back stays flat on the mat',
+      'Return and repeat on the other side'
+    ],
+    coaching: 'Keep pressing into the ball throughout. That pressure is what switches the deep stomach muscles on and makes the whole thing work.',
+    why: 'Trains the middle to stay still while the arms and legs move, which is what it does all day and almost never gets asked to do deliberately.',
+    watchOut: [
+      'Lower back lifting off the floor — reduce the range until it stays down',
+      'Losing the pressure into the ball as you reach',
+      'Rushing, which lets momentum do the work'
+    ],
+    load: 'Bodyweight. Progress by reaching further while the back stays flat.', credits: 40 },
+
+  { id: 'heavy-bag-rounds', name: 'Heavy Bag Rounds',
+    youtube: 'heavy bag boxing rounds technique beginner',
+    category: 'cardio', movementPattern: 'push',
+    position: 'standing', impact: false, balanceDemand: false,
+    equipment: ['punching-bag'], equipmentOptional: [],
+    affectsAreas: ['full-body', 'shoulder', 'abdominals', 'calves'],
+    contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
+    energyRequired: 7, difficultyLevel: 4, duration: 600,
+    perSide: false, sets: 4, reps: '2 minutes', rest: '60s',
+    instructions: [
+      'Wrap your hands and put gloves on before you touch the bag',
+      'Stand a comfortable arm-length away, hands up by your chin',
+      'Work for two minutes: jabs, crosses, and hooks, moving around the bag rather than standing square',
+      'Rest a minute between rounds',
+      'Four rounds, and keep the hands up even when you are tired'
+    ],
+    coaching: 'Turn your hips into each punch. Power comes from the ground up, and punching with the arm alone is both weaker and much harder on the shoulder.',
+    why: 'Hard cardio that does not feel like cardio, and it works the whole body at once. It is also genuinely good for a bad mood, which is a legitimate reason to do it.',
+    watchOut: [
+      'Hitting the bag without wraps or gloves — wrists get hurt this way, easily',
+      'Locking the elbow at full extension',
+      'Standing flat and square rather than moving',
+      'Hands dropping as you tire, which is when the shoulders start taking strain'
+    ],
+    load: 'Effort only. Aim for a pace you can hold for all four rounds.', credits: 70 },
+
+  { id: 'sandbag-clean-press', name: 'Sandbag Clean and Press',
+    youtube: 'sandbag clean and press technique',
+    category: 'strength', movementPattern: 'hinge',
+    position: 'standing', impact: false, balanceDemand: false,
+    equipment: ['sandbag'], equipmentOptional: [],
+    affectsAreas: ['full-body', 'glutes', 'hamstring', 'shoulder', 'upper-back'],
+    contraindications: ['lower-back-acute', 'shoulder-acute'],
+    energyRequired: 8, difficultyLevel: 5, duration: 240,
+    perSide: false, sets: 4, reps: '6', rest: '90s', tempo: '2-0-2',
+    instructions: [
+      'Stand over the bag with your feet hip-width apart',
+      'Hinge at the hips with a flat back and take a firm grip of the bag',
+      'Drive up through your legs and pull it to your chest in one movement',
+      'Press it overhead, then bring it back to your chest',
+      'Lower it to the floor under control rather than dropping it'
+    ],
+    coaching: 'A sandbag shifts as you lift it, and that is the point — it asks your whole body to stabilise something awkward, which is what real life mostly involves.',
+    why: 'The closest thing in a gym to lifting something genuinely unwieldy. It builds strength that shows up when you move furniture or lift a child.',
+    watchOut: [
+      'Rounding the back to reach the bag — hinge, do not stoop',
+      'Pressing before you are fully upright',
+      'Dropping the bag from the chest rather than lowering it',
+      'Going heavy before the movement is smooth; awkward loads punish rushing'
+    ],
+    load: 'Considerably lighter than a barbell for the same movement. A shifting load feels much heavier than it is.', credits: 65 },
+
+  { id: 'landmine-press', name: 'Landmine Press',
+    youtube: 'landmine press single arm technique',
+    category: 'strength', movementPattern: 'push',
+    position: 'standing', impact: false, balanceDemand: false,
+    equipment: ['landmine'], equipmentOptional: [],
+    affectsAreas: ['shoulder', 'chest-pecs', 'abdominals', 'triceps-biceps'],
+    contraindications: ['shoulder-acute', 'lower-back-acute'],
+    energyRequired: 5, difficultyLevel: 3, duration: 240,
+    perSide: true, sets: 3, reps: '10 each side', rest: '60s', tempo: '2-1-3',
+    instructions: [
+      'Set one end of a barbell in a landmine holder or wedged securely in a corner',
+      'Stand facing it and hold the free end at shoulder height in one hand',
+      'Brace your stomach and stand with feet hip-width apart',
+      'Press the bar up and away at an angle until your arm is almost straight',
+      'Lower slowly over three counts, then complete all reps before swapping'
+    ],
+    coaching: 'The angle is why this exists. Pressing up and forward rather than straight overhead lets people with cranky shoulders press at all.',
+    why: 'Overhead pressing strength for anyone whose shoulders do not tolerate a straight overhead press. It also asks the trunk to resist being twisted the whole time.',
+    watchOut: [
+      'Leaning back to help the bar up',
+      'Twisting the hips towards the pressing arm — they stay square',
+      'Bar end not secured properly; check it before you load it'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that your hips stay square.', credits: 50 },
+
+  { id: 'strap-hamstring-stretch', name: 'Strap Hamstring Stretch',
+    youtube: 'strap hamstring stretch supine technique',
+    category: 'recovery', movementPattern: 'stretch',
+    position: 'floor', impact: false, balanceDemand: false,
+    equipment: ['stretching-strap'], equipmentOptional: [],
+    affectsAreas: ['hamstring', 'calves'],
+    contraindications: ['hamstring-acute'],
+    energyRequired: 1, difficultyLevel: 1, duration: 120,
+    perSide: true, sets: 2, reps: '30 seconds each side', rest: '0s',
+    instructions: [
+      'Lie on your back with both knees bent and feet flat',
+      'Loop a strap around the arch of one foot, holding an end in each hand',
+      'Straighten that leg up towards the ceiling as far as is comfortable',
+      'Draw gently on the strap until you feel a long pull down the back of the thigh',
+      'Hold for thirty seconds, then swap sides'
+    ],
+    coaching: 'Let the strap do the holding so your shoulders can stay relaxed on the floor. Reaching up with your hands turns a stretch into a sit-up.',
+    why: 'The strap lets you reach a proper hamstring stretch without curling your back to get there, which is why this version suits people that a seated forward fold does not.',
+    watchOut: [
+      'Pulling hard enough that the knee has to bend',
+      'The other leg lifting off the floor — keep it flat or bent, but down',
+      'Bouncing rather than holding steady'
+    ],
+    load: 'No weight. A strong pull, never a sharp one.', credits: 25 },
+
+  { id: 'blocks-supported-forward-fold', name: 'Supported Forward Fold',
+    youtube: 'yoga block supported forward fold',
+    category: 'recovery', movementPattern: 'stretch',
+    position: 'standing', impact: false, balanceDemand: false,
+    equipment: ['yoga-blocks'], equipmentOptional: [],
+    affectsAreas: ['hamstring', 'lower-back', 'calves'],
+    contraindications: ['lower-back-acute', 'hamstring-acute'],
+    energyRequired: 1, difficultyLevel: 1, duration: 90,
+    perSide: false, sets: 2, reps: '45 seconds', rest: '15s',
+    instructions: [
+      'Set two blocks on the floor about shoulder-width apart in front of you',
+      'Stand with feet hip-width apart and a soft bend in both knees',
+      'Hinge forward from the hips and rest both hands on the blocks',
+      'Let your head and neck hang heavy',
+      'Hold for forty-five seconds, breathing into your back'
+    ],
+    coaching: 'The blocks bring the floor up to you. That is not a compromise — it is what lets you keep a flat back, which is where the stretch actually is.',
+    why: 'A forward fold with the back kept long rather than rounded. For most people that is a better hamstring stretch and a much kinder one on the lower back.',
+    watchOut: [
+      'Locking the knees straight',
+      'Rounding the back to get lower — raise the blocks instead',
+      'Coming up quickly at the end; roll up slowly'
+    ],
+    load: 'No weight.', credits: 25 },
+
+  { id: 'ankle-weight-leg-raises', name: 'Weighted Side-Lying Leg Raise',
+    youtube: 'side lying leg raise ankle weight',
+    category: 'strength', movementPattern: 'hip-abduction',
+    position: 'floor', impact: false, balanceDemand: false,
+    equipment: ['ankle-weights'], equipmentOptional: [],
+    affectsAreas: ['glutes', 'hip'],
+    contraindications: ['hip-acute'],
+    energyRequired: 4, difficultyLevel: 2, duration: 180,
+    perSide: true, sets: 3, reps: '15 each side', rest: '45s', tempo: '2-1-3',
+    instructions: [
+      'Fasten the weights around your ankles and lie on your side, legs stacked',
+      'Rest your head on your lower arm and place the top hand on the floor for stability',
+      'Lift the top leg towards the ceiling, keeping the toes pointing forward',
+      'Pause at the top',
+      'Lower slowly over three counts, stopping just short of touching down'
+    ],
+    coaching: 'Toes pointing forward, not up. Rolling the leg open lets the hip flexor take over, and the muscle you are after stops working entirely.',
+    why: 'The outside of the hip is what keeps you level on one leg. Ankle weights let you keep loading it once bodyweight has stopped being difficult.',
+    watchOut: [
+      'The top leg drifting forwards as it rises',
+      'Toes rotating up towards the ceiling',
+      'Rolling backwards at the hips — stay stacked'
+    ],
+    load: 'Light. Ankle weights feel small and add up quickly on a long lever.', credits: 40 },
+
+  { id: 'weighted-vest-walk', name: 'Weighted Vest Walk',
+    youtube: 'weighted vest walking rucking technique',
+    category: 'cardio', movementPattern: 'locomotion',
+    position: 'standing', impact: false, balanceDemand: false,
+    equipment: ['weighted-vest'], equipmentOptional: [],
+    affectsAreas: ['glutes', 'quadriceps', 'calves', 'upper-back', 'abdominals'],
+    contraindications: ['lower-back-acute', 'knee-acute'],
+    energyRequired: 6, difficultyLevel: 2, duration: 1800,
+    perSide: false, sets: 1, reps: '30 minutes', rest: '0s',
+    instructions: [
+      'Fit the vest snugly so it does not bounce as you walk',
+      'Start with a few minutes unloaded or at a very light setting',
+      'Walk at a brisk but comfortable pace for around thirty minutes',
+      'Stand tall — the temptation is to lean forward under the weight',
+      'Take the vest off before you stop and stretch'
+    ],
+    coaching: 'Stand as tall as you would without it. If the vest is bending you forward it is too heavy, whatever the number on it says.',
+    why: 'Adds real load to walking without adding impact. It builds leg and back endurance, and it is one of very few ways to make walking harder without making it faster.',
+    watchOut: [
+      'A vest heavy enough to change your posture',
+      'Adding weight and distance in the same week',
+      'Any lower back ache afterwards: reduce the weight rather than the walk'
+    ],
+    load: 'Start well under what feels necessary. Under ten percent of your bodyweight is plenty to begin.', credits: 65 }
+);
