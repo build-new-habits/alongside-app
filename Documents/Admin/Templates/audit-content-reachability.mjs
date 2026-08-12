@@ -80,9 +80,11 @@ const usedTags=new Set(); EXERCISES.forEach(e=>(e.equipment||[]).forEach(t=>used
 // a requirement at all. What matters is whether any exercise CAN use
 // the capability, not whether the id alone completes one.
 [...tickable].forEach(id=>{
+  // yoga-mat is comfort, not kit -- deliberately required by nothing.
+  const COMFORT_ONLY = ['yoga-mat'];
   const implied=EQUIPMENT_IMPLIES[id]||[id];
   const anyUse=EXERCISES.some(e=>(e.equipment||[]).some(t=>implied.includes(t)));
-  if(!anyUse && !UNSATISFIABLE_TAGS.includes(id)) {
+  if(!anyUse && !UNSATISFIABLE_TAGS.includes(id) && !COMFORT_ONLY.includes(id)) {
     fail('WARN','equipment',`"${id}" is tickable and no exercise anywhere uses it`);
     return;
   }
@@ -108,9 +110,59 @@ EXERCISES.filter(e=>typeof e.difficultyLevel!=='number').forEach(e=>fail('ERROR'
 EXERCISES.filter(e=>typeof e.impact!=='boolean').forEach(e=>fail('ERROR','data',`${e.id} missing impact`));
 EXERCISES.filter(e=>/^https?:/i.test(e.youtube||'')).forEach(e=>fail('ERROR','data',`${e.id} youtube is a URL`));
 
+
+// ── 6. NAVIGATION REACHABILITY ────────────────────────────────────────
+//
+// Added 11 Aug 2026. A route can be registered, highlighted in the nav
+// map, and point at a view file that does not exist -- 'about',
+// 'community-impact' and 'annual-reflection' all did. The code believed
+// they existed, so anything navigating there failed at import. Not a
+// hidden door: a door onto a missing room.
+//
+// Separately, a view can exist and be reachable from nowhere, which is
+// the navigation version of the unreachable-content defect this file
+// was written for.
+import fs from 'fs';
+const routerSrc = fs.readFileSync('js/router.js','utf8');
+const ROUTES={};
+for (const m of routerSrc.matchAll(/'([a-z0-9\/-]+)':\s*{\s*path:\s*'([^']+)'/g)) {
+  ROUTES[m[1]] = m[2].replace('./','js/');
+}
+const LINK_PATTERNS=[
+  /navigate\(\s*['"`]([a-z0-9\/-]+)['"`]/g,
+  /data-nav\s*=\s*["']([a-z0-9\/-]+)["']/g,
+  /data-route\s*=\s*["']([a-z0-9\/-]+)["']/g,
+  /href\s*=\s*["']#\/?([a-z0-9\/-]+)["']/g,
+  /pendingDoorRoute['"]\s*,\s*['"]([a-z0-9\/-]+)['"]/g,
+  /["']([a-z0-9-]+)["']\s*:\s*["']([a-z0-9-]+)["']/g,
+];
+const linksFrom=f=>{
+  if(!fs.existsSync(f)) return [];
+  const src=fs.readFileSync(f,'utf8'); const out=new Set();
+  for(const p of LINK_PATTERNS) for(const m of src.matchAll(p))
+    [m[1],m[2]].forEach(v=>{ if(v&&ROUTES[v]) out.add(v); });
+  return [...out];
+};
+
+// Missing view files first -- this is the one that breaks in front of a user.
+Object.entries(ROUTES).forEach(([r,f])=>{
+  if(!fs.existsSync(f)) fail('ERROR','nav',`route "${r}" points at ${f}, which does not exist`);
+});
+
+const ENTRY=new Set(['today','progress','noticing','settings']);
+linksFrom('index.html').forEach(r=>ENTRY.add(r));
+const reached=new Set(ENTRY);
+let grew=true;
+while(grew){
+  grew=false;
+  for(const r of [...reached]) for(const l of linksFrom(ROUTES[r]||'')) if(!reached.has(l)){reached.add(l);grew=true;}
+}
+Object.keys(ROUTES).filter(r=>!reached.has(r)&&!r.startsWith('onboarding'))
+  .forEach(r=>fail('WARN','nav',`route "${r}" has a view but nothing navigates to it`));
+
 const order={ERROR:0,WARN:1,INFO:2};
 F.sort((a,b)=>order[a.sev]-order[b.sev]);
-console.log('AUDIT — '+EXERCISES.length+' exercises, '+defined.size+' categories, '+tickable.size+' equipment ids\n');
+console.log('AUDIT — '+EXERCISES.length+' exercises, '+defined.size+' categories, '+tickable.size+' equipment ids, '+Object.keys(ROUTES).length+' routes\n');
 ['ERROR','WARN','INFO'].forEach(s=>{
   const f=F.filter(x=>x.sev===s);
   console.log(s+': '+f.length);
