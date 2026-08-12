@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v166
+## 12 Aug 2026 v165
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v165.md`. Remove v165 on upload.
+Supersedes `master_schedule_12aug2026_v164.md`. Remove v164 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -320,41 +320,7 @@ Graeme's plank model included that mindful practice produces more muscle definit
 
 ---
 
-## 🟢 SCHEME-1 — Colour scheme: SHIPPED, 12 Aug 2026
-
-`css/base/variables.css` v3 → **v4**. `js/display-prefs.js` v1 → **v2**. `js/views/settings.js` v18 → **v19**. `css/components/display-preferences.css` v1 → **v2**. `index.html` pre-paint script extended. `tools/contrast-check.mjs` v1 → **v2**. `sw.js` → **v279**, cache **alongside-v279**.
-
-**Dark is the default and stays the design intent.** Light and high contrast are adaptations somebody chooses; nothing changes for anyone who does not.
-
-### Why the reference code could not be pasted
-
-Both implementations Graeme supplied — DPC Hub's `settings.js` and BNH OS's `[data-theme]` block — are **light-by-default with dark as the option.** Their "dark theme" is this app's normal state, so the palettes could not transfer even in principle. **What transferred was the logic:** a scheme class on the root, chosen in Settings, applied before first paint.
-
-### Every pairing measured, not eyeballed
-
-Worst text or accent ratio in the light scheme is **4.68:1**; worst text ratio **6.01:1**.
-
-Teal had to move: `#2DD4BF` measures **1.6:1 on white** and would have been effectively invisible, so light uses `#0F766E` — reads as the same colour, measures 5.47 on card. Amber likewise, since it is unreadable on a light ground.
-
-**High contrast was previously reachable only via `@media (prefers-contrast: high)`** — that is, only for somebody who had already found their OS setting. The query is kept so system-wide users are unaffected; the scheme makes it choosable.
-
-### The gate is the real deliverable
-
-`tools/contrast-check.mjs` v2 runs the full matrix against **all three schemes**, with unoverridden tokens falling back to `:root` exactly as the browser resolves them — so a token a scheme forgot appears as a real, usually terrible, ratio rather than a missing value. **That is precisely how the removed `html.light-mode` block hid six unoverridden tokens.**
-
-**Verified by reversal:** setting light's secondary text to `#A0AEC0` fails at 2.26:1.
-
-`verify-disp1.mjs` additionally asserts that light overrides **every one of the six tokens the old block forgot**, that dark is the default, that the scheme applies before paint, and that switching removes the previous class first — two scheme classes at once would resolve by CSS file order rather than by what the person chose.
-
-### ⚠️ Process note
-
-**This was settled by Graeme and then listed as "blocking on you" in the very response written to demonstrate that habit had stopped.** Fifth instance in one session of reopening a closed decision. `tools/verify-decisions.mjs` covers code drift; it cannot catch this, which is a reading failure. The rule stands: *before listing anything as open, verify it is open — and a decision the person has already stated is not open.*
-
-### Superseded
-
-The earlier scoping entry below is retained for the reasoning trail only. The work described as "not booked" is done.
-
-#### 🔵 LIGHT MODE / DISPLAY SCHEME — direction settled 12 Aug 2026, build not started
+## 🔵 LIGHT MODE / DISPLAY SCHEME — direction settled 12 Aug 2026, build not started
 
 **Graeme, 12 Aug: *"I must insist on dark mode default with the potential for adaptations by the user."* That is the shape. Decision closed — do not re-open it.**
 
@@ -1682,4 +1648,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v166*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v165*
