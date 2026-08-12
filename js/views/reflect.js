@@ -1,6 +1,34 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 12 Aug 2026 v4 - EMP-1. Condition-aware empathy selection.
+ *
+ *   The prompt used to be chosen by pool[atStage % pool.length] --
+ *   rotation. One screen earlier this file collects how the session
+ *   felt, whether pain was worse, and mood after; saveAndSummarise()
+ *   holds all three at the moment of selection and used none of them.
+ *   Somebody could answer "Struggled", "Worse than usual" and
+ *   "Struggling", then be handed a prompt about strong energy.
+ *
+ *   That is the same fault as sessionVariety earlier today -- the app
+ *   asks and does not listen -- but it costs more here, because a
+ *   mistimed empathy prompt does not read as generic. It reads as the
+ *   coach not having heard you, at the most exposed moment in the
+ *   session.
+ *
+ *   buildEmpathyContext() below is the only place with the full picture,
+ *   which is why the context is assembled here and the matching lives in
+ *   data/empathy-transfer.js. The view knows WHEN to ask; the data file
+ *   knows WHAT fits. Matches P5's shape: no view defines content.
+ *
+ *   P4 applies. Selection is silent -- nothing announces that the coach
+ *   noticed. If it visibly softened on a hard day, its ordinary tone
+ *   would become a verdict on every other day.
+ *
+ *   NOT changed: cadence. The gap, skip-widening, minimum-sessions floor
+ *   and stage-advance thresholds are all untouched. This changes WHICH
+ *   prompt fires, never WHETHER one does.
+ *
  * 16 Jul 2026 v3 (S4-B3-3) - saveAndSummarise() create-if-not-found fix:
  *   Companion fix to coach-reflection.js v5, workout.js v5, and
  *   yoga-session.js v3 — all part of the same activityLog duplicate/
@@ -86,7 +114,10 @@
 
 import { store }          from "../store.js";
 import { router }         from "../router.js";
-import { EMPATHY_PROMPTS } from "../data/empathy-transfer.js";
+// EMPATHY_PROMPTS no longer imported: v4 moved pool access into
+// selectEmpathyPrompt(), so this view never touches the pool directly.
+import { selectEmpathyPrompt } from "../data/empathy-transfer.js";
+import { getTodaysCheckin, getHistory } from "../data/checkin.js";
 
 export const centered = false;
 
@@ -167,6 +198,82 @@ function getSessionCount() {
   return (store.get("activityLog") || []).length;
 }
 
+// EMP-1 thresholds. Named rather than inlined so the numbers are
+// arguable in one place.
+const LOW_ENERGY_MAX        = 4;  // spec: "low (4 or below)"
+const LOW_MOOD_AFTER_MAX    = 3;  // MOOD_LABELS 1-3 = Struggling / Low
+const RETURNING_GAP_DAYS    = 10; // "a return after a longer gap"
+const SUSTAINED_LOOKBACK    = 5;  // check-ins examined for a rough patch
+const SUSTAINED_LOW_COUNT   = 3;  // ...of which this many low = sustained
+const VARIABLE_SPREAD       = 4;  // energy range implying real variability
+const GENTLE_TYPES = ["rest", "quiet", "breathing", "mindfulness", "yoga", "walk", "journal"];
+
+/**
+ * Everything the matcher needs about THIS session, assembled here
+ * because this is the only place that has it: feelAnswer, painAnswer and
+ * moodAfter live in this module and are not persisted until
+ * saveAndSummarise() runs.
+ *
+ * Every signal is optional. A missing one resolves false rather than
+ * throwing, so a prompt is never blocked by absent data — the catch-all
+ * in each pool still wins on a score of zero.
+ */
+function buildEmpathyContext(sessionCount) {
+  const checkin = getTodaysCheckin() || {};
+  const log     = store.get("activityLog") || [];
+
+  // What the person just told us. Values differ per activity type
+  // (FEEL_OPTIONS above): gym/coach = hard, cardio = tough, yoga and
+  // mindfulness and rest = restless, breathing = same.
+  const hardFeels = ["hard", "tough", "restless", "same"];
+  const struggled =
+    (feelAnswer !== null && hardFeels.includes(feelAnswer)) ||
+    painAnswer === "worse" ||
+    (typeof moodAfter === "number" && moodAfter <= LOW_MOOD_AFTER_MAX);
+
+  const checkedInToday = typeof checkin.energy === "number";
+  const lowEnergy      = checkedInToday && checkin.energy <= LOW_ENERGY_MAX;
+
+  // Gap before today. The just-saved entry is last, so compare the two
+  // most recent completions.
+  let returning = false;
+  if (log.length >= 2) {
+    const times = log
+      .map(e => new Date(e.completedAt || e.date || e.timestamp).getTime())
+      .filter(n => Number.isFinite(n))
+      .sort((a, b) => b - a);
+    if (times.length >= 2) {
+      returning = (times[0] - times[1]) / 86400000 >= RETURNING_GAP_DAYS;
+    }
+  }
+
+  // A rough patch, not a single hard day. detectBurnout() exists in
+  // data/checkin.js and deliberately is NOT reused: it answers a
+  // clinical-ish question with its own thresholds, and quietly borrowing
+  // it here would couple two unrelated judgements.
+  const recent = (getHistory(SUSTAINED_LOOKBACK) || [])
+    .map(c => c && c.energy)
+    .filter(n => typeof n === "number");
+  const sustainedDifficulty =
+    recent.filter(n => n <= LOW_ENERGY_MAX).length >= SUSTAINED_LOW_COUNT;
+  const variablePattern =
+    recent.length >= 3 && (Math.max(...recent) - Math.min(...recent)) >= VARIABLE_SPREAD;
+
+  // "Adjusting rather than skipping": the person keeps turning up across
+  // a spread of energies rather than only on good days. Deliberately
+  // generous — this is a preference, never a requirement, so a false
+  // positive costs a point of score and nothing else.
+  const adjusting = sessionCount >= 6 && variablePattern;
+
+  const type = (store.get("currentActivityEntry") || {}).type || "";
+  const gentleSession = GENTLE_TYPES.includes(type);
+
+  return {
+    sessionCount, struggled, lowEnergy, checkedInToday,
+    returning, sustainedDifficulty, variablePattern, adjusting, gentleSession,
+  };
+}
+
 function getEmpathyPromptForSession(sessionCount) {
   if (sessionCount <= EMPATHY_MIN_SESSIONS) return null;
 
@@ -176,12 +283,21 @@ function getEmpathyPromptForSession(sessionCount) {
 
   if (sessionCount - last < gap) return null;
 
+  // Cadence above is unchanged from v3. Only the choice below is new.
   const stageNum = store.get("empathyTransferStage") || 1;
-  const pool     = EMPATHY_PROMPTS[stageNum] || EMPATHY_PROMPTS[1];
-  const atStage  = store.get("empathyPromptsAtStage") || 0;
-  const text     = pool[atStage % pool.length];
+  const ctx      = buildEmpathyContext(sessionCount);
+  const lastFired = store.get("empathyLastPrompt") || { stage: 0, index: -1, runLength: 0 };
 
-  return { stage: stageNum, text };
+  const atStage = store.get("empathyPromptsAtStage") || 0;
+  const chosen  = selectEmpathyPrompt(stageNum, ctx, lastFired, atStage);
+  if (!chosen) return null;
+
+  return {
+    stage: chosen.stage,
+    text: chosen.text,
+    index: chosen.index,
+    runLength: chosen.runLength,
+  };
 }
 
 function fireEmpathyPrompt(sessionCount) {
@@ -201,6 +317,19 @@ function fireEmpathyPrompt(sessionCount) {
   store.set("lastEmpathyPromptSession", sessionCount);
   // Genuine engagement (not a skip) resets the consecutive-skip streak.
   store.set("empathyPromptSkips", 0);
+
+  // EMP-1. Record WHICH prompt fired, not just that one did. Without
+  // this the repeat cap can never trigger: runLength would stay at 1
+  // forever and a hard fortnight would produce the same sentence every
+  // session. Reads from the resolved empathyPrompt rather than
+  // re-selecting, so what is recorded is exactly what was shown.
+  if (empathyPrompt && typeof empathyPrompt.index === "number") {
+    store.set("empathyLastPrompt", {
+      stage:     empathyPrompt.stage,
+      index:     empathyPrompt.index,
+      runLength: empathyPrompt.runLength || 1,
+    });
+  }
 }
 
 function skipEmpathyPrompt(sessionCount) {

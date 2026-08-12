@@ -1,5 +1,22 @@
 /**
  * store.js - Data persistence layer
+ * 12 Aug 2026 v32
+ *
+ * v32 - EMP-1. New field empathyLastPrompt, needed by condition-aware
+ *   empathy selection. Until now the prompt was chosen by
+ *   `pool[atStage % pool.length]` -- pure rotation -- so nothing needed
+ *   to remember WHICH prompt fired, only how many had. Fit-first
+ *   selection can legitimately land on the same prompt several sessions
+ *   running (the pools hold 4-5 prompts and someone can genuinely
+ *   struggle repeatedly), so the run has to be tracked to cap it.
+ *
+ *     empathyLastPrompt: { stage, index, runLength }
+ *
+ *   One nested object rather than three flat fields: they are only ever
+ *   read and written together, and splitting them invites exactly the
+ *   partial-update bug that leaves runLength counting a prompt that is
+ *   no longer the one at that index.
+ *
  * 12 Aug 2026 v31
  *
  * v31 - set() now lazily inits the way get() already did. get() opened
@@ -233,6 +250,11 @@
  *                                             resets to 0 on stage advance
  *     lastEmpathyPromptSession integer / 0  - session count at last fire,
  *                                             enforces the 3-4 session gap
+ *     empathyLastPrompt        object       - EMP-1. { stage, index,
+ *                                             runLength } — which prompt
+ *                                             last fired and how many
+ *                                             times consecutively. index
+ *                                             -1 = none yet.
  *     empathyPromptSkips       integer / 0  - consecutive skip streak (NOT
  *                                             lifetime total - resets to 0
  *                                             on any non-skip response; see
@@ -458,6 +480,16 @@ export const store = {
       empathyPromptSkips: typeof saved.empathyPromptSkips === 'number'
         ? saved.empathyPromptSkips
         : 0,
+      // EMP-1. Shape-validated as a whole, not field by field: a partial
+      // object here is worse than none, because runLength would then be
+      // counting a prompt that stage/index no longer identifies.
+      empathyLastPrompt: (saved.empathyLastPrompt
+          && typeof saved.empathyLastPrompt === 'object'
+          && typeof saved.empathyLastPrompt.stage === 'number'
+          && typeof saved.empathyLastPrompt.index === 'number'
+          && typeof saved.empathyLastPrompt.runLength === 'number')
+        ? saved.empathyLastPrompt
+        : { stage: 0, index: -1, runLength: 0 },
 
       // ── LAST CHECK-IN ─────────────────────────────────────────
       lastCheckin: (saved.lastCheckin && typeof saved.lastCheckin === 'object')
@@ -1038,6 +1070,11 @@ export const store = {
       lastEmpathyPromptSession: 0,  // integer, session count at last fire
       empathyPromptSkips:       0,  // integer, consecutive skip streak —
                                      // resets to 0 on any non-skip response
+      // EMP-1. Which prompt last fired, and how many times running.
+      // index -1 / stage 0 means "none yet" — distinct from index 0,
+      // which is a real prompt. runLength caps repeats at 2 so a hard
+      // fortnight does not produce the same sentence five times.
+      empathyLastPrompt: { stage: 0, index: -1, runLength: 0 },
 
       // ── LAST CHECK-IN ─────────────────────────────────────────
       lastCheckin: {
