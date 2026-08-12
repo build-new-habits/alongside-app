@@ -1092,3 +1092,28 @@
   font-size: var(--text-xs);
   font-weight: var(--font-normal);
 }
+
+/* ============================================================
+   CORE-1 — body caution, 12 Aug 2026
+   Fires when an exercise loads an area the person flagged sore today and
+   is NOT contraindicated. Contraindicated exercises never reach a card.
+
+   Styled as a NOTE, not a warning. No red, no icon, no alarm: this is
+   the coach saying it knows something, not the app refusing. Amber would
+   make an ordinary sore knee look like an injury, and somebody who sees
+   a warning every session stops reading them.
+
+   Contrast, tokens as of A11Y-1 and verified in all three schemes by
+   tools/contrast-check.mjs: --color-text on --color-bg-card 8.40:1.
+   ============================================================ */
+
+.exercise-caution {
+  margin: var(--space-3) 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-card);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text);
+}

@@ -74,6 +74,7 @@
  */
 
 import { store } from "../store.js";
+import { bodyCaution } from "../data/session-rationale.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { getActiveConditionIds, getConditionName } from "../data/conditions.js";
@@ -250,6 +251,15 @@ export function render() {
                 <p class="exercise-load-text" aria-labelledby="ps-section-load">${fullEx.load}</p>
               </div>
             ` : ""}
+            ${(() => {
+              // CORE-1. Fires when this exercise loads an area flagged sore today
+              // and is NOT contraindicated -- contraindicated ones never reach a
+              // card. Names the area, per P7: a coach told something specific that
+              // then hedges is pretending not to know. Invitation, not instruction.
+              const _c = bodyCaution(fullEx);
+              return _c ? `<p class="exercise-caution" role="note">${_c}</p>` : "";
+            })()}
+
             ${fullEx.watchOut && fullEx.watchOut.length > 0 ? `
               <div class="exercise-watchout" role="region" aria-label="What to watch for with ${ex.name}">
                 <span class="exercise-section-label" id="ps-section-watchout">What to watch for</span>
