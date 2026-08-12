@@ -1341,3 +1341,244 @@ GYM.push(
     credits: 50
   }
 );
+
+// ══════════════════════════════════════════════════════════════════════
+// HOME EQUIPMENT DEPTH (EQ-1, 11 Aug 2026)
+//
+// Traced a home user's actual kit -- adjustable dumbbells, medicine
+// ball, jump box, skipping rope, balance board, bands, mat, steps -- and
+// found the balance board reachable by no session type at all, and the
+// box, rope and BOSU one exercise deep each. One candidate means it
+// appears almost never, which is indistinguishable from not owning it.
+//
+// Ticking equipment you own should change something.
+// ══════════════════════════════════════════════════════════════════════
+
+GYM.push(
+  { id: 'balance-board-single-leg', name: 'Balance Board Single-Leg Hold',
+    youtube: 'balance board single leg hold progression',
+    category: 'rehabilitation', movementPattern: 'proprioception',
+    position: 'standing', impact: false, balanceDemand: true,
+    equipment: ['balance-board'], equipmentOptional: ['bosu-ball'],
+    affectsAreas: ['ankle-foot', 'knee', 'hip', 'core'],
+    contraindications: ['ankle-foot-acute', 'knee-acute'],
+    energyRequired: 3, difficultyLevel: 4, duration: 180,
+    perSide: true, sets: 3, reps: '20 seconds each side', rest: '40s',
+    instructions: [
+      'Set the board near a wall or worktop you can touch if you need to',
+      'Step on with both feet and find level first',
+      'Shift your weight onto one foot and lift the other just clear of the board',
+      'Hold as still as you can for twenty seconds, looking straight ahead',
+      'Step down between sides rather than hopping across'
+    ],
+    coaching: 'Look ahead, not down. Balance is a conversation between your eyes, your inner ear and your feet, and staring at your feet removes one of the three.',
+    why: 'Single-leg balance on an unstable surface is the hardest thing you can ask of the ankle, and it is what turns a stumble into a recovery rather than a fall.',
+    watchOut: [
+      'Gripping with the toes until the foot cramps — spread the weight instead',
+      'Attempting this without something within reach to steady yourself on',
+      'Holding your breath while concentrating'
+    ],
+    load: 'Bodyweight only. Progress by holding longer or closing the eyes briefly, never by adding weight.', credits: 40 },
+
+  { id: 'balance-board-squat', name: 'Balance Board Squat',
+    youtube: 'balance board squat technique',
+    category: 'strength', movementPattern: 'squat',
+    position: 'standing', impact: false, balanceDemand: true,
+    equipment: ['balance-board'], equipmentOptional: ['bosu-ball'],
+    affectsAreas: ['quadriceps', 'glutes', 'ankle-foot', 'core'],
+    contraindications: ['knee-acute', 'ankle-foot-acute'],
+    energyRequired: 5, difficultyLevel: 4, duration: 180,
+    perSide: false, sets: 3, reps: '10', rest: '60s', tempo: '3-1-3',
+    instructions: [
+      'Step onto the board with your feet about shoulder-width apart',
+      'Find level and take a moment before you start',
+      'Squat slowly, going only as low as you can while the board stays steady',
+      'Pause briefly at the bottom',
+      'Press back up through the whole foot without letting the board tip'
+    ],
+    coaching: 'Depth is not the goal here, control is. A shallow squat that keeps the board level is a better rep than a deep one that does not.',
+    why: 'Trains the small muscles around the ankle, knee and hip that a stable floor never asks for. That is what keeps you upright on uneven ground.',
+    watchOut: [
+      'Going as deep as a normal squat and losing the board',
+      'Arms windmilling to stay balanced, which means it is too advanced today',
+      'Knees drifting inward as you press up'
+    ],
+    load: 'Bodyweight until you can do all ten without the board tipping.', credits: 45 },
+
+  { id: 'balance-board-rocking', name: 'Balance Board Controlled Rocking',
+    youtube: 'balance board rocking ankle control',
+    category: 'rehabilitation', movementPattern: 'proprioception',
+    position: 'standing', impact: false, balanceDemand: true,
+    equipment: ['balance-board'], equipmentOptional: [],
+    affectsAreas: ['ankle-foot', 'calves', 'knee'],
+    contraindications: ['ankle-foot-acute'],
+    energyRequired: 2, difficultyLevel: 3, duration: 180,
+    perSide: false, sets: 3, reps: '30 seconds', rest: '30s',
+    instructions: [
+      'Step onto the board with both feet, something steady within reach',
+      'Tip the board slowly forward until the front edge touches down',
+      'Bring it slowly back and tip it to the rear edge',
+      'Move deliberately rather than letting it drop from one side to the other',
+      'After thirty seconds, switch to rocking side to side'
+    ],
+    coaching: 'Slowly is the exercise. Letting the board fall from edge to edge is easier and trains almost nothing.',
+    why: 'Takes the ankle deliberately through the range where it usually gets caught out. Good preparation before single-leg work and useful in its own right after any ankle trouble.',
+    watchOut: [
+      'Letting the board drop rather than lowering it',
+      'Knees locking straight — keep them softly bent',
+      'Attempting it with nothing to steady yourself on'
+    ],
+    load: 'Bodyweight only.', credits: 35 },
+
+  { id: 'box-step-up-weighted', name: 'Weighted Box Step-Up',
+    youtube: 'weighted box step up technique',
+    category: 'strength', movementPattern: 'lunge',
+    position: 'standing', impact: false, balanceDemand: false,
+    equipment: ['plyo-box', 'dumbbell'], equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'hamstring'],
+    contraindications: ['knee-acute', 'hip-acute'],
+    energyRequired: 6, difficultyLevel: 3, duration: 240,
+    perSide: true, sets: 3, reps: '10 each side', rest: '60s', tempo: '2-1-3',
+    instructions: [
+      'Stand facing a box at roughly knee height, a dumbbell in each hand',
+      'Place your whole right foot on the box, not just the toes',
+      'Drive through the right heel to stand up onto the box',
+      'Bring the left foot up to meet it, then step back down leading with the left',
+      'Complete all reps on one side before changing'
+    ],
+    coaching: 'Push down through the foot on the box rather than springing off the back foot. If the back foot is doing the work, the box is too high.',
+    why: 'Single-leg strength that carries straight over to stairs, kerbs and getting into a car. It also finds side-to-side differences that two-legged work hides.',
+    watchOut: [
+      'Pushing off the trailing foot to launch yourself up',
+      'Box so high the hip has to rotate to get onto it',
+      'Dropping down rather than lowering under control'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that you never push off the back foot.', credits: 50 },
+
+  { id: 'box-jump-step-down', name: 'Box Jump with Step-Down',
+    youtube: 'box jump step down safe technique',
+    category: 'cardio', movementPattern: 'jump',
+    position: 'standing', impact: true, balanceDemand: false,
+    equipment: ['plyo-box'], equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'calves', 'ankle-foot'],
+    contraindications: ['knee-acute', 'ankle-foot-acute', 'achilles-acute', 'hip-acute'],
+    energyRequired: 7, difficultyLevel: 5, duration: 180,
+    perSide: false, sets: 4, reps: '5', rest: '90s', tempo: 'Explosive up, controlled down',
+    instructions: [
+      'Stand a comfortable stride from a box you are confident you can clear easily',
+      'Dip quickly at the hips and knees, swinging your arms back',
+      'Jump up and land softly on the box with both feet, knees bent',
+      'Stand up fully on the box',
+      'STEP down one foot at a time — never jump down'
+    ],
+    coaching: 'Step down, always. Jumping down is where nearly every box jump injury happens, and it adds nothing at all to the exercise.',
+    why: 'Trains power, which fades earlier than strength does and is what lets you react quickly. Landing on a box rather than the floor means far less impact than a jump squat.',
+    watchOut: [
+      'Jumping down instead of stepping down',
+      'A box so high you have to tuck your knees to clear it — lower is better done well',
+      'Landing with straight legs or a heavy thud',
+      'Doing these when tired, which is when landing form goes'
+    ],
+    load: 'Bodyweight only. Progress with box height, slowly, and never with weight.', credits: 55 },
+
+  { id: 'skipping-intervals', name: 'Skipping Intervals',
+    youtube: 'skipping rope interval workout technique',
+    category: 'cardio', movementPattern: 'jump',
+    position: 'standing', impact: true, balanceDemand: false,
+    equipment: ['skipping-rope'], equipmentOptional: [],
+    affectsAreas: ['calves', 'ankle-foot', 'quadriceps', 'shoulder'],
+    contraindications: ['knee-acute', 'ankle-foot-acute', 'achilles-acute'],
+    energyRequired: 7, difficultyLevel: 4, duration: 480,
+    perSide: false, sets: 6, reps: '40 seconds', rest: '40s',
+    instructions: [
+      'Set the rope length by standing on the middle — the handles should reach your armpits',
+      'Keep your elbows close to your ribs and turn the rope with your wrists',
+      'Skip for forty seconds, jumping just high enough to clear the rope',
+      'Rest forty seconds, shaking the legs out',
+      'Repeat six times'
+    ],
+    coaching: 'Turn the rope with your wrists, not your arms. Big arm circles are tiring, and they are why most people last thirty seconds.',
+    why: 'One of the most efficient pieces of cardio there is, and it trains the calves and ankles to absorb landing forces, which protects them everywhere else.',
+    watchOut: [
+      'Jumping far higher than the rope needs',
+      'Landing flat-footed and heavily — stay on the balls of the feet',
+      'Big arm circles instead of wrist turns',
+      'Any calf or Achilles tightness: stop, and come back to it another day'
+    ],
+    load: 'Bodyweight only. Build the number of rounds before the length of them.', credits: 60 },
+
+  { id: 'medicine-ball-overhead-throw', name: 'Medicine Ball Overhead Throw',
+    youtube: 'medicine ball overhead throw wall power',
+    category: 'strength', movementPattern: 'jump',
+    position: 'standing', impact: false, balanceDemand: false,
+    equipment: ['medicine-ball'], equipmentOptional: [],
+    affectsAreas: ['full-body', 'shoulder', 'abdominals', 'upper-back'],
+    contraindications: ['shoulder-acute', 'lower-back-acute'],
+    energyRequired: 6, difficultyLevel: 3, duration: 180,
+    perSide: false, sets: 4, reps: '6', rest: '60s', tempo: 'Explosive',
+    instructions: [
+      'Stand a couple of strides from a solid wall, holding the ball in both hands',
+      'Take it overhead and slightly behind, letting your ribs stay down',
+      'Throw it forward into the wall as hard as you comfortably can',
+      'Catch or collect the rebound and reset properly before the next one',
+      'Six throws, then rest a full minute'
+    ],
+    coaching: 'Reset fully between throws. This is a power exercise, and six good throws beat twenty tired ones by a wide margin.',
+    why: 'Trains the whole body to produce force quickly, which is the quality that fades first with age and the one almost nobody trains directly.',
+    watchOut: [
+      'Arching the lower back to get the ball further behind you',
+      'Standing so close there is no time to collect the rebound safely',
+      'A ball heavy enough to slow the throw down, which stops it training power'
+    ],
+    load: 'Light. Speed is the training effect, and a heavy ball removes it.', credits: 50 },
+
+  { id: 'medicine-ball-squat-press', name: 'Medicine Ball Squat to Press',
+    youtube: 'medicine ball squat press technique',
+    category: 'strength', movementPattern: 'squat',
+    position: 'standing', impact: false, balanceDemand: false,
+    equipment: ['medicine-ball'], equipmentOptional: [],
+    affectsAreas: ['quadriceps', 'glutes', 'shoulder', 'abdominals'],
+    contraindications: ['knee-acute', 'shoulder-acute'],
+    energyRequired: 6, difficultyLevel: 3, duration: 240,
+    perSide: false, sets: 3, reps: '12', rest: '60s', tempo: '2-1-2',
+    instructions: [
+      'Stand with feet shoulder-width apart, holding the ball at your chest',
+      'Squat down as far as is comfortable, keeping your chest up',
+      'Drive up through your heels',
+      'As you reach standing, press the ball straight overhead',
+      'Bring it back to your chest and go straight into the next rep'
+    ],
+    coaching: 'Let the press flow out of the squat rather than pausing between the two. Done as one movement it becomes conditioning as well as strength.',
+    why: 'Squat and press together is about as much of the body as one movement can reach, and it is the pattern behind lifting anything from the floor to a shelf.',
+    watchOut: [
+      'Pressing before you are fully upright, which loads the lower back',
+      'Heels lifting at the bottom of the squat',
+      'Ribs flaring as the ball goes overhead'
+    ],
+    load: 'Heavy enough that the last two reps are hard, light enough that the two halves stay one movement.', credits: 50 },
+
+  { id: 'step-platform-lateral-step', name: 'Lateral Step-Over',
+    youtube: 'lateral step over platform technique',
+    category: 'cardio', movementPattern: 'lunge',
+    position: 'standing', impact: false, balanceDemand: true,
+    equipment: ['step-platform'], equipmentOptional: ['plyo-box'],
+    affectsAreas: ['glutes', 'quadriceps', 'hip', 'ankle-foot'],
+    contraindications: ['knee-acute', 'hip-acute'],
+    energyRequired: 5, difficultyLevel: 2, duration: 240,
+    perSide: false, sets: 3, reps: '45 seconds', rest: '45s',
+    instructions: [
+      'Stand side-on to a low step with it to your right',
+      'Step your right foot up onto it, then bring the left up to meet it',
+      'Step down the other side with the right foot, then the left',
+      'Reverse direction and come back',
+      'Keep moving steadily for forty-five seconds'
+    ],
+    coaching: 'Sideways is the point. Almost all everyday movement is forwards, so the muscles that move you sideways get very little use and are the ones that steady you.',
+    why: 'Works the outside of the hips, which keep you level when you walk, while raising the heart rate with no impact at all.',
+    watchOut: [
+      'Only the front of the foot landing on the step',
+      'Rushing until it becomes a hop',
+      'Knee drifting inward as you step up'
+    ],
+    load: 'Bodyweight. A light weight held at the chest once the pattern is smooth.', credits: 45 }
+);

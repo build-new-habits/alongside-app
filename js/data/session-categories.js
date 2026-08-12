@@ -1,5 +1,11 @@
 /**
  * data/session-categories.js
+ * 11 Aug 2026 v4
+ *
+ * v4 - EQ-1. New "balance-work" and "power" categories. Balance content
+ *   was reachable by no session type at all; jumps, throws and skipping
+ *   only through Cardio.
+ *
  * 11 Aug 2026 v2
  *
  * v2 - New "loaded-carry" category. All six carry exercises were
@@ -163,6 +169,32 @@ export const CATEGORY_MATCHERS = {
   // maintenance intent tilt, which prioritises exactly this pattern
   // because grip strength predicts independence better than almost
   // anything else we measure.
+  // EQ-1 (11 Aug 2026). Two categories added after tracing a home user's
+  // own equipment list against the engine.
+  //
+  // "balance-work" existed as content and as a tickable balance board,
+  // and NO session type routed to it -- so somebody could tell the app
+  // they owned a balance board and it would never once appear. The fifth
+  // instance today of content that exists and nothing can select.
+  //
+  // "power" covers jumps, throws and skipping. It was reachable only
+  // through a Cardio session, which meant a jump box and a skipping rope
+  // were nearly as orphaned. Power is the quality that fades before
+  // strength does, so it deserves a route into ordinary sessions rather
+  // than only the one somebody picks when they want to get out of breath.
+  //
+  // Both respect the impact and balance gates, which are applied
+  // downstream in _filterCandidates -- a category existing does not
+  // override what somebody has told us they cannot do.
+  "balance-work":     ex => ex.movementPattern === "balance" ||
+                            ex.movementPattern === "proprioception" ||
+                            ex.balanceDemand === true,
+
+  "power":            ex => ex.movementPattern === "jump" ||
+                            (ex.impact === true && (ex.difficultyLevel || 1) >= 3) ||
+                            ((ex.equipment || []).includes("medicine-ball") &&
+                             /throw|slam|pass/i.test(ex.name)),
+
   "loaded-carry":     ex => ex.movementPattern === "carry",
 
   "conditioning":     ex => ex.category === "cardio" && (ex.energyRequired || 5) >= 5,
