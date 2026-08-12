@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v251
+ * Full integrity sweep - 85 of 544 exercises were unreachable by any session
+ * type, and three safety exclusions named conditions that do not exist so they
+ * never fired. Both fixed, plus a permanent audit to catch the next one.
+ *
  * 11 Aug 2026 v250
  * EQ-1 - balance boards, jump boxes and skipping ropes now actually appear.
  * New balance-work and power categories, plus nine entries for the home
@@ -1098,7 +1103,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v260";
+const CACHE_NAME = "alongside-v261";
 
 const SHELL_URLS = [
 
