@@ -1,57 +1,22 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v150
+## 11 Aug 2026 v149
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_11aug2026_v149.md`. Remove v149 on upload.
+Supersedes `alongside_master_schedule_11aug2026_v148.md`. Remove v148 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
----
+**This version's substantive changes:** Six further build sessions since v148 — **WOW-4**, **PT-1** (+ two content refinements and a copy audit), **PT-4/WOW-6**, **PT-11**, **PT-12** — plus the **second persona trace**, now the required gate before any device pass. `sw.js` v228→v235. Twenty-two files changed across eleven sessions today, **none on-device confirmed**. Two new findings from the second trace, both significant: **PT-11**, a fourth private exercise pool that never filtered on fitness, meaning the WOW-2 fix covered only half the surface; and **PT-12**, closing the reader-without-writer pattern itself rather than another instance of it. **Recommendation on record: stop building, run the device pass.**
 
-## What happened since v149
-
-**One very long session. 62 commits, 43 files, ~12,900 lines added. `sw.js` v235 → v253, cache `alongside-v253` → `alongside-v263`. Exercise database 461 → 556.**
-
-v149's standing recommendation was *stop building, run the device pass*. That is not what happened, and the reason is worth recording honestly: Graeme opened the app, found the exercise cards had no guidance, and every subsequent finding came from following that thread. The session was driven by use, not by plan.
-
-**None of it is on-device confirmed. That gate is now very wide and is the single most important outstanding item in this document.**
-
-### The pattern that ran through the whole day
-
-The same defect appeared **eight times in eight different costumes**: content that exists, is correct, is written to standard, and that nothing in the product can ever select.
-
-| # | Instance | Scale |
-|---|---|---|
-| 1 | Equipment vocabulary mismatch | 92 of 124 equipment exercises unreachable for every user |
-| 2 | Difficulty ceiling capped at 3/10 | 14 exercises above every possible ceiling |
-| 3 | Private exercise pool in `session-builder.js` | 139 practice entries + entire yoga library invisible |
-| 4 | Loaded carries | All 6; no category selected `movementPattern: carry` |
-| 5 | Cardio warm-up tags | 2 of 4 machine warm-ups untickable |
-| 6 | Balance board | Content and equipment both present, no route |
-| 7 | Contraindications naming non-existent conditions | 13 safety exclusions that never fired |
-| 8 | Category coverage | 85 of 544 exercises — 15.6% of the database |
-
-**Every one was found by a person using the product or by a persona trace. None was found by the code.** That gap is now closed by a permanent audit — see INF-AUDIT below.
-
-### Streams completed
-
-**CON-1 → CON-9 — exercise content consolidation.** Single registry (the parallel copy in `js/data/exercises.js` is now a shim). Equipment vocabulary resolver. Exercise Entry Standard written, with `watchOut` and effort-relative `load` added and backfilled across all 556 entries. New `gym.js` (machines, conditioning, cable and machine strength, loaded core, medicine ball, balance, plyometrics). Private pool retired. Equipment became a preference in selection, not only a permission — gym Full Body went from 0–1 equipment exercises out of 13 to 11 of 13.
-
-**CONT-1 / CONT-2 — the app now remembers what you did.** Every session view wrote `exercisesCount: 3` — a number — and never which exercises. That single absence is why selection had to be `Math.random()` over 500+ exercises, and therefore why there was no progressive overload, no skill acquisition (making the whole `watchOut` library decorative), and no familiarity. New `exerciseHistory`, and continuity-aware selection bounded by a 21-day recency window, an 8-session mastery ceiling and a variety preference (`sessionVariety`).
-
-**CAP-1 → CAP-5 — the capability screen.** Answering "if we are not age restricting, how do we ensure the appropriate level for that user?" The instrument was wrong, not the policy: *how active are you* measures frequency, not capacity. Four questions replace it, three-state so a wheelchair user can answer "No" to the chair question rather than being forced into "not easily". `legPower` added as a separate axis after a trace found a wheelchair user served seated *leg* exercises. All 556 entries tagged `position` / `impact` / `balanceDemand`. New `seated.js`, 38 entries.
-
-**The coach explains the programme.** New `session-rationale.js`. Opening, per-section purpose, and a longer arc — connected to the person's stated goals and training intent. Progression is **invited, never directed**, reads the day (a flare invites less, a low-energy day invites the same), and never states a number.
-
-**Graeme's six UX items**, all shipped: duplicate time question removed, check-in scroll and pacing fixed, in-card performance notes generalised to what each exercise actually produces, "Not a fan" control, coach rationale, empty-session guard.
-
-**Navigation and integrity sweep.** Three routes pointed at view files that had never been written. `about` removed, `community-impact` and `annual-reflection` built, front doors added.
+**Recent history, condensed for continuity (full detail in `Admin/Past MS/` for each version):**
+- **v148, first three WOW sessions + Locked Principles:** WOW-2, WOW-1, WOW-0 shipped and measured. Four Locked Principles agreed (P1–P4). Two false statements found live in `privacy.js` and removed. BETA-1 to BETA-4 logged.
+- **v147, Persona Tracing Wave 1 outcome:** brief executed same day it was written. Two 🔴 Critical findings confirmed by executing live code — a day-one check-in contradicting the user's own onboarding disclosure for 100% of users, and `fitnessLevel` having no live writer since OB-THREAD. Ten task rows PT-1 to PT-10. Three deliverables pushed to `Admin/`. Persona 2.5 confirmed as the Wave 2 candidate on evidence: the blank-slate persona surfaced both criticals first, making "least data given to the app" the selection criterion for future waves.
 
 ---
 
-## 🔒 Locked Principles — agreed 11–12 Aug 2026
+## 🔒 Locked Principles — agreed 11 Aug 2026
 
-Seven principles agreed with Graeme in conversation. **Every future proposal must pass all seven.** They exist because the product's differentiation is a set of refusals, and refusals decay silently unless written down.
+Four principles agreed with Graeme in conversation. **Every future proposal must pass all four.** They exist because the product's differentiation is a set of refusals, and refusals decay silently unless written down.
 
 **P1 — The coach never sells, and never withholds what it can see.**
 If the coach has noticed something, it says it. Free. Personal buys **tools** (choose session type, choose duration, log lifts, export, longer windows), never *deeper coaching*. The moment the coach's helpfulness becomes tier-dependent, "trust me, I've got you" becomes "I've got you up to a point," and a conditional promise is not a promise.
@@ -68,16 +33,6 @@ Graeme's point, and the most important thing agreed in the whole conversation. N
 **Framing note that produced P4, worth keeping:** *"Here's what you did"* has a comparison buried in it, and the comparison has a verdict attached. Behind it sits *"here's what you failed to achieve against last time."* There are British sprinters who have not PB'd in years; it does not eradicate their progress, commitment or quality. A flat or falling number carries no information about whether today was a good day — it was hot, they slept badly, they came anyway, which is the harder thing.
 
 ---
-
-
-**P5 — No view defines exercise content. Views render; `js/data/exercises/` is the only source.**
-Agreed 11 Aug after the third recurrence in two days. A fix applied to the database must not need applying twice. The private pool in `session-builder.js` cost three separate double-fixes (PT-11, CON-2, PT-19), each second application found only after somebody hit the bug live.
-
-**P6 — Content existing is not the same as content being reachable.**
-Agreed 12 Aug after the same defect appeared eight times in one day, in eight different forms, none of them found by the code. Any change to categories, equipment vocabulary, session types or routes must be followed by `Documents/Admin/Templates/audit-content-reachability.mjs`. A tick that unlocks nothing, a category that matches nothing, a route pointing at a missing file, and a contraindication naming a condition that does not exist are all the same defect wearing different clothes.
-
-**P7 — Confidence scales with information; authority never does.**
-Agreed 12 Aug. When the coach has been told something — a named sore area, and an exercise that loads it — it says so specifically rather than hedging, because hedging what we have been told is a coach pretending not to know. But the adjustment itself stays an invitation: *"consider taking some weight off"*, never *"take some weight off"*. The coach knows which exercise works which area; the person knows how it feels today. Naming the first without commanding the second is what respects both.
 
 ## 🛠️ WOW Build Sessions — 11 Aug 2026
 
@@ -175,47 +130,13 @@ Full report: `Admin/alongside_persona-wave1_second-pass_11aug2026_v1.md`.
 
 ---
 
-## 🛑 RECOMMENDATION ON RECORD — run the device pass, and it is now overdue
+## 🛑 RECOMMENDATION ON RECORD — run the device pass next
 
-**Restated 12 Aug, stronger than at v149.** v149 said stop building and run the device pass. Instead, 62 further commits shipped across 18 cache versions. Every one is verified by node assertion, fresh-clone check and regression matrix — and **none by a human holding a phone.**
+Twenty-two files across eleven sessions today, **none confirmed on a real screen**. The consent gate has never rendered. `gym-programme.js` v5–v7 remains the oldest untested item on the board.
 
-That is not a criticism of the work; every finding came from Graeme using the product, which is exactly the right source. But the gap between "verified" and "confirmed working" is now eighteen cache versions wide, and beta starts mid-September.
+The next real risk is not a missing feature — it is that something shipped today does not render, and the longer the untested queue grows the harder attribution becomes. **Wave 2 (persona 2.5, post-cardiac) should wait until after that pass.**
 
-**The single highest-value path through everything shipped today:** clear cache → build a gym Full Body → complete it. That one route exercises the pulse-raiser, equipment preference, watch-outs, load guidance, in-card notes, not-a-fan, session rationale and the progression invitation together. Then a check-in, for the scroll fix and the "I'm ready" pacing buttons — both judgement calls that cannot be tested any other way.
-
----
-
-## 🔬 Third Persona Trace — 12 Aug 2026
-
-Eight personas run against live code over simulated 6–8 week periods, not read but **executed**. Findings, all fixed the same day:
-
-| Persona | Finding |
-|---|---|
-| **2.10 Dad, 76, frail** | Served **High Knees** as his opening pulse-raiser. The difficulty ceiling applied to `main` only; warm-ups were exempt on reasoning that held while they came from 70 hand-written warm-ups and stopped holding at CON-6. |
-| **2.11 Mum, 76, low confidence** | Served **Warrior III**, a single-leg balance pose and a genuine fall risk. Root cause: 30 entries carried no `difficultyLevel`, and every read was `(ex.difficultyLevel \|\| 1)` — treating untagged as the *easiest possible*, which is backwards for safety. Separately, her Mobility session opened with **five breathing practices in a row**. |
-| **2.15 Priya, 27, gym 4×/week** | Her eight most-repeated exercises after eight weeks were three cardio warm-ups and five accessories — **not one barbell lift**. CONT-1 anchored uniformly, and thin categories repeat while deep ones rotate, so it anchored what did not matter. |
-| **Wheelchair user** | Correctly given seated work, then handed **Seated Leg Extension and Seated Hamstring Curl**. The screen asked whether he could rise from a chair; it never asked whether his legs work. Also 68% session-to-session overlap — the identical workout for eight weeks. |
-| **2.13 / 2.14 ADHD vs autistic** | Both received ~51–57% overlap: one treatment serving neither. `sessionVariety` now separates them (23% vs 45%). |
-| **All sessions** | **12% contained a duplicate exercise.** CON-6's per-category object spread defeated the identity-based dedupe guard. |
-
-**Selection criterion confirmed again:** the personas with the least data and the most constraint surface the most defects. A wheelchair user and two 76-year-olds found six of the eight.
-
----
-
-## 📋 New task rows — 12 Aug 2026
-
-| Task | Status | Notes | Next |
-|---|---|---|---|
-| **INF-AUDIT — content and navigation reachability audit** | 🟢 **Built and in use, 12 Aug.** `Documents/Admin/Templates/audit-content-reachability.mjs`. Checks categories, exercise reachability, equipment vocabulary both ways, contraindication validity, missing view files and orphaned routes. | Caught two defects *while being used to fix others* — a reintroduced `chest-acute`, and a `breathing-warmup` narrowing that left one candidate. | Run after any content, category, equipment or route change. |
-| **BUILD-DEVICE — on-device confirmation pass** | 🔴 **Overdue.** Eighteen cache versions unconfirmed. | Gym Full Body end to end, then a check-in. | **Next session. Nothing else should precede it.** |
-| **CONT-3 — remaining session views log a count, not exercise ids** | 🟠 **Open.** `core-session.js`, `yoga-session.js`, `prescribed-session.js` still write `exercisesCount` only, so their exercises never become familiar and CONT-1 does not apply to them. | One field each, same change as `gym-programme.js` v9 and `workout.js` v10. | Book after the device pass. |
-| **CAP-6 — intent and variety questions have no screen** | 🟠 **Open.** `trainingIntent` and `sessionVariety` are live in the engine and read by selection. Nothing asks either question, so every user runs on defaults and the maintain/recover branches are unreachable. | Wording proposed for intent ("What are you hoping for right now?") and variety; **both need Graeme's confirmation before build.** | Decision, then build. |
-| **DATA-1 — `contentType` retirement** | 🟠 **Decided, not done.** Written on 368 of 556 entries, read by nothing anywhere. `category` is what the engines select on. | Deliberately not bundled into the 12 Aug session — it touches 368 entries across 12 files for no functional gain, and that is how mistakes get made. | Clean standalone task. |
-| **DATA-2 — 49 loaded exercises carry no `sets`/`reps` fields** | 🟡 **Open.** The card shows a duration where a gym user expects 3 × 10. 44 of the 49 state it in their `instructions` prose, so the information exists in the wrong place. | Extraction from prose is error-prone and has deliberately not been guessed at. | Manual pass, or a per-entry decision. |
-| **NAV-1 — two orphaned views remain** | 🟡 **Open.** `coach-reflection` and `mobility-conditioning` have views and nothing navigates to them. | Down from 6. | Decide: front door, or retire. |
-| **NAV-2 — first-run navigation and goal-directed pointers** | 🟠 **Designed in conversation, not built.** Four bottom-nav items for 42 routes. Agreed approach: fix missing front doors first (done), then goal-directed pointers ("given what you told me, start here"), then a short skippable tour last — a tour of a product with hidden doors just teaches people the doors are hidden. | Graeme's idea, refined in conversation 12 Aug. | Book after device pass. |
-| **CAP-7 — seated pool depth** | 🟡 **Improved, not solved.** A seated user with no leg function sees 53% session-to-session overlap against a gym-goer's much lower figure, because the eligible pool is structurally smaller (61 vs 500+). | 38 seated entries now. Genuine parity needs roughly 30 more. | Content session in its own right. |
-| **RAT-2 — recovery protocols have no surface** | 🟡 **Open.** 28 exercises remain unreachable by any session type — cold showers, hydration, nutrition timing, nap protocols, visualisation practice. These are correctly *not* session items. | They need their own place in the product rather than a category. | Design decision. |
+Device pass checklist: hard-reload past `alongside-v235`; consent gate renders and gates correctly; Tom-shaped day-one opening; a generated session; Progress minutes non-zero; locked tiles tap through; lift note saves and recalls; `gym-programme.js` one-exercise-at-a-time walkthrough.
 
 ---
 
