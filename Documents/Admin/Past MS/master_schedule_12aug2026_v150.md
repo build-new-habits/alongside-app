@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v151
+## 12 Aug 2026 v150
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v150.md`. Remove v150 on upload.
+Supersedes `master_schedule_11aug2026_v149.md`. Remove v149 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -46,95 +46,6 @@ The same defect appeared **eight times in eight different costumes**: content th
 **Graeme's six UX items**, all shipped: duplicate time question removed, check-in scroll and pacing fixed, in-card performance notes generalised to what each exercise actually produces, "Not a fan" control, coach rationale, empty-session guard.
 
 **Navigation and integrity sweep.** Three routes pointed at view files that had never been written. `about` removed, `community-impact` and `annual-reflection` built, front doors added.
-
----
-
----
-
-## 🎯 THE TIER BOUNDARY — decided 12 Aug 2026
-
-**Two new documents in `Documents/Business/`. These now govern all product decisions and every future proposal must pass them.**
-
-- `alongside_tier_boundary_12aug2026_v1.md` (**v2**) — why someone pays
-- `alongside_destination_architecture_12aug2026_v1.md` (**v1**) — the specification for the paid spine
-
-### The answer
-
-> **Free is the session. Personal is the plan.**
-> Free gives you a coach for today. Personal gives you a coach who knows where you're going.
-
-From Graeme's track analogy: you turn up and ask his daughter's athletics coach for a session. He gives you a real one, properly judged, genuinely worth having. **He withholds nothing — there is nothing to withhold, because you named no destination.** Anna named one, so she has a plan that adapts every week. **Naming a destination is the paid act**, identically for body and mind.
-
-### Three answers rejected as conversion arguments — but KEPT as retention
-
-Recorded in full in the tier document so no future session deletes them as dead ends:
-
-| Concept | Stay | Pay |
-|---|---|---|
-| Deepening relationship over time | ✅ Keep | ✗ 97% gone before day 30 |
-| Impact allocation and the vote | ✅ Keep | ✗ *"Why not just give them a pound?"* |
-| Transfer outward to real life | ✅ Keep (the arc) | ✗ Patronising; assumes the app knows your life |
-
-**Common fault: all three priced feelings. Feelings are why people stay and talk. Capability is why they pay.**
-
-### Ten destination shapes — body AND mind
-
-**Body:** Endurance · Strength · Return · Consistency · Composition · Preservation
-**Mind:** Steadiness · Restoration · Presence · Connection
-
-A destination carries one body shape and/or one mind shape. **A mind-only destination is not a lesser answer.** An earlier draft offered body only, which reproduced exactly the mind/body split the product exists to refuse.
-
-### Decisions that changed existing behaviour
-
-- **In Step moves to FREE.** It is a practice, not a journey. The paid act is naming a destination, not access to content
-- **Free gains the drop-in coach question** — *"Something like last time, or something different?"* This is what makes free a coach rather than a generator
-- **The upgrade door is visible at ALL times**, never triggered by our judgement of readiness. Graeme's correction: *"That's us deciding when the user is ready. I might have got bored at day nine and gone."* P3 governs interruptions; a permanent non-interrupting surface is not one
-- **Never say "upgrade to Personal" in-product** — the possessive collision makes it read as *"you shouldn't ask me that."* Offer the capability in plain English; name the tier only where money changes hands
-- **Restoration is declared, not gated.** Crisis is not burnout. Requires a declaration that is not a one-time footnote, visible routing to real help, crisis policy v7 wired live throughout, and the copy rule **"company on the road, never recovery"**
-- **Mind progress is never measured.** Graeme's psychologist framing: invite the practice, the journal belongs to the person, export for a real professional if they choose
-
-### Three copy rules — non-negotiable, each earned from a real mistake
-
-1. **No internal terms in user-facing copy.** A draft used *"a Connection journey"* — a term invented an hour earlier that no user has ever seen
-2. **Every offer answers three questions in order:** what is it, what would it do for me, how do I get it
-3. **The read-it-cold test.** Read every line as someone who has never seen the document. This caught *"I don't know where yours is"* in the check-in openings, and then caught the Connection line
-
-### Build sequence
-
-| # | Item | Tier | Notes |
-|---|---|---|---|
-| **1** | **Drop-in coach question** | Free | **Start here.** Independent of everything, uses existing `exerciseHistory` |
-| 2 | Condition-aware empathy selection | Free | Prompts/stages/conditions all exist; only the matcher is missing |
-| 3 | The always-visible door | Both | Cheap; stops losing people at day nine |
-| 4 | Grounding moments | Free | In-exercise layer. Earns the pub sentence |
-| 5 | **The plan** | Paid | **Largest piece. Does not exist yet** |
-| 6 | Progress that reads | Paid | Depends on 5 |
-
-**⚠️ §9 of the tier document is the important line: the plan does not exist yet.** `programmes.js` and `programmeEngine.js` are not a destination-driven adaptive road.
-
----
-
-## 🔧 Third-pass trace fixes — shipped 12 Aug 2026
-
-`sw.js` v263 → **v264**. `session-builder.js` → **v22**, `store.js` v29 → **v30**, `Schema.md` v1.24 → **v1.25**, new `tools/schema-check.mjs`.
-
-| ID | Finding | Resolution |
-|---|---|---|
-| **C1** | 🔴 **Safety.** `capability.legPower` read by `capabilityProfile()`, never declared/written/asked — always fell back to `'full'`, so a wheelchair user was served **Seated Leg Extension**, the exact exercise the v29 note exists to prevent | Declared; default now conditional (`'limited'` when `needsSeated`). Gate then caught a second fault: `_loadsLegs()` proxied "loads legs" as "has equipment OR difficulty 3+", so a bodyweight leg extension passed. Leg movement patterns now count on their own account |
-| **C2** | 🔴 140 of 556 entries are `contentType: 'practice'` (complete standalone sessions) and `session-builder.js` never read the field — a 60-min cardio build returned **C25K Week 1 AND Week 2 AND a 20-minute run** | Practices excluded from component selection |
-| **C3** | 🔴 `ex.sets \|\| 3` tripled duration-based exercises; 60-min request labelled **"552–562 mins"** | Fixed at both parallel call sites |
-| **C4** | 🔴 Found because C3 exposed it: fixed exercise counts ignore how long each takes; 60-min request produced 104 min of work | Sessions trimmed to requested duration. **Never trims warmup, cooldown or prescribed** |
-| **A1/A2** | 🟠 `Schema.md` claimed store v21 when live was v29; documented `liftLogEnabled` default `false` when live is `true` | Reconciled to v30. **`liftLogEnabled` default-on needs Graeme's confirm or overrule** |
-| **A3** | 🟠 A store-path audit would not have caught C1 or C2 | `tools/schema-check.mjs` — exits 1 on drift, can gate a commit |
-
-**Retracted:** third-pass §3 ("exercise count no longer responds to duration") was **wrong**. `EXERCISE_COUNT` sets 60 min = 17. That is the allocation working as designed; earlier variation was pools running dry pre-CON.
-
-### Still open from the third pass
-
-- **C1 second half** — the conditional question (*"Do your legs take weight?"*, fires when `chairRise !== 'yes'`). **Wording needs Graeme's sign-off before it ships**
-- **A2** — confirm or overrule `liftLogEnabled` default-on
-- **Ten mis-tagged practices** (Savasana, pre-sport warm-ups) genuinely are components. Data pass, not a fix session
-- **Practices must remain reachable** via Coach decides / Library / Mobility — confirm, or 140 entries became invisible
 
 ---
 
