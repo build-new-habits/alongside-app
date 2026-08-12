@@ -1,6 +1,18 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v277
+ * GM-1 completion. Grounding moments wired into yoga-session.js v3 -> v4.
+ * Yoga is the natural home for these: it is already the frame, and a pose
+ * held still is exactly the plank case Graeme described. Cache bump only.
+ *
+ * Recorded because it caused real friction: three items were re-raised as
+ * open questions after Graeme had already settled them -- the 20 texts
+ * (approved), In Step's relationship to the free tier (agreed 9 Aug), and
+ * yoga (agreed earlier the same day). Restating settled decisions as open
+ * ones wastes his time and makes finished work look unfinished. Check the
+ * record before asking.
+ *
  * 12 Aug 2026 v276
  * GM-1. Grounding moments. New js/data/grounding-moments.js and
  * css/components/grounding-moments.css, both precached. store.js v33 ->
@@ -1298,7 +1310,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v276";
+const CACHE_NAME = "alongside-v277";
 
 const SHELL_URLS = [
 
