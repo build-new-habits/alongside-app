@@ -1,5 +1,13 @@
 /**
  * settings.js
+ * 12 Aug 2026 v19
+ *
+ * v19 - SCHEME-1. Colour scheme control in Settings > Display: dark
+ *   (default), light, high contrast. Dark is the product; the other two
+ *   are adaptations somebody chooses. Uses role="radiogroup" with
+ *   aria-checked rather than the [data-toggle] switch pattern, because
+ *   this is one-of-three rather than on/off.
+ *
  * 12 Aug 2026 v18
  *
  * v18 - LOG-1. "Weight notes" renamed "Session notes", and its copy now
@@ -243,7 +251,7 @@ import { getProgramme, PROGRAMMES }      from '../data/programmes.js';
 import { getProgressStats }              from '../data/programmeEngine.js';
 import { getBeat3Script }                from '../data/beat3-scripts.js';
 import {
-  DISPLAY_RANGES, getDisplayPref, setDisplayPref,
+  DISPLAY_RANGES, SCHEMES, getDisplayPref, setDisplayPref,
   resetDisplayPrefs, formatDisplayValue
 } from '../display-prefs.js';
 import { openSheet }                     from './onboarding/sheet-manager.js';
@@ -816,6 +824,26 @@ export function SettingsView(router) {
 
         <p id="disp-status" class="visually-hidden" role="status" aria-live="polite"></p>
 
+        <div class="disp-field">
+          <span class="disp-field__label" id="disp-scheme-label">Colour scheme</span>
+          <span class="disp-field__hint" id="disp-scheme-hint">
+            Dark is how the app is designed. The other two are here because eyes differ.
+          </span>
+          <div class="disp-schemes" role="radiogroup"
+               aria-labelledby="disp-scheme-label" aria-describedby="disp-scheme-hint">
+            ${SCHEMES.map(s => {
+              const on = getDisplayPref("scheme") === s.value;
+              return `
+                <button type="button" class="disp-scheme ${on ? "disp-scheme--on" : ""}"
+                        role="radio" aria-checked="${on}" data-scheme="${s.value}">
+                  <span class="disp-scheme__label">${s.label}</span>
+                  <span class="disp-scheme__sub">${s.sub}</span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+        </div>
+
         ${_dispSlider("textScale", "disp-text-scale", "Text size",
           "Makes every piece of text in the app larger or smaller.",
           { anchors: ["A", "A"] })}
@@ -1092,6 +1120,20 @@ export function SettingsView(router) {
       input.addEventListener('change', () => {
         const label = container.querySelector(`label[for="${input.id}"]`)?.textContent.trim() || name;
         _dispAnnounce(`${label} set to ${formatDisplayValue(name, input.value)}`);
+      });
+    });
+
+    container.querySelectorAll('[data-scheme]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const value = btn.dataset.scheme;
+        setDisplayPref('scheme', value);
+        container.querySelectorAll('[data-scheme]').forEach(b => {
+          const on = b === btn;
+          b.setAttribute('aria-checked', on ? 'true' : 'false');
+          b.classList.toggle('disp-scheme--on', on);
+        });
+        const label = btn.querySelector('.disp-scheme__label')?.textContent.trim() || value;
+        _dispAnnounce(`Colour scheme set to ${label}`);
       });
     });
 

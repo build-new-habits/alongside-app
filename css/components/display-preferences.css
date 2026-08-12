@@ -223,3 +223,64 @@ body {
     transition: none;
   }
 }
+
+/* ============================================================
+   COLOUR SCHEME CHOICES (SCHEME-1) - 12 Aug 2026 v2
+   Same recessed pattern as .ci-choice, for the same reason: text on a
+   recessed surface clears AA comfortably in all three schemes, where an
+   elevated one does not. All colours are tokens, so this block restyles
+   itself when the scheme it is sitting in changes.
+   ============================================================ */
+
+.disp-schemes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.disp-scheme {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-4);
+  min-height: 64px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-md);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+/* Selection is carried by a 2px border AND aria-checked, never by colour
+   alone - WCAG 1.4.1. */
+.disp-scheme--on {
+  border: 2px solid var(--color-primary);
+  padding: calc(var(--space-4) - 1px);
+}
+
+.disp-scheme__label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: var(--leading-normal);
+}
+
+.disp-scheme__sub {
+  font-size: var(--text-sm);
+  font-weight: var(--font-normal);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.disp-scheme:hover { border-color: var(--color-primary); }
+
+.disp-scheme:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disp-scheme { transition: none; }
+}

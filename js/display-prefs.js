@@ -1,6 +1,11 @@
 /**
  * js/display-prefs.js
- * 12 Aug 2026 v1
+ * 12 Aug 2026 v2
+ *
+ * v2 - SCHEME-1. Colour scheme added: dark (default), light, high
+ *   contrast. Dark is the product; the other two are adaptations
+ *   somebody has chosen. See variables.css v4 for the palettes and the
+ *   measured ratios.
  *
  * DISP-1. Display preferences: text size, line spacing, letter spacing,
  * underline links, enhanced focus.
@@ -33,6 +38,7 @@
  */
 
 export const DISPLAY_KEYS = {
+  scheme:        "alongside-scheme",
   textScale:     "alongside-text-scale",
   leadingScale:  "alongside-leading-scale",
   letterSpacing: "alongside-letter-spacing",
@@ -41,6 +47,11 @@ export const DISPLAY_KEYS = {
 };
 
 export const DISPLAY_DEFAULTS = {
+  // "dark" is the product, not merely the first option. Graeme, 12 Aug:
+  // "I must insist on dark mode default with the potential for
+  // adaptations by the user." Anything else here is an adaptation
+  // somebody has chosen.
+  scheme:        "dark",
   textScale:     "1",
   leadingScale:  "1",
   letterSpacing: "0",
@@ -51,6 +62,18 @@ export const DISPLAY_DEFAULTS = {
 // Ranges are deliberately conservative at the bottom end: nothing here
 // should let somebody make the app unreadable and then be unable to find
 // the control that fixes it. 0.9 is a nudge down, not a shrink.
+export const SCHEMES = [
+  { value: "dark",          label: "Dark",          sub: "The default. Light text on deep blue." },
+  { value: "light",         label: "Light",         sub: "Dark text on white. Easier for some eyes, particularly with astigmatism." },
+  { value: "high-contrast", label: "High contrast", sub: "Maximum separation between text and background." },
+];
+
+export const SCHEME_CLASS = {
+  "dark":          "",                        // no class -- :root defaults ARE dark
+  "light":         "scheme-light",
+  "high-contrast": "scheme-high-contrast",
+};
+
 export const DISPLAY_RANGES = {
   textScale:     { min: 0.9, max: 1.6,  step: 0.05 },
   leadingScale:  { min: 0.9, max: 1.35, step: 0.05 },
@@ -105,6 +128,14 @@ export function applyDisplayPrefs() {
   root.style.setProperty("--user-text-scale",    String(_clamp("textScale",    getDisplayPref("textScale"))));
   root.style.setProperty("--user-leading-scale", String(_clamp("leadingScale", getDisplayPref("leadingScale"))));
   root.style.setProperty("--user-letter-spacing", _clamp("letterSpacing", getDisplayPref("letterSpacing")) + "em");
+
+  // Scheme. Every class removed before one is added, so switching twice
+  // cannot leave two schemes fighting -- the later declaration in
+  // variables.css would silently win and the result would depend on file
+  // order rather than on what the person chose.
+  Object.values(SCHEME_CLASS).forEach(c => { if (c) root.classList.remove(c); });
+  const schemeClass = SCHEME_CLASS[getDisplayPref("scheme")];
+  if (schemeClass) root.classList.add(schemeClass);
 
   root.classList.toggle("underline-links", getDisplayPref("underline") === "on");
   root.classList.toggle("enhanced-focus",  getDisplayPref("focus")     === "on");
