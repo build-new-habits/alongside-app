@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v160
+## 12 Aug 2026 v159
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v159.md`. Remove v159 on upload.
+Supersedes `master_schedule_12aug2026_v158.md`. Remove v158 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -70,88 +70,6 @@ The same defect appeared **eight times in eight different costumes**: content th
 **Wave 2 candidate on evidence:** persona 2.5 (post-cardiac, total beginner). The blank-slate persona surfaced every critical first, so "least data given to the app" is the confirmed selection criterion.
 
 **Fixture note:** the Node harness and persona fixtures are reusable but were built pre-capability-screen. They need `capability{}` added before the next run.
-
-## 🟢 LOG-2 — Yoga session notes: SHIPPED, 12 Aug 2026
-
-`js/session-log.js` v1 → **v2**, `js/views/yoga-session.js` v2 → **v3**, `sw.js` → **v275**, cache **alongside-v275**.
-
-Graeme: *"yes, but note-and-duration only — no reps, no level."* `performanceFields()` gains a `mode`; `"gentle"` returns duration and a free note and nothing else. **A pose is not a set** — counting reps there imports the exact frame the practice exists outside of. The gate asserts gentle mode offers none of reps, level, weight, incline, speed, distance or tension, so it fails if that branch ever widens.
-
----
-
-## 📝 GROUNDING MOMENTS — first 15 drafts written, 12 Aug 2026. AWAITING GRAEME'S MARKING.
-
-**`Documents/Admin/alongside_grounding_moments_drafts_12aug2026_v1.md`.** Build sequence item 3.
-
-### Correction to the record
-
-Earlier versions of this document listed grounding moments as *"Claude writes it, Graeme marks ~15 drafts."* Graeme asked whether they were actually written. **They were not** — nothing existed anywhere: no data file, no drafts, only three references in the tier documents and the open question *"the library needs writing."* It had been carried as though it were waiting on him. It was waiting on Claude.
-
-He then supplied the plank and running models verbally, and the drafts below were written from them.
-
-### The structural finding — worth more than the drafts
-
-His two examples look different but share one shape:
-
-**Contact → Place → Beyond.** Body, then world, then other people.
-
-The plank: where your forearms meet the ground → imagine grass under your hands → you are a line held above a meadow growing around you. The run: the sound of your feet → the air on your skin, birds, wind → *someone coming home from work, wondering what their day might have been like.*
-
-**That is the empathy transfer arc compressed into ninety seconds.** Stage 1 self-recognition to stage 3 situational empathy — the journey the prompt library walks over 85 sessions, happening inside a single plank. The running example's closing line is a stage 3 prompt almost word for word.
-
-**If that holds, grounding moments are not a feature sitting near empathy transfer. They are its practice ground** — and the reason it might land for somebody who never reaches session 85.
-
-**Implication:** one moment should not do all three steps. Step 3 lands on a first-week user as instruction and on a month-four user as invitation. So the same exercise wants a shallower and a deeper version, selected the way empathy prompts now are — which would make this cheap, since that matcher exists.
-
-### The 15
-
-Tagged by movement shape, not exercise name, so 550+ exercises are covered by a few dozen moments rather than hand-writing each: isometric holds (3), outdoor cardio (5), loaded strength (2), floor work (2), seated (1), balance (1), indoor cardio machines (1).
-
-**Flagged in the document as weakest, honestly rather than after he finds them:**
-- **G7 and G8** sit closest to the running example and closest to overreach. Instructing somebody to feel compassion is the fastest way to stop them feeling any. G7 may need to be time-gated or cut.
-- **G15** is the weakest. A treadmill offers no world to notice, so it reaches for the empathy move without the sensory step under it.
-
-### The attentional-focus claim — deliberately not used
-
-Graeme's plank model included that mindful practice produces more muscle definition. That is real (attentional focus / mind-muscle connection; EMG evidence for internal focus, especially isolation work) but it is **not** in any of the copy. It would need a proper citation to sit alongside Plumbly, Zhang and Batson, and a grounding moment that promises a physical return stops grounding and becomes another performance instruction — the thing these exist to interrupt. Suggested for the Philosophy page, not the coach's voice.
-
-### Open questions in the document
-
-1. Do the three steps deepen with time?
-2. Where does one appear — during a hold, on the card, or in the rest gap?
-3. How often? Every session is too often; these depend on being slightly unexpected.
-4. Free tier confirmed?
-5. The attentional-focus claim — Philosophy, or nowhere?
-
----
-
-## 🔵 LIGHT MODE / DISPLAY SCHEME — direction settled 12 Aug 2026, build not started
-
-**Graeme, 12 Aug: *"I must insist on dark mode default with the potential for adaptations by the user."* That is the shape. Decision closed — do not re-open it.**
-
-This supersedes the 26 April note that *"dark mode was confirmed as permanent."* Dark remains the default and the design intent; what changes is that the person may adapt it. Both are true at once.
-
-### What Graeme already has, and why it cannot be pasted
-
-He supplied DPC Hub's `settings.js`, and BNH OS (March) holds a `[data-theme="dark"]` palette with per-token contrast measured. **Neither transfers as code, and his instruction is explicit: apply the logic, not the file.**
-
-The reason is structural, not stylistic. **Both reference products are light-by-default with dark as the option. Alongside is the inverse** — Midnight Teal *is* the default. So their "dark theme" is Alongside's normal state, and what Alongside needs is a **light palette that exists nowhere**. The BNH OS block is valuable as method — token by token with a measured ratio against a named background, which is what `tools/contrast-check.mjs` already enforces — but not one hex value carries over.
-
-### Cost, now that DISP-1 exists
-
-The mechanism is built: `js/display-prefs.js` already does localStorage, root classes and pre-paint application, and Settings > Display is live. **Adding the control is an hour or two.** The palette is the job.
-
-| Task | Size |
-|---|---|
-| Scheme control in Settings > Display | Trivial — pattern is live |
-| Light palette, all 11 surface/text tokens, each measured | Real work |
-| High contrast as *selectable* | Half-built — `prefers-contrast: high` exists, auto-only |
-| Component sweep for hardcoded hex | Same shape as DISP-2's 129 font-sizes |
-| Extend `contrast-check.mjs` to gate BOTH palettes | Small, non-negotiable |
-
-**Cheapest first move:** make high contrast user-selectable. That palette already exists and only lacks a switch.
-
----
 
 ## 🟢 A2 RESOLVED + LOG-1 — Session notes: SHIPPED, 12 Aug 2026
 
@@ -1453,4 +1371,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v160*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v159*
