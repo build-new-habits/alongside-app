@@ -1594,7 +1594,16 @@ export const store = {
     // exclusion this schema change exists to avoid. Logged as CAP-4.
     const needsSeated = c.chairRise === 'no' || c.floorAccess === 'no';
 
-    return { impactSafe, floorSafe, balanceSafe, ceilingCap, needsSeated, asked };
+    // CAP-5. Legs are a separate axis from standing. Unasked defaults to
+    // 'full', because legPower is only asked of people who said they
+    // cannot rise easily, and assuming limitation of everyone else would
+    // be both wrong and insulting.
+    const legPower     = c.legPower || 'full';
+    const legsUsable   = legPower !== 'none';
+    const legsLoadable = legPower === 'full';
+
+    return { impactSafe, floorSafe, balanceSafe, ceilingCap, needsSeated,
+             legsUsable, legsLoadable, asked };
   },
 
   /**

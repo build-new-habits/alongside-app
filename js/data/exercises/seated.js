@@ -894,3 +894,466 @@ SEATED.push(
     credits: 40
   }
 );
+
+// ══════════════════════════════════════════════════════════════════════
+// SEATED DEPTH (CAP-5, 11 Aug 2026)
+//
+// An 8-week trace of a wheelchair user found 68% session-to-session
+// overlap and 17 distinct exercises: he did the identical workout for
+// eight weeks. Correct, respectful of what he had told us, and
+// monotonous -- which is its own kind of exclusion.
+//
+// These are upper-body and trunk entries specifically, since that is the
+// pool that thins fastest once leg work is correctly withheld.
+// ══════════════════════════════════════════════════════════════════════
+
+SEATED.push(
+  {
+    id: 'seated-band-pull-apart',
+    name: 'Seated Band Pull-Apart',
+    youtube: 'seated band pull apart posture',
+    category: 'strength', movementPattern: 'pull',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: ['resistance-band'], equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 3, difficultyLevel: 1, duration: 180,
+    perSide: false, sets: 3, reps: '15', rest: '45s', tempo: '2-1-3',
+    instructions: [
+      'Sit tall holding a band with both hands, arms straight out in front at chest height',
+      'Set your hands about shoulder-width apart on the band',
+      'Pull your hands apart and out to the sides, keeping both arms straight',
+      'Squeeze your shoulder blades together at the widest point',
+      'Return slowly over three counts, resisting the band the whole way'
+    ],
+    coaching: 'Keep your arms straight throughout. The moment your elbows bend it becomes a row, which is a fine exercise but not this one.',
+    why: 'Works the small muscles between the shoulder blades that hold your shoulders back. If you spend a lot of the day with your arms in front of you, this is the direct antidote.',
+    watchOut: [
+      'Elbows bending as the band gets harder near the end of the range',
+      'Shrugging the shoulders up towards the ears',
+      'Letting the band snap the hands back together'
+    ],
+    load: 'Light. This is a small-muscle exercise and a strong band recruits everything except the muscles you are after.',
+    credits: 35
+  },
+  {
+    id: 'seated-band-face-pull',
+    name: 'Seated Band Face Pull',
+    youtube: 'seated band face pull technique',
+    category: 'strength', movementPattern: 'pull',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: ['resistance-band'], equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 3, difficultyLevel: 2, duration: 180,
+    perSide: false, sets: 3, reps: '12', rest: '45s', tempo: '2-1-3',
+    instructions: [
+      'Anchor a band at roughly face height in front of you',
+      'Sit tall and hold an end in each hand, arms straight out',
+      'Pull both hands back towards your face, letting your elbows travel out wide and high',
+      'Finish with your hands either side of your head and your shoulder blades squeezed',
+      'Return slowly over three counts'
+    ],
+    coaching: 'Elbows high and wide, not tucked in. That angle is what reaches the muscles at the back of the shoulder rather than the ones down your sides.',
+    why: 'One of the best things you can do for shoulder health, particularly if you push a chair or use your arms heavily. It balances out all the forward work.',
+    watchOut: [
+      'Elbows dropping low, which turns it into a row',
+      'Leaning back to generate the pull',
+      'Rushing; the slow return is doing as much as the pull'
+    ],
+    load: 'Light. Shoulder health work responds to control, not tension.',
+    credits: 35
+  },
+  {
+    id: 'seated-band-lat-pulldown',
+    name: 'Seated Band Pulldown',
+    youtube: 'seated band lat pulldown overhead anchor',
+    category: 'strength', movementPattern: 'pull',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: ['resistance-band'], equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 4, difficultyLevel: 2, duration: 240,
+    perSide: false, sets: 3, reps: '12', rest: '60s', tempo: '2-1-3',
+    instructions: [
+      'Anchor a band above head height — a door frame, a hook, or a bar',
+      'Sit tall beneath or just in front of it, holding an end in each hand, arms overhead',
+      'Pull both hands down and out towards your shoulders',
+      'Drive your elbows down towards your ribs and squeeze at the bottom',
+      'Let your arms rise slowly over three counts'
+    ],
+    coaching: 'Start each rep by pulling your shoulder blades down before your arms bend at all. That habit is the difference between feeling this in your back and feeling it only in your arms.',
+    why: 'Builds the broad muscles down the sides of your back — the ones that do most of the work in any pulling movement, including pushing a wheelchair.',
+    watchOut: [
+      'Leaning back and using bodyweight rather than pulling',
+      'Elbows flaring forward instead of driving down',
+      'Letting the band pull your arms up fast at the end of each rep'
+    ],
+    load: 'Enough tension that the last two reps are hard, light enough that you stay sitting tall.',
+    credits: 45
+  },
+  {
+    id: 'seated-band-external-rotation',
+    name: 'Seated Shoulder External Rotation',
+    youtube: 'seated band external rotation shoulder',
+    category: 'rehabilitation', movementPattern: 'shoulder-rotation',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: ['resistance-band'], equipmentOptional: [],
+    affectsAreas: ['rotator-cuff', 'shoulder'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 2, difficultyLevel: 1, duration: 180,
+    perSide: true, sets: 3, reps: '15 each side', rest: '30s', tempo: '2-1-3',
+    instructions: [
+      'Anchor a band at elbow height beside you',
+      'Sit side-on with the working arm furthest from the anchor',
+      'Tuck that elbow against your ribs, forearm across your stomach',
+      'Keeping the elbow pinned, rotate your forearm outwards away from your body',
+      'Return slowly over three counts'
+    ],
+    coaching: 'Your elbow stays glued to your side throughout. Tuck a rolled towel under it if it keeps drifting — that one adjustment makes the exercise work.',
+    why: 'Strengthens the small muscles that hold the shoulder joint together. Unglamorous, and it is what keeps shoulders working for people who use their arms heavily every day.',
+    watchOut: [
+      'Elbow drifting away from the ribs',
+      'Turning the whole body instead of just the forearm',
+      'Using a band strong enough that the shoulder starts helping'
+    ],
+    load: 'Very light. This is the one exercise where almost everybody uses too much.',
+    credits: 30
+  },
+  {
+    id: 'seated-overhead-band-press',
+    name: 'Seated Band Overhead Press',
+    youtube: 'seated band overhead press technique',
+    category: 'strength', movementPattern: 'push',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: ['resistance-band'], equipmentOptional: [],
+    affectsAreas: ['shoulder', 'triceps-biceps', 'upper-back'],
+    contraindications: ['shoulder-acute', 'lower-back-acute'],
+    energyRequired: 4, difficultyLevel: 2, duration: 240,
+    perSide: false, sets: 3, reps: '12', rest: '60s', tempo: '2-1-3',
+    instructions: [
+      'Sit on the middle of a band, or anchor it low behind you',
+      'Hold an end in each hand at shoulder height, palms facing forward',
+      'Brace your stomach so your ribs stay down',
+      'Press both hands up until your arms are almost straight overhead',
+      'Lower slowly over three counts back to shoulder height'
+    ],
+    coaching: 'Ribs down as you press. If your lower back arches, the band is too strong and your spine has taken over from your shoulders.',
+    why: 'Overhead strength is what lets you reach a high shelf or lift something into a cupboard. The band keeps tension on right through the top of the movement.',
+    watchOut: [
+      'Lower back arching as the hands go overhead',
+      'Hands drifting forward in front of your face',
+      'Any pinching at the top: reduce how far you press'
+    ],
+    load: 'Enough tension that the last two reps are hard, light enough that your ribs stay down.',
+    credits: 45
+  },
+  {
+    id: 'seated-band-woodchop',
+    name: 'Seated Band Woodchop',
+    youtube: 'seated band woodchop rotation core',
+    category: 'strength', movementPattern: 'rotation',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: ['resistance-band'], equipmentOptional: [],
+    affectsAreas: ['abdominals', 'core', 'shoulder'],
+    contraindications: ['lower-back-acute', 'shoulder-acute'],
+    energyRequired: 4, difficultyLevel: 2, duration: 240,
+    perSide: true, sets: 3, reps: '10 each side', rest: '45s', tempo: '2-1-2',
+    instructions: [
+      'Anchor a band high to one side of you',
+      'Sit tall, side-on, holding the band in both hands up by that shoulder',
+      'Pull it down and across your body towards your opposite hip',
+      'Turn through your ribs as you go, keeping your hips still',
+      'Return slowly to the start, then complete all reps before swapping sides'
+    ],
+    coaching: 'Turn from the ribs and keep the hips facing forward. This is the movement pattern behind reaching for anything that is not directly in front of you.',
+    why: 'Rotation under load, which is what your trunk does every time you reach across yourself. It builds a middle that works rather than one that just holds still.',
+    watchOut: [
+      'Hips turning with the ribs rather than staying square',
+      'Bending the arms and turning it into a pull',
+      'Letting the band snap you back on the return'
+    ],
+    load: 'Light enough that you can control the return at the same speed as the pull.',
+    credits: 45
+  },
+  {
+    id: 'seated-shoulder-shrug',
+    name: 'Seated Shrug',
+    youtube: 'seated dumbbell shrug technique',
+    category: 'strength', movementPattern: 'pull',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: ['dumbbell'], equipmentOptional: ['resistance-band'],
+    affectsAreas: ['upper-back', 'shoulder'],
+    contraindications: ['upper-back-acute', 'shoulder-acute'],
+    energyRequired: 3, difficultyLevel: 1, duration: 180,
+    perSide: false, sets: 3, reps: '15', rest: '45s', tempo: '2-1-3',
+    instructions: [
+      'Sit tall with a dumbbell in each hand, arms hanging at your sides',
+      'Let your shoulders relax fully down to start',
+      'Lift both shoulders straight up towards your ears',
+      'Hold for a second at the top',
+      'Lower slowly over three counts until the shoulders are fully down again'
+    ],
+    coaching: 'Straight up and straight down. Rolling the shoulders backwards at the top adds nothing and grinds the joint.',
+    why: 'Strengthens the muscles that carry the weight of your arms all day. For anyone who pushes, lifts or carries a lot, these take a steady beating and rarely get trained.',
+    watchOut: [
+      'Rolling the shoulders rather than lifting them',
+      'Bending the elbows to help the weight up',
+      'Tensing the neck; the movement is in the shoulders'
+    ],
+    load: 'Heavier than you might expect for the size of the movement, but only once the straight-up path is reliable.',
+    credits: 35
+  },
+  {
+    id: 'seated-isometric-press',
+    name: 'Seated Isometric Chest Press',
+    youtube: 'isometric chest press palms together',
+    category: 'strength', movementPattern: 'isometric',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: [], equipmentOptional: [],
+    affectsAreas: ['chest-pecs', 'shoulder', 'triceps-biceps'],
+    contraindications: ['shoulder-acute', 'chest-acute'],
+    energyRequired: 3, difficultyLevel: 1, duration: 180,
+    perSide: false, sets: 3, reps: '20 seconds', rest: '40s', tempo: 'Steady hold',
+    instructions: [
+      'Sit tall and bring both palms together in front of your chest',
+      'Press your hands into each other as hard as feels comfortable',
+      'Keep your shoulders down and your breathing steady',
+      'Hold the press for twenty seconds',
+      'Release slowly rather than letting go suddenly'
+    ],
+    coaching: 'Breathe all the way through. Holding your breath is the instinct here and it is what makes an isometric feel far harder than it needs to.',
+    why: 'Builds chest and arm strength with no equipment at all, and no movement through the shoulder joint — useful on days when the shoulder is grumbling but you still want to work.',
+    watchOut: [
+      'Holding your breath, which is the most common habit on any isometric',
+      'Shoulders creeping up towards the ears as the effort builds',
+      'Pressing so hard the hands shake; strong and steady beats maximal'
+    ],
+    load: 'No weight. Effort only, and around seventy percent is plenty.',
+    credits: 30
+  }
+);
+
+// Targeted at the measured bottlenecks (CAP-5, second pass). Counting the
+// eligible pool for a seated user with no leg function found: 1 stretch,
+// 1 anti-rotation, 2 core-stability, 3 push, 3 cardio-warmup. One
+// candidate in a category means every session picks the same one, which
+// is exactly the monotony the trace showed.
+SEATED.push(
+  { id: 'seated-neck-side-stretch', name: 'Seated Neck Side Stretch',
+    youtube: 'seated neck side stretch technique',
+    category: 'recovery', movementPattern: 'stretch',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: [], equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder'], contraindications: ['upper-back-acute'],
+    energyRequired: 1, difficultyLevel: 1, duration: 120,
+    perSide: true, sets: 2, reps: '30 seconds each side', rest: '0s',
+    instructions: [
+      'Sit tall with both shoulders relaxed down',
+      'Let your right ear travel slowly towards your right shoulder',
+      'Rest your right hand lightly on the side of your head — its weight is enough',
+      'Hold for thirty seconds, breathing normally',
+      'Return slowly to the middle and repeat on the other side'
+    ],
+    coaching: 'Let the hand rest rather than pull. The weight of an arm is plenty, and pulling is how a stretch becomes a strain.',
+    why: 'The muscles down the side of the neck take the load of holding your head all day, and they tighten first in anyone who uses their arms heavily.',
+    watchOut: [
+      'Pulling with the hand rather than letting it rest',
+      'The opposite shoulder lifting to meet the stretch — keep it down',
+      'Any tingling down the arm: come out of it and leave this one'
+    ],
+    load: 'No weight. The stretch should feel like a long pull, never sharp.', credits: 25 },
+
+  { id: 'seated-chest-doorway-stretch', name: 'Seated Chest Stretch',
+    youtube: 'seated chest stretch hands behind',
+    category: 'recovery', movementPattern: 'stretch',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: [], equipmentOptional: [],
+    affectsAreas: ['chest-pecs', 'shoulder'], contraindications: ['shoulder-acute'],
+    energyRequired: 1, difficultyLevel: 1, duration: 90,
+    perSide: false, sets: 2, reps: '30 seconds', rest: '15s',
+    instructions: [
+      'Sit tall, away from the chair back if you can',
+      'Reach both hands behind you and clasp them, or hold the sides of the chair',
+      'Draw your shoulder blades together and lift your chest',
+      'Hold for thirty seconds, breathing into the front of your chest',
+      'Release slowly'
+    ],
+    coaching: 'Lead with the chest lifting rather than the arms going back. It reaches the same place and asks far less of the shoulder joint.',
+    why: 'Everything most people do happens in front of them, and the chest shortens to match. This is the direct undoing of that.',
+    watchOut: [
+      'Arching the lower back instead of opening the chest',
+      'Forcing the arms further back than is comfortable',
+      'Chin poking forward — keep it gently tucked'
+    ],
+    load: 'No weight.', credits: 25 },
+
+  { id: 'seated-lat-side-stretch', name: 'Seated Side Reach',
+    youtube: 'seated side stretch overhead reach',
+    category: 'recovery', movementPattern: 'stretch',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: [], equipmentOptional: [],
+    affectsAreas: ['upper-back', 'spine', 'shoulder'], contraindications: ['shoulder-acute', 'spine-acute'],
+    energyRequired: 1, difficultyLevel: 1, duration: 120,
+    perSide: true, sets: 2, reps: '30 seconds each side', rest: '0s',
+    instructions: [
+      'Sit tall with both hips firmly on the seat',
+      'Reach your right arm up overhead',
+      'Lean slowly to the left, letting the reach lengthen your right side',
+      'Hold for thirty seconds, keeping both hips down',
+      'Come back upright and repeat on the other side'
+    ],
+    coaching: 'Reach up before you lean over. Length first, then the bend — going straight into the lean just compresses the side you are trying to open.',
+    why: 'Opens the whole side of the trunk from hip to armpit, which is where sitting for long periods quietly shortens things.',
+    watchOut: [
+      'One hip lifting off the seat',
+      'Leaning forward or back rather than directly sideways',
+      'Bouncing at the end of the reach'
+    ],
+    load: 'No weight.', credits: 25 },
+
+  { id: 'seated-wrist-forearm-stretch', name: 'Seated Wrist and Forearm Stretch',
+    youtube: 'seated wrist forearm stretch technique',
+    category: 'recovery', movementPattern: 'stretch',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: [], equipmentOptional: [],
+    affectsAreas: ['wrist-elbow', 'triceps-biceps'], contraindications: ['wrist-elbow-acute'],
+    energyRequired: 1, difficultyLevel: 1, duration: 120,
+    perSide: true, sets: 2, reps: '30 seconds each side', rest: '0s',
+    instructions: [
+      'Sit tall and extend your right arm in front of you, palm facing down',
+      'Use your left hand to draw the fingers gently back towards you',
+      'Hold for thirty seconds, then turn the palm up and repeat',
+      'Swap arms and do both directions on the left',
+      'Keep the working elbow soft rather than locked'
+    ],
+    coaching: 'Gently is the whole instruction. Wrists respond badly to being forced and there is nothing to gain by pushing.',
+    why: 'Anybody who grips, pushes or carries a lot works their forearms constantly and stretches them almost never. This is where wrist and elbow trouble starts.',
+    watchOut: [
+      'Locking the elbow of the arm being stretched',
+      'Pulling hard enough to feel it in the joint rather than the muscle',
+      'Any pins and needles in the hand: stop'
+    ],
+    load: 'No weight.', credits: 25 },
+
+  { id: 'seated-band-anti-rotation-hold', name: 'Seated Anti-Rotation Hold',
+    youtube: 'seated band anti rotation hold core',
+    category: 'strength', movementPattern: 'anti-rotation',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: ['resistance-band'], equipmentOptional: [],
+    affectsAreas: ['abdominals', 'core', 'shoulder'], contraindications: ['lower-back-acute'],
+    energyRequired: 4, difficultyLevel: 2, duration: 180,
+    perSide: true, sets: 3, reps: '20 seconds each side', rest: '40s',
+    instructions: [
+      'Anchor a band at chest height to one side of you',
+      'Sit tall, side-on, holding the band in both hands',
+      'Press your hands straight out in front of your chest and hold them there',
+      'Resist the band trying to turn you for twenty seconds',
+      'Bring your hands in slowly, then repeat on the other side'
+    ],
+    coaching: 'Nothing moves at all. This is the exercise — the not-moving, for twenty seconds, while something tries to move you.',
+    why: 'Holding still under load is a different demand from pressing and returning, and it is closer to what real life asks: staying square while you reach for something.',
+    watchOut: [
+      'Turning towards the anchor as the hold goes on',
+      'Holding your breath — breathe steadily the whole twenty seconds',
+      'Shoulders creeping up towards the ears'
+    ],
+    load: 'Light enough to stay completely square for the full hold.', credits: 40 },
+
+  { id: 'seated-dead-bug-arms', name: 'Seated Arm Reach with Brace',
+    youtube: 'seated core brace arm reach',
+    category: 'strength', movementPattern: 'anti-extension',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: [], equipmentOptional: ['dumbbell'],
+    affectsAreas: ['abdominals', 'core', 'shoulder'], contraindications: ['lower-back-acute', 'shoulder-acute'],
+    energyRequired: 3, difficultyLevel: 1, duration: 180,
+    perSide: true, sets: 3, reps: '10 each side', rest: '45s', tempo: '3-1-3',
+    instructions: [
+      'Sit tall, away from the chair back if you can',
+      'Brace your stomach as though bracing for a gentle prod',
+      'Reach one arm slowly up overhead until it is beside your ear',
+      'Hold for a second without letting your ribs flare or your back arch',
+      'Lower slowly and repeat on the other side'
+    ],
+    coaching: 'The test is whether your ribs stay down as the arm goes up. If your lower back arches to let the arm travel further, stop short of that point.',
+    why: 'Reaching overhead without your back taking the strain is what your middle is for. It is also the pattern behind putting anything on a high shelf.',
+    watchOut: [
+      'Ribs flaring and the lower back arching as the arm rises',
+      'Rushing, which lets momentum hide the arch',
+      'Leaning to the opposite side to get the arm higher'
+    ],
+    load: 'Bodyweight. A light weight only once ten slow reps each side feel controlled.', credits: 35 },
+
+  { id: 'seated-band-chest-fly', name: 'Seated Band Chest Fly',
+    youtube: 'seated band chest fly technique',
+    category: 'strength', movementPattern: 'push',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: ['resistance-band'], equipmentOptional: [],
+    affectsAreas: ['chest-pecs', 'shoulder'], contraindications: ['shoulder-acute', 'chest-acute'],
+    energyRequired: 4, difficultyLevel: 2, duration: 180,
+    perSide: false, sets: 3, reps: '12', rest: '45s', tempo: '2-1-3',
+    instructions: [
+      'Pass a band around the back of your chair at chest height',
+      'Sit tall holding an end in each hand, arms out wide with a soft bend at the elbow',
+      'Bring both hands together in front of your chest in a wide arc',
+      'Squeeze at the middle for a second',
+      'Let your arms open slowly over three counts, staying in control at the widest point'
+    ],
+    coaching: 'Keep the same soft elbow bend the whole way. Straightening as you come together turns it into a press and takes the chest out of it.',
+    why: 'Works the chest through a wider arc than pressing does, which reaches the part of it that pressing largely misses.',
+    watchOut: [
+      'Elbows straightening as the hands meet',
+      'Opening wider than feels comfortable in the shoulder',
+      'Letting the band snap the arms open on the return'
+    ],
+    load: 'Lighter than for pressing. The long lever makes the same band feel much stronger.', credits: 40 },
+
+  { id: 'seated-arm-intervals', name: 'Seated Arm Intervals',
+    youtube: 'seated arm cardio interval workout',
+    category: 'cardio', movementPattern: 'locomotion',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: [], equipmentOptional: [],
+    affectsAreas: ['shoulder', 'upper-back', 'chest-pecs', 'triceps-biceps'],
+    contraindications: ['shoulder-acute'],
+    energyRequired: 6, difficultyLevel: 2, duration: 300,
+    perSide: false, sets: 5, reps: '30 seconds', rest: '30s',
+    instructions: [
+      'Sit tall with your arms relaxed',
+      'For thirty seconds, move your arms as fast as you comfortably can — punches, overhead reaches, wide circles, whatever suits',
+      'Rest for thirty seconds with your arms down and your breathing settling',
+      'Repeat five times in total',
+      'Change the movement each round if you like — variety keeps the effort up'
+    ],
+    coaching: 'Pick a pace you can repeat five times, not one you can manage once. The last round should look like the first.',
+    why: 'Genuinely hard cardio using the upper body alone. Five rounds of this raises your fitness in the same way running does for somebody who runs.',
+    watchOut: [
+      'Going flat out in the first round and fading badly',
+      'Shoulders creeping up and staying there',
+      'Holding your breath during the hard thirty seconds'
+    ],
+    load: 'Bodyweight. Effort should be hard but repeatable across all five rounds.', credits: 55 },
+
+  { id: 'seated-shoulder-rolls-warmup', name: 'Seated Shoulder Rolls',
+    youtube: 'seated shoulder rolls warm up',
+    category: 'cardio', movementPattern: 'locomotion',
+    position: 'seated', impact: false, balanceDemand: false,
+    equipment: [], equipmentOptional: [],
+    affectsAreas: ['shoulder', 'upper-back'], contraindications: [],
+    energyRequired: 2, difficultyLevel: 1, duration: 180,
+    perSide: false, sets: 1, tempo: 'Slow and full', rest: '0s',
+    instructions: [
+      'Sit tall with your arms relaxed at your sides',
+      'Roll both shoulders slowly forwards in the biggest circle you can make',
+      'After a minute, reverse and roll them backwards',
+      'Add a gentle arm swing once the shoulders feel loose',
+      'Continue for three minutes'
+    ],
+    coaching: 'Make the circles as big as they will comfortably go. A small shrug is not a warm-up, it is a fidget.',
+    why: 'Warms the shoulder joint through its full range before you ask anything of it, which matters most for anybody whose arms do the work their legs might otherwise.',
+    watchOut: [
+      'Circles shrinking to a shrug',
+      'Rushing rather than moving slowly through the full range',
+      'Any clicking with pain: reduce the size of the circle'
+    ],
+    load: 'No weight.', credits: 25 }
+);
