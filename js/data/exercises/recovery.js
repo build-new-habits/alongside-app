@@ -1160,7 +1160,7 @@ export const RECOVERY = [
     category: 'recovery',
     contentType: 'practice',
     movementPattern: 'grounding',
-    equipment: [],
+    equipment: ['sauna'],
     equipmentOptional: [],
     affectsAreas: ['full-body', 'cardiovascular'],
     contraindications: ['cardiovascular-condition'],

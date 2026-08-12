@@ -75,11 +75,20 @@ const satisfiable=new Set(); Object.values(EQUIPMENT_IMPLIES).forEach(l=>l.forEa
 const usedTags=new Set(); EXERCISES.forEach(e=>(e.equipment||[]).forEach(t=>usedTags.add(t)));
 [...usedTags].filter(t=>!satisfiable.has(t)&&!UNSATISFIABLE_TAGS.includes(t))
   .forEach(t=>fail('ERROR','equipment',`exercise tag "${t}" cannot be satisfied by any tickable id`));
+// An id can legitimately unlock nothing ON ITS OWN and still be useful:
+// a bench is only ever needed alongside a dumbbell, and a mat is never
+// a requirement at all. What matters is whether any exercise CAN use
+// the capability, not whether the id alone completes one.
 [...tickable].forEach(id=>{
+  const implied=EQUIPMENT_IMPLIES[id]||[id];
+  const anyUse=EXERCISES.some(e=>(e.equipment||[]).some(t=>implied.includes(t)));
+  if(!anyUse && !UNSATISFIABLE_TAGS.includes(id)) {
+    fail('WARN','equipment',`"${id}" is tickable and no exercise anywhere uses it`);
+    return;
+  }
   const r=resolveEquipment([id]);
   const n=EXERCISES.filter(e=>(e.equipment||[]).length>0 && exerciseIsAvailable(e,r)).length;
-  if(n===0) fail('WARN','equipment',`"${id}" is tickable but unlocks 0 exercises`);
-  else if(n<=2) fail('INFO','equipment',`"${id}" unlocks only ${n} exercise(s)`);
+  if(anyUse && n<=2) fail('INFO','equipment',`"${id}" fully unlocks only ${n} exercise(s) alone`);
 });
 
 // 4. CONTRAINDICATIONS MATCH REAL CONDITIONS
