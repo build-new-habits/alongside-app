@@ -1,10 +1,31 @@
 /* ============================================================
    checkin-conversation.css
    css/components/checkin-conversation.css
+   12 Aug 2026 v9
+
+   v9 - A11Y-1 landed, so v8's measurements below are now out of date and
+   are corrected here rather than left to rot. --color-text-secondary is
+   now #B9C6D6 and --color-text-muted #B2C0D0, which means:
+     label   #E2E8F0 on #1E293B = 11.87:1  (unchanged)
+     sub     #B9C6D6 on #1E293B =  8.44:1  (was 7.24)
+     border  #B2C0D0 on #334155 =  5.59:1  (was 4.04)
+   All still comfortably AA, and the border still carries the 1.4.11
+   boundary.
+
+   v8's reasoning is kept below because it is still WHY this component is
+   shaped the way it is -- but note the failure it describes is now fixed
+   at the token level, so the choice to recess rather than elevate is no
+   longer forced. It stays because it is still the better call: a recessed
+   surface gives the sub-line 8.44:1 instead of the ~5:1 an elevated one
+   would, and the hover-must-not-lighten constraint disappears entirely.
+   Do not "simplify" this back onto --color-bg-elevated without checking
+   what that does to the sub-line first.
+
    12 Aug 2026 v8
 
    v8 - DIC-1, the drop-in coach question. New .ci-choice stacked choice
-   buttons for the check-in panel.
+   buttons for the check-in panel. (Measurements in this entry were
+   correct at the time and are superseded by v9 above.)
 
    ACCESSIBILITY NOTE, and the reason this is not a copy of
    coach-proposal.css's .cp-missed-offer__btn, which is the nearest
@@ -667,7 +688,7 @@
 }
 
 /* ============================================================
-   DROP-IN COACH QUESTION (DIC-1) - 12 Aug 2026 v8
+   DROP-IN COACH QUESTION (DIC-1) - 12 Aug 2026 v9
    Stacked choice buttons. See the contrast working in the file
    header before changing any colour here.
    ============================================================ */
@@ -709,7 +730,9 @@
   white-space: normal;
 }
 
-/* Border only. Changing the background here would fail the sub-line. */
+/* Border only. Pre-A11Y-1 this was forced: lightening the background put
+   the sub-line under 4.5:1. That constraint has gone, but border-only
+   hover is kept -- it is quieter, and it keeps the sub-line at 8.44:1. */
 .ci-choice:hover {
   border-color: var(--color-primary);
 }
