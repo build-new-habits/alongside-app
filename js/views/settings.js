@@ -1,5 +1,12 @@
 /**
  * settings.js
+ * 11 Aug 2026 v16
+ *
+ * v16 - About panel now says why the product exists, condensed from
+ *   Graeme's own words on the website rather than paraphrased. It
+ *   previously showed a tier and a version number, which answers a
+ *   different question from the one somebody opening About is asking.
+ *
  * 11 Aug 2026 v15
  *
  * v15 — PT-4. New "Weight notes" panel, appended to the Equipment tab
@@ -773,6 +780,46 @@ export function SettingsView(router) {
       <div class="settings-section">
         <h2 class="settings-section__heading">About</h2>
 
+        <!-- WHY IT EXISTS (11 Aug 2026).
+             The About panel showed a tier and a version number, which is
+             a diagnostics readout rather than an About. Somebody opening
+             About is usually asking "can I trust this?", and a build
+             number does not answer that.
+             Condensed from Graeme's own words on buildnewhabits.co.uk/about
+             rather than paraphrased -- the voice is the point, and a
+             summary written by anyone else would lose it. Kept short
+             deliberately: this is an overview with a route to the full
+             piece, not a copy of it. -->
+        <div class="settings-about-story">
+          <p>I built Alongside because I needed it and it didn't exist.</p>
+          <p>
+            I was injured, and nothing I found could adapt with me. Apps kept
+            telling me to push. AI gave me generic answers. I couldn't afford
+            a physio. I just needed something that understood where I was, and
+            could work around what I could give rather than demand something
+            I couldn't.
+          </p>
+          <p>
+            That is where every decision in this product comes from. No
+            streaks. No punishment for absence. No comparison to who you were
+            last week. A coach that speaks to you first, before it asks
+            anything of you &mdash; and that changes what it offers when
+            you're struggling, because it noticed rather than because you
+            asked.
+          </p>
+          <p>
+            It rejects the idea of &lsquo;normal&rsquo;. We're all normal
+            &mdash; perfectly, differently, normal.
+          </p>
+          <p class="settings-about-signoff">Graeme</p>
+          <a class="btn btn-ghost btn-full"
+             href="https://buildnewhabits.co.uk/about/"
+             target="_blank" rel="noopener"
+             aria-label="Read the full story on our website, opens in a new tab">
+            Read the full story
+          </a>
+        </div>
+
         <div class="settings-about-block">
           <p>Alongside: Move</p>
           <p class="settings-version"
@@ -794,6 +841,16 @@ export function SettingsView(router) {
         </div>
 
         <div class="settings-about-links">
+          <button class="btn btn-ghost"
+                  data-action="nav-impact"
+                  aria-label="See your credits and where they go">
+            Your impact
+          </button>
+          <button class="btn btn-ghost"
+                  data-action="nav-activity-log"
+                  aria-label="View your full activity log">
+            Activity log
+          </button>
           <button class="btn btn-ghost"
                   data-action="nav-privacy"
                   aria-label="View privacy policy">
@@ -1089,6 +1146,17 @@ export function SettingsView(router) {
 
       case 'nav-privacy':
         router.navigate('privacy');
+        break;
+
+      // Front doors added 11 Aug 2026. Both views existed and nothing
+      // navigated to them -- the navigation version of the unreachable
+      // content defect found eight times elsewhere today.
+      case 'nav-impact':
+        router.navigate('community-impact');
+        break;
+
+      case 'nav-activity-log':
+        router.navigate('activity-log');
         break;
 
       case 'reset-data':

@@ -44,7 +44,7 @@ const APP_VERSION = "03 Aug 2026 v8";
 
 const NAV_VIEWS = new Set([
   'today', 'progress', 'noticing', 'settings', 'weekly-plan',
-  'activity-log', 'library', 'upgrade', 'about', 'privacy',
+  'activity-log', 'library', 'upgrade', 'privacy',
   'goal-setup', 'community-impact', 'annual-reflection',
 ]);
 

@@ -1,5 +1,11 @@
 /**
  * progress.js
+ * 11 Aug 2026 v4
+ *
+ * v4 - "Your year" link added. annual-reflection.js existed as a route
+ *   pointing at nothing, and now exists as a view that nothing linked
+ *   to. Progress is where somebody looking back would go.
+ *
  * 11 Aug 2026 v3
  *
  * v3 — WOW-4 (Persona Tracing Wave 1). Free-tier lookback window lifted
@@ -89,6 +95,18 @@ export function ProgressView(router) {
           ${renderActivitySummary(tier)}
           ${stats.hasActiveProgramme ? renderProgrammeProgress(stats) : ''}
           ${tier === 'personal' || tier === 'athlete' ? renderExportBlock() : renderExportLocked()}
+
+          <!-- Front door for the annual reflection, added 11 Aug 2026.
+               The view existed and nothing navigated to it. Progress is
+               where somebody looking back would go. It handles having
+               no year of data gracefully, so it is safe to offer from
+               day one rather than hidden until it fills. -->
+          <button class="btn btn-ghost btn-full"
+                  id="progress-year-btn"
+                  style="margin-top: var(--space-4);"
+                  aria-label="Look back across your year">
+            Your year
+          </button>
         </div>
 
       </div>
@@ -305,6 +323,9 @@ export function ProgressView(router) {
         _handleExport(type);
       });
     });
+
+    container.querySelector('#progress-year-btn')
+      ?.addEventListener('click', () => router.navigate('annual-reflection'));
 
     // Locked export tap
     const lockedExport = container.querySelector('[data-route="upgrade"]');
