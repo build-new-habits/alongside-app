@@ -1,5 +1,11 @@
 /**
  * yoga-session.js - Guided Yoga and Pilates Session
+ * 12 Aug 2026 v4
+ *
+ * v4 - GM-1. Grounding moments on the pose card. Yoga is the natural
+ *   home for these: it is already the frame, and a pose held still is
+ *   exactly the plank case Graeme described.
+ *
  * 12 Aug 2026 v3
  *
  * v3 - LOG-2. Session notes on the pose card, in "gentle" mode: duration
@@ -131,6 +137,7 @@
 import { store } from "../store.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
+import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
 
 export const centered = false;
 
@@ -529,6 +536,12 @@ function renderPose() {
   }
 
   const pose     = sessionQueue[currentIndex];
+
+  // GM-1. Chosen once per render so the card does not shuffle on a timer
+  // tick. Yoga is the natural home for these -- it is already the frame,
+  // and a pose held still is exactly the plank case.
+  const gmSessionCount  = (store.get("activityLog") || []).length;
+  const groundingMoment = selectMoment(pose, gmSessionCount);
   const total    = sessionQueue.length;
   const progress = Math.round((currentIndex / total) * 100);
   const isLast   = currentIndex >= total - 1;
@@ -596,6 +609,14 @@ function renderPose() {
              set: reps and levels would import the frame this practice
              exists outside of. What is worth writing down is how long you
              held it and what you noticed. -->
+        ${groundingMoment ? `
+          <aside class="gmoment" aria-label="Something to notice">
+            <p class="gmoment__text">${groundingMoment.text}</p>
+            <button class="gmoment__dismiss" id="gmoment-dismiss"
+                    aria-label="Do not show this one again">Not for me</button>
+          </aside>
+        ` : ""}
+
         ${renderLogBlock(pose, `ys-log-${currentIndex}`, "gentle")}
       </div>
 
@@ -935,6 +956,19 @@ export function onMount() {
   // LOG-2. Re-wired per render; attachLogEvents() guards double-binding.
   if (phase === "session" && sessionQueue[currentIndex]) {
     attachLogEvents(sessionQueue[currentIndex], `ys-log-${currentIndex}`);
+
+    // GM-1. Recorded on mount, not at render, so one that was built but
+    // never reached the screen is not counted as seen.
+    const gmEl = document.querySelector(".gmoment");
+    if (gmEl) {
+      const sc = (store.get("activityLog") || []).length;
+      const m  = selectMoment(sessionQueue[currentIndex], sc);
+      if (m) recordMomentShown(m, sc);
+      document.getElementById("gmoment-dismiss")?.addEventListener("click", () => {
+        if (m) dismissMoment(m.id);
+        gmEl.remove();
+      });
+    }
   }
 
   document.getElementById("ys-back-btn")?.addEventListener("click", () => {
