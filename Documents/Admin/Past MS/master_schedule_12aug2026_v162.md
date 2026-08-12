@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v163
+## 12 Aug 2026 v162
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v162.md`. Remove v162 on upload.
+Supersedes `master_schedule_12aug2026_v161.md`. Remove v161 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -120,24 +120,11 @@ Raised separately rather than smuggled in. Right now the app tells you "90s rest
 
 Simulation run as well as assertion, per the EMP-1 lesson: the hold pool is fully covered before anything repeats, and nothing appears twice running.
 
-### 🟢 All three "still open" items were already closed. GM-1 is complete.
+### Still open
 
-`sw.js` → **v277**, cache **alongside-v277**. `yoga-session.js` v3 → **v4**.
-
-1. **Yoga — agreed earlier the same day, now wired.** Grounding moments render on the pose card. Yoga is the natural home: it is already the frame, and a pose held still is exactly the plank case.
-2. **In Step — settled 9 Aug 2026** and should never have been re-raised. Personal tier, four movements, sixteen scenarios, three lateral options, three-day cooldown, gated via `auth.js` `isPremium()` in `noticing.js`. **The relationship to free was settled too:** *"you don't have to explain the difference between free and premium. They feel it."* Grounding moments are not in tension with In Step — **they are what makes In Step legible.** A free user who notices something in a plank and finds it stays with them already understands what the paid version offers. That is the tier boundary position exactly: free is excellent, limited in scope, and is the entire marketing budget.
-3. **The 20 texts were approved in the same exchange that produced them** — *"I like your statements."* Approved, not awaiting marking.
-
-### ⚠️ Process note — this caused real friction and is worth keeping
-
-**Three settled decisions were re-raised as open questions.** Graeme: *"isn't this what we just discussed and I said it was good?"* and *"my god this is annoying."*
-
-Two failures, and the second is the one that matters:
-
-- **Not checking the record.** In Step was agreed in a session with a full written summary. It was retrievable and was not retrieved before asking.
-- **Treating "I like it" as insufficient.** Approval was given plainly and was logged as though it were pending. That is the same shape as the earlier "needs Graeme, not code" errors: **manufacturing an open question out of a closed one.** Three occurrences in one session is a pattern, not an accident.
-
-**Standing rule: before listing anything as open, check whether it was already answered. A closed decision restated as open makes finished work look unfinished and costs the person time they already spent.**
+1. **Yoga placement** — one line, since the module is shared. Not yet wired.
+2. **Interaction with In Step** — In Step is four movements, sixteen scenarios, Personal tier, deliberate. These are seconds long, free, in-exercise. Complementary or confusing?
+3. **The 20 texts still want Graeme's marking.** Built does not mean approved; changing them is a data edit with no code change.
 
 ### Previous entry, retained
 
@@ -1553,4 +1540,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v163*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v162*
