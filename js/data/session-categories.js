@@ -1,5 +1,11 @@
 /**
  * data/session-categories.js
+ * 11 Aug 2026 v5
+ *
+ * v5 - Full-sweep additions. An integrity audit found 85 of 544
+ *   exercises matching no category any session type declares. Seven new
+ *   categories close the genuine gaps.
+ *
  * 11 Aug 2026 v4
  *
  * v4 - EQ-1. New "balance-work" and "power" categories. Balance content
@@ -156,10 +162,16 @@ export const CATEGORY_MATCHERS = {
                               pattern(ex, "push", "pull", "shoulder-rotation"),
 
   "anti-extension":   ex => pattern(ex, "anti-extension"),
-  "anti-rotation":    ex => pattern(ex, "anti-rotation"),
+  // "rotation" included 11 Aug 2026. The matcher required the
+  // anti-rotation pattern exactly, so every rotational exercise --
+  // cable woodchop, seated torso rotation, medicine ball rotational
+  // throw -- was unreachable. Resisting rotation and producing it are
+  // different qualities, but they belong to the same slot in a session
+  // and a person needs both.
+  "anti-rotation":    ex => pattern(ex, "anti-rotation", "rotation"),
   "anti-lateral":     ex => pattern(ex, "anti-lateral-flexion"),
   "core-stability":   ex => pattern(ex, "anti-extension", "anti-rotation",
-                                    "anti-lateral-flexion") ||
+                                    "anti-lateral-flexion", "rotation") ||
                             (has(ex, "abdominals") && pattern(ex, "isometric")),
 
   // Added 11 Aug 2026 (CAP-3). All six carry exercises in the database
@@ -186,6 +198,48 @@ export const CATEGORY_MATCHERS = {
   // Both respect the impact and balance gates, which are applied
   // downstream in _filterCandidates -- a category existing does not
   // override what somebody has told us they cannot do.
+  // ── FULL-SWEEP ADDITIONS (11 Aug 2026) ──────────────────────────────
+  //
+  // A whole-codebase integrity audit found 85 of 544 exercises -- 15.6%
+  // of the database -- matching NO category any session type declares.
+  // Written, tagged, standard-compliant, and unreachable.
+  //
+  // The categories below close the genuine gaps. What remains
+  // deliberately unreachable is the recovery-protocol content (cold
+  // showers, hydration, nutrition timing, nap protocols) and
+  // visualisation practice: those are not session exercises and should
+  // not be dropped into the middle of a workout. They need their own
+  // surface, which is a design job rather than a category.
+  //
+  // The recurring lesson, now on its eighth instance today: content
+  // existing is not the same as content being reachable, and nothing in
+  // the product checked the difference until this audit.
+
+  // Arm isolation had no category at all -- curls and tricep extensions
+  // were unreachable while shoulder-isolation existed.
+  "arm-isolation":    ex => (ex.affectsAreas || []).includes("triceps-biceps") &&
+                            !(ex.affectsAreas || []).includes("upper-back"),
+
+  // "conditioning" requires energyRequired >= 5, so every gentle cardio
+  // session -- brisk walks, easy rows, Nordic walking -- fell through.
+  "easy-cardio":      ex => ex.category === "cardio" &&
+                            (ex.energyRequired || 5) <= 5 &&
+                            (ex.duration || 0) > 360,
+
+  "self-massage":     ex => ex.movementPattern === "self-massage",
+
+  "pilates":          ex => ex.movementPattern === "pilates-move" ||
+                            ex.movementPattern === "pilates-sequence",
+
+  "yoga-flow":        ex => ex.movementPattern === "yoga-flow",
+
+  "swim":             ex => ex.movementPattern === "swim",
+
+  // Rehabilitation patterns that existed only inside prescribed
+  // programmes and could never appear in a generated session.
+  "rehab-control":    ex => ["eccentric-control", "joint-mobilisation",
+                             "joint-rotation", "extension"].includes(ex.movementPattern),
+
   "balance-work":     ex => ex.movementPattern === "balance" ||
                             ex.movementPattern === "proprioception" ||
                             ex.balanceDemand === true,
