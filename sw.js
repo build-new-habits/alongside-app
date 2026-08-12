@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v243
+ * In-card performance notes generalised - speed and incline for a treadmill,
+ * resistance level for a cross trainer, band colour, duration for a hold.
+ * Recording is now on by default.
+ *
  * 11 Aug 2026 v242
  * Time question removed from check-in (it was asked twice), and a reversible
  * "Not a fan of this one" control added to the exercise card. Exercise
@@ -1057,7 +1062,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v252";
+const CACHE_NAME = "alongside-v253";
 
 const SHELL_URLS = [
 
