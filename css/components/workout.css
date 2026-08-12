@@ -1,6 +1,10 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   11 Aug 2026 v6
+
+   v6 - .sb-rationale, .sb-section-why, .sb-rationale-arc.
+
    11 Aug 2026 v5
 
    v5 - .exercise-preference, the "Not a fan of this one" control.
@@ -465,6 +469,52 @@
   font-style: italic;
   margin: 0;
   padding: var(--space-2) 0 0;
+}
+
+/* ============================================
+   SESSION RATIONALE  (11 Aug 2026)
+   ============================================
+
+   The coach explaining its own reasoning. Sits between the coach line
+   and the exercise list, so the order reads: what I'm thinking, why
+   this shape, then the session itself.
+
+   Section lines are quiet by design -- they are context for the block
+   below, not headings competing with it.
+   ============================================ */
+
+.sb-rationale {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text);            /* 8.4:1 on card, AAA */
+}
+
+.sb-section-why {
+  margin: var(--space-1) 0 var(--space-2);
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);  /* 5.9:1 on bg, AA */
+}
+
+.sb-rationale-arc {
+  margin-top: var(--space-3);
+}
+
+.sb-rationale-arc > summary {
+  min-height: 44px;                    /* WCAG 2.2 AA touch target */
+  display: flex;
+  align-items: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.sb-rationale-arc > p {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text);
 }
 
 /* ============================================

@@ -1,6 +1,14 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 11 Aug 2026 v7
+ *
+ * v7 - Renders the session rationale: the opening explanation above the
+ *   exercise list, a one-line purpose under each section heading, and
+ *   the longer arc behind a "What this is building" disclosure. The arc
+ *   is collapsed by default because somebody about to train wants to
+ *   start, and the person who wants the reasoning can open it.
+ *
  * 11 Aug 2026 v6
  *
  * v6 - Duration display. Raw seconds were printed straight onto the
@@ -618,9 +626,18 @@ function renderPreview() {
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div>
           <p class="coach-message-text">${builtSession.coachLine}</p>
+          ${builtSession.rationale?.opening ? `
+            <p class="sb-rationale">${builtSession.rationale.opening}</p>
+          ` : ""}
           <p class="text-sm text-muted" style="margin-top: var(--space-2);">
             ${builtSession.duration} &nbsp;&middot;&nbsp; ${builtSession.exercises.length} exercises
           </p>
+          ${builtSession.rationale?.arc ? `
+            <details class="sb-rationale-arc">
+              <summary>What this is building</summary>
+              <p>${builtSession.rationale.arc}</p>
+            </details>
+          ` : ""}
         </div>
       </div>
 
@@ -628,6 +645,7 @@ function renderPreview() {
 
         ${warmup.length > 0 ? `
           <p class="sb-section-label text-xs text-muted">Warm-up</p>
+          ${builtSession.rationale?.sections?.warmup ? `<p class="sb-section-why">${builtSession.rationale.sections.warmup}</p>` : ""}
           ${warmup.map(ex => `
             <div class="sb-exercise-item" role="listitem">
               <div class="sb-exercise-left">
@@ -642,6 +660,7 @@ function renderPreview() {
 
         ${main.length > 0 ? `
           <p class="sb-section-label text-xs text-muted" style="margin-top: var(--space-3);">Main session</p>
+          ${builtSession.rationale?.sections?.main ? `<p class="sb-section-why">${builtSession.rationale.sections.main}</p>` : ""}
           ${main.map(ex => `
             <div class="sb-exercise-item" role="listitem">
               <div class="sb-exercise-left">
@@ -657,6 +676,7 @@ function renderPreview() {
 
         ${cooldown.length > 0 ? `
           <p class="sb-section-label text-xs text-muted" style="margin-top: var(--space-3);">Cool-down</p>
+          ${builtSession.rationale?.sections?.cooldown ? `<p class="sb-section-why">${builtSession.rationale.sections.cooldown}</p>` : ""}
           ${cooldown.map(ex => `
             <div class="sb-exercise-item" role="listitem">
               <div class="sb-exercise-left">
