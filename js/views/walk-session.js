@@ -47,6 +47,7 @@
  */
 
 import { store } from "../store.js";
+import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
 export const centered = false;
@@ -409,6 +410,12 @@ function renderWalking() {
 
 // ── Done screen ───────────────────────────────────────────────────────────────
 
+// LOG-4. These views log against the ACTIVITY, not an exercise -- there is
+// no exercise object here and store.logLift() is keyed by id. A stable
+// synthetic id per activity type means "last time" is a real comparable
+// note rather than one orphaned entry per session.
+const LOG_SUBJECT = { id: "activity-walk", name: "Walk", equipment: [] };
+
 function renderDone() {
   const name     = store.get("name") || "";
   const wt       = WALK_TYPES.find(t => t.id === selectedType);
@@ -439,6 +446,8 @@ function renderDone() {
           </p>
         </div>
       </div>
+
+      ${renderLogBlock(LOG_SUBJECT, "walk-log", "distance")}
 
       <div style="display: flex; flex-direction: column; gap: var(--space-3);
                   margin-top: var(--space-6);">
@@ -601,6 +610,10 @@ function formatMMSS(seconds) {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // LOG-4. Only present on the done screen; attachLogEvents() no-ops when
+  // the block is absent and guards double-binding when it is not.
+  attachLogEvents(LOG_SUBJECT, "walk-log");
+
   mountSessionGuard({
     isActive: () => phase === "walking" && sessionStarted,
     label:    "walk",
