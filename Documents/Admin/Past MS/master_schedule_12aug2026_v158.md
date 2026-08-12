@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v159
+## 12 Aug 2026 v158
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v158.md`. Remove v158 on upload.
+Supersedes `master_schedule_12aug2026_v157.md`. Remove v157 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -70,60 +70,6 @@ The same defect appeared **eight times in eight different costumes**: content th
 **Wave 2 candidate on evidence:** persona 2.5 (post-cardiac, total beginner). The blank-slate persona surfaced every critical first, so "least data given to the app" is the confirmed selection criterion.
 
 **Fixture note:** the Node harness and persona fixtures are reusable but were built pre-capability-screen. They need `capability{}` added before the next run.
-
-## 🟢 A2 RESOLVED + LOG-1 — Session notes: SHIPPED, 12 Aug 2026
-
-**A2 closed: `liftLogEnabled` stays default-ON, confirmed by Graeme.** He then widened it: *"But not just weight. Time, tension, elevation etc."*
-
-New `js/session-log.js` and `css/components/session-log.css`. `js/views/gym-programme.js` v3 → **v4**. `js/views/workout.js` v10 → **v11**. `js/views/settings.js` v17 → **v18**. `css/main.css` v16 → **v17**. New `tools/verify-log1.mjs`. `sw.js` → **v274**, cache **alongside-v274**.
-
-### Most of it already existed — and that is the finding
-
-`store.js` v28 generalised `logLift()` on **11 Aug**, from Graeme's own words at the time, to **nine metrics**: weight, reps, speed, incline, level, distance, duration, band tension, free note. The field set already adapted to the equipment:
-
-| Equipment | Fields |
-|---|---|
-| Treadmill | Speed · Incline % · Minutes |
-| Bike, rower, elliptical, stair climber, ski erg | Level · Minutes · Distance |
-| Resistance band | Band · Reps |
-| Dumbbell, barbell, kettlebell, cable, machines | Weight · Reps |
-| Holds and planks | Minutes · Note |
-| Bodyweight | Reps · Note |
-
-So time, tension and elevation all worked. **Two other things were wrong, and together they made a nine-metric log read as a gym-weights feature.**
-
-### Gap 1 — REACH
-
-`renderLiftBlock()` lived inside `gym-programme.js` and nowhere else. **Of eleven session views, exactly one offered it.** `workout.js` — the main coach-built session player — had no way to write anything down at all.
-
-Extracted to `js/session-log.js`; `gym-programme.js` now imports rather than owns it, and `workout.js` gains it. **P5's shape: a view should not own something several views need.** Id prefixes now carry the exercise index, so the Save handler cannot write one exercise's numbers onto another as the card re-renders.
-
-### Gap 2 — TRUTH
-
-Settings called it **"Weight notes"**, described as *"For gym sessions. Jot down what you lifted."* Nine metrics behind a weight-only label — almost certainly the whole reason it read as weight-only.
-
-Renamed **"Session notes"**, copy now naming weight, time, level, incline and band, and no longer claiming to be gym-only because as of `workout.js` v11 it is not.
-
-**Named "Session notes" rather than anything containing performance, progress or personal best** — those carry a verdict, and P4 says the app may display and never interpret. The store field `liftLogEnabled` is untouched: renaming a live field for tidiness is a migration, not a rename.
-
-**Standing note: a feature that describes itself wrongly is one people correctly believe does not do the thing.** This one had been fully built for a day and read as missing.
-
-### 🔴 Deliberately excluded — and the gate asserts it stays that way
-
-**`breathing-session.js` and `quiet-session.js` do not get this and should not.** Those are restoration; `breathing-session.js` contains no exercises at all. A metrics box on a screen whose purpose is to stop measuring contradicts the product. This is a boundary, not an oversight, and `tools/verify-log1.mjs` fails if either view ever gains it.
-
-Graeme delegated the reach decision ("I don't mind, you choose"). The answer was deliberately **not** "all session views" for that reason.
-
-**Not done, and each is a separate small job:**
-- **Single-activity views** — walk, run, cycle, swim. Different shape: one activity, not a sequence of exercises. Needs its own field set (a walk produces distance and minutes; a swim produces lengths). Not booked.
-- **`yoga-session.js`** — an open question rather than a no. A duration note is harmless, but yoga is the one place the product is most explicitly not about performance. Needs a decision.
-- **`prescribed-session.js`, `core-session.js`, `morning-session.js`** — card-shaped, so cheap follow-ons now the module is shared. Not booked.
-
-### Verification
-
-`tools/verify-log1.mjs`, 22 assertions. The first nine assert that **every metric `store.logLift()` accepts is reachable from some field set** — a metric the store accepts but no field offers is unrecordable by design, which is the reader-without-writer pattern in its mirror image. Others assert the exclusions hold, the CSS reaches the browser, the old `.gp-lift` rules were removed rather than left dead, and that no verdict word appears in the panel copy.
-
----
 
 ## 🟢 C1 SECOND HALF — the conditional leg question: SHIPPED, 12 Aug 2026
 
@@ -1371,4 +1317,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v159*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v158*
