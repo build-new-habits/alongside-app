@@ -532,7 +532,14 @@ export const workoutGenerator = {
   generateDailyOptions() {
     const profile     = this.getUserProfile();
     const checkin     = checkinData.getTodaysCheckin();
-    const intensity   = store.get("todayIntensity") || "moderate";
+    // BIAS-1. todayIntensity comes from check-in ENERGY alone.
+    // proposalBias carries what the coach worked out from severe pain,
+    // burnout risk, consecutive training days and returning after time
+    // away -- written since 03 Aug and read by nothing until now.
+    const intensity   = checkinData.resolveIntensity(
+      store.get("todayIntensity") || "moderate",
+      store.get("proposalBias")
+    );
     const burnout     = checkinData.detectBurnout();
     const goalProfile = this.getGoalProfile();
 
