@@ -1,6 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v266
+ * The two "logged, not fixed" items from DIC-1, actually fixed. Graeme
+ * pushed back on the logging and was right: touch-once means a file
+ * appears in one session's scope, not that scope can never grow, and
+ * neither store.js nor Schema.md had been opened this session. The rule
+ * was being used as a reason rather than applied as one.
+ * js/store.js v30 -> v31: set() now lazily inits the way get() already
+ * did. Documents/Live State/Schema.md v1.25 -> v1.26: DOC-2, the front
+ * page said store.js v30 in the header and v21 four lines later.
+ * Cache bump only, no new files.
+ *
  * 12 Aug 2026 v265
  * DIC-1, the drop-in coach question. js/views/checkin.js v13 -> v14 (the
  * question, its 21-day gate, and the sessionVariety write - sessionVariety
@@ -1136,7 +1147,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v265";
+const CACHE_NAME = "alongside-v266";
 
 const SHELL_URLS = [
 
