@@ -238,19 +238,35 @@ function updateBreathCircle(phaseLabel, duration) {
 }
 
 function logSession() {
-  const log   = store.get("activityLog") || [];
+  // PT-6, 12 Aug 2026. This wrote straight to activityLog with
+  // store.set(), bypassing store.logActivity() and therefore all three
+  // of its guards:
+  //
+  //   1. The 10-second dedupe window, which exists specifically to stop
+  //      the duplicate-write bug found in session B3-3. This function is
+  //      called from THREE places (the completion handler and two exit
+  //      paths at :460 and :503), so it was the most exposed of the
+  //      bypassing views, not the least.
+  //   2. The empty-partial guard added in store.js v24 after Graeme
+  //      backed straight out of a session and it saved anyway.
+  //   3. The exerciseHistory write, so breathing practices never became
+  //      familiar and continuity-aware selection could not see them.
+  //
+  // Same fields, same id shape, one shared write path.
   const today = new Date().toISOString().split("T")[0];
-  log.push({
-    id:          today + "-breathing-" + Math.random().toString(36).slice(2, 6),
-    date:        today,
-    type:        "mindfulness",
-    name:        `${TYPES.find(t => t.id === selectedType)?.label || "Breathing"} — ${selectedMins} min`,
+  const nowIso = new Date().toISOString();
+  store.logActivity({
+    id:           today + "-breathing-" + Math.random().toString(36).slice(2, 6),
+    date:         today,
+    type:         "mindfulness",
+    name:         `${TYPES.find(t => t.id === selectedType)?.label || "Breathing"} — ${selectedMins} min`,
     durationMins: selectedMins,
     creditsEarned,
-    source:      "self-directed",
-    completedAt: new Date().toISOString()
+    source:       "self-directed",
+    status:       "completed",
+    completedAt:  nowIso,
+    sessionEnd:   nowIso
   });
-  store.set("activityLog", log);
 
   const total = (store.get("totalCredits") || 0) + creditsEarned;
   store.set("totalCredits", total);
