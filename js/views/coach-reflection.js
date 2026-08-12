@@ -260,7 +260,7 @@ function buildReflection() {
   if (highConsist) {
     return { type: "consistency", proposalBias: null, lines: [
       "You have checked in almost every day this week.",
-      "Not because I am counting -- because you have been showing up for yourself.",
+      "Not because I am counting -- because you keep coming back.",
       "What would you like to do with that today?"
     ]};
   }
