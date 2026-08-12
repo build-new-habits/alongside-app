@@ -1,6 +1,21 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v269
+ * DISP-1, display preferences. New Settings > Display tab: text size,
+ * line spacing, letter spacing, underline links, stronger focus outlines.
+ * New js/display-prefs.js and css/components/display-preferences.css,
+ * both added to SHELL_URLS. css/base/variables.css v2 -> v3 (the --text-*
+ * and --leading-* tokens now multiply a user scale; the dead
+ * @media (prefers-larger-text) block removed - not a real media feature,
+ * never matched). css/main.css v15 -> v16. js/views/settings.js v16 -> v17.
+ * index.html gains an inline pre-paint script so preferences apply before
+ * first paint instead of flashing. css/base/reset.css: .sr-only aliased
+ * to .visually-hidden (A11Y-3 - seven elements used a class that was
+ * never defined, five of them holding text meant to be heard not seen).
+ * New tools/verify-disp1.mjs. Defaults are exactly 1/1/0em, so nothing
+ * changes for anyone who never opens the tab.
+ *
  * 12 Aug 2026 v268
  * A11Y-2. The html.light-mode block removed from css/base/global.css and
  * archived to Documents/Archive/ with its reasoning. It was unreachable
@@ -1170,7 +1185,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v268";
+const CACHE_NAME = "alongside-v269";
 
 const SHELL_URLS = [
 
@@ -1202,12 +1217,14 @@ const SHELL_URLS = [
   "/alongside-app/css/components/sheet-manager.css",
   "/alongside-app/css/components/settings-reflection.css",
   "/alongside-app/css/components/checkin-conversation.css",
+  "/alongside-app/css/components/display-preferences.css",
   "/alongside-app/css/components/tier-gating.css",
 
   // Core JS
   "/alongside-app/js/app.js",
   "/alongside-app/js/router.js",
   "/alongside-app/js/store.js",
+  "/alongside-app/js/display-prefs.js",
   "/alongside-app/js/tts.js",
   "/alongside-app/js/session-guard.js",
   "/alongside-app/js/session-resume.js",
