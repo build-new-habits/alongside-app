@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v252
+ * Every tickable equipment id now unlocks something. 24 did not - ticking a
+ * pull-up bar changed nothing. 12 entries written, the rest mapped to kit that
+ * asks the same thing.
+ *
  * 11 Aug 2026 v251
  * Full integrity sweep - 85 of 544 exercises were unreachable by any session
  * type, and three safety exclusions named conditions that do not exist so they
@@ -1103,7 +1108,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v261";
+const CACHE_NAME = "alongside-v262";
 
 const SHELL_URLS = [
 
