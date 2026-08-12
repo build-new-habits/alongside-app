@@ -55,7 +55,7 @@ export function CompleteView(router) {
             ${name ? "You are set, " + _esc(_cap(name)) + "." : "You are set."}
           </h1>
           <p class="text-secondary" style="margin-bottom: var(--space-5);">
-            Here is what the first part of your journey looks like.
+            Here is what the first few weeks look like.
           </p>
 
           <div class="complete-journey-card"

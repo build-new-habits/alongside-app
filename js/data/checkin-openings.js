@@ -181,11 +181,11 @@ const PROGRESS = {
   'four-week':          { careMode: false, b1: "Four weeks. That's actually a long time to keep showing up.",        b2: "I'm curious what feels different now compared to when you started." },
   'eight-week':         { careMode: false, b1: "Eight weeks. I've watched this change shape — not in a straight line, but it's changed.", b2: "I want to understand how today fits into that." },
   'twelve-week':        { careMode: false, b1: "Twelve weeks. That's a whole chapter.",                              b2: "I'm not going to let you check in without knowing you know that." },
-  'three-month':        { careMode: false, b1: "Three months. I want you to sit with that for a second.",            b2: "What do you think has actually changed?" },
+  'three-month':        { careMode: false, b1: "Three months. That is worth stopping on for a second.",            b2: "What do you think has actually changed?" },
   'phase-transition':   { careMode: false, b1: "You've moved into a new phase. That doesn't happen automatically — you did something to get here.", b2: "I want to know how today feels with that behind you." },
   'visible-progress':   { careMode: false, b1: "Have you looked at how far you've come since you started? I have.",                          b2: "I want to know how today feels, knowing that." },
   'programme-complete': { careMode: false, b1: "You finished a whole programme. That's not something everyone does.",                         b2: "I'm curious how it feels to be starting something new." },
-  'personal-best-long': { careMode: false, b1: "That was your longest session yet. I noticed.",                                              b2: "How does that sit with you?" },
+  'personal-best-long': { careMode: false, b1: "That was your longest session yet. I noticed.",                                              b2: "How do you feel about that?" },
   'personal-best-week': { careMode: false, b1: "Last week was your most active week since you started. Have you noticed that?",              b2: "I want to know how today feels coming off the back of it." },
   'return-positive':    { careMode: true,  b1: "Before you went quiet, things were sounding good. I held onto that.",                       b2: "I want to know how you're coming back — whether that's still true, or something happened." },
   'mood-lift-pattern':  { careMode: false, b1: "For the last few weeks, you've been finishing sessions feeling better than you started.",    b2: "Have you noticed that about yourself?" },
@@ -228,7 +228,7 @@ const ARRIVAL_ABANDONED = [
 // "Do you remember telling me during onboarding that...?"
 
 const DAY_ONE = [
-  { trigger: 'movement-pain',      careMode: true,  b1: "Do you remember telling me during onboarding that movement has sometimes hurt — physically?",  b2: "I was wondering how you're reflecting on that now, before your very first session." },
+  { trigger: 'movement-pain',      careMode: true,  b1: "Do you remember telling me during onboarding that movement has sometimes hurt — physically?",  b2: "I was wondering how you feel about that now, before your very first session." },
   { trigger: 'self-consciousness', careMode: false, b1: "Do you remember telling me that being around other people when you exercise has felt hard?",    b2: "You're here now, on your own terms. I was wondering how that feels going into your first one." },
   { trigger: 'motivation',         careMode: false, b1: "Do you remember telling me that getting started — actually starting — has been the hardest part?", b2: "You've just done that. I was wondering what it feels like to be on this side of it." },
   { trigger: 'time-energy',        careMode: false, b1: "Do you remember saying that finding time and energy has been the thing that keeps getting in the way?", b2: "I was wondering — right now, today, how is that feeling?" },
@@ -262,7 +262,7 @@ const DAY_ONE = [
   { trigger: 'escalation-trap',    careMode: false, b1: "Do you remember telling me that last time it moved too fast, too soon?",                        b2: "I was wondering what a pace that actually worked would feel like — you'd know better than I would." },
   { trigger: 'invisible-person',   careMode: false, b1: "Do you remember telling me you never felt like it knew you were there?",                        b2: "I know you're here. I was wondering how you're doing today — actually." },
   { trigger: 'body-story',         careMode: true,  b1: "Do you remember telling me your relationship with your body has made this complicated?",        b2: "I'm not going to ask you to explain it. I was wondering how today feels, going into your first session." },
-  { trigger: 'the-history',        careMode: true,  b1: "Do you remember telling me there's a longer history here than any of the rest of it?",          b2: "None of that needs revisiting today. I was wondering how it sits with you, standing here before the first one." },
+  { trigger: 'the-history',        careMode: true,  b1: "Do you remember telling me there's a longer history here than any of the rest of it?",          b2: "None of that needs going into today. I was wondering how you feel, standing here before the first one." },
 
   { trigger: 'generic',            careMode: false, b1: "This is the first real one.",                                                                   b2: "No history yet — just you, now. How are you today?" },
 ];
