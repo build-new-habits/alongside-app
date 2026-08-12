@@ -74,6 +74,7 @@
  */
 
 import { store } from "../store.js";
+import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { getActiveConditionIds, getConditionName } from "../data/conditions.js";
 import { EXERCISES } from "../data/exercises/index.js";
@@ -85,6 +86,18 @@ const CREDITS_PER_EXERCISE = 35;
 const CREDITS_MAX          = 150;
 
 // -- Session state ---------------------------------------------------------------
+// PT-3 / PRESC-1, 12 Aug 2026. This view had no session clock, so it
+// could not report elapsed time even once it started logging completions.
+// Same pattern as workout.js:186 and core-session.js -- GUARDED SET,
+// because onMount() re-fires on every router.navigate back into this
+// view and an unguarded assignment would restart the clock each time.
+let sessionStartTime = null;
+
+function elapsedMins() {
+  if (!sessionStartTime) return null;
+  return Math.max(1, Math.round((Date.now() - sessionStartTime) / 60000));
+}
+
 let currentIndex  = 0;
 let timerInterval = null;
 let timeRemaining = 0;
@@ -256,6 +269,11 @@ export function render() {
           `;
         })()}
 
+        <!-- LOG-3. Physio-prescribed work is exactly where a note matters
+             most: "3kg felt fine, 4kg pulled" is the thing somebody needs
+             at their next appointment and cannot reconstruct afterwards. -->
+        ${renderLogBlock(ex, `ps-log-${currentIndex}`)}
+
         <!-- Notes -->
         ${ex.notes ? `
           <div class="exercise-instructions card">
@@ -355,6 +373,16 @@ function formatTime(seconds) {
 export function onMount() {
   const exercises = store.get("prescribedExercises") || [];
   const active    = exercises.filter(e => !e.completedToday);
+
+  // LOG-3. Re-wired per render; attachLogEvents() guards double-binding.
+  if (active[currentIndex]) {
+    attachLogEvents(active[currentIndex], `ps-log-${currentIndex}`);
+  }
+
+  // PT-3. Latch once. onMount() re-fires on every navigate back into this
+  // view, so an unguarded assignment would reset the clock and report a
+  // forty-minute session as four.
+  if (active.length > 0 && sessionStartTime === null) sessionStartTime = Date.now();
 
   // Already-done state - literal back to wherever the user came from
   document.getElementById("ps-back-btn")?.addEventListener("click", () => {
@@ -507,6 +535,33 @@ function completeSession(active) {
   store.set("lastWorkoutCredits", creditsEarned);
   store.set("lastWorkoutName",    "Prescribed Session");
 
+  // PRESC-1, 12 Aug 2026. This function did not log the session at all.
+  // It awarded credits and navigated away, so a FINISHED prescribed
+  // session was never recorded -- the only logActivity() call in this
+  // file is savePartialSession(), which fires when somebody ABANDONS one.
+  //
+  // Consequences, all silent: Progress under-counted every completed
+  // prescribed session; exerciseHistory never learned any of these
+  // exercises, so continuity-aware selection and the drop-in coach
+  // question could not see them; and the coach's own condition-specific
+  // recommendations were the least-tracked thing in the product.
+  //
+  // exerciseIds is what store.logActivity() forwards to recordExercises()
+  // -- and only when status is not "partial", which is why abandoning
+  // one correctly recorded nothing.
+  const nowIso = new Date().toISOString();
+  store.logActivity({
+    type:           "prescribed-session",
+    source:         "coach-recommended",
+    sessionEnd:     nowIso,
+    completedAt:    nowIso,
+    status:         "completed",
+    durationMins:   elapsedMins(),
+    exercisesCount: progress.length,
+    exerciseIds:    progress.map(e => e.exerciseId).filter(Boolean),
+    creditsEarned
+  });
+
   cleanupSession();
   dismountSessionGuard();
   // Route through reflect.js for post-session reflection, then on to
@@ -516,6 +571,7 @@ function completeSession(active) {
 
 function cleanupSession() {
   pauseTimer();
+  sessionStartTime = null;   // PT-3: reset for the next session
   currentIndex  = 0;
   timeRemaining = 0;
   timerStarted  = false;
@@ -552,6 +608,11 @@ function savePartialSession() {
     completedAt:    nowIso,
     status:         "partial",
     exercisesCount: progress.length,
+    // CONT-3. Supplied here too, though store.logActivity() deliberately
+    // ignores it for partial entries -- an abandoned session should not
+    // make its exercises "familiar". Present so the two call sites do not
+    // diverge if that guard is ever revisited.
+    exerciseIds:    progress.map(e => e.exerciseId).filter(Boolean),
     creditsEarned
   });
 
