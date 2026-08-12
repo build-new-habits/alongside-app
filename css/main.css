@@ -1,4 +1,8 @@
 /* main.css
+ * 12 Aug 2026 v18
+ *
+ * v18 - GM-1. components/grounding-moments.css imported.
+ *
  * 12 Aug 2026 v17
  *
  * v17 - LOG-1. components/session-log.css imported.
@@ -95,6 +99,7 @@
 @import 'components/checkin-conversation.css';
 @import 'components/display-preferences.css';
 @import 'components/session-log.css';
+@import 'components/grounding-moments.css';
 /* Content-gated — add when content sessions complete */
 /* D3:  @import 'components/home-threshold.css';       */
 /* D10: @import 'components/community-impact.css';     */

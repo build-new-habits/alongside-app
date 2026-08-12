@@ -1,0 +1,63 @@
+/* ============================================================
+   grounding-moments.css
+   css/components/grounding-moments.css
+   12 Aug 2026 v1
+
+   A short invitation to notice something, on the exercise card.
+
+   Styled to be QUIET. This is the one thing on the card that is not an
+   instruction, and it should not compete with the ones that are. No
+   accent fill, no icon, no border on three sides -- a single left rule
+   in the primary colour, and otherwise the same surface as everything
+   around it.
+
+   The temptation is to make it feel special. That would be the mistake:
+   a moment that announces itself is one more thing being asked of you,
+   and these exist to interrupt that, not to add to it.
+
+   Contrast, against tokens as of A11Y-1:
+     text    #E2E8F0 on --color-bg (#1E293B)  11.87:1
+     dismiss #B9C6D6 on --color-bg (#1E293B)   8.44:1
+     rule    --color-primary on --color-bg     7.86:1
+   ============================================================ */
+
+.gmoment {
+  margin: var(--space-4) 0;
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  background: var(--color-bg);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+}
+
+.gmoment__text {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+/* Present, findable, and not inviting. Somebody who wants it will see
+   it; nobody is nudged toward it. */
+.gmoment__dismiss {
+  display: inline-block;
+  margin-top: var(--space-3);
+  padding: var(--space-2) 0;
+  min-height: 44px;               /* WCAG 2.2 AA 2.5.8 target size */
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.gmoment__dismiss:hover {
+  color: var(--color-text);
+}
+
+.gmoment__dismiss:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
