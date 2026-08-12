@@ -1,0 +1,225 @@
+/* ============================================================
+   display-preferences.css
+   css/components/display-preferences.css
+   12 Aug 2026 v1
+
+   DISP-1. Two separate things live here:
+
+     1. THE EFFECTS - what the preferences actually do to the app.
+        These are global and apply everywhere, not just in Settings.
+     2. THE CONTROLS - the panel in Settings > Display.
+
+   Built on Alongside's own tokens throughout. The pattern came from The
+   Learning Studio via DPC Hub, but none of the CSS did: that codebase
+   has its own class names, its own palette and its own type scale.
+   Porting the markup would have imported a second design system.
+
+   Reuses the existing .settings-section / .settings-field /
+   .settings-toggle conventions from settings.css so the Display tab
+   looks like the other six tabs rather than a bolt-on.
+
+   Contrast verified against tools/contrast-check.mjs tokens:
+   --color-text on --color-bg-card 8.40:1, --color-text-secondary 5.97:1.
+   ============================================================ */
+
+/* ============================================================
+   1. THE EFFECTS
+   ============================================================ */
+
+/* Letter spacing inherits from :root, so it reaches everything that does
+   not set its own. Applied at body rather than :root so the 43 explicit
+   letter-spacing declarations elsewhere still win where they are
+   deliberate (logo wordmark, small caps, tracked headings). */
+body {
+  letter-spacing: var(--user-letter-spacing, 0em);
+}
+
+/* Text scale and line-height scale are applied by multiplying the
+   --text-* and --leading-* tokens in base/variables.css - nothing needed
+   here. See that file's v3 note for why token-scaling rather than a
+   body font-size override. */
+
+/* ── Underline all links ──────────────────────────────────────────────
+   WCAG 1.4.1: colour must not be the only means of conveying
+   information. Alongside's links are teal on dark, which passes on
+   contrast, but someone who cannot separate teal from body text has no
+   second signal. This gives them one.
+
+   Scoped to genuine links and .btn-text. Deliberately NOT applied to
+   .btn / .btn-primary / .btn-secondary / .btn-ghost: those already read
+   as controls through shape and fill, and underlining them makes the
+   interface look broken rather than clearer. */
+.underline-links a:not(.btn),
+.underline-links .btn-text {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: from-font;
+}
+
+/* ── Enhanced focus outlines ──────────────────────────────────────────
+   The app already meets WCAG 2.2 AA 2.4.11 Focus Not Obscured and 2.4.13
+   Focus Appearance with a 2px --color-primary outline. This is for
+   people who need considerably more than the minimum: 4px, a larger
+   offset, and a dark halo so the ring stays visible against both
+   --color-bg-card and --color-bg-elevated.
+
+   :focus-visible only, never :focus, so a mouse or touch tap does not
+   leave rings scattered across the screen. */
+.enhanced-focus *:focus-visible {
+  outline: 4px solid var(--color-primary) !important;
+  outline-offset: 3px !important;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 7px var(--color-bg-deep) !important;
+}
+
+/* ============================================================
+   2. THE CONTROLS
+   ============================================================ */
+
+.disp-field {
+  margin-bottom: var(--space-5);
+  max-width: 460px;
+}
+
+.disp-field__label {
+  display: block;
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: var(--leading-normal);
+  margin-bottom: var(--space-1);
+}
+
+.disp-field__hint {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--font-normal);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-3);
+}
+
+.disp-slider-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* The value readout. min-width stops the row jittering as the number
+   changes width - which matters more than usual here, because the thing
+   being adjusted IS the text size, so the row is already moving. */
+.disp-value {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  min-width: 4.5em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Anchor glyphs at each end of a slider. aria-hidden in the markup;
+   these are a visual cue only, and the label carries the meaning. */
+.disp-anchor {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.disp-anchor--small { font-size: var(--text-sm); }
+.disp-anchor--large { font-size: var(--text-2xl); }
+
+/* ── Range input ──────────────────────────────────────────────────────
+   Styled explicitly rather than left to the UA, because the default
+   thumb on several Android builds is well under the 24x24 CSS px
+   minimum for WCAG 2.2 AA 2.5.8 Target Size. 28px here. */
+.disp-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 28px;
+  background: transparent;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.disp-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+}
+
+.disp-slider::-moz-range-track {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+}
+
+.disp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -11px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid var(--color-bg-deep);
+  cursor: pointer;
+}
+
+.disp-slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid var(--color-bg-deep);
+  cursor: pointer;
+}
+
+.disp-slider:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 4px;
+  border-radius: var(--radius-full);
+}
+
+/* ── Live sample ──────────────────────────────────────────────────────
+   Adjusting type without seeing type is guesswork. This sits inside the
+   panel and inherits every setting, so the effect is visible in the same
+   glance as the control.
+
+   Sample copy is intentionally ordinary product language rather than
+   lorem ipsum or a pangram: what matters is whether the app is
+   comfortable to read, not whether a specimen sentence is. */
+.disp-sample {
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-md);
+  max-width: 460px;
+}
+
+.disp-sample__caption {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-2);
+}
+
+.disp-sample__body {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disp-slider,
+  .disp-sample {
+    transition: none;
+  }
+}

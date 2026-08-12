@@ -98,6 +98,27 @@ input[type="number"] {
   display: none !important;
 }
 
+/* .sr-only is an ALIAS, added 12 Aug 2026 (DISP-1, finding A11Y-3).
+   Seven elements across index.html and five view files already carried
+   class="sr-only" and it was never defined anywhere in this codebase.
+   The two in index.html are empty live regions, so no visible effect.
+   The other five hold text that was written to be heard and not seen,
+   and has therefore been visible on screen all along:
+     js/views/noticing.js:177          <h1>Noticing</h1>
+     js/views/reflect.js:334           <h1>A thought before you go</h1>
+     js/views/prescribed.js:298        "N sessions completed this week"
+     js/views/onboarding/plan-select.js:122  "Choose your training plan"
+     js/views/onboarding/frequency.js:77     "Select number of training days per week"
+
+   Aliased rather than renamed in five files: one rule, no touch risk,
+   and it also catches any future use of the more common name. If any of
+   those five is actually wanted VISIBLE, the fix is to give that one a
+   real heading class -- not to remove this rule.
+
+   NOTE: this makes those five elements disappear from screen. That is
+   what the markup always asked for, but it is a visible change and is
+   flagged in the master schedule for eyeballing. */
+.sr-only,
 .visually-hidden {
   position: absolute;
   width: 1px;
