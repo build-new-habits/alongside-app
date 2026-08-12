@@ -1,6 +1,9 @@
 /**
  * js/session-log.js
- * 12 Aug 2026 v2
+ * 12 Aug 2026 v3
+ *
+ * v3 - LOG-4. "distance" and "lengths" modes for the single-activity
+ *   views, rendered on their completion screens.
  *
  * v2 - LOG-2. A "gentle" mode restricting fields to duration and a note,
  *   and yoga-session.js wired to it. See performanceFields().
@@ -43,9 +46,10 @@
  * oversight, and it should stay one.
  *
  * The single-activity views -- walk, run, cycle, swim -- are a different
- * shape again: one activity, not a sequence of exercises. They would need
- * their own field set (a walk produces distance and minutes, a swim
- * produces lengths) and are a separate, smaller job.
+ * shape: one activity, not a sequence of exercises. Handled at LOG-4 with
+ * "distance" and "lengths" modes, rendered once on the completion screen
+ * rather than on a card. Duration is omitted there because those views
+ * already run a live clock.
  *
  * yoga-session.js RESOLVED 12 Aug: yes, but note-and-duration only
  * (mode: "gentle"). A pose is not a set; counting reps there would import
@@ -88,6 +92,30 @@ export function performanceFields(exercise, mode) {
     return [
       { key: "durationMins", label: "Minutes", type: "number", step: "0.5"  },
       { key: "note",         label: "Note",    type: "text",   maxlength: "40" }
+    ];
+  }
+
+  // LOG-4. Single-activity sessions -- walk, run, cycle, swim. One
+  // continuous activity, not a sequence of exercises, so there is no card
+  // to sit on; this renders once on the completion screen instead.
+  //
+  // Duration is deliberately ABSENT: these views all run a live clock and
+  // write durationMins themselves. Asking somebody to type a number the
+  // app already knows is the sort of thing that makes an app feel like
+  // paperwork.
+  //
+  // What is left is what the app genuinely cannot know: how far, and
+  // anything worth remembering.
+  if (mode === "distance") {
+    return [
+      { key: "distance", label: "Distance", type: "number", step: "0.1"  },
+      { key: "note",     label: "Note",     type: "text",   maxlength: "40" }
+    ];
+  }
+  if (mode === "lengths") {
+    return [
+      { key: "distance", label: "Lengths", type: "number", step: "1"    },
+      { key: "note",     label: "Note",    type: "text",   maxlength: "40" }
     ];
   }
 
