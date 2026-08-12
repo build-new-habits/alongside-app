@@ -1,5 +1,15 @@
 /**
  * gym-programme.js
+ * 11 Aug 2026 v11
+ *
+ * v11 - In-card performance notes generalised. The block offered weight
+ *   and reps to every exercise, so for most of the database there was
+ *   nothing worth writing down. Fields now follow what the exercise
+ *   actually produces: speed and incline for a treadmill, resistance
+ *   level for a cross trainer, band colour, duration for a hold, reps
+ *   for bodyweight. Recorded in the card before Next, because nobody
+ *   remembers afterwards.
+ *
  * 11 Aug 2026 v10
  *
  * v10 - "Not a fan of this one" on the exercise card. The
@@ -618,36 +628,115 @@ export function GymProgrammeView(router) {
   // Off by default (store.liftLogEnabled). Someone who turns it on has
   // asked for it, which is a different thing from being given it.
 
+  /**
+   * Which metrics does this exercise actually produce?
+   *
+   * Generalised 11 Aug 2026. Graeme: "I would like an option to add
+   * details into the card, by that I mean the weight, time, tension,
+   * etc... Not after the session, straight in the card before clicking
+   * next. I'll never remember otherwise."
+   *
+   * The old block offered weight and reps to everything, which meant
+   * that for most of the database there was nothing worth writing down.
+   * A treadmill session produces a speed and an incline; a cross trainer
+   * produces a resistance level; a band produces a colour; a plank
+   * produces a duration. Asking for a weight in those cases is asking
+   * the wrong question and gets no answer.
+   *
+   * Derived from equipment and movement rather than stored per entry, so
+   * it needs no schema change and no re-tagging of 518 exercises.
+   */
+  function _performanceFields(exercise) {
+    const eq = exercise.equipment || [];
+    const has = (...ids) => ids.some(id => eq.includes(id));
+
+    if (has('treadmill')) {
+      return [
+        { key: 'speed',        label: 'Speed',    type: 'number', step: '0.1' },
+        { key: 'incline',      label: 'Incline %', type: 'number', step: '0.5' },
+        { key: 'durationMins', label: 'Minutes',  type: 'number', step: '1'   }
+      ];
+    }
+    if (has('exercise-bike', 'elliptical', 'stair-climber', 'rowing-machine',
+            'ski-erg', 'bicycle')) {
+      return [
+        { key: 'level',        label: 'Level',   type: 'number', step: '1' },
+        { key: 'durationMins', label: 'Minutes', type: 'number', step: '1' },
+        { key: 'distance',     label: 'Distance', type: 'number', step: '0.1' }
+      ];
+    }
+    if (has('resistance-band')) {
+      return [
+        { key: 'tension', label: 'Band',  type: 'text',   maxlength: '30' },
+        { key: 'reps',    label: 'Reps',  type: 'number', step: '1' }
+      ];
+    }
+    if (has('dumbbell', 'kettlebell', 'barbell', 'medicine-ball',
+            'cable-machine', 'leg-press-machine', 'leg-curl-machine',
+            'chest-press-machine', 'gym-membership')) {
+      const unit = store.get('weightUnit') || 'kg';
+      return [
+        { key: 'weight', label: `Weight (${unit})`, type: 'number', step: '0.5' },
+        { key: 'reps',   label: 'Reps',             type: 'number', step: '1'   }
+      ];
+    }
+    // Bodyweight. A hold gets a duration, everything else gets reps.
+    if (exercise.duration || /hold|plank|isometric/i.test(exercise.name)) {
+      return [
+        { key: 'durationMins', label: 'Minutes', type: 'number', step: '0.5' },
+        { key: 'note',         label: 'Note',    type: 'text',   maxlength: '40' }
+      ];
+    }
+    return [
+      { key: 'reps', label: 'Reps', type: 'number', step: '1' },
+      { key: 'note', label: 'Note', type: 'text',   maxlength: '40' }
+    ];
+  }
+
+  /**
+   * The flat reference line. No verb, no framing, no comparison, no
+   * delta -- a note the person left themselves, per Locked Principle P4.
+   */
+  function _lastLine(exercise) {
+    const last = store.lastLift(exercise.id);
+    if (!last) return '<p class="gp-lift__last gp-lift__last--empty">No note yet for this one.</p>';
+    const bits = [];
+    if (last.weight       !== undefined) bits.push(`${last.weight} ${_esc(last.unit || 'kg')}`);
+    if (last.reps         !== undefined) bits.push(`${last.reps} reps`);
+    if (last.speed        !== undefined) bits.push(`speed ${last.speed}`);
+    if (last.incline      !== undefined) bits.push(`${last.incline}% incline`);
+    if (last.level        !== undefined) bits.push(`level ${last.level}`);
+    if (last.distance     !== undefined) bits.push(`${last.distance} distance`);
+    if (last.durationMins !== undefined) bits.push(`${last.durationMins} min`);
+    if (last.tension      !== undefined) bits.push(_esc(last.tension));
+    if (last.note         !== undefined) bits.push(_esc(last.note));
+    return `<p class="gp-lift__last">Last: ${bits.join(' \u00B7 ')}</p>`;
+  }
+
   function renderLiftBlock(exercise) {
     if (store.get('liftLogEnabled') !== true) return '';
     if (!exercise?.id) return '';
 
-    const unit = store.get('weightUnit') || 'kg';
-    const last = store.lastLift(exercise.id);
-
-    // Flat reference line. No verb, no framing, no voice — a note the
-    // person left themselves.
-    const lastLine = last
-      ? `<p class="gp-lift__last">Last: ${last.weight} ${_esc(last.unit || unit)}${last.reps ? ' \u00D7 ' + last.reps : ''}</p>`
-      : `<p class="gp-lift__last gp-lift__last--empty">No note yet for this one.</p>`;
+    const fields = _performanceFields(exercise);
 
     return `
-      <div class="gp-lift card" role="group" aria-label="Weight note for ${_esc(exercise.name)}">
-        ${lastLine}
+      <div class="gp-lift card" role="group" aria-label="Your notes for ${_esc(exercise.name)}">
+        ${_lastLine(exercise)}
         <div class="gp-lift__row">
-          <label class="gp-lift__label" for="gp-lift-weight">Weight (${_esc(unit)})</label>
-          <input class="gp-lift__input" id="gp-lift-weight" type="number"
-                 inputmode="decimal" min="0" step="0.5"
-                 autocomplete="off"
-                 data-exercise-id="${_esc(exercise.id)}">
-          <label class="gp-lift__label" for="gp-lift-reps">Reps</label>
-          <input class="gp-lift__input" id="gp-lift-reps" type="number"
-                 inputmode="numeric" min="0" step="1"
-                 autocomplete="off">
+          ${fields.map(f => `
+            <label class="gp-lift__label" for="gp-perf-${f.key}">${f.label}</label>
+            <input class="gp-lift__input" id="gp-perf-${f.key}"
+                   type="${f.type}"
+                   inputmode="${f.type === 'number' ? 'decimal' : 'text'}"
+                   ${f.step ? `min="0" step="${f.step}"` : ''}
+                   ${f.maxlength ? `maxlength="${f.maxlength}"` : ''}
+                   autocomplete="off"
+                   data-perf-key="${f.key}">
+          `).join('')}
           <button class="btn btn-secondary gp-lift__save" id="gp-lift-save"
-                  aria-label="Save this weight as a note for next time">Save</button>
+                  aria-label="Save these as a note for next time">Save</button>
         </div>
-        <p class="gp-lift__status" id="gp-lift-status" role="status"></p>
+        <p class="gp-lift__status" id="gp-lift-status" role="status" aria-live="polite"></p>
       </div>
     `;
   }
@@ -656,21 +745,24 @@ export function GymProgrammeView(router) {
     const saveBtn = document.getElementById('gp-lift-save');
     if (!saveBtn || !exercise?.id) return;
     saveBtn.addEventListener('click', () => {
-      const w = parseFloat(document.getElementById('gp-lift-weight')?.value);
-      const r = parseInt(document.getElementById('gp-lift-reps')?.value, 10);
       const status = document.getElementById('gp-lift-status');
-      if (isNaN(w) || w <= 0) {
-        if (status) status.textContent = 'Add a weight first.';
-        document.getElementById('gp-lift-weight')?.focus();
+      const entry  = {};
+      document.querySelectorAll('[data-perf-key]').forEach(input => {
+        const key = input.getAttribute('data-perf-key');
+        const raw = input.value;
+        if (raw === '' || raw === null) return;
+        entry[key] = input.type === 'number' ? parseFloat(raw) : raw;
+      });
+
+      const saved = store.logLift(exercise.id, entry);
+      if (!saved) {
+        // Nothing entered. Not an error and not framed as one -- every
+        // field is optional and skipping this is a legitimate choice.
+        if (status) status.textContent = 'Add something first, or carry on without.';
         return;
       }
-      store.logLift(exercise.id, {
-        weight: w,
-        unit:   store.get('weightUnit') || 'kg',
-        reps:   isNaN(r) ? null : r
-      });
-      // Neutral confirmation. States that it saved; says nothing about the
-      // number itself — see P4 above.
+      // Neutral confirmation. States that it saved; says nothing about
+      // the numbers themselves (P4).
       if (status) status.textContent = 'Noted.';
     });
   }
