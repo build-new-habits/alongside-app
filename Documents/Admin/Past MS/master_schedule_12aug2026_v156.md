@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v157
+## 12 Aug 2026 v156
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v156.md`. Remove v156 on upload.
+Supersedes `master_schedule_12aug2026_v155.md`. Remove v155 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -71,56 +71,6 @@ The same defect appeared **eight times in eight different costumes**: content th
 
 **Fixture note:** the Node harness and persona fixtures are reusable but were built pre-capability-screen. They need `capability{}` added before the next run.
 
-## 🟢 EMP-2 — Both EMP-1 "content gaps" closed: SHIPPED, 12 Aug 2026
-
-**Target WB 10 Aug 2026.** `js/session-builder.js` v22 → **v23**. `js/data/empathy-transfer.js` v2 → **v3**. `js/views/reflect.js` v4 → **v5**. `sw.js` → **v271**, cache **alongside-v271**. No schema change.
-
-### The framing that was wrong
-
-v156 logged these as *"two content gaps — yours, not code."* Graeme asked how they get resolved. **Neither needed new prompt content. Both were code.** Second time today that a "this needs Graeme" label did not survive the question being asked — the first being the touch-once items. Worth noticing as a pattern rather than twice as a coincidence: *labelling something as somebody else's decision is itself a claim, and it needs the same evidence as any other.*
-
-### 🟢 Gap 1 — "the coach made visible adjustments" is now evaluable
-
-Nothing recorded that an adjustment had happened, so the prompt sat as a bare fallback. `session-builder.js` v23 now writes `session.rationale.adjusted` on **two triggers, both meaning the person could SEE it**:
-
-1. Something was left out and explained — `pulseRaiser.reason` is the coach saying so in its own words
-2. A condition flagged at **4+** today, which constrains selection and makes `progressionInvitation()` name the sore area. 4 matches the threshold already used there, not a new number
-
-Written onto the session rather than as a new store field: `generatedSession` is already persisted, and this is a fact about one session, not a standing property of the person. `reflect.js` reads it **date-guarded** — `generatedSession` outlives the session it describes, so without the check a walk today would inherit yesterday's adjustment.
-
-**Silent adaptation deliberately does not count.** A prompt about noticing someone else should follow a moment the person actually witnessed, or it praises them for something invisible. Stage 3 Prompt B, whose condition is the same moment plus engagement, now also matches on it.
-
-### 🟢 Gap 2 — stage 5 needed no new prompt. It was a staging bug.
-
-**Every stage header in `empathy-transfer.js` carries a session range** — *"Sessions 1-12"*, *"12-30"*, *"30-55"*, *"55-85"*, *"85+"*. **Nothing ever read them.** Stage advance counted firings only, so two mechanisms describing the same progression drifted apart.
-
-| Stage | Documented | Actually entered |
-|---|---|---|
-| 2 | 12 | 21 — late, harmless |
-| 3 | 30 | 41 — late, harmless |
-| 4 | 55 | 61 — late, harmless |
-| **5** | **85** | **~77 — early, and this is the entire bug** |
-
-All four stage 5 prompts gate at 85+, 90+, 95+ and 100+ **because the stage was designed to begin at 85.** Arriving at 77 meant ten sessions with nothing that qualifies.
-
-`STAGE_SESSION_FLOOR` now enforces the ranges the file already declared. **The floor only ever delays entry, never accelerates it**, so stages 2–4 are unaffected in practice — they already arrive after their floor. One change, correcting only the broken case, and no content required.
-
-### Verification — assertion *and* simulation, per the EMP-1 lesson
-
-Assertions alone were what let the coverage regression through last time, so both were run:
-
-- Stage 5 entered at session **89**
-- **Zero fallbacks** across a 160-session arc
-- Max consecutive repeat still **2**
-
-Stage 3 coverage narrows to 2 of 5 during a sustained rough patch. **Checked rather than assumed:** that is fit working correctly — those two prompts genuinely score highest there. Neutral-context reachability still covers all five, and the harness asserts it.
-
-### Correction recorded in-file
-
-`empathy-transfer.js` v2's NOTE 2 and NOTE 3 are marked **SUPERSEDED** rather than deleted, so the reasoning trail survives and nobody re-derives the wrong conclusion from a stale comment.
-
----
-
 ## 🟢 EMP-1 — Condition-aware empathy selection: SHIPPED, 12 Aug 2026
 
 **Tier-boundary build sequence item 2. Target WB 10 Aug 2026. Code complete, fresh-clone verified, on-device confirmation outstanding.**
@@ -162,11 +112,7 @@ Fixed by rotating on `empathyPromptsAtStage` among near-equal scorers, with a to
 
 **Standing lesson: assertions prove the rules you thought of. Simulating a real arc is what shows the behaviour.** Neither substitutes for the other. Test 6 in the harness now encodes it.
 
-### 🟢 Two gaps raised here — BOTH CLOSED same day by EMP-2, and both were code
-
-**The "need Graeme, not code" heading below was wrong.** Kept for the trail; see the EMP-2 section above for how each was actually resolved. As originally written:
-
-#### 🟠 Two content gaps in the source spec — need Graeme, not code
+### 🟠 Two content gaps in the source spec — need Graeme, not code
 
 1. **Stage 2 Prompt B is unmatchable.** Its trigger is *"after a session where the coach made visible adjustments (noted in the rationale card)"*. `session-rationale.js` writes nothing to store, so nothing records that an adjustment happened. It carries an explicit `note` and an empty `requires`, so it participates only as a fallback and **the gap is visible in the data rather than buried**. Fixing properly means persisting an adjustment flag — small, but a real change to a file shipped today.
 2. **Stage 5 has no catch-all.** Its four prompts gate at 85+, 90+, 95+ and 100+ sessions, but stage 5 is reached at roughly session 75. Someone can enter it with **no qualifying prompt for about ten sessions**, and the simulation shows index [0] firing four times running there because it is the only eligible one. Handled by falling back to the nearest threshold. **The real fix is one new stage 5 prompt with no session gate** — a content job, not a code one.
@@ -1270,4 +1216,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v157*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v156*
