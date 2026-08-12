@@ -1,5 +1,17 @@
 /**
  * store.js - Data persistence layer
+ * 12 Aug 2026 v30
+ *
+ * v30 - C1 fail-safe. capability.legPower declared (it was read by
+ *   capabilityProfile() and never declared, never written, never asked),
+ *   and its unknown-value default made conditional: 'full' normally, but
+ *   'limited' when the person has told us they cannot rise from a chair or
+ *   reach the floor. A third-pass trace of the same wheelchair user the
+ *   v29 note describes served him Seated Leg Extension again, because
+ *   legPower always fell back to 'full'. The conditional QUESTION is not
+ *   built yet - wording pending sign-off - so this closes the safety gap
+ *   without it.
+ *
  * 12 Aug 2026 v29
  *
  * 12 Aug 2026 v29 - CAP-5. capability.legPower ('full' | 'limited' |
@@ -901,6 +913,11 @@ export const store = {
         floorAccess:  null,
         bothFeet:     null,
         balanceWorry: null,
+        // C1 (12 Aug 2026, third-pass trace). Declared — it was READ at
+        // capabilityProfile() and never declared, never written, never
+        // asked. See the fail-safe note there. Stays null until the
+        // conditional question is built and its wording signed off.
+        legPower:     null,
         askedAt:      null
       },
 
@@ -1612,7 +1629,37 @@ export const store = {
     // 'full', because legPower is only asked of people who said they
     // cannot rise easily, and assuming limitation of everyone else would
     // be both wrong and insulting.
-    const legPower     = c.legPower || 'full';
+    // ── C1 FAIL-SAFE (12 Aug 2026, third-pass persona trace) ──────────────
+    //
+    // The v29 note says this fix exists because a wheelchair user was
+    // "correctly given seated work and then handed Seated Leg Extension and
+    // Seated Hamstring Curl". A trace against the shipped fix served him
+    // Seated Leg Extension again.
+    //
+    // Cause: legPower is read here, consumed by two filters in
+    // session-builder.js, and was never declared, never written and never
+    // asked — the conditional question this depends on was never built. So
+    // it always fell back to 'full', both filters passed everything, and
+    // the original bug reproduced exactly.
+    //
+    // The 'full' default is right for the general case: assuming limitation
+    // of everyone would be both wrong and insulting. It is wrong for
+    // precisely the person this protects. So the default is now CONDITIONAL
+    // — unknown legPower means 'full' UNLESS the person has told us they
+    // cannot rise from a chair or get to the floor, in which case legs are
+    // treated as usable but NOT loadable until they say otherwise.
+    //
+    // That fails safe for the one group at risk and assumes nothing about
+    // anyone else. It is deliberately conservative in one direction only:
+    // someone who CAN load their legs and is temporarily under-served will
+    // say so; someone who cannot and is over-served can be hurt.
+    //
+    // This is the safety half of C1 and needs no new copy. The question
+    // itself — asked only when chairRise !== 'yes' — is the other half and
+    // is held pending sign-off on its wording, because a question about
+    // whether someone's legs work is the most sensitive in the product.
+    const legPowerDefault = needsSeated ? 'limited' : 'full';
+    const legPower     = c.legPower || legPowerDefault;
     const legsUsable   = legPower !== 'none';
     const legsLoadable = legPower === 'full';
 
