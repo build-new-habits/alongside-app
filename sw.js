@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v250
+ * EQ-1 - balance boards, jump boxes and skipping ropes now actually appear.
+ * New balance-work and power categories, plus nine entries for the home
+ * equipment that was one exercise deep.
+ *
  * 11 Aug 2026 v249
  * Persona trace fixes - no category may fill more than a third of a section
  * (a Mobility session opened with five breathing practices), leg function is
@@ -1093,7 +1098,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v259";
+const CACHE_NAME = "alongside-v260";
 
 const SHELL_URLS = [
 
