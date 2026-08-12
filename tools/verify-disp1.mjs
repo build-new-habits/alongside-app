@@ -13,6 +13,10 @@ let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const eq = (a, b, m) => { if (a !== b) throw new Error(`${m}\n        got:  ${a}\n        want: ${b}`); };
+// Added with SCHEME-1. Its absence produced eight identical "ok is not
+// defined" failures on first run -- which looked like eight code faults
+// and was one harness fault. Worth noting how convincing that was.
+const ok = (c, m) => { if (!c) throw new Error(m); };
 
 // Strip comments before any positional or presence test. Three false
 // failures on the first run of this harness came from matching text
@@ -81,6 +85,42 @@ check("defaults are exactly 1 / 1 / 0em so nothing changes uninvited", () => {
 });
 check("the dead @media (prefers-larger-text) block is gone", () => {
   eq(vars.includes("@media (prefers-larger-text)"), false, "not a real media feature; never matched");
+});
+
+console.log("\nTEST 3b - SCHEME-1, colour scheme");
+check("dark is the default", () =>
+  ok(/scheme:\s*"dark"/.test(prefs),
+     "Graeme, 12 Aug: dark default with adaptations on top, not the other way round"));
+check("all three schemes offered", () => {
+  for (const s of ["dark", "light", "high-contrast"])
+    ok(new RegExp(`value: "${s}"`).test(prefs), `${s} missing from SCHEMES`);
+});
+check("scheme applies before first paint", () => {
+  ok(/scheme-light/.test(html), "not in the pre-paint script - light users flash dark on every launch");
+  ok(html.indexOf("scheme-light") < html.indexOf("</head>"), "after </head>");
+});
+check("switching removes the previous class first", () =>
+  ok(/SCHEME_CLASS\)\.forEach\(c => \{ if \(c\) root\.classList\.remove\(c\)/.test(prefs),
+     "two scheme classes at once would resolve by file order, not by choice"));
+check("light and high-contrast blocks exist in variables.css", () => {
+  const v = varsRaw;
+  ok(/:root\.scheme-light \{/.test(v), "light palette missing");
+  ok(/:root\.scheme-high-contrast \{/.test(v), "high contrast palette missing");
+});
+check("light overrides EVERY token the removed block forgot", () => {
+  const v = varsRaw;
+  const light = v.slice(v.indexOf(":root.scheme-light {"), v.indexOf("}", v.indexOf(":root.scheme-light {")));
+  for (const tk of ["color-bg-deep","color-bg-elevated","color-bg-hover",
+                    "color-border-focus","color-border-light","color-text-inverse"])
+    ok(new RegExp(`--${tk}:`).test(light),
+       `--${tk} unoverridden - this is exactly what made the old light-mode block unusable`);
+});
+check("the OS-level prefers-contrast query still works", () =>
+  ok(/@media \(prefers-contrast: high\)/.test(varsRaw),
+     "somebody who set it system-wide should not have to find Settings"));
+check("Settings exposes the control", () => {
+  ok(/data-scheme=/.test(setts), "no scheme control rendered");
+  ok(/role="radiogroup"/.test(setts), "one-of-three needs radiogroup, not a switch");
 });
 
 console.log("\nTEST 4 - stylesheet reaches the browser");

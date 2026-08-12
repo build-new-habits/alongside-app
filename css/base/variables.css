@@ -1,4 +1,10 @@
 /* variables.css - Midnight Teal Design Tokens
+   12 Aug 2026 v4
+
+   v4 - SCHEME-1. Light and high-contrast schemes added as opt-in
+   adaptations. Dark remains the default and the design intent; see the
+   block at the foot of this file.
+
    12 Aug 2026 v3
 
    v3 - DISP-1, display preferences. Three user-controlled scales added,
@@ -248,7 +254,94 @@
   }
 }
 
-/* High contrast mode */
+/* ============================================================
+   DISPLAY SCHEMES (SCHEME-1, 12 Aug 2026)
+
+   DARK IS AND REMAINS THE DEFAULT. Graeme, 12 Aug: "I must insist on
+   dark mode default with the potential for adaptations by the user."
+   Midnight Teal above is the product; everything below is an adaptation
+   somebody has asked for, and nothing here applies unless they do.
+
+   That is the inverse of the reference implementations Graeme supplied
+   (DPC Hub, and BNH OS's [data-theme] block). Both are light-by-default
+   with dark as the option, so their "dark theme" is this app's normal
+   state. The LOGIC transferred -- a scheme class on the root, chosen in
+   Settings, applied before first paint. None of the values did.
+
+   WHY LIGHT EXISTS AT ALL. Light text on dark surfaces smears for people
+   with astigmatism, and light sensitivity runs in both directions. This
+   product is for neurodivergent adults, people navigating hormonal
+   change, and people with chronic conditions and burnout -- an audience
+   where display mode is functional rather than cosmetic.
+
+   EVERY PAIRING MEASURED. Worst text or accent ratio in the light scheme
+   is 4.68:1 (primary on the elevated surface); worst text ratio is
+   6.01:1. gated by tools/contrast-check.mjs, which runs all three
+   schemes and exits 1 on any pairing below AA. Do not adjust a value
+   here without re-running it.
+
+   An earlier html.light-mode block was removed on 12 Aug (A11Y-2). It
+   was unreachable -- no class was ever set -- and would not have worked
+   if it had been, because six tokens were never overridden. This one
+   overrides all of them, which is the whole difference.
+   ============================================================ */
+
+/* ── Light ─────────────────────────────────────────────────────────
+   Layer order inverts: "deep" becomes the outermost page tone and
+   "card" becomes white, so depth still reads as nearer-the-viewer
+   rather than simply darker. */
+:root.scheme-light {
+  --color-bg-deep:        #F1F5F9;
+  --color-bg:             #F8FAFC;
+  --color-bg-card:        #FFFFFF;
+  --color-bg-hover:       #E8EEF4;
+  --color-bg-elevated:    #E8EEF4;
+
+  --color-text:           #0F172A;   /* 17.85 on card, 15.27 on elevated */
+  --color-text-secondary: #3D4C5F;   /*  8.76 on card,  7.49 on elevated */
+  --color-text-muted:     #4A5A70;   /*  7.03 on card,  6.01 on elevated */
+  --color-text-inverse:   #FFFFFF;
+
+  /* Teal darkened for a light ground. #2DD4BF is 1.6:1 on white and
+     would be effectively invisible; this reads as the same colour and
+     measures 5.47 on card, 4.68 on elevated. */
+  --color-primary:        #0F766E;
+  --color-primary-dark:   #0F766E;
+  --color-primary-glow:   rgba(15, 118, 110, 0.10);
+  --color-border-focus:   #0F766E;
+
+  --color-success:        #047857;
+  --color-warning:        #92400E;   /* amber is unreadable on white; this is its usable form */
+
+  --color-border:         #64748B;   /* 4.76 on card -- above the 3:1 needed for boundaries */
+  --color-border-light:   #CBD5E1;
+}
+
+/* ── High contrast ─────────────────────────────────────────────────
+   Was previously reachable ONLY via @media (prefers-contrast: high),
+   i.e. only if somebody had already found their OS setting. The media
+   query is kept below so that still works; this makes it choosable. */
+:root.scheme-high-contrast {
+  --color-bg-deep:        #000000;
+  --color-bg:             #000000;
+  --color-bg-card:        #14202E;
+  --color-bg-hover:       #1E2C3D;
+  --color-bg-elevated:    #1E2C3D;
+
+  --color-text:           #FFFFFF;
+  --color-text-secondary: #F1F5F9;
+  --color-text-muted:     #E2E8F0;
+
+  --color-primary:        #5EEAD4;
+  --color-primary-dark:   #5EEAD4;
+  --color-border-focus:   #5EEAD4;
+  --color-border:         #CBD5E1;
+  --color-border-light:   #94A3B8;
+}
+
+/* OS-level preference, unchanged. Someone who has set it system-wide
+   still gets it without opening Settings. An explicit choice wins,
+   because the class above is more specific than :root alone. */
 @media (prefers-contrast: high) {
   :root {
     --color-text: #FFFFFF;

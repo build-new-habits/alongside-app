@@ -104,6 +104,7 @@
     (function () {
       try {
         var K = {
+          scheme:        "alongside-scheme",
           textScale:     "alongside-text-scale",
           leadingScale:  "alongside-leading-scale",
           letterSpacing: "alongside-letter-spacing",
@@ -111,6 +112,7 @@
           focus:         "alongside-enhanced-focus"
         };
         var D = {
+          scheme:        "dark",
           textScale:     "1",
           leadingScale:  "1",
           letterSpacing: "0",
@@ -119,6 +121,12 @@
         };
         var g = function (k, d) { var v = localStorage.getItem(k); return v === null ? d : v; };
         var r = document.documentElement;
+        // Scheme first, and this is the whole reason the script is inline:
+        // applied after paint, a light-scheme user gets a full-screen
+        // flash of dark on every single launch.
+        var sc = g(K.scheme, D.scheme);
+        if (sc === "light")              r.classList.add("scheme-light");
+        else if (sc === "high-contrast") r.classList.add("scheme-high-contrast");
         r.style.setProperty("--user-text-scale",     g(K.textScale,    D.textScale));
         r.style.setProperty("--user-leading-scale",  g(K.leadingScale, D.leadingScale));
         r.style.setProperty("--user-letter-spacing", g(K.letterSpacing, D.letterSpacing) + "em");
