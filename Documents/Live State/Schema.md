@@ -1,10 +1,29 @@
 # Alongside — Data Schema Reference
-## 12 Aug 2026 v1.28
+## 12 Aug 2026 v1.29
 
-**File:** `js/store.js` (confirmed live version: **v33, 12 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v34, 12 Aug 2026**)
 **Storage:** `localStorage` key `alongside_user`
 
-**This version supersedes:** v1.27 (12 Aug 2026).
+**This version supersedes:** v1.28 (12 Aug 2026).
+
+**v1.29 (12 Aug 2026)** — GM-1. One new field, `grounding`. `store.js` v33 → **v34**.
+
+### `grounding` — **NEW, `store.js` v34**
+
+```
+grounding: { lastSession: number, lastId: string|null, shown: [], dismissed: [] }
+```
+
+| Key | Meaning |
+|---|---|
+| `lastSession` | Session count when a moment last appeared. Drives cadence |
+| `lastId` | Which one, so the same never appears twice running |
+| `shown` | Ids already seen, so the pool rotates fairly rather than repeating favourites |
+| `dismissed` | Ids the person dismissed. **Permanent — never re-offered** |
+
+**`dismissed` is not a skip and must never be counted as one.** `empathyPromptSkips` widens a gap when someone passes; this removes an item from the pool for good. Somebody who dismisses a moment has told us something, and asking again is the nagging this product exists not to do.
+
+Written and read by `js/data/grounding-moments.js`. Stored as one object because the four keys are only ever read and written together; a partial update would leave `dismissed` describing a state the rest no longer matches.
 
 **v1.28 (12 Aug 2026)** — C1. `capability.legPower` is now written for the first time, and its fail-safe widened. `store.js` v32 → **v33**.
 

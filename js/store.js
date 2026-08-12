@@ -1,5 +1,16 @@
 /**
  * store.js - Data persistence layer
+ * 12 Aug 2026 v34
+ *
+ * v34 - GM-1. New field `grounding` for grounding moments:
+ *   { lastSession, lastId, shown[], dismissed[] }.
+ *
+ *   dismissed[] is permanent by design. Somebody who dismisses a moment
+ *   has told us something, and asking again is the nagging this product
+ *   exists to not do. It is also not a skip and must never be counted as
+ *   one -- unlike empathyPromptSkips, which widens a gap, this simply
+ *   removes an item from the pool for good.
+ *
  * 12 Aug 2026 v33
  *
  * v33 - C1-SAFETY. capabilityProfile()'s legPower default widened to
@@ -495,6 +506,18 @@ export const store = {
       // EMP-1. Shape-validated as a whole, not field by field: a partial
       // object here is worse than none, because runLength would then be
       // counting a prompt that stage/index no longer identifies.
+      // GM-1. Grounding moments. One object rather than four flat fields:
+      // they are only read and written together, and a partial update
+      // would leave dismissed[] describing a state the rest no longer
+      // matches. Same reasoning as empathyLastPrompt below.
+      grounding: (saved.grounding && typeof saved.grounding === 'object')
+        ? {
+            lastSession: typeof saved.grounding.lastSession === 'number' ? saved.grounding.lastSession : 0,
+            lastId:      typeof saved.grounding.lastId === 'string'      ? saved.grounding.lastId      : null,
+            shown:       Array.isArray(saved.grounding.shown)     ? saved.grounding.shown     : [],
+            dismissed:   Array.isArray(saved.grounding.dismissed) ? saved.grounding.dismissed : [],
+          }
+        : { lastSession: 0, lastId: null, shown: [], dismissed: [] },
       empathyLastPrompt: (saved.empathyLastPrompt
           && typeof saved.empathyLastPrompt === 'object'
           && typeof saved.empathyLastPrompt.stage === 'number'
@@ -1087,6 +1110,10 @@ export const store = {
       // which is a real prompt. runLength caps repeats at 2 so a hard
       // fortnight does not produce the same sentence five times.
       empathyLastPrompt: { stage: 0, index: -1, runLength: 0 },
+      // GM-1. lastSession/lastId drive cadence and no-repeat; shown[]
+      // rotates the pool fairly; dismissed[] is permanent and never
+      // re-offered. Dismissal is not a skip and is never counted as one.
+      grounding: { lastSession: 0, lastId: null, shown: [], dismissed: [] },
 
       // ── LAST CHECK-IN ─────────────────────────────────────────
       lastCheckin: {
