@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v154
+## 12 Aug 2026 v153
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v153.md`. Remove v153 on upload.
+Supersedes `master_schedule_12aug2026_v152.md`. Remove v152 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -121,24 +121,7 @@ Worse, if it were switched on it would not work. **Six surface and text tokens a
 
 **Severity is low because it is unreachable** — this is dead CSS, not a live user-facing failure. But it is the P6 defect in its ninth costume: content that exists, is written to standard, and that nothing in the product can ever reach.
 
-**🟢 RESOLVED same day — code removed, decision kept open.** `css/base/global.css` block removed and archived in full to `Documents/Archive/alongside_light_mode_removed_css_12aug2026_v1.md`, with reasoning, the verbatim CSS, and what a real implementation needs. `sw.js` v268, cache **alongside-v268**. Zero live effect — every rule was scoped under a class never applied. Also removed `--color-bg-surface`, a token defined only inside that block and read by nothing.
-
-**The initial recommendation to delete on the grounds that "light mode is not on any roadmap" was wrong reasoning and is corrected here.** Dark-only is a genuine accessibility limitation, not a preference: light text on dark surfaces causes halation for people with astigmatism (the text appears to smear), and light sensitivity runs in both directions. **Alongside: Move is built for neurodivergent adults, people navigating hormonal change, and people with chronic conditions and burnout — precisely the audience for whom display mode is functional rather than cosmetic.** Roadmap absence was the wrong test; audience need is the right one.
-
-**Fixing the six tokens was rejected on its own merits**, separately from that. It yields a *reachable* broken light mode instead of an unreachable one, which is strictly worse, and overriding six tokens does not restyle 25 component stylesheets. What existed was 37 lines covering four components.
-
-### 🔵 NEW SCOPED FEATURE — Light mode, for the beta conversation
-
-**Not a bug fix. A feature with an accessibility rationale strong enough to justify the scope.** Not booked; needs a decision on whether it lands before or after public launch.
-
-What it requires, recorded so it is not re-derived:
-1. All eleven surface and text tokens overridden, not five — including the six that were missing
-2. `tools/contrast-check.mjs` extended to run its full matrix against **both** palettes, gating on both
-3. A component sweep for hardcoded hex values that bypass tokens
-4. A Settings control plus a persisted store field
-5. `prefers-color-scheme` as the initial default, with an explicit choice overriding it
-
-⚠️ **A revival must start from `variables.css` v2**, not the archived block — that palette predates A11Y-1.
+**Decision needed, not booked:** either wire the toggle and fix the six tokens, or delete the block. Carrying ~60 lines of broken CSS that claims a feature exists is the worst of the three. **Recommend deleting it** — light mode is not on any roadmap, and a future implementation would want to start from the current palette, not a stale one. Overrule if light mode is genuinely wanted for beta.
 
 ---
 
@@ -1072,4 +1055,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v154*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v153*
