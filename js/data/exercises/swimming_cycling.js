@@ -30,6 +30,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-catch-drill',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Freestyle Catch Drill',
     youtube: 'freestyle catch drill technique',
     category: 'cardio',
@@ -64,6 +67,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-bilateral-breathing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Bilateral Breathing Drill',
     youtube: 'bilateral breathing drill technique',
     category: 'cardio',
@@ -97,6 +103,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-kick-drill',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kick Set — Board',
     youtube: 'kick set - board technique',
     category: 'cardio',
@@ -130,6 +139,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-pull-buoy',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Pull Buoy Set',
     youtube: 'pull buoy set technique',
     category: 'cardio',
@@ -163,6 +175,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-catch-up-drill',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Catch-Up Drill',
     youtube: 'catch-up drill technique',
     category: 'cardio',
@@ -196,6 +211,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-fingertip-drag',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Fingertip Drag Drill',
     youtube: 'fingertip drag drill technique',
     category: 'cardio',
@@ -229,6 +247,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-descending-intervals',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Descending Intervals',
     youtube: 'descending intervals technique',
     category: 'cardio',
@@ -262,6 +283,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-easy-400',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Easy 400 Metres',
     youtube: 'easy 400 metres technique',
     category: 'cardio',
@@ -294,6 +318,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-hard-200',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Hard 200 Metres',
     youtube: 'hard 200 metres technique',
     category: 'cardio',
@@ -326,6 +353,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-sprint-50',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Sprint 50 Metres × 6',
     youtube: 'sprint 50 metres 6 technique',
     category: 'cardio',
@@ -359,6 +389,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-medley',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Swim, Pull, Kick Medley',
     youtube: 'swim pull kick medley technique',
     category: 'cardio',
@@ -392,6 +425,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-backstroke',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Backstroke Technique',
     youtube: 'backstroke swimming technique',
     category: 'cardio',
@@ -426,6 +462,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-open-water-prep',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Open Water Preparation',
     youtube: 'open water preparation technique',
     category: 'cardio',
@@ -459,6 +498,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-pool-endurance',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Pool Endurance — 1500 Metres',
     youtube: 'pool endurance - 1500 metres technique',
     category: 'cardio',
@@ -492,6 +534,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'swim-breaststroke',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Breaststroke Technique',
     youtube: 'breaststroke swimming technique',
     category: 'cardio',
@@ -530,6 +575,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'cycle-easy-spin',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Easy Spin — 30 Minutes',
     youtube: 'easy spin - 30 minutes technique',
     category: 'cardio',
@@ -563,6 +611,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'cycle-tempo-45',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Tempo Ride — 45 Minutes',
     youtube: 'tempo ride - 45 minutes technique',
     category: 'cardio',
@@ -596,6 +647,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'cycle-hill-simulation',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Hill Climb Simulation',
     youtube: 'hill climb simulation technique',
     category: 'cardio',
@@ -630,6 +684,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'cycle-intervals',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Cycling Interval Session',
     youtube: 'cycling interval session technique',
     category: 'cardio',
@@ -663,6 +720,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'cycle-cadence-drill',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cadence Drill — Cycling',
     youtube: 'cadence drill - cycling technique',
     category: 'cardio',
@@ -696,6 +756,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'cycle-sprint-intervals',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Sprint Intervals — Cycling',
     youtube: 'sprint intervals - cycling technique',
     category: 'cardio',
@@ -729,6 +792,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'cycle-endurance-90',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Endurance Ride — 90 Minutes',
     youtube: 'endurance ride - 90 minutes technique',
     category: 'cardio',
@@ -762,6 +828,9 @@ export const SWIMMING_CYCLING = [
 
   {
     id: 'cycle-recovery-spin',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Recovery Spin — 20 Minutes',
     youtube: 'recovery spin - 20 minutes technique',
     category: 'recovery',

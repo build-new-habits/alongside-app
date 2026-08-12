@@ -32,6 +32,9 @@ export const RUNNING = [
 
   {
     id: 'c25k-week1',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'C25K — Week 1 Session',
     youtube: 'couch to 5k week 1 running plan',
     category: 'cardio',
@@ -67,6 +70,9 @@ export const RUNNING = [
 
   {
     id: 'c25k-week2',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'C25K — Week 2 Session',
     youtube: 'couch to 5k week 2 running plan',
     category: 'cardio',
@@ -102,6 +108,9 @@ export const RUNNING = [
 
   {
     id: 'c25k-week3',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'C25K — Week 3 Session',
     youtube: 'couch to 5k week 3 running plan',
     category: 'cardio',
@@ -136,6 +145,9 @@ export const RUNNING = [
 
   {
     id: 'c25k-week4',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'C25K — Week 4 Session',
     youtube: 'couch to 5k week 4 running plan',
     category: 'cardio',
@@ -171,6 +183,9 @@ export const RUNNING = [
 
   {
     id: 'c25k-week5-day1',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'C25K — Week 5, Session 1',
     youtube: 'couch to 5k week 5 running plan',
     category: 'cardio',
@@ -205,6 +220,9 @@ export const RUNNING = [
 
   {
     id: 'c25k-week5-day3',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'C25K — Week 5, Session 3 (20-Minute Run)',
     youtube: 'couch to 5k week 5 day 3 20 minute run',
     category: 'cardio',
@@ -238,6 +256,9 @@ export const RUNNING = [
 
   {
     id: 'c25k-week6',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'C25K — Week 6 Session',
     youtube: 'couch to 5k week 6 running plan',
     category: 'cardio',
@@ -271,6 +292,9 @@ export const RUNNING = [
 
   {
     id: 'c25k-week7',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'C25K — Week 7 Session (25-Minute Run)',
     youtube: 'couch to 5k week 7 running plan',
     category: 'cardio',
@@ -303,6 +327,9 @@ export const RUNNING = [
 
   {
     id: 'c25k-week8',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'C25K — Week 8 Session (28-Minute Run)',
     youtube: 'couch to 5k week 8 running plan',
     category: 'cardio',
@@ -335,6 +362,9 @@ export const RUNNING = [
 
   {
     id: 'c25k-week9',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'C25K — Week 9, Graduation Run (30 Minutes)',
     youtube: 'couch to 5k graduation run week 9',
     category: 'cardio',
@@ -373,6 +403,9 @@ export const RUNNING = [
 
   {
     id: 'run-easy-20',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Easy Run — 20 Minutes',
     youtube: 'easy run pace guide',
     category: 'cardio',
@@ -406,6 +439,9 @@ export const RUNNING = [
 
   {
     id: 'run-tempo-20',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Tempo Run — 20 Minutes',
     youtube: 'tempo run pacing guide',
     category: 'cardio',
@@ -439,6 +475,9 @@ export const RUNNING = [
 
   {
     id: 'run-intervals-400m',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: '400m Intervals × 6',
     youtube: '400m interval training technique',
     category: 'cardio',
@@ -472,6 +511,9 @@ export const RUNNING = [
 
   {
     id: 'run-intervals-800m',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: '800m Intervals × 4',
     youtube: '800m interval training technique',
     category: 'cardio',
@@ -505,6 +547,9 @@ export const RUNNING = [
 
   {
     id: 'run-fartlek-25',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Fartlek Run — 25 Minutes',
     youtube: 'fartlek training explained',
     category: 'cardio',
@@ -539,6 +584,9 @@ export const RUNNING = [
 
   {
     id: 'run-progression',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Progression Run — 30 Minutes',
     youtube: 'progression run pacing guide',
     category: 'cardio',
@@ -572,6 +620,9 @@ export const RUNNING = [
 
   {
     id: 'run-hills',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Hill Repeat Session',
     youtube: 'hill repeats running technique',
     category: 'cardio',
@@ -606,6 +657,9 @@ export const RUNNING = [
 
   {
     id: 'run-strides',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Strides',
     youtube: 'running strides technique',
     category: 'cardio',
@@ -640,6 +694,9 @@ export const RUNNING = [
 
   {
     id: 'run-parkrun',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Parkrun Effort — 5K Race Simulation',
     youtube: 'parkrun race pacing guide',
     category: 'cardio',
@@ -674,6 +731,9 @@ export const RUNNING = [
 
   {
     id: 'run-5k-time-trial',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: '5K Time Trial',
     youtube: '5k time trial pacing guide',
     category: 'cardio',
@@ -712,6 +772,9 @@ export const RUNNING = [
 
   {
     id: 'run-drill-high-knees',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'High Knees',
     youtube: 'high knees running drill technique',
     category: 'cardio',
@@ -746,6 +809,9 @@ export const RUNNING = [
 
   {
     id: 'run-drill-butt-kicks',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Butt Kicks',
     youtube: 'butt kicks running drill technique',
     category: 'cardio',
@@ -779,6 +845,9 @@ export const RUNNING = [
 
   {
     id: 'run-drill-a-skip',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'A-Skip',
     youtube: 'a-skip running drill tutorial',
     category: 'cardio',
@@ -813,6 +882,9 @@ export const RUNNING = [
 
   {
     id: 'run-drill-b-skip',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'B-Skip',
     youtube: 'b-skip running drill tutorial',
     category: 'cardio',
@@ -847,6 +919,9 @@ export const RUNNING = [
 
   {
     id: 'run-drill-bounding',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Bounding',
     youtube: 'bounding running drill technique',
     category: 'cardio',
@@ -881,6 +956,9 @@ export const RUNNING = [
 
   {
     id: 'run-drill-cadence',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cadence Drill',
     youtube: 'running cadence drill technique',
     category: 'cardio',
@@ -915,6 +993,9 @@ export const RUNNING = [
 
   {
     id: 'run-drill-stride-outs',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Stride-Outs',
     youtube: 'stride outs running technique',
     category: 'cardio',
@@ -953,6 +1034,9 @@ export const RUNNING = [
 
   {
     id: 'run-easy-30',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Easy Run — 30 Minutes',
     youtube: 'easy run pace guide',
     category: 'cardio',
@@ -985,6 +1069,9 @@ export const RUNNING = [
 
   {
     id: 'run-tempo-30',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Tempo Run — 30 Minutes',
     youtube: 'tempo run pacing guide',
     category: 'cardio',
@@ -1016,6 +1103,9 @@ export const RUNNING = [
 
   {
     id: 'run-intervals-1k',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: '1K Intervals × 5',
     youtube: '1k interval training guide',
     category: 'cardio',
@@ -1049,6 +1139,9 @@ export const RUNNING = [
 
   {
     id: 'run-cruise-intervals',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cruise Intervals',
     youtube: 'cruise intervals running guide',
     category: 'cardio',
@@ -1082,6 +1175,9 @@ export const RUNNING = [
 
   {
     id: 'run-marathon-pace',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Marathon Pace Run — 40 Minutes',
     youtube: 'marathon pace training guide',
     category: 'cardio',
@@ -1114,6 +1210,9 @@ export const RUNNING = [
 
   {
     id: 'run-long-60',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Long Run — 60 Minutes',
     youtube: 'long run pacing guide',
     category: 'cardio',
@@ -1147,6 +1246,9 @@ export const RUNNING = [
 
   {
     id: 'run-long-slow-90',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Long Slow Run — 90 Minutes',
     youtube: 'long slow run pacing guide',
     category: 'cardio',
@@ -1180,6 +1282,9 @@ export const RUNNING = [
 
   {
     id: 'run-back-to-back',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Back-to-Back Run Days',
     youtube: 'back to back running days training guide',
     category: 'cardio',

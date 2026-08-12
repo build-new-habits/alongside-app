@@ -21,6 +21,9 @@ export const RECOVERY = [
 
   {
     id: 'childs-pose',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Child\'s Pose',
     youtube: 'childs pose technique',
     category: 'recovery',
@@ -55,6 +58,9 @@ export const RECOVERY = [
 
   {
     id: 'supine-twist',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Supine Spinal Twist',
     youtube: 'supine spinal twist technique',
     category: 'recovery',
@@ -89,6 +95,9 @@ export const RECOVERY = [
 
   {
     id: 'foam-roll-upper-back',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Foam Roll — Upper Back',
     youtube: 'foam roll - upper back technique',
     category: 'recovery',
@@ -122,6 +131,9 @@ export const RECOVERY = [
 
   {
     id: 'foam-roll-quads',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Foam Roll — Quads',
     youtube: 'foam roll - quads technique',
     category: 'recovery',
@@ -155,6 +167,9 @@ export const RECOVERY = [
 
   {
     id: 'diaphragmatic-breathing',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Diaphragmatic Breathing',
     youtube: 'diaphragmatic breathing technique',
     category: 'recovery',
@@ -189,6 +204,9 @@ export const RECOVERY = [
 
   {
     id: 'leg-up-wall',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Legs Up the Wall',
     youtube: 'legs up the wall technique',
     category: 'recovery',
@@ -228,6 +246,9 @@ export const RECOVERY = [
 
   {
     id: 'box-breathing',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Box Breathing',
     youtube: 'box breathing technique',
     category: 'recovery',
@@ -263,6 +284,9 @@ export const RECOVERY = [
 
   {
     id: 'four-seven-eight-breathing',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: '4-7-8 Breathing',
     youtube: '4-7-8 breathing technique',
     category: 'recovery',
@@ -298,6 +322,9 @@ export const RECOVERY = [
 
   {
     id: 'physiological-sigh',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Physiological Sigh',
     youtube: 'physiological sigh technique',
     category: 'recovery',
@@ -332,6 +359,9 @@ export const RECOVERY = [
 
   {
     id: 'belly-breathing',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Belly Breathing',
     youtube: 'belly breathing technique',
     category: 'recovery',
@@ -366,6 +396,9 @@ export const RECOVERY = [
 
   {
     id: 'extended-exhale-breathing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Extended Exhale Breathing',
     youtube: 'extended exhale breathing technique',
     category: 'recovery',
@@ -400,6 +433,9 @@ export const RECOVERY = [
 
   {
     id: 'alternate-nostril-breathing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Alternate Nostril Breathing',
     youtube: 'alternate nostril breathing technique',
     category: 'recovery',
@@ -436,6 +472,9 @@ export const RECOVERY = [
 
   {
     id: 'pursed-lip-breathing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Pursed Lip Breathing',
     youtube: 'pursed lip breathing technique',
     category: 'recovery',
@@ -470,6 +509,9 @@ export const RECOVERY = [
 
   {
     id: 'coherent-breathing',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Coherent Breathing',
     youtube: 'coherent breathing technique',
     category: 'recovery',
@@ -504,6 +546,9 @@ export const RECOVERY = [
 
   {
     id: 'humming-bee-breath',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Humming Bee Breath',
     youtube: 'humming bee breath technique',
     category: 'recovery',
@@ -539,6 +584,9 @@ export const RECOVERY = [
 
   {
     id: 'energising-breath',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Energising Breath',
     youtube: 'energising breath technique',
     category: 'recovery',
@@ -575,6 +623,9 @@ export const RECOVERY = [
 
   {
     id: 'three-part-breath',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Three-Part Breath',
     youtube: 'three-part breath technique',
     category: 'recovery',
@@ -609,6 +660,9 @@ export const RECOVERY = [
 
   {
     id: 'breath-counting',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Breath Counting',
     youtube: 'breath counting technique',
     category: 'recovery',
@@ -650,6 +704,9 @@ export const RECOVERY = [
 
   {
     id: 'cold-shower-protocol',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Cold Shower — Recovery Protocol',
     youtube: 'cold shower - recovery protocol technique',
     category: 'recovery',
@@ -684,6 +741,9 @@ export const RECOVERY = [
 
   {
     id: 'contrast-therapy',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Contrast Therapy',
     youtube: 'contrast therapy technique',
     category: 'recovery',
@@ -718,6 +778,9 @@ export const RECOVERY = [
 
   {
     id: 'napping-protocol',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Recovery Nap Protocol',
     youtube: 'recovery nap protocol technique',
     category: 'recovery',
@@ -751,6 +814,9 @@ export const RECOVERY = [
 
   {
     id: 'hydration-protocol',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Hydration Protocol',
     youtube: 'hydration protocol technique',
     category: 'recovery',
@@ -785,6 +851,9 @@ export const RECOVERY = [
 
   {
     id: 'nutrition-timing',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Post-Exercise Nutrition Window',
     youtube: 'post-exercise nutrition window technique',
     category: 'recovery',
@@ -819,6 +888,9 @@ export const RECOVERY = [
 
   {
     id: 'trigger-point-release-ball',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Trigger Point Release — Ball',
     youtube: 'trigger point release - ball technique',
     category: 'recovery',
@@ -853,6 +925,9 @@ export const RECOVERY = [
 
   {
     id: 'elevation-recovery',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Leg Elevation Recovery',
     youtube: 'leg elevation recovery technique',
     category: 'recovery',
@@ -886,6 +961,9 @@ export const RECOVERY = [
 
   {
     id: 'mindful-walk',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Mindful Walk',
     youtube: 'mindful walk technique',
     category: 'recovery',
@@ -925,6 +1003,9 @@ export const RECOVERY = [
 
   {
     id: 'active-recovery-walk',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Active Recovery Walk',
     youtube: 'active recovery walk technique',
     category: 'recovery',
@@ -959,6 +1040,9 @@ export const RECOVERY = [
 
   {
     id: 'sleep-position-optimisation',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Sleep Position Optimisation',
     youtube: 'sleep position optimisation technique',
     category: 'recovery',
@@ -992,6 +1076,9 @@ export const RECOVERY = [
 
   {
     id: 'meditation-sleep-onset',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Sleep Onset Meditation',
     youtube: 'sleep onset meditation technique',
     category: 'recovery',
@@ -1027,6 +1114,9 @@ export const RECOVERY = [
 
   {
     id: 'breathing-478',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: '4-7-8 Breathing',
     youtube: '4-7-8 breathing technique',
     category: 'recovery',
@@ -1062,6 +1152,9 @@ export const RECOVERY = [
 
   {
     id: 'sauna-protocol',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Sauna Recovery Protocol',
     youtube: 'sauna recovery protocol technique',
     category: 'recovery',
