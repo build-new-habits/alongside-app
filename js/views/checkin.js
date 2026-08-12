@@ -1,5 +1,62 @@
 /**
  * js/views/checkin.js
+ * 12 Aug 2026 v14
+ *
+ * v14 - DIC-1, the drop-in coach question. Destination Architecture
+ *   section 8, and the first item of the tier-boundary build sequence.
+ *
+ *   From Graeme's track analogy: you turn up at the athletics club and
+ *   ask for a session, and the coach asks the one question a human
+ *   coach asks -- do you want what you did last time, or something
+ *   different? That single question is what makes free a COACH rather
+ *   than a generator, and it costs almost nothing, because the
+ *   machinery behind it was already built.
+ *
+ *   What made this cheap: sessionVariety was a READER WITHOUT A WRITER.
+ *   store.js declares it (default 'balanced', validated against
+ *   familiar|balanced|varied) and session-builder.js reads it at the
+ *   novelty-rate calculation -- familiar 0.10, balanced 0.25, varied
+ *   0.55 -- but nothing in the entire codebase ever wrote it. No
+ *   Settings control, no onboarding question, no view. The store.js
+ *   comment says "the person's own answer, never inferred from
+ *   behaviour", and the person had never been asked. Selection has been
+ *   running on a default nobody chose. This is the missing writer, not
+ *   a new mechanism. Third recurrence of the PT-12 pattern.
+ *
+ *   Decision (Graeme, 12 Aug): write sessionVariety DIRECTLY rather than
+ *   adding a per-session override field. The question fires before every
+ *   coach-built session, so "today's answer" and "standing preference"
+ *   converge in practice, and a second self-clearing field would be two
+ *   sources of truth for one concept -- the exact family of bug this
+ *   build has paid for several times. Recorded consequence: if a
+ *   Settings control for variety ever lands, this question overwrites it
+ *   each session. That is intended -- what you say today beats what you
+ *   set in March -- and is on record rather than discovered later.
+ *   No schema change, so store.js and Schema.md are untouched.
+ *
+ *   Gating (Decision 3): asked only when at least one exercise sits
+ *   inside the 21-day window, which is precisely session-builder.js's
+ *   own isAnchor() cutoff (CONTINUITY_WINDOW_DAYS). Outside it nothing
+ *   is an anchor, so 'familiar' and 'varied' would produce near-
+ *   identical sessions and the coach would have asked a question it
+ *   cannot act on. A question that changes nothing is worse than no
+ *   question: it teaches the person the coach is reading a script
+ *   rather than reading them. The spec says the same thing in its own
+ *   words -- "he asks about last time, he never asks about March".
+ *
+ *   Also gated on pendingDoorRoute being a session-generating door
+ *   (session-builder or coach-proposal). Reached via Home's standalone
+ *   "Check in" link, no session follows, so there is nothing to shape.
+ *
+ *   The answer is written the moment it is given, not deferred to
+ *   _saveAll(). Deliberate: it is a preference, not check-in data, and
+ *   it should survive someone backing out and re-entering by another
+ *   door. They answered the question; the answer stands.
+ *
+ *   No .ci-panel-q in this panel. The coach has already asked in the
+ *   thread, and asking again inside the panel is the same duplication
+ *   v12 removed for the time question.
+ *
  * 11 Aug 2026 v13
  *
  * v13 - Pacing. The energy and mood panels opened 400ms after the last
@@ -647,7 +704,107 @@ export function CheckinView(router) {
   async function _finishConversation() {
     await _showCoachBubble(_buildSummary());
     await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+    if (_shouldAskVariety()) {
+      await _showVarietyBeat();   // continues to _showActionButtons() itself
+      return;
+    }
     _showActionButtons();
+  }
+
+  // ───────────────────────────────────────────────────────
+  // DROP-IN COACH QUESTION (DIC-1)
+  // Destination Architecture section 8. See the v14 header note for why
+  // this is a missing writer rather than a new mechanism.
+  // ───────────────────────────────────────────────────────
+
+  // Mirrors session-builder.js's own isAnchor() cutoff. If these ever
+  // diverge the question starts promising something selection cannot
+  // deliver, so they are deliberately the same number.
+  const CONTINUITY_WINDOW_DAYS = 21;
+
+  // The two Home doors with requiresCheckin: true (today.js HOME_DOORS).
+  // Both build through session-builder.js, which is what reads the answer.
+  const SESSION_DOORS = ["session-builder", "coach-proposal"];
+
+  // Values map 1:1 onto session-builder.js's VARIETY_NOVELTY keys.
+  // Copy rule 10.1 -- no internal terms. "Variety", "novelty" and
+  // "anchor" are ours; none of them appears on screen.
+  const VARIETY_CHOICES = [
+    {
+      value: "familiar",
+      label: "Something like last time",
+      sub:   "Stay with the movements you've been building on"
+    },
+    {
+      value: "varied",
+      label: "Something different",
+      sub:   "A change of pace, with movements you've not done lately"
+    },
+    {
+      value: "balanced",
+      label: "Mix it up",
+      sub:   "Some of each"
+    }
+  ];
+
+  /**
+   * Is anything still familiar? True when at least one exercise was
+   * completed inside the continuity window. exerciseHistory is written
+   * on completion only (store.js recordExercises), so a session that was
+   * built and abandoned correctly counts for nothing here.
+   */
+  function _hasRecentHistory() {
+    const history = store.get("exerciseHistory");
+    if (!history || typeof history !== "object") return false;
+    return Object.keys(history).some(id => {
+      const s = store.exerciseStats(id);
+      return s.seen && s.daysSince !== null && s.daysSince <= CONTINUITY_WINDOW_DAYS;
+    });
+  }
+
+  function _shouldAskVariety() {
+    return SESSION_DOORS.includes(store.get("pendingDoorRoute")) && _hasRecentHistory();
+  }
+
+  async function _showVarietyBeat() {
+    await _showCoachBubble(
+      "Want to do something like last time, or shall we do something different today?"
+    );
+    await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+    _showVarietyPanel();
+  }
+
+  function _showVarietyPanel() {
+    const panel = _buildPanel(`
+      <div class="ci-choices" role="group" aria-label="How today's session should feel">
+        ${VARIETY_CHOICES.map(c => `
+          <button type="button" class="ci-choice" data-variety="${c.value}">
+            <span class="ci-choice__label">${_esc(c.label)}</span>
+            <span class="ci-choice__sub">${_esc(c.sub)}</span>
+          </button>
+        `).join("")}
+      </div>
+    `);
+
+    panel.querySelectorAll("[data-variety]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const choice = VARIETY_CHOICES.find(c => c.value === btn.dataset.variety);
+        if (!choice) return;
+        store.set("sessionVariety", choice.value);
+        _closePanel(panel);
+        _fadePastBubbles();
+        await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
+        _showUserBubble(choice.label);
+        await new Promise(r => setTimeout(r, T.PANEL_DELAY));
+        _showActionButtons();
+      });
+    });
+
+    _openPanel(panel);
+    setTimeout(
+      () => panel.querySelector("[data-variety]")?.focus({ preventScroll: true }),
+      150
+    );
   }
 
   // ─────────────────────────────────────────────────────────────────────────
