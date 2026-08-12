@@ -1,5 +1,13 @@
 /**
  * router.js
+ * 11 Aug 2026 v15
+ *
+ * Navigation audit, 11 Aug 2026. Three routes pointed at view files
+ * that had never been written -- about, community-impact and
+ * annual-reflection -- so the router believed they existed and anything
+ * navigating there failed at import. 'about' removed (settings.js has a
+ * working panel); the other two are now built.
+ *
  * 09 Aug 2026 v14
  *
  * v14 — New route 'in-step' -> in-step.js (InStepView). Added to
@@ -123,11 +131,20 @@ const VIEW_NAMES = {
   'journal-entry':     { path: './views/journal-entry.js',    fn: 'JournalEntryView'    },
   'activity-log':      { path: './views/activity-log.js',     fn: 'ActivityLogView'     },
   'library':           { path: './views/library.js',          fn: 'LibraryView'         },
-  'about':             { path: './views/about.js',            fn: 'AboutView'           },
+  // 'about' removed 11 Aug 2026. It pointed at a view file that had
+  // never been written, while settings.js has had a working About panel
+  // all along. Two Abouts would be two places to maintain the same
+  // information and two chances for them to disagree.
   'privacy':           { path: './views/privacy.js',          fn: 'PrivacyView'         },
   'upgrade':           { path: './views/upgrade.js',          fn: 'UpgradeView'         },
   'goal-setup':        { path: './views/onboarding/goal-setup.js', fn: 'GoalSetupView'  },
   'community-impact':  { path: './views/community-impact.js', fn: 'CommunityImpactView' },
+  // 'annual-reflection' kept, and the view now exists. Graeme: "what if
+  // I forget? Is it not worth just having it there from the start?" --
+  // and he is right that removing it is a weak plan, because schedules
+  // get archived. A broken route was not a reminder either; it did not
+  // prompt anybody, it just failed. The view is now built and handles
+  // having no year of data gracefully.
   'annual-reflection': { path: './views/annual-reflection.js',fn: 'AnnualReflectionView'},
 
   // ── Session builder ────────────────────────────────────────────────────────
@@ -185,7 +202,7 @@ const NAV_MAP = {
   'progress': 'progress', 'weekly-plan': 'progress',
   'noticing': 'noticing', 'journal-entry': 'noticing', 'library': 'noticing',
   'in-step': 'noticing',
-  'settings': 'settings', 'about': 'settings', 'privacy': 'settings',
+  'settings': 'settings', 'privacy': 'settings',
   'upgrade': 'settings', 'goal-setup': 'settings',
   'community-impact': 'settings', 'annual-reflection': 'settings',
 };
