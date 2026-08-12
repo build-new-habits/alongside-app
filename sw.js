@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v244
+ * Check-in pacing and scroll - the newest coach message can now scroll to the
+ * top of the viewport, and the energy and mood panels open on a tap rather
+ * than a 400ms timer.
+ *
  * 11 Aug 2026 v243
  * In-card performance notes generalised - speed and incline for a treadmill,
  * resistance level for a cross trainer, band colour, duration for a hold.
@@ -1062,7 +1067,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v253";
+const CACHE_NAME = "alongside-v254";
 
 const SHELL_URLS = [
 
