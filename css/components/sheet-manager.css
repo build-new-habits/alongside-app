@@ -120,14 +120,14 @@
 }
 
 .sheet-header__title {
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--user-text-scale, 1));
   font-weight: 600;
   color: var(--color-surface, #E8F4F4);
   margin: 0;
 }
 
 .sheet-header__subtitle {
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--user-text-scale, 1));
   color: var(--color-muted, #6B8585);
   margin: 4px 0 0;
 }
@@ -192,7 +192,7 @@
   border: none;
   background: var(--color-primary, #1B6B6B);
   color: #ffffff;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--user-text-scale, 1));
   font-weight: 600;
   cursor: pointer;
   transition: background 100ms ease;
@@ -224,7 +224,7 @@
   border: none;
   background: transparent;
   color: var(--color-muted, #6B8585);
-  font-size: 0.9rem;
+  font-size: calc(0.9rem * var(--user-text-scale, 1));
   text-align: center;
   cursor: pointer;
   transition: color 100ms ease;

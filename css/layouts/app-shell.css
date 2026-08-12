@@ -65,7 +65,7 @@
 
 /* Fallback icon if image doesn't load */
 .logo-icon {
-  font-size: 3rem;
+  font-size: calc(3rem * var(--user-text-scale, 1));
   display: none;
 }
 
@@ -258,7 +258,7 @@
 }
 
 .nav-icon {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
   margin-bottom: var(--space-1);
   transition: transform var(--transition-spring);
 }
@@ -340,7 +340,7 @@
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
-  font-size: 1.25rem;
+  font-size: calc(1.25rem * var(--user-text-scale, 1));
   display: flex;
   align-items: center;
   justify-content: center;

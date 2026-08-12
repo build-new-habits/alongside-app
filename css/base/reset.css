@@ -7,7 +7,7 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: calc(16px * var(--user-text-scale, 1));
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;

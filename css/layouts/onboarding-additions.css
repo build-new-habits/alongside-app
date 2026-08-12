@@ -178,7 +178,7 @@
 }
 
 .equip-facility-icon {
-  font-size: 1.75rem;
+  font-size: calc(1.75rem * var(--user-text-scale, 1));
   flex-shrink: 0;
   line-height: 1;
   width: 2.25rem;
@@ -207,14 +207,14 @@
 }
 
 .equip-facility-chevron {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
   color: var(--color-text-muted);
   flex-shrink: 0;
   line-height: 1;
 }
 
 .equip-facility-check {
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--user-text-scale, 1));
   color: var(--color-primary);
   flex-shrink: 0;
   font-weight: var(--font-bold);
@@ -324,7 +324,7 @@
 }
 
 .equip-accordion__chevron {
-  font-size: 1.25rem;
+  font-size: calc(1.25rem * var(--user-text-scale, 1));
   color: var(--color-text-muted);
   line-height: 1;
   transition: transform 0.18s ease;
@@ -691,7 +691,7 @@
 }
 
 .complete-journey-card__icon {
-  font-size: 2rem;
+  font-size: calc(2rem * var(--user-text-scale, 1));
   flex-shrink: 0;
   line-height: 1;
 }
@@ -903,7 +903,7 @@
 }
 
 .plan-card__icon {
-  font-size: 1.75rem;
+  font-size: calc(1.75rem * var(--user-text-scale, 1));
   flex-shrink: 0;
   line-height: 1;
 }

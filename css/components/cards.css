@@ -194,7 +194,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 }
 
@@ -244,7 +244,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
   flex-shrink: 0;
 }
 

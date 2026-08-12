@@ -142,7 +142,7 @@
 .cardio-feel-scale {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: calc(10px * var(--user-text-scale, 1));
   color: var(--color-text-muted);
   padding: 0 var(--space-1);
 }
@@ -248,12 +248,12 @@
 }
 
 .checkin-value-emoji {
-  font-size: 2.5rem;
+  font-size: calc(2.5rem * var(--user-text-scale, 1));
   line-height: 1;
 }
 
 .checkin-value-number {
-  font-size: 4rem;
+  font-size: calc(4rem * var(--user-text-scale, 1));
   font-weight: var(--font-bold);
   color: var(--color-primary);
   line-height: 1;
@@ -335,7 +335,7 @@
   border: 2px solid var(--color-border);
   background: var(--color-bg-card);
   color: var(--color-text);
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -357,7 +357,7 @@
 
 .checkin-sleep-number {
   display: block;
-  font-size: 4rem;
+  font-size: calc(4rem * var(--user-text-scale, 1));
   font-weight: var(--font-bold);
   color: var(--color-primary);
   line-height: 1;
@@ -547,7 +547,7 @@
 }
 
 .intention-path-icon {
-  font-size: 1.75rem;
+  font-size: calc(1.75rem * var(--user-text-scale, 1));
   flex-shrink: 0;
 }
 
@@ -752,7 +752,7 @@
   color: var(--color-primary);
 }
 
-.activity-type-card span:first-child { font-size: 1.4rem; }
+.activity-type-card span:first-child { font-size: calc(1.4rem * var(--user-text-scale, 1)); }
 
 .activity-log-selected {
   display: flex;
@@ -854,7 +854,7 @@
   color: var(--color-primary);
 }
 
-.coach-activity-pick-btn span:first-child { font-size: 1.6rem; }
+.coach-activity-pick-btn span:first-child { font-size: calc(1.6rem * var(--user-text-scale, 1)); }
 
 /* ============================================
    SETTINGS — EDITABLE PROFILE
@@ -1061,10 +1061,10 @@
   background: var(--color-primary-glow);
 }
 
-.movement-tile-icon { font-size: 1.4rem; }
+.movement-tile-icon { font-size: calc(1.4rem * var(--user-text-scale, 1)); }
 
 .movement-tile-label {
-  font-size: 10px;
+  font-size: calc(10px * var(--user-text-scale, 1));
   font-weight: var(--font-semibold);
   color: var(--color-text-secondary);
   text-align: center;
@@ -1103,7 +1103,7 @@
   background: var(--color-primary-glow);
 }
 
-.facility-preset-icon { font-size: 1.5rem; }
+.facility-preset-icon { font-size: calc(1.5rem * var(--user-text-scale, 1)); }
 
 .facility-preset-label {
   font-size: var(--text-sm);
@@ -1167,7 +1167,7 @@
   margin-bottom: var(--space-4);
 }
 
-.library-section-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+.library-section-icon { font-size: calc(1.5rem * var(--user-text-scale, 1)); flex-shrink: 0; margin-top: 2px; }
 
 .library-section-title {
   font-size: var(--text-lg);
@@ -1235,8 +1235,8 @@
   padding: var(--space-2);
 }
 
-.library-tile-icon { font-size: 1.4rem; }
-.library-tile--compact .library-tile-icon { font-size: 1.1rem; }
+.library-tile-icon { font-size: calc(1.4rem * var(--user-text-scale, 1)); }
+.library-tile--compact .library-tile-icon { font-size: calc(1.1rem * var(--user-text-scale, 1)); }
 
 .library-tile-label {
   font-size: var(--text-xs);
@@ -1254,7 +1254,7 @@
   position: absolute;
   top: var(--space-1);
   right: var(--space-1);
-  font-size: 9px;
+  font-size: calc(9px * var(--user-text-scale, 1));
   font-weight: var(--font-bold);
   color: var(--color-text-muted);
   background: var(--color-bg);
@@ -1336,14 +1336,14 @@
 }
 
 .progress-ring-num {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
   font-weight: var(--font-bold);
   color: var(--color-primary);
   line-height: 1;
 }
 
 .progress-ring-of {
-  font-size: 9px;
+  font-size: calc(9px * var(--user-text-scale, 1));
   color: var(--color-text-muted);
   font-weight: var(--font-semibold);
 }
@@ -1421,7 +1421,7 @@
 }
 
 .progress-dot-day {
-  font-size: 11px;
+  font-size: calc(11px * var(--user-text-scale, 1));
   color: var(--color-text-muted);
   font-weight: var(--font-semibold);
 }
@@ -1482,17 +1482,17 @@
 
 .progress-tile--empty { opacity: 0.4; }
 
-.progress-tile-icon { font-size: 1.2rem; }
+.progress-tile-icon { font-size: calc(1.2rem * var(--user-text-scale, 1)); }
 
 .progress-tile-value {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
   font-weight: var(--font-bold);
   color: var(--color-text);
   line-height: 1;
 }
 
 .progress-tile-label {
-  font-size: 9px;
+  font-size: calc(9px * var(--user-text-scale, 1));
   color: var(--color-text-muted);
   font-weight: var(--font-semibold);
   text-transform: uppercase;
@@ -1537,7 +1537,7 @@
 }
 
 .progress-body-value {
-  font-size: 1.8rem;
+  font-size: calc(1.8rem * var(--user-text-scale, 1));
   font-weight: var(--font-bold);
   color: var(--color-text);
 }
@@ -1603,7 +1603,7 @@
   border-color: var(--color-primary);
 }
 
-.yoga-focus-icon { font-size: 1.8rem; }
+.yoga-focus-icon { font-size: calc(1.8rem * var(--user-text-scale, 1)); }
 
 .yoga-focus-label {
   font-size: var(--text-sm);
@@ -1645,7 +1645,7 @@
 }
 
 .yoga-duration-num {
-  font-size: 2.5rem;
+  font-size: calc(2.5rem * var(--user-text-scale, 1));
   font-weight: var(--font-bold);
   color: var(--color-primary);
   line-height: 1;
@@ -1762,7 +1762,7 @@
 }
 
 .yoga-timer-seconds {
-  font-size: 3rem;
+  font-size: calc(3rem * var(--user-text-scale, 1));
   font-weight: var(--font-bold);
   color: var(--color-text);
   line-height: 1;
@@ -1892,7 +1892,7 @@
 }
 
 .quiet-mode-card-icon {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
   flex-shrink: 0;
 }
 
@@ -2023,7 +2023,7 @@
 }
 
 .quiet-timer-digits {
-  font-size: 4rem;
+  font-size: calc(4rem * var(--user-text-scale, 1));
   font-weight: var(--font-bold);
   color: var(--color-text);
   line-height: 1;

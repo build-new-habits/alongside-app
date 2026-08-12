@@ -274,7 +274,7 @@
 }
 
 .condition-icon {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
 }
 
 .condition-name {
@@ -400,7 +400,7 @@
 }
 
 .warning-icon {
-  font-size: 1.75rem;
+  font-size: calc(1.75rem * var(--user-text-scale, 1));
   flex-shrink: 0;
 }
 
@@ -473,7 +473,7 @@
 }
 
 .stat-emoji {
-  font-size: 2rem;
+  font-size: calc(2rem * var(--user-text-scale, 1));
 }
 
 .stat-label {
@@ -563,7 +563,7 @@
 }
 
 .option-icon {
-  font-size: 2.5rem;
+  font-size: calc(2.5rem * var(--user-text-scale, 1));
 }
 
 .option-info h4 {
@@ -621,7 +621,7 @@
 }
 
 .history-emoji {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--user-text-scale, 1));
 }
 
 .history-value {

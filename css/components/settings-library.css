@@ -34,7 +34,7 @@
   border: none;
   border-radius: var(--radius-md);
   color: var(--color-text-muted);
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--user-text-scale, 1));
   font-weight: var(--font-medium);
   font-family: inherit;
   cursor: pointer;
@@ -142,7 +142,7 @@
 }
 
 .library-card-icon {
-  font-size: 1.75rem;
+  font-size: calc(1.75rem * var(--user-text-scale, 1));
   line-height: 1;
   display: block;
 }
@@ -160,13 +160,13 @@
   gap: var(--space-1);
 }
 
-.library-card--compact .library-card-icon { font-size: 1.35rem; }
+.library-card--compact .library-card-icon { font-size: calc(1.35rem * var(--user-text-scale, 1)); }
 
 .library-soon-badge {
   position: absolute;
   top: var(--space-2);
   right: var(--space-2);
-  font-size: 0.6rem;
+  font-size: calc(0.6rem * var(--user-text-scale, 1));
   font-weight: var(--font-semibold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -235,7 +235,7 @@
 }
 
 .facility-preset-icon {
-  font-size: 1.75rem;
+  font-size: calc(1.75rem * var(--user-text-scale, 1));
   line-height: 1;
   display: block;
 }
@@ -319,7 +319,7 @@
 }
 
 .speech-rate-desc {
-  font-size: 0.6rem;
+  font-size: calc(0.6rem * var(--user-text-scale, 1));
   color: var(--color-text-muted);
   text-align: center;
   line-height: 1.2;
@@ -539,7 +539,7 @@
   outline-offset: 2px;
 }
 
-.coach-style-icon { font-size: 1.25rem; }
+.coach-style-icon { font-size: calc(1.25rem * var(--user-text-scale, 1)); }
 
 .coach-style-label {
   font-size: var(--text-sm);
