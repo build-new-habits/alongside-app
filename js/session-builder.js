@@ -1,6 +1,30 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 12 Aug 2026 v22
+ *
+ * v22 — C2/C3, third-pass persona trace.
+ *   C2: contentType 'practice' now excluded from component selection. 140
+ *   of 556 entries are complete standalone sessions, and this file had
+ *   never read the field — so a 60-minute cardio build returned C25K Week
+ *   1 AND Week 2 AND a 20-minute run in one session. CON-6 did not close
+ *   this: moving to the shared database is what brought the practices in.
+ *   C3: the duration estimate no longer triples duration-based exercises.
+ *   `ex.sets || 3` multiplied a 20-minute run by 3; a 60-minute request
+ *   was labelled "552–562 mins". Fixed at both parallel call sites.
+ *   C4: sessions are now trimmed to the requested duration. Fixing C3
+ *   exposed a separate fault it had been masking — EXERCISE_COUNT
+ *   allocates a fixed count, and count stops being a proxy for time once
+ *   entries range from 1 to 9 minutes each. A 60-minute request was
+ *   producing 104 minutes of work and a 30-minute request over 60.
+ *   Correctly labelling a 100-minute session as 100 minutes is not a fix
+ *   when the person asked for 60. Trims main only, longest first, never
+ *   below 3, never warmup or cooldown, never prescribed.
+ *   C1 (partial): _loadsLegs() no longer proxies "loads the legs" as "has
+ *   equipment or is difficulty 3+". The gate caught Seated Leg Extension
+ *   passing that test — bodyweight, low difficulty, and the exact exercise
+ *   the CAP-5 note exists to prevent.
+ *
  * 11 Aug 2026 v21
  *
  * v21 - Full sweep. Seven new categories wired in, closing an audit
@@ -685,6 +709,49 @@ function intentPriority(ex) {
   return false;
 }
 
+
+// ── C4 (12 Aug 2026, third-pass gate) ───────────────────────────────────────
+// EXERCISE_COUNT allocates a fixed count per duration (60 min -> 5 warmup,
+// 9 main, 3 cooldown = 17). Count is a proxy for time, and it stops holding
+// once entries vary from 1 to 9 minutes each: the gate found a 60-minute
+// request producing 104 minutes of work, and a 30-minute request producing
+// over 60.
+//
+// C3 fixed the arithmetic (a 20-minute run was being counted as 60). This is
+// the separate fault C3 exposed: the estimate was right and the SESSION was
+// too long. Correctly labelling a 100-minute session as 100 minutes is not a
+// fix when the person asked for 60.
+//
+// Trims from the MAIN section only, longest first, never below three main
+// exercises, and never touches warmup or cooldown — the warmup floor is a
+// safety rule, not a suggestion. Tolerance is 15%: a session should feel
+// like the time asked for, not be padded or clipped to the minute.
+function _exerciseMins(ex) {
+  return ex.duration
+    ? (ex.duration * (ex.sets || 1) / 60)
+    : ((ex.sets || 3) * 1.5);
+}
+
+function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
+  const MIN_MAIN  = 3;
+  const TOLERANCE = 1.15;
+  // `prescribed` is COUNTED but never trimmed — see the call site note.
+  const total = () => [...warmup, ...prescribed, ...main, ...cooldown]
+    .reduce((a, e) => a + _exerciseMins(e), 0);
+
+  const trimmed = [...main];
+  while (total() > targetMins * TOLERANCE && trimmed.length > MIN_MAIN) {
+    let worstIdx = 0;
+    for (let i = 1; i < trimmed.length; i++) {
+      if (_exerciseMins(trimmed[i]) > _exerciseMins(trimmed[worstIdx])) worstIdx = i;
+    }
+    trimmed.splice(worstIdx, 1);
+    main.length = 0;
+    main.push(...trimmed);
+  }
+  return main;
+}
+
 function _filterCandidates(categories, section, equipSet, conditionSet) {
   const ceiling = _difficultyCeiling();
   const prefs   = store.get("exercisePreferences") || {};
@@ -830,8 +897,23 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
     return LEG_AREAS.some(a => areas.includes(a)) &&
            !areas.includes("full-body");
   };
+  // C1 (12 Aug 2026, third-pass gate). This previously proxied "loads the
+  // legs" as "has equipment OR is difficulty 3+". The gate caught it:
+  // Seated Leg Extension is bodyweight and low-difficulty, so it passed —
+  // and it is the exact exercise the CAP-5 note exists to prevent. Loading
+  // the quadriceps IS that movement; the proxy measured the wrong thing.
+  //
+  // A leg pattern is now leg-loading on its own account. Unloaded range
+  // work — ankle circles, gentle mobility — still passes, which is the
+  // stated intent above: keeping what function exists is worth more than
+  // protecting it into disuse.
+  const LEG_PATTERNS = ["squat", "hinge", "lunge", "locomotion", "step"];
   const _loadsLegs = ex =>
-    _needsLegs(ex) && ((ex.equipment || []).length > 0 || (ex.difficultyLevel || 1) >= 3);
+    _needsLegs(ex) && (
+      LEG_PATTERNS.includes(ex.movementPattern) ||
+      (ex.equipment || []).length > 0 ||
+      (ex.difficultyLevel || 1) >= 3
+    );
 
   const isBalance = ex => ex.balanceDemand === true;
   const isImpact = ex => ex.impact === true;
@@ -856,6 +938,30 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
     // handled as a de-prioritisation at selection, not a removal --
     // "not a fan" is not "never again", and treating it as such would
     // quietly shrink somebody's world every time they were honest.
+    // ── C2 (12 Aug 2026, third-pass persona trace) ────────────────────────
+    // A practice IS a session, not one of N components inside another one.
+    // Traced: a single 60-minute cardio build returned C25K Week 1 AND
+    // Week 2 AND a 20-minute easy run — two different weeks of the same
+    // couch-to-5K programme, stacked, plus a separate run.
+    //
+    // 140 of 556 entries carry contentType 'practice' — complete standalone
+    // sessions (C25K weeks, 20-minute rows, 30-minute yin yoga sequences,
+    // 5-minute breathing practices). Nothing in this file had ever read
+    // contentType. Tenth instance of the written-never-read pattern, and the
+    // second one CON-6 did not close: moving to the shared database brought
+    // the practices in with everything else.
+    //
+    // These are not lost — practices are the natural content for "Coach
+    // decides", the Library and Mobility & Conditioning, where a person
+    // picks one whole thing. Confirming those routes reach them is logged.
+    //
+    // KNOWN, DELIBERATELY NOT FIXED HERE: roughly ten entries are genuinely
+    // components mis-tagged as practices (Corpse Pose/Savasana, General
+    // Pre-Sport Warm-Up, Post-Run Cool-Down). Excluding them is correct for
+    // this mixed builder — a 15-minute warm-up routine is not one of five
+    // warmup items — but re-tagging is exercise-data work. Touch-once.
+    if (ex.contentType === "practice") return false;
+
     if (prefs[ex.id]?.preference === "avoid") return false;
     if (impactGated && isImpact(ex)) return false;
     if (cap.asked && !cap.floorSafe   && isFloor(ex))   return false;
@@ -985,10 +1091,21 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
       isPrescribed: true, prescribedBy: ex.prescribedBy || null
     }));
 
+  // C4 trim. PRESCRIBED EXERCISES ARE NEVER TRIMMED and are never passed to
+  // _trimToDuration() — this file's own rule is that "the engine never
+  // removes or overrides prescribed exercises", and a specialist's
+  // instruction outranks a time target. They are counted toward the total
+  // (so the trim makes room for them by removing engine-chosen work
+  // instead), then re-inserted in their original position.
+  _trimToDuration(warmupExercises, [...prescribed], mainExercises, cooldownExercises, durationMins);
   const allExercises = [...warmupExercises, ...prescribed, ...mainExercises, ...cooldownExercises];
+
   const estMins = Math.round(allExercises.reduce((acc, ex) => {
-    const sets = ex.sets || 3;
-    const dur  = ex.duration ? (ex.duration * sets / 60) : (sets * 1.5);
+    // C3 (12 Aug 2026) — see the note at the parallel call site below. This
+    // is buildSessionFromSelection()'s copy; the two must stay in step.
+    const dur = ex.duration
+      ? (ex.duration * (ex.sets || 1) / 60)
+      : ((ex.sets || 3) * 1.5);
     return acc + dur;
   }, 0));
   const durationStr = `${Math.max(estMins - 5, durationMins - 5)}–${Math.max(estMins + 5, durationMins + 5)} mins`;
@@ -1355,11 +1472,17 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   );
 
   // Calculate estimated duration
+  _trimToDuration(warmupExercises, [], mainExercises, cooldownExercises, durationMins);
   const allExercises = [...warmupExercises, ...mainExercises, ...cooldownExercises];
+
   const estMins = Math.round(allExercises.reduce((acc, ex) => {
-    const sets = ex.sets || 3;
-    const reps = typeof ex.reps === "string" ? 1 : (ex.reps || 1);
-    const dur  = ex.duration ? (ex.duration * sets / 60) : (sets * 1.5);
+    // C3 (12 Aug 2026) — a duration-based exercise carries its own TOTAL
+    // time. `sets || 3` was tripling it: a 20-minute run counted as 60, a
+    // 30-minute C25K session as 90, which is how a 60-minute request came
+    // back labelled "552–562 mins". Sets only multiply rep-based work.
+    const dur = ex.duration
+      ? (ex.duration * (ex.sets || 1) / 60)
+      : ((ex.sets || 3) * 1.5);
     return acc + dur;
   }, 0));
   const durationStr = `${Math.max(estMins - 5, durationMins - 5)}–${Math.max(estMins + 5, durationMins + 5)} mins`;
