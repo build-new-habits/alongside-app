@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v174
+## 12 Aug 2026 v173
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v173.md`. Remove v173 on upload.
+Supersedes `master_schedule_12aug2026_v172.md`. Remove v172 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -354,51 +354,6 @@ Graeme's plank model included that mindful practice produces more muscle definit
 `verify-decisions.mjs`'s P5 check matched on `equipment` **plus** `movementPattern` — which is what a *strength* entry looks like. Yoga poses carry `holdSeconds` and `rest`, so **30 inline pose entries walked straight through the check written that morning to catch exactly this.**
 
 Now matches on `id` + `name`, the weakest signal every selectable thing in the product shares. **Each remaining budget is documented with its justification, because a budget without a reason is a hole.**
-
----
-
-## 🔬 PERSONA TRACE — Wave 2, 12 Aug 2026
-
-Two personas from `alongside_move_overview_and_personas_25jul2026_v2.md` §4, executed against **live modules** with a `localStorage` stub. Scripts saved to `Documents/Admin/Templates/persona-a.mjs` and `persona-b.mjs` so they can be re-run rather than rewritten.
-
-### 🟢 Nadia — ADHD, mid-30s, novelty-driven. Clean.
-
-Ten sessions of hyperfocus, three weeks away, then a return. Checked: **10 sessions logged, 5 exercises became familiar** (so CONT-1 works), **zero streak fields anywhere in her store**, her *"something different"* choice persisted to `sessionVariety` (DIC-1 works), and both a grounding moment and an empathy prompt fired on her return session.
-
-**Nothing shamed the gap.** No streak to break, no visible absence to explain. That is the persona's central need and it holds.
-
-### 🔴 Ruth — perimenopause, unpredictable energy. Found BURN-1.
-
-Her whole profile is unpredictable energy, and she is precisely who burnout detection exists for.
-
-## 🔴 BURN-1 — burnout detection had never run. Fixed 12 Aug 2026.
-
-`js/data/checkin.js`, `js/data/workoutGenerator.js`, `js/views/coach-proposal.js`. New `tools/verify-burn1.mjs`. `sw.js` → **v288**, cache **alongside-v288**.
-
-**Two faults, stacked, neither of which errored:**
-
-1. **`workoutGenerator.js:543` called `detectBurnout()` with NO ARGUMENT.** The function returns `false` on its first line when the history is missing — so it returned `false` **every time, for everybody**, since the day it was written.
-2. **Seven places then read `burnout.level`.** On a boolean that is `undefined`, so every comparison was false — including `recoveryMode: burnout.level === "high"`, which is what gates `filterToRecoveryPool()`.
-
-**The entire recovery path was unreachable.** Somebody could report a fortnight of exhaustion, be told by the coach that today should be lighter, and the generator would build as if nothing had been said.
-
-**The shape mismatch hid the missing argument, and the missing argument hid the shape mismatch.** Neither is visible on its own — a call site passing nothing looks like a default, and `.level` on a boolean fails silently.
-
-**Fixed:** `detectBurnout()` returns `{ level: 'none'|'moderate'|'high', avgEnergy }` — the shape its callers were **already written for**. They were right; the function was wrong. It now defaults to reading the store when called without an argument, so fault 1 cannot recur silently. The original threshold of 4 is kept as the outer edge, so nobody who registered before stops registering.
-
-### Both persona claims now hold against real code
-
-| Persona doc says | Result |
-|---|---|
-| *"A hard morning is treated as its own data point"* | energy 2 → **low** |
-| *"A good day is not defaulted to caution because of her profile"* | energy 8 in a burnout pattern → **moderate**, not low |
-
-The second is the one that matters: BIAS-1's one-step rule means her good day is respected rather than overridden. Had `lighter` been a floor rather than a step, this persona's stated requirement would have been broken by the fix intended to serve her.
-
-### Two apparent findings that were test errors, recorded so they are not re-raised
-
-- **`detectBurnout()` returning false initially** — the trace called it with no argument. That *was* the live bug, but the trace found it by accident rather than by design.
-- **`joint-pain` producing a general rather than named caution** — not a real condition id. The vocabulary is anatomical (`knee`, `hip`, `lower-back`) plus `chronic-fatigue` and `anxiety`. The code was right.
 
 ---
 
@@ -2042,4 +1997,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v174*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v173*
