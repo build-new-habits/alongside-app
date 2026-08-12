@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v152
+## 12 Aug 2026 v151
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v151.md`. Remove v151 on upload.
+Supersedes `master_schedule_12aug2026_v150.md`. Remove v150 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -70,73 +70,6 @@ The same defect appeared **eight times in eight different costumes**: content th
 **Wave 2 candidate on evidence:** persona 2.5 (post-cardiac, total beginner). The blank-slate persona surfaced every critical first, so "least data given to the app" is the confirmed selection criterion.
 
 **Fixture note:** the Node harness and persona fixtures are reusable but were built pre-capability-screen. They need `capability{}` added before the next run.
-
-## 🟢 DIC-1 — The drop-in coach question: SHIPPED, 12 Aug 2026
-
-**Build sequence item 1 of the tier boundary. Target WB 10 Aug 2026. Code complete and confirmed on a fresh clone of the live remote; on-device confirmation outstanding.**
-
-`js/views/checkin.js` v13 → **v14**. `css/components/checkin-conversation.css` v7 → **v8**. New `tools/verify-dic1.mjs`. `sw.js` v253-header/v264-cache → **v265**. No `store.js` change, so `Schema.md` untouched at v1.25.
-
-### The finding that made this cheap
-
-**`sessionVariety` was a reader without a writer.** `store.js` declares it (default `'balanced'`, validated against `familiar | balanced | varied`) and `session-builder.js` reads it to set the novelty rate — `familiar: 0.10, balanced: 0.25, varied: 0.55`. **Nothing in the codebase ever wrote it.** No Settings control, no onboarding question, no view. The `store.js` comment reads *"the person's own answer, never inferred from behaviour"* — and the person had never been asked. Selection has been running on a default nobody chose.
-
-So this was not a new mechanism bolted onto existing machinery. **It was the missing writer.** Third recurrence of the PT-12 reader-without-writer pattern in two days, which makes `tools/schema-check.mjs`-style gating look better value each time it appears.
-
-### Decisions taken with Graeme
-
-| # | Decision | Outcome |
-|---|---|---|
-| 1 | Where does it fire? | **End of check-in**, gated on a pending session door. One file, covers both session-generating doors, stays out of `coach-proposal`'s auto-opening options panel (where the v19 overlay bug lived) |
-| 2 | What does it write? | **`sessionVariety` directly.** No per-session override field — the question fires before every coach-built session, so "today's answer" and "standing preference" converge, and a second self-clearing field would be two sources of truth for one concept |
-| 3 | When is it skipped? | **Outside the 21-day window.** Precisely `session-builder.js`'s own `isAnchor()` cutoff. Outside it nothing is an anchor, so `familiar` and `varied` produce near-identical sessions and the coach would have asked a question it cannot act on |
-
-**Recorded consequence of Decision 2, so it is not discovered later:** if a Settings control for variety ever lands, this question overwrites it every session. That is intended — what you say today beats what you set in March — but it is a decision, not an accident.
-
-**Reasoning behind Decision 3, worth keeping:** a question that changes nothing is worse than no question, because it teaches the person the coach is reading a script rather than reading them. The spec says the same thing in its own words — *"he asks about last time, he never asks about March."*
-
-### Copy as shipped
-
-Coach bubble: *"Want to do something like last time, or shall we do something different today?"*
-
-| Choice | Sub-line | Writes |
-|---|---|---|
-| Something like last time | Stay with the movements you've been building on | `familiar` |
-| Something different | A change of pace, with movements you've not done lately | `varied` |
-| Mix it up | Some of each | `balanced` |
-
-No `.ci-panel-q` inside the panel — the coach has already asked in the thread, and asking again is the duplication v12 removed for the time question. Copy rule 10.1 holds: *variety*, *novelty* and *anchor* are ours, and none appears on screen.
-
-### 🟠 Accessibility finding — existing failure in `coach-proposal.css`, NOT fixed (touch-once)
-
-The nearest existing pattern, `.cp-missed-offer__btn`, puts `--color-text-muted` (`#A0B0C0`) on `--color-bg-elevated` (`#3E4C63`). **Measured 3.91:1 — below the 4.5:1 AA floor for normal text.** `--color-text-secondary` (`#A8B8CC`) on the same surface is 4.30:1 and also fails. `bg-elevated` is simply too light a surface for either muted token, and it is referenced 46+ times.
-
-`.ci-choice` therefore **recesses rather than elevates**: surface `--color-bg` (`#1E293B`) against the `--color-bg-card` (`#334155`) panel. Label 11.87:1, sub-line 7.24:1. The surface-to-panel step is only 1.41:1, under 1.4.11's 3:1 for component boundaries, so the border carries it — `--color-text-muted` measures 4.04:1 against the panel. **Hover moves the border only**; lightening the background would push the sub-line back under 4.5:1.
-
-**New task row — 🟠 A11Y-1, `--color-bg-elevated` contrast sweep.** Every muted or secondary text token sitting on `bg-elevated` anywhere in the app. Not booked. This is the same shape as the design-consistency audit and probably belongs with it.
-
-### 🟠 Logged, not fixed (touch-once)
-
-- **`store.set()` does not lazily init the way `store.get()` does** (`store.js` :1223 vs :1212). `get()` self-heals with `if (!this.data) this.init()`; `set()` throws `TypeError: Cannot set properties of null`. **Unreachable in the live app** — `app.js` :150 calls `store.init()` on boot — but it is a latent trap for any future call site that writes before it reads. Found by the verification harness, which is the point of having one.
-- **🟠 DOC-2 — `Schema.md` v1.25** correctly states store.js v30 in its header, but a body line two paragraphs down still reads *"`store.js` remains v21"*, left over from the v1.20 text. One-line fix, not booked.
-
-### ✅ DOC-1 closed
-
-`sw.js` header entries had stopped at v253 while `CACHE_NAME` reached v264 — eleven bumps during the long 12 Aug session went in without header entries. **Recorded as a stated gap rather than eleven reconstructed entries**, since inventing them after the fact would be worse than saying so. The counter is correct from v265 forward.
-
-### Verification
-
-`tools/verify-dic1.mjs`, 12 assertions, written before the change was trusted. Cross-file value contract (`checkin.js` ↔ `session-builder.js` ↔ `store.js` whitelist), the window constant, `SESSION_DOORS` against `today.js`'s `requiresCheckin: true` doors, `exerciseStats` boundary maths at 20/21/22 days, and validation round-trip including rejection of a bogus value. **All pass on a fresh clone of the live remote.**
-
-Two harness failures occurred and **both were the harness, not the code** — a relative import path, and the `store.init()` omission above. Consistent with v151's note that the first verification run was wrong and the code right six times out of six on 11–12 Aug. Checking the source before accepting a failure remains the rule.
-
-### Still open on DIC-1
-
-- **On-device confirmation.** Sits behind Graeme's agreed sequence: trace clean through code, fix, re-trace, then verify on screen
-- **Tier question not asked, and built for everyone deliberately.** The spec says *free users get* the drop-in question. Gating it to free would leave Personal users with a worse coach than free, since the plan (build item 5) does not exist yet — and P1 says the coach never withholds what it can see. Built unconditionally. **Flagged for Graeme to overrule if he wants it free-only**
-- **Build item 2** — condition-aware empathy selection — is the next cheapest item and is unblocked
-
----
 
 ## 🎯 THE TIER BOUNDARY — decided 12 Aug 2026
 
@@ -1001,4 +934,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v152*
+*Build New Habits · Alongside: Move · Master Schedule · 11 Aug 2026 v149*
