@@ -1,10 +1,32 @@
 # Alongside — Data Schema Reference
-## 12 Aug 2026 v1.29
+## 12 Aug 2026 v1.30
 
-**File:** `js/store.js` (confirmed live version: **v34, 12 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v36, 12 Aug 2026**)
 **Storage:** `localStorage` key `alongside_user`
 
-**This version supersedes:** v1.28 (12 Aug 2026).
+**This version supersedes:** v1.29 (12 Aug 2026).
+
+**v1.30 (12 Aug 2026)** — BIAS-1. `proposalBias` declared and wired. `store.js` v34 → **v36**.
+
+### `proposalBias` — **NOW DECLARED AND READ**, `store.js` v36
+
+`'rest' | 'lighter' | null`. Written by `js/views/coach-reflection.js`; read by `js/data/workoutGenerator.js` via `resolveIntensity()`.
+
+**This entry previously read:** *"written in `coach-reflection.js` (12 sites) but read nowhere else in the codebase… clearly intending to influence the next generated proposal — but nothing downstream ever consumes it. Still open, not fixed here."* That was accurate from 03 Aug until 12 Aug.
+
+**What it carries.** `todayIntensity` is derived from check-in **energy alone**. `proposalBias` is what the coach works out from **severe pain, burnout risk, several consecutive training days, and returning after time away** — signals energy does not capture.
+
+**How they combine.** `resolveIntensity(base, bias)` in `js/data/checkin.js`:
+
+| Bias | Effect |
+|---|---|
+| `null` | intensity unchanged |
+| `'lighter'` | **one step down** — high→moderate, moderate→low, low→low |
+| `'rest'` | low |
+
+**A step, not a floor.** Somebody with high energy in a burnout pattern gets moderate, not low. Overriding a good day entirely because of a pattern would be the app deciding it knows better than the person in front of it — P7's line: confidence scales with information, authority never does.
+
+**It was also undeclared in `store.js`**, existing only because `store.set()` creates arbitrary paths. It survived reloads, but was invisible to anyone reading the file for the field list — which is how a field carrying severe-pain and burnout signals went nine days without a reader.
 
 **v1.29 (12 Aug 2026)** — GM-1. One new field, `grounding`. `store.js` v33 → **v34**.
 

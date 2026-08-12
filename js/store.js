@@ -1,5 +1,13 @@
 /**
  * store.js - Data persistence layer
+ * 12 Aug 2026 v36
+ *
+ * v36 - BIAS-1. proposalBias declared and validated. It has been written
+ *   by coach-reflection.js since 03 Aug and was never in this file, so it
+ *   was invisible to anyone reading the field list -- which is how a
+ *   field carrying severe-pain and burnout signals went nine days without
+ *   a reader.
+ *
  * 12 Aug 2026 v35
  *
  * v35 - PT-5. logSession() removed. Zero callers; progressLog itself is
@@ -506,6 +514,9 @@ export const store = {
       lastEmpathyPromptSession: typeof saved.lastEmpathyPromptSession === 'number'
         ? saved.lastEmpathyPromptSession
         : 0,
+      proposalBias: ['rest', 'lighter'].includes(saved.proposalBias)
+        ? saved.proposalBias
+        : null,
       empathyPromptSkips: typeof saved.empathyPromptSkips === 'number'
         ? saved.empathyPromptSkips
         : 0,
@@ -1109,6 +1120,14 @@ export const store = {
       empathyPromptsFired:      0,  // integer, total prompts fired all time
       empathyPromptsAtStage:    0,  // integer, resets to 0 on stage advance
       lastEmpathyPromptSession: 0,  // integer, session count at last fire
+      // BIAS-1, 12 Aug 2026. Written by coach-reflection.js since 03 Aug and
+      // never declared here, so it existed only by virtue of store.set()
+      // creating arbitrary paths. It survives a reload (mergeWithDefaults
+      // spreads saved values) but was invisible to anybody reading this
+      // file for the field list, which is how it stayed unread for nine days.
+      //
+      // 'rest' | 'lighter' | null. Read by data/checkin.js resolveIntensity().
+      proposalBias:             null,
       empathyPromptSkips:       0,  // integer, consecutive skip streak —
                                      // resets to 0 on any non-skip response
       // EMP-1. Which prompt last fired, and how many times running.
