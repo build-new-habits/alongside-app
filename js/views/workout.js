@@ -1,5 +1,12 @@
 /**
  * workout.js - Workout Execution View
+ * 12 Aug 2026 v12
+ *
+ * v12 - GM-1. Grounding moments on the exercise card, from Graeme's
+ *   plank and running models: contact, then place, then beyond.
+ *   Chosen once per render; recorded on mount. Appears rarely on
+ *   purpose -- silence is the common case.
+ *
  * 12 Aug 2026 v11
  *
  * v11 - LOG-1. Session notes added to the exercise card. Graeme, 12 Aug:
@@ -157,6 +164,7 @@
 
 import { store }         from "../store.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
+import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
 import { checkinData }   from "../data/checkin.js";
 import { recordSession } from "../data/programmeEngine.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
@@ -195,6 +203,14 @@ export function render() {
   }
 
   const exercise = workout.exercises[currentExerciseIndex];
+
+  // GM-1. Chosen once per render, so the card does not shuffle moments
+  // on a timer tick. Returns null far more often than not: wrong family,
+  // too soon, severe pain, already dismissed, or simply not this
+  // session. Silence is the common case and costs nothing.
+  const sessionCount    = (store.get("activityLog") || []).length;
+  const groundingMoment = selectMoment(exercise, sessionCount);
+
   const isLastExercise = currentExerciseIndex === workout.exercises.length - 1;
   const progress = ((currentExerciseIndex) / workout.exercises.length) * 100;
 
@@ -300,6 +316,14 @@ export function render() {
               ${exercise.watchOut.map(item => `<li>${item}</li>`).join("")}
             </ul>
           </div>
+        ` : ""}
+
+        ${groundingMoment ? `
+          <aside class="gmoment" aria-label="Something to notice">
+            <p class="gmoment__text">${groundingMoment.text}</p>
+            <button class="gmoment__dismiss" id="gmoment-dismiss"
+                    aria-label="Do not show this one again">Not for me</button>
+          </aside>
         ` : ""}
 
         <!-- Session notes. LOG-1: this used to exist only in
@@ -409,6 +433,23 @@ export function onMount() {
   // onto another.
   if (workout?.exercises?.[currentExerciseIndex]) {
     attachLogEvents(workout.exercises[currentExerciseIndex], `wo-log-${currentExerciseIndex}`);
+  }
+
+  // GM-1. Recorded on mount rather than at render, so a moment that was
+  // built but never actually reached the screen is not counted as seen.
+  const gmEl = document.querySelector(".gmoment");
+  if (gmEl) {
+    const sc = (store.get("activityLog") || []).length;
+    const ex = workout?.exercises?.[currentExerciseIndex];
+    const m  = ex ? selectMoment(ex, sc) : null;
+    if (m) recordMomentShown(m, sc);
+
+    document.getElementById("gmoment-dismiss")?.addEventListener("click", () => {
+      if (m) dismissMoment(m.id);
+      // Goes quietly. No confirmation, no explanation, nothing logged as
+      // a skip -- dismissing is an answer, not an avoidance.
+      gmEl.remove();
+    });
   }
 
   if (!workout) return;
