@@ -1,4 +1,31 @@
-/* variables.css - Midnight Teal Design Tokens */
+/* variables.css - Midnight Teal Design Tokens
+   12 Aug 2026 v2
+
+   v2 - A11Y-1. --color-text-secondary and --color-text-muted lightened so
+   they clear WCAG AA (4.5:1) on --color-bg-elevated, the lightest surface
+   in the palette.
+
+   The failure: 56 CSS rules set an elevated background and 15 of them put
+   secondary or muted text directly on it. Secondary measured 4.30:1 and
+   muted 3.91:1 -- both under the 4.5:1 floor for normal text. Because
+   --color-bg-hover is the same value (#3E4C63), every card hover state
+   was affected too.
+
+   Fixed at the token rather than in 15 places, and by lightening the text
+   rather than darkening the surface. Darkening --color-bg-elevated to make
+   the old text pass would have brought it to 1.00:1 against
+   --color-bg-card, so "elevated" would have become visually identical to
+   "card" and every raised element in the app would have flattened.
+
+   The cost, stated plainly: secondary and muted are now close enough to be
+   nearly indistinguishable, so the palette effectively carries two text
+   weights rather than three. That is the honest position anyway -- if a
+   palette cannot support three weights on its own lightest surface at AA,
+   it has two, and pretending otherwise is what produced 15 failing rules.
+
+   Do not darken either token without re-running the numbers against
+   #3E4C63, not just against #1E293B and #334155.
+*/
 
 :root {
   /* ========================================
@@ -24,8 +51,8 @@
   
   /* Text */
   --color-text: #E2E8F0;          /* Primary text - off-white     contrast: 11.87 on BG, 8.40 on BG_CARD */
-  --color-text-secondary: #A8B8CC; /* Secondary text               contrast: 5.12 on BG_CARD, 7.23 on BG — was #94A3B8 (failed 4.04 on BG_CARD) */
-  --color-text-muted: #A0B0C0;    /* Muted text                   contrast: 4.67 on BG_CARD, 6.59 on BG — was #64748B (failed 2.18 on BG_CARD) */
+  --color-text-secondary: #B9C6D6; /* Secondary text  contrast: 8.44 on BG, 5.97 on BG_CARD, 5.01 on BG_ELEVATED — was #A8B8CC (failed 4.30 on BG_ELEVATED) */
+  --color-text-muted: #B2C0D0;    /* Muted text      contrast: 7.90 on BG, 5.59 on BG_CARD, 4.69 on BG_ELEVATED — was #A0B0C0 (failed 3.91 on BG_ELEVATED) */
   --color-text-inverse: #0F172A;  /* Text on light/accent backgrounds */
   
   /* Primary Accent - Electric Teal (matched to logo) */
