@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v247
+ * The coach is now direct when it knows: if you have said an area is sore and
+ * the exercise loads it, it says so and suggests taking weight off rather than
+ * hedging. Plainer arc language.
+ *
  * 11 Aug 2026 v246
  * Progression is invited, never directed. The coach offers a little more only
  * when the day suits it, invites less during a flare, and treats holding steady
@@ -1077,7 +1082,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v256";
+const CACHE_NAME = "alongside-v257";
 
 const SHELL_URLS = [
 
