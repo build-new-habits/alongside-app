@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v241
+ * CAP-4 - new seated.js, 21 entries of seated cardio, strength, core, lower
+ * body and chair-supported standing. Database 497 -> 518.
+ *
  * 11 Aug 2026 v240
  * CAP-1/CAP-2 - capability screen in onboarding, and all 497 exercises tagged
  * with position, impact and balanceDemand so the gates read data rather than
@@ -1048,7 +1052,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v250";
+const CACHE_NAME = "alongside-v251";
 
 const SHELL_URLS = [
 
