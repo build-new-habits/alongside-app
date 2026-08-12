@@ -98,6 +98,18 @@ check("every chairRise answer that SHOWS the question also fails safe", () => {
     ok(p.legsLoadable === false, `chairRise '${c}' shows the question but did not fail safe`);
   }
 });
+check("the question copy is defined exactly once", () => {
+  const n = (view.match(/take your weight through your legs/g) || []).length;
+  ok(n === 1, `copy appears ${n} times - two render sites must share one definition, ` +
+     "or the most sensitive question in the product drifts into two versions");
+});
+check("both render sites use the shared definition", () => {
+  const n = (view.match(/_legPowerGroup\(\)/g) || []).length;
+  ok(n >= 3, `expected the definition plus both call sites, found ${n}`);
+});
+check("the supporting line is wired to the radiogroup for screen readers", () =>
+  ok(/aria-describedby="lg-\$\{id\}-sub"/.test(view),
+     "the reason for asking must be announced, not just shown"));
 check("the view shows the question for exactly those answers", () =>
   ok(/selections\.chairRise && selections\.chairRise !== 'yes'/.test(view),
      "trigger drift between view and profile is how C1 happened in the first place"));
