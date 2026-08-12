@@ -1,22 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v165
+## 12 Aug 2026 v164
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v164.md`. Remove v164 on upload.
-
-> ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
->
-> Graeme, 12 Aug: *"I need you to be so much more reliable and better... it raises questions for how reliable you are."* He was right, and the cause was diagnosable rather than vague.
->
-> **The fault: answering from recall instead of from source.** In Step's tier was quoted back to him from a *chat summary* — stale by construction — while the current decision sat in `alongside_destination_architecture_12aug2026_v1.md`, one of the two documents this prompt names as required reading. Same root cause as re-raising his approved grounding texts and the settled yoga decision.
->
-> **Compounding habit: manufacturing open questions.** Responses ended with "still open" lists to appear thorough. Several items were not open. That does not demonstrate rigour — it offloads verification onto him, which is backwards.
->
-> **Two rules, checkable rather than aspirational:**
-> 1. **Nothing enters an open-items list unless verified open in that same turn.** If it cannot be confirmed against the repo, it does not get listed.
-> 2. **The repo beats memory, always.** Chat summaries are not a source. `grep` costs three seconds.
->
-> **And a mechanism, because stated rules are exactly what failed:** `tools/verify-decisions.mjs`. See below.
+Supersedes `master_schedule_12aug2026_v163.md`. Remove v163 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -90,41 +76,6 @@ The same defect appeared **eight times in eight different costumes**: content th
 `js/session-log.js` v1 → **v2**, `js/views/yoga-session.js` v2 → **v3**, `sw.js` → **v275**, cache **alongside-v275**.
 
 Graeme: *"yes, but note-and-duration only — no reps, no level."* `performanceFields()` gains a `mode`; `"gentle"` returns duration and a free note and nothing else. **A pose is not a set** — counting reps there imports the exact frame the practice exists outside of. The gate asserts gentle mode offers none of reps, level, weight, incline, speed, distance or tension, so it fails if that branch ever widens.
-
----
-
-## 🛡️ DECISION-DRIFT GATE — `tools/verify-decisions.mjs`, 12 Aug 2026
-
-**Locked decisions now get enforcement, not just prose.**
-
-### Why it exists
-
-In Step sat locked for hours after the decision made it free. **Nothing failed.** That was the **fourth instance in one day** of one shape:
-
-| Instance | Stated where | Enforced where |
-|---|---|---|
-| `sessionVariety` | store.js comment: *"the person's own answer"* | Nowhere — never written |
-| `exerciseFeedback` | Read by `applyFeedbackWeighting()` | Nowhere — never written |
-| `@media (prefers-larger-text)` | A styled block | Nowhere — not a real media feature |
-| **In Step is free** | Destination Architecture §9, §18 | Nowhere — still `isPremium()` |
-
-**A stated intent with no enforcement decays silently, and the silence is what makes it expensive.**
-
-### What it checks
-
-Free-tier features are actually free · no upgrade language inside a coach card (P1/P2) · no delta, verdict or streak language (P4) · no view defines an exercise-shaped pool (P5) · no voice picker exposed · every tracked store field has both a reader and a writer · the capability fail-safe covers everyone the question is asked of · grounding moments never appear on the acute-pain path.
-
-**Each failure names the document the decision is recorded in**, so a future failure is traced rather than argued about.
-
-**Deliberately limited.** It cannot check tone, judgement, or whether a line sounds like the coach — those still need Graeme. The point is that everything *checkable* is checked, so his attention goes only to what he alone can judge.
-
-### Three failures on first run — all harness faults, each one useful
-
-1. **"progress" matched `progressionInvitation`**, a function name. Identifiers are not user-facing copy.
-2. **`BREATHING_EXERCISES` in `quiet-session.js`** is breathing *patterns*, not database exercises. Now matches on **shape** — `equipment` plus `movementPattern` — not on a name. **A gate that cries wolf gets switched off**, which would be worse than no gate.
-3. **`liftLogEnabled` is written through a generic `[data-toggle]` handler**, so no literal `set("liftLogEnabled")` exists to grep. That is also precisely how a genuinely writerless field could hide, so both forms now count.
-
-**Verified by reversal:** renaming the In Step button id makes it fail and name the source document. Ten gates now run green on a fresh clone.
 
 ---
 
@@ -1648,4 +1599,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v165*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v164*
