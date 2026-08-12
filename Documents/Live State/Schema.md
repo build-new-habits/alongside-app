@@ -1,10 +1,29 @@
 # Alongside — Data Schema Reference
-## 12 Aug 2026 v1.27
+## 12 Aug 2026 v1.28
 
-**File:** `js/store.js` (confirmed live version: **v32, 12 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v33, 12 Aug 2026**)
 **Storage:** `localStorage` key `alongside_user`
 
-**This version supersedes:** v1.26 (12 Aug 2026).
+**This version supersedes:** v1.27 (12 Aug 2026).
+
+**v1.28 (12 Aug 2026)** — C1. `capability.legPower` is now written for the first time, and its fail-safe widened. `store.js` v32 → **v33**.
+
+### `capability.legPower` — now ASKED, `store.js` v33
+
+`'full' | 'limited' | 'none' | null`. Written by `js/views/onboarding/lifestyle.js` v4 from a conditional question shown **only when `chairRise !== 'yes'`**. Read by `capabilityProfile()`, which derives `legsUsable` (`!== 'none'`) and `legsLoadable` (`=== 'full'`); both are consumed by two filters in `session-builder.js`.
+
+| Answer shown | Stored |
+|---|---|
+| Yes | `'full'` |
+| A little, or on good days | `'limited'` |
+| No | `'none'` |
+| I'd rather not say | **`null`** |
+
+**"I'd rather not say" stores `null`, not a fourth value.** Storing the string would be truthy, so `c.legPower || default` would skip the fail-safe — and since it matches none of the three, `legsLoadable` would be false but `legsUsable` **true by accident**.
+
+**Fail-safe, widened at v33.** Unanswered resolves to `'limited'` when `needsSeated || (asked && chairRise !== 'yes')`. It previously keyed on `needsSeated` alone (`chairRise === 'no'`), which did not cover `'not-easily'` — so somebody who said rising from a chair is not easy, then declined the question, was served fully loaded leg work. Still gated on `asked`, so nobody who never saw the capability screen is assumed limited.
+
+Covered by `tools/verify-c1.mjs`, which fails on the pre-fix code.
 
 **v1.27 (12 Aug 2026)** — EMP-1. One new field, `empathyLastPrompt`. `store.js` v31 → **v32**.
 

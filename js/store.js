@@ -1,5 +1,17 @@
 /**
  * store.js - Data persistence layer
+ * 12 Aug 2026 v33
+ *
+ * v33 - C1-SAFETY. capabilityProfile()'s legPower default widened to
+ *   cover everyone the conditional question is asked of. It fires when
+ *   chairRise !== 'yes' but the fail-safe only triggered on needsSeated
+ *   (chairRise === 'no'), so a person who answered 'not-easily' and then
+ *   declined the question fell through to 'full' and was served fully
+ *   loaded leg work. Found while making that question optional --
+ *   optional is only safe if unanswered fails safe. Still gated on
+ *   `asked`, so nobody who never saw the capability screen is assumed
+ *   limited. See the C1-SAFETY note at the site.
+ *
  * 12 Aug 2026 v32
  *
  * v32 - EMP-1. New field empathyLastPrompt, needed by condition-aware
@@ -1709,10 +1721,31 @@ export const store = {
     // say so; someone who cannot and is over-served can be hurt.
     //
     // This is the safety half of C1 and needs no new copy. The question
-    // itself — asked only when chairRise !== 'yes' — is the other half and
-    // is held pending sign-off on its wording, because a question about
-    // whether someone's legs work is the most sensitive in the product.
-    const legPowerDefault = needsSeated ? 'limited' : 'full';
+    // itself — asked only when chairRise !== 'yes' — was the other half.
+    // Wording signed off by Graeme 12 Aug 2026 and now built; see
+    // views/onboarding/lifestyle.js. The default below was widened at the
+    // same time — see the C1-SAFETY note.
+    // C1-SAFETY, 12 Aug 2026. The default must cover exactly the people
+    // the QUESTION is asked of, and it did not.
+    //
+    // The conditional question fires when chairRise !== 'yes' -- so for
+    // 'not-easily' as well as 'no'. needsSeated is only true for
+    // chairRise === 'no' (or floorAccess === 'no'). So somebody who said
+    // getting out of a chair is NOT EASY, and then skipped or declined
+    // the leg question, fell straight through to 'full' and was served
+    // fully loaded leg work. That is the same shape as the original C1
+    // bug, one answer to the left.
+    //
+    // Found while making the question optional. Optional was only ever
+    // safe if an unanswered question fails safe, and it did not.
+    //
+    // Now: if we thought it worth ASKING, we do not assume 'full' when
+    // unanswered. Still gated on `asked`, so nobody who never saw the
+    // capability screen is assumed limited -- assuming limitation of
+    // everyone would be both wrong and insulting, which was the correct
+    // half of the v29 reasoning and is preserved.
+    const legPowerUnknown = needsSeated || (asked && c.chairRise !== 'yes');
+    const legPowerDefault = legPowerUnknown ? 'limited' : 'full';
     const legPower     = c.legPower || legPowerDefault;
     const legsUsable   = legPower !== 'none';
     const legsLoadable = legPower === 'full';

@@ -1,6 +1,23 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v272
+ * C1 second half. The conditional leg question is built and live -- the
+ * last outstanding half of the safety fix that has been held since 12 Aug
+ * pending sign-off on its wording, because a question about whether
+ * somebody's legs work is the most sensitive in the product. Wording
+ * agreed with Graeme; optional, with "I'd rather not say".
+ * views/onboarding/lifestyle.js v3 -> v4, store.js v32 -> v33,
+ * Schema.md v1.27 -> v1.28, new tools/verify-c1.mjs.
+ *
+ * A REAL HOLE was found while making the question optional, and optional
+ * would have opened it: the question fires when chairRise !== 'yes', but
+ * the fail-safe only triggered on needsSeated (chairRise === 'no'). So
+ * somebody who said getting out of a chair is NOT EASY, then declined the
+ * question, fell through to legPower 'full' and fully loaded leg work --
+ * the original C1 bug, one answer to the left. The default now covers
+ * exactly the people the question is asked of. Cache bump only.
+ *
  * 12 Aug 2026 v271
  * EMP-2. Closes the two gaps EMP-1 raised, both of which turned out to be
  * code rather than content -- EMP-1's "needs Graeme, not code" framing was
@@ -1231,7 +1248,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v271";
+const CACHE_NAME = "alongside-v272";
 
 const SHELL_URLS = [
 
