@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v275
+ * LOG-2. Session notes on yoga poses, in "gentle" mode -- duration and a
+ * free note only, no reps and no level. Graeme, 12 Aug: a pose is not a
+ * set, and counting reps there would import the frame the practice exists
+ * outside of. session-log.js v1 -> v2 gains the mode; yoga-session.js
+ * v2 -> v3 uses it. Cache bump only, no new files.
+ *
  * 12 Aug 2026 v274
  * LOG-1. Session notes. Graeme: "Weight notes should be on. But not just
  * weight. Time, tension, elevation etc."
@@ -1279,7 +1286,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v274";
+const CACHE_NAME = "alongside-v275";
 
 const SHELL_URLS = [
 
