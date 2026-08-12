@@ -1,5 +1,10 @@
 /**
  * data/session-categories.js
+ * 11 Aug 2026 v2
+ *
+ * v2 - New "loaded-carry" category. All six carry exercises were
+ *   unreachable: nothing selected movementPattern "carry".
+ *
  * 11 Aug 2026 v1
  *
  * CON-6 — maps the session builder's category vocabulary onto the main
@@ -139,6 +144,15 @@ export const CATEGORY_MATCHERS = {
   "core-stability":   ex => pattern(ex, "anti-extension", "anti-rotation",
                                     "anti-lateral-flexion") ||
                             (has(ex, "abdominals") && pattern(ex, "isometric")),
+
+  // Added 11 Aug 2026 (CAP-3). All six carry exercises in the database
+  // were unreachable: no category matcher selected movementPattern
+  // "carry", so farmer's carries, suitcase carries and overhead carries
+  // could never appear in any session. Found while implementing the
+  // maintenance intent tilt, which prioritises exactly this pattern
+  // because grip strength predicts independence better than almost
+  // anything else we measure.
+  "loaded-carry":     ex => ex.movementPattern === "carry",
 
   "conditioning":     ex => ex.category === "cardio" && (ex.energyRequired || 5) >= 5,
   "interval":         ex => ex.category === "cardio" && (ex.energyRequired || 5) >= 6,

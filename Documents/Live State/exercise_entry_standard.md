@@ -1,6 +1,6 @@
 # Exercise Entry Standard
 
-**11 Aug 2026 v1**
+**11 Aug 2026 v2**
 
 Build New Habits · Alongside: Move · Live State
 
@@ -258,6 +258,25 @@ search phrase reaches whatever good demonstration currently exists.
 
 Format: exercise name plus a qualifier — `"cable chest press standing
 technique"`. Avoid a named creator, which dates and implies endorsement.
+
+---
+
+## No time-stamped horizons
+
+**Never attach a number of years to a benefit.**
+
+Write "in years to come", "later on", "further down the line". Never "in ten years' time", "by the time you're eighty", "within five years".
+
+The reason is not stylistic. A specific horizon invites the person to do the arithmetic on their own decline — it hands somebody a countdown and calls it encouragement. "This keeps you getting out of a chair unaided in years to come" is a reason to do the exercise. "...in ten years' time" is a date to dread, and it will be read by someone who may already be quietly frightened about exactly that.
+
+This applies to `why`, `coaching`, `load`, `watchOut`, coach lines, and any programme rationale.
+
+| Write | Not |
+|---|---|
+| in years to come | in ten years' time |
+| later on | by the time you're seventy |
+| further down the line | within five years |
+| keeps this available to you | stops you losing this by sixty |
 
 ---
 
