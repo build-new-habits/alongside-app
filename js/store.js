@@ -1,6 +1,12 @@
 /**
  * store.js - Data persistence layer
- * 11 Aug 2026 v27
+ * 11 Aug 2026 v28
+ *
+ * 11 Aug 2026 v28 - logLift() generalised from weight-and-reps to any
+ *   metric the exercise actually produces: speed, incline, resistance
+ *   level, distance, duration, band tension, free note. liftLogEnabled
+ *   now defaults true -- a recording feature that is off by default is
+ *   one nobody uses.
  *
  * 11 Aug 2026 v27 - capability{} values are strings, not booleans, so a
  *   wheelchair user can answer "No" rather than approximating themselves
@@ -321,7 +327,15 @@ export const store = {
         : defaults.onboarding,
 
       // ── LIFT LOG (v20) ────────────────────────────────────────
-      liftLogEnabled: typeof saved.liftLogEnabled === 'boolean' ? saved.liftLogEnabled : false,
+      // Default changed false -> true, 11 Aug 2026. Graeme: "I would like
+      // an option to add details into the card... Not after the session,
+      // straight in the card before clicking next. I'll never remember
+      // otherwise." A recording feature that is off by default is a
+      // recording feature nobody uses, and the note is only useful if it
+      // exists by the time the exercise comes round again. Still
+      // switchable off in Settings, and every field remains optional --
+      // nothing is ever required to complete a session.
+      liftLogEnabled: typeof saved.liftLogEnabled === 'boolean' ? saved.liftLogEnabled : true,
       liftLog: (saved.liftLog && typeof saved.liftLog === 'object' && !Array.isArray(saved.liftLog))
         ? saved.liftLog
         : {},
@@ -946,7 +960,7 @@ export const store = {
       //
       // Off by default. Someone who turns it on has asked for it, which is
       // a different thing from being given it.
-      liftLogEnabled: false,
+      liftLogEnabled: true,
 
       // { [exerciseId]: [ { at: ISO, weight: number, unit: 'kg'|'lb',
       //                     reps: number|null } ] }
@@ -1279,17 +1293,46 @@ export const store = {
    * recent one.
    */
   logLift(exerciseId, entry) {
-    if (!exerciseId || !entry || typeof entry.weight !== 'number') return null;
+    if (!exerciseId || !entry) return null;
     if (this.data.liftLogEnabled !== true) return null;
+
+    // Generalised 11 Aug 2026 from weight-and-reps to whatever the
+    // exercise actually produces. Graeme: "the weight, time, tension,
+    // etc as discussed."
+    //
+    // A treadmill session produces a speed and an incline; a cross
+    // trainer produces a resistance level; a band produces a colour; a
+    // plank produces a duration. Recording only weight meant that for
+    // most of the database there was nothing to write down, and a
+    // person came back next week with nothing to go on.
+    //
+    // Every field is optional and free-form within its type. Nothing is
+    // computed from them, nothing is compared, and nothing is narrated
+    // -- P4 applies: these are notes the person left themselves.
+    const NUMERIC = ['weight', 'reps', 'speed', 'incline', 'level',
+                     'distance', 'durationMins'];
+    const TEXT    = ['tension', 'note'];
+
+    const record = { at: new Date().toISOString() };
+    let hasValue = false;
+    for (const k of NUMERIC) {
+      if (typeof entry[k] === 'number' && !Number.isNaN(entry[k])) {
+        record[k] = entry[k]; hasValue = true;
+      }
+    }
+    for (const k of TEXT) {
+      if (typeof entry[k] === 'string' && entry[k].trim()) {
+        record[k] = entry[k].trim().slice(0, 60); hasValue = true;
+      }
+    }
+    if (!hasValue) return null;
+    if (record.weight !== undefined) {
+      record.unit = entry.unit || this.data.weightUnit || 'kg';
+    }
 
     const log = { ...(this.data.liftLog || {}) };
     const list = [...(log[exerciseId] || [])];
-    list.push({
-      at:     new Date().toISOString(),
-      weight: entry.weight,
-      unit:   entry.unit || this.data.weightUnit || 'kg',
-      reps:   typeof entry.reps === 'number' ? entry.reps : null
-    });
+    list.push(record);
     if (list.length > 20) list.splice(0, list.length - 20);
     log[exerciseId] = list;
     this.data.liftLog = log;
