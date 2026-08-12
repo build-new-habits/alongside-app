@@ -1,7 +1,7 @@
 # Alongside — Data Schema Reference
-## 12 Aug 2026 v1.24
+## 12 Aug 2026 v1.25
 
-**File:** `js/store.js` (confirmed live version: v21, 11 Aug 2026)
+**File:** `js/store.js` (confirmed live version: **v30, 12 Aug 2026**)
 **Storage:** `localStorage` key `alongside_user`
 
 **This version supersedes:** v1.20 (11 Aug 2026). Adds the cross-reference below to the new Exercise Entry Standard (CON-3). No `store.js` change in this pass — `store.js` remains v21.
@@ -163,6 +163,17 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | `onboardingComplete` | `boolean` | `false` | Gates app entry |
 | `onboardingStep` | `number` | `1` | Resume position if onboarding is interrupted |
 
+
+### `capability.legPower` — **DECLARED, `store.js` v30, 12 Aug 2026**
+
+| Field | Type | Default | Notes |
+|-------|------|---------|-------|
+| `capability.legPower` | `'full'\|'limited'\|'none'\|null` | `null` | **Not yet asked.** The conditional question (fires when `chairRise !== 'yes'`) is built pending sign-off on its wording |
+
+**C1, third-pass trace.** Read by `capabilityProfile()` and consumed by two filters in `session-builder.js`, but never declared, never written and never asked — so it always fell back to `'full'` and a wheelchair user was served Seated Leg Extension, the exact exercise the v29 note exists to prevent.
+
+**The unknown-value default is now conditional:** `'limited'` when `needsSeated` is true (the person cannot rise from a chair or reach the floor), `'full'` otherwise. Fails safe for the one group at risk and assumes nothing about anyone else. **Do not simplify this back to a flat `'full'`.**
+
 ### `exerciseFeedback` — **DECLARED, `store.js` v21, 11 Aug 2026**
 
 | Field | Type | Default | Notes |
@@ -181,7 +192,7 @@ PT-4. A **memory aid, not analytics** — Graeme's framing: knowing what you set
 
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
-| `liftLogEnabled` | `boolean` | `false` | Off by default. Toggled in Settings > Equipment. `logLift()` no-ops while false |
+| `liftLogEnabled` | `boolean` | **`true`** | **Changed to default-on in `store.js` v28** — "a recording feature that is off by default is one nobody uses". Supersedes the v20 default of `false`. Toggled in Settings > Equipment; `logLift()` no-ops while false. Note P4 is not breached by default-on: the protection lives in how the number is *presented* (no delta, no interpretation), not in whether it is recorded |
 | `liftLog` | `object` | `{}` | `{ [exerciseId]: [{ at, weight, unit, reps }] }`. Newest last, capped at 20 per exercise |
 
 **Helpers:** `store.logLift(exerciseId, { weight, unit, reps })` and `store.lastLift(exerciseId)`.
