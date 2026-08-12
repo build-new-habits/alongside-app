@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v167
+## 12 Aug 2026 v166
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v166.md`. Remove v166 on upload.
+Supersedes `master_schedule_12aug2026_v165.md`. Remove v165 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -317,54 +317,6 @@ Graeme's plank model included that mindful practice produces more muscle definit
 3. How often? Every session is too often; these depend on being slightly unexpected.
 4. Free tier confirmed?
 5. The attentional-focus claim — Philosophy, or nowhere?
-
----
-
-## 🟢 OPEN-LIST SWEEP — five items closed, one new bug found, 12 Aug 2026
-
-`sw.js` → **v281**, cache **alongside-v281**. `js/store.js` v34 → **v35**. New `tools/verify-cont3.mjs`. Eleven gates green on a fresh clone.
-
-### 🔴 PRESC-1 — NEW, found while doing CONT-3, and the worst of the batch
-
-**`completeSession()` in `prescribed-session.js` never logged the session at all.** It awarded credits and navigated to reflect. The only `logActivity()` call in the file is `savePartialSession()`, which fires when somebody **abandons** one.
-
-**So a finished prescribed session was recorded only if you gave up on it — and then only as `partial`.**
-
-Consequences, every one silent: Progress under-counted every completed prescribed session; `exerciseHistory` never learned those exercises; and **the coach's own condition-specific recommendations were the least-tracked thing in the product.**
-
-The file also had **no session clock**, so it could not report elapsed time even once it started logging. Added, with the guarded-latch pattern from `workout.js` — unguarded, it would restart on every navigate back and report a forty-minute session as four. That is **PT-3's problem in a file PT-3 never scoped**, which is worth noting: the persona trace found the pattern but not all of its instances.
-
-### 🟢 CONT-3 — three views logged a count, never the ids
-
-`core-session`, `yoga-session` and `prescribed-session` supplied `exercisesCount` and never `exerciseIds`. `store.logActivity()` forwards ids to `recordExercises()`; with none supplied it never fired, so **`exerciseHistory` never learned a single core exercise or yoga pose.**
-
-Continuity-aware selection and the drop-in coach question's 21-day window could not see any of it — so DIC-1, shipped this morning, was invisible to anyone whose training is core or yoga.
-
-### 🟢 LOG-3 — session notes reach `core-session` and `prescribed-session`
-
-Physio-prescribed work is where a note matters most: *"3kg felt fine, 4kg pulled"* is exactly what somebody needs at their next appointment and cannot reconstruct afterwards. Full field set for both; yoga stays gentle-mode.
-
-### 🟢 PT-5 — `store.logSession()` retired
-
-Zero callers, confirmed exhaustively. `breathing-session.js` and `quiet-session.js` each have a **local** function of the same name, which is what made it look alive. `progressLog` itself stays — written by `programmeEngine.js`, read by `gym-programme.js`. Its `durationMinutes` field name is where **PT-3's divergence began**, so removing the source stops it being copied by anyone reading `store.js` for a pattern.
-
-### 🟢 DISP-2 — 110 hardcoded font-sizes now scale
-
-DISP-1 shipped with 514 token-based sizes scaling and **110 ignoring the slider**. Somebody scaling text up got most of the app larger and a scattering of labels, badges and headings stubbornly unchanged — **arguably worse than nothing scaling, because it looks broken rather than unsupported.**
-
-Each wrapped as `calc(X * var(--user-text-scale, 1))` — identity at the default, so no visual change for anyone who never opens the control, and the original value stays legible in source. `variables.css` excluded deliberately: its tokens already multiply the scale, and wrapping twice would square it.
-
-**Gated** — `verify-disp1.mjs` now fails if any hardcoded font-size reappears, so this cannot drift back one stylesheet at a time.
-
-### 🟠 DISP-3 — NEW, not fixed
-
-Around **20 of those declarations are below the app's own `--text-xs` of 13px** — 9px, 10px, 11px, 0.6rem — concentrated in `global.css`, `morning-session.css` and `weekly-plan-v2.css`. They now scale, so somebody *can* enlarge them, but they are too small by default. That is a design decision, not a sweep.
-
-### ⚠️ PT-7 was already fixed and was listed as open
-
-`session-builder-ui.js` already uses `lockedFeature()` — no `disabled` attribute, no `opacity: 0.45`, only comments describing the old state.
-
-**This was a verification failure inside the list written to demonstrate verification.** The grep for `lockedFeature(` returned lines 308 and 369, and those were read as evidence of the *problem* rather than of the *fix*. **Grepping for a term is not the same as reading what it says.** Closed.
 
 ---
 
@@ -1730,4 +1682,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v167*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v166*
