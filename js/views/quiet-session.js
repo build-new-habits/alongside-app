@@ -921,17 +921,32 @@ function formatTime(seconds) {
 // ── Session logging ───────────────────────────────────────────────────────────
 
 function logSession(type, name, credits) {
-  const existing = store.get("activityLog") || [];
-  existing.push({
-    id:        "quiet-" + Date.now(),
+  // PT-6, 12 Aug 2026. Wrote straight to activityLog, bypassing
+  // store.logActivity() and its dedupe, empty-partial and
+  // exerciseHistory handling.
+  //
+  // PT-3 as well, at its source: this wrote `duration` and `loggedAt`
+  // where every other view writes `durationMins` and `completedAt`. So
+  // progress.js -- which sums durationMins -- counted every mindful and
+  // breathing session as zero minutes, and today.js could not see a
+  // completedAt. The field names were the bug, not just the write path.
+  //
+  // `duration: null` is kept as durationMins: null deliberately: a
+  // completion's length is always exactly the chosen duration, already
+  // in the name. Recorded properly for the partial exit below, where it
+  // genuinely varies.
+  const nowIso = new Date().toISOString();
+  store.logActivity({
+    id:           "quiet-" + Date.now(),
     type,
     name,
-    source:    "quiet-session",
-    credits,
-    duration:  null,
-    loggedAt:  new Date().toISOString()
+    source:       "quiet-session",
+    status:       "completed",
+    creditsEarned: credits,
+    durationMins: null,
+    completedAt:  nowIso,
+    sessionEnd:   nowIso
   });
-  store.set("activityLog", existing);
 
   const current = store.get("totalCredits") || 0;
   store.set("totalCredits", current + credits);
@@ -956,19 +971,23 @@ function logSession(type, name, credits) {
  * doesn't hold for a partial exit, so it's genuinely useful here).
  */
 function logPartialMindfulSession() {
-  const existing = store.get("activityLog") || [];
-  existing.push({
-    id:           "quiet-" + Date.now(),
-    type:         "mindful",
-    name:         mindfulDuration + " min mindful session",
-    source:       "quiet-session",
-    status:       "partial",
-    credits:      0,
-    duration:     Math.round(mindfulElapsed / 60),
-    loggedAt:     new Date().toISOString(),
-    completedAt:  new Date().toISOString()
+  // PT-6 / PT-3. Same migration as logSession() above: shared write path,
+  // and durationMins rather than `duration`, which progress.js could not
+  // see. store.logActivity()'s empty-partial guard now applies too, so
+  // opening this and backing straight out no longer records a session
+  // that did not happen.
+  const nowIso = new Date().toISOString();
+  store.logActivity({
+    id:            "quiet-" + Date.now(),
+    type:          "mindful",
+    name:          mindfulDuration + " min mindful session",
+    source:        "quiet-session",
+    status:        "partial",
+    creditsEarned: 0,
+    durationMins:  Math.round(mindfulElapsed / 60),
+    completedAt:   nowIso,
+    sessionEnd:    nowIso
   });
-  store.set("activityLog", existing);
 }
 
 // ── Mount ─────────────────────────────────────────────────────────────────────

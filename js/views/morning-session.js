@@ -181,26 +181,36 @@ function getCurrentStepNumber(session) {
   return 1;
 }
 
-function logActivity(session, durationMins) {
-  const entry = {
-    id:          new Date().toISOString() + "-" + Math.random().toString(36).slice(2, 7),
-    date:        new Date().toISOString().split("T")[0],
+// PT-6 / PT-3, 12 Aug 2026. RENAMED from logActivity().
+//
+// A local function called logActivity() shadowed store.logActivity()
+// entirely, which is why this file reads as compliant to any grep for
+// the name -- and why PT-6 listed it as bypassing while a check for
+// "uses logActivity" said it did not. The name was doing the hiding.
+//
+// It also wrote `duration` where progress.js reads `durationMins`, and
+// no completedAt at all, so morning sessions counted as zero minutes and
+// today.js could not place them. Both fixed by using the shared path.
+function _saveMorningSession(session, durationMins) {
+  const nowIso = new Date().toISOString();
+  const entry = store.logActivity({
+    id:           nowIso + "-" + Math.random().toString(36).slice(2, 7),
+    date:         nowIso.split("T")[0],
     type:         "morning-session",
-    name:        session.title,
-    duration:    durationMins,
+    name:         session.title,
+    status:       "completed",
+    durationMins: durationMins,
     energyBefore: store.get("lastCheckin.energy") || null,
-    feel:        postFeel || "right",
-    painChange:  "none",
-    source:      "coach-recommended",
-    sessionId:   session.id
-  };
-  const log = store.get("activityLog") || [];
-  log.push(entry);
-  // Cap at 90 entries
-  while (log.length > 90) log.shift();
-  store.set("activityLog", log);
-  // Set currentActivityEntry so reflect.js can personalise its question
-  store.set("currentActivityEntry", entry);
+    feel:         postFeel || "right",
+    painChange:   "none",
+    source:       "coach-recommended",
+    sessionId:    session.id,
+    completedAt:  nowIso,
+    sessionEnd:   nowIso
+  });
+  // The 90-entry cap lived here; store.logActivity() owns trimming now,
+  // so a per-view cap would fight it.
+  if (entry) store.set("currentActivityEntry", entry);
 }
 
 /**
@@ -224,19 +234,21 @@ function savePartialSession(session) {
     date:         new Date().toISOString().split("T")[0],
     type:         "morning-session",
     name:         session.title,
-    duration:     durationMins,
+    durationMins: durationMins,
     status:       "partial",
     energyBefore: store.get("lastCheckin.energy") || null,
     feel:         null,
     painChange:   "none",
     source:       "coach-recommended",
-    sessionId:    session.id
+    sessionId:    session.id,
+    completedAt:  new Date().toISOString(),
+    sessionEnd:   new Date().toISOString()
   };
-  const log = store.get("activityLog") || [];
-  log.push(entry);
-  while (log.length > 90) log.shift();
-  store.set("activityLog", log);
-  store.set("currentActivityEntry", entry);
+  // PT-6. Shared write path, so the empty-partial guard applies: opening
+  // this and backing straight out no longer records a session that did
+  // not happen. store.logActivity() returns null when it drops one.
+  const saved = store.logActivity(entry);
+  if (saved) store.set("currentActivityEntry", saved);
 }
 
 // -- Render --------------------------------------------------------------------
@@ -1025,7 +1037,7 @@ function handleClick(e) {
       const duration = sessionStart
         ? Math.round((Date.now() - sessionStart) / 60000)
         : null;
-      logActivity(session, duration);
+      _saveMorningSession(session, duration);
     }
     dismountSessionGuard();
     // Reset state
