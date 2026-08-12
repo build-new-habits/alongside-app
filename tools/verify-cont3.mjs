@@ -57,6 +57,36 @@ check("id prefixes are per-exercise everywhere", () => {
        `${v}: a fixed id lets one exercise's numbers be written onto another`);
 });
 
+console.log("\nLOG-4 - single-activity views capture what the app cannot measure");
+for (const [v, mode] of [["walk-session","distance"],["running-session","distance"],
+                         ["cycle-session","distance"],["swim-session","lengths"]])
+  check(`${v} captures ${mode}`, () => {
+    const s = read(v);
+    ok(new RegExp(`renderLogBlock\\(LOG_SUBJECT, "[a-z]+-log", "${mode}"\\)`).test(s),
+       `no ${mode} capture on the completion screen`);
+    ok(/attachLogEvents\(LOG_SUBJECT/.test(s), "block would render but never save");
+    ok(/id: "activity-[a-z]+"/.test(s),
+       "needs a stable synthetic id, or every session is an orphaned entry");
+  });
+check("these modes never ask for duration", () => {
+  const shared = fs.readFileSync("js/session-log.js", "utf8");
+  for (const mode of ["distance", "lengths"]) {
+    const m = shared.match(new RegExp(`if \\(mode === "${mode}"\\) \\{[\\s\\S]*?\\n  \\}`));
+    ok(m, `${mode} branch not found`);
+    ok(!/durationMins/.test(m[0]),
+       `${mode} must not ask for a number the live clock already writes`);
+  }
+});
+check("the block sits before the actions, not after", () => {
+  for (const v of ["walk-session","running-session","cycle-session","swim-session"]) {
+    const s = read(v);
+    const block = s.indexOf("renderLogBlock(LOG_SUBJECT");
+    const btn   = s.indexOf("btn btn-primary btn-full", block);
+    ok(block !== -1 && btn !== -1 && block < btn,
+       `${v}: stranded underneath the buttons, where nobody fills it in`);
+  }
+});
+
 console.log("\nRestoration views stay excluded");
 for (const v of ["breathing-session", "quiet-session"])
   check(`${v} has no note block`, () =>

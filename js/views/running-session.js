@@ -64,6 +64,7 @@
  */
 
 import { store } from "../store.js";
+import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { checkpointSession, getResumableSession, clearCheckpoint, computeElapsedSeconds } from "../session-resume.js";
 
@@ -488,6 +489,12 @@ function renderRunning() {
   `;
 }
 
+// LOG-4. These views log against the ACTIVITY, not an exercise -- there is
+// no exercise object here and store.logLift() is keyed by id. A stable
+// synthetic id per activity type means "last time" is a real comparable
+// note rather than one orphaned entry per session.
+const LOG_SUBJECT = { id: "activity-run", name: "Run", equipment: [] };
+
 function renderDone() {
   const name = store.get("name") || "";
   const rt   = RUN_TYPES.find(t => t.id === selectedType);
@@ -516,6 +523,8 @@ function renderDone() {
           </p>
         </div>
       </div>
+
+      ${renderLogBlock(LOG_SUBJECT, "run-log", "distance")}
 
       <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-6);">
         <button class="btn btn-primary btn-full" id="rs-reflect-btn">
@@ -892,6 +901,10 @@ function rerender() {
 // ── Mount ─────────────────────────────────────────────────────────────────────
 
 export function onMount() {
+  // LOG-4. Only present on the done screen; attachLogEvents() no-ops when
+  // the block is absent and guards double-binding when it is not.
+  attachLogEvents(LOG_SUBJECT, "run-log");
+
   // 03 Aug 2026 v4 - visibilitychange listener persists across rerenders
   // within this view's lifecycle; guard so it's only added once, since
   // onMount() runs on every rerender (pause, prompt, etc), not just cold

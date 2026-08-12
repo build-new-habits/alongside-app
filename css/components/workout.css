@@ -1089,6 +1089,6 @@
 
 .ps-weight-chip-date {
   color: var(--color-text-muted);
-  font-size: calc(10px * var(--user-text-scale, 1));
+  font-size: var(--text-xs);
   font-weight: var(--font-normal);
 }

@@ -138,6 +138,25 @@ check("no hardcoded font-size escapes the scale", () => {
      `these ignore the text-size control entirely:\n        ${offenders.join("\n        ")}`);
 });
 
+console.log("\nTEST 3d - DISP-3, the app's own 13px floor is enforced");
+check("no text is smaller than --text-xs", () => {
+  const glob = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
+    e.isDirectory() ? glob(`${d}/${e.name}`) : (e.name.endsWith(".css") ? [`${d}/${e.name}`] : []));
+  const tiny = [];
+  for (const f of glob("css")) {
+    if (f.endsWith("variables.css")) continue;
+    fs.readFileSync(f, "utf8").split("\n").forEach((line, i) => {
+      const m = line.match(/font-size:\s*(?:calc\()?([0-9.]+)(px|rem)/);
+      if (!m) return;
+      const px = parseFloat(m[1]) * (m[2] === "rem" ? 16 : 1);
+      if (px < 13) tiny.push(`${f}:${i + 1} (${px}px)`);
+    });
+  }
+  ok(tiny.length === 0,
+     `variables.css states "minimum xs 13px for readability on health app" — ` +
+     `these break the app's own standard:\n        ${tiny.join("\n        ")}`);
+});
+
 console.log("\nTEST 4 - stylesheet reaches the browser");
 check("display-preferences.css imported by main.css", () =>
   eq(mainC.includes("components/display-preferences.css"), true,
