@@ -329,13 +329,23 @@ function _distinctPatterns(exercises) {
 // can" -- the out is built into the sentence, so declining is not a
 // failure but one of the two answers the question invited.
 //
-// NOT conditional when it does. Graeme: "there are times when the coach
-// will know... Bulgarian Dead Lifts are good for your back, but you said
-// they are hurting a little, instead of not doing them, maybe take the
-// pressure off a bit." Hedging something we have been told is a coach
-// pretending not to know, and it is worse than saying it plainly. When
-// somebody has named a sore area and the exercise loads it, the coach
-// says so, says why, and still leaves the decision theirs.
+// SPECIFIC when it does, but still not directive. Graeme: "there are
+// times when the coach will know... Bulgarian Dead Lifts are good for
+// your back, but you said they are hurting a little, instead of not
+// doing them, maybe take the pressure off a bit."
+//
+// The distinction that took two passes to get right: what changes with
+// knowledge is the SPECIFICITY, not the authority. Hedging something we
+// have been told is a coach pretending not to know, so the coach names
+// the sore area and says which exercise loads it. But the adjustment
+// itself stays an invitation -- "consider taking some weight off", not
+// "take some weight off". Graeme, on the first version: "this is then
+// optional and invitational."
+//
+// He is right, and it is the stronger position. The coach is the one
+// who knows which exercise works which area; the person is the one who
+// knows how it feels today. Naming the first without commanding the
+// second is what respects both.
 //
 // IT READS THE DAY. Graeme again: "It might be more fitting to drop
 // weights to protect an injury while in rehab phase, or a mild flare up.
@@ -389,7 +399,7 @@ export function progressionInvitation(exercise) {
   //
   // The three levels:
   //   KNOWS SPECIFICALLY  named area sore, this exercise loads it
-  //                       -> direct, and says why
+  //                       -> names what it knows, and still invites
   //   KNOWS GENERALLY     something sore, or a low-energy day
   //                       -> clear steer, no naming
   //   DOES NOT KNOW       nothing reported
@@ -423,12 +433,12 @@ export function progressionInvitation(exercise) {
     // Direct, because we know. Names the reason, so it does not read as
     // arbitrary caution, and keeps the exercise rather than removing it --
     // taking the pressure off is usually better than taking it away.
-    return `You said your ${name} is sore today, and this one works it. Take some weight off rather than skipping it — keeping the movement without the load is what helps it settle.`;
+    return `You said your ${name} is sore today, and this one works it. Consider taking some weight off rather than skipping it — keeping the movement without the load is what helps it settle.`;
   }
 
   if (sore.length > 0) {
     // Something is sore but not this. A steer rather than a warning.
-    return "You are carrying something sore today, so this is not the session to push. Match last time, or a little under.";
+    return "You are carrying something sore today, so this is probably not the session to push. Matching last time, or a little under, would be a good call.";
   }
 
   if (intent === "recover") {
