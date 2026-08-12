@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v245
+ * The coach now explains the programme - why these exercises, together, today,
+ * how they feed the person's stated goals, and what it is building towards.
+ * New js/data/session-rationale.js.
+ *
  * 11 Aug 2026 v244
  * Check-in pacing and scroll - the newest coach message can now scroll to the
  * top of the viewport, and the energy and mood panels open on a tap rather
@@ -1067,7 +1072,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v254";
+const CACHE_NAME = "alongside-v255";
 
 const SHELL_URLS = [
 
