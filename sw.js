@@ -1,6 +1,34 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v280
+ * Four items from the verified-open list, all silent failures.
+ *
+ * PRESC-1 (new, found while doing CONT-3): completeSession() in
+ * prescribed-session.js never logged anything. It awarded credits and
+ * navigated away, so a FINISHED prescribed session -- the coach's own
+ * condition-specific recommendation -- was recorded only if ABANDONED,
+ * and then only as partial. Now logs as completed, with a session clock
+ * added since the file had none (PT-3's problem, in a file PT-3 never
+ * scoped).
+ *
+ * CONT-3: core-session, yoga-session and prescribed-session logged an
+ * exercise COUNT and never the ids, so store.recordExercises() never
+ * fired for them and exerciseHistory never learned a single core
+ * exercise or yoga pose. Continuity-aware selection and the drop-in
+ * coach question's 21-day window could not see any of it.
+ *
+ * LOG-3: session notes now reach core-session and prescribed-session.
+ * Physio-prescribed work is where a note matters most -- "3kg felt fine,
+ * 4kg pulled" is exactly what somebody needs at their next appointment
+ * and cannot reconstruct afterwards.
+ *
+ * PT-5: store.logSession() removed. Zero callers. progressLog itself
+ * stays, live. store.js v34 -> v35.
+ *
+ * New tools/verify-cont3.mjs, which fails 8 assertions on the pre-fix
+ * code. Cache bump only, no new files.
+ *
  * 12 Aug 2026 v279
  * SCHEME-1. Colour scheme control: dark (default), light, high contrast.
  *
@@ -1356,7 +1384,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v279";
+const CACHE_NAME = "alongside-v280";
 
 const SHELL_URLS = [
 
