@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v171
+## 12 Aug 2026 v170
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v170.md`. Remove v170 on upload.
+Supersedes `master_schedule_12aug2026_v169.md`. Remove v169 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -354,47 +354,6 @@ Graeme's plank model included that mindful practice produces more muscle definit
 `verify-decisions.mjs`'s P5 check matched on `equipment` **plus** `movementPattern` — which is what a *strength* entry looks like. Yoga poses carry `holdSeconds` and `rest`, so **30 inline pose entries walked straight through the check written that morning to catch exactly this.**
 
 Now matches on `id` + `name`, the weakest signal every selectable thing in the product shares. **Each remaining budget is documented with its justification, because a budget without a reason is a hole.**
-
----
-
-## 🔴 PT-1 WAS ALREADY FIXED — third stale entry today
-
-**PT-1 was fixed on 11 Aug 2026.** All seven live territories map correctly in `_resolveDayOne()`, and five have purpose-written `DAY_ONE` rows. Verified by reading the code, not the comment.
-
-It was listed as **the top open item**, seven mappings were drafted, and Graeme reviewed copy for work that already existed. **That is his time spent on a failure to check.**
-
-**Third occurrence today**, after **DATA-1** (described as read-by-nothing; read in two live places) and **PT-7** (described as using `disabled`; already on `lockedFeature()`).
-
-**The pattern is now unambiguous.** `tools/verify-decisions.mjs` catches code drifting from decisions. **Nothing catches the schedule drifting from the code** — and three times today it has, always in the same direction: an entry true when written, invalidated by later work, never updated.
-
-**Rule, and it is not optional: before any item is listed as open or acted on, its claim must be re-verified against live code in that same session.** A schedule entry is a snapshot. It ages.
-
----
-
-## 🟢 VOICE-1 — six therapy phrases removed from LIVE copy, and gated
-
-`js/data/checkin-openings.js`, `js/views/coach-reflection.js`, `js/views/onboarding/complete.js`. New `tools/verify-voice.mjs`. `sw.js` → **v285**, cache **alongside-v285**.
-
-### Graeme caught it in a draft. It was already shipped.
-
-He flagged *"sits with you"*. It was live — on the **day-one opening shown to somebody who had just chosen "there's a longer history than any of that"**. The most delicate line in the product, written in the register of a therapy room.
-
-| Was | Now | Why |
-|---|---|---|
-| *"I want you to sit with that for a second"* | *"That is worth stopping on for a second"* | Instructs somebody what to do with a feeling |
-| *"How does that sit with you?"* | *"How do you feel about that?"* | The phrase he flagged |
-| *"how you're reflecting on that now"* | *"how you feel about that now"* | Asks somebody to perform reflection rather than answer |
-| *"needs revisiting… how it sits with you"* | *"needs going into… how you feel"* | Both, on the same line |
-| *"you have been showing up for yourself"* | *"you keep coming back"* | Say what they actually did |
-| *"the first part of your journey"* | *"the first few weeks"* | **Copy rule 10.1 breach** — "journey" is a banned internal term, live on onboarding's final screen |
-
-### The gate, and why it is narrow on purpose
-
-`verify-voice.mjs` checks **user-facing strings only**. Class names, function names and internal tags are not copy — `renderCoachNarrative()` and `.complete-journey-card` are fine, and **a gate that flagged them would be switched off within a week.**
-
-Physical cues are exempt for the same reason: *"Sit with legs extended"* is a yoga instruction and *"let gravity do the work"* is about not forcing a stretch. Both were caught on the first run and exempted rather than allowed to weaken the list.
-
-**Verified by reversal:** restoring *"sits with you"* fails it.
 
 ---
 
@@ -1907,4 +1866,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v171*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v170*
