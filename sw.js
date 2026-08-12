@@ -1,6 +1,36 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v288
+ * BURN-1. Found by tracing the perimenopause persona -- somebody whose
+ * whole profile is unpredictable energy, and precisely who burnout
+ * detection exists for.
+ *
+ * TWO FAULTS, STACKED, neither of which errored:
+ *   1. workoutGenerator.js:543 called checkinData.detectBurnout() with NO
+ *      ARGUMENT. The function returns false on its first line for a
+ *      missing history, so it returned false every time, for everybody,
+ *      since the day it was written.
+ *   2. Seven places in workoutGenerator.js then read burnout.level. On a
+ *      boolean that is undefined, so every comparison was false --
+ *      including recoveryMode: burnout.level === "high", which is what
+ *      gates filterToRecoveryPool() in exercises/index.js:334.
+ *
+ * The entire recovery path was unreachable. Somebody could report a
+ * fortnight of exhaustion and the generator would build as if nothing had
+ * been said. The shape mismatch hid the missing argument and the missing
+ * argument hid the shape mismatch.
+ *
+ * detectBurnout() now returns { level: none|moderate|high, avgEnergy },
+ * which is the shape its callers were already written for -- they were
+ * right and the function was wrong. It also defaults to reading the store
+ * when called without an argument, so fault 1 cannot recur silently.
+ * coach-proposal.js adapted: it tested truthily, and an object is always
+ * truthy. 4 is kept as the outer threshold so nobody who registered
+ * before stops registering.
+ *
+ * New tools/verify-burn1.mjs. Cache bump only.
+ *
  * 12 Aug 2026 v287
  * BIAS-1. proposalBias is finally read. coach-reflection.js has computed
  * it since 03 Aug -- 'rest' or 'lighter', from severe pain, burnout risk,
@@ -1565,7 +1595,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v287";
+const CACHE_NAME = "alongside-v288";
 
 const SHELL_URLS = [
 
