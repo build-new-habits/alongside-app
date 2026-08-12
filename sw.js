@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v242
+ * Time question removed from check-in (it was asked twice), and a reversible
+ * "Not a fan of this one" control added to the exercise card. Exercise
+ * preferences are now honoured by generated sessions, not only prescribed ones.
+ *
  * 11 Aug 2026 v241
  * CAP-4 - new seated.js, 21 entries of seated cardio, strength, core, lower
  * body and chair-supported standing. Database 497 -> 518.
@@ -1052,7 +1057,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v251";
+const CACHE_NAME = "alongside-v252";
 
 const SHELL_URLS = [
 
