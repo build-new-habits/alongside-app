@@ -1,5 +1,15 @@
 /**
  * settings.js
+ * 12 Aug 2026 v18
+ *
+ * v18 - LOG-1. "Weight notes" renamed "Session notes", and its copy now
+ *   describes what the feature has actually recorded since 11 Aug: nine
+ *   metrics, chosen per equipment. Graeme: "Weight notes should be on.
+ *   But not just weight. Time, tension, elevation etc." Those already
+ *   worked; the setting was describing a narrower feature than existed.
+ *   Panel also no longer says "For gym sessions", because as of
+ *   workout.js v11 it is not.
+ *
  * 12 Aug 2026 v17
  *
  * v17 - DISP-1. New "Display" tab: text size, line spacing, letter
@@ -695,20 +705,34 @@ export function SettingsView(router) {
   // note to yourself, never as tracking, progress, or personal bests —
   // locked principle P4. Uses the existing generic [data-toggle] handler
   // (attachEvents, ~line 805), so no new wiring.
+  // LOG-1, 12 Aug 2026. Renamed from "Weight notes". The store has
+  // recorded nine metrics since 11 Aug -- weight, reps, speed, incline,
+  // level, distance, duration, band tension, free note -- and the fields
+  // offered already adapt to the equipment. Only this panel still said
+  // "what you lifted", which is very likely why the feature read as
+  // weight-only. A feature that describes itself wrongly is one people
+  // correctly believe does not do the thing.
+  //
+  // "Session notes" rather than anything with "performance", "progress"
+  // or "personal best" in it: those words carry a verdict, and P4 says
+  // the app may display and never interpret. The function name is left
+  // as-is; the store field liftLogEnabled is untouched, since renaming a
+  // live field for tidiness is a migration, not a rename.
   function renderLiftLogPanel() {
     const on = store.get('liftLogEnabled') === true;
 
     return `
       <div class="settings-section">
-        <h2 class="settings-section__heading">Weight notes</h2>
+        <h2 class="settings-section__heading">Session notes</h2>
         <p class="settings-section__sub">
-          For gym sessions. Jot down what you lifted so you are not guessing at
-          the machine next time.
+          Jot down what you did &mdash; weight, time, level, incline, band,
+          whatever that exercise actually gives you &mdash; so you are not
+          guessing next time.
         </p>
 
         <div class="settings-field settings-field--toggle">
           <label class="settings-label" for="settings-lift-log">
-            Keep weight notes
+            Keep session notes
             <span class="settings-label__sub">Shows what you noted last time, and somewhere to add today's</span>
           </label>
           <button
@@ -717,14 +741,14 @@ export function SettingsView(router) {
             role="switch"
             aria-checked="${on ? 'true' : 'false'}"
             data-toggle="liftLogEnabled"
-            aria-label="Weight notes ${on ? 'on' : 'off'}">
+            aria-label="Session notes ${on ? 'on' : 'off'}">
             <span class="settings-toggle__track" aria-hidden="true"></span>
           </button>
         </div>
 
         <p class="text-sm text-muted" style="margin-top: var(--space-3);">
-          Just the number, kept for you. No streaks, no targets, and nothing
-          said about whether it went up or down.
+          Just what you wrote, kept for you. No streaks, no targets, and
+          nothing said about whether it went up or down.
         </p>
       </div>
     `;

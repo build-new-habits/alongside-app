@@ -1,0 +1,94 @@
+/* ============================================================
+   session-log.css
+   css/components/session-log.css
+   12 Aug 2026 v1
+
+   Session notes -- what you did on an exercise, so you are not guessing
+   at it next time. Moved here from gym-programme.css (LOG-1), renamed
+   from .gp-lift* now that it is not gym-specific: the same block records
+   a treadmill incline, a band colour and a plank duration.
+
+   Deliberately plain. Nothing here highlights, compares or celebrates a
+   number -- P4 says the app may display load and the coach never
+   interprets it, and the styling has to hold that line as much as the
+   copy does. No accent colour on the value, no emphasis on a change, no
+   badge.
+
+   Contrast, verified against tools/contrast-check.mjs tokens after
+   A11Y-1: --color-text on --color-bg-card 8.40:1, --color-text-secondary
+   5.97:1, --color-text-muted 5.59:1. Inputs sit on --color-bg-elevated
+   where --color-text measures 7.04:1.
+   ============================================================ */
+
+.slog {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+}
+
+.slog__last {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.slog__last--empty {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.slog__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.slog__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.slog__input {
+  width: 5.5rem;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.slog__input:focus-visible,
+.slog__save:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.slog__save {
+  min-height: 44px;
+}
+
+.slog__status {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: var(--space-2) 0 0;
+  min-height: 1.25rem;
+}
+.slog__invite {
+  /* progressionInvitation() -- an invitation, never an instruction, and
+     never a number. Sized as body text rather than a hint: it is the
+     coach speaking, not UI chrome. */
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin: 0 0 var(--space-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slog__input,
+  .slog__save {
+    transition: none;
+  }
+}
