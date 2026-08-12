@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v164
+## 12 Aug 2026 v163
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v163.md`. Remove v163 on upload.
+Supersedes `master_schedule_12aug2026_v162.md`. Remove v162 on upload.
 
 **⚠️ Location:** the canonical copy of this document is `Documents/Admin/master_schedule.md` in the `alongside-app` repo, not project knowledge. If the repo and a project-knowledge copy ever disagree, the repo wins. This project-knowledge copy remains a searchable snapshot only. `Admin/Past MS/` in the repo holds every superseded version by date.
 
@@ -76,52 +76,6 @@ The same defect appeared **eight times in eight different costumes**: content th
 `js/session-log.js` v1 → **v2**, `js/views/yoga-session.js` v2 → **v3**, `sw.js` → **v275**, cache **alongside-v275**.
 
 Graeme: *"yes, but note-and-duration only — no reps, no level."* `performanceFields()` gains a `mode`; `"gentle"` returns duration and a free note and nothing else. **A pose is not a set** — counting reps there imports the exact frame the practice exists outside of. The gate asserts gentle mode offers none of reps, level, weight, incline, speed, distance or tension, so it fails if that branch ever widens.
-
----
-
-## 🔴🟢 DOOR-1 — In Step was locked and should not have been. Fixed 12 Aug 2026.
-
-`js/views/noticing.js`, `js/views/in-step.js`, new `css/components/upgrade-door.css`, `css/main.css` v18 → **v19**, new `tools/verify-door1.mjs`. `sw.js` → **v278**, cache **alongside-v278**.
-
-### The stale-code failure — read this part first
-
-**In Step was gated behind `isPremium()` and should have been free.**
-
-It was Personal tier in the 9 Aug build. The **12 Aug tier decision moved it**, and the code never followed:
-
-> §18 — *"Free users have full access to everything in Wellbeing — In Step, the empathy arc, grounding moments, journalling — but no personal journey through it. Same rule, no exceptions to explain."*
->
-> §9 — *"In Step is free, and is the best door in the product — because someone who has just finished a scenario has felt the shape of the thing."*
-
-**Nothing failed.** No error, no broken screen. The app worked perfectly and was simply wrong — the single best demonstration of what this product is for was invisible to exactly the people it was written for.
-
-**Compounded by Claude quoting the superseded decision back at Graeme** earlier in the same session, sourced from a chat summary, while the current position sat in `alongside_destination_architecture_12aug2026_v1.md` — **one of the two documents the session start prompt names as required reading.** It was read at session start and the tier line did not register.
-
-**Standing lesson: a specification change is not done until the code matches it. A tier decision that lives only in a document is a decision the product has not made.** This is the same family as the reader-without-writer pattern — a stated intent with nothing enforcing it — and it is the fourth distinct instance today.
-
-**Guarded now.** `tools/verify-door1.mjs` asserts the card is ungated **and** that the spec still says free, so a future reversal in either direction fails loudly instead of drifting silently.
-
-### The door, built from §9 verbatim
-
-The offer existed in the specification and nowhere in the code. It now renders at the end of an In Step scenario:
-
-> *"That's In Step — four movements, one thing at a time, each going a bit deeper.*
->
-> *There's a longer version of the same idea. You pick something you'd like to get better at — being steadier, being more present, noticing other people more — and I build it out over months, shaped around what you're actually noticing rather than a fixed course.*
->
-> *That's part of the paid plan, if you ever fancy it."*
-
-**P1 and P2 made visible, not just asserted.** It sits outside the `card-coach` block, carries no coach icon, and is bordered rather than filled — somebody can tell at a glance that something other than the coach is speaking. That promise only holds if the difference is visible without reading. The gate asserts the door is not inside the coach's card.
-
-**Not styled as a call to action.** No accent fill, no arrow, a link rather than a button. It fires straight after something reflective, and a hard CTA would break the moment — which is the entire reason this is the best door in the product.
-
-**Copy rule 10.2 satisfied in order:** what is it (four movements) → what would it do for me (built out over months, shaped around what you're noticing) → how do I get it (a route to Upgrade that actually works). The gate checks all three.
-
-**Free users only.** Somebody already paying is not sold to.
-
-### Why this closes the grounding-moments question properly
-
-Free is the entire marketing budget. **In Step free + grounding moments free + the door at the moment of feeling** is one mechanism, not three features: notice something in a plank, meet the same shape deliberately in In Step, and then — only there, only once, softly — hear that there is a longer version. Nothing explains the difference between free and paid. The person feels it, then is told what it is called.
 
 ---
 
@@ -1599,4 +1553,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v164*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v163*
