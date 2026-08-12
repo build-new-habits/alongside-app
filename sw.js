@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v248
+ * Progression stays invitational even when the coach knows. What changes with
+ * knowledge is the specificity, not the authority -- "consider taking some
+ * weight off", never "take some weight off".
+ *
  * 11 Aug 2026 v247
  * The coach is now direct when it knows: if you have said an area is sore and
  * the exercise loads it, it says so and suggests taking weight off rather than
@@ -1082,7 +1087,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v257";
+const CACHE_NAME = "alongside-v258";
 
 const SHELL_URLS = [
 
