@@ -281,7 +281,7 @@ function _arc(exercises, intent, goals) {
   if (intent === "maintain") {
     lines.push("Kept up, this is the work that keeps you doing what you do now, in years to come.");
   } else if (intent === "recover") {
-    lines.push("Each session asks for slightly more than the last, at a pace your body sets rather than the calendar.");
+    lines.push("Each session builds on the last, at whatever pace your body sets. There is no schedule to keep up with.");
   } else if (goals.includes("get-stronger") || goals.includes("build-muscle")) {
     // Reworded 11 Aug 2026. The original said the weight "will go up
     // over the coming weeks", which is a promise the coach cannot keep
@@ -290,7 +290,7 @@ function _arc(exercises, intent, goals) {
     // ready or in spite of where they are. The arc now describes what
     // meeting the same lifts makes POSSIBLE, and leaves when to a
     // per-session invitation that reads the day.
-    lines.push("Meeting the same lifts again is what makes it possible to add a little when the day suits it. I will ask, never tell.");
+    lines.push("You will keep meeting these same lifts. When a day suits it, I will suggest adding a bit — but only as a suggestion, and only when it makes sense.");
   }
 
   return lines.length ? lines.join(" ") : null;
@@ -325,9 +325,17 @@ function _distinctPatterns(exercises) {
 // is answerable honestly by somebody having a good day and somebody
 // having a bad one, and both answers are correct.
 //
-// ALWAYS CONDITIONAL. "If it feels right", "if you can". The out is built
-// into the sentence, so declining it is not a failure -- it is one of the
-// two answers the question invited.
+// CONDITIONAL WHEN THE COACH DOES NOT KNOW. "If it feels right", "if you
+// can" -- the out is built into the sentence, so declining is not a
+// failure but one of the two answers the question invited.
+//
+// NOT conditional when it does. Graeme: "there are times when the coach
+// will know... Bulgarian Dead Lifts are good for your back, but you said
+// they are hurting a little, instead of not doing them, maybe take the
+// pressure off a bit." Hedging something we have been told is a coach
+// pretending not to know, and it is worse than saying it plainly. When
+// somebody has named a sore area and the exercise loads it, the coach
+// says so, says why, and still leaves the decision theirs.
 //
 // IT READS THE DAY. Graeme again: "It might be more fitting to drop
 // weights to protect an injury while in rehab phase, or a mild flare up.
@@ -363,14 +371,64 @@ export function progressionInvitation(exercise) {
   const intent    = store.get("trainingIntent") || "improve";
   const intensity = store.get("todayIntensity") || null;
 
-  // Pain first. It outranks everything, including a good mood and a
-  // stated intent to improve.
+  // ── HOW MUCH THE COACH KNOWS ──────────────────────────────────────────
+  //
+  // Graeme, correcting an earlier version of this that hedged everything:
+  // "Always conditional -- except not always. We have mood, energy,
+  // conditions. There are times when the coach doesn't know. There are
+  // times when the coach will know that they shouldn't... but when the
+  // user is doing the exercise the coach probably does know. Bulgarian
+  // Dead Lifts are good for your back, but you said they are hurting a
+  // little, instead of not doing them, maybe take the pressure off a bit."
+  //
+  // He is right, and the hedge was the mistake. Confidence should scale
+  // with information. When somebody has told us a specific area is sore
+  // AND this exercise loads that area, the coach knows something real and
+  // hedging it into "if it feels right" is a coach pretending not to
+  // know. Say it plainly, name why, and still leave the decision theirs.
+  //
+  // The three levels:
+  //   KNOWS SPECIFICALLY  named area sore, this exercise loads it
+  //                       -> direct, and says why
+  //   KNOWS GENERALLY     something sore, or a low-energy day
+  //                       -> clear steer, no naming
+  //   DOES NOT KNOW       nothing reported
+  //                       -> conditional, or says nothing
   const conditions = store.get("conditions") || [];
   const scores     = store.get("conditionPainScores") || {};
-  const flaring    = conditions.some(id => (scores[id] || 0) >= 4);
+  const sore       = conditions.filter(id => (scores[id] || 0) >= 4);
+  const areas      = exercise.affectsAreas || [];
 
-  if (flaring) {
-    return "Go a little lighter than last time today. Protecting it while it settles is the work, not a step backwards.";
+  // Condition ids and affectsAreas share most of their vocabulary. These
+  // are the ones that do not line up by name.
+  const AREA_ALIASES = {
+    "lower-back":     ["lower-back", "spine"],
+    "upper-back":     ["upper-back", "thoracic"],
+    "sciatica":       ["lower-back", "glutes", "hamstring", "piriformis"],
+    "it-band":        ["hip", "knee"],
+    "shin-splints":   ["calves", "ankle-foot"],
+    "achilles":       ["calves", "achilles", "ankle-foot"],
+    "plantar-fasciitis": ["ankle-foot", "calves"],
+    "biceps-triceps": ["triceps-biceps"],
+    "wrist-elbow":    ["wrist-elbow"]
+  };
+
+  const loadsSoreArea = sore.find(id => {
+    const mapped = AREA_ALIASES[id] || [id];
+    return mapped.some(a => areas.includes(a));
+  });
+
+  if (loadsSoreArea) {
+    const name = _conditionLabel(loadsSoreArea);
+    // Direct, because we know. Names the reason, so it does not read as
+    // arbitrary caution, and keeps the exercise rather than removing it --
+    // taking the pressure off is usually better than taking it away.
+    return `You said your ${name} is sore today, and this one works it. Take some weight off rather than skipping it — keeping the movement without the load is what helps it settle.`;
+  }
+
+  if (sore.length > 0) {
+    // Something is sore but not this. A steer rather than a warning.
+    return "You are carrying something sore today, so this is not the session to push. Match last time, or a little under.";
   }
 
   if (intent === "recover") {
@@ -392,4 +450,19 @@ export function progressionInvitation(exercise) {
   }
 
   return "Match last time, and see how it sits. There is no hurry to add anything yet.";
+}
+
+/**
+ * Plain-language name for a condition, for use mid-sentence.
+ * Lower case and possessive-friendly: "your lower back", "your knee".
+ */
+function _conditionLabel(id) {
+  const LABELS = {
+    "lower-back": "lower back", "upper-back": "upper back and neck",
+    "ankle-foot": "ankle", "wrist-elbow": "wrist or elbow",
+    "biceps-triceps": "arm", "chest-pecs": "chest",
+    "shin-splints": "shin", "plantar-fasciitis": "foot",
+    "it-band": "IT band", "abdominals": "middle"
+  };
+  return LABELS[id] || id.replace(/-/g, " ");
 }
