@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v170
+## 12 Aug 2026 v169
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v169.md`. Remove v169 on upload.
+Supersedes `master_schedule_12aug2026_v168.md`. Remove v168 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -357,39 +357,7 @@ Now matches on `id` + `name`, the weakest signal every selectable thing in the p
 
 ---
 
-## 🟢 CORE-1 — RESOLVED and built, 12 Aug 2026
-
-**Graeme's call:** *"Allow both, but when conditions flag we provide a listen to your body and don't push too hard message."*
-
-`js/data/session-rationale.js` gains `bodyCaution()` and `soreAreaLoaded()`. Rendered in `workout.js`, `core-session.js`, `prescribed-session.js`, `gym-programme.js`. New `tools/verify-core1.mjs`. `sw.js` → **v284**, cache **alongside-v284**.
-
-### Built the P7 way, not the generic way
-
-*"Listen to your body"* on its own is **exactly the hedge P7 warns against** — a coach that has been told a specific area is sore, knows this exercise loads it, and then says something vague, is pretending not to know.
-
-**Two levels, matching P7's existing three-level model rather than inventing a parallel one:**
-
-| Level | Case | Says |
-|---|---|---|
-| **Knows specifically** | `bird-dog` works the lower back | *"Your lower back is sore today, and this one works it. Go by how it feels rather than by how it went last time — easing off here is the useful thing to do, not a compromise."* |
-| **Knows generally** | `dead-bug` works core and abdominals, **not** the back | *"You are carrying something sore today. This one does not work that area, but go by how it feels as you move rather than pushing to a number."* |
-| **Knows nothing** | nothing flagged | silent |
-
-**Why the second level is not a cop-out.** Naming the lower back on an exercise that does not work it would be the coach claiming knowledge it does not have — and that erodes the times it genuinely does. A wrong specific is worse than a right general.
-
-### The mistake, caught by testing his scenario rather than the code
-
-The first version did **only** the named level. `dead-bug`'s `affectsAreas` is `core, abdominals` — not `lower-back` — so **Graeme's exact case, a sore back while doing Dead Bug, was completely silent.** The gate caught it because the test was written against his scenario, not against what the function did.
-
-### Where it came from
-
-`bodyCaution()` was lifted out of `progressionInvitation()`, which **returns early when no previous lift is logged** — so a first-time exercise, precisely when somebody is least sure what they are doing, got nothing at all. The alias table now exists once, so the two rules cannot drift on which conditions map to which areas.
-
-**Styled as a note, never a warning.** No red, no icon. Amber would make an ordinary sore knee look like an injury, and somebody who sees a warning every session stops reading them. Contraindicated exercises still never reach a card — this is the layer below that: not dangerous, but worth naming.
-
-### Superseded
-
-#### 🟠 CORE-1 — original content question, retained for the trail
+## 🟠 CORE-1 — NEW content question, flagged not guessed
 
 `core-session.js` was migrated to shared ids correctly — it is the pattern yoga should have followed. But its own comment flags a question that was never answered:
 
@@ -1866,4 +1834,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v170*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v169*
