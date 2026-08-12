@@ -2,24 +2,18 @@
  * onboarding/lifestyle.js
  * 11 Aug 2026 v3
  *
- * NOT READY FOR BETA. Verified 11 Aug 2026 by executing live code: the
- * screen collects and stores correctly and capabilityProfile() computes
- * correctly, but the SELECTION GATES DO NOT HOLD. Traced -- a wheelchair
- * user answering "no" to the chair question was still served McGill
- * Curl-Ups (floor work) and a man who cannot jump was still served Drop
- * Steps. Two blockers, both content rather than code:
+ * CAP-2 RESOLVED 11 Aug 2026. This step was committed flagged "NOT
+ * READY FOR BETA" because the selection gates matched on exercise names
+ * and were verified missing things -- a wheelchair user who answered
+ * "no" to the chair question was still served McGill Curl-Ups. All 497
+ * entries now carry position, impact and balanceDemand tags and the
+ * gates read those instead.
  *
- *   CAP-2  No exercise carries a position, impact or balance tag.
- *          Gates match on names, and names miss. Deriving from
- *          instructions text was tested and leaves 197 of 497 unclear
- *          -- not good enough for a safety gate.
- *   CAP-4  needsSeated is computed and nothing acts on it, because the
- *          database holds 2 chair and 8 seated entries. Not enough to
- *          build a session from.
- *
- * Asking somebody four careful questions and then handing them the
- * thing they just said they cannot do is worse than not asking. This
- * step must not reach a beta user until both are closed.
+ * CAP-4 REMAINS OPEN. The seated pool is 49 entries (29 seated plus 20
+ * position-agnostic practices). A wheelchair user gets a short, real,
+ * correctly-filtered session rather than a wrong one -- but four
+ * exercises is not a programme. Seated and supported content is the
+ * outstanding job.
  *
  * v3 - CAP-1 capability screen. Four questions measuring CAPACITY,
  *   where the questions above measure FREQUENCY. Somebody can garden

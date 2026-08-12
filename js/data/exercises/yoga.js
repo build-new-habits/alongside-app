@@ -53,6 +53,9 @@ export const YOGA = [
 
   {
     id: 'yoga-downward-dog',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Downward Facing Dog',
     youtube: 'downward facing dog yoga pose tutorial',
     category: 'mobility',
@@ -87,6 +90,9 @@ export const YOGA = [
 
   {
     id: 'yoga-warrior-1',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Warrior I',
     youtube: 'warrior 1 yoga pose tutorial',
     category: 'mobility',
@@ -122,6 +128,9 @@ export const YOGA = [
 
   {
     id: 'yoga-warrior-2',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Warrior II',
     youtube: 'warrior 2 yoga pose tutorial',
     category: 'mobility',
@@ -157,6 +166,9 @@ export const YOGA = [
 
   {
     id: 'yoga-triangle',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Triangle Pose',
     youtube: 'triangle pose yoga tutorial',
     category: 'mobility',
@@ -192,6 +204,9 @@ export const YOGA = [
 
   {
     id: 'yoga-chair-pose',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Chair Pose',
     youtube: 'chair pose yoga tutorial',
     category: 'strength',
@@ -225,6 +240,9 @@ export const YOGA = [
 
   {
     id: 'yoga-tree-pose',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Tree Pose',
     youtube: 'tree pose yoga tutorial',
     category: 'mobility',
@@ -258,6 +276,9 @@ export const YOGA = [
 
   {
     id: 'yoga-cobra',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Cobra Pose',
     youtube: 'cobra pose yoga tutorial',
     category: 'mobility',
@@ -292,6 +313,9 @@ export const YOGA = [
 
   {
     id: 'yoga-seated-forward-fold',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Seated Forward Fold',
     youtube: 'seated forward fold yoga pose tutorial',
     category: 'mobility',
@@ -327,6 +351,9 @@ export const YOGA = [
 
   {
     id: 'yoga-crescent-lunge',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Crescent Lunge',
     youtube: 'crescent lunge yoga pose tutorial',
     category: 'mobility',
@@ -359,6 +386,9 @@ export const YOGA = [
 
   {
     id: 'yoga-half-moon',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Half Moon Pose',
     youtube: 'half moon pose yoga tutorial',
     category: 'mobility',
@@ -394,6 +424,9 @@ export const YOGA = [
 
   {
     id: 'yoga-corpse-pose',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Corpse Pose (Savasana)',
     youtube: 'corpse pose savasana yoga tutorial',
     category: 'recovery',
@@ -429,6 +462,9 @@ export const YOGA = [
 
   {
     id: 'yoga-warrior-3',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Warrior III',
     youtube: 'warrior 3 yoga pose tutorial',
     category: 'strength',
@@ -462,6 +498,9 @@ export const YOGA = [
 
   {
     id: 'yoga-boat-pose',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Boat Pose',
     youtube: 'boat pose yoga tutorial',
     category: 'strength',
@@ -495,6 +534,9 @@ export const YOGA = [
 
   {
     id: 'yoga-bridge-pose',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Bridge Pose',
     youtube: 'bridge pose yoga tutorial',
     category: 'strength',
@@ -529,6 +571,9 @@ export const YOGA = [
 
   {
     id: 'yoga-pigeon-pose',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Pigeon Pose',
     youtube: 'pigeon pose yoga tutorial',
     category: 'mobility',
@@ -565,6 +610,9 @@ export const YOGA = [
 
   {
     id: 'yoga-supine-twist',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Supine Spinal Twist',
     youtube: 'supine spinal twist yoga pose tutorial',
     category: 'recovery',
@@ -600,6 +648,9 @@ export const YOGA = [
 
   {
     id: 'yoga-legs-up-wall',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Legs Up the Wall',
     youtube: 'legs up the wall yoga pose tutorial',
     category: 'recovery',
@@ -636,6 +687,9 @@ export const YOGA = [
 
   {
     id: 'yoga-cat-cow-flow',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Cat-Cow Flow',
     youtube: 'cat-cow flow yoga pose tutorial',
     category: 'mobility',
@@ -676,6 +730,9 @@ export const YOGA = [
 
   {
     id: 'yoga-flow-morning',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Morning Wake-Up Flow',
     youtube: 'morning wake-up flow yoga pose tutorial',
     category: 'mobility',
@@ -716,6 +773,9 @@ export const YOGA = [
 
   {
     id: 'yoga-flow-evening',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Evening Wind-Down Flow',
     youtube: 'evening wind-down flow yoga pose tutorial',
     category: 'recovery',
@@ -762,6 +822,9 @@ export const YOGA = [
 
   {
     id: 'yoga-sun-salutation-b',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Sun Salutation B',
     youtube: 'sun salutation b yoga pose tutorial',
     category: 'mobility',
@@ -801,6 +864,9 @@ export const YOGA = [
 
   {
     id: 'yoga-yin-hip-sequence',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Yin Yoga — Hip Opening Sequence',
     youtube: 'yin yoga - hip opening sequence yoga pose tutorial',
     category: 'recovery',
@@ -839,6 +905,9 @@ export const YOGA = [
 
   {
     id: 'yoga-restorative-sequence',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Restorative Yoga Sequence',
     youtube: 'restorative yoga sequence yoga pose tutorial',
     category: 'recovery',
@@ -873,6 +942,9 @@ export const YOGA = [
 
   {
     id: 'yoga-balance-series',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Balance Challenge Series',
     youtube: 'balance challenge series yoga pose tutorial',
     category: 'strength',
@@ -910,6 +982,9 @@ export const YOGA = [
 
   {
     id: 'yoga-forward-fold-series',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Forward Fold Series',
     youtube: 'forward fold series yoga pose tutorial',
     category: 'mobility',
@@ -946,6 +1021,9 @@ export const YOGA = [
 
   {
     id: 'yoga-backbend-series',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Backbend Opening Series',
     youtube: 'backbend opening series yoga pose tutorial',
     category: 'mobility',
@@ -983,6 +1061,9 @@ export const YOGA = [
 
   {
     id: 'yoga-power-flow',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Power Yoga Flow — 30 Minutes',
     youtube: 'power yoga flow - 30 minutes yoga pose tutorial',
     category: 'strength',
@@ -1018,6 +1099,9 @@ export const YOGA = [
 
   {
     id: 'yoga-pranayama',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Pranayama Breathing Practice',
     youtube: 'pranayama breathing practice yoga pose tutorial',
     category: 'mindfulness',
@@ -1051,6 +1135,9 @@ export const YOGA = [
 
   {
     id: 'yoga-chair',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Chair Yoga — Seated Sequence',
     youtube: 'chair yoga - seated sequence yoga pose tutorial',
     category: 'mobility',
@@ -1087,6 +1174,9 @@ export const YOGA = [
 
   {
     id: 'yoga-hip-strength',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Hip Strength and Stability — Yoga',
     youtube: 'hip strength and stability yoga pose tutorial',
     category: 'strength',

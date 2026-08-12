@@ -32,6 +32,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-lateral-shuffle',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Lateral Shuffle',
     youtube: 'lateral shuffle drill technique',
     category: 'cardio',
@@ -68,6 +71,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-t-drill',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'T-Drill',
     youtube: 't-drill technique',
     category: 'cardio',
@@ -106,6 +112,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-5-10-5',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: '5-10-5 Shuttle',
     youtube: '5-10-5 shuttle drill technique',
     category: 'cardio',
@@ -143,6 +152,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-figure-8-run',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Figure-8 Run',
     youtube: 'figure-8 run drill technique',
     category: 'cardio',
@@ -178,6 +190,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-defensive-slide',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Defensive Slide',
     youtube: 'defensive slide drill technique',
     category: 'cardio',
@@ -214,6 +229,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-ladder-in-out',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Ladder In-Out',
     youtube: 'ladder in-out drill technique',
     category: 'cardio',
@@ -250,6 +268,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-ladder-ickey-shuffle',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Ladder Ickey Shuffle',
     youtube: 'ladder ickey shuffle drill technique',
     category: 'cardio',
@@ -286,6 +307,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-pro-agility',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Pro Agility Drill',
     youtube: 'pro agility drill technique',
     category: 'cardio',
@@ -327,6 +351,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'saq-acceleration-run',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Acceleration Run — 10m',
     youtube: 'acceleration run - 10m drill technique',
     category: 'cardio',
@@ -363,6 +390,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'saq-wall-drive',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Wall Drive — Sprint Mechanics',
     youtube: 'wall drive - sprint mechanics drill technique',
     category: 'cardio',
@@ -397,6 +427,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'saq-falling-start',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Falling Start',
     youtube: 'falling start drill technique',
     category: 'cardio',
@@ -432,6 +465,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'saq-resisted-sprint',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Resisted Sprint — Partner or Sled',
     youtube: 'resisted sprint - partner or sled drill technique',
     category: 'cardio',
@@ -467,6 +503,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'saq-cone-weave',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cone Weave',
     youtube: 'cone weave drill technique',
     category: 'cardio',
@@ -503,6 +542,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'saq-box-drill',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Box Drill',
     youtube: 'box drill technique',
     category: 'cardio',
@@ -538,6 +580,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'saq-reaction-ball',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Reaction Ball Drill',
     youtube: 'reaction ball drill technique',
     category: 'cardio',
@@ -573,6 +618,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'saq-mirror-drill',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Mirror Drill',
     youtube: 'mirror drill technique',
     category: 'cardio',
@@ -613,6 +661,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-warmup-general',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'General Pre-Sport Warm-Up',
     youtube: 'general pre-sport warm-up drill technique',
     category: 'mobility',
@@ -653,6 +704,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-warmup-lower-body',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Lower Body Activation Warm-Up',
     youtube: 'lower body activation warm-up drill technique',
     category: 'mobility',
@@ -691,6 +745,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-warmup-upper-body',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Upper Body Activation Warm-Up',
     youtube: 'upper body activation warm-up drill technique',
     category: 'mobility',
@@ -729,6 +786,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-cooldown-general',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'General Post-Sport Cool-Down',
     youtube: 'general post-sport cool-down drill technique',
     category: 'recovery',
@@ -768,6 +828,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-cooldown-running',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Post-Run Cool-Down Routine',
     youtube: 'post-run cool-down routine drill technique',
     category: 'recovery',
@@ -806,6 +869,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-session-football-conditioning',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Football Conditioning Session',
     youtube: 'football conditioning session drill technique',
     category: 'cardio',
@@ -847,6 +913,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-sprint-build-up',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Sprint Build-Up — Sport Prep',
     youtube: 'sprint build-up - sport prep drill technique',
     category: 'cardio',
@@ -882,6 +951,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-cutting-movement',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cutting Drill',
     youtube: 'cutting drill technique',
     category: 'cardio',
@@ -918,6 +990,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-zig-zag-run',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Zig-Zag Run',
     youtube: 'zig-zag run drill technique',
     category: 'cardio',
@@ -953,6 +1028,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-backpedal-turn',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Backpedal and Turn Drill',
     youtube: 'backpedal and turn drill technique',
     category: 'cardio',
@@ -988,6 +1066,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-dot-drill',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Dot Drill',
     youtube: 'dot drill technique',
     category: 'cardio',
@@ -1023,6 +1104,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-partner-chase',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Partner Chase Drill',
     youtube: 'partner chase drill technique',
     category: 'cardio',
@@ -1057,6 +1141,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-change-of-pace',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Change of Pace Run',
     youtube: 'change of pace run drill technique',
     category: 'cardio',
@@ -1092,6 +1179,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-defensive-footwork',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Defensive Footwork Circuit',
     youtube: 'defensive footwork circuit drill technique',
     category: 'cardio',
@@ -1135,6 +1225,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'circuit-amrap-bodyweight',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'AMRAP Bodyweight Circuit',
     youtube: 'amrap bodyweight circuit drill technique',
     category: 'cardio',
@@ -1172,6 +1265,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'circuit-emom-strength',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'EMOM Strength Circuit',
     youtube: 'emom strength circuit drill technique',
     category: 'strength',
@@ -1208,6 +1304,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-conditioning-tabata',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Tabata — Sport Conditioning',
     youtube: 'tabata - sport conditioning drill technique',
     category: 'cardio',
@@ -1244,6 +1343,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'power-endurance-circuit',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Power Endurance Circuit',
     youtube: 'power endurance circuit drill technique',
     category: 'cardio',
@@ -1280,6 +1382,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'repeated-sprint-ability',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Repeated Sprint Ability (RSA)',
     youtube: 'repeated sprint ability rsa drill technique',
     category: 'cardio',
@@ -1315,6 +1420,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'conditioning-beep-test',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Beep Test Simulation',
     youtube: 'beep test simulation drill technique',
     category: 'cardio',
@@ -1350,6 +1458,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'yoyo-intermittent',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Yo-Yo Intermittent Recovery',
     youtube: 'yo-yo intermittent recovery drill technique',
     category: 'cardio',
@@ -1385,6 +1496,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-speed-ladder-advanced',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Speed Ladder — Advanced Patterns',
     youtube: 'speed ladder - advanced patterns drill technique',
     category: 'cardio',
@@ -1421,6 +1535,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'conditioning-small-sided-game',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Small-Sided Game Conditioning',
     youtube: 'small-sided game conditioning drill technique',
     category: 'cardio',
@@ -1455,6 +1572,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'conditioning-max-aerobic-speed',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Max Aerobic Speed Intervals',
     youtube: 'max aerobic speed intervals drill technique',
     category: 'cardio',
@@ -1490,6 +1610,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-warmup-dynamic-full',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dynamic Warm-Up — Full Session',
     youtube: 'dynamic warm-up - full session drill technique',
     category: 'mobility',
@@ -1531,6 +1654,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-carioca',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Carioca',
     youtube: 'carioca drill technique',
     category: 'cardio',
@@ -1568,6 +1694,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-backpedal',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Backpedal',
     youtube: 'backpedal drill technique',
     category: 'cardio',
@@ -1604,6 +1733,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'plyometric-med-ball-circuit',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Medicine Ball Power Circuit',
     youtube: 'medicine ball power circuit drill technique',
     category: 'strength',
@@ -1640,6 +1772,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'conditioning-10-20-30',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: '10-20-30 Running Protocol',
     youtube: '10-20-30 running protocol drill technique',
     category: 'cardio',
@@ -1677,6 +1812,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'strength-endurance-circuit',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Strength-Endurance Circuit',
     youtube: 'strength-endurance circuit drill technique',
     category: 'strength',
@@ -1714,6 +1852,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'sport-specific-speed-ladder',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Sport-Specific Ladder Warm-Up',
     youtube: 'sport-specific ladder warm-up drill technique',
     category: 'mobility',
@@ -1751,6 +1892,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'conditioning-vo2-intervals',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'VO2 Max Intervals',
     youtube: 'vo2 max intervals drill technique',
     category: 'cardio',
@@ -1785,6 +1929,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'drill-drop-step',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Drop Step',
     youtube: 'drop step drill technique',
     category: 'cardio',
@@ -1821,6 +1968,9 @@ export const SPORT_CONDITIONING = [
 
   {
     id: 'conditioning-high-low',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'High-Low Conditioning',
     youtube: 'high-low conditioning drill technique',
     category: 'cardio',

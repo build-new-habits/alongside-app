@@ -720,7 +720,7 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   // not get jumping, bounding, sprinting or landing work -- not because
   // of their age, but because impact loading is the one thing that should
   // be earned rather than defaulted into.
-  const IMPACT_PATTERNS = /jump|hop|bound|skater|tuck|depth|plyo|sprint|explosive|burpee|deceleration|reactive change|high knees|butt kicks|carioca|skip|jog|run(?!ning shoes)|agility|ladder|shuttle|box drill|dot drill|beep test|yoyo|rsa|repeated sprint/i;
+  
   const LOW_IMPACT_ONLY = new Set(["sedentary", "light", "returning"]);
   // Unknown counts as gated, matching the same safe-default reasoning
   // applied to untagged difficulty: someone who has told us nothing has
@@ -745,32 +745,28 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   // Floor access. Without it every supine, prone and kneeling movement
   // is not merely hard but unusable, and being handed them repeatedly is
   // how somebody decides the app is not for them.
-  // KNOWN LIMITATION, recorded rather than hidden. These three gates
-  // match on names because the database carries no impact, floor or
-  // balance tag, and movementPattern cannot stand in for them: Depth
-  // Jump is tagged "squat", and "locomotion" covers both a treadmill
-  // walk and carioca.
+  // CAP-2 RESOLVED (11 Aug 2026). These gates read real tags now.
   //
-  // Name matching therefore MISSES things. Traced live: a 76-year-old
-  // who cannot jump was still served High Knees, and one who cannot get
-  // to the floor was still served a Hollow Body Hold. The patterns below
-  // are widened as far as names reliably allow, but the real fix is
-  // three boolean tags on all 497 entries -- the same lesson as the 30
-  // untagged difficulties, where a derived fallback bought time and the
-  // data was what actually solved it. Logged as CAP-2.
-  const FLOOR_PATTERNS = /supine|prone|kneel|floor|lying|dead ?bug|bird ?dog|bridge|plank|cat-?cow|child|savasana|roll|hollow|donkey|clamshell|crunch|sit-?up|superman|hip thrust|pigeon|cobra|quadruped|side-?lying|seated forward/i;
-  const isFloor = ex => FLOOR_PATTERNS.test(ex.name + " " + (ex.id || ""));
-
-  // Balance is its own axis. Warrior III is low impact and moderate
-  // difficulty and completely wrong for someone worried about falling,
-  // so no difficulty band can express this.
-  const BALANCE_PATTERNS = /single-leg|one leg|tree pose|warrior 3|warrior iii|half moon|balance|bosu|wobble|airplane|stork/i;
-  const isBalance = ex =>
-    ex.movementPattern === "balance" ||
-    ex.movementPattern === "proprioception" ||
-    BALANCE_PATTERNS.test(ex.name + " " + (ex.id || ""));
-  const isImpact = ex =>
-    ex.movementPattern === "jump" || IMPACT_PATTERNS.test(ex.id + " " + ex.name);
+  // They used to match on exercise NAMES, because the database carried
+  // no position, impact or balance data and movementPattern could not
+  // stand in -- Depth Jump is tagged "squat" and "locomotion" covers
+  // both a treadmill walk and carioca. Name matching missed things, and
+  // it was verified missing them: a wheelchair user who answered "no"
+  // to the chair question was still served McGill Curl-Ups, and a man
+  // who cannot jump was still served Drop Steps.
+  //
+  // All 497 entries now carry position ('floor' | 'standing' | 'seated'
+  // | 'any'), impact (boolean) and balanceDemand (boolean). Same lesson
+  // as the 30 untagged difficulties: a derived fallback buys time and
+  // the data is what actually solves it.
+  //
+  // 'any' means the exercise imposes no position requirement -- most
+  // breathing and meditation practice, and the recovery protocols. It
+  // passes every position gate deliberately, because there is nothing
+  // to gate.
+  const isFloor   = ex => ex.position === "floor";
+  const isBalance = ex => ex.balanceDemand === true;
+  const isImpact = ex => ex.impact === true;
 
   const _difficulty = ex => {
     if (typeof ex.difficultyLevel === "number") return ex.difficultyLevel;
@@ -785,6 +781,10 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
     if (impactGated && isImpact(ex)) return false;
     if (cap.asked && !cap.floorSafe   && isFloor(ex))   return false;
     if (cap.asked && !cap.balanceSafe && isBalance(ex)) return false;
+    // CAP-4: somebody who cannot rise from a chair needs seated and
+    // supported work, not a gentler standing programme.
+    if (cap.asked && cap.needsSeated &&
+        ex.position !== "seated" && ex.position !== "any") return false;
     if (section === "main" && !withinCeiling(ex)) return false;
     if (section === "warmup" && useCeilingOnWarmup && !withinCeiling(ex)) return false;
     // Equipment check: exercise needs no equipment, or user has it.

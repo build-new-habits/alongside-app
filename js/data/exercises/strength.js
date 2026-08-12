@@ -59,6 +59,9 @@ export const STRENGTH = [
 
   {
     id: 'glute-bridge',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Glute Bridge',
     youtube: 'glute bridge exercise technique',
     category: 'strength',
@@ -91,6 +94,9 @@ export const STRENGTH = [
 
   {
     id: 'bird-dog',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Bird Dog',
     youtube: 'bird dog exercise technique',
     category: 'strength',
@@ -135,6 +141,9 @@ export const STRENGTH = [
 
   {
     id: 'dead-bug',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Dead Bug',
     youtube: 'dead bug exercise technique',
     category: 'strength',
@@ -179,6 +188,9 @@ export const STRENGTH = [
 
   {
     id: 'goblet-squat',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Goblet Squat',
     youtube: 'goblet squat exercise technique',
     category: 'strength',
@@ -213,6 +225,9 @@ export const STRENGTH = [
 
   {
     id: 'push-up',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Press-Up',
     youtube: 'press-up exercise technique',
     category: 'strength',
@@ -247,6 +262,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-row',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Row',
     youtube: 'dumbbell row exercise technique',
     category: 'strength',
@@ -281,6 +299,9 @@ export const STRENGTH = [
 
   {
     id: 'romanian-deadlift',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Romanian Deadlift',
     youtube: 'romanian deadlift exercise technique',
     category: 'strength',
@@ -315,6 +336,9 @@ export const STRENGTH = [
 
   {
     id: 'plank',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Plank',
     youtube: 'plank exercise technique',
     category: 'strength',
@@ -359,6 +383,9 @@ export const STRENGTH = [
 
   {
     id: 'clamshell',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Clamshell',
     youtube: 'clamshell exercise technique',
     category: 'strength',
@@ -392,6 +419,9 @@ export const STRENGTH = [
 
   {
     id: 'reverse-lunge',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Reverse Lunge',
     youtube: 'reverse lunge exercise technique',
     category: 'strength',
@@ -430,6 +460,9 @@ export const STRENGTH = [
 
   {
     id: 'press-up-incline',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Incline Press-Up',
     youtube: 'incline press-up exercise technique',
     category: 'strength',
@@ -462,6 +495,9 @@ export const STRENGTH = [
 
   {
     id: 'press-up-decline',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Decline Press-Up',
     youtube: 'decline press-up exercise technique',
     category: 'strength',
@@ -494,6 +530,9 @@ export const STRENGTH = [
 
   {
     id: 'bulgarian-split-squat',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Bulgarian Split Squat',
     youtube: 'bulgarian split squat exercise technique',
     category: 'strength',
@@ -527,6 +566,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-sumo-squat',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Sumo Squat',
     youtube: 'dumbbell sumo squat exercise technique',
     category: 'strength',
@@ -559,6 +601,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-lateral-raise',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Lateral Raise',
     youtube: 'dumbbell lateral raise exercise technique',
     category: 'strength',
@@ -591,6 +636,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-overhead-press',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Overhead Press',
     youtube: 'dumbbell overhead press exercise technique',
     category: 'strength',
@@ -623,6 +671,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-bicep-curl',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Bicep Curl',
     youtube: 'dumbbell bicep curl exercise technique',
     category: 'strength',
@@ -655,6 +706,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-tricep-extension',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Overhead Tricep Extension',
     youtube: 'dumbbell overhead tricep extension exercise technique',
     category: 'strength',
@@ -687,6 +741,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-chest-press-floor',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Floor Press',
     youtube: 'dumbbell floor press exercise technique',
     category: 'strength',
@@ -719,6 +776,9 @@ export const STRENGTH = [
 
   {
     id: 'inverted-row-table',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Inverted Row — Table',
     youtube: 'inverted row - table exercise technique',
     category: 'strength',
@@ -752,6 +812,9 @@ export const STRENGTH = [
 
   {
     id: 'ab-wheel-rollout',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Ab Wheel Rollout',
     youtube: 'ab wheel rollout exercise technique',
     category: 'strength',
@@ -796,6 +859,9 @@ export const STRENGTH = [
 
   {
     id: 'pallof-press',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Pallof Press',
     youtube: 'pallof press exercise technique',
     category: 'strength',
@@ -841,6 +907,9 @@ export const STRENGTH = [
 
   {
     id: 'farmers-carry',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Farmer\'s Carry',
     youtube: 'farmers carry exercise technique',
     category: 'strength',
@@ -873,6 +942,9 @@ export const STRENGTH = [
 
   {
     id: 'suitcase-carry',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Suitcase Carry — Single Arm',
     youtube: 'suitcase carry - single arm exercise technique',
     category: 'strength',
@@ -905,6 +977,9 @@ export const STRENGTH = [
 
   {
     id: 'hip-hinge-drill',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Hip Hinge Drill — Bodyweight',
     youtube: 'hip hinge drill - bodyweight exercise technique',
     category: 'strength',
@@ -945,6 +1020,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-swing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kettlebell Swing',
     youtube: 'kettlebell swing exercise technique',
     category: 'strength',
@@ -979,6 +1057,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-goblet-squat',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kettlebell Goblet Squat',
     youtube: 'kettlebell goblet squat exercise technique',
     category: 'strength',
@@ -1012,6 +1093,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-clean',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kettlebell Clean',
     youtube: 'kettlebell clean exercise technique',
     category: 'strength',
@@ -1046,6 +1130,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-press',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kettlebell Press',
     youtube: 'kettlebell press exercise technique',
     category: 'strength',
@@ -1078,6 +1165,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-turkish-getup',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Turkish Get-Up',
     youtube: 'turkish get-up exercise technique',
     category: 'strength',
@@ -1113,6 +1203,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-deadlift',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kettlebell Deadlift',
     youtube: 'kettlebell deadlift exercise technique',
     category: 'strength',
@@ -1146,6 +1239,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-row',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kettlebell Single-Arm Row',
     youtube: 'kettlebell single-arm row exercise technique',
     category: 'strength',
@@ -1178,6 +1274,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-snatch',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kettlebell Snatch',
     youtube: 'kettlebell snatch exercise technique',
     category: 'strength',
@@ -1211,6 +1310,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-halo',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kettlebell Halo',
     youtube: 'kettlebell halo exercise technique',
     category: 'mobility',
@@ -1242,6 +1344,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-windmill',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kettlebell Windmill',
     youtube: 'kettlebell windmill exercise technique',
     category: 'strength',
@@ -1275,6 +1380,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-figure-8',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kettlebell Figure-8',
     youtube: 'kettlebell figure-8 exercise technique',
     category: 'strength',
@@ -1307,6 +1415,9 @@ export const STRENGTH = [
 
   {
     id: 'kettlebell-around-body-pass',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Around the Body Pass',
     youtube: 'around the body pass exercise technique',
     category: 'strength',
@@ -1344,6 +1455,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-jump-squat',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Jump Squat',
     youtube: 'jump squat exercise technique',
     category: 'strength',
@@ -1377,6 +1491,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-box-jump',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Box Jump',
     youtube: 'box jump exercise technique',
     category: 'strength',
@@ -1411,6 +1528,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-broad-jump',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Broad Jump',
     youtube: 'broad jump exercise technique',
     category: 'strength',
@@ -1444,6 +1564,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-burpee',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Burpee',
     youtube: 'burpee exercise technique',
     category: 'cardio',
@@ -1478,6 +1601,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-explosive-press-up',
+    position: 'floor',
+    impact: true,
+    balanceDemand: false,
     name: 'Explosive Press-Up',
     youtube: 'explosive press-up exercise technique',
     category: 'strength',
@@ -1510,6 +1636,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-depth-jump',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Depth Jump',
     youtube: 'depth jump exercise technique',
     category: 'strength',
@@ -1543,6 +1672,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-lateral-hop',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Lateral Hops',
     youtube: 'lateral hops exercise technique',
     category: 'strength',
@@ -1576,6 +1708,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-skater-jumps',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Skater Jumps',
     youtube: 'skater jumps exercise technique',
     category: 'strength',
@@ -1608,6 +1743,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-tuck-jump',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Tuck Jump',
     youtube: 'tuck jump exercise technique',
     category: 'strength',
@@ -1641,6 +1779,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-sprint-build',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Sprint Build-Up',
     youtube: 'sprint build-up exercise technique',
     category: 'cardio',
@@ -1674,6 +1815,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-med-ball-slam',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Medicine Ball Slam',
     youtube: 'medicine ball slam exercise technique',
     category: 'strength',
@@ -1706,6 +1850,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-med-ball-chest-pass',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Medicine Ball Chest Pass',
     youtube: 'medicine ball chest pass exercise technique',
     category: 'strength',
@@ -1737,6 +1884,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-single-leg-hop',
+    position: 'standing',
+    impact: true,
+    balanceDemand: true,
     name: 'Single-Leg Hop for Distance',
     youtube: 'single-leg hop for distance exercise technique',
     category: 'strength',
@@ -1770,6 +1920,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-reactive-agility',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Reactive Change of Direction',
     youtube: 'reactive change of direction exercise technique',
     category: 'cardio',
@@ -1803,6 +1956,9 @@ export const STRENGTH = [
 
   {
     id: 'plyo-deceleration-run',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Deceleration Run',
     youtube: 'deceleration run exercise technique',
     category: 'cardio',
@@ -1843,6 +1999,9 @@ export const STRENGTH = [
 
   {
     id: 'barbell-deadlift',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Barbell Deadlift',
     youtube: 'barbell deadlift exercise technique',
     category: 'strength',
@@ -1881,6 +2040,9 @@ export const STRENGTH = [
 
   {
     id: 'barbell-squat',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Barbell Back Squat',
     youtube: 'barbell back squat exercise technique',
     category: 'strength',
@@ -1918,6 +2080,9 @@ export const STRENGTH = [
 
   {
     id: 'barbell-bench-press',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Barbell Bench Press',
     youtube: 'barbell bench press exercise technique',
     category: 'strength',
@@ -1954,6 +2119,9 @@ export const STRENGTH = [
 
   {
     id: 'barbell-overhead-press',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Barbell Overhead Press',
     youtube: 'barbell overhead press exercise technique',
     category: 'strength',
@@ -1989,6 +2157,9 @@ export const STRENGTH = [
 
   {
     id: 'barbell-row',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Barbell Bent-Over Row',
     youtube: 'barbell bent-over row exercise technique',
     category: 'strength',
@@ -2024,6 +2195,9 @@ export const STRENGTH = [
 
   {
     id: 'barbell-rdl',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Romanian Deadlift',
     youtube: 'romanian deadlift exercise technique',
     category: 'strength',
@@ -2060,6 +2234,9 @@ export const STRENGTH = [
 
   {
     id: 'barbell-hip-thrust',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Barbell Hip Thrust',
     youtube: 'barbell hip thrust exercise technique',
     category: 'strength',
@@ -2096,6 +2273,9 @@ export const STRENGTH = [
 
   {
     id: 'barbell-front-squat',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Barbell Front Squat',
     youtube: 'barbell front squat exercise technique',
     category: 'strength',
@@ -2132,6 +2312,9 @@ export const STRENGTH = [
 
   {
     id: 'barbell-good-morning',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Good Morning',
     youtube: 'good morning exercise technique',
     category: 'strength',
@@ -2167,6 +2350,9 @@ export const STRENGTH = [
 
   {
     id: 'barbell-power-clean',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Power Clean',
     youtube: 'power clean exercise technique',
     category: 'strength',
@@ -2206,6 +2392,9 @@ export const STRENGTH = [
 
   {
     id: 'band-pull-apart',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Band Pull-Apart',
     youtube: 'band pull-apart exercise technique',
     category: 'strength',
@@ -2239,6 +2428,9 @@ export const STRENGTH = [
 
   {
     id: 'band-face-pull',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Band Face Pull',
     youtube: 'band face pull exercise technique',
     category: 'strength',
@@ -2273,6 +2465,9 @@ export const STRENGTH = [
 
   {
     id: 'band-squat',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Band Squat',
     youtube: 'band squat exercise technique',
     category: 'strength',
@@ -2306,6 +2501,9 @@ export const STRENGTH = [
 
   {
     id: 'band-hip-hinge',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Band Hip Hinge — Deadlift Pattern',
     youtube: 'band hip hinge - deadlift pattern exercise technique',
     category: 'strength',
@@ -2339,6 +2537,9 @@ export const STRENGTH = [
 
   {
     id: 'band-chest-press',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Band Chest Press',
     youtube: 'band chest press exercise technique',
     category: 'strength',
@@ -2372,6 +2573,9 @@ export const STRENGTH = [
 
   {
     id: 'band-row-seated',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Seated Band Row',
     youtube: 'seated band row exercise technique',
     category: 'strength',
@@ -2406,6 +2610,9 @@ export const STRENGTH = [
 
   {
     id: 'band-lateral-walk',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Band Lateral Walk',
     youtube: 'band lateral walk exercise technique',
     category: 'strength',
@@ -2440,6 +2647,9 @@ export const STRENGTH = [
 
   {
     id: 'band-standing-row',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Band Standing Single-Arm Row',
     youtube: 'band standing single-arm row exercise technique',
     category: 'strength',
@@ -2474,6 +2684,9 @@ export const STRENGTH = [
 
   {
     id: 'band-bicep-curl',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Band Bicep Curl',
     youtube: 'band bicep curl exercise technique',
     category: 'strength',
@@ -2507,6 +2720,9 @@ export const STRENGTH = [
 
   {
     id: 'band-tricep-pushdown',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Band Tricep Pushdown',
     youtube: 'band tricep pushdown exercise technique',
     category: 'strength',
@@ -2540,6 +2756,9 @@ export const STRENGTH = [
 
   {
     id: 'band-overhead-press',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Band Overhead Press',
     youtube: 'band overhead press exercise technique',
     category: 'strength',
@@ -2573,6 +2792,9 @@ export const STRENGTH = [
 
   {
     id: 'band-pallof-press',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Band Pallof Press',
     youtube: 'band pallof press exercise technique',
     category: 'strength',
@@ -2627,6 +2849,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-romanian-deadlift',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Romanian Deadlift',
     youtube: 'dumbbell romanian deadlift exercise technique',
     category: 'strength',
@@ -2662,6 +2887,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-step-up',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Step-Up',
     youtube: 'dumbbell step-up exercise technique',
     category: 'strength',
@@ -2696,6 +2924,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-reverse-lunge',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Reverse Lunge',
     youtube: 'dumbbell reverse lunge exercise technique',
     category: 'strength',
@@ -2730,6 +2961,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-shoulder-y-raise',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Y-Raise',
     youtube: 'dumbbell y-raise exercise technique',
     category: 'strength',
@@ -2764,6 +2998,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-single-leg-deadlift',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Single-Leg Dumbbell Deadlift',
     youtube: 'single-leg dumbbell deadlift exercise technique',
     category: 'strength',
@@ -2797,6 +3034,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-incline-row',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Incline Row',
     youtube: 'dumbbell incline row exercise technique',
     category: 'strength',
@@ -2831,6 +3071,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-goblet-squat-pause',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Paused Goblet Squat',
     youtube: 'paused goblet squat exercise technique',
     category: 'strength',
@@ -2864,6 +3107,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-floor-fly',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Floor Fly',
     youtube: 'dumbbell floor fly exercise technique',
     category: 'strength',
@@ -2897,6 +3143,9 @@ export const STRENGTH = [
 
   {
     id: 'functional-carry-overhead',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Overhead Carry',
     youtube: 'overhead carry exercise technique',
     category: 'strength',
@@ -2930,6 +3179,9 @@ export const STRENGTH = [
 
   {
     id: 'functional-sandbag-carry',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Bear Hug Carry',
     youtube: 'bear hug carry exercise technique',
     category: 'strength',
@@ -2963,6 +3215,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-zottman-curl',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Zottman Curl',
     youtube: 'zottman curl exercise technique',
     category: 'strength',
@@ -2997,6 +3252,9 @@ export const STRENGTH = [
 
   {
     id: 'dumbbell-pullover',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Pullover',
     youtube: 'dumbbell pullover exercise technique',
     category: 'strength',
@@ -3030,6 +3288,9 @@ export const STRENGTH = [
 
   {
     id: 'bodyweight-pistol-squat-progression',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Pistol Squat Progression',
     youtube: 'pistol squat progression exercise technique',
     category: 'strength',
@@ -3064,6 +3325,9 @@ export const STRENGTH = [
 
   {
     id: 'bodyweight-nordic-curl-progression',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Nordic Curl — Assisted Progression',
     youtube: 'nordic curl - assisted progression exercise technique',
     category: 'strength',
@@ -3098,6 +3362,9 @@ export const STRENGTH = [
 
   {
     id: 'isometric-wall-sit',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Wall Sit',
     youtube: 'wall sit exercise technique',
     category: 'strength',
@@ -3133,6 +3400,9 @@ export const STRENGTH = [
 
   {
     id: 'isometric-hollow-hold',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Hollow Body Hold',
     youtube: 'hollow body hold exercise technique',
     category: 'strength',

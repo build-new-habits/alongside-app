@@ -26,6 +26,9 @@ export const MOBILITY = [
 
   {
     id: 'hip-flexor-stretch',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Hip Flexor Stretch',
     youtube: 'hip flexor stretch technique',
     category: 'mobility',
@@ -69,6 +72,9 @@ export const MOBILITY = [
 
   {
     id: 'cat-cow',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Cat-Cow Stretch',
     youtube: 'cat-cow stretch technique',
     category: 'mobility',
@@ -102,6 +108,9 @@ export const MOBILITY = [
 
   {
     id: 'world-greatest-stretch',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'World\'s Greatest Stretch',
     youtube: 'worlds greatest stretch technique',
     category: 'mobility',
@@ -135,6 +144,9 @@ export const MOBILITY = [
 
   {
     id: '90-90-hip-stretch',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: '90-90 Hip Stretch',
     youtube: '90-90 hip stretch technique',
     category: 'mobility',
@@ -179,6 +191,9 @@ export const MOBILITY = [
 
   {
     id: 'thoracic-rotation',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Thoracic Rotation',
     youtube: 'thoracic rotation technique',
     category: 'mobility',
@@ -228,6 +243,9 @@ export const MOBILITY = [
 
   {
     id: 'leg-swing-forward',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Leg Swing — Forward and Back',
     youtube: 'leg swing - forward and back stretch technique',
     category: 'mobility',
@@ -261,6 +279,9 @@ export const MOBILITY = [
 
   {
     id: 'leg-swing-lateral',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Leg Swing — Lateral',
     youtube: 'leg swing - lateral stretch technique',
     category: 'mobility',
@@ -294,6 +315,9 @@ export const MOBILITY = [
 
   {
     id: 'inchworm',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Inchworm',
     youtube: 'inchworm stretch technique',
     category: 'mobility',
@@ -329,6 +353,9 @@ export const MOBILITY = [
 
   {
     id: 'lateral-lunge-reach',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Lateral Lunge with Reach',
     youtube: 'lateral lunge with reach stretch technique',
     category: 'mobility',
@@ -363,6 +390,9 @@ export const MOBILITY = [
 
   {
     id: 'hip-cars',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Hip CARs',
     youtube: 'hip cars stretch technique',
     category: 'mobility',
@@ -409,6 +439,9 @@ export const MOBILITY = [
 
   {
     id: 'ankle-circles',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Ankle Circles',
     youtube: 'ankle circles technique',
     category: 'mobility',
@@ -441,6 +474,9 @@ export const MOBILITY = [
 
   {
     id: 'deep-squat-hold',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Deep Squat Hold',
     youtube: 'deep squat hold stretch technique',
     category: 'mobility',
@@ -474,6 +510,9 @@ export const MOBILITY = [
 
   {
     id: 'couch-stretch',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Couch Stretch',
     youtube: 'couch stretch technique',
     category: 'mobility',
@@ -507,6 +546,9 @@ export const MOBILITY = [
 
   {
     id: 'pigeon-pose',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Pigeon Pose',
     youtube: 'pigeon pose stretch technique',
     category: 'mobility',
@@ -542,6 +584,9 @@ export const MOBILITY = [
 
   {
     id: 'thread-the-needle',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Thread the Needle',
     youtube: 'thread the needle stretch technique',
     category: 'mobility',
@@ -575,6 +620,9 @@ export const MOBILITY = [
 
   {
     id: 'standing-quad-stretch',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Standing Quad Stretch',
     youtube: 'standing quad stretch technique',
     category: 'mobility',
@@ -608,6 +656,9 @@ export const MOBILITY = [
 
   {
     id: 'upper-trap-stretch',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Upper Trapezius Stretch',
     youtube: 'upper trapezius stretch technique',
     category: 'mobility',
@@ -642,6 +693,9 @@ export const MOBILITY = [
 
   {
     id: 'chest-opener-arms-back',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Chest Opener — Arms Behind',
     youtube: 'chest opener - arms behind stretch technique',
     category: 'mobility',
@@ -675,6 +729,9 @@ export const MOBILITY = [
 
   {
     id: 'adductor-stretch-standing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Standing Adductor Stretch',
     youtube: 'standing adductor stretch technique',
     category: 'mobility',
@@ -708,6 +765,9 @@ export const MOBILITY = [
 
   {
     id: 'spinal-flexion-extension-standing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Standing Spinal Wave',
     youtube: 'standing spinal wave stretch technique',
     category: 'mobility',
@@ -750,6 +810,9 @@ export const MOBILITY = [
 
   {
     id: 'worlds-greatest-stretch',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: "World's Greatest Stretch",
     youtube: 'worlds greatest stretch yoga pose tutorial',
     category: 'mobility',
@@ -787,6 +850,9 @@ export const MOBILITY = [
 
   {
     id: 'thoracic-rotation-seated',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Seated Thoracic Rotation',
     youtube: 'seated thoracic rotation technique',
     category: 'mobility',
@@ -823,6 +889,9 @@ export const MOBILITY = [
 
   {
     id: 'thoracic-extension-foam-roll',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Thoracic Extension Over Foam Roller',
     youtube: 'thoracic extension over foam roller stretch technique',
     category: 'mobility',
@@ -869,6 +938,9 @@ export const MOBILITY = [
 
   {
     id: 'ankle-mobility-circles',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Ankle Circles and CARs',
     youtube: 'ankle circles and cars technique',
     category: 'mobility',
@@ -904,6 +976,9 @@ export const MOBILITY = [
 
   {
     id: 'ankle-wall-dorsiflexion',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Ankle Dorsiflexion Drill — Wall',
     youtube: 'ankle dorsiflexion drill - wall stretch technique',
     category: 'mobility',
@@ -939,6 +1014,9 @@ export const MOBILITY = [
 
   {
     id: 'wrist-extension-floor',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Wrist Extension on Floor',
     youtube: 'wrist extension on floor stretch technique',
     category: 'mobility',
@@ -973,6 +1051,9 @@ export const MOBILITY = [
 
   {
     id: 'hip-90-90-stretch',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Hip 90-90 Stretch',
     youtube: 'hip 90-90 stretch technique',
     category: 'mobility',
@@ -1008,6 +1089,9 @@ export const MOBILITY = [
 
   {
     id: 'hip-flexor-sofa-stretch',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Couch Stretch',
     youtube: 'couch stretch technique',
     category: 'mobility',
@@ -1042,6 +1126,9 @@ export const MOBILITY = [
 
   {
     id: 'shoulder-cars-standing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Shoulder CARs — Standing',
     youtube: 'shoulder cars - standing stretch technique',
     category: 'mobility',
@@ -1077,6 +1164,9 @@ export const MOBILITY = [
 
   {
     id: 'spinal-cars',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Spinal CARs',
     youtube: 'spinal cars stretch technique',
     category: 'mobility',
@@ -1111,6 +1201,9 @@ export const MOBILITY = [
 
   {
     id: 'frog-stretch',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Frog Stretch',
     youtube: 'frog stretch technique',
     category: 'mobility',
@@ -1145,6 +1238,9 @@ export const MOBILITY = [
 
   {
     id: 'shoulder-dislocates',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Shoulder Dislocates — Band',
     youtube: 'shoulder dislocates - band stretch technique',
     category: 'mobility',
@@ -1180,6 +1276,9 @@ export const MOBILITY = [
 
   {
     id: 'neck-mobility',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Neck Mobility Routine',
     youtube: 'neck mobility routine stretch technique',
     category: 'mobility',
@@ -1217,6 +1316,9 @@ export const MOBILITY = [
 
   {
     id: 'hip-circles-standing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Standing Hip Circles',
     youtube: 'standing hip circles technique',
     category: 'mobility',
@@ -1251,6 +1353,9 @@ export const MOBILITY = [
 
   {
     id: 'prone-thoracic-rotation',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Prone Thoracic Rotation',
     youtube: 'prone thoracic rotation technique',
     category: 'mobility',
@@ -1297,6 +1402,9 @@ export const MOBILITY = [
 
   {
     id: 'seated-figure-4-stretch',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Seated Figure-4 Stretch',
     youtube: 'seated figure-4 stretch technique',
     category: 'mobility',
@@ -1332,6 +1440,9 @@ export const MOBILITY = [
 
   {
     id: 'mobility-flow-5min',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Five-Minute Morning Mobility Flow',
     youtube: 'five-minute morning mobility flow stretch technique',
     category: 'mobility',
@@ -1369,6 +1480,9 @@ export const MOBILITY = [
 
   {
     id: 'hip-flexor-progressive',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Hip Flexor Progressive Series',
     youtube: 'hip flexor progressive series stretch technique',
     category: 'mobility',

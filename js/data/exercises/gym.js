@@ -51,6 +51,9 @@ export const GYM = [
 
   {
     id: 'gym-treadmill-intervals',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Treadmill Intervals',
     youtube: 'treadmill interval workout beginners',
     category: 'cardio',
@@ -86,6 +89,9 @@ export const GYM = [
 
   {
     id: 'gym-treadmill-incline-walk',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Treadmill Incline Walk',
     youtube: 'incline treadmill walking workout',
     category: 'cardio',
@@ -121,6 +127,9 @@ export const GYM = [
 
   {
     id: 'gym-cross-trainer-intervals',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cross Trainer Intervals',
     youtube: 'elliptical interval training workout',
     category: 'cardio',
@@ -156,6 +165,9 @@ export const GYM = [
 
   {
     id: 'gym-stair-climber-steady',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Stair Climber — Steady',
     youtube: 'stair climber workout proper form',
     category: 'cardio',
@@ -191,6 +203,9 @@ export const GYM = [
 
   {
     id: 'gym-stair-climber-intervals',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Stair Climber Intervals',
     youtube: 'stair climber interval workout',
     category: 'cardio',
@@ -226,6 +241,9 @@ export const GYM = [
 
   {
     id: 'gym-ski-erg-intervals',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Ski Erg Intervals',
     youtube: 'ski erg technique workout',
     category: 'cardio',
@@ -265,6 +283,9 @@ export const GYM = [
 
   {
     id: 'gym-sled-push',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Sled Push',
     youtube: 'sled push prowler technique',
     category: 'cardio',
@@ -300,6 +321,9 @@ export const GYM = [
 
   {
     id: 'gym-battle-ropes-waves',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Battle Rope Waves',
     youtube: 'battle rope alternating waves technique',
     category: 'cardio',
@@ -335,6 +359,9 @@ export const GYM = [
 
   {
     id: 'gym-kettlebell-suitcase-carry',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Kettlebell Suitcase Carry',
     youtube: 'suitcase carry kettlebell technique',
     category: 'strength',
@@ -370,6 +397,9 @@ export const GYM = [
 
   {
     id: 'gym-farmers-carry-heavy',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: "Farmer's Carry — Heavy",
     youtube: 'farmers carry technique heavy',
     category: 'strength',
@@ -412,6 +442,9 @@ export const GYM = [
 GYM.push(
   {
     id: 'gym-cable-chest-press',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cable Chest Press',
     youtube: 'cable chest press standing technique',
     category: 'strength',
@@ -449,6 +482,9 @@ GYM.push(
 
   {
     id: 'gym-seated-cable-row',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Seated Cable Row',
     youtube: 'seated cable row proper form',
     category: 'strength',
@@ -485,6 +521,9 @@ GYM.push(
 
   {
     id: 'gym-lat-pulldown',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Lat Pulldown',
     youtube: 'lat pulldown proper form technique',
     category: 'strength',
@@ -522,6 +561,9 @@ GYM.push(
 
   {
     id: 'gym-cable-pull-through',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cable Pull-Through',
     youtube: 'cable pull through hip hinge technique',
     category: 'strength',
@@ -559,6 +601,9 @@ GYM.push(
 
   {
     id: 'gym-tricep-rope-pushdown',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Tricep Rope Pushdown',
     youtube: 'tricep rope pushdown cable technique',
     category: 'strength',
@@ -595,6 +640,9 @@ GYM.push(
 
   {
     id: 'gym-cable-woodchop',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cable Woodchop',
     youtube: 'cable woodchop rotation technique',
     category: 'strength',
@@ -631,6 +679,9 @@ GYM.push(
 
   {
     id: 'gym-leg-press',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Leg Press',
     youtube: 'leg press machine proper form',
     category: 'strength',
@@ -668,6 +719,9 @@ GYM.push(
 
   {
     id: 'gym-chest-press-machine',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Chest Press Machine',
     youtube: 'chest press machine proper form',
     category: 'strength',
@@ -704,6 +758,9 @@ GYM.push(
 
   {
     id: 'gym-leg-curl',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Leg Curl',
     youtube: 'hamstring leg curl machine form',
     category: 'strength',
@@ -749,6 +806,9 @@ GYM.push(
 GYM.push(
   {
     id: 'gym-incline-dumbbell-press',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Incline Dumbbell Press',
     youtube: 'incline dumbbell press technique',
     category: 'strength',
@@ -786,6 +846,9 @@ GYM.push(
 
   {
     id: 'gym-dumbbell-arnold-press',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Arnold Press',
     youtube: 'arnold press dumbbell technique',
     category: 'strength',
@@ -822,6 +885,9 @@ GYM.push(
 
   {
     id: 'gym-renegade-row',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Dumbbell Renegade Row',
     youtube: 'renegade row technique form',
     category: 'strength',
@@ -858,6 +924,9 @@ GYM.push(
 
   {
     id: 'gym-hip-thrust-barbell',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Barbell Hip Thrust',
     youtube: 'barbell hip thrust technique',
     category: 'strength',
@@ -902,6 +971,9 @@ GYM.push(
 GYM.push(
   {
     id: 'gym-cable-crunch',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Cable Crunch',
     youtube: 'cable crunch kneeling technique',
     category: 'strength',
@@ -938,6 +1010,9 @@ GYM.push(
 
   {
     id: 'gym-weighted-decline-situp',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Weighted Decline Sit-Up',
     youtube: 'decline sit up weighted technique',
     category: 'strength',
@@ -975,6 +1050,9 @@ GYM.push(
 
   {
     id: 'gym-ab-wheel-rollout',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Ab Wheel Rollout',
     youtube: 'ab wheel rollout beginner technique',
     category: 'strength',
@@ -1021,6 +1099,9 @@ GYM.push(
 GYM.push(
   {
     id: 'gym-medicine-ball-rotational-throw',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Medicine Ball Rotational Throw',
     youtube: 'medicine ball rotational throw wall',
     category: 'strength',
@@ -1057,6 +1138,9 @@ GYM.push(
 
   {
     id: 'gym-bosu-squat',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'BOSU Ball Squat',
     youtube: 'bosu ball squat balance technique',
     category: 'strength',
@@ -1093,6 +1177,9 @@ GYM.push(
 
   {
     id: 'gym-balance-board-hold',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Balance Board Hold',
     youtube: 'balance board hold technique beginners',
     category: 'rehabilitation',
@@ -1128,6 +1215,9 @@ GYM.push(
 
   {
     id: 'gym-lateral-box-hop',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Lateral Box Hop',
     youtube: 'lateral box hop plyometric technique',
     category: 'cardio',
@@ -1165,6 +1255,9 @@ GYM.push(
 
   {
     id: 'gym-trx-row',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'TRX Row',
     youtube: 'trx inverted row suspension technique',
     category: 'strength',
@@ -1210,6 +1303,9 @@ GYM.push(
 GYM.push(
   {
     id: 'gym-cable-pallof-press',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Cable Pallof Press',
     youtube: 'cable pallof press anti rotation technique',
     category: 'strength',

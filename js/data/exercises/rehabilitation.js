@@ -37,6 +37,9 @@ export const REHABILITATION = [
 
   {
     id: 'clamshell-activation',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Clamshell — Glute Activation',
     youtube: 'clamshell - glute activation exercise technique',
     category: 'rehabilitation',
@@ -86,6 +89,9 @@ export const REHABILITATION = [
 
   {
     id: 'clamshell-banded',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Banded Clamshell',
     youtube: 'banded clamshell exercise technique',
     category: 'rehabilitation',
@@ -123,6 +129,9 @@ export const REHABILITATION = [
 
   {
     id: 'glute-bridge-activation',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Glute Bridge — Activation',
     youtube: 'glute bridge - activation exercise technique',
     category: 'rehabilitation',
@@ -172,6 +181,9 @@ export const REHABILITATION = [
 
   {
     id: 'glute-bridge-single-leg',
+    position: 'floor',
+    impact: false,
+    balanceDemand: true,
     name: 'Single-Leg Glute Bridge',
     youtube: 'single-leg glute bridge exercise technique',
     category: 'rehabilitation',
@@ -220,6 +232,9 @@ export const REHABILITATION = [
 
   {
     id: 'donkey-kick',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Donkey Kick',
     youtube: 'donkey kick exercise technique',
     category: 'rehabilitation',
@@ -257,6 +272,9 @@ export const REHABILITATION = [
 
   {
     id: 'fire-hydrant',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Fire Hydrant',
     youtube: 'fire hydrant exercise technique',
     category: 'rehabilitation',
@@ -294,6 +312,9 @@ export const REHABILITATION = [
 
   {
     id: 'side-lying-hip-abduction',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Side-Lying Hip Abduction',
     youtube: 'side-lying hip abduction exercise technique',
     category: 'rehabilitation',
@@ -331,6 +352,9 @@ export const REHABILITATION = [
 
   {
     id: 'resistance-band-walk-lateral',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Resistance Band Walk — Lateral',
     youtube: 'resistance band walk - lateral exercise technique',
     category: 'rehabilitation',
@@ -368,6 +392,9 @@ export const REHABILITATION = [
 
   {
     id: 'monster-walk',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Monster Walk',
     youtube: 'monster walk exercise technique',
     category: 'rehabilitation',
@@ -405,6 +432,9 @@ export const REHABILITATION = [
 
   {
     id: 'hip-thrust-bodyweight',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Hip Thrust — Bodyweight',
     youtube: 'hip thrust - bodyweight exercise technique',
     category: 'rehabilitation',
@@ -442,6 +472,9 @@ export const REHABILITATION = [
 
   {
     id: 'glute-bridge-march',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Glute Bridge March',
     youtube: 'glute bridge march exercise technique',
     category: 'rehabilitation',
@@ -479,6 +512,9 @@ export const REHABILITATION = [
 
   {
     id: 'step-up-glute-focus',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Step-Up — Glute Focus',
     youtube: 'step-up - glute focus exercise technique',
     category: 'rehabilitation',
@@ -516,6 +552,9 @@ export const REHABILITATION = [
 
   {
     id: 'reverse-lunge-glute-focus',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Reverse Lunge — Glute Focus',
     youtube: 'reverse lunge - glute focus exercise technique',
     category: 'rehabilitation',
@@ -553,6 +592,9 @@ export const REHABILITATION = [
 
   {
     id: 'standing-hip-abduction',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Standing Hip Abduction',
     youtube: 'standing hip abduction exercise technique',
     category: 'rehabilitation',
@@ -591,6 +633,9 @@ export const REHABILITATION = [
 
   {
     id: 'glute-squeeze-isometric',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Glute Squeeze — Isometric',
     youtube: 'glute squeeze - isometric exercise technique',
     category: 'rehabilitation',
@@ -628,6 +673,9 @@ export const REHABILITATION = [
 
   {
     id: 'prone-hip-extension',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Prone Hip Extension',
     youtube: 'prone hip extension exercise technique',
     category: 'rehabilitation',
@@ -671,6 +719,9 @@ export const REHABILITATION = [
 
   {
     id: 'hamstring-isometric-hold',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Hamstring Isometric Hold',
     youtube: 'hamstring isometric hold exercise technique',
     category: 'rehabilitation',
@@ -709,6 +760,9 @@ export const REHABILITATION = [
 
   {
     id: 'supine-hamstring-stretch',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Supine Hamstring Stretch',
     youtube: 'supine hamstring stretch exercise technique',
     category: 'rehabilitation',
@@ -747,6 +801,9 @@ export const REHABILITATION = [
 
   {
     id: 'active-straight-leg-raise',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Active Straight Leg Raise',
     youtube: 'active straight leg raise exercise technique',
     category: 'rehabilitation',
@@ -784,6 +841,9 @@ export const REHABILITATION = [
 
   {
     id: 'prone-hamstring-curl',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Prone Hamstring Curl',
     youtube: 'prone hamstring curl exercise technique',
     category: 'rehabilitation',
@@ -821,6 +881,9 @@ export const REHABILITATION = [
 
   {
     id: 'romanian-deadlift-rehab',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Romanian Deadlift — Rehab Load',
     youtube: 'romanian deadlift - rehab load exercise technique',
     category: 'rehabilitation',
@@ -859,6 +922,9 @@ export const REHABILITATION = [
 
   {
     id: 'nordic-curl-assisted',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Nordic Curl — Assisted',
     youtube: 'nordic curl - assisted exercise technique',
     category: 'rehabilitation',
@@ -896,6 +962,9 @@ export const REHABILITATION = [
 
   {
     id: 'hamstring-bridge-curl',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Hamstring Bridge Curl',
     youtube: 'hamstring bridge curl exercise technique',
     category: 'rehabilitation',
@@ -933,6 +1002,9 @@ export const REHABILITATION = [
 
   {
     id: 'standing-hamstring-curl-band',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Standing Hamstring Curl — Band',
     youtube: 'standing hamstring curl - band exercise technique',
     category: 'rehabilitation',
@@ -970,6 +1042,9 @@ export const REHABILITATION = [
 
   {
     id: 'single-leg-deadlift-rehab',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Single-Leg Deadlift — Rehab',
     youtube: 'single-leg deadlift - rehab exercise technique',
     category: 'rehabilitation',
@@ -1008,6 +1083,9 @@ export const REHABILITATION = [
 
   {
     id: 'hamstring-90-90-stretch',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Hamstring 90-90 Stretch',
     youtube: 'hamstring 90-90 stretch exercise technique',
     category: 'rehabilitation',
@@ -1046,6 +1124,9 @@ export const REHABILITATION = [
 
   {
     id: 'hamstring-neural-floss',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Hamstring Neural Flossing',
     youtube: 'hamstring neural flossing exercise technique',
     category: 'rehabilitation',
@@ -1083,6 +1164,9 @@ export const REHABILITATION = [
 
   {
     id: 'walking-lunge-short-stride',
+    position: 'standing',
+    impact: true,
+    balanceDemand: false,
     name: 'Walking Lunge — Short Stride',
     youtube: 'walking lunge - short stride exercise technique',
     category: 'rehabilitation',
@@ -1120,6 +1204,9 @@ export const REHABILITATION = [
 
   {
     id: 'copenhagen-adductor',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Copenhagen Adductor',
     youtube: 'copenhagen adductor exercise technique',
     category: 'rehabilitation',
@@ -1156,6 +1243,9 @@ export const REHABILITATION = [
 
   {
     id: 'towel-hamstring-curl',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Towel Hamstring Curl',
     youtube: 'towel hamstring curl exercise technique',
     category: 'rehabilitation',
@@ -1200,6 +1290,9 @@ export const REHABILITATION = [
 
   {
     id: 'seated-calf-raise',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Seated Calf Raise',
     youtube: 'seated calf raise exercise technique',
     category: 'rehabilitation',
@@ -1236,6 +1329,9 @@ export const REHABILITATION = [
 
   {
     id: 'standing-calf-raise-eccentric',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Eccentric Heel Drop',
     youtube: 'eccentric heel drop exercise technique',
     category: 'rehabilitation',
@@ -1273,6 +1369,9 @@ export const REHABILITATION = [
 
   {
     id: 'single-leg-calf-raise',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Single-Leg Calf Raise',
     youtube: 'single-leg calf raise exercise technique',
     category: 'rehabilitation',
@@ -1310,6 +1409,9 @@ export const REHABILITATION = [
 
   {
     id: 'achilles-heel-drop-straight',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Achilles Heel Drop — Straight Knee',
     youtube: 'achilles heel drop - straight knee exercise technique',
     category: 'rehabilitation',
@@ -1347,6 +1449,9 @@ export const REHABILITATION = [
 
   {
     id: 'achilles-heel-drop-bent',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Achilles Heel Drop — Bent Knee',
     youtube: 'achilles heel drop - bent knee exercise technique',
     category: 'rehabilitation',
@@ -1384,6 +1489,9 @@ export const REHABILITATION = [
 
   {
     id: 'standing-calf-stretch-wall',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Standing Calf Stretch — Wall',
     youtube: 'standing calf stretch - wall exercise technique',
     category: 'rehabilitation',
@@ -1421,6 +1529,9 @@ export const REHABILITATION = [
 
   {
     id: 'soleus-stretch-bent-knee',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Soleus Stretch — Bent Knee',
     youtube: 'soleus stretch - bent knee exercise technique',
     category: 'rehabilitation',
@@ -1458,6 +1569,9 @@ export const REHABILITATION = [
 
   {
     id: 'ankle-alphabet',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Ankle Alphabet',
     youtube: 'ankle alphabet exercise technique',
     category: 'rehabilitation',
@@ -1493,6 +1607,9 @@ export const REHABILITATION = [
 
   {
     id: 'banded-ankle-dorsiflexion',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Banded Ankle Dorsiflexion',
     youtube: 'banded ankle dorsiflexion exercise technique',
     category: 'rehabilitation',
@@ -1530,6 +1647,9 @@ export const REHABILITATION = [
 
   {
     id: 'calf-foam-roll',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Calf Foam Roll',
     youtube: 'calf foam roll exercise technique',
     category: 'rehabilitation',
@@ -1573,6 +1693,9 @@ export const REHABILITATION = [
 
   {
     id: 'terminal-knee-extension',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Terminal Knee Extension',
     youtube: 'terminal knee extension exercise technique',
     category: 'rehabilitation',
@@ -1610,6 +1733,9 @@ export const REHABILITATION = [
 
   {
     id: 'vmo-squat',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'VMO Squat',
     youtube: 'vmo squat exercise technique',
     category: 'rehabilitation',
@@ -1647,6 +1773,9 @@ export const REHABILITATION = [
 
   {
     id: 'step-down-eccentric',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Step-Down — Eccentric',
     youtube: 'step-down - eccentric exercise technique',
     category: 'rehabilitation',
@@ -1684,6 +1813,9 @@ export const REHABILITATION = [
 
   {
     id: 'wall-squat-hold',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Wall Squat Hold — Isometric',
     youtube: 'wall squat hold - isometric exercise technique',
     category: 'rehabilitation',
@@ -1721,6 +1853,9 @@ export const REHABILITATION = [
 
   {
     id: 'it-band-foam-roll',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'IT Band Foam Roll',
     youtube: 'it band foam roll exercise technique',
     category: 'rehabilitation',
@@ -1758,6 +1893,9 @@ export const REHABILITATION = [
 
   {
     id: 'lateral-quad-stretch',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Lateral Quad and IT Band Stretch',
     youtube: 'lateral quad and it band stretch exercise technique',
     category: 'rehabilitation',
@@ -1795,6 +1933,9 @@ export const REHABILITATION = [
 
   {
     id: 'tfl-release-standing',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'TFL and Hip Flexor Release',
     youtube: 'tfl and hip flexor release exercise technique',
     category: 'rehabilitation',
@@ -1832,6 +1973,9 @@ export const REHABILITATION = [
 
   {
     id: 'tibialis-anterior-raise',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Tibialis Anterior Raise',
     youtube: 'tibialis anterior raise exercise technique',
     category: 'rehabilitation',
@@ -1869,6 +2013,9 @@ export const REHABILITATION = [
 
   {
     id: 'shin-splint-calf-raise-progression',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Shin Splint Calf Raise Progression',
     youtube: 'shin splint calf raise progression exercise technique',
     category: 'rehabilitation',
@@ -1906,6 +2053,9 @@ export const REHABILITATION = [
 
   {
     id: 'balance-single-leg-hold',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Single-Leg Balance Hold',
     youtube: 'single-leg balance hold exercise technique',
     category: 'rehabilitation',
@@ -1943,6 +2093,9 @@ export const REHABILITATION = [
 
   {
     id: 'patella-mobilisation',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Patella Mobilisation',
     youtube: 'patella mobilisation exercise technique',
     category: 'rehabilitation',
@@ -1980,6 +2133,9 @@ export const REHABILITATION = [
 
   {
     id: 'y-balance-reach',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Y-Balance Reach',
     youtube: 'y-balance reach exercise technique',
     category: 'rehabilitation',
@@ -2023,6 +2179,9 @@ export const REHABILITATION = [
 
   {
     id: 'pendulum-swing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Pendulum Swing',
     youtube: 'pendulum swing exercise technique',
     category: 'rehabilitation',
@@ -2060,6 +2219,9 @@ export const REHABILITATION = [
 
   {
     id: 'external-rotation-band',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'External Rotation — Band',
     youtube: 'external rotation - band exercise technique',
     category: 'rehabilitation',
@@ -2096,6 +2258,9 @@ export const REHABILITATION = [
 
   {
     id: 'internal-rotation-band',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Internal Rotation — Band',
     youtube: 'internal rotation - band exercise technique',
     category: 'rehabilitation',
@@ -2132,6 +2297,9 @@ export const REHABILITATION = [
 
   {
     id: 'wall-slide',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Wall Slide',
     youtube: 'wall slide exercise technique',
     category: 'rehabilitation',
@@ -2169,6 +2337,9 @@ export const REHABILITATION = [
 
   {
     id: 'shoulder-cars',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Shoulder CARs',
     youtube: 'shoulder cars exercise technique',
     category: 'rehabilitation',
@@ -2206,6 +2377,9 @@ export const REHABILITATION = [
 
   {
     id: 'prone-ytw',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Prone Y-T-W',
     youtube: 'prone y-t-w exercise technique',
     category: 'rehabilitation',
@@ -2243,6 +2417,9 @@ export const REHABILITATION = [
 
   {
     id: 'scapular-pushup',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Scapular Press-Up',
     youtube: 'scapular press-up exercise technique',
     category: 'rehabilitation',
@@ -2280,6 +2457,9 @@ export const REHABILITATION = [
 
   {
     id: 'doorway-chest-stretch',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Doorway Chest Stretch',
     youtube: 'doorway chest stretch exercise technique',
     category: 'rehabilitation',
@@ -2317,6 +2497,9 @@ export const REHABILITATION = [
 
   {
     id: 'wrist-cars',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Wrist CARs',
     youtube: 'wrist cars exercise technique',
     category: 'rehabilitation',
@@ -2353,6 +2536,9 @@ export const REHABILITATION = [
 
   {
     id: 'wrist-extension-stretch',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Wrist Extension Stretch',
     youtube: 'wrist extension stretch exercise technique',
     category: 'rehabilitation',
@@ -2390,6 +2576,9 @@ export const REHABILITATION = [
 
   {
     id: 'forearm-pronation-supination',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Forearm Pronation and Supination',
     youtube: 'forearm pronation and supination exercise technique',
     category: 'rehabilitation',
@@ -2427,6 +2616,9 @@ export const REHABILITATION = [
 
   {
     id: 'grip-strength-towel',
+    position: 'any',
+    impact: false,
+    balanceDemand: false,
     name: 'Grip Strengthening — Towel Squeeze',
     youtube: 'grip strengthening - towel squeeze exercise technique',
     category: 'rehabilitation',
@@ -2471,6 +2663,9 @@ export const REHABILITATION = [
 
   {
     id: 'pelvic-tilt',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Pelvic Tilt',
     youtube: 'pelvic tilt exercise technique',
     category: 'rehabilitation',
@@ -2520,6 +2715,9 @@ export const REHABILITATION = [
 
   {
     id: 'diaphragmatic-breathing-core',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Diaphragmatic Breathing — Core Activation',
     youtube: 'diaphragmatic breathing - core activation exercise technique',
     category: 'rehabilitation',
@@ -2569,6 +2767,9 @@ export const REHABILITATION = [
 
   {
     id: 'dead-bug-progression-1',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Dead Bug — Progression 1',
     youtube: 'dead bug - progression 1 exercise technique',
     category: 'rehabilitation',
@@ -2617,6 +2818,9 @@ export const REHABILITATION = [
 
   {
     id: 'dead-bug-progression-2',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Dead Bug — Progression 2',
     youtube: 'dead bug - progression 2 exercise technique',
     category: 'rehabilitation',
@@ -2654,6 +2858,9 @@ export const REHABILITATION = [
 
   {
     id: 'dead-bug-progression-3',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Dead Bug — Progression 3',
     youtube: 'dead bug - progression 3 exercise technique',
     category: 'rehabilitation',
@@ -2702,6 +2909,9 @@ export const REHABILITATION = [
 
   {
     id: 'bird-dog-rehab',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Bird Dog — Core Rehab',
     youtube: 'bird dog - core rehab exercise technique',
     category: 'rehabilitation',
@@ -2751,6 +2961,9 @@ export const REHABILITATION = [
 
   {
     id: 'mckenzie-extension',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'McKenzie Press-Up',
     youtube: 'mckenzie press-up exercise technique',
     category: 'rehabilitation',
@@ -2788,6 +3001,9 @@ export const REHABILITATION = [
 
   {
     id: 'sciatic-neural-floss',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Sciatic Neural Flossing',
     youtube: 'sciatic neural flossing exercise technique',
     category: 'rehabilitation',
@@ -2826,6 +3042,9 @@ export const REHABILITATION = [
 
   {
     id: 'seated-lumbar-rotation',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Seated Lumbar Rotation',
     youtube: 'seated lumbar rotation exercise technique',
     category: 'rehabilitation',
@@ -2864,6 +3083,9 @@ export const REHABILITATION = [
 
   {
     id: 'ql-stretch-side-bend',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'QL Stretch — Side Bend',
     youtube: 'ql stretch - side bend exercise technique',
     category: 'rehabilitation',
@@ -2902,6 +3124,9 @@ export const REHABILITATION = [
 
   {
     id: 'mcgill-curl-up',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'McGill Curl-Up',
     youtube: 'mcgill curl-up exercise technique',
     category: 'rehabilitation',
@@ -2950,6 +3175,9 @@ export const REHABILITATION = [
 
   {
     id: 'side-plank-modified',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Side Plank — Modified',
     youtube: 'side plank - modified exercise technique',
     category: 'rehabilitation',
@@ -3007,6 +3235,9 @@ export const REHABILITATION = [
 
   {
     id: 'kegel-basic',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Pelvic Floor Contraction — Basic',
     youtube: 'pelvic floor contraction - basic exercise technique',
     category: 'rehabilitation',
@@ -3044,6 +3275,9 @@ export const REHABILITATION = [
 
   {
     id: 'kegel-quick-flicks',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Pelvic Floor Quick Flicks',
     youtube: 'pelvic floor quick flicks exercise technique',
     category: 'rehabilitation',
@@ -3080,6 +3314,9 @@ export const REHABILITATION = [
 
   {
     id: 'bridge-pelvic-floor',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Glute Bridge with Pelvic Floor',
     youtube: 'glute bridge with pelvic floor exercise technique',
     category: 'rehabilitation',
@@ -3118,6 +3355,9 @@ export const REHABILITATION = [
 
   {
     id: 'squat-pelvic-floor',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Squat with Pelvic Floor Awareness',
     youtube: 'squat with pelvic floor awareness exercise technique',
     category: 'rehabilitation',
@@ -3162,6 +3402,9 @@ export const REHABILITATION = [
 
   {
     id: 'hypermobility-joint-awareness',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Joint Position Awareness',
     youtube: 'joint position awareness exercise technique',
     category: 'rehabilitation',
@@ -3199,6 +3442,9 @@ export const REHABILITATION = [
 
   {
     id: 'hypermobility-knee-stability',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Knee Stability — Soft Knee Hold',
     youtube: 'knee stability - soft knee hold exercise technique',
     category: 'rehabilitation',
@@ -3236,6 +3482,9 @@ export const REHABILITATION = [
 
   {
     id: 'hypermobility-shoulder-packing',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Shoulder Packing',
     youtube: 'shoulder packing exercise technique',
     category: 'rehabilitation',
@@ -3273,6 +3522,9 @@ export const REHABILITATION = [
 
   {
     id: 'hypermobility-hip-stability',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Hip Stability in Standing',
     youtube: 'hip stability in standing exercise technique',
     category: 'rehabilitation',
@@ -3315,6 +3567,9 @@ export const REHABILITATION = [
 
   {
     id: 'rehab-knee-terminal-extension',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Knee Terminal Extension',
     youtube: 'knee terminal extension exercise technique',
     category: 'rehabilitation',
@@ -3351,6 +3606,9 @@ export const REHABILITATION = [
 
   {
     id: 'rehab-shoulder-y-t-w',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Y-T-W Exercise',
     youtube: 'y-t-w exercise technique',
     category: 'rehabilitation',
@@ -3388,6 +3646,9 @@ export const REHABILITATION = [
 
   {
     id: 'rehab-ankle-proprioception',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
     name: 'Ankle Proprioception Progression',
     youtube: 'ankle proprioception progression exercise technique',
     category: 'rehabilitation',
@@ -3425,6 +3686,9 @@ export const REHABILITATION = [
 
   {
     id: 'rehab-wrist-flexion-extension',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Wrist Flexion-Extension Strengthening',
     youtube: 'wrist flexion-extension strengthening exercise technique',
     category: 'rehabilitation',
@@ -3462,6 +3726,9 @@ export const REHABILITATION = [
 
   {
     id: 'rehab-cervical-deep-flexors',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Deep Cervical Flexor Activation',
     youtube: 'deep cervical flexor activation exercise technique',
     category: 'rehabilitation',
@@ -3499,6 +3766,9 @@ export const REHABILITATION = [
 
   {
     id: 'rehab-hip-flexor-strengthening',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
     name: 'Hip Flexor Strengthening',
     youtube: 'hip flexor strengthening exercise technique',
     category: 'rehabilitation',
@@ -3535,6 +3805,9 @@ export const REHABILITATION = [
 
   {
     id: 'rehab-lateral-hip-strengthening',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Lateral Hip Strengthening Progression',
     youtube: 'lateral hip strengthening progression exercise technique',
     category: 'rehabilitation',
@@ -3573,6 +3846,9 @@ export const REHABILITATION = [
 
   {
     id: 'rehab-thoracic-mobility-rehab',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Thoracic Mobility — Rehabilitation',
     youtube: 'thoracic mobility - rehabilitation exercise technique',
     category: 'rehabilitation',
@@ -3610,6 +3886,9 @@ export const REHABILITATION = [
 
   {
     id: 'rehab-breathing-rehab',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
     name: 'Breathing Retraining — Rehabilitation',
     youtube: 'breathing retraining - rehabilitation exercise technique',
     category: 'rehabilitation',
@@ -3649,6 +3928,9 @@ export const REHABILITATION = [
 
   {
     id: 'rehab-neural-flossing',
+    position: 'seated',
+    impact: false,
+    balanceDemand: false,
     name: 'Neural Flossing — Sciatic Nerve',
     youtube: 'neural flossing - sciatic nerve exercise technique',
     category: 'rehabilitation',
