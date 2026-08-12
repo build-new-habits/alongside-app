@@ -1,5 +1,20 @@
 /**
  * onboarding/lifestyle.js
+ * 12 Aug 2026 v5
+ *
+ * v5 - C1 copy corrected to Graeme's actual wording. v4 rendered his
+ *   supporting sentence AS the question; he meant the question as the
+ *   heading and that sentence beneath it. _renderRadioGroup() gains an
+ *   optional `sub`, wired via aria-describedby so a screen reader hears
+ *   the question first and the reason after, matching the visual order
+ *   rather than running them together.
+ *
+ *   The copy is now defined ONCE, in _legPowerGroup(), and referenced by
+ *   both render sites. v4 duplicated it across the initial render and the
+ *   reveal handler -- the same drift pattern that has cost this build
+ *   repeatedly, and worst of all here: two versions of the most sensitive
+ *   question in the product, one of which nobody would read again.
+ *
  * 12 Aug 2026 v4
  *
  * v4 - C1 second half. The conditional leg question, asked only of
@@ -240,19 +255,7 @@ export function LifestyleView(router) {
         <div id="leg-power-section"
              aria-live="polite"
              ${showLegPower ? '' : 'hidden'}>
-          ${showLegPower ? _renderRadioGroup({
-            id:       'leg-power',
-            heading:  'Some exercises ask your legs to carry your weight. Can yours?',
-            field:    'legPower',
-            optional: true,
-            options: [
-              { value: 'full',    label: 'Yes'                      },
-              { value: 'limited', label: 'A little, or on good days' },
-              { value: 'none',    label: 'No'                       },
-              { value: 'skip',    label: 'I\'d rather not say'      },
-            ],
-            selected: selections.legPower,
-          }) : ''}
+          ${showLegPower ? _renderRadioGroup(_legPowerGroup()) : ''}
         </div>
 
         ${_renderRadioGroup({
@@ -338,16 +341,56 @@ export function LifestyleView(router) {
     attachEvents(container);
   }
 
-  function _renderRadioGroup({ id, heading, field, options, selected, optional }) {
+  // C1 second half. Defined ONCE and referenced by both render sites --
+  // the initial render and the reveal handler. Duplicating the copy is
+  // exactly the drift pattern that has cost this build repeatedly, and it
+  // would be worst here: two versions of the most sensitive question in
+  // the product, one of which nobody would ever read again.
+  //
+  // Wording signed off by Graeme 12 Aug 2026. The question names a
+  // concrete everyday action, matching the other capability questions
+  // (chair, floor, both feet off the ground) rather than asking about an
+  // abstract capacity. "Moving from a chair to somewhere else" describes
+  // a transfer, an ordinary daily action for many wheelchair users -- it
+  // includes them without naming them or assuming anything.
+  //
+  // The middle option carries "or on good days" because the screen
+  // already promises bodies have good and bad spells; an option list that
+  // forced a permanent verdict would contradict the page it sits on.
+  function _legPowerGroup() {
+    return {
+      id:       'leg-power',
+      heading:  'Can you take your weight through your legs \u2014 standing, or moving from a chair to somewhere else?',
+      sub:      'Some exercises ask your legs to carry your weight.',
+      field:    'legPower',
+      optional: true,
+      options: [
+        { value: 'full',    label: 'Yes'                      },
+        { value: 'limited', label: 'A little, or on good days' },
+        { value: 'none',    label: 'No'                       },
+        { value: 'skip',    label: 'I\'d rather not say'      },
+      ],
+      selected: selections.legPower,
+    };
+  }
+
+  function _renderRadioGroup({ id, heading, sub, field, options, selected, optional }) {
+    // `sub` added 12 Aug 2026 for the C1 leg question: a supporting line
+    // under the question giving the reason for asking. Referenced by the
+    // radiogroup's aria-describedby rather than folded into its label, so
+    // a screen reader hears the question first and the reason after,
+    // matching the visual order instead of running them together.
     return `
       <section class="lifestyle-group" aria-labelledby="lg-${id}">
         <h2 class="lifestyle-group__heading" id="lg-${id}">
           ${_esc(heading)}
           ${optional ? '<span class="lifestyle-group__optional">(optional)</span>' : ''}
         </h2>
+        ${sub ? `<p class="lifestyle-group__sub" id="lg-${id}-sub">${_esc(sub)}</p>` : ''}
         <div class="lifestyle-chips"
              role="radiogroup"
-             aria-labelledby="lg-${id}">
+             aria-labelledby="lg-${id}"
+             ${sub ? `aria-describedby="lg-${id}-sub"` : ''}>
           ${options.map(opt => `
             <button
               class="lifestyle-chip ${selected === opt.value ? 'lifestyle-chip--selected' : ''}"
@@ -404,19 +447,7 @@ export function LifestyleView(router) {
           if (legSection) {
             if (value !== 'yes') {
               legSection.removeAttribute('hidden');
-              legSection.innerHTML = _renderRadioGroup({
-                id:       'leg-power',
-                heading:  'Some exercises ask your legs to carry your weight. Can yours?',
-                field:    'legPower',
-                optional: true,
-                options: [
-                  { value: 'full',    label: 'Yes'                      },
-                  { value: 'limited', label: 'A little, or on good days' },
-                  { value: 'none',    label: 'No'                       },
-                  { value: 'skip',    label: 'I\'d rather not say'      },
-                ],
-                selected: selections.legPower,
-              });
+              legSection.innerHTML = _renderRadioGroup(_legPowerGroup());
               // Re-attach events for the new chips.
               attachEvents(container);
             } else {
