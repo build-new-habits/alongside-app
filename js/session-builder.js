@@ -1,6 +1,14 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 11 Aug 2026 v21
+ *
+ * v21 - Full sweep. Seven new categories wired in, closing an audit
+ *   finding that 85 of 544 exercises -- 15.6% of the database -- matched
+ *   no category any session type declared. Arm isolation, gentle cardio,
+ *   foam rolling, pilates, yoga flows, swimming and rehabilitation
+ *   control work were all written, tagged and unreachable.
+ *
  * 11 Aug 2026 v20
  *
  * v20 - EQ-1. "balance-work" and "power" wired into Lower, Full, Core,
@@ -334,7 +342,7 @@ export const SESSION_TYPES = [
     icon:        "💪",
     description: "Push and pull. Shoulder, chest, back, arms.",
     warmupCategories:   ["thoracic-mobility", "shoulder-warmup", "band-warmup", "cardio-warmup"],
-    mainCategories:     ["horizontal-pull", "horizontal-push", "vertical-pull", "shoulder-isolation"],
+    mainCategories:     ["horizontal-pull", "horizontal-push", "vertical-pull", "shoulder-isolation", "arm-isolation"],
     cooldownCategories: ["chest-stretch", "lat-stretch", "thread-needle"]
   },
   {
@@ -361,7 +369,7 @@ export const SESSION_TYPES = [
     icon:        "🎯",
     description: "Anti-extension, anti-rotation, anti-lateral. Real core work.",
     warmupCategories:   ["cardio-warmup", "breathing-warmup", "cat-cow"],
-    mainCategories:     ["anti-extension", "anti-rotation", "anti-lateral", "loaded-carry", "balance-work"],
+    mainCategories:     ["anti-extension", "anti-rotation", "anti-lateral", "loaded-carry", "balance-work", "pilates"],
     cooldownCategories: ["child-pose", "supine-rotation"]
   },
   {
@@ -370,8 +378,8 @@ export const SESSION_TYPES = [
     icon:        "🏃",
     description: "Conditioning and cardiovascular work. No heavy loading.",
     warmupCategories:   ["lower-mobility"],
-    mainCategories:     ["conditioning", "interval", "power"],
-    cooldownCategories: ["static-stretch", "breathing-cool"]
+    mainCategories:     ["conditioning", "interval", "power", "easy-cardio", "swim"],
+    cooldownCategories: ["static-stretch", "self-massage", "breathing-cool"]
   },
   {
     id:          "mobility",
@@ -383,7 +391,7 @@ export const SESSION_TYPES = [
     // warm-up should open the joints it is about to work.
     warmupCategories:   ["breathing-warmup", "cat-cow", "hip-mobility",
                          "thoracic-mobility", "ankle-mobility"],
-    mainCategories:     ["hip-mobility", "thoracic-mobility", "ankle-mobility", "shoulder-mobility", "balance-work"],
+    mainCategories:     ["hip-mobility", "thoracic-mobility", "ankle-mobility", "shoulder-mobility", "balance-work", "pilates", "yoga-flow", "rehab-control"],
     cooldownCategories: ["deep-stretch"]
   }
 ];
