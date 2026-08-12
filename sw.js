@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 11 Aug 2026 v239
+ * CAP-3 - training intent (improve/maintain/recover) tilts selection, and all
+ * six loaded carries are now reachable (nothing selected them before).
+ *
  * 11 Aug 2026 v238
  * Empty-session guard (exiting a session you never started no longer saves it)
  * and CAP-1, a four-question capability screen measuring what a person can do
@@ -1039,7 +1043,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v248";
+const CACHE_NAME = "alongside-v249";
 
 const SHELL_URLS = [
 
