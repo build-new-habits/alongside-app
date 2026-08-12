@@ -1,5 +1,30 @@
 /**
  * data/empathy-transfer.js - Empathy Transfer Prompt Pool
+ * 12 Aug 2026 v3
+ *
+ * v3 - EMP-2. The two gaps v2 raised are closed, and BOTH turned out to
+ *   be code, not content. v2 called them "content gaps needing Graeme".
+ *   That was wrong, and this note corrects it.
+ *
+ *   GAP 1 -- "the coach made visible adjustments" is now evaluable.
+ *   session-builder.js v23 writes session.rationale.adjusted, on two
+ *   triggers that both mean the person could SEE it: something was left
+ *   out and explained, or a condition was flagged at 4+ (which
+ *   constrains selection and makes progressionInvitation name the sore
+ *   area). Silent adaptation deliberately does not count -- a prompt
+ *   about noticing someone else should follow a moment the person
+ *   actually witnessed, or it praises them for something invisible.
+ *
+ *   GAP 2 -- stage 5 needed no new prompt at all. Every stage header
+ *   below carries a session range ("Sessions 1-12", "12-30", "30-55",
+ *   "55-85", "85+") and nothing ever read them: stage advance counted
+ *   FIRINGS only, so the two mechanisms drifted. Simulation showed
+ *   stages 2-4 arriving late against their own ranges (harmless) and
+ *   stage 5 arriving at ~77 against a documented 85 -- the entire bug,
+ *   since all four stage 5 prompts gate at 85+. STAGE_SESSION_FLOOR now
+ *   enforces the ranges this file already declared. Re-simulated: stage
+ *   5 entered at session 89, zero fallbacks across a 160-session arc.
+ *
  * 12 Aug 2026 v2
  *
  * v2 - EMP-1. Condition-aware selection. Each prompt is now an object
@@ -28,7 +53,9 @@
  *   session. Graeme's decision, 12 Aug: today's answers lead, check-in
  *   energy second.
  *
- *   NOTE 2 -- one condition genuinely cannot be evaluated. Stage 2
+ *   NOTE 2 -- SUPERSEDED BY v3, which made this condition evaluable via
+ *   the coachAdjusted tag. Retained so the reasoning trail survives.
+ *   As written at v2: one condition genuinely cannot be evaluated. Stage 2
  *   Prompt B's trigger is "after a session where the coach made visible
  *   adjustments (noted in the rationale card)". session-rationale.js
  *   writes nothing to store, so nothing records that an adjustment
@@ -41,11 +68,14 @@
  *   The spec author built an always-valid option into every pool, which
  *   is strong evidence fit-first-with-fallback was the intended mechanic
  *   from the start. Stage 5 is the exception and has no catch-all: its
- *   four prompts gate at 85+, 90+, 95+ and 100+ sessions, but stage 5 is
- *   reached at roughly session 75. Someone can enter stage 5 with no
- *   qualifying prompt for about ten sessions. Handled by falling back to
- *   the nearest-threshold prompt, and flagged as a content gap in the
- *   master schedule -- it is a spec hole, not a code one.
+ *   four prompts gate at 85+, 90+, 95+ and 100+ sessions.
+ *
+ *   SUPERSEDED BY v3: v2 concluded this was a spec hole needing new
+ *   content. It was a staging bug. Stage 5 was being entered around
+ *   session 77 against its own documented range of 85+; with
+ *   STAGE_SESSION_FLOOR enforced, all four prompts qualify on entry and
+ *   the nearest-threshold fallback below never fires in practice. It is
+ *   kept as a genuine safety net rather than a workaround.
  *
  *   NOTE 4 -- P4 applies here too. The prompt should fit the day without
  *   announcing that it noticed. If the coach visibly softens when you
@@ -137,8 +167,7 @@ export const EMPATHY_PROMPTS = {
     {
       text: "The coach adjusts based on what's actually going on for you — not what should be going on, not what was planned. Is there someone in your life you could do that for today? Not a big gesture. Just noticing where they actually are.",
       requires: [],
-      prefers:  [],
-      note:     "TRUE CONDITION UNAVAILABLE - see file header, EMP-1 note 2"
+      prefers:  ["coachAdjusted"]
     },
     // Prompt C — when: after a quiet session, a rest day, or a session where the user modified significantly
     {
@@ -168,7 +197,7 @@ export const EMPATHY_PROMPTS = {
     {
       text: "That person who seemed like they weren't trying, or weren't listening, or just seemed difficult — they have a check-in score too. You just don't get to see it. If you did, you might train them differently.",
       requires: [],
-      prefers:  ["checkedInToday"]
+      prefers:  ["checkedInToday", "coachAdjusted"]
     },
     // Prompt C — when: after 35+ sessions, user well established in the practice
     {
@@ -284,6 +313,35 @@ export const MAX_RUN = 2;
 // near-equals share the rotation. Fit leads; it does not monopolise.
 export const TIE_TOLERANCE = 1;
 
+// EMP-2. The session at which each stage may first be entered, taken
+// verbatim from the stage headers below ("Sessions 1-12", "12-30",
+// "30-55", "55-85", "85+"). Those ranges were written into this file
+// from the start and nothing ever read them: stage advance counted
+// FIRINGS only, so the two mechanisms drifted apart.
+//
+// A 140-session simulation showed the drift is not uniform. Stages 2-4
+// arrive LATE against their own ranges (21 vs 12, 41 vs 30, 61 vs 55),
+// which is harmless. Stage 5 arrives EARLY -- around session 77 against
+// a documented 85 -- and that is the whole of the stage 5 bug: all four
+// of its prompts gate at 85+ or higher, because the stage was designed
+// to begin at 85. Somebody could sit in stage 5 for ten sessions with no
+// qualifying prompt.
+//
+// The floor only ever DELAYS entry, never accelerates it, so stages 2-4
+// are unaffected in practice -- they already arrive after their floor.
+// One change, and it corrects only the case that is broken. No new
+// prompt content required.
+export const STAGE_SESSION_FLOOR = { 1: 0, 2: 12, 3: 30, 4: 55, 5: 85 };
+
+/**
+ * May this person enter the next stage yet? Firing count is necessary
+ * but not sufficient -- the stage's own documented session range has to
+ * have been reached too.
+ */
+export function canEnterStage(stageNum, sessionCount) {
+  return sessionCount >= (STAGE_SESSION_FLOOR[stageNum] ?? 0);
+}
+
 /**
  * Does a single condition hold for this session?
  *
@@ -305,6 +363,7 @@ function conditionHolds(cond, ctx) {
     case "lowEnergy":           return ctx.lowEnergy === true;
     case "goodEnergy":          return ctx.lowEnergy === false && ctx.struggled === false;
     case "checkedInToday":      return ctx.checkedInToday === true;
+    case "coachAdjusted":       return ctx.coachAdjusted === true;   // EMP-2
 
     // Patterns across sessions.
     case "returning":           return ctx.returning === true;

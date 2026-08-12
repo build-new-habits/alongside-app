@@ -7,7 +7,8 @@
  * than grepping for strings.
  */
 import fs from "node:fs";
-import { EMPATHY_PROMPTS, selectEmpathyPrompt, MAX_RUN } from "../js/data/empathy-transfer.js";
+import { EMPATHY_PROMPTS, selectEmpathyPrompt, MAX_RUN,
+         STAGE_SESSION_FLOOR, canEnterStage } from "../js/data/empathy-transfer.js";
 
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
@@ -17,7 +18,7 @@ const ok = (c, m) => { if (!c) throw new Error(m); };
 const ctx = o => ({
   sessionCount: 10, struggled: false, lowEnergy: false, checkedInToday: true,
   returning: false, sustainedDifficulty: false, variablePattern: false,
-  adjusting: false, gentleSession: false, ...o,
+  adjusting: false, gentleSession: false, coachAdjusted: false, ...o,
 });
 const NONE = { stage: 0, index: -1, runLength: 0 };
 
@@ -36,7 +37,8 @@ check("every prompt has text, requires and prefers", () => {
 });
 check("no unknown condition tags (a typo must not silently disable a prompt)", () => {
   const known = new Set(["struggled","persisted","gentleSession","lowEnergy","goodEnergy",
-    "checkedInToday","returning","sustainedDifficulty","variablePattern","adjusting"]);
+    "checkedInToday","returning","sustainedDifficulty","variablePattern","adjusting",
+    "coachAdjusted"]);
   for (const [s, pool] of Object.entries(EMPATHY_PROMPTS))
     pool.forEach((p, i) => [...p.requires, ...p.prefers].forEach(c => {
       ok(c.startsWith("minSessions:") || known.has(c), `stage ${s}[${i}] unknown tag "${c}"`);
@@ -128,12 +130,35 @@ check("fit still overrides rotation", () => {
   }
 });
 
-console.log("\nTEST 7 - the unavailable condition is declared, not faked");
-check("stage 2 prompt B carries an explicit note about its missing signal", () => {
+console.log("\nTEST 7 - EMP-2, the two content gaps closed");
+check("stage 2 prompt B now states a real, evaluable condition", () => {
   const p = EMPATHY_PROMPTS[2][1];
-  ok(typeof p.note === "string" && /UNAVAILABLE/i.test(p.note),
-     "the coach-adjusted condition should be visibly unmatchable, not quietly dropped");
-  ok(p.requires.length === 0, "it must not require a condition that can never hold");
+  ok(p.prefers.includes("coachAdjusted"),
+     "its trigger should now be matchable, not a bare fallback");
+  ok(!p.note, "the UNAVAILABLE note should be gone now the signal exists");
+});
+check("coachAdjusted actually changes the stage 2 outcome", () => {
+  const on  = selectEmpathyPrompt(2, ctx({ coachAdjusted: true,  sessionCount: 25 }), NONE, 0);
+  ok(on.index === 1 || on.score > 0, "an adjusted session should favour prompt B");
+});
+check("stage floors match the stage headers in the same file", () => {
+  ok(STAGE_SESSION_FLOOR[5] === 85, "stage 5 header says Sessions 85+");
+  ok(STAGE_SESSION_FLOOR[4] === 55 && STAGE_SESSION_FLOOR[3] === 30 && STAGE_SESSION_FLOOR[2] === 12,
+     "floors should mirror the documented ranges");
+});
+check("stage 5 cannot be entered before session 85", () => {
+  ok(canEnterStage(5, 77) === false, "77 was the simulated real-world entry point");
+  ok(canEnterStage(5, 85) === true,  "85 must be allowed");
+});
+check("with the floor applied, stage 5 never falls back", () => {
+  for (let s = 85; s <= 140; s += 4) {
+    const r = selectEmpathyPrompt(5, ctx({ sessionCount: s }), NONE, 0);
+    ok(r.fellBack === false, `stage 5 still fell back at session ${s}`);
+  }
+});
+check("floors only delay, never accelerate", () => {
+  for (let st = 2; st <= 5; st++)
+    ok(canEnterStage(st, 1e6) === true, `stage ${st} unreachable at a huge session count`);
 });
 
 console.log("\nTEST 8 - reflect.js wiring");
