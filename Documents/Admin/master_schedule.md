@@ -8,13 +8,15 @@ Supersedes `master_schedule_12aug2026_v150.md`. Remove v150 on upload.
 
 ---
 
-## What happened since v149
+## What happened in the 12 Aug build session (recorded at v150)
 
 **One very long session. 62 commits, 43 files, ~12,900 lines added. `sw.js` v235 → v253, cache `alongside-v253` → `alongside-v263`. Exercise database 461 → 556.**
 
 v149's standing recommendation was *stop building, run the device pass*. That is not what happened, and the reason is worth recording honestly: Graeme opened the app, found the exercise cards had no guidance, and every subsequent finding came from following that thread. The session was driven by use, not by plan.
 
-**None of it is on-device confirmed. That gate is now very wide and is the single most important outstanding item in this document.**
+**On-device confirmation — corrected 12 Aug (v151).** Earlier versions of this document repeatedly said "none of it is on-device confirmed", which was wrong and unfair. Graeme has been testing throughout and sharing screenshots in other chats — the exercise-card guidance gap that drove this entire session came from him opening the app. The accurate claim is narrower: **these specific changes have not been confirmed against the persona paths they were built for.**
+
+**The agreed sequence is Graeme's, and it is deliberate:** trace it clean through code first, fix, re-trace, and only then verify on screen. His reasoning — using the product himself mid-build pulls the work onto tangents and away from the thing being fixed. Claude should not push for a device pass ahead of that sequence.
 
 ### The pattern that ran through the whole day
 
@@ -50,6 +52,24 @@ The same defect appeared **eight times in eight different costumes**: content th
 ---
 
 ---
+
+---
+
+## 🔬 Persona tracing — status at v151
+
+| Pass | Date | Outcome |
+|---|---|---|
+| First | 11 Aug | PT-1 to PT-10. Three deliverables in `Admin/` |
+| Second | 11 Aug | PT-11 (fourth private exercise pool), PT-12 (reader-without-writer sweep) |
+| Third | 12 Aug | C1–C4 + A1–A3. **All shipped.** Report in `outputs`, not yet filed to `Admin/` |
+
+**Owed to Graeme, explicitly requested:** the third pass produced only the technical punch list. **The next trace must produce the full three-document set** — technical, plain-language, and above all the **narrative**: what these people would actually say, what they liked, what they never touched, what they would tell a friend. That narrative is the deliverable Graeme values most and it was missed.
+
+**Also never traced: `reflect.js`.** Three passes walked past the post-session reflection, which is where the empathy transfer fires — the thing Graeme considers the heart of the product. A session does not end at the last exercise; it ends at reflection. **Trace it next time.**
+
+**Wave 2 candidate on evidence:** persona 2.5 (post-cardiac, total beginner). The blank-slate persona surfaced every critical first, so "least data given to the app" is the confirmed selection criterion.
+
+**Fixture note:** the Node harness and persona fixtures are reusable but were built pre-capability-screen. They need `capability{}` added before the next run.
 
 ## 🎯 THE TIER BOUNDARY — decided 12 Aug 2026
 
