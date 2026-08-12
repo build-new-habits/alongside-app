@@ -1,6 +1,9 @@
 /**
  * js/session-log.js
- * 12 Aug 2026 v1
+ * 12 Aug 2026 v2
+ *
+ * v2 - LOG-2. A "gentle" mode restricting fields to duration and a note,
+ *   and yoga-session.js wired to it. See performanceFields().
  *
  * Session notes: what you did on an exercise, so you are not guessing at
  * it next time.
@@ -44,9 +47,10 @@
  * their own field set (a walk produces distance and minutes, a swim
  * produces lengths) and are a separate, smaller job.
  *
- * yoga-session.js is an open question rather than a no: a duration note
- * is harmless, but yoga is the one place the product most explicitly is
- * not about performance. Left alone pending a decision.
+ * yoga-session.js RESOLVED 12 Aug: yes, but note-and-duration only
+ * (mode: "gentle"). A pose is not a set; counting reps there would import
+ * the exact frame the practice exists outside of. What is worth writing
+ * down is how long you held it and what you noticed.
  *
  * P4 THROUGHOUT. Nothing here computes, compares or narrates. The last
  * line is flat -- "Last: 60 kg / 8 reps" -- with no verb, no delta, no
@@ -71,7 +75,22 @@ function esc(str) {
  * "Weight" against a plank is why a person came back next week with
  * nothing written down.
  */
-export function performanceFields(exercise) {
+export function performanceFields(exercise, mode) {
+  // LOG-2. Yoga takes note-and-duration only -- Graeme, 12 Aug: "yes, but
+  // note-and-duration only, no reps, no level."
+  //
+  // A pose is not a set. Counting reps in yoga would import the exact
+  // frame the practice exists outside of, and a resistance level is
+  // meaningless there. What IS worth writing down is how long you held it
+  // and what you noticed -- "wobbled on tree pose, right side stiff" is
+  // genuinely useful next week in a way that a number is not.
+  if (mode === "gentle") {
+    return [
+      { key: "durationMins", label: "Minutes", type: "number", step: "0.5"  },
+      { key: "note",         label: "Note",    type: "text",   maxlength: "40" }
+    ];
+  }
+
   const eq = exercise?.equipment || [];
   const has = (...ids) => ids.some(id => eq.includes(id));
 
@@ -145,12 +164,15 @@ export function lastLine(exercise) {
  * @param {Object} exercise
  * @param {string} [idPrefix] unique per call site, so two blocks on one
  *   page cannot collide on element ids.
+ * @param {string} [mode] "gentle" restricts the fields to duration and a
+ *   note. Used by yoga, where reps and levels would import the wrong
+ *   frame entirely.
  */
-export function renderLogBlock(exercise, idPrefix = "slog") {
+export function renderLogBlock(exercise, idPrefix = "slog", mode) {
   if (store.get("liftLogEnabled") !== true) return "";
   if (!exercise?.id) return "";
 
-  const fields = performanceFields(exercise);
+  const fields = performanceFields(exercise, mode);
 
   // The invitation sits with the note, because this is the moment the
   // person is deciding what to use. Invitational, never a number, and it

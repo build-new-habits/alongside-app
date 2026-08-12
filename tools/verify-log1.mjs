@@ -60,6 +60,19 @@ for (const f of ["js/views/breathing-session.js", "js/views/quiet-session.js"])
     ok(!/renderLogBlock/.test(read(f)),
        "restoration screens exist to stop measuring; a metrics box contradicts the product"));
 
+console.log("\nTEST 3b - LOG-2, yoga takes gentle mode only");
+const yoga = read("js/views/yoga-session.js");
+check("yoga renders the block in gentle mode", () =>
+  ok(/renderLogBlock\(pose, `ys-log-\$\{currentIndex\}`, "gentle"\)/.test(yoga),
+     "yoga must pass gentle, or it inherits reps and levels"));
+check("gentle mode offers duration and note ONLY", () => {
+  const m = shared.match(/if \(mode === "gentle"\) \{[\s\S]*?\n  \}/);
+  ok(m, "gentle branch not found");
+  ok(/durationMins/.test(m[0]) && /note/.test(m[0]), "should offer duration and note");
+  for (const bad of ["reps", "level", "weight", "incline", "speed", "distance", "tension"])
+    ok(!new RegExp(`key: "${bad}"`).test(m[0]), `gentle mode must not offer ${bad}`);
+});
+
 console.log("\nTEST 4 - the setting describes what it actually does");
 check("panel is no longer called 'Weight notes'", () =>
   ok(!/>Weight notes</.test(set), "nine metrics behind a weight-only label"));
