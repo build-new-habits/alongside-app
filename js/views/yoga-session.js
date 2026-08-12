@@ -1,6 +1,13 @@
 /**
  * yoga-session.js - Guided Yoga and Pilates Session
- * 12 Aug 2026 v4
+ * 12 Aug 2026 v5
+ *
+ * v5 - P5 / YOGA-1. Pose contraindications and watchOut now resolve from
+ *   the exercise database instead of this file's own copy. 16 of 19 poses
+ *   had diverged, always toward being LESS cautious -- Downward Dog listed
+ *   knee and hip while the database says shoulder, wrist/elbow and
+ *   hamstring, and Pilates Hundred listed none at all. Sequence timing and
+ *   cues stay here, because they belong to the sequence.
  *
  * v4 - GM-1. Grounding moments on the pose card. Yoga is the natural
  *   home for these: it is already the frame, and a pose held still is
@@ -135,6 +142,7 @@
  */
 
 import { store } from "../store.js";
+import { EXERCISES } from "../data/exercises/index.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
@@ -145,6 +153,52 @@ export const centered = false;
 let phase         = "focus";    // "focus" | "duration" | "overview" | "session" | "rest" | "done"
 let selectedFocus = null;
 let selectedMins  = null;
+// ── P5 / YOGA-1, 12 Aug 2026 ───────────────────────────────────────────────
+//
+// The pose sequences below carry TIMING and SEQUENCE COACHING -- holdSeconds,
+// rest, and cues written for this flow. That is legitimately this view's
+// content: the same pose is held 90 seconds in one sequence and 120 in
+// another, and that belongs with the sequence.
+//
+// What is NOT this view's content is the pose's identity and its SAFETY
+// data, and until now this file carried its own copy of both. They had
+// diverged badly, always in the direction of being less cautious:
+//
+//   Downward Dog   inline: knee, hip
+//                      DB: shoulder, wrist/elbow, hamstring
+//   Pilates Hundred inline: none at all
+//                      DB: abdominals, lower back
+//   Warrior 3      inline: ankle/foot, knee
+//                      DB: ankle/foot, glutes, hamstring, lower back
+//
+// 16 of 19 poses disagreed. Somebody with an acute wrist injury was being
+// offered a full weight-bearing wrist pose, because a fix applied to the
+// exercise database never reached this file. And watchOut -- present on
+// 19 of 19 in the database since CON-3's Exercise Entry Standard -- reached
+// none of them.
+//
+// This is exactly the defect P5 exists to prevent, except here it costs
+// safety rather than rework. Contraindications and watchOut now resolve
+// from the database at render time, so the database stays the single
+// source and a future fix reaches here automatically.
+const _POSE_DB = new Map(EXERCISES.map(e => [e.id, e]));
+
+/**
+ * Merge a sequence entry with its database record. Sequence timing and
+ * cues win; contraindications and watchOut ALWAYS come from the database,
+ * never from the sequence, so they cannot silently narrow again.
+ */
+function resolvePose(entry) {
+  const db = _POSE_DB.get(entry.id);
+  if (!db) return entry;                    // unknown id: render what we have
+  return {
+    ...entry,
+    contraindications: db.contraindications || [],
+    watchOut:          db.watchOut || null,
+    affectsAreas:      db.affectsAreas || [],
+  };
+}
+
 let sessionQueue  = [];
 let currentIndex  = 0;
 let timerInterval = null;
@@ -380,7 +434,13 @@ function buildSession(focusId, durationMins) {
     if (pain >= 7) activeConditions.add(`${id}-acute`);
   });
 
-  const safe = pool.filter(ex => {
+  // P5 / YOGA-1. Resolve against the database BEFORE filtering, or the
+  // filter runs on this file's stale copy of the contraindications --
+  // which is how somebody with an acute wrist injury was being offered
+  // Downward Dog. See resolvePose() and the note above it.
+  const resolved = pool.map(resolvePose);
+
+  const safe = resolved.filter(ex => {
     const contra = ex.contraindications || [];
     return !contra.some(c => activeConditions.has(c));
   });
@@ -594,6 +654,14 @@ function renderPose() {
           <ul class="exercise-cues" aria-label="Coaching cues">
             ${pose.cues.map(cue => `<li>${cue}</li>`).join("")}
           </ul>
+        ` : ""}
+
+        <!-- YOGA-1. watchOut exists on 19 of 19 of these poses in the
+             database, from CON-3's Exercise Entry Standard, and reached
+             none of them here because this file carried its own copy of
+             the pose. Same treatment as every other session view. -->
+        ${pose.watchOut ? `
+          <p class="exercise-watchout" role="note">${pose.watchOut}</p>
         ` : ""}
 
         <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(pose.youtube || (pose.name + " yoga pose tutorial"))}"

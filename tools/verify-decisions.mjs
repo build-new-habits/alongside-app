@@ -116,13 +116,43 @@ check("No view defines its own exercise pool", "Locked Principles P5", () => {
   //
   // The real signal is an exercise-SHAPED object in a view: something
   // carrying equipment or movementPattern, which is what selection reads.
+  // BLIND SPOT CLOSED 12 Aug 2026. The first version matched on
+  // `equipment:` plus `movementPattern:`, which is what a strength entry
+  // looks like. Yoga poses carry holdSeconds and rest instead, so
+  // yoga-session.js's 30 inline pose entries -- a private pool of exactly
+  // the kind P5 exists to forbid -- walked straight through the check
+  // written that morning to catch them.
+  //
+  // Now matches on the WEAKEST shared signal instead: an object literal
+  // carrying both an `id` and a `name`. That is what every selectable
+  // thing in this product has, whatever else it does or does not carry.
+  // Budgets, each justified. A budget without a reason is a hole.
+  const ALLOW = {
+    // LOG-4's synthetic logging subject: { id: "activity-walk", name: "Walk" }.
+    // Not an exercise and not selectable -- these views log against the
+    // ACTIVITY because there is no exercise object in a walk.
+    "walk-session.js": 2, "running-session.js": 2,
+    "cycle-session.js": 2, "swim-session.js": 2,
+    // Breathing PATTERNS (box, 4-7-8, physiological sigh) with coachIntro
+    // and phase timings, plus short mindful practices. Session structure,
+    // not database exercises. Tracked as QUIET-1 for a proper look.
+    "quiet-session.js": 21,
+    // Pose SEQUENCES: timing and sequence-specific cues, which legitimately
+    // belong to the sequence. Their contraindications and watchOut resolve
+    // from the database at build time (YOGA-1, yoga-session.js v5) and
+    // tools/verify-yoga1.mjs asserts that resolution happens BEFORE the
+    // safety filter runs.
+    "yoga-session.js": 60,
+  };
   for (const f of fs.readdirSync("js/views").filter(x => x.endsWith(".js"))) {
     const s = read(`js/views/${f}`);
-    const arrays = s.match(/const [A-Z_]+\s*=\s*\[[\s\S]{0,4000}?\n\];/g) || [];
-    for (const a of arrays)
-      ok(!(/equipment:\s*\[/.test(a) && /movementPattern:/.test(a)),
-         `js/views/${f} defines an exercise-shaped pool \u2014 the private pool in ` +
-         `session-builder.js cost three separate double-fixes`);
+    const inline = (s.match(/\{\s*id:\s*["'][a-z0-9-]+["'],\s*\n?\s*name:/g) || []).length
+                 + (s.match(/\{ id: ["'][a-z0-9-]+["'],\s+name:/g) || []).length;
+    const budget = ALLOW[f] ?? 0;
+    ok(inline <= budget,
+       `js/views/${f} defines ${inline} inline exercise entries \u2014 views render, ` +
+       `js/data/exercises/ is the only source. The private pool in ` +
+       `session-builder.js cost three separate double-fixes.`);
   }
 });
 
