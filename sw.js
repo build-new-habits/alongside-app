@@ -1,6 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v267
+ * A11Y-1. css/base/variables.css v1 -> v2: --color-text-secondary and
+ * --color-text-muted lightened so both clear AA on --color-bg-elevated,
+ * the lightest surface in the palette. 56 rules set an elevated
+ * background and 15 put secondary or muted text on it, measuring 4.30
+ * and 3.91 against a 4.5 floor; --color-bg-hover is the same value, so
+ * every card hover state was affected too. Fixed at the token, not in 15
+ * places. css/components/checkin-conversation.css v8 -> v9: corrects the
+ * measurements in its own header, which the token change invalidated.
+ * New tools/contrast-check.mjs gates the whole matrix. Cache bump only.
+ *
  * 12 Aug 2026 v266
  * The two "logged, not fixed" items from DIC-1, actually fixed. Graeme
  * pushed back on the logging and was right: touch-once means a file
@@ -1147,7 +1158,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v266";
+const CACHE_NAME = "alongside-v267";
 
 const SHELL_URLS = [
 
