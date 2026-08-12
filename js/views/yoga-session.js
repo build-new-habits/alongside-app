@@ -828,6 +828,9 @@ function finaliseSession() {
     completedAt:  nowIso,
     status:       "completed",
     durationMins: elapsedMins(),
+    // CONT-3. Poses never became familiar, for the same reason as
+    // core-session: a count was logged, never the ids.
+    exerciseIds:  sessionQueue.slice(0, currentIndex).map(p => p.id).filter(Boolean),
     creditsEarned
   });
 
