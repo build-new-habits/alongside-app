@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v168
+## 12 Aug 2026 v167
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v167.md`. Remove v167 on upload.
+Supersedes `master_schedule_12aug2026_v166.md`. Remove v166 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -317,51 +317,6 @@ Graeme's plank model included that mindful practice produces more muscle definit
 3. How often? Every session is too often; these depend on being slightly unexpected.
 4. Free tier confirmed?
 5. The attentional-focus claim — Philosophy, or nowhere?
-
----
-
-## 🔴 DATA-1 — DO NOT DO THIS. The entry below is wrong.
-
-**`sw.js` v282, cache alongside-v282.**
-
-The DATA-1 entry describes `contentType` as *"written on 368 of 556 entries, read by nothing anywhere"* and calls retirement *"a clean standalone task."*
-
-**It is read in two live, load-bearing places:**
-
-| Reader | Effect |
-|---|---|
-| `session-builder.js:973` | `if (ex.contentType === "practice") return false;` — **excludes 140 standalone practices from component selection** |
-| `session-categories.js:96` | `ex.contentType === "activation"` — drives the activation category |
-
-**Retiring the field would make 20-minute rows and 30-minute yin yoga sequences selectable as one of five warm-up items.**
-
-The entry was **true when written** and was invalidated by **CON-6**, which moved practices into the shared database — after which `session-builder.js` had to start reading `contentType` to keep them out. Nobody updated the entry.
-
-**Lesson, and it is the same one as In Step's tier:** a schedule entry is a snapshot, not a standing fact. Any entry describing a field as dead must be re-verified against live code before acting on it, because the thing that makes a field dead is exactly the thing a later session might change.
-
-**Status: closed as WILL-NOT-DO.** If `contentType` ever genuinely needs retiring, the two readers must be replaced first, and that is a design job on session selection, not a data cleanup.
-
----
-
-## 🟢 DISP-3 — the app's own 13px floor, now enforced
-
-**19 declarations sat below the minimum `variables.css` states in its own comment**: *"minimum xs 13px for readability on health app."* They ran at 9px, 10px, 11px and 0.6rem — feel-scale labels, badges, day names, session durations. **All readable content, none decorative.**
-
-Concentrated in `global.css` (6), `morning-session.css` (5), `settings-library.css` (3), `weekly-plan-v2.css` (3), plus `workout.css` and `tier-gating.css`. Raised to `var(--text-xs)`.
-
-**Same family as everything else today** — a standard declared and not enforced — so it is gated. `verify-disp1.mjs` now fails if anything drops below 13px again, quoting the file's own sentence back.
-
-⚠️ **Needs a device look:** several were badges in tight absolutely-positioned corners. 9px → 13px is a real size jump and layout should be eyeballed alongside A11Y-3.
-
-## 🟢 LOG-4 — walk, run, cycle, swim
-
-Distance (lengths for swim) plus a note, rendered **once on the completion screen** rather than on a card, because these are one continuous activity and not a sequence of exercises.
-
-**Duration deliberately omitted.** All four already run a live clock and write `durationMins` themselves. Asking somebody to type a number the app already knows is what makes an app feel like paperwork.
-
-A **stable synthetic id** per activity (`activity-walk`, `activity-run`…) means *"last time you walked"* is a real comparable note rather than one orphaned entry per session.
-
-**The gate asserts the block sits BEFORE the action buttons.** The first attempt inserted it underneath them, where nobody would ever fill it in — caught by reading the output rather than by the syntax check, which passed.
 
 ---
 
@@ -1775,4 +1730,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v168*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v167*
