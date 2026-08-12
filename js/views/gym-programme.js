@@ -1,5 +1,15 @@
 /**
  * gym-programme.js
+ * 12 Aug 2026 v4
+ *
+ * v4 - LOG-1. The note block (_performanceFields, _lastLine,
+ *   renderLiftBlock, attachLiftEvents) moved out to js/session-log.js.
+ *   It lived here and nowhere else, so of eleven session views exactly
+ *   one offered it -- which is why a nine-metric log read as a
+ *   gym-weights feature. No behaviour change in this view; the same
+ *   markup and the same logic, reached through an import. P5's shape: a
+ *   view should not own something several views need.
+ *
  * 11 Aug 2026 v12
  *
  * v12 - Progression invitation on the card, beside the note. Graeme:
@@ -68,7 +78,7 @@
  *   knowing what to set the machine to, not tracking progress. Governed by
  *   locked principle P4: the app may display load, the coach never
  *   interprets it. No delta, no arrow, no "best", no coach voice around the
- *   number. See the long note at renderLiftBlock() for why the asymmetry
+ *   number. See the long note at renderLogBlock() for why the asymmetry
  *   matters and what must not be added later.
  *
  * 11 Aug 2026 v5
@@ -222,7 +232,10 @@
  */
 
 import { store }                    from '../store.js';
-import { progressionInvitation } from '../data/session-rationale.js';
+// EMP/LOG-1: the note block moved to js/session-log.js so workout.js can
+// reach it too. progressionInvitation is still used by the block, but it
+// is imported there now, not here.
+import { renderLogBlock, attachLogEvents } from '../session-log.js';
 import { getProgramme }             from '../data/programmes.js';
 import {
   getProgressStats,
@@ -657,134 +670,13 @@ export function GymProgrammeView(router) {
    * Derived from equipment and movement rather than stored per entry, so
    * it needs no schema change and no re-tagging of 518 exercises.
    */
-  function _performanceFields(exercise) {
-    const eq = exercise.equipment || [];
-    const has = (...ids) => ids.some(id => eq.includes(id));
-
-    if (has('treadmill')) {
-      return [
-        { key: 'speed',        label: 'Speed',    type: 'number', step: '0.1' },
-        { key: 'incline',      label: 'Incline %', type: 'number', step: '0.5' },
-        { key: 'durationMins', label: 'Minutes',  type: 'number', step: '1'   }
-      ];
-    }
-    if (has('exercise-bike', 'elliptical', 'stair-climber', 'rowing-machine',
-            'ski-erg', 'bicycle')) {
-      return [
-        { key: 'level',        label: 'Level',   type: 'number', step: '1' },
-        { key: 'durationMins', label: 'Minutes', type: 'number', step: '1' },
-        { key: 'distance',     label: 'Distance', type: 'number', step: '0.1' }
-      ];
-    }
-    if (has('resistance-band')) {
-      return [
-        { key: 'tension', label: 'Band',  type: 'text',   maxlength: '30' },
-        { key: 'reps',    label: 'Reps',  type: 'number', step: '1' }
-      ];
-    }
-    if (has('dumbbell', 'kettlebell', 'barbell', 'medicine-ball',
-            'cable-machine', 'leg-press-machine', 'leg-curl-machine',
-            'chest-press-machine', 'gym-membership')) {
-      const unit = store.get('weightUnit') || 'kg';
-      return [
-        { key: 'weight', label: `Weight (${unit})`, type: 'number', step: '0.5' },
-        { key: 'reps',   label: 'Reps',             type: 'number', step: '1'   }
-      ];
-    }
-    // Bodyweight. A hold gets a duration, everything else gets reps.
-    if (exercise.duration || /hold|plank|isometric/i.test(exercise.name)) {
-      return [
-        { key: 'durationMins', label: 'Minutes', type: 'number', step: '0.5' },
-        { key: 'note',         label: 'Note',    type: 'text',   maxlength: '40' }
-      ];
-    }
-    return [
-      { key: 'reps', label: 'Reps', type: 'number', step: '1' },
-      { key: 'note', label: 'Note', type: 'text',   maxlength: '40' }
-    ];
-  }
 
   /**
    * The flat reference line. No verb, no framing, no comparison, no
    * delta -- a note the person left themselves, per Locked Principle P4.
    */
-  function _lastLine(exercise) {
-    const last = store.lastLift(exercise.id);
-    if (!last) return '<p class="gp-lift__last gp-lift__last--empty">No note yet for this one.</p>';
-    const bits = [];
-    if (last.weight       !== undefined) bits.push(`${last.weight} ${_esc(last.unit || 'kg')}`);
-    if (last.reps         !== undefined) bits.push(`${last.reps} reps`);
-    if (last.speed        !== undefined) bits.push(`speed ${last.speed}`);
-    if (last.incline      !== undefined) bits.push(`${last.incline}% incline`);
-    if (last.level        !== undefined) bits.push(`level ${last.level}`);
-    if (last.distance     !== undefined) bits.push(`${last.distance} distance`);
-    if (last.durationMins !== undefined) bits.push(`${last.durationMins} min`);
-    if (last.tension      !== undefined) bits.push(_esc(last.tension));
-    if (last.note         !== undefined) bits.push(_esc(last.note));
-    return `<p class="gp-lift__last">Last: ${bits.join(' \u00B7 ')}</p>`;
-  }
 
-  function renderLiftBlock(exercise) {
-    if (store.get('liftLogEnabled') !== true) return '';
-    if (!exercise?.id) return '';
 
-    const fields = _performanceFields(exercise);
-
-    // The invitation sits with the note, because this is the moment the
-    // person is deciding what to use. Invitational, never a number, and
-    // it reads the day -- a flare invites less, a low-energy day invites
-    // the same, and only a settled day invites more. See
-    // progressionInvitation() for the reasoning in full.
-    const invite = progressionInvitation(exercise);
-
-    return `
-      <div class="gp-lift card" role="group" aria-label="Your notes for ${_esc(exercise.name)}">
-        ${_lastLine(exercise)}
-        ${invite ? `<p class="gp-lift__invite">${_esc(invite)}</p>` : ''}
-        <div class="gp-lift__row">
-          ${fields.map(f => `
-            <label class="gp-lift__label" for="gp-perf-${f.key}">${f.label}</label>
-            <input class="gp-lift__input" id="gp-perf-${f.key}"
-                   type="${f.type}"
-                   inputmode="${f.type === 'number' ? 'decimal' : 'text'}"
-                   ${f.step ? `min="0" step="${f.step}"` : ''}
-                   ${f.maxlength ? `maxlength="${f.maxlength}"` : ''}
-                   autocomplete="off"
-                   data-perf-key="${f.key}">
-          `).join('')}
-          <button class="btn btn-secondary gp-lift__save" id="gp-lift-save"
-                  aria-label="Save these as a note for next time">Save</button>
-        </div>
-        <p class="gp-lift__status" id="gp-lift-status" role="status" aria-live="polite"></p>
-      </div>
-    `;
-  }
-
-  function attachLiftEvents(exercise) {
-    const saveBtn = document.getElementById('gp-lift-save');
-    if (!saveBtn || !exercise?.id) return;
-    saveBtn.addEventListener('click', () => {
-      const status = document.getElementById('gp-lift-status');
-      const entry  = {};
-      document.querySelectorAll('[data-perf-key]').forEach(input => {
-        const key = input.getAttribute('data-perf-key');
-        const raw = input.value;
-        if (raw === '' || raw === null) return;
-        entry[key] = input.type === 'number' ? parseFloat(raw) : raw;
-      });
-
-      const saved = store.logLift(exercise.id, entry);
-      if (!saved) {
-        // Nothing entered. Not an error and not framed as one -- every
-        // field is optional and skipping this is a legitimate choice.
-        if (status) status.textContent = 'Add something first, or carry on without.';
-        return;
-      }
-      // Neutral confirmation. States that it saved; says nothing about
-      // the numbers themselves (P4).
-      if (status) status.textContent = 'Noted.';
-    });
-  }
 
   function renderCurrentExercise(container, session, stats, sessionType) {
     const exercise    = session.exercises[currentExerciseIndex];
@@ -856,7 +748,7 @@ export function GymProgrammeView(router) {
             </div>
           ` : ''}
 
-          ${renderLiftBlock(exercise)}
+          ${renderLogBlock(exercise)}
 
           <!-- Guidance — instructions / coaching / why, same structure and
                same real fields as prescribed-session.js/workout.js. -->
@@ -977,7 +869,7 @@ export function GymProgrammeView(router) {
       renderCurrentExercise(container, session, stats, sessionType);
     });
 
-    attachLiftEvents(exercise);
+    attachLogEvents(exercise);
 
     // Not a fan — toggles and re-renders so the label updates in place.
     document.querySelector('[data-notafan]')?.addEventListener('click', (e) => {
