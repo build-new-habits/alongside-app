@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v273
+ * C1 copy corrected. v272 rendered Graeme's supporting sentence as the
+ * question itself; he meant the question as the heading with that
+ * sentence beneath. views/onboarding/lifestyle.js v4 -> v5,
+ * css/layouts/onboarding-additions.css gains .lifestyle-group__sub.
+ * The question copy is now defined once and shared by both render sites
+ * rather than duplicated. Cache bump only.
+ *
  * 12 Aug 2026 v272
  * C1 second half. The conditional leg question is built and live -- the
  * last outstanding half of the safety fix that has been held since 12 Aug
@@ -1248,7 +1256,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v272";
+const CACHE_NAME = "alongside-v273";
 
 const SHELL_URLS = [
 
