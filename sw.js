@@ -1,6 +1,34 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v279
+ * SCHEME-1. Colour scheme control: dark (default), light, high contrast.
+ *
+ * Dark remains the product and the design intent -- Graeme, 12 Aug: "I
+ * must insist on dark mode default with the potential for adaptations by
+ * the user." Light and high contrast are adaptations somebody chooses,
+ * and nothing changes for anyone who does not.
+ *
+ * Logic from the DPC Hub settings file he supplied; none of its values,
+ * because that product is light-by-default and this one is not -- its
+ * "dark theme" is this app's normal state.
+ *
+ * Light exists because light-on-dark smears for people with astigmatism
+ * and light sensitivity runs both ways. For an audience of neurodivergent
+ * adults, people navigating hormonal change, and people with chronic
+ * conditions, display mode is functional rather than cosmetic.
+ *
+ * High contrast was previously reachable ONLY via
+ * @media (prefers-contrast: high) -- i.e. only if somebody had already
+ * found their OS setting. That query is kept; the scheme makes it
+ * choosable.
+ *
+ * variables.css v3 -> v4, display-prefs.js v1 -> v2, settings.js v18 ->
+ * v19, display-preferences.css v1 -> v2, index.html pre-paint script
+ * extended. tools/contrast-check.mjs v1 -> v2 now runs the full matrix
+ * against ALL THREE schemes -- every pairing measured, worst 4.68:1.
+ * Cache bump only, no new files.
+ *
  * 12 Aug 2026 v278
  * DOOR-1, and a stale-code correction that matters more than the feature.
  *
@@ -1328,7 +1356,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v278";
+const CACHE_NAME = "alongside-v279";
 
 const SHELL_URLS = [
 
