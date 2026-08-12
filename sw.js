@@ -1,6 +1,18 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v276
+ * GM-1. Grounding moments. New js/data/grounding-moments.js and
+ * css/components/grounding-moments.css, both precached. store.js v33 ->
+ * v34 and Schema.md v1.28 -> v1.29 add the `grounding` field.
+ * workout.js v11 -> v12 renders them. main.css v17 -> v18.
+ *
+ * Twenty moments across seven movement families, matched from fields
+ * every exercise already carries rather than a new field on 550+ entries.
+ * No research cited anywhere in the feature, per Graeme 12 Aug: claim,
+ * why, and what to look out for -- the product does not argue from
+ * papers. Nothing promises an outcome.
+ *
  * 12 Aug 2026 v275
  * LOG-2. Session notes on yoga poses, in "gentle" mode -- duration and a
  * free note only, no reps and no level. Graeme, 12 Aug: a pose is not a
@@ -1286,7 +1298,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v275";
+const CACHE_NAME = "alongside-v276";
 
 const SHELL_URLS = [
 
@@ -1320,6 +1332,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/checkin-conversation.css",
   "/alongside-app/css/components/display-preferences.css",
   "/alongside-app/css/components/session-log.css",
+  "/alongside-app/css/components/grounding-moments.css",
 
   // CSS completeness, same pass. main.css @imports these, and an @import
   // from a cached stylesheet is still its own network request.
@@ -1462,6 +1475,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/programmeEngine.js",
   "/alongside-app/js/data/programmes.js",
   "/alongside-app/js/data/signal-words.js",
+  "/alongside-app/js/data/grounding-moments.js",
   "/alongside-app/js/data/feelings.js",
   "/alongside-app/js/data/coach-voice.js",
 
