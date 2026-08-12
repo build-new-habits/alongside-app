@@ -1,6 +1,10 @@
 /**
  * store.js - Data persistence layer
- * 11 Aug 2026 v25
+ * 11 Aug 2026 v26
+ *
+ * 11 Aug 2026 v26 - CAP-3. New trainingIntent field
+ *   ('improve' | 'maintain' | 'recover'). Intent, never trajectory --
+ *   the app may observe direction, it must never narrate it.
  *
  * 11 Aug 2026 v25 - CAP-1. New capability{} field and
  *   capabilityProfile(), answering "if we are not age restricting, how
@@ -528,6 +532,10 @@ export const store = {
         ? saved.sessionVariety
         : 'balanced',
 
+      trainingIntent: ['improve', 'maintain', 'recover'].includes(saved.trainingIntent)
+        ? saved.trainingIntent
+        : 'improve',
+
       capability: (saved.capability && typeof saved.capability === 'object')
         ? { ...defaults.capability, ...saved.capability }
         : { ...defaults.capability },
@@ -799,6 +807,45 @@ export const store = {
       // null means not yet asked, and is treated as the cautious answer
       // everywhere, consistent with how untagged difficulty and unknown
       // activity level are handled.
+      // ── TRAINING INTENT (11 Aug 2026, CAP-3) ──────────────────────
+      //
+      // Graeme: the 36-year-old answering these four questions is
+      // probably on the way up; the 76-year-old might be too, or might
+      // be managing decline. How do we serve the difference?
+      //
+      // We do NOT ask about trajectory, and we do not announce it.
+      // exerciseHistory and repeat capability screens make the direction
+      // observable, but saying "you seem to be declining" is a verdict,
+      // breaches P4, and is exactly what would make somebody delete the
+      // app. Trajectory may change what is OFFERED. It never changes
+      // what is SAID.
+      //
+      // So the question is about intent, which is the person's own and
+      // is theirs to state:
+      //
+      //   'improve'  - get stronger and fitter than I am now
+      //   'maintain' - keep hold of what I have got
+      //   'recover'  - get back something I have lost
+      //
+      // All three are positively framed and functionally different.
+      // 'recover' matters most: it is how somebody in decline actually
+      // thinks about it -- as a goal, not a diagnosis -- and it is the
+      // same sentence a 36-year-old post-injury would choose, which is
+      // precisely why it works for both.
+      //
+      // CRITICALLY, 'maintain' is NOT a diluted 'improve'. What is lost
+      // first is specific and known: power before strength, balance
+      // early, grip strength (which predicts independence better than
+      // almost anything), and floor transfer (which decides whether
+      // somebody keeps living in their own home). Maintenance
+      // PRIORITISES those four rather than doing less of everything.
+      // See session-builder.js's INTENT_PRIORITY.
+      //
+      // Default 'improve' because that is what most people arriving at a
+      // fitness product want, and because assuming decline unasked would
+      // be its own kind of insult.
+      trainingIntent: 'improve',
+
       capability: {
         chairRise:    null,   // true | false | null
         floorAccess:  null,
