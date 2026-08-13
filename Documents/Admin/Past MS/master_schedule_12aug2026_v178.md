@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v179
+## 12 Aug 2026 v178
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v178.md`. Remove v178 on upload.
+Supersedes `master_schedule_12aug2026_v177.md`. Remove v177 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -354,24 +354,6 @@ Graeme's plank model included that mindful practice produces more muscle definit
 `verify-decisions.mjs`'s P5 check matched on `equipment` **plus** `movementPattern` — which is what a *strength* entry looks like. Yoga poses carry `holdSeconds` and `rest`, so **30 inline pose entries walked straight through the check written that morning to catch exactly this.**
 
 Now matches on `id` + `name`, the weakest signal every selectable thing in the product shares. **Each remaining budget is documented with its justification, because a budget without a reason is a hole.**
-
----
-
-## 🟢 QUIET-1 — breathing and mindfulness now become familiar. 12 Aug 2026.
-
-`js/views/quiet-session.js`. `sw.js` → **v292**, cache **alongside-v292**.
-
-**It logged no `exerciseIds` at all**, so no breathing pattern or mindfulness practice ever entered `exerciseHistory` — the same gap CONT-3 closed for core and yoga. *"Something like last time"* could never offer somebody the breathing pattern they actually use.
-
-**The cause was an id split.** This file uses short local ids — `box`, `478`, `sigh` — while the database uses `box-breathing`, `four-seven-eight-breathing`, `physiological-sigh`. Every one has a database equivalent; only the id differed.
-
-**Mapped rather than renamed**, because renaming the local ids would touch phase data, rendering and resume state for what is a logging fix. Unmapped practices log **no** id rather than a local one that matches nothing — a phantom history entry is worse than none.
-
-### Deliberately NOT migrated wholesale, and the scoping is the point
-
-It looked like YOGA-1 and is not. The breathing patterns **legitimately live in this view** — they are phase timings and coach intros, which the database does not hold. And unlike `yoga-session.js`, these carry **no contraindications and no `watchOut`**, so there is no safety divergence to fix.
-
-**Scoped to the actual bug rather than to the shape of the previous one.** Assuming the same fix because the symptom rhymes is how a two-hour job gets invented out of a ten-minute one.
 
 ---
 
@@ -2176,4 +2158,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v179*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v178*
