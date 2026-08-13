@@ -213,6 +213,30 @@ export function render() {
 // right after type selection. Defaults home, never sticky -- no memory of a
 // past answer, so it can never go stale. Feeds which of home/gymEquipment
 // the equipment step reads from.
+
+/**
+ * SB-META, 12 Aug 2026. Builds the small line under an exercise name.
+ *
+ * Every field was interpolated unguarded, so a missing one printed the
+ * literal word "undefined" -- "Fire Hydrant undefined sets 1.5 min
+ * undefined". On the session overview, which is the screen where
+ * somebody decides whether this coach knows what it is doing.
+ *
+ * Not every exercise has sets or a tempo: a timed hold has a duration and
+ * nothing else, and the database is honest about that. The rendering was
+ * not. Parts are collected and joined, so an exercise with only a
+ * duration shows only a duration.
+ */
+function _exerciseMeta(ex, opts = {}) {
+  const parts = [];
+  if (ex.sets) parts.push(`${ex.sets} set${ex.sets === 1 ? "" : "s"}`);
+  const amount = ex.reps || formatDuration(ex.duration);
+  if (amount) parts.push(amount);
+  if (ex.tempo) parts.push(ex.tempo);
+  if (opts.rest && ex.rest && ex.rest !== "0s") parts.push(`rest ${ex.rest}`);
+  return parts.join(" &nbsp; ");
+}
+
 function renderLocationStep() {
   const type = SESSION_TYPES.find(t => t.id === selectedType);
   return `
@@ -645,13 +669,13 @@ function renderPreview() {
 
         ${warmup.length > 0 ? `
           <p class="sb-section-label text-xs text-muted">Warm-up</p>
-          ${builtSession.rationale?.sections?.warmup ? `<p class="sb-section-why">${builtSession.rationale.sections.warmup}</p>` : ""}
+          ${builtSession.rationale?.sections?.warmup ? `<p class="sb-section-why coach-voice">${builtSession.rationale.sections.warmup}</p>` : ""}
           ${warmup.map(ex => `
             <div class="sb-exercise-item" role="listitem">
               <div class="sb-exercise-left">
                 <span class="sb-exercise-name">${ex.name}</span>
                 <span class="sb-exercise-meta text-xs text-muted">
-                  ${ex.sets} sets &nbsp; ${ex.reps || formatDuration(ex.duration)} &nbsp; ${ex.tempo}
+                  ${_exerciseMeta(ex)}
                 </span>
               </div>
             </div>
@@ -660,14 +684,13 @@ function renderPreview() {
 
         ${main.length > 0 ? `
           <p class="sb-section-label text-xs text-muted" style="margin-top: var(--space-3);">Main session</p>
-          ${builtSession.rationale?.sections?.main ? `<p class="sb-section-why">${builtSession.rationale.sections.main}</p>` : ""}
+          ${builtSession.rationale?.sections?.main ? `<p class="sb-section-why coach-voice">${builtSession.rationale.sections.main}</p>` : ""}
           ${main.map(ex => `
             <div class="sb-exercise-item" role="listitem">
               <div class="sb-exercise-left">
                 <span class="sb-exercise-name">${ex.name}</span>
                 <span class="sb-exercise-meta text-xs text-muted">
-                  ${ex.sets} sets &nbsp; ${ex.reps || formatDuration(ex.duration)} &nbsp; ${ex.tempo}
-                  ${ex.rest && ex.rest !== "0s" ? "&nbsp; rest " + ex.rest : ""}
+                  ${_exerciseMeta(ex, { rest: true })}
                 </span>
               </div>
             </div>
@@ -676,13 +699,13 @@ function renderPreview() {
 
         ${cooldown.length > 0 ? `
           <p class="sb-section-label text-xs text-muted" style="margin-top: var(--space-3);">Cool-down</p>
-          ${builtSession.rationale?.sections?.cooldown ? `<p class="sb-section-why">${builtSession.rationale.sections.cooldown}</p>` : ""}
+          ${builtSession.rationale?.sections?.cooldown ? `<p class="sb-section-why coach-voice">${builtSession.rationale.sections.cooldown}</p>` : ""}
           ${cooldown.map(ex => `
             <div class="sb-exercise-item" role="listitem">
               <div class="sb-exercise-left">
                 <span class="sb-exercise-name">${ex.name}</span>
                 <span class="sb-exercise-meta text-xs text-muted">
-                  ${ex.reps || formatDuration(ex.duration)} &nbsp; ${ex.tempo}
+                  ${_exerciseMeta(ex)}
                 </span>
               </div>
             </div>

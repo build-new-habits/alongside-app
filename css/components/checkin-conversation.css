@@ -145,7 +145,16 @@
      70vh of trailing space guarantees any new message can reach the
      top of the viewport, including the last one in the thread. The
      space is never seen -- the thread is scrolled, not read to the end. */
-  padding: var(--space-5) var(--space-4) 70vh;
+  /* CI-SPACE, 12 Aug 2026. Was 70vh. That guaranteed any message could
+     reach the TOP of the viewport, which solved the 11 Aug complaint and
+     created a new one: short messages were dragged to the ceiling with
+     half a screen of nothing beneath them.
+     46vh is the panel clearance -- enough for the sliding panel to open
+     over empty space rather than over the conversation. checkin.js's
+     PANEL_CLEARANCE must match this number; it decides per message
+     whether to anchor the top or the bottom, which is what makes the
+     smaller padding safe. */
+  padding: var(--space-5) var(--space-4) 46vh;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);

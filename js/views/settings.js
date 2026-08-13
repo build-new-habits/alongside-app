@@ -1121,7 +1121,11 @@ export function SettingsView(router) {
     // holding the whole screen for a cache lookup.
     if (activeTab === 'about' && swVersion === null) {
       _readSwVersion().then(v => {
-        swVersion = v || 'unknown';
+        // VER-1b. The cache name is "alongside-v294", so stripping the
+        // prefix leaves "v294" -- already carrying its own v. The
+        // template adds another, which shipped as "vv294". Strip it here
+        // so the ONE place that formats a version does it once.
+        swVersion = (v || 'unknown').replace(/^v/, '');
         const el = container.querySelector('#settings-version');
         if (el) {
           el.textContent = 'v' + swVersion;
