@@ -1,6 +1,35 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v306
+ * CONSENT-1. Graeme: "I consented because of the colour change on
+ * continue, but the box should show a tick or be fully teal."
+ *
+ * The consent checkbox was styled with accent-color alone, which on a
+ * dark background renders the native box as a hollow teal outline that
+ * looks near-identical checked and unchecked. The only reliable signal
+ * that consent had registered was the Continue button brightening -- a
+ * different element, further down the screen, communicating by colour
+ * alone. WCAG 1.4.1, on the one control in this app with legal weight.
+ *
+ * Now drawn explicitly: bordered empty box, filled with a tick when
+ * checked. Three signals -- fill, tick, border -- so it survives
+ * greyscale and low vision. The tick is a clip-path, needing no font and
+ * no network request, because this screen appears on a first load before
+ * anything else has cached.
+ *
+ * EQUIP-2. "Still not picking up home equipment." EQUIP-1 made the copy
+ * honest -- "Here's your home kit" -- and no more useful, because his
+ * home list is genuinely empty: he saved Full gym, a gym-scope facility,
+ * and the session defaults to the home location. A truthful sentence
+ * above an entirely unticked list still reads as the app having
+ * forgotten.
+ *
+ * Now falls back to the other scope when the matching one is empty, and
+ * says so. An empty list is not a safer answer than a slightly wrong
+ * one: everything here is one tap to untick, while showing nothing costs
+ * re-entering a whole gym.
+ *
  * 12 Aug 2026 v305
  * SW-1. THE BUG THAT MADE EVERY OTHER FIX UNRELIABLE TODAY.
  *
@@ -2040,7 +2069,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v305";
+const CACHE_NAME = "alongside-v306";
 
 const SHELL_URLS = [
 
