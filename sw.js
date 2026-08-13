@@ -1,6 +1,28 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v314
+ * LOG-6. The note is readable back before you save it.
+ *
+ * Graeme: "Can we make that expandable as well so that you can actually
+ * see what's written rather than a few characters at a time... you can
+ * then read back over what you said before pressing save."
+ *
+ * TWO limits were in the way and LOG-5 only moved one. The field was also
+ * capped at 40 CHARACTERS -- "3kg felt fine, 4kg pulled and the back
+ * tightened" is 50, so it was truncated mid-sentence regardless of how
+ * wide the box got.
+ *
+ * Now a textarea that grows with its content, capped at 280. A note is
+ * not an essay, but it should hold a thought. It starts at one row rather
+ * than three: an empty tall box on every card reads as an expectation to
+ * fill it, and this field is optional.
+ *
+ * A character count appears in the last 60 characters only. A counter
+ * from the first keystroke is pressure; one near the ceiling is help --
+ * and meeting a 280 limit with no warning is the same failure as the 40
+ * one, just later.
+ *
  * 12 Aug 2026 v313
  * SCROLL-1 and LOG-5, both from the device pass.
  *
@@ -2261,7 +2283,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v313";
+const CACHE_NAME = "alongside-v314";
 
 const SHELL_URLS = [
 
