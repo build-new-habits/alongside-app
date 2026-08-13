@@ -213,9 +213,34 @@ export function TodayView(router) {
     // actually navigate; insisting on one true location is a filing
     // system, not a product. Mobility & Conditioning keeps its route in.
     { id: 'yoga', label: 'Yoga & Pilates', icon: '\uD83E\uDDD8\u200D\u2640\uFE0F', route: 'yoga-session', requiresCheckin: false },
+    // NAV-6, FLAGGED NOT CHANGED. This routes to 'noticing', which is
+    // also a bottom-nav destination -- the same duplication as the
+    // Progress tile removed below, hidden by a different label.
+    //
+    // Deliberately left alone, because it is not the same decision.
+    // Progress was called Progress in both places, so the tile was plainly
+    // redundant. Here the tile says "Wellbeing" and the nav says
+    // "Noticing", and somebody looking for the first may not recognise
+    // the second -- which is exactly the failure that made Yoga
+    // unfindable. Removing it could cost a door rather than tidy one.
+    //
+    // The real question is whether these should share a name, and that is
+    // Graeme's call, not a cleanup.
     { id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing', requiresCheckin: false },
     { id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'conditions-update', requiresCheckin: false },
-    { id: 'progress', label: 'Progress', icon: '\uD83D\uDCCA', route: 'progress', requiresCheckin: false },
+    // NAV-6, 12 Aug 2026. Progress tile REMOVED. Graeme: "why do we have
+    // a progress tile when we have a tab? You're right about it looking
+    // cluttered."
+    //
+    // It was the only tile duplicating a bottom-nav destination, and the
+    // bottom nav is reachable from every screen while Home is not -- so
+    // the tile was the weaker of the two routes and cost a slot on the
+    // one screen where slots are scarce.
+    //
+    // Removed rather than moved: NAV-3 added Yoga & Pilates this morning
+    // and Home is where things go to become hard to find. A door that
+    // already exists somewhere better is not a second door, it is
+    // clutter.
     { id: 'library', label: 'Library', icon: '\uD83D\uDCDA', route: 'library', requiresCheckin: false },
     { id: 'unsure', label: 'Unsure? Coach decides', icon: '\uD83C\uDFAF', route: 'coach-proposal', requiresCheckin: true },
   ];

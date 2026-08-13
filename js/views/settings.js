@@ -1056,11 +1056,29 @@ export function SettingsView(router) {
   let swVersion = null;
 
   async function _readSwVersion() {
+    // VER-2, 12 Aug 2026. ASK THE CONTROLLING WORKER, do not infer.
+    //
+    // This previously read caches.keys() and took the first alongside-v
+    // entry. That answers "which caches exist", not "which one is serving
+    // this page" -- and during an update both exist. Graeme saw v303 here
+    // while Settings was still rendering v302's tab strip.
+    //
+    // A number that is confidently wrong only during an update is wrong
+    // at exactly the moment somebody checks it.
     try {
-      if (!navigator.serviceWorker?.controller) return null;
-      const cacheNames = await caches.keys();
-      const hit = cacheNames.find(n => n.startsWith('alongside-v'));
-      return hit ? hit.replace('alongside-', '') : null;
+      const sw = navigator.serviceWorker?.controller;
+      if (!sw) return null;
+      return await new Promise(resolve => {
+        const timer = setTimeout(() => resolve(null), 1200);
+        const onMessage = e => {
+          if (e.data?.type !== 'VERSION') return;
+          clearTimeout(timer);
+          navigator.serviceWorker.removeEventListener('message', onMessage);
+          resolve(e.data.version || null);
+        };
+        navigator.serviceWorker.addEventListener('message', onMessage);
+        sw.postMessage({ type: 'GET_VERSION' });
+      });
     } catch { return null; }
   }
 
