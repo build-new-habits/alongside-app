@@ -300,8 +300,40 @@ export function applyFeedbackWeighting(exercises) {
  *   painScores: { [conditionId]: 0-10 } — from today's check-in sliders
  * @returns {Object[]} suitable exercises (safe + caution, no avoid)
  */
+/**
+ * DATA-1b, 12 Aug 2026. Is this a COMPONENT, or a whole session?
+ *
+ * Shared by both engines. session-builder.js had its own version of this
+ * rule; workoutGenerator.js had none at all, and drew from a 340-exercise
+ * pool containing 71 entries of 10+ minutes and 89 tagged 'practice'. So
+ * a generated workout could hand somebody a 30-minute Brisk Walk as one
+ * of its items.
+ *
+ * Two independent checks, because each catches what the other misses:
+ *
+ *   contentType 'practice'  — 140 entries, most under 10 minutes, so the
+ *                             duration rule cannot see them
+ *   duration >= 600s        — 28 entries carry NO contentType at all, and
+ *                             eleven more are correctly tagged 'exercise'
+ *                             and still are not components
+ *
+ * 600 and not 300: several legitimate components run to five minutes --
+ * plank progressions, longer holds, some mobility flows.
+ */
+export function isSessionLength(ex) {
+  return ex?.contentType === "practice" || (ex?.duration || 0) >= 600;
+}
+
 export function getSuitableExercises(userProfile, checkinData) {
   let pool = [...EXERCISES];
+
+  // 0. DATA-1b. Whole sessions are not components. This runs FIRST so
+  //    every filter below works on a pool that could actually be
+  //    assembled into a session -- and so the count the caller sees is
+  //    honest. Standalone content is reached through the Library,
+  //    Mobility & Conditioning and the single-activity views, which do
+  //    not come through here.
+  pool = pool.filter(ex => !isSessionLength(ex));
 
   // 1. Equipment filter
   pool = filterByEquipment(pool, userProfile.equipment || []);

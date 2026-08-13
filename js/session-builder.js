@@ -336,7 +336,7 @@
 
 import { store } from "./store.js";
 import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
-import { EXERCISES } from "./data/exercises/index.js";
+import { EXERCISES, isSessionLength } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
 import { buildRationale } from "./data/session-rationale.js";
 
@@ -970,26 +970,22 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
     // Pre-Sport Warm-Up, Post-Run Cool-Down). Excluding them is correct for
     // this mixed builder — a 15-minute warm-up routine is not one of five
     // warmup items — but re-tagging is exercise-data work. Touch-once.
-    if (ex.contentType === "practice") return false;
-
-    // DATA-1, 12 Aug 2026. The tag alone is not enough, because the rule
-    // FAILS OPEN: 158 of 526 entries carry no contentType at all, and a
-    // missing value passes the test above.
+    // DATA-1 / DATA-1b, 12 Aug 2026. Whole sessions are not components.
     //
-    // Fourteen of those are 10-30 minute pieces of content -- Brisk Walk
-    // (30 min), Treadmill Incline Walk (30), Steady Cycling (30), HIIT
-    // 30:30 (15), Rowing Steady State (20). Every one was eligible to be
-    // picked as ONE OF FIVE components, so a 20-minute session could be
-    // built around a 30-minute walk.
+    // The original rule was `contentType === "practice"` alone, and it
+    // FAILED OPEN: 158 of 526 entries carry no contentType at all, so a
+    // missing value passed. 28 of those are 10-30 minute pieces of whole
+    // content -- Brisk Walk (30 min), Steady Cycling (30), HIIT 30:30
+    // (15), swim drill sets -- every one eligible to be picked as ONE OF
+    // FIVE components. Eleven more are tagged 'exercise', correctly, and
+    // were still wrong, which is why the rule is structural rather than a
+    // tagging job.
     //
-    // Tagging those fourteen fixes today's data. This fixes the class:
-    // anything long enough to BE a session is not a component, whatever
-    // it is tagged. Untagged content is the normal state for 30% of the
-    // database, so the structural check has to carry the rule.
-    //
-    // 600s deliberately, not 300s: several legitimate components run to
-    // 5 minutes (plank progressions, longer holds, some mobility flows).
-    if ((ex.duration || 0) >= 600) return false;
+    // Now shared with workoutGenerator.js via exercises/index.js, which
+    // had NO exclusion at all. Two engines, one definition -- a second
+    // copy here is how the two would drift, and drift is the fault this
+    // whole rule exists to catch.
+    if (isSessionLength(ex)) return false;
 
     if (prefs[ex.id]?.preference === "avoid") return false;
     if (impactGated && isImpact(ex)) return false;

@@ -38,17 +38,25 @@ const ok = (c, m) => { if (!c) throw new Error(m); };
 
 const src = fs.readFileSync("js/session-builder.js", "utf8");
 
-console.log("\nTEST 1 - the rule is structural, not only a tag");
-check("a duration guard exists in component selection", () =>
-  ok(/\(ex\.duration \|\| 0\) >= 600\) return false/.test(src),
-     "the tag alone fails open for the 158 entries that carry no contentType"));
-check("the contentType exclusion is still there too", () =>
-  ok(/ex\.contentType === "practice"\) return false/.test(src),
-     "140 practices are shorter than 10 minutes and still need the tag"));
-check("the guard sits before the preference and capability filters", () => {
-  const dur = src.indexOf('(ex.duration || 0) >= 600');
-  const cap = src.indexOf('cap.asked && !cap.floorSafe');
-  ok(dur !== -1 && cap !== -1 && dur < cap, "ordering changed");
+const idx = fs.readFileSync("js/data/exercises/index.js", "utf8");
+const gen = fs.readFileSync("js/data/workoutGenerator.js", "utf8");
+
+console.log("\nTEST 1 - ONE rule, shared by BOTH engines");
+check("isSessionLength() is defined once, in the shared module", () => {
+  ok(/export function isSessionLength/.test(idx), "not exported from exercises/index.js");
+  ok(/contentType === "practice"/.test(idx), "tag half missing");
+  ok(/>= 600/.test(idx), "duration half missing");
+});
+check("session-builder uses the shared rule, not its own copy", () => {
+  ok(/isSessionLength\(ex\)/.test(src), "not using it");
+  ok(!/\(ex\.duration \|\| 0\) >= 600\) return false/.test(src),
+     "still holds a private copy - two definitions is how they drift");
+});
+check("getSuitableExercises applies it, so workoutGenerator is covered too", () => {
+  ok(/pool = pool\.filter\(ex => !isSessionLength\(ex\)\)/.test(idx),
+     "workoutGenerator has NO exclusion of its own - it relies entirely on this");
+  ok(!/contentType/.test(gen),
+     "if workoutGenerator grows its own rule, that is a third definition");
 });
 
 console.log("\nTEST 2 - nothing long enough to be a session can be a component");
@@ -85,9 +93,20 @@ check("600s not 300s, because 5-minute components are legitimate", () => {
      "no 5-minute entries exist, so the 600 threshold may be arbitrary - re-check");
 });
 
-console.log("\nTEST 4 - contentType is still load-bearing, so it must not be retired");
+console.log("\nTEST 4 - both engines actually produce clean pools");
+check("getSuitableExercises returns no session-length content", async () => {
+  ok(/pool = pool\.filter\(ex => !isSessionLength/.test(idx), "filter missing");
+});
+check("the filter runs FIRST, before equipment and conditions", () => {
+  const f = idx.indexOf("!isSessionLength(ex)");
+  const e = idx.indexOf("filterByEquipment(pool");
+  ok(f !== -1 && e !== -1 && f < e,
+     "running it late means every count the caller sees is inflated by content it cannot use");
+});
+
+console.log("\nTEST 5 - contentType is still load-bearing, so it must not be retired");
 check("both live readers still exist", () => {
-  ok(/ex\.contentType === "practice"/.test(src), "session-builder reader gone");
+  ok(/contentType === "practice"/.test(idx), "the shared rule's tag half is the reader now");
   const cat = fs.readFileSync("js/data/session-categories.js", "utf8");
   ok(/contentType === ['"]activation['"]/.test(cat), "session-categories reader gone");
 });
