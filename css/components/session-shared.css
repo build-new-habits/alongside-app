@@ -1,0 +1,226 @@
+/* ============================================================
+   session-shared.css
+   css/components/session-shared.css
+   12 Aug 2026 v1
+
+   The .cs-*, .gym-* and .workout-header-title families — used across
+   core-session, yoga-session, gym-programme and others, and never
+   defined anywhere.
+
+   Found in the device pass. Graeme, part 4: "I also found lots of bad
+   styling." His screenshots show the Yoga & Pilates practice picker, the
+   Core Session picker and both duration pickers rendering as plain
+   centred text — no cards, no structure, just sentences run together.
+
+   Same fault as the .ws-* family fixed earlier: a class with no rule is
+   valid markup that renders as a draft. `.workout-header-title` alone is
+   used 41 times, the largest single gap in the codebase, and is why
+   several screens show the title colliding with the home icon.
+
+   Styled to patterns already in the product rather than inventing
+   another: choice cards follow .ci-choice's recessed treatment, exercise
+   cards follow .card. Contrast verified in all three schemes by
+   tools/contrast-check.mjs.
+   ============================================================ */
+
+/* ── Session header ──────────────────────────────────────────────────
+   Used by nearly every session view. Its absence is why the title and
+   the home icon overlap on several screens: the title had no width
+   constraint and ran under the fixed icon. */
+
+.workout-header-title {
+  flex: 1 1 auto;
+  min-width: 0;                    /* lets it shrink rather than overflow */
+  padding-right: var(--space-6);   /* clears the fixed home icon */
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  text-align: right;
+  line-height: var(--leading-normal);
+  overflow-wrap: break-word;
+}
+
+/* ── Focus and duration pickers (.cs-*) ──────────────────────────────
+   Recessed, not elevated: text on --color-bg clears AA in all three
+   schemes where an elevated surface does not. Same reasoning as
+   .ci-choice. */
+
+.cs-focus-grid,
+.cs-duration-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.cs-focus-card,
+.cs-duration-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-4);
+  min-height: 64px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-md);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.cs-focus-card:hover,
+.cs-duration-card:hover { border-color: var(--color-primary); }
+
+.cs-focus-card:focus-visible,
+.cs-duration-card:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.cs-focus-card.is-selected,
+.cs-duration-card.is-selected {
+  border: 2px solid var(--color-primary);
+  padding: calc(var(--space-4) - 1px);
+}
+
+.cs-focus-icon {
+  font-size: var(--text-2xl);
+  line-height: 1;
+  margin-bottom: var(--space-1);
+}
+
+.cs-focus-label,
+.cs-duration-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: var(--leading-normal);
+}
+
+.cs-focus-desc,
+.cs-duration-desc {
+  font-size: var(--text-sm);
+  font-weight: var(--font-normal);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* The "5 poses" / "4 exercises" count. Secondary to the label it sits
+   beside, never a headline — this is a fact, not a target. */
+.cs-duration-count {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.cs-why-details {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Exercise list on session overviews (.gym-*) ─────────────────── */
+
+.gym-exercises-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.gym-exercise-card {
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-md);
+}
+
+.gym-exercise-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.gym-exercise-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.gym-exercise-name {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: var(--leading-normal);
+}
+
+.gym-card-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.gym-card-chevron {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  font-size: var(--text-lg);
+  line-height: 1;
+}
+
+.gym-exercise-detail {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.core-overview-badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ── Coaching cues ──────────────────────────────────────────────────
+   .exercise-cues (the list) already exists; the individual item did
+   not, so cues rendered as unstyled list items. */
+
+.exercise-cue {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-1);
+}
+
+.exercise-why-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-1);
+}
+
+/* ── View containers ────────────────────────────────────────────── */
+
+.yoga-session-view,
+.walk-session-view,
+.session-builder-view {
+  padding: var(--space-4);
+  padding-bottom: var(--space-8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-focus-card,
+  .cs-duration-card { transition: none; }
+}
