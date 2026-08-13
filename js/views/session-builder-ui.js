@@ -1,6 +1,12 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 13 Aug 2026 v8
+ *
+ * v8 - TIER-B. The silent downgrade at the preselect path is removed.
+ *   A free user arriving with a locked session type now routes to
+ *   upgrade instead of being handed Full Body 30 with no explanation.
+ *
  * 11 Aug 2026 v7
  *
  * v7 - Renders the session rationale: the opening explanation above the
@@ -876,8 +882,26 @@ export function onMount() {
     if (pre && pre.type && SESSION_TYPES.some(t => t.id === pre.type)) {
       store.set("sessionBuilderPreselect", null);
       selectedType = pre.type;
+
+      // TIER-B, 13 Aug 2026. The silent downgrade is gone. This line
+      // used to read:
+      //     if (!isPremium()) { selectedType = "full"; selectedDuration = 30; }
+      // -- so a free user who tapped "Lower body" in the Library was
+      // handed a 30-minute Full Body session with no badge, no
+      // explanation and no route to upgrade. It was the quietest
+      // paywall in the product and the only one that lied.
+      //
+      // library.js now gates those cards, so a locked type can no
+      // longer arrive by preselect at all. This is the belt to that
+      // braces: if one ever does, route to upgrade. Substituting
+      // silently is the behaviour being removed, so it must not
+      // survive as the fallback.
+      if (!isPremium() && pre.type !== "full") {
+        router.navigate("upgrade");
+        return;
+      }
+
       phase = isPremium() ? "location" : "equipment";
-      if (!isPremium()) { selectedType = "full"; selectedDuration = 30; }
       rerender();
       return;
     }
@@ -916,11 +940,23 @@ export function onMount() {
   document.querySelectorAll(".sb-type-tile").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedType = btn.dataset.type;
+
+      // TIER-B, 13 Aug 2026. This branch used to reassign
+      // selectedType = "full" and selectedDuration = 30 for free users.
+      // It was DEAD in practice -- locked types render through
+      // lockedFeature(), which produces no .sb-type-tile, so the only
+      // tile a free user can click is already "full" -- but it was the
+      // same silent-substitution pattern, byte for byte, as the live
+      // bug in the Library preselect path.
+      //
+      // Removed rather than left as harmless. Dead code that performs a
+      // forbidden behaviour is a working example somebody copies, and
+      // it makes the gate unable to tell dead from live. The free path
+      // now sets the duration it is entitled to and says so.
       if (isPremium()) {
         phase = "location";
       } else {
-        selectedType     = "full";
-        selectedDuration = 30;
+        selectedDuration = 30;   // the free tier's only length
         phase            = "equipment";
       }
       rerender();
