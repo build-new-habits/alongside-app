@@ -1,6 +1,32 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v299
+ * EXIT-1. Device pass part 4. Graeme: "I started quite a few to see if it
+ * was those. When I exited it asked me to save. I need to be able to exit
+ * and not save. That's why my sessions have shot up, but I haven't done
+ * any."
+ *
+ * session-guard.js has offered "Exit without saving" since 21 May 2026.
+ * NINE views each built their own two-button exit dialog instead, and not
+ * one of them included it. So opening a session to see what it was, and
+ * backing out, ALWAYS wrote a partial activityLog entry.
+ *
+ * His Home read "7 of 3 this week" from sessions he had not done. That is
+ * not a cosmetic count: exerciseHistory, continuity selection, burnout
+ * detection and the weekly plan all read activityLog, so every one of
+ * them was being fed sessions that did not happen.
+ *
+ * Nothing errored. Every dialog did exactly what it said it would.
+ *
+ * Discard added to all nine, wired to leave WITHOUT writing, and
+ * navigating Home rather than to reflect -- there is nothing to reflect
+ * on. Styled as the quietest of the three and asserted to stay below
+ * "Exit and save progress", so somebody genuinely mid-session does not
+ * lose work by reaching for the wrong one.
+ *
+ * New tools/verify-exit1.mjs.
+ *
  * 12 Aug 2026 v298
  * LANG-1b. Graeme: "Do I need to do something with the audit or have you
  * applied the fix to the findings?"
@@ -1865,7 +1891,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v298";
+const CACHE_NAME = "alongside-v299";
 
 const SHELL_URLS = [
 
