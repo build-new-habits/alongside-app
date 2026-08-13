@@ -1,6 +1,37 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v289
+ * BURN-2. The coach and the session no longer disagree.
+ *
+ * BURN-1 made the recovery path reachable. Verifying it end-to-end turned
+ * up the next-order fault: THREE independent definitions of burnout, in
+ * three files, all feeding the same decision.
+ *   detectBurnout()     data/checkin.js       average energy over 5 days
+ *   isBurnoutRisk()     coach-reflection.js   3 of last 4 days low
+ *   sustainedDifficulty reflect.js            3 of last 5 low
+ *
+ * Traced across five scenarios, TWO contradicted: the generator narrowed
+ * the exercise pool while coach-reflection returned false, so the session
+ * quietly got easier and the coach said nothing. Somebody flat at 4s all
+ * week got a shorter, gentler session with no explanation.
+ *
+ * That is a P4 failure rather than a logic one. Silence on a drop is only
+ * credible if there is also silence on a rise -- and here the app was
+ * deciding somebody was fragile behind their back.
+ *
+ * isBurnoutRisk() now defers to detectBurnout() rather than becoming a
+ * fourth definition, and speaks at the same threshold that starts
+ * changing the session. The message is graded too: 'high' narrows the
+ * pool and proposes rest, 'moderate' only steps intensity down, and
+ * saying the same thing for both would either overstate a flat week or
+ * understate a fortnight of exhaustion.
+ *
+ * reflect.js's sustainedDifficulty deliberately left alone: it selects an
+ * empathy prompt rather than shaping a session. Different question.
+ *
+ * New tools/verify-burn2.mjs. Cache bump only.
+ *
  * 12 Aug 2026 v288
  * BURN-1. Found by tracing the perimenopause persona -- somebody whose
  * whole profile is unpredictable energy, and precisely who burnout
@@ -1595,7 +1626,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v288";
+const CACHE_NAME = "alongside-v289";
 
 const SHELL_URLS = [
 
