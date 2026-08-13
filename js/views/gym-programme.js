@@ -1095,6 +1095,14 @@ export function GymProgrammeView(router) {
                   aria-label="Exit and save progress so far">
             Exit and save progress
           </button>
+          <!-- EXIT-1. Nine views each built a two-button exit dialog while
+               the shared guard has had a third option since 21 May, so
+               backing out of a session you only opened to look at always
+               saved one. -->
+          <button class="btn btn-ghost btn-full session-exit-discard" id="exit-confirm-discard"
+                  aria-label="Exit without saving this session">
+            Exit without saving
+          </button>
         </div>
       </div>
     `;
@@ -1110,6 +1118,14 @@ export function GymProgrammeView(router) {
       savePartialSession(container, session);
       cleanupSession();
       router.navigate('reflect');
+    });
+
+    // EXIT-1. Discard: leave WITHOUT writing a partial entry.
+    document.getElementById('exit-confirm-discard')?.addEventListener('click', () => {
+      overlay.remove();
+      dismountSessionGuard();
+      cleanupSession();
+      router.navigate('today');
     });
   }
 
