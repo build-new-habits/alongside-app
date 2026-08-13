@@ -991,10 +991,42 @@ export function CheckinView(router) {
    * behaviour is consistent throughout the whole check-in — including
    * the summary bubble at the end (Graeme's decision, 03 Jul 2026).
    */
+  /**
+   * CI-SPACE, 12 Aug 2026. Graeme, from the device pass: "There's a lot of
+   * unnecessary dead space in check-in and writing disappears
+   * unnecessarily off the page. My suggestion is to leave a gap for the
+   * slides to pop over the top, but bring the writing down."
+   *
+   * The cause was block:"start" on EVERY message. It was added on 11 Aug
+   * for the opposite complaint -- the top of a long message being cut off
+   * -- and it fixed that, but it also drags every SHORT message to the top
+   * of the viewport, leaving the rest of the screen empty beneath it. The
+   * conversation ends up floating at the ceiling with nothing under it.
+   *
+   * Both are the same question asked at two message lengths, so it is
+   * answered per message rather than once for all of them:
+   *
+   *   fits in the space above the panel -> block:"end", so it sits just
+   *   above where the panel appears, like any other conversation
+   *
+   *   taller than that space -> block:"start", so its top is readable and
+   *   nobody has to scroll back up
+   *
+   * The trailing padding drops from 70vh to 46vh with it -- enough for
+   * the panel to open over empty space rather than over the conversation,
+   * which is the gap Graeme is describing.
+   */
+  const PANEL_CLEARANCE = 0.46;   // must match .ci-thread's padding-bottom
+
   function _scrollToNewElement(el) {
     setTimeout(() => {
       if (!el) return;
-      el.scrollIntoView({ block: "start", behavior: REDUCED_MOTION ? "auto" : "smooth" });
+      const available = window.innerHeight * (1 - PANEL_CLEARANCE);
+      const tooTall   = el.getBoundingClientRect().height > available;
+      el.scrollIntoView({
+        block: tooTall ? "start" : "end",
+        behavior: REDUCED_MOTION ? "auto" : "smooth",
+      });
     }, T.SCROLL_DELAY);
   }
 

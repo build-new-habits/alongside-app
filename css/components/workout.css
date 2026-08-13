@@ -512,11 +512,36 @@
   color: var(--color-text);            /* 8.4:1 on card, AAA */
 }
 
+/* VOICE-2, 12 Aug 2026. Graeme, from the device pass: "The writing in the
+   red circles, are these the coach? Could they be teal?"
+
+   Yes, they are. This carries buildRationale()'s section intros -- "Warming
+   up. Raising your heart rate first, then loosening the joints you are
+   about to ask something of." That is the coach explaining its reasoning,
+   and it was --text-xs in --color-text-secondary: smaller and greyer than
+   the exercise names, and the same treatment as the "Warm-up" / "Main
+   session" labels above it, which are UI chrome.
+
+   So on the one screen where the coach explains itself, it looked like
+   furniture. P2 says the coach and the helper layer must be visibly
+   distinct, and that cuts both ways: if everything looks the same, the
+   coach has no voice here at all.
+
+   TEAL, NOT GOLD -- Graeme asked. Gold is the paid-tier marker across the
+   whole product family, and this is free-tier content on a free-tier
+   screen. Gold here would quietly imply the rationale is something you
+   pay for.
+
+   Sized up from --text-xs to --text-sm as well. Chrome can be small;
+   something written to be read should not be.
+
+   Contrast, all three schemes, gated by tools/contrast-check.mjs:
+   --color-primary 7.86:1 on bg, 5.56:1 on card. */
 .sb-section-why {
-  margin: var(--space-1) 0 var(--space-2);
-  font-size: var(--text-xs);
+  margin: var(--space-1) 0 var(--space-3);
+  font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
-  color: var(--color-text-secondary);  /* 5.9:1 on bg, AA */
+  color: var(--color-primary);
 }
 
 .sb-rationale-arc {
