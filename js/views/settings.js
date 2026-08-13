@@ -1,5 +1,16 @@
 /**
  * settings.js
+ * 12 Aug 2026 v20
+ *
+ * v20 - VER-1. The About screen's version was hardcoded to '115' while
+ *   the live cache was at v293. 178 versions of drift, on the ONLY
+ *   surface that tells anybody which build their phone is running -- so
+ *   every "are you on the latest?" check during device testing has been
+ *   meaningless. This file's own v86 note describes exactly that
+ *   confusion happening. Now read from the running service worker's
+ *   cache name, and shows "unknown" rather than a confident wrong number
+ *   if it cannot be read.
+ *
  * 12 Aug 2026 v19
  *
  * v19 - SCHEME-1. Colour scheme control in Settings > Display: dark
@@ -961,9 +972,35 @@ export function SettingsView(router) {
 
   // ── About panel (with developer bypass) ───────────────────────────────────
 
+  // VER-1. Cache name from the running service worker, so the About
+  // screen cannot drift from the build the phone is actually on.
+  let swVersion = null;
+
+  async function _readSwVersion() {
+    try {
+      if (!navigator.serviceWorker?.controller) return null;
+      const cacheNames = await caches.keys();
+      const hit = cacheNames.find(n => n.startsWith('alongside-v'));
+      return hit ? hit.replace('alongside-', '') : null;
+    } catch { return null; }
+  }
+
   function renderAboutPanel() {
     const tier = store.get('tier') || 'free';
-    const APP_VERSION = '115';
+
+    // VER-1, 12 Aug 2026. This was hardcoded to '115' while the live
+    // cache was at v293 -- 178 versions of drift. It is the ONLY way
+    // anybody can tell which build their phone is running, and it has
+    // been wrong for weeks, which makes every "are you on the latest?"
+    // check during device testing meaningless. The v86 note in this
+    // file's own header describes exactly that confusion happening.
+    //
+    // Read from the service worker instead of restating it. The registered
+    // SW's script URL is not enough (it does not carry the cache name), so
+    // this asks the active worker directly and falls back to the build
+    // date if it cannot answer -- an honest "unknown" rather than a
+    // confident wrong number.
+    const APP_VERSION = swVersion || 'checking\u2026';
 
     return `
       <div class="settings-section">
@@ -1078,6 +1115,21 @@ export function SettingsView(router) {
   // ── Events ─────────────────────────────────────────────────────────────────
 
   function attachEvents(container) {
+    // VER-1. Read the real cache name once, then repaint the label in
+    // place. Deliberately not blocking the render: the About panel should
+    // appear immediately and fill this in a moment later, rather than
+    // holding the whole screen for a cache lookup.
+    if (activeTab === 'about' && swVersion === null) {
+      _readSwVersion().then(v => {
+        swVersion = v || 'unknown';
+        const el = container.querySelector('#settings-version');
+        if (el) {
+          el.textContent = 'v' + swVersion;
+          el.setAttribute('aria-label', 'App version ' + swVersion);
+        }
+      });
+    }
+
     // Tab switching
     container.querySelectorAll('[data-tab]').forEach(btn => {
       btn.addEventListener('click', () => {
