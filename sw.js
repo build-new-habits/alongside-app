@@ -1,6 +1,31 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v297
+ * Device pass part 3. Graeme: "Audit for plain language. Standing, 2
+ * point, 3 point start is confusing. Also, lack of clarity on
+ * instructions for the exercise about sudden changes of pace."
+ *
+ * LANG-1. Both fixed, and the stance jargon was six instances not one --
+ * "athletic position" and "3-point stance" across sport_conditioning.js,
+ * an American-football term in a product for people who have been failed
+ * by fitness culture. All six now describe the position instead of naming
+ * it.
+ *
+ * Change of Pace Run: the timings were always in `instructions`, which
+ * Graeme could not see because the session OVERVIEW shows only a name and
+ * a duration. But he found a real gap in them regardless -- the surge
+ * timing was "vary the timing, no rhythm", which is deliberate and reads
+ * as an omission. Now says so explicitly: "somewhere between 20 and 60
+ * seconds in, and it is your call when". His own suggestion, and right:
+ * naming the vagueness beats leaving it to look like a gap.
+ *
+ * 85 further instances across the database are documented in
+ * Documents/Admin/alongside_plain_language_audit_12aug2026_v1.md and
+ * deliberately NOT auto-fixed -- each needs a replacement in Graeme's
+ * voice, and a wrong plain-English substitution can change what the
+ * exercise actually asks for.
+ *
  * 12 Aug 2026 v296
  * Device pass part 2. Two fixes and a new gate.
  *
@@ -1817,7 +1842,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v296";
+const CACHE_NAME = "alongside-v297";
 
 const SHELL_URLS = [
 
