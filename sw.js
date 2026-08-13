@@ -1,6 +1,34 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v302
+ * Device pass part 5.
+ *
+ * EQUIP-1 -- Graeme: "Even though in settings my equipment says full gym,
+ * in the cardio, core, strength I have to select the equipment."
+ *
+ * The behaviour was correct and the COPY was not. Equipment is saved per
+ * scope -- homeEquipment and gymEquipment are separate lists -- and the
+ * session reads the one matching today's location, which defaults to
+ * home. He had saved Full gym under the gym scope, so the session showed
+ * his home list and looked like it had forgotten everything.
+ *
+ * "Here's what I think you have access to today" is true of either list
+ * and therefore explains neither. Now names it: "Here's your gym kit" /
+ * "Here's your home kit", and when the matching list is empty it says the
+ * other one may exist rather than implying nothing is saved at all.
+ *
+ * COUNT-1b -- reflect.js's getSessionCount() counted every activityLog
+ * entry, partials included. So a session opened and backed out of moved
+ * somebody toward their next empathy prompt AND toward the next stage of
+ * the arc. Now uses store.completedSessions(), matching Home, Progress
+ * and Build Your Base.
+ *
+ * Checked and NOT a bug: buildSummary() has its own local sessionCount
+ * meaning "this week", which looked like the empathy engine reading a
+ * weekly figure. It is a separate variable for the summary line and is
+ * never passed to the empathy code. Recorded so it is not re-raised.
+ *
  * 12 Aug 2026 v301
  * CSS-2. Graeme, device pass part 4: "I also found lots of bad styling."
  *
@@ -1948,7 +1976,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v301";
+const CACHE_NAME = "alongside-v302";
 
 const SHELL_URLS = [
 
