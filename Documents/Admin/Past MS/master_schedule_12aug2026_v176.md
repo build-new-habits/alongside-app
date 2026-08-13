@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v177
+## 12 Aug 2026 v176
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v176.md`. Remove v176 on upload.
+Supersedes `master_schedule_12aug2026_v175.md`. Remove v175 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -686,29 +686,6 @@ No amount of correct tagging fixes a rule that fails open, and tagging today's 2
 **Both rules stay.** 140 practices are shorter than 10 minutes and still need the tag; the duration guard catches what the tag cannot. They cover different halves.
 
 `tools/verify-data1.mjs` fails 2 assertions on the pre-fix code, and asserts **both readers still exist** — so nobody retires the field on the strength of the old entry.
-
-### 🔴 DATA-1b — the first fix covered ONE OF TWO ENGINES
-
-Graeme asked *"so this is genuinely fixed?"* **It was not.**
-
-`session-builder.js` had the new rule. **`workoutGenerator.js` is a separate engine**, drawing its pool from `getSuitableExercises()` — and that had **no exclusion of any kind**, not for practices, not for length.
-
-Measured: **340 exercises returned, of which 71 were 10+ minutes and 89 were tagged `practice`.** A generated workout could hand somebody a 30-minute Brisk Walk as one of its items — worse than the engine that was fixed.
-
-**`isSessionLength()` now lives once** in `data/exercises/index.js`, applied inside `getSuitableExercises()` as **step 0** — before equipment and conditions, so every count downstream is honest rather than inflated by content that cannot be used. `session-builder.js` imports it rather than keeping its own copy: **a second copy is exactly how two engines drift, and drift is the fault this rule exists to catch.**
-
-| | Before | After |
-|---|---|---|
-| workoutGenerator pool | 340 (71 long, 89 practice) | **278 — zero, zero** |
-| session-builder pool | — | **389 — zero, zero** |
-
-**167 standalone entries remain reachable** through the Library, Mobility & Conditioning and the single-activity views, none of which come through `getSuitableExercises()`.
-
-### ⚠️ Why it was missed, recorded because it will recur
-
-**The first fix was verified against the engine it changed.** Fixing one call site and checking that call site proves nothing about the other one. This product has two session engines and they do not share their filters by default — any rule about what may be selected has to be checked in both, or placed where both must read it.
-
-**Graeme's standing point, which prompted this:** *"That's why we need to completely fix things when we find them. I will forget to do them otherwise."* Correct — and DATA-1 was a nine-day-old entry that was wrong in both directions when it was finally opened.
 
 ---
 
@@ -2144,4 +2121,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v177*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v176*
