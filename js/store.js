@@ -1,5 +1,11 @@
 /**
  * store.js - Data persistence layer
+ * 12 Aug 2026 v38
+ *
+ * v38 - COUNT-1. completedSessions(), one definition of "a session that
+ *   happened", after Home, Progress and Build Your Base each used a
+ *   different one and disagreed on screen: 7, 7 and 2.
+ *
  * 12 Aug 2026 v37
  *
  * v37 - FEED-1. clearExerciseFeedback(), so the control can be undone.
@@ -1533,6 +1539,35 @@ export const store = {
     this.data.updatedAt = new Date().toISOString();
     this.save();
     return log[log.length - 1];
+  },
+
+  /**
+   * completedSessions(entries) — COUNT-1, 12 Aug 2026.
+   *
+   * The single definition of "a session that happened".
+   *
+   * Graeme, device pass part 4: "7 out of 3 sessions registered on both
+   * home and progress pages, but not in the 'Build your base' section in
+   * progress which is the reliable data. These need to match and I would
+   * guess the 'build your base' data collection is correct."
+   *
+   * He is right, and it was three different rules:
+   *   today.js      counted EVERY activityLog entry, partials included
+   *   progress.js   counted every entry in the window, partials included
+   *   programmeEngine counted activeProgramme.totalSessions, which only
+   *                   increments on genuine completion
+   *
+   * So the two prominent numbers were inflated by every session somebody
+   * opened and backed out of, and the accurate one was buried inside a
+   * programme card. Three surfaces, three answers, and the person has no
+   * way to know which to believe.
+   *
+   * A partial is a real record and stays in activityLog -- it is how the
+   * app knows you started, and it feeds continuity. It is just not a
+   * session you did, and it must never be counted as one.
+   */
+  completedSessions(entries) {
+    return (entries || []).filter(e => e && e.status !== 'partial');
   },
 
   /**

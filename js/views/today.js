@@ -198,6 +198,21 @@ export function TodayView(router) {
   const HOME_DOORS = [
     { id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder', requiresCheckin: true },
     { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'mobility-conditioning', requiresCheckin: false },
+    // NAV-3, 12 Aug 2026. Graeme, device pass part 4: "Yoga was not easy
+    // to find... Can the yoga/pilates door be offered in multiple places
+    // as well?"
+    //
+    // He looked in Cardio/Core/Strength, then Mobility & Conditioning,
+    // then Wellbeing, then Library. Yoga lives inside Mobility &
+    // Conditioning, which is a reasonable place for it and not a
+    // findable one -- somebody looking for yoga is not looking for
+    // "conditioning".
+    //
+    // A second door is the right answer rather than moving it. The same
+    // thing being reachable from more than one place is how people
+    // actually navigate; insisting on one true location is a filing
+    // system, not a product. Mobility & Conditioning keeps its route in.
+    { id: 'yoga', label: 'Yoga & Pilates', icon: '\uD83E\uDDD8\u200D\u2640\uFE0F', route: 'yoga-session', requiresCheckin: false },
     { id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing', requiresCheckin: false },
     { id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'conditions-update', requiresCheckin: false },
     { id: 'progress', label: 'Progress', icon: '\uD83D\uDCCA', route: 'progress', requiresCheckin: false },
@@ -237,8 +252,12 @@ export function TodayView(router) {
   }
 
   function _sessionCompletedToday() {
+    // COUNT-1. This drives the greeting -- "You moved today, that's done."
+    // Counting partials meant opening a session and backing out told
+    // somebody they had moved. That is worse than a wrong number: it is
+    // the coach claiming to have seen something that did not happen.
     const today       = _todayString();
-    const activityLog = store.get('activityLog') || [];
+    const activityLog = store.completedSessions(store.get('activityLog'));
     return activityLog.some(e => {
       const ts = e.completedAt || e.loggedAt || e.date;
       return ts && new Date(ts).toISOString().split('T')[0] === today;
@@ -402,7 +421,9 @@ export function TodayView(router) {
   }
 
   function _buildCoachLine() {
-    const activityLog    = store.get('activityLog') || [];
+    // COUNT-1. Same rule -- the coach must not refer back to a session
+    // yesterday that was opened and abandoned.
+    const activityLog    = store.completedSessions(store.get('activityLog'));
     const checkinHistory = store.get('checkinHistory') || {};
     const yesterday      = _yesterdayString();
 
@@ -446,7 +467,13 @@ export function TodayView(router) {
   }
 
   function _sessionsThisWeek() {
-    const activityLog = store.get('activityLog') || [];
+    // COUNT-1, 12 Aug 2026. Counted EVERY entry, partials included, so
+    // opening a session to look at it and backing out incremented the
+    // number on Home. Graeme's read "7 of 3" from two real sessions.
+    // Build Your Base said 2, because programmeEngine only counts genuine
+    // completions -- and he correctly identified that as the trustworthy
+    // one. store.completedSessions() is now the single definition.
+    const activityLog = store.completedSessions(store.get('activityLog'));
     const monday      = _mondayString();
     return activityLog.filter(e => {
       const ts = e.completedAt || e.loggedAt || e.date;
