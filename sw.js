@@ -1,6 +1,24 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v301
+ * CSS-2. Graeme, device pass part 4: "I also found lots of bad styling."
+ *
+ * His screenshots show the Yoga & Pilates practice picker, the Core
+ * Session picker and both duration pickers rendering as plain centred
+ * text -- no cards, no structure, sentences run together. Same fault as
+ * the .ws-* family: valid markup, no rule, renders as a draft.
+ *
+ * New css/components/session-shared.css covering .cs-* (the pickers),
+ * .gym-* (exercise lists) and .workout-header-title -- the last used 41
+ * times, the largest single gap in the codebase, and the reason session
+ * titles collide with the home icon on several screens. It had no width
+ * constraint, so it ran under the fixed icon.
+ *
+ * verify-css.mjs ratchet tightened 157 -> 131, and both families locked
+ * so they cannot regress whatever the budget says. 174 -> 131 across the
+ * two passes.
+ *
  * 12 Aug 2026 v300
  * Device pass part 4 continued. Three fixes.
  *
@@ -1930,7 +1948,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v300";
+const CACHE_NAME = "alongside-v301";
 
 const SHELL_URLS = [
 
@@ -1966,6 +1984,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/session-log.css",
   "/alongside-app/css/components/grounding-moments.css",
   "/alongside-app/css/components/single-activity-session.css",
+  "/alongside-app/css/components/session-shared.css",
   "/alongside-app/css/components/upgrade-door.css",
 
   // CSS completeness, same pass. main.css @imports these, and an @import
