@@ -1,6 +1,40 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v310
+ * EQUIP-4. MY OWN FIX DISABLED ITSELF.
+ *
+ * Graeme, fourth report, on confirmed v309 with the new tabs visible:
+ * "You can see that we are on the correct version... but the equipment
+ * isn't coming across."
+ *
+ * He was right, and delivery was not the problem this time. EQUIP-3 was
+ * live and correct. It was switched off by a line written a week earlier.
+ *
+ * Choosing a session duration set equipmentOverride to the RAW saved list
+ * -- ["adjustable-dumbbells", "band-light", ...] -- BEFORE the person had
+ * ticked anything. EQUIP-3 then correctly treated a populated override as
+ * "their own deliberate choices" and skipped resolution, so it compared
+ * "dumbbells" against a list containing "adjustable-dumbbells" and found
+ * nothing.
+ *
+ * The exemption was written for deliberate ticks and fired before any
+ * tick existed. Now null until the person actually touches a checkbox,
+ * which is the only state in which resolution runs.
+ *
+ * Verified against his exact twelve saved ids: ticks Dumbbells,
+ * Resistance bands, Bench, Box or step, Foam roller. Nothing he does not
+ * own.
+ *
+ * THE GATE WAS ALSO WRONG, AGAIN. It replicated renderEquipmentCheck's
+ * logic rather than exercising it, so it kept passing while the screen
+ * took a different path. It now asserts the real function's shape before
+ * replicating, and fails if the duration handler pre-seeds.
+ *
+ * Also: "git stash" to test a gate against pre-fix code stashes THE GATE
+ * TOO, so it silently tests the old gate against the old source and
+ * reports zero failures. Only the source file may be reverted.
+ *
  * 12 Aug 2026 v309
  * NAV-7. Sub-tabs inside each Settings section.
  *
@@ -2148,7 +2182,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v309";
+const CACHE_NAME = "alongside-v310";
 
 const SHELL_URLS = [
 
