@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v183
+## 12 Aug 2026 v182
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v182.md`. Remove v182 on upload.
+Supersedes `master_schedule_12aug2026_v181.md`. Remove v181 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -525,95 +525,6 @@ BURN-1 made the recovery path reachable. **Verifying it end-to-end turned up the
 
 1. **The first agreement check reimplemented `isBurnoutRisk()`** and therefore kept reporting the old result after the fix landed. A test that reimplements the thing it tests is testing itself. It now calls the real functions.
 2. **The P4 copy check flagged `"burnout"` inside `type: "burnout-risk"`** — an internal identifier. Scoped to the message lines, which is the same lesson `verify-voice.mjs` learned this morning: **identifiers are not copy.**
-
----
-
-## 🔴 PROCESS — THE THREE RULES THAT COME OUT OF TODAY
-
-**These are not observations. They are how work is done from now on.**
-
-Graeme, after four failed attempts at one bug: *"I want you to do a deep sweep to guarantee this is right. No more 'I didn't look at that file' or 'I didn't see it'."*
-
-### 1. Deep sweep before declaring anything done
-
-Trace **every** file that touches the thing. Not the ones that seem relevant — all of them. The equipment sequence needed four attempts because each one stopped at the first plausible cause:
-
-| | What was assumed | What was true |
-|---|---|---|
-| EQUIP-1 | wrong scope | never compared the ids |
-| EQUIP-2 | empty list | patched copy, not data |
-| EQUIP-3 | right fix | read the **wrong catalogue file** |
-| EQUIP-4 | right fix again | disabled by a pre-seed never traced |
-
-The sweep that finally worked took 42 files, 3 writes and 17 reads — and found **four items missing from the catalogue entirely**, blocking six exercises for every user since the database was written.
-
-### 2. Derive test fixtures from the files. Never type them.
-
-**Three gates passed while the device failed**, because I hand-typed the equipment ids into a constant. A gate built from a hand-typed fixture cannot catch a wrong fixture — it tests the assumption, not the data.
-
-**Corollary:** a gate must not *replicate* logic it could *exercise*. `verify-equip3` v1 replicated `renderEquipmentCheck` and faithfully tested a path the screen no longer took.
-
-### 3. Verify against a fresh clone, never the working directory
-
-**The v310 commit did not contain its own fix.** While testing a gate against pre-fix code I checked a file out at `HEAD~2` and restored it from `/tmp`; the commit in between captured the reverted file. Locally everything passed. Deployed, it failed.
-
-Also: **`git stash` to test a gate against old code stashes the gate too** — it runs the old gate against the old source and reports zero failures. That looks like proof and is nothing. Revert the source file only.
-
----
-
-## 🔴 THE DELIVERY BUG THAT SHAPED THE WHOLE DAY
-
-**SW-2.** `cache.add(url)` fetches through the **browser HTTP cache**. GitHub Pages serves JS with a long max-age, so the browser answered from its own store with a 200 and the service worker wrote **stale files into each newly created cache**.
-
-Every version bump produced a correctly-named cache full of old code. The About screen honestly reported the new version; the JavaScript in it was older. **Three correct fixes never reached the device.**
-
-It also explains why *"clear site data"* kept appearing to work — that wipes the HTTP cache, so the next install fetched real files.
-
-**SW-1** (scoping lookups to the current cache) could not help, because the current cache *was* the stale one. Both were needed.
-
----
-
-## 📋 SESSION CLOSE — 12 Aug 2026
-
-**`sw.js` v288 → v314. `store.js` v34 → v38. `Schema.md` v1.29 → v1.31. 53 substantive commits. 30 verification gates, all passing on a fresh clone of the remote.**
-
-### Device pass — complete, parts 0–5
-
-Graeme ran `alongside_device_pass_12aug2026_v1.md` on device. **Twenty-two fixes came out of it.** Two he never flagged — found by looking at what else was in frame.
-
-| Part | Found |
-|---|---|
-| **0** | VER-1/1b — version display **178 versions stale**; the tool for spotting stale builds was itself stale |
-| **1** | SB-META (`undefined` printed on the session overview), VOICE-2 (coach reasoning styled as chrome), CI-SPACE |
-| **2** | CSS-1 — **174 undefined classes**, four session views unstyled entirely; DISP-4 |
-| **3** | LANG-1 — stance jargon ×6, Change of Pace timings |
-| **4** | **EXIT-1** — nine views, no way to leave without saving; COUNT-1; NAV-3; NAV-4; CSS-2 |
-| **5** | EQUIP-1→5, CONSENT-1, SCROLL-1, LOG-5, LOG-6 |
-
-### The three that mattered most
-
-**EXIT-1** — `session-guard.js` has offered "Exit without saving" since 21 May. **Nine views each built their own two-button dialog and none included it.** Opening a session to look at it always wrote a partial entry. Graeme's Home read "7 of 3" from sessions he never did — and `exerciseHistory`, continuity, burnout detection and the weekly plan all read that log.
-
-**CONSENT-1** — the consent checkbox was styled with `accent-color` alone, which on a dark background looks near-identical checked and unchecked. The only reliable signal was the Continue button brightening. **WCAG 1.4.1, on the one control in the app with legal weight.**
-
-**EQUIP-5** — four equipment items required by exercises existed nowhere anybody could tick them.
-
-### Navigation, rebuilt on evidence
-
-Three independent "couldn't find it" failures, one cause. **NAV-3** (yoga door), **NAV-5** (Settings → three sections, Graeme's own grouping), **NAV-6** (Progress tile removed), **NAV-7** (sub-tabs). NAV-2's goal-directed pointers remain the open half.
-
-### 🟠 Still open
-
-| | |
-|---|---|
-| **Graeme** | CAP-6 · REST-1 · DATA-2 · PT-4 · Wellbeing/Noticing naming |
-| **Natalie** | BETA-1 (privacy and terms pages do not exist) · BETA-2 · BETA-4 |
-| **Buildable** | NAV-2 pointers · CSS ratchet 131 → 0 · DISP-3 layout check |
-| **Closed by decision** | LANG-1 remainder (92 items, beta feedback) · DATA-1 retirement · PT-1 · PT-7 · PT-8 |
-
-### ⚠️ Note for Graeme
-
-*"When you write the master schedule please ensure that prices is in there."* Read as **processes** and recorded above as the three rules. **If pricing was meant, say so and I will add it** — the pricing model sits in `alongside_pricing_model_20jun2026_v2.docx` and is not currently reflected here.
 
 ---
 
@@ -2353,4 +2264,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v183*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v182*
