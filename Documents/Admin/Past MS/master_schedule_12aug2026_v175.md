@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v176
+## 12 Aug 2026 v175
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v175.md`. Remove v175 on upload.
+Supersedes `master_schedule_12aug2026_v174.md`. Remove v174 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -657,35 +657,7 @@ The entry was **true when written** and was invalidated by **CON-6**, which move
 
 **Lesson, and it is the same one as In Step's tier:** a schedule entry is a snapshot, not a standing fact. Any entry describing a field as dead must be re-verified against live code before acting on it, because the thing that makes a field dead is exactly the thing a later session might change.
 
-**Status: closed as WILL-NOT-DO for retirement.** If `contentType` ever genuinely needs retiring, the two readers must be replaced first, and that is a design job on session selection, not a data cleanup.
-
-### 🟢 BUT the entry was pointing at a real bug, in the opposite direction. Fixed 12 Aug.
-
-Graeme: *"Can we do this now, otherwise it will not get done. What's needed?"* Scoping it properly found the fault nobody had:
-
-**The exclusion rule FAILS OPEN.** `158 of 526` entries carry **no `contentType` at all**, and the rule is `ex.contentType === "practice"` — so a missing value **passes**. The rule was silently inapplicable to 30% of the database.
-
-**28 of those untagged entries are 10–30 minutes of whole content:**
-
-| Duration | Content |
-|---|---|
-| 30 min | Brisk Walk · Steady Cycling · Treadmill Incline Walk · Walk-Run Intervals · Weighted Vest Walk |
-| 20–25 min | Treadmill Intervals · Rowing Steady State · Cross Trainer Intervals · Stair Climber Steady |
-| 10–15 min | HIIT 30:30 · Ski Erg Intervals · Sled Push · Heavy Bag Rounds · nine swim and running drill sets |
-
-**Every one was eligible to be picked as ONE OF FIVE components.** A 20-minute session could be built around a 30-minute walk.
-
-### Why this is structural, not a tagging job
-
-**Eleven of the 28 are tagged `exercise` — correctly — and were still wrong.**
-
-No amount of correct tagging fixes a rule that fails open, and tagging today's 28 leaves the 159th untagged entry to reintroduce it. `session-builder.js` now excludes anything of **600s or more** from component selection, whatever it is tagged.
-
-**600 and not 300**, because several legitimate components run to five minutes — plank progressions, longer holds, some mobility flows. **388 timed components remain eligible**, so the threshold is not swallowing real content.
-
-**Both rules stay.** 140 practices are shorter than 10 minutes and still need the tag; the duration guard catches what the tag cannot. They cover different halves.
-
-`tools/verify-data1.mjs` fails 2 assertions on the pre-fix code, and asserts **both readers still exist** — so nobody retires the field on the strength of the old entry.
+**Status: closed as WILL-NOT-DO.** If `contentType` ever genuinely needs retiring, the two readers must be replaced first, and that is a design job on session selection, not a data cleanup.
 
 ---
 
@@ -2121,4 +2093,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v176*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v175*
