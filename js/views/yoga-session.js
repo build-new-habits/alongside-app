@@ -144,7 +144,7 @@
 import { store } from "../store.js";
 import { EXERCISES } from "../data/exercises/index.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
-import { renderLogBlock, attachLogEvents } from "../session-log.js";
+import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
 
 export const centered = false;
@@ -835,6 +835,7 @@ function advancePose() {
   creditsEarned += 20;
   const pose = sessionQueue[currentIndex];
   currentIndex++;
+  scrollToTop();   // SCROLL-1: a new card starts at the top
   timeRemaining = 0;
   timerRunning  = false;
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
@@ -1143,6 +1144,7 @@ export function onMount() {
     timerRunning  = false;
     timeRemaining = 0;
     currentIndex++;
+  scrollToTop();   // SCROLL-1: a new card starts at the top
     if (currentIndex >= sessionQueue.length) { finaliseSession(); rerender(); }
     else { phase = "session"; rerender(); }
   });

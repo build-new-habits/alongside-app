@@ -1,6 +1,11 @@
 /**
  * js/session-log.js
- * 12 Aug 2026 v3
+ * 12 Aug 2026 v4
+ *
+ * v4 - LOG-5. The note field now takes the remaining width instead of
+ *   sharing a fixed 5.5rem with the number boxes. Graeme: "is like a
+ *   bigger box for notes to fill the remaining space to the right of
+ *   it." A note is prose; a number is three characters.
  *
  * v3 - LOG-4. "distance" and "lengths" modes for the single-activity
  *   views, rendered on their completion screens.
@@ -196,6 +201,30 @@ export function lastLine(exercise) {
  *   note. Used by yoga, where reps and levels would import the wrong
  *   frame entirely.
  */
+/**
+ * SCROLL-1, 12 Aug 2026. Graeme: "When I click next exercise I'm dropped
+ * to the bottom of the screen. Always a new screen should start at the
+ * top."
+ *
+ * router.js resets scroll on every view MOUNT -- but advancing between
+ * exercises does not navigate, it re-renders in place, so nothing reset
+ * it. You finish a card at the bottom (Next Exercise lives there), the
+ * next card renders, and you are still at the bottom: past its name, past
+ * the timer, looking at the watch-outs for something you have not read
+ * yet.
+ *
+ * Five views, nine advance points. Lives here rather than in each of them
+ * because every card-shaped view already imports this module, and nine
+ * copies of a one-line fix is how eight of them drift.
+ *
+ * `instant` deliberately: a smooth scroll from the bottom of one card to
+ * the top of the next animates past everything in between, which reads as
+ * the screen having lurched.
+ */
+export function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
 export function renderLogBlock(exercise, idPrefix = "slog", mode) {
   if (store.get("liftLogEnabled") !== true) return "";
   if (!exercise?.id) return "";
@@ -215,7 +244,7 @@ export function renderLogBlock(exercise, idPrefix = "slog", mode) {
       <div class="slog__row">
         ${fields.map(f => `
           <label class="slog__label" for="${idPrefix}-${f.key}">${esc(f.label)}</label>
-          <input class="slog__input" id="${idPrefix}-${f.key}"
+          <input class="slog__input ${f.key === "note" ? "slog__input--note" : ""}" id="${idPrefix}-${f.key}"
                  type="${f.type}"
                  inputmode="${f.type === "number" ? "decimal" : "text"}"
                  ${f.step ? `min="0" step="${f.step}"` : ""}
