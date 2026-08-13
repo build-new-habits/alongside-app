@@ -1,4 +1,20 @@
 # ALONGSIDE: Market Research & Feasibility Analysis
+
+> ## ⚠️ SUPERSEDED PRICING — SAFE TO IGNORE
+>
+> **This document quotes £9.99/month and/or £89/year. Those figures are retired.**
+>
+> **The confirmed price is £7.99 a month, or £49.99 for the year** (launch rate to
+> the end of November 2026; £59.99/year thereafter; beta conversion £39.99/year).
+> Source: `Documents/Business/alongside_pricing_model_20jun2026_v2.docx` §1,
+> confirmed by Graeme on 13 August 2026.
+>
+> Nothing else in this document is affected — the reasoning, research and
+> structure still stand and are worth reading. Only the numbers are old news.
+> The document is kept intact rather than edited so the thinking that produced
+> the change stays legible.
+
+
 ## Reality Check Before Building | January 2026
 
 ---

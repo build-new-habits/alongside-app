@@ -1,5 +1,24 @@
 /**
  * data/exercises/rehabilitation.js
+ * 13 Aug 2026 v4
+ *
+ * v4 - C1. Three shared copy blocks rewritten across all 94
+ *   entries. The old text assumed a clinician exists: "check with
+ *   whoever is treating you", and framed everything as "rehabilitation",
+ *   which reads as a diagnosis to somebody who has neither. Both were
+ *   reaching people with no condition at all (see C2, still open).
+ *
+ *   External help is now OFFERED, never presumed. The wording has to
+ *   work for somebody mid-physio, somebody who has never seen anyone,
+ *   and somebody who cannot afford to -- the third is not hypothetical;
+ *   it is in Graeme's own About copy, "I couldn't afford a physio".
+ *
+ *   NOT FIXED HERE, logged as C1b: all 94 entries still share ONE
+ *   identical watchOut block. A generic "what to watch for" teaches
+ *   nothing and trains people to stop reading the block, which costs
+ *   the entries where it is specific. That is a content stream, not a
+ *   build session.
+ *
  * 10 Aug 2026 v3
  *
  * v3 — Added tailored YouTube search terms to all 94 exercises
@@ -69,10 +88,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25,
     sets: 2,
     reps: "15 each side",
@@ -120,10 +139,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   },
 
@@ -161,10 +180,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25,
     sets: 3,
     reps: "12",
@@ -212,10 +231,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40,
     sets: 3,
     reps: "10 each side",
@@ -263,10 +282,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -303,10 +322,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -343,10 +362,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -383,10 +402,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -423,10 +442,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -463,10 +482,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
   },
 
@@ -503,10 +522,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
   },
 
@@ -543,10 +562,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45
   },
 
@@ -583,10 +602,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45
   },
 
@@ -624,10 +643,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -664,10 +683,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
   },
 
@@ -704,10 +723,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -751,10 +770,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -792,10 +811,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -832,10 +851,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   },
 
@@ -872,10 +891,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -913,10 +932,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
   },
 
@@ -953,10 +972,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 60
   },
 
@@ -993,10 +1012,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45
   },
 
@@ -1033,10 +1052,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
   },
 
@@ -1074,10 +1093,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 50
   },
 
@@ -1115,10 +1134,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -1155,10 +1174,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -1195,10 +1214,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45
   },
 
@@ -1234,10 +1253,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 50
   },
 
@@ -1274,10 +1293,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
   },
 
@@ -1320,10 +1339,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -1360,10 +1379,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -1400,10 +1419,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -1440,10 +1459,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -1480,10 +1499,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -1520,10 +1539,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -1560,10 +1579,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -1598,10 +1617,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
   },
 
@@ -1638,10 +1657,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -1678,10 +1697,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -1724,10 +1743,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   },
 
@@ -1764,10 +1783,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -1804,10 +1823,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
   },
 
@@ -1844,10 +1863,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   },
 
@@ -1884,10 +1903,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   },
 
@@ -1924,10 +1943,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -1964,10 +1983,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -2004,10 +2023,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -2044,10 +2063,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   },
 
@@ -2084,10 +2103,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -2124,10 +2143,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -2164,10 +2183,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
   },
 
@@ -2210,10 +2229,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -2249,10 +2268,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   },
 
@@ -2288,10 +2307,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   },
 
@@ -2328,10 +2347,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   },
 
@@ -2368,10 +2387,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   },
 
@@ -2408,10 +2427,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -2448,10 +2467,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -2488,10 +2507,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -2527,10 +2546,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
   },
 
@@ -2567,10 +2586,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
   },
 
@@ -2607,10 +2626,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -2647,10 +2666,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -2695,10 +2714,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15,
     sets: 2,
     reps: "15",
@@ -2747,10 +2766,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20,
     sets: 1,
     reps: null,
@@ -2798,10 +2817,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35,
     sets: 2,
     reps: "8 each side",
@@ -2849,10 +2868,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
   },
 
@@ -2889,10 +2908,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45,
     sets: 3,
     reps: "6 each side",
@@ -2941,10 +2960,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35,
     sets: 2,
     reps: "6 each side",
@@ -2992,10 +3011,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -3033,10 +3052,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -3074,10 +3093,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
   },
 
@@ -3115,10 +3134,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -3155,10 +3174,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30,
     sets: 3,
     reps: "10",
@@ -3206,10 +3225,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35,
     sets: 2,
     reps: "each side",
@@ -3266,10 +3285,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
   },
 
@@ -3305,10 +3324,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
   },
 
@@ -3346,10 +3365,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   },
 
@@ -3387,10 +3406,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -3433,10 +3452,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -3473,10 +3492,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
   },
 
@@ -3513,10 +3532,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
   },
 
@@ -3553,10 +3572,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   }
 
@@ -3597,10 +3616,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -3637,10 +3656,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
   },
 
@@ -3677,10 +3696,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
   },
 
@@ -3717,10 +3736,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
   },
 
@@ -3757,10 +3776,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -3796,10 +3815,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
   },
 
@@ -3837,10 +3856,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 50
   },
 
@@ -3877,10 +3896,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45
   },
 
@@ -3919,10 +3938,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
   },
 
@@ -3960,10 +3979,10 @@ export const REHABILITATION = [
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; rehabilitation works through repetition over weeks',
-      'Any increase in symptoms lasting more than a day: reduce the load and check with whoever is treating you'
+      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
+      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
     ],
-    load: 'Light, and only as much as keeps you pain-free. In rehabilitation, less done consistently beats more done once.',
+    load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
   }
 

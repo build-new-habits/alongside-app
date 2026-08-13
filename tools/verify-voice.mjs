@@ -40,6 +40,19 @@ const BANNED = [
   ["sit in the discomfort",  "instructs, and clinical"],
   ["honour your",            "self-help register"],
   ["tune into your",         "self-help register"],
+
+  // C1, 13 Aug 2026 — external help is OFFERED, never presumed.
+  // The old rehabilitation boilerplate carried "check with whoever is
+  // treating you" on all 94 entries, to people who mostly have nobody
+  // treating them, and (before C2) to people with no condition at all.
+  // Graeme's own About copy says "I couldn't afford a physio" — the
+  // product cannot ship wording that assumes what its founder could not
+  // access. Note js/data/exercises is NOT in FILES below, so this is
+  // scoped to view and data copy; the exercise sweep is separate.
+  ["whoever is treating you", "presumes a clinician already exists — offer help, do not assume it"],
+  ["ask your physio",         "as above"],
+  ["your physio will",        "as above"],
+  ["as your doctor said",     "as above"],
 ];
 
 // Physical cues that legitimately contain a banned substring.
@@ -48,10 +61,34 @@ const EXEMPT = [
   // "Let gravity do the work" is a physical cue about not forcing a
   // stretch, not an instruction to do emotional work on yourself.
   /(gravity|the floor|the wall|the bench|the machine) do the work/i,
+
+  // C1, 13 Aug 2026. Adding js/data/exercises to FILES surfaced twelve
+  // hits, ALL of them physical cues: "legs do the work", "leaving the
+  // back to do the work", "lets momentum do the work", "lean into the
+  // turns", "lean into it with straight arms".
+  //
+  // The temptation was to drop the exercise library back out of FILES.
+  // That would have been the wrong fix: the library is exactly where
+  // the presumed-clinician copy lived, and it is the largest body of
+  // user-facing text in the product. Widening the exemption keeps the
+  // sweep and keeps the rule -- a banned phrase in a body cue is a
+  // false positive, and a gate that cries wolf gets switched off.
+  //
+  // Deliberately anchored to body parts and physics, not a blanket
+  // "do the work" pardon: "do the work" aimed at a PERSON is still
+  // caught, which is the register this rule exists for.
+  // Anatomy or physics as the subject, with an optional "to" between --
+  // "leaving the back TO do the work" is the same cue as "the back does
+  // the work". Built from the twelve real hits rather than guessed, then
+  // re-run until only genuine register violations remained.
+  /(legs|arms|glutes|hamstrings|quads|back|core|shoulders|momentum|gravity|the right muscles|the muscle|the band|the weight[^.]{0,20}) (to )?do the work/i,
+  /lean into (it|the turn|the turns|the stretch|the movement|the wall|the bar)/i,
 ];
 
 const FILES = [
   ...fs.readdirSync("js/data").filter(f => f.endsWith(".js")).map(f => `js/data/${f}`),
+  // C1: the exercise library is where the presumed-clinician copy lived.
+  ...fs.readdirSync("js/data/exercises").filter(f => f.endsWith(".js")).map(f => `js/data/exercises/${f}`),
   ...fs.readdirSync("js/views").filter(f => f.endsWith(".js")).map(f => `js/views/${f}`),
   ...fs.readdirSync("js/views/onboarding").filter(f => f.endsWith(".js")).map(f => `js/views/onboarding/${f}`),
 ];

@@ -1,16 +1,8 @@
 # Alongside: Move — Master Schedule
-## 13 Aug 2026 v187
+## 13 Aug 2026 v186
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_13aug2026_v186.md`. Remove v186 on upload.
-
-> ### 🔴 DATE CORRECTION, 13 Aug — "the November thing is not real"
->
-> Graeme, 13 Aug, verbatim. **November 2026 is not a real revenue date.** It appears in the June pricing model as a modelling assumption and has been repeated in several sessions — including twice by me today — as though it were a commitment. It is not one, and no plan should be sequenced against it.
->
-> The £49.99 launch rate holding "to the end of November 2026" remains the stated annual price condition and is unaffected. What is withdrawn is the idea that revenue *starts* then.
->
-> **The real dependency chain is unchanged and still the thing that matters:** Appendix A triage → Supabase schema → Stripe. Three deep, none started. It should be sequenced on its own merits rather than against a date nobody committed to.
+Supersedes `master_schedule_13aug2026_v185.md`. Remove v185 on upload.
 
 > ### 🟢 13 Aug, second build block — THE WHOLE TIER MODEL IS NOW REAL
 >
@@ -147,11 +139,7 @@ Source: `alongside_blueprint_trust-tier-voice_13aug2026_v1.md`. Five streams, te
 | **D-1** | Price is **£7.99/month, £49.99/year** (launch, to 30 Nov 2026; £59.99 Year 2+; beta £39.99/yr). | 🟢 **CONFIRMED by Graeme, 13 Aug.** |
 | **D-2** | Free tier must not reach premium session shapes through the Library. | 🟢 **Direction confirmed 13 Aug.** Exact boundary pending — see LIB-BOUNDARY. |
 
-**D-1 — CLOSED, 13 Aug.** £7.99/month, £49.99/year. Anything anywhere stating otherwise is retired and safe to ignore.
-
-**⚠️ CORRECTION TO THIS SCHEDULE, 13 Aug.** An earlier v185 entry claimed `build-new-habits/website` publishes £9.99/£89. **That was wrong.** The live site was checked directly: `upgrade/index.html` renders £7.99 and £49.99 and has since it was built from the locked architecture. The £9.99 figure came from a March-era file in project knowledge, not from the site repo — a stale copy read as if it were live, which is exactly the failure this project's own ground-truth rule exists to prevent. **WEB-PRICE is withdrawn, not completed: there was never anything to fix.**
-
-**Retired figures banded rather than deleted, 13 Aug.** Four Archive documents quoting £9.99/£89 now carry a "SUPERSEDED PRICING — SAFE TO IGNORE" banner at the top, naming the confirmed figures and their source. Deliberately not edited in place: the reasoning and research in them still stand, and keeping the old numbers visible under a banner leaves the thinking that produced the change legible. Files: `Alongside freemium model.md`, `Alongside market research.md`, `Alongside paywall codes feedback.md`, `Alongside build schedule.md`.
+**D-1 consequence — the website is now wrong.** `build-new-habits/website` publishes £9.99/month and £89/year. `alongside-business-plan-mar2026.docx` and `Alongside_freemium_model.md` do too. The June 2026 pricing model is the confirmed source. Publishing one price on the site while the app states another is a consumer-law exposure, not untidiness. **Correct in place, not by appending.** Logged as WEB-PRICE below.
 
 **🟠 LIB-BOUNDARY — awaiting Graeme.** His steer: free is the Full Body coach session and wellbeing, not the Library. Four Library categories carry things the 8 Mar freemium document lists as **permanently free on ethical grounds**: Prescribed (physio compliance — "a health issue, not a premium feature"), Mindful practice (breathing, journal, mindful movement, rest day), Coach recommends, and the activity Log. Locking the Library as a *screen* would paywall all four. Recommendation is to lock by *card*, not by screen. Needs his yes before B1 builds.
 
@@ -222,7 +210,7 @@ Measured: 30 of 186 Full Body main candidates (16.1%) and 31 of 108 warm-up cand
 | **E1** | Empathy prompt conditions are `prefers`, not `requires`, so a neutral context degenerates to rotation. Priya (energy 7 for three weeks) was told she'd had a hard day three times. Move to `requires` **and add positive-context prompts** or the pool starves. | 🟠 P2 | 🟠 Unstarted | w/c 17 Aug |
 | **E2** | `progress.js:469` — export counts partials; every on-screen count does not. **Change the gate too**: `verify-count1.mjs:60-66` asserts `via >= 2`, a floor, so it cannot detect the case it exists for. | 🟡 P3 | 🟠 Unstarted | w/c 17 Aug |
 | **E3** | `in-step.js:6` header still says "Personal tier" — DOOR-1 made it free 12 Aug. Correct **in place**. | 🟡 P3 | 🟠 Unstarted | w/c 17 Aug |
-| **WEB-PRICE** | ~~Website publishes £9.99/£89.~~ **WITHDRAWN — the claim was false.** Live site verified: `upgrade/index.html` publishes £7.99/£49.99 correctly. Archive docs banded as superseded instead. | 🟠 P2 | 🟢 **Closed 13 Aug** | w/c 17 Aug |
+| **WEB-PRICE** | Website publishes £9.99/£89. Correct to £7.99/£49.99 across `build-new-habits/website` and retire the figure in the March business plan and `Alongside_freemium_model.md`, in place. | 🟠 P2 | 🟠 Unstarted | w/c 17 Aug |
 
 ### Two questions for Graeme, not fixes
 
