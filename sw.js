@@ -1,6 +1,39 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v296
+ * Device pass part 2. Two fixes and a new gate.
+ *
+ * CSS-1 -- Graeme, on the run type picker: "Image 1 is unstyled. We need
+ * to audit all pages. This was a previously known issue in Library."
+ *
+ * He was right that it is a class of problem rather than one screen.
+ * Auditing every class rendered by a view against every class defined in
+ * CSS found 174 with NO RULE ANYWHERE -- including the entire .ws-*
+ * family, so walk, run, cycle and swim rendered as unstyled text on every
+ * screen of all four.
+ *
+ * Nothing errors. A class with no rule is not a bug to any tool: the
+ * markup is valid, the JS runs, the screen appears. It just looks like a
+ * draft, and the only detector was somebody opening it.
+ *
+ * New css/components/single-activity-session.css, precached. Styled to
+ * existing patterns rather than a fifth visual language: choice cards
+ * follow .ci-choice, the prompt follows .gmoment.
+ *
+ * DISP-4 -- Graeme: "where I increase text size in settings/display the
+ * things like week plan then need to be slideable like the settings
+ * tabs." The week strip was grid-template-columns: repeat(7, 1fr), which
+ * forces seven days into the viewport whatever the text size, so at 130%
+ * Sat and Sun were simply unreachable. A fixed column count and a
+ * user-controlled type scale cannot both be satisfied, and it should not
+ * be the text size that gives. Now scrolls with snap, exactly as he
+ * suggested. At default scale all seven still fit.
+ *
+ * New tools/verify-css.mjs: a RATCHET, budgeted at the current 157 rather
+ * than zero. 174 cannot be fixed in one pass and a gate that fails from
+ * day one gets switched off. It can only go down.
+ *
  * 12 Aug 2026 v295
  * Device pass, parts 0 and 1. Four fixes.
  *
@@ -1784,7 +1817,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v295";
+const CACHE_NAME = "alongside-v296";
 
 const SHELL_URLS = [
 
@@ -1819,6 +1852,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/display-preferences.css",
   "/alongside-app/css/components/session-log.css",
   "/alongside-app/css/components/grounding-moments.css",
+  "/alongside-app/css/components/single-activity-session.css",
   "/alongside-app/css/components/upgrade-door.css",
 
   // CSS completeness, same pass. main.css @imports these, and an @import
