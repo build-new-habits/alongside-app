@@ -232,6 +232,7 @@
  */
 
 import { store }                    from '../store.js';
+import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { bodyCaution } from "../data/session-rationale.js";
 // EMP/LOG-1: the note block moved to js/session-log.js so workout.js can
 // reach it too. progressionInvitation is still used by the block, but it
@@ -809,6 +810,13 @@ export function GymProgrammeView(router) {
             return _c ? `<p class="exercise-caution" role="note">${_c}</p>` : "";
           })()}
 
+          <!-- FEED-1. Two buttons, no "about right" -- silence already means
+               that, and a third option turns an optional aside into a
+               question on every exercise. Not a rating: no stars, no scale.
+               Two of the last five are needed before selection moves
+               anything, and nothing is ever displayed back. -->
+          ${renderFeedbackControl(exercise)}
+
           ${exercise.watchOut && exercise.watchOut.length > 0 ? `
             <div class="exercise-watchout" role="region" aria-label="What to watch for with ${_esc(exercise.name)}">
               <span class="exercise-section-label" id="gp-section-watchout">What to watch for</span>
@@ -878,6 +886,8 @@ export function GymProgrammeView(router) {
     });
 
     attachLogEvents(exercise);
+    // FEED-1. Self-painting, so no re-render hook is needed.
+    attachFeedbackEvents(exercise);
 
     // Not a fan — toggles and re-renders so the label updates in place.
     document.querySelector('[data-notafan]')?.addEventListener('click', (e) => {
