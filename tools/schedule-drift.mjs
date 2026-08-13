@@ -44,7 +44,11 @@ const DEAD = /(read by nothing|never read|zero callers|no callers|written on .{0
 // Only OPEN claims. A resolved entry that describes what USED to be dead
 // is a reasoning trail, not an instruction, and flagging those would bury
 // the live ones -- a report of 38 items is a report nobody reads.
-const RESOLVED = /🟢|RESOLVED|SUPERSEDED|CLOSED|WILL-NOT-DO|WAS ALREADY FIXED|SHIPPED|Fixed|fixed on/;
+// A row that CORRECTS a stale claim necessarily quotes the claim it is
+// correcting. Those are the most valuable rows in the document and the
+// gate must not keep flagging them -- a gate that reports its own
+// corrections is one people stop reading.
+const RESOLVED = /🟢|RESOLVED|SUPERSEDED|CLOSED|WILL-NOT-DO|WAS ALREADY FIXED|SHIPPED|Fixed|fixed on|STALE|Already corrected|CORRECTED|Original entry|Original finding/;
 const OPEN     = /🟠|🔴|Not booked|not booked|Open\.|⬜/;
 
 const claims = [];

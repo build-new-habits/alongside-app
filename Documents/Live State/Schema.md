@@ -1,10 +1,38 @@
 # Alongside — Data Schema Reference
-## 12 Aug 2026 v1.30
+## 12 Aug 2026 v1.31
 
-**File:** `js/store.js` (confirmed live version: **v36, 12 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v38, 12 Aug 2026**)
 **Storage:** `localStorage` key `alongside_user`
 
-**This version supersedes:** v1.29 (12 Aug 2026).
+**This version supersedes:** v1.30 (12 Aug 2026).
+
+**v1.31 (12 Aug 2026)** — device pass. `store.js` v36 → **v38**.
+
+### `clearExerciseFeedback(exerciseId)` — NEW method, `store.js` v37
+
+Removes every `exerciseFeedback` entry for one exercise, so tapping the button already set undoes it. **A signal you cannot withdraw is one people stop giving.** Removes *all* entries for that id, not just the last — the reader looks at the last five, so leaving four behind would mean the undo silently did nothing.
+
+### `completedSessions(entries)` — NEW method, `store.js` v38
+
+**The single definition of "a session that happened":** every entry whose `status` is not `'partial'`.
+
+Added after Graeme's device pass found **three surfaces using three rules** and showing three different numbers on screen:
+
+| Surface | Counted | Showed |
+|---|---|---|
+| Home | every entry, partials included | **7** |
+| Progress | every entry in window, partials included | **7** |
+| Build Your Base | `activeProgramme.totalSessions`, completions only | **2** |
+
+Now used by `today.js` (×4), `progress.js` (×2) and `reflect.js`'s `getSessionCount()`.
+
+**Two of those reads matter more than the count.** `_sessionCompletedToday()` drives *"You moved today — that's done"*, and `getSessionCount()` drives the empathy arc — so a session opened and abandoned both told somebody they had moved and advanced them toward a prompt meant to follow real experience.
+
+**Partials remain in `activityLog`.** A partial is a real record — it is how the app knows you started, and continuity reads it. It is simply not a session you did.
+
+### `exerciseFeedback` — **NOW WRITTEN** (FEED-1)
+
+Previously recorded here as read-by-`applyFeedbackWeighting()`-and-never-written since v1.3. `js/exercise-feedback.js` writes it via `store.logExerciseFeedback()`. **Last of the five reader-without-writer fields closed.**
 
 **v1.30 (12 Aug 2026)** — BIAS-1. `proposalBias` declared and wired. `store.js` v34 → **v36**.
 
