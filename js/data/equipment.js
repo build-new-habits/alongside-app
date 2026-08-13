@@ -94,7 +94,18 @@ export const EQUIPMENT_CATEGORIES = [
       { id: 'boxing-gloves', name: 'Boxing gloves + pads' },
       { id: 'sandbag', name: 'Sandbag' },
       { id: 'landmine', name: 'Landmine attachment' },
-      { id: 'sled', name: 'Sled or prowler' }
+      { id: 'sled', name: 'Sled or prowler' },
+      // EQUIP-5, 12 Aug 2026. Deep sweep. These three were REQUIRED by
+      // exercises and existed nowhere in the catalogue, so nobody could
+      // ever tick them and six exercises were permanently unreachable --
+      // agility-ladder (4), nordic-walking-poles (1), reaction-ball (1).
+      // Found by resolving the entire catalogue and diffing it against
+      // every equipment tag the database requires, which is the check
+      // that should have existed from the start.
+      { id: 'agility-ladder', name: 'Agility ladder' },
+      { id: 'agility-cones', name: 'Agility cones/markers' },
+      { id: 'reaction-ball', name: 'Reaction ball' },
+      { id: 'nordic-walking-poles', name: 'Nordic walking poles' }
     ]
   },
   {
