@@ -1,6 +1,25 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v312
+ * EQUIP-4 ACTUALLY SHIPPED THIS TIME.
+ *
+ * The v310 commit did not contain the fix. Testing the new sweep against
+ * pre-fix code, I checked session-builder-ui.js out at HEAD~2 and
+ * restored it from /tmp afterwards -- but the commit in between captured
+ * the reverted file. So v310 and v311 both shipped the OLD duration
+ * handler, which pre-seeds equipmentOverride and switches the resolver
+ * off.
+ *
+ * Caught by running the sweep against a FRESH CLONE of the remote rather
+ * than the working directory. Locally everything passed; deployed, it
+ * failed. That check is the only reason this was not a fifth report from
+ * Graeme.
+ *
+ * Lesson, and it is the same shape as the others: verifying the thing in
+ * front of me rather than the thing that shipped. Fresh-clone verification
+ * after push is not ceremony.
+ *
  * 12 Aug 2026 v311
  * EQUIP-5. Deep sweep of the entire equipment chain.
  *
@@ -2217,7 +2236,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v311";
+const CACHE_NAME = "alongside-v312";
 
 const SHELL_URLS = [
 
