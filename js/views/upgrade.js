@@ -1,6 +1,6 @@
 /**
  * upgrade.js - Upgrade / Membership view
- * 13 Aug 2026 v4
+ * 13 Aug 2026 v5
  *
  * A2. The real page, replacing the 22 May stub.
  *
@@ -47,9 +47,15 @@
  * wellbeing arc, genuinely gated in in-step.js), and leaves the fourth
  * slot empty rather than filling it.
  *
- * Three honest statements beat four with padding. When D-2 resolves and
- * the exercise-library question is decided, the fourth goes back in --
- * STATEMENTS below is a list precisely so that is a one-line change.
+ * UPDATE, same day. TIER-C shipped and gated the programme engine, so
+ * "Your programme builds" is now true and has been restored. TIER-D
+ * settled the other one the opposite way: the exercise database is
+ * deliberately NEVER tier-gated, because capability already decides what
+ * somebody gets -- by what is safe for them, not by what they have paid.
+ * That statement stays retired permanently, and the line asserting it
+ * should be removed from the 09 Jul architecture doc rather than built.
+ *
+ * Four statements again, as the architecture intended, all four true.
  *
  * ── THE TRANSACTION ─────────────────────────────────────────────────
  *
@@ -111,6 +117,11 @@ const STATEMENTS = [
   // progress.js:384 stops the coach narrative after line 1 for free, and
   // withholds the 90-day window, the type breakdown and export.
   "Your progress becomes a conversation \u2014 patterns noticed, trends named, the coach reflecting back what it sees across weeks, not just today.",
+  // gym-programme.js -- TRUE as of TIER-C, 13 Aug 2026. Withheld when
+  // this page shipped that morning because the twelve-week engine had
+  // no tier check at all and the statement would have been a promise
+  // the product did not keep. It keeps it now.
+  "Your programme builds \u2014 week on week, phase by phase, going somewhere rather than just showing up.",
   // in-step.js: the long arc behind the In Step door.
   "And the long practices open up \u2014 the ones that go somewhere over months, shaped around what you\u2019re actually noticing rather than a fixed course."
 ];
