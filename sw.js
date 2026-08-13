@@ -1,10 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 13 Aug 2026 v315
+ * 13 Aug 2026 v316
  * A1 + A3. settings.js v22, settings.css v7, upgrade.js v3.
  * No new files to precache — both changed files are already listed.
-
+ *
  * 12 Aug 2026 v314
  * LOG-6. The note is readable back before you save it.
  *
@@ -2287,7 +2287,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v315";
+const CACHE_NAME = "alongside-v316";
 
 const SHELL_URLS = [
 
