@@ -12,6 +12,13 @@ const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "")
                     .replace(/<!--[\s\S]*?-->/g, "")
                     .replace(/^\s*\/\/[^\n]*$/gm, "");
 const read = f => strip(fs.readFileSync(`js/views/${f}.js`, "utf8"));
+const mem = {};
+globalThis.localStorage = {
+  getItem: k => (k in mem ? mem[k] : null),
+  setItem: (k, v) => { mem[k] = String(v); },
+  removeItem: k => { delete mem[k]; },
+};
+const { EXERCISES: EX } = await import("/home/claude/repo/js/data/exercises/index.js");
 
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
@@ -86,6 +93,26 @@ check("the block sits before the actions, not after", () => {
        `${v}: stranded underneath the buttons, where nobody fills it in`);
   }
 });
+
+console.log("\nQUIET-1 - breathing and mindfulness become familiar too");
+check("quiet-session supplies exerciseIds", () =>
+  ok(/exerciseIds:\s*DB_ID\[localId\]/.test(read("quiet-session")),
+     "no ids logged, so no breathing pattern ever becomes familiar - " +
+     "'something like last time' could never offer the one they actually use"));
+check("every mapped id exists in the exercise database", async () => {
+  const s = read("quiet-session");
+  const block = s.match(/const DB_ID = \{[\s\S]*?\n\};/);
+  ok(block, "DB_ID map not found");
+  const targets = [...block[0].matchAll(/:\s*"([a-z0-9-]+)"/g)].map(m => m[1]);
+  ok(targets.length >= 10, `expected the full map, found ${targets.length}`);
+  const db = new Set(EX.map(e => e.id));
+  const missing = targets.filter(x => !db.has(x));
+  ok(missing.length === 0,
+     `mapped to ids that do not exist - a phantom history entry: ${missing.join(", ")}`);
+});
+check("an unmapped practice logs NO id rather than a local one", () =>
+  ok(/DB_ID\[localId\] \? \[DB_ID\[localId\]\] : \[\]/.test(read("quiet-session")),
+     "logging a local id that matches nothing is worse than logging none"));
 
 console.log("\nRestoration views stay excluded");
 for (const v of ["breathing-session", "quiet-session"])
