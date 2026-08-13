@@ -49,7 +49,7 @@ for (const f of walk("css", ".css"))
 const missing = [...used.keys()].filter(c => !defined.has(c)).sort();
 
 // Ratchet. Lower this as families are fixed; never raise it.
-const BUDGET = 157;
+const BUDGET = 131;   // 174 -> 157 (CSS-1, .ws-*) -> 131 (CSS-2, .cs-*/.gym-*)
 
 console.log(`\nclasses rendered by views: ${used.size}`);
 console.log(`classes defined in CSS:    ${defined.size}`);
@@ -75,7 +75,16 @@ const LOCKED = ["ws-type-grid", "ws-type-card", "ws-type-icon", "ws-type-label",
                 "ws-type-desc", "ws-duration-grid", "ws-duration-card",
                 "ws-duration-label", "ws-timer-block", "ws-timer-value",
                 "ws-timer-label", "ws-prompt-text", "ws-prompt-dismiss",
-                "ws-active-card", "ws-controls"];
+                "ws-active-card", "ws-controls",
+                // CSS-2. The pickers Graeme saw rendering as plain text,
+                // plus workout-header-title -- 41 uses, the largest single
+                // gap, and why titles collided with the home icon.
+                "cs-focus-grid", "cs-focus-card", "cs-focus-icon",
+                "cs-focus-label", "cs-focus-desc", "cs-duration-grid",
+                "cs-duration-card", "cs-duration-label", "cs-duration-desc",
+                "cs-duration-count", "gym-exercise-card", "gym-exercise-name",
+                "gym-exercises-list", "gym-card-meta-row", "gym-card-chevron",
+                "workout-header-title", "exercise-cue", "yoga-session-view"];
 const regressed = LOCKED.filter(c => !defined.has(c));
 if (regressed.length) {
   fails++;
