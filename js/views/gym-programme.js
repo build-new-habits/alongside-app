@@ -237,7 +237,7 @@ import { bodyCaution } from "../data/session-rationale.js";
 // EMP/LOG-1: the note block moved to js/session-log.js so workout.js can
 // reach it too. progressionInvitation is still used by the block, but it
 // is imported there now, not here.
-import { renderLogBlock, attachLogEvents } from '../session-log.js';
+import { renderLogBlock, attachLogEvents, scrollToTop } from '../session-log.js';
 import { getProgramme }             from '../data/programmes.js';
 import {
   getProgressStats,
@@ -926,6 +926,7 @@ export function GymProgrammeView(router) {
       finishSession(container, session, stats);
     } else {
       currentExerciseIndex++;
+  scrollToTop();   // SCROLL-1: a new card starts at the top
       resetTimer();
       renderCurrentExercise(container, session, stats, sessionType);
     }

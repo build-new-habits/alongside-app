@@ -102,5 +102,45 @@ check("js/session-log.js precached", () =>
 check("the old .gp-lift rules are gone, not left dead", () =>
   ok(!/\.gp-lift/.test(gymCss), "dead CSS left behind after the move"));
 
+console.log("\nSCROLL-1 - a new card starts at the top");
+for (const v of ["workout", "core-session", "prescribed-session", "gym-programme", "yoga-session"])
+  check(`${v} scrolls up on advance`, () => {
+    const s = fs.readFileSync(`js/views/${v}.js`, "utf8");
+    const advances = (s.match(/(current(Exercise)?Index)\+\+;/g) || []).length;
+    const scrolls  = (s.match(/scrollToTop\(\);/g) || []).length;
+    ok(advances > 0, "no advance point found - the regex has drifted");
+    ok(scrolls >= advances,
+       `${advances} advance point(s), ${scrolls} scroll reset(s). router.js ` +
+       `resets scroll on view MOUNT, but advancing re-renders in place - so ` +
+       `you finish a card at the bottom and the next one opens there too`);
+    ok(/import \{[^}]*scrollToTop[^}]*\} from ['"]\.\.\/session-log\.js['"]/.test(s),
+       "not imported");
+  });
+check("one definition, not five", () => {
+  const src = fs.readFileSync("js/session-log.js", "utf8");
+  ok(/export function scrollToTop/.test(src), "helper missing from the shared module");
+  for (const v of ["workout", "core-session", "yoga-session"])
+    ok(!/function scrollToTop/.test(fs.readFileSync(`js/views/${v}.js`, "utf8")),
+       `${v} declares its own - five copies is how four of them drift`);
+});
+check("instant, not smooth", () => {
+  const src = fs.readFileSync("js/session-log.js", "utf8");
+  ok(/behavior: "instant"/.test(src),
+     "a smooth scroll from the bottom of one card to the top of the next " +
+     "animates past everything between, which reads as a lurch");
+});
+
+console.log("\nLOG-5 - the note field takes the space it needs");
+check("note is not a fixed-width number box", () => {
+  const css = fs.readFileSync("css/components/session-log.css", "utf8");
+  ok(/\.slog__input--note \{/.test(css), "no note modifier");
+  const rule = css.slice(css.indexOf(".slog__input--note {"), css.indexOf("}", css.indexOf(".slog__input--note {")));
+  ok(/flex: 1 1/.test(rule), "must take the remaining width");
+  ok(/min-width: 0/.test(rule), "without this it pushes Save off the edge on a tight row");
+});
+check("the markup tags the note field", () =>
+  ok(/f\.key === "note" \? "slog__input--note"/.test(fs.readFileSync("js/session-log.js", "utf8")),
+     "class never applied"));
+
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
 process.exit(fails === 0 ? 0 : 1);
