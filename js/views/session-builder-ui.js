@@ -460,9 +460,23 @@ function renderEquipmentCheck() {
       <div class="card card-coach" style="margin-bottom: var(--space-4);">
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
         <p class="coach-message-text">
+          ${/* EQUIP-1, 12 Aug 2026. Graeme, device pass part 5: "Even though
+                in settings my equipment says full gym, in the cardio, core,
+                strength I have to select the equipment."
+
+                The behaviour was correct and the copy was not. Equipment is
+                saved per SCOPE -- homeEquipment and gymEquipment are
+                separate lists -- and this screen reads the one matching
+                today's location, which defaults to home. He had saved Full
+                gym under the gym scope, so the session showed his home
+                list and looked like it had forgotten.
+
+                Naming the list is the whole fix. "Here's what I think you
+                have access to today" is true of either list and therefore
+                explains neither. */ ""}
           ${hasSavedEquipment
-            ? `Here's what I think you have access to today. Untick anything you don't have &mdash; I'll adjust the session. Changes here don't affect your saved settings.`
-            : `I don't have any equipment saved for you yet. Tick anything you have today &mdash; I'll build around it. Changes here don't affect your saved settings.`}
+            ? `Here's your ${selectedLocation === "gym" ? "gym" : "home"} kit. Untick anything you haven't got with you &mdash; I'll adjust the session. Changes here don't affect what you've saved.`
+            : `I haven't got any ${selectedLocation === "gym" ? "gym" : "home"} equipment saved for you${selectedLocation === "gym" ? " &mdash; you may have saved a home list instead" : ""}. Tick anything you have today and I'll build around it. Changes here don't affect what you've saved.`}
         </p>
       </div>
 

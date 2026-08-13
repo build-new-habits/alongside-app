@@ -208,7 +208,12 @@ function getSessionCount() {
   // treats every activityLog entry as a countable session — consistent
   // with the app-wide Credits Scope Rule that all activity counts, not
   // just workouts. activityLog.length (post-save) is used as the count.
-  return (store.get("activityLog") || []).length;
+  // COUNT-1, 12 Aug 2026. Partials excluded, matching Home, Progress and
+  // Build Your Base. A session opened and backed out of moved somebody
+  // toward their next empathy prompt and toward the next stage of the
+  // arc -- so the prompt that is meant to arrive after real accumulated
+  // experience could arrive after none.
+  return store.completedSessions(store.get("activityLog")).length;
 }
 
 // EMP-1 thresholds. Named rather than inlined so the numbers are
