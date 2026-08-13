@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v180
+## 12 Aug 2026 v179
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v179.md`. Remove v179 on upload.
+Supersedes `master_schedule_12aug2026_v178.md`. Remove v178 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -354,48 +354,6 @@ Graeme's plank model included that mindful practice produces more muscle definit
 `verify-decisions.mjs`'s P5 check matched on `equipment` **plus** `movementPattern` — which is what a *strength* entry looks like. Yoga poses carry `holdSeconds` and `rest`, so **30 inline pose entries walked straight through the check written that morning to catch exactly this.**
 
 Now matches on `id` + `name`, the weakest signal every selectable thing in the product shares. **Each remaining budget is documented with its justification, because a budget without a reason is a hole.**
-
----
-
-## 🟢 FEED-1 — the LAST reader-without-a-writer is closed. 12 Aug 2026.
-
-New `js/exercise-feedback.js`. `js/store.js` v36 → **v37**. Rendered in `workout.js`, `core-session.js`, `prescribed-session.js`, `gym-programme.js`. New `tools/verify-feed1.mjs`. `sw.js` → **v293**, cache **alongside-v293**.
-
-`applyFeedbackWeighting()` has read `exerciseFeedback` since v1.3 and **nothing ever wrote it**. The weighting has never once run on real data — it takes the array, finds it empty, returns the pool untouched. `store.logExerciseFeedback()` was even built for it in v20.
-
-**Fifth confirmed instance of the pattern, and the last one open.**
-
-### The full set, now closed
-
-| Field | Written | Read | Closed |
-|---|---|---|---|
-| `sessionVariety` | never | selection | **DIC-1** |
-| `empathyLastPrompt` | n/a — new | — | **EMP-1** |
-| `proposalBias` | 03 Aug | never | **BIAS-1** |
-| `capability.legPower` | never asked | profile | **C1** |
-| `exerciseFeedback` | never | weighting | **FEED-1** |
-
-### Design decisions
-
-**Not a rating.** No stars, no scale, no "out of 10" — the skip/dislike spec §6 settled that, and *"Not a fan of this one"* already follows it. This **matches that pattern** rather than inventing a second vocabulary for the same card.
-
-**No "about right" third option.** Silence already means that. A third button turns an optional aside into a question with three answers on every exercise, which is measurement pressure.
-
-**Undoable.** `clearExerciseFeedback()` added, so tapping the button already set withdraws it — the same undo *"Not a fan"* offers. **A signal you cannot withdraw is one people stop giving.** Clears *all* entries for that id, because leaving four of five behind would make the undo silently do nothing.
-
-**Self-painting**, rather than requiring a view re-render. Only `gym-programme` has a re-render function of the right shape; inventing one in three views for a two-button control would be the tail wagging the dog.
-
-**P4:** two of the last five are needed before selection moves anything, so one hard day changes nothing — and nothing is ever displayed back. No counter, no history, no *"you've found this hard 3 times."*
-
-**Absent from breathing and quiet sessions.** Asking whether restoration was too easy is a category error.
-
----
-
-## 🔵 NAV-2 — NOT built, and deliberately so
-
-Its own entry says **"Book after device pass"** — the agreed sequence is front doors, then goal-directed pointers, then a short tour. **The device pass has not happened.**
-
-Building it now would jump Graeme's own sequencing, and the pointers depend on knowing which doors people actually fail to find — which is exactly what the device pass produces. It was listed as "buildable" in an earlier summary; that was wrong. **Sequence-gated, not buildable.**
 
 ---
 
@@ -2218,4 +2176,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v180*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v179*
