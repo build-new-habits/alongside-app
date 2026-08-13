@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v318
+ * TIER-A/B/C/F. library.js v4, today.js v13, gym-programme.js v5,
+ * session-builder-ui.js v8, noticing.js, index.html, upgrade.js v5.
+ * No new files to precache.
+ *
  * 13 Aug 2026 v317
  * A2. The real upgrade page. upgrade.js v4, new
  * css/components/upgrade-page.css (precached), main.css v22.
@@ -2291,7 +2296,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v317";
+const CACHE_NAME = "alongside-v318";
 
 const SHELL_URLS = [
 
