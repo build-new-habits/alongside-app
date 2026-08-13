@@ -151,5 +151,50 @@ check("Wellbeing is called Wellbeing everywhere a user can read it", () => {
      "reader announces on arriving from a tab labelled Wellbeing");
 });
 
+console.log("\nTIER-E — Progress differs in KIND, not length");
+
+const progress = read("js/views/progress.js");
+
+check("free is a fortnight", () =>
+  ok(/const FREE_WINDOW\s*=\s*14/.test(progress),
+     "the free window is not 14 days. Section 4.1: if free is fourteen days " +
+     "and Personal is ninety, we are selling a bigger number"));
+
+check("free RECORDS — no appraisal attached to a count", () => {
+  // These fired on a number crossing a threshold: nine sessions got
+  // "building something", ten got promoted to "a real habit". A verdict
+  // on the person, delivered by arithmetic. P4 forbids it, and it was
+  // doing the work that reading should do.
+  for (const banned of [/a real habit/i, /consistent movement/i,
+                        /consistency like that changes things/i,
+                        /a lot of showing up/i]) {
+    ok(!banned.test(progress),
+       `an appraisal is attached to a session count: ${banned}. Free records; ` +
+       "it states the number and stops");
+  }
+});
+
+check("Personal READS — the observation free cannot produce exists", () =>
+  ok(/_readShowedUpAnyway/.test(progress),
+     "the read is gone. Personal without it is free with a bigger window, " +
+     "which is exactly the failure section 4.1 names"));
+
+check("the read waits until it has earned its closing line", () => {
+  const fn = progress.slice(progress.indexOf("function _readShowedUpAnyway"));
+  const body = fn.slice(0, fn.indexOf("function _detectEnergyPattern"));
+  ok(/lowDays\.length < 3/.test(body),
+     "no floor on low-energy arrivals — a read from two data points is a horoscope");
+  ok(/finished < 3/.test(body),
+     "no floor on COMPLETED sessions. Without it the line can read 'you came in " +
+     "low 3 times, 2 of those you moved anyway' and then claim the person does " +
+     "not know that about themselves, on top of a number that also says they " +
+     "did not, once");
+});
+
+check("the window is initialised per tier", () =>
+  ok(/activeWindow === null.*premium|premium \? PAID_DEFAULT : FREE_WINDOW/s.test(progress),
+     "a single shared default leaves a Personal user on the 14-day window while " +
+     "their tab strip offers only 30 and 90 — no tab reads as selected"));
+
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
 process.exit(fails === 0 ? 0 : 1);

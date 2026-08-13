@@ -1,5 +1,47 @@
 /**
  * progress.js
+ * 13 Aug 2026 v5
+ *
+ * v5 - TIER-E. Progress must differ in KIND, not length.
+ *
+ * Source: Documents/Business/alongside_tier_boundary_12aug2026_v1.md
+ * section 4.1, which is blunt about what was wrong here:
+ *
+ *   "If free is fourteen days and Personal is ninety, we are selling a
+ *    bigger number, and bigger numbers are easy to shrug at."
+ *
+ *   Free RECORDS.  "That's four this fortnight." What you did. True,
+ *                  useful, complete.
+ *   Personal READS. "You've come in low-energy eleven times. Nine of
+ *                  those, you finished. I don't think you know that
+ *                  about yourself."
+ *
+ * That is not more data. It is a different act, and it is only possible
+ * when there is a destination to read toward.
+ *
+ * WHAT CHANGED, AND WHAT I ARGUED WITH.
+ *
+ * The window drops 30 -> 14 for free. This partly reverses WOW-4
+ * (11 Aug), which lifted free from 7 to 30 with a good argument: a
+ * 7-day slice showed persona 2.12 a single entry and no shape at all,
+ * making free "a different product with the coaching removed". That
+ * reasoning was right about 7 and is not right about 14. Danny trains
+ * roughly twice a week, so a fortnight holds about four sessions --
+ * enough to have a shape. The boundary document is dated one day AFTER
+ * WOW-4 and specifies fourteen, and its own copy says "fortnight", so
+ * the number is deliberate rather than incidental. WOW-4's principle
+ * survives intact; only its number moves.
+ *
+ * If free were ONLY losing sixteen days this would be a worse product.
+ * It isn't: the point of the change is the second half.
+ *
+ * Free line 1 also loses its appraisals -- "That's a real habit",
+ * "That's consistent movement". Those read as verdicts on the person,
+ * which P4 forbids ("the coach displays but never interprets"), and
+ * they were doing the work that reading should do. A record states the
+ * number and stops. Stripping them makes free MORE compliant with the
+ * founding principle, not less generous.
+ *
  * 11 Aug 2026 v4
  *
  * v4 - "Your year" link added. annual-reflection.js existed as a route
@@ -60,14 +102,23 @@ import { getGoalLabel }     from '../data/goals.js';
 
 export function ProgressView(router) {
 
-  // 11 Aug 2026 v3 (WOW-4) — free tier default lifted from 7 to 30 days.
-  // Not generosity: coherence. The founding principle is "variability is
-  // information", and a 7-day window is structurally incapable of showing
-  // variability. Persona 2.12 trains roughly twice a week with gaps; in any
-  // 7-day slice he saw one entry and no shape at all — which made the free
-  // tier a different product with the coaching removed, rather than a
-  // smaller version of it. Personal keeps 90 days, plus export and tools.
-  let activeWindow = 30; // 30 (free) | 30 | 90 (Personal)
+  // TIER-E, 13 Aug 2026. Free is a fortnight; Personal is 30 or 90.
+  //
+  // WOW-4's reasoning (11 Aug) still holds and is why this is 14 and not
+  // 7: "variability is information", and a 7-day window is structurally
+  // incapable of showing variability -- persona 2.12 saw one entry and no
+  // shape at all. Fourteen days holds about four of his sessions, which
+  // has a shape. The difference that matters is not the window; it is
+  // what the coach DOES with it (see _buildObservation).
+  const FREE_WINDOW = 14;
+  const PAID_DEFAULT = 30;
+
+  // Initialised per tier at first render rather than at module load.
+  // A single shared default left a Personal user with activeWindow = 14
+  // while their tab strip only offered 30 and 90 — so no tab read as
+  // selected and aria-selected was false on all of them. Caught by
+  // rendering both tiers rather than reading the code.
+  let activeWindow = null;
 
   // ── Mount ──────────────────────────────────────────────────────────────────
 
@@ -79,6 +130,15 @@ export function ProgressView(router) {
 
   function render(container) {
     const tier  = store.get('tier') || 'free';
+    const premium = tier === 'personal' || tier === 'athlete';
+
+    if (activeWindow === null) activeWindow = premium ? PAID_DEFAULT : FREE_WINDOW;
+
+    // A user who lapses mid-session would otherwise keep a window they
+    // are no longer entitled to. Clamp rather than reset, so somebody
+    // upgrading does not lose the view they were looking at.
+    if (!premium && activeWindow !== FREE_WINDOW) activeWindow = FREE_WINDOW;
+    if (premium && activeWindow === FREE_WINDOW)  activeWindow = PAID_DEFAULT;
     const name  = store.get('name') || '';
     const stats = getProgressStats();
 
@@ -119,17 +179,17 @@ export function ProgressView(router) {
 
   function renderWindowTabs(tier) {
     const premium = tier === 'personal' || tier === 'athlete';
-    // Free sees 30 days by default and 90 as a visible, tappable locked
-    // option — not a hidden feature. Consistent with WOW-4's principle that
-    // nothing is a dead end: a locked control explains itself and offers a
-    // route, rather than being absent or inert.
-    const windows = premium ? [30, 90] : [30, 90];
+    // Free sees its fortnight, plus 30 and 90 as visible, tappable
+    // locked options — not hidden features. WOW-4's principle that
+    // nothing is a dead end: a locked control explains itself and offers
+    // a route, rather than being absent or inert.
+    const windows = premium ? [30, 90] : [FREE_WINDOW, 30, 90];
     return `
       <div class="progress-tabs"
            role="tablist"
            aria-label="Lookback window">
         ${windows.map(w => {
-          const locked = !premium && w === 90;
+          const locked = !premium && w !== FREE_WINDOW;
           return `
           <button
             class="progress-tab ${activeWindow === w ? 'progress-tab--active' : ''}${locked ? ' progress-tab--locked' : ''}"
@@ -366,25 +426,55 @@ export function ProgressView(router) {
     const lines = [];
     const count = recent.length;
 
-    // Line 1 — consistency observation
+    // ── Line 1 — the RECORD. What you did, stated plainly.
+    //
+    // TIER-E. The appraisals that used to hang off these counts --
+    // "That's a real habit", "That's consistent movement", "Consistency
+    // like that changes things" -- are gone. Two reasons, and the second
+    // matters more than the first.
+    //
+    // P4: the coach displays but never interprets. "That's a real
+    // habit" is a verdict on the person, delivered on the strength of a
+    // number crossing ten. Somebody who did nine sessions through a
+    // hard fortnight got told they were "building something"; somebody
+    // who did ten got promoted to a habit. That is exactly the
+    // arithmetic this product refuses everywhere else.
+    //
+    // And they were doing the work that READING should do. If the free
+    // record already appraises, there is nothing left for Personal to
+    // add but a bigger number -- which is the failure section 4.1
+    // names. Stripping them is what makes room for the difference.
+    const period = windowDays === 14 ? 'this fortnight'
+                 : windowDays === 30 ? 'in the last 30 days'
+                 : windowDays === 90 ? 'over the last 90 days'
+                 : 'in this window';
+
     if (count === 0) {
       lines.push('Nothing logged in this window. Whenever you\'re ready — the app is here.');
     } else if (count === 1) {
-      lines.push('One session in this window. A start, and starts matter.');
-    } else if (count <= 4 && windowDays === 7) {
-      lines.push(`${count} sessions this week. That\'s consistent movement.`);
-    } else if (count >= 5 && windowDays === 7) {
-      lines.push(`${count} sessions this week. That\'s a lot of showing up.`);
-    } else if (windowDays === 30) {
-      lines.push(`${count} sessions in the last 30 days.${count >= 10 ? ' That\'s a real habit.' : ' Building something here.'}`);
-    } else if (windowDays === 90) {
-      lines.push(`${count} sessions over 90 days.${count >= 24 ? ' Consistency like that changes things.' : ' The foundation is forming.'}`);
+      lines.push(`One session ${period}.`);
+    } else {
+      lines.push(`That\'s ${count} ${period}.`);
     }
 
     if (tier === 'free' || !lines.length) return { lines: lines.length ? lines : ['Keep going.'] };
 
-    // Line 2 — energy pattern (Personal only)
-    const energyPattern = _detectEnergyPattern(checkinHistory, windowDays);
+    // ── Everything below is the READ, and Personal only. ──────────────
+    //
+    // Not more data — a different act. Line R comes first because it is
+    // the one that says something a person could not have counted for
+    // themselves.
+    const showedUpAnyway = _readShowedUpAnyway(checkinHistory, recent, windowDays);
+    if (showedUpAnyway) lines.push(showedUpAnyway);
+
+    // Line 2 — energy pattern (Personal only).
+    //
+    // Suppressed when the read above already fired: that read is
+    // ABOUT low energy, so following it with "Energy has been low in
+    // this window. The sessions you did were worth more because of
+    // that" says the same thing twice and blunts the better line.
+    // Mechanical de-duplication only — the existing copy is unchanged.
+    const energyPattern = showedUpAnyway ? null : _detectEnergyPattern(checkinHistory, windowDays);
     if (energyPattern) lines.push(energyPattern);
 
     // Line 3 — activity type pattern (Personal only)
@@ -398,6 +488,76 @@ export function ProgressView(router) {
     }
 
     return { lines };
+  }
+
+  /**
+   * The READ. TIER-E, 13 Aug 2026.
+   *
+   * The tier boundary document's own example of what Personal does that
+   * free cannot:
+   *
+   *   "You've come in low-energy eleven times. Nine of those, you
+   *    finished. I don't think you know that about yourself."
+   *
+   * Why THIS observation and not another: it is the one a person could
+   * not have counted for themselves. Session totals they could tally.
+   * The overlap between how they arrived and what they then did is
+   * invisible from the inside, and it is the single most useful thing
+   * this app knows about somebody -- it is the evidence for the whole
+   * premise, that showing up when you feel bad is the actual skill.
+   *
+   * P4 COMPLIANCE, because this is the line most at risk of breaching
+   * it. It points at what was noticed and attaches no verdict. It does
+   * not say the person is resilient, disciplined, or doing well. The
+   * closing sentence is about what they KNOW, not about their worth,
+   * and it is Graeme's own wording from the boundary document.
+   *
+   * Deliberately silent unless there is something real to say: at least
+   * three low-energy arrivals, at least three of them completed, and a
+   * majority. A "read" manufactured from two data points is a
+   * horoscope, and one that fires when the answer is unflattering would
+   * be the coach keeping score.
+   *
+   * The three-COMPLETED floor was added after rendering it: with only
+   * the arrivals floor, Danny's fortnight produced "you've come in low
+   * 3 times, 2 of those you moved anyway" — technically true, and it
+   * puts "I don't think you know that about yourself" on top of a
+   * number that also says he did not, once. The line has to be worth
+   * the weight of its closing sentence. It waits until it is.
+   */
+  function _readShowedUpAnyway(checkinHistory, recent, windowDays) {
+    const cutoff = _cutoffDate(windowDays);
+
+    // Low-energy arrivals: energy 4 or below at check-in.
+    const lowDays = Object.entries(checkinHistory)
+      .filter(([date, v]) =>
+        new Date(date) >= cutoff && typeof v?.energy === 'number' && v.energy <= 4)
+      .map(([date]) => date);
+
+    if (lowDays.length < 3) return null;
+
+    // Did a session land on that same day? activityLog timestamps are
+    // ISO; checkinHistory keys are YYYY-MM-DD, so compare on the date
+    // part only. Using the same field precedence the rest of this file
+    // uses (completedAt || loggedAt || date) rather than a new one.
+    const sessionDays = new Set(
+      recent.map(e => {
+        const ts = e.completedAt || e.loggedAt || e.date;
+        return ts ? new Date(ts).toISOString().split('T')[0] : null;
+      }).filter(Boolean)
+    );
+
+    const finished = lowDays.filter(d => sessionDays.has(d)).length;
+    if (finished < 3) return null;
+    if (finished < Math.ceil(lowDays.length / 2)) return null;
+
+    const times = `${lowDays.length} times`;   // floor of 3 above
+    const done  = finished === lowDays.length
+      ? 'Every one of those'
+      : `${finished} of those`;
+
+    return `You've come in low on energy ${times}. ${done}, you moved anyway. ` +
+           `I don't think you know that about yourself.`;
   }
 
   function _detectEnergyPattern(checkinHistory, windowDays) {
