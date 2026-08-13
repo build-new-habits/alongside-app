@@ -1,6 +1,29 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v291
+ * DATA-1b. v290 fixed ONE OF TWO ENGINES.
+ *
+ * Graeme asked whether DATA-1 was genuinely fixed. It was not.
+ * session-builder.js had the new rule; workoutGenerator.js is a separate
+ * engine that draws its pool from getSuitableExercises(), and that had NO
+ * exclusion of any kind -- not for practices, not for length. Measured:
+ * 340 exercises returned, of which 71 were 10+ minutes and 89 tagged
+ * 'practice'. A generated workout could hand somebody a 30-minute Brisk
+ * Walk as one of its items.
+ *
+ * isSessionLength() now lives once in data/exercises/index.js and is
+ * applied inside getSuitableExercises() as step 0 -- before equipment and
+ * conditions, so every count downstream is honest. session-builder.js
+ * imports the same function rather than keeping its own copy, because a
+ * second copy is exactly how two engines drift, and drift is the fault
+ * this rule exists to catch.
+ *
+ * After: both pools contain zero long entries and zero practices. The 167
+ * standalone entries remain reachable through the Library, Mobility &
+ * Conditioning and the single-activity views, which do not come through
+ * getSuitableExercises().
+ *
  * 12 Aug 2026 v290
  * DATA-1, and it was the opposite of what the schedule said.
  *
@@ -1654,7 +1677,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v290";
+const CACHE_NAME = "alongside-v291";
 
 const SHELL_URLS = [
 
