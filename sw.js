@@ -1,6 +1,42 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v293
+ * FEED-1. The LAST reader-without-a-writer on the board.
+ *
+ * applyFeedbackWeighting() has read exerciseFeedback since v1.3 and
+ * nothing ever wrote it, so the weighting has never once run on real
+ * data -- it takes the array, finds it empty, and returns the pool
+ * untouched. store.logExerciseFeedback() was even built for it in v20.
+ * The response existed; the capture never did. Fifth confirmed instance
+ * of the pattern, and the last one open.
+ *
+ * New js/exercise-feedback.js, precached. Two buttons on the exercise
+ * card in workout, core-session, prescribed-session and gym-programme.
+ *
+ * NOT A RATING. No stars, no scale, no "out of 10" -- the skip/dislike
+ * spec section 6 settled that, and "Not a fan of this one" already
+ * follows it, so this matches that pattern rather than inventing a
+ * second vocabulary for the same card.
+ *
+ * NO "ABOUT RIGHT" THIRD OPTION: silence already means that, and a third
+ * button turns an optional aside into a question on every exercise,
+ * which is measurement pressure.
+ *
+ * store.js v36 -> v37 adds clearExerciseFeedback(), so tapping the
+ * button already set undoes it -- the same undo "Not a fan" offers. A
+ * signal you cannot withdraw is one people stop giving. It clears ALL
+ * entries for that id, since leaving four of five behind would make the
+ * undo silently do nothing.
+ *
+ * The control repaints itself rather than needing a view re-render: only
+ * gym-programme has a re-render function of the right shape, and
+ * inventing one in three views for a two-button control would be the
+ * tail wagging the dog.
+ *
+ * P4: two of the last five are needed before selection moves anything,
+ * so one hard day changes nothing, and nothing is ever displayed back.
+ *
  * 12 Aug 2026 v292
  * QUIET-1. quiet-session.js logged no exerciseIds at all, so no breathing
  * pattern or mindfulness practice ever became familiar -- the same gap
@@ -1697,7 +1733,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v292";
+const CACHE_NAME = "alongside-v293";
 
 const SHELL_URLS = [
 
@@ -1759,6 +1795,7 @@ const SHELL_URLS = [
   "/alongside-app/js/router.js",
   "/alongside-app/js/store.js",
   "/alongside-app/js/session-log.js",
+  "/alongside-app/js/exercise-feedback.js",
   "/alongside-app/js/display-prefs.js",
   "/alongside-app/js/tts.js",
   "/alongside-app/js/session-guard.js",
