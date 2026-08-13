@@ -74,6 +74,7 @@
  */
 
 import { store } from "../store.js";
+import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { bodyCaution } from "../data/session-rationale.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
@@ -260,6 +261,13 @@ export function render() {
               return _c ? `<p class="exercise-caution" role="note">${_c}</p>` : "";
             })()}
 
+            <!-- FEED-1. Two buttons, no "about right" -- silence already means
+                 that, and a third option turns an optional aside into a
+                 question on every exercise. Not a rating: no stars, no scale.
+                 Two of the last five are needed before selection moves
+                 anything, and nothing is ever displayed back. -->
+            ${renderFeedbackControl(fullEx)}
+
             ${fullEx.watchOut && fullEx.watchOut.length > 0 ? `
               <div class="exercise-watchout" role="region" aria-label="What to watch for with ${ex.name}">
                 <span class="exercise-section-label" id="ps-section-watchout">What to watch for</span>
@@ -387,6 +395,8 @@ export function onMount() {
   // LOG-3. Re-wired per render; attachLogEvents() guards double-binding.
   if (active[currentIndex]) {
     attachLogEvents(active[currentIndex], `ps-log-${currentIndex}`);
+    // FEED-1. Self-painting, so no re-render hook is needed.
+    attachFeedbackEvents(active[currentIndex]);
   }
 
   // PT-3. Latch once. onMount() re-fires on every navigate back into this

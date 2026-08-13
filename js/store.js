@@ -1,5 +1,10 @@
 /**
  * store.js - Data persistence layer
+ * 12 Aug 2026 v37
+ *
+ * v37 - FEED-1. clearExerciseFeedback(), so the control can be undone.
+ *   A signal you cannot withdraw is one people stop giving.
+ *
  * 12 Aug 2026 v36
  *
  * v36 - BIAS-1. proposalBias declared and validated. It has been written
@@ -1528,6 +1533,28 @@ export const store = {
     this.data.updatedAt = new Date().toISOString();
     this.save();
     return log[log.length - 1];
+  },
+
+  /**
+   * clearExerciseFeedback(exerciseId) — FEED-1, 12 Aug 2026.
+   *
+   * Removes every entry for one exercise, so tapping the button that is
+   * already set undoes it. The same undo "Not a fan of this one" offers,
+   * and for the same reason: somebody who taps by accident, or changes
+   * their mind by the next set, must be able to take it back. A signal
+   * you cannot withdraw is one people stop giving.
+   *
+   * Removes ALL entries for that id, not just the last, because the
+   * reader looks at the last five and leaving four behind would mean the
+   * undo silently did nothing.
+   */
+  clearExerciseFeedback(exerciseId) {
+    if (!exerciseId) return null;
+    const log = (this.data.exerciseFeedback || []).filter(e => e.exerciseId !== exerciseId);
+    this.data.exerciseFeedback = log;
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+    return log;
   },
 
   // logSession() REMOVED 12 Aug 2026 (PT-5). Zero callers, confirmed by

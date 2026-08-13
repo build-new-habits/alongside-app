@@ -1117,3 +1117,66 @@
   line-height: var(--leading-relaxed);
   color: var(--color-text);
 }
+
+/* ============================================================
+   FEED-1 — exercise difficulty feedback, 12 Aug 2026
+
+   Two buttons, deliberately quiet. This is an optional aside on a card
+   that already carries instructions, a watch-out, a caution and a note
+   field; it must not compete with any of them.
+
+   Styled to match .exercise-preference ("Not a fan of this one") rather
+   than inventing a second visual language for the same kind of signal on
+   the same card.
+
+   NOT a rating: no stars, no scale, no colour coding of hard vs easy.
+   Selected state is a border and a label change, so it reads as
+   "recorded" rather than as a score.
+
+   Contrast, all three schemes, gated by tools/contrast-check.mjs:
+   --color-text-secondary on --color-bg 8.44:1; selected uses
+   --color-primary at 7.86:1.
+   ============================================================ */
+
+.ex-feedback {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+  flex-wrap: wrap;
+}
+
+.ex-feedback__btn {
+  flex: 1 1 auto;
+  min-height: 44px;               /* WCAG 2.2 AA 2.5.8 */
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.ex-feedback__btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+/* Selected. Border and text only - no fill, because a filled button here
+   would read as the primary action on the card, which it is not. */
+.ex-feedback__btn.is-set {
+  border: 2px solid var(--color-primary);
+  padding: calc(var(--space-2) - 1px) calc(var(--space-3) - 1px);
+  color: var(--color-text);
+}
+
+.ex-feedback__btn:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ex-feedback__btn { transition: none; }
+}

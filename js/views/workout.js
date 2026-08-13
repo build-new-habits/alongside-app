@@ -163,6 +163,7 @@
  */
 
 import { store }         from "../store.js";
+import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { bodyCaution } from "../data/session-rationale.js";
 import { renderLogBlock, attachLogEvents } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
@@ -317,6 +318,13 @@ export function render() {
           return _c ? `<p class="exercise-caution" role="note">${_c}</p>` : "";
         })()}
 
+        <!-- FEED-1. Two buttons, no "about right" -- silence already means
+             that, and a third option turns an optional aside into a
+             question on every exercise. Not a rating: no stars, no scale.
+             Two of the last five are needed before selection moves
+             anything, and nothing is ever displayed back. -->
+        ${renderFeedbackControl(exercise)}
+
         ${exercise.watchOut && exercise.watchOut.length > 0 ? `
           <div class="exercise-watchout" role="region" aria-label="What to watch for with this exercise">
             <span class="exercise-section-label" id="section-watchout-${currentExerciseIndex}">
@@ -443,6 +451,8 @@ export function onMount() {
   // onto another.
   if (workout?.exercises?.[currentExerciseIndex]) {
     attachLogEvents(workout.exercises[currentExerciseIndex], `wo-log-${currentExerciseIndex}`);
+    // FEED-1. Self-painting, so no re-render hook is needed.
+    attachFeedbackEvents(workout.exercises[currentExerciseIndex]);
   }
 
   // GM-1. Recorded on mount rather than at render, so a moment that was
