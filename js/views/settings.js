@@ -1,5 +1,15 @@
 /**
  * settings.js
+ * 12 Aug 2026 v21
+ *
+ * v21 - NAV-5. Seven horizontal tabs replaced by three sections, using
+ *   Graeme's own grouping: App Controls, Settings, About. Two of the
+ *   three things he could not find anywhere in the app were in here, both
+ *   in the fourth tab of a strip that scrolled with the scrollbar hidden.
+ *   Session notes separated from Equipment -- it is a behaviour toggle,
+ *   not a fact about what you own, and it was filed there because
+ *   Equipment happened to be the smallest panel.
+ *
  * 12 Aug 2026 v20
  *
  * v20 - VER-1. The About screen's version was hardcoded to '115' while
@@ -276,6 +286,65 @@ export function SettingsView(router) {
   let devTapTimer       = null;
   let reflectionExpanded = false;
 
+  /**
+   * NAV-5, 12 Aug 2026. Three sections, not seven tabs.
+   *
+   * Graeme, device pass part 4: "Changing equipment and turning on session
+   * notes really hard to find. Like really really hard."
+   *
+   * Both lived in the Equipment tab, FOURTH of seven, in a strip that
+   * scrolled horizontally with the scrollbar hidden -- so Profile,
+   * Programme and Conditions sat off-screen with nothing saying they
+   * existed. Two of the three things he could not find in the whole app
+   * were in here.
+   *
+   * HIS GROUPING, agreed in conversation: "we divide into app controls,
+   * about, and settings." It names a distinction the tabs never made.
+   * Programme (how often the coach expects you) and Display (text size)
+   * sat adjacent as if they were the same kind of thing. They are not --
+   * one is a coaching decision, the other an accessibility preference.
+   *
+   * That missing rule is why Session notes ended up appended to Equipment
+   * in the first place: Equipment was the smallest panel, 855 characters
+   * and one control, so a behaviour toggle got filed by convenience.
+   *
+   * WHY A LIST AND NOT HOME TILES. He proposed About and App Controls as
+   * tiles on Home. Home already carries eight; ten would be a longer list
+   * to scan, and these are the least-used destinations in the product --
+   * you set reminders once and read the story once. The actual failure was
+   * that Equipment was scrolled OUT OF VIEW, not that Settings was hard to
+   * reach; Settings is already one tap from the bottom nav. Three rows,
+   * nothing off-screen, nothing can hide.
+   */
+  // NAV-5. null = the index. Not sticky: reopening Settings shows the
+  // index, so somebody who went in for Display once is not dropped back
+  // into Display next time wondering where everything went.
+  let activeSection = null;
+
+  const _section = id => SECTIONS.find(s => s.id === id) || SECTIONS[0];
+
+  const SECTIONS = [
+    {
+      id: 'controls',
+      label: 'App Controls',
+      sub: 'Reminders, session notes, and your programme',
+      panels: ['notify', 'liftlog', 'programme'],
+    },
+    {
+      id: 'settings',
+      label: 'Settings',
+      sub: 'Your profile, conditions, equipment and display',
+      panels: ['profile', 'conditions', 'equipment', 'display'],
+    },
+    {
+      id: 'about',
+      label: 'About',
+      sub: 'The story behind Alongside, policies and your plan',
+      panels: ['about'],
+    },
+  ];
+
+  // Kept so deep links and the developer bypass still resolve.
   const TABS = [
     { id: 'profile',     label: 'Profile'     },
     { id: 'programme',   label: 'Programme'   },
@@ -310,36 +379,42 @@ export function SettingsView(router) {
     container.innerHTML = `
       <div class="settings-view" role="main" aria-label="Settings">
 
-        <h1 class="settings-title">Settings</h1>
+        ${activeSection === null ? `
 
-        <!-- Tab strip -->
-        <div class="settings-tabs" role="tablist" aria-label="Settings sections">
-          ${TABS.map(tab => `
-            <button
-              class="settings-tab ${activeTab === tab.id ? 'settings-tab--active' : ''}"
-              role="tab"
-              id="settings-tab-${tab.id}"
-              aria-selected="${activeTab === tab.id ? 'true' : 'false'}"
-              aria-controls="settings-panel-${tab.id}"
-              data-tab="${tab.id}">
-              ${tab.label}
+          <h1 class="settings-title">Settings</h1>
+
+          <!-- NAV-5. Three rows. Nothing scrolls, so nothing hides. -->
+          <nav class="settings-index" aria-label="Settings sections">
+            ${SECTIONS.map(s => `
+              <button class="settings-index__row" data-section="${s.id}">
+                <span class="settings-index__text">
+                  <span class="settings-index__label">${s.label}</span>
+                  <span class="settings-index__sub">${s.sub}</span>
+                </span>
+                <span class="settings-index__chevron" aria-hidden="true">&rsaquo;</span>
+              </button>
+            `).join('')}
+          </nav>
+
+        ` : `
+
+          <div class="settings-section-header">
+            <button class="btn btn-ghost" id="settings-back-btn"
+                    aria-label="Back to all settings">
+              &larr; Settings
             </button>
-          `).join('')}
-        </div>
+          </div>
+          <h1 class="settings-title">${_section(activeSection).label}</h1>
 
-        <!-- Tab panels -->
-        <div class="settings-panels">
-          ${TABS.map(tab => `
-            <div
-              class="settings-panel ${activeTab === tab.id ? 'settings-panel--active' : ''}"
-              role="tabpanel"
-              id="settings-panel-${tab.id}"
-              aria-labelledby="settings-tab-${tab.id}"
-              ${activeTab !== tab.id ? 'hidden' : ''}>
-              ${renderPanel(tab.id)}
-            </div>
-          `).join('')}
-        </div>
+          <div class="settings-panels">
+            ${_section(activeSection).panels.map(id => `
+              <div class="settings-panel settings-panel--active" id="settings-panel-${id}">
+                ${renderPanel(id)}
+              </div>
+            `).join('')}
+          </div>
+
+        `}
 
       </div>
     `;
@@ -354,7 +429,11 @@ export function SettingsView(router) {
       case 'profile':    return renderProfilePanel();
       case 'programme':  return renderProgrammePanel();
       case 'conditions': return renderConditionsPanel();
-      case 'equipment':  return renderEquipmentPanel() + renderLiftLogPanel();
+      // NAV-5. Session notes is its own panel now, not a lodger in
+      // Equipment. It is a behaviour toggle; Equipment is a fact about
+      // what you own. Filing them together is what made it unfindable.
+      case 'equipment':  return renderEquipmentPanel();
+      case 'liftlog':    return renderLiftLogPanel();
       case 'notify':     return renderNotifyPanel();
       case 'display':    return renderDisplayPanel();
       case 'about':      return renderAboutPanel();
@@ -1119,7 +1198,7 @@ export function SettingsView(router) {
     // place. Deliberately not blocking the render: the About panel should
     // appear immediately and fill this in a moment later, rather than
     // holding the whole screen for a cache lookup.
-    if (activeTab === 'about' && swVersion === null) {
+    if (activeSection === 'about' && swVersion === null) {
       _readSwVersion().then(v => {
         // VER-1b. The cache name is "alongside-v294", so stripping the
         // prefix leaves "v294" -- already carrying its own v. The
@@ -1134,13 +1213,29 @@ export function SettingsView(router) {
       });
     }
 
-    // Tab switching
+    // NAV-5. Index -> section.
+    container.querySelectorAll('[data-section]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeSection = btn.dataset.section;
+        render(container);
+        // Focus the heading, not the back button: a screen reader should
+        // hear where it has arrived before how to leave.
+        container.querySelector('.settings-title')?.focus();
+      });
+    });
+
+    // Section -> index.
+    document.getElementById('settings-back-btn')?.addEventListener('click', () => {
+      activeSection = null;
+      render(container);
+      container.querySelector('.settings-index__row')?.focus();
+    });
+
+    // Legacy [data-tab] switching, kept for the developer bypass panel.
     container.querySelectorAll('[data-tab]').forEach(btn => {
       btn.addEventListener('click', () => {
         activeTab = btn.dataset.tab;
         render(container);
-        const newTab = container.querySelector(`[data-tab="${activeTab}"]`);
-        if (newTab) newTab.focus();
       });
     });
 
@@ -1208,7 +1303,9 @@ export function SettingsView(router) {
 
     container.querySelector('#disp-reset')?.addEventListener('click', () => {
       resetDisplayPrefs();
-      activeTab = 'display';
+      // NAV-5. Stay where we are: Display lives inside the Settings
+      // section now, so re-rendering must not bounce back to the index.
+      activeSection = 'settings';
       render(container);
       container.querySelector('#disp-status').textContent = 'Display settings reset to defaults';
       container.querySelector('#disp-reset')?.focus();
@@ -1227,7 +1324,9 @@ export function SettingsView(router) {
         btn.setAttribute('aria-label', label.replace(next ? 'off' : 'on', next ? 'on' : 'off'));
         // Re-render notifications panel to show/hide time input
         if (field === 'checkInNotification.enabled') {
-          activeTab = 'notify';
+          // NAV-5. Reminders lives in App Controls now; re-rendering must
+          // not bounce back to the index mid-toggle.
+          activeSection = 'controls';
           render(container);
         }
       });

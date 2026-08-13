@@ -599,3 +599,89 @@
   color: white;
   border: none;
 }
+
+/* ============================================================
+   SETTINGS INDEX (NAV-5) — 12 Aug 2026
+
+   Three rows replacing a seven-tab horizontal strip. Graeme, device pass:
+   "Changing equipment and turning on session notes really hard to find.
+   Like really really hard." Both were in the fourth of seven tabs, in a
+   strip that scrolled with the scrollbar hidden.
+
+   Nothing here scrolls, so nothing can hide. That is the whole point —
+   the failure was content being off-screen, not Settings being hard to
+   reach.
+
+   Rows, not cards: this is an index, and an index that looks like a set
+   of choices competes with the choices inside it.
+   ============================================================ */
+
+.settings-index {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-4);
+}
+
+.settings-index__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4) var(--space-4);
+  min-height: 64px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  cursor: pointer;
+}
+
+.settings-index__row:first-child { border-top: 1px solid var(--color-border); }
+.settings-index__row:hover       { background: var(--color-bg-hover); }
+
+.settings-index__row:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: -3px;   /* inset, so a full-width row is not clipped */
+}
+
+.settings-index__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.settings-index__label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: var(--leading-normal);
+}
+
+/* The description matters as much as the label: "App Controls" alone does
+   not tell you session notes is in there, which is the exact problem
+   being fixed. */
+.settings-index__sub {
+  font-size: var(--text-sm);
+  font-weight: var(--font-normal);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.settings-index__chevron {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  font-size: var(--text-xl);
+  line-height: 1;
+}
+
+.settings-section-header {
+  display: flex;
+  align-items: center;
+  padding-top: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-index__row { transition: none; }
+}
