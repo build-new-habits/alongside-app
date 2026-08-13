@@ -1,6 +1,34 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v290
+ * DATA-1, and it was the opposite of what the schedule said.
+ *
+ * The entry described contentType as "written on 368 of 556 entries and
+ * read by nothing" and called retiring it "a clean standalone task".
+ * Both halves were wrong. It is read in two live places -- and the real
+ * fault was not dead weight but a rule that FAILS OPEN:
+ *
+ *   158 of 526 entries carry NO contentType at all, and the exclusion is
+ *   `ex.contentType === "practice"`, so a missing value passes.
+ *
+ * 28 of those are 10-30 minute pieces of whole content: Brisk Walk (30
+ * min), Steady Cycling (30), Treadmill Incline Walk (30), Walk-Run
+ * Intervals (30), HIIT 30:30 (15), swim drill sets (10-15). Every one was
+ * eligible to be picked as ONE OF FIVE components -- so a 20-minute
+ * session could be built around a 30-minute walk.
+ *
+ * ELEVEN OF THE 28 ARE TAGGED `exercise`, CORRECTLY, AND WERE STILL
+ * WRONG. That is why this is a structural rule and not more tagging: no
+ * amount of correct tagging fixes a rule that fails open.
+ *
+ * session-builder.js now excludes anything with duration >= 600s from
+ * component selection, whatever it is tagged. 600 and not 300, because
+ * several legitimate components run to five minutes. 388 timed components
+ * remain eligible.
+ *
+ * New tools/verify-data1.mjs. Cache bump only.
+ *
  * 12 Aug 2026 v289
  * BURN-2. The coach and the session no longer disagree.
  *
@@ -1626,7 +1654,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v289";
+const CACHE_NAME = "alongside-v290";
 
 const SHELL_URLS = [
 
