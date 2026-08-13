@@ -1,6 +1,38 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v307
+ * EQUIP-3. The actual cause, after two fixes that were not.
+ *
+ * Graeme: "If I have stated that I have equipment then it needs to
+ * register that I have it. That's simple... This shouldn't be a back and
+ * forth problem like this."
+ *
+ * He was right. EQUIP-1 named the scope in the copy and EQUIP-2 added a
+ * fallback between scopes. Neither touched the cause: THREE PARTS OF THE
+ * APP USED THREE DIFFERENT NAMES FOR THE SAME OBJECTS.
+ *
+ *   Settings saves        dumbbells-heavy, kettlebell-light, exercise-bike
+ *   Session screen offers dumbbells, kettlebells, bike
+ *   Exercise database     dumbbell, kettlebell, exercise-bike
+ *
+ * Measured: of the 15 options on the session equipment screen, FIVE could
+ * ever be ticked from a saved list, and those five matched by coincidence
+ * of spelling -- barbell, pull-up-bar, foam-roller, treadmill,
+ * rowing-machine. Graeme selected a full gym and saw exactly those.
+ *
+ * equipment-map.js ALREADY EXISTED and already reconciled two of the
+ * three, wired into exercise selection on 11 Aug (CON-2). The session
+ * equipment screen simply never asked it. Its own plural vocabulary is
+ * now in that same map -- not a new file, because a second map is how a
+ * fourth vocabulary starts -- and the screen resolves before comparing.
+ *
+ * A full gym now ticks 15 of 15.
+ *
+ * An override stays literal: those ids came from this screen's own
+ * checkboxes, and resolving them would re-tick what somebody had just
+ * unticked.
+ *
  * 12 Aug 2026 v306
  * CONSENT-1. Graeme: "I consented because of the colour change on
  * continue, but the box should show a tick or be fully teal."
@@ -2069,7 +2101,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v306";
+const CACHE_NAME = "alongside-v307";
 
 const SHELL_URLS = [
 
