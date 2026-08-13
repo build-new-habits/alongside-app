@@ -403,6 +403,25 @@ function showExitConfirm() {
                 aria-label="Exit and save progress so far">
           Exit and save progress
         </button>
+        <!-- EXIT-1, 12 Aug 2026. Graeme, device pass part 4: "I started
+             quite a few to see if it was those. When I exited it asked me
+             to save. I need to be able to exit and not save. That's why my
+             sessions have shot up, but I haven't done any."
+
+             The shared session-guard.js has had this third option since
+             21 May. NINE views each built their own two-button dialog
+             instead and none of them included it, so opening a session to
+             look at it and backing out ALWAYS wrote a partial entry.
+             Graeme's own count reached 7 of 3 from sessions he never did.
+
+             Deliberately the smallest visual weight of the three -- the
+             option is available, not encouraged -- matching
+             .sg-exit-discard's existing treatment rather than inventing
+             one. -->
+        <button class="btn btn-ghost btn-full session-exit-discard" id="exit-confirm-discard"
+                aria-label="Exit without saving this session">
+          Exit without saving
+        </button>
       </div>
     </div>
   `;
@@ -420,6 +439,15 @@ function showExitConfirm() {
     savePartialSession();
     resetSession();
     router.navigate("reflect");
+  });
+
+  // EXIT-1. Discard: leave WITHOUT writing a partial entry. The whole
+  // point is that opening a session to look at it must not record one.
+  document.getElementById("exit-confirm-discard")?.addEventListener("click", () => {
+    overlay.remove();
+    dismountSessionGuard();
+    resetSession();
+    router.navigate("today");
   });
 }
 

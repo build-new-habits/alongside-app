@@ -187,3 +187,27 @@
     animation: none;
   }
 }
+
+/* ── "Exit without saving" in the per-view dialogs (EXIT-1, 12 Aug 2026) ──
+   Nine views each built their own two-button exit dialog rather than using
+   the shared guard, and none of them offered a discard. So opening a
+   session to look at it and backing out ALWAYS wrote a partial entry —
+   Graeme's own count reached 7 of 3 from sessions he had not done.
+
+   Matches .sg-exit-discard deliberately: the same option should not look
+   like two different things depending on which screen you exit from.
+
+   Smallest visual weight of the three. The option is available, not
+   encouraged — somebody who has genuinely done half a session should find
+   "Exit and save progress" the obvious choice. */
+.session-exit-discard {
+  color: var(--color-text-secondary);
+  border-color: transparent;
+  font-size: var(--text-sm);
+}
+
+.session-exit-discard:hover,
+.session-exit-discard:focus-visible {
+  color: var(--color-text);
+  background: var(--color-bg-hover);
+}
