@@ -72,6 +72,16 @@ check("Home and Progress agree by construction", () => {
      "if either counts differently the two screens disagree again");
 });
 
+console.log("\nTEST 2b - the empathy arc counts real sessions only");
+check("reflect.js getSessionCount excludes partials", () => {
+  const s = fs.readFileSync("js/views/reflect.js", "utf8");
+  const fn = s.slice(s.indexOf("function getSessionCount"), s.indexOf("// EMP-1 thresholds"));
+  ok(/completedSessions/.test(fn),
+     "a session opened and abandoned moved somebody toward their next empathy " +
+     "prompt AND toward the next stage of the arc - so a prompt meant to arrive " +
+     "after accumulated experience could arrive after none");
+});
+
 console.log("\nTEST 3 - partials are still RECORDED, just not counted");
 check("nothing filters partials out of activityLog itself", () => {
   const s = fs.readFileSync("js/store.js", "utf8");
