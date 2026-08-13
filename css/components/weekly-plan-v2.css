@@ -38,10 +38,45 @@
 .wp-title { font-size: var(--text-2xl); font-weight: var(--font-bold); color: var(--color-text); margin: 0; }
 .wp-subtitle { font-size: var(--text-sm); color: var(--color-text-muted); margin: 0; }
 
-/* Grid */
-.wp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-1); }
+/* Grid
+   DISP-4, 12 Aug 2026. Graeme, from the device pass: "Nothing breaks
+   exactly, but where I increase text size in settings/display the things
+   like week plan then need to be slideable like the settings tabs."
 
-.wp-day-slot { display: flex; flex-direction: column; }
+   repeat(7, 1fr) forced seven days into the viewport whatever the text
+   size, so at 130% the row simply ran off the right edge with no way to
+   reach Sat and Sun. A fixed column count and a user-controlled type
+   scale cannot both be satisfied; one of them has to give, and it should
+   not be the person's text size.
+
+   Now scrolls horizontally, exactly as he suggested and exactly as the
+   Settings tab strip already does. Days get a minimum width rather than
+   an equal share, so they stay legible instead of squeezing. At the
+   default scale all seven still fit, so nothing changes for anybody who
+   has not touched the control.
+
+   scroll-snap keeps a day aligned rather than stranded half off-screen,
+   and scroll-padding keeps the snapped day clear of the left edge. */
+.wp-grid {
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-left: var(--space-1);
+  -webkit-overflow-scrolling: touch;
+  /* No visible scrollbar on mobile; the content itself signals the
+     overflow by being cut mid-card at the edge. */
+  scrollbar-width: none;
+}
+.wp-grid::-webkit-scrollbar { display: none; }
+
+.wp-day-slot {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+  min-width: 4.5rem;      /* scales with the root, so it grows with text */
+  scroll-snap-align: start;
+}
 
 .wp-day-btn {
   display: flex;
@@ -70,6 +105,9 @@
 .wp-day-today-marker { font-size: var(--text-xs); color: var(--color-primary); font-weight: var(--font-bold); }
 
 /* Legend */
+/* DISP-4. flex-wrap was already right -- the legend reflows to two lines
+   at larger text rather than clipping, which is the correct behaviour for
+   a legend and is why it was left alone. */
 .wp-legend { display: flex; flex-wrap: wrap; gap: var(--space-3); padding: var(--space-2) 0; }
 .wp-legend__item { display: flex; align-items: center; gap: var(--space-1); }
 .wp-legend__icon { font-size: var(--text-sm); color: var(--color-text-muted); }
