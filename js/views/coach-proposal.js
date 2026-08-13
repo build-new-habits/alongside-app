@@ -1,5 +1,15 @@
 /**
  * coach-proposal.js
+ * 13 Aug 2026 v20
+ *
+ * v20 - C1. The severe-pain choice line names the limit. It previously
+ *   acknowledged the flag and offered two options, never once saying
+ *   what the coach cannot do -- which quietly implies it can do
+ *   everything on the list. External help is offered, never presumed.
+ *   No crisis language: this is a painful joint, not a safeguarding
+ *   flag, and reaching for crisis wording here would blunt it where it
+ *   is actually needed.
+ *
  * 04 Aug 2026 v19
  *
  * v19 — Real regression fix, found via screenshot: the session-options
@@ -481,10 +491,48 @@ export function CoachProposalView(router) {
     return match ? match.choice : null;
   }
 
+  /**
+   * C1, 13 Aug 2026. The honest-limit line.
+   *
+   * Graeme's own framing, 13 Aug: "I can't give you medical support, but
+   * I can adjust your programme for you and give you exercises. If you
+   * need more than that I think you should look for external help."
+   *
+   * WHY IT BELONGS HERE AND ALMOST NOWHERE ELSE. Severe is the one
+   * moment the user has explicitly told the coach something is badly
+   * wrong. Before this, the coach acknowledged it and offered two
+   * options and never once said what it cannot do -- which quietly
+   * implies it can do everything on the list. Naming the limit is not a
+   * disclaimer; it is the difference between a coach and a claim.
+   *
+   * THE RULE THIS FIXES, stated so it survives: the product must never
+   * ASSUME external help exists. The old rehabilitation copy said
+   * "check with whoever is treating you" to 94 exercises' worth of
+   * people, most of whom have nobody treating them. Graeme's own About
+   * copy says "I couldn't afford a physio". So help is OFFERED, never
+   * presumed, and the wording works for somebody mid-physio, somebody
+   * who has never seen anyone, and somebody who cannot afford to.
+   *
+   * DELIBERATELY NOT: no crisis resources, no helpline, no urgency.
+   * This is a painful knee, not a safeguarding flag, and the Crisis &
+   * Safeguarding Policy governs that path separately. Reaching for
+   * crisis language here would both frighten people and blunt it where
+   * it is actually needed.
+   *
+   * Register: invitational, no therapy voice, no verdict. "It's worth"
+   * not "you should" -- the one place Graeme's draft says "I think you
+   * should" is softened, because every other coach line in the product
+   * offers rather than instructs and one exception reads as alarm.
+   */
   function _buildSevereChoiceLine(pending) {
     const names  = pending.conditionIds.map(getConditionName);
     const plural = names.length > 1;
-    return `I noted that ${_joinNames(names)} ${plural ? 'are' : 'is'} Severe today. I can adapt around ${plural ? 'them' : 'it'}, or we can call today a rest day \u2014 what would you like to do?`;
+    const them   = plural ? 'them' : 'it';
+
+    return `I can see ${_joinNames(names)} ${plural ? 'are' : 'is'} really difficult today. ` +
+           `I can't give you medical support \u2014 that isn't something I can do. ` +
+           `What I can do is work around ${them}, or we can call today a rest day. ` +
+           `If you need more than that, it's worth finding someone who can look at ${them} properly.`;
   }
 
   function renderSevereChoice() {
