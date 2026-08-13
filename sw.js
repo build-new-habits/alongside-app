@@ -1,6 +1,29 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v298
+ * LANG-1b. Graeme: "Do I need to do something with the audit or have you
+ * applied the fix to the findings?"
+ *
+ * Answer was: 6 fixed, 85 left to him. Over-cautious -- the same fault as
+ * manufacturing open questions, making work for him that could be done
+ * here. Re-examined every instance in context:
+ *
+ * FIXED NOW: "brace your core" (2) and proprioception (3, glossed on use
+ * the way AMRAP already is).
+ *
+ * FALSE POSITIVES, removed from the audit: AMRAP and EMOM are ALREADY
+ * glossed on first use -- "Complete as many rounds as possible (AMRAP)".
+ * They are defined terms, not jargon. v1 also counted matches in id, name
+ * and youtube fields, which nobody reads as prose.
+ *
+ * The remaining 92 genuinely need Graeme's voice, and the audit now says
+ * WHY per term rather than just listing them -- "eccentric" is not simply
+ * "the lowering part" in every context, "bilateral breathing" is the
+ * actual name of a swimming technique, and "hip hinge" may be a word his
+ * audience already has. A wrong plain-English substitution can change
+ * what the exercise asks for.
+ *
  * 12 Aug 2026 v297
  * Device pass part 3. Graeme: "Audit for plain language. Standing, 2
  * point, 3 point start is confusing. Also, lack of clarity on
@@ -1842,7 +1865,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v297";
+const CACHE_NAME = "alongside-v298";
 
 const SHELL_URLS = [
 
