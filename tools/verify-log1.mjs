@@ -130,16 +130,67 @@ check("instant, not smooth", () => {
      "animates past everything between, which reads as a lurch");
 });
 
+console.log("\nLOG-6 - the note is readable back before saving");
+const slog = fs.readFileSync("js/session-log.js", "utf8");
+const slogCss = fs.readFileSync("css/components/session-log.css", "utf8");
+check("the note is a textarea, not a one-line input", () => {
+  ok(/<textarea class="slog__input slog__input--note"/.test(slog),
+     "an input shows a few characters at a time whatever its width");
+  ok(/multiline: true/.test(slog), "no field is marked multiline");
+});
+check("it grows with its content", () => {
+  ok(/function autogrow/.test(slog), "no growth");
+  ok(/el\.style\.height = "auto";/.test(slog),
+     "without resetting to auto first the box can only ever grow - deleting " +
+     "text would leave the space behind");
+  ok(/addEventListener\("input", \(\) => \{ autogrow/.test(slog), "not wired to typing");
+});
+check("it starts at one row", () => {
+  ok(/rows="1"/.test(slog),
+     "an empty three-line box on every card reads as an expectation to " +
+     "fill it, and this field is optional");
+});
+check("the 40-character cap is gone", () => {
+  ok(!/maxlength: "40"/.test(slog),
+     "40 truncates 'felt fine, back was tight' mid-sentence - the box size " +
+     "was only half the problem");
+  ok(/maxlength: "280"/.test(slog), "no raised cap");
+});
+check("it warns before the new cap", () => {
+  ok(/function remaining/.test(slog), "no counter");
+  ok(/left <= 60/.test(slog),
+     "a counter from the first keystroke is pressure; one near the ceiling " +
+     "is help");
+  ok(/aria-live="polite"/.test(slog), "count must be announced");
+});
+check("the textarea does not fight its own sizing", () => {
+  const rule = slogCss.slice(slogCss.indexOf(".slog__input--note {"),
+                             slogCss.indexOf("}", slogCss.indexOf(".slog__input--note {")));
+  ok(/resize: none/.test(rule), "a drag handle fighting auto-grow is worse than neither");
+  ok(/overflow: hidden/.test(rule), "a scrollbar flickers before each height update");
+  ok(/font-family: inherit/.test(rule), "textareas default to monospace");
+  ok(/flex: 1 1 100%/.test(rule),
+     "sharing a row with two number boxes leaves it three words wide");
+});
+check("a saved note is readable when shown back", () => {
+  const rule = slogCss.slice(slogCss.indexOf(".slog__last {"),
+                             slogCss.indexOf("}", slogCss.indexOf(".slog__last {")));
+  ok(!/white-space: nowrap/.test(rule) && !/text-overflow: ellipsis/.test(rule),
+     "a long note must wrap, not truncate - reading it back is the point");
+});
+
 console.log("\nLOG-5 - the note field takes the space it needs");
 check("note is not a fixed-width number box", () => {
   const css = fs.readFileSync("css/components/session-log.css", "utf8");
   ok(/\.slog__input--note \{/.test(css), "no note modifier");
   const rule = css.slice(css.indexOf(".slog__input--note {"), css.indexOf("}", css.indexOf(".slog__input--note {")));
-  ok(/flex: 1 1/.test(rule), "must take the remaining width");
+  ok(/flex: 1 1 100%/.test(rule), "must take a full row of its own");
   ok(/min-width: 0/.test(rule), "without this it pushes Save off the edge on a tight row");
 });
 check("the markup tags the note field", () =>
-  ok(/f\.key === "note" \? "slog__input--note"/.test(fs.readFileSync("js/session-log.js", "utf8")),
+  // LOG-6 replaced the conditional class with a dedicated textarea
+  // branch, so the class is now literal rather than computed.
+  ok(/<textarea class="slog__input slog__input--note"/.test(fs.readFileSync("js/session-log.js", "utf8")),
      "class never applied"));
 
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
