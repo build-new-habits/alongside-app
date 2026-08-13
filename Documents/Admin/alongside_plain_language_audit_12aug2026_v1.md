@@ -1,7 +1,7 @@
 # Alongside: Move — Plain Language Audit
-## 12 Aug 2026 v2
+## 12 Aug 2026 v3
 
-Build New Habits | Exercise database | **For Graeme to mark**
+Build New Habits | Exercise database | **CLOSED 12 Aug — reference only**
 
 Graeme, device pass part 3: *"Audit for plain language. Standing, 2 point, 3 point start is confusing."*
 
@@ -24,7 +24,21 @@ v1 also counted matches in `id`, `name` and `youtube` fields, which nobody reads
 
 ---
 
-# What still needs your voice — 92 instances
+# 🟢 CLOSED — Graeme's decision, 12 Aug 2026
+
+> *"These, I think, look fine. That's what we can discover in beta and user feedback in time."*
+
+**The 92 below stay as they are.** Not deferred, not pending — decided.
+
+The reasoning is sound and worth keeping: every candidate replacement below carries a risk of changing what the exercise asks for, and **the people who will tell us whether "eccentric" or "hip hinge" is a barrier are the beta testers, not us guessing at it now.** Real confusion from a real person beats a guess about hypothetical confusion.
+
+This document stays as the reference list, so that when a beta tester says *"I didn't know what this meant"*, the term is already located and a candidate is already written.
+
+**Do not re-raise this as an open item.**
+
+---
+
+# The 92, kept for reference
 
 Each of these has a plain-English candidate, and each has a reason I have not applied it. **A wrong substitution is worse than the jargon: it can change what the exercise asks for.**
 
@@ -150,11 +164,9 @@ Each of these has a plain-English candidate, and each has a reason I have not ap
 
 ---
 
-## How to mark this
+## If beta surfaces one of these
 
-Per term, one of: **apply the candidate** / **use this instead: …** / **leave it**.
-
-"Leave it" is a real answer for several — `hip hinge` and `scapular` in particular may be words your audience already has.
+The term is already located and a candidate is already drafted, so the fix is a data edit with no code change. Wait for somebody to actually trip on it.
 
 ---
 

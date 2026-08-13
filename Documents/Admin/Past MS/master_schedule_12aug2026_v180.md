@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v181
+## 12 Aug 2026 v180
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v180.md`. Remove v180 on upload.
+Supersedes `master_schedule_12aug2026_v179.md`. Remove v179 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -354,52 +354,6 @@ Graeme's plank model included that mindful practice produces more muscle definit
 `verify-decisions.mjs`'s P5 check matched on `equipment` **plus** `movementPattern` — which is what a *strength* entry looks like. Yoga poses carry `holdSeconds` and `rest`, so **30 inline pose entries walked straight through the check written that morning to catch exactly this.**
 
 Now matches on `id` + `name`, the weakest signal every selectable thing in the product shares. **Each remaining budget is documented with its justification, because a budget without a reason is a hole.**
-
----
-
-## 🔬 DEVICE PASS — 12 Aug 2026, parts 0–3 complete
-
-Graeme worked through `Documents/Admin/alongside_device_pass_12aug2026_v1.md` on device. `sw.js` **v294 → v298**, cache **alongside-v298**.
-
-### Found by writing the instructions, before he started
-
-**VER-1.** Step 0 said *"check Settings → About shows v293."* Checking whether that was even possible found `APP_VERSION` **hardcoded to `115`** while the cache was at 293 — **178 versions of drift, on the only surface that tells anybody which build their phone is running.** Every *"are you on the latest?"* check during device testing has been meaningless, and `settings.js`'s own v86 note records exactly that confusion happening. **The tool for diagnosing stale builds was itself stale.** Now read from the running service worker. (Shipped as `vv294` — VER-1b, doubled prefix, fixed.)
-
-### Parts 0–1
-
-| | |
-|---|---|
-| **SB-META** 🔴 | The session overview printed the literal word **"undefined"** — *"Fire Hydrant undefined sets 1½ min undefined"*. Unguarded interpolation; not every exercise has sets or a tempo. **Graeme did not flag this** — it was in his own screenshot, on the screen where somebody decides whether the coach knows what it is doing |
-| **VOICE-2** | *"The writing in the red circles, are these the coach? Could they be teal?"* Yes. `.sb-section-why` carries the coach's own reasoning and was styled as UI chrome. Now teal at `--text-sm`. **Not gold** — gold is the paid-tier marker, and this is free-tier content |
-| **CI-SPACE** | *"Leave a gap for the slides to pop over the top, but bring the writing down."* `block:"start"` on every message, added 11 Aug for the opposite complaint. Now decided per message; trailing space 70vh → 46vh, gated against the JS constant |
-
-### Part 2 — the audit he asked for
-
-**CSS-1.** *"Image 1 is unstyled. We need to audit all pages."* He was right that it was a class of problem. **174 classes rendered by views with no CSS rule anywhere** — including the whole `.ws-*` family, so **walk, run, cycle and swim rendered as unstyled text on every screen of all four**.
-
-Nothing errors. A class with no rule is valid markup; the only detector was somebody opening the screen. New `single-activity-session.css` covers all 17. **`tools/verify-css.mjs` added as a ratchet at 157** — not zero, because a gate that fails from day one gets switched off.
-
-**DISP-4.** *"Where I increase text size the things like week plan then need to be slideable like the settings tabs."* `repeat(7, 1fr)` forced seven days into the viewport whatever the text size, so at 130% Sat and Sun were unreachable. Now scrolls with snap. **A fixed column count and a user-controlled type scale cannot both be satisfied, and it should not be the text size that gives.**
-
-### Part 3
-
-**Exercise count:** cardio at 60 min builds **17**, not 4. **PT-8's count claim is stale**; the duration label question stands.
-
-**LANG-1.** *"Audit for plain language. Standing, 2 point, 3 point start is confusing."* Six instances, not one — an American-football term in a product for people failed by fitness culture. **Change of Pace Run**: timings existed in `instructions` but the overview shows only a name and duration. He found a real gap anyway — *"vary the timing, no rhythm"* is deliberate and reads as an omission. Now explicit, including that the choice is his. **Naming the vagueness beats leaving it to look like a gap.**
-
-### 🟢 LANG-1 remainder — CLOSED by Graeme, not deferred
-
-> *"These, I think, look fine. That's what we can discover in beta and user feedback in time."*
-
-92 further instances stay as they are. **The reasoning is right and worth keeping:** every candidate replacement risks changing what the exercise asks for, and the people who can say whether `eccentric` or `hip hinge` is a barrier are **beta testers, not us guessing now**. Real confusion from a real person beats a guess about hypothetical confusion.
-
-`alongside_plain_language_audit_12aug2026_v1.md` v3 stays as a **reference list** — when a tester trips on a term, it is already located with a candidate drafted. **Not an open item. Do not re-raise.**
-
-**Also corrected:** the audit's first version was wrong twice. `AMRAP` and `EMOM` are **already glossed on first use** and are defined terms, not jargon; and it counted matches in `id`, `name` and `youtube` fields that nobody reads.
-
-### Still outstanding from the device pass
-
-**Steps 4 and 5 not yet run.** Step 4 — the doors somebody cannot find — is the one that unblocks NAV-2 and is the only step Claude cannot do.
 
 ---
 
@@ -2264,4 +2218,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v181*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v180*
