@@ -947,23 +947,8 @@ export function onMount() {
         phase = "equipment";
         // 05 Aug 2026 -- reads the location-scoped list, not the flat merged
         // `equipment` -- the actual fix for the "assumed home" bug.
-        // EQUIP-4, 12 Aug 2026. DO NOT pre-seed the override.
-        //
-        // This set equipmentOverride to the RAW saved list the moment a
-        // duration was chosen -- before the person had ticked anything.
-        // EQUIP-3 then treated it as "their own tick choices" and skipped
-        // resolution, so it compared "dumbbells" against a list containing
-        // "adjustable-dumbbells" and found nothing.
-        //
-        // My own fix disabled itself. The exemption was written for a
-        // person's deliberate ticks and fired before any tick existed.
-        //
-        // null means "nothing chosen yet, use what is saved", which is
-        // what renderEquipmentCheck() already handles -- and it is the
-        // only state in which resolution runs. The override is set by the
-        // checkbox handler and the Build button below, which is where it
-        // belongs: after somebody has actually touched something.
-        equipmentOverride = null;
+        const scopedKey = selectedLocation === "gym" ? "gymEquipment" : "homeEquipment";
+        equipmentOverride = [...(store.get(scopedKey) || [])];
       } else {
         selectedDuration  = 30;
         equipmentOverride = [...(store.get("equipment") || [])];
