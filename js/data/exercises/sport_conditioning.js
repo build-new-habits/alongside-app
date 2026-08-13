@@ -50,7 +50,7 @@ export const SPORT_CONDITIONING = [
     duration: 90,
     perSide: false,
     instructions: [
-      'Stand in athletic position — knees bent, weight on balls of feet, feet shoulder-width',
+      'Stand with feet about shoulder-width apart, knees soft, weight forward on the balls of your feet',
       'Step laterally with the lead foot, then bring the trailing foot to meet it',
       'Never cross your feet — maintain the shoulder-width gap throughout',
       'Stay low — the hips should not rise and fall with each step',
@@ -131,7 +131,7 @@ export const SPORT_CONDITIONING = [
     perSide: false,
     instructions: [
       'Place 3 cones in a line, 5 metres apart',
-      'Start at the middle cone in athletic position',
+      'Start at the middle cone, feet apart and knees soft',
       'Sprint 5 metres to the right cone, touch it',
       'Sprint 10 metres to the left cone, touch it',
       'Sprint 5 metres back to the middle',
@@ -326,7 +326,7 @@ export const SPORT_CONDITIONING = [
     perSide: false,
     instructions: [
       'Place 3 cones in a line, 5 metres apart',
-      'Start at the middle cone in a 3-point stance or athletic position',
+      'Start at the middle cone, feet apart and knees soft, ready to move either way',
       'Sprint to the right cone, touch it with your right hand',
       'Sprint to the far left cone — 10 metres — touch it with your left hand',
       'Sprint back through the middle cone',
@@ -370,7 +370,7 @@ export const SPORT_CONDITIONING = [
     perSide: false,
     instructions: [
       'Mark a start line and a line 10 metres ahead',
-      'Start from a standing, 2-point or 3-point stance',
+      'Start however you like \u2014 standing, or crouched with one or both hands down',
       'Drive explosively from the start — lean forward, drive the arms hard',
       'Accelerate maximally over the full 10 metres',
       'Do not decelerate until past the finish line',
@@ -1159,12 +1159,12 @@ export const SPORT_CONDITIONING = [
     duration: 300,
     perSide: false,
     instructions: [
-      'Run at 50% effort — easy jogging pace',
-      'Without any outward signal, accelerate suddenly to 90% effort for 10 metres',
-      'Drop back to 50% immediately',
-      'Vary the timing and duration of each surge — no rhythm, no predictability',
-      'Continue for 3 minutes, rest 90 seconds',
-      'Complete 4 sets'
+      'Run at 50% effort — an easy jogging pace you could hold a conversation at',
+      'Somewhere between 20 and 60 seconds in, and it is your call when, accelerate hard to about 90% for 10 metres',
+      'Drop straight back to 50%',
+      'How long you spend easy before the next surge is deliberately yours to choose — the unpredictability is the point, so do not settle into a rhythm',
+      'Keep that going for 3 minutes, then rest for 90 seconds',
+      'Four rounds in total'
     ],
     coaching: 'The surprise in your own body is the point. Training for sudden acceleration without predictable lead-in is how you replicate match demands.',
     why: 'Develops the ability to accelerate at unpredictable moments — the defining physical skill for forwards and wingers in team sports.',
@@ -1712,7 +1712,7 @@ export const SPORT_CONDITIONING = [
     duration: 180,
     perSide: false,
     instructions: [
-      'Stand in athletic position facing forward',
+      'Stand facing forward, feet apart and knees soft',
       'Step backward with one foot, then the other — in a controlled running motion',
       'Stay low — hips bent, weight on balls of feet',
       'Arms stay relaxed and active',
@@ -1947,7 +1947,7 @@ export const SPORT_CONDITIONING = [
     duration: 180,
     perSide: true,
     instructions: [
-      'Stand in athletic position facing forward',
+      'Stand facing forward, feet apart and knees soft',
       'Step one foot back and to the outside — opening the hip',
       'This drops the body into a position facing diagonally',
       'From there, accelerate in the direction the step opened',
