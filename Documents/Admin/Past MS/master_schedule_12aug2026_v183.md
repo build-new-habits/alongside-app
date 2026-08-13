@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 13 Aug 2026 v184
+## 12 Aug 2026 v183
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v183.md`. Remove v183 on upload.
+Supersedes `master_schedule_12aug2026_v182.md`. Remove v182 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -69,106 +69,21 @@ The same defect appeared **eight times in eight different costumes**: content th
 
 ---
 
-## 🔬 Persona tracing — status at v184 (pass 4 complete, 13 Aug)
+## 🔬 Persona tracing — status at v151
 
 | Pass | Date | Outcome |
 |---|---|---|
 | First | 11 Aug | PT-1 to PT-10. Three deliverables in `Admin/` |
 | Second | 11 Aug | PT-11 (fourth private exercise pool), PT-12 (reader-without-writer sweep) |
 | Third | 12 Aug | C1–C4 + A1–A3. **All shipped.** Report in `outputs`, not yet filed to `Admin/` |
-| **Fourth** | **13 Aug** | **Full three-document set produced, narrative included. Nine findings. See below.** |
 
-**The owed narrative is delivered.** `alongside_persona-wave1-pass4_narrative_13aug2026_v1.md`, plus technical report and plain-language summary, same date. Personas 2.12 (Danny) and 2.15 (Priya), three weeks each, played forward through the real engine under a controllable clock so recency windows behaved as they would live.
+**Owed to Graeme, explicitly requested:** the third pass produced only the technical punch list. **The next trace must produce the full three-document set** — technical, plain-language, and above all the **narrative**: what these people would actually say, what they liked, what they never touched, what they would tell a friend. That narrative is the deliverable Graeme values most and it was missed.
 
-**`reflect.js` — partially traced.** The empathy arc was traced end to end and produced EMP-3 and EMP-4 below. The rest of the reflection flow was not. Still owed.
+**Also never traced: `reflect.js`.** Three passes walked past the post-session reflection, which is where the empathy transfer fires — the thing Graeme considers the heart of the product. A session does not end at the last exercise; it ends at reflection. **Trace it next time.**
 
-**⚠️ Wave 2 selection criterion REVERSED on evidence.** v151 said "least data given to the app" was confirmed, and nominated persona 2.5. Pass 4 found the opposite. Danny (blank slate) surfaced the single most serious finding, but Priya surfaced **more**, and for a worse reason: she gave the app four strong signals — full gym, fully capable, `get-stronger`, four sessions a week — and every one sat inert. A graceful fallback is a healthier failure than present-but-unused data. **Wave 2 should be persona 2.3 (national-standard sprinter) or 2.9 (academy footballer).** 2.5 still deserves a pass as a *safety* trace — declared cardiac condition, medical-review path — but not as a capability trace.
+**Wave 2 candidate on evidence:** persona 2.5 (post-cardiac, total beginner). The blank-slate persona surfaced every critical first, so "least data given to the app" is the confirmed selection criterion.
 
-**Still never traced after four passes:** the Noticing Hub and In Step as a genuine front door (persona 2.11's entry route). Neither Wave 1 persona would ever go there.
-
-**Fixture note — resolved.** Fixtures now carry `capability{}`, `trainingIntent`, `sessionVariety` and `legPower`. One further trap found: goal IDs must come from `js/data/goals.js`. An invented id (`"strength"` rather than `"get-stronger"`) silently suppresses the rationale arc and produced one wrong reading before it was caught.
-
----
-
-## 🔵 REMEDIATION BLUEPRINT — Trust, Tier & Voice. Opened 13 Aug 2026.
-
-Source: `alongside_blueprint_trust-tier-voice_13aug2026_v1.md`. Five streams, ten sessions, sequenced so touch-once holds. `js/session-builder.js` is wanted by four separate streams — that is four separate blocks, each grounding against the live header first.
-
-### Decisions
-
-| ID | Decision | Status |
-|---|---|---|
-| **D-1** | Price is **£7.99/month, £49.99/year** (launch, to 30 Nov 2026; £59.99 Year 2+; beta £39.99/yr). | 🟢 **CONFIRMED by Graeme, 13 Aug.** |
-| **D-2** | Free tier must not reach premium session shapes through the Library. | 🟢 **Direction confirmed 13 Aug.** Exact boundary pending — see LIB-BOUNDARY. |
-
-**D-1 consequence — the website is now wrong.** `build-new-habits/website` publishes £9.99/month and £89/year. `alongside-business-plan-mar2026.docx` and `Alongside_freemium_model.md` do too. The June 2026 pricing model is the confirmed source. Publishing one price on the site while the app states another is a consumer-law exposure, not untidiness. **Correct in place, not by appending.** Logged as WEB-PRICE below.
-
-**🟠 LIB-BOUNDARY — awaiting Graeme.** His steer: free is the Full Body coach session and wellbeing, not the Library. Four Library categories carry things the 8 Mar freemium document lists as **permanently free on ethical grounds**: Prescribed (physio compliance — "a health issue, not a premium feature"), Mindful practice (breathing, journal, mindful movement, rest day), Coach recommends, and the activity Log. Locking the Library as a *screen* would paywall all four. Recommendation is to lock by *card*, not by screen. Needs his yes before B1 builds.
-
-### Stream A — the paywall is not a paywall yet
-
-| ID | Task | Priority | Status | Week |
-|---|---|---|---|---|
-| **A1** | Remove the dev-panel instruction from user-facing copy. `DEV_PANEL_ENABLED` flag on the `AGE_GATE_ENABLED` pattern; wrap panel markup **and** the triple-tap listener. Gate it. | 🔴 P1 | 🟡 In progress | w/c 10 Aug |
-| **A2** | Build the real upgrade page from `alongside_upgrade_page_architecture_09jul2026_v1.md` — **do not redesign it**, Graeme's copy is already written. Fully functional except the transaction. Never "coming soon". | 🔴 P1 | 🟠 Unstarted | w/c 10 Aug |
-| **A3** | `about-plan` panel in Settings. The About group's subtitle already reads "...and your plan" with nothing behind it. **The only new proactive surface** — not Home, not check-in, not reflect. | 🟠 P2 | 🟡 In progress | w/c 10 Aug |
-
-**Why A1 exists.** `js/views/upgrade.js:44-47` told every user: *"use the dev panel to switch tiers. Triple-tap the version number."* Every locked feature routes there, so the most-visited conversion surface published the tier bypass. The panel itself is correctly hidden and is a legitimate tool — the fault was one paragraph advertising it.
-
-**Why A3 exists.** Traced across three weeks: a free user meets Personal *only* as a padlock on something already denied. Never as a description. For a persona defined by decision paralysis, a padlock is not information.
-
-### Stream B — the Library gives away what the tier picker protects
-
-| ID | Task | Priority | Status | Week |
-|---|---|---|---|---|
-| **B1** | Tier-sensitive Library. `library.js` has **zero** occurrences of `isPremium` or `lockedFeature`. Use `lockedFeature()` — the pattern already exists one file away. | 🟠 P2 | 🟠 Blocked on LIB-BOUNDARY | w/c 17 Aug |
-| **B2** | Delete the silent-override at `session-builder-ui.js:880`. A locked type arriving by preselect must route to `upgrade`, never substitute. | 🟠 P2 | 🟠 Unstarted | w/c 17 Aug |
-
-A free user taps "Lower body" in the Library and silently receives a 30-minute Full Body session. One file away, WOW-4/PT-7 (11 Aug) made locked tiles tappable specifically so this moment converts. The Library bypasses that fix and adds a silent substitution on top.
-
-### Stream C — the app talks to healthy people as if they were patients
-
-| ID | Task | Priority | Status | Week |
-|---|---|---|---|---|
-| **C1** | Rephrase advice so external help is **offered, never assumed**. All **94** rehabilitation entries share one identical `watchOut` block and one identical `load` line — confirmed by `grep -c`, 94 of 94. | 🔴 P1 | 🟠 Unstarted | w/c 17 Aug |
-| **C1b** | Per-entry `watchOut` backfill for the 94. Content stream, not a build session. Estimate separately. | 🟡 P3 | 🟠 Unstarted | TBD |
-| **C2** | Rehab library must stop reaching people with no conditions. Schema-first: `generalPurpose` tag. **Triage table for Graeme's review before any tags are written.** | 🔴 P1 | 🟠 Unstarted | w/c 17 Aug |
-| **C3** | Adapted/seated content deprioritised for the fully capable. **Preference, not exclusion** — same mechanism as the CON-2 equipment change, opposite direction. | 🔴 P1 | 🟠 Unstarted | w/c 17 Aug |
-| **C4** | Strength weighting: a gym-equipped `get-stronger` user gets no barbell squat and no deadlift. **Re-trace after C3 before building** — C3 may fix most of it. | 🔴 P1 | 🟠 Blocked on re-trace | w/c 24 Aug |
-
-**C1's constraint, stated because it is the point.** The copy must work for somebody mid-physio, somebody who has never seen anyone, and somebody who cannot afford to. The third is in Graeme's own About copy at `settings.js:1195-1200` — *"I couldn't afford a physio."* The product cannot ship copy assuming what its founder could not access. `prescribed.js` / `intention.js` references to a physio are **correct as-is** — opt-in screens for people who have one. Do not "fix" them.
-
-**C2/C3 are the inverse of the 12 Aug pattern.** That day found the same defect eight times: *content that exists and nothing can select*. These are *content that everything can select*. `INF-AUDIT` tests reachability in one direction only and cannot see this. **Extend it.**
-
-Measured: 30 of 186 Full Body main candidates (16.1%) and 31 of 108 warm-up candidates (28.7%) come from the rehabilitation library. Priya — fully capable, full rack, 16 sessions — performed Seated Arm Cycling 9×, Rehab Ankle Proprioception 7×, Seated Shoulder Rolls 6×, against Barbell Bench Press 5×. She met **94 distinct exercises in 16 sessions**.
-
-### Stream D — Personal must feel different, not just unlock more
-
-| ID | Task | Priority | Status | Week |
-|---|---|---|---|---|
-| **D1** | Coach phrase pools. `generateCoachLine()` is **one fixed string per session type**; warm-up and cool-down purpose are **one string each, total**. Free is locked to Full Body/30min, so Danny's opening line is byte-identical every session, indefinitely. | 🟠 P2 | 🟠 Blocked on C3/C2/C4 | w/c 24 Aug |
-| **D2** | Personal guarantees variety — by phrase **class**, not count. Free gets the full expanded pool, never a thin version. Personal adds observations across time. **P4 is the hard constraint**: `_arc()`'s rule, "a property of the PROGRAMME, never of the person". | 🟠 P2 | 🟠 Blocked on D1 | w/c 24 Aug |
-| **D3** | Personal enrichment for the strength user: hold main lifts steady and vary accessories; *ask* about `sessionVariety` rather than defaulting it; lift log as memory not analytics; persist the allocation preset. | 🟡 P3 | 🟠 Blocked on C3/C4 | w/c 31 Aug |
-
-**D1 scaffold rule:** rotation on an existing counter, never `Math.random()`. Copy `empathy-transfer.js`'s mechanism *and read its comments first* — a stable sort on score alone always returns the lowest index, and that lesson cost a 140-session simulation to learn.
-
-**D3's honest refusal, to go on the upgrade page rather than be discovered after payment:** Alongside will show what you lifted and will never tell you whether it was good. P4 is not negotiable for one persona's convenience.
-
-### Stream E — smaller, evidenced
-
-| ID | Task | Priority | Status | Week |
-|---|---|---|---|---|
-| **E1** | Empathy prompt conditions are `prefers`, not `requires`, so a neutral context degenerates to rotation. Priya (energy 7 for three weeks) was told she'd had a hard day three times. Move to `requires` **and add positive-context prompts** or the pool starves. | 🟠 P2 | 🟠 Unstarted | w/c 17 Aug |
-| **E2** | `progress.js:469` — export counts partials; every on-screen count does not. **Change the gate too**: `verify-count1.mjs:60-66` asserts `via >= 2`, a floor, so it cannot detect the case it exists for. | 🟡 P3 | 🟠 Unstarted | w/c 17 Aug |
-| **E3** | `in-step.js:6` header still says "Personal tier" — DOOR-1 made it free 12 Aug. Correct **in place**. | 🟡 P3 | 🟠 Unstarted | w/c 17 Aug |
-| **WEB-PRICE** | Website publishes £9.99/£89. Correct to £7.99/£49.99 across `build-new-habits/website` and retire the figure in the March business plan and `Alongside_freemium_model.md`, in place. | 🟠 P2 | 🟠 Unstarted | w/c 17 Aug |
-
-### Two questions for Graeme, not fixes
-
-- **An unchosen weekly target renders as a shortfall.** `strategicGoal.weeklySessionTarget: 3` with `setAt: null`; `today.js:359-365` renders "1 of 3 this week". The count is right — COUNT-1 fixed it. Does a denominator nobody agreed to belong in a product whose north star is "joy at the gap"?
-- **Programme milestones are emoji achievement badges.** `programmes.js:63-102` — "10 sessions completed ⭐". The streak was removed deliberately; count-based badges are a milder member of the same family.
-
----
+**Fixture note:** the Node harness and persona fixtures are reusable but were built pre-capability-screen. They need `capability{}` added before the next run.
 
 ## 🟢 LOG-2 — Yoga session notes: SHIPPED, 12 Aug 2026
 

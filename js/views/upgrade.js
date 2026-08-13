@@ -1,5 +1,22 @@
 /**
  * upgrade.js - Upgrade / Membership view (stub)
+ * 13 Aug 2026 v3
+ *
+ * v3 - A1. Removed the two sentences telling every user to open the
+ *   developer panel and triple-tap the version number to switch tiers.
+ *   Found by the 13 Aug persona trace. Every locked feature in the
+ *   product routes here -- six session types, three durations, the
+ *   90-day progress tab, the export block, the In Step door -- so the
+ *   single most-visited conversion surface published the tier bypass.
+ *
+ *   SCOPE NOTE, deliberate. The blueprint filed A1 against settings.js
+ *   alone, which was wrong: the flag belongs there but the offending
+ *   copy was here. Removing it now rather than waiting for A2 keeps
+ *   verify-decisions.mjs green, and A2 replaces this file wholesale, so
+ *   the two edits supersede rather than collide.
+ *
+ *   What remains is still a stub and still says so. A2 builds the real
+ *   page from alongside_upgrade_page_architecture_09jul2026_v1.md.
  *
  * 03 Aug 2026 v2 - Fixed crash: render() called store.getUserTier(),
  *   which doesn't exist anywhere in store.js - confirmed via direct grep
@@ -41,10 +58,7 @@ export function render() {
             Subscriptions are coming soon. You are currently on the
             <strong>${tier}</strong> tier.
           </p>
-          <p class="text-sm text-muted" style="margin-top:var(--space-2);">
-            During beta, use the dev panel to switch tiers.
-            Triple-tap the version number at the bottom of Settings.
-          </p>
+
         </div>
       </div>
 
