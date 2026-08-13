@@ -1,6 +1,31 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v313
+ * SCROLL-1 and LOG-5, both from the device pass.
+ *
+ * SCROLL-1 -- Graeme: "When I click next exercise I'm dropped to the
+ * bottom of the screen. Always a new screen should start at the top."
+ *
+ * router.js resets scroll on every view MOUNT, but advancing between
+ * exercises does not navigate -- it re-renders in place, so nothing reset
+ * it. You finish a card at the bottom, where Next Exercise lives, the
+ * next card renders, and you are still at the bottom: past its name, past
+ * the timer, reading watch-outs for something you have not seen yet.
+ *
+ * Eight advance points across five views. The helper lives in
+ * session-log.js, which every card-shaped view already imports, because
+ * five copies of a one-line fix is how four of them drift. Instant, not
+ * smooth: animating from the bottom of one card to the top of the next
+ * reads as a lurch.
+ *
+ * LOG-5 -- "is like a bigger box for notes to fill the remaining space to
+ * the right of it." Every field shared a fixed 5.5rem, which is right for
+ * "12.5" and absurd for "felt fine, back was tight". Sizing a note like a
+ * number tells somebody not to write much, which is the opposite of the
+ * point. The note now takes the remaining width, with min-width:0 so it
+ * shrinks rather than pushing Save off a tight row.
+ *
  * 12 Aug 2026 v312
  * EQUIP-4 ACTUALLY SHIPPED THIS TIME.
  *
@@ -2236,7 +2261,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v312";
+const CACHE_NAME = "alongside-v313";
 
 const SHELL_URLS = [
 
