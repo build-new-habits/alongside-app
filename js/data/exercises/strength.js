@@ -830,7 +830,7 @@ export const STRENGTH = [
     instructions: [
       'Kneel on a mat, holding the ab wheel with both hands',
       'Start with the wheel under your shoulders',
-      'Brace your core hard and slowly roll the wheel forward',
+      'Tighten your middle hard, as if bracing to be nudged, and slowly roll the wheel forward',
       'Go only as far as you can without your back arching',
       'Roll back in using your core — not momentum',
       'Complete 3 sets of 6 to 8 reps'
@@ -2019,7 +2019,7 @@ export const STRENGTH = [
       'Stand with the bar over your mid-foot, feet hip-width apart',
       'Hinge down and grip the bar just outside your legs',
       'Set your back flat, chest up, hips higher than knees',
-      'Take a breath into your belly and brace your core hard',
+      'Take a breath into your belly and tighten your middle hard',
       'Drive through the floor — push the earth away rather than pulling the bar up',
       'Hips and shoulders rise at the same rate',
       'At the top, stand fully upright — squeeze the glutes',

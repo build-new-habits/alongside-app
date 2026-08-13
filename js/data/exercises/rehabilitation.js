@@ -1594,7 +1594,7 @@ export const REHABILITATION = [
       'Complete the full alphabet on the right, then switch to the left'
     ],
     coaching: 'This looks simple but covers every direction your ankle moves. It is one of the best all-round ankle mobility exercises there is.',
-    why: 'Restores ankle range of motion and proprioception after injury — safe in the acute phase because there is no load through the joint.',
+    why: 'Restores ankle range of motion and proprioception \u2014 your sense of where the joint is \u2014 after injury — safe in the acute phase because there is no load through the joint.',
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
       'Working into pain rather than up to the edge of it',
@@ -3672,7 +3672,7 @@ export const REHABILITATION = [
       'Progress levels only when the current level is fully controlled',
       'Complete 3 sets at whatever level is currently appropriate'
     ],
-    coaching: 'Ankle sprains damage the proprioceptive nerves as much as the ligaments. Restoring balance and proprioception prevents re-injury more than any other intervention.',
+    coaching: 'Ankle sprains damage the nerves that tell you where your foot is as much as they damage the ligaments. Restoring balance and proprioception prevents re-injury more than any other intervention.',
     why: 'Proprioception training is the most important component of ankle sprain rehabilitation — people who skip this step have very high re-injury rates within the first year of return to sport.',
         watchOut: [
       'Progressing to the next stage before the current one is comfortable and pain-free',
