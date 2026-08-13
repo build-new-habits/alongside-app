@@ -1,6 +1,27 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v305
+ * SW-1. THE BUG THAT MADE EVERY OTHER FIX UNRELIABLE TODAY.
+ *
+ * The fetch handler used caches.match(request) -- a GLOBAL lookup across
+ * every cache this origin holds, oldest first. So an old alongside-v2xx
+ * cache could answer for settings.js while this worker was v304, and the
+ * About screen would honestly report v304 while the page ran code from a
+ * dozen versions earlier.
+ *
+ * That is precisely what Graeme reported: v304 in About, the old Settings
+ * tab strip on screen, on a genuinely fresh fetch. Both true. The worker
+ * answered from a cache the activate handler had not deleted yet, and a
+ * hit is a hit.
+ *
+ * It also explains why "close it fully and reopen, maybe twice" kept
+ * being the advice all day. That advice was never reliable: whether a fix
+ * appeared depended on which cache answered first.
+ *
+ * Now scoped to CACHE_NAME, so only the current cache can answer and a
+ * miss falls through to the network.
+ *
  * 12 Aug 2026 v304
  * VER-2. The version indicator could report a build the page was not
  * running. VER-1 read caches.keys() and took the alongside-v entry, which
@@ -2019,7 +2040,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v304";
+const CACHE_NAME = "alongside-v305";
 
 const SHELL_URLS = [
 
@@ -2290,24 +2311,45 @@ self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
   if (url.origin !== self.location.origin) return;
 
+  // SW-1, 12 Aug 2026. THE BUG THAT MADE EVERY OTHER FIX UNRELIABLE.
+  //
+  // This was caches.match(event.request) -- a GLOBAL lookup across every
+  // cache the origin holds, oldest first. So an old alongside-v2xx cache
+  // could answer for settings.js while sw.js itself was v304, and the
+  // About screen would honestly report v304 while the page ran code from
+  // twelve versions ago.
+  //
+  // That is exactly what Graeme saw: v304 in About, the old Settings tab
+  // strip on screen, on what he correctly described as a fresh fetch.
+  // It was fresh; the service worker answered from a cache the activate
+  // handler had not got round to deleting, and a hit is a hit.
+  //
+  // It also explains why "close it fully and reopen" kept being the
+  // advice all day. Nothing about that was reliable -- whether a fix
+  // appeared depended on which cache happened to answer first.
+  //
+  // Scoped to CACHE_NAME. A miss now falls through to the network, which
+  // is correct: the newest cache is the only one that should ever answer,
+  // and anything it lacks should be fetched rather than guessed at from
+  // history.
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
+    caches.open(CACHE_NAME).then(cache =>
+      cache.match(event.request).then(cached => {
+        if (cached) return cached;
 
-      return fetch(event.request).then(response => {
-        if (!response || response.status !== 200 || response.type !== "basic") {
+        return fetch(event.request).then(response => {
+          if (!response || response.status !== 200 || response.type !== "basic") {
+            return response;
+          }
+          cache.put(event.request, response.clone());
           return response;
-        }
-        const toCache = response.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, toCache);
+        }).catch(() => {
+          // Offline navigation: the shell from THIS cache, not any older one.
+          if (event.request.mode === "navigate") {
+            return cache.match("/alongside-app/index.html");
+          }
         });
-        return response;
-      }).catch(() => {
-        if (event.request.mode === "navigate") {
-          return caches.match("/alongside-app/index.html");
-        }
-      });
-    })
+      })
+    )
   );
 });
