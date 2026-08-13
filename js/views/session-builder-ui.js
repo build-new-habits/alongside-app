@@ -442,10 +442,35 @@ function renderEquipmentCheck() {
   // today's answer, not the flat merged `equipment` (workoutGenerator.js's
   // problem, confirmed 04 Aug -- this is where it's fixed for the
   // session-builder path specifically, not a change to the shared field).
-  const savedEquip   = selectedLocation === "gym" ? gymEquip : homeEquip;
+  // EQUIP-2, 12 Aug 2026. Graeme, second report: "Still not picking up
+  // home equipment."
+  //
+  // EQUIP-1 named the scope in the copy, which made the behaviour
+  // honest -- "Here's your home kit" -- and no more useful, because his
+  // home list is genuinely empty. He saved Full gym, which is a
+  // gym-scope facility, and the session defaults to the home location.
+  // So he got a truthful sentence above an entirely unticked list, and
+  // reasonably read it as the app having forgotten.
+  //
+  // FALL BACK RATHER THAN SHOW NOTHING. If the matching scope is empty
+  // and the other has something in it, use the other and say so. An
+  // empty list is not a safer answer than a slightly wrong one here:
+  // everything on this screen is a checkbox the person can untick in a
+  // tap, and the cost of guessing wrong is one tap while the cost of
+  // showing nothing is re-entering a whole gym.
+  //
+  // Only when the matching scope is EMPTY. Somebody with both lists
+  // saved still gets exactly the one they asked for.
+  const matching  = selectedLocation === "gym" ? gymEquip : homeEquip;
+  const other     = selectedLocation === "gym" ? homeEquip : gymEquip;
+  const usingFallback = matching.length === 0 && other.length > 0;
+  const savedEquip    = usingFallback ? other : matching;
+
   const currentEquip = equipmentOverride ?? savedEquip;
   const equipSet     = new Set(currentEquip);
   const hasSavedEquipment = savedEquip.length > 0;
+  const scopeWord     = selectedLocation === "gym" ? "gym" : "home";
+  const otherWord     = selectedLocation === "gym" ? "home" : "gym";
 
   return `
     <div class="view session-builder-view">
@@ -474,9 +499,11 @@ function renderEquipmentCheck() {
                 Naming the list is the whole fix. "Here's what I think you
                 have access to today" is true of either list and therefore
                 explains neither. */ ""}
-          ${hasSavedEquipment
-            ? `Here's your ${selectedLocation === "gym" ? "gym" : "home"} kit. Untick anything you haven't got with you &mdash; I'll adjust the session. Changes here don't affect what you've saved.`
-            : `I haven't got any ${selectedLocation === "gym" ? "gym" : "home"} equipment saved for you${selectedLocation === "gym" ? " &mdash; you may have saved a home list instead" : ""}. Tick anything you have today and I'll build around it. Changes here don't affect what you've saved.`}
+          ${usingFallback
+            ? `I haven't got a ${scopeWord} list saved, so I've started from your ${otherWord} kit. Untick anything you haven't got with you &mdash; I'll adjust the session. Changes here don't affect what you've saved.`
+            : hasSavedEquipment
+              ? `Here's your ${scopeWord} kit. Untick anything you haven't got with you &mdash; I'll adjust the session. Changes here don't affect what you've saved.`
+              : `I haven't got any equipment saved for you yet. Tick anything you have today and I'll build around it. Changes here don't affect what you've saved.`}
         </p>
       </div>
 
