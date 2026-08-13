@@ -125,6 +125,7 @@ import { store }                          from "../store.js";
 import { router }                         from "../router.js";
 import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection } from "../session-builder.js";
 import { isPremium, lockedFeature }        from "../auth.js";
+import { resolveEquipment }               from "../data/equipment-map.js";
 
 export const centered = false;
 
@@ -467,7 +468,26 @@ function renderEquipmentCheck() {
   const savedEquip    = usingFallback ? other : matching;
 
   const currentEquip = equipmentOverride ?? savedEquip;
-  const equipSet     = new Set(currentEquip);
+
+  // EQUIP-3, 12 Aug 2026. RESOLVE before comparing.
+  //
+  // This compared raw ids, so a saved "dumbbells-heavy" never ticked the
+  // "Dumbbells" option -- the two screens use different names for the
+  // same objects. Five of the fifteen options here matched by coincidence
+  // of spelling; the other ten could never be ticked whatever somebody
+  // saved. Graeme selected a full gym and saw Barbell, Pull-up bar and
+  // Foam roller ticked: exactly the coincidences.
+  //
+  // equipment-map.js already existed and already did this for exercise
+  // selection (CON-2, 11 Aug). This screen simply never asked it.
+  //
+  // An OVERRIDE is left literal: those ids came from this screen's own
+  // checkboxes, so they are already in this vocabulary, and resolving
+  // them would re-tick things the person had just unticked.
+  const resolvedSaved = equipmentOverride ? null : resolveEquipment(currentEquip);
+  const isTicked = optId => equipmentOverride
+    ? equipmentOverride.includes(optId)
+    : [...resolveEquipment([optId])].some(tag => resolvedSaved.has(tag));
   const hasSavedEquipment = savedEquip.length > 0;
   const scopeWord     = selectedLocation === "gym" ? "gym" : "home";
   const otherWord     = selectedLocation === "gym" ? "home" : "gym";
@@ -510,7 +530,7 @@ function renderEquipmentCheck() {
       <div style="display:flex;flex-direction:column;gap:var(--space-2);"
            role="group" aria-label="Equipment available today">
         ${EQUIPMENT_OPTIONS.map(opt => {
-          const checked = equipSet.has(opt.id);
+          const checked = isTicked(opt.id);
           return `
             <label class="sb-equipment-label"
                    data-equipment="${opt.id}"
