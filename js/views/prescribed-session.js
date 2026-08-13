@@ -76,7 +76,7 @@
 import { store } from "../store.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { bodyCaution } from "../data/session-rationale.js";
-import { renderLogBlock, attachLogEvents } from "../session-log.js";
+import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { getActiveConditionIds, getConditionName } from "../data/conditions.js";
 import { EXERCISES } from "../data/exercises/index.js";
@@ -535,6 +535,7 @@ function advanceSession(active) {
     completeSession(active);
   } else {
     currentIndex++;
+  scrollToTop();   // SCROLL-1: a new card starts at the top
     resetTimer();
     router.navigate("prescribed-session");
   }
