@@ -63,7 +63,16 @@ check("GET_VERSION answers from CACHE_NAME", () => {
 });
 check("cache name and file header agree", () => {
   const cacheV  = sw.match(/const CACHE_NAME = "alongside-v(\d+)"/);
-  const headerV = sw.match(/\* 12 Aug 2026 v(\d+)\n/);
+  // 13 Aug 2026. Was pinned to the literal date "12 Aug 2026", so this
+  // check only ever worked on the day it was written -- the FIRST header
+  // entry after that is dated differently, the regex misses it, and the
+  // match falls through to whichever older entry still says 12 Aug. It
+  // failed on a correct v315 bump for exactly that reason.
+  //
+  // A gate that silently stops guarding when the calendar moves is worse
+  // than no gate, because the green tick still appears. Match the first
+  // dated version line in the header chain, whatever its date.
+  const headerV = sw.match(/\*\s+\d{1,2} [A-Z][a-z]{2} \d{4} v(\d+)\s*\n/);
   ok(cacheV && headerV, "could not read both versions");
   ok(cacheV[1] === headerV[1],
      `cache says v${cacheV[1]}, header says v${headerV[1]} - the header is ` +
