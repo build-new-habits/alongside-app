@@ -95,5 +95,38 @@ check("the index is not sticky", () => {
      "they were last time wondering where everything went");
 });
 
+console.log("\nTEST 6 - NAV-6: Home does not duplicate the bottom nav");
+check("no tile routes to a nav destination except the flagged one", () => {
+  const home = fs.readFileSync("js/views/today.js", "utf8");
+  const tiles = [...home.matchAll(/\{ id: '[\w-]+', label: '([^']+)'[^}]*?route: '([\w-]+)'/g)]
+    .map(m => ({ label: m[1], route: m[2] }));
+  ok(tiles.length > 0, "no tiles found - the regex has drifted from the markup");
+  const nav = ["today", "progress", "noticing", "settings"];
+  const dup = tiles.filter(t => nav.includes(t.route) && t.label !== "Wellbeing");
+  ok(dup.length === 0,
+     `duplicates a bottom-nav destination, which is reachable from every ` +
+     `screen while Home is not: ${dup.map(d => `${d.label} -> ${d.route}`).join(", ")}`);
+});
+check("the Progress tile stays removed", () => {
+  const home = fs.readFileSync("js/views/today.js", "utf8");
+  ok(!/id: 'progress', label: 'Progress'/.test(home),
+     "it was the only tile duplicating the nav by name as well as route");
+});
+
+console.log("\nTEST 7 - VER-2: the version comes from the running worker");
+check("settings asks, rather than inferring from cache names", () => {
+  const s2 = fs.readFileSync("js/views/settings.js", "utf8");
+  ok(/postMessage\(\{ type: 'GET_VERSION' \}\)/.test(s2),
+     "reading caches.keys() answers which caches EXIST, not which is serving " +
+     "the page - during an update both do, and About reported a build the " +
+     "page was not running");
+  ok(!/const cacheNames = await caches\.keys\(\)/.test(s2), "old inference still present");
+});
+check("the worker answers", () => {
+  const sw = fs.readFileSync("sw.js", "utf8");
+  ok(/event\.data\?\.type === "GET_VERSION"/.test(sw), "no handler - settings would time out");
+  ok(/CACHE_NAME\.replace\("alongside-", ""\)/.test(sw), "must report its OWN cache name");
+});
+
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
 process.exit(fails === 0 ? 0 : 1);
