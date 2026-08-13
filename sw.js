@@ -1,6 +1,45 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v300
+ * Device pass part 4 continued. Three fixes.
+ *
+ * COUNT-1 -- Graeme: "7 out of 3 sessions registered on both home and
+ * progress pages, but not in the 'Build your base' section which is the
+ * reliable data. These need to match and I would guess the 'build your
+ * base' data collection is correct."
+ *
+ * Correct diagnosis. Three surfaces, three rules: today.js and
+ * progress.js counted EVERY activityLog entry including partials;
+ * programmeEngine counted only genuine completions. So the two prominent
+ * numbers were inflated by every session opened and abandoned, and the
+ * accurate one was buried in a programme card.
+ *
+ * store.js v38 adds completedSessions() as the single definition, applied
+ * at all four reads in today.js and both in progress.js. Two of those
+ * matter more than the count: _sessionCompletedToday() drives "You moved
+ * today, that's done", and _buildCoachLine() refers back to yesterday --
+ * so the coach was claiming to have seen sessions that never happened.
+ *
+ * Partials stay IN activityLog. A partial is a real record; it is how the
+ * app knows you started, and continuity reads it. It is simply not a
+ * session you did.
+ *
+ * NAV-3 -- "Yoga was not easy to find... Can the yoga/pilates door be
+ * offered in multiple places as well?" Yes. He searched Cardio/Core/
+ * Strength, Mobility & Conditioning, Wellbeing and Library. Yoga lives
+ * inside Mobility & Conditioning, which is reasonable and not findable --
+ * somebody looking for yoga is not looking for "conditioning". Second
+ * door added to Home; the original route stays. The same thing reachable
+ * from more than one place is how people navigate.
+ *
+ * NAV-4 -- "Changing equipment and turning on session notes really hard
+ * to find. Like really really hard." Both are in the Equipment tab,
+ * FOURTH of seven, in a strip that scrolls with the scrollbar hidden --
+ * so Profile, Programme and Conditions sat off-screen with nothing
+ * saying so. Scroll-driven fade added at each edge. Does not fix seven
+ * tabs, which is NAV-2's job; stops the strip actively hiding them.
+ *
  * 12 Aug 2026 v299
  * EXIT-1. Device pass part 4. Graeme: "I started quite a few to see if it
  * was those. When I exited it asked me to save. I need to be able to exit
@@ -1891,7 +1930,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v299";
+const CACHE_NAME = "alongside-v300";
 
 const SHELL_URLS = [
 
