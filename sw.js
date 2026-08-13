@@ -1,6 +1,41 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v311
+ * EQUIP-5. Deep sweep of the entire equipment chain.
+ *
+ * Graeme, after four failed fixes: "I want you to do a deep sweep to
+ * guarantee this is right. No more 'I didn't look at that file' or 'I
+ * didn't see it'."
+ *
+ * Fair. Every earlier attempt failed on something unexamined -- wrong
+ * diagnosis, wrong layer, wrong catalogue file, then a pre-seed I had not
+ * traced. And every gate I wrote tested a fixture I had typed, or
+ * REPLICATED logic instead of exercising it.
+ *
+ * Traced all 42 files touching equipment. Three writes, seventeen reads,
+ * every one followed to its consumer. Findings:
+ *
+ * 1. FOUR ITEMS WERE MISSING FROM THE CATALOGUE. agility-ladder,
+ *    agility-cones, reaction-ball and nordic-walking-poles are REQUIRED by
+ *    exercises and existed nowhere anybody could tick them -- six
+ *    exercises permanently unreachable for every user since the database
+ *    was written. Added.
+ *
+ * 2. Every other link is sound. All 48 exercise tags are now reachable,
+ *    all 15 screen options can be ticked by something, and every consumer
+ *    (session-builder x3, workoutGenerator via filterByEquipment,
+ *    session-builder-ui) resolves before comparing.
+ *
+ * 3. Round-trip verified on Graeme's real twelve saved ids: first load
+ *    ticks Dumbbells, Resistance bands, Bench, Box or step, Foam roller;
+ *    unticking sticks; manually ticking unowned kit sticks; the gym
+ *    fallback works; an empty list ticks nothing.
+ *
+ * New tools/verify-equipment-sweep.mjs walks catalogue -> store ->
+ * resolver -> screen -> exercise selection on every run, deriving
+ * everything from the files. It fails 2 assertions on the pre-fix code.
+ *
  * 12 Aug 2026 v310
  * EQUIP-4. MY OWN FIX DISABLED ITSELF.
  *
@@ -2182,7 +2217,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v310";
+const CACHE_NAME = "alongside-v311";
 
 const SHELL_URLS = [
 
