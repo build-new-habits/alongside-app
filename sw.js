@@ -1,6 +1,24 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v294
+ * VER-1, found while writing the device pass instructions.
+ *
+ * Step 0 of that document says "check Settings > About shows v293".
+ * Checking whether that was possible: the About screen's APP_VERSION was
+ * HARDCODED to '115' while the cache was at 293. 178 versions of drift,
+ * on the only surface that tells anybody which build their phone is
+ * running.
+ *
+ * So every "are you on the latest?" check during device testing has been
+ * meaningless -- and settings.js's own v86 note records exactly that
+ * confusion happening ("on the latest version, phone was still showing
+ * old, unstyled"). The tool for diagnosing stale builds was itself stale.
+ *
+ * Now read from the running service worker's cache name rather than
+ * restated, and shows "unknown" instead of a confident wrong number if it
+ * cannot be read. settings.js v19 -> v20. Cache bump only.
+ *
  * 12 Aug 2026 v293
  * FEED-1. The LAST reader-without-a-writer on the board.
  *
@@ -1733,7 +1751,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v293";
+const CACHE_NAME = "alongside-v294";
 
 const SHELL_URLS = [
 
