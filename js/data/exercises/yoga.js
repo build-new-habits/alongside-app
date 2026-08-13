@@ -970,7 +970,7 @@ export const YOGA = [
       'Rest in mountain pose for 5 breaths between sides'
     ],
     coaching: 'Focus on a fixed point at eye level — the drishti. A stable gaze creates a stable balance. Wobbling is normal and is not failure.',
-    why: 'A progressive balance challenge that develops proprioception, ankle stability, and hip stability simultaneously. Balance deteriorates with age if untrained — this directly addresses that.',
+    why: 'A progressive balance challenge that develops proprioception \u2014 your sense of where a joint is \u2014 along with ankle and hip stability. Balance deteriorates with age if untrained — this directly addresses that.',
         watchOut: [
       'Rushing between poses without resetting your balance',
       'Staring at the floor rather than fixing on a point ahead',
