@@ -1,5 +1,25 @@
 /*
  * css/components/settings.css
+ * 13 Aug 2026 v7
+ *
+ * v7 — A3. "Your plan" panel. Reuses the existing settings type scale and
+ *   spacing tokens rather than introducing a new visual language: this is
+ *   a settings panel, and a panel that looks like a pricing page inside
+ *   Settings reads as an advert. The gold accent (#B8970A, the paid-tier
+ *   signal across the whole product family) is used ONCE, on the price
+ *   line, and carries no meaning by itself — the tier is stated in text,
+ *   the price is stated in text, and removing all colour loses nothing.
+ *   WCAG 2.2 AA: 1.4.1 (no meaning by colour alone) and 1.4.3 (contrast).
+ *
+ *   The price line was originally written AS gold text and that was wrong,
+ *   caught before shipping by checking the pair rather than trusting the
+ *   token. #B8970A on --color-bg-card (#334155) is 3.68:1 — below AA.
+ *   Gold clears AA only on the two deepest surfaces (6.35:1 and 5.20:1),
+ *   and settings panels sit on cards. The product's one proven-safe gold
+ *   usage is the reverse: gold BACKGROUND with dark text, 6.6:1, per
+ *   coach-proposal.css v?. So emphasis here is weight and size only, and
+ *   the gold signal stays where it already works.
+ *
  * 04 Aug 2026 v6
  *
  * v6 — .settings-update-block/.settings-update-status for the new
@@ -450,6 +470,57 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+}
+
+/* ── Your plan (A3, 13 Aug 2026) ─────────────────────────────────── */
+
+.settings-plan-current {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-5);
+}
+
+.settings-plan-current__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.settings-plan-current__tier {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.settings-plan-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.settings-plan-block p {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.settings-plan-block__heading {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1) 0;
+}
+
+/* Weight and size carry the emphasis. No colour at all — see the header
+   note; gold as text fails AA on the card surface this renders on. */
+.settings-plan-price {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
 }
 
 /* ── Update block (04 Aug 2026) ──────────────────────────────────── */
