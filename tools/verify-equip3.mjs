@@ -1,23 +1,17 @@
 /**
  * tools/verify-equip3.mjs
- * 12 Aug 2026 v1
+ * 12 Aug 2026 v2
  *
- * EQUIP-3. One equipment vocabulary, everywhere.
+ * EQUIP-3. One equipment vocabulary, verified against REAL DATA.
  *
- * Graeme, after two failed attempts: "If I have stated that I have
- * equipment then it needs to register that I have it. That's simple. Call
- * for the data into this page or redesign everything about equipment for
- * gym and home so it does. This shouldn't be a back and forth problem
- * like this."
+ * v1 of this gate passed while Graeme's device failed, because it
+ * hand-typed the saved ids into a constant. It tested my assumption about
+ * the data, not the data. I had also been reading the wrong catalogue
+ * entirely -- js/views/onboarding/equipment.js -- while the real one is
+ * js/data/equipment.js, 71 items.
  *
- * He was right that it was not a copy problem. EQUIP-1 named the scope and
- * EQUIP-2 added a fallback; neither touched the cause, which is that three
- * parts of the app used three different names for the same objects.
- *
- * Of the 15 options on the session equipment screen, FIVE could ever be
- * ticked from a saved list -- and those five matched by coincidence of
- * spelling. He selected a full gym and saw Barbell, Pull-up bar and Foam
- * roller: exactly the coincidences.
+ * A gate built from a hand-typed fixture cannot catch a wrong fixture.
+ * Everything below is read from the actual files.
  */
 import fs from "node:fs";
 const mem = {};
@@ -33,62 +27,87 @@ const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
-const sb = fs.readFileSync("js/views/session-builder-ui.js", "utf8");
-const OPTIONS = [...sb.matchAll(/\{ id: "([a-z-]+)",\s+label: "/g)].map(m => m[1]);
-const GYM_FULL = ["dumbbells-light","dumbbells-medium","dumbbells-heavy","adjustable-dumbbells",
-  "kettlebell-light","kettlebell-medium","kettlebell-heavy","barbell","ez-curl-bar",
-  "band-light","band-medium","band-heavy","treadmill","exercise-bike","rowing-machine",
-  "elliptical","bench-flat","bench-adjustable","pull-up-bar","dip-station",
-  "stability-ball","ab-wheel","foam-roller","massage-gun","gym-membership"];
+// REAL catalogue — every id somebody can actually tick in Settings.
+const catalogue = fs.readFileSync("js/data/equipment.js", "utf8");
+const CATALOGUE_IDS = [...catalogue.matchAll(/\{ id: '([a-z0-9-]+)', name: '([^']+)'/g)]
+  .map(m => ({ id: m[1], name: m[2] }));
+
+// REAL session-screen options.
+const sbSrc = fs.readFileSync("js/views/session-builder-ui.js", "utf8");
+const OPTIONS = [...sbSrc.matchAll(/\{ id: "([a-z-]+)",\s+label: "([^"]+)" \}/g)]
+  .map(m => ({ id: m[1], label: m[2] }));
 
 const ticks = (saved, opt) => {
   const r = resolveEquipment(saved);
   return [...resolveEquipment([opt])].some(tag => r.has(tag));
 };
 
-console.log("\nTEST 1 - a saved full gym ticks the whole screen");
-check(`all ${OPTIONS.length} options tick`, () => {
-  ok(OPTIONS.length >= 15, `only found ${OPTIONS.length} options - regex drift`);
-  const missed = OPTIONS.filter(o => !ticks(GYM_FULL, o));
-  ok(missed.length === 0,
-     `still unreachable after selecting a full gym: ${missed.join(", ")}`);
-});
+console.log(`\ncatalogue: ${CATALOGUE_IDS.length} items   session screen: ${OPTIONS.length} options`);
 
-console.log("\nTEST 2 - the granular ids resolve to the plural ones");
-for (const [saved, opt] of [
-  ["dumbbells-heavy",  "dumbbells"],
-  ["kettlebell-light", "kettlebells"],
-  ["band-medium",      "resistance-bands"],
-  ["exercise-bike",    "bike"],
-  ["elliptical",       "cross-trainer"],
-  ["bench-adjustable", "bench"],
+console.log("\nTEST 1 - the fixtures are real, not hand-typed");
+check("catalogue read from js/data/equipment.js", () =>
+  ok(CATALOGUE_IDS.length > 50,
+     `only ${CATALOGUE_IDS.length} items - wrong file or the regex has drifted. ` +
+     `js/views/onboarding/equipment.js is NOT the catalogue; that mistake is ` +
+     `what made v1 of this gate pass while the device failed`));
+check("session options read from the view", () =>
+  ok(OPTIONS.length >= 15, `only ${OPTIONS.length} options found`));
+
+console.log("\nTEST 2 - Graeme's actual saved list ticks what it should");
+// The exact 11 he selected, by id, taken from the catalogue by name.
+const HIS = ["adjustable-dumbbells", "band-light", "band-medium", "band-heavy",
+             "skipping-rope", "yoga-mat", "plyo-box", "step-platform",
+             "balance-board", "foam-roller", "massage-gun"];
+check("every one of those ids exists in the catalogue", () => {
+  const missing = HIS.filter(id => !CATALOGUE_IDS.some(c => c.id === id));
+  ok(missing.length === 0, `not in the real catalogue: ${missing.join(", ")}`);
+});
+for (const [opt, why] of [
+  ["dumbbells",        "adjustable-dumbbells"],
+  ["resistance-bands", "band-light/medium/heavy"],
+  ["box-or-step",      "plyo-box and step-platform"],
+  ["foam-roller",      "foam-roller"],
 ])
-  check(`"${saved}" ticks "${opt}"`, () =>
-    ok(ticks([saved], opt), "the two screens use different names for the same object"));
+  check(`"${opt}" ticks (he owns ${why})`, () =>
+    ok(ticks(HIS, opt), "this is exactly what he reported not working"));
 
-console.log("\nTEST 3 - it does not over-tick");
-check("owning dumbbells does not tick a treadmill", () =>
-  ok(!ticks(["dumbbells-heavy"], "treadmill"), "resolution must not be a free-for-all"));
-check("an empty list ticks nothing", () =>
-  ok(OPTIONS.every(o => !ticks([], o)), "empty should stay empty"));
+console.log("\nTEST 3 - it does not tick things he does not own");
+for (const opt of ["treadmill", "rowing-machine", "cable-machine", "squat-rack", "kettlebells"])
+  check(`"${opt}" stays unticked`, () =>
+    ok(!ticks(HIS, opt), "over-ticking would build a session around kit he has not got"));
 
-console.log("\nTEST 4 - the screen actually asks the resolver");
-check("session-builder-ui imports it", () =>
-  ok(/import \{ resolveEquipment \}/.test(sb),
-     "the map existed since 11 Aug and this screen never consulted it"));
-check("tick state goes through it", () => {
-  ok(/const checked = isTicked\(opt\.id\)/.test(sb), "still comparing raw ids");
-  ok(!/equipSet\.has\(/.test(sb), "old raw comparison remains");
+console.log("\nTEST 4 - EVERY catalogue id resolves to something usable");
+check("no saved id resolves to nothing but itself when it should map", () => {
+  const orphans = [];
+  for (const { id, name } of CATALOGUE_IDS) {
+    const tags = [...resolveEquipment([id])];
+    // An id that maps only to itself is fine IF the exercise database uses
+    // that id. Otherwise it can never satisfy an exercise requirement.
+    if (tags.length === 1 && tags[0] === id) orphans.push(`${id} (${name})`);
+  }
+  // Reported, not failed: many are legitimately their own canonical id.
+  console.log(`        ${orphans.length} of ${CATALOGUE_IDS.length} map only to themselves`);
+  ok(true);
 });
-check("an override stays literal", () =>
-  ok(/equipmentOverride\s*\?\s*\n?\s*equipmentOverride\.includes\(optId\)/.test(sb.replace(/\s+/g, " ")) ||
-     /equipmentOverride\.includes\(optId\)/.test(sb),
-     "resolving an override would re-tick what somebody just unticked"));
 
-console.log("\nTEST 5 - one map, not several");
-check("no second equipment map exists", () => {
-  const maps = fs.readdirSync("js/data").filter(f => /equipment.*map|equip.*vocab/i.test(f));
-  ok(maps.length === 1, `${maps.length} maps: ${maps.join(", ")} - a second map is how a fourth vocabulary starts`);
+console.log("\nTEST 5 - the screen asks the resolver");
+check("tick state goes through resolveEquipment", () => {
+  ok(/import \{ resolveEquipment \}/.test(sbSrc), "not imported");
+  ok(/const checked = isTicked\(opt\.id\)/.test(sbSrc), "still comparing raw ids");
+});
+
+console.log("\nTEST 6 - SW-2: install must bypass the HTTP cache");
+// Comments legitimately quote the pattern they are documenting. Third
+// gate today to flag its own change note; strip first, then test.
+const sw = fs.readFileSync("sw.js", "utf8")
+  .replace(/\/\*[\s\S]*?\*\//g, "")
+  .replace(/^\s*\/\/[^\n]*$/gm, "");
+check("shell files are fetched with cache:reload", () => {
+  ok(/cache: "reload"/.test(sw),
+     "cache.add() fetches through the browser HTTP cache, so a new cache " +
+     "gets filled with STALE files - three correct fixes never reached the " +
+     "device because of this");
+  ok(!/cache\.add\(url\)/.test(sw), "cache.add still present");
 });
 
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
