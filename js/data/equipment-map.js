@@ -1,5 +1,12 @@
 /**
  * data/equipment-map.js
+ * 12 Aug 2026 v2
+ *
+ * v2 - EQUIP-3. The session equipment screen's own vocabulary added. CON-2
+ *   reconciled two vocabularies and wired the resolver into exercise
+ *   selection; the "Equipment today" screen has a third and consulted
+ *   neither. Five of its fifteen options could ever be ticked.
+ *
  * 11 Aug 2026 v1
  *
  * CON-2 — equipment vocabulary resolver.
@@ -56,6 +63,35 @@
  * to itself only.
  */
 export const EQUIPMENT_IMPLIES = {
+  // ── EQUIP-3, 12 Aug 2026. The SESSION SCREEN's vocabulary ─────────────
+  //
+  // Graeme, after two failed attempts at this: "If I have stated that I
+  // have equipment then it needs to register that I have it. That's
+  // simple." He was right that it was not a copy problem, and I had
+  // patched the copy twice without touching the cause.
+  //
+  // CON-2 built this map to reconcile TWO vocabularies -- the granular
+  // ids Settings saves, and the coarse tags the exercise database uses --
+  // and wired it into exercise selection, where it works.
+  //
+  // There is a THIRD. session-builder-ui.js's "Equipment today" screen
+  // offers its own plural ids (dumbbells, kettlebells, bike,
+  // cross-trainer) which appear in neither of the other two. Measured: of
+  // its 15 options, FIVE could ever be ticked from a saved list, and
+  // those five matched by coincidence of spelling. Graeme selected a full
+  // gym and saw Barbell, Pull-up bar and Foam roller -- exactly the
+  // coincidences.
+  //
+  // Added here rather than in a new file: a second map is how a fourth
+  // vocabulary starts.
+  "dumbbells":        ["dumbbell"],
+  "kettlebells":      ["kettlebell"],
+  "resistance-bands": ["resistance-band"],
+  "bike":             ["exercise-bike"],
+  "stationary-bike":  ["exercise-bike"],
+  "cross-trainer":    ["elliptical"],
+  "box-or-step":      ["plyo-box"],
+
   // ── Weights ────────────────────────────────────────────────────────────
   "dumbbells-light":      ["dumbbell"],
   "dumbbells-medium":     ["dumbbell"],
