@@ -1,5 +1,40 @@
 /**
  * today.js
+ * 13 Aug 2026 v13
+ *
+ * v13 - TIER-A and TIER-F.
+ *
+ * TIER-A. Two of the seven doors bypassed the free tier's own
+ * definition. The boundary (Documents/Business/
+ * alongside_tier_boundary_12aug2026_v1.md section 4) is that free is a
+ * full-body session "the coach decides" -- no session-type selection.
+ * Mobility & Conditioning and Yoga & Pilates both routed straight to
+ * self-directed session views with no tier check, so a free user COULD
+ * choose their session type; they simply could not do it through the
+ * picker that says so. Same fault as the Library, different costume.
+ *
+ * THE SAFETY OBJECTION, ANSWERED IN FULL, because someone will raise it
+ * again and the answer must not have to be re-derived. Gentle movement
+ * is not being paywalled. A free user in pain still gets it: the severe
+ * zone override still forces the single Gentle Care card, Care mode
+ * still fires, burnout bias still lowers intensity, and the coach
+ * proposal still OFFERS mobility whenever the day calls for it. What a
+ * free user loses is the ability to CHOOSE gentle movement instead of
+ * being offered it. That distinction is the entire tier, and nothing
+ * safety-critical sits on the paid side of it.
+ *
+ * Conditions Update stays free and always will -- it is how somebody
+ * tells the coach they are hurting.
+ *
+ * TIER-F. The Wellbeing door and the bottom-nav "Noticing" tab route to
+ * the same view. One destination, two entry points, two different names,
+ * which reads as two features and finds neither. Both entry points are
+ * worth keeping -- a door on Home and a persistent tab serve different
+ * moments -- so the fix is the name. "Wellbeing" wins because it says
+ * what it is to somebody who has never used the app; "Noticing" needs
+ * the philosophy to decode it, and a nav label is the worst place in a
+ * product to ask for that.
+ *
  * 04 Aug 2026 v12
  *
  * v12 — Mobility & Conditioning routes to its own real landing screen
@@ -163,6 +198,7 @@
  */
 
 import { store }               from '../store.js';
+import { isPremium, lockedFeature } from '../auth.js';
 import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
 
 export function TodayView(router) {
@@ -197,7 +233,9 @@ export function TodayView(router) {
   // counted as one of the "real" doors, exactly as before.
   const HOME_DOORS = [
     { id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder', requiresCheckin: true },
-    { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'mobility-conditioning', requiresCheckin: false },
+    // tier: 'personal' -- self-directed session-type choice. See the header
+    // note for why this is not a safety regression.
+    { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'mobility-conditioning', requiresCheckin: false , tier: 'personal' },
     // NAV-3, 12 Aug 2026. Graeme, device pass part 4: "Yoga was not easy
     // to find... Can the yoga/pilates door be offered in multiple places
     // as well?"
@@ -212,7 +250,16 @@ export function TodayView(router) {
     // thing being reachable from more than one place is how people
     // actually navigate; insisting on one true location is a filing
     // system, not a product. Mobility & Conditioning keeps its route in.
-    { id: 'yoga', label: 'Yoga & Pilates', icon: '\uD83E\uDDD8\u200D\u2640\uFE0F', route: 'yoga-session', requiresCheckin: false },
+    // tier: 'personal' -- self-directed session-type choice.
+    { id: 'yoga', label: 'Yoga & Pilates', icon: '\uD83E\uDDD8\u200D\u2640\uFE0F', route: 'yoga-session', requiresCheckin: false , tier: 'personal' },
+    // TIER-F, 13 Aug 2026 -- RESOLVED. The flag below stood since
+    // NAV-6. The door and the bottom-nav tab route to the same view;
+    // the nav label is now "Wellbeing" too (index.html), so the two
+    // entry points finally name one destination. Kept as two entries
+    // deliberately: a door on Home and a persistent tab serve different
+    // moments.
+    //
+    // Original NAV-6 note follows.
     // NAV-6, FLAGGED NOT CHANGED. This routes to 'noticing', which is
     // also a bottom-nav destination -- the same duplication as the
     // Progress tile removed below, hidden by a different label.
@@ -366,16 +413,36 @@ export function TodayView(router) {
         ` : ''}
 
         <div class="today-doors" role="group" aria-label="Choose how you want to move today">
-          ${HOME_DOORS.map(d => `
+          ${HOME_DOORS.map(d => {
+            const inner = `
+              <span class="today-door__icon" aria-hidden="true">${d.icon}</span>
+              <span class="today-door__label">${_esc(d.label)}</span>
+            `;
+
+            // TIER-A. A <div> inside, never a <button>: lockedFeature()
+            // returns role="button" and nesting one interactive control
+            // in another is invalid. Same treatment as the type picker
+            // and the Library, deliberately -- a locked thing should
+            // look the same everywhere or it reads as a different kind
+            // of refusal each time.
+            if (d.tier && !isPremium()) {
+              return lockedFeature(
+                `<div class="today-door">${inner}</div>`,
+                d.tier,
+                _esc(d.label)
+              );
+            }
+
+            return `
             <button class="today-door ${d.id === 'unsure' ? 'today-door--unsure' : ''}"
                     data-route="${d.route}"
                     data-door-id="${d.id}"
                     data-requires-checkin="${d.requiresCheckin}"
                     aria-label="${_esc(d.label)}">
-              <span class="today-door__icon" aria-hidden="true">${d.icon}</span>
-              <span class="today-door__label">${_esc(d.label)}</span>
+              ${inner}
             </button>
-          `).join('')}
+          `;
+          }).join('')}
         </div>
 
         ${!_checkedInToday() ? `

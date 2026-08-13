@@ -1,6 +1,47 @@
 /**
  * library.js - Library Page
  *
+ * 13 Aug 2026 v4
+ *
+ * TIER-B. The Library was the last unlocked door into paid session
+ * shapes. This file contained ZERO occurrences of isPremium or
+ * lockedFeature -- confirmed by grep -- while one file away, in
+ * session-builder-ui.js, the type picker gates the identical choices.
+ * A free user tapped "Lower body" here and silently received a
+ * 30-minute Full Body session: no badge, no explanation, no route to
+ * upgrade. The worst version of a paywall is one that takes something
+ * away without telling you.
+ *
+ * THE BOUNDARY, and where it comes from. Not invented here --
+ * Documents/Business/alongside_tier_boundary_12aug2026_v1.md section 1:
+ * "Free gives you a coach for today. Personal gives you a coach who
+ * knows where you're going." Free is a full-body session the COACH
+ * chooses. The paid act is self-direction.
+ *
+ * The test that decides every card below, and every future one:
+ * is this a SESSION or a PLAN? a PRACTICE or a JOURNEY?
+ * Sessions and practices are free. Plans and journeys are paid.
+ *
+ * FREE, and permanently so:
+ *   - Full Body -- it IS the free session
+ *   - Coach recommends -- it IS the coach deciding
+ *   - Mindful practice: breathing, journal, mindful movement, rest day
+ *   - Prescribed -- 8 Mar 2026 freemium decision, verbatim: "physio
+ *     compliance is a health issue, not a premium feature"
+ *   - Every Log category. Recording what you already did is not a
+ *     feature anybody should be sold
+ *   - Cardio (gym) -- routes to activity-log; logging, not a session
+ *
+ * PAID: everything self-directed. All of "At home" (choosing location
+ * AND type), the four gym session types, My programme (a twelve-week
+ * phased programme is the definition of a plan -- TIER-C), and the five
+ * direct-target activities.
+ *
+ * Tier lives as DATA on the definitions, not as branching in the render.
+ * A future card is one field, and omitting it fails safe: absent means
+ * free, which is the wrong-but-harmless direction, and verify-tier.mjs
+ * catches it regardless.
+ *
  * 05 Aug 2026 v3
  *
  * v3 — Gym Session Builder Phase 1 (blueprint
@@ -57,6 +98,7 @@
  */
 
 import { store } from "../store.js";
+import { isPremium, lockedFeature } from "../auth.js";
 
 export const centered = false;
 
@@ -72,6 +114,11 @@ const GUIDED_CATEGORIES = [
     label:       "At home",
     icon:        "\uD83C\uDFE0",
     description: "Bodyweight or home equipment",
+    // Paid in full. Every card here is a self-directed choice of BOTH
+    // location and session type -- the location step is already
+    // isPremium()-gated in session-builder-ui.js, so leaving this open
+    // would be the same bypass in a different doorway.
+    tier:        "personal",
     sessions: [
       { label: "Mixed workout",  icon: "\u2728",        target: "home-workout",   note: "Coach builds a range of things" },
       { label: "Core",          icon: "\uD83E\uDDD8",  target: "core-session",   note: "Choose intensity" },
@@ -103,17 +150,18 @@ const GUIDED_CATEGORIES = [
     // "Cardio" (a log-what-you-did shortcut to activity-log, a
     // different, working, deliberately-unchanged feature) are untouched.
     sessions: [
-      { label: "My programme",   icon: "\uD83C\uDFCB",  target: "gym-programme",   note: "Your current programme" },
-      { label: "Core",           icon: "\uD83E\uDDD8",  target: "session-builder", note: "", preselectType: "core"  },
-      { label: "Upper body",     icon: "\uD83D\uDCAA",  target: "session-builder", note: "", preselectType: "upper" },
-      { label: "Lower body",     icon: "\uD83E\uDDB5",  target: "session-builder", note: "", preselectType: "lower" },
-      { label: "Glute Focus",    icon: "\uD83C\uDF51",  target: "session-builder", note: "", preselectType: "glute" },
+      { label: "My programme",   icon: "\uD83C\uDFCB",  target: "gym-programme",   note: "Your current programme", tier: "personal" },
+      { label: "Core",           icon: "\uD83E\uDDD8",  target: "session-builder", note: "", preselectType: "core"  , tier: "personal" },
+      { label: "Upper body",     icon: "\uD83D\uDCAA",  target: "session-builder", note: "", preselectType: "upper" , tier: "personal" },
+      { label: "Lower body",     icon: "\uD83E\uDDB5",  target: "session-builder", note: "", preselectType: "lower" , tier: "personal" },
+      { label: "Glute Focus",    icon: "\uD83C\uDF51",  target: "session-builder", note: "", preselectType: "glute" , tier: "personal" },
       { label: "Full Body",      icon: "\u26A1",        target: "session-builder", note: "A blend of everything", preselectType: "full" },
       { label: "Cardio",         icon: "\uD83C\uDFC3",  target: "activity-log",    note: "Treadmill, bike, rower" },
     ]
   },
   {
     id:          "run",
+    tier:        "personal",   // self-directed activity choice
     label:       "Run",
     icon:        "\uD83C\uDFC3",
     description: "Easy, intervals, or long run",
@@ -122,6 +170,7 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "walk",
+    tier:        "personal",   // self-directed activity choice
     label:       "Walk",
     icon:        "\uD83D\uDEB6",
     description: "Gentle, mindful, brisk, or nature walk",
@@ -130,6 +179,7 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "swim",
+    tier:        "personal",   // self-directed activity choice
     label:       "Swim",
     icon:        "\uD83C\uDFCA",
     description: "Steady or interval swim session",
@@ -138,6 +188,7 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "cycle",
+    tier:        "personal",   // self-directed activity choice
     label:       "Cycle",
     icon:        "\uD83D\uDEB4",
     description: "Road, indoor, or turbo trainer",
@@ -146,6 +197,7 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "yoga",
+    tier:        "personal",   // self-directed activity choice
     label:       "Yoga / Pilates",
     icon:        "\uD83E\uDDD8",
     description: "Flexibility, strength, balance, recovery",
@@ -300,15 +352,34 @@ function renderGuidedLanding() {
       </p>
 
       <div class="library-category-grid">
-        ${GUIDED_CATEGORIES.map(cat => `
-          <button class="library-category-card"
-                  data-guided="${cat.id}"
-                  aria-label="${cat.label}: ${cat.description}">
+        ${GUIDED_CATEGORIES.map(cat => {
+          const inner = `
             <span class="library-category-icon" aria-hidden="true">${cat.icon}</span>
             <span class="library-category-label">${cat.label}</span>
             <span class="library-category-sub">${cat.description}</span>
+          `;
+
+          // A <div> inside, never a <button>: lockedFeature() returns
+          // role="button" and nesting one interactive control inside
+          // another is invalid. Same reasoning, same treatment, as the
+          // type picker in session-builder-ui.js -- consistency across
+          // the two screens is the point, not merely gating.
+          if (cat.tier && !isPremium()) {
+            return lockedFeature(
+              `<div class="library-category-card">${inner}</div>`,
+              cat.tier,
+              cat.label
+            );
+          }
+
+          return `
+          <button class="library-category-card"
+                  data-guided="${cat.id}"
+                  aria-label="${cat.label}: ${cat.description}">
+            ${inner}
           </button>
-        `).join("")}
+        `;
+        }).join("")}
       </div>
     </div>
   `;
@@ -334,19 +405,33 @@ function renderGuidedSubScreen(categoryId) {
       </p>
 
       <div class="library-session-grid">
-        ${cat.sessions.map(s => `
-          <button class="library-session-card"
-                  data-target="${s.target}"
-                  ${s.quiet ? `data-quiet="${s.quiet}"` : ""}
-                  ${s.preselectType ? `data-preselect-type="${s.preselectType}"` : ""}
-                  aria-label="${s.label}${s.note ? ": " + s.note : ""}">
+        ${cat.sessions.map(s => {
+          const inner = `
             <span class="library-session-icon" aria-hidden="true">${s.icon}</span>
             <span class="library-session-text">
               <span class="library-session-label">${s.label}</span>
               ${s.note ? `<span class="library-session-note">${s.note}</span>` : ""}
             </span>
+          `;
+
+          if (s.tier && !isPremium()) {
+            return lockedFeature(
+              `<div class="library-session-card">${inner}</div>`,
+              s.tier,
+              s.label + " session"
+            );
+          }
+
+          return `
+          <button class="library-session-card"
+                  data-target="${s.target}"
+                  ${s.quiet ? `data-quiet="${s.quiet}"` : ""}
+                  ${s.preselectType ? `data-preselect-type="${s.preselectType}"` : ""}
+                  aria-label="${s.label}${s.note ? ": " + s.note : ""}">
+            ${inner}
           </button>
-        `).join("")}
+        `;
+        }).join("")}
       </div>
     </div>
   `;
@@ -399,10 +484,43 @@ function renderLogLanding() {
 // the right type already chosen -- read-once-and-clear pattern, same as
 // running-session.js's resume checkpoint.
 function navigateToSession(target, quiet, preselectType) {
+  // TIER-B, defence in depth. The locked cards are not buttons and carry
+  // no data-target, so nothing here should ever be reachable for a paid
+  // route on the free tier. This guard exists because the render and the
+  // handler are two places that must agree, and the previous bug in this
+  // file was exactly a disagreement of that kind -- the render offered
+  // something the handler then quietly swapped for something else.
+  //
+  // Routing to upgrade rather than silently substituting: a substitution
+  // is what TIER-B was raised to remove.
+  if (!isPremium() && _isPaidTarget(target, preselectType)) {
+    screen = "landing";
+    router.navigate("upgrade");
+    return;
+  }
+
   if (quiet) store.set("quietMode", quiet);
   if (preselectType) store.set("sessionBuilderPreselect", { type: preselectType });
   screen = "landing";  // reset for next time
   router.navigate(target);
+}
+
+// Derived from the definitions above rather than hardcoded, so a card and
+// its guard cannot drift apart. That drift is the whole bug class this
+// change closes.
+function _isPaidTarget(target, preselectType) {
+  for (const cat of GUIDED_CATEGORIES) {
+    if (cat.tier && cat.directTarget === target) return true;
+    for (const s of (cat.sessions || [])) {
+      if (!s.tier) continue;
+      if (s.target !== target) continue;
+      // "session-builder" is shared by free Full Body and four paid
+      // types, so the preselect is what distinguishes them.
+      if (s.preselectType && s.preselectType !== preselectType) continue;
+      return true;
+    }
+  }
+  return false;
 }
 
 function rerender() {

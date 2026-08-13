@@ -1,6 +1,23 @@
 /**
  * gym-programme.js
- * 12 Aug 2026 v4
+ * 13 Aug 2026 v5
+ *
+ * v5 - TIER-C. The twelve-week programme engine had NO tier check
+ * anywhere: neither this file nor data/programmeEngine.js contained a
+ * single occurrence of isPremium or tier, and library.js offered
+ * "My programme" to everybody. So the free tier reached the full
+ * four-phase, twelve-week generative programme.
+ *
+ * That is the exact thing the paid tier is: "Free gives you a coach for
+ * today. Personal gives you a coach who knows where you're going."
+ * A twelve-week phased programme with milestones is the definition of
+ * knowing where you're going. This closes open decision D-2.
+ *
+ * Gated HERE as well as in library.js on purpose. The Library card is
+ * the front door, but home-threshold.js also routes here when resuming
+ * a generated session, and a guard that only covers the front door is
+ * a guard somebody walks around. This one is deliberately NOT applied
+ * to a resume-in-progress path -- see the note at the check itself.
  *
  * v4 - LOG-1. The note block (_performanceFields, _lastLine,
  *   renderLiftBlock, attachLiftEvents) moved out to js/session-log.js.
@@ -232,6 +249,7 @@
  */
 
 import { store }                    from '../store.js';
+import { isPremium }                from '../auth.js';
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { bodyCaution } from "../data/session-rationale.js";
 // EMP/LOG-1: the note block moved to js/session-log.js so workout.js can
@@ -267,6 +285,27 @@ export function GymProgrammeView(router) {
   // ── Mount ──────────────────────────────────────────────────────────────────
 
   function mount(container) {
+    // TIER-C. Somebody on the free tier who reaches this route -- a
+    // stale deep link, a bookmark, a lapsed subscription -- is sent to
+    // the upgrade page rather than shown a programme they cannot have.
+    //
+    // ONE DELIBERATE EXCEPTION, and it matters. A user who was on
+    // Personal, started a programme, and has since lapsed keeps an
+    // activeProgramme in their store. Ejecting them mid-programme with
+    // a paywall would be punishing somebody for a billing state in the
+    // middle of something they committed twelve weeks to. They finish
+    // what they started. The gate is about STARTING a plan.
+    // store.hasActiveProgramme() rather than a truthy check on the
+    // object: activeProgramme DEFAULTS to a populated object in
+    // getDefaults(), so `!!store.get('activeProgramme')` is true for
+    // every user who has ever opened the app and the guard would never
+    // have fired. Caught before shipping by reading the default rather
+    // than assuming null.
+    if (!isPremium() && !store.hasActiveProgramme()) {
+      router.navigate('upgrade');
+      return;
+    }
+
     const weekResult = advanceWeekIfNeeded();
     const stats      = getProgressStats();
 
