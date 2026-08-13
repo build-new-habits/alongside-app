@@ -162,11 +162,35 @@ function hasHighCheckinConsistency() {
   return history.filter(h => h.date >= cutoffStr && h.date < today).length >= 6;
 }
 
+/**
+ * BURN-2, 12 Aug 2026. Now reads the SAME source as the generator.
+ *
+ * There were three independent definitions of burnout in three files,
+ * all feeding the same decision:
+ *   detectBurnout()  in data/checkin.js  — average energy over 5 days
+ *   isBurnoutRisk()  here                — 3 of last 4 days low
+ *   sustainedDifficulty in reflect.js    — 3 of last 5 low
+ *
+ * Traced across five scenarios, TWO produced a contradiction: the
+ * generator narrowed the exercise pool while this function returned
+ * false, so the coach said nothing about it. Somebody flat at 4s all
+ * week got an easier session with no explanation.
+ *
+ * That is a P4 failure, not a logic one. Silence on a drop is only
+ * credible if there is also silence on a rise -- and here the app was
+ * quietly deciding somebody was fragile, behind their back.
+ *
+ * So this defers to detectBurnout() rather than adding a fourth
+ * definition. It speaks at 'moderate', which is the same threshold that
+ * starts changing the session, so the coach and the session can no
+ * longer disagree about whether this is a hard patch.
+ *
+ * reflect.js's sustainedDifficulty is deliberately NOT folded in: it
+ * selects an empathy prompt rather than shaping a session, and its own
+ * note explains why it does not reuse this. Different question.
+ */
 function isBurnoutRisk() {
-  const history = checkinData.getHistory(4) || [];
-  const today   = getTodayStr();
-  const recent  = history.filter(h => h.date < today).slice(-4);
-  return recent.filter(h => (h.energy || 5) <= 3 || (h.mood || 5) <= 3).length >= 3;
+  return checkinData.detectBurnout(store.get("checkinHistory") || {}).level !== "none";
 }
 
 function hasSeverePainToday() {
@@ -207,6 +231,18 @@ function buildReflection() {
   }
 
   if (burnoutRisk) {
+    // BURN-2. Graded, because the session is graded. 'high' narrows the
+    // exercise pool via filterToRecoveryPool(); 'moderate' only steps the
+    // intensity down. Saying the same thing for both would either
+    // overstate a flat week or understate a fortnight of exhaustion.
+    const level = checkinData.detectBurnout(store.get("checkinHistory") || {}).level;
+    if (level === "high") {
+      return { type: "burnout-risk", proposalBias: "rest", lines: [
+        "Your energy has been low for a while now, not just today.",
+        "That is not a problem to fix -- it is information worth acknowledging.",
+        "I am going to keep everything gentle today. What do you need?"
+      ]};
+    }
     return { type: "burnout-risk", proposalBias: "lighter", lines: [
       "Your energy and mood have been running low for a few days now.",
       "That is not a problem to fix -- it is information worth acknowledging.",
