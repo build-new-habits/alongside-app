@@ -1,6 +1,33 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v309
+ * NAV-7. Sub-tabs inside each Settings section.
+ *
+ * Graeme: "Inside the three doors in settings are just long scrollable
+ * pages. Can these be sectioned into slideable tabs to keep it clean?"
+ *
+ * Yes, and safely -- which it would NOT have been before NAV-5. The old
+ * strip failed because seven tabs could not fit and scrolled with the
+ * scrollbar hidden, so three were invisible. Three and four fit across a
+ * phone, and this strip has NO overflow-x: if a label ever outgrows the
+ * width the row wraps rather than scrolling. A wrapped tab is ugly; a
+ * scrolled one is invisible, and invisible is what made Equipment
+ * unfindable.
+ *
+ * App Controls  Reminders | Notes | Programme
+ * Settings      Profile | Conditions | Equipment | Display
+ * About         Story | App | Data
+ *
+ * About was one 24,000-character panel and is now three, split by what
+ * the content is rather than by length. Parameterised rather than split
+ * into three functions, so the markup stays in one place and the version
+ * lookup stays single.
+ *
+ * A one-panel section renders no tabs at all: one tab is not a choice.
+ * Changing section resets to its first tab; in-section actions (Display
+ * reset, reminders toggle) keep theirs.
+ *
  * 12 Aug 2026 v308
  * SW-2. THE REASON THREE CORRECT FIXES DID NOT REACH THE DEVICE.
  *
@@ -2121,7 +2148,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v308";
+const CACHE_NAME = "alongside-v309";
 
 const SHELL_URLS = [
 
