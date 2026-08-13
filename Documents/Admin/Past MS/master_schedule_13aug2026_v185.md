@@ -1,32 +1,8 @@
 # Alongside: Move — Master Schedule
-## 13 Aug 2026 v186
+## 13 Aug 2026 v185
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_13aug2026_v185.md`. Remove v185 on upload.
-
-> ### 🟢 13 Aug, second build block — THE WHOLE TIER MODEL IS NOW REAL
->
-> `sw.js` v317 → **v319**, cache `alongside-v319`. All **32** gates green on a fresh clone, including new `verify-tier.mjs` (14 checks).
->
-> **TIER-A/B/C/E/F all shipped.** The free boundary is now where `alongside_tier_boundary_12aug2026_v1.md` says it is, for the first time. Three surfaces had been reaching paid session shapes on free — the Library (zero tier awareness), two Home doors, and the entire twelve-week programme engine — each looking perfectly correct in isolation.
->
-> | | |
-> |---|---|
-> | **TIER-A** | Mobility & Conditioning and Yoga & Pilates gated. **Not a safety regression** — severe-pain override, Care mode and the coach proposal still deliver gentle movement to free users. They lose *choosing* it, not access to it. Written into `today.js`'s header so nobody re-derives it |
-> | **TIER-B** | Library gated. Tier is **data on the definitions**, not branching in the render — a future card is one field, and omitting it fails safe. Free keeps Full Body, Cardio (logging), Mindful practice, Prescribed, Coach recommends |
-> | **TIER-C** | Programme engine gated, with one exception: somebody who started on Personal and lapsed **finishes their programme**. Ejecting them mid-plan punishes a billing state, not a choice. **Closes D-2** |
-> | **TIER-D** | No code. The exercise database is deliberately **never** tier-gated — capability decides by what is safe, not what is paid. Gated *against* in `verify-tier.mjs` so it cannot be re-litigated in code |
-> | **TIER-E** | **Progress differs in kind, not length.** Free is a fortnight and *records*; Personal *reads* |
-> | **TIER-F** | Nav tab and the `sr-only` heading renamed to Wellbeing. Same route as the Home door — two names read as two features |
->
-> **Statement 4 restored to the upgrade page.** *"Your programme builds"* was withheld that morning because the engine had no tier check; TIER-C made it true. Four statements again, all four true.
->
-> **Three faults caught by rendering rather than reading — the transferable lesson of the block:**
-> 1. A second silent downgrade in the type-picker click handler, byte-identical to the Library one. **Found by the new gate, not by me.** Dead in practice, but dead code performing a forbidden behaviour is an example somebody copies.
-> 2. The first programme guard used `!!store.get('activeProgramme')` — that field **defaults to a populated object**, so it would never have fired. `store.hasActiveProgramme()` is the real test.
-> 3. `activeWindow` was a single shared default, leaving a Personal user on 14 days with a tab strip offering only 30 and 90 and **no tab selected**.
->
-> **jsdom is now installed in the trace harness.** Real click-through verification of rendered output, at both tiers. This is how all three of the above were found; none was visible in the source.
+Supersedes `master_schedule_13aug2026_v184.md`. Remove v184 on upload.
 
 > ### 🟢 13 Aug build session — A1, A3 and A2 SHIPPED
 >
@@ -170,8 +146,8 @@ The page therefore ships **three** true statements, not four, and the fourth slo
 
 | ID | Task | Priority | Status | Week |
 |---|---|---|---|---|
-| **TIER-B** | Library gated by card, not by screen. `library.js` v4, `session-builder-ui.js` v8. Two silent downgrades removed. | 🟠 P2 | 🟢 **Completed 13 Aug** | w/c 10 Aug |
-| **TIER-A/C/E/F** | Home doors, programme engine, Progress kind-not-length, Wellbeing naming. `today.js` v13, `gym-programme.js` v5, `progress.js` v5, `noticing.js`, `index.html`. `verify-tier.mjs` (14 checks). | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 10 Aug |
+| **B1** | Tier-sensitive Library. `library.js` has **zero** occurrences of `isPremium` or `lockedFeature`. Use `lockedFeature()` — the pattern already exists one file away. | 🟠 P2 | 🟠 **Blocked on LIB-BOUNDARY** — next in sequence | w/c 17 Aug |
+| **B2** | Delete the silent-override at `session-builder-ui.js:880`. A locked type arriving by preselect must route to `upgrade`, never substitute. | 🟠 P2 | 🟠 Unstarted | w/c 17 Aug |
 
 A free user taps "Lower body" in the Library and silently receives a 30-minute Full Body session. One file away, WOW-4/PT-7 (11 Aug) made locked tiles tappable specifically so this moment converts. The Library bypasses that fix and adds a silent substitution on top.
 
