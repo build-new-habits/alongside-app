@@ -90,6 +90,44 @@ check("no saved id resolves to nothing but itself when it should map", () => {
   ok(true);
 });
 
+console.log("\nTEST 4b - EQUIP-4: the override is not pre-seeded");
+check("choosing a duration does NOT fill equipmentOverride", () => {
+  ok(!/equipmentOverride = \[\.\.\.\(store\.get\(scopedKey\) \|\| \[\]\)\]/.test(sbSrc),
+     "pre-seeding with the RAW saved list makes EQUIP-3 skip resolution -- " +
+     "the fix disables itself before the person has ticked anything");
+  const dur = sbSrc.slice(sbSrc.indexOf('.sb-duration-btn'), sbSrc.indexOf('.sb-preset-btn'));
+  ok(/equipmentOverride = null;/.test(dur),
+     "must stay null so renderEquipmentCheck resolves from the saved list");
+});
+check("the override is still set once somebody ticks", () => {
+  ok(/equipmentOverride = checked;/.test(sbSrc),
+     "unticking must survive a re-render, or the screen fights the person");
+});
+check("END TO END: the exact render path ticks the right options", () => {
+  // Replication is only honest if the thing replicated is still there.
+  // Assert the real function's shape first, then run the logic -- v1 of
+  // this gate replicated a path the code no longer took and passed while
+  // the device failed.
+  const fn = sbSrc.slice(sbSrc.indexOf("function renderEquipmentCheck"),
+                         sbSrc.indexOf("return `", sbSrc.indexOf("function renderEquipmentCheck")));
+  ok(/const resolvedSaved = equipmentOverride \? null : resolveEquipment\(currentEquip\)/.test(fn),
+     "the render path no longer matches what this test replicates");
+  const dur = sbSrc.slice(sbSrc.indexOf('.sb-duration-btn'), sbSrc.indexOf('.sb-preset-btn'));
+  ok(/equipmentOverride = null;/.test(dur),
+     "duration pre-seeds the override, so resolution is skipped and this " +
+     "replication does not reflect what the screen actually does");
+  const override = null;
+  const resolved = resolveEquipment(HIS);
+  const isTicked = o => override
+    ? override.includes(o)
+    : [...resolveEquipment([o])].some(tag => resolved.has(tag));
+  const on = OPTIONS.map(o => o.id).filter(isTicked);
+  for (const want of ["dumbbells", "resistance-bands", "bench", "box-or-step", "foam-roller"])
+    ok(on.includes(want), `"${want}" not ticked - he owns it. Got: ${on.join(", ")}`);
+  for (const nope of ["treadmill", "kettlebells", "squat-rack"])
+    ok(!on.includes(nope), `"${nope}" ticked and he does not own it`);
+});
+
 console.log("\nTEST 5 - the screen asks the resolver");
 check("tick state goes through resolveEquipment", () => {
   ok(/import \{ resolveEquipment \}/.test(sbSrc), "not imported");
