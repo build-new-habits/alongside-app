@@ -1,6 +1,26 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v308
+ * SW-2. THE REASON THREE CORRECT FIXES DID NOT REACH THE DEVICE.
+ *
+ * The install handler used cache.add(url). cache.add fetches through the
+ * BROWSER HTTP CACHE. GitHub Pages serves JS with a long max-age, so the
+ * browser answered from its own store with a 200, and the worker wrote
+ * that STALE FILE into the newly created v307 cache.
+ *
+ * Every version bump therefore produced a correctly-named cache full of
+ * old code. SW-1 scoped lookups to the current cache and could not help,
+ * because the current cache WAS the stale one. Graeme saw v307 in About
+ * and pre-EQUIP-3 behaviour on screen and was right that patching was not
+ * working -- EQUIP-3 is correct and verified against his real saved list;
+ * it simply never arrived.
+ *
+ * It is also why "clear site data" appeared to fix things: that wipes the
+ * HTTP cache, so the next install fetched genuine files.
+ *
+ * Now fetches with cache:"reload", bypassing the HTTP cache entirely.
+ *
  * 12 Aug 2026 v307
  * EQUIP-3. The actual cause, after two fixes that were not.
  *
@@ -2101,7 +2121,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v307";
+const CACHE_NAME = "alongside-v308";
 
 const SHELL_URLS = [
 
@@ -2334,11 +2354,36 @@ self.addEventListener("message", event => {
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
+      // SW-2, 12 Aug 2026. THE REASON THREE CORRECT FIXES DID NOT REACH
+      // THE DEVICE.
+      //
+      // This was cache.add(url), which fetches through the BROWSER HTTP
+      // CACHE. GitHub Pages serves JS with a long max-age, so the browser
+      // answered from its own store with a 200 and the service worker
+      // dutifully wrote that STALE FILE into the shiny new v307 cache.
+      //
+      // So every version bump created a correctly-named cache full of old
+      // code. SW-1 scoped lookups to the current cache and could not help,
+      // because the current cache was the problem. Graeme saw v307 in
+      // About and pre-EQUIP-3 behaviour on screen, for the third time, and
+      // was right to say a patch was not working.
+      //
+      // cache:"reload" forces a network fetch and bypasses the HTTP cache
+      // entirely. A Request built this way is what cache.put stores, so
+      // the new cache now contains what was actually deployed.
+      //
+      // This is also why "clear site data" kept appearing to fix it: that
+      // wiped the HTTP cache too, so the next install fetched real files.
       return Promise.allSettled(
         SHELL_URLS.map(url =>
-          cache.add(url).catch(() => {
-            console.warn("SW: could not cache", url);
-          })
+          fetch(new Request(url, { cache: "reload" }))
+            .then(res => {
+              if (!res || res.status !== 200) throw new Error(`bad status ${res && res.status}`);
+              return cache.put(url, res);
+            })
+            .catch(() => {
+              console.warn("SW: could not cache", url);
+            })
         )
       );
     }).then(() => {
