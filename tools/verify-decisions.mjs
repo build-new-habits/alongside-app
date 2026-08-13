@@ -1,5 +1,19 @@
 /**
  * tools/verify-decisions.mjs
+ * 13 Aug 2026 v2
+ *
+ * v2 - A1. Two checks added after the 13 Aug persona trace found that
+ *   upgrade.js told every user how to bypass the tier system: "use the
+ *   dev panel to switch tiers. Triple-tap the version number at the
+ *   bottom of Settings." Every locked feature in the product routes to
+ *   that screen, so the most-visited conversion surface published the
+ *   bypass. The panel itself is a legitimate tool and stays.
+ *
+ *   Note on strip(): comments are removed before matching, deliberately.
+ *   The dev panel SHOULD be discussed in comments -- the whole house
+ *   style depends on that. What must never appear is the gesture in
+ *   rendered copy.
+ *
  * 12 Aug 2026 v1
  *
  * DECISION-DRIFT GATE.
@@ -201,6 +215,45 @@ check("The capability fail-safe covers everyone the question is asked of", "C1-S
 check("Grounding moments never appear on the severe-pain path", "GM-1", () => {
   ok(/>= 7\)? return false|>= 7\)/.test(read("js/data/grounding-moments.js")),
      "the acute-pain guard is missing");
+});
+
+console.log("\nTIER INTEGRITY \u2014 the bypass is never advertised");
+
+check("No view publishes the developer bypass gesture", "A1, 13 Aug 2026", () => {
+  const views = fs.readdirSync("js/views", { recursive: true })
+    .filter(f => typeof f === "string" && f.endsWith(".js"));
+
+  // Two distinct rules, and the distinction is the whole check.
+  //
+  // The GESTURE may appear nowhere in rendered copy, settings.js included.
+  // Describing how to open the bypass is the fault, wherever it sits.
+  //
+  // The PANEL may be named only in settings.js, which owns it and needs a
+  // heading on it. A first draft of this check banned the phrase outright
+  // and failed on the panel's own <h3>Developer panel</h3> -- a false
+  // positive that would have taught the next person to weaken the rule.
+  const gesture = views.filter(f =>
+    /triple[- ]?tap/i.test(read(`js/views/${f}`)));
+  ok(gesture.length === 0,
+     `the bypass gesture is described in rendered copy: ${gesture.join(", ")} \u2014 ` +
+     "every locked feature in the product routes to upgrade.js, so this is the " +
+     "most-read screen a free user reaches");
+
+  const named = views.filter(f =>
+    f !== "settings.js" && /dev(eloper)? panel/i.test(read(`js/views/${f}`)));
+  ok(named.length === 0,
+     `the developer panel is named outside the view that owns it: ${named.join(", ")}`);
+});
+
+check("The dev panel gesture and its markup share one flag", "A1, 13 Aug 2026", () => {
+  const s = read("js/views/settings.js");
+  ok(/const DEV_PANEL_ENABLED\s*=/.test(s),
+     "DEV_PANEL_ENABLED is gone \u2014 there is no single switch to close the bypass before launch");
+  const gates = (s.match(/DEV_PANEL_ENABLED/g) || []).length;
+  ok(gates >= 3,
+     `DEV_PANEL_ENABLED appears ${gates} times; the declaration, the markup and the ` +
+     "listener must all be covered. Gating the panel without the listener leaves the " +
+     "tap sequence live with nothing to open");
 });
 
 console.log(fails === 0

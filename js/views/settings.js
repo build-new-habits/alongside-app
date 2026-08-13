@@ -1,6 +1,32 @@
 /**
  * settings.js
- * 12 Aug 2026 v21
+ * 13 Aug 2026 v22
+ *
+ * v22 - A1 + A3, from the 13 Aug persona trace (blueprint
+ *   alongside_blueprint_trust-tier-voice_13aug2026_v1.md).
+ *
+ *   A1 - DEV_PANEL_ENABLED. The developer tier switcher is fine and stays;
+ *   what was not fine is that upgrade.js printed the gesture to open it in
+ *   user-facing copy ("triple-tap the version number at the bottom of
+ *   Settings"), on the one screen every locked feature routes to. That is
+ *   how a bypass becomes a feature. The instruction is gone with the
+ *   upgrade stub; the flag here is the mechanism, because a rule that
+ *   lives only in a document is exactly what failed. Wrapping the LISTENER
+ *   as well as the markup is the point -- hiding the panel while leaving
+ *   the gesture live would leave a dead tap sequence that still fires.
+ *
+ *   A3 - about-plan panel. Traced across three weeks: a free user meets
+ *   Personal ONLY as a padlock on something already denied. Never once as
+ *   a description of what it is. For persona 2.12, whose defining trait is
+ *   decision paralysis, a padlock is not information -- it is a closed
+ *   door with no sign on it. The hook already existed: the About group's
+ *   subtitle has read "...policies and your plan" since NAV-5 with
+ *   nothing behind the last three words.
+ *
+ *   Deliberately the ONLY new proactive surface. P1 says the coach never
+ *   sells and P3 forbids interruption on a timer. A panel somebody chooses
+ *   to open breaches neither. Home, check-in and reflect would all convert
+ *   better and all cost more than they are worth.
  *
  * v21 - NAV-5. Seven horizontal tabs replaced by three sections, using
  *   Graeme's own grouping: App Controls, Settings, About. Two of the
@@ -282,6 +308,14 @@ import { openSheet }                     from './onboarding/sheet-manager.js';
 export function SettingsView(router) {
 
   let activeTab        = 'profile';
+  // A1, 13 Aug 2026. The tier switcher is a developer tool. It stays
+  // reachable during beta because Graeme and testers genuinely need it,
+  // and it is never advertised anywhere in user-facing copy. Flip to
+  // false before public launch (January 2027). Pattern copied from
+  // AGE_GATE_ENABLED in views/onboarding/thread.js -- a named const with
+  // the flip condition stated, not a magic boolean.
+  const DEV_PANEL_ENABLED = true;
+
   let devTapCount       = 0;
   let devTapTimer       = null;
   let reflectionExpanded = false;
@@ -335,6 +369,7 @@ export function SettingsView(router) {
     equipment:  "Equipment",
     display:    "Display",
     "about-story": "Story",
+    "about-plan":  "Plan",
     "about-app":   "App",
     "about-data":  "Data",
   };
@@ -378,7 +413,7 @@ export function SettingsView(router) {
       id: 'about',
       label: 'About',
       sub: 'The story behind Alongside, policies and your plan',
-      panels: ['about-story', 'about-app', 'about-data'],
+      panels: ['about-story', 'about-plan', 'about-app', 'about-data'],
     },
   ];
 
@@ -391,6 +426,7 @@ export function SettingsView(router) {
     { id: 'notify',      label: 'Reminders'   },
     { id: 'display',     label: 'Display'     },
     { id: 'about',       label: 'About'       },
+    { id: 'about-plan',  label: 'Your plan'   },
   ];
 
   // v11 — My Movement rebuild. Matches store.js's movementIdentity
@@ -502,6 +538,7 @@ export function SettingsView(router) {
       // 'about' removed with NAV-7: the section now references the three
       // split ids, so a bare 'about' case is unreachable. The gate caught
       // it, which is the gate doing exactly its job.
+      case 'about-plan':   return renderPlanPanel();
       case 'about-story':  return renderAboutPanel("story");
       case 'about-app':    return renderAboutPanel("app");
       case 'about-data':   return renderAboutPanel("data");
@@ -1158,6 +1195,106 @@ export function SettingsView(router) {
    * lookup and tier read stay single. Three copies of that preamble is
    * how they drift.
    */
+  /**
+   * A3, 13 Aug 2026 — "Your plan".
+   *
+   * The whole reason this exists: before it, the ONLY way anybody on the
+   * free tier learned that Personal exists was by tapping something they
+   * had just been refused. Six locked session types, three locked
+   * durations, the 90-day tab, the export block, the In Step door. Every
+   * one of those describes Personal in the negative -- here is a thing you
+   * cannot have -- and none of them ever says what it is.
+   *
+   * Register matters here more than usual. This is the helper layer, not
+   * the coach (P2), so it does not speak in the coach's voice and does not
+   * sit in a card-coach block. It states what is true, plainly, and stops.
+   * No urgency, no badge, no "most popular", nothing that reads as a
+   * pitch -- the whole product's credibility rests on the coach never
+   * selling, and a settings panel that starts persuading is the first
+   * crack in that.
+   *
+   * Symmetrical by design: a Personal user opening this sees what they
+   * have, not an upsell to something else. A panel that only ever exists
+   * to sell becomes a panel people learn not to open.
+   *
+   * Price is stated here as well as on the upgrade page. Somebody deciding
+   * whether to look should not have to visit the sales screen to find out
+   * the number. Source: alongside_pricing_model_20jun2026_v2.docx section
+   * 1, confirmed by Graeme 13 Aug 2026. The launch annual rate is
+   * time-limited and says so -- an honest limit, stated upfront, is the
+   * standing rule for this and it is not an urgency mechanic.
+   */
+  function renderPlanPanel() {
+    const tier      = store.get('tier') || 'free';
+    const isPaid    = tier !== 'free';
+    const tierLabel = isPaid ? 'Personal' : 'Free';
+
+    return `
+      <div class="settings-section">
+        <h2 class="settings-section__heading">Your plan</h2>
+
+        <div class="settings-plan-current">
+          <p class="settings-plan-current__label">You are on</p>
+          <p class="settings-plan-current__tier">${_esc(tierLabel)}</p>
+        </div>
+
+        ${isPaid ? `
+          <div class="settings-plan-block">
+            <p>Everything is open to you — every session type, every length,
+               the full picture of your progress, and the long practices in
+               Wellbeing.</p>
+            <p>Five percent of what you pay goes to causes this community
+               chooses.</p>
+          </div>
+
+          <div class="settings-plan-block">
+            <p class="text-sm text-muted">
+              Payment and renewals aren't live yet. When they are, you'll
+              manage them from here.
+            </p>
+          </div>
+        ` : `
+          <div class="settings-plan-block">
+            <p>Free is a real session. The coach reads how you are today and
+               builds you something — it holds nothing back from the session
+               itself. Everything that keeps you safe is free and always
+               will be.</p>
+          </div>
+
+          <div class="settings-plan-block">
+            <h3 class="settings-plan-block__heading">What Personal adds</h3>
+            <p>You name where you're heading, and the coach builds towards it
+               rather than only meeting today.</p>
+            <p>Sessions become yours — the kind, the length, and how the time
+               is spent.</p>
+            <p>Your progress becomes a conversation: what's changed across
+               months, not just this week.</p>
+            <p>And the longer practices open up — the ones that go somewhere
+               over time rather than finishing when the session does.</p>
+          </div>
+
+          <div class="settings-plan-block">
+            <p class="settings-plan-price">£7.99 a month, or £49.99 for the year.</p>
+            <p class="text-sm text-muted">
+              The yearly rate holds until the end of November 2026. No
+              contract either way, and nothing is lost if you change your
+              mind — your data stays yours whatever you decide.
+            </p>
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn btn-primary"
+                    data-action="nav-upgrade"
+                    aria-label="Read more about the Personal plan">
+              Have a look
+            </button>
+          </div>
+        `}
+
+      </div>
+    `;
+  }
+
   function renderAboutPanel(part = "story") {
     const tier = store.get('tier') || 'free';
 
@@ -1268,7 +1405,10 @@ export function SettingsView(router) {
         </div>
         `}
 
-        <!-- Developer bypass panel (hidden — shown after triple-tap on version) -->
+        <!-- Developer bypass panel. Hidden until a deliberate triple-tap on
+             the version label. A1: the gesture is never documented in
+             user-facing copy anywhere in the product. -->
+        ${!DEV_PANEL_ENABLED ? "" : `
         <div class="settings-dev-panel" id="settings-dev-panel" hidden aria-hidden="true">
           <h3 class="settings-dev-panel__heading">Developer panel</h3>
           <p class="settings-dev-panel__tier">Current tier: <strong id="dev-current-tier">${tier}</strong></p>
@@ -1286,6 +1426,7 @@ export function SettingsView(router) {
                     aria-label="Switch to Athlete tier">Athlete</button>
           </div>
         </div>
+        `}
 
       </div>
     `;
@@ -1492,8 +1633,11 @@ export function SettingsView(router) {
       btn.addEventListener('click', () => handleAction(btn.dataset.action, container));
     });
 
-    // Developer bypass: triple-tap version label
-    const versionEl = container.querySelector('#settings-version');
+    // Developer bypass: triple-tap version label. A1 -- gated on the same
+    // flag as the markup, so flipping it removes the gesture and not just
+    // the panel. Hiding one without the other leaves a live tap sequence
+    // with nothing to open, which is worse than either.
+    const versionEl = DEV_PANEL_ENABLED ? container.querySelector('#settings-version') : null;
     if (versionEl) {
       versionEl.addEventListener('click', () => {
         devTapCount++;
@@ -1670,6 +1814,12 @@ export function SettingsView(router) {
       // content defect found eight times elsewhere today.
       case 'nav-impact':
         router.navigate('community-impact');
+        break;
+
+      // A3. The only route to the upgrade page that is not a padlock on
+      // something already refused.
+      case 'nav-upgrade':
+        router.navigate('upgrade');
         break;
 
       case 'nav-activity-log':

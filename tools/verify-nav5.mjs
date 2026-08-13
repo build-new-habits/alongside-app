@@ -158,8 +158,25 @@ check("the strip wraps rather than scrolls", () => {
 check("a one-panel section shows no tabs", () =>
   ok(/panels\.length < 2 \? "" :/.test(s),
      "one tab is not a choice, it is decoration"));
-check("About is split into three", () => {
-  ok(/'about-story', 'about-app', 'about-data'/.test(s), "still one panel");
+check("About is split, and every part is routed", () => {
+  // 13 Aug 2026, A3. Was pinned to the exact literal
+  // `'about-story', 'about-app', 'about-data'`, so adding a FOURTH panel
+  // (about-plan) failed a check about the other three. That is the gate
+  // asserting an incidental ordering rather than the decision it guards
+  // -- NAV-5's decision is that About is several panels and each one is
+  // reachable, not that they sit in a particular sequence.
+  //
+  // Loosened to test membership and routing rather than sequence.
+  // Deliberately NOT extended to check that each listed id has a case in
+  // renderPanel(): the existing "sections and router agree" check below
+  // already does exactly that, and proved it by failing correctly when
+  // about-plan's case was removed during this build. A second copy of a
+  // working assertion is upkeep with no coverage.
+  const group = s.match(/panels:\s*\[([^\]]*'about-story'[^\]]*)\]/);
+  ok(group, "the About section no longer lists its panels");
+  const ids = [...group[1].matchAll(/'([^']+)'/g)].map(m => m[1]);
+  for (const id of ["about-story", "about-app", "about-data"])
+    ok(ids.includes(id), `${id} dropped from the About section`);
   for (const part of ["story", "app", "data"])
     ok(new RegExp(`renderAboutPanel\\("${part}"\\)`).test(s), `${part} not routed`);
 });
