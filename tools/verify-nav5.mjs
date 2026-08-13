@@ -1,0 +1,99 @@
+/**
+ * tools/verify-nav5.mjs
+ * 12 Aug 2026 v1
+ *
+ * NAV-5. Three sections, not seven tabs.
+ *
+ * Graeme, device pass part 4: "Changing equipment and turning on session
+ * notes really hard to find. Like really really hard."
+ *
+ * Two of the three things he could not find anywhere in the app were in
+ * Settings, both in the FOURTH tab of a strip that scrolled horizontally
+ * with the scrollbar hidden. Profile, Programme and Conditions sat
+ * off-screen with nothing indicating they existed.
+ *
+ * His grouping, agreed in conversation: "we divide into app controls,
+ * about, and settings."
+ */
+import fs from "node:fs";
+
+let fails = 0;
+const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
+  catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
+const ok = (c, m) => { if (!c) throw new Error(m); };
+const eq = (a, b, m) => { if (a !== b) throw new Error(`${m}\n        got: ${a}  want: ${b}`); };
+
+const s = fs.readFileSync("js/views/settings.js", "utf8");
+
+console.log("\nTEST 1 - three sections, Graeme's grouping");
+check("exactly three", () => {
+  const ids = [...s.matchAll(/^\s{6}id: '(\w+)',\n\s+label: '/gm)].map(m => m[1]);
+  eq(ids.length, 3, `sections: ${ids.join(", ")}`);
+  for (const want of ["controls", "settings", "about"])
+    ok(ids.includes(want), `missing "${want}"`);
+});
+check("each row explains what is inside", () => {
+  const subs = [...s.matchAll(/sub: '([^']+)'/g)].map(m => m[1]);
+  eq(subs.length, 3, "every section needs a description");
+  ok(subs.some(x => /session notes/i.test(x)),
+     "App Controls must NAME session notes - 'App Controls' alone does not " +
+     "tell you it is in there, which is the exact problem being fixed");
+  ok(subs.some(x => /equipment/i.test(x)), "Settings must name equipment");
+});
+
+console.log("\nTEST 2 - every panel is reachable, none orphaned");
+check("sections and router agree", () => {
+  const referenced = [...s.matchAll(/panels: \[([^\]]+)\]/g)]
+    .flatMap(m => m[1].replace(/[ ']/g, "").split(","));
+  const routed = [...s.matchAll(/case '(\w+)':\s+return render/g)].map(m => m[1]);
+  const missing = referenced.filter(p => !routed.includes(p));
+  const orphan  = routed.filter(p => !referenced.includes(p));
+  ok(missing.length === 0, `referenced but not routed: ${missing.join(", ")}`);
+  ok(orphan.length === 0,
+     `routed but unreachable - a panel nobody can open: ${orphan.join(", ")}`);
+});
+
+console.log("\nTEST 3 - session notes is no longer a lodger");
+check("it has its own panel", () => {
+  ok(/case 'liftlog':\s+return renderLiftLogPanel/.test(s), "no liftlog route");
+  ok(!/renderEquipmentPanel\(\) \+ renderLiftLogPanel\(\)/.test(s),
+     "still appended to Equipment - it is a behaviour toggle, not a fact " +
+     "about what you own, and it was filed there because Equipment was the " +
+     "smallest panel");
+});
+check("it sits in App Controls, not Settings", () => {
+  const controls = s.slice(s.indexOf("id: 'controls'"), s.indexOf("id: 'settings'"));
+  ok(/'liftlog'/.test(controls), "session notes should be a control, not a preference");
+});
+
+console.log("\nTEST 4 - nothing scrolls, so nothing hides");
+check("the index does not overflow", () => {
+  const css = fs.readFileSync("css/components/settings.css", "utf8");
+  const rule = css.slice(css.indexOf(".settings-index {"), css.indexOf("}", css.indexOf(".settings-index {")));
+  ok(/flex-direction: column/.test(rule), "must stack vertically");
+  ok(!/overflow-x/.test(rule), "horizontal overflow is the fault being fixed");
+});
+check("rows clear the 44px touch floor", () => {
+  const css = fs.readFileSync("css/components/settings.css", "utf8");
+  const rule = css.slice(css.indexOf(".settings-index__row {"), css.indexOf("}", css.indexOf(".settings-index__row {")));
+  const m = rule.match(/min-height:\s*(\d+)px/);
+  ok(m && parseInt(m[1], 10) >= 44, "WCAG 2.2 AA 2.5.8");
+});
+
+console.log("\nTEST 5 - re-renders do not bounce back to the index");
+check("in-section actions keep their section", () => {
+  ok(!/activeTab = 'display';\s*\n\s*render\(container\)/.test(s),
+     "Display reset would return to the index mid-action");
+  ok(!/activeTab = 'notify';\s*\n\s*render\(container\)/.test(s),
+     "toggling reminders would return to the index mid-toggle");
+  ok(/activeSection = 'settings'/.test(s) && /activeSection = 'controls'/.test(s),
+     "both deep links should set the section instead");
+});
+check("the index is not sticky", () => {
+  ok(/let activeSection = null;/.test(s),
+     "opening Settings should show the index, not drop somebody back where " +
+     "they were last time wondering where everything went");
+});
+
+console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
+process.exit(fails === 0 ? 0 : 1);
