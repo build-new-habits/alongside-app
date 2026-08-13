@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v175
+## 12 Aug 2026 v174
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v174.md`. Remove v174 on upload.
+Supersedes `master_schedule_12aug2026_v173.md`. Remove v173 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -354,57 +354,6 @@ Graeme's plank model included that mindful practice produces more muscle definit
 `verify-decisions.mjs`'s P5 check matched on `equipment` **plus** `movementPattern` — which is what a *strength* entry looks like. Yoga poses carry `holdSeconds` and `rest`, so **30 inline pose entries walked straight through the check written that morning to catch exactly this.**
 
 Now matches on `id` + `name`, the weakest signal every selectable thing in the product shares. **Each remaining budget is documented with its justification, because a budget without a reason is a hole.**
-
----
-
-## 🟢 BURN-2 — the coach and the session no longer disagree. 12 Aug 2026.
-
-`js/views/coach-reflection.js`. New `tools/verify-burn2.mjs`. `sw.js` → **v289**, cache **alongside-v289**.
-
-BURN-1 made the recovery path reachable. **Verifying it end-to-end turned up the next-order fault**, which is the argument for verifying downstream rather than stopping at the function.
-
-### Three definitions of burnout, in three files, feeding one decision
-
-| Where | Rule |
-|---|---|
-| `detectBurnout()` — `data/checkin.js` | average energy over 5 days |
-| `isBurnoutRisk()` — `coach-reflection.js` | 3 of last 4 days low |
-| `sustainedDifficulty` — `reflect.js` | 3 of last 5 low |
-
-**Traced across five scenarios, two contradicted:**
-
-| Scenario | Generator | Coach |
-|---|---|---|
-| Flat and low, all 4s | narrows the pool | **silent** |
-| Swinging between 1 and 8 | narrows the pool | **silent** |
-
-**The session quietly got easier and the coach said nothing about it.**
-
-**This is a P4 failure, not a logic one.** Silence on a drop is only credible if there is also silence on a rise — and here the app was deciding somebody was fragile behind their back, which is precisely the thing this product refuses to do.
-
-### Fixed by deferring, not by adding a fourth rule
-
-`isBurnoutRisk()` now calls `detectBurnout()` and speaks at **the same threshold that starts changing the session**.
-
-**The message is graded too, because the session is.** `'high'` narrows the pool and proposes rest; `'moderate'` only steps intensity down. Saying the same thing for both would either overstate a flat week or understate a fortnight of exhaustion.
-
-`reflect.js`'s `sustainedDifficulty` is **deliberately left alone** — it selects an empathy prompt rather than shaping a session, and its own note already explains why it does not reuse this. Different question, correctly separate.
-
-### End-to-end, verified
-
-| | Rested | Exhausted |
-|---|---|---|
-| `burnout.level` | none | **high** |
-| `proposalBias` | null | **rest** |
-| Resolved intensity | high | **low** |
-| Recovery pool gate | false | **true** |
-
-`filterToRecoveryPool()` narrows 556 exercises to 236 — **the pool genuinely does something**, which had never once happened in the live app.
-
-### Two gate lessons, both previously learned and repeated
-
-1. **The first agreement check reimplemented `isBurnoutRisk()`** and therefore kept reporting the old result after the fix landed. A test that reimplements the thing it tests is testing itself. It now calls the real functions.
-2. **The P4 copy check flagged `"burnout"` inside `type: "burnout-risk"`** — an internal identifier. Scoped to the message lines, which is the same lesson `verify-voice.mjs` learned this morning: **identifiers are not copy.**
 
 ---
 
@@ -2093,4 +2042,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v175*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v174*
