@@ -816,13 +816,67 @@
   margin-bottom: var(--space-3);
 }
 
+/* CONSENT-1, 12 Aug 2026. Graeme, device pass: "I consented because of
+   the colour change on continue, but the box should show a tick or be
+   fully teal."
+
+   He was right, and this is the worst place in the product for it. The
+   only styling was accent-color, which on a dark background renders the
+   native box as a hollow teal outline that looks near-identical checked
+   and unchecked. The ONLY reliable signal that consent had registered was
+   the Continue button brightening -- a different element, further down
+   the screen, communicating by colour alone.
+
+   That is a WCAG 1.4.1 failure (colour as the sole indicator) on the one
+   control in the app with legal weight. Somebody could tap Continue
+   believing they had not agreed, or agree without registering that they
+   had.
+
+   Now drawn explicitly: empty box with a visible border unchecked, filled
+   with a tick when checked. Three signals rather than one -- fill, tick,
+   and border weight -- so it survives greyscale and low vision.
+
+   appearance:none is safe here because every state below is drawn by
+   hand; the input keeps its native semantics and keyboard behaviour. */
 .ob-consent__checkbox {
+  appearance: none;
+  -webkit-appearance: none;
   width: 24px;
   height: 24px;
   flex-shrink: 0;
   margin-top: 2px;
-  accent-color: var(--color-primary);
+  background: var(--color-bg);
+  border: 2px solid var(--color-text-secondary);
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.ob-consent__checkbox::before {
+  content: "";
+  width: 13px;
+  height: 13px;
+  transform: scale(0);
+  /* A tick drawn as a clip-path, so it needs no font, no icon file and no
+     network request -- this screen must work on a first, offline-capable
+     load before anything else has cached. */
+  clip-path: polygon(14% 44%, 0 65%, 40% 100%, 100% 16%, 82% 0%, 37% 62%);
+  background: var(--color-text-inverse);
+}
+
+.ob-consent__checkbox:checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.ob-consent__checkbox:checked::before { transform: scale(1); }
+
+.ob-consent__checkbox:hover:not(:checked) { border-color: var(--color-primary); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-consent__checkbox { transition: none; }
 }
 
 .ob-consent__checkbox:focus-visible {
