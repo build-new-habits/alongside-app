@@ -72,6 +72,33 @@
 
 .settings-tabs::-webkit-scrollbar { display: none; }
 
+/* NAV-4, 12 Aug 2026. Graeme, device pass part 4: "Changing equipment and
+   turning on session notes really hard to find. Like really really hard."
+
+   Both live in the Equipment tab -- FOURTH of seven in a strip that
+   scrolls horizontally with the scrollbar hidden. So on a phone the
+   visible tabs were Equipment, Reminders, Display, About, and Profile,
+   Programme and Conditions were off-screen to the LEFT with nothing
+   indicating they existed.
+
+   A hidden scrollbar is right on mobile; giving no other overflow signal
+   is not. A fade at each edge says "there is more this way" without
+   adding chrome, and only appears when there is genuinely more --
+   scroll-driven, so it is not a permanent decoration implying content
+   that is not there.
+
+   Does not fix the underlying problem, which is seven tabs. That is
+   NAV-2's job. This stops the strip actively hiding them. */
+.settings-tabs {
+  /* Two gradients pinned to the scroll container's edges, sized to zero
+     when scrolled fully to that end. */
+  background:
+    linear-gradient(to right, var(--color-bg) 30%, transparent) left / 2rem 100% no-repeat local,
+    linear-gradient(to left,  var(--color-bg) 30%, transparent) right / 2rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(0,0,0,0.28), transparent) left / 1rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.28), transparent) right / 1rem 100% no-repeat scroll;
+}
+
 .settings-tab {
   flex: 0 0 auto !important;
   flex-shrink: 0 !important;

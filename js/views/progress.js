@@ -149,7 +149,11 @@ export function ProgressView(router) {
   // ── Coach narrative ────────────────────────────────────────────────────────
 
   function renderCoachNarrative(stats, tier, name) {
-    const activityLog  = store.get('activityLog') || [];
+    // COUNT-1. Partials excluded here too -- this feeds _buildObservation(),
+    // which writes the "N sessions in the last 30 days" coach line. A coach
+    // congratulating somebody on sessions they backed out of is worse than
+    // a wrong number.
+    const activityLog  = store.completedSessions(store.get('activityLog'));
     const checkinHistory = store.get('checkinHistory') || {};
     const goals        = store.get('goals') || [];
     const observation  = _buildObservation(activityLog, checkinHistory, stats, activeWindow, tier, name);
@@ -170,7 +174,8 @@ export function ProgressView(router) {
   // ── Activity summary ───────────────────────────────────────────────────────
 
   function renderActivitySummary(tier) {
-    const activityLog = store.get('activityLog') || [];
+    // COUNT-1. Partials excluded, matching Home and Build Your Base.
+    const activityLog = store.completedSessions(store.get('activityLog'));
     const cutoff      = _cutoffDate(activeWindow);
     const recent      = activityLog.filter(e => {
       const ts = e.completedAt || e.loggedAt || e.date;
