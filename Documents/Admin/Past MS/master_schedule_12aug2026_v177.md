@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 12 Aug 2026 v178
+## 12 Aug 2026 v177
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_12aug2026_v177.md`. Remove v177 on upload.
+Supersedes `master_schedule_12aug2026_v176.md`. Remove v176 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -354,20 +354,6 @@ Graeme's plank model included that mindful practice produces more muscle definit
 `verify-decisions.mjs`'s P5 check matched on `equipment` **plus** `movementPattern` — which is what a *strength* entry looks like. Yoga poses carry `holdSeconds` and `rest`, so **30 inline pose entries walked straight through the check written that morning to catch exactly this.**
 
 Now matches on `id` + `name`, the weakest signal every selectable thing in the product shares. **Each remaining budget is documented with its justification, because a budget without a reason is a hole.**
-
----
-
-## 🟢 LEGAL-1 — "Ltd" removed from the live consent label. 12 Aug 2026.
-
-**Repo: `build-new-habits/website`.** `index.html`. Pushed and verified on a fresh clone.
-
-A previous session fixed `site.js`'s footer and recorded the rule. **The phrase survived in the mailing-list consent checkbox on the homepage** — and that is the one place on the site where it is a **legal declaration** rather than decoration, because it names the party a person is consenting to receive email from.
-
-> *"I agree to receive emails from Build New Habits ~~Ltd~~. I can unsubscribe at any time."*
-
-Build New Habits is an unregistered sole trader; **BIZ-1 (HMRC registration) is still outstanding**. Whole-site grep confirms no other live instance.
-
-**Why it survived a fix that was recorded as done:** the earlier session fixed the footer, which is where the phrase was *noticed*, and did not sweep for the phrase itself. Same shape as DATA-1b — a fix verified against the place it was found rather than against the whole surface.
 
 ---
 
@@ -2158,4 +2144,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v178*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v177*
