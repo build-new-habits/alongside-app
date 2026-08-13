@@ -1,5 +1,11 @@
 /**
  * js/session-log.js
+ * 12 Aug 2026 v5
+ *
+ * v5 - LOG-6. The note is a growing textarea, capped at 280 rather than
+ *   40 characters, so somebody can read back what they wrote before
+ *   saving instead of seeing it a few characters at a time.
+ *
  * 12 Aug 2026 v4
  *
  * v4 - LOG-5. The note field now takes the remaining width instead of
@@ -96,7 +102,7 @@ export function performanceFields(exercise, mode) {
   if (mode === "gentle") {
     return [
       { key: "durationMins", label: "Minutes", type: "number", step: "0.5"  },
-      { key: "note",         label: "Note",    type: "text",   maxlength: "40" }
+      { key: "note",         label: "Note",    type: "text",   maxlength: "280", multiline: true }
     ];
   }
 
@@ -114,13 +120,13 @@ export function performanceFields(exercise, mode) {
   if (mode === "distance") {
     return [
       { key: "distance", label: "Distance", type: "number", step: "0.1"  },
-      { key: "note",     label: "Note",     type: "text",   maxlength: "40" }
+      { key: "note",     label: "Note",     type: "text",   maxlength: "280", multiline: true }
     ];
   }
   if (mode === "lengths") {
     return [
       { key: "distance", label: "Lengths", type: "number", step: "1"    },
-      { key: "note",     label: "Note",    type: "text",   maxlength: "40" }
+      { key: "note",     label: "Note",    type: "text",   maxlength: "280", multiline: true }
     ];
   }
 
@@ -161,12 +167,12 @@ export function performanceFields(exercise, mode) {
   if (exercise?.duration || /hold|plank|isometric/i.test(exercise?.name || "")) {
     return [
       { key: "durationMins", label: "Minutes", type: "number", step: "0.5"  },
-      { key: "note",         label: "Note",    type: "text",   maxlength: "40" }
+      { key: "note",         label: "Note",    type: "text",   maxlength: "280", multiline: true }
     ];
   }
   return [
     { key: "reps", label: "Reps", type: "number", step: "1"       },
-    { key: "note", label: "Note", type: "text",   maxlength: "40" }
+    { key: "note", label: "Note", type: "text",   maxlength: "280", multiline: true }
   ];
 }
 
@@ -244,13 +250,23 @@ export function renderLogBlock(exercise, idPrefix = "slog", mode) {
       <div class="slog__row">
         ${fields.map(f => `
           <label class="slog__label" for="${idPrefix}-${f.key}">${esc(f.label)}</label>
-          <input class="slog__input ${f.key === "note" ? "slog__input--note" : ""}" id="${idPrefix}-${f.key}"
-                 type="${f.type}"
-                 inputmode="${f.type === "number" ? "decimal" : "text"}"
-                 ${f.step ? `min="0" step="${f.step}"` : ""}
-                 ${f.maxlength ? `maxlength="${f.maxlength}"` : ""}
-                 autocomplete="off"
-                 data-perf-key="${f.key}">
+          ${f.multiline ? `
+            <textarea class="slog__input slog__input--note" id="${idPrefix}-${f.key}"
+                      rows="1"
+                      maxlength="${f.maxlength || 280}"
+                      autocomplete="off"
+                      data-autogrow="1"
+                      data-perf-key="${f.key}"></textarea>
+            <span class="slog__remaining" aria-live="polite"></span>
+          ` : `
+            <input class="slog__input" id="${idPrefix}-${f.key}"
+                   type="${f.type}"
+                   inputmode="${f.type === "number" ? "decimal" : "text"}"
+                   ${f.step ? `min="0" step="${f.step}"` : ""}
+                   ${f.maxlength ? `maxlength="${f.maxlength}"` : ""}
+                   autocomplete="off"
+                   data-perf-key="${f.key}">
+          `}
         `).join("")}
         <button class="btn btn-secondary slog__save" id="${idPrefix}-save"
                 aria-label="Save these as a note for next time">Save</button>
@@ -265,7 +281,59 @@ export function renderLogBlock(exercise, idPrefix = "slog", mode) {
  * querying the document, so a page holding two blocks does not write one
  * exercise's numbers onto the other.
  */
+/**
+ * LOG-6, 12 Aug 2026. Grow the note field to fit what is in it.
+ *
+ * Graeme: "Can we make that expandable as well so that you can actually
+ * see what's written rather than a few characters at a time... you can
+ * then read back over what you said before pressing save."
+ *
+ * Two separate limits were in the way. The field was one line wide enough
+ * for a number, AND capped at 40 characters -- "3kg felt fine, 4kg pulled
+ * and the back tightened" is 50, so it was truncated mid-sentence. Cap
+ * raised to 280; a note is not an essay, but it should hold a thought.
+ *
+ * Grows from one row rather than starting tall: an empty three-line box
+ * on every exercise card reads as an expectation to fill it, and this
+ * field is optional.
+ *
+ * Height is reset to auto before measuring, or the box can only ever grow
+ * -- deleting text would leave the space behind.
+ */
+function autogrow(el) {
+  if (!el) return;
+  el.style.height = "auto";
+  el.style.height = `${el.scrollHeight}px`;
+}
+
+/**
+ * LOG-6. Warn before the cap, not at it.
+ *
+ * A 280-character limit somebody meets mid-sentence, with no warning, is
+ * the same failure as the 40-character one -- they just meet it later.
+ * The count appears only in the last 60 characters, so it is help when it
+ * matters rather than a word counter watching somebody write.
+ */
+function remaining(el) {
+  const box = el?.parentElement?.querySelector(".slog__remaining");
+  if (!box) return;
+  const max  = parseInt(el.getAttribute("maxlength") || "280", 10);
+  const left = max - el.value.length;
+  box.textContent = left <= 60 ? `${left} characters left` : "";
+}
+
 export function attachLogEvents(exercise, idPrefix = "slog") {
+  // LOG-6. Wire growth for every note field in this block, and size any
+  // that already hold text on first render.
+  document.querySelectorAll("[data-autogrow]").forEach(el => {
+    if (el.dataset.grown !== "1") {
+      el.dataset.grown = "1";
+      el.addEventListener("input", () => { autogrow(el); remaining(el); });
+    }
+    autogrow(el);
+    remaining(el);
+  });
+
   const saveBtn = document.getElementById(`${idPrefix}-save`);
   if (!saveBtn || !exercise?.id) return;
   if (saveBtn.dataset.wired === "1") return;   // idempotent: safe to re-call after a re-render
