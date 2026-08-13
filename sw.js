@@ -1,6 +1,19 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v304
+ * VER-2. The version indicator could report a build the page was not
+ * running. VER-1 read caches.keys() and took the alongside-v entry, which
+ * answers "which caches exist", not "which one is serving this page".
+ * During an update both exist -- so Graeme saw v303 in About and the old
+ * tab strip in Settings simultaneously. The worker now answers for
+ * itself, over the message channel that already existed for SKIP_WAITING.
+ *
+ * NAV-6. Progress tile removed from Home. Graeme: "why do we have a
+ * progress tile when we have a tab? You're right about it looking
+ * cluttered." Correct -- it was the only tile duplicating a bottom-nav
+ * destination, and Home had grown to eight.
+ *
  * 12 Aug 2026 v303
  * NAV-5. Settings: three sections, not seven tabs.
  *
@@ -2006,7 +2019,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v303";
+const CACHE_NAME = "alongside-v304";
 
 const SHELL_URLS = [
 
@@ -2216,6 +2229,22 @@ const SHELL_URLS = [
 self.addEventListener("message", event => {
   if (event.data?.type === "SKIP_WAITING") {
     self.skipWaiting();
+  }
+
+  // VER-2, 12 Aug 2026. Report the version THIS worker is serving.
+  //
+  // VER-1 had the About screen read caches.keys() and pick the entry
+  // starting "alongside-v". That answers a different question: which
+  // caches EXIST, not which one is serving the page. During an update
+  // both exist, so About showed v303 while the page was still running
+  // v302's JavaScript -- Graeme saw the new version number and the old
+  // Settings screen at the same time.
+  //
+  // Worse than the original hardcoded 115, in a way: a number that is
+  // confidently wrong only during an update is exactly when somebody
+  // checks it.
+  if (event.data?.type === "GET_VERSION") {
+    event.source?.postMessage({ type: "VERSION", version: CACHE_NAME.replace("alongside-", "") });
   }
 });
 
