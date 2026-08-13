@@ -323,6 +323,44 @@ export function SettingsView(router) {
 
   const _section = id => SECTIONS.find(s => s.id === id) || SECTIONS[0];
 
+  // NAV-7. Short labels deliberately: four must fit across a phone
+  // without scrolling, and a label that needs truncating is a label that
+  // will hide.
+  const PANEL_LABEL = {
+    notify:     "Reminders",
+    liftlog:    "Notes",
+    programme:  "Programme",
+    profile:    "Profile",
+    conditions: "Conditions",
+    equipment:  "Equipment",
+    display:    "Display",
+    "about-story": "Story",
+    "about-app":   "App",
+    "about-data":  "Data",
+  };
+
+  // NAV-7. Which sub-tab is open, per section. Resets when the section
+  // changes so nobody re-enters a section on a tab they do not remember
+  // choosing.
+  let activePanel = null;
+
+  /**
+   * NAV-7, 12 Aug 2026. Sub-tabs inside each section.
+   *
+   * Graeme: "Inside the three doors in settings are just long scrollable
+   * pages. Can these be sectioned into slideable tabs to keep it clean?"
+   *
+   * Yes -- and safely, which it would not have been before NAV-5. The old
+   * strip failed because SEVEN tabs could not fit and scrolled with the
+   * scrollbar hidden, so three of them were invisible. Three and four fit
+   * across a phone without scrolling, and the CSS below has no
+   * overflow-x, so if a label ever grows past the width it wraps rather
+   * than hiding.
+   *
+   * Each `panels` entry becomes one tab. About was a single 24,000-
+   * character panel rather than several, so it is split by what the
+   * content actually is: the story, the app itself, and your data.
+   */
   const SECTIONS = [
     {
       id: 'controls',
@@ -340,7 +378,7 @@ export function SettingsView(router) {
       id: 'about',
       label: 'About',
       sub: 'The story behind Alongside, policies and your plan',
-      panels: ['about'],
+      panels: ['about-story', 'about-app', 'about-data'],
     },
   ];
 
@@ -406,13 +444,38 @@ export function SettingsView(router) {
           </div>
           <h1 class="settings-title">${_section(activeSection).label}</h1>
 
-          <div class="settings-panels">
-            ${_section(activeSection).panels.map(id => `
-              <div class="settings-panel settings-panel--active" id="settings-panel-${id}">
-                ${renderPanel(id)}
-              </div>
-            `).join('')}
-          </div>
+          ${(() => {
+            // NAV-7. Sub-tabs. Safe here in a way the old seven-tab strip
+            // was not: three and four fit across a phone, and the CSS has
+            // no overflow-x, so a label can never scroll out of sight.
+            const panels = _section(activeSection).panels;
+            const open   = panels.includes(activePanel) ? activePanel : panels[0];
+
+            // A single-panel section gets no tabs at all. One tab is not a
+            // choice, it is decoration.
+            const tabs = panels.length < 2 ? "" : `
+              <div class="settings-subtabs" role="tablist"
+                   aria-label="${_section(activeSection).label} sections">
+                ${panels.map(id => `
+                  <button class="settings-subtab ${id === open ? "settings-subtab--active" : ""}"
+                          role="tab"
+                          aria-selected="${id === open}"
+                          aria-controls="settings-panel-${id}"
+                          data-panel="${id}">
+                    ${PANEL_LABEL[id] || id}
+                  </button>
+                `).join("")}
+              </div>`;
+
+            return `
+              ${tabs}
+              <div class="settings-panels">
+                <div class="settings-panel settings-panel--active"
+                     role="tabpanel" id="settings-panel-${open}">
+                  ${renderPanel(open)}
+                </div>
+              </div>`;
+          })()}
 
         `}
 
@@ -436,7 +499,12 @@ export function SettingsView(router) {
       case 'liftlog':    return renderLiftLogPanel();
       case 'notify':     return renderNotifyPanel();
       case 'display':    return renderDisplayPanel();
-      case 'about':      return renderAboutPanel();
+      // 'about' removed with NAV-7: the section now references the three
+      // split ids, so a bare 'about' case is unreachable. The gate caught
+      // it, which is the gate doing exactly its job.
+      case 'about-story':  return renderAboutPanel("story");
+      case 'about-app':    return renderAboutPanel("app");
+      case 'about-data':   return renderAboutPanel("data");
       default:           return '';
     }
   }
@@ -1082,7 +1150,15 @@ export function SettingsView(router) {
     } catch { return null; }
   }
 
-  function renderAboutPanel() {
+  /**
+   * NAV-7. About was one 24,000-character panel; it is now three tabs.
+   *
+   * Parameterised rather than split into three functions: the markup
+   * stays in one place where its nesting is visible, and the version
+   * lookup and tier read stay single. Three copies of that preamble is
+   * how they drift.
+   */
+  function renderAboutPanel(part = "story") {
     const tier = store.get('tier') || 'free';
 
     // VER-1, 12 Aug 2026. This was hardcoded to '115' while the live
@@ -1113,6 +1189,7 @@ export function SettingsView(router) {
              summary written by anyone else would lose it. Kept short
              deliberately: this is an overview with a route to the full
              piece, not a copy of it. -->
+        ${part !== "story" ? "" : `
         <div class="settings-about-story">
           <p>I built Alongside because I needed it and it didn't exist.</p>
           <p>
@@ -1142,7 +1219,9 @@ export function SettingsView(router) {
             Read the full story
           </a>
         </div>
+        `}
 
+        ${part !== "app" ? "" : `
         <div class="settings-about-block">
           <p>Alongside: Move</p>
           <p class="settings-version"
@@ -1162,7 +1241,9 @@ export function SettingsView(router) {
           </button>
           <p class="settings-update-status" id="settings-update-status" aria-live="polite"></p>
         </div>
+        `}
 
+        ${part !== "data" ? "" : `
         <div class="settings-about-links">
           <button class="btn btn-ghost"
                   data-action="nav-impact"
@@ -1185,6 +1266,7 @@ export function SettingsView(router) {
             Reset all data
           </button>
         </div>
+        `}
 
         <!-- Developer bypass panel (hidden — shown after triple-tap on version) -->
         <div class="settings-dev-panel" id="settings-dev-panel" hidden aria-hidden="true">
@@ -1235,10 +1317,20 @@ export function SettingsView(router) {
     container.querySelectorAll('[data-section]').forEach(btn => {
       btn.addEventListener('click', () => {
         activeSection = btn.dataset.section;
+        activePanel   = null;   // NAV-7: always open a section on its first tab
         render(container);
         // Focus the heading, not the back button: a screen reader should
         // hear where it has arrived before how to leave.
         container.querySelector('.settings-title')?.focus();
+      });
+    });
+
+    // NAV-7. Sub-tab switching.
+    container.querySelectorAll('[data-panel]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activePanel = btn.dataset.panel;
+        render(container);
+        container.querySelector(`[data-panel="${activePanel}"]`)?.focus();
       });
     });
 
@@ -1324,6 +1416,7 @@ export function SettingsView(router) {
       // NAV-5. Stay where we are: Display lives inside the Settings
       // section now, so re-rendering must not bounce back to the index.
       activeSection = 'settings';
+      activePanel   = 'display';   // NAV-7: stay on the tab the action came from
       render(container);
       container.querySelector('#disp-status').textContent = 'Display settings reset to defaults';
       container.querySelector('#disp-reset')?.focus();
@@ -1345,6 +1438,7 @@ export function SettingsView(router) {
           // NAV-5. Reminders lives in App Controls now; re-rendering must
           // not bounce back to the index mid-toggle.
           activeSection = 'controls';
+          activePanel   = 'notify';   // NAV-7: stay on the tab the action came from
           render(container);
         }
       });

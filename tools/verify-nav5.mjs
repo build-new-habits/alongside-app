@@ -45,7 +45,9 @@ console.log("\nTEST 2 - every panel is reachable, none orphaned");
 check("sections and router agree", () => {
   const referenced = [...s.matchAll(/panels: \[([^\]]+)\]/g)]
     .flatMap(m => m[1].replace(/[ ']/g, "").split(","));
-  const routed = [...s.matchAll(/case '(\w+)':\s+return render/g)].map(m => m[1]);
+  // \w excludes hyphens, so about-story/-app/-data read as unrouted when
+  // they are routed. Panel ids are kebab-case; the pattern must be too.
+  const routed = [...s.matchAll(/case '([\w-]+)':\s+return render/g)].map(m => m[1]);
   const missing = referenced.filter(p => !routed.includes(p));
   const orphan  = routed.filter(p => !referenced.includes(p));
   ok(missing.length === 0, `referenced but not routed: ${missing.join(", ")}`);
@@ -126,6 +128,52 @@ check("the worker answers", () => {
   const sw = fs.readFileSync("sw.js", "utf8");
   ok(/event\.data\?\.type === "GET_VERSION"/.test(sw), "no handler - settings would time out");
   ok(/CACHE_NAME\.replace\("alongside-", ""\)/.test(sw), "must report its OWN cache name");
+});
+
+console.log("\nTEST 8 - NAV-7: sub-tabs, and they cannot hide");
+check("every panel has a short label", () => {
+  const referenced = [...s.matchAll(/panels: \[([^\]]+)\]/g)]
+    .flatMap(m => m[1].replace(/[ ']/g, "").split(","));
+  const labels = s.slice(s.indexOf("const PANEL_LABEL"), s.indexOf("let activePanel"));
+  for (const p of referenced)
+    ok(new RegExp(`["']?${p}["']?:`).test(labels), `no tab label for "${p}"`);
+});
+check("no section carries more than four tabs", () => {
+  for (const m of s.matchAll(/panels: \[([^\]]+)\]/g)) {
+    const n = m[1].split(",").length;
+    ok(n <= 4,
+       `${n} tabs - five or more is where the old strip started scrolling ` +
+       `and hiding its own contents`);
+  }
+});
+check("the strip wraps rather than scrolls", () => {
+  const css = fs.readFileSync("css/components/settings.css", "utf8");
+  const rule = css.slice(css.indexOf(".settings-subtabs {"),
+                         css.indexOf("}", css.indexOf(".settings-subtabs {")));
+  ok(/flex-wrap: wrap/.test(rule), "must wrap");
+  ok(!/overflow-x/.test(rule),
+     "a wrapped tab is ugly; a scrolled one is invisible, and invisible is " +
+     "what made Equipment unfindable");
+});
+check("a one-panel section shows no tabs", () =>
+  ok(/panels\.length < 2 \? "" :/.test(s),
+     "one tab is not a choice, it is decoration"));
+check("About is split into three", () => {
+  ok(/'about-story', 'about-app', 'about-data'/.test(s), "still one panel");
+  for (const part of ["story", "app", "data"])
+    ok(new RegExp(`renderAboutPanel\\("${part}"\\)`).test(s), `${part} not routed`);
+});
+check("changing section resets to its first tab", () =>
+  ok(/activePanel   = null;/.test(s),
+     "otherwise somebody re-enters a section on a tab they never chose"));
+check("in-section actions keep their tab", () => {
+  ok(/activePanel   = 'display';/.test(s), "Display reset would jump tabs");
+  ok(/activePanel   = 'notify';/.test(s), "reminders toggle would jump tabs");
+});
+check("sub-tabs carry tab semantics", () => {
+  ok(/role="tablist"/.test(s) && /role="tab"/.test(s) && /role="tabpanel"/.test(s),
+     "screen readers need the relationship, not just buttons");
+  ok(/aria-selected="\$\{id === open\}"/.test(s), "no selected state announced");
 });
 
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);

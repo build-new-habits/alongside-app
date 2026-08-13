@@ -685,3 +685,64 @@
 @media (prefers-reduced-motion: reduce) {
   .settings-index__row { transition: none; }
 }
+
+/* ============================================================
+   SETTINGS SUB-TABS (NAV-7) — 12 Aug 2026
+
+   Graeme: "Inside the three doors in settings are just long scrollable
+   pages. Can these be sectioned into slideable tabs to keep it clean?"
+
+   Yes, and safely — which it would not have been before NAV-5. The old
+   strip failed because SEVEN tabs could not fit and scrolled with the
+   scrollbar hidden, so three of them were invisible. Three and four fit
+   across a phone.
+
+   NO overflow-x HERE, DELIBERATELY. If a label ever grows past the
+   available width the row wraps to a second line rather than scrolling.
+   A wrapped tab is ugly; a scrolled one is invisible, and invisible is
+   what cost Graeme twenty minutes hunting for Equipment.
+
+   Tabs share the width equally rather than sizing to their text, so the
+   strip cannot creep wider than the screen as labels change.
+   ============================================================ */
+
+.settings-subtabs {
+  display: flex;
+  flex-wrap: wrap;                 /* wrap, never scroll */
+  gap: var(--space-1);
+  margin: var(--space-3) 0 var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.settings-subtab {
+  flex: 1 1 0;                     /* equal share, shrink before overflowing */
+  min-width: 0;
+  min-height: 44px;                /* WCAG 2.2 AA 2.5.8 */
+  padding: var(--space-2) var(--space-1);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.settings-subtab:hover { color: var(--color-text); }
+
+/* Selected carries weight and a rule as well as colour — WCAG 1.4.1. */
+.settings-subtab--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: var(--font-semibold);
+}
+
+.settings-subtab:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: -3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-subtab { transition: none; }
+}
