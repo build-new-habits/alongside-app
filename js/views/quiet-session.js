@@ -772,7 +772,7 @@ function startBreathing(exerciseId) {
         clearInterval(breathingInterval);
         breathingInterval = null;
         breathingComplete = true;
-        logSession("breathing", ex.name, ex.credits);
+        logSession("breathing", ex.name, ex.credits, ex.id);
         rerender();
         return;
       }
@@ -859,7 +859,7 @@ function runMindfulTimer(session) {
         mindfulTimer    = null;
         mindfulComplete = true;
         dismountSessionGuard();
-        logSession("mindful", mindfulDuration + " min mindful session", 20);
+        logSession("mindful", mindfulDuration + " min mindful session", 20, session?.[0]?.id);
         rerender();
         return;
       }
@@ -920,7 +920,38 @@ function formatTime(seconds) {
 
 // ── Session logging ───────────────────────────────────────────────────────────
 
-function logSession(type, name, credits) {
+// QUIET-1, 12 Aug 2026. The breathing patterns and mindful practices in
+// this file use short local ids -- "box", "478", "sigh" -- while the
+// exercise database uses full ones: box-breathing,
+// four-seven-eight-breathing, physiological-sigh. Every one has a
+// database equivalent; only the id differs.
+//
+// The patterns themselves legitimately live here: they are phase timings
+// and coach intros, which the database does not hold. What was missing is
+// that logSession() supplied no exerciseIds at all, so no breathing or
+// mindfulness practice ever became familiar -- the same gap CONT-3 closed
+// for core and yoga. "Something like last time" could never offer a
+// person the breathing pattern they actually use.
+//
+// Mapped rather than renamed: renaming the local ids would touch the
+// phase data, the rendering and the resume state for a logging fix.
+const DB_ID = {
+  "box":                 "box-breathing",
+  "478":                 "four-seven-eight-breathing",
+  "sigh":                "physiological-sigh",
+  "extended-exhale":     "extended-exhale-breathing",
+  "resonance":           "coherent-breathing",       // database name for the same 5.5-breath pattern
+  "breath-awareness":    "breath-awareness-meditation",
+  "breath-awareness-10": "breath-awareness-meditation",
+  "breath-awareness-15": "breath-awareness-meditation",
+  "body-scan-short":     "body-scan-short",
+  "body-scan-medium":    "sleep-body-scan",
+  "body-scan-full":      "sleep-body-scan",
+  "open-awareness":      "open-awareness-meditation",
+  "noting-practice":     "noting-practice",
+};
+
+function logSession(type, name, credits, localId) {
   // PT-6, 12 Aug 2026. Wrote straight to activityLog, bypassing
   // store.logActivity() and its dedupe, empty-partial and
   // exerciseHistory handling.
@@ -944,6 +975,10 @@ function logSession(type, name, credits) {
     status:       "completed",
     creditsEarned: credits,
     durationMins: null,
+    // QUIET-1. Database id, so exerciseHistory and continuity can see it.
+    // Omitted entirely when unmapped rather than logging a local id that
+    // matches nothing -- a phantom entry is worse than none.
+    exerciseIds:  DB_ID[localId] ? [DB_ID[localId]] : [],
     completedAt:  nowIso,
     sessionEnd:   nowIso
   });
