@@ -1,5 +1,7 @@
 /**
- * js/views/noticing.js - Noticing Hub Landing View
+ * js/views/noticing.js - Wellbeing Hub Landing View
+ *
+ * 13 Aug 2026 - TIER-F. Screen-reader heading follows the nav label.
  *
  * 10 Aug 2026 v5:
  *   - Fixed two real field-name-mismatch bugs in "Your reflections",
@@ -177,7 +179,14 @@ export function render() {
   return `
     <div class="view noticing-view">
 
-      <h1 class="sr-only">Noticing</h1>
+      <!-- TIER-F, 13 Aug 2026. Screen-reader heading follows the nav
+           label and the Home door, both of which say Wellbeing. A
+           sighted user never saw this heading, so it had drifted
+           unnoticed -- but it is the FIRST thing a screen-reader user
+           hears on arriving, and hearing "Noticing" after tapping
+           "Wellbeing" is precisely the two-features-one-destination
+           confusion this change exists to remove. -->
+      <h1 class="sr-only">Wellbeing</h1>
 
       <div class="view-header">
         <p class="text-secondary" style="margin: 0;">
