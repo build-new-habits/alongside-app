@@ -1,22 +1,8 @@
 # Alongside: Move — Master Schedule
-## 13 Aug 2026 v185
+## 13 Aug 2026 v184
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_13aug2026_v184.md`. Remove v184 on upload.
-
-> ### 🟢 13 Aug build session — A1, A3 and A2 SHIPPED
->
-> `sw.js` v314 → **v317**, cache `alongside-v314` → **`alongside-v317`**. Three deploys, each verified against a fresh clone. All **31** gates green (30 plus new `verify-upg2.mjs`).
->
-> **The paywall is now a paywall.** The product states a price for the first time. Every locked surface in it — six session types, three durations, the 90-day tab, the export block, the In Step door — now arrives somewhere real instead of at a stub telling people to triple-tap the version number.
->
-> **Four gate faults found and fixed while building, all pre-existing:**
-> 1. `verify-sw1.mjs` had the date **hardcoded**. It would silently stop guarding the moment the calendar moved, while still showing green. It failed a correct v315 bump for exactly that reason. De-pinned.
-> 2. `verify-nav5.mjs` asserted a literal panel **ordering**, so adding a fourth About panel failed a check about the other three. Now tests membership and routing.
-> 3. `verify-css.mjs` caught `.upgrade-cta` used with no rule. Class removed rather than a rule invented to satisfy the gate.
-> 4. Gold as **text** fails WCAG AA on this product's card surfaces — measured 3.68:1 on `--color-bg-card`, 3.09:1 on `--color-bg-hover`. Caught before shipping. `verify-upg2.mjs` now enforces it.
->
-> The recurring shape: **a gate that has only ever passed is unproven.** Every new assertion this session was reversal-tested.
+Supersedes `master_schedule_12aug2026_v183.md`. Remove v183 on upload.
 
 > ### ⚠️ WORKING RULES — added 12 Aug 2026 after Graeme raised reliability
 >
@@ -123,20 +109,9 @@ Source: `alongside_blueprint_trust-tier-voice_13aug2026_v1.md`. Five streams, te
 
 | ID | Task | Priority | Status | Week |
 |---|---|---|---|---|
-| **A1** | Dev-panel instruction removed from user-facing copy. `DEV_PANEL_ENABLED` gates markup **and** listener. Two `verify-decisions.mjs` checks, both reversal-tested. | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 10 Aug |
-| **A2** | Real upgrade page shipped. `upgrade.js` v4, new `css/components/upgrade-page.css`, `main.css` v22, `verify-upg2.mjs` (9 checks). | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 10 Aug |
-| **A3** | `about-plan` panel live in Settings, price stated, symmetrical for paid users. `settings.js` v22, `settings.css` v7. | 🟠 P2 | 🟢 **Completed 13 Aug** | w/c 10 Aug |
-
-**🔴 A2 raised a new problem, and it is the most important thing on this page.** The upgrade architecture's four "what changes" statements were written 09 Jul against an *intended* tier boundary. **Two of them describe things the free tier already has**, checked against live code 13 Aug rather than assumed:
-
-| Doc statement | Live reality |
-|---|---|
-| *"Your exercise library opens fully — every movement available"* | **No tier gate on the exercise database anywhere.** `grep isPremium()` across `js/` returns `session-builder-ui.js`, `in-step.js`, `settings.js` only. Difficulty is capped by the **capability** screen, not by tier. |
-| *"Your programme builds — week on week, phase by phase"* | `gym-programme.js` and `data/programmeEngine.js` contain **no tier check at all**. Free reaches the full twelve-week engine via `library.js:106`. This is D-2. |
-
-The page therefore ships **three** true statements, not four, and the fourth slot is deliberately empty. `STATEMENTS` in `upgrade.js` is a list so restoring it is one line.
-
-**🟠 EX-TIER — new, needs Graeme.** Is the exercise library meant to be tier-gated at all? The 09 Jul doc says free is "difficulty level 1 only"; the live app has no such gate, and the capability screen now does that job properly and more humanely. Recommendation: **leave it ungated and retire the doc's line** — capping a free user's exercises by tier, when capability already caps them by what is safe, is the artificial crippling the free tier is explicitly not meant to do. But it changes what Personal is worth, so it is a decision, not a fix.
+| **A1** | Remove the dev-panel instruction from user-facing copy. `DEV_PANEL_ENABLED` flag on the `AGE_GATE_ENABLED` pattern; wrap panel markup **and** the triple-tap listener. Gate it. | 🔴 P1 | 🟡 In progress | w/c 10 Aug |
+| **A2** | Build the real upgrade page from `alongside_upgrade_page_architecture_09jul2026_v1.md` — **do not redesign it**, Graeme's copy is already written. Fully functional except the transaction. Never "coming soon". | 🔴 P1 | 🟠 Unstarted | w/c 10 Aug |
+| **A3** | `about-plan` panel in Settings. The About group's subtitle already reads "...and your plan" with nothing behind it. **The only new proactive surface** — not Home, not check-in, not reflect. | 🟠 P2 | 🟡 In progress | w/c 10 Aug |
 
 **Why A1 exists.** `js/views/upgrade.js:44-47` told every user: *"use the dev panel to switch tiers. Triple-tap the version number."* Every locked feature routes there, so the most-visited conversion surface published the tier bypass. The panel itself is correctly hidden and is a legitimate tool — the fault was one paragraph advertising it.
 
@@ -146,7 +121,7 @@ The page therefore ships **three** true statements, not four, and the fourth slo
 
 | ID | Task | Priority | Status | Week |
 |---|---|---|---|---|
-| **B1** | Tier-sensitive Library. `library.js` has **zero** occurrences of `isPremium` or `lockedFeature`. Use `lockedFeature()` — the pattern already exists one file away. | 🟠 P2 | 🟠 **Blocked on LIB-BOUNDARY** — next in sequence | w/c 17 Aug |
+| **B1** | Tier-sensitive Library. `library.js` has **zero** occurrences of `isPremium` or `lockedFeature`. Use `lockedFeature()` — the pattern already exists one file away. | 🟠 P2 | 🟠 Blocked on LIB-BOUNDARY | w/c 17 Aug |
 | **B2** | Delete the silent-override at `session-builder-ui.js:880`. A locked type arriving by preselect must route to `upgrade`, never substitute. | 🟠 P2 | 🟠 Unstarted | w/c 17 Aug |
 
 A free user taps "Lower body" in the Library and silently receives a 30-minute Full Body session. One file away, WOW-4/PT-7 (11 Aug) made locked tiles tappable specifically so this moment converts. The Library bypasses that fix and adds a silent substitution on top.
