@@ -972,6 +972,25 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
     // warmup items — but re-tagging is exercise-data work. Touch-once.
     if (ex.contentType === "practice") return false;
 
+    // DATA-1, 12 Aug 2026. The tag alone is not enough, because the rule
+    // FAILS OPEN: 158 of 526 entries carry no contentType at all, and a
+    // missing value passes the test above.
+    //
+    // Fourteen of those are 10-30 minute pieces of content -- Brisk Walk
+    // (30 min), Treadmill Incline Walk (30), Steady Cycling (30), HIIT
+    // 30:30 (15), Rowing Steady State (20). Every one was eligible to be
+    // picked as ONE OF FIVE components, so a 20-minute session could be
+    // built around a 30-minute walk.
+    //
+    // Tagging those fourteen fixes today's data. This fixes the class:
+    // anything long enough to BE a session is not a component, whatever
+    // it is tagged. Untagged content is the normal state for 30% of the
+    // database, so the structural check has to carry the rule.
+    //
+    // 600s deliberately, not 300s: several legitimate components run to
+    // 5 minutes (plank progressions, longer holds, some mobility flows).
+    if ((ex.duration || 0) >= 600) return false;
+
     if (prefs[ex.id]?.preference === "avoid") return false;
     if (impactGated && isImpact(ex)) return false;
     if (cap.asked && !cap.floorSafe   && isFloor(ex))   return false;
