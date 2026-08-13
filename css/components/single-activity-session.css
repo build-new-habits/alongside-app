@@ -1,0 +1,183 @@
+/* ============================================================
+   single-activity-session.css
+   css/components/single-activity-session.css
+   12 Aug 2026 v1
+
+   The .ws-* family, used by walk-session, running-session,
+   cycle-session and swim-session — and never defined anywhere.
+
+   Found in the device pass. Graeme, on the run type picker: "Image 1 is
+   unstyled. We need to audit all pages. This was a previously known
+   issue in Library."
+
+   He was right that it is a class of problem rather than one screen. An
+   audit of every class used in a view template against every class
+   defined in CSS found 174 undefined, of which this family is 17 — and
+   the single largest coherent block. Four views, every screen of each,
+   rendering as unstyled text.
+
+   Why it stayed invisible: nothing errors. A class with no rule is not a
+   bug to any tool — the markup is valid, the JS runs, the screen appears.
+   It just looks like a draft. tools/verify-css.mjs now fails on it.
+
+   Styled to match the patterns already established elsewhere rather than
+   inventing a fifth visual language: choice cards follow .ci-choice
+   (recessed surface, border carries the boundary), the timer follows the
+   session-view scale, and the prompt card follows .gmoment.
+
+   Contrast verified in all three schemes by tools/contrast-check.mjs.
+   ============================================================ */
+
+/* ── Type and duration choice grids ─────────────────────────────────
+   Same recessed treatment as .ci-choice: text on --color-bg clears AA
+   comfortably in all three schemes, where an elevated surface does not. */
+
+.ws-type-grid,
+.ws-duration-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.ws-type-card,
+.ws-duration-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-4);
+  min-height: 64px;                /* comfortably over the 44px floor */
+  background: var(--color-bg);
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-md);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.ws-type-card:hover,
+.ws-duration-card:hover {
+  border-color: var(--color-primary);
+}
+
+.ws-type-card:focus-visible,
+.ws-duration-card:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.ws-type-card.is-selected,
+.ws-duration-card.is-selected {
+  /* Border and weight, never colour alone — WCAG 1.4.1. */
+  border: 2px solid var(--color-primary);
+  padding: calc(var(--space-4) - 1px);
+}
+
+.ws-type-icon {
+  font-size: var(--text-2xl);
+  line-height: 1;
+  margin-bottom: var(--space-1);
+}
+
+.ws-type-label,
+.ws-duration-label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: var(--leading-normal);
+}
+
+.ws-type-desc,
+.ws-duration-desc {
+  font-size: var(--text-sm);
+  font-weight: var(--font-normal);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Active session ────────────────────────────────────────────────── */
+
+.ws-active-card {
+  padding: var(--space-5) var(--space-4);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.ws-timer-block {
+  margin: var(--space-5) 0;
+  text-align: center;
+}
+
+.ws-timer-value {
+  display: block;
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  line-height: var(--leading-tight);
+  font-variant-numeric: tabular-nums;   /* stops the layout jittering per second */
+}
+
+.ws-timer-label {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ── In-session prompt ──────────────────────────────────────────────
+   The coach speaking mid-activity. Same quiet left-rule treatment as
+   .gmoment, for the same reason: it should be noticed without
+   interrupting. */
+
+.ws-prompt-card {
+  margin: var(--space-4) 0;
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+}
+
+.ws-prompt-text {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+.ws-prompt-dismiss {
+  display: inline-block;
+  margin-top: var(--space-3);
+  padding: var(--space-2) 0;
+  min-height: 44px;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.ws-prompt-dismiss:hover { color: var(--color-text); }
+
+.ws-prompt-dismiss:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Controls ───────────────────────────────────────────────────────── */
+
+.ws-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-type-card,
+  .ws-duration-card { transition: none; }
+}

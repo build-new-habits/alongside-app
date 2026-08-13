@@ -1,4 +1,8 @@
 /* main.css
+ * 12 Aug 2026 v20
+ *
+ * v20 - CSS-1. components/single-activity-session.css imported.
+ *
  * 12 Aug 2026 v19
  *
  * v19 - DOOR-1. components/upgrade-door.css imported.
@@ -104,6 +108,7 @@
 @import 'components/display-preferences.css';
 @import 'components/session-log.css';
 @import 'components/grounding-moments.css';
+@import 'components/single-activity-session.css';
 @import 'components/upgrade-door.css';
 /* Content-gated — add when content sessions complete */
 /* D3:  @import 'components/home-threshold.css';       */
