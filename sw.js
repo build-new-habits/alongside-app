@@ -1,6 +1,36 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v303
+ * NAV-5. Settings: three sections, not seven tabs.
+ *
+ * Graeme, device pass part 4: "Changing equipment and turning on session
+ * notes really hard to find. Like really really hard." TWO of the three
+ * things he could not find anywhere in the app were in here, both in the
+ * FOURTH tab of a strip that scrolled with the scrollbar hidden -- so
+ * Profile, Programme and Conditions sat off-screen with nothing saying
+ * they existed.
+ *
+ * HIS GROUPING: "we divide into app controls, about, and settings." It
+ * names a distinction the tabs never made. Programme (how often the coach
+ * expects you) and Display (text size) sat adjacent as if they were the
+ * same kind of thing. That missing rule is why Session notes ended up
+ * appended to Equipment: Equipment was the smallest panel, 855 characters
+ * and one control, so a behaviour toggle got filed by convenience. It now
+ * has its own panel, in App Controls.
+ *
+ * WHY A LIST AND NOT HOME TILES, and this was the one place I pushed back
+ * on his proposal: Home already carries eight tiles, ten would be a longer
+ * list to scan, and About and App Controls are the least-used
+ * destinations in the product. The actual failure was content scrolled
+ * OUT OF VIEW, not Settings being hard to reach -- it is already one tap
+ * from the bottom nav. Three rows, nothing off-screen, nothing can hide.
+ *
+ * Each row names what is inside, because "App Controls" alone does not
+ * tell you session notes is in there, which is the exact problem.
+ *
+ * New tools/verify-nav5.mjs. settings.js v20 -> v21.
+ *
  * 12 Aug 2026 v302
  * Device pass part 5.
  *
@@ -1976,7 +2006,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v302";
+const CACHE_NAME = "alongside-v303";
 
 const SHELL_URLS = [
 
