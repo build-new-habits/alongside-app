@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v317
+ * A2. The real upgrade page. upgrade.js v4, new
+ * css/components/upgrade-page.css (precached), main.css v22.
+ *
  * 13 Aug 2026 v316
  * A1 + A3. settings.js v22, settings.css v7, upgrade.js v3.
  * No new files to precache — both changed files are already listed.
@@ -2287,7 +2291,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v316";
+const CACHE_NAME = "alongside-v317";
 
 const SHELL_URLS = [
 
@@ -2325,6 +2329,7 @@ const SHELL_URLS = [
   "/alongside-app/css/components/single-activity-session.css",
   "/alongside-app/css/components/session-shared.css",
   "/alongside-app/css/components/upgrade-door.css",
+  "/alongside-app/css/components/upgrade-page.css",
 
   // CSS completeness, same pass. main.css @imports these, and an @import
   // from a cached stylesheet is still its own network request.
