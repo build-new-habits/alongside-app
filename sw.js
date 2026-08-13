@@ -1,6 +1,26 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v292
+ * QUIET-1. quiet-session.js logged no exerciseIds at all, so no breathing
+ * pattern or mindfulness practice ever became familiar -- the same gap
+ * CONT-3 closed for core and yoga. "Something like last time" could never
+ * offer somebody the breathing pattern they actually use.
+ *
+ * The cause was an id split: this file uses short local ids ("box",
+ * "478", "sigh") while the database uses full ones (box-breathing,
+ * four-seven-eight-breathing, physiological-sigh). Every one has a
+ * database equivalent; only the id differed. Mapped rather than renamed,
+ * because renaming the local ids would touch phase data, rendering and
+ * resume state for what is a logging fix. Unmapped practices log no id at
+ * all rather than a local one that matches nothing.
+ *
+ * NOT migrated wholesale: the breathing patterns legitimately live in
+ * this view -- they are phase timings and coach intros, which the
+ * database does not hold -- and unlike yoga-session they carry no
+ * contraindications and no watchOut, so there is no safety divergence to
+ * fix. Scoped to the actual bug.
+ *
  * 12 Aug 2026 v291
  * DATA-1b. v290 fixed ONE OF TWO ENGINES.
  *
@@ -1677,7 +1697,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v291";
+const CACHE_NAME = "alongside-v292";
 
 const SHELL_URLS = [
 
