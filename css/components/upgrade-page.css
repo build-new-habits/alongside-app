@@ -1,0 +1,149 @@
+/*
+ * css/components/upgrade-page.css
+ * 13 Aug 2026 v1
+ *
+ * A2. The upgrade page. Companion to js/views/upgrade.js v4.
+ *
+ * DESIGN INTENT, from alongside_upgrade_page_architecture_09jul2026_v1.md.
+ * The doc asks for four statements "stacked with breathing room between
+ * each", and that breathing room is the design. This page is quiet on
+ * purpose: it is the one screen where a product like this could reach
+ * for urgency, and the whole credibility of the coach depends on it not
+ * doing so. No badges, no countdown, no highlighted "best value" card.
+ *
+ * WHERE THE GOLD SITS, AND WHY IT SITS THERE. #B8970A is the paid-tier
+ * signal across the whole Alongside family. As TEXT it fails WCAG AA on
+ * this product's card surfaces -- measured, not assumed: 3.68:1 on
+ * --color-bg-card (#334155) and 3.09:1 on --color-bg-hover (#3E4C63).
+ * It only clears AA on the two deepest backgrounds. The product's one
+ * proven-safe usage is the reverse -- gold BACKGROUND with near-black
+ * text at 6.6:1, per coach-proposal.css -- so that is the form used
+ * here, on the left border of the price block only.
+ *
+ * A border is not information. The price is stated in text, the plan is
+ * named in text, and removing every colour from this page loses nothing
+ * at all. WCAG 2.2 AA: 1.4.1 and 1.4.3.
+ */
+
+.upgrade-view {
+  padding: var(--space-6);
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+/* ── Blocks ───────────────────────────────────────────────────────── */
+
+.upgrade-block {
+  margin-bottom: var(--space-7);
+}
+
+.upgrade-heading {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-4) 0;
+  line-height: 1.3;
+}
+
+.upgrade-lede {
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  margin: 0 0 var(--space-2) 0;
+}
+
+.upgrade-lede--emphasis {
+  font-weight: var(--font-semibold);
+}
+
+.upgrade-body {
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin: 0 0 var(--space-3) 0;
+}
+
+.upgrade-body--emphasis {
+  color: var(--color-text-primary);
+  font-weight: var(--font-semibold);
+}
+
+.upgrade-body--quiet {
+  font-size: var(--text-sm);
+}
+
+/* ── What changes ─────────────────────────────────────────────────────
+   The doc: "Four statements. Not bullet points. Stacked with breathing
+   room between each." No markers, no icons, no counters -- a bulleted
+   list reads as a feature comparison and invites tallying, which is
+   exactly the frame this page is written to avoid. */
+
+.upgrade-block--changes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.upgrade-change {
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Price ────────────────────────────────────────────────────────────
+   One block, both options in one sentence. Two cards with one of them
+   visually preferred is the "right choice" framing the Design Notes
+   rule out. */
+
+.upgrade-price-block {
+  border-left: 3px solid #B8970A;
+  padding-left: var(--space-4);
+  margin: var(--space-6) 0 var(--space-7) 0;
+}
+
+.upgrade-price {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1) 0;
+  line-height: 1.4;
+}
+
+.upgrade-price-note {
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-3) 0;
+}
+
+/* ── Action ───────────────────────────────────────────────────────── */
+
+.upgrade-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.upgrade-safety {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  text-align: center;
+  margin: 0;
+}
+
+/* Confirmation. Empty until the CTA fires, and it must not occupy space
+   or draw a border while empty -- an empty bordered box below the button
+   reads as an error slot waiting to fill. */
+.upgrade-confirm {
+  margin: var(--space-5) 0 0 0;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+.upgrade-confirm--visible {
+  border-left: 3px solid #B8970A;
+  padding-left: var(--space-4);
+}
+
+/* Reduced motion is respected by having none: nothing on this page
+   animates, per the doc's Design Notes. Recorded so it stays that way. */
