@@ -1,6 +1,39 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 12 Aug 2026 v295
+ * Device pass, parts 0 and 1. Four fixes.
+ *
+ * SB-META -- worst of the four, and unflagged. The session overview
+ * printed the literal word "undefined": "Fire Hydrant undefined sets
+ * 1.5 min undefined". Every field was interpolated unguarded, and not
+ * every exercise has sets or a tempo -- a timed hold has a duration and
+ * nothing else. The database was honest; the rendering was not. This is
+ * the screen where somebody decides whether the coach knows what it is
+ * doing.
+ *
+ * VOICE-2 -- Graeme: "The writing in the red circles, are these the
+ * coach? Could they be teal?" Yes. .sb-section-why carries the coach's
+ * own section reasoning and was --text-xs in --color-text-secondary --
+ * smaller and greyer than the exercise names, the same treatment as the
+ * "Warm-up" label above it, which is chrome. So on the one screen where
+ * the coach explains itself, it looked like furniture. Now teal at
+ * --text-sm. NOT gold: gold is the paid-tier marker family-wide and this
+ * is free-tier content, so gold would imply the rationale is something
+ * you pay for.
+ *
+ * CI-SPACE -- Graeme: "a lot of unnecessary dead space in check-in and
+ * writing disappears off the page... leave a gap for the slides to pop
+ * over the top, but bring the writing down." Cause was block:"start" on
+ * every message, added 11 Aug for the opposite complaint. Now decided per
+ * message: short ones anchor to the bottom so they sit above the panel,
+ * tall ones anchor to the top so nothing is cut off. Trailing space 70vh
+ * -> 46vh, which is the panel clearance. The two numbers are gated
+ * against each other.
+ *
+ * VER-1b -- yesterday's version fix shipped as "vv294". The cache name
+ * already carries its v; the template added another.
+ *
  * 12 Aug 2026 v294
  * VER-1, found while writing the device pass instructions.
  *
@@ -1751,7 +1784,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v294";
+const CACHE_NAME = "alongside-v295";
 
 const SHELL_URLS = [
 
