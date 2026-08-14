@@ -1,5 +1,14 @@
 /**
  * data/field-contract.js
+ * 14 Aug 2026 v2
+ *
+ * v2 - W3-A / W3-D. Capability writers repointed from the unreachable
+ *   views/onboarding/lifestyle.js to thread.js steps 9a-9d, and
+ *   lifestyle.activityLevel gains 'returning', which has been written
+ *   since 11 Aug and read by three call sites. Two gaps in the gate
+ *   itself logged as CONTRACT-2 (writer existence is not reachability)
+ *   and CONTRACT-3 (lookup-table keys are invisible to the scan).
+ *
  * 13 Aug 2026 v1
  *
  * ONE DECLARED VOCABULARY PER FIELD, AND WHAT IT MEANS.
@@ -93,13 +102,20 @@ export const FIELD_CONTRACT = {
 
   // ── Lifestyle. Writer: views/onboarding/lifestyle.js ──────────────
   "lifestyle.activityLevel": {
-    values: ["sedentary", "light", "moderate", "active", "very-active"],
-    writer: "views/onboarding/lifestyle.js",
+    // W3-D, 14 Aug 2026: 'returning' was missing. ACTIVITY_CHIPS has
+    // written it since 11 Aug and all three readers handle it --
+    // filterByFitnessLevel (ceiling 6), DIFFICULTY_CEILINGS (3) and
+    // LOW_IMPACT_ONLY (gated). The gate did not catch it because it
+    // scans string COMPARISONS (=== "x") and these are object KEYS and
+    // Set members. Lookup-table keys are a vocabulary use the gate
+    // cannot currently see. Logged as CONTRACT-3.
+    values: ["sedentary", "light", "returning", "moderate", "active", "very-active"],
+    writer: "views/onboarding/thread.js (step 9, ACTIVITY_CHIPS)",
     meaning: "How much the person moves in ordinary life. Keys DIFFICULTY_CEILINGS in session-builder.js — so a value outside this list silently falls through to the 'moderate' ceiling of 4."
   },
   "fitnessLevel": {
     values: ["sedentary", "light", "moderate", "active", "very-active"],
-    writer: "views/onboarding/lifestyle.js:548, views/settings.js:1746",
+    writer: "views/settings.js:1746",
     meaning: "Written from activityLevel and shares its vocabulary. NOT 'beginner'/'intermediate'/'advanced' — those read plausibly and fall through to the moderate ceiling."
   },
   "lifestyle.exerciseHistory": {
@@ -108,9 +124,23 @@ export const FIELD_CONTRACT = {
     meaning: "Relationship with exercise over time. Says nothing about current capability."
   },
   "lifestyle.stressLevel": {
-    values: ["low", "moderate", "high", "very-high"],
-    writer: "views/onboarding/lifestyle.js",
-    meaning: "Self-reported. Feeds burnout detection. Not a clinical measure and must never be treated as one."
+    // W3-A, 14 Aug 2026. Corrected on three counts, all found when
+    // deleting lifestyle.js removed the writer exclusion that hid them.
+    //
+    // 1. VOCABULARY. The live writer is step 10 of the onboarding
+    //    thread, which writes ENERGY_CHIPS ids. It has never written
+    //    low/moderate/high/very-high. The old declaration described a
+    //    screen that no longer exists.
+    // 2. MEANING. It does NOT feed burnout detection. detectBurnout()
+    //    reads checkinHistory and has never read this field.
+    // 3. NO READER. Nothing in js/ reads lifestyle.stressLevel. Step 10
+    //    asks a careful question about the difference between ordinary
+    //    tiredness and the kind sleep does not fix, and the answer is
+    //    stored and never consulted. Logged as WRITE-1: either give it a
+    //    reader or stop asking. Not decided here.
+    values: ["exhausted", "running-low", "up-and-down", "decent", "pretty-good"],
+    writer: "views/onboarding/thread.js (step 10, ENERGY_CHIPS)",
+    meaning: "Self-reported energy at onboarding. Currently has NO READER — stored, never consulted. Not a clinical measure and must never be treated as one."
   },
   "lifestyle.sleepQuality": {
     values: ["good", "okay", "poor"],
@@ -118,33 +148,48 @@ export const FIELD_CONTRACT = {
     meaning: "Typical sleep, asked once at onboarding. Distinct from the per-day sleepQuality in a check-in."
   },
 
-  // ── Capability. Writer: views/onboarding/lifestyle.js:524 ─────────
+  // ── Capability. Writer: views/onboarding/thread.js, steps 9a-9d ───
+  //
+  // W3-A, 14 Aug 2026. Was views/onboarding/lifestyle.js:524, which is
+  // not registered in router.js and whose only inbound navigate() calls
+  // sheet-manager.js swallows. The contract named a writer that could
+  // not run, so capability.askedAt was null for every live user and six
+  // protective branches in session-builder.js were dead.
+  //
+  // Direction 2 of verify-contract.mjs checks a writer EXISTS IN SOURCE,
+  // not that it is REACHABLE. That gap is what hid this. Logged as
+  // CONTRACT-2.
+  //
+  // capability.bothFeet is deliberately not written at onboarding -- the
+  // impact gate already works from lifestyle.activityLevel alone
+  // (measured 14 Aug: active 35 impact exercises, sedentary 0, with
+  // capability unasked). Settings remains its writer.
   //
   // Each answer means EXACTLY what it asks and nothing wider. Two of the
   // three worst defects of 13 Aug came from ignoring that.
   "capability.chairRise": {
     values: ["yes", "not-easily", "no", null],
-    writer: "views/onboarding/lifestyle.js:524",
+    writer: "views/onboarding/thread.js:_writeStepValue (steps 9a-9d)",
     meaning: "Can they stand up from a chair without using their hands. ONLY 'no' means seated-only work. 'not-easily' means standing work with support — not a chair sentence."
   },
   "capability.floorAccess": {
     values: ["yes", "not-comfortably", "rather-not", "no", null],
-    writer: "views/onboarding/lifestyle.js:524",
+    writer: "views/onboarding/thread.js:_writeStepValue (steps 9a-9d)",
     meaning: "Can they get DOWN to the floor and back up. Says NOTHING about whether they can stand. Handled by floorSafe, which removes floor-position exercises — it must not feed needsSeated (CAP-7)."
   },
   "capability.bothFeet": {
     values: ["yes", "no", null],
-    writer: "views/onboarding/lifestyle.js:524",
+    writer: "views/onboarding/thread.js:_writeStepValue (steps 9a-9d)",
     meaning: "Can both feet leave the ground at once — i.e. IMPACT. Says nothing about standing, balance or needing a chair. Handled by the impact gate alone (CAP-6b)."
   },
   "capability.balanceWorry": {
     values: ["no", "sometimes", "yes", null],
-    writer: "views/onboarding/lifestyle.js:524",
+    writer: "views/onboarding/thread.js:_writeStepValue (steps 9a-9d)",
     meaning: "Worry about falling. Removes balance-demanding exercises. Not a statement about strength."
   },
   "capability.legPower": {
     values: ["full", "limited", "none", null],
-    writer: "views/onboarding/lifestyle.js",
+    writer: "views/onboarding/thread.js:_writeStepValue (step 9c)",
     meaning: "How much the legs can drive. NOT 'yes'/'no' — those read plausibly and make legsLoadable false, which makes a fully capable person read as restricted. Declining stores null, not a sentinel — 'skip' exists only in the UI layer and is converted at the writer."
   },
 
