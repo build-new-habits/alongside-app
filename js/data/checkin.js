@@ -1,7 +1,12 @@
 /**
  * checkin.js
- * 24 Jun 2026 v3
+ * 14 Aug 2026 v4
  *
+ * v4 - W2-2. saveCheckin() clears proposalBias, which was written only
+ *   by coach-reflection.js and never cleared.
+ *
+ * 24 Jun 2026 v3
+  *
  * v3 — Compatibility fix. v2 (23 Jun) replaced the existing utility API
  *   with new named exports, breaking js/views/checkin.js which imports:
  *     checkinData.getTodaysCheckin()
@@ -130,6 +135,22 @@ export function getHistory(n) {
 export function saveCheckin(data) {
   const today    = new Date().toDateString();
   const todayKey = new Date().toISOString().split('T')[0];
+
+  // ── W2-2 (14 Aug 2026, persona trace Wave 2) ────────────────────────
+  //
+  // proposalBias is written in three places, all inside
+  // coach-reflection.js's option handlers, and was never cleared. So a
+  // bias worked out from YESTERDAY's burnout, consecutive days or severe
+  // pain sat in the store describing TODAY, and resolveIntensity() reads
+  // it without checking its age. field-contract.js already names
+  // proposalBias as the WRITTEN-NEVER-READ example; this is the other
+  // half of the same fault -- read, but never expired.
+  //
+  // Cleared here rather than dated: the check-in is the first thing on
+  // any session route and coach-reflection runs after it, so a real bias
+  // for today is rewritten moments later and a stale one never survives
+  // into a new day. checkin.js:866 is the only caller, once per day.
+  store.set('proposalBias', null);
 
   // Write to checkinHistory (keyed by ISO date)
   const history = store.get('checkinHistory') || {};
