@@ -23,9 +23,21 @@ const ctx = o => ({
 const NONE = { stage: 0, index: -1, runLength: 0 };
 
 console.log("\nTEST 1 - prompt integrity (wording is owned by the source spec)");
-check("21 prompts across 5 stages", () => {
+check("33 prompts across 5 stages, none of them a thin pool", () => {
+  // VOICE-2, 13 Aug 2026: 21 -> 33. Stage 1 gained twelve
+  // positive-context prompts, because E1 correctly gated two of the
+  // original four behind real difficulty and left somebody having a
+  // good run meeting only two prompts across their whole arc.
   const n = Object.values(EMPATHY_PROMPTS).reduce((a, p) => a + p.length, 0);
-  ok(n === 21, `expected 21, got ${n}`);
+  ok(n === 33, `expected 33, got ${n}`);
+
+  // The exact total catches accidental deletion; this catches the more
+  // likely failure, which is one stage quietly collapsing while the
+  // total stays plausible because another grew.
+  for (const [s, pool] of Object.entries(EMPATHY_PROMPTS))
+    ok(pool.length >= 4,
+       `stage ${s} has only ${pool.length} prompts. A pool this thin repeats ` +
+       `itself inside a single arc, which is the fault VOICE-2 exists to fix`);
 });
 check("every prompt has text, requires and prefers", () => {
   for (const [s, pool] of Object.entries(EMPATHY_PROMPTS))

@@ -1,6 +1,21 @@
 /**
  * data/empathy-transfer.js - Empathy Transfer Prompt Pool
-' * 13 Aug 2026 v4
+ * 13 Aug 2026 v5
+ *
+ * v5 - VOICE-2. Twelve positive-context prompts added to stage 1, all
+ *   requiring goodEnergy so none can fire on a hard day. E1 had
+ *   correctly gated two of the original four behind real difficulty,
+ *   which left somebody having a straightforwardly good run meeting
+ *   only two prompts across their whole arc -- and one of those was
+ *   about meeting difficulty. 21 prompts to 33.
+ *
+ *   The design problem, recorded for whoever writes the next one:
+ *   praise slides into verdict almost immediately and P4 forbids
+ *   verdicts. Every line points at what HAPPENED, never at what it says
+ *   about the person. "That went well" is a description; "you're doing
+ *   well" would not be.
+ *
+ * 13 Aug 2026 v4
  *
  * v4 - E1. Prompts B and D documented a condition ("when check-in energy
  *   was low", "after a particularly difficult session") that lived only
@@ -180,6 +195,89 @@ export const EMPATHY_PROMPTS = {
       // none.
       requires: ["anyOf:struggled,returning,lowEnergy"],
       prefers:  ["struggled", "returning"]
+    },
+
+    // ── VOICE-2, 13 Aug 2026: positive-context prompts ────────────────
+    //
+    // E1 correctly gated prompts B and D behind actual difficulty. That
+    // left somebody having a straightforwardly good run meeting only two
+    // of four prompts across their whole arc, which is thin -- and the
+    // two remaining are the neutral catch-all and one about meeting
+    // difficulty. A person for whom this is simply going well had almost
+    // nothing said to them.
+    //
+    // All require goodEnergy (energy above 4 AND no reported struggle),
+    // so none can fire on a hard day. Written and approved by Graeme; do
+    // not paraphrase.
+    //
+    // THE DESIGN PROBLEM THESE HAD TO SOLVE, recorded because the next
+    // person writing one will hit it: praise slides into verdict almost
+    // immediately, and P4 forbids verdicts. Every line points at what
+    // HAPPENED rather than what it says about the person. "That went
+    // well" is a description. "You're doing well" would not be.
+    {
+      text: "Nothing was in your way today and you came anyway. That's worth noticing, because it's the kind of day people forget. The hard ones get remembered. This one counts the same.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
+    },
+    {
+      text: "That was a straightforward one. Not every session has to cost you something. Some of them are just the thing you do now.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
+    },
+    {
+      // Graeme's own rewrite, 13 Aug. The draft ended "I'm not going to
+      // make that mean anything — I just thought it was worth saying out
+      // loud", which he rejected as meaning nothing. His version does
+      // something instead of commenting on itself.
+      text: "You had the energy today and you spent some of it here. There were other places it could have gone. Thanks for choosing to spend it here. If I could I'd give you extra credit. But sadly, I can't.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
+    },
+    {
+      text: "Good days are easy to spend without noticing. This one has something in it now.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
+    },
+    {
+      text: "Somewhere in this is a version of you that finds this ordinary. Not easy — ordinary. That's a different thing, and it arrives quietly.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
+    },
+    {
+      text: "You turned up on a day that didn't require anything of you. Those are the ones that build the habit, though nobody ever writes about them.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
+    },
+    {
+      text: "That went well. I'd rather tell you that plainly than dress it up.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
+    },
+    {
+      text: "Nothing to report today, which is its own kind of report.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
+    },
+    {
+      text: "There's a question in this somewhere: what does it feel like when it isn't hard? Worth knowing, because that's the feeling you're aiming at.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
+    },
+    {
+      text: "You've got something spare today. Might be worth spending a bit of it on someone else before it's gone.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
+    },
+    {
+      text: "Easy days aren't a lesser version of the hard ones. They're what the hard ones are for.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
+    },
+    {
+      text: "That's the sort of session nobody tells a story about. It's also the sort that most of this is made of.",
+      requires: ["goodEnergy"],
+      prefers:  ["goodEnergy"]
     }
   ],
 
