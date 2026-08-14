@@ -298,43 +298,6 @@ export const STRENGTH = [
   },
 
   {
-    id: 'romanian-deadlift',
-    position: 'standing',
-    impact: false,
-    balanceDemand: false,
-    name: 'Romanian Deadlift',
-    youtube: 'romanian deadlift exercise technique',
-    category: 'strength',
-    movementPattern: 'hinge',
-    equipment: ['dumbbell'],
-    equipmentOptional: ['kettlebell'],
-    affectsAreas: ['hamstring', 'glutes', 'lower-back'],
-    contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
-    energyRequired: 6,
-    difficultyLevel: 2,
-    duration: 90,
-    perSide: false,
-    instructions: [
-      'Stand with feet hip-width apart, holding dumbbells in front of your thighs',
-      'Hinge at your hips, pushing them back as you lower the weights',
-      'Keep your back flat and the weights close to your legs',
-      'Lower until you feel a stretch in your hamstrings - usually mid-shin',
-      'Drive hips forward to return to standing',
-      'Complete 3 sets of 10 reps'
-    ],
-    coaching: 'This is a hip hinge, not a squat - your knees stay almost straight.',
-    why: 'Strengthens the posterior chain - hamstrings, glutes and back - all in one movement.',
-        watchOut: [
-      'Your back rounding as you lower — stop where your back is still flat, even if that is only halfway down',
-      'Feeling this in your lower back rather than the back of your thighs, which usually means the hips are not moving back far enough',
-      'Bending the knees to reach lower; the knees stay softly bent and still throughout',
-      'Any sharp pain in the back at any point: put the weight down and leave this one for today'
-    ],
-    load: 'Heavy enough that your hamstrings are clearly working, light enough that your back never rounds.',
-    credits: 65
-  },
-
-  {
     id: 'plank',
     position: 'floor',
     impact: false,
@@ -808,53 +771,6 @@ export const STRENGTH = [
     ],
     load: 'Bodyweight. Make it harder by walking the feet further out.',
     credits: 60
-  },
-
-  {
-    id: 'ab-wheel-rollout',
-    position: 'floor',
-    impact: false,
-    balanceDemand: false,
-    name: 'Ab Wheel Rollout',
-    youtube: 'ab wheel rollout exercise technique',
-    category: 'strength',
-    movementPattern: 'anti-extension',
-    equipment: ['ab-wheel'],
-    equipmentOptional: ['yoga-mat'],
-    affectsAreas: ['abdominals', 'lower-back', 'shoulder'],
-    contraindications: ['lower-back-acute', 'shoulder-acute', 'wrist-elbow-acute', 'abdominals-acute'],
-    energyRequired: 7,
-    difficultyLevel: 3,
-    duration: 90,
-    perSide: false,
-    instructions: [
-      'Kneel on a mat, holding the ab wheel with both hands',
-      'Start with the wheel under your shoulders',
-      'Tighten your middle hard, as if bracing to be nudged, and slowly roll the wheel forward',
-      'Go only as far as you can without your back arching',
-      'Roll back in using your core — not momentum',
-      'Complete 3 sets of 6 to 8 reps'
-    ],
-    coaching: 'Start with a very short range — even 20 to 30 cm forward. The range builds over weeks. Back arching means you have gone too far.',
-    why: 'One of the highest-demand anti-extension core exercises. Requires and builds significant core strength and shoulder stability together.',
-        watchOut: [
-      'Lower back sagging as you roll out, which is the moment it stops working and starts risking something',
-      'Going further than you can control — a few inches done well is a successful rep',
-      'Pulling back with the arms rather than the stomach'
-    ],
-    load: 'Bodyweight only. Progress by rolling further, never by adding weight.',
-    credits: 80,
-    sets: 3,
-    reps: "8 to 12",
-    holdSeconds: 0,
-    rest: 60,
-    description: "Kneel on the floor with the ab wheel in front of you. Slowly roll forward until your body is close to parallel with the floor. Use your core to pull yourself back. Do not let your hips drop.",
-    cues: [
-      "Control the rollout — 3 seconds forward, 3 seconds back",
-      "Protect the lower back by not rolling past parallel",
-      "Keep the glutes engaged throughout",
-      "Beginners: reduce the range of motion — short rolls are still effective"
-    ],
   },
 
   {
@@ -1563,43 +1479,6 @@ export const STRENGTH = [
   },
 
   {
-    id: 'plyo-burpee',
-    position: 'standing',
-    impact: true,
-    balanceDemand: false,
-    name: 'Burpee',
-    youtube: 'burpee exercise technique',
-    category: 'cardio',
-    movementPattern: 'locomotion',
-    equipment: [],
-    equipmentOptional: [],
-    affectsAreas: ['full-body'],
-    contraindications: ['shoulder-acute', 'wrist-elbow-acute', 'knee-acute', 'lower-back-acute'],
-    energyRequired: 8,
-    difficultyLevel: 3,
-    duration: 90,
-    perSide: false,
-    instructions: [
-      'Stand tall',
-      'Drop into a squat and place both hands on the floor',
-      'Jump or step both feet back into a plank',
-      'Lower your chest to the floor — press back up',
-      'Jump or step both feet forward to your hands',
-      'Jump upward with arms overhead',
-      'That is one rep — complete 3 sets of 10'
-    ],
-    coaching: 'There is no shame in stepping instead of jumping — the stepping version still delivers most of the benefit with less joint stress.',
-    why: 'The burpee is one of the most comprehensive full-body conditioning exercises — strength, power, and cardiovascular demand in one movement.',
-        watchOut: [
-      'Hips sagging in the press-up portion as you tire',
-      'Landing heavily on the jump back in',
-      'Rushing through so form disappears entirely; slower and cleaner beats faster and ragged'
-    ],
-    load: 'Bodyweight only. Reduce the number of reps before reducing the quality.',
-    credits: 90
-  },
-
-  {
     id: 'plyo-explosive-press-up',
     position: 'floor',
     impact: true,
@@ -2198,7 +2077,7 @@ export const STRENGTH = [
     position: 'standing',
     impact: false,
     balanceDemand: false,
-    name: 'Romanian Deadlift',
+    name: 'Barbell Romanian Deadlift',
     youtube: 'romanian deadlift exercise technique',
     category: 'strength',
     contentType: 'exercise',

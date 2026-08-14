@@ -239,46 +239,6 @@ export const SEATED = [
   },
 
   {
-    id: 'seated-band-row',
-    name: 'Seated Band Row',
-    youtube: 'seated resistance band row technique',
-    category: 'strength',
-    movementPattern: 'pull',
-    position: 'seated',
-    adaptive: true,   // CAP-6
-    impact: false,
-    balanceDemand: false,
-    equipment: ['resistance-band'],
-    equipmentOptional: [],
-    affectsAreas: ['upper-back', 'triceps-biceps', 'shoulder'],
-    contraindications: ['shoulder-acute'],
-    energyRequired: 4,
-    difficultyLevel: 1,
-    duration: 240,
-    perSide: false,
-    sets: 3,
-    reps: '12',
-    rest: '45s',
-    tempo: '2-1-3',
-    instructions: [
-      'Anchor a band at chest height in front of you, or loop it around your feet if you can reach them',
-      'Sit tall and take an end in each hand, arms straight out in front',
-      'Pull both hands back towards your lower ribs, driving your elbows behind you',
-      'Squeeze your shoulder blades together and hold for a second',
-      'Let your hands travel forward slowly over three counts'
-    ],
-    coaching: 'Lead with your elbows, not your hands. Think about putting your elbows in your back pockets and the right muscles do the work without you having to find them.',
-    why: 'Strengthens the muscles across the upper back that hold your shoulders where they belong. If you spend a lot of the day seated, this is the single most useful thing you can do for how your upper body feels.',
-    watchOut: [
-      'Leaning back to start the pull rather than keeping the trunk still',
-      'Shrugging the shoulders up towards the ears instead of drawing the blades together',
-      'Letting the band snap your arms forward at the end of each rep'
-    ],
-    load: 'Enough tension that the last two reps are hard, light enough that you sit tall throughout.',
-    credits: 45
-  },
-
-  {
     id: 'seated-band-chest-press',
     name: 'Seated Band Chest Press',
     youtube: 'seated resistance band chest press',
