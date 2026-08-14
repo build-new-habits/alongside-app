@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 14 Aug 2026 v341
+ * W2-1 cooldown difficulty ceiling, W2-2 proposalBias cleared at
+ * check-in, W2-3/W2-4 comment corrections. session-builder.js v31,
+ * data/checkin.js v4, store.js v42, onboarding-thread-data.js v5.
+ *
  * 13 Aug 2026 v340
  * CONTRACT-1. New js/data/field-contract.js (precached),
  * arrival.js -- the onboarding arrival message reached the right field.
@@ -2383,7 +2388,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v340";
+const CACHE_NAME = "alongside-v341";
 
 const SHELL_URLS = [
 
