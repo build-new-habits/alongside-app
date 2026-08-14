@@ -1,6 +1,22 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 13 Aug 2026 v28
+ *
+ * v28 - VOICE-2. Session opening lines become rotating pools of eight
+ *   per type, replacing one fixed string each. Free is locked to Full
+ *   Body at 30 minutes, so persona 2.12 read a byte-identical sentence
+ *   at the top of every session he ever did -- for a product whose whole
+ *   differentiator is the coach, the person with the least to
+ *   personalise against got the least varied coach. Eight sessions
+ *   before a repeat now, from one.
+ *
+ *   Rotation on completed-session count, never Math.random(): random
+ *   will happily hand the same line twice running, which is the exact
+ *   complaint. Partials do not advance it, matching COUNT-1.
+ *
+ *   Lines written and approved by Graeme -- do not paraphrase.
+ *
  * 13 Aug 2026 v27
  *
  * v27 - FIX-5. Sport-conditioning content (sled sprints, agility
@@ -555,21 +571,123 @@ const EXERCISE_COUNT = {
 
 // ── Coach line templates ───────────────────────────────────────────────────────
 
+/**
+ * COACH LINE POOLS — VOICE-2, 13 Aug 2026.
+ *
+ * Every line written and approved by Graeme (see
+ * alongside_coach_voice_drafts_13aug2026_v1.md). Do not paraphrase or
+ * "improve" these: the voice is the product, and a build session
+ * rewriting them loses the only thing that cannot be rebuilt.
+ *
+ * WHY POOLS. Until today this was ONE fixed string per session type,
+ * varying only by the duration number. Free is locked to Full Body at
+ * 30 minutes, so persona 2.12 read a byte-identical sentence at the top
+ * of every session he ever did -- seven times across the three weeks
+ * traced on 13 Aug, and indefinitely thereafter. For a product whose
+ * whole differentiator is the coach, the person with the least to
+ * personalise against got the least varied coach.
+ *
+ * ROTATION, NOT RANDOM. Indexed on the person's completed-session count,
+ * so consecutive sessions cannot repeat a line and the whole pool is
+ * reached in order. Math.random() cannot promise either -- it will
+ * happily hand the same line twice running, which is the exact
+ * complaint this fixes. Same reasoning as empathy-transfer.js, and its
+ * comments are worth reading before touching this: a stable sort on
+ * score alone always returns the lowest index, and a pool that is never
+ * reached is worse than the repetition it replaced.
+ */
+const COACH_LINES = {
+  full: [
+    d => `Full body in ${d} minutes. I've kept the session broad — every major pattern gets a turn. It's more efficient than it looks.`,
+    d => `${d} minutes, all of you. Nothing gets a whole session to itself today, which means nothing gets skipped either.`,
+    d => `A bit of everything, in ${d} minutes. Push, pull, squat, hinge, brace. That's most of what a body does.`,
+    d => `Full body today. ${d} minutes is enough to touch every pattern once, properly, without rushing any of them.`,
+    d => `${d} minutes across the whole body. The order matters more than it looks — bigger movements first, while you've got the most to give them.`,
+    d => `Everything gets a look-in today. ${d} minutes, spread evenly, nothing left waiting until next time.`,
+    d => `Full body, ${d} minutes. This is the session that works when you don't know what you need — it covers the ground either way.`,
+    d => `${d} minutes. One session, all the main patterns. Not the most specialised way to train, and by some distance the most reliable.`
+  ],
+  lower: [
+    d => `${d} minutes of lower body. Squat, hinge, single-leg — each pattern trains something the others don't. Do them in the order shown.`,
+    d => `Legs today, ${d} minutes. Heaviest work first while your legs are still honest about what they can do.`,
+    d => `${d} minutes below the waist. Two legs, then one leg — the second is where most people find out something.`,
+    d => `Lower body. ${d} minutes. Squat and hinge are different jobs and both need doing; that's why they're both here.`,
+    d => `${d} minutes of legs. Take the rest between sets seriously — this is the session where cutting it short costs you the most.`,
+    d => `Legs, ${d} minutes. Everything here has to hold you up eventually. Might as well train it that way.`,
+    d => `${d} minutes. Big movements first, single-leg after, calves last — that order isn't arbitrary.`,
+    d => `Lower body today. ${d} minutes. Get the first movement right and the rest of the session tends to follow.`
+  ],
+  upper: [
+    d => `Upper body today. ${d} minutes of push and pull, balanced across all the major patterns. Your shoulder blades do more work than you think.`,
+    d => `${d} minutes up top. Push and pull in roughly equal measure — most people's shoulders prefer it that way.`,
+    d => `Upper body, ${d} minutes. Pull first if your posture's had a long week. It usually has.`,
+    d => `${d} minutes. Chest, back, shoulders, arms — in that rough order, because the small stuff can wait until the big stuff is done.`,
+    d => `Upper body today. ${d} minutes. Control the way down as much as the way up; that half is where most of the work hides.`,
+    d => `${d} minutes of pushing and pulling. Your back does the quiet half of this. Give it the same attention.`,
+    d => `Upper body, ${d} minutes. Nothing here needs to be heavy to be useful.`,
+    d => `${d} minutes. Push, pull, repeat. It's a simple session and it doesn't need to be more than that.`
+  ],
+  core: [
+    d => `Core session — ${d} minutes of real anti-movement work. The core's job is to resist, not just crunch. This session reflects that.`,
+    d => `${d} minutes of core. Mostly holding still under load, which is harder and more useful than it sounds.`,
+    d => `Core today, ${d} minutes. Your midsection's actual job is stopping things moving. That's what's in here.`,
+    d => `${d} minutes. Bracing, anti-rotation, anti-extension. Less glamorous than sit-ups and considerably more transferable.`,
+    d => `Core, ${d} minutes. Breathe through the holds — the temptation is to hold your breath, and that's the bit to resist.`,
+    d => `${d} minutes of core work. If your lower back is talking during these, come out of the position rather than pushing through it.`,
+    d => `Core today. ${d} minutes. Quality over duration here — a shaky ten seconds beats a sloppy minute.`,
+    d => `${d} minutes. This is the part of you that everything else borrows from.`
+  ],
+  cardio: [
+    d => `${d} minutes of conditioning work. Keep your effort honest — this should feel like sustained work, not sprinting followed by rest.`,
+    d => `${d} minutes of conditioning. Find a pace you could hold a broken conversation at, and stay there.`,
+    d => `Conditioning today, ${d} minutes. The aim is steady, not spectacular.`,
+    d => `${d} minutes. Your breathing is the gauge — working hard, still in control.`,
+    d => `Conditioning, ${d} minutes. Starting too fast is the most common way to make this harder than it needs to be.`,
+    d => `${d} minutes of steady work. Easier to hold than it is to start.`,
+    d => `Conditioning today. ${d} minutes. This is the session that makes everything else feel less like an event.`,
+    d => `${d} minutes. Nothing clever here. Just sustained, repeatable effort.`
+  ],
+  mobility: [
+    d => `${d} minutes of mobility. Active range of motion — not passive stretching. Move slowly into restriction and breathe through it.`,
+    d => `${d} minutes of mobility. Slow is the point. Rushing this turns it into something else entirely.`,
+    d => `Mobility today, ${d} minutes. Looking for range you can control, not range you can reach.`,
+    d => `${d} minutes. Move to the edge of the restriction and breathe there. The breathing is doing more than it looks.`,
+    d => `Mobility, ${d} minutes. This is the session that pays for the others.`,
+    d => `${d} minutes. Nothing here should hurt. Uncomfortable is fine; sharp is not.`,
+    d => `Mobility today. ${d} minutes. Your joints will tell you where they want attention if you go slowly enough to hear it.`,
+    d => `${d} minutes of range work. Small, controlled, repeated. That's the whole method.`
+  ],
+  glute: [
+    d => `I've built this around ${d} minutes of glute-focused work. Everything here loads the posterior chain progressively — warmup first, then the movements that matter.`,
+    d => `${d} minutes of glute work. Hinging, bridging, stepping — three different ways of asking the same muscles the same question.`,
+    d => `Glutes today, ${d} minutes. Slow down the top of each rep; that's where the work actually lands.`,
+    d => `${d} minutes on the posterior chain. Most people's is underworked. This is the correction.`,
+    d => `Glute focus, ${d} minutes. If you feel this mostly in your lower back, shorten the range rather than pushing on.`,
+    d => `${d} minutes. Bridges and hinges first, single-leg after — the order stacks the fatigue where it's useful.`,
+    d => `Glutes today. ${d} minutes. These are the muscles that make walking upstairs unremarkable.`,
+    d => `${d} minutes of glute work. Squeeze at the top, and mean it.`
+  ]
+};
+
+/**
+ * Rotation index. Completed sessions, not activityLog.length: partials
+ * must not advance the rotation, for the same reason they do not count
+ * anywhere else a person can see (COUNT-1).
+ */
+function _rotationIndex() {
+  try {
+    return store.completedSessions(store.get("activityLog") || []).length;
+  } catch { return 0; }
+}
+
 function generateCoachLine(sessionType, durationMins, conditions, equipment, conditionNote) {
   const type = SESSION_TYPES.find(t => t.id === sessionType);
-  const name = store.get("name") || "";
 
-  const lines = {
-    glute:  `I've built this around ${durationMins} minutes of glute-focused work. Everything here loads the posterior chain progressively — warmup first, then the movements that matter.`,
-    upper:  `Upper body today. ${durationMins} minutes of push and pull, balanced across all the major patterns. Your shoulder blades do more work than you think.`,
-    lower:  `${durationMins} minutes of lower body. Squat, hinge, single-leg — each pattern trains something the others don't. Do them in the order shown.`,
-    full:   `Full body in ${durationMins} minutes. I've kept the session broad — every major pattern gets a turn. It's more efficient than it looks.`,
-    core:   `Core session — ${durationMins} minutes of real anti-movement work. The core's job is to resist, not just crunch. This session reflects that.`,
-    cardio: `${durationMins} minutes of conditioning work. Keep your effort honest — this should feel like sustained work, not sprinting followed by rest.`,
-    mobility: `${durationMins} minutes of mobility. Active range of motion — not passive stretching. Move slowly into restriction and breathe through it.`
-  };
-
-  let line = lines[sessionType] || `${durationMins}-minute ${type?.label || ""} session, built for you today.`;
+  const pool = COACH_LINES[sessionType];
+  const line0 = pool && pool.length
+    ? pool[_rotationIndex() % pool.length](durationMins)
+    : `${durationMins}-minute ${type?.label || ""} session, built for you today.`;
+  let line = line0;
 
   if (conditionNote) {
     line += " " + conditionNote;
