@@ -771,43 +771,6 @@ export const RUNNING = [
   // ============================================
 
   {
-    id: 'run-drill-high-knees',
-    position: 'standing',
-    impact: true,
-    balanceDemand: false,
-    name: 'High Knees',
-    youtube: 'high knees running drill technique',
-    category: 'cardio',
-    contentType: 'exercise',
-    movementPattern: 'locomotion',
-    equipment: [],
-    equipmentOptional: [],
-    affectsAreas: ['hip-flexor', 'quadriceps', 'calves'],
-    contraindications: ['knee-acute', 'hamstring-acute'],
-    energyRequired: 5,
-    difficultyLevel: 2,
-    duration: 60,
-    perSide: false,
-    instructions: [
-      'Stand tall with feet hip-width apart',
-      'Run on the spot, driving each knee up to hip height',
-      'Land on the ball of the foot — not the heel',
-      'Arms pump in rhythm — opposite arm to leg',
-      'Keep the torso upright, not leaning back',
-      'Complete 3 × 20-metre lengths or 3 × 20-second bursts'
-    ],
-    coaching: 'The value is in the knee drive and the quick ground contact — not the height. Focus on light, fast feet.',
-    why: 'Trains hip flexor strength and quick foot turnover — two of the most important factors in running efficiency.',
-        watchOut: [
-      'Leaning back to lift the knees higher',
-      'Landing heavily',
-      'Sacrificing posture for knee height'
-    ],
-    load: 'Bodyweight only.',
-    credits: 30
-  },
-
-  {
     id: 'run-drill-butt-kicks',
     position: 'standing',
     impact: true,

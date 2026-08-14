@@ -922,45 +922,6 @@ GYM.push(
     credits: 65
   },
 
-  {
-    id: 'gym-hip-thrust-barbell',
-    position: 'floor',
-    impact: false,
-    balanceDemand: false,
-    name: 'Barbell Hip Thrust',
-    youtube: 'barbell hip thrust technique',
-    category: 'strength',
-    movementPattern: 'hip-extension',
-    equipment: ['barbell', 'bench'],
-    equipmentOptional: [],
-    affectsAreas: ['glutes', 'hamstring'],
-    contraindications: ['lower-back-acute', 'hip-acute'],
-    energyRequired: 6,
-    difficultyLevel: 4,
-    duration: 240,
-    perSide: false,
-    sets: 3,
-    reps: '10',
-    rest: '90s',
-    tempo: '2-2-2',
-    instructions: [
-      'Sit on the floor with your upper back against the long edge of a bench and a padded barbell across your hips',
-      'Plant your feet flat, about shoulder-width apart and far enough forward that your shins are vertical at the top',
-      'Tuck your chin slightly and brace your stomach',
-      'Drive through your heels to lift your hips until your body is level from knees to shoulders',
-      'Squeeze hard for two seconds at the top, then lower under control'
-    ],
-    coaching: 'Finish every rep by squeezing your backside rather than by pushing your hips higher. Height beyond level comes from arching the back, not from the glutes.',
-    why: 'The most direct glute exercise there is, and strong glutes are what protect the lower back and make walking, running and lifting all feel easier.',
-    watchOut: [
-      'Over-arching at the top and finishing with the lower back rather than the backside',
-      'Feet too close, so the front of the thighs take over',
-      'Chin lifting and the neck extending as you drive up; keep looking forward, not up',
-      'Bar sitting on bare hip bones without a pad, which is simply painful'
-    ],
-    load: 'Heavy enough that the two-second squeeze at the top is genuinely hard to hold.',
-    credits: 60
-  }
 );
 
 // ══════════════════════════════════════════════════════════════════════
