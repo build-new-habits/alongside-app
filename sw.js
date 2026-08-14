@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v326
+ * VOICE-3 / D2. New js/data/personal-reads.js (precached) —
+ * Personal-tier observations, each gated on a real data signal.
+ * session-rationale.js v3.
+ *
  * 13 Aug 2026 v325
  * VOICE-2. session-builder.js v28, session-rationale.js v2,
  * empathy-transfer.js v5. 108 approved coach lines. Nothing new to precache.
@@ -2323,7 +2328,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v325";
+const CACHE_NAME = "alongside-v326";
 
 const SHELL_URLS = [
 
@@ -2443,6 +2448,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/morning-programme.js",
   "/alongside-app/js/data/session-categories.js",
   "/alongside-app/js/data/session-rationale.js",
+  "/alongside-app/js/data/personal-reads.js",
   "/alongside-app/js/views/activity-log.js",
   "/alongside-app/js/views/annual-reflection.js",
   "/alongside-app/js/views/community-impact.js",
