@@ -1,6 +1,6 @@
 # Exercise Entry Standard
 
-**11 Aug 2026 v2**
+**13 Aug 2026 v3**
 
 Build New Habits · Alongside: Move · Live State
 
@@ -64,6 +64,45 @@ need to hear it.
 | `contraindications` | `string[]` | Conditions that exclude this exercise. |
 | `energyRequired` | `number` | 1–10. Daily gate. |
 | `difficultyLevel` | `number` | 1–10. Structural ceiling. |
+
+### Selection-eligibility fields — added 13 Aug 2026
+
+Three fields decide **who an entry is offered to**, as opposed to who can
+safely perform it. That distinction is the whole reason they exist.
+
+The capability screen answers *what can this person do?*, and every gate
+built on it **subtracts**. Nothing ever asked *what does this person
+need?* — so an engine that only subtracts hands specialist content to
+everybody capable of performing it. Three separate traces on 13 Aug found
+the same shape three times: a 33-year-old man with a desk job served a
+pelvic-floor rehabilitation squat four times in seven sessions; a
+powerlifter with a full rack served seated arm cycling nine times in three
+weeks; a barbell lower-body session containing Tree Pose and a sled sprint.
+
+None of that content is unsafe. It is simply **not for them**, and being
+handed it repeatedly is how somebody decides the app has not understood
+them.
+
+| Field | Type | Purpose |
+|---|---|---|
+| `generalPurpose` | `boolean` | **Rehabilitation entries only.** `true` means the entry reads as ordinary training to somebody with no condition. **Absent means false** — a new rehabilitation entry stays condition-only until somebody decides otherwise, which is the right direction to be wrong in. 61 of 94 approved by Graeme, 13 Aug 2026. |
+| `adaptive` | `boolean` | `true` on every entry that exists to accommodate a limitation (all of `seated.js`). De-prioritised for somebody who was asked the capability questions and cleared every axis. |
+| `discipline` | `string` | `'sport'` on all of `sport_conditioning.js`. Sled sprints and agility ladders are correctly tagged `category: 'cardio'`, `movementPattern: 'locomotion'` — a true description and no help at all in deciding whether they belong in a barbell session. |
+
+**All three are preferences in selection, never exclusions.** If a category
+would otherwise be empty the content comes back, so no session can be
+starved and the CAP-4 warm-up floor holds. Verified by reversal: turning
+the `adaptive` rule into an exclusion drops a seated user to five
+exercises, which is the exact regression CAP-4 was raised to fix.
+
+**One trap, recorded because it will catch the next person.**
+`_filterCandidates()` in `session-builder.js` overwrites each match's
+`category` with the *session* category (`"squat-pattern"`) before any
+filter sees it. The first version of the `generalPurpose` filter tested
+`ex.category === "rehabilitation"`, ran on every candidate, and excluded
+**nothing at all** while reading as completely correct. `sourceLibrary`
+now preserves the entry's own library. Any future filter reading
+`ex.category` inside that function has the same bug waiting.
 
 ### Required where the exercise is loaded
 

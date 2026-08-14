@@ -202,7 +202,7 @@ CONT-1 made that gap urgent rather than theoretical — continuity became a real
 
 ## Cross-reference — exercise content fields
 
-Static exercise entries in `js/data/exercises/*.js` are **not** store fields and are not documented here. Their canonical definition is `Documents/Live State/exercise_entry_standard.md` (11 Aug 2026 v1).
+Static exercise entries in `js/data/exercises/*.js` are **not** store fields and are not documented here. Their canonical definition is `Documents/Live State/exercise_entry_standard.md` (13 Aug 2026 v3, which now also documents the three selection-eligibility fields `generalPurpose`, `adaptive` and `discipline`).
 
 Two fields were added to that standard on 11 Aug 2026:
 
