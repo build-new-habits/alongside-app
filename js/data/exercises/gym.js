@@ -1177,6 +1177,13 @@ GYM.push(
 
   {
     id: 'gym-balance-board-hold',
+    generalPurpose: true,   // C2, 13 Aug 2026. Tagged category:
+    // 'rehabilitation' but not a rehab protocol -- balance-board work and
+    // general seated exercises. Promoted so the C2 filter does not remove
+    // them from ordinary sessions. The CATEGORY looks wrong and should be
+    // corrected at source; logged rather than changed here, because
+    // intentPriority() reads category === 'rehabilitation' for the
+    // 'recover' training intent and that wants checking first.
     position: 'standing',
     impact: false,
     balanceDemand: true,

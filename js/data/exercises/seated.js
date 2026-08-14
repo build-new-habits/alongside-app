@@ -693,6 +693,13 @@ SEATED.push(
 
   {
     id: 'seated-heel-toe-raise',
+    generalPurpose: true,   // C2, 13 Aug 2026. Tagged category:
+    // 'rehabilitation' but not a rehab protocol -- balance-board work and
+    // general seated exercises. Promoted so the C2 filter does not remove
+    // them from ordinary sessions. The CATEGORY looks wrong and should be
+    // corrected at source; logged rather than changed here, because
+    // intentPriority() reads category === 'rehabilitation' for the
+    // 'recover' training intent and that wants checking first.
     name: 'Seated Heel and Toe Raise',
     youtube: 'seated heel toe raise circulation exercise',
     category: 'rehabilitation',
@@ -1044,6 +1051,13 @@ SEATED.push(
   },
   {
     id: 'seated-band-external-rotation',
+    generalPurpose: true,   // C2, 13 Aug 2026. Tagged category:
+    // 'rehabilitation' but not a rehab protocol -- balance-board work and
+    // general seated exercises. Promoted so the C2 filter does not remove
+    // them from ordinary sessions. The CATEGORY looks wrong and should be
+    // corrected at source; logged rather than changed here, because
+    // intentPriority() reads category === 'rehabilitation' for the
+    // 'recover' training intent and that wants checking first.
     name: 'Seated Shoulder External Rotation',
     youtube: 'seated band external rotation shoulder',
     category: 'rehabilitation', movementPattern: 'shoulder-rotation',
