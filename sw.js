@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v340
+ * CONTRACT-1. New js/data/field-contract.js (precached),
+ * arrival.js -- the onboarding arrival message reached the right field.
+ *
  * 13 Aug 2026 v339
  * SEATED-GAP. seated.js -- six new entries filling the categories a
  * seated, equipment-free user could not reach.
@@ -2379,7 +2383,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v339";
+const CACHE_NAME = "alongside-v340";
 
 const SHELL_URLS = [
 
@@ -2500,6 +2504,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/session-categories.js",
   "/alongside-app/js/data/session-rationale.js",
   "/alongside-app/js/data/personal-reads.js",
+  "/alongside-app/js/data/field-contract.js",
   "/alongside-app/js/views/activity-log.js",
   "/alongside-app/js/views/annual-reflection.js",
   "/alongside-app/js/views/community-impact.js",
