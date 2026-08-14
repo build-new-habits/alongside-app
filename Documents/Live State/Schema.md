@@ -1,7 +1,7 @@
 # Alongside — Data Schema Reference
-## 12 Aug 2026 v1.31
+## 13 Aug 2026 v1.32
 
-**File:** `js/store.js` (confirmed live version: **v38, 12 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v39, 13 Aug 2026**)
 **Storage:** `localStorage` key `alongside_user`
 
 **This version supersedes:** v1.30 (12 Aug 2026).
@@ -507,7 +507,8 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 | `empathyTransferStage` | `number` | `1` | 1–5, current stage of the 5-stage prompt library. |
 | `empathyPromptsFired` | `number` | `0` | Total, all-time. |
 | `empathyPromptsAtStage` | `number` | `0` | Resets to 0 on stage advance. |
-| `lastEmpathyPromptSession` | `number` | `0` | Session count at last fire — enforces the 3–4 session gap. |
+| `lastEmpathyPromptSession` | `number` | `0` | Session count at last fire — enforces the session gap. |
+| `lastEmpathyPromptAt` | `string \| null` | `null` | **EMP-4, 13 Aug 2026.** ISO timestamp of the last empathy prompt. The cadence is time-aware as well as session-aware: a session-only gate rations the coaching voice in proportion to how *few* sessions somebody does, which is backwards for the people this product exists for. Persona 2.12 met the empathy arc once in three weeks; persona 2.15, at sixteen sessions, met it four times. Written beside `lastEmpathyPromptSession`, never separately. |
 | `empathyPromptSkips` | `number` | `0` | **Consecutive** skip streak, not lifetime total — resets to 0 on any non-skip response. |
 | `proposalBias` | `'lighter'\|'rest'\|null` | — *(undocumented, resolved 03 Aug)* | Written by `coach-reflection.js` (severe-pain → `'rest'`; burnout-risk/consecutive-days/returning → `'lighter'`; else `null`). **See the write-only finding at the top of this document** — nothing downstream reads it. |
 

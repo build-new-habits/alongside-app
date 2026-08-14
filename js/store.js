@@ -1,5 +1,11 @@
 /**
  * store.js - Data persistence layer
+ * 13 Aug 2026 v39
+ *
+ * v39 - EMP-4. New field lastEmpathyPromptAt (ISO string | null),
+ *   written beside lastEmpathyPromptSession and never separately. The
+ *   empathy cadence is now time-aware as well as session-aware.
+ *
  * 12 Aug 2026 v38
  *
  * v38 - COUNT-1. completedSessions(), one definition of "a session that
@@ -525,6 +531,9 @@ export const store = {
       lastEmpathyPromptSession: typeof saved.lastEmpathyPromptSession === 'number'
         ? saved.lastEmpathyPromptSession
         : 0,
+      lastEmpathyPromptAt: typeof saved.lastEmpathyPromptAt === 'string'
+        ? saved.lastEmpathyPromptAt
+        : null,
       proposalBias: ['rest', 'lighter'].includes(saved.proposalBias)
         ? saved.proposalBias
         : null,
@@ -1131,6 +1140,14 @@ export const store = {
       empathyPromptsFired:      0,  // integer, total prompts fired all time
       empathyPromptsAtStage:    0,  // integer, resets to 0 on stage advance
       lastEmpathyPromptSession: 0,  // integer, session count at last fire
+      // EMP-4, 13 Aug 2026. ISO timestamp of the last empathy prompt, or
+      // null. Needed because the cadence is now time-aware as well as
+      // session-aware: persona 2.12 completed seven sessions in three
+      // weeks and met the empathy arc ONCE, while persona 2.15 at
+      // sixteen sessions met it four times. A session-only gate rations
+      // the coaching voice in proportion to how few sessions somebody
+      // does, which is exactly backwards for the people this is for.
+      lastEmpathyPromptAt: null,    // ISO string | null
       // BIAS-1, 12 Aug 2026. Written by coach-reflection.js since 03 Aug and
       // never declared here, so it existed only by virtue of store.set()
       // creating arbitrary paths. It survives a reload (mergeWithDefaults

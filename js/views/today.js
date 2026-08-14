@@ -1,5 +1,13 @@
 /**
  * today.js
+ * 13 Aug 2026 v14
+ *
+ * v14 - HOME-1. The weekly denominator appears only if the person set
+ *   one. weeklySessionTarget defaults to 3 with setAt: null -- the field
+ *   records that nobody agreed to it -- so Home read "1 of 3 this week"
+ *   to a persona defined by decision paralysis: two short of something
+ *   never chosen. The target itself stays for anybody who sets one.
+ *
  * 13 Aug 2026 v13
  *
  * v13 - TIER-A and TIER-F.
@@ -387,7 +395,21 @@ export function TodayView(router) {
     const coachLine     = sessionDone
       ? "You moved today \u2014 that's done. Tap in below any time if you'd like to do more."
       : _buildCoachLine();
-    const weeklyTarget  = store.get('strategicGoal.weeklySessionTarget') || 3;
+    // HOME-1, 13 Aug 2026. The denominator only appears if the person
+    // actually set one.
+    //
+    // strategicGoal.weeklySessionTarget defaults to 3 with setAt: null --
+    // the field literally records that nobody agreed to it. So Home read
+    // "1 of 3 this week" to persona 2.12, whose defining trait is
+    // decision paralysis: visibly two short of something he never chose.
+    // The count was right (COUNT-1 fixed that); the shortfall was
+    // invented.
+    //
+    // Deliberately NOT removing the target outright. Somebody who sets
+    // one wants to see it, and taking that away would be the opposite
+    // error. setAt is the honest test of whether it was ever a choice.
+    const targetSetAt   = store.get('strategicGoal.setAt');
+    const weeklyTarget  = targetSetAt ? (store.get('strategicGoal.weeklySessionTarget') || null) : null;
     const sessionCount  = _sessionsThisWeek();
 
     container.innerHTML = `
@@ -406,9 +428,13 @@ export function TodayView(router) {
         ${sessionCount > 0 ? `
           <div class="today-week-count"
                role="status"
-               aria-label="${sessionCount} of ${weeklyTarget} sessions this week">
+               aria-label="${weeklyTarget
+                 ? `${sessionCount} of ${weeklyTarget} sessions this week`
+                 : `${sessionCount} ${sessionCount === 1 ? 'session' : 'sessions'} this week`}">
             <span class="today-week-count__number">${sessionCount}</span>
-            <span class="today-week-count__label">of ${weeklyTarget} this week</span>
+            <span class="today-week-count__label">${weeklyTarget
+              ? `of ${weeklyTarget} this week`
+              : 'this week'}</span>
           </div>
         ` : ''}
 
