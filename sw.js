@@ -1,6 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v338
+ * ORIENT-1. today.js v15 -- Home reads goals for first-run orientation.
+ *
  * 13 Aug 2026 v337
  * CAP-7. store.js v41 -- floor access no longer confines somebody to a
  * chair.
@@ -2372,7 +2375,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v337";
+const CACHE_NAME = "alongside-v338";
 
 const SHELL_URLS = [
 
