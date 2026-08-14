@@ -1,5 +1,31 @@
 /**
  * data/exercises/rehabilitation.js
+ * 13 Aug 2026 v8
+ *
+ * v8 - SAFEGUARD-1. Eleven stop lines, phrased eleven ways, are now one
+ *   standard. Graeme, 13 Aug: the safeguards should say "I do not
+ *   recommend continuing if... I cannot give medical advice or support.
+ *   Please reach out to someone (a human) professional."
+ *
+ *   Shape: observable sign, stop, the coach naming its own limit, point
+ *   outward. Two tiers differing only in time pressure -- "speak to
+ *   someone today" for time-critical, "worth getting someone to look"
+ *   for needs-assessment.
+ *
+ *   No condition named, no 999, no A&E. Naming a condition is a
+ *   diagnosis, and the Crisis & Safeguarding Policy owns crisis language
+ *   and is unsigned -- borrowing that register here would settle a
+ *   question nobody has answered.
+ *
+ *   ON THE CAUDA EQUINA LINE. Graeme's instinct was that somebody in
+ *   that state would not be using the app, and that the coach must have
+ *   missed earlier signals. The pattern is right; that reasoning is not,
+ *   and it is why the line goes in. Cauda equina is not a state somebody
+ *   arrives in -- it develops DURING a course of ordinary back exercises.
+ *   There were no earlier signals to miss. It is the one red flag in
+ *   this library that no signal the app holds could ever surface, which
+ *   is precisely why the words have to be there instead.
+ *
  * 13 Aug 2026 v7
  *
  * v7 - CLINICAL REVIEW. The twelve entries I flagged as beyond my
@@ -1242,8 +1268,9 @@ export const REHABILITATION = [
     why: 'Hamstring tightness is often partly neural, not just muscular. Neural flossing addresses both and is particularly useful when the hamstring feels tight but not torn.',
         watchOut: [
       "If you are holding the end position, do not. One second and back — this is a pumping movement, not a stretch",
-      "If it reproduces the symptom you are settling, stop for today. Nerve work should ease things, not bring them on",
-      "If you are doing more because it feels productive, do less. Little and often does more here than a long session"
+      "If it brings on the symptom you are trying to settle, stop for today. I can't give you medical support — if it keeps happening, it's worth getting someone to look at it",
+      "If you are doing more because it feels productive, do less. Little and often does more here than a long session",
+      "If pins and needles, burning or numbness increase or travel further down the leg, stop. I can't give you medical support — it's worth getting someone to look at it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -1448,7 +1475,8 @@ export const REHABILITATION = [
       "If you are rising back up on the working side, use both feet. Only the lowering is the exercise",
       "If the pain sits right on the heel bone rather than a few centimetres up the tendon, do the drops from flat ground instead of off a step",
       "Some discomfort during this is expected. Up to about 3 or 4 out of 10 is fine if it settles quickly afterwards",
-      "Judge it by the next morning: if it is worse than usual, halve the sets next time rather than stopping altogether"
+      "Judge it by the next morning: if it is worse than usual, halve the sets next time rather than stopping altogether",
+      "If you feel a sudden sharp snap, or you get swelling or a marked limp, stop. I can't give you medical support — please speak to someone today"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -1529,7 +1557,8 @@ export const REHABILITATION = [
       "If you are pushing back up on the painful side, use the other foot. Only the lowering is the exercise",
       "If the pain sits right on the heel bone rather than a few centimetres up the tendon, do the drops from flat ground instead of off a step — dropping below the step compresses that spot and makes it worse",
       "Some discomfort during this is expected. Up to about 3 or 4 out of 10 is fine if it settles quickly afterwards",
-      "Judge it by the next morning: if stiffness or pain is worse than usual, halve the sets next time. Stop for a sudden sharp snap, swelling, a marked limp, or pain climbing above 5 out of 10"
+      "Judge it by the next morning: if stiffness or pain is worse than usual, halve the sets next time",
+      "If you feel a sudden sharp snap, or you get swelling, a marked limp, or pain climbing above about 5 out of 10, stop. I can't give you medical support and that is past what I can help with — please speak to someone today"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -1569,7 +1598,8 @@ export const REHABILITATION = [
       "If you are pushing back up on the painful side, use the other foot. Only the lowering is the exercise",
       "If your knee straightens as you lower, you have switched to the other calf muscle. Hold the 30 degree bend throughout",
       "If the pain sits right on the heel bone rather than a few centimetres up the tendon, do the drops from flat ground instead of off a step",
-      "Judge it by the next morning: if stiffness or pain is worse than usual, halve the sets next time. Stop for a sudden sharp snap, swelling, a marked limp, or pain climbing above 5 out of 10"
+      "Judge it by the next morning: if stiffness or pain is worse than usual, halve the sets next time",
+      "If you feel a sudden sharp snap, or you get swelling, a marked limp, or pain climbing above about 5 out of 10, stop. I can't give you medical support and that is past what I can help with — please speak to someone today"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -2141,7 +2171,7 @@ export const REHABILITATION = [
       "If you are rushing the two halves together, separate them: two counts up onto the toes, then a deliberate shift and pull the toes up",
       "If your shins ache during rather than working, shorten the range at the toe-raise end",
       "If you have done these two days running, leave 48 hours. The gap is part of the method, not a rest day you have earned",
-      "Stop for a sharp, localised, point-tender spot on the bone rather than a spread-out ache along the shin, and get it looked at"
+      "If the ache narrows to a sharp, tender spot on the bone rather than spreading along the shin, stop. I can't give you medical support — it's worth getting someone to look at it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -3114,7 +3144,8 @@ export const REHABILITATION = [
       "If your hips peel off the floor, or your back muscles grip instead of your arms pressing, keep your pelvis heavy and relaxed and press only through your palms",
       "Even a few inches is fine. Height is not the point",
       "If back stiffness eases, or pain moves out of your leg and retreats up into your low back, carry on at that comfortable range",
-      "Stop if pain, numbness or tingling travels further down your buttock, thigh or leg, and get it assessed"
+      "If pain, numbness or tingling travels further down your buttock, thigh or leg, stop. I can't give you medical support and that is past what I can help with — it's worth getting someone to look at it",
+      "I'd stop this one altogether if you notice any sudden change in your bladder or bowel, or numbness between your legs. That is well past what I can help with — please speak to someone today"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -3155,7 +3186,7 @@ export const REHABILITATION = [
       "If you are pulling into a sustained hamstring stretch, ease off. This is a slow, smooth glide and never a stretch",
       "As your knee straightens, look up at the ceiling at the same time; as it bends, drop your chin. Keep the range small and completely pain-free",
       "If you are moving quickly, slow right down. Gentle and slow is the whole method",
-      "Stop if electric zings, burning, pins and needles or numbness increase or travel further down the leg"
+      "If electric zings, burning, pins and needles or numbness increase or travel further down the leg, stop. I can't give you medical support — it's worth getting someone to look at it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -3392,7 +3423,7 @@ export const REHABILITATION = [
       "If your buttocks clench, your thighs grip, or you find yourself holding your breath, place a hand on your lower belly and keep your glutes completely soft",
       "If you feel a sensation of pushing downward or outward rather than lifting, breathe in naturally and — as you exhale — imagine drawing the base of your pelvis up toward your ribs like a gentle lift",
       "Focus as much on the complete release as on the lift. The letting go is half of it",
-      "Stop if squeezing triggers pelvic ache, tailbone pain or a sharp spasm. That can mean an overactive pelvic floor, which needs assessment rather than more strengthening"
+      "If squeezing brings on pelvic ache, tailbone pain or a sharp spasm, stop. That can mean the muscles are already overactive, in which case more squeezing makes it worse. I can't give you medical support and I can't tell the difference — it's worth getting someone to look at it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
@@ -3431,7 +3462,8 @@ export const REHABILITATION = [
       "If the tension stays on between reps and the muscles never fully let go, think of it as snap up, completely let go",
       "If you cannot feel the release between each flick, slow to a two-second cycle, or go back to basic contractions until the release is obvious",
       "If you are holding your breath or tensing your shoulders to match the rhythm, slow down until the breathing is easy again",
-      "Do not start with the fast version until the full release is comfortable. Stop for persistent pelvic ache, burning, or sudden urgency, and get assessed"
+      "Leave the fast version until the full release is comfortable — this one needs the letting go more than the squeezing",
+      "If you get persistent pelvic ache, burning, or sudden urgency, stop. I can't give you medical support — it's worth getting someone to look at it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
@@ -3471,7 +3503,7 @@ export const REHABILITATION = [
         watchOut: [
       "If your lower back arches hard or your belly domes outward at the top, keep the lift moderate — a straight diagonal line from knees to ribs, not an arch",
       "If you lose the pelvic floor lift as soon as the hips move, exhale and begin the gentle lift a split second before you drive through your heels",
-      "Stop for sharp pain at the front of the hip, pinching in the low back, or any sense of bearing down during the lift"
+      "If you get sharp pain at the front of the hip, pinching in the low back, or any sense of bearing down during the lift, stop. I can't give you medical support — it's worth getting someone to look at it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -3511,8 +3543,8 @@ export const REHABILITATION = [
         watchOut: [
       "If you find yourself bearing down at the bottom to brace for standing up, inhale and let the pelvic floor lengthen as you sit back, then exhale to lift as you drive up",
       "If you feel heavy downward pressure at the bottom, reduce the depth — squat to a chair or box until that pressure goes",
-      "Be comfortable with a pain-free bodyweight squat and with isolated pelvic floor contractions before combining the two",
-      "Stop for a feeling of vaginal or rectal heaviness, dragging, or a bulge, and see a pelvic health physiotherapist"
+      "If you feel heaviness or dragging low down, or notice a bulge, stop. I can't give you medical support and that is past what I can help with — please speak to someone about it",
+      "Be comfortable with a pain-free bodyweight squat and with isolated pelvic floor contractions before combining the two"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -3885,7 +3917,7 @@ export const REHABILITATION = [
       "If the muscles along the front and sides of your neck stand out like cables, or your head lifts off the floor, the big muscles have taken over. Make the nod much smaller",
       "Think of a tiny nod — five to ten degrees, as if saying yes very slightly. Tongue resting on the roof of your mouth, teeth slightly apart",
       "This should feel like a quarter of your effort, not a strength exercise. If you cannot feel anything at first, that is normal — the movement is far smaller than people expect",
-      "Stop straight away for dizziness, nausea, lightheadedness, visual disturbance, or a headache spreading at the back of your head"
+      "If you get dizziness, nausea, lightheadedness, changes to your vision, or a headache spreading at the back of your head, stop straight away. I can't give you medical support and that is past what I can help with — please speak to someone today"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -4088,7 +4120,7 @@ export const REHABILITATION = [
     why: 'Neural mobilisation techniques improve nerve mobility and reduce neural tension in sciatica rehabilitation. Evidence shows superior outcomes compared to stretching alone.',
         watchOut: [
       "If you are holding at the end, release it. A pump, not a stretch",
-      "If pain travels further down the leg, stop. This should ease symptoms, not chase them",
+      "If pain travels further down the leg, stop. I can't give you medical support — it's worth getting someone to look at it",
       "If you are going hard and fast, slow right down. Gentle and slow is the entire method"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
