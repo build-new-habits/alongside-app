@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 14 Aug 2026 v342
+ * W3-A. Capability questions reachable at last. onboarding-thread-data.js
+ * v6 (steps 9a-9d, showIf), thread.js v9 (conditional walk, askedAt),
+ * field-contract.js v2. views/onboarding/lifestyle.js DELETED and removed
+ * from the precache list above -- it was the writer of nothing.
+ *
  * 14 Aug 2026 v341
  * W2-1 cooldown difficulty ceiling, W2-2 proposalBias cleared at
  * check-in, W2-3/W2-4 comment corrections. session-builder.js v31,
@@ -2388,7 +2394,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v341";
+const CACHE_NAME = "alongside-v342";
 
 const SHELL_URLS = [
 
@@ -2520,7 +2526,6 @@ const SHELL_URLS = [
   "/alongside-app/js/views/onboarding/complete.js",
   "/alongside-app/js/views/onboarding/frequency.js",
   "/alongside-app/js/views/onboarding/hard-before.js",
-  "/alongside-app/js/views/onboarding/lifestyle.js",
   "/alongside-app/js/views/onboarding/name.js",
   "/alongside-app/js/views/onboarding/reflection.js",
   "/alongside-app/js/views/onboarding/welcome.js",
