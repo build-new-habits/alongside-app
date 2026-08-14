@@ -124,15 +124,36 @@ export function ArrivalView(router) {
    * Stays specific without being presumptuous.
    */
   function _getStartingContext(fitnessLevel, goals) {
+    const exerciseHistory = store.get("lifestyle.exerciseHistory") || null;
     const hasGoals = goals && goals.length > 0;
 
-    if (fitnessLevel === "returning") {
+    // CONTRACT-1, 13 Aug 2026. These branches tested fitnessLevel
+    // against "returning", "beginner", "new-to-exercise" and
+    // "experienced". fitnessLevel can hold NONE of those -- it carries
+    // the activityLevel vocabulary (sedentary | light | moderate |
+    // active | very-active), written from it at
+    // onboarding/lifestyle.js:548.
+    //
+    // So four of the five branches were unreachable and only somebody
+    // with activityLevel 'active' ever got a tailored line. Everybody
+    // else fell through to the generic default -- including the person
+    // this file's warmest sentence was written for. "It takes something
+    // to come back" has never been shown to anybody.
+    //
+    // This is the app's FIRST spoken words after onboarding. Three
+    // carefully written first-impression lines were dead copy.
+    //
+    // The author meant exercise HISTORY, which is a real field with
+    // exactly these distinctions: never | lapsed | returning | active.
+    // Switched to that. Nothing here is inferred that the person did
+    // not tell us.
+    if (exerciseHistory === "returning" || exerciseHistory === "lapsed") {
       return "It takes something to come back. Whatever brought you here, I'm glad it did.";
     }
-    if (fitnessLevel === "beginner" || fitnessLevel === "new-to-exercise") {
+    if (exerciseHistory === "never") {
       return "Starting something new is one of the harder things to do. I don't take lightly that you're here.";
     }
-    if (fitnessLevel === "experienced" || fitnessLevel === "active") {
+    if (exerciseHistory === "active" || fitnessLevel === "active" || fitnessLevel === "very-active") {
       return hasGoals
         ? "You know what you're doing. What I'm here to do is make sure what you're doing actually works for your life."
         : "You've been here before. What I'm here to do is make sure this time feels different.";
