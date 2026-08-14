@@ -115,5 +115,39 @@ check("McKenzie extension carries the bladder and bowel line", () => {
      "the bladder and bowel stop line is absent from McKenzie Press-Up");
 });
 
+console.log("\nC1b — no entry falls back to shared boilerplate");
+
+check("every entry has its own watchOut", () => {
+  const thin = REHABILITATION.filter(e => !e.watchOut || e.watchOut.length < 3);
+  ok(thin.length === 0,
+     `${thin.length} entries have fewer than three watchOut lines: ` +
+     thin.map(e => e.id).join(", "));
+
+  // The original fault: one identical four-line block on all 94. A
+  // generic "what to watch for" teaches nothing and trains people to
+  // stop reading the block, which then costs the entries where it is
+  // specific and genuinely matters.
+  const counts = {};
+  REHABILITATION.forEach(e => (e.watchOut || []).forEach(w => {
+    counts[w] = (counts[w] || 0) + 1;
+  }));
+  const shared = Object.entries(counts).filter(([, n]) => n > 2);
+  ok(shared.length === 0,
+     `${shared.length} watchOut line(s) appear in more than two entries, which is ` +
+     `boilerplate returning: ` +
+     shared.slice(0, 3).map(([w, n]) => `${n}x "${w.slice(0, 50)}…"`).join(" | "));
+});
+
+check("difficulty is not a constant", () => {
+  // All 94 carried difficultyLevel: 1 until 13 Aug. Present and wrong,
+  // which defeats _difficulty()'s fallback -- that only fires when the
+  // field is ABSENT. Difficulty is the capability ceiling, so this was
+  // the most consequential data fault in the library.
+  const levels = new Set(REHABILITATION.map(e => e.difficultyLevel));
+  ok(levels.size >= 4,
+     `only ${levels.size} distinct difficulty value(s) across 94 entries. ` +
+     "A constant here silently defeats the capability ceiling");
+});
+
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
 process.exit(fails === 0 ? 0 : 1);
