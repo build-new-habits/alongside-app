@@ -1,4 +1,28 @@
 /**
+ * 13 Aug 2026 - SEATED-GAP. Six entries added, filling every category a
+ * seated user could reach but had nothing in.
+ *
+ * Traced: somebody who cannot rise from a chair unaided, owns no
+ * equipment and is capped at difficulty 2 received TWELVE distinct
+ * exercises across nine sessions -- against 33 for an able-bodied
+ * beginner. Category by category their usable pool was hip-hinge 0,
+ * horizontal-pull 0, hip-flexor-stretch 0, spinal-decompression 0,
+ * horizontal-push 1, squat-pattern 1.
+ *
+ * That is CAP-4's problem in its third form. CAP-4 fixed "four
+ * exercises and no programme". CAP-7 fixed "confined to a chair by an
+ * answer about the floor". This is "the same twelve, forever" -- and
+ * for somebody with the least confidence, repetition is the thing most
+ * likely to end it.
+ *
+ * loaded-carry, balance-work and power remain 0 and are DELIBERATELY
+ * not filled. Those categories are genuinely unavailable seated, and
+ * inventing token versions to make a number go up would be worse than
+ * an honest gap. The builder skips empty categories rather than failing.
+ *
+ * 12 distinct -> 16. Not parity, and further improvement is more
+ * content rather than more code.
+ *
  * 13 Aug 2026 - CAP-6 (C3). Every entry here now carries `adaptive: true`.
  *
  * WHAT IT MEANS: this exercise exists to accommodate a limitation. It is
@@ -72,6 +96,260 @@
  */
 
 export const SEATED = [
+
+  // ══════════════════════════════════════════════════════════════════════
+  // SEATED-GAP, 13 Aug 2026 — filling the categories a seated user could
+  // not reach.
+  //
+  // Traced: somebody who cannot rise from a chair unaided, has no
+  // equipment, and is capped at difficulty 2 received TWELVE distinct
+  // exercises across nine sessions. Category by category, their usable
+  // pool was: hip-hinge 0, horizontal-pull 0, hip-flexor-stretch 0,
+  // spinal-decompression 0, horizontal-push 1, squat-pattern 1.
+  //
+  // loaded-carry, balance-work and power are also 0 for this person and
+  // are deliberately NOT filled. Those categories are genuinely not
+  // available seated, and inventing token versions to make a number go
+  // up would be worse than an honest gap — the session builder already
+  // skips empty categories rather than failing.
+  //
+  // Every entry below needs nothing but a chair.
+  // ══════════════════════════════════════════════════════════════════════
+
+  {
+    id: 'seated-self-resisted-row',
+    name: 'Seated Self-Resisted Row',
+    youtube: 'seated self resisted row no equipment',
+    category: 'strength',
+    movementPattern: 'pull',
+    position: 'seated',
+    adaptive: true,
+    impact: false,
+    balanceDemand: false,
+    equipment: [],
+    equipmentOptional: ['resistance-band'],
+    affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps'],
+    contraindications: ['shoulder-acute', 'upper-back-acute'],
+    energyRequired: 3,
+    difficultyLevel: 2,
+    duration: 180,
+    perSide: false,
+    sets: 3,
+    reps: '10',
+    rest: '45s',
+    tempo: 'Three seconds pulling, three returning',
+    instructions: [
+      'Sit tall, both feet flat or footplates set, hands out in front at chest height',
+      'Make a loose fist with your right hand and cup it with your left palm',
+      'Pull your right elbow back toward your ribs while your left hand resists it',
+      'Let the elbow travel slowly — the resistance should make it hard work, not impossible',
+      'Squeeze the shoulder blade back at the end, then return just as slowly',
+      'Ten each side'
+    ],
+    coaching: 'The amount of resistance is entirely yours to set, which is what makes this useful — you can make it easy on a flat day and genuinely hard on a good one without changing anything else.',
+    why: 'Almost all seated pulling exercises need a band or a machine. This one needs nothing, and pulling is the movement most missing from a day spent sitting.',
+    watchOut: [
+      'If your shoulder creeps up toward your ear as you pull, drop it down and use less resistance',
+      'If you are rushing, slow both directions down — the resistance you provide is only as good as the time you spend under it',
+      'If your torso twists to help, sit square against the chair back and pull with less force'
+    ],
+    load: 'Set by how hard you resist. Enough that the last two reps are a struggle.'
+  },
+
+  {
+    id: 'seated-scapular-retraction',
+    name: 'Seated Shoulder Blade Squeeze',
+    youtube: 'seated scapular retraction exercise',
+    category: 'strength',
+    movementPattern: 'pull',
+    position: 'seated',
+    adaptive: true,
+    impact: false,
+    balanceDemand: false,
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'shoulder'],
+    contraindications: ['upper-back-acute'],
+    energyRequired: 2,
+    difficultyLevel: 1,
+    duration: 150,
+    perSide: false,
+    sets: 3,
+    reps: '10',
+    rest: '30s',
+    tempo: 'Hold three seconds',
+    instructions: [
+      'Sit tall with your arms relaxed at your sides',
+      'Draw both shoulder blades back and down, as if pinching something between them',
+      'Keep your shoulders away from your ears throughout',
+      'Hold for three seconds',
+      'Release completely before the next one'
+    ],
+    coaching: 'The movement is small and most people over-do it at first. Back and down, not up and back.',
+    why: 'The muscles between the shoulder blades switch off after long periods sitting. This wakes them up and needs nothing but a chair.',
+    watchOut: [
+      'If your shoulders lift toward your ears, you are shrugging rather than squeezing. Think down as much as back',
+      'If your lower back arches, sit back into the chair and make the squeeze smaller',
+      'If you cannot feel it, put a hand on the opposite shoulder blade so you can feel it move'
+    ],
+    load: 'Bodyweight. The hold is what makes it work, not the effort.'
+  },
+
+  {
+    id: 'seated-hip-hinge',
+    name: 'Seated Hip Hinge',
+    youtube: 'seated hip hinge chair exercise',
+    category: 'strength',
+    movementPattern: 'hinge',
+    position: 'seated',
+    adaptive: true,
+    impact: false,
+    balanceDemand: false,
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['lower-back', 'glutes', 'hamstring'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 3,
+    difficultyLevel: 2,
+    duration: 180,
+    perSide: false,
+    sets: 3,
+    reps: '8',
+    rest: '45s',
+    tempo: 'Four seconds down, two up',
+    instructions: [
+      'Sit toward the front of the chair, feet flat and hip-width apart if you can place them',
+      'Cross your arms over your chest and sit tall',
+      'Hinge forward from the hips, keeping your back flat — your chest travels forward, not down',
+      'Go only as far as you can keep the back straight',
+      'Return to upright by squeezing your glutes'
+    ],
+    coaching: 'The hinge is the movement your back most wants you to be good at, and it can be trained perfectly well sitting down. Flat back is the whole exercise.',
+    why: 'Hinging is how you reach for anything below waist height. Every hinge exercise in the library needs standing — this one does not.',
+    watchOut: [
+      'If your back rounds as you go forward, that is your stopping point. It will move further over weeks',
+      'If you feel it mostly in your lower back rather than your hips, come less far forward and lead with your chest',
+      'If you are using your arms on your thighs to push back up, cross them over your chest instead'
+    ],
+    load: 'Bodyweight. Depth is limited by your back staying flat, not by how far you can lean.'
+  },
+
+  {
+    id: 'seated-wall-press',
+    name: 'Seated Chair Press',
+    youtube: 'seated chair press up triceps',
+    category: 'strength',
+    movementPattern: 'push',
+    position: 'seated',
+    adaptive: true,
+    impact: false,
+    balanceDemand: false,
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['chest-pecs', 'shoulder', 'triceps-biceps'],
+    contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
+    energyRequired: 3,
+    difficultyLevel: 2,
+    duration: 180,
+    perSide: false,
+    sets: 3,
+    reps: '8',
+    rest: '45s',
+    tempo: 'Three seconds pressing',
+    instructions: [
+      'Sit tall with your hands on the arms of the chair, or flat on the seat beside your hips',
+      'Press down through your hands as if to lift yourself, without actually lifting',
+      'Keep your shoulders down and away from your ears',
+      'Hold the press for three seconds, building the effort gradually',
+      'Release slowly rather than dropping'
+    ],
+    coaching: 'You are not trying to lift off. The effort of trying is the exercise, and it lets you work as hard or as gently as the day allows.',
+    why: 'Pressing strength is what makes getting up from a chair possible one day. This builds it without needing to get up.',
+    watchOut: [
+      'If your shoulders lift toward your ears, drop them and press with less force',
+      'If your wrists hurt, press through a loose fist rather than a flat hand',
+      'If you are holding your breath, count the three seconds out loud'
+    ],
+    load: 'Set by how hard you press. Build the effort over the three seconds rather than starting at maximum.'
+  },
+
+  {
+    id: 'seated-hip-flexor-stretch',
+    name: 'Seated Hip Flexor Stretch',
+    youtube: 'seated hip flexor stretch chair edge',
+    category: 'mobility',
+    movementPattern: 'stretch',
+    position: 'seated',
+    adaptive: true,
+    impact: false,
+    balanceDemand: false,
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['hip-flexor', 'hip'],
+    contraindications: ['hip-acute'],
+    energyRequired: 1,
+    difficultyLevel: 1,
+    duration: 120,
+    perSide: true,
+    sets: 2,
+    reps: '30 seconds',
+    rest: '15s',
+    tempo: 'Hold still',
+    instructions: [
+      'Sit toward the edge of the chair, turned slightly to the right so your left hip is near the corner',
+      'Let your left leg drop back and down behind you as far as is comfortable',
+      'Sit tall and gently tuck your hips underneath you',
+      'You should feel a stretch across the front of the left hip',
+      'Hold for thirty seconds, breathing normally, then swap sides'
+    ],
+    coaching: 'The tuck is what creates the stretch, not how far the leg goes back. Most people get this the wrong way round and reach with the leg instead.',
+    why: 'Sitting shortens the front of the hips more than anything else, and every existing stretch for it needs kneeling on the floor.',
+    watchOut: [
+      'If you feel it in your lower back rather than the front of the hip, tuck your hips under more and take the leg less far back',
+      'If you are gripping the chair to stay steady, move further in from the edge',
+      'If it pinches at the front of the hip, come out and take less range'
+    ],
+    load: 'Gentle. This one responds to time rather than force.'
+  },
+
+  {
+    id: 'seated-spinal-decompression',
+    name: 'Seated Spinal Lengthening',
+    youtube: 'seated spinal decompression chair',
+    category: 'mobility',
+    movementPattern: 'spinal-decompression',
+    position: 'seated',
+    adaptive: true,
+    impact: false,
+    balanceDemand: false,
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['lower-back', 'upper-back', 'thoracic'],
+    contraindications: ['lower-back-acute'],
+    energyRequired: 1,
+    difficultyLevel: 1,
+    duration: 120,
+    perSide: false,
+    sets: 2,
+    reps: '5 breaths',
+    rest: '20s',
+    tempo: 'Slow, with the breath',
+    instructions: [
+      'Sit tall with your feet flat or supported and your hands resting in your lap',
+      'Breathe in and grow taller through the top of your head, as if a thread is lifting you',
+      'Keep your shoulders down as you lengthen',
+      'Breathe out slowly and keep the height rather than sinking back down',
+      'Repeat for five slow breaths'
+    ],
+    coaching: 'Almost nothing moves here and that is deliberate. It is the end of a session, and the point is to leave taller than you arrived.',
+    why: 'Every spinal decompression exercise in the library involves hanging or lying down. This closes a session for somebody who does neither.',
+    watchOut: [
+      'If your chin lifts as you grow taller, tuck it very slightly — the length comes from the back of the neck',
+      'If your shoulders rise with the breath, let them settle and lengthen more slowly',
+      'If you sink back down on the out-breath, that is normal at first. Keeping a little of the height each time is the practice'
+    ],
+    load: 'None. Breath and posture only.'
+  },
 
   // ══════════════════════════════════════════════════════════════════════
   // SEATED CARDIO
