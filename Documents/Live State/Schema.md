@@ -1,7 +1,7 @@
 # Alongside — Data Schema Reference
-## 13 Aug 2026 v1.32
+## 13 Aug 2026 v1.33
 
-**File:** `js/store.js` (confirmed live version: **v39, 13 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v40, 13 Aug 2026**)
 **Storage:** `localStorage` key `alongside_user`
 
 **This version supersedes:** v1.30 (12 Aug 2026).
@@ -181,6 +181,20 @@ Object, all keys default `null`.
 `'maintain'` is **not** a diluted `'improve'`. What is lost first is specific and known — power before strength, balance early, grip strength (which predicts independence better than almost anything), and floor transfer (which decides whether somebody keeps living in their own home). Maintenance *prioritises* those rather than doing less of everything.
 
 **Read by** `session-builder.js` (main-section tilt) and `session-rationale.js` (arc). **Not yet collected — no screen asks the question.** Wording proposed, awaiting confirmation. See CAP-6.
+
+---
+
+## `sessionPreset` — **NEW, `store.js` v40, 13 Aug 2026**
+
+`"balanced" | "strength" | "mobility"`, default `"balanced"`.
+
+The allocation preset chosen on the duration screen, deciding how a session's time splits between warm-up, working set and cool-down. Personal-tier control (`session-builder-ui.js` gates the picker on `isPremium()`).
+
+It was module state, reset to `"balanced"` on every mount. Persona 2.15 trains four times a week and wants *Mostly strength* every time; she was re-picking it from scratch at every session. Remembering it is not a new feature — it is the absence of an irritation.
+
+**Deliberately separate from `sessionVariety`.** That field is about REPETITION — do you want what you did last time, or something different — and is asked fresh at check-in. This one is about the SHAPE of the session and is a standing preference until changed. Two concepts, two fields: collapsing them would be the one-field-two-meanings fault this build has already paid for more than once.
+
+**Read by** `session-builder-ui.js` at mount, and written when the person picks a preset.
 
 ---
 
