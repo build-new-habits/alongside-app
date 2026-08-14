@@ -1,5 +1,17 @@
 /**
  * programmes.js
+ * 13 Aug 2026 v3
+ *
+ * v3 - The fourteen count-threshold milestones removed ("10 sessions
+ *   completed", "20 sessions"). A milestone marking progress through the
+ *   PROGRAMME describes the plan; one marking accumulated volume grades
+ *   the person -- nine sessions got nothing and ten got a star. That is
+ *   arithmetic as judgement, the same pattern stripped from the Progress
+ *   narrative the same day. The streak was removed on principle; count
+ *   thresholds are a milder member of that family. Phase and week
+ *   markers stay: they describe where the programme is, not what the
+ *   person is worth. 47 milestones -> 33.
+ *
  * 23 Jun 2026 v2
  *
  * Programme template definitions. Static data — one object per 12-week plan.
@@ -74,8 +86,21 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['strength', 'cardio'],
         milestones: [
-          { id: 'halfway',      label: 'Halfway through — 6 weeks done 💪' },
-          { id: 'ten-sessions', label: '10 sessions completed ⭐'           }
+          // 13 Aug 2026. 'ten-sessions' and 'twenty-sessions' removed.
+          //
+          // The line: a milestone that marks progress through the
+          // PROGRAMME describes the plan; a milestone that marks
+          // accumulated volume grades the person. Nine sessions got
+          // nothing and ten got a star -- arithmetic as judgement, which
+          // is the same pattern stripped out of the Progress narrative
+          // this morning ("that's a real habit" at ten, "building
+          // something" at nine).
+          //
+          // The streak was removed on principle. Count thresholds are a
+          // milder member of that family and go for the same reason.
+          // Phase and week markers stay: they describe where the
+          // programme is, not what the person is worth.
+          { id: 'halfway',      label: 'Halfway through — 6 weeks done 💪' }
         ]
       },
       {
@@ -87,7 +112,6 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['cardio', 'strength'],
         milestones: [
-          { id: 'twenty-sessions', label: '20 sessions completed 🔥' }
         ]
       },
       {
@@ -139,8 +163,7 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['cardio', 'strength'],
         milestones: [
-          { id: 'halfway',      label: 'Halfway — stamina is building 💪' },
-          { id: 'ten-sessions', label: '10 cardio sessions done ⭐'        }
+          { id: 'halfway',      label: 'Halfway — stamina is building 💪' }
         ]
       },
       {
@@ -152,7 +175,6 @@ export const PROGRAMMES = [
         intensityBias: 'challenging',
         focusBias: ['cardio', 'strength'],
         milestones: [
-          { id: 'twenty-sessions', label: '20 sessions — serious progress 🔥' }
         ]
       },
       {
@@ -204,8 +226,7 @@ export const PROGRAMMES = [
         intensityBias: 'gentle',
         focusBias: ['strength', 'mobility'],
         milestones: [
-          { id: 'halfway',      label: 'Halfway — careful progress 💪' },
-          { id: 'ten-sessions', label: '10 sessions — consistency is the win ⭐' }
+          { id: 'halfway',      label: 'Halfway — careful progress 💪' }
         ]
       },
       {
@@ -217,7 +238,6 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['strength', 'cardio'],
         milestones: [
-          { id: 'twenty-sessions', label: '20 sessions — real strength building 🔥' }
         ]
       },
       {
@@ -272,8 +292,7 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['strength', 'cardio', 'mobility'],
         milestones: [
-          { id: 'halfway',      label: 'Halfway — the habit is real now 💪' },
-          { id: 'ten-sessions', label: '10 sessions — look at that ⭐'       }
+          { id: 'halfway',      label: 'Halfway — the habit is real now 💪' }
         ]
       },
       {
@@ -285,7 +304,6 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['cardio', 'strength'],
         milestones: [
-          { id: 'twenty-sessions', label: '20 sessions — you built something 🔥' }
         ]
       },
       {
@@ -337,8 +355,7 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['strength', 'cardio'],
         milestones: [
-          { id: 'halfway',      label: 'Halfway — noticeably stronger 💪' },
-          { id: 'ten-sessions', label: '10 sessions of real work ⭐'       }
+          { id: 'halfway',      label: 'Halfway — noticeably stronger 💪' }
         ]
       },
       {
@@ -350,7 +367,6 @@ export const PROGRAMMES = [
         intensityBias: 'challenging',
         focusBias: ['strength'],
         milestones: [
-          { id: 'twenty-sessions', label: '20 sessions — real strength built 🔥' }
         ]
       },
       {
@@ -402,8 +418,7 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['cardio', 'strength'],
         milestones: [
-          { id: 'halfway',      label: 'Halfway — energy levels changing 💪' },
-          { id: 'ten-sessions', label: '10 sessions completed ⭐'             }
+          { id: 'halfway',      label: 'Halfway — energy levels changing 💪' }
         ]
       },
       {
@@ -415,7 +430,6 @@ export const PROGRAMMES = [
         intensityBias: 'challenging',
         focusBias: ['cardio', 'strength'],
         milestones: [
-          { id: 'twenty-sessions', label: '20 sessions — serious commitment 🔥' }
         ]
       },
       {
@@ -468,8 +482,7 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['yoga', 'mobility', 'mindfulness'],
         milestones: [
-          { id: 'halfway',      label: 'Halfway — noticeably more mobile 💪' },
-          { id: 'ten-sessions', label: '10 sessions — real change building ⭐' }
+          { id: 'halfway',      label: 'Halfway — noticeably more mobile 💪' }
         ]
       },
       {
@@ -481,7 +494,6 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['yoga', 'mobility'],
         milestones: [
-          { id: 'twenty-sessions', label: '20 sessions — transformed range 🔥' }
         ]
       },
       {
@@ -534,8 +546,7 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['strength', 'mobility'],
         milestones: [
-          { id: 'halfway',      label: 'Halfway — noticeably more stable 💪' },
-          { id: 'ten-sessions', label: '10 sessions of body awareness ⭐'     }
+          { id: 'halfway',      label: 'Halfway — noticeably more stable 💪' }
         ]
       },
       {
@@ -547,7 +558,6 @@ export const PROGRAMMES = [
         intensityBias: 'moderate',
         focusBias: ['strength', 'cardio'],
         milestones: [
-          { id: 'twenty-sessions', label: '20 sessions — real stability built 🔥' }
         ]
       },
       {

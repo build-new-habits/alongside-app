@@ -1,6 +1,16 @@
 /**
  * reflect.js - Reflect Screen
  *
+ * 13 Aug 2026 v6
+ *
+ * v6 - EMP-4. The empathy cadence is time-aware as well as
+ *   session-aware. Persona 2.12 completed seven sessions in three weeks
+ *   and met the empathy arc ONCE; persona 2.15, at sixteen sessions, met
+ *   it four times. A session-only gate rations the coaching voice in
+ *   proportion to how FEW sessions somebody does, which is exactly
+ *   backwards for the people this product exists for. Two paths now,
+ *   whichever arrives first. EMPATHY_MIN_SESSIONS 3 -> 2.
+ *
  * 12 Aug 2026 v5 - EMP-2. Closes the two gaps EMP-1 raised, both of
  *   which turned out to be code rather than content.
  *
@@ -200,7 +210,23 @@ const MOOD_LABELS = [
 const STAGE_ADVANCE_THRESHOLDS = { 1: 4, 2: 5, 3: 5, 4: 4, 5: Infinity };
 const EMPATHY_BASE_GAP    = 4; // sessions between prompts under normal conditions ("every 3-4")
 const EMPATHY_WIDENED_GAP = 6; // after 3+ consecutive skips
-const EMPATHY_MIN_SESSIONS = 3; // no prompt fires in the user's first three sessions
+const EMPATHY_MIN_SESSIONS = 2; // EMP-4: was 3. See getEmpathyPromptForSession().
+// EMP-4. The second path: real time elapsed, with at least this many
+// sessions inside it so the prompt still lands on something done rather
+// than on the calendar alone. Fourteen days matches the fortnight used
+// by the free Progress window (TIER-E) -- one idea of "recently" across
+// the product rather than three.
+// Ten days, not fourteen. Simulated against three real patterns before
+// choosing: at fourteen the time path never actually fired for persona
+// 2.12 -- his sessions fall 11 days apart, so he stayed on one prompt in
+// three weeks and the change bought nothing. Ten matches
+// RETURNING_GAP_DAYS below, so "a while" means one thing in this file
+// rather than two. Measured effect: 2.12 goes 1 prompt -> 2, a
+// once-a-fortnight user goes 1 -> 2 and meets the arc in week four
+// rather than week six, and 2.15 is unchanged at 4 because at four
+// sessions a week she always hits the session gap first.
+const EMPATHY_TIME_GAP_DAYS     = 10;
+const EMPATHY_TIME_MIN_SESSIONS = 2;
 
 function getSessionCount() {
   // "Session count" per the spec is unit of experience, not calendar
@@ -304,14 +330,73 @@ function buildEmpathyContext(sessionCount) {
   };
 }
 
+/** Earliest completed session on record, or null. EMP-4 baseline. */
+function _firstSessionAt() {
+  try {
+    const log = store.completedSessions(store.get("activityLog") || []);
+    const times = log
+      .map(e => e.completedAt || e.loggedAt || e.date)
+      .filter(Boolean)
+      .map(ts => new Date(ts).getTime())
+      .filter(n => !Number.isNaN(n));
+    return times.length ? new Date(Math.min(...times)).toISOString() : null;
+  } catch { return null; }
+}
+
 function getEmpathyPromptForSession(sessionCount) {
+  // ── EMP-4, 13 Aug 2026: the cadence is now time-aware as well as
+  // session-aware. ──────────────────────────────────────────────────
+  //
+  // THE PROBLEM, measured. Persona 2.12 completed seven sessions across
+  // three weeks and received exactly ONE empathy prompt, on day twelve.
+  // Persona 2.15, at sixteen sessions, received four. So the mechanism
+  // most identified with this product's purpose was four times more
+  // present for the confident gym user than for the hesitant beginner
+  // it was built for.
+  //
+  // THE CAUSE. Cadence counted sessions only. The people this product
+  // exists for -- irregular, stop-start, variable energy -- accumulate
+  // sessions slowly by definition. A session-only gate therefore
+  // rations the coaching voice in exact proportion to how much somebody
+  // needs it, which is precisely backwards.
+  //
+  // THE FIX. Two paths to the same prompt: the existing session gap, OR
+  // enough real time elapsed with at least a couple of sessions in it.
+  // Whichever arrives first. Priya's cadence is untouched, because at
+  // four sessions a week she always hits the session gap first. Danny
+  // now meets it in his first fortnight and roughly fortnightly after.
+  //
+  // MIN lowered 3 -> 2 for the same reason: a person who does two
+  // sessions in a fortnight and hears nothing has met the product's
+  // exercise engine and not its actual point.
+  //
+  // Deliberately NOT purely time-based. A prompt that fires on the
+  // calendar rather than on something the person did is a notification,
+  // and P3 forbids interruption on a timer.
   if (sessionCount <= EMPATHY_MIN_SESSIONS) return null;
 
   const skips = store.get("empathyPromptSkips") || 0;
   const gap   = skips >= 3 ? EMPATHY_WIDENED_GAP : EMPATHY_BASE_GAP;
   const last  = store.get("lastEmpathyPromptSession") || 0;
 
-  if (sessionCount - last < gap) return null;
+  const sessionGapMet = (sessionCount - last) >= gap;
+
+  // Baseline: the last prompt if there has been one, otherwise the
+  // person's FIRST session. Without that fallback the time path could
+  // never help before the first prompt ever fired -- and the first
+  // prompt is exactly the one a sparse user waits longest for. Caught by
+  // simulating it rather than reasoning about it: the initial version
+  // returned null here and changed nothing at all for the persona it was
+  // written for.
+  const lastAt = store.get("lastEmpathyPromptAt") || _firstSessionAt();
+  const daysSince = lastAt
+    ? Math.floor((Date.now() - new Date(lastAt).getTime()) / 86400000)
+    : null;
+  const timeGapMet = daysSince !== null
+    && daysSince >= EMPATHY_TIME_GAP_DAYS
+    && (sessionCount - last) >= EMPATHY_TIME_MIN_SESSIONS;
+
+  if (!sessionGapMet && !timeGapMet) return null;
 
   // Cadence above is unchanged from v3. Only the choice below is new.
   const stageNum = store.get("empathyTransferStage") || 1;
@@ -351,6 +436,10 @@ function fireEmpathyPrompt(sessionCount) {
 
   store.set("empathyPromptsFired", fired);
   store.set("lastEmpathyPromptSession", sessionCount);
+  // EMP-4. Written beside the session marker, never separately: the two
+  // are read together by the cadence gate, and a writer that updates one
+  // and not the other is the reader-without-writer fault in reverse.
+  store.set("lastEmpathyPromptAt", new Date().toISOString());
   // Genuine engagement (not a skip) resets the consecutive-skip streak.
   store.set("empathyPromptSkips", 0);
 
@@ -382,6 +471,7 @@ function skipEmpathyPrompt(sessionCount) {
   // current + gap - 1, genuinely one session earlier than a normal gap.
   // Flagged for Graeme to confirm this interpretation is correct.
   store.set("lastEmpathyPromptSession", sessionCount - 1);
+  store.set("lastEmpathyPromptAt", new Date().toISOString());
 }
 
 function buildSummary(entry, feel, pain, moodAfterValue) {
