@@ -127,8 +127,17 @@ check("silence is never read as capability", () => {
   // cost of being wrong here is a capable person seeing a seated warm-up;
   // the cost the other way is somebody who needs it not being offered it.
   const src = fs.readFileSync("js/session-builder.js", "utf8");
-  const fn = src.slice(src.indexOf("function _capabilityUnrestricted"));
-  ok(/cap\.asked\s*&&/.test(fn.slice(0, 500)),
+  // 13 Aug 2026: was fn.slice(0, 500) — a fixed character window that
+  // broke the moment the function gained a comment explaining itself.
+  // The assertion stayed true; the gate stopped being able to see it.
+  // Same brittleness as the date-pinned sw1 check and the ordering-pinned
+  // nav5 check found earlier today: a gate that measures position rather
+  // than substance fails on correct code.
+  //
+  // Now reads to the function's closing brace.
+  const start = src.indexOf("function _capabilityUnrestricted");
+  const fn = src.slice(start, src.indexOf("\n}", start));
+  ok(/cap\.asked\s*&&/.test(fn),
      "_capabilityUnrestricted() does not require cap.asked, so a user who was " +
      "never asked would be treated as unrestricted");
   ok(sessionFor(NEVER_ASKED, []).length >= 6, "unasked user got a thin session");

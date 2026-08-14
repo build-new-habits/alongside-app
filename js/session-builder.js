@@ -1,6 +1,20 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 13 Aug 2026 v30
+ *
+ * v30 - CAP-6b. impactSafe removed from _capabilityUnrestricted().
+ *   Found by the Wave-2 verification trace: persona 2.12, a 33-year-old
+ *   desk worker who is fully capable but answered "no" to whether both
+ *   feet leave the ground. That is a statement about IMPACT, not about
+ *   needing a chair -- and it made the person read as restricted, so
+ *   adapted content stayed at full weight and he received FOURTEEN
+ *   seated or supported items across nine sessions. Now one.
+ *
+ *   I conflated two separate axes when writing CAP-6. Impact is already
+ *   handled properly and separately by the impact gate; somebody who
+ *   cannot jump can still stand, hinge, press and pull.
+ *
  * 13 Aug 2026 v29
  *
  * v29 - DEDUPE-1. pickFrom() will not select an exercise whose NAME is
@@ -1009,8 +1023,23 @@ function _offDisciplineForGym(ex) {
  */
 function _capabilityUnrestricted() {
   const cap = store.capabilityProfile();
+  // CAP-6b, 13 Aug 2026. impactSafe REMOVED from this test.
+  //
+  // Found by tracing persona 2.12: a 33-year-old desk worker, fully
+  // capable, who answered "no" to whether both feet leave the ground.
+  // That is a statement about IMPACT, not about needing a chair -- and
+  // it made capabilityUnrestricted false, so adapted content stayed at
+  // full weight and he received fourteen seated or supported items
+  // across nine sessions.
+  //
+  // The two are separate axes and I conflated them when writing this.
+  // Impact is already handled properly and separately by the impact
+  // gate in _filterCandidates(), which removes jumping outright.
+  // Somebody who cannot jump can still stand, hinge, press and pull.
+  //
+  // The remaining four are the right test: they are all statements
+  // about whether the person needs the floor, a chair, or support.
   return cap.asked &&
-         cap.impactSafe &&
          !cap.needsSeated &&
          cap.legsLoadable &&
          store.get("capability.floorAccess")  === "yes" &&
