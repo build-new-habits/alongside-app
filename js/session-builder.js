@@ -1,6 +1,35 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 13 Aug 2026 v24
+ *
+ * v24 - CAP-6 (C3). Adapted content is de-prioritised for people who do
+ *   not need it. The capability screen answers "what CAN this person
+ *   do?" and every gate built on it subtracts; nothing ever asked "what
+ *   does this person NEED?", so an engine that only subtracts hands
+ *   adapted work to everybody able to perform it. Traced 13 Aug,
+ *   persona 2.15: Seated Arm Cycling x9 in three weeks against Barbell
+ *   Bench Press x5, and three of her last four sessions OPENED with
+ *   seated shoulder rolls.
+ *
+ *   Preference, never exclusion -- same shape as the 'less' rule it
+ *   sits beside. If a category has nothing else, adapted comes back, so
+ *   no session can be starved and the CAP-4 warm-up floor holds.
+ *
+ *   AND THE BUG UNDERNEATH IT. The rule went in and persona 2.15 still
+ *   opened with Seated Arm Cycling. The reserved cardio-warmup slot
+ *   picks at random from its own pool and consults NONE of the
+ *   preference rules in pickFrom -- not 'less', not adapted, not
+ *   continuity -- while sixteen non-adaptive options sat unreachable.
+ *   It also declared `const pickFrom = ...`, SHADOWING the function of
+ *   the same name, so at the call site it read exactly as though it
+ *   were using the real selector. Three passes over this file missed it
+ *   for that reason. Renamed to pulsePool.
+ *
+ *   STILL OPEN, logged as SEL-1: that slot continues to ignore 'less'
+ *   preferences, so somebody can say "not a fan" and keep receiving it
+ *   as their opener. Same root cause, wider than this file's scope.
+ *
  * 12 Aug 2026 v23
  *
  * v23 - EMP-2. session.rationale.adjusted now records whether the coach
@@ -762,6 +791,21 @@ function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
   return main;
 }
 
+/**
+ * CAP-6 (C3), 13 Aug 2026. One definition, used by both _filterCandidates
+ * and pickFrom. See js/data/exercises/seated.js's header for the full
+ * reasoning and the traced evidence.
+ */
+function _capabilityUnrestricted() {
+  const cap = store.capabilityProfile();
+  return cap.asked &&
+         cap.impactSafe &&
+         !cap.needsSeated &&
+         cap.legsLoadable &&
+         store.get("capability.floorAccess")  === "yes" &&
+         store.get("capability.balanceWorry") === "no";
+}
+
 function _filterCandidates(categories, section, equipSet, conditionSet) {
   const ceiling = _difficultyCeiling();
   const prefs   = store.get("exercisePreferences") || {};
@@ -868,6 +912,32 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   // frequency is a poor proxy for capacity -- somebody can garden daily
   // and still not get off the floor unaided.
   const cap = store.capabilityProfile();
+
+  // CAP-6 (C3). See _capabilityUnrestricted() at module scope -- one
+  // definition, because _filterCandidates and pickFrom are separate
+  // scopes and two copies of a capability rule is how they drift.
+  // Kept as a named call rather than inlined so the reasoning below
+  // stays attached to it.
+  //
+  // "Unrestricted" means the person was ASKED and cleared
+  // every axis. Deliberately conservative on each count:
+  //
+  //   asked        -- silence is never read as capability. Somebody who
+  //                   never saw the screen keeps the adapted pool at
+  //                   full weight, same fail-safe direction as every
+  //                   other gate in this file.
+  //   impactSafe   -- bothFeet === 'yes' specifically, not merely "not no"
+  //   floorSafe    -- note this is true when floorAccess is NULL, so it
+  //                   is tested against 'yes' directly here rather than
+  //                   trusting the profile's permissive default
+  //   balanceSafe  -- same reasoning as floorSafe
+  //   legsLoadable -- the axis CAP-5 added; full leg power, not partial
+  //
+  // Any one of these unmet and the person keeps adapted content weighted
+  // normally. The cost of being wrong in that direction is somebody
+  // capable seeing a seated warm-up; the cost the other way is somebody
+  // who needs it not being offered it. Those are not symmetrical.
+  const capabilityUnrestricted = _capabilityUnrestricted();
 
   const impactGated =
     (cap.asked && !cap.impactSafe) ||
@@ -1227,8 +1297,29 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
         // is right at home and wrong standing next to a cross trainer.
         // Falls back to bodyweight whenever no machine is available.
         const machine = cardio.filter(e => (e.equipment || []).length > 0);
-        const pickFrom = machine.length > 0 ? machine : cardio;
-        const chosenPulse = pickFrom[Math.floor(Math.random() * pickFrom.length)];
+        let pulsePool = machine.length > 0 ? machine : cardio;
+
+        // CAP-6 (C3), 13 Aug 2026. This reserved slot picked at random
+        // from its own pool and never consulted a single one of the
+        // preference rules in pickFrom() below -- not 'less', not
+        // adapted content, not continuity. It is why persona 2.15 kept
+        // opening sessions with Seated Arm Cycling even after the
+        // adaptive de-prioritisation went in: 16 non-adaptive
+        // cardio-warmup options existed and this path could not see them.
+        //
+        // The local `const pickFrom` also SHADOWED the function of the
+        // same name, so the bypass was invisible at the call site and
+        // read as though it were using it. Renamed to pulsePool.
+        //
+        // Logged, not fixed here: 'less' preferences are still ignored
+        // by this slot. Same root cause, wider blast radius than C3's
+        // file scope -- see the master schedule.
+        if (_capabilityUnrestricted()) {
+          const notAdapted = pulsePool.filter(e => e.adaptive !== true);
+          if (notAdapted.length > 0) pulsePool = notAdapted;
+        }
+
+        const chosenPulse = pulsePool[Math.floor(Math.random() * pulsePool.length)];
         selected.push(chosenPulse);
         chosen.add(chosenPulse.id);
         usedCategories.add("cardio-warmup");
@@ -1361,6 +1452,40 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       // has nothing else, never chosen while something else exists.
       const notLess = candidates.filter(e => prefs[e.id]?.preference !== "less");
       if (notLess.length > 0) candidates = notLess;
+
+      // ── CAP-6 (C3), 13 Aug 2026 ──────────────────────────────────────
+      // Adapted content is de-prioritised for somebody who does not need
+      // it. Same shape as the 'less' rule directly above, deliberately:
+      // available when a category has nothing else, never chosen while
+      // something else exists.
+      //
+      // THE GENERAL LESSON, because this is a class of bug and not one
+      // instance. The capability screen answers "what CAN this person
+      // do?" and every gate built on it subtracts. Nothing ever asked
+      // "what does this person NEED?" -- so an engine that only
+      // subtracts hands adapted work to everybody able to perform it.
+      // Seated arm cycling is not unsafe for a powerlifter. It is
+      // simply not for her, and receiving it nine times in three weeks
+      // is how somebody decides the app has not understood them.
+      //
+      // Traced 13 Aug, persona 2.15 (capability all yes, full rack,
+      // four sessions a week): Seated Arm Cycling x9, Seated Shoulder
+      // Rolls x6, Seated Punches x5 -- against Barbell Bench Press x5.
+      // Three of her last four sessions opened with shoulder rolls.
+      //
+      // EXCLUSION WOULD BE WRONG. A hard filter starves thin categories
+      // and would break the warm-up floor the CAP-4 work established.
+      // This is the same correction CON-8 made for equipment, in the
+      // opposite direction: a preference in selection, not a permission.
+      //
+      // Only applies when the capability screen was actually ANSWERED
+      // and cleared. Somebody who was never asked, or who reported any
+      // limitation, keeps the adapted pool at full weight -- silence is
+      // never read as capability.
+      if (_capabilityUnrestricted()) {
+        const notAdapted = candidates.filter(e => e.adaptive !== true);
+        if (notAdapted.length > 0) candidates = notAdapted;
+      }
 
       // Intent tilt, applied before continuity so that a maintenance user
       // builds familiarity WITH the capacities that matter to them rather
