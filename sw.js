@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v324
+ * E1, E2, E3, FIX-5. progress.js v6, in-step.js, empathy-transfer.js v4,
+ * session-builder.js v27, sport_conditioning.js. Nothing new to precache.
+ *
  * 13 Aug 2026 v323
  * C4 residuals, SEL-1, FIX-4. session-builder.js v26, gym.js, seated.js.
  * No new files to precache.
@@ -2315,7 +2319,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v323";
+const CACHE_NAME = "alongside-v324";
 
 const SHELL_URLS = [
 
