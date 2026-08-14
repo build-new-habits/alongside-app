@@ -1,5 +1,18 @@
 /**
  * data/exercises/rehabilitation.js
+ * 13 Aug 2026 v5
+ *
+ * v5 - C2. 61 of the 94 entries carry generalPurpose: true, approved by
+ *   Graeme 13 Aug 2026 (alongside_c2_triage_13aug2026_v1.md). Absent
+ *   means false, so a new entry stays condition-only until somebody
+ *   decides otherwise.
+ *
+ *   Three promoted entries renamed to drop a clinical suffix the name no
+ *   longer needs to carry -- `category` does the tagging. Bird Dog was
+ *   NOT promoted: stripping "— Core Rehab" collided with the existing
+ *   general `bird-dog` in strength.js, and that collision is the signal
+ *   that the entry is redundant for anybody without a condition.
+ *
  * 13 Aug 2026 v4
  *
  * v4 - C1. Three shared copy blocks rewritten across all 94
@@ -60,6 +73,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Clamshell — Glute Activation',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'clamshell - glute activation exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -112,6 +126,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Banded Clamshell',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'banded clamshell exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -152,6 +167,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Glute Bridge — Activation',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'glute bridge - activation exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -204,6 +220,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: true,
     name: 'Single-Leg Glute Bridge',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'single-leg glute bridge exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -255,6 +272,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Donkey Kick',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'donkey kick exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -295,6 +313,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Fire Hydrant',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'fire hydrant exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -335,6 +354,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Side-Lying Hip Abduction',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'side-lying hip abduction exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -375,6 +395,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Resistance Band Walk — Lateral',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'resistance band walk - lateral exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -415,6 +436,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Monster Walk',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'monster walk exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -455,6 +477,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Hip Thrust — Bodyweight',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'hip thrust - bodyweight exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -495,6 +518,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Glute Bridge March',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'glute bridge march exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -535,6 +559,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Step-Up — Glute Focus',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'step-up - glute focus exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -575,6 +600,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Reverse Lunge — Glute Focus',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'reverse lunge - glute focus exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -615,6 +641,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Standing Hip Abduction',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'standing hip abduction exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -656,6 +683,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Glute Squeeze — Isometric',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'glute squeeze - isometric exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -696,6 +724,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Prone Hip Extension',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'prone hip extension exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -783,6 +812,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Supine Hamstring Stretch',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'supine hamstring stretch exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -824,6 +854,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Active Straight Leg Raise',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'active straight leg raise exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -945,6 +976,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Nordic Curl — Assisted',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'nordic curl - assisted exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1064,7 +1096,8 @@ export const REHABILITATION = [
     position: 'standing',
     impact: false,
     balanceDemand: true,
-    name: 'Single-Leg Deadlift — Rehab',
+    name: 'Single-Leg Deadlift',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'single-leg deadlift - rehab exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1106,6 +1139,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Hamstring 90-90 Stretch',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'hamstring 90-90 stretch exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1187,6 +1221,7 @@ export const REHABILITATION = [
     impact: true,
     balanceDemand: false,
     name: 'Walking Lunge — Short Stride',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'walking lunge - short stride exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1227,6 +1262,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Copenhagen Adductor',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'copenhagen adductor exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1313,6 +1349,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Seated Calf Raise',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'seated calf raise exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1392,6 +1429,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: true,
     name: 'Single-Leg Calf Raise',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'single-leg calf raise exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1512,6 +1550,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Standing Calf Stretch — Wall',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'standing calf stretch - wall exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1552,6 +1591,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Soleus Stretch — Bent Knee',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'soleus stretch - bent knee exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1592,6 +1632,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Ankle Alphabet',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'ankle alphabet exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -1670,6 +1711,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Calf Foam Roll',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'calf foam roll exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1836,6 +1878,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Wall Squat Hold — Isometric',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'wall squat hold - isometric exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1876,6 +1919,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'IT Band Foam Roll',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'it band foam roll exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1916,6 +1960,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Lateral Quad and IT Band Stretch',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'lateral quad and it band stretch exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -1956,6 +2001,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'TFL and Hip Flexor Release',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'tfl and hip flexor release exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2076,6 +2122,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: true,
     name: 'Single-Leg Balance Hold',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'single-leg balance hold exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -2156,6 +2203,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: true,
     name: 'Y-Balance Reach',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'y-balance reach exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2242,6 +2290,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'External Rotation — Band',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'external rotation - band exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2281,6 +2330,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Internal Rotation — Band',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'internal rotation - band exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2320,6 +2370,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Wall Slide',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'wall slide exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2360,6 +2411,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Shoulder CARs',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'shoulder cars exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -2400,6 +2452,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Prone Y-T-W',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'prone y-t-w exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2440,6 +2493,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Scapular Press-Up',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'scapular press-up exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -2480,6 +2534,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Doorway Chest Stretch',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'doorway chest stretch exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2520,6 +2575,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Wrist CARs',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'wrist cars exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -2559,6 +2615,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Wrist Extension Stretch',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'wrist extension stretch exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2599,6 +2656,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Forearm Pronation and Supination',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'forearm pronation and supination exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2639,6 +2697,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Grip Strengthening — Towel Squeeze',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'grip strengthening - towel squeeze exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2686,6 +2745,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Pelvic Tilt',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'pelvic tilt exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2738,6 +2798,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Diaphragmatic Breathing — Core Activation',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'diaphragmatic breathing - core activation exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2790,6 +2851,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Dead Bug — Progression 1',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'dead bug - progression 1 exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2841,6 +2903,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Dead Bug — Progression 2',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'dead bug - progression 2 exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2881,6 +2944,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Dead Bug — Progression 3',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'dead bug - progression 3 exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -2932,6 +2996,13 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Bird Dog — Core Rehab',
+    // NOT generalPurpose. Caught by the rename: stripping "— Core Rehab"
+    // collided with the existing general `bird-dog` in strength.js, which
+    // is the signal that this entry is redundant for anybody without a
+    // condition. Two identically-named exercises in one selection pool is
+    // its own bug. Keeps the clinical name, because here the name is
+    // doing real work.
+    
     youtube: 'bird dog - core rehab exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -3065,6 +3136,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Seated Lumbar Rotation',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'seated lumbar rotation exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -3106,6 +3178,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'QL Stretch — Side Bend',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'ql stretch - side bend exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -3147,6 +3220,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'McGill Curl-Up',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'mcgill curl-up exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -3198,6 +3272,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Side Plank — Modified',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'side plank - modified exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -3505,6 +3580,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Shoulder Packing',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'shoulder packing exercise technique',
     category: 'rehabilitation',
     contentType: 'activation',
@@ -3545,6 +3621,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: true,
     name: 'Hip Stability in Standing',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'hip stability in standing exercise technique',
     category: 'rehabilitation',
     contentType: 'rehabilitation',
@@ -3629,6 +3706,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Y-T-W Exercise',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'y-t-w exercise technique',
     category: 'rehabilitation',
     contentType: 'exercise',
@@ -3789,6 +3867,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Hip Flexor Strengthening',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'hip flexor strengthening exercise technique',
     category: 'rehabilitation',
     contentType: 'exercise',
@@ -3828,6 +3907,7 @@ export const REHABILITATION = [
     impact: false,
     balanceDemand: false,
     name: 'Lateral Hip Strengthening Progression',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'lateral hip strengthening progression exercise technique',
     category: 'rehabilitation',
     contentType: 'exercise',
@@ -3868,7 +3948,8 @@ export const REHABILITATION = [
     position: 'floor',
     impact: false,
     balanceDemand: false,
-    name: 'Thoracic Mobility — Rehabilitation',
+    name: 'Thoracic Mobility',
+    generalPurpose: true,   // C2, approved 13 Aug 2026
     youtube: 'thoracic mobility - rehabilitation exercise technique',
     category: 'rehabilitation',
     contentType: 'exercise',

@@ -1,6 +1,20 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 13 Aug 2026 v25
+ *
+ * v25 - C2 + sourceLibrary. The rehabilitation library no longer reaches
+ *   people with no declared condition; condition work is delivered by
+ *   conditionProgrammes.js, which this filter does not touch.
+ *
+ *   AND THE TRAP IT EXPOSED. The first version of this filter tested
+ *   `ex.category === "rehabilitation"`. It ran on every candidate and
+ *   excluded NOTHING, because matched.push() overwrites `category` with
+ *   the SESSION category ("squat-pattern") before any filter sees it.
+ *   It read as correct and did nothing at all. `sourceLibrary` now
+ *   preserves the entry's own library. Any future filter reading
+ *   ex.category inside _filterCandidates has the same bug waiting.
+ *
  * 13 Aug 2026 v24
  *
  * v24 - CAP-6 (C3). Adapted content is de-prioritised for people who do
@@ -825,7 +839,18 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
       // Tag the entry with the category and section it was selected FOR, so
       // the selection loops below can still reason about variety across
       // categories. Non-destructive -- the database entry is not mutated.
-      matched.push({ ...ex, category, section });
+      // C2, 13 Aug 2026. `category` here is the SESSION category the
+      // exercise was selected for ("squat-pattern"), and it overwrites
+      // the entry's own library category ("rehabilitation"). That
+      // overwrite is deliberate and load-bearing for variety, but it
+      // means any later filter reading ex.category sees the wrong thing
+      // -- the first C2 filter was written that way, ran on every
+      // candidate, and excluded nothing at all while reading as correct.
+      //
+      // sourceLibrary preserves the original. Named for what it is
+      // rather than "originalCategory", so nobody assumes it is
+      // interchangeable with the reassigned field.
+      matched.push({ ...ex, sourceLibrary: ex.category, category, section });
     }
   }
 
@@ -1008,6 +1033,32 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   const useCeilingOnWarmup = warmupPool !== null && warmupPool.length > 0;
 
   return matched.filter(ex => {
+    // ── C2, 13 Aug 2026 ──────────────────────────────────────────────
+    // The rehabilitation library is not general content and was never
+    // meant to be. Nothing here read `category`, so every rehab entry
+    // tagged movementPattern 'squat' was a valid squat candidate for
+    // anybody: 30 of 186 Full Body main candidates (16%) and 31 of 108
+    // warm-up candidates (29%). Persona 2.12 -- 33, desk job, no injury,
+    // male -- was served "Squat with Pelvic Floor Awareness" four times
+    // in seven sessions, and read coaching copy telling him to check
+    // with whoever was treating him. Nobody was treating him.
+    //
+    // A blanket exclusion would over-correct: clamshells, glute bridges,
+    // dead bugs, doorway chest stretches and calf stretches all live in
+    // this file and are ordinary training. So all 94 were triaged
+    // individually and 61 carry generalPurpose: true (approved by
+    // Graeme, 13 Aug 2026 -- see alongside_c2_triage_13aug2026_v1.md).
+    //
+    // ABSENT MEANS FALSE, deliberately. A new rehabilitation entry stays
+    // condition-only until somebody decides otherwise, which is the
+    // right direction to be wrong in.
+    //
+    // Condition-specific work is NOT lost by this: it is delivered
+    // through conditionProgrammes.js, which selects on the declared
+    // condition and its phase. This filter governs the GENERAL session
+    // pool only.
+    if (ex.sourceLibrary === "rehabilitation" && ex.generalPurpose !== true) return false;
+
     // EXERCISE PREFERENCES (11 Aug 2026). conditionProgrammes.js has
     // honoured these since 04 Aug; this file never has, so telling the
     // coach you were not a fan of something changed your prescribed
