@@ -61,9 +61,24 @@ for (const [f, label] of [["js/views/today.js", "Home"], ["js/views/progress.js"
   check(`${label} counts completions only`, () => {
     const s = fs.readFileSync(f, "utf8");
     ok(/store\.completedSessions\(/.test(s), "still counting raw activityLog");
-    const raw = (s.match(/store\.get\('activityLog'\)/g) || []).length;
-    const via = (s.match(/store\.completedSessions\(store\.get\('activityLog'\)\)/g) || []).length;
-    ok(via >= 2, `only ${via} of ${raw + via} reads go through the shared rule`);
+    // E2, 13 Aug 2026. This was `ok(via >= 2, ...)` -- a FLOOR, asserting
+    // that at least two reads were compliant rather than that all were.
+    // progress.js had three reads, two compliant, and the gate stayed
+    // green while the export quietly counted partials for weeks. A
+    // threshold gate cannot detect the case it exists for.
+    //
+    // Now: the number of raw reads NOT wrapped in completedSessions()
+    // must be zero. Comments stripped first, because this file's own
+    // change notes quote the pattern they warn about.
+    const src = s.replace(/\/\*[\s\S]*?\*\//g, "")
+                 .replace(/^\s*\/\/[^\n]*$/gm, "");
+    const total = (src.match(/store\.get\('activityLog'\)/g) || []).length;
+    const via   = (src.match(/store\.completedSessions\(store\.get\('activityLog'\)\)/g) || []).length;
+    ok(via >= 1, "no read goes through the shared rule at all");
+    ok(total === via,
+       `${total - via} of ${total} activityLog reads bypass store.completedSessions(). ` +
+       "Every count a person can see -- on screen OR in an export they hand to a " +
+       "clinician -- must come from one rule");
   });
 check("Home and Progress agree by construction", () => {
   const a = fs.readFileSync("js/views/today.js", "utf8");

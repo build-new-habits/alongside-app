@@ -1,6 +1,17 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 13 Aug 2026 v27
+ *
+ * v27 - FIX-5. Sport-conditioning content (sled sprints, agility
+ *   ladders, reactive change of direction) joins the gym-session
+ *   de-prioritisation, tagged discipline: 'sport' at source. It reached
+ *   persona 2.15's Lower Body session as category 'cardio',
+ *   movementPattern 'locomotion' -- a correct description of a sled
+ *   sprint and no help in deciding whether it belongs in a barbell
+ *   session. Preference, not exclusion: personas 2.3 and 2.9 exist and
+ *   this is exactly their content.
+ *
  * 13 Aug 2026 v26
  *
  * v26 - C4 residuals + SEL-1 + FIX-4.
@@ -849,6 +860,20 @@ function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
 const CROSS_DISCIPLINE  = new Set(["yoga-pose", "pilates-move"]);
 const GYM_SESSION_TYPES = new Set(["lower", "upper", "full", "core", "glute"]);
 
+// FIX-5, 13 Aug 2026. Sport-conditioning content -- sled sprints,
+// agility ladders, reactive change of direction -- is tagged
+// discipline: 'sport' and joins the same de-prioritisation. It reached
+// persona 2.15's gym Lower Body session as category 'cardio',
+// movementPattern 'locomotion', which is a correct description of a
+// sled sprint and no help at all in deciding whether it belongs.
+//
+// One helper rather than two checks at four call sites: the pulse slot
+// and pickFrom must agree, and two lists that must agree is how they
+// stop agreeing.
+function _offDisciplineForGym(ex) {
+  return CROSS_DISCIPLINE.has(ex.movementPattern) || ex.discipline === "sport";
+}
+
 /**
  * CAP-6 (C3), 13 Aug 2026. One definition, used by both _filterCandidates
  * and pickFrom. See js/data/exercises/seated.js's header for the full
@@ -1433,8 +1458,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
         // below, and this slot runs first. The temporal-dead-zone error
         // it caused was invisible in review and immediate at runtime.
         if (GYM_SESSION_TYPES.has(sessionType)) {
-          const onDiscipline = pulsePool.filter(
-            e => !CROSS_DISCIPLINE.has(e.movementPattern));
+          const onDiscipline = pulsePool.filter(e => !_offDisciplineForGym(e));
           if (onDiscipline.length > 0) pulsePool = onDiscipline;
         }
 
@@ -1634,8 +1658,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       // a gym-shaped session. They remain reachable when nothing else
       // fits the slot.
       if (wantsGymDiscipline) {
-        const onDiscipline = candidates.filter(
-          e => !CROSS_DISCIPLINE.has(e.movementPattern));
+        const onDiscipline = candidates.filter(e => !_offDisciplineForGym(e));
         if (onDiscipline.length > 0) candidates = onDiscipline;
       }
 
