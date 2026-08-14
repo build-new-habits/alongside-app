@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v335
+ * Documentation only -- master schedule v190, Schema.md v1.33,
+ * exercise_entry_standard.md v3. No application files changed.
+ *
  * 13 Aug 2026 v334
  * C1b complete. rehabilitation.js v9 -- all 94 entries individually
  * written and re-rated.
@@ -2360,7 +2364,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v334";
+const CACHE_NAME = "alongside-v335";
 
 const SHELL_URLS = [
 
