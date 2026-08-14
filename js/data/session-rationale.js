@@ -1,5 +1,12 @@
 /**
  * data/session-rationale.js
+' * 13 Aug 2026 v3
+ *
+ * v3 - VOICE-3 / D2. buildRationale() now returns a fourth field,
+ *   `read` - the Personal-tier observation across time. Null for free
+ *   users, and null when no signal genuinely holds, so silence means
+ *   there was nothing true to say rather than nothing written.
+ *
  * 13 Aug 2026 v2
  *
  * v2 - VOICE-2. Warm-up and cool-down purpose become rotating pools of
@@ -53,6 +60,7 @@
  */
 
 import { store } from "../store.js";
+import { buildReads } from "./personal-reads.js";
 
 // ── Goal language ────────────────────────────────────────────────────────
 //
@@ -129,6 +137,21 @@ const SECTION_PURPOSE_POOLS = {
  * random cannot promise that. Indexed on completed sessions so partials
  * do not advance it, matching COUNT-1 everywhere else.
  */
+/**
+ * The Personal read. Rotation across eligible reads rather than always
+ * the first: with two signals both holding, taking index 0 every time
+ * means the second line is written and never seen. That is the exact
+ * fault empathy-transfer.js's comments were written about, and it cost
+ * a 140-session simulation to find there.
+ */
+function _read(exercises) {
+  const tier = store.get("tier") || "free";
+  if (tier === "free") return null;
+  const eligible = buildReads(exercises);
+  if (!eligible.length) return null;
+  return eligible[_rotation() % eligible.length].text;
+}
+
 function _rotation() {
   try {
     return store.completedSessions(store.get("activityLog") || []).length;
@@ -190,11 +213,11 @@ const _full  = p => PATTERN_PURPOSE[p]?.full  || null;
  * @param {Object} [opts]
  * @param {string} [opts.excludedReason] — coach-voice line explaining a
  *        deliberate omission, e.g. the pulse-raiser rule's reason
- * @returns {{ opening:string, sections:Object, arc:string|null }}
+ * @returns {{ opening:string, sections:Object, arc:string|null, read:string|null }}
  */
 export function buildRationale(session, opts = {}) {
   const exercises = session?.exercises || [];
-  if (exercises.length === 0) return { opening: "", sections: {}, arc: null };
+  if (exercises.length === 0) return { opening: "", sections: {}, arc: null, read: null };
 
   const intent = store.get("trainingIntent") || "improve";
   const goals  = store.get("goals") || [];
@@ -202,7 +225,14 @@ export function buildRationale(session, opts = {}) {
   return {
     opening:  _opening(exercises, intent, goals, opts.excludedReason),
     sections: _sections(exercises, _rotation()),
-    arc:      _arc(exercises, intent, goals)
+    arc:      _arc(exercises, intent, goals),
+
+    // D2 / VOICE-3, 13 Aug 2026. The Personal-only observation across
+    // time. Null for free users and null when no signal genuinely
+    // holds -- buildReads() returns only lines whose data is present,
+    // so silence here means there was nothing true to say rather than
+    // nothing written.
+    read:     _read(exercises)
   };
 }
 
