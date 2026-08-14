@@ -1,47 +1,8 @@
 # Alongside: Move — Master Schedule
-## 13 Aug 2026 v191
+## 13 Aug 2026 v190
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_13aug2026_v190.md`. Remove v190 on upload.
-
-> ### 🟢 WAVE-2 VERIFICATION TRACE — six personas. `alongside-v339`. 37 gates green.
->
-> Six people played forward three weeks each through the real engine: **2.12, 2.15, 2.10, 2.11, 2.13, 2.14**. Two to verify the day's fixes, four never traced before.
->
-> #### The fixes landed
->
-> | | Before | After |
-> |---|---|---|
-> | **2.12 Danny** | Pelvic-floor squat ×4, Nordic curl in session one | Zero rehab content. Hardest difficulty **2** — exactly his ceiling |
-> | **2.15 Priya** | No squat, no deadlift, seated arm cycling ×9 | **Barbell Back Squat in 8 of 9 sessions.** One seated item in three weeks |
-> | **Coach voice** | One sentence forever | **8 distinct opening lines in 9 sessions**, all six personas |
->
-> **A matrix gap open since 05 Jul is closed.** 2.13 (ADHD, novelty) got 42 distinct exercises, most-repeated ×5. 2.14 (autistic, predictability) got 31 distinct, most-repeated ×9. Same engine, opposite shapes, both coherent. The matrix called this *"a real design tension, not just a missing field"*.
->
-> #### Three findings, all the same shape
->
-> **One capability answer being read as a wider limitation than the person gave.**
->
-> - **CAP-6b** — `impactSafe` was in `_capabilityUnrestricted()`. Persona 2.12 answered "no" to both feet leaving the ground — a statement about **impact** — and received **fourteen** seated items in nine sessions. Now one. Mine, from that morning.
-> - **CAP-7** — `needsSeated` fired on `floorAccess === 'no'` and restricts to seated-only. Persona 2.11 was **confined to a chair by an answer about the floor**. Her main pool: 157 raw → 87 → 62 → 56 → 14 → **7**. Nine sessions from seven exercises. 15 distinct became 29.
-> - **ORIENT-1** — `_buildCoachLine()` needed history for every branch, so a new user got **nothing** on a screen led by three workout doors. Nothing on Home had ever read `goals`. Persona 2.11's gap since 05 Jul — *"is the Noticing Hub a genuine front door"* — answered: **it was not.**
->
-> **ORIENT-1 was deliberately not fixed by reordering the doors.** That would have fixed 2.11 by breaking 2.14, for whom a Home screen that rearranges itself is precisely aversive. The grid is fixed for everybody and the coach speaks instead. `verify-tier.mjs` now asserts `HOME_DOORS` is never sorted by preference, so the fix cannot later be "improved" into the thing that breaks her.
->
-> #### SEATED-GAP — content, not code
->
-> The seated-dependent user got 12 distinct exercises in nine sessions against 33 for an able-bodied beginner. Diagnosed per category: hip-hinge 0, horizontal-pull 0, hip-flexor-stretch 0, spinal-decompression 0. Six entries added, all needing nothing but a chair. **12 → 16.** Not parity, and further gain is more content rather than more code.
->
-> **loaded-carry, balance-work and power remain 0 and are deliberately not filled.** Genuinely unavailable seated; token versions to make a number rise would be worse than an honest gap.
->
-> #### 🟠 Still open, and all Graeme's
->
-> - **Cauda equina line** — applied; confirm, or have the safeguarding reviewers see it first
-> - **Dose-tier architecture** — the clinician's proposal to decouple movement skill from tissue load
-> - **P6, P10, P11** — three approved Personal reads withheld. P11 needs destinations
-> - **HMRC · three safeguarding reviewers · ICO**
-> - **Supabase → Stripe** — two deep, not three
-> - **Four of the six personas have only had their SESSIONS traced.** Home, check-in, Progress, Wellbeing and upgrade are untraced for 2.10, 2.11, 2.13, 2.14. Both fully-traced personas surfaced most of their findings *outside* the session engine. `alongside_persona_trace_brief_wave2_13aug2026_v1.md` exists for this and is deliberately unleading.
+Supersedes `master_schedule_13aug2026_v189.md`. Remove v189 on upload.
 
 > ### 🟢 13 AUG, FULL DAY CLOSED. `alongside-v334`. 37 gates green on a fresh clone.
 >
