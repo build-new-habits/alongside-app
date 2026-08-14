@@ -1,7 +1,12 @@
 /**
  * js/data/onboarding-thread-data.js
- * 29 Jun 2026 v4
+ * 14 Aug 2026 v5
  *
+ * v5 - W2-4. Step 8 comment corrected: conditions store IDs, not names.
+ *   Comment only, no behaviour change.
+ *
+ * 29 Jun 2026 v4
+  *
  * v4 — generateSummary('equipment', ...) corrected to match what
  *   equipment.js (confirmed against real source) actually writes — no
  *   facility name is ever stored, only the combined equipment[] list.
@@ -494,7 +499,9 @@ export function generateSummary(type, value, storeData) {
     }
 
     case 'conditions': {
-      // value: string[] of condition names (human-readable, from conditions.js)
+      // value: string[] of condition IDs (e.g. 'lower-back'), from conditions.js.
+      // W2-4, 14 Aug 2026: this said "names (human-readable)". It does not --
+      // views/onboarding/conditions.js writes c.id. Comment was wrong, code right.
       if (!value || value.length === 0) return 'Nothing to flag.';
       if (value.length === 1) return value[0];
       if (value.length === 2) return value.join(', ');

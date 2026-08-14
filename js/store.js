@@ -1,5 +1,10 @@
 /**
  * store.js - Data persistence layer
+ * 14 Aug 2026 v42
+ *
+ * v42 - W2-3. activityLevel comment corrected to include 'returning'.
+ *   Comment only, no behaviour change. Rebased onto v41 (CAP-7).
+ *
  * 13 Aug 2026 v41
  *
  * v41 - CAP-7. floorAccess removed from needsSeated. Not being able to
@@ -1073,7 +1078,12 @@ export const store = {
 
       // ── LIFESTYLE ────────────────────────────────────────────
       lifestyle: {
-        activityLevel:   null,  // sedentary|light|moderate|active|very-active
+        activityLevel:   null,  // sedentary|light|returning|moderate|active|very-active
+                                // W2-3, 14 Aug 2026: 'returning' was missing here.
+                                // ACTIVITY_CHIPS has written it since 11 Aug and all
+                                // three readers handle it (filterByFitnessLevel 6,
+                                // DIFFICULTY_CEILINGS 3, LOW_IMPACT_ONLY gated).
+                                // Comment was stale, not the code.
         stressLevel:     null,  // low|moderate|high|very-high
         sleepQuality:    null,  // poor|okay|good
         exerciseHistory: null,  // 'never'|'lapsed'|'returning'|'active'

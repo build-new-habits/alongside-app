@@ -1,6 +1,13 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 14 Aug 2026 v31
+ *
+ * v31 - W2-1. The difficulty ceiling now applies to cooldown as well as
+ *   main and warmup, with the same relax-if-empty protection. Persona
+ *   trace Wave 2. Rebased onto v30 (CAP-6b) -- different region of the
+ *   file, no interaction with _capabilityUnrestricted().
+ *
  * 13 Aug 2026 v30
  *
  * v30 - CAP-6b. impactSafe removed from _capabilityUnrestricted().
@@ -1258,6 +1265,26 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   const warmupPool = section === "warmup" ? matched.filter(withinCeiling) : null;
   const useCeilingOnWarmup = warmupPool !== null && warmupPool.length > 0;
 
+  // ── W2-1 (14 Aug 2026, persona trace Wave 2) ──────────────────────────
+  //
+  // Cooldown was exempt from the ceiling on the reasoning that "a stretch
+  // has no meaningful difficulty ceiling." True while cooldowns came from
+  // a curated stretch pool. It stopped being true at CON-6, when every
+  // section began drawing from the shared database.
+  //
+  // Traced live: a sedentary user (ceiling 2) was offered Tree Pose,
+  // Chair Pose, Half Moon, Boat Pose and WARRIOR III in cooldown -- the
+  // same pose, and the same fall risk, that caused the ceiling to be
+  // extended to warmup for persona 2.11 on 11 Aug. That fix closed main
+  // and warmup and left the third door open. Reproduced on HEAD f107cfc.
+  //
+  // Third instance of one pattern: a filter correct against a curated
+  // pool, left in place after the pool became the whole database.
+  //
+  // Protected by relaxing rather than exempting, exactly as warmup is.
+  const cooldownPool = section === "cooldown" ? matched.filter(withinCeiling) : null;
+  const useCeilingOnCooldown = cooldownPool !== null && cooldownPool.length > 0;
+
   return matched.filter(ex => {
     // ── C2, 13 Aug 2026 ──────────────────────────────────────────────
     // The rehabilitation library is not general content and was never
@@ -1356,6 +1383,8 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
     if (cap.asked && !cap.legsLoadable && _loadsLegs(ex)) return false;
     if (section === "main" && !withinCeiling(ex)) return false;
     if (section === "warmup" && useCeilingOnWarmup && !withinCeiling(ex)) return false;
+    // W2-1. See the cooldown pool note above.
+    if (section === "cooldown" && useCeilingOnCooldown && !withinCeiling(ex)) return false;
     // Equipment check: exercise needs no equipment, or user has it.
     // CON-2: equipSet is now a resolved capability set, not the raw ticks.
     if (!exerciseIsAvailable(ex, equipSet)) return false;
