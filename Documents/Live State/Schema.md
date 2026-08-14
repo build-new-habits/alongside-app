@@ -1,7 +1,7 @@
 # Alongside — Data Schema Reference
 ## 13 Aug 2026 v1.33
 
-**File:** `js/store.js` (confirmed live version: **v40, 13 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v41, 13 Aug 2026**)
 **Storage:** `localStorage` key `alongside_user`
 
 **This version supersedes:** v1.30 (12 Aug 2026).
