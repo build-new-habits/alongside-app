@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v325
+ * VOICE-2. session-builder.js v28, session-rationale.js v2,
+ * empathy-transfer.js v5. 108 approved coach lines. Nothing new to precache.
+ *
  * 13 Aug 2026 v324
  * E1, E2, E3, FIX-5. progress.js v6, in-step.js, empathy-transfer.js v4,
  * session-builder.js v27, sport_conditioning.js. Nothing new to precache.
@@ -2319,7 +2323,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v324";
+const CACHE_NAME = "alongside-v325";
 
 const SHELL_URLS = [
 
