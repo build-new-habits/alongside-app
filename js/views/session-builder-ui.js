@@ -1,6 +1,17 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 13 Aug 2026 v9
+ *
+ * v9 - D3. The allocation preset persists. It was module state reset to
+ *   "balanced" on every mount, so persona 2.15 -- four gym sessions a
+ *   week, wants "Mostly strength" every time -- re-picked it from
+ *   scratch at every session. Seeded from store.sessionPreset and
+ *   written back on choice. The reset path returns to the SAVED preset,
+ *   not to balanced: resetting a remembered preference to a default is
+ *   the same bug in a second place, and would have left the store write
+ *   looking correct while behaviour stayed unchanged.
+ *
  * 13 Aug 2026 v8
  *
  * v8 - TIER-B. The silent downgrade at the preselect path is removed.
@@ -131,6 +142,16 @@ import { store }                          from "../store.js";
 import { router }                         from "../router.js";
 import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection } from "../session-builder.js";
 import { isPremium, lockedFeature }        from "../auth.js";
+
+/**
+ * The person's saved allocation preset, validated against the live
+ * preset list rather than a hardcoded array -- a preset removed from
+ * ALLOCATION_PRESETS must not leave somebody stuck on a dead id.
+ */
+function _savedPreset() {
+  const saved = store.get("sessionPreset");
+  return ALLOCATION_PRESETS.some(p => p.id === saved) ? saved : "balanced";
+}
 import { resolveEquipment }               from "../data/equipment-map.js";
 
 export const centered = false;
@@ -157,7 +178,13 @@ let phase             = "type";      // "type" | "location" | "duration" | "equi
 let selectedType      = null;
 let selectedLocation  = "home";      // "home" | "gym" -- never sticky, reset on resetState()
 let selectedDuration  = null;
-let selectedPreset    = "balanced";
+// D3, 13 Aug 2026. Seeded from the store rather than hardcoded, and
+// written back on every choice. Persona 2.15 trains four times a week
+// and wants "Mostly strength" every time; she was re-picking it from
+// scratch at every session, because this was module state reset on
+// every mount. Remembering it is not a feature, it is the absence of
+// an irritation.
+let selectedPreset    = _savedPreset();
 let buildMode         = null;        // "coach" | "recommend" | "own"
 let candidatePools    = null;
 let selectedCandidateIds = new Set();
@@ -859,7 +886,11 @@ function resetState() {
   selectedType         = null;
   selectedLocation      = "home";
   selectedDuration      = null;
-  selectedPreset        = "balanced";
+  // D3: the reset returns to the person's SAVED preset, not to
+  // "balanced". Resetting a remembered preference to a default is the
+  // same bug in a different place -- it would have made the store write
+  // look correct while the behaviour stayed unchanged.
+  selectedPreset        = _savedPreset();
   buildMode             = null;
   candidatePools        = null;
   selectedCandidateIds  = new Set();
@@ -1013,6 +1044,9 @@ export function onMount() {
   document.querySelectorAll(".sb-preset-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedPreset = btn.dataset.preset;
+      // Written immediately, not on session start: somebody who changes
+      // their mind and backs out has still told us something true.
+      store.set("sessionPreset", selectedPreset);
       rerender();
     });
   });
