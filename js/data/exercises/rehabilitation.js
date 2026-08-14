@@ -1,5 +1,41 @@
 /**
  * data/exercises/rehabilitation.js
+ * 13 Aug 2026 v7
+ *
+ * v7 - CLINICAL REVIEW. The twelve entries I flagged as beyond my
+ *   competence were reviewed by a clinician (13 Aug 2026, via Graeme).
+ *   Their wording and thresholds, condensed to this file's format.
+ *
+ *   THREE THINGS I HAD WRONG AND WOULD HAVE SHIPPED:
+ *
+ *   1. Achilles heel drops. Where the pain SITS changes the exercise.
+ *      Insertional pain (on the heel bone) versus mid-portion (2-6cm up
+ *      the tendon): dropping below step level compresses the insertion
+ *      and makes it worse. My draft told everybody to drop below the
+ *      step. Now: flat ground if the pain is on the bone.
+ *
+ *   2. Neural flossing dose. 30 reps is too high for an irritated nerve
+ *      root -- nerve tissue has a low provocation threshold. Corrected
+ *      to 10-12 across all three flossing entries. Note the database
+ *      already disagreed with itself: a near-duplicate entry said 10.
+ *      The 30 was the outlier and nobody had noticed.
+ *
+ *   3. Pelvic floor. The clinician named hypertonicity as the thing
+ *      that matters -- for an overactive pelvic floor, MORE contraction
+ *      makes symptoms worse. Quick flicks specifically should not be
+ *      attempted before full release is comfortable. I had written
+ *      nothing here, which was the right call.
+ *
+ *   Difficulty ratings follow their recommendation to rate the MOVEMENT
+ *   and handle dose separately: single-leg eccentric heel drop 3,
+ *   step-down 4. See the master schedule for the dose-tier proposal,
+ *   which is an architecture decision and not applied here.
+ *
+ *   NOT APPLIED, pending Graeme: the cauda equina red flag (sudden
+ *   bowel or bladder change, saddle numbness) on McKenzie Press-Up.
+ *   That is emergency-medical language and the Crisis & Safeguarding
+ *   Policy governing it is not signed off.
+ *
  * 13 Aug 2026 v6
  *
  * v6 - C1b batches 1 and 2. Hamstrings (15) and glutes (17) rewritten
@@ -1200,7 +1236,7 @@ export const REHABILITATION = [
       'At the same time, look up and extend your neck slightly',
       'Hold for just 1 second — this is not a held stretch',
       'Bend the knee back down and drop your chin',
-      'Repeat this alternating movement rhythmically for 30 reps, then switch sides'
+      'Repeat this alternating movement rhythmically for 10 to 12 slow reps, then switch sides'
     ],
     coaching: 'This is a neural mobilisation, not a muscle stretch. The rhythmic movement flushes the sciatic nerve — it should feel releasing, not painful.',
     why: 'Hamstring tightness is often partly neural, not just muscular. Neural flossing addresses both and is particularly useful when the hamstring feels tight but not torn.',
@@ -1395,7 +1431,7 @@ export const REHABILITATION = [
     affectsAreas: ['calves', 'achilles'],
     contraindications: ['calves-acute', 'achilles-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1409,10 +1445,10 @@ export const REHABILITATION = [
     coaching: 'The lowering phase is the entire point. Rising on two feet is just resetting — all the work is in the slow single-leg descent.',
     why: 'Eccentric heel drops are the most evidence-backed treatment for Achilles tendinopathy. The slow lengthening under load remodels and strengthens the tendon.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are rising back up on the working side, use both feet. Only the lowering is the exercise",
+      "If the pain sits right on the heel bone rather than a few centimetres up the tendon, do the drops from flat ground instead of off a step",
+      "Some discomfort during this is expected. Up to about 3 or 4 out of 10 is fine if it settles quickly afterwards",
+      "Judge it by the next morning: if it is worse than usual, halve the sets next time rather than stopping altogether"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -1476,7 +1512,7 @@ export const REHABILITATION = [
     affectsAreas: ['achilles', 'calves'],
     contraindications: ['achilles-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1490,10 +1526,10 @@ export const REHABILITATION = [
     coaching: 'Some mild discomfort is expected during Achilles rehab. Sharp pain means stop. Mild ache during and after is normal at this stage.',
     why: 'The straight-knee version targets the gastrocnemius — the larger, outer calf muscle that attaches directly to the Achilles tendon.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are pushing back up on the painful side, use the other foot. Only the lowering is the exercise",
+      "If the pain sits right on the heel bone rather than a few centimetres up the tendon, do the drops from flat ground instead of off a step — dropping below the step compresses that spot and makes it worse",
+      "Some discomfort during this is expected. Up to about 3 or 4 out of 10 is fine if it settles quickly afterwards",
+      "Judge it by the next morning: if stiffness or pain is worse than usual, halve the sets next time. Stop for a sudden sharp snap, swelling, a marked limp, or pain climbing above 5 out of 10"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -1516,7 +1552,7 @@ export const REHABILITATION = [
     affectsAreas: ['achilles', 'calves'],
     contraindications: ['achilles-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1530,10 +1566,10 @@ export const REHABILITATION = [
     coaching: 'Do both the straight and bent-knee versions — they target different parts of the calf and both connect to the Achilles.',
     why: 'The bent-knee version targets the soleus — the deeper calf muscle whose tendon blends into the Achilles. Essential for complete Achilles rehabilitation.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are pushing back up on the painful side, use the other foot. Only the lowering is the exercise",
+      "If your knee straightens as you lower, you have switched to the other calf muscle. Hold the 30 degree bend throughout",
+      "If the pain sits right on the heel bone rather than a few centimetres up the tendon, do the drops from flat ground instead of off a step",
+      "Judge it by the next morning: if stiffness or pain is worse than usual, halve the sets next time. Stop for a sudden sharp snap, swelling, a marked limp, or pain climbing above 5 out of 10"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -1844,7 +1880,7 @@ export const REHABILITATION = [
     affectsAreas: ['quadriceps', 'knee', 'glutes'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 4,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1858,10 +1894,10 @@ export const REHABILITATION = [
     coaching: 'Watch your knee in a mirror if possible. It should track straight — not collapsing inward. Slowing down helps keep it honest.',
     why: 'Eccentric step-downs are a benchmark test and treatment for knee pain. The slow lowering builds quad and glute control under load.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your knee caves inward as you lower, slow down and keep it tracking over your second toe. Lower the step if it still caves",
+      "If you are dropping rather than lowering, count four seconds down. The slow lowering is the entire exercise",
+      "If you fully weight the floor at the bottom, you have gone too far. Touch lightly and come straight back up",
+      "Hold a wall or rail if you are wobbling — balance is not what this trains"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
@@ -2088,7 +2124,7 @@ export const REHABILITATION = [
     affectsAreas: ['shin-splints', 'calves'],
     contraindications: ['shin-splints-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2102,10 +2138,10 @@ export const REHABILITATION = [
     coaching: 'This is a progression — only start it once the tibialis raise is pain-free. Do not push through sharp shin pain.',
     why: 'Balances strength between the calf and tibialis anterior — the imbalance between these two muscles is a primary cause of shin splints.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are rushing the two halves together, separate them: two counts up onto the toes, then a deliberate shift and pull the toes up",
+      "If your shins ache during rather than working, shorten the range at the toe-raise end",
+      "If you have done these two days running, leave 48 hours. The gap is part of the method, not a rest day you have earned",
+      "Stop for a sharp, localised, point-tender spot on the bone rather than a spread-out ache along the shin, and get it looked at"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -3061,7 +3097,7 @@ export const REHABILITATION = [
     affectsAreas: ['lower-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 2,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -3075,10 +3111,10 @@ export const REHABILITATION = [
     coaching: 'This is a directional exercise — it helps some back conditions and not others. If it increases leg pain or makes symptoms worse, stop and see a physio.',
     why: 'McKenzie extension reduces disc pressure and is one of the most evidence-backed treatments for discogenic lower back pain and sciatica.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your hips peel off the floor, or your back muscles grip instead of your arms pressing, keep your pelvis heavy and relaxed and press only through your palms",
+      "Even a few inches is fine. Height is not the point",
+      "If back stiffness eases, or pain moves out of your leg and retreats up into your low back, carry on at that comfortable range",
+      "Stop if pain, numbness or tingling travels further down your buttock, thigh or leg, and get it assessed"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -3111,15 +3147,15 @@ export const REHABILITATION = [
       'Hold for just 1 second — this is not a held stretch',
       'Bend the knee back and drop your chin to your chest',
       'Repeat rhythmically — the movement is like a slow pump',
-      'Complete 30 reps each side'
+      'Complete 10 to 12 slow reps each side'
     ],
     coaching: 'Neural flossing should never cause sharp pain down the leg. A gentle pulling sensation is expected. If it causes sharp pain, stop.',
     why: 'Mobilises the sciatic nerve by creating a pumping action that reduces inflammation and adhesions along the nerve path.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are pulling into a sustained hamstring stretch, ease off. This is a slow, smooth glide and never a stretch",
+      "As your knee straightens, look up at the ceiling at the same time; as it bends, drop your chin. Keep the range small and completely pain-free",
+      "If you are moving quickly, slow right down. Gentle and slow is the whole method",
+      "Stop if electric zings, burning, pins and needles or numbness increase or travel further down the leg"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -3353,10 +3389,10 @@ export const REHABILITATION = [
     coaching: 'Most people hold their breath or tense their glutes and thighs instead. Check: can you still breathe freely? If not, reduce the effort.',
     why: 'Strengthens the pelvic floor — the hammock of muscles supporting the bladder, bowel, and reproductive organs. Weak pelvic floor contributes to leakage, prolapse risk, and low back instability.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your buttocks clench, your thighs grip, or you find yourself holding your breath, place a hand on your lower belly and keep your glutes completely soft",
+      "If you feel a sensation of pushing downward or outward rather than lifting, breathe in naturally and — as you exhale — imagine drawing the base of your pelvis up toward your ribs like a gentle lift",
+      "Focus as much on the complete release as on the lift. The letting go is half of it",
+      "Stop if squeezing triggers pelvic ache, tailbone pain or a sharp spasm. That can mean an overactive pelvic floor, which needs assessment rather than more strengthening"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
@@ -3392,10 +3428,10 @@ export const REHABILITATION = [
     coaching: 'Quick flicks train the fast-twitch pelvic floor fibres — the ones that respond to a cough, sneeze, or jump. Both slow holds and quick flicks are needed.',
     why: 'The fast-twitch pelvic floor muscles prevent leakage during sudden pressure increases. Slow holds alone do not train this.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If the tension stays on between reps and the muscles never fully let go, think of it as snap up, completely let go",
+      "If you cannot feel the release between each flick, slow to a two-second cycle, or go back to basic contractions until the release is obvious",
+      "If you are holding your breath or tensing your shoulders to match the rhythm, slow down until the breathing is easy again",
+      "Do not start with the fast version until the full release is comfortable. Stop for persistent pelvic ache, burning, or sudden urgency, and get assessed"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
@@ -3419,7 +3455,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['glutes-acute', 'lower-back-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -3433,10 +3469,9 @@ export const REHABILITATION = [
     coaching: 'Linking pelvic floor engagement to the exhale and the lift mirrors how the pelvic floor naturally works with breathing and movement.',
     why: 'Integrates pelvic floor activation into a functional movement pattern — a step beyond isolated contractions toward real-world strength.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your lower back arches hard or your belly domes outward at the top, keep the lift moderate — a straight diagonal line from knees to ribs, not an arch",
+      "If you lose the pelvic floor lift as soon as the hips move, exhale and begin the gentle lift a split second before you drive through your heels",
+      "Stop for sharp pain at the front of the hip, pinching in the low back, or any sense of bearing down during the lift"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -3460,7 +3495,7 @@ export const REHABILITATION = [
     contraindications: ['knee-acute'],
     caution: ['glutes-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -3474,10 +3509,10 @@ export const REHABILITATION = [
     coaching: 'The pelvic floor should lengthen on the way down and lift on the way up — like a lift going down as you descend and up as you rise.',
     why: 'Trains the pelvic floor to work dynamically under load — the functional demand it faces in daily life and sport.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you find yourself bearing down at the bottom to brace for standing up, inhale and let the pelvic floor lengthen as you sit back, then exhale to lift as you drive up",
+      "If you feel heavy downward pressure at the bottom, reduce the depth — squat to a chair or box until that pressure goes",
+      "Be comfortable with a pain-free bodyweight squat and with isolated pelvic floor contractions before combining the two",
+      "Stop for a feeling of vaginal or rectal heaviness, dragging, or a bulge, and see a pelvic health physiotherapist"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -3847,10 +3882,10 @@ export const REHABILITATION = [
     coaching: 'This is a subtle exercise — not a strong chin tuck. The deep cervical flexors are small and fatigue quickly. Quality of activation is everything.',
     why: 'Deep cervical flexor weakness is present in almost all people with neck pain and headaches. This specific activation exercise is the cornerstone of neck pain rehabilitation.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If the muscles along the front and sides of your neck stand out like cables, or your head lifts off the floor, the big muscles have taken over. Make the nod much smaller",
+      "Think of a tiny nod — five to ten degrees, as if saying yes very slightly. Tongue resting on the roof of your mouth, teeth slightly apart",
+      "This should feel like a quarter of your effort, not a strength exercise. If you cannot feel anything at first, that is normal — the movement is far smaller than people expect",
+      "Stop straight away for dizziness, nausea, lightheadedness, visual disturbance, or a headache spreading at the back of your head"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
