@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v336
+ * CAP-6b. session-builder.js v30 -- impact separated from adapted-content
+ * need.
+ *
  * 13 Aug 2026 v335
  * Documentation only -- master schedule v190, Schema.md v1.33,
  * exercise_entry_standard.md v3. No application files changed.
@@ -2364,7 +2368,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v335";
+const CACHE_NAME = "alongside-v336";
 
 const SHELL_URLS = [
 
