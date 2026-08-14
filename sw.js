@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v328
+ * DEDUPE-1. Eleven duplicate exercise entries retired (556 -> 545),
+ * five renamed, session-builder.js v29 name guard, core-session.js
+ * repointed. Nothing new to precache.
+ *
  * 13 Aug 2026 v327
  * HOME-1, milestone badges, EMP-4. today.js v14, reflect.js v6,
  * programmes.js v3, store.js v39. Nothing new to precache.
@@ -2332,7 +2337,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v327";
+const CACHE_NAME = "alongside-v328";
 
 const SHELL_URLS = [
 
