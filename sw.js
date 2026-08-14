@@ -1,6 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v333
+ * SAFEGUARD-1. rehabilitation.js v8 -- one standard stop-line voice.
+ *
  * 13 Aug 2026 v332
  * Clinical review applied. rehabilitation.js v7 -- 12 entries plus a
  * dose correction across three neural flossing entries.
@@ -2353,7 +2356,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v332";
+const CACHE_NAME = "alongside-v333";
 
 const SHELL_URLS = [
 
