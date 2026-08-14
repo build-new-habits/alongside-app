@@ -1,53 +1,8 @@
 # Alongside: Move — Master Schedule
-## 13 Aug 2026 v190
+## 13 Aug 2026 v189
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_13aug2026_v189.md`. Remove v189 on upload.
-
-> ### 🟢 13 AUG, FULL DAY CLOSED. `alongside-v334`. 37 gates green on a fresh clone.
->
-> `sw.js` v314 → **v334**. Twenty deploys, every one verified against a fresh clone. Gate suite 30 → **37**.
->
-> #### Closed since v189
->
-> | Item | Outcome |
-> |---|---|
-> | **HOME-1** | Weekly denominator shows only if `setAt` is non-null. The target stays for anybody who sets one — removing it outright would have been the opposite error |
-> | **Milestone badges** | Fourteen count-thresholds removed, 47 → 33. Phase and week markers kept: a milestone marking progress through the PROGRAMME describes the plan; one marking accumulated volume grades the person |
-> | **EMP-4** | Empathy cadence now time-aware as well as session-aware. Persona 2.12 goes 1 prompt → 2; a once-a-fortnight user meets the arc in week four rather than week six; 2.15 unchanged |
-> | **DEDUPE-1** | 14 duplicate exercise names resolved, 556 → 545 entries. Three different problems wearing one label, only one of them an actual duplicate |
-> | **D3** | Allocation preset persists. Two of D3's three items were already built — verified, not assumed |
-> | **NAV-8** | Two `NAV_MAP` entries pointed at the wrong tab, in opposite directions. Also closed a flag open since 13 Jun |
-> | **VOICE-2** | 108 approved coach lines. One fixed sentence per session type became pools of eight |
-> | **VOICE-3 / D2** | Nine Personal reads, each a `{text, when}` pair gated on a real signal. Ungated lines fail closed |
-> | **SAFEGUARD-1** | Eleven stop lines, eleven phrasings, now one standard in two urgency tiers |
-> | **C1b** | **COMPLETE.** All 94 rehab entries individually written and re-rated |
->
-> #### The two most consequential findings of the day
->
-> **1. `difficultyLevel: 1` on all 94 rehabilitation entries.** Not absent — present and wrong, which defeats `_difficulty()`'s safe default (that only fires when the field is missing). Difficulty IS the capability ceiling: `ceilingCap = 2` protects somebody who cannot rise from a chair unaided, `WARMUP_MAX_DIFFICULTY = 4` gates warm-ups. 94 entries claiming to be the easiest thing in the database, in the library most likely to reach people with the least capacity. Now `{1: 36, 2: 31, 3: 21, 4: 4, 5: 1, 6: 1}`.
->
-> **2. A clinical review corrected three things that would have shipped.** Achilles: where the pain SITS changes the exercise — insertional versus mid-portion, and dropping below step level compresses the insertion. Neural flossing: 30 reps is too high for an irritated nerve root, corrected to 10–12 across three entries, and **the database already disagreed with itself** — a near-duplicate said 10 and nobody had noticed. Pelvic floor: hypertonicity is the thing that matters, and more contraction makes it worse.
->
-> #### 🔴 The cauda equina decision — applied, and Graeme may want reviewers on it first
->
-> The clinician flagged a red flag the app **cannot detect from any signal it holds**: cauda equina develops DURING a course of ordinary back exercises rather than being a state somebody arrives in. There are no earlier signals for the coach to have missed. It is now a stop line on McKenzie Press-Up, in the standard register — no condition named, no 999, no A&E, and the only thing carrying the urgency is the word *today*.
->
-> **The question for the safeguarding reviewers is not "did we warn enough".** It is: *is there anything else in this product the app cannot possibly detect?*
->
-> #### Still open, and all of it Graeme's
->
-> - **Cauda equina line** — applied; confirm or have reviewers see it first
-> - **Dose-tier architecture** — the clinician's proposal to decouple movement skill from tissue load. Not applied; it is a design decision
-> - **P6, P10, P11** — three approved Personal reads withheld, documented in `personal-reads.js`. P11 needs destinations
-> - **HMRC registration · three safeguarding reviewers · ICO**
-> - **Supabase → Stripe** — two deep, not three (see the correction above)
->
-> #### The transferable lesson, stated once
->
-> **Ten defects today were found only by executing, never by reading**, and every one of them read as correct. A filter testing an overwritten field. A guard on a field that defaults truthy. A `const` shadowing a function of the same name. A temporal dead zone. A gate appended after `process.exit()`. A coverage test simulating one context. A deletion script that stripped two lines per entry and reported success. **jsdom is installed in the trace harness and real click-through verification is now the standard.**
->
-> And four fixture-drift errors — invented goal id, `legPower: "yes"`, module-state leakage, `fitnessLevel: "beginner"`. Every one produced a plausible wrong answer. **Any fixture field must be checked against a real writer before conclusions are drawn from it.**
+Supersedes `master_schedule_13aug2026_v188.md`. Remove v188 on upload.
 
 > ### 🟢 13 AUG — END OF DAY. `alongside-v326`. 35 gates green on a fresh clone.
 >
@@ -123,11 +78,7 @@ Supersedes `master_schedule_13aug2026_v189.md`. Remove v189 on upload.
 >
 > The £49.99 launch rate holding "to the end of November 2026" remains the stated annual price condition and is unaffected. What is withdrawn is the idea that revenue *starts* then.
 >
-> **⚠️ CORRECTION TO THIS ENTRY, 13 Aug (later the same day).** The line above originally read *"Appendix A triage → Supabase schema → Stripe. Three deep, none started."* **That was false, and I wrote it into this document myself, in v187, while the correction already sat at line ~2481 of the same file** — recorded on 04 Aug after a direct re-check. Appendix A closed on **03 Aug 2026**: all 18 unclassified fields triaged (11 live, 5 dormant, 2 dead), `Schema.md` v1.9 → v1.10. It surfaced two real bugs, both since fixed — `userTier` had no writer and its one reader always evaluated false, locking Personal-tier options for paying users; `proposalBias` was written and never read, so the coach decided somebody needed a lighter session after severe pain and nothing looked.
->
-> I repeated a stale blocker several times across 13 Aug and told Graeme it was his single highest priority — on the day I was arguing that a tier check does not prove a feature exists and a green gate does not prove it guards anything. Same fault, applied to my own notes.
->
-> **The real dependency chain is Supabase schema → Stripe. Two deep, and the schema work that would have blocked it is done.** The revenue path is materially shorter than this document said this morning.
+> **The real dependency chain is unchanged and still the thing that matters:** Appendix A triage → Supabase schema → Stripe. Three deep, none started. It should be sequenced on its own merits rather than against a date nobody committed to.
 
 > ### 🟢 13 Aug, second build block — THE WHOLE TIER MODEL IS NOW REAL
 >
@@ -309,7 +260,7 @@ A free user taps "Lower body" in the Library and silently receives a 30-minute F
 | ID | Task | Priority | Status | Week |
 |---|---|---|---|---|
 | **C1** | Rephrase advice so external help is **offered, never assumed**. 94 entries recopied; severe-pain line names the coach's limit. `rehabilitation.js` v4, `coach-proposal.js` v20. `verify-voice.mjs` extended to sweep `js/data/exercises`. | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 17 Aug |
-| **C1b** | **COMPLETE 13 Aug.** All 94 entries individually written (notice-then-try format) and individually re-rated. `difficultyLevel` went from a constant 1 to a real spread. Clinical review applied to 12. `verify-safeguard.mjs` holds both against regression. | 🟡 P3 | 🟢 **Completed 13 Aug** | — |
+| **C1b** | Per-entry `watchOut` backfill for the 94. All still share ONE identical block. Content stream, not a build session. | 🟡 P3 | 🟠 **Open** | TBD |
 | **C2** | Rehab library gated. 61 of 94 tagged `generalPurpose`, triage approved by Graeme. `sourceLibrary` added after the first filter excluded nothing. `verify-c2.mjs`. | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 17 Aug |
 | **C3** | Adapted content de-prioritised for the fully capable. 38 entries tagged, `session-builder.js` v24, `verify-cap6.mjs` (6 checks, both directions reversal-tested). | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 17 Aug |
 | **C4** | Strength weighting. Discipline fit (FIX-1), the opening-pick bias (FIX-2) and sport-conditioning (FIX-5) all shipped. Priya opens on Barbell Front Squat and it holds. | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 24 Aug |
@@ -339,7 +290,7 @@ Measured: 30 of 186 Full Body main candidates (16.1%) and 31 of 108 warm-up cand
 |---|---|---|---|---|
 | **D1** | Coach phrase pools. 108 approved lines: 8 per session type, 8 warm-up, 8 cool-down, 12 positive empathy prompts. Rotation on completed-session count. `verify-voice.mjs` pool-collapse guard. | 🟠 P2 | 🟢 **Completed 13 Aug** | w/c 24 Aug |
 | **D2** | Personal reads. `js/data/personal-reads.js` — nine observations, each a `{text, when}` pair gated on a real signal. Ungated lines fail closed. `verify-reads.mjs`. | 🟠 P2 | 🟢 **Completed 13 Aug** | w/c 24 Aug |
-| **D3** | Allocation preset persists (`sessionPreset`, schema-first). `sessionVariety` and the lift log were already built — verified, not assumed. | 🟡 P3 | 🟢 **Completed 13 Aug** | — |
+| **D3** | Personal enrichment for 2.15: persist the allocation preset, *ask* about `sessionVariety` rather than defaulting it, lift log as memory. **Now unblocked** — C3 and C4 have landed. | 🟡 P3 | 🟠 **Next** | w/c 17 Aug |
 
 **D1 scaffold rule:** rotation on an existing counter, never `Math.random()`. Copy `empathy-transfer.js`'s mechanism *and read its comments first* — a stable sort on score alone always returns the lowest index, and that lesson cost a 140-session simulation to learn.
 
