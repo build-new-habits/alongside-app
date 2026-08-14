@@ -1,20 +1,8 @@
 # Alongside: Move — Master Schedule
-## 13 Aug 2026 v188
+## 13 Aug 2026 v187
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_13aug2026_v187.md`. Remove v187 on upload.
-
-> ### 🟢 C1 and C3 SHIPPED — `alongside-v321`. 33 gates green.
->
-> **C1.** All 94 rehabilitation entries shared one identical `watchOut` block and one identical `load` line, both assuming a clinician exists. External help is now **offered, never presumed** — the wording works for somebody mid-physio, somebody who has never seen anyone, and somebody who cannot afford to. The third is not hypothetical: Graeme's own About copy says *"I couldn't afford a physio."* `coach-proposal.js` v20 names the coach's limit when severe pain is flagged, in Graeme's own framing. No crisis language on that path — a painful joint is not a safeguarding flag, and borrowing that wording blunts it where it is needed.
->
-> **C3 / CAP-6.** All 38 `seated.js` entries carry `adaptive: true`. Selection de-prioritises them for anybody ASKED and cleared on every axis. **Preference, never exclusion** — reversal-tested: turning it into an exclusion drops a seated user to five exercises, the exact CAP-4 regression.
->
-> **🔴 THE BUG UNDERNEATH C3, and the most transferable finding of the day.** The rule went in and persona 2.15 *still* opened with Seated Arm Cycling. The reserved cardio-warmup slot picks at random from its own pool and consults **none** of the preference rules — not `less`, not adapted, not continuity — while sixteen non-adaptive options sat unreachable. It also declared `const pickFrom = ...`, **shadowing the selector function of the same name**, so at the call site it read exactly as though it were using it. Three separate passes over this file missed it for that reason.
->
-> **🟠 SEL-1 — NEW, open.** That slot still ignores `less` preferences. Somebody can say "not a fan of this" and keep receiving it as their session opener. Same root cause, wider than C3's file scope. Worth a sweep for other selection paths that bypass `pickFrom`.
->
-> **Three fixture-drift errors in two days — a pattern, not bad luck.** Invented goal id (`"strength"` for `"get-stronger"`) silently suppressed the rationale arc; `legPower: "yes"` where the field takes `full|limited|none` made a fully capable persona read as restricted; and the trace harness leaked store state between runs because `session-builder.js` imports the store unsuffixed. **All three produced plausible-looking wrong results.** Any future fixture must be validated against the real field vocabulary before conclusions are drawn from it.
+Supersedes `master_schedule_13aug2026_v186.md`. Remove v186 on upload.
 
 > ### 🔴 DATE CORRECTION, 13 Aug — "the November thing is not real"
 >
@@ -203,24 +191,11 @@ A free user taps "Lower body" in the Library and silently receives a 30-minute F
 
 | ID | Task | Priority | Status | Week |
 |---|---|---|---|---|
-| **C1** | Rephrase advice so external help is **offered, never assumed**. 94 entries recopied; severe-pain line names the coach's limit. `rehabilitation.js` v4, `coach-proposal.js` v20. `verify-voice.mjs` extended to sweep `js/data/exercises`. | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 17 Aug |
+| **C1** | Rephrase advice so external help is **offered, never assumed**. All **94** rehabilitation entries share one identical `watchOut` block and one identical `load` line — confirmed by `grep -c`, 94 of 94. | 🔴 P1 | 🟠 Unstarted | w/c 17 Aug |
 | **C1b** | Per-entry `watchOut` backfill for the 94. Content stream, not a build session. Estimate separately. | 🟡 P3 | 🟠 Unstarted | TBD |
 | **C2** | Rehab library must stop reaching people with no conditions. Schema-first: `generalPurpose` tag. **Triage table for Graeme's review before any tags are written.** | 🔴 P1 | 🟠 Unstarted | w/c 17 Aug |
-| **C3** | Adapted content de-prioritised for the fully capable. 38 entries tagged, `session-builder.js` v24, `verify-cap6.mjs` (6 checks, both directions reversal-tested). | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 17 Aug |
-| **C4** | Strength weighting. **Re-traced after C3 — measured, not assumed.** Largely fixed; four specific residual faults remain (below). | 🔴 P1 | 🟡 **Reduced, re-scoped 13 Aug** | w/c 24 Aug |
-
-**C4 — measured baseline after C3, persona 2.15, 16 sessions replayed through the live engine.**
-
-Before C3: no barbell squat, no deadlift, and a sled sprint in a gym lower-body session. After C3: **Barbell Front Squat and Barbell Deadlift both appear**, seated content is gone entirely, and Step-Up — Glute Focus recurs in all four lower sessions, so continuity is working. Most of C4 was a symptom of C3.
-
-Four residual faults, each specific and none of them requiring a new weighting mechanism:
-
-1. **Cross-discipline leakage.** *Half Moon Pose* (yoga) and *Single Leg Stretch* (pilates) selected into a gym lower-body session. Same root shape as C2 and C3: the category matchers read `movementPattern` and `affectsAreas` only, and never `category` or the source discipline.
-2. **Upper-body pushing in lower-body slots.** *Burpee* and *Explosive Press-Up* in Lower Body. Likely `movementPattern: 'squat'` or `'locomotion'` on a whole-body movement.
-3. **The main lift does not hold.** Barbell Front Squat appears on d20 and d14, then Paused Goblet Squat on d10 and d4. `squat-pattern` treats a wall sit, a goblet squat and a barbell front squat as interchangeable, so progressive overload is still impossible on the thing she came for.
-4. **104 distinct exercises across 16 sessions** — barely changed from 94. Variety is not the problem; the *anchor* is.
-
-**Recommended scope:** fix 1 and 2 with the same `category`-aware filter that C2 needs (they are one job, not three), and treat 3 as its own change — an "anchor lift" concept that holds the primary compound steady while accessories rotate. 4 resolves itself if 3 does.
+| **C3** | Adapted/seated content deprioritised for the fully capable. **Preference, not exclusion** — same mechanism as the CON-2 equipment change, opposite direction. | 🔴 P1 | 🟠 Unstarted | w/c 17 Aug |
+| **C4** | Strength weighting: a gym-equipped `get-stronger` user gets no barbell squat and no deadlift. **Re-trace after C3 before building** — C3 may fix most of it. | 🔴 P1 | 🟠 Blocked on re-trace | w/c 24 Aug |
 
 **C1's constraint, stated because it is the point.** The copy must work for somebody mid-physio, somebody who has never seen anyone, and somebody who cannot afford to. The third is in Graeme's own About copy at `settings.js:1195-1200` — *"I couldn't afford a physio."* The product cannot ship copy assuming what its founder could not access. `prescribed.js` / `intention.js` references to a physio are **correct as-is** — opt-in screens for people who have one. Do not "fix" them.
 
