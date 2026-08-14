@@ -1,64 +1,8 @@
 # Alongside: Move — Master Schedule
-## 13 Aug 2026 v189
+## 13 Aug 2026 v188
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_13aug2026_v188.md`. Remove v188 on upload.
-
-> ### 🟢 13 AUG — END OF DAY. `alongside-v326`. 35 gates green on a fresh clone.
->
-> `sw.js` v314 → **v326**. Twelve deploys, each verified against a fresh clone. Gate suite 30 → **35**.
->
-> **Every finding in the Wave 1 Pass 4 persona trace is closed except five, and those five are decisions rather than defects.** See the two tables below.
->
-> #### Closed today
->
-> | Finding | Closed by |
-> |---|---|
-> | Rehabilitation library reaching people with no condition (16% of Danny's pool) | **C2** — 61 of 94 triaged general-purpose, approved by Graeme |
-> | Capability gating only ever subtracting, so a powerlifter got seated arm cycling ×9 | **C3 / CAP-6** |
-> | Gym-equipped strength user getting no barbell squat and no deadlift | **FIX-2** |
-> | Library ungated — silent downgrade to Full Body 30 | **TIER-B** |
-> | Upgrade page a 63-line stub publishing the tier bypass | **A1 + A2** |
-> | Export counting partials while every on-screen count did not | **E2** |
-> | Difficulty prompts firing on people with no difficulty | **E1** |
-> | One fixed coach sentence per session type, forever | **VOICE-2** — 108 approved lines |
-> | Free reaching the twelve-week programme engine | **TIER-C** |
-> | Progress differing by length, not kind | **TIER-E** |
-> | Rehab copy assuming a clinician exists (94 entries) | **C1** |
-> | Yoga, Pilates and sport-conditioning content in barbell sessions | **FIX-1 + FIX-5** |
-> | Personal-tier reads asserting facts with no data behind them | **VOICE-3 / D2** — nine reads, each gated on a real signal |
-> | Wellbeing and Noticing as one destination under two names | **TIER-F** |
-> | `in-step.js` header claiming Personal tier | **E3** |
-> | Reserved warm-up slot ignoring `less` preferences | **SEL-1** |
->
-> #### 🟠 Still open — and why
->
-> | Item | Status | What it needs |
-> |---|---|---|
-> | **HOME-1** — "1 of 3 this week" from a target nobody chose (`weeklySessionTarget: 3`, `setAt: null`) | Untouched | **Graeme's decision.** The count is right; the question is whether a denominator nobody agreed to belongs in a product whose north star is "joy at the gap" |
-> | **Milestone emoji badges** — 33 across `programmes.js`, e.g. "10 sessions completed ⭐" | Untouched | **Graeme's decision.** The streak was removed deliberately; count-based badges are a milder member of the same family |
-> | **EMP-4** — the empathy arc fired **once in three weeks** for Danny (`EMPATHY_MIN_SESSIONS 3`, `EMPATHY_BASE_GAP 4`) | Untouched | **Graeme's decision.** Cadence is calibrated in sessions, and the personas this product exists for accumulate sessions slowly. The mechanism most identified with the product's purpose is nearly invisible to them |
-> | **C1b** — all 94 rehabilitation entries still share ONE identical `watchOut` block | Logged | Content stream, not a build session. A generic "what to watch for" teaches nothing and trains people to stop reading the block |
-> | **14 duplicate exercise names** (World's Greatest Stretch, Romanian Deadlift, Burpee, 4-7-8 Breathing…) plus two near-identical knee-extension entries | Logged | Content cleanup. **All pre-existing** — verified none were introduced by the 13 Aug renames |
-> | **P6, P10, P11** — three approved Personal reads withheld | Documented in `personal-reads.js` | P6 needs a divergence definition that would duplicate the Progress read; P10 needs a definition of "strongest" that would breach P4 by grading sessions; **P11 needs destinations to exist** |
-> | **D3** — Personal enrichment for 2.15: persist the allocation preset, *ask* about `sessionVariety` rather than defaulting it, lift log as memory | Unstarted | Now unblocked — C3 and C4 have landed |
-> | **Noticing Hub / In Step as a front door** | Never traced, four passes running | Persona 2.11's entry route. Neither Wave 1 persona would ever go there |
-> | **`reflect.js`** | Partially traced | The empathy arc was traced end to end; the rest of the reflection flow was not |
->
-> #### The transferable lesson of the day
->
-> **Six defects were found only by executing, never by reading.** A filter testing `ex.category` that excluded nothing because `category` is overwritten upstream. A guard using `!!store.get('activityLog')` on a field that defaults to a populated object. A `const pickFrom` shadowing the function of the same name. A temporal-dead-zone reference. A gate appended after `process.exit()`. A pool-coverage test that failed on correct behaviour because it simulated one context.
->
-> Every one of them read as correct. **jsdom is now installed in the trace harness** and real click-through verification is the standard, not source reading.
->
-> #### Gates fixed that could not catch what they guarded
->
-> - `verify-sw1.mjs` had the **date hardcoded** — it would have gone silently blind the moment the calendar moved, while still showing green.
-> - `verify-count1.mjs` asserted `via >= 2`, a **floor**. Three reads, two compliant, gate green while the export miscounted for weeks. Now: zero non-compliant reads.
-> - `verify-nav5.mjs` pinned a literal panel **ordering**, so a fourth panel failed a check about the other three.
-> - `verify-empathy.mjs` test 6 simulated **one context**, so prompts requiring difficulty could never fire. Now simulates five different lives.
->
-> **A gate that has only ever passed is unproven.** Every new assertion today was reversal-tested.
+Supersedes `master_schedule_13aug2026_v187.md`. Remove v187 on upload.
 
 > ### 🟢 C1 and C3 SHIPPED — `alongside-v321`. 33 gates green.
 >
@@ -260,10 +204,10 @@ A free user taps "Lower body" in the Library and silently receives a 30-minute F
 | ID | Task | Priority | Status | Week |
 |---|---|---|---|---|
 | **C1** | Rephrase advice so external help is **offered, never assumed**. 94 entries recopied; severe-pain line names the coach's limit. `rehabilitation.js` v4, `coach-proposal.js` v20. `verify-voice.mjs` extended to sweep `js/data/exercises`. | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 17 Aug |
-| **C1b** | Per-entry `watchOut` backfill for the 94. All still share ONE identical block. Content stream, not a build session. | 🟡 P3 | 🟠 **Open** | TBD |
-| **C2** | Rehab library gated. 61 of 94 tagged `generalPurpose`, triage approved by Graeme. `sourceLibrary` added after the first filter excluded nothing. `verify-c2.mjs`. | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 17 Aug |
+| **C1b** | Per-entry `watchOut` backfill for the 94. Content stream, not a build session. Estimate separately. | 🟡 P3 | 🟠 Unstarted | TBD |
+| **C2** | Rehab library must stop reaching people with no conditions. Schema-first: `generalPurpose` tag. **Triage table for Graeme's review before any tags are written.** | 🔴 P1 | 🟠 Unstarted | w/c 17 Aug |
 | **C3** | Adapted content de-prioritised for the fully capable. 38 entries tagged, `session-builder.js` v24, `verify-cap6.mjs` (6 checks, both directions reversal-tested). | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 17 Aug |
-| **C4** | Strength weighting. Discipline fit (FIX-1), the opening-pick bias (FIX-2) and sport-conditioning (FIX-5) all shipped. Priya opens on Barbell Front Squat and it holds. | 🔴 P1 | 🟢 **Completed 13 Aug** | w/c 24 Aug |
+| **C4** | Strength weighting. **Re-traced after C3 — measured, not assumed.** Largely fixed; four specific residual faults remain (below). | 🔴 P1 | 🟡 **Reduced, re-scoped 13 Aug** | w/c 24 Aug |
 
 **C4 — measured baseline after C3, persona 2.15, 16 sessions replayed through the live engine.**
 
@@ -288,9 +232,9 @@ Measured: 30 of 186 Full Body main candidates (16.1%) and 31 of 108 warm-up cand
 
 | ID | Task | Priority | Status | Week |
 |---|---|---|---|---|
-| **D1** | Coach phrase pools. 108 approved lines: 8 per session type, 8 warm-up, 8 cool-down, 12 positive empathy prompts. Rotation on completed-session count. `verify-voice.mjs` pool-collapse guard. | 🟠 P2 | 🟢 **Completed 13 Aug** | w/c 24 Aug |
-| **D2** | Personal reads. `js/data/personal-reads.js` — nine observations, each a `{text, when}` pair gated on a real signal. Ungated lines fail closed. `verify-reads.mjs`. | 🟠 P2 | 🟢 **Completed 13 Aug** | w/c 24 Aug |
-| **D3** | Personal enrichment for 2.15: persist the allocation preset, *ask* about `sessionVariety` rather than defaulting it, lift log as memory. **Now unblocked** — C3 and C4 have landed. | 🟡 P3 | 🟠 **Next** | w/c 17 Aug |
+| **D1** | Coach phrase pools. `generateCoachLine()` is **one fixed string per session type**; warm-up and cool-down purpose are **one string each, total**. Free is locked to Full Body/30min, so Danny's opening line is byte-identical every session, indefinitely. | 🟠 P2 | 🟠 Blocked on C3/C2/C4 | w/c 24 Aug |
+| **D2** | Personal guarantees variety — by phrase **class**, not count. Free gets the full expanded pool, never a thin version. Personal adds observations across time. **P4 is the hard constraint**: `_arc()`'s rule, "a property of the PROGRAMME, never of the person". | 🟠 P2 | 🟠 Blocked on D1 | w/c 24 Aug |
+| **D3** | Personal enrichment for the strength user: hold main lifts steady and vary accessories; *ask* about `sessionVariety` rather than defaulting it; lift log as memory not analytics; persist the allocation preset. | 🟡 P3 | 🟠 Blocked on C3/C4 | w/c 31 Aug |
 
 **D1 scaffold rule:** rotation on an existing counter, never `Math.random()`. Copy `empathy-transfer.js`'s mechanism *and read its comments first* — a stable sort on score alone always returns the lowest index, and that lesson cost a 140-session simulation to learn.
 
@@ -300,9 +244,9 @@ Measured: 30 of 186 Full Body main candidates (16.1%) and 31 of 108 warm-up cand
 
 | ID | Task | Priority | Status | Week |
 |---|---|---|---|---|
-| **E1** | Empathy conditions moved from `prefers` to `requires` via the new `anyOf:` tag, plus 12 positive-context prompts so the pool does not starve. 21 → 33. | 🟠 P2 | 🟢 **Completed 13 Aug** | w/c 17 Aug |
-| **E2** | Export routed through `store.completedSessions()`. Gate changed from a floor (`via >= 2`) to zero non-compliant reads. | 🟡 P3 | 🟢 **Completed 13 Aug** | w/c 17 Aug |
-| **E3** | `in-step.js` header corrected in place. | 🟡 P3 | 🟢 **Completed 13 Aug** | w/c 17 Aug |
+| **E1** | Empathy prompt conditions are `prefers`, not `requires`, so a neutral context degenerates to rotation. Priya (energy 7 for three weeks) was told she'd had a hard day three times. Move to `requires` **and add positive-context prompts** or the pool starves. | 🟠 P2 | 🟠 Unstarted | w/c 17 Aug |
+| **E2** | `progress.js:469` — export counts partials; every on-screen count does not. **Change the gate too**: `verify-count1.mjs:60-66` asserts `via >= 2`, a floor, so it cannot detect the case it exists for. | 🟡 P3 | 🟠 Unstarted | w/c 17 Aug |
+| **E3** | `in-step.js:6` header still says "Personal tier" — DOOR-1 made it free 12 Aug. Correct **in place**. | 🟡 P3 | 🟠 Unstarted | w/c 17 Aug |
 | **WEB-PRICE** | ~~Website publishes £9.99/£89.~~ **WITHDRAWN — the claim was false.** Live site verified: `upgrade/index.html` publishes £7.99/£49.99 correctly. Archive docs banded as superseded instead. | 🟠 P2 | 🟢 **Closed 13 Aug** | w/c 17 Aug |
 
 ### Two questions for Graeme, not fixes
