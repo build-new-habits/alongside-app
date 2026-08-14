@@ -1,5 +1,30 @@
 /**
  * data/exercises/rehabilitation.js
+ * 13 Aug 2026 v6
+ *
+ * v6 - C1b batches 1 and 2. Hamstrings (15) and glutes (17) rewritten
+ *   and re-rated. Copy approved by Graeme; do not paraphrase.
+ *
+ *   TWO BACKFILLS, not one. All 94 entries shared an identical
+ *   four-line watchOut AND carried difficultyLevel: 1. The difficulty
+ *   is the more serious of the two, because it defeats a safety net
+ *   already in the codebase: _difficulty() (11 Aug) falls back to
+ *   energyRequired when difficultyLevel is ABSENT, and these are not
+ *   absent -- they are present and wrong, so the fallback never fires.
+ *   Nordic Curl - Assisted read as difficulty 1 with energyRequired 5.
+ *
+ *   Difficulty is the capability ceiling: ceilingCap = 2 for somebody
+ *   who cannot rise from a chair unaided, and WARMUP_MAX_DIFFICULTY = 4
+ *   gates warm-ups. 94 entries claiming to be the easiest thing in the
+ *   database, in the library most likely to reach people with the least
+ *   capacity.
+ *
+ *   Copy format is Graeme's: what you might NOTICE, then what to TRY.
+ *   A bare list of faults tells somebody what they did wrong; this
+ *   tells them what to do about it.
+ *
+ *   62 entries still on the shared block. Batches 3-8 follow.
+ *
  * 13 Aug 2026 v5
  *
  * v5 - C2. 61 of the 94 entries carry generalPurpose: true, approved by
@@ -100,10 +125,9 @@ export const REHABILITATION = [
     coaching: 'Small and controlled beats big and sloppy every time. If you feel it burning in the side of your hip, it is working.',
     why: 'Activates gluteus medius — the hip stabiliser that protects your knees and lower back in every movement.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your top hip rolls backwards as the knee opens, you have gone past your range. Stop where the hips stay stacked — it will be a smaller movement than you expect",
+      "If you feel it mostly in the front of your hip, you are lifting rather than rotating. Think about turning the thigh bone in the socket instead",
+      "If your feet come apart, press the heels together and start again. The feet staying joined is what makes this work"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25,
@@ -138,7 +162,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hip'],
     contraindications: ['hip-acute', 'glutes-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -152,10 +176,9 @@ export const REHABILITATION = [
     coaching: 'Choose a band that makes the last 3 reps feel genuinely hard. Too easy means too light a band.',
     why: 'The resistance band increases gluteus medius activation compared to bodyweight alone — more effective for rehab and strength building.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If the band snaps the knee shut on the way back, it is too strong for now. Use a lighter one and control the return",
+      "If your hips are rocking to get the knee higher, the band is winning. Lighter band, smaller range",
+      "If you feel it in your lower back, you have started using your spine to help. Reset your position and take less range"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -194,10 +217,9 @@ export const REHABILITATION = [
     coaching: 'The squeeze at the top is the whole point. If you rush past it, you are losing half the benefit.',
     why: 'Glute bridge directly activates the glutes and teaches the brain to use them — essential before any lower body workout.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you feel this mostly in your hamstrings, walk your feet slightly closer to your bottom and squeeze the glutes before you lift",
+      "If your lower back arches at the top, you have lifted too far. Stop where your body makes a straight line from knee to shoulder, not higher",
+      "If your feet slide away, you are pushing forward rather than down. Drive straight through the heels"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25,
@@ -232,7 +254,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hamstring', 'lower-back'],
     contraindications: ['lower-back-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -246,10 +268,9 @@ export const REHABILITATION = [
     coaching: 'Hips staying level is the challenge. If they drop, go back to the two-legged version and build more strength first.',
     why: 'Single-leg work reveals and corrects side-to-side glute strength imbalances — important for runners and anyone with hip or knee pain.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If the lifted hip drops, you have found the actual limit. Lower and reset rather than finishing the set crooked",
+      "If your hamstring cramps, bring the working foot slightly closer in and squeeze the glute before lifting",
+      "If you cannot keep the hips level at all yet, go back to the two-foot bridge for a few weeks. This is the harder version, not the next rep"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40,
@@ -284,7 +305,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes'],
     contraindications: ['wrist-elbow-acute', 'glutes-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -298,10 +319,9 @@ export const REHABILITATION = [
     coaching: 'Think about pressing the ceiling with your heel, not just swinging the leg up. Your back should stay flat.',
     why: 'Isolates glute max with minimal load on other structures — ideal for glute rehab and activation.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your lower back arches to get the leg higher, stop lower. The range comes from the hip, and it is smaller than it looks",
+      "If your hips rotate open, square them to the floor and take less height",
+      "If your wrists ache, come down onto your forearms instead. The exercise is unaffected"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -325,7 +345,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hip'],
     contraindications: ['wrist-elbow-acute', 'hip-acute', 'glutes-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -339,10 +359,9 @@ export const REHABILITATION = [
     coaching: 'Keep your weight even through both hands. It wants to shift — resist it.',
     why: 'Works the gluteus medius from a different angle than clamshells — together they give full hip stabiliser coverage.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are leaning away to lift higher, keep your weight even and accept a lower leg",
+      "If the knee straightens as it rises, hold the 90 degree bend. A straight leg makes it a different exercise",
+      "If you feel a pinch at the front of the hip, come down and shorten the range — that pinch is a signal, not something to work through"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -380,10 +399,9 @@ export const REHABILITATION = [
     coaching: 'Toes pointing slightly down works the glutes harder. Toes up shifts more load to the hip flexors.',
     why: 'Directly targets the gluteus medius and minimus — essential for hip stability and IT band health.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you go above about 45 degrees, your back starts doing the work. Lower is better here",
+      "If your toes are pointing at the ceiling, the leg has rolled. Turn it so the toes point forward, or slightly down",
+      "If you feel it at the front of your hip rather than the side or back, roll slightly forward and lift less"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -407,7 +425,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hip', 'quadriceps'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -421,10 +439,9 @@ export const REHABILITATION = [
     coaching: 'Stay low throughout. Standing up straight makes it too easy and loses the glute engagement.',
     why: 'One of the most effective glute med exercises. Used in knee rehab, hip rehab, and as a warm-up before running and jumping.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your knees fall inward, the band has won. Lighter band, and push the knees out against it as you step",
+      "If you have stood up out of the squat, sink back down. Standing tall takes the glutes out of it entirely",
+      "If the trailing foot snaps in, slow down. Both feet should move under control, not just the leading one"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -448,7 +465,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hip', 'quadriceps'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -462,10 +479,9 @@ export const REHABILITATION = [
     coaching: 'This looks a bit silly but it is highly effective. The diagonal step pattern works the glutes from hip flexion and abduction together.',
     why: 'Trains the glutes to stabilise the hip and knee during walking and running movements — exactly what they need to do in sport.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your knees track inward as you step, lighter band, wider stance",
+      "If you are walking normally with a band on, exaggerate the outward angle. The 45 degree step is the whole point of it",
+      "If your lower back is working, you have straightened up. Stay in the quarter-squat throughout"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -489,7 +505,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hamstring'],
     contraindications: ['hamstring-acute', 'glutes-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -503,10 +519,9 @@ export const REHABILITATION = [
     coaching: 'The range of motion is bigger than a glute bridge because your shoulders are elevated. You will feel the difference.',
     why: 'The hip thrust produces the highest glute activation of any exercise — it is the gold standard for glute development and rehab.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your ribs flare and your back arches at the top, tuck your chin and think about lifting with the hips only",
+      "If it is mostly hamstrings, walk your feet in a little and squeeze at the top for a second",
+      "If the bench digs into your back, it is too high or too hard. Just under the shoulder blades, with a cushion if needed"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
@@ -530,7 +545,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'core', 'lower-back'],
     contraindications: ['lower-back-acute', 'glutes-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 4,
     duration: 90,
     perSide: false,
     instructions: [
@@ -544,10 +559,9 @@ export const REHABILITATION = [
     coaching: 'Hips staying perfectly still is the whole challenge. Start with tiny lifts and build range over time.',
     why: 'Combines glute strength with the core stability needed to keep hips level during single-leg movements.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your hips drop when a foot comes up, you have found the limit. Hold the bridge and lift the foot less far",
+      "If your hips twist as you lift, slow the whole thing down — this is a hold with a small movement, not a march",
+      "If you cannot hold the bridge for the full set, do the plain bridge for now and come back to this"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
@@ -571,7 +585,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'quadriceps', 'hamstring'],
     contraindications: ['knee-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -585,10 +599,9 @@ export const REHABILITATION = [
     coaching: 'The heel drive is the key — it shifts the work from quads to glutes.',
     why: 'A functional glute strengthener that directly transfers to climbing stairs, hills, and daily movement.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are pushing off the back foot, that leg is doing the work. Let it hang and drive through the heel on the step",
+      "If your knee travels inward as you rise, lower the step until it stays over your foot",
+      "If you are jumping up rather than pressing, slow it down. Speed hides which muscles are working"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45
@@ -612,7 +625,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hamstring', 'quadriceps'],
     contraindications: ['knee-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 5,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -626,10 +639,9 @@ export const REHABILITATION = [
     coaching: 'Thinking about the front glute changes where you feel the exercise. Most people feel lunges in the quads — this cue shifts it to the glutes.',
     why: 'Reverse lunges load the glutes more than forward lunges and are gentler on the knee.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your front knee travels past your toes, take a longer step back",
+      "If you are wobbling, hold a wall with one hand. Balance is not what this is training",
+      "If you feel it mostly in the front of your thigh, lean your torso forward very slightly and squeeze the front glute as you stand up"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45
@@ -653,7 +665,7 @@ export const REHABILITATION = [
     affectsAreas: ['glutes', 'hip'],
     contraindications: ['glutes-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -668,10 +680,9 @@ export const REHABILITATION = [
     coaching: 'This can be done anywhere — a great one for office breaks or waiting for the kettle.',
     why: 'Strengthens the hip abductors in a functional standing position — directly relevant to walking, running, and balance.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your body leans away as the leg rises, stand taller and lift less. The lean is your body finding a shortcut",
+      "If your toes turn out, lead with the heel instead. Toes-out turns it into a hip flexor movement",
+      "If your standing leg is doing all the work, hold onto something. Balance is not the target here"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -709,10 +720,9 @@ export const REHABILITATION = [
     coaching: 'This is the simplest glute activation there is. It can be done sitting at a desk, lying in bed, or standing at a bus stop.',
     why: 'Isometric contractions re-establish the brain-to-muscle connection — especially useful after injury or long periods of inactivity.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are squeezing your stomach or thighs too, let those go and find the glutes on their own. It takes a few attempts",
+      "If you are holding your breath, breathe out through the squeeze",
+      "If you cannot feel anything at all, put a hand on each glute so you can feel which side is working. One side is often quieter than the other"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
@@ -750,10 +760,9 @@ export const REHABILITATION = [
     coaching: 'The lift only needs to be a few inches. Squeezing the glute before you lift means the glute does the work, not the lower back.',
     why: 'A safe starting point for glute activation after injury — minimal load, no compression on the spine.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your lower back is arching, you are lifting too high. A few inches is genuinely the whole range",
+      "If your pelvis rocks to one side, press both hip bones into the floor and lift less",
+      "If you feel it in your back rather than your glute, squeeze the glute first, then lift. The order matters more than the height"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -797,10 +806,9 @@ export const REHABILITATION = [
     coaching: 'Start gently — 30 to 50% effort. Isometric work is safe in the acute phase because there is no movement through the injured tissue.',
     why: 'Isometric contractions maintain hamstring strength and reduce pain during the acute phase without stressing the injury.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your foot slides along the floor, you are pushing harder than you need to. Ease off until the foot stays put — the effort is meant to go nowhere",
+      "If you find yourself holding your breath, count the hold out loud. It is hard to hold your breath and speak at the same time",
+      "If you are gripping the chair to brace, rest your hands in your lap instead. The leg should be doing this on its own"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -839,10 +847,9 @@ export const REHABILITATION = [
     coaching: 'A stretch should feel like a pull, never a sharp pain. If it is sharp, bend the knee more until it is just a gentle tension.',
     why: 'Restores hamstring length gently during the subacute phase — important for returning to normal movement patterns.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If it has started to hurt rather than pull, you have gone past where this works. Bend the knee slightly and stay there",
+      "If your other hip is lifting off the floor, you are borrowing range from your back. Keep that hip down and accept a shorter stretch",
+      "If you are bouncing at the end, hold still instead. The muscle lets go with time, not with pressure"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -866,7 +873,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring', 'hip-flexor', 'core'],
     contraindications: ['lower-back-acute', 'hamstring-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -880,10 +887,9 @@ export const REHABILITATION = [
     coaching: 'The quad staying tight is what protects the hamstring here. If the knee bends, the hamstring is doing more work than it should be at this stage.',
     why: 'Builds hamstring control through a safe range — a standard progression in physiotherapy after hamstring strain.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If the knee bends as the leg rises, lower it until the knee locks again. The straight knee is the exercise; the height is not",
+      "If your lower back arches off the floor, press it down before you lift, and stop the leg lower",
+      "If the leg drops quickly at the end, slow it down. The way down is half of this"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -920,10 +926,9 @@ export const REHABILITATION = [
     coaching: 'The slow lowering (eccentric phase) is where most of the rehab benefit comes from. Do not rush it.',
     why: 'Rebuilds hamstring strength through active range of motion — the next step after isometric work.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your hips lift off the floor, you have run out of range and started borrowing. Stop where the hips stay down",
+      "If the leg is swinging rather than curling, slow the whole rep down until you can stop it anywhere",
+      "If you feel a pulling sensation behind the knee, come back out. That is not the muscle you are after"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -947,7 +952,7 @@ export const REHABILITATION = [
     contraindications: ['lower-back-acute', 'hamstring-acute'],
     caution: ['glutes-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -961,10 +966,9 @@ export const REHABILITATION = [
     coaching: 'Use the lightest weight that still feels like work. This is rehab, not a strength session — range and control matter more than load.',
     why: 'Progressive hamstring loading through a lengthened position — one of the most effective exercises for hamstring injury rehabilitation.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your lower back starts to round, that is your stopping point. Come back up. It will move lower over weeks",
+      "If it feels like a squat, your knees are bending. Push your hips backwards instead of dropping down",
+      "If you are trying to reach the floor, stop. Where you stop is set by your hamstrings, not by how far down your hands get"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
@@ -988,7 +992,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring'],
     contraindications: ['hamstring-acute', 'hamstring-subacute', 'knee-acute'],
     energyRequired: 5,
-    difficultyLevel: 1,
+    difficultyLevel: 6,
     duration: 120,
     perSide: false,
     instructions: [
@@ -1002,10 +1006,9 @@ export const REHABILITATION = [
     coaching: 'This is a hard exercise even for fit people. The hands are there to help — use them. The eccentric lowering is the goal, not the return.',
     why: 'Nordic curls are the most evidence-backed exercise for hamstring injury prevention and rehabilitation. The eccentric loading rebuilds tendon strength.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you fold at the waist, you are falling from the hips rather than the knees. Squeeze your glutes and keep a straight line from knee to head",
+      "If you drop suddenly partway down, you went past what you can hold. Catch yourself earlier next time — earlier is progress, not failure",
+      "If your hamstrings are still sore from last time, leave it. This one makes real muscle damage on purpose, and the recovery gap is part of the method"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 60
@@ -1028,7 +1031,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring', 'glutes'],
     contraindications: ['hamstring-acute', 'glutes-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1042,10 +1045,9 @@ export const REHABILITATION = [
     coaching: 'This works the hamstrings from a lengthened position — which is where most hamstring injuries happen. Start small with the range.',
     why: 'Trains the hamstrings eccentrically through a functional range, building resilience for running and jumping.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your hips drop as the heels travel out, you have gone as far as you can hold. Come back in and stop there",
+      "If you cannot drag your heels back, you slid out too far. Shorten it",
+      "If the hamstring cramps, that usually means the range is longer than it is ready for. Shorten it rather than pushing on"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45
@@ -1068,7 +1070,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring'],
     contraindications: ['hamstring-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1082,10 +1084,9 @@ export const REHABILITATION = [
     coaching: 'The slow lowering is doing most of the work. A 3-second lowering builds more strength than a fast one.',
     why: 'Builds hamstring strength through functional range in a standing position — closer to how the hamstring works in sport and daily movement.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your standing hip drifts out sideways, put a hand on a wall and reset. Balance should not be the hard part here",
+      "If you are swinging the leg forward first, you are using a run-up. Start each rep from still",
+      "If the band pulls your foot back down, you are letting go. Control the way down as much as the way up"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
@@ -1110,7 +1111,7 @@ export const REHABILITATION = [
     contraindications: ['hamstring-acute', 'lower-back-acute'],
     caution: ['glutes-acute'],
     energyRequired: 5,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1124,10 +1125,9 @@ export const REHABILITATION = [
     coaching: 'Balance is hard at first — holding a wall lightly is fine. Build up to freestanding over time.',
     why: 'Trains single-leg hamstring strength and balance together — essential for returning to running and any sport involving one-leg landing.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If the raised hip rolls open toward the ceiling, you have gained range you have not earned. Keep both hips pointing at the floor",
+      "If your back rounds to reach lower, stop higher. Depth is not the point",
+      "If you are wobbling and rushing, hold a wall or a chair. That is not cheating — it lets you train the hinge instead of fighting the balance"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 50
@@ -1166,10 +1166,9 @@ export const REHABILITATION = [
     coaching: 'Round back means you are stretching your lower back, not your hamstring. Sit on a cushion if your back rounds immediately.',
     why: 'Restores hamstring length with the hip in a position that closely mimics running — more functional than a lying hamstring stretch.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your lower back is rounding, sit on a cushion and hinge from the hip instead. Reaching further with a rounded back is not more stretch",
+      "If you are reaching with your hands, move your chest toward the leg instead. The hands are along for the ride",
+      "If you are locking the knee hard, soften it. A slight bend often puts the stretch where you actually want it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -1206,10 +1205,9 @@ export const REHABILITATION = [
     coaching: 'This is a neural mobilisation, not a muscle stretch. The rhythmic movement flushes the sciatic nerve — it should feel releasing, not painful.',
     why: 'Hamstring tightness is often partly neural, not just muscular. Neural flossing addresses both and is particularly useful when the hamstring feels tight but not torn.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are holding the end position, do not. One second and back — this is a pumping movement, not a stretch",
+      "If it reproduces the symptom you are settling, stop for today. Nerve work should ease things, not bring them on",
+      "If you are doing more because it feels productive, do less. Little and often does more here than a long session"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -1233,7 +1231,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring', 'glutes', 'quadriceps'],
     contraindications: ['hamstring-acute', 'knee-acute', 'glutes-acute'],
     energyRequired: 5,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1247,10 +1245,9 @@ export const REHABILITATION = [
     coaching: 'Short strides are deliberate here — as the hamstring heals, you can progressively lengthen them over weeks.',
     why: 'Returns the hamstring to functional loading through normal gait patterns — a key step before returning to running.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If the front knee travels inward, slow down and point it over the middle of your foot",
+      "If your back knee is touching the floor, stop an inch above it instead",
+      "If you have drifted back to a normal-length stride, shorten it again. The short step is the whole adaptation"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45
@@ -1274,7 +1271,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring', 'adductors', 'hip'],
     contraindications: ['hamstring-acute', 'hip-acute'],
     energyRequired: 5,
-    difficultyLevel: 1,
+    difficultyLevel: 5,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1287,10 +1284,9 @@ export const REHABILITATION = [
     coaching: 'This is harder than it looks. Start with a lower surface if needed. The adductor and hamstring work together here — both benefit.',
     why: 'Strengthens the inner thigh and hamstring together — clinically used for groin and hamstring injury prevention in sport.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your hips roll backwards, you have turned it into a half-lying position. Stack the hips and shorten the range",
+      "If you cannot control the lift, move the support closer to your knee. Full length is the last version, not the first",
+      "If your groin cramps in the first few sessions, that is common. Shorten the lever rather than pushing through it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 50
@@ -1313,7 +1309,7 @@ export const REHABILITATION = [
     affectsAreas: ['hamstring', 'glutes'],
     contraindications: ['hamstring-acute', 'glutes-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1327,10 +1323,9 @@ export const REHABILITATION = [
     coaching: 'The smooth floor lets the towel slide easily. If it sticks, try socks on a wooden floor instead.',
     why: 'A low-equipment eccentric hamstring exercise that builds strength through the lengthened range — the range most prone to injury.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your hips sink as the heels go out, you have reached your limit. Come back in",
+      "If you cannot pull your heels back, you went out too far. Take less range next time",
+      "If the towel grabs and the movement goes jerky, you are on carpet. A smooth floor makes this work"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
@@ -3920,7 +3915,7 @@ export const REHABILITATION = [
     contraindications: [],
     caution: ['glutes-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -3934,10 +3929,9 @@ export const REHABILITATION = [
     coaching: 'Lateral hip strength is the foundation of lower limb health — it affects knee alignment, IT band tension, and lower back stability all at once.',
     why: 'Lateral hip weakness is implicated in patellofemoral pain, IT band syndrome, gluteal tendinopathy, and lower back pain. A single rehabilitation series addresses all of these.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your form falls apart partway through, stop there rather than finishing the numbers. The last exercise is the hardest and comes when the others are tired on purpose",
+      "If the single-leg touch-down has your knee falling inward, hold a wall and go less deep, or leave that part out until the rest is comfortable",
+      "If you are sore for more than two days afterwards, halve the reps next time and build up"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 50
@@ -4058,10 +4052,9 @@ export const REHABILITATION = [
     coaching: 'Neural flossing creates movement of the nerve through its pathway — like flossing between teeth. If any movement produces sharp radiating pain, stop immediately.',
     why: 'Neural mobilisation techniques improve nerve mobility and reduce neural tension in sciatica rehabilitation. Evidence shows superior outcomes compared to stretching alone.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are holding at the end, release it. A pump, not a stretch",
+      "If pain travels further down the leg, stop. This should ease symptoms, not chase them",
+      "If you are going hard and fast, slow right down. Gentle and slow is the entire method"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
