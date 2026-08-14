@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v327
+ * HOME-1, milestone badges, EMP-4. today.js v14, reflect.js v6,
+ * programmes.js v3, store.js v39. Nothing new to precache.
+ *
  * 13 Aug 2026 v326
  * VOICE-3 / D2. New js/data/personal-reads.js (precached) —
  * Personal-tier observations, each gated on a real data signal.
@@ -2328,7 +2332,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v326";
+const CACHE_NAME = "alongside-v327";
 
 const SHELL_URLS = [
 
