@@ -196,5 +196,41 @@ check("the window is initialised per tier", () =>
      "a single shared default leaves a Personal user on the 14-day window while " +
      "their tab strip offers only 30 and 90 — no tab reads as selected"));
 
+console.log("\nORIENT-1 — Home reads what the person told onboarding");
+
+check("the orientation line uses real goal ids", () => {
+  // Five times on this project an invented-but-plausible id has silently
+  // produced wrong behaviour. These are checked against the live list.
+  const src = fs.readFileSync("js/views/today.js", "utf8");
+  const m = src.match(/WELLBEING_GOALS = new Set\(\[([\s\S]*?)\]\)/);
+  ok(m, "WELLBEING_GOALS is gone — Home no longer reads goals at all");
+  const used = [...m[1].matchAll(/'([a-z-]+)'/g)].map(x => x[1]);
+  const real = fs.readFileSync("js/data/goals.js", "utf8");
+  const bad = used.filter(g => !new RegExp(`id: '${g}'`).test(real));
+  ok(bad.length === 0,
+     `goal id(s) that do not exist in js/data/goals.js: ${bad.join(", ")}`);
+});
+
+check("orientation stops once somebody has found their way", () => {
+  const src = fs.readFileSync("js/views/today.js", "utf8");
+  ok(/sessionsSoFar < ORIENTATION_SESSIONS/.test(src),
+     "the orientation line has no session limit. It is orientation, not a nudge — " +
+     "somebody who has been here a fortnight has found the doors, and a coach " +
+     "that keeps pointing at one is a coach that is selling");
+});
+
+check("the door order is NOT reordered by goals", () => {
+  // The obvious fix for persona 2.11 was to promote Wellbeing up the
+  // grid. That would have fixed her by breaking persona 2.14, who is
+  // autistic and predictability-seeking: a Home screen that rearranges
+  // itself is precisely aversive. The grid is fixed for everybody and
+  // the coach speaks instead.
+  const src = read("js/views/today.js");
+  const doors = src.slice(src.indexOf("HOME_DOORS"), src.indexOf("HOME_DOORS") + 2000);
+  ok(!/sort\(|goals\.includes|reorder/i.test(doors),
+     "HOME_DOORS is being sorted or filtered by preference. The order must be " +
+     "identical for every user — persona 2.14 needs a layout that does not move");
+});
+
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
 process.exit(fails === 0 ? 0 : 1);
