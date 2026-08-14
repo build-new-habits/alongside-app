@@ -1,4 +1,30 @@
 /**
+ * 13 Aug 2026 - CAP-6 (C3). Every entry here now carries `adaptive: true`.
+ *
+ * WHAT IT MEANS: this exercise exists to accommodate a limitation. It is
+ * not lesser and it is not unsafe for anybody -- it is simply not FOR
+ * somebody who has told us they can stand, get to the floor, take
+ * impact and load their legs.
+ *
+ * WHY IT WAS NEEDED. The capability screen was built to answer "what
+ * can this person do?" and it does that well. It was never asked "what
+ * does this person NEED?", so it only ever subtracts -- and an engine
+ * that only subtracts hands adapted content to everybody capable of
+ * performing it. Traced 13 Aug: persona 2.15 (26, four gym sessions a
+ * week, full rack, capability all yes) performed Seated Arm Cycling
+ * nine times in three weeks and Seated Shoulder Rolls six, against
+ * Barbell Bench Press five. Three of her last four sessions OPENED
+ * with seated shoulder rolls.
+ *
+ * The fix in session-builder.js is a DE-PRIORITISATION, never an
+ * exclusion: if a category has nothing else, these come back. That
+ * protects the warm-up floor and means no session can be starved.
+ *
+ * This file exists because CAP-4 found a wheelchair user answering the
+ * capability questions honestly and receiving four exercises and no
+ * programme. That was worth fixing and this does not undo it -- the tag
+ * changes who these are OFFERED to first, never who can have them.
+ *
  * data/exercises/seated.js
  * 11 Aug 2026 v1
  *
@@ -58,6 +84,7 @@ export const SEATED = [
     category: 'cardio',
     movementPattern: 'locomotion',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -96,6 +123,7 @@ export const SEATED = [
     category: 'cardio',
     movementPattern: 'push',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -134,6 +162,7 @@ export const SEATED = [
     category: 'cardio',
     movementPattern: 'locomotion',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -176,6 +205,7 @@ export const SEATED = [
     category: 'strength',
     movementPattern: 'push',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: ['dumbbell'],
@@ -215,6 +245,7 @@ export const SEATED = [
     category: 'strength',
     movementPattern: 'pull',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: ['resistance-band'],
@@ -254,6 +285,7 @@ export const SEATED = [
     category: 'strength',
     movementPattern: 'push',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: ['resistance-band'],
@@ -293,6 +325,7 @@ export const SEATED = [
     category: 'strength',
     movementPattern: 'push',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: ['dumbbell'],
@@ -332,6 +365,7 @@ export const SEATED = [
     category: 'strength',
     movementPattern: 'pull',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: ['dumbbell'],
@@ -371,6 +405,7 @@ export const SEATED = [
     category: 'strength',
     movementPattern: 'push',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: ['dumbbell'],
@@ -414,6 +449,7 @@ export const SEATED = [
     category: 'strength',
     movementPattern: 'anti-rotation',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: ['resistance-band'],
@@ -453,6 +489,7 @@ export const SEATED = [
     category: 'strength',
     movementPattern: 'rotation',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -492,6 +529,7 @@ export const SEATED = [
     category: 'strength',
     movementPattern: 'anti-extension',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -531,6 +569,7 @@ export const SEATED = [
     category: 'strength',
     movementPattern: 'anti-lateral-flexion',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -579,6 +618,7 @@ SEATED.push(
     category: 'strength',
     movementPattern: 'squat',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -618,6 +658,7 @@ SEATED.push(
     category: 'strength',
     movementPattern: 'hip-abduction',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: ['resistance-band'],
@@ -657,6 +698,7 @@ SEATED.push(
     category: 'rehabilitation',
     movementPattern: 'calf-raise',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -696,6 +738,7 @@ SEATED.push(
     category: 'strength',
     movementPattern: 'hinge',
     position: 'seated',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: ['resistance-band'],
@@ -745,6 +788,7 @@ SEATED.push(
     category: 'strength',
     movementPattern: 'squat',
     position: 'standing',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -785,6 +829,7 @@ SEATED.push(
     category: 'strength',
     movementPattern: 'calf-raise',
     position: 'standing',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -824,6 +869,7 @@ SEATED.push(
     category: 'strength',
     movementPattern: 'hip-abduction',
     position: 'standing',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -863,6 +909,7 @@ SEATED.push(
     category: 'cardio',
     movementPattern: 'locomotion',
     position: 'standing',
+    adaptive: true,   // CAP-6
     impact: false,
     balanceDemand: false,
     equipment: [],
@@ -913,7 +960,8 @@ SEATED.push(
     name: 'Seated Band Pull-Apart',
     youtube: 'seated band pull apart posture',
     category: 'strength', movementPattern: 'pull',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
@@ -941,7 +989,8 @@ SEATED.push(
     name: 'Seated Band Face Pull',
     youtube: 'seated band face pull technique',
     category: 'strength', movementPattern: 'pull',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
@@ -969,7 +1018,8 @@ SEATED.push(
     name: 'Seated Band Pulldown',
     youtube: 'seated band lat pulldown overhead anchor',
     category: 'strength', movementPattern: 'pull',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
@@ -997,7 +1047,8 @@ SEATED.push(
     name: 'Seated Shoulder External Rotation',
     youtube: 'seated band external rotation shoulder',
     category: 'rehabilitation', movementPattern: 'shoulder-rotation',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['rotator-cuff', 'shoulder'],
     contraindications: ['shoulder-acute'],
@@ -1025,7 +1076,8 @@ SEATED.push(
     name: 'Seated Band Overhead Press',
     youtube: 'seated band overhead press technique',
     category: 'strength', movementPattern: 'push',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['shoulder', 'triceps-biceps', 'upper-back'],
     contraindications: ['shoulder-acute', 'lower-back-acute'],
@@ -1053,7 +1105,8 @@ SEATED.push(
     name: 'Seated Band Woodchop',
     youtube: 'seated band woodchop rotation core',
     category: 'strength', movementPattern: 'rotation',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['abdominals', 'core', 'shoulder'],
     contraindications: ['lower-back-acute', 'shoulder-acute'],
@@ -1081,7 +1134,8 @@ SEATED.push(
     name: 'Seated Shrug',
     youtube: 'seated dumbbell shrug technique',
     category: 'strength', movementPattern: 'pull',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: ['dumbbell'], equipmentOptional: ['resistance-band'],
     affectsAreas: ['upper-back', 'shoulder'],
     contraindications: ['upper-back-acute', 'shoulder-acute'],
@@ -1109,7 +1163,8 @@ SEATED.push(
     name: 'Seated Isometric Chest Press',
     youtube: 'isometric chest press palms together',
     category: 'strength', movementPattern: 'isometric',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['chest-pecs', 'shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute', 'chest-pecs-acute'],
@@ -1143,7 +1198,8 @@ SEATED.push(
   { id: 'seated-neck-side-stretch', name: 'Seated Neck Side Stretch',
     youtube: 'seated neck side stretch technique',
     category: 'recovery', movementPattern: 'stretch',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['upper-back', 'shoulder'], contraindications: ['upper-back-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 120,
@@ -1167,7 +1223,8 @@ SEATED.push(
   { id: 'seated-chest-doorway-stretch', name: 'Seated Chest Stretch',
     youtube: 'seated chest stretch hands behind',
     category: 'recovery', movementPattern: 'stretch',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['chest-pecs', 'shoulder'], contraindications: ['shoulder-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 90,
@@ -1191,7 +1248,8 @@ SEATED.push(
   { id: 'seated-lat-side-stretch', name: 'Seated Side Reach',
     youtube: 'seated side stretch overhead reach',
     category: 'recovery', movementPattern: 'stretch',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['upper-back', 'spine', 'shoulder'], contraindications: ['shoulder-acute', 'lower-back-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 120,
@@ -1215,7 +1273,8 @@ SEATED.push(
   { id: 'seated-wrist-forearm-stretch', name: 'Seated Wrist and Forearm Stretch',
     youtube: 'seated wrist forearm stretch technique',
     category: 'recovery', movementPattern: 'stretch',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['wrist-elbow', 'triceps-biceps'], contraindications: ['wrist-elbow-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 120,
@@ -1239,7 +1298,8 @@ SEATED.push(
   { id: 'seated-band-anti-rotation-hold', name: 'Seated Anti-Rotation Hold',
     youtube: 'seated band anti rotation hold core',
     category: 'strength', movementPattern: 'anti-rotation',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['abdominals', 'core', 'shoulder'], contraindications: ['lower-back-acute'],
     energyRequired: 4, difficultyLevel: 2, duration: 180,
@@ -1263,7 +1323,8 @@ SEATED.push(
   { id: 'seated-dead-bug-arms', name: 'Seated Arm Reach with Brace',
     youtube: 'seated core brace arm reach',
     category: 'strength', movementPattern: 'anti-extension',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: ['dumbbell'],
     affectsAreas: ['abdominals', 'core', 'shoulder'], contraindications: ['lower-back-acute', 'shoulder-acute'],
     energyRequired: 3, difficultyLevel: 1, duration: 180,
@@ -1287,7 +1348,8 @@ SEATED.push(
   { id: 'seated-band-chest-fly', name: 'Seated Band Chest Fly',
     youtube: 'seated band chest fly technique',
     category: 'strength', movementPattern: 'push',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['chest-pecs', 'shoulder'], contraindications: ['shoulder-acute', 'chest-pecs-acute'],
     energyRequired: 4, difficultyLevel: 2, duration: 180,
@@ -1311,7 +1373,8 @@ SEATED.push(
   { id: 'seated-arm-intervals', name: 'Seated Arm Intervals',
     youtube: 'seated arm cardio interval workout',
     category: 'cardio', movementPattern: 'locomotion',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['shoulder', 'upper-back', 'chest-pecs', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
@@ -1336,7 +1399,8 @@ SEATED.push(
   { id: 'seated-shoulder-rolls-warmup', name: 'Seated Shoulder Rolls',
     youtube: 'seated shoulder rolls warm up',
     category: 'cardio', movementPattern: 'locomotion',
-    position: 'seated', impact: false, balanceDemand: false,
+    position: 'seated',
+    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['shoulder', 'upper-back'], contraindications: [],
     energyRequired: 2, difficultyLevel: 1, duration: 180,
