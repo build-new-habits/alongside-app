@@ -153,5 +153,45 @@ check("the warm-up pulse slot does not shadow pickFrom", () => {
      "as correct at the call site and survived three passes over this file");
 });
 
+console.log("\nCAP-7 — one answer is never read as a wider limitation");
+
+check("a floor restriction does not confine somebody to a chair", () => {
+  // Persona 2.11: 76, unsteady, cannot get down to the floor, but
+  // answered 'not easily' rather than 'no' to rising from a chair.
+  // needsSeated fired on floorAccess and restricted her to seated
+  // exercises only. Her main pool collapsed to SEVEN, so nine sessions
+  // were the same fifteen movements -- for the user with the least
+  // confidence and the most to lose from boredom.
+  //
+  // Not being able to get DOWN to the floor is not the same as not
+  // being able to STAND UP. Floor access is already handled separately
+  // by floorSafe.
+  const ex = sessionFor(
+    { chairRise: "not-easily", floorAccess: "no", bothFeet: "no",
+      balanceWorry: "sometimes", legPower: "limited", askedAt: ASKED }, [], "full", 30);
+  // position === "standing" specifically, not "!== seated": the first
+  // version of this check counted position "any" as standing, so it
+  // passed with the bug restored. Reversal-testing caught that; a check
+  // that cannot fail is not a check.
+  const standing = ex.filter(e => e.position === "standing");
+  ok(standing.length > 0,
+     "somebody who simply cannot reach the floor received no standing work at " +
+     "all. needsSeated must key on chairRise alone -- floor access is already " +
+     "handled by floorSafe");
+});
+
+check("SAFETY: somebody who cannot rise from a chair still gets seated work", () => {
+  // The other direction, and the one that matters more. CAP-4 exists
+  // because this user once received four exercises and no programme.
+  const ex = sessionFor(
+    { chairRise: "no", floorAccess: "no", bothFeet: "no",
+      balanceWorry: "yes", legPower: "none", askedAt: ASKED }, [], "full", 30);
+  ok(ex.length >= 6, `only ${ex.length} exercises for a seated-dependent user`);
+  const seated = ex.filter(e => e.position === "seated" || e.position === "any");
+  ok(seated.length >= ex.length - 2,
+     `${ex.length - seated.length} non-seated exercises reached somebody who ` +
+     "cannot rise from a chair unaided");
+});
+
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
 process.exit(fails === 0 ? 0 : 1);

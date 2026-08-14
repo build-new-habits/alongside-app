@@ -1,5 +1,14 @@
 /**
  * store.js - Data persistence layer
+ * 13 Aug 2026 v41
+ *
+ * v41 - CAP-7. floorAccess removed from needsSeated. Not being able to
+ *   get DOWN to the floor is not the same as not being able to STAND
+ *   UP, and needsSeated restricts selection to seated exercises only.
+ *   Persona 2.11 was confined to a chair by an answer about the floor;
+ *   her main pool collapsed to seven exercises. Floor access is already
+ *   handled separately by floorSafe.
+ *
  * 13 Aug 2026 v40
  *
  * v40 - D3. New field sessionPreset ('balanced' | 'strength' |
@@ -1839,7 +1848,30 @@ export const store = {
     // holds 2 chair and 8 seated entries, which is not enough to build
     // a session from, and pretending otherwise would deliver exactly the
     // exclusion this schema change exists to avoid. Logged as CAP-4.
-    const needsSeated = c.chairRise === 'no' || c.floorAccess === 'no';
+    // CAP-7, 13 Aug 2026. floorAccess REMOVED from this test.
+    //
+    // needsSeated restricts selection to seated exercises only
+    // (session-builder.js:1343). It was firing on floorAccess === 'no',
+    // which conflates two different things: not being able to get DOWN
+    // to the floor is not the same as not being able to STAND UP.
+    //
+    // Found by tracing persona 2.11 -- 76, unsteady, cannot get to the
+    // floor, but answered 'not easily' rather than 'no' to rising from a
+    // chair. She was restricted to seated work and her main pool
+    // collapsed to SEVEN exercises. Across nine sessions that is the
+    // same fifteen movements over and over, for the user with the least
+    // confidence and the most to lose from boredom. CAP-4's problem in
+    // different clothes.
+    //
+    // Floor access is already handled correctly and separately by
+    // floorSafe, which removes floor-position exercises. Standing work
+    // supported by a chair or wall is exactly what this person needs and
+    // exactly what she was being denied.
+    //
+    // Third instance today of the same mistake: one capability answer
+    // being read as a broader limitation than the person actually gave.
+    // See CAP-6b (impact read as needing a chair).
+    const needsSeated = c.chairRise === 'no';
 
     // CAP-5. Legs are a separate axis from standing. Unasked defaults to
     // 'full', because legPower is only asked of people who said they
