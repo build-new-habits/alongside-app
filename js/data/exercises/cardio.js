@@ -718,42 +718,6 @@ export const CARDIO = [
   },
 
   {
-    id: 'cardio-stair-climbing',
-    position: 'standing',
-    impact: false,
-    balanceDemand: false,
-    name: 'Stair Climbing',
-    youtube: 'stair climbing exercise technique',
-    category: 'cardio',
-    contentType: 'practice',
-    movementPattern: 'locomotion',
-    equipment: [],
-    equipmentOptional: [],
-    affectsAreas: ['glutes', 'quadriceps', 'calves'],
-    contraindications: ['knee-acute', 'glutes-acute'],
-    energyRequired: 6,
-    difficultyLevel: 2,
-    duration: 1200,
-    perSide: false,
-    instructions: [
-      'Find a staircase of at least 3 flights, or a stair machine',
-      'Walk up at a steady pace — do not use the handrail unless needed for safety',
-      'Take the stairs down slowly — eccentric load is valuable',
-      'Work continuously for 20 minutes',
-      'Progress to taking stairs 2 at a time as fitness improves'
-    ],
-    coaching: 'Stair climbing is harder than walking because of the vertical component. The caloric cost per minute is significantly higher than flat walking.',
-    why: 'Stair climbing builds glute and quad strength alongside cardiovascular fitness. Accessible with no equipment and no gym — a hidden training tool available in most buildings.',
-        watchOut: [
-      'Pulling on the rail rather than driving through the legs',
-      'Short toe-only steps',
-      'Hurrying on the way down'
-    ],
-    load: 'Bodyweight only.',
-    credits: 45
-  },
-
-  {
     id: 'cardio-skipping',
     position: 'standing',
     impact: true,
@@ -787,43 +751,6 @@ export const CARDIO = [
     ],
     load: 'Bodyweight only.',
     credits: 70
-  },
-
-  {
-    id: 'cardio-shadow-boxing',
-    position: 'standing',
-    impact: false,
-    balanceDemand: false,
-    name: 'Shadow Boxing',
-    youtube: 'shadow boxing exercise technique',
-    category: 'cardio',
-    contentType: 'practice',
-    movementPattern: 'locomotion',
-    equipment: [],
-    equipmentOptional: [],
-    affectsAreas: ['full-body', 'shoulder'],
-    contraindications: ['shoulder-acute'],
-    energyRequired: 6,
-    difficultyLevel: 2,
-    duration: 900,
-    perSide: false,
-    instructions: [
-      'Stand in a comfortable fighting stance — non-dominant foot slightly forward',
-      'Move around the space continuously — never stand still',
-      'Throw punches in combinations: jab, cross, hook, uppercut',
-      'Add defensive movements: slip, roll, step back',
-      'Work in 3-minute rounds with 1 minute rest between',
-      'Complete 3 to 5 rounds'
-    ],
-    coaching: 'Shadow boxing is harder when you stay moving. The footwork is the conditioning — the punches are the technique. Combine both.',
-    why: 'Shadow boxing develops cardiovascular fitness, coordination, and rotational power while also providing an excellent outlet for stress and frustration.',
-        watchOut: [
-      'Locking the elbows at full extension',
-      'Neck and shoulders tensing',
-      'Standing flat rather than staying light on the feet'
-    ],
-    load: 'Bodyweight only.',
-    credits: 65
   },
 
   {

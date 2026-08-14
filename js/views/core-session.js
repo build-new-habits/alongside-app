@@ -229,7 +229,7 @@ const FOCUS_TYPES = [
 
 const EXERCISE_POOL_IDS = {
   stability: ["dead-bug", "bird-dog", "plank", "side-plank-modified", "pallof-press", "mcgill-curl-up"],
-  strength:  ["ab-wheel-rollout", "isometric-hollow-hold", "dead-bug-progression-3", "band-pallof-press", "glute-bridge-single-leg"],
+  strength:  ["gym-ab-wheel-rollout", "isometric-hollow-hold", "dead-bug-progression-3", "band-pallof-press", "glute-bridge-single-leg"],
   mobility:  ["thoracic-rotation", "hip-flexor-stretch", "thoracic-extension-foam-roll", "90-90-hip-stretch", "hip-cars", "prone-thoracic-rotation"],
   rehab:     ["pelvic-tilt", "glute-bridge-activation", "dead-bug-progression-1", "clamshell-activation", "diaphragmatic-breathing-core", "bird-dog-rehab"]
 };

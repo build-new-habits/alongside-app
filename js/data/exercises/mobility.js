@@ -107,42 +107,6 @@ export const MOBILITY = [
   },
 
   {
-    id: 'world-greatest-stretch',
-    position: 'standing',
-    impact: false,
-    balanceDemand: false,
-    name: 'World\'s Greatest Stretch',
-    youtube: 'worlds greatest stretch technique',
-    category: 'mobility',
-    movementPattern: 'stretch',
-    equipment: [],
-    equipmentOptional: ['yoga-mat'],
-    affectsAreas: ['hip', 'hip-flexor', 'thoracic', 'hamstring'],
-    contraindications: ['knee-acute'],
-    caution: ['hamstring-acute'],
-    energyRequired: 4,
-    difficultyLevel: 2,
-    duration: 90,
-    perSide: true,
-    instructions: [
-      'Step into a deep lunge, right foot forward',
-      'Place left hand on floor inside right foot',
-      'Rotate torso, reaching right arm to ceiling',
-      'Hold 3 breaths, then switch sides'
-    ],
-    coaching: 'Keep your back knee off the ground for more intensity, or rest it down for easier version.',
-    why: 'This single movement opens hips, thoracic spine, and hip flexors efficiently.',
-        watchOut: [
-      'Bouncing into the stretch rather than holding it still',
-      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
-      'Holding your breath, which makes everything tighter',
-      'Forcing the range on one side to match the other; sides are rarely equal'
-    ],
-    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
-    credits: 40
-  },
-
-  {
     id: '90-90-hip-stretch',
     position: 'seated',
     impact: false,
@@ -817,7 +781,7 @@ export const MOBILITY = [
     youtube: 'worlds greatest stretch yoga pose tutorial',
     category: 'mobility',
     contentType: 'exercise',
-    movementPattern: 'yoga-pose',
+    movementPattern: 'stretch',
     equipment: [],
     equipmentOptional: ['yoga-mat'],
     affectsAreas: ['hip-flexor', 'adductors', 'thoracic', 'shoulder'],
@@ -1077,43 +1041,6 @@ export const MOBILITY = [
     ],
     coaching: 'Most people cannot sit upright in 90-90 at first. Use a folded blanket under the front hip if it is raised off the floor.',
     why: 'The 90-90 position simultaneously stretches both internal and external hip rotation — addressing the full range of hip mobility in one position.',
-        watchOut: [
-      'Bouncing into the stretch rather than holding it still',
-      'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',
-      'Holding your breath, which makes everything tighter',
-      'Forcing the range on one side to match the other; sides are rarely equal'
-    ],
-    load: 'Bodyweight. Progress by holding longer, not by pushing harder.',
-    credits: 30
-  },
-
-  {
-    id: 'hip-flexor-sofa-stretch',
-    position: 'floor',
-    impact: false,
-    balanceDemand: false,
-    name: 'Couch Stretch',
-    youtube: 'couch stretch technique',
-    category: 'mobility',
-    contentType: 'exercise',
-    movementPattern: 'hip-rotation',
-    equipment: [],
-    equipmentOptional: ['yoga-mat'],
-    affectsAreas: ['hip-flexor', 'quadriceps'],
-    contraindications: ['knee-acute'],
-    energyRequired: 2,
-    difficultyLevel: 1,
-    duration: 120,
-    perSide: true,
-    instructions: [
-      'Kneel facing away from a wall or sofa',
-      'Place your right shin up the wall — toes pointing up, heel toward the ceiling',
-      'Step your left foot forward so the left knee is at 90 degrees',
-      'Keep your torso upright — resist leaning forward',
-      'Hold for 60 to 120 seconds each side'
-    ],
-    coaching: 'This is intense. Work up to the full time gradually. The hip flexor and quad stretch here is deeper than any standing stretch.',
-    why: 'The couch stretch is the most effective hip flexor and quad stretch available — directly counteracts the position of prolonged sitting and is used in competitive CrossFit warm-ups.',
         watchOut: [
       'Bouncing into the stretch rather than holding it still',
       'Pushing to the point of pain; a stretch should feel like a strong pull, never sharp',

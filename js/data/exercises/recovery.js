@@ -1113,44 +1113,6 @@ export const RECOVERY = [
   },
 
   {
-    id: 'breathing-478',
-    position: 'floor',
-    impact: false,
-    balanceDemand: false,
-    name: '4-7-8 Breathing',
-    youtube: '4-7-8 breathing technique',
-    category: 'recovery',
-    contentType: 'practice',
-    movementPattern: 'breath-awareness',
-    equipment: [],
-    equipmentOptional: [],
-    affectsAreas: ['nervous-system'],
-    contraindications: [],
-    energyRequired: 1,
-    difficultyLevel: 1,
-    duration: 300,
-    perSide: false,
-    instructions: [
-      'Sit or lie comfortably',
-      'Exhale completely through the mouth',
-      'Close the mouth and inhale through the nose for 4 counts',
-      'Hold the breath for 7 counts',
-      'Exhale completely through the mouth for 8 counts',
-      'This is one cycle — repeat 4 times',
-      'Practice twice daily for best results'
-    ],
-    coaching: 'The extended breath hold may feel uncomfortable at first. Reduce the counts proportionally if needed — the 1:1.75:2 ratio is what matters, not the absolute numbers.',
-    why: 'Developed by Dr Andrew Weil, 4-7-8 breathing produces rapid parasympathetic activation through the prolonged exhale and breath hold. Demonstrated to reduce anxiety and aid sleep onset.',
-        watchOut: [
-      'Forcing the breath rather than letting it lengthen naturally',
-      'Lifting the shoulders on the in-breath instead of expanding the ribs',
-      'Continuing if you feel light-headed; return to normal breathing and rest'
-    ],
-    load: 'No load. If any pattern feels uncomfortable, return to your natural breath.',
-    credits: 20
-  },
-
-  {
     id: 'sauna-protocol',
     position: 'any',
     impact: false,

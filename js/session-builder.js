@@ -1,6 +1,16 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 13 Aug 2026 v29
+ *
+ * v29 - DEDUPE-1. pickFrom() will not select an exercise whose NAME is
+ *   already in the session. `chosen` is a Set of IDS, so identity was
+ *   checked by id while the person reads the name -- both members of a
+ *   same-named pair could land in one session and somebody could read
+ *   "Burpee" twice on one screen. Same shape as the 11 Aug duplicate-
+ *   OBJECT fix, which was invisible to an identity check; this one was
+ *   invisible to an id check.
+ *
  * 13 Aug 2026 v28
  *
  * v28 - VOICE-2. Session opening lines become rotating pools of eight
@@ -1707,6 +1717,28 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
 
     function pickFrom(pool) {
       if (pool.length === 0) return null;
+
+      // ── DEDUPE-1, 13 Aug 2026: no two exercises with the same NAME ──
+      //
+      // `chosen` is a Set of IDS, so nothing stopped both members of a
+      // same-named pair being selected into one session. Somebody could
+      // read "Burpee" twice on one screen and reasonably conclude the
+      // app was broken.
+      //
+      // The fourteen duplicate names in the database were cleaned the
+      // same day, so this guards nothing today. It stays because the
+      // fault was never the specific pairs -- it was that identity was
+      // checked by id when the person reads the name. A future import,
+      // or a legitimate pair kept apart on purpose (Pigeon Pose and
+      // Pigeon Pose — Yoga are deliberately two entries), brings it back.
+      //
+      // Same shape as the 11 Aug fix for duplicate OBJECTS, which
+      // `matched.push({ ...ex })` created by spreading one entry into
+      // several per-category copies. That one was invisible to an
+      // identity check; this one is invisible to an id check.
+      const usedNames = new Set(selected.map(e => e.name));
+      const distinct = pool.filter(e => !usedNames.has(e.name));
+      if (distinct.length > 0) pool = distinct;
 
       // Equipment preference (CON-8) decides WHICH pool we choose from,
       // continuity decides which member of it.
