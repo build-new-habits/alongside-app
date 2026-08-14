@@ -1,5 +1,40 @@
 /**
  * data/exercises/rehabilitation.js
+ * 13 Aug 2026 v9
+ *
+ * v9 - C1b COMPLETE. All 94 entries now carry their own watchOut and
+ *   their own difficultyLevel. Zero on the shared block.
+ *
+ *   Difficulty went from {1: 94} to {1: 36, 2: 31, 3: 21, 4: 4, 5: 1,
+ *   6: 1}. That field is the capability ceiling, so a constant there
+ *   silently defeated it -- and it defeated the _difficulty() safe
+ *   default too, which only fires when the field is ABSENT rather than
+ *   present and wrong.
+ *
+ *   STILL BOILERPLATE, deliberately:  is identical on all 94
+ *   ("Light, and only as much as keeps you pain-free. Little and often
+ *   beats a lot, once."). Unlike watchOut, that is genuinely true of
+ *   every entry here, and a generic line that is accurate is not the
+ *   same fault as a generic line that teaches nothing. Flagged rather
+ *   than fixed for the sake of it.
+ *
+ * 13 Aug 2026 v9
+ *
+ * v9 - C1b COMPLETE. All 94 entries now carry their own watchOut and
+ *   their own difficultyLevel. Zero remain on the shared block.
+ *
+ *   Difficulty went from {1: 94} to {1: 36, 2: 31, 3: 21, 4: 4, 5: 1,
+ *   6: 1}. That field is the capability ceiling, so a constant there
+ *   silently defeated it -- and it defeated the _difficulty() safe
+ *   default too, which only fires when the field is ABSENT rather than
+ *   present and wrong.
+ *
+ *   STILL BOILERPLATE, deliberately: the load line is identical on all
+ *   94. Unlike watchOut, that line is genuinely true of every entry
+ *   here -- light, pain-free, little and often. A generic line that is
+ *   accurate is not the same fault as a generic line that teaches
+ *   nothing. Flagged rather than churned for the sake of it.
+ *
  * 13 Aug 2026 v8
  *
  * v8 - SAFEGUARD-1. Eleven stop lines, phrased eleven ways, are now one
@@ -1432,10 +1467,9 @@ export const REHABILITATION = [
     coaching: 'The slow lowering is where the healing happens. Do not let the heels drop quickly.',
     why: 'Safe starting point for calf loading after acute injury — seated position removes body weight load while still working the muscle.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your heels come off the chair rather than your toes staying down, you are pushing your feet forward. Keep the balls of the feet planted",
+      "If you are bouncing, hold the top for a full second. The pause is where the work is",
+      "If you feel it more in the front of your shins, you are lifting rather than pressing. Push down through the balls of the feet"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -1500,7 +1534,7 @@ export const REHABILITATION = [
     affectsAreas: ['calves', 'achilles'],
     contraindications: ['calves-acute', 'achilles-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -1514,10 +1548,10 @@ export const REHABILITATION = [
     coaching: 'Full range matters — press all the way up, lower all the way down. Half reps build half the strength.',
     why: 'Progresses from eccentric-only to full concentric and eccentric loading — the next step in returning the calf and Achilles to full strength.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you cannot get all the way up, hold the wall with both hands. Height with support beats a half rep without",
+      "If your ankle rolls outward at the top, press through the base of the big toe rather than the outside of the foot",
+      "If you are dropping down quickly, take three seconds. Most of the benefit is in the lowering",
+      "If your calf cramps, stop and stretch it gently. Cramping usually means too many reps too soon"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -1637,10 +1671,9 @@ export const REHABILITATION = [
     coaching: 'The heel must stay flat on the floor — that is what gives the stretch. If the heel lifts, step the foot closer.',
     why: 'Maintains calf and Achilles flexibility during rehabilitation — reduced flexibility is a significant risk factor for re-injury.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your back heel lifts, step in closer. A shorter stance with the heel down does more than a long one with it up",
+      "If your back knee bends, straighten it — bending it moves the stretch to a different muscle",
+      "If your back foot turns out, point it forward. Turning out gives you range you are not actually stretching"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -1678,10 +1711,9 @@ export const REHABILITATION = [
     coaching: 'This feels different to the standard calf stretch — lower and tighter. That is the soleus. Both stretches are needed for full Achilles health.',
     why: 'Stretches the soleus, which is commonly neglected. Tight soleus increases Achilles load during walking and running.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you feel it high in the calf rather than low near the ankle, bend the back knee more and step in closer",
+      "If your heel lifts as you bend, you have gone too deep. Sink less",
+      "If you are pushing hard into it, ease off. This one responds to time rather than force"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -1717,10 +1749,9 @@ export const REHABILITATION = [
     coaching: 'This looks simple but covers every direction your ankle moves. It is one of the best all-round ankle mobility exercises there is.',
     why: 'Restores ankle range of motion and proprioception \u2014 your sense of where the joint is \u2014 after injury — safe in the acute phase because there is no load through the joint.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your whole leg is swinging, rest the leg on something so only the foot can move",
+      "If the letters are getting small, slow down and make them bigger. The range is the exercise",
+      "If your ankle aches partway through, finish at whichever letter you reached rather than pushing to Z"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
@@ -1743,7 +1774,7 @@ export const REHABILITATION = [
     affectsAreas: ['ankle-foot', 'calves', 'achilles'],
     contraindications: ['achilles-acute'],
     energyRequired: 2,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1757,10 +1788,9 @@ export const REHABILITATION = [
     coaching: 'The band provides a small distraction to the ankle joint that helps restore range. This is a common physio technique.',
     why: 'Improves ankle dorsiflexion range — limited dorsiflexion is linked to calf tightness, Achilles problems, knee pain, and running injuries.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your whole leg turns to pull the foot, keep the knee still and move only from the ankle",
+      "If the band drags your foot back quickly, control the return. Both directions count",
+      "If you feel a pinch at the front of the ankle, take less range rather than pushing into it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -1784,7 +1814,7 @@ export const REHABILITATION = [
     affectsAreas: ['calves'],
     contraindications: ['calves-acute'],
     energyRequired: 2,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 120,
     perSide: true,
     instructions: [
@@ -1798,10 +1828,9 @@ export const REHABILITATION = [
     coaching: 'Roll slowly — about one inch per second. Tender spots mean the tissue needs more time there, not faster movement.',
     why: 'Reduces calf tension and improves tissue quality — supports Achilles health and reduces injury recurrence risk.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If it is sharply painful rather than uncomfortable, take some weight off with your hands or drop the other foot to the floor",
+      "If you are rolling fast, slow right down. Stopping on a tender spot for a few breaths does more than travelling up and down",
+      "If your wrists ache from holding yourself up, do it seated on a chair with the roller on a low stool"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -1830,7 +1859,7 @@ export const REHABILITATION = [
     affectsAreas: ['quadriceps', 'knee'],
     contraindications: ['knee-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -1844,10 +1873,9 @@ export const REHABILITATION = [
     coaching: 'The squeeze at full extension activates the VMO — the teardrop-shaped muscle on the inner quad that stabilises the kneecap.',
     why: 'Terminal knee extensions specifically target the VMO, which is often weak in knee pain. Strengthening it improves kneecap tracking and reduces pain.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your whole leg moves back, keep your foot planted and straighten only the knee",
+      "If you are locking the knee hard at the end, squeeze the thigh instead. The last few degrees are the point, not the lock",
+      "If your hip hitches up to help, keep your hips level and use a lighter band"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -1870,7 +1898,7 @@ export const REHABILITATION = [
     affectsAreas: ['quadriceps', 'knee', 'glutes'],
     contraindications: ['knee-acute', 'glutes-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -1884,10 +1912,9 @@ export const REHABILITATION = [
     coaching: 'The wide toe angle and outward knee push shifts load onto the VMO. This is not about depth — it is about the quad squeeze at the top.',
     why: 'The turned-out foot position preferentially loads the VMO over the outer quad, helping to rebalance the forces acting on the kneecap.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your knees fall inward, push them out over your little toes. That direction is the whole reason for this version",
+      "If your heels lift, you have gone deeper than your ankles allow. Come up higher, or put a small book under your heels",
+      "If your knee hurts at the bottom, use less depth. A small range done well is the exercise"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -1951,7 +1978,7 @@ export const REHABILITATION = [
     affectsAreas: ['quadriceps', 'knee', 'glutes'],
     contraindications: ['glutes-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -1965,10 +1992,10 @@ export const REHABILITATION = [
     coaching: 'Find the angle that produces a muscle burn but no knee pain. That is your working range — stay there.',
     why: 'Isometric quad loading reduces knee pain while building strength — safe in acute and early subacute phases when movement is painful.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your knees pass your toes, walk your feet further from the wall",
+      "If your lower back arches away from the wall, tuck your ribs down and hold higher",
+      "If you are shaking, that is normal near the end. If it starts in the first few seconds, hold a shallower position",
+      "If your knees hurt, come higher — anywhere above 90 degrees is fine and still works"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -1992,7 +2019,7 @@ export const REHABILITATION = [
     affectsAreas: ['it-band', 'quadriceps', 'hip'],
     contraindications: ['it-band-acute'],
     energyRequired: 2,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 120,
     perSide: true,
     instructions: [
@@ -2006,10 +2033,9 @@ export const REHABILITATION = [
     coaching: 'The IT band itself cannot be stretched — it is a thick band of connective tissue. You are releasing the muscles around it. It will be tender.',
     why: 'Reduces tension in the lateral thigh and TFL muscle, which can reduce pain along the IT band. Most effective when combined with glute strengthening.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If it is sharply painful, take weight off through the front foot. Grinding through does not make it work faster",
+      "If you are rolling quickly, slow down and pause where it is tender",
+      "If your supporting shoulder aches, do fewer, shorter passes rather than one long one"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -2047,10 +2073,9 @@ export const REHABILITATION = [
     coaching: 'The further you lean the hips to the side, the deeper the stretch. Start gentle and increase over time.',
     why: 'One of the few effective stretches for the lateral hip and IT band region. Complements foam rolling well.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you feel it in your lower back rather than the outer thigh, shift your hips further sideways and lean less",
+      "If you are twisting as you lean, keep your shoulders square and move only sideways",
+      "If your balance is going, hold the wall properly rather than touching it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -2074,7 +2099,7 @@ export const REHABILITATION = [
     affectsAreas: ['it-band', 'hip-flexor', 'hip'],
     contraindications: ['knee-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2088,10 +2113,9 @@ export const REHABILITATION = [
     coaching: 'The rotation is what makes this target the TFL. Without it, it is just a hip flexor stretch.',
     why: 'Releases the TFL — the muscle at the top of the IT band that is often the true source of IT band tension.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you feel it in your lower back, tuck your hips under before shifting forward. The tuck comes first",
+      "If your front knee travels past your toes, step it further forward",
+      "If your kneeling knee is sore, put a folded towel under it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -2128,10 +2152,9 @@ export const REHABILITATION = [
     coaching: 'You will feel this in the muscle running along the outer shin. That is exactly where it should be.',
     why: 'Strengthens the tibialis anterior — the muscle most involved in shin splints. Directly addresses the source of the pain.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your heels lift as your toes come up, press them down. Heels stay planted throughout",
+      "If your shins burn quickly, that is the muscle working — but stop the set if it turns sharp",
+      "If you are rushing, hold the top for two seconds. Twenty fast reps do less than ten slow ones"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -2195,7 +2218,7 @@ export const REHABILITATION = [
     affectsAreas: ['knee', 'ankle-foot', 'glutes'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -2209,10 +2232,9 @@ export const REHABILITATION = [
     coaching: 'Wobbling is the point — it means your stabilisers are working. Only hold a wall if you are about to fall.',
     why: 'Restores proprioception — the body\'s sense of joint position. Lost after any lower limb injury and essential to recover before returning to sport.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are gripping with your toes, spread them and press the whole foot down instead",
+      "If you touch down repeatedly, hold a wall with one finger. One finger is enough to steady you and still leaves the work to your leg",
+      "If you are holding your breath to balance, breathe out slowly. Balance improves when the breathing does"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -2249,10 +2271,9 @@ export const REHABILITATION = [
     coaching: 'This only works when the quad is completely relaxed. If the muscle is on, the kneecap is locked in place.',
     why: 'Maintains kneecap mobility during rehabilitation and recovery from surgery. A stuck kneecap contributes to pain and limits knee flexion.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If the kneecap will not move, your thigh is still switched on. Shake the leg out and try again with it completely soft",
+      "If you are pressing hard, ease off. This is a gentle glide, not a push",
+      "If it is painful rather than odd-feeling, stop. I can't give you medical support — it's worth getting someone to look at it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -2276,7 +2297,7 @@ export const REHABILITATION = [
     affectsAreas: ['knee', 'ankle-foot', 'glutes', 'hip'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 5,
-    difficultyLevel: 1,
+    difficultyLevel: 4,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2290,10 +2311,9 @@ export const REHABILITATION = [
     coaching: 'Distance matters less than control. A short, controlled reach is better than a long one that makes you hop or twist.',
     why: 'The Y-balance test is used clinically to assess injury risk and rehabilitation progress. As an exercise it builds the full lower limb stability needed to return to sport.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you put weight on the reaching foot, you have reached too far. Touch lightly or not at all",
+      "If your standing knee caves inward, reach shorter and keep it over your foot",
+      "If you cannot hold a plain single-leg stand for thirty seconds yet, do that first. This is the version after it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
@@ -2336,10 +2356,10 @@ export const REHABILITATION = [
     coaching: 'This is a passive exercise — the arm swings like a pendulum, not an active movement. Any muscular effort defeats the purpose.',
     why: 'Creates gentle traction on the shoulder joint, reducing pain and maintaining range of motion in the acute phase when active movement is too painful.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your arm feels tense or you are lifting it, let it go completely. The arm is dead weight — your body swings, the arm follows",
+      "If you are swinging hard, make the circles smaller. This is meant to open the joint gently, not stretch it",
+      "If you cannot lean forward comfortably, rest your forehead on your supporting forearm instead",
+      "If the shoulder aches more afterwards than before, stop. I can't give you medical support — it's worth getting someone to look at it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -2363,7 +2383,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2376,10 +2396,10 @@ export const REHABILITATION = [
     coaching: 'The elbow stays glued to your side. The moment it lifts, you are using the wrong muscles.',
     why: 'Strengthens the infraspinatus and teres minor — two of the four rotator cuff muscles. Weakness here is the most common cause of shoulder impingement.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your elbow drifts away from your side, tuck a rolled towel between elbow and ribs and hold it there. Losing that contact turns it into a different exercise",
+      "If your shoulder shrugs up as you rotate, use a lighter band and keep the shoulder relaxed down",
+      "If you are twisting your whole body to get more range, plant your feet and move only the forearm",
+      "If the band snaps your hand back, you are letting go. Two seconds out, two seconds back"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -2403,7 +2423,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2416,10 +2436,9 @@ export const REHABILITATION = [
     coaching: 'Same rule as external rotation — elbow stays against your side. Do both internal and external in every shoulder rehab session.',
     why: 'Strengthens the subscapularis — the rotator cuff muscle on the front of the shoulder. Balance between internal and external rotation is critical for shoulder health.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your elbow leaves your side, tuck a rolled towel there and keep hold of it",
+      "If you are leaning away from the anchor to gain range, stand square and use a lighter band",
+      "If your wrist bends as you pull, keep it straight — the movement comes from the shoulder, not the hand"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -2443,7 +2462,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder', 'upper-back', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -2457,10 +2476,10 @@ export const REHABILITATION = [
     coaching: 'The wall gives you honest feedback — any gap tells you where your mobility and control are limited.',
     why: 'Trains the lower trapezius and serratus anterior together — the muscles that control the shoulder blade and create a stable base for the shoulder joint.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your lower back arches away from the wall as your arms go up, you have gone past your range. Stop where your back stays flat",
+      "If your elbows or wrists lift off the wall, come back down. Contact is what makes this work — height without contact is not progress",
+      "If your shoulders shrug toward your ears, slide more slowly and think about keeping them down",
+      "If you feel a pinch at the front or top of the shoulder, stop at that point rather than pushing past it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -2484,7 +2503,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2498,10 +2517,10 @@ export const REHABILITATION = [
     coaching: 'CARs stands for Controlled Articular Rotations. Slower is better — you are exploring and building range at the same time.',
     why: 'Takes the shoulder through its full available range under active muscular control — maintains joint health and builds awareness of limitations.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your body twists or leans to help the arm around, stand against a wall so you can feel yourself staying still",
+      "If the arm speeds up through part of the circle, that is where the control runs out. Slow that section down rather than skipping it",
+      "If you cannot get all the way round, go as far as you can and reverse. A partial circle done well beats a full one thrown",
+      "If you feel a catch or a click with pain, stop. I can't give you medical support — it's worth getting someone to look at it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30
@@ -2525,7 +2544,7 @@ export const REHABILITATION = [
     affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -2539,10 +2558,10 @@ export const REHABILITATION = [
     coaching: 'These are small movements with low weight — the difficulty comes from volume and holding position, not from load.',
     why: 'Directly targets the lower and mid trapezius — muscles that are almost always weak in people with shoulder and neck pain from sitting.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your head lifts and your neck strains, rest your forehead on a rolled towel and leave it there",
+      "If your lower back arches to help the arms up, press your hips into the floor and lift the arms less",
+      "If your thumbs turn down, turn them up. Thumb direction changes which part of the shoulder does the work",
+      "If you are rushing between positions, hold each one for the full two seconds. Height is not the measure here"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -2566,7 +2585,7 @@ export const REHABILITATION = [
     affectsAreas: ['shoulder', 'upper-back'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -2580,10 +2599,10 @@ export const REHABILITATION = [
     coaching: 'Most people have never felt this movement before. It takes a few reps to find it. If arms are bending, it is a press-up — not a scapular press-up.',
     why: 'Activates the serratus anterior — the muscle that holds the shoulder blade against the ribcage. Weakness here causes winging and shoulder impingement.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your elbows bend at all, you have turned it into a press-up. Arms stay locked straight throughout",
+      "If your hips sag or pike up, tighten your middle and keep a straight line from head to heels",
+      "If the movement feels tiny, it is meant to. This is a couple of inches of shoulder blade travel and nothing else",
+      "If your wrists ache, do it on your fists or on parallel handles instead"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -2621,10 +2640,9 @@ export const REHABILITATION = [
     coaching: 'Lean forward slowly — do not throw yourself into the stretch. A gentle sustained pull works better than a hard fast one.',
     why: 'Releases pec minor tightness that pulls the shoulder blade forward — one of the most common postural problems from sitting and screen use.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you feel it in the front of your shoulder joint rather than across the chest, lower your arms and try again — high positions pinch some shoulders",
+      "If your lower back arches as you lean, tuck your ribs down and lean less",
+      "If you are pushing into a strong stretch, ease off. Thirty seconds of gentle beats ten of forced"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -2661,10 +2679,9 @@ export const REHABILITATION = [
     coaching: 'This is a daily maintenance exercise — 2 minutes a day prevents most wrist problems from building up.',
     why: 'Maintains wrist joint health and range of motion. Particularly useful for anyone who types, uses a mouse, or does press-ups regularly.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your forearm is rotating, hold it still with your other hand so only the wrist moves",
+      "If the circle has flat sections, that is where the range runs out. Go slowly through those rather than skipping them",
+      "If your wrist clicks without pain, that is usually fine. If it clicks with pain, take less range"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
@@ -2702,10 +2719,9 @@ export const REHABILITATION = [
     coaching: 'Gentle and sustained is the goal. These stretches work best when held for at least 20 seconds.',
     why: 'Maintains wrist flexor and extensor length — important for preventing and managing tennis elbow, golfer\'s elbow and repetitive strain.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you feel it in the joint rather than along the forearm, ease off and bend the wrist less",
+      "If you are pulling hard, lighten the pressure. Twenty seconds gentle does more than five seconds forced",
+      "If your fingers tingle, release it. That is a nerve rather than a muscle"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
@@ -2743,10 +2759,9 @@ export const REHABILITATION = [
     coaching: 'The weight of even a light object adds enough load to make this therapeutic. As strength returns, use a slightly heavier object.',
     why: 'Restores forearm rotation — commonly restricted after wrist or elbow injury. Essential for almost every upper body movement.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your elbow swings out from your side, tuck it in and hold it there",
+      "If your shoulder is turning, keep it still — the movement is forearm only",
+      "If the object is heavy enough to change your grip, use something lighter"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -2784,10 +2799,9 @@ export const REHABILITATION = [
     coaching: 'Release completely between reps — full release is as important as the squeeze for building endurance.',
     why: 'Rebuilds grip strength after wrist or elbow injury. Grip strength is also a reliable indicator of overall upper limb health.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are squeezing at maximum effort, drop to about two thirds. This one responds to repetition, not force",
+      "If your forearm cramps, release fully between reps and rest longer",
+      "If your wrist bends as you squeeze, keep it straight and neutral"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -2833,10 +2847,9 @@ export const REHABILITATION = [
     coaching: 'This is a tiny movement — it should not involve lifting your hips. Just a gentle rocking of the pelvis.',
     why: 'Activates the deep abdominal muscles that support the lumbar spine — the starting point for all lower back rehabilitation.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you cannot feel the gap close, put one hand under your lower back so you can feel it press down. Most people find this by touch before they find it by feel",
+      "If your buttocks or thighs are doing the squeezing, let them go and use only your stomach",
+      "If you are holding your breath, breathe out as you flatten. The two go together"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15,
@@ -2886,10 +2899,9 @@ export const REHABILITATION = [
     coaching: 'The engagement is gentle — about 20% of maximum. If you are holding your breath or gripping hard, you are doing too much.',
     why: 'The deep core — transversus abdominis and pelvic floor — activates with the breath. This re-establishes that connection after injury or inactivity.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your chest hand is rising and your belly hand is still, you are breathing high. Slow the breath right down and let the belly go first",
+      "If you are pulling your belly hard toward your spine, ease off. This is a gentle draw-in, not a brace",
+      "If you feel lightheaded, you are breathing too deeply or too fast. Return to normal breathing for a minute"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20,
@@ -2924,7 +2936,7 @@ export const REHABILITATION = [
     affectsAreas: ['abdominals', 'lower-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2938,10 +2950,9 @@ export const REHABILITATION = [
     coaching: 'Arms only to start. The lower back staying flat is everything — reduce the range if it lifts.',
     why: 'Trains the anti-extension function of the core — the most important job the abs do in protecting the spine.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your lower back lifts away from the floor, you have gone too far. Stop the arm higher and keep the back down",
+      "If you cannot tell whether your back is lifting, slide a hand underneath it. You should feel steady pressure the whole time",
+      "If you are rushing, slow down — this is a slow-motion exercise and speed hides the fault it is designed to expose"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35,
@@ -2976,7 +2987,7 @@ export const REHABILITATION = [
     affectsAreas: ['abdominals', 'lower-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: true,
     instructions: [
@@ -2990,10 +3001,9 @@ export const REHABILITATION = [
     coaching: 'Leg only this time. Harder than it looks — the longer lever of the leg challenges the lower back more than the arm.',
     why: 'Progresses dead bug to leg extension — the pattern used in walking and running where the core must prevent the back from arching.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your back lifts as the leg extends, keep the heel higher. The height of the heel is your dial",
+      "If your ribs flare up as you extend, breathe out through the movement and keep them down",
+      "If this is easy but progression 1 was not, go back — the arm version is the foundation"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
@@ -3017,7 +3027,7 @@ export const REHABILITATION = [
     affectsAreas: ['abdominals', 'lower-back'],
     contraindications: ['lower-back-acute', 'abdominals-acute'],
     energyRequired: 5,
-    difficultyLevel: 1,
+    difficultyLevel: 4,
     duration: 90,
     perSide: true,
     instructions: [
@@ -3031,10 +3041,9 @@ export const REHABILITATION = [
     coaching: 'The opposite arm and leg combination is the full version. If the lower back lifts at all, go back to progressions 1 or 2.',
     why: 'The full dead bug pattern — opposite limb extension that directly trains the core stability needed for walking, running, and all sport.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your back lifts once both limbs move together, go back to one limb at a time for a while. This version is not the next rep, it is the next stage",
+      "If one side is noticeably harder than the other, do fewer on the easier side rather than more on the harder",
+      "If you are holding your breath to stay stable, you are working too hard. Reduce the range until you can breathe through it"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45,
@@ -3076,7 +3085,7 @@ export const REHABILITATION = [
     contraindications: ['lower-back-acute', 'wrist-elbow-acute'],
     caution: ['glutes-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -3090,10 +3099,10 @@ export const REHABILITATION = [
     coaching: 'Imagine a glass of water on your lower back. Do not spill it.',
     why: 'Trains the deep spinal stabilisers in a low-load, safe position. A standard first-line exercise in lower back rehabilitation worldwide.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your hips rotate as the leg goes back, lower the leg. Level hips matter more than a high leg",
+      "If your lower back sags, tighten your middle gently and lift the leg only to hip height",
+      "If you are wobbling, widen your knees slightly for a broader base",
+      "If your wrists ache, come down onto your fists or forearms"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35,
@@ -3225,10 +3234,9 @@ export const REHABILITATION = [
     coaching: 'Move from your mid-back, not just your shoulders. Imagine your spine is the axis of rotation.',
     why: 'Maintains spinal rotation mobility and reduces stiffness — safe in the acute phase because it is unloaded and low range.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your hips turn with your shoulders, plant both feet and hold the chair with the opposite hand to keep them still",
+      "If you are forcing the last bit of rotation, stop where it is comfortable. This is a mobility drill, not a stretch to win",
+      "If you feel a sharp catch as you turn, come back to centre and take less range"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
@@ -3267,10 +3275,9 @@ export const REHABILITATION = [
     coaching: 'Keep your hips level — they want to shift as you lean. Resist that to get the stretch in the right place.',
     why: 'Stretches the quadratus lumborum — the deep lower back muscle that is one of the most common sources of lower back tightness and pain.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are leaning forward or twisting as you bend, work with your back against a wall so you can feel yourself staying in one plane",
+      "If your hips slide out to the side, keep them square and bend less",
+      "If you feel it in the front of your shoulder rather than your side, lower the raised arm a little"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -3294,7 +3301,7 @@ export const REHABILITATION = [
     affectsAreas: ['abdominals'],
     contraindications: ['lower-back-acute', 'abdominals-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 60,
     perSide: false,
     instructions: [
@@ -3308,10 +3315,9 @@ export const REHABILITATION = [
     coaching: 'The hands under the back are not for comfort — they hold the natural spinal curve that protects the discs. Without them, this becomes a harmful crunch.',
     why: 'Developed by spine researcher Stuart McGill — activates the rectus abdominis while maintaining spinal alignment. Safer than sit-ups or crunches for most back conditions.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your lower back flattens into the floor, you have lost the point of it. Keep your hands underneath and keep the natural arch there",
+      "If you are lifting high, come down. A few centimetres is the whole range — this is not a sit-up",
+      "If your neck aches, keep your chin gently tucked and lift your head and shoulders as one piece"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 30,
@@ -3346,7 +3352,7 @@ export const REHABILITATION = [
     affectsAreas: ['abdominals', 'lower-back', 'glutes'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute', 'abdominals-acute', 'glutes-acute', 'lower-back-acute'],
     energyRequired: 4,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 60,
     perSide: true,
     instructions: [
@@ -3360,10 +3366,9 @@ export const REHABILITATION = [
     coaching: 'The modified version from knees is completely valid. Build the hold time before progressing to full side plank from feet.',
     why: 'Trains the lateral core — the quadratus lumborum and obliques — which resist sideways bending forces on the spine. Part of the McGill Big Three for back rehabilitation.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your hips roll backwards, push them forward and hold a shorter time. The line matters more than the seconds",
+      "If your shoulder aches, check your elbow is directly under it rather than in front",
+      "If your hips sag partway through, come down and rest rather than finishing the hold badly. The last five seconds of a collapsed plank teach nothing"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35,
@@ -3587,10 +3592,9 @@ export const REHABILITATION = [
     coaching: 'People with hypermobility often unconsciously rest in their ligaments rather than their muscles. This practice builds the habit of active mid-range holding.',
     why: 'Proprioception — the sense of joint position — is often reduced in hypermobility. Training it is the foundation of managing hypermobile joints safely.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you cannot tell where neutral is for a joint, move it to both extremes and settle in the middle. Neutral is easier to find by contrast",
+      "If you find yourself pushing joints into their end range while checking, come back. Noticing is the exercise, not stretching",
+      "If this makes you anxious about your joints, do fewer of them and keep it brief"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -3627,10 +3631,9 @@ export const REHABILITATION = [
     coaching: 'This tiny bend is doing a lot. Locking the knee out is easy — holding it slightly bent with muscular control takes real work for hypermobile joints.',
     why: 'Trains the quads to actively stabilise the knee rather than relying on the ligaments. Reduces knee hyperextension, pain, and instability.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If the knee keeps snapping back to locked, you are relaxing the thigh. Keep a light squeeze the whole time",
+      "If you cannot tell whether it is locked, put a hand on the front of the thigh — it should feel firm, not soft",
+      "If you are gripping hard, ease off. This is a light hold you could keep while chatting"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 20
@@ -3668,10 +3671,9 @@ export const REHABILITATION = [
     coaching: 'Think of your shoulder blades sliding into back pockets. The movement is subtle — not a big retraction.',
     why: 'Creates active shoulder girdle stability — essential for hypermobile shoulders that rely on passive structures and are prone to subluxation and pain.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your shoulders lift toward your ears, you are shrugging rather than packing. Think down and back, and much gentler than feels useful",
+      "If you are squeezing hard, halve it. This is a light engagement you could hold while talking",
+      "If you cannot feel anything, put your fingertips on the opposite shoulder blade so you can feel it move"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 15
@@ -3695,7 +3697,7 @@ export const REHABILITATION = [
     affectsAreas: ['hip', 'glutes', 'lower-back'],
     contraindications: ['glutes-acute', 'lower-back-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -3709,10 +3711,9 @@ export const REHABILITATION = [
     coaching: 'Most hypermobile people stand by hanging into the hip — ligaments taking the load. This builds the muscular alternative.',
     why: 'Single-leg hip stability is essential for every step taken, for stairs, and for any sport. Building it reduces hip pain and the risk of joint damage over time.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your hip hikes up or drops, put your hands on your hip bones so you can feel them level",
+      "If you are gripping your buttock hard, ease off. Steady beats tight here",
+      "If you cannot hold it, touch a wall with one hand. The hip is what you are training, not the balance"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
@@ -3740,7 +3741,7 @@ export const REHABILITATION = [
     affectsAreas: ['quadriceps', 'knee'],
     contraindications: ['knee-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 60,
     perSide: true,
     instructions: [
@@ -3753,10 +3754,9 @@ export const REHABILITATION = [
     coaching: 'Terminal extension specifically targets the VMO — the inner quad muscle most affected by knee injury and most responsible for knee stability.',
     why: 'Knee terminal extension is a core exercise in ACL and patellofemoral rehabilitation — it restores the final degrees of extension strength without loading the joint in vulnerable positions.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your whole leg moves back, keep your foot planted and straighten only the knee",
+      "If you are locking the knee hard at the end, squeeze the thigh instead",
+      "If your hip hitches up to help, keep your hips level and use a lighter band"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -3780,7 +3780,7 @@ export const REHABILITATION = [
     affectsAreas: ['upper-back', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 3,
     duration: 90,
     perSide: false,
     instructions: [
@@ -3794,10 +3794,10 @@ export const REHABILITATION = [
     coaching: 'The Y-T-W directly targets the lower and middle trapezius — muscles almost universally undertrained and responsible for shoulder stability.',
     why: 'Y-T-W is a clinical rehabilitation staple for shoulder impingement, rotator cuff issues, and postural dysfunction. Restores scapular control and stability.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your head lifts and your neck strains, rest your forehead down and leave it there",
+      "If your lower back arches, press the hips into the bench or floor and lift the arms less",
+      "If you have added weight and the shoulder blades stop moving, drop the weight. Very light or nothing at all is the point",
+      "If you are rushing, slow down — squeezing the shoulder blades is the exercise, not raising the arms"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
@@ -3820,7 +3820,7 @@ export const REHABILITATION = [
     affectsAreas: ['ankle-foot', 'calves'],
     contraindications: ['ankle-foot-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -3834,10 +3834,9 @@ export const REHABILITATION = [
     coaching: 'Ankle sprains damage the nerves that tell you where your foot is as much as they damage the ligaments. Restoring balance and proprioception prevents re-injury more than any other intervention.',
     why: 'Proprioception training is the most important component of ankle sprain rehabilitation — people who skip this step have very high re-injury rates within the first year of return to sport.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If you are wobbling constantly at one level, stay there rather than moving up. The levels are a ladder, not a schedule",
+      "If you touch down often with eyes closed, go back to eyes open. Closing them removes most of your balance information",
+      "If your ankle aches afterwards, halve the times and build up"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
@@ -3860,7 +3859,7 @@ export const REHABILITATION = [
     affectsAreas: ['wrist-elbow'],
     contraindications: ['wrist-elbow-acute'],
     energyRequired: 2,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -3874,10 +3873,9 @@ export const REHABILITATION = [
     coaching: 'Start lighter than feels necessary. Wrist tendons are slow to recover and easy to re-injure with too much load too soon.',
     why: "Wrist flexor and extensor strengthening restores the forearm strength balance disrupted by tennis elbow, golfer's elbow, and repetitive strain injuries.",
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your forearm lifts off the table, hold it down with your other hand. Only the wrist moves",
+      "If you are dropping the weight quickly, control the lowering. That half matters more",
+      "If your wrist aches the next day, use a lighter weight rather than fewer reps"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 35
@@ -3941,7 +3939,7 @@ export const REHABILITATION = [
     affectsAreas: ['hip-flexor', 'abdominals'],
     contraindications: ['hip-acute'],
     energyRequired: 3,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: true,
     instructions: [
@@ -3954,10 +3952,9 @@ export const REHABILITATION = [
     coaching: 'Hip flexor weakness is often overlooked in lower back and hip pain rehabilitation. It is one of the most important muscles for gait, stair climbing, and running.',
     why: 'Hip flexor strength — not just flexibility — is essential for healthy hip mechanics. Weakness leads to compensatory patterns that drive knee, hip, and lower back pain.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your back arches as the knee comes up, tuck your ribs down and lift the knee lower",
+      "If you are leaning back to lift higher, stand tall and take less height",
+      "If your standing leg is struggling, hold a wall. The banded leg is what you are training"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 40
@@ -4022,7 +4019,7 @@ export const REHABILITATION = [
     affectsAreas: ['thoracic', 'upper-back'],
     contraindications: [],
     energyRequired: 2,
-    difficultyLevel: 1,
+    difficultyLevel: 2,
     duration: 90,
     perSide: false,
     instructions: [
@@ -4036,10 +4033,10 @@ export const REHABILITATION = [
     coaching: 'Thoracic stiffness is a primary contributor to neck pain, shoulder impingement, and lower back pain — often overlooked in rehabilitation programs that treat these in isolation.',
     why: 'Thoracic mobility restoration is foundational for shoulder, neck, and lower back rehabilitation. Improving thoracic movement reduces compensatory demands on adjacent joints.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If your lower back is doing the arching on the foam roller, bend your knees and keep your hips on the floor. The movement belongs in the upper back",
+      "If the roller is painful on your spine, you have it too low or you are pressing too hard. Keep it between the shoulder blades and support your head",
+      "If you cannot rotate far in the seated or side-lying parts, take what you have. Forcing rotation is where this goes wrong",
+      "If any part of the sequence hurts rather than feeling tight, leave that part out and do the rest"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 45
@@ -4078,10 +4075,9 @@ export const REHABILITATION = [
     coaching: 'Diaphragmatic breathing restores intra-abdominal pressure regulation — the foundation of core stability. Without it, all other core rehabilitation is built on unstable ground.',
     why: 'Altered breathing patterns are found in almost all people with chronic lower back pain and postural dysfunction. Restoring diaphragmatic breathing is the first step in core rehabilitation.',
         watchOut: [
-      'Progressing to the next stage before the current one is comfortable and pain-free',
-      'Working into pain rather than up to the edge of it',
-      'Doing the exercise once and expecting change; this kind of work does its job through repetition over weeks',
-      'If something is worse for more than a day, ease the load right back. If it keeps happening, it is worth getting someone to look at it'
+      "If the chest hand rises first, slow the breath down and start the inhale by letting the belly go soft",
+      "If you feel lightheaded, you are breathing too deeply. Smaller, slower breaths",
+      "If you cannot make the belly move lying down, try it on your side with your knees drawn up"
     ],
     load: 'Light, and only as much as keeps you pain-free. Little and often beats a lot, once.',
     credits: 25
