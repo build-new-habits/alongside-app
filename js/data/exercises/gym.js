@@ -1189,7 +1189,7 @@ GYM.push(
     balanceDemand: true,
     name: 'Balance Board Hold',
     youtube: 'balance board hold technique beginners',
-    category: 'rehabilitation',
+    category: 'strength',
     movementPattern: 'proprioception',
     equipment: ['balance-board'],
     equipmentOptional: ['wobble-cushion'],
@@ -1364,7 +1364,7 @@ GYM.push(
 GYM.push(
   { id: 'balance-board-single-leg', name: 'Balance Board Single-Leg Hold',
     youtube: 'balance board single leg hold progression',
-    category: 'rehabilitation', movementPattern: 'proprioception',
+    category: 'strength', movementPattern: 'proprioception',
     position: 'standing', impact: false, balanceDemand: true,
     equipment: ['balance-board'], equipmentOptional: ['bosu-ball'],
     affectsAreas: ['ankle-foot', 'knee', 'hip', 'core'],
@@ -1414,7 +1414,7 @@ GYM.push(
 
   { id: 'balance-board-rocking', name: 'Balance Board Controlled Rocking',
     youtube: 'balance board rocking ankle control',
-    category: 'rehabilitation', movementPattern: 'proprioception',
+    category: 'strength', movementPattern: 'proprioception',
     position: 'standing', impact: false, balanceDemand: true,
     equipment: ['balance-board'], equipmentOptional: [],
     affectsAreas: ['ankle-foot', 'calves', 'knee'],

@@ -82,7 +82,9 @@ check("every rehabilitation entry is decided either way", () => {
                 .replace(/\/\*[\s\S]*?\*\//g, "")
                 .replace(/^\s*\/\/[^\n]*$/gm, "");
   const tagged = (src.match(/generalPurpose: true/g) || []).length;
-  ok(REHAB.size === 99, `expected 99 rehabilitation-tagged entries, found ${REHAB.size}`);
+  // Back to 94 after FIX-4 corrected five entries that carried
+  // category: 'rehabilitation' without being rehab protocols.
+  ok(REHAB.size === 94, `expected 94 rehabilitation entries, found ${REHAB.size}`);
   ok(tagged === 61,
      `${tagged} entries tagged generalPurpose; the approved triage is 61 in this file. ` +
      "If the library changed, re-triage rather than adjusting this number");
