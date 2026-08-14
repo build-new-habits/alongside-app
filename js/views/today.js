@@ -1,5 +1,25 @@
 /**
  * today.js
+ * 13 Aug 2026 v15
+ *
+ * v15 - ORIENT-1. Home now reads what the person told onboarding.
+ *   _buildCoachLine() returned null for anybody without history, so a
+ *   new user landed on a bare greeting and seven doors, the first three
+ *   of which are workouts. Nothing on this screen had ever read goals.
+ *
+ *   Persona 2.11 -- 76, does not know how to move confidently, told the
+ *   app she wants to reduce stress and feel better -- landed on a screen
+ *   led by workouts with the thing she came for fourth. Her matrix gap
+ *   since 05 Jul ("is the Noticing Hub a genuine front door") is
+ *   answered: it was not.
+ *
+ *   NOT FIXED BY REORDERING THE DOORS, which was the obvious answer.
+ *   Persona 2.14 is autistic and predictability-seeking; a Home screen
+ *   that rearranges itself is precisely aversive to her. Fixing one
+ *   persona by breaking another is not a fix. The grid stays identical
+ *   for everybody and the coach speaks instead -- which is what P1 asks
+ *   for anyway: the coach offers.
+ *
  * 13 Aug 2026 v14
  *
  * v14 - HOME-1. The weekly denominator appears only if the person set
@@ -538,6 +558,14 @@ export function TodayView(router) {
     return capName ? `${timeGreet}, ${capName}.` : `${timeGreet}.`;
   }
 
+  // ORIENT-1. Goal ids taken from js/data/goals.js -- checked against the
+  // real list rather than guessed, because inventing plausible ids has
+  // silently produced wrong behaviour on this project five times.
+  const WELLBEING_GOALS = new Set([
+    'reduce-stress', 'sleep-better', 'improve-mood', 'feel-better'
+  ]);
+  const ORIENTATION_SESSIONS = 4;
+
   function _buildCoachLine() {
     // COUNT-1. Same rule -- the coach must not refer back to a session
     // yesterday that was opened and abandoned.
@@ -573,6 +601,48 @@ export function TodayView(router) {
       .length;
 
     if (recentCheckins >= 5) return "You've been showing up.";
+
+    // ── ORIENT-1, 13 Aug 2026 ────────────────────────────────────────
+    //
+    // Everything above needs history. For somebody in their first days
+    // this function returned null, so Home was a bare greeting and seven
+    // doors -- and the first three of those are workouts.
+    //
+    // THE PERSON THIS IS FOR. Persona 2.11: 76, lifelong overweight,
+    // ex-dancer, "doesn't know how to exercise or move confidently",
+    // more likely to engage with mindfulness than structured exercise.
+    // She tells the app during onboarding that she wants to reduce
+    // stress and feel better. Nothing on Home has ever read `goals` --
+    // grep returned nothing before this. So the person least likely to
+    // want a workout landed on a screen led by workouts, with the thing
+    // she came for fourth.
+    //
+    // The matrix has carried her gap since 05 Jul: "unconfirmed whether
+    // the Noticing Hub is reachable as a genuine front door at
+    // onboarding". Confirmed 13 Aug: it is not. Every route out of
+    // onboarding ends here.
+    //
+    // WHY NOT REORDER THE DOORS, which was the obvious fix. Persona 2.14
+    // is autistic and predictability-seeking; a Home screen that
+    // rearranges itself based on what the app thinks you want is
+    // precisely aversive to her. Fixing 2.11 by breaking 2.14 is not a
+    // fix. The grid stays fixed for everybody and the coach speaks
+    // instead -- which is also what P1 asks for: the coach offers.
+    //
+    // Fires only in the first few sessions. Orientation, not a nudge:
+    // somebody who has been here a fortnight has found the doors.
+    const sessionsSoFar = activityLog.length;
+    if (sessionsSoFar < ORIENTATION_SESSIONS) {
+      const goals = store.get('goals') || [];
+      if (goals.some(g => WELLBEING_GOALS.has(g))) {
+        return "Wellbeing is where the breathing and the quieter practices live \u2014 that might be the door for you.";
+      }
+      if (goals.length === 0) {
+        // Persona 2.12's case: no goal, genuine decision paralysis.
+        // Naming the door that decides for you is the whole point of it.
+        return "If you'd rather not choose, \u201CUnsure\u201D lets me decide today.";
+      }
+    }
 
     return null;
   }
