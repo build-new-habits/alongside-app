@@ -702,7 +702,7 @@ SEATED.push(
     // 'recover' training intent and that wants checking first.
     name: 'Seated Heel and Toe Raise',
     youtube: 'seated heel toe raise circulation exercise',
-    category: 'rehabilitation',
+    category: 'strength',
     movementPattern: 'calf-raise',
     position: 'seated',
     adaptive: true,   // CAP-6
@@ -1060,7 +1060,7 @@ SEATED.push(
     // 'recover' training intent and that wants checking first.
     name: 'Seated Shoulder External Rotation',
     youtube: 'seated band external rotation shoulder',
-    category: 'rehabilitation', movementPattern: 'shoulder-rotation',
+    category: 'strength', movementPattern: 'shoulder-rotation',
     position: 'seated',
     adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
