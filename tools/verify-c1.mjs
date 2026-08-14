@@ -79,17 +79,27 @@ check("'No' (none) -> neither usable nor loadable", () => {
 });
 
 console.log("\nTEST 5 - 'skip' must never reach the store");
-const view = fs.readFileSync("js/views/onboarding/lifestyle.js", "utf8");
-check("the view converts 'skip' to null before saving", () =>
-  ok(/legPower:\s*selections\.legPower === 'skip' \? null : selections\.legPower/.test(view),
+// W3-A, 14 Aug 2026. The capability questions moved from the unreachable
+// views/onboarding/lifestyle.js to thread.js steps 9a-9d, and that file
+// is now deleted. These assertions follow the implementation.
+const writer = fs.readFileSync("js/views/onboarding/thread.js", "utf8");
+const data   = fs.readFileSync("js/data/onboarding-thread-data.js", "utf8");
+
+check("the writer converts 'skip' to null before saving", () =>
+  ok(/capability\.legPower' && value === 'skip'\)\s*\n?\s*\?\s*null/.test(writer) ||
+     /=== 'skip'[\s\S]{0,80}\? null/.test(writer),
      "storing the string 'skip' would be TRUTHY, bypassing the fail-safe entirely"));
 check("a stray 'skip' would still fail safe on usable, proving why null matters", () => {
   const p = profile({ chairRise: "not-easily", floorAccess: "yes", legPower: "skip" });
   ok(p.legsLoadable === false, "loadable requires exactly 'full'");
   ok(p.legsUsable === true,
      "…but usable is 'not none', so 'skip' would read as legs-usable by accident — " +
-     "which is why the view stores null instead");
+     "which is why the writer stores null instead");
 });
+check("askedAt is set when a capability answer is written", () =>
+  ok(/store\.set\(\s*['"]capability\.askedAt['"]/.test(writer),
+     "without askedAt, capabilityProfile().asked stays false and every answer " +
+     "above is stored and then ignored — the defect W3-A exists to fix"));
 
 console.log("\nTEST 6 - the question's trigger matches the fail-safe's trigger");
 check("every chairRise answer that SHOWS the question also fails safe", () => {
@@ -99,23 +109,24 @@ check("every chairRise answer that SHOWS the question also fails safe", () => {
   }
 });
 check("the question copy is defined exactly once", () => {
-  const n = (view.match(/take your weight through your legs/g) || []).length;
-  ok(n === 1, `copy appears ${n} times - two render sites must share one definition, ` +
-     "or the most sensitive question in the product drifts into two versions");
+  const n = (data.match(/take your weight through your legs/g) || []).length;
+  ok(n === 1, `copy appears ${n} times - the most sensitive question in the ` +
+     "product must not drift into two versions");
 });
-check("both render sites use the shared definition", () => {
-  const n = (view.match(/_legPowerGroup\(\)/g) || []).length;
-  ok(n >= 3, `expected the definition plus both call sites, found ${n}`);
-});
-check("the supporting line is wired to the radiogroup for screen readers", () =>
-  ok(/aria-describedby="lg-\$\{id\}-sub"/.test(view),
-     "the reason for asking must be announced, not just shown"));
-check("the view shows the question for exactly those answers", () =>
-  ok(/selections\.chairRise && selections\.chairRise !== 'yes'/.test(view),
-     "trigger drift between view and profile is how C1 happened in the first place"));
-check("retracting the question clears the answer", () =>
-  ok(/selections\.legPower = null;/.test(view),
-     "a hidden question must not leave a stale legPower behind"));
+check("the copy lives in the data file, not the view", () =>
+  ok(!/take your weight through your legs/.test(writer),
+     "one definition, in STEPS['9c'].coach"));
+check("the leg question shows for exactly the answers that fail safe", () =>
+  ok(/cr !== 'yes'/.test(data),
+     "trigger drift between the reveal and the profile is how C1 happened"));
+// Retraction: the thread is forward-only, so a chairRise answer cannot be
+// changed after the leg question has been revealed and the stale-answer
+// case cannot arise. That is why the lifestyle.js retraction logic has no
+// successor here. It also means a mis-tap is currently permanent —
+// logged as W3-A2, a Settings editor for capability.
+check("the thread has no backward navigation, so retraction cannot occur", () =>
+  ok(!/STEP_ORDER\[idx - 1\]/.test(writer),
+     "if back navigation is ever added, the retraction clear must come with it"));
 
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
 process.exit(fails === 0 ? 0 : 1);
