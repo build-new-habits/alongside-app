@@ -1,5 +1,15 @@
 /**
  * js/views/onboarding/thread.js
+ * 14 Aug 2026 v9
+ *
+ * v9 - W3-A. Capability steps 9a-9d wired in. Three changes:
+ *   _nextStep() now walks past steps whose showIf() does not apply,
+ *   reading store fresh at each hop because 9a decides 9b/9d and 9b
+ *   decides 9c; _writeStepValue() converts legPower 'skip' to null and
+ *   sets capability.askedAt on the first capability answer, without
+ *   which every answer is stored and then ignored; and 9a gets a dynamic
+ *   acknowledgement that displays the answer without interpreting it.
+ *
  * 11 Aug 2026 v8
  *
  * v8 — WOW-0. Consent gate added before Step 1. Live onboarding had
@@ -170,6 +180,11 @@ import {
   generateSummary,
   generateConditionsAck,
   generateFrequencyAck,
+  generateBalanceAck,
+  BALANCE_CHIPS,
+  CHAIR_RISE_CHIPS,
+  FLOOR_ACCESS_CHIPS,
+  LEG_POWER_CHIPS,
 }                             from '../../data/onboarding-thread-data.js';
 import { openSheet }          from './sheet-manager.js';
 
@@ -565,9 +580,35 @@ export function ThreadView(router) {
   // ── Next step helper ───────────────────────────────────────────────────────
 
   function _nextStep(currentId) {
-    const idx = STEP_ORDER.indexOf(currentId);
-    if (idx === -1 || idx >= STEP_ORDER.length - 1) return null;
-    return STEP_ORDER[idx + 1];
+    let idx = STEP_ORDER.indexOf(currentId);
+    if (idx === -1) return null;
+
+    // W3-A. A step may declare showIf(storeData). Walk forward past any
+    // step that does not apply to this person, rather than rendering it
+    // and hiding it -- a hidden-but-present step still takes a turn in
+    // the thread and still counts toward progress.
+    //
+    // store.data is read fresh on each hop, because 9a's answer decides
+    // whether 9b and 9d apply and 9b's answer decides whether 9c does.
+    while (idx < STEP_ORDER.length - 1) {
+      idx += 1;
+      const nextId = STEP_ORDER[idx];
+      const step   = STEPS[nextId];
+      if (!step || typeof step.showIf !== 'function') return nextId;
+      let applies;
+      try {
+        applies = step.showIf(store.data);
+      } catch (err) {
+        // A predicate that throws must not strand somebody mid-onboarding.
+        // Failing OPEN is correct here: these are protective questions, and
+        // asking one unnecessarily is a far smaller harm than skipping one
+        // that was needed.
+        console.warn('[thread] showIf threw for step', nextId, err);
+        applies = true;
+      }
+      if (applies) return nextId;
+    }
+    return null;
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -1178,9 +1219,34 @@ export function ThreadView(router) {
     if (step.storeField === 'strategicGoal.weeklySessionTarget') {
       const n = value === '5plus' ? 5 : parseInt(value, 10);
       store.set(step.storeField, isNaN(n) ? 3 : n);
-    } else {
-      store.set(step.storeField, value);
+      return;
     }
+
+    // ── W3-A capability writes ────────────────────────────────────────
+    if (step.storeField && step.storeField.startsWith('capability.')) {
+      // 'skip' is a UI answer, not a capability value. Stored as null so
+      // store.js's widened default treats declining exactly like not
+      // answering. Writing the string would be truthy and match none of
+      // full/limited/none, making legsLoadable false but legsUsable TRUE
+      // by accident -- defeating the C1 fail-safe it exists to protect.
+      const v = (step.storeField === 'capability.legPower' && value === 'skip')
+        ? null
+        : value;
+      store.set(step.storeField, v);
+
+      // askedAt is the ONLY thing capabilityProfile() reads to tell
+      // "answered" from "never asked". Without it every answer above is
+      // stored and then ignored, and all six protective branches in
+      // session-builder.js stay dead -- which is exactly the state this
+      // whole change exists to fix. Set on the first capability answer so
+      // it is correct even if the person abandons partway through.
+      if (!store.get('capability.askedAt')) {
+        store.set('capability.askedAt', new Date().toISOString());
+      }
+      return;
+    }
+
+    store.set(step.storeField, value);
   }
 
   /**
@@ -1242,6 +1308,11 @@ export function ThreadView(router) {
     // Step 12 — frequency: dynamic ack
     if (step.id === 12) {
       return generateFrequencyAck(value);
+    }
+
+    // Step 9a — balance: dynamic ack (W3-A)
+    if (step.id === '9a') {
+      return generateBalanceAck(value);
     }
 
     return step.coachAfter?.answered || null;

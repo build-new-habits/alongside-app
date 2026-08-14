@@ -1,5 +1,13 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 14 Aug 2026 v6
+ *
+ * v6 - W3-A. Capability steps 9a-9d. The CAP-1 questions moved here from
+ *   the unreachable views/onboarding/lifestyle.js. balanceWorry asked of
+ *   everyone and gating chairRise/floorAccess; legPower conditional on
+ *   chairRise; bothFeet deliberately not asked. New step property showIf.
+ *   See the block comment above step 9a for the persona reasoning.
+ *
  * 14 Aug 2026 v5
  *
  * v5 - W2-4. Step 8 comment corrected: conditions store IDs, not names.
@@ -85,6 +93,77 @@ export const HARD_BEFORE_PHRASE_MAP = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Step 6 — age bands. Single select. */
+// ── Capability chips (W3-A, 14 Aug 2026) ────────────────────────────────────
+// Vocabulary copied verbatim from views/onboarding/lifestyle.js, which was
+// the declared writer in field-contract.js. Changing any of these strings
+// changes what capabilityProfile() derives -- 'not-easily' and 'rather-not'
+// are load-bearing, not cosmetic.
+
+// Three points, not two. store.js documents 'no' | 'sometimes' | 'yes'
+// and field-contract.js declares all three. balanceSafe is currently true
+// only for 'no' or null, so 'sometimes' and 'yes' behave identically today
+// -- but collapsing them would make a declared value unproducible and
+// throw away a distinction the schema is holding open.
+export const BALANCE_CHIPS = [
+  { id: 'no',        label: 'No, not really' },
+  { id: 'sometimes', label: 'Sometimes'      },
+  { id: 'yes',       label: 'Yes'            },
+];
+
+export const CHAIR_RISE_CHIPS = [
+  { id: 'yes',        label: 'Yes'        },
+  { id: 'not-easily', label: 'Not easily' },
+  { id: 'no',         label: 'No'         },
+];
+
+export const FLOOR_ACCESS_CHIPS = [
+  { id: 'yes',             label: 'Yes'                 },
+  { id: 'not-comfortably', label: 'Not comfortably'     },
+  { id: 'rather-not',      label: "I'd rather not try"  },
+  { id: 'no',              label: 'No'                  },
+];
+
+// 'skip' is a UI answer, not a capability value. thread.js converts it to
+// null at the writer -- see _writeStepValue(). Writing the string "skip"
+// would be truthy and match none of full/limited/none, so legsLoadable
+// would be false but legsUsable TRUE by accident, defeating the fail-safe.
+export const LEG_POWER_CHIPS = [
+  { id: 'full',    label: 'Yes'                      },
+  { id: 'limited', label: 'A little, or on good days' },
+  { id: 'none',    label: 'No'                       },
+  { id: 'skip',    label: "I'd rather not say"       },
+];
+
+/**
+ * Does the chair/floor pair apply to this person? (W3-A)
+ *
+ * OR, deliberately, not AND. Any single trigger is enough. Somebody who
+ * says they do not worry about balance is still caught by age or activity
+ * level, and somebody young and active who DOES worry is caught by their
+ * own answer -- which is the case no demographic trigger would find.
+ *
+ * MOBILITY_RELEVANT_CONDITIONS is the set where the chair/floor answer
+ * could plausibly differ from "obviously yes". It is not a list of
+ * "serious" conditions and must not become one.
+ */
+const MOBILITY_RELEVANT_CONDITIONS = new Set([
+  'hip', 'knee', 'ankle-foot', 'lower-back', 'sciatica', 'osteoporosis',
+  'hypermobility', 'fibromyalgia', 'chronic-fatigue', 'cardiovascular-condition',
+  'calves', 'achilles', 'plantar-fasciitis', 'it-band', 'shin-splints',
+]);
+
+const CAPABILITY_TRIGGER_AGE_BANDS   = new Set(['60s', '70plus']);
+const CAPABILITY_TRIGGER_ACTIVITY    = new Set(['sedentary', 'returning']);
+
+export function _capabilityQuestionsApply(storeData) {
+  const d = storeData || {};
+  const bw = (d.capability || {}).balanceWorry;
+  if (bw === 'yes' || bw === 'sometimes') return true;
+  if (CAPABILITY_TRIGGER_AGE_BANDS.has(d.ageBand)) return true;
+  if (CAPABILITY_TRIGGER_ACTIVITY.has((d.lifestyle || {}).activityLevel)) return true;
+  return (d.conditions || []).some(id => MOBILITY_RELEVANT_CONDITIONS.has(id));
+}
+
 export const AGE_CHIPS = [
   { id: 'under-20', label: 'Under 20' },
   { id: '20s',      label: '20s' },
@@ -355,6 +434,118 @@ export const STEPS = {
     },
   },
 
+  // ── Steps 9a-9d — Capability (W3-A, 14 Aug 2026) ─────────────────────────
+  //
+  // The four CAP-1 questions, rebuilt as thread steps. They previously
+  // lived in views/onboarding/lifestyle.js, which was not registered in
+  // router.js and whose only inbound navigate() calls were swallowed by
+  // sheet-manager.js. So capability.askedAt was null for EVERY live user,
+  // capabilityProfile().asked was false, and SIX protective branches in
+  // session-builder.js never ran for anybody: floorSafe, balanceSafe,
+  // needsSeated, legsUsable, legsLoadable and _capabilityUnrestricted().
+  // Eight CAP work items sat behind a screen nobody could reach.
+  //
+  // WHY THEY ARE SPLIT RATHER THAN ALL ASKED
+  //
+  // Persona review of the actual wording, 14 Aug. The four questions are
+  // not one thing:
+  //
+  //   balanceWorry  — reads neutrally to everybody, 2.3 to 2.10
+  //   bothFeet      — reads neutrally, but see below: it is NOT asked
+  //   chairRise     — right for 2.10; insulting to 2.3, a national-
+  //                   standard 15-year-old sprinter
+  //   floorAccess   — same
+  //
+  // So balanceWorry is asked of everyone and gates the other two. Nobody
+  // is asked whether they can rise from a chair unless something suggests
+  // the answer might not be "obviously yes".
+  //
+  // WHY balanceWorry IS THE GATE, AND NOT AGE
+  //
+  // A trigger built only on age, activity level or declared condition
+  // MISSES persona 2.8 — dyspraxia and autism, young, enthusiastic, not
+  // sedentary. Dyspraxia is a motor-coordination condition and is not in
+  // CONDITIONS (neither is autism). She is precisely the person whose
+  // failure mode is a fall, and she would trip no demographic trigger.
+  // Asking everyone the one neutral question catches her.
+  //
+  // The triggers are OR, not AND, so somebody who answers "no" to
+  // worrying about balance out of pride is still caught by age or
+  // activity level.
+  //
+  // WHY bothFeet IS NOT ASKED AT ALL
+  //
+  // Measured, 14 Aug: with capability unasked, an 'active' user already
+  // receives impact work (35 impact exercises across 30 sessions) and a
+  // 'sedentary' user receives none (0). session-builder.js:1201-1202 has
+  // an explicit !cap.asked fallback that gates impact from
+  // lifestyle.activityLevel alone. The question earns no protection it
+  // does not already have. The field stays in the schema and Settings can
+  // write it; it does not cost an onboarding screen.
+  //
+  // This answers Graeme's original question -- if we are not filtering by
+  // age, how do we protect people? Age selects who gets ASKED. Their
+  // answer decides what they can do.
+
+  '9a': {
+    id: '9a',
+    type: 'inline-chips-single',
+    chips: BALANCE_CHIPS,
+    storeField: 'capability.balanceWorry',
+    summaryType: 'balanceWorry',
+    coach: "One more thing, and then I'll stop asking questions.\n\nDo you ever worry about losing your balance?\n\nThere's no wrong answer here. Plenty of people say yes and are perfectly capable — it just changes which things I'd put in front of you early on.",
+    coachAfter: {
+      answered: null, // dynamic — see generateBalanceAck()
+    },
+  },
+
+  '9b': {
+    id: '9b',
+    type: 'inline-chips-single',
+    chips: CHAIR_RISE_CHIPS,
+    storeField: 'capability.chairRise',
+    summaryType: 'chairRise',
+    // Revealed only when the answer could plausibly not be "obviously yes".
+    showIf: (storeData) => _capabilityQuestionsApply(storeData),
+    coach: "Can you get up from a chair without pushing off with your hands?\n\nI ask because it tells me something about what your legs are ready for — more than age or how often you exercise does.",
+    coachAfter: {
+      answered: "Thank you. That's genuinely useful.",
+    },
+  },
+
+  '9c': {
+    id: '9c',
+    type: 'inline-chips-single',
+    chips: LEG_POWER_CHIPS,
+    storeField: 'capability.legPower',
+    summaryType: 'legPower',
+    // C1 fail-safe. Asked only of somebody who has just said getting out
+    // of a chair is not easy or not possible. Optional by Graeme's
+    // decision, which is only safe because store.js treats unanswered as
+    // 'limited' for exactly this group.
+    showIf: (storeData) => {
+      const cr = (storeData.capability || {}).chairRise;
+      return !!cr && cr !== 'yes';
+    },
+    coach: "Can you take your weight through your legs — standing, or moving from a chair to somewhere else?\n\nSome exercises ask your legs to carry your weight, so this matters. Say if you'd rather not answer.",
+    coachAfter: {
+      answered: "Understood.",
+    },
+  },
+
+  '9d': {
+    id: '9d',
+    type: 'inline-chips-single',
+    chips: FLOOR_ACCESS_CHIPS,
+    storeField: 'capability.floorAccess',
+    summaryType: 'floorAccess',
+    showIf: (storeData) => _capabilityQuestionsApply(storeData),
+    coach: "And can you get down to the floor and back up on your own?\n\nQuite a lot of good exercises happen on the floor. If that's not somewhere you want to be, I'll simply build around it — it isn't a limitation, it's just information.",
+    coachAfter: {
+      answered: "Good. I'll work with that.",
+    },
+  },
+
   // ── Step 10 — Energy ──────────────────────────────────────────────────────
   // Inline chips. Single select. No skip.
   // Writes store.lifestyle.stressLevel (energy maps to this field).
@@ -447,7 +638,9 @@ export const STEPS = {
 // 4 is skipped if user chose "I'd rather not say" in 3a (goes to 5 directly).
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const STEP_ORDER = [0, 1, 2, '2b', '3a', '3b', 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+export const STEP_ORDER = [0, 1, 2, '2b', '3a', '3b', 4, 5, 6, 7, 8, 9,
+                           '9a', '9b', '9c', '9d',
+                           10, 11, 12, 13, 14];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SUMMARY BUBBLE GENERATORS
@@ -463,8 +656,49 @@ export const STEP_ORDER = [0, 1, 2, '2b', '3a', '3b', 4, 5, 6, 7, 8, 9, 10, 11, 
  * @param {object} store    — the full store data object (for multi-field steps)
  * @returns {string}        — plain-English summary for the user bubble
  */
+/**
+ * Coach acknowledgement after the balance question (W3-A).
+ *
+ * P4, Locked: the coach DISPLAYS, it does not interpret. Neither branch
+ * tells the person what their answer means about them. "Yes" must not
+ * become "you are unsteady" and "no" must not become "you are fine".
+ */
+export function generateBalanceAck(value) {
+  return (value === 'yes' || value === 'sometimes')
+    ? "Thank you for saying. I'll keep that in mind — it doesn't rule anything out, it just changes the order I'd suggest things in."
+    : "Good to know. I'll still build sensibly, but that opens a few more options.";
+}
+
 export function generateSummary(type, value, storeData) {
   switch (type) {
+
+    // ── W3-A capability summaries ──────────────────────────────────
+    // The user bubble repeats their answer back. It must never editorialise:
+    // "Yes, sometimes" is what they said, not "you have balance problems".
+    case 'balanceWorry':
+      return { 'no': 'No, not really', 'sometimes': 'Sometimes', 'yes': 'Yes' }[value]
+             || 'Not answered';
+
+    case 'chairRise':
+      return { 'yes': 'Yes', 'not-easily': 'Not easily', 'no': 'No' }[value] || 'Not answered';
+
+    case 'floorAccess':
+      return {
+        'yes': 'Yes',
+        'not-comfortably': 'Not comfortably',
+        'rather-not': "I'd rather not try",
+        'no': 'No',
+      }[value] || 'Not answered';
+
+    case 'legPower':
+      // 'skip' never reaches the store (converted to null at the writer),
+      // but the bubble is generated from the CHIP value, so handle it here.
+      return {
+        'full': 'Yes',
+        'limited': 'A little, or on good days',
+        'none': 'No',
+        'skip': "I'd rather not say",
+      }[value] || 'Not answered';
 
     case 'name':
       // value: string
