@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v337
+ * CAP-7. store.js v41 -- floor access no longer confines somebody to a
+ * chair.
+ *
  * 13 Aug 2026 v336
  * CAP-6b. session-builder.js v30 -- impact separated from adapted-content
  * need.
@@ -2368,7 +2372,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v336";
+const CACHE_NAME = "alongside-v337";
 
 const SHELL_URLS = [
 
