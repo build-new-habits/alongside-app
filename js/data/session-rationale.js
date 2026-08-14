@@ -1,5 +1,13 @@
 /**
  * data/session-rationale.js
+ * 13 Aug 2026 v2
+ *
+ * v2 - VOICE-2. Warm-up and cool-down purpose become rotating pools of
+ *   eight. Both were ONE STRING EACH, total, across every session type
+ *   and every session a person ever did. `main` stays single because the
+ *   per-pattern detail that follows it already varies, and stacking two
+ *   rotations there read as assembled rather than written.
+ *
  * 11 Aug 2026 v1
  *
  * The coach explaining the session.
@@ -79,11 +87,59 @@ const GOAL_FOCUS = {
 };
 
 // What each session block is doing, and why it comes where it does.
-const SECTION_PURPOSE = {
-  warmup:   "Warming up. Raising your heart rate first, then loosening the joints you are about to ask something of.",
-  main:     "The working part. This is where the change happens.",
-  cooldown: "Winding down. Lengthening what you have just worked, and letting your breathing settle."
+/**
+ * VOICE-2, 13 Aug 2026. Warm-up and cool-down were ONE STRING EACH,
+ * total, across every session type and every session a person ever did.
+ * Only `main` varied, by movement pattern. Lines written and approved by
+ * Graeme -- do not paraphrase.
+ *
+ * `main` deliberately stays a single opener because it is immediately
+ * followed by the per-pattern detail that already varies, and stacking
+ * two rotations there produced sentences that read as though they had
+ * been assembled rather than written.
+ */
+const SECTION_PURPOSE_POOLS = {
+  warmup: [
+    "Warming up. Raising your heart rate first, then loosening the joints you are about to ask something of.",
+    "The warm-up. Getting warm before getting specific — in that order, deliberately.",
+    "Starting gently. This part is preparation, not a test.",
+    "Warming up. A few minutes of easier movement so the harder movement has somewhere to land.",
+    "The opening. Blood moving first, joints second, load third.",
+    "Warm-up. The point is to arrive at the working part already moving well.",
+    "Easing in. Nothing here should feel like effort yet.",
+    "Warming up. Short, and worth not skipping."
+  ],
+  main: [
+    "The working part. This is where the change happens."
+  ],
+  cooldown: [
+    "Winding down. Lengthening what you have just worked, and letting your breathing settle.",
+    "The end of the session. Slowing everything down on purpose.",
+    "Cooling down. Long, unhurried, and the easiest part to skip — which is why I put it in.",
+    "Winding down. Letting your breathing come back before you go anywhere.",
+    "The last part. Lengthening what you've just shortened.",
+    "Cooling down. Two or three minutes here changes how tomorrow feels.",
+    "Finishing. Slow breathing, long positions, nothing to push against.",
+    "The wind-down. This is where the session ends rather than just stops."
+  ]
 };
+
+/**
+ * Rotation, not random: consecutive sessions must not repeat a line, and
+ * random cannot promise that. Indexed on completed sessions so partials
+ * do not advance it, matching COUNT-1 everywhere else.
+ */
+function _rotation() {
+  try {
+    return store.completedSessions(store.get("activityLog") || []).length;
+  } catch { return 0; }
+}
+
+function _sectionPurpose(section, rotation) {
+  const pool = SECTION_PURPOSE_POOLS[section];
+  if (!pool || !pool.length) return "";
+  return pool[Math.abs(rotation | 0) % pool.length];
+}
 
 /**
  * What a movement pattern is FOR, in plain language.
@@ -145,7 +201,7 @@ export function buildRationale(session, opts = {}) {
 
   return {
     opening:  _opening(exercises, intent, goals, opts.excludedReason),
-    sections: _sections(exercises),
+    sections: _sections(exercises, _rotation()),
     arc:      _arc(exercises, intent, goals)
   };
 }
@@ -240,13 +296,13 @@ function _goalConnection(goals, exercises) {
 
 // ── Sections ─────────────────────────────────────────────────────────────
 
-function _sections(exercises) {
+function _sections(exercises, rotation = 0) {
   const out = {};
   for (const section of ["warmup", "main", "cooldown"]) {
     const inSection = exercises.filter(e => e.section === section);
     if (inSection.length === 0) continue;
 
-    let line = SECTION_PURPOSE[section];
+    let line = _sectionPurpose(section, rotation);
     if (section === "main") {
       // The section line uses the FULL form, because there is room for
       // one proper explanation here and it is the most useful place in

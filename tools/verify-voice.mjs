@@ -134,5 +134,40 @@ if (uniq.length) {
   console.log("\n  PASS  no therapy or self-help register in user-facing copy\n");
 }
 
+
+// ── VOICE-2, 13 Aug 2026: pools must not collapse ────────────────────
+// Every one of these was a SINGLE fixed string until today. Free is
+// locked to Full Body at 30 minutes, so persona 2.12 read a
+// byte-identical sentence at the top of every session he ever did.
+// The failure mode to guard is not a bad line -- it is a pool quietly
+// shrinking back to one, which nothing else would ever notice.
+{
+  const sb  = fs.readFileSync("js/session-builder.js", "utf8");
+  const sr  = fs.readFileSync("js/data/session-rationale.js", "utf8");
+  let poolFails = 0;
+
+  const poolCheck = (label, src, name, min) => {
+    const m = src.match(new RegExp(name + ":\\s*\\[([\\s\\S]*?)\\n\\s*\\]", ));
+    const n = m ? (m[1].match(/^\s*(d =>|")/gm) || []).length : 0;
+    if (n >= min) { console.log(`  PASS  ${label} pool has ${n} lines`); }
+    else { poolFails++; console.log(`  FAIL  ${label} pool has ${n} lines, minimum ${min}. ` +
+      `A pool that collapses to one is the fault VOICE-2 fixed, and it would ` +
+      `look completely normal in review.`); }
+  };
+
+  console.log("\nVOICE-2 - no coach pool has collapsed");
+  for (const type of ["full", "lower", "upper", "core", "cardio", "mobility", "glute"])
+    poolCheck(`session line: ${type}`, sb, type, 4);
+  poolCheck("warm-up purpose", sr, "warmup", 4);
+  poolCheck("cool-down purpose", sr, "cooldown", 4);
+
+  if (!/_rotationIndex\(\)/.test(sb) || /Math\.random\(\)\s*\*\s*COACH_LINES/.test(sb))
+    { poolFails++; console.log("  FAIL  session lines are not rotated on a counter"); }
+  else console.log("  PASS  session lines rotate on a counter, not Math.random()");
+
+  if (poolFails) { console.log(`\n${poolFails} FAILURE(S)\n`); process.exit(1); }
+  console.log("");
+}
+
 console.log(fails === 0 ? "ALL PASS\n" : `${fails} FAILURE(S)\n`);
 process.exit(fails === 0 ? 0 : 1);
