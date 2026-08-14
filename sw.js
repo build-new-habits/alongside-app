@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v329
+ * NAV-8 + upgrade statement withdrawal. router.js v16, upgrade.js v6.
+ * Nothing new to precache.
+ *
  * 13 Aug 2026 v328
  * DEDUPE-1. Eleven duplicate exercise entries retired (556 -> 545),
  * five renamed, session-builder.js v29 name guard, core-session.js
@@ -2337,7 +2341,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v328";
+const CACHE_NAME = "alongside-v329";
 
 const SHELL_URLS = [
 
