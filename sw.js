@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v331
+ * C1b batches 1-2. rehabilitation.js v6 -- 32 entries rewritten and
+ * re-rated. Nothing new to precache.
+ *
  * 13 Aug 2026 v330
  * D3. store.js v40 (new field sessionPreset),
  * session-builder-ui.js v9. Nothing new to precache.
@@ -2345,7 +2349,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v330";
+const CACHE_NAME = "alongside-v331";
 
 const SHELL_URLS = [
 
