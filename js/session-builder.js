@@ -1,6 +1,38 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 13 Aug 2026 v26
+ *
+ * v26 - C4 residuals + SEL-1 + FIX-4.
+ *
+ *   FIX-1 (C4-1) discipline fit. Yoga and Pilates movements sort behind
+ *   everything else in a gym-shaped session. Measured by reversal:
+ *   12 yoga/pilates entries across 12 Lower Body sessions became 0.
+ *   The markers ('yoga-pose', 'pilates-move') already existed and
+ *   nothing had ever read them -- the same shape as C2 and C3.
+ *
+ *   FIX-2 (C4-3) the opening pick. The anchor mechanism was NOT the
+ *   fault and was nearly rebuilt on that misreading. SECTION_NOVELTY
+ *   .main is 0.0, so a main lift already holds once chosen -- persona
+ *   2.15 kept Paused Goblet Squat faithfully for three weeks. The fault
+ *   was one line earlier: her FIRST session picked at uniform random
+ *   from everything unseen, so a goblet squat and a barbell front squat
+ *   were equally likely, and continuity then preserved the coin toss.
+ *   A first-ever main pick now prefers the loadable option the person
+ *   owns the kit for, when their goal is strength. She now opens with
+ *   Barbell Front Squat and it holds.
+ *
+ *   SEL-1. The reserved cardio-warmup slot now honours 'less'
+ *   preferences and discipline fit. Telling the coach "not a fan" and
+ *   watching it open every session with that exercise is worse than
+ *   never being asked.
+ *
+ *   Scope trap worth recording: the pulse slot runs ~120 lines BEFORE
+ *   pickFrom's locals are declared, so referencing `wantsGymDiscipline`
+ *   there threw a temporal-dead-zone error that was invisible in review
+ *   and immediate at runtime. CROSS_DISCIPLINE and GYM_SESSION_TYPES
+ *   are module scope for that reason.
+ *
  * 13 Aug 2026 v25
  *
  * v25 - C2 + sourceLibrary. The rehabilitation library no longer reaches
@@ -805,6 +837,18 @@ function _trimToDuration(warmup, prescribed, main, cooldown, targetMins) {
   return main;
 }
 
+// FIX-1 (C4-1), 13 Aug 2026. Yoga and Pilates movements are marked in
+// the database by movementPattern and nothing had ever read it. Persona
+// 2.15 -- barbell, rack, four gym sessions a week -- was served Tree
+// Pose and Half Moon Pose in Lower Body, and Tree Pose again in Core.
+// They match `balance-work` legitimately; the question nobody asked was
+// whether a yoga pose belongs in a barbell session.
+//
+// Module scope because the reserved cardio-warmup slot needs them as
+// well as pickFrom, and those run in that order.
+const CROSS_DISCIPLINE  = new Set(["yoga-pose", "pilates-move"]);
+const GYM_SESSION_TYPES = new Set(["lower", "upper", "full", "core", "glute"]);
+
 /**
  * CAP-6 (C3), 13 Aug 2026. One definition, used by both _filterCandidates
  * and pickFrom. See js/data/exercises/seated.js's header for the full
@@ -1370,6 +1414,30 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
           if (notAdapted.length > 0) pulsePool = notAdapted;
         }
 
+        // SEL-1, 13 Aug 2026. Logged when CAP-6 shipped, fixed here.
+        // This slot ignored 'less' preferences entirely, so somebody
+        // could tell the coach "not a fan of this" and keep receiving it
+        // as the first thing in every session -- the single most
+        // prominent position in the whole workout. Telling the coach
+        // something and watching nothing change is worse than never
+        // being asked.
+        const pulseNotLess = pulsePool.filter(
+          e => prefs[e.id]?.preference !== "less");
+        if (pulseNotLess.length > 0) pulsePool = pulseNotLess;
+
+        // And cross-discipline fit, for the same reason it applies in
+        // pickFrom: a yoga pose is a strange way to open a barbell
+        // session.
+        // GYM_SESSION_TYPES.has(sessionType) inline rather than the
+        // `wantsGymDiscipline` local: that local is declared ~120 lines
+        // below, and this slot runs first. The temporal-dead-zone error
+        // it caused was invisible in review and immediate at runtime.
+        if (GYM_SESSION_TYPES.has(sessionType)) {
+          const onDiscipline = pulsePool.filter(
+            e => !CROSS_DISCIPLINE.has(e.movementPattern));
+          if (onDiscipline.length > 0) pulsePool = onDiscipline;
+        }
+
         const chosenPulse = pulsePool[Math.floor(Math.random() * pulsePool.length)];
         selected.push(chosenPulse);
         chosen.add(chosenPulse.id);
@@ -1463,6 +1531,30 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       baseNovelty + (SECTION_NOVELTY[section] ?? 0)
     );
 
+    // ── FIX-1 (C4-1), 13 Aug 2026: discipline fit ────────────────────
+    // Persona 2.15 -- barbell, rack, four gym sessions a week -- was
+    // served Tree Pose and Half Moon Pose in a Lower Body session, and
+    // Tree Pose again in Core. They arrive legitimately: both are
+    // movementPattern 'yoga-pose' with balance in affectsAreas, so
+    // `balance-work` matches them, and nothing has ever read the
+    // pattern to ask whether a yoga pose belongs in a barbell session.
+    //
+    // The markers already exist and were simply never used --
+    // 'yoga-pose' and 'pilates-move' are distinct patterns in the
+    // database. Same finding shape as C2 and C3: the data was right and
+    // nothing read it.
+    //
+    // Preference, not exclusion, for the third time in this file and
+    // for the same reason: the Yoga & Pilates door must keep working,
+    // thin categories must not starve, and somebody whose only balance
+    // option IS a yoga pose should still get one.
+    // Declared at module scope (see CROSS_DISCIPLINE above): the
+    // reserved cardio-warmup slot runs BEFORE this point and needs them
+    // too. Declaring them here threw "Cannot access before
+    // initialization" the moment SEL-1 used them -- caught by building a
+    // session, not by reading the file.
+    const wantsGymDiscipline = GYM_SESSION_TYPES.has(sessionType);
+
     function isAnchor(ex) {
       const s = store.exerciseStats(ex.id);
       if (!s.seen) return false;
@@ -1538,6 +1630,15 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
         if (notAdapted.length > 0) candidates = notAdapted;
       }
 
+      // FIX-1. Yoga and Pilates movements sort behind everything else in
+      // a gym-shaped session. They remain reachable when nothing else
+      // fits the slot.
+      if (wantsGymDiscipline) {
+        const onDiscipline = candidates.filter(
+          e => !CROSS_DISCIPLINE.has(e.movementPattern));
+        if (onDiscipline.length > 0) candidates = onDiscipline;
+      }
+
       // Intent tilt, applied before continuity so that a maintenance user
       // builds familiarity WITH the capacities that matter to them rather
       // than around them.
@@ -1561,7 +1662,48 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       // No anchor available, or this slot is deliberately novel: prefer
       // something never met before over something met and dropped.
       const unseen = candidates.filter(e => !store.exerciseStats(e.id).seen);
-      const from = unseen.length > 0 ? unseen : candidates;
+      let from = unseen.length > 0 ? unseen : candidates;
+
+      // ── FIX-2 (C4-3), 13 Aug 2026: the opening pick ─────────────────
+      // The anchor mechanism is NOT the problem here and was nearly
+      // rebuilt on that mistaken reading. SECTION_NOVELTY.main is 0.0,
+      // so once a main lift is chosen it holds -- which is exactly
+      // right, and it worked: persona 2.15 kept Paused Goblet Squat for
+      // three weeks straight.
+      //
+      // The fault is one line earlier. Her FIRST session picked at
+      // uniform random from everything unseen, so a goblet squat and a
+      // barbell front squat were equally likely -- and continuity then
+      // faithfully preserved the coin toss for three weeks. She has a
+      // barbell, a rack, and a goal of getting stronger, and never met
+      // a barbell squat once.
+      //
+      // So: on a first-ever main-slot pick, for somebody whose goal is
+      // strength, prefer the option that can actually be loaded and
+      // that they own the kit for. Deliberately narrow --
+      //   main section only (warm-ups should stay varied),
+      //   strength goals only (nobody else asked to add weight),
+      //   equipment they have declared,
+      //   and only when a real choice exists.
+      // Everything after this point is untouched, because everything
+      // after this point was already correct.
+      if (section === "main" && unseen.length > 0) {
+        const goals = store.get("goals") || [];
+        const wantsLoad = goals.includes("get-stronger") || goals.includes("build-muscle");
+        if (wantsLoad) {
+          const loadable = from.filter(e =>
+            (e.equipment || []).length > 0 &&
+            (e.equipment || []).every(eq => equipSet.has(eq)));
+          if (loadable.length > 0) {
+            // Heaviest-capable first: a barbell squat over a goblet
+            // squat, by difficulty as the available proxy for load.
+            const top = Math.max(...loadable.map(e => e.difficultyLevel || 1));
+            const heaviest = loadable.filter(e => (e.difficultyLevel || 1) === top);
+            from = heaviest;
+          }
+        }
+      }
+
       return from[Math.floor(Math.random() * from.length)];
     }
 
