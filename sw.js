@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 13 Aug 2026 v332
+ * Clinical review applied. rehabilitation.js v7 -- 12 entries plus a
+ * dose correction across three neural flossing entries.
+ *
  * 13 Aug 2026 v331
  * C1b batches 1-2. rehabilitation.js v6 -- 32 entries rewritten and
  * re-rated. Nothing new to precache.
@@ -2349,7 +2353,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v331";
+const CACHE_NAME = "alongside-v332";
 
 const SHELL_URLS = [
 
