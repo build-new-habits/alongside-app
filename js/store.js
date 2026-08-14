@@ -1,5 +1,12 @@
 /**
  * store.js - Data persistence layer
+ * 13 Aug 2026 v40
+ *
+ * v40 - D3. New field sessionPreset ('balanced' | 'strength' |
+ *   'mobility'), the allocation preset the person last chose. Was module
+ *   state reset on every mount. Separate from sessionVariety by design:
+ *   shape of the session vs repetition across sessions.
+ *
  * 13 Aug 2026 v39
  *
  * v39 - EMP-4. New field lastEmpathyPromptAt (ISO string | null),
@@ -686,6 +693,9 @@ export const store = {
         ? saved.exerciseHistory
         : {},
 
+      sessionPreset: ['balanced', 'strength', 'mobility'].includes(saved.sessionPreset)
+        ? saved.sessionPreset
+        : 'balanced',
       sessionVariety: ['familiar', 'balanced', 'varied'].includes(saved.sessionVariety)
         ? saved.sessionVariety
         : 'balanced',
@@ -933,6 +943,21 @@ export const store = {
       // someone wants variety because they skipped a session would be
       // exactly the kind of silent judgement this product refuses.
       sessionVariety: 'balanced',
+      // D3, 13 Aug 2026. The allocation preset the person last chose --
+      // 'balanced' | 'strength' | 'mobility'. Personal-tier control.
+      //
+      // It was module state in session-builder-ui.js, reset to
+      // 'balanced' on every mount. Persona 2.15 trains four times a week
+      // and wants "Mostly strength" every time; she was re-picking it
+      // from scratch at every single session. Remembering it is not a
+      // new feature, it is the absence of an irritation.
+      //
+      // Distinct from sessionVariety, which is about REPETITION and is
+      // asked fresh at check-in. This is about the SHAPE of the session
+      // and is a standing preference until changed. Two concepts, two
+      // fields, deliberately -- collapsing them would be the
+      // one-field-two-meanings fault this build has paid for before.
+      sessionPreset: 'balanced',
 
       // ── CAPABILITY SCREEN (11 Aug 2026) ───────────────────────────
       //
