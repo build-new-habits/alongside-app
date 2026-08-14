@@ -1,6 +1,6 @@
 /**
  * upgrade.js - Upgrade / Membership view
- * 13 Aug 2026 v5
+ * 13 Aug 2026 v6
  *
  * A2. The real page, replacing the 22 May stub.
  *
@@ -46,6 +46,14 @@
  * true, plus a third that is true and was not in the doc (the long
  * wellbeing arc, genuinely gated in in-step.js), and leaves the fourth
  * slot empty rather than filling it.
+ *
+ * SECOND UPDATE, same day. The third statement -- about the long
+ * wellbeing practices -- has been WITHDRAWN. It described a feature
+ * that does not exist. See the note in STATEMENTS below; the short
+ * version is that I verified a tier check rather than a feature, and a
+ * tier check only proves somebody is being refused something.
+ *
+ * Three statements again, all three true.
  *
  * UPDATE, same day. TIER-C shipped and gated the programme engine, so
  * "Your programme builds" is now true and has been restored. TIER-D
@@ -122,8 +130,30 @@ const STATEMENTS = [
   // no tier check at all and the statement would have been a promise
   // the product did not keep. It keeps it now.
   "Your programme builds \u2014 week on week, phase by phase, going somewhere rather than just showing up.",
-  // in-step.js: the long arc behind the In Step door.
-  "And the long practices open up \u2014 the ones that go somewhere over months, shaped around what you\u2019re actually noticing rather than a fixed course."
+  // WITHDRAWN 13 Aug 2026, same day it shipped. This said:
+  //
+  //   "And the long practices open up — the ones that go somewhere over
+  //    months, shaped around what you're actually noticing rather than a
+  //    fixed course."
+  //
+  // It is not true. isPremium() appears in in-step.js exactly ONCE, and
+  // only to decide whether to render the upgrade door. A Personal user
+  // gets nothing extra in In Step -- the long arc the door describes is
+  // the Destination Architecture's four mind destinations (Steadiness,
+  // Restoration, Presence, Connection) and NONE of them are built. grep
+  // for any of those names across js/ returns comments only.
+  //
+  // I wrote this statement this morning while removing two others for
+  // exactly this fault, and I checked the wrong thing: in-step.js
+  // contained isPremium(), so I took the feature as gated. What was
+  // gated was the advert for it.
+  //
+  // The lesson, and it generalises: a tier check proves somebody is
+  // being REFUSED something. It does not prove the something exists.
+  // Verify the feature, never the gate.
+  //
+  // Goes back in when the mind destinations ship, alongside P11 in
+  // personal-reads.js, which is waiting on the same thing.
 ];
 
 export function render() {

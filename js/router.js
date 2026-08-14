@@ -1,5 +1,27 @@
 /**
  * router.js
+ * 13 Aug 2026 v16
+ *
+ * v16 - NAV-8. Two NAV_MAP entries pointed at the wrong tab, in
+ *   opposite directions.
+ *
+ *   'library' -> 'noticing' meant opening the exercise Library
+ *   highlighted the wellbeing tab. Already odd; TIER-F made it visibly
+ *   worse the same day by renaming that tab to "Wellbeing". Now 'today'.
+ *
+ *   'quiet-session' and 'breathing-session' -> 'today' meant somebody
+ *   inside a breathing practice, launched from the Wellbeing hub, was
+ *   told they were on Today. Now 'noticing'.
+ *
+ *   The nav tab is the only persistent "where am I" signal in the
+ *   product. When it disagrees with how you got somewhere it is worse
+ *   than absent, because it is confidently wrong.
+ *
+ *   Also closes a flag open since 13 Jun 2026 ("noticing / noticing-hub
+ *   possible duplicate VIEW_NAMES entries -- resolve whenever the
+ *   Noticing Hub is next in scope"). Verified: there is one entry, not
+ *   two. The duplicate was resolved at some point and the flag never was.
+ *
  * 11 Aug 2026 v15
  *
  * Navigation audit, 11 Aug 2026. Three routes pointed at view files
@@ -197,11 +219,25 @@ const NAV_MAP = {
   'workout': 'today', 'gym-programme': 'today', 'morning-session': 'today',
   'core-session': 'today', 'yoga-session': 'today', 'walk-session': 'today',
   'running-session': 'today', 'cycle-session': 'today', 'swim-session': 'today',
-  'quiet-session': 'today', 'breathing-session': 'today',
+  // NAV-8, 13 Aug 2026. Moved from 'today'. Both are launched from the
+  // Wellbeing hub (noticing.js's breathe and mindful-movement cards) and
+  // exist nowhere else, so highlighting the Today tab while somebody is
+  // inside a breathing practice told them they were somewhere they were
+  // not. The nav tab is the only persistent "where am I" signal in the
+  // product; when it disagrees with how you got here, it is worse than
+  // absent.
+  'quiet-session': 'noticing', 'breathing-session': 'noticing',
   'prescribed': 'today', 'prescribed-session': 'today', 'session-builder': 'today',
   'progress': 'progress', 'weekly-plan': 'progress',
-  'noticing': 'noticing', 'journal-entry': 'noticing', 'library': 'noticing',
+  'noticing': 'noticing', 'journal-entry': 'noticing',
   'in-step': 'noticing',
+  // NAV-8. 'library' moved from 'noticing' to 'today'. The Library is an
+  // exercise surface reached from a Home door -- it holds every session
+  // type, prescribed exercises and the programme. Mapping it to the
+  // wellbeing tab was already odd; TIER-F made it worse the same day by
+  // renaming that tab to "Wellbeing", so opening the exercise Library
+  // now visibly highlighted "Wellbeing".
+  'library': 'today',
   'settings': 'settings', 'privacy': 'settings',
   'upgrade': 'settings', 'goal-setup': 'settings',
   'community-impact': 'settings', 'annual-reflection': 'settings',

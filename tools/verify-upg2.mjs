@@ -61,6 +61,31 @@ check("the CTA is honest about payment", () => {
      "the confirmation does not state that no payment was taken");
 });
 
+check("no statement describes an unbuilt feature", () => {
+  // 13 Aug 2026. Added after shipping a statement about "long practices
+  // that go somewhere over months" on the strength of in-step.js
+  // containing isPremium(). What that gate protected was the ADVERT for
+  // the feature, not the feature -- a Personal user gets nothing extra
+  // in In Step, and the mind destinations it described are unbuilt.
+  //
+  // A tier check proves somebody is being REFUSED something. It does not
+  // prove the something exists. This checks the feature side.
+  const claims = [
+    [/long practices|over months|mind destination/i, "Steadiness|Restoration|Presence|Connection",
+     "the long wellbeing arc (Destination Architecture mind destinations)"],
+    [/exercise library opens|every movement available/i, null,
+     "an exercise-library tier gate — deliberately never built, see TIER-D"]
+  ];
+  const js = fs.readFileSync("js/session-builder.js", "utf8") +
+             fs.readFileSync("js/views/in-step.js", "utf8");
+  for (const [claim, evidence, label] of claims) {
+    if (!claim.test(view)) continue;
+    ok(evidence && new RegExp(evidence).test(js),
+       `the page claims ${label}, and nothing in the codebase implements it. ` +
+       "Verify the feature, never the gate");
+  }
+});
+
 console.log("\nA2 — no urgency mechanics (Design Notes, 09 Jul 2026)");
 
 check("no countdown, badge or social proof", () => {
