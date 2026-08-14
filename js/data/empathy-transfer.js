@@ -1,5 +1,20 @@
 /**
  * data/empathy-transfer.js - Empathy Transfer Prompt Pool
+' * 13 Aug 2026 v4
+ *
+ * v4 - E1. Prompts B and D documented a condition ("when check-in energy
+ *   was low", "after a particularly difficult session") that lived only
+ *   in prefers, never requires. With no difficulty signals every prompt
+ *   scores 0, the tie band holds all four, and selection degenerates to
+ *   rotation -- so persona 2.15, energy 7 every day for three weeks, was
+ *   told she had moved through something difficult. EMP-1s fix arriving
+ *   from the other side: absence of difficulty is not a signal a scorer
+ *   can act on, it has to be a requirement.
+ *
+ *   New compound tag "anyOf:a,b,c" -- requires[] is AND, and a prompt
+ *   about difficulty should fire when the day was hard OR energy was low
+ *   OR they came back after a gap.
+ *
  * 12 Aug 2026 v3
  *
  * v3 - EMP-2. The two gaps v2 raised are closed, and BOTH turned out to
@@ -135,7 +150,20 @@ export const EMPATHY_PROMPTS = {
     // Prompt B — when: after a session where check-in energy was low (4 or below) and the session was completed
     {
       text: "You moved through something difficult today. Not just the physical part — the part before it, where you decided to come. That decision happens quietly and it doesn't get logged anywhere. I noticed it.",
-      requires: [],
+      // E1, 13 Aug 2026. Was requires: [], prefers: ["lowEnergy",
+      // "struggled"] -- so the documented condition on the line above
+      // was a preference only. With NO difficulty signals every prompt
+      // scores 0, TIE_TOLERANCE puts them all in the tied band, and
+      // selection degenerates to rotation. Persona 2.15 -- energy 7
+      // every day for three weeks, no pain, no missed sessions -- was
+      // told she had moved through something difficult.
+      //
+      // This is EMP-1's fix arriving from the other side. EMP-1 stopped
+      // somebody having a hard day getting a cheerful prompt. Nothing
+      // stopped somebody having an easy month getting a sympathetic one,
+      // because the ABSENCE of difficulty is not a signal a scorer can
+      // act on -- it has to be a requirement.
+      requires: ["anyOf:lowEnergy,struggled"],
       prefers:  ["lowEnergy", "struggled"]
     },
     // Prompt C — when: after 6+ completed sessions, when the user has shown a pattern of adjusting rather than skipping
@@ -147,7 +175,10 @@ export const EMPATHY_PROMPTS = {
     // Prompt D — when: after a particularly difficult session or a return after a longer gap
     {
       text: "Something worth sitting with on the way home: the version of you that shows up here on hard days — what would you call that quality? Not the fitness part. The other part.",
-      requires: [],
+      // E1. Same change, same reason: "on hard days" is a claim about
+      // the person's experience and must not fire when there have been
+      // none.
+      requires: ["anyOf:struggled,returning,lowEnergy"],
       prefers:  ["struggled", "returning"]
     }
   ],
@@ -352,6 +383,13 @@ export function canEnterStage(stageNum, sessionCount) {
 function conditionHolds(cond, ctx) {
   if (cond.startsWith("minSessions:")) {
     return ctx.sessionCount >= parseInt(cond.split(":")[1], 10);
+  }
+  // E1, 13 Aug 2026. "anyOf:a,b,c" — holds when at least one does.
+  // Needed because requires[] is AND, and a prompt about difficulty
+  // should fire when the day was hard OR the energy was low OR they
+  // came back after a gap, not only when all three are true at once.
+  if (cond.startsWith("anyOf:")) {
+    return cond.slice(6).split(",").some(c => conditionHolds(c.trim(), ctx));
   }
   switch (cond) {
     // Today's answers — these lead, per the 12 Aug decision.

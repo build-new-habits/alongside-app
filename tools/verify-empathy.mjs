@@ -41,7 +41,13 @@ check("no unknown condition tags (a typo must not silently disable a prompt)", (
     "coachAdjusted"]);
   for (const [s, pool] of Object.entries(EMPATHY_PROMPTS))
     pool.forEach((p, i) => [...p.requires, ...p.prefers].forEach(c => {
-      ok(c.startsWith("minSessions:") || known.has(c), `stage ${s}[${i}] unknown tag "${c}"`);
+      // E1, 13 Aug 2026: "anyOf:a,b,c" is a compound tag. Each member
+      // must still be a known condition, so a typo inside one is caught
+      // rather than silently passing the whole compound.
+      const parts = c.startsWith("anyOf:") ? c.slice(6).split(",").map(x => x.trim()) : [c];
+      parts.forEach(part =>
+        ok(part.startsWith("minSessions:") || known.has(part),
+           `stage ${s}[${i}] unknown tag "${part}"` + (c === part ? "" : ` (inside "${c}")`)));
     }));
 });
 
@@ -107,19 +113,42 @@ check("a tie never manufactures a repeat", () => {
 
 console.log("\nTEST 6 - pool coverage (the fault a passing suite still missed)");
 check("every prompt in every stage is reachable over a long arc", () => {
+  // E1, 13 Aug 2026. This ran 200 iterations of ONE neutral context. That
+  // was right when every prompt had requires: [] -- any unreachable
+  // prompt then meant the rotation was broken, which is the bug this
+  // test was written for and it caught it.
+  //
+  // It is the wrong test now. Prompts B and D require difficulty, so
+  // under a permanently neutral context they SHOULD never fire, and the
+  // test failed on correct behaviour. Reachability has to mean
+  // "reachable by somebody", not "reachable by one hypothetical person
+  // who never has a hard day".
+  //
+  // The rotation bug it guards is still guarded: within any single
+  // context, prompts tied on score must still take turns.
+  const CONTEXTS = [
+    ctx({ sessionCount: 200 }),                                        // neutral
+    ctx({ sessionCount: 200, lowEnergy: true }),                       // flat
+    ctx({ sessionCount: 200, struggled: true, lowEnergy: true }),      // hard day
+    ctx({ sessionCount: 200, returning: true }),                       // back after a gap
+    ctx({ sessionCount: 200, adjusting: true, variablePattern: true }) // adapting
+  ];
   for (let s = 1; s <= 5; s++) {
     const pool = EMPATHY_PROMPTS[s];
     const seen = new Set();
-    let last = NONE;
-    for (let i = 0; i < 200; i++) {
-      // Session count high enough that no minSessions gate excludes anything.
-      const r = selectEmpathyPrompt(s, ctx({ sessionCount: 200 }), last, i);
-      seen.add(r.index);
-      last = { stage: r.stage, index: r.index, runLength: r.runLength };
+    for (const c of CONTEXTS) {
+      let last = NONE;
+      for (let i = 0; i < 200; i++) {
+        const r = selectEmpathyPrompt(s, c, last, i);
+        if (!r) continue;
+        seen.add(r.index);
+        last = { stage: r.stage, index: r.index, runLength: r.runLength };
+      }
     }
     ok(seen.size === pool.length,
-       `stage ${s}: only ${seen.size} of ${pool.length} prompts ever fire (${[...seen].sort()}). ` +
-       `A stable sort on score alone always returns the lowest index.`);
+       `stage ${s}: only ${seen.size} of ${pool.length} prompts fire across five ` +
+       `different lives (${[...seen].sort()}). A prompt no context can reach is ` +
+       `either mis-tagged or dead copy.`);
   }
 });
 check("fit still overrides rotation", () => {

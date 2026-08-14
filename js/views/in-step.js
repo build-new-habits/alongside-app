@@ -3,7 +3,14 @@
  * 09 Aug 2026 v1
  *
  * "In Step" — practice space extending the empathy transfer arc.
- * Route: "in-step". Personal tier (gated via js/auth.js isPremium()).
+ * Route: "in-step". FREE since DOOR-1 (12 Aug 2026) -- the empathy arc
+ * is a practice, not a journey, and practices are free. The long-horizon
+ * version behind the upgrade door is the paid part.
+ *
+ * E3, 13 Aug 2026: this line previously still said "Personal tier (gated
+ * via js/auth.js isPremium())". The code was right and the header was
+ * wrong for a day. Documentation drift of exactly the kind logged at the
+ * top of master schedule v183.
  * Nav: hidden (activity flow, same pattern as journal-entry/breathing-session).
  *
  * Spec: PM chat session, 09 Aug 2026 ("In Step" concept development).

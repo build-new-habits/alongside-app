@@ -1,5 +1,11 @@
 /**
  * progress.js
+ * 13 Aug 2026 v6
+ *
+ * v6 - E2. The export counted partials while every on-screen count did
+ *   not. Last raw activityLog read in the file, now routed through
+ *   store.completedSessions() like the rest.
+ *
  * 13 Aug 2026 v5
  *
  * v5 - TIER-E. Progress must differ in KIND, not length.
@@ -626,7 +632,18 @@ export function ProgressView(router) {
   // ── Export handler ─────────────────────────────────────────────────────────
 
   function _handleExport(type) {
-    const activityLog    = store.get('activityLog') || [];
+    // E2, 13 Aug 2026. This was the last raw activityLog read in the
+    // file. Every count ON SCREEN routes through completedSessions()
+    // (:156, :178, and today.js :285/:451/:501) and this one did not --
+    // so the document a Personal user copies out, plausibly to show a
+    // physio or a GP, reported a HIGHER session count than the screen it
+    // came from, by the number of partials in the window.
+    //
+    // verify-count1.mjs missed it because it asserted `via >= 2` -- that
+    // AT LEAST TWO reads are compliant, not that all are. progress.js
+    // had three, two compliant, gate green. A threshold gate cannot
+    // detect the case it exists for; the gate is corrected alongside this.
+    const activityLog    = store.completedSessions(store.get('activityLog'));
     const checkinHistory = store.get('checkinHistory') || {};
     const goals          = store.get('goals') || [];
     const name           = store.get('name') || 'User';
