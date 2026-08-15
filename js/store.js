@@ -1,5 +1,13 @@
 /**
  * store.js - Data persistence layer
+ * 15 Aug 2026 v47
+ *
+ * v47 - MOOD-1. logActivity() mirrors moodAfter into the day's
+ *   checkinHistory entry. It was written to activityLog and read from
+ *   checkinHistory, so three coach branches were dead — including
+ *   'low-in-better-out', the observation that tells somebody they
+ *   arrived low and left better.
+ *
  * 14 Aug 2026 v46
  *
  * v46 - CARDIAC-1. New field exerciseClearance. null means NOT ASKED and
@@ -1858,6 +1866,52 @@ export const store = {
     // anything and must not make an exercise look familiar.
     if (finalEntry.status !== 'partial' && Array.isArray(finalEntry.exerciseIds)) {
       this.recordExercises(finalEntry.exerciseIds, finalEntry.performance);
+    }
+
+    // ── MOOD-1 (15 Aug 2026, moment-of-delight audit) ──────────────────
+    //
+    // moodAfter is written here, into activityLog. Three branches in
+    // checkin-openings.js read it from checkinHistory, which is a
+    // different object that has never carried the field. So all three
+    // were dead:
+    //
+    //   'low-in-better-out'     — "Last time you said you weren't sure
+    //                              you wanted to start — but you did, and
+    //                              you felt better after."
+    //   'better-after-pattern'  — the same observation across three days
+    //   'active-quiet-pattern'  — needs moodAfter to detect the shape
+    //
+    // The first of those is arguably the most valuable sentence the coach
+    // has. It is the one that tells somebody the thing they cannot see
+    // about themselves, and it has never been shown to anybody.
+    //
+    // Mirrored here rather than fixed at the reader, for two reasons.
+    // This is the single shared write path, so every caller is covered
+    // including future ones -- reflect.js, gym-programme.js and
+    // workout.js all pass through here. And checkinHistory is genuinely
+    // the right home: "how I felt after moving today" is a fact about the
+    // day, which is what that object records.
+    //
+    // Last write wins on a multi-session day. Honest rather than
+    // flattering: taking the highest would let one good session paper
+    // over a hard one, and the coach would then say "you felt better
+    // after" to somebody who did not.
+    //
+    // Only mirrors a real number. A null must not overwrite a value
+    // already recorded, or a later session logged without a reflection
+    // would erase the reflection the person actually gave.
+    if (typeof finalEntry.moodAfter === 'number' && finalEntry.status !== 'partial') {
+      const dayKey  = (finalEntry.completedAt ? new Date(finalEntry.completedAt) : new Date())
+        .toISOString().split('T')[0];
+      const history = { ...(this.data.checkinHistory || {}) };
+      if (history[dayKey]) {
+        history[dayKey] = { ...history[dayKey], moodAfter: finalEntry.moodAfter };
+        this.data.checkinHistory = history;
+        this.save();
+      }
+      // No checkin for that day means the person moved without checking
+      // in. Nothing to attach it to, and inventing a check-in entry would
+      // put words in their mouth on every other field.
     }
 
     return finalEntry;
