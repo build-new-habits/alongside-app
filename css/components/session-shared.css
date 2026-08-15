@@ -224,3 +224,22 @@
   .cs-focus-card,
   .cs-duration-card { transition: none; }
 }
+
+/* ── First-session recognition (DELIGHT-1, 15 Aug 2026) ───────────────────
+   Sits ABOVE the usual done card, as its own quiet block. Deliberately
+   not decorated: no badge, no confetti, no colour change. Somebody who
+   told us that every previous attempt escalated until it broke is exactly
+   the person who reads celebration as the start of pressure.
+
+   The separation between the two cards is doing the work — the
+   recognition is a different kind of statement from "8 exercises, 20
+   minutes", and it should not look like a subheading of it. */
+
+.cs-first-session {
+  text-align: left;
+}
+
+.cs-first-session__heading {
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
