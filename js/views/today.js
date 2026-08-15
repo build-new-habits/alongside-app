@@ -1,5 +1,11 @@
 /**
  * today.js
+ * 15 Aug 2026 v17
+ *
+ * v17 - PACE-2. A weekly target set sharply above recent actual
+ *   history is named warmly on Home, once a week at most. Matrix
+ *   decision 4, agreed 05 Jul.
+ *
  * 15 Aug 2026 v16
  *
  * v16 - TARGET-2. Reaching the weekly target the person chose is now
@@ -232,6 +238,7 @@
  */
 
 import { store }               from '../store.js';
+import { noticePlanJump } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
 import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
 
@@ -457,8 +464,16 @@ export function TodayView(router) {
     // current state of the week, so it is idempotent and P4-safe — the
     // coach displays, it does not interpret. It appears on the days she
     // has moved, and the week resets it.
+    // PACE-2. Matrix decision 4: a plan set sharply above recent actual
+    // history gets named warmly, once a week at most. Checked before the
+    // other lines because it is about the shape of the whole week rather
+    // than about today, and because it is the one persona 2.8 needs.
+    const planJump = noticePlanJump();
+
     const targetMet = sessionDone && weeklyTarget && sessionCount >= weeklyTarget;
-    const coachLine     = targetMet
+    const coachLine     = planJump
+      ? planJump.body
+      : targetMet
       ? `That's the ${weeklyTarget} you said you'd aim for this week. Anything else is extra, not expected.`
       : sessionDone
       ? "You moved today \u2014 that's done. Tap in below any time if you'd like to do more."
