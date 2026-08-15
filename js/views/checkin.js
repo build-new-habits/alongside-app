@@ -351,6 +351,20 @@ export function CheckinView(router) {
   // ENERGY PANEL
   // ─────────────────────────────────────────────────────────────────────────
 
+  /**
+   * QUICK-1. Is this a short check-in?
+   *
+   * Reads the stored preference rather than asking every time. Asking
+   * "have you got time?" before every session would itself be the
+   * friction 2.16 is complaining about, and it would make her declare
+   * her own busyness daily, which is its own small indignity.
+   *
+   * Changed in Settings, under "How you like things".
+   */
+  function _briefPath() {
+    return store.get('sessionPace') === 'brief';
+  }
+
   function _showEnergyPanel() {
     const val     = _checkin.energy;
     const hour    = new Date().getHours();
@@ -443,6 +457,35 @@ export function CheckinView(router) {
       await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
       _showUserBubble(`${checkinData.getMoodEmoji(_checkin.mood)} ${_checkin.mood}/10 — ${checkinData.getMoodLabel(_checkin.mood)}`);
       await _showCoachBubble(_moodBridge(_checkin.mood));
+
+      // ── QUICK-1 (15 Aug 2026) ─────────────────────────────────────
+      //
+      // Persona 2.16 — parent of young children, short windows only,
+      // "wants the workout, not conversation". Her unprompted sentence
+      // in the would-they-tell-someone audit was "it talks too much",
+      // and she is in the tertiary market the thesis names, currently
+      // served worse than personas the product is not aimed at.
+      //
+      // The brief path stops here: energy and mood are in, which is
+      // everything detectBurnout() reads and the source of
+      // todayIntensity. The feeling word, sleep and variety questions
+      // are enrichment and wait for a day she has time.
+      //
+      // The coach has still spoken first, and has still responded to
+      // both answers. That is the part that does not compress.
+      //
+      // Conditions are NOT skipped — see _briefPath(). Somebody with a
+      // declared condition is asked about pain regardless of pace.
+      if (_briefPath()) {
+        if (_conditions.length > 0) {
+          await _showCoachBubble("One thing before we go. How's the pain today?");
+          _showConditionsPanel();
+        } else {
+          await _finishConversation();
+        }
+        return;
+      }
+
       _showFeelingWordPanel();
     });
 
