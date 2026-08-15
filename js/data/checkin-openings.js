@@ -1,5 +1,13 @@
 /**
  * js/data/checkin-openings.js
+ * 14 Aug 2026 v4
+ *
+ * v4 - OPEN-1. Three day-one openings could never fire. `else if (ageBand)`
+ *   sat above injury-recovery, return-to-fitness and feel-good, and
+ *   ageBand is asked of everyone, so it always won. Generic fallback moved
+ *   last. return-to-fitness repointed from lifestyle.exerciseHistory
+ *   (writer deleted) to lifestyle.activityLevel === 'returning'.
+ *
  * 11 Aug 2026 v3
  *
  * v3 — PT-1 (Persona Tracing Wave 1). _resolveDayOne()'s territory branch
@@ -378,10 +386,28 @@ function _resolveDayOne() {
   // for anyone, so it now fires for any known age band and sits just above
   // 'generic' — a warmer default than "No history yet" for someone who
   // named no territory and logged no condition.
-  else if (ageBand)  trigger = 'changing-body';
-  else if (lifestyle.returningAfter === 'injury' || lifestyle.returningAfter === 'illness') trigger = 'injury-recovery';
-  else if (lifestyle.exerciseHistory === 'lapsed' || lifestyle.exerciseHistory === 'returning') trigger = 'return-to-fitness';
-  else if (goals.includes('feel-good'))                            trigger = 'feel-good';
+  //
+  // OPEN-1, 14 Aug 2026. Three branches below 'changing-body' could never
+  // fire. ageBand is asked of everyone at step 6 and is therefore always
+  // truthy, so `else if (ageBand)` swallowed injury-recovery,
+  // return-to-fitness and feel-good outright -- three written, reviewed
+  // coach openings that no user has ever seen. The comment above says
+  // this line "sits just above 'generic'". It did not; it sat above four
+  // more specific triggers.
+  //
+  // Reordered so the generic fallback is last, which is what it was
+  // always described as. 'changing-body' is a warmer default than
+  // 'generic', not a match.
+  else if (lifestyle.returningAfter === 'injury' ||
+           lifestyle.returningAfter === 'illness')       trigger = 'injury-recovery';
+  // OPEN-1. Was lifestyle.exerciseHistory, whose only writer was the
+  // deleted views/onboarding/lifestyle.js -- so this had no live input
+  // even once the ordering was fixed. Reads lifestyle.activityLevel
+  // instead, which the onboarding thread writes at step 9 and whose
+  // 'returning' chip means exactly this.
+  else if (lifestyle.activityLevel === 'returning')      trigger = 'return-to-fitness';
+  else if (goals.includes('feel-good'))                  trigger = 'feel-good';
+  else if (ageBand)                                      trigger = 'changing-body';
 
   const v = DAY_ONE.find(d => d.trigger === trigger) || DAY_ONE.find(d => d.trigger === 'generic');
   return { b1: v.b1, b2: v.b2, mode: 'day-one', careMode: v.careMode };

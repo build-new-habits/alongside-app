@@ -1,5 +1,11 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 14 Aug 2026 v7
+ *
+ * v7 - OPEN-1. Step 9e writes lifestyle.returningAfter, which
+ *   checkin-openings.js reads and nothing wrote. Shown only when the
+ *   activity answer was 'returning'.
+ *
  * 14 Aug 2026 v6
  *
  * v6 - W3-A. Capability steps 9a-9d. The CAP-1 questions moved here from
@@ -104,6 +110,14 @@ export const HARD_BEFORE_PHRASE_MAP = {
 // only for 'no' or null, so 'sometimes' and 'yes' behave identically today
 // -- but collapsing them would make a declared value unproducible and
 // throw away a distinction the schema is holding open.
+// Vocabulary from store.js:1090 — 'injury'|'illness'|'life'|'burnout'.
+export const RETURNING_AFTER_CHIPS = [
+  { id: 'injury',  label: 'An injury'          },
+  { id: 'illness', label: 'Illness'            },
+  { id: 'life',    label: 'Life got in the way' },
+  { id: 'burnout', label: 'Burnout'            },
+];
+
 export const BALANCE_CHIPS = [
   { id: 'no',        label: 'No, not really' },
   { id: 'sometimes', label: 'Sometimes'      },
@@ -546,6 +560,29 @@ export const STEPS = {
     },
   },
 
+  // ── Step 9e — Returning after what (OPEN-1, 14 Aug 2026) ─────────────────
+  //
+  // lifestyle.returningAfter is READ by checkin-openings.js to select the
+  // 'injury-recovery' day-one opening, and had no writer at all -- its
+  // only one was the deleted views/onboarding/lifestyle.js. So the opening
+  // was doubly dead: unreachable in the trigger chain AND with no input.
+  //
+  // Asked only of somebody who has just said they are coming back after a
+  // break, which is the one group for whom it is a kind question rather
+  // than a prying one.
+  '9e': {
+    id: '9e',
+    type: 'inline-chips-single',
+    chips: RETURNING_AFTER_CHIPS,
+    storeField: 'lifestyle.returningAfter',
+    summaryType: 'returningAfter',
+    showIf: (storeData) => (storeData.lifestyle || {}).activityLevel === 'returning',
+    coach: "You said you're coming back after a break. Can I ask what from?\n\nOnly because coming back from an injury is a different thing to coming back from a hard year, and I'd rather not treat them the same.",
+    coachAfter: {
+      answered: "Thank you. I'll bear that in mind.",
+    },
+  },
+
   // ── Step 10 — Energy ──────────────────────────────────────────────────────
   // Inline chips. Single select. No skip.
   // Writes store.lifestyle.stressLevel (energy maps to this field).
@@ -639,7 +676,7 @@ export const STEPS = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const STEP_ORDER = [0, 1, 2, '2b', '3a', '3b', 4, 5, 6, 7, 8, 9,
-                           '9a', '9b', '9c', '9d',
+                           '9a', '9b', '9c', '9d', '9e',
                            10, 11, 12, 13, 14];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -675,6 +712,11 @@ export function generateSummary(type, value, storeData) {
     // ── W3-A capability summaries ──────────────────────────────────
     // The user bubble repeats their answer back. It must never editorialise:
     // "Yes, sometimes" is what they said, not "you have balance problems".
+    case 'returningAfter':
+      return { 'injury': 'An injury', 'illness': 'Illness',
+               'life': 'Life got in the way', 'burnout': 'Burnout' }[value]
+             || 'Not answered';
+
     case 'balanceWorry':
       return { 'no': 'No, not really', 'sometimes': 'Sometimes', 'yes': 'Yes' }[value]
              || 'Not answered';
