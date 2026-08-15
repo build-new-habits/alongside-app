@@ -154,6 +154,21 @@ export const FIELD_CONTRACT = {
     meaning: "TWO LEVELS, and they must stay two. 'avoid' is never suggested again — a hard exclusion in _filterCandidates(). 'less' is offered roughly a fifth as often, never zero; it was implemented as 'never chosen while something else exists', which in a pool of fifty is never, and the gentler option was doing the harsher thing. Binary per the skip/dislike spec: not a rating, no stars, no scores. Both reversible in Settings."
   },
 
+  // ASSESS-1, 15 Aug 2026.
+  "sessionMode": {
+    values: ["coach-led", "coach-supported", "free-hand"],
+    writer: "views/settings.js",
+    meaning: "How much the person wants decided for them. SAFETY IS NOT A MODE — capability gates, the condition filter and the exercise-clearance question apply identically in all three. Default coach-led, which is the product's centre; the other two exist for somebody who does not need deciding for."
+  },
+
+  // ASSESS-1. measuredLevel deliberately reuses lifestyle.activityLevel's
+  // vocabulary so no downstream reader has to learn a second scale.
+  "assessment.baseline.measuredLevel": {
+    values: ["sedentary", "light", "moderate", "active", "very-active"],
+    writer: "store.js recordAssessment()",
+    meaning: "What the coach read from how the movements felt. Written straight to fitnessLevel, which is the field three readers already resolve, so this is the first thing that can move the difficulty ceiling without the person editing Settings. NOT a score, and it must read down as honestly as up."
+  },
+
   // PB-1, 15 Aug 2026. Matrix decision 2, agreed 05 Jul.
   "showPersonalBests": {
     values: [true, false],
