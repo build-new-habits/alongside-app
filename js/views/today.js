@@ -564,6 +564,22 @@ export function TodayView(router) {
   const WELLBEING_GOALS = new Set([
     'reduce-stress', 'sleep-better', 'improve-mood', 'feel-better'
   ]);
+  // ORIENT-2. Ids verified against data/goals.js, not invented -- a goal
+  // id that reads plausibly and matches nothing has cost this project
+  // four times.
+  const STRENGTH_GOALS = new Set([
+    'get-stronger', 'build-muscle', 'improve-cardio', 'lose-weight', 'tone-up'
+  ]);
+  // 'move-better' and 'stay-mobile' were in the first draft of this set.
+  // Neither exists in goals.js. They read entirely plausibly and would
+  // have matched nothing, silently sending everybody in this group to the
+  // generic line -- the fifth instance of that exact fault. The ids below
+  // are the real mobility-recovery group, and verify-delight.mjs now
+  // asserts every id in both sets exists.
+  const MOVEMENT_GOALS = new Set([
+    'flexibility', 'balance', 'reduce-pain',
+    'injury-recovery', 'prevent-injury', 'improve-posture'
+  ]);
   const ORIENTATION_SESSIONS = 4;
 
   function _buildCoachLine() {
@@ -642,6 +658,35 @@ export function TodayView(router) {
         // Naming the door that decides for you is the whole point of it.
         return "If you'd rather not choose, \u201CUnsure\u201D lets me decide today.";
       }
+
+      // ── ORIENT-2 (15 Aug 2026, first-ninety-seconds audit) ──────────
+      //
+      // ORIENT-1 gave a line to wellbeing-goal users and to users with no
+      // goal at all. Everybody else still got null. Checked across the
+      // persona set: FIVE of nine were silent here -- 2.6, 2.10, 2.15,
+      // 2.16 and 2.4. That includes the 76-year-old and the returning
+      // lifter, neither of whom is an edge case.
+      //
+      // They come out of a twenty-question conversation that ends "I'm
+      // glad you're here, [name]. Let's see what we can do." and land on
+      // a grid of four unlabelled doors in silence. The product handles
+      // its edge cases warmly and says nothing to the middle.
+      //
+      // Same constraints as ORIENT-1: the grid does NOT reorder, because
+      // a Home screen that rearranges itself is aversive to persona 2.14.
+      // The coach speaks instead. Orientation, not a nudge -- it names
+      // where the thing they asked for lives, once, in the first few
+      // sessions, and then stops.
+      if (goals.some(g => STRENGTH_GOALS.has(g))) {
+        return "Cardio, Core & Strength is the door for what you said you're after.";
+      }
+      if (goals.some(g => MOVEMENT_GOALS.has(g))) {
+        return "Mobility & Conditioning is where the gentler movement lives \u2014 that might be the door for you.";
+      }
+      // Everything else, including 'build-habit' alone. Says the true
+      // thing rather than guessing a door: the smallest session is the
+      // one most likely to actually happen.
+      return "Any door is a fine place to start. The shortest session counts as much as the longest one.";
     }
 
     return null;
