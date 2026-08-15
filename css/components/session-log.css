@@ -1,8 +1,11 @@
 /* ============================================================
    session-log.css
    css/components/session-log.css
-   12 Aug 2026 v1
+   15 Aug 2026 v2
 
+
+   v2 - PB-1. .slog__best, styled identically to the last-note line so a
+        best does not read as an achievement to defend.
    Session notes -- what you did on an exercise, so you are not guessing
    at it next time. Moved here from gym-programme.css (LOG-1), renamed
    from .gp-lift* now that it is not gym-specific: the same block records
@@ -30,6 +33,16 @@
   color: var(--color-text);
   margin: 0 0 var(--space-3);
   font-variant-numeric: tabular-nums;
+}
+
+/* PB-1, 15 Aug 2026. Sits directly under the last-note line and looks
+   the same as it. Deliberately not highlighted: a best styled as an
+   achievement becomes a target, and the toggle exists precisely because
+   most people should not be shown one. */
+.slog__best {
+  font-size: 0.85em;
+  opacity: 0.8;
+  margin: 0.15em 0 0;
 }
 
 .slog__last--empty {

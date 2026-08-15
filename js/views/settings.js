@@ -1,5 +1,10 @@
 /**
  * settings.js
+ * 15 Aug 2026 v27
+ *
+ * v27 - PB-1. "Show your best" toggle, off by default and separate from
+ *   session notes. Bests are recorded either way; this governs display.
+ *
  * 15 Aug 2026 v26
  *
  * v26 - QUICK-1. sessionPace control in "How you like things". The
@@ -1181,6 +1186,10 @@ export function SettingsView(router) {
   // live field for tidiness is a migration, not a rename.
   function renderLiftLogPanel() {
     const on = store.get('liftLogEnabled') === true;
+    // PB-1. Bests are RECORDED regardless; this governs whether they are
+    // shown. Turning it on later reveals everything already logged
+    // rather than starting from nothing.
+    const pbOn = store.get('showPersonalBests') === true;
 
     return `
       <div class="settings-section">
@@ -1190,6 +1199,22 @@ export function SettingsView(router) {
           whatever that exercise actually gives you &mdash; so you are not
           guessing next time.
         </p>
+
+        <div class="settings-field settings-field--toggle">
+          <label class="settings-label" for="settings-pb">
+            Show your best
+            <span class="settings-label__sub">The highest you have logged for an exercise, alongside your last note. Off unless you want it.</span>
+          </label>
+          <button
+            class="settings-toggle ${pbOn ? 'settings-toggle--on' : ''}"
+            id="settings-pb"
+            data-action="toggle-pb"
+            role="switch"
+            aria-checked="${pbOn ? 'true' : 'false'}"
+            aria-label="Show your best">
+            <span class="settings-toggle__track" aria-hidden="true"></span>
+          </button>
+        </div>
 
         <div class="settings-field settings-field--toggle">
           <label class="settings-label" for="settings-lift-log">
@@ -2008,6 +2033,16 @@ export function SettingsView(router) {
           .map(b => b.dataset.movement);
         store.set('movementIdentity', selectedMovement);
         _showToast('How you move, updated', container);
+        break;
+      }
+
+      case 'toggle-pb': {
+        const next = store.get('showPersonalBests') !== true;
+        store.set('showPersonalBests', next);
+        render(container);
+        attachEvents(container);
+        _showToast(next ? 'I will show your best alongside your notes'
+                        : 'Bests hidden — still recorded if you want them later', container);
         break;
       }
 

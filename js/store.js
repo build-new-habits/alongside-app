@@ -1,5 +1,11 @@
 /**
  * store.js - Data persistence layer
+ * 15 Aug 2026 v50
+ *
+ * v50 - PB-1. personalBests + showPersonalBests, and logLift() records
+ *   a best on the way in so liftLog's 20-entry eviction cannot lose it.
+ *   Matrix decision 2, agreed 05 Jul.
+ *
  * 15 Aug 2026 v49
  *
  * v49 - QUICK-1. New field sessionPace ('full' | 'brief') for the
@@ -551,6 +557,15 @@ export const store = {
       liftLog: (saved.liftLog && typeof saved.liftLog === 'object' && !Array.isArray(saved.liftLog))
         ? saved.liftLog
         : {},
+
+      // PB-1
+      personalBests: (saved.personalBests && typeof saved.personalBests === 'object'
+                      && !Array.isArray(saved.personalBests))
+        ? saved.personalBests
+        : {},
+      showPersonalBests: typeof saved.showPersonalBests === 'boolean'
+        ? saved.showPersonalBests
+        : false,
 
       // ── CONSENT (v19) ─────────────────────────────────────────
       // Never overwrite a real consent record with defaults — an existing
@@ -1328,6 +1343,36 @@ export const store = {
       // rather than by session so recall works across programmes.
       liftLog: {},
 
+      // ── PERSONAL BESTS (PB-1, 15 Aug 2026) ────────────────────
+      //
+      // Matrix decision 2, agreed 05 Jul: "basic performance logging
+      // becomes a Personal-tier feature independent of the weekly
+      // programme builder". Persona 2.7 — runs 10k, gyms, wants PBs, not
+      // interested in mindful content. Without this he keeps a second app
+      // for the one thing he cares about, and two-app users churn.
+      //
+      // STORED, NOT DERIVED, for one reason: liftLog caps at 20 entries
+      // per exercise and evicts oldest-first. That is right for a memory
+      // aid, whose only read is the most recent entry — but a genuine
+      // best would be silently thrown away. Written as it happens
+      // instead, so it survives.
+      //
+      // { [exerciseId]: { [metric]: { value, unit, at } } }
+      //
+      // ONLY unambiguous metrics. weight, reps, distance and speed are
+      // "more is better" in every context this app logs them. durationMins
+      // deliberately is NOT tracked: longer is better for a plank and
+      // worse for a 5k, and a "best" that is sometimes backwards is worse
+      // than none. Logged as an open item rather than guessed.
+      personalBests: {},
+
+      // Default OFF, and separate from liftLogEnabled on purpose.
+      // Somebody using session notes as a memory aid did not ask to be
+      // shown a best, and for personas 2.5, 2.8 and 2.13 a visible best
+      // is a target to fall short of. 2.7 turns it on because he came
+      // looking for it.
+      showPersonalBests: false,
+
       // ── ACTIVITY LOG ─────────────────────────────────────────
       // Each entry: { date, type, durationMins, moodAfter (int|null),
       //               isEvent (bool), eventName (string|null), ... }
@@ -1728,9 +1773,53 @@ export const store = {
     if (list.length > 20) list.splice(0, list.length - 20);
     log[exerciseId] = list;
     this.data.liftLog = log;
+
+    // ── PB-1 (15 Aug 2026) ────────────────────────────────────────────
+    //
+    // Updated on the way in, because liftLog evicts at 20 entries and a
+    // best that only existed in the evicted tail would vanish silently.
+    //
+    // Recorded regardless of showPersonalBests. The toggle governs
+    // whether the person is SHOWN a best, not whether one is kept —
+    // otherwise turning it on later would show an empty history and
+    // quietly lose everything they had already done. Nothing reads this
+    // unless they ask for it.
+    const PB_METRICS = ['weight', 'reps', 'distance', 'speed'];
+    const bests = { ...(this.data.personalBests || {}) };
+    const forEx = { ...(bests[exerciseId] || {}) };
+    let changed = false;
+    for (const m of PB_METRICS) {
+      if (typeof record[m] !== 'number') continue;
+      const current = forEx[m];
+      // Strictly greater: equalling a best is not beating it, and
+      // announcing it as new would be a small untruth.
+      if (!current || record[m] > current.value) {
+        forEx[m] = { value: record[m], at: record.at };
+        if (m === 'weight' && record.unit) forEx[m].unit = record.unit;
+        changed = true;
+      }
+    }
+    if (changed) {
+      bests[exerciseId] = forEx;
+      this.data.personalBests = bests;
+    }
+
     this.data.updatedAt = new Date().toISOString();
     this.save();
     return list[list.length - 1];
+  },
+
+  /**
+   * PB-1. The recorded bests for an exercise, or null.
+   *
+   * Returns the record only. No delta against the last attempt, no
+   * ranking, no streak of improvements — same restraint as lastLift(),
+   * and for the same reason: P4. The person can see what their best is;
+   * the coach does not tell them what it means.
+   */
+  personalBest(exerciseId) {
+    const b = (this.data.personalBests || {})[exerciseId];
+    return b && Object.keys(b).length ? b : null;
   },
 
   /**
