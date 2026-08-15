@@ -1,39 +1,8 @@
 # Alongside: Move — Master Schedule
-## 15 Aug 2026 v194
+## 15 Aug 2026 v193
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_15aug2026_v193.md`. Remove v193 on upload.
-
-> ### 🟢 15 AUG PM — THE FOUR UNBUILT SPECS. `alongside-v353`. 47 gates green.
->
-> The would-they-tell-someone audit found four weak persona sentences. **Three of the four were specced and unbuilt** — a far better problem than not knowing what to do. All three are now built.
->
-> | ID | Persona | Their sentence before | Agreed | Built |
-> |---|---|---|---|---|
-> | **PACE-1/2** | 2.8, dyspraxia + autism | *"I went too hard for two weeks and then stopped."* | 05 Jul | 15 Aug |
-> | **QUICK-1** | 2.16, time-poor parent | *"It talks too much."* | 05 Jul | 15 Aug |
-> | **PB-1** | 2.7, the runner | *"No PB tracking, so I use something else."* | 05 Jul | 15 Aug |
->
-> **PACE-1/2 — proactive pacing.** Matrix decisions 4 and 4a. A third exercise activity in a day gets a warm check-in, once, never blocking a fourth. A weekly target set sharply above recent actual history gets named on Home, once a week at most. Mindful and Noticing activities are **uncapped entirely** — 2.11 enters through that door and warning her would be actively wrong. 2.8 was the only persona whose failure mode is **harm rather than indifference**.
->
-> **QUICK-1 — the short check-in.** Matrix gap 8 and open question 6, which asked what stays non-negotiable when the coach compresses. Now answered and gated: energy and mood stay (what `detectBurnout()` reads), the pain question stays at **either** setting, and the coach still speaks first. Feeling word, sleep and variety compress. A stored preference, not a question — asking "have you got time?" daily would be the friction itself.
->
-> **PB-1 — personal bests.** Matrix decision 2. Stored not derived, because `liftLog` evicts at 20 and a derived best would vanish. Only unambiguous metrics; `durationMins` deliberately excluded (longer is better for a plank, worse for a 5k). **Recorded even when hidden, shown only on request, Personal tier.** Flat line, no delta, and the gate asserts the CSS does not highlight it — a best styled as an achievement becomes a target to defend.
->
-> #### Still open
->
-> - 🟠 **2.4 — why a self-directed person stays.** *"I already know what I'm doing."* Not articulated anywhere. A positioning question, not a build one. **Needs Graeme, not a trace.**
-> - 🟡 **Wave 3** — 2.16, 2.8, 2.6, 2.4, full-surface (Home, check-in, Progress, Wellbeing, upgrade), now against a product that has real answers for three of them.
-> - 🟡 **Legal docs still say 13+/16+**, must align to 18+. Outside the repo.
-> - 🟡 **`durationMins` as a PB** — needs a direction convention before it can be tracked.
->
-> #### Process
->
-> **Nine faulty gate assertions of mine in three days**, every one passing or crashing while testing nothing: a hardcoded `true`; three regexes matching an explanatory comment rather than code; a threshold set from assumption; a character class capturing an empty string; a fixture ending months in the past; a validation tested on write when it runs on load; and one that **threw a TypeError and produced no output at all**, which I nearly read as a pass.
->
-> **A gate that crashes is not a gate that failed.** Reversal-testing caught every one. The rule that holds: a gate is not proven until it has been made to fail, and "no output" is not "green".
->
-> Also: I invented a CSS class name (`settings-toggle__knob`; the real one is `settings-toggle__track`) and two goal ids that do not exist. Same fault class as the persona-fixture drift that has cost this project five times. Both now gated.
+Supersedes `master_schedule_14aug2026_v192.md`. Remove v192 on upload.
 
 > ### 🟢 15 AUG — THE THREE AUDITS. `alongside-v350`. 44 gates green.
 >
@@ -2793,4 +2762,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 15 Aug 2026 v194*
+*Build New Habits · Alongside: Move · Master Schedule · 15 Aug 2026 v193*
