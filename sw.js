@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v354
+ * QUICK-2, from the Wave 3 trace of persona 2.16. store.js, pacing.js
+ * v2, today.js. The short check-in existed only in Settings.
+ *
  * 15 Aug 2026 v353
  * PB-1, personal bests for persona 2.7. store.js v50, session-log.js,
  * settings.js v27, session-log.css, field-contract.js.
@@ -2447,7 +2451,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v353";
+const CACHE_NAME = "alongside-v354";
 
 const SHELL_URLS = [
 
