@@ -1,6 +1,36 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 15 Aug 2026 v35
+ *
+ * v35 - PROG-1 ATTEMPTED AND REVERTED, plus one real fix.
+ *
+ *   THE FIX: _difficulty() lifted to module scope. It was defined inside
+ *   _filterCandidates(), so selectFromCategories() could not see it. One
+ *   definition now, so the two call sites cannot disagree about what
+ *   "hard" means.
+ *
+ *   THE ATTEMPT: programme phase intensity ('gentle' | 'moderate' |
+ *   'challenging') reaches coach-proposal.js and NOT this door, so a
+ *   person on a twelve-week programme who uses the session-builder gets
+ *   week 10 built the same as week 1. Real gap, and the obvious fix is
+ *   to prefer the harder half of the permitted pool in a challenging
+ *   phase.
+ *
+ *   It moved mean difficulty by 3% across 200 sessions. Not shipped.
+ *   The reason is the library, not the wiring: 393 of 551 entries sit at
+ *   difficulty 1-2, so the harder half of any per-slot pool is still
+ *   easy. Progression cannot be delivered by preference over a library
+ *   that has no range to prefer within.
+ *
+ *   Recorded here rather than dropped, so the next person does not spend
+ *   the same afternoon rediscovering it. The content work comes first.
+ *
+ *   Found on the way: a ReferenceError thrown inside session generation
+ *   was SWALLOWED upstream and produced a fallback session, so a
+ *   50-session measurement returned entirely plausible numbers from
+ *   broken code. Logged as SILENT-1.
+ *
  * 14 Aug 2026 v34
  *
  * v34 - W2-7. 'less' no longer behaves identically to 'avoid'.
@@ -1085,6 +1115,30 @@ function _capabilityUnrestricted() {
          store.get("capability.balanceWorry") === "no";
 }
 
+/**
+ * How hard is this exercise?
+ *
+ * PROG-1, 15 Aug 2026: lifted to module scope. It was defined inside
+ * _filterCandidates(), so selectFromCategories() could not see it — and
+ * a first version of the phase logic below called it from there, threw a
+ * ReferenceError, and the throw was SWALLOWED somewhere upstream. The
+ * session still generated from a fallback, and a 50-session measurement
+ * returned entirely plausible numbers from broken code.
+ *
+ * Two things follow. One definition, so the two call sites cannot
+ * disagree about what "hard" means. And logged separately: a throw
+ * inside session generation should not be able to look like a working
+ * session.
+ *
+ * Falls back to energyRequired because it is present on every entry and
+ * correlates well; 10 for the unrated, which fails safe by excluding.
+ */
+function _difficulty(ex) {
+  if (typeof ex.difficultyLevel === "number") return ex.difficultyLevel;
+  if (typeof ex.energyRequired === "number")  return ex.energyRequired;
+  return 10;
+}
+
 function _filterCandidates(categories, section, equipSet, conditionSet) {
   const ceiling = _difficultyCeiling();
   const prefs   = store.get("exercisePreferences") || {};
@@ -1313,11 +1367,6 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   const isBalance = ex => ex.balanceDemand === true;
   const isImpact = ex => ex.impact === true;
 
-  const _difficulty = ex => {
-    if (typeof ex.difficultyLevel === "number") return ex.difficultyLevel;
-    if (typeof ex.energyRequired === "number")  return ex.energyRequired;
-    return 10;
-  };
   const withinCeiling = ex => _difficulty(ex) <= ceiling;
   const warmupPool = section === "warmup" ? matched.filter(withinCeiling) : null;
   const useCeilingOnWarmup = warmupPool !== null && warmupPool.length > 0;

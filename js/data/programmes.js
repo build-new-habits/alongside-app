@@ -1,5 +1,11 @@
 /**
  * programmes.js
+ * 15 Aug 2026 v4
+ *
+ * v4 - CHAIN-1. Six programmes now declare nextProgrammeId. After twelve
+ *   weeks every route fell through to goal-setup and the same eight
+ *   options.
+ *
  * 13 Aug 2026 v3
  *
  * v3 - The fourteen count-threshold milestones removed ("10 sessions
@@ -53,6 +59,15 @@ export const PROGRAMMES = [
 
   {
     id: 'beginner-fitness',
+    // CHAIN-1, 15 Aug 2026. handleEndOption()'s 'progress' branch looks
+    // for nextProgrammeId and starts the successor directly. NO programme
+    // declared one, so after twelve weeks -- the longest commitment in the
+    // product -- every route fell through to goal-setup and the same eight
+    // options. Graeme, 15 Aug: "my concern about ending a programme and
+    // starting a new one, is there more..." There was not.
+    //
+    // Build Your Base establishes the habit; Back to Strength is what the habit is for.
+    nextProgrammeId: 'back-to-strength',
     name: 'Build Your Base',
     tagline: 'A gentle 12-week foundation — energy, strength, and habit',
     description: 'Start where you are. No pressure, no shame. This plan builds movement into your life steadily, adapting every day to how you feel.',
@@ -131,6 +146,15 @@ export const PROGRAMMES = [
 
   {
     id: 'couch-to-cardio',
+    // CHAIN-1, 15 Aug 2026. handleEndOption()'s 'progress' branch looks
+    // for nextProgrammeId and starts the successor directly. NO programme
+    // declared one, so after twelve weeks -- the longest commitment in the
+    // product -- every route fell through to goal-setup and the same eight
+    // options. Graeme, 15 Aug: "my concern about ending a programme and
+    // starting a new one, is there more..." There was not.
+    //
+    // Cardio base, then breadth -- Move More widens what the base is used for.
+    nextProgrammeId: 'move-more',
     name: 'Couch to Cardio',
     tagline: '12 weeks to sustained cardiovascular fitness',
     description: 'Gradually build your stamina from scratch. No running required until you\'re ready — this is your pace, your way.',
@@ -194,6 +218,15 @@ export const PROGRAMMES = [
 
   {
     id: 'back-to-strength',
+    // CHAIN-1, 15 Aug 2026. handleEndOption()'s 'progress' branch looks
+    // for nextProgrammeId and starts the successor directly. NO programme
+    // declared one, so after twelve weeks -- the longest commitment in the
+    // product -- every route fell through to goal-setup and the same eight
+    // options. Graeme, 15 Aug: "my concern about ending a programme and
+    // starting a new one, is there more..." There was not.
+    //
+    // Strength rebuilt, then built on.
+    nextProgrammeId: 'build',
     name: 'Back to Strength',
     tagline: 'Rebuild confidence and reduce pain over 12 weeks',
     description: 'Designed for people managing pain, injury recovery, or returning after a long break. Every session adapts to your condition report.',
@@ -259,6 +292,15 @@ export const PROGRAMMES = [
 
   {
     id: 'feel-good-foundation',
+    // CHAIN-1, 15 Aug 2026. handleEndOption()'s 'progress' branch looks
+    // for nextProgrammeId and starts the successor directly. NO programme
+    // declared one, so after twelve weeks -- the longest commitment in the
+    // product -- every route fell through to goal-setup and the same eight
+    // options. Graeme, 15 Aug: "my concern about ending a programme and
+    // starting a new one, is there more..." There was not.
+    //
+    // Feeling better, then steadier. Both wellbeing-led.
+    nextProgrammeId: 'ground',
     name: 'Feel Good Foundation',
     tagline: 'Mixed movement, better energy, and a habit that lasts',
     description: 'Not about hitting targets. About feeling better day to day — more energy, less stress, more like yourself. Variety every week so nothing gets stale.',
@@ -386,6 +428,15 @@ export const PROGRAMMES = [
 
   {
     id: 'move-more',
+    // CHAIN-1, 15 Aug 2026. handleEndOption()'s 'progress' branch looks
+    // for nextProgrammeId and starts the successor directly. NO programme
+    // declared one, so after twelve weeks -- the longest commitment in the
+    // product -- every route fell through to goal-setup and the same eight
+    // options. Graeme, 15 Aug: "my concern about ending a programme and
+    // starting a new one, is there more..." There was not.
+    //
+    // Breadth, then depth.
+    nextProgrammeId: 'build',
     name: 'Move More',
     tagline: 'Cardio-led movement with strength for lasting change',
     description: 'Built around increasing movement and energy expenditure — but never about restriction or punishment. Cardio-led, with strength woven in to support you long term.',
@@ -513,6 +564,15 @@ export const PROGRAMMES = [
 
   {
     id: 'ground',
+    // CHAIN-1, 15 Aug 2026. handleEndOption()'s 'progress' branch looks
+    // for nextProgrammeId and starts the successor directly. NO programme
+    // declared one, so after twelve weeks -- the longest commitment in the
+    // product -- every route fell through to goal-setup and the same eight
+    // options. Graeme, 15 Aug: "my concern about ending a programme and
+    // starting a new one, is there more..." There was not.
+    //
+    // Steadier, then wider. Open is the least prescriptive of the three.
+    nextProgrammeId: 'open',
     name: 'Ground',
     tagline: 'Balance, stability, and coordination over 12 weeks',
     description: 'Core strength, proprioception, and body awareness — building the kind of stability that protects you in everyday life and keeps you moving well as you age.',
