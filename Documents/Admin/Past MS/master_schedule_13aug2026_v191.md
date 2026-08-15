@@ -1,56 +1,8 @@
 # Alongside: Move — Master Schedule
-## 14 Aug 2026 v192
+## 13 Aug 2026 v191
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_13aug2026_v191.md`. Remove v191 on upload.
-
-> ### 🟢 14 AUG — THE CAPABILITY SYSTEM IS LIVE. `alongside-v344`. 38 gates green.
->
-> Two chats ran Wave 2 in parallel on 13–14 Aug and collided on version numbers twice. The second chat is now retired; this schedule and the codebase are owned by one thread again.
->
-> #### The finding that reframed the week
->
-> **Eight CAP work items sat behind a screen nobody could open.** The only writer of `capability.*` was `views/onboarding/lifestyle.js`, which was never registered in `router.js` and whose two inbound `navigate()` calls `sheet-manager.js` swallows to close a sheet. So `capability.askedAt` was `null` for **every live user**, `capabilityProfile().asked` was `false`, and six protective branches in `session-builder.js` never ran for anybody: `floorSafe`, `balanceSafe`, `needsSeated`, `legsUsable`, `legsLoadable`, `_capabilityUnrestricted()`.
->
-> CAP-6b and CAP-7 — shipped 14 Aug from the six-persona trace — were correct fixes to states no live user could reach. Not wasted. **Pending.** They went live with W3-A.
->
-> #### Shipped
->
-> | ID | What | Evidence |
-> |---|---|---|
-> | **W2-1** | Difficulty ceiling extended to **cooldown**. Warrior III, Tree Pose, Half Moon and Boat Pose were being served to a sedentary user (ceiling 2) — the same pose and persona that caused the warmup fix on 11 Aug, one section right | 5 over-ceiling candidates → 0, section not starved |
-> | **W2-2** | `proposalBias` cleared at check-in. Written only by `coach-reflection.js`, never cleared, so yesterday's bias described today | Reversal-tested |
-> | **W3-A** | **Capability questions reachable.** Thread steps 9a–9d. `balanceWorry` asked of everyone and gating `chairRise`/`floorAccess`; `legPower` behind a non-`yes` chair answer; `bothFeet` not asked at all | 2.10: 0 floor-position and 0 balance-demand exercises in 30 sessions. 2.6: unrestricted |
-> | **W3-A2** | Capability editable in **Settings**. The thread is forward-only, so a mis-tap was permanent. Blanking every answer clears `askedAt` | Both directions reversal-tested |
-> | **W3-B** | `trainingIntent` gets a writer (step 9f). Had **none** — every user was `improve`, so `maintain` and `recover` were unreachable | Independence-capacity work **14.8% → 33.6%**; rehab-leaning **33.3% → 42.8%**, 60 sessions each |
-> | **OPEN-1** | **Three day-one coach openings could never fire.** `else if (ageBand)` sat above `injury-recovery`, `return-to-fitness` and `feel-good`, and `ageBand` is asked of everyone. Written, reviewed copy no user has ever seen | Four openings now verified distinct |
-> | **WRITE-1** | `lifestyle.stressLevel` gets its first reader, `coldStartBias()`. Step 10 asked a careful question and nothing looked at the answer | Off after 3 check-ins, downward only, never burnout |
-> | **CONTRACT-2** | A declared writer must now **exist and be referenced from outside itself**. Declaring an orphaned file is what hid all of the above | Caught two more orphans immediately |
-> | **CONTRACT-3** | Lookup tables keyed on a contracted vocabulary have their keys checked. The scan reads `x === "y"` and cannot see an object key — how `'returning'` stayed undeclared | |
->
-> **`views/onboarding/lifestyle.js` is deleted** (564 lines), with its `sw.js` precache entry. `lifestyle.exerciseHistory` and `lifestyle.sleepQuality` retired — one writer, now gone, no live reader.
->
-> #### Why the capability questions are split
->
-> Reviewed against all sixteen personas. `chairRise` and `floorAccess` are right for 2.10 and **insulting to 2.3**, a national-standard 15-year-old sprinter. `balanceWorry` reads neutrally to everyone, so it is asked universally and gates the other two.
->
-> **The gate is `balanceWorry` rather than age because age, activity and declared condition all MISS persona 2.8** — dyspraxia and autism, young, enthusiastic, not sedentary, and dyspraxia is not in `CONDITIONS`. She is the persona whose failure mode is a fall. Triggers are OR, so pride does not defeat them either.
->
-> `bothFeet` is not asked: measured, the impact gate already works from `activityLevel` alone (active 35 impact exercises across 30 sessions, sedentary 0).
->
-> #### Three process failures, recorded because they recur
->
-> 1. **Two gate assertions passed against explanatory comments rather than code.** The `askedAt` reversal test stayed green with the write deleted. Same class as a gate after `process.exit()`. Both tightened to assert constructs.
-> 2. **The localStorage fixture-drift trap, fifth instance.** `store.init()` **merges** with what is already there, so personas run in one process inherit each other's state. Every opening fixture resolved to the same branch until `localStorage.clear()` was added.
-> 3. **A condition-filter finding was reported wrong** before being corrected: bare condition ids were passed where the live path resolves phase variants through `getActiveConditionIds()`.
->
-> #### Open, with no owner yet
->
-> - **W3-A2 follow-up** — none. Closed.
-> - **D-2** the cardiac promise · **D-3** neurodivergence in `CONDITIONS` · **D-5** two doors, two amounts of listening
-> - **A1.11** the 13+/16+ contradiction — blocks tracing personas 2.2, 2.3 and 2.9 entirely. **Legal, for Natalie, not a build item.**
-> - **Wave 3** — 2.16, 2.8, 2.6, 2.4, full-surface (Home, check-in, Progress, Wellbeing, upgrade), not sessions only
-> - **The three audits that have never been run** — first ninety seconds, moment-of-delight inventory, would-they-tell-someone. See `alongside_plan_route-to-exceptional_14aug2026_v1.md`
+Supersedes `master_schedule_13aug2026_v190.md`. Remove v190 on upload.
 
 > ### 🟢 WAVE-2 VERIFICATION TRACE — six personas. `alongside-v339`. 37 gates green.
 >
@@ -2716,4 +2668,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 14 Aug 2026 v192*
+*Build New Habits · Alongside: Move · Master Schedule · 12 Aug 2026 v183*
