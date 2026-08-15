@@ -154,6 +154,13 @@ export const FIELD_CONTRACT = {
     meaning: "TWO LEVELS, and they must stay two. 'avoid' is never suggested again — a hard exclusion in _filterCandidates(). 'less' is offered roughly a fifth as often, never zero; it was implemented as 'never chosen while something else exists', which in a pool of fifty is never, and the gentler option was doing the harsher thing. Binary per the skip/dislike spec: not a rating, no stars, no scores. Both reversible in Settings."
   },
 
+  // QUICK-1, 15 Aug 2026. Matrix gap 8, open since 05 Jul.
+  "sessionPace": {
+    values: ["full", "brief"],
+    writer: "views/settings.js",
+    meaning: "How much the coach asks before a session. 'brief' asks energy and mood only — the two inputs detectBurnout() reads. It NEVER compresses the pain question for somebody with a declared condition, and it never removes the coach's first line."
+  },
+
   // CARDIAC-1, 14 Aug 2026.
   "exerciseClearance": {
     values: ["cleared", "not-yet", "not-sure", null],

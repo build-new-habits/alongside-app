@@ -1,5 +1,10 @@
 /**
  * store.js - Data persistence layer
+ * 15 Aug 2026 v49
+ *
+ * v49 - QUICK-1. New field sessionPace ('full' | 'brief') for the
+ *   short-window path. Matrix gap 8, open since 05 Jul.
+ *
  * 15 Aug 2026 v48
  *
  * v48 - PACE-1. New field pacing { noticedOn, planNudgeAt }, for the
@@ -805,6 +810,11 @@ export const store = {
         ? { ...defaults.pacing, ...saved.pacing }
         : { ...defaults.pacing },
 
+      // QUICK-1
+      sessionPace: ['full', 'brief'].includes(saved.sessionPace)
+        ? saved.sessionPace
+        : defaults.sessionPace,
+
       // ── WEEKLY PLAN ───────────────────────────────────────────
       weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
         ? {
@@ -1190,6 +1200,36 @@ export const store = {
         noticedOn:   null,   // 'YYYY-MM-DD' | null
         planNudgeAt: null    // ISO string | null
       },
+
+      // ── SESSION PACE (QUICK-1, 15 Aug 2026) ───────────────────
+      //
+      // Matrix gap 8 and open question 6, both since 05 Jul: "no
+      // low-friction/quick path exists as a concept. Time-poor users
+      // (2.16) need the coach to compress without dropping 'coach speaks
+      // first'."
+      //
+      // 'full'  — every panel: energy, mood, feeling word, sleep,
+      //           conditions, variety.
+      // 'brief' — energy, mood, and conditions-if-any. Nothing else.
+      //
+      // What is NOT compressible, and why:
+      //   energy + mood      the two inputs detectBurnout() actually
+      //                      reads, and the source of todayIntensity.
+      //                      Dropping them would make the product stop
+      //                      adapting, which is the product.
+      //   conditions pain    safety. Somebody with a declared condition
+      //                      is asked regardless of pace. 2.16 has none
+      //                      so she never sees it; somebody who does is
+      //                      not offered a shortcut past it.
+      //
+      // What compresses: the feeling word, sleep, and the variety
+      // question. All are enrichment. Sleep is one of six burnout
+      // patterns, so detection degrades slightly and does not stop.
+      //
+      // The coach still speaks first. Once, briefly. That is the line
+      // this feature is not allowed to cross.
+      sessionPace: 'full',   // 'full' | 'brief'
+
 
       exercisePreferences: {}, // { [exerciseId]: { preference: 'avoid'|'less', setAt, source } } — per alongside_exercise_skip_dislike_spec_16may2026_v1.docx. Binary signal, not a rating (spec §6: "not a rating system... no stars, no thumbs, no scores"). First consumer: js/data/conditionProgrammes.js's candidate selection, 04 Aug 2026 — the full spec's in-session Skip flow (gym-programme.js/prescribed-session.js/core-session.js) remains separate future work.
 
