@@ -1,5 +1,12 @@
 /**
  * checkin.js
+ * 14 Aug 2026 v5
+ *
+ * v5 - WRITE-1. coldStartBias() gives lifestyle.stressLevel its first
+ *   reader. Onboarding asked how someone's energy had been and nothing
+ *   ever looked at the answer. Applies only before three check-ins exist,
+ *   only downward, and never as burnout.
+ *
  * 14 Aug 2026 v4
  *
  * v4 - W2-2. saveCheckin() clears proposalBias, which was written only
@@ -105,7 +112,48 @@ export function resolveIntensity(baseIntensity, bias) {
   const base = ['low', 'moderate', 'high'].includes(baseIntensity) ? baseIntensity : 'moderate';
   if (bias === 'rest')    return 'low';
   if (bias === 'lighter') return base === 'high' ? 'moderate' : 'low';
+  // WRITE-1. No coach bias yet -- fall back to what they told us at
+  // onboarding, but only while there is nothing better to go on.
+  if (bias == null && coldStartBias() === 'lighter') {
+    return base === 'high' ? 'moderate' : 'low';
+  }
   return base;
+}
+
+/**
+ * WRITE-1, 14 Aug 2026. The first reader lifestyle.stressLevel has ever had.
+ *
+ * Step 10 of onboarding asks a careful question -- the difference between
+ * tired-because-you-have-been-busy and tired-in-a-way-sleep-does-not-fix
+ * -- and until now the answer was stored and never consulted by anything.
+ * Somebody who says "running on empty" and is then handed a standard first
+ * session has been asked a caring question and ignored, which is worse
+ * than not asking.
+ *
+ * Deliberately narrow, on three counts:
+ *
+ * 1. COLD START ONLY. detectBurnout() needs three days of check-ins before
+ *    it can say anything. This covers only that gap and switches itself
+ *    off the moment real data exists. A month-old onboarding answer must
+ *    never outrank this week's check-ins.
+ * 2. DOWNWARD ONLY. It can soften a session, never harden one. "Pretty
+ *    good" at onboarding does not earn anybody a harder first week.
+ * 3. NOT BURNOUT. It does not touch detectBurnout(), because burnout is a
+ *    claim about an observed pattern and this is a self-report from before
+ *    the pattern existed. Calling it burnout would be the coach
+ *    interpreting rather than responding.
+ *
+ * @returns {'lighter'|null}
+ */
+export function coldStartBias() {
+  const history = store.get('checkinHistory') || {};
+  // Three is detectBurnout()'s own threshold. Kept identical on purpose:
+  // if that changes, this should change with it, and a mismatch would
+  // leave a window where neither signal applies.
+  if (Object.keys(history).length >= 3) return null;
+
+  const declared = (store.get('lifestyle') || {}).stressLevel;
+  return (declared === 'exhausted' || declared === 'running-low') ? 'lighter' : null;
 }
 
 // ─── Check-in history ─────────────────────────────────────────────────────────
@@ -333,6 +381,7 @@ export const checkinData = {
   saveCheckin,
   getSuggestedIntensity,
   resolveIntensity,
+  coldStartBias,
   getEnergyEmoji,
   getEnergyLabel,
   getMoodEmoji,

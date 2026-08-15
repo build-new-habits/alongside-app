@@ -1,5 +1,10 @@
 /**
  * store.js - Data persistence layer
+ * 14 Aug 2026 v44
+ *
+ * v44 - WRITE-1. lifestyle.stressLevel comment corrected to the vocabulary
+ *   the live writer actually produces, and it finally has a reader.
+ *
  * 14 Aug 2026 v43
  *
  * v43 - OPEN-1. lifestyle.exerciseHistory and lifestyle.sleepQuality
@@ -1090,7 +1095,11 @@ export const store = {
                                 // three readers handle it (filterByFitnessLevel 6,
                                 // DIFFICULTY_CEILINGS 3, LOW_IMPACT_ONLY gated).
                                 // Comment was stale, not the code.
-        stressLevel:     null,  // low|moderate|high|very-high
+        stressLevel:     null,  // exhausted|running-low|up-and-down|decent|pretty-good
+                                // WRITE-1, 14 Aug 2026: comment previously said
+                                // low|moderate|high|very-high, which the live writer
+                                // (thread step 10, ENERGY_CHIPS) has never produced.
+                                // Read by coldStartBias() in data/checkin.js.
         sleepQuality:    null,  // poor|okay|good
         exerciseHistory: null,  // 'never'|'lapsed'|'returning'|'active'
         returningAfter:  null,  // 'injury'|'illness'|'life'|'burnout'|null
