@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v348
+ * STREAK-1. checkin-openings.js v5 — the seven-check-in milestone
+ * claimed "Seven days in a row" on a count, not consecutive days.
+ *
  * 15 Aug 2026 v347
  * DELIGHT-1 first-session recognition (new js/data/first-session.js,
  * added to the precache list above), ORIENT-2 nobody left silent on
@@ -2422,7 +2426,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v347";
+const CACHE_NAME = "alongside-v348";
 
 const SHELL_URLS = [
 
