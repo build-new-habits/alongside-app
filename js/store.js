@@ -1,5 +1,10 @@
 /**
  * store.js - Data persistence layer
+ * 15 Aug 2026 v48
+ *
+ * v48 - PACE-1. New field pacing { noticedOn, planNudgeAt }, for the
+ *   proactive-pacing work agreed 05 Jul (matrix decisions 4 and 4a).
+ *
  * 15 Aug 2026 v47
  *
  * v47 - MOOD-1. logActivity() mirrors moodAfter into the day's
@@ -795,6 +800,11 @@ export const store = {
         ? saved.exercisePreferences
         : {},
 
+      // PACE-1
+      pacing: (saved.pacing && typeof saved.pacing === 'object')
+        ? { ...defaults.pacing, ...saved.pacing }
+        : { ...defaults.pacing },
+
       // ── WEEKLY PLAN ───────────────────────────────────────────
       weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
         ? {
@@ -1161,6 +1171,25 @@ export const store = {
       // of withholding those from somebody who is anxious about their
       // heart is real and the risk of providing them is not.
       exerciseClearance: null,
+
+      // ── PROACTIVE PACING (PACE-1, 15 Aug 2026) ────────────────
+      //
+      // Matrix decision 4a, agreed 05 Jul 2026, built 15 Aug.
+      //
+      // noticedOn is the calendar date the daily pacing line was last
+      // shown, so it appears ONCE on the day it applies rather than after
+      // every subsequent session. A date, not a boolean, so it resets
+      // itself at midnight without a scheduler.
+      //
+      // planNudgeAt is the last time the coach mentioned a sharp jump
+      // between the plan and recent history (decision 4). Throttled to
+      // once a week: a person who has decided to push on has heard it,
+      // and repeating it would become the nagging this feature exists to
+      // avoid.
+      pacing: {
+        noticedOn:   null,   // 'YYYY-MM-DD' | null
+        planNudgeAt: null    // ISO string | null
+      },
 
       exercisePreferences: {}, // { [exerciseId]: { preference: 'avoid'|'less', setAt, source } } — per alongside_exercise_skip_dislike_spec_16may2026_v1.docx. Binary signal, not a rating (spec §6: "not a rating system... no stars, no thumbs, no scores"). First consumer: js/data/conditionProgrammes.js's candidate selection, 04 Aug 2026 — the full spec's in-session Skip flow (gym-programme.js/prescribed-session.js/core-session.js) remains separate future work.
 
