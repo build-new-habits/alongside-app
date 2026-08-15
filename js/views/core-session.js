@@ -1,6 +1,13 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 15 Aug 2026 v12
+ *
+ * v12 - ASSESS-1 step 2, plus DECL-1. The baseline is asked at the end
+ *   of a first session, about the movements just done. And the
+ *   pendingSkipOffer declaration, lost since W2-7, is restored -- Skip
+ *   was throwing a ReferenceError in production.
+ *
  * 15 Aug 2026 v11
  *
  * v11 - PACE-1. A third exercise activity in one day gets a warm
@@ -150,6 +157,9 @@
 import { store } from "../store.js";
 import { firstSessionRecognition } from "../data/first-session.js";
 import { noticeDailyPace } from "../data/pacing.js";
+import { questionsForSession, shouldOfferBaseline, recordBaseline,
+         baselineIntro, baselineAck, EFFORT_CHIPS } from "../data/assessment.js";
+import { EXERCISES } from "../data/exercises/index.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { bodyCaution } from "../data/session-rationale.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
@@ -165,6 +175,24 @@ let selectedFocus = null;
 let selectedMins  = null;
 let sessionQueue  = [];
 let currentIndex  = 0;
+
+// ── W2-7 (14 Aug 2026) — DECLARATION RESTORED 15 Aug ────────────────────
+//
+// The exercise just skipped, if the "tell me more" strip is showing for
+// it. Cleared on any answer, on dismissal, and on leaving the view.
+//
+// This declaration went missing between the W2-7 commit and now. The
+// three assignments and two reads survived, so in a module -- strict
+// mode by definition -- tapping Skip threw a ReferenceError. Every gate
+// stayed green because they all assert against the SOURCE of this file
+// and never execute it. Logged as DECL-1: nothing in the suite runs a
+// view, which is why a device pass is not optional.
+let pendingSkipOffer = null;
+
+// ASSESS-1. Baseline answers collected on the done screen, and the
+// acknowledgement once recorded. Reset with the rest of the session.
+let baselineAnswers = {};
+let baselineDone    = null;
 let timerInterval = null;
 let timeRemaining = 0;
 let timerRunning  = false;
@@ -738,6 +766,66 @@ function renderExercise() {
  * Binary per the skip/dislike spec section 6: "not a rating system... no
  * stars, no thumbs, no scores." Both choices are reversible in Settings.
  */
+/**
+ * ASSESS-1. The baseline block on the done screen.
+ *
+ * Below the first-session recognition, above the pacing note. That order
+ * is deliberate: the recognition is the emotional moment and earns the
+ * right to ask something; questions first would dilute it.
+ *
+ * Skip is a real, equally weighted option, not a small grey link.
+ */
+function renderBaseline() {
+  const qs   = questionsForSession(sessionQueue.map(e => e.id), _exMap());
+  const done = store.completedSessions(store.get("activityLog") || []).length;
+
+  if (baselineDone) {
+    return `
+      <div class="card card-coach cs-baseline">
+        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <div><p class="coach-message-text">${_escB(baselineDone)}</p></div>
+      </div>`;
+  }
+  if (!shouldOfferBaseline(done, qs)) return "";
+
+  const intro = baselineIntro();
+  return `
+    <div class="card card-coach cs-baseline">
+      <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+      <div>
+        <h2 class="cs-baseline__heading">${_escB(intro.heading)}</h2>
+        <p class="coach-message-text">${_escB(intro.body)}</p>
+        ${qs.map(q => `
+          <fieldset class="cs-baseline__group">
+            <legend class="cs-baseline__legend">How was ${_escB(q.label)}?</legend>
+            <div class="cs-baseline__chips">
+              ${EFFORT_CHIPS.map(c => `
+                <button class="btn btn-ghost btn-small ${baselineAnswers[q.key] === c.id ? "is-selected" : ""}"
+                        data-baseline-q="${_escB(q.key)}" data-baseline-a="${_escB(c.id)}"
+                        aria-pressed="${baselineAnswers[q.key] === c.id ? "true" : "false"}">${_escB(c.label)}</button>
+              `).join("")}
+            </div>
+          </fieldset>
+        `).join("")}
+        <div class="cs-baseline__actions">
+          <button class="btn btn-primary btn-small" data-baseline-save>Done</button>
+          <button class="btn btn-ghost btn-small" data-baseline-skip>Skip this</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+let _exMapCache = null;
+function _exMap() {
+  if (!_exMapCache) _exMapCache = new Map(EXERCISES.map(e => [e.id, e]));
+  return _exMapCache;
+}
+
+function _escB(s) {
+  return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 function renderSkipOffer() {
   if (!pendingSkipOffer) return "";
   const name = String(pendingSkipOffer.name || "that one")
@@ -821,6 +909,7 @@ function renderDone() {
           </div>
         </div>
       ` : ``}
+      ${renderBaseline()}
       ${pacing ? `
         <div class="card card-coach cs-pacing" style="margin-top: var(--space-8);">
           <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
@@ -1007,6 +1096,7 @@ function resetSession() {
   sessionQueue  = [];
   currentIndex  = 0;
   pendingSkipOffer = null;   // W2-7: must not leak between sessions
+    baselineAnswers = {}; baselineDone = null;   // ASSESS-1
   creditsEarned = 0;
   timeRemaining = 0;
   timerRunning  = false;
@@ -1193,6 +1283,7 @@ export function onMount() {
   document.getElementById("cs-start-btn")?.addEventListener("click", () => {
     currentIndex  = 0;
     pendingSkipOffer = null;   // W2-7: must not leak between sessions
+    baselineAnswers = {}; baselineDone = null;   // ASSESS-1
     creditsEarned = 0;
     timeRemaining = 0;
     timerRunning  = false;
@@ -1256,6 +1347,28 @@ export function onMount() {
       pendingSkipOffer = skipped || null;
       rerender();
     }
+  });
+
+  // ASSESS-1. Baseline chips, save and skip.
+  document.querySelectorAll("[data-baseline-q]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      baselineAnswers[btn.dataset.baselineQ] = btn.dataset.baselineA;
+      rerender();
+    });
+  });
+  document.querySelector("[data-baseline-save]")?.addEventListener("click", () => {
+    // No answers at all is a skip, not a save. recordBaseline() returns
+    // null and we must not report a read that did not happen.
+    const entry = recordBaseline(baselineAnswers);
+    if (!entry) { store.declineAssessment(); baselineDone = null; }
+    else baselineDone = baselineAck(store.assessmentChange());
+    rerender();
+  });
+  document.querySelector("[data-baseline-skip]")?.addEventListener("click", () => {
+    store.declineAssessment();
+    baselineAnswers = {};
+    baselineDone = null;
+    rerender();
   });
 
   // W2-7. Skip-offer answers. Delegated because the strip is rendered
