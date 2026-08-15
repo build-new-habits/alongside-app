@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 14 Aug 2026 v346
+ * W2-7 / D-3. Post-skip preference offer in core-session.js v9, "How you
+ * like things" panel in settings.js v25, 'less' no longer identical to
+ * 'avoid' in session-builder.js v34. settings.css v9.
+ *
  * 14 Aug 2026 v345
  * AGE-1 rebanded to 18+, CARDIAC-1 exercise clearance, W2-6 variety
  * anchoring, CONTRACT-2 strengthened. Eight orphaned pre-thread
@@ -2412,7 +2417,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v345";
+const CACHE_NAME = "alongside-v346";
 
 const SHELL_URLS = [
 
