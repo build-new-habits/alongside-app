@@ -154,6 +154,13 @@ export const FIELD_CONTRACT = {
     meaning: "TWO LEVELS, and they must stay two. 'avoid' is never suggested again — a hard exclusion in _filterCandidates(). 'less' is offered roughly a fifth as often, never zero; it was implemented as 'never chosen while something else exists', which in a pool of fifty is never, and the gentler option was doing the harsher thing. Binary per the skip/dislike spec: not a rating, no stars, no scores. Both reversible in Settings."
   },
 
+  // PB-1, 15 Aug 2026. Matrix decision 2, agreed 05 Jul.
+  "showPersonalBests": {
+    values: [true, false],
+    writer: "views/settings.js",
+    meaning: "Whether the person is SHOWN their best, not whether one is kept — bests are recorded either way, so turning this on later reveals what they have already done rather than starting from nothing. Default false: for personas 2.5, 2.8 and 2.13 a visible best is a target to fall short of."
+  },
+
   // QUICK-1, 15 Aug 2026. Matrix gap 8, open since 05 Jul.
   "sessionPace": {
     values: ["full", "brief"],
