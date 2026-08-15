@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v359
+ * ASSESS-1 step 2 (new js/data/assessment.js, added to the precache list
+ * above) and DECL-1, a ReferenceError shipped in W2-7. core-session.js
+ * v12, session-shared.css v4.
+ *
  * 15 Aug 2026 v358
  * ASSESS-1 step 1. store.js v51 — assessment schema, recordAssessment(),
  * assessmentChange(), declineAssessment(). The ceiling can move.
@@ -2468,7 +2473,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v358";
+const CACHE_NAME = "alongside-v359";
 
 const SHELL_URLS = [
 
@@ -2637,6 +2642,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/checkin-openings.js",
   "/alongside-app/js/data/first-session.js",
   "/alongside-app/js/data/pacing.js",
+  "/alongside-app/js/data/assessment.js",
   "/alongside-app/js/data/conditions.js",
   "/alongside-app/js/data/conditionProgrammes.js",
   "/alongside-app/js/data/equipment.js",
