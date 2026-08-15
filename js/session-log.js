@@ -1,5 +1,10 @@
 /**
  * js/session-log.js
+ * 15 Aug 2026 v6
+ *
+ * v6 - PB-1. bestLine(), shown only when the person has asked for it
+ *   and their tier includes it. Flat, no delta, no comparison.
+ *
  * 12 Aug 2026 v5
  *
  * v5 - LOG-6. The note is a growing textarea, capped at 280 rather than
@@ -75,6 +80,7 @@
  */
 
 import { store } from "./store.js";
+import { isPremium } from './auth.js';   // PB-1: Personal tier
 import { progressionInvitation } from "./data/session-rationale.js";
 
 function esc(str) {
@@ -193,7 +199,33 @@ export function lastLine(exercise) {
   if (last.durationMins !== undefined) bits.push(`${last.durationMins} min`);
   if (last.tension      !== undefined) bits.push(esc(last.tension));
   if (last.note         !== undefined) bits.push(esc(last.note));
-  return `<p class="slog__last">Last: ${bits.join(" \u00B7 ")}</p>`;
+  return `<p class="slog__last">Last: ${bits.join(" \u00B7 ")}</p>${bestLine(exercise)}`;
+}
+
+/**
+ * PB-1. The person's best for this exercise, when they have asked to see
+ * it and their tier includes it.
+ *
+ * Flat, like lastLine() above and for the same reason. "Best: 85 kg" is a
+ * fact about their own log. "Best: 85 kg — up 5 since May!" would be the
+ * coach interpreting, and P4 is Locked.
+ *
+ * Silent by default. showPersonalBests is off unless the person turned it
+ * on, because for personas 2.5, 2.8 and 2.13 a visible best is a target
+ * to fall short of. Persona 2.7 turns it on because he came looking.
+ */
+export function bestLine(exercise) {
+  if (store.get('showPersonalBests') !== true) return '';
+  if (!isPremium()) return '';
+  const best = store.personalBest(exercise.id);
+  if (!best) return '';
+  const bits = [];
+  if (best.weight)   bits.push(`${best.weight.value} ${esc(best.weight.unit || 'kg')}`);
+  if (best.reps)     bits.push(`${best.reps.value} reps`);
+  if (best.distance) bits.push(`${best.distance.value} distance`);
+  if (best.speed)    bits.push(`speed ${best.speed.value}`);
+  if (!bits.length) return '';
+  return `<p class="slog__best">Your best: ${bits.join(" \u00B7 ")}</p>`;
 }
 
 /**
