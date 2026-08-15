@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 14 Aug 2026 v345
+ * AGE-1 rebanded to 18+, CARDIAC-1 exercise clearance, W2-6 variety
+ * anchoring, CONTRACT-2 strengthened. Eight orphaned pre-thread
+ * onboarding views deleted and removed from the precache list above.
+ * store.js v46, session-builder.js v33, thread.js v11,
+ * onboarding-thread-data.js v9, settings.js v24.
+ *
  * 14 Aug 2026 v344
  * W3-B trainingIntent writer (step 9f), WRITE-1 coldStartBias.
  * onboarding-thread-data.js v8, thread.js v10, data/checkin.js v5,
@@ -2405,7 +2412,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v344";
+const CACHE_NAME = "alongside-v345";
 
 const SHELL_URLS = [
 
@@ -2531,15 +2538,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/annual-reflection.js",
   "/alongside-app/js/views/community-impact.js",
   "/alongside-app/js/views/home-threshold.js",
-  "/alongside-app/js/views/onboarding/about.js",
-  "/alongside-app/js/views/onboarding/arrival.js",
-  "/alongside-app/js/views/onboarding/body.js",
-  "/alongside-app/js/views/onboarding/complete.js",
   "/alongside-app/js/views/onboarding/frequency.js",
-  "/alongside-app/js/views/onboarding/hard-before.js",
-  "/alongside-app/js/views/onboarding/name.js",
-  "/alongside-app/js/views/onboarding/reflection.js",
-  "/alongside-app/js/views/onboarding/welcome.js",
   "/alongside-app/js/views/upgrade.js",
 
   "/alongside-app/js/views/privacy.js",
