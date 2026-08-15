@@ -1,5 +1,13 @@
 /**
  * settings.js
+ * 14 Aug 2026 v25
+ *
+ * v25 - D-3 / W2-7. "How you like things": the sessionVariety control and
+ *   a reviewable, reversible list of exercises the person has asked to
+ *   see less of or not at all. Deliberately not a "neurodivergent mode",
+ *   and autism/ADHD deliberately not added to CONDITIONS -- see the note
+ *   above renderPreferencesSection().
+ *
  * 14 Aug 2026 v24
  *
  * v24 - AGE-1. The age select wrote its LABELS as values. Saving your age
@@ -322,6 +330,11 @@ import { openSheet }                     from './onboarding/sheet-manager.js';
 // W3-A2. Imported, never redefined. A second copy of these option lists
 // is exactly how vocabulary drift happens, and capability answers are the
 // most consequential strings in the product.
+// W2-7. Names for the preference list. Reading the id back to the person
+// ("bodyweight-nordic-curl-progression") would be useless and slightly
+// insulting; the list has to say what they actually skipped.
+import { EXERCISES } from '../data/exercises/index.js';
+
 import {
   AGE_CHIPS,
   BALANCE_CHIPS,
@@ -654,7 +667,116 @@ export function SettingsView(router) {
 
         ${renderCapabilitySection()}
 
+        ${renderPreferencesSection()}
+
         ${renderReflectionSection()}
+      </div>
+    `;
+  }
+
+  // ── How you like things (D-3 / W2-7, 14 Aug 2026) ───────────────────────
+  //
+  // Graeme's position, 14 Aug: the app is built with neurodiversity
+  // understood from the start, so the coach should need no adapting --
+  // but Settings should let people shape the experience.
+  //
+  // Deliberately NOT a "neurodivergent mode", and autism and ADHD are
+  // deliberately NOT in CONDITIONS. That list drives exercise
+  // contraindication filtering; neurodivergence is not a movement
+  // contraindication, and putting it there would make the engine treat it
+  // as a limitation -- the opposite of building it in from the start. It
+  // would also be a label that filtered nothing, which is the same fault
+  // the conditions question had before CARDIAC-1.
+  //
+  // So these are preferences anybody might hold, named by what they do.
+  // Persona 2.14 wants the first one; persona 2.13 wants its opposite;
+  // neither has to identify as anything to get it.
+
+  // Built lazily and once: EXERCISES is 545 entries and this runs on
+  // every Settings render.
+  let _exNameCache = null;
+  function getExerciseName(id) {
+    if (!_exNameCache) _exNameCache = new Map(EXERCISES.map(e => [e.id, e.name]));
+    // An id with no entry means the library changed under a stored
+    // preference. Show the id rather than dropping the row, so the person
+    // can still clear it.
+    return _exNameCache.get(id) || id;
+  }
+
+  function renderPreferencesSection() {
+    const variety = store.get('sessionVariety') || 'balanced';
+    const prefs   = store.get('exercisePreferences') || {};
+    const entries = Object.entries(prefs)
+      .map(([id, v]) => ({ id, ...v, name: getExerciseName(id) }))
+      .sort((a, b) => (b.setAt || '').localeCompare(a.setAt || ''));
+
+    const VARIETY_OPTIONS = [
+      { id: 'familiar', label: 'Mostly the same each time',
+        hint: 'About two thirds of a session repeats from the last one.' },
+      { id: 'balanced', label: 'A bit of both',
+        hint: 'Some familiar work, some new. This is the default.' },
+      { id: 'varied',   label: 'Something different each time',
+        hint: 'Sessions rotate widely across the library.' },
+    ];
+
+    return `
+      <div class="settings-preferences">
+        <h2 class="settings-section__heading">How you like things</h2>
+        <p class="settings-section__sub">
+          None of this is about what you can do — it is about what you
+          would rather the coach did. Change it whenever you like.
+        </p>
+
+        <fieldset class="settings-field settings-capability__group">
+          <legend class="settings-label">How much should sessions change?</legend>
+          <p class="settings-section__sub" id="pref-variety-hint">
+            The coach also asks this before a session. Whatever you set
+            here is the answer it starts from.
+          </p>
+          <select class="settings-select"
+                  id="settings-pref-variety"
+                  data-field="sessionVariety"
+                  aria-describedby="pref-variety-hint">
+            ${VARIETY_OPTIONS.map(o => `
+              <option value="${o.id}"${variety === o.id ? ' selected' : ''}>${_esc(o.label)}</option>
+            `).join('')}
+          </select>
+          <p class="settings-section__sub">
+            ${_esc(VARIETY_OPTIONS.find(o => o.id === variety)?.hint || '')}
+          </p>
+        </fieldset>
+
+        <div class="settings-field">
+          <h3 class="settings-label">Exercises you have asked me to change</h3>
+          ${entries.length === 0 ? `
+            <p class="settings-section__sub">
+              Nothing yet. When you skip something during a session, the
+              coach offers to see it less often — or not at all.
+            </p>
+          ` : `
+            <ul class="settings-preflist">
+              ${entries.map(e => `
+                <li class="settings-preflist__item">
+                  <span class="settings-preflist__name">${_esc(e.name)}</span>
+                  <span class="settings-preflist__tag">
+                    ${e.preference === 'avoid' ? 'Not again' : 'Less often'}
+                  </span>
+                  <button class="btn btn-ghost btn-small"
+                          data-clear-pref="${_esc(e.id)}"
+                          aria-label="Undo — start offering ${_esc(e.name)} normally again">
+                    Undo
+                  </button>
+                </li>
+              `).join('')}
+            </ul>
+          `}
+        </div>
+
+        <button class="settings-save-btn btn btn-primary"
+                data-action="save-preferences"
+                aria-label="Save how you like things">
+          Save
+        </button>
       </div>
     `;
   }
@@ -1548,6 +1670,18 @@ export function SettingsView(router) {
   // ── Events ─────────────────────────────────────────────────────────────────
 
   function attachEvents(container) {
+    // W2-7. Undo a stored preference. Immediate rather than batched under
+    // Save: the row disappears, which is its own confirmation, and a
+    // person undoing something should not have to also remember to save.
+    container.querySelectorAll('[data-clear-pref]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        store.setExercisePreference(btn.dataset.clearPref, null);
+        render(container);
+        attachEvents(container);
+        _showToast('Back to normal — I will offer it again', container);
+      });
+    });
+
     // VER-1. Read the real cache name once, then repaint the label in
     // place. Deliberately not blocking the render: the About panel should
     // appear immediately and fill this in a moment later, rather than
@@ -1851,6 +1985,13 @@ export function SettingsView(router) {
           .map(b => b.dataset.movement);
         store.set('movementIdentity', selectedMovement);
         _showToast('How you move, updated', container);
+        break;
+      }
+
+      case 'save-preferences': {
+        const v = container.querySelector('[data-field="sessionVariety"]')?.value;
+        if (v) store.set('sessionVariety', v);
+        _showToast('Saved — the coach will use this from your next session', container);
         break;
       }
 

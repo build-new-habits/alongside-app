@@ -1,6 +1,14 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 14 Aug 2026 v9
+ *
+ * v9 - W2-7. Skipping an exercise now offers "less often" or "not again",
+ *   AFTER the skip, never before -- a skip is not a complaint and most
+ *   are "not today". This is the in-session flow the skip/dislike spec
+ *   left as future work; exercisePreferences has had no writer outside
+ *   gym-programme.js since 04 Aug.
+ *
  * 11 Aug 2026 v8
  *
  * v8 - CON-3b. Renders watchOut ("What to watch for") and load ("How
@@ -700,6 +708,42 @@ function renderExercise() {
 
 // ── Phase 5: Rest card ────────────────────────────────────────────────────────
 
+/**
+ * W2-7. The strip offered after a skip.
+ *
+ * Deliberately quiet. No heading, no icon, no "why did you skip?" -- the
+ * question is already implied, and asking it out loud turns a neutral act
+ * into a small interrogation. Naming the exercise matters: "Fewer of
+ * these" is meaningless three cards later without it.
+ *
+ * P4 (Locked): the coach displays, it does not interpret. Neither option
+ * says anything about the person -- not "too hard", not "you struggled".
+ * They are instructions to the app, phrased as instructions.
+ *
+ * Binary per the skip/dislike spec section 6: "not a rating system... no
+ * stars, no thumbs, no scores." Both choices are reversible in Settings.
+ */
+function renderSkipOffer() {
+  if (!pendingSkipOffer) return "";
+  const name = String(pendingSkipOffer.name || "that one")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+  return `
+    <div class="cs-skip-offer" role="group"
+         aria-label="Tell the coach about skipping ${name}">
+      <p class="cs-skip-offer__line">Want me to change how often ${name} comes up?</p>
+      <div class="cs-skip-offer__actions">
+        <button class="btn btn-ghost btn-small" data-skip-pref="less"
+                aria-label="Offer ${name} less often">Less often</button>
+        <button class="btn btn-ghost btn-small" data-skip-pref="avoid"
+                aria-label="Never offer ${name} again">Not again</button>
+        <button class="btn btn-ghost btn-small" data-skip-pref="dismiss"
+                aria-label="Leave it as it is">Leave it</button>
+      </div>
+    </div>
+  `;
+}
+
 function renderRest() {
   const nextEx = sessionQueue[currentIndex];
   return `
@@ -916,6 +960,7 @@ function resetSession() {
   selectedMins  = null;
   sessionQueue  = [];
   currentIndex  = 0;
+  pendingSkipOffer = null;   // W2-7: must not leak between sessions
   creditsEarned = 0;
   timeRemaining = 0;
   timerRunning  = false;
@@ -1101,6 +1146,7 @@ export function onMount() {
   // Start
   document.getElementById("cs-start-btn")?.addEventListener("click", () => {
     currentIndex  = 0;
+    pendingSkipOffer = null;   // W2-7: must not leak between sessions
     creditsEarned = 0;
     timeRemaining = 0;
     timerRunning  = false;
@@ -1133,18 +1179,53 @@ export function onMount() {
   });
 
   // Skip
+  //
+  // ── W2-7 (14 Aug 2026) ────────────────────────────────────────────
+  //
+  // Skipping used to be silent: the exercise went past and came back
+  // next session, and the session after that. exercisePreferences has
+  // existed since 04 Aug with the in-session flow marked "separate
+  // future work" in the spec. This is that flow.
+  //
+  // The offer appears AFTER the skip, never before. A skip is not a
+  // complaint -- most are "not today", and making somebody justify
+  // moving on would turn a neutral act into a small interrogation. So
+  // the exercise is skipped first, unconditionally, and then a quiet
+  // strip offers two ways to say more. Ignoring it is the default and
+  // costs nothing.
+  //
+  // Binary, per spec section 6: "not a rating system... no stars, no
+  // thumbs, no scores." Two buttons, both reversible in Settings.
   document.getElementById("cs-skip-btn")?.addEventListener("click", () => {
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     timerRunning  = false;
     timeRemaining = 0;
+    const skipped = sessionQueue[currentIndex];
     currentIndex++;
   scrollToTop();   // SCROLL-1: a new card starts at the top
     if (currentIndex >= sessionQueue.length) {
       finaliseSession();
     } else {
       phase = "session";
+      pendingSkipOffer = skipped || null;
       rerender();
     }
+  });
+
+  // W2-7. Skip-offer answers. Delegated because the strip is rendered
+  // conditionally and rerender() replaces the node.
+  document.querySelectorAll("[data-skip-pref]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const choice = btn.dataset.skipPref;
+      const ex = pendingSkipOffer;
+      pendingSkipOffer = null;
+      if (ex && (choice === "less" || choice === "avoid")) {
+        // source 'skip' distinguishes this from a Settings edit, so the
+        // two can be told apart later without guessing.
+        store.setExercisePreference(ex.id, choice, "skip");
+      }
+      rerender();
+    });
   });
 
   // Skip rest

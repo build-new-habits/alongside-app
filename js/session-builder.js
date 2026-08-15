@@ -1,6 +1,24 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 14 Aug 2026 v34
+ *
+ * v34 - W2-7. 'less' no longer behaves identically to 'avoid'.
+ *
+ *   CORRECTION to my own Wave 2 note, recorded rather than quietly
+ *   dropped. I reported that session-builder never read
+ *   exercisePreferences. It read BOTH levels already -- 'avoid' at the
+ *   candidate filter, 'less' at selection. I had grepped for a store.set
+ *   and concluded from the absence of a writer that there was no reader.
+ *
+ *   The real defect was narrower and more interesting: 'less' was
+ *   implemented as "never chosen while something else exists", which in
+ *   a pool of fifty is never. Measured: an exercise served 24 times in
+ *   60 sessions dropped to 0 under 'less' -- identical to 'avoid'. A
+ *   deliberately two-level signal had collapsed to one, and the gentler
+ *   option was doing the harsher thing. Now probabilistic: roughly a
+ *   fifth of its previous rate, never zero.
+ *
  * 14 Aug 2026 v33
  *
  * v33 - CARDIAC-1. exerciseClearance gates LOADED STRENGTH work only.
@@ -1437,6 +1455,7 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
     // true of everyone who declared no relevant condition. Reading it as
     // 'not-yet' would quietly restrict the whole userbase.
     if (_needsClearance() && _isLoadedStrength(ex)) return false;
+
     if (section === "main" && !withinCeiling(ex)) return false;
     if (section === "warmup" && useCeilingOnWarmup && !withinCeiling(ex)) return false;
     // W2-1. See the cooldown pool note above.
@@ -1911,10 +1930,32 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
         candidates = pool;
       }
 
-      // 'less' exercises sort to the back: still available when a category
-      // has nothing else, never chosen while something else exists.
-      const notLess = candidates.filter(e => prefs[e.id]?.preference !== "less");
-      if (notLess.length > 0) candidates = notLess;
+      // ── W2-7 (14 Aug 2026) ───────────────────────────────────────────
+      //
+      // CORRECTION to my own Wave 2 finding. I reported that
+      // session-builder never read exercisePreferences. It did — this
+      // rule, right here, has read 'less' since it was written. What it
+      // never read was 'avoid', which is handled in _filterCandidates()
+      // now. Reading the grep and not the code is exactly the mistake
+      // this project keeps paying for.
+      //
+      // The rule as written was "never chosen while something else
+      // exists", and in a pool of fifty that means never. Measured: an
+      // exercise served 24 times in 60 sessions dropped to 0 — identical
+      // to an avoided one. So a deliberately two-level signal had
+      // collapsed to one level, and the gentler option was doing the
+      // harsher thing.
+      //
+      // "Offer this less often" is not "never offer this". Now
+      // probabilistic: LESS_SUPPRESSION is the share of picks that step
+      // past a 'less' item, so it stays in rotation at roughly a fifth of
+      // its previous rate. Somebody who wanted it gone had the other
+      // button, and that button now works.
+      const LESS_SUPPRESSION = 0.8;
+      if (Math.random() < LESS_SUPPRESSION) {
+        const notLess = candidates.filter(e => prefs[e.id]?.preference !== "less");
+        if (notLess.length > 0) candidates = notLess;
+      }
 
       // ── CAP-6 (C3), 13 Aug 2026 ──────────────────────────────────────
       // Adapted content is de-prioritised for somebody who does not need
