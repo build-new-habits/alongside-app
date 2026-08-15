@@ -1,6 +1,13 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 15 Aug 2026 v10
+ *
+ * v10 - DELIGHT-1. The done screen was identical for session one and
+ *   session fifty. A first session is now recognised as a first, using
+ *   the territory the person named at onboarding. Fires once, ever, and
+ *   never mentions the next one.
+ *
  * 14 Aug 2026 v9
  *
  * v9 - W2-7. Skipping an exercise now offers "less often" or "not again",
@@ -135,6 +142,7 @@
  */
 
 import { store } from "../store.js";
+import { firstSessionRecognition } from "../data/first-session.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { bodyCaution } from "../data/session-rationale.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
@@ -782,8 +790,25 @@ function renderDone() {
   const focus       = FOCUS_TYPES.find(f => f.id === selectedFocus);
   const exercisesDone = currentIndex;
 
+  // DELIGHT-1. Counted from the log AFTER finaliseSession() has written
+  // this session, so a first session reads as 1 rather than 0.
+  const completedCount = store.completedSessions(store.get("activityLog") || []).length;
+  const firstTime = firstSessionRecognition(
+    completedCount,
+    store.get("onboarding.primaryTerritory")
+  );
+
   return `
     <div class="view core-session-view" style="text-align: center;">
+      ${firstTime ? `
+        <div class="card card-coach cs-first-session" style="margin-top: var(--space-8);">
+          <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <div>
+            <h2 class="cs-first-session__heading">${firstTime.heading}</h2>
+            <p class="coach-message-text">${firstTime.body}</p>
+          </div>
+        </div>
+      ` : ``}
       <div class="card card-coach" style="margin-top: var(--space-8);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div>
