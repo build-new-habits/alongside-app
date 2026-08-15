@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v352
+ * QUICK-1, the short check-in path for persona 2.16. store.js v49,
+ * checkin.js, settings.js v26, field-contract.js.
+ *
  * 15 Aug 2026 v351
  * PACE-1 and PACE-2, proactive pacing for persona 2.8. New
  * js/data/pacing.js (added to the precache list above), store.js v48,
@@ -2439,7 +2443,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v351";
+const CACHE_NAME = "alongside-v352";
 
 const SHELL_URLS = [
 
