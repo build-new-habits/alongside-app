@@ -1,7 +1,10 @@
 /* ============================================================
    session-shared.css
    css/components/session-shared.css
-   15 Aug 2026 v3
+   15 Aug 2026 v4
+
+   v4 - ASSESS-1. .cs-baseline, the calibration block. Must not read as a
+        form: no progress dots, no numbering, no required markers.
 
    v3 - PACE-1. .cs-pacing, the daily pacing block.
    v2 - DELIGHT-1. .cs-first-session, the recognition block on a first
@@ -263,4 +266,45 @@
 .cs-pacing__heading {
   color: var(--color-primary);
   margin-bottom: var(--space-2);
+}
+
+/* ── Baseline calibration (ASSESS-1, 15 Aug 2026) ─────────────────────────
+   Same undecorated card as the first-session and pacing blocks. This one
+   especially must not look like a form or a quiz: no progress dots, no
+   numbering, no required markers. Three questions in the coach's own
+   card, in the coach's own voice.
+
+   Skip sits beside Done at the same weight, because a skip that looks
+   like the lesser option is not really an option. */
+
+.cs-baseline {
+  text-align: left;
+}
+
+.cs-baseline__heading {
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+
+.cs-baseline__group {
+  border: 0;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  min-inline-size: 0;
+}
+
+.cs-baseline__legend {
+  padding: 0;
+  margin-bottom: var(--space-2);
+}
+
+.cs-baseline__chips,
+.cs-baseline__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.cs-baseline__actions {
+  margin-top: var(--space-4);
 }
