@@ -33,9 +33,19 @@
  *   Injecting a throw deliberately shows it propagates cleanly.
  *   SILENT-1 DOES NOT EXIST. The claim was wrong.
  *
- *   So the honest state: the wiring gap is real, the fix is unproven,
- *   and the first thing to do on picking this up is find out why the
- *   block never ran -- not to rebuild it.
+ *   RESOLVED, 15 Aug evening, and this is the third correction on the
+ *   same item. The block was NOT unreachable. Instrumenting the anchor
+ *   point directly shows pickFrom()'s body runs nine times per session
+ *   and sees warmup, main and cooldown.
+ *
+ *   My "executed zero times" reading was an artefact of where I put the
+ *   probe: immediately AFTER the getPhaseBias() call, so anything going
+ *   wrong on that line meant the probe never fired and I read the
+ *   silence as the block not running.
+ *
+ *   So the placement is fine and the idea is still untested. Retrying it
+ *   is worthwhile. The thing to verify first is getPhaseBias() resolving
+ *   correctly from inside this module -- probe BEFORE it, not after.
  *
  * 14 Aug 2026 v34
  *
