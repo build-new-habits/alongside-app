@@ -1,5 +1,10 @@
 /**
  * today.js
+ * 15 Aug 2026 v18
+ *
+ * v18 - QUICK-2. The coach offers the short check-in once, after six
+ *   check-ins. It existed only in Settings, where 2.16 will not look.
+ *
  * 15 Aug 2026 v17
  *
  * v17 - PACE-2. A weekly target set sharply above recent actual
@@ -238,7 +243,7 @@
  */
 
 import { store }               from '../store.js';
-import { noticePlanJump } from '../data/pacing.js';
+import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
 import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
 
@@ -470,9 +475,17 @@ export function TodayView(router) {
     // than about today, and because it is the one persona 2.8 needs.
     const planJump = noticePlanJump();
 
+    // QUICK-2. Offered here rather than in the check-in itself: the
+    // check-in is the thing she is finding long, and interrupting it to
+    // ask about its length would be self-defeating. Home is where she
+    // arrives with a moment to read something.
+    const briefOffer = planJump ? null : offerBriefPath();
+
     const targetMet = sessionDone && weeklyTarget && sessionCount >= weeklyTarget;
     const coachLine     = planJump
       ? planJump.body
+      : briefOffer
+      ? briefOffer.body
       : targetMet
       ? `That's the ${weeklyTarget} you said you'd aim for this week. Anything else is extra, not expected.`
       : sessionDone

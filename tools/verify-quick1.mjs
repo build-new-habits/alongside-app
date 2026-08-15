@@ -103,5 +103,49 @@ check('the brief branch renders no extra question',
   !/_buildPanel\(/.test(branch),
   'asking would be the friction she is complaining about');
 
+// ── QUICK-2: the offer, because Settings is not discovery ────
+const P = await import(BASE + 'data/pacing.js');
+function seedCheckins(n) {
+  localStorage.clear(); store.init();
+  const h = {};
+  for (let i = 0; i < n; i++) {
+    const d = new Date(Date.now() - i * 86400000).toISOString().split('T')[0];
+    h[d] = { energy: 6, mood: 6, date: d };
+  }
+  store.set('checkinHistory', h);
+}
+
+seedCheckins(3);
+check('not offered to somebody two weeks in', P.offerBriefPath() === null,
+  'offering it early would be the app deciding she is in a hurry');
+
+seedCheckins(6);
+const offer = P.offerBriefPath();
+check('offered after a run of full check-ins', offer !== null,
+  offer ? offer.body.slice(0, 55) : '');
+check('and only once, ever', P.offerBriefPath() === null,
+  'somebody who ignored the offer has answered it');
+
+seedCheckins(6);
+store.set('sessionPace', 'brief');
+check('never offered to somebody already using it', P.offerBriefPath() === null);
+
+seedCheckins(6);
+const body = P.offerBriefPath().body;
+check('the offer names what she gives up',
+  /know a bit less/.test(body),
+  'selling it without the trade would be a small dishonesty');
+check('it says where to find it',
+  /Settings/.test(body));
+
+const todaySrc = fs.readFileSync(new URL('../js/views/today.js', import.meta.url), 'utf8');
+check('offered on Home, not inside the check-in',
+  /offerBriefPath\(\)/.test(todaySrc) &&
+  !/offerBriefPath/.test(fs.readFileSync(new URL('../js/views/checkin.js', import.meta.url), 'utf8')),
+  'interrupting the long thing to ask about its length would be self-defeating');
+check('and it does not displace the pacing line',
+  /planJump \? null : offerBriefPath\(\)/.test(todaySrc),
+  'a plan-jump nudge matters more than a settings tip');
+
 console.log(failures === 0 ? '\nQUICK-1 GATE GREEN' : `\nQUICK-1 GATE RED — ${failures} failure(s)`);
 process.exit(failures === 0 ? 0 : 1);
