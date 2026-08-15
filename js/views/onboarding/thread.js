@@ -1,5 +1,11 @@
 /**
  * js/views/onboarding/thread.js
+ * 14 Aug 2026 v10
+ *
+ * v10 - W3-B. Step 9f acknowledgement wired. trainingIntent is a
+ *   top-level field, so _writeStepValue()'s generic store.set path
+ *   already handles the write -- only the ack needed adding.
+ *
  * 14 Aug 2026 v9
  *
  * v9 - W3-A. Capability steps 9a-9d wired in. Three changes:
@@ -181,6 +187,7 @@ import {
   generateConditionsAck,
   generateFrequencyAck,
   generateBalanceAck,
+  generateIntentAck,
   BALANCE_CHIPS,
   CHAIR_RISE_CHIPS,
   FLOOR_ACCESS_CHIPS,
@@ -1313,6 +1320,11 @@ export function ThreadView(router) {
     // Step 9a — balance: dynamic ack (W3-A)
     if (step.id === '9a') {
       return generateBalanceAck(value);
+    }
+
+    // Step 9f — training intent: dynamic ack (W3-B)
+    if (step.id === '9f') {
+      return generateIntentAck(value);
     }
 
     return step.coachAfter?.answered || null;
