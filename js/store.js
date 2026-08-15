@@ -1,5 +1,16 @@
 /**
  * store.js - Data persistence layer
+ * 14 Aug 2026 v46
+ *
+ * v46 - CARDIAC-1. New field exerciseClearance. null means NOT ASKED and
+ *   must never be read as 'not-yet'.
+ *
+ * 14 Aug 2026 v45
+ *
+ * v45 - AGE-1. ageBand rebanded to 18+ bands and migrated. There were
+ *   THREE vocabularies live: the thread chips, the contract's (from the
+ *   retired about.js), and settings.js writing labels as values. One now.
+ *
  * 14 Aug 2026 v44
  *
  * v44 - WRITE-1. lifestyle.stressLevel comment corrected to the vocabulary
@@ -451,11 +462,50 @@ export const store = {
    * fields inside onboarding{}. They are picked up safely by the existing
    * onboarding{} spread — no additional explicit handling needed.
    */
+  /**
+   * AGE-1, 14 Aug 2026. Old age bands to new.
+   *
+   * The old chips were decade bands anchored at 0 ('30s' = 30-39); the new
+   * ones are anchored at 5 ('35-44'). Those never align, so every mapping
+   * below is a judgement rather than a translation. Each old band maps to
+   * whichever new band contains its MIDPOINT, which is consistent and
+   * happens to be conservative where it matters: '60s' (midpoint 65) lands
+   * in '65-74', so somebody who was inside the capability age trigger
+   * before is still inside it afterwards.
+   *
+   * 'under-20' maps to '18-24' because the product is 18+ and there is no
+   * band below it. That is the one mapping that could be wrong about a
+   * real person rather than merely imprecise, and it resolves in the
+   * direction of treating them as an adult, which is what the Terms will
+   * say they are.
+   */
+  _migrateAgeBand(v) {
+    const MAP = {
+      'under-20': '18-24',
+      '20s':      '25-34',
+      '30s':      '35-44',
+      '40s':      '45-54',
+      '50s':      '55-64',
+      '60s':      '65-74',
+      '70plus':   '75plus',
+      // settings.js wrote LABELS as values until AGE-1. Anyone who edited
+      // their age in Settings has one of these stored, matching nothing.
+      'Under 20': '18-24',
+      '20s ':     '25-34',
+      '70+':      '75plus',
+      'Prefer not to say': 'prefer-not',
+    };
+    return MAP[v] || v;
+  },
+
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
     return {
       ...defaults,
       ...saved,
+
+      // AGE-1. Runs before the spread's ageBand would win.
+      ageBand: saved.ageBand ? this._migrateAgeBand(saved.ageBand) : defaults.ageBand,
 
       // ── ONBOARDING (top-level flags stay top-level) ───────────
       // v7: primaryTerritory, threadStartedAt, threadCompletedAt
@@ -897,6 +947,10 @@ export const store = {
 
       // ── PROFILE ───────────────────────────────────────────────
       name: '',
+      // AGE-1, 14 Aug 2026: 18-24|25-34|35-44|45-54|55-64|65-74|75plus|prefer-not
+      // Single vocabulary, defined in data/onboarding-thread-data.js
+      // AGE_CHIPS and imported by both the thread and Settings. Old values
+      // are migrated in mergeWithDefaults(); see _migrateAgeBand().
       ageBand: null,
       age: null,          // DEPRECATED — kept for migration only. Do not write new values.
       gender: null,
@@ -1084,6 +1138,21 @@ export const store = {
         legPower:     null,
         askedAt:      null
       },
+
+      // CARDIAC-1, 14 Aug 2026. 'cleared'|'not-yet'|'not-sure'|null.
+      // Whether a professional has told this person it is okay to
+      // exercise unsupervised. Asked at thread step 8a, only of people
+      // declaring a condition where the answer changes what we offer.
+      //
+      // null means NOT ASKED, and must not be read as 'not-yet'. Somebody
+      // who declared no relevant condition is not un-cleared; they were
+      // never in the group the question is for.
+      //
+      // This gates LOADED STRENGTH work only. Wellbeing, breathing,
+      // mobility and walking stay open at every value, because the harm
+      // of withholding those from somebody who is anxious about their
+      // heart is real and the risk of providing them is not.
+      exerciseClearance: null,
 
       exercisePreferences: {}, // { [exerciseId]: { preference: 'avoid'|'less', setAt, source } } — per alongside_exercise_skip_dislike_spec_16may2026_v1.docx. Binary signal, not a rating (spec §6: "not a rating system... no stars, no thumbs, no scores"). First consumer: js/data/conditionProgrammes.js's candidate selection, 04 Aug 2026 — the full spec's in-session Skip flow (gym-programme.js/prescribed-session.js/core-session.js) remains separate future work.
 
