@@ -1,7 +1,13 @@
 /* ============================================================
    session-shared.css
    css/components/session-shared.css
-   12 Aug 2026 v1
+   15 Aug 2026 v3
+
+   v3 - PACE-1. .cs-pacing, the daily pacing block.
+   v2 - DELIGHT-1. .cs-first-session, the recognition block on a first
+        completed session. (The v2 change was made without bumping this
+        header; recorded here rather than silently.)
+   v1 - 12 Aug 2026.
 
    The .cs-*, .gym-* and .workout-header-title families — used across
    core-session, yoga-session, gym-programme and others, and never
@@ -240,6 +246,21 @@
 }
 
 .cs-first-session__heading {
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+
+/* ── Proactive pacing (PACE-1, 15 Aug 2026) ──────────────────────────────
+   Same undecorated treatment as the first-session block, and for the same
+   reason in reverse: this must not read as a warning. No amber, no icon,
+   no border colour. It is the coach saying one thing, in the same voice
+   it says everything else. */
+
+.cs-pacing {
+  text-align: left;
+}
+
+.cs-pacing__heading {
   color: var(--color-primary);
   margin-bottom: var(--space-2);
 }

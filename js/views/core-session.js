@@ -1,6 +1,12 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 15 Aug 2026 v11
+ *
+ * v11 - PACE-1. A third exercise activity in one day gets a warm
+ *   check-in on the done screen. Never blocks a fourth. Matrix decision
+ *   4a, agreed 05 Jul.
+ *
  * 15 Aug 2026 v10
  *
  * v10 - DELIGHT-1. The done screen was identical for session one and
@@ -143,6 +149,7 @@
 
 import { store } from "../store.js";
 import { firstSessionRecognition } from "../data/first-session.js";
+import { noticeDailyPace } from "../data/pacing.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { bodyCaution } from "../data/session-rationale.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
@@ -798,6 +805,11 @@ function renderDone() {
     store.get("onboarding.primaryTerritory")
   );
 
+  // PACE-1. Third exercise activity today. Called here rather than in
+  // finaliseSession() so it reads the log AFTER this session is in it,
+  // and it marks itself shown so a re-render does not repeat it.
+  const pacing = noticeDailyPace();
+
   return `
     <div class="view core-session-view" style="text-align: center;">
       ${firstTime ? `
@@ -806,6 +818,15 @@ function renderDone() {
           <div>
             <h2 class="cs-first-session__heading">${firstTime.heading}</h2>
             <p class="coach-message-text">${firstTime.body}</p>
+          </div>
+        </div>
+      ` : ``}
+      ${pacing ? `
+        <div class="card card-coach cs-pacing" style="margin-top: var(--space-8);">
+          <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
+          <div>
+            <h2 class="cs-pacing__heading">${pacing.heading}</h2>
+            <p class="coach-message-text">${pacing.body}</p>
           </div>
         </div>
       ` : ``}
