@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v351
+ * PACE-1 and PACE-2, proactive pacing for persona 2.8. New
+ * js/data/pacing.js (added to the precache list above), store.js v48,
+ * core-session.js v11, today.js, session-shared.css v3.
+ *
  * 15 Aug 2026 v350
  * TARGET-1 and TARGET-2. thread.js v12 records that a weekly target was
  * chosen; today.js acknowledges reaching it.
@@ -2434,7 +2439,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v350";
+const CACHE_NAME = "alongside-v351";
 
 const SHELL_URLS = [
 
@@ -2602,6 +2607,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/checkin.js",
   "/alongside-app/js/data/checkin-openings.js",
   "/alongside-app/js/data/first-session.js",
+  "/alongside-app/js/data/pacing.js",
   "/alongside-app/js/data/conditions.js",
   "/alongside-app/js/data/conditionProgrammes.js",
   "/alongside-app/js/data/equipment.js",
