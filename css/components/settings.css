@@ -1,5 +1,11 @@
 /*
  * css/components/settings.css
+ * 14 Aug 2026 v9
+ *
+ * v9 - D-3 / W2-7. .settings-preferences, .settings-preflist and
+ *   .cs-skip-offer. The preference row wraps rather than truncating:
+ *   somebody cannot undo what they cannot read.
+ *
  * 14 Aug 2026 v8
  *
  * v8 - W3-A2. .settings-capability and .settings-capability__group for the
@@ -474,6 +480,65 @@
 .settings-capability__group .settings-section__sub {
   margin-top: 0;
   margin-bottom: var(--space-2);
+}
+
+/* ── How you like things (D-3 / W2-7, 14 Aug 2026) ───────────────────────
+   The preference list. Each row is name / tag / undo, and the undo has to
+   stay reachable at 320px, so the row wraps rather than truncating the
+   name — somebody cannot undo what they cannot read. */
+
+.settings-preferences {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.settings-preflist {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+
+.settings-preflist__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.settings-preflist__name {
+  flex: 1 1 60%;
+  min-width: 0;          /* lets the name wrap instead of forcing overflow */
+}
+
+.settings-preflist__tag {
+  font-size: 0.85em;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+/* ── Post-skip offer (W2-7) ───────────────────────────────────────────────
+   Sits under the Skip button inside a session. Quiet by design: it must
+   read as an aside, not as a prompt demanding an answer. */
+
+.cs-skip-offer {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.cs-skip-offer__line {
+  margin: 0 0 var(--space-2);
+  font-size: 0.9em;
+  opacity: 0.85;
+}
+
+.cs-skip-offer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .settings-movement-divider {
