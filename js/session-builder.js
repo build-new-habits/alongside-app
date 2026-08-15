@@ -3,33 +3,39 @@
  *
  * 15 Aug 2026 v35
  *
- * v35 - PROG-1 ATTEMPTED AND REVERTED, plus one real fix.
+ * v35 - PROG-1 attempted, reverted, and MY CONCLUSION ABOUT IT
+ *   CORRECTED the same evening. Read this before trying it again.
  *
- *   THE FIX: _difficulty() lifted to module scope. It was defined inside
- *   _filterCandidates(), so selectFromCategories() could not see it. One
- *   definition now, so the two call sites cannot disagree about what
- *   "hard" means.
+ *   THE ONE REAL FIX: _difficulty() lifted to module scope. It was
+ *   defined inside _filterCandidates(), so selectFromCategories() could
+ *   not see it. One definition now. That part stands.
  *
- *   THE ATTEMPT: programme phase intensity ('gentle' | 'moderate' |
- *   'challenging') reaches coach-proposal.js and NOT this door, so a
- *   person on a twelve-week programme who uses the session-builder gets
- *   week 10 built the same as week 1. Real gap, and the obvious fix is
- *   to prefer the harder half of the permitted pool in a challenging
- *   phase.
+ *   THE GAP, which is real: programme phases declare an intensityBias
+ *   ('gentle' | 'moderate' | 'challenging') that climbs across twelve
+ *   weeks. It reaches coach-proposal.js and NOT this door, so somebody
+ *   on a programme who uses the session-builder gets week 10 built the
+ *   same as week 1.
  *
- *   It moved mean difficulty by 3% across 200 sessions. Not shipped.
- *   The reason is the library, not the wiring: 393 of 551 entries sit at
- *   difficulty 1-2, so the harder half of any per-slot pool is still
- *   easy. Progression cannot be delivered by preference over a library
- *   that has no range to prefer within.
+ *   WHAT I ACTUALLY ESTABLISHED, AND WHAT I DID NOT.
  *
- *   Recorded here rather than dropped, so the next person does not spend
- *   the same afternoon rediscovering it. The content work comes first.
+ *   I added a phase preference here, measured a 3% difficulty change
+ *   across 200 sessions, and concluded that progression cannot be
+ *   delivered by preference because 393 of 551 entries sit at difficulty
+ *   1-2. I wrote that up as a finding.
  *
- *   Found on the way: a ReferenceError thrown inside session generation
- *   was SWALLOWED upstream and produced a fallback session, so a
- *   50-session measurement returned entirely plausible numbers from
- *   broken code. Logged as SILENT-1.
+ *   It is not a finding. Instrumenting the block showed it executed ZERO
+ *   times in that test configuration, so the 3% was run-to-run noise on
+ *   unchanged behaviour. The idea was never tested. Whether it works is
+ *   still unknown.
+ *
+ *   I also claimed a ReferenceError thrown in here was swallowed
+ *   upstream and produced a fallback session, and logged it as SILENT-1.
+ *   Injecting a throw deliberately shows it propagates cleanly.
+ *   SILENT-1 DOES NOT EXIST. The claim was wrong.
+ *
+ *   So the honest state: the wiring gap is real, the fix is unproven,
+ *   and the first thing to do on picking this up is find out why the
+ *   block never ran -- not to rebuild it.
  *
  * 14 Aug 2026 v34
  *
