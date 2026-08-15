@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v358
+ * ASSESS-1 step 1. store.js v51 — assessment schema, recordAssessment(),
+ * assessmentChange(), declineAssessment(). The ceiling can move.
+ *
  * 15 Aug 2026 v357
  * Correction only. SILENT-1 does not exist and the PROG-1 negative
  * result was never established. See session-builder.js v35.
@@ -2464,7 +2468,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v357";
+const CACHE_NAME = "alongside-v358";
 
 const SHELL_URLS = [
 
