@@ -1,5 +1,11 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 14 Aug 2026 v8
+ *
+ * v8 - W3-B. Step 9f writes trainingIntent, which had no writer at all --
+ *   every user was 'improve' and both the 'maintain' and 'recover'
+ *   branches of session-builder.js were unreachable. Asked of everyone.
+ *
  * 14 Aug 2026 v7
  *
  * v7 - OPEN-1. Step 9e writes lifestyle.returningAfter, which
@@ -116,6 +122,23 @@ export const RETURNING_AFTER_CHIPS = [
   { id: 'illness', label: 'Illness'            },
   { id: 'life',    label: 'Life got in the way' },
   { id: 'burnout', label: 'Burnout'            },
+];
+
+// W3-B, 14 Aug 2026. store.js:1050 declares improve|maintain|recover and
+// session-builder.js tilts main-section selection on it -- 'maintain'
+// prioritises carries, grip, balance, sit-to-stand and floor transfer,
+// the capacities that decide whether somebody keeps living in their own
+// home. It had NO WRITER anywhere, so every user was 'improve' and that
+// entire branch was unreachable, as was 'recover'.
+//
+// Labels carry the meaning rather than the word. "Maintain" reads as
+// settling to somebody who does not think of themselves as declining, and
+// as a euphemism to somebody who does. What the option actually does is
+// hold on to specific capacities, so that is what it says.
+export const INTENT_CHIPS = [
+  { id: 'improve',  label: 'Build something — get stronger or fitter' },
+  { id: 'maintain', label: 'Hold on to what I have'                   },
+  { id: 'recover',  label: 'Come back from something'                 },
 ];
 
 export const BALANCE_CHIPS = [
@@ -583,6 +606,35 @@ export const STEPS = {
     },
   },
 
+  // ── Step 9f — Training intent (W3-B, 14 Aug 2026) ────────────────────────
+  //
+  // Asked of everyone, unlike the chair and floor questions. Reviewed
+  // against all sixteen personas: there is no one it lands badly on. A
+  // footballer picks the first, a 76-year-old picks the second, somebody
+  // six weeks post-injury picks the third, and none of the three is a
+  // verdict about them. That is what makes it safe to ask universally
+  // where "can you get out of a chair" is not.
+  //
+  // Not derived from age or activity level, though it would have been
+  // easy. Deriving 'maintain' from being 70plus is exactly the age
+  // filtering this product refuses -- plenty of 76-year-olds are
+  // building, and plenty of 40-year-olds are holding on. The person says.
+  //
+  // Placed after the capability questions so it reads as "now I know what
+  // your body does, what are we aiming it at" rather than as another
+  // question about limits.
+  '9f': {
+    id: '9f',
+    type: 'inline-chips-single',
+    chips: INTENT_CHIPS,
+    storeField: 'trainingIntent',
+    summaryType: 'trainingIntent',
+    coach: "Last one, and it's the one that shapes most of what I suggest.\n\nWhat are we actually aiming at?\n\nThere's no better answer here. Holding on to what you've got is real work, and it's a different session to building something new.",
+    coachAfter: {
+      answered: null, // dynamic — see generateIntentAck()
+    },
+  },
+
   // ── Step 10 — Energy ──────────────────────────────────────────────────────
   // Inline chips. Single select. No skip.
   // Writes store.lifestyle.stressLevel (energy maps to this field).
@@ -676,7 +728,7 @@ export const STEPS = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const STEP_ORDER = [0, 1, 2, '2b', '3a', '3b', 4, 5, 6, 7, 8, 9,
-                           '9a', '9b', '9c', '9d', '9e',
+                           '9a', '9b', '9c', '9d', '9e', '9f',
                            10, 11, 12, 13, 14];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -700,6 +752,23 @@ export const STEP_ORDER = [0, 1, 2, '2b', '3a', '3b', 4, 5, 6, 7, 8, 9,
  * tells the person what their answer means about them. "Yes" must not
  * become "you are unsteady" and "no" must not become "you are fine".
  */
+/**
+ * Coach acknowledgement after the training-intent question (W3-B).
+ *
+ * None of the three is treated as lesser. The 'maintain' line in
+ * particular must not read as consolation -- it is the option that
+ * unlocks the carries, grip and floor-transfer work, which is more
+ * demanding than what 'improve' selects for a deconditioned person, not
+ * less.
+ */
+export function generateIntentAck(value) {
+  if (value === 'maintain')
+    return "Good. That means I'll keep putting the things that matter in front of you — carrying, gripping, getting up and down — rather than quietly making everything easier.";
+  if (value === 'recover')
+    return "Understood. We'll rebuild rather than push, and I'll lean on the movements that are designed for exactly that.";
+  return "Right then. We'll build.";
+}
+
 export function generateBalanceAck(value) {
   return (value === 'yes' || value === 'sometimes')
     ? "Thank you for saying. I'll keep that in mind — it doesn't rule anything out, it just changes the order I'd suggest things in."
@@ -712,6 +781,10 @@ export function generateSummary(type, value, storeData) {
     // ── W3-A capability summaries ──────────────────────────────────
     // The user bubble repeats their answer back. It must never editorialise:
     // "Yes, sometimes" is what they said, not "you have balance problems".
+    case 'trainingIntent':
+      return { 'improve': 'Build something', 'maintain': "Hold on to what I've got",
+               'recover': 'Come back from something' }[value] || 'Not answered';
+
     case 'returningAfter':
       return { 'injury': 'An injury', 'illness': 'Illness',
                'life': 'Life got in the way', 'burnout': 'Burnout' }[value]

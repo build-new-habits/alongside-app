@@ -133,6 +133,15 @@ export const FIELD_CONTRACT = {
   // Live writer and live reader as of 14 Aug 2026 (OPEN-1). Before that it
   // had a reader and no writer, so the 'injury-recovery' day-one opening
   // had no input -- on top of being unreachable in the trigger chain.
+  // W3-B, 14 Aug 2026. Had no writer at all until step 9f: every user was
+  // the 'improve' default and both other branches of intentPriority() in
+  // session-builder.js were unreachable.
+  "trainingIntent": {
+    values: ["improve", "maintain", "recover"],
+    writer: "views/onboarding/thread.js (step 9f, INTENT_CHIPS)",
+    meaning: "What the person is aiming at. 'maintain' PRIORITISES carries, grip, balance and floor transfer — it does not mean doing less. Never inferred from age or activity level; the person says."
+  },
+
   "lifestyle.returningAfter": {
     values: ["injury", "illness", "life", "burnout", null],
     writer: "views/onboarding/thread.js (step 9e, RETURNING_AFTER_CHIPS)",
@@ -149,14 +158,14 @@ export const FIELD_CONTRACT = {
     //    screen that no longer exists.
     // 2. MEANING. It does NOT feed burnout detection. detectBurnout()
     //    reads checkinHistory and has never read this field.
-    // 3. NO READER. Nothing in js/ reads lifestyle.stressLevel. Step 10
-    //    asks a careful question about the difference between ordinary
-    //    tiredness and the kind sleep does not fix, and the answer is
-    //    stored and never consulted. Logged as WRITE-1: either give it a
-    //    reader or stop asking. Not decided here.
+    // 3. NO READER -- RESOLVED 14 Aug 2026 (WRITE-1). Step 10 asks a
+    //    careful question and the answer went nowhere. It now seeds
+    //    coldStartBias(), which softens the first sessions for somebody
+    //    who arrived exhausted and switches itself off the moment three
+    //    real check-ins exist.
     values: ["exhausted", "running-low", "up-and-down", "decent", "pretty-good"],
     writer: "views/onboarding/thread.js (step 10, ENERGY_CHIPS)",
-    meaning: "Self-reported energy at onboarding. Currently has NO READER — stored, never consulted. Not a clinical measure and must never be treated as one."
+    meaning: "Self-reported energy at onboarding. Read ONLY by coldStartBias() in data/checkin.js, and only until three check-ins exist — it can soften a session, never harden one, and is never reported as burnout. Not a clinical measure and must never be treated as one."
   },
   // RETIRED 14 Aug 2026 (OPEN-1). lifestyle.sleepQuality had one writer,
   // the deleted lifestyle.js, and NO reader -- views/checkin.js has its
