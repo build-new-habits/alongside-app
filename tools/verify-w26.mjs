@@ -1,6 +1,10 @@
 /**
  * tools/verify-w26.mjs
- * 14 Aug 2026 v1
+ * 14 Aug 2026 v2
+ *
+ * v2 - the v1 thresholds were too tight for the sample size and this gate
+ *   failed about one fresh-clone run in three. Trials 8 -> 20, and the
+ *   balanced/varied gap set from measurement rather than assumption.
  *
  * W2-6. "Something like last time" means it, and the other two settings
  * are unmoved. Measured rather than asserted: intentPriority and slot
@@ -21,7 +25,11 @@ let failures = 0;
 const check = (n, ok, d='') => { console.log(`${ok?'PASS':'FAIL'}  ${n}${d?' — '+d:''}`); if(!ok) failures++; };
 const idsOf = x => { const a=(x&&(x.exercises||x.items||x))||[]; return (Array.isArray(a)?a:[]).map(e=>e.id||e.exerciseId).filter(Boolean); };
 
-function overlap(variety, trials = 8) {
+// 20 runs, not 8. At 8 the balanced/varied gap swung between 7 and 14
+// points and this gate failed roughly one run in three on a fresh clone.
+// A flaky gate is worse than no gate: it teaches whoever hits it to
+// re-run until green, and the next real regression gets re-run too.
+function overlap(variety, trials = 20) {
   const all = [];
   for (let t = 0; t < trials; t++) {
     localStorage.clear(); store.init();      // fixture drift: init MERGES
@@ -44,8 +52,13 @@ const fam = overlap('familiar'), bal = overlap('balanced'), var_ = overlap('vari
 console.log(`\n   familiar ${fam.toFixed(0)}%   balanced ${bal.toFixed(0)}%   varied ${var_.toFixed(0)}%\n`);
 
 check("'familiar' means it — over half the session repeats", fam >= 50, `${fam.toFixed(0)}%`);
+// Thresholds set from measurement, not from hope. Across 20 runs the
+// familiar/balanced gap sits around 30 points and balanced/varied around
+// 8, so 15 and 4 leave room for sampling noise while still failing if
+// either setting stops being distinct. The ORDER is the real assertion;
+// the gaps only stop the three collapsing into each other.
 check('the three settings stay ordered and separated',
-  fam > bal + 15 && bal > var_ + 8, `${fam.toFixed(0)} > ${bal.toFixed(0)} > ${var_.toFixed(0)}`);
+  fam > bal + 15 && bal > var_ + 4, `${fam.toFixed(0)} > ${bal.toFixed(0)} > ${var_.toFixed(0)}`);
 check("'familiar' does NOT collapse into identical sessions",
   fam < 90, `${fam.toFixed(0)}% — identical sessions are a different failure and a worse one`);
 check("'varied' still delivers real novelty for persona 2.13", var_ < 30, `${var_.toFixed(0)}%`);
