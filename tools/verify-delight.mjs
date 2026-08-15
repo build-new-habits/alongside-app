@@ -91,5 +91,77 @@ check('the door grid is still never reordered',
   !/HOME_DOORS[\s\S]{0,200}\.sort\(/.test(today),
   'reordering would fix 2.11 by breaking 2.14');
 
+// ── STREAK-1: the product must not keep streaks ──────────────
+const openingsSrc = fs.readFileSync(
+  new URL('../js/data/checkin-openings.js', import.meta.url), 'utf8');
+const openings = await import(BASE + 'data/checkin-openings.js');
+const { store: store0 } = await import(BASE + 'store.js');
+
+// Asserted BEHAVIOURALLY, at every count the trigger fires on. The first
+// version of this checked the source for "days in a row" and failed on
+// the comment explaining why that phrase was removed — source-matching
+// again, in reverse. What matters is what the person is shown.
+function milestoneAt(n) {
+  localStorage.clear();
+  store0.init();
+  store0.set('ageBand', '45-54');
+  const h = {};
+  // Deliberately scattered — no two dates adjacent — but ENDING TODAY.
+  // The first version of this ended months in the past, so the gap >= 7
+  // Simple Arrival branch overrode the milestone and the test failed
+  // against correct behaviour. Somebody returning after a month should be
+  // met with "you came back", not a running total, and the ordering in
+  // resolveOpening() already gets that right.
+  const today = new Date();
+  for (let i = 0; i < n; i++) {
+    const d = new Date(today.getTime() - (n - 1 - i) * 3 * 86400000)
+      .toISOString().split('T')[0];
+    h[d] = { energy: 6, mood: 6, date: d };
+  }
+  store0.set('checkinHistory', h);
+  return openings.resolveOpening();
+}
+check('nothing stores a key called streak-',
+  !/`streak-\$\{/.test(openingsSrc) && !/'streak-'/.test(openingsSrc),
+  'Settings promises the person in writing: "No streaks."');
+check('the milestone count is substituted, not hardcoded',
+  /\{n\}/.test(openingsSrc) && /replace\('\{n\}'/.test(openingsSrc),
+  'the trigger fires at 7, 14 and 21; the copy said "Seven" every time');
+
+// Behavioural: seven check-ins spread over months.
+localStorage.clear();
+const { store } = await import(BASE + 'store.js');
+store.init();
+store.set('ageBand', '45-54');
+const spread = {};
+for (const d of ['2026-05-04','2026-05-22','2026-06-09','2026-06-28',
+                 '2026-07-11','2026-07-30','2026-08-14'])
+  spread[d] = { energy: 6, mood: 6, date: d };
+store.set('checkinHistory', spread);
+const milestone = openings.resolveOpening();
+check('a scattered seven is not described as a run',
+  !/in a row\.|consecutive/i.test(milestone?.b1 || ''), milestone?.b1);
+check('and it still says the true number',
+  /7/.test(milestone?.b1 || ''), milestone?.b1);
+for (const n of [7, 14, 21]) {
+  const m = milestoneAt(n);
+  const b1 = m?.b1 || '';
+  check(`at ${n} scattered check-ins, no claim of consecutive days`,
+    !/in a row\.|consecutive days/i.test(b1), b1.slice(0, 60));
+  check(`at ${n}, the number shown is ${n}`,
+    b1.includes(String(n)), b1.slice(0, 60));
+}
+
+check('the stored key is a count, not a streak',
+  String(store.get('checkin.lastMilestoneNoticed')).startsWith('checkins-'),
+  String(store.get('checkin.lastMilestoneNoticed')));
+
+// The other consecutive-days reader is a REST prompt and must survive.
+const reflect = fs.readFileSync(
+  new URL('../js/views/coach-reflection.js', import.meta.url), 'utf8');
+check('coach-reflection still notices consecutive days to suggest EASING',
+  /consecutive >= 3[\s\S]{0,200}proposalBias: "lighter"/.test(reflect),
+  'load management, not reward — the opposite mechanic, and correct');
+
 console.log(failures === 0 ? '\nDELIGHT GATE GREEN' : `\nDELIGHT GATE RED — ${failures} failure(s)`);
 process.exit(failures === 0 ? 0 : 1);
