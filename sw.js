@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v357
+ * Correction only. SILENT-1 does not exist and the PROG-1 negative
+ * result was never established. See session-builder.js v35.
+ *
  * 15 Aug 2026 v356
  * CHAIN-1 programme succession, and session-builder.js v35 lifting
  * _difficulty() to module scope. PROG-1 attempted and reverted -- see
@@ -2460,7 +2464,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v356";
+const CACHE_NAME = "alongside-v357";
 
 const SHELL_URLS = [
 
