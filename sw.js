@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v347
+ * DELIGHT-1 first-session recognition (new js/data/first-session.js,
+ * added to the precache list above), ORIENT-2 nobody left silent on
+ * Home. core-session.js v10, today.js, session-shared.css v2.
+ *
  * 14 Aug 2026 v346
  * W2-7 / D-3. Post-skip preference offer in core-session.js v9, "How you
  * like things" panel in settings.js v25, 'less' no longer identical to
@@ -2417,7 +2422,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v346";
+const CACHE_NAME = "alongside-v347";
 
 const SHELL_URLS = [
 
@@ -2584,6 +2589,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/onboarding-thread-data.js",
   "/alongside-app/js/data/checkin.js",
   "/alongside-app/js/data/checkin-openings.js",
+  "/alongside-app/js/data/first-session.js",
   "/alongside-app/js/data/conditions.js",
   "/alongside-app/js/data/conditionProgrammes.js",
   "/alongside-app/js/data/equipment.js",
