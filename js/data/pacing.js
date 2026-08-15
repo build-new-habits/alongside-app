@@ -1,5 +1,10 @@
 /**
  * pacing.js - Proactive pacing
+ * 15 Aug 2026 v2
+ *
+ * v2 - QUICK-2. offerBriefPath(). The short check-in existed only in
+ *   Settings, and persona 2.16 will never browse Settings.
+ *
  * 15 Aug 2026 v1
  *
  * PACE-1 and PACE-2. Matrix decisions 4 and 4a, agreed 05 Jul 2026 and
@@ -208,6 +213,51 @@ export function noticePlanJump() {
     // plainly that the ambitious version is allowed — otherwise this
     // reads as the app deciding she cannot manage it.
     body: `You've set ${target} a week, and lately it's been ${rounded}. That's a real jump. You can absolutely go for it — but if you'd rather build up to it, starting nearer where you are tends to be the version people are still doing in a month.`
+  };
+}
+
+/**
+ * QUICK-2, 15 Aug 2026. Found by the Wave 3 trace of persona 2.16.
+ *
+ * QUICK-1 built her the short check-in and put the control in Settings,
+ * under "How you like things". Traced: she is a parent of young children
+ * with nineteen-minute windows, and she is never going to browse
+ * Settings. The feature exists, is correct, and she will not find it.
+ *
+ * That is the sixth instance in two days of the same fault in a
+ * different costume — something built well and reachable only in theory.
+ * Here it is not a wiring bug; it is worse, because it looks finished.
+ *
+ * So the coach offers it, once, at the moment the friction has just been
+ * felt: after a run of full check-ins, on somebody who is actually
+ * turning up. Offering it to a person who has done two sessions would be
+ * the app deciding they are in a hurry.
+ *
+ * Once ever, and never again — briefOfferedAt is set whether or not they
+ * take it. Somebody who ignored the offer has answered it.
+ *
+ * @returns {{heading:string, body:string}|null}
+ */
+export function offerBriefPath() {
+  if (store.get('sessionPace') !== 'full') return null;
+  if ((store.get('pacing') || {}).briefOfferedAt) return null;
+
+  // Six check-ins is roughly a fortnight of turning up. Enough for the
+  // length to have become a thing she notices, not so many that the
+  // offer arrives after she has already stopped.
+  const checkins = Object.keys(store.get('checkinHistory') || {}).length;
+  if (checkins < 6) return null;
+
+  const pacing = { ...(store.get('pacing') || {}) };
+  pacing.briefOfferedAt = new Date().toISOString();
+  store.set('pacing', pacing);
+
+  return {
+    heading: "Something I can change",
+    // Names the trade honestly rather than selling it. She is giving
+    // something up, and pretending otherwise would be the kind of small
+    // dishonesty this product avoids.
+    body: "If these check-ins feel long, I can ask you two questions instead of five — energy and mood, and nothing else. I would know a bit less about your week, and you would be moving sooner. It is in Settings under \u201CHow you like things\u201D whenever you want it."
   };
 }
 

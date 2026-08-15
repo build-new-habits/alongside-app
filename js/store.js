@@ -1212,8 +1212,11 @@ export const store = {
       // and repeating it would become the nagging this feature exists to
       // avoid.
       pacing: {
-        noticedOn:   null,   // 'YYYY-MM-DD' | null
-        planNudgeAt: null    // ISO string | null
+        noticedOn:    null,  // 'YYYY-MM-DD' | null
+        planNudgeAt:  null,  // ISO string | null
+        // QUICK-2, 15 Aug 2026. When the coach offered the short
+        // check-in. Once, ever — see offerBriefPath().
+        briefOfferedAt: null // ISO string | null
       },
 
       // ── SESSION PACE (QUICK-1, 15 Aug 2026) ───────────────────
