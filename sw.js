@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 14 Aug 2026 v343
+ * W3-A2 capability editor in Settings, OPEN-1 three dead day-one
+ * openings revived, CONTRACT-2/3 gate blind spots closed.
+ * settings.js v23, checkin-openings.js v4, onboarding-thread-data.js v7,
+ * store.js v43, field-contract.js, settings.css v8, verify-contract v2.
+ *
  * 14 Aug 2026 v342
  * W3-A. Capability questions reachable at last. onboarding-thread-data.js
  * v6 (steps 9a-9d, showIf), thread.js v9 (conditional walk, askedAt),
@@ -2394,7 +2400,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v342";
+const CACHE_NAME = "alongside-v343";
 
 const SHELL_URLS = [
 
