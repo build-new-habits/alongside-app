@@ -118,11 +118,27 @@ export const FIELD_CONTRACT = {
     writer: "views/settings.js:1746",
     meaning: "Written from activityLevel and shares its vocabulary. NOT 'beginner'/'intermediate'/'advanced' — those read plausibly and fall through to the moderate ceiling."
   },
-  "lifestyle.exerciseHistory": {
-    values: ["never", "lapsed", "returning", "active"],
-    writer: "views/onboarding/lifestyle.js",
-    meaning: "Relationship with exercise over time. Says nothing about current capability."
+  // RETIRED 14 Aug 2026 (OPEN-1). lifestyle.exerciseHistory had exactly
+  // one writer, the deleted views/onboarding/lifestyle.js, and exactly one
+  // reader, checkin-openings.js's return-to-fitness trigger -- which could
+  // never fire anyway because `else if (ageBand)` sat above it. The reader
+  // now uses lifestyle.activityLevel === 'returning', which the live
+  // onboarding thread writes and which means the same thing.
+  //
+  // Removed from the contract rather than left with a dead writer: a
+  // contract entry for a field nothing writes and nothing reads is exactly
+  // the "table that looks complete and is not" this file exists to stop.
+  // The field itself stays in store.js defaults, marked RETIRED, so
+  // existing localStorage is not disturbed.
+  // Live writer and live reader as of 14 Aug 2026 (OPEN-1). Before that it
+  // had a reader and no writer, so the 'injury-recovery' day-one opening
+  // had no input -- on top of being unreachable in the trigger chain.
+  "lifestyle.returningAfter": {
+    values: ["injury", "illness", "life", "burnout", null],
+    writer: "views/onboarding/thread.js (step 9e, RETURNING_AFTER_CHIPS)",
+    meaning: "What the person is coming back from, asked only when they said 'returning'. Selects a day-one coach opening. Not a diagnosis and never shown back to them as one."
   },
+
   "lifestyle.stressLevel": {
     // W3-A, 14 Aug 2026. Corrected on three counts, all found when
     // deleting lifestyle.js removed the writer exclusion that hid them.
@@ -142,11 +158,11 @@ export const FIELD_CONTRACT = {
     writer: "views/onboarding/thread.js (step 10, ENERGY_CHIPS)",
     meaning: "Self-reported energy at onboarding. Currently has NO READER — stored, never consulted. Not a clinical measure and must never be treated as one."
   },
-  "lifestyle.sleepQuality": {
-    values: ["good", "okay", "poor"],
-    writer: "views/onboarding/lifestyle.js",
-    meaning: "Typical sleep, asked once at onboarding. Distinct from the per-day sleepQuality in a check-in."
-  },
+  // RETIRED 14 Aug 2026 (OPEN-1). lifestyle.sleepQuality had one writer,
+  // the deleted lifestyle.js, and NO reader -- views/checkin.js has its
+  // own per-day sleepQuality on the check-in object, which is a different
+  // field that merely shares a leaf name. Nothing consulted the onboarding
+  // one. Retired in store.js defaults.
 
   // ── Capability. Writer: views/onboarding/thread.js, steps 9a-9d ───
   //

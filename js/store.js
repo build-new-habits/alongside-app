@@ -1,5 +1,11 @@
 /**
  * store.js - Data persistence layer
+ * 14 Aug 2026 v43
+ *
+ * v43 - OPEN-1. lifestyle.exerciseHistory and lifestyle.sleepQuality
+ *   marked RETIRED: single writer deleted in W3-A, no live reader.
+ *   lifestyle.returningAfter gains a writer at thread step 9e.
+ *
  * 14 Aug 2026 v42
  *
  * v42 - W2-3. activityLevel comment corrected to include 'returning'.
@@ -1087,7 +1093,17 @@ export const store = {
         stressLevel:     null,  // low|moderate|high|very-high
         sleepQuality:    null,  // poor|okay|good
         exerciseHistory: null,  // 'never'|'lapsed'|'returning'|'active'
-        returningAfter:  null   // 'injury'|'illness'|'life'|'burnout'|null
+        returningAfter:  null,  // 'injury'|'illness'|'life'|'burnout'|null
+                                // Writer: onboarding thread step 9e (OPEN-1, 14 Aug 2026).
+                                // Reader: checkin-openings.js 'injury-recovery'.
+        // RETIRED 14 Aug 2026 (OPEN-1). Both fields below had exactly one
+        // writer -- views/onboarding/lifestyle.js, deleted in W3-A -- and
+        // no live reader. exerciseHistory's only reader was the
+        // return-to-fitness trigger, which now reads activityLevel;
+        // sleepQuality's apparent reader in checkin.js is a different
+        // field that shares a leaf name. Kept in defaults so existing
+        // localStorage is not disturbed; removed from field-contract.js.
+        // Do not write to these. Delete after one release.
       },
 
       // ── EQUIPMENT ────────────────────────────────────────────

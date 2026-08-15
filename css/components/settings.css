@@ -1,5 +1,11 @@
 /*
  * css/components/settings.css
+ * 14 Aug 2026 v8
+ *
+ * v8 - W3-A2. .settings-capability and .settings-capability__group for the
+ *   capability editor. Fieldset resets included: UA borders and inline
+ *   padding on fieldset, and min-inline-size:0 so it can shrink.
+ *
  * 13 Aug 2026 v7
  *
  * v7 — A3. "Your plan" panel. Reuses the existing settings type scale and
@@ -433,6 +439,41 @@
 .settings-movement-chip:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* ── Capability editor (W3-A2, 14 Aug 2026) ───────────────────────────────
+   Four selects letting somebody correct or update what their body can do.
+   A fieldset per question so screen readers announce the legend with each
+   control, and the hint is wired via aria-describedby in the markup.
+
+   Deliberately plain. This is the screen where a person tells us they can
+   no longer get off the floor; it should not look like a settings toggle
+   with a flourish. Spacing does the work. */
+
+.settings-capability {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.settings-capability__group {
+  /* fieldset resets — UA styles put a border and inline padding on these */
+  border: 0;
+  margin: 0 0 var(--space-5) 0;
+  padding: 0;
+  min-inline-size: 0;   /* stops a fieldset refusing to shrink in flex/grid */
+}
+
+.settings-capability__group > .settings-label {
+  /* legend, not label: it does not inherit the block layout automatically */
+  display: block;
+  padding: 0;
+  margin-bottom: var(--space-1);
+}
+
+.settings-capability__group .settings-section__sub {
+  margin-top: 0;
+  margin-bottom: var(--space-2);
 }
 
 .settings-movement-divider {
