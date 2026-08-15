@@ -1,5 +1,11 @@
 /**
  * data/exercises/strength.js
+ * 15 Aug 2026 v7
+ *
+ * v7 - DIFF-1. Six technically demanding lifts re-rated. Power Clean,
+ *   Kettlebell Snatch and Turkish Get-Up were all rated 3 -- the same as
+ *   a Barbell Hip Thrust -- and light/returning both cap at 3.
+ *
  * 11 Aug 2026 v6
  *
  * v6 - CON-9 batch 1. watchOut and load added to all 90 entries in this
@@ -1021,7 +1027,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body', 'glutes', 'hamstring', 'shoulder'],
     contraindications: ['lower-back-acute', 'wrist-elbow-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 7,
-    difficultyLevel: 3,
+    difficultyLevel: 4,   // DIFF-1 15 Aug 2026: was 3. Same rack-catch demand as the snatch, one stage lower.
     duration: 90,
     perSide: true,
     instructions: [
@@ -1093,7 +1099,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body', 'shoulder', 'abdominals', 'hip'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute', 'lower-back-acute'],
     energyRequired: 7,
-    difficultyLevel: 3,
+    difficultyLevel: 4,   // DIFF-1 15 Aug 2026: was 3. Loaded overhead through five positions including a floor transfer.
     duration: 180,
     perSide: true,
     instructions: [
@@ -1202,7 +1208,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body', 'glutes', 'hamstring', 'shoulder'],
     contraindications: ['shoulder-acute', 'lower-back-acute', 'wrist-elbow-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 8,
-    difficultyLevel: 3,
+    difficultyLevel: 4,   // DIFF-1 15 Aug 2026: was 3. Overhead ballistic. Mis-timed, the bell lands on the forearm.
     duration: 90,
     perSide: true,
     instructions: [
@@ -2242,7 +2248,7 @@ export const STRENGTH = [
     affectsAreas: ['full-body', 'glutes', 'hamstring', 'upper-back'],
     contraindications: ['lower-back-acute', 'wrist-elbow-acute', 'shoulder-acute', 'hamstring-acute', 'glutes-acute'],
     energyRequired: 9,
-    difficultyLevel: 3,
+    difficultyLevel: 5,   // DIFF-1 15 Aug 2026: was 3. Olympic lift. Triple extension under a bar, caught in a front rack.
     duration: 120,
     perSide: false,
     instructions: [
@@ -3180,7 +3186,7 @@ export const STRENGTH = [
     affectsAreas: ['quadriceps', 'glutes', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'glutes-acute'],
     energyRequired: 7,
-    difficultyLevel: 3,
+    difficultyLevel: 4,   // DIFF-1 15 Aug 2026: was 3. Single-leg, full depth, balance-dependent.
     duration: 90,
     perSide: true,
     instructions: [
@@ -3217,7 +3223,7 @@ export const STRENGTH = [
     affectsAreas: ['hamstring'],
     contraindications: ['hamstring-acute'],
     energyRequired: 7,
-    difficultyLevel: 3,
+    difficultyLevel: 4,   // DIFF-1 15 Aug 2026: was 3. Eccentric hamstring loading. The unassisted version is already d6.
     duration: 90,
     perSide: false,
     instructions: [
