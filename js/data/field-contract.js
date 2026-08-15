@@ -146,6 +146,14 @@ export const FIELD_CONTRACT = {
   // W3-B, 14 Aug 2026. Had no writer at all until step 9f: every user was
   // the 'improve' default and both other branches of intentPriority() in
   // session-builder.js were unreachable.
+  // W2-7, 14 Aug 2026. Uncontracted until now, which is part of why the
+  // two levels drifted into meaning the same thing.
+  "exercisePreferences.preference": {
+    values: ["avoid", "less"],
+    writer: "views/core-session.js (post-skip offer), views/gym-programme.js",
+    meaning: "TWO LEVELS, and they must stay two. 'avoid' is never suggested again — a hard exclusion in _filterCandidates(). 'less' is offered roughly a fifth as often, never zero; it was implemented as 'never chosen while something else exists', which in a pool of fifty is never, and the gentler option was doing the harsher thing. Binary per the skip/dislike spec: not a rating, no stars, no scores. Both reversible in Settings."
+  },
+
   // CARDIAC-1, 14 Aug 2026.
   "exerciseClearance": {
     values: ["cleared", "not-yet", "not-sure", null],
