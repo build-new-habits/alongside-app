@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 14 Aug 2026 v344
+ * W3-B trainingIntent writer (step 9f), WRITE-1 coldStartBias.
+ * onboarding-thread-data.js v8, thread.js v10, data/checkin.js v5,
+ * store.js v44, field-contract.js. New gates verify-w3b, verify-write1.
+ *
  * 14 Aug 2026 v343
  * W3-A2 capability editor in Settings, OPEN-1 three dead day-one
  * openings revived, CONTRACT-2/3 gate blind spots closed.
@@ -2400,7 +2405,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v343";
+const CACHE_NAME = "alongside-v344";
 
 const SHELL_URLS = [
 
