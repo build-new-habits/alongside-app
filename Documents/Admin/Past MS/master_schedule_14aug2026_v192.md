@@ -1,54 +1,8 @@
 # Alongside: Move — Master Schedule
-## 15 Aug 2026 v193
+## 14 Aug 2026 v192
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_14aug2026_v192.md`. Remove v192 on upload.
-
-> ### 🟢 15 AUG — THE THREE AUDITS. `alongside-v350`. 44 gates green.
->
-> The audits had never been run. Three waves of persona tracing had produced ~30 findings and **every one was a thing that was WRONG** — none was a thing that was MISSING, because absence does not throw and reads as correct when you execute it.
->
-> #### The pattern, which matters more than any single fix
->
-> Six findings. **Five were the same shape: written, reviewed, warm copy — or a stated design principle — that no user could reach.**
->
-> | ID | What no user could reach | Evidence |
-> |---|---|---|
-> | **OPEN-1** | Three day-one coach openings. `else if (ageBand)` sat above `injury-recovery`, `return-to-fitness` and `feel-good`, and ageBand is asked of everyone | Four openings now verified distinct |
-> | **STREAK-1** | The app promises "No streaks. No punishment for absence." in Settings and said **"Seven days in a row"** on a *count*. Seven check-ins over 102 days, longest run one day. Stored key was literally `streak-7`, and it said "Seven" at 14 and 21 too | Now count-based, dynamic, and says out loud that we do not count consecutive days |
-> | **MOOD-1** | *"Last time you said you weren't sure you wanted to start — but you did, and you felt better after."* `moodAfter` is written to `activityLog` and read from `checkinHistory` — a different object. Three branches dead | Mirrored at `logActivity()`, the shared write path |
-> | **TARGET-1** | A weekly target the person chose at step 12. `setAt`'s only writer was the **skippable** step 13, so "Twice a week" then "Decide later" left her own answer invisible | Step 12 now records the choice |
-> | **DELIGHT-1** | A first session, recognised as a first. `renderDone()` was identical for session one and session fifty | Uses the territory they named at step 3 |
-> | **ORIENT-2** | A coach line on Home. **Five of nine personas got `null`** — including 2.10, 2.15, 2.16 and 2.4 | Ten of ten now hear something |
->
-> **The writing and the thinking are not the weak point. The wiring between them and the person is.** A defect trace found none of this in thirty findings, because every one of these paths executed perfectly while reaching nobody. Worth making the first question of a session, not the last.
->
-> #### Also shipped, 14–15 Aug
->
-> **W3-A** capability questions reachable (8 CAP items had sat behind an unrouted screen; `asked` was false for every live user) · **W3-A2** capability editable in Settings · **W3-B** `trainingIntent` writer — independence-capacity work 14.8% → 33.6% · **CARDIAC-1** exercise-clearance question, loaded-strength items 159 → 0 for an uncleared user while 372 items remain · **AGE-1** 18+ bands, one vocabulary replacing three · **W2-6** familiar variety 40% → 62% · **W2-7** `'less'` stopped meaning `'avoid'` (40% → 7%, not 0%) plus the post-skip offer and the "How you like things" panel · **WRITE-1** `lifestyle.stressLevel` gets its first reader · **CONTRACT-2/3** writer reachability traced to router entry points, lookup-table keys checked · **TARGET-2** reaching a chosen target closes the week rather than opening a demand.
->
-> `views/onboarding/lifestyle.js` and eight orphaned pre-thread views deleted — 1,719 lines.
->
-> #### Decisions taken
->
-> - **D-2 cardiac:** scope is **Phase IV maintenance**, not treatment. The talk test was already in 13 entries. Clearance question added; a "no" is a redirect, not a refusal.
-> - **D-3 neurodivergence:** **not** added to `CONDITIONS` — that list drives contraindication filtering and neurodivergence is not a movement contraindication. Preferences panel instead. The gate asserts they stay out.
-> - **A1.11:** launching **18+**. Removes UK Children's Code obligations. Puts personas 2.2, 2.3 and 2.9 outside launch.
->
-> #### Open, and now the highest-value work
->
-> From the would-they-tell-someone audit — three of the four weak sentences are **specced and unbuilt**, which is a better problem than not knowing what to do:
->
-> - 🟠 **Proactive Pacing (2.8)** — agreed 5 Jul, never built. **The only open item whose failure mode is harm rather than indifference.** WB 17 Aug.
-> - 🟠 **Short-session path (2.16)** — matrix gap 8. She is in the tertiary market and currently served worse than personas the product is not aimed at. WB 17 Aug.
-> - 🟡 **Basic PB logging (2.7)** — decoupled and specced, never built.
-> - 🟡 **Why a self-directed person stays (2.4)** — not articulated anywhere.
-> - 🟡 **Legal docs still say 13+/16+** — must be aligned to 18+. Outside the repo.
-> - 🟡 **Wave 3** — 2.16, 2.8, 2.6, 2.4, full-surface. **After** the two builds above, or it re-confirms what 5 Jul already concluded.
->
-> #### Process, recorded because it recurred
->
-> **Six of my own gate assertions were faulty in three days**, all the same shape: a hardcoded `true`; two regexes that matched an explanatory comment rather than the code; a threshold set from assumption not measurement; a character class that captured an empty string; a fixture ending months in the past. Every one *passed* while testing nothing. Reversal-testing caught all six — a gate is not proven until it has been made to fail.
+Supersedes `master_schedule_13aug2026_v191.md`. Remove v191 on upload.
 
 > ### 🟢 14 AUG — THE CAPABILITY SYSTEM IS LIVE. `alongside-v344`. 38 gates green.
 >
@@ -2762,4 +2716,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 15 Aug 2026 v193*
+*Build New Habits · Alongside: Move · Master Schedule · 14 Aug 2026 v192*
