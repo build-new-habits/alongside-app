@@ -34,6 +34,20 @@ Supersedes `master_schedule_15aug2026_v194.md`. Remove v194 on upload.
 > - 🟡 **On-device pass** — nothing shipped today has been seen on a phone.
 > - 🟡 **Token** lapses ~5 Sep.
 >
+> #### 🔵 NEW STREAM — ASSESSMENT. Blueprint written 15 Aug.
+>
+> Graeme, 15 Aug: *"There needs to be a better baseline assessment of fitness, and like a teacher would, milestone assessments to ensure the programme is the right fit."*
+>
+> **This is the keystone the progression work kept stalling on.** Three fields describe the person's level —  (frequency),  (safety),  (Settings-only) — and **none measures capacity, none can move.** The difficulty ceiling resolves from how often somebody says they exercise, and only changes if they edit Settings themselves.
+>
+> So a twelve-week programme cannot progress anyone: phases declare a climbing  under a ceiling that never moves. PROG-1 was the wrong end of the problem. **Reassessment is what makes twelve weeks mean twelve weeks.**
+>
+> It also answers 2.4. A self-directed person does not need deciding for; she may well want measuring — the one thing she cannot do for herself.
+>
+> Full spec: . Build order: schema + measuredLevel writing to fitnessLevel; baseline inside the first session; reassessment at phase boundaries; **then** retry PROG-1 against a ceiling that moves; then  and the filter library.
+>
+> **Library framing corrected by Graeme:** *"I'm adding so we can better serve, not compete."* The test is filter depth, not catalogue size — roughly 40-60 entries at difficulty 4-6, against 29 today. Same gap assessment exposes from the other side.
+>
 > #### Open — mine
 >
 > - 🟡 **PROG-1 retry.** Placement is fine, idea untested. Verify `getPhaseBias()` resolves from inside session-builder — probe BEFORE it.
