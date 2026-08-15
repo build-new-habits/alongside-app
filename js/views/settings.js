@@ -1,5 +1,11 @@
 /**
  * settings.js
+ * 15 Aug 2026 v26
+ *
+ * v26 - QUICK-1. sessionPace control in "How you like things". The
+ *   short check-in asks energy and mood only; the pain question stays
+ *   at either setting.
+ *
  * 14 Aug 2026 v25
  *
  * v25 - D-3 / W2-7. "How you like things": the sessionVariety control and
@@ -705,6 +711,7 @@ export function SettingsView(router) {
 
   function renderPreferencesSection() {
     const variety = store.get('sessionVariety') || 'balanced';
+    const pace    = store.get('sessionPace') || 'full';   // QUICK-1
     const prefs   = store.get('exercisePreferences') || {};
     const entries = Object.entries(prefs)
       .map(([id, v]) => ({ id, ...v, name: getExerciseName(id) }))
@@ -744,6 +751,22 @@ export function SettingsView(router) {
           <p class="settings-section__sub">
             ${_esc(VARIETY_OPTIONS.find(o => o.id === variety)?.hint || '')}
           </p>
+        </fieldset>
+
+        <fieldset class="settings-field settings-capability__group">
+          <legend class="settings-label">How much should the coach ask before a session?</legend>
+          <p class="settings-section__sub" id="pref-pace-hint">
+            The short version asks how your energy and mood are, and
+            nothing else. If you have told me about a condition, I will
+            still ask about pain either way.
+          </p>
+          <select class="settings-select"
+                  id="settings-pref-pace"
+                  data-field="sessionPace"
+                  aria-describedby="pref-pace-hint">
+            <option value="full"${pace === 'full' ? ' selected' : ''}>The usual — energy, mood, sleep, how you're feeling</option>
+            <option value="brief"${pace === 'brief' ? ' selected' : ''}>Short — energy and mood only</option>
+          </select>
         </fieldset>
 
         <div class="settings-field">
@@ -1991,6 +2014,9 @@ export function SettingsView(router) {
       case 'save-preferences': {
         const v = container.querySelector('[data-field="sessionVariety"]')?.value;
         if (v) store.set('sessionVariety', v);
+        // QUICK-1
+        const p = container.querySelector('[data-field="sessionPace"]')?.value;
+        if (p === 'full' || p === 'brief') store.set('sessionPace', p);
         _showToast('Saved — the coach will use this from your next session', container);
         break;
       }
