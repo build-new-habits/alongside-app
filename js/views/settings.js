@@ -1,5 +1,16 @@
 /**
  * settings.js
+ * 14 Aug 2026 v23
+ *
+ * v23 - W3-A2. Capability editor. Onboarding steps 9a-9d are forward-only,
+ *   so before this a mis-tap on the chair question left somebody
+ *   permanently restricted with no route back -- and capability is not
+ *   static anyway. All four questions are editable here, including the two
+ *   onboarding asks conditionally, because Settings is somewhere the
+ *   person chose to go. "Not answered" is selectable on each, and blanking
+ *   everything clears askedAt so the profile returns to its never-asked
+ *   path rather than sitting at asked=true with all-null answers.
+ *
  * 13 Aug 2026 v22
  *
  * v22 - A1 + A3, from the 13 Aug persona trace (blueprint
@@ -302,6 +313,15 @@ import {
   resetDisplayPrefs, formatDisplayValue
 } from '../display-prefs.js';
 import { openSheet }                     from './onboarding/sheet-manager.js';
+// W3-A2. Imported, never redefined. A second copy of these option lists
+// is exactly how vocabulary drift happens, and capability answers are the
+// most consequential strings in the product.
+import {
+  BALANCE_CHIPS,
+  CHAIR_RISE_CHIPS,
+  FLOOR_ACCESS_CHIPS,
+  LEG_POWER_CHIPS,
+} from '../data/onboarding-thread-data.js';
 
 // ─── View registration ────────────────────────────────────────────────────────
 
@@ -619,7 +639,87 @@ export function SettingsView(router) {
 
         ${renderMovementSection()}
 
+        ${renderCapabilitySection()}
+
         ${renderReflectionSection()}
+      </div>
+    `;
+  }
+
+  // ── Capability section (W3-A2, 14 Aug 2026) ─────────────────────────────
+  //
+  // Onboarding steps 9a-9d are a forward-only thread: once a chip is
+  // tapped there is no way back. Before this section existed, a mis-tap on
+  // the chair question left somebody permanently restricted with no route
+  // to correct it -- and capability answers are not static anyway. Bodies
+  // change over months, which is the whole premise of the product.
+  //
+  // store.js's own CAP-1 note worried about somebody being "behind on a
+  // question they can no longer see or change". This is that route.
+  //
+  // Two deliberate choices:
+  //
+  // 1. ALL FOUR are shown here, including chairRise and floorAccess, even
+  //    though onboarding asks those two conditionally. The reason they are
+  //    conditional there is that they can land as insulting when pushed at
+  //    somebody unprompted. Settings is not unprompted -- the person came
+  //    looking. Withholding them here would mean a 30-year-old who develops
+  //    a knee problem has no way to say so.
+  //
+  // 2. "Not answered" is a real, selectable option on every question.
+  //    capabilityProfile() treats null as cautious-but-unrestricted, so
+  //    clearing an answer is meaningful and must be possible. A person who
+  //    said "no" during a bad flare must be able to take it back.
+
+  function renderCapabilitySection() {
+    const cap = store.get('capability') || {};
+
+    const group = (field, legend, hint, chips) => `
+      <fieldset class="settings-field settings-capability__group">
+        <legend class="settings-label">${legend}</legend>
+        <p class="settings-section__sub" id="cap-${field}-hint">${hint}</p>
+        <select class="settings-select"
+                id="settings-cap-${field}"
+                data-field="capability.${field}"
+                aria-describedby="cap-${field}-hint">
+          <option value=""${!cap[field] ? ' selected' : ''}>Not answered</option>
+          ${chips.map(c => `
+            <option value="${c.id}"${cap[field] === c.id ? ' selected' : ''}>${_esc(c.label)}</option>
+          `).join('')}
+        </select>
+      </fieldset>
+    `;
+
+    return `
+      <div class="settings-capability">
+        <h2 class="settings-section__heading">What your body can do today</h2>
+        <p class="settings-section__sub">
+          These change what the coach puts in front of you. Nothing here is
+          a verdict — change them whenever they stop being true, and leave
+          anything blank that you would rather not answer.
+        </p>
+
+        ${group('balanceWorry', 'Do you ever worry about losing your balance?',
+                'Removes exercises that demand balance. Not a statement about strength.',
+                BALANCE_CHIPS)}
+
+        ${group('chairRise', 'Can you get up from a chair without pushing off with your hands?',
+                'Tells the coach what your legs are ready for.',
+                CHAIR_RISE_CHIPS)}
+
+        ${group('legPower', 'Can you take your weight through your legs?',
+                'Some exercises ask your legs to carry your weight.',
+                LEG_POWER_CHIPS.filter(c => c.id !== 'skip'))}
+
+        ${group('floorAccess', 'Can you get down to the floor and back up on your own?',
+                'If the floor is not somewhere you want to be, the coach builds around it.',
+                FLOOR_ACCESS_CHIPS)}
+
+        <button class="settings-save-btn btn btn-primary"
+                data-action="save-capability"
+                aria-label="Save what your body can do today">
+          Save
+        </button>
       </div>
     `;
   }
@@ -1738,6 +1838,47 @@ export function SettingsView(router) {
           .map(b => b.dataset.movement);
         store.set('movementIdentity', selectedMovement);
         _showToast('How you move, updated', container);
+        break;
+      }
+
+      case 'save-capability': {
+        // W3-A2. Empty string means "Not answered" and must be stored as
+        // null, not "". capabilityProfile() tests `c.legPower || default`
+        // and `balanceWorry === 'no' || === null`; an empty string is
+        // falsy in the first and matches neither branch of the second,
+        // which would silently make a person read as restricted.
+        const FIELDS = ['balanceWorry', 'chairRise', 'legPower', 'floorAccess'];
+        let anyAnswered = false;
+
+        for (const f of FIELDS) {
+          const raw = container.querySelector(`[data-field="capability.${f}"]`)?.value;
+          const val = raw === '' || raw === undefined ? null : raw;
+          store.set(`capability.${f}`, val);
+          if (val !== null) anyAnswered = true;
+        }
+
+        // askedAt is what capabilityProfile() reads to tell "answered"
+        // from "never asked". It has to move BOTH ways.
+        //
+        // Setting it is obvious. Clearing it is the subtle half: if
+        // somebody blanks every answer, leaving askedAt set would keep
+        // asked=true with all-null values, and the profile would then
+        // apply its answered-path defaults rather than falling back to
+        // the never-asked path. Same end state by two routes, and only
+        // one of them is honest about what the person told us.
+        //
+        // bothFeet is deliberately untouched here. It is not asked at
+        // onboarding and not editable in this section, so a blanket
+        // clear would wipe a value this screen never offered to set.
+        if (anyAnswered) {
+          if (!store.get('capability.askedAt')) {
+            store.set('capability.askedAt', new Date().toISOString());
+          }
+        } else if (!store.get('capability.bothFeet')) {
+          store.set('capability.askedAt', null);
+        }
+
+        _showToast('Saved — the coach will use this from your next session', container);
         break;
       }
 

@@ -1,5 +1,14 @@
 /**
  * tools/verify-contract.mjs
+ * 14 Aug 2026 v2
+ *
+ * v2 - CONTRACT-2 and CONTRACT-3, both found by the W3-A capability work.
+ *   A declared writer must now exist AND be referenced from outside
+ *   itself; declaring an orphaned file is what hid capability.* being
+ *   unwritten for three days. And lookup tables keyed on a contracted
+ *   vocabulary now have their keys checked, which the comparison scan
+ *   structurally cannot see.
+ *
  * 13 Aug 2026 v1
  *
  * FIELD CONTRACT — every comparison uses a value the field can hold,
@@ -120,6 +129,89 @@ check("every declared value is produced somewhere", () => {
   }
   ok(orphan.length === 0,
      `${orphan.length} unreachable value(s):\n        ` + orphan.slice(0, 6).join("\n        "));
+});
+
+console.log("\nCONTRACT — a declared writer must be able to run");
+
+check("every declared writer file exists and is reachable", () => {
+  // CONTRACT-2, 14 Aug 2026. Direction 2 above proves a value is PRODUCED
+  // somewhere in source. It never proved the producing file could RUN.
+  //
+  // That gap hid the largest defect found so far. capability.* declared
+  // views/onboarding/lifestyle.js as its writer for three days. The file
+  // existed, the writes were right there in it, and every check passed --
+  // but the view was not registered in router.js and sheet-manager.js
+  // swallowed the only navigate() calls that led to it. capability.askedAt
+  // was null for every live user and six protective branches in
+  // session-builder.js never ran for anybody. Two separate work streams
+  // then spent a day fixing logic behind that screen.
+  //
+  // Reachability here means: the file exists, and something outside it
+  // either imports it or routes to it. That is not a proof of execution --
+  // an imported function can still go uncalled -- but it catches the
+  // orphaned-file case, which is the one that actually happened.
+  const bad = [];
+  for (const [field, spec] of Object.entries(FIELD_CONTRACT)) {
+    if (!spec.writer) continue;
+    for (const w of spec.writer.split(",")) {
+      const path = w.trim().split(":")[0];
+      if (!path.endsWith(".js")) continue;           // prose like "(step 9c)"
+      if (path.includes("*")) continue;              // glob: a family, not a file
+      // Writers are declared both with and without the js/ prefix.
+      // Normalising here rather than rewriting 20 contract entries.
+      const full = path.startsWith("js/") ? path : `js/${path}`;
+      if (!fs.existsSync(full)) {
+        bad.push(`${field}: declared writer ${path} DOES NOT EXIST`);
+        continue;
+      }
+      const base = path.split("/").pop();
+      const rel  = full.replace(/^js\//, "");
+      const referenced = Object.entries(SRC).some(([file, src]) =>
+        !file.endsWith(rel) &&
+        (src.includes(`from './${base}'`)   || src.includes(`from "./${base}"`)   ||
+         src.includes(`/${base}'`)          || src.includes(`/${base}"`)          ||
+         src.includes(rel.replace(/\.js$/, "").replace(/^views\//, ""))));
+      if (!referenced)
+        bad.push(`${field}: declared writer ${path} exists but NOTHING imports or routes to it`);
+    }
+  }
+  ok(bad.length === 0,
+     `${bad.length} unreachable writer(s):\n        ` + [...new Set(bad)].join("\n        "));
+});
+
+console.log("\nCONTRACT — vocabulary used as keys, not just comparisons");
+
+check("lookup tables keyed on a contracted field use declared values", () => {
+  // CONTRACT-3, 14 Aug 2026. The comparison scan above reads `x === "y"`.
+  // It cannot see a vocabulary used as an OBJECT KEY or a Set member, and
+  // that is how 'returning' hid: ACTIVITY_CHIPS has written it since
+  // 11 Aug, DIFFICULTY_CEILINGS and LOW_IMPACT_ONLY are both keyed on it,
+  // three readers handle it -- and it was undeclared while this gate
+  // stayed green.
+  //
+  // Scanned in the opposite direction to the check above: rather than
+  // hunting every table, take the tables that are known to be keyed on a
+  // contracted vocabulary and require their keys to be declared. A new
+  // table wants adding here, which is deliberate -- the list is the
+  // record of which lookups carry vocabulary.
+  const KEYED = [
+    ["lifestyle.activityLevel", "DIFFICULTY_CEILINGS"],
+    ["lifestyle.activityLevel", "LOW_IMPACT_ONLY"],
+  ];
+  const bad = [];
+  const all = Object.values(SRC).join("\n");
+  for (const [field, table] of KEYED) {
+    const spec = FIELD_CONTRACT[field];
+    if (!spec) { bad.push(`${table} keyed on ${field}, which is not contracted`); continue; }
+    const allowed = new Set(spec.values.filter(v => typeof v === "string"));
+    const m = all.match(new RegExp(`${table}\\s*=\\s*(?:new Set\\()?[\\[{]([\\s\\S]*?)[\\]}]`));
+    if (!m) { bad.push(`${table} not found — renamed? this check is now blind`); continue; }
+    for (const km of m[1].matchAll(/["']([a-z0-9-]+)["']/g))
+      if (!allowed.has(km[1]))
+        bad.push(`${table} has key "${km[1]}", undeclared for ${field} (allowed: ${[...allowed].join("|")})`);
+  }
+  ok(bad.length === 0,
+     `${bad.length} undeclared key(s):\n        ` + [...new Set(bad)].join("\n        "));
 });
 
 console.log("\nCONTRACT — the record stays honest");

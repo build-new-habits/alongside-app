@@ -154,5 +154,102 @@ check('showIf predicates tolerate an empty store',
     try { D.STEPS[id].showIf({}); return true; } catch { return false; }
   }));
 
+// ── W3-A2: capability is editable after onboarding ───────────
+const settingsSrc = fs.readFileSync(
+  new URL('../js/views/settings.js', import.meta.url), 'utf8');
+
+check('Settings renders a capability editor',
+  /renderCapabilitySection/.test(settingsSrc) &&
+  /\$\{renderCapabilitySection\(\)\}/.test(settingsSrc),
+  'defined AND composed — a function nobody calls is how this started');
+
+// Assert the CONSTRUCTS, not the substring. Twice now a check in this
+// file has been satisfied by an explanatory comment rather than by code.
+// A comment mentioning capability.legPower is not an editor for it.
+const capHandler = settingsSrc.slice(
+  settingsSrc.indexOf("case 'save-capability'"),
+  settingsSrc.indexOf("case 'save-fitness-level'"));
+for (const f of ['balanceWorry', 'chairRise', 'legPower', 'floorAccess']) {
+  check(`Settings RENDERS an editor for ${f}`,
+    new RegExp(`group\\(\\s*'${f}'`).test(settingsSrc));
+  check(`Settings SAVES ${f}`,
+    new RegExp(`'${f}'`).test(capHandler),
+    'must appear inside the save-capability handler, not merely in prose');
+}
+check('the save handler is reachable from a control',
+  /data-action="save-capability"/.test(settingsSrc));
+
+check('Settings imports the shared vocabularies rather than redefining them',
+  /BALANCE_CHIPS[\s\S]{0,200}from '\.\.\/data\/onboarding-thread-data\.js'/.test(settingsSrc) &&
+  !/const BALANCE_CHIPS\s*=/.test(settingsSrc));
+
+check('blanking every answer clears askedAt',
+  /store\.set\(\s*['"]capability\.askedAt['"]\s*,\s*null\s*\)/.test(settingsSrc),
+  'otherwise asked stays true with all-null answers and the profile takes ' +
+  'the answered path when nothing was answered');
+
+check('empty select value is stored as null, not an empty string',
+  /raw === ''[\s\S]{0,60}\?\s*null/.test(settingsSrc));
+
+// Behavioural: the round trip a mis-tap needs.
+store.init();
+store.set('capability.chairRise', 'no');
+store.set('capability.askedAt', new Date().toISOString());
+check('a mis-tap restricts', store.capabilityProfile().legsLoadable === false);
+store.set('capability.chairRise', 'yes');
+check('correcting it in Settings lifts the restriction',
+  store.capabilityProfile().legsLoadable === true);
+
+store.init();
+store.set('capability.balanceWorry', 'yes');
+store.set('capability.askedAt', new Date().toISOString());
+check('answered then fully blanked returns to the never-asked path', (() => {
+  store.set('capability.balanceWorry', null);
+  store.set('capability.askedAt', null);
+  const p = store.capabilityProfile();
+  return p.asked === false && p.balanceSafe === true;
+})());
+
+// ── OPEN-1: day-one openings that could never fire ───────────
+const openings = await import(BASE + 'data/checkin-openings.js');
+
+function openingFor(fixture) {
+  // Fixture-drift guard. store.init() MERGES with whatever is already in
+  // localStorage, so without this the openings inherit territory and
+  // condition state set by earlier checks in this file and every fixture
+  // resolves to the same branch. This has now cost this project five
+  // separate times.
+  localStorage.clear();
+  store.init();
+  for (const [k, v] of Object.entries(fixture)) store.set(k, v);
+  // resolveOpening() returns the COPY, not a trigger id, so the branches
+  // are proved by the lines they produce being distinct from one another.
+  return openings.resolveOpening()?.b1 || '';
+}
+
+// ageBand is set for every fixture below — that is the whole point.
+// Before OPEN-1, `else if (ageBand)` swallowed all three of these.
+const injury  = openingFor({ ageBand: '40s', 'lifestyle.returningAfter': 'injury' });
+const returnF = openingFor({ ageBand: '40s', 'lifestyle.activityLevel': 'returning' });
+const feelG   = openingFor({ ageBand: '40s', goals: ['feel-good'] });
+const changing= openingFor({ ageBand: '40s' });
+
+check('injury-recovery fires despite an ageBand being set',
+  injury.length > 0 && injury !== changing, injury.slice(0, 50));
+check('return-to-fitness fires, reading the LIVE activityLevel field',
+  returnF.length > 0 && returnF !== changing, returnF.slice(0, 50));
+check('feel-good fires', feelG.length > 0 && feelG !== changing, feelG.slice(0, 50));
+check('changing-body still fires as the fallback it was described as',
+  changing.length > 0);
+check('all four are genuinely different openings',
+  new Set([injury, returnF, feelG, changing]).size === 4);
+
+// 9e must be the writer returningAfter never had.
+check('step 9e writes lifestyle.returningAfter',
+  D.STEPS['9e']?.storeField === 'lifestyle.returningAfter');
+check('9e is asked only of someone returning',
+  D.STEPS['9e'].showIf({ lifestyle: { activityLevel: 'returning' } }) === true &&
+  D.STEPS['9e'].showIf({ lifestyle: { activityLevel: 'active' } }) === false);
+
 console.log(failures === 0 ? '\nW3-A GATE GREEN' : `\nW3-A GATE RED — ${failures} failure(s)`);
 process.exit(failures === 0 ? 0 : 1);
