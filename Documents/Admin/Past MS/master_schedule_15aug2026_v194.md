@@ -1,42 +1,8 @@
 # Alongside: Move — Master Schedule
-## 15 Aug 2026 v195
+## 15 Aug 2026 v194
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_15aug2026_v194.md`. Remove v194 on upload.
-
-> ### 🟢 15 AUG EVENING — WAVE 3 AND PROGRESSION. `alongside-v357`. 49 gates green.
->
-> **Wave 3 traced 2.16, 2.8, 2.6 and 2.4 full-surface.** The capability work holds: 2.8 was served 0 balance-demand and 0 floor-position exercises across 113, reached only because the balance question is asked universally — no age or condition trigger would have found her. Pacing fired on both her three-session days. 2.16's check-in panels went 45 → 18 across three weeks.
->
-> | ID | What | Status |
-> |---|---|---|
-> | **QUICK-2** | The short check-in existed only in Settings, where 2.16 will never look. Coach now offers it once, on Home, after six check-ins | Shipped |
-> | **DIFF-1** | Power Clean, Kettlebell Snatch and Turkish Get-Up all rated **3** — and `light`/`returning` cap at 3. A "light activity" user was being served Olympic lifts, 7 Power Cleans in 50 sessions. Six entries re-rated | Shipped |
-> | **CHAIN-1** | **Zero** programmes declared `nextProgrammeId`, so after twelve weeks both routes were circular. Six now chain into three journeys of 24–36 weeks | Shipped |
-> | **PROG-1** | Phase intensity reaches coach-proposal and not the session-builder door | **Attempted, reverted, unproven** |
->
-> #### 🟠 Three corrections to my own reporting, same item, same evening
->
-> Recorded in full because the pattern matters more than the item.
->
-> 1. I reported **SILENT-1** — a throw swallowed inside session generation producing plausible numbers from broken code — and called it the most important find of the day. Injecting a throw shows it propagates cleanly. **It does not exist.**
-> 2. I reported PROG-1 moved difficulty 3% and concluded progression cannot be delivered by preference over this library. **The block executed zero times; the 3% was noise.** The conclusion was never established, and I had written it into the file as fact.
-> 3. I then reported the block was unreachable. **It runs nine times per session.** My probe sat immediately after the failing call, so I read silence as absence.
->
-> **The rule that would have caught all three, and the nine faulty gate assertions before them: a number is not executed evidence until you have confirmed which code produced it.** Probe before the suspect line, not after.
->
-> #### Open — needs Graeme
->
-> - 🟠 **Chain routes** — I invented them. Product judgement, one line each to change.
-> - 🟠 **The library question** — 393 of 551 entries at difficulty 1–2. Building a top end serves 2.6/2.7/2.15 and moves toward competing with strength apps on their terms. **Decide deliberately, not by accumulation.**
-> - 🟠 **2.4** — why a self-directed person stays. She is in the named secondary market and is served as a beginner.
-> - 🟡 **Legal docs** still 13+/16+, must align to 18+.
-> - 🟡 **On-device pass** — nothing shipped today has been seen on a phone.
-> - 🟡 **Token** lapses ~5 Sep.
->
-> #### Open — mine
->
-> - 🟡 **PROG-1 retry.** Placement is fine, idea untested. Verify `getPhaseBias()` resolves from inside session-builder — probe BEFORE it.
+Supersedes `master_schedule_15aug2026_v193.md`. Remove v193 on upload.
 
 > ### 🟢 15 AUG PM — THE FOUR UNBUILT SPECS. `alongside-v353`. 47 gates green.
 >
@@ -2827,4 +2793,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 15 Aug 2026 v195*
+*Build New Habits · Alongside: Move · Master Schedule · 15 Aug 2026 v194*
