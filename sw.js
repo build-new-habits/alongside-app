@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v356
+ * CHAIN-1 programme succession, and session-builder.js v35 lifting
+ * _difficulty() to module scope. PROG-1 attempted and reverted -- see
+ * the note in session-builder.js.
+ *
  * 15 Aug 2026 v355
  * DIFF-1, from the Wave 3 trace of persona 2.6. Six technical lifts
  * re-rated in data/exercises/strength.js. New gate verify-diff1.
@@ -2455,7 +2460,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v355";
+const CACHE_NAME = "alongside-v356";
 
 const SHELL_URLS = [
 
