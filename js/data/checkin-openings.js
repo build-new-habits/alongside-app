@@ -1,5 +1,12 @@
 /**
  * js/data/checkin-openings.js
+ * 15 Aug 2026 v5
+ *
+ * v5 - STREAK-1. The seven-check-in milestone claimed "Seven days in a
+ *   row" on a COUNT, not consecutive days, stored a key called `streak-7`
+ *   in a product that promises no streaks, and said "Seven" at fourteen
+ *   and twenty-one too. Now count-based, honest, and dynamic.
+ *
  * 14 Aug 2026 v4
  *
  * v4 - OPEN-1. Three day-one openings could never fire. `else if (ageBand)`
@@ -185,7 +192,38 @@ const IMAGINARY = [
 // in v2 (see header) — journal entries are never read by this file.
 
 const PROGRESS = {
-  'seven-day-streak':   { careMode: false, b1: "Seven days in a row. Movement, noticing, or both — seven.",         b2: "I want to know how that feels from the inside, not just as a number." },
+  // ── STREAK-1, 15 Aug 2026 ──────────────────────────────────────────────
+  //
+  // This entry read: "Seven days in a row. Movement, noticing, or both —
+  // seven." Three separate faults, found by the moment-of-delight audit.
+  //
+  // 1. IT WAS NOT TRUE. The trigger is totalCheckins % 7, a COUNT of
+  //    check-ins, not consecutive days. Traced: seven check-ins spread
+  //    across 102 days, longest run one day, and the coach said "Seven
+  //    days in a row." P4 is Locked — the coach displays, it does not
+  //    interpret — and this interpreted, wrongly.
+  //
+  // 2. IT WAS A STREAK, in a product whose first non-negotiable is "no
+  //    streaks, no shame, no comparison architecture". The stored key was
+  //    literally `streak-7`. And Settings promises the person in writing:
+  //    "No streaks. No punishment for absence." So the app made a promise
+  //    on one screen and broke it on another. Persona 2.5 selected
+  //    'escalation-trap' — being told you are on a run is precisely the
+  //    pressure she named, and the loss when it ends is the shame.
+  //
+  // 3. THE NUMBER WAS WRONG AFTER THE FIRST ONE. The trigger fires at 7,
+  //    14, 21 and so on; the copy said "Seven" every time.
+  //
+  // Now honest, count-based, and it says out loud that we do not count
+  // consecutive days — which is a thing worth saying to somebody who has
+  // been punished by every other app for missing a Tuesday. {n} is
+  // substituted with the real count.
+  //
+  // The other consecutive-days reader, coach-reflection.js:253, is
+  // deliberately left alone. It notices three sessions in a row in order
+  // to suggest VARYING or going lighter — load management, not reward.
+  // That is the opposite mechanic and it is correct.
+  'checkin-count':      { careMode: false, b1: "That's {n} check-ins now. Not in a row — I don't count that way.", b2: "I want to know how that feels from the inside, not just as a number." },
   'four-week':          { careMode: false, b1: "Four weeks. That's actually a long time to keep showing up.",        b2: "I'm curious what feels different now compared to when you started." },
   'eight-week':         { careMode: false, b1: "Eight weeks. I've watched this change shape — not in a straight line, but it's changed.", b2: "I want to understand how today fits into that." },
   'twelve-week':        { careMode: false, b1: "Twelve weeks. That's a whole chapter.",                              b2: "I'm not going to let you check in without knowing you know that." },
@@ -313,7 +351,10 @@ export function resolveOpening() {
   if (milestone && PROGRESS[milestone]) {
     _writeMode('progress');
     const v = PROGRESS[milestone];
-    return { b1: v.b1, b2: v.b2, mode: 'progress', careMode: v.careMode };
+    // STREAK-1. {n} is the real check-in count. Hardcoding "Seven" meant
+    // the fourteenth and twenty-first also said seven.
+    const sub = s => String(s || '').replace('{n}', totalCheckins);
+    return { b1: sub(v.b1), b2: sub(v.b2), mode: 'progress', careMode: v.careMode };
   }
 
   // ── Base modes — weighted selection ────────────────────────────────────────
@@ -517,10 +558,12 @@ function _resolveImaginary() {
 function _detectMilestone(totalCheckins, historyKeys) {
   const last = store.get('checkin.lastMilestoneNoticed');
 
-  // Checkin-count milestones (every 7)
+  // Check-in COUNT milestones, every 7. STREAK-1: the key said `streak-`
+  // and the copy said "in a row"; neither was true. Renamed so the store
+  // stops recording a streak this product does not keep.
   if (totalCheckins % 7 === 0) {
-    const key = `streak-${totalCheckins}`;
-    if (last !== key) { store.set('checkin.lastMilestoneNoticed', key); return 'seven-day-streak'; }
+    const key = `checkins-${totalCheckins}`;
+    if (last !== key) { store.set('checkin.lastMilestoneNoticed', key); return 'checkin-count'; }
   }
 
   // Programme week milestones
