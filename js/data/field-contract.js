@@ -82,10 +82,20 @@
 export const FIELD_CONTRACT = {
 
   // ── Identity. Writer: views/onboarding/about.js ───────────────────
+  // AGE-1, 14 Aug 2026. This entry declared the bands of
+  // views/onboarding/about.js -- an orphaned pre-thread view, now deleted
+  // -- while the LIVE writer wrote 'under-20'|'20s'|'30s'. Two
+  // vocabularies, and settings.js made a third by writing labels. The
+  // contract described the one nobody used.
+  //
+  // CONTRACT-2 did not catch it: about.js was imported by name.js and
+  // body.js, which were themselves orphaned. Reachability was checked as
+  // "referenced by something", and an orphaned CLUSTER satisfies that.
+  // Now traced to a router-registered entry point instead.
   "ageBand": {
-    values: ["under-18", "18-24", "25-34", "35-44", "45-54", "55-64", "65+", "prefer-not", null],
-    writer: "views/onboarding/about.js",
-    meaning: "Age band, in ten-year steps from 25. NOT free-form ranges — '30-39' and '18-29' read plausibly and match nothing, which is how two persona fixtures were silently wrong."
+    values: ["18-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75plus", "prefer-not", null],
+    writer: "views/onboarding/thread.js (step 6, AGE_CHIPS)",
+    meaning: "Age band. Lowest is 18 because the product is 18+ — there is deliberately no under-18 option. Selects who gets ASKED the chair and floor questions; it never decides what anyone can do. 'prefer-not' is a real answer and reaches the capability questions by the other three triggers."
   },
   "gender": {
     // TWO WRITERS THAT DISAGREE, found by this gate on its first run.
@@ -96,7 +106,7 @@ export const FIELD_CONTRACT = {
     // nothing anywhere noticing. Recorded rather than silently
     // normalised — which of the two is right is Graeme's call.
     values: ["female", "male", "non-binary", "other", "prefer-not", null],
-    writer: "views/onboarding/about.js, views/settings.js",
+    writer: "views/settings.js",  // AGE-1: about.js deleted, was orphaned,
     meaning: "Optional. Used for hormonal tracking only. Must NOT gate exercise selection — a pelvic-floor squat reaching a male user was a selection fault, not a gender one."
   },
 
@@ -136,6 +146,13 @@ export const FIELD_CONTRACT = {
   // W3-B, 14 Aug 2026. Had no writer at all until step 9f: every user was
   // the 'improve' default and both other branches of intentPriority() in
   // session-builder.js were unreachable.
+  // CARDIAC-1, 14 Aug 2026.
+  "exerciseClearance": {
+    values: ["cleared", "not-yet", "not-sure", null],
+    writer: "views/onboarding/thread.js (step 8a, CLEARANCE_CHIPS)",
+    meaning: "Whether a professional has said unsupervised exercise is okay. null means NOT ASKED and must never be read as 'not-yet' — most people are never asked. Gates LOADED STRENGTH only; mobility, walking, breathing and bodyweight stay open at every value."
+  },
+
   "trainingIntent": {
     values: ["improve", "maintain", "recover"],
     writer: "views/onboarding/thread.js (step 9f, INTENT_CHIPS)",
@@ -229,11 +246,13 @@ export const FIELD_CONTRACT = {
     writer: "views/session-builder-ui.js",
     meaning: "How one session's time splits between warm-up, work and cool-down. The SHAPE of a session, a standing preference. Distinct from sessionVariety."
   },
-  "trainingIntent": {
-    values: ["improve", "maintain", "recover"],
-    writer: "views/onboarding, views/settings.js",
-    meaning: "What the person wants from training right now. Weights category priority."
-  },
+  // W3-B, 14 Aug 2026: a second, vaguer trainingIntent entry sat here
+  // declaring writer "views/onboarding, views/settings.js" -- neither a
+  // real path. A duplicate key in an object literal is legal JS and the
+  // last one silently wins, so the contract had two answers and the gate
+  // only ever saw one. The live entry is above, with the capability
+  // fields. Nothing writes trainingIntent in settings.js today; if that
+  // changes, add it to the entry above rather than making a second.
   "tier": {
     values: ["free", "personal", "athlete"],
     writer: "views/upgrade.js, views/settings.js dev panel",

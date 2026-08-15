@@ -1,5 +1,9 @@
 /**
  * js/views/onboarding/thread.js
+ * 14 Aug 2026 v11
+ *
+ * v11 - CARDIAC-1. Step 8a acknowledgement wired.
+ *
  * 14 Aug 2026 v10
  *
  * v10 - W3-B. Step 9f acknowledgement wired. trainingIntent is a
@@ -188,6 +192,7 @@ import {
   generateFrequencyAck,
   generateBalanceAck,
   generateIntentAck,
+  generateClearanceAck,
   BALANCE_CHIPS,
   CHAIR_RISE_CHIPS,
   FLOOR_ACCESS_CHIPS,
@@ -1325,6 +1330,11 @@ export function ThreadView(router) {
     // Step 9f — training intent: dynamic ack (W3-B)
     if (step.id === '9f') {
       return generateIntentAck(value);
+    }
+
+    // Step 8a — exercise clearance: dynamic ack (CARDIAC-1)
+    if (step.id === '8a') {
+      return generateClearanceAck(value);
     }
 
     return step.coachAfter?.answered || null;

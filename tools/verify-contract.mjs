@@ -134,45 +134,51 @@ check("every declared value is produced somewhere", () => {
 console.log("\nCONTRACT — a declared writer must be able to run");
 
 check("every declared writer file exists and is reachable", () => {
-  // CONTRACT-2, 14 Aug 2026. Direction 2 above proves a value is PRODUCED
-  // somewhere in source. It never proved the producing file could RUN.
+  // CONTRACT-2, 14 Aug 2026, strengthened same day.
   //
-  // That gap hid the largest defect found so far. capability.* declared
-  // views/onboarding/lifestyle.js as its writer for three days. The file
-  // existed, the writes were right there in it, and every check passed --
-  // but the view was not registered in router.js and sheet-manager.js
-  // swallowed the only navigate() calls that led to it. capability.askedAt
-  // was null for every live user and six protective branches in
-  // session-builder.js never ran for anybody. Two separate work streams
-  // then spent a day fixing logic behind that screen.
+  // First version required a writer file to exist and be "referenced from
+  // outside itself". That was not enough: field-contract.js declared
+  // views/onboarding/about.js as the writer of ageBand, and about.js was
+  // referenced by name.js and body.js -- which were themselves orphaned
+  // from the retired multi-screen onboarding. An orphaned CLUSTER passed.
+  // The contract then described a vocabulary no live code produced, while
+  // the real writer produced a different one and settings.js a third.
   //
-  // Reachability here means: the file exists, and something outside it
-  // either imports it or routes to it. That is not a proof of execution --
-  // an imported function can still go uncalled -- but it catches the
-  // orphaned-file case, which is the one that actually happened.
+  // Now traced transitively from the routes registered in router.js, plus
+  // the sheets sheet-manager.js mounts. If a file cannot be reached from
+  // an entry point the app can actually navigate to, it cannot be a
+  // writer, however much code it contains.
+  const routerSrc = fs.readFileSync("js/router.js", "utf8");
+  const roots = new Set();
+  for (const m of routerSrc.matchAll(/path:\s*'\.\/([^']+)'/g)) roots.add("js/" + m[1]);
+  const sheetMgr = SRC["js/views/onboarding/sheet-manager.js"] || "";
+  for (const m of sheetMgr.matchAll(/['"]onboarding\/([a-z-]+)['"]/g))
+    roots.add(`js/views/onboarding/${m[1]}.js`);
+
+  const seen = new Set();
+  const stack = [...roots];
+  while (stack.length) {
+    const f = stack.pop();
+    if (seen.has(f) || !SRC[f]) continue;
+    seen.add(f);
+    const dir = f.split("/").slice(0, -1).join("/");
+    for (const m of SRC[f].matchAll(/(?:from|import\()\s*['"](\.[^'"]+)['"]/g)) {
+      try { stack.push(new URL(m[1], "file:///" + dir + "/").pathname.slice(1)); } catch {}
+    }
+  }
+
   const bad = [];
   for (const [field, spec] of Object.entries(FIELD_CONTRACT)) {
     if (!spec.writer) continue;
     for (const w of spec.writer.split(",")) {
-      const path = w.trim().split(":")[0];
-      if (!path.endsWith(".js")) continue;           // prose like "(step 9c)"
-      if (path.includes("*")) continue;              // glob: a family, not a file
-      // Writers are declared both with and without the js/ prefix.
-      // Normalising here rather than rewriting 20 contract entries.
+      const path = w.trim().split(":")[0].split(" ")[0];
+      if (!path.endsWith(".js") || path.includes("*")) continue;
       const full = path.startsWith("js/") ? path : `js/${path}`;
       if (!fs.existsSync(full)) {
         bad.push(`${field}: declared writer ${path} DOES NOT EXIST`);
-        continue;
+      } else if (!seen.has(full)) {
+        bad.push(`${field}: declared writer ${path} exists but is NOT REACHABLE from any registered route`);
       }
-      const base = path.split("/").pop();
-      const rel  = full.replace(/^js\//, "");
-      const referenced = Object.entries(SRC).some(([file, src]) =>
-        !file.endsWith(rel) &&
-        (src.includes(`from './${base}'`)   || src.includes(`from "./${base}"`)   ||
-         src.includes(`/${base}'`)          || src.includes(`/${base}"`)          ||
-         src.includes(rel.replace(/\.js$/, "").replace(/^views\//, ""))));
-      if (!referenced)
-        bad.push(`${field}: declared writer ${path} exists but NOTHING imports or routes to it`);
     }
   }
   ok(bad.length === 0,

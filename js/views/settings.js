@@ -1,5 +1,11 @@
 /**
  * settings.js
+ * 14 Aug 2026 v24
+ *
+ * v24 - AGE-1. The age select wrote its LABELS as values. Saving your age
+ *   here stored 'Under 20' or '70+', which matched nothing anywhere, and
+ *   dropped you out of the capability age trigger. Now imports AGE_CHIPS.
+ *
  * 14 Aug 2026 v23
  *
  * v23 - W3-A2. Capability editor. Onboarding steps 9a-9d are forward-only,
@@ -317,6 +323,7 @@ import { openSheet }                     from './onboarding/sheet-manager.js';
 // is exactly how vocabulary drift happens, and capability answers are the
 // most consequential strings in the product.
 import {
+  AGE_CHIPS,
   BALANCE_CHIPS,
   CHAIR_RISE_CHIPS,
   FLOOR_ACCESS_CHIPS,
@@ -595,8 +602,14 @@ export function SettingsView(router) {
                   id="settings-agebandsel"
                   data-field="ageBand"
                   aria-label="Your age range">
-            ${['Under 20','20s','30s','40s','50s','60s','70+','Prefer not to say'].map(b => `
-              <option value="${b}" ${ageBand === b ? 'selected' : ''}>${b}</option>
+            <!-- AGE-1, 14 Aug 2026. This list was hardcoded LABELS used as
+                 VALUES, so saving here wrote 'Under 20' or '70+' into
+                 ageBand -- matching neither the onboarding chips nor the
+                 contract, and silently dropping the person out of the
+                 capability age trigger. Now the same AGE_CHIPS the thread
+                 uses, ids as values. -->
+            ${AGE_CHIPS.map(b => `
+              <option value="${b.id}" ${ageBand === b.id ? 'selected' : ''}>${_esc(b.label)}</option>
             `).join('')}
           </select>
         </div>
