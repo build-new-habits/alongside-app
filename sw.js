@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v349
+ * MOOD-1. store.js v47 — moodAfter mirrored into checkinHistory, so the
+ * three coach branches that read it there can finally fire.
+ *
  * 15 Aug 2026 v348
  * STREAK-1. checkin-openings.js v5 — the seven-check-in milestone
  * claimed "Seven days in a row" on a count, not consecutive days.
@@ -2426,7 +2430,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v348";
+const CACHE_NAME = "alongside-v349";
 
 const SHELL_URLS = [
 
