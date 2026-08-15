@@ -83,36 +83,36 @@ function walk(fixture, answers = {}) {
 const PERSONAS = [
   // [name, fixture, answers, expected steps]
   ['2.6 footballer, active, no worries',
-   { ageBand: '30s', 'lifestyle.activityLevel': 'active', conditions: [] },
+   { ageBand: '35-44', 'lifestyle.activityLevel': 'active', conditions: [] },
    { '9a': 'no' }, ['9a', '9f']],
 
-  ['2.3 sprinter, 15, national standard',
-   { ageBand: 'under20', 'lifestyle.activityLevel': 'very-active', conditions: [] },
+  ['2.3 sprinter — OUT OF SCOPE at 18+, kept as the youngest adult band',
+   { ageBand: '18-24', 'lifestyle.activityLevel': 'very-active', conditions: [] },
    { '9a': 'no' }, ['9a', '9f']],
 
   ['2.10 Dad, 76, frail — caught by age even saying no',
-   { ageBand: '70plus', 'lifestyle.activityLevel': 'light', conditions: [] },
+   { ageBand: '75plus', 'lifestyle.activityLevel': 'light', conditions: [] },
    { '9a': 'no', '9b': 'yes' }, ['9a', '9b', '9d', '9f']],
 
   ['2.8 niece, dyspraxia — young, active, no listed condition',
-   { ageBand: '20s', 'lifestyle.activityLevel': 'moderate', conditions: [] },
+   { ageBand: '25-34', 'lifestyle.activityLevel': 'moderate', conditions: [] },
    { '9a': 'yes', '9b': 'yes' }, ['9a', '9b', '9d', '9f']],
 
   ['2.5 Denise, 52, sedentary + cardiac',
-   { ageBand: '50s', 'lifestyle.activityLevel': 'sedentary',
+   { ageBand: '55-64', 'lifestyle.activityLevel': 'sedentary',
      conditions: ['cardiovascular-condition'] },
    { '9a': 'no', '9b': 'yes' }, ['9a', '9b', '9d', '9f']],
 
   ['chairRise not-easily reveals the leg question',
-   { ageBand: '70plus', 'lifestyle.activityLevel': 'sedentary', conditions: [] },
+   { ageBand: '75plus', 'lifestyle.activityLevel': 'sedentary', conditions: [] },
    { '9a': 'yes', '9b': 'not-easily' }, ['9a', '9b', '9c', '9d', '9f']],
 
   ['chairRise yes does NOT reveal the leg question',
-   { ageBand: '70plus', 'lifestyle.activityLevel': 'sedentary', conditions: [] },
+   { ageBand: '75plus', 'lifestyle.activityLevel': 'sedentary', conditions: [] },
    { '9a': 'yes', '9b': 'yes' }, ['9a', '9b', '9d', '9f']],
 
   ['knee condition alone triggers, at any age',
-   { ageBand: '30s', 'lifestyle.activityLevel': 'active', conditions: ['knee'] },
+   { ageBand: '35-44', 'lifestyle.activityLevel': 'active', conditions: ['knee'] },
    { '9a': 'no', '9b': 'yes' }, ['9a', '9b', '9d', '9f']],
 ];
 
@@ -232,10 +232,10 @@ function openingFor(fixture) {
 
 // ageBand is set for every fixture below — that is the whole point.
 // Before OPEN-1, `else if (ageBand)` swallowed all three of these.
-const injury  = openingFor({ ageBand: '40s', 'lifestyle.returningAfter': 'injury' });
-const returnF = openingFor({ ageBand: '40s', 'lifestyle.activityLevel': 'returning' });
-const feelG   = openingFor({ ageBand: '40s', goals: ['feel-good'] });
-const changing= openingFor({ ageBand: '40s' });
+const injury  = openingFor({ ageBand: '45-54', 'lifestyle.returningAfter': 'injury' });
+const returnF = openingFor({ ageBand: '45-54', 'lifestyle.activityLevel': 'returning' });
+const feelG   = openingFor({ ageBand: '45-54', goals: ['feel-good'] });
+const changing= openingFor({ ageBand: '45-54' });
 
 check('injury-recovery fires despite an ageBand being set',
   injury.length > 0 && injury !== changing, injury.slice(0, 50));

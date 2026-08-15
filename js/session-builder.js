@@ -1,6 +1,20 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 14 Aug 2026 v33
+ *
+ * v33 - CARDIAC-1. exerciseClearance gates LOADED STRENGTH work only.
+ *   Persona 2.5 declared a heart condition and the buildable pool changed
+ *   by zero exercises. Mobility, walking, breathing and bodyweight stay
+ *   open at every value, and null means not-asked, never not-cleared.
+ *
+ * 14 Aug 2026 v32
+ *
+ * v32 - W2-6. Section novelty now SCALES with sessionVariety instead of
+ *   being added flat on top of it. "Something like last time" was
+ *   delivering 40% overlap because the warm-up and cool-down weighting
+ *   overrode the person's answer. 'balanced' and 'varied' unchanged.
+ *
  * 14 Aug 2026 v31
  *
  * v31 - W2-1. The difficulty ceiling now applies to cooldown as well as
@@ -1246,6 +1260,31 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   // stated intent above: keeping what function exists is worth more than
   // protecting it into disuse.
   const LEG_PATTERNS = ["squat", "hinge", "lunge", "locomotion", "step"];
+  /**
+   * CARDIAC-1. Is this person waiting on a professional's yes?
+   * 'not-sure' is treated as 'not-yet' -- the coach says so out loud in
+   * generateClearanceAck(), so this is not a hidden decision.
+   */
+  const _needsClearance = () => {
+    const c = store.get("exerciseClearance");
+    return c === "not-yet" || c === "not-sure";
+  };
+
+  /**
+   * CARDIAC-1. Loaded strength work: external resistance, or a strength
+   * movement heavy enough to drive a large blood-pressure response.
+   *
+   * Bodyweight mobility, seated work and walking are deliberately NOT
+   * caught. The line is external load and maximal effort, not "strength".
+   */
+  const _isLoadedStrength = ex => {
+    const equip = ex.equipment || [];
+    const LOADED = /barbell|dumbbell|kettlebell|weight|machine|cable|smith|leg-press|plate/i;
+    if (equip.some(e => LOADED.test(String(e)))) return true;
+    if (ex.category === "strength" && (ex.difficultyLevel ?? 0) >= 4) return true;
+    return false;
+  };
+
   const _loadsLegs = ex =>
     _needsLegs(ex) && (
       LEG_PATTERNS.includes(ex.movementPattern) ||
@@ -1381,6 +1420,23 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
     // on all 518 entries.
     if (cap.asked && !cap.legsUsable && _needsLegs(ex)) return false;
     if (cap.asked && !cap.legsLoadable && _loadsLegs(ex)) return false;
+
+    // ── CARDIAC-1 (14 Aug 2026) ──────────────────────────────────────
+    //
+    // Somebody who declared a condition where it matters and has NOT been
+    // told by a professional that unsupervised exercise is fine.
+    //
+    // Withholds loaded strength work and nothing else. Mobility, walking,
+    // breathing, seated and bodyweight movement all stay, because the
+    // harm of withholding those from somebody frightened of their own
+    // heart is real and immediate, and the risk of providing them is not.
+    // Persona 2.5 is that person: three years post-cardiac-event, never
+    // exercised, and what she needs first is permission to move at all.
+    //
+    // null is NOT a gate. It means the question was never asked, which is
+    // true of everyone who declared no relevant condition. Reading it as
+    // 'not-yet' would quietly restrict the whole userbase.
+    if (_needsClearance() && _isLoadedStrength(ex)) return false;
     if (section === "main" && !withinCeiling(ex)) return false;
     if (section === "warmup" && useCeilingOnWarmup && !withinCeiling(ex)) return false;
     // W2-1. See the cooldown pool note above.
@@ -1714,7 +1770,15 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     const MASTERY_THRESHOLD      = 8;
 
     // CONT-2 -- the person's own answer, never inferred from behaviour.
-    const VARIETY_NOVELTY = { familiar: 0.10, balanced: 0.25, varied: 0.55 };
+    // W2-6, 14 Aug 2026: familiar 0.10 -> 0.05, alongside SECTION_SCALE
+    // below. Measured over 96 session-to-session transitions per setting,
+    // 12 independent runs: mean overlap with the previous session went
+    // 40% -> 62% for 'familiar', with 'balanced' and 'varied' unmoved at
+    // 30% and 16%. The floor still dips on individual transitions, which
+    // is inherent to a probabilistic pick and is not worth tuning away --
+    // driving it higher starts producing identical sessions, which is a
+    // different failure and a worse one.
+    const VARIETY_NOVELTY = { familiar: 0.05, balanced: 0.25, varied: 0.55 };
     const variety = store.get("sessionVariety") || "balanced";
     const baseNovelty = VARIETY_NOVELTY[variety] ?? VARIETY_NOVELTY.balanced;
 
@@ -1736,9 +1800,33 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
     // weeks; nobody needs to master a hip flexor stretch. So the main
     // section anchors hard and warm-ups and cool-downs rotate freely.
     const SECTION_NOVELTY = { warmup: 0.55, main: 0.0, cooldown: 0.55 };
+
+    // ── W2-6 (14 Aug 2026, persona trace Wave 2) ─────────────────────
+    //
+    // The section weighting above was a FLAT addition, so it overrode the
+    // person's own answer in exactly the section they notice first.
+    // Persona 2.14 -- autistic, predictability-seeking -- chose "something
+    // like last time" nine sessions running and got a mean 40% overlap
+    // with a range of 11-70%. Traced: main anchored at 90% repeat while
+    // his warm-up changed almost every session.
+    //
+    // That is backwards for him and it is the opposite of 2.15's problem.
+    // For a lifter the main lift is the thing to hold; for him the OPENING
+    // is, because the first two minutes are what tell his nervous system
+    // what kind of thing this is going to be. And the variance is worse
+    // than the mean: for somebody whose whole ask is the removal of
+    // surprise, an unpredictable AMOUNT of surprise is the surprise.
+    //
+    // So the section weighting now scales with what the person asked for
+    // rather than being added on top of it. 'familiar' keeps roughly a
+    // third of the section rotation; 'balanced' and 'varied' are
+    // unchanged, so 2.15's slot anchoring and 2.13's novelty are both
+    // untouched -- she chose neither of those settings.
+    const SECTION_SCALE = { familiar: 0.15, balanced: 1.0, varied: 1.0 };
+    const sectionScale = SECTION_SCALE[variety] ?? 1.0;
     const noveltyRate = Math.min(
       1,
-      baseNovelty + (SECTION_NOVELTY[section] ?? 0)
+      baseNovelty + (SECTION_NOVELTY[section] ?? 0) * sectionScale
     );
 
     // ── FIX-1 (C4-1), 13 Aug 2026: discipline fit ────────────────────
