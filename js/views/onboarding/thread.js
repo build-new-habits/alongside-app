@@ -1,5 +1,12 @@
 /**
  * js/views/onboarding/thread.js
+ * 15 Aug 2026 v12
+ *
+ * v12 - TARGET-1. Step 12 now writes strategicGoal.setAt. Its only
+ *   writer was the skippable programme sheet, so a person who chose
+ *   "twice a week" and then skipped step 13 had their answer treated as
+ *   though it had never been given.
+ *
  * 14 Aug 2026 v11
  *
  * v11 - CARDIAC-1. Step 8a acknowledgement wired.
@@ -1231,6 +1238,26 @@ export function ThreadView(router) {
     if (step.storeField === 'strategicGoal.weeklySessionTarget') {
       const n = value === '5plus' ? 5 : parseInt(value, 10);
       store.set(step.storeField, isNaN(n) ? 3 : n);
+
+      // ── TARGET-1 (15 Aug 2026, moment-of-delight audit) ─────────────
+      //
+      // strategicGoal.setAt records whether the weekly target was ever
+      // actually CHOSEN, as opposed to sitting at its default of 3.
+      // today.js reads it and shows the denominator only when it is set
+      // -- HOME-1, correctly, because persona 2.12 was being shown "1 of
+      // 3 this week" against a number he had never agreed to.
+      //
+      // But the only writer was plan-select.js, which is step 13 and is
+      // SKIPPABLE ("Decide later"). So somebody who answered step 12 with
+      // "Twice a week" and then skipped the programme sheet had setAt
+      // null, and Home showed "1 session this week" -- her own explicit
+      // answer invisible, two screens after she gave it.
+      //
+      // Step 12 IS the moment of choosing. HOME-1's principle was right
+      // and its writer was incomplete. plan-select.js still writes setAt
+      // too; last one wins and both are true statements about when the
+      // person settled on a number.
+      store.set('strategicGoal.setAt', new Date().toISOString());
       return;
     }
 

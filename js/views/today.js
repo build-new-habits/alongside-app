@@ -1,5 +1,11 @@
 /**
  * today.js
+ * 15 Aug 2026 v16
+ *
+ * v16 - TARGET-2. Reaching the weekly target the person chose is now
+ *   said out loud, in a line that closes the week rather than opening a
+ *   demand. Previously it read identically to missing it.
+ *
  * 13 Aug 2026 v15
  *
  * v15 - ORIENT-1. Home now reads what the person told onboarding.
@@ -412,9 +418,6 @@ export function TodayView(router) {
     const name          = store.get('name') || '';
     const greeting      = _buildGreeting(name);
     const sessionDone   = _sessionCompletedToday();
-    const coachLine     = sessionDone
-      ? "You moved today \u2014 that's done. Tap in below any time if you'd like to do more."
-      : _buildCoachLine();
     // HOME-1, 13 Aug 2026. The denominator only appears if the person
     // actually set one.
     //
@@ -431,6 +434,35 @@ export function TodayView(router) {
     const targetSetAt   = store.get('strategicGoal.setAt');
     const weeklyTarget  = targetSetAt ? (store.get('strategicGoal.weeklySessionTarget') || null) : null;
     const sessionCount  = _sessionsThisWeek();
+
+    // ── TARGET-2 (15 Aug 2026, moment-of-delight audit) ────────────────
+    //
+    // Hitting the weekly target the person chose at step 12 got exactly
+    // the same treatment as missing it: the counter read "2 of 2" and
+    // nothing was said. Somebody set a number, reached it, and the app
+    // did not notice.
+    //
+    // The line CLOSES the week rather than opening a demand, which is the
+    // whole difference between this and a target mechanic. "That's the
+    // two you said you'd aim for" states what happened; "anything else is
+    // extra, not expected" removes the obligation that a hit target
+    // otherwise creates. Persona 2.5 named 'escalation-trap' — for her,
+    // reaching a goal is historically the moment the pressure starts.
+    //
+    // It also must not stop her doing more. Somebody who hits two on
+    // Tuesday should not read this as the week being over, so the
+    // invitation stays.
+    //
+    // No new state and no "fired once" flag: the line describes the true
+    // current state of the week, so it is idempotent and P4-safe — the
+    // coach displays, it does not interpret. It appears on the days she
+    // has moved, and the week resets it.
+    const targetMet = sessionDone && weeklyTarget && sessionCount >= weeklyTarget;
+    const coachLine     = targetMet
+      ? `That's the ${weeklyTarget} you said you'd aim for this week. Anything else is extra, not expected.`
+      : sessionDone
+      ? "You moved today \u2014 that's done. Tap in below any time if you'd like to do more."
+      : _buildCoachLine();
 
     container.innerHTML = `
       <div class="today-view" role="main" aria-label="Today">
