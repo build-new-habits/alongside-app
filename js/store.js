@@ -1,5 +1,12 @@
 /**
  * store.js - Data persistence layer
+ * 15 Aug 2026 v51
+ *
+ * v51 - ASSESS-1. New fields assessment { baseline, history,
+ *   lastOfferedAt, declined } and sessionMode. The first thing in the
+ *   product that can MOVE the difficulty ceiling without the person
+ *   editing Settings.
+ *
  * 15 Aug 2026 v50
  *
  * v50 - PB-1. personalBests + showPersonalBests, and logLift() records
@@ -830,6 +837,18 @@ export const store = {
         ? saved.sessionPace
         : defaults.sessionPace,
 
+      // ASSESS-1
+      assessment: (saved.assessment && typeof saved.assessment === 'object')
+        ? {
+            ...defaults.assessment,
+            ...saved.assessment,
+            history: Array.isArray(saved.assessment.history) ? saved.assessment.history : []
+          }
+        : { ...defaults.assessment, history: [] },
+      sessionMode: ['coach-led', 'coach-supported', 'free-hand'].includes(saved.sessionMode)
+        ? saved.sessionMode
+        : defaults.sessionMode,
+
       // ── WEEKLY PLAN ───────────────────────────────────────────
       weeklyPlan: (saved.weeklyPlan && typeof saved.weeklyPlan === 'object')
         ? {
@@ -1218,6 +1237,55 @@ export const store = {
         // check-in. Once, ever — see offerBriefPath().
         briefOfferedAt: null // ISO string | null
       },
+
+      // ── ASSESSMENT (ASSESS-1, 15 Aug 2026) ────────────────────
+      //
+      // Graeme, 15 Aug: "There needs to be a better baseline assessment
+      // of fitness, and like a teacher would, milestone assessments to
+      // ensure the programme is the right fit."
+      //
+      // THE GAP THIS FILLS. Three fields describe how hard somebody's
+      // sessions should be, and none of them measures capacity or can
+      // move on its own:
+      //
+      //   lifestyle.activityLevel   self-reported FREQUENCY
+      //   capability.*              what they CAN do -- safety, binary
+      //   fitnessLevel              same vocabulary, Settings-only writer
+      //
+      // _difficultyCeiling() resolves fitnessLevel || activityLevel, so
+      // how hard a session is comes from how often somebody says they
+      // exercise, and only ever changes if they edit Settings.
+      //
+      // That is why a twelve-week programme cannot progress anybody.
+      // Phases declare an intensityBias that climbs, under a ceiling
+      // that does not. PROG-1 tried to add preference inside a fixed
+      // ceiling, which is decoration. This is the other end of it.
+      //
+      // measuredLevel uses the SAME five-value vocabulary as
+      // activityLevel, deliberately. A new scale would mean every
+      // downstream reader learning it, and the vocabulary drift that
+      // caused has cost this project repeatedly.
+      //
+      // WHAT IT IS NOT. There is no score here and there must never be
+      // one -- a number invites comparison and becomes a target, which
+      // is why the streak went and why personal bests are off by
+      // default. results holds how each movement FELT, in the person's
+      // own words, and measuredLevel is what the coach does with that.
+      //
+      // declined is remembered so nobody is asked twice in a programme.
+      // Somebody who skipped has answered.
+      assessment: {
+        baseline:      null,  // { at, measuredLevel, results } | null
+        history:       [],    // [{ at, week, measuredLevel, results, changedFrom }]
+        lastOfferedAt: null,  // ISO string | null — reassessment throttle
+        declined:      false
+      },
+
+      // Coach-led is the default and the product's centre. The other two
+      // exist for persona 2.4, who does not need deciding for.
+      // SAFETY IS NOT A MODE: capability gates, the condition filter and
+      // the clearance question apply identically in all three.
+      sessionMode: 'coach-led',   // 'coach-led' | 'coach-supported' | 'free-hand'
 
       // ── SESSION PACE (QUICK-1, 15 Aug 2026) ───────────────────
       //
@@ -1810,6 +1878,103 @@ export const store = {
     this.data.updatedAt = new Date().toISOString();
     this.save();
     return list[list.length - 1];
+  },
+
+  /**
+   * ASSESS-1. Record a baseline or a reassessment.
+   *
+   * This is the first writer of fitnessLevel outside Settings, and
+   * therefore the first thing in the product that can move the
+   * difficulty ceiling on the person's behalf.
+   *
+   * WHY IT WRITES fitnessLevel RATHER THAN A NEW FIELD. Three readers
+   * already resolve `fitnessLevel || lifestyle.activityLevel` --
+   * _difficultyCeiling(), _filterCandidates() and workoutGenerator. A
+   * fourth field would mean each of them learning about it, and a reader
+   * that missed the update would silently keep using the old level. One
+   * field, one meaning.
+   *
+   * Settings remains an override, deliberately. Somebody who disagrees
+   * with the read must be able to say so, and the app must not argue.
+   *
+   * @param {object} p
+   * @param {string} p.measuredLevel  sedentary|light|moderate|active|very-active
+   * @param {object} p.results        how each movement felt, their words
+   * @param {number} [p.week]         programme week, for a reassessment
+   * @returns {object|null} the recorded entry
+   */
+  recordAssessment({ measuredLevel, results, week } = {}) {
+    const LEVELS = ['sedentary', 'light', 'moderate', 'active', 'very-active'];
+    if (!LEVELS.includes(measuredLevel)) {
+      console.error('Store: recordAssessment called with an unknown level', measuredLevel);
+      return null;
+    }
+
+    const a = { ...(this.data.assessment || {}) };
+    const previous = a.baseline ? (a.history.length
+      ? a.history[a.history.length - 1].measuredLevel
+      : a.baseline.measuredLevel) : null;
+
+    const entry = {
+      at: new Date().toISOString(),
+      measuredLevel,
+      results: results || {},
+      ...(typeof week === 'number' ? { week } : {}),
+      ...(previous ? { changedFrom: previous } : {})
+    };
+
+    if (!a.baseline) {
+      a.baseline = entry;
+    } else {
+      // Capped at 12: four phase boundaries a year for three years. This
+      // is a record of where somebody has been, not a dataset.
+      a.history = [...(a.history || []), entry].slice(-12);
+    }
+    a.declined = false;
+    this.data.assessment = a;
+
+    // The point of the whole feature.
+    this.data.fitnessLevel = measuredLevel;
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+    return entry;
+  },
+
+  /**
+   * ASSESS-1. What changed since last time, or null on a baseline.
+   *
+   * Returns the two levels and a direction. Deliberately NOT a score, a
+   * percentage or a streak of improvements -- P4, and the same restraint
+   * that keeps lastLift() free of deltas.
+   *
+   * 'down' is a first-class answer. Somebody returning after illness
+   * gets an honest read, and a measure that only ever ratchets up
+   * becomes another thing to fall behind.
+   */
+  assessmentChange() {
+    const a = this.data.assessment || {};
+    const latest = (a.history && a.history.length)
+      ? a.history[a.history.length - 1]
+      : a.baseline;
+    if (!latest || !latest.changedFrom) return null;
+    const LEVELS = ['sedentary', 'light', 'moderate', 'active', 'very-active'];
+    const from = LEVELS.indexOf(latest.changedFrom);
+    const to   = LEVELS.indexOf(latest.measuredLevel);
+    if (from < 0 || to < 0) return null;
+    return {
+      from: latest.changedFrom,
+      to:   latest.measuredLevel,
+      direction: to > from ? 'up' : to < from ? 'down' : 'same'
+    };
+  },
+
+  /** ASSESS-1. Remember a skip, so nobody is asked twice. */
+  declineAssessment() {
+    const a = { ...(this.data.assessment || {}) };
+    a.declined = true;
+    a.lastOfferedAt = new Date().toISOString();
+    this.data.assessment = a;
+    this.save();
   },
 
   /**
