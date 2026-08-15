@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v350
+ * TARGET-1 and TARGET-2. thread.js v12 records that a weekly target was
+ * chosen; today.js acknowledges reaching it.
+ *
  * 15 Aug 2026 v349
  * MOOD-1. store.js v47 — moodAfter mirrored into checkinHistory, so the
  * three coach branches that read it there can finally fire.
@@ -2430,7 +2434,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v349";
+const CACHE_NAME = "alongside-v350";
 
 const SHELL_URLS = [
 
