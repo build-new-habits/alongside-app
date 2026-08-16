@@ -1,5 +1,12 @@
 /**
  * programmeEngine.js
+ * 16 Aug 2026 v3
+ *
+ * v3 - COUNTDOWN-1. getProgressStats() no longer returns percentComplete or
+ *   weeksRemaining. Both were distance-remaining measures, forbidden by
+ *   the chapters blueprint, and both were being rendered live. weeksIn
+ *   replaces them and can only count upward.
+ *
  * 23 Jun 2026 v2
  *
  * Programme lifecycle engine. Handles phase tracking, session recording,
@@ -152,8 +159,24 @@ export function getProgressStats() {
     phase:              phase?.name      || 'build',
     phaseName:          phase?.label     || 'Foundation',
     phaseMessage:       phase?.coachMessage || '',
-    percentComplete:    Math.round(((ap.currentWeek || 1) / 12) * 100),
-    weeksRemaining:     12 - (ap.currentWeek || 1),
+    // COUNTDOWN-1, 16 Aug 2026. percentComplete and weeksRemaining are GONE.
+    //
+    // Both were distance-remaining measures, and the chapters blueprint
+    // rules them out in one line that Graeme agreed in full: keep the
+    // milestone, remove the countdown, show progress made and never
+    // distance remaining. A progress bar cannot obey that rule, because
+    // a bar IS the remaining distance.
+    //
+    // They were not theoretical. progress.js rendered a real bar with
+    // "8 weeks remaining" underneath it, on a screen every user sees,
+    // while My Programme was shipped the same day with a gate that
+    // explicitly fails if a progress bar appears. Two screens, opposite
+    // rules, and the newer one had the test.
+    //
+    // Removed at source rather than hidden at the view, so nothing can
+    // quietly render a countdown again by reading a field that offers
+    // one. weeksIn replaces both, and it can only count upward.
+    weeksIn:            Math.max(0, (ap.currentWeek || 1) - 1),
     milestones:         ap.milestones    || [],
     recentSessions:     log.slice(-10),
     midProgrammeGlanceShown:  ap.midProgrammeGlanceShown  || false,

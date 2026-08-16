@@ -1,5 +1,20 @@
 /**
  * progress.js
+ * 16 Aug 2026 v7
+ *   COUNTDOWN-1. The programme progress bar is gone, with "8 weeks
+ *   remaining" and "N% complete" beside it. All three were
+ *   distance-remaining measures on a screen every user sees, and the
+ *   chapters blueprint rules them out in a line Graeme agreed in full:
+ *   keep the milestone, remove the countdown, show progress made and
+ *   never distance remaining.
+ *
+ *   The milestones stay and face backwards instead. "The end is close"
+ *   became "10 weeks in"; "halfway through" became "five weeks done".
+ *   The evidence for milestones is real — endowed progress, the goal
+ *   gradient — so removing them would lose something. What gets removed
+ *   is the mechanism that works by amplifying perceived obligation,
+ *   which is persona 2.5's declared territory with a bar drawn on it.
+ *
  * 13 Aug 2026 v6
  *
  * v6 - E2. The export counted partials while every on-screen count did
@@ -215,7 +230,7 @@ export function ProgressView(router) {
   // ── Coach narrative ────────────────────────────────────────────────────────
 
   function renderCoachNarrative(stats, tier, name) {
-    // COUNT-1. Partials excluded here too -- this feeds _buildObservation(),
+    // COUNTDOWN-1. Partials excluded here too -- this feeds _buildObservation(),
     // which writes the "N sessions in the last 30 days" coach line. A coach
     // congratulating somebody on sessions they backed out of is worse than
     // a wrong number.
@@ -240,7 +255,7 @@ export function ProgressView(router) {
   // ── Activity summary ───────────────────────────────────────────────────────
 
   function renderActivitySummary(tier) {
-    // COUNT-1. Partials excluded, matching Home and Build Your Base.
+    // COUNTDOWN-1. Partials excluded, matching Home and Build Your Base.
     const activityLog = store.completedSessions(store.get('activityLog'));
     const cutoff      = _cutoffDate(activeWindow);
     const recent      = activityLog.filter(e => {
@@ -286,17 +301,10 @@ export function ProgressView(router) {
         <h2 class="progress-programme__name">${stats.programmeName || 'Your programme'}</h2>
 
         <div class="progress-programme__track">
-          <div class="progress-programme__bar"
-               role="progressbar"
-               aria-valuenow="${stats.percentComplete}"
-               aria-valuemin="0"
-               aria-valuemax="100"
-               aria-label="${stats.percentComplete}% through the programme">
-            <div class="progress-programme__fill"
-                 style="width: ${stats.percentComplete}%"></div>
-          </div>
           <span class="progress-programme__label">
-            Week ${stats.currentWeek} of 12 — ${stats.phaseName}
+            ${stats.weeksIn === 0
+              ? 'Just started'
+              : `${stats.weeksIn} ${stats.weeksIn === 1 ? 'week' : 'weeks'} in`} — ${stats.phaseName}
           </span>
         </div>
 
@@ -305,7 +313,6 @@ export function ProgressView(router) {
         <div class="progress-programme__stats">
           <span>${stats.totalSessions} sessions completed</span>
           <span>${stats.sessionsThisWeek} of ${stats.weeklyTarget} this week</span>
-          <span>${stats.weeksRemaining} weeks remaining</span>
         </div>
 
         ${recentMissed.length > 0 ? `
@@ -617,11 +624,14 @@ export function ProgressView(router) {
   }
 
   function _programmeObservation(stats, recent) {
-    if (stats.percentComplete >= 90) {
-      return `Week ${stats.currentWeek} of 12 — the end is close. The habit is already built.`;
+    // COUNTDOWN-1. "The end is close" and "halfway through" were both
+    // distance-to-the-end statements. Kept as milestones, reworded to
+    // face backwards: what has been done, not what is left.
+    if (stats.weeksIn >= 10) {
+      return `${stats.weeksIn} weeks in. The habit is already built.`;
     }
     if (stats.currentWeek === 6 && !stats.midProgrammeGlanceShown) {
-      return 'Halfway through the programme. That\'s a real marker.';
+      return 'Five weeks done. That\'s a real marker.';
     }
     if (stats.sessionsThisWeek >= stats.weeklyTarget) {
       return `This week\'s sessions done. The programme is on track.`;
@@ -680,7 +690,7 @@ export function ProgressView(router) {
         ``,
         `${count} sessions in the last ${windowDays} days. ${mins} minutes of movement.`,
         stats.hasActiveProgramme
-          ? `Programme: ${stats.programmeName} — Week ${stats.currentWeek} of 12. ${stats.percentComplete}% complete.`
+          ? `Programme: ${stats.programmeName} — ${stats.weeksIn} weeks in, ${stats.totalSessions} sessions.`
           : '',
         goalLabels ? `Working towards: ${goalLabels}.` : '',
         ``,
