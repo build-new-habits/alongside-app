@@ -1,5 +1,8 @@
 /*
  * css/layouts/today.css
+ * 16 Aug 2026 v5
+ *   CHAP-1 step 3. .today-hinge, the end-of-chapter offer.
+ *
  * 16 Aug 2026 v4
  *
  * v4 — CHAP-1 step 2. .today-programme-row added: full width, above the
@@ -86,6 +89,46 @@
 .today-week-count__label {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
+}
+
+/* ── The hinge (CHAP-1 step 3) ────────────────────────────────── */
+/* Bordered rather than filled, and no accent on the heading. A chapter
+   ending is a fact, not a trophy — the moment this reads as a reward is
+   the moment the next chapter reads as an obligation. */
+
+.today-hinge {
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.today-hinge__heading {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0;
+  line-height: var(--leading-snug);
+}
+
+.today-hinge__body {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+.today-hinge__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.today-hinge__actions .btn {
+  min-height: 44px;
 }
 
 /* ── My Programme row (CHAP-1 step 2) ─────────────────────────── */

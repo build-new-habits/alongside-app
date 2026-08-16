@@ -1,5 +1,12 @@
 /**
  * programmeEngine.js
+ * 16 Aug 2026 v5
+ *   CHAP-1 step 3 part two. chapterSuccessor() and startChapter() —
+ *   one definition of "what comes next" and one of "start a chapter",
+ *   replacing a private chain map in gym-programme.js that disagreed
+ *   with programmes.js on four of eight chapters, and a fifteen-line
+ *   reset block that existed there twice.
+ *
  * 16 Aug 2026 v3
  *
  * v3 - COUNTDOWN-1. getProgressStats() no longer returns percentComplete or
@@ -552,6 +559,78 @@ export function advanceWeekIfNeeded() {
  * `chapterEnded` argument -- built on 16 Aug and inert until now --
  * actually carries something.
  */
+/**
+ * CHAP-1 step 3. The chapter that would likely come next.
+ *
+ * ONE definition, reading `nextProgrammeId` from programmes.js -- the
+ * same field My Programme's arc renders. Before this there were TWO
+ * chain maps: CHAIN-1's data, and a private PROGRESSIONS object inside
+ * gym-programme.js. FOUR of eight entries disagreed:
+ *
+ *   beginner-fitness      data: back-to-strength   view: feel-good-foundation
+ *   feel-good-foundation  data: ground             view: build
+ *   open                  data: (none)             view: ground
+ *   ground                data: open               view: build
+ *
+ * So My Programme could tell somebody "Back to Strength would likely
+ * come next" and the end-of-chapter screen could then offer them Feel
+ * Good Foundation. Nothing errored; the product simply held two
+ * opinions and showed whichever one the person happened to reach.
+ *
+ * The private map is deleted rather than reconciled. Reconciling would
+ * have left two maps that agree today and drift tomorrow.
+ */
+export function chapterSuccessor(programmeId) {
+  const p = programmeId ? getProgramme(programmeId) : null;
+  if (!p || !p.nextProgrammeId) return null;
+  return getProgramme(p.nextProgrammeId) || null;
+}
+
+/**
+ * Start a chapter, from scratch.
+ *
+ * The reset block below existed twice, inline, in gym-programme.js --
+ * once for "run it again" and once for "move on" -- differing only in
+ * whether programmeId changed. Two copies of a fifteen-line reset is
+ * two places to forget a field, and `completed` was already being set
+ * false in both while nothing set it true.
+ *
+ * @param {string} programmeId
+ * @param {object} [opts]
+ * @param {boolean} [opts.keepHistory] repeat rather than a new chapter
+ */
+export function startChapter(programmeId, { keepHistory = false } = {}) {
+  const programme = getProgramme(programmeId);
+  if (!programme) return false;
+
+  store.set('activeProgramme.programmeId',   programme.id);
+  store.set('activeProgramme.programmeName', programme.name);
+  store.set('activeProgramme.startDate',     new Date().toISOString());
+  store.set('activeProgramme.currentWeek',   1);
+  store.set('activeProgramme.currentPhase',  'build');
+  store.set('activeProgramme.phase',         1);
+  store.set('activeProgramme.sessionsThisWeek', 0);
+  store.set('activeProgramme.totalSessions',    0);
+  store.set('activeProgramme.milestones',       []);
+  store.set('activeProgramme.missedSessions',   []);
+  store.set('activeProgramme.midProgrammeGlanceShown',  false);
+  store.set('activeProgramme.programmeReflectionShown', false);
+
+  // Clearing these is what ANSWERS the hinge. Until it is cleared,
+  // isHingePending() stays true and the offer keeps standing -- which is
+  // correct: an unanswered question should not quietly disappear.
+  store.set('activeProgramme.completed',   false);
+  store.set('activeProgramme.completedAt', null);
+  store.set('programme.currentChapterId',  programme.id);
+  store.set('programme.hingeOfferedAt',    null);
+
+  if (!keepHistory) {
+    // chaptersDone is deliberately NOT touched. It is the arc, and a new
+    // chapter adds to it rather than replacing it.
+  }
+  return true;
+}
+
 export function isHingePending() {
   const ap = store.get('activeProgramme') || {};
   return !!(ap.programmeId && ap.completed);

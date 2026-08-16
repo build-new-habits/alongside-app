@@ -151,9 +151,109 @@ check('the finished chapter shows on My Programme',
   /Build Your Base/.test(el.textContent),
   'chaptersDone was already rendered — completion needed no new surface');
 
-// ── 8. What is NOT built ─────────────────────────────────────────────
-check('NOTE: the next-chapter offer is not built', true,
-  'this gate covers state and the reassessment trigger only');
+// ── 8. THE OFFER. Part two — on Home, reached by everyone. ───────────
+//
+// It existed before this, inside gym-programme.js, gated on
+// currentWeek >= 12 and reachable through ONE of thirteen session
+// views. So it is asserted HERE, on the surface everybody reaches,
+// rather than on the view that happened to have it.
+
+const { TodayView } = await import(B + 'views/today.js');
+
+function home(seedFn) {
+  seedFn();
+  const c = document.getElementById('c');
+  const navs = [];
+  TodayView({ navigate: v => navs.push(v) }).mount(c);
+  return { c, navs, text: c.textContent.replace(/\s+/g, ' ') };
+}
+
+const atHingeHome = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
+check('the hinge appears on HOME, not one session view in thirteen',
+  !!atHingeHome.c.querySelector('.today-hinge'));
+check('and it names the chapter that finished',
+  /That's Build Your Base done/.test(atHingeHome.text));
+check('and suggests the successor from the SHARED chain',
+  /Back to Strength would be my suggestion/.test(atHingeHome.text),
+  'programmes.js, not the deleted private map that said Feel Good Foundation');
+check('with all three ways out offered',
+  atHingeHome.c.querySelectorAll('[data-hinge]').length === 3);
+
+// It must not block. Somebody opened the app to move.
+// Presence alone is not enough: hiding the grid with an inline style
+// left this passing, because jsdom does not compute CSS and the nodes
+// are still there. Reversal testing caught it. Check they are present
+// AND visible AND actually clickable.
+const doorsGrid = atHingeHome.c.querySelector('.today-doors');
+const doorsHidden = !doorsGrid
+  || doorsGrid.hasAttribute('hidden')
+  || /display:\s*none|visibility:\s*hidden/.test(doorsGrid.getAttribute('style') || '');
+check('the doors still work underneath it',
+  atHingeHome.c.querySelectorAll('[data-door-id]').length > 0 && !doorsHidden,
+  'gym-programme blocked the session until an option was chosen');
+
+// No countdown and no verdict, at the moment most likely to produce one.
+for (const [re, what] of [
+  [/\d+%/,                'a percentage'],
+  [/\bcomplete[d]?\b.*\d/, 'a completion figure'],
+  [/well done|congratulations|smashed|crushed/i, 'a verdict'],
+  [/weeks remaining|weeks left/i, 'a countdown'],
+]) {
+  check(`the hinge shows no ${what}`, !re.test(atHingeHome.c.innerHTML));
+}
+
+// Answering it. Executed: click, then read the store and the re-render.
+// Guarded, so a missing card FAILS rather than throwing. A gate that
+// crashes is not a gate that failed — removing the card from Home
+// produced a TypeError here rather than a red assertion, which is the
+// difference between a gate reporting a fault and a gate falling over
+// next to one.
+const nextBtn = atHingeHome.c.querySelector('[data-hinge="next"]');
+check('there is a button to start the next chapter', !!nextBtn);
+const before = store.get('activeProgramme.programmeId');
+nextBtn?.click();
+check('choosing the next chapter starts it',
+  store.get('activeProgramme.programmeId') === 'back-to-strength' &&
+  store.get('activeProgramme.programmeId') !== before);
+check('and answers the hinge', PE.isHingePending() === false);
+check('and the new chapter starts at week one',
+  store.get('activeProgramme.currentWeek') === 1 &&
+  store.get('activeProgramme.totalSessions') === 0);
+check('while the arc keeps the finished chapter',
+  (store.get('programme.chaptersDone') || []).length === 1,
+  'a new chapter adds to the arc; it does not replace it');
+check('and the card is gone once answered',
+  !document.getElementById('c').querySelector('.today-hinge'));
+
+const repeatHome = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
+repeatHome.c.querySelector('[data-hinge="repeat"]')?.click();
+check('running it again restarts the same chapter',
+  store.get('activeProgramme.programmeId') === 'beginner-fitness' &&
+  store.get('activeProgramme.currentWeek') === 1 &&
+  PE.isHingePending() === false);
+
+const differentHome = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
+differentHome.c.querySelector('[data-hinge="different"]')?.click();
+check('something different routes somewhere to choose',
+  differentHome.navs.includes('goal-setup'));
+check('and leaves the hinge standing until they actually choose',
+  PE.isHingePending() === true,
+  'a hinge that can be dismissed leaves somebody between chapters with nothing to say so');
+
+// And nobody mid-chapter ever sees it.
+const midHome = home(() => { seed(70, 11); PE.advanceWeekIfNeeded(); });
+check('nobody mid-chapter sees a hinge',
+  !midHome.c.querySelector('.today-hinge'));
+
+// ── 9. One chain, not two ────────────────────────────────────────────
+check('gym-programme no longer carries its own chain map',
+  !/const PROGRESSIONS\s*=/.test(
+    (await import('node:fs')).readFileSync('js/views/gym-programme.js', 'utf8')),
+  'four of eight entries disagreed with programmes.js');
+check('and the shared successor matches what My Programme renders',
+  PE.chapterSuccessor('beginner-fitness')?.id === 'back-to-strength' &&
+  PE.chapterSuccessor('feel-good-foundation')?.id === 'ground' &&
+  PE.chapterSuccessor('build') === null);
 
 console.log(failures === 0 ? '\nALL PASS\n' : `\n${failures} FAILURE(S)\n`);
 process.exit(failures === 0 ? 0 : 1);
