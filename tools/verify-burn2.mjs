@@ -38,13 +38,24 @@ const ok = (c, m) => { if (!c) throw new Error(m); };
 const iso = d => new Date(Date.now() - d * 86400000).toISOString().split("T")[0];
 const hist = es => Object.fromEntries(es.map((e, i) => [iso(es.length - i), { energy: e, mood: e }]));
 
-const src = fs.readFileSync("js/views/coach-reflection.js", "utf8");
-
 console.log("\nTEST 1 - one definition, not three");
-check("coach-reflection defers to detectBurnout rather than defining its own", () => {
-  const fn = src.slice(src.indexOf("function isBurnoutRisk"), src.indexOf("function hasSeverePainToday"));
-  ok(/detectBurnout\(/.test(fn), "still has an independent definition");
-  ok(!/<= 3\).length >= 3/.test(fn), "old 3-of-4 rule still present");
+
+// BIAS-2, 16 Aug 2026. This asserted that coach-reflection.js deferred
+// to detectBurnout() instead of defining burnout itself. That file is
+// deleted, and the assertion is now stronger stated the other way:
+// NOTHING outside checkin.js may define burnout. A second definition is
+// what the original BURN-2 fix existed to prevent, and deleting the file
+// removed one candidate rather than the rule.
+const allSrc = fs.readdirSync("js/data").filter(f => f.endsWith(".js"))
+  .map(f => ["js/data/" + f, fs.readFileSync("js/data/" + f, "utf8")])
+  .concat(fs.readdirSync("js/views").filter(f => f.endsWith(".js"))
+    .map(f => ["js/views/" + f, fs.readFileSync("js/views/" + f, "utf8")]));
+check("only checkin.js defines burnout", () => {
+  const definers = allSrc
+    .filter(([f, s]) => /function detectBurnout/.test(s))
+    .map(([f]) => f);
+  ok(definers.length === 1 && definers[0] === "js/data/checkin.js",
+     "definitions in: " + definers.join(", "));
 });
 
 console.log("\nTEST 2 - the session never changes while the coach stays silent");
@@ -67,32 +78,35 @@ for (const [label, es] of SCENARIOS)
        `session changes (level ${level}) while the coach says nothing`);
   });
 
-console.log("\nTEST 3 - the message is graded, because the session is");
-check("'high' and 'moderate' do not say the same thing", () => {
-  const branch = src.slice(src.indexOf('if (burnoutRisk) {'), src.indexOf('if (burnoutRisk) {') + 1400);
-  ok(/level === "high"/.test(branch), "no high branch - a flat week and a fortnight of exhaustion read alike");
-  ok(/proposalBias: "rest"/.test(branch), "'high' should propose rest, matching the pool narrowing");
-  ok(/proposalBias: "lighter"/.test(branch), "'moderate' should still be lighter");
-});
-check("the high message does not overstate a moderate week", () => {
-  const branch = src.slice(src.indexOf('if (burnoutRisk) {'), src.indexOf('if (burnoutRisk) {') + 1400);
-  ok(/low for a while now, not just today/.test(branch), "high message missing");
+console.log("\nTEST 3 - the SESSION is still graded by burnout level");
+
+// BIAS-2, 16 Aug 2026. Tests 3 and 4 asserted the graded burnout COPY
+// -- "low for a while now, not just today" -- which lived in
+// coach-reflection.js. That view's route was retired on 04 Aug, so the
+// copy has been unreachable for twelve days, and the file is now
+// deleted. These assertions passed throughout by reading its source.
+//
+// The GRADING SURVIVES because it was never only copy: burnout.level
+// drives recoveryMode, pool selection and intensity in
+// workoutGenerator.js, and that is reachable. So the tests now assert
+// the thing a person actually experiences.
+//
+// WHAT IS GONE, recorded rather than quietly dropped: the graded
+// burnout MESSAGE. Nothing says "this has been low for a while now,
+// not just today" any more. It was already saying it to nobody, so
+// this is not a regression -- but it is a real gap and it is flagged
+// in the master schedule, not buried here.
+const genSrc = fs.readFileSync("js/data/workoutGenerator.js", "utf8");
+
+check("'high' narrows the pool, 'moderate' does not", () => {
+  ok(/burnout\.level === "high"/.test(genSrc),
+     "no high branch — a flat week and a fortnight of exhaustion would be served alike");
+  ok(/recoveryMode:\s*burnout\.level === "high"/.test(genSrc),
+     "recoveryMode should follow the high level");
 });
 
-console.log("\nTEST 4 - P4: it says what it noticed, without a verdict");
-check("no diagnosis or instruction in the burnout copy", () => {
-  const branch = src.slice(src.indexOf('if (burnoutRisk) {'), src.indexOf('if (burnoutRisk) {') + 1400);
-  // Only the lines[] arrays. `type: "burnout-risk"` is an internal
-  // identifier and tripped the first run of this check -- the same
-  // lesson verify-voice.mjs learned: identifiers are not copy.
-  const lines = [...branch.matchAll(/"([^"\\]{20,})"/g)].map(m => m[1]);
-  ok(lines.length >= 4, `expected the message lines, found ${lines.length}`);
-  for (const line of lines)
-    for (const w of ["burnout", "burnt out", "you should", "you must", "you need to rest", "overtraining"])
-      ok(!new RegExp(w, "i").test(line),
-         `"${w}" names or prescribes - the coach reports what it saw, it does not diagnose\n        in: ${line}`);
-  ok(/What do you need\?/.test(branch), "should hand the decision back");
+check("and the grading is read from ONE definition", () => {
+  ok(/checkinData\.detectBurnout\(/.test(genSrc),
+     "must defer to checkin.js's detectBurnout, not re-derive a level");
 });
 
-console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
-process.exit(fails === 0 ? 0 : 1);

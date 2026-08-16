@@ -145,6 +145,78 @@ export function resolveIntensity(baseIntensity, bias) {
  *
  * @returns {'lighter'|null}
  */
+/**
+ * BIAS-2, 16 Aug 2026. The coach's bias, DERIVED rather than stored.
+ *
+ * THE BUG THIS REPLACES. `proposalBias` was a stored field written by
+ * coach-reflection.js. That view's route was retired on 04 Aug as
+ * obsolete -- correctly -- and unreachable code cannot write, so the
+ * field silently stopped being written that day. Twelve days later
+ * workoutGenerator.js was still READING it and this file was still
+ * CLEARING it. A reader and a clearer with no writer.
+ *
+ * Three gates were green throughout, because all three asserted the
+ * behaviour by reading coach-reflection.js's SOURCE TEXT. The logic was
+ * in the file, so they passed. None asked whether anybody could reach
+ * it.
+ *
+ * WHY DERIVED AND NOT RESTORED. Restoring a writer somewhere reachable
+ * would have fixed today's symptom and kept the shape that caused it: a
+ * value that is correct only while somebody remembers to write it. A
+ * derived value cannot have a missing writer. It is the same reasoning
+ * that put the difficulty ceiling on one field with one meaning rather
+ * than a fourth level field beside three others.
+ *
+ * WHAT IT NO LONGER CARRIES, because each now has a live owner of its
+ * own -- and duplicating them here would be two engines for one
+ * decision, which is the fault this codebase keeps finding:
+ *
+ *   severe pain        -> SEVERE-1's Gentle Care bypass, which is a
+ *                         stronger answer than an intensity nudge
+ *   burnout            -> detectBurnout(), read directly by
+ *                         workoutGenerator and driving recoveryMode
+ *   returning after a  -> getReEntryIntensity(), wired through
+ *   break                 coach-proposal.js
+ *
+ * So one trigger is left, and it is the only one that had no other
+ * owner: several days in a row.
+ *
+ * @returns {'lighter'|null}
+ */
+export function coachBias() {
+  // Three is coach-reflection.js's original threshold, kept rather than
+  // re-chosen. Changing a number while moving code is how a move
+  // becomes a silent behaviour change.
+  return consecutiveActiveDays() >= 3 ? 'lighter' : null;
+}
+
+/**
+ * Days in a row, counting BACK from yesterday.
+ *
+ * Lifted from coach-reflection.js unchanged, because it was the only
+ * definition and it was about to be deleted with the file. Today is
+ * deliberately excluded: somebody who has already moved today has not
+ * yet made it a longer run, and counting it would soften the very
+ * session they are about to do.
+ */
+export function consecutiveActiveDays() {
+  const log = store.get('activityLog') || [];
+  const today = new Date().toISOString().split('T')[0];
+  const activeDates = new Set(log.filter(e => e.date && e.date < today).map(e => e.date));
+  let count = 0;
+  const cursor = new Date();
+  cursor.setDate(cursor.getDate() - 1);
+  // Bounded. An unbounded while-loop over a Set that could be seeded
+  // with odd data is a hang, not a bug report.
+  for (let i = 0; i < 400; i++) {
+    const dateStr = cursor.toISOString().split('T')[0];
+    if (!activeDates.has(dateStr)) break;
+    count++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return count;
+}
+
 export function coldStartBias() {
   const history = store.get('checkinHistory') || {};
   // Three is detectBurnout()'s own threshold. Kept identical on purpose:
@@ -198,7 +270,9 @@ export function saveCheckin(data) {
   // any session route and coach-reflection runs after it, so a real bias
   // for today is rewritten moments later and a stale one never survives
   // into a new day. checkin.js:866 is the only caller, once per day.
-  store.set('proposalBias', null);
+  // BIAS-2. The proposalBias clear is GONE. There is nothing to clear:
+  // the bias is derived at read time by coachBias(), so it cannot go
+  // stale and cannot survive into a new day.
 
   // Write to checkinHistory (keyed by ISO date)
   const history = store.get('checkinHistory') || {};

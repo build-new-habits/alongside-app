@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Aug 2026 v371
+ * BIAS-2. checkin.js v5, workoutGenerator.js, router.js. proposalBias is
+ * retired: it had a reader and a clearer and no writer since 04 Aug. The
+ * bias is now DERIVED at read time by coachBias(), so it cannot have a
+ * missing writer. coach-reflection.js deleted and unprecached.
+ *
  * 16 Aug 2026 v370
  * SEVERE-1. session-builder.js v36. The Gentle Care bypass now EXISTS.
  * workoutGenerator v1.3's changelog has claimed it since August; it was
@@ -2575,7 +2581,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v370";
+const CACHE_NAME = "alongside-v371";
 
 const SHELL_URLS = [
 
@@ -2656,7 +2662,6 @@ const SHELL_URLS = [
   "/alongside-app/js/views/checkin-mini.js",
   "/alongside-app/js/views/intention.js",
   "/alongside-app/js/views/coach-proposal.js",
-  "/alongside-app/js/views/coach-reflection.js",
   "/alongside-app/js/views/workout.js",
   "/alongside-app/js/views/workout-complete.js",
   "/alongside-app/js/views/progress.js",
