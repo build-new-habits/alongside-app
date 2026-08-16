@@ -1,5 +1,9 @@
 /*
  * css/layouts/progress.css
+ * 16 Aug 2026 v4
+ *   COUNTDOWN-1. .progress-programme__bar and __fill deleted with the
+ *   markup they styled.
+ *
  * 11 Aug 2026 v3
  *
  * v3 — WOW-4. Styles for .progress-tab--locked (the 90-day view on the
@@ -182,25 +186,11 @@
   gap: var(--space-2);
 }
 
-.progress-programme__bar {
-  height: 8px;
-  background: var(--color-bg-elevated);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-}
-
-.progress-programme__fill {
-  height: 100%;
-  background: var(--color-primary);
-  border-radius: var(--radius-full);
-  transition: width 0.3s ease;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .progress-programme__fill {
-    transition: none;
-  }
-}
+/* COUNTDOWN-1, 16 Aug 2026. .progress-programme__bar and __fill removed
+   with the markup they styled. A bar cannot obey "show progress made,
+   never distance remaining", because a bar IS the remaining distance.
+   Deleted rather than left orphaned: dead styles are how a removed
+   feature comes back. */
 
 .progress-programme__label {
   font-size: var(--text-sm);
