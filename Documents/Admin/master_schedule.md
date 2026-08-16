@@ -125,6 +125,26 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > #### 🔵 Next
 >
+> ### 🟢 SHIPPED 16 Aug — ASSESS-1 step 3. `alongside-v365`, 55 gates green, 60 checks green.
+>
+> **The read stops being a one-off.** Steps 1–2 moved the difficulty ceiling once, at the first session, and then never again — so somebody four months stronger was still served against a day-one read. The same three questions are now offered again **twelve weeks** after the last one, in a reassessment voice.
+>
+> **Triggered on TIME, not the chapter boundary alone.** The blueprint puts reassessment at the hinge, but programmes are Personal and the chapter-completion signal is written by CHAP-1 step 3, which does not exist. Gating on it would have built a feature **no free user could reach, through code that is not written** — the 15 Aug fault with a plan attached. `chapterEnded` is an argument the hinge will pass when it lands; time is what makes it reachable today. Time rather than session count, because somebody training once a week would wait most of a year, and they are exactly the person whose day-one read fits worst.
+>
+> **A decline lapses after four weeks** rather than being permanent as it correctly is for the baseline. Somebody who skipped once in March was mid-session and did not fancy it — they did not opt out forever.
+>
+> **Two constants, both one-line changes, neither scientific:** `REASSESS_AFTER_WEEKS = 12` (matches a chapter, so programme and non-programme users get the same rhythm) and `QUIET_AFTER_DECLINE_WEEKS = 4`.
+>
+> **`recordBaseline` → `recordAssessmentAnswers`.** The old name stopped being true, and a name that says "first time only" eventually gets read as a guarantee.
+>
+> **Gate: `verify-assess3.mjs`, 26 assertions, 14 reversal tests.** It drives `renderSessionMoments()` and then the real DOM — renders, taps the chips, presses Done, reads what the coach says back. **That last part was added because reversal testing found two holes all 22 earlier assertions missed**, both because nothing exercised the save handler: swapping the reassessment acknowledgement for the baseline one, and dropping `offerKind` from the reset. Rendering is half the path; the other half is what happens when somebody presses the button.
+>
+> **One correction on record:** my reset comment claimed it prevented a stale voice reaching a new mount. Reversal testing showed `offerKind` is reassigned on every render, so removing the reset changed nothing and failed nothing. Kept for consistency, relabelled as not load-bearing — a comment claiming a guard is load-bearing when it is not is the same false confidence as a gate that tests nothing.
+>
+> **🔵 CHAP-1 step 3, the hinge, is now UNBLOCKED.** So is PROG-1, which had stalled on the same dependency twice.
+>
+> **Superseded:** the note below choosing this as the next build.
+>
 > **Chosen 16 Aug, Graeme delegating the call: ASSESS-1 step 3.** It is the only item that unblocks something rather than adding to the pile — the hinge (CHAP-1 step 3) cannot be built without it, and PROG-1 cannot be retried without it either. Both have now stalled on it twice. The rehab door is blocked on a person, the device check is parked, and Destinations is a blueprint rather than a build; ASSESS-1 step 3 is the one thing that is neither blocked nor optional.
 >
 > **CHAP-1 step 3, the hinge mechanic — blocked on ASSESS-1 step 3**, which is not built. Steps 4 (weekly focus), 5 (Blocks, offered at the first hinge) and 6 (event goals) follow. The Blocks *vocabulary* is already live and gated in the view; step 5 is the offer mechanic, not the display.
