@@ -1,6 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v361
+ * CHAP-1 step 1. store.js v52 — programme.presentation and weekFocus.
+ *
  * 15 Aug 2026 v360
  * SHARED-1. The end-of-session moments move to data/session-moments.js
  * (new, precached above), rendered by reflect.js which every session
@@ -2478,7 +2481,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v360";
+const CACHE_NAME = "alongside-v361";
 
 const SHELL_URLS = [
 
