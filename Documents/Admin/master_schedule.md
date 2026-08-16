@@ -125,6 +125,31 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > #### 🔵 Next
 >
+> ### 🔴 CHAP-1 step 4 — BUILT, MEASURED, AND REVERTED. Nothing shipped. Live state stays `alongside-v368`.
+>
+> **The weekly focus was built in full and then backed out, because the measurement showed it did not do what the coach would have said it did.**
+>
+> Built: `week-focus.js` (propose from the last read's hardest movement, edit, decline), the "This week" section and picker in My Programme, Home proposing on mount, and a selection tilt in `session-builder.js`.
+>
+> **Why it was reverted.** §6 says the focus describes *what the coach will lean into*. A coach saying *"I'm leaning towards the hinging this week"* while sessions are unchanged is the product making a claim it does not honour — worse than saying nothing. So the tilt had to be real, and it was measured rather than assumed:
+>
+> | | focus-pattern movements in the main section, 40 builds |
+> |---|---|
+> | Focus set to hinging | **39** |
+> | No focus at all | **40** |
+>
+> **No effect.** Instrumenting it showed the tilt was *reached* 60 times and *applied* 12 times across 12 builds — so it fired, and firing changed nothing.
+>
+> **The architectural reason, which is the useful part.** `pickFrom()` receives a pool **already filtered to one category** (`hip-hinge`, `squat`, and so on). Within that pool, filtering by `movementPattern` is close to a no-op, because the category has already determined the pattern. **The tilt has to act at category selection, not inside a category** — a different and larger change than the one-line preference the intent tilt models.
+>
+> Had I trusted "applied 12 times" as success, this would have shipped as a working feature. It is the day's recurring fault in its purest form: *a number is not executed evidence until you know what produced it.*
+>
+> #### 🟠 Needs Graeme before step 4 is rebuilt
+>
+> **Is a display-only weekly focus worth having?** If the tilt is deferred, the focus can still be proposed, shown and edited — but the coach's line must not claim to lean into anything, because it would not be. That is a product and voice decision, not an implementation one.
+>
+> Two other things caught while building it, both real and both now reverted with the rest: a `ReferenceError` from calling `_cap()` in `my-programme.js`, which exists in `today.js` and never existed there — **invisible to every assertion that only rendered the view, and caught only by clicking the picker open** (same class as DECL-1). And a fixture that tilted toward `push` inside a glute session, found fewer than two candidates, correctly did not apply, and failed an assertion while the code behaved exactly as designed.
+>
 > ### 🟢 SHIPPED 16 Aug — CHAP-1 step 3, PART TWO. THE HINGE IS COMPLETE. `alongside-v368`, 62 checks green.
 >
 > **The offer moved to Home.** It already existed inside `gym-programme.js`, gated on `currentWeek >= 12` — reachable through **one of thirteen session views**. Anybody who finished a chapter having trained by another route was never asked what came next; the chapter simply carried on being their chapter. Same shape as the fault SHARED-1 fixed, which is why this was a **move, not a new feature**.
