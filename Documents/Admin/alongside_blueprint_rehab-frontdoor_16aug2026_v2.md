@@ -186,7 +186,13 @@ That is the sentence that settles it. The screen runs **before chain entry**, th
 2. Progressive muscle weakness, numbness, or loss of coordination.
 3. Unexplained systemic symptoms — fever, unexplained weight loss, or unrelenting night pain unaffected by movement.
 
-**Outcome on any yes: a hard stop.** Reviewer's wording, to be used close to verbatim:
+**SUPERSEDED 16 Aug — see the two-level design below.** The single universal hard stop described in this section was replaced: sending somebody with unexplained weight loss the same instruction as somebody with new saddle anaesthesia is exactly the false-positive problem this document flags elsewhere and then commits.
+
+**LOCKED DESIGN: two levels, permanently.** Question 1 (bladder, bowel, saddle) → A&E now, 999 if they cannot get there safely. Everything else, and every "I'm not sure" → stop exercising, call NHS 111. Both messages carry an unconditional emergency line so the urgent route is always visible without anybody having to grade their own symptoms into it.
+
+Three levels were considered and rejected: the split turns on "rapidly" versus "gradually" worsening neurological symptoms, which asks the user to perform the triage. NHS 111 is the human triage layer, already staffed, already designed for exactly this uncertainty.
+
+The original single-message wording, retained for reference:
 
 > *"Your symptoms require an in-person medical evaluation before starting any movement program. Please contact your GP, call NHS 111, or attend A&E immediately."*
 

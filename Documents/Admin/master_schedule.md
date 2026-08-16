@@ -60,6 +60,35 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > **Named risk: this is now the fourth unfilled clinical/safeguarding role.** Three safeguarding reviewer roles have been open since early July with no movement, and the rehab physiotherapist does not exist either. "Review before public launch" is a plan that depends on somebody who has not been approached. **January is the launch and the beta starts mid-September.**
 >
+> ### 🟢 LOCKED — red-flag escalation: TWO levels, permanently
+>
+> Graeme, 16 Aug: *"Two levels for always. That seems more simple and more legally sound."* Not a beta-only simplification — the standing design.
+>
+> | Level | Trigger | Message |
+> |---|---|---|
+> | **EMERGENCY** | Question 1 only — bladder, bowel or saddle sensory change | Stop. A&E now; 999 if you cannot get there safely |
+> | **STOP AND SEEK ADVICE** | Any other yes, and every "I'm not sure" | Stop exercising, call NHS 111 before continuing |
+>
+> **Plus an unconditional line in BOTH messages**, so the emergency route is always visible without anybody having to classify themselves into it: *"If you have new bladder or bowel problems, numbness around your genitals or anus, or weakness that is getting worse quickly — get emergency help now."*
+>
+> **Why two and not three.** A three-level design splits neurological symptoms into "rapidly" vs "gradually" worsening, which hands a clinical judgement to a frightened person on a phone — and the source document itself notes that people do not *see* neurological deterioration, they experience it. Two levels ask nobody to self-triage, and **NHS 111 is the human triage layer we would otherwise be inventing**. Upgrading to three later is a config change, not a rebuild.
+>
+> **Principle to carry into the spec verbatim:** *a red-flag screen is a safety-netting tool, not a diagnostic assessment.* It is also the framing that keeps the product the safe side of the MHRA software-as-medical-device line: monitoring general fitness and wellbeing is not usually a medical purpose, and software offering only lifestyle or referral advice is unlikely to be classified as a device — whereas software that *screens users for potential conditions* is more likely to be. **The wording is doing regulatory work, not just clinical work.**
+>
+> ### 🅿️ FALLBACK, recorded and not expected — narrow the health data
+>
+> Graeme, 16 Aug: *"Make this a fall back, but I don't expect to use it."* Recorded so it is a decision rather than a December scramble.
+>
+> **If no clinician is secured before public launch:** do not ship the red-flag screen, drop the conditions system back to preferences, and be a fitness app that adapts to energy and mood rather than to conditions. Smaller product, defensible without clinical governance.
+>
+> **The principle behind it:** risk is reduced by adding clinical governance **or** by reducing clinical claims. Two levers, not one. Ship a smaller honest product rather than a larger unverified one.
+>
+> ### 📄 THE PACK — one document, supersedes three
+>
+> `Documents/Admin/alongside_clinical_review_pack_16aug2026_v1.docx`. Replaces the rehab front door pack, the ME/CFS follow-up and the red-flag review, which had begun to overtake each other. Six pages: the two-level design, four draft questions, seven implementation questions, the three unhandled conditions, and the 95-exercise audit template including **selection logic, not just the exercises**.
+>
+> **It opens by stating that no physiotherapist has reviewed this product and that the earlier review was AI**, so a clinician cannot mistakenly assume a colleague vetted it. Non-negotiable — remove that and the pack becomes misleading by omission.
+>
 > - **Red-flag screen** — 🔴 **CONFIRMED FOR BEFORE BETA by Graeme, 16 Aug.** Review pack issued: `alongside_redflag_screen_review_16aug2026_v1.docx`. Draft wording for the three items written for the physio to **rewrite rather than approve**, plus seven implementation questions — false-positive tolerance, firing cadence, whether everyone or only pain-declarers is screened, what exactly stops, whether a self-cleared flag is acceptable, and Graeme's observed-improvement redirect. **Nothing ships in wording the reviewer has not seen.**
 > - **Rehab front door** — 🔵 **SCOPE CUT 16 Aug: a landing, not a door.** Build the red-flag screen + hard stop, a duration question with the six-week redirect, and MIN-2 for the three systemic conditions — all bolted onto the existing conditions flow. **Defer** the named front door, chain entry routing, post-surgical path and the upper limb. Reasoning: ~43% of UK adults have chronic pain (defined at 3 months) against a 6-week redirect threshold, so most arrivals get signposted rather than programmed; and the app already adapts to pain, so four of the door's five parts are safety and signposting rather than capability. Decisive factor was maintenance — a clinical-review dependency is a poor fit for a founder moving to the next product after launch. **Graeme's refinement to carry into phase 2: redirect on OBSERVED lack of improvement (the app already holds daily pain scores) rather than self-reported duration.** 🟢 **95-exercise clinical content audit confirmed — goes ahead regardless of the door.**
 > - **Rehab front door blueprint** — 🟢 **v2, 16 Aug, physio review received and folded in.** `alongside_blueprint_rehab-frontdoor_16aug2026_v2.md`. **Q1 reversed: the refusal to red-flag screen was "indefensible"** — a three-item screen with a hard stop now runs before chain entry. Redirect threshold 12 weeks → **6, unified**. Chain programming constrained to isometric/closed-chain/mid-range. Post-surgical inside 6 months routes out entirely. **Upper limb does not open.** Buildable once the three pre-beta conditions are met.: `Documents/Admin/alongside_blueprint_rehab-frontdoor_16aug2026_v1.md`, marked NOT FOR BUILD. A physiotherapist review pack was produced alongside it for Graeme to send out. **Ten questions are the blocker**, Q1 above all: the design deliberately does no red-flag screening, and that refusal is the thing most likely to be wrong. Nothing ships until answers come back and the blueprint goes to v2.
