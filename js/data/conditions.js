@@ -1,6 +1,21 @@
 /**
  * conditions.js — Condition definitions for onboarding and check-in
  *
+ * 16 Aug 2026 v1.5
+ *   HYPER-1. Physiotherapist review, 16 Aug: hypermobility/EDS must
+ *   strictly avoid end-range passive stretching. getExerciseSafetyTier()
+ *   now returns 'avoid' for stretch-pattern exercises when hypermobility
+ *   is declared.
+ *
+ *   Closes a real gap rather than adding a nicety: hypermobility
+ *   appeared in the avoid/caution lists of ZERO of 551 exercises, so
+ *   every exercise returned 'safe' for it. The condition was collected,
+ *   it triggered the clearance question, and then it changed nothing.
+ *   chronic-fatigue, fibromyalgia and osteoporosis are in the same state
+ *   and are deliberately NOT fixed here — the reviewer gave specific
+ *   guidance for hypermobility only. See the rehab front door blueprint
+ *   §10.
+ *
  * 04 Aug 2026 v1.4
  *   Pain Input Redesign, same day as v1.3's threshold fix. New
  *   getPainBand(score) — the one canonical source of pain-severity
@@ -241,6 +256,39 @@ export function getActiveConditionIds(conditionIds = [], painScores = {}) {
  */
 export function getExerciseSafetyTier(exercise, activeConditions) {
   if (!activeConditions || activeConditions.length === 0) return 'safe';
+
+  // ── HYPER-1, 16 Aug 2026. Physiotherapist review, verbatim: ──────
+  //
+  //   "Hypermobility/EDS: Focus on active control, proprioception, and
+  //    closed-chain stability, strictly avoiding end-range passive
+  //    stretching."
+  //
+  // Implemented as a RULE rather than as a tag on individual entries,
+  // for two reasons. One entry-by-entry pass would be thirty separate
+  // clinical claims made by me; this is one claim, made by the
+  // reviewer, applied consistently. And a rule cannot drift as the
+  // library grows -- a stretch added next month is covered on the day
+  // it is added, where a hand-tagged list silently stops being true.
+  //
+  // WHY THIS EXISTED AS A GAP AT ALL. Before today, `hypermobility`
+  // appeared in the avoid/caution list of exactly ZERO of the 551
+  // exercises, so every exercise in the library returned 'safe' for it.
+  // The condition was collected at onboarding, it triggered the
+  // exercise-clearance question, and then it changed nothing. Same for
+  // chronic-fatigue, fibromyalgia and osteoporosis -- see the rehab
+  // front door blueprint §10; those three are NOT fixed here, because
+  // the reviewer gave specific guidance only for this one and inventing
+  // the rest would be worse than leaving them open.
+  //
+  // THE PROXY, STATED HONESTLY. `movementPattern: 'stretch'` is not the
+  // same claim as "end-range passive stretching" -- some stretches are
+  // mid-range. It is the closest thing the data can express today, and
+  // it errs toward excluding a safe exercise rather than serving an
+  // unsafe one, which is the right direction for the error. Sharpening
+  // it needs a field the library does not have.
+  if (activeConditions.includes('hypermobility') && exercise.movementPattern === 'stretch') {
+    return 'avoid';
+  }
 
   const avoid   = exercise.avoid   || exercise.contraindications || [];
   const caution = exercise.caution || [];

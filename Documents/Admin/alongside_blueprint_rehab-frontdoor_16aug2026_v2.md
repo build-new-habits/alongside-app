@@ -239,9 +239,22 @@ For ME/CFS specifically, the reviewer's verdict makes this more than a gap. The 
 
 1. **Decouple ME/CFS entirely** — a pacing model with an energy envelope, not progressive rehab. Correct, and the largest build.
 2. **Honest exclusion for now** — at onboarding, say plainly that the app is not built for ME/CFS yet and why. Small, shippable, and better than silent inaction.
-3. **Populate `avoid`/`caution` for the other three** (fibromyalgia, hypermobility, osteoporosis) with the reviewer's guidance: hypermobility → no end-range passive stretching, closed-chain only; osteoporosis → no loaded spinal flexion.
+3. **Populate `avoid`/`caution` where there is clinical backing — and ONLY there.**
 
-**My recommendation: 2 and 3 before beta, 1 as its own stream.** Option 2 is not a cop-out — telling somebody the truth about what a product cannot do for them is the same principle as the redirect, applied to ourselves.
+   | Condition | What the reviewer actually said | Buildable now? |
+   |---|---|---|
+   | `hypermobility` / EDS | Active control, proprioception, closed-chain stability. **Strictly avoid end-range passive stretching.** | **Yes** — specific and actionable |
+   | `chronic-fatigue` / ME-CFS | Never route through a load/pain adaptation model; needs pacing, HR ceilings, energy envelopes | **No** — needs its own model, not a filter |
+   | `fibromyalgia` | **Nothing.** Named in the question, not addressed in the answer | **No — goes back to the reviewer** |
+   | `osteoporosis` | **Nothing.** Not raised in the review at all | **No — goes back to the reviewer** |
+
+   > **⚠️ CORRECTION, 16 Aug, same session.** An earlier draft of this line read *"with the reviewer's guidance: hypermobility → no end-range passive stretching, closed-chain only; osteoporosis → no loaded spinal flexion."* **The osteoporosis clause was mine, not the reviewer's.** It is plausible, it may well be correct, and none of that matters: it was written into a clinical-safety document as the stated view of a named professional who never said it.
+   >
+   > That is the worst instance of this week's recurring fault. Elsewhere it produced a wrong number in a schedule. Here it would have produced **invented clinical guidance carrying a physiotherapist's authority** — and it would have been indistinguishable from the real answers around it, because I had formatted it identically to them.
+   >
+   > **Standing rule: clinical content is quoted or attributed, never inferred, never extended, and never smoothed into a list of things somebody actually said. Where a reviewer was silent, the document says they were silent.**
+
+**My recommendation: 2 and 3 before beta, 1 as its own stream — noting that 3 now covers hypermobility only.** Fibromyalgia and osteoporosis go back to the reviewer as a short follow-up, because the honest position is that we asked and did not get an answer. Option 2 is not a cop-out — telling somebody the truth about what a product cannot do for them is the same principle as the redirect, applied to ourselves.
 
 ---
 
