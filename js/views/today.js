@@ -1,5 +1,13 @@
 /**
  * today.js
+ * 16 Aug 2026 v20
+ *   CHAP-1 step 3 part two. The hinge moves to Home. An end-of-chapter
+ *   offer already existed inside gym-programme.js, reachable through one
+ *   of thirteen session views, so anybody finishing a chapter by another
+ *   route was never asked what came next. It does not block the doors:
+ *   somebody who opened the app to move for twenty minutes should be
+ *   able to.
+ *
  * 16 Aug 2026 v19
  *
  * v19 - CHAP-1 step 2. Two changes, both Graeme's, agreed 15 Aug.
@@ -271,7 +279,8 @@
 import { store }               from '../store.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
-import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
+import { advanceWeekIfNeeded, isHingePending, chapterSuccessor, startChapter }
+  from '../data/programmeEngine.js';
 import { getProgramme }        from '../data/programmes.js';
 
 export function TodayView(router) {
@@ -548,6 +557,8 @@ export function TodayView(router) {
           </div>
         ` : ''}
 
+        ${_hingeCard()}
+
         <button class="today-programme-row"
                 data-route="my-programme"
                 data-requires-checkin="false"
@@ -646,6 +657,26 @@ export function TodayView(router) {
       'checkin':      () => router.navigate('checkin'),
       'checkin-mini': () => router.navigate('checkin-mini'),
     };
+
+    // CHAP-1 step 3. Answering the hinge. Every path either starts a
+    // chapter or sends them somewhere to choose one -- none of them
+    // just closes the card, because a hinge that can be dismissed
+    // leaves somebody between chapters with nothing to tell them so.
+    container.querySelectorAll('[data-hinge]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const ap = store.get('activeProgramme') || {};
+        const choice = btn.dataset.hinge;
+        if (choice === 'repeat') {
+          startChapter(ap.programmeId, { keepHistory: true });
+          renderHome(container);
+        } else if (choice === 'next') {
+          const next = chapterSuccessor(ap.programmeId);
+          if (next && startChapter(next.id)) renderHome(container);
+        } else {
+          router.navigate('goal-setup');
+        }
+      });
+    });
 
     container.querySelectorAll('[data-action]').forEach(btn => {
       const action = btn.dataset.action;
@@ -793,6 +824,61 @@ export function TodayView(router) {
     }
 
     return null;
+  }
+
+  /**
+   * CHAP-1 step 3 part two. The hinge, on Home.
+   *
+   * WHY HERE. An end-of-chapter offer already existed, inside
+   * gym-programme.js, gated on currentWeek >= 12 -- reachable through
+   * ONE of thirteen session views. So a person who finished a chapter
+   * having trained through any other route was never asked what came
+   * next; the chapter simply carried on being their chapter. Same shape
+   * as the fault SHARED-1 fixed for the end-of-session moments, and the
+   * reason this is a MOVE rather than a new feature.
+   *
+   * Home is the honest place for it. It is the one surface everybody
+   * reaches, and "what happens next" is a decision to take with a clear
+   * head rather than a card at the end of a workout.
+   *
+   * IT DOES NOT BLOCK. The doors are still underneath it and still
+   * work. gym-programme's version returns early and blocks the session
+   * until an option is chosen, which is the wrong trade for somebody
+   * who opened the app to move for twenty minutes. An unanswered
+   * question stays until it is answered -- there is no dismiss, because
+   * dismissing would leave somebody permanently between chapters with
+   * nothing to say so.
+   */
+  function _hingeCard() {
+    if (!isHingePending()) return '';
+
+    const ap   = store.get('activeProgramme') || {};
+    const done = getProgramme(ap.programmeId);
+    const next = chapterSuccessor(ap.programmeId);
+
+    // No countdown, no score, no "you completed 100%". It states the
+    // fact and asks the question -- COUNTDOWN-1's rule applies here
+    // most of all, because this is the moment a chapter could most
+    // easily be made to read as an exam result.
+    return `
+      <section class="today-hinge" aria-label="Your chapter is complete">
+        <h2 class="today-hinge__heading">That's ${_esc(done?.name || "your chapter")} done.</h2>
+        <p class="today-hinge__body">
+          ${_esc(next
+            ? `Nothing has to change today. When you're ready, ${next.name} would be my suggestion — or run this one again, or go somewhere different entirely.`
+            : "Nothing has to change today. When you're ready, you can run this one again or pick something different.")}
+        </p>
+        <div class="today-hinge__actions">
+          ${next ? `
+            <button class="btn btn-primary btn-small" data-hinge="next"
+                    aria-label="Start ${_esc(next.name)}">Start ${_esc(next.name)}</button>` : ''}
+          <button class="btn btn-ghost btn-small" data-hinge="repeat"
+                  aria-label="Run ${_esc(done?.name || "this chapter")} again">Run it again</button>
+          <button class="btn btn-ghost btn-small" data-hinge="different"
+                  aria-label="Choose something different">Something different</button>
+        </div>
+      </section>
+    `;
   }
 
   function _programmeHint() {

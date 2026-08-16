@@ -1,5 +1,13 @@
 /**
  * gym-programme.js
+ * 16 Aug 2026 v6
+ *   CHAP-1 step 3. The private PROGRESSIONS map is deleted — it
+ *   disagreed with programmes.js on four of eight chapters, so this
+ *   screen could offer a different next chapter from the one My
+ *   Programme had just named. And the fifteen-line programme reset,
+ *   which existed twice inline here, is now startChapter() in the
+ *   engine. Both are one definition now.
+ *
  * 13 Aug 2026 v5
  *
  * v5 - TIER-C. The twelve-week programme engine had NO tier check
@@ -258,6 +266,8 @@ import { bodyCaution } from "../data/session-rationale.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from '../session-log.js';
 import { getProgramme }             from '../data/programmes.js';
 import {
+  chapterSuccessor,
+  startChapter,
   getProgressStats,
   recordSession,
   markMidProgrammeGlanceShown,
@@ -551,25 +561,14 @@ export function GymProgrammeView(router) {
     return options;
   }
 
-  function _suggestNextProgramme(programme, stats) {
-    if (!programme) return null;
-
-    // Natural progression map
-    const PROGRESSIONS = {
-      'beginner-fitness':    'feel-good-foundation',
-      'feel-good-foundation': 'build',
-      'couch-to-cardio':     'move-more',
-      'back-to-strength':    'build',
-      'open':                'ground',
-      'ground':              'build',
-      'move-more':           'build',
-      'build':               null,    // highest in strength track — coach decides
-    };
-
-    const nextId = PROGRESSIONS[programme.id];
-    if (!nextId) return null;
-
-    return getProgramme(nextId);
+  // CHAP-1 step 3. The private PROGRESSIONS map is GONE.
+  //
+  // It disagreed with programmes.js on four of eight chapters, so this
+  // screen could offer a different next chapter from the one My
+  // Programme had just named. One definition now, in programmeEngine,
+  // reading the nextProgrammeId field CHAIN-1 already established.
+  function _suggestNextProgramme(programme) {
+    return chapterSuccessor(programme?.id);
   }
 
   // ── End option handler ─────────────────────────────────────────────────────
@@ -578,18 +577,7 @@ export function GymProgrammeView(router) {
     switch (optionId) {
 
       case 'repeat': {
-        // Reset programme to week 1, keep history
-        store.set('activeProgramme.currentWeek',      1);
-        store.set('activeProgramme.currentPhase',     'build');
-        store.set('activeProgramme.sessionsThisWeek', 0);
-        store.set('activeProgramme.totalSessions',    0);
-        store.set('activeProgramme.milestones',       []);
-        store.set('activeProgramme.startDate',        new Date().toISOString());
-        store.set('activeProgramme.completed',        false);
-        store.set('activeProgramme.completedAt',      null);
-        store.set('activeProgramme.midProgrammeGlanceShown',  false);
-        store.set('activeProgramme.programmeReflectionShown', false);
-        store.set('activeProgramme.missedSessions',   []);
+        startChapter(stats.programmeId, { keepHistory: true });
         router.navigate('today');
         break;
       }
@@ -600,26 +588,9 @@ export function GymProgrammeView(router) {
         const options   = _buildEndOptions(programme, stats);
         const progOpt   = options.find(o => o.id === 'progress');
 
-        if (progOpt?.nextProgrammeId) {
-          // Start the next programme directly
-          const next = getProgramme(progOpt.nextProgrammeId);
-          if (next) {
-            store.set('activeProgramme.programmeId',   next.id);
-            store.set('activeProgramme.programmeName', next.name);
-            store.set('activeProgramme.startDate',     new Date().toISOString());
-            store.set('activeProgramme.currentWeek',   1);
-            store.set('activeProgramme.currentPhase',  'build');
-            store.set('activeProgramme.sessionsThisWeek', 0);
-            store.set('activeProgramme.totalSessions',    0);
-            store.set('activeProgramme.milestones',       []);
-            store.set('activeProgramme.completed',        false);
-            store.set('activeProgramme.completedAt',      null);
-            store.set('activeProgramme.midProgrammeGlanceShown',  false);
-            store.set('activeProgramme.programmeReflectionShown', false);
-            store.set('activeProgramme.missedSessions',   []);
-            router.navigate('today');
-            break;
-          }
+        if (progOpt?.nextProgrammeId && startChapter(progOpt.nextProgrammeId)) {
+          router.navigate('today');
+          break;
         }
         // No specific successor — go to goal-setup
         router.navigate('goal-setup');
