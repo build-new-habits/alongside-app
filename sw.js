@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Aug 2026 v363
+ * CHAP-1 step 2, TIER. my-programme.js v2. Graeme's decision: My
+ * Programme is Personal, but a free user's own goals, sessions and read
+ * are facts they own rather than features, so the screen shows
+ * everything the person actually has and adds ONE locked preview of
+ * what Personal adds. Gated on data first, then tier. No new files, so
+ * the precache list is unchanged -- this bump exists so the changed
+ * module actually reaches a device.
+ *
  * 16 Aug 2026 v362
  * CHAP-1 step 2. My Programme — the "where am I going?" screen. New
  * js/views/my-programme.js and css/layouts/my-programme.css, both
@@ -2494,7 +2503,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v362";
+const CACHE_NAME = "alongside-v363";
 
 const SHELL_URLS = [
 
