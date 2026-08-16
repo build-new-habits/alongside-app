@@ -1,6 +1,10 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 16 Aug 2026 v36
+ *   SEVERE-1. The Gentle Care bypass, on both entry points. Rollback is
+ *   one constant: SEVERE_BYPASS_ENABLED.
+ *
  * 15 Aug 2026 v35
  *
  * v35 - PROG-1 attempted, reverted, and MY CONCLUSION ABOUT IT
@@ -550,6 +554,7 @@ import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 import { EXERCISES, isSessionLength } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
 import { buildRationale } from "./data/session-rationale.js";
+import { getZoneStatus } from "./data/conditions.js";
 
 // ── Allocation presets (05 Aug 2026) ──────────────────────────────────────────
 // Scales EXERCISE_COUNT's warmup/main/cooldown split. Warmup always floors at
@@ -1595,7 +1600,16 @@ export function buildCandidatePools({ sessionType, durationMins, equipmentOverri
  * exercise is added automatically — the safety rule (never skip a
  * warmup) holds even in "build your own" mode, it isn't optional.
  */
-export function buildSessionFromSelection({ sessionType, durationMins, selectedIds, equipmentOverride }) {
+export function buildSessionFromSelection({ sessionType, durationMins, selectedIds, equipmentOverride, ignoreSevere }) {
+  // SEVERE-1. The self-directed route gets the same answer. Putting the
+  // bypass only on buildSession() would have made it a safety rule that
+  // one of two entry points honoured -- the exact shape of every
+  // reachability fault found this week.
+  if (SEVERE_BYPASS_ENABLED && !ignoreSevere) {
+    const zone = severeZoneToday();
+    if (zone) return gentleCareSession(zone, durationMins);
+  }
+
   const type = SESSION_TYPES.find(t => t.id === sessionType);
   if (!type) return null;
 
@@ -1669,7 +1683,111 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
   return session;
 }
 
-export function buildSession({ sessionType, durationMins, equipmentOverride, preset }) {
+/**
+ * SEVERE-1, 16 Aug 2026. The Gentle Care bypass.
+ *
+ * ── ROLLBACK: set this to false. That is the whole switch. ──────────
+ *
+ * WHY IT EXISTS. workoutGenerator.js v1.3's changelog has claimed since
+ * August that "any severe pain zone bypasses the full workout pool and
+ * returns a single Gentle Care card", and four files reference Gentle
+ * Care in comments. Executed on 16 Aug, it did not: somebody with a
+ * knee at 9/10 was built a full nine-exercise session including
+ * Single-Leg Glute Bridge, Bear Hug Carry and Inchworm. The severity was
+ * detected correctly and then consulted by almost nothing --
+ * getZoneStatus() had exactly one caller in the whole app, and it was
+ * morning-session.js.
+ *
+ * WHAT THIS IS NOT. It is not a clinical judgement, and it must not be
+ * read as one. No physiotherapist has reviewed it. The threshold is not
+ * mine either: it is getZoneStatus()'s own existing definition of a
+ * severe zone, which is pain >= 7.
+ *
+ * A KNOWN INCONSISTENCY, surfaced rather than silently resolved:
+ * getPainBand() calls 8+ severe while getZoneStatus() calls 7+ severe.
+ * Both are live and they disagree. This uses the zone function, because
+ * this is a zone decision -- but the disagreement is real and belongs in
+ * the clinical review rather than being quietly picked by me.
+ *
+ * WHAT IT DOES NOT DO. It does not lock anybody out. It changes what the
+ * coach BUILDS, not what the person may reach; the doors on Home are
+ * untouched, and `ignoreSevere` exists so a deliberate override can be
+ * wired to a control later without touching this logic.
+ */
+const SEVERE_BYPASS_ENABLED = true;
+
+/**
+ * The zone the person has severe pain in, or null.
+ * Reads the store so every route through buildSession() gets the same
+ * answer -- the alternative is each view deciding for itself, which is
+ * how a safety rule ends up living in one view of thirteen.
+ */
+function severeZoneToday() {
+  const ids    = store.get("conditions") || [];
+  const scores = store.get("conditionPainScores") || {};
+  const status = getZoneStatus(ids, scores);
+  const zone = ["lower-limb", "spine", "upper-limb", "systemic"]
+    .find(z => status[z] === "severe");
+  return zone || null;
+}
+
+/**
+ * The Gentle Care card itself.
+ *
+ * Three things, and deliberately not a workout: something to breathe
+ * with, something to settle with, and the option of a walk. Chosen by id
+ * with a category fallback, so a renamed entry degrades to something
+ * sensible rather than to an empty card.
+ *
+ * A side effect worth naming: all three of these were among the 28
+ * exercises the reachability audit found that no session type can
+ * serve. This is the route they were always supposed to have.
+ *
+ * THE COACH DOES NOT DIAGNOSE. It says what it has noticed -- the pain
+ * score the person themselves entered -- and what it is doing about it.
+ * It does not name a condition, does not say what is wrong, and does not
+ * tell anybody to see somebody. That last part is the red-flag screen's
+ * job and it is not built yet.
+ */
+function gentleCareSession(zone, durationMins) {
+  const pick = (id, category) =>
+    EXERCISES.find(e => e.id === id) ||
+    EXERCISES.find(e => e.category === category) ||
+    null;
+
+  const items = [
+    pick("box-breathing", "recovery"),
+    pick("body-scan-short", "mindfulness"),
+    pick("mindful-walk", "recovery")
+  ].filter(Boolean).map((e, i) => ({
+    ...e,
+    section: i === 2 ? "main" : "warmup",
+    _gentleCare: true
+  }));
+
+  return {
+    id: "gentle-care",
+    title: "Something gentler today",
+    subtitle: "",
+    duration: durationMins || 20,
+    gentleCare: true,
+    severeZone: zone,
+    coachLine:
+      "You've told me the pain is high today, so I'm not going to build you a session. " +
+      "Here's something gentler instead — breathing, a few quiet minutes, and a walk " +
+      "if you feel like moving at all. None of it is required.",
+    exercises: items,
+    rationale: []
+  };
+}
+
+export function buildSession({ sessionType, durationMins, equipmentOverride, preset, ignoreSevere }) {
+  // SEVERE-1. Before anything else, and before any pool is built.
+  if (SEVERE_BYPASS_ENABLED && !ignoreSevere) {
+    const zone = severeZoneToday();
+    if (zone) return gentleCareSession(zone, durationMins);
+  }
+
   const type = SESSION_TYPES.find(t => t.id === sessionType);
   if (!type) return null;
 
