@@ -1,8 +1,16 @@
 # Alongside: Move — The Rehab Front Door
 
-## Blueprint · 16 Aug 2026 v1
+## Blueprint · 16 Aug 2026 v2
 
-Build New Habits | **STATUS: NOT FOR BUILD. Requires a physiotherapist's review before any of it ships.**
+Build New Habits | **STATUS: REVIEWED. Physiotherapist review received 16 Aug 2026 and folded in below. Buildable once the three pre-beta conditions in §11 are met.**
+
+> ### v2 — what the review changed
+>
+> **Q1: my refusal to screen for red flags was wrong, and the reviewer's word was "indefensible".** The reasoning I missed: *asking "where does it hurt" and "how long" is already a triage interaction in the user's eyes.* Declining to screen after that is not neutrality — it is implicit false reassurance to somebody with cauda equina syndrome, progressive neurological deficit or malignancy. **A three-item screen with a hard stop is now the first thing the door does.** This is the single largest change in v2, and it is a reversal.
+>
+> **Q7 turned out not to be about this door at all.** See §10 — it is a live finding in the shipped product.
+>
+> Also changed: redirect threshold 12 weeks → **6 weeks, unified across chains**; chain programming constrained to isometric / sub-maximal closed-chain / mid-range; recurrent case classified as subacute with a low-friction redirect; professional exercises get an **8-week** expiry checkpoint; post-surgical becomes an absolute exclusion inside 6 months; **upper limb does not open**; pain bands must change; referral routing is now specific.
 
 ---
 
@@ -146,26 +154,104 @@ Recorded so the physio can challenge the refusals as readily as the inclusions.
 
 These are the blockers. Everything above is provisional until these are answered.
 
-**Q1 — Red flags. Is the refusal to screen defensible, or is it the wrong call?**
-The design deliberately asks no screening questions (night pain, unexplained weight loss, bladder or bowel change, saddle anaesthesia, trauma, fever, neurological deficit). The reasoning: asking implies competence to act on the answer, and a false reassurance is worse than no question. **The counter-argument is obvious and may well be stronger — that a handful of specific questions, with a single unambiguous "please seek urgent advice" outcome, is a duty rather than an overreach.** If so, we need to know exactly which questions, exactly what the app should say, and exactly how urgent it should sound.
+**Q1 — Red flags. ANSWERED: the refusal was indefensible. Screening is now mandatory and comes first.**
 
-**Q2 — Is "months" the right threshold for the redirect?** Twelve weeks is the common chronic-pain definition. Six weeks is a common physiotherapy review point. What should the band be, and should it differ by chain — is a shoulder that has hurt for six weeks a different case from a lower back that has?
+> *"If an app asks 'Where does it hurt?' and 'How long?', you have already entered a triage interaction in the user's eyes."*
 
-**Q3 — Is chain-not-condition clinically sound, or is it hiding something that matters?** We think it is more honest. Is there a case where it is actively unsafe — where working "the lower limb" while a specific structure is irritated does harm that a condition-specific route would have avoided?
+That is the sentence that settles it. The screen runs **before chain entry**, three items:
 
-**Q4 — The recurrent case: "on and off for a long time."** Not acute, not straightforwardly chronic, and probably the most common honest answer. What should happen? Is it a redirect, a normal path, or something else?
+1. Bladder or bowel incontinence, or numbness between the legs or groin. *(Cauda equina)*
+2. Progressive muscle weakness, numbness, or loss of coordination.
+3. Unexplained systemic symptoms — fever, unexplained weight loss, or unrelenting night pain unaffected by movement.
 
-**Q5 — Professional-prescribed exercises are given priority over anything the app would choose, indefinitely, with no expiry.** Is that right? Should the app ask, after some period, whether those exercises are still current? If so, when — and how does it ask without undermining the clinician?
+**Outcome on any yes: a hard stop.** Reviewer's wording, to be used close to verbatim:
 
-**Q6 — Post-surgical.** Currently no path at all. Should the door screen for it and route out entirely, or is there a safe band with sufficient time elapsed and clearance obtained?
+> *"Your symptoms require an in-person medical evaluation before starting any movement program. Please contact your GP, call NHS 111, or attend A&E immediately."*
 
-**Q7 — Hypermobility/EDS, fibromyalgia, chronic fatigue/ME-CFS.** All three exist as conditions today and all three are systemic rather than chain-based. Should they route through this door at all, or does a load-and-pain model actively mislead for them? **Post-exertional malaise in ME-CFS is a specific worry: a product that adapts to how you feel *today* may push somebody into a crash tomorrow.**
+**This is the one place in the entire product where a hard stop is correct**, and it does not contradict §2.2's no-lock-out principle — that principle protects against being locked out for having *chronic pain*. This is an emergency-pathology stop, it is specific, it is rare, and it routes somewhere urgent rather than leaving the person nowhere. It must be built so that it cannot be dismissed into a workout.
 
-**Q8 — What must never appear on screen?** Any wording, framing or feature that a physiotherapist would consider a red line for a non-clinical product.
+**Q2 — ANSWERED: six weeks, unified across all chains.** Not twelve. Most soft-tissue and non-specific spinal presentations reach peak biological healing by six weeks, so any non-traumatic pain past six weeks without professional review triggers the redirect. **Do not segment by joint** — it adds clinical complexity without changing the need for human assessment. The duration bands in §4.2 change to: days / **under 6 weeks** / **over 6 weeks** / on and off for a long time.
 
-**Q9 — The upper limb gap (§3.1).** Should the door offer arms and shoulders at all until the library is deeper, or open with lower limb and spine only?
+**Q3 — ANSWERED: sound, and it is current best practice because it reduces tissue-threat hypervigilance — with one caveat that becomes a hard programming constraint.**
 
-**Q10 — Referral routing.** When the app redirects, what should it actually say — self-refer to NHS physiotherapy, GP first, private? This varies by nation within the UK and we would rather be accurate than generic.
+The blind spot is reactive structural pathology (patellar/achilles tendinopathy, labral impingement, disc extrusion with radiculopathy). Generic "lower body" work can inadvertently programme end-range loading or stretch-shortening cycles into acutely reactive tissue.
+
+**So chain programming is constrained to:** isometrics, sub-maximal closed-chain variations, and mid-range movement. **Explicitly excluded:** end-range stretching, and high rate-of-force-development drills. This is a filter on exercise selection, not a note in the copy, and it needs its own gate.
+
+**Q4 — ANSWERED: treat as subacute/maintenance (group B), not acute.** It is the hallmark of episodic mechanical low back pain and recurrent tendinopathy. Gentle movement today, plus a **low-friction** redirect — not the full one:
+
+> *"Because this keeps coming back, a physio can help identify what triggers it so you aren't stuck in this cycle."*
+
+**Q5 — ANSWERED: add an expiry checkpoint at 8 weeks.** A home exercise programme given six months ago for an acute tear is almost certainly obsolete and probably *underloading* for subacute remodelling. Never silently override — but do not let a static protocol become permanent dogma. At 8 weeks:
+
+> *"It's been a while since these were prescribed. Are these still the exact exercises your physio wants you doing, or is it time for an updated check-in?"*
+
+Schema implication: `prescribedExercises` entries need a prescribed-at date and a last-confirmed date. **Check whether `setAt` already carries this before adding a field.**
+
+**Q6 — ANSWERED: absolute screening exclusion.** Surgical repairs run to structural healing timelines and surgeon-specific weight-bearing and range-of-motion protocols. **If the pain relates to surgery in the past 6 months, route out entirely** until there is explicit, written Phase IV discharge clearance from the surgical team or physio. This becomes a fourth screening item alongside the three red flags.
+
+**Q7 — ANSWERED, and the answer is bigger than this door. See §10.**
+
+> *"ME/CFS must never route through a standard load/pain adaptation model. Post-exertional malaise is not mechanical load intolerance; it is neuro-immune. Adapting volume to 'how you feel today' is the exact mechanism that triggers severe baseline crashes."*
+
+The worry was right and understated. ME/CFS needs **pacing models — heart-rate ceilings, energy envelopes — not progressive rehab.** Decouple immediately.
+
+**Hypermobility/EDS:** active control, proprioception, closed-chain stability. **Strictly avoid end-range passive stretching.**
+
+**Q8 — ANSWERED. Three banned categories, now auditable:**
+
+- **Structural/nocebic language:** "fix your bad posture", "realign your pelvis", "out of place", "wear and tear", "damaged chain".
+- **Clinical metrics:** "your knee is 40% recovered". *(Already refused in §5.)*
+- **Biomechanical dogma:** "safe vs dangerous movement". **All movement is neutral — it is current capacity versus applied load.**
+
+**Audited against the live codebase, 16 Aug: clean.** Zero user-facing hits across all three categories. The only matches were the word "degenerates" in a code comment about selection logic, "misaligned" in a CSS comment about nav tabs, and "your weak side" in a swimming cue about bilateral breathing — which is a neutral technical term but is worth rewording, since it is the only place the product says "weak" to a person about their own body.
+
+**Q9 — ANSWERED: do not open the upper limb.** Four rotator cuff and five wrist/elbow exercises cannot safely scale or regress around impingement, frozen shoulder or epicondylalgia. **Launch with lower body and spine only**, and say clearly on screen that upper-body support is in development — absent, not broken.
+
+**Q10 — ANSWERED. Three structured routes, offered together:**
+
+- In many NHS England and Scotland regions you can **self-refer directly to MSK physiotherapy online**, without seeing a GP first — check the local NHS Trust website.
+- Or book with the GP surgery's **First Contact Practitioner (FCP) physio**.
+- If going private, ensure the provider is **HCPC registered** and a member of the **Chartered Society of Physiotherapy**.
+
+---
+
+## 10. 🔴 The finding that is NOT about this door — systemic conditions in the shipped product
+
+Q7's answer sent me to check the live code, and what is there is worse than the door being unbuilt.
+
+**Four systemic conditions are collected at onboarding, trigger the exercise-clearance question, and then have no effect whatsoever on what the person is given.**
+
+`getExerciseSafetyTier()` decides between `safe`, `caution` and `avoid` by matching active condition IDs against each exercise's `avoid`/`caution` lists. Grepped the entire exercise library:
+
+| Condition | Exercises naming it in `avoid` or `caution` |
+|---|---|
+| `chronic-fatigue` (ME/CFS) | **0** |
+| `fibromyalgia` | **0** |
+| `hypermobility` (EDS) | **0** |
+| `osteoporosis` | **0** |
+
+**So every exercise in the library returns `safe` for all four.** The condition is asked about, acknowledged, and then discarded at the point it would have mattered — the same WRONG-vs-MISSING shape as everything else this week: nothing throws, the screen looks right, and only executing the filter shows that it does nothing.
+
+For ME/CFS specifically, the reviewer's verdict makes this more than a gap. The product's core mechanic — adapt volume to how you feel today — is **the exact mechanism that triggers post-exertional crashes**. Somebody with ME/CFS is currently offered a product whose central promise is contraindicated for them, and the app has recorded that they have it.
+
+**This is a live safety item, not a rehab-door item, and it is a beta blocker.** Options, for Graeme:
+
+1. **Decouple ME/CFS entirely** — a pacing model with an energy envelope, not progressive rehab. Correct, and the largest build.
+2. **Honest exclusion for now** — at onboarding, say plainly that the app is not built for ME/CFS yet and why. Small, shippable, and better than silent inaction.
+3. **Populate `avoid`/`caution` for the other three** (fibromyalgia, hypermobility, osteoporosis) with the reviewer's guidance: hypermobility → no end-range passive stretching, closed-chain only; osteoporosis → no loaded spinal flexion.
+
+**My recommendation: 2 and 3 before beta, 1 as its own stream.** Option 2 is not a cop-out — telling somebody the truth about what a product cannot do for them is the same principle as the redirect, applied to ourselves.
+
+---
+
+## 11. Pre-beta conditions, set by the reviewer
+
+Three, and they gate a beta involving anybody in pain:
+
+1. **Red-flag hard stops** — automated cessation, not advisory copy.
+2. **A defined pain scale.** MSK traffic-light: **0–3 acceptable discomfort · 4–5 monitor closely · 6+ back off.** **The live bands do not match this** — `getPainBand()` currently reads 0–2 none, 3–5 mild, 6–7 moderate, 8+ severe. The severe override that abandons the workout entirely fires at **8+**, where the reviewer puts "back off" at **6**. This needs a decision: align the bands, or keep two scales and be explicit about which is which.
+3. **Clinical content audit of all 95 rehab exercise descriptions** — independent review, checking that cueing emphasises capacity and reassurance rather than fear-avoidance.
 
 ---
 
@@ -195,4 +281,4 @@ The design deliberately asks no screening questions (night pain, unexplained wei
 
 ---
 
-*Build New Habits · Alongside: Move · The Rehab Front Door · 16 Aug 2026 v1 · NOT FOR BUILD pending physiotherapist review*
+*Build New Habits · Alongside: Move · The Rehab Front Door · 16 Aug 2026 v2 · Physiotherapist review received and folded in · Buildable once §11's three pre-beta conditions are met*
