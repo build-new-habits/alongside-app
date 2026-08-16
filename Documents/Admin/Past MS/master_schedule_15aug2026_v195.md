@@ -1,42 +1,8 @@
 # Alongside: Move — Master Schedule
-## 15 Aug 2026 v196
+## 15 Aug 2026 v195
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_15aug2026_v195.md`. Remove v195 on upload.
-
-> ### 🔴 PICK UP HERE — mid-stream, 15 Aug evening. `alongside-v360`. 52 gates green.
->
-> #### The finding that matters most today
->
-> **A device check found that four end-of-session moments built on 15 Aug reached ONE of eleven session views.** Graeme tested through a different door, correctly reported nothing appeared, and nothing was there to appear. Fifty-one gates stayed green — **every gate reads view SOURCE, none executes a view or knows which views a person can reach.**
->
-> Fixed by **SHARED-1**: the moments moved to `data/session-moments.js`, rendered by `views/reflect.js`, which every session view already routed to (33 navigations from 10+ views). `verify-shared1.mjs` now fails if any session view reaches neither reflect nor renders them itself — it immediately caught `breathing-session` and `quiet-session`, which I would have missed.
->
-> **Also live, shipped 15 Aug:** ASSESS-1 steps 1–2 (the difficulty ceiling can move — max served 3 → 6 on reassessment, and back down on an honest read down) · DECL-1 (a `ReferenceError` in the Skip button, live since W2-7, caught only on device) · CHAIN-1 · DIFF-1 · QUICK-1/2 · PB-1 · PACE-1/2 · TARGET-1/2 · STREAK-1 · MOOD-1 · DELIGHT-1 · ORIENT-2.
->
-> #### 🔵 NEXT SESSION STARTS HERE
->
-> **`alongside_blueprint_chapters_15aug2026_v1.md`** — agreed with Graeme in full, ready to build. Chapters vs Blocks as two presentations of ONE engine; hinge points replacing fixed chains; My Programme as a full-width row above the six tiles; weekly **focus** not weekly goal; countdowns only against a date the person supplied.
->
-> Build order: **(1)** schema + `programme.presentation` · **(2)** My Programme view, reads what already exists, worth shipping alone · **(3)** hinge mechanic — needs ASSESS-1 step 3 first · **(4)** weekly focus · **(5)** Blocks · **(6)** event goals.
->
-> Layout agreed: cog removed from the header (Settings is in the nav bar), My Programme full width above the grid, six tiles unchanged, "Unsure? Coach decides" below, **"Update check-in" keeps its text label** and additionally gets offered contextually after a door.
->
-> #### 🟠 Blocked / needs Graeme
->
-> - **Rehab front door** — Graeme's idea, and the strongest differentiation raised today. Name the CHAIN, never the condition; chronic (his own case is 9 months) routes to a professional as a redirect, not a refusal. Blueprint not yet written. **Needs a physio to read the spec before it ships.**
-> - **Device check must be rewritten** against real routes before anybody retests. Stages 1 and 5 pointed at the wrong door.
-> - **`session-builder-ui` route trace incomplete** — the Cardio/Core/Strength door neither navigates to reflect nor logs a session directly. ~80% traced.
-> - **Legal docs** still 13+/16+, must align to 18+.
-> - **Token lapses ~5 Sep.**
->
-> #### Process, and it is the through-line of the whole day
->
-> **Nine faulty gate assertions of mine, plus three corrections on one item, plus eleven commits into an unreachable view.** Every one shares a root: **accepting a plausible result without confirming which code produced it.**
->
-> Two rules that would have caught all of them:
-> 1. A number is not executed evidence until you have confirmed which code produced it. Probe BEFORE the suspect line, not after.
-> 2. A green suite is not evidence the app runs. **Nothing in the suite executes a view.** A device pass belongs in the rhythm, not at the end.
+Supersedes `master_schedule_15aug2026_v194.md`. Remove v194 on upload.
 
 > ### 🟢 15 AUG EVENING — WAVE 3 AND PROGRESSION. `alongside-v357`. 49 gates green.
 >
@@ -2875,4 +2841,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 15 Aug 2026 v196*
+*Build New Habits · Alongside: Move · Master Schedule · 15 Aug 2026 v195*
