@@ -146,9 +146,18 @@ check('and it is still there for somebody who wants to update WITHOUT starting a
 
 const seedNothing = () => { store.set('goals', []); };
 
-const seedFree = () => { store.set('goals', ['get-stronger', 'feel-better']); };
+// Tier is set EXPLICITLY in every fixture from here on. It was implicit
+// before, which was fine until the successor line became Personal-only
+// and two assertions that had passed for days started failing on a
+// default nobody had chosen. A fixture that relies on a default is a
+// fixture that changes meaning when the default does.
+const seedFree = () => {
+  store.set('tier', 'free');
+  store.set('goals', ['get-stronger', 'feel-better']);
+};
 
 const seedChapter = () => {
+  store.set('tier', 'personal');
   store.set('goals', ['get-stronger']);
   store.set('activeProgramme.programmeId', 'beginner-fitness');
   store.set('activeProgramme.startDate', new Date(Date.now() - 21 * 864e5).toISOString());
@@ -225,6 +234,52 @@ check('a date the PERSON supplied does get counted toward',
   'a hike on 14 September is a real deadline; the app is being useful about a fact');
 check('and the supplied date is shown in words, not as a bare number',
   /14 September/.test(event.text));
+
+// ─────────────────────────────────────────────────────────────────────
+// 5b. Tier — show what they have, lock only what they do not
+// ─────────────────────────────────────────────────────────────────────
+
+// Graeme, 16 Aug: My Programme is Personal, but a free user still has
+// goals and a level, and whatever they have should be there while they
+// can still see what Personal offers.
+//
+// The assertion that carries the weight is the NEGATIVE one: a free
+// user's own goals, sessions and read must never sit behind the lock.
+// They are facts the person owns, not features.
+
+const freeUser = mountWith(MyProgrammeView, seedFree);
+const lockOf = () => el.querySelector('.locked-feature-wrap');
+
+check('a free user is shown what Personal adds', !!lockOf());
+check('and the lock routes somewhere rather than being inert',
+  !!lockOf() && lockOf().dataset.route === 'upgrade' && lockOf().getAttribute('role') === 'button',
+  'WOW-4: nothing is a dead end');
+check('and the lock says what it unlocks, not just that it is locked',
+  /Chapters that follow on from each other/.test(freeUser.text),
+  'a locked control that cannot name its feature is a wall');
+check("a free user's OWN goals are not behind the lock",
+  !!lockOf() && !lockOf().textContent.includes('Get stronger') && /Get stronger/.test(freeUser.text),
+  'their goals are a fact they own, not a feature');
+
+// Data first, then tier. A free user who HAS a programme still sees it.
+const freeWithProgramme = mountWith(MyProgrammeView, () => {
+  seedChapter();
+  store.set('tier', 'free');   // after seedChapter, which sets personal
+});
+check('a free user who has a programme still sees it',
+  /Build Your Base/.test(freeWithProgramme.text) && /3 weeks in/.test(freeWithProgramme.text),
+  'gating on tier before data would hide a fact from the person who owns it');
+
+// The screen must not promise the chain above and sell it below.
+check('and is not promised a successor chapter it then locks',
+  !/would likely come next/.test(freeWithProgramme.text),
+  'the successor IS the chain -- one side of the line or the other');
+
+const paying = mountWith(MyProgrammeView, seedChapter);
+check('a paying user sees the successor', /would likely come next/.test(paying.text));
+check('and is not sold something they already have',
+  !el.querySelector('.locked-feature-wrap'),
+  'an upsell shown to a subscriber is an error, not a nudge');
 
 // ─────────────────────────────────────────────────────────────────────
 // 6. The weekly focus has NOT shipped

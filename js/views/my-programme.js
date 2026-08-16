@@ -1,6 +1,30 @@
 /**
  * my-programme.js - My Programme
  *
+ * 16 Aug 2026 v2
+ *
+ * v2 - TIER. Graeme's decision, 16 Aug: My Programme is a Personal
+ *   feature, but a free user still has goals and a level, and "whatever
+ *   they have available should be there" while still being able to see
+ *   what Personal offers.
+ *
+ *   So the rule is: SHOW EVERYTHING THE PERSON ACTUALLY HAS, whatever
+ *   their tier, and add ONE locked preview of what Personal adds. Never
+ *   hide a fact somebody owns behind a paywall -- their goals, their
+ *   sessions and their own read are theirs, not features.
+ *
+ *   Gated on DATA FIRST, then tier. A free user with a programme in
+ *   their store still sees it; the lock is for what they do not have,
+ *   which is what a lock is for. Gating on tier first would have hidden
+ *   real data from somebody who had it.
+ *
+ *   One lock, not three. Locking each absent section separately would
+ *   turn a screen about where somebody is going into a page of things
+ *   they cannot have, which is the opposite of what it is for. Same
+ *   pattern as progress.js's locked window tabs and WOW-4's principle
+ *   that nothing is a dead end: the locked block explains itself and
+ *   offers a route rather than being absent or inert.
+ *
  * 16 Aug 2026 v1
  *
  * CHAP-1 step 2, per alongside_blueprint_chapters_15aug2026_v1.md §8.
@@ -46,12 +70,8 @@
  * is the exact fault that shipped eleven times on 15 Aug and cost a day
  * to find. The section arrives with its writer.
  *
- * TIER. Not gated. Programmes are Personal, but a free user still has
- * goals, a level and sessions done, and this screen shows each person
- * what they actually have. Sections with no data are absent rather than
- * locked, and nothing about a programme is invented for somebody who
- * has none. Whether the row should instead be a Personal-tier upsell is
- * a product decision and is flagged for Graeme, not taken here.
+ * TIER. See the v2 note above. Data first, then tier; one locked
+ * preview, never a locked fact.
  *
  * WCAG 2.2 AA: single h1, h2 per section, role="main" with a label,
  * semantic lists for the arc, no meaning carried by colour alone, the
@@ -60,6 +80,7 @@
  */
 
 import { store }                from '../store.js';
+import { isPremium, lockedFeature } from '../auth.js';
 import { getProgramme }         from '../data/programmes.js';
 import { getGoalLabel }         from '../data/goals.js';
 import { advanceWeekIfNeeded }  from '../data/programmeEngine.js';
@@ -78,7 +99,8 @@ export function MyProgrammeView(router) {
     const sections = [
       _whereYouAre(),
       _theArc(),
-      _whatYoureAimingAt()
+      _whatYoureAimingAt(),
+      _whatPersonalAdds()
     ].filter(Boolean);
 
     container.innerHTML = `
@@ -222,7 +244,18 @@ export function MyProgrammeView(router) {
       // might develop quicker, or not." So this says what would likely
       // follow and says plainly that it is not settled -- it must not
       // read as a track already laid.
-      const next = programme.nextProgrammeId ? getProgramme(programme.nextProgrammeId) : null;
+      //
+      // Personal only, and NOT for the reason a paywall usually is. A
+      // free user seeing "Back to Strength would likely come next" and
+      // then a locked block explaining that chapters follow on from each
+      // other is the screen contradicting itself in two paragraphs --
+      // promising the chain above and selling it below. The successor IS
+      // the chain, so it belongs on one side of the line or the other.
+      // Caught by mounting the free-with-a-programme state and reading
+      // it, not by reasoning about it.
+      const next = (isPremium() && programme.nextProgrammeId)
+        ? getProgramme(programme.nextProgrammeId)
+        : null;
       if (next) {
         parts.push(`<p class="my-programme-line my-programme-line--soft">
           ${_esc(`If things carry on as they are, ${next.name} would likely come next. Nothing is fixed — we will decide when you get there.`)}
@@ -282,6 +315,55 @@ export function MyProgrammeView(router) {
 
     if (!parts.length) return null;
     return _section("What you are aiming at", parts.join(''));
+  }
+
+  // ── What Personal adds ──────────────────────────────────────────────
+
+  /**
+   * The one lock on this screen, and it is shown only when there is
+   * genuinely something the person does not already have.
+   *
+   * It describes what Personal ADDS rather than what free withholds,
+   * and it names two real things -- chapters that follow on from each
+   * other, and a date to work toward -- rather than a generic upsell.
+   * A locked control that cannot say what it unlocks is just a wall.
+   *
+   * It renders LAST, under what the person does have, so the screen
+   * still opens on their own goals and their own progress. A paywall at
+   * the top would make "where am I going?" answer "nowhere, unless you
+   * pay", which is not the product.
+   *
+   * No countdown and no number in here either. The rules of the screen
+   * do not relax because the block is selling something.
+   *
+   * The wrapper is interactive and routes to upgrade via the delegated
+   * listener initPaywallListener() wires once in app.js -- nothing to
+   * wire here, which is the whole point of the shared component.
+   */
+  function _whatPersonalAdds() {
+    if (isPremium()) return null;
+
+    // Data first. Somebody who already has these needs no preview of
+    // them, whatever their tier says.
+    const hasChapter  = !!store.get('activeProgramme.programmeId');
+    const hasArc      = (store.get('programme')?.chaptersDone || []).length > 0;
+    const hasDate     = !!store.get('strategicGoal.targetDate');
+    if (hasChapter && hasArc && hasDate) return null;
+
+    const rows = [];
+    if (!hasChapter || !hasArc) {
+      rows.push("Chapters that follow on from each other, chosen one at a time rather than fixed in advance.");
+    }
+    if (!hasDate) {
+      rows.push("Something you are working towards, with the date you gave, if you have one.");
+    }
+
+    const preview = rows
+      .map(r => `<p class="my-programme-line my-programme-line--soft">${_esc(r)}</p>`)
+      .join('');
+
+    return _section("What Personal adds",
+      lockedFeature(preview, 'personal', "My Programme"));
   }
 
   // ── Shared ──────────────────────────────────────────────────────────
