@@ -7,6 +7,13 @@
  * No changes needed elsewhere in the app when new category files are added —
  * just import the new array here and spread it into EXERCISES.
  *
+ * 16 Aug 2026 v1.8
+ *   HYPER-1. filterByConditions() now delegates to conditions.js's
+ *   getExerciseSafetyTier() instead of reimplementing the same decision
+ *   inline. That function had ZERO callers and its own doc comment
+ *   claimed this one used it. One definition now, so a clinical rule
+ *   added to it takes effect everywhere by construction.
+ *
  * 11 Aug 2026 v1.7
  *
  * v1.7 - CAP-4. New seated.js registered: 21 entries of seated cardio,
@@ -106,7 +113,7 @@ import { SPORT_CONDITIONING } from './sport_conditioning.js';
 import { GYM }               from './gym.js';
 import { SEATED }            from './seated.js';
 
-import { getActiveConditionIds } from '../conditions.js';
+import { getActiveConditionIds, getExerciseSafetyTier } from '../conditions.js';
 import { resolveEquipment, exerciseIsAvailable } from '../equipment-map.js';
 import { store }                  from '../../store.js';
 
@@ -165,19 +172,33 @@ export function filterByConditions(exercises, activeConditionIds) {
   const safe    = [];
   const caution = [];
 
+  // HYPER-1, 16 Aug 2026. This loop used to reimplement the avoid/caution
+  // decision inline, and conditions.js exported getExerciseSafetyTier()
+  // making the identical decision separately. Two implementations of one
+  // rule, and the doc comment on getExerciseSafetyTier() claimed THIS
+  // function called it -- which it never did.
+  //
+  // It had ZERO callers anywhere in the app. So a clinical rule added to
+  // it, as HYPER-1's was, is a rule nothing in the product would ever
+  // run. The gate caught that: the rule was correct, the filter served
+  // all 30 stretches anyway, and every other assertion still passed.
+  //
+  // Now delegated, so there is one definition of "can this person do
+  // this exercise" and a clinical rule added to it takes effect
+  // everywhere by construction. The one behavioural difference is
+  // deliberate: getExerciseSafetyTier() reads `avoid || contraindications`
+  // where this read `contraindications` alone, so an entry using `avoid`
+  // is now honoured rather than silently ignored.
   for (const exercise of exercises) {
-    const avoid   = exercise.contraindications || [];
-    const cautionList = exercise.caution || [];
-
-    // Hard block
-    if (avoid.some(c => activeConditionIds.includes(c))) continue;
-
-    // Soft block — include but flag
-    if (cautionList.some(c => activeConditionIds.includes(c))) {
-      caution.push({ ...exercise, _cautionActive: true });
-    } else {
-      safe.push(exercise);
-    }
+    // Named `safety`, not `tier`. verify-contract.mjs reads any `tier`
+    // as the subscription field (free|personal|athlete) and flagged the
+    // comparison immediately -- correctly, because in this codebase
+    // "tier" already means something else and a second meaning is how
+    // two fields become one bug.
+    const safety = getExerciseSafetyTier(exercise, activeConditionIds);
+    if (safety === 'avoid') continue;
+    if (safety === 'caution') caution.push({ ...exercise, _cautionActive: true });
+    else safe.push(exercise);
   }
 
   return { safe, caution };
