@@ -125,6 +125,26 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > #### 🔵 Next
 >
+> ### 🔴 BIAS-2 — `proposalBias` has had no writer since 04 Aug. Found by trying to delete a dead file.
+>
+> **The capability that is silently gone.** `coach-reflection.js` computed `proposalBias` — the coach's read that somebody needs REST rather than the usual session, from consecutive low days. Its route was retired on 04 Aug as obsolete (correctly — its four options duplicate Home's doors). **Unreachable code cannot write, so `proposalBias` stopped being written that day.**
+>
+> Today: `workoutGenerator.js:541` still **reads** it. `checkin.js:201` still **clears** it. **Nothing sets it to a value.** A reader and a clearer, no writer — the PT-12 pattern again, and it has been live for twelve days.
+>
+> **Three gates were green throughout** — `verify-bias1`, `verify-burn2` and `verify-delight` all assert this behaviour by **reading `coach-reflection.js`'s source text**. The logic was present in the file, so they passed. None of them asked whether anybody could reach it. Source-text assertions cannot see reachability, which is the lesson of 15 Aug arriving from a third direction.
+>
+> **How it surfaced:** I deleted the file as dead weight, and three gates went red at once. **The deletion is what made a twelve-day-old regression visible.**
+>
+> #### 🟠 Needs Graeme — and the deletion is REVERTED pending it
+>
+> `coach-reflection.js` is restored. It is the only remaining specification of this capability, and deleting it would destroy the logic somebody would need to restore it. Live state unchanged at `alongside-v369`, 62 checks green.
+>
+> **The decision: does the coach still get to say "rest today"?** Either (a) move the bias computation into a reachable place — check-in is the obvious home, since it already collects energy and mood and already clears the field — or (b) retire `proposalBias` deliberately, remove the reader and the clearer, and delete the file. **What must not happen is leaving it as it is**, where a live reader consults a field nothing ever sets.
+>
+> #### ⚠️ Correction on record, same session
+>
+> I justified the deletion partly by claiming the route was **broken** — it names `CoachReflectionView` and the file exports `render`/`onMount`. **That was wrong.** `router.js` supports two patterns and falls back to `mod.render()`, so the route worked fine. I caught it because the gate I wrote to prove it flagged **23 other routes** as missing exports — and 23 broken routes in a working app is not a finding, it is a broken test. Corrected in both files before it reached the record.
+>
 > ### 🔴 CHAP-1 step 4 — BUILT, MEASURED, AND REVERTED. Nothing shipped. Live state stays `alongside-v368`.
 >
 > **The weekly focus was built in full and then backed out, because the measurement showed it did not do what the coach would have said it did.**
