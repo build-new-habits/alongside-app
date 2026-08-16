@@ -169,7 +169,36 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
-> ### 🔴 BIAS-2 — `proposalBias` has had no writer since 04 Aug. Found by trying to delete a dead file.
+> ### 🟢 BIAS-2 — RESOLVED 16 Aug. `alongside-v371`, 63 checks green. Graeme: *"whatever you think is best."*
+>
+> **Retired, not restored — and the distinction is the whole fix.** Restoring a writer somewhere reachable would have fixed today's symptom and kept the shape that caused it: a value that is correct only while somebody remembers to write it. **A derived value cannot have a missing writer.** `coachBias()` in `checkin.js` computes it from today's activity log at the moment it is asked.
+>
+> **Three of the four triggers dropped deliberately**, because each already has a live owner and duplicating them would be two engines for one decision:
+>
+> | Trigger | Who owns it now |
+> |---|---|
+> | Severe pain | **SEVERE-1's Gentle Care bypass** — stronger than an intensity nudge |
+> | Burnout | `detectBurnout()`, read directly by `workoutGenerator` |
+> | Returning after a break | `getReEntryIntensity()` via `coach-proposal.js` |
+> | **Several days in a row** | **the only one with no other owner — this is what `coachBias()` carries** |
+>
+> Threshold kept at the original 3. Changing a number while moving code is how a move becomes a silent behaviour change.
+>
+> **`coach-reflection.js` deleted** with its route, nav entries and precache line. It was kept last time because it was the last remaining definition of this logic; that logic now lives in `checkin.js`, so the file held nothing.
+>
+> #### 🔴 FOUR GATES REWRITTEN — and this is the part that matters most
+>
+> `verify-bias1`, `verify-burn2`, `verify-delight` and `verify-w2` **all asserted this behaviour by reading `coach-reflection.js`'s source text, and all four stayed green for twelve days while the code was unreachable.** Four gates, one blind spot, and it is the same blind spot as 15 Aug: *source-text assertions cannot see reachability.*
+>
+> They now assert reachable behaviour — that the bias is derived, that only `checkin.js` defines burnout, that several days in a row still makes the next session lighter **and is still never counted back as a streak**, and that nothing stores a bias which could survive a day.
+>
+> #### 🟠 Recorded, not dropped — the graded burnout message is gone
+>
+> Nothing now says *"this has been low for a while now, not just today."* That copy lived in the deleted file and had been unreachable since 04 Aug, so **this is not a regression** — it was already saying it to nobody. But it is a real gap. If the coach should grade what it says about burnout as well as what it builds, that copy needs a reachable home. **Graeme's call.**
+>
+> #### ⚠️ Process slip, mine
+>
+> `sw.js` went into the same commit as the application files. I used `git add -A js tools sw.js` and it swept the service worker in with the rest, breaking the rule that `sw.js` ships last and alone. No functional consequence — the push is correct and the fresh clone verifies — but the rule exists so a bad deploy can be rolled back without reverting application code, and this commit cannot be split now. **Recorded rather than quietly left.** Found by trying to delete a dead file.
 >
 > **The capability that is silently gone.** `coach-reflection.js` computed `proposalBias` — the coach's read that somebody needs REST rather than the usual session, from consecutive low days. Its route was retired on 04 Aug as obsolete (correctly — its four options duplicate Home's doors). **Unreachable code cannot write, so `proposalBias` stopped being written that day.**
 >
