@@ -125,7 +125,27 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > #### 🔵 Next
 >
-> ### 🔴🔴 SEVERE-1 — the Gentle Care bypass does not exist in the session path. VERIFY FIRST NEXT SESSION.
+> ### 🟢 SEVERE-1 — BUILT 16 Aug. `alongside-v370`, 63 checks green. **PROVISIONAL — needs the physiotherapist.**
+>
+> Graeme, 16 Aug: *"do the best work you've got for severe 1... We can always roll it back, but let's see the full offering."* So it is built, and built to be reversible.
+>
+> **A severe pain zone now returns a Gentle Care card** — breathing, a body scan, and an optional walk — instead of a workout. On **both** `buildSession()` and `buildSessionFromSelection()`, because a safety rule honoured by one of two entry points is the shape of every reachability fault found this week.
+>
+> **🔁 ROLLBACK IS ONE CONSTANT: `SEVERE_BYPASS_ENABLED` in `session-builder.js`.** The gate is written so flipping it produces clean failures naming the decision, not a confusing cascade.
+>
+> **What it is built on, and it is not my clinical judgement:** `workoutGenerator.js` v1.3's changelog, which has claimed this behaviour since August, and `getZoneStatus()`'s own existing definition of a severe zone at **pain ≥ 7**.
+>
+> **🟠 The threshold disagreement is ASSERTED, not resolved.** `getPainBand()` calls 8+ severe; `getZoneStatus()` calls 7+ severe. Both are live and they contradict each other. The gate pins the disagreement so it reaches the clinical review as a known fact rather than being quietly picked by me. **This is a question for the physio, and it should go in the pack.**
+>
+> **It does not lock anybody out.** It changes what the coach *builds*, not what a person may reach. `ignoreSevere` exists so a deliberate override can be wired to a control later without touching the logic.
+>
+> **A side effect worth having:** the card is built from three of the 28 exercises the reachability audit found unservable — `box-breathing`, `body-scan-short`, `mindful-walk`. This is the route they were always meant to have.
+>
+> **The gate found a real hole in itself.** Defaulting a *missing* pain score to severe was NOT caught, because every fixture supplied one. **Silence must not be read as severity** — the same rule the capability system already holds in the other direction, where silence is never read as limitation. Somebody who declared a condition at onboarding and never entered a score must still be offered sessions.
+>
+> #### 🔴 Still to verify before this can be called finished
+>
+> Nothing has executed this on a device. The bypass changes what a whole group of people are served, on my reading of a changelog. **It is the single strongest argument for getting the physio review moving**, and it belongs in the pack alongside the red-flag screen and the threshold disagreement.
 >
 > **`workoutGenerator.js` v1.3's changelog says:** *"Any severe pain zone bypasses the full workout pool and returns a single Gentle Care card (breathing + mindfulness + mindful walk)."* Four files reference "Gentle Care" in comments. **I could not find an implementation of it in the session path.**
 >
