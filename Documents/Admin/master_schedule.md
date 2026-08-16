@@ -38,6 +38,22 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 > - **Three chain successors are named `Build`, `Open` and `Ground`.** They resolve correctly, but the arc line reads *"Build would likely come next"*, which is a sentence about a programme called Build. A naming question in `programmes.js`, not a view bug. Related to the still-open 🟠 *chain routes — I invented them*.
 > - **Rehab front door** — still needs a physio to read the spec before it ships.
 >
+> #### 🔵 NEW STREAM — DESTINATIONS. Raised by Graeme, 16 Aug. Not yet blueprinted.
+>
+> Graeme, on the chain-successor names: *"Where does fitness come in? Which fit for different things like, to keep up with grandkids, play sport, walking, hiking, running 5k, 10k, preparing for a marathon? What if I want to differentiate core strength to build a solid foundation, strength for conditioning, and build muscle?"*
+>
+> **The naming question was the wrong question, and this is the right one.** Checked before answering, and the gap is measurable:
+>
+> **Seven selectable onboarding goals have NO programme that serves them:** `start-running`, `run-10k`, `cycling`, `swimming`, `injury-recovery`, `return-to-fitness`, `return-after-illness`. A person picks one at onboarding and the programme matcher has nothing to give them. `run-5k` is covered; `start-running` and `run-10k`, either side of it, are not.
+>
+> **And Graeme's own examples are not in `goals.js` at all** — no hiking, no marathon, no sport, nothing like "keep up with grandkids". The purpose-shaped goals, which are the ones people actually say out loud, are the ones missing.
+>
+> **Three strength intentions currently collapse into one.** `get-stronger`, `build-muscle` and `tone-up` all route to the same programmes; `Build` declares `engineGoals: ['build-muscle']` alone. Foundation, conditioning and hypertrophy are three different programmes with three different session shapes, and the product currently cannot tell them apart.
+>
+> **This is the same object as two questions already open:** the 🟠 *library question* (393 of 551 entries at difficulty 1–2, and Graeme's framing — *"I'm adding so we can better serve, not compete"*) and the ten destination shapes from the tier model, which are **specified and not built** — `goals.js` is the onboarding list only.
+>
+> **Blueprint needed before any renaming.** Renaming Build/Open/Ground now would decorate a structure that is about to change shape.
+>
 > #### 🔵 Next
 >
 > **CHAP-1 step 3, the hinge mechanic — blocked on ASSESS-1 step 3**, which is not built. Steps 4 (weekly focus), 5 (Blocks, offered at the first hinge) and 6 (event goals) follow. The Blocks *vocabulary* is already live and gated in the view; step 5 is the offer mechanic, not the display.
@@ -2904,6 +2920,35 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 | 🟢 Cleanup — **STALE, corrected 12 Aug.** `journal-entry.js:129` reads it. Original finding: `journalEntryType` set but never read | 🆕 **New, 09 Aug**, same discovery. Both `noticing.js`'s weekly-prompt button and the new In Step "write about it" button set `store.journalEntryType` before navigating to journal-entry, matching the original v2 intent — but `journal-entry.js` v3 never reads that field at all (removed or never carried over during the v3 privacy-rule rewrite). Entries still save fine; they just don't land on the type-appropriate pre-selected screen. | Needs a small fix in `journal-entry.js` to read and act on `journalEntryType` — contained, low-risk. | Not booked. |
 
 *All standing rules, Stream A/C/D/E detail not listed above are unchanged from v71–v78 — see those versions for full detail.*
+
+---
+
+## 🔑 STANDING RULE — Project knowledge is WRITE-ONLY. Decided 16 Aug 2026.
+
+**This rule goes into every build blueprint, every session prompt, and stays in this document. It is not a preference; it is a correctness rule.**
+
+> **Claude NEVER reads project knowledge for the master schedule, the schema, or any live state.**
+> **The repo is the only source Claude reads. `Documents/Admin/master_schedule.md` and `Documents/Live State/Schema.md` are canonical, always, with no exception and no tie-break needed — there is no second copy to conflict with.**
+> **Claude still PRODUCES a snapshot at session close for Graeme to upload and review. That copy exists for Graeme, and Claude never reads it back.**
+
+### Why, with the evidence
+
+Graeme, 16 Aug: *"You only snapshot read it rather than the repo that you fully read. That's why we have that system."*
+
+**Confirmed by measurement, not assumed.** A project-knowledge search for the master schedule on 16 Aug 2026 returned **`alongside_master_schedule_10aug2026_v141.md` — fifty-six versions behind**, still describing 10 Aug as "not yet started" and BUILD-4 as upcoming work. The v196 and v197 snapshots were not what came back.
+
+The old session-start instruction said to search project knowledge for `alongside_master_schedule` **before doing anything else**. Followed literally on 16 Aug, that hands Claude a document describing the product a week in the past, and every plan built on it inherits the error silently. The only thing that prevented it was the second rule — that the repo copy wins — which made the first rule dead weight at best and a trap at worst.
+
+**A stale copy that looks current is more dangerous than no copy, because it answers confidently.** That is the same fault as `schema-check.mjs` reporting a clean field diff over an empty string, and the same fault as Schema.md sitting eleven store versions behind while a gate existed specifically to prevent it. Three instances, one shape: *a source that cannot be current being trusted as though it were.*
+
+### What this changes in practice
+
+| Step | Before | From 16 Aug |
+|---|---|---|
+| Session start | Search PK for `alongside_master_schedule`, then reconcile against the repo | **Clone the repo and read `Documents/Admin/master_schedule.md`. Do not search PK for it.** |
+| Live state | PK snapshot, repo wins on conflict | **Repo only. No conflict is possible.** |
+| Session close | Write new version, push to repo, archive to `Past MS/`, upload snapshot to PK | **Unchanged.** Snapshot still produced for Graeme's review. |
+| Deleting old PK entries | Claude cannot; Graeme must | **Unchanged, and no longer urgent** — a stale PK copy can no longer mislead a session, because nothing reads it. |
 
 ---
 
