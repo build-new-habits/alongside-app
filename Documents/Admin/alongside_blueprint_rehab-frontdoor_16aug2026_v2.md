@@ -2,7 +2,29 @@
 
 ## Blueprint · 16 Aug 2026 v2
 
-Build New Habits | **STATUS: REVIEWED. Physiotherapist review received 16 Aug 2026 and folded in below. Buildable once the three pre-beta conditions in §11 are met.**
+Build New Habits | **STATUS: SCOPE CUT — see the LANDING decision below. The full door is deferred, not cancelled.**
+
+> ### 🔵 SCOPE DECISION, 16 Aug — a landing, not a door
+>
+> Graeme, after weighing whether the feature is worth building at all: **build the landing, defer the door.**
+>
+> **The analysis that produced it.** Chronic pain affects roughly 43% of UK adults and is defined at three months, while the reviewed redirect threshold is six weeks — so **most people arriving at this door are past it by definition** and receive the signpost rather than a rehab programme. Meanwhile the app *already* adapts to pain: 29 chain-tagged conditions, phase-aware variants, 94 phase-tagged rehab exercises, the severe-pain override. **Four of the door's five components are safety and signposting rather than capability.** It is a responsible layer over something that already works, not a new thing the product could not otherwise do.
+>
+> **The decisive argument was maintenance, not value.** Graeme intends to move to the next product after launch. A feature carrying an ongoing clinical-review dependency is a poor fit for a founder who will not be refining this one; differentiation that cannot be maintained becomes a liability.
+>
+> **BUILD (bolted onto the existing conditions flow — no new entry point, no chain routing, no branding):**
+>
+> 1. **The red-flag screen with the hard stop.** Confirmed by Graeme as important. Non-negotiable and cheap, and it applies *today* regardless of the door: the app already asks where it hurts and how much, so it is already a triage interaction in the user's eyes.
+> 2. **A duration question and the six-week redirect**, with the reviewer's referral routing.
+> 3. **MIN-2** for the three unhandled systemic conditions.
+>
+> **DEFER:** the named front door, chain-based entry routing, the post-surgical path, the upper limb entirely.
+>
+> **Graeme's refinement, worth recording as better than the spec:** he framed the redirect as firing *"if still no better"* rather than on duration reported at declaration. That is the stronger design — the app already holds daily pain scores, so it could redirect on **observed** lack of improvement rather than on a self-reported number. It is more build and it is a clinical trigger, so it needs the reviewer's view. **Phase 1 is the duration question; the observed version is the obvious phase 2.**
+>
+> **Confirmed: the 95-exercise clinical content audit goes ahead regardless.** Those exercises are live now; the audit was never contingent on the door.
+
+**STATUS (superseded above): REVIEWED. Physiotherapist review received 16 Aug 2026 and folded in below. Buildable once the three pre-beta conditions in §11 are met.**
 
 > ### v2 — what the review changed
 >
