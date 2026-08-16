@@ -156,10 +156,6 @@
 
 import { store } from "../store.js";
 import { firstSessionRecognition } from "../data/first-session.js";
-import { noticeDailyPace } from "../data/pacing.js";
-import { questionsForSession, shouldOfferBaseline, recordBaseline,
-         baselineIntro, baselineAck, EFFORT_CHIPS } from "../data/assessment.js";
-import { EXERCISES } from "../data/exercises/index.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { bodyCaution } from "../data/session-rationale.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
@@ -189,10 +185,6 @@ let currentIndex  = 0;
 // view, which is why a device pass is not optional.
 let pendingSkipOffer = null;
 
-// ASSESS-1. Baseline answers collected on the done screen, and the
-// acknowledgement once recorded. Reset with the rest of the session.
-let baselineAnswers = {};
-let baselineDone    = null;
 let timerInterval = null;
 let timeRemaining = 0;
 let timerRunning  = false;
@@ -766,65 +758,13 @@ function renderExercise() {
  * Binary per the skip/dislike spec section 6: "not a rating system... no
  * stars, no thumbs, no scores." Both choices are reversible in Settings.
  */
-/**
- * ASSESS-1. The baseline block on the done screen.
- *
- * Below the first-session recognition, above the pacing note. That order
- * is deliberate: the recognition is the emotional moment and earns the
- * right to ask something; questions first would dilute it.
- *
- * Skip is a real, equally weighted option, not a small grey link.
- */
-function renderBaseline() {
-  const qs   = questionsForSession(sessionQueue.map(e => e.id), _exMap());
-  const done = store.completedSessions(store.get("activityLog") || []).length;
-
-  if (baselineDone) {
-    return `
-      <div class="card card-coach cs-baseline">
-        <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <div><p class="coach-message-text">${_escB(baselineDone)}</p></div>
-      </div>`;
-  }
-  if (!shouldOfferBaseline(done, qs)) return "";
-
-  const intro = baselineIntro();
-  return `
-    <div class="card card-coach cs-baseline">
-      <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-      <div>
-        <h2 class="cs-baseline__heading">${_escB(intro.heading)}</h2>
-        <p class="coach-message-text">${_escB(intro.body)}</p>
-        ${qs.map(q => `
-          <fieldset class="cs-baseline__group">
-            <legend class="cs-baseline__legend">How was ${_escB(q.label)}?</legend>
-            <div class="cs-baseline__chips">
-              ${EFFORT_CHIPS.map(c => `
-                <button class="btn btn-ghost btn-small ${baselineAnswers[q.key] === c.id ? "is-selected" : ""}"
-                        data-baseline-q="${_escB(q.key)}" data-baseline-a="${_escB(c.id)}"
-                        aria-pressed="${baselineAnswers[q.key] === c.id ? "true" : "false"}">${_escB(c.label)}</button>
-              `).join("")}
-            </div>
-          </fieldset>
-        `).join("")}
-        <div class="cs-baseline__actions">
-          <button class="btn btn-primary btn-small" data-baseline-save>Done</button>
-          <button class="btn btn-ghost btn-small" data-baseline-skip>Skip this</button>
-        </div>
-      </div>
-    </div>`;
-}
-
-let _exMapCache = null;
-function _exMap() {
-  if (!_exMapCache) _exMapCache = new Map(EXERCISES.map(e => [e.id, e]));
-  return _exMapCache;
-}
-
-function _escB(s) {
-  return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
+// SHARED-1, 15 Aug 2026. The baseline block that used to live here has
+// moved to data/session-moments.js, rendered by views/reflect.js.
+//
+// It was here, and here only, which meant it appeared for one of eleven
+// session views. reflect.js is where every session already ends up, so
+// it now reaches all of them. Removed rather than left as a second copy:
+// two definitions of a coach moment is how they drift apart.
 
 function renderSkipOffer() {
   if (!pendingSkipOffer) return "";
@@ -885,40 +825,17 @@ function renderDone() {
   const focus       = FOCUS_TYPES.find(f => f.id === selectedFocus);
   const exercisesDone = currentIndex;
 
-  // DELIGHT-1. Counted from the log AFTER finaliseSession() has written
-  // this session, so a first session reads as 1 rather than 0.
-  const completedCount = store.completedSessions(store.get("activityLog") || []).length;
-  const firstTime = firstSessionRecognition(
-    completedCount,
-    store.get("onboarding.primaryTerritory")
-  );
-
-  // PACE-1. Third exercise activity today. Called here rather than in
-  // finaliseSession() so it reads the log AFTER this session is in it,
-  // and it marks itself shown so a re-render does not repeat it.
-  const pacing = noticeDailyPace();
+  // SHARED-1, 15 Aug 2026. The first-session recognition and the daily
+  // pacing note used to render here, and here only -- so they reached
+  // one of eleven session views. They now live in
+  // data/session-moments.js, rendered by views/reflect.js, which every
+  // session view routes to, including this one.
+  //
+  // Removed rather than left as a second copy: two definitions of a
+  // coach moment is how they drift apart.
 
   return `
     <div class="view core-session-view" style="text-align: center;">
-      ${firstTime ? `
-        <div class="card card-coach cs-first-session" style="margin-top: var(--space-8);">
-          <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-          <div>
-            <h2 class="cs-first-session__heading">${firstTime.heading}</h2>
-            <p class="coach-message-text">${firstTime.body}</p>
-          </div>
-        </div>
-      ` : ``}
-      ${renderBaseline()}
-      ${pacing ? `
-        <div class="card card-coach cs-pacing" style="margin-top: var(--space-8);">
-          <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
-          <div>
-            <h2 class="cs-pacing__heading">${pacing.heading}</h2>
-            <p class="coach-message-text">${pacing.body}</p>
-          </div>
-        </div>
-      ` : ``}
       <div class="card card-coach" style="margin-top: var(--space-8);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div>
@@ -1096,7 +1013,6 @@ function resetSession() {
   sessionQueue  = [];
   currentIndex  = 0;
   pendingSkipOffer = null;   // W2-7: must not leak between sessions
-    baselineAnswers = {}; baselineDone = null;   // ASSESS-1
   creditsEarned = 0;
   timeRemaining = 0;
   timerRunning  = false;
@@ -1283,7 +1199,6 @@ export function onMount() {
   document.getElementById("cs-start-btn")?.addEventListener("click", () => {
     currentIndex  = 0;
     pendingSkipOffer = null;   // W2-7: must not leak between sessions
-    baselineAnswers = {}; baselineDone = null;   // ASSESS-1
     creditsEarned = 0;
     timeRemaining = 0;
     timerRunning  = false;
@@ -1347,28 +1262,6 @@ export function onMount() {
       pendingSkipOffer = skipped || null;
       rerender();
     }
-  });
-
-  // ASSESS-1. Baseline chips, save and skip.
-  document.querySelectorAll("[data-baseline-q]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      baselineAnswers[btn.dataset.baselineQ] = btn.dataset.baselineA;
-      rerender();
-    });
-  });
-  document.querySelector("[data-baseline-save]")?.addEventListener("click", () => {
-    // No answers at all is a skip, not a save. recordBaseline() returns
-    // null and we must not report a read that did not happen.
-    const entry = recordBaseline(baselineAnswers);
-    if (!entry) { store.declineAssessment(); baselineDone = null; }
-    else baselineDone = baselineAck(store.assessmentChange());
-    rerender();
-  });
-  document.querySelector("[data-baseline-skip]")?.addEventListener("click", () => {
-    store.declineAssessment();
-    baselineAnswers = {};
-    baselineDone = null;
-    rerender();
   });
 
   // W2-7. Skip-offer answers. Delegated because the strip is rendered

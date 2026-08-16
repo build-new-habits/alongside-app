@@ -58,7 +58,14 @@ const files = [...walk('js/views'), ...walk('js/data'), 'js/session-log.js', 'js
 const offenders = [];
 
 for (const f of files) {
-  const src = strip(fs.readFileSync(f, 'utf8'));
+  const raw = fs.readFileSync(f, 'utf8');
+  // Assignments read from the STRIPPED source, so HTML attributes inside
+  // template literals do not read as assignments. Declarations read from
+  // the RAW source, because the template-literal strip cannot handle the
+  // nested `${...`...`...}` in these files and was swallowing real
+  // declarations along with the markup — reporting `out` as undeclared
+  // when `let out = ''` was four lines above the first use.
+  const src = strip(raw);
   // Bare assignments at the start of a statement: `foo = ...` or `foo += ...`
   // Line-based, and markup lines are excluded. Nested template literals
   // survive the strip above, so `class="x"` becomes `class=""` and reads
@@ -80,7 +87,7 @@ for (const f of files) {
       `function\\s*\\w*\\s*\\([^)]*\\b${name}\\b|` +     // function params
       `\\b(?:catch|for)\\s*\\([^)]*\\b${name}\\b|` +
       `\\{[^{}]*\\b${name}\\b[^{}]*\\}\\s*=`             // destructuring
-    ).test(src);
+    ).test(raw);
     if (!declared) offenders.push(`${path.basename(f)}: ${name}`);
   }
 }
@@ -92,10 +99,16 @@ check('no module assigns an identifier it never declares',
 
 // The specific one that shipped, asserted by name so it cannot recur silently.
 const cs = fs.readFileSync('js/views/core-session.js', 'utf8');
-for (const v of ['pendingSkipOffer', 'baselineAnswers', 'baselineDone']) {
-  check(`core-session declares ${v}`,
-    new RegExp(`let\\s+${v}\\b`).test(cs));
-}
+check('core-session declares pendingSkipOffer',
+  /let\s+pendingSkipOffer\b/.test(cs),
+  'the one that shipped as a ReferenceError');
+
+// SHARED-1. The baseline state moved to data/session-moments.js, so it
+// must NOT still be here — two definitions of a coach moment is how they
+// drift apart.
+const sm = fs.readFileSync('js/data/session-moments.js', 'utf8');
+check('the baseline state lives in session-moments, not core-session',
+  /let\s+baselineAnswers\b/.test(sm) && !/let\s+baselineAnswers\b/.test(cs));
 
 console.log(failures === 0 ? '\nDECL-1 GATE GREEN' : `\nDECL-1 GATE RED — ${failures} failure(s)`);
 process.exit(failures === 0 ? 0 : 1);
