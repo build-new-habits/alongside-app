@@ -1,0 +1,264 @@
+/**
+ * tools/verify-chap2.mjs
+ * 16 Aug 2026 v1
+ *
+ * CHAP-1 step 2. My Programme.
+ *
+ * THIS GATE EXECUTES THE VIEWS. Every other gate in this suite reads
+ * source text, which is exactly why four end-of-session moments could
+ * ship into one of eleven session views on 15 Aug with fifty-one gates
+ * green: not one of them knew whether a person could reach the code it
+ * was reading. A regex proves a string exists in a file. It does not
+ * prove a screen renders it, and those are different claims.
+ *
+ * So this mounts Home in jsdom, finds the row, CLICKS it, and asserts
+ * where the click goes. Then it mounts the destination across four real
+ * user states and reads the text a person would actually see.
+ *
+ * The negative assertions carry most of the weight, because the failure
+ * mode for this feature is not "it does not work" -- it is "it works and
+ * quietly becomes a deadline". Blueprint §3: keep the milestone, remove
+ * the countdown, show progress made and never distance remaining.
+ *
+ * Every assertion here was reversal-tested: made to fail on purpose
+ * before being trusted. A gate that has never been made to fail proves
+ * nothing, and "no output" is not "green".
+ */
+import fs from 'node:fs';
+import { JSDOM } from '/home/claude/node_modules/jsdom/lib/api.js';
+
+const dom = new JSDOM('<!doctype html><div id="main-content"></div>',
+  { url: 'https://build-new-habits.github.io/alongside-app/' });
+globalThis.window = dom.window;
+globalThis.document = dom.window.document;
+Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator, configurable: true, writable: true });
+Object.defineProperty(globalThis, 'localStorage', { value: dom.window.localStorage, configurable: true, writable: true });
+
+const BASE = new URL('../js/', import.meta.url).href;
+const { store }           = await import(BASE + 'store.js');
+const { TodayView }       = await import(BASE + 'views/today.js');
+const { MyProgrammeView } = await import(BASE + 'views/my-programme.js');
+
+let failures = 0;
+const check = (n, ok, d = '') => {
+  console.log(`${ok ? 'PASS' : 'FAIL'}  ${n}${d ? ' — ' + d : ''}`);
+  if (!ok) failures++;
+};
+
+const el = document.getElementById('main-content');
+const flat = () => el.textContent.replace(/\s+/g, ' ').trim();
+
+/** Mount a view for real, from a seeded store, and hand back what a
+ *  person would see. Anything thrown is a FAIL rather than a crash:
+ *  a gate that dies is not a gate that failed. */
+function mountWith(View, seed) {
+  localStorage.clear();
+  store.init();
+  if (seed) seed();
+  const navs = [];
+  try {
+    View({ navigate: v => navs.push(v) }).mount(el);
+  } catch (e) {
+    return { navs, text: '', threw: e };
+  }
+  return { navs, text: flat(), threw: null };
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// 1. The route exists, and points at something real
+// ─────────────────────────────────────────────────────────────────────
+
+const routerSrc = fs.readFileSync('js/router.js', 'utf8');
+const entry = routerSrc.match(/'my-programme':\s*\{\s*path:\s*'([^']+)',\s*fn:\s*'([^']+)'/);
+check('the router declares a my-programme route', !!entry);
+if (entry) {
+  const filePath = 'js/' + entry[1].replace(/^\.\//, '');
+  check('and its path points at a file that exists', fs.existsSync(filePath), filePath);
+  // The 04 Aug session-builder bug: a route pointed at a filename that
+  // had never existed, so import() threw before anything else ran and
+  // the route could not have worked on any device, ever.
+  check('and the file really exports the factory the router names',
+    fs.existsSync(filePath) && new RegExp(`export function ${entry[2]}\\b`).test(fs.readFileSync(filePath, 'utf8')),
+    entry[2]);
+}
+check('the nav tab agrees with how you got there',
+  /'my-programme':\s*'today'/.test(routerSrc),
+  "NAV-8: a tab that disagrees with the route is worse than absent");
+
+// ─────────────────────────────────────────────────────────────────────
+// 2. Home renders the row — executed, not read
+// ─────────────────────────────────────────────────────────────────────
+
+const home = mountWith(TodayView, () => {});
+check('Home mounts without throwing', !home.threw, home.threw ? String(home.threw) : '');
+
+const row = el.querySelector('.today-programme-row');
+check('Home renders the My Programme row', !!row);
+check('the row is a real button with an accessible name',
+  !!row && row.tagName === 'BUTTON' && (row.getAttribute('aria-label') || '').length > 0);
+
+const grid = el.querySelector('.today-doors');
+check('the row sits ABOVE the six tiles',
+  !!row && !!grid && !!(row.compareDocumentPosition(grid) & dom.window.Node.DOCUMENT_POSITION_FOLLOWING),
+  'full width above the grid, not a seventh tile');
+check('and it is not styled as one of the tiles',
+  !!row && !row.classList.contains('today-door'),
+  'in the grid people tap it expecting a workout');
+
+// The claim that matters: tapping it actually goes somewhere.
+if (row) {
+  const before = home.navs.length;
+  row.click();
+  check('clicking the row navigates to my-programme',
+    home.navs.length === before + 1 && home.navs[home.navs.length - 1] === 'my-programme',
+    home.navs.join(',') || 'nothing happened');
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// 3. The cog is gone, and Settings did not go with it
+// ─────────────────────────────────────────────────────────────────────
+
+check('the cog is gone from Home', !el.querySelector('.today-settings-link'));
+check('and Settings is still reachable from the bottom nav',
+  /data-nav="settings"/.test(fs.readFileSync('index.html', 'utf8')),
+  'removing the only route to a screen would be a regression, not a tidy-up');
+// Both branches, executed. The first fixture has not checked in today,
+// so Home offers "Check in" -- I asserted "Update check-in" against it
+// and the gate caught me, which is the whole argument for running one
+// rather than reading it. The claim being defended is that NEITHER
+// branch is icon-only, so both are mounted.
+check('before checking in, the control says so in words',
+  /Check in/.test(el.innerHTML) && !/Update check-in/.test(el.innerHTML));
+
+const checkedIn = mountWith(TodayView, () => {
+  store.set('lastCheckin.timestamp', new Date().toISOString());
+});
+check('"Update check-in" keeps a visible text label',
+  !checkedIn.threw && /Update check-in/.test(el.innerHTML),
+  'an icon-only control is the least discoverable thing on a screen, and a passport-and-pen has no meaning for "change how I said I am feeling"');
+check('and it is still there for somebody who wants to update WITHOUT starting a session',
+  !!el.querySelector('[data-action="checkin-mini"]'),
+  'the case the contextual offer misses: checked in this morning, felt worse by evening');
+
+// ─────────────────────────────────────────────────────────────────────
+// 4. The destination renders, in every state a person can arrive in
+// ─────────────────────────────────────────────────────────────────────
+
+const seedNothing = () => { store.set('goals', []); };
+
+const seedFree = () => { store.set('goals', ['get-stronger', 'feel-better']); };
+
+const seedChapter = () => {
+  store.set('goals', ['get-stronger']);
+  store.set('activeProgramme.programmeId', 'beginner-fitness');
+  store.set('activeProgramme.startDate', new Date(Date.now() - 21 * 864e5).toISOString());
+  store.set('activeProgramme.currentWeek', 4);
+  store.set('activeProgramme.totalSessions', 9);
+  store.recordAssessment({ measuredLevel: 'moderate', results: {} });
+};
+
+const seedEvent = () => {
+  seedChapter();
+  store.set('programme.presentation', 'blocks');
+  store.set('activeProgramme.currentWeek', 8);
+  store.set('strategicGoal.targetDescription', 'The coast path walk');
+  store.set('strategicGoal.targetDate', new Date(Date.now() + 29 * 864e5).toISOString());
+};
+
+const nothing = mountWith(MyProgrammeView, seedNothing);
+check('it mounts for somebody with nothing at all', !nothing.threw && nothing.text.length > 0,
+  nothing.threw ? String(nothing.threw) : '');
+check('and does not claim they are on a programme',
+  /not following a chapter/i.test(nothing.text));
+
+const free = mountWith(MyProgrammeView, seedFree);
+check('a free user with no programme still sees what they are after',
+  /Get stronger/.test(free.text) && /Feel better/.test(free.text),
+  'goals, a level and sessions done are not Personal-tier facts');
+
+const chapter = mountWith(MyProgrammeView, seedChapter);
+check('the chapter is named', /Build Your Base/.test(chapter.text));
+check('the arc names what would likely come next',
+  /Back to Strength would likely come next/.test(chapter.text));
+check('and says plainly that it is not settled',
+  /Nothing is fixed/.test(chapter.text),
+  'CHAIN-1 made it a rail; the blueprint makes it a default');
+
+// ─────────────────────────────────────────────────────────────────────
+// 5. Progress made, never distance remaining — the whole feature
+// ─────────────────────────────────────────────────────────────────────
+
+// currentWeek 4 means three weeks are BEHIND them. The forbidden number
+// is 8, which is 12 minus 4, and the only way it appears is if somebody
+// has written a countdown against a programme length.
+check('weeks are counted forward', /3 weeks in/.test(chapter.text), 'week 4 of a programme = 3 weeks in');
+check('and never backward against the programme length',
+  !/\b8 weeks (left|remaining|to go)\b/i.test(chapter.text) &&
+  !/weeks (left|remaining)\b/i.test(chapter.text),
+  'a twelve-week bar is a manufactured deadline');
+
+const BANNED = [
+  [/\d+\s?% /,                       'a percentage complete'],
+  [/progress-bar|progress-fill|__bar\b/, 'a progress bar'],
+  [/\bstreak\b/i,                    'a streak'],
+  [/\bday(s)? in a row\b/i,          'consecutive anything'],
+  [/\bbehind\b/i,                    'telling somebody they are behind'],
+  [/\bon track\b/i,                  'a track to fall off']
+];
+for (const [re, what] of BANNED) {
+  check(`no ${what}`, !re.test(chapter.text) && !re.test(el.innerHTML));
+}
+
+// The blocks vocabulary is the same engine, and it must also count
+// forward. If Blocks needs a countdown to feel like Blocks, the choice
+// was cosmetic and that is worth discovering early.
+const event = mountWith(MyProgrammeView, seedEvent);
+check('the blocks vocabulary still counts weeks DONE',
+  /Week 7 done/.test(event.text),
+  'one flag, two vocabularies — never two engines');
+
+// The one honest countdown, and the positive half of the assertion
+// above. Without this, "no countdown" could pass simply because the
+// branch never renders at all.
+check('a date the PERSON supplied does get counted toward',
+  /29 days to go/.test(event.text) && /The coast path walk/.test(event.text),
+  'a hike on 14 September is a real deadline; the app is being useful about a fact');
+check('and the supplied date is shown in words, not as a bare number',
+  /14 September/.test(event.text));
+
+// ─────────────────────────────────────────────────────────────────────
+// 6. The weekly focus has NOT shipped
+// ─────────────────────────────────────────────────────────────────────
+
+// Nothing writes weekFocus.key yet — it is build step 4. If a section
+// for it appears now, it is copy no user can reach, which is the fault
+// that cost a day on 15 Aug. Seeded deliberately, so this fails the
+// moment somebody renders it ahead of its writer.
+const focus = mountWith(MyProgrammeView, () => {
+  seedChapter();
+  store.set('weekFocus.key', 'single-leg');
+});
+check('the weekly focus is not rendered before it has a writer',
+  !/single-leg/i.test(focus.text) && !/focus/i.test(focus.text),
+  'step 4 — the section arrives with the thing that fills it');
+
+// ─────────────────────────────────────────────────────────────────────
+// 7. It reads. It does not write.
+// ─────────────────────────────────────────────────────────────────────
+
+// Seeded so no week is due to turn (21 days elapsed, currentWeek
+// already 4), which is the only write mount() is entitled to make.
+localStorage.clear();
+store.init();
+seedChapter();
+const before = localStorage.getItem('alongside_user');
+MyProgrammeView({ navigate: () => {} }).mount(el);
+const after = localStorage.getItem('alongside_user');
+check('mounting the view writes nothing to the store',
+  before === after,
+  'step 2 is a display surface; a read-only screen that saves is a screen with a side effect nobody expects');
+
+console.log(failures === 0
+  ? `\nALL PASS — ${'my-programme'} renders from a real click on a real Home.\n`
+  : `\n${failures} FAILURE(S)\n`);
+process.exit(failures === 0 ? 0 : 1);

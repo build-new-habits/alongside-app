@@ -1,5 +1,19 @@
 /*
  * css/layouts/today.css
+ * 16 Aug 2026 v4
+ *
+ * v4 — CHAP-1 step 2. .today-programme-row added: full width, above the
+ *   grid, deliberately NOT a .today-door. The six tiles answer "what
+ *   shall I do now?"; this answers "where am I going?", and styling it
+ *   as a tile would make people tap it expecting a workout. It is a row
+ *   with a chevron, which is the established shape for "this leads
+ *   somewhere" rather than "this starts something".
+ *
+ *   .today-settings-link REMOVED with the cog it styled. Settings is a
+ *   bottom-nav destination reachable from every screen. The greeting's
+ *   padding-right went with it — it existed only to clear the cog, and
+ *   leaving it would have kept a 52px gap guarding nothing.
+ *
  * 04 Aug 2026 v3
  *
  * v3 — .today-door__hint added for the "Your programme" indicator on
@@ -33,35 +47,6 @@
   position: relative;
 }
 
-/* ── Settings corner affordance ──────────────────────────────────── */
-
-.today-settings-link {
-  position: absolute;
-  top: var(--space-6);
-  right: var(--space-4);
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--text-xl);
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.today-settings-link:hover,
-.today-settings-link:focus-visible {
-  background: var(--color-bg-elevated);
-}
-
-.today-settings-link:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
 /* ── Greeting ─────────────────────────────────────────────────── */
 
 .today-greeting {
@@ -69,7 +54,6 @@
   font-weight: var(--font-bold);
   color: var(--color-text);
   margin: 0;
-  padding-right: 52px; /* clears the settings affordance */
   line-height: 1.2;
 }
 
@@ -102,6 +86,63 @@
 .today-week-count__label {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
+}
+
+/* ── My Programme row (CHAP-1 step 2) ─────────────────────────── */
+
+.today-programme-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.today-programme-row:hover {
+  border-color: var(--color-primary);
+}
+
+.today-programme-row:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.today-programme-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+  min-width: 0;
+}
+
+.today-programme-row__label {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  line-height: var(--leading-snug);
+}
+
+.today-programme-row__hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-snug);
+}
+
+/* Decorative only — aria-hidden in the markup, and the row's accessible
+   name already says where it goes. Nothing here is the sole carrier of
+   meaning, so it can be safely ignored by a screen reader. */
+.today-programme-row__chevron {
+  font-size: var(--text-xl);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
 }
 
 /* ── Six doors ────────────────────────────────────────────────── */
