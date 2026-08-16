@@ -1,8 +1,19 @@
 # Alongside: Move — ME/CFS: a starting point
 
-## 16 Aug 2026 v1
+## 16 Aug 2026 v2
 
-Build New Habits | **Draft for Graeme to refine. Contains clinical questions that must go back to the physiotherapist before anything ships.**
+Build New Habits | **Decisions taken. Clinical questions issued to the physiotherapist 16 Aug — see `alongside_physio_followup_mecfs_16aug2026_v1.docx`. Nothing builds until they answer.**
+
+> ### Graeme's decisions, 16 Aug
+>
+> | | Decision |
+> |---|---|
+> | **§2 Two populations** | **B — one ID, one distinguishing question** about delayed crashes. Physio writes it; we drafted a version for them to correct or replace. |
+> | **§3 What remains** | **Option 2 — non-exertional practices only.** Breathing, mindfulness, seated. No sessions, no programmes, no progression. *(Read from "2b"; the option list was numbered 1–4 rather than lettered, and this reading was flagged back to Graeme.)* |
+> | **§4 Register** | **Draft A** — plain and direct, explains the reasoning. |
+> | **§5 Where it fires** | **Both** onboarding and Conditions Update. |
+> | **§5 Repeat** | **Once at declaration**, never again unless they ask. |
+> | **§5 Kit opt-in** | **STILL OPEN** — Graeme asked what Kit is. Decision outstanding. |
 
 ---
 
