@@ -1,0 +1,156 @@
+/*
+ * css/layouts/my-programme.css
+ * 16 Aug 2026 v1
+ *
+ * CHAP-1 step 2. The "where am I going?" screen.
+ *
+ * WHAT IS DELIBERATELY ABSENT, and it is the point of the feature:
+ *
+ *   No progress bar. No percentage. No ring, meter or fill of any
+ *   kind. Progress visualisation accelerates behaviour near completion
+ *   by amplifying perceived obligation — it works by making completion
+ *   always visible, always close and rarely final, which is persona
+ *   2.5's declared territory with a countdown drawn on it. The
+ *   blueprint's rule is keep the milestone, remove the countdown, show
+ *   progress made and never distance remaining, and a bar cannot obey
+ *   it because a bar IS the remaining distance.
+ *
+ *   No accent colour on any number. Same restraint as PB-1, where the
+ *   gate asserts the CSS does not highlight a personal best: a figure
+ *   styled as an achievement becomes a target to defend.
+ *
+ * All colours are existing tokens from css/base/variables.css, every
+ * one already cleared by tools/contrast-check.mjs against all three
+ * schemes. No new token is introduced here, so nothing on this screen
+ * can drift out of AA behind the checker's back.
+ *
+ * WCAG 2.2 AA: text sizes inherit the user scale tokens, list markers
+ * are removed but list semantics are kept, and nothing is distinguished
+ * by colour alone.
+ */
+
+.my-programme-view {
+  padding: var(--space-6) var(--space-4) var(--space-8);
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.my-programme-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.my-programme-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.my-programme-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.my-programme-section {
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.my-programme-section__title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--leading-snug);
+}
+
+/* The chapter name. Larger than the body, and that is all — no accent
+   colour, because it is where somebody is rather than something they
+   have won. */
+.my-programme-chapter {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0;
+  line-height: var(--leading-snug);
+}
+
+.my-programme-line {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+/* The "what would likely come next" line. Quieter, because it is the
+   least settled thing on the screen and must not read as a track
+   already laid. */
+.my-programme-line--soft {
+  color: var(--color-text-secondary);
+}
+
+.my-programme-empty {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+/* ── The arc ──────────────────────────────────────────────────── */
+
+.my-programme-arc,
+.my-programme-goals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.my-programme-arc__item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.my-programme-arc__name {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: var(--leading-snug);
+}
+
+.my-programme-arc__when {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.my-programme-goals__item {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Back ─────────────────────────────────────────────────────── */
+
+.my-programme-back {
+  margin-top: auto;
+  min-height: 44px;
+}

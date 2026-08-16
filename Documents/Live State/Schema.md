@@ -1,10 +1,42 @@
 # Alongside — Data Schema Reference
-## 13 Aug 2026 v1.33
+## 16 Aug 2026 v1.34
 
-**File:** `js/store.js` (confirmed live version: **v41, 13 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v52, 15 Aug 2026**)
 **Storage:** `localStorage` key `alongside_user`
 
-**This version supersedes:** v1.30 (12 Aug 2026).
+**This version supersedes:** v1.33 (13 Aug 2026).
+
+---
+
+## v1.34 (16 Aug 2026) — eleven store versions of drift, and the gate that could not see it
+
+`store.js` v41 → **v52**. Nine top-level fields were undocumented: `assessment`, `exerciseClearance`, `pacing`, `personalBests`, `programme`, `sessionMode`, `sessionPace`, `showPersonalBests`, `weekFocus`.
+
+**Why the drift got this far.** `tools/schema-check.mjs` exists precisely to stop it, and it reported the version mismatch faithfully — but its field diff had never examined anything. It anchored on `indexOf('getDefaults()')`, matching the first *mention of the name* in the header comment rather than the definition ~760 lines later, then searched for the closing brace from the start of that slice, so the end index landed before the start index and `String.slice()` returned `''`. Zero keys were extracted, so every key counted as documented and `UNDOCUMENTED` could not fire at any amount of drift.
+
+It was found by probing the extraction rather than reading the verdict. The lesson is the 15 Aug rule with one addition: **a red check is no more trustworthy than a green one.** This one was failing, for a real reason, while its main assertion was empty — and the plausible fix, bumping the version line, would have turned it green and buried all nine fields.
+
+`schema-check.mjs` is now **v2**: anchored on the definition, ended relative to the return, and it asserts its own extraction — fewer than 50 top-level fields fails loudly rather than passing quietly. Reversal-tested by renaming `getDefaults` in a scratch clone.
+
+### The nine fields
+
+| Field | Shape | Writer | Reader |
+|---|---|---|---|
+| `assessment` | `{ baseline, history[], lastOfferedAt, declined }` | `store.recordAssessment()` / `store.declineAssessment()` | `store.assessmentChange()`, `data/assessment.js` |
+| `programme` | `{ presentation, chaptersDone[], currentChapterId, hingeOfferedAt }` | none yet (CHAP-1 step 1 is schema only) | `views/my-programme.js` |
+| `weekFocus` | `{ key, proposedAt, editedByUser }` | none yet (CHAP-1 step 4) | `views/my-programme.js` |
+| `exerciseClearance` | `'cleared' \| 'not-yet' \| 'not-sure' \| null` | `views/onboarding/thread.js` step 8a | `session-builder.js` `_needsClearance()` |
+| `pacing` | `{ noticedOn, planNudgeAt, briefOfferedAt }` | `data/pacing.js` | `data/pacing.js`, `views/today.js` |
+| `sessionPace` | `'full' \| 'brief'` | `views/settings.js`, `data/pacing.js` | check-in flow |
+| `sessionMode` | `'coach-led' \| 'coach-supported' \| 'free-hand'` | `views/settings.js` | session generation |
+| `personalBests` | `{ [exerciseId]: { ... } }` | `store.recordPersonalBest()` | `store.personalBest()` |
+| `showPersonalBests` | `boolean`, default `false` | `views/settings.js` | session views |
+
+**`assessment` is the one that matters most**, because it is what finally lets `fitnessLevel` move without the person editing Settings. `recordAssessment()` writes the measured level straight onto `fitnessLevel` — one field, one meaning — rather than adding a fourth level field that existing readers would not know about. There is deliberately **no score** anywhere in it: `results` holds how each movement felt in the person's own words, and `history` is capped at 12 entries because it is a record of where somebody has been, not a dataset.
+
+**`programme` and `weekFocus` are declared and written by nothing today.** That is correct for CHAP-1 step 1, and is recorded here so nobody reads their presence as evidence the hinge or the weekly focus is built. `programme.presentation` defaults to `'chapters'` and is validated to `'chapters' | 'blocks'` on load.
+
+**`showPersonalBests` is separate from `liftLogEnabled` on purpose**, and defaults off: somebody using session notes as a memory aid did not ask to be shown a best, and for personas 2.5, 2.8 and 2.13 a visible best is a target to fall short of.
 
 **v1.31 (12 Aug 2026)** — device pass. `store.js` v36 → **v38**.
 
@@ -272,6 +304,7 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | **1.14** | **04 Aug 2026** | **Phase D-1 (schema), Conditions Update.** Two new fields: `conditionGoals` (felt-sense condition-specific goal, `'healed'\|'cope'\|'improve'` + optional note, new `store.setConditionGoal()`) and `prescribedExercisesOrigin` (`'professional'\|'self'\|null`, lets `prescribed.js` branch its coach voice correctly). Also documented in the field-reference table: `pendingDoorRoute`, added earlier today (Phase C follow-up) but missed in Schema.md at the time. `js/store.js` v14→v15. |
 | **1.15** | **04 Aug 2026** | **Condition programmes, real routes built.** `prescribedExercises` entries can now carry an optional `conditionId` — additive, nullable, existing entries unaffected. New `prescribedExercisesActiveCondition` — single-use context flag, cleared the instant it's read. `js/store.js` v15→v16. New module `js/data/conditionProgrammes.js` (not a schema file, but the reason these fields exist) — real, tested exercise-selection logic for "Coach builds it"/"Coach recommends, you select," built on `affectsAreas`/`rehabPhase`/`contraindications` data that already existed. |
 | **1.16** | **04 Aug 2026** | **Cross-condition exercise reuse, not duplication.** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — one entry can now genuinely serve more than one condition, so doing the same physical exercise once correctly counts once everywhere, rather than the same exercise appearing as two separate entries with independent completion state and double credits. Backward compatible — old singular-shaped entries read correctly via new `getEntryConditionIds()`, migrate naturally on rebuild, no explicit migration step. `js/data/conditionProgrammes.js` v2→v3. Smoke-tested against real overlapping conditions before shipping. |
+| **1.34** | **16 Aug 2026** | **Eleven versions of drift, caught by fixing the gate meant to catch it.** `store.js` v41 → v52. Nine undocumented top-level fields folded in: `assessment` (ASSESS-1 — the field that lets the difficulty ceiling move), `programme` + `weekFocus` (CHAP-1 step 1, declared and written by nothing), `exerciseClearance` (CARDIAC-1), `pacing` + `sessionPace` (PACE-1/QUICK-1), `sessionMode`, `personalBests` + `showPersonalBests` (PB-1). `tools/schema-check.mjs` v1 → **v2**: its field diff had been slicing an empty string since the day it was written, so it could not fire at any amount of drift. Now anchored on the definition and self-asserting. |
 | **1.17** | **09 Aug 2026** | **"In Step" (Noticing Hub, Personal tier) + drift catch-up.** New field `inStepProgress` (`unlockedAt`, `scenarioIndex`, `completedCount`, `choiceLog`) — four-movement scenario practice extending the empathy transfer arc, `js/store.js` v17→v18, new `js/data/in-step-scenarios.js` + `js/views/in-step.js`, new route `in-step`. Also documented `exercisePreferences` (`store.js` v17, 04 Aug), missed in Schema.md at the time — same drift pattern as `pendingDoorRoute` in 1.14, caught here rather than left open. |
 
 ### Corrections made in this pass
@@ -700,4 +733,4 @@ All 18 fields flagged in the 30 Jul v1.9 follow-up list have been individually c
 
 ---
 
-*Build New Habits · Alongside: Move · Data Schema Reference · 03 Aug 2026 v1.10*
+*Build New Habits · Alongside: Move · Data Schema Reference · 16 Aug 2026 v1.34*

@@ -1,5 +1,11 @@
 /**
  * tools/schema-check.mjs
+ * 16 Aug 2026 v2
+ *
+ * v2 - The field diff had never run. See the note at the extraction
+ *   below. Nine store fields were undocumented while this reported the
+ *   version line alone.
+ *
  * 12 Aug 2026 v1
  *
  * A3/A1. Diffs js/store.js getDefaults() against Documents/Live State/Schema.md
@@ -27,13 +33,42 @@ if (storeVer !== claimed) {
 }
 
 // 2. Top-level keys in getDefaults()
-const defBlock = storeSrc.slice(storeSrc.indexOf('getDefaults()'));
-const body = defBlock.slice(defBlock.indexOf('return {'), defBlock.indexOf('\n    };'));
+//
+// v2, 16 Aug 2026. THIS BLOCK HAD NEVER EXAMINED ANYTHING.
+//
+// It anchored on indexOf('getDefaults()'), which matches the FIRST
+// mention of the name -- line 209, inside the header comment, not line
+// 972 where the method is defined. It then looked for the closing
+// '\n    };' from the start of that slice rather than from the return,
+// so the end index came out BEFORE the start index and String.slice()
+// returned ''. Zero keys were extracted, every key was therefore
+// "documented", and UNDOCUMENTED could not fire however far Schema.md
+// drifted. The whole check reduced to its version line.
+//
+// Found by probing the extraction rather than reading the verdict: the
+// check was failing, for the right reason, while its second assertion
+// was empty. A red check is no more trustworthy than a green one.
+//
+// Anchored on the definition, ended relative to the return, and the
+// result is asserted -- an empty body now FAILS instead of passing.
+const defStart = storeSrc.indexOf('\n  getDefaults() {');
+const defBlock = defStart < 0 ? '' : storeSrc.slice(defStart);
+const iReturn  = defBlock.indexOf('return {');
+const iClose   = iReturn < 0 ? -1 : defBlock.indexOf('\n    };', iReturn);
+const body     = (iReturn >= 0 && iClose > iReturn) ? defBlock.slice(iReturn, iClose) : '';
 const keys = new Set();
 for (const m of body.matchAll(/^      ([a-zA-Z][\w]*)\s*:/gm)) keys.add(m[1]);
 
 const documented = new Set();
 for (const m of schemaSrc.matchAll(/`([a-zA-Z][\w]*)(?:\.[\w]+)?`/g)) documented.add(m[1]);
+
+// The extraction must be shown to have worked before its silence means
+// anything. 101 top-level fields live in getDefaults() today; a run that
+// finds a handful has found the wrong block, and "nothing undocumented"
+// would be a lie rather than a pass.
+if (keys.size < 50) {
+  issues.push(`EXTRACTION: only ${keys.size} top-level fields found in getDefaults() — the anchor is wrong, so the field diff below proves nothing`);
+}
 
 const undocumented = [...keys].filter(k => !documented.has(k)).sort();
 if (undocumented.length) {
