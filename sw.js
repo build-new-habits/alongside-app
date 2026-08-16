@@ -1,6 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Aug 2026 v370
+ * SEVERE-1. session-builder.js v36. The Gentle Care bypass now EXISTS.
+ * workoutGenerator v1.3's changelog has claimed it since August; it was
+ * not in the session path, and somebody with a knee at 9/10 was built a
+ * nine-exercise session including Single-Leg Glute Bridge and Inchworm.
+ * Severe zone (getZoneStatus's own 7+) now returns breathing, a body
+ * scan and an optional walk, on BOTH entry points.
+ *
+ * PROVISIONAL. No physiotherapist has reviewed it. Rollback is one
+ * constant: SEVERE_BYPASS_ENABLED in session-builder.js.
+ *
  * 16 Aug 2026 v369
  * DATA-SEATED. Seventeen seated exercises had impact and balanceDemand
  * swallowed into a trailing comment -- "adaptive: true,   // CAP-6
@@ -2564,7 +2575,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v369";
+const CACHE_NAME = "alongside-v370";
 
 const SHELL_URLS = [
 
