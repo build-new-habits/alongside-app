@@ -2,8 +2,17 @@
  * conditions.js — Condition definitions for onboarding and check-in
  *
  * 16 Aug 2026 v1.5
- *   HYPER-1. Physiotherapist review, 16 Aug: hypermobility/EDS must
- *   strictly avoid end-range passive stretching. getExerciseSafetyTier()
+ *   HYPER-1. Clinical guidance, 16 Aug: hypermobility/EDS must strictly
+ *   avoid end-range passive stretching.
+ *
+ *   SOURCE, stated precisely because it matters: an AI-generated
+ *   clinical review, cross-checked across several models by Graeme. NOT
+ *   a named physiotherapist, and not clinically signed off. Human
+ *   physiotherapy review is scheduled before public launch. An earlier
+ *   version of this comment said "Physiotherapist review, verbatim" —
+ *   that was wrong, and it was wrong in the exact way this file's own
+ *   §10 blueprint entry warns about: clinical authority attached to
+ *   something that had not earned it. getExerciseSafetyTier()
  *   now returns 'avoid' for stretch-pattern exercises when hypermobility
  *   is declared.
  *
@@ -257,11 +266,20 @@ export function getActiveConditionIds(conditionIds = [], painScores = {}) {
 export function getExerciseSafetyTier(exercise, activeConditions) {
   if (!activeConditions || activeConditions.length === 0) return 'safe';
 
-  // ── HYPER-1, 16 Aug 2026. Physiotherapist review, verbatim: ──────
+  // ── HYPER-1, 16 Aug 2026. ─────────────────────────────────────────
+  //
+  // SOURCE: AI-generated clinical review, cross-checked across several
+  // models. NOT a named physiotherapist. Human review before public
+  // launch. Quoted as written:
   //
   //   "Hypermobility/EDS: Focus on active control, proprioception, and
   //    closed-chain stability, strictly avoiding end-range passive
   //    stretching."
+  //
+  // The rule is kept despite the unverified source because the direction
+  // of its error is safe: it withholds 30 stretches from one group and
+  // leaves 521 exercises available. A wrong exclusion costs somebody
+  // some stretching. A wrong inclusion costs somebody a joint.
   //
   // Implemented as a RULE rather than as a tag on individual entries,
   // for two reasons. One entry-by-entry pass would be thirty separate
