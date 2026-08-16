@@ -4,7 +4,11 @@
  *
  * HYPER-1. Hypermobility/EDS and end-range passive stretching.
  *
- * Physiotherapist review, 16 Aug 2026, verbatim:
+ * SOURCE: AI-generated clinical review, cross-checked across several
+ * models by Graeme, 16 Aug 2026. NOT a named physiotherapist and NOT
+ * clinically signed off; human physiotherapy review is scheduled before
+ * public launch. This gate is the record of what was implemented and on
+ * what authority, so the authority is stated plainly. Quoted as written:
  *
  *   "Hypermobility/EDS: Focus on active control, proprioception, and
  *    closed-chain stability, strictly avoiding end-range passive
