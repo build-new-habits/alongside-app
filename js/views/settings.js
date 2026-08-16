@@ -1,5 +1,10 @@
 /**
  * settings.js
+ * 16 Aug 2026 v28
+ *   COUNTDOWN-1. The programme card said "Week 9 of 12". Second instance
+ *   of the same fault as progress.js, found by making the gate
+ *   product-wide instead of scoping it to the screen being built.
+ *
  * 15 Aug 2026 v27
  *
  * v27 - PB-1. "Show your best" toggle, off by default and separate from
@@ -989,7 +994,9 @@ export function SettingsView(router) {
         ${stats.hasActiveProgramme ? `
           <div class="settings-programme-card">
             <p class="settings-programme-card__name">${stats.programmeName}</p>
-            <p class="settings-programme-card__week">Week ${stats.currentWeek} of 12</p>
+            <p class="settings-programme-card__week">${stats.weeksIn === 0
+              ? "Just started"
+              : `${stats.weeksIn} ${stats.weeksIn === 1 ? "week" : "weeks"} in`}</p>
             <p class="settings-programme-card__phase">${stats.phaseName}</p>
           </div>
 
