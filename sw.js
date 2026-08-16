@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Aug 2026 v368
+ * CHAP-1 step 3 part two. today.js v20, gym-programme.js v6,
+ * programmeEngine.js v5, today.css v5. The hinge moves to Home, so an
+ * end-of-chapter offer that lived in one of thirteen session views now
+ * reaches everybody. gym-programme's private PROGRESSIONS map is
+ * deleted -- it disagreed with programmes.js on four of eight chapters,
+ * so the offer could name a different next chapter from the one My
+ * Programme had just shown. chapterSuccessor() and startChapter() are
+ * now the single definitions. No new files.
+ *
  * 16 Aug 2026 v367
  * CHAP-1 step 3, part one. programmeEngine.js v4, session-moments.js v3.
  * A chapter can now END. Before this it could not: currentWeek was
@@ -2545,7 +2555,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v367";
+const CACHE_NAME = "alongside-v368";
 
 const SHELL_URLS = [
 
