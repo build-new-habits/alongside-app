@@ -1,5 +1,12 @@
 /**
  * router.js
+ * 16 Aug 2026 v18
+ *   BIAS-2. The 'coach-reflection' route and view are removed. Graeme
+ *   confirmed the screen obsolete on 04 Aug; the file stayed because it
+ *   was the last remaining definition of proposalBias. That logic now
+ *   lives in checkin.js as a derived value, so the file has nothing
+ *   left to hold.
+ *
  * 16 Aug 2026 v17
  *
  * v17 - CHAP-1 step 2. New route 'my-programme' -> my-programme.js
@@ -148,7 +155,6 @@ const VIEW_NAMES = {
   'today':             { path: './views/today.js',            fn: 'TodayView'           },
   'checkin':           { path: './views/checkin.js',          fn: 'CheckinView'         },
   'checkin-mini':      { path: './views/checkin-mini.js',     fn: 'CheckinMiniView'     },
-  'coach-reflection':  { path: './views/coach-reflection.js', fn: 'CoachReflectionView' },
   'coach-proposal':    { path: './views/coach-proposal.js',   fn: 'CoachProposalView'   },
   'home-threshold':    { path: './views/home-threshold.js',   fn: 'HomeThresholdView'   },
   'intention':         { path: './views/intention.js',        fn: 'IntentionView'       },
@@ -215,7 +221,7 @@ const hideNavViews = new Set([
   'onboarding/equipment', 'onboarding/plan-select',
   // Core flow (no nav)
   'home-threshold', 'community-impact', 'annual-reflection',
-  'checkin', 'checkin-mini', 'coach-reflection', 'coach-proposal',
+  'checkin', 'checkin-mini', 'coach-proposal',
   'workout', 'gym-programme', 'morning-session', 'core-session',
   'yoga-session', 'walk-session', 'running-session', 'cycle-session',
   'swim-session', 'quiet-session', 'breathing-session',
@@ -225,7 +231,7 @@ const hideNavViews = new Set([
 
 const NAV_MAP = {
   'today': 'today', 'checkin': 'today', 'checkin-mini': 'today',
-  'coach-reflection': 'today', 'coach-proposal': 'today',
+  'coach-proposal': 'today',
   'home-threshold': 'today', 'intention': 'today', 'reflect': 'today',
   'workout': 'today', 'gym-programme': 'today', 'morning-session': 'today',
   'core-session': 'today', 'yoga-session': 'today', 'walk-session': 'today',

@@ -67,12 +67,25 @@ check("only valid values survive a reload", () => {
 
 console.log("\nTEST 3 - reader and writer both exist (PT-12 pattern)");
 const gen = fs.readFileSync("js/data/workoutGenerator.js", "utf8");
-const ref = fs.readFileSync("js/views/coach-reflection.js", "utf8");
-check("coach-reflection writes it", () =>
-  ok(/store\.set\("proposalBias"/.test(ref), "writer gone"));
-check("workoutGenerator reads it", () =>
-  ok(/store\.get\("proposalBias"\)/.test(gen),
-     "written and never read - the coach says lighter and hands over the same session"));
+const chk = fs.readFileSync("js/data/checkin.js", "utf8");
+
+// BIAS-2, 16 Aug 2026. This test used to assert that coach-reflection.js
+// CONTAINED a store.set("proposalBias") -- reading the file's source
+// text. It passed for twelve days after that view's route was retired,
+// because the writer was still in the file and nobody could reach it.
+// A source-text assertion cannot see reachability.
+//
+// The field is now retired and the bias is DERIVED, which is the only
+// version of this that cannot rot: a computed value has no writer to
+// lose.
+check("the bias is derived, not stored", () =>
+  ok(/export function coachBias\(/.test(chk), "coachBias() gone"));
+check("nothing stores it any more", () =>
+  ok(!/store\.set\(['\"]proposalBias/.test(chk + gen),
+     "a stored bias is a bias that can silently stop being written"));
+check("workoutGenerator uses the derived value", () =>
+  ok(/checkinData\.coachBias\(\)/.test(gen),
+     "and not store.get(\"proposalBias\"), which returned null for twelve days"));
 check("it is combined, not substituted", () =>
   ok(/resolveIntensity\(/.test(gen),
      "must combine with todayIntensity, not replace it - they encode different things"));

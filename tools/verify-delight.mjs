@@ -160,11 +160,19 @@ check('the stored key is a count, not a streak',
   String(store.get('checkin.lastMilestoneNoticed')));
 
 // The other consecutive-days reader is a REST prompt and must survive.
-const reflect = fs.readFileSync(
-  new URL('../js/views/coach-reflection.js', import.meta.url), 'utf8');
-check('coach-reflection still notices consecutive days to suggest EASING',
-  /consecutive >= 3[\s\S]{0,200}proposalBias: "lighter"/.test(reflect),
+// BIAS-2, 16 Aug 2026. The consecutive-days EASING prompt moved out of
+// coach-reflection.js, which is deleted, into checkin.js's coachBias()
+// as a derived value. The mechanic is what matters and it survives:
+// several days in a row makes the next session LIGHTER. Load
+// management, not reward — the opposite of a streak, and correct.
+const chk = fs.readFileSync(
+  new URL('../js/data/checkin.js', import.meta.url), 'utf8');
+check('several days in a row still makes the next session LIGHTER',
+  /consecutiveActiveDays\(\) >= 3 \? 'lighter'/.test(chk),
   'load management, not reward — the opposite mechanic, and correct');
+check('and it is still never rewarded as a streak',
+  !/streak/i.test(chk),
+  'the same days that soften a session must never be counted back at somebody');
 
 console.log(failures === 0 ? '\nDELIGHT GATE GREEN' : `\nDELIGHT GATE RED — ${failures} failure(s)`);
 process.exit(failures === 0 ? 0 : 1);
