@@ -536,9 +536,12 @@ export const workoutGenerator = {
     // proposalBias carries what the coach worked out from severe pain,
     // burnout risk, consecutive training days and returning after time
     // away -- written since 03 Aug and read by nothing until now.
+    // BIAS-2. Derived, not read from the store. proposalBias had had no
+    // writer since 04 Aug, so this line has been passing null to
+    // resolveIntensity() for twelve days without anything noticing.
     const intensity   = checkinData.resolveIntensity(
       store.get("todayIntensity") || "moderate",
-      store.get("proposalBias")
+      checkinData.coachBias()
     );
     // BURN-1. Was called with NO ARGUMENT, so it returned false every
     // time for everybody -- and the seven burnout.level reads below were
