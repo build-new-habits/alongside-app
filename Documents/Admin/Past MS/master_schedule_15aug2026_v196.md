@@ -1,48 +1,8 @@
 # Alongside: Move — Master Schedule
-## 16 Aug 2026 v197
+## 15 Aug 2026 v196
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
-
-> ### 🔴 PICK UP HERE — 16 Aug. `alongside-v362`. 54 gates green, 58 checks green.
->
-> #### Shipped: CHAP-1 step 2 — My Programme
->
-> **`js/views/my-programme.js` (new), reached from a full-width row on Home above the six tiles.** Reads what already exists and writes nothing. **Three** of the blueprint's four sections — the fourth is the weekly focus, deliberately withheld, see below. Each is absent when it has no data rather than shown empty: where you are (chapter, weeks in, sessions so far, what the last read changed), the arc (chapters finished, chapter now, what would likely come next and that it is not fixed), and what you are aiming at (goals, the weekly target only if `setAt`, the event and its date).
->
-> **The cog is gone from Home.** Settings is a bottom-nav destination reachable from every screen — verified in `index.html` before removing it, not assumed. `.today-settings-link` and the greeting's 52px clearance went with it. **"Update check-in" keeps its text label**, both branches gated.
->
-> **The weekly focus is deliberately NOT rendered.** Nothing writes `weekFocus.key` — that is step 4. Rendering the section now would put reviewed copy where no user could reach it, which is the 15 Aug fault. The gate seeds `weekFocus.key` and **fails if the section appears**, so it cannot ship ahead of its writer by accident.
->
-> #### The find: `schema-check.mjs` had never examined anything
->
-> It reported `store.js` v52 vs Schema.md v41 faithfully — and its **field diff had been slicing an empty string since the day it was written.** It anchored on `indexOf('getDefaults()')`, matching the first *mention of the name* in the header comment rather than the definition ~760 lines below, then searched for the closing brace from the start of that slice, so the end index landed **before** the start index and `String.slice()` returned `''`. Zero keys extracted, so every field counted as documented and `UNDOCUMENTED` could not fire at any amount of drift.
->
-> **Nine store fields were hidden behind it:** `assessment`, `exerciseClearance`, `pacing`, `personalBests`, `programme`, `sessionMode`, `sessionPace`, `showPersonalBests`, `weekFocus`.
->
-> **The rule this adds to the two from 15 Aug: a red check is no more trustworthy than a green one.** This one was failing, for a real reason, while its main assertion was empty — and the plausible fix, bumping the version line, would have turned it green and buried all nine. Found by probing the extraction rather than reading the verdict.
->
-> `schema-check.mjs` **v2** — anchored on the definition, ended relative to the return, and it now asserts its own extraction: under 50 top-level fields fails loudly. `Schema.md` **v1.34**, current at `store.js` v52.
->
-> #### `verify-chap2.mjs` — the first gate that EXECUTES a view
->
-> Every other gate reads source text, which is exactly why four end-of-session moments reached one of eleven views on 15 Aug with fifty-one gates green: **not one of them knew whether a person could reach the code it was reading.**
->
-> This one mounts Home in jsdom, finds the row, **clicks it**, and asserts where the click lands; then mounts the destination in five seeded states and reads the text a person would see. **Sixteen reversal tests, all caught.** It also caught a wrong assertion of mine while being written — a fresh user sees "Check in", not "Update check-in" — which is the argument for running a gate rather than reading it, in one line.
->
-> Two smaller instances of the same fault class, both mine, both this session: a `grep '[^\x00-\x7F]'` under `LC_ALL=C` that matched almost every line because GNU grep does not interpret `\x` escapes, and a `grep -o 'alongside-v[0-9]*' | tail -1` that read a cache version out of a **comment** and reported `alongside-v2`. Neither reached the repo; both were the same mistake as the nine faulty assertions.
->
-> #### 🟠 Needs Graeme
->
-> - **My Programme and tier.** Programmes are Personal; the row is currently shown to everyone and displays only what that person actually has, with nothing locked and nothing invented. Whether it should instead be a Personal-tier upsell is a product decision and was not taken. **The view is built either way — this is one branch, not a rebuild.**
-> - **Three chain successors are named `Build`, `Open` and `Ground`.** They resolve correctly, but the arc line reads *"Build would likely come next"*, which is a sentence about a programme called Build. A naming question in `programmes.js`, not a view bug. Related to the still-open 🟠 *chain routes — I invented them*.
-> - **Rehab front door** — still needs a physio to read the spec before it ships.
->
-> #### 🔵 Next
->
-> **CHAP-1 step 3, the hinge mechanic — blocked on ASSESS-1 step 3**, which is not built. Steps 4 (weekly focus), 5 (Blocks, offered at the first hinge) and 6 (event goals) follow. The Blocks *vocabulary* is already live and gated in the view; step 5 is the offer mechanic, not the display.
->
-> Still open from 15 Aug: **device check must be rewritten against real routes** (stages 1 and 5 pointed at the wrong door) · **`session-builder-ui` route trace ~80%** · **legal docs still 13+/16+, must align to 18+** · **PAT token lapses ~5 Sep**.
+Supersedes `master_schedule_15aug2026_v195.md`. Remove v195 on upload.
 
 > ### 🔴 PICK UP HERE — mid-stream, 15 Aug evening. `alongside-v360`. 52 gates green.
 >
@@ -2915,4 +2875,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 16 Aug 2026 v197*
+*Build New Habits · Alongside: Move · Master Schedule · 15 Aug 2026 v196*
