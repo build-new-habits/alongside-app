@@ -36,7 +36,19 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > - **My Programme and tier.** Programmes are Personal; the row is currently shown to everyone and displays only what that person actually has, with nothing locked and nothing invented. Whether it should instead be a Personal-tier upsell is a product decision and was not taken. **The view is built either way — this is one branch, not a rebuild.**
 > - **Three chain successors are named `Build`, `Open` and `Ground`.** They resolve correctly, but the arc line reads *"Build would likely come next"*, which is a sentence about a programme called Build. A naming question in `programmes.js`, not a view bug. Related to the still-open 🟠 *chain routes — I invented them*.
-> - **Rehab front door** — 🟢 **Blueprint written 16 Aug**: `Documents/Admin/alongside_blueprint_rehab-frontdoor_16aug2026_v1.md`, marked NOT FOR BUILD. A physiotherapist review pack was produced alongside it for Graeme to send out. **Ten questions are the blocker**, Q1 above all: the design deliberately does no red-flag screening, and that refusal is the thing most likely to be wrong. Nothing ships until answers come back and the blueprint goes to v2.
+> ### 🔴 SAFETY — systemic conditions are collected and then ignored. Found 16 Aug via the physio review.
+>
+> **Four conditions are asked about at onboarding, trigger the clearance question, and then have zero effect on what the person is served.** `getExerciseSafetyTier()` matches condition IDs against each exercise's `avoid`/`caution` lists; **`chronic-fatigue`, `fibromyalgia`, `hypermobility` and `osteoporosis` appear in those lists exactly 0 times across the whole library.** Every exercise returns `safe` for all four.
+>
+> **ME/CFS is the serious one.** The reviewing physiotherapist: *"Post-exertional malaise is not mechanical load intolerance; it is neuro-immune. Adapting volume to how you feel today is the exact mechanism that triggers severe baseline crashes."* The product's central mechanic is contraindicated for a group it knowingly records.
+>
+> **Beta blocker. Needs Graeme.** Recommended: (2) honest exclusion copy at onboarding for ME/CFS + (3) populate `avoid`/`caution` for the other three, both before beta; (1) a proper pacing/energy-envelope model as its own stream. Full options in the blueprint §10.
+>
+> ### 🟠 Pain bands disagree with clinical guidance
+>
+> `getPainBand()` reads 0–2 none / 3–5 mild / 6–7 moderate / 8+ severe, and the severe override abandons the workout at **8+**. The reviewer's MSK traffic-light puts **6+ at "back off"**. Two scales, and ours is the more permissive. Decision needed: align, or keep both and be explicit.
+>
+> - **Rehab front door** — 🟢 **Blueprint v2, 16 Aug, physio review received and folded in.** `alongside_blueprint_rehab-frontdoor_16aug2026_v2.md`. **Q1 reversed: the refusal to red-flag screen was "indefensible"** — a three-item screen with a hard stop now runs before chain entry. Redirect threshold 12 weeks → **6, unified**. Chain programming constrained to isometric/closed-chain/mid-range. Post-surgical inside 6 months routes out entirely. **Upper limb does not open.** Buildable once the three pre-beta conditions are met.: `Documents/Admin/alongside_blueprint_rehab-frontdoor_16aug2026_v1.md`, marked NOT FOR BUILD. A physiotherapist review pack was produced alongside it for Graeme to send out. **Ten questions are the blocker**, Q1 above all: the design deliberately does no red-flag screening, and that refusal is the thing most likely to be wrong. Nothing ships until answers come back and the blueprint goes to v2.
 > - **Device check rewrite** — 🅿️ **PARKED by Graeme, 16 Aug.** Not to be rewritten until the current build plans are complete, then checked in phases after a thorough route trace. The `session-builder-ui` trace (~80%) is the prerequisite, not this.
 >
 > #### 🔵 NEW STREAM — DESTINATIONS. Raised by Graeme, 16 Aug. Not yet blueprinted.
