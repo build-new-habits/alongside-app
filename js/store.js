@@ -1,5 +1,11 @@
 /**
  * store.js - Data persistence layer
+ * 15 Aug 2026 v52
+ *
+ * v52 - CHAP-1. New fields programme { presentation, chaptersDone,
+ *   currentChapterId, hingeOfferedAt } and weekFocus. Two presentations
+ *   of one engine; focus rather than goal.
+ *
  * 15 Aug 2026 v51
  *
  * v51 - ASSESS-1. New fields assessment { baseline, history,
@@ -837,6 +843,22 @@ export const store = {
         ? saved.sessionPace
         : defaults.sessionPace,
 
+      // CHAP-1
+      programme: (saved.programme && typeof saved.programme === 'object')
+        ? {
+            ...defaults.programme,
+            ...saved.programme,
+            presentation: ['chapters', 'blocks'].includes(saved.programme.presentation)
+              ? saved.programme.presentation
+              : defaults.programme.presentation,
+            chaptersDone: Array.isArray(saved.programme.chaptersDone)
+              ? saved.programme.chaptersDone : []
+          }
+        : { ...defaults.programme, chaptersDone: [] },
+      weekFocus: (saved.weekFocus && typeof saved.weekFocus === 'object')
+        ? { ...defaults.weekFocus, ...saved.weekFocus }
+        : { ...defaults.weekFocus },
+
       // ASSESS-1
       assessment: (saved.assessment && typeof saved.assessment === 'object')
         ? {
@@ -1279,6 +1301,53 @@ export const store = {
         history:       [],    // [{ at, week, measuredLevel, results, changedFrom }]
         lastOfferedAt: null,  // ISO string | null — reassessment throttle
         declined:      false
+      },
+
+      // ── PROGRAMME PRESENTATION (CHAP-1, 15 Aug 2026) ──────────
+      //
+      // Graeme, 15 Aug: "What if we give users the choice of the two
+      // different programme choices?"
+      //
+      // TWO PRESENTATIONS, ONE ENGINE. Underneath, both are
+      // assessment -> chapter -> hinge -> reassessment -> next chapter.
+      // Only the framing differs. Two engines would be two places for a
+      // coach moment to land in only one, which is precisely the fault
+      // SHARED-1 fixed this evening.
+      //
+      //   'chapters' — ongoing, no end date, "three chapters in"
+      //   'blocks'   — defined twelve weeks, "week 9 done"
+      //
+      // EVEN IN BLOCKS: weeks COMPLETED, never weeks remaining. The
+      // goal-gradient effect is real and milestones do motivate, but the
+      // standard progress bar works by amplifying perceived obligation
+      // -- which is persona 2.5's declared territory with a countdown on
+      // it. Progress made, never distance left.
+      //
+      // Default 'chapters', and Blocks is offered AT THE FIRST HINGE,
+      // never at signup: choosing between two structural models you have
+      // not experienced is a decision nobody can make well.
+      programme: {
+        presentation:     'chapters',  // 'chapters' | 'blocks'
+        chaptersDone:     [],          // [{ id, name, completedAt, measuredLevelAtEnd }]
+        currentChapterId: null,
+        hingeOfferedAt:   null         // one offer per hinge
+      },
+
+      // ── WEEKLY FOCUS (CHAP-1) ─────────────────────────────────
+      //
+      // FOCUS, not goal. A weekly goal can be missed; a weekly focus
+      // cannot. It describes what the coach will lean into, not what the
+      // person must achieve, and it is never scored, never counted, and
+      // its absence is never mentioned -- a focus reported on at week
+      // end is a target wearing a different hat.
+      //
+      // The coach proposes and the person may adjust. Required weekly
+      // goal-setting is a weekly chore and loses 2.16; an unchangeable
+      // focus is a prescription and loses 2.4.
+      weekFocus: {
+        key:          null,   // movement pattern or capacity
+        proposedAt:   null,
+        editedByUser: false   // did they change it? tells us if the proposal lands
       },
 
       // Coach-led is the default and the product's centre. The other two
