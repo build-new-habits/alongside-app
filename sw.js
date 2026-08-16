@@ -1,6 +1,19 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Aug 2026 v362
+ * CHAP-1 step 2. My Programme — the "where am I going?" screen. New
+ * js/views/my-programme.js and css/layouts/my-programme.css, both
+ * precached above. Reached from a full-width row on Home above the six
+ * tiles; the cog goes, Settings being in the nav bar already. Reads
+ * only, writes nothing. tools/verify-chap2.mjs is the first gate in the
+ * suite that EXECUTES a view rather than reading its source, which is
+ * the gap that let four moments ship into one of eleven views on 15 Aug
+ * with every gate green. Also: schema-check.mjs v2 — its field diff had
+ * been slicing an empty string since it was written, hiding nine
+ * undocumented store fields. Schema.md v1.34, now current at store.js
+ * v52.
+ *
  * 15 Aug 2026 v361
  * CHAP-1 step 1. store.js v52 — programme.presentation and weekFocus.
  *
@@ -2481,7 +2494,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v361";
+const CACHE_NAME = "alongside-v362";
 
 const SHELL_URLS = [
 
@@ -2493,6 +2506,7 @@ const SHELL_URLS = [
   "/alongside-app/css/main.css",
   "/alongside-app/css/layouts/onboarding-additions.css",
   "/alongside-app/css/layouts/today.css",
+  "/alongside-app/css/layouts/my-programme.css",
   "/alongside-app/css/layouts/conditions-update.css",
   "/alongside-app/css/layouts/library.css",
   "/alongside-app/css/layouts/mobility-conditioning.css",
@@ -2613,6 +2627,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/privacy.js",
   "/alongside-app/js/views/onboarding/goal-setup.js",
   "/alongside-app/js/views/library.js",
+  "/alongside-app/js/views/my-programme.js",
   "/alongside-app/js/session-builder.js",
   "/alongside-app/js/views/session-builder-ui.js",
   "/alongside-app/js/views/noticing.js",
