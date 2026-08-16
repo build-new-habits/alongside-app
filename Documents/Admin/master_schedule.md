@@ -125,6 +125,32 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > #### 🔵 Next
 >
+> ### 🟢 SHIPPED 16 Aug — COUNTDOWN-1. `alongside-v366`, 61 checks green.
+>
+> **The countdown the blueprint forbids was already shipping.** Found while starting the hinge, and it changed what got built.
+>
+> `progress.js` rendered a filled progress bar with **"N% complete"** and **"8 weeks remaining"** beneath it. `settings.js` showed **"Week 9 of 12"**. Both on screens every user sees — while My Programme shipped *hours earlier* with a gate that fails if a progress bar appears. **Two screens, opposite rules, and only the newer one had a test.**
+>
+> The blueprint line Graeme agreed in full: *keep the milestone, remove the countdown, show progress made and never distance remaining.* A bar cannot obey it, because a bar IS the remaining distance.
+>
+> **Removed at source.** `percentComplete` and `weeksRemaining` are gone from `getProgressStats()` rather than merely unused by the views, so nothing can render a countdown again by reading a field that offers one. `weeksIn` replaces both and can only count upward.
+>
+> **Milestones KEPT, reworded to face backwards.** "The end is close" → "10 weeks in". "Halfway through" → "five weeks done". Endowed progress and the goal gradient are real effects; what goes is the mechanism that works by amplifying perceived obligation.
+>
+> **Why this displaced the hinge.** The hinge would have added a "chapter complete" moment to a screen saying "8 weeks remaining" — building on the wrong foundation. A live contradiction of a core principle outranks an unbuilt feature.
+>
+> **The gate is product-wide, not scoped to the screen being built** — the scoped version is exactly what let this live for weeks. That breadth found the `settings.js` instance immediately.
+>
+> #### 🟠 Needs Graeme — twelve within-session progress bars
+>
+> Twelve session views carry `role="progressbar"`: *"Session progress, 40%"* during a workout. **Flagged, not changed.** That is orientation inside something finite somebody chose four minutes ago, not a deadline stretched over months — and a progressbar role is exactly what tells a screen-reader user where they are. My read is that they stay. It is a judgement, and the wrong call removes something useful.
+>
+> *(Also on record: an earlier version of the gate flagged `annual-reflection.js`'s "Months you moved in: 7 of 12" — which counts months BEHIND somebody across a year, the opposite of a countdown. The gate now anchors on "week" so it cannot have me delete the right thing. And the banned strings were being checked against a week-9 render while the late milestone only fires from week 10, so restoring it failed nothing; the gate now renders the late state too.)*
+>
+> #### ⚠️ Near miss worth recording
+>
+> I began writing this gate as `verify-count1.mjs` — **which already exists**, as the 12 Aug gate giving the product one definition of "a session that happened". The file-creation tool refused to overwrite it. Had it not, a real gate would have been silently replaced and the suite would still have reported all green. Renamed COUNTDOWN-1. **Check the ID is free before claiming it.**
+>
 > ### 🟢 SHIPPED 16 Aug — ASSESS-1 step 3. `alongside-v365`, 55 gates green, 60 checks green.
 >
 > **The read stops being a one-off.** Steps 1–2 moved the difficulty ceiling once, at the first session, and then never again — so somebody four months stronger was still served against a day-one read. The same three questions are now offered again **twelve weeks** after the last one, in a reassessment voice.
