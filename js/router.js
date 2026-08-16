@@ -1,5 +1,15 @@
 /**
  * router.js
+ * 16 Aug 2026 v17
+ *
+ * v17 - CHAP-1 step 2. New route 'my-programme' -> my-programme.js
+ *   (MyProgrammeView). NOT added to hideNavViews: this is a
+ *   where-am-I-going screen, not an activity flow, so the bottom nav
+ *   stays visible and somebody can leave it the same way they leave
+ *   Progress. NAV_MAP entry 'today', because the only route to it is
+ *   the full-width row on Home -- NAV-8's rule, that the tab must agree
+ *   with how you got here.
+ *
  * 13 Aug 2026 v16
  *
  * v16 - NAV-8. Two NAV_MAP entries pointed at the wrong tab, in
@@ -153,6 +163,7 @@ const VIEW_NAMES = {
   'journal-entry':     { path: './views/journal-entry.js',    fn: 'JournalEntryView'    },
   'activity-log':      { path: './views/activity-log.js',     fn: 'ActivityLogView'     },
   'library':           { path: './views/library.js',          fn: 'LibraryView'         },
+  'my-programme':      { path: './views/my-programme.js',     fn: 'MyProgrammeView'     },
   // 'about' removed 11 Aug 2026. It pointed at a view file that had
   // never been written, while settings.js has had a working About panel
   // all along. Two Abouts would be two places to maintain the same
@@ -238,6 +249,8 @@ const NAV_MAP = {
   // renaming that tab to "Wellbeing", so opening the exercise Library
   // now visibly highlighted "Wellbeing".
   'library': 'today',
+  // CHAP-1 step 2. Reached only from Home's full-width row.
+  'my-programme': 'today',
   'settings': 'settings', 'privacy': 'settings',
   'upgrade': 'settings', 'goal-setup': 'settings',
   'community-impact': 'settings', 'annual-reflection': 'settings',

@@ -1,5 +1,31 @@
 /**
  * today.js
+ * 16 Aug 2026 v19
+ *
+ * v19 - CHAP-1 step 2. Two changes, both Graeme's, agreed 15 Aug.
+ *
+ *   MY PROGRAMME, full width, above the grid. The six tiles answer
+ *   "what shall I do now?". My Programme answers "where am I going?".
+ *   Inside the grid it would read as another kind of session and people
+ *   would tap it expecting a workout, so it is a row rather than a
+ *   seventh tile -- the same reasoning that keeps "Unsure? Coach
+ *   decides" spanning both columns underneath.
+ *
+ *   THE COG GOES. Settings is a bottom-nav destination reachable from
+ *   every screen, so the corner affordance was the weaker of two routes
+ *   to one place and it was crowding the header. Verified present in
+ *   index.html's nav before removing it, not assumed.
+ *
+ *   "Update check-in" KEEPS ITS TEXT LABEL. An icon-only control is the
+ *   least discoverable element on a screen, a passport-and-pen has no
+ *   established meaning for "change how I said I am feeling", and
+ *   hiding it would repeat the exact fault Graeme found in Settings. It
+ *   also needs an accessible name under WCAG 2.2 regardless. It gets
+ *   offered contextually after a door as well -- that is the better
+ *   half of the idea -- but the link stays for the one case the
+ *   contextual path misses: somebody who checked in this morning, felt
+ *   worse by evening, and wants to say so WITHOUT starting a session.
+ *
  * 15 Aug 2026 v18
  *
  * v18 - QUICK-2. The coach offers the short check-in once, after six
@@ -246,6 +272,7 @@ import { store }               from '../store.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
 import { advanceWeekIfNeeded } from '../data/programmeEngine.js';
+import { getProgramme }        from '../data/programmes.js';
 
 export function TodayView(router) {
 
@@ -481,6 +508,14 @@ export function TodayView(router) {
     // arrives with a moment to read something.
     const briefOffer = planJump ? null : offerBriefPath();
 
+    // CHAP-1 step 2. The row's second line, and it says only what is
+    // actually there: the chapter name when one exists, and a plain
+    // description of the screen when one does not. It never invents a
+    // programme for somebody who has none, and it carries no number --
+    // a count on Home's one "where am I going" control would turn a
+    // destination into a scoreboard.
+    const programmeHint = _programmeHint();
+
     const targetMet = sessionDone && weeklyTarget && sessionCount >= weeklyTarget;
     const coachLine     = planJump
       ? planJump.body
@@ -494,11 +529,6 @@ export function TodayView(router) {
 
     container.innerHTML = `
       <div class="today-view" role="main" aria-label="Today">
-
-        <button class="today-settings-link" data-action="settings"
-                aria-label="Settings">
-          <span aria-hidden="true">\u2699\uFE0F</span>
-        </button>
 
         <header class="today-header">
           <h1 class="today-greeting">${_esc(greeting)}</h1>
@@ -517,6 +547,17 @@ export function TodayView(router) {
               : 'this week'}</span>
           </div>
         ` : ''}
+
+        <button class="today-programme-row"
+                data-route="my-programme"
+                data-requires-checkin="false"
+                aria-label="My Programme — where you are going">
+          <span class="today-programme-row__text">
+            <span class="today-programme-row__label">My Programme</span>
+            ${programmeHint ? `<span class="today-programme-row__hint">${_esc(programmeHint)}</span>` : ''}
+          </span>
+          <span class="today-programme-row__chevron" aria-hidden="true">\u203A</span>
+        </button>
 
         <div class="today-doors" role="group" aria-label="Choose how you want to move today">
           ${HOME_DOORS.map(d => {
@@ -598,10 +639,12 @@ export function TodayView(router) {
       });
     });
 
+    // 'settings' removed with the cog, v19. Settings is in the bottom
+    // nav; a handler with nothing to fire it is one more thing to
+    // believe in later.
     const actions = {
       'checkin':      () => router.navigate('checkin'),
       'checkin-mini': () => router.navigate('checkin-mini'),
-      'settings':     () => router.navigate('settings'),
     };
 
     container.querySelectorAll('[data-action]').forEach(btn => {
@@ -750,6 +793,13 @@ export function TodayView(router) {
     }
 
     return null;
+  }
+
+  function _programmeHint() {
+    const id = store.get('activeProgramme.programmeId');
+    if (!id) return "Your goals and where you are up to";
+    const p = getProgramme(id);
+    return p ? p.name : "Your goals and where you are up to";
   }
 
   function _timeGreeting() {
