@@ -1206,7 +1206,8 @@ SEATED.push(
     youtube: 'seated band pull apart posture',
     category: 'strength', movementPattern: 'pull',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
@@ -1235,7 +1236,8 @@ SEATED.push(
     youtube: 'seated band face pull technique',
     category: 'strength', movementPattern: 'pull',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
@@ -1264,7 +1266,8 @@ SEATED.push(
     youtube: 'seated band lat pulldown overhead anchor',
     category: 'strength', movementPattern: 'pull',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
@@ -1300,7 +1303,8 @@ SEATED.push(
     youtube: 'seated band external rotation shoulder',
     category: 'strength', movementPattern: 'shoulder-rotation',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['rotator-cuff', 'shoulder'],
     contraindications: ['shoulder-acute'],
@@ -1329,7 +1333,8 @@ SEATED.push(
     youtube: 'seated band overhead press technique',
     category: 'strength', movementPattern: 'push',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['shoulder', 'triceps-biceps', 'upper-back'],
     contraindications: ['shoulder-acute', 'lower-back-acute'],
@@ -1358,7 +1363,8 @@ SEATED.push(
     youtube: 'seated band woodchop rotation core',
     category: 'strength', movementPattern: 'rotation',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['abdominals', 'core', 'shoulder'],
     contraindications: ['lower-back-acute', 'shoulder-acute'],
@@ -1387,7 +1393,8 @@ SEATED.push(
     youtube: 'seated dumbbell shrug technique',
     category: 'strength', movementPattern: 'pull',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: ['dumbbell'], equipmentOptional: ['resistance-band'],
     affectsAreas: ['upper-back', 'shoulder'],
     contraindications: ['upper-back-acute', 'shoulder-acute'],
@@ -1416,7 +1423,8 @@ SEATED.push(
     youtube: 'isometric chest press palms together',
     category: 'strength', movementPattern: 'isometric',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['chest-pecs', 'shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute', 'chest-pecs-acute'],
@@ -1451,7 +1459,8 @@ SEATED.push(
     youtube: 'seated neck side stretch technique',
     category: 'recovery', movementPattern: 'stretch',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['upper-back', 'shoulder'], contraindications: ['upper-back-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 120,
@@ -1476,7 +1485,8 @@ SEATED.push(
     youtube: 'seated chest stretch hands behind',
     category: 'recovery', movementPattern: 'stretch',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['chest-pecs', 'shoulder'], contraindications: ['shoulder-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 90,
@@ -1501,7 +1511,8 @@ SEATED.push(
     youtube: 'seated side stretch overhead reach',
     category: 'recovery', movementPattern: 'stretch',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['upper-back', 'spine', 'shoulder'], contraindications: ['shoulder-acute', 'lower-back-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 120,
@@ -1526,7 +1537,8 @@ SEATED.push(
     youtube: 'seated wrist forearm stretch technique',
     category: 'recovery', movementPattern: 'stretch',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['wrist-elbow', 'triceps-biceps'], contraindications: ['wrist-elbow-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 120,
@@ -1551,7 +1563,8 @@ SEATED.push(
     youtube: 'seated band anti rotation hold core',
     category: 'strength', movementPattern: 'anti-rotation',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['abdominals', 'core', 'shoulder'], contraindications: ['lower-back-acute'],
     energyRequired: 4, difficultyLevel: 2, duration: 180,
@@ -1576,7 +1589,8 @@ SEATED.push(
     youtube: 'seated core brace arm reach',
     category: 'strength', movementPattern: 'anti-extension',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: ['dumbbell'],
     affectsAreas: ['abdominals', 'core', 'shoulder'], contraindications: ['lower-back-acute', 'shoulder-acute'],
     energyRequired: 3, difficultyLevel: 1, duration: 180,
@@ -1601,7 +1615,8 @@ SEATED.push(
     youtube: 'seated band chest fly technique',
     category: 'strength', movementPattern: 'push',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['chest-pecs', 'shoulder'], contraindications: ['shoulder-acute', 'chest-pecs-acute'],
     energyRequired: 4, difficultyLevel: 2, duration: 180,
@@ -1626,7 +1641,8 @@ SEATED.push(
     youtube: 'seated arm cardio interval workout',
     category: 'cardio', movementPattern: 'locomotion',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['shoulder', 'upper-back', 'chest-pecs', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
@@ -1652,7 +1668,8 @@ SEATED.push(
     youtube: 'seated shoulder rolls warm up',
     category: 'cardio', movementPattern: 'locomotion',
     position: 'seated',
-    adaptive: true,   // CAP-6 impact: false, balanceDemand: false,
+    adaptive: true,   // CAP-6
+    impact: false, balanceDemand: false,
     equipment: [], equipmentOptional: [],
     affectsAreas: ['shoulder', 'upper-back'], contraindications: [],
     energyRequired: 2, difficultyLevel: 1, duration: 180,
