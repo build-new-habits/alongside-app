@@ -125,6 +125,37 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > #### 🔵 Next
 >
+> ### 🟢 SHIPPED 16 Aug — CHAP-1 step 3, PART TWO. THE HINGE IS COMPLETE. `alongside-v368`, 62 checks green.
+>
+> **The offer moved to Home.** It already existed inside `gym-programme.js`, gated on `currentWeek >= 12` — reachable through **one of thirteen session views**. Anybody who finished a chapter having trained by another route was never asked what came next; the chapter simply carried on being their chapter. Same shape as the fault SHARED-1 fixed, which is why this was a **move, not a new feature**.
+>
+> **It does not block.** gym-programme's version returns early and holds the session until an option is chosen. The doors stay live under this one — somebody who opened the app to move for twenty minutes should be able to.
+>
+> **There is no dismiss.** An unanswered hinge stays until answered; dismissing would leave somebody between chapters with nothing to say so. *"Something different"* routes to goal-setup and deliberately leaves the hinge standing until they actually choose.
+>
+> #### 🔴 FOUR OF EIGHT CHAINS DISAGREED — found and fixed
+>
+> `gym-programme.js` carried a **private `PROGRESSIONS` map** that contradicted `programmes.js`:
+>
+> | Chapter | `programmes.js` | the private map |
+> |---|---|---|
+> | `beginner-fitness` | back-to-strength | **feel-good-foundation** |
+> | `feel-good-foundation` | ground | **build** |
+> | `open` | (none) | **ground** |
+> | `ground` | open | **build** |
+>
+> So **My Programme could say "Back to Strength would likely come next" and the end-of-chapter screen then offer Feel Good Foundation.** Nothing errored — the product held two opinions and showed whichever the person happened to reach. Deleted rather than reconciled: reconciling leaves two maps that agree today and drift tomorrow. `chapterSuccessor()` is the one definition now, and `startChapter()` replaces a fifteen-line reset that existed twice inline.
+>
+> **No verdict in the copy, and the gate enforces it.** *"That's Build Your Base done."* No percentage, no "well done", no countdown — this is the moment a chapter could most easily be made to read as an exam result.
+>
+> #### Two holes in my own gate, both found by reversal testing
+>
+> Removing the hinge card **crashed** the gate rather than failing it — an unguarded `querySelector` threw. A gate that falls over next to a fault is not a gate that reported one. And *"the doors still work"* passed while the grid was hidden with an inline style, because **jsdom does not compute CSS**, so presence proved nothing about visibility. Both fixed.
+>
+> #### 🔵 NEXT — CHAP-1 steps 4, 5, 6
+>
+> **(4)** weekly focus, proposed and editable · **(5)** Blocks presentation offered at the first hinge — the vocabulary is already live and gated, this is the offer mechanic · **(6)** event goals, `targetDescription` and `targetDate`, offered at the first hinge. **Steps 5 and 6 both hang off the hinge, which now exists.**
+>
 > ### 🟢 SHIPPED 16 Aug — CHAP-1 step 3, PART ONE. `alongside-v367`, 62 checks green.
 >
 > **A chapter can now end. Before this it could not.** `currentWeek` was capped at twelve and nothing ever set `completed`, so somebody **seventeen weeks into a twelve-week chapter sat at "11 weeks in" indefinitely**, with `chaptersDone` empty and `currentChapterId` null. Found by executing `advanceWeekIfNeeded()` at 120 days elapsed and reading every completion field — not by reading the function.
