@@ -125,6 +125,30 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > #### 🔵 Next
 >
+> ### 🔴🔴 SEVERE-1 — the Gentle Care bypass does not exist in the session path. VERIFY FIRST NEXT SESSION.
+>
+> **`workoutGenerator.js` v1.3's changelog says:** *"Any severe pain zone bypasses the full workout pool and returns a single Gentle Care card (breathing + mindfulness + mindful walk)."* Four files reference "Gentle Care" in comments. **I could not find an implementation of it in the session path.**
+>
+> **Executed, not read.** A persona with a knee condition at **9/10 pain**:
+>
+> - `getZoneStatus(['knee'], {knee:9})` → `{'lower-limb': 'severe'}`. **The severity IS detected correctly.**
+> - `getActiveConditionIds` → `['knee','knee-acute']`. **The phase-aware filter IS working** — they get acute-variant-safe selection.
+> - **And they are then built a full 9–10 exercise session**, including Single-Leg Glute Bridge, Bear Hug Carry and Inchworm.
+>
+> **`getZoneStatus()` is called by exactly ONE view — `morning-session.js`.** Nothing in `session-builder.js` calls it. So the zone severity is computed correctly and then consulted by almost nothing.
+>
+> **`combinedSevere` is a separate thing and is working as designed:** it is true only when lower-limb AND spine are both severe. It is not the single-zone bypass the changelog describes.
+>
+> #### What is NOT yet established
+>
+> Whether this is a regression or a feature that was specified and never built. The acute filter genuinely protects — contraindicated work is excluded — so the honest question is whether the bypass is **needed** on top of it, or whether the changelog overstates what shipped. **That is a clinical question as much as a code one**, and it belongs with the physiotherapist alongside the red-flag screen.
+>
+> **Do not build a bypass before answering it.** Adding a hard stop on single-zone severe pain would change what a large group of people are served, on my reading of a changelog rather than a clinical judgement.
+>
+> #### Two corrections on record, both mine, both same session
+>
+> I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
+>
 > ### 🔴 BIAS-2 — `proposalBias` has had no writer since 04 Aug. Found by trying to delete a dead file.
 >
 > **The capability that is silently gone.** `coach-reflection.js` computed `proposalBias` — the coach's read that somebody needs REST rather than the usual session, from consecutive low days. Its route was retired on 04 Aug as obsolete (correctly — its four options duplicate Home's doors). **Unreachable code cannot write, so `proposalBias` stopped being written that day.**
