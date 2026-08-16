@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 15 Aug 2026 v360
+ * SHARED-1. The end-of-session moments move to data/session-moments.js
+ * (new, precached above), rendered by reflect.js which every session
+ * view routes to. They previously reached one view of eleven.
+ *
  * 15 Aug 2026 v359
  * ASSESS-1 step 2 (new js/data/assessment.js, added to the precache list
  * above) and DECL-1, a ReferenceError shipped in W2-7. core-session.js
@@ -2473,7 +2478,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v359";
+const CACHE_NAME = "alongside-v360";
 
 const SHELL_URLS = [
 
@@ -2643,6 +2648,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/first-session.js",
   "/alongside-app/js/data/pacing.js",
   "/alongside-app/js/data/assessment.js",
+  "/alongside-app/js/data/session-moments.js",
   "/alongside-app/js/data/conditions.js",
   "/alongside-app/js/data/conditionProgrammes.js",
   "/alongside-app/js/data/equipment.js",
