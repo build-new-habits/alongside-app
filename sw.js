@@ -1,6 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Aug 2026 v367
+ * CHAP-1 step 3, part one. programmeEngine.js v4, session-moments.js v3.
+ * A chapter can now END. Before this it could not: currentWeek was
+ * capped at twelve and nothing ever set `completed`, so somebody
+ * seventeen weeks into a twelve-week chapter sat at "11 weeks in"
+ * indefinitely with chaptersDone empty. Completion is now recorded, the
+ * finished chapter lands in the arc (already rendered by My Programme,
+ * so it needed no new surface), and ASSESS-1's chapterEnded argument is
+ * finally passed something rather than hardcoded false everywhere. The
+ * next-chapter OFFER is not built. No new files.
+ *
  * 16 Aug 2026 v366
  * COUNTDOWN-1. progress.js v7, settings.js v28, programmeEngine.js v3,
  * progress.css v4. The programme progress bar is gone, with "N%
@@ -2534,7 +2545,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v366";
+const CACHE_NAME = "alongside-v367";
 
 const SHELL_URLS = [
 
