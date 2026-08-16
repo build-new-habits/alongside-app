@@ -141,6 +141,10 @@ import { router }         from "../router.js";
 // selectEmpathyPrompt(), so this view never touches the pool directly.
 import { selectEmpathyPrompt, canEnterStage } from "../data/empathy-transfer.js";
 import { getTodaysCheckin, getHistory } from "../data/checkin.js";
+// SHARED-1. The end-of-session moments, in the one place every session
+// view already routes to. See data/session-moments.js for why.
+import { renderSessionMoments, attachSessionMoments, resetSessionMoments }
+  from "../data/session-moments.js";
 
 export const centered = false;
 
@@ -149,6 +153,7 @@ let feelAnswer    = null;
 let painAnswer    = null;
 let openText      = "";
 let moodAfter     = 5;
+let _momentsMounted = false;   // SHARED-1
 let empathyPrompt = null; // { stage, text } | null - set by saveAndSummarise() if one should fire
 
 const QUESTIONS = {
@@ -611,6 +616,7 @@ export function render() {
         <div class="view-header">
           <h1>Done</h1>
         </div>
+        ${renderSessionMoments({ exerciseIds: _sessionExerciseIds(entry) })}
         <div class="card card-coach reflect-coach-card">
           <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
           <p class="coach-message-text">${summary}</p>
@@ -704,6 +710,25 @@ export function render() {
   `;
 }
 
+/**
+ * SHARED-1. What was actually done, for the baseline questions.
+ *
+ * Empty list rather than a guess. A session with no recorded exercises
+ * -- breathing, journalling, a logged walk -- correctly gets no
+ * baseline: there is nothing to ask how it felt.
+ */
+function _repaintMoments() {
+  const main = document.getElementById("main-content");
+  if (!main) return;
+  main.innerHTML = render();
+  onMount();
+  attachSessionMoments(main, _repaintMoments);
+}
+
+function _sessionExerciseIds(entry) {
+  return Array.isArray(entry?.exerciseIds) ? entry.exerciseIds : [];
+}
+
 export function onMount() {
   // NOTE: this reset to "reflect" runs on every mount, including the
   // remounts triggered by saveAndSummarise() and resolveEmpathyPrompt()
@@ -721,6 +746,11 @@ export function onMount() {
   painAnswer    = null;
   openText      = "";
   empathyPrompt = null;
+
+  // SHARED-1. Fresh mount only. onMount() also runs after every internal
+  // re-render, and resetting there would wipe the baseline answers the
+  // moment the first chip was tapped.
+  if (!_momentsMounted) { resetSessionMoments(); _momentsMounted = true; }
 
   const checkin = store.get("lastCheckin") || {};
   moodAfter = (typeof checkin.mood === "number") ? checkin.mood : 5;
@@ -839,6 +869,10 @@ function saveAndSummarise() {
   if (main) {
     main.innerHTML = render();
     onMount();
+    // SHARED-1. Re-wire the moment controls after every repaint. Both
+    // repaint sites in this file get this; missing one would leave the
+    // baseline chips dead on whichever path took the other.
+    attachSessionMoments(main, _repaintMoments);
   }
 }
 
@@ -858,5 +892,9 @@ function resolveEmpathyPrompt(wasSkipped) {
   if (main) {
     main.innerHTML = render();
     onMount();
+    // SHARED-1. Re-wire the moment controls after every repaint. Both
+    // repaint sites in this file get this; missing one would leave the
+    // baseline chips dead on whichever path took the other.
+    attachSessionMoments(main, _repaintMoments);
   }
 }

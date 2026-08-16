@@ -62,12 +62,15 @@ check('every territory line refers back to what THEY said',
   'the personalisation is their own words, not praise');
 
 // ── Wired in ─────────────────────────────────────────────────
-const cs = fs.readFileSync(new URL('../js/views/core-session.js', import.meta.url), 'utf8');
-check('the done screen calls it', /firstSessionRecognition\(/.test(cs));
-check('and actually renders it', /firstTime \?/.test(cs) && /firstTime\.heading/.test(cs),
+// SHARED-1, 15 Aug: the recognition moved out of core-session.js, which
+// reached one of eleven session views, into data/session-moments.js,
+// rendered by reflect.js. These assertions follow it.
+const cs = fs.readFileSync(new URL('../js/data/session-moments.js', import.meta.url), 'utf8');
+check('the shared moments call it', /firstSessionRecognition\(/.test(cs));
+check('and actually render it', /if \(first\)/.test(cs) && /first\.heading/.test(cs),
   'a function nobody renders is how capability.* stayed dead for three days');
 check('counted from completedSessions, not a raw log length',
-  /completedSessions\(store\.get\("activityLog"\)/.test(cs));
+  /completedSessions\(log\)/.test(cs));
 
 // ── ORIENT-2: nobody is left in silence ──────────────────────
 const today = fs.readFileSync(new URL('../js/views/today.js', import.meta.url), 'utf8');

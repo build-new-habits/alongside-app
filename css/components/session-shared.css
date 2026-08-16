@@ -1,7 +1,10 @@
 /* ============================================================
    session-shared.css
    css/components/session-shared.css
-   15 Aug 2026 v4
+   15 Aug 2026 v5
+
+   v5 - SHARED-1. .sm-* replaces .cs-first-session / .cs-baseline /
+        .cs-pacing. The moments are no longer core-session's.
 
    v4 - ASSESS-1. .cs-baseline, the calibration block. Must not read as a
         form: no progress dots, no numbering, no required markers.
@@ -308,3 +311,35 @@
 .cs-baseline__actions {
   margin-top: var(--space-4);
 }
+
+/* ── Shared session moments (SHARED-1, 15 Aug 2026) ───────────────────────
+   Renamed from .cs-* because these no longer belong to core-session — they
+   render in reflect.js for every session view, and in the two wellbeing
+   views that do not route there. Same undecorated treatment as before. */
+
+.sm-first, .sm-baseline, .sm-pacing { text-align: left; }
+
+.sm-first__heading,
+.sm-baseline__heading,
+.sm-pacing__heading {
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+
+.sm-baseline__group {
+  border: 0;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  min-inline-size: 0;
+}
+
+.sm-baseline__legend { padding: 0; margin-bottom: var(--space-2); }
+
+.sm-baseline__chips,
+.sm-baseline__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.sm-baseline__actions { margin-top: var(--space-4); }

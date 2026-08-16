@@ -1,6 +1,11 @@
 /**
  * quiet-session.js - Something Quieter View
  *
+ * 15 Aug 2026 v6
+ *
+ * v6 - SHARED-1. Both completion screens render the end-of-session
+ *   moments.
+ *
  * 23 Jul 2026 v5
  *
  * CHANGELOG
@@ -98,6 +103,10 @@
  */
 
 import { store }  from "../store.js";
+// SHARED-1. See breathing-session.js. Both completion screens in this
+// view get the moments; missing one would mean a first journal entry is
+// marked and a first breathing practice is not.
+import { renderSessionMoments } from "../data/session-moments.js";
 import { router } from "../router.js";
 import { mountSessionGuard, dismountSessionGuard, showExitCard } from "../session-guard.js";
 
@@ -471,6 +480,7 @@ function renderBreathingSession(ex) {
 
 function renderBreathingComplete(ex) {
   return `
+    ${renderSessionMoments({})}
     <div class="card card-coach quiet-coach-card">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
       <div>
@@ -546,6 +556,7 @@ function renderJournalMode() {
 
 function renderJournalSaved() {
   return `
+    ${renderSessionMoments({})}
     <div class="card card-coach quiet-coach-card">
       <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
       <div>

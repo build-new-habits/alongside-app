@@ -1,6 +1,11 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 15 Aug 2026 v3
+ *
+ * v3 - SHARED-1. Renders the end-of-session moments, so a first
+ *   session that happens to be a breathing session is still marked.
+ *
  * 23 Jul 2026 v2
  *
  * CHANGELOG
@@ -31,6 +36,13 @@
  */
 
 import { store }  from "../store.js";
+// SHARED-1. This view does not route to reflect.js, so it renders the
+// moments itself. No exerciseIds: a breathing session has nothing to ask
+// how it felt, so the baseline correctly does not appear, and mindful
+// activity is uncapped so the pacing note does not either. What DOES
+// appear is the first-session recognition -- persona 2.11 enters the
+// product through this door and her first session must be marked.
+import { renderSessionMoments } from "../data/session-moments.js";
 import { router } from "../router.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 
@@ -421,6 +433,8 @@ function renderDone() {
   const name = store.get("name") || "";
   return `
     <div class="view breathing-view" style="text-align: center;">
+
+      ${renderSessionMoments({})}
 
       <div class="card card-coach" style="margin-top: var(--space-8);">
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">

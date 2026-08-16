@@ -130,9 +130,12 @@ check('the plan nudge permits the ambitious version',
   /You can absolutely go for it/.test(src));
 
 // ── Wired in ─────────────────────────────────────────────────
-const cs = fs.readFileSync(new URL('../js/views/core-session.js', import.meta.url), 'utf8');
-check('the done screen calls AND renders the daily line',
-  /noticeDailyPace\(\)/.test(cs) && /\$\{pacing \?/.test(cs));
+// SHARED-1: moved to the shared moments, so it reaches every session
+// view rather than the one it was originally written into.
+const cs = fs.readFileSync(new URL('../js/data/session-moments.js', import.meta.url), 'utf8');
+check('the shared moments call AND render the daily line',
+  /noticeDailyPace\(\)/.test(cs) && /if \(pacingNote\)/.test(cs) &&
+  /pacingNote\.heading/.test(cs));
 const today = fs.readFileSync(new URL('../js/views/today.js', import.meta.url), 'utf8');
 check('Home calls AND renders the plan line',
   /noticePlanJump\(\)/.test(today) && /planJump\s*\n?\s*\?\s*planJump\.body/.test(today));
