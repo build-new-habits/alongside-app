@@ -125,6 +125,28 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > #### 🔵 Next
 >
+> ### 🟢 SHIPPED 16 Aug — CHAP-1 step 3, PART ONE. `alongside-v367`, 62 checks green.
+>
+> **A chapter can now end. Before this it could not.** `currentWeek` was capped at twelve and nothing ever set `completed`, so somebody **seventeen weeks into a twelve-week chapter sat at "11 weeks in" indefinitely**, with `chaptersDone` empty and `currentChapterId` null. Found by executing `advanceWeekIfNeeded()` at 120 days elapsed and reading every completion field — not by reading the function.
+>
+> **The cap stays.** `currentWeek` feeds `getPhaseForWeek()` and the phase biases, which only define twelve weeks; letting it run past would push them off the end of their own data. Completion is a separate fact and is recorded separately. Idempotent, so opening the app twice cannot record two finished chapters.
+>
+> **The finished chapter lands in `programme.chaptersDone`** with `measuredLevelAtEnd` — what the next chapter's offer will reason from. **My Programme already renders `chaptersDone`, so completion is visible with no new surface.**
+>
+> **ASSESS-1's `chapterEnded` is now actually passed.** It shipped hours earlier hardcoded `false` at every call site — an integration point nothing integrated with, which is the shape of a feature rather than a feature.
+>
+> **A hinge brings the read FORWARD; it does not overrule a no.** Reversal testing found that reordering those two checks passed every assertion — which would mean nagging somebody the moment their chapter ends, the point at which the coach is asking most of them. The order is load-bearing and now has an assertion rather than a comment.
+>
+> #### 🟠 Found, recorded, NOT fixed — the hinge that already exists in one view
+>
+> `gym-programme.js` contains a **week-12 reflection with repeat / progress / choose options**, gated on `currentWeek >= 12`. It is reachable through **one of thirteen session views** — the same shape as the fault SHARED-1 fixed for the session moments. So the product has an end-of-chapter moment that most people will never see, and it is now sitting alongside a completion event that fires for everyone.
+>
+> **This is what the offer work has to resolve**, and it is a move rather than a build: the options largely exist, in the wrong place.
+>
+> #### 🔵 NEXT — CHAP-1 step 3, part two: the offer
+>
+> The next-chapter offer, on a shared surface, informed by `measuredLevelAtEnd`, offered with reasoning and changeable — *"I might change my priorities, I might develop quicker, or not."* **`verify-chap3.mjs` carries a standing assertion saying the offer is not built**, so a green suite cannot be misread as a finished hinge.
+>
 > ### 🟢 SHIPPED 16 Aug — COUNTDOWN-1. `alongside-v366`, 61 checks green.
 >
 > **The countdown the blueprint forbids was already shipping.** Found while starting the hinge, and it changed what got built.
