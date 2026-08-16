@@ -42,6 +42,8 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > **ME/CFS is the serious one.** The reviewing physiotherapist: *"Post-exertional malaise is not mechanical load intolerance; it is neuro-immune. Adapting volume to how you feel today is the exact mechanism that triggers severe baseline crashes."* The product's central mechanic is contraindicated for a group it knowingly records.
 >
+> **🟢 Starting point drafted 16 Aug**: `Documents/Admin/alongside_mecfs_starting_point_16aug2026_v1.md` — three copy registers, the options for what remains available, six decisions for Graeme and five follow-up questions for the physiotherapist. **The first finding in it is that `chronic-fatigue` is one condition ID covering two populations** ("Chronic fatigue / ME-CFS"): the adaptive model probably serves persistent fatigue well and may harm ME/CFS, so any single decision is wrong for one of the two groups. **HYPER-1 shipped 16 Aug** and closed the hypermobility half of this; fibromyalgia and osteoporosis remain open and go back to the reviewer with the ME/CFS questions.
+>
 > **Beta blocker. Needs Graeme.** Recommended: (2) honest exclusion copy at onboarding for ME/CFS + (3) populate `avoid`/`caution` for the other three, both before beta; (1) a proper pacing/energy-envelope model as its own stream. Full options in the blueprint §10.
 >
 > ### 🟠 Pain bands disagree with clinical guidance
