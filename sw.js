@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Aug 2026 v366
+ * COUNTDOWN-1. progress.js v7, settings.js v28, programmeEngine.js v3,
+ * progress.css v4. The programme progress bar is gone, with "N%
+ * complete", "8 weeks remaining" and "Week 9 of 12" beside it. All were
+ * distance-remaining measures on screens every user sees, while My
+ * Programme shipped the same day with a gate that fails if a progress
+ * bar appears. percentComplete and weeksRemaining removed at source so
+ * no view can render a countdown by reading a field that offers one.
+ * Milestones kept and reworded to face backwards. No new files.
+ *
  * 16 Aug 2026 v365
  * ASSESS-1 step 3. assessment.js v2, session-moments.js v2. The read
  * stops being a one-off: the same three questions are offered again
@@ -2524,7 +2534,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v365";
+const CACHE_NAME = "alongside-v366";
 
 const SHELL_URLS = [
 
