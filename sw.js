@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Aug 2026 v369
+ * DATA-SEATED. Seventeen seated exercises had impact and balanceDemand
+ * swallowed into a trailing comment -- "adaptive: true,   // CAP-6
+ * impact: false, balanceDemand: false," -- so both fields were commented
+ * out on every one of them. Behaviourally benign, because both readers
+ * test === true and undefined is the correct answer for seated work, but
+ * seventeen entries were silently relying on that. Restored explicitly.
+ * The reachability audit's ERROR count goes 18 -> 1.
+ *
  * 16 Aug 2026 v368
  * CHAP-1 step 3 part two. today.js v20, gym-programme.js v6,
  * programmeEngine.js v5, today.css v5. The hinge moves to Home, so an
@@ -2555,7 +2564,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v368";
+const CACHE_NAME = "alongside-v369";
 
 const SHELL_URLS = [
 
