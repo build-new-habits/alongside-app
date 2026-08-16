@@ -44,11 +44,24 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > **The naming question was the wrong question, and this is the right one.** Checked before answering, and the gap is measurable:
 >
-> **Seven selectable onboarding goals have NO programme that serves them:** `start-running`, `run-10k`, `cycling`, `swimming`, `injury-recovery`, `return-to-fitness`, `return-after-illness`. A person picks one at onboarding and the programme matcher has nothing to give them. `run-5k` is covered; `start-running` and `run-10k`, either side of it, are not.
+> **CORRECTION, same session, before this line was acted on.** I first wrote here that seven selectable goals had NO programme serving them. **That was wrong.** I had read `suitableFor` and inferred coverage instead of executing `getProgrammesForGoals()`. Running the real matcher over all 26 selectable goals shows **every one returns a programme.** The false version was pushed and is corrected here rather than quietly overwritten — it is the same fault as the nine gate assertions and the empty schema diff: *a plausible answer accepted without confirming which code produced it.* The rule keeps earning its place.
+>
+> **What the executed matcher actually shows, and it is a sharper finding than the wrong one.** 26 selectable goals collapse into 8 engine goals, so the product asks 26 questions and gives 8 answers:
+>
+> | The person chose | What they get |
+> |---|---|
+> | `start-running`, `run-5k`, `run-10k`, `cycling`, `swimming` | **Couch to Cardio** — all five, identically |
+> | `get-stronger`, `build-muscle`, `tone-up` | **Build** — all three, identically |
+> | `flexibility`, `prevent-injury`, `improve-posture` | **Open** |
+> | `reduce-pain`, `injury-recovery` | **Back to Strength** |
+> | `return-to-fitness`, `return-after-illness` | **Build Your Base** |
+> | 8 feel-and-energy goals | **Build Your Base / Feel Good Foundation** |
+>
+> Somebody training for a 10K and somebody who wants to swim better are handed the same twelve weeks. **The goal was collected, acknowledged, and then discarded at the point it would have mattered** — which is the WRONG-vs-MISSING pattern from 15 Aug: nothing throws, the screen looks right, and only executing it shows the collapse.
 >
 > **And Graeme's own examples are not in `goals.js` at all** — no hiking, no marathon, no sport, nothing like "keep up with grandkids". The purpose-shaped goals, which are the ones people actually say out loud, are the ones missing.
 >
-> **Three strength intentions currently collapse into one.** `get-stronger`, `build-muscle` and `tone-up` all route to the same programmes; `Build` declares `engineGoals: ['build-muscle']` alone. Foundation, conditioning and hypertrophy are three different programmes with three different session shapes, and the product currently cannot tell them apart.
+> **Graeme's strength question is the same collapse, seen from inside.** `get-stronger`, `build-muscle` and `tone-up` all resolve to the single engine goal `build-muscle` and the single programme `Build`. Foundation, conditioning and hypertrophy are three different intentions with three different session shapes, and there is currently no field in which they differ.
 >
 > **This is the same object as two questions already open:** the 🟠 *library question* (393 of 551 entries at difficulty 1–2, and Graeme's framing — *"I'm adding so we can better serve, not compete"*) and the ten destination shapes from the tier model, which are **specified and not built** — `goals.js` is the onboarding list only.
 >
