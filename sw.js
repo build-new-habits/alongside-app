@@ -1,6 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Aug 2026 v364
+ * HYPER-1. conditions.js v1.5, exercises/index.js v1.8. The
+ * physiotherapist review found that hypermobility/EDS must strictly
+ * avoid end-range passive stretching; it appeared in the avoid/caution
+ * lists of ZERO of 551 exercises, so every exercise returned safe for
+ * it. Now a rule in getExerciseSafetyTier() -- and filterByConditions()
+ * delegates to that function rather than duplicating it, because it had
+ * no callers at all and the rule would otherwise have run nowhere.
+ * chronic-fatigue, fibromyalgia and osteoporosis remain unhandled
+ * DELIBERATELY, pinned by verify-hyper1.mjs, awaiting reviewer guidance.
+ *
  * 16 Aug 2026 v363
  * CHAP-1 step 2, TIER. my-programme.js v2. Graeme's decision: My
  * Programme is Personal, but a free user's own goals, sessions and read
@@ -2503,7 +2514,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v363";
+const CACHE_NAME = "alongside-v364";
 
 const SHELL_URLS = [
 
