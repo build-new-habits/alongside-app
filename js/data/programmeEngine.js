@@ -458,6 +458,17 @@ export function getWeekShape() {
  * Checks for week 6 glance and week 12 reflection triggers.
  * @returns {{ weekAdvanced: bool, week6Trigger: bool, week12Trigger: bool }}
  */
+/**
+ * The length of a chapter, in weeks.
+ *
+ * Hardcoded 12 in four places before this. Named here because the
+ * chapters blueprint drops the number from what the PERSON sees -- "Back
+ * to Strength", not "12-Week Back to Strength" -- which makes it purely
+ * an engine fact, and an engine fact with four copies is four things to
+ * change and three to forget.
+ */
+const CHAPTER_WEEKS = 12;
+
 export function advanceWeekIfNeeded() {
   const ap = store.get('activeProgramme');
   if (!ap?.programmeId) return { weekAdvanced: false, week6Trigger: false, week12Trigger: false };
@@ -467,11 +478,54 @@ export function advanceWeekIfNeeded() {
 
   const today       = new Date();
   const daysDiff    = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-  const newWeek     = Math.min(Math.floor(daysDiff / 7) + 1, 12);
+  const elapsedWeek = Math.floor(daysDiff / 7) + 1;
+  const newWeek     = Math.min(elapsedWeek, CHAPTER_WEEKS);
   const currentWeek = ap.currentWeek || 1;
 
+  // ── CHAP-1 step 3. The chapter can now END. ───────────────────────
+  //
+  // Before this, it could not. currentWeek was capped at 12 and nothing
+  // ever set `completed`, so somebody seventeen weeks into a twelve-week
+  // chapter sat at "11 weeks in" indefinitely, with chaptersDone empty
+  // and currentChapterId null. Verified by execution, not by reading:
+  // 120 days elapsed, advanceWeekIfNeeded() returned weekAdvanced false
+  // and every completion field was untouched.
+  //
+  // The cap STAYS. currentWeek feeds getPhaseForWeek() and the phase
+  // biases, and letting it run past twelve would push those off the end
+  // of data that only defines twelve weeks. Completion is a separate
+  // fact from the week number, so it is recorded separately.
+  //
+  // Idempotent: `completed` guards it, so this fires once per chapter
+  // however many times the app is opened afterwards.
+  let chapterComplete = false;
+  if (elapsedWeek > CHAPTER_WEEKS && !ap.completed) {
+    chapterComplete = true;
+    const programme = getProgramme(ap.programmeId);
+
+    store.set('activeProgramme.completed',   true);
+    store.set('activeProgramme.completedAt', new Date().toISOString());
+
+    // The arc. My Programme already renders chaptersDone, so this is
+    // visible the moment it is written -- no new surface needed for the
+    // completion itself. The next-chapter OFFER is the separate piece.
+    const done = store.get('programme.chaptersDone') || [];
+    const already = done.some(c => c.id === ap.programmeId);
+    if (!already) {
+      store.set('programme.chaptersDone', [...done, {
+        id:   ap.programmeId,
+        name: programme?.name || ap.programmeName || 'A chapter',
+        completedAt: new Date().toISOString(),
+        // Where they were when it ended. Recorded, never shown as a
+        // score -- it is what the next chapter's offer reasons from.
+        measuredLevelAtEnd: store.get('fitnessLevel') || null
+      }]);
+    }
+    store.set('programme.currentChapterId', ap.programmeId);
+  }
+
   if (newWeek <= currentWeek) {
-    return { weekAdvanced: false, week6Trigger: false, week12Trigger: false };
+    return { weekAdvanced: false, week6Trigger: false, week12Trigger: false, chapterComplete };
   }
 
   // Update week and phase
@@ -487,7 +541,20 @@ export function advanceWeekIfNeeded() {
   const week6Trigger  = newWeek === 6  && !ap.midProgrammeGlanceShown;
   const week12Trigger = newWeek === 12 && !ap.programmeReflectionShown;
 
-  return { weekAdvanced: true, week6Trigger, week12Trigger };
+  return { weekAdvanced: true, week6Trigger, week12Trigger, chapterComplete };
+}
+
+/**
+ * CHAP-1 step 3. Is a hinge waiting to be answered?
+ *
+ * True from the moment a chapter completes until the person chooses
+ * what happens next. The reassessment reads this so ASSESS-1's
+ * `chapterEnded` argument -- built on 16 Aug and inert until now --
+ * actually carries something.
+ */
+export function isHingePending() {
+  const ap = store.get('activeProgramme') || {};
+  return !!(ap.programmeId && ap.completed);
 }
 
 /**

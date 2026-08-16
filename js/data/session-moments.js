@@ -1,5 +1,13 @@
 /**
  * session-moments.js - The things the coach says when a session ends
+ * 16 Aug 2026 v3
+ *   CHAP-1 step 3. chapterEnded is now actually passed. It was built on
+ *   16 Aug and hardcoded false at every call site, which made it an
+ *   integration point nothing integrated with -- the shape of a feature
+ *   rather than a feature. A chapter ending now brings the reassessment
+ *   forward regardless of the twelve-week clock, which is what the
+ *   blueprint means by reassessment AT the hinge.
+ *
  * 16 Aug 2026 v2
  *   ASSESS-1 step 3. The same three questions are now also offered as a
  *   reassessment, twelve weeks after the last read, in the coach's
@@ -51,6 +59,7 @@
 import { store } from '../store.js';
 import { firstSessionRecognition } from './first-session.js';
 import { noticeDailyPace } from './pacing.js';
+import { isHingePending } from './programmeEngine.js';
 import {
   questionsForSession, shouldOfferBaseline, shouldOfferReassessment,
   recordAssessmentAnswers, baselineIntro, baselineAck,
@@ -140,8 +149,9 @@ export function renderSessionMoments({ exerciseIds } = {}) {
   // ASSESS-1 step 3. Baseline first, and the two can never both fire:
   // shouldOfferReassessment() returns false until a baseline exists.
   offerKind = shouldOfferBaseline(completedCount, qs) ? 'baseline'
-            : shouldOfferReassessment(qs)            ? 'reassessment'
-            : null;
+            : shouldOfferReassessment(qs, { chapterEnded: isHingePending() })
+                                                     ? 'reassessment'
+                                                     : null;
 
   if (baselineDone) {
     out += card(`<p class="coach-message-text">${esc(baselineDone)}</p>`, 'sm-baseline');
