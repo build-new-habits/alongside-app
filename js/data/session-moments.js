@@ -1,5 +1,12 @@
 /**
  * session-moments.js - The things the coach says when a session ends
+ * 16 Aug 2026 v2
+ *   ASSESS-1 step 3. The same three questions are now also offered as a
+ *   reassessment, twelve weeks after the last read, in the coach's
+ *   reassessment voice rather than the baseline's. Reached through this
+ *   file because this file is the one route every session view already
+ *   goes through -- which is exactly what SHARED-1 was for.
+ *
  * 15 Aug 2026 v1
  *
  * SHARED-1. Built after a device check found the fault.
@@ -45,14 +52,21 @@ import { store } from '../store.js';
 import { firstSessionRecognition } from './first-session.js';
 import { noticeDailyPace } from './pacing.js';
 import {
-  questionsForSession, shouldOfferBaseline, recordBaseline,
-  baselineIntro, baselineAck, EFFORT_CHIPS
+  questionsForSession, shouldOfferBaseline, shouldOfferReassessment,
+  recordAssessmentAnswers, baselineIntro, baselineAck,
+  reassessmentIntro, reassessmentAck, EFFORT_CHIPS
 } from './assessment.js';
 import { EXERCISES } from './exercises/index.js';
 
 // Module state, reset by resetSessionMoments() when a view mounts.
 let baselineAnswers = {};
 let baselineDone    = null;
+// ASSESS-1 step 3. Which read is being offered, so the save handler
+// acknowledges it in the right voice. Set during render and read on
+// save -- if it were recomputed on save, recordAssessmentAnswers() would
+// already have written the new entry and the gate would answer for the
+// NEXT read rather than the one just taken.
+let offerKind       = null;
 let pacingNote      = null;
 let pacingChecked   = false;
 
@@ -76,6 +90,14 @@ function esc(s) {
 export function resetSessionMoments() {
   baselineAnswers = {};
   baselineDone    = null;
+  // ASSESS-1 step 3. Belt-and-braces, and honestly labelled as such:
+  // renderSessionMoments() assigns offerKind unconditionally on every
+  // render, so it cannot actually go stale. Reversal testing proved
+  // that -- removing this line changed no behaviour and failed no
+  // assertion. An earlier version of this comment claimed it prevented
+  // a baseline being acknowledged in the reassessment voice, which was
+  // false. Kept for consistency with the state beside it; not relied on.
+  offerKind       = null;
   pacingNote      = null;
   pacingChecked   = false;
 }
@@ -114,10 +136,17 @@ export function renderSessionMoments({ exerciseIds } = {}) {
 
   // 2. Baseline — only where there is something to ask about.
   const qs = questionsForSession(exerciseIds || [], exMap());
+
+  // ASSESS-1 step 3. Baseline first, and the two can never both fire:
+  // shouldOfferReassessment() returns false until a baseline exists.
+  offerKind = shouldOfferBaseline(completedCount, qs) ? 'baseline'
+            : shouldOfferReassessment(qs)            ? 'reassessment'
+            : null;
+
   if (baselineDone) {
     out += card(`<p class="coach-message-text">${esc(baselineDone)}</p>`, 'sm-baseline');
-  } else if (shouldOfferBaseline(completedCount, qs)) {
-    const intro = baselineIntro();
+  } else if (offerKind) {
+    const intro = offerKind === 'reassessment' ? reassessmentIntro() : baselineIntro();
     out += card(`
       <h2 class="sm-baseline__heading">${esc(intro.heading)}</h2>
       <p class="coach-message-text">${esc(intro.body)}</p>
@@ -170,9 +199,12 @@ export function attachSessionMoments(container, rerender) {
   container.querySelector('[data-sm-save]')?.addEventListener('click', () => {
     // No answers at all is a skip, not a save. recordBaseline() returns
     // null and we must not report a read that did not happen.
-    const entry = recordBaseline(baselineAnswers);
+    const kind = offerKind;
+    const entry = recordAssessmentAnswers(baselineAnswers);
     if (!entry) { store.declineAssessment(); baselineDone = null; }
-    else baselineDone = baselineAck(store.assessmentChange());
+    else baselineDone = kind === 'reassessment'
+      ? reassessmentAck(store.assessmentChange())
+      : baselineAck(store.assessmentChange());
     rerender && rerender();
   });
 
