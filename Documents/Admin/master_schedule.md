@@ -36,7 +36,8 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > - **My Programme and tier.** Programmes are Personal; the row is currently shown to everyone and displays only what that person actually has, with nothing locked and nothing invented. Whether it should instead be a Personal-tier upsell is a product decision and was not taken. **The view is built either way — this is one branch, not a rebuild.**
 > - **Three chain successors are named `Build`, `Open` and `Ground`.** They resolve correctly, but the arc line reads *"Build would likely come next"*, which is a sentence about a programme called Build. A naming question in `programmes.js`, not a view bug. Related to the still-open 🟠 *chain routes — I invented them*.
-> - **Rehab front door** — still needs a physio to read the spec before it ships.
+> - **Rehab front door** — 🟢 **Blueprint written 16 Aug**: `Documents/Admin/alongside_blueprint_rehab-frontdoor_16aug2026_v1.md`, marked NOT FOR BUILD. A physiotherapist review pack was produced alongside it for Graeme to send out. **Ten questions are the blocker**, Q1 above all: the design deliberately does no red-flag screening, and that refusal is the thing most likely to be wrong. Nothing ships until answers come back and the blueprint goes to v2.
+> - **Device check rewrite** — 🅿️ **PARKED by Graeme, 16 Aug.** Not to be rewritten until the current build plans are complete, then checked in phases after a thorough route trace. The `session-builder-ui` trace (~80%) is the prerequisite, not this.
 >
 > #### 🔵 NEW STREAM — DESTINATIONS. Raised by Graeme, 16 Aug. Not yet blueprinted.
 >
@@ -69,6 +70,8 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > #### 🔵 Next
 >
+> **Chosen 16 Aug, Graeme delegating the call: ASSESS-1 step 3.** It is the only item that unblocks something rather than adding to the pile — the hinge (CHAP-1 step 3) cannot be built without it, and PROG-1 cannot be retried without it either. Both have now stalled on it twice. The rehab door is blocked on a person, the device check is parked, and Destinations is a blueprint rather than a build; ASSESS-1 step 3 is the one thing that is neither blocked nor optional.
+>
 > **CHAP-1 step 3, the hinge mechanic — blocked on ASSESS-1 step 3**, which is not built. Steps 4 (weekly focus), 5 (Blocks, offered at the first hinge) and 6 (event goals) follow. The Blocks *vocabulary* is already live and gated in the view; step 5 is the offer mechanic, not the display.
 >
 > Still open from 15 Aug: **device check must be rewritten against real routes** (stages 1 and 5 pointed at the wrong door) · **`session-builder-ui` route trace ~80%** · **legal docs still 13+/16+, must align to 18+** · **PAT token lapses ~5 Sep**.
@@ -94,7 +97,7 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 > #### 🟠 Blocked / needs Graeme
 >
 > - **Rehab front door** — Graeme's idea, and the strongest differentiation raised today. Name the CHAIN, never the condition; chronic (his own case is 9 months) routes to a professional as a redirect, not a refusal. Blueprint not yet written. **Needs a physio to read the spec before it ships.**
-> - **Device check must be rewritten** against real routes before anybody retests. Stages 1 and 5 pointed at the wrong door.
+> - **Device check must be rewritten** against real routes before anybody retests. Stages 1 and 5 pointed at the wrong door. **[PARKED 16 Aug — see top block.]**
 > - **`session-builder-ui` route trace incomplete** — the Cardio/Core/Strength door neither navigates to reflect nor logs a session directly. ~80% traced.
 > - **Legal docs** still 13+/16+, must align to 18+.
 > - **Token lapses ~5 Sep.**
