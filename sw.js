@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Aug 2026 v365
+ * ASSESS-1 step 3. assessment.js v2, session-moments.js v2. The read
+ * stops being a one-off: the same three questions are offered again
+ * twelve weeks after the last one, in a reassessment voice rather than
+ * the baseline's. Triggered on TIME rather than on the chapter boundary
+ * alone -- programmes are Personal and the chapter-completion signal is
+ * written by CHAP-1 step 3, which does not exist, so gating on the hinge
+ * would have built something no user could reach. chapterEnded is an
+ * argument the hinge will pass when it exists. No new files.
+ *
  * 16 Aug 2026 v364
  * HYPER-1. conditions.js v1.5, exercises/index.js v1.8. The
  * physiotherapist review found that hypermobility/EDS must strictly
@@ -2514,7 +2524,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v364";
+const CACHE_NAME = "alongside-v365";
 
 const SHELL_URLS = [
 
