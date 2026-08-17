@@ -169,6 +169,26 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
+> ### 🟢 BURN-3 — the graded burnout message is back, and reachable. `alongside-v372`, 64 checks green.
+>
+> Graeme: *"that needs to come back."* It does, and on **Home** rather than where it was.
+>
+> **Two sentences, because the session is graded too.** `high` narrows the pool and sets recoveryMode; `moderate` does not. One sentence for both would tell somebody having a flat week the same thing as somebody a fortnight into exhaustion.
+>
+> **Above the yesterday line.** Burnout is a statement about the last week and belongs *before* somebody chooses what to do. And if somebody has been flat for a week, *"you did strength work yesterday"* is not the most useful thing the coach can say to them.
+>
+> **P4 held: the word "burnout" never appears on screen.** It is a clinical claim this product is not qualified to make. The coach says what it noticed and what it will do.
+>
+> **The gate mounts Home and reads the sentence**, rather than grepping a file — which is the whole reason the last version went unseen. Six reversal tests. One scoping fix on the way: the banned-word checks first ran against the entire page and failed on door labels; a banned-word test is only meaningful against the text it is meant to police.
+>
+> #### 🟠 The 5 gym orphans — NOT done, and deliberately
+>
+> All five are `contentType: 'practice'`, not exercises: three circuits (EMOM, med-ball plyo, strength-endurance) and two sport warm-ups. Relabelling their `category` to make them match a session type would be **guessing at `matchCategory()`'s rules**, and inventing a mapping is the fault this week keeps punishing. They need a proper read of the matcher first. **Small, but not small enough to guess at.**
+>
+> #### ⚠️ Also found by the suite, unrelated
+>
+> `verify-chap2` hardcoded *"14 September"* as today+29 and went red **when the clock rolled past midnight during this session**. Now computed. `verify-sw1` was fixed for exactly this once already — worth a sweep for other hardcoded dates in gates.
+>
 > ### 🟢 BIAS-2 — RESOLVED 16 Aug. `alongside-v371`, 63 checks green. Graeme: *"whatever you think is best."*
 >
 > **Retired, not restored — and the distinction is the whole fix.** Restoring a writer somewhere reachable would have fixed today's symptom and kept the shape that caused it: a value that is correct only while somebody remembers to write it. **A derived value cannot have a missing writer.** `coachBias()` in `checkin.js` computes it from today's activity log at the moment it is asked.
