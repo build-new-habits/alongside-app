@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 17 Aug 2026 v379
+ * TARGET-4. store.js v53, Schema.md v1.35. targetDate and
+ * targetDescription existed in two places and were read under a third
+ * name that never existed. TARGET-3 made the readers tolerant; this
+ * closes the divergence at the source with a one-way migration into
+ * strategicGoal, on load, into empty fields only. No new files.
+ *
  * 17 Aug 2026 v378
  * GOAL-2. workoutGenerator.js read "goal.primaryGoal" and
  * "goal.targetDate" — and no top-level `goal` object exists or ever
@@ -2634,7 +2641,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v378";
+const CACHE_NAME = "alongside-v379";
 
 const SHELL_URLS = [
 
