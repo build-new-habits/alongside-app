@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 18 Aug 2026 v380
+ * PRAC-1. The guided practice library. Three new files precached:
+ * js/views/practices.js, js/data/practice-library.js,
+ * css/components/practices.css. 28 whole practices in the database
+ * had no door in the product; the Library now has one, free and
+ * ungated. store.js unchanged at v53, Schema.md unchanged at v1.35 —
+ * the route adds no store field.
+ *
  * 17 Aug 2026 v379
  * TARGET-4. store.js v53, Schema.md v1.35. targetDate and
  * targetDescription existed in two places and were read under a third
@@ -2641,7 +2649,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v379";
+const CACHE_NAME = "alongside-v380";
 
 const SHELL_URLS = [
 
@@ -2701,6 +2709,7 @@ const SHELL_URLS = [
   "/alongside-app/css/layouts/onboarding.css",
 
   "/alongside-app/css/components/tier-gating.css",
+  "/alongside-app/css/components/practices.css",
 
   // Core JS
   "/alongside-app/js/app.js",
@@ -2773,6 +2782,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/privacy.js",
   "/alongside-app/js/views/onboarding/goal-setup.js",
   "/alongside-app/js/views/library.js",
+  "/alongside-app/js/views/practices.js",
   "/alongside-app/js/views/my-programme.js",
   "/alongside-app/js/session-builder.js",
   "/alongside-app/js/views/session-builder-ui.js",
@@ -2837,6 +2847,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/exercises/rehabilitation.js",
   "/alongside-app/js/data/exercises/recovery.js",
   "/alongside-app/js/data/exercises/mindfulness.js",
+  "/alongside-app/js/data/practice-library.js",
 
   // Assets
   "/alongside-app/assets/images/logo-icon-small.png",
