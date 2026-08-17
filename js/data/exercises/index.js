@@ -351,9 +351,20 @@ export function getSuitableExercises(userProfile, checkinData) {
   // 0. DATA-1b. Whole sessions are not components. This runs FIRST so
   //    every filter below works on a pool that could actually be
   //    assembled into a session -- and so the count the caller sees is
-  //    honest. Standalone content is reached through the Library,
-  //    Mobility & Conditioning and the single-activity views, which do
-  //    not come through here.
+  //    honest.
+  //
+  //    CORRECTION, 17 Aug 2026. This said standalone content "is reached
+  //    through the Library, Mobility & Conditioning and the
+  //    single-activity views, which do not come through here."
+  //
+  //    Verified by mounting the Library and scanning every view: it is
+  //    NOT. All 28 standalone items are referenced by no view at all.
+  //
+  //    This comment is why the gap survived — the code said the route
+  //    existed, so nobody checked. Same shape as workoutGenerator's
+  //    changelog claiming a Gentle Care bypass that was not there. A
+  //    confident comment is not evidence. The route is specified in the
+  //    master schedule and not yet built.
   pool = pool.filter(ex => !isSessionLength(ex));
 
   // 1. Equipment filter
