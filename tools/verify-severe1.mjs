@@ -59,9 +59,25 @@ check('the self-directed route gets the same answer', sel?.gentleCare === true,
 // ── 2. It does NOT fire for anybody else ─────────────────────────────
 seed(['knee'], { knee: 6 });
 const moderate = SB.buildSession({ sessionType:'full', durationMins:30 });
-check('moderate pain still gets a real session', !moderate?.gentleCare,
-  'getZoneStatus calls severe at 7+; 6 is moderate');
+check('moderate pain still gets a real session', !moderate?.gentleCare);
 check('and it is a full session', (moderate?.exercises || []).length > 4);
+
+// ── THE BOUNDARY. Graeme, 17 Aug: "7 is the top of moderate and 8 is
+// severe." Moving the threshold from 7 to 8 changed real behaviour and
+// this gate passed unchanged, because nothing tested either side of the
+// line. A threshold with no boundary test is a number nobody is
+// checking.
+seed(['knee'], { knee: 7 });
+const seven = SB.buildSession({ sessionType:'full', durationMins:30 });
+check('7 is the TOP OF MODERATE and still gets a session', !seven?.gentleCare,
+  'the change on 17 Aug — somebody at 7 was previously handed the card');
+check('but 7 still gets ACUTE-safe work', 
+  C.getActiveConditionIds(['knee'], { knee: 7 }).includes('knee-acute'),
+  'the protective filter deliberately did NOT move with the bypass');
+
+seed(['knee'], { knee: 8 });
+check('8 is severe and gets the card',
+  SB.buildSession({ sessionType:'full', durationMins:30 })?.gentleCare === true);
 
 seed([], {});
 const clear = SB.buildSession({ sessionType:'full', durationMins:30 });
@@ -112,10 +128,16 @@ check('a deliberate override can still build a session', !overridden?.gentleCare
 //
 // EXPECTED TO FAIL the day somebody reconciles these — which is the
 // point. It carries the question to whoever does the clinical review.
-check('the two severity definitions still disagree, and that is recorded',
-  C.getPainBand(7).id === 'moderate' &&
+// The two functions still differ, and that is now DELIBERATE rather
+// than unresolved. getPainBand's 8 governs whether a session is built
+// at all; getZoneStatus's 7 governs whether the work is acute-safe.
+// Two thresholds, two jobs. Asserted so nobody "tidies" them into one
+// and silently stops protecting people at 7.
+check('the bypass follows getPainBand (8+)',
+  C.getPainBand(7).id === 'moderate' && C.getPainBand(8).id === 'severe');
+check('and the acute filter still follows 7+, on purpose',
   C.getZoneStatus(['knee'], { knee: 7 })['lower-limb'] === 'severe',
-  'getPainBand says 7 is moderate; getZoneStatus says 7 is severe. Unreconciled, deliberately — clinical review owns it');
+  'two thresholds, two jobs — merging them would loosen the protective one');
 
 // ── 6. The card's content is real ────────────────────────────────────
 const ids = (card.exercises || []).map(e => e.id);
