@@ -1,7 +1,30 @@
 # Alongside — Data Schema Reference
-## 16 Aug 2026 v1.34
+## 17 Aug 2026 v1.35
 
-**File:** `js/store.js` (confirmed live version: **v52, 15 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v53, 17 Aug 2026**)
+
+---
+
+## v1.35 (17 Aug 2026) — TARGET-4: four names for one idea, reduced to one
+
+`store.js` v52 → **v53**. No new fields. One migration, and the reason it exists is worth more than the change.
+
+**`targetDate` and `targetDescription` existed in two places**, and were read under a third name that never existed at all:
+
+| Path | Written by | Read by |
+|---|---|---|
+| `targetDate` (top level) | `onboarding/goal-setup.js` | `goal-setup.js`, `workoutGenerator.js` |
+| `strategicGoal.targetDate` | **nothing** | `views/my-programme.js` |
+| `goal.targetDate` | **no such object** | `workoutGenerator.js` — always `undefined` |
+| `goal.primaryGoal` | **no such object** | `workoutGenerator.js` — so a chosen primary goal was silently replaced by `goals[0]` |
+
+**Found in that order, each by accident while chasing the next.** TARGET-3 made the readers tolerant, which stopped the visible bug but left the divergence: two fields, either editable, drifting apart. GOAL-2 removed the phantom third name.
+
+**TARGET-4 closes it at the source.** On load, `mergeWithDefaults()` copies the top-level pair into `strategicGoal` — **one way, and only into an empty field.** The top-level pair is never written back to and never overwrites a later answer: *a migration that can overwrite is a migration that will, on the day somebody edits the newer field first.* Idempotent, so once `strategicGoal` holds a value the copy stops.
+
+**`strategicGoal` is canonical from here.** The top-level pair stays declared for existing installs and should be considered read-only legacy.
+
+**File:** `js/store.js` (superseded header below)
 **Storage:** `localStorage` key `alongside_user`
 
 **This version supersedes:** v1.33 (13 Aug 2026).
@@ -304,6 +327,7 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | **1.14** | **04 Aug 2026** | **Phase D-1 (schema), Conditions Update.** Two new fields: `conditionGoals` (felt-sense condition-specific goal, `'healed'\|'cope'\|'improve'` + optional note, new `store.setConditionGoal()`) and `prescribedExercisesOrigin` (`'professional'\|'self'\|null`, lets `prescribed.js` branch its coach voice correctly). Also documented in the field-reference table: `pendingDoorRoute`, added earlier today (Phase C follow-up) but missed in Schema.md at the time. `js/store.js` v14→v15. |
 | **1.15** | **04 Aug 2026** | **Condition programmes, real routes built.** `prescribedExercises` entries can now carry an optional `conditionId` — additive, nullable, existing entries unaffected. New `prescribedExercisesActiveCondition` — single-use context flag, cleared the instant it's read. `js/store.js` v15→v16. New module `js/data/conditionProgrammes.js` (not a schema file, but the reason these fields exist) — real, tested exercise-selection logic for "Coach builds it"/"Coach recommends, you select," built on `affectsAreas`/`rehabPhase`/`contraindications` data that already existed. |
 | **1.16** | **04 Aug 2026** | **Cross-condition exercise reuse, not duplication.** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — one entry can now genuinely serve more than one condition, so doing the same physical exercise once correctly counts once everywhere, rather than the same exercise appearing as two separate entries with independent completion state and double credits. Backward compatible — old singular-shaped entries read correctly via new `getEntryConditionIds()`, migrate naturally on rebuild, no explicit migration step. `js/data/conditionProgrammes.js` v2→v3. Smoke-tested against real overlapping conditions before shipping. |
+| **1.35** | **17 Aug 2026** | **TARGET-4.** `store.js` v52 → v53. One-way migration of `targetDate`/`targetDescription` from top level into `strategicGoal`, on load, into empty fields only. Closes a divergence where two editable fields held one idea — and a third, `goal.*`, was read but had never existed, silently replacing a chosen primary goal with `goals[0]`. |
 | **1.34** | **16 Aug 2026** | **Eleven versions of drift, caught by fixing the gate meant to catch it.** `store.js` v41 → v52. Nine undocumented top-level fields folded in: `assessment` (ASSESS-1 — the field that lets the difficulty ceiling move), `programme` + `weekFocus` (CHAP-1 step 1, declared and written by nothing), `exerciseClearance` (CARDIAC-1), `pacing` + `sessionPace` (PACE-1/QUICK-1), `sessionMode`, `personalBests` + `showPersonalBests` (PB-1). `tools/schema-check.mjs` v1 → **v2**: its field diff had been slicing an empty string since the day it was written, so it could not fire at any amount of drift. Now anchored on the definition and self-asserting. |
 | **1.17** | **09 Aug 2026** | **"In Step" (Noticing Hub, Personal tier) + drift catch-up.** New field `inStepProgress` (`unlockedAt`, `scenarioIndex`, `completedCount`, `choiceLog`) — four-movement scenario practice extending the empathy transfer arc, `js/store.js` v17→v18, new `js/data/in-step-scenarios.js` + `js/views/in-step.js`, new route `in-step`. Also documented `exercisePreferences` (`store.js` v17, 04 Aug), missed in Schema.md at the time — same drift pattern as `pendingDoorRoute` in 1.14, caught here rather than left open. |
 
@@ -733,4 +757,4 @@ All 18 fields flagged in the 30 Jul v1.9 follow-up list have been individually c
 
 ---
 
-*Build New Habits · Alongside: Move · Data Schema Reference · 16 Aug 2026 v1.34*
+*Build New Habits · Alongside: Move · Data Schema Reference · 17 Aug 2026 v1.35*

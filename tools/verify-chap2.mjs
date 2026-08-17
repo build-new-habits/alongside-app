@@ -351,6 +351,38 @@ check('strategicGoal takes precedence over the top-level pair',
   /the structured one/.test(both.text) && !/the old one/.test(both.text));
 
 
+// ── TARGET-4, 17 Aug 2026. The migration. ───────────────────────────
+//
+// TARGET-3 made the readers tolerant, which stopped the visible bug but
+// left two editable fields holding one idea. This closes it on load —
+// one way, into an empty field only.
+localStorage.clear();
+store.init();
+store.set('targetDescription', 'The coast path walk');
+store.set('targetDate', new Date(Date.now() + 30 * 864e5).toISOString());
+store.init();   // reload
+check('TARGET-4 an onboarding target migrates into strategicGoal',
+  store.get('strategicGoal.targetDescription') === 'The coast path walk' &&
+  !!store.get('strategicGoal.targetDate'),
+  'strategicGoal is canonical from here');
+
+// It must NEVER overwrite a later answer.
+localStorage.clear();
+store.init();
+store.set('targetDescription', 'the old onboarding one');
+store.set('strategicGoal.targetDescription', 'the one they set at the hinge');
+store.init();
+check('TARGET-4 and it never overwrites an answer given later',
+  store.get('strategicGoal.targetDescription') === 'the one they set at the hinge',
+  'a migration that can overwrite is a migration that will');
+
+// Idempotent — running twice must not resurrect anything.
+store.set('strategicGoal.targetDescription', '');
+store.init();
+store.init();
+check('TARGET-4 is idempotent across reloads',
+  typeof store.get('strategicGoal.targetDescription') === 'string');
+
 console.log(failures === 0
   ? `\nALL PASS — ${'my-programme'} renders from a real click on a real Home.\n`
   : `\n${failures} FAILURE(S)\n`);
