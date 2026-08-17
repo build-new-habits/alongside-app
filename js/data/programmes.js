@@ -1,5 +1,28 @@
 /**
  * programmes.js
+ * 18 Aug 2026 v5
+ *
+ * v5 - NAMING-1. Three successor programmes renamed. `Build`, `Open` and
+ *   `Ground` were bare verbs sitting next to four entry programmes with
+ *   human names (Build Your Base, Couch to Cardio, Back to Strength,
+ *   Feel Good Foundation), and they read as fragments in the sentence
+ *   they actually appear in: my-programme.js composes "<name> would
+ *   likely come next", and "Build would likely come next" is not a
+ *   sentence about a programme.
+ *
+ *   `Build` also collided with the chapter named `build` that every
+ *   programme carries in its build/push/peak/recovery arc, so the same
+ *   word meant two things one level apart.
+ *
+ *     build  -> Strength That Lasts
+ *     open   -> Room to Move
+ *     ground -> Steady Ground
+ *
+ *   IDs are unchanged, deliberately. They are referenced by
+ *   nextProgrammeId, by activeProgramme.programmeId in the store, and by
+ *   anybody mid-programme right now; renaming them would strand live
+ *   users to make a copy change.
+ *
  * 15 Aug 2026 v4
  *
  * v4 - CHAIN-1. Six programmes now declare nextProgrammeId. After twelve
@@ -365,7 +388,7 @@ export const PROGRAMMES = [
 
   {
     id: 'build',
-    name: 'Build',
+    name: 'Strength That Lasts',
     tagline: '12 weeks of progressive strength — at your pace, with your body',
     description: 'A proper strength programme that adapts to how you feel every day. No rigid plans, no shame when life happens. Progressive overload done sensibly.',
     icon: '💪',
@@ -500,7 +523,7 @@ export const PROGRAMMES = [
 
   {
     id: 'open',
-    name: 'Open',
+    name: 'Room to Move',
     tagline: 'Flexibility, mobility and mindful movement over 12 weeks',
     description: 'Yoga, mobility work, and mindful movement — building range, ease, and body awareness. Gentle enough for any starting point, deep enough to change how you move.',
     icon: '🧘',
@@ -573,7 +596,7 @@ export const PROGRAMMES = [
     //
     // Steadier, then wider. Open is the least prescriptive of the three.
     nextProgrammeId: 'open',
-    name: 'Ground',
+    name: 'Steady Ground',
     tagline: 'Balance, stability, and coordination over 12 weeks',
     description: 'Core strength, proprioception, and body awareness — building the kind of stability that protects you in everyday life and keeps you moving well as you age.',
     icon: '🎯',
