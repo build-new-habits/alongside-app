@@ -255,5 +255,83 @@ check('and the shared successor matches what My Programme renders',
   PE.chapterSuccessor('feel-good-foundation')?.id === 'ground' &&
   PE.chapterSuccessor('build') === null);
 
+// ── 10. CHAP-1 step 6. The event goal, at the FIRST hinge. ──────────
+//
+// Blueprint §7: offered at the first hinge, NOT at signup — "most
+// people have no event, and asking implies they ought to". At signup
+// the question tells somebody with no answer that they are missing one.
+// After a finished chapter it is fair, because they have just shown
+// they finish things.
+
+const evHome = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
+check('the first hinge asks about an event',
+  /anything you're working towards/i.test(evHome.text));
+check('and it does not block the chapter choice',
+  evHome.c.querySelectorAll('[data-hinge]').length === 3,
+  'an aside underneath, not a gate in front');
+check('there is no skip button',
+  !/skip/i.test(evHome.c.innerHTML),
+  'a skip makes ignoring it feel like a decision; doing nothing is a complete answer');
+
+// Answering it.
+evHome.c.querySelector('[data-event="open"]')?.click();
+const whatEl = document.getElementById('c').querySelector('#hinge-event-what');
+const whenEl = document.getElementById('c').querySelector('#hinge-event-when');
+check('the form opens', !!whatEl && !!whenEl);
+if (whatEl && whenEl) {
+  whatEl.value = 'The coast path walk';
+  whenEl.value = new Date(Date.now() + 40 * 864e5).toISOString().split('T')[0];
+  document.getElementById('c').querySelector('[data-event="save"]')?.click();
+}
+check('saving records the event where My Programme reads it',
+  store.get('strategicGoal.targetDescription') === 'The coast path walk' &&
+  !!store.get('strategicGoal.targetDate'),
+  'strategicGoal is the structured home TARGET-3 prefers');
+
+// Asked ONCE.
+const askedTwice = home(() => {
+  store.set('activeProgramme.completed', true);
+  store.set('activeProgramme.programmeId', 'beginner-fitness');
+});
+check('and it is never asked twice',
+  !/anything you're working towards/i.test(askedTwice.text),
+  'hingeOfferedAt records that the question was put');
+
+// Declining still counts as being asked.
+const evDeclined = home(() => { seed(120); PE.advanceWeekIfNeeded(); });
+evDeclined.c.querySelector('[data-event="open"]')?.click();
+document.getElementById('c').querySelector('[data-event="cancel"]')?.click();
+check('declining is remembered',
+  !!store.get('programme.hingeOfferedAt') &&
+  !store.get('strategicGoal.targetDescription'),
+  'a question put and declined has still been put');
+
+// And the ONLY thing suppressing it here is hingeOfferedAt: no target
+// was saved. The earlier "asked twice" check passed for the wrong
+// reason — a target had been saved by the test above, so hasTarget
+// alone was doing the work and removing the alreadyAsked guard changed
+// nothing. Reversal testing found that; this is the assertion that
+// actually pins it.
+const reRendered = home(() => {
+  store.set('activeProgramme.programmeId', 'beginner-fitness');
+  store.set('activeProgramme.completed', true);
+  store.set('programme.hingeOfferedAt', new Date().toISOString());
+  store.set('programme.chaptersDone', [{ id: 'beginner-fitness', name: 'Build Your Base' }]);
+});
+check('and having been asked once is enough on its own',
+  !/anything you're working towards/i.test(reRendered.text) &&
+  !store.get('strategicGoal.targetDate'),
+  'no target set — hingeOfferedAt is the only thing suppressing it');
+
+// Somebody who already told onboarding is not asked at all.
+const evHasOne = home(() => {
+  seed(120);
+  store.set('targetDate', new Date(Date.now() + 20 * 864e5).toISOString());
+  PE.advanceWeekIfNeeded();
+});
+check('somebody who already has a target is never asked',
+  !/anything you're working towards/i.test(evHasOne.text),
+  'including one set at onboarding, in the top-level field');
+
 console.log(failures === 0 ? '\nALL PASS\n' : `\n${failures} FAILURE(S)\n`);
 process.exit(failures === 0 ? 0 : 1);
