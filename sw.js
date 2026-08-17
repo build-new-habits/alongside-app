@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 17 Aug 2026 v377
+ * CHAP-1 step 6, and CHAP-1 IS COMPLETE. today.js, today.css. The event
+ * goal is offered at the FIRST hinge and asked once — never at signup,
+ * where asking implies somebody ought to have an answer. It does not
+ * block the chapter choice, there is no skip button, and declining is
+ * remembered so it is not re-asked. No new files.
+ *
  * 17 Aug 2026 v376
  * TARGET-3. my-programme.js. The event section read
  * strategicGoal.targetDate, which nothing writes, while onboarding's
@@ -2619,7 +2626,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v376";
+const CACHE_NAME = "alongside-v377";
 
 const SHELL_URLS = [
 
