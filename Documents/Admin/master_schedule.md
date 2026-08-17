@@ -169,6 +169,22 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
+> ### 🟢 AUDIT-2 — the "28 unreachable exercises" were a FALSE POSITIVE. Audit ERRORs now 0.
+>
+> **All 28 were session-length by the codebase's own definition.** `isSessionLength()` — `contentType: 'practice'`, or duration ≥ 600s — and `getSuitableExercises()` filters exactly those out first, because *"whole sessions are not components"*. A twenty-minute EMOM circuit cannot be one of four picks in a main section, and was never meant to be.
+>
+> **Zero were genuinely orphaned.** The audit knew the distinction existed in the codebase and was not applying it. Left as an ERROR it told somebody to go and fix twenty-eight correct things — **an audit that cries wolf gets ignored, and is then worth nothing on the day it is right.**
+>
+> Now split: session-length and unmatched → **INFO, expected by design**; a COMPONENT nobody can reach → **ERROR**, which is the real fault. **Audit ERRORs went 18 → 1 → 0 today, and the last one was the audit being wrong rather than the code.**
+>
+> **The 28 still need a route of their own** — the guided practice library. That is unchanged and still open. What changed is that they are no longer misreported as broken data, and the "5 genuine gym orphans" item on the build list **does not exist**: those five are whole sessions too.
+>
+> #### ⚠️ One assertion is marked [UNPROVEN], deliberately
+>
+> I could not make the orphan-component check FAIL. A seeded entry with a ghost category, ghost `movementPattern`, short duration and no practice `contentType` stayed reachable, so some matcher picks it up on another field. **Either components genuinely cannot be orphaned, or my seed was wrong again — and I have not established which.**
+>
+> Every other assertion in that file was made to fail on purpose. It is labelled in the gate output rather than left looking like a guard, because **a gate that has never been made to fail proves nothing, and that rule applies to my own work or it is not a rule.**
+>
 > ### 🟢 GOAL-2 — SHIPPED 17 Aug. `alongside-v378`, 67 checks green. A chosen primary goal was being ignored.
 >
 > `workoutGenerator.js` read **`goal.primaryGoal`** and **`goal.targetDate`** — and there is **no top-level `goal` object** in `getDefaults()`, and never has been. Both always returned `undefined`. Because the first had a fallback, **the person's chosen primary goal was silently replaced by whichever goal happened to be first in their list.** Nothing threw. Nothing looked wrong. It used the wrong answer, quietly.
