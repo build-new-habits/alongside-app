@@ -169,6 +169,22 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
+> ### 🟢 GOAL-2 — SHIPPED 17 Aug. `alongside-v378`, 67 checks green. A chosen primary goal was being ignored.
+>
+> `workoutGenerator.js` read **`goal.primaryGoal`** and **`goal.targetDate`** — and there is **no top-level `goal` object** in `getDefaults()`, and never has been. Both always returned `undefined`. Because the first had a fallback, **the person's chosen primary goal was silently replaced by whichever goal happened to be first in their list.** Nothing threw. Nothing looked wrong. It used the wrong answer, quietly.
+>
+> **Fourth naming variant of one idea found today:** `goal.*`, top-level `targetDate`, `strategicGoal.targetDate`, and `goals[]`. That is why the duplication needs **a decision and a migration**, not another preference chain.
+>
+> #### ⚠️ Not the gate I set out to build, and a claim of mine that was wrong
+>
+> The plan was to extend `verify-write1` to nested fields. **Measured first: 74 of 124 nested fields look one-ended**, and most are false positives, because objects are written whole or through store helpers. A gate with a 74-item baseline tells nobody anything, and a gate nobody reads gets muted.
+>
+> **And it would NOT have caught TARGET-3.** My Programme read `store.get('strategicGoal')` and then a property off the object — no dot-path read to detect. **I told Graeme it would have caught it. It would not have.**
+>
+> What a dot-path scan *does* catch is a read naming a path that cannot resolve: narrow, zero false positives, and it found a live bug on its first run. `verify-goal2.mjs`, four reversal tests, all caught.
+>
+> **The nested reader/writer problem remains open**, and is now honestly described: it needs a design better than a keyword scan, because the writes it must recognise happen through helpers and whole-object sets.
+>
 > ### 🟢🟢 CHAP-1 IS COMPLETE — step 6 shipped 17 Aug. `alongside-v377`, 66 checks green.
 >
 > All six steps done: schema · My Programme · the hinge · the weekly focus · Blocks vocabulary · the event goal.
