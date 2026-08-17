@@ -169,6 +169,20 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
+> ### 🟢 WRITE-1 GATE — SHIPPED 17 Aug. 65 checks green. The fault class is now guarded.
+>
+> Graeme: *"I don't want to defer. I won't remember to do it."* So nothing is deferred — the order is gate first, because the gate finds the rest.
+>
+> **`tools/verify-write1.mjs`** pins the current **40 one-ended store fields** and fails when the set **grows**. It deliberately does NOT demand all 40 be fixed today: many are legitimate settings somebody may never touch, and failing on all of them would make the gate noise. **A noisy gate gets muted.**
+>
+> Detection is deliberately generous — a field counts as connected on any plausible read or write, including through store helpers — so a false alarm is unlikely and it will miss some real mismatches. **That is the right direction for the error.** It exists to stop the set growing, not to be the last word on any one field. Comments are stripped first, so a changelog entry naming a dead field cannot vouch for it — which is exactly how four gates vouched for `coach-reflection.js` while nobody could reach it.
+>
+> **Reversal testing lesson, again:** two seeds first showed NOT CAUGHT and **both were bad seeds, not holes** — one inserted the orphan field outside `getDefaults()`, the other severed one of six readers. Re-seeded properly, both caught. *A reversal test that fails to fail is a test of the seed first.*
+>
+> #### The 40, for later triage — not urgent, now guarded
+>
+> Mostly dormant settings (`waterSettings`, `speechRate`, `journalSettings`), features declared and unbuilt (`weeklyReview`, `safeguarding`, `foodPrompts`), and three that matter more: **`weekFocus`** (CHAP-1 step 4), **`proposalBias`** (retired by BIAS-2 — declared but now correctly unreferenced), and **`targetDescription`** (CHAP-1 step 6, read by My Programme, written by nothing yet).
+>
 > ### 🔴 WRITE-1 — the week plan is written and read by nothing. Step 4 is BLOCKED on it.
 >
 > Graeme chose the week-level tilt for the weekly focus (option a, Personal tier). **I traced the lever before building on it, and it is not load-bearing.**
