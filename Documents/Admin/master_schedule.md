@@ -169,6 +169,24 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
+> ### 🔵 NEXT BUILD, FULLY TRACED — connect the weekly plan. Start here.
+>
+> Not deferred, not blocked: **traced and ready**, and stopped only because it is a real feature rather than a patch and the session had run long. Everything needed to start is below, so no rediscovery is required.
+>
+> **The chain, all of it verified by reading the code:**
+>
+> 1. `getWeekShape()` (`programmeEngine.js`) derives `sessionTypes` from the phase bias → writes `activeProgramme.weekPlan`
+> 2. `weekly-plan.js:137-151` fills declared gym days with those types → writes `activeProgramme.sessionSequence`
+> 3. **Nothing reads either.** `gym-programme.js` takes its session from `store.get('gymProgrammeSession')`, unrelated.
+>
+> **The connection point is `workoutGenerator.js:532`, `generateDailyOptions()`.** It takes zero parameters and reads everything from the store itself — which is exactly why it is the right place: `coach-proposal.js`'s `_generateOptions()` just calls it, so a plan consulted there reaches the coach's proposal without touching the view.
+>
+> **The build:** `generateDailyOptions()` looks up today in `activeProgramme.sessionSequence` and, if a type is declared for today, offers it as one of the three options — a **preference, not a replacement**, matching the idiom used for equipment, training intent and the severe bypass. The person declared it; the coach should honour it without being trapped by it.
+>
+> **Then, and only then, CHAP-1 step 4** — the week-level focus tilt, Personal tier, per Graeme's decision. It tilts `getWeekShape()`'s `sessionTypes`, which now actually reaches somebody. **Step 4 has no honest implementation until this exists**: the category tilt measured 39-vs-40, and the week tilt would write to a field nobody reads.
+>
+> **`targetDescription`/`targetDate` (step 6)** is independent of all this and can be built at any point — My Programme already renders both and `verify-chap2` already proves the one honest countdown behaves.
+>
 > ### 🟢 WRITE-1 GATE — SHIPPED 17 Aug. 65 checks green. The fault class is now guarded.
 >
 > Graeme: *"I don't want to defer. I won't remember to do it."* So nothing is deferred — the order is gate first, because the gate finds the rest.
