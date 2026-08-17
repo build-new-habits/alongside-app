@@ -169,6 +169,23 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
+> ### 🟢 TARGET-4 — SHIPPED 17 Aug. `alongside-v379`, 67 checks green. Four names for one idea, reduced to one.
+>
+> | Path | Written by | Read by |
+> |---|---|---|
+> | `targetDate` (top level) | `onboarding/goal-setup.js` | `goal-setup.js`, `workoutGenerator.js` |
+> | `strategicGoal.targetDate` | **nothing** | `my-programme.js` |
+> | `goal.targetDate` | **no such object** | `workoutGenerator.js` — always `undefined` |
+> | `goal.primaryGoal` | **no such object** | so a chosen primary goal was silently replaced by `goals[0]` |
+>
+> **Found in that order, each by accident while chasing the next.** TARGET-3 made the readers tolerant — that stopped the visible bug and left the divergence: two editable fields holding one idea, drifting apart the moment somebody edited either. GOAL-2 removed the phantom third. **TARGET-4 closes the rest at the source.**
+>
+> On load, `mergeWithDefaults()` copies the top-level pair into `strategicGoal`. **One way, and only into an empty field** — never written back to, never overwriting a later answer, because *a migration that can overwrite is a migration that will,* on the day somebody edits the newer field first. Idempotent.
+>
+> **`strategicGoal` is canonical from here.** The top-level pair stays declared for existing installs and is read-only legacy.
+>
+> **`schema-check` caught the drift the moment `store.js` changed** — the gate whose field diff had been slicing an empty string until yesterday morning, now doing exactly the job it was written for. `Schema.md` **v1.35**.
+>
 > ### 🟢 AUDIT-2 — the "28 unreachable exercises" were a FALSE POSITIVE. Audit ERRORs now 0.
 >
 > **All 28 were session-length by the codebase's own definition.** `isSessionLength()` — `contentType: 'practice'`, or duration ≥ 600s — and `getSuitableExercises()` filters exactly those out first, because *"whole sessions are not components"*. A twenty-minute EMOM circuit cannot be one of four picks in a main section, and was never meant to be.
