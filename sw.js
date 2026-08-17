@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 17 Aug 2026 v373
+ * SEVERE-1 threshold. Graeme: "7 is the top of moderate and 8 is
+ * severe." The Gentle Care bypass now fires at 8+ via getPainBand.
+ * getZoneStatus and the acute-variant filter deliberately STAY at 7 —
+ * that number also switches somebody onto acute-safe exercises, and
+ * moving it would have loosened a protective filter far beyond the
+ * decision taken. Two thresholds, two jobs. No new files.
+ *
  * 16 Aug 2026 v372
  * BURN-3. today.js v21. The graded burnout message returns, on Home,
  * above the yesterday line — it had been unreachable since 04 Aug. Two
@@ -2587,7 +2595,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v372";
+const CACHE_NAME = "alongside-v373";
 
 const SHELL_URLS = [
 
