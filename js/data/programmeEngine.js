@@ -1,5 +1,9 @@
 /**
  * programmeEngine.js
+ * 17 Aug 2026 v6
+ *   PLAN-1. plannedFocusToday() — the first reader activeProgramme
+ *   .sessionSequence has ever had.
+ *
  * 16 Aug 2026 v5
  *   CHAP-1 step 3 part two. chapterSuccessor() and startChapter() —
  *   one definition of "what comes next" and one of "start a chapter",
@@ -629,6 +633,48 @@ export function startChapter(programmeId, { keepHistory = false } = {}) {
     // chapter adds to it rather than replacing it.
   }
   return true;
+}
+
+/**
+ * PLAN-1, 17 Aug 2026. What the person planned for today.
+ *
+ * THE GAP THIS CLOSES. getWeekShape() derived session types and wrote
+ * activeProgramme.weekPlan; weekly-plan.js filled declared gym days and
+ * wrote activeProgramme.sessionSequence; and NOTHING read either.
+ * gym-programme.js takes its session from an unrelated field. The weekly
+ * plan was a screen that recorded intentions nobody acted on -- somebody
+ * could declare Tuesday as core work and be offered whatever the phase
+ * bias felt like.
+ *
+ * Returns a FOCUS -- 'strength' | 'mobility' | 'cardio' -- because that
+ * is the vocabulary generateDailyOptions() orders its three options by.
+ * The plan speaks in session types (glute, upper, core...), so the map
+ * below is deliberately coarse and is the one judgement in this file:
+ * anything that is not clearly cardio or mobility is strength work. It
+ * is a nudge in ordering, so a wrong guess costs somebody a reordered
+ * list, not a wrong session.
+ *
+ * @returns {'strength'|'mobility'|'cardio'|null}
+ */
+export function plannedFocusToday() {
+  // Array-checked, not truthy-checked. `|| []` accepts a STRING and
+  // then seq.find() throws — and this runs inside the coach's proposal,
+  // so one corrupted field would have taken the whole screen down rather
+  // than falling back to the phase bias. Caught by the gate feeding it
+  // rubbish; store.js validates this field on load, but a defensive read
+  // costs nothing and the failure mode here is severe.
+  const seq = store.get('activeProgramme.sessionSequence');
+  if (!Array.isArray(seq) || !seq.length) return null;
+
+  const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const today = DAYS[new Date().getDay()];
+
+  const slot = seq.find(s => s && s.day === today && !s.completed);
+  if (!slot || !slot.type) return null;
+
+  if (slot.type === 'cardio')   return 'cardio';
+  if (slot.type === 'mobility') return 'mobility';
+  return 'strength';
 }
 
 export function isHingePending() {
