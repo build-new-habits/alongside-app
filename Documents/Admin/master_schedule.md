@@ -169,6 +169,24 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
+> ### 🟢 TARGET-3 — SHIPPED 17 Aug. `alongside-v376`, 66 checks green. A live bug in yesterday's work.
+>
+> **`targetDate` and `targetDescription` exist at TOP LEVEL *and* inside `strategicGoal`.** Onboarding's `goal-setup.js` writes the top-level pair; **My Programme read only the `strategicGoal` pair, which nothing writes.**
+>
+> So anybody who set a target date at onboarding **saw nothing** in the section built to show what they are aiming at. Shipped by me yesterday, and exactly the fault this week keeps producing: a reader pointed at a field with no writer while the real data sat one level away.
+>
+> Reads both now, preferring `strategicGoal` — the structured home, and where step 6 will write. The top-level pair is the fallback so existing people see their own date **today** rather than after a migration.
+>
+> **🟠 The duplication itself is flagged, not silently resolved.** Two fields with one meaning is a bug waiting to happen, and picking one quietly would be the wrong kind of tidy. It needs a decision and a migration, not a preference order.
+>
+> #### ⚠️ The gate addition nearly didn't run
+>
+> I appended the new assertions to `verify-chap2.mjs` **after its `process.exit()`** — dead code, and the suite still reported ALL PASS. Caught by **counting assertions before and after** rather than trusting the summary line: 42 became 45 only once the block moved above the exit. *A gate that grows by appending needs its assertion count checked, not its verdict.*
+>
+> #### 🔵 Step 6 proper — the writer — is what remains
+>
+> The reader is now correct and gated. What is still missing is a way to SET an event goal after onboarding, at the hinge, per §7. That is the last of CHAP-1.
+>
 > ### 🟢 CHAP-1 STEP 4 — SHIPPED 17 Aug. `alongside-v375`, 66 checks green. **CHAP-1 is now complete except step 6.**
 >
 > **Third lever, and this one was measured.** A coach that says *"I'm leaning towards the hinging this week"* and changes nothing is making a claim the product does not honour — worse than silence.
