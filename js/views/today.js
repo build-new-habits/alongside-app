@@ -287,6 +287,7 @@ import { advanceWeekIfNeeded, isHingePending, chapterSuccessor, startChapter }
   from '../data/programmeEngine.js';
 import { getProgramme }        from '../data/programmes.js';
 import { detectBurnout }       from '../data/checkin.js';
+import { proposeWeekFocus }    from '../data/week-focus.js';
 
 export function TodayView(router) {
 
@@ -381,6 +382,11 @@ export function TodayView(router) {
 
   function mount(container) {
     advanceWeekIfNeeded();
+    // CHAP-1 step 4. Proposed HERE because Home is the one surface
+    // everybody reaches. Proposing it lazily on read would mean My
+    // Programme writing to the store when somebody merely looked at it,
+    // and that view's gate asserts it writes nothing.
+    proposeWeekFocus();
     const state = _resolveState();
 
     if (state === 'proposal-accepted') {
