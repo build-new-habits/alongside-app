@@ -1,5 +1,9 @@
 /**
  * store.js - Data persistence layer
+ * 17 Aug 2026 v53
+ *   TARGET-4. One-way migration of targetDate/targetDescription from
+ *   the top level into strategicGoal, on load, into empty fields only.
+ *
  * 15 Aug 2026 v52
  *
  * v52 - CHAP-1. New fields programme { presentation, chaptersDone,
@@ -614,13 +618,44 @@ export const store = {
       },
 
       // ── STRATEGIC GOAL ────────────────────────────────────────
-      strategicGoal: {
-        ...defaults.strategicGoal,
-        ...(saved.strategicGoal || {}),
-        measurementsOptIn: Array.isArray(saved.strategicGoal?.measurementsOptIn)
-          ? saved.strategicGoal.measurementsOptIn
-          : []
-      },
+      //
+      // TARGET-4, 17 Aug 2026. ONE-WAY MIGRATION, top level -> here.
+      //
+      // `targetDate` and `targetDescription` existed in TWO places:
+      // top level, written by onboarding's goal-setup.js, and inside
+      // strategicGoal, which is the structured home everything newer
+      // reads. My Programme read only the second and so showed nothing
+      // to anybody who set a date at onboarding (TARGET-3), and
+      // workoutGenerator read a third spelling that never existed at all
+      // (GOAL-2). Four names for one idea.
+      //
+      // TARGET-3 made the readers tolerant. That stopped the bug but
+      // left the divergence: two fields, either editable, silently
+      // drifting apart. This closes it at the source.
+      //
+      // ONE WAY, and only into an EMPTY field. The top-level pair is
+      // never written back to and never overwrites an answer somebody
+      // gave later -- a migration that can overwrite is a migration that
+      // will, on the day somebody edits the newer field first.
+      //
+      // It runs on every load and is idempotent: once strategicGoal
+      // holds a value, the copy stops happening.
+      strategicGoal: (() => {
+        const sg = {
+          ...defaults.strategicGoal,
+          ...(saved.strategicGoal || {}),
+          measurementsOptIn: Array.isArray(saved.strategicGoal?.measurementsOptIn)
+            ? saved.strategicGoal.measurementsOptIn
+            : []
+        };
+        if (!sg.targetDescription && typeof saved.targetDescription === 'string' && saved.targetDescription) {
+          sg.targetDescription = saved.targetDescription;
+        }
+        if (!sg.targetDate && saved.targetDate) {
+          sg.targetDate = saved.targetDate;
+        }
+        return sg;
+      })(),
 
       // ── PROGRESS / ACTIVITY LOGS ──────────────────────────────
       exerciseFeedback:    Array.isArray(saved.exerciseFeedback)    ? saved.exerciseFeedback    : [],
