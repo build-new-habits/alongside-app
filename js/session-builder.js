@@ -554,7 +554,7 @@ import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 import { EXERCISES, isSessionLength } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
 import { buildRationale } from "./data/session-rationale.js";
-import { getZoneStatus } from "./data/conditions.js";
+import { getZoneStatus, getPainBand, getCondition } from "./data/conditions.js";
 
 // ── Allocation presets (05 Aug 2026) ──────────────────────────────────────────
 // Scales EXERCISE_COUNT's warmup/main/cooldown split. Warmup always floors at
@@ -1725,10 +1725,39 @@ const SEVERE_BYPASS_ENABLED = true;
 function severeZoneToday() {
   const ids    = store.get("conditions") || [];
   const scores = store.get("conditionPainScores") || {};
-  const status = getZoneStatus(ids, scores);
-  const zone = ["lower-limb", "spine", "upper-limb", "systemic"]
-    .find(z => status[z] === "severe");
-  return zone || null;
+
+  // THRESHOLD: 8+, via getPainBand. Graeme, 17 Aug: "7 is the top of
+  // moderate and 8 is severe."
+  //
+  // This deliberately does NOT use getZoneStatus(), which calls 7+
+  // severe, and it deliberately does not change getZoneStatus either.
+  // That function's 7 is the same number getActiveConditionIds() uses to
+  // switch somebody onto ACUTE exercise variants, and that filter is
+  // protective. Moving it would have quietly stopped somebody at 7 being
+  // served acute-safe work -- a loosening far beyond the decision that
+  // was actually taken.
+  //
+  // So the two thresholds now mean two different things, on purpose:
+  //   pain 7  -> a real session, built from acute-safe variants
+  //   pain 8+ -> no session; the Gentle Care card
+  //
+  // That is the shape Graeme described: the top of moderate still gets
+  // to train, protected. Severe does not.
+  //
+  // STILL A LOOSENING, and recorded as one. Somebody at 7 who would have
+  // been handed a Gentle Care card an hour ago now gets a session. The
+  // decision removes a live contradiction between two definitions of
+  // "severe", which is worth having -- but it is a founder's judgement,
+  // not a clinician's, and it belongs in the physio pack as a change
+  // made rather than a question still open.
+  for (const id of ids) {
+    const score = scores[id];
+    if (typeof score !== "number") continue;      // silence is not severity
+    if (getPainBand(score).id !== "severe") continue;
+    const cond = getCondition(id);
+    if (cond && cond.zone) return cond.zone;
+  }
+  return null;
 }
 
 /**
