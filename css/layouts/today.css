@@ -1,5 +1,8 @@
 /*
  * css/layouts/today.css
+ * 17 Aug 2026 v6
+ *   CHAP-1 step 6. .today-hinge__aside / __event / __input.
+ *
  * 16 Aug 2026 v5
  *   CHAP-1 step 3. .today-hinge, the end-of-chapter offer.
  *
@@ -129,6 +132,43 @@
 
 .today-hinge__actions .btn {
   min-height: 44px;
+}
+
+/* ── The event goal at the hinge (CHAP-1 step 6) ──────────────── */
+/* Quieter than the chapter choice above it. The chapter is the
+   question; this is an aside, and it should look like one. */
+
+.today-hinge__aside {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+.today-hinge__event {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.today-hinge__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.today-hinge__input {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.today-hinge__input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* ── My Programme row (CHAP-1 step 2) ─────────────────────────── */

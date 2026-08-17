@@ -1,5 +1,10 @@
 /**
  * today.js
+ * 17 Aug 2026 v22
+ *   CHAP-1 step 6. The event goal, offered at the FIRST hinge and asked
+ *   once — never at signup, where asking implies somebody ought to have
+ *   an answer.
+ *
  * 16 Aug 2026 v21
  *   BURN-3. The graded burnout message returns, on Home, above the
  *   yesterday line. It had been unreachable since 04 Aug.
@@ -673,6 +678,33 @@ export function TodayView(router) {
     // chapter or sends them somewhere to choose one -- none of them
     // just closes the card, because a hinge that can be dismissed
     // leaves somebody between chapters with nothing to tell them so.
+    // CHAP-1 step 6. The event goal.
+    container.querySelectorAll('[data-event]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.event;
+        if (action === 'open') { _eventOpen = true; renderHome(container); return; }
+
+        if (action === 'save') {
+          const what = container.querySelector('#hinge-event-what')?.value?.trim() || '';
+          const when = container.querySelector('#hinge-event-when')?.value || '';
+          // Written to strategicGoal, the structured home My Programme
+          // prefers. A description with no date is fine and common --
+          // "the wedding" is a real answer even before anybody has
+          // booked anything.
+          if (what) store.set('strategicGoal.targetDescription', what);
+          if (when) store.set('strategicGoal.targetDate', new Date(when).toISOString());
+        }
+
+        // Asked once, whether they answered or not. Recorded on both
+        // save and cancel, because a question put and declined has
+        // still been put -- re-asking would make declining feel like it
+        // did not count.
+        store.set('programme.hingeOfferedAt', new Date().toISOString());
+        _eventOpen = false;
+        renderHome(container);
+      });
+    });
+
     container.querySelectorAll('[data-hinge]').forEach(btn => {
       btn.addEventListener('click', () => {
         const ap = store.get('activeProgramme') || {};
@@ -894,6 +926,9 @@ export function TodayView(router) {
    * dismissing would leave somebody permanently between chapters with
    * nothing to say so.
    */
+  // Whether the event form is open is not a fact about the person.
+  let _eventOpen = false;
+
   function _hingeCard() {
     if (!isHingePending()) return '';
 
@@ -922,7 +957,68 @@ export function TodayView(router) {
           <button class="btn btn-ghost btn-small" data-hinge="different"
                   aria-label="Choose something different">Something different</button>
         </div>
+        ${_eventPrompt()}
       </section>
+    `;
+  }
+
+  /**
+   * CHAP-1 step 6. The event goal, offered at the FIRST hinge.
+   *
+   * Blueprint §7: "Offered at the first hinge, not at signup: most
+   * people have no event, and asking implies they ought to."
+   *
+   * That sentence is the whole design. At signup, asking "what are you
+   * training for?" tells somebody with no answer that they are missing
+   * one. After a finished chapter it is a fair question, because they
+   * have just demonstrated they are the kind of person who finishes
+   * things.
+   *
+   * FIRST hinge only, and asked ONCE. programme.hingeOfferedAt records
+   * that the question has been put -- it is the field CHAP-1 step 1
+   * declared for exactly this ("one offer per hinge") and it is used
+   * rather than adding a new one, so no schema change is needed.
+   *
+   * Not asked at all if they already have a target: somebody who told
+   * onboarding about their hike does not need asking again.
+   *
+   * It does not block the chapter choice. It sits underneath, and doing
+   * nothing at all is a complete answer -- there is no "skip" to press,
+   * because a skip button makes ignoring it feel like a decision.
+   */
+  function _eventPrompt() {
+    const alreadyAsked = !!store.get('programme.hingeOfferedAt');
+    const hasTarget    = !!(store.get('strategicGoal.targetDate') || store.get('targetDate'));
+    const firstHinge   = (store.get('programme.chaptersDone') || []).length <= 1;
+    if (alreadyAsked || hasTarget || !firstHinge) return '';
+
+    if (_eventOpen) {
+      return `
+        <div class="today-hinge__event">
+          <label class="today-hinge__label" for="hinge-event-what">
+            What is it?
+          </label>
+          <input class="today-hinge__input" id="hinge-event-what" type="text"
+                 placeholder="A hike, a wedding, a park run" maxlength="60">
+          <label class="today-hinge__label" for="hinge-event-when">
+            When, if you know
+          </label>
+          <input class="today-hinge__input" id="hinge-event-when" type="date">
+          <div class="today-hinge__actions">
+            <button class="btn btn-primary btn-small" data-event="save">Save it</button>
+            <button class="btn btn-ghost btn-small" data-event="cancel">Never mind</button>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <p class="today-hinge__aside">
+        Is there anything you're working towards? A date in the diary, if you
+        have one — it changes nothing about how I work, but I'll keep it in view.
+        <button class="btn btn-ghost btn-small" data-event="open"
+                aria-label="Tell me what you are working towards">Tell me</button>
+      </p>
     `;
   }
 
