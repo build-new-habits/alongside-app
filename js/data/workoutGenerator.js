@@ -669,17 +669,39 @@ export const workoutGenerator = {
    * Falls back to default order (strength / mobility / cardio) if no programme.
    */
   getWorkoutFocusOrder() {
-    const bias = programmeEngine.getPhaseBias();
-    if (!bias || !bias.primaryFocus) {
-      return ["strength", "mobility", "cardio"];
+    const all = ["strength", "mobility", "cardio"];
+
+    // PLAN-1, 17 Aug 2026. What the person PLANNED leads.
+    //
+    // activeProgramme.sessionSequence had a writer and no reader: the
+    // weekly plan screen recorded intentions nobody acted on, so
+    // somebody could declare Tuesday as core work and be offered
+    // whatever the phase bias felt like. This is its first reader.
+    //
+    // A PREFERENCE, NOT A REPLACEMENT. It reorders the three options so
+    // the planned one comes first; it never removes the other two. Same
+    // idiom as the equipment correction, the training-intent tilt and
+    // the severe bypass -- and the right one here, because a plan made
+    // on Sunday should not trap somebody on Tuesday. Persona 2.4 plans;
+    // persona 2.12 changes his mind, and both have to be able to.
+    //
+    // It outranks the phase bias deliberately. The phase bias is the
+    // programme's opinion; the sequence is the person's, and this
+    // product hands the person the casting vote everywhere else.
+    const planned = programmeEngine.plannedFocusToday();
+    if (planned) {
+      return [planned, ...all.filter(f => f !== planned)];
     }
 
-    const all     = ["strength", "mobility", "cardio"];
+    const bias = programmeEngine.getPhaseBias();
+    if (!bias || !bias.primaryFocus) {
+      return all;
+    }
+
     const primary = bias.primaryFocus === "strength" ? "strength"
                   : bias.primaryFocus === "cardio"   ? "cardio"
                   : "mobility";
-    const rest    = all.filter(f => f !== primary);
-    return [primary, ...rest];
+    return [primary, ...all.filter(f => f !== primary)];
   },
 
   /**
