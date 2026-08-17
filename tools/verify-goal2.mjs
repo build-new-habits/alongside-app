@@ -76,5 +76,49 @@ check('and the primary goal is read from where it is written',
   /store\.get\("strategicGoal\.primaryGoal"\)/.test(all),
   'otherwise a chosen primary is silently replaced by goals[0]');
 
+// ── AUDIT-2. Whole sessions are not orphans. ────────────────────────
+//
+// The reachability audit reported 28 ERRORS for exercises no session
+// type can serve. All 28 were session-length by the codebase's OWN
+// definition — isSessionLength(), contentType 'practice' or duration
+// >= 600s — and getSuitableExercises() filters those out first, because
+// "whole sessions are not components". Zero were genuinely orphaned.
+//
+// Pinned here so the distinction cannot quietly collapse again: a
+// COMPONENT that no session type can reach is a real fault, and this
+// asserts there are none.
+const { EXERCISES, isSessionLength } = await import(new URL('../js/data/exercises/index.js', import.meta.url));
+const { matchCategory } = await import(new URL('../js/data/session-categories.js', import.meta.url));
+
+const sbSrc = fs.readFileSync('js/session-builder.js', 'utf8');
+const declared = new Set();
+for (const m of sbSrc.matchAll(/(?:warmupCategories|mainCategories|cooldownCategories):\s*\[([^\]]*)\]/g))
+  for (const c of m[1].matchAll(/["']([a-z0-9-]+)["']/g)) declared.add(c[1]);
+
+const reachable = new Set();
+for (const c of declared)
+  for (const s of ['warmup','main','cooldown'])
+    for (const e of matchCategory(EXERCISES, c, s)) reachable.add(e.id);
+
+const orphanComponents = EXERCISES.filter(e => !reachable.has(e.id) && !isSessionLength(e));
+// ⚠️ UNPROVEN, and labelled as such rather than left looking like a
+// guard. I could not make this assertion FAIL. Seeding a real entry
+// with a ghost category AND a ghost movementPattern, short duration and
+// no practice contentType still left it reachable — some matcher is
+// picking it up on another field (affectsAreas or contentType), so the
+// orphan set stayed empty.
+//
+// That means one of two things and I have not established which: either
+// the matchers are broad enough that a component genuinely cannot be
+// orphaned, or my seed was wrong again. Every other assertion in this
+// file was made to fail on purpose; this one was not, so it is recorded
+// as an observation rather than trusted as a gate.
+//
+// A gate that has never been made to fail proves nothing — that rule
+// applies to my own work or it is not a rule.
+check('[UNPROVEN] no COMPONENT exercise is unreachable by every session type',
+  orphanComponents.length === 0,
+  orphanComponents.slice(0, 6).map(e => e.id).join(', ') || 'the 28 the audit flagged were all whole sessions — but see the note above');
+
 console.log(failures === 0 ? '\nALL PASS\n' : `\n${failures} FAILURE(S)\n`);
 process.exit(failures === 0 ? 0 : 1);
