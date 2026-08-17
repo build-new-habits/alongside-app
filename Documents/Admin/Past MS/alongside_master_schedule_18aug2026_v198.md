@@ -1,56 +1,8 @@
 # Alongside: Move — Master Schedule
-## 18 Aug 2026 v199
+## 18 Aug 2026 v198
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_18aug2026_v198.md`. Remove v198 on upload.
-
-> ### 🔴 PICK UP HERE — 18 Aug, later. `alongside-v381`. **69 gates green on a fresh clone.**
->
-> #### 🟢 ONUNMOUNT-1 — SHIPPED. The teardown that two files said existed.
->
-> `quiet-session.js` has stated in its header since 02 Jul that `onUnmount` is *"called by `router.navigate()` before leaving this view."* **Nothing called it.** Not the router, not `app.js`, not anything. Found by grepping for the CALLER rather than reading the comment. `quiet-session.js` and `breathing-session.js` both export one and both rely on it to clear a running interval, so **leaving either mid-session left a timer running against a dead DOM.**
->
-> Same shape as the `exercises/index.js` comment claiming the 28 standalone items were reached through the Library, and the same reason it survived twelve weeks: *the code said the mechanism existed, so nobody looked.* A source-text gate would have read both comments and stayed green.
->
-> `navigate()` now calls it on the outgoing module, read from `viewCache`, guarded so a view that throws on the way out cannot strand somebody on the screen they are trying to leave. `verify-onunmount1.mjs` **executes a real navigation**, plus the inverse assertion that matters more: no view may export an `onUnmount` the router cannot reach. Three reversal tests, all caught.
->
-> `library.js` v6 now imports `router` explicitly rather than relying on `app.js`'s `window.router`. No behaviour change in a browser; it stops the file being untestable outside one.
->
-> #### 🟢 BUILD QUEUE #1 CLOSED — the `session-builder-ui` trace is 100%, and the gap was a misclassification
->
-> The open concern was that the Cardio/Core/Strength door *"neither navigates to reflect nor logs a session directly."* **It does neither because it is not a player.** It hands off to `gym-programme` via `generatedSession`, and `gym-programme` logs through `store.logActivity()` and routes to `reflect` on all three exits including the session-guard path. **The loop closes.** Not a gap.
->
-> One real loose end: `session-builder-ui.js:1151` writes `usingGeneratedSession`, which **nothing reads** — already documented dormant since 03 Aug. A dead line sitting next to the live one, and it will mislead the next reader of that function. Removal needs a `Schema.md` touch, so logged rather than done.
->
-> #### 🟢 DECISIONS TAKEN — 18 Aug
->
-> - **Pain bands: the schedule entry was STALE and is corrected.** Graeme's own 17 Aug note is already in `session-builder.js` — *"7 is the top of moderate and 8 is severe"* — and two thresholds now mean two different things on purpose: **pain 7 → a real session built from acute-safe variants; pain 8+ → no session, Gentle Care.** That IS backing off at 7. **The gap against the reviewer is 6, not 7:** at 6 nothing happens at all — a "Moderate" label and programming identical to somebody at 3. Closing it means a third rung (reduce load and volume, no acute variants). **Clinical call — goes in the pack.**
-> - **The 5 movement practices: FREE, confirmed.** The paid act is *composing* — `session-builder-ui`, already gated. A circuit in the practice library is a fixed pre-made whole thing; picking it is the same act as picking a nap protocol. Paywalling 5 items inside an otherwise-free screen also puts a gold badge on the hard work.
-> - **Persona 2.4 — ANSWERED by Graeme.** *"They build a relationship with key insights that are not metric-driven but human-centred. They experience something beyond 'just' the exercises."* 🔵 **Build consequence, added to the next trace:** she decides in the first two or three sessions, and the surfaces that deliver this — noticing hub, arcs, coach moments — mostly accrue over weeks. **Trace what she actually meets in session two.**
->
-> #### 🟠 TWO RECOMMENDATIONS ON THE TABLE — need Graeme
->
-> **1. The library question. Recommendation: depth at 3–4, not height at 5–6, and decide it by trace rather than by count.**
->
-> Measured 18 Aug: difficulty spread is **187 / 206 / 123 / 20 / 9 / 6**. Strength alone is 177 items with only **20 at difficulty 4+**. Two findings sharpen this past the raw 393-of-551 number:
->
-> - **There is no movement-pattern taxonomy at all.** `movementPatterns` does not exist on any entry; selection runs on category, section, difficulty and equipment. **Coverage at the top end cannot currently be reasoned about, because the data has no axis to measure it on.**
-> - **The 20 top-end strength items are scattered across 12 equipment types** — one barbell, three dumbbell, three kettlebell, and single items on ab-wheel, bosu, sandbag, dip station. **A person at home with a pair of dumbbells can reach three of them.** The problem is not that there is no top end; it is that almost nobody can reach a coherent set of it.
->
-> So: **do not build difficulty 6.** Progression for this audience is volume, consistency and confidence, and the differentiator is the relationship — which is persona 2.4's own answer. Add depth at 3–4 on the equipment people actually have, and settle it by running a capable persona twelve weeks to see whether the engine plateaus. **If it repeats the same items at week 12, that is evidence. If it does not, 393-of-551 is a red herring.**
->
-> **2. Chain successor naming. Recommendation: rename the three bare verbs, and fix one mis-route first.**
->
-> The four entry programmes have human names — Build Your Base, Couch to Cardio, Back to Strength, Feel Good Foundation. The successors are bare verbs: **Build, Open, Ground**. That is a register mismatch, and *"Build would likely come next"* reads as a fragment rather than a name. `Build` also collides with the chapter named `build` in every programme's build/push/peak/recovery arc.
->
-> Proposed, tested in the arc sentence: **`build` → "Strength That Lasts"** · **`open` → "Room to Move"** · **`ground` → "Steady Ground"**. `Move More` is fine as it is.
->
-> **🔴 And a mis-route found while checking this: `beginner-fitness` → `back-to-strength`.** Back to Strength is described as *"for people managing pain, injury recovery, or returning after a long break."* Somebody who has just completed twelve weeks of Build Your Base is none of those. **It should almost certainly go to `build` or `move-more`.** This is the still-open 🟠 *chain routes — I invented them* item, and it now has a concrete first instance.
->
-> Graeme's wider 16 Aug question — *grandkids, sport, 5k, marathon, core strength versus conditioning versus muscle* — is a **destinations** axis, not a successor axis. Successors answer "what comes next in the same relationship"; destinations answer "what am I for". Keep them apart or the Destinations stream inherits a naming problem it did not create.
->
-> ---
-
+Supersedes `master_schedule_16aug2026_v197.md`. Remove v197 on upload.
 
 > ### 🔴 PICK UP HERE — 18 Aug. `alongside-v380`. **68 gates green on a fresh clone.**
 >
