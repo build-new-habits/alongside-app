@@ -1,0 +1,258 @@
+/* ============================================================
+   css/components/practices.css
+   Alongside: Move — Guided Practices view
+
+   18 Aug 2026 v1
+
+   PRAC-1. Styles for views/practices.js: the group list, the item
+   list, and the single practice.
+
+   Written against the patterns already in the product rather than
+   inventing a new visual language — the card treatment follows
+   .library-session-card, the coach block follows .quiet-coach-card,
+   and the caution note follows the warning treatment used elsewhere.
+
+   Text sits on --color-bg and --color-bg-card only. Both clear AA for
+   --color-text and --color-text-secondary in all three schemes;
+   --color-bg-elevated does not for the muted token, so it is not used
+   for body copy here.
+
+   Every interactive control is at least 44px tall (WCAG 2.2 AA,
+   2.5.8 Target Size), and every one has a visible focus ring.
+
+   Classes: .practices-view, .practices-header, .practices-back-btn,
+            .practices-title, .practices-intro, .practices-group-grid,
+            .practices-group-card, .practices-group-label,
+            .practices-group-sub, .practices-item-grid,
+            .practices-item-card, .practices-item-name,
+            .practices-item-meta, .practices-item-why,
+            .practices-meta, .practices-caution, .practices-kit,
+            .practices-block, .practices-block-title, .practices-steps,
+            .practices-coach, .practices-watch, .practices-load,
+            .practices-ack, .practices-did-btn
+   ============================================================ */
+
+/* ── View shell ───────────────────────────────────────────────────── */
+
+.practices-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: var(--space-8);
+  background: var(--color-bg);
+  box-sizing: border-box;
+}
+
+.practices-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-2);
+  min-height: 56px;
+}
+
+.practices-back-btn {
+  min-height: 44px;
+  min-width: 44px;
+  flex: 0 0 auto;
+}
+
+.practices-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0;
+  flex: 1;
+}
+
+.practices-intro,
+.practices-meta {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  margin: 0 var(--space-4) var(--space-4);
+}
+
+.practices-meta {
+  margin-bottom: var(--space-3);
+}
+
+/* ── Group and item cards ─────────────────────────────────────────── */
+
+.practices-group-grid,
+.practices-item-grid {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-6);
+  padding: 0 var(--space-4);
+}
+
+.practices-group-card,
+.practices-item-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-4);
+  text-align: left;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.practices-group-card:hover,
+.practices-item-card:hover {
+  background: var(--color-bg-hover);
+}
+
+.practices-group-card:focus-visible,
+.practices-item-card:focus-visible,
+.practices-did-btn:focus-visible,
+.practices-back-btn:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.practices-group-label,
+.practices-item-name {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.practices-group-sub,
+.practices-item-why {
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.practices-item-meta {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* ── One practice ─────────────────────────────────────────────────── */
+
+.practices-block {
+  margin: 0 var(--space-4) var(--space-5);
+}
+
+.practices-block-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-2);
+}
+
+.practices-block p {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.practices-steps {
+  margin: 0;
+  padding-left: var(--space-5);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+}
+
+.practices-steps li {
+  margin-bottom: var(--space-2);
+}
+
+.practices-watch {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+}
+
+.practices-watch li {
+  padding-left: var(--space-4);
+  margin-bottom: var(--space-2);
+  position: relative;
+}
+
+.practices-watch li::before {
+  content: "\2022";
+  position: absolute;
+  left: 0;
+  color: var(--color-text-muted);
+}
+
+.practices-load {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.practices-kit {
+  margin: 0 var(--space-4) var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.practices-coach {
+  margin: 0 var(--space-4) var(--space-5);
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+}
+
+.practices-coach p {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+}
+
+/* Caution, not alarm. The border carries the signal; the background
+   stays a surface that keeps body text above AA. */
+.practices-caution {
+  margin: 0 var(--space-4) var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border-left: 3px solid var(--color-warning);
+  border-radius: var(--radius-md);
+}
+
+.practices-caution p {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+}
+
+/* ── Action ───────────────────────────────────────────────────────── */
+
+.practices-did-btn {
+  margin: var(--space-2) var(--space-4) var(--space-6);
+  min-height: 48px;
+}
+
+.practices-ack {
+  margin: var(--space-2) var(--space-4) var(--space-6);
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-md);
+}
+
+.practices-ack p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}

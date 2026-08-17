@@ -1,4 +1,8 @@
 /* main.css
+ * 18 Aug 2026 v23
+ *
+ * v23 - PRAC-1. components/practices.css imported.
+ *
  * 13 Aug 2026 v22
  *
  * v22 - A2. components/upgrade-page.css imported.
@@ -121,6 +125,7 @@
 @import 'components/session-shared.css';
 @import 'components/upgrade-door.css';
 @import 'components/upgrade-page.css';
+@import 'components/practices.css';
 /* Content-gated — add when content sessions complete */
 /* D3:  @import 'components/home-threshold.css';       */
 /* D10: @import 'components/community-impact.css';     */
