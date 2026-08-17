@@ -169,6 +169,27 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
+> ### 🔵 NEXT BUILD, FULLY SPECIFIED — the guided practice library. 28 items nobody can reach.
+>
+> Traced, not started, because it is a feature rather than a patch. Everything needed is here.
+>
+> **Verified by mounting the Library and by scanning every view:** all 28 standalone items are referenced by **no view at all**. Not the Library, not Mobility & Conditioning, not the single-activity views — despite `exercises/index.js` stating that "standalone content is reached through the Library". **That comment is wrong**, and it is why the gap survived: the code says the route exists.
+>
+> **What is stranded, grouped:**
+>
+> | Group | Count | Items |
+> |---|---|---|
+> | Recovery protocols | 10 | cold shower, contrast therapy, napping, hydration, nutrition timing, elevation, sauna, sleep position, active-recovery walk, cycle recovery spin |
+> | Mindfulness practices | 12 | 5-4-3-2-1 grounding, feet-on-floor, safe place, loving-kindness, mindful observation, worry time, compassionate self-talk, nature visualisation, morning intention, gratitude, digital detox, mindful walking |
+> | Walks | 1 | mindful-walk |
+> | Circuits and sport warm-ups | 5 | EMOM, med-ball plyo, strength-endurance, two sport warm-ups |
+>
+> **The build:** a route that serves whole items rather than assembling components — filter `EXERCISES` by `isSessionLength()`, group by `category`, and hand the chosen one to the existing single-activity player. `quiet-session.js` already plays practices this way, so the player exists; what is missing is the way in.
+>
+> **Check before building:** `quiet-session.js` keeps its OWN hardcoded `BREATHING_EXERCISES` array with ids mirroring the database. Whether the new route reuses that player or the database list is the first decision, and **two sources for one thing is the pattern that produced four names for `targetDate`.**
+>
+> **Tier:** all wellbeing practices are FREE per the tier model — *"Free = coach-chosen full-body session + all wellbeing practices."* This route must not be gated.
+>
 > ### 🟢 TARGET-4 — SHIPPED 17 Aug. `alongside-v379`, 67 checks green. Four names for one idea, reduced to one.
 >
 > | Path | Written by | Read by |
