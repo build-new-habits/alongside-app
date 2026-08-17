@@ -320,6 +320,37 @@ check('mounting the view writes nothing to the store',
   before === after,
   'step 2 is a display surface; a read-only screen that saves is a screen with a side effect nobody expects');
 
+// ── TARGET-3, 17 Aug 2026 ────────────────────────────────────────────
+//
+// targetDate and targetDescription exist at TOP LEVEL and again inside
+// strategicGoal. Onboarding's goal-setup.js writes the top-level pair;
+// this view read only the strategicGoal pair, which nothing writes. So
+// somebody who set a date at onboarding saw nothing in the section that
+// exists to show what they are aiming at.
+const onboardingOnly = mountWith(MyProgrammeView, () => {
+  store.set('tier', 'personal');
+  store.set('goals', ['get-stronger']);
+  store.set('targetDescription', 'The coast path walk');
+  store.set('targetDate', new Date(Date.now() + 29 * 864e5).toISOString());
+});
+check('a target set at ONBOARDING is shown on My Programme',
+  /The coast path walk/.test(onboardingOnly.text),
+  'the top-level pair is where goal-setup.js actually writes');
+check('and its date is counted toward',
+  /29 days to go/.test(onboardingOnly.text));
+
+// strategicGoal wins when both are present — it is the structured home
+// and where step 6 will write.
+const both = mountWith(MyProgrammeView, () => {
+  store.set('tier', 'personal');
+  store.set('goals', ['get-stronger']);
+  store.set('targetDescription', 'the old one');
+  store.set('strategicGoal.targetDescription', 'the structured one');
+});
+check('strategicGoal takes precedence over the top-level pair',
+  /the structured one/.test(both.text) && !/the old one/.test(both.text));
+
+
 console.log(failures === 0
   ? `\nALL PASS — ${'my-programme'} renders from a real click on a real Home.\n`
   : `\n${failures} FAILURE(S)\n`);
