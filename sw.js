@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 16 Aug 2026 v372
+ * BURN-3. today.js v21. The graded burnout message returns, on Home,
+ * above the yesterday line — it had been unreachable since 04 Aug. Two
+ * sentences, because the session is graded too: 'high' narrows the pool
+ * and sets recoveryMode, 'moderate' does not. No new files.
+ *
  * 16 Aug 2026 v371
  * BIAS-2. checkin.js v5, workoutGenerator.js, router.js. proposalBias is
  * retired: it had a reader and a clearer and no writer since 04 Aug. The
@@ -2581,7 +2587,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v371";
+const CACHE_NAME = "alongside-v372";
 
 const SHELL_URLS = [
 
