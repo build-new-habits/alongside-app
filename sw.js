@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 18 Aug 2026 v381
+ * ONUNMOUNT-1. router.js v20 and library.js v6 changed; cache bumped so
+ * installed clients pick them up. No new files.
+ *
  * 18 Aug 2026 v380
  * PRAC-1. The guided practice library. Three new files precached:
  * js/views/practices.js, js/data/practice-library.js,
@@ -2649,7 +2653,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v380";
+const CACHE_NAME = "alongside-v381";
 
 const SHELL_URLS = [
 
