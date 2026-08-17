@@ -1,6 +1,12 @@
 /**
  * library.js - Library Page
  *
+ * 18 Aug 2026 v6
+ *
+ * v6 - Imports router explicitly instead of reading the bare name and
+ *      relying on app.js's `window.router`. No behaviour change in a
+ *      browser; it stops the file being untestable outside one.
+ *
  * 18 Aug 2026 v5
  *
  * PRAC-1. New "Practices" category, free and ungated, whose direct
@@ -104,6 +110,12 @@
  */
 
 import { store } from "../store.js";
+// 18 Aug 2026. This file used `router` as a bare name and relied on
+// app.js setting `window.router`. That works in a browser and fails
+// anywhere else — verify-prac1 reported the Library's navigation
+// broken on its first run and the harness was right about the
+// mechanism even though the app was fine. Nine other views import it.
+import { router } from "../router.js";
 import { isPremium, lockedFeature } from "../auth.js";
 
 export const centered = false;

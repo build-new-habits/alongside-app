@@ -1,5 +1,11 @@
 /**
  * router.js
+ * 18 Aug 2026 v20
+ *   ONUNMOUNT-1. navigate() now calls onUnmount() on the outgoing
+ *   view. It never did, despite two view headers saying it does.
+ *   quiet-session.js and breathing-session.js both left timers
+ *   running against a dead DOM.
+ *
  * 18 Aug 2026 v19
  *   PRAC-1. New 'practices' route: the guided practice library. Nav
  *   hidden, mapped to Today because the Library is its door.
@@ -292,6 +298,26 @@ export const router = {
     }
 
     history.pushState({ view: viewName }, '', `#${viewName}`);
+
+    // ONUNMOUNT-1. Tear the outgoing view down before mounting the next.
+    //
+    // quiet-session.js's own header has said since 02 Jul that onUnmount
+    // is "called by router.navigate() before leaving this view". It was
+    // not. Nothing called it, here or anywhere — found 18 Aug while
+    // building PRAC-1, by grepping for the caller rather than trusting
+    // the comment. quiet-session.js and breathing-session.js both export
+    // one and both rely on it to clear a running interval, so leaving
+    // either mid-session left a timer ticking against a dead DOM.
+    //
+    // Guarded and swallowed: a view that throws on the way out must not
+    // be able to strand somebody on the screen they are trying to leave.
+    if (this.currentView && this.currentView !== viewName) {
+      const outgoing = this.viewCache[this.currentView];
+      if (outgoing && typeof outgoing.onUnmount === 'function') {
+        try { outgoing.onUnmount(); }
+        catch (err) { console.warn(`Router: onUnmount failed for "${this.currentView}"`, err); }
+      }
+    }
 
     if (this.currentView && this.currentView !== viewName) {
       this.history.push(this.currentView);
