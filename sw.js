@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 18 Aug 2026 v382
+ * NAMING-1. programmes.js v5 renames three successors. Cache bumped so
+ * installed clients do not keep showing the old names. No new files.
+ *
  * 18 Aug 2026 v381
  * ONUNMOUNT-1. router.js v20 and library.js v6 changed; cache bumped so
  * installed clients pick them up. No new files.
@@ -2653,7 +2657,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v381";
+const CACHE_NAME = "alongside-v382";
 
 const SHELL_URLS = [
 
