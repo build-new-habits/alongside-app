@@ -169,6 +169,29 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
+> ### 🔴 WRITE-1 — the week plan is written and read by nothing. Step 4 is BLOCKED on it.
+>
+> Graeme chose the week-level tilt for the weekly focus (option a, Personal tier). **I traced the lever before building on it, and it is not load-bearing.**
+>
+> | Field | Writer | Reader |
+> |---|---|---|
+> | `activeProgramme.weekPlan` | `getWeekShape()` | **none** |
+> | `activeProgramme.sessionSequence` | `weekly-plan.js` | **none** |
+>
+> `getWeekShape()` derives session types from the phase bias, `weekly-plan.js` fills declared gym days with them and writes `sessionSequence` — **and nothing consumes either.** `gym-programme.js` picks its session from `store.get('gymProgrammeSession')`, unrelated. The weekly plan is a display that records intentions nobody acts on.
+>
+> **So a focus tilting the week's shape would change `sessionTypes`, which fills `sessionSequence`, which nothing reads.** Decorative in a second way — and I recommended this lever to Graeme on the assumption it worked, which is the same mistake as the category tilt, made one level up.
+>
+> #### The finding is bigger than the focus
+>
+> This is the **third reader/writer mismatch this week**: `proposalBias` had a reader and no writer; these two have writers and no readers; and `weekFocus`/`programme` were declared with neither until CHAP-1 built them. **There is no gate that checks store fields have both ends.** `verify-contract.mjs` checks declared *values* are reachable, not that fields are connected.
+>
+> **Recommended next build: a reader/writer gate over the whole store.** It would have caught all three, and it is the highest-value thing left on the list — bigger than any single feature, because it closes the fault class rather than one instance.
+>
+> #### 🟠 Step 4 — now genuinely blocked, and it is a bigger question
+>
+> The weekly focus needs a lever that reaches session selection. Neither candidate works: category tilt is a no-op inside a pre-filtered pool; week shape is written to a field nobody reads. **The honest options are (1) make the weekly plan load-bearing — connect `sessionSequence` to what the coach proposes, which is a real feature in its own right and probably what the weekly plan was always for; or (2) defer step 4 past beta.** My recommendation is now firmly the latter, with the weekly plan connection as its own piece of work.
+>
 > ### 🟢 BURN-3 — the graded burnout message is back, and reachable. `alongside-v372`, 64 checks green.
 >
 > Graeme: *"that needs to come back."* It does, and on **Home** rather than where it was.
