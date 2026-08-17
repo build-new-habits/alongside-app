@@ -169,6 +169,30 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
+> ### 🟢🟢 CHAP-1 IS COMPLETE — step 6 shipped 17 Aug. `alongside-v377`, 66 checks green.
+>
+> All six steps done: schema · My Programme · the hinge · the weekly focus · Blocks vocabulary · the event goal.
+>
+> **The event goal is offered at the FIRST hinge and asked once.** Blueprint §7: not at signup, because *"most people have no event, and asking implies they ought to"* — at signup the question tells somebody with no answer that they are missing one; after a finished chapter it is fair, because they have just shown they finish things.
+>
+> - **No skip button.** A skip makes ignoring it feel like a decision; doing nothing is a complete answer.
+> - **Does not block the chapter choice** — it sits underneath.
+> - **Declining is remembered**, so it is not re-asked. A question put and declined has still been put.
+> - **Never asked** of somebody who already has a target, including one set at onboarding in the top-level field.
+> - Uses `programme.hingeOfferedAt`, the field step 1 declared for exactly this — **no schema change**.
+>
+> #### ⚠️ A test that passed for the wrong reason
+>
+> *"It is never asked twice"* stayed green while the `alreadyAsked` guard was removed — because the preceding test had saved a target, so `hasTarget` alone was doing the work. **Reversal testing found it; the assertion did not.** Added an isolating case where `hingeOfferedAt` is the only thing suppressing the prompt.
+>
+> Second time in two features that an assertion has been true for reasons other than the one it names. Worth carrying: **a green assertion proves the outcome, not the mechanism** — only breaking the mechanism proves that.
+>
+> #### 🔵 WHAT REMAINS
+>
+> **Build:** the 5 gym orphans (needs a read of `matchCategory()`) · the 23 practices, which need a ROUTE not a recategorisation · extend `verify-write1` to nested fields — **it would have caught TARGET-3** · resolve the duplicated `targetDate`/`targetDescription` pair (decision + migration) · `session-builder-ui` route trace (~80%) · device check rewrite, then Graeme's device test.
+>
+> **Not build:** clinical pack out, with SEVERE-1 and the threshold change as decisions made · HMRC · domain switch-over · **PAT token expires 5 Sep**.
+>
 > ### 🟢 TARGET-3 — SHIPPED 17 Aug. `alongside-v376`, 66 checks green. A live bug in yesterday's work.
 >
 > **`targetDate` and `targetDescription` exist at TOP LEVEL *and* inside `strategicGoal`.** Onboarding's `goal-setup.js` writes the top-level pair; **My Programme read only the `strategicGoal` pair, which nothing writes.**
