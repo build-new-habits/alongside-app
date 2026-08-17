@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 17 Aug 2026 v378
+ * GOAL-2. workoutGenerator.js read "goal.primaryGoal" and
+ * "goal.targetDate" — and no top-level `goal` object exists or ever
+ * has. Both always returned undefined, and because the first had a
+ * fallback, the person's CHOSEN primary goal was silently replaced by
+ * whichever goal was first in their list. Now reads strategicGoal. No
+ * new files.
+ *
  * 17 Aug 2026 v377
  * CHAP-1 step 6, and CHAP-1 IS COMPLETE. today.js, today.css. The event
  * goal is offered at the FIRST hinge and asked once — never at signup,
@@ -2626,7 +2634,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v377";
+const CACHE_NAME = "alongside-v378";
 
 const SHELL_URLS = [
 
