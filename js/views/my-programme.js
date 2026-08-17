@@ -1,6 +1,11 @@
 /**
  * my-programme.js - My Programme
  *
+ * 17 Aug 2026 v4
+ *   TARGET-3. The event section read strategicGoal.targetDate, which
+ *   nothing writes; onboarding writes the TOP-LEVEL targetDate. Reads
+ *   both now, preferring the structured one.
+ *
  * 17 Aug 2026 v3
  *   CHAP-1 step 4. "This week" arrives, with its editor — v1 withheld
  *   it because nothing wrote weekFocus.key, and said the section would
@@ -358,13 +363,36 @@ export function MyProgrammeView(router) {
     // It is honest because the person supplied the date. Nothing here
     // manufactures one, and there is deliberately no branch that counts
     // toward a programme length -- see the gate.
-    if (sg.targetDescription) {
-      parts.push(`<p class="my-programme-line">${_esc(sg.targetDescription)}</p>`);
+    // TARGET-3, 17 Aug 2026. READS BOTH HOMES, because there are two.
+    //
+    // `targetDate` and `targetDescription` exist at TOP LEVEL and again
+    // inside `strategicGoal`. Onboarding's goal-setup.js writes the
+    // top-level pair; this view was reading only the strategicGoal pair,
+    // which nothing writes. So somebody who set a target date at
+    // onboarding saw nothing here -- the section that exists to show
+    // what they are aiming at was silently blind to the only place the
+    // answer was stored.
+    //
+    // Shipped by me yesterday, and exactly the fault this week keeps
+    // producing: a reader pointed at a field with no writer, while the
+    // real data sat one level away.
+    //
+    // strategicGoal is preferred because it is the structured, newer
+    // home and is where CHAP-1 step 6 will write. The top-level pair is
+    // the fallback so existing people see their own date TODAY rather
+    // than after a migration. The duplication itself is flagged for
+    // resolution -- two fields with one meaning is a bug waiting to
+    // happen, and picking one silently would be the wrong kind of tidy.
+    const targetText = sg.targetDescription || store.get('targetDescription') || '';
+    const targetWhen = sg.targetDate        || store.get('targetDate')        || null;
+
+    if (targetText) {
+      parts.push(`<p class="my-programme-line">${_esc(targetText)}</p>`);
     }
-    if (sg.targetDate) {
-      const days = _daysUntil(sg.targetDate);
+    if (targetWhen) {
+      const days = _daysUntil(targetWhen);
       parts.push(`<p class="my-programme-line">
-        ${_esc(_dayMonth(sg.targetDate))}${days !== null && days > 0
+        ${_esc(_dayMonth(targetWhen))}${days !== null && days > 0
           ? _esc(` — ${days} ${days === 1 ? "day" : "days"} to go`)
           : ''}
       </p>`);
@@ -404,7 +432,7 @@ export function MyProgrammeView(router) {
     // them, whatever their tier says.
     const hasChapter  = !!store.get('activeProgramme.programmeId');
     const hasArc      = (store.get('programme')?.chaptersDone || []).length > 0;
-    const hasDate     = !!store.get('strategicGoal.targetDate');
+    const hasDate     = !!(store.get('strategicGoal.targetDate') || store.get('targetDate'));
     if (hasChapter && hasArc && hasDate) return null;
 
     const rows = [];
