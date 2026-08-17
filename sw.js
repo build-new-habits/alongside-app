@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 17 Aug 2026 v374
+ * PLAN-1. programmeEngine.js, workoutGenerator.js. The weekly plan
+ * finally does something: activeProgramme.sessionSequence had a writer
+ * and no reader, so somebody could declare Tuesday as core work and be
+ * offered whatever the phase bias felt like. Today's declared session
+ * now LEADS the coach's three options — a preference, not a
+ * replacement. No new files.
+ *
  * 17 Aug 2026 v373
  * SEVERE-1 threshold. Graeme: "7 is the top of moderate and 8 is
  * severe." The Gentle Care bypass now fires at 8+ via getPainBand.
@@ -2595,7 +2603,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v373";
+const CACHE_NAME = "alongside-v374";
 
 const SHELL_URLS = [
 
