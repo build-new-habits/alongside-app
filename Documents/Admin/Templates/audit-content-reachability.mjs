@@ -37,7 +37,7 @@
  * touches either.
  */
 
-import { EXERCISES } from '../../../js/data/exercises/index.js';
+import { EXERCISES , isSessionLength } from '../../../js/data/exercises/index.js';
 import { CATEGORY_MATCHERS, matchCategory } from '../../../js/data/session-categories.js';
 import { EQUIPMENT_CATEGORIES } from '../../../js/data/equipment.js';
 import { EQUIPMENT_IMPLIES, UNSATISFIABLE_TAGS, resolveEquipment, exerciseIsAvailable } from '../../../js/data/equipment-map.js';
@@ -66,8 +66,30 @@ const anyCat=new Set();
 for(const c of declared){
   ['warmup','main','cooldown'].forEach(s=>matchCategory(EXERCISES,c,s).forEach(e=>anyCat.add(e.id)));
 }
-const unreachable=EXERCISES.filter(e=>!anyCat.has(e.id));
-if(unreachable.length) fail('ERROR','reach',`${unreachable.length} exercises match no category any session type uses`);
+// AUDIT-2, 17 Aug 2026. This reported 28 ERRORS and every one was a
+// false positive.
+//
+// The codebase already draws the distinction this check was missing:
+// isSessionLength() -- contentType 'practice', or duration >= 600s --
+// and getSuitableExercises() filters those out FIRST, because "whole
+// sessions are not components". A twenty-minute EMOM circuit cannot be
+// one of four picks in a main section, and it is not supposed to be.
+// All 28 were session-length. Zero were genuinely orphaned.
+//
+// Left as one ERROR, the audit told somebody to go and fix twenty-eight
+// things that were correct. An audit that cries wolf gets ignored, and
+// then it is worth nothing on the day it is right. Now split:
+//
+//   session-length and unmatched  -> INFO. Expected, by design.
+//   a COMPONENT nobody can reach  -> ERROR. That is the real fault.
+const unreachable   = EXERCISES.filter(e=>!anyCat.has(e.id));
+const orphanedParts = unreachable.filter(e=>!isSessionLength(e));
+const standalone    = unreachable.filter(e=>isSessionLength(e));
+
+if(orphanedParts.length)
+  fail('ERROR','reach',`${orphanedParts.length} COMPONENT exercise(s) match no category any session type uses: ${orphanedParts.slice(0,6).map(e=>e.id).join(', ')}`);
+if(standalone.length)
+  fail('INFO','reach',`${standalone.length} standalone/session-length items are not session components — by design (isSessionLength). They need a route of their own, not a category.`);
 
 // 3. EQUIPMENT VOCABULARY BOTH WAYS
 const tickable=new Set(); EQUIPMENT_CATEGORIES.forEach(c=>c.items.forEach(i=>tickable.add(i.id)));
