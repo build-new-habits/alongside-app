@@ -1,5 +1,9 @@
 /**
  * router.js
+ * 18 Aug 2026 v19
+ *   PRAC-1. New 'practices' route: the guided practice library. Nav
+ *   hidden, mapped to Today because the Library is its door.
+ *
  * 16 Aug 2026 v18
  *   BIAS-2. The 'coach-reflection' route and view are removed. Graeme
  *   confirmed the screen obsolete on 04 Aug; the file stayed because it
@@ -212,6 +216,7 @@ const VIEW_NAMES = {
   'breathing-session':  { path: './views/breathing-session.js', fn: 'BreathingSessionView'  },
   'prescribed':         { path: './views/prescribed.js',        fn: 'PrescribedView'        },
   'prescribed-session': { path: './views/prescribed-session.js',fn: 'PrescribedSessionView' },
+  'practices':          { path: './views/practices.js',        fn: 'PracticesView'         },
 };
 
 const hideNavViews = new Set([
@@ -227,6 +232,9 @@ const hideNavViews = new Set([
   'swim-session', 'quiet-session', 'breathing-session',
   'prescribed', 'prescribed-session', 'session-builder',
   'reflect', 'journal-entry', 'privacy', 'upgrade', 'in-step',
+  // PRAC-1. A practice is read start to finish; the nav bar is one
+  // more thing on the screen while somebody is trying to settle.
+  'practices',
 ]);
 
 const NAV_MAP = {
@@ -255,6 +263,10 @@ const NAV_MAP = {
   // renaming that tab to "Wellbeing", so opening the exercise Library
   // now visibly highlighted "Wellbeing".
   'library': 'today',
+  // PRAC-1. Reached from the Library, which maps to Today. Mapping it
+  // to Wellbeing would repeat the NAV-8 fault from the other side --
+  // the tab would disagree with the door somebody came through.
+  'practices': 'today',
   // CHAP-1 step 2. Reached only from Home's full-width row.
   'my-programme': 'today',
   'settings': 'settings', 'privacy': 'settings',

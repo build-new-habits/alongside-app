@@ -1,6 +1,12 @@
 /**
  * library.js - Library Page
  *
+ * 18 Aug 2026 v5
+ *
+ * PRAC-1. New "Practices" category, free and ungated, whose direct
+ * target is the new `practices` route. Twenty-eight whole practices in
+ * the database had no door anywhere in the product; this is it.
+ *
  * 13 Aug 2026 v4
  *
  * TIER-B. The Library was the last unlocked door into paid session
@@ -215,6 +221,25 @@ const GUIDED_CATEGORIES = [
       { label: "Mindful movement",icon: "\uD83C\uDF3F",        target: "quiet-session", quiet: "mindful",   note: "" },
       { label: "Rest day",        icon: "\uD83D\uDECC",        target: "reflect",                            note: "Log a deliberate rest" },
     ]
+  },
+  {
+    // PRAC-1, 18 Aug 2026. The door for the 28 whole practices that no
+    // view referenced. Separate from "Mindful practice" above, which is
+    // breathing, journalling and a timed mindful sit: this category is
+    // recovery protocols, grounding practices, full warm-ups and whole
+    // circuits, and folding them into the mindful card would have
+    // mislabelled two of the four groups.
+    //
+    // FREE, and no `tier` field, deliberately. Tier is data on the
+    // definition and absent means free; the tier model reads "Free =
+    // coach-chosen full-body session + all wellbeing practices", and
+    // nothing behind this card is a plan or a journey.
+    id:          "practices",
+    label:       "Practices",
+    icon:        "\uD83E\uDDF4",
+    description: "Recovery, grounding, warm-ups and whole circuits",
+    sessions:    [],
+    directTarget: "practices"
   },
   {
     id:          "prescribed",
