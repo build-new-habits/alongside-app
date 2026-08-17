@@ -394,7 +394,22 @@ export const workoutGenerator = {
    */
   getGoalProfile() {
     const goals       = store.get("goals") || [];
-    const primaryGoal = store.get("goal.primaryGoal") || goals[0] || null;
+    // GOAL-2, 17 Aug 2026. This read "goal.primaryGoal" — and there is
+    // no top-level `goal` object in getDefaults(). It has always been
+    // undefined, so the fallback did all the work and the person's
+    // CHOSEN primary goal was silently replaced by whichever goal
+    // happened to be first in the list.
+    //
+    // The real field is strategicGoal.primaryGoal. This is the fourth
+    // naming variant of the same idea found today — goal.*, targetDate
+    // at top level, strategicGoal.targetDate, and goals[] — and the
+    // reason a decision and a migration are flagged rather than another
+    // preference chain being added.
+    //
+    // goals[0] stays as the fallback: somebody who never set a primary
+    // still has goals, and the order they gave them in is the best guess
+    // available.
+    const primaryGoal = store.get("strategicGoal.primaryGoal") || goals[0] || null;
     const goalSet     = new Set(goals);
 
     return {
@@ -498,8 +513,12 @@ export const workoutGenerator = {
   validateWeightTarget() {
     const currentWeight = store.get("weight");
     const targetWeight  = store.get("targetWeight");
-    const targetDate    = store.get("targetDate") ||
-                          store.get("goal.targetDate");
+    // GOAL-2. The second half of this read "goal.targetDate", which has
+    // never existed. Harmless — the first read works — but a dead branch
+    // in a validator is a branch somebody will one day trust. Now reads
+    // the two real homes, matching TARGET-3's precedence.
+    const targetDate    = store.get("strategicGoal.targetDate") ||
+                          store.get("targetDate");
 
     if (!currentWeight || !targetWeight || !targetDate) return null;
 
