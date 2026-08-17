@@ -169,6 +169,28 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
+> ### 🟢 CHAP-1 STEP 4 — SHIPPED 17 Aug. `alongside-v375`, 66 checks green. **CHAP-1 is now complete except step 6.**
+>
+> **Third lever, and this one was measured.** A coach that says *"I'm leaning towards the hinging this week"* and changes nothing is making a claim the product does not honour — worse than silence.
+>
+> | Attempt | Lever | Result |
+> |---|---|---|
+> | 1 | tilt inside `pickFrom()` | **MEASURED 39 vs 40** — no effect. The pool is already filtered to one category, so the category has already decided the pattern. Reverted. |
+> | 2 | tilt the week's shape | **TRACED before building** — `weekPlan` and `sessionSequence` both had writers and no readers. Not built; PLAN-1 fixed that gap instead. |
+> | 3 | reorder `mainCategories` | **MEASURED 60 vs 28 across 30 builds.** Shipped. |
+>
+> `selectFromCategories()` takes one from each category in turn and drops the tail when slots run out, so **category ORDER decides what gets a slot**. A reorder, never a filter — every original category survives, nothing is starved, and **main section only**, because the warm-up floor and the reserved pulse-raiser slot are rules and a preference must not disturb a rule.
+>
+> **My Programme's "This week" section arrives with it**, as v1 promised. Proposed on Home; My Programme still writes nothing when merely looked at.
+>
+> #### Two gates caught me
+>
+> **`verify-voice`** found *"lean into"* in two **aria-labels** — self-help register, sitting in the accessible names where I would not have looked. **`verify-write1`** refused to pass until `weekFocus` was pruned from its baseline: the gate working exactly as designed, insisting the set shrink as fields are fixed rather than drift out of date. **40 one-ended fields → 39.**
+>
+> #### 🔵 NEXT — step 6, and then CHAP-1 is done
+>
+> `targetDescription`/`targetDate`. Independent of everything else, and largely free: My Programme already renders both, and `verify-chap2` already proves the one honest countdown behaves. It also clears another baseline field.
+>
 > ### 🟢 PLAN-1 — SHIPPED 17 Aug. `alongside-v374`, 66 checks green. The weekly plan finally does something.
 >
 > `activeProgramme.sessionSequence` had a **writer and no reader**. Somebody could declare Tuesday as core work and be offered whatever the phase bias felt like. **`plannedFocusToday()` is its first reader**, and today's declared session now LEADS the coach's three options.
