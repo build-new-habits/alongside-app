@@ -136,10 +136,21 @@ localStorage.clear();
 const { store } = await import(BASE + 'store.js');
 store.init();
 store.set('ageBand', '45-54');
+// Dates computed backwards from TODAY, not fixed literals. They were
+// '2026-05-04' through '2026-08-14' — scattered, which is the point, but
+// anchored to the week the test was written. The moment "today" drifts
+// far enough past the last one, the gap-since-last-check-in branch
+// overrides the milestone and this fails against correct behaviour.
+// verify-chap2 and verify-sw1 have both already been fixed for exactly
+// this, so it is a pattern rather than an accident.
+//
+// Still deliberately scattered — no two adjacent, spanning months — so
+// "seven check-ins" can never be mistaken for seven days in a row.
 const spread = {};
-for (const d of ['2026-05-04','2026-05-22','2026-06-09','2026-06-28',
-                 '2026-07-11','2026-07-30','2026-08-14'])
+for (const gap of [104, 86, 68, 49, 36, 17, 2]) {
+  const d = new Date(Date.now() - gap * 864e5).toISOString().split('T')[0];
   spread[d] = { energy: 6, mood: 6, date: d };
+}
 store.set('checkinHistory', spread);
 const milestone = openings.resolveOpening();
 check('a scattered seven is not described as a run',
