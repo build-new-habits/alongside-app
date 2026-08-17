@@ -169,7 +169,25 @@ Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
-> ### 🔵 NEXT BUILD, FULLY TRACED — connect the weekly plan. Start here.
+> ### 🟢 PLAN-1 — SHIPPED 17 Aug. `alongside-v374`, 66 checks green. The weekly plan finally does something.
+>
+> `activeProgramme.sessionSequence` had a **writer and no reader**. Somebody could declare Tuesday as core work and be offered whatever the phase bias felt like. **`plannedFocusToday()` is its first reader**, and today's declared session now LEADS the coach's three options.
+>
+> **A preference, not a replacement.** It reorders; it never removes the other two. A plan made on Sunday must not trap somebody on Tuesday — 2.4 plans, 2.12 changes his mind, and both have to be able to.
+>
+> **It outranks the phase bias deliberately.** The phase bias is the programme's opinion; the sequence is the person's, and this product hands the person the casting vote everywhere else.
+>
+> **The one judgement in it**, flagged as such: the session-type-to-focus map is coarse — anything not clearly cardio or mobility counts as strength. It is a nudge in ordering, so a wrong guess costs a reordered list, not a wrong session.
+>
+> **The gate caught a real crash.** A truthy-check accepts a string, and `seq.find()` then throws — **inside the coach's proposal**, so one corrupted field would have taken the whole screen down rather than falling back to the phase bias. Now `Array.isArray`-checked. Found by feeding the gate rubbish rather than by reasoning about it.
+>
+> #### 🟠 A real limit of the WRITE-1 gate, found immediately
+>
+> **`verify-write1` did NOT catch this fault.** `sessionSequence` is nested under `activeProgramme`, and that gate only walks **top-level** store fields. The reader/writer class is guarded **one level deep, not all the way down.** Extending it to nested fields is genuine work — `activeProgramme` alone has ~20 — and is flagged rather than pretended.
+>
+> #### 🔵 NEXT — CHAP-1 step 4 is now unblocked
+>
+> The week-level focus tilt, Personal tier, per Graeme's decision. It tilts `getWeekShape()`'s `sessionTypes`, which now genuinely reach somebody. **Step 6** (`targetDescription`/`targetDate`) is independent and can go any time.
 >
 > Not deferred, not blocked: **traced and ready**, and stopped only because it is a real feature rather than a patch and the session had run long. Everything needed to start is below, so no rediscovery is required.
 >
