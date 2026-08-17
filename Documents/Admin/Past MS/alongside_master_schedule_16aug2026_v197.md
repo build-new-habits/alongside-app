@@ -1,44 +1,10 @@
 # Alongside: Move — Master Schedule
-## 18 Aug 2026 v198
+## 16 Aug 2026 v197
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_16aug2026_v197.md`. Remove v197 on upload.
+Supersedes `master_schedule_15aug2026_v196.md`. Remove v196 on upload.
 
-> ### 🔴 PICK UP HERE — 18 Aug. `alongside-v380`. **68 gates green on a fresh clone.**
->
-> #### 🟢 PRAC-1 — SHIPPED 18 Aug. The 28 whole practices have a door.
->
-> **`js/views/practices.js` (new), reached from a new free "Practices" card in the Library.** Groups → items → one practice. 28 of 28 reachable by clicking, measured by walking the buttons, not by reading the file.
->
-> **The set is DERIVED, never listed.** `js/data/practice-library.js` (new) defines it as *session-length AND matched by no category any session type uses* — the same rule `audit-content-reachability.mjs` already uses, so the audit and the route cannot disagree about what is stranded. An array of 28 ids in the view would have been the `targetDate` fault in a new costume; the gate fails if any practice id appears in the view source. It also fails safe forwards: a practice added next month with no category home appears on the day it is added, with no list to remember to update.
->
-> **`isSessionLength()` and `getSuitableExercises()` are UNCHANGED.** The filter was never the fault. A twenty-minute EMOM circuit still cannot be one of four picks in a main section. What was missing was the door.
->
-> **The `quiet-session.js` question, answered: its arrays STAY.** Zero of the 28 ids appear in `BREATHING_EXERCISES` or `MINDFUL_SESSIONS`, and neither is replaceable by the database — they hold phase timings and guided-sequence text the database does not carry, and `DB_ID` already reconciles the vocabularies one-way with one owner. **Two places holding different facts about different items is not duplication. Two places holding the same fact is.** Reasoning written into both new files.
->
-> **Free and ungated.** No `tier` field on the card. Condition safety is NOT skipped: the canonical `getActiveConditionIds()` → `getExerciseSafetyTier()` path runs here too, so a contraindicated circuit is withheld during an acute flare while the grounding practices stay offered. Capability is deliberately not filtered — hiding a circuit behind an `energyRequired` ceiling on a self-directed screen is the silent downgrade TIER-B was raised to remove.
->
-> **No timer, no counts, no streaks.** The 28 do not share a shape; a countdown on "Sleep Position Optimisation" is nonsense, and timed sitting already exists in quiet-session's mindful mode. "I did this" writes one activity entry through `store.logActivity()` and says *"Logged. That is all it needs to be."*
->
-> **`verify-prac1.mjs` — the second gate that EXECUTES.** Mounts the Library, clicks the card, asserts where it lands, mounts the destination, walks every group and every item, and reads what a person would see. **Nine reversal tests.**
->
-> #### The reversal test that was NOT CAUGHT, and why it was my seed
->
-> A streak line planted in the acknowledgement went undetected. The no-counts assertion was real; it ran on the screen *before* "I did this" was pressed, so it never saw the acknowledgement — which is exactly where counting language would live. **The blueprint's rule held: suspect the seed first.** Assertion now reads both states and carries a guard that fails if the acknowledgement is not the screen actually read.
->
-> #### 🟠 One product decision outstanding — the 5 movement items
->
-> The 3 circuits and 2 sport warm-ups shipped FREE, per the blueprint's explicit *"this route must not be gated."* But they are not wellbeing practices: an EMOM circuit is a self-directed session, and the one-line test makes self-direction the paid act. Defensible either way. **Tier is data on the definition, so changing it is one field.** Needs Graeme.
->
-> #### 🟠 Three findings LOGGED, not fixed (outside scope)
->
-> 1. **44 database entries share an identical copy-pasted breathing `watchOut`.** "Lifting the shoulders on the in-breath instead of expanding the ribs" currently sits on the cold shower protocol and on the nap. Worked around by showing `watchOut`/`load` for movement groups only — honest on its own terms, since `watchOut` is a field about movement form. The data still needs a pass.
-> 2. **`onUnmount` has NO CALLER anywhere.** `quiet-session.js`'s own header states it is "called by `router.navigate()` before leaving this view". Nothing calls it — not the router, not anything. `quiet-session.js` and `breathing-session.js` both export one and both rely on it to clear timers. Another confident comment describing a mechanism that is not there. `practices.js` sidesteps it by using the factory pattern, where state is per-visit by construction.
-> 3. **`library.js` never imports `router`** — it reads the bare name and relies on `window.router` from `app.js`. Works in a browser; nine other views import it explicitly. The first run of `verify-prac1` reported the Library's navigation broken and **the seed was wrong, not the app.**
->
-> ---
->
-> ### 16 Aug. `alongside-v362`. 54 gates green, 58 checks green.
+> ### 🔴 PICK UP HERE — 16 Aug. `alongside-v362`. 54 gates green, 58 checks green.
 >
 > #### Shipped: CHAP-1 step 2 — My Programme
 >
@@ -203,9 +169,9 @@ Supersedes `master_schedule_16aug2026_v197.md`. Remove v197 on upload.
 >
 > I first probed with `getZoneStatus('lower-limb')` — passing a string where the function takes `(conditionIds, painScores)` — and got `combinedSevere: false`, which I nearly reported as "severity not detected". **The function was right and my call was wrong.** Corrected before reporting. Second: see the BIAS-2 correction below about the router.
 >
-> ### 🟢 BUILT 18 Aug — the guided practice library. (Was: 🔵 NEXT BUILD, FULLY SPECIFIED.)
+> ### 🔵 NEXT BUILD, FULLY SPECIFIED — the guided practice library. 28 items nobody can reach.
 >
-> **Shipped as PRAC-1, `alongside-v380`. See the top of this document.** The spec below is kept as the reasoning trail. Two things in it were superseded by the build: the stranded list is 28 with recovery at **11** (mindful-walk sits in recovery, not in a separate Walks row), and there is no "existing single-activity player" to hand items to — none of the existing views takes an arbitrary database item, so `practices.js` renders one thinly itself.
+> Traced, not started, because it is a feature rather than a patch. Everything needed is here.
 >
 > **Verified by mounting the Library and by scanning every view:** all 28 standalone items are referenced by **no view at all**. Not the Library, not Mobility & Conditioning, not the single-activity views — despite `exercises/index.js` stating that "standalone content is reached through the Library". **That comment is wrong**, and it is why the gap survived: the code says the route exists.
 >
