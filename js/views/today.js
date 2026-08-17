@@ -1,5 +1,9 @@
 /**
  * today.js
+ * 16 Aug 2026 v21
+ *   BURN-3. The graded burnout message returns, on Home, above the
+ *   yesterday line. It had been unreachable since 04 Aug.
+ *
  * 16 Aug 2026 v20
  *   CHAP-1 step 3 part two. The hinge moves to Home. An end-of-chapter
  *   offer already existed inside gym-programme.js, reachable through one
@@ -282,6 +286,7 @@ import { isPremium, lockedFeature } from '../auth.js';
 import { advanceWeekIfNeeded, isHingePending, chapterSuccessor, startChapter }
   from '../data/programmeEngine.js';
 import { getProgramme }        from '../data/programmes.js';
+import { detectBurnout }       from '../data/checkin.js';
 
 export function TodayView(router) {
 
@@ -722,6 +727,40 @@ export function TodayView(router) {
     const activityLog    = store.completedSessions(store.get('activityLog'));
     const checkinHistory = store.get('checkinHistory') || {};
     const yesterday      = _yesterdayString();
+
+    // ── BURN-3, 16 Aug 2026. The graded burnout message, restored. ──
+    //
+    // It lived in coach-reflection.js, whose route was retired on 04 Aug.
+    // Unreachable code says nothing, so this had been said to nobody for
+    // twelve days -- and four gates stayed green throughout by reading
+    // that file's source text.
+    //
+    // HOME, not the end of a session. Burnout is a statement about the
+    // last week, and it belongs BEFORE somebody chooses what to do, not
+    // after they have already done it. Home is also the one surface
+    // everybody reaches, which is the whole reason the previous version
+    // went unseen.
+    //
+    // FIRST, above the yesterday line. If somebody has been flat for a
+    // week, "you did strength work yesterday" is not the most useful
+    // thing the coach can say to them.
+    //
+    // GRADED, because the session is graded. 'high' narrows the pool and
+    // sets recoveryMode; 'moderate' does not. Saying the same sentence
+    // for both would tell somebody having a flat week the same thing as
+    // somebody a fortnight into exhaustion.
+    //
+    // P4: it says what it noticed and what it is doing. No diagnosis, no
+    // instruction, no "you are burnt out" -- that is a clinical claim
+    // this product is not qualified to make, and the word is deliberately
+    // absent from what a person sees.
+    const burnout = detectBurnout(checkinHistory);
+    if (burnout.level === 'high') {
+      return "Your energy has been low for a while now, not just today. I'll keep things gentle until it lifts.";
+    }
+    if (burnout.level === 'moderate') {
+      return "It's been a flatter few days than usual. I'll go a bit easier with what I suggest.";
+    }
 
     const yesterdaySessions = activityLog.filter(e => {
       const ts = e.completedAt || e.loggedAt || e.date;

@@ -232,8 +232,15 @@ check('the blocks vocabulary still counts weeks DONE',
 check('a date the PERSON supplied does get counted toward',
   /29 days to go/.test(event.text) && /The coast path walk/.test(event.text),
   'a hike on 14 September is a real deadline; the app is being useful about a fact');
+// Computed, not hardcoded. This asserted "14 September" — the date 29
+// days from when it was written — and went red the moment the clock
+// rolled past midnight during a long session. A gate that fails because
+// the calendar moved is a gate that will cry wolf, and verify-sw1.mjs
+// was fixed for exactly this once already.
+const expectedDate = new Date(Date.now() + 29 * 864e5)
+  .toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
 check('and the supplied date is shown in words, not as a bare number',
-  /14 September/.test(event.text));
+  event.text.includes(expectedDate), expectedDate);
 
 // ─────────────────────────────────────────────────────────────────────
 // 5b. Tier — show what they have, lock only what they do not
