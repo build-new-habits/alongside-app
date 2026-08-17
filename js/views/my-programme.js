@@ -1,6 +1,11 @@
 /**
  * my-programme.js - My Programme
  *
+ * 17 Aug 2026 v3
+ *   CHAP-1 step 4. "This week" arrives, with its editor — v1 withheld
+ *   it because nothing wrote weekFocus.key, and said the section would
+ *   arrive with its writer. It has.
+ *
  * 16 Aug 2026 v2
  *
  * v2 - TIER. Graeme's decision, 16 Aug: My Programme is a Personal
@@ -84,8 +89,14 @@ import { isPremium, lockedFeature } from '../auth.js';
 import { getProgramme }         from '../data/programmes.js';
 import { getGoalLabel }         from '../data/goals.js';
 import { advanceWeekIfNeeded }  from '../data/programmeEngine.js';
+import { currentWeekFocus, setWeekFocus, focusLine, FOCUS_OPTIONS }
+  from '../data/week-focus.js';
 
 export function MyProgrammeView(router) {
+
+  // Whether the picker is open is not a fact about the person, so it
+  // lives here and not in the store.
+  let _focusEditing = false;
 
   function mount(container) {
     // Idempotent, and it returns early unless a week has genuinely
@@ -98,6 +109,7 @@ export function MyProgrammeView(router) {
   function render(container) {
     const sections = [
       _whereYouAre(),
+      _thisWeeksFocus(),
       _theArc(),
       _whatYoureAimingAt(),
       _whatPersonalAdds()
@@ -206,6 +218,51 @@ export function MyProgrammeView(router) {
       return "I took a read of where you are at your first session, and that is what I am working from.";
     }
     return null;
+  }
+
+  // ── 1b. This week (CHAP-1 step 4) ───────────────────────────────────
+
+  /**
+   * The section v1 deliberately withheld. Its note said "the section
+   * arrives with its writer" -- this is that, and the writer now
+   * measurably tilts a session rather than only claiming to.
+   *
+   * ABSENT, never empty. No focus -- no read to propose from, or the
+   * person declined one -- and this returns null and the screen says
+   * nothing. §6: its absence is never mentioned.
+   *
+   * NOTHING IS COUNTED. No "2 of 3 focus sessions", no tick, no record
+   * of whether it was honoured. A focus reported on at week end is a
+   * target wearing a different hat.
+   */
+  function _thisWeeksFocus() {
+    const focus = currentWeekFocus();
+    const line  = focusLine();
+    if (!focus && !_focusEditing) return null;
+
+    const parts = [];
+    if (line) parts.push(`<p class="my-programme-line">${_esc(line)}</p>`);
+
+    if (_focusEditing) {
+      parts.push(`
+        <ul class="my-programme-focus" aria-label="Choose what I lean towards this week">
+          ${FOCUS_OPTIONS.map(o => `
+            <li><button class="btn btn-ghost btn-small"
+                    data-focus="${_esc(o.key)}"
+                    aria-pressed="${focus && focus.key === o.key ? 'true' : 'false'}"
+                    >${_esc(_capitalise(o.label))}</button></li>
+          `).join('')}
+          <li><button class="btn btn-ghost btn-small" data-focus="none">No focus this week</button></li>
+        </ul>
+      `);
+    } else {
+      parts.push(`
+        <button class="btn btn-ghost btn-small" data-action="edit-focus"
+                aria-label="Change what I lean towards this week">Lean towards something else</button>
+      `);
+    }
+
+    return _section("This week", parts.join(''));
   }
 
   // ── 2. The arc ──────────────────────────────────────────────────────
@@ -381,6 +438,18 @@ export function MyProgrammeView(router) {
   function attachEvents(container) {
     container.querySelector('[data-action="back"]')
       ?.addEventListener('click', () => router.navigate('today'));
+
+    container.querySelector('[data-action="edit-focus"]')
+      ?.addEventListener('click', () => { _focusEditing = true; render(container); });
+
+    container.querySelectorAll('[data-focus]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const k = btn.dataset.focus;
+        setWeekFocus(k === 'none' ? null : k);
+        _focusEditing = false;
+        render(container);
+      });
+    });
   }
 
   function _daysUntil(iso) {
@@ -401,6 +470,15 @@ export function MyProgrammeView(router) {
     const d = new Date(iso);
     if (isNaN(d.getTime())) return '';
     return d.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+  }
+
+  // Named _capitalise, not _cap. The first version of this section
+  // called _cap(), which exists in today.js and has never existed here
+  // -- a ReferenceError that could only fire once somebody opened the
+  // picker, so every assertion that merely rendered the view missed it.
+  function _capitalise(str) {
+    const s = String(str ?? '');
+    return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
   function _esc(str) {

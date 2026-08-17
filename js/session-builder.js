@@ -555,6 +555,7 @@ import { EXERCISES, isSessionLength } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
 import { buildRationale } from "./data/session-rationale.js";
 import { getZoneStatus, getPainBand, getCondition } from "./data/conditions.js";
+import { focusOrderedCategories } from "./data/week-focus.js";
 
 // ── Allocation presets (05 Aug 2026) ──────────────────────────────────────────
 // Scales EXERCISE_COUNT's warmup/main/cooldown split. Warmup always floors at
@@ -2358,7 +2359,18 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   const alreadyChosen = new Set(prescribed.map(p => p.exerciseId || p.id).filter(Boolean));
 
   const warmupExercises   = selectFromCategories(type.warmupCategories,   "warmup",   adjustedCounts.warmup,   alreadyChosen);
-  const mainExercises     = [...prescribed, ...selectFromCategories(type.mainCategories, "main", adjustedCounts.main, alreadyChosen)];
+  // CHAP-1 step 4. The weekly focus leads the MAIN section's categories.
+  //
+  // selectFromCategories() takes one from each category in turn and
+  // drops the tail when slots run out, so category ORDER decides what
+  // actually gets a slot. Reordering is therefore a real preference --
+  // and it is a reorder, never a filter, so nothing is starved.
+  //
+  // Main only. A weekly focus should not reshape somebody's warm-up or
+  // cool-down; the warm-up floor and the reserved pulse-raiser slot are
+  // rules, and a preference must not disturb a rule.
+  const mainCategories    = focusOrderedCategories(type.mainCategories);
+  const mainExercises     = [...prescribed, ...selectFromCategories(mainCategories, "main", adjustedCounts.main, alreadyChosen)];
   const cooldownExercises = selectFromCategories(type.cooldownCategories, "cooldown", adjustedCounts.cooldown, alreadyChosen);
 
   // If equipment mismatch is severe, add a coach note

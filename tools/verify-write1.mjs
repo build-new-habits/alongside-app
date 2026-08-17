@@ -87,7 +87,10 @@ const BASELINE = new Set([
   'mindfulPromptFrequency','speechRate','checkInNotification','noticingWeekInCycle',
   'journalSettings','waterReminderEnabled','lastWaterReminder','community',
   'liftLog','personalBests','updatedAt',
-  'onboardingStep','age','weekFocus','sessionMode','mindfulPromptDepth','proposalBias',
+  // weekFocus removed 17 Aug: CHAP-1 step 4 connected it. This is the
+  // gate working as intended — the baseline shrinks as fields are fixed,
+  // and it insists on being pruned rather than drifting out of date.
+  'onboardingStep','age','sessionMode','mindfulPromptDepth','proposalBias',
   'activityPreferences','noticingPreferences','noticingProgress','safeguarding',
   'weeklyReview','weightLog','waterLog','waterSettings','coachOffers','unwellMode',
   'foodPrompts','practiceHistory'
