@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 17 Aug 2026 v376
+ * TARGET-3. my-programme.js. The event section read
+ * strategicGoal.targetDate, which nothing writes, while onboarding's
+ * goal-setup.js writes the TOP-LEVEL targetDate. Anybody who set a
+ * target date at onboarding saw nothing in the section built to show
+ * what they are aiming at. Reads both now, preferring the structured
+ * one. No new files.
+ *
  * 17 Aug 2026 v375
  * CHAP-1 step 4. New js/data/week-focus.js (precached above). The coach
  * proposes a weekly focus from the last read's hardest movement, the
@@ -2611,7 +2619,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v375";
+const CACHE_NAME = "alongside-v376";
 
 const SHELL_URLS = [
 
