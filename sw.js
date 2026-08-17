@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 17 Aug 2026 v375
+ * CHAP-1 step 4. New js/data/week-focus.js (precached above). The coach
+ * proposes a weekly focus from the last read's hardest movement, the
+ * person can change or decline it, and it REORDERS the main section's
+ * categories so the focus leads. Measured at 60 focus movements across
+ * 30 builds against 28 without — attempt 1 measured 39 against 40 and
+ * was reverted. My Programme's "This week" section arrives with it.
+ *
  * 17 Aug 2026 v374
  * PLAN-1. programmeEngine.js, workoutGenerator.js. The weekly plan
  * finally does something: activeProgramme.sessionSequence had a writer
@@ -2603,7 +2611,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v374";
+const CACHE_NAME = "alongside-v375";
 
 const SHELL_URLS = [
 
@@ -2773,6 +2781,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/checkin-openings.js",
   "/alongside-app/js/data/first-session.js",
   "/alongside-app/js/data/pacing.js",
+  "/alongside-app/js/data/week-focus.js",
   "/alongside-app/js/data/assessment.js",
   "/alongside-app/js/data/session-moments.js",
   "/alongside-app/js/data/conditions.js",
