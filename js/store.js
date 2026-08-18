@@ -1,5 +1,16 @@
 /**
  * store.js - Data persistence layer
+ * 18 Aug 2026 v54
+ *   ATHLETE-RETIRE. The 'athlete' tier is gone. It granted NOTHING
+ *   beyond Personal anywhere in the app -- same credits, same export,
+ *   same everything -- had no entry route, no content and no price, and
+ *   existed only as an enum value with a dev switcher pointing at it.
+ *   Graeme's call, 18 Aug: retire rather than name.
+ *
+ *   Carries a one-way migration, athlete -> personal, in
+ *   mergeWithDefaults(). See the note there: without it, anybody
+ *   holding the value would have silently dropped to free.
+ *
  * 17 Aug 2026 v53
  *   TARGET-4. One-way migration of targetDate/targetDescription from
  *   the top level into strategicGoal, on load, into empty fields only.
@@ -1000,7 +1011,21 @@ export const store = {
       lastProposalDate: saved.lastProposalDate || null,
 
       coachStyle: saved.coachStyle || 'nurturing',
-      tier:       saved.tier       || 'free'
+
+      // ATHLETE-RETIRE, 18 Aug 2026. One-way migration, athlete ->
+      // personal. NOT a cosmetic tidy: this line was
+      // `saved.tier || 'free'` with no validation, so once "athlete"
+      // stopped being recognised as paid, anybody holding it -- Graeme's
+      // own dev device, at minimum, since the tier switcher wrote it --
+      // would have silently dropped to free. They would have lost the
+      // Plan, their two impact credits per session, and their export,
+      // with nothing on screen to explain it.
+      //
+      // Athlete was always "unlocked within Personal, no extra charge",
+      // so personal is what they already had. Migrating UP is the only
+      // honest direction; a retirement must never take something away
+      // from somebody who did nothing wrong.
+      tier:       saved.tier === 'athlete' ? 'personal' : (saved.tier || 'free')
     };
   },
 
@@ -2556,7 +2581,7 @@ export const store = {
     const lastDate = this.data.community?.lastCreditAt?.split('T')[0];
     if (lastDate === today) return;
 
-    const creditsToAdd = this.data.tier === 'personal' || this.data.tier === 'athlete' ? 2 : 1;
+    const creditsToAdd = this.data.tier === 'personal' ? 2 : 1;   // ATHLETE-RETIRE
     this.data.community.credits = (this.data.community.credits || 0) + creditsToAdd;
     this.data.community.lastCreditAt = new Date().toISOString();
     this.data.updatedAt = new Date().toISOString();

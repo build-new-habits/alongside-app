@@ -1,6 +1,9 @@
 /**
  * settings.js
- * 18 Aug 2026 v31
+ * 18 Aug 2026 v32
+ *
+ * v32 - ATHLETE-RETIRE. Dev tier switcher loses its Athlete button.
+ *
  *
  * v31 - COACH-TILE. New "Your Coaching" row on the Settings landing,
  *   holding capability, the two preference controls and the
@@ -1779,9 +1782,10 @@ export function SettingsView(router) {
             <button class="btn btn-secondary btn-sm"
                     data-dev-tier="personal"
                     aria-label="Switch to the Plan">Plan</button>
-            <button class="btn btn-secondary btn-sm"
-                    data-dev-tier="athlete"
-                    aria-label="Switch to Athlete tier">Athlete</button>
+            <!-- ATHLETE-RETIRE, 18 Aug 2026. The Athlete switcher is gone.
+                 It was the only way into that tier and the tier granted
+                 nothing, so this button's entire function was to put a
+                 device into a state indistinguishable from Personal. -->
           </div>
         </div>
         `}

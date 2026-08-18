@@ -1,6 +1,9 @@
 /**
  * progress.js
- * 18 Aug 2026 v8
+ * 18 Aug 2026 v9
+ *
+ * v9 - ATHLETE-RETIRE. Three tier checks simplified.
+ *
  *
  * v8 - NAME-1. The paid tier is "the Plan", not "Personal".
  *   Graeme's decision, 18 Aug. Copy only -- no logic, no gating
@@ -157,7 +160,7 @@ export function ProgressView(router) {
 
   function render(container) {
     const tier  = store.get('tier') || 'free';
-    const premium = tier === 'personal' || tier === 'athlete';
+    const premium = tier === 'personal';   // ATHLETE-RETIRE
 
     if (activeWindow === null) activeWindow = premium ? PAID_DEFAULT : FREE_WINDOW;
 
@@ -181,7 +184,7 @@ export function ProgressView(router) {
           ${renderCoachNarrative(stats, tier, name)}
           ${renderActivitySummary(tier)}
           ${stats.hasActiveProgramme ? renderProgrammeProgress(stats) : ''}
-          ${tier === 'personal' || tier === 'athlete' ? renderExportBlock() : renderExportLocked()}
+          ${tier === 'personal' ? renderExportBlock() : renderExportLocked()}
 
           <!-- Front door for the annual reflection, added 11 Aug 2026.
                The view existed and nothing navigated to it. Progress is
@@ -205,7 +208,7 @@ export function ProgressView(router) {
   // ── Window tabs (Personal only) ────────────────────────────────────────────
 
   function renderWindowTabs(tier) {
-    const premium = tier === 'personal' || tier === 'athlete';
+    const premium = tier === 'personal';   // ATHLETE-RETIRE
     // Free sees its fortnight, plus 30 and 90 as visible, tappable
     // locked options — not hidden features. WOW-4's principle that
     // nothing is a dead end: a locked control explains itself and offers

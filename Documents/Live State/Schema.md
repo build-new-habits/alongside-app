@@ -1,7 +1,7 @@
 # Alongside — Data Schema Reference
-## 17 Aug 2026 v1.35
+## 18 Aug 2026 v1.36
 
-**File:** `js/store.js` (confirmed live version: **v53, 17 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v54, 18 Aug 2026**)
 
 ---
 
@@ -429,7 +429,7 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 | `gender` | `string\|null` | `null` | |
 | `hormonalTracking` | `boolean` | `false` | Enables menstrual cycle overlay. See `cycleLength` in Appendix A — cycle length itself is never user-configurable; always defaults to 28. |
 | `coachStyle` | `string` | `'nurturing'` | `nurturing\|steady\|energetic\|minimal`. Beta: Nurturing voice delivers for all style settings silently — this is permanent product policy, not a beta-only restriction (Free tier: locked to Nurturing; Personal+: all values selectable in UI but all render as Nurturing). |
-| `tier` | `string` | `'free'` | `free\|personal\|athlete`. Athlete unlocked within Personal, no extra charge. **This is the one genuine tier field** — see `userTier` bug note at the top of this document. Never write or read `userTier`; it does not exist in `getDefaults()` and has no writer anywhere. |
+| `tier` | `string` | `'free'` | `free\|personal`. **ATHLETE-RETIRE, 18 Aug 2026:** `athlete` removed. It granted nothing beyond `personal` anywhere in the app, had no entry route, no content and no price. `mergeWithDefaults()` migrates any saved `athlete` up to `personal` on load, one way — without it, holders would have silently dropped to free. **This is the one genuine tier field** — see `userTier` bug note at the top of this document. Never write or read `userTier`; it does not exist in `getDefaults()` and has no writer anywhere. |
 | `fitnessLevel` | `string\|null` | `null` | Read by `workoutGenerator.js`'s `getUserProfile()`. Written by Settings. |
 | `weight` | `number\|null` | `null` | |
 | `weightUnit` | `'kg'\|'lbs'` | `'kg'` | |

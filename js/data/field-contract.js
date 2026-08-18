@@ -291,7 +291,24 @@ export const FIELD_CONTRACT = {
   // fields. Nothing writes trainingIntent in settings.js today; if that
   // changes, add it to the entry above rather than making a second.
   "tier": {
-    values: ["free", "personal", "athlete"],
+    values: ["free", "personal"],   // ATHLETE-RETIRE, 18 Aug 2026
+    // RETIRED VALUES. Values the field no longer accepts but which may
+    // still exist in somebody's saved data, so migration code must be
+    // allowed to compare against them.
+    //
+    // Added 18 Aug 2026 when verify-contract correctly went red on
+    // store.js's athlete -> personal migration. The gate's rule -- no
+    // comparison against a value the field cannot hold -- is right, and
+    // a migration is the one place that rule must not apply, because the
+    // whole point of a migration is to recognise a value that is no
+    // longer valid. Declaring it beats exempting a file: the exemption
+    // would have hidden every future undeclared comparison in store.js
+    // too, and this way the retired value stays visible and documented.
+    //
+    // Remove "athlete" from here only when no device could plausibly
+    // still hold it -- which is not a date anyone can know, so in
+    // practice it stays.
+    retired: ["athlete"],
     writer: "views/upgrade.js, views/settings.js dev panel",
     meaning: "Subscription tier. The field is `tier` — NOT `userTier`, which had no writer and whose reader always evaluated false, locking paid options for paying users."
   },
