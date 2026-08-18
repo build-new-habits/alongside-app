@@ -1,5 +1,11 @@
 /**
  * settings.js
+ * 18 Aug 2026 v29
+ *
+ * v29 - NAME-1. The paid tier is "the Plan", not "Personal".
+ *   Graeme's decision, 18 Aug. Copy only -- no logic, no gating
+ *   and no tier boundary moved. Reasoning in js/auth.js v2.
+ *
  * 16 Aug 2026 v28
  *   COUNTDOWN-1. The programme card said "Week 9 of 12". Second instance
  *   of the same fault as progress.js, found by making the gate
@@ -1517,7 +1523,7 @@ export function SettingsView(router) {
   function renderPlanPanel() {
     const tier      = store.get('tier') || 'free';
     const isPaid    = tier !== 'free';
-    const tierLabel = isPaid ? 'Personal' : 'Free';
+    const tierLabel = isPaid ? 'Plan' : 'Free';
 
     return `
       <div class="settings-section">
@@ -1552,7 +1558,7 @@ export function SettingsView(router) {
           </div>
 
           <div class="settings-plan-block">
-            <h3 class="settings-plan-block__heading">What Personal adds</h3>
+            <h3 class="settings-plan-block__heading">What the Plan adds</h3>
             <p>You name where you're heading, and the coach builds towards it
                rather than only meeting today.</p>
             <p>Sessions become yours — the kind, the length, and how the time
@@ -1575,7 +1581,7 @@ export function SettingsView(router) {
           <div class="settings-actions">
             <button class="btn btn-primary"
                     data-action="nav-upgrade"
-                    aria-label="Read more about the Personal plan">
+                    aria-label="Read more about the Plan">
               Have a look
             </button>
           </div>
@@ -1710,7 +1716,7 @@ export function SettingsView(router) {
                     aria-label="Switch to Free tier">Free</button>
             <button class="btn btn-secondary btn-sm"
                     data-dev-tier="personal"
-                    aria-label="Switch to Personal tier">Personal</button>
+                    aria-label="Switch to the Plan">Plan</button>
             <button class="btn btn-secondary btn-sm"
                     data-dev-tier="athlete"
                     aria-label="Switch to Athlete tier">Athlete</button>

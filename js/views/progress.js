@@ -1,5 +1,11 @@
 /**
  * progress.js
+ * 18 Aug 2026 v8
+ *
+ * v8 - NAME-1. The paid tier is "the Plan", not "Personal".
+ *   Graeme's decision, 18 Aug. Copy only -- no logic, no gating
+ *   and no tier boundary moved. Reasoning in js/auth.js v2.
+ *
  * 16 Aug 2026 v7
  *   COUNTDOWN-1. The programme progress bar is gone, with "8 weeks
  *   remaining" and "N% complete" beside it. All three were
@@ -219,7 +225,7 @@ export function ProgressView(router) {
             aria-selected="${activeWindow === w ? 'true' : 'false'}"
             aria-controls="panel-${w}"
             ${locked ? 'data-route="upgrade"' : `data-window="${w}"`}
-            aria-label="${w} days${locked ? ' \u2014 Personal plan feature, tap to learn more' : ''}">
+            aria-label="${w} days${locked ? ' \u2014 part of the Plan, tap to learn more' : ''}">
             ${w} days${locked ? ' \uD83D\uDD12' : ''}
           </button>`;
         }).join('')}
@@ -371,10 +377,10 @@ export function ProgressView(router) {
         <div class="progress-export__lock"
              role="button"
              tabindex="0"
-             aria-label="Export is a Personal feature — tap to find out more"
+             aria-label="Export is part of the Plan — tap to find out more"
              data-route="upgrade">
           <span class="progress-export__lock-label">Export your progress</span>
-          <span class="progress-export__lock-sub">Personal feature</span>
+          <span class="progress-export__lock-sub">Part of the Plan</span>
         </div>
       </section>
     `;

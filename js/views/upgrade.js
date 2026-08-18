@@ -1,5 +1,11 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 18 Aug 2026 v7
+ *
+ * v7 - NAME-1. The paid tier is "the Plan", not "Personal".
+ *   Graeme's decision, 18 Aug. Copy only -- no logic, no gating
+ *   and no tier boundary moved. Reasoning in js/auth.js v2.
+ *
  * 13 Aug 2026 v6
  *
  * A2. The real page, replacing the 22 May stub.
@@ -173,7 +179,7 @@ export function render() {
         </div>
 
         <div class="upgrade-block">
-          <h1 class="upgrade-heading">You&rsquo;re on Personal.</h1>
+          <h1 class="upgrade-heading">You have a Plan.</h1>
           <p class="upgrade-lede">Everything is open to you. Nothing here needs deciding.</p>
           <p class="upgrade-body">
             Five percent of what you pay goes to causes this community chooses.
@@ -192,7 +198,7 @@ export function render() {
   }
 
   return `
-    <div class="view upgrade-view" role="main" aria-label="The Personal plan">
+    <div class="view upgrade-view" role="main" aria-label="The Plan">
 
       <div class="view-header">
         <button class="btn btn-ghost" data-action="upgrade-back" aria-label="Go back">
@@ -211,8 +217,8 @@ export function render() {
         <p class="upgrade-lede upgrade-lede--emphasis">That wasn&rsquo;t a trial. That was real.</p>
       </header>
 
-      <section class="upgrade-block" aria-label="What Personal is">
-        <p class="upgrade-body">Personal tier gives the coach more to work with.</p>
+      <section class="upgrade-block" aria-label="What the Plan is">
+        <p class="upgrade-body">The Plan gives the coach more to work with.</p>
         <p class="upgrade-body">The deeper the relationship, the better it understands you.</p>
       </section>
 
@@ -259,7 +265,7 @@ export function render() {
       <div class="upgrade-actions">
         <button class="btn btn-primary btn-full btn-large"
                 id="upgrade-cta"
-                aria-label="Start the Personal plan">
+                aria-label="Start the Plan">
           I&rsquo;m ready
         </button>
 
@@ -304,7 +310,7 @@ export function onMount() {
       // the page says it. A gate that cannot read the promise cannot
       // guard it.
       confirm.textContent =
-        "You\u2019re on Personal. Payment opens when beta ends \u2014 " +
+        "You have a Plan. Payment opens when beta ends \u2014 " +
         "you haven\u2019t been charged, and everything is yours to use in the meantime.";
       confirm.classList.add("upgrade-confirm--visible");
     }

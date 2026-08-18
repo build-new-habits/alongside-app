@@ -117,9 +117,24 @@ check("the stylesheet is imported and precached", () => {
      "not in sw.js precache — first offline load renders unstyled");
 });
 
-check("a paid user is not sold to", () =>
-  ok(/isPaid/.test(view) && /You&rsquo;re on Personal|You\\u2019re on Personal/.test(view),
-     "the page has no separate state for somebody already on Personal"));
+// 18 Aug 2026 (NAME-1). This asserted the literal marketing sentence
+// "You're on Personal", so a pure copy rename turned it red while the
+// behaviour it names -- a paid user is not sold to -- was untouched.
+// Second gate in one day to fail on a property it was not testing.
+//
+// Rewritten to test the actual property: the paid branch exists, and it
+// renders NO price and NO buy button. That is what "not sold to" means,
+// and it survives any rewording of the acknowledgement.
+check("a paid user is not sold to", () => {
+  ok(/isPaid/.test(view), "the page has no separate state for a paying user");
+  const paidBranch = view.slice(view.indexOf("if (isPaid) {"),
+                               view.indexOf("if (isPaid) {") + 1400);
+  ok(paidBranch.length > 0, "could not locate the isPaid branch");
+  ok(!/PRICE_MONTHLY|PRICE_ANNUAL|\u00A3\d/.test(paidBranch),
+     "the paid branch quotes a price at somebody who already pays");
+  ok(!/id="upgrade-cta"/.test(paidBranch),
+     "the paid branch shows the buy button");
+});
 
 console.log(fails === 0 ? "\nALL PASS\n" : `\n${fails} FAILURE(S)\n`);
 process.exit(fails === 0 ? 0 : 1);

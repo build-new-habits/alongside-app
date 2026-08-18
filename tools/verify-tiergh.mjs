@@ -151,8 +151,15 @@ check('10 TIER-G: the free mode is "coach", not "recommend" or "own"',
   freeModes.length === 1 && freeModes[0].dataset.mode === 'coach');
 check('11 TIER-G: the two composing routes are shown locked, not hidden',
   freeLocked.length === 2, `found ${freeLocked.length}`);
+// NAME-1, same day: the tier is "the Plan". Assert BOTH that the new
+// wording is there and that the retired one is not, so a partial rename
+// leaving one surface on "Personal" goes red rather than passing.
 check('12 TIER-G: locked routes name what they are, for screen readers',
-  freeLocked.every(n => /Personal plan feature/.test(n.getAttribute('aria-label') || '')));
+  freeLocked.every(n => {
+    const l = n.getAttribute('aria-label') || '';
+    return /part of the Plan/.test(l) && !/Personal/.test(l);
+  }),
+  freeLocked.map(n => n.getAttribute('aria-label')).join(' | '));
 
 await reachBuildMode('personal');
 const paidModes = [...el.querySelectorAll('.sb-buildmode-btn')].map(b => b.dataset.mode);
