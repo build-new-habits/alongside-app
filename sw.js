@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 18 Aug 2026 v388
+ * ATHLETE-RETIRE. The 'athlete' tier is gone -- it granted nothing
+ * beyond the Plan anywhere, had no entry route, no content and no price.
+ * store.js v54 carries a one-way migration, athlete -> personal, so
+ * anybody holding the value keeps what they had rather than silently
+ * dropping to free. Cache bumped so installed clients receive that
+ * migration. No new app files.
+ *
  * 18 Aug 2026 v387
  * SLEEP-1, COACH-TILE, PRICE-3 and A11Y-LOCK spacing. New app file
  * js/data/pricing.js -- ADDED TO THE PRECACHE LIST below, not just
@@ -2694,7 +2702,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v387";
+const CACHE_NAME = "alongside-v388";
 
 const SHELL_URLS = [
 
