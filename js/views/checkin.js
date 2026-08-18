@@ -1,5 +1,21 @@
 /**
  * js/views/checkin.js
+ * 18 Aug 2026 v15
+ *
+ * v15 - QUICK-3. Two faults on the brief check-in path, both found
+ *   on-device 18 Aug, both the same shape: QUICK-1 removed a step and
+ *   left the things attached to it behind.
+ *
+ *   1. _moodBridge() spoke BEFORE the brief-path check, and all three
+ *      of its lines asked about sleep. The coach asked a question it
+ *      had already decided not to ask, then moved to conditions. The
+ *      brief path now has its own three lines.
+ *
+ *   2. The full path's beat between that question and the next panel is
+ *      the sleep panel's own confirm button. The brief path had no
+ *      panel there, so the coach's line and the conditions panel landed
+ *      together and the check-in read as too fast. _PANEL_BEAT_MS.
+ *
  * 12 Aug 2026 v14
  *
  * v14 - DIC-1, the drop-in coach question. Destination Architecture
@@ -365,6 +381,10 @@ export function CheckinView(router) {
     return store.get('sessionPace') === 'brief';
   }
 
+  // QUICK-3. Pause between a coach question and the panel that answers
+  // it, on paths with no confirm button of their own.
+  const _PANEL_BEAT_MS = 700;
+
   function _showEnergyPanel() {
     const val     = _checkin.energy;
     const hour    = new Date().getHours();
@@ -479,6 +499,14 @@ export function CheckinView(router) {
       if (_briefPath()) {
         if (_conditions.length > 0) {
           await _showCoachBubble("One thing before we go. How's the pain today?");
+          // QUICK-3. The full path has a beat here that the brief path
+          // did not: the sleep panel's own confirm button. Without it the
+          // coach's question and the panel answering it arrived in the
+          // same instant. _PANEL_BEAT_MS is a read-the-question pause,
+          // not decoration -- it is the difference between being asked
+          // and being processed. Zero under prefers-reduced-motion, where
+          // the panel's own entrance is already instant.
+          await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : _PANEL_BEAT_MS));
           _showConditionsPanel();
         } else {
           await _finishConversation();
@@ -1084,7 +1112,23 @@ export function CheckinView(router) {
     return "That's low. I want to understand the full picture.";
   }
 
+  // QUICK-3, 18 Aug 2026. All three of these lines asked about sleep,
+  // and were spoken BEFORE the brief-path check below decided not to ask
+  // about sleep. On a brief check-in the coach put a question to the
+  // person and then answered nothing, moving straight to conditions. It
+  // reads as not being listened to, which is the one thing this check-in
+  // exists to avoid.
+  //
+  // The brief path gets its own lines. They acknowledge the mood and
+  // close, because on the brief path there genuinely is nothing more to
+  // ask -- energy and mood are everything detectBurnout() and
+  // todayIntensity read.
   function _moodBridge(mood) {
+    if (_briefPath()) {
+      if (mood >= 8) return "Good. That's enough for me to work with.";
+      if (mood >= 5) return "Alright. I've got what I need.";
+      return "Understood. I'll keep that in mind for today.";
+    }
     if (mood >= 8) return "Good. And sleep — how was last night?";
     if (mood >= 5) return "Alright. How did you sleep?";
     return "Understood. Sleep affects everything — tell me about last night.";

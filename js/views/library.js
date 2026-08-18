@@ -1,6 +1,16 @@
 /**
  * library.js - Library Page
  *
+ * 18 Aug 2026 v7
+ *
+ * v7 - TIER-H. "At home" was locked as a whole category while "At the
+ *      gym" was open with per-card locks, so the free Full Body session
+ *      was reachable at the gym and not at home. Made symmetric: the
+ *      category opens, its five self-directed cards carry their own
+ *      tier, and a free Full Body card replaces the retired "Mixed
+ *      workout", whose target "home-workout" was never a route in this
+ *      app at all. See the block comment on the category itself.
+ *
  * 18 Aug 2026 v6
  *
  * v6 - Imports router explicitly instead of reading the bare name and
@@ -132,18 +142,35 @@ const GUIDED_CATEGORIES = [
     label:       "At home",
     icon:        "\uD83C\uDFE0",
     description: "Bodyweight or home equipment",
-    // Paid in full. Every card here is a self-directed choice of BOTH
-    // location and session type -- the location step is already
-    // isPremium()-gated in session-builder-ui.js, so leaving this open
-    // would be the same bypass in a different doorway.
-    tier:        "personal",
+    // TIER-H, 18 Aug 2026. This category was locked WHOLE, while "At the
+    // gym" one row below was open with its cards locked individually --
+    // so a free user could build the free Full Body session at the gym
+    // and not at home. For an audience of neurodivergent adults, people
+    // navigating hormonal change and time-poor parents, home is the more
+    // likely room, and it was the one that was shut.
+    //
+    // The old comment justifying the category lock said opening it would
+    // bypass the isPremium()-gated location step. That is true, and it
+    // was equally true of "At the gym", which was open. The reasoning did
+    // not match its own implementation.
+    //
+    // Now symmetric with the gym: category open, cards gated, one free
+    // door, and that door is the same free act -- a full-body session the
+    // coach builds. Tier stays data on the definitions, so _isPaidTarget()
+    // below picks this up with no change.
+    //
+    // "Mixed workout" is RETIRED. Its target, "home-workout", is not a
+    // route: it appears nowhere in router.js and nowhere else in js/ --
+    // grepped, not assumed. It has been a dead link since it was written,
+    // and the category lock is the only reason nobody ever hit it. Full
+    // Body replaces it and is the thing it described.
     sessions: [
-      { label: "Mixed workout",  icon: "\u2728",        target: "home-workout",   note: "Coach builds a range of things" },
-      { label: "Core",          icon: "\uD83E\uDDD8",  target: "core-session",   note: "Choose intensity" },
-      { label: "HIIT",          icon: "\u26A1",        target: "core-session",   note: "High intensity intervals" },
-      { label: "Strength",      icon: "\uD83D\uDCAA",  target: "core-session",   note: "Bodyweight or home weights" },
-      { label: "Cardio",        icon: "\uD83C\uDFC3",  target: "walk-session",   note: "Raise the heart rate" },
-      { label: "Mobility",      icon: "\uD83C\uDF3F",  target: "core-session",   note: "Open and unlock the body" },
+      { label: "Full Body",     icon: "\u26A1",        target: "session-builder", note: "A blend of everything, built for you", preselectType: "full" },
+      { label: "Core",          icon: "\uD83E\uDDD8",  target: "core-session",   note: "Choose intensity",            tier: "personal" },
+      { label: "HIIT",          icon: "\u26A1",        target: "core-session",   note: "High intensity intervals",    tier: "personal" },
+      { label: "Strength",      icon: "\uD83D\uDCAA",  target: "core-session",   note: "Bodyweight or home weights",  tier: "personal" },
+      { label: "Cardio",        icon: "\uD83C\uDFC3",  target: "walk-session",   note: "Raise the heart rate",        tier: "personal" },
+      { label: "Mobility",      icon: "\uD83C\uDF3F",  target: "core-session",   note: "Open and unlock the body",    tier: "personal" },
     ]
   },
   {
