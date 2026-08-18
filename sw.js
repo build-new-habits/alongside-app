@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 18 Aug 2026 v387
+ * SLEEP-1, COACH-TILE, PRICE-3 and A11Y-LOCK spacing. New app file
+ * js/data/pricing.js -- ADDED TO THE PRECACHE LIST below, not just
+ * cached on first fetch: settings.js and upgrade.js both import it at
+ * module load, so an offline first load without it would fail to render
+ * either screen.
+ *
  * 18 Aug 2026 v386
  * PRICE-2. Annual is £59.99 from launch, not £49.99, and the "rate
  * holds until November" line is gone with it. settings.js also
@@ -2687,7 +2694,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v386";
+const CACHE_NAME = "alongside-v387";
 
 const SHELL_URLS = [
 
@@ -2866,6 +2873,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/conditionProgrammes.js",
   "/alongside-app/js/data/equipment.js",
   "/alongside-app/js/data/goals.js",
+  "/alongside-app/js/data/pricing.js",
   "/alongside-app/js/data/workoutGenerator.js",
   "/alongside-app/js/data/programmeEngine.js",
   "/alongside-app/js/data/programmes.js",
