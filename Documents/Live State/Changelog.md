@@ -1,7 +1,56 @@
 # Alongside — Changelog
 
-**Date:** 8 March 2026  
 All versions reflect `store.js` schema version and the primary files changed.
+
+**Maintenance resumed 18 Aug 2026**, per Graeme's decision. This file went stale
+between March and July 2026 and a note on 30 Jul recorded an intention to resume
+that was not carried through. Entries run newest-first from here.
+
+**The Mar–Jul 2026 gap is deliberately NOT backfilled.** Many versions of
+`workoutGenerator.js`, `coach-proposal.js` and `sw.js` shipped in that window;
+reconstructing them from `git log` would produce a plausible history rather than
+a true one. `git log` is the record for that period and is better than an
+invented changelog.
+
+---
+
+## alongside-v387 — 18 August 2026
+
+### SLEEP-1 — the coach claimed an adaptation it never made
+
+- `workoutGenerator.js` v1.13 → v1.14. `generateRationale()` said *"I have
+  adjusted for your poor sleep last night."* Nothing adjusted. `sleepQuality` is
+  written by `checkin.js`, stored by `data/checkin.js`, and read in **exactly one
+  place in the app** — that sentence. It reaches no intensity calculation, no
+  exercise filter, no duration cap; `detectBurnout()` does not read it either.
+- Claim removed, not reworded. The check-in still asks and still stores.
+- **Whether poor sleep should genuinely lighten a session is SLEEP-2**, for the
+  physio pack — a clinical-ish call, not a same-day fix.
+
+### COACH-TILE — the dials that shape sessions got their own door
+
+- `settings.js` v30 → v31. New **"Your Coaching"** row on the Settings landing:
+  capability, the two preference controls, and the reflection, all lifted out of
+  Profile unchanged. They sat below name and age band; the landing had three rows
+  and a screen of empty space.
+
+### PRICE-3 — the price exists once
+
+- New `js/data/pricing.js`. `upgrade.js` v10 and `settings.js` v31 both import it.
+  `settings.js` had typed £49.99 in prose and was still doing so hours after the
+  price changed.
+
+### A11Y-LOCK spacing
+
+- `tier-gating.css` v2 → v3. The dashed border sat hard against the text on all
+  sides. Padding on the wrapper, spacing between stacked paragraphs.
+
+### Gates
+
+- New `verify-sleep1.mjs` (10 checks) and `verify-price.mjs` (7 checks).
+- `schedule-drift.mjs` v2 — master schedule header/footer version agreement.
+  v141 wrote the rule; it has since been broken twice by sessions that could
+  read it. Enforced rather than restated.
 
 ---
 

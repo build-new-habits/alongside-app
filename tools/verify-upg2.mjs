@@ -37,13 +37,21 @@ const sw   = fs.readFileSync("sw.js", "utf8");
 console.log("\nA2 — the page states a price and asks for a decision");
 
 check("a price appears in rendered copy", () => {
-  ok(/\\u00A3|£/.test(view), "no currency symbol anywhere in the view");
-  // 18 Aug 2026 (PRICE-2). Annual is 59.99 from launch; 49.99 was a
-  // window that closed before the soft launch and was unreachable by
-  // anyone. Deliberately hardcoded -- a price gate that reads the
-  // price out of the file it is checking asserts nothing.
-  ok(/7\.99/.test(view) && /59\.99/.test(view),
-     "the confirmed prices (7.99 monthly, 59.99 annual) are not both present");
+  // PRICE-3: the £ now lives in js/data/pricing.js with the numbers.
+  // Asserted where it actually is, rather than deleted -- a rendered
+  // price with no currency symbol is still a real fault.
+  const priceMod = read("js/data/pricing.js");
+  ok(/\\u00A3|£/.test(priceMod), "no currency symbol in the price module");
+  // 18 Aug 2026 (PRICE-3). The numbers moved to js/data/pricing.js so
+  // they exist once in the app; this view now imports them. So the
+  // property here is no longer "the digits appear in this file" --
+  // it is "this page gets its price from the one place that holds
+  // it". The digits themselves are asserted by verify-price.mjs,
+  // against the module that owns them.
+  ok(/from ["']\.\.\/data\/pricing\.js["']/.test(view),
+     "the page does not import the price module");
+  ok(/PRICE_MONTHLY/.test(view) && /PRICE_ANNUAL/.test(view),
+     "the page does not render both prices");
 });
 
 check("the page never says 'coming soon'", () => {

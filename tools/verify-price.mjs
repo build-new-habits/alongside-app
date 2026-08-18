@@ -39,14 +39,18 @@ const check = (n, ok, d = '') => {
 };
 
 const root = new URL('../', import.meta.url).pathname;
+// PRICE-3, 18 Aug 2026. Truth moved out of the view into
+// js/data/pricing.js, so the number exists once in the app rather than
+// once per screen that mentions it. This gate follows the truth.
+const priceSrc   = fs.readFileSync(path.join(root, 'js/data/pricing.js'), 'utf8');
 const upgradeSrc = fs.readFileSync(path.join(root, 'js/views/upgrade.js'), 'utf8');
 
 // ── 1. The source of truth is a single pair of constants ─────────────
 
-const monthly = upgradeSrc.match(/const PRICE_MONTHLY\s*=\s*"\\u00A3([\d.]+)"/);
-const annual  = upgradeSrc.match(/const PRICE_ANNUAL\s*=\s*"\\u00A3([\d.]+)"/);
+const monthly = priceSrc.match(/export const PRICE_MONTHLY\s*=\s*"\\u00A3([\d.]+)"/);
+const annual  = priceSrc.match(/export const PRICE_ANNUAL\s*=\s*"\\u00A3([\d.]+)"/);
 
-check('1  the app declares both prices as constants',
+check('1  the app declares both prices as constants, in ONE module',
   !!monthly && !!annual,
   monthly && annual ? `£${monthly[1]} / £${annual[1]}` : 'one or both missing');
 
@@ -58,8 +62,8 @@ const MONTHLY = monthly[1];
 const ANNUAL  = annual[1];
 
 check('2  and states them exactly once each — a duplicated price goes wrong in one place',
-  (upgradeSrc.match(/PRICE_MONTHLY\s*=/g) || []).length === 1 &&
-  (upgradeSrc.match(/PRICE_ANNUAL\s*=/g) || []).length === 1);
+  (priceSrc.match(/PRICE_MONTHLY\s*=/g) || []).length === 1 &&
+  (priceSrc.match(/PRICE_ANNUAL\s*=/g) || []).length === 1);
 
 // ── 2. No retired figure survives anywhere current ───────────────────
 
@@ -118,6 +122,16 @@ for (const file of walk(root)) {
   }
 }
 
+// PRICE-3 (the inverse). No view may declare its own. This is the
+// assertion that stops the duplicate coming back: settings.js typed the
+// number for weeks and only a price CHANGE revealed it.
+const declarers = walk(path.join(root, 'js'))
+  .filter(f => !f.endsWith('data/pricing.js'))
+  .filter(f => /const PRICE_(MONTHLY|ANNUAL)\s*=/.test(fs.readFileSync(f, 'utf8')))
+  .map(f => path.relative(root, f));
+check('2b no view declares its own price constant',
+  declarers.length === 0, declarers.join(', '));
+
 check('3  PRICE-2 (the sweep): no retired price is published anywhere current',
   hits.length === 0,
   hits.join(', '));
@@ -127,9 +141,10 @@ if (superseded.length) {
 
 // ── 3. The pages a person actually reads ─────────────────────────────
 
-check('4  the Plan page publishes the live annual price',
-  new RegExp(`\\\\u00A3${ANNUAL.replace('.', '\\.')}`).test(upgradeSrc),
-  `expected £${ANNUAL}`);
+check('4  the Plan page imports the price rather than typing it',
+  /from ["']\.\.\/data\/pricing\.js["']/.test(upgradeSrc) &&
+  /PRICE_ANNUAL/.test(upgradeSrc),
+  `live annual is £${ANNUAL}`);
 
 const upgradeBody = upgradeSrc
   .replace(/\/\*[\s\S]*?\*\//g, '')

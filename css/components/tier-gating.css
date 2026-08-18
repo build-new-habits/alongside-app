@@ -1,6 +1,12 @@
 /*
  * css/components/tier-gating.css
- * 18 Aug 2026 v2
+ * 18 Aug 2026 v3
+ *
+ * v3 - Spacing. The dashed border introduced in v2 sat hard against the
+ *   text on all sides. Padding added to the wrapper, and spacing between
+ *   stacked paragraphs. Seen on device, not in a gate: nothing asserts
+ *   that a box looks like it contains its contents rather than traps
+ *   them, and nothing sensibly could.
  *
  * v2 - A11Y-LOCK. Two faults, both systemic, both found on-device
  *   18 Aug in My Programme's "What Personal adds" block and then
@@ -37,6 +43,19 @@
   border-radius: var(--radius-lg);
   border: 1px dashed var(--color-primary);
   transition: background-color 150ms ease;
+
+  /* v3, 18 Aug 2026. The dashed border was drawn hard against the text
+     on both sides -- the first line started on the border and the last
+     line ran into it. A border with no breathing room reads as a box
+     that has trapped the content rather than one that contains it, and
+     it was the first thing Graeme saw on device.
+
+     Padding on the WRAP, not the inner, so it applies wherever this
+     component is used without any call site knowing about it. Card- and
+     tile-shaped content already carries its own internal padding, so
+     this adds a consistent outer margin to every locked surface rather
+     than doubling anything up. */
+  padding: var(--space-3);
 }
 
 .locked-feature-wrap:hover,
@@ -58,6 +77,14 @@
 .locked-feature-inner > p:first-child,
 .locked-feature-inner > div:first-child > p:first-child {
   padding-right: 7.5rem;
+}
+
+/* v3. Paragraphs after the first were running the full width into the
+   right-hand border. The badge only occupies the first line, so they do
+   not need the full 7.5rem reserve -- they need the same breathing room
+   as everything else. */
+.locked-feature-inner > p + p {
+  margin-top: var(--space-2);
 }
 
 .locked-badge {

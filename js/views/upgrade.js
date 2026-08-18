@@ -1,6 +1,11 @@
 /**
  * upgrade.js - Upgrade / Membership view
- * 18 Aug 2026 v9
+ * 18 Aug 2026 v10
+ *
+ * v10 - PRICE-3. The two price constants moved to js/data/pricing.js
+ *   and imported. settings.js now imports the same ones, so the
+ *   number exists once in the app rather than twice.
+ *
  *
  * v9 - PRICE-2. Annual is £59.99, not £49.99, from launch. £7.99 × 12
  *   is £95.88, so £49.99 discounted the annual by 48% -- and every
@@ -124,6 +129,7 @@
 
 import { store }  from "../store.js";
 import { router } from "../router.js";
+import { PRICE_MONTHLY, PRICE_ANNUAL } from "../data/pricing.js";
 
 export const centered = false;
 
@@ -133,8 +139,9 @@ export const centered = false;
 // website both still say GBP 9.99/89, logged as WEB-PRICE. Constants so
 // the number exists in ONE place: a price duplicated across a page is a
 // price that ends up wrong in one of them.
-const PRICE_MONTHLY = "\u00A37.99";
-const PRICE_ANNUAL  = "\u00A359.99";
+// PRICE-3, 18 Aug 2026. Moved to js/data/pricing.js so the number lives
+// in exactly one place across the whole app. See that file for why it is
+// not exported from here and not fetched from the website.
 // PRICE-2, 18 Aug 2026. ANNUAL_LIMIT is retired. The old copy said the
 // yearly rate "holds until the end of November 2026" -- a window that
 // closed BEFORE the soft launch (first week of December) and two months
