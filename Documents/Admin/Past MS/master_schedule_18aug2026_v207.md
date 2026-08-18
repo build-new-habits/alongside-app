@@ -1,51 +1,8 @@
 # Alongside: Move — Master Schedule
-## 18 Aug 2026 v208
+## 18 Aug 2026 v207
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_18aug2026_v207.md`. Remove v207 on upload.
-
-> ### 🟢 THE FOUR REVENUE DECISIONS ARE CLOSED — 18 Aug. `alongside_revenue_architecture_18aug2026_v1.md` **v2**.
->
-> Graeme: *"I think all of these are excellent and I agree with your reasoning for all."* Full reasoning in §7 of that document — recorded rather than just the outcomes, because these are exactly the decisions that get re-argued.
->
-> | # | Decision | Outcome |
-> |---|---|---|
-> | 1 | Personal bests (`session-log.js` `bestLine()`) | 🟢 **FREE.** `showPersonalBests` stays **off by default** — ungating is not switching on |
-> | 2 | Data export (`progress.js`) | 🟢 **FREE**, with **tier-differentiated contents** |
-> | 3 | Duration cap on £44.99-forever | 🟢 **NO CAP.** Recommendation **reversed** |
-> | 4 | The month-six honesty line | 🟢 **KEPT**, second wording |
->
-> #### 🔴 THE ONE THAT DECIDED ITSELF ON NON-COMMERCIAL GROUNDS — export
->
-> **UK GDPR gives a right of access and portability regardless of payment.** Gating export does not remove the right, it **converts a button into a support email** — so the paywall protects no revenue and manufactures admin on a one-person business. Once ICO registration is live and the Safety page is a selling point, *"pay us to get your data out"* is the wrong sentence to have to defend.
->
-> **The tier difference moves into the CONTENTS.** Free exports what free has; the Plan exports the arc. **Kind, not length** — the same rule as §4.1. 🟠 Goes to Natalie with the trial and cooling-off questions.
->
-> #### 🟠 A RECOMMENDATION REVERSED, AND THE REVERSAL IS THE POINT
->
-> v1 of the revenue document recommended capping the beta rate by duration **as well as** by cohort. **That was wrong.** *"The rate never rises for anyone"* is load-bearing — it is what makes every price set now safe to set, because a discount can always be added later and a rate can never be raised. **A duration cap on the beta rate IS a rate rise**, aimed at the cohort that did three months of unpaid work. The worst available place to break the promise, for a finite number of testers times roughly £15 a year.
->
-> **What gets bounded is WHO, not how long.** *"Anyone who signs up in December"* lets a stranger arriving on 20 December take a rate meant for somebody testing since September. **Eligibility is beta-cohort membership before a named date; December is the redemption window.** 🟠 Stripe coupon restricted to a named customer list, not a public code. Date set when the cohort closes.
->
-> #### 🟢 R4 GAINS TWO FILES AND KEEPS ITS BOUNDARY
->
-> `session-log.js` and `progress.js` join R4's scope. **`progress.js` needs care:** it carries its own ad-hoc tier gating predating `auth.js`, deliberately never retrofitted. Export is one of three gated things in it — **the 30/90-day window and the tiered observation depth do NOT move**, because those are the kind-not-length distinction, and moving them would collapse the boundary this work just drew.
->
-> #### 🟢 The month-six wording, final
->
-> > **Monthly costs more over a year, but it costs less if you stop. Whichever suits you.**
->
-> The earlier draft — *"if you think you might stop before the year is out, stay monthly"* — read as **under-confident**, as though the product did not expect the person to stay. The final line states the arithmetic in both directions and attaches no preference.
->
-> #### 🔵 R-STREAM PLANNING DEPTH — settled, and deliberately uneven
->
-> **R1 is the only one with a build spec, and the rest should not all get one now.** **R4** is ready to build — known files, known order, no design left. **R3** needs three small answers (surface, copy, the gate assertion pinning the single-entry read) and can be specced and built in one session. **R2 needs a DISCOVERY session before a spec** — the demonstration must be built from data that actually exists at the end of onboarding, and `goal-setup.js` has not been opened; writing a spec first would be writing against a file nobody read, which is the failure this project keeps catching. **R5** is a checklist with Graeme's actions on it, not a build. **R6** gets specced when R5 moves.
->
-> **Next: R4.** Document → gate → code. It is the boundary already decided and it is currently wrong in the live product.
->
-> **No code shipped this session.** Documents only; `sw.js` untouched at v388, `alongside-v388`.
->
-> ---
+Supersedes `master_schedule_18aug2026_v206.md`. Remove v206 on upload.
 
 > ### 🔵 REVENUE ARCHITECTURE — the boundary moves, and this time it is written down
 >
@@ -4026,4 +3983,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v208*
+*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v207*
