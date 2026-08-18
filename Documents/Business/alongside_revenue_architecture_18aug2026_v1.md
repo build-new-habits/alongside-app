@@ -1,5 +1,7 @@
 # Alongside: Move — Revenue Architecture
-## 18 Aug 2026 v1
+## 18 Aug 2026 v2
+
+**v2 — the four open decisions are closed.** Graeme, 18 Aug: personal bests free, export free with tier-differentiated contents, **no duration cap on the beta rate** (recommendation reversed — see §7.3), and the month-six honesty line kept in its second wording. §4 R4 and §5 updated to match. Nothing else changed.
 
 Build New Habits | What people pay for, why they stay, and the build order that makes it real.
 
@@ -289,11 +291,15 @@ The gate and code work. **Order is non-negotiable: document → gate → code**,
 | `js/views/session-builder-ui.js` | Unlock the session-type picker, duration picker, allocation presets and build-mode step. Free reaches the location step: `phase = isPremium() ? "location" : "equipment"` must go |
 | `sw.js` | Last, alone, cache bump |
 
-**Three still open — Graeme's call, listed so they are not decided by default:**
+**Step 4 — the three former open items, decided 18 Aug (§7). In R4's scope, not deferred.**
 
-1. **`session-log.js` `bestLine()`** — personal bests gated. A best is a fact about the person's own log, and free already includes lift notes and recall. Recommendation: **move to free.**
-2. **`progress.js` export lock** — exporting your own data. If self-direction is an accessibility argument, data portability is its strongest form. Recommendation: **move to free.**
-3. **`library.js` "My programme"** — continuity, correctly paid. Recommendation: **stays paid.**
+| File | Change | Why |
+|---|---|---|
+| `js/session-log.js` | `bestLine()` — remove the `isPremium()` guard. **Leave `showPersonalBests` off by default** | §7.1. Ungating is not switching on |
+| `js/views/progress.js` | Export available to free. `renderExportLocked()` retires. **Free exports what free has; the Plan exports the arc** | §7.2. The tier difference moves into the contents |
+| `js/views/library.js` | "My programme" **keeps** its tier tag | §7. Continuity, correctly paid |
+
+**`progress.js` needs care.** It carries its own ad-hoc tier gating that predates `auth.js` and was deliberately never retrofitted. Export is one of three gated things in it — **the 30/90-day window and the tiered observation depth stay exactly as they are**, because those are the kind-not-length distinction from §4.1, and moving them would collapse the boundary this document just drew.
 
 ---
 
@@ -340,17 +346,17 @@ Draft copy, for the build session:
 >
 > Same plan, nothing changes. Just cheaper, if it suits you.
 >
-> **If you think you might stop before the year is out, stay monthly. It will cost you less.**
+> **Monthly costs more over a year, but it costs less if you stop. Whichever suits you.**
 >
 > [ Switch to annual ] [ Not now ]
 
-**That last line is deliberate and should survive review.** It is the pub-test sentence — *my fitness app told me the cheaper option might not suit me* — and word of mouth is the only channel this business can afford. It costs almost nothing, because the people it protects are the ones you would not want locked in.
+**That last line is deliberate and survived review — see §7.4.** It is the pub-test sentence, and word of mouth is the only channel this business can afford. It costs almost nothing, because the people it protects are the ones you would not want locked in: an annual subscriber who wanted to leave in month eight is a refund request and a bad review, not revenue. **Wording matters here.** The earlier draft — *if you think you might stop before the year is out, stay monthly* — read as under-confident, as though the product did not expect the person to stay. The final line states the arithmetic in both directions and attaches no preference.
 
 **Mechanics:** computable from the subscription start date at render time. No scheduled job, no cron, no email send, zero ongoing admin. Six months rather than twelve: at twelve you are discounting people you already have.
 
 **Honest accounting, recorded so nobody re-derives it as a surprise:** £7.99 × 12 = £95.88 against £59.99. At the model's own 6% monthly churn, somebody still paying at month six has a long expected remaining life, so this **loses money** on anyone who would have stayed. It is an honesty move and the cost is the point. Detecting who is about to leave in order to pitch them is precisely what this product refuses to do.
 
-🟠 **Open:** `£44.99` forever has **no cohort cap** — December bounds who can take it, nothing bounds how long it runs. Needs a line in the ToS. Natalie also still holds the trial / cooling-off question.
+🟢 **Closed 18 Aug (§7.3):** no duration cap. The rate never rises for anyone, and a duration cap on the beta rate would be a rate rise aimed at the people who did three months of unpaid work. Bounded by **cohort membership before a named date**, with December as the redemption window. Needs a ToS line. 🟠 Natalie still holds the trial / cooling-off question.
 
 ---
 
@@ -370,14 +376,45 @@ Recorded so these are not re-proposed. Each was argued and rejected with reasons
 
 ---
 
-## 7. Open decisions for Graeme
+## 7. The four decisions — CLOSED 18 Aug
 
-| # | Decision | Recommendation |
-|---|---|---|
-| 1 | Personal bests — free or paid? | Free |
-| 2 | Data export — free or paid? | Free |
-| 3 | Cohort cap on £44.99-forever | Cap by cohort as well as by December |
-| 4 | Month-six copy — does the "stay monthly" line survive? | Keep it |
+Graeme: *I think all of these are excellent and I agree with your reasoning for all.* Reasoning recorded, not just outcomes, because these get re-argued otherwise.
+
+### 7.1 Personal bests — FREE
+
+A best is a fact about the person's own log, and free already includes lift notes and recall. `my-programme.js`'s own header refuses to hide a fact somebody owns behind a paywall; the same principle applies here.
+
+**The tension, named rather than glossed:** PB-1 records the best on the way in so `liftLog`'s 20-entry eviction cannot lose it, so a free user may see a number drawn from data older than their fourteen-day record. That is acceptable — it is **their** number, not a coach read. *Your best: 85 kg* is a fact. *Up 5 since May* would be the arc, and **P4 already forbids it.**
+
+`showPersonalBests` stays **off by default**, unchanged. For personas 2.5, 2.8 and 2.13 a visible best is a target to fall short of. **Ungating is not switching on.**
+
+### 7.2 Data export — FREE, with tier-differentiated contents
+
+**The deciding argument is not commercial.** UK GDPR gives a right of access and portability regardless of payment, so gating export does not remove the right — it converts a button into a support email. The paywall protects no revenue and creates admin, on a one-person business. Once ICO registration is live and the Safety page is a selling point, *pay us to get your data out* is the wrong sentence to have to defend.
+
+**The tier difference is in what the export CONTAINS, not whether it exists.** Free exports what free has. The Plan exports the arc. **Kind, not length** — the same rule as §4.1 of the tier document.
+
+🟠 **For Natalie**, with the trial and cooling-off questions. Not legal advice.
+
+### 7.3 Beta rate — NO duration cap. Tighter cohort definition instead
+
+**Recommendation reversed.** v1 of this document recommended capping £44.99-forever by cohort *and* duration. That was wrong, and the reversal is recorded rather than quietly edited out.
+
+**Rate never rises for anyone is load-bearing.** It is what makes every price set now safe to set, because a discount can always be added later and a rate can never be raised. **A duration cap on the beta rate IS a rate rise**, aimed at the cohort that did three months of unpaid work — the worst available place to break the promise.
+
+The exposure is small: a finite number of testers times roughly £15 a year. Against a broken promise to the earliest supporters, it is not close.
+
+**What is bounded is WHO, not how long.** *Anyone who signs up in December* is loose — it lets a stranger who arrives on 20 December take a rate meant for somebody who tested since September. **Eligibility is membership of the beta cohort before a named date. December is the redemption window, not the eligibility rule.**
+
+🟠 Implementation: a Stripe coupon restricted to a named customer list, not a public code. The named date needs setting when the cohort closes.
+
+### 7.4 The month-six line — KEPT, second wording
+
+The risk with the original was that it reads as **under-confident**, as though the product does not expect the person to stay. That is a wording problem, not a reason to drop the honesty. Final:
+
+> **Monthly costs more over a year, but it costs less if you stop. Whichever suits you.**
+
+It states the arithmetic in both directions and attaches no preference. Full block in §5.
 
 ---
 
