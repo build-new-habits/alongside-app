@@ -100,10 +100,23 @@ check('9  locked state is still visually distinct without dimming',
 check('10 and it survives forced-colors, where a background tint does not',
   /@media \(forced-colors: active\)[\s\S]*\.locked-feature-wrap/.test(cssSrc));
 
-check('11 A11Y-LOCK: the badge no longer sits on top of leading text',
-  /\.locked-feature-inner > p:first-child[\s\S]{0,160}padding-right/.test(cssSrc));
+// SWEEP-1, 18 Aug 2026. Was a {0,160} window between the selector and
+// the declaration -- my own, written the same morning I found the same
+// fault in two other gates. Asserted against the rule BLOCK now, which
+// is the unit CSS actually has.
+{
+  const i = cssSrc.indexOf('.locked-feature-inner > p:first-child');
+  const block = i === -1 ? '' : cssSrc.slice(i, cssSrc.indexOf('}', i) + 1);
+  check('11 A11Y-LOCK: the badge no longer sits on top of leading text',
+    i !== -1 && /padding-right/.test(block),
+    i === -1 ? 'the first-child rule is gone entirely' : '');
+}
+
+check('12 A11Y-LOCK: the locked box does not sit hard against its own text',
+  /\.locked-feature-wrap\s*\{[^}]*padding:/.test(cssSrc),
+  'a border with no breathing room reads as trapping the content');
 
 console.log(failures === 0
-  ? `\nAll 11 checks green.`
+  ? `\nAll 12 checks green.`
   : `\n${failures} FAILED.`);
 process.exit(failures === 0 ? 0 : 1);
