@@ -1,5 +1,7 @@
 **DRAFT — FOR SOLICITOR REVIEW, NOT FOR PUBLICATION. Bracketed items in bold are placeholders still to be confirmed.**
 
+*v3 change note (18 Aug 2026): pricing restructured. The £4.99 three-month introductory rate is REMOVED — it placed a 60% price rise at month four, in the window where people are most likely to leave. Replaced with a free trial, which costs nothing to give and creates no price rise. Annual is £59.99 from launch, not £49.99: the old launch-year window closed 30 Nov 2026, before the soft launch in December and two months before public launch in January 2027, so it was a price nobody could have paid. Year 2 pricing deferred to Year 2. Beta rate £44.99, December 2026 only. The "Personal subscription" heading is now "The Plan" (tier renamed 18 Aug). Two new bracketed placeholders for solicitor review: trial length, and the trial/cooling-off interaction.*
+
 *v2 change note: added the mandatory UK Consumer Rights Act 2015 s.65 carve-out to Section 6 (liability for death/personal injury from negligence cannot be excluded), and made the “not a medical device” framing explicit in Section 1, consistent with MHRA**'**s general-wellbeing boundary test. No other changes from v1.*
 
 **Terms of Service — Alongside: Move**
@@ -28,25 +30,41 @@ We reserve the right to suspend or terminate accounts that violate these Terms o
 
 Alongside is available free of charge with a permanent free tier. Safety-critical features — including burnout detection, Recovery Mode, and condition safety filtering — are never paywalled.
 
-### **Personal subscription**
+### **The Plan**
 
-- Monthly: £7.99/month, with an introductory rate of £4.99/month for the first 3 months from signup.
+- Monthly: £7.99/month. **No introductory rate** — the price you see is the price you pay from the first payment onward.
 
-- Annual (launch year, to 30 Nov 2026): £49.99/year.
+- Annual: £59.99/year.
 
-- Annual (standard, from Year 2): £59.99/year. Users who joined at an earlier rate keep that rate.
-
-- Beta participants: a permanently locked annual rate of £39.99/year, available to those who convert after the beta period.
+- Beta participants: a permanently locked annual rate of £44.99/year, available **during December 2026 only**. Once taken, this rate is held for as long as the subscription runs.
 
 - Community organisation members: access via a unique code issued to partner organisations, at rates set out at the time of the partnership.
+
+- **Your rate never rises.** If we change our prices, you keep the rate you joined at for as long as your subscription runs. Any change applies only to people joining after it.
+
+- **[YEAR 2 PRICING — deliberately not set. To be decided in Year 2 in light of real data, and in any case subject to the rate-never-rises commitment above.]**
+
+### **Free trial**
+
+- **[TRIAL LENGTH — 30 days recommended; 14 days under consideration. One figure to be confirmed before publication.]** Card details are taken at signup and no payment is made during the trial.
+
+- You'll be reminded before the trial ends and told exactly what you'll be charged and when.
+
+- Cancel at any point during the trial and you will not be charged at all.
 
 ### **Auto-renewal**
 
 Your subscription renews automatically at the end of each billing period unless you cancel first. You'll receive an email reminder 7 days before each annual renewal. Cancel any time from Settings → Subscription.
 
+Annual subscriptions renew on the anniversary of your first payment.
+
 ### **Refund policy**
 
-Under UK Consumer Contracts Regulations, you can cancel and receive a full refund within 14 days of purchase, unless you've actively used the subscription during that period, in which case we apply a pro-rata refund for unused days. After 14 days, subscriptions are non-refundable, though you can cancel any time to stop future renewals. If a technical fault prevented you from using the service, contact hello@buildnewhabits.co.uk for a full refund.
+Under UK Consumer Contracts Regulations, you can cancel and receive a full refund within 14 days of the contract being concluded, unless you've actively used the subscription during that period, in which case we apply a pro-rata refund for unused days.
+
+**[FOR SOLICITOR REVIEW — the interaction between the free trial and the statutory cooling-off period. Our understanding is that the 14-day CCR period runs from the day the contract is concluded (signup), not from the day payment is first taken — so on a trial the statutory right may already have expired at the moment of the first charge. We propose offering a voluntary 14-day full-refund right running from the FIRST PAYMENT, in addition to the statutory right, so that nobody is charged at a point where they have no way out. Please confirm this is the correct construction and that offering a more generous voluntary right does not complicate the statutory position.]**
+
+After that, subscriptions are non-refundable, though you can cancel any time to stop future renewals. If a technical fault prevented you from using the service, contact hello@buildnewhabits.co.uk for a full refund.
 
 ## **4. Your Data**
 
