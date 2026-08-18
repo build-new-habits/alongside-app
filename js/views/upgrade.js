@@ -1,5 +1,17 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 18 Aug 2026 v9
+ *
+ * v9 - PRICE-2. Annual is £59.99, not £49.99, from launch. £7.99 × 12
+ *   is £95.88, so £49.99 discounted the annual by 48% -- and every
+ *   price set now is set PERMANENTLY for the launch cohort, because
+ *   nobody's rate ever rises. £59.99 is still 37% off and is exactly
+ *   £5 a month, which is a line somebody says out loud.
+ *
+ *   The "yearly rate holds until..." sentence is GONE with
+ *   ANNUAL_LIMIT: Year 2 pricing is deferred to Year 2, so nothing
+ *   expires. See the constant for why the old window was unreachable.
+ *
  * 18 Aug 2026 v8
  *
  * v8 - IMPACT-COLOUR. The five-percent block carries
@@ -122,8 +134,15 @@ export const centered = false;
 // the number exists in ONE place: a price duplicated across a page is a
 // price that ends up wrong in one of them.
 const PRICE_MONTHLY = "\u00A37.99";
-const PRICE_ANNUAL  = "\u00A349.99";
-const ANNUAL_LIMIT  = "the end of November 2026";
+const PRICE_ANNUAL  = "\u00A359.99";
+// PRICE-2, 18 Aug 2026. ANNUAL_LIMIT is retired. The old copy said the
+// yearly rate "holds until the end of November 2026" -- a window that
+// closed BEFORE the soft launch (first week of December) and two months
+// before public launch, so £49.99 was a price nobody could ever pay.
+// Graeme's decision: £59.99 is simply the annual price from launch, and
+// Year 2 is deferred to Year 2. Nothing expires, so there is nothing to
+// count down to -- which suits a page whose whole design forbids
+// urgency.
 
 // The doc: "Four statements. Not bullet points. Stacked with breathing
 // room between each." Three ship today -- see the header note on why the
@@ -252,9 +271,6 @@ export function render() {
       <section class="upgrade-price-block" aria-label="Price">
         <p class="upgrade-price">${PRICE_MONTHLY} a month. ${PRICE_ANNUAL} for the year.</p>
         <p class="upgrade-price-note">That&rsquo;s it.</p>
-        <p class="upgrade-body upgrade-body--quiet">
-          The yearly rate holds until ${ANNUAL_LIMIT}.
-        </p>
       </section>
 
       <section class="upgrade-block" aria-label="Where the money goes">

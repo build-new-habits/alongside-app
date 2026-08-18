@@ -1,6 +1,14 @@
 /**
  * settings.js
- * 18 Aug 2026 v29
+ * 18 Aug 2026 v30
+ *
+ * v30 - PRICE-2. The annual price said £49.99. Found by the new
+ *   verify-price.mjs sweep on the day it was written, not by anybody
+ *   looking -- this file publishes the price in prose, a second copy
+ *   of a number upgrade.js holds in a constant precisely so it exists
+ *   in one place. The duplication is the fault; the wrong figure was
+ *   only its symptom. 🟠 Logged: this should read the constant.
+ *
  *
  * v29 - NAME-1. The paid tier is "the Plan", not "Personal".
  *   Graeme's decision, 18 Aug. Copy only -- no logic, no gating
@@ -1570,7 +1578,7 @@ export function SettingsView(router) {
           </div>
 
           <div class="settings-plan-block">
-            <p class="settings-plan-price">£7.99 a month, or £49.99 for the year.</p>
+            <p class="settings-plan-price">£7.99 a month, or £59.99 for the year.</p>
             <p class="text-sm text-muted">
               The yearly rate holds until the end of November 2026. No
               contract either way, and nothing is lost if you change your

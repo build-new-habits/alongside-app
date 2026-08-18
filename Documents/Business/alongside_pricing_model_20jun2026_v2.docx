@@ -1,4 +1,7 @@
-20 Jun 2026 v2
+18 Aug 2026 v3
+
+*Supersedes 20 Jun 2026 v2. Section 1 restructured; sections 2-5 projections NOT recomputed and are stale — see the note under the table.*
+
 
 **Alongside: Move**
 
@@ -10,15 +13,26 @@ Build New Habits Ltd — 20 Jun 2026 v2 (5 scenarios, 4-year model)
 
 | **Tier** | **Price** | **Notes** |
 | --- | --- | --- |
-| Monthly (standard) | £7.99/month | Standard ongoing rate. |
-| Launch intro — first 3 months | £4.99/month then £7.99 | From date of signup. Any user, any point in launch year. |
-| Annual — launch year | £49.99/year | To 30 Nov 2026. Honest time-limit communicated upfront. |
-| Annual — standard (Year 2+) | £59.99/year | Rises after launch year. Early adopters locked at their rate. |
-| Beta conversion — annual | £39.99/year | Beta participants only. Rate locked permanently for this cohort. |
-| Beta conversion — intro monthly | £4.99 × 6 months then £7.99 | Lower commitment route. Can switch to annual at any point. |
+| Monthly | £7.99/month | Flat from day one. No introductory rate. |
+| Annual | £59.99/year | From launch. Exactly £5/month. No expiry date. |
+| Free trial | [LENGTH TBC — 30 days recommended] | Card taken at signup, no payment during trial, reminder before it ends. |
+| Beta conversion — annual | £44.99/year | Beta participants only, **December 2026 only**. Locked permanently once taken. |
 | Community org — Year 1 | £39.99/year | Via unique code per organisation. Tracked individually. |
 | Community org — Year 2+ | £49.99/year | Same model. Modest increase as product proven. |
-| Taster code (org members) | 1 month free | Unlocks full premium for 1 month. Redeemable any time Year 1. |
+| Taster code (org members) | 1 month free | Unlocks the Plan for 1 month. Redeemable any time Year 1. |
+| Year 2 standard pricing | Deferred | Decided in Year 2, on real data. Subject to rate-never-rises. |
+
+**Changes at 18 Aug 2026, and why — v3.**
+
+**The £4.99 three-month intro is removed.** It removed risk at the point of decision but paid for it with a **60% price rise at month four**, landing exactly when novelty has gone and habit has not formed. It discounted the churn window and then supplied a reason to leave at the end of it. A free trial does the same job at no cost and creates no price rise. The model's own finding stands: **monthly churn, not acquisition, is the real financial risk.**
+
+**Annual is £59.99, not £49.99.** The old £49.99 launch-year window ran to 30 Nov 2026 — **before** the soft launch (first week of December) and two months before public launch (January 2027). It was a price nobody could have paid. Beyond fixing the date: £7.99 × 12 = £95.88, so £49.99 was a **48% discount**, against a more typical 15–20%. £59.99 is still 37% off and is exactly £5/month, which is a line somebody repeats out loud.
+
+**The grandfathering commitment makes every price permanent for the launch cohort.** Nobody's rate ever rises, so a price set now is set forever for the people who join first and stay longest. Underpricing at launch is not a launch decision for them; it is a permanent one. Discounts can always be added later. The rate cannot be raised.
+
+**Beta is £44.99, December 2026 only**, up from £39.99. It keeps the beta rate **under fifty** while standard sits above it — that threshold does real work, and giving it to testers makes their rate feel like the reward it is. The revenue difference across a small beta cohort is trivial; what the standard price signals is not.
+
+**All projections in sections 2–5 below are computed against the OLD prices and are now stale.** They have not been recomputed in this revision. 🟠 Break-even and revenue scenarios need rerunning at £7.99/£59.99 before they are quoted anywhere.
 
 # **2. Startup Costs ****&**** Break-Even**
 
