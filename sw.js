@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 18 Aug 2026 v385
+ * IMPACT-COLOUR. The five-percent block on the Plan page is teal
+ * (.upgrade-body--impact). Contrast computed in all three themes, all
+ * clear AA. Cache bumped so installed clients pick up upgrade-page.css
+ * v2. No new files.
+ *
  * 18 Aug 2026 v384
  * NAME-1. The paid tier is "the Plan", not "Personal" — Graeme's
  * decision, 18 Aug. Copy across nine files plus the shared
@@ -2674,7 +2680,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v384";
+const CACHE_NAME = "alongside-v385";
 
 const SHELL_URLS = [
 
