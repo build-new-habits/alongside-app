@@ -103,9 +103,18 @@ check('it is flat, like the last-note line above it',
   /slog__best/.test(src) && /store\.get\('showPersonalBests'\)/.test(src));
 
 const css = fs.readFileSync(new URL('../css/components/session-log.css', import.meta.url), 'utf8');
-check('and styled the same as the last-note line, not highlighted',
-  /\.slog__best\s*\{/.test(css) && !/\.slog__best[\s\S]{0,120}(gold|--color-accent|bold|700)/.test(css),
-  'a best styled as an achievement becomes a target to defend');
+// SWEEP-1, 18 Aug 2026. Negative {0,120} window -- silently green if the
+// emphasis moved past 120 characters, e.g. behind a media query or below
+// two added properties. Asserted against the RULE BLOCK instead, which is
+// the actual unit: everything between the selector and its closing brace.
+{
+  const i = css.indexOf('.slog__best');
+  const block = i === -1 ? '' : css.slice(i, css.indexOf('}', i) + 1);
+  check('and styled the same as the last-note line, not highlighted',
+    i !== -1 && !/gold|--color-accent|bold|700|600/.test(block),
+    i === -1 ? '.slog__best not found — the assertion had nothing to read'
+             : 'a best styled as an achievement becomes a target to defend');
+}
 
 // ── Reachable ────────────────────────────────────────────────
 const settings = fs.readFileSync(new URL('../js/views/settings.js', import.meta.url), 'utf8');
