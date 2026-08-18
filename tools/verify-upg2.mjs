@@ -38,9 +38,12 @@ console.log("\nA2 — the page states a price and asks for a decision");
 
 check("a price appears in rendered copy", () => {
   ok(/\\u00A3|£/.test(view), "no currency symbol anywhere in the view");
-  ok(/7\.99/.test(view) && /49\.99/.test(view),
-     "the confirmed prices (7.99 monthly, 49.99 annual, per the 20 Jun 2026 " +
-     "pricing model) are not both present");
+  // 18 Aug 2026 (PRICE-2). Annual is 59.99 from launch; 49.99 was a
+  // window that closed before the soft launch and was unreachable by
+  // anyone. Deliberately hardcoded -- a price gate that reads the
+  // price out of the file it is checking asserts nothing.
+  ok(/7\.99/.test(view) && /59\.99/.test(view),
+     "the confirmed prices (7.99 monthly, 59.99 annual) are not both present");
 });
 
 check("the page never says 'coming soon'", () => {
