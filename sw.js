@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 18 Aug 2026 v386
+ * PRICE-2. Annual is £59.99 from launch, not £49.99, and the "rate
+ * holds until November" line is gone with it. settings.js also
+ * published £49.99 in prose -- found by the new verify-price.mjs sweep,
+ * not by anybody looking. Cache bumped so installed clients stop
+ * showing a price that is no longer real. No new app files.
+ *
  * 18 Aug 2026 v385
  * IMPACT-COLOUR. The five-percent block on the Plan page is teal
  * (.upgrade-body--impact). Contrast computed in all three themes, all
@@ -2680,7 +2687,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v385";
+const CACHE_NAME = "alongside-v386";
 
 const SHELL_URLS = [
 
