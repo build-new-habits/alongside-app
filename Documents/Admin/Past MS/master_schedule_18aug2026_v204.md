@@ -1,82 +1,8 @@
 # Alongside: Move — Master Schedule
-## 18 Aug 2026 v205
+## 18 Aug 2026 v204
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_18aug2026_v204.md`. Remove v204 on upload.
-
-> ### 🔴 PICK UP HERE — 18 Aug, third block. `alongside-v387`. **75 gates green on a fresh clone.**
->
-> #### 🔴 SLEEP-1 — THE COACH CLAIMED AN ADAPTATION IT NEVER MADE
->
-> **The most serious finding of the day, and it came from Graeme asking a question rather than reporting a bug:** *"do we need sleep data for the coach?"*
->
-> `generateRationale()` in `workoutGenerator.js` said **"I have adjusted for your poor sleep last night."** **Nothing adjusted.** `sleepQuality` is written by `checkin.js`, stored by `data/checkin.js`, and read in **exactly one place in the entire app** — that sentence. It reaches no intensity calculation, no exercise filter, no duration cap. `detectBurnout()` does not read it either.
->
-> **Same fault class as `onUnmount`'s missing caller and the Library route `exercises/index.js` claimed for the 28 practices — with one difference that outweighs the rest. Those were comments lying to developers. This was the COACH, in coach voice, telling a person it had done something for them.** P4 says the coach displays and never interprets; claiming an adaptation that did not happen is worse than either.
->
-> **Removed, not reworded.** The check-in still asks and still stores — removing the data alongside the claim would have smuggled a second decision inside the first, and gated against.
->
-> 🟠 **SLEEP-2 — for the physio pack.** Whether poor sleep *should* genuinely lighten a session is a clinical-ish product decision, not a same-day fix. Until it is answered the coach says nothing about sleep, which is true. **Answer this alongside the pain-band-at-6 question; they are the same kind of call.**
->
-> **The transferable rule, now enforced in `verify-sleep1.mjs` check 2:** the engine may mention a field in coach copy only if it reads that field. Written as a relationship rather than a banned sentence, because the next instance will not use the word "sleep".
->
-> #### 🟢 COACH-TILE — the dials that shape sessions have a door
->
-> `settings.js` **v31**. Graeme, on device: the Settings landing has *"loads of space"*. New **"Your Coaching"** row — *"What your body can do, how sessions are built, and your reflection"* — holding capability, the two preference controls and the reflection, all three lifted out of Profile **unchanged**.
->
-> **Why it matters beyond tidiness:** capability decides what the coach will and will not put in front of somebody. Filing it under "Profile", below name and age band, made it read as a personal detail rather than as the dial it is — **the same findability fault NAV-5 fixed for session notes.** Movement identity stays in Profile: that is a fact about you, not a dial.
->
-> #### 🟢 PRICE-3 — the price exists once
->
-> New **`js/data/pricing.js`**. `upgrade.js` **v10** and `settings.js` **v31** both import it.
->
-> **Graeme's question was whether `settings.js` should read the price, and from the website. Answer: yes to one source, no to the website.** The app is a PWA that must work fully offline, so a fetched price would be missing exactly when somebody has no signal, and it inverts the direction of truth — **the site is a publication OF the price, not the source of it.** `verify-price.mjs` enforces agreement instead: same guarantee, no runtime coupling.
->
-> #### 🟢 A11Y-LOCK spacing — `tier-gating.css` v3
->
-> The dashed border from v2 sat hard against the text on all sides. Padding on the wrapper, spacing between stacked paragraphs. **Seen on device, not by a gate, and nothing sensibly could assert it** — no test knows whether a box looks like it contains its contents or has trapped them.
->
-> #### 🟢 RE-FORECAST — pricing model v5
->
-> | | Old | **New** |
-> |---|---|---|
-> | Break-even, year-one cash | 34–55 users | **36 users** |
-> | Running costs in the model | **omitted entirely** | £408/yr included |
-> | Churn modelled | **no** — despite the model naming churn as the real risk | yes |
->
-> **The number barely moved despite a £10 rise on the annual**, because the old table omitted running costs and the 30-day trial removes one paid month from every monthly subscriber. The two changes nearly cancel. Worth knowing, because a £10 rise looks like it should have moved this.
->
-> **New: churn-adjusted LTV.** At 6% churn a monthly subscriber is worth **£117**, an annual **£193**, blended **£163**. **Lifetime break-even is 15 users; cash break-even is 36. Only the second pays bills, and every scenario should be read as cash.**
->
-> **New: year-one cash by user count.** 50 users → £3,379. 100 → £6,759. **200 → £13,517.** Real and achievable for a first year, and **not a salary.** The existing £50,000 review trigger sits at roughly **740 paying users**. 🟠 Sections 3–5's five scenarios remain stale and are flagged in place — recomputing them needs beta conversion data to be worth anything.
->
-> #### 🟢 Changelog.md — RESUMED, per Graeme
->
-> Entry for this block written, newest-first. **The Mar–Jul 2026 gap is deliberately NOT backfilled**: reconstructing it from `git log` would produce a plausible history rather than a true one, and `git log` is the better record for that window.
->
-> #### 🟢 `schedule-drift.mjs` v2 — the header/footer rule is now enforced
->
-> v141 recorded the drift and wrote the rule; **it has since been broken twice by sessions that could read it.** Now checked. **First placement of the block landed inside a conditional failure branch, so it would only ever have run on days something else was already wrong — a check that cannot fire is worse than none, because it looks like coverage.** Moved and reversal-tested.
->
-> #### 🟡 THREE EXISTING GATES UPDATED, none weakened
->
-> - **`verify-nav5.mjs`** asserted *"exactly three"* sections. Its own header says the property is *"nothing scrolls, so nothing hides"* — **a ceiling, not a count.** Now ≤5 plus the four required ids, and the description count is tied to the section count so a new row cannot ship without one.
-> - **`verify-upg2.mjs`** — price checks follow the number to the module that owns it. **Third time in one day a gate went red on a property it was not testing.**
-> - **The pattern is now three deep** (character-distance for order, marketing sentence for behaviour, digits-in-file for source-of-truth). 🟠 **A sweep of the suite for other proxies is overdue** and is the largest outstanding QA item.
->
-> #### 🟢 ATHLETE — answered from the code, not from memory
->
-> `store.js`: *"Athlete unlocked within Personal — no extra charge."* It grants **nothing** beyond the Plan anywhere in the app — same two impact credits, same everything. **No entry route, no content, no price.** It is not a tier; it is an unused enum value with a dev-tier switcher pointing at it. **Recommendation: retire it rather than name it.** 🟠 Graeme's call.
->
-> #### 🟢 RATE-1 — CONFIRMED by Graeme
->
-> **Six months, framed as loyalty and reward, with a larger "help us grow our community" prompt and pledge alongside it.** Nothing built — downstream of Stripe. The three findings from v202 stand: **not in coach voice** (P2 helper layer), **no scheduled job needed** (render-time computation), and **it loses money on anyone who would have stayed**, which is why it is an honesty move and the cost is the point.
->
-> #### 🔴 BLOCKER — Graeme is on it
->
-> **HMRC sole trader registration → business bank account → Stripe.** Confirmed as Graeme's own next action, 18 Aug.
->
-> ---
+Supersedes `master_schedule_18aug2026_v203.md`. Remove v203 on upload.
 
 > ### 🟢 PRICING IS CLOSED — trial confirmed at 30 days, 18 Aug
 >
@@ -3875,4 +3801,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v205*
+*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v204*
