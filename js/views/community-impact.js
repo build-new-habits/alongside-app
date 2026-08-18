@@ -1,5 +1,11 @@
 /**
  * views/community-impact.js
+ * 18 Aug 2026 v2
+ *
+ * v2 - NAME-1. The paid tier is "the Plan", not "Personal".
+ *   Graeme's decision, 18 Aug. Copy only -- no logic, no gating
+ *   and no tier boundary moved. Reasoning in js/auth.js v2.
+ *
  * 11 Aug 2026 v1
  *
  * WHY THIS EXISTS
@@ -123,7 +129,7 @@ export function CommunityImpactView(container) {
           </div>
           <div class="ci-breakdown__row">
             <dt>Credits per session</dt>
-            <dd>${perSession}${tier === 'free' ? ' (Free)' : ' (Personal)'}</dd>
+            <dd>${perSession}${tier === 'free' ? ' (Free)' : ' (Plan)'}</dd>
           </div>
           <div class="ci-breakdown__row ci-breakdown__row--total">
             <dt>Your total</dt>
@@ -131,7 +137,7 @@ export function CommunityImpactView(container) {
           </div>
         </dl>
         <p class="ci-breakdown__note">
-          One credit per completed session, two on the Personal tier. Sessions
+          One credit per completed session, two on the Plan. Sessions
           you started and did not finish do not count &mdash; and neither does
           anything you did before credits were switched on.
         </p>

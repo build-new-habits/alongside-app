@@ -1,6 +1,16 @@
 /**
  * js/auth.js - Tier-Gating Helpers
  *
+ * 18 Aug 2026 v2
+ *
+ * v2 - NAME-1. The paid tier is "the Plan", product-wide. Graeme's
+ *   decision, 18 Aug, after Apollo was retired: it carried the
+ *   idealised-male-body association that this product exists to refuse,
+ *   in a product for people that standard has failed. "Premium" was
+ *   rejected for the opposite reason -- it frames free as the deficient
+ *   version, when the boundary document has free "complete in itself
+ *   and limited in scope".
+ *
  * 03 Aug 2026 v1
  *
  * CHANGELOG
@@ -86,14 +96,30 @@ export function isAthlete() {
  * aria-hidden) — the wrapper is the interactive element, not its contents.
  *
  * @param {string} html    - the feature HTML to show, dimmed, underneath
- * @param {string} tier    - "personal" | "athlete" - which plan unlocks it
+ * @param {string} tier    - "personal" | "athlete" - which plan unlocks it.
+ *                           "personal" renders as "Plan" (NAME-1).
  * @param {string} context - short description for the aria-label, e.g.
  *                            "30-day progress charts". Optional but should
  *                            be included whenever the wrapped feature
  *                            isn't self-explanatory from its own markup.
  */
 export function lockedFeature(html, tier = "personal", context = "") {
-  const label = tier === "athlete" ? "Athlete" : "Personal";
+  // NAME-1, 18 Aug 2026. The paid tier is "the Plan". "Personal" is
+  // retired product-wide -- the possessive collision Graeme named ("to
+  // you and me that's the tier, but 'that's personal' reads as 'you
+  // shouldn't ask me that'"), and it appeared on every locked surface
+  // in the product while the tier boundary document said the tier name
+  // belongs on the pricing page and the account screen only.
+  //
+  // "Plan" costs nothing to learn: it is already the word doing the
+  // work in every piece of copy written for this boundary. "Free is the
+  // session, the Plan is the plan" is the same sentence it always was.
+  //
+  // The "athlete" branch is UNCHANGED and deliberately so: no call site
+  // in js/ passes it -- grepped, not assumed -- so renaming it would be
+  // inventing a name for a tier with no surface. 🟠 Open when Athlete
+  // gets one.
+  const label = tier === "athlete" ? "Athlete" : "Plan";
   const desc  = context ? `${context} — ` : "";
   return `
     <div class="locked-feature-wrap"
@@ -101,7 +127,7 @@ export function lockedFeature(html, tier = "personal", context = "") {
          data-locked-tier="${tier}"
          role="button"
          tabindex="0"
-         aria-label="${desc}${label} plan feature — tap to learn more">
+         aria-label="${desc}part of the ${label} — tap to learn more">
       <div class="locked-feature-inner" aria-hidden="true">
         ${html}
       </div>

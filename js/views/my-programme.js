@@ -1,6 +1,12 @@
 /**
  * my-programme.js - My Programme
  *
+ * 18 Aug 2026 v5
+ *
+ * v5 - NAME-1. The paid tier is "the Plan", not "Personal".
+ *   Graeme's decision, 18 Aug. Copy only -- no logic, no gating
+ *   and no tier boundary moved. Reasoning in js/auth.js v2.
+ *
  * 17 Aug 2026 v4
  *   TARGET-3. The event section read strategicGoal.targetDate, which
  *   nothing writes; onboarding writes the TOP-LEVEL targetDate. Reads
@@ -117,7 +123,7 @@ export function MyProgrammeView(router) {
       _thisWeeksFocus(),
       _theArc(),
       _whatYoureAimingAt(),
-      _whatPersonalAdds()
+      _whatThePlanAdds()
     ].filter(Boolean);
 
     container.innerHTML = `
@@ -425,7 +431,7 @@ export function MyProgrammeView(router) {
    * listener initPaywallListener() wires once in app.js -- nothing to
    * wire here, which is the whole point of the shared component.
    */
-  function _whatPersonalAdds() {
+  function _whatThePlanAdds() {
     if (isPremium()) return null;
 
     // Data first. Somebody who already has these needs no preview of
@@ -447,7 +453,7 @@ export function MyProgrammeView(router) {
       .map(r => `<p class="my-programme-line my-programme-line--soft">${_esc(r)}</p>`)
       .join('');
 
-    return _section("What Personal adds",
+    return _section("What the Plan adds",
       lockedFeature(preview, 'personal', "My Programme"));
   }
 
