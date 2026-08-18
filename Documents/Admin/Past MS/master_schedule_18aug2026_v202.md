@@ -1,56 +1,8 @@
 # Alongside: Move — Master Schedule
-## 18 Aug 2026 v203
+## 18 Aug 2026 v202
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_18aug2026_v202.md`. Remove v202 on upload.
-
-> ### 🟢 PRICE-2 — PRICING SETTLED AND SHIPPED, 18 Aug. `alongside-v386`. **74 gates green.**
->
-> #### Decided by Graeme
->
-> | | |
-> |---|---|
-> | **Monthly** | **£7.99 flat from day one.** No introductory rate. |
-> | **Annual** | **£59.99 from launch.** No expiry date. |
-> | **Beta** | **£44.99, December 2026 only**, locked permanently once taken. |
-> | **Year 2** | **Deferred to Year 2**, decided on real data. |
-> | **Trial** | 🟠 **Length still open** — 30 days recommended, 14 under consideration. Sole placeholder in the ToS. |
->
-> **Why £59.99 and not £49.99.** £7.99 × 12 = £95.88, so £49.99 was a **48% discount** against a more typical 15–20%. £59.99 is still 37% off and is **exactly £5 a month**, a line somebody repeats out loud. The settling argument is **grandfathering**: nobody's rate ever rises, so every price set now is set *permanently* for the cohort that matters most. Discounts can always be added later; the rate cannot be raised. **£44.99 beta keeps the tester rate under fifty while standard sits above it** — that threshold does real work.
->
-> **Why the intro rate is gone.** It removed risk at the point of decision and paid for it with a **60% price rise at month four**, in the window where people are most likely to leave. A trial does the same job at no cost and creates no price rise.
->
-> #### 🔴 A LEGAL POINT THAT NEEDS NATALIE — the trial and the cooling-off period
->
-> Graeme proposed 14 days trial plus statutory rights "which works out at 30 days". **It does not.** Under the CCRs the 14-day period runs from **the day the contract is concluded** — signup — not from first payment. On a trial converting at day 15, **the statutory right has already expired at the moment of the first charge.** Charging on the day the cancellation right lapses is a pattern consumer bodies take an interest in.
->
-> **Not legal advice and must not be treated as settled.** Written into ToS v3 as a bracketed question for Natalie, with a proposed fix: a **voluntary 14-day full refund running from FIRST PAYMENT**, in addition to the statutory right.
->
-> #### 🟠 The hybrid was argued against and dropped
->
-> Graeme's "14-day trial then 50% refund for the second 30 days" was **rejected, with reasons**: it reintroduces both things the trial removes — real cash exposure and manual partial-refund admin — and adds a rule nobody can hold in their head. A 50% offer also reads as haggling, which is off-register. **Pick one instrument.**
->
-> #### Shipped
->
-> `upgrade.js` **v9** — `PRICE_ANNUAL` £49.99 → £59.99; `ANNUAL_LIMIT` and the "rate holds until November" line **retired**, since nothing expires now. `settings.js` **v30** — **published £49.99 in prose**, a second copy of a number `upgrade.js` holds in a constant precisely so it exists in one place. 🟠 It should read the constant; the duplication is the fault and the wrong figure only its symptom. `sw.js` **v386**. Website `upgrade/index.html` **v13**, plus a **stale header note** that still described the £4.99 intro and a Year 2 rise as current.
->
-> **ToS v3** — intro removed, trial section added, £44.99 December-only, rate-never-rises made explicit, two bracketed questions for Natalie. **Pricing model v3** — section 1 restructured with the reasoning; **sections 2–5 projections NOT recomputed and flagged stale.** 🟠 Break-even and revenue scenarios need rerunning at £7.99/£59.99 before being quoted anywhere. **`Bnh portfolio.html` banded `SUPERSEDED PRICING`** rather than edited — correcting it would produce projections nobody has recomputed, which is worse than one plainly stale.
->
-> #### 🟢 `verify-price.mjs` — the gate offered on 13 Aug, now built, and it found something on day one
->
-> **`settings.js`'s £49.99 was found by the sweep, not by anybody looking.** Six checks. Truth is `upgrade.js`'s constants; everything else in the repo must agree or **carry a visible `SUPERSEDED PRICING` banner** — the mechanism is deliberately narrow so it cannot become a way to silence the gate by accident.
->
-> **The reversal test found a real gap in the gate itself.** Reverting `settings.js` to £49.99 went **undetected**, because £49.99 had just been removed from the retired list for being the live **Community org Year 2** rate. So the sweep could not catch the exact regression it had found ten minutes earlier. **Check 6 asserts the pair instead** — wherever the monthly price is quoted beside an annual figure, that figure must be the live one. Caught on re-run. **A gate that has never been made to fail proves nothing, and this one proved it about itself.**
->
-> #### 🆕 `RATE-1` note added
->
-> Graeme's clarification accepted: **"the coach" is his shorthand for the app**, not a push against P1/P2. The architectural distinction stands — billing speaks in the P2 helper layer — but it does not need restating each time he uses the shorthand.
->
-> #### 🔴 UNCHANGED BLOCKER
->
-> **Stripe needs a business bank account, which needs HMRC sole trader registration.** Trial mechanics, `RATE-1`, refunds and every price above are all downstream of it. **The pricing design has not been the constraint for some time.**
->
-> ---
+Supersedes `master_schedule_18aug2026_v201.md`. Remove v201 on upload.
 
 > ### 🟠 PRICING — decisions taken 18 Aug, docs NOT yet updated
 >
@@ -3789,4 +3741,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v203*
+*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v202*
