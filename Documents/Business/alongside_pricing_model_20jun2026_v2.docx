@@ -1,6 +1,6 @@
-18 Aug 2026 v4
+18 Aug 2026 v5
 
-*Supersedes 20 Jun 2026 v2. Section 1 restructured; sections 2-5 projections NOT recomputed and are stale — see the note under the table.*
+*Supersedes 20 Jun 2026 v2. Section 1 restructured (v3/v4). Section 2 break-even RE-FORECAST at the new prices, with two new sub-sections on churn-adjusted lifetime value and year-one cash (v5). Sections 3-5 scenario projections remain stale and are flagged in place.*
 
 
 **Alongside: Move**
@@ -56,16 +56,49 @@ Build New Habits Ltd — 20 Jun 2026 v2 (5 scenarios, 4-year model)
 
 ## **2.2 Break-Even**
 
-| **Route** | **Users needed** | **Net per user** | **Notes** |
-| --- | --- | --- | --- |
-| Monthly @ £7.99 | 267 user-months | £7.76 | e.g. 89 users × 3 months |
-| Annual launch @ £49.99 | 41 users | £48.54 | Very achievable within beta conversion alone. |
-| Annual standard @ £59.99 | 34 users | £58.25 | Lowest user count to break even. |
-| Beta annual @ £39.99 | 52 users | £38.83 |  |
-| Community org @ £39.99 | 52 users | £38.83 |  |
-| **Mixed (most likely)** | **35–55 users** | Blended | Realistic mix of all tiers. |
+**RE-FORECAST, 18 Aug 2026 (v4).** Recomputed at £7.99/£59.99 with the 30-day free trial. Stripe fees 2.9% + 30p applied per transaction. Startup £1,974 plus £408 first-year running costs (£34/month) = **£2,382 to cover in year one.**
 
-*Break-even is a low bar. 34–55 paying users covers the entire £2,000 startup cost. Monthly churn is the real financial risk — not the initial investment.*
+| **Route** | **Net per transaction** | **Users to cover £2,382** | **Notes** |
+| --- | --- | --- | --- |
+| Annual @ £59.99 | £57.95 | **42** | Single payment. Lowest count. |
+| Beta annual @ £44.99 | £43.39 | 55 | December 2026 cohort only. |
+| Community org Y1 @ £39.99 | £38.53 | 62 | Unique code per organisation. |
+| Community org Y2+ @ £49.99 | £48.24 | 50 | |
+| Monthly @ £7.99 | £7.46 | 320 user-months | 11 paid months in year one — the trial takes the first. |
+| **Blended 60/40 annual/monthly** | **£67.59 per user, year one** | **36** | The realistic figure. |
+
+**Break-even is 36 paying users in year one, up from the 34–55 previously stated.** The number barely moves despite a £10 rise on the annual, because the old table omitted running costs entirely and the trial removes one paid month from every monthly subscriber. **The two changes very nearly cancel out — worth knowing, because a £10 price rise looks like it should have moved this and it did not.**
+
+## **2.3 Churn-adjusted lifetime value — NEW, 18 Aug 2026**
+
+The old model's own conclusion was that **monthly churn, not acquisition, is the real financial risk**, and then never modelled it. Corrected here. A 30-day trial means every monthly subscriber's first month is unpaid.
+
+| **Monthly churn** | **Expected life** | **Paid months** | **Lifetime value** |
+| --- | --- | --- | --- |
+| 4% | 25 months | 24 | £179 |
+| **6% (model assumption)** | **16.7 months** | **15.7** | **£117** |
+| 8% | 12.5 months | 11.5 | £86 |
+| 10% | 10 months | 9 | £67 |
+
+Annual at 70% renewal: **£193 lifetime**. Blended 60/40 at 6% churn: **£163 per user**, so on a lifetime basis break-even is **15 users**.
+
+**The gap between 36 and 15 is the whole point.** Break-even on *cash in year one* needs more than twice the users of break-even on *lifetime value*, and only the first number pays any bills. **Every scenario below should be read as cash, not LTV.**
+
+## **2.4 Year-one cash, by user count — NEW, 18 Aug 2026**
+
+Blended 60/40, one annual payment or eleven monthly payments per user.
+
+| **Paying users** | **Year-one cash** |
+| --- | --- |
+| 25 | £1,690 |
+| 36 | £2,382 — break-even |
+| 50 | £3,379 |
+| 100 | £6,759 |
+| 200 | £13,517 |
+
+**Sobering and worth stating plainly: 200 paying users is roughly £13,500 of year-one cash.** That is a real and achievable outcome for a first year, and it is not a salary. The model's existing £50,000 review trigger sits at roughly **740 paying users**. Nothing in this changes whether the product is worth building; it changes what "success in year one" should be taken to mean.
+
+**🟠 What this re-forecast does NOT do.** Sections 3–5's five scenarios still carry the old prices and the old assumptions, including a "revenue starts November 2026" line that the 13 Aug correction already withdrew. They are **not recomputed here** and should not be quoted. Recomputing them needs the conversion-rate assumptions revisited too, which is a separate piece of work and needs beta data to be worth doing.
 
 # **3. Shared Modelling Assumptions**
 

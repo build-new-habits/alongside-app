@@ -2,6 +2,14 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
+ * 18 Aug 2026 v1.14
+ *   SLEEP-1. generateRationale() claimed "I have adjusted for your poor
+ *   sleep last night" when nothing had. sleepQuality is read in exactly
+ *   one place in the app -- that sentence -- and reaches no intensity,
+ *   filter or duration logic anywhere. The claim is removed. Whether
+ *   poor sleep SHOULD lighten a session is SLEEP-2, for the physio
+ *   pack. See the block comment at the removal site.
+ *
  * 11 Aug 2026 v1.14
  *
  * v1.14 — PT-2 (Persona Tracing Wave 1). getUserProfile()'s fitnessLevel
@@ -1168,9 +1176,32 @@ export const workoutGenerator = {
     };
     if (focusExplanations[focus]) parts.push(focusExplanations[focus]);
 
-    if (checkin?.sleepQuality === "poor") {
-      parts.push("I have adjusted for your poor sleep last night.");
-    }
+    // SLEEP-1, 18 Aug 2026. This line has been REMOVED, not reworded.
+    //
+    // It said "I have adjusted for your poor sleep last night." Nothing
+    // adjusted. sleepQuality is written by checkin.js, stored by
+    // data/checkin.js, and read in exactly ONE place in the entire
+    // app -- here, to produce that sentence. It reaches no intensity
+    // calculation, no exercise filter, no duration cap, and
+    // detectBurnout() does not look at it either.
+    //
+    // Same fault class as onUnmount's missing caller and the Library
+    // route that exercises/index.js claimed for the 28 practices, with
+    // one difference that matters more than all of it: those were
+    // comments lying to developers. This was the COACH lying to the
+    // person, in the coach's own voice, about having done something for
+    // them. P4 says the coach displays and never interprets; claiming an
+    // adaptation that did not happen is worse than either.
+    //
+    // Removed rather than wired, because whether poor sleep should
+    // genuinely lighten a session is a clinical-ish product decision and
+    // belongs in the physio pack, not in a same-day fix. Logged as
+    // SLEEP-2. Until then the coach says nothing about sleep, which is
+    // true.
+    //
+    // The check-in still ASKS about sleep on the full path, and the
+    // answer is still stored -- see the master schedule entry for why
+    // that is deliberate and not an oversight.
 
     // Strategic connection line (v1.1) — v1.9: guarded, see changelog above.
     if (typeof programmeEngine.getStrategicRationale === "function") {

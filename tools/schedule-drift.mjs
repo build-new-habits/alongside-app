@@ -1,5 +1,12 @@
 /**
  * tools/schedule-drift.mjs
+ * 18 Aug 2026 v2
+ *
+ * v2 - Header/footer version agreement on master_schedule.md. v141
+ *   recorded the drift and wrote a rule against it; the rule was then
+ *   broken twice by sessions that could read it. Enforced rather than
+ *   restated.
+ *
  * 12 Aug 2026 v1
  *
  * SCHEDULE-DRIFT GATE.
@@ -22,6 +29,38 @@
  * asserts are dead, and reports any that are demonstrably alive.
  */
 import fs from "node:fs";
+
+// ── HEADER / FOOTER AGREEMENT, added 18 Aug 2026 ─────────────────────
+//
+// v141 recorded this fault and wrote the rule: header and footer must be
+// updated together at every session close. The rule has since been
+// broken TWICE by sessions that could read it -- on 18 Aug the file
+// opened with header v199 and footer v197.
+//
+// A rule in a document does not enforce itself. This does.
+//
+// Runs FIRST and exits on failure. The first placement of this block
+// landed inside a conditional failure branch, so it would only ever
+// have run on days something else was already wrong -- a check that
+// cannot fire is worse than no check, because it looks like coverage.
+{
+  const ms = fs.readFileSync(
+    new URL('../Documents/Admin/master_schedule.md', import.meta.url), 'utf8');
+  const headerV = ms.match(/^##\s+\d{1,2} \w{3} \d{4} (v\d+)/m);
+  const lines   = ms.trimEnd().split('\n');
+  const footerV = lines[lines.length - 1].match(/(v\d+)\*?\s*$/);
+  const ok = !!headerV && !!footerV && headerV[1] === footerV[1];
+
+  console.log(`  ${ok ? 'PASS' : 'FAIL'}  master schedule header and footer state the same version` +
+    (ok ? ` (${headerV[1]})`
+        : ` -- header ${headerV ? headerV[1] : 'unreadable'}, footer ${footerV ? footerV[1] : 'unreadable'}`));
+
+  if (!ok) {
+    console.log('\n  Both must be updated together at session close. See master schedule v141.\n');
+    process.exit(1);
+  }
+}
+
 import path from "node:path";
 
 const SCHEDULE = "Documents/Admin/master_schedule.md";
