@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 18 Aug 2026 v384
+ * NAME-1. The paid tier is "the Plan", not "Personal" — Graeme's
+ * decision, 18 Aug. Copy across nine files plus the shared
+ * lockedFeature() component. No logic, no gating and no tier boundary
+ * moved. Cache bumped so installed clients stop showing two names for
+ * one tier. No new app files.
+ *
  * 18 Aug 2026 v383
  * Device-check round, 18 Aug. Five items from Graeme's on-device pass:
  * TIER-G (build-mode step ungated), TIER-H ("At home" locked whole
@@ -2667,7 +2674,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v383";
+const CACHE_NAME = "alongside-v384";
 
 const SHELL_URLS = [
 
