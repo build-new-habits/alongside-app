@@ -1,72 +1,8 @@
 # Alongside: Move — Master Schedule
-## 18 Aug 2026 v207
+## 18 Aug 2026 v206
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_18aug2026_v206.md`. Remove v206 on upload.
-
-> ### 🔵 REVENUE ARCHITECTURE — the boundary moves, and this time it is written down
->
-> **New governing document: `Documents/Business/alongside_revenue_architecture_18aug2026_v1.md`.** Read it before any session touching tiers, pricing or the paid spine. It supersedes **section 4** of the tier boundary document.
->
-> #### 🔴 FIRST, THE PROCESS FAILURE, because it is the reason this entry exists
->
-> A decision was taken on 18 Aug — self-direction moves to free, the arc is the paid act — and **it never reached the repository.** No document, no schedule entry, nothing in `Documents/`. **v196 to v206 then shipped on top of the superseded boundary**, and a later session reading the repo correctly reported the old boundary as live, because it was.
->
-> **A decision that lives only in a conversation has not been taken.** Same fault class as `onUnmount` and `sleepQuality`, moved up a level: there, code claimed something no caller performed; here, a decision claimed a status no artefact carried.
->
-> #### 🟢 THE BOUNDARY — Free is today. The Plan is the arc.
->
-> Graeme's anecdote, 18 Aug. The Tuesday-night drop-in at his daughter's athletics club gets a real coach, real direction, and on a second visit *"oh, hello — same as last time, or something different?"* **What he never gets is somebody holding the arc.** Anna's coach holds her history, her injuries, her goals and the hard conversations. **Two coaching relationships, neither lesser.**
->
-> **Self-direction moves to FREE.** It is an accessibility feature. Charging for it penalises the person mainstream fitness culture already fails worst — the one who knows their own body better than the default does. The old gates charged for **CONTROL**: traced across personas, the people served best never met that paywall, and the people who would pay for control hit a library that is 393/551 at difficulty 1–2. **Charging the wrong people for the wrong thing.**
->
-> #### 🔴 THE COMMERCIAL FINDING — staying and paying are different questions
->
-> **The relationship is why people STAY. It cannot be why they PAY**, because at day nine they do not have one. The tier document already recorded this — *97% gone before day 30* — and it is the reason "sell the relationship" fails as a conversion argument however true it is as a retention one.
->
-> **The resolution is in the anecdote itself.** What separates Anna from the drop-in is not accumulated data; it is that she **named a destination**, and the instant she did, the coach could say things it could not before. That is a **state change in one conversation, not a slow accrual.** So: **do not sell the relationship, demonstrate its shape** — naming a destination must visibly change what the coach can say on the next screen, not in six weeks.
->
-> #### 🔴 R1 — THE HARD CONVERSATION IS THE MONEY, AND IT IS ZERO LINES OF CODE
->
-> Graeme's most distinctive capacity — *"if we're not on course, the coach would tell us, and we readjust the plan"* — **does not exist.** Ground-truthed: `strategicGoal.targetDate` is written by onboarding, stored by `store.js` v54, rendered by `my-programme.js` and `today.js`, and **compared to progress by nothing anywhere.** No off-course detection, no renegotiation, no path to moving a date.
->
-> Full spec in the revenue document §4. **The safety half outweighs the feature**: every suppression condition (Care Mode, burnout, pain band, low mood or energy) blocks it, because telling somebody in burnout they are off course is exactly the harm this product exists to refuse. **Three options always, and "leave it where it is" must be a real, unnagged, unstyled-as-lesser choice.**
->
-> **`verify-hard1.mjs` MUST EXECUTE, NOT GREP.** This is precisely the class SWEEP-1 named: 43 of 77 gates are source-text only, and code that is present, correct and unreachable passes every one of them.
->
-> #### 🟢 PRICING — CLOSED, and there was never a conflict
->
-> **Launch is 1 January 2027**, so *"£59.99 from launch"* and *"£59.99 from January"* name the same date. The app, the schedule and the ToS agree. **£44.99 is a Stripe coupon** — December 2026, beta cohort, locked once taken — and **stays out of the app entirely**: no constant, no view, no date logic. It is what a set of accounts is charged, which is Stripe's job.
->
-> 🟠 **Brief changed, recorded rather than smoothed over.** The earlier 18 Aug note said the month-six offer must be framed *"as a longer relationship, never as a saving"*. **Graeme's later instruction supersedes it: the saving is the honest thing and it is stated.** Still the P2 helper layer, never coach voice — no *"I've noticed"*.
->
-> **The line worth protecting through review:** *"If you think you might stop before the year is out, stay monthly. It will cost you less."* It loses money on paper and earns the pub sentence, which is the only channel this business can afford.
->
-> 🟠 **£44.99-forever has no cohort cap** — December bounds who can take it, nothing bounds how long it runs.
->
-> #### Build order — R1 to R4 are buildable now, R5 is not
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **R1** | The hard conversation — `store.js` v55, `Schema.md` v1.37, detection, suppression, three options, `verify-hard1` | 🔵 Specified | w/c 24 Aug |
-> | **R2** | The naming moment — demonstration at onboarding. **Ground-truth `goal-setup.js` first** | 🔵 Specified | w/c 24 Aug |
-> | **R3** | Recognition without an arc, in free — *"same as last time?"*. Reads **one** log entry, never a pattern | 🔵 Specified | w/c 24 Aug |
-> | **R4** | Self-direction to free — **document → gate → code**, in that order | 🔵 Specified | w/c 24 Aug |
-> | **R5** | Stripe | 🔴 Blocked on HMRC | Blocked |
-> | **R6** | Month-six annual offer | 🔵 Specified, blocked on R5 | After R5 |
->
-> **R4 order is non-negotiable.** `verify-tier.mjs` names §4 of the tier boundary document as its source of truth, so code first leaves a gate defending a claim the product no longer makes. And **TIER-B's replacement must not be a smaller floor** — `tags >= 11` can be satisfied by the wrong eleven. Name what stays paid, assert the absence on what moved.
->
-> #### 🟠 FOUR DECISIONS OPEN FOR GRAEME
->
-> 1. Personal bests (`session-log.js` `bestLine()`) — **recommend free**
-> 2. Data export (`progress.js`) — **recommend free**
-> 3. Cohort cap on £44.99 — **recommend capping**
-> 4. Does the *"stay monthly"* line survive? — **recommend keeping it**
->
-> **No code shipped this session.** Documents only; `sw.js` untouched, still v388, `alongside-v388`.
->
-> ---
+Supersedes `master_schedule_18aug2026_v205.md`. Remove v205 on upload.
 
 > ### 🟢 SWEEP-1 and ATHLETE-RETIRE — `alongside-v388`. **77 gates green on a fresh clone.**
 >
@@ -3983,4 +3919,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v207*
+*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v206*
