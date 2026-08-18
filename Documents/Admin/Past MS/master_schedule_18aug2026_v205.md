@@ -1,52 +1,8 @@
 # Alongside: Move — Master Schedule
-## 18 Aug 2026 v206
+## 18 Aug 2026 v205
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_18aug2026_v205.md`. Remove v205 on upload.
-
-> ### 🟢 SWEEP-1 and ATHLETE-RETIRE — `alongside-v388`. **77 gates green on a fresh clone.**
->
-> #### 🟢 SWEEP-1 — the gate suite audited, and the finding is about DIRECTION
->
-> New **`tools/audit-gate-proxies.mjs`**, permanent and re-runnable. **Exits 0 always and deliberately does not fail a build**: a regex cannot tell a proxy from a property, and a script that guessed would manufacture exactly the false confidence it exists to remove. Triage of the first full pass is written into the file.
->
-> **THE FINDING, and it is worth carrying beyond this project: a POSITIVE distance window fails loudly when the gap grows. A NEGATIVE one goes SILENTLY GREEN the moment the thing it forbids drifts past the limit.** One added comment above a `.sort()` call would have disarmed `verify-delight` permanently, with nothing to see. **Positive windows are a nuisance. Negative windows are a false floor.**
->
-> All four negatives fixed and reversal-tested: `verify-delight` (HOME_DOORS never reordered → bracket-matched region), `verify-pb1` (personal best never emphasised → the rule block), `verify-door1` (In Step never gated → no `isPremium` in live code at all), `verify-quick3` (mine, written the same morning I found the fault in two others).
->
-> 🟡 **`verify-delight`'s first replacement sliced to the wrong closing bracket and produced a false FAIL.** The array closes on an indented `  ];`. Seed wrong, app right, bracket-matched and noted in place.
->
-> **NOT fixed, deliberately.** `verify-c2`'s `REHAB.size === 94` and `verify-empathy`'s `n === 33` read as magic numbers and are not — both are tripwires forcing human re-triage of a safety classification, and both say so in their own comments. **Changing them to floors would have removed a deliberate control.**
->
-> #### 🔴 THE STRUCTURAL FINDING — 43 of 77 gates are SOURCE-TEXT ONLY
->
-> For a copyright rule or a precache list that is correct; there is no runtime to execute. **For any gate asserting BEHAVIOUR it is the `onUnmount` fault waiting to happen** — the code is in the file, the gate passes, and nobody asks whether a person can reach it. **This is now the largest outstanding QA job in the project** and is not a one-session task. Start with `verify-door1` and `verify-tier`; both assert routing.
->
-> #### 🟢 ATHLETE-RETIRE — Graeme's call, confirmed 18 Aug
->
-> The tier granted **nothing** beyond the Plan anywhere — same credits, same export — with **no entry route, no content and no price**. An enum value with a dev switcher pointing at it.
->
-> **The load-bearing part was not the deletion, it was the migration.** `store.js` read `tier: saved.tier || 'free'` with **no validation**, so the moment "athlete" stopped counting as paid, anybody holding it would have **silently dropped to free** — losing the Plan, their second impact credit and their export, with nothing on screen to explain it. **Graeme's own device could hold it: the dev switcher wrote that value and nothing else ever did.** `store.js` **v54** carries a one-way migration, athlete → personal. **A retirement must never take something from somebody who did nothing wrong.**
->
-> Also: `auth.js` **v3** (`isAthlete()` removed — no callers anywhere, which is the whole story of that tier: a predicate nothing asked, for a state nothing granted), `progress.js` **v9**, `community-impact.js` **v3**, `settings.js` **v32**, `field-contract.js`, `Schema.md` **v1.36**, `sw.js` **v388**.
->
-> #### 🟢 The contract gained a concept, rather than an exemption
->
-> `verify-contract` **correctly went red** on the migration. Its rule — *no comparison against a value the field cannot hold* — is right, and **a migration is the one place it must not apply**, because recognising an invalid value is the entire point.
->
-> `field-contract.js` now has a **`retired`** list, and the gate honours it. **Declaring beats exempting the file:** an exemption for `store.js` would have hidden every future undeclared comparison in it too, and this way the retired value stays visible and documented.
->
-> #### 🟡 Two seed faults, and the second is the instructive one
->
-> `verify-athlete-retire` first wrote to the wrong `localStorage` key, and **every** tier came back free. **Check 3 — "a free user is untouched" — passed throughout, because free is the default and a broken seed produced the right answer for the wrong reason.** That is the seed fault in its most dangerous form: a green result. The key is now read from `store.STORAGE_KEY` rather than typed.
->
-> #### 🟡 A force-push happened, and it should be on record
->
-> Backticks in a commit message were **shell-expanded** — the `free` command ran and its output was spliced into the middle of the migration explanation, the most important sentence in the commit. A `--amend` intended to fix it landed on the **wrong commit**, giving `sw.js` the ATHLETE-RETIRE message.
->
-> Resolved by resetting both commits and recommitting with `-F` message files, then **`--force-with-lease`**. **The tree was confirmed byte-identical to what had already been pushed before forcing — only the messages differed.** Solo repo, no collaborators, low risk, but recorded rather than passed over. **Lesson: commit messages go in a file, never inline with backticks.**
->
-> ---
+Supersedes `master_schedule_18aug2026_v204.md`. Remove v204 on upload.
 
 > ### 🔴 PICK UP HERE — 18 Aug, third block. `alongside-v387`. **75 gates green on a fresh clone.**
 >
@@ -3919,4 +3875,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v206*
+*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v205*
