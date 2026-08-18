@@ -1,6 +1,19 @@
 /**
  * settings.js
- * 18 Aug 2026 v30
+ * 18 Aug 2026 v31
+ *
+ * v31 - COACH-TILE. New "Your Coaching" row on the Settings landing,
+ *   holding capability, the two preference controls and the
+ *   reflection -- all three lifted out of Profile unchanged. The
+ *   landing had three rows and a screen of empty space while the
+ *   controls that decide what the coach puts in front of somebody sat
+ *   below their name and age band.
+ *
+ *   PRICE-2 follow-up: the annual price now reads the constant rather
+ *   than repeating the number in prose. Logged as 🟠 in v30 and done
+ *   here rather than left -- a price that exists twice is a price
+ *   that goes wrong in one place, which is exactly how v30 happened.
+ *
  *
  * v30 - PRICE-2. The annual price said £49.99. Found by the new
  *   verify-price.mjs sweep on the day it was written, not by anybody
@@ -348,6 +361,7 @@
  */
 
 import { store }          from '../store.js';
+import { PRICE_MONTHLY, PRICE_ANNUAL } from "../data/pricing.js";
 import { GOAL_CATEGORIES, getGoalLabel } from '../data/goals.js';
 import { getProgramme, PROGRAMMES }      from '../data/programmes.js';
 import { getProgressStats }              from '../data/programmeEngine.js';
@@ -442,6 +456,7 @@ export function SettingsView(router) {
     "about-plan":  "Plan",
     "about-app":   "App",
     "about-data":  "Data",
+    coaching:      "Coaching",
   };
 
   // NAV-7. Which sub-tab is open, per section. Resets when the section
@@ -480,6 +495,23 @@ export function SettingsView(router) {
       panels: ['profile', 'conditions', 'equipment', 'display'],
     },
     {
+      // COACH-TILE, 18 Aug 2026. Graeme, on device: the Settings landing
+      // has "loads of space" and these controls were buried three levels
+      // down inside Profile, underneath name and age band.
+      //
+      // They are the highest-value controls in the product -- capability
+      // decides what the coach will and will not put in front of you,
+      // and the two preference controls decide how much a session
+      // changes and how much the coach asks before one. Filing them
+      // under "Profile" made them read as personal details rather than
+      // as the dials they are, which is the same findability fault NAV-5
+      // fixed for session notes.
+      id: 'coaching',
+      label: 'Your Coaching',
+      sub: 'What your body can do, how sessions are built, and your reflection',
+      panels: ['coaching'],
+    },
+    {
       id: 'about',
       label: 'About',
       sub: 'The story behind Alongside, policies and your plan',
@@ -497,6 +529,7 @@ export function SettingsView(router) {
     { id: 'display',     label: 'Display'     },
     { id: 'about',       label: 'About'       },
     { id: 'about-plan',  label: 'Your plan'   },
+    { id: 'coaching',    label: 'Your Coaching' },
   ];
 
   // v11 — My Movement rebuild. Matches store.js's movementIdentity
@@ -596,6 +629,7 @@ export function SettingsView(router) {
   function renderPanel(tabId) {
     switch (tabId) {
       case 'profile':    return renderProfilePanel();
+      case 'coaching':   return renderCoachingPanel();
       case 'programme':  return renderProgrammePanel();
       case 'conditions': return renderConditionsPanel();
       // NAV-5. Session notes is its own panel now, not a lodger in
@@ -694,7 +728,24 @@ export function SettingsView(router) {
         </button>
 
         ${renderMovementSection()}
+      </div>
+    `;
+  }
 
+  // ── Your Coaching panel (COACH-TILE, 18 Aug 2026) ──────────────────────────
+  //
+  // Three sections lifted out of Profile unchanged. Not rewritten, not
+  // re-ordered, not restyled -- the copy in each was reviewed and this
+  // move is about WHERE they live, not what they say. Movement identity
+  // stays in Profile: it is a fact about you, like your age band, not a
+  // dial the coach reads before building a session.
+  //
+  // The save handlers are delegated on the container and keyed on
+  // data-action, so they follow the markup without change -- confirmed
+  // by reading the handler switch, not assumed.
+  function renderCoachingPanel() {
+    return `
+      <div class="settings-section">
         ${renderCapabilitySection()}
 
         ${renderPreferencesSection()}
@@ -1523,10 +1574,13 @@ export function SettingsView(router) {
    *
    * Price is stated here as well as on the upgrade page. Somebody deciding
    * whether to look should not have to visit the sales screen to find out
-   * the number. Source: alongside_pricing_model_20jun2026_v2.docx section
-   * 1, confirmed by Graeme 13 Aug 2026. The launch annual rate is
-   * time-limited and says so -- an honest limit, stated upfront, is the
-   * standing rule for this and it is not an urgency mechanic.
+   * the number.
+   *
+   * PRICE-3, 18 Aug 2026: it is now IMPORTED from js/data/pricing.js, not
+   * typed. It used to be typed, and on 18 Aug it still said £49.99 three
+   * hours after the annual price changed. Nothing here is time-limited
+   * any more -- Year 2 pricing is deferred to Year 2, so there is no
+   * expiry to state.
    */
   function renderPlanPanel() {
     const tier      = store.get('tier') || 'free';
@@ -1578,7 +1632,7 @@ export function SettingsView(router) {
           </div>
 
           <div class="settings-plan-block">
-            <p class="settings-plan-price">£7.99 a month, or £59.99 for the year.</p>
+            <p class="settings-plan-price">${PRICE_MONTHLY} a month, or ${PRICE_ANNUAL} for the year.</p>
             <p class="text-sm text-muted">
               The yearly rate holds until the end of November 2026. No
               contract either way, and nothing is lost if you change your

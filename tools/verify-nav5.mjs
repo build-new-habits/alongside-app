@@ -26,19 +26,35 @@ const eq = (a, b, m) => { if (a !== b) throw new Error(`${m}\n        got: ${a} 
 const s = fs.readFileSync("js/views/settings.js", "utf8");
 
 console.log("\nTEST 1 - three sections, Graeme's grouping");
-check("exactly three", () => {
+// 18 Aug 2026 (COACH-TILE). Was eq(ids.length, 3). A fourth row was
+// added and this went red -- correctly, it caught the change. But
+// "exactly three" was never the property. The reasoning in this file's
+// own header is "nothing scrolls, so nothing hides", which is a CEILING,
+// not a count. Four rows do not scroll on a phone; the landing had a
+// screen of empty space below three.
+//
+// So it now asserts the ceiling and the required ids. A fifth row still
+// passes; a sixth does not, and by then somebody should be asked.
+check("few enough rows that nothing scrolls", () => {
   const ids = [...s.matchAll(/^\s{6}id: '(\w+)',\n\s+label: '/gm)].map(m => m[1]);
-  eq(ids.length, 3, `sections: ${ids.join(", ")}`);
-  for (const want of ["controls", "settings", "about"])
+  ok(ids.length <= 5, `sections: ${ids.join(", ")} — the landing must not scroll`);
+  for (const want of ["controls", "settings", "coaching", "about"])
     ok(ids.includes(want), `missing "${want}"`);
 });
 check("each row explains what is inside", () => {
+  const ids  = [...s.matchAll(/^\s{6}id: '(\w+)',\n\s+label: '/gm)].map(m => m[1]);
   const subs = [...s.matchAll(/sub: '([^']+)'/g)].map(m => m[1]);
-  eq(subs.length, 3, "every section needs a description");
+  // Tied to the section count rather than hardcoded, so adding a row can
+  // never quietly ship without its description.
+  eq(subs.length, ids.length, "every section needs a description");
   ok(subs.some(x => /session notes/i.test(x)),
      "App Controls must NAME session notes - 'App Controls' alone does not " +
      "tell you it is in there, which is the exact problem being fixed");
   ok(subs.some(x => /equipment/i.test(x)), "Settings must name equipment");
+  // COACH-TILE, same rule applied to the new row: "Your Coaching" alone
+  // does not tell anybody their capability answers are in there.
+  ok(subs.some(x => /what your body can do/i.test(x)),
+     "Your Coaching must NAME the capability questions");
 });
 
 console.log("\nTEST 2 - every panel is reachable, none orphaned");
