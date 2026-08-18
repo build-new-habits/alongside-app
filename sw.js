@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 18 Aug 2026 v383
+ * Device-check round, 18 Aug. Five items from Graeme's on-device pass:
+ * TIER-G (build-mode step ungated), TIER-H ("At home" locked whole
+ * while the gym was open, plus a dead "home-workout" target retired),
+ * A11Y-LOCK (every locked surface dimmed its own text to 2.95:1),
+ * QUICK-3 (the brief check-in asked about sleep then skipped it), IS-2
+ * (In Step staged one movement at a time, with an intro). Cache bumped
+ * so installed clients pick up the changed views and the CSS. No new
+ * app files — the three new files are gates, which are not precached.
+ *
  * 18 Aug 2026 v382
  * NAMING-1. programmes.js v5 renames three successors. Cache bumped so
  * installed clients do not keep showing the old names. No new files.
@@ -2657,7 +2667,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v382";
+const CACHE_NAME = "alongside-v383";
 
 const SHELL_URLS = [
 
