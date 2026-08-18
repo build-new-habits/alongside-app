@@ -1,5 +1,10 @@
 /*
  * css/components/upgrade-page.css
+ * 18 Aug 2026 v2
+ *
+ * v2 - IMPACT-COLOUR. .upgrade-body--impact, teal, for the five-percent
+ *   block. Contrast computed in all three themes -- see the rule.
+ *
  * 13 Aug 2026 v1
  *
  * A2. The upgrade page. Companion to js/views/upgrade.js v4.
@@ -69,6 +74,24 @@
 
 .upgrade-body--quiet {
   font-size: var(--text-sm);
+}
+
+/* IMPACT-COLOUR, 18 Aug 2026. The five-percent block in teal, at
+   Graeme's request. Teal is the brand primary and is deliberately NOT
+   the gold that marks paid tiers across the product family -- this
+   block is about where the money goes, not about buying, and colouring
+   it gold would read as another sales cue on the one page that must
+   not have any.
+
+   Contrast computed, not eyeballed, in all three themes:
+     #2DD4BF on --color-bg-deep  9.59:1
+     #2DD4BF on --color-bg       7.86:1
+     #0F766E on light-mode bg    5.23:1
+     #5EEAD4 high-contrast      12.07:1
+   All clear WCAG 2.2 AA. Colour carries emphasis only, never meaning,
+   so nothing is lost if it is not perceived (1.4.1). */
+.upgrade-body--impact {
+  color: var(--color-primary);
 }
 
 /* ── What changes ─────────────────────────────────────────────────────

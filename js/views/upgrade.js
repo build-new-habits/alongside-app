@@ -1,5 +1,10 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 18 Aug 2026 v8
+ *
+ * v8 - IMPACT-COLOUR. The five-percent block carries
+ *   .upgrade-body--impact (teal). Class only; no copy change.
+ *
  * 18 Aug 2026 v7
  *
  * v7 - NAME-1. The paid tier is "the Plan", not "Personal".
@@ -253,11 +258,11 @@ export function render() {
       </section>
 
       <section class="upgrade-block" aria-label="Where the money goes">
-        <p class="upgrade-body">
+        <p class="upgrade-body upgrade-body--impact">
           And five percent of everything you pay goes to causes our
           community chooses.
         </p>
-        <p class="upgrade-body">Your subscription does more than you might think.</p>
+        <p class="upgrade-body upgrade-body--impact">Your subscription does more than you might think.</p>
       </section>
 
       <!-- THE BUTTON. "I'm ready" echoes the home page CTA -- the doc:
