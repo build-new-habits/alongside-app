@@ -28,9 +28,25 @@ const mainC    = read("css/main.css");
 const sw       = read("sw.js");
 
 console.log("\nTEST 1 - In Step is free, and the code says so");
-check("the In Step card is not gated", () =>
-  ok(!/isPremium\(\) \? `[\s\S]{0,400}noticing-in-step-btn/.test(noticing),
-     "still behind a premium gate; the spec made it free on 12 Aug"));
+// SWEEP-1, 18 Aug 2026. Was a NEGATIVE {0,400} window between an
+// isPremium() ternary and the button id -- silently green if a gate were
+// reintroduced 401 characters above the card, which on a screen this
+// size is a plausible refactor rather than a contrived one.
+//
+// The property is stronger and simpler than the pattern: noticing.js
+// does not gate ANYTHING any more. It imports neither isPremium nor
+// lockedFeature, and its own header says so. Asserted against the code
+// with comments stripped, so the file can keep the history of why the
+// gate was removed without that history satisfying the assertion.
+check("the In Step card is not gated", () => {
+  const code = noticing
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/.*$/gm, '')
+    .replace(/<!--[\s\S]*?-->/g, '');
+  ok(!/\bisPremium\b/.test(code),
+     "isPremium appears in live code on this screen; the spec made In Step free on 12 Aug");
+  ok(/id="noticing-in-step-btn"/.test(code), "the card is not rendered at all");
+});
 check("no lockedFeature wrapper remains on this screen", () =>
   ok(!/lockedFeature\(/.test(noticing), "In Step was the only gated card here"));
 check("the card is always rendered", () =>
