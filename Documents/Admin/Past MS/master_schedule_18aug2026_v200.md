@@ -1,64 +1,8 @@
 # Alongside: Move — Master Schedule
-## 18 Aug 2026 v201
+## 18 Aug 2026 v200
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_18aug2026_v200.md`. Remove v200 on upload.
-
-> ### 🟢 NAME-1 — THE PAID TIER IS "THE PLAN". Decided and shipped, 18 Aug. `alongside-v384`. **73 gates green.**
->
-> **Graeme's decision, taken this session and committed:** *"Plan it is. Committed. Locked badges should carry Plan."*
->
-> #### What was retired, and why — all three, so none of them comes back
->
-> **Apollo is retired for Move.** Apollo is the idealised male physical form; *"Apollonian"* in ordinary English means the classically perfect male body. **This product is built for people mainstream fitness culture has consistently failed, and the paid tier was named after the standard that failed them.** That is a values problem, not a taste one, and it is the kind of thing a reviewer notices in seconds.
->
-> **"Premium" was rejected for the opposite reason.** The boundary rests on free being *"complete in itself and limited in scope"*. **"Premium" means "the better version"** — Free/Premium frames the free tier as the deficient one, quietly undoing the thing the boundary document worked hardest to establish.
->
-> **"Personal" was retired for the possessive collision Graeme identified on 12 Aug** — *"to you and me that's the tier, but 'that's personal' reads as 'you shouldn't ask me that'"* — and because it was on **every locked surface in the product** while section 7 of the boundary document said the tier name belongs on the pricing page and the account screen only.
->
-> #### Why "Plan" won: it costs nothing to learn
->
-> It is **already the word doing the work in every piece of copy written for this boundary.** *"Free is the session, the plan is the plan."* The offer sentence was already *"I can build a plan around it."* **The thing being bought and the word for it are now the same word**, so there is no translation step at the moment of decision — which matters because the conversion problem is not distinctiveness, it is somebody at day nine understanding the offer in one glance.
->
-> **The honest cost, recorded rather than glossed:** "plan" is the universal SaaS word for a pricing tier, so "the Plan" can read generically. Distinctiveness was traded for comprehension, deliberately.
->
-> #### The finding that came out of the naming work, and matters beyond it
->
-> **Once Apollo goes, the Greek scheme has no good replacement for Move.** Hermes is thematically perfect — god of roads and wayfinding, and *"you cannot build a road to nowhere"* is Graeme's own line — but Hermès is a trademark minefield. Atlas maps well until you remember the audience includes people in burnout, and asking them to hold up the world is the wrong invitation.
->
-> **That gap is informative.** The scheme is elegant when looking at eight products on a roadmap; **no user ever sees more than one.** It was built for the builder, not the buyer. **Retained as internal shorthand for roadmap conversations, retired as user-facing naming.** Worth knowing before it is designed into eight products rather than one. Athena, Hypnos and Themis survive the values test easily; **Aphrodite for a carers' product is a separate mismatch** — she is erotic love, not caregiving — 🟠 open, not urgent.
->
-> #### Shipped
->
-> `auth.js` **v1 → v2** — `lockedFeature()` badge and `aria-label`. Scope was deliberately wider than the badge: **a badge reading "Plan" beside a heading reading "What Personal adds" is worse than either name.** Nine files, copy only, **no logic, no gating and no tier boundary moved.**
->
-> `session-builder-ui.js` v11 · `my-programme.js` v5 · `progress.js` v8 · `settings.js` v29 · `upgrade.js` v7 · `community-impact.js` v2 · `session-log.js` (stale comment) · `sw.js` v384.
->
-> **The `athlete` branch is UNCHANGED and deliberately so.** No call site in `js/` passes it — grepped, not assumed — so renaming it would be inventing a name for a tier with no surface. 🟠 Open for when Athlete gets one.
->
-> **Three genuine non-tier uses of the word were left alone**, and are named in the gate so the sweep cannot be quietly widened to hide a real failure: `personalBests`/`showPersonalBests` (store field and toggle), "Personal best" (a lifting term in coach copy), "Personal Capacity" (a noticing theme).
->
-> #### `verify-name1.mjs` — 6 checks, reversal-tested
->
-> **The load-bearing assertion is an ABSENCE, and it sweeps all of `js/`, not the files changed today.** The risk is not that today's rename was wrong; it is that it **half-reverts later** — one view rewritten from an old draft, one string copied from a stale doc — and the product carries two names for one tier. The next instance will arrive in a file nobody is looking at. Three reversals run, all caught, including the half-revert case.
->
-> #### 🟡 A SECOND GATE FAILED ON A PROPERTY IT WAS NOT TESTING — same day, same shape
->
-> `verify-upg2.mjs`'s **"a paid user is not sold to"** asserted the literal marketing sentence *"You're on Personal"*, so a pure copy rename turned it red while the behaviour it names was untouched. Rewritten to assert the **actual property**: the `isPaid` branch renders **no price and no buy button**. It now survives any rewording of the acknowledgement and still fails if a paying user is ever shown a pitch.
->
-> **This is the second time in one day** — `verify-quick1.mjs` tested a character distance where it meant an order. **Two instances is a pattern worth naming: an assertion that names a property and tests a proxy for it will go red on the wrong things and green on the right ones.** Worth a sweep of the suite for other proxies at some point. 🟠 Logged, not booked.
->
-> `verify-tiergh.mjs` check 12 also updated — now asserts the new wording is present **and** the retired one is absent, so a partial rename goes red.
->
-> #### 🟢 PRICE — verified correct, nothing shipped was wrong
->
-> Graeme corrected the price to **£7.99 monthly / £49.99 annual**. **Checked rather than assumed:** `upgrade.js` holds `PRICE_MONTHLY = £7.99` and `PRICE_ANNUAL = £49.99` as constants; the website publishes the same; the ToS draft carries £7.99 with the £4.99 introductory rate for three months, and £49.99 annual to 30 Nov 2026; the pricing model agrees. **All correct, and correct before this session.**
->
-> **The stale £9.99/£89 lives in PROJECT-KNOWLEDGE reference docs** — including `alongside_move_overview_and_personas_25jul2026_v2.md`, which is exactly the document a session reaches for when it wants a summary. The repo's `Archive/` copies are banded as superseded; **the project-knowledge copy is not.** 🔴 **Graeme's action — Claude cannot delete project-knowledge entries.** This is the same trap as the 13 Aug WEB-PRICE false alarm, where a March-era project-knowledge file was read as if it were live.
->
-> 🟠 **Proposed, not built:** a four-line gate asserting the app constants against one declared source and flagging any non-archive doc publishing a different figure. Would close this class permanently.
->
-> ---
+Supersedes `master_schedule_18aug2026_v199.md`. Remove v199 on upload.
 
 > ### 🔴 PICK UP HERE — 18 Aug, device-check round. `alongside-v383`. **72 gates green on a fresh clone.**
 >
@@ -3703,4 +3647,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v201*
+*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v200*
