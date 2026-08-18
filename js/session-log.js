@@ -80,7 +80,7 @@
  */
 
 import { store } from "./store.js";
-import { isPremium } from './auth.js';   // PB-1: Personal tier
+import { isPremium } from './auth.js';   // PB-1: the Plan (NAME-1)
 import { progressionInvitation } from "./data/session-rationale.js";
 
 function esc(str) {

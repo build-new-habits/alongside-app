@@ -1,6 +1,11 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 18 Aug 2026 v11
+ *
+ * v11 - NAME-1. Two copy lines now say "the Plan" rather than "the
+ *   Personal plan". Copy only. Reasoning in js/auth.js v2.
+ *
  * 18 Aug 2026 v10
  *
  * v10 - TIER-G. The build-mode step had no tier check. A free user
@@ -406,7 +411,7 @@ function renderTypePicker() {
 
       ${!premium ? `
         <p class="text-xs text-muted" style="text-align:center; margin-top: var(--space-4);">
-          All session types are available on the Personal plan.
+          All session types come with the Plan.
         </p>
       ` : ""}
 
@@ -698,7 +703,7 @@ function renderBuildModeStep() {
 
       ${!premium ? `
         <p class="text-xs text-muted" style="text-align:center; margin-top: var(--space-4);">
-          Choosing your own movements is part of the Personal plan.
+          Choosing your own movements is part of the Plan.
         </p>
       ` : ""}
 
