@@ -1,6 +1,29 @@
 /*
  * css/components/tier-gating.css
- * 03 Aug 2026 v1
+ * 18 Aug 2026 v2
+ *
+ * v2 - A11Y-LOCK. Two faults, both systemic, both found on-device
+ *   18 Aug in My Programme's "What Personal adds" block and then
+ *   confirmed to affect EVERY locked surface in the product.
+ *
+ *   1. opacity: 0.55 on the wrapper dimmed the TEXT, not just the
+ *      chrome. --color-text-secondary reads 5.97:1 on --color-bg-card
+ *      at full strength and 2.95:1 composited at 0.55. Even
+ *      --color-text at 9.45:1 fell to 4.11:1. Every locked tile,
+ *      duration, session type and preview block failed WCAG 2.2 AA
+ *      1.4.3, and the failure was invisible because each surface
+ *      looked deliberately styled.
+ *
+ *      Locked state is now carried by a dashed primary border and the
+ *      badge, never by reduced contrast. Encoding a state in lowered
+ *      legibility fails the people this product is built for first.
+ *
+ *   2. .locked-badge is absolutely positioned with no space reserved
+ *      beneath it. On a short tile it landed in whitespace and looked
+ *      fine; on a full-width paragraph it landed ON the first line of
+ *      text. Reserved right-hand space is now claimed on a leading
+ *      <p>, which is the text-shaped case, leaving card and tile
+ *      layouts untouched.
  *
  * Locked-feature wrapper — used by js/auth.js's lockedFeature() helper.
  * Every variable below confirmed against css/base/variables.css before
@@ -10,15 +33,15 @@
 
 .locked-feature-wrap {
   position: relative;
-  opacity: 0.55;
   cursor: pointer;
   border-radius: var(--radius-lg);
-  transition: opacity 150ms ease;
+  border: 1px dashed var(--color-primary);
+  transition: background-color 150ms ease;
 }
 
 .locked-feature-wrap:hover,
 .locked-feature-wrap:focus-visible {
-  opacity: 0.75;
+  background: var(--color-bg-hover);
   outline: 3px solid var(--color-border-focus);
   outline-offset: 2px;
 }
@@ -26,6 +49,15 @@
 .locked-feature-inner {
   pointer-events: none;
   user-select: none;
+}
+
+/* Reserve room for the badge on text-shaped locked content. A leading
+   <p> is the paragraph case (My Programme's preview block); cards and
+   tiles lead with a span or a div and are deliberately not matched, so
+   their layout is unchanged. */
+.locked-feature-inner > p:first-child,
+.locked-feature-inner > div:first-child > p:first-child {
+  padding-right: 7.5rem;
 }
 
 .locked-badge {
@@ -51,5 +83,13 @@
 @media (prefers-reduced-motion: reduce) {
   .locked-feature-wrap {
     transition: none;
+  }
+}
+
+/* Windows High Contrast / forced-colours: a dashed border survives,
+   a background tint does not. Nothing here depends on the tint. */
+@media (forced-colors: active) {
+  .locked-feature-wrap {
+    border: 1px dashed CanvasText;
   }
 }

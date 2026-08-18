@@ -1,6 +1,27 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 18 Aug 2026 v10
+ *
+ * v10 - TIER-G. The build-mode step had no tier check. A free user
+ *   reaching it through the Library's free "Full Body" card could pick
+ *   "Coach recommends, I'll choose" or "Build my own" and compose a
+ *   session exercise by exercise -- the paid act, by the one-line test
+ *   in alongside_tier_boundary_12aug2026_v1.md section 4. The free
+ *   tier's session is "full body only, the coach decides."
+ *
+ *   Both composing routes now render through lockedFeature(); "Coach
+ *   builds it" is untouched and remains the free path. The routes are
+ *   shown rather than hidden, per the boundary document's section 6
+ *   door principle. A guard in the click handler mirrors the render.
+ *
+ *   NOT changed, deliberately: the identical three routes on
+ *   conditions-update.js. Those sit on prescribed/condition work, which
+ *   is permanently free on ethical grounds, and "Build my own" there
+ *   routes to prescribed.js -- transcribing what a clinician actually
+ *   told you, not composing from the database. Same words, different
+ *   act. See the master schedule entry for this session.
+ *
  * 13 Aug 2026 v9
  *
  * v9 - D3. The allocation preset persists. It was module state reset to
@@ -599,8 +620,51 @@ function renderEquipmentCheck() {
 // (Coach builds it / Coach recommends / Build your own), not its persistent-
 // storage model -- this still produces a one-off generatedSession, same as
 // before. "Coach builds it" is the unchanged existing flow.
+// TIER-G helper. Identical inner content for locked and unlocked so the
+// two states read as the same product, not two designs -- the same rule
+// the type picker above already follows. A <div> inside lockedFeature(),
+// never a <button>: it returns role="button" and nesting one interactive
+// control inside another is invalid.
+function _buildModeOption(premium, mode, title, blurb) {
+  const inner = `
+      <span style="font-weight:var(--font-semibold);">${title}</span>
+      <span class="text-secondary text-sm">${blurb}</span>`;
+
+  if (!premium) {
+    return lockedFeature(`
+      <div class="card"
+           style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;width:100%;background:var(--color-surface);padding:var(--space-4);">
+        ${inner}
+      </div>
+    `, "personal", title);
+  }
+
+  return `
+    <button class="card sb-buildmode-btn" data-mode="${mode}"
+            style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;width:100%;cursor:pointer;background:var(--color-surface);padding:var(--space-4);">
+      ${inner}
+    </button>
+  `;
+}
+
+//
+// TIER-G, 18 Aug 2026. This step had NO tier check at all. A free user
+// reached it through the Library's free "Full Body" card and could pick
+// "Coach recommends, I'll choose" or "Build my own" -- choosing their own
+// exercises, one at a time, from the candidate pools.
+//
+// alongside_tier_boundary_12aug2026_v1.md, section 4: free is "Full body
+// only. The coach decides." The one-line test makes composing the paid
+// act. Two of these three routes are composing.
+//
+// The locked routes are SHOWN, not hidden, per section 6 -- "the door is
+// visible at all times, the person walks through it when they choose."
+// Hiding them would leave a screen with one button on it, which is a
+// question with one answer, and would remove the exact conversion moment
+// this file already argues for in the type picker above.
 function renderBuildModeStep() {
-  const type = SESSION_TYPES.find(t => t.id === selectedType);
+  const type    = SESSION_TYPES.find(t => t.id === selectedType);
+  const premium = isPremium();
   return `
     <div class="view session-builder-view">
 
@@ -622,17 +686,21 @@ function renderBuildModeStep() {
           <span style="font-weight:var(--font-semibold);">Coach builds it</span>
           <span class="text-secondary text-sm">I'll pick everything for you, based on your equipment and how you're doing today.</span>
         </button>
-        <button class="card sb-buildmode-btn" data-mode="recommend"
-                style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;width:100%;cursor:pointer;background:var(--color-surface);padding:var(--space-4);">
-          <span style="font-weight:var(--font-semibold);">Coach recommends, I'll choose</span>
-          <span class="text-secondary text-sm">I'll suggest a starting selection from a wider list — swap anything you like.</span>
-        </button>
-        <button class="card sb-buildmode-btn" data-mode="own"
-                style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;width:100%;cursor:pointer;background:var(--color-surface);padding:var(--space-4);">
-          <span style="font-weight:var(--font-semibold);">Build my own</span>
-          <span class="text-secondary text-sm">Pick everything yourself from what's available today.</span>
-        </button>
+        ${_buildModeOption(
+          premium, "recommend", "Coach recommends, I'll choose",
+          "I'll suggest a starting selection from a wider list — swap anything you like."
+        )}
+        ${_buildModeOption(
+          premium, "own", "Build my own",
+          "Pick everything yourself from what's available today."
+        )}
       </div>
+
+      ${!premium ? `
+        <p class="text-xs text-muted" style="text-align:center; margin-top: var(--space-4);">
+          Choosing your own movements is part of the Personal plan.
+        </p>
+      ` : ""}
 
     </div>
   `;
@@ -1088,6 +1156,18 @@ export function onMount() {
   document.querySelectorAll(".sb-buildmode-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       buildMode = btn.dataset.mode;
+
+      // TIER-G belt to the render's braces. Locked routes render through
+      // lockedFeature(), which produces no .sb-buildmode-btn, so this
+      // cannot fire today. It is here because the two silent-substitution
+      // bugs removed on 13 Aug both lived in exactly this position, and
+      // routing to the door is the correct failure -- never quietly
+      // handing somebody the coach-built session they did not ask for.
+      if (!isPremium() && buildMode !== "coach") {
+        router.navigate("upgrade");
+        return;
+      }
+
       if (buildMode === "coach") {
         triggerBuild();
         return;
