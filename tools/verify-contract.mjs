@@ -76,6 +76,12 @@ check("every literal compared to a contracted field is declared", () => {
     // `cap.legPower === "full"` or `c.legPower === 'no'`.
     const leaf = field.split(".").pop();
     const allowed = new Set(spec.values.filter(v => typeof v === "string"));
+    // RETIRED values, added 18 Aug 2026. A value the field no longer
+    // accepts but which may still sit in saved data. Migration code must
+    // be able to recognise it, so comparisons are permitted -- but only
+    // where the contract DECLARES it, so a retired value stays visible
+    // rather than becoming an untracked special case. See "tier".
+    const retired = new Set((spec.retired || []).filter(v => typeof v === "string"));
     // <thing>.leaf === "literal"  /  "literal" === <thing>.leaf
     const re = new RegExp(
       `\\b${leaf}\\s*[!=]==?\\s*["']([a-z0-9-]+)["']|["']([a-z0-9-]+)["']\\s*[!=]==?\\s*[\\w.]*\\b${leaf}\\b`, "g");
@@ -98,6 +104,7 @@ check("every literal compared to a contracted field is declared", () => {
         // nothing. Session categories are exempted by name so the
         // collision stays visible rather than being papered over.
         if (leaf === "category" && SESSION_CATEGORIES.has(lit)) continue;
+        if (retired.has(lit)) continue;
         if (!allowed.has(lit))
           bad.push(`${file}: ${leaf} compared to "${lit}" (allowed: ${[...allowed].join("|")})`);
       }
@@ -210,6 +217,12 @@ check("lookup tables keyed on a contracted field use declared values", () => {
     const spec = FIELD_CONTRACT[field];
     if (!spec) { bad.push(`${table} keyed on ${field}, which is not contracted`); continue; }
     const allowed = new Set(spec.values.filter(v => typeof v === "string"));
+    // RETIRED values, added 18 Aug 2026. A value the field no longer
+    // accepts but which may still sit in saved data. Migration code must
+    // be able to recognise it, so comparisons are permitted -- but only
+    // where the contract DECLARES it, so a retired value stays visible
+    // rather than becoming an untracked special case. See "tier".
+    const retired = new Set((spec.retired || []).filter(v => typeof v === "string"));
     const m = all.match(new RegExp(`${table}\\s*=\\s*(?:new Set\\()?[\\[{]([\\s\\S]*?)[\\]}]`));
     if (!m) { bad.push(`${table} not found — renamed? this check is now blind`); continue; }
     for (const km of m[1].matchAll(/["']([a-z0-9-]+)["']/g))

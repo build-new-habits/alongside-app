@@ -1,6 +1,14 @@
 /**
  * js/auth.js - Tier-Gating Helpers
  *
+ * 18 Aug 2026 v3
+ *
+ * v3 - ATHLETE-RETIRE. The "athlete" tier is gone. isAthlete() removed
+ *   (no callers), isPremium() simplified, and lockedFeature() no longer
+ *   branches on a label it could never reach -- no call site in js/ ever
+ *   passed "athlete". Graeme's call, 18 Aug. store.js v54 migrates
+ *   anybody holding the value up to personal.
+ *
  * 18 Aug 2026 v2
  *
  * v2 - NAME-1. The paid tier is "the Plan", product-wide. Graeme's
@@ -82,12 +90,12 @@ export function getUserTier() {
 
 export function isPremium() {
   const tier = getUserTier();
-  return tier === "personal" || tier === "athlete";
+  return tier === "personal";   // ATHLETE-RETIRE, 18 Aug 2026
 }
 
-export function isAthlete() {
-  return getUserTier() === "athlete";
-}
+// ATHLETE-RETIRE, 18 Aug 2026. isAthlete() removed. It had no callers
+// anywhere in js/ -- grepped, not assumed -- which is the whole story of
+// that tier: a predicate nothing asked, for a state nothing granted.
 
 /**
  * Wrap any HTML string with the standard locked-feature UI: dimmed
@@ -119,7 +127,11 @@ export function lockedFeature(html, tier = "personal", context = "") {
   // in js/ passes it -- grepped, not assumed -- so renaming it would be
   // inventing a name for a tier with no surface. 🟠 Open when Athlete
   // gets one.
-  const label = tier === "athlete" ? "Athlete" : "Plan";
+  // ATHLETE-RETIRE: one tier, one label. The parameter is kept so the
+  // hundred-odd call sites need no edit, and so a future second tier has
+  // somewhere to go, but "personal" is the only value that means
+  // anything today.
+  const label = "Plan";
   const desc  = context ? `${context} — ` : "";
   return `
     <div class="locked-feature-wrap"

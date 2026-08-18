@@ -108,11 +108,18 @@ const upgradeSrc = fs.readFileSync(new URL('../js/views/upgrade.js', import.meta
 check('5  the pricing page names the tier — this is where a name earns its place',
   /the Plan|a Plan|The Plan/.test(stripComments(upgradeSrc)));
 
-// ── The Athlete branch is untouched, on purpose ──────────────────────
+// ── One tier, one label (ATHLETE-RETIRE, 18 Aug 2026) ────────────────
+//
+// This used to assert that "athlete" still rendered "Athlete", on the
+// reasoning that renaming a tier with no surface would be inventing a
+// name for nothing. Graeme retired the tier the same day, so the
+// assertion inverts: whatever is passed, the badge says Plan. There is
+// one paid tier and it has one name.
 
 el.innerHTML = lockedFeature('<p>x</p>', 'athlete', '');
-check('6  "athlete" still renders "Athlete" — no name invented for a tier with no surface',
-  el.querySelector('.locked-badge-label')?.textContent.trim() === 'Athlete');
+check('6  a retired tier name cannot leak back through the badge',
+  el.querySelector('.locked-badge-label')?.textContent.trim() === 'Plan',
+  el.querySelector('.locked-badge-label')?.textContent.trim());
 
 console.log(failures === 0
   ? `\nAll 6 checks green.`
