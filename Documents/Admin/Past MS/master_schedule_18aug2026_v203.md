@@ -1,20 +1,8 @@
 # Alongside: Move — Master Schedule
-## 18 Aug 2026 v204
+## 18 Aug 2026 v203
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_18aug2026_v203.md`. Remove v203 on upload.
-
-> ### 🟢 PRICING IS CLOSED — trial confirmed at 30 days, 18 Aug
->
-> **Graeme: "Let's do 30 days. Confirmed."** ToS **v4**, pricing model **v4**. The last open commercial term is settled and **no bracketed placeholder for a price or a length remains in either document.**
->
-> **The full set, all decided:** £7.99/month flat · £59.99/year from launch · 30-day free trial, card at signup, no charge during · £44.99 beta annual, December 2026 only, locked once taken · rate never rises for anyone · Year 2 deferred to Year 2 · community org £39.99 Year 1 / £49.99 Year 2+ · taster code 1 month free.
->
-> **30 over 14, and the reason it was not close:** a trial has no cash exposure, so length was never a cost question. What is being sold is a plan that adapts over weeks, and 14 days can barely demonstrate that — the tier boundary document's own finding is that longitudinal depth cannot carry conversion because people leave before they feel it. **The one real argument for 14 was faster conversion data during beta.** Weighed and not taken.
->
-> **What is left in the ToS is a QUESTION, not an undecided term** — the trial/cooling-off interaction for Natalie. Recorded so nobody reads a bracket and thinks a price is still open.
->
-> ---
+Supersedes `master_schedule_18aug2026_v202.md`. Remove v202 on upload.
 
 > ### 🟢 PRICE-2 — PRICING SETTLED AND SHIPPED, 18 Aug. `alongside-v386`. **74 gates green.**
 >
@@ -3801,4 +3789,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v204*
+*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v203*
