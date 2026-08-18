@@ -1,46 +1,8 @@
 # Alongside: Move — Master Schedule
-## 18 Aug 2026 v202
+## 18 Aug 2026 v201
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_18aug2026_v201.md`. Remove v201 on upload.
-
-> ### 🟠 PRICING — decisions taken 18 Aug, docs NOT yet updated
->
-> **Shipped this session:** `IMPACT-COLOUR` (five-percent block in teal on the Plan page, contrast computed in all three themes) and `NAME-1` on the **public website** — `who-its-for/index.html` v12, `upgrade/index.html` v12, `site.css` v23. Zero "Personal" in rendered content on either page, verified against a fresh clone. Two class names renamed with the copy they style.
->
-> #### 🟢 DECIDED — monthly intro discount is DROPPED
->
-> **£7.99 flat from day one, with a 30-day full refund replacing the £4.99-for-three-months intro.** Graeme's decision after the churn argument.
->
-> **The reasoning, recorded so it is not re-litigated:** the intro rate removed risk at the point of decision but paid for it by putting a **60% price rise at month four** — landing exactly when novelty has gone and habit has not formed. It discounted the churn window and then added a reason to leave at the end of it. The refund removes the same risk without creating a price rise, and it makes a sentence already on the page true: *"This isn't a commitment to us. It's a commitment to yourself. And you can change your mind."* That is currently backed by 14 statutory days with a pro-rata catch.
->
-> 🟠 **For Natalie:** confirm a voluntary 30-day policy does not complicate the statutory 14-day CCR position. Read is that it is strictly more generous and therefore fine, but that is a legal question.
->
-> #### 🟠 PROPOSED, awaiting Graeme — the December window
->
-> Graeme's fix to the unreachable £49.99: make it the price from January, with £39.99 for beta users in December only. **Adjustment proposed:** December is the soft-launch month, so "from January" leaves December undefined for anyone who is not a beta tester. Cleaner as **£49.99 is the annual price from launch onward; £39.99 is the beta cohort's conversion rate, December only, locked permanently once taken.** Gives beta testers a real reward for three months of unpaid work, a deadline that is not manufactured, and no month where the price is a question mark.
->
-> #### 🆕 NEW STREAM ITEM — `RATE-1`, the honest-rate offer
->
-> **Graeme's idea, 18 Aug:** the product notices somebody has been paying monthly for six or twelve months and offers them the annual rate, which is cheaper. Logged here per the standing rule that a new feature gets added to the schedule before it is planned. **Not booked, not built, and it depends on Stripe, which depends on the business bank account, which depends on HMRC.**
->
-> **Three things established while assessing it:**
->
-> 1. **It must NOT be in coach voice.** Graeme's draft line — *"I've noticed you've been paying for Alongside: Move every month for a year"* — is the coach talking about billing. The tier boundary document, section 6, is explicit: the door *"does not breach P1, because the coach is not the one speaking. This is the P2 helper layer: visibly distinct, never in coach voice."* Same content, different speaker.
-> 2. **No scheduled job is needed.** This was recorded as its blocker and it is wrong. Months-paid is computable from the subscription start date at render time, so it is a card the app draws when somebody opens it — not a cron, not an email send, **zero ongoing admin.**
-> 3. **As a revenue move it is NEGATIVE, and should be taken anyway.** £7.99 × 12 = £95.88 against £49.99. At the model's own 6% monthly churn, somebody still paying at month six has a long expected remaining life, so converting them to annual **loses** money on anyone who would have stayed. It only wins financially if it catches somebody about to leave — and detecting who is about to leave in order to pitch them is precisely what this product refuses to do.
->
-> **So it is an honesty move, and the cost is the point.** *"You have paid monthly for six months. The annual rate would have cost you less. Here it is."* That earns the pub-test sentence — *my fitness app told me I was overpaying and offered me a cheaper deal* — and word of mouth is the only channel this business can afford. **Recommendation: six months, not twelve.** At twelve you are discounting people you already have; at six you are being honest early enough for it to mean something. 🟠 Graeme's call.
->
-> #### 🔴 STILL THE REAL BLOCKER, unchanged
->
-> **Stripe needs a business bank account, which needs HMRC sole trader registration.** None of the above is buildable until that moves. The pricing design is not the constraint and has not been for some time.
->
-> #### 🟠 DOCS NOT YET UPDATED — three of them, deliberately held
->
-> `alongside_terms_of_service_draft_23jul2026_v2.docx`, `alongside_pricing_model_20jun2026_v2.docx`, and the website's own pricing copy all still carry **£4.99 intro, £49.99 to 30 Nov 2026, £59.99 Year 2**. Held pending Graeme's confirmation on the December window so all three change once, together, rather than twice. The ToS also still says **"Personal subscription"** as a heading — NAME-1 covered code and site copy, not documents.
->
-> ---
+Supersedes `master_schedule_18aug2026_v200.md`. Remove v200 on upload.
 
 > ### 🟢 NAME-1 — THE PAID TIER IS "THE PLAN". Decided and shipped, 18 Aug. `alongside-v384`. **73 gates green.**
 >
@@ -3741,4 +3703,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v202*
+*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v201*
