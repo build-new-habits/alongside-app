@@ -1,98 +1,8 @@
 # Alongside: Move — Master Schedule
-## 18 Aug 2026 v200
+## 18 Aug 2026 v199
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_18aug2026_v199.md`. Remove v199 on upload.
-
-> ### 🔴 PICK UP HERE — 18 Aug, device-check round. `alongside-v383`. **72 gates green on a fresh clone.**
->
-> Graeme ran a free-tier pass on device and brought back eight screenshots and six observations. **Four were real faults, one was a product decision, one was fine.** Everything below shipped in one session and is confirmed live against a fresh clone of `main`, not against local state.
->
-> #### 🟢 TIER-G — the build-mode step had no tier check at all
->
-> `session-builder-ui.js` **v9 → v10**. A free user reaching the builder through the Library's free "Full Body" card could pick **"Coach recommends, I'll choose"** or **"Build my own"** and compose a session exercise by exercise. The boundary document is explicit — free is *"full body only. The coach decides."* — and the one-line test makes composing the paid act. **Two of the three routes were the paid act, ungated.**
->
-> Both now render through `lockedFeature()`. **Shown, not hidden**, per the boundary document's section 6 door principle: hiding them leaves a screen with one button on it, which is a question with one answer, and removes the exact conversion moment this file already argues for in its own type picker. A guard in the click handler mirrors the render — dead in practice, present because the two silent-substitution bugs removed on 13 Aug lived in precisely that position.
->
-> #### 🟠 THE DISAGREEMENT, AND WHERE IT LANDED — conditions-update.js
->
-> Graeme's challenge was fair and directly put: *"Coach owns the 'I'll plan something for you'. Why would the two build-your-own not be premium?"* — meaning the identical three routes on the Conditions screen.
->
-> **The principle is his and it is right.** Where the answer differs is that **"Build my own" there is not the same act.** It routes to `prescribed.js`, which that file defines as exercises given by an external professional — physio, consultant, GP. **Free-text entry, no exercise database behind it.** The person is not composing from our library; they are writing down what a clinician told them to do. Paywalling it says *pay us before you can record what your physiotherapist gave you*, which is the sentence the ethical carve-out exists to prevent.
->
-> **"Coach recommends, I'll choose" on that screen is the genuinely arguable one** and was NOT resolved. Ticking from a coach-offered list is closer to composing. The argument for leaving it free is that somebody with a flaring hip knows which movements hurt in a way the engine does not. That is a judgement, not a proof. **🟠 Graeme's call, and it is one field.**
->
-> The reasoning is written into `session-builder-ui.js`'s header so it is not re-derived from the words alone next time. `verify-tiergh.mjs` check 14 asserts `conditions-update.js` stays ungated, so it cannot be "tidied up" into consistency by somebody who has not read this.
->
-> #### 🟢 TIER-H — "At home" was shut and "At the gym" was open
->
-> `library.js` **v6 → v7**. "At home" carried `tier` at **category** level, so nothing inside was reachable. "At the gym", three lines below, had **no category tier** — its cards were gated individually, and two were not: Full Body and Cardio (logging). **So a free user could build the free full-body session at the gym and not at home.** For an audience of neurodivergent adults, people navigating hormonal change and time-poor parents, home is the more likely room, and it was the one that was shut. Graeme spotted it immediately.
->
-> The comment justifying the category lock said opening it would bypass the `isPremium()`-gated location step. **True, and equally true of the gym, which was open. The reasoning did not match its own implementation.**
->
-> Now symmetric: category open, five self-directed cards gated, one free door, and that door is the same free act.
->
-> **🔴 And a dead route found while doing it: `home-workout` has never existed.** The "Mixed workout" card's target appears in `library.js` and **nowhere else in the repo** — not `router.js`, not any view. Grepped, not assumed. **The category lock is the only reason nobody ever hit a dead link.** Retired; Full Body replaces it and is the thing it described. Asserted in the gate so it cannot return.
->
-> #### 🟢 A11Y-LOCK — every locked surface in the product failed WCAG AA
->
-> `css/components/tier-gating.css` **v1 → v2**. Graeme's report was cosmetic — *"is the Personal tag in the way of something? It looks messy."* It was in the way, and underneath it was something worse.
->
-> `.locked-feature-wrap` set **`opacity: 0.55`**, which dims the **TEXT**, not just the chrome. Composited against `--color-bg-card`: `--color-text-secondary` falls **5.97:1 → 2.95:1**, and even `--color-text` falls **9.45:1 → 4.11:1**. **Every locked tile, duration, session type and preview block in the product failed 1.4.3**, and the failure was invisible because each surface looked deliberately styled. Locked state is now carried by a **dashed primary border** and the badge. **Encoding a state in lowered legibility fails the people this product is built for first.**
->
-> Second fault, the visible one: `.locked-badge` is absolutely positioned with **no space reserved beneath it**. On a short tile it lands in whitespace; on a full-width paragraph it lands **on the first line of text**, which is what Graeme photographed in My Programme. Reserved right-hand space now claimed on a leading `<p>` — the text-shaped case — leaving card and tile layouts untouched.
->
-> A `forced-colors` fallback was added: a dashed border survives High Contrast, a background tint does not.
->
-> #### 🟢 QUICK-3 — the coach asked about sleep and then skipped it
->
-> `checkin.js` **v14 → v15**. Graeme: *"I'm not being asked my sleep anymore, although the question is there."* Exactly right, and the cause is precise. `_moodBridge()` speaks **before** the brief-path check, and **all three of its lines asked about sleep** — *"Good. And sleep — how was last night?"* QUICK-1's brief path then skips sleep entirely and moves to conditions. **The coach put a question to the person and answered nothing.**
->
-> **The fault class, worth naming because it is the third instance this month:** a change removed a step and left the things attached to it behind. Same shape as `onUnmount`'s missing caller and `exercises/index.js`'s claimed Library route.
->
-> Second half of the same report — *"it doesn't have that 'next' type trigger, it moves too fast."* The full path's beat there **is the sleep panel's own confirm button**. The brief path had no panel, so the coach's line and the conditions panel arrived together. `_PANEL_BEAT_MS` (700ms, zero under `prefers-reduced-motion`).
->
-> #### 🟢 IS-2 — In Step is staged, and has an intro
->
-> `in-step.js` **v1 → v2**. **Graeme's decision, taken this session:** *"I think I want staged In Step. It feels too confusing, like I can access all of it and therefore none of it lands properly."*
->
-> v1 opened all four movements from the start with only a per-movement cooldown — **correct against its own header comment**, which is exactly why nothing caught that it was wrong on device. Now sequential: **Solo → Partner → Floor → Environment**, each opening when the one before is answered once. The order is not arbitrary — it widens outward from your own patterns to the people nearest you to strangers to the world, which is the arc the scenarios were written in. **The 3-day per-movement cooldown is unchanged and applies on top; the two gates do different jobs.**
->
-> **Derived from `completedCount`, not stored. No schema change.** A new field would be a second place holding the same fact. And anyone who already reached a later movement under v1 **keeps it** — closing a door somebody has already walked through would be the product punishing them for our sequencing. Asserted as check 8.
->
-> Also: the landing had one coach line describing the **format** and nothing saying what In Step is **for**. An intro now sits above the movements, in P2 helper register rather than coach voice. And a **bare `completedCount` digit** sat on each card — an unlabelled number, which is a score in a product whose first principle is that it does not evaluate anybody, and a naked digit to a screen reader. **Removed**, and gated against returning.
->
-> #### 🟢 Images 7 & 8 — Home and the variety sheet. No change. Graeme: *"These are great."*
->
-> #### Gates — three new, 39 checks, all reversal-tested
->
-> | Gate | Checks | Executes? |
-> |---|---|---|
-> | `verify-tiergh.mjs` | 14 | **Yes** — mounts Library and the builder at both tiers, clicks through, counts what is actually pressable |
-> | `verify-is2.mjs` | 14 | **Yes** — mounts In Step against five seeded progress states |
-> | `verify-quick3.mjs` | 11 | Source + **computed** contrast: composites the real tokens at the real opacity and does the 1.4.3 sum |
->
-> **The load-bearing assertions are the inverses.** Not *"the locked thing is locked"* but *"there is exactly ONE free door and it is the coach-built one"* — a presence assertion would stay green if a second free route were added tomorrow. Three reversals run against each gate, all caught.
->
-> **Two seed faults caught, both mine, both the same lesson as 16 Aug — suspect the seed first.** A symmetry assertion re-mounted the Library without navigating and read the sub-screen it had been left on (`library.js` holds `screen` at module level; in the app the router resets it, in a bare harness nothing does). And an anti-opacity assertion read the **source** and went red on the word "opacity" **inside my own comment explaining why the opacity was removed** — rewritten to read the rendered DOM, which is the only version that means anything.
->
-> #### 🟡 One existing gate went red on my own change, and it was the gate that was wrong
->
-> `verify-quick1.mjs` **v1 → v2**. Its `PAIN IS NOT COMPRESSIBLE` check used a `{0,200}` **character window** between the condition test and the panel call. QUICK-3's added pause and comment overflowed it, and the gate went red on a change that **did not alter the behaviour it guards at all**. A distance in characters is not the property being asserted — **order is**. Rewritten to test that, reversal-tested both ways: it still fails when the conditions panel is genuinely dropped. **No assertion weakened.**
->
-> #### 🟠 NEEDS GRAEME
->
-> - **"Coach recommends, I'll choose" on the Conditions screen** — free or paid. One field either way. See the disagreement section above.
-> - **The word "Personal" is on every badge in the product.** The tier boundary document, section 7, says never say it in-product: *"to you and me that's the tier — but 'that's personal' reads as 'you shouldn't ask me that.'"* The word belongs on the pricing page and the account screen; everywhere else, describe the thing. `lockedFeature()` prints the tier name on every locked surface. **Not touched this session** — it is a copy decision across a shared component, not a bug.
-> - **The In Step intro copy is new user-facing writing in the product's voice.** Written to the brief; his register, his call. Uses em dashes, consistent with existing coach copy, but flagged given the standing preference against dashes in external-facing text.
->
-> #### 🔴 PROCESS FAULT — the header/footer drift has recurred, twice
->
-> v141 recorded this exact fault and set the rule: **both header and footer must be updated together at every session close.** On opening today's file the **header read v199 and the footer read v197**. Sessions since have updated one and not the other, and the rule written to prevent it has now been broken twice by the sessions that could read it.
->
-> Both corrected to **v200** this version. Worth saying plainly: a rule in a document does not enforce itself. **`tools/schedule-drift.mjs` exists and does NOT check this** — verified by running it, not assumed: it only checks that no schedule entry calls a live symbol dead. A header-vs-footer assertion is the cheapest fix available and should be the next thing anybody does to this file. 🟠
->
-> ---
+Supersedes `master_schedule_18aug2026_v198.md`. Remove v198 on upload.
 
 > ### 🔴 PICK UP HERE — 18 Aug, later. `alongside-v381`. **69 gates green on a fresh clone.**
 >
@@ -3647,4 +3557,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v200*
+*Build New Habits · Alongside: Move · Master Schedule · 16 Aug 2026 v197*
