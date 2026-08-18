@@ -1,5 +1,15 @@
 /**
  * tools/verify-quick1.mjs
+ * 18 Aug 2026 v2
+ *
+ * v2 - One assertion rewritten. See the note at PAIN IS NOT
+ *   COMPRESSIBLE: it tested a character distance where it meant to test
+ *   an order, and went red on a QUICK-3 change that did not touch the
+ *   behaviour it guards. No assertion weakened — the rewritten form
+ *   still fails if the conditions panel is dropped or moved above the
+ *   test that decides whether to show it, and was reversal-tested both
+ *   ways.
+ *
  * 15 Aug 2026 v1
  *
  * QUICK-1. The short check-in path for persona 2.16.
@@ -63,8 +73,17 @@ check('mood is still asked on the brief path',
 check('the coach still responds before the branch',
   /_showCoachBubble\(_moodBridge/.test(beforeBranch),
   '"coach speaks first" is the line this feature may not cross');
+// 18 Aug 2026 (QUICK-3). This was a {0,200} character window between the
+// two, and QUICK-3's added pause and its comment pushed the real code
+// past it — the gate went red on a change that did not alter the
+// behaviour it guards at all. A distance in characters is not the
+// property being asserted; ORDER is. Rewritten to test that, so the
+// assertion survives anything written between them and still fails if
+// the panel is ever dropped or moved above the condition test.
+const painIdx  = branch.indexOf('_conditions.length > 0');
+const panelIdx = branch.indexOf('_showConditionsPanel()');
 check('PAIN IS NOT COMPRESSIBLE — asked at either setting',
-  /_conditions\.length > 0[\s\S]{0,200}_showConditionsPanel\(\)/.test(branch),
+  painIdx !== -1 && panelIdx > painIdx,
   'somebody with a declared condition is not offered a shortcut past it');
 
 // ── Burnout still works on the brief path ────────────────────
