@@ -1,79 +1,8 @@
 # Alongside: Move — Master Schedule
-## 20 Aug 2026 v212
+## 20 Aug 2026 v211
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_20aug2026_v211.md`. Remove v211 on upload.
-
-> ### 🔴 STOP WRITING DOCUMENTS. THE ORDER THAT SERVES THE BUSINESS:
->
-> **1. HMRC sole trader registration** — Graeme's, blocks the bank account, blocks Stripe, blocks **all** revenue.
-> **2. R1, the hard conversation** — the most distinctive capacity in the product, **still zero lines of code**.
-> **3. P-1 + P-3, load progression with reversal** — the Plan currently cannot deliver its own promise.
-> **4. Everything below.**
->
-> **Five documents were produced on 20 Aug and no R-stream code was written.** That is the honest position and it is recorded here rather than buried.
->
-> ---
->
-> ### 🔵 THE GEAR CHANGE — `Documents/Business/alongside_gear_change_20aug2026_v1.md`
->
-> Decisions in its §9. **Retention mechanic, not a conversion one** — a free user cannot see gear changes, so it sells nothing at day nine. R2 remains the conversion work.
->
-> #### 🟢 THE GAP IT CLOSES
->
-> Progression boundary §4.2 says directional goals never acquire a target. Graeme spotted the consequence: **those people would have nothing to see at all**, which is not the same as protecting them.
->
-> > **A target is a destination. A gear change is a noticing. Directional goals get no target — and still get gear changes.**
->
-> Nothing promised, so nothing failed. *"Enjoy exercise"* never gets a date; it does get *"you've started choosing this yourself."*
->
-> #### 🔴 SIX PROPERTIES — and property 4 is load-bearing
->
-> Retrospective only · discrete not continuous · **named, never numbered** · **cannot be lost** · rejectable · never comparative.
->
-> **Property 4 is what separates this from a streak.** A streak is a thing you can break; a gear change is a thing that happened. **If any future surface lets a gear change be revoked, downgraded or re-earned, it HAS become a streak and must be removed.**
->
-> #### 🟢 "AND IT STUCK" IS DOING REAL WORK
->
-> **No gear change may fire on first occurrence.** One yoga session is not a range change; coming back once is not a return. The confirmation delay is what makes the observation true — and what stops the app congratulating somebody for something they did once and abandoned.
->
-> 🔴 **Weight is NEVER a gear change**, in any form. Weight moves for reasons that have nothing to do with the person's effort, and this product must not imply otherwise. It remains a target type for those who choose it.
->
-> #### 🟢 IT ATTACHES TO THE HINGE — which already exists and is already half-built
->
-> `programme.hingeOfferedAt`, `isHingePending()`, `_hingeCard()`. **The hinge already asks the FORWARD question. The gear change is the backward half of the same moment** — no new surface needed.
->
-> 🔴 **`chaptersDone` already writes `measuredLevelAtEnd`** with the comment *"recorded, never shown as a score."* **A completed gear change is already being recorded and nothing reads it back to the person.** Third instance of the same pattern today, after `sessionVariety` and `goalHasTarget`.
->
-> 🟠 Directional goals have no chapters, so they need a second attachment — **recommend the check-in opening, monthly at most.** NOT designed here: `checkin-openings.js` has not been opened, and the 20 Aug rule applies.
->
-> #### 🟢 TIER — a gear change is a READ
->
-> Free records fully (no tier gate on any write, already true). **The coach only says it on the Plan.** 🟠 Open: may the coach name changes that happened while the person was on free? **Recommend yes** — the change is theirs and a coach pretending not to have seen it would be lying — **but never as a backlog of six at once.** One at a time, at hinges, in order.
->
-> #### 🔴 BANNED FORMS
->
-> Streaks in any form, forever. Counts of any kind. Time comparisons finer than *"when we started"*. **Congratulation — "well done" is a grade**, and the coach observed something rather than awarding it. Badges, levels, unlocks, confetti, exclamation marks. Any implication the person should now maintain it.
->
-> #### 🟢 BREAK-EVEN AT THE LIVE PRICES — computed 20 Aug
->
-> Net after Stripe at the model's conservative 2.9% + 30p: **£59.99 → £57.95 · £44.99 → £43.39 · £7.99 → £7.46.**
->
-> | To cover | @ £59.99 | @ £44.99 | @ £7.99/m |
-> |---|---|---|---|
-> | Running costs only (~£802/yr) | **14** | **19** | 9, full year |
-> | Startup only (£1,974) | **35** | **46** | 265 user-months |
-> | **Both, year one (£2,776)** | **48** | **64** | 372 user-months |
->
-> **Graeme's question answered: 64 beta users at £44.99 clears everything in year one.**
->
-> 🟠 **Stripe is cheaper than the model assumes** — UK domestic is 1.5% + 20p plus 0.5% Billing = **2% + 20p**, not 2.9% + 30p. Immaterial (~£40/yr at 64 users) but the model overstates costs throughout.
->
-> 🟠 **The beta promise costs ~£930/year, permanently.** 64 at £44.99 nets £2,777; the same 64 at £59.99 would net £3,709. Small, deliberate, worth paying — **but it should be a known number, not a discovered one.**
->
-> 🔴 **Annual break-even is far more robust than monthly.** An annual subscriber cannot churn mid-year. At 6% monthly churn a £7.99 subscriber leaving at month five has paid £37 — **nearly three of them to equal one annual user.** The beta cohort converting to ANNUAL in December is the single most valuable thing that can happen to this business.
->
-> ---
+Supersedes `master_schedule_20aug2026_v210.md`. Remove v210 on upload.
 
 > ### 🔵 PROGRESSION BOUNDARY v2 — goals vs targets, and progression without a number
 >
@@ -4265,4 +4194,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 20 Aug 2026 v212*
+*Build New Habits · Alongside: Move · Master Schedule · 20 Aug 2026 v211*
