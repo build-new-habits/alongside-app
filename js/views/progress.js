@@ -1,6 +1,26 @@
 /**
  * progress.js
- * 18 Aug 2026 v9
+ * 20 Aug 2026 v10
+ *
+ * v10 - R4 / decision 7.2. EXPORT IS FREE. renderExportLocked() and its
+ *   tap handler are removed. UK GDPR gives a right of access and
+ *   portability regardless of payment, so the lock never withheld the
+ *   DATA -- only the button, converting a self-serve action into a
+ *   support email, on a one-person business.
+ *
+ *   The tier difference survives in the CONTENTS and is emergent: the
+ *   export is scoped by activeWindow (14 free, 30/90 paid) and its
+ *   programme lines drop out when there is no programme. No conditional
+ *   was needed or added.
+ *
+ *   NOTHING ELSE IN THIS FILE MOVED. The 30/90-day window and the
+ *   tiered observation depth stay exactly as they are -- those are the
+ *   kind-not-length distinction of section 4.1, and moving them would
+ *   collapse the boundary R4 exists to draw.
+ *
+ *   FLAGGED, NOT FIXED (touch-once): .progress-export--locked and
+ *   .progress-export__lock* are now dead CSS. The stylesheet is outside
+ *   this session's file list.
  *
  * v9 - ATHLETE-RETIRE. Three tier checks simplified.
  *
@@ -184,7 +204,16 @@ export function ProgressView(router) {
           ${renderCoachNarrative(stats, tier, name)}
           ${renderActivitySummary(tier)}
           ${stats.hasActiveProgramme ? renderProgrammeProgress(stats) : ''}
-          ${tier === 'personal' ? renderExportBlock() : renderExportLocked()}
+          <!-- R4 / decision 7.2, 20 Aug 2026. Was:
+                 tier === 'personal' ? renderExportBlock() : renderExportLocked()
+               UK GDPR gives a right of access and portability regardless
+               of payment, so the lock never withheld the DATA -- only the
+               button, converting a self-serve action into a support email.
+               The tier difference survives in the CONTENTS: this export is
+               scoped by activeWindow (14 free, 30/90 paid) and its
+               programme lines drop out when there is no programme. No
+               conditional needed; the differentiation is emergent. -->
+          ${renderExportBlock()}
 
           <!-- Front door for the annual reflection, added 11 Aug 2026.
                The view existed and nothing navigated to it. Progress is
@@ -374,20 +403,13 @@ export function ProgressView(router) {
     `;
   }
 
-  function renderExportLocked() {
-    return `
-      <section class="progress-export progress-export--locked" aria-label="Export your progress">
-        <div class="progress-export__lock"
-             role="button"
-             tabindex="0"
-             aria-label="Export is part of the Plan — tap to find out more"
-             data-route="upgrade">
-          <span class="progress-export__lock-label">Export your progress</span>
-          <span class="progress-export__lock-sub">Part of the Plan</span>
-        </div>
-      </section>
-    `;
-  }
+  // R4, 20 Aug 2026. renderExportLocked() is REMOVED, not left unused.
+  // A dead paywall renderer is a working example somebody reinstates.
+  //
+  // FLAGGED, NOT FIXED (touch-once): the CSS classes it used --
+  // .progress-export--locked, .progress-export__lock and its two child
+  // classes -- are now dead in the stylesheet. Left alone deliberately;
+  // the stylesheet is outside this session's file list.
 
   // ── Events ─────────────────────────────────────────────────────────────────
 
@@ -413,18 +435,7 @@ export function ProgressView(router) {
 
     container.querySelector('#progress-year-btn')
       ?.addEventListener('click', () => router.navigate('annual-reflection'));
-
-    // Locked export tap
-    const lockedExport = container.querySelector('[data-route="upgrade"]');
-    if (lockedExport) {
-      lockedExport.addEventListener('click', () => router.navigate('upgrade'));
-      lockedExport.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          router.navigate('upgrade');
-        }
-      });
-    }
+    // R4: the locked-export tap handler is gone with its renderer.
   }
 
   // ── Coach observation builder ──────────────────────────────────────────────
