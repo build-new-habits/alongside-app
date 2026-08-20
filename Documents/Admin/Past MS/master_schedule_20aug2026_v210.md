@@ -1,64 +1,8 @@
 # Alongside: Move — Master Schedule
-## 20 Aug 2026 v211
+## 20 Aug 2026 v210
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_20aug2026_v210.md`. Remove v210 on upload.
-
-> ### 🔵 PROGRESSION BOUNDARY v2 — goals vs targets, and progression without a number
->
-> `Documents/Business/alongside_progression_boundary_20aug2026_v1.md` **v2**. Decisions 5–8 open in its §7.
->
-> #### 🟢 FREE HAS GOALS. THE PLAN HAS TARGETS.
->
-> A **goal** is a direction (*"I want to feel better"*). A **target** is a destination (*"10K by March"*) — dated, with an end state. **Free onboarding does not change**: removing goals from free would degrade it, since `programmes.js` matches on goals and `workoutGenerator.js` uses them for the session rationale. It also breaks the anecdote — **the drop-in coach DOES ask what you want to do**; what he does not hold is where you are going and by when.
->
-> **The Plan adds a step at the point of upgrade.** That is also the cleanest form of R2: **the naming moment IS the upgrade**, not a demonstration bolted near it.
->
-> 🔴 **`goals.js` v2 already models every domain Graeme named** — stress, mood, sleep, energy, habit, weight, cardio, mobility, pain, posture, returning. Four goals carry `hasTarget: true` with a target type. **Both fields are declared and read ONLY inside `goals.js` itself — four data declarations plus their own accessors. No file outside `goals.js` imports or calls either.** Reader-less, same class as `sessionVariety` before DIC-1. The taxonomy was written in June and has been inert since.
->
-> ✅ **`schedule-drift.mjs` challenged this claim on the first run** and was right to: the symbol appears five times in live code. Re-read, all five are inside `goals.js` — the declarations and the accessor. Claim stands, **wording tightened from "never consumed" to name where the uses are.** The gate asking is the gate working.
->
-> #### 🔴 PROGRESSION FOR NON-MEASURABLE GOALS — three forbidden answers first
->
-> Counting consecutive weeks is **a streak** (absolute prohibition). Charting self-reported mood makes **a chart the person is failing** for personas 2.5, 2.8 and 2.13, and breaks P4. Scoring whether a practice "worked" grades the person's interior — **we respond, they report.**
->
-> #### 🟢 THREE CLASSES OF GOAL, NOT TWO
->
-> | Class | Target | Progression |
-> |---|---|---|
-> | **Measured** | A number and a date | The number moves |
-> | **Practised** | **A described end state in their words, and a date** | Range, depth, autonomy, integration |
-> | **Directional** | **NONE. EVER.** | The coach keeps making sessions that suit you |
->
-> **Directional goals must never acquire a target.** Dating *"enjoy exercise"* is absurd and, for somebody whose relationship with exercise is the injury, harmful. **The Plan does not promise a road for everything, and saying so is worth more than pretending.**
->
-> #### 🟢 THE DESIGN PRINCIPLE
->
-> > **For practised goals, progression is something the coach DOES, not something the person SEES.**
->
-> No bar, no level, no count, no chart — **no progression surface at all.** The person experiences the coach offering things slightly beyond where they are, and getting it right more often as months pass. All four axes are **behavioural** (which practices opened, length chosen, prompted vs self-initiated, where in the session) — **none reads how the person felt, and none touches the journal.**
->
-> #### 🟢 THE PAID MOMENT is the occasional observation
->
-> *"Three months ago, I was the one suggesting you take a minute before we started. The last few times, you got there before I did."* A **read**, not a record — §4.1's distinction applied to wellbeing. **Free records what happened; the Plan notices what changed.**
->
-> Rules are tight: **change in KIND, never a count** (a count is a target in disguise and the shortest road back to a streak); no time comparison finer than *"a while ago"*; **must be rejectable**; and **suppression STRICTER than R1's** — R1's whole list plus never at session start, never inside a practice, never on a day low mood was reported.
->
-> 🟠 **§4.6, the REVERSE observation** (*"you've been reaching for these less lately"*) — **most sensitive sentence in the product. HOLD until beta evidence.** It reflects check-in data back rather than merely adapting to it, and that is a new act. Build the forward direction first.
->
-> #### 🟢 TRIAL — decided, and the half that is not
->
-> **DECIDED (Graeme's commercial policy):** voluntary **full refund for 14 days from FIRST PAYMENT**, in addition to any statutory right. His to grant, granted.
->
-> 🔴 **STILL NATALIE'S:** whether granting it resolves the CCR position. The v197 entry says *"not legal advice and must not be treated as settled"* and that has not changed. **Deciding to be generous is not the same as being advised that generosity fixes a statutory problem.** The two must not be collapsed.
->
-> **Confirmation screen drafted** (§9). Under the CCRs a distance contract needs pre-contract information before the person is bound plus express acknowledgement that payment follows — **the tickbox is the legally meaningful part**, not a link nobody opens. **No comparison to the statutory period appears in it.**
->
-> #### 🔴 STALE FIGURES QUOTED IN SESSION — my error, recorded
->
-> The v197 entry says the pricing model's **sections 2–5 were not recomputed at £7.99/£59.99 and must not be quoted before rerunning.** They were quoted to Graeme this session anyway — break-even 34–55 users, Scenario 2 at 33 paid users. **Direction of the error favours the business** (£59.99 is 20% more per annual user, so break-even is lower), but the figures given were not current. 🟠 **Rerun before anyone quotes them again.**
->
-> ---
+Supersedes `master_schedule_20aug2026_v209.md`. Remove v209 on upload.
 
 > ### 🔴 PROGRESSION DOES NOT EXIST — for anyone, on any tier
 >
@@ -4194,4 +4138,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 20 Aug 2026 v211*
+*Build New Habits · Alongside: Move · Master Schedule · 20 Aug 2026 v210*

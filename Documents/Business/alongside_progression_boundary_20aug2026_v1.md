@@ -1,5 +1,7 @@
 # Alongside: Move — The Progression Boundary
-## 20 Aug 2026 v1
+## 20 Aug 2026 v2
+
+**v2 adds §3.1 (goals versus targets), §4 (progression without a number) and §9 (the trial confirmation).** v1's finding and boundary are unchanged.
 
 Build New Habits | Why the Plan is worth paying for, and why it needs no new paywall.
 
@@ -99,7 +101,122 @@ The decisive line is the second from bottom. **A difficulty gate optimises acqui
 
 ---
 
-## 4. Build shape
+## 3.1 Goals are not targets — and only one of them is paid
+
+Graeme, 20 Aug, proposed a Plan-tier onboarding that sets a destination across mental health, mindfulness, weight, general fitness, mobility and *"the feeling someone has around fitness"* — and asked whether free should therefore have no goals at all.
+
+**Most of that already exists in data.** `goals.js` v2 categorises goals across exactly those domains: feel better day to day, more energy, reduce stress, improve mood, sleep better, build a consistent routine, build muscle, get stronger, lose weight, improve cardio, flexibility, balance, reduce pain, posture, return after illness, enjoy exercise. Four goals carry `hasTarget: true` with a `targetType` of weight, distance or programme.
+
+🔴 **Nothing outside `goals.js` reads either field.** Both are declared on four goals and read only by their own accessors within that file; **no other module imports or calls either one.** Same class as `sessionVariety` before DIC-1 — a field waiting for the feature it was built for. **The taxonomy for this work was written in June and has been inert since.**
+
+✅ Verified rather than assumed: `schedule-drift.mjs` flagged the first draft of this claim because the symbol appears five times in live code. All five are the declarations and the accessor inside `goals.js`. The claim holds; the wording now says where the uses are instead of denying they exist.
+
+### The distinction
+
+| | A goal | A target |
+|---|---|---|
+| Is | A **direction** | A **destination** |
+| Example | *"I want to feel better"* | *"10K by March"* |
+| Has a date | No | **Yes** |
+| Has an end state | No | **Yes** |
+| Tier | **Free** | **The Plan** |
+
+> **Free has goals. The Plan has targets.**
+
+**Free onboarding does not change.** Removing goals from free would degrade it: `programmes.js` matches programmes on goals via `getProgrammesForGoals()`, and `workoutGenerator.js` uses them for the session's rationale. Free sessions would become generic, which §4 of the tier boundary forbids.
+
+It also breaks the anecdote. **The drop-in coach does ask what you want to do.** What he does not hold is where you are going and by when.
+
+**The Plan adds a step at the point of upgrade**, where the direction becomes a destination. That is also the cleanest available form of R2: **the naming moment IS the upgrade**, rather than a demonstration bolted near it.
+
+---
+
+## 4. Progression without a number
+
+Load progression is straightforward for *get stronger*. **This section is about the other two thirds of the goal list**, and it is the part that decides whether this product works for its actual market or only for lifters.
+
+### 4.1 The problem, stated honestly
+
+What does progression mean for *reduce stress*, *sleep better*, *improve mood*, *build a consistent routine*?
+
+Three obvious answers are all forbidden, and each for a reason already settled:
+
+| Tempting answer | Why it is out |
+|---|---|
+| Count consecutive weeks of practice | **A streak.** Absolute prohibition, §5 |
+| Chart self-reported mood over time | For personas 2.5, 2.8 and 2.13, **a chart of how you feel becomes a chart you are failing.** It also breaks P4: a number with a trend attached is a verdict |
+| Score whether the practice "worked" | The coach does not grade the person's interior. **We respond, they report** |
+
+### 4.2 Three classes of goal, not two
+
+The honest taxonomy has a third class, and naming it is what stops the Plan promising a road it cannot build.
+
+| Class | Target is | Progression is | Examples |
+|---|---|---|---|
+| **Measured** | A number and a date | The number moves | Lose weight, run 5K/10K, get stronger |
+| **Practised** | **A described end state, in their words, and a date** | **Range, depth, autonomy, integration** — see 4.3 | Reduce stress, sleep better, improve mood, mindfulness |
+| **Directional** | **None. Ever.** | The coach keeps making sessions that suit you | Enjoy exercise, move more, feel better day to day |
+
+**Directional goals must never acquire a target.** Putting a date on *"enjoy exercise"* is absurd and, for somebody whose relationship with exercise is the injury, actively harmful. **The Plan does not promise a road for everything**, and saying so plainly is worth more than pretending otherwise.
+
+For **practised** goals the target is a sentence, not a metric: *"By March I want to be able to get through a bad week without it flattening me."* Not measurable. Still a destination — the coach can point at it, and R1's hard conversation still works against it.
+
+### 4.3 What actually progresses — four axes
+
+For practised goals, progression happens in **what the person does**, never in **how they feel**.
+
+| Axis | What grows | Observable from |
+|---|---|---|
+| **Range** | How many practices they have that genuinely work, and knowing which suits which state | Which practices were opened and completed |
+| **Depth** | Duration and subtlety. A two-minute body scan becomes ten. Breath awareness becomes breath regulation | Practice length chosen |
+| **Autonomy** | **The big one.** Early on the coach suggests a practice. Later the person recognises the state and goes there unprompted | Whether entry was prompted or self-initiated |
+| **Integration** | The practice attaches to movement rather than sitting beside it — grounding before a session, then during, then whenever it is needed | Where in the session it was used |
+
+**Every one of those is behavioural.** None requires reading how the person felt, and none touches the journal — the Journal Privacy Rule is absolute and unaffected.
+
+### 4.4 The design principle
+
+> **For practised goals, progression is something the coach DOES, not something the person SEES.**
+
+There is no bar, no level, no count, no chart. **There is no progression surface at all.**
+
+What the person experiences is that the coach keeps offering things slightly beyond where they are, and gets it right more often as the months pass. That is exactly what a good therapist or coach does: they do not show you a graph, they keep meeting you a little ahead of yourself.
+
+**Is invisible progression worth paying for?** Yes — but only if it is occasionally *named*, which is 4.5.
+
+### 4.5 The observation — and this is the paid moment
+
+Periodically, the coach says what it has noticed. Not a score. An observation the person can accept or reject.
+
+> *Three months ago, I was the one suggesting you take a minute before we started. The last few times, you got there before I did.*
+
+That is a **read**, not a record — precisely the free/Plan distinction of tier boundary §4.1, applied to wellbeing rather than to training. **Free records what happened. The Plan notices what changed.**
+
+**The rules, and they are tight:**
+
+- **Names a change in KIND, never a count.** *"You've started going there yourself"* — never *"you did that four times."* A count is a target in disguise, and the shortest road back to a streak.
+- **No time comparison finer than "a while ago".** No *"in the last 30 days"*, no week-on-week.
+- **Must be rejectable.** The person can say *that's not how it feels* and the coach accepts it without argument. It was an observation, not a finding.
+- **Suppression is STRICTER than R1's.** Everything on R1's list — Care Mode, burnout, pain band, bottom mood or energy — plus: never at the start of a session, never within a wellbeing practice, and never on a day the person has reported a low mood at all. Telling somebody with depression what the app has noticed about them, at the wrong moment, is the harm this product exists to refuse.
+
+### 4.6 It must run backwards too
+
+If the pattern reverses, the coach can say so — and this is the wellbeing form of R1's hard conversation:
+
+> *You've been reaching for these less lately. Nothing wrong with that. Has something changed, or shall we try something different?*
+
+🟠 **This is the most sensitive sentence in the product** and I do not think it should ship on my judgement alone. It reads check-in mood and energy — not journal, which is protected absolutely — and check-in data already drives adaptation, so the reading itself is established. **Reflecting it back is the new act.** Recommend: build the forward direction (4.5) first, ship it, and hold 4.6 until there is real beta evidence about how the observation lands.
+
+### 4.7 What this is NOT
+
+- Not a wellbeing score, index, or streak of any kind
+- Not a chart of mood, sleep or energy over time
+- Not a claim that the person is better. **The coach reports what it did and what it noticed, never how the person is**
+- Not therapy, and never phrased as though it were
+
+---
+
+## 4A. Build shape
 
 **Not specified in detail here on purpose.** §1's process finding applies to this document too: the implementing session must open `session-builder.js`, `store.js` and `liftLog` first and record what it finds. What follows is scope and constraint, not a design.
 
@@ -167,6 +284,10 @@ Progression matters from **Year 2**, when the free base is large enough for a co
 | 2 | Build P-1 (load) + P-3 (reversal) together as one item | **Yes — reversal is a safety requirement, not a phase two** |
 | 3 | Where does this sit against R1 and R2? | **R1 first.** The hard conversation needs somewhere to point; a target with no rising road makes the conversation harder to have honestly |
 | 4 | Difficulty line — finally closed? | **Close it.** §3 |
+| 5 | **Free has goals, the Plan has targets** — free onboarding unchanged | **Yes.** §3.1 |
+| 6 | **Three goal classes**, with directional goals never acquiring a target | **Yes.** §4.2. The honest limit is worth more than a promise |
+| 7 | **Invisible progression** for practised goals, named occasionally (4.5) | **Yes** |
+| 8 | The reverse observation (4.6) | **Hold until beta evidence.** Build 4.5 first |
 
 ---
 
@@ -188,4 +309,34 @@ Progression matters from **Year 2**, when the free base is large enough for a co
 
 ---
 
-*Build New Habits · Alongside: Move · The Progression Boundary · 20 Aug 2026 v1*
+## 9. The trial confirmation screen
+
+🟢 **DECIDED 20 Aug — Graeme's commercial policy:** a **voluntary full refund for 14 days from FIRST PAYMENT**, in addition to any statutory right. This is his to grant and it is granted.
+
+🔴 **STILL OPEN — Natalie's:** whether granting it resolves the CCR position. The schedule records the earlier entry as *"not legal advice and must not be treated as settled"*, and that has not changed. **The two must not be collapsed:** deciding to be generous is not the same as being advised that generosity fixes a statutory problem.
+
+### Why a confirmation screen, not just terms
+
+Under the Consumer Contracts Regulations a distance contract requires pre-contract information **before** the person is bound, and express acknowledgement that an obligation to pay follows. A trial that becomes a subscription without that is where subscription businesses get into difficulty. **The tickbox is the legally meaningful part** — express acknowledgement, not a link nobody opens.
+
+### Draft — for Natalie to mark up, not to ship
+
+> **Before you start your 30 days**
+>
+> Your Plan starts today. We won't take any payment until **[date]**, 30 days from now.
+>
+> Cancel before then and you won't be charged at all. You'll go back to the free tier and keep everything you've done.
+>
+> After **[date]** you'll be charged **£7.99 a month** until you cancel. You can cancel any time, and we'll also honour a full refund for 14 days after that first payment.
+>
+> ☐ I understand my Plan starts today and payment begins on **[date]**.
+>
+> **[ Start my 30 days ]  [ Not yet ]**
+
+**Deliberately absent: any comparison to the statutory period.** The line *"over double the statutory cancellation period"* must not ship — under the CCRs the 14 days may run from contract formation and therefore expire on **day 14, inside the trial**. The voluntary refund stands in its place, so nobody has to be told a right quietly lapsed.
+
+P2 helper layer. **Billing never speaks in coach voice.**
+
+---
+
+*Build New Habits · Alongside: Move · The Progression Boundary · 20 Aug 2026 v2*
