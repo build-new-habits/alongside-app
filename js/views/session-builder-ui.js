@@ -1,7 +1,32 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
- * 18 Aug 2026 v11
+ * 20 Aug 2026 v12
+ *
+ * v12 - R4. EVERY STEP OF THIS BUILDER IS NOW FREE. The type picker,
+ *   the duration picker, the warm-up/work/cool-down split and the
+ *   build-mode step each rendered through lockedFeature() on the free
+ *   tier, and the location step was skipped entirely -- so a free user
+ *   was never asked whether they were at home or at the gym. The coach
+ *   guessing instead of asking, which is the one thing this product is
+ *   built not to do.
+ *
+ *   TIER-G is reversed two days after it was added. Both decisions are
+ *   recorded in the comments below rather than the earlier one being
+ *   deleted; the reversal is the useful part.
+ *
+ *   The isPremium/lockedFeature import is REMOVED, not left unused. An
+ *   unused paywall import is a working example somebody copies, and it
+ *   leaves the gate unable to tell a live gate from a dead one.
+ *
+ *   TWO FOOTNOTES DELETED, both untrue rather than merely redundant:
+ *   "All session types come with the Plan" and "Choosing your own
+ *   movements is part of the Plan".
+ *
+ *   Caught only by execution: removing the `premium` local left three
+ *   references behind, and the view threw on render while every
+ *   source-text gate stayed green. node --check passed it too -- it
+ *   parses .js as a script, not a module.
  *
  * v11 - NAME-1. Two copy lines now say "the Plan" rather than "the
  *   Personal plan". Copy only. Reasoning in js/auth.js v2.
@@ -167,7 +192,12 @@
 import { store }                          from "../store.js";
 import { router }                         from "../router.js";
 import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection } from "../session-builder.js";
-import { isPremium, lockedFeature }        from "../auth.js";
+// R4, 20 Aug 2026. isPremium/lockedFeature are no longer used in this
+// file. Every step of the builder -- type, duration, allocation split,
+// location, build mode -- is now free. The import is REMOVED rather than
+// left: an unused paywall import is a working example somebody copies,
+// and it makes verify-tier.mjs unable to tell a live gate from a dead
+// one. Restore it deliberately if a step ever becomes paid again.
 
 /**
  * The person's saved allocation preset, validated against the live
@@ -341,9 +371,10 @@ function renderLocationStep() {
   `;
 }
 
+// R4, 20 Aug 2026. The type picker no longer gates. Every SESSION_TYPES
+// entry is pressable on every tier. Choosing what you work on today is
+// self-direction, and self-direction is an accessibility feature.
 function renderTypePicker() {
-  const premium = isPremium();
-
   return `
     <div class="view session-builder-view">
 
@@ -364,10 +395,6 @@ function renderTypePicker() {
       <div style="display: flex; flex-direction: column; gap: var(--space-3);"
            role="group" aria-label="Choose session type">
         ${SESSION_TYPES.map(t => {
-          const locked = !premium && t.id !== "full";
-
-          // Shared inner content — identical for locked and unlocked so the
-          // two states read as the same product, not two designs.
           const inner = `
               <span style="font-size:2rem;flex-shrink:0;line-height:1;" aria-hidden="true">${t.icon}</span>
               <div style="flex:1;min-width:0;">
@@ -375,28 +402,11 @@ function renderTypePicker() {
                 <p class="text-secondary" style="font-size:var(--text-sm);">${t.description}</p>
               </div>`;
 
-          // 11 Aug 2026 (WOW-4/PT-7). Locked tiles were rendered with the
-          // HTML disabled attribute, which removes them from the tab order
-          // entirely — so the aria-label explaining "Personal tier" was
-          // unreachable by keyboard and screen reader, and tapping did
-          // nothing at all. Priya (persona 2.15) taps "Lower body", wants it
-          // enough to reach for it, and the app ignores her: the single best
-          // conversion moment in the product, doing nothing.
-          //
-          // Now uses auth.js's lockedFeature(), the same treatment
-          // noticing.js already uses for In Step — focusable, announced, and
-          // tapping routes to /upgrade. A <div> is used inside, never a
-          // <button>: lockedFeature() returns role="button" and nesting one
-          // interactive control inside another is invalid.
-          if (locked) {
-            return lockedFeature(`
-            <div class="card"
-                 style="display:flex;align-items:center;gap:var(--space-4);text-align:left;width:100%;background:var(--color-surface);">
-              ${inner}
-            </div>
-          `, "personal", t.label + " session");
-          }
-
+          // R4, 20 Aug 2026. The lockedFeature() branch that stood here is
+          // GONE. WOW-4/PT-7's reasoning was about making a locked tile
+          // reachable by keyboard; the tile is not locked any more, so
+          // there is nothing to reach. Priya (persona 2.15) taps "Lower
+          // body" and gets lower body.
           return `
             <button class="card sb-type-tile"
                     data-type="${t.id}"
@@ -409,18 +419,26 @@ function renderTypePicker() {
         }).join("")}
       </div>
 
-      ${!premium ? `
-        <p class="text-xs text-muted" style="text-align:center; margin-top: var(--space-4);">
-          All session types come with the Plan.
-        </p>
-      ` : ""}
+      <!-- R4, 20 Aug 2026. A free-tier footnote reading "All session
+           types come with the Plan" stood here. Removed: every session
+           type IS free now, so the line was not merely redundant but
+           untrue. It was also the only remaining reference to the
+           premium local, which is why the view threw on render once that
+           local went -- caught by verify-tiergh.mjs EXECUTING the view,
+           not by any source-text check and not by node --check.
+
+           NOTE, and it cost two attempts: no backtick may appear in a
+           comment that sits inside a template literal. The comment does
+           not protect it -- it closes the template. -->
 
     </div>
   `;
 }
 
+// R4, 20 Aug 2026. Ungated, same reasoning as the type picker. The
+// person with forty minutes and the person with ten are both telling the
+// coach something true about today.
 function renderDurationPicker() {
-  const premium = isPremium();
   const type    = SESSION_TYPES.find(t => t.id === selectedType);
 
   return `
@@ -441,22 +459,11 @@ function renderDurationPicker() {
       <div style="display:flex;flex-direction:column;gap:var(--space-3);"
            role="group" aria-label="Choose duration">
         ${DURATIONS.map(d => {
-          const locked = !premium && d.mins !== 30;
           const inner = `
               <div>
                 <span style="font-size:var(--text-lg);font-weight:var(--font-semibold);">${d.label}</span>
                 <span class="text-secondary" style="font-size:var(--text-sm);margin-left:var(--space-2);">${d.desc}</span>
               </div>`;
-
-          // 11 Aug 2026 (WOW-4/PT-7) — same swap as the type picker above.
-          if (locked) {
-            return lockedFeature(`
-            <div class="card"
-                 style="display:flex;align-items:center;justify-content:space-between;text-align:left;width:100%;background:var(--color-surface);">
-              ${inner}
-            </div>
-          `, "personal", d.label + " sessions");
-          }
 
           const recLabel = d.mins === 30
             ? "<span style='font-size:var(--text-xs);color:var(--color-primary);flex-shrink:0;'>Recommended</span>"
@@ -473,7 +480,10 @@ function renderDurationPicker() {
         }).join("")}
       </div>
 
-      ${isPremium() ? `
+      <!-- R4, 20 Aug 2026. This block was wrapped in a tier-conditional
+           template expression. The warm-up/work/cool-down split is
+           self-direction and is now free, so it is unwrapped entirely
+           rather than left as a condition that always evaluates true. -->
         <p class="text-sm text-muted" style="margin-top: var(--space-5); margin-bottom: var(--space-2);">
           How should today's time split across warm-up, work, and cool-down?
         </p>
@@ -489,7 +499,6 @@ function renderDurationPicker() {
             </button>
           `).join("")}
         </div>
-      ` : ""}
 
     </div>
   `;
@@ -625,24 +634,20 @@ function renderEquipmentCheck() {
 // (Coach builds it / Coach recommends / Build your own), not its persistent-
 // storage model -- this still produces a one-off generatedSession, same as
 // before. "Coach builds it" is the unchanged existing flow.
-// TIER-G helper. Identical inner content for locked and unlocked so the
-// two states read as the same product, not two designs -- the same rule
-// the type picker above already follows. A <div> inside lockedFeature(),
-// never a <button>: it returns role="button" and nesting one interactive
-// control inside another is invalid.
-function _buildModeOption(premium, mode, title, blurb) {
+// R4, 20 Aug 2026. TIER-G is REVERSED. This helper locked two of the
+// three build routes for free users, one week after TIER-G added the
+// lock. The reasoning then was that composing is the paid act; the
+// reasoning now is that composing is how somebody with a body the
+// default does not fit gets a session they can actually do.
+//
+// The `premium` parameter is removed along with the branch. Leaving a
+// dead parameter would have been the smaller edit, and the wrong one:
+// the next person to read this signature would reasonably assume the
+// tier still decides something here.
+function _buildModeOption(mode, title, blurb) {
   const inner = `
       <span style="font-weight:var(--font-semibold);">${title}</span>
       <span class="text-secondary text-sm">${blurb}</span>`;
-
-  if (!premium) {
-    return lockedFeature(`
-      <div class="card"
-           style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;width:100%;background:var(--color-surface);padding:var(--space-4);">
-        ${inner}
-      </div>
-    `, "personal", title);
-  }
 
   return `
     <button class="card sb-buildmode-btn" data-mode="${mode}"
@@ -653,23 +658,19 @@ function _buildModeOption(premium, mode, title, blurb) {
 }
 
 //
-// TIER-G, 18 Aug 2026. This step had NO tier check at all. A free user
-// reached it through the Library's free "Full Body" card and could pick
-// "Coach recommends, I'll choose" or "Build my own" -- choosing their own
-// exercises, one at a time, from the candidate pools.
+// TIER-G, 18 Aug 2026 -- ADDED, AND REVERSED TWO DAYS LATER, and both
+// decisions are recorded because the reversal is the useful part.
 //
-// alongside_tier_boundary_12aug2026_v1.md, section 4: free is "Full body
-// only. The coach decides." The one-line test makes composing the paid
-// act. Two of these three routes are composing.
+// TIER-G locked "Coach recommends" and "Build my own" against section 4
+// of the 12 Aug boundary: free is "Full body only. The coach decides."
+// R4 retires that boundary. Self-direction is an accessibility feature,
+// and the free tier is not a place where the coach refuses to let you
+// choose. All three routes are open on every tier.
 //
-// The locked routes are SHOWN, not hidden, per section 6 -- "the door is
-// visible at all times, the person walks through it when they choose."
-// Hiding them would leave a screen with one button on it, which is a
-// question with one answer, and would remove the exact conversion moment
-// this file already argues for in the type picker above.
+// What survives from TIER-G is the layout argument: a screen with one
+// button on it is a question with one answer. It now has three.
 function renderBuildModeStep() {
-  const type    = SESSION_TYPES.find(t => t.id === selectedType);
-  const premium = isPremium();
+  const type = SESSION_TYPES.find(t => t.id === selectedType);
   return `
     <div class="view session-builder-view">
 
@@ -692,20 +693,22 @@ function renderBuildModeStep() {
           <span class="text-secondary text-sm">I'll pick everything for you, based on your equipment and how you're doing today.</span>
         </button>
         ${_buildModeOption(
-          premium, "recommend", "Coach recommends, I'll choose",
+          "recommend", "Coach recommends, I'll choose",
           "I'll suggest a starting selection from a wider list — swap anything you like."
         )}
         ${_buildModeOption(
-          premium, "own", "Build my own",
+          "own", "Build my own",
           "Pick everything yourself from what's available today."
         )}
       </div>
 
-      ${!premium ? `
-        <p class="text-xs text-muted" style="text-align:center; margin-top: var(--space-4);">
-          Choosing your own movements is part of the Plan.
-        </p>
-      ` : ""}
+      <!-- R4, 20 Aug 2026. A free-tier footnote reading "Choosing your
+           own movements is part of the Plan" stood here. Removed for the
+           same reason as its twin in the type picker: it is no longer
+           true. Choosing your own movements is free, and it is arguably
+           the single most important thing to be free -- the person whose
+           body does not fit the default is the person who most needs to
+           override it. -->
 
     </div>
   `;
@@ -995,17 +998,23 @@ export function onMount() {
       // explanation and no route to upgrade. It was the quietest
       // paywall in the product and the only one that lied.
       //
-      // library.js now gates those cards, so a locked type can no
-      // longer arrive by preselect at all. This is the belt to that
-      // braces: if one ever does, route to upgrade. Substituting
-      // silently is the behaviour being removed, so it must not
-      // survive as the fallback.
-      if (!isPremium() && pre.type !== "full") {
-        router.navigate("upgrade");
-        return;
-      }
+      // R4, 20 Aug 2026. The upgrade-route guard that stood here is
+      // GONE. It caught a free user arriving with any preselect other
+      // than "full" and sent them to the paywall. Those cards are free
+      // now, so the guard would fire on a legitimate journey -- a
+      // paywall in front of an open door.
+      //
+      // The rule it was protecting SURVIVES and is worth restating: if a
+      // route is not available, send the person to the door and say so.
+      // Never substitute silently. That is still the standard here; it
+      // just has nothing left to catch on this path.
 
-      phase = isPremium() ? "location" : "equipment";
+      // R4, 20 Aug 2026. Was `isPremium() ? "location" : "equipment"`.
+      // The free path skipped the location step entirely, so a free user
+      // was never asked whether they were at home or at the gym -- the
+      // coach GUESSING instead of asking, which is the one thing this
+      // product is built not to do.
+      phase = "location";
       rerender();
       return;
     }
@@ -1023,7 +1032,7 @@ export function onMount() {
       phase = "location";
       rerender();
     } else if (phase === "equipment") {
-      phase = isPremium() ? "duration" : "type";
+      phase = "duration";   // R4: the free path no longer skips duration
       rerender();
     } else if (phase === "buildmode") {
       phase = "equipment";
@@ -1057,12 +1066,10 @@ export function onMount() {
       // forbidden behaviour is a working example somebody copies, and
       // it makes the gate unable to tell dead from live. The free path
       // now sets the duration it is entitled to and says so.
-      if (isPremium()) {
-        phase = "location";
-      } else {
-        selectedDuration = 30;   // the free tier's only length
-        phase            = "equipment";
-      }
+      // R4, 20 Aug 2026. The free branch here set selectedDuration = 30
+      // and jumped to equipment, because 30 minutes was "the free tier's
+      // only length". It is not any more. One path for everybody.
+      phase = "location";
       rerender();
     });
   });
@@ -1083,7 +1090,13 @@ export function onMount() {
   document.querySelectorAll(".sb-duration-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedDuration = parseInt(btn.dataset.mins);
-      if (isPremium()) {
+      // R4, 20 Aug 2026. The `else` that stood here forced
+      // selectedDuration = 30, copied the flat saved equipment list into
+      // the override and called triggerBuild() immediately -- so a free
+      // user never saw the equipment check OR the build-mode step, and
+      // the flat list is the very thing EQUIP-4 below identifies as
+      // wrong. One path for everybody now.
+      {
         phase = "equipment";
         // 05 Aug 2026 -- reads the location-scoped list, not the flat merged
         // `equipment` -- the actual fix for the "assumed home" bug.
@@ -1104,10 +1117,6 @@ export function onMount() {
         // checkbox handler and the Build button below, which is where it
         // belongs: after somebody has actually touched something.
         equipmentOverride = null;
-      } else {
-        selectedDuration  = 30;
-        equipmentOverride = [...(store.get("equipment") || [])];
-        triggerBuild();
       }
       rerender();
     });
@@ -1162,16 +1171,10 @@ export function onMount() {
     btn.addEventListener("click", () => {
       buildMode = btn.dataset.mode;
 
-      // TIER-G belt to the render's braces. Locked routes render through
-      // lockedFeature(), which produces no .sb-buildmode-btn, so this
-      // cannot fire today. It is here because the two silent-substitution
-      // bugs removed on 13 Aug both lived in exactly this position, and
-      // routing to the door is the correct failure -- never quietly
-      // handing somebody the coach-built session they did not ask for.
-      if (!isPremium() && buildMode !== "coach") {
-        router.navigate("upgrade");
-        return;
-      }
+      // R4, 20 Aug 2026. The TIER-G guard here is GONE -- all three
+      // build modes are free, so there is no locked route left to catch.
+      // Its principle is unchanged and still applies elsewhere: route to
+      // the door, never substitute silently.
 
       if (buildMode === "coach") {
         triggerBuild();

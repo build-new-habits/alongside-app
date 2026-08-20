@@ -1,12 +1,22 @@
 /**
  * tools/verify-pb1.mjs
- * 15 Aug 2026 v1
+ * 20 Aug 2026 v2
  *
  * PB-1. Personal bests for persona 2.7, without turning the product
  * into a scoreboard for everybody else.
  *
- * Matrix decision 2, agreed 05 Jul: basic performance logging as a
- * Personal-tier feature, decoupled from the Athlete programme builder.
+ * R4 / decision 7.1, 20 Aug 2026. THE TIER CHECK IS INVERTED. Matrix
+ * decision 2 (05 Jul) made bests a paid feature. A best is a fact about
+ * the person's own log -- they produced it, and free already includes
+ * lift notes and recall -- so it is free.
+ *
+ * WHAT DID NOT CHANGE, and it is the more important half: the opt-in.
+ * showPersonalBests still defaults to false and every tone assertion
+ * below still holds. Ungating is not switching on. For personas 2.5,
+ * 2.8 and 2.13 a visible best is a target to fall short of, which is
+ * the failure this product exists to avoid -- and that risk belongs to
+ * free users exactly as much as paid ones, so widening who can see it
+ * makes the default MORE load-bearing, not less.
  */
 import fs from 'node:fs';
 import { JSDOM } from '/home/claude/node_modules/jsdom/lib/api.js';
@@ -89,8 +99,20 @@ store.set('showPersonalBests', true);
 check('shown when asked for', /Your best: 90/.test(slog.bestLine(ex)), slog.bestLine(ex));
 
 store.set('tier', 'free');
-check('Personal tier only', slog.bestLine(ex) === '',
-  'matrix decision 2 — Personal, decoupled from Athlete');
+check('R4: a FREE user sees their own best when they ask for it',
+  /Your best: 90/.test(slog.bestLine(ex)),
+  slog.bestLine(ex) || '(empty) — the tier gate is back. "Your best: 90 kg" ' +
+  'is a fact the person produced, not a coach read');
+
+// The inverse, and the one that matters more. Asserted on the FREE tier
+// specifically: ungating widened who is exposed to the default, so the
+// default has to hold for the newly-included group, not just the old one.
+fresh(); store.set('tier', 'free'); store.logLift('squat', { weight: 90 });
+check('R4 (inverse): and still NOT by default, on free',
+  slog.bestLine(ex) === '',
+  'ungating is not switching on — a visible best is a target to fall ' +
+  'short of for personas 2.5, 2.8 and 2.13');
+store.set('showPersonalBests', true);
 
 // ── Tone ─────────────────────────────────────────────────────
 store.set('tier', 'personal');
