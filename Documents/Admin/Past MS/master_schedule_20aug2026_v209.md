@@ -1,66 +1,8 @@
 # Alongside: Move — Master Schedule
-## 20 Aug 2026 v210
+## 20 Aug 2026 v209
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_20aug2026_v209.md`. Remove v209 on upload.
-
-> ### 🔴 PROGRESSION DOES NOT EXIST — for anyone, on any tier
->
-> **New document: `Documents/Business/alongside_progression_boundary_20aug2026_v1.md`.** Proposed; four decisions open in its §7.
->
-> Ground-truthed 20 Aug against `session-builder.js` v11 and `programmeEngine.js`. **Sets default to 3, reps come from the exercise definition, and nothing escalates either across sessions.** No load guidance, no complexity ladder. `session-builder.js`'s own header says it: *"a person on a programme who uses the session-builder gets week 10 built the same as week 1."*
->
-> **CONT-1 gave continuity, not progression.** Movements recur so form can be corrected — meeting the same squat eight times is not that squat getting harder. The one attempt at progression-by-preference (15 Aug) was measured at 3%, written up as a finding, then instrumented and shown to have **executed zero times**. Noise on unchanged behaviour. Still untested.
->
-> #### 🔴 THIS IS A DELIVERY PROBLEM BEFORE IT IS A PAYWALL PROBLEM
->
-> Tier boundary v3 promises *"you name what you're working toward, the coach builds the road."* **Without progression the road is flat.** The Plan is currently charging for something it cannot deliver — a refund-and-bad-review risk in the December soft launch, and reason to build it whether or not it becomes the boundary.
->
-> #### 🟢 THE BOUNDARY NEEDS NO NEW GATE
->
-> **You cannot progressively overload toward nothing.** Progression requires a destination, and free has none by design — so the boundary is **structural, like "My programme"**, not an `isPremium()` check. Nothing is withheld and there is no paywall to resent. The moment somebody names a destination the road can rise, **which is exactly what R2 should demonstrate**.
->
-> #### 🟢 THE DIFFICULTY LINE IS REJECTED — on commercial grounds, not philosophical
->
-> Graeme proposed free = basic movements only. Checked against the live library (552 exercises): **394 are level 1–2 (71%)**. Paid would be 158 entries — **40 gym barbell, 27 rehabilitation**. `seated.js` is 43 entries all level 1–2; `mobility.js` is 36, all level 1–2.
->
-> **The personas this product exists for live permanently in the free band with nothing to buy**, while the paid tier serves able gym-goers — a market with Strong, Hevy and Fitbod ten years ahead. And **a difficulty gate is a one-time unlock**: it converts once and then removes the reason to stay, against a model whose own conclusion is that *1% of churn outweighs doubling acquisition*.
->
-> #### 🔴 PROCESS FINDING — three specs written against unopened files, in one session
->
-> | Item | Claimed | Actual |
-> |---|---|---|
-> | R3 | "not built, cheap to build" | **Shipped 12 Aug as DIC-1.** Gated, free |
-> | R1 | "unbuilt" | Correct — but only confirmed by grepping afterwards |
-> | Progression | "machinery largely exists, gated not built" | **Does not exist for anyone** |
->
-> The R3 spec was written in the same document that warned R2 must not be specced before opening `goal-setup.js`. **Writing the warning is not following it.** RULE: no item enters an R-stream spec until the files it names have been opened in that session and the finding recorded.
->
-> #### 🔴 NEVER STREAKS. EVER.
->
-> Graeme, 20 Aug: *"never ever ever streaks. Ever."* Recorded as an **absolute alongside the safety constraints**, not a preference. No consecutive-session counting, no chain, no calendar grid, no reference to a run of any length — any tier, any copy, forever. Belongs in the banned vocabulary of every gate checking coach or helper copy.
->
-> #### 🔴 LEGAL — a line that must not ship
->
-> **"This is over double the statutory cancellation period."** Under the Consumer Contracts Regulations the 14-day cooling-off runs from **contract formation, not first payment** — so the statutory right may expire on **day 14, inside the 30-day trial**. The sentence would claim more protection than exists, at the moment of deciding. **Cut the comparison.** To Natalie with the existing trial/cooling-off question.
->
-> #### 🟢 Upgrade copy approved — and the trial funnel corrected
->
-> The 30-day card-up-front trial is at the **upgrade point, not app signup**. Free → trial → paid. Approved copy in the progression document §8: *"You're not the only one this pays for… We won't charge you for 30 days… Cancel any time and go back to free."* **"5% of every subscription"**, never "this year" — the commitment is permanent.
->
-> **Impact Credits vote: no cadence stated.** A quarterly vote on a small pot is *"pitching for £0.90."* 🟠 **Triggers on pot size, not the calendar.** Threshold to be set.
->
-> #### 🟠 Three faults in the pricing model (20 Jun 2026 v2)
->
-> 1. Models **one** free-to-paid rate; the funnel is now **two-stage**. Collapsed, it cannot show which stage loses people — and the fixes are opposite.
-> 2. Pricing **superseded** throughout — lower annual, lower beta, and a monthly intro rate since dropped. Needs a banner or a rewrite. **Figures not repeated:** `verify-price.mjs` went red on the progression document for publishing one, which is PRICE-2 working. The gate cannot tell quotation from publication, and should not have to.
-> 3. Says **"Build New Habits Ltd"** throughout. Not registered.
->
-> #### 🔴 And the thing none of this changes
->
-> **Year 1 is an org-outreach business, not a freemium one.** 150–600 free users by end of Year 1; Scenario 2 reaches 33 paid only because **80 come from org taster codes**. Progression matters from Year 2. **Org outreach is still blocked on Graeme confirming the categories.**
->
-> ---
+Supersedes `master_schedule_18aug2026_v208.md`. Remove v208 on upload.
 
 > ### 🟢 R4 SHIPPED — self-direction is free. `alongside-v389`.
 >
@@ -4138,4 +4080,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 20 Aug 2026 v210*
+*Build New Habits · Alongside: Move · Master Schedule · 20 Aug 2026 v209*
