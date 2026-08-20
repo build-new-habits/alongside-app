@@ -1,6 +1,16 @@
 /**
  * js/session-log.js
- * 15 Aug 2026 v6
+ * 20 Aug 2026 v7
+ *
+ * v7 - R4 / decision 7.1. PERSONAL BESTS ARE FREE. bestLine()'s
+ *   isPremium() check and its import are removed. A best is a fact the
+ *   person produced, and free already includes lift notes and recall.
+ *   "Up 5 since May" would be the arc, and P4 forbids that separately.
+ *
+ *   THE OPT-IN STAYS, AND STAYS OFF BY DEFAULT. Ungating is not
+ *   switching on. For personas 2.5, 2.8 and 2.13 a visible best is a
+ *   target to fall short of -- and widening who can see it makes that
+ *   default MORE load-bearing, not less.
  *
  * v6 - PB-1. bestLine(), shown only when the person has asked for it
  *   and their tier includes it. Flat, no delta, no comparison.
@@ -80,7 +90,10 @@
  */
 
 import { store } from "./store.js";
-import { isPremium } from './auth.js';   // PB-1: the Plan (NAME-1)
+// R4, 20 Aug 2026. The isPremium import is REMOVED. bestLine() gated on
+// tier; a personal best is a fact about the person's own log, and free
+// already includes lift notes and recall. Decision 7.1, revenue
+// architecture v2.
 import { progressionInvitation } from "./data/session-rationale.js";
 
 function esc(str) {
@@ -215,8 +228,15 @@ export function lastLine(exercise) {
  * to fall short of. Persona 2.7 turns it on because he came looking.
  */
 export function bestLine(exercise) {
+  // The opt-in STAYS, and stays off by default. Ungating is not
+  // switching on: for personas 2.5, 2.8 and 2.13 a visible best is a
+  // target to fall short of, which is the entire failure mode this
+  // product exists to avoid. Free users can now turn it on; nobody has
+  // it done to them.
   if (store.get('showPersonalBests') !== true) return '';
-  if (!isPremium()) return '';
+  // R4: `if (!isPremium()) return '';` removed. "Your best: 85 kg" is a
+  // fact the person produced. "Up 5 since May" would be the arc, and P4
+  // forbids that separately and for different reasons.
   const best = store.personalBest(exercise.id);
   if (!best) return '';
   const bits = [];

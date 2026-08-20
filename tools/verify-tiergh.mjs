@@ -1,9 +1,22 @@
 /**
  * tools/verify-tiergh.mjs
- * 18 Aug 2026 v1
+ * 20 Aug 2026 v2
  *
- * TIER-G — the session builder's build-mode step had no tier check.
- * TIER-H — "At home" was locked whole while "At the gym" was open.
+ * TIER-G/H/I — what a free user can actually reach in the Library and
+ * the session builder.
+ *
+ * R4, 20 Aug 2026. INVERTED. v1 asserted the 12 Aug boundary: exactly
+ * ONE free door inside "At home", five self-directed cards locked, and
+ * exactly ONE pressable build mode. That boundary charged for CONTROL
+ * and is retired -- self-direction is an accessibility feature, and
+ * charging for it penalised the person mainstream fitness culture
+ * already fails worst.
+ *
+ * The load-bearing inverse moves rather than disappears. It used to be
+ * "there is exactly one free door". It is now "there is exactly one
+ * LOCKED door, and it is My programme" -- because a gate that only
+ * asserted things are open would stay green if the whole paywall fell
+ * out, and the twelve-week programme is genuinely the arc.
  *
  * THIS GATE EXECUTES THE VIEWS. Both faults were invisible to source
  * text. TIER-G's screen read as correct because the three routes are
@@ -42,6 +55,9 @@ globalThis.router = router;
 
 const LibraryMod = await import(BASE + 'views/library.js');
 const SBMod      = await import(BASE + 'views/session-builder-ui.js');
+// Compared against the live list rather than a hardcoded count, so
+// adding a session type cannot silently leave one gated.
+const { SESSION_TYPES } = await import(BASE + 'session-builder.js');
 
 let failures = 0;
 const check = (n, ok, d = '') => {
@@ -86,6 +102,14 @@ check('3  TIER-H: "At home" is NOT locked as a whole category',
   homeCard && homeCard.classList.contains('locked-feature-wrap')
     ? 'still wrapped in lockedFeature()' : '');
 
+// R4: the five activity categories are self-direction and are now free.
+// Asserted at the landing, where they live.
+const activityLocked = [...el.querySelectorAll('.locked-feature-wrap')]
+  .filter(n => /^(run|walk|swim|cycle|yoga)/i.test(n.textContent.trim()));
+check('3b R4: Run, Walk, Swim, Cycle and Yoga are NOT locked',
+  activityLocked.length === 0,
+  `${activityLocked.length} still locked. Going for a run is not a plan`);
+
 // Symmetry, asserted at the landing BEFORE walking into a sub-screen.
 //
 // SEED NOTE. The first run of this gate asserted this after clicking
@@ -103,20 +127,63 @@ if (homeCard && homeCard.dataset.guided) homeCard.click();
 const homeFree   = [...el.querySelectorAll('button[data-target]')];
 const homeLocked = [...el.querySelectorAll('.locked-feature-wrap')];
 
-check('4  TIER-H (inverse): exactly ONE free door inside "At home"',
-  homeFree.length === 1,
+check('4  R4: every door inside "At home" is free — all six',
+  homeFree.length === 6,
   `found ${homeFree.length}: ${homeFree.map(b => b.getAttribute('aria-label') || '?').join(' | ')}`);
-check('5  TIER-H: that door is the coach-built Full Body session',
-  homeFree.length === 1 &&
-  homeFree[0].dataset.target === 'session-builder' &&
-  homeFree[0].dataset.preselectType === 'full');
-check('6  TIER-H: the five self-directed cards are locked, not hidden',
-  homeLocked.length === 5, `found ${homeLocked.length}`);
+check('5  R4: the coach-built Full Body session is still among them',
+  homeFree.some(b => b.dataset.target === 'session-builder' &&
+                     b.dataset.preselectType === 'full'),
+  'the free tier must still contain the session the COACH builds — ' +
+  'self-direction being free does not mean self-direction is compulsory');
+check('6  R4 (inverse): NOTHING inside "At home" is locked',
+  homeLocked.length === 0,
+  `${homeLocked.length} still locked: ` +
+  homeLocked.map(n => n.getAttribute('aria-label') || '?').join(' | '));
 
 // The retired dead route must not come back anywhere in the app.
 const libSrc = fs.readFileSync(new URL('../js/views/library.js', import.meta.url), 'utf8');
 check('7  "home-workout" is gone — it was never a route in router.js',
   !/target:\s*"home-workout"/.test(libSrc));
+
+// ── R4: the gym category, where the ONE paid surface lives ───────────
+//
+// THE LOAD-BEARING INVERSE. v1's was "exactly one free door"; with the
+// boundary moved, the check that carries the weight is the opposite --
+// exactly one LOCKED door, and it must be My programme. Without this,
+// removing the paywall entirely would pass every other assertion here.
+// SEED NOTE, R4. The first draft of this block re-mounted the landing
+// and clicked "At the gym" -- and every gym assertion reported the HOME
+// cards instead. library.js holds `screen` at module level, so the
+// re-mount landed back inside "At home" where the previous block left
+// it, and "Start a session" was not on screen to be clicked. The app is
+// right and the harness was wrong: in the app the router resets it.
+//
+// Walk back the way a person does, via the Back control, rather than
+// reaching into module state -- then verify we actually arrived before
+// asserting anything about what is locked. A gate that asserts against
+// the wrong screen is worse than no gate: it was green on the count and
+// wrong about the subject.
+document.getElementById('lib-back-btn')?.click();
+const gymCard2 = [...el.querySelectorAll('[data-guided]')]
+  .find(n => /at the gym/i.test(n.textContent));
+check('7z  harness: reached the gym category, not still inside "At home"',
+  !!gymCard2, 'back-navigation failed — the assertions below would be ' +
+  'reporting the wrong screen');
+if (gymCard2 && gymCard2.dataset.guided) gymCard2.click();
+const gymFree   = [...el.querySelectorAll('button[data-target]')];
+const gymLocked = [...el.querySelectorAll('.locked-feature-wrap')];
+
+check('7a R4 (inverse): exactly ONE locked door in "At the gym"',
+  gymLocked.length === 1,
+  `found ${gymLocked.length}: ` +
+  gymLocked.map(n => n.getAttribute('aria-label') || '?').join(' | '));
+check('7b R4: and it is My programme — the arc, not a session',
+  gymLocked.length === 1 &&
+  /my programme/i.test(gymLocked[0].getAttribute('aria-label') || ''),
+  gymLocked.map(n => n.getAttribute('aria-label')).join(' | '));
+check('7c R4: the five self-directed gym cards are pressable on free',
+  gymFree.length === 6,
+  `found ${gymFree.length}: ${gymFree.map(b => b.dataset.preselectType || b.dataset.target).join(', ')}`);
 
 // ── TIER-G: the build-mode step ──────────────────────────────────────
 
@@ -144,22 +211,63 @@ await reachBuildMode('free');
 const freeModes  = [...el.querySelectorAll('.sb-buildmode-btn')];
 const freeLocked = [...el.querySelectorAll('.locked-feature-wrap')];
 
-check('9  TIER-G (inverse): exactly ONE pressable build mode on free',
-  freeModes.length === 1,
+check('9  R4: all three build modes are pressable on free',
+  freeModes.length === 3,
   `found ${freeModes.length}: ${freeModes.map(b => b.dataset.mode).join(', ')}`);
-check('10 TIER-G: the free mode is "coach", not "recommend" or "own"',
-  freeModes.length === 1 && freeModes[0].dataset.mode === 'coach');
-check('11 TIER-G: the two composing routes are shown locked, not hidden',
-  freeLocked.length === 2, `found ${freeLocked.length}`);
-// NAME-1, same day: the tier is "the Plan". Assert BOTH that the new
-// wording is there and that the retired one is not, so a partial rename
-// leaving one surface on "Personal" goes red rather than passing.
-check('12 TIER-G: locked routes name what they are, for screen readers',
-  freeLocked.every(n => {
-    const l = n.getAttribute('aria-label') || '';
-    return /part of the Plan/.test(l) && !/Personal/.test(l);
-  }),
-  freeLocked.map(n => n.getAttribute('aria-label')).join(' | '));
+check('10 R4: and "coach builds it" is still one of them',
+  freeModes.some(b => b.dataset.mode === 'coach'),
+  'the coach-built route is the default and the product centre — it must ' +
+  'survive self-direction becoming free');
+check('11 R4 (inverse): NOTHING in the build-mode step is locked',
+  freeLocked.length === 0,
+  `${freeLocked.length} still locked: ` +
+  freeLocked.map(n => n.getAttribute('aria-label') || '?').join(' | '));
+
+// R4: the free path reached equipment directly, skipping location, so a
+// free user was never asked whether they were at home or at the gym --
+// the coach GUESSING instead of asking.
+//
+// SEED NOTE, R4. The first draft seeded a preselect and re-rendered, and
+// went red against a correct app. session-builder-ui.js holds BOTH
+// `phase` and `preselectChecked` at module level, and resetState() is
+// not exported -- so the re-render landed on whatever screen the
+// previous block left (buildmode), with the preselect branch already
+// spent. Same class as the harness fault at check 7z.
+//
+// Walk back to the type picker the way a person does, by pressing Back,
+// then take the journey forwards. Slower, and it tests the route a real
+// free user actually travels rather than a state we injected.
+setTier('free');
+for (let i = 0; i < 8; i++) {
+  if (el.querySelector('.sb-type-tile')) break;
+  const back = document.getElementById('sb-back-btn');
+  if (!back) break;
+  back.click();
+  el.innerHTML = SBMod.render();
+  SBMod.onMount();
+}
+check('12a harness: reached the type picker before testing the journey',
+  !!el.querySelector('.sb-type-tile'),
+  'could not walk back — the assertion below would be testing nothing');
+
+// Counted BEFORE clicking, while the picker is still on screen. Compared
+// against the live SESSION_TYPES length rather than a hardcoded number,
+// so adding a session type cannot silently leave one gated.
+const typeTiles  = [...el.querySelectorAll('.sb-type-tile')];
+const typeLocked = [...el.querySelectorAll('.locked-feature-wrap')];
+check('12b R4: EVERY session type is pressable on free, not just Full Body',
+  typeTiles.length === SESSION_TYPES.length && typeLocked.length === 0,
+  `${typeTiles.length} pressable of ${SESSION_TYPES.length}, ` +
+  `${typeLocked.length} locked: ${typeTiles.map(b => b.dataset.type).join(', ')}`);
+
+// The journey itself: pick a NON-full type, the one a free user could
+// not previously choose, and confirm it reaches the location step.
+const lowerTile = typeTiles.find(b => b.dataset.type !== 'full') || typeTiles[0];
+if (lowerTile) { lowerTile.click(); el.innerHTML = SBMod.render(); SBMod.onMount(); }
+check('12 R4: a free user is ASKED where they are, not guessed at',
+  !!document.getElementById('sb-location-continue-btn') ||
+  !!el.querySelector('.sb-location-btn'),
+  'the location step is still skipped on free — the coach assumed home');
 
 await reachBuildMode('personal');
 const paidModes = [...el.querySelectorAll('.sb-buildmode-btn')].map(b => b.dataset.mode);
@@ -167,6 +275,70 @@ check('13 TIER-G: all three routes remain pressable on Personal',
   paidModes.length === 3 &&
   ['coach', 'recommend', 'own'].every(m => paidModes.includes(m)),
   paidModes.join(', '));
+
+// R4: the SECOND route into the builder -- arriving from the Library
+// with a preselected type. Reversal-testing found check 12 did not cover
+// it: check 12 walks the type picker, and the preselect branch is a
+// different code path that sets `phase` independently. Reverting only
+// that branch left both gates green while a free user coming from the
+// Library skipped the location step.
+//
+// Two paths set the same state; both must be asserted. This is the same
+// shape as the render-and-handler disagreement library.js was carrying.
+for (let i = 0; i < 8; i++) {
+  if (el.querySelector('.sb-type-tile')) break;
+  const back = document.getElementById('sb-back-btn');
+  if (!back) break;
+  back.click();
+  el.innerHTML = SBMod.render();
+  SBMod.onMount();
+}
+// Reaching the type picker and pressing Back once more runs resetState()
+// -- which clears preselectChecked, so the branch below can fire.
+document.getElementById('sb-back-btn')?.click();
+store.set('sessionBuilderPreselect', { type: 'lower' });
+navigatedTo = null;
+el.innerHTML = SBMod.render();
+SBMod.onMount();
+
+check('12c R4: arriving from the Library with a preselect is NOT paywalled',
+  navigatedTo !== 'upgrade',
+  `routed to "${navigatedTo}" — a free user tapping "Lower body" in the ` +
+  'Library now has every right to be there');
+check('12d R4: and that route asks where they are too',
+  !!document.getElementById('sb-location-continue-btn') ||
+  !!el.querySelector('.sb-location-btn'),
+  'the preselect path still skips the location step on free');
+
+// ── R4 / decision 7.2: export is reachable on the free tier ──────────
+//
+// WHY THIS IS HERE AND NOT IN verify-tier.mjs. The source-text version
+// asserts that renderExportLocked() has not come back. Reversal-testing
+// found that insufficient: re-locking the export as
+//   ${tier === 'personal' ? renderExportBlock() : ''}
+// contains no locked renderer, so the text gate stayed GREEN while a
+// free user lost the button. A named absence only catches the return of
+// the thing by name.
+//
+// The only assertion that cannot be routed around is mounting the view
+// on the free tier and looking for the buttons.
+const { ProgressView } = await import(BASE + 'views/progress.js');
+setTier('free');
+const progressEl = document.createElement('div');
+document.body.appendChild(progressEl);
+ProgressView(router).mount(progressEl);
+const exportBtns = [...progressEl.querySelectorAll('[data-export]')];
+
+check('15 R4: a FREE user can reach the export buttons',
+  exportBtns.length === 3,
+  `found ${exportBtns.length}: ${exportBtns.map(b => b.dataset.export).join(', ')} ` +
+  '— UK GDPR gives a right of access regardless of payment; gating this ' +
+  'never withheld the data, only the button');
+
+check('15b R4: including the professional export, for a physio or GP',
+  exportBtns.some(b => b.dataset.export === 'professional'),
+  'the person least able to pay is the person most likely to need to ' +
+  'show a clinician what they have been doing');
 
 // ── The exception, asserted so it cannot be "tidied up" later ─────────
 
@@ -176,6 +348,6 @@ check('14 conditions-update.js is NOT tier-gated — prescribed work is free',
   'condition programmes are permanently free on ethical grounds');
 
 console.log(failures === 0
-  ? `\nAll 14 checks green.`
+  ? `\nAll checks green.`
   : `\n${failures} FAILED.`);
 process.exit(failures === 0 ? 0 : 1);

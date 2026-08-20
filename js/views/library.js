@@ -1,7 +1,22 @@
 /**
  * library.js - Library Page
  *
- * 18 Aug 2026 v7
+ * 20 Aug 2026 v8
+ *
+ * v8 - R4. SELF-DIRECTION IS FREE. Ten of the eleven tier tags in this
+ *      file are gone: the five "At home" session types, the four gym
+ *      session types, and the five activity categories (Run, Walk,
+ *      Swim, Cycle, Yoga -- these carried the tag on the CATEGORY, not
+ *      a card). "My programme" KEEPS its tag and is now the only paid
+ *      surface in the Library: a twelve-week generative programme is
+ *      the arc, not a session.
+ *
+ *      The boundary now runs THROUGH a single array. verify-tier.mjs
+ *      asserts that card by name rather than counting tags, because a
+ *      blanket untag would have freed the programme by accident and a
+ *      count cannot say which one survived.
+ *
+ *      Source: alongside_revenue_architecture_18aug2026_v1.md v2 s3.
  *
  * v7 - TIER-H. "At home" was locked as a whole category while "At the
  *      gym" was open with per-card locks, so the free Full Body session
@@ -166,11 +181,20 @@ const GUIDED_CATEGORIES = [
     // Body replaces it and is the thing it described.
     sessions: [
       { label: "Full Body",     icon: "\u26A1",        target: "session-builder", note: "A blend of everything, built for you", preselectType: "full" },
-      { label: "Core",          icon: "\uD83E\uDDD8",  target: "core-session",   note: "Choose intensity",            tier: "personal" },
-      { label: "HIIT",          icon: "\u26A1",        target: "core-session",   note: "High intensity intervals",    tier: "personal" },
-      { label: "Strength",      icon: "\uD83D\uDCAA",  target: "core-session",   note: "Bodyweight or home weights",  tier: "personal" },
-      { label: "Cardio",        icon: "\uD83C\uDFC3",  target: "walk-session",   note: "Raise the heart rate",        tier: "personal" },
-      { label: "Mobility",      icon: "\uD83C\uDF3F",  target: "core-session",   note: "Open and unlock the body",    tier: "personal" },
+      // R4, 20 Aug 2026. tier REMOVED from all five. Choosing which
+      // session you do today is self-direction, and self-direction is an
+      // accessibility feature -- charging for it penalised the person
+      // who most needs to override the default because the default
+      // hurts. Revenue architecture section 3.
+      //
+      // Full Body stays first and unchanged: the coach-built session is
+      // still the centre of the product. Self-direction being free does
+      // not make it compulsory.
+      { label: "Core",          icon: "\uD83E\uDDD8",  target: "core-session",   note: "Choose intensity" },
+      { label: "HIIT",          icon: "\u26A1",        target: "core-session",   note: "High intensity intervals" },
+      { label: "Strength",      icon: "\uD83D\uDCAA",  target: "core-session",   note: "Bodyweight or home weights" },
+      { label: "Cardio",        icon: "\uD83C\uDFC3",  target: "walk-session",   note: "Raise the heart rate" },
+      { label: "Mobility",      icon: "\uD83C\uDF3F",  target: "core-session",   note: "Open and unlock the body" },
     ]
   },
   {
@@ -195,18 +219,32 @@ const GUIDED_CATEGORIES = [
     // "Cardio" (a log-what-you-did shortcut to activity-log, a
     // different, working, deliberately-unchanged feature) are untouched.
     sessions: [
+      // R4, 20 Aug 2026. "My programme" KEEPS its tier -- it is the
+      // twelve-week generative programme, which is the ARC and the one
+      // genuinely paid thing in this file. The four session types below
+      // lose theirs: they are session shapes, and choosing a session
+      // shape is still choosing a session.
+      //
+      // This is the line the boundary now runs along, inside a single
+      // array. A blanket untag would have freed the programme by
+      // accident, which is why verify-tier.mjs asserts this card BY NAME
+      // rather than counting tags.
       { label: "My programme",   icon: "\uD83C\uDFCB",  target: "gym-programme",   note: "Your current programme", tier: "personal" },
-      { label: "Core",           icon: "\uD83E\uDDD8",  target: "session-builder", note: "", preselectType: "core"  , tier: "personal" },
-      { label: "Upper body",     icon: "\uD83D\uDCAA",  target: "session-builder", note: "", preselectType: "upper" , tier: "personal" },
-      { label: "Lower body",     icon: "\uD83E\uDDB5",  target: "session-builder", note: "", preselectType: "lower" , tier: "personal" },
-      { label: "Glute Focus",    icon: "\uD83C\uDF51",  target: "session-builder", note: "", preselectType: "glute" , tier: "personal" },
+      { label: "Core",           icon: "\uD83E\uDDD8",  target: "session-builder", note: "", preselectType: "core"  },
+      { label: "Upper body",     icon: "\uD83D\uDCAA",  target: "session-builder", note: "", preselectType: "upper" },
+      { label: "Lower body",     icon: "\uD83E\uDDB5",  target: "session-builder", note: "", preselectType: "lower" },
+      { label: "Glute Focus",    icon: "\uD83C\uDF51",  target: "session-builder", note: "", preselectType: "glute" },
       { label: "Full Body",      icon: "\u26A1",        target: "session-builder", note: "A blend of everything", preselectType: "full" },
       { label: "Cardio",         icon: "\uD83C\uDFC3",  target: "activity-log",    note: "Treadmill, bike, rower" },
     ]
   },
+  // R4, 20 Aug 2026. Run, Walk, Swim, Cycle and Yoga each carried
+  // tier: "personal" with the comment "self-directed activity choice".
+  // All five removed. Going for a run is not a plan, and the person who
+  // wants to log a walk is frequently the person for whom a gym session
+  // is not available at all.
   {
     id:          "run",
-    tier:        "personal",   // self-directed activity choice
     label:       "Run",
     icon:        "\uD83C\uDFC3",
     description: "Easy, intervals, or long run",
@@ -215,7 +253,6 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "walk",
-    tier:        "personal",   // self-directed activity choice
     label:       "Walk",
     icon:        "\uD83D\uDEB6",
     description: "Gentle, mindful, brisk, or nature walk",
@@ -224,7 +261,6 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "swim",
-    tier:        "personal",   // self-directed activity choice
     label:       "Swim",
     icon:        "\uD83C\uDFCA",
     description: "Steady or interval swim session",
@@ -233,7 +269,6 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "cycle",
-    tier:        "personal",   // self-directed activity choice
     label:       "Cycle",
     icon:        "\uD83D\uDEB4",
     description: "Road, indoor, or turbo trainer",
@@ -242,7 +277,6 @@ const GUIDED_CATEGORIES = [
   },
   {
     id:          "yoga",
-    tier:        "personal",   // self-directed activity choice
     label:       "Yoga / Pilates",
     icon:        "\uD83E\uDDD8",
     description: "Flexibility, strength, balance, recovery",

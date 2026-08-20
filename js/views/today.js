@@ -1,5 +1,15 @@
 /**
  * today.js
+ * 20 Aug 2026 v23
+ *   R4. SELF-DIRECTION IS FREE. The 12 Aug boundary charged for
+ *   CONTROL -- "Full body only. The coach decides." Retired: choosing
+ *   which session you do today is still choosing a session, and
+ *   charging for it penalised the person mainstream fitness culture
+ *   already fails worst. Source: alongside_revenue_architecture_
+ *   18aug2026_v1.md v2 section 3, tier boundary v3 section 4.
+ *   Both self-directed Home doors -- Mobility & Conditioning and Yoga
+ *   & Pilates -- lose tier: 'personal'. No door on Home is gated now.
+ *
  * 17 Aug 2026 v22
  *   CHAP-1 step 6. The event goal, offered at the FIRST hinge and asked
  *   once — never at signup, where asking implies somebody ought to have
@@ -326,9 +336,12 @@ export function TodayView(router) {
   // counted as one of the "real" doors, exactly as before.
   const HOME_DOORS = [
     { id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder', requiresCheckin: true },
-    // tier: 'personal' -- self-directed session-type choice. See the header
-    // note for why this is not a safety regression.
-    { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'mobility-conditioning', requiresCheckin: false , tier: 'personal' },
+    // R4, 20 Aug 2026. tier: 'personal' REMOVED. Choosing which session
+    // you do today is self-direction, and self-direction is an
+    // accessibility feature -- charging for it penalised the person who
+    // most needs to override the default because the default hurts.
+    // Revenue architecture section 3: free is today, the Plan is the arc.
+    { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'mobility-conditioning', requiresCheckin: false },
     // NAV-3, 12 Aug 2026. Graeme, device pass part 4: "Yoga was not easy
     // to find... Can the yoga/pilates door be offered in multiple places
     // as well?"
@@ -343,8 +356,10 @@ export function TodayView(router) {
     // thing being reachable from more than one place is how people
     // actually navigate; insisting on one true location is a filing
     // system, not a product. Mobility & Conditioning keeps its route in.
-    // tier: 'personal' -- self-directed session-type choice.
-    { id: 'yoga', label: 'Yoga & Pilates', icon: '\uD83E\uDDD8\u200D\u2640\uFE0F', route: 'yoga-session', requiresCheckin: false , tier: 'personal' },
+    // R4, 20 Aug 2026. tier: 'personal' REMOVED -- same reasoning as the
+    // door above. NAV-3's finding stands: yoga was hard to find, and a
+    // paywall on top of that was a second wall on the same door.
+    { id: 'yoga', label: 'Yoga & Pilates', icon: '\uD83E\uDDD8\u200D\u2640\uFE0F', route: 'yoga-session', requiresCheckin: false },
     // TIER-F, 13 Aug 2026 -- RESOLVED. The flag below stood since
     // NAV-6. The door and the bottom-nav tab route to the same view;
     // the nav label is now "Wellbeing" too (index.html), so the two

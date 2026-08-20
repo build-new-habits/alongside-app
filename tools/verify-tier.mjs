@@ -1,14 +1,25 @@
 /**
  * tools/verify-tier.mjs
- * 13 Aug 2026 v1
+ * 20 Aug 2026 v2
  *
  * TIER-A/B/C/F GATE — the free boundary is where the boundary document
  * says it is.
  *
- * SOURCE OF TRUTH: Documents/Business/alongside_tier_boundary_12aug2026_v1.md
- * section 1 — "Free gives you a coach for today. Personal gives you a
- * coach who knows where you're going." Free is a full-body session the
- * COACH chooses. The paid act is self-direction.
+ * SOURCE OF TRUTH: Documents/Business/alongside_revenue_architecture_18aug2026_v1.md
+ * section 3, and Documents/Business/alongside_tier_boundary_12aug2026_v1.md
+ * v3 section 4 — "Free is today. The Plan is the arc."
+ *
+ * R4, 20 Aug 2026. THIS GATE PREVIOUSLY ASSERTED THE OPPOSITE. v1 checked
+ * that self-directed session shapes were LOCKED, because the 12 Aug
+ * boundary charged for control: "Full body only. The coach decides."
+ * That boundary is retired. Self-direction is an accessibility feature,
+ * and charging for it penalised the person mainstream fitness culture
+ * already fails worst. The paid act is naming a destination.
+ *
+ * The assertions are inverted rather than deleted. A gate that merely
+ * stopped checking would let the old gating drift back in silently,
+ * which is the exact failure this file was written to prevent — it just
+ * points the other way now.
  *
  * WHY A GATE AND NOT A NOTE. Three separate surfaces reached paid
  * session shapes on the free tier for months, each looking perfectly
@@ -50,14 +61,50 @@ check("library.js imports the shared paywall components", () => {
      "free user tap 'Lower body' and silently receive Full Body 30");
 });
 
-check("every paid Library surface is tagged", () => {
-  // Tag count rather than named cards: naming them here would mean two
-  // lists to keep in step, which is the drift this gate exists to stop.
+check("exactly ONE Library surface is paid, and it is My programme", () => {
+  // R4, 20 Aug 2026. v1 asserted `tags >= 11`. That was a FLOOR, and a
+  // floor can be satisfied by the wrong eleven -- it would have stayed
+  // green if the ten self-directed tags had been swapped for ten
+  // others. Replaced with an exact count plus a named survivor, so both
+  // directions of drift go red: re-gating anything, or ungating the one
+  // thing that is genuinely the arc.
   const tags = (library.match(/tier:\s*["']personal["']/g) || []).length;
-  ok(tags >= 11,
-     `only ${tags} paid Library surfaces tagged; expected at least 11 ` +
-     "(At home, Run, Walk, Swim, Cycle, Yoga, plus My programme and the " +
-     "four gym session types)");
+  ok(tags === 1,
+     `${tags} paid Library surfaces tagged; expected exactly 1. ` +
+     "Self-directed session types and activity categories are FREE " +
+     "(revenue architecture section 3). Only 'My programme' is paid, " +
+     "because a twelve-week programme is the arc, not a session");
+  const line = library.split("\n").find(l => /My programme/.test(l));
+  ok(line, "the 'My programme' card has gone missing from the gym category");
+  ok(/tier:\s*["']personal["']/.test(line),
+     "'My programme' is no longer paid. It is the twelve-week generative " +
+     "programme -- the arc itself, and the one thing in the Library that " +
+     "is a plan rather than a session");
+});
+
+check("the ten self-directed Library surfaces are FREE", () => {
+  // Named individually, because this is the change R4 made and a count
+  // alone cannot say WHICH survived. Two shapes: cards inside a
+  // category, and whole categories with a directTarget.
+  for (const label of ["Core", "HIIT", "Strength", "Cardio", "Mobility",
+                       "Upper body", "Lower body", "Glute Focus"]) {
+    const lines = library.split("\n").filter(l =>
+      new RegExp(`label:\\s*"${label}"`).test(l));
+    ok(lines.length > 0, `the "${label}" card has gone missing from the Library`);
+    for (const l of lines) {
+      ok(!/tier:\s*["']personal["']/.test(l),
+         `the "${label}" card has been re-gated. Choosing which session you ` +
+         "do today is self-direction, and self-direction is an accessibility " +
+         "feature -- charging for it penalises the person who most needs to " +
+         "override the default");
+    }
+  }
+  for (const id of ["run", "walk", "swim", "cycle", "yoga"]) {
+    const block = library.slice(library.indexOf(`id:          "${id}"`));
+    const upToNext = block.slice(0, block.indexOf("},"));
+    ok(!/tier:\s*["']personal["']/.test(upToNext),
+       `the "${id}" category has been re-gated. Going for a run is not a plan`);
+  }
 });
 
 check("the free Library surfaces are NOT tagged", () => {
@@ -84,14 +131,27 @@ check("no silent downgrade survives anywhere", () => {
 
 console.log("\nTIER-A — Home doors follow the same boundary");
 
-check("the two self-directed doors are gated", () => {
+check("the two self-directed doors are FREE", () => {
+  // R4, 20 Aug 2026. INVERTED. v1 required tier: 'personal' on both.
   for (const id of ["mobility-conditioning", "yoga"]) {
     const line = today.split("\n").find(l => l.includes(`id: '${id}'`));
     ok(line, `the ${id} door has gone missing from HOME_DOORS`);
-    ok(/tier:\s*'personal'/.test(line),
-       `the ${id} door is open to free users — free is a full-body session ` +
-       "the coach chooses, with no session-type selection");
+    ok(!/tier:/.test(line),
+       `the ${id} door has been re-gated. Free is today and the Plan is the ` +
+       "arc -- choosing which session you do today is still a session");
   }
+});
+
+check("NO Home door is gated at all", () => {
+  // The inverse, and the load-bearing half. Naming the two doors above
+  // would stay green if a THIRD door were gated tomorrow. Every door on
+  // Home is now free; the paid act is not reachable from this grid.
+  const doors = today.slice(today.indexOf("const HOME_DOORS"));
+  const block = doors.slice(0, doors.indexOf("\n  ];"));
+  const gated = block.split("\n").filter(l => /^\s*\{ id:/.test(l) && /tier:/.test(l));
+  ok(gated.length === 0,
+     `${gated.length} Home door(s) still carry a tier tag: ` +
+     gated.map(l => (l.match(/id: '([^']+)'/) || [])[1]).join(", "));
 });
 
 check("SAFETY: nothing safety-critical is ever gated", () => {
@@ -110,6 +170,28 @@ check("SAFETY: nothing safety-critical is ever gated", () => {
        `the ${id} door has been made paid — ${why}. Safety-critical features ` +
        "are permanently free; this is a founding constraint, not a preference");
   }
+});
+
+console.log("\nTIER-I — the session builder does not gate its own steps");
+
+check("no step of the builder is locked", () => {
+  // R4, 20 Aug 2026. The type picker, duration picker, allocation
+  // presets and build-mode step each rendered through lockedFeature()
+  // for free users, and the location step was skipped entirely. All
+  // four were CONTROL, which is now free.
+  //
+  // Asserted on the source rather than by render because
+  // verify-tiergh.mjs already executes this view and counts what a free
+  // user can press. This is the cheap companion check that catches a
+  // lockedFeature() coming back before the behavioural gate has to.
+  ok(!/lockedFeature/.test(sbUI),
+     "session-builder-ui.js locks one of its steps again. Session type, " +
+     "duration, the warm-up/work/cool-down split and how the session is " +
+     "built are all self-direction, and self-direction is free");
+  ok(!/phase\s*=\s*isPremium\(\)\s*\?/.test(sbUI),
+     "a builder phase is still chosen by tier. The free path skipped the " +
+     "location step entirely, so a free user was never asked whether they " +
+     "were at home or at the gym -- the coach guessing instead of asking");
 });
 
 console.log("\nTIER-C — a plan is paid");
@@ -154,6 +236,49 @@ check("Wellbeing is called Wellbeing everywhere a user can read it", () => {
 console.log("\nTIER-E — Progress differs in KIND, not length");
 
 const progress = read("js/views/progress.js");
+
+check("EXPORT is free — a right of access does not depend on payment", () => {
+  // R4/decision 7.2, 20 Aug 2026. UK GDPR gives a right of access and
+  // portability regardless of payment, so gating export never removed
+  // the right -- it converted a button into a support email, protecting
+  // no revenue and manufacturing admin on a one-person business.
+  ok(!/renderExportLocked/.test(progress),
+     "the export lock is back. Gating export does not withhold the data, " +
+     "it withholds the BUTTON, and the obligation survives either way");
+  ok(/renderExportBlock\(\)/.test(progress),
+     "the export block is gone entirely");
+});
+
+check("the export still differs by tier, in CONTENTS not existence", () => {
+  // The differentiation is emergent and must stay that way: the export
+  // is scoped by activeWindow (14 free, 30/90 paid) and its programme
+  // lines drop out when there is no programme. No conditional required.
+  // Asserted so a later "simplification" to a fixed window does not
+  // quietly hand free users the paid horizon.
+  const fn = progress.slice(progress.indexOf("function _handleExport"));
+  const body = fn.slice(0, fn.indexOf("function _buildExportText"));
+  ok(/_cutoffDate\(activeWindow\)/.test(body),
+     "the export no longer scopes to activeWindow. Free exports a " +
+     "fortnight and the Plan exports its horizon -- that difference IS " +
+     "the tier boundary here, and it is the only one");
+});
+
+check("PERSONAL BESTS are free, and still off by default", () => {
+  // R4/decision 7.1. A best is a fact about the person's own log, not a
+  // coach read. But ungating is NOT switching on: for personas 2.5, 2.8
+  // and 2.13 a visible best is a target to fall short of.
+  const slog = read("js/session-log.js");
+  const fn = slog.slice(slog.indexOf("export function bestLine"));
+  const body = fn.slice(0, fn.indexOf("\n}"));
+  ok(!/isPremium/.test(body),
+     "bestLine() gates on tier again. 'Your best: 85 kg' is a fact the " +
+     "person produced; 'up 5 since May' would be the arc, and P4 forbids " +
+     "that separately");
+  ok(/showPersonalBests'\)\s*!==\s*true/.test(body),
+     "the showPersonalBests opt-in has gone. Ungating is not switching on " +
+     "-- a visible best is a target to fall short of for the personas this " +
+     "product exists to serve");
+});
 
 check("free is a fortnight", () =>
   ok(/const FREE_WINDOW\s*=\s*14/.test(progress),

@@ -1,5 +1,9 @@
 # Alongside: Move — The Tier Boundary
-## 12 Aug 2026 v2
+## 20 Aug 2026 v3
+
+**v3 — section 4 is replaced.** The 12 Aug boundary charged for **control**: *"Full body only. The coach decides. No session-type or duration selection."* **Self-direction is now FREE.** Traced across personas 18 Aug: the people this product serves best never met that paywall, and the people who would have paid for control hit a library that is 393 of 551 entries at difficulty 1–2. It was charging the wrong people for the wrong thing, and it made free a place where the coach quietly refused to let you choose.
+
+**Governing document from here: `alongside_revenue_architecture_18aug2026_v1.md` (v2).** Read it first. Sections 1–3, 5–9 of this document stand unchanged, and the track analogy in §3 is still the source of the language.
 
 Build New Habits | Why someone pays, what they feel, and how they find out. Sits beside `alongside_experience_blueprint_22jun2026_v1.md`. That document is the map of the park; this one is the answer to *what is the ticket for*.
 
@@ -72,27 +76,48 @@ This is what makes the boundary honest and what makes it survive **Locked Princi
 
 ## 4. The boundary
 
-### Free — an excellent session, every time
+> ### Free is today. The Plan is the arc.
 
+**REPLACED 18 Aug 2026.** The previous wording is preserved in git history and its removal is the subject of this revision.
+
+### Free — an excellent session, every time, and you choose it
+
+- **You choose what you do today.** Session type, duration, activity, how it is built. **Self-direction is an accessibility feature.** Charging for it penalises the person mainstream fitness culture already fails worst: the one who knows their own body better than any default does, and who needs to override that default because it hurts
 - A real session, adapted to today: energy, pain, capability, equipment, training intent
-- Full body only. **The coach decides.** No session-type or duration selection
+- **Recognition between sessions, without an arc.** *"Same as last time, or something different?"* — the drop-in coach remembering your face. Ordinary courtesy, and it is not the arc. See R3 in the revenue document
 - Every safety feature, permanently. Care mode. Condition-aware exclusion
-- The empathy transfer arc, grounding moments, **and In Step** — moved to free (12 Aug). In Step is a *practice*, not a journey; the paid act is naming where you are going, not access to content. This also resolves the awkward split where the empathy work straddled the paywall
+- The empathy transfer arc, grounding moments, **and In Step** — moved to free (12 Aug). In Step is a *practice*, not a journey; the paid act is naming where you are going, not access to content
 - **A record**: fourteen days of what you did
-- Lift notes and recall
+- Lift notes and recall, and **your own personal bests** (18 Aug — a best is a fact about your own log, not a coach read)
+- **Export your own data** (18 Aug — a right of access does not depend on payment; the tier difference is in what the export contains)
 
-Free is **complete in itself and limited in scope**. Nothing inside it is degraded to create pressure. What is missing is a destination, not quality.
+Free is **complete in itself and limited in horizon**. Nothing inside it is degraded to create pressure. **What is missing is a destination, not quality, and not control.**
 
-### Personal — a coach who knows where you're going
+### The Plan — a coach who knows where you're going
 
 - **You name what you're working toward.** The coach builds the road
+- **It carries the hard truths.** When the date is not going to happen, it says so, and helps you move it. See R1 in the revenue document — the most distinctive capacity in the product
 - Every session arrives **with its reason attached** — why this, why today, why lighter than Saturday
 - **The road moves when life does.** Ill for a week, flat for a fortnight, ahead of schedule — the plan adapts rather than leaving you behind
-- **The coach teaches you to make the call yourself.** Why upper/lower, when to pull back. A deepening capacity, not just more buttons
-- All session types and durations, with the reasoning
+- **The coach teaches you to make the call yourself.** Why upper/lower, when to pull back. A deepening capacity
+- Chapters that follow on from one another
 - **Progress that reads rather than records** — see §4.1
 - Grounding moments woven to what you are actually doing
 - Impact credits and the community vote
+
+### 4.0 What the boundary is NOT
+
+Recorded because the old boundary is the obvious place to drift back to.
+
+| Not the boundary | Why |
+|---|---|
+| Choosing a session type or duration | Accessibility, not a premium feature. Free, 18 Aug |
+| Choosing how a session is built | Same. All three build modes are free |
+| Seeing your own personal bests | A fact about your own log. Free, 18 Aug (§7.1 revenue doc) |
+| Exporting your own data | A right of access does not depend on payment. Free, 18 Aug (§7.2) |
+| Any safety feature, ever | Founding constraint |
+
+**The one-line test is unchanged:** *is this a session, or a plan? a practice, or a journey?* What changed on 18 Aug is the recognition that **choosing which session is still a session.**
 
 ### 4.1 Progress must differ in KIND, not length
 
