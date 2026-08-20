@@ -1,62 +1,8 @@
 # Alongside: Move — Master Schedule
-## 20 Aug 2026 v209
+## 18 Aug 2026 v208
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_18aug2026_v208.md`. Remove v208 on upload.
-
-> ### 🟢 R4 SHIPPED — self-direction is free. `alongside-v389`.
->
-> Document → gates → code, in that order. Two commits: `e53ed51` (application files) then `e8a8c67` (`sw.js` alone). **Fresh-clone verified: 72 verify gates green, 0 red.**
->
-> | File | Version | Change |
-> |---|---|---|
-> | `today.js` | v23 | Both self-directed doors ungated. **No Home door is gated now** |
-> | `library.js` | v8 | Ten of eleven tier tags gone. **"My programme" keeps its tag and is the only paid Library surface** |
-> | `session-builder-ui.js` | v12 | Every step free — type, duration, allocation split, build mode, **and the location step free users never saw** |
-> | `session-log.js` | v7 | Personal bests free. **Opt-in stays off by default** |
-> | `progress.js` | v10 | Export free. **Nothing else in the file moved** |
-> | `sw.js` | v389 | Cache bump, alone, last |
-> | Tier boundary doc | **v3** | §4 replaced, new §4.0 "what the boundary is NOT" |
-> | `verify-tier` / `verify-tiergh` / `verify-pb1` | **v2** each | Inverted, not deleted |
->
-> #### 🔴 THREE GATES ASSERTED THE OLD BOUNDARY — a third was found by the suite
->
-> `verify-tier` and `verify-tiergh` were known. **`verify-pb1` was not** — it went red on the full-suite run because it asserted bests were paid. All three **inverted rather than deleted**: a gate that merely stopped checking would let the old gating drift back silently, which is what these files exist to prevent.
->
-> **`verify-tier`'s TIER-B floor is gone.** It asserted `tags >= 11`. **A floor can be satisfied by the wrong eleven** — it would have stayed green if the ten self-directed tags had been swapped for ten others. Replaced with an exact count plus the survivor named.
->
-> #### 🟢 GATES WRITTEN BEFORE CODE — the reversal test performed, not claimed
->
-> All fifteen new assertions went **red against the old code first**. Nine further reversals were then applied on a throwaway copy. **Two were NOT caught first time**, and both gaps are closed:
->
-> - **Re-locking export as a tier conditional** contains no locked renderer, so the source-text check stayed green while a free user lost the button. Now a **behavioural mount** of `progress.js` on free.
-> - **The builder has TWO entry paths** — type picker and Library preselect — that set `phase` independently. Reverting only the preselect branch left **both gates green**. Both paths asserted now.
->
-> #### 🔴 `node --check` DOES NOT VALIDATE ES MODULES — standing rule is wrong
->
-> Removing the `premium` local left three references behind. The view **threw on render** while every source-text gate stayed green **and `node --check` passed the file**, because it parses `.js` as a script rather than a module.
->
-> **The reliable check is `cp file /tmp/x.mjs && node --check /tmp/x.mjs`** — the `.mjs` extension forces module parsing. The standing rule says `node --check` before every commit; on this evidence it has been giving false assurance. **Also learned twice in ten minutes: a backtick inside a comment inside a template literal closes the template.** The comment does not protect it.
->
-> This is the strongest available argument for **R1's `verify-hard1.mjs` executing rather than grepping** — now demonstrated rather than asserted.
->
-> #### 🟠 DATE DISCIPLINE FAILED THIS SESSION — flagged, partly unfixed
->
-> Everything written today was dated **18 Aug** because the conversation was anchored to Graeme's 18 Aug decisions. **Today is 20 Aug.** The standing rule says verify the date before writing and never copy from a prior version; I copied from context. **Corrected in all code, gates and the tier boundary document.**
->
-> 🟠 **NOT corrected: `alongside_revenue_architecture_18aug2026_v1.md`.** The date is in the filename, which is now referenced by `verify-tier.mjs`'s source-of-truth header, this schedule, the tier boundary document and two commit messages. Renaming has a real blast radius and belongs in its own scoped task, not slipped into a build session. **Its content is right; its filename says the wrong day.**
->
-> #### 🟠 Flagged, not fixed (touch-once)
->
-> - `.progress-export--locked` and `.progress-export__lock*` are **dead CSS**. Stylesheet was outside this session's file list.
-> - **33 gates import jsdom from a hardcoded `/home/claude/node_modules/` path.** "53 gates green on fresh clone" is only true where jsdom already exists at that path. Worth a scoped fix.
-> - `auth.js`'s `initPaywallListener()` calls bare `router.navigate()` with no import, working only because `app.js:38` sets `window.router`.
->
-> #### Next
->
-> **R3** — recognition without an arc — needs three answers (surface, copy, the gate assertion pinning the single-entry read). **R2** needs a discovery session before a spec. **R1** is the money and still has zero lines of code.
->
-> ---
+Supersedes `master_schedule_18aug2026_v207.md`. Remove v207 on upload.
 
 > ### 🟢 THE FOUR REVENUE DECISIONS ARE CLOSED — 18 Aug. `alongside_revenue_architecture_18aug2026_v1.md` **v2**.
 >
@@ -4080,4 +4026,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 20 Aug 2026 v209*
+*Build New Habits · Alongside: Move · Master Schedule · 18 Aug 2026 v208*
