@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 21 Aug 2026 v217
+## 21 Aug 2026 v216
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_21aug2026_v216.md`. Remove v216 on upload.
+Supersedes `master_schedule_21aug2026_v215.md`. Remove v215 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -138,23 +138,6 @@ Supersedes `master_schedule_21aug2026_v216.md`. Remove v216 on upload.
 >
 > ---
 
-> ### 🟢 GATE-PATH SHIPPED — the suite's green now means something
->
-> **49 gate files** rewritten to resolve from `import.meta.url`: **14** for the repo path, **35** for jsdom. Every one version-bumped to `21 Aug 2026 vN+1` with the note *"path resolution only — no assertion changed."* No app code touched, no `sw.js` bump.
->
-> 🟢 **Proven by reversal, both directions:**
->
-> - With `/home/claude/repo` **removed entirely**, a clone at `/home/claude/gp` runs **78 pass, 0 fail**. Before today that same test gave 63/14.
-> - Breaking `store.js` in a *local* copy turned **all 49 store-importing gates red** — proof they read the tree you are editing, not another one.
->
-> 🟠 **The reversal also exposed something worth keeping in view.** Five gates — `verify-decisions`, `decl1`, `empathy`, `log1`, `write1` — stayed **green while `store.js` was unloadable**, because `readFileSync` regexes do not care whether a module loads. That is the **43-of-78 source-text problem**, not a path problem, and it is now measured rather than estimated.
->
-> 🟢 **A false start worth recording.** The first scripted pass inserted the path shim **above** each file's docblock and skipped version bumps entirely — 49 files silently edited against the header rule. Reverted with `git checkout` and redone: shim below the docblock, version bumped, no history lost. **Syntax-check every file after any scripted edit, and read one of them.**
->
-> Cold start blueprint → **v3**. Its live-state table no longer claims a gate count that was never true.
->
-> ---
->
 > ### 🔴 GOAL-SETUP-1 — A ROUTED VIEW HAS NEVER LOADED. FIVE BUTTONS POINT AT IT.
 >
 > Found 21 Aug while ground-truthing R2-a's second file. **Confirmed by execution, not by reading.**
@@ -221,7 +204,7 @@ Supersedes `master_schedule_21aug2026_v216.md`. Remove v216 on upload.
 >
 > | ID | Task | Status | Target |
 > |---|---|---|---|
-> | **GATE-PATH** | 49 files now resolve from `import.meta.url` — 14 repo-path, 35 jsdom | 🟢 **SHIPPED 21 Aug** | Done |
+> | **GATE-PATH** | 14 gates resolve `store.js` from `import.meta.url`, not `/home/claude/repo`. Reversal: run from a second clone path with the original removed | 🔵 Ready to build | w/c 24 Aug |
 > | **DESC-1** | Top-level `targetDescription` has **no writer anywhere** — `goal-setup.js:277` and `:406` read a field that is always empty | 🔵 Specified | w/c 31 Aug |
 > | **BURN-RECENCY** | `detectBurnout()` reads the last seven **recorded** check-in keys, not seven calendar days, so it has no recency guard. Matters where it is an assertion — `today.js`, `coach-proposal.js` | 🔵 Specified | w/c 31 Aug |
 >
@@ -4447,4 +4430,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 21 Aug 2026 v217*
+*Build New Habits · Alongside: Move · Master Schedule · 21 Aug 2026 v216*

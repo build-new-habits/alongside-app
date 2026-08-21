@@ -1,5 +1,8 @@
 /**
  * tools/verify-data1.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 12 Aug 2026 v1
  *
  * DATA-1, as it actually turned out.
@@ -22,6 +25,16 @@
  * wrong. That is why this is a structural rule and not more tagging: no
  * amount of correct tagging fixes a rule that fails open.
  */
+
+// ── GATE-PATH, 21 Aug 2026 ─────────────────────────────────────────
+// Resolved from THIS FILE, never hardcoded. This gate previously
+// imported an absolute /home/claude/repo path: cloned anywhere else it
+// went red, and -- worse -- if that directory existed from an earlier
+// session it read THAT copy and reported green on code nobody was
+// editing. Five reversals of the merge guard passed exactly this way.
+import { fileURLToPath as __f } from "node:url";
+import { dirname as __d, resolve as __r } from "node:path";
+const __REPO = __r(__d(__f(import.meta.url)), "..");
 import fs from "node:fs";
 const mem = {};
 globalThis.localStorage = {
@@ -29,7 +42,7 @@ globalThis.localStorage = {
   setItem: (k, v) => { mem[k] = String(v); },
   removeItem: k => { delete mem[k]; },
 };
-const { EXERCISES } = await import("/home/claude/repo/js/data/exercises/index.js");
+const { EXERCISES } = await import(__REPO + "/js/data/exercises/index.js");
 
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }

@@ -1,5 +1,8 @@
 /**
  * verify-dic1.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 12 Aug 2026 v1
  *
  * Gate for DIC-1. Written before trusting the change.
@@ -7,6 +10,16 @@
  * The four things that can silently break, each tested against the REAL
  * source rather than a restatement of it.
  */
+
+// ── GATE-PATH, 21 Aug 2026 ─────────────────────────────────────────
+// Resolved from THIS FILE, never hardcoded. This gate previously
+// imported an absolute /home/claude/repo path: cloned anywhere else it
+// went red, and -- worse -- if that directory existed from an earlier
+// session it read THAT copy and reported green on code nobody was
+// editing. Five reversals of the merge guard passed exactly this way.
+import { fileURLToPath as __f } from "node:url";
+import { dirname as __d, resolve as __r } from "node:path";
+const __REPO = __r(__d(__f(import.meta.url)), "..");
 import fs from "node:fs";
 
 let fails = 0;
@@ -62,7 +75,7 @@ globalThis.localStorage = {
   setItem: (k, v) => { mem[k] = String(v); },
   removeItem: k => { delete mem[k]; },
 };
-const { store } = await import("/home/claude/repo/js/store.js");
+const { store } = await import(__REPO + "/js/store.js");
 // store.set() does NOT lazily init the way store.get() does (store.js:1223 vs
 // :1212). app.js:150 calls store.init() on boot so the live path is safe, but
 // the harness must do the same. Logged as a latent asymmetry, not fixed here.

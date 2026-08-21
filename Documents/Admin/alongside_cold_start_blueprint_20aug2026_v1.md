@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 21 Aug 2026 v2
+## 21 Aug 2026 v3
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -49,7 +49,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | `Documents/Live State/Schema.md` | Store fields. **Must match `store.js`** |
 | `Documents/Business/` | Governing documents — see below |
 | `Documents/Archive/` | Stale, kept not deleted |
-| `tools/verify-*.mjs` | 77 gates — **but see the clone-path fault in §8** |
+| `tools/verify-*.mjs` | 78 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order:**
@@ -71,15 +71,14 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | `store.js` | v55 |
 | `Schema.md` | v1.38 |
 | `sw.js` | **v393**, cache `alongside-v393` |
-| Gates | **77.** 63 green on a genuinely clean clone; **14 red** — see below |
+| Gates | **78, all green** — and now genuinely green from any clone path |
 
-🔴 **"77 green on a fresh clone" is FALSE, and v1 of this document told you otherwise.**
+🟢 **GATE-PATH closed 21 Aug.** v1 of this document claimed 75 green on a fresh clone. That was never true: 14 gates hardcoded `/home/claude/repo`, so a clone elsewhere went red — and if that directory existed from an earlier session they read **that** copy and reported green on code nobody was editing. A clean clone actually ran 63 pass, 14 fail.
 
-**14 gates hardcode `/home/claude/repo/js/store.js`.** Clone anywhere else and they go red. Worse — if a `/home/claude/repo` directory happens to exist from an earlier session, they read **that** copy instead of yours, and report green on code you are not looking at. Proven on 21 Aug: with the old directory removed, a clean clone runs **63 pass, 14 fail**.
+All 49 affected files now resolve from `import.meta.url` — 14 for the repo path, 35 for jsdom. **Proven by reversal:** with `/home/claude/repo` removed entirely, a clone at another path runs 78 green; and breaking `store.js` in that local copy turns all 49 store-importing gates red.
 
-The 14: `verify-bias1`, `burn1`, `burn2`, `c1`, `cont3`, `core1`, `count1`, `data1`, `dic1`, `equip3`, `equipment-sweep`, `feed1`, `gm1`, `yoga1`.
+⚠️ **Still true:** 5 source-text gates stayed green through that break, because `readFileSync` regexes do not care whether the module loads. That is the 43-of-78 problem in §8, not a path problem.
 
-**Until they are fixed, clone to `/home/claude/repo` exactly**, and treat their green as unproven. `verify-hard1.mjs` and `verify-hard1-store.mjs` resolve from `import.meta.url` and are the pattern to copy.
 
 **Stack:** vanilla JS PWA, ES modules, localStorage (pre-Supabase), WCAG 2.2 AA throughout.
 
@@ -196,7 +195,8 @@ Truth lives in `js/data/pricing.js`. `verify-price.mjs` enforces it.
 |---|---|
 | **Progression does not exist** | For any tier. `session-builder.js` builds week 10 like week 1 |
 | **43 of 77 gates are source-text only** | They cannot tell live code from dead |
-| **14 gates hardcode the clone path** | They can report green on a copy you are not editing. See §4 |
+| ~~14 gates hardcode the clone path~~ | **Closed 21 Aug (GATE-PATH).** |
+| **1 module does not link** | `onboarding/goal-setup.js` — routed, reachable from five buttons, never loaded. `verify-link.mjs` guards the class. See GOAL-SETUP-1 |
 | **A gate can pass against defaults** | `verify-hard1-store` first wrote to the wrong localStorage key and every assertion passed, having never loaded its own fixture. Put a positive control first |
 | 33 gates hardcode `/home/claude/node_modules/jsdom` | "Green on fresh clone" is only true where jsdom exists there |
 | `auth.js` `initPaywallListener()` | Calls bare `router.navigate()`; works only via `window.router` |
