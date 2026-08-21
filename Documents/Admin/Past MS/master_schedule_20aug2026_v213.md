@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 21 Aug 2026 v214
+## 20 Aug 2026 v213
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_20aug2026_v213.md`. Remove v213 on upload.
+Supersedes `master_schedule_20aug2026_v212.md`. Remove v212 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -138,34 +138,6 @@ Supersedes `master_schedule_20aug2026_v213.md`. Remove v213 on upload.
 >
 > ---
 
-> ### 🟢 R1 AND R2 — THIRTEEN DECISIONS CLOSED, 21 Aug 2026
->
-> `Documents/Business/alongside_r1_r2_amendment_21aug2026_v1.md` **v1**. Build authority for R1 and R2's boundary half.
->
-> 🔴 **The 18 Aug R1 spec was wrong in eleven places, all found by opening the files it named.** Same pattern the cold start blueprint warns about. The two that changed the product:
->
-> **1. Weight-based targets are excluded from R1 entirely in v1.** The only writer of a top-level `targetDate` is `goalSetupSaveWeightTargetDate()` in `goal-setup.js:443` — a **weight-loss** flow. So a real population carries a weight goal plus a date, and R1 as specified would comment on their progress toward it. `goal-setup.js` already treats weight dates as needing a warning; the codebase had decided this class was different and the spec had not noticed.
->
-> **2. A dated target can only be recorded on the Plan.** Graeme, 21 Aug: *it is the act of telling the coach your goal that is the "I want you to do something with this" moment.* Not a change to the boundary — **v213 already said it, at the "cleanest form of R2" note above.** `my-programme.js` drifted: it imports `isPremium` and uses it three times, none of them near the target section, so free users see the date and the countdown.
->
-> 🟢 **Free onboarding does not change.** `programmes.js` matches on goals, `workoutGenerator.js` uses them for the session rationale, and the drop-in coach *does* ask what you want to do. Only the **dated target** surface moves.
->
-> 🟢 **This dissolved the grace-period problem rather than patching it.** If a target can only exist on the Plan, `targetSetAt` can only start on the Plan, so the 28-day maturity guard **is** the grace window by construction. A proposed `tierChangedAt` field was dropped — nothing records tier-change time (`upgrade.js:428`, `settings.js:2112`, no timestamp at either), and now nothing needs to.
->
-> 🟠 **Decide before October.** Removing a recording surface free users have is a degradation, and the standing rule is that free is never degraded. **There are no real users yet**, so decided now it costs nobody and decided later it takes something back.
->
-> #### The other eleven, in brief
->
-> 28-day maturity guard, raised from 21 to match the window · new `strategicGoal.targetSetAt`, because `setAt` records when the **frequency** was agreed, not the date · both `targetDate` homes read, both formats parsed through one shared day-key helper · description required for the trigger, with a labelled invitation field where it is missing · pain 7+ via `getZoneStatus()`, **deliberately the opposite call from SEVERE-1** and explicitly not resolving the 7-vs-8 clinical question · burnout suppresses at moderate **and** high · partials count · bottom band is mood or energy ≤3 · Care Mode defined as severe pain today or a `careMode` opening today, since **no `store.get('careMode')` exists** · all three options resolve inline in My Programme, reshape pre-filled with the person's existing words · nothing deletes a target or `review.outcomes` on downgrade.
->
-> 🟢 **The asymmetry that set four of those thresholds:** a suppressed offer leaves `lastOfferedAt` untouched and returns next open, and the trigger already requires the date to be 14+ days out. Over-suppressing costs a conversation a fortnight later. Under-suppressing tells somebody in a bad patch their date will not work. Not comparable — so every threshold sits on the cautious side.
->
-> #### 🟠 Logged, not fixed
->
-> Top-level `targetDescription` has **no writer anywhere** — read at `goal-setup.js:277` and `:406`, always empty · `detectBurnout()` reads the last seven **recorded** keys, not seven days, so it has no recency guard, which matters for `today.js` and `coach-proposal.js` where it is an assertion · **14 gates hardcode `/home/claude/repo`** and go red on any other clone path, same fault class as the jsdom hardcoding · `verify-hard1.mjs` will add a sixth reference to the mis-dated `18aug2026` revenue filename — goes on the rename task.
->
-> ---
->
 > ### 🔵 PROGRESSION BOUNDARY v2 — goals vs targets, and progression without a number
 >
 > `Documents/Business/alongside_progression_boundary_20aug2026_v1.md` **v2**. Decisions 5–8 open in its §7.
@@ -403,7 +375,7 @@ Supersedes `master_schedule_20aug2026_v213.md`. Remove v213 on upload.
 >
 > Graeme's most distinctive capacity — *"if we're not on course, the coach would tell us, and we readjust the plan"* — **does not exist.** Ground-truthed: `strategicGoal.targetDate` is written by onboarding, stored by `store.js` v54, rendered by `my-programme.js` and `today.js`, and **compared to progress by nothing anywhere.** No off-course detection, no renegotiation, no path to moving a date.
 >
-> 🟢 **AMENDED 21 Aug — `Documents/Business/alongside_r1_r2_amendment_21aug2026_v1.md` is now the build authority for R1 and for R2's boundary half.** Thirteen decisions closed, eleven of them corrections to a spec written against files nobody had opened. Two changed the product. Original spec in the revenue document §4. **The safety half outweighs the feature**: every suppression condition (Care Mode, burnout, pain band, low mood or energy) blocks it, because telling somebody in burnout they are off course is exactly the harm this product exists to refuse. **Three options always, and "leave it where it is" must be a real, unnagged, unstyled-as-lesser choice.**
+> Full spec in the revenue document §4. **The safety half outweighs the feature**: every suppression condition (Care Mode, burnout, pain band, low mood or energy) blocks it, because telling somebody in burnout they are off course is exactly the harm this product exists to refuse. **Three options always, and "leave it where it is" must be a real, unnagged, unstyled-as-lesser choice.**
 >
 > **`verify-hard1.mjs` MUST EXECUTE, NOT GREP.** This is precisely the class SWEEP-1 named: 43 of 77 gates are source-text only, and code that is present, correct and unreachable passes every one of them.
 >
@@ -421,10 +393,8 @@ Supersedes `master_schedule_20aug2026_v213.md`. Remove v213 on upload.
 >
 > | ID | Task | Status | Target |
 > |---|---|---|---|
-> | **R1-a** | Detection, dark — `Schema.md` v1.38, `store.js` v55, `js/data/goal-review.js`, `verify-hard1.mjs`, `sw.js` v393. **No view changes** | 🔵 Ready to build | w/c 24 Aug |
-> | **R2-a** | Boundary correction — target entry gated to the Plan; `targetSetAt` written at both date sites. `today.js`, `goal-setup.js`, `sw.js` v394 | 🔵 Ready to build | w/c 24 Aug |
-> | **R1-b** | The surface — `my-programme.js` does **both** jobs in one visit: tier-gates the target display, and renders the three options. `sw.js` v395 | 🔵 Ready to build | w/c 24 Aug |
-> | **R2-b** | The demonstration at upgrade. **Needs a discovery session before a spec** — the revenue document's acceptance criteria for it were written against the pre-correction boundary | 🟠 Needs discovery | w/c 31 Aug |
+> | **R1** | The hard conversation — `store.js` v55, `Schema.md` v1.37, detection, suppression, three options, `verify-hard1` | 🔵 Specified | w/c 24 Aug |
+> | **R2** | The naming moment — demonstration at onboarding. **Ground-truth `goal-setup.js` first** | 🔵 Specified | w/c 24 Aug |
 > | **R3** | Recognition without an arc, in free — *"same as last time?"*. Reads **one** log entry, never a pattern | 🔵 Specified | w/c 24 Aug |
 > | **R4** | Self-direction to free — **document → gate → code**, in that order | 🔵 Specified | w/c 24 Aug |
 > | **R5** | Stripe | 🔴 Blocked on HMRC | Blocked |
@@ -4358,4 +4328,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 21 Aug 2026 v214*
+*Build New Habits · Alongside: Move · Master Schedule · 20 Aug 2026 v213*
