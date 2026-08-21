@@ -1,5 +1,28 @@
 /**
  * coach-proposal.js
+ * 20 Aug 2026 v21
+ *
+ * v21 - REENTRY-2. Three changes, all on the return journey.
+ *
+ *   1. AN INJURY CHIP. There was none. The return door offered "Life
+ *      got full", "Was unwell" and "Finding it harder" -- so somebody
+ *      coming back from an injury had no true answer, and none of the
+ *      available ones stepped the intensity down.
+ *
+ *   2. getReEntryIntensity() WAS PASSED A HARDCODED 'illness'
+ *      regardless of what the person actually said. It now receives the
+ *      real context, so injury steps down too.
+ *
+ *   3. A GENTLER-START OFFER for life/harder returns. Not applied,
+ *      offered -- and the wording states the physiology rather than
+ *      implying a judgement: fitness slips whatever the reason, which
+ *      is not a comment on the person. Declining is an equal choice and
+ *      is never remarked on afterwards.
+ *
+ *   "Nothing to flag" on the injury question clears the ASK only,
+ *   never the step down. Saying nothing hurts is not a claim to be back
+ *   to full.
+ *
  * 13 Aug 2026 v20
  *
  * v20 - C1. The severe-pain choice line names the limit. It previously
@@ -394,6 +417,10 @@ export function CoachProposalView(router) {
   let proposal      = null;
   let choiceMade    = false;
   let reEntryCtx    = null;
+  // REENTRY-2, 20 Aug 2026. Whether a person coming back from a
+  // non-clinical absence has ACCEPTED the gentler start. Defaults false:
+  // the offer is made, nothing changes until they say yes.
+  let gentlerAccepted = false;
   let missedOffer   = null;
 
   // ── Severe pain choice state (new 04 Aug 2026) ───────────────────────────
@@ -624,6 +651,9 @@ export function CoachProposalView(router) {
 
         <!-- Re-entry banner (illness/long gap) -->
         ${reEntryCtx && !reEntryCtx.contextCaptured ? renderReturnDoor() : ''}
+        ${reEntryCtx && reEntryCtx.contextCaptured && reEntryCtx.offersGentlerStart && !gentlerAccepted
+            ? renderGentlerOffer() : ''}
+        ${reEntryCtx && reEntryCtx.asksWhatHurts ? renderWhatHurts() : ''}
 
         <!-- Compress/extend offer -->
         ${missedOffer && !choiceMade ? renderMissedOffer(missedOffer) : ''}
@@ -858,6 +888,61 @@ export function CoachProposalView(router) {
 
   // ── Return door renderer ───────────────────────────────────────────────────
 
+  // REENTRY-2, 20 Aug 2026. The OFFER, for life/harder returns.
+  //
+  // It states the reason plainly rather than implying a judgement.
+  // Three weeks away costs fitness whatever the reason -- that is
+  // physiology, not a comment on the person -- and saying so is kinder
+  // than letting them discover it by failing a session. Declining is a
+  // real, equal choice, and the decline is not remarked on afterwards.
+  function renderGentlerOffer() {
+    const weeks = Math.floor((reEntryCtx?.gapDays || 0) / 7);
+    const span  = weeks >= 2 ? `${weeks} weeks` : 'a little while';
+    return `
+      <div class="cp-return-door" role="region" aria-label="Starting back">
+        <p class="cp-return-door__message">
+          You have been away ${span}. Fitness slips in that time whatever the
+          reason &mdash; it is not a comment on you, it is just what bodies do.
+          I can start you a notch gentler today and build back from there.
+        </p>
+        <div class="cp-return-door__chips" role="group"
+             aria-label="How would you like to start back?">
+          <button class="cp-chip" data-gentler="yes" aria-pressed="false">
+            Yes, ease me back in
+          </button>
+          <button class="cp-chip" data-gentler="no" aria-pressed="false">
+            No, I feel fine &mdash; carry on as before
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // REENTRY-2. Injury only. ASKS rather than assumes -- the app does not
+  // know what is wrong and must not imply it does. This writes nothing
+  // to conditions and nothing to prescribedExercises; it routes to the
+  // existing pain flow, which is already the place that reasons about
+  // what hurts and what to avoid.
+  function renderWhatHurts() {
+    return `
+      <div class="cp-return-door" role="region" aria-label="After an injury">
+        <p class="cp-return-door__message">
+          Since you were injured &mdash; is anything still sore, or anything you
+          would rather I left out today? Tell me and I will work around it.
+        </p>
+        <div class="cp-return-door__chips" role="group"
+             aria-label="Anything still sore?">
+          <button class="cp-chip" data-hurts="tell" aria-pressed="false">
+            Let me tell you
+          </button>
+          <button class="cp-chip cp-chip--skip" data-hurts="no" aria-pressed="false">
+            Nothing to flag
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
   function renderReturnDoor() {
     // Sideways door — never "why did you miss sessions?"
     // "Anything you'd like me to know about the last little while?"
@@ -874,6 +959,13 @@ export function CoachProposalView(router) {
                   aria-pressed="false">Life got full</button>
           <button class="cp-chip" data-return-context="illness"
                   aria-pressed="false">Was unwell</button>
+          <!-- REENTRY-2, 20 Aug 2026. There was no injury option at all.
+               Graeme, 20 Aug. Somebody returning from an injury was
+               choosing between "life got full" and "finding it harder",
+               neither of which is true and neither of which stepped the
+               intensity down. -->
+          <button class="cp-chip" data-return-context="injury"
+                  aria-pressed="false">Was injured</button>
           <button class="cp-chip" data-return-context="harder"
                   aria-pressed="false">Finding it harder</button>
           <button class="cp-chip cp-chip--skip" data-return-context="skip"
@@ -926,6 +1018,36 @@ export function CoachProposalView(router) {
       });
     });
 
+    // REENTRY-2, 20 Aug 2026.
+    container.querySelectorAll('[data-gentler]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        gentlerAccepted = btn.dataset.gentler === 'yes';
+        // Full re-render, not a patch. Accepting changes
+        // effectiveIntensity, which changes the OPTIONS -- so the
+        // preview cards have to be rebuilt too. Same reasoning, and the
+        // same shape, as handleReturnContext above: that one used to
+        // patch .cp-doors and broke when the element stopped existing.
+        proposal              = buildProposal();
+        currentPreviewOptions = proposal.options;
+        selectedOptionId      = null;
+        render(container);
+      });
+    });
+
+    container.querySelectorAll('[data-hurts]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.dataset.hurts === 'tell') {
+          router.navigate('conditions-update');
+          return;
+        }
+        // "Nothing to flag" clears only the ASK, never the step down.
+        // Saying nothing hurts is not a claim to be back to full, and
+        // needsGentlerStart is untouched here deliberately.
+        reEntryCtx = { ...reEntryCtx, asksWhatHurts: false };
+        render(container);
+      });
+    });
+
     // Door 1 preview panel — always present in the DOM (v8)
     attachPreviewEvents(container);
   }
@@ -936,6 +1058,8 @@ export function CoachProposalView(router) {
     if (context !== 'skip') {
       captureReturnContext(context);
     }
+    // REENTRY-2. A fresh answer supersedes any earlier offer state.
+    gentlerAccepted = false;
 
     // Dismiss return door and rebuild the proposal with re-entry context
     // applied — full re-render (Phase C, 04 Aug 2026: this used to just
@@ -1017,9 +1141,21 @@ export function CoachProposalView(router) {
     // Pain override check
     const conditionNarrative = _buildConditionNarrative(conditions, painScores);
 
-    // Re-entry intensity adjustment
+    // Re-entry intensity adjustment.
+    //
+    // REENTRY-2, 20 Aug 2026. Was: illness only, hardcoded 'illness'
+    // regardless of what the person actually said. Now passes the real
+    // context, so injury steps down too.
+    //
+    // life/harder are NOT stepped down here. Detraining is real after
+    // three weeks away for work -- but so is the insult of being told
+    // you have lost ground when you feel fine. Those get an OFFER
+    // (renderGentlerOffer below), and the step down is applied only if
+    // it is accepted.
     let effectiveIntensity = phaseBias.intensityBias;
     if (reEntryCtx?.needsGentlerStart) {
+      effectiveIntensity = getReEntryIntensity(reEntryCtx.context, effectiveIntensity);
+    } else if (reEntryCtx?.offersGentlerStart && gentlerAccepted) {
       effectiveIntensity = getReEntryIntensity('illness', effectiveIntensity);
     }
 

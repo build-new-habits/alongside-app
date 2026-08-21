@@ -1,5 +1,31 @@
 /**
  * programmeEngine.js
+ * 20 Aug 2026 v7
+ *   REENTRY-2. Returning after a break no longer depends on having been
+ *   ill. Graeme, 20 Aug: "If I've been away for 3 weeks for work I'm
+ *   not fit enough to start where I left off. But I should be offered."
+ *
+ *   Detraining does not care why you were away. getReEntryContext()
+ *   previously set needsGentlerStart ONLY for 'illness', so a
+ *   three-week work absence returned somebody at full phase intensity
+ *   -- which is how people come back, find it too hard, and stop.
+ *
+ *   Two distinct things now. needsGentlerStart (illness, injury) is
+ *   applied without asking, because both carry a reason to be careful
+ *   that is not the person's to override on session one.
+ *   offersGentlerStart (life, harder) is OFFERED and declinable,
+ *   because telling somebody who feels fine that they have lost ground
+ *   is its own insult.
+ *
+ *   'injury' is NEW. There was no injury option at all -- somebody
+ *   coming back from one was choosing between "life got full" and
+ *   "finding it harder", neither true, neither stepping down.
+ *   asksWhatHurts routes to the existing pain flow. It writes nothing
+ *   to conditions or prescribedExercises: the app does not know what is
+ *   wrong and must not imply it does.
+ *
+ *   Schema.md v1.37 documents the permitted values. Schema first.
+ *
  * 17 Aug 2026 v6
  *   PLAN-1. plannedFocusToday() — the first reader activeProgramme
  *   .sessionSequence has ever had.
@@ -275,13 +301,40 @@ export function getReEntryContext() {
   const absenceContext  = store.get('absence.context');   // illness | life | harder | null
   const returnCaptured  = store.get('absence.returnCapturedAt');
 
+  // REENTRY-2, 20 Aug 2026. Graeme: "If I've been away for 3 weeks for
+  // work I'm not fit enough to start where I left off. But I should be
+  // offered." Detraining does not care why you were away -- the previous
+  // shape returned somebody at FULL phase intensity after any
+  // non-illness absence, which is how people come back, find it too
+  // hard, and stop.
+  //
+  // Two different things now, and the distinction is the point:
+  //
+  //   needsGentlerStart -- illness and injury. Applied WITHOUT asking,
+  //     because both carry a reason to be careful that is not the
+  //     person's judgement to override on the first session back.
+  //
+  //   offersGentlerStart -- life and harder. OFFERED and declinable.
+  //     Somebody away by choice who feels fine should not be told they
+  //     have lost ground; somebody who has genuinely detrained should
+  //     not have to work that out by failing a session.
+  const clinical = absenceContext === 'illness' || absenceContext === 'injury';
+
   return {
     gapDays,
-    context:           absenceContext || null,
-    contextCaptured:   !!returnCaptured,
-    needsGentlerStart: absenceContext === 'illness',
-    // For illness returns: programme holds current week, intensity drops one level
-    holdWeek:          absenceContext === 'illness',
+    context:            absenceContext || null,
+    contextCaptured:    !!returnCaptured,
+    needsGentlerStart:  clinical,
+    // Offered, not applied. coach-proposal.js decides what to do with it.
+    offersGentlerStart: absenceContext === 'life' || absenceContext === 'harder',
+    // Programme holds its week rather than advancing. Clinical only:
+    // three weeks at a conference is not a reason to repeat a week.
+    holdWeek:           clinical,
+    // REENTRY-2. Injury alone. The coach ASKS what is still sore rather
+    // than assuming recovery. Not a clinical record: this writes nothing
+    // to conditions or prescribedExercises and never implies the app
+    // knows what is wrong.
+    asksWhatHurts:      absenceContext === 'injury',
   };
 }
 
@@ -322,7 +375,13 @@ export function clearReturnContext() {
  * @returns {string} adapted intensityBias
  */
 export function getReEntryIntensity(reEntryContext, phaseIntensity) {
-  if (reEntryContext !== 'illness') return phaseIntensity;
+  // REENTRY-2, 20 Aug 2026. Was illness-only. Injury now steps down for
+  // the same reason. life/harder are handled by the CALLER, because
+  // those are offered rather than imposed -- this function applies a
+  // step down, it does not decide whether one was consented to.
+  if (reEntryContext !== 'illness' && reEntryContext !== 'injury') {
+    return phaseIntensity;
+  }
 
   const scale = ['gentle', 'moderate', 'challenging'];
   const current = scale.indexOf(phaseIntensity);
@@ -335,7 +394,7 @@ export function getReEntryIntensity(reEntryContext, phaseIntensity) {
  * not completed. Writes to activeProgramme.missedSessions.
  * Never shames — purely for adaptation tracking.
  *
- * @param {string} reason — 'life' | 'illness' | 'harder'
+ * @param {string} reason — 'life' | 'illness' | 'injury' | 'harder'
  */
 export function recordMissedSession(reason = 'life') {
   const missed = store.get('activeProgramme.missedSessions') || [];
