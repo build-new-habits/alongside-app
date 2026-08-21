@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 21 Aug 2026 v216
+## 21 Aug 2026 v215
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_21aug2026_v215.md`. Remove v215 on upload.
+Supersedes `master_schedule_21aug2026_v214.md`. Remove v214 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -138,42 +138,6 @@ Supersedes `master_schedule_21aug2026_v215.md`. Remove v215 on upload.
 >
 > ---
 
-> ### 🔴 GOAL-SETUP-1 — A ROUTED VIEW HAS NEVER LOADED. FIVE BUTTONS POINT AT IT.
->
-> Found 21 Aug while ground-truthing R2-a's second file. **Confirmed by execution, not by reading.**
->
-> `js/views/onboarding/goal-setup.js:29` statically imports `{ programmeEngine }`. `js/data/programmeEngine.js` exports **twenty named functions and no such symbol**, so this is a link-time `SyntaxError` — **the module never loads at all.** And `programmeEngine.startProgramme()` at `:411` does not exist in any module, so repairing the import alone would not make the view work.
->
-> 🔴 **BIAS-3's fault class, one level worse.** BIAS-3 threw at RUNTIME on the third line of a function. This throws at LINK time, so nothing in the file has ever run. **No existing gate could have caught it** — 43 of 78 are source-text only, and the source text is impeccable: a correctly spelled import of a plausibly named symbol.
->
-> **Reachable from five places:** `today.js:734`, `settings.js:2229`, `settings.js:2233`, `gym-programme.js:596`, `gym-programme.js:601`. In `app.js` `NAV_VIEWS`, routed at `router.js:189`.
->
-> #### 🔴 What is unreachable as a result
->
-> - **The 12-week weight-target safety warning** — the check that tells somebody their weight goal sits on an unrealistic timescale. In a product built for people at risk around food and body image this is the serious one. It is doubly dead: `validateWeightTarget()` also needs `targetWeight`, which **has no writer anywhere**, so it would return `null` on line 63 even if the module loaded. **It has never fired for anyone.**
-> - The date editor at `:443` — the only writer of top-level `targetDate`
-> - `goalSetupConfirm()`, and the only call to a `startProgramme` that does not exist
->
-> #### 🟢 LINK-1 — `tools/verify-link.mjs`, and the sweep that scoped it
->
-> All **103 modules** imported: **exactly one link failure, zero runtime failures.** The fault is contained; the codebase simply had no check for the class. It does now.
->
-> **The known-failure list is exact in both directions.** A new break turns it red — and so does *fixing* `goal-setup.js` without delisting it. An allowlist that only catches additions rots into permanent permission.
->
-> Five reversals confirmed: a new break caught · a listed module silently fixed caught · the list emptied while still broken caught · a sweep that found nothing caught by its positive control · and removing the jsdom `matchMedia` stub correctly does **not** go red, because a missing browser API is reported rather than failed.
->
-> 🟠 **Known limit, accepted:** because jsdom gaps cannot be told from real faults, runtime throws are reported and never fail the gate. Link failures are unambiguous and do.
->
-> #### 🟠 GRAEME'S DECISION — repair or retire
->
-> **`plan-select.js` already performs the live onboarding programme start** (`:168`–`:175`), writing `activeProgramme.programmeId`, `strategicGoal.weeklySessionTarget` and `setAt`. So `goal-setup.js` may be a superseded path that stayed routed. Five navigation sites need somewhere to go either way, and the weight-target warning needs a home regardless of which way this goes.
->
-> #### 🟠 AMENDMENT CORRECTED TO v2
->
-> `alongside_r1_r2_amendment_21aug2026_v1.md` **v2**. The **decision** to exclude weight targets from R1 is unchanged; **its stated reason was wrong.** v1 argued a real population carries a weight goal plus a date — that population cannot exist, because the only writer is unreachable and `targetWeight` has no writer at all. The surviving argument does not depend on population: a weight target can still be set through `strategicGoal`, and R1 commenting on progress toward one is a risk not worth taking. The both-homes `targetDate` read is likewise **defensive only**, covering TARGET-4's migration and historic installs rather than live users.
->
-> ---
->
 > ### 🟢 R1-a SHIPPED — the hard conversation has code. `alongside-v393`.
 >
 > Two commits, `5c4c1c3` then `01cdf7e` for `sw.js` alone. Verified by second fresh clone.
@@ -494,7 +458,7 @@ Supersedes `master_schedule_21aug2026_v215.md`. Remove v215 on upload.
 > | ID | Task | Status | Target |
 > |---|---|---|---|
 > | **R1-a** | Detection, dark — `Schema.md` v1.38, `store.js` v55, `js/data/goal-review.js`, `verify-hard1.mjs` + `verify-hard1-store.mjs`, `sw.js` v393 | 🟢 **SHIPPED 21 Aug** | Done |
-> | **R2-a** | Boundary correction — target entry gated to the Plan; `targetSetAt` written. **Scope reduced to `today.js` alone** — the second site is in a view that does not load (GOAL-SETUP-1) | 🟠 Blocked on GOAL-SETUP-1 | w/c 24 Aug |
+> | **R2-a** | Boundary correction — target entry gated to the Plan; `targetSetAt` written at both date sites. `today.js`, `goal-setup.js`, `sw.js` v394 | 🔵 Ready to build | w/c 24 Aug |
 > | **R1-b** | The surface — `my-programme.js` does **both** jobs in one visit: tier-gates the target display, and renders the three options. `sw.js` v395 | 🔵 Ready to build | w/c 24 Aug |
 > | **R2-b** | The demonstration at upgrade. **Needs a discovery session before a spec** — the revenue document's acceptance criteria for it were written against the pre-correction boundary | 🟠 Needs discovery | w/c 31 Aug |
 > | **R3** | Recognition without an arc, in free — *"same as last time?"*. Reads **one** log entry, never a pattern | 🔵 Specified | w/c 24 Aug |
@@ -4430,4 +4394,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 21 Aug 2026 v216*
+*Build New Habits · Alongside: Move · Master Schedule · 21 Aug 2026 v215*
