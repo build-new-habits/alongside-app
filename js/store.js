@@ -1,5 +1,24 @@
 /**
  * store.js - Data persistence layer
+ * 21 Aug 2026 v55
+ *   R1-a. Two additions to strategicGoal, both dark this session.
+ *
+ *   targetSetAt -- when the DATED TARGET was named. Distinct from
+ *   setAt, which plan-select.js and thread.js write when the weekly
+ *   FREQUENCY is agreed. R1's maturity guard exists to stop the coach
+ *   judging a target it has barely seen; setAt cannot do that job,
+ *   because it gives no protection at all to a date named last week
+ *   through the today.js hinge. Readers fall back to setAt where this
+ *   is absent, so existing installs behave exactly as before.
+ *   WRITTEN BY NOTHING until R2-a adds both writers. Deliberate,
+ *   one session, tracked by tools/verify-hard1.mjs.
+ *
+ *   review -- the hard conversation's own state. lastOfferedAt is the
+ *   28-day throttle and is set ONLY when an offer was actually shown;
+ *   a suppressed offer leaves it untouched and returns on the next
+ *   open. outcomes logs one entry per resolved conversation and is
+ *   NEVER cleared on downgrade.
+ *
  * 18 Aug 2026 v54
  *   ATHLETE-RETIRE. The 'athlete' tier is gone. It granted NOTHING
  *   beyond Personal anywhere in the app -- same credits, same export,
@@ -652,12 +671,29 @@ export const store = {
       // It runs on every load and is idempotent: once strategicGoal
       // holds a value, the copy stops happening.
       strategicGoal: (() => {
+        //
+        // R1-a, 21 Aug 2026. `review` is guarded explicitly rather than
+        // left to the spread. The spread above takes saved values
+        // wholesale, so a corrupt or half-written `review` -- a string,
+        // null, an object with `outcomes` missing -- would pass straight
+        // through and throw at the first `.outcomes.push()`. Same
+        // treatment measurementsOptIn already gets, and for the same
+        // reason.
+        const savedReview = saved.strategicGoal?.review;
         const sg = {
           ...defaults.strategicGoal,
           ...(saved.strategicGoal || {}),
           measurementsOptIn: Array.isArray(saved.strategicGoal?.measurementsOptIn)
             ? saved.strategicGoal.measurementsOptIn
-            : []
+            : [],
+          review: {
+            lastOfferedAt: (savedReview && typeof savedReview === 'object' && typeof savedReview.lastOfferedAt === 'string')
+              ? savedReview.lastOfferedAt
+              : null,
+            outcomes: (savedReview && typeof savedReview === 'object' && Array.isArray(savedReview.outcomes))
+              ? savedReview.outcomes
+              : []
+          }
         };
         if (!sg.targetDescription && typeof saved.targetDescription === 'string' && saved.targetDescription) {
           sg.targetDescription = saved.targetDescription;
@@ -1489,8 +1525,10 @@ export const store = {
         targetUnit:          null,
         weeklySessionTarget: 3,
         setAt:               null,
+        targetSetAt:         null,
         planPresentedAt:     null,
-        measurementsOptIn:   []
+        measurementsOptIn:   [],
+        review:              { lastOfferedAt: null, outcomes: [] }
       },
 
       // ── ACTIVE PROGRAMME ─────────────────────────────────────
