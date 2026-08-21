@@ -1,5 +1,35 @@
 /**
  * checkin.js
+ * 20 Aug 2026 v6
+ *
+ * v6 - BIAS-3. THE GENERATOR HAS BEEN DEAD, FOR EVERYONE, SINCE BIAS-2.
+ *
+ *   coachBias() and consecutiveActiveDays() were exported as named
+ *   functions and never added to the checkinData facade.
+ *   workoutGenerator.js reaches this module only through that facade,
+ *   so checkinData.coachBias() was undefined and calling it threw.
+ *
+ *   It threw on the THIRD LINE of generateDailyOptions(). Everything
+ *   below was unreachable: detectBurnout(), the menstrual cycle phase,
+ *   programme phase bias, the intensity floor, condition-aware
+ *   filtering. coach-proposal.js caught it and served
+ *   _getFallbackOptions() instead -- silently, every session, every
+ *   user.
+ *
+ *   WHAT COMES BACK TO LIFE, and this is a real behaviour change:
+ *     - todayIntensity actually reaches the generator
+ *     - WRITE-1's coldStartBias applies, so the onboarding stress
+ *       answer stops being collected and ignored
+ *     - BURN-1's recovery path becomes reachable
+ *     - coachBias lightens after three consecutive days
+ *     - real generated options replace the fallback three
+ *
+ *   THE LESSON. Two export styles in one module is the fault: a named
+ *   export looks complete on its own and is invisible to the only
+ *   caller that matters. verify-bias1.mjs was GREEN throughout, because
+ *   it asserted the source TEXT said checkinData.coachBias() was
+ *   called. It never executed it. verify-bias3.mjs now executes.
+ *
  * 14 Aug 2026 v5
  *
  * v5 - WRITE-1. coldStartBias() gives lifestyle.stressLevel its first
@@ -449,6 +479,24 @@ export function detectBurnout(checkinHistory) {
 // js/views/checkin.js imports { checkinData } from '../data/checkin.js'
 // and calls checkinData.getTodaysCheckin(), .saveCheckin() etc.
 
+// BIAS-3, 20 Aug 2026. THE FACADE IS THE CONTRACT.
+//
+// coachBias and consecutiveActiveDays were exported as named functions
+// by BIAS-2 and never added to this object -- and workoutGenerator.js
+// reaches this module ONLY through the facade. So
+// checkinData.coachBias() was undefined, and calling it threw.
+//
+// It threw on the THIRD LINE of generateDailyOptions(), which meant
+// everything below that line was unreachable: burnout detection, cycle
+// phase, programme phase bias, condition-aware filtering, the lot.
+// coach-proposal.js caught it and quietly served _getFallbackOptions().
+// Every session, for every user, since BIAS-2.
+//
+// TWO EXPORT STYLES IN ONE MODULE IS THE FAULT. A named export looks
+// complete on its own and is invisible to the only caller that matters.
+// Anything added here from now on must appear in BOTH places, and
+// verify-bias3.mjs asserts that every exported function reachable by
+// the facade is actually ON the facade.
 export const checkinData = {
   getTodaysCheckin,
   getHistory,
@@ -456,6 +504,8 @@ export const checkinData = {
   getSuggestedIntensity,
   resolveIntensity,
   coldStartBias,
+  coachBias,
+  consecutiveActiveDays,
   getEnergyEmoji,
   getEnergyLabel,
   getMoodEmoji,
