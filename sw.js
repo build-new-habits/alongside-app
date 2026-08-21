@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 21 Aug 2026 v393
+ * R1-a. New js/data/goal-review.js ADDED TO THE PRECACHE LIST below --
+ * off-course detection for the hard conversation. Nothing imports it
+ * yet (R1-b is the consumer), but a module that ships uncached is a
+ * module that breaks offline the moment something does import it, and
+ * that failure would land a version later than the change that caused
+ * it. Precache list plus cache bump.
+ *
  * 20 Aug 2026 v392
  * BIAS-3. The session generator runs again. Cache bump only.
  *
@@ -2721,7 +2729,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v392";
+const CACHE_NAME = "alongside-v393";
 
 const SHELL_URLS = [
 
@@ -2900,6 +2908,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/conditionProgrammes.js",
   "/alongside-app/js/data/equipment.js",
   "/alongside-app/js/data/goals.js",
+  "/alongside-app/js/data/goal-review.js",
   "/alongside-app/js/data/pricing.js",
   "/alongside-app/js/data/workoutGenerator.js",
   "/alongside-app/js/data/programmeEngine.js",
