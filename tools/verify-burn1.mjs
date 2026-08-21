@@ -1,5 +1,8 @@
 /**
  * tools/verify-burn1.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 12 Aug 2026 v1
  *
  * BURN-1. Found by tracing the perimenopause persona -- somebody whose
@@ -16,6 +19,16 @@
  * The shape mismatch hid the missing argument and the missing argument
  * hid the shape mismatch. The recovery path had never run.
  */
+
+// ── GATE-PATH, 21 Aug 2026 ─────────────────────────────────────────
+// Resolved from THIS FILE, never hardcoded. This gate previously
+// imported an absolute /home/claude/repo path: cloned anywhere else it
+// went red, and -- worse -- if that directory existed from an earlier
+// session it read THAT copy and reported green on code nobody was
+// editing. Five reversals of the merge guard passed exactly this way.
+import { fileURLToPath as __f } from "node:url";
+import { dirname as __d, resolve as __r } from "node:path";
+const __REPO = __r(__d(__f(import.meta.url)), "..");
 import fs from "node:fs";
 const mem = {};
 globalThis.localStorage = {
@@ -23,9 +36,9 @@ globalThis.localStorage = {
   setItem: (k, v) => { mem[k] = String(v); },
   removeItem: k => { delete mem[k]; },
 };
-const { store } = await import("/home/claude/repo/js/store.js");
+const { store } = await import(__REPO + "/js/store.js");
 store.init();
-const { detectBurnout } = await import("/home/claude/repo/js/data/checkin.js");
+const { detectBurnout } = await import(__REPO + "/js/data/checkin.js");
 
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }

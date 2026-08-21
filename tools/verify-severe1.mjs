@@ -1,5 +1,8 @@
 /**
  * tools/verify-severe1.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 16 Aug 2026 v1
  *
  * SEVERE-1. Severe pain gets a Gentle Care card, not a workout.
@@ -20,7 +23,12 @@
  * disagree. The gate pins the disagreement so it reaches the clinical
  * review as a known fact rather than being quietly resolved by me.
  */
-import { JSDOM } from '/home/claude/node_modules/jsdom/lib/api.js';
+
+// GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
+// absolute path into one machine's node_modules.
+import { createRequire as __cr } from "node:module";
+const __require = __cr(import.meta.url);
+const { JSDOM } = __require("jsdom");
 const dom = new JSDOM('<!doctype html>', { url: 'https://x/' });
 globalThis.window = dom.window; globalThis.document = dom.window.document;
 Object.defineProperty(globalThis,'navigator',{value:dom.window.navigator,configurable:true,writable:true});

@@ -1,5 +1,8 @@
 /**
  * tools/verify-equipment-sweep.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 12 Aug 2026 v1
  *
  * EQUIPMENT: the whole chain, end to end, every time.
@@ -23,6 +26,16 @@
  * If any link breaks, this fails. Nothing here is hand-typed except
  * Graeme's own saved list, which is the actual regression case.
  */
+
+// ── GATE-PATH, 21 Aug 2026 ─────────────────────────────────────────
+// Resolved from THIS FILE, never hardcoded. This gate previously
+// imported an absolute /home/claude/repo path: cloned anywhere else it
+// went red, and -- worse -- if that directory existed from an earlier
+// session it read THAT copy and reported green on code nobody was
+// editing. Five reversals of the merge guard passed exactly this way.
+import { fileURLToPath as __f } from "node:url";
+import { dirname as __d, resolve as __r } from "node:path";
+const __REPO = __r(__d(__f(import.meta.url)), "..");
 import fs from "node:fs";
 const mem = {};
 globalThis.localStorage = {
@@ -30,10 +43,10 @@ globalThis.localStorage = {
   setItem: (k, v) => { mem[k] = String(v); },
   removeItem: k => { delete mem[k]; },
 };
-const { store } = await import("/home/claude/repo/js/store.js");
+const { store } = await import(__REPO + "/js/store.js");
 store.init();
-const { resolveEquipment } = await import("/home/claude/repo/js/data/equipment-map.js");
-const { EXERCISES, filterByEquipment } = await import("/home/claude/repo/js/data/exercises/index.js");
+const { resolveEquipment } = await import(__REPO + "/js/data/equipment-map.js");
+const { EXERCISES, filterByEquipment } = await import(__REPO + "/js/data/exercises/index.js");
 
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }

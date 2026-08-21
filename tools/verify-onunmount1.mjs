@@ -1,5 +1,8 @@
 /**
  * tools/verify-onunmount1.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 18 Aug 2026 v1
  *
  * ONUNMOUNT-1. The router tears the outgoing view down.
@@ -20,9 +23,14 @@
  * onUnmount actually ran. And it asserts the inverse that matters more:
  * that no view exports an onUnmount the router will never reach.
  */
+
+// GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
+// absolute path into one machine's node_modules.
+import { createRequire as __cr } from "node:module";
+const __require = __cr(import.meta.url);
 import fs from 'node:fs';
 import path from 'node:path';
-import { JSDOM } from '/home/claude/node_modules/jsdom/lib/api.js';
+const { JSDOM } = __require("jsdom");
 
 const dom = new JSDOM('<!doctype html><div id="main-content"></div><nav id="bottom-nav"></nav>',
   { url: 'https://build-new-habits.github.io/alongside-app/' });
