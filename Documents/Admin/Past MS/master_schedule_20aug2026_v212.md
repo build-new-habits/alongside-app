@@ -1,71 +1,8 @@
 # Alongside: Move — Master Schedule
-## 20 Aug 2026 v213
+## 20 Aug 2026 v212
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_20aug2026_v212.md`. Remove v212 on upload.
-
-> ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
->
-> **Any chat with no memory reads that first, then this.** Token location, repo access, verification method, file discipline, the boundary, the absolute constraints, pricing, build order, known faults, both narratives, and how Graeme works.
->
-> ---
->
-> ### 🔴 BIAS-3 — THE SESSION GENERATOR HAD BEEN DEAD FOR EVERY USER. FIXED. `alongside-v392`.
->
-> `coachBias()` and `consecutiveActiveDays()` were exported from `checkin.js` as named functions and **never added to the `checkinData` facade**. `workoutGenerator.js` reaches that module **only** through the facade, so `checkinData.coachBias()` was `undefined` and calling it threw.
->
-> **It threw on the THIRD LINE of `generateDailyOptions()`.** Everything below was unreachable:
->
-> - `detectBurnout()` and the whole recovery path (BURN-1)
-> - menstrual cycle phase
-> - programme phase bias and the difficulty floor
-> - condition-aware filtering
-> - **`todayIntensity` never reached the generator at all**
-> - **WRITE-1's `coldStartBias` never ran** — the onboarding stress question was collected and ignored, which is worse than not asking
->
-> `coach-proposal.js` caught it and served `_getFallbackOptions()`. **Silently. Every session. Every user. Every day since BIAS-2.**
->
-> **Verified after the fix:** three real options for cold-start, mid-programme and three-days-in-a-row users. The smoke run across five absence contexts and both tiers now emits **zero** "workoutGenerator unavailable" warnings, where every mount emitted one before.
->
-> 🔴 **AND `verify-bias1.mjs` WAS GREEN THROUGHOUT.** It asserts the source TEXT says `checkinData.coachBias()` is called — which was true. The call was there, correct, and fatal. **A source-text gate cannot tell a live call from a throwing one.** Fifth time in one session that a green gate sat on broken behaviour.
->
-> **Structural fault: two export styles in one module.** A named export looks complete on its own and is invisible to the only caller that matters. `verify-bias3.mjs` executes, and asserts that every method any consumer calls THROUGH the facade is ON it.
->
-> **Two gate-writing corrections, both found by running it:** the first structural check flagged three harmless zero-caller exports — *a gate that fires on something harmless gets suppressed, and then it is not there for the real one* — and the today-exclusion assertion **passed for the wrong reason** until reseeded. That reversal also taught that `e.date < today` is **redundant**: the cursor starts at yesterday, so it never visits today whatever the Set holds.
->
-> ---
->
-> ### 🟢 REENTRY-2 — coming back after a break
->
-> Graeme: *"If I've been away for 3 weeks for work I'm not fit enough to start where I left off. But I should be offered. But it also has no injured option."* Both right.
->
-> **IMPOSED** (illness, injury) — steps down without asking; both carry a reason to be careful that is not the person's to override on session one. **OFFERED** (life, harder) — declinable; telling somebody who feels fine that they have lost ground is its own insult. **Collapsing the two in either direction is the failure.**
->
-> The offer states physiology, never judgement: *fitness slips whatever the reason — it is not a comment on you.* Injury also **asks what is still sore** and routes to the pain flow; it writes nothing to `conditions` or `prescribedExercises`. **"Nothing to flag" clears the ASK only, never the step down.**
->
-> `Schema.md` v1.37 first, then engine, then view. `verify-reentry2.mjs` — 24 assertions, executed, seven reversals caught.
->
-> ---
->
-> ### 🟢 PLAIN-2 — three more upgrade statements, two deliberately withheld
->
-> The gear change and R1 are both unbuilt. **R1 is the best line this product has and it goes up the day it ships, not before.**
->
-> ---
->
-> ### 🔴 THE ACQUISITION REFRAME — the most important thing recorded today
->
-> **At 150–600 free users in Year 1, friction cannot fix revenue.** At 600 free users, a brilliant 20% conversion is 120 customers; a poor 3% is 18. **The gap between the best and worst tier boundary imaginable is ~100 customers. The gap between 600 free users and 6,000 is 900.**
->
-> **There is no conversion problem. There is a traffic problem**, and no paywall design fixes traffic. Six hours went on the tier boundary today while org outreach — the actual Year 1 revenue channel — sat waiting on Graeme's confirmation.
->
-> **This is a referral-led business with a free tier as a trust-builder**, not a freemium business. Channels: physios and clinicians (pack finished, unsent), **social prescribing link workers** (NHS England funds the role to refer people to exactly this), occupational health and menopause policies, condition charities, and the confirmed org categories.
->
-> **Free's job is not to be a product. It is evidence that you do no harm** — which is what earns the referral. **And price is not the barrier; trust is.** £7.99 is nothing. People decline because six previous apps made them feel like a failure. **The marketing asset is the refusal list, not the feature list.**
->
-> 🟠 **Referral-led acquisition strategy still to be written** — channels, what each needs from Graeme, what the product must prove to each.
->
-> ---
+Supersedes `master_schedule_20aug2026_v211.md`. Remove v211 on upload.
 
 > ### 🔴 STOP WRITING DOCUMENTS. THE ORDER THAT SERVES THE BUSINESS:
 >
@@ -4328,4 +4265,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 20 Aug 2026 v213*
+*Build New Habits · Alongside: Move · Master Schedule · 20 Aug 2026 v212*
