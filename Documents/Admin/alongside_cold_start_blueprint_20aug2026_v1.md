@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 20 Aug 2026 v1
+## 21 Aug 2026 v2
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -49,7 +49,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | `Documents/Live State/Schema.md` | Store fields. **Must match `store.js`** |
 | `Documents/Business/` | Governing documents — see below |
 | `Documents/Archive/` | Stale, kept not deleted |
-| `tools/verify-*.mjs` | 75 gates |
+| `tools/verify-*.mjs` | 77 gates — **but see the clone-path fault in §8** |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order:**
@@ -68,10 +68,18 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 
 | | Version |
 |---|---|
-| `store.js` | v54 |
-| `Schema.md` | v1.37 |
-| `sw.js` | **v392**, cache `alongside-v392` |
-| Gates | **75, all green** on a fresh clone with jsdom installed |
+| `store.js` | v55 |
+| `Schema.md` | v1.38 |
+| `sw.js` | **v393**, cache `alongside-v393` |
+| Gates | **77.** 63 green on a genuinely clean clone; **14 red** — see below |
+
+🔴 **"77 green on a fresh clone" is FALSE, and v1 of this document told you otherwise.**
+
+**14 gates hardcode `/home/claude/repo/js/store.js`.** Clone anywhere else and they go red. Worse — if a `/home/claude/repo` directory happens to exist from an earlier session, they read **that** copy instead of yours, and report green on code you are not looking at. Proven on 21 Aug: with the old directory removed, a clean clone runs **63 pass, 14 fail**.
+
+The 14: `verify-bias1`, `burn1`, `burn2`, `c1`, `cont3`, `core1`, `count1`, `data1`, `dic1`, `equip3`, `equipment-sweep`, `feed1`, `gm1`, `yoga1`.
+
+**Until they are fixed, clone to `/home/claude/repo` exactly**, and treat their green as unproven. `verify-hard1.mjs` and `verify-hard1-store.mjs` resolve from `import.meta.url` and are the pattern to copy.
 
 **Stack:** vanilla JS PWA, ES modules, localStorage (pre-Supabase), WCAG 2.2 AA throughout.
 
@@ -169,14 +177,16 @@ Truth lives in `js/data/pricing.js`. `verify-price.mjs` enforces it.
 | **1** | **HMRC sole trader registration** | 🔴 **Graeme's.** Blocks bank account → Stripe → all revenue |
 | **2** | **Send the finished physio/clinical pack** | 🔴 Graeme's. It is finished and unsent |
 | **3** | **Confirm org outreach categories** | 🔴 Graeme's. Year 1 revenue is org referrals, not freemium |
-| **4** | **R1 — the hard conversation** | 🔵 **Zero lines.** Full spec in revenue architecture §4 |
+| **4** | **R1-b — the hard conversation's surface** | 🟡 **R1-a shipped 21 Aug** (detection, dark). R1-b is the three options in `my-programme.js`. Authority: `alongside_r1_r2_amendment_21aug2026_v1.md` |
 | **5** | **P-1 + P-3 — load progression with reversal** | 🔵 The Plan cannot deliver its own promise without it |
-| **6** | R2 — the naming moment | 🔵 **Needs discovery before a spec** |
+| **6** | **R2-a — targets become Plan-only** | 🟡 Boundary correction, decided 21 Aug. **Decide before October** — after that it takes something back. R2-b (the demonstration) still needs discovery |
 | **7** | Gear change | 🔵 After the above |
 
-**R1 is the most distinctive thing in the product and it does not exist.** *"If we're not on course, the coach tells us, and we readjust the plan."* `strategicGoal.targetDate` is written, stored and displayed — and compared to progress by nothing, anywhere.
+**R1-a shipped 21 Aug 2026.** `js/data/goal-review.js` — pure, zero imports — now holds detection, suppression and the trailing rate, with 82 executing checks across `verify-hard1.mjs` and `verify-hard1-store.mjs` and 22 confirmed reversals. **Nothing reads it yet.** `strategicGoal.targetSetAt` is written by nothing until R2-a. Both are deliberate one-session orphans, tracked by the gates.
 
-**Success for R1:** an executing gate (`verify-hard1.mjs`, not source-text) proving every suppression condition blocks the offer, three options always present with "leave it where it is" a real unnagged choice, the throttle held, free never sees it, no banned vocabulary in any branch.
+⚠️ **Read `alongside_r1_r2_amendment_21aug2026_v1.md` before touching R1 or R2.** The 18 Aug spec was wrong in eleven places, all found by opening the files it named. Two changed the product: **weight-based targets are excluded from R1 entirely**, and **a dated target can only be recorded on the Plan.**
+
+**Success for R1-b:** three options always present with "leave it where it is" a real unnagged choice, free never sees it, no banned vocabulary in any branch — and the target display tier-gated in the same visit, because `my-programme.js` gets touched once.
 
 ---
 
@@ -185,7 +195,9 @@ Truth lives in `js/data/pricing.js`. `verify-price.mjs` enforces it.
 | Fault | Note |
 |---|---|
 | **Progression does not exist** | For any tier. `session-builder.js` builds week 10 like week 1 |
-| **43 of 75 gates are source-text only** | They cannot tell live code from dead |
+| **43 of 77 gates are source-text only** | They cannot tell live code from dead |
+| **14 gates hardcode the clone path** | They can report green on a copy you are not editing. See §4 |
+| **A gate can pass against defaults** | `verify-hard1-store` first wrote to the wrong localStorage key and every assertion passed, having never loaded its own fixture. Put a positive control first |
 | 33 gates hardcode `/home/claude/node_modules/jsdom` | "Green on fresh clone" is only true where jsdom exists there |
 | `auth.js` `initPaywallListener()` | Calls bare `router.navigate()`; works only via `window.router` |
 | Dead CSS: `.progress-export--locked` | Renderer removed 20 Aug |
@@ -206,7 +218,7 @@ Graeme turns up at his daughter's athletics club on a Tuesday. The coach asks wh
 
 ### The injury (what the Plan is for)
 
-*Illustrative. R1 does not exist — this is what it would do.*
+*Illustrative. R1-a's detection exists as of 21 Aug; the surface below is R1-b and does not.*
 
 > **March.** I told the coach I wanted to walk up a local hill again by September without stopping. It didn't say *great goal*. It asked what walking had felt like before, and whether anything hurt. I mentioned an old knee problem. It wrote it down.
 >

@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 21 Aug 2026 v215
+## 21 Aug 2026 v214
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_21aug2026_v214.md`. Remove v214 on upload.
+Supersedes `master_schedule_20aug2026_v213.md`. Remove v213 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -138,42 +138,6 @@ Supersedes `master_schedule_21aug2026_v214.md`. Remove v214 on upload.
 >
 > ---
 
-> ### 🟢 R1-a SHIPPED — the hard conversation has code. `alongside-v393`.
->
-> Two commits, `5c4c1c3` then `01cdf7e` for `sw.js` alone. Verified by second fresh clone.
->
-> **`js/data/goal-review.js` v1 — pure, zero imports.** Detection, every suppression condition, the trailing 28-day rate. `store.js` **v55** adds `strategicGoal.targetSetAt` and `strategicGoal.review`, the review guarded explicitly rather than left to the spread. `Schema.md` **v1.38**.
->
-> **82 executing checks. 22 confirmed reversals** — 17 on detection, 5 on the merge guard. `verify-hard1.mjs` was written first and confirmed red before the module existed.
->
-> 🟡 **Two deliberate orphans, tracked by the gates.** Nothing reads `goal-review.js` until **R1-b**; nothing writes `targetSetAt` until **R2-a**. If either slips off this schedule, the orphan becomes the systematic fault this codebase keeps producing.
->
-> 🟢 **Unknown suppresses.** Every missing or wrong-typed suppression input returns silence, so a careless caller in R1-b gets no offer rather than a wrong one. The cost of a forgotten field lands on the feature, never on the person.
->
-> #### 🔴 "75 GATES GREEN ON A FRESH CLONE" WAS NEVER TRUE
->
-> **14 gates hardcode `/home/claude/repo/js/store.js`.** With that directory removed, a clean clone runs **63 pass, 14 fail**. Worse than failing: if a `/home/claude/repo` exists from an earlier session, they read **that** copy and report green on code nobody is editing.
->
-> Proven the hard way — the first `verify-hard1-store.mjs` hardcoded the same path, so **all five merge-guard reversals passed while reading a pristine copy in another directory.** The exact fault flagged in the existing gates an hour earlier, reproduced in a new file.
->
-> `verify-bias1`, `burn1`, `burn2`, `c1`, `cont3`, `core1`, `count1`, `data1`, `dic1`, `equip3`, `equipment-sweep`, `feed1`, `gm1`, `yoga1`. **One-line fix each.** Booked as **GATE-PATH** below. Cold start blueprint corrected to **v2**.
->
-> #### 🟠 A GATE CAN PASS AGAINST DEFAULTS — new fault class
->
-> `verify-hard1-store.mjs` first wrote its fixtures to localStorage key `alongside_data`. The live key is `alongside_user` (`store.js:501`). **Every assertion passed, having never loaded the corrupt data at all** — caught only because one case returned `null` where a valid string should have survived.
->
-> **A test that constructs its own state must first prove the state arrived.** A positive control now runs before anything else in that gate, and this belongs in any future gate that builds fixtures.
->
-> #### New tasks
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **GATE-PATH** | 14 gates resolve `store.js` from `import.meta.url`, not `/home/claude/repo`. Reversal: run from a second clone path with the original removed | 🔵 Ready to build | w/c 24 Aug |
-> | **DESC-1** | Top-level `targetDescription` has **no writer anywhere** — `goal-setup.js:277` and `:406` read a field that is always empty | 🔵 Specified | w/c 31 Aug |
-> | **BURN-RECENCY** | `detectBurnout()` reads the last seven **recorded** check-in keys, not seven calendar days, so it has no recency guard. Matters where it is an assertion — `today.js`, `coach-proposal.js` | 🔵 Specified | w/c 31 Aug |
->
-> ---
->
 > ### 🟢 R1 AND R2 — THIRTEEN DECISIONS CLOSED, 21 Aug 2026
 >
 > `Documents/Business/alongside_r1_r2_amendment_21aug2026_v1.md` **v1**. Build authority for R1 and R2's boundary half.
@@ -457,7 +421,7 @@ Supersedes `master_schedule_21aug2026_v214.md`. Remove v214 on upload.
 >
 > | ID | Task | Status | Target |
 > |---|---|---|---|
-> | **R1-a** | Detection, dark — `Schema.md` v1.38, `store.js` v55, `js/data/goal-review.js`, `verify-hard1.mjs` + `verify-hard1-store.mjs`, `sw.js` v393 | 🟢 **SHIPPED 21 Aug** | Done |
+> | **R1-a** | Detection, dark — `Schema.md` v1.38, `store.js` v55, `js/data/goal-review.js`, `verify-hard1.mjs`, `sw.js` v393. **No view changes** | 🔵 Ready to build | w/c 24 Aug |
 > | **R2-a** | Boundary correction — target entry gated to the Plan; `targetSetAt` written at both date sites. `today.js`, `goal-setup.js`, `sw.js` v394 | 🔵 Ready to build | w/c 24 Aug |
 > | **R1-b** | The surface — `my-programme.js` does **both** jobs in one visit: tier-gates the target display, and renders the three options. `sw.js` v395 | 🔵 Ready to build | w/c 24 Aug |
 > | **R2-b** | The demonstration at upgrade. **Needs a discovery session before a spec** — the revenue document's acceptance criteria for it were written against the pre-correction boundary | 🟠 Needs discovery | w/c 31 Aug |
@@ -4394,4 +4358,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 21 Aug 2026 v215*
+*Build New Habits · Alongside: Move · Master Schedule · 21 Aug 2026 v214*
