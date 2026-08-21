@@ -1,5 +1,8 @@
 /**
  * tools/verify-chap3.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 16 Aug 2026 v1
  *
  * CHAP-1 step 3, part one: the chapter can END.
@@ -15,7 +18,12 @@
  * the reassessment trigger only, and says so, so nobody reads a green
  * suite as "the hinge is done".
  */
-import { JSDOM } from '/home/claude/node_modules/jsdom/lib/api.js';
+
+// GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
+// absolute path into one machine's node_modules.
+import { createRequire as __cr } from "node:module";
+const __require = __cr(import.meta.url);
+const { JSDOM } = __require("jsdom");
 const dom = new JSDOM('<!doctype html><div id="c"></div>', { url: 'https://x/' });
 globalThis.window = dom.window; globalThis.document = dom.window.document;
 Object.defineProperty(globalThis,'navigator',{value:dom.window.navigator,configurable:true,writable:true});

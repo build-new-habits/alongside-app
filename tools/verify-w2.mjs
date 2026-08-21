@@ -1,5 +1,8 @@
 /**
  * tools/verify-w2.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 14 Aug 2026 v1
  *
  * W2-1: the difficulty ceiling applies to cooldown as well as main and
@@ -8,7 +11,12 @@
  *
  * Run: node tools/verify-w2.mjs
  */
-import { JSDOM } from '/home/claude/node_modules/jsdom/lib/api.js';
+
+// GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
+// absolute path into one machine's node_modules.
+import { createRequire as __cr } from "node:module";
+const __require = __cr(import.meta.url);
+const { JSDOM } = __require("jsdom");
 import { readFileSync } from 'node:fs';
 
 const dom = new JSDOM('<!doctype html><html><body></body></html>',

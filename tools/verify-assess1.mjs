@@ -1,5 +1,8 @@
 /**
  * tools/verify-assess1.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 15 Aug 2026 v1
  *
  * ASSESS-1. The difficulty ceiling can move without the person editing
@@ -11,8 +14,13 @@
  * served is the same defect one step along, and this project has shipped
  * that shape more than once.
  */
+
+// GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
+// absolute path into one machine's node_modules.
+import { createRequire as __cr } from "node:module";
+const __require = __cr(import.meta.url);
 import fs from 'node:fs';
-import { JSDOM } from '/home/claude/node_modules/jsdom/lib/api.js';
+const { JSDOM } = __require("jsdom");
 const dom = new JSDOM('<!doctype html>', { url: 'https://build-new-habits.github.io/alongside-app/' });
 globalThis.window = dom.window; globalThis.document = dom.window.document;
 Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator, configurable: true, writable: true });

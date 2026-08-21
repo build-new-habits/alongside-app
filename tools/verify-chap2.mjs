@@ -1,5 +1,8 @@
 /**
  * tools/verify-chap2.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 16 Aug 2026 v1
  *
  * CHAP-1 step 2. My Programme.
@@ -24,8 +27,13 @@
  * before being trusted. A gate that has never been made to fail proves
  * nothing, and "no output" is not "green".
  */
+
+// GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
+// absolute path into one machine's node_modules.
+import { createRequire as __cr } from "node:module";
+const __require = __cr(import.meta.url);
 import fs from 'node:fs';
-import { JSDOM } from '/home/claude/node_modules/jsdom/lib/api.js';
+const { JSDOM } = __require("jsdom");
 
 const dom = new JSDOM('<!doctype html><div id="main-content"></div>',
   { url: 'https://build-new-habits.github.io/alongside-app/' });

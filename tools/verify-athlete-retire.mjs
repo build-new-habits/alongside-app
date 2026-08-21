@@ -1,5 +1,8 @@
 /**
  * tools/verify-athlete-retire.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 18 Aug 2026 v1
  *
  * ATHLETE-RETIRE. The tier is gone, and nobody lost anything.
@@ -23,9 +26,14 @@
  *
  * Every assertion was reversal-tested.
  */
+
+// GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
+// absolute path into one machine's node_modules.
+import { createRequire as __cr } from "node:module";
+const __require = __cr(import.meta.url);
 import fs from 'node:fs';
 import path from 'node:path';
-import { JSDOM } from '/home/claude/node_modules/jsdom/lib/api.js';
+const { JSDOM } = __require("jsdom");
 
 const dom = new JSDOM('<!doctype html><div id="main-content"></div>',
   { url: 'https://build-new-habits.github.io/alongside-app/' });

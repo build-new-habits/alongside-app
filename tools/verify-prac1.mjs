@@ -1,5 +1,8 @@
 /**
  * tools/verify-prac1.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 18 Aug 2026 v1
  *
  * PRAC-1. The guided practice library.
@@ -25,8 +28,13 @@
  * copy first, and confirmed to go red. A gate that has never been made
  * to fail proves nothing.
  */
+
+// GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
+// absolute path into one machine's node_modules.
+import { createRequire as __cr } from "node:module";
+const __require = __cr(import.meta.url);
 import fs from 'node:fs';
-import { JSDOM } from '/home/claude/node_modules/jsdom/lib/api.js';
+const { JSDOM } = __require("jsdom");
 
 const dom = new JSDOM('<!doctype html><div id="main-content"></div>',
   { url: 'https://build-new-habits.github.io/alongside-app/' });

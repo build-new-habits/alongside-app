@@ -1,5 +1,8 @@
 /**
  * tools/verify-reentry2.mjs
+ * 21 Aug 2026 v2
+ * GATE-PATH. Path resolution only -- no assertion changed.
+ *
  * 20 Aug 2026 v1
  *
  * REENTRY-2 — coming back after a break.
@@ -28,6 +31,11 @@
  * SOURCE OF TRUTH: Schema.md v1.37 section 8.
  */
 
+// GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
+// absolute path into one machine's node_modules.
+import { createRequire as __cr } from "node:module";
+const __require = __cr(import.meta.url);
+
 import fs from "node:fs";
 
 const read = p => fs.readFileSync(new URL("../" + p, import.meta.url), "utf8");
@@ -41,7 +49,7 @@ const check = (name, ok, detail = "") => {
 console.log("\nREENTRY-2 — returning after a break\n");
 
 // ── Behavioural half: the engine is pure enough to execute directly ──
-const { JSDOM } = await import("/home/claude/node_modules/jsdom/lib/api.js");
+const { JSDOM } = __require("jsdom");
 const dom = new JSDOM("<!doctype html><div></div>",
   { url: "https://build-new-habits.github.io/alongside-app/" });
 globalThis.window = dom.window;
