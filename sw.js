@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 20 Aug 2026 v390
+ * PLAIN-1. Cache bump only -- no service worker logic changed.
+ * upgrade.js v11 and settings.js v33 carried four false claims about
+ * what the Plan includes; an installed PWA would keep serving them
+ * from cache without this bump.
+ *
  * 20 Aug 2026 v389
  * R4. Self-direction moves to free. Cache bump only -- no service
  * worker logic changed. Five view files and three gates changed in the
@@ -2708,7 +2714,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v389";
+const CACHE_NAME = "alongside-v390";
 
 const SHELL_URLS = [
 
