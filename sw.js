@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 20 Aug 2026 v391
+ * REENTRY-2 + PLAIN-2. Cache bump only -- no service worker logic
+ * changed.
+ *
  * 20 Aug 2026 v390
  * PLAIN-1. Cache bump only -- no service worker logic changed.
  * upgrade.js v11 and settings.js v33 carried four false claims about
@@ -2714,7 +2718,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v390";
+const CACHE_NAME = "alongside-v391";
 
 const SHELL_URLS = [
 
