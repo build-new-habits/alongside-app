@@ -1,8 +1,8 @@
 # Alongside: Move — R1 and R2 Amendment
-## 21 Aug 2026 v1
+## 21 Aug 2026 v2
 
 **Amends:** `Documents/Business/alongside_revenue_architecture_18aug2026_v1.md` §4, entries **R1** and **R2**.
-**Status:** Decisions closed by Graeme, 21 Aug 2026. This document is the build authority for R1 and for R2's boundary half. Where it conflicts with the revenue architecture, this document wins. Where it conflicts with `master_schedule.md`, the schedule wins.
+**Status:** Decisions closed by Graeme, 21 Aug 2026. **v2 corrects two claims in v1** — see §1.10. The decisions themselves are unchanged; one of their stated reasons was wrong. This document is the build authority for R1 and for R2's boundary half. Where it conflicts with the revenue architecture, this document wins. Where it conflicts with `master_schedule.md`, the schedule wins.
 
 ---
 
@@ -28,6 +28,8 @@ Every finding below was confirmed by opening the file named. Line numbers are ag
 `js/store.js:662` migrates top level into `strategicGoal` on load, one way, and **only into an empty field**. `my-programme.js:392` already reads both, preferring the structured one — that was TARGET-3.
 
 **Consequence:** R1 must read both homes and parse both formats. Reading only `strategicGoal.targetDate` repeats TARGET-3 in a new file.
+
+⚠️ **Corrected in v2:** `goalSetupSaveWeightTargetDate()` is **unreachable** — `goal-setup.js` does not link (§1.10). So the top-level `targetDate` has no *reachable* writer, and the both-homes read is **defensive only**: it covers TARGET-4's migration and any historic install, not a live population. Still required, but v1 overstated what it was protecting.
 
 ### 1.2 `strategicGoal.setAt` does not record what R1 needs
 
@@ -69,13 +71,31 @@ For R1 this causes over-suppression, which is harmless. It matters for `today.js
 
 `my-programme.js` imports `isPremium` and uses it at lines 324, 435 and 457 — none of them near the target section. `_whatYoureAimingAt()` renders the date and the countdown to free users. Nothing in the boundary ever sanctioned this; it accumulated.
 
+### 1.10 `goal-setup.js` does not link — found 21 Aug, after v1 was written
+
+`js/views/onboarding/goal-setup.js:29` statically imports `{ programmeEngine }`. `js/data/programmeEngine.js` exports twenty named functions and **no such symbol**, so the import is a link-time `SyntaxError` and the module never loads. Confirmed by execution, not by reading.
+
+`programmeEngine.startProgramme()` at `:411` does not exist in any module either, so repairing the import alone would not make the view work.
+
+**Reachable from five places:** `today.js:734`, `settings.js:2229`, `settings.js:2233`, `gym-programme.js:596`, `gym-programme.js:601`. It is in `app.js`'s `NAV_VIEWS` and routed at `router.js:189`.
+
+**What is unreachable as a result:**
+
+- The **12-week weight-target safety warning**. `validateWeightTarget()` also depends on `targetWeight`, which **has no writer anywhere in the codebase**, so it would return `null` on line 63 even if the module loaded. This has never fired for anyone.
+- The date editor at `:443` — the only writer of top-level `targetDate`
+- `goalSetupConfirm()`
+
+A sweep of all 103 modules found **this is the only link failure**, and zero runtime failures. Now guarded permanently by `tools/verify-link.mjs` (LINK-1), whose known-failure list is exact in both directions: a new break turns it red, and so does fixing this one without delisting it.
+
+Tracked as **GOAL-SETUP-1**. Repair-or-retire is a product decision, not a build one — `plan-select.js` already performs the live onboarding programme start, so this may be a superseded path that stayed routed.
+
 ---
 
 ## 2. Decisions closed, 21 Aug 2026
 
 | # | Decision | Rationale |
 |---|---|---|
-| 1 | **Weight-based targets are excluded entirely in v1**, as a suppression condition with its own gate assertion | The only top-level `targetDate` writer is a weight-loss flow, so a real population carries `primaryGoal` weight plus a date. R1 would comment on progress toward a weight target, for people this product exists for because fitness culture failed them. `goal-setup.js` already treats weight dates as needing a warning — the codebase had already decided this goal class is different. Handling rather than excluding needs its own design, not a copy variant. |
+| 1 | **Weight-based targets are excluded entirely in v1**, as a suppression condition with its own gate assertion | **Decision unchanged; reason corrected in v2.** v1 argued that a real population carries a weight goal plus a date. It cannot — the only writer of that pair is unreachable (§1.10), and `targetWeight` has no writer anywhere. The surviving argument is the one that does not depend on population: a weight target can still be set through `strategicGoal` at any time, and R1 commenting on progress toward one is a risk this product should not take for people it exists to serve. `goal-setup.js` already treated weight dates as needing a warning, so the codebase had decided this class was different before R1 was specified. Handling rather than excluding needs its own design. |
 | 2 | **Maturity guard raised to 28 days**, matching the window | A 21-day window at three sessions a week expects nine sessions, so the 60% line sits at 5.4 and one bad week flips it. 28 days expects twelve and is steadier. The window is then always full, always the same length, no partial-window arithmetic, one number in the gate. Says out loud as: *the coach will not judge a target until it has had a full month to look at it.* |
 | 3 | **New field `strategicGoal.targetSetAt`**, written at both date-write sites; falls back to `setAt` where absent | The guard exists to stop the coach judging a target it has barely seen. `setAt` records a different fact (§1.2). Using one for the other means the guard protects the wrong thing. |
 | 4 | **`tierChangedAt` dropped** | It was a patch for a hole that decision 12 closes by construction. See §6. |
@@ -238,4 +258,4 @@ Every assertion below imports `goal-review.js` and calls it against constructed 
 
 ---
 
-*Build New Habits · Alongside: Move · R1 and R2 Amendment · 21 Aug 2026 v1*
+*Build New Habits · Alongside: Move · R1 and R2 Amendment · 21 Aug 2026 v2*
