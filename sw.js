@@ -1,6 +1,9 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 20 Aug 2026 v392
+ * BIAS-3. The session generator runs again. Cache bump only.
+ *
  * 20 Aug 2026 v391
  * REENTRY-2 + PLAIN-2. Cache bump only -- no service worker logic
  * changed.
@@ -2718,7 +2721,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v391";
+const CACHE_NAME = "alongside-v392";
 
 const SHELL_URLS = [
 
