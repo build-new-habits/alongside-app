@@ -1,5 +1,14 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 20 Aug 2026 v12
+ *
+ * v12 - PLAIN-2. Three statements added, all verified against the live
+ *   build and each naming the file that makes it true. Two of the seven
+ *   drafted are deliberately ABSENT: the gear change and R1 are both
+ *   unbuilt, and R1 is the best line this product has. They go up the
+ *   day they ship, not before -- the same discipline v6 recorded when it
+ *   withdrew a statement on the morning it was written.
+ *
  * 20 Aug 2026 v11
  *
  * v11 - PLAIN-1. THE PAGE WAS SELLING SOMETHING THE PRODUCT GIVES AWAY.
@@ -195,6 +204,17 @@ export const centered = false;
 // PLAIN-1, 20 Aug 2026. EVERY STATEMENT BELOW WAS CHECKED AGAINST THE
 // LIVE BUILD TODAY, not against a document. Each carries the file that
 // makes it true. If a statement cannot name one, it does not ship.
+// PLAIN-2, 20 Aug 2026. Graeme: people scan before they read, and the
+// page must not assume knowledge. Each statement is now a plain claim a
+// stranger can act on, with no unexplained "it" and no example that
+// needs local knowledge to parse.
+//
+// SEVEN WERE DRAFTED. TWO ARE NOT HERE:
+//   "It reflects back what's changed" -- the gear change, unbuilt.
+//   "If your target stops being realistic it says so" -- R1, unbuilt,
+//     and the best line this product has. It goes up the day it ships.
+// Both stay in the marketing narrative. Neither goes on a page that
+// takes money until it is true.
 const STATEMENTS = [
   // onboarding writes strategicGoal.targetDescription/targetDate;
   // my-programme.js renders it. Free never sets one.
@@ -205,6 +225,16 @@ const STATEMENTS = [
   // actually do and does NOT say the sessions get harder -- they do
   // not yet, for anybody.
   "Sessions follow on from one another instead of each starting fresh.",
+  // checkin.js + coach-proposal.js: energy, pain, time and feeling word
+  // are collected before every session and change what is built.
+  // ALSO TRUE ON FREE -- included because it describes the coaching
+  // relationship the page is selling, not because it is withheld.
+  "The session changes when your day does. Tired, sore, short of time, flat -- you say so, and it adapts.",
+  // conditions.js + prescribedExercises: told once, held permanently,
+  // never re-asked.
+  "It remembers your conditions and injuries, so you never have to say them twice.",
+  // programmeEngine.js getReEntryContext() -- REENTRY-2, 20 Aug 2026.
+  "If you have been away, it does not start you over. You come back where you left off, gentler if you need it.",
   // progress.js: the free narrative stops after line 1; the 30- and
   // 90-day windows and the type breakdown are the Plan's.
   "Your progress becomes something the coach reads back to you \u2014 what has changed across months, not a list of what you did.",
