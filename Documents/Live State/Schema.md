@@ -1,7 +1,36 @@
 # Alongside — Data Schema Reference
-## 20 Aug 2026 v1.37
+## 21 Aug 2026 v1.38
 
-**File:** `js/store.js` (confirmed live version: **v54, 18 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v55, 21 Aug 2026**)
+
+---
+
+## v1.38 (21 Aug 2026) — R1-a: the fields the hard conversation needs
+
+`store.js` v54 → **v55**. Two additions to `strategicGoal`, no migrations, no behaviour change. Detection ships dark in this session; nothing reads these fields until R1-b.
+
+Authority: `Documents/Business/alongside_r1_r2_amendment_21aug2026_v1.md` v1.
+
+### `strategicGoal.targetSetAt` — because `setAt` records a different fact
+
+`setAt` is written by `onboarding/plan-select.js:175` and `onboarding/thread.js:1260`, both at the moment the **weekly session frequency** is agreed. It is never written when a date is named.
+
+R1's maturity guard exists to stop the coach judging a target it has barely seen. Using `setAt` for that means the guard protects the wrong thing: it gives no protection at all to a date named last week through the `today.js` hinge.
+
+`targetSetAt` records **when the dated target was named**. Readers fall back to `setAt` where it is absent, so existing installs behave exactly as they would have.
+
+⚠️ **Declared here, written by nothing until R2-a.** This is a deliberate orphan for one session, tracked by `tools/verify-hard1.mjs`. R2-a adds the writers at both date-write sites.
+
+### `strategicGoal.review` — the hard conversation's own state
+
+| Field | Type | Default | Purpose |
+|---|---|---|---|
+| `lastOfferedAt` | `string\|null` (ISO) | `null` | Throttle. 28 days. **Only set when an offer was actually shown** — a suppressed offer leaves it untouched and returns on the next open |
+| `outcomes` | `array` | `[]` | One entry per resolved conversation: `{ at, choice, previousDate, newDate }`, `choice` being `moved` \| `reshaped` \| `kept` |
+
+**`outcomes` is never cleared on downgrade.** Somebody who moves their date in November and returns to free in January must find it intact. Nothing currently clears `strategicGoal` on tier change; this is a "do not break it" assertion, not new work.
+
+**Merge guarding.** The `strategicGoal` merge is an IIFE that spreads `saved.strategicGoal` over the defaults, so a corrupt saved value passes straight through. `review` is guarded explicitly — object shape checked, `outcomes` coerced to an array — the same treatment `measurementsOptIn` already gets in that block.
 
 ---
 
@@ -327,6 +356,7 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | **1.14** | **04 Aug 2026** | **Phase D-1 (schema), Conditions Update.** Two new fields: `conditionGoals` (felt-sense condition-specific goal, `'healed'\|'cope'\|'improve'` + optional note, new `store.setConditionGoal()`) and `prescribedExercisesOrigin` (`'professional'\|'self'\|null`, lets `prescribed.js` branch its coach voice correctly). Also documented in the field-reference table: `pendingDoorRoute`, added earlier today (Phase C follow-up) but missed in Schema.md at the time. `js/store.js` v14→v15. |
 | **1.15** | **04 Aug 2026** | **Condition programmes, real routes built.** `prescribedExercises` entries can now carry an optional `conditionId` — additive, nullable, existing entries unaffected. New `prescribedExercisesActiveCondition` — single-use context flag, cleared the instant it's read. `js/store.js` v15→v16. New module `js/data/conditionProgrammes.js` (not a schema file, but the reason these fields exist) — real, tested exercise-selection logic for "Coach builds it"/"Coach recommends, you select," built on `affectsAreas`/`rehabPhase`/`contraindications` data that already existed. |
 | **1.16** | **04 Aug 2026** | **Cross-condition exercise reuse, not duplication.** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — one entry can now genuinely serve more than one condition, so doing the same physical exercise once correctly counts once everywhere, rather than the same exercise appearing as two separate entries with independent completion state and double credits. Backward compatible — old singular-shaped entries read correctly via new `getEntryConditionIds()`, migrate naturally on rebuild, no explicit migration step. `js/data/conditionProgrammes.js` v2→v3. Smoke-tested against real overlapping conditions before shipping. |
+| **1.38** | **21 Aug 2026** | **R1-a.** `store.js` v54 → v55. `strategicGoal.targetSetAt` (the maturity guard's honest clock — `setAt` records when the *frequency* was agreed, not the date) and `strategicGoal.review` (`lastOfferedAt` throttle, `outcomes` log). Both additive, no migration. Declared dark: nothing reads `review` until R1-b and nothing writes `targetSetAt` until R2-a, tracked by `verify-hard1.mjs`. |
 | **1.35** | **17 Aug 2026** | **TARGET-4.** `store.js` v52 → v53. One-way migration of `targetDate`/`targetDescription` from top level into `strategicGoal`, on load, into empty fields only. Closes a divergence where two editable fields held one idea — and a third, `goal.*`, was read but had never existed, silently replacing a chosen primary goal with `goals[0]`. |
 | **1.34** | **16 Aug 2026** | **Eleven versions of drift, caught by fixing the gate meant to catch it.** `store.js` v41 → v52. Nine undocumented top-level fields folded in: `assessment` (ASSESS-1 — the field that lets the difficulty ceiling move), `programme` + `weekFocus` (CHAP-1 step 1, declared and written by nothing), `exerciseClearance` (CARDIAC-1), `pacing` + `sessionPace` (PACE-1/QUICK-1), `sessionMode`, `personalBests` + `showPersonalBests` (PB-1). `tools/schema-check.mjs` v1 → **v2**: its field diff had been slicing an empty string since the day it was written, so it could not fire at any amount of drift. Now anchored on the definition and self-asserting. |
 | **1.17** | **09 Aug 2026** | **"In Step" (Noticing Hub, Personal tier) + drift catch-up.** New field `inStepProgress` (`unlockedAt`, `scenarioIndex`, `completedCount`, `choiceLog`) — four-movement scenario practice extending the empathy transfer arc, `js/store.js` v17→v18, new `js/data/in-step-scenarios.js` + `js/views/in-step.js`, new route `in-step`. Also documented `exercisePreferences` (`store.js` v17, 04 Aug), missed in Schema.md at the time — same drift pattern as `pendingDoorRoute` in 1.14, caught here rather than left open. |
@@ -477,9 +507,15 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 | `targetValue` | `number\|null` | `null` |
 | `targetUnit` | `string\|null` | `null` |
 | `weeklySessionTarget` | `number` | `3` |
-| `setAt` | `string\|null` (ISO) | `null` |
+| `setAt` | `string\|null` (ISO) | `null` | 
+| `targetSetAt` | `string\|null` (ISO) | `null` |
 | `planPresentedAt` | `string\|null` (ISO) | `null` |
 | `measurementsOptIn` | `string[]` | `[]` |
+| `review` | `object` | `{ lastOfferedAt: null, outcomes: [] }` |
+
+⚠️ **`weeklySessionTarget` defaults to `3` with `setAt: null`.** The pair records that **nobody agreed to it.** `setAt` is the honest test of whether it was ever a choice, and `today.js` (HOME-1) and `my-programme.js` both refuse to display the target without it. Any new reader must inherit that rule: **a default of 3 is never a denominator.**
+
+⚠️ **`targetSetAt` vs `setAt`** — different facts. `setAt` is when the weekly frequency was agreed; `targetSetAt` is when the dated target was named. See v1.38 above.
 
 ### `activeProgramme` (nested object)
 
