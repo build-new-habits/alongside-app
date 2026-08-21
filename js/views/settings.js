@@ -1,5 +1,22 @@
 /**
  * settings.js
+ * 20 Aug 2026 v33
+ *
+ * v33 - PLAIN-1. THREE LIVE FALSEHOODS REMOVED from the "What the Plan
+ *   adds" block, all on a page asking somebody to buy:
+ *
+ *   1. "Sessions become yours -- the kind, the length, and how the time
+ *      is spent." R4 moved all three to FREE the same morning.
+ *   2. "And the longer practices open up." This is the exact statement
+ *      WITHDRAWN from upgrade.js v6 on 13 Aug for being untrue. It was
+ *      removed from that page and left standing here -- which is how a
+ *      correction becomes half a correction.
+ *   3. "The yearly rate holds until the end of November 2026." PRICE-2
+ *      retired that on 18 Aug. A deadline already passed.
+ *
+ *   Replacements each name the file that makes them true. The 30-day
+ *   trial replaces the dead deadline.
+ *
  * 18 Aug 2026 v32
  *
  * v32 - ATHLETE-RETIRE. Dev tier switcher loses its Athlete button.
@@ -1622,24 +1639,49 @@ export function SettingsView(router) {
                will be.</p>
           </div>
 
+          <!-- PLAIN-1, 20 Aug 2026. THREE FALSEHOODS REMOVED FROM THIS
+               BLOCK, all of them live on a page asking people to buy.
+
+               1. "Sessions become yours -- the kind, the length, and how
+                  the time is spent." R4 moved all three to FREE the same
+                  morning. Selling what the product gives away.
+
+               2. "And the longer practices open up." This is the exact
+                  statement WITHDRAWN from upgrade.js v6 on 13 Aug for
+                  being untrue -- in-step.js contains isPremium() once,
+                  only to decide whether to render the upgrade door. It
+                  was removed from one page and left standing on this
+                  one, which is how a correction becomes half a
+                  correction.
+
+               3. "The yearly rate holds until the end of November 2026."
+                  PRICE-2 retired that on 18 Aug. A deadline that had
+                  already passed, on a purchase page.
+
+               Replacements are checked against the live build, and each
+               names the file that makes it true. -->
           <div class="settings-plan-block">
             <h3 class="settings-plan-block__heading">What the Plan adds</h3>
-            <p>You name where you're heading, and the coach builds towards it
-               rather than only meeting today.</p>
-            <p>Sessions become yours — the kind, the length, and how the time
-               is spent.</p>
-            <p>Your progress becomes a conversation: what's changed across
-               months, not just this week.</p>
-            <p>And the longer practices open up — the ones that go somewhere
-               over time rather than finishing when the session does.</p>
+            <!-- strategicGoal, written at onboarding, rendered by my-programme.js -->
+            <p>You tell the coach where you're heading, and it builds towards
+               that rather than only meeting today.</p>
+            <!-- programmeEngine.js chaptersDone + successor offer; CONT-1 -->
+            <p>Sessions follow on from one another instead of each starting
+               fresh.</p>
+            <!-- progress.js: free stops after narrative line 1 -->
+            <p>Your progress becomes something the coach reads back to you:
+               what's changed across months, not a list of what you did.</p>
+            <!-- community-impact.js:143 -->
+            <p>And every session you finish counts double towards where the
+               five percent goes.</p>
           </div>
 
           <div class="settings-plan-block">
             <p class="settings-plan-price">${PRICE_MONTHLY} a month, or ${PRICE_ANNUAL} for the year.</p>
             <p class="text-sm text-muted">
-              The yearly rate holds until the end of November 2026. No
-              contract either way, and nothing is lost if you change your
-              mind — your data stays yours whatever you decide.
+              Thirty days before you pay anything, and no contract either way.
+              Nothing is lost if you change your mind — your data stays yours
+              whatever you decide.
             </p>
           </div>
 

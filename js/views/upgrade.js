@@ -1,5 +1,42 @@
 /**
  * upgrade.js - Upgrade / Membership view
+ * 20 Aug 2026 v11
+ *
+ * v11 - PLAIN-1. THE PAGE WAS SELLING SOMETHING THE PRODUCT GIVES AWAY.
+ *
+ *   Statement 1 read "Your sessions become yours -- the kind, the
+ *   length, and how the time is spent." That was TRUE at 09:00 and
+ *   FALSE by 11:00: R4 moved session type, duration and the allocation
+ *   split to free the same morning. The most-visited conversion surface
+ *   in the app spent the afternoon advertising the free tier.
+ *
+ *   THE LESSON, which is the twin of the one in v6's withdrawn
+ *   statement: that note says a tier check does not prove the feature
+ *   exists. This one says a TRUE statement does not stay true. Copy
+ *   asserting a tier boundary has to be re-read whenever the boundary
+ *   moves, and nothing in the gate suite was watching this file.
+ *   verify-plain1.mjs now does.
+ *
+ *   Statement 3 said the programme builds "week on week, phase by
+ *   phase". Progression does not exist -- ground-truthed 20 Aug, see
+ *   alongside_progression_boundary_20aug2026_v1.md. Rewritten to what
+ *   the chapter engine actually does: sessions that follow on from one
+ *   another, which is CONT-1 and is real.
+ *
+ *   Graeme, 20 Aug: the page was too abstract. "Ready to go deeper",
+ *   "the coach more to work with", "the deeper the relationship" --
+ *   somebody deciding whether to spend sixty pounds cannot act on any
+ *   of it. Rewritten in plain language, still warm, still not a
+ *   feature table.
+ *
+ *   THE TRIAL IS NOW ON THE PAGE. Thirty days, no charge, cancel and
+ *   keep everything -- the strongest thing in the offer and it appeared
+ *   on neither this page nor Settings.
+ *
+ *   R1 IS DELIBERATELY NOT MENTIONED. "The coach tells you when you
+ *   will not reach your target" is the best line this product has and
+ *   it has zero lines of code. It goes on the page the day it ships.
+ *
  * 18 Aug 2026 v10
  *
  * v10 - PRICE-3. The two price constants moved to js/data/pricing.js
@@ -155,18 +192,25 @@ export const centered = false;
 // room between each." Three ship today -- see the header note on why the
 // other two were withheld. Each was checked against a live tier gate
 // before being written here.
+// PLAIN-1, 20 Aug 2026. EVERY STATEMENT BELOW WAS CHECKED AGAINST THE
+// LIVE BUILD TODAY, not against a document. Each carries the file that
+// makes it true. If a statement cannot name one, it does not ship.
 const STATEMENTS = [
-  // session-builder-ui.js: type picker, duration picker and allocation
-  // presets are all isPremium()-gated. Free is full body, 30 minutes.
-  "Your sessions become yours \u2014 the kind, the length, and how the time is spent.",
-  // progress.js:384 stops the coach narrative after line 1 for free, and
-  // withholds the 90-day window, the type breakdown and export.
-  "Your progress becomes a conversation \u2014 patterns noticed, trends named, the coach reflecting back what it sees across weeks, not just today.",
-  // gym-programme.js -- TRUE as of TIER-C, 13 Aug 2026. Withheld when
-  // this page shipped that morning because the twelve-week engine had
-  // no tier check at all and the statement would have been a promise
-  // the product did not keep. It keeps it now.
-  "Your programme builds \u2014 week on week, phase by phase, going somewhere rather than just showing up.",
+  // onboarding writes strategicGoal.targetDescription/targetDate;
+  // my-programme.js renders it. Free never sets one.
+  "You tell the coach where you're heading \u2014 a distance, a date, something you want to be able to do again, or just a direction.",
+  // gym-programme.js + programmeEngine.js chaptersDone: a completed
+  // chapter offers a successor that reasons from where the last one
+  // ended. CONT-1 gives movements that recur. This says what those two
+  // actually do and does NOT say the sessions get harder -- they do
+  // not yet, for anybody.
+  "Sessions follow on from one another instead of each starting fresh.",
+  // progress.js: the free narrative stops after line 1; the 30- and
+  // 90-day windows and the type breakdown are the Plan's.
+  "Your progress becomes something the coach reads back to you \u2014 what has changed across months, not a list of what you did.",
+  // community-impact.js:143 -- "one credit per completed session, two
+  // on the Plan".
+  "Every session you finish counts double towards where the five percent goes.",
   // WITHDRAWN 13 Aug 2026, same day it shipped. This said:
   //
   //   "And the long practices open up — the ones that go somewhere over
@@ -242,15 +286,14 @@ export function render() {
            "She is not buying something new. She is going deeper with
            something she already loves." -->
       <header class="upgrade-block">
-        <h1 class="upgrade-heading">Ready to go deeper?</h1>
-        <p class="upgrade-lede">You&rsquo;ve already felt something different.</p>
-        <p class="upgrade-lede">The coach noticed. Adapted. Met you where you were.</p>
-        <p class="upgrade-lede upgrade-lede--emphasis">That wasn&rsquo;t a trial. That was real.</p>
-      </header>
-
-      <section class="upgrade-block" aria-label="What the Plan is">
-        <p class="upgrade-body">The Plan gives the coach more to work with.</p>
-        <p class="upgrade-body">The deeper the relationship, the better it understands you.</p>
+        <h1 class="upgrade-heading">A coach who knows where you&rsquo;re going.</h1>
+        <p class="upgrade-lede">
+          Free gives you a coach for today. It meets you where you are, every time.
+        </p>
+        <p class="upgrade-lede upgrade-lede--emphasis">
+          The Plan gives you a coach who also knows where you want to get to,
+          and builds towards it.
+        </p>
       </section>
 
       <!-- WHAT CHANGES. Not a feature list, and deliberately not a
@@ -263,12 +306,36 @@ export function render() {
 
       <!-- COMMITMENT, answered before she asks. First, because the doc
            puts commitment ahead of cost. -->
+      <!-- PLAIN-1. "This isn't a commitment to us, it's a commitment to
+           yourself" is gone. Graeme, 20 Aug, rejecting gift-framing in
+           the trial copy: state the facts and do the person no favours.
+           That line put the obligation back on the reader, which is the
+           opposite of what it sounded like it was doing.
+
+           The trial appears here for the first time. It was on neither
+           this page nor Settings, and it is the strongest thing in the
+           offer. Deliberately WITHOUT any comparison to the statutory
+           cancellation period -- see the progression boundary section 9
+           and the note for Natalie. -->
       <section class="upgrade-block" aria-label="Commitment">
-        <p class="upgrade-body">No contract. Cancel any time.</p>
         <p class="upgrade-body upgrade-body--emphasis">
-          This isn&rsquo;t a commitment to us. It&rsquo;s a commitment to yourself.
+          Thirty days before you pay anything.
         </p>
-        <p class="upgrade-body">And you can change your mind.</p>
+        <p class="upgrade-body">
+          Not a penny until day 30. Cancel before then and you are not charged
+          at all &mdash; you go back to free and keep everything you have done.
+        </p>
+        <p class="upgrade-body">No contract either way. Cancel whenever you like.</p>
+      </section>
+
+      <!-- What free keeps. Stated plainly and last, because the page
+           should not be able to be read as a threat. Every item is
+           true as of R4, 20 Aug 2026. -->
+      <section class="upgrade-block" aria-label="What stays free">
+        <p class="upgrade-body">
+          And free stays exactly as it is: every session, every safety feature,
+          and choosing what you do. Nothing is taken away.
+        </p>
       </section>
 
       <!-- PRICING. Honest, calm, no pressure. No badge on either option:
