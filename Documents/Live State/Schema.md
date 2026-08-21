@@ -1,5 +1,5 @@
 # Alongside — Data Schema Reference
-## 18 Aug 2026 v1.36
+## 20 Aug 2026 v1.37
 
 **File:** `js/store.js` (confirmed live version: **v54, 18 Aug 2026**)
 
@@ -587,7 +587,23 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 
 ## 8. Absence & Return
 
-`absence` (nested object): `context` (`string|null`, default `null`), `capturedAt` (`string|null`, default `null`).
+`absence` (nested object): `context` (`string|null`, default `null`), `capturedAt` (`string|null`, default `null`), `returnCapturedAt` (`string|null`, default `null`).
+
+**`context` permitted values — REVISED 20 Aug 2026 (REENTRY-2):**
+
+| Value | Written when | Effect |
+|---|---|---|
+| `'illness'` | "Was unwell" | Intensity one level gentler; programme **holds** the week |
+| `'injury'` | **NEW.** "Was injured" | Intensity one level gentler; programme **holds**; **the coach asks what is still sore** rather than assuming recovery |
+| `'life'` | "Life got full" | **CHANGED.** Was full phase intensity. Now **offers** a gentler start, which the person may decline |
+| `'harder'` | "Finding it harder" | **CHANGED.** As `life` — offered, not imposed |
+| `null` | Skipped, or never asked | No adaptation |
+
+**Why `life` and `harder` changed.** Graeme, 20 Aug: *"If I've been away for 3 weeks for work I'm not fit enough to start where I left off. But I should be offered."* Detraining does not care why you were away. The previous behaviour returned somebody at full phase intensity after any non-illness absence, which is how people come back, find it too hard, and stop.
+
+**Why it is OFFERED and not imposed.** Somebody who was away by choice and feels fine should not be told they have lost ground. `illness` and `injury` still step down without asking, because those carry a clinical reason.
+
+**`injury` is not a clinical record.** It sets intensity and prompts a question. It does not write to `conditions`, does not alter `prescribedExercises`, and never implies the app knows what is wrong.
 
 ---
 
