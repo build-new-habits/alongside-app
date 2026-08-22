@@ -1,7 +1,7 @@
 # Alongside: Move — Weight Targets: Audit and Decision
-## 22 Aug 2026 v1
+## 22 Aug 2026 v2
 
-**Status:** Evidence and a recommendation. **No decision taken, no code changed.** This is the paper for the clinical and legal conversation, not a build spec.
+**Status:** 🔴 **v1's recommendation was REJECTED by Graeme, 22 Aug, and he was right.** §6 is retained for the record and superseded by **§9**, which is the decision. Still no code changed.
 
 **Question:** does Alongside: Move support weight-based targets?
 
@@ -134,4 +134,52 @@ Three questions worth adding to the nine-question document:
 
 ---
 
-*Build New Habits · Alongside: Move · Weight Targets: Audit and Decision · 22 Aug 2026 v1*
+## 9. THE DECISION — 22 Aug 2026. Supersedes §6.
+
+**Weight tracking is a feature, off by default, available on the Plan.**
+
+Graeme: *"someone might want this and to deny them seems wrong."*
+
+### Why v1 was wrong
+
+v1 recommended retiring weight targets and dressed the codebase's accidental state as philosophy. Refusing to let an adult record their own goal is paternalism, and this product already treats self-direction as an accessibility feature rather than a risk. The four failures in §2 were **accidents, not decisions**, and reading them as intent was the error.
+
+### What was decided
+
+| # | Decision |
+|---|---|
+| 1 | Weight tracking is **off by default**, enabled in Settings |
+| 2 | **All** weight recording is Plan-only — dated or undated, behind a locked screen. This removes the free branch entirely |
+| 3 | **R1 speaks to weight targets when the option is on.** Turning it on IS the consent — telling the coach is the "I want you to do something with this" moment. A coach that holds the target but will not speak to it is the same paternalism one layer down |
+| 4 | 🔴 **NON-NEGOTIABLE: the hard conversation never does arithmetic on the body.** R1 may say the date looks like a harder ask than it needs to be, and offer to move it. It must **never** state a rate, a projected weight, a shortfall, or a number of kilos or pounds. The three options are about the plan. **The body is not scored** |
+| 5 | All existing R1 suppression applies unchanged — pain, burnout, care mode, bottom band. They matter more here, not less |
+| 6 | `validateWeightTarget()` becomes **live**, checking pace at the moment a target is set. Distinct from R1: set-time intent versus review-time progress. Both are needed |
+
+### The safety bands — proposed 22 Aug, awaiting clinical sign-off
+
+Checked against UK guidance. **NHS recommends 0.5–1 kg (roughly 1–2 lb) per week; NICE CG189 centres on a ~600 kcal daily deficit.**
+
+| Implied rate | Behaviour |
+|---|---|
+| **≤ 2 lb/week** | Accept silently. **This is the top of the recommended range, not beyond it** |
+| **> 2 to < 3 lb/week** | Accept. One gentle note. No obstruction |
+| **3 to < 4 lb/week** | Accept **only where the implied duration is ≤ 3 weeks**. Beyond that, warn and offer to move the date |
+| **≥ 4 lb/week** | 🔴 **Decline to store.** Signpost to a GP or registered dietitian and say plainly this is past what the app will advise on |
+| **Observed rate** | If logged loss runs ≥ 3 lb/week across **three consecutive weeks**, the coach raises it once and the target is revised |
+
+**On the 3-week figure.** Graeme proposed it and asked for it to be checked. The only time limit in UK guidance is **12 weeks** — and that is the maximum for very-low-energy diets **under specialist supervision**, in specific circumstances such as weight loss needed for surgery, nutritionally complete, with ongoing clinical support. Alongside has none of that. **12 weeks is the ceiling with a clinician; 3 weeks unsupervised is conservative against it and defensible.**
+
+It is also well chosen for a second reason: early loss is substantially water, so a three-week window ignores the initial drop and catches only a sustained pattern.
+
+### Two further safeguards, added 22 Aug
+
+- 🔴 **The app must NEVER prompt a weigh-in.** Frequent weighing is itself a risk behaviour. Logging is passive and user-initiated only — no reminders, no streaks, no "time to weigh in"
+- 🔴 **The ≥ 4 lb refusal declines the FIELD, not the person.** It must never read as rejecting the goal or the person holding it
+
+### What clinical review is now for
+
+**Calibration, not principle.** The bands, the 3-week window, the set-time wording, and whether enabling the toggle needs anything at the point of opt-in. §7's questions are superseded: question 3 asked whether the field carries risk in itself. It has been answered as a product decision — it does not, provided the safeguards above hold.
+
+---
+
+*Build New Habits · Alongside: Move · Weight Targets: Audit and Decision · 22 Aug 2026 v2*

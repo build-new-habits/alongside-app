@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v219
+## 22 Aug 2026 v218
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v218.md`. Remove v218 on upload.
+Supersedes `master_schedule_21aug2026_v217.md`. Remove v217 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -152,48 +152,6 @@ Supersedes `master_schedule_22aug2026_v218.md`. Remove v218 on upload.
 >
 > ---
 >
-> ### 🟢 WEIGHT-1 DECIDED — tracking is a feature, off by default, Plan-only
->
-> `alongside_weight_targets_audit_22aug2026_v1.md` **v2**. 🔴 **The audit's own recommendation was rejected, and rightly.**
->
-> v1 recommended retiring weight targets. Graeme: *"someone might want this and to deny them seems wrong."* **The four failures were accidents, not decisions, and reading them as intent dressed the codebase's accidental state as philosophy.** Refusing to let an adult record their own goal is paternalism, and this product already treats self-direction as an accessibility feature rather than a risk.
->
-> | # | Decision |
-> |---|---|
-> | 1 | **Off by default**, enabled in Settings |
-> | 2 | **All** weight recording is **Plan-only** — dated or undated, behind a locked screen. Removes the free branch entirely |
-> | 3 | **R1 speaks to weight targets when the option is on.** Turning it on IS the consent — telling the coach is the "do something with this" moment |
-> | 4 | 🔴 **NON-NEGOTIABLE: the hard conversation never does arithmetic on the body.** No rate, no projected weight, no shortfall, no number of kilos. The options are about the plan. **The body is not scored** |
-> | 5 | All R1 suppression unchanged — pain, burnout, care mode, bottom band. They matter more here |
-> | 6 | `validateWeightTarget()` becomes **live** at set-time. Distinct from R1: set-time intent vs review-time progress |
->
-> #### 🟠 Safety bands — proposed 22 Aug, awaiting clinical sign-off
->
-> Checked against UK guidance: **NHS recommends 0.5–1 kg (~1–2 lb) per week; NICE CG189 centres on a ~600 kcal daily deficit.**
->
-> | Implied rate | Behaviour |
-> |---|---|
-> | **≤ 2 lb/wk** | Accept silently — **the top of the recommended range, not beyond it** |
-> | **> 2 to < 3** | Accept, one gentle note, no obstruction |
-> | **3 to < 4** | Accept only where implied duration is **≤ 3 weeks**; beyond that warn and offer to move the date |
-> | **≥ 4** | 🔴 **Decline to store.** Signpost to GP or dietitian; say plainly this is past what the app advises on |
-> | **Observed** | ≥ 3 lb/wk across **three consecutive weeks** → coach raises it once, target revised |
->
-> 🟢 **The 3-week figure was checked, not assumed.** The only time limit in UK guidance is **12 weeks** — the maximum for very-low-energy diets **under specialist supervision**, nutritionally complete, with ongoing clinical support. Alongside has none of that, so **12 weeks is the ceiling with a clinician and 3 weeks unsupervised is conservative against it.** It also correctly ignores the initial water-weight drop and catches only a sustained pattern.
->
-> #### 🔴 Two safeguards added 22 Aug
->
-> - **The app must NEVER prompt a weigh-in.** Frequent weighing is itself a risk behaviour. Logging is passive and user-initiated — no reminders, no streaks, no "time to weigh in"
-> - **The ≥ 4 lb refusal declines the FIELD, not the person.** It must never read as rejecting the goal or the person holding it
->
-> #### Build scope — WEIGHT-1 is no longer a deletion
->
-> Settings toggle (Plan-gated) · writers for `weight` and `targetWeight` · `weightLog` with a passive-only entry point · `validateWeightTarget()` wired and re-banded · 🔴 **the `goals.js:350` flatMap fixed so `hasTarget` and `targetType` survive the export** — without this `targetType` stays null and R1's weight leg stays dead · `Schema.md` · R1 exclusion becomes toggle-conditional · gates, including one asserting R1 copy contains no bodily arithmetic.
->
-> ⚠️ **Clinical review is now for calibration, not principle.** The audit's question 3 — does a target-weight field carry risk in itself — has been answered as a product decision: it does not, provided the safeguards hold.
->
-> ---
->
 > ### 🟠 WEIGHT TARGETS — AUDIT DONE, DECISION OPEN
 >
 > `Documents/Business/alongside_weight_targets_audit_22aug2026_v1.md` **v1**. Evidence and a recommendation; **no decision taken, no code changed.**
@@ -210,7 +168,7 @@ Supersedes `master_schedule_22aug2026_v218.md`. Remove v218 on upload.
 >
 > | ID | Task | Status | Target |
 > |---|---|---|---|
-> | **WEIGHT-1** | **DECIDED 22 Aug — now a BUILD, not a deletion.** See the block above | 🔵 Ready to scope | Before beta |
+> | **WEIGHT-1** | Decide: weight as direction only, or build targets properly with clinical review | 🟠 **Awaiting Graeme + clinical** | Before beta |
 > | **UNIT-1** | `weightUnit` has no writer — `session-log.js:179` always labels the field `kg` | 🔵 Specified | w/c 31 Aug |
 >
 > ---
@@ -4524,4 +4482,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v219*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v218*
