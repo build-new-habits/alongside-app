@@ -1,5 +1,17 @@
 /**
  * js/views/onboarding/plan-select.js
+ * 22 Aug 2026 v2
+ * CHOOSER-1. Option building and card markup moved to
+ * js/data/plan-options.js so the post-onboarding chooser
+ * (views/programme-select.js) presents the identical three options
+ * rather than a second copy that can drift. No behaviour change here.
+ *
+ * NOTE, logged not fixed: this screen still writes six activeProgramme
+ * fields directly instead of calling startChapter(). Harmless during
+ * onboarding, where everything is already at its default, but it is a
+ * second write path for one piece of state -- the divergence class that
+ * produced TARGET-3. Tracked as PLAN-WRITE-1.
+ *
  * 26 Jun 2026 v1
  *
  * Onboarding — plan selection screen.
@@ -28,50 +40,19 @@
  *   - Gold badge contrast: #1A1A1A text on #B8970A background — meets AA.
  */
 
-import { store }                 from "../../store.js";
-import { getProgrammesForGoals } from "../../data/programmes.js";
-import { toEngineGoals }         from "../../data/goals.js";
+import { store } from "../../store.js";
+import {
+  buildPlanOptions,
+  renderPlanCard as renderSharedPlanCard,
+  escapeHtml as _esc
+} from "../../data/plan-options.js";
 
 export function PlanSelectView(router) {
 
   let selectedIndex = 0; // Best match pre-selected
 
   function buildOptions() {
-    const goals       = store.get("goals") || [];
-    const weeklyTarget = store.get("strategicGoal.weeklySessionTarget") || 3;
-    const engineGoals = toEngineGoals(goals);
-    const programmes  = getProgrammesForGoals(engineGoals);
-    const best        = programmes[0];
-
-    if (!best) return [];
-
-    // Derive three character-differentiated variants from the best match
-    return [
-      {
-        programme:   best,
-        badge:       "Highly Recommended",
-        variant:     "recommended",
-        tagOverride: null,
-        noteOverride: null,
-        weeklyNote:  `${weeklyTarget} session${weeklyTarget !== 1 ? "s" : ""} a week`,
-      },
-      {
-        programme:   best,
-        badge:       null,
-        variant:     "gentle",
-        tagOverride: "Gentle start",
-        noteOverride: "Fewer sessions, more recovery time. The same destination, at your pace.",
-        weeklyNote:  `${Math.max(1, weeklyTarget - 1)} session${weeklyTarget - 1 !== 1 ? "s" : ""} a week`,
-      },
-      {
-        programme:   best,
-        badge:       null,
-        variant:     "committed",
-        tagOverride: "Full commitment",
-        noteOverride: "More sessions, faster progression. For when you are ready to push.",
-        weeklyNote:  `${Math.min(6, weeklyTarget + 1)} session${weeklyTarget + 1 !== 1 ? "s" : ""} a week`,
-      },
-    ];
+    return buildPlanOptions();
   }
 
   function mount(container) {
@@ -182,63 +163,9 @@ export function PlanSelectView(router) {
   }
 
   function renderPlanCard(opt, index) {
-    const isSelected  = index === selectedIndex;
-    const prog        = opt.programme;
-    const name        = opt.tagOverride  || prog.name || "Your programme";
-    const description = opt.noteOverride || prog.tagline || prog.description || "";
-    const firstPhase  = prog.phases?.[0];
-    const weeks       = prog.durationWeeks || 12;
-
-    return `
-      <div class="plan-card ${isSelected ? "plan-card--selected" : ""} ${opt.variant === "recommended" ? "plan-card--recommended" : ""}"
-           data-plan-index="${index}"
-           role="radio"
-           aria-checked="${isSelected}"
-           tabindex="${isSelected ? "0" : "-1"}">
-
-        ${opt.badge ? `
-          <div class="plan-badge" aria-label="${opt.badge}">
-            ${opt.badge}
-          </div>
-        ` : ""}
-
-        <div class="plan-card__body">
-          <div class="plan-card__header">
-            <span class="plan-card__icon" aria-hidden="true">
-              ${prog.icon || "&#127793;"}
-            </span>
-            <div class="plan-card__titles">
-              <p class="plan-card__name">${_esc(name)}</p>
-              <p class="plan-card__weekly">${_esc(opt.weeklyNote)}</p>
-            </div>
-            <span class="plan-card__duration">${weeks}w</span>
-          </div>
-
-          <p class="plan-card__desc">${_esc(description)}</p>
-
-          ${firstPhase && !opt.tagOverride ? `
-            <p class="plan-card__phase-hint">
-              First four weeks: ${_esc(firstPhase.description || firstPhase.name || "")}
-            </p>
-          ` : ""}
-        </div>
-
-        <div class="plan-card__select-indicator" aria-hidden="true">
-          ${isSelected ? "&#10003;" : ""}
-        </div>
-
-      </div>
-    `;
+    return renderSharedPlanCard(opt, index, index === selectedIndex);
   }
 
-  function _esc(str) {
-    if (!str) return "";
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-  }
 
   return { mount };
 }

@@ -1,5 +1,18 @@
 /**
  * router.js
+ * 22 Aug 2026 v21
+ *   CHOOSER-1. The 'goal-setup' route now resolves to
+ *   views/programme-select.js. The old target,
+ *   views/onboarding/goal-setup.js, had NEVER LOADED -- it statically
+ *   imported { programmeEngine }, a symbol programmeEngine.js does not
+ *   export, so it was a link-time SyntaxError. Five call sites reached
+ *   it, including the chapter-end hinge fallback at today.js:734.
+ *
+ *   The ROUTE KEY IS DELIBERATELY UNCHANGED so those five call sites
+ *   need no edit -- one of them is today.js, already scheduled for R2-a,
+ *   and touch-once exists to stop two sessions editing one file.
+ *   Renaming the key is tracked as CHOOSER-2.
+ *
  * 18 Aug 2026 v20
  *   ONUNMOUNT-1. navigate() now calls onUnmount() on the outgoing
  *   view. It never did, despite two view headers saying it does.
@@ -186,7 +199,8 @@ const VIEW_NAMES = {
   // information and two chances for them to disagree.
   'privacy':           { path: './views/privacy.js',          fn: 'PrivacyView'         },
   'upgrade':           { path: './views/upgrade.js',          fn: 'UpgradeView'         },
-  'goal-setup':        { path: './views/onboarding/goal-setup.js', fn: 'GoalSetupView'  },
+  // Route key retained; implementation replaced. See v21 note above.
+  'goal-setup':        { path: './views/programme-select.js', fn: 'ProgrammeSelectView' },
   'community-impact':  { path: './views/community-impact.js', fn: 'CommunityImpactView' },
   // 'annual-reflection' kept, and the view now exists. Graeme: "what if
   // I forget? Is it not worth just having it there from the start?" --

@@ -1,5 +1,18 @@
 /**
  * tools/verify-write1.mjs
+ * 22 Aug 2026 v2
+ * CHOOSER-1. `targetDate` added to the baseline. Its only writer,
+ * goalSetupSaveWeightTargetDate() in onboarding/goal-setup.js, was
+ * retired with that view -- and the view had never loaded, so the writer
+ * was already unreachable. The field is now MIGRATION-ONLY: store.js
+ * reads it once, one way, to carry historic installs into
+ * strategicGoal.targetDate (TARGET-4). That is a legitimate permanent
+ * one-ended field, not a gap.
+ *
+ * NOTE: this gate went red on exactly the change that caused it, which
+ * is the behaviour it was built for. The baseline is being updated with
+ * a reason, not to silence it.
+ *
  * 17 Aug 2026 v1
  *
  * WRITE-1. Every store field should have both ends.
@@ -83,6 +96,12 @@ for (const k of fields) {
 // the thing this gate exists to prevent.
 const BASELINE = new Set([
   'hormonalTracking','coachStyle','weight','weightUnit','targetWeight','targetDescription',
+  // targetDate — MIGRATION-ONLY as of 22 Aug 2026 (CHOOSER-1). Read by
+  // store.js's one-way TARGET-4 migration for historic installs; its
+  // writer was retired with onboarding/goal-setup.js, which had never
+  // loaded. Do NOT connect a new writer: dated targets now belong to
+  // strategicGoal, and R2-a makes them Plan-only.
+  'targetDate',
   'trainingIntent','exerciseClearance','lifestyle','gymProgrammeWeek','liftLogEnabled',
   'mindfulPromptFrequency','speechRate','checkInNotification','noticingWeekInCycle',
   'journalSettings','waterReminderEnabled','lastWaterReminder','community',
