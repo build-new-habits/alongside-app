@@ -1,5 +1,22 @@
 /**
  * workout.js - Workout Execution View
+ * 22 Aug 2026 v12
+ *
+ * v12 - EMPTY-1. A session with exercises: [] crashed this view. The
+ *   guard checked that a workout existed and never that it contained
+ *   anything, so the next line read .role off undefined.
+ *
+ *   Not hypothetical: coach-proposal.js _getFallbackOptions() returns
+ *   exercises: [] by design, and BIAS-3 meant that fallback served
+ *   EVERY user. "Strength session" and "Gentle movement" both carry
+ *   type: workout and route here -- the FIRST option on Door 1, in both
+ *   energy branches, landed on a blank crash. The other three fallback
+ *   types route to views that build their own sessions and were fine.
+ *
+ *   BIAS-3 closed the path reaching it. The hole stayed open: any
+ *   future throw in generateDailyOptions lands here again. A fallback
+ *   that crashes is not a fallback.
+ *
  * 12 Aug 2026 v12
  *
  * v12 - GM-1. Grounding moments on the exercise card, from Graeme's
@@ -204,6 +221,25 @@ export function render() {
     return renderNoWorkout();
   }
 
+  // EMPTY-1, 22 Aug 2026. The guard above checked that a workout EXISTS
+  // and never that it contained anything. A session with exercises: []
+  // passed it, and the next line read .role off undefined -- a blank
+  // crash, mid-journey, with the person having just chosen to train.
+  //
+  // NOT HYPOTHETICAL. coach-proposal.js's _getFallbackOptions() returns
+  // exercises: [] by design, and BIAS-3 meant that fallback was serving
+  // EVERY user. Both "Strength session" and "Gentle movement" carry
+  // type: 'workout' and route here, so the first option on Door 1 --
+  // both branches -- landed on this crash. The other three fallback
+  // types route to views that build their own sessions and were fine.
+  //
+  // BIAS-3 closed the path that was reaching this. The hole stayed
+  // open: any future throw in generateDailyOptions falls back here
+  // again. A fallback that crashes is not a fallback.
+  if (!Array.isArray(workout.exercises) || workout.exercises.length === 0) {
+    return renderEmptyWorkout();
+  }
+
   const exercise = workout.exercises[currentExerciseIndex];
 
   // GM-1. Chosen once per render, so the card does not shuffle moments
@@ -371,6 +407,29 @@ export function render() {
   `;
 }
 
+// EMPTY-1. Distinct from renderNoWorkout(): that one means "you have
+// not chosen anything yet". This means "something went wrong building
+// what you chose", which is a different sentence and deserves an honest
+// one. It does not apologise at length, does not blame the person, and
+// offers the two things that actually work from here.
+function renderEmptyWorkout() {
+  return `
+    <div class="view">
+      <div class="card card-coach">
+        <h2>I could not build that one</h2>
+        <p>
+          Something went wrong putting that session together &mdash; that is on
+          me, not on you. Let us pick again, and it should come through
+          properly this time.
+        </p>
+        <button class="btn btn-primary" id="no-workout-back-btn">
+          Choose again
+        </button>
+      </div>
+    </div>
+  `;
+}
+
 function renderNoWorkout() {
   return `
     <div class="view">
@@ -437,12 +496,24 @@ function formatRole(role) {
 export function onMount() {
   const workout = _getWorkout();
 
-  // Latch the session clock once, on first mount with a real workout.
-  if (workout && sessionStartTime === null) sessionStartTime = Date.now();
+  // EMPTY-1, 22 Aug 2026. The render guard was not enough on its own.
+  // onMount runs regardless of what render() returned, and everything
+  // below assumes a populated exercise list -- the timer reads
+  // .duration off exercises[0] and threw a SECOND time, behind the
+  // first fix. Found only by executing the view again after guarding
+  // it; the render fix alone looked complete and was not.
+  //
+  // Bind the one control the empty screen has, then stop.
+  const empty = !workout || !Array.isArray(workout.exercises) || workout.exercises.length === 0;
 
   document.getElementById("no-workout-back-btn")?.addEventListener("click", () => {
     router.back();
   });
+
+  if (empty) return;
+
+  // Latch the session clock once, on first mount with a real workout.
+  if (sessionStartTime === null) sessionStartTime = Date.now();
 
   // LOG-1. Re-wired on every mount because the view re-renders per
   // exercise; attachLogEvents() guards against double-binding itself.
