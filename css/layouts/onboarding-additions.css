@@ -1,5 +1,9 @@
 /*
  * css/layouts/onboarding-additions.css
+ * 22 Aug 2026 v11
+ * CHOOSER-1. Two spacing classes for the post-onboarding programme
+ * chooser. The plan cards themselves are unchanged and shared.
+ *
  * 29 Jun 2026 v10
  *
  * v10 (29 Jun 2026)
@@ -1187,4 +1191,18 @@
 
 .reflection-actions {
   padding-top: var(--space-4);
+}
+
+/* ── CHOOSER-1, 22 Aug 2026 ──────────────────────────────────────────
+   Post-onboarding programme chooser (views/programme-select.js).
+   Spacing only -- the plan cards above are shared with onboarding and
+   must look identical in both places, because they are the same three
+   options and a person may well see them twice. */
+
+.programme-select-body {
+  padding: 0 var(--space-4) var(--space-5);
+}
+
+.programme-select-actions {
+  padding: 0 var(--space-4) var(--space-6);
 }
