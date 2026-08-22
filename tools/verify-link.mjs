@@ -1,5 +1,8 @@
 /**
  * tools/verify-link.mjs
+ * 22 Aug 2026 v2
+ * CHOOSER-1. Known-failure list emptied -- goal-setup.js retired.
+ *
  * 21 Aug 2026 v1
  *
  * LINK-1 — every module must actually load.
@@ -62,12 +65,12 @@ const REPO = path.resolve(HERE, "..");
  * listed module starts linking.
  */
 const KNOWN_LINK_FAILURES = new Map([
-  ["js/views/onboarding/goal-setup.js",
-   "GOAL-SETUP-1. Imports { programmeEngine }, which programmeEngine.js does not " +
-   "export, and calls programmeEngine.startProgramme(), which does not exist in any " +
-   "module. Repair-or-retire decision pending: plan-select.js already performs the " +
-   "live onboarding programme start. Takes the 12-week weight-target safety warning " +
-   "and the only writer of top-level targetDate down with it."]
+  // Empty as of 22 Aug 2026. goal-setup.js was RETIRED (CHOOSER-1), not
+  // repaired: it moved to Documents/Archive/ and the 'goal-setup' route
+  // now resolves to views/programme-select.js.
+  //
+  // Keep this list EXACT. A new break turns the gate red, and so does
+  // fixing a listed module without delisting it.
 ]);
 
 /* ─────────────────────────────────────────────────────────────────── */
