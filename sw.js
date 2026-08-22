@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v394
+ * CHOOSER-1. js/views/onboarding/goal-setup.js REMOVED from the precache
+ * list -- the file is retired to Documents/Archive/, and a precache
+ * entry for a file that no longer exists is exactly what
+ * Promise.allSettled() was adopted to survive rather than something to
+ * leave in place. Added js/views/programme-select.js and
+ * js/data/plan-options.js. Cache bump.
+ *
  * 21 Aug 2026 v393
  * R1-a. New js/data/goal-review.js ADDED TO THE PRECACHE LIST below --
  * off-course detection for the hard conversation. Nothing imports it
@@ -2729,7 +2737,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v393";
+const CACHE_NAME = "alongside-v394";
 
 const SHELL_URLS = [
 
@@ -2857,10 +2865,10 @@ const SHELL_URLS = [
   "/alongside-app/js/views/community-impact.js",
   "/alongside-app/js/views/home-threshold.js",
   "/alongside-app/js/views/onboarding/frequency.js",
+  "/alongside-app/js/views/programme-select.js",
   "/alongside-app/js/views/upgrade.js",
 
   "/alongside-app/js/views/privacy.js",
-  "/alongside-app/js/views/onboarding/goal-setup.js",
   "/alongside-app/js/views/library.js",
   "/alongside-app/js/views/practices.js",
   "/alongside-app/js/views/my-programme.js",
@@ -2909,6 +2917,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/equipment.js",
   "/alongside-app/js/data/goals.js",
   "/alongside-app/js/data/goal-review.js",
+  "/alongside-app/js/data/plan-options.js",
   "/alongside-app/js/data/pricing.js",
   "/alongside-app/js/data/workoutGenerator.js",
   "/alongside-app/js/data/programmeEngine.js",
