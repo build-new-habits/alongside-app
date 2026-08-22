@@ -1,6 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v395
+ * EMPTY-1. Cache bump only -- no service worker logic changed.
+ * workout.js v12 guards a session with no exercises.
+ *
  * 22 Aug 2026 v394
  * CHOOSER-1. js/views/onboarding/goal-setup.js REMOVED from the precache
  * list -- the file is retired to Documents/Archive/, and a precache
@@ -2737,7 +2741,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v394";
+const CACHE_NAME = "alongside-v395";
 
 const SHELL_URLS = [
 
