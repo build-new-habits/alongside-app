@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v218
+## 21 Aug 2026 v217
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_21aug2026_v217.md`. Remove v217 on upload.
+Supersedes `master_schedule_21aug2026_v216.md`. Remove v216 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -138,41 +138,6 @@ Supersedes `master_schedule_21aug2026_v217.md`. Remove v217 on upload.
 >
 > ---
 
-> ### 🟢 CHOOSER-1 SHIPPED 22 Aug — GOAL-SETUP-1 CLOSED. `alongside-v394`.
->
-> Commits `7e4fcaf` and `8e5d851`. Verified by execution: `verify-chooser1` **36 checks green**, `verify-link` **0 known-broken modules**, **79 gates green**.
->
-> `goal-setup.js` retired to `Documents/Archive/goal-setup_retired_22aug2026.js` — archived, not deleted. New `js/views/programme-select.js`, with option-building extracted into `js/data/plan-options.js` and **shared** with onboarding rather than copied. `plan-select.js` v2, `router.js` v21.
->
-> 🟢 **One decision in it beats the plan it replaced.** The `goal-setup` **route key was kept** and repointed in `router.js`, so none of the five call sites needed editing. The scoped plan had been to reroute all five — which would have burned `today.js`'s single visit and collided with R2-a. **Keeping the key was the better answer.**
->
-> 🔴 **And a near-miss worth more than the feature.** This shipped at **06:49**; the next session opened the repo at **06:52** intending to build it, and would have rebuilt a feature that was three minutes old. Caught only because `HEAD` looked wrong. **The blueprint's warning is now measured in minutes, not days: never plan from a conversation, always from `git log`.**
->
-> 🟠 **Shipped without a schedule update.** v217 recorded nothing of it, and the blueprint still listed `goal-setup.js` as a known-broken module — a first-read document asserting a fault that no longer existed. Closed here and in blueprint **v4**.
->
-> ---
->
-> ### 🟠 WEIGHT TARGETS — AUDIT DONE, DECISION OPEN
->
-> `Documents/Business/alongside_weight_targets_audit_22aug2026_v1.md` **v1**. Evidence and a recommendation; **no decision taken, no code changed.**
->
-> 🔴 **Alongside already does not support weight targets** — not by decision, but by four independent failures. A user can select "Lose weight"; they cannot attach a number or a date to it. `weight`, `targetWeight` and `weightLog` have **no writers anywhere**. The date editor was in the view retired this morning. `validateWeightTarget()` — a genuine piece of care that warns on an unsafe pace — is **called by nothing**, and a prior session (GOAL-2) repaired a dead branch inside it. **A function nobody calls was fixed.**
->
-> 🔴 **The one grep would have got backwards.** `goals.js:117` declares `hasTarget: true, targetType: 'weight'`. The `flatMap` at `:350` that rebuilds the exported array copies six named fields and **drops both**. At runtime `goalHasTarget('lose-weight')` is `false` and no goal in the product exposes a target type. The shim was written for backward compatibility with `goal-setup.js` — **it outlived the view it was shimming and narrowed the data on the way through.**
->
-> ⚠️ **R1's weight exclusion rests on one of its three legs.** The `targetType` leg is dead because nothing supplies one; the `primaryGoal` leg is live and holds. `verify-hard1.mjs` passes all three because it constructs `targetType` directly rather than sourcing it from `goals.js`. **Gate-design lesson: a pure function's gate proves the function, not the wiring.**
->
-> 🟢 **Recommendation: do not restore. Make the absence deliberate and write it down.** Direction is supported and works — *losing weight matters to me* shapes the programme through `engineGoalId`. Destination is not. That is the same line as *"free has goals, the Plan has targets"*, applied to a goal class instead of a tier, for a stronger reason.
->
-> 🟠 **Needs a clinician's name before it becomes doctrine.** Three questions drafted for the health professional review; **question 3 is the one that decides it** — does a target-weight field carry risk in itself, independent of what is done with it? If yes, retiring is the correct answer rather than a shortcut.
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **WEIGHT-1** | Decide: weight as direction only, or build targets properly with clinical review | 🟠 **Awaiting Graeme + clinical** | Before beta |
-> | **UNIT-1** | `weightUnit` has no writer — `session-log.js:179` always labels the field `kg` | 🔵 Specified | w/c 31 Aug |
->
-> ---
->
 > ### 🟢 GATE-PATH SHIPPED — the suite's green now means something
 >
 > **49 gate files** rewritten to resolve from `import.meta.url`: **14** for the repo path, **35** for jsdom. Every one version-bumped to `21 Aug 2026 vN+1` with the note *"path resolution only — no assertion changed."* No app code touched, no `sw.js` bump.
@@ -4482,4 +4447,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v218*
+*Build New Habits · Alongside: Move · Master Schedule · 21 Aug 2026 v217*

@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 21 Aug 2026 v3
+## 22 Aug 2026 v4
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -49,7 +49,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | `Documents/Live State/Schema.md` | Store fields. **Must match `store.js`** |
 | `Documents/Business/` | Governing documents — see below |
 | `Documents/Archive/` | Stale, kept not deleted |
-| `tools/verify-*.mjs` | 78 gates |
+| `tools/verify-*.mjs` | 79 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order:**
@@ -70,8 +70,9 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v55 |
 | `Schema.md` | v1.38 |
-| `sw.js` | **v393**, cache `alongside-v393` |
-| Gates | **78, all green** — and now genuinely green from any clone path |
+| `sw.js` | **v394**, cache `alongside-v394` |
+| `router.js` | v21 · `plan-select.js` v2 · new `programme-select.js` v1, `plan-options.js` v1 |
+| Gates | **79, all green** — and genuinely green from any clone path |
 
 🟢 **GATE-PATH closed 21 Aug.** v1 of this document claimed 75 green on a fresh clone. That was never true: 14 gates hardcoded `/home/claude/repo`, so a clone elsewhere went red — and if that directory existed from an earlier session they read **that** copy and reported green on code nobody was editing. A clean clone actually ran 63 pass, 14 fail.
 
@@ -196,7 +197,8 @@ Truth lives in `js/data/pricing.js`. `verify-price.mjs` enforces it.
 | **Progression does not exist** | For any tier. `session-builder.js` builds week 10 like week 1 |
 | **43 of 77 gates are source-text only** | They cannot tell live code from dead |
 | ~~14 gates hardcode the clone path~~ | **Closed 21 Aug (GATE-PATH).** |
-| **1 module does not link** | `onboarding/goal-setup.js` — routed, reachable from five buttons, never loaded. `verify-link.mjs` guards the class. See GOAL-SETUP-1 |
+| ~~1 module does not link~~ | **Closed 22 Aug (CHOOSER-1).** `verify-link.mjs` now reports 0 known-broken and guards the class permanently |
+| **Source text can contradict runtime** | `goals.js` declares `hasTarget`/`targetType`; the `flatMap` that builds the export drops them. Grep confirms the opposite of the truth. **Execute** |
 | **A gate can pass against defaults** | `verify-hard1-store` first wrote to the wrong localStorage key and every assertion passed, having never loaded its own fixture. Put a positive control first |
 | 33 gates hardcode `/home/claude/node_modules/jsdom` | "Green on fresh clone" is only true where jsdom exists there |
 | `auth.js` `initPaywallListener()` | Calls bare `router.navigate()`; works only via `window.router` |
