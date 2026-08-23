@@ -44,6 +44,27 @@
  *   AGE_GATE_ENABLED is present and false. Do not flip it until A1.11
  *   (ToS 13+ vs business-doc 16+) is resolved and Natalie's advice lands.
  *
+ * 22 Aug 2026 v13
+ *   CONSENT-1. The consent gate no longer reaches outside the view, and
+ *   no longer has an unguarded dereference.
+ *
+ *   Five document.getElementById() calls became _thread.querySelector().
+ *   The old form depended on the view being attached to the document AND
+ *   on ob-consent-* IDs staying globally unique app-wide, enforced by
+ *   nothing.
+ *
+ *   continueBtn.classList.add('is-inactive') had NO optional chaining --
+ *   the only unguarded dereference in the function -- so a missing
+ *   element threw and ONBOARDING DIED ON THE SCREEN THAT CAPTURES LEGAL
+ *   CONSENT. error.hidden was unguarded in two further places.
+ *
+ *   Failure is now loud: a missing element logs to console.error rather
+ *   than passing silently, because somebody using the app with no
+ *   consent record is a problem that otherwise looks like nothing.
+ *
+ *   Behaviour is unchanged when the markup is present. Gated by
+ *   tools/verify-consent1.mjs, which drives the real gate.
+ *
  * 03 Jul 2026 v7
  *
  * v7 — Appendix M fix, applied here for the first time. Graeme reported
@@ -376,26 +397,52 @@ export function ThreadView(router) {
       </section>
     `;
 
-    const check    = document.getElementById('ob-consent-check');
-    const continueBtn = document.getElementById('ob-consent-continue');
-    const error    = document.getElementById('ob-consent-error');
+    // CONSENT-1, 22 Aug 2026. Scoped to _thread, which is the element
+    // the markup above was just written into.
+    //
+    // These were document.getElementById(). Two problems with that on
+    // the one screen where failure is legal rather than functional:
+    //
+    //   1. It depends on the view being attached to the document. A
+    //      harness -- or any future render into a detached node --
+    //      returns null for all three and the gate dies.
+    //   2. It depends on ob-consent-* IDs staying globally unique across
+    //      the whole app, forever, enforced by nothing.
+    //
+    // And `continueBtn.classList.add()` below had NO optional chaining
+    // while every other line in this function did, so a null element
+    // threw and ONBOARDING DIED ON THE CONSENT SCREEN. `error.hidden`
+    // was unguarded in two more places.
+    const check       = _thread.querySelector('#ob-consent-check');
+    const continueBtn = _thread.querySelector('#ob-consent-continue');
+    const error       = _thread.querySelector('#ob-consent-error');
+
+    // If the gate cannot be wired, say so where it will be seen. Silence
+    // here means somebody uses the app with no consent record and
+    // nothing looks wrong -- which is the whole reason this is the one
+    // failure worth being loud about.
+    if (!check || !continueBtn || !error) {
+      console.error('CONSENT GATE INCOMPLETE — consent cannot be captured', {
+        check: !!check, continueBtn: !!continueBtn, error: !!error
+      });
+    }
 
     check?.addEventListener('change', () => {
       const ok = check.checked;
-      continueBtn.setAttribute('aria-disabled', ok ? 'false' : 'true');
-      continueBtn.classList.toggle('is-inactive', !ok);
-      if (ok) error.hidden = true;
+      continueBtn?.setAttribute('aria-disabled', ok ? 'false' : 'true');
+      continueBtn?.classList.toggle('is-inactive', !ok);
+      if (ok && error) error.hidden = true;
     });
-    continueBtn.classList.add('is-inactive');
+    continueBtn?.classList.add('is-inactive');
 
-    document.getElementById('ob-consent-inapp')?.addEventListener('click', () => {
+    _thread.querySelector('#ob-consent-inapp')?.addEventListener('click', () => {
       router.navigate('privacy');
     });
 
     continueBtn?.addEventListener('click', () => {
       if (!check?.checked) {
         // Not a dead button: say what is needed and put focus where it is.
-        error.hidden = false;
+        if (error) error.hidden = false;
         check?.focus();
         return;
       }
@@ -408,7 +455,7 @@ export function ThreadView(router) {
       _beginThread();
     });
 
-    document.getElementById('ob-consent-check')?.focus();
+    _thread.querySelector('#ob-consent-check')?.focus();
   }
 
   // ── Begin thread — Step 1 ──────────────────────────────────────────────────
