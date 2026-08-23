@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v227
+## 22 Aug 2026 v226
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v226.md`. Remove v226 on upload.
+Supersedes `master_schedule_22aug2026_v225.md`. Remove v225 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -182,29 +182,17 @@ Supersedes `master_schedule_22aug2026_v226.md`. Remove v226 on upload.
 >
 > ---
 >
-> ### 🟢 WEIGHT BANDS TIGHTENED AND SOURCED — NO CLINICAL SIGN-OFF NEEDED
+> ### 🟢 CLINICAL REVIEWER NAMED — GARETH CROFT
 >
-> 🔴 **The refusal moves from 4 lb/week to 3.** Graeme, 22 Aug: *"Let's be tough and not generous."*
+> Graeme, 22 Aug: **Gareth Croft** reviews the WEIGHT-1 safety bands.
 >
-> **The evidence supports it and the numbers are now cited in the code.** Published behavioural weight-loss trial protocols — NCT03704064, NCT05635019, NCT03779048 — treat loss above **3 lb/week sustained for 3–4 consecutive weeks** as a gallstone risk requiring intervention: weight monitored at every group session, participants asked to slow or stop. Gallstone risk rises above roughly 1.5 kg (3.3 lb) per week. Above 2 lb/week, lean tissue and bone loss join fat loss.
+> ⚠️ **His discipline is not recorded here and it matters.** What a sign-off means differs between a GP, a registered dietitian, a physiotherapist and a clinical psychologist — particularly for the ≥ 4 lb refusal, which signposts to *"a GP or a registered dietitian"* in copy. **Confirm before the pack goes out.**
 >
-> **3 lb/week is where a SUPERVISED programme intervenes. This app supervises nothing** — no bloods, no clinician, no weekly review. So it refuses at the point a monitored programme would step in, because it has none of the monitoring that makes going further survivable.
+> **What he is being asked:** calibration, not principle. The four rate bands, `CAP_WEEKS` (3), `OBSERVED_WEEKS` (3), the set-time wording, and whether enabling the toggle needs anything at the point of opt-in.
 >
-> 🟢 **The 3–4 lb "capped" band and `CAP_WEEKS` are GONE.** `CAP_WEEKS` was a number nobody could source. What replaces it is one line meaning the same thing in both directions: **a target implying 3 lb a week is declined; observed loss at 3 lb a week for three consecutive weeks is raised.**
+> 🟢 **The build is arranged so his answer is cheap.** All six numbers sit in one `PROVISIONAL` block in `js/data/weight-targets.js`, and **no gate hardcodes any of them** — every assertion references the constants. His reply changes six values and nothing else moves.
 >
-> #### 🟢 The sign-off requirement is dropped, and the reasoning matters
->
-> **A refusal is not a clinical recommendation.** Declining to help is not practising medicine, and every claim not made is one that cannot be wrong — which is the safer regulatory position too.
->
-> Graeme: MyFitnessPal permits effectively unlimited targets behind a 1,200 kcal floor. **Asking permission to be stricter than the market was asking the wrong question**, and it would have delayed a *safety* feature while waiting for approval to be careful. **The recommendation to seek sign-off was over-caution dressed as rigour.**
->
-> Citations in published protocols are also **better provenance than one clinician's agreement**: checkable, and they do not expire.
->
-> ⚠️ **No individual is named against these bands, deliberately.** A name implies a professional endorsement that was neither given formally nor needed.
->
-> 🔴 **Unchanged and still not clinical:** never prompt a weigh-in · no arithmetic on the body at review-time · the refusal declines the field, not the person. Those are product philosophy and stand on their own.
->
-> 🟢 The refusal copy still signposts outward to *"a GP or a registered dietitian"*. That stays — pointing somebody outward costs nothing, and it is the one place naming a profession is right.
+> 🔴 **What is NOT his to change:** the three rules in the `NOT PROVISIONAL` block — never prompt a weigh-in · no arithmetic on the body at review-time · the refusal declines the field, not the person. Those are product philosophy, and they stand whether or not he has a view.
 >
 > ---
 >
@@ -4752,4 +4740,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v227*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v226*

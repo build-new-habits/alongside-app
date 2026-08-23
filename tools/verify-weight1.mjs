@@ -1,5 +1,10 @@
 /**
  * tools/verify-weight1.mjs
+ * 22 Aug 2026 v2
+ * Bands tightened: the refusal moves from 4 lb/week to 3, and the
+ * "capped" band and CAP_WEEKS are gone. Section 4 retired with them.
+ * The numbers now carry citations rather than a pending sign-off.
+ *
  * 22 Aug 2026 v1
  *
  * WEIGHT-1a — weight targets: bands, units, and the refusal.
@@ -40,8 +45,7 @@
  */
 
 import {
-  RATE_SILENT_MAX, RATE_NOTE_MAX, RATE_REFUSE,
-  CAP_WEEKS, OBSERVED_WEEKS,
+  RATE_SILENT_MAX, RATE_REFUSE, OBSERVED_WEEKS,
   toKg, fromKg, formatWeight,
   bandFor, validateWeightTarget,
   suggestSustainableDate, observedRateBreach
@@ -62,12 +66,19 @@ const EPS = 0.0005;
 // ── 0. Positive control ─────────────────────────────────────────────
 section("0. Positive control — the constants are real and ordered");
 {
-  ok("constants are numbers", [RATE_SILENT_MAX, RATE_NOTE_MAX, RATE_REFUSE, CAP_WEEKS, OBSERVED_WEEKS]
+  ok("constants are numbers", [RATE_SILENT_MAX, RATE_REFUSE, OBSERVED_WEEKS]
      .every(v => typeof v === "number" && !Number.isNaN(v)));
-  ok("bands are strictly ordered", RATE_SILENT_MAX < RATE_NOTE_MAX && RATE_NOTE_MAX < RATE_REFUSE,
-     `${RATE_SILENT_MAX} < ${RATE_NOTE_MAX} < ${RATE_REFUSE}`);
-  ok("CAP_WEEKS and OBSERVED_WEEKS are positive whole weeks",
-     Number.isInteger(CAP_WEEKS) && CAP_WEEKS > 0 && Number.isInteger(OBSERVED_WEEKS) && OBSERVED_WEEKS > 0);
+  ok("bands are strictly ordered", RATE_SILENT_MAX < RATE_REFUSE,
+     `${RATE_SILENT_MAX} < ${RATE_REFUSE}`);
+  ok("OBSERVED_WEEKS is a positive whole number of weeks",
+     Number.isInteger(OBSERVED_WEEKS) && OBSERVED_WEEKS > 0);
+
+  // The refusal must sit where supervised trials intervene -- ~3 lb/wk,
+  // which is 1.361 kg. Asserted as a RANGE rather than a literal so a
+  // future recalibration is possible, but drifting toward the 4 lb line
+  // the market tolerates goes red.
+  ok("the refusal sits at roughly 3 lb/week, not 4",
+     RATE_REFUSE > 1.3 && RATE_REFUSE < 1.45, `${RATE_REFUSE} kg/wk`);
 }
 
 // ── 1. Units ────────────────────────────────────────────────────────
@@ -120,30 +131,24 @@ section("3. Bands — verdict at each boundary and either side");
   ok("just under the silent ceiling is silent", rate(RATE_SILENT_MAX - EPS).band === "silent");
   ok("exactly at the silent ceiling is silent", rate(RATE_SILENT_MAX).band === "silent");
   ok("just over the silent ceiling gets a note", rate(RATE_SILENT_MAX + EPS).band === "note");
-  ok("just under the note ceiling gets a note", rate(RATE_NOTE_MAX - EPS).band === "note");
-  ok("at the note ceiling is capped", rate(RATE_NOTE_MAX).band === "capped");
-  ok("just under refuse is capped", rate(RATE_REFUSE - EPS).band === "capped");
-  ok("at refuse is refused", rate(RATE_REFUSE).band === "refuse");
+  ok("just under the refusal still gets a note", rate(RATE_REFUSE - EPS).band === "note");
+  ok("at the refusal it is refused", rate(RATE_REFUSE).band === "refuse");
+  ok("there is no longer a time-limited middle band",
+     !["silent", "note", "refuse"].includes("capped") &&
+     rate(RATE_REFUSE - EPS).timeLimited === false);
   ok("well over refuse is refused", rate(RATE_REFUSE * 2).band === "refuse");
   ok("zero and negative rates are silent", rate(0).band === "silent" && rate(-1).band === "silent");
 
   ok("refuse is the ONLY band that declines to store",
-     ["silent", "note", "capped"].every(b => rate({ silent: 0, note: 0, capped: 0 }[b] ?? 0).store !== false)
+     rate(0).store === true && rate(RATE_REFUSE - EPS).store === true
      && rate(RATE_REFUSE).store === false);
 }
 
-// ── 4. The cap ──────────────────────────────────────────────────────
-section("4. The 3-4 lb band is time-limited, not open-ended");
-{
-  const capped = (weeks) => validateWeightTarget({
-    currentKg: 90, targetKg: 90 - (RATE_NOTE_MAX * weeks), weeks, now: NOW
-  });
-  ok(`accepted at CAP_WEEKS (${CAP_WEEKS})`, capped(CAP_WEEKS).accepted === true, capped(CAP_WEEKS).band);
-  ok("refused beyond CAP_WEEKS", capped(CAP_WEEKS + 1).accepted === false, capped(CAP_WEEKS + 1).band);
-  ok("a silent-band target is NOT time-limited", validateWeightTarget({
-    currentKg: 90, targetKg: 90 - (RATE_SILENT_MAX * 26), weeks: 26, now: NOW
-  }).accepted === true);
-}
+// ── 4. Retired ──────────────────────────────────────────────────────
+//
+// The 3-4 lb time-limited band is gone. CAP_WEEKS was a number nobody
+// could source; the refusal now sits at the threshold supervised trials
+// actually use, so there is no middle band to time-limit.
 
 // ── 5. The refusal ──────────────────────────────────────────────────
 section("5. The refusal declines the field, not the person");
@@ -182,14 +187,14 @@ section("6. The suggested date is a DATE, never a trajectory");
 // ── 7. Observed rate ────────────────────────────────────────────────
 section("7. Observed rate — a pattern, not a fortnight of water");
 {
-  const weeks = n => Array.from({ length: n }, () => RATE_NOTE_MAX + 0.1);
+  const weeks = n => Array.from({ length: n }, () => RATE_REFUSE + 0.1);
   ok(`silent at OBSERVED_WEEKS-1 (${OBSERVED_WEEKS - 1})`,
      observedRateBreach(weeks(OBSERVED_WEEKS - 1)) === false);
   ok(`fires at OBSERVED_WEEKS (${OBSERVED_WEEKS})`,
      observedRateBreach(weeks(OBSERVED_WEEKS)) === true);
   ok("a single fast week does not fire", observedRateBreach([RATE_REFUSE, 0.2, 0.2]) === false);
   ok("must be CONSECUTIVE", observedRateBreach([
-     RATE_NOTE_MAX + 0.1, 0.1, RATE_NOTE_MAX + 0.1, RATE_NOTE_MAX + 0.1]) === false);
+     RATE_REFUSE + 0.1, 0.1, RATE_REFUSE + 0.1, RATE_REFUSE + 0.1]) === false);
   ok("empty history does not fire", observedRateBreach([]) === false && observedRateBreach(null) === false);
 }
 
