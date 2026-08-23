@@ -1,5 +1,30 @@
 /**
  * js/data/weight-targets.js
+ * 22 Aug 2026 v2
+ *
+ * v2 - BANDS TIGHTENED, and the numbers now carry citations instead of
+ *   a pending sign-off.
+ *
+ *   The refusal moves from 4 lb/week to 3. Published clinical trial
+ *   protocols use >3 lb/week sustained as the point at which a
+ *   SUPERVISED programme intervenes -- monitoring weight at every group
+ *   session, asking participants to slow or stop. This app supervises
+ *   nothing: no bloods, no clinician, no weekly review. Refusing where a
+ *   monitored programme would step in is the only defensible line for
+ *   something that cannot monitor.
+ *
+ *   The 3-4 lb "capped" band and CAP_WEEKS are GONE. CAP_WEEKS was a
+ *   number nobody could source. What replaces it is one line meaning the
+ *   same thing whether planned or observed: 3 lb a week.
+ *
+ *   No clinical sign-off is pending and none is needed. A refusal is not
+ *   a clinical recommendation -- declining to help is not practising
+ *   medicine, and every claim not made is one that cannot be wrong.
+ *   MyFitnessPal permits effectively unlimited targets behind a 1,200
+ *   kcal floor. Asking permission to be stricter than that was asking
+ *   the wrong question, and it would have delayed a safety feature while
+ *   waiting for approval to be careful.
+ *
  * 22 Aug 2026 v1
  *
  * WEIGHT-1a — weight targets: units, bands, validation.
@@ -32,44 +57,59 @@
  */
 
 /* ────────────────────────────────────────────────────────────────────
- * PROVISIONAL — awaiting clinical sign-off.
+ * THE SAFETY BANDS — sourced, not provisional.
  *
- * Changing these numbers must not require touching logic or gates.
  * Every assertion in tools/verify-weight1.mjs references these
- * constants; NO GATE HARDCODES A NUMBER. One clinical email should
- * change values here and nothing else.
+ * constants. NO GATE HARDCODES A NUMBER, so a future recalibration
+ * changes values here and nothing else moves.
  *
- * Stated in kg/week, derived once from the agreed pound figures.
- * NHS guidance is 0.5-1 kg (about 1-2 lb) per week; NICE CG189 centres
- * on roughly a 600 kcal daily deficit. So 2 lb/week is the TOP of the
- * recommended range, not beyond it.
+ * Stated in kg/week, derived once from the pound figures.
+ *
+ * SOURCES
+ *
+ *   NHS / NICE CG189 — 0.5-1 kg (about 1-2 lb) per week, on roughly a
+ *   600 kcal daily deficit. So 2 lb/week is the TOP of the recommended
+ *   range, not beyond it.
+ *
+ *   Published behavioural weight-loss trial protocols (e.g. NCT03704064,
+ *   NCT05635019, NCT03779048) treat loss above 3 lb/week sustained for
+ *   3-4 consecutive weeks as a gallstone risk requiring intervention:
+ *   weight monitored at every group session, participants asked to slow
+ *   or stop. Gallstone risk rises above roughly 1.5 kg (3.3 lb) per
+ *   week through changes in bile composition.
+ *
+ *   Above 2 lb/week, lean tissue and bone loss become the concern
+ *   alongside fat loss.
+ *
+ * WHY THE LINE IS 3 AND NOT 4
+ *
+ *   3 lb/week is where a SUPERVISED programme intervenes. This app
+ *   supervises nothing -- no bloods, no clinician, no weekly review. So
+ *   it refuses at the point a monitored programme would step in, because
+ *   it has none of the monitoring that makes going further survivable.
+ *
+ *   The same number governs intent and reality. A target implying 3 lb a
+ *   week is declined; observed loss at 3 lb a week for three consecutive
+ *   weeks is raised. One line, both directions.
  * ──────────────────────────────────────────────────────────────────── */
 
 /** 2 lb/wk. Top of NHS guidance. Accept silently. */
 export const RATE_SILENT_MAX = 0.907;
 
-/** 3 lb/wk. Above guidance. Accept with one gentle note below this. */
-export const RATE_NOTE_MAX = 1.361;
-
-/** 4 lb/wk. Decline to store. Clinical support, not this app. */
-export const RATE_REFUSE = 1.814;
-
 /**
- * Weeks a target in the 3-4 lb/wk band may run.
+ * 3 lb/wk. The line, in both directions.
  *
- * Graeme proposed 3 and asked for it to be checked. The only time limit
- * in UK guidance is 12 weeks -- and that is the MAXIMUM for
- * very-low-energy diets UNDER SPECIALIST SUPERVISION, nutritionally
- * complete, with ongoing clinical support. This app has none of that, so
- * 12 weeks is the ceiling WITH a clinician and 3 weeks unsupervised is
- * conservative against it.
+ * At or above this a target is declined and observed loss is raised.
+ * Below it, above RATE_SILENT_MAX, the target is accepted with one
+ * gentle note and no obstruction.
  */
-export const CAP_WEEKS = 3;
+export const RATE_REFUSE = 1.361;
 
 /**
- * Consecutive weeks of observed loss at or above RATE_NOTE_MAX before
- * the coach raises it. Three also correctly ignores the initial drop,
- * which is substantially water, and catches only a sustained pattern.
+ * Consecutive weeks of observed loss at or above RATE_REFUSE before the
+ * coach raises it. Matches the 3-4 week window the trial protocols use,
+ * and correctly ignores the initial drop, which is substantially water,
+ * catching only a sustained pattern.
  */
 export const OBSERVED_WEEKS = 3;
 
@@ -169,8 +209,7 @@ export function bandFor(kgPerWeek) {
   const r = Number(kgPerWeek);
   if (!Number.isFinite(r) || r <= 0) return { band: "silent", store: true, timeLimited: false };
   if (r <= RATE_SILENT_MAX) return { band: "silent", store: true,  timeLimited: false };
-  if (r <  RATE_NOTE_MAX)   return { band: "note",   store: true,  timeLimited: false };
-  if (r <  RATE_REFUSE)     return { band: "capped", store: true,  timeLimited: true  };
+  if (r <  RATE_REFUSE)     return { band: "note",   store: true,  timeLimited: false };
   return { band: "refuse", store: false, timeLimited: false };
 }
 
@@ -219,7 +258,7 @@ export function validateWeightTarget({ currentKg, targetKg, weeks, now, tracking
   }
 
   const rate = loss / w;
-  const { band, store, timeLimited } = bandFor(rate);
+  const { band } = bandFor(rate);
   const suggestedDate = suggestSustainableDate({ currentKg, targetKg, from: now });
 
   // Rule 2 governs every string below: a DATE may appear, because this
@@ -234,15 +273,6 @@ export function validateWeightTarget({ currentKg, targetKg, weeks, now, tracking
     };
   }
 
-  if (band === "capped" && timeLimited && w > CAP_WEEKS) {
-    return {
-      accepted: false, band, suggestedDate,
-      message: "That's a demanding pace to hold for this long. I'd rather give it more room — " +
-               "I could aim for the same target further out, and we'd both be on surer ground. " +
-               "Or keep the date and we'll see how it goes."
-    };
-  }
-
   if (band === "note") {
     return {
       accepted: true, band, suggestedDate,
@@ -254,7 +284,7 @@ export function validateWeightTarget({ currentKg, targetKg, weeks, now, tracking
 }
 
 /**
- * Has observed loss run at or above RATE_NOTE_MAX for OBSERVED_WEEKS
+ * Has observed loss run at or above RATE_REFUSE for OBSERVED_WEEKS
  * consecutive weeks?
  *
  * @param {number[]} weeklyRatesKg most recent last
@@ -263,7 +293,7 @@ export function observedRateBreach(weeklyRatesKg) {
   if (!Array.isArray(weeklyRatesKg) || weeklyRatesKg.length < OBSERVED_WEEKS) return false;
   let run = 0;
   for (const r of weeklyRatesKg) {
-    run = (Number(r) >= RATE_NOTE_MAX) ? run + 1 : 0;
+    run = (Number(r) >= RATE_REFUSE) ? run + 1 : 0;
     if (run >= OBSERVED_WEEKS) return true;
   }
   return false;

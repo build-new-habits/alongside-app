@@ -1,5 +1,5 @@
 # Alongside: Move — Weight Targets: Audit and Decision
-## 22 Aug 2026 v2
+## 22 Aug 2026 v3
 
 **Status:** 🔴 **v1's recommendation was REJECTED by Graeme, 22 Aug, and he was right.** §6 is retained for the record and superseded by **§9**, which is the decision. Still no code changed.
 
@@ -155,31 +155,46 @@ v1 recommended retiring weight targets and dressed the codebase's accidental sta
 | 5 | All existing R1 suppression applies unchanged — pain, burnout, care mode, bottom band. They matter more here, not less |
 | 6 | `validateWeightTarget()` becomes **live**, checking pace at the moment a target is set. Distinct from R1: set-time intent versus review-time progress. Both are needed |
 
-### The safety bands — proposed 22 Aug, awaiting clinical sign-off
+### The safety bands — TIGHTENED 22 Aug, and sourced
 
-Checked against UK guidance. **NHS recommends 0.5–1 kg (roughly 1–2 lb) per week; NICE CG189 centres on a ~600 kcal daily deficit.**
+🔴 **The refusal is 3 lb/week, not 4.** Graeme: *"Let's be tough and not generous."*
 
 | Implied rate | Behaviour |
 |---|---|
-| **≤ 2 lb/week** | Accept silently. **This is the top of the recommended range, not beyond it** |
+| **≤ 2 lb/week** | Accept silently. **The top of the recommended range, not beyond it** |
 | **> 2 to < 3 lb/week** | Accept. One gentle note. No obstruction |
-| **3 to < 4 lb/week** | Accept **only where the implied duration is ≤ 3 weeks**. Beyond that, warn and offer to move the date |
-| **≥ 4 lb/week** | 🔴 **Decline to store.** Signpost to a GP or registered dietitian and say plainly this is past what the app will advise on |
-| **Observed rate** | If logged loss runs ≥ 3 lb/week across **three consecutive weeks**, the coach raises it once and the target is revised |
+| **≥ 3 lb/week** | 🔴 **Decline to store.** Signpost to a GP or registered dietitian, offer a sustainable date instead |
+| **Observed rate** | Logged loss at ≥ 3 lb/week across **three consecutive weeks** → the coach raises it once |
 
-**On the 3-week figure.** Graeme proposed it and asked for it to be checked. The only time limit in UK guidance is **12 weeks** — and that is the maximum for very-low-energy diets **under specialist supervision**, in specific circumstances such as weight loss needed for surgery, nutritionally complete, with ongoing clinical support. Alongside has none of that. **12 weeks is the ceiling with a clinician; 3 weeks unsupervised is conservative against it and defensible.**
+**Sources, now cited in `js/data/weight-targets.js` itself:**
 
-It is also well chosen for a second reason: early loss is substantially water, so a three-week window ignores the initial drop and catches only a sustained pattern.
+- **NHS / NICE CG189** — 0.5–1 kg (about 1–2 lb) per week, on roughly a 600 kcal daily deficit. So **2 lb/week is the top of the recommended range**, not beyond it.
+- **Published trial protocols** (NCT03704064, NCT05635019, NCT03779048) treat loss above **3 lb/week sustained for 3–4 consecutive weeks** as a gallstone risk requiring intervention — weight monitored at every session, participants asked to slow or stop.
+- Gallstone risk rises above roughly **1.5 kg (3.3 lb)/week** through changes in bile composition. Above **2 lb/week**, lean tissue and bone loss join fat loss.
+
+**Why 3 and not 4.** 3 lb/week is where a **supervised** programme intervenes. This app supervises nothing — no bloods, no clinician, no weekly review. It refuses at the point a monitored programme would step in, because it has none of the monitoring that makes going further survivable.
+
+🟢 **`CAP_WEEKS` and the 3–4 lb band are gone.** `CAP_WEEKS` was a number nobody could source. One line now governs both directions: **a target implying 3 lb a week is declined; observed loss at 3 lb a week for three weeks is raised.**
 
 ### Two further safeguards, added 22 Aug
 
 - 🔴 **The app must NEVER prompt a weigh-in.** Frequent weighing is itself a risk behaviour. Logging is passive and user-initiated only — no reminders, no streaks, no "time to weigh in"
 - 🔴 **The ≥ 4 lb refusal declines the FIELD, not the person.** It must never read as rejecting the goal or the person holding it
 
-### What clinical review is now for
+### Clinical sign-off: dropped, 22 Aug
 
-**Calibration, not principle.** The bands, the 3-week window, the set-time wording, and whether enabling the toggle needs anything at the point of opt-in. §7's questions are superseded: question 3 asked whether the field carries risk in itself. It has been answered as a product decision — it does not, provided the safeguards above hold.
+**A refusal is not a clinical recommendation.** Declining to help is not practising medicine, and every claim not made is one that cannot be wrong — the safer regulatory position as well as the honest one.
+
+Graeme: MyFitnessPal permits effectively unlimited targets behind a 1,200 kcal floor. **Asking permission to be stricter than the market was asking the wrong question**, and it would have delayed a *safety* feature while waiting for approval to be careful. The recommendation to seek sign-off was **over-caution dressed as rigour**.
+
+Citations in published protocols are also better provenance than one clinician's agreement: checkable, and they do not expire.
+
+⚠️ **No individual is named against these bands, deliberately.** A name implies a professional endorsement that was neither formally given nor needed.
+
+🔴 **Still not clinical, and unchanged:** never prompt a weigh-in · no arithmetic on the body at review-time · the refusal declines the field, not the person.
+
+🟢 The refusal copy still signposts outward to *"a GP or a registered dietitian"*. Pointing somebody outward costs nothing, and it is the one place naming a profession is right.
 
 ---
 
-*Build New Habits · Alongside: Move · Weight Targets: Audit and Decision · 22 Aug 2026 v2*
+*Build New Habits · Alongside: Move · Weight Targets: Audit and Decision · 22 Aug 2026 v3*
