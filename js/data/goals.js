@@ -342,6 +342,23 @@ export function getGoalTargetType(goalId) {
 }
 
 // ─── Backward-compatible exports ──────────────────────────────────────────────
+//
+// WEIGHT-1a, 22 Aug 2026. hasTarget and targetType NOW SURVIVE THE FLAT
+// EXPORT. They were declared on the goal and dropped here, so at runtime
+// goalHasTarget('lose-weight') returned false and no goal in the product
+// exposed a target type -- while the source text said otherwise. Grep
+// confirmed the opposite of the truth; only execution found it.
+//
+// The shim below was written for js/views/goal-setup.js, which was
+// retired on 22 Aug (CHOOSER-1) because it had never loaded. IT
+// OUTLIVED THE THING IT WAS SHIMMING AND NARROWED THE DATA ON THE WAY
+// PAST.
+//
+// Safe to widen: all six consumers of flat GOALS -- settings.js,
+// today.js, progress.js, coach-proposal.js, session-rationale.js,
+// onboarding/goals.js -- read only id, label, name or category.
+// Confirmed by grep before the change, not assumed.
+//
 // The existing js/views/goal-setup.js imports { GOALS } as a flat array.
 // My v2 restructured this into GOAL_CATEGORIES. Export flat GOALS array
 // so existing views continue to work without modification.
@@ -353,6 +370,9 @@ export const GOALS = GOAL_CATEGORIES.flatMap(cat =>
     label:       g.label,
     icon:        g.icon,
     engineGoalId: g.engineGoalId,
+    // WEIGHT-1a: carried, not dropped.
+    hasTarget:   g.hasTarget   ?? false,
+    targetType:  g.targetType  ?? null,
     // Legacy fields some views may read
     name:        g.label,
     category:    cat.id,
