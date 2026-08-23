@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v400
+ * R2-a. Cache bump only -- no new files. today.js is already precached;
+ * the bump is what carries the tier gate and the corrected hinge copy to
+ * a device holding the old ones.
+ *
+ * The old copy told people naming a date "changes nothing about how I
+ * work". That is now false, so the bump matters more than usual.
+ *
  * 22 Aug 2026 v399
  * CONSENT-2. Cache bump only -- no new files. onboarding/thread.js is
  * already precached; the bump is what carries the fixed consent gate to
@@ -2770,7 +2778,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v399";
+const CACHE_NAME = "alongside-v400";
 
 const SHELL_URLS = [
 
