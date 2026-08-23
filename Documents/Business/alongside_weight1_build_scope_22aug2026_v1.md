@@ -1,7 +1,7 @@
 # Alongside: Move — WEIGHT-1 Build Scope
-## 22 Aug 2026 v2
+## 22 Aug 2026 v3
 
-**Status:** 🟠 **Scope for agreement. No code written.** v2 fills in §7 with **recommendations, not decisions.** Each is marked 🟠 until Graeme confirms. Nothing is built before then.
+**Status:** 🟢 **All five points CONFIRMED by Graeme, 22 Aug. WEIGHT-1a is cleared to build.** v3 records the confirmations, one correction, and one change Graeme made that improves the design. Copy for 1b remains his.
 
 **Authority:** `alongside_weight_targets_audit_22aug2026_v1.md` v2 §9 holds the decisions. This document holds the build.
 
@@ -93,7 +93,7 @@ OBSERVED_WEEKS    3      //  consecutive weeks at >= RATE_NOTE_MAX before the co
 | 1 | `Documents/Live State/Schema.md` | → **v1.39** |
 | 2 | `js/store.js` | v55 → **v56**. `weightTracking` (bool, default false), `weightUnit` gains a writer, `weightLog` documented, `strategicGoal.weightTargetBand` |
 | 3 | `tools/verify-weight1.mjs` | **NEW**, red first |
-| 4 | `js/data/weight-targets.js` | **NEW**. Constants, `toKg()`, `bandFor()`, `validateWeightTarget()`, `observedRateBreach()` |
+| 4 | `js/data/weight-targets.js` | **NEW**. Constants, `toKg()`, `fromKg()`, `formatWeight()` (kg / lb / st+lb), `bandFor()`, `validateWeightTarget()`, `suggestSustainableDate()`, `observedRateBreach()` |
 | 5 | `js/data/goals.js` | The `flatMap` at `:350` carries `hasTarget` and `targetType` |
 | 6 | `js/data/goal-review.js` | v1 → **v2**. `isWeightTarget()` becomes conditional on `ctx.weightTrackingEnabled` |
 | 7 | `tools/verify-hard1.mjs` | Extended: weight suppressed when off, **not** suppressed when on |
@@ -102,7 +102,7 @@ OBSERVED_WEEKS    3      //  consecutive weeks at >= RATE_NOTE_MAX before the co
 
 ### WEIGHT-1b — after R1-b
 
-`js/views/settings.js` (toggle, first tier gate) · logging surface · `js/views/my-programme.js` (target surface) · stylesheet · gate extension · `sw.js`
+`js/views/settings.js` (toggle, first tier gate, **display-unit picker**) · `js/views/progress.js` (log surface) · `js/views/my-programme.js` (target surface, **composite st+lb input**) · stylesheet · gate extension · `sw.js`
 
 ---
 
@@ -126,7 +126,10 @@ Every assertion imports the module and calls it. **No assertion hardcodes a thre
 6. Bands are computed from kg regardless of the user's display unit
 7. `weightTracking` false ⇒ no band is ever computed
 8. **Copy assertions:** no refusal string contains a projected weight, a rate, or a shortfall figure; no string in the module prompts a weigh-in
-9. Reversals for all of the above, each confirmed to fail
+9. **Round-trip:** `fromKg(toKg(x, unit), unit)` returns `x` for `kg`, `lb` and `st+lb` across a realistic range, so no display unit loses data
+10. **`st+lb` formatting:** pounds wrap at 14, never renders `13 st 14 lb`, and a whole-stone value renders without a stray `0 lb`
+11. `suggestSustainableDate()` returns a date at or under `RATE_SILENT_MAX`, and **never returns a weight or a rate**
+12. Reversals for all of the above, each confirmed to fail
 
 Plus in `verify-hard1.mjs`: R1 suppresses a weight target when tracking is **off**, and does **not** suppress when it is **on** — the second is the assertion that proves the toggle is really the consent.
 
@@ -136,19 +139,31 @@ Plus in `verify-hard1.mjs`: R1 suppresses a weight target when tracking is **off
 
 🟠 **All five are proposals awaiting confirmation.** None is a decision yet.
 
-### 7.1 Canonical kg, display converts — 🟠 recommend YES
+### 7.1 Canonical kg, display converts — 🟢 CONFIRMED, after a correction
+
+⚠️ **v2 explained this badly and Graeme read it as forcing users into kilograms.** It does not. **Canonical kg is a STORAGE decision. Display is unchanged and unconstrained.**
+
+Somebody who works in stone and pounds enters and sees **12 st 4 lb**; the value in the store is kg. The same arrangement as storing dates in ISO and showing "Thursday". **Nobody is asked to think in kilograms.**
+
+🔴 **New scope Graeme surfaced: stone-and-pounds is a COMPOSITE display.** It needs a genuine two-part input and formatter — `st` + `lb`, with the pounds part wrapping at 14 — not one number with a unit label beside it. Three display units, not two: `kg`, `lb`, `st+lb`. This is real UI work and it belongs in **1b**; the conversion and formatting functions belong in **1a** with the rest of the pure logic, and are gated there.
+
+🟢 **Also confirmed:** an implied rate of 4 lb/week or more is **not advisable and belongs with clinical support, not this app.**
 
 Forced by §1.1. Store one unit, convert at the edge. `weightUnit` becomes a display preference with a real writer, and every band, every comparison and every stored value is kg.
 
 **The alternative — storing whatever the person typed alongside a unit flag — means every consumer must convert correctly, forever.** One that forgets compares 80 against 176 and the ≥4 lb refusal silently stops working. A single canonical unit makes that class of fault impossible rather than merely unlikely.
 
-### 7.2 A plain switch, no confirmation step — 🟠 recommend PLAIN SWITCH
+### 7.2 A plain switch, no confirmation step — 🟢 CONFIRMED
 
 A confirmation dialogue would be the app implying the person is about to do something questionable. That is shame wearing a safety costume, and it contradicts the reason this feature was reinstated: refusing an adult their own goal is paternalism.
 
 **The honesty belongs in the helper text, not in a barrier.** Say plainly what turning it on does, then get out of the way. The real safeguards — the bands, the refusal, never prompting a weigh-in — sit deeper and do not require the person to click through a warning to reach their own data.
 
-### 7.3 Logging in Progress, target in My Programme — 🟠 recommend SPLIT BY KIND
+### 7.3 Logging in Progress, target in My Programme — 🟢 DECIDED. **This should not have been asked.**
+
+Graeme: *"What do you need me for here?"* — correct. Placement follows from distinctions already in the product, and the passive entry point follows from the never-prompt rule already agreed. **Asking cost him a decision he had effectively already made.**
+
+⚠️ **Worth noticing as a pattern:** a question that only restates existing principles is not a decision point, it is a summary. Decisions to escalate are the ones where the principles genuinely conflict or run out.
 
 - **The target** goes in My Programme, beside the other targets. It is a target; it belongs where targets live, and R1 reads it from there.
 - **The log** goes in Progress. It is a trend, and Progress is the trend surface.
@@ -158,7 +173,7 @@ This follows the existing distinction rather than inventing one: My Programme is
 
 ⚠️ **Entry point must be passive.** A control that is there when looked for, never a card that appears asking to be filled in. No badge, no empty state that reads as an unfinished task.
 
-### 7.4 Toggle copy — 🟠 DRAFT for Graeme, coach voice is his
+### 7.4 Toggle copy — 🟢 AGREED AS DRAFTED
 
 **Label:** Weight tracking
 
@@ -170,19 +185,32 @@ This follows the existing distinction rather than inventing one: My Programme is
 
 **What it deliberately avoids:** any suggestion that tracking helps, works, or is recommended. The app is opening a door, not encouraging anyone through it.
 
-### 7.5 The 1a / 1b split — 🟠 recommend CONFIRM
+### 7.5 The 1a / 1b split — 🟢 CONFIRMED (delegated: *"do what you think is best"*)
 
 1a is inert by construction, so *"ship nothing before the clinical reply"* is satisfied by the shape of the work rather than by remembering not to deploy. 1b needs R1-b landed because `my-programme.js` gets one visit.
 
 ---
 
-## 7A. One further piece of copy this surfaces
+## 7A. The ≥ 4 lb response — Graeme's change, and the rule it clarified
 
-The **≥ 4 lb refusal** is the hardest sentence in the feature and it is not in the five. **Draft, for Graeme:**
+🟢 **Graeme improved the draft.** A flat decline leaves somebody stuck. The coach should **offer a recalculated date at a sustainable pace** — same target, longer horizon.
 
-> That's a faster pace than I'm able to help you plan for. It's not a judgement on the goal — it's past the point where I'd be guessing, and this is a conversation for a GP or a registered dietitian. I can hold a target at a gentler pace if you'd like, or leave it open-ended.
+> That's faster than I can plan for safely — not a judgement on where you want to get to, but at that pace I'd be guessing, and it's a conversation for a GP or a registered dietitian.
+>
+> If it helps, I could aim for the same target around **[date]** instead, at a pace I can support. Or leave it open-ended, and we just get moving.
 
-**Constraints it is written against:** it declines the field, not the person; it states no number, no rate and no projection; it offers two ways forward rather than a dead end; and it does not pretend to clinical authority it does not have.
+### 🔴 The rule this clarified, which a future session could get backwards
+
+**Recalculating a date IS arithmetic.** The non-negotiable says the hard conversation never does arithmetic on the body. Those appear to collide. They do not, and the distinction must be written down:
+
+| | | |
+|---|---|---|
+| **Set-time** | Planning | **May** compute and propose a date. The person is deciding what to aim at and needs to know what is feasible |
+| **Review-time (R1)** | Judgement | **May never** state a rate, a projection, a shortfall, or a weight. A number here is a verdict on the person |
+
+**The rule protects the conversation where a number becomes a verdict, not the one where it is a plan.**
+
+Set-time must still **offer**, never impose — the person may decline the suggested date and keep their own, subject to the bands. And it proposes a **date**, never a weight trajectory.
 
 ---
 
@@ -192,4 +220,4 @@ The **≥ 4 lb refusal** is the hardest sentence in the feature and it is not in
 
 ---
 
-*Build New Habits · Alongside: Move · WEIGHT-1 Build Scope · 22 Aug 2026 v2*
+*Build New Habits · Alongside: Move · WEIGHT-1 Build Scope · 22 Aug 2026 v3*

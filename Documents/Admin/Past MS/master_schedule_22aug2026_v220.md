@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v221
+## 22 Aug 2026 v220
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v220.md`. Remove v220 on upload.
+Supersedes `master_schedule_22aug2026_v219.md`. Remove v219 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -152,35 +152,6 @@ Supersedes `master_schedule_22aug2026_v220.md`. Remove v220 on upload.
 >
 > ---
 >
-> ### 🟢 WEIGHT-1 CONFIRMED 22 Aug — scope v3, 1a cleared to build
->
-> All five points confirmed. Two things changed in the confirming.
->
-> #### ⚠️ A correction I had to make: "canonical kg" was explained badly
->
-> Graeme read it as forcing users into kilograms — *"I work with stone and pounds as do many others."* **It is a STORAGE decision only.** Somebody who works in stone and pounds enters and sees **12 st 4 lb**; the stored value is kg. Same as storing dates in ISO and showing "Thursday".
->
-> 🔴 **And his objection added real scope.** Stone-and-pounds is a **composite** display — it needs a genuine two-part input and formatter with pounds wrapping at 14, not one number with a unit label. **Three display units, not two:** `kg`, `lb`, `st+lb`. Conversion and formatting go in 1a and are gated; the input goes in 1b.
->
-> #### 🟢 Graeme improved the ≥ 4 lb response — and it clarified a rule
->
-> A flat decline leaves somebody stuck. The coach now **offers a recalculated date at a sustainable pace** — same target, longer horizon.
->
-> 🔴 **The rule this clarified, which a future session could get backwards.** Recalculating a date IS arithmetic, and the non-negotiable says the hard conversation never does arithmetic on the body. They appear to collide. They do not:
->
-> | | | |
-> |---|---|---|
-> | **Set-time** | Planning | **May** compute and propose a date — the person is deciding what to aim at and needs to know what is feasible |
-> | **Review-time (R1)** | Judgement | **Never** a rate, projection, shortfall or weight. A number here is a verdict on the person |
->
-> **The rule protects the conversation where a number becomes a verdict, not the one where it is a plan.** Set-time offers, never imposes, and proposes a date, never a weight trajectory.
->
-> #### 🟠 A process note worth keeping
->
-> On placement of the log and target, Graeme asked: *"What do you need me for here?"* — and he was right. Both followed from distinctions already in the product and from the never-prompt rule already agreed. **A question that only restates existing principles is a summary, not a decision point.** Escalate the ones where principles genuinely conflict or run out.
->
-> ---
->
 > ### 🟠 WEIGHT-1 SCOPED — `alongside_weight1_build_scope_22aug2026_v1.md` v1
 >
 > **No code written.** Five confirmations needed first — see §7 of the scope.
@@ -272,7 +243,7 @@ Supersedes `master_schedule_22aug2026_v220.md`. Remove v220 on upload.
 >
 > | ID | Task | Status | Target |
 > |---|---|---|---|
-> | **WEIGHT-1a** | Constants, banding, validator, unit conversion + `st+lb` formatting, schema, `goals.js` fix, R1 conditionality, gates. **No views** | 🟢 **CLEARED TO BUILD** | Next |
+> | **WEIGHT-1a** | Constants, banding, validator, unit conversion, schema, `goals.js` fix, R1 conditionality, gates. **No views** | 🟠 Scoped, awaiting 5 confirmations | Before beta |
 > | **WEIGHT-1b** | Settings toggle, logging surface, target surface. **After R1-b** | 🟠 Scoped | Before beta |
 > | ~~UNIT-1~~ | **Folded into WEIGHT-1a** — not separable, see below | 🟢 Merged | — |
 > | **UNIT-1** | `weightUnit` has no writer — `session-log.js:179` always labels the field `kg` | 🔵 Specified | w/c 31 Aug |
@@ -4588,4 +4559,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v221*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v220*
