@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v226
+## 22 Aug 2026 v225
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v225.md`. Remove v225 on upload.
+Supersedes `master_schedule_22aug2026_v224.md`. Remove v224 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -163,36 +163,6 @@ Supersedes `master_schedule_22aug2026_v225.md`. Remove v225 on upload.
 > Styling the *"leave it where it is"* chip differently **passed**. The chip-uniformity check ran against a **synthetic** script with no `keep` chip, so it never touched the real conversation. **A test on a stand-in is not a test of the thing.** Now asserted against the actual three chips and reversal-confirmed twice. Second time in one day a gate proved a function while missing the wiring.
 >
 > Also caught: a gate fixture recomputing `iso(40)` from `Date.now()` on every call, so it compared two timestamps milliseconds apart and went red against correct code — **a fixture that moves is not a fixture**. And removing the inline panels took the `save-describe` handler with it while leaving its button: a dead control.
->
-> ---
->
-> ### 🟢 R2-a SHIPPED — `alongside-v400`, `today.js` v24
->
-> **A dated target can only be recorded on the Plan.** The boundary always said so; the code had drifted.
->
-> 🟢 **Goals stay free and untouched.** `programmes.js` matches on them and `workoutGenerator.js` uses them for the session rationale. The drop-in coach *does* ask what you want to do — what he does not hold is where you are going and by when.
->
-> 🔴 **Free sees NOTHING here — no locked teaser.** A *"the Plan can do this"* prompt on the screen somebody opens every morning is pressure on the wrong surface. Gated and reversal-confirmed: **adding a teaser turns it red**, which is precisely the change a well-meaning future session is most likely to make.
->
-> 🟢 **The copy no longer lies.** It said naming a date *"changes nothing about how I work"* — true when nothing read the date, false now that R1 does. Asserted against the rendered text **and** the source, so a future edit cannot quietly restore it. Deliberately still not *"I'll build towards it"*: the programme does not plan around the date, and chapters are twelve weeks regardless.
->
-> `strategicGoal.targetSetAt` now has its writer — **only when a date is actually given.** 9 reversals confirmed.
->
-> 🟠 **Fixture fault:** the gate's first fixture omitted `activeProgramme.completed`, so `isHingePending()` was false and it reported *"the hinge renders: FAIL"* against correct code. **Read the guard rather than guessing at the fixture** — third fixture fault of the day.
->
-> ---
->
-> ### 🟢 CLINICAL REVIEWER NAMED — GARETH CROFT
->
-> Graeme, 22 Aug: **Gareth Croft** reviews the WEIGHT-1 safety bands.
->
-> ⚠️ **His discipline is not recorded here and it matters.** What a sign-off means differs between a GP, a registered dietitian, a physiotherapist and a clinical psychologist — particularly for the ≥ 4 lb refusal, which signposts to *"a GP or a registered dietitian"* in copy. **Confirm before the pack goes out.**
->
-> **What he is being asked:** calibration, not principle. The four rate bands, `CAP_WEEKS` (3), `OBSERVED_WEEKS` (3), the set-time wording, and whether enabling the toggle needs anything at the point of opt-in.
->
-> 🟢 **The build is arranged so his answer is cheap.** All six numbers sit in one `PROVISIONAL` block in `js/data/weight-targets.js`, and **no gate hardcodes any of them** — every assertion references the constants. His reply changes six values and nothing else moves.
->
-> 🔴 **What is NOT his to change:** the three rules in the `NOT PROVISIONAL` block — never prompt a weigh-in · no arithmetic on the body at review-time · the refusal declines the field, not the person. Those are product philosophy, and they stand whether or not he has a view.
 >
 > ---
 >
@@ -799,7 +769,7 @@ Supersedes `master_schedule_22aug2026_v225.md`. Remove v225 on upload.
 > | ID | Task | Status | Target |
 > |---|---|---|---|
 > | **R1-a** | Detection, dark — `Schema.md` v1.38, `store.js` v55, `js/data/goal-review.js`, `verify-hard1.mjs` + `verify-hard1-store.mjs`, `sw.js` v393 | 🟢 **SHIPPED 21 Aug** | Done |
-> | **R2-a** | Shipped `alongside-v400`. `today.js` v24 — hinge Plan-gated, copy corrected, `targetSetAt` written. 27 executing checks | 🟢 **SHIPPED 22 Aug** | Done |
+> | **R2-a** | Boundary correction — `today.js` alone. **NOW RUNS AFTER R1-b** | 🔵 Ready, sequenced after R1-b | w/c 24 Aug |
 > | **R1-b** | Shipped `alongside-v397`. Target display tier-gated; three options inline; 45 executing checks. **Render half superseded by THREAD-1a** | 🟢 **SHIPPED 22 Aug** | Done |
 > | **THREAD-1a** | Shipped `alongside-v398`. `thread-runner.js`, `goal-review-script.js`, `goal-review-thread.js`, `my-programme.js` v7, 56 executing checks | 🟢 **SHIPPED 22 Aug** | Done |
 > | **CONSENT-2** | Consent gate scoped to its own container, every dereference guarded, loud on failure. `thread.js` v13, 24 executing checks | 🟢 **SHIPPED 22 Aug** | Done |
@@ -4740,4 +4710,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v226*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v225*
