@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v397
+ * R1-b. Cache bump only. my-programme.js v6 and
+ * css/layouts/my-programme.css v3 are both already in the precache
+ * list; no new files. The bump is what makes the new view and its
+ * styles reach a device that already has the old ones cached.
+ *
  * 22 Aug 2026 v396
  * WEIGHT-1a. New js/data/weight-targets.js ADDED TO THE PRECACHE LIST
  * below. Nothing imports it yet -- WEIGHT-1b is the consumer -- but a
@@ -2748,7 +2754,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v396";
+const CACHE_NAME = "alongside-v397";
 
 const SHELL_URLS = [
 
