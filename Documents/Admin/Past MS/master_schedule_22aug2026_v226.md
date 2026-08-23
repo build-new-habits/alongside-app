@@ -184,7 +184,7 @@ Supersedes `master_schedule_22aug2026_v225.md`. Remove v225 on upload.
 >
 > ### 🟢 CLINICAL REVIEWER NAMED — GARETH CROFT
 >
-> Graeme, 22 Aug: **Gareth Croft** reviews the WEIGHT-1 safety bands.
+> Graeme, 22 Aug: *[Reviewer name redacted 22 Aug 2026 at Graeme's request. No individual is named against the weight bands: a name implies a professional endorsement neither formally given nor needed. Superseded by v227 — the bands are cited to published sources instead.]*
 >
 > ⚠️ **His discipline is not recorded here and it matters.** What a sign-off means differs between a GP, a registered dietitian, a physiotherapist and a clinical psychologist — particularly for the ≥ 4 lb refusal, which signposts to *"a GP or a registered dietitian"* in copy. **Confirm before the pack goes out.**
 >
