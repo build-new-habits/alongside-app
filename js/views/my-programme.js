@@ -1,6 +1,41 @@
 /**
  * my-programme.js - My Programme
  *
+ * 22 Aug 2026 v6
+ *
+ * v6 - R1-b. The hard conversation gets a surface, and the target
+ *   display gets the tier gate the boundary always implied.
+ *
+ *   TWO JOBS IN ONE VISIT, deliberately. Touch-once: this file is wanted
+ *   by R1's surface and by R2's boundary correction, so it gets one
+ *   edit that does both rather than two that collide.
+ *
+ *   1. The dated target is now Plan-only. "Free has goals, the Plan has
+ *      targets" -- the boundary said so; this screen had drifted,
+ *      rendering the date and the countdown to everyone. The GOALS stay
+ *      free and untouched: a goal is a direction and it belongs to the
+ *      person.
+ *
+ *   2. If the trailing rate says the date is at risk, the coach opens
+ *      the conversation and offers three ways through: move the date,
+ *      reshape the target, or leave it exactly where it is.
+ *
+ *   ALL THREE RESOLVE INLINE. No modal, no navigation. Routing to
+ *   today.js's hinge editor would depend on state that has to be
+ *   re-established on arrival, which is somewhere it can fail.
+ *
+ *   "LEAVE IT WHERE IT IS" IS A REAL CHOICE. One tap, never nagged,
+ *   not asked again inside the throttle, and styled with the same
+ *   weight as the other two. A de-emphasised third option is a nudge
+ *   wearing a choice's clothes.
+ *
+ *   NO ARITHMETIC ON THE BODY, AND NO ARITHMETIC ON THE PERSON. This is
+ *   review-time, which is judgement, so nothing here states a rate, a
+ *   shortfall, a percentage or a count of missed sessions. The coach
+ *   says the date looks like a harder ask than it needs to be. It does
+ *   not show its working, because showing the working is the scoreboard
+ *   this product refuses to keep.
+ *
  * 18 Aug 2026 v5
  *
  * v5 - NAME-1. The paid tier is "the Plan", not "Personal".
@@ -100,6 +135,9 @@ import { isPremium, lockedFeature } from '../auth.js';
 import { getProgramme }         from '../data/programmes.js';
 import { getGoalLabel }         from '../data/goals.js';
 import { advanceWeekIfNeeded }  from '../data/programmeEngine.js';
+import { evaluateGoalReview }   from '../data/goal-review.js';
+import { detectBurnout, getTodaysCheckin } from '../data/checkin.js';
+import { getZoneStatus }        from '../data/conditions.js';
 import { currentWeekFocus, setWeekFocus, focusLine, FOCUS_OPTIONS }
   from '../data/week-focus.js';
 
@@ -108,6 +146,11 @@ export function MyProgrammeView(router) {
   // Whether the picker is open is not a fact about the person, so it
   // lives here and not in the store.
   let _focusEditing = false;
+
+  // Which branch of the hard conversation is open: null | 'move' |
+  // 'reshape'. Same reasoning -- it is a fact about this render, not
+  // about the person, so it never reaches the store.
+  let _reviewOpen = null;
 
   function mount(container) {
     // Idempotent, and it returns early unless a week has genuinely
@@ -392,20 +435,217 @@ export function MyProgrammeView(router) {
     const targetText = sg.targetDescription || store.get('targetDescription') || '';
     const targetWhen = sg.targetDate        || store.get('targetDate')        || null;
 
-    if (targetText) {
-      parts.push(`<p class="my-programme-line">${_esc(targetText)}</p>`);
-    }
-    if (targetWhen) {
-      const days = _daysUntil(targetWhen);
-      parts.push(`<p class="my-programme-line">
-        ${_esc(_dayMonth(targetWhen))}${days !== null && days > 0
-          ? _esc(` — ${days} ${days === 1 ? "day" : "days"} to go`)
-          : ''}
-      </p>`);
+    // R1-b. THE DATED TARGET IS PLAN-ONLY.
+    //
+    // "Free has goals, the Plan has targets" -- the boundary document
+    // said so from the start and this screen had drifted, rendering the
+    // date and the countdown to everyone. The goals above stay free and
+    // untouched: a goal is a direction, and it belongs to the person
+    // whatever they pay. What the Plan buys is the coach HOLDING a
+    // destination -- keeping it in view and telling the truth about it.
+    if (isPremium()) {
+      if (targetText) {
+        parts.push(`<p class="my-programme-line">${_esc(targetText)}</p>`);
+      }
+      if (targetWhen) {
+        const days = _daysUntil(targetWhen);
+        parts.push(`<p class="my-programme-line">
+          ${_esc(_dayMonth(targetWhen))}${days !== null && days > 0
+            ? _esc(` — ${days} ${days === 1 ? "day" : "days"} to go`)
+            : ''}
+        </p>`);
+      }
+
+      // A date with no words. today.js writes the description and the
+      // date independently, so skipping the "what" is one tap -- and R1
+      // requires the person's own words, because the coach must never
+      // invent a phrase for somebody's goal and then quote it back.
+      //
+      // An invitation, never an error state, and never a badge or a
+      // prompt that reads as an unfinished task.
+      if (targetWhen && !targetText) {
+        parts.push(_describeTargetInvite());
+      }
+
+      const review = _reviewOffer();
+      if (review) parts.push(review);
     }
 
     if (!parts.length) return null;
     return _section("What you are aiming at", parts.join(''));
+  }
+
+  // ── The hard conversation ───────────────────────────────────────────
+
+  /**
+   * Assemble what goal-review.js needs and ask it.
+   *
+   * The module is pure and takes everything as arguments, so THIS is the
+   * wiring -- and the wiring is where the fault usually is. Every field
+   * below is supplied deliberately; goal-review.js treats anything
+   * missing or wrong-typed as a reason to stay silent, so a mistake here
+   * costs the feature and never the person.
+   */
+  function _reviewContext() {
+    const checkin = getTodaysCheckin() || {};
+    const burnout = detectBurnout(store.get('checkinHistory') || {});
+
+    // Pain: the highest score across the person's own conditions today.
+    // getZoneStatus() calls 7+ severe and getPainBand() calls 8+; they
+    // disagree, deliberately, pending clinical review. R1 takes the
+    // LOWER number and does not resolve that question -- see
+    // goal-review.js PAIN_SEVERE.
+    const painScores = store.get('conditionPainScores') || {};
+    const painLevel  = Object.values(painScores)
+      .filter(v => typeof v === 'number')
+      .reduce((max, v) => v > max ? v : max, 0);
+
+    // Care Mode. checkin.lastOpeningMode records the last opening the
+    // coach chose, and 'care' is one of them.
+    //
+    // IT CARRIES NO DATE -- neither does openingModeHistory, which is a
+    // bare array of strings. So a 'care' opening from last week reads as
+    // today's. Used anyway, undated, ON PURPOSE: over-suppressing costs
+    // a conversation a fortnight later, under-suppressing means saying
+    // this to somebody the coach had already decided needed gentleness.
+    // Logged as a finding, not worked around.
+    const careOpeningToday = store.get('checkin.lastOpeningMode') === 'care';
+
+    return {
+      isPremium: isPremium(),
+      now: new Date(),
+      strategicGoal: store.get('strategicGoal') || {},
+      legacyTargetDate: store.get('targetDate') || null,
+      targetType: null,
+      activityLog: store.get('activityLog') || [],
+      painLevel,
+      burnoutLevel: burnout && burnout.level ? burnout.level : 'none',
+      mood:   typeof checkin.mood   === 'number' ? checkin.mood   : undefined,
+      energy: typeof checkin.energy === 'number' ? checkin.energy : undefined,
+      careOpeningToday,
+      weightTrackingEnabled: store.get('weightTracking') === true
+    };
+  }
+
+  /**
+   * The offer itself.
+   *
+   * NO ARITHMETIC ON THE PERSON. The coach names what it noticed and
+   * offers three ways through. It does not state a rate, a shortfall, a
+   * percentage or a count of sessions, because showing the working turns
+   * a conversation into a scoreboard -- and P4 says the coach displays,
+   * never interprets, which cuts both ways: it may not interpret a
+   * person into a number either.
+   */
+  function _reviewOffer() {
+    const r = evaluateGoalReview(_reviewContext());
+    if (!r.offer) return null;
+
+    if (_reviewOpen === 'move') return _reviewMovePanel(r);
+    if (_reviewOpen === 'reshape') return _reviewReshapePanel(r);
+
+    return `
+      <div class="my-programme-review" role="group"
+           aria-label="About the date you are working towards">
+        <p class="my-programme-review__body">
+          I have been looking at ${_esc(r.targetDescription)} and the date you
+          set. At the pace things are going, that date is a harder ask than it
+          needs to be. Nothing has gone wrong — life does this. Shall we look
+          at it together?
+        </p>
+        <div class="my-programme-review__actions">
+          <button class="btn btn-secondary btn-small" data-review="move">
+            Move the date
+          </button>
+          <button class="btn btn-secondary btn-small" data-review="reshape">
+            Reshape the target
+          </button>
+          <button class="btn btn-secondary btn-small" data-review="keep">
+            Leave it where it is
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function _reviewMovePanel(r) {
+    return `
+      <div class="my-programme-review" role="group" aria-label="Move the date">
+        <label class="my-programme-review__label" for="review-date">
+          When would you like to aim for instead?
+        </label>
+        <input class="my-programme-review__input" id="review-date" type="date"
+               value="${_esc(r.targetDate || '')}">
+        <div class="my-programme-review__actions">
+          <button class="btn btn-primary btn-small" data-review="save-move">Save it</button>
+          <button class="btn btn-ghost btn-small" data-review="cancel">Never mind</button>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Reshape. Both fields PRE-FILLED with the person's existing words --
+   * a blank box would imply the old answer was wrong, and it wasn't.
+   */
+  function _reviewReshapePanel(r) {
+    return `
+      <div class="my-programme-review" role="group" aria-label="Reshape the target">
+        <label class="my-programme-review__label" for="review-what">
+          What are you working towards?
+        </label>
+        <input class="my-programme-review__input" id="review-what" type="text"
+               maxlength="60" value="${_esc(r.targetDescription || '')}">
+        <label class="my-programme-review__label" for="review-when">
+          And by when?
+        </label>
+        <input class="my-programme-review__input" id="review-when" type="date"
+               value="${_esc(r.targetDate || '')}">
+        <div class="my-programme-review__actions">
+          <button class="btn btn-primary btn-small" data-review="save-reshape">Save it</button>
+          <button class="btn btn-ghost btn-small" data-review="cancel">Never mind</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function _describeTargetInvite() {
+    return `
+      <div class="my-programme-describe">
+        <label class="my-programme-review__label" for="target-describe">
+          Tell me what this date is for, in your own words
+        </label>
+        <input class="my-programme-review__input" id="target-describe" type="text"
+               maxlength="60">
+        <div class="my-programme-review__actions">
+          <button class="btn btn-secondary btn-small" data-review="save-describe">
+            Save it
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Record an outcome and close the conversation.
+   *
+   * lastOfferedAt is set HERE and only here -- when an offer was shown
+   * and answered. A suppressed offer never reaches this function, so a
+   * fortnight of low mood cannot silently spend the throttle.
+   */
+  function _recordReviewOutcome(choice, previousDate, newDate) {
+    const review = store.get('strategicGoal.review') || { lastOfferedAt: null, outcomes: [] };
+    const outcomes = Array.isArray(review.outcomes) ? review.outcomes.slice() : [];
+    outcomes.push({
+      at: new Date().toISOString(),
+      choice,
+      previousDate: previousDate || null,
+      newDate: newDate || null
+    });
+    store.set('strategicGoal.review', {
+      lastOfferedAt: new Date().toISOString(),
+      outcomes
+    });
   }
 
   // ── What Personal adds ──────────────────────────────────────────────
@@ -482,6 +722,82 @@ export function MyProgrammeView(router) {
         setWeekFocus(k === 'none' ? null : k);
         _focusEditing = false;
         render(container);
+      });
+    });
+
+    // ── The hard conversation ──────────────────────────────────────
+    //
+    // Every branch writes to strategicGoal.* and NEVER to the top-level
+    // targetDate/targetDescription pair. Two editors for one field is
+    // what caused TARGET-3; this one does not add a third writer to the
+    // legacy home.
+    container.querySelectorAll('[data-review]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.review;
+        const sg = store.get('strategicGoal') || {};
+        const previousDate = sg.targetDate || store.get('targetDate') || null;
+
+        if (action === 'move' || action === 'reshape') {
+          _reviewOpen = action;
+          render(container);
+          // Focus the first field so the keyboard lands where the person
+          // is being asked to type. WCAG 2.2 AA: the panel replaced the
+          // control that opened it, so focus must be moved deliberately
+          // or it falls back to the document.
+          container.querySelector('#review-date, #review-what')?.focus();
+          return;
+        }
+
+        if (action === 'cancel') {
+          _reviewOpen = null;
+          render(container);
+          return;
+        }
+
+        // "Leave it where it is" is a REAL answer, recorded like any
+        // other. It is not a dismissal and it is not asked again inside
+        // the throttle.
+        if (action === 'keep') {
+          _recordReviewOutcome('kept', previousDate, previousDate);
+          _reviewOpen = null;
+          render(container);
+          return;
+        }
+
+        if (action === 'save-move') {
+          const v = container.querySelector('#review-date')?.value;
+          if (v) {
+            store.set('strategicGoal.targetDate', v);
+            store.set('strategicGoal.targetSetAt', new Date().toISOString());
+            _recordReviewOutcome('moved', previousDate, v);
+          }
+          _reviewOpen = null;
+          render(container);
+          return;
+        }
+
+        if (action === 'save-reshape') {
+          const what = container.querySelector('#review-what')?.value?.trim();
+          const when = container.querySelector('#review-when')?.value;
+          if (what) store.set('strategicGoal.targetDescription', what);
+          if (when) {
+            store.set('strategicGoal.targetDate', when);
+            store.set('strategicGoal.targetSetAt', new Date().toISOString());
+          }
+          _recordReviewOutcome('reshaped', previousDate, when || previousDate);
+          _reviewOpen = null;
+          render(container);
+          return;
+        }
+
+        // The description invitation. NOT part of the conversation, so
+        // it records no outcome and does not touch the throttle -- it is
+        // somebody filling in their own words, not answering a question.
+        if (action === 'save-describe') {
+          const what = container.querySelector('#target-describe')?.value?.trim();
+          if (what) store.set('strategicGoal.targetDescription', what);
+          render(container);
+        }
       });
     });
   }
