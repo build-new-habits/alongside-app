@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v396
+ * WEIGHT-1a. New js/data/weight-targets.js ADDED TO THE PRECACHE LIST
+ * below. Nothing imports it yet -- WEIGHT-1b is the consumer -- but a
+ * module that ships uncached breaks offline the moment something does
+ * import it, and that failure would surface a version later than the
+ * change that caused it. Precache list plus cache bump.
+ *
  * 22 Aug 2026 v395
  * EMPTY-1. Cache bump only -- no service worker logic changed.
  * workout.js v12 guards a session with no exercises.
@@ -2741,7 +2748,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v395";
+const CACHE_NAME = "alongside-v396";
 
 const SHELL_URLS = [
 
@@ -2921,6 +2928,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/equipment.js",
   "/alongside-app/js/data/goals.js",
   "/alongside-app/js/data/goal-review.js",
+  "/alongside-app/js/data/weight-targets.js",
   "/alongside-app/js/data/plan-options.js",
   "/alongside-app/js/data/pricing.js",
   "/alongside-app/js/data/workoutGenerator.js",
