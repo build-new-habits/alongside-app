@@ -1,5 +1,11 @@
 /**
  * tools/verify-hard1.mjs
+ * 22 Aug 2026 v2
+ * WEIGHT-1a. Section 3 extended: the weight exclusion is now
+ * CONDITIONAL on weightTrackingEnabled. Section 3b asserts the second
+ * half -- that with tracking ON, R1 speaks. That assertion is the one
+ * that proves the toggle really is the consent rather than decoration.
+ *
  * 21 Aug 2026 v1
  *
  * R1 — the hard conversation. Off-course detection.
@@ -179,6 +185,35 @@ section("3. Weight-based targets excluded entirely");
 
   const byUnit = evaluateGoalReview(sg({ targetUnit: "kg" }));
   ok("silent on a kg target unit", byUnit.offer === false && byUnit.reason.includes("weight"));
+}
+
+// ── 3b. ...but the toggle is real consent, not decoration ───────────
+section("3b. With tracking ON, a weight target is treated like any other");
+{
+  const on = (o = {}) => evaluateGoalReview({ ...baseContext(o), weightTrackingEnabled: true });
+
+  ok("primaryGoal lose-weight FIRES when tracking is on",
+     on({ strategicGoal: { ...baseContext().strategicGoal, primaryGoal: "lose-weight" } }).offer === true);
+  ok("targetType weight FIRES when tracking is on",
+     on({ targetType: "weight" }).offer === true);
+
+  // Everything else must still apply. A weight target gets no exemption
+  // from the safety half -- if anything these matter more here.
+  ok("suppression still applies — burnout", on({ targetType: "weight", burnoutLevel: "high" }).offer === false);
+  ok("suppression still applies — pain",    on({ targetType: "weight", painLevel: 8 }).offer === false);
+  ok("suppression still applies — band",    on({ targetType: "weight", mood: 2 }).offer === false);
+  ok("maturity still applies", evaluateGoalReview({
+     ...sg({ targetSetAt: daysAgo(10) }), targetType: "weight", weightTrackingEnabled: true }).offer === false);
+
+  // Unknown suppresses: an explicit true is required.
+  for (const v of [undefined, null, "yes", 1]) {
+    ok(`weightTrackingEnabled=${JSON.stringify(v)} does NOT unlock a weight target`,
+       evaluateGoalReview({ ...baseContext({ targetType: "weight" }), weightTrackingEnabled: v }).offer === false);
+  }
+
+  // And the toggle must not unlock anything else by accident.
+  ok("tracking on does not bypass an unagreed weekly target", evaluateGoalReview({
+     ...sg({ setAt: null }), targetType: "weight", weightTrackingEnabled: true }).offer === false);
 }
 
 // ── 4. The denominator nobody agreed to ─────────────────────────────

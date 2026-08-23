@@ -1,6 +1,10 @@
 /**
  * tools/verify-write1.mjs
  * 22 Aug 2026 v2
+ * WEIGHT-1a, 22 Aug 2026. `weightTracking` added — declared dark, writer
+ * lands with WEIGHT-1b. Dated promise, not permission. See the note at
+ * the entry.
+ *
  * CHOOSER-1. `targetDate` added to the baseline. Its only writer,
  * goalSetupSaveWeightTargetDate() in onboarding/goal-setup.js, was
  * retired with that view -- and the view had never loaded, so the writer
@@ -96,6 +100,17 @@ for (const k of fields) {
 // the thing this gate exists to prevent.
 const BASELINE = new Set([
   'hormonalTracking','coachStyle','weight','weightUnit','targetWeight','targetDescription',
+  // weightTracking — DECLARED DARK 22 Aug 2026 (WEIGHT-1a). The opt-in
+  // for weight tracking. No writer until WEIGHT-1b builds the Settings
+  // toggle; goal-review.js consumes it as a context argument, which this
+  // scan correctly does not count as a store read.
+  //
+  // This gate caught it on the first run after the field was added,
+  // which is the gate working exactly as built. The entry is a DATED
+  // PROMISE, not permission: WEIGHT-1b removes it. If this line is still
+  // here once 1b has shipped, the field is an orphan and the baseline is
+  // lying.
+  'weightTracking',
   // targetDate — MIGRATION-ONLY as of 22 Aug 2026 (CHOOSER-1). Read by
   // store.js's one-way TARGET-4 migration for historic installs; its
   // writer was retired with onboarding/goal-setup.js, which had never

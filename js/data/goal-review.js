@@ -1,5 +1,20 @@
 /**
  * js/data/goal-review.js
+ * 22 Aug 2026 v2
+ *   WEIGHT-1a. The weight exclusion becomes CONDITIONAL on the person
+ *   having turned weight tracking on. Turning it on IS the consent:
+ *   telling the coach is the "I want you to do something with this"
+ *   moment. A coach that holds the target but refuses to speak to it is
+ *   paternalism one layer down.
+ *
+ *   Unknown still suppresses -- ctx.weightTrackingEnabled must be an
+ *   explicit true. A caller that forgets the field gets silence.
+ *
+ *   NOTE for R1-b: rule 2 of weight-targets.js applies here in its
+ *   STRICT form. This is review-time, which is judgement, so no rate,
+ *   projection, shortfall or weight may appear in any string. Set-time
+ *   may propose a date; this may not do arithmetic on the body at all.
+ *
  * 21 Aug 2026 v1
  *
  * R1 — the hard conversation. Off-course detection.
@@ -262,6 +277,7 @@ function isWeightTarget(strategicGoal, targetType) {
  * @param {object} ctx.strategicGoal
  * @param {string|null} ctx.legacyTargetDate  top-level `targetDate`
  * @param {string|null} ctx.targetType        from goals.js, if known
+ * @param {boolean} ctx.weightTrackingEnabled  store.weightTracking
  * @param {Array} ctx.activityLog
  * @param {number} ctx.painLevel              today, 0-10
  * @param {string} ctx.burnoutLevel           detectBurnout() level
@@ -285,7 +301,14 @@ export function evaluateGoalReview(ctx) {
   if (!nowKey) return silent("context-missing");
 
   // ── Weight targets, before anything else looks at the numbers ─────
-  if (isWeightTarget(strategicGoal, ctx.targetType)) {
+  //
+  // Excluded ONLY where the person has not turned tracking on. With it
+  // on, a weight target is treated like any other -- same trigger, same
+  // maturity, same throttle, same three options.
+  //
+  // Unknown suppresses: an explicit true is required, so a caller that
+  // forgets the field gets silence rather than an unwanted conversation.
+  if (isWeightTarget(strategicGoal, ctx.targetType) && ctx.weightTrackingEnabled !== true) {
     return silent("weight-target-excluded");
   }
 

@@ -2,6 +2,15 @@
  * workoutGenerator.js - Workout Generation Engine
  * Creates 3 daily workout options based on user profile and check-in
  *
+ * 22 Aug 2026 v1.15
+ *   WEIGHT-1a. validateWeightTarget() removed -- 46 lines that no caller
+ *   reached and that returned null unconditionally, because `weight` and
+ *   `targetWeight` have no writers anywhere in the codebase. The 12-week
+ *   unsafe-pace warning inside it had never fired for anyone, and GOAL-2
+ *   had previously repaired a dead branch within it: a function nobody
+ *   calls was fixed. Rewritten, not moved, into js/data/weight-targets.js
+ *   where it is pure, banded and gated. Original archived.
+ *
  * 18 Aug 2026 v1.14
  *   SLEEP-1. generateRationale() claimed "I have adjusted for your poor
  *   sleep last night" when nothing had. sleepQuality is read in exactly
@@ -190,11 +199,11 @@
  *     Core areas: core, abdominals, lower-back, glutes, hip-flexor,
  *     hamstring, adductors, hip-abductors, pelvic-floor.
  *
- *   validateWeightTarget()
- *     Reads weight, targetWeight, targetDate from store.
- *     Returns a coach message string if implied rate exceeds ~1 kg/week.
- *     Returns null if target is safe or insufficient data.
- *     Used by UI to surface a warm, non-blocking intervention.
+ *   validateWeightTarget()  -- REMOVED 22 Aug 2026 (WEIGHT-1a).
+ *     This entry claimed it was "used by UI to surface a warm,
+ *     non-blocking intervention." It was called by nothing, and
+ *     returned null unconditionally because its inputs had no writers.
+ *     Rewritten in js/data/weight-targets.js.
  *
  *   generateRationale() extended:
  *     Goal-aware lines added — weight-loss users see a coach line
@@ -509,49 +518,20 @@ export const workoutGenerator = {
   },
 
   // ── Weight target safeguarding ──────────────────────────────────────────────
-
-  /**
-   * Validate the user's weight target against a safe rate of change.
-   * Safe rate: ~0.5-1 kg per week (1-2 lbs).
-   * Returns a warm coach message string if the target is unsafe.
-   * Returns null if the target is safe, or if data is insufficient to check.
-   *
-   * @returns {string|null}
-   */
-  validateWeightTarget() {
-    const currentWeight = store.get("weight");
-    const targetWeight  = store.get("targetWeight");
-    // GOAL-2. The second half of this read "goal.targetDate", which has
-    // never existed. Harmless — the first read works — but a dead branch
-    // in a validator is a branch somebody will one day trust. Now reads
-    // the two real homes, matching TARGET-3's precedence.
-    const targetDate    = store.get("strategicGoal.targetDate") ||
-                          store.get("targetDate");
-
-    if (!currentWeight || !targetWeight || !targetDate) return null;
-
-    const current = parseFloat(currentWeight);
-    const target  = parseFloat(targetWeight);
-    if (isNaN(current) || isNaN(target)) return null;
-
-    const weightDiff = Math.abs(current - target);
-    if (weightDiff < 0.5) return null; // Already at or near target
-
-    const today      = new Date();
-    const end        = new Date(targetDate);
-    const msPerWeek  = 7 * 24 * 60 * 60 * 1000;
-    const weeksLeft  = (end - today) / msPerWeek;
-
-    if (weeksLeft <= 0) return null; // Date already passed — no intervention
-
-    const kgPerWeek = weightDiff / weeksLeft;
-
-    if (kgPerWeek <= 1.0) return null; // Safe rate — no message needed
-
-    return "That is a meaningful goal and I want to help you get there. That timeline concerns me a little though — a pace of around 0.5 to 1 kg a week tends to be more sustainable and kinder to your body. Want to adjust the date, or keep the goal open-ended for now?";
-  },
-
-  // ── Daily options ───────────────────────────────────────────────────────────
+  //
+  // WEIGHT-1a, 22 Aug 2026. validateWeightTarget() REMOVED from here.
+  // It was called by nothing, and returned null unconditionally because
+  // `weight` and `targetWeight` had no writers anywhere -- so the
+  // 12-week unsafe-pace warning it contained had never fired for anyone.
+  // GOAL-2 previously repaired a dead branch inside it: a function
+  // nobody calls was fixed.
+  //
+  // Rewritten, not moved, in js/data/weight-targets.js, where it is
+  // pure, banded, gated by tools/verify-weight1.mjs, and actually
+  // reachable. Its copy was good and has been reused.
+  //
+  // Original archived at
+  // Documents/Archive/workoutGenerator_validateWeightTarget_retired_22aug2026.js
 
   /**
    * Generate today's 3 workout options
