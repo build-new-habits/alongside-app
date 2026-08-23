@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v225
+## 22 Aug 2026 v224
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v224.md`. Remove v224 on upload.
+Supersedes `master_schedule_22aug2026_v223.md`. Remove v223 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -163,26 +163,6 @@ Supersedes `master_schedule_22aug2026_v224.md`. Remove v224 on upload.
 > Styling the *"leave it where it is"* chip differently **passed**. The chip-uniformity check ran against a **synthetic** script with no `keep` chip, so it never touched the real conversation. **A test on a stand-in is not a test of the thing.** Now asserted against the actual three chips and reversal-confirmed twice. Second time in one day a gate proved a function while missing the wiring.
 >
 > Also caught: a gate fixture recomputing `iso(40)` from `Date.now()` on every call, so it compared two timestamps milliseconds apart and went red against correct code — **a fixture that moves is not a fixture**. And removing the inline panels took the `save-describe` handler with it while leaving its button: a dead control.
->
-> ---
->
-> ### 🟢 CONSENT-2 SHIPPED — `alongside-v399`, `thread.js` v13
->
-> Five `document.getElementById` calls became `_thread.querySelector`. Every dereference guarded. A missing element now logs `console.error` — **somebody using the app with no consent record is a problem that otherwise looks like nothing.**
->
-> `tools/verify-consent2.mjs` **mounts onboarding and drives it**: past the splash, tick the box, click Continue, read the store. A source-text gate would assert `store.set('consent.given', true)` appears in the file — **it does appear, and it appeared throughout the whole period in which a null element would have stopped it ever running.** It also checks `consent.policyVersion` matches the constant actually shipping: *"they agreed"* is not evidence unless it records what they agreed to. **9 reversals confirmed.**
->
-> #### 🟠 Three process faults from this task, all mine
->
-> 1. **The ID was already taken.** `CONSENT-1` is the 12 Aug checkbox-affordance work on the same screen. Renamed throughout. **Check the schedule before minting an ID.**
-> 2. **A guard assertion matched its own COMMENTS** describing the old bug, and went red against correct code. **A test that reads source must read the source, not the prose about it.**
-> 3. 🔴 **The version block anchored to a v7 history entry deep in the file**, so the header still read `v12` while the file was `v13`. Caught only because the fresh-clone check printed it. **A version block that is present but not where anyone reads it is the same as absent.**
->
-> #### 🟠 Logged, not fixed
->
-> **30 gates `readFileSync` with cwd-relative paths**, so the suite must be run from repo root. This is a *different* fault from GATE-PATH and less dangerous: a relative path reads your tree or fails loudly — it never silently reads someone else's. Booked as **GATE-PATH-2**, low priority.
->
-> Also: `thread.js` calls `scrollIntoView` unguarded where `thread-runner.js` uses `?.` for the same call. Stubbed in the gate rather than changed in the product — an unrelated fix riding along inside a consent change is how scope creep starts.
 >
 > ---
 >
@@ -772,8 +752,8 @@ Supersedes `master_schedule_22aug2026_v224.md`. Remove v224 on upload.
 > | **R2-a** | Boundary correction — `today.js` alone. **NOW RUNS AFTER R1-b** | 🔵 Ready, sequenced after R1-b | w/c 24 Aug |
 > | **R1-b** | Shipped `alongside-v397`. Target display tier-gated; three options inline; 45 executing checks. **Render half superseded by THREAD-1a** | 🟢 **SHIPPED 22 Aug** | Done |
 > | **THREAD-1a** | Shipped `alongside-v398`. `thread-runner.js`, `goal-review-script.js`, `goal-review-thread.js`, `my-programme.js` v7, 56 executing checks | 🟢 **SHIPPED 22 Aug** | Done |
-> | **CONSENT-2** | Consent gate scoped to its own container, every dereference guarded, loud on failure. `thread.js` v13, 24 executing checks | 🟢 **SHIPPED 22 Aug** | Done |
-> | **THREAD-1b-char** | Characterisation gate: prove what onboarding does today, before changing it. **Unblocked — CONSENT-2 done** | 🔵 **NEXT** | Before THREAD-1b |
+> | **CONSENT-1** | One unguarded dereference in the consent gate, and five `document.getElementById` calls that reach outside the view. **Fix BEFORE any migration** | 🔴 **Ready to build** | Next |
+> | **THREAD-1b-char** | Characterisation gate: prove what onboarding does today, before changing it | 🔵 Ready | Before THREAD-1b |
 > | **THREAD-1b** | Migrate onboarding onto the runner; delete the second renderer | 🟢 **Approved by Graeme 22 Aug** — gated on CONSENT-1 and the characterisation gate | — |
 > | **THREAD-2** | Should goal-setting generally be conversational? **Undecided** | 🟠 Open question | — |
 > | **R2-b** | The demonstration at upgrade. **Needs a discovery session before a spec** — the revenue document's acceptance criteria for it were written against the pre-correction boundary | 🟠 Needs discovery | w/c 31 Aug |
@@ -4710,4 +4690,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v225*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v224*
