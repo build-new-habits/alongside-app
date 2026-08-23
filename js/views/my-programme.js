@@ -1,6 +1,23 @@
 /**
  * my-programme.js - My Programme
  *
+ * 22 Aug 2026 v7
+ *
+ * v7 - THREAD-1a. The three options are GONE from this screen. What
+ *   remains is a quiet invitation; the conversation itself happens in
+ *   views/goal-review-thread.js.
+ *
+ *   v6 shipped copy that asked "Shall we look at it together?" and then
+ *   answered with a date input and a Save button. The mismatch was the
+ *   small fault. The real one: the coach speaks in bubbles while getting
+ *   to know somebody and handed them a FORM the moment the conversation
+ *   turned difficult -- the interaction that most needs to feel like a
+ *   person, built most like an admin screen.
+ *
+ *   The invitation does NOT auto-open. A typing indicator starting while
+ *   somebody is mid-scroll on a browsable screen is an ambush, and this
+ *   is the one conversation that must never ambush.
+ *
  * 22 Aug 2026 v6
  *
  * v6 - R1-b. The hard conversation gets a surface, and the target
@@ -146,11 +163,6 @@ export function MyProgrammeView(router) {
   // Whether the picker is open is not a fact about the person, so it
   // lives here and not in the store.
   let _focusEditing = false;
-
-  // Which branch of the hard conversation is open: null | 'move' |
-  // 'reshape'. Same reasoning -- it is a fact about this render, not
-  // about the person, so it never reaches the store.
-  let _reviewOpen = null;
 
   function mount(container) {
     // Idempotent, and it returns early unless a week has genuinely
@@ -541,73 +553,31 @@ export function MyProgrammeView(router) {
     const r = evaluateGoalReview(_reviewContext());
     if (!r.offer) return null;
 
-    if (_reviewOpen === 'move') return _reviewMovePanel(r);
-    if (_reviewOpen === 'reshape') return _reviewReshapePanel(r);
-
+    // An invitation, and only an invitation. The conversation lives at
+    // the 'goal-review' route. Nothing here opens itself.
+    //
+    // It says enough to be a real choice -- somebody should know what
+    // they are agreeing to talk about before they tap -- and no more,
+    // because the whole point is that the coach does not deliver this
+    // sideways on a screen the person opened for another reason.
     return `
       <div class="my-programme-review" role="group"
            aria-label="About the date you are working towards">
         <p class="my-programme-review__body">
           I have been looking at ${_esc(r.targetDescription)} and the date you
-          set. At the pace things are going, that date is a harder ask than it
-          needs to be. Nothing has gone wrong — life does this. Shall we look
-          at it together?
+          set. Nothing has gone wrong — but I think it is worth a conversation
+          when you have a minute.
         </p>
         <div class="my-programme-review__actions">
-          <button class="btn btn-secondary btn-small" data-review="move">
-            Move the date
-          </button>
-          <button class="btn btn-secondary btn-small" data-review="reshape">
-            Reshape the target
-          </button>
-          <button class="btn btn-secondary btn-small" data-review="keep">
-            Leave it where it is
+          <button class="btn btn-secondary btn-small" data-review="open">
+            Have that conversation
           </button>
         </div>
       </div>
     `;
   }
 
-  function _reviewMovePanel(r) {
-    return `
-      <div class="my-programme-review" role="group" aria-label="Move the date">
-        <label class="my-programme-review__label" for="review-date">
-          When would you like to aim for instead?
-        </label>
-        <input class="my-programme-review__input" id="review-date" type="date"
-               value="${_esc(r.targetDate || '')}">
-        <div class="my-programme-review__actions">
-          <button class="btn btn-primary btn-small" data-review="save-move">Save it</button>
-          <button class="btn btn-ghost btn-small" data-review="cancel">Never mind</button>
-        </div>
-      </div>
-    `;
-  }
 
-  /**
-   * Reshape. Both fields PRE-FILLED with the person's existing words --
-   * a blank box would imply the old answer was wrong, and it wasn't.
-   */
-  function _reviewReshapePanel(r) {
-    return `
-      <div class="my-programme-review" role="group" aria-label="Reshape the target">
-        <label class="my-programme-review__label" for="review-what">
-          What are you working towards?
-        </label>
-        <input class="my-programme-review__input" id="review-what" type="text"
-               maxlength="60" value="${_esc(r.targetDescription || '')}">
-        <label class="my-programme-review__label" for="review-when">
-          And by when?
-        </label>
-        <input class="my-programme-review__input" id="review-when" type="date"
-               value="${_esc(r.targetDate || '')}">
-        <div class="my-programme-review__actions">
-          <button class="btn btn-primary btn-small" data-review="save-reshape">Save it</button>
-          <button class="btn btn-ghost btn-small" data-review="cancel">Never mind</button>
-        </div>
-      </div>
-    `;
-  }
 
   function _describeTargetInvite() {
     return `
@@ -626,27 +596,6 @@ export function MyProgrammeView(router) {
     `;
   }
 
-  /**
-   * Record an outcome and close the conversation.
-   *
-   * lastOfferedAt is set HERE and only here -- when an offer was shown
-   * and answered. A suppressed offer never reaches this function, so a
-   * fortnight of low mood cannot silently spend the throttle.
-   */
-  function _recordReviewOutcome(choice, previousDate, newDate) {
-    const review = store.get('strategicGoal.review') || { lastOfferedAt: null, outcomes: [] };
-    const outcomes = Array.isArray(review.outcomes) ? review.outcomes.slice() : [];
-    outcomes.push({
-      at: new Date().toISOString(),
-      choice,
-      previousDate: previousDate || null,
-      newDate: newDate || null
-    });
-    store.set('strategicGoal.review', {
-      lastOfferedAt: new Date().toISOString(),
-      outcomes
-    });
-  }
 
   // ── What Personal adds ──────────────────────────────────────────────
 
@@ -727,79 +676,21 @@ export function MyProgrammeView(router) {
 
     // ── The hard conversation ──────────────────────────────────────
     //
-    // Every branch writes to strategicGoal.* and NEVER to the top-level
-    // targetDate/targetDescription pair. Two editors for one field is
-    // what caused TARGET-3; this one does not add a third writer to the
-    // legacy home.
-    container.querySelectorAll('[data-review]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const action = btn.dataset.review;
-        const sg = store.get('strategicGoal') || {};
-        const previousDate = sg.targetDate || store.get('targetDate') || null;
+    // One job now: go there. Every branch, every write and the throttle
+    // all live in views/goal-review-thread.js, because the conversation
+    // is a place you enter rather than a panel that unfolds here.
+    container.querySelector('[data-review="open"]')
+      ?.addEventListener('click', () => router.navigate('goal-review'));
 
-        if (action === 'move' || action === 'reshape') {
-          _reviewOpen = action;
-          render(container);
-          // Focus the first field so the keyboard lands where the person
-          // is being asked to type. WCAG 2.2 AA: the panel replaced the
-          // control that opened it, so focus must be moved deliberately
-          // or it falls back to the document.
-          container.querySelector('#review-date, #review-what')?.focus();
-          return;
-        }
-
-        if (action === 'cancel') {
-          _reviewOpen = null;
-          render(container);
-          return;
-        }
-
-        // "Leave it where it is" is a REAL answer, recorded like any
-        // other. It is not a dismissal and it is not asked again inside
-        // the throttle.
-        if (action === 'keep') {
-          _recordReviewOutcome('kept', previousDate, previousDate);
-          _reviewOpen = null;
-          render(container);
-          return;
-        }
-
-        if (action === 'save-move') {
-          const v = container.querySelector('#review-date')?.value;
-          if (v) {
-            store.set('strategicGoal.targetDate', v);
-            store.set('strategicGoal.targetSetAt', new Date().toISOString());
-            _recordReviewOutcome('moved', previousDate, v);
-          }
-          _reviewOpen = null;
-          render(container);
-          return;
-        }
-
-        if (action === 'save-reshape') {
-          const what = container.querySelector('#review-what')?.value?.trim();
-          const when = container.querySelector('#review-when')?.value;
-          if (what) store.set('strategicGoal.targetDescription', what);
-          if (when) {
-            store.set('strategicGoal.targetDate', when);
-            store.set('strategicGoal.targetSetAt', new Date().toISOString());
-          }
-          _recordReviewOutcome('reshaped', previousDate, when || previousDate);
-          _reviewOpen = null;
-          render(container);
-          return;
-        }
-
-        // The description invitation. NOT part of the conversation, so
-        // it records no outcome and does not touch the throttle -- it is
-        // somebody filling in their own words, not answering a question.
-        if (action === 'save-describe') {
-          const what = container.querySelector('#target-describe')?.value?.trim();
-          if (what) store.set('strategicGoal.targetDescription', what);
-          render(container);
-        }
+    // The description invitation stays HERE, not in the thread. It is
+    // not part of the conversation: it is somebody filling in their own
+    // words, so it records no outcome and never touches the throttle.
+    container.querySelector('[data-review="save-describe"]')
+      ?.addEventListener('click', () => {
+        const what = container.querySelector('#target-describe')?.value?.trim();
+        if (what) store.set('strategicGoal.targetDescription', what);
+        render(container);
       });
-    });
   }
 
   function _daysUntil(iso) {

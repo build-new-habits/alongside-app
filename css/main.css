@@ -1,4 +1,9 @@
 /* main.css
+ * 22 Aug 2026 v24
+ *   THREAD-1a. layouts/goal-review.css -- the hard conversation's own
+ *   screen. Two rules; everything inside the thread reuses onboarding's
+ *   ob- classes so the coach cannot look different in different places.
+ *
  * 18 Aug 2026 v23
  *
  * v23 - PRAC-1. components/practices.css imported.
@@ -87,6 +92,7 @@
 @import 'layouts/progress.css';
 @import 'layouts/today.css';
 @import 'layouts/my-programme.css';
+@import 'layouts/goal-review.css';
 @import 'layouts/conditions-update.css';
 @import 'layouts/library.css';
 @import 'layouts/mobility-conditioning.css';
