@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v398
+ * THREAD-1a. THREE new files added to the precache list --
+ * js/views/thread-runner.js, js/data/goal-review-script.js and
+ * js/views/goal-review-thread.js -- plus the cache bump.
+ *
+ * css/layouts/goal-review.css is NOT listed separately and does not
+ * need to be: main.css @imports it, and main.css is already precached.
+ *
  * 22 Aug 2026 v397
  * R1-b. Cache bump only. my-programme.js v6 and
  * css/layouts/my-programme.css v3 are both already in the precache
@@ -2754,7 +2762,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v397";
+const CACHE_NAME = "alongside-v398";
 
 const SHELL_URLS = [
 
@@ -2934,6 +2942,9 @@ const SHELL_URLS = [
   "/alongside-app/js/data/equipment.js",
   "/alongside-app/js/data/goals.js",
   "/alongside-app/js/data/goal-review.js",
+  "/alongside-app/js/data/goal-review-script.js",
+  "/alongside-app/js/views/thread-runner.js",
+  "/alongside-app/js/views/goal-review-thread.js",
   "/alongside-app/js/data/weight-targets.js",
   "/alongside-app/js/data/plan-options.js",
   "/alongside-app/js/data/pricing.js",
