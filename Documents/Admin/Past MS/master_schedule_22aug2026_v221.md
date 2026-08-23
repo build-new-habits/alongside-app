@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v222
+## 22 Aug 2026 v221
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v221.md`. Remove v221 on upload.
+Supersedes `master_schedule_22aug2026_v220.md`. Remove v220 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -152,32 +152,6 @@ Supersedes `master_schedule_22aug2026_v221.md`. Remove v221 on upload.
 >
 > ---
 >
-> ### 🟢 R2-a UNBLOCKED — hinge copy agreed, and the order SWAPS
->
-> The hinge line at `today.js:1033` has been flagged as blocking four times and never addressed. Exact live text:
->
-> > *"Is there anything you're working towards? A date in the diary, if you have one — **it changes nothing about how I work**, but I'll keep it in view."*
->
-> Two things break it: R2-a makes it Plan-only, and after R1-b the claim is simply untrue.
->
-> #### 🔴 R1-b NOW RUNS BEFORE R2-a
->
-> **If R2-a ships first, the new copy would promise something not yet built** — the exact fault `verify-plain1` exists to catch. Writing an interim line instead means touching `today.js` twice, which breaks touch-once.
->
-> R1-b does not need targets to be Plan-only: it already checks `isPremium()`. **So nothing is lost by swapping, and R2-a then writes the final copy once, at the point it is true.**
->
-> #### 🟢 Agreed replacement copy
->
-> > *"Is there anything you're working towards? A date in the diary, if you have one. I'll keep it in view — and if it starts looking like a harder ask than it needs to be, I'll say so."*
->
-> Claims **only what R1 actually does.** Deliberately **not** *"I'll build towards it"* — the programme does not plan around the date and will not after R1-b, since chapters are twelve weeks regardless. It gives a real reason to name a date, and it warns the person the hard conversation exists **before** it happens, so it does not arrive as a surprise.
->
-> #### 🟢 Free sees nothing here — no locked teaser on Today
->
-> A *"the Plan can do this"* prompt on the screen somebody opens every morning is pressure on the wrong surface. **The locked block in My Programme already does that job where it belongs.**
->
-> ---
->
 > ### 🟢 WEIGHT-1 CONFIRMED 22 Aug — scope v3, 1a cleared to build
 >
 > All five points confirmed. Two things changed in the confirming.
@@ -298,7 +272,7 @@ Supersedes `master_schedule_22aug2026_v221.md`. Remove v221 on upload.
 >
 > | ID | Task | Status | Target |
 > |---|---|---|---|
-> | **WEIGHT-1a** | Shipped `alongside-v396`. `weight-targets.js`, store v56, Schema v1.39, `goals.js` flatMap fixed, `goal-review.js` v2, 2 new gates | 🟢 **SHIPPED 22 Aug** | Done |
+> | **WEIGHT-1a** | Constants, banding, validator, unit conversion + `st+lb` formatting, schema, `goals.js` fix, R1 conditionality, gates. **No views** | 🟢 **CLEARED TO BUILD** | Next |
 > | **WEIGHT-1b** | Settings toggle, logging surface, target surface. **After R1-b** | 🟠 Scoped | Before beta |
 > | ~~UNIT-1~~ | **Folded into WEIGHT-1a** — not separable, see below | 🟢 Merged | — |
 > | **UNIT-1** | `weightUnit` has no writer — `session-log.js:179` always labels the field `kg` | 🔵 Specified | w/c 31 Aug |
@@ -678,8 +652,8 @@ Supersedes `master_schedule_22aug2026_v221.md`. Remove v221 on upload.
 > | ID | Task | Status | Target |
 > |---|---|---|---|
 > | **R1-a** | Detection, dark — `Schema.md` v1.38, `store.js` v55, `js/data/goal-review.js`, `verify-hard1.mjs` + `verify-hard1-store.mjs`, `sw.js` v393 | 🟢 **SHIPPED 21 Aug** | Done |
-> | **R2-a** | Boundary correction — `today.js` alone. **NOW RUNS AFTER R1-b** | 🔵 Ready, sequenced after R1-b | w/c 24 Aug |
-> | **R1-b** | The surface — `my-programme.js` does **both** jobs in one visit: tier-gates the target display, and renders the three options. **NOW RUNS BEFORE R2-a** | 🔵 **NEXT** | w/c 24 Aug |
+> | **R2-a** | Boundary correction — target entry gated to the Plan; `targetSetAt` written. **Scope reduced to `today.js` alone** — the second site is in a view that does not load (GOAL-SETUP-1) | 🟠 Blocked on GOAL-SETUP-1 | w/c 24 Aug |
+> | **R1-b** | The surface — `my-programme.js` does **both** jobs in one visit: tier-gates the target display, and renders the three options. `sw.js` v395 | 🔵 Ready to build | w/c 24 Aug |
 > | **R2-b** | The demonstration at upgrade. **Needs a discovery session before a spec** — the revenue document's acceptance criteria for it were written against the pre-correction boundary | 🟠 Needs discovery | w/c 31 Aug |
 > | **R3** | Recognition without an arc, in free — *"same as last time?"*. Reads **one** log entry, never a pattern | 🔵 Specified | w/c 24 Aug |
 > | **R4** | Self-direction to free — **document → gate → code**, in that order | 🔵 Specified | w/c 24 Aug |
@@ -4614,4 +4588,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v222*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v221*
