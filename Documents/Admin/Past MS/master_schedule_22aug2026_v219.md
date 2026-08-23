@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v220
+## 22 Aug 2026 v219
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v219.md`. Remove v219 on upload.
+Supersedes `master_schedule_22aug2026_v218.md`. Remove v218 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -152,39 +152,6 @@ Supersedes `master_schedule_22aug2026_v219.md`. Remove v219 on upload.
 >
 > ---
 >
-> ### 🟠 WEIGHT-1 SCOPED — `alongside_weight1_build_scope_22aug2026_v1.md` v1
->
-> **No code written.** Five confirmations needed first — see §7 of the scope.
->
-> #### 🔴 The finding that reshaped it: no unit conversion exists anywhere
->
-> Searched `2.2046`, `0.4536`, `lbToKg`, `kgToLb`, `toKg` — **nothing in the codebase.** `weightUnit` defaults to `kg` and has no writer.
->
-> **The agreed bands are stated in POUNDS. The store's default unit is KILOGRAMS.** Shipping a band check without a canonical unit means a threshold that silently means different things to different people — and the **≥ 4 lb refusal is the one place in this product where being wrong by a factor of 2.2 is unacceptable.**
->
-> So: **all weights stored in kg, canonical, always.** Display converts. Bands computed in kg from constants derived once from the agreed pound figures. **UNIT-1 folds into WEIGHT-1a and closes** — it was never separable.
->
-> #### Other ground truth
->
-> - 🟠 **`settings.js` has NO tier gate at all** — it does not import `isPremium` or `lockedFeature`. WEIGHT-1b introduces the first one, which is a precedent rather than a line. `library.js:144` and `my-programme.js:99` are the pattern
-> - 🟢 **The toggle pattern exists** — `hormonalTracking` at `settings.js:727` is the exact analogue, handled generically at `:1983`. **Reuse, do not fork**
-> - 🟢 **The `goals.js` flatMap fix is safe** — all six consumers of flat `GOALS` read only `id`, `label`, `name`, `category`. **None reads `hasTarget` or `targetType`**, so adding them cannot change existing behaviour
-> - 🟢 **`validateWeightTarget()` gets rewritten, not moved** — relocating dead code out of a large live file is the worse trade. Original archived; its copy is good and gets reused
->
-> #### 🔴 The constants block, and the line that matters most in it
->
-> All clinical numbers live in ONE named block marked **PROVISIONAL**, and **every gate references the constants — no gate hardcodes a number.** Otherwise one clinician email turns a dozen gates red and somebody edits assertions under time pressure, which is how a safety threshold gets quietly loosened for the wrong reason.
->
-> ⚠️ **A second block, marked NOT PROVISIONAL**, holds the three rules that are product philosophy rather than clinical calibration: never prompt a weigh-in · no arithmetic on the body · the refusal declines the field, not the person. **A future session tuning numbers must not read these as tunable.**
->
-> #### Split, for the same reason R1 split
->
-> **WEIGHT-1a is dark** — no views, inert by construction, which is the honest reading of *"ship nothing before the clinical reply."* **WEIGHT-1b needs R1-b landed first**, because `my-programme.js` is spoken for and the weight target belongs beside the other targets.
->
-> 🟢 **New field `strategicGoal.weightTargetBand`** records which band accepted a target at set-time. If a threshold ever tightens, that is the difference between a clean audit and re-deriving intent from arithmetic months later. **Cheap now, impossible retrospectively.**
->
-> ---
->
 > ### 🟢 WEIGHT-1 DECIDED — tracking is a feature, off by default, Plan-only
 >
 > `alongside_weight_targets_audit_22aug2026_v1.md` **v2**. 🔴 **The audit's own recommendation was rejected, and rightly.**
@@ -243,9 +210,7 @@ Supersedes `master_schedule_22aug2026_v219.md`. Remove v219 on upload.
 >
 > | ID | Task | Status | Target |
 > |---|---|---|---|
-> | **WEIGHT-1a** | Constants, banding, validator, unit conversion, schema, `goals.js` fix, R1 conditionality, gates. **No views** | 🟠 Scoped, awaiting 5 confirmations | Before beta |
-> | **WEIGHT-1b** | Settings toggle, logging surface, target surface. **After R1-b** | 🟠 Scoped | Before beta |
-> | ~~UNIT-1~~ | **Folded into WEIGHT-1a** — not separable, see below | 🟢 Merged | — |
+> | **WEIGHT-1** | **DECIDED 22 Aug — now a BUILD, not a deletion.** See the block above | 🔵 Ready to scope | Before beta |
 > | **UNIT-1** | `weightUnit` has no writer — `session-log.js:179` always labels the field `kg` | 🔵 Specified | w/c 31 Aug |
 >
 > ---
@@ -4559,4 +4524,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v220*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v219*
