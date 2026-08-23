@@ -1,5 +1,38 @@
 /**
  * today.js
+ * 22 Aug 2026 v24
+ *   R2-a. THE BOUNDARY CORRECTION. A dated target can only be recorded
+ *   on the Plan.
+ *
+ *   Not a change to the boundary -- the boundary always said "free has
+ *   goals, the Plan has targets". The code had drifted: this hinge let a
+ *   free user record a dated target, and my-programme.js displayed it to
+ *   them. Graeme, 22 Aug: it is the act of telling the coach your goal
+ *   that is the "I want you to do something with this" moment. Anyone is
+ *   welcome to own their goals on paper; the coach will not do anything
+ *   with that.
+ *
+ *   GOALS ARE UNTOUCHED AND STAY FREE. programmes.js matches on them and
+ *   workoutGenerator.js uses them for the session rationale, so removing
+ *   them would degrade free -- and it would break the anecdote, because
+ *   the drop-in coach DOES ask what you want to do. What he does not
+ *   hold is where you are going and by when.
+ *
+ *   FREE SEES NOTHING HERE. No locked teaser. A "the Plan can do this"
+ *   prompt on the screen somebody opens every morning is pressure on the
+ *   wrong surface; the locked block in My Programme already does that
+ *   job where it belongs.
+ *
+ *   The copy changed too. It used to say naming a date "changes nothing
+ *   about how I work", which was true when nothing read the date and is
+ *   false now that R1 does. It now claims ONLY what R1 actually does --
+ *   deliberately not "I'll build towards it", because the programme does
+ *   not plan around the date and chapters are twelve weeks regardless.
+ *
+ *   And it writes strategicGoal.targetSetAt. setAt records when the
+ *   weekly FREQUENCY was agreed, which is a different fact; using it for
+ *   R1's maturity guard meant the guard protected the wrong thing.
+ *
  * 20 Aug 2026 v23
  *   R4. SELF-DIRECTION IS FREE. The 12 Aug boundary charged for
  *   CONTROL -- "Full body only. The coach decides." Retired: choosing
@@ -707,7 +740,16 @@ export function TodayView(router) {
           // "the wedding" is a real answer even before anybody has
           // booked anything.
           if (what) store.set('strategicGoal.targetDescription', what);
-          if (when) store.set('strategicGoal.targetDate', new Date(when).toISOString());
+          if (when) {
+            store.set('strategicGoal.targetDate', new Date(when).toISOString());
+            // R2-a. When the DATE was named. Distinct from setAt, which
+            // plan-select.js and thread.js write when the weekly
+            // frequency is agreed. R1's maturity guard exists to stop
+            // the coach judging a target it has barely seen, and setAt
+            // cannot do that job -- it gave no protection at all to a
+            // date named through this hinge last week.
+            store.set('strategicGoal.targetSetAt', new Date().toISOString());
+          }
         }
 
         // Asked once, whether they answered or not. Recorded on both
@@ -1002,6 +1044,12 @@ export function TodayView(router) {
    * because a skip button makes ignoring it feel like a decision.
    */
   function _eventPrompt() {
+    // R2-a. Plan only, and silently -- free is not shown a locked
+    // version. Free is complete in itself and limited in horizon; it is
+    // never degraded to create pressure, and a teaser on the morning
+    // screen would be exactly that.
+    if (!isPremium()) return '';
+
     const alreadyAsked = !!store.get('programme.hingeOfferedAt');
     const hasTarget    = !!(store.get('strategicGoal.targetDate') || store.get('targetDate'));
     const firstHinge   = (store.get('programme.chaptersDone') || []).length <= 1;
@@ -1030,7 +1078,8 @@ export function TodayView(router) {
     return `
       <p class="today-hinge__aside">
         Is there anything you're working towards? A date in the diary, if you
-        have one — it changes nothing about how I work, but I'll keep it in view.
+        have one. I'll keep it in view — and if it starts looking like a harder
+        ask than it needs to be, I'll say so.
         <button class="btn btn-ghost btn-small" data-event="open"
                 aria-label="Tell me what you are working towards">Tell me</button>
       </p>
