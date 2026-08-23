@@ -1,5 +1,12 @@
 /**
  * tools/verify-hard1b.mjs
+ * 22 Aug 2026 v2
+ * THREAD-1a. The three options moved OFF this screen into the
+ * conversation at views/goal-review-thread.js. What this gate now
+ * asserts about My Programme is narrower and, in one respect, more
+ * important: the invitation must NOT auto-open. Branch behaviour moved
+ * to tools/verify-thread1.mjs.
+ *
  * 22 Aug 2026 v1
  *
  * R1-b — the hard conversation's surface, and the target tier gate.
@@ -146,22 +153,29 @@ section("1. Free never sees a dated target");
 }
 
 // ── 2. The offer ────────────────────────────────────────────────────
-section("2. The offer renders with three real options");
+section("2. The invitation, and it does not open itself");
 {
   const { el } = await mount(offCourseState());
-  const opts = [...el.querySelectorAll("[data-review]")].map(b => b.dataset.review);
-  ok("offer is present", el.querySelector(".my-programme-review") !== null);
-  ok("all three options present", ["move", "reshape", "keep"].every(k => opts.includes(k)), opts.join(","));
+  ok("invitation is present", el.querySelector(".my-programme-review") !== null);
   ok("it uses the person's own words", txt(el).includes("Quantocks"));
 
-  // "Leave it where it is" must not be visually demoted. A ghost button
-  // beside two solid ones is a nudge wearing a choice's clothes.
-  const cls = k => el.querySelector(`[data-review="${k}"]`).className;
-  ok("all three carry the same button weight",
-     cls("move") === cls("reshape") && cls("reshape") === cls("keep"),
-     `${cls("move")} | ${cls("keep")}`);
-  ok("none of the three is a ghost button",
-     !["move", "reshape", "keep"].some(k => /btn-ghost/.test(cls(k))));
+  // THE POINT OF THREAD-1a. A typing indicator starting while somebody
+  // is mid-scroll is an ambush, and this is the one conversation that
+  // must never ambush.
+  ok("NO thread rendered on this screen", el.querySelector(".ob-thread") === null);
+  ok("no typing indicator on this screen", el.querySelector(".ob-typing") === null);
+  ok("no bubbles on this screen", el.querySelector(".ob-bubble") === null);
+
+  // One control, and it goes somewhere rather than unfolding.
+  const controls = [...el.querySelectorAll("[data-review]")].map(b => b.dataset.review);
+  ok("a single invitation control", controls.filter(c => c === "open").length === 1, controls.join(","));
+  ok("the old inline panels are gone",
+     !controls.includes("move") && !controls.includes("reshape") && !controls.includes("keep"));
+  ok("tapping it does not mutate anything", (() => {
+    const before = JSON.stringify(store.get("strategicGoal.review"));
+    el.querySelector('[data-review="open"]').dispatchEvent(new dom.window.Event("click"));
+    return JSON.stringify(store.get("strategicGoal.review")) === before;
+  })());
 }
 
 // ── 3. NO ARITHMETIC ON THE PERSON ──────────────────────────────────
@@ -207,64 +221,12 @@ section("5. A suppressed offer leaves the throttle untouched");
      String(store.get("strategicGoal.review").lastOfferedAt));
 }
 
-// ── 6. The three branches write what they claim ─────────────────────
-section("6. Each option records an outcome and closes the conversation");
-{
-  // Leave it where it is.
-  {
-    const { el, store } = await mount(offCourseState());
-    el.querySelector('[data-review="keep"]').dispatchEvent(new dom.window.Event("click"));
-    const r = store.get("strategicGoal.review");
-    ok("keep records an outcome", r.outcomes.length === 1 && r.outcomes[0].choice === "kept",
-       JSON.stringify(r.outcomes));
-    ok("keep sets lastOfferedAt", typeof r.lastOfferedAt === "string");
-    ok("the offer is gone afterwards", el.querySelector(".my-programme-review") === null);
-  }
-
-  // Move the date.
-  {
-    const { el, store } = await mount(offCourseState());
-    el.querySelector('[data-review="move"]').dispatchEvent(new dom.window.Event("click"));
-    const input = el.querySelector("#review-date");
-    ok("move opens a date field", input !== null);
-    input.value = day(120);
-    el.querySelector('[data-review="save-move"]').dispatchEvent(new dom.window.Event("click"));
-    const r = store.get("strategicGoal.review");
-    ok("move records the new date", r.outcomes[0]?.choice === "moved" && r.outcomes[0]?.newDate === day(120),
-       JSON.stringify(r.outcomes[0]));
-    ok("the target date actually moved", store.get("strategicGoal.targetDate") === day(120));
-    ok("targetSetAt is refreshed, so maturity restarts",
-       typeof store.get("strategicGoal.targetSetAt") === "string" &&
-       store.get("strategicGoal.targetSetAt") > iso(-1));
-    ok("the legacy top-level date was NOT written", !store.get("targetDate"));
-  }
-
-  // Reshape, pre-filled.
-  {
-    const { el, store } = await mount(offCourseState());
-    el.querySelector('[data-review="reshape"]').dispatchEvent(new dom.window.Event("click"));
-    const what = el.querySelector("#review-what");
-    ok("reshape pre-fills the person's existing words",
-       what?.value === "Walk the Quantocks ridge with Jen", String(what?.value));
-    ok("reshape pre-fills the existing date", el.querySelector("#review-when")?.value?.length === 10);
-    what.value = "Walk the ridge with Jen and the dog";
-    el.querySelector('[data-review="save-reshape"]').dispatchEvent(new dom.window.Event("click"));
-    ok("reshape saves the new words",
-       store.get("strategicGoal.targetDescription") === "Walk the ridge with Jen and the dog");
-    ok("reshape records an outcome", store.get("strategicGoal.review").outcomes[0]?.choice === "reshaped");
-  }
-
-  // Never mind.
-  {
-    const { el, store } = await mount(offCourseState());
-    el.querySelector('[data-review="move"]').dispatchEvent(new dom.window.Event("click"));
-    el.querySelector('[data-review="cancel"]').dispatchEvent(new dom.window.Event("click"));
-    ok("cancel returns to the offer", el.querySelector('[data-review="move"]') !== null);
-    ok("cancel records NOTHING", store.get("strategicGoal.review").outcomes.length === 0);
-    ok("cancel does not consume the throttle",
-       store.get("strategicGoal.review").lastOfferedAt === null);
-  }
-}
+// ── 6. Branch behaviour moved to verify-thread1.mjs ────────────────
+//
+// Move / reshape / leave-it, their writes and the throttle now live in
+// the conversation, so they are asserted where they live. Nothing is
+// lost: verify-thread1 mounts the thread the same way this gate mounts
+// this screen.
 
 // ── 7. The description invitation ───────────────────────────────────
 section("7. A date with no words gets an invitation, not an error");
@@ -295,11 +257,17 @@ section("8. WCAG 2.2 AA basics");
   const { el } = await mount(offCourseState());
   ok("the offer is a labelled group",
      el.querySelector('.my-programme-review[role="group"][aria-label]') !== null);
-  el.querySelector('[data-review="move"]').dispatchEvent(new dom.window.Event("click"));
-  ok("the date field has a real <label for>",
-     el.querySelector('label[for="review-date"]') !== null);
   ok("every review control is a real button",
      [...el.querySelectorAll("[data-review]")].every(n => n.tagName === "BUTTON"));
+
+  // The description field keeps a real <label for>. Placeholder-as-label
+  // fails WCAG 3.3.2, and this one has no coach bubble above it to act
+  // as the visible question -- unlike the thread's inputs.
+  const st = offCourseState();
+  delete st.strategicGoal.targetDescription;
+  const { el: el2 } = await mount(st);
+  ok("the description field has a real <label for>",
+     el2.querySelector('label[for="target-describe"]') !== null);
 }
 
 console.log(`\n${"-".repeat(60)}`);

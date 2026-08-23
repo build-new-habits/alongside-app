@@ -1,5 +1,10 @@
 /**
  * router.js
+ * 22 Aug 2026 v22
+ *   THREAD-1a. New 'goal-review' route -- the hard conversation, which
+ *   is entered from My Programme rather than opened over it. Back goes
+ *   to my-programme, not today.
+ *
  * 22 Aug 2026 v21
  *   CHOOSER-1. The 'goal-setup' route now resolves to
  *   views/programme-select.js. The old target,
@@ -193,6 +198,9 @@ const VIEW_NAMES = {
   'activity-log':      { path: './views/activity-log.js',     fn: 'ActivityLogView'     },
   'library':           { path: './views/library.js',          fn: 'LibraryView'         },
   'my-programme':      { path: './views/my-programme.js',     fn: 'MyProgrammeView'     },
+  // THREAD-1a. The hard conversation is ENTERED from My Programme's
+  // invitation, never opened over the top of it.
+  'goal-review':       { path: './views/goal-review-thread.js', fn: 'GoalReviewThreadView' },
   // 'about' removed 11 Aug 2026. It pointed at a view file that had
   // never been written, while settings.js has had a working About panel
   // all along. Two Abouts would be two places to maintain the same
@@ -289,6 +297,7 @@ const NAV_MAP = {
   'practices': 'today',
   // CHAP-1 step 2. Reached only from Home's full-width row.
   'my-programme': 'today',
+  'goal-review': 'my-programme',
   'settings': 'settings', 'privacy': 'settings',
   'upgrade': 'settings', 'goal-setup': 'settings',
   'community-impact': 'settings', 'annual-reflection': 'settings',

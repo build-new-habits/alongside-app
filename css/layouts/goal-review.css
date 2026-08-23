@@ -1,0 +1,29 @@
+/*
+ * css/layouts/goal-review.css
+ * 22 Aug 2026 v1
+ *   THREAD-1a. The hard conversation's own screen.
+ *
+ *   Two rules only. Everything inside the thread -- bubbles, typing,
+ *   chips, the input bar -- reuses the ob- classes that onboarding
+ *   already defines, deliberately. If this screen had its own bubble
+ *   styles the coach could start looking subtly different depending on
+ *   which conversation you were in, which is a philosophy problem
+ *   wearing a CSS costume.
+ */
+
+.goal-review-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/*
+ * Back is always reachable. Somebody who opens this and decides they do
+ * not want it today must be able to leave without answering -- and
+ * leaving costs nothing, because the throttle is only spent on an
+ * answer. See goal-review-thread.js.
+ */
+.goal-review-back {
+  margin-top: auto;
+  min-height: 44px;
+}
