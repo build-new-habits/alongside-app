@@ -1,5 +1,26 @@
 /**
  * js/views/onboarding/thread.js
+ * 22 Aug 2026 v13
+ *   CONSENT-2. The consent gate no longer reaches outside the view, and
+ *   no longer has an unguarded dereference.
+ *
+ *   Five document.getElementById() calls became _thread.querySelector().
+ *   The old form depended on the view being attached to the document AND
+ *   on ob-consent-* IDs staying globally unique app-wide, enforced by
+ *   nothing.
+ *
+ *   continueBtn.classList.add('is-inactive') had NO optional chaining --
+ *   the only unguarded dereference in the function -- so a missing
+ *   element threw and ONBOARDING DIED ON THE SCREEN THAT CAPTURES LEGAL
+ *   CONSENT. error.hidden was unguarded in two further places.
+ *
+ *   Failure is now loud: a missing element logs to console.error rather
+ *   than passing silently, because somebody using the app with no
+ *   consent record is a problem that otherwise looks like nothing.
+ *
+ *   Behaviour is unchanged when the markup is present. Gated by
+ *   tools/verify-consent1.mjs, which drives the real gate.
+ *
  * 15 Aug 2026 v12
  *
  * v12 - TARGET-1. Step 12 now writes strategicGoal.setAt. Its only
@@ -43,27 +64,6 @@
  *
  *   AGE_GATE_ENABLED is present and false. Do not flip it until A1.11
  *   (ToS 13+ vs business-doc 16+) is resolved and Natalie's advice lands.
- *
- * 22 Aug 2026 v13
- *   CONSENT-1. The consent gate no longer reaches outside the view, and
- *   no longer has an unguarded dereference.
- *
- *   Five document.getElementById() calls became _thread.querySelector().
- *   The old form depended on the view being attached to the document AND
- *   on ob-consent-* IDs staying globally unique app-wide, enforced by
- *   nothing.
- *
- *   continueBtn.classList.add('is-inactive') had NO optional chaining --
- *   the only unguarded dereference in the function -- so a missing
- *   element threw and ONBOARDING DIED ON THE SCREEN THAT CAPTURES LEGAL
- *   CONSENT. error.hidden was unguarded in two further places.
- *
- *   Failure is now loud: a missing element logs to console.error rather
- *   than passing silently, because somebody using the app with no
- *   consent record is a problem that otherwise looks like nothing.
- *
- *   Behaviour is unchanged when the markup is present. Gated by
- *   tools/verify-consent1.mjs, which drives the real gate.
  *
  * 03 Jul 2026 v7
  *
@@ -397,7 +397,7 @@ export function ThreadView(router) {
       </section>
     `;
 
-    // CONSENT-1, 22 Aug 2026. Scoped to _thread, which is the element
+    // CONSENT-2, 22 Aug 2026. Scoped to _thread, which is the element
     // the markup above was just written into.
     //
     // These were document.getElementById(). Two problems with that on
