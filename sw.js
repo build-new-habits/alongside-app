@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v399
+ * CONSENT-2. Cache bump only -- no new files. onboarding/thread.js is
+ * already precached; the bump is what carries the fixed consent gate to
+ * a device holding the old one.
+ *
+ * Worth the bump on its own: the version it replaces could throw
+ * mid-render on the screen that captures legal consent.
+ *
  * 22 Aug 2026 v398
  * THREAD-1a. THREE new files added to the precache list --
  * js/views/thread-runner.js, js/data/goal-review-script.js and
@@ -2762,7 +2770,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v398";
+const CACHE_NAME = "alongside-v399";
 
 const SHELL_URLS = [
 
