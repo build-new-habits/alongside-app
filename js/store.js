@@ -1,5 +1,30 @@
 /**
  * store.js - Data persistence layer
+ * 22 Aug 2026 v56
+ *   WEIGHT-1a. Weight tracking declared, dark. A feature, off by
+ *   default, Plan-only at the surface.
+ *
+ *   weightTracking -- the opt-in. Turning it on is the consent: it is
+ *   what lets the coach speak to a weight target at all.
+ *
+ *   weight / targetWeight / weightLog are CANONICAL KILOGRAMS, ALWAYS.
+ *   weightUnit is a DISPLAY PREFERENCE and never affects what is
+ *   stored. Somebody who works in stone and pounds enters and sees
+ *   12 st 4 lb; the stored number is kg. The bands compare a rate
+ *   against a threshold, so if the stored value were sometimes 80 and
+ *   sometimes 176 any consumer that forgot to convert would compare the
+ *   wrong quantities -- and the 4 lb/week refusal is the one place here
+ *   where being wrong by a factor of 2.2 is unacceptable.
+ *
+ *   strategicGoal.weightTargetBand records which band accepted a target
+ *   at set-time. If a threshold ever tightens, that is the difference
+ *   between a clean audit and re-deriving intent from arithmetic months
+ *   later.
+ *
+ *   NO WRITERS until WEIGHT-1b. weight, targetWeight and weightLog had
+ *   none before this change either -- declared long ago, never wired.
+ *   Tracked by tools/verify-weight1.mjs.
+ *
  * 21 Aug 2026 v55
  *   R1-a. Two additions to strategicGoal, both dark this session.
  *
@@ -1148,6 +1173,10 @@ export const store = {
       fitnessLevel: null,
 
       // ── BODY AND TARGETS ─────────────────────────────────────
+      // WEIGHT-1a: weight and targetWeight are CANONICAL KILOGRAMS.
+      // weightUnit is display only -- 'kg' | 'lb' | 'st'. Never convert
+      // on the way in; convert on the way out.
+      weightTracking: false,
       weight: null,
       weightUnit: 'kg',
       targetWeight: null,
@@ -1526,6 +1555,7 @@ export const store = {
         weeklySessionTarget: 3,
         setAt:               null,
         targetSetAt:         null,
+        weightTargetBand:    null,
         planPresentedAt:     null,
         measurementsOptIn:   [],
         review:              { lastOfferedAt: null, outcomes: [] }

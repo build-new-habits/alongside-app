@@ -1,7 +1,44 @@
 # Alongside — Data Schema Reference
-## 21 Aug 2026 v1.38
+## 22 Aug 2026 v1.39
 
-**File:** `js/store.js` (confirmed live version: **v55, 21 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v56, 22 Aug 2026**)
+
+---
+
+## v1.39 (22 Aug 2026) — WEIGHT-1a: weight tracking, declared dark
+
+`store.js` v55 → **v56**. Authority: `alongside_weight1_build_scope_22aug2026_v1.md` v3.
+
+Weight tracking is **a feature, off by default, Plan-only**. Nothing here is read or written by any view until WEIGHT-1b.
+
+### The fields
+
+| Field | Type | Default | Purpose |
+|---|---|---|---|
+| `weightTracking` | `boolean` | `false` | The opt-in. **Off by default.** Plan-only at the surface |
+| `weight` | `number\|null` | `null` | **Canonical kilograms, always** |
+| `targetWeight` | `number\|null` | `null` | **Canonical kilograms, always** |
+| `weightUnit` | `'kg'\|'lb'\|'st'` | `'kg'` | **Display preference only.** Never affects what is stored |
+| `weightLog` | `array` | `[]` | `{ at, kg }`. Passive entry only |
+| `strategicGoal.weightTargetBand` | `string\|null` | `null` | Which band accepted the target at set-time: `silent` \| `note` \| `capped` |
+
+### 🔴 Canonical kilograms — storage only, never display
+
+Somebody who works in stone and pounds enters and sees **12 st 4 lb**. The stored value is kg. The same arrangement as storing dates in ISO and rendering "Thursday".
+
+**Why one internal unit is not optional here.** The safety bands compare a rate against a threshold. If the stored number were sometimes 80 and sometimes 176 depending on a display preference, any consumer that forgot to convert would compare the wrong quantities — and the **≥ 4 lb/week refusal is the one place in this product where being wrong by a factor of 2.2 is unacceptable.** A single canonical unit makes that class of fault impossible rather than merely unlikely.
+
+`weightUnit` gains a real writer in WEIGHT-1b. Until then it is `'kg'` and `session-log.js:179` labels the resistance field accordingly — the UNIT-1 bug, now folded in here rather than fixed separately, because it was never separable.
+
+### 🔴 `weightTargetBand` — written once, at set-time
+
+Records which band accepted a target when it was set. **If a threshold ever tightens, this is the difference between a clean audit — *these were accepted under the old band* — and re-deriving intent from dates and arithmetic months later.** Cheap now, impossible retrospectively.
+
+### ⚠️ Declared dark
+
+`weightTracking` has no writer until WEIGHT-1b. `weight`, `targetWeight` and `weightLog` had **no writers before this change and still have none** — they were declared long ago and never wired, which is what the 22 Aug audit found. WEIGHT-1a does not change that; it makes the shape correct and gates it. `tools/verify-weight1.mjs` is the tracker.
+
+---
 
 ---
 
@@ -356,6 +393,7 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | **1.14** | **04 Aug 2026** | **Phase D-1 (schema), Conditions Update.** Two new fields: `conditionGoals` (felt-sense condition-specific goal, `'healed'\|'cope'\|'improve'` + optional note, new `store.setConditionGoal()`) and `prescribedExercisesOrigin` (`'professional'\|'self'\|null`, lets `prescribed.js` branch its coach voice correctly). Also documented in the field-reference table: `pendingDoorRoute`, added earlier today (Phase C follow-up) but missed in Schema.md at the time. `js/store.js` v14→v15. |
 | **1.15** | **04 Aug 2026** | **Condition programmes, real routes built.** `prescribedExercises` entries can now carry an optional `conditionId` — additive, nullable, existing entries unaffected. New `prescribedExercisesActiveCondition` — single-use context flag, cleared the instant it's read. `js/store.js` v15→v16. New module `js/data/conditionProgrammes.js` (not a schema file, but the reason these fields exist) — real, tested exercise-selection logic for "Coach builds it"/"Coach recommends, you select," built on `affectsAreas`/`rehabPhase`/`contraindications` data that already existed. |
 | **1.16** | **04 Aug 2026** | **Cross-condition exercise reuse, not duplication.** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — one entry can now genuinely serve more than one condition, so doing the same physical exercise once correctly counts once everywhere, rather than the same exercise appearing as two separate entries with independent completion state and double credits. Backward compatible — old singular-shaped entries read correctly via new `getEntryConditionIds()`, migrate naturally on rebuild, no explicit migration step. `js/data/conditionProgrammes.js` v2→v3. Smoke-tested against real overlapping conditions before shipping. |
+| **1.39** | **22 Aug 2026** | **WEIGHT-1a.** `store.js` v55 → v56. `weightTracking` (opt-in, default false), `strategicGoal.weightTargetBand`, and `weight`/`targetWeight`/`weightLog` documented as **canonical kilograms** with `weightUnit` demoted to a display preference. Additive, no migration. Declared dark: no writers until WEIGHT-1b, tracked by `verify-weight1.mjs`. |
 | **1.38** | **21 Aug 2026** | **R1-a.** `store.js` v54 → v55. `strategicGoal.targetSetAt` (the maturity guard's honest clock — `setAt` records when the *frequency* was agreed, not the date) and `strategicGoal.review` (`lastOfferedAt` throttle, `outcomes` log). Both additive, no migration. Declared dark: nothing reads `review` until R1-b and nothing writes `targetSetAt` until R2-a, tracked by `verify-hard1.mjs`. |
 | **1.35** | **17 Aug 2026** | **TARGET-4.** `store.js` v52 → v53. One-way migration of `targetDate`/`targetDescription` from top level into `strategicGoal`, on load, into empty fields only. Closes a divergence where two editable fields held one idea — and a third, `goal.*`, was read but had never existed, silently replacing a chosen primary goal with `goals[0]`. |
 | **1.34** | **16 Aug 2026** | **Eleven versions of drift, caught by fixing the gate meant to catch it.** `store.js` v41 → v52. Nine undocumented top-level fields folded in: `assessment` (ASSESS-1 — the field that lets the difficulty ceiling move), `programme` + `weekFocus` (CHAP-1 step 1, declared and written by nothing), `exerciseClearance` (CARDIAC-1), `pacing` + `sessionPace` (PACE-1/QUICK-1), `sessionMode`, `personalBests` + `showPersonalBests` (PB-1). `tools/schema-check.mjs` v1 → **v2**: its field diff had been slicing an empty string since the day it was written, so it could not fire at any amount of drift. Now anchored on the definition and self-asserting. |
