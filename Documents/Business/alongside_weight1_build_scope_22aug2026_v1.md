@@ -1,7 +1,7 @@
 # Alongside: Move — WEIGHT-1 Build Scope
-## 22 Aug 2026 v1
+## 22 Aug 2026 v2
 
-**Status:** 🟠 **Scope for agreement. No code written.** Nothing here is built until Graeme confirms §7.
+**Status:** 🟠 **Scope for agreement. No code written.** v2 fills in §7 with **recommendations, not decisions.** Each is marked 🟠 until Graeme confirms. Nothing is built before then.
 
 **Authority:** `alongside_weight_targets_audit_22aug2026_v1.md` v2 §9 holds the decisions. This document holds the build.
 
@@ -132,13 +132,57 @@ Plus in `verify-hard1.mjs`: R1 suppresses a weight target when tracking is **off
 
 ---
 
-## 7. What I need from you before writing code
+## 7. The five open points — recommendations, 22 Aug
 
-1. **Storing canonical kg with display conversion** — confirm. It is forced by §1.1, but it is a data decision and it is yours.
-2. **Does the toggle need anything at the point of enabling** — a sentence, a confirm step — or is a plain switch right? My instinct is a plain switch with honest helper text, since a confirmation dialogue implies the person is doing something wrong.
-3. **Where weight logging lives.** Progress is the trend surface and the natural home; Settings is where the toggle is. I lean **Progress**, with the target itself in My Programme beside the other targets.
-4. **The toggle's label and helper text** — coach voice, so yours. It is the moment somebody opts into being measured, and it is the most consequential copy in the feature.
-5. **Confirm the split** — 1a dark now, 1b after R1-b.
+🟠 **All five are proposals awaiting confirmation.** None is a decision yet.
+
+### 7.1 Canonical kg, display converts — 🟠 recommend YES
+
+Forced by §1.1. Store one unit, convert at the edge. `weightUnit` becomes a display preference with a real writer, and every band, every comparison and every stored value is kg.
+
+**The alternative — storing whatever the person typed alongside a unit flag — means every consumer must convert correctly, forever.** One that forgets compares 80 against 176 and the ≥4 lb refusal silently stops working. A single canonical unit makes that class of fault impossible rather than merely unlikely.
+
+### 7.2 A plain switch, no confirmation step — 🟠 recommend PLAIN SWITCH
+
+A confirmation dialogue would be the app implying the person is about to do something questionable. That is shame wearing a safety costume, and it contradicts the reason this feature was reinstated: refusing an adult their own goal is paternalism.
+
+**The honesty belongs in the helper text, not in a barrier.** Say plainly what turning it on does, then get out of the way. The real safeguards — the bands, the refusal, never prompting a weigh-in — sit deeper and do not require the person to click through a warning to reach their own data.
+
+### 7.3 Logging in Progress, target in My Programme — 🟠 recommend SPLIT BY KIND
+
+- **The target** goes in My Programme, beside the other targets. It is a target; it belongs where targets live, and R1 reads it from there.
+- **The log** goes in Progress. It is a trend, and Progress is the trend surface.
+- **Settings holds the toggle only** — the switch, not the data.
+
+This follows the existing distinction rather than inventing one: My Programme is *what you are aiming at*, Progress is *what has happened*. Putting the log in Settings would file a person's own record under configuration.
+
+⚠️ **Entry point must be passive.** A control that is there when looked for, never a card that appears asking to be filled in. No badge, no empty state that reads as an unfinished task.
+
+### 7.4 Toggle copy — 🟠 DRAFT for Graeme, coach voice is his
+
+**Label:** Weight tracking
+
+**Helper text:**
+
+> Off unless you want it. Turn it on to record your weight and set a target, and I'll take it into account. I'll never ask you to weigh yourself.
+
+**Why each line is there.** *"Off unless you want it"* states the default as a stance, not a setting. *"I'll take it into account"* is the honest consequence — this is the toggle that lets R1 speak, and saying so is what makes it consent. *"I'll never ask you to weigh yourself"* turns an internal rule into a promise made to the person, which is the strongest form it can take and the hardest to quietly drop later.
+
+**What it deliberately avoids:** any suggestion that tracking helps, works, or is recommended. The app is opening a door, not encouraging anyone through it.
+
+### 7.5 The 1a / 1b split — 🟠 recommend CONFIRM
+
+1a is inert by construction, so *"ship nothing before the clinical reply"* is satisfied by the shape of the work rather than by remembering not to deploy. 1b needs R1-b landed because `my-programme.js` gets one visit.
+
+---
+
+## 7A. One further piece of copy this surfaces
+
+The **≥ 4 lb refusal** is the hardest sentence in the feature and it is not in the five. **Draft, for Graeme:**
+
+> That's a faster pace than I'm able to help you plan for. It's not a judgement on the goal — it's past the point where I'd be guessing, and this is a conversation for a GP or a registered dietitian. I can hold a target at a gentler pace if you'd like, or leave it open-ended.
+
+**Constraints it is written against:** it declines the field, not the person; it states no number, no rate and no projection; it offers two ways forward rather than a dead end; and it does not pretend to clinical authority it does not have.
 
 ---
 
@@ -148,4 +192,4 @@ Plus in `verify-hard1.mjs`: R1 suppresses a weight target when tracking is **off
 
 ---
 
-*Build New Habits · Alongside: Move · WEIGHT-1 Build Scope · 22 Aug 2026 v1*
+*Build New Habits · Alongside: Move · WEIGHT-1 Build Scope · 22 Aug 2026 v2*
