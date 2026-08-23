@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v401
+ * Weight bands tightened. Cache bump only -- weight-targets.js is
+ * already precached. The bump carries the stricter refusal (3 lb/week,
+ * down from 4) to a device holding the looser one.
+ *
+ * A cache bump for a SAFETY threshold: worth doing on its own, and worth
+ * doing promptly.
+ *
  * 22 Aug 2026 v400
  * R2-a. Cache bump only -- no new files. today.js is already precached;
  * the bump is what carries the tier gate and the corrected hinge copy to
@@ -2778,7 +2786,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v400";
+const CACHE_NAME = "alongside-v401";
 
 const SHELL_URLS = [
 
