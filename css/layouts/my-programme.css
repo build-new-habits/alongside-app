@@ -1,5 +1,19 @@
 /*
  * css/layouts/my-programme.css
+ * 22 Aug 2026 v3
+ *   R1-b. .my-programme-review, the hard conversation, and
+ *   .my-programme-describe, the invitation to name a date.
+ *
+ *   The three options are DELIBERATELY IDENTICAL in weight. "Leave it
+ *   where it is" gets the same colour, the same size and the same
+ *   prominence as the other two, because a de-emphasised third option
+ *   is a nudge wearing a choice's clothes. Nothing here may be styled
+ *   to steer.
+ *
+ *   No accent colour, no alert styling, no icon. This is a conversation,
+ *   not a warning, and it must not read as a problem the person has
+ *   caused.
+ *
  * 17 Aug 2026 v2
  *   CHAP-1 step 4. .my-programme-focus, the weekly focus picker.
  *
@@ -77,7 +91,7 @@
   font-weight: var(--font-semibold);
   color: var(--color-text-secondary);
   margin: 0;
-  line-height: var(--leading-snug);
+  line-height: var(--leading-normal);
 }
 
 /* The chapter name. Larger than the body, and that is all — no accent
@@ -88,7 +102,7 @@
   font-weight: var(--font-semibold);
   color: var(--color-text);
   margin: 0;
-  line-height: var(--leading-snug);
+  line-height: var(--leading-normal);
 }
 
 .my-programme-line {
@@ -153,7 +167,7 @@
 .my-programme-arc__name {
   font-size: var(--text-base);
   color: var(--color-text);
-  line-height: var(--leading-snug);
+  line-height: var(--leading-normal);
 }
 
 .my-programme-arc__when {
@@ -173,4 +187,86 @@
 .my-programme-back {
   margin-top: auto;
   min-height: 44px;
+}
+
+/* ── The hard conversation (R1-b) ──────────────────────────────── */
+
+/*
+ * A quiet card, not an alert. Same surface treatment as the rest of the
+ * screen: no accent border, no warning colour, no icon. The coach is
+ * opening a conversation, and the styling should carry no more urgency
+ * than the sentence does.
+ */
+.my-programme-review {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.my-programme-review__body {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+.my-programme-review__label {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: var(--leading-normal);
+  margin-bottom: var(--space-1);
+}
+
+.my-programme-review__input {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.my-programme-review__input:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/*
+ * Stacked, full width, equal. Not a row -- a row implies a primary on
+ * the left and an afterthought on the right, and all three of these are
+ * the same kind of answer.
+ *
+ * 44px minimum on every control (WCAG 2.5.8 target size).
+ */
+.my-programme-review__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.my-programme-review__actions .btn {
+  width: 100%;
+  min-height: 44px;
+}
+
+/* ── The invitation to name a date (R1-b) ──────────────────────── */
+
+/*
+ * Deliberately plainer than the conversation above. This is not a
+ * question being asked, it is a field being made available, and it must
+ * never read as an unfinished task. No badge, no highlight, no count.
+ */
+.my-programme-describe {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
