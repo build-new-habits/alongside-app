@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v223
+## 22 Aug 2026 v222
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v222.md`. Remove v222 on upload.
+Supersedes `master_schedule_22aug2026_v221.md`. Remove v221 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -149,39 +149,6 @@ Supersedes `master_schedule_22aug2026_v222.md`. Remove v222 on upload.
 > 🔴 **And a near-miss worth more than the feature.** This shipped at **06:49**; the next session opened the repo at **06:52** intending to build it, and would have rebuilt a feature that was three minutes old. Caught only because `HEAD` looked wrong. **The blueprint's warning is now measured in minutes, not days: never plan from a conversation, always from `git log`.**
 >
 > 🟠 **Shipped without a schedule update.** v217 recorded nothing of it, and the blueprint still listed `goal-setup.js` as a known-broken module — a first-read document asserting a fault that no longer existed. Closed here and in blueprint **v4**.
->
-> ---
->
-> ### 🔴 THREAD-1 — R1-b's COPY PROMISES A CONVERSATION AND THE UI HANDS OVER A FORM
->
-> `alongside_thread1_build_scope_22aug2026_v1.md` **v1**. Raised by Graeme hours after R1-b shipped.
->
-> The offer asks *"Shall we look at it together?"* and tapping any option produces a date input and a Save button. **Copy running ahead of what is built — the fault class `verify-plain1` exists to catch. R1-b was gated on nine things and not on that one.**
->
-> 🔴 **The inconsistency is worse than the mismatch.** The coach speaks in bubbles while getting to know somebody, then hands them a form the moment the conversation turns difficult. **The interaction that most needs to feel like a person is the one built most like an admin screen.** Softening the copy to match the form would resolve the contradiction by making the product smaller.
->
-> #### Ground truth
->
-> 🟢 The script/render split **already exists** — `STEPS` is data in `onboarding-thread-data.js`. The pattern is proven.
-> 🔴 But `thread.js` is **1,395 lines and not a component**: it imports onboarding data and `sheet-manager`, and writes `consent.given`, `consent.policyVersion`, `name`, `onboarding.*` and `strategicGoal.setAt` directly from inside the renderer.
->
-> #### 🔴 Entered, never embedded
->
-> My Programme keeps a quiet invitation; tapping it opens the thread. **A typing indicator starting while somebody is mid-scroll is an ambush, and this is the one conversation that must never ambush.** Short — three or four beats. Threads suit onboarding partly *because* onboarding happens once.
->
-> #### 🔴 THE RISKY DECISION, and it is Graeme's to overturn
->
-> Extracting a runner and leaving `thread.js` alone means **two renderers for the coach's voice** — which is how a product ends up with the coach sounding subtly different in different places. That is a philosophy problem, not a maintenance one.
->
-> But migrating onboarding means editing **the flow that captures legal consent**, weeks before beta, in a 1,395-line file.
->
-> **Recommendation: split.** THREAD-1a extracts and R1 consumes it, before beta. THREAD-1b migrates onboarding, **after** beta. Onboarding is the funnel and breaking it is the one unrecoverable mistake available here; a fault in R1's new thread costs a feature, not a launch.
->
-> ⚠️ **The duplication is tracked, not tolerated.** A gate asserts both renderers agree on the eleven timing constants, reduced-motion collapsing every one to zero, `aria-live="polite"`, and coach-left/user-right semantics. **Duplication that nothing watches is exactly what produced `goal-setup.js`.**
->
-> #### 🟠 The fallback, to be chosen deliberately rather than discovered
->
-> If the extraction does not fit before beta, the honest fallback is to **soften R1's copy to match the form and ship the thread after** — a worse product, an intact schedule. Graeme's call, and better made now than in September.
 >
 > ---
 >
@@ -712,10 +679,7 @@ Supersedes `master_schedule_22aug2026_v222.md`. Remove v222 on upload.
 > |---|---|---|---|
 > | **R1-a** | Detection, dark — `Schema.md` v1.38, `store.js` v55, `js/data/goal-review.js`, `verify-hard1.mjs` + `verify-hard1-store.mjs`, `sw.js` v393 | 🟢 **SHIPPED 21 Aug** | Done |
 > | **R2-a** | Boundary correction — `today.js` alone. **NOW RUNS AFTER R1-b** | 🔵 Ready, sequenced after R1-b | w/c 24 Aug |
-> | **R1-b** | Shipped `alongside-v397`. Target display tier-gated; three options inline; 45 executing checks. **Render half superseded by THREAD-1a** | 🟢 **SHIPPED 22 Aug** | Done |
-> | **THREAD-1a** | Extract a reusable thread runner; R1's conversation becomes a thread, entered not embedded. `thread.js` untouched | 🟠 Scoped | Before beta |
-> | **THREAD-1b** | Migrate onboarding onto the runner; delete the second renderer | 🔵 Booked | **After beta** |
-> | **THREAD-2** | Should goal-setting generally be conversational? **Undecided** | 🟠 Open question | — |
+> | **R1-b** | The surface — `my-programme.js` does **both** jobs in one visit: tier-gates the target display, and renders the three options. **NOW RUNS BEFORE R2-a** | 🔵 **NEXT** | w/c 24 Aug |
 > | **R2-b** | The demonstration at upgrade. **Needs a discovery session before a spec** — the revenue document's acceptance criteria for it were written against the pre-correction boundary | 🟠 Needs discovery | w/c 31 Aug |
 > | **R3** | Recognition without an arc, in free — *"same as last time?"*. Reads **one** log entry, never a pattern | 🔵 Specified | w/c 24 Aug |
 > | **R4** | Self-direction to free — **document → gate → code**, in that order | 🔵 Specified | w/c 24 Aug |
@@ -4650,4 +4614,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v223*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v222*
