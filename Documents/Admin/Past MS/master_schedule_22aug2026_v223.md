@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v224
+## 22 Aug 2026 v223
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v223.md`. Remove v223 on upload.
+Supersedes `master_schedule_22aug2026_v222.md`. Remove v222 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -149,44 +149,6 @@ Supersedes `master_schedule_22aug2026_v223.md`. Remove v223 on upload.
 > 🔴 **And a near-miss worth more than the feature.** This shipped at **06:49**; the next session opened the repo at **06:52** intending to build it, and would have rebuilt a feature that was three minutes old. Caught only because `HEAD` looked wrong. **The blueprint's warning is now measured in minutes, not days: never plan from a conversation, always from `git log`.**
 >
 > 🟠 **Shipped without a schedule update.** v217 recorded nothing of it, and the blueprint still listed `goal-setup.js` as a known-broken module — a first-read document asserting a fault that no longer existed. Closed here and in blueprint **v4**.
->
-> ---
->
-> ### 🟢 THREAD-1a SHIPPED · 🔴 CONSENT-1 FOUND · THREAD-1b APPROVED
->
-> `alongside-v398`. `thread-runner.js` (renders, no store), `goal-review-script.js` (copy, no logic), `goal-review-thread.js` (persistence). **83 gates green. 18 reversals confirmed.**
->
-> My Programme keeps a quiet invitation and nothing opens itself — gated: **no thread, no typing indicator and no bubbles render on that screen.** The divergence gate works **from both sides**: drifting an onboarding timing by 50ms turns it red.
->
-> #### 🔴 A reversal that stayed GREEN, and why it matters
->
-> Styling the *"leave it where it is"* chip differently **passed**. The chip-uniformity check ran against a **synthetic** script with no `keep` chip, so it never touched the real conversation. **A test on a stand-in is not a test of the thing.** Now asserted against the actual three chips and reversal-confirmed twice. Second time in one day a gate proved a function while missing the wiring.
->
-> Also caught: a gate fixture recomputing `iso(40)` from `Date.now()` on every call, so it compared two timestamps milliseconds apart and went red against correct code — **a fixture that moves is not a fixture**. And removing the inline panels took the `save-describe` handler with it while leaving its button: a dead control.
->
-> ---
->
-> ### 🔴 CONSENT-1 — THE CONSENT GATE HAS ONE UNGUARDED DEREFERENCE
->
-> Found while probing whether onboarding could be driven in a harness.
->
-> `thread.js:389` — `continueBtn.classList.add('is-inactive')` — has **no optional chaining. It is the only unguarded dereference in its own function**: lines 383, 391, 395 and 411 all use `?.`. If `#ob-consent-continue` were ever absent, **the consent gate throws and onboarding dies on the screen that captures legal consent.**
->
-> All five elements are fetched with `document.getElementById`, so the gate also depends on being attached to the document and on those IDs staying globally unique app-wide. Only **2** container-scoped queries exist in the whole file.
->
-> ⚠️ **Not hypothetical** — this is exactly how the probe failed before the container was attached.
->
-> 🔴 **Fix BEFORE anything migrates**, not during. Diagnosing a consent failure while a refactor is in flight means two suspects instead of one.
->
-> ---
->
-> ### 🟢 THREAD-1b APPROVED — and the order that makes it safe
->
-> Graeme gave an explicit yes, 22 Aug. **That changes what is permitted, not what is wise** — this touches the only flow whose failure is legal rather than functional, and **its failure mode is silent: consent not recorded looks perfectly fine on screen.**
->
-> 🟢 **Onboarding CAN be driven in a harness** — it mounts, runs past the splash and renders the consent gate under jsdom. That removes the main practical objection to doing it before beta.
->
-> **So the order is: CONSENT-1 → characterisation gate → migration.** Prove what onboarding does today, then require that proof to stay green through the change. That is what makes a one-way change practically reversible — and if the characterisation gate turns out to be hard to write, **that is the signal to defer to after beta after all.**
 >
 > ---
 >
@@ -751,10 +713,8 @@ Supersedes `master_schedule_22aug2026_v223.md`. Remove v223 on upload.
 > | **R1-a** | Detection, dark — `Schema.md` v1.38, `store.js` v55, `js/data/goal-review.js`, `verify-hard1.mjs` + `verify-hard1-store.mjs`, `sw.js` v393 | 🟢 **SHIPPED 21 Aug** | Done |
 > | **R2-a** | Boundary correction — `today.js` alone. **NOW RUNS AFTER R1-b** | 🔵 Ready, sequenced after R1-b | w/c 24 Aug |
 > | **R1-b** | Shipped `alongside-v397`. Target display tier-gated; three options inline; 45 executing checks. **Render half superseded by THREAD-1a** | 🟢 **SHIPPED 22 Aug** | Done |
-> | **THREAD-1a** | Shipped `alongside-v398`. `thread-runner.js`, `goal-review-script.js`, `goal-review-thread.js`, `my-programme.js` v7, 56 executing checks | 🟢 **SHIPPED 22 Aug** | Done |
-> | **CONSENT-1** | One unguarded dereference in the consent gate, and five `document.getElementById` calls that reach outside the view. **Fix BEFORE any migration** | 🔴 **Ready to build** | Next |
-> | **THREAD-1b-char** | Characterisation gate: prove what onboarding does today, before changing it | 🔵 Ready | Before THREAD-1b |
-> | **THREAD-1b** | Migrate onboarding onto the runner; delete the second renderer | 🟢 **Approved by Graeme 22 Aug** — gated on CONSENT-1 and the characterisation gate | — |
+> | **THREAD-1a** | Extract a reusable thread runner; R1's conversation becomes a thread, entered not embedded. `thread.js` untouched | 🟠 Scoped | Before beta |
+> | **THREAD-1b** | Migrate onboarding onto the runner; delete the second renderer | 🔵 Booked | **After beta** |
 > | **THREAD-2** | Should goal-setting generally be conversational? **Undecided** | 🟠 Open question | — |
 > | **R2-b** | The demonstration at upgrade. **Needs a discovery session before a spec** — the revenue document's acceptance criteria for it were written against the pre-correction boundary | 🟠 Needs discovery | w/c 31 Aug |
 > | **R3** | Recognition without an arc, in free — *"same as last time?"*. Reads **one** log entry, never a pattern | 🔵 Specified | w/c 24 Aug |
@@ -4690,4 +4650,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v224*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v223*
