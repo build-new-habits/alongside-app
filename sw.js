@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v402
+ * R1 copy pass. Cache bump only -- goal-review-script.js is already
+ * precached. The bump carries the corrected conversation to a device
+ * holding the old one, which still promises "I will keep working with
+ * you either way" -- a promise the product cannot keep at a refusal or
+ * a downgrade.
+ *
  * 22 Aug 2026 v401
  * Weight bands tightened. Cache bump only -- weight-targets.js is
  * already precached. The bump carries the stricter refusal (3 lb/week,
@@ -2786,7 +2793,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v401";
+const CACHE_NAME = "alongside-v402";
 
 const SHELL_URLS = [
 
