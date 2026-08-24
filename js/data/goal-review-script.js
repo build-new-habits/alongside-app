@@ -1,5 +1,21 @@
 /**
  * js/data/goal-review-script.js
+ * 22 Aug 2026 v2
+ *
+ * v2 - Copy pass with Graeme, 22 Aug. Three changes, all his calls.
+ *
+ *   1. The opening no longer repeats the invitation's first line.
+ *   2. "I will keep working with you either way" is GONE. Graeme: what
+ *      if we reach the hard no point -- we won't be working with them
+ *      then. At a refusal or a downgrade the coach stops holding the
+ *      target entirely, so it was a promise that becomes false in
+ *      exactly the situation it existed to comfort.
+ *   3. Both change-branches close with "We carry on from here." The
+ *      fear after this conversation is not about dates -- it is that
+ *      the coach now thinks less of you. NOT "let's start this journey
+ *      together": they are not starting, they may be four months in,
+ *      and "journey" is the register this product opposes.
+ *
  * 22 Aug 2026 v1
  *
  * THREAD-1a — the hard conversation, as a script.
@@ -41,10 +57,19 @@ export const GOAL_REVIEW_SCRIPT = {
   open: {
     id: 'open',
     type: 'chips',
+    // Picks up where the invitation left off. My Programme has already
+    // said "I have been looking at X and the date you set"; repeating it
+    // one tap later read as a stutter.
+    //
+    // But their OWN WORDS stay in. The first attempt cut the whole
+    // sentence and the gate caught it: R1 requires the person's phrasing
+    // throughout, because the coach must never substitute a phrase of
+    // its own for somebody's goal and then discuss it. So the words are
+    // woven into what the coach noticed, rather than announced first.
     coach: ctx =>
-      `I have been looking at ${ctx.targetDescription} and the date you set.\n\n` +
-      `At the pace things are going, that date is a harder ask than it needs to be. ` +
-      `Nothing has gone wrong — life does this.\n\n` +
+      `At the pace things are going, ${ctx.targetDescription} by that date ` +
+      `is a harder ask than it needs to be. Nothing has gone wrong — life ` +
+      `does this.\n\n` +
       `Shall we look at it together?`,
     chips: [
       { id: 'move',    label: 'Move the date' },
@@ -74,7 +99,7 @@ export const GOAL_REVIEW_SCRIPT = {
   moved: {
     id: 'moved',
     type: 'end',
-    coach: ctx => `Done — ${ctx.targetDescription} it is, with more room around it.`
+    coach: ctx => `Done — ${ctx.targetDescription}, with more time on it. We carry on from here.`
   },
 
   // ── Reshape ───────────────────────────────────────────────────────
@@ -112,7 +137,7 @@ export const GOAL_REVIEW_SCRIPT = {
   reshaped: {
     id: 'reshaped',
     type: 'end',
-    coach: 'Got it. I have it written down the way you just said it.'
+    coach: 'Got it — written down the way you just said it. We carry on from here.'
   },
 
   // ── Leave it ──────────────────────────────────────────────────────
@@ -124,7 +149,12 @@ export const GOAL_REVIEW_SCRIPT = {
   kept: {
     id: 'kept',
     type: 'end',
-    coach: 'Right — we leave it exactly where it is. I will keep working with you either way.'
+    // Ends clean. "I will keep working with you either way" was removed:
+    // at a refusal or a downgrade the coach stops holding the target
+    // entirely, so it is a promise that becomes false in exactly the
+    // situation it was meant to comfort. And reassurance offered only to
+    // the person who declined reads as being let off.
+    coach: 'Right — we leave it exactly where it is.'
   }
 };
 
