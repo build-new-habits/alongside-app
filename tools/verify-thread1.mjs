@@ -305,6 +305,61 @@ section("4. No arithmetic on the person");
   ok("it says nothing has gone wrong", /nothing has gone wrong/i.test(body));
 }
 
+// ── 4b. The 22 Aug copy pass, locked in ─────────────────────────────
+section("4b. Copy decisions taken with Graeme, 22 Aug");
+{
+  // Without these, restoring any of the removed lines passes silently.
+  // The copy IS the feature here -- there is no behaviour to catch it.
+  const open = await openThread();
+  const openText = txt(open.el);
+
+  // 1. The thread must not restate the invitation's first line.
+  ok("the opening does not repeat the invitation",
+     !/I have been looking at/i.test(openText), openText.slice(0, 120));
+  ok("but it still opens on what it noticed",
+     /harder ask than it needs to be/i.test(openText));
+  ok("'nothing has gone wrong' appears ONCE in the thread",
+     (openText.match(/nothing has gone wrong/gi) || []).length === 1);
+
+  // 2. A promise the product cannot keep, at a refusal or a downgrade.
+  const branches = {};
+  for (const b of ["keep", "move", "reshape"]) {
+    const { el } = await openThread();
+    el.querySelector(`[data-chip="${b}"]`).dispatchEvent(new dom.window.Event("click"));
+    await settle();
+    if (b !== "keep") {
+      const f1 = el.querySelector(".ob-input-bar__field");
+      f1.value = b === "move" ? day(120) : "Walk the ridge";
+      el.querySelector(".ob-input-bar__send").dispatchEvent(new dom.window.Event("click"));
+      await settle();
+      const f2 = el.querySelector(".ob-input-bar__field");
+      if (f2) {
+        f2.value = day(150);
+        el.querySelector(".ob-input-bar__send").dispatchEvent(new dom.window.Event("click"));
+        await settle();
+      }
+    }
+    branches[b] = txt(el);
+  }
+  const all = Object.values(branches).join(" ");
+  ok("no branch promises to keep working with them either way",
+     !/keep working with you|either way/i.test(all), all.slice(-140));
+
+  // 3. Both change-branches close the loop; "leave it" ends clean.
+  ok("move closes with 'We carry on from here'",
+     /we carry on from here/i.test(branches.move), branches.move.slice(-120));
+  ok("reshape closes with 'We carry on from here'",
+     /we carry on from here/i.test(branches.reshape), branches.reshape.slice(-120));
+  ok("'leave it where it is' ends clean, with no added reassurance",
+     !/we carry on from here/i.test(branches.keep), branches.keep.slice(-120));
+
+  // Rejected vocabulary: they are not starting, and this product does
+  // not use the language of the industry that failed these people.
+  ok("no 'journey' anywhere", !/journey/i.test(all));
+  ok("no 'start' framing on a change branch",
+     !/let's start|starting your|begin your/i.test(all));
+}
+
 // ── 5. DIVERGENCE — two renderers, one coach ────────────────────────
 section("5. Divergence between the runner and onboarding/thread.js");
 {
