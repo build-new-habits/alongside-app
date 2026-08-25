@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v228
+## 22 Aug 2026 v227
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v227.md`. Remove v227 on upload.
+Supersedes `master_schedule_22aug2026_v226.md`. Remove v226 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -179,38 +179,6 @@ Supersedes `master_schedule_22aug2026_v227.md`. Remove v227 on upload.
 > `strategicGoal.targetSetAt` now has its writer — **only when a date is actually given.** 9 reversals confirmed.
 >
 > 🟠 **Fixture fault:** the gate's first fixture omitted `activeProgramme.completed`, so `isHingePending()` was false and it reported *"the hinge renders: FAIL"* against correct code. **Read the guard rather than guessing at the fixture** — third fixture fault of the day.
->
-> ---
->
-> ### 🟢 WEIGHT-1b SHIPPED — the feature is reachable end to end
->
-> `alongside-v405`. `store.js` v57, `Schema.md` v1.40, `settings.js` v34, `my-programme.js` v8, `progress.js` v11, `verify-weight1b.mjs` 88 checks.
->
-> Toggle · display unit (`kg` / `lb` / `st & lb`) · current weight · target · log · sustained-rate note. **Both remaining orphans in this feature now have callers**: `validateWeightTarget()` runs at set-time, `observedRateBreach()` runs on the log.
->
-> 🟢 **A weight target is a MEASUREMENT ON THE EXISTING TARGET**, not a second one. `strategicGoal.targetValue` + `targetUnit` were already schema'd with no writer and one reader. Their words and their date stay; a number attaches.
->
-> 🟢 **Passive throughout.** No badge, no reminder, no *"you haven't weighed in"*, and an empty log says nothing about the gap. **No chart** — a graph of somebody losing weight invites reading a slope, and reading a slope is the arithmetic on the body this product refuses. No per-entry delta, arrow or colour: a red number for a gain is a verdict.
->
-> #### 🔴 A BUG WRITTEN, CAUGHT — AND ITS FIRST REVERSAL PASSED
->
-> The first implementation set `weightRateRaisedAt` in the save handler **before** rendering. The render then saw the flag, drew nothing, and **the note would have appeared ZERO times** — failing silently. A "show once" that writes its own flag too early shows never.
->
-> 🔴 **The reversal proving the fix stayed GREEN.** Every assertion saw the note on **mount**, with a log that already breached — but the fault only lives on the **save** path, where a new entry is what tips somebody over. Nothing tested that path.
->
-> #### 🔴 THE PATTERN OF THE DAY — three instances, same shape
->
-> | Where | The gate proved | It never exercised |
-> |---|---|---|
-> | `verify-thread1` chips | uniformity, on a synthetic script | the real conversation's `keep` chip |
-> | `verify-weight1b` targets | conversion, entering **kg** | `toKg(v,'kg')` is a no-op — lb and st untested |
-> | `verify-weight1b` note | the note, on **mount** | the save path the bug lived on |
->
-> **A gate can prove the function and never touch the path the code exists for.** Standing question for every new gate: *does my fixture actually reach the branch I am claiming to test?*
->
-> Fifth fixture fault too: a log ending today plus an entry saved now spans zero days, which `_weeklyRates` correctly skips, so nothing tipped. **Build the fixture to the mechanism; do not guess at it.**
->
-> 🟢 **`verify-write1` corrected me three times today** — `weight`, `weightUnit`, `weightLog` all left the baseline as they gained both ends; `weightTracking` stayed with a corrected reason. It is the most valuable gate in the suite and it is not one I wrote.
 >
 > ---
 >
@@ -464,8 +432,7 @@ Supersedes `master_schedule_22aug2026_v227.md`. Remove v227 on upload.
 > | ID | Task | Status | Target |
 > |---|---|---|---|
 > | **WEIGHT-1a** | Shipped `alongside-v396`. `weight-targets.js`, store v56, Schema v1.39, `goals.js` flatMap fixed, `goal-review.js` v2, 2 new gates | 🟢 **SHIPPED 22 Aug** | Done |
-> | **WEIGHT-1b** | Shipped `alongside-v405`. Toggle, display unit, weight, target, log, sustained-rate note. 88 executing checks | 🟢 **SHIPPED 22 Aug** | Done |
-> | **TARGET-DEAD** | Remove top-level `targetWeight` — no reader, no writer anywhere | 🔵 Ready | Next |
+> | **WEIGHT-1b** | Settings toggle, logging surface, target surface. **After R1-b** | 🟠 Scoped | Before beta |
 > | ~~UNIT-1~~ | **Folded into WEIGHT-1a** — not separable, see below | 🟢 Merged | — |
 > | **UNIT-1** | `weightUnit` has no writer — `session-log.js:179` always labels the field `kg` | 🔵 Specified | w/c 31 Aug |
 >
@@ -4785,4 +4752,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v228*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v227*
