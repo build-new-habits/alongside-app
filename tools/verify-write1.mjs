@@ -104,7 +104,7 @@ const BASELINE = new Set([
   // the debt. This gate caught that itself, which is the direction that
   // matters: an allowlist that only ever grows is permission, not a
   // record.
-  'hormonalTracking','coachStyle','targetWeight','targetDescription',
+  'hormonalTracking','coachStyle','targetDescription',
   // weightTracking — DECLARED DARK 22 Aug 2026 (WEIGHT-1a). The opt-in
   // for weight tracking. No writer until WEIGHT-1b builds the Settings
   // toggle; goal-review.js consumes it as a context argument, which this

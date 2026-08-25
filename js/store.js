@@ -1,5 +1,21 @@
 /**
  * store.js - Data persistence layer
+ * 22 Aug 2026 v58
+ *   TARGET-DEAD. Top-level `targetWeight` REMOVED.
+ *
+ *   It had no reader and no writer anywhere. Its only writer was in
+ *   onboarding/goal-setup.js, a view that had NEVER LOADED and was
+ *   retired on 22 Aug; its only readers were that same view and a dead
+ *   branch of workoutGenerator, removed the same day.
+ *
+ *   Not revived, deliberately. strategicGoal.targetValue + targetUnit is
+ *   the single home for a weight target, and a second home for the same
+ *   fact is precisely what caused TARGET-3.
+ *
+ *   Nothing migrates: the field was never written, so no install can be
+ *   carrying a value in it. Any that somehow is simply drops it, which
+ *   is the correct outcome for a number nothing could ever read.
+ *
  * 22 Aug 2026 v57
  *   WEIGHT-1b. weightLog gains its writer, and weightRateRaisedAt
  *   records that the coach has spoken once about a sustained rate.
@@ -19,7 +35,7 @@
  *   weightTracking -- the opt-in. Turning it on is the consent: it is
  *   what lets the coach speak to a weight target at all.
  *
- *   weight / targetWeight / weightLog are CANONICAL KILOGRAMS, ALWAYS.
+ *   weight / weightLog are CANONICAL KILOGRAMS, ALWAYS.
  *   weightUnit is a DISPLAY PREFERENCE and never affects what is
  *   stored. Somebody who works in stone and pounds enters and sees
  *   12 st 4 lb; the stored number is kg. The bands compare a rate
@@ -33,7 +49,7 @@
  *   between a clean audit and re-deriving intent from arithmetic months
  *   later.
  *
- *   NO WRITERS until WEIGHT-1b. weight, targetWeight and weightLog had
+ *   NO WRITERS until WEIGHT-1b. weight and weightLog had
  *   none before this change either -- declared long ago, never wired.
  *   Tracked by tools/verify-weight1.mjs.
  *
@@ -1185,14 +1201,13 @@ export const store = {
       fitnessLevel: null,
 
       // ── BODY AND TARGETS ─────────────────────────────────────
-      // WEIGHT-1a: weight and targetWeight are CANONICAL KILOGRAMS.
+      // WEIGHT-1a: weight is CANONICAL KILOGRAMS.
       // weightUnit is display only -- 'kg' | 'lb' | 'st'. Never convert
       // on the way in; convert on the way out.
       weightTracking: false,
       weightRateRaisedAt: null,
       weight: null,
       weightUnit: 'kg',
-      targetWeight: null,
       targetDate: null,
       targetDescription: '',
 
