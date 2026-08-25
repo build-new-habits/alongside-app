@@ -1,7 +1,21 @@
 # Alongside — Data Schema Reference
-## 22 Aug 2026 v1.40
+## 22 Aug 2026 v1.41
 
-**File:** `js/store.js` (confirmed live version: **v57, 22 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v58, 22 Aug 2026**)
+
+---
+
+## v1.41 (22 Aug 2026) — TARGET-DEAD: one field removed
+
+`store.js` v57 → **v58**. Top-level **`targetWeight` is gone.**
+
+It had **no reader and no writer anywhere**. Its only writer lived in `onboarding/goal-setup.js`, a view that had never loaded and was retired on 22 Aug; its only readers were that same view and a dead branch of `workoutGenerator.js`, removed the same day.
+
+🔴 **Not revived, deliberately.** `strategicGoal.targetValue` + `targetUnit` is the single home for a weight target. A second home for the same fact is precisely what caused TARGET-3, and this field was one of the two homes that made TARGET-3 possible.
+
+**Nothing migrates.** The field was never written, so no install can be carrying a value. Any that somehow is simply drops it — the correct outcome for a number nothing could read.
+
+---
 
 ---
 
@@ -417,6 +431,7 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | **1.14** | **04 Aug 2026** | **Phase D-1 (schema), Conditions Update.** Two new fields: `conditionGoals` (felt-sense condition-specific goal, `'healed'\|'cope'\|'improve'` + optional note, new `store.setConditionGoal()`) and `prescribedExercisesOrigin` (`'professional'\|'self'\|null`, lets `prescribed.js` branch its coach voice correctly). Also documented in the field-reference table: `pendingDoorRoute`, added earlier today (Phase C follow-up) but missed in Schema.md at the time. `js/store.js` v14→v15. |
 | **1.15** | **04 Aug 2026** | **Condition programmes, real routes built.** `prescribedExercises` entries can now carry an optional `conditionId` — additive, nullable, existing entries unaffected. New `prescribedExercisesActiveCondition` — single-use context flag, cleared the instant it's read. `js/store.js` v15→v16. New module `js/data/conditionProgrammes.js` (not a schema file, but the reason these fields exist) — real, tested exercise-selection logic for "Coach builds it"/"Coach recommends, you select," built on `affectsAreas`/`rehabPhase`/`contraindications` data that already existed. |
 | **1.16** | **04 Aug 2026** | **Cross-condition exercise reuse, not duplication.** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — one entry can now genuinely serve more than one condition, so doing the same physical exercise once correctly counts once everywhere, rather than the same exercise appearing as two separate entries with independent completion state and double credits. Backward compatible — old singular-shaped entries read correctly via new `getEntryConditionIds()`, migrate naturally on rebuild, no explicit migration step. `js/data/conditionProgrammes.js` v2→v3. Smoke-tested against real overlapping conditions before shipping. |
+| **1.41** | **22 Aug 2026** | **TARGET-DEAD.** `store.js` v57 → v58. Top-level `targetWeight` removed — no reader, no writer, both having died with `goal-setup.js` and the `workoutGenerator` branch on 22 Aug. Not revived: `strategicGoal.targetValue`/`targetUnit` is the single home. No migration needed; it was never written. |
 | **1.40** | **22 Aug 2026** | **WEIGHT-1b.** `store.js` v56 → v57. `weightRateRaisedAt` — the coach speaks once about a sustained rate, written *after* the note renders. Writers arrive for `weightTracking`, `weightUnit`, `weight`, `weightLog`, `strategicGoal.targetValue`/`targetUnit`/`weightTargetBand`. Top-level `targetWeight` left dead and booked for removal. |
 | **1.39** | **22 Aug 2026** | **WEIGHT-1a.** `store.js` v55 → v56. `weightTracking` (opt-in, default false), `strategicGoal.weightTargetBand`, and `weight`/`targetWeight`/`weightLog` documented as **canonical kilograms** with `weightUnit` demoted to a display preference. Additive, no migration. Declared dark: no writers until WEIGHT-1b, tracked by `verify-weight1.mjs`. |
 | **1.38** | **21 Aug 2026** | **R1-a.** `store.js` v54 → v55. `strategicGoal.targetSetAt` (the maturity guard's honest clock — `setAt` records when the *frequency* was agreed, not the date) and `strategicGoal.review` (`lastOfferedAt` throttle, `outcomes` log). Both additive, no migration. Declared dark: nothing reads `review` until R1-b and nothing writes `targetSetAt` until R2-a, tracked by `verify-hard1.mjs`. |
