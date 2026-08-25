@@ -1,6 +1,30 @@
 /**
  * my-programme.js - My Programme
  *
+ * 22 Aug 2026 v8
+ *
+ * v8 - WEIGHT-1b. A weight target, when the person has turned tracking
+ *   on. Only then, and never otherwise.
+ *
+ *   IT IS A MEASUREMENT ON THE EXISTING TARGET, NOT A SECOND TARGET.
+ *   strategicGoal.targetValue + targetUnit were already in the schema
+ *   with no writer and one reader (goal-review's isWeightTarget), so
+ *   the shape was sketched and never wired. Their words and their date
+ *   stay exactly as they are; a number attaches to them.
+ *
+ *   Top-level `targetWeight` is left alone. It now has no reader and no
+ *   writer anywhere, and creating a second home for the same fact is
+ *   what caused TARGET-3.
+ *
+ *   THE BANDS RUN AT SET-TIME. A target implying 3 lb a week or more is
+ *   declined, with a sustainable date offered instead. Set-time is
+ *   planning, so it MAY compute and propose a date -- review-time is
+ *   judgement and may not. See weight-targets.js rule 2.
+ *
+ *   NO PROMPT, EVER. The field is there when looked for and silent
+ *   otherwise: no badge, no empty state that reads as an unfinished
+ *   task, nothing that asks anybody to weigh themselves.
+ *
  * 22 Aug 2026 v7
  *
  * v7 - THREAD-1a. The three options are GONE from this screen. What
@@ -153,6 +177,7 @@ import { getProgramme }         from '../data/programmes.js';
 import { getGoalLabel }         from '../data/goals.js';
 import { advanceWeekIfNeeded }  from '../data/programmeEngine.js';
 import { evaluateGoalReview }   from '../data/goal-review.js';
+import { toKg, fromKg, validateWeightTarget } from '../data/weight-targets.js';
 import { detectBurnout, getTodaysCheckin } from '../data/checkin.js';
 import { getZoneStatus }        from '../data/conditions.js';
 import { currentWeekFocus, setWeekFocus, focusLine, FOCUS_OPTIONS }
@@ -479,6 +504,9 @@ export function MyProgrammeView(router) {
         parts.push(_describeTargetInvite());
       }
 
+      const weight = _weightTarget(sg);
+      if (weight) parts.push(weight);
+
       const review = _reviewOffer();
       if (review) parts.push(review);
     }
@@ -578,6 +606,51 @@ export function MyProgrammeView(router) {
   }
 
 
+
+  /**
+   * The weight target. Shown only where the person has turned tracking
+   * on -- the toggle in Settings is the consent, and without it this
+   * does not exist.
+   */
+  function _weightTarget(sg) {
+    if (store.get('weightTracking') !== true) return '';
+
+    const unit  = store.get('weightUnit') || 'kg';
+    const kg    = sg.targetUnit === 'kg' ? sg.targetValue : null;
+    const shown = kg != null
+      ? (unit === 'st'
+          ? `${fromKg(kg, 'st').st} st ${fromKg(kg, 'st').lb} lb`
+          : String(Math.round(fromKg(kg, unit) * 10) / 10))
+      : '';
+
+    const stone = unit === 'st';
+    return `
+      <div class="my-programme-weight">
+        <label class="my-programme-review__label" for="weight-target">
+          A weight you are aiming for, if you want one
+        </label>
+        ${stone
+          ? `<div class="my-programme-weight__stone">
+               <input class="my-programme-review__input my-programme-weight__part"
+                      id="weight-target" type="number" inputmode="numeric" min="0" max="60"
+                      value="${kg != null ? fromKg(kg, 'st').st : ''}" aria-label="Stone">
+               <span class="my-programme-weight__unit">st</span>
+               <input class="my-programme-review__input my-programme-weight__part"
+                      id="weight-target-lb" type="number" inputmode="numeric" min="0" max="13"
+                      value="${kg != null ? fromKg(kg, 'st').lb : ''}" aria-label="Pounds">
+               <span class="my-programme-weight__unit">lb</span>
+             </div>`
+          : `<input class="my-programme-review__input" id="weight-target"
+                    type="number" inputmode="decimal" min="0" step="0.1"
+                    value="${_esc(shown)}"
+                    aria-label="Target weight in ${unit === 'lb' ? 'pounds' : 'kilograms'}">`}
+        <div class="my-programme-review__actions">
+          <button class="btn btn-secondary btn-small" data-review="save-weight">Save it</button>
+        </div>
+        <p class="my-programme-weight__note" id="weight-target-note" role="status"></p>
+      </div>
+    `;
+  }
 
   function _describeTargetInvite() {
     return `
@@ -685,6 +758,79 @@ export function MyProgrammeView(router) {
     // The description invitation stays HERE, not in the thread. It is
     // not part of the conversation: it is somebody filling in their own
     // words, so it records no outcome and never touches the throttle.
+    // WEIGHT-1b. The bands run HERE, at set-time.
+    //
+    // Set-time is planning, so it may compute and propose a DATE -- the
+    // person is deciding what to aim at and needs to know what is
+    // feasible. Review-time (R1) is judgement and may never state a
+    // rate, a projection or a weight. See weight-targets.js rule 2.
+    container.querySelector('[data-review="save-weight"]')
+      ?.addEventListener('click', () => {
+        const unit = store.get('weightUnit') || 'kg';
+        const main = container.querySelector('#weight-target');
+        const note = container.querySelector('#weight-target-note');
+        if (!main) return;
+
+        let targetKg = null;
+        if (unit === 'st') {
+          const st = main.value;
+          const lb = container.querySelector('#weight-target-lb')?.value;
+          if (st !== '' || (lb !== '' && lb !== undefined)) {
+            targetKg = toKg({ st: Number(st || 0), lb: Number(lb || 0) }, 'st');
+          }
+        } else if (main.value !== '') {
+          targetKg = toKg(main.value, unit);
+        }
+
+        // Clearing it removes it. Somebody deleting their target is
+        // deleting it, not leaving the old one behind.
+        if (targetKg === null || !(targetKg > 0)) {
+          store.set('strategicGoal.targetValue', null);
+          store.set('strategicGoal.targetUnit', null);
+          store.set('strategicGoal.weightTargetBand', null);
+          render(container);
+          return;
+        }
+
+        const sg = store.get('strategicGoal') || {};
+        const currentKg = store.get('weight');
+        const targetDate = sg.targetDate || store.get('targetDate') || null;
+
+        // Without a current weight or a date there is no rate to judge,
+        // so the target is simply held. The coach does not ask for the
+        // missing pieces -- asking for a weigh-in is the one thing it
+        // never does.
+        if (currentKg == null || !targetDate) {
+          store.set('strategicGoal.targetValue', targetKg);
+          store.set('strategicGoal.targetUnit', 'kg');
+          store.set('strategicGoal.weightTargetBand', null);
+          render(container);
+          return;
+        }
+
+        const weeks = Math.max(
+          1, Math.round((new Date(targetDate) - Date.now()) / (7 * 86400000))
+        );
+        const result = validateWeightTarget({
+          currentKg, targetKg, weeks,
+          now: new Date().toISOString().slice(0, 10),
+          trackingEnabled: true
+        });
+
+        if (!result.accepted) {
+          // Declined. The FIELD is refused, never the person -- the
+          // message says so and offers a date that works instead.
+          if (note) note.textContent = result.message;
+          return;
+        }
+
+        store.set('strategicGoal.targetValue', targetKg);
+        store.set('strategicGoal.targetUnit', 'kg');
+        store.set('strategicGoal.weightTargetBand', result.band);
+        if (note && result.message) note.textContent = result.message;
+        else render(container);
+      });
+
     container.querySelector('[data-review="save-describe"]')
       ?.addEventListener('click', () => {
         const what = container.querySelector('#target-describe')?.value?.trim();

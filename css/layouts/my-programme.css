@@ -1,5 +1,14 @@
 /*
  * css/layouts/my-programme.css
+ * 22 Aug 2026 v4
+ *   WEIGHT-1b. .my-programme-weight -- the optional weight target.
+ *
+ *   Styled DELIBERATELY QUIETLY, and plainer than the conversation
+ *   above it. It is not a question being asked, it is a field being
+ *   made available. No badge, no highlight, no empty state that reads
+ *   as an unfinished task -- frequent weighing is itself a risk
+ *   behaviour, so nothing here may look like a prompt.
+ *
  * 22 Aug 2026 v3
  *   R1-b. .my-programme-review, the hard conversation, and
  *   .my-programme-describe, the invitation to name a date.
@@ -269,4 +278,54 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+}
+
+/* ── Weight target (WEIGHT-1b) ─────────────────────────────────── */
+
+/*
+ * Quiet on purpose. This is a field being made available, not a
+ * question being asked. Nothing here may read as an unfinished task.
+ */
+.my-programme-weight {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Stone and pounds is a composite -- two fields, as the weight is said. */
+.my-programme-weight__stone {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.my-programme-weight__part {
+  flex: 1;
+  min-width: 0;
+}
+
+.my-programme-weight__unit {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/*
+ * Where the set-time response lands, including a refusal. role="status"
+ * in the markup, so it is announced without stealing focus.
+ *
+ * NOT styled as an error: no red, no icon, no alert border. A refusal
+ * here declines the FIELD, not the person, and colouring it like a
+ * mistake would say the opposite of the words.
+ */
+.my-programme-weight__note {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+.my-programme-weight__note:empty {
+  display: none;
 }

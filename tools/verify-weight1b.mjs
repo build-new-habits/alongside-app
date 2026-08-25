@@ -1,5 +1,10 @@
 /**
  * tools/verify-weight1b.mjs
+ * 22 Aug 2026 v2
+ * Section 7 added: the weight TARGET in My Programme, and the bands
+ * running at set-time. Until this existed, validateWeightTarget() had
+ * no caller anywhere -- the bands were correct and unreachable.
+ *
  * 22 Aug 2026 v1
  *
  * WEIGHT-1b (Settings half) — the toggle, the display unit, the weight.
@@ -56,6 +61,8 @@ const txt = el => (el.textContent || "").replace(/\s+/g, " ").trim();
 const { store } = await import(`${REPO}/js/store.js`);
 const { toKg } = await import(`${REPO}/js/data/weight-targets.js`);
 const { SettingsView } = await import(`${REPO}/js/views/settings.js`);
+const { MyProgrammeView } = await import(`${REPO}/js/views/my-programme.js`);
+const { RATE_REFUSE } = await import(`${REPO}/js/data/weight-targets.js`);
 
 async function mount(state) {
   localStorage.clear();
@@ -223,6 +230,153 @@ section("6. Turning it off does not delete what was recorded");
   // not a safeguard.
   ok("the recorded weight survives", store.get("weight") === 80, String(store.get("weight")));
   ok("the controls are hidden again", el.querySelector("#settings-weight-now") === null);
+}
+
+// ── 7. The weight TARGET, and the bands at set-time ─────────────────
+section("7. The weight target in My Programme");
+
+const iso = d => new Date(Date.now() + d * 86400000).toISOString();
+
+async function mountProgramme(over = {}) {
+  localStorage.clear();
+  localStorage.setItem("alongside_user", JSON.stringify({
+    tier: "personal", name: "Test",
+    consent: { given: true, at: new Date().toISOString() },
+    onboarding: { complete: true },
+    weightTracking: true, weightUnit: "kg", weight: 100,
+    strategicGoal: {
+      targetDescription: "Walk the Quantocks ridge with Jen",
+      targetDate: iso(140), targetSetAt: iso(-60), setAt: iso(-60),
+      weeklySessionTarget: 3, review: { lastOfferedAt: null, outcomes: [] }
+    },
+    ...over
+  }));
+  store.init();
+  const el = document.createElement("div");
+  document.body.appendChild(el);
+  const v = MyProgrammeView({ navigate() {} });
+  (v.mount || v.render).call(v, el);
+  await wait(80);
+  return el;
+}
+
+{
+  // Hidden unless tracking is on. The Settings toggle is the consent.
+  const off = await mountProgramme({ weightTracking: false });
+  ok("no weight target while tracking is off", off.querySelector("#weight-target") === null);
+  ok("no mention of a weight goal while off",
+     !/weight you are aiming/i.test(txt(off)), txt(off).slice(0, 120));
+
+  const on = await mountProgramme();
+  ok("the field appears when tracking is on", on.querySelector("#weight-target") !== null);
+  ok("it has a real <label for>", on.querySelector('label[for="weight-target"]') !== null);
+  ok("it is offered, not demanded",
+     /if you want one/i.test(txt(on)), txt(on).slice(0, 200));
+  ok("nothing prompts a weigh-in",
+     !/weigh yourself|time to weigh|remember to weigh/i.test(txt(on)));
+}
+
+{
+  // A sustainable target: 100kg -> 92kg over 20 weeks is 0.4 kg/wk.
+  const el = await mountProgramme();
+  el.querySelector("#weight-target").value = "92";
+  el.querySelector('[data-review="save-weight"]').dispatchEvent(new dom.window.Event("click"));
+  await wait(80);
+  ok("a sustainable target is accepted",
+     Math.abs(store.get("strategicGoal.targetValue") - 92) < 0.01,
+     String(store.get("strategicGoal.targetValue")));
+  ok("stored as kilograms", store.get("strategicGoal.targetUnit") === "kg");
+  ok("the band is recorded for audit", store.get("strategicGoal.weightTargetBand") === "silent",
+     String(store.get("strategicGoal.weightTargetBand")));
+  ok("the legacy top-level targetWeight is NOT written", !store.get("targetWeight"));
+}
+
+{
+  // THE REFUSAL. 100kg -> 70kg over ~4 weeks is far past RATE_REFUSE.
+  const el = await mountProgramme({
+    strategicGoal: {
+      targetDescription: "Walk the ridge", targetDate: iso(28),
+      targetSetAt: iso(-60), setAt: iso(-60), weeklySessionTarget: 3,
+      review: { lastOfferedAt: null, outcomes: [] }
+    }
+  });
+  el.querySelector("#weight-target").value = "70";
+  el.querySelector('[data-review="save-weight"]').dispatchEvent(new dom.window.Event("click"));
+  await wait(80);
+
+  ok("an unsafe target is NOT stored", store.get("strategicGoal.targetValue") == null,
+     String(store.get("strategicGoal.targetValue")));
+  const note = txt(el.querySelector("#weight-target-note"));
+  ok("the person is told why", note.length > 20, note);
+  ok("it signposts outward", /GP|dietitian/i.test(note), note);
+  ok("it declines the FIELD, not the person",
+     /not a judgement/i.test(note), note);
+  ok("it offers a way forward", /further out|open-ended/i.test(note), note);
+  ok("the note is announced without stealing focus",
+     el.querySelector("#weight-target-note")?.getAttribute("role") === "status");
+
+  // Set-time may propose a DATE. It may not state a rate or a weight.
+  ok("no rate stated", !/per week|a week|\/week/i.test(note), note);
+  ok("no weight or shortfall stated", !/\d+(\.\d+)?\s*(kg|lb|st|pounds|stone)/i.test(note), note);
+}
+
+{
+  // No current weight means no rate to judge -- and the coach does NOT
+  // ask for one. Asking for a weigh-in is the thing it never does.
+  const el = await mountProgramme({ weight: null });
+  el.querySelector("#weight-target").value = "92";
+  el.querySelector('[data-review="save-weight"]').dispatchEvent(new dom.window.Event("click"));
+  await wait(80);
+  ok("the target is simply held", Math.abs(store.get("strategicGoal.targetValue") - 92) < 0.01);
+  ok("no band is claimed without a rate", store.get("strategicGoal.weightTargetBand") === null);
+  ok("it does not ask for a weigh-in",
+     !/weigh yourself|enter your weight first|we need your weight/i.test(txt(el)));
+}
+
+{
+  // THE TARGET MUST CONVERT TOO, and this was nearly missed.
+  //
+  // Every other assertion in section 7 enters kilograms, where
+  // toKg(v,'kg') is a no-op -- so a reversal replacing the conversion
+  // with Number(main.value) stayed GREEN. Exactly the gap the chip
+  // test had: the fixture never used the case the code exists for.
+  const lb = await mountProgramme({ weightUnit: "lb" });
+  lb.querySelector("#weight-target").value = "202.83";   // ~92 kg
+  lb.querySelector('[data-review="save-weight"]').dispatchEvent(new dom.window.Event("click"));
+  await wait(80);
+  ok("a target entered in POUNDS is stored as kg",
+     Math.abs(store.get("strategicGoal.targetValue") - 92) < 0.05,
+     String(store.get("strategicGoal.targetValue")));
+
+  const st = await mountProgramme({ weightUnit: "st" });
+  ok("stone renders as a composite", st.querySelector("#weight-target-lb") !== null);
+  st.querySelector("#weight-target").value = "14";
+  st.querySelector("#weight-target-lb").value = "7";
+  st.querySelector('[data-review="save-weight"]').dispatchEvent(new dom.window.Event("click"));
+  await wait(80);
+  ok("a target entered in STONE AND POUNDS is stored as kg",
+     Math.abs(store.get("strategicGoal.targetValue") - toKg({ st: 14, lb: 7 }, "st")) < 0.05,
+     String(store.get("strategicGoal.targetValue")));
+}
+
+{
+  // Clearing removes it.
+  const el = await mountProgramme({
+    weightTracking: true, weightUnit: "kg", weight: 100,
+    strategicGoal: {
+      targetDescription: "Walk the ridge", targetDate: iso(140),
+      targetSetAt: iso(-60), setAt: iso(-60), weeklySessionTarget: 3,
+      targetValue: 92, targetUnit: "kg",
+      review: { lastOfferedAt: null, outcomes: [] }
+    }
+  });
+  ok("an existing target is shown back", el.querySelector("#weight-target")?.value === "92",
+     String(el.querySelector("#weight-target")?.value));
+  el.querySelector("#weight-target").value = "";
+  el.querySelector('[data-review="save-weight"]').dispatchEvent(new dom.window.Event("click"));
+  await wait(80);
+  ok("clearing removes the target", store.get("strategicGoal.targetValue") === null);
+  ok("and clears the recorded band", store.get("strategicGoal.weightTargetBand") === null);
 }
 
 console.log(`\n${"-".repeat(60)}`);
