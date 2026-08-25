@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 22 Aug 2026 v4
+## 22 Aug 2026 v5
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -49,7 +49,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | `Documents/Live State/Schema.md` | Store fields. **Must match `store.js`** |
 | `Documents/Business/` | Governing documents — see below |
 | `Documents/Archive/` | Stale, kept not deleted |
-| `tools/verify-*.mjs` | 79 gates |
+| `tools/verify-*.mjs` | 88 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order:**
@@ -68,11 +68,17 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 
 | | Version |
 |---|---|
-| `store.js` | v55 |
-| `Schema.md` | v1.38 |
-| `sw.js` | **v394**, cache `alongside-v394` |
-| `router.js` | v21 · `plan-select.js` v2 · new `programme-select.js` v1, `plan-options.js` v1 |
-| Gates | **79, all green** — and genuinely green from any clone path |
+| `store.js` | v58 |
+| `Schema.md` | v1.41 |
+| `sw.js` | **v405**, cache `alongside-v405` |
+| `router.js` | v22 · `my-programme.js` v8 · `today.js` v24 · `settings.js` v34 · `progress.js` v11 · `onboarding/thread.js` v13 |
+| Gates | **88, all green** — and genuinely green from any clone path |
+
+🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
+
+**It was written because this table went stale three times on 22 Aug alone** — and staleness here is worse than in an ordinary document, because §"Session Start" tells a new session to *stop and reconcile* when versions do not match. A stale table halts work over a discrepancy that exists only on paper. Three hand-fixes later, the fourth approach was to make drifting impossible.
+
+⚠️ It asserts **agreement, not correctness**: it cannot tell whether the prose below is still true, only that the numbers are. The prose still needs a person.
 
 🟢 **GATE-PATH closed 21 Aug.** v1 of this document claimed 75 green on a fresh clone. That was never true: 14 gates hardcoded `/home/claude/repo`, so a clone elsewhere went red — and if that directory existed from an earlier session they read **that** copy and reported green on code nobody was editing. A clean clone actually ran 63 pass, 14 fail.
 
