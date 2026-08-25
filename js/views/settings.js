@@ -1,5 +1,38 @@
 /**
  * settings.js
+ * 22 Aug 2026 v34
+ *
+ * v34 - WEIGHT-1b (Settings half). Weight tracking, off by default,
+ *   Plan only.
+ *
+ *   THE FIRST TIER GATE IN THIS FILE. settings.js has never imported
+ *   isPremium or lockedFeature -- the two prior mentions were comments.
+ *   So this is a precedent, not a line: the pattern followed is
+ *   library.js:144 and my-programme.js:99.
+ *
+ *   Free sees NOTHING of it. Not a locked row, not a greyed switch.
+ *   Somebody who cannot use a feature does not need to be shown the
+ *   shape of it every time they open their profile.
+ *
+ *   The toggle is the CONSENT. Turning it on is what lets the coach
+ *   speak to a weight target at all -- goal-review.js reads
+ *   weightTracking and will not raise a weight target without it.
+ *
+ *   Weight is stored in CANONICAL KILOGRAMS always; weightUnit is a
+ *   display preference only. Somebody working in stone and pounds
+ *   enters and sees 12 st 4 lb and the stored number is kg. The bands
+ *   compare a rate against a threshold, so a value that is sometimes 80
+ *   and sometimes 176 would let any consumer that forgot to convert
+ *   compare the wrong quantities -- and the 3 lb/week refusal is the
+ *   one place here where being wrong by a factor of 2.2 is
+ *   unacceptable.
+ *
+ *   NO WEIGH-IN PROMPT ANYWHERE. Not here, not as a reminder, not as a
+ *   badge, not as an empty state that reads as an unfinished task.
+ *   Frequent weighing is itself a risk behaviour, so the entry point is
+ *   passive: a control that is there when looked for, and silent
+ *   otherwise.
+ *
  * 20 Aug 2026 v33
  *
  * v33 - PLAIN-1. THREE LIVE FALSEHOODS REMOVED from the "What the Plan
@@ -381,6 +414,8 @@
  */
 
 import { store }          from '../store.js';
+import { isPremium }      from '../auth.js';
+import { toKg, fromKg } from '../data/weight-targets.js';
 import { PRICE_MONTHLY, PRICE_ANNUAL } from "../data/pricing.js";
 import { GOAL_CATEGORIES, getGoalLabel } from '../data/goals.js';
 import { getProgramme, PROGRAMMES }      from '../data/programmes.js';
@@ -677,6 +712,9 @@ export function SettingsView(router) {
     const ageBand      = store.get('ageBand') || '';
     const gender       = store.get('gender') || '';
     const hormonalTracking = store.get('hormonalTracking') || false;
+    const weightTracking   = store.get('weightTracking') === true;
+    const weightUnit       = store.get('weightUnit') || 'kg';
+    const weightKg         = store.get('weight');
 
     return `
       <div class="settings-section">
@@ -741,6 +779,8 @@ export function SettingsView(router) {
           </button>
         </div>
 
+        ${_weightSection(weightTracking, weightUnit, weightKg)}
+
         <button class="settings-save-btn btn btn-primary"
                 data-action="save-profile"
                 aria-label="Save profile changes">
@@ -749,6 +789,81 @@ export function SettingsView(router) {
 
         ${renderMovementSection()}
       </div>
+    `;
+  }
+
+  /**
+   * Weight tracking. Off by default, Plan only, and invisible on free.
+   *
+   * Free gets no locked row and no greyed switch. Showing somebody the
+   * shape of a feature they cannot use, on a screen they open to change
+   * their name, is pressure dressed as information.
+   */
+  function _weightSection(on, unit, kg) {
+    if (!isPremium()) return '';
+
+    const units = [
+      { id: 'kg', label: 'kg' },
+      { id: 'lb', label: 'lb' },
+      { id: 'st', label: 'st & lb' }
+    ];
+
+    return `
+      <div class="settings-field settings-field--toggle">
+        <label class="settings-label" for="settings-weight-tracking">
+          Weight tracking
+          <span class="settings-label__sub">Off unless you want it. Turn it on to record your weight and set a target, and I'll take it into account. I'll never ask you to weigh yourself.</span>
+        </label>
+        <button
+          class="settings-toggle ${on ? 'settings-toggle--on' : ''}"
+          id="settings-weight-tracking"
+          role="switch"
+          aria-checked="${on ? 'true' : 'false'}"
+          data-toggle="weightTracking"
+          aria-label="Weight tracking ${on ? 'on' : 'off'}">
+          <span class="settings-toggle__track" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      ${on ? `
+        <div class="settings-field" role="group" aria-label="How weights are shown">
+          <span class="settings-label" id="settings-weight-unit-label">Show weights in</span>
+          <div class="settings-unit-picker">
+            ${units.map(u => `
+              <button type="button"
+                      class="settings-unit ${unit === u.id ? 'settings-unit--on' : ''}"
+                      data-weight-unit="${u.id}"
+                      role="radio"
+                      aria-checked="${unit === u.id ? 'true' : 'false'}"
+                      aria-labelledby="settings-weight-unit-label">${u.label}</button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="settings-field">
+          <label class="settings-label" for="settings-weight-now">
+            Your weight now
+            <span class="settings-label__sub">Only if you want to. Nothing here will ask you again.</span>
+          </label>
+          ${unit === 'st'
+            ? `<div class="settings-weight-stone">
+                 <input class="settings-input settings-input--short" id="settings-weight-now"
+                        type="number" inputmode="numeric" min="0" max="60"
+                        value="${kg != null ? fromKg(kg, 'st').st : ''}"
+                        aria-label="Stone">
+                 <span class="settings-weight-stone__unit">st</span>
+                 <input class="settings-input settings-input--short" id="settings-weight-now-lb"
+                        type="number" inputmode="numeric" min="0" max="13"
+                        value="${kg != null ? fromKg(kg, 'st').lb : ''}"
+                        aria-label="Pounds">
+                 <span class="settings-weight-stone__unit">lb</span>
+               </div>`
+            : `<input class="settings-input" id="settings-weight-now"
+                      type="number" inputmode="decimal" min="0" step="0.1"
+                      value="${kg != null ? Math.round(fromKg(kg, unit) * 10) / 10 : ''}"
+                      aria-label="Your weight in ${unit === 'lb' ? 'pounds' : 'kilograms'}">`}
+        </div>
+      ` : ''}
     `;
   }
 
@@ -1991,6 +2106,21 @@ export function SettingsView(router) {
         const label = btn.getAttribute('aria-label') || '';
         btn.setAttribute('aria-label', label.replace(next ? 'off' : 'on', next ? 'on' : 'off'));
         // Re-render notifications panel to show/hide time input
+        // WEIGHT-1b. Turning tracking on reveals the unit picker and the
+        // weight field beneath it, so the panel has to re-render. Same
+        // branch the reminders toggle uses -- reusing it rather than
+        // forking the handler.
+        if (field === 'weightTracking') {
+          // 'profile' is a PANEL id; the SECTION holding it is
+          // 'settings'. Setting activeSection = 'profile' bounced the
+          // person out of their profile into Reminders mid-toggle --
+          // precisely what the NAV-5 note below warns about, repeated
+          // by the next person to touch this handler.
+          activeSection = 'settings';
+          activePanel   = 'profile';
+          render(container);
+          return;
+        }
         if (field === 'checkInNotification.enabled') {
           // NAV-5. Reminders lives in App Controls now; re-rendering must
           // not bounce back to the index mid-toggle.
@@ -1998,6 +2128,18 @@ export function SettingsView(router) {
           activePanel   = 'notify';   // NAV-7: stay on the tab the action came from
           render(container);
         }
+      });
+    });
+
+    // WEIGHT-1b. Display unit only -- NEVER touches the stored value,
+    // which is canonical kilograms. Changing how you read a number must
+    // not change the number.
+    container.querySelectorAll('[data-weight-unit]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        store.set('weightUnit', btn.dataset.weightUnit);
+        activeSection = 'settings';
+        activePanel   = 'profile';
+        render(container);
       });
     });
 
@@ -2129,6 +2271,35 @@ export function SettingsView(router) {
         if (name  !== undefined) store.set('name', name);
         if (age   !== undefined) store.set('ageBand', age);
         if (gender !== undefined) store.set('gender', gender);
+
+        // WEIGHT-1b. CONVERT ON THE WAY IN, ALWAYS. Whatever unit the
+        // person types in, kilograms is what is stored -- so no consumer
+        // downstream can compare 80 against 176.
+        //
+        // A cleared field clears the value. Somebody removing their
+        // weight is removing it, not leaving the old one behind.
+        if (isPremium() && store.get('weightTracking') === true) {
+          const unit = store.get('weightUnit') || 'kg';
+          const main = container.querySelector('#settings-weight-now');
+          if (main) {
+            if (unit === 'st') {
+              const lbEl = container.querySelector('#settings-weight-now-lb');
+              const st = main.value, lb = lbEl?.value;
+              if (st === '' && (lb === '' || lb === undefined)) {
+                store.set('weight', null);
+              } else {
+                const kg = toKg({ st: Number(st || 0), lb: Number(lb || 0) }, 'st');
+                if (kg !== null && kg > 0) store.set('weight', kg);
+              }
+            } else if (main.value === '') {
+              store.set('weight', null);
+            } else {
+              const kg = toKg(main.value, unit);
+              if (kg !== null && kg > 0) store.set('weight', kg);
+            }
+          }
+        }
+
         _showToast('Profile saved', container);
         break;
       }
