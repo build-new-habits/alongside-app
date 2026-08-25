@@ -1,5 +1,17 @@
 /**
  * store.js - Data persistence layer
+ * 22 Aug 2026 v57
+ *   WEIGHT-1b. weightLog gains its writer, and weightRateRaisedAt
+ *   records that the coach has spoken once about a sustained rate.
+ *
+ *   ONCE means once. Without a timestamp the note would reappear on
+ *   every render of Progress -- which is nagging, and nagging somebody
+ *   about the rate they are losing weight at is the worst possible
+ *   version of this feature.
+ *
+ *   weightLog entries are { at, kg } and kg is CANONICAL KILOGRAMS, as
+ *   everywhere else.
+ *
  * 22 Aug 2026 v56
  *   WEIGHT-1a. Weight tracking declared, dark. A feature, off by
  *   default, Plan-only at the surface.
@@ -1177,6 +1189,7 @@ export const store = {
       // weightUnit is display only -- 'kg' | 'lb' | 'st'. Never convert
       // on the way in; convert on the way out.
       weightTracking: false,
+      weightRateRaisedAt: null,
       weight: null,
       weightUnit: 'kg',
       targetWeight: null,

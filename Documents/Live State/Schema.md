@@ -1,7 +1,31 @@
 # Alongside — Data Schema Reference
-## 22 Aug 2026 v1.39
+## 22 Aug 2026 v1.40
 
-**File:** `js/store.js` (confirmed live version: **v56, 22 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v57, 22 Aug 2026**)
+
+---
+
+## v1.40 (22 Aug 2026) — WEIGHT-1b: the surfaces, and one new field
+
+`store.js` v56 → **v57**. Weight tracking is now reachable end to end: the Settings toggle, the display unit, the weight, the target, and the log.
+
+| Field | Type | Default | Purpose |
+|---|---|---|---|
+| `weightRateRaisedAt` | `string\|null` (ISO) | `null` | The coach has spoken **once** about a sustained rate of loss |
+
+### 🔴 Why the timestamp exists
+
+`observedRateBreach()` fires when logged loss runs at or above 3 lb a week for three consecutive weeks — the threshold supervised trials intervene at. Without a record that it has spoken, the note would reappear on **every render of Progress**, which is nagging somebody about the rate they are losing weight at: the worst available version of this feature.
+
+⚠️ **The flag is written AFTER the note is rendered, never before.** The first implementation set it in the save handler before re-rendering — so the render then saw the flag and drew nothing, and the note would have appeared **zero** times. A "show once" that writes its own flag too early shows never, and fails silently.
+
+### Fields that gained writers in this version
+
+`weightTracking` (Settings toggle) · `weightUnit` (display picker) · `weight` (Settings, and the most recent log entry) · `weightLog` (Progress) · `strategicGoal.targetValue` and `targetUnit` (My Programme, canonical kg) · `strategicGoal.weightTargetBand` (recorded at set-time).
+
+⚠️ **Top-level `targetWeight` is now fully dead** — no reader, no writer. Deliberately not revived: `strategicGoal.targetValue` + `targetUnit` is the single home, and a second home for the same fact is what caused TARGET-3. Booked for removal.
+
+---
 
 ---
 
@@ -393,6 +417,7 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 | **1.14** | **04 Aug 2026** | **Phase D-1 (schema), Conditions Update.** Two new fields: `conditionGoals` (felt-sense condition-specific goal, `'healed'\|'cope'\|'improve'` + optional note, new `store.setConditionGoal()`) and `prescribedExercisesOrigin` (`'professional'\|'self'\|null`, lets `prescribed.js` branch its coach voice correctly). Also documented in the field-reference table: `pendingDoorRoute`, added earlier today (Phase C follow-up) but missed in Schema.md at the time. `js/store.js` v14→v15. |
 | **1.15** | **04 Aug 2026** | **Condition programmes, real routes built.** `prescribedExercises` entries can now carry an optional `conditionId` — additive, nullable, existing entries unaffected. New `prescribedExercisesActiveCondition` — single-use context flag, cleared the instant it's read. `js/store.js` v15→v16. New module `js/data/conditionProgrammes.js` (not a schema file, but the reason these fields exist) — real, tested exercise-selection logic for "Coach builds it"/"Coach recommends, you select," built on `affectsAreas`/`rehabPhase`/`contraindications` data that already existed. |
 | **1.16** | **04 Aug 2026** | **Cross-condition exercise reuse, not duplication.** `prescribedExercises` entries: `conditionId` (singular) replaced with `conditionIds` (array) — one entry can now genuinely serve more than one condition, so doing the same physical exercise once correctly counts once everywhere, rather than the same exercise appearing as two separate entries with independent completion state and double credits. Backward compatible — old singular-shaped entries read correctly via new `getEntryConditionIds()`, migrate naturally on rebuild, no explicit migration step. `js/data/conditionProgrammes.js` v2→v3. Smoke-tested against real overlapping conditions before shipping. |
+| **1.40** | **22 Aug 2026** | **WEIGHT-1b.** `store.js` v56 → v57. `weightRateRaisedAt` — the coach speaks once about a sustained rate, written *after* the note renders. Writers arrive for `weightTracking`, `weightUnit`, `weight`, `weightLog`, `strategicGoal.targetValue`/`targetUnit`/`weightTargetBand`. Top-level `targetWeight` left dead and booked for removal. |
 | **1.39** | **22 Aug 2026** | **WEIGHT-1a.** `store.js` v55 → v56. `weightTracking` (opt-in, default false), `strategicGoal.weightTargetBand`, and `weight`/`targetWeight`/`weightLog` documented as **canonical kilograms** with `weightUnit` demoted to a display preference. Additive, no migration. Declared dark: no writers until WEIGHT-1b, tracked by `verify-weight1.mjs`. |
 | **1.38** | **21 Aug 2026** | **R1-a.** `store.js` v54 → v55. `strategicGoal.targetSetAt` (the maturity guard's honest clock — `setAt` records when the *frequency* was agreed, not the date) and `strategicGoal.review` (`lastOfferedAt` throttle, `outcomes` log). Both additive, no migration. Declared dark: nothing reads `review` until R1-b and nothing writes `targetSetAt` until R2-a, tracked by `verify-hard1.mjs`. |
 | **1.35** | **17 Aug 2026** | **TARGET-4.** `store.js` v52 → v53. One-way migration of `targetDate`/`targetDescription` from top level into `strategicGoal`, on load, into empty fields only. Closes a divergence where two editable fields held one idea — and a third, `goal.*`, was read but had never existed, silently replacing a chosen primary goal with `goals[0]`. |

@@ -1,5 +1,13 @@
 /*
  * css/layouts/progress.css
+ * 22 Aug 2026 v5
+ *   WEIGHT-1b. .progress-weight -- the log and the sustained-rate note.
+ *
+ *   NO CHART. A graph of somebody losing weight invites reading a
+ *   slope, and reading a slope is the arithmetic on the body this
+ *   product refuses. A list of what was recorded, and nothing about
+ *   what was not.
+ *
  * 16 Aug 2026 v4
  *   COUNTDOWN-1. .progress-programme__bar and __fill deleted with the
  *   markup they styled.
@@ -372,4 +380,105 @@
 
 @media (prefers-reduced-motion: reduce) {
   .progress-tab--locked { transition: none; }
+}
+
+/* ── Weight log (WEIGHT-1b) ────────────────────────────────────── */
+
+.progress-weight {
+  margin-top: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.progress-weight__heading {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.progress-weight__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/*
+ * A row is a date and a number. No delta, no arrow, no colour for "up"
+ * or "down" -- a red number for a gain would be a verdict, and this
+ * product does not score the body.
+ */
+.progress-weight__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.progress-weight__when {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.progress-weight__what {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+}
+
+.progress-weight__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: var(--leading-relaxed);
+}
+
+.progress-weight__input {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  color: var(--color-text);
+}
+
+.progress-weight__input:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.progress-weight__stone {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.progress-weight__input--part {
+  flex: 1;
+  min-width: 0;
+}
+
+.progress-weight__unit {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/*
+ * The sustained-rate note. NOT an alert: no red, no icon, no border.
+ * It points somebody outward once, and styling it like a warning would
+ * make a concern feel like a telling-off.
+ */
+.progress-weight__note {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+  padding: var(--space-3);
+  background: var(--color-bg-card);
+  border-radius: var(--radius-md);
 }
