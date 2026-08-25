@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v404
+ * WEIGHT-1b weight target. Cache bump only -- my-programme.js and its
+ * stylesheet are already precached. The bump carries the target field
+ * and, with it, the first caller validateWeightTarget() has ever had.
+ *
  * 22 Aug 2026 v403
  * WEIGHT-1b (Settings half). Cache bump only -- settings.js and
  * settings.css are both already precached, and weight-targets.js was
@@ -2799,7 +2804,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v403";
+const CACHE_NAME = "alongside-v404";
 
 const SHELL_URLS = [
 
