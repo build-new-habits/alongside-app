@@ -99,7 +99,12 @@ for (const k of fields) {
 // connected or removed. If you are updating it upward, stop: that is
 // the thing this gate exists to prevent.
 const BASELINE = new Set([
-  'hormonalTracking','coachStyle','weight','weightUnit','targetWeight','targetDescription',
+  // WEIGHT-1b, 22 Aug 2026. 'weight' and 'weightUnit' REMOVED -- both
+  // now have writers in settings.js, so the baseline was overstating
+  // the debt. This gate caught that itself, which is the direction that
+  // matters: an allowlist that only ever grows is permission, not a
+  // record.
+  'hormonalTracking','coachStyle','targetWeight','targetDescription',
   // weightTracking — DECLARED DARK 22 Aug 2026 (WEIGHT-1a). The opt-in
   // for weight tracking. No writer until WEIGHT-1b builds the Settings
   // toggle; goal-review.js consumes it as a context argument, which this
@@ -110,6 +115,18 @@ const BASELINE = new Set([
   // PROMISE, not permission: WEIGHT-1b removes it. If this line is still
   // here once 1b has shipped, the field is an orphan and the baseline is
   // lying.
+  // 'weightTracking' -- CORRECTED 22 Aug. When this was added the note
+  // called it a dated promise: "WEIGHT-1b removes it." That promise was
+  // unkeepable, and the real reason is different and permanent.
+  //
+  // It IS written -- the Settings toggle writes it -- but through the
+  // generic [data-toggle] handler, as store.set(field, next) where field
+  // comes from a data attribute. A literal scan cannot see that, and
+  // never will. 'hormonalTracking' sits in this list for exactly the
+  // same reason.
+  //
+  // So this entry is not debt awaiting payment. It is a limit of what a
+  // text scan can prove about a dynamic write, and it stays.
   'weightTracking',
   // targetDate — MIGRATION-ONLY as of 22 Aug 2026 (CHOOSER-1). Read by
   // store.js's one-way TARGET-4 migration for historic installs; its
