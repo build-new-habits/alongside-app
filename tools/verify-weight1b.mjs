@@ -1,5 +1,10 @@
 /**
  * tools/verify-weight1b.mjs
+ * 22 Aug 2026 v3
+ * Section 8: the log in Progress and the sustained-rate note. Until
+ * this, observedRateBreach() had no caller -- the rule was written,
+ * gated and unreachable.
+ *
  * 22 Aug 2026 v2
  * Section 7 added: the weight TARGET in My Programme, and the bands
  * running at set-time. Until this existed, validateWeightTarget() had
@@ -63,6 +68,7 @@ const { toKg } = await import(`${REPO}/js/data/weight-targets.js`);
 const { SettingsView } = await import(`${REPO}/js/views/settings.js`);
 const { MyProgrammeView } = await import(`${REPO}/js/views/my-programme.js`);
 const { RATE_REFUSE } = await import(`${REPO}/js/data/weight-targets.js`);
+const { ProgressView } = await import(`${REPO}/js/views/progress.js`);
 
 async function mount(state) {
   localStorage.clear();
@@ -377,6 +383,166 @@ async function mountProgramme(over = {}) {
   await wait(80);
   ok("clearing removes the target", store.get("strategicGoal.targetValue") === null);
   ok("and clears the recorded band", store.get("strategicGoal.weightTargetBand") === null);
+}
+
+// ── 8. The log, and the sustained-rate note ─────────────────────────
+section("8. The weight log in Progress");
+
+async function mountProgress(over = {}) {
+  localStorage.clear();
+  localStorage.setItem("alongside_user", JSON.stringify({
+    tier: "personal", name: "Test",
+    consent: { given: true, at: new Date().toISOString() },
+    onboarding: { complete: true },
+    weightTracking: true, weightUnit: "kg",
+    ...over
+  }));
+  store.init();
+  const el = document.createElement("div");
+  document.body.appendChild(el);
+  const v = ProgressView({ navigate() {} });
+  (v.mount || v.render).call(v, el);
+  await wait(80);
+  return el;
+}
+
+/** A log losing `kgPerWeek` every 7 days, oldest first. */
+function fallingLog(weeks, kgPerWeek, startKg = 100) {
+  const out = [];
+  for (let i = 0; i <= weeks; i++) {
+    out.push({
+      at: new Date(Date.now() - (weeks - i) * 7 * 86400000).toISOString(),
+      kg: startKg - i * kgPerWeek
+    });
+  }
+  return out;
+}
+
+{
+  const off = await mountProgress({ weightTracking: false });
+  ok("no log while tracking is off", off.querySelector("#weight-log-input") === null);
+  ok("no mention of weight while off", !/your weight/i.test(txt(off)), txt(off).slice(0, 100));
+
+  const free = await mountProgress({ tier: "free" });
+  ok("free never sees the log", free.querySelector("#weight-log-input") === null);
+
+  const on = await mountProgress();
+  ok("the field appears when tracking is on", on.querySelector("#weight-log-input") !== null);
+  ok("it has a real <label for>", on.querySelector('label[for="weight-log-input"]') !== null);
+  ok("it is offered, not demanded", /if you want to/i.test(txt(on)), txt(on).slice(0, 160));
+
+  // An empty log must be silent. No badge, no "you haven't weighed in".
+  ok("an empty log says nothing about the gap",
+     !/haven't|no entries|start tracking|weigh in|nothing recorded/i.test(txt(on)),
+     txt(on).slice(0, 160));
+
+  // NO CHART. A slope invites reading, and reading a slope is the
+  // arithmetic on the body this product refuses.
+  ok("no chart or trend line rendered",
+     on.querySelector("svg, canvas, .progress-weight__chart") === null);
+}
+
+{
+  // Logging converts on the way in, like everywhere else.
+  const el = await mountProgress({ weightUnit: "lb" });
+  el.querySelector("#weight-log-input").value = "176.37";
+  el.querySelector('[data-action="log-weight"]').dispatchEvent(new dom.window.Event("click"));
+  await wait(80);
+  const log = store.get("weightLog");
+  ok("an entry was recorded", Array.isArray(log) && log.length === 1, JSON.stringify(log));
+  ok("stored as kilograms", Math.abs(log[0].kg - 80) < 0.05, String(log[0]?.kg));
+  ok("the entry carries a timestamp", typeof log[0].at === "string" && log[0].at.includes("T"));
+  ok("current weight follows the newest entry", Math.abs(store.get("weight") - 80) < 0.05);
+}
+
+{
+  // Existing entries are shown back, in the person's display unit.
+  const el = await mountProgress({ weightUnit: "st", weightLog: fallingLog(2, 0.2) });
+  const rows = el.querySelectorAll(".progress-weight__row");
+  ok("past entries are listed", rows.length === 3, String(rows.length));
+  ok("shown in stone and pounds", /st/.test(txt(rows[0])), txt(rows[0]));
+
+  // No delta, no arrow, no colour. A red number for a gain is a verdict.
+  ok("no per-entry change or direction shown",
+     !/[▲▼↑↓]|\+\d|-\d.*(kg|lb)/.test(txt(el)), txt(el).slice(0, 200));
+}
+
+{
+  // THE SUSTAINED-RATE NOTE. RATE_REFUSE is ~1.361 kg/wk.
+  const slow = await mountProgress({ weightLog: fallingLog(4, 0.4) });
+  ok("a gentle rate says nothing",
+     slow.querySelector(".progress-weight__note") === null, txt(slow).slice(0, 160));
+
+  const fast = await mountProgress({ weightLog: fallingLog(4, RATE_REFUSE + 0.2) });
+  const note = fast.querySelector(".progress-weight__note");
+  ok("a sustained fast rate IS raised", note !== null, txt(fast).slice(0, 200));
+  ok("it points outward", /GP|dietitian/i.test(txt(note)), txt(note));
+  ok("it says nothing is wrong with the person",
+     /not because anything is wrong/i.test(txt(note)), txt(note));
+  ok("it is announced without stealing focus", note?.getAttribute("role") === "status");
+
+  // No arithmetic on the body: the person can read their own log.
+  ok("the note states no rate", !/per week|a week|\/week/i.test(txt(note)), txt(note));
+  ok("the note states no weight", !/\d+(\.\d+)?\s*(kg|lb|st)/i.test(txt(note)), txt(note));
+
+  // ONCE MEANS ONCE. The first implementation wrote the flag BEFORE
+  // rendering, so the render saw it and drew nothing -- the note would
+  // have appeared zero times and nothing would have failed.
+  ok("the flag is recorded once shown",
+     typeof store.get("weightRateRaisedAt") === "string",
+     String(store.get("weightRateRaisedAt")));
+
+  const again = await mountProgress({
+    weightLog: fallingLog(4, RATE_REFUSE + 0.2),
+    weightRateRaisedAt: new Date().toISOString()
+  });
+  ok("it never speaks a second time",
+     again.querySelector(".progress-weight__note") === null, txt(again).slice(0, 160));
+}
+
+{
+  // THE PATH THE BUG LIVED ON. Every assertion above sees the note on
+  // MOUNT, with a log that already breaches. The original fault was in
+  // the SAVE handler -- it wrote weightRateRaisedAt and then called
+  // render(), so the render saw the flag, drew nothing, and the note
+  // would have appeared zero times.
+  //
+  // A reversal could not catch that until this existed, because nothing
+  // tested the case where a new entry is what tips somebody into breach.
+  // Three entries -> two weekly rates -> one short of OBSERVED_WEEKS.
+  // The last sits a week back, so the entry saved NOW is a genuine
+  // seven-day gap. (First attempt used a log ending today: the new pair
+  // spanned zero days, _weeklyRates skipped it, and nothing tipped.)
+  const step = RATE_REFUSE + 0.2;
+  const seed = [0, 1, 2].map(i => ({
+    at: new Date(Date.now() - (3 - i) * 7 * 86400000).toISOString(),
+    kg: 100 - i * step
+  }));
+  const el = await mountProgress({ weightLog: seed });
+  ok("not yet raised before the tipping entry",
+     store.get("weightRateRaisedAt") == null, String(store.get("weightRateRaisedAt")));
+  ok("and no note is showing yet",
+     el.querySelector(".progress-weight__note") === null);
+
+  el.querySelector("#weight-log-input").value = String(100 - 3 * step);
+  el.querySelector('[data-action="log-weight"]').dispatchEvent(new dom.window.Event("click"));
+  await wait(80);
+
+  ok("the note appears on the render that follows the save",
+     el.querySelector(".progress-weight__note") !== null, txt(el).slice(0, 200));
+  ok("and only then is the flag written",
+     typeof store.get("weightRateRaisedAt") === "string");
+}
+
+{
+  // Gaining or holding steady must not trigger it. The rule is about
+  // sustained LOSS.
+  const gaining = await mountProgress({ weightLog: fallingLog(4, -0.5) });
+  ok("gaining weight is never raised",
+     gaining.querySelector(".progress-weight__note") === null);
+  const flat = await mountProgress({ weightLog: fallingLog(4, 0) });
+  ok("a steady weight is never raised",
+     flat.querySelector(".progress-weight__note") === null);
 }
 
 console.log(`\n${"-".repeat(60)}`);

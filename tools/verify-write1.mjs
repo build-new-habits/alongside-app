@@ -143,7 +143,7 @@ const BASELINE = new Set([
   // and it insists on being pruned rather than drifting out of date.
   'onboardingStep','age','sessionMode','mindfulPromptDepth','proposalBias',
   'activityPreferences','noticingPreferences','noticingProgress','safeguarding',
-  'weeklyReview','weightLog','waterLog','waterSettings','coachOffers','unwellMode',
+  'weeklyReview','waterLog','waterSettings','coachOffers','unwellMode',
   'foodPrompts','practiceHistory'
 ]);
 
