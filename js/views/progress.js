@@ -1,5 +1,28 @@
 /**
  * progress.js
+ * 22 Aug 2026 v11
+ *
+ * v11 - WEIGHT-1b. The weight log, and the sustained-rate note.
+ *
+ *   PASSIVE ENTRY, ALWAYS. A field that is there when looked for and
+ *   silent otherwise. No badge, no reminder, no empty state that reads
+ *   as an unfinished task, no "you haven't weighed in for a while".
+ *   Frequent weighing is itself a risk behaviour, so the app must never
+ *   be the thing that asks.
+ *
+ *   NO STREAK, and no gap-shaming either. The log shows what was
+ *   recorded and says nothing about what was not.
+ *
+ *   THE SUSTAINED-RATE NOTE. observedRateBreach() had no caller until
+ *   now -- the rule was written, gated and unreachable. It fires when
+ *   logged loss runs at or above 3 lb a week for three consecutive
+ *   weeks, which is the threshold supervised trials intervene at.
+ *
+ *   It speaks ONCE. weightRateRaisedAt records that it has, because a
+ *   note that reappeared on every render would be nagging somebody
+ *   about the rate they are losing weight at -- the worst available
+ *   version of this feature.
+ *
  * 20 Aug 2026 v10
  *
  * v10 - R4 / decision 7.2. EXPORT IS FREE. renderExportLocked() and its
@@ -147,6 +170,13 @@
 import { store }            from '../store.js';
 import { getProgressStats } from '../data/programmeEngine.js';
 import { getGoalLabel }     from '../data/goals.js';
+import { toKg, formatWeight, observedRateBreach } from '../data/weight-targets.js';
+
+// Set by _rateNote when it renders the sustained-rate note, committed by
+// _commitRateRaise once the markup is on screen. It is a fact about this
+// render, not about the person, so it lives here and not in the store --
+// what reaches the store is only the timestamp saying it was said.
+let _pendingRateRaise = false;
 
 // ─── View registration ────────────────────────────────────────────────────────
 
@@ -213,6 +243,8 @@ export function ProgressView(router) {
                scoped by activeWindow (14 free, 30/90 paid) and its
                programme lines drop out when there is no programme. No
                conditional needed; the differentiation is emergent. -->
+          ${_weightLog(premium)}
+
           ${renderExportBlock()}
 
           <!-- Front door for the annual reflection, added 11 Aug 2026.
@@ -232,6 +264,146 @@ export function ProgressView(router) {
     `;
 
     attachEvents(container, tier);
+
+    // AFTER the markup exists. See _rateNote.
+    _commitRateRaise();
+  }
+
+  /**
+   * The weight log. Plan only, and only where tracking is on.
+   *
+   * Deliberately plain: a list of what was recorded and a field to add
+   * to it. No chart, no trend line, no projection -- a graph of somebody
+   * losing weight invites reading a slope, and reading a slope is the
+   * arithmetic on the body this product refuses.
+   */
+  function _weightLog(premium) {
+    if (!premium || store.get('weightTracking') !== true) return '';
+
+    const unit    = store.get('weightUnit') || 'kg';
+    const entries = (store.get('weightLog') || [])
+      .filter(e => e && typeof e.kg === 'number')
+      .slice()
+      .sort((a, b) => String(b.at).localeCompare(String(a.at)))
+      .slice(0, 8);
+
+    const stone = unit === 'st';
+    const note  = _rateNote(premium);
+
+    return `
+      <section class="progress-weight" aria-label="Your weight">
+        <h2 class="progress-weight__heading">Your weight</h2>
+
+        ${note}
+
+        ${entries.length ? `
+          <ul class="progress-weight__list">
+            ${entries.map(e => `
+              <li class="progress-weight__row">
+                <span class="progress-weight__when">${_esc(_weightDate(e.at))}</span>
+                <span class="progress-weight__what">${_esc(formatWeight(e.kg, unit))}</span>
+              </li>
+            `).join('')}
+          </ul>
+        ` : ''}
+
+        <label class="progress-weight__label" for="weight-log-input">
+          Add a weight, if you want to
+        </label>
+        ${stone
+          ? `<div class="progress-weight__stone">
+               <input class="progress-weight__input progress-weight__input--part"
+                      id="weight-log-input" type="number" inputmode="numeric" min="0" max="60"
+                      aria-label="Stone">
+               <span class="progress-weight__unit">st</span>
+               <input class="progress-weight__input progress-weight__input--part"
+                      id="weight-log-input-lb" type="number" inputmode="numeric" min="0" max="13"
+                      aria-label="Pounds">
+               <span class="progress-weight__unit">lb</span>
+             </div>`
+          : `<input class="progress-weight__input" id="weight-log-input"
+                    type="number" inputmode="decimal" min="0" step="0.1"
+                    aria-label="Your weight in ${unit === 'lb' ? 'pounds' : 'kilograms'}">`}
+        <button class="btn btn-secondary btn-small" data-action="log-weight">Save it</button>
+      </section>
+    `;
+  }
+
+  /**
+   * The sustained-rate note. Speaks once, then never again.
+   *
+   * Says what it noticed and points outward. It does NOT state the rate,
+   * a projection, or any weight -- the person can read their own log,
+   * and the coach putting a number on it turns a concern into a verdict.
+   */
+  function _rateNote(premium) {
+    if (!premium || store.get('weightTracking') !== true) return '';
+    if (store.get('weightRateRaisedAt')) return '';
+
+    const weekly = _weeklyRates(store.get('weightLog') || []);
+    if (!observedRateBreach(weekly)) return '';
+
+    // Marked here and WRITTEN AFTER the render, not before.
+    //
+    // The first version set weightRateRaisedAt in the save handler
+    // before re-rendering -- which meant this function then saw the flag
+    // and returned nothing, so the note would never have appeared at
+    // all. A "show once" that writes its own flag too early shows zero
+    // times, and nothing would have failed loudly.
+    _pendingRateRaise = true;
+
+    return `
+      <p class="progress-weight__note" role="status">
+        Your weight has been coming down quickly for a few weeks now. That
+        can be harder on you than it looks, and it is worth a word with a GP
+        or a registered dietitian — not because anything is wrong, but
+        because they can see things I cannot.
+      </p>
+    `;
+  }
+
+  /**
+   * Weekly loss rates in kg, oldest first, from a log of {at, kg}.
+   *
+   * Pairs consecutive entries and normalises by the days between them,
+   * so an irregular log still yields comparable weekly figures. Gains
+   * and flat weeks come through as <= 0 and break the run, which is
+   * correct: the rule is about SUSTAINED loss.
+   */
+  function _weeklyRates(log) {
+    const sorted = (log || [])
+      .filter(e => e && typeof e.kg === 'number' && e.at)
+      .slice()
+      .sort((a, b) => String(a.at).localeCompare(String(b.at)));
+    const rates = [];
+    for (let i = 1; i < sorted.length; i++) {
+      const days = (new Date(sorted[i].at) - new Date(sorted[i - 1].at)) / 86400000;
+      if (!(days > 0)) continue;
+      rates.push((sorted[i - 1].kg - sorted[i].kg) / (days / 7));
+    }
+    return rates;
+  }
+
+  /**
+   * Set once the note has actually been drawn. Cleared immediately after
+   * the write, so a later render cannot re-trigger it.
+   */
+  function _commitRateRaise() {
+    if (!_pendingRateRaise) return;
+    _pendingRateRaise = false;
+    store.set('weightRateRaisedAt', new Date().toISOString());
+  }
+
+  function _weightDate(at) {
+    const d = new Date(at);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  }
+
+  function _esc(s) {
+    return String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   // ── Window tabs (Personal only) ────────────────────────────────────────────
@@ -414,6 +586,36 @@ export function ProgressView(router) {
   // ── Events ─────────────────────────────────────────────────────────────────
 
   function attachEvents(container, tier) {
+    // WEIGHT-1b. Logging is user-initiated, always. Nothing here asks.
+    container.querySelector('[data-action="log-weight"]')
+      ?.addEventListener('click', () => {
+        const unit = store.get('weightUnit') || 'kg';
+        const main = container.querySelector('#weight-log-input');
+        if (!main) return;
+
+        let kg = null;
+        if (unit === 'st') {
+          const lb = container.querySelector('#weight-log-input-lb')?.value;
+          if (main.value !== '' || (lb !== '' && lb !== undefined)) {
+            kg = toKg({ st: Number(main.value || 0), lb: Number(lb || 0) }, 'st');
+          }
+        } else if (main.value !== '') {
+          kg = toKg(main.value, unit);
+        }
+        if (kg === null || !(kg > 0)) return;
+
+        const log = (store.get('weightLog') || []).slice();
+        log.push({ at: new Date().toISOString(), kg });
+        store.set('weightLog', log);
+
+        // The current weight follows the most recent entry, so the
+        // set-time bands judge against something true rather than
+        // whatever was typed into Settings months ago.
+        store.set('weight', kg);
+
+        render(container);
+      });
+
     // Window tabs
     container.querySelectorAll('[data-window]').forEach(btn => {
       btn.addEventListener('click', () => {
