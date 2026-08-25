@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 22 Aug 2026 v228
+## 22 Aug 2026 v229
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v227.md`. Remove v227 on upload.
+Supersedes `master_schedule_22aug2026_v228.md`. Remove v228 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -179,6 +179,32 @@ Supersedes `master_schedule_22aug2026_v227.md`. Remove v227 on upload.
 > `strategicGoal.targetSetAt` now has its writer — **only when a date is actually given.** 9 reversals confirmed.
 >
 > 🟠 **Fixture fault:** the gate's first fixture omitted `activeProgramme.completed`, so `isHingePending()` was false and it reported *"the hinge renders: FAIL"* against correct code. **Read the guard rather than guessing at the fixture** — third fixture fault of the day.
+>
+> ---
+>
+> ### 🟡 CHARACTERISATION GATE — CONSENT COVERED, HALF THE FLOW NOT
+>
+> `tools/verify-onboarding-characterisation.mjs`, 21 checks. **Not a feature gate** — it asserts no design decision. It pins what onboarding does *today* so the migration has something to be measured against. Before THREAD-1b a failure is a regression; after it, a failure means behaviour CHANGED and somebody must decide whether that was intended.
+>
+> 🟢 **Fully covered — the part whose failure is legal:** `consent.given`, `consent.at`, `consent.policyVersion`, `name`, `onboarding.threadStartedAt`, `onboarding.primaryTerritory`, the splash-then-gate order, the polite live region, and consent not being asked twice.
+>
+> 🔴 **NOT COVERED: the sheet steps.** The walk drives the thread as far as `sheet-manager.js` and stops — sheets have their own views and focus trap and this harness cannot operate them. So `goals`, `strategicGoal.setAt`, `capability.askedAt` and `onboarding.threadCompletedAt` are uncharacterised. **Roughly half the flow's store writes sit behind that boundary.**
+>
+> ⚠️ **The gap is an ASSERTION, not a comment** — the gate fails if those fields ever start being covered without the note being updated. A gate whose green implies more coverage than it has is worse than no gate, and that fault has been caught three times today already.
+>
+> #### 🟠 SO THE ABORT SIGNAL PARTLY FIRED — and it is Graeme's call
+>
+> The test set before starting was: *if the characterisation gate is hard to write, that is the signal to defer THREAD-1b until after beta.* It was **easy for the thread and impossible for the sheets.** Two honest options:
+>
+> 1. **Narrow THREAD-1b** to the thread mechanics and leave every sheet step untouched. Migratable now, with the covered contract intact.
+> 2. **Extend the harness to drive `sheet-manager.js` first**, then migrate the whole flow. Safer, and more work than the migration itself.
+>
+> 🔴 **What must not happen is migrating the sheet steps against no characterisation**, on the one flow whose failure is silent and legal.
+>
+> #### Two findings from writing it
+>
+> - The **consent block stays in the thread as history** — you can scroll back to what you agreed to. Correct behaviour; my first assertion encoded the opposite and went red against working code.
+> - Some steps are **multi-select with a confirm button**. The first walk clicked the same chip six times and never advanced, because it selected the first `.ob-chip` in the document rather than the live tray. **Only the last tray is live; the rest are history.**
 >
 > ---
 >
@@ -465,7 +491,7 @@ Supersedes `master_schedule_22aug2026_v227.md`. Remove v227 on upload.
 > |---|---|---|---|
 > | **WEIGHT-1a** | Shipped `alongside-v396`. `weight-targets.js`, store v56, Schema v1.39, `goals.js` flatMap fixed, `goal-review.js` v2, 2 new gates | 🟢 **SHIPPED 22 Aug** | Done |
 > | **WEIGHT-1b** | Shipped `alongside-v405`. Toggle, display unit, weight, target, log, sustained-rate note. 88 executing checks | 🟢 **SHIPPED 22 Aug** | Done |
-> | **TARGET-DEAD** | Remove top-level `targetWeight` — no reader, no writer anywhere | 🔵 Ready | Next |
+> | **TARGET-DEAD** | Removed. `store.js` v58, `Schema.md` v1.41. Reinstating it turns `verify-write1` red | 🟢 **SHIPPED 22 Aug** | Done |
 > | ~~UNIT-1~~ | **Folded into WEIGHT-1a** — not separable, see below | 🟢 Merged | — |
 > | **UNIT-1** | `weightUnit` has no writer — `session-log.js:179` always labels the field `kg` | 🔵 Specified | w/c 31 Aug |
 >
@@ -848,8 +874,8 @@ Supersedes `master_schedule_22aug2026_v227.md`. Remove v227 on upload.
 > | **R1-b** | Shipped `alongside-v397`. Target display tier-gated; three options inline; 45 executing checks. **Render half superseded by THREAD-1a** | 🟢 **SHIPPED 22 Aug** | Done |
 > | **THREAD-1a** | Shipped `alongside-v398`. `thread-runner.js`, `goal-review-script.js`, `goal-review-thread.js`, `my-programme.js` v7, 56 executing checks | 🟢 **SHIPPED 22 Aug** | Done |
 > | **CONSENT-2** | Consent gate scoped to its own container, every dereference guarded, loud on failure. `thread.js` v13, 24 executing checks | 🟢 **SHIPPED 22 Aug** | Done |
-> | **THREAD-1b-char** | Characterisation gate: prove what onboarding does today, before changing it. **Unblocked — CONSENT-2 done** | 🔵 **NEXT** | Before THREAD-1b |
-> | **THREAD-1b** | Migrate onboarding onto the runner; delete the second renderer | 🟢 **Approved by Graeme 22 Aug** — gated on CONSENT-1 and the characterisation gate | — |
+> | **THREAD-1b-char** | 21 checks. Consent fully covered; **sheet steps NOT covered** — see below | 🟡 **PARTIAL 22 Aug** | Done, with a stated gap |
+> | **THREAD-1b** | Migrate onboarding onto the runner. **Scope must now exclude the sheet steps, or the harness must be extended first** | 🟠 Approved, needs a scope call | — |
 > | **THREAD-2** | Should goal-setting generally be conversational? **Undecided** | 🟠 Open question | — |
 > | **R2-b** | The demonstration at upgrade. **Needs a discovery session before a spec** — the revenue document's acceptance criteria for it were written against the pre-correction boundary | 🟠 Needs discovery | w/c 31 Aug |
 > | **R3** | Recognition without an arc, in free — *"same as last time?"*. Reads **one** log entry, never a pattern | 🔵 Specified | w/c 24 Aug |
@@ -4785,4 +4811,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v228*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v229*
