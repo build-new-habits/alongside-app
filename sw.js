@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v403
+ * WEIGHT-1b (Settings half). Cache bump only -- settings.js and
+ * settings.css are both already precached, and weight-targets.js was
+ * added at v396. The bump is what makes the toggle reachable on a device
+ * holding the old settings screen.
+ *
  * 22 Aug 2026 v402
  * R1 copy pass. Cache bump only -- goal-review-script.js is already
  * precached. The bump carries the corrected conversation to a device
@@ -2793,7 +2799,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v402";
+const CACHE_NAME = "alongside-v403";
 
 const SHELL_URLS = [
 
