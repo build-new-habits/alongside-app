@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 22 Aug 2026 v405
+ * WEIGHT-1b complete. Cache bump only -- progress.js and its stylesheet
+ * are already precached. The bump carries the weight log and the
+ * sustained-rate note, and with them the first caller
+ * observedRateBreach() has ever had.
+ *
  * 22 Aug 2026 v404
  * WEIGHT-1b weight target. Cache bump only -- my-programme.js and its
  * stylesheet are already precached. The bump carries the target field
@@ -2804,7 +2810,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v404";
+const CACHE_NAME = "alongside-v405";
 
 const SHELL_URLS = [
 
