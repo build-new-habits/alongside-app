@@ -1,6 +1,13 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   26 Aug 2026 v8
+
+   v8 - .exercise-swap, the SWAP-0 cardio machine swap control and its
+        panel. Tokens matched to .exercise-preference below, including
+        its measured --color-text-secondary decision: --color-text-muted
+        is 4.04:1 on --color-bg-card and fails AA for body text.
+
    11 Aug 2026 v7
 
    v7 - .gp-lift__invite, the progression invitation.
@@ -609,6 +616,88 @@
      letting the border carry the state, so colour is never the only
      signal either -- the label text itself changes. */
   color: var(--color-text);
+}
+
+/* ============================================
+   SWAP  (SWAP-0, 26 Aug 2026)
+   ============================================ */
+
+.exercise-swap {
+  margin-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.exercise-swap__btn {
+  min-height: 44px;                    /* WCAG 2.2 AA touch target */
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  /* Same measured choice as .exercise-preference__btn: the muted token
+     fails AA for body text on card. Secondary measures 5.9:1. */
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.exercise-swap__btn:hover,
+.exercise-swap__btn:focus-visible {
+  color: var(--color-text);
+  border-color: var(--color-text-secondary);
+}
+
+.exercise-swap__panel {
+  width: 100%;
+  padding: var(--space-4);
+}
+
+.exercise-swap__intro {
+  margin: 0 0 var(--space-3) 0;
+}
+
+.exercise-swap__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.exercise-swap__option {
+  width: 100%;
+  min-height: 44px;                    /* WCAG 2.2 AA touch target */
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.exercise-swap__option:hover,
+.exercise-swap__option:focus-visible {
+  border-color: var(--color-primary);
+}
+
+.exercise-swap__option-name {
+  font-size: var(--text-base);
+}
+
+/* Rendered from the first draft and never given a rule -- caught by
+   verify-css, not by looking. An undefined class renders as unstyled
+   text and errors nowhere. Secondary rather than muted, for the same
+   measured reason as .exercise-preference__btn above. */
+.exercise-swap__option-meta {
+  color: var(--color-text-secondary);
 }
 
 /* ============================================
