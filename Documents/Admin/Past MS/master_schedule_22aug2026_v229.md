@@ -1,149 +1,8 @@
 # Alongside: Move — Master Schedule
-## 26 Aug 2026 v230
+## 22 Aug 2026 v229
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_22aug2026_v229.md`. Remove v229 on upload.
-
-> ### 🟢 SWAP-0 SHIPPED 26 Aug — `alongside-v406`. 89 gates green.
->
-> Graeme, from a smaller-than-usual gym: *"The app said treadmill but I had
-> to use the cross trainer. There were machines I had to use instead of
-> others the coach suggested. Can we add a 'swap' button to choose
-> something else in that range?"*
->
-> This is the **"Not available right now"** branch of
-> `alongside_exercise_skip_dislike_spec_16may2026_v1.docx` — the row
-> *"Product — Full skip/dislike spec, in-session flow"* (🆕 04 Aug), open
-> and unbooked since. Partly closed by this; see SWAP-1 below for the rest.
->
-> **One approved-spec change, made deliberately and recorded:** the 16 May
-> spec has the **coach** pick the substitute. SWAP-0 has the **person**
-> pick. Which machine is free is a fact the coach does not hold and cannot
-> see, so picking would be interpretation without information (**P4**).
-> Not tier-gated — occupied equipment is an access barrier, not a premium
-> inconvenience, and self-direction is free.
->
-> #### 🔴 The scope IS the design, and the evidence is the reason
->
-> The obvious version — swap on `movementPattern` — fails twice:
->
-> - **`locomotion` is a bucket, not a range.** 133 of 551 entries. Matching
->   a treadmill against it returns *C25K Week 7*, *Marathon Pace Run*,
->   *5K Time Trial* — **43 candidates**, nearly all useless to somebody
->   standing next to a cross trainer.
-> - **It does not separate strength from plyometric.** Leg Press
->   (squat/strength/d3) returns **Jump Squat, Box Jump, Depth Jump, Tuck
->   Jump**. Chest Press Machine returns Tricep Rope Pushdown. Offering
->   Depth Jump to somebody who wanted a leg press is wrong for anyone and
->   **dangerous for this audience.** That is a safety problem, not an
->   ergonomics one.
->
-> **Cardio machines are the one place the rule holds.** Only 24
-> machine-equipped exercises exist in total; treadmill (3), rower (4),
-> cross trainer (2), bike (2), stair climber (2) are all
-> `locomotion`/`cardio` and differ only by difficulty — which is precisely
-> why gyms put them in a row. Graeme's real case returns **8 genuine
-> options**. `verify-swap0` §5 pins the strength exclusion so a later
-> widening cannot reintroduce Depth Jump silently.
->
-> **Equipment is a preference in the ordering, not a gate.** If the ticked
-> kit leaves nothing, every candidate is returned. The person is in the gym
-> telling us what is in front of them; the onboarding list is older and
-> less informed than they are. Consistent with CON-1..9.
->
-> #### 🔴 `verify-write1` caught a design error in the first draft
->
-> v1 added a `swapLog` store field with an argument for why it deliberately
-> had no reader. The gate failed it — *"proposalBias looked exactly like
-> this for twelve days"* — and it was right, though not for the stated
-> reason. **CONT-1 (11 Aug) already logs `exerciseIds` from
-> `session.exercises`**, and `applySwap()` replaces that entry, so the
-> cross trainer is *already* what gets recorded, because it is what
-> happened. `swapLog` was a second home for a fact already stored: the
-> exact reasoning that removed `targetWeight` on 22 Aug.
->
-> **`store.js` stays v58 and `Schema.md` stays v1.41 — reverted, untouched,
-> confirmed by fresh clone.** Worth keeping on record: the gate caught a
-> *design* error, not a typo, in a build whose whole argument was about not
-> letting situational facts leak into permanent ones. **The instinct to
-> record something is not the same as the need for a new place to record
-> it.**
->
-> `verify-css` separately caught `.exercise-swap__option-meta` rendered
-> with no rule. And `verify-swap0` failed itself on first run: the storage
-> key was hand-typed instead of read off `store.STORAGE_KEY` — **a fixture
-> invented rather than sourced tests the assumption, not the code.**
->
-> #### Shipped
->
-> `js/data/exercises/index.js` v1.8→**v1.9** (`CARDIO_MACHINES`,
-> `isCardioMachine()`, `getSwapCandidates()`) · `js/views/gym-programme.js`
-> v6→**v7** (control, panel, `applySwap()`, focus management) ·
-> `css/components/workout.css` v7→**v8** · `tools/verify-swap0.mjs` **new,
-> 38 checks, every assertion reversal-tested** · cold start blueprint
-> updated (gate count 89, cache v406) · `sw.js` v405→**v406**, last.
->
-> **🟡 NOT on-device confirmed — this is the only remaining gate.**
-> Build a gym session containing a cardio machine; confirm **Swap** appears
-> on it and **not** on a bodyweight exercise; tap it and confirm the list is
-> machines only (no runs, no C25K); pick the cross trainer and confirm the
-> card becomes it *with its own instructions, coaching, watch-outs and
-> timer*; finish and confirm the swapped exercise is what gets logged; and
-> confirm **no "too hard" was recorded against the original.**
-> Screenshot or console evidence per step.
->
-> ---
->
-> ### 🔴 SKIP-MEANS-TOO-HARD — live fault, found 26 Aug, NOT fixed. Graeme's call.
->
-> `gym-programme.js:929` (PT-12, 11 Aug):
->
-> ```js
-> if (exercise?.id) store.logExerciseFeedback(exercise.id, 'too-hard');
-> ```
->
-> **Every skip is recorded as "too hard."** When Graeme skipped the busy
-> treadmill on 26 Aug, the app learned the exercise was beyond him and
-> deprioritised it (`programmeScore` 0.5). Silently, with nothing said.
->
-> This is precisely what the 16 May spec exists to prevent: *"The system
-> should not learn a permanent preference from it."* The PT-12 comment
-> argues the case explicitly — *"the effect of a too-hard signal is the
-> right response to a skip either way"* — and that reasoning is wrong for
-> the situational case, which is the common one in a gym.
->
-> **Deliberately not folded into SWAP-0**, and Graeme was asked directly
-> before the deploy closed. Redesigning what a skip *means* is a product
-> decision, not a bug fix, and belongs with the in-session skip/dislike
-> work. SWAP-0 gives an alternative path that writes nothing; Skip still
-> does. **Not booked — needs Graeme's ruling first.**
->
-> ---
->
-> ### 🔵 SWAP-1 — the real swap family. Post-beta, per Graeme's decision 26 Aug.
->
-> Everything SWAP-0 cannot serve: strength, mobility, yoga, pilates, and
-> the strength machines. Graeme chose the derived-family route over a
-> curated equipment map, and the instinct is right — `practice-library.js`
-> already derives its groups from fields every entry carries rather than
-> tagging 551 of them.
->
-> **This is a content-design job, not a code job.** Somebody has to decide
-> what makes two exercises genuinely interchangeable when `movementPattern`
-> demonstrably cannot — see the Depth Jump evidence above. Needs its own
-> scoped session and its own thinking time, not a build slot.
->
-> **Correction to the record:** an earlier row in this schedule states
-> *"There is no movement-pattern taxonomy at all. `movementPatterns` does
-> not exist on any entry."* **That is wrong.** Singular `movementPattern`
-> is present on **all 551 entries** across 42 values. It is not missing; it
-> is too coarse to carry a swap on its own, which is a different problem
-> with a different answer.
->
-> **Blueprint:** `Documents/Admin/alongside_blueprint_SWAP-0_26aug2026_v2.md`
-> (§3 holds the full evidence, §6a the `swapLog` correction).
->
-> ---
+Supersedes `master_schedule_22aug2026_v228.md`. Remove v228 on upload.
 
 > ### 🟢 START HERE: `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md`
 >
@@ -4900,7 +4759,7 @@ Source: Task Inventory Section J v3 (23 Jul 2026 reprioritisation). Now maintain
 | Product — Pain Input Redesign + coach messaging (full arc, 04 Aug) | 🟢 **Built and pushed across 4 same-day passes.** (1) Sliders replace chip buttons — `checkin.js` v9, `checkin-mini.js` v4, canonical `conditions.js` `getPainBand()` v1.4, `.ci-pain-chip` removed. (2) Multi-condition natural-language messaging — `coach-proposal.js` v15, `_joinNames()`. (3) Mixed-severity combined narrative (Mild+Moderate+Severe in one message, each by its own state) — `coach-proposal.js` v16. (4) Severe pain active Rest/Adapt choice, with a genuine audit-trail record (`severePainChoices`, `store.js` v13) — `coach-proposal.js` v17. `Schema.md` v1.13, `sw.js` v199. | **Not yet on-device confirmed — one full pass needed, covers all four.** Both sliders + label boundaries; Mild/Moderate/mixed-severity messages read correctly; Severe triggers the choice screen and blocks doors until answered; Rest routes to a gentle no-session screen; same-day re-entry doesn't re-prompt; Adapt proceeds normally. | Booked — on-device test is the only remaining gate before Phase B. |
 | **NEW-1 — Condition-specific programme routes** | 🟢 **Built and confirmed on-device, 04 Aug.** All 3 real routes live in `conditions-update.js`: "Coach builds it" (automatic, `js/data/conditionProgrammes.js`, smoke-tested against real data), "Coach recommends, I'll choose" (checkbox selection, now with a one-line rationale per exercise and an Avoid/Less-often dislike signal — see rows below), "Build my own" (`prescribed.js`, condition-tagged). `prescribedExercises` entries carry an optional `conditionId`. All 4 of Graeme's original decisions applied: one-time generation, flat list for now (captured for future progression, not lost), 8 exercises for real substance, check-in gating fixed alongside. Graeme's full on-device pass across today's whole body of work confirmed working. | None — closed. | Shipped, confirmed. |
 | Product — Exercise rationale + dislike signal | 🟢 **Built, 04 Aug**, Graeme's two questions, both real, both shipped same day. One-line `why` rationale now shown per candidate — already existed on all 461 exercises, zero new content. "Not keen on this one" applies the already-approved `alongside_exercise_skip_dislike_spec_16may2026_v1.docx` (binary Avoid/Less-often, not a rating) to the candidate list — new `exercisePreferences` field, `conditionProgrammes.js` excludes avoided exercises and de-prioritises "less" ones, smoke-tested before wiring in. | **Not yet on-device confirmed** for this specific addition. | Booked — on-device pass next. |
-| Product — Full skip/dislike spec, in-session flow | 🟡 **PARTLY CLOSED 26 Aug by SWAP-0.** The "not available today" half now exists for cardio machines, person-chooses (see the SWAP-0 entry at the top of this document). Everything else — strength, mobility, yoga, pilates — is SWAP-1, post-beta. The "not keen" half in-session is untouched, and 🔴 **SKIP-MEANS-TOO-HARD** is the live fault found while doing this. Original entry: 🆕 **New, 04 Aug**, explicitly deferred while building the row above. The approved spec also covers skipping *during* an active session (`gym-programme.js`/`prescribed-session.js`/`core-session.js`) with a "not available today" vs "not keen" distinction — genuinely separate, larger scope than the browsing-list version just shipped. | Needs its own scoped build session. | Not booked. |
+| Product — Full skip/dislike spec, in-session flow | 🆕 **New, 04 Aug**, explicitly deferred while building the row above. The approved spec also covers skipping *during* an active session (`gym-programme.js`/`prescribed-session.js`/`core-session.js`) with a "not available today" vs "not keen" distinction — genuinely separate, larger scope than the browsing-list version just shipped. | Needs its own scoped build session. | Not booked. |
 | Product — Check-in gating made optional | 🟢 **Fixed, 04 Aug.** Graeme: "we should fix this so it's optional not fixed." `today.js` v9 — session-generating doors only force check-in the first time today; once checked in, doors go straight through. `checkin-mini.js` v6 — Skip now honours `pendingDoorRoute` instead of always dumping to `intention`. New voluntary "Update check-in" link on Home replaces "Check in" once already checked in today. Resolves the check-in-mini-every-time complaint below directly — check-in-mini no longer appears automatically for second-or-later sessions at all. | None — closed. | Shipped. |
 | Product — check-in-mini's flat page style vs full check-in's conversational thread | 🟡 **Largely resolved as a side effect, 04 Aug.** The check-in-gating fix above means check-in-mini's page-style UI no longer appears automatically for every second session — it's voluntary now, reached only via "Update check-in." Confirmed earlier: full check-in's conversational bubble thread was never touched, still intact. Whether check-in-mini itself should ever get the conversational treatment (for when someone does choose to open it) remains open, but the urgency driving this — being forced into it constantly — is gone. | Graeme's call whether this still needs a redesign, now that it's optional rather than forced. | Not booked, lower urgency than before. |
 | 🟢 **NEW-2 — Coach fitness-level recalibration engine.** `exerciseFeedback` is now WRITTEN (FEED-1, 12 Aug) — the capture UI it was waiting on exists. Original entry: 🆕 **New, 04 Aug**, Graeme's question during Home Nav discussion: can the coach notice and correct for a user's starting fitness self-assessment being too optimistic or pessimistic, across all programme tiers? Genuinely open — what data this needs hasn't been decided. Real candidate signals found while grounding the Home Nav blueprint, not yet wired together: dormant `exerciseFeedback` field (never written, but `applyFeedbackWeighting()` already exists and is ready to consume it); completion/skip rates against prescribed reps/sets; `conditionPainScores` trend over time; `fitnessLevel` (elsewhere flagged as inconsistently applied). | Needs a dedicated design conversation — likely sequenced after NEW-1 exists to recalibrate against. | Not booked. |
@@ -4952,4 +4811,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 26 Aug 2026 v230*
+*Build New Habits · Alongside: Move · Master Schedule · 22 Aug 2026 v229*
