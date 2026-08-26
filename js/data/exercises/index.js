@@ -7,6 +7,21 @@
  * No changes needed elsewhere in the app when new category files are added —
  * just import the new array here and spread it into EXERCISES.
  *
+ * 26 Aug 2026 v1.9
+ *   SWAP-0. CARDIO_MACHINES, isCardioMachine() and getSwapCandidates().
+ *
+ *   Scoped to cardio machines deliberately, and the scope IS the design.
+ *   movementPattern is not a swap axis on its own: 'locomotion' covers 133
+ *   of 551 entries, so a treadmill matched against it returns marathon
+ *   pace runs; and it does not separate strength from plyometric, so Leg
+ *   Press returns Depth Jump. The second of those is a safety problem, not
+ *   an ergonomics one. See alongside_blueprint_SWAP-0_26aug2026_v1.md §3.
+ *
+ *   The cardio machines are the one place the rule genuinely holds --
+ *   treadmill, cross trainer, bike, rower and stair climber are all
+ *   locomotion/cardio and differ only by difficulty, which is precisely
+ *   why gyms put them in a row. 24 machine exercises exist in total.
+ *
  * 16 Aug 2026 v1.8
  *   HYPER-1. filterByConditions() now delegates to conditions.js's
  *   getExerciseSafetyTier() instead of reimplementing the same decision
@@ -343,6 +358,74 @@ export function applyFeedbackWeighting(exercises) {
  */
 export function isSessionLength(ex) {
   return ex?.contentType === "practice" || (ex?.duration || 0) >= 600;
+}
+
+/**
+ * SWAP-0, 26 Aug 2026.
+ *
+ * The cardio machines a person swaps between when one is occupied. These
+ * are equipment tags as exercises carry them, NOT the granular ids ticked
+ * in onboarding -- resolveEquipment() bridges the two, per CON-2.
+ */
+export const CARDIO_MACHINES = [
+  'treadmill',
+  'elliptical',
+  'exercise-bike',
+  'rowing-machine',
+  'stair-climber'
+];
+
+export function isCardioMachine(ex) {
+  return (ex?.equipment || []).some(q => CARDIO_MACHINES.includes(q));
+}
+
+/**
+ * getSwapCandidates(exercise, userEquipment) — SWAP-0, 26 Aug 2026.
+ *
+ * "The app said treadmill but I had to use the cross trainer."
+ *
+ * Returns the machines the person could reasonably move to, nearest
+ * difficulty first. Returns [] for anything that is not a cardio machine:
+ * a partial answer here would be worse than none, because the exercises
+ * this cannot serve are the ones where a wrong suggestion carries a risk.
+ *
+ * Equipment is a preference in the ordering, not a gate. If the person's
+ * ticked kit leaves nothing, every candidate is returned instead. They are
+ * standing in the gym telling us what is in front of them; the onboarding
+ * list is older and less informed than they are, and hiding the cross
+ * trainer because it was never ticked would be the list overruling the
+ * person. Equipment has been "a preference in selection, not only a
+ * permission" since CON-1..9.
+ *
+ * @param {object}   exercise       the one they cannot get on
+ * @param {string[]} userEquipment  store 'equipment' (granular ids)
+ * @param {object[]} [pool]         injectable for tests
+ * @returns {object[]}
+ */
+export function getSwapCandidates(exercise, userEquipment = [], pool = EXERCISES) {
+  if (!isCardioMachine(exercise)) return [];
+
+  const busy = new Set(exercise.equipment || []);
+
+  const matched = pool.filter(e =>
+    e.id !== exercise.id &&
+    isCardioMachine(e) &&
+    e.category === exercise.category &&
+    e.movementPattern === exercise.movementPattern &&
+    // Rule 4: swapping a treadmill for another treadmill is not a swap.
+    !(e.equipment || []).some(q => busy.has(q))
+  );
+
+  const byCloseness = (a, b) => {
+    const d = Math.abs(a.difficultyLevel - exercise.difficultyLevel)
+            - Math.abs(b.difficultyLevel - exercise.difficultyLevel);
+    return d !== 0 ? d : String(a.name).localeCompare(String(b.name));
+  };
+
+  const resolved = resolveEquipment(userEquipment || []);
+  const owned = matched.filter(e => exerciseIsAvailable(e, resolved));
+
+  return (owned.length > 0 ? owned : matched).sort(byCloseness);
 }
 
 export function getSuitableExercises(userProfile, checkinData) {
