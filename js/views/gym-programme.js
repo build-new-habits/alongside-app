@@ -1,5 +1,26 @@
 /**
  * gym-programme.js
+ * 26 Aug 2026 v7
+ *   SWAP-0. A Swap control on cardio machine exercises.
+ *
+ *   Graeme, from a busy gym: "The app said treadmill but I had to use the
+ *   cross trainer." The app's only answer to that was Skip -- which
+ *   silently records 'too-hard' against the exercise (see the handler
+ *   below), so a machine being occupied taught the coach he was not up to
+ *   it. That is the exact fault alongside_exercise_skip_dislike_spec
+ *   _16may2026_v1.docx exists to prevent.
+ *
+ *   The PERSON picks, not the coach. Which machine is free is a fact the
+ *   coach does not hold and cannot see, so choosing for them would be the
+ *   coach interpreting information it does not have (P4). It is also not
+ *   tier-gated: equipment being occupied is an access barrier, not a
+ *   premium inconvenience, and self-direction is free.
+ *
+ *   Cardio machines only, deliberately. getSwapCandidates() returns []
+ *   for everything else and the reasoning is in exercises/index.js v1.9 --
+ *   movementPattern does not separate strength from plyometric, so a
+ *   widened version offers Depth Jump to somebody who wanted a leg press.
+ *
  * 16 Aug 2026 v6
  *   CHAP-1 step 3. The private PROGRESSIONS map is deleted — it
  *   disagreed with programmes.js on four of eight chapters, so this
@@ -276,6 +297,8 @@ import {
 }                                   from '../data/programmeEngine.js';
 import { getActiveVoice }           from '../data/coach-voice.js';
 import { mountSessionGuard, dismountSessionGuard } from '../session-guard.js';
+// SWAP-0. isCardioMachine decides whether the control renders at all.
+import { isCardioMachine, getSwapCandidates } from '../data/exercises/index.js';
 
 // ─── View registration ────────────────────────────────────────────────────────
 
@@ -283,6 +306,9 @@ export function GymProgrammeView(router) {
 
   let sessionStarted    = false;
   let currentExerciseIndex = 0;
+  // SWAP-0. Panel state, not persisted -- it belongs to this card, and
+  // advancing to the next exercise must close it. See advanceOrFinish().
+  let swapPanelOpen     = false;
   let sessionStartTime  = null;
 
   // 11 Aug 2026 v5 — one-exercise-at-a-time walkthrough state, matching
@@ -797,6 +823,11 @@ export function GymProgrammeView(router) {
             </div>
           ` : ''}
 
+          <!-- SWAP-0 (26 Aug 2026). Only on cardio machines, and only when
+               there is somewhere real to go. A control that opens an empty
+               list is worse than no control. -->
+          ${renderSwapControl(exercise)}
+
           <!-- NOT A FAN (11 Aug 2026). A quiet, reversible preference, not
                a rating. Deliberately not stars, thumbs or a score -- the
                product does not rank exercises and does not ask people to.
@@ -899,6 +930,27 @@ export function GymProgrammeView(router) {
     // FEED-1. Self-painting, so no re-render hook is needed.
     attachFeedbackEvents(exercise);
 
+    // SWAP-0. Toggle the panel, then the options within it.
+    document.getElementById('gp-swap-btn')?.addEventListener('click', () => {
+      swapPanelOpen = !swapPanelOpen;
+      renderCurrentExercise(container, session, stats, sessionType);
+      if (swapPanelOpen) {
+        // Move focus into the panel that just opened, or a keyboard or
+        // screen-reader user is left on a button whose label has changed
+        // under them with no idea anything appeared. WCAG 2.2 AA.
+        document.querySelector('.exercise-swap__option')?.focus();
+      } else {
+        document.getElementById('gp-swap-btn')?.focus();
+      }
+    });
+
+    container.querySelectorAll('[data-swap-to]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const toId = e.currentTarget.getAttribute('data-swap-to');
+        if (toId) applySwap(container, session, stats, sessionType, toId);
+      });
+    });
+
     // Not a fan — toggles and re-renders so the label updates in place.
     document.querySelector('[data-notafan]')?.addEventListener('click', (e) => {
       const id = e.currentTarget.getAttribute('data-notafan');
@@ -932,6 +984,10 @@ export function GymProgrammeView(router) {
   }
 
   function advanceOrFinish(container, session, stats, sessionType) {
+    // SWAP-0. The panel belongs to the card being left. Without this it
+    // reopens on the next exercise, which is a different exercise with a
+    // different (or empty) candidate list.
+    swapPanelOpen = false;
     if (currentExerciseIndex >= session.exercises.length - 1) {
       finishSession(container, session, stats);
     } else {
@@ -1162,6 +1218,116 @@ export function GymProgrammeView(router) {
    * and session-builder.js honour, so one tap here reaches both the
    * prescribed programme and every generated session.
    */
+  /**
+   * SWAP-0. The control, and the panel it opens.
+   *
+   * Renders nothing at all unless this is a cardio machine WITH real
+   * candidates behind it. Deliberately: an affordance that opens onto an
+   * empty list teaches people not to trust the affordances.
+   */
+  function renderSwapControl(exercise) {
+    if (!isCardioMachine(exercise)) return '';
+    const options = getSwapCandidates(exercise, store.get('equipment') || []);
+    if (options.length === 0) return '';
+
+    if (!swapPanelOpen) {
+      return `
+        <div class="exercise-swap">
+          <button type="button"
+                  class="btn btn-ghost btn-small exercise-swap__btn"
+                  id="gp-swap-btn"
+                  aria-expanded="false"
+                  aria-controls="gp-swap-panel">
+            Can't get on this? Swap it
+          </button>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="exercise-swap">
+        <button type="button"
+                class="btn btn-ghost btn-small exercise-swap__btn"
+                id="gp-swap-btn"
+                aria-expanded="true"
+                aria-controls="gp-swap-panel">
+          Never mind, keep ${_esc(exercise.name)}
+        </button>
+
+        <div class="exercise-swap__panel card"
+             id="gp-swap-panel"
+             role="group"
+             aria-label="Choose something else instead of ${_esc(exercise.name)}">
+          <p class="coach-voice exercise-swap__intro">
+            No problem — pick whatever's free.
+          </p>
+          <ul class="exercise-swap__list">
+            ${options.map(opt => `
+              <li>
+                <button type="button"
+                        class="exercise-swap__option"
+                        data-swap-to="${_esc(opt.id)}">
+                  <span class="exercise-swap__option-name">${_esc(opt.name)}</span>
+                  <span class="exercise-swap__option-meta text-xs text-muted">
+                    ${_esc(_swapMeta(opt))}
+                  </span>
+                </button>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  function _swapMeta(ex) {
+    const mins = ex.duration ? Math.round(ex.duration / 60) : null;
+    return mins ? `${mins} min` : '';
+  }
+
+  /**
+   * Replace the exercise in the live session, in place.
+   *
+   * The swapped-in exercise is the WHOLE database entry, so it arrives
+   * with its own instructions, coaching, watch-outs, load guidance and
+   * timer rather than the old one's. `section` and `reps` are carried
+   * across so the session's shape is unchanged -- the person swapped a
+   * machine, not a plan.
+   *
+   * Writes NOTHING to exerciseFeedback and NOTHING to exercisePreferences.
+   * Both change what the coach offers next time; a busy treadmill must
+   * not. That is the whole difference between this and Skip.
+   *
+   * There is deliberately no separate swap record. CONT-1 already logs
+   * exerciseIds from session.exercises at completion, so replacing the
+   * entry here IS the record -- the cross trainer is what gets logged,
+   * because it is what happened. A second home for the same fact is what
+   * caused TARGET-3, and verify-write1 caught the first draft of this
+   * doing exactly that.
+   */
+  function applySwap(container, session, stats, sessionType, toId) {
+    const current = session.exercises[currentExerciseIndex];
+    const options = getSwapCandidates(current, store.get('equipment') || []);
+    const chosen  = options.find(o => o.id === toId);
+    if (!chosen) return;
+
+    session.exercises[currentExerciseIndex] = {
+      ...chosen,
+      section: current.section,
+      reps:    current.reps ?? chosen.reps
+    };
+
+    const generated = store.get('generatedSession') || {};
+    if (generated.session) store.set('generatedSession', generated);
+
+    swapPanelOpen = false;
+    // The card is a different exercise now -- timer state belonged to the
+    // old one and must not carry over.
+    resetTimer();
+    renderCurrentExercise(container, session, stats, sessionType);
+    scrollToTop();
+  }
+
   function _isNotAFan(exerciseId) {
     const prefs = store.get("exercisePreferences") || {};
     return prefs[exerciseId]?.preference === "less";

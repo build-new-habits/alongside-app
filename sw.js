@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 26 Aug 2026 v406
+ * SWAP-0. Cache bump only -- js/data/exercises/index.js,
+ * js/views/gym-programme.js and css/components/workout.css are all
+ * already precached, and no new shipped file exists (the gate lives in
+ * tools/, which is build-time only). The bump is what carries the swap
+ * control to a device already holding the old versions.
+ *
  * 22 Aug 2026 v405
  * WEIGHT-1b complete. Cache bump only -- progress.js and its stylesheet
  * are already precached. The bump carries the weight log and the
@@ -2810,7 +2817,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v405";
+const CACHE_NAME = "alongside-v406";
 
 const SHELL_URLS = [
 
