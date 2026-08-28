@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 28 Aug 2026 v233
+## 28 Aug 2026 v232
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_28aug2026_v232.md`. Remove v232 on upload.
+Supersedes `master_schedule_28aug2026_v231.md`. Remove v231 on upload.
 
 > ### 🟢 PM RECONCILIATION — 28 Aug 2026 (v232). Two-week sweep: chats 14–28 Aug against this document.
 >
@@ -34,7 +34,7 @@ Supersedes `master_schedule_28aug2026_v232.md`. Remove v232 on upload.
 > referenced here. It is the send-first document for that reviewer; the 16 Aug clinical pack
 > remains the full pack. **Both are finished and neither has been sent.**
 >
-> #### 🟢 LEGAL-2 — four pre-beta compliance documents drafted 28 Aug, into `Documents/Business/`.
+> #### 🟢 LEGAL-2 — three pre-beta compliance documents drafted 28 Aug, into `Documents/Business/`.
 >
 > Drafted against today's DPIA gap list; every product claim traced to a code path or artefact
 > per the 28 Aug rule. All three carry sign-off blocks and await Graeme's adoption, then Foot
@@ -45,7 +45,6 @@ Supersedes `master_schedule_28aug2026_v232.md`. Remove v232 on upload.
 > | `alongside_childrens_access_assessment_28aug2026_v1.docx` | The documented access assessment the 18+ position rests on — the highest-priority Natalie/Foot Anstey question. Evidence cites `field-contract.js` (bands start at 18, no under-18 vocabulary), `thread.js` (`AGE_GATE_ENABLED=false`, stated honestly as built-not-live), banned-forms gates, pricing |
 > | `alongside_breach_response_procedure_28aug2026_v1.docx` | **Article 33/34 + INF-7** — hour-one steps, 72-hour clock, breach log template, processor table (Sentry/Zoho/Kit/GitHub live; Supabase/Stripe pre-go-live). R12 (who acts if Graeme cannot) recorded as open inside it, not hidden. **INF-7 closing unblocks the Supabase schema design session** |
 > | `alongside_complaints_procedure_28aug2026_v1.docx` | **DUAA s.164A** — live law since 19 June with no process behind it. Route, 30-day acknowledgement, templates, log |
-> | `alongside_ropa_28aug2026_v1.docx` | **Article 30 ROPA** — required (the under-250 exemption does not apply: special category data, not occasional). Seven activities: five live (on-device coaching data, Sentry, Kit, Zoho, beta records) + Supabase and Stripe marked PLANNED with go-live gates. `TO CONFIRM` items deliberately not guessed — Kit US transfer mechanism, Sentry retention, Zoho data-centre, 2FA status — all folded into the Article 28 task. **v233 exists because v232 shipped saying "three" while the ROPA was already in the commit** — an asserted string replacement failed on a heading depth and a newline let the push proceed; caught on the post-push check, corrected here rather than force-pushed |
 >
 > 🟠 **Needs Graeme:** sign and date all three; create empty `breach_log.md` and
 > `complaints_log.md` when adopted (or ask for them). 🟡 The two log files are deliberately not
@@ -5092,4 +5091,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 28 Aug 2026 v233*
+*Build New Habits · Alongside: Move · Master Schedule · 28 Aug 2026 v232*
