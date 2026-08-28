@@ -1,89 +1,8 @@
 # Alongside: Move — Master Schedule
-## 28 Aug 2026 v231
+## 26 Aug 2026 v230
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_26aug2026_v230.md`. Remove v230 on upload.
-
-> ### 🟠 LEGAL-1 — DATA PROTECTION PACK DRAFTED 28 Aug. Four documents into `Documents/Business/`.
->
-> Foot Anstey (Bethany Filby, 18 Aug) offered to look at a first draft and revise the fee
-> estimate from it. Taken up. Drafted against the ICO's own Article 13 checklist rather
-> than against other apps' policies.
->
-> | Document | What it is |
-> |---|---|
-> | `alongside_privacy_policy_28aug2026_v5.docx` | Adult privacy policy, rewritten from the 23 Jul v3 |
-> | `alongside_privacy_policy_annotations_28aug2026_v1.docx` | Every section mapped to its source requirement, with links |
-> | `alongside_dpia_28aug2026_v1.docx` | Full DPIA, ICO seven-step. Steps 1–6 complete, Step 7 needs Graeme |
-> | `alongside_compliance_register_28aug2026_v1.docx` | Every obligation, blocker, owner and sequence |
->
-> #### 🔴 A false statement caught before it shipped — the third of the same shape
->
-> Privacy policy v4 said **"we ask for your date of birth when you create an account."**
-> `AGE_GATE_ENABLED = false` in `thread.js`. **The app does not ask.** Corrected in v5 to
-> describe a control that will be live before beta, not one that is running.
->
-> This is the same fault as **"Build New Habits Ltd"** and **"ICO registered"**, both found
-> live in `privacy.js` on 11 Aug. Three instances, one shape: *a legal or marketing document
-> describing an intention as though it were a fact.* **Rule, from here: no compliance
-> document ships a claim about the product that is not traceable to a code path or a gate.**
-> Same discipline `verify-plain1.mjs` already applies to conversion copy, applied to legal copy.
->
-> #### 🔴 A1.11 is decided but three documents still disagree
->
-> | Where | Age |
-> |---|---|
-> | Privacy policy v5 | **18+** — correct, matches the 15 Aug decision |
-> | ToS draft v2/v3 | 13+ |
-> | Business documents | 16+ |
-> | The app | No check running |
->
-> Already logged as 🟡 on 15 Aug. **Raised to 🟠 and blocking:** documents cannot go to
-> Foot Anstey contradicting each other on the one area they have named as highest-risk.
->
-> #### 🔴 The 18+ reasoning is thinner than the 15 Aug note implies
->
-> The note says launching 18+ *"removes UK Children's Code obligations."* **That is the
-> conclusion, not the reasoning.** The Code applies to services *likely to be accessed by*
-> children whether or not they are aimed at them, and the ICO's position is that
-> self-declaration alone is unlikely to be effective age assurance. What removes the
-> obligation is a **documented, evidenced, periodically reviewed access assessment**. It does
-> not exist. It is free to produce and the material for it is strong — no child-appealing
-> content, adult clinical referral routes, adult copy, pricing. **It just has to be written
-> down and dated.** Highest-priority question for Natalie.
->
-> #### 🔴 Obligations that are live law today and have no process behind them
->
-> - **DUAA s.164A complaints procedure** — in force **19 June 2026**, no exemptions, no size
->   threshold. Privacy policy v3 pointed only at the ICO and would not have met it.
-> - **Article 30 ROPA** — required. The under-250-staff exemption **does not apply** where
->   processing includes special category data or is not occasional. Alongside is both.
-> - **Article 33 breach procedure** — 72-hour clock, no procedure to follow at hour one.
->
-> #### 🟡 ICO registration may not be as blocked as assumed
->
-> Believed blocked on HMRC. The fee duty attaches to **being a controller who processes
-> personal data**, not to HMRC status, and the ICO's service explicitly covers sole traders.
-> **One call to 0303 123 1113** to ask whether registration can proceed now in Graeme's own
-> name with Build New Habits as trading name. If yes, unblocks wording in three documents.
->
-> #### 🟠 What the DPIA says must happen before beta opens
->
-> Article 28 written terms with Supabase, Sentry, Zoho and Kit · breach procedure and log ·
-> complaints procedure and log · Sentry scrubbing gate, reversal-tested · children's access
-> assessment · physiotherapist and safeguarding reviewers filled **or** the decision to
-> proceed without them recorded · **who acts if Graeme cannot** — R12, currently unanswered ·
-> user consultation with beta testers week two, written back into DPIA Step 3.
->
-> #### 🔴 Process note against myself
->
-> This session opened by searching project knowledge for `alongside_master_schedule` and got
-> **v141 (10 Aug)** — twenty-one hundred lines and eighty-nine versions stale. The 16 Aug rule
-> says **clone the repo, do not search PK.** The rule was in the stale copy too, so following
-> the old instruction hid the new one. **Caught on the second pass, not the first.** The PK
-> copies below v230 should be deleted; Claude cannot do it.
-
----
+Supersedes `master_schedule_22aug2026_v229.md`. Remove v229 on upload.
 
 > ### 🟢 SWAP-0 SHIPPED 26 Aug — `alongside-v406`. 89 gates green.
 >
@@ -5033,4 +4952,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 28 Aug 2026 v231*
+*Build New Habits · Alongside: Move · Master Schedule · 26 Aug 2026 v230*
