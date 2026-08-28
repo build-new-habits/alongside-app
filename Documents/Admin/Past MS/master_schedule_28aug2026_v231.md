@@ -1,66 +1,8 @@
 # Alongside: Move — Master Schedule
-## 28 Aug 2026 v232
+## 28 Aug 2026 v231
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_28aug2026_v231.md`. Remove v231 on upload.
-
-> ### 🟢 PM RECONCILIATION — 28 Aug 2026 (v232). Two-week sweep: chats 14–28 Aug against this document.
->
-> Every major session's outputs from the last fortnight had landed here. **Two items agreed in
-> chats had not**, and are booked below. Three pre-beta compliance documents from today's DPIA
-> gap list have been drafted. The stale R3/R4 rows in the R-stream table are corrected in place.
->
-> #### 🟠 CONTENT-GAP-1 — the 16 gap-closing exercise entries. Agreed 17 Aug, never scheduled.
->
-> The PRAC-1 session (17 Aug) measured the library's real top-end holes and Graeme agreed the fix:
-> **author 16 entries into the physio review scope** rather than shipping ahead of it. The gaps,
-> re-stated so they are not re-derived: **pull** (0 common-kit items at difficulty 3+),
-> **anti-extension** (0), **anti-lateral-flexion** (0), and **no resistance-band strength item
-> above difficulty 2 anywhere**. Two further findings from the 22 Aug reviewer-document session,
-> also previously unlogged: **side-bend resistance has 2 entries in the whole library**, and
-> **challenging pulling movements available to home-only users number exactly one.**
->
-> This is authoring work feeding the clinical review — it belongs in the pack's scope, and the
-> pack is still unsent (see the pre-beta critical path note below). 🟠 **Booked w/c 31 Aug**,
-> content stream. Audit tool already exists:
-> `Documents/Admin/Templates/audit-pattern-coverage.mjs`.
->
-> #### 🟡 REVIEWER-DOC — the "Nine questions" document (22 Aug, v3) now on record.
->
-> A two-page plain-language version of the clinical questions was produced 22 Aug for Graeme's
-> health-professional contact — nine direct questions covering the safety screen wording, the 95
-> rehab entries, selection logic, pain thresholds (including the live 7-vs-8 contradiction),
-> sleep, ME/CFS, hypermobility, progression, and home-equipment additions. It was never
-> referenced here. It is the send-first document for that reviewer; the 16 Aug clinical pack
-> remains the full pack. **Both are finished and neither has been sent.**
->
-> #### 🟢 LEGAL-2 — three pre-beta compliance documents drafted 28 Aug, into `Documents/Business/`.
->
-> Drafted against today's DPIA gap list; every product claim traced to a code path or artefact
-> per the 28 Aug rule. All three carry sign-off blocks and await Graeme's adoption, then Foot
-> Anstey validation alongside the LEGAL-1 pack:
->
-> | Document | Closes |
-> |---|---|
-> | `alongside_childrens_access_assessment_28aug2026_v1.docx` | The documented access assessment the 18+ position rests on — the highest-priority Natalie/Foot Anstey question. Evidence cites `field-contract.js` (bands start at 18, no under-18 vocabulary), `thread.js` (`AGE_GATE_ENABLED=false`, stated honestly as built-not-live), banned-forms gates, pricing |
-> | `alongside_breach_response_procedure_28aug2026_v1.docx` | **Article 33/34 + INF-7** — hour-one steps, 72-hour clock, breach log template, processor table (Sentry/Zoho/Kit/GitHub live; Supabase/Stripe pre-go-live). R12 (who acts if Graeme cannot) recorded as open inside it, not hidden. **INF-7 closing unblocks the Supabase schema design session** |
-> | `alongside_complaints_procedure_28aug2026_v1.docx` | **DUAA s.164A** — live law since 19 June with no process behind it. Route, 30-day acknowledgement, templates, log |
->
-> 🟠 **Needs Graeme:** sign and date all three; create empty `breach_log.md` and
-> `complaints_log.md` when adopted (or ask for them). 🟡 The two log files are deliberately not
-> created until the procedures are adopted — a log implies the procedure it belongs to is live.
->
-> #### 🔴 The pre-beta critical path, restated from the sweep so it is not lost in the detail:
->
-> **clinical pack sent → reviewer answers → red-flag screen built → beta.** The pack has been
-> finished and unsent since ~16 Aug; the red-flag screen is confirmed pre-beta with zero code and
-> cannot be written until the wording comes back. Beta is ~2.5 weeks out. Also on the clock:
-> **PAT token expires 5 Sep** (8 days); **domain decision** (app origin must be settled before
-> beta installs — 17 Aug session ended awaiting Namecheap and nothing has landed since);
-> **A1.11 age alignment** across ToS/business docs (blocks Foot Anstey);
-> **beta tester recruitment has no booked task anywhere.**
->
-> ---
+Supersedes `master_schedule_26aug2026_v230.md`. Remove v230 on upload.
 
 > ### 🟠 LEGAL-1 — DATA PROTECTION PACK DRAFTED 28 Aug. Four documents into `Documents/Business/`.
 >
@@ -1158,8 +1100,8 @@ Supersedes `master_schedule_28aug2026_v231.md`. Remove v231 on upload.
 > | **THREAD-1b** | Migrate onboarding onto the runner. **Scope must now exclude the sheet steps, or the harness must be extended first** | 🟠 Approved, needs a scope call | — |
 > | **THREAD-2** | Should goal-setting generally be conversational? **Undecided** | 🟠 Open question | — |
 > | **R2-b** | The demonstration at upgrade. **Needs a discovery session before a spec** — the revenue document's acceptance criteria for it were written against the pre-correction boundary | 🟠 Needs discovery | w/c 31 Aug |
-> | **R3** | Recognition without an arc. **Row corrected 28 Aug (v232): shipped 12 Aug as DIC-1** — gated, free. This row had sat stale as "Specified" for over two weeks | 🟢 **SHIPPED 12 Aug (DIC-1)** | Done |
-> | **R4** | Self-direction to free. **Row corrected 28 Aug (v232): shipped 20 Aug**, `alongside-v389` — see the R4 entry above. This row had drifted | 🟢 **SHIPPED 20 Aug** | Done |
+> | **R3** | Recognition without an arc, in free — *"same as last time?"*. Reads **one** log entry, never a pattern | 🔵 Specified | w/c 24 Aug |
+> | **R4** | Self-direction to free — **document → gate → code**, in that order | 🔵 Specified | w/c 24 Aug |
 > | **R5** | Stripe | 🔴 Blocked on HMRC | Blocked |
 > | **R6** | Month-six annual offer | 🔵 Specified, blocked on R5 | After R5 |
 >
@@ -5091,4 +5033,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 28 Aug 2026 v232*
+*Build New Habits · Alongside: Move · Master Schedule · 28 Aug 2026 v231*
