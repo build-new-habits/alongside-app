@@ -1,37 +1,9 @@
 # Alongside: Move — Master Schedule
-## 29 Aug 2026 v235
+## 29 Aug 2026 v234
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_29aug2026_v234.md`. Remove v234 on upload.
+Supersedes `master_schedule_28aug2026_v233.md`. Remove v233 on upload.
 
-> ### 🔴 CARD-1 SPEC WRITTEN 29 Aug — and a safety-ordering fault found while writing it.
->
-> Discovery and spec complete in one sitting. `Documents/Admin/alongside_blueprint_CARD-1_29aug2026_v1.md`. **No code written.** Build is a named session, not started.
->
-> #### 🔴 THE FAULT — independent of density, and it should be fixed whatever happens to the rest of CARD-1
->
-> In `workout.js` v12, **`bodyCaution` renders below "How heavy", and `watchOut` renders below the feedback control.** `bodyCaution` is the single personalised safety line in the card — it fires when the exercise loads an area the person flagged sore *today* (CORE-1). It currently sits roughly two screenfuls down, under three blocks of static prose. `watchOut` sits beneath an interactive control that most people will read as the end of the card. **Density is itself a safety failure**: the more prose above the caution, the less likely it is read. Corrected order is specified in §2.
->
-> #### 🟢 Three findings that made the spec smaller, not larger
->
-> **`exerciseHistory` already exists** — `store.js` v58, CONT-1, 11 Aug. `{ n, first, last, best }` keyed by exercise id, written by all seven session types through `store.logActivity()`. Familiarity is fully derivable. **No store field, no `Schema.md` change, schema-first does not apply.**
->
-> **`watchOut` is already segregated**, so the per-cue safety flag assumed in the v234 teardown note is unnecessary. Safety content is `watchOut` plus `bodyCaution`; nothing else needs flagging.
->
-> **The preference belongs in `display-prefs.js`, not `store.js`** — device-level, survives a store reset, matches all three reasons already written into that file. Adding the key means adding it to the `index.html` pre-paint duplicate too, and `verify-disp1.mjs` will fail if only one is done.
->
-> #### 🔴 P4 is load-bearing here
->
-> `store.js` states `exerciseHistory` is never used to comment on consistency or decline. Reading it to size the card is permitted because nothing is displayed. **The card must never say why it got shorter** — no count, no "you know this one". It simply stops explaining. Gate assertion 4 exists to enforce this and has a reversal test.
->
-> #### 🟠 Two dormant fields found, logged not fixed (touch-once)
->
-> `exercise.cues` is read by `core-session`, `yoga-session` and `morning-session`, and **not** by `workout.js`, `prescribed-session.js` or `gym-programme.js`. `exercise.description` has **no reader anywhere** in the codebase despite being present across the database. Notably, `core-session.js:510` and `yoga-session.js:538` already render `cues[0]` as a single working-view line with the full list in detail — **CARD-1 standardises an existing pattern rather than inventing one.**
->
-> #### 🟠 Scope reality — six views, twelve files
->
-> Six views render `watchOut`; four render the full card structure. **Recommendation: extract one shared card renderer** rather than making the same edit six times. Six divergent copies is exactly how `cues` came to be rendered in three views and not the other three. That is decision 1 of 3 open for Graeme in §9.
->
 > ### 🟡 COMPETITOR TEARDOWN — Bend, 29 Aug 2026. Three rows booked, one spec superseded in principle.
 >
 > Graeme walked the full Bend onboarding and app (~30 screenshots) and asked for a teardown against Move. Bend is the category incumbent — 15,000,000+ claimed users. **No code was written and no file was opened.** What follows is what the teardown changed, not the teardown itself.
@@ -72,7 +44,7 @@ Supersedes `master_schedule_29aug2026_v234.md`. Remove v234 on upload.
 >
 > | ID | Task | Status | Target |
 > |---|---|---|---|
-> | **CARD-1** | Exercise card progressive disclosure. **Discovery done + spec written 29 Aug** — `Documents/Admin/alongside_blueprint_CARD-1_29aug2026_v1.md`. `exerciseHistory` already exists (CONT-1), so **no store or schema change**. Build not started, 12 files, shared-renderer decision open | 🔵 Spec complete, build pending | w/c 31 Aug |
+> | **CARD-1** | Exercise card progressive disclosure. **Discovery only** — does workout history record exercise IDs. Supersedes the all-sections-visible model in the exercise card spec v1.0 once specced | 🟠 Needs discovery | w/c 31 Aug |
 > | **SENSORY-1a** | Transition time control (Off / 5 / 10 / 15 / 20s). **Beta scope** — access need, not a feature | 🔵 Spec needed | w/c 31 Aug |
 > | **SENSORY-1b** | Sound toggles, external audio ducking, exercise-name voiceover | 🔵 Post-beta | After beta |
 >
@@ -5166,4 +5138,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 29 Aug 2026 v235*
+*Build New Habits · Alongside: Move · Master Schedule · 29 Aug 2026 v234*
