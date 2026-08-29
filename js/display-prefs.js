@@ -1,6 +1,21 @@
 /**
  * js/display-prefs.js
- * 12 Aug 2026 v2
+ * 29 Aug 2026 v3
+ *
+ * v3 - CARD-1. New key `fullInstructions`. When "on", the exercise card
+ *   renders every section expanded regardless of phase or familiarity.
+ *
+ *   It lives HERE and not in store.js for the same three reasons already
+ *   written below: it is device-level (a phone's density has no business
+ *   syncing to a laptop), and above all it must survive a store reset --
+ *   somebody who needs full instructions needs them more at the moment
+ *   everything else resets, not less.
+ *
+ *   Unlike the other keys it is not applied pre-paint, because it changes
+ *   nothing about the shell. It is still duplicated into index.html's K
+ *   and D blocks because verify-disp1.mjs compares those maps whole, and
+ *   a key present in one copy and not the other is exactly the silent
+ *   drift that gate exists to catch.
  *
  * v2 - SCHEME-1. Colour scheme added: dark (default), light, high
  *   contrast. Dark is the product; the other two are adaptations
@@ -44,6 +59,7 @@ export const DISPLAY_KEYS = {
   letterSpacing: "alongside-letter-spacing",
   underline:     "alongside-underline-links",
   focus:         "alongside-enhanced-focus",
+  fullInstructions: "alongside-full-instructions",
 };
 
 export const DISPLAY_DEFAULTS = {
@@ -57,6 +73,10 @@ export const DISPLAY_DEFAULTS = {
   letterSpacing: "0",
   underline:     "off",
   focus:         "off",
+  // "off" means the card sizes itself. Not a reduced experience -- the
+  // full text is one tap away at every level, and nothing safety-bearing
+  // is ever collapsed. See alongside_blueprint_CARD-1_29aug2026_v1.md.
+  fullInstructions: "off",
 };
 
 // Ranges are deliberately conservative at the bottom end: nothing here

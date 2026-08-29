@@ -1,6 +1,25 @@
 /**
  * workout.js - Workout Execution View
- * 22 Aug 2026 v12
+ * 29 Aug 2026 v13
+ *
+ * v13 - CARD-1. The exercise card moves out of this file and into the
+ *   shared renderer, js/exercise-card.js. Two things change with it.
+ *
+ *   ORDER. bodyCaution rendered below "How heavy" and watchOut rendered
+ *   below the feedback control -- the one personalised safety line in
+ *   the card sat roughly two screenfuls down, and the hazard list sat
+ *   beneath a control most people read as the end of the card. Caution
+ *   is now first, hazards precede the explanatory text, feedback is
+ *   last.
+ *
+ *   DENSITY. Sections size themselves by phase and familiarity. Nothing
+ *   safety-bearing is ever collapsed, and no history count is ever
+ *   rendered (P4). See the header of exercise-card.js.
+ *
+ *   This file also starts rendering exercise.cues, which it never did --
+ *   core-session, yoga-session and morning-session already did, and the
+ *   difference was drift, not a decision.
+ *
  *
  * v12 - EMPTY-1. A session with exercises: [] crashed this view. The
  *   guard checked that a workout existed and never that it contained
@@ -181,7 +200,7 @@
 
 import { store }         from "../store.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
-import { bodyCaution } from "../data/session-rationale.js";
+import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
 import { checkinData }   from "../data/checkin.js";
@@ -294,83 +313,18 @@ export function render() {
           Watch how to do this
         </a>
 
-        <!-- Exercise card - universal three-section structure -->
-        <div class="exercise-instructions card" role="region" aria-label="Exercise guidance for ${exercise.name}">
-
-          <!-- Section 1: How to get there -->
-          ${exercise.instructions && exercise.instructions.length > 0 ? `
-            <span class="exercise-section-label" id="section-setup-${currentExerciseIndex}">
-              How to get there
-            </span>
-            <ul class="exercise-section-list" aria-labelledby="section-setup-${currentExerciseIndex}">
-              ${exercise.instructions.map(inst => `<li>${inst}</li>`).join("")}
-            </ul>
-          ` : ""}
-
-          <!-- Section 2: What to focus on -->
-          ${exercise.coaching ? `
-            <hr class="exercise-section-divider" aria-hidden="true">
-            <span class="exercise-section-label" id="section-focus-${currentExerciseIndex}">
-              What to focus on
-            </span>
-            <div class="coaching-tip" aria-labelledby="section-focus-${currentExerciseIndex}">
-              <span class="tip-icon" aria-hidden="true">\uD83D\uDCA1</span>
-              <p>${exercise.coaching}</p>
-            </div>
-          ` : ""}
-
-          <!-- Section 3: Why this helps -->
-          ${exercise.why ? `
-            <hr class="exercise-section-divider" aria-hidden="true">
-            <span class="exercise-section-label" id="section-why-${currentExerciseIndex}">
-              Why this helps
-            </span>
-            <p class="exercise-why-text" aria-labelledby="section-why-${currentExerciseIndex}">
-              ${exercise.why}
-            </p>
-          ` : ""}
-
-        </div>
-
-        <!-- How heavy - effort-relative only, never a weight (P4). -->
-        ${exercise.load ? `
-          <div class="exercise-load" role="region" aria-label="How heavy for this exercise">
-            <span class="exercise-section-label" id="section-load-${currentExerciseIndex}">
-              How heavy
-            </span>
-            <p class="exercise-load-text" aria-labelledby="section-load-${currentExerciseIndex}">
-              ${exercise.load}
-            </p>
-          </div>
-        ` : ""}
-
-        <!-- What to watch for. A coach noticing something, not an alert. -->
-        ${(() => {
-          // CORE-1. Fires when this exercise loads an area flagged sore today
-          // and is NOT contraindicated -- contraindicated ones never reach a
-          // card. Names the area, per P7: a coach told something specific that
-          // then hedges is pretending not to know. Invitation, not instruction.
-          const _c = bodyCaution(exercise);
-          return _c ? `<p class="exercise-caution" role="note">${_c}</p>` : "";
-        })()}
+        <!-- CARD-1. One shared renderer. Caution first, hazards before the
+             explanatory text, feedback last. Sections size themselves by
+             phase and familiarity; nothing safety-bearing collapses. -->
+        ${renderExerciseCard(exercise, { idPrefix: `wo-${currentExerciseIndex}`, running: timerStarted })}
 
         <!-- FEED-1. Two buttons, no "about right" -- silence already means
              that, and a third option turns an optional aside into a
              question on every exercise. Not a rating: no stars, no scale.
              Two of the last five are needed before selection moves
-             anything, and nothing is ever displayed back. -->
+             anything, and nothing is ever displayed back. Now LAST, so it
+             no longer sits above the hazard list. -->
         ${renderFeedbackControl(exercise)}
-
-        ${exercise.watchOut && exercise.watchOut.length > 0 ? `
-          <div class="exercise-watchout" role="region" aria-label="What to watch for with this exercise">
-            <span class="exercise-section-label" id="section-watchout-${currentExerciseIndex}">
-              What to watch for
-            </span>
-            <ul class="exercise-watchout-list" aria-labelledby="section-watchout-${currentExerciseIndex}">
-              ${exercise.watchOut.map(item => `<li>${item}</li>`).join("")}
-            </ul>
-          </div>
-        ` : ""}
 
         ${groundingMoment ? `
           <aside class="gmoment" aria-label="Something to notice">
@@ -524,6 +478,7 @@ export function onMount() {
     attachLogEvents(workout.exercises[currentExerciseIndex], `wo-log-${currentExerciseIndex}`);
     // FEED-1. Self-painting, so no re-render hook is needed.
     attachFeedbackEvents(workout.exercises[currentExerciseIndex]);
+    attachCardEvents(document.getElementById("app") || document);
   }
 
   // GM-1. Recorded on mount rather than at render, so a moment that was
