@@ -1,0 +1,6 @@
+# 29 Aug 2026. Added after `npm install jsdom` (needed to run the full gate
+# suite) was swept into a commit by `git add -A`. The gates need jsdom;
+# the repo does not need its 1,800 files.
+node_modules/
+package.json
+package-lock.json
