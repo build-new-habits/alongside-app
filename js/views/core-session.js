@@ -31,6 +31,18 @@
  *
  * 11 Aug 2026 v8
  *
+ * 29 Aug 2026 v9
+ *
+ * v9 - CARD-1. Working view AND the pre-session preview list move to
+ *   the shared renderer. Two renderers in one file is the drift the
+ *   shared card exists to prevent; the preview is simply `running: false`. bodyCaution
+ *   and watchOut both sat below the feedback control; both now precede
+ *   the explanatory text. The `cs-why-details` <details> is replaced by
+ *   the shared disclosure so every card behaves the same way.
+ *
+ *   ex.description keeps its own paragraph above the card -- it is
+ *   core-session's own framing, not part of the shared card.
+ *
  * v8 - CON-3b. Renders watchOut ("What to watch for") and load ("How
  *   heavy") on the active exercise card, matching gym-programme.js v8
  *   and workout.js v9. Deliberately NOT added to the preview list
@@ -157,7 +169,7 @@
 import { store } from "../store.js";
 import { firstSessionRecognition } from "../data/first-session.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
-import { bodyCaution } from "../data/session-rationale.js";
+import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { EXERCISES, filterByConditions } from "../data/exercises/index.js";
@@ -502,24 +514,7 @@ function renderSessionOverview() {
             </button>
 
             <div class="gym-exercise-detail" id="core-ex-detail-${i}" hidden>
-              ${ex.instructions && ex.instructions.length > 0 ? `
-                <ul class="exercise-cues" aria-label="How to get there">
-                  ${ex.instructions.map(inst => `<li>${inst}</li>`).join("")}
-                </ul>
-              ` : ""}
-              ${ex.cues?.length ? `<p class="exercise-cue">${ex.cues[0]}</p>` : ""}
-              ${ex.coaching ? `
-                <div class="coaching-tip">
-                  <span class="tip-icon" aria-hidden="true">\uD83D\uDCA1</span>
-                  <p>${ex.coaching}</p>
-                </div>
-              ` : ""}
-              ${ex.why ? `
-                <div class="exercise-why">
-                  <p class="exercise-why-label">Why this exercise</p>
-                  <p class="exercise-why-text">${ex.why}</p>
-                </div>
-              ` : ""}
+              ${renderExerciseCard(ex, { idPrefix: `cs-pre-${i}`, running: false })}
             </div>
           </div>
         `).join("")}
@@ -639,65 +634,10 @@ function renderExercise() {
 
         <p class="exercise-description">${ex.description}</p>
 
-        ${ex.instructions && ex.instructions.length > 0 ? `
-          <ul class="exercise-cues" aria-label="How to get there">
-            ${ex.instructions.map(inst => `<li>${inst}</li>`).join("")}
-          </ul>
-        ` : ""}
+        ${renderExerciseCard(ex, { idPrefix: `cs-${ex.id}`, running: false })}
 
-        ${ex.cues?.length ? `
-          <ul class="exercise-cues" aria-label="Coaching cues">
-            ${ex.cues.map(cue => `<li>${cue}</li>`).join("")}
-          </ul>
-        ` : ""}
-
-        ${ex.coaching ? `
-          <div class="coaching-tip">
-            <span class="tip-icon" aria-hidden="true">\uD83D\uDCA1</span>
-            <p>${ex.coaching}</p>
-          </div>
-        ` : ""}
-
-        ${ex.why ? `
-          <details class="cs-why-details">
-            <summary class="text-sm text-muted">Why this exercise?</summary>
-            <p class="text-sm text-muted" style="margin-top: var(--space-2);">
-              ${ex.why}
-            </p>
-          </details>
-        ` : ""}
-
-        ${ex.load ? `
-          <div class="exercise-load" role="region" aria-label="How heavy for this exercise">
-            <span class="exercise-section-label" id="cs-section-load">How heavy</span>
-            <p class="exercise-load-text" aria-labelledby="cs-section-load">${ex.load}</p>
-          </div>
-        ` : ""}
-
-        ${(() => {
-          // CORE-1. Fires when this exercise loads an area flagged sore today
-          // and is NOT contraindicated -- contraindicated ones never reach a
-          // card. Names the area, per P7: a coach told something specific that
-          // then hedges is pretending not to know. Invitation, not instruction.
-          const _c = bodyCaution(ex);
-          return _c ? `<p class="exercise-caution" role="note">${_c}</p>` : "";
-        })()}
-
-        <!-- FEED-1. Two buttons, no "about right" -- silence already means
-             that, and a third option turns an optional aside into a
-             question on every exercise. Not a rating: no stars, no scale.
-             Two of the last five are needed before selection moves
-             anything, and nothing is ever displayed back. -->
+        <!-- FEED-1. Now LAST, so it no longer sits above the hazard list. -->
         ${renderFeedbackControl(ex)}
-
-        ${ex.watchOut && ex.watchOut.length > 0 ? `
-          <div class="exercise-watchout" role="region" aria-label="What to watch for with this exercise">
-            <span class="exercise-section-label" id="cs-section-watchout">What to watch for</span>
-            <ul class="exercise-watchout-list" aria-labelledby="cs-section-watchout">
-              ${ex.watchOut.map(item => `<li>${item}</li>`).join("")}
-            </ul>
-          </div>
-        ` : ""}
 
         <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.youtube || (ex.name + " exercise form"))}"
            target="_blank"
@@ -1151,6 +1091,7 @@ export function onMount() {
     attachLogEvents(sessionQueue[currentIndex], `cs-log-${currentIndex}`);
     // FEED-1. Self-painting, so no re-render hook is needed.
     attachFeedbackEvents(sessionQueue[currentIndex]);
+    attachCardEvents(document.getElementById("app") || document);
   }
 
   mountSessionGuard({

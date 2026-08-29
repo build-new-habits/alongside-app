@@ -3,6 +3,13 @@
  *
  * 11 Aug 2026 v5
  *
+ * 29 Aug 2026 v6
+ *
+ * v6 - CARD-1. Card moves to the shared renderer, js/exercise-card.js.
+ *   bodyCaution rendered below "How heavy" and watchOut below the
+ *   feedback control; both now precede the explanatory text. Also starts
+ *   rendering exercise.cues, which this file never did.
+ *
  * v5 - CON-3b. Renders watchOut ("What to watch for") and load ("How
  *   heavy") from the linked database entry, completing the guidance
  *   block that v4 introduced. Same fullEx lookup, same structure,
@@ -75,7 +82,7 @@
 
 import { store } from "../store.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
-import { bodyCaution } from "../data/session-rationale.js";
+import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { getActiveConditionIds, getConditionName } from "../data/conditions.js";
@@ -225,57 +232,11 @@ export function render() {
           const fullEx = ex.exerciseId ? EXERCISES.find(e => e.id === ex.exerciseId) : null;
           if (!fullEx) return "";
           return `
-            <div class="exercise-instructions card" role="region" aria-label="Exercise guidance for ${ex.name}">
-              ${fullEx.instructions && fullEx.instructions.length > 0 ? `
-                <span class="exercise-section-label" id="ps-section-setup">How to get there</span>
-                <ul class="exercise-section-list" aria-labelledby="ps-section-setup">
-                  ${fullEx.instructions.map(inst => `<li>${inst}</li>`).join("")}
-                </ul>
-              ` : ""}
-              ${fullEx.coaching ? `
-                <hr class="exercise-section-divider" aria-hidden="true">
-                <span class="exercise-section-label" id="ps-section-focus">What to focus on</span>
-                <div class="coaching-tip" aria-labelledby="ps-section-focus">
-                  <span class="tip-icon" aria-hidden="true">\uD83D\uDCA1</span>
-                  <p>${fullEx.coaching}</p>
-                </div>
-              ` : ""}
-              ${fullEx.why ? `
-                <hr class="exercise-section-divider" aria-hidden="true">
-                <span class="exercise-section-label" id="ps-section-why">Why this helps</span>
-                <p class="exercise-why-text" aria-labelledby="ps-section-why">${fullEx.why}</p>
-              ` : ""}
-            </div>
-            ${fullEx.load ? `
-              <div class="exercise-load" role="region" aria-label="How heavy for ${ex.name}">
-                <span class="exercise-section-label" id="ps-section-load">How heavy</span>
-                <p class="exercise-load-text" aria-labelledby="ps-section-load">${fullEx.load}</p>
-              </div>
-            ` : ""}
-            ${(() => {
-              // CORE-1. Fires when this exercise loads an area flagged sore today
-              // and is NOT contraindicated -- contraindicated ones never reach a
-              // card. Names the area, per P7: a coach told something specific that
-              // then hedges is pretending not to know. Invitation, not instruction.
-              const _c = bodyCaution(fullEx);
-              return _c ? `<p class="exercise-caution" role="note">${_c}</p>` : "";
-            })()}
+            ${renderExerciseCard(fullEx, { idPrefix: `ps-${fullEx.id}`, running: false })}
 
-            <!-- FEED-1. Two buttons, no "about right" -- silence already means
-                 that, and a third option turns an optional aside into a
-                 question on every exercise. Not a rating: no stars, no scale.
-                 Two of the last five are needed before selection moves
-                 anything, and nothing is ever displayed back. -->
+            <!-- FEED-1. Now LAST, so it no longer sits above the hazard list. -->
             ${renderFeedbackControl(fullEx)}
 
-            ${fullEx.watchOut && fullEx.watchOut.length > 0 ? `
-              <div class="exercise-watchout" role="region" aria-label="What to watch for with ${ex.name}">
-                <span class="exercise-section-label" id="ps-section-watchout">What to watch for</span>
-                <ul class="exercise-watchout-list" aria-labelledby="ps-section-watchout">
-                  ${fullEx.watchOut.map(item => `<li>${item}</li>`).join("")}
-                </ul>
-              </div>
-            ` : ""}
             <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(fullEx.youtube || (ex.name + " exercise form"))}"
                target="_blank"
                rel="noopener noreferrer"
@@ -397,6 +358,7 @@ export function onMount() {
     attachLogEvents(active[currentIndex], `ps-log-${currentIndex}`);
     // FEED-1. Self-painting, so no re-render hook is needed.
     attachFeedbackEvents(active[currentIndex]);
+    attachCardEvents(document.getElementById("app") || document);
   }
 
   // PT-3. Latch once. onMount() re-fires on every navigate back into this
