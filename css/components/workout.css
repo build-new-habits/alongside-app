@@ -1,7 +1,14 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
-   26 Aug 2026 v8
+   29 Aug 2026 v9
+
+   v9 - CARD-1. .xcard-* — the shared exercise card and its disclosures.
+   The toggle is a real button, so it needs a real target size and a
+   visible focus ring; the chevron is decorative and rotates only when
+   motion is allowed. Collapsed bodies use the [hidden] attribute, not
+   display:none on a class, so the accessibility tree keeps them.
+
 
    v8 - .exercise-swap, the SWAP-0 cardio machine swap control and its
         panel. Tokens matched to .exercise-preference below, including
@@ -1293,4 +1300,100 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ex-feedback__btn { transition: none; }
+}
+
+
+/* ============================================
+   CARD-1 — shared exercise card
+   ============================================ */
+
+.exercise-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* The caution is the personalised safety line. It leads the card and it
+   has no control, at any familiarity level, in any phase. Styling it
+   distinctly is the point: it is not part of the run of static prose. */
+.exercise-card .exercise-caution {
+  margin: 0 0 var(--space-2) 0;
+}
+
+.xcard-section {
+  border-top: 1px solid var(--color-border-light, rgba(255, 255, 255, 0.12));
+}
+
+.xcard-section:first-of-type {
+  border-top: none;
+}
+
+.xcard-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 48px;            /* WCAG 2.2 target size */
+  padding: var(--space-3) 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.xcard-toggle:focus-visible {
+  outline: 2px solid var(--color-primary, currentColor);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.xcard-toggle-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-primary, currentColor);
+}
+
+/* Decorative. The label and aria-expanded carry the meaning. */
+.xcard-toggle-chev {
+  flex: 0 0 auto;
+  width: 0.6em;
+  height: 0.6em;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.6;
+  transition: transform 150ms ease;
+}
+
+.xcard-toggle[aria-expanded="true"] .xcard-toggle-chev {
+  transform: rotate(-135deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xcard-toggle-chev { transition: none; }
+}
+
+.xcard-section-body {
+  padding-bottom: var(--space-3);
+}
+
+/* [hidden] must win. A later display rule on a child class would
+   otherwise re-show a section the button says is closed. */
+.xcard-section-body[hidden] {
+  display: none !important;
+}
+
+.xcard-lead-cue {
+  padding: var(--space-3) 0;
+}
+
+.xcard-lead-cue .exercise-cue {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed, 1.6);
 }

@@ -109,11 +109,21 @@ check("easing off is not framed as failure (P4)", () => {
 });
 
 console.log("\nTEST 5 - rendered on every card-shaped view");
+
+// CARD-1 (29 Aug 2026). The four views no longer call bodyCaution
+// themselves -- they render js/exercise-card.js, which calls it once.
+// This test was rewritten rather than deleted: the thing it protects is
+// unchanged, which is that a caution actually reaches every card-shaped
+// view. It now checks the chain rather than a duplicated call.
+check("the shared card calls bodyCaution and renders the markup", () => {
+  const s = fs.readFileSync("js/exercise-card.js", "utf8");
+  ok(/bodyCaution\(/.test(s), "the shared card never calls it - the caution would never appear anywhere");
+  ok(/exercise-caution/.test(s), "no markup");
+});
 for (const v of ["workout", "core-session", "prescribed-session", "gym-programme"])
-  check(`${v} renders it`, () => {
+  check(`${v} renders the shared card`, () => {
     const s = fs.readFileSync(`js/views/${v}.js`, "utf8");
-    ok(/bodyCaution\(/.test(s), "imported nowhere - the caution would never appear");
-    ok(/exercise-caution/.test(s), "no markup");
+    ok(/renderExerciseCard\(/.test(s), "does not render the shared card - the caution would never appear here");
   });
 check("the alias table exists in exactly one place", () => {
   const src = fs.readFileSync("js/data/session-rationale.js", "utf8");
