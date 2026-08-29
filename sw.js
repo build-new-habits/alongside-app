@@ -1,5 +1,20 @@
 /**
+ * sw.js — v407, 29 Aug 2026
+ *
+ * CARD-1. New js/exercise-card.js, precached. It is the shared exercise
+ * card: one renderer for workout, core-session, prescribed-session and
+ * gym-programme, replacing four copies that had already drifted apart.
+ *
+ * Omitting it from SHELL_URLS would have left every card-shaped view
+ * importing a file the shell does not hold — the INF-CACHE failure again,
+ * where 40 files were missing from the precache and nothing said so.
+ */
+/**
  * sw.js - Alongside Service Worker
+ *
+ * 29 Aug 2026 v407
+ *
+ * v407 - CARD-1. See the note at the top of this file.
  *
  * 26 Aug 2026 v406
  * SWAP-0. Cache bump only -- js/data/exercises/index.js,
@@ -2817,7 +2832,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v406";
+const CACHE_NAME = "alongside-v407";
 
 const SHELL_URLS = [
 
@@ -2885,6 +2900,7 @@ const SHELL_URLS = [
   "/alongside-app/js/store.js",
   "/alongside-app/js/session-log.js",
   "/alongside-app/js/exercise-feedback.js",
+  "/alongside-app/js/exercise-card.js",
   "/alongside-app/js/display-prefs.js",
   "/alongside-app/js/tts.js",
   "/alongside-app/js/session-guard.js",
