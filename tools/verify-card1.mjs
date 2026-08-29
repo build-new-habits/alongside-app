@@ -131,10 +131,40 @@ check("fullInstructions is a display preference, not a store field", () => {
 
 console.log("\nTEST 6 - the card is shared, not re-inlined");
 
-check("workout.js no longer builds its own card", () => {
-  ok(workout.includes("renderExerciseCard("), "workout.js does not use the shared renderer");
-  ok(!workout.includes("exercise-instructions card"), "workout.js still contains an inline card block");
-});
+// Every view that renders a full exercise card. yoga-session.js and
+// practices.js are deliberately absent: neither renders a feedback
+// control, so neither ever had the ordering fault, and their content is
+// poses and practices rather than database exercises.
+const CARD_VIEWS = [
+  "js/views/workout.js",
+  "js/views/prescribed-session.js",
+  "js/views/gym-programme.js",
+  "js/views/core-session.js",
+];
+
+for (const f of CARD_VIEWS) {
+  const src = stripJs(fs.readFileSync(f, "utf8"));
+  check(f + " uses the shared renderer", () => {
+    ok(src.includes("renderExerciseCard("), "does not call the shared renderer");
+    // Structure, not class name. prescribed-session.js legitimately reuses
+    // the `exercise-instructions card` CLASS for the physio-notes block,
+    // which is not an exercise card at all. Asserting on the class gave a
+    // false positive on the first run of this gate. The real markers of a
+    // re-inlined card are the setup list and its label.
+    ok(!src.includes("exercise-section-list"), "still builds an inline setup list");
+    ok(!src.includes("How to get there"), "still builds an inline card structure");
+  });
+  check(f + " renders the feedback control after the card", () => {
+    const c = src.indexOf("renderExerciseCard("), fb = src.indexOf("renderFeedbackControl(");
+    ok(c > -1, "no card call");
+    if (fb === -1) return;
+    ok(c < fb, "feedback control renders before the card; the hazard list would sit beneath it again");
+  });
+  check(f + " no longer builds its own caution or hazard block", () => {
+    ok(!/bodyCaution\s*\(/.test(src), "still calls bodyCaution directly; ordering can drift again");
+    ok(!src.includes("exercise-watchout-list"), "still contains an inline watchOut list");
+  });
+}
 
 console.log(fails ? `\n${fails} FAILED\n` : "\nALL PASS\n");
 process.exit(fails ? 1 : 0);

@@ -1,5 +1,12 @@
 /**
  * gym-programme.js
+ * 29 Aug 2026 v8
+ *
+ * v8 - CARD-1. Card moves to the shared renderer, js/exercise-card.js.
+ *   bodyCaution and watchOut both sat below the feedback control; both
+ *   now precede the explanatory text. Swap control and "not a fan" keep
+ *   their positions, between the card and the feedback control.
+ *
  * 26 Aug 2026 v7
  *   SWAP-0. A Swap control on cardio machine exercises.
  *
@@ -280,7 +287,7 @@
 import { store }                    from '../store.js';
 import { isPremium }                from '../auth.js';
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
-import { bodyCaution } from "../data/session-rationale.js";
+import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
 // EMP/LOG-1: the note block moved to js/session-log.js so workout.js can
 // reach it too. progressionInvitation is still used by the block, but it
 // is imported there now, not here.
@@ -788,40 +795,9 @@ export function GymProgrammeView(router) {
 
           ${renderLogBlock(exercise)}
 
-          <!-- Guidance — instructions / coaching / why, same structure and
-               same real fields as prescribed-session.js/workout.js. -->
-          ${exercise.instructions?.length || exercise.coaching || exercise.why ? `
-            <div class="exercise-instructions card" role="region" aria-label="Exercise guidance for ${_esc(exercise.name)}">
-              ${exercise.instructions && exercise.instructions.length > 0 ? `
-                <span class="exercise-section-label" id="gp-section-setup">How to get there</span>
-                <ul class="exercise-section-list" aria-labelledby="gp-section-setup">
-                  ${exercise.instructions.map(step => `<li>${_esc(step)}</li>`).join('')}
-                </ul>
-              ` : ''}
-              ${exercise.coaching ? `
-                <hr class="exercise-section-divider" aria-hidden="true">
-                <span class="exercise-section-label" id="gp-section-focus">What to focus on</span>
-                <div class="coaching-tip" aria-labelledby="gp-section-focus">
-                  <span class="tip-icon" aria-hidden="true">\uD83D\uDCA1</span>
-                  <p>${_esc(exercise.coaching)}</p>
-                </div>
-              ` : ''}
-              ${exercise.why ? `
-                <hr class="exercise-section-divider" aria-hidden="true">
-                <span class="exercise-section-label" id="gp-section-why">Why this helps</span>
-                <p class="exercise-why-text" aria-labelledby="gp-section-why">${_esc(exercise.why)}</p>
-              ` : ''}
-            </div>
-          ` : ''}
-
-          <!-- How heavy - effort-relative only, never a weight. See the
-               Exercise Entry Standard and Locked Principle P4. -->
-          ${exercise.load ? `
-            <div class="exercise-load" role="region" aria-label="How heavy for ${_esc(exercise.name)}">
-              <span class="exercise-section-label" id="gp-section-load">How heavy</span>
-              <p class="exercise-load-text" aria-labelledby="gp-section-load">${_esc(exercise.load)}</p>
-            </div>
-          ` : ''}
+          <!-- CARD-1. Shared renderer. Caution first, hazards before the
+               explanatory text, feedback last. -->
+          ${renderExerciseCard(exercise, { idPrefix: `gp-${exercise.id}`, running: false })}
 
           <!-- SWAP-0 (26 Aug 2026). Only on cardio machines, and only when
                there is somewhere real to go. A control that opens an empty
@@ -843,29 +819,8 @@ export function GymProgrammeView(router) {
             </button>
           </div>
 
-          <!-- What to watch for. A coach noticing something, not an alert. -->
-          ${(() => {
-            // CORE-1. Fires when this exercise loads an area flagged sore today
-            // and is NOT contraindicated. Names the area, per P7.
-            const _c = bodyCaution(exercise);
-            return _c ? `<p class="exercise-caution" role="note">${_c}</p>` : "";
-          })()}
-
-          <!-- FEED-1. Two buttons, no "about right" -- silence already means
-               that, and a third option turns an optional aside into a
-               question on every exercise. Not a rating: no stars, no scale.
-               Two of the last five are needed before selection moves
-               anything, and nothing is ever displayed back. -->
+          <!-- FEED-1. Now LAST, so it no longer sits above the hazard list. -->
           ${renderFeedbackControl(exercise)}
-
-          ${exercise.watchOut && exercise.watchOut.length > 0 ? `
-            <div class="exercise-watchout" role="region" aria-label="What to watch for with ${_esc(exercise.name)}">
-              <span class="exercise-section-label" id="gp-section-watchout">What to watch for</span>
-              <ul class="exercise-watchout-list" aria-labelledby="gp-section-watchout">
-                ${exercise.watchOut.map(item => `<li>${_esc(item)}</li>`).join('')}
-              </ul>
-            </div>
-          ` : ''}
 
           <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + ' exercise form'))}"
              target="_blank"
@@ -929,6 +884,7 @@ export function GymProgrammeView(router) {
     attachLogEvents(exercise);
     // FEED-1. Self-painting, so no re-render hook is needed.
     attachFeedbackEvents(exercise);
+    attachCardEvents(document.getElementById("app") || document);
 
     // SWAP-0. Toggle the panel, then the options within it.
     document.getElementById('gp-swap-btn')?.addEventListener('click', () => {

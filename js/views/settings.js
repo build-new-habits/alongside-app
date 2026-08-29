@@ -1,5 +1,12 @@
 /**
  * settings.js
+ * 29 Aug 2026 v35
+ *
+ * v35 - CARD-1. "Always show full instructions" added to the Display
+ *   panel. Overrides every collapse in the exercise card. Sits with the
+ *   other access preferences and, per the P3 note in display-prefs.js,
+ *   is never offered on a timer or in onboarding.
+ *
  * 22 Aug 2026 v34
  *
  * v34 - WEIGHT-1b (Settings half). Weight tracking, off by default,
@@ -1552,6 +1559,9 @@ export function SettingsView(router) {
 
         ${_dispToggle("focus", "disp-focus", "Stronger focus outlines",
           "A thicker, brighter ring around whatever you have selected with a keyboard")}
+
+        ${_dispToggle("fullInstructions", "disp-full-instructions", "Always show full instructions",
+          "Exercise cards normally open the parts you need and tuck the rest away. Turn this on to see everything, every time")}
 
         <button class="btn btn-secondary" id="disp-reset" type="button"
                 style="margin-top: var(--space-4);">
