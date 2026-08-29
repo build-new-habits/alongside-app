@@ -1,31 +1,9 @@
 # Alongside: Move — Master Schedule
-## 29 Aug 2026 v236
+## 29 Aug 2026 v235
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_29aug2026_v235.md`. Remove v235 on upload.
+Supersedes `master_schedule_29aug2026_v234.md`. Remove v234 on upload.
 
-> ### 🟠 CARD-1 BUILD STARTED 29 Aug — steps 1–3 of 8. NOT DEPLOYED.
->
-> Graeme chose the **shared renderer** over six separate edits, 29 Aug. Built in the spec's order. **`sw.js` deliberately not bumped, so none of this is live.** Five views still render their own cards and are unchanged.
->
-> #### 🟢 Done
->
-> **1. `js/display-prefs.js` v3 + `index.html`.** New `fullInstructions` key, default `"off"`. Device-level, survives a store reset — **no `store.js` or `Schema.md` change**. `verify-disp1.mjs` green, and **reversal-tested**: removing the key from the `index.html` copy alone makes it fail, which is the drift that gate exists to catch.
->
-> **2. `js/exercise-card.js` v1 — the shared renderer.** Caution first, hazards before explanatory text, feedback last. Setup closes when the timer starts and stops opening by default at `n >= 3`; `watchOut` never auto-collapses while a caution fires; `load` and `why` collapse after the first meeting. Real disclosure — `<button>`, `aria-expanded`, `aria-controls`, content stays in the DOM via the `hidden` attribute rather than `display:none`.
->
-> **3. `js/views/workout.js` v13.** Moved onto the shared renderer; 3,685 characters of inline card removed. **It now renders `exercise.cues`, which it never did** — core-session, yoga-session and morning-session already did, and the difference was drift rather than a decision.
->
-> **4. `tools/verify-card1.mjs` v1 — 12 checks, gate 90.** No negative distance windows anywhere; every positional assertion compares `indexOf` against `indexOf`, which cannot pass by drifting. **Three reversals run and confirmed failing**: moving the caution below Setup, dropping the caution term from `watchOpen`, and interpolating the history count into the template (P4).
->
-> #### 🟠 Remaining — steps 4–8
->
-> `prescribed-session.js`, `gym-programme.js`, `core-session.js`, `yoga-session.js`, `practices.js` onto the shared renderer · Settings → Display toggle in `settings.js` · CSS for `.xcard-*` · full gate suite with `jsdom` · **`sw.js` last, alone, cache bump**.
->
-> #### 🔴 The card is unstyled until the CSS lands
->
-> `.xcard-toggle`, `.xcard-section`, `.xcard-section-body`, `.xcard-lead-cue` have no rules yet. Functional and accessible, but visually raw. **Do not device-test the card before step 6.**
->
 > ### 🔴 CARD-1 SPEC WRITTEN 29 Aug — and a safety-ordering fault found while writing it.
 >
 > Discovery and spec complete in one sitting. `Documents/Admin/alongside_blueprint_CARD-1_29aug2026_v1.md`. **No code written.** Build is a named session, not started.
@@ -94,7 +72,7 @@ Supersedes `master_schedule_29aug2026_v235.md`. Remove v235 on upload.
 >
 > | ID | Task | Status | Target |
 > |---|---|---|---|
-> | **CARD-1** | Exercise card progressive disclosure. **Build steps 1–3 of 8 done 29 Aug.** `exercise-card.js` v1 (shared renderer), `workout.js` v13, `display-prefs.js` v3, `index.html`, `tools/verify-card1.mjs` (12 checks, 3 reversal-tested). **Five views still on their own copies. `sw.js` NOT bumped — nothing is deployed** | 🟠 Part-built, not deployed | w/c 31 Aug |
+> | **CARD-1** | Exercise card progressive disclosure. **Discovery done + spec written 29 Aug** — `Documents/Admin/alongside_blueprint_CARD-1_29aug2026_v1.md`. `exerciseHistory` already exists (CONT-1), so **no store or schema change**. Build not started, 12 files, shared-renderer decision open | 🔵 Spec complete, build pending | w/c 31 Aug |
 > | **SENSORY-1a** | Transition time control (Off / 5 / 10 / 15 / 20s). **Beta scope** — access need, not a feature | 🔵 Spec needed | w/c 31 Aug |
 > | **SENSORY-1b** | Sound toggles, external audio ducking, exercise-name voiceover | 🔵 Post-beta | After beta |
 >
@@ -5188,4 +5166,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 29 Aug 2026 v236*
+*Build New Habits · Alongside: Move · Master Schedule · 29 Aug 2026 v235*
