@@ -1,54 +1,8 @@
 # Alongside: Move — Master Schedule
-## 29 Aug 2026 v234
+## 28 Aug 2026 v233
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_28aug2026_v233.md`. Remove v233 on upload.
-
-> ### 🟡 COMPETITOR TEARDOWN — Bend, 29 Aug 2026. Three rows booked, one spec superseded in principle.
->
-> Graeme walked the full Bend onboarding and app (~30 screenshots) and asked for a teardown against Move. Bend is the category incumbent — 15,000,000+ claimed users. **No code was written and no file was opened.** What follows is what the teardown changed, not the teardown itself.
->
-> #### 🔴 The safety finding — the most useful thing in the exercise
->
-> Bend collects declared areas of concern across 25+ body regions and answers the entire set with one screen: *"Thanks for sharing. We'll let you know which exercises to be cautious about."* No red-flag screen, no medical caveat, no signposting. Its age picker offers **"13 or below"** as a selectable value with no gate behind it. That is the market leader's floor. Two consequences worth keeping: the red-flag screen is **differentiating, not merely compliance overhead**, and resolving A1.11 puts Move above the sector norm rather than level with it.
->
-> #### 🔴 What Bend confirms about the engagement model — recorded because it is confirmatory, not new
->
-> Streaks are the whole mechanic: header flame, widget flame, active and longest streak on the dashboard, and a **locked "Restore Streak"** — the anxiety is manufactured and then monetised. The "Bendometer" opens a newly paying user at **0%** with "Next Day: +1%". Gear changes answer this directly and better: they start somewhere and cannot be lost. **No action. The constraint holds.**
->
-> #### 🟢 Pricing — independent support for the 20 Aug acquisition reframe
->
-> £59.99 nominal, £29.99 standard yearly, £19.99 via a second "one-time offer" paywall, £9.99 monthly. The consumer stretching category has been priced to the floor by exactly this funnel. Move cannot win a price fight there and should not try. This is outside confirmation of the reframe already on record: Year 1 revenue comes from organisation relationships, not freemium conversion.
->
-> #### 🟡 CARD-1 — exercise card density. Graeme's own observation, and he is right.
->
-> `alongside_exercise_card_complete_spec.md` v1.0 renders **Setup, Form Cues and Why This all at once**. On a phone, mid-position, that is roughly ten lines of body text. The spec itself argues the three sections are needed at different moments and then displays them simultaneously, which cancels the separation it just made.
->
-> Proposed replacement is **disclosure keyed to phase**: Setup expanded before the timer starts and self-collapsing when it does; **one** cue during; Why This collapsed in-session and expanded in library context. Stronger form: **density decreases with familiarity** — full card on first encounter, then name plus one cue plus a quiet "show me again". That is a coach behaviour, not a UI behaviour.
->
-> **Three constraints, non-negotiable.** Safety-relevant cues never collapse, which needs a flag on the cue rather than a judgement at render time. Collapsed is not hidden — real disclosure pattern, `aria-expanded`, content present in the DOM and in the accessibility tree. And a global "always show full instructions" toggle, because reduced density helps most neurodivergent users and actively hurts some.
->
-> **🔴 Discovery before spec, the same rule as R2-b.** The familiarity model needs to know whether this person has met this exercise before. If workout history already records exercise IDs it is derivable and CARD-1 is presentation-layer only — no change to the 551 entries. If it does not, it is a new store field and **schema-first applies**: `store.js` and `Schema.md` before any code. This is not known, and must not be guessed.
->
-> #### 🟡 SENSORY-1 — the one place Bend is straightforwardly better than Move
->
-> Bend's per-routine settings sheet carries: sound at end of each exercise, sound after the transition, duck external audio, voiceover of exercise names, and **transition time (Off / 5 / 10 / 15 / 20 seconds)**. The transition picker is the load-bearing one — someone who needs longer to get down onto the floor sets it once and the whole app respects it. **Split decided 29 Aug: 1a into beta, 1b after.** The transition control is an access need rather than a feature, and it is a picker plus one stored value.
->
-> #### 🟢 Two smaller things taken, one deliberately declined
->
-> **Taken.** Per-exercise time adjustment on the routine preview (− 0:30 +) — the plan as proposal rather than instruction, which sits closer to Move's philosophy than to Bend's own. And the illustration system: one coloured circle per exercise, so a routine card carries a recognisable fingerprint. Cheap, needs no photography, and inherently more inclusive than stock imagery. Both folded into CARD-1's scope question rather than booked separately.
->
-> **Declined.** Bend's AI tab ("Describe your perfect routine"). Move's differentiator is that the coach proposes. A free-text routine generator would undercut the thing being sold.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **CARD-1** | Exercise card progressive disclosure. **Discovery only** — does workout history record exercise IDs. Supersedes the all-sections-visible model in the exercise card spec v1.0 once specced | 🟠 Needs discovery | w/c 31 Aug |
-> | **SENSORY-1a** | Transition time control (Off / 5 / 10 / 15 / 20s). **Beta scope** — access need, not a feature | 🔵 Spec needed | w/c 31 Aug |
-> | **SENSORY-1b** | Sound toggles, external audio ducking, exercise-name voiceover | 🔵 Post-beta | After beta |
->
-> **CARD-1 discovery runs alongside R2-b discovery in w/c 31 Aug — Graeme's call, taken 29 Aug.** R2-b remains the priority of the two. Neither displaces the clinical pack, the PAT rotation (expires 5 Sept), or A1.11.
+Supersedes `master_schedule_28aug2026_v232.md`. Remove v232 on upload.
 
 > ### 🟢 PM RECONCILIATION — 28 Aug 2026 (v232). Two-week sweep: chats 14–28 Aug against this document.
 >
@@ -5138,4 +5092,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 29 Aug 2026 v234*
+*Build New Habits · Alongside: Move · Master Schedule · 28 Aug 2026 v233*
