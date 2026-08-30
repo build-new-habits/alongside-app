@@ -1,56 +1,9 @@
 # Alongside: Move — Master Schedule
-## 29 Aug 2026 v237
+## 29 Aug 2026 v236
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_29aug2026_v236.md`. Remove v236 on upload.
+Supersedes `master_schedule_29aug2026_v235.md`. Remove v235 on upload.
 
-> ### 🔴 DEVICE TEST 29 Aug — three faults found, one is a beta blocker. CHECKIN-2 specced.
->
-> Graeme device-tested `alongside-v407` the same evening. Three findings, ranked by consequence rather than by how they were raised.
->
-> #### 🔴 1. CHECKIN-2 — a sore area that is not on the list cannot be reported at all
->
-> The check-in sliders render one per entry in `store.conditions`, set at onboarding, and they are the **only** input to `bodyCaution`. There is no route to add an area. Confirmed against the data: **`shoulder` exists as an `affectsAreas` value across the database and has no condition entry and no way to create one.** A shoulder that flares up on a Tuesday can be loaded all week with a silent card.
->
-> The caution that CARD-1 spent the afternoon moving to the top of the card is blind to anything not declared months earlier. **Beta blocker.** Blueprint written: `Documents/Admin/alongside_blueprint_CHECKIN-2_29aug2026_v1.md`.
->
-> **🔴 Free text is forbidden in the picker.** An id matching no `affectsAreas` value produces a slider that works, saves, and silently never fires a caution — a control that looks like it did something and did not.
->
-> **🔴 Silence is never "no pain."** Graeme's condition-lifecycle idea (2b) is right and better than the transient-field design it replaces — if conditions can resolve, one list suffices instead of two. But a missed check-in must never count toward resolution. Somebody too unwell to open the app for a fortnight must not be met with "shall we take that off your list?" `quietRun` resets on a missed day. Not pauses. Resets. Its own gate, its own reversal.
->
-> **🔴 Eligibility is behavioural, not clinical — a deliberate refusal.** Graeme delegated the episodic/persistent call. A static taxonomy was declined: it would be wrong for individuals constantly (one person's sprained ankle is five years of instability) and would place an unreviewed clinical classification inside a safety-adjacent feature with no clinician in between. Eligibility derives from the person's own reporting pattern instead — recurrence or a long span disqualifies, thin history disqualifies, and **the default when uncertain is never to ask.** The never-ask list for definitionally lifelong conditions is drafted **for the health-professional reviewer**, not shipped on Claude's judgement.
->
-> **Split: 2a (add an area, the safety gap) builds first; 2b (resolution and the ask) on the same schema after.** Schema-first applies to both — `conditions` becomes records, and `store.js` plus `Schema.md` come before code.
->
-> #### 🟠 2. TIME-1 — three views, three answers, one exercise
->
-> Timers are derived three unrelated ways. `prescribed-session.js` and `gym-programme.js` parse a duration out of the **prescription reps string** via `parseHoldSeconds`. `workout.js` uses `exercise.duration`. **`holdSeconds`, the actual database field, is read only by `yoga-session.js` and `core-session.js`.** So an exercise carrying `holdSeconds: 30` gets a clock in a yoga or core session and nothing at all in a programme session. Same data, three answers, depending on the route in. Same class of fault as `cues`; wants the same fix.
->
-> #### 🟠 3. CARD-2 — the three-layer card supersedes CARD-1's disclosure model, one day old
->
-> Graeme's proposal, and it is the better idea: cut the card by **when the person needs something** rather than by content type. Before (why, how heavy, focus) · During (setup, watch for, sets/reps, video) · After (too hard/too easy/not a fan, the log, notes). Only one layer on screen, so six instructions is fine — that is the thing being done.
->
-> Two things fall straight out: **the band-and-reps log currently renders above everything**, before a single rep, and the section disclosures largely stop being needed. **Constraint: the caution and one cue sit outside the layers, pinned.** A layer navigated away from is more hidden than a section collapsed.
->
-> The shared renderer and the safety ordering fix both survive — the layers go inside `exercise-card.js`, so there is one place to build them rather than four.
->
-> #### 🟠 Defect introduced 29 Aug, not yet fixed
->
-> `running: false` is **hardcoded** in `prescribed-session.js` and `gym-programme.js`. Both have live timer state. Setup never self-collapses in either view, so the phase half of CARD-1 is simply not wired there. Fix with CARD-2.
->
-> #### 🟠 `node_modules` swept into history again
->
-> `npm install jsdom` (needed for the full suite) plus `git add -A` put ~1,800 files into the CARD-1 steps 4–7 commit; the `sw.js` commit then deleted them, so **that commit is 1,839 files rather than one** and is not "last and alone" in the sense the rule intends. HEAD is clean, verified by fresh clone, and `.gitignore` now covers `node_modules/`, `package.json`, `package-lock.json`. **The blobs remain in history unless rewritten — decision outstanding, same as the July occurrence.**
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **CHECKIN-2a** | Add a sore area at check-in. Schema-first — `conditions` becomes records. **Beta blocker** | 🔵 Spec complete, build next | w/c 31 Aug |
-> | **CHECKIN-2b** | Condition resolution, quiet-run tracking, the noticing ask | 🔵 Spec complete | After 2a |
-> | **TIME-1** | One timer source. `holdSeconds` canonical across all five views | 🟠 Needs spec | w/c 31 Aug |
-> | **CARD-2** | Three-layer card. Supersedes CARD-1 disclosure model; also fixes the hardcoded `running: false` | 🟠 Needs spec | w/c 31 Aug |
->
 > ### 🟠 CARD-1 BUILD STARTED 29 Aug — steps 1–3 of 8. NOT DEPLOYED.
 >
 > Graeme chose the **shared renderer** over six separate edits, 29 Aug. Built in the spec's order. **`sw.js` deliberately not bumped, so none of this is live.** Five views still render their own cards and are unchanged.
@@ -5235,4 +5188,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 29 Aug 2026 v237*
+*Build New Habits · Alongside: Move · Master Schedule · 29 Aug 2026 v236*
