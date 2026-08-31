@@ -1,76 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v243
+## 31 Aug 2026 v242
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v242.md`. Remove v242 on upload.
-
-> ### 🟢 CARD-3 BUILT AND DEPLOYED 31 Aug — `alongside-v411`. 92/92 gates.
->
-> Three pages replace CARD-2's tabs, the same day the tabs shipped. Tabs were optional lateral navigation — "here are three places you may go" — and the honest response was to go to none of them, which is what the device test showed. Pages fix it **without gating**: you pass through DO because the timer lives there, not because a checklist made you. Forcing progression was rejected as coercive.
->
-> **DECIDE** — last time, `load` when there is no last time, the view's adjust controls, and Skip. **DO** — hazards first and unhidden, then instructions, then the timer and video. **NOTE** — the log block, then feedback last.
->
-> #### 🟢 The safety regression is closed
->
-> CARD-2 put `watchOut` inside a tab, so an exercise could be started with the hazards never on screen. They are now the **first thing in the DO page body**, before any explanatory text, with nothing to interact with first. Gate assertions 2a/2b/2c, all three reversal-tested — including swapping hazards and instructions, which proves 2b measures order rather than presence.
->
-> #### 🟢 The first of three card attempts that actually removed words
->
-> CARD-1 collapsed sections. CARD-2 sorted them into tabs. Neither removed a single word. **`why` is now off the card entirely** and belongs in the library — reference material, not what a warm-up needs. **`load` is conditional**: it renders on DECIDE only when there is no last time, so their own band always wins over the generic prescription, and the otherwise-thin first encounter still has something on it. Graeme's call, and it is the one addition in a change that is otherwise all subtraction.
->
-> #### 🔴 Adjust controls: shipped honest, not shipped as mocked
->
-> The blueprint listed less time / more time, swap, and make-it-easier on DECIDE, and said less/more time already existed. **Discovery found it does not — nothing in `js/` adjusts an exercise's duration, and "make it easier" does not exist either.** Swap exists in `gym-programme.js` alone, cardio-only, from SWAP-0.
->
-> **Decision, Graeme 31 Aug: ship what is real.** Less/more time goes to **TIME-2**, because TIME-2 is about to change what that number means and building an adjuster against a label being replaced is rework. "Make it easier" goes to **SWAP-1**, post-beta — it is not a control, it is the interchangeability problem, and SWAP-0 was narrowed to cardio precisely because widening it returned unsafe substitutes for this audience.
->
-> #### 🔴 A live crash found and fixed on the way through
->
-> `prescribed-session.js` `onMount()` called `parseHoldSeconds(ex.reps)` at a line **TIME-1 did not update when it retired that function**. Nothing imports it. The call sits past the already-done early return, so **every real prescribed session threw a ReferenceError in `alongside-v410`**. `render()` had been moved onto `resolveTiming()`; `onMount()` had not. Now it is.
->
-> **The lesson is TIME-1's, not CARD-3's:** a rename that updates the call sites you are looking at is not finished. Nothing gated it, and nothing would have.
->
-> #### 🟠 Three other faults closed in passing
->
-> - The `xcard:page` listener **stacked on every mount** — `onMount` re-fires per navigate and `#app` outlives the render. Guarded, the same way `attachCardEvents` guards itself.
-> - `core-session.js` had **feedback above the log block** in its After layer, the wrong way round against the safety ordering. Feedback is last everywhere now.
-> - `sw.js` carried an **orphan CARD-1 header reading "v407, 29 Aug 2026" above the real header**, so the top of the file advertised a version three behind `CACHE_NAME`. Folded into the history in date order.
->
-> #### 🟢 `core-session.js` version numbering — corrected in place, not renumbered
->
-> The file carried **two histories**: a chain running to v12 on 15 Aug, with CARD-1 and CARD-2 written in as "29 Aug v9" and "31 Aug v10", reusing numbers that already existed. **Decision, Graeme 31 Aug: next number is 13, with a note in the file.** Rewriting a deployed file's history risks fresh errors for no functional gain — the same reasoning that settled the 29 Aug date error.
->
-> #### 🟢 The label that lied, handled without a guess
->
-> "Hold" was printed by the **views**, not the card, always as `sets > 1 ? "Set 1 of N" : "Hold"`. `resolveTiming` returns `{seconds, source}` and carries no held-vs-repped discriminator, so there is nothing to branch on honestly. The single-set label now reads **"About this long"** in workout, prescribed-session and gym-programme — true of a hold and a rep budget alike, and it does not duplicate the live countdown sitting above it, which "About 1:30" would have. **`core-session` keeps "Hold"**, deliberately: it times `ex.holdSeconds` directly and in a curated core session that is a genuine hold. TIME-2 does the general case.
->
-> #### 🟢 The slot model, and why the blast radius stayed small
->
-> The blueprint's §5.1 (card renders the action bar) and §5.2 (view-supplied slots) contradicted each other. **§5.2 matched the code and won.** Every action bar stays in its view with its own ids — `wo`/`ps`/`cs`/`gp` prefixed — and the card renders only the page frame. Moving four different bars with four different button inventories into one renderer would have been the opposite of survivable. Two new ids per view: `*-begin-btn`, `*-done-btn`.
->
-> `opts.running` is **gone from the card**, not merely unused. The view states the page outright, so the whole class of bug CARD-2 needed a gate for — a live-timer view hardcoding `running: false` — no longer has anywhere to live.
->
-> #### 🟢 Shipped
->
-> `js/exercise-card.js` **v3** · `workout.js` **v16** · `prescribed-session.js` **v9** · `gym-programme.js` **v11** · `core-session.js` **v13** · `css/components/workout.css` **v11** · `tools/verify-card3.mjs` — 25 checks, **replaces `verify-card2.mjs`, deleted rather than left passing against a dead model** · `Documents/Admin/alongside_cold_start_blueprint_20aug2026_v1.md` **v6** · `sw.js` **v411**, alone.
->
-> **18 of 18 reversals proven failing** before the gate was trusted, via a harness that mutates one anchor, confirms the *specific* assertion newly failed, and restores. Post-push verification from a second independent fresh clone.
->
-> #### 🟠 Untested on device. Four views changed shape at once.
->
-> #### 🟠 Known, not caused here
->
-> `tools/precache-check.mjs` fails on `css/layouts/goal-review.css`, which is `@import`ed by `main.css` and documented as such in `sw.js`. **It fails identically on a clean HEAD clone** — the gate does not follow `@import`. Not a regression; needs a decision on whether to teach the gate about imports or to list the file.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **CARD-3** | Three-page exercise flow. **BUILT AND DEPLOYED 31 Aug**, `alongside-v411`. Closes the hazards-behind-a-tab regression; removes `why` from the card | 🟢 Shipped, untested on device | 31 Aug |
-> | **TIME-2** | Held vs repped distinction, correct timer labels, plain Done on rep-based. **Now also owns less time / more time**, which does not exist | 🟠 Needs spec | w/c 31 Aug |
-> | **SWAP-1** | Exercise interchangeability. **Now also owns "make it easier"**, which does not exist and must not be a generic control on strength work | 🟠 Post-beta | Post-beta |
-> | **PRECACHE-IMPORT** | `precache-check.mjs` does not follow `@import`; fails on `goal-review.css` on a clean clone | 🟠 Needs decision | Post-beta |
->
+Supersedes `master_schedule_31aug2026_v241.md`. Remove v241 on upload.
 
 > ### 🔴 TIME-2 — `duration` is two different things and the UI labels both "Hold"
 >
@@ -126,7 +58,7 @@ Supersedes `master_schedule_31aug2026_v242.md`. Remove v242 on upload.
 >
 > | ID | Task | Status | Target |
 > |---|---|---|---|
-> | **CARD-3** | Three-page exercise flow. Supersedes CARD-2. Closes the hazards-behind-a-tab regression | 🟢 **SHIPPED 31 Aug**, `alongside-v411` — see the v243 block at the top | 31 Aug |
+> | **CARD-3** | Three-page exercise flow. Supersedes CARD-2. Closes the hazards-behind-a-tab regression | 🔵 Spec complete, build pending | w/c 31 Aug |
 > | **TEXT-1** | App-wide text budget. The session proposal screen is two coach paragraphs and three section descriptions before the button; no card design touches it | 🟠 Needs spec | Post-CARD-3 |
 > | **CONTENT-2** | Reduce `watchOut` from four generic lines to one specific line across 551 exercises. **The change that actually removes text.** Content job, not code | 🟠 Needs scoping | Post-beta |
 >
@@ -277,7 +209,7 @@ Supersedes `master_schedule_31aug2026_v242.md`. Remove v242 on upload.
 > | **CHECKIN-2a** | Add a sore area at check-in. **BUILT AND DEPLOYED 29 Aug**, `alongside-v408`. Schema decision reversed during build — see below | 🟢 Shipped, untested on device | 29 Aug |
 > | **CHECKIN-2b** | Condition resolution, quiet-run tracking, the noticing ask | 🔵 Spec complete | After 2a |
 > | **TIME-1** | One timer source, `js/exercise-timing.js`. **BUILT AND DEPLOYED 31 Aug**, `alongside-v409`. Premise corrected during build — `duration` is canonical, not `holdSeconds` | 🟢 Shipped, untested on device | 31 Aug |
-> | **CARD-2** | Three-layer card. Deployed 31 Aug as `alongside-v410`, **superseded the same day by CARD-3** — the tab model hid the hazard list. `verify-card2.mjs` deleted | ⚪ Superseded by CARD-3 | 31 Aug |
+> | **CARD-2** | Three-layer card. **BUILT AND DEPLOYED 31 Aug**, `alongside-v410`. Supersedes CARD-1's disclosure model; fixes `running: false` and the log block above the card | 🟢 Shipped, untested on device | 31 Aug |
 >
 > ### 🟠 CARD-1 BUILD STARTED 29 Aug — steps 1–3 of 8. NOT DEPLOYED.
 >
@@ -5463,4 +5395,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v243*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v242*
