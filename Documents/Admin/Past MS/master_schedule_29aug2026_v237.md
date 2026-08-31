@@ -1,39 +1,9 @@
 # Alongside: Move — Master Schedule
-## 29 Aug 2026 v238
+## 29 Aug 2026 v237
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_29aug2026_v237.md`. Remove v237 on upload.
+Supersedes `master_schedule_29aug2026_v236.md`. Remove v236 on upload.
 
-> ### 🟢 CHECKIN-2a BUILT AND DEPLOYED 29 Aug — `alongside-v408`. 91/91 gates.
->
-> The beta blocker is closed. A sore area can now be added mid-programme, so `bodyCaution` is no longer limited to what was declared at onboarding.
->
-> #### 🔴 The blueprint's schema was wrong, and building it found out
->
-> `alongside_blueprint_CHECKIN-2_29aug2026_v1.md` specced `conditions` becoming an array of records. Building it found **25 readers across 15 files** — `session-builder.js`, six session views, the check-in, onboarding, `reflect`, `practices`, the exercise index — every one treating it as an array of string ids. Reshaping the field breaks all of them, and **a reader missed is a condition that silently stops reaching a caution check**, which is the worst available failure for this feature.
->
-> **Reversed to a parallel `conditionMeta` map.** `conditions` keeps its shape and its meaning — "which areas is this person carrying right now" — which is exactly what those 25 sites want. Lifecycle sits alongside it with one reader. Every existing call site is correct and untouched. Dormant ids leave `conditions` and their records stay in `conditionMeta`, so `conditions` is always "active now" and nothing has to be re-declared on reactivation.
->
-> #### 🟢 `shoulder` was already in the catalogue — the gap was narrower than it looked
->
-> `CONDITIONS` in `js/data/conditions.js` already held all 19 body areas including `shoulder`. Nothing could **add** to `conditions` after onboarding; the vocabulary was never missing. So 2a needed no new taxonomy.
->
-> The picker derives from the existing **`zone`** field rather than a hand-curated list, so it cannot drift out of step as the catalogue grows. `systemic` is excluded — "something else sore today" is the wrong frame for anxiety, menopause or fibromyalgia, and offering them here would invite somebody to declare a long-term condition through a door meant for a tweaked shoulder. **`pelvic-floor` is the single explicit exception, Graeme's call, listed in exactly the same neutral form as everything else.**
->
-> #### 🔴 `verify-write1` caught `conditionMeta` as a one-ended field, correctly
->
-> Written by 2a, read by 2b. That is the `proposalBias` shape and the baseline entry says so rather than pretending otherwise. **A dated promise, not permission:** if 2b ships and the entry is still there, the baseline is lying; if 2b is abandoned, the field is removed rather than left sitting.
->
-> **Considered and rejected:** inventing a reader in `soreAreaLoaded` that skips conditions whose meta says dormant. It reads well and it is wrong — if `conditions` and `conditionMeta` ever disagree, the safe direction is for the caution to **fire**, not to be suppressed. A reader added only to satisfy a gate would have made the safety behaviour worse.
->
-> #### 🟢 Shipped
->
-> `js/store.js` **v59** — `conditionMeta`, `addSoreArea()`, `_migrateConditionMeta()` proven idempotent against five fixtures before anything read it · `js/data/conditions.js` — `soreAreaOptions()`, 19 options · `js/views/checkin.js` **v16** — "Something else sore today?", real disclosure, focus moves to the new slider · `css/components/checkin.css` **v1** — the file had **no version header at all** and was carrying none; numbered from here rather than guessing · `Documents/Live State/Schema.md` · `tools/verify-checkin2.mjs` — 12 checks, gate 91 · `sw.js` **v408**, alone.
->
-> **Three reversals proven failing:** letting systemic conditions into the picker, inventing `addedAt` as today, and adding a free-text box. **Free text is forbidden** — an id resolving to no real body area gives a slider that saves and silently never fires a caution.
->
-> #### 🟠 Untested on a device. `alongside-v408` is live, so the next person to open the app gets it.
->
 > ### 🔴 DEVICE TEST 29 Aug — three faults found, one is a beta blocker. CHECKIN-2 specced.
 >
 > Graeme device-tested `alongside-v407` the same evening. Three findings, ranked by consequence rather than by how they were raised.
@@ -76,7 +46,7 @@ Supersedes `master_schedule_29aug2026_v237.md`. Remove v237 on upload.
 >
 > | ID | Task | Status | Target |
 > |---|---|---|---|
-> | **CHECKIN-2a** | Add a sore area at check-in. **BUILT AND DEPLOYED 29 Aug**, `alongside-v408`. Schema decision reversed during build — see below | 🟢 Shipped, untested on device | 29 Aug |
+> | **CHECKIN-2a** | Add a sore area at check-in. Schema-first — `conditions` becomes records. **Beta blocker** | 🔵 Spec complete, build next | w/c 31 Aug |
 > | **CHECKIN-2b** | Condition resolution, quiet-run tracking, the noticing ask | 🔵 Spec complete | After 2a |
 > | **TIME-1** | One timer source. `holdSeconds` canonical across all five views | 🟠 Needs spec | w/c 31 Aug |
 > | **CARD-2** | Three-layer card. Supersedes CARD-1 disclosure model; also fixes the hardcoded `running: false` | 🟠 Needs spec | w/c 31 Aug |
@@ -5265,4 +5235,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 29 Aug 2026 v238*
+*Build New Habits · Alongside: Move · Master Schedule · 29 Aug 2026 v237*
