@@ -3,6 +3,37 @@
  *
  * 11 Aug 2026 v5
  *
+ * 31 Aug 2026 v9
+ *
+ * v9 - CARD-3. Three pages, and a live crash fixed on the way through.
+ *
+ *   THE CRASH. onMount() called parseHoldSeconds(ex.reps) at a line
+ *   TIME-1 did not update when it retired the local copy of that
+ *   function. Nothing imports it, so the call threw a ReferenceError on
+ *   every mount past the already-done early return -- which is every
+ *   real prescribed session in v410. render() had been moved onto
+ *   resolveTiming(); onMount() had not. Now it is.
+ *
+ *   THE CONTRAINDICATION FLAG IS NOT PAGE-SCOPED. It is this view's
+ *   personalised safety line, the same role bodyCaution plays inside the
+ *   card, so it renders on all three pages. Scoping it to DECIDE would
+ *   have hidden it from the page where the exercise is actually done.
+ *
+ *   WHERE THINGS LANDED. DECIDE: the flag, the sets/reps meta, last time
+ *   from the card. DO: the flag, the card's hazards and instructions,
+ *   the video, then the timer or rep target, then the physio's notes.
+ *   NOTE: the flag, the log block, feedback last.
+ *
+ *   THE CARD IS CONDITIONAL HERE and always was -- it renders only when
+ *   ex.exerciseId links to the shared database. Manually-added exercises
+ *   have no instructions to show. The page model therefore governs the
+ *   VIEW's layout, and the card is one part of it rather than the whole
+ *   of it, which is why the timer target and the notes are paged by this
+ *   file rather than passed in as a slot.
+ *
+ *   Ids unchanged: ps-timer-btn, ps-complete-btn, ps-skip-btn,
+ *   ps-back-btn, ps-exit-btn. New: ps-begin-btn, ps-done-btn.
+ *
  * 31 Aug 2026 v8
  *
  * v8 - CARD-2. Three-layer card. The YouTube link moves into During,
@@ -99,7 +130,7 @@ import { store } from "../store.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
 import { resolveTiming, formatTime } from "../exercise-timing.js";
-import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
+import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { getActiveConditionIds, getConditionName } from "../data/conditions.js";
 import { EXERCISES } from "../data/exercises/index.js";
@@ -127,6 +158,10 @@ let currentIndex  = 0;
 let timerInterval = null;
 let timeRemaining = 0;
 let timerStarted  = false;
+
+// CARD-3. "decide" | "do" | "note". Ephemeral, per exercise, reset on
+// every advance. Never stored.
+let currentCardPage = "decide";
 
 // -- Real-time safety check ------------------------------------------------------
 // Real gap found and fixed 04 Aug 2026: this file previously read zero
@@ -217,87 +252,107 @@ export function render() {
           <span class="meta-tag">+${creditsForIndex(currentIndex, active.length)} \u2B50</span>
         </div>
 
-        <!-- Timer (hold-based exercises only) -->
-        ${hasTimer ? `
-          <div class="exercise-target">
-            <div class="timer-display">
-              <div class="timer-circle">
-                <span class="timer-value" id="ps-timer-display">${formatTime(timeRemaining || holdSecs)}</span>
-                <span class="timer-label">${ex.sets > 1 ? "Set 1 of " + ex.sets : "Hold"}</span>
-              </div>
-            </div>
-          </div>
-        ` : ex.reps ? `
-          <div class="exercise-target">
-            <div class="reps-display">
-              <div class="reps-info">
-                <span class="reps-value">${ex.sets || 3} \u00D7 ${ex.reps}</span>
-                <span class="reps-label">sets \u00D7 reps</span>
-              </div>
-            </div>
-          </div>
-        ` : ""}
-
-        <!-- Full guidance (only when this prescribed exercise is linked to
-             the shared database via exerciseId — manually-added exercises
-             have no instructions/coaching/why/youtube to show, correctly
-             show notes only). Same lookup _checkContraindication() already
-             uses, same three-section structure workout.js uses. Found 10
-             Aug: this screen previously showed name + sets/reps + notes
-             only, nothing else, for every prescribed exercise regardless
-             of whether the linked database entry had full guidance
-             available — it did, at 100% coverage, just never displayed. -->
+        <!-- CARD-3. One card, three pages, and it renders whether or not
+             this prescribed exercise links to the shared database. The
+             card itself is conditional -- manually-added exercises have
+             no instructions to show -- so the page model governs THIS
+             file's layout and the card is one part of it. -->
         ${(() => {
           const fullEx = ex.exerciseId ? EXERCISES.find(e => e.id === ex.exerciseId) : null;
           if (!fullEx) return "";
-          return `
-            ${renderExerciseCard(fullEx, {
-              idPrefix: `ps-${fullEx.id}`,
-              running:  timerStarted,
-              duringSlot: `
-                <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(fullEx.youtube || (ex.name + " exercise form"))}"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="youtube-link"
-                   aria-label="Watch how to do ${ex.name} on YouTube (opens in new tab)">
-                  <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
-                  Watch how to do this
-                </a>`,
-              afterSlot: `${renderFeedbackControl(fullEx)}`
-            })}
-          `;
+          return renderExerciseCard(fullEx, {
+            idPrefix: `ps-${fullEx.id}`,
+            page:     currentCardPage,
+            lastTime: lastLine(ex),
+            doSlot: `
+              <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(fullEx.youtube || (ex.name + " exercise form"))}"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="youtube-link"
+                 aria-label="Watch how to do ${ex.name} on YouTube (opens in new tab)">
+                <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
+                Watch how to do this
+              </a>`,
+            noteSlot: `
+              <!-- LOG-3. Physio-prescribed work is exactly where a note
+                   matters most: "3kg felt fine, 4kg pulled" is the thing
+                   somebody needs at their next appointment and cannot
+                   reconstruct afterwards. Feedback stays last. -->
+              ${renderLogBlock(ex, `ps-log-${currentIndex}`)}
+
+              ${renderFeedbackControl(fullEx)}`
+          });
         })()}
 
-        <!-- LOG-3. Physio-prescribed work is exactly where a note matters
-             most: "3kg felt fine, 4kg pulled" is the thing somebody needs
-             at their next appointment and cannot reconstruct afterwards. -->
-        ${renderLogBlock(ex, `ps-log-${currentIndex}`)}
+        <!-- The timer target belongs to DO, and it renders AFTER the card
+             so the caution keeps its place at the top of the page. -->
+        ${currentCardPage === "do" ? `
+          ${hasTimer ? `
+            <div class="exercise-target">
+              <div class="timer-display">
+                <div class="timer-circle">
+                  <span class="timer-value" id="ps-timer-display">${formatTime(timeRemaining || holdSecs)}</span>
+                  <span class="timer-label">${ex.sets > 1 ? "Set 1 of " + ex.sets : "About this long"}</span>
+                </div>
+              </div>
+            </div>
+          ` : ex.reps ? `
+            <div class="exercise-target">
+              <div class="reps-display">
+                <div class="reps-info">
+                  <span class="reps-value">${ex.sets || 3} \u00D7 ${ex.reps}</span>
+                  <span class="reps-label">sets \u00D7 reps</span>
+                </div>
+              </div>
+            </div>
+          ` : ""}
 
-        <!-- Notes -->
-        ${ex.notes ? `
-          <div class="exercise-instructions card">
-            <h3>Notes from your physio</h3>
-            <p>${ex.notes}</p>
-          </div>
+          ${ex.notes ? `
+            <div class="exercise-instructions card">
+              <h3>Notes from your physio</h3>
+              <p>${ex.notes}</p>
+            </div>
+          ` : ""}
         ` : ""}
+
+        <!-- No linked database entry means no card, and therefore no log
+             block from the card's NOTE slot. This is the fallback so a
+             manually-added exercise is still loggable. -->
+        ${(!ex.exerciseId && currentCardPage === "note")
+          ? renderLogBlock(ex, `ps-log-${currentIndex}`) : ""}
       </div>
 
-      <!-- Actions -->
+      <!-- Actions. Ids unchanged; WHICH renders is what CARD-3 changed.
+           Skip is on DECIDE only. -->
       <div class="workout-actions">
-        ${hasTimer ? `
-          <button class="btn btn-large btn-full ${timerStarted ? "btn-secondary" : "btn-accent"}"
-                  id="ps-timer-btn" aria-live="polite">
-            ${!timerStarted ? "\u25B6 Start Timer" : (timerInterval ? "\u23F8 Pause" : "\u25B6 Resume")}
+        ${currentCardPage === "decide" ? `
+          <button class="btn btn-accent btn-large btn-full" id="ps-begin-btn">
+            Start this one \u2192
+          </button>
+
+          <button class="btn btn-ghost btn-small" id="ps-skip-btn">
+            Skip this one
           </button>
         ` : ""}
 
-        <button class="btn btn-primary btn-large btn-full" id="ps-complete-btn">
-          ${isLast ? "\uD83C\uDF89 Complete Session" : "Next Exercise \u2192"}
-        </button>
+        ${currentCardPage === "do" ? `
+          ${hasTimer ? `
+            <button class="btn btn-large btn-full ${timerStarted ? "btn-secondary" : "btn-accent"}"
+                    id="ps-timer-btn" aria-live="polite">
+              ${!timerStarted ? "\u25B6 Start Timer" : (timerInterval ? "\u23F8 Pause" : "\u25B6 Resume")}
+            </button>
+          ` : ""}
 
-        <button class="btn btn-ghost btn-small" id="ps-skip-btn">
-          Skip this one
-        </button>
+          <button class="btn btn-primary btn-large btn-full" id="ps-done-btn">
+            Done \u2192
+          </button>
+        ` : ""}
+
+        ${currentCardPage === "note" ? `
+          <button class="btn btn-primary btn-large btn-full" id="ps-complete-btn">
+            ${isLast ? "\uD83C\uDF89 Complete Session" : "Next Exercise \u2192"}
+          </button>
+        ` : ""}
       </div>
 
     </div>
@@ -397,7 +452,10 @@ export function onMount() {
   });
 
   const ex       = active[currentIndex];
-  const holdSecs = parseHoldSeconds(ex.reps);
+  // TIME-1 retired the local parseHoldSeconds and updated render() but
+  // not this line, so onMount threw a ReferenceError on every real
+  // prescribed session. Same resolver render() uses.
+  const holdSecs = resolveTiming(ex, ex.reps).seconds;
 
   // Initialise timer display
   if (holdSecs) {
@@ -438,6 +496,33 @@ export function onMount() {
   document.getElementById("ps-skip-btn")?.addEventListener("click", () => {
     advanceSession(active);
   });
+
+  // CARD-3. Forward, and deliberately without touching the clock.
+  document.getElementById("ps-begin-btn")?.addEventListener("click", () => {
+    currentCardPage = "do";
+    scrollToTop();
+    router.navigate("prescribed-session");
+  });
+
+  document.getElementById("ps-done-btn")?.addEventListener("click", () => {
+    currentCardPage = "note";
+    scrollToTop();
+    router.navigate("prescribed-session");
+  });
+
+  // Back is announced by the card; the page number has one owner.
+  // Bound once -- onMount re-fires per navigate and #app outlives it.
+  const _root = document.getElementById("app") || document;
+  if (!_root.__psPageBound) {
+    _root.__psPageBound = true;
+    _root.addEventListener("xcard:page", ev => {
+      const to = ev.detail && ev.detail.page;
+      if (to !== "decide" && to !== "do") return;
+      currentCardPage = to;
+      scrollToTop();
+      router.navigate("prescribed-session");
+    });
+  }
 }
 
 // -- Timer -----------------------------------------------------------------------
@@ -452,6 +537,10 @@ function startTimer() {
       clearInterval(timerInterval);
       timerInterval = null;
       if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
+      // CARD-3. The clock running out IS the end of the exercise. The one
+      // automatic forward move; everything else is a tap.
+      currentCardPage = "note";
+      router.navigate("prescribed-session");
     }
   }, 1000);
 }
@@ -472,6 +561,9 @@ function resetTimer() {
   pauseTimer();
   timeRemaining = 0;
   timerStarted  = false;
+  // CARD-3. A new exercise always starts on DECIDE. Both advance paths
+  // come through here.
+  currentCardPage = "decide";
 }
 
 // -- Exercise flow -----------------------------------------------------------------
@@ -566,6 +658,7 @@ function cleanupSession() {
   currentIndex  = 0;
   timeRemaining = 0;
   timerStarted  = false;
+  currentCardPage = "decide";   // CARD-3. Index resets here, so the page must too.
   store.set("prescribedSessionProgress", null);
 }
 

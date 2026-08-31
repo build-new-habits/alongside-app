@@ -1,6 +1,23 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   31 Aug 2026 v11
+
+   v11 - CARD-3. The tab styles are deleted, not left orphaned. Three
+   pages replace them, and only one is ever in the DOM, so there is no
+   [hidden] rule to get wrong and no panel to keep out of the
+   accessibility tree -- the markup that is not on the page simply is not
+   rendered.
+
+   .xcard-step is the small "Decide / Do / Note" label. It is aria-hidden
+   in the markup because the card's region label already carries "step 1
+   of 3"; the visible text is orientation for sighted users and would
+   otherwise be announced twice.
+
+   .xcard-back keeps the 48px target the tabs had. Going back is the one
+   navigation the person performs by hand, and it must not be the
+   smallest thing on the page.
+
    31 Aug 2026 v10
 
    v10 - CARD-2. .xcard-tabs / .xcard-tab / .xcard-panel replace the v9
@@ -1321,9 +1338,9 @@
   gap: var(--space-2);
 }
 
-/* PINNED. Caution and the lead cue sit above the tabs and are visible in
-   every layer. Styled apart from the panel content on purpose: they are
-   not part of the run of prose, and they never move behind a tab. */
+/* PINNED. Caution and the lead cue render on every page, above the page
+   body. Styled apart from the page content on purpose: they are not part
+   of the run of prose, and they are never page-scoped. */
 .exercise-card .exercise-caution {
   margin: 0 0 var(--space-2) 0;
 }
@@ -1334,51 +1351,47 @@
   line-height: var(--leading-relaxed, 1.6);
 }
 
-.xcard-tabs {
-  display: flex;
-  gap: var(--space-1);
-  border-bottom: 1px solid var(--color-border-light, rgba(255, 255, 255, 0.12));
-}
-
-.xcard-tab {
-  flex: 1 1 0;
-  min-height: 48px;              /* WCAG 2.2 target size */
-  padding: var(--space-2) var(--space-1);
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: inherit;
-  font: inherit;
-  font-size: var(--text-sm);
-  cursor: pointer;
+/* Orientation only. aria-hidden in the markup -- the card's region label
+   already says "step 1 of 3", and this would otherwise be read twice. */
+.xcard-step {
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--font-bold, 700);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   opacity: 0.65;
 }
 
-.xcard-tab[aria-selected="true"] {
-  opacity: 1;
-  font-weight: var(--font-bold, 700);
-  border-bottom-color: var(--color-primary, currentColor);
+.xcard-page {
+  padding-top: var(--space-2);
 }
 
-.xcard-tab:focus-visible {
+/* Their own words from the last time they did this. Set apart from the
+   surrounding prose because it is the one thing on DECIDE that is about
+   them rather than about the exercise. Never a trend, never a count. */
+.xcard-last {
+  padding: var(--space-3);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-surface-raised, rgba(255, 255, 255, 0.04));
+}
+
+.xcard-last__line {
+  margin: var(--space-1) 0 0 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed, 1.6);
+}
+
+/* The one navigation the person performs by hand, so it keeps the 48px
+   target the tabs had rather than shrinking to a text link. */
+.xcard-back {
+  align-self: flex-start;
+  min-height: 48px;              /* WCAG 2.2 target size */
+  margin-top: var(--space-3);
+}
+
+.xcard-back:focus-visible {
   outline: 2px solid var(--color-primary, currentColor);
-  outline-offset: -2px;
-}
-
-.xcard-panel {
-  padding-top: var(--space-3);
-}
-
-/* [hidden] must win over any later display rule on a panel or its
-   children, or a tab could say closed while its content is on screen. */
-.xcard-panel[hidden] {
-  display: none !important;
-}
-
-/* The panel is focusable so keyboard users land in the content after
-   choosing a tab. It should not draw a ring when reached by mouse. */
-.xcard-panel:focus:not(:focus-visible) {
-  outline: none;
+  outline-offset: 2px;
 }
 
 .xcard-block + .xcard-block {
@@ -1396,8 +1409,8 @@
   opacity: 0.7;
 }
 
-/* Display preference "always show full instructions" flattens the tabs
-   entirely rather than opening one of them. */
+/* Display preference "always show full instructions" renders every page
+   in one region rather than walking somebody through three screens. */
 .exercise-card--flat .xcard-block + .xcard-block {
   margin-top: var(--space-4);
 }

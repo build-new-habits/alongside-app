@@ -1,5 +1,38 @@
 /**
  * workout.js - Workout Execution View
+ * 31 Aug 2026 v16
+ *
+ * v16 - CARD-3. Three pages, not three tabs. This is the view the page
+ *   flow was proven on before it spread.
+ *
+ *   WHAT MOVED. The timer/reps target and the YouTube link came OFF the
+ *   top of the view and into DO, so they arrive with the thing they
+ *   describe instead of ahead of the decision to attempt it. The log
+ *   block, the grounding moment and the feedback control are NOTE, in
+ *   that order -- feedback last, as the safety ordering requires.
+ *
+ *   THE ACTION BAR IS STILL THIS VIEW'S, and every existing id is
+ *   unchanged: timer-toggle-btn, complete-exercise-btn,
+ *   skip-exercise-btn. What changed is WHICH of them renders on which
+ *   page. Skip renders on DECIDE and nowhere else -- you decide before
+ *   you start, not halfway through. Two ids are new, wo-begin-btn and
+ *   wo-done-btn, because DECIDE and DO each needed a forward control
+ *   that did not exist when the whole card was one screen.
+ *
+ *   LANDING ON DO DOES NOT START THE CLOCK. wo-begin-btn moves the page
+ *   and nothing else. Auto-starting would punish reading, which is the
+ *   opposite of why the hazards were moved into view.
+ *
+ *   PAGE STATE IS EPHEMERAL and lives here beside currentExerciseIndex,
+ *   never in the store. It resets on every exercise change and on
+ *   cleanup, so nobody lands on NOTE for a movement they have not done.
+ *
+ *   "Hold" IS GONE FROM THE SINGLE-SET LABEL. TIME-2 established that
+ *   `duration` means both "hold this long" and "spend about this long
+ *   doing reps" -- inchworm carries duration 90 and no reps field at
+ *   all. The circle now reads "About this long", which is true of both
+ *   until TIME-2 gives us a real held-vs-repped distinction.
+ *
  * 31 Aug 2026 v15
  *
  * v15 - CARD-2. Three-layer card. Feedback control, grounding moment and
@@ -215,7 +248,7 @@ import { store }         from "../store.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
 import { resolveTiming, formatTime } from "../exercise-timing.js";
-import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
+import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
 import { checkinData }   from "../data/checkin.js";
 import { recordSession } from "../data/programmeEngine.js";
@@ -227,6 +260,11 @@ let currentExerciseIndex = 0;
 let timerInterval = null;
 let timeRemaining = 0;
 let timerStarted = false; // Timer doesn't start until user taps Start
+
+// CARD-3. "decide" | "do" | "note". Ephemeral UI state, deliberately not
+// in the store: surviving a reload would put somebody back on NOTE for an
+// exercise they have not done. Reset on every exercise change.
+let currentCardPage = "decide";
 
 // 11 Aug 2026 — WOW-1 (PT-3). Session-level elapsed time. This view had no
 // session clock, so both logActivity() calls below wrote durationMins null
@@ -312,32 +350,34 @@ export function render() {
           <span class="meta-tag">+${exercise.credits} \u2B50</span>
         </div>
 
-        <!-- Timer or Reps display -->
-        <div class="exercise-target">
-          ${renderExerciseTarget(exercise)}
-        </div>
-
-        <!-- YouTube Demo Link -->
-        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + " exercise form"))}"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="youtube-link"
-           aria-label="Watch how to do ${exercise.name} on YouTube (opens in new tab)">
-          <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
-          Watch how to do this
-        </a>
-
-        <!-- CARD-1. One shared renderer. Caution first, hazards before the
-             explanatory text, feedback last. Sections size themselves by
-             phase and familiarity; nothing safety-bearing collapses. -->
-        <!-- CARD-2. Three layers. Feedback, the grounding moment and the
-             session notes all belong to After, so they no longer sit
-             between the guidance and the controls. -->
+        <!-- CARD-3. Three pages, one job each. The target and the video
+             are DO material -- they belong beside the movement, not above
+             the decision to attempt it. The log block, the grounding
+             moment and the feedback control are NOTE, feedback last.
+             Nothing safety-bearing is page-scoped: bodyCaution renders on
+             all three pages, inside the card. -->
         ${renderExerciseCard(exercise, {
           idPrefix: `wo-${currentExerciseIndex}`,
-          running:  timerStarted,
-          afterSlot: `
-            ${renderFeedbackControl(exercise)}
+          page:     currentCardPage,
+          lastTime: lastLine(exercise),
+          doSlot: `
+            <div class="exercise-target">
+              ${renderExerciseTarget(exercise)}
+            </div>
+
+            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + " exercise form"))}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="youtube-link"
+               aria-label="Watch how to do ${exercise.name} on YouTube (opens in new tab)">
+              <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
+              Watch how to do this
+            </a>`,
+          noteSlot: `
+            <!-- Session notes. LOG-1: this used to exist only in
+                 gym-programme.js, so a coach-built session offered no way
+                 to write anything down. -->
+            ${renderLogBlock(exercise, `wo-log-${currentExerciseIndex}`)}
 
             ${groundingMoment ? `
               <aside class="gmoment" aria-label="Something to notice">
@@ -347,28 +387,42 @@ export function render() {
               </aside>
             ` : ""}
 
-            <!-- Session notes. LOG-1: this used to exist only in
-                 gym-programme.js, so a coach-built session offered no way
-                 to write anything down. -->
-            ${renderLogBlock(exercise, `wo-log-${currentExerciseIndex}`)}`
+            ${renderFeedbackControl(exercise)}`
         })}
       </div>
 
-      <!-- Action buttons -->
+      <!-- Action buttons. Ids unchanged; WHICH of them renders is what
+           CARD-3 changed. Skip is on DECIDE only. -->
       <div class="workout-actions">
-        ${resolveTiming(exercise).seconds ? `
-          <button class="btn btn-large btn-full ${timerStarted ? "btn-secondary" : "btn-accent"}" id="timer-toggle-btn" aria-live="polite">
-            ${!timerStarted ? "\u25B6 Start Timer" : (timerInterval ? "\u23F8 Pause" : "\u25B6 Resume")}
+        ${currentCardPage === "decide" ? `
+          <button class="btn btn-accent btn-large btn-full" id="wo-begin-btn">
+            Start this one \u2192
+          </button>
+
+          <button class="btn btn-ghost btn-small" id="skip-exercise-btn">
+            Skip this one
           </button>
         ` : ""}
 
-        <button class="btn btn-primary btn-large btn-full" id="complete-exercise-btn">
-          ${isLastExercise ? "\uD83C\uDF89 Complete Workout" : "Next Exercise \u2192"}
-        </button>
+        ${currentCardPage === "do" ? `
+          ${resolveTiming(exercise).seconds ? `
+            <button class="btn btn-large btn-full ${timerStarted ? "btn-secondary" : "btn-accent"}" id="timer-toggle-btn" aria-live="polite">
+              ${!timerStarted ? "\u25B6 Start Timer" : (timerInterval ? "\u23F8 Pause" : "\u25B6 Resume")}
+            </button>
+          ` : ""}
 
-        <button class="btn btn-ghost btn-small" id="skip-exercise-btn">
-          Skip this one
-        </button>
+          <!-- Rendered whether or not there is a clock. A timer that has
+               not finished must not trap somebody who has. -->
+          <button class="btn btn-primary btn-large btn-full" id="wo-done-btn">
+            Done \u2192
+          </button>
+        ` : ""}
+
+        ${currentCardPage === "note" ? `
+          <button class="btn btn-primary btn-large btn-full" id="complete-exercise-btn">
+            ${isLastExercise ? "\uD83C\uDF89 Complete Workout" : "Next Exercise \u2192"}
+          </button>
+        ` : ""}
       </div>
     </div>
   `;
@@ -418,7 +472,7 @@ function renderExerciseTarget(exercise) {
       <div class="timer-display">
         <div class="timer-circle">
           <span class="timer-value" id="timer-display">${formatTime(timeRemaining || resolveTiming(exercise).seconds)}</span>
-          <span class="timer-label">${sets > 1 ? `Set 1 of ${sets}` : "Hold"}</span>
+          <span class="timer-label">${sets > 1 ? `Set 1 of ${sets}` : "About this long"}</span>
         </div>
       </div>
     `;
@@ -562,6 +616,37 @@ export function onMount() {
   document.getElementById("skip-exercise-btn")?.addEventListener("click", () => {
     skipExercise();
   });
+
+  // CARD-3. Forward, and deliberately without touching the clock.
+  document.getElementById("wo-begin-btn")?.addEventListener("click", () => {
+    currentCardPage = "do";
+    scrollToTop();
+    router.navigate("workout");
+  });
+
+  document.getElementById("wo-done-btn")?.addEventListener("click", () => {
+    currentCardPage = "note";
+    scrollToTop();
+    router.navigate("workout");
+  });
+
+  // Back is announced by the card, not performed by it: the page number
+  // has one owner and it is this file.
+  //
+  // Bound once. onMount re-fires on every navigate and #app outlives the
+  // render, so an unguarded addEventListener here stacks a new handler per
+  // exercise -- the same class of leak attachCardEvents guards against.
+  const _root = document.getElementById("app") || document;
+  if (!_root.__woPageBound) {
+    _root.__woPageBound = true;
+    _root.addEventListener("xcard:page", ev => {
+      const to = ev.detail && ev.detail.page;
+      if (to !== "decide" && to !== "do") return;
+      currentCardPage = to;
+      scrollToTop();
+      router.navigate("workout");
+    });
+  }
 }
 
 // ── Exit confirmation overlay ──────────────────────────────────────────────
@@ -647,7 +732,13 @@ function startTimer() {
       updateTimerDisplay();
     } else {
       clearInterval(timerInterval);
+      timerInterval = null;
       if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
+      // CARD-3. The clock running out IS the end of the exercise, so
+      // NOTE is where the person now is. This is the one automatic
+      // forward move; every other transition is a tap.
+      currentCardPage = "note";
+      router.navigate("workout");
     }
   }, 1000);
 }
@@ -703,6 +794,10 @@ function resetTimer() {
   pauseTimer();
   timeRemaining = 0;
   timerStarted  = false;
+  // CARD-3. A new exercise always starts on DECIDE. Both advance paths
+  // (complete and skip) come through here, so this is the one place it
+  // needs to happen.
+  currentCardPage = "decide";
 }
 
 /**
@@ -810,6 +905,7 @@ function cleanupWorkout() {
   currentExerciseIndex = 0;
   timeRemaining = 0;
   timerStarted  = false;
+  currentCardPage = "decide";   // CARD-3. Index resets here, so the page must too.
   // v3 — clears generatedSession back to its store.js default shape,
   // rather than setting the never-written activeWorkout to null.
   store.set("generatedSession", { session: null, builtAt: null, inputs: {} });

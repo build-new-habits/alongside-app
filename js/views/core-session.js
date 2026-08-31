@@ -1,6 +1,38 @@
 /**
  * core-session.js - Guided Core Session
  *
+ * 31 Aug 2026 v13
+ *
+ * v13 - CARD-3. Three pages.
+ *
+ *   VERSION NUMBERING, CORRECTED IN PLACE. This file carried two
+ *   histories. The chain below ran to v12 on 15 Aug; CARD-1 and CARD-2
+ *   were then written in as "29 Aug v9" and "31 Aug v10", reusing numbers
+ *   that already existed. Those two blocks are left where they are rather
+ *   than renumbered -- rewriting a deployed file's history risks fresh
+ *   errors for no functional gain -- but the next number is 13, not 11,
+ *   and this note is the correction. Graeme's call, 31 Aug.
+ *
+ *   WHAT MOVED. DECIDE: last time from the card, and nothing else new.
+ *   DO: the card's hazards and instructions, the description, the video,
+ *   then the hold timer. NOTE: the log block, then feedback last -- v10
+ *   had feedback above the log block, which is the wrong way round.
+ *
+ *   THE PREVIEW LIST keeps rendering the card and no longer passes
+ *   `running: false`. The card stopped reading that flag in v3, because
+ *   the page is now stated outright by the caller and there is nothing to
+ *   infer. Preview cards render on DECIDE, which is what a list of things
+ *   you have not done yet should show.
+ *
+ *   "Hold" IS CORRECT HERE and is deliberately left alone. This view
+ *   times ex.holdSeconds directly, and in a curated core session that is
+ *   a genuine hold. The label was only ever wrong where `duration` was
+ *   standing in for a rep budget, which is the other three views. TIME-2
+ *   covers the general case.
+ *
+ *   Ids unchanged: cs-timer-btn, cs-next-btn, cs-skip-btn, cs-back-btn,
+ *   cs-start-btn, cs-exit-btn. New: cs-begin-btn, cs-done-btn.
+ *
  * 15 Aug 2026 v12
  *
  * v12 - ASSESS-1 step 2, plus DECL-1. The baseline is asked at the end
@@ -178,7 +210,7 @@ import { store } from "../store.js";
 import { firstSessionRecognition } from "../data/first-session.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
-import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
+import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { EXERCISES, filterByConditions } from "../data/exercises/index.js";
 import { getActiveConditionIds } from "../data/conditions.js";
@@ -208,6 +240,9 @@ let pendingSkipOffer = null;
 let timerInterval = null;
 let timeRemaining = 0;
 let timerRunning  = false;
+
+// CARD-3. Ephemeral page state, reset on every exercise change.
+let currentCardPage = "decide";
 let creditsEarned = 0;
 let restRemaining = 0;
 
@@ -522,7 +557,7 @@ function renderSessionOverview() {
             </button>
 
             <div class="gym-exercise-detail" id="core-ex-detail-${i}" hidden>
-              ${renderExerciseCard(ex, { idPrefix: `cs-pre-${i}`, running: false })}  <!-- preview: genuinely pre-start, so Before is correct -->
+              ${renderExerciseCard(ex, { idPrefix: `cs-pre-${i}`, page: "decide" })}  <!-- preview: genuinely pre-start, so Before is correct -->
             </div>
           </div>
         `).join("")}
@@ -627,25 +662,13 @@ function renderExercise() {
           ${ex.rest > 0 ? `<span class="meta-tag">${ex.rest}s rest</span>` : ""}
         </div>
 
-        ${hasTimer ? `
-          <div class="exercise-target">
-            <div class="timer-display">
-              <div class="timer-circle">
-                <span class="timer-value" id="cs-timer-display">
-                  ${formatTime(timeRemaining || ex.holdSeconds)}
-                </span>
-                <span class="timer-label">Hold</span>
-              </div>
-            </div>
-          </div>
-        ` : ""}
-
-        <p class="exercise-description">${ex.description}</p>
-
         ${renderExerciseCard(ex, {
           idPrefix: `cs-${ex.id}`,
-          running:  !!timerInterval,
-          duringSlot: `
+          page:     currentCardPage,
+          lastTime: lastLine(ex),
+          doSlot: `
+            <p class="exercise-description">${ex.description}</p>
+
             <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.youtube || (ex.name + " exercise form"))}"
                target="_blank"
                rel="noopener noreferrer"
@@ -653,37 +676,67 @@ function renderExercise() {
                aria-label="Watch how to do ${ex.name} on YouTube (opens in new tab)">
               <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
               Watch how to do this
-            </a>`,
-          afterSlot: `
-            ${renderFeedbackControl(ex)}
+            </a>
 
+            ${hasTimer ? `
+              <div class="exercise-target">
+                <div class="timer-display">
+                  <div class="timer-circle">
+                    <span class="timer-value" id="cs-timer-display">
+                      ${formatTime(timeRemaining || ex.holdSeconds)}
+                    </span>
+                    <span class="timer-label">Hold</span>
+                  </div>
+                </div>
+              </div>
+            ` : ""}`,
+          noteSlot: `
             <!-- LOG-3. Card-shaped view, so the shared block applies. Full
                  field set: core work is loaded and repped like any other
-                 strength exercise, unlike yoga's gentle mode. -->
-            ${renderLogBlock(ex, `cs-log-${currentIndex}`)}`
+                 strength exercise, unlike yoga's gentle mode. Feedback
+                 last, which v10 had the wrong way round. -->
+            ${renderLogBlock(ex, `cs-log-${currentIndex}`)}
+
+            ${renderFeedbackControl(ex)}`
         })}
 
       </div>
 
+      <!-- Actions. Ids unchanged; WHICH renders is what CARD-3 changed.
+           Skip is on DECIDE only. -->
       <div class="workout-actions">
 
-        ${hasTimer ? `
-          <button class="btn btn-large btn-full ${timerRunning ? "btn-secondary" : "btn-accent"}"
-                  id="cs-timer-btn"
-                  aria-live="polite"
-                  aria-label="${timerRunning ? "Pause hold timer" : "Start hold timer"}">
-            ${timerRunning ? "Pause" : (timeRemaining > 0 && timeRemaining < ex.holdSeconds ? "Resume" : "Start hold")}
+        ${currentCardPage === "decide" ? `
+          <button class="btn btn-accent btn-large btn-full" id="cs-begin-btn">
+            Start this one \u2192
+          </button>
+
+          <button class="btn btn-ghost btn-small" id="cs-skip-btn"
+                  aria-label="Skip ${ex.name}">
+            Skip
           </button>
         ` : ""}
 
-        <button class="btn btn-primary btn-large btn-full" id="cs-next-btn">
-          ${isLast ? "Finish session" : "Done — Next"}
-        </button>
+        ${currentCardPage === "do" ? `
+          ${hasTimer ? `
+            <button class="btn btn-large btn-full ${timerRunning ? "btn-secondary" : "btn-accent"}"
+                    id="cs-timer-btn"
+                    aria-live="polite"
+                    aria-label="${timerRunning ? "Pause hold timer" : "Start hold timer"}">
+              ${timerRunning ? "Pause" : (timeRemaining > 0 && timeRemaining < ex.holdSeconds ? "Resume" : "Start hold")}
+            </button>
+          ` : ""}
 
-        <button class="btn btn-ghost btn-small" id="cs-skip-btn"
-                aria-label="Skip ${ex.name}">
-          Skip
-        </button>
+          <button class="btn btn-primary btn-large btn-full" id="cs-done-btn">
+            Done \u2192
+          </button>
+        ` : ""}
+
+        ${currentCardPage === "note" ? `
+          <button class="btn btn-primary btn-large btn-full" id="cs-next-btn">
+            ${isLast ? "Finish session" : "Done — Next"}
+          </button>
+        ` : ""}
 
       </div>
 
@@ -839,11 +892,10 @@ function startExerciseTimer(holdSecs) {
       timerInterval = null;
       timerRunning  = false;
       if ("vibrate" in navigator) navigator.vibrate([200, 100, 200]);
-      const btn = document.getElementById("cs-timer-btn");
-      if (btn) {
-        btn.textContent = "Hold complete";
-        btn.disabled    = true;
-      }
+      // CARD-3. The hold ending IS the end of the exercise, so NOTE is
+      // where the person now is. The one automatic forward move.
+      currentCardPage = "note";
+      rerender();
     }
   }, 1000);
 }
@@ -883,6 +935,7 @@ function completeExercise() {
   scrollToTop();   // SCROLL-1: a new card starts at the top
   timeRemaining = 0;
   timerRunning  = false;
+  currentCardPage = "decide";   // CARD-3. A new exercise starts on DECIDE.
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 
   if (currentIndex >= sessionQueue.length) {
@@ -966,6 +1019,7 @@ function resetSession() {
   creditsEarned = 0;
   timeRemaining = 0;
   timerRunning  = false;
+  currentCardPage = "decide";   // CARD-3. Index resets here, so the page must too.
   restRemaining = 0;
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   if (restInterval)  { clearInterval(restInterval);  restInterval  = null; }
@@ -1153,6 +1207,7 @@ export function onMount() {
     creditsEarned = 0;
     timeRemaining = 0;
     timerRunning  = false;
+    currentCardPage = "decide";   // CARD-3. Every session opens on DECIDE.
     sessionStartTime = Date.now();
     phase         = "session";
     rerender();
@@ -1173,6 +1228,33 @@ export function onMount() {
       btn.setAttribute("aria-label", timerRunning ? "Pause hold timer" : "Resume hold timer");
     }
   });
+
+  // CARD-3. Forward, and deliberately without touching the clock.
+  document.getElementById("cs-begin-btn")?.addEventListener("click", () => {
+    currentCardPage = "do";
+    scrollToTop();
+    rerender();
+  });
+
+  document.getElementById("cs-done-btn")?.addEventListener("click", () => {
+    currentCardPage = "note";
+    scrollToTop();
+    rerender();
+  });
+
+  // Back is announced by the card; the page number has one owner. Bound
+  // once -- onMount re-fires on every rerender and #app outlives it.
+  const _csRoot = document.getElementById("app") || document;
+  if (!_csRoot.__csPageBound) {
+    _csRoot.__csPageBound = true;
+    _csRoot.addEventListener("xcard:page", ev => {
+      const to = ev.detail && ev.detail.page;
+      if (to !== "decide" && to !== "do") return;
+      currentCardPage = to;
+      scrollToTop();
+      rerender();
+    });
+  }
 
   // Next / complete
   document.getElementById("cs-next-btn")?.addEventListener("click", () => {
@@ -1203,6 +1285,7 @@ export function onMount() {
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
     timerRunning  = false;
     timeRemaining = 0;
+    currentCardPage = "decide";   // CARD-3. A new exercise starts on DECIDE.
     const skipped = sessionQueue[currentIndex];
     currentIndex++;
   scrollToTop();   // SCROLL-1: a new card starts at the top
