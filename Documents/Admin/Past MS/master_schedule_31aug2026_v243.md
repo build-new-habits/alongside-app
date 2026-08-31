@@ -1,68 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v244
+## 31 Aug 2026 v243
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v243.md`. Remove v243 on upload.
-
-> ### 🟢 STRETCH-1 BUILT AND DEPLOYED 31 Aug — `alongside-v414`. 93 gates.
->
-> An eighth session type. **Asked for by people already using the app** — which is also how Graeme found Bend.
->
-> Mobility existed but its main work is ACTIVE range of motion: CARs, pilates, yoga-flow, rehab-control. `deep-stretch` appeared exactly once in `session-builder.js`, as a cool-down. Somebody wanting twenty minutes of stretching picked Mobility and got controlled articular rotations. **No new content needed** — counted by running `matchCategory` over the live database rather than assuming: static-stretch 30, deep-stretch 53, glute 15, hamstring 9, hip-flexor 8. A sedentary user at difficulty ceiling 2 still gets 44 main candidates.
->
-> **Main category order is load-bearing.** `poolFor()` takes one from each category in order then fills from the top, so small region-specific pools are listed first and the two large generic pools last. Reversed, a 15-minute session would be five deep in `deep-stretch` and all hip openers.
->
-> **`joint-rotation` was nearly used and matches zero entries.** Checked before writing it in. Gate assertion 3 now checks every category in every session type for dead references — the assertion exists because it would have caught the mistake about to be made.
->
-> **`verify-w2.mjs` now derives its type list from `SESSION_TYPES`.** It hardcoded seven ids, so an eighth type would have inherited none of its ceiling or starvation coverage while staying green.
->
-> #### 🔴 CARD-3 device test — two faults found and fixed, `alongside-v413`
->
-> `lastLine()` returns **markup**, not a plain string, and its no-data case returns a populated "No note yet" paragraph rather than `""`. So DECIDE printed raw HTML tags on screen, and the empty case counted as data — suppressing `load` on exactly the first encounter it exists for. Both fixed. **Root cause: the function had zero callers before CARD-3 and had never rendered anywhere.** It was named as the top device-test suspect before the test, and it was.
->
-> Hazards now render in a **rose box** (Graeme's call) — on DO they read as one more grey section. `--color-danger` gained a light-scheme override: `#FB7185` is ~2.6:1 on white and would have failed AA in light mode, the same trap `--color-warning` already carried a fix for. The list TEXT keeps the body colour, so legibility never depends on the accent.
->
-> #### 🔴 Cross-view navigation bug, found on review before device test — `alongside-v412`
->
-> Every view bound `xcard:page` on the shared `#app` root and none unbinds. Back inside a core session fired workout.js's handler too and navigated the person out of the session, mid-exercise. Each handler now ignores cards that are not its own. **Every static assertion about those files passed while the behaviour was broken** — the class of fault the source-text suite cannot see.
->
-> #### 🟠 Session builder findings, from Graeme's device use
->
-> - **`activation` is region-blind.** Lower Body's warm-up offers Shoulder CARs, Wrist CARs, Grip Strengthening and Seated Shoulder Rolls, because the category matched and body region was never checked. **Not yet fixed.**
-> - **"Mostly strength" is an allocation preset on the DURATION screen**, not a session type. Graeme looked for it and did not find it. Working as built; discoverable as designed is a separate question.
-> - Injuries, capability, equipment, difficulty ceiling and "not a fan" all correctly reduce the candidate pool.
->
-> #### 🔵 Agreed product model — build-your-own tiering
->
-> **Free:** build a session, coach recommends within it, do it, it does not persist. **Premium:** built sessions persist and are retrievable; the coach reasons across a week / fortnight / month / the full 12 weeks, guiding balance so somebody does not build six lower-body sessions and nothing for their back.
->
-> **Coach help WITHIN a build stays free** — R4 (20 Aug) made every builder step free and reversed TIER-G two days after adding it. Re-gating it would be the third reversal on the same question.
->
-> **Perishability must be defined before it is built.** "Not kept as a reusable template" is a tier. "Vanishes if your phone rings mid-build" is data loss wearing a pricing badge, and is the current behaviour. The first is premium; the second is a bug and should be fixed free.
->
-> **Do not build a second programme model.** `activeProgramme` already carries a 12-week arc with start date, total sessions and completion state. A user-built series is a variant of that object, not a parallel structure beside it.
->
-> #### 🔵 Flexibility progress without a streak or a trend line — design direction
->
-> Depth is a readout of TODAY's state, not of trajectory: it swings with warmth, sleep and stress, so displaying it as progress makes a cold Tuesday read as failure. Early flexibility gain is mostly increased **stretch tolerance** — neural — not tissue lengthening. So the honest twelve-week marker is **the same depth, less intensity**.
->
-> Capture two things: **where you got to**, as a named landmark (fingertips to knees / shins / ankles / floor — no tape measure), and **how it felt** there. The coach shows back their own words at the same landmark from before. No arrow, no percentage, no count. Reuses the `lastLine` display-only pattern.
->
-> **This is also the hypermobility answer.** Rewarding "further" rewards a hypermobile person for the one thing that harms them. Hypermobility spectrum and hEDS are strongly comorbid with ADHD, autism, chronic fatigue and POTS — Move's actual core audience, not dancers. Dropping advanced ballet/gymnastics range does NOT drop the risk. Not making depth the headline does, and costs nothing.
->
-> 🟠 Watch in copy: an intensity rating can become a self-criticism vector.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **STRETCH-1** | Stretch session type, existing content | 🟢 Shipped `alongside-v414`, untested on device | 31 Aug |
-> | **ACTIVATION-SCOPE** | `activation` is region-blind; lower-body warm-ups offer wrist mobility | 🟠 Found, not fixed | w/c 31 Aug |
-> | **STRETCH-2** | Landmark + intensity capture. Schema-first — new store field | 🔵 Direction agreed, needs spec | Post-beta |
-> | **SERIES-1** | Saved built sessions, multi-week arcs, coach balance guidance. Extends `activeProgramme` | 🔵 Model agreed, needs spec | Post-beta |
-> | **BUILD-PERISH** | A built session must survive until started. Bug, not a tier | 🟠 Needs fixing free | Pre-beta |
-> | **PRESET-DISCOVER** | "Mostly strength" undiscoverable on the duration screen | 🟠 Needs decision | Post-beta |
-
+Supersedes `master_schedule_31aug2026_v242.md`. Remove v242 on upload.
 
 > ### 🟢 CARD-3 BUILT AND DEPLOYED 31 Aug — `alongside-v411`. 92/92 gates.
 >
@@ -5523,4 +5463,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v244*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v243*
