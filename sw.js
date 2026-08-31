@@ -12,6 +12,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v409
+ *
+ * v409 - TIME-1. New js/exercise-timing.js, precached. One answer to
+ *   "does this exercise need a clock", replacing three views that each
+ *   had their own and disagreed.
+ *
  * 29 Aug 2026 v408
  *
  * v408 - CHECKIN-2a. No new files to precache; the change is inside
@@ -2840,7 +2846,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v408";
+const CACHE_NAME = "alongside-v409";
 
 const SHELL_URLS = [
 
@@ -2909,6 +2915,7 @@ const SHELL_URLS = [
   "/alongside-app/js/session-log.js",
   "/alongside-app/js/exercise-feedback.js",
   "/alongside-app/js/exercise-card.js",
+  "/alongside-app/js/exercise-timing.js",
   "/alongside-app/js/display-prefs.js",
   "/alongside-app/js/tts.js",
   "/alongside-app/js/session-guard.js",
