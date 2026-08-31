@@ -12,6 +12,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 29 Aug 2026 v408
+ *
+ * v408 - CHECKIN-2a. No new files to precache; the change is inside
+ *   store.js, conditions.js, checkin.js and checkin.css, all already in
+ *   SHELL_URLS. The bump is for the store migration: _migrateConditionMeta
+ *   runs on load, and a stale shell would keep running the old store
+ *   against new data.
+ *
  * 29 Aug 2026 v407
  *
  * v407 - CARD-1. See the note at the top of this file.
@@ -2832,7 +2840,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v407";
+const CACHE_NAME = "alongside-v408";
 
 const SHELL_URLS = [
 
