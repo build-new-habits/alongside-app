@@ -1,5 +1,24 @@
 /**
  * gym-programme.js
+ * 31 Aug 2026 v11
+ *
+ * v11 - CARD-3. Three pages. The swap control moves from After to DECIDE,
+ *   where it belongs: swapping is an adjustment you make BEFORE starting,
+ *   not a thing you reach for having already done the exercise. That is
+ *   the whole argument for pages -- the same control means something
+ *   different depending on when it is offered.
+ *
+ *   Not-a-fan, the log block and the feedback control are NOTE, feedback
+ *   last. The timer target and the YouTube link are DO.
+ *
+ *   THIS VIEW RE-RENDERS ITSELF rather than going through the router, and
+ *   startTimer() sits outside renderCurrentExercise() with no reference
+ *   to its arguments. A closure-level _ctx now holds them so the clock
+ *   running out can move the page, which is the one automatic transition.
+ *
+ *   Ids unchanged: gp-timer-btn, gp-next-btn, gp-skip-btn, gp-swap-btn,
+ *   gp-exit-btn. New: gp-begin-btn, gp-done-btn.
+ *
  * 31 Aug 2026 v10
  *
  * v10 - CARD-2. Three-layer card. The log block, swap control, preference
@@ -306,7 +325,7 @@ import { resolveTiming, formatTime as _fmtTime } from "../exercise-timing.js";
 // EMP/LOG-1: the note block moved to js/session-log.js so workout.js can
 // reach it too. progressionInvitation is still used by the block, but it
 // is imported there now, not here.
-import { renderLogBlock, attachLogEvents, scrollToTop } from '../session-log.js';
+import { renderLogBlock, attachLogEvents, scrollToTop, lastLine } from '../session-log.js';
 import { getProgramme }             from '../data/programmes.js';
 import {
   chapterSuccessor,
@@ -331,6 +350,14 @@ export function GymProgrammeView(router) {
   // SWAP-0. Panel state, not persisted -- it belongs to this card, and
   // advancing to the next exercise must close it. See advanceOrFinish().
   let swapPanelOpen     = false;
+
+  // CARD-3. Ephemeral page state, reset on every advance.
+  let currentCardPage = "decide";
+
+  // CARD-3. startTimer() lives outside renderCurrentExercise and so has no
+  // access to its arguments. Latched here so the clock can trigger the one
+  // automatic page move without threading parameters through the timer.
+  let _ctx = null;
   let sessionStartTime  = null;
 
   // 11 Aug 2026 v5 — one-exercise-at-a-time walkthrough state, matching
@@ -739,6 +766,9 @@ export function GymProgrammeView(router) {
 
 
   function renderCurrentExercise(container, session, stats, sessionType) {
+    // CARD-3. Latched so the timer and the card's Back can re-render
+    // without these being threaded through every call site.
+    _ctx = { container, session, stats, sessionType };
     const exercise    = session.exercises[currentExerciseIndex];
     const isLast      = currentExerciseIndex >= session.exercises.length - 1;
     const progress    = (currentExerciseIndex / session.exercises.length) * 100;
@@ -787,42 +817,50 @@ export function GymProgrammeView(router) {
             ${exercise.rest ? `<span class="meta-tag">${_esc(exercise.rest)} rest</span>` : ''}
           </div>
 
-          <!-- Timer (hold-based exercises) or reps display -->
-          ${hasTimer ? `
-            <div class="exercise-target">
-              <div class="timer-display">
-                <div class="timer-circle">
-                  <span class="timer-value" id="gp-timer-display">${formatTime(timeRemaining || holdSecs)}</span>
-                  <span class="timer-label">${exercise.sets > 1 ? "Set 1 of " + exercise.sets : "Hold"}</span>
-                </div>
-              </div>
-            </div>
-          ` : exercise.reps ? `
-            <div class="exercise-target">
-              <div class="reps-display">
-                <div class="reps-info">
-                  <span class="reps-value">${exercise.sets || 3} \u00D7 ${_esc(exercise.reps)}</span>
-                  <span class="reps-label">sets \u00D7 reps</span>
-                </div>
-              </div>
-            </div>
-          ` : ''}
-
-          <!-- CARD-2. Three layers. The log block, the swap control, the
-               preference and the feedback control all move INTO the After
-               layer -- renderLogBlock sat ABOVE the card here, so band and
-               reps and Save were the first thing on screen, before a
-               single rep had been done. -->
+          <!-- CARD-3. Three pages, one job each. Swap is an adjust
+               control and belongs on DECIDE -- swapping after the set is
+               done is not an adjustment, it is a regret. Log block,
+               not-a-fan and feedback are NOTE, feedback last. -->
           ${renderExerciseCard(exercise, {
             idPrefix: `gp-${exercise.id}`,
-            running:  timerStarted,
-            afterSlot: `
-              ${renderLogBlock(exercise)}
-
+            page:     currentCardPage,
+            lastTime: lastLine(exercise),
+            adjustSlot: `
               <!-- SWAP-0 (26 Aug 2026). Only on cardio machines, and only
                    when there is somewhere real to go. A control that opens
                    an empty list is worse than no control. -->
-              ${renderSwapControl(exercise)}
+              ${renderSwapControl(exercise)}`,
+            doSlot: `
+              ${hasTimer ? `
+                <div class="exercise-target">
+                  <div class="timer-display">
+                    <div class="timer-circle">
+                      <span class="timer-value" id="gp-timer-display">${formatTime(timeRemaining || holdSecs)}</span>
+                      <span class="timer-label">${exercise.sets > 1 ? "Set 1 of " + exercise.sets : "About this long"}</span>
+                    </div>
+                  </div>
+                </div>
+              ` : exercise.reps ? `
+                <div class="exercise-target">
+                  <div class="reps-display">
+                    <div class="reps-info">
+                      <span class="reps-value">${exercise.sets || 3} \u00D7 ${_esc(exercise.reps)}</span>
+                      <span class="reps-label">sets \u00D7 reps</span>
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+
+              <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + ' exercise form'))}"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="youtube-link"
+                 aria-label="Watch how to do ${_esc(exercise.name)} on YouTube (opens in new tab)">
+                <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
+                Watch how to do this
+              </a>`,
+            noteSlot: `
+              ${renderLogBlock(exercise)}
 
               <!-- NOT A FAN (11 Aug 2026). A quiet, reversible preference,
                    not a rating. Deliberately not stars, thumbs or a score
@@ -842,33 +880,39 @@ export function GymProgrammeView(router) {
 
               ${renderFeedbackControl(exercise)}`
           })}
-
-          <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + ' exercise form'))}"
-             target="_blank"
-             rel="noopener noreferrer"
-             class="youtube-link"
-             aria-label="Watch how to do ${_esc(exercise.name)} on YouTube (opens in new tab)">
-            <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
-            Watch how to do this
-          </a>
         </div>
 
-        <!-- Actions -->
+        <!-- Actions. Ids unchanged; WHICH renders is what CARD-3
+             changed. Skip is on DECIDE only. -->
         <div class="workout-actions">
-          ${hasTimer ? `
-            <button class="btn btn-large btn-full ${timerStarted ? 'btn-secondary' : 'btn-accent'}"
-                    id="gp-timer-btn" aria-live="polite">
-              ${!timerStarted ? '\u25B6 Start Timer' : (timerInterval ? '\u23F8 Pause' : '\u25B6 Resume')}
+          ${currentCardPage === "decide" ? `
+            <button class="btn btn-accent btn-large btn-full" id="gp-begin-btn">
+              Start this one \u2192
+            </button>
+
+            <button class="btn btn-ghost btn-small" id="gp-skip-btn">
+              Skip this one
             </button>
           ` : ''}
 
-          <button class="btn btn-primary btn-large btn-full" id="gp-next-btn">
-            ${isLast ? '\uD83C\uDF89 Finish Session' : 'Next Exercise \u2192'}
-          </button>
+          ${currentCardPage === "do" ? `
+            ${hasTimer ? `
+              <button class="btn btn-large btn-full ${timerStarted ? 'btn-secondary' : 'btn-accent'}"
+                      id="gp-timer-btn" aria-live="polite">
+                ${!timerStarted ? '\u25B6 Start Timer' : (timerInterval ? '\u23F8 Pause' : '\u25B6 Resume')}
+              </button>
+            ` : ''}
 
-          <button class="btn btn-ghost btn-small" id="gp-skip-btn">
-            Skip this one
-          </button>
+            <button class="btn btn-primary btn-large btn-full" id="gp-done-btn">
+              Done \u2192
+            </button>
+          ` : ''}
+
+          ${currentCardPage === "note" ? `
+            <button class="btn btn-primary btn-large btn-full" id="gp-next-btn">
+              ${isLast ? '\uD83C\uDF89 Finish Session' : 'Next Exercise \u2192'}
+            </button>
+          ` : ''}
         </div>
 
       </div>
@@ -958,6 +1002,33 @@ export function GymProgrammeView(router) {
       if (exercise?.id) store.logExerciseFeedback(exercise.id, 'too-hard');
       advanceOrFinish(container, session, stats, sessionType);
     });
+
+    // CARD-3. Forward, and deliberately without touching the clock.
+    document.getElementById('gp-begin-btn')?.addEventListener('click', () => {
+      currentCardPage = "do";
+      scrollToTop();
+      renderCurrentExercise(container, session, stats, sessionType);
+    });
+
+    document.getElementById('gp-done-btn')?.addEventListener('click', () => {
+      currentCardPage = "note";
+      scrollToTop();
+      renderCurrentExercise(container, session, stats, sessionType);
+    });
+
+    // Back is announced by the card; the page number has one owner. Bound
+    // once on the container, which survives the innerHTML re-render that
+    // clears every handler bound above it.
+    if (!container.__gpPageBound) {
+      container.__gpPageBound = true;
+      container.addEventListener("xcard:page", ev => {
+        const to = ev.detail && ev.detail.page;
+        if (to !== "decide" && to !== "do") return;
+        currentCardPage = to;
+        scrollToTop();
+        if (_ctx) renderCurrentExercise(_ctx.container, _ctx.session, _ctx.stats, _ctx.sessionType);
+      });
+    }
   }
 
   function advanceOrFinish(container, session, stats, sessionType) {
@@ -965,6 +1036,8 @@ export function GymProgrammeView(router) {
     // reopens on the next exercise, which is a different exercise with a
     // different (or empty) candidate list.
     swapPanelOpen = false;
+    // CARD-3. A new exercise always starts on DECIDE.
+    currentCardPage = "decide";
     if (currentExerciseIndex >= session.exercises.length - 1) {
       finishSession(container, session, stats);
     } else {
@@ -988,6 +1061,10 @@ export function GymProgrammeView(router) {
         clearInterval(timerInterval);
         timerInterval = null;
         if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+        // CARD-3. The clock running out IS the end of the exercise. The
+        // one automatic forward move; everything else is a tap.
+        currentCardPage = "note";
+        if (_ctx) renderCurrentExercise(_ctx.container, _ctx.session, _ctx.stats, _ctx.sessionType);
       }
     }, 1000);
   }
