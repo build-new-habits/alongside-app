@@ -1248,6 +1248,12 @@ export function onMount() {
   if (!_csRoot.__csPageBound) {
     _csRoot.__csPageBound = true;
     _csRoot.addEventListener("xcard:page", ev => {
+      // Every view binds this on the shared #app root and none is ever
+      // removed, so a handler from a view you visited earlier is still
+      // live. Without this prefix check, Back inside one session fires
+      // another view's handler and navigates you out of it.
+      const _pfx = (ev.detail && ev.detail.prefix) || "";
+      if (!_pfx.startsWith("cs-")) return;
       const to = ev.detail && ev.detail.page;
       if (to !== "decide" && to !== "do") return;
       currentCardPage = to;

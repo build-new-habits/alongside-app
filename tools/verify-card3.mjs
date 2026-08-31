@@ -202,6 +202,28 @@ for (const v of VIEWS) {
   });
 }
 
+console.log("\nTEST 11 - page handlers do not answer for other views");
+
+// Every view binds xcard:page on a shared root and none unbinds. A handler
+// from a view visited earlier is still live, so without a prefix check,
+// Back inside one session fires another view's handler and navigates out
+// of it. Found on review, not by a gate -- this assertion is the gate.
+const PREFIX = {
+  "js/views/workout.js": "wo-", "js/views/prescribed-session.js": "ps-",
+  "js/views/gym-programme.js": "gp-", "js/views/core-session.js": "cs-",
+};
+for (const v of VIEWS) {
+  check("11. " + v.split("/").pop() + " ignores other views' cards", () => {
+    const t = src[v];
+    const at = t.indexOf('addEventListener("xcard:page"');
+    ok(at > -1, v + " has no xcard:page handler");
+    const guardAt = t.indexOf('startsWith("' + PREFIX[v] + '")', at);
+    ok(guardAt > -1, "no prefix guard; this handler answers for every view's cards");
+    const pageAt = t.indexOf('!== "decide"', at);
+    ok(pageAt > -1 && guardAt < pageAt, "the prefix guard runs after the page check");
+  });
+}
+
 console.log("\nTEST 10 - the page budgets hold");
 
 check("10a. DECIDE carries no instructions, no hazards, no why", () => {
