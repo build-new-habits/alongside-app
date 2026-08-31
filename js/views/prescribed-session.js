@@ -3,6 +3,13 @@
  *
  * 11 Aug 2026 v5
  *
+ * 31 Aug 2026 v8
+ *
+ * v8 - CARD-2. Three-layer card. The YouTube link moves into During,
+ *   where somebody actually wants it, and the feedback control into
+ *   After. Also fixes `running: false`, hardcoded here while this view
+ *   has had live timerStarted state all along.
+ *
  * 31 Aug 2026 v7
  *
  * v7 - TIME-1. Timer resolves through js/exercise-timing.js. This view
@@ -244,19 +251,20 @@ export function render() {
           const fullEx = ex.exerciseId ? EXERCISES.find(e => e.id === ex.exerciseId) : null;
           if (!fullEx) return "";
           return `
-            ${renderExerciseCard(fullEx, { idPrefix: `ps-${fullEx.id}`, running: false })}
-
-            <!-- FEED-1. Now LAST, so it no longer sits above the hazard list. -->
-            ${renderFeedbackControl(fullEx)}
-
-            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(fullEx.youtube || (ex.name + " exercise form"))}"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="youtube-link"
-               aria-label="Watch how to do ${ex.name} on YouTube (opens in new tab)">
-              <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
-              Watch how to do this
-            </a>
+            ${renderExerciseCard(fullEx, {
+              idPrefix: `ps-${fullEx.id}`,
+              running:  timerStarted,
+              duringSlot: `
+                <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(fullEx.youtube || (ex.name + " exercise form"))}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="youtube-link"
+                   aria-label="Watch how to do ${ex.name} on YouTube (opens in new tab)">
+                  <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
+                  Watch how to do this
+                </a>`,
+              afterSlot: `${renderFeedbackControl(fullEx)}`
+            })}
           `;
         })()}
 

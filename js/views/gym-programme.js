@@ -1,5 +1,14 @@
 /**
  * gym-programme.js
+ * 31 Aug 2026 v10
+ *
+ * v10 - CARD-2. Three-layer card. The log block, swap control, preference
+ *   and feedback control move into the After layer. renderLogBlock sat
+ *   ABOVE the card, so band/reps/Save was the first thing on screen
+ *   before a single rep had been done. Also fixes `running: false`, which
+ *   was hardcoded here while this view has had live timerStarted state
+ *   all along.
+ *
  * 31 Aug 2026 v9
  *
  * v9 - TIME-1. Timer and time formatting resolve through
@@ -799,34 +808,40 @@ export function GymProgrammeView(router) {
             </div>
           ` : ''}
 
-          ${renderLogBlock(exercise)}
+          <!-- CARD-2. Three layers. The log block, the swap control, the
+               preference and the feedback control all move INTO the After
+               layer -- renderLogBlock sat ABOVE the card here, so band and
+               reps and Save were the first thing on screen, before a
+               single rep had been done. -->
+          ${renderExerciseCard(exercise, {
+            idPrefix: `gp-${exercise.id}`,
+            running:  timerStarted,
+            afterSlot: `
+              ${renderLogBlock(exercise)}
 
-          <!-- CARD-1. Shared renderer. Caution first, hazards before the
-               explanatory text, feedback last. -->
-          ${renderExerciseCard(exercise, { idPrefix: `gp-${exercise.id}`, running: false })}
+              <!-- SWAP-0 (26 Aug 2026). Only on cardio machines, and only
+                   when there is somewhere real to go. A control that opens
+                   an empty list is worse than no control. -->
+              ${renderSwapControl(exercise)}
 
-          <!-- SWAP-0 (26 Aug 2026). Only on cardio machines, and only when
-               there is somewhere real to go. A control that opens an empty
-               list is worse than no control. -->
-          ${renderSwapControl(exercise)}
+              <!-- NOT A FAN (11 Aug 2026). A quiet, reversible preference,
+                   not a rating. Deliberately not stars, thumbs or a score
+                   -- the product does not rank exercises and does not ask
+                   people to. One tap says "less of this"; a second undoes
+                   it. -->
+              <div class="exercise-preference">
+                <button type="button"
+                        class="exercise-preference__btn ${_isNotAFan(exercise.id) ? "is-set" : ""}"
+                        data-notafan="${_esc(exercise.id)}"
+                        aria-pressed="${_isNotAFan(exercise.id)}">
+                  ${_isNotAFan(exercise.id)
+                    ? "Noted — you'll see less of this"
+                    : "Not a fan of this one"}
+                </button>
+              </div>
 
-          <!-- NOT A FAN (11 Aug 2026). A quiet, reversible preference, not
-               a rating. Deliberately not stars, thumbs or a score -- the
-               product does not rank exercises and does not ask people to.
-               One tap says "less of this"; a second undoes it. -->
-          <div class="exercise-preference">
-            <button type="button"
-                    class="exercise-preference__btn ${_isNotAFan(exercise.id) ? "is-set" : ""}"
-                    data-notafan="${_esc(exercise.id)}"
-                    aria-pressed="${_isNotAFan(exercise.id)}">
-              ${_isNotAFan(exercise.id)
-                ? "Noted — you'll see less of this"
-                : "Not a fan of this one"}
-            </button>
-          </div>
-
-          <!-- FEED-1. Now LAST, so it no longer sits above the hazard list. -->
-          ${renderFeedbackControl(exercise)}
+              ${renderFeedbackControl(exercise)}`
+          })}
 
           <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(exercise.youtube || (exercise.name + ' exercise form'))}"
              target="_blank"
