@@ -80,9 +80,9 @@ function list(cls, items) {
   return `<ul class="${cls}">${items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>`;
 }
 
-function section(label, body) {
+function section(label, body, mod) {
   if (!body) return "";
-  return `<div class="xcard-block">
+  return `<div class="xcard-block${mod ? " " + mod : ""}">
       <span class="exercise-section-label">${esc(label)}</span>
       ${body}
     </div>`;
@@ -113,19 +113,26 @@ export function renderExerciseCard(exercise, opts = {}) {
   const cues     = Array.isArray(exercise.cues) ? exercise.cues : [];
   const leadCue  = cues[0] || exercise.coaching || "";
   const restCues = cues.slice(1);
-  const lastTime = typeof opts.lastTime === "string" ? opts.lastTime.trim() : "";
+  // lastLine() returns MARKUP, not a plain string -- and its no-data case
+  // returns a populated "No note yet" paragraph rather than "". Escaping
+  // it printed the tags on screen, and the empty case counted as content,
+  // which suppressed `load` on exactly the first encounter it exists for.
+  // Both found on the first device test; the function had never rendered
+  // anywhere before CARD-3 called it. It escapes its own user content, so
+  // it is injected as HTML.
+  const rawLast  = typeof opts.lastTime === "string" ? opts.lastTime.trim() : "";
+  const hasLast  = rawLast !== "" && !rawLast.includes("slog__last--empty");
 
   // Their own words, verbatim, or silence. There is no third option here
   // and no interpretation layer between lastLine() and the screen.
-  const lastBlock = lastTime
-    ? `<div class="xcard-last">
-         <span class="exercise-section-label">Last time</span>
-         <p class="xcard-last__line">${esc(lastTime)}</p>
-       </div>`
+  // No added label: lastLine() already self-labels with "Last:", and
+  // "LAST TIME / Last: 60 kg" said it twice.
+  const lastBlock = hasLast
+    ? `<div class="xcard-last">${rawLast}</div>`
     : "";
 
   // Only when there is no last time. See the header note.
-  const loadBlock = (!lastTime && exercise.load)
+  const loadBlock = (!hasLast && exercise.load)
     ? section("How heavy", `<p>${esc(exercise.load)}</p>`)
     : "";
 
@@ -143,8 +150,14 @@ export function renderExerciseCard(exercise, opts = {}) {
   // hazards before any explanatory text, feedback last. watchOut is the
   // first thing in this page body and nothing hides it.
   const doBody = [
+    // Given its own rose-tinted box on Graeme's call, 31 Aug. It was
+    // reading as one more grey section among several, which is the
+    // problem CARD-3 was meant to fix and only half fixed: moving the
+    // hazards into view is not the same as making them look different
+    // from the instructions underneath them.
     section("What to watch for",
-      (exercise.watchOut && exercise.watchOut.length) ? list("exercise-watchout-list", exercise.watchOut) : ""),
+      (exercise.watchOut && exercise.watchOut.length) ? list("exercise-watchout-list", exercise.watchOut) : "",
+      "xcard-block--hazard"),
     section("How to get there",
       (exercise.instructions && exercise.instructions.length) ? list("exercise-section-list", exercise.instructions) : ""),
     section("More on form", restCues.length ? list("exercise-section-list", restCues) : ""),

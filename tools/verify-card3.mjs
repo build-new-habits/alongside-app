@@ -152,14 +152,30 @@ for (const v of VIEWS) {
 
 console.log("\nTEST 5 - last time is their own words and nothing else");
 
-check("5a. the last-time panel prints the string and does not compute on it", () => {
+check("5a. the last-time panel prints lastLine() verbatim and computes nothing", () => {
   const i = card.indexOf("const lastBlock");
   ok(i > -1, "no lastBlock");
   const body = card.slice(i, card.indexOf('    : "";', i));
-  ok(body.includes("esc(lastTime)"), "the last-time line is not escaped-printed verbatim");
-  for (const bad of ["length", "Math.", " - ", " + ", "reduce", "filter", "map(", "%"]) {
+  // lastLine() returns markup and escapes its own user content, so the
+  // card injects it raw. Escaping it printed the tags on screen.
+  ok(body.includes("${rawLast}"), "the last-time panel does not print lastLine() output verbatim");
+  ok(!body.includes("esc(rawLast)"), "the panel escapes markup that is already escaped inside");
+  for (const bad of ["Math.", " - ", " + ", "reduce", "filter", "map(", "%"]) {
     ok(!body.includes(bad), "the last-time panel computes with " + bad.trim() + "; it may only display");
   }
+});
+
+check("5c. lastLine()'s empty case counts as no last time", () => {
+  // lastLine() returns a populated "No note yet" paragraph rather than
+  // "", so a bare truthiness test treats no-data as data -- which
+  // suppressed `load` on exactly the first encounter it exists for.
+  const i = card.indexOf("const hasLast");
+  ok(i > -1, "no hasLast; the empty case is not being detected");
+  const line = card.slice(i, card.indexOf(";", i));
+  ok(line.includes("slog__last--empty"), "the empty-state marker is not checked for");
+  const loadAt = card.indexOf("const loadBlock");
+  ok(card.slice(loadAt, card.indexOf(";", loadAt)).includes("!hasLast"),
+     "`load` still keys off raw output rather than the emptiness check");
 });
 
 check("5b. no trend, delta, arrow or session count anywhere in the card", () => {
@@ -168,6 +184,24 @@ check("5b. no trend, delta, arrow or session count anywhere in the card", () => 
     ok(!card.toLowerCase().includes(bad.toLowerCase()),
        'the card contains "' + bad.trim() + '" -- P4: the coach displays, it does not interpret');
   }
+});
+
+check("5d. the hazard block is visually distinct from ordinary prose", () => {
+  const i = card.indexOf("const doBody =");
+  const body = card.slice(i, card.indexOf("].join", i));
+  ok(body.includes("xcard-block--hazard"),
+     "the hazard section has no modifier class; it renders as one more grey block");
+  const css = fs.readFileSync("css/components/workout.css", "utf8");
+  ok(css.includes(".xcard-block--hazard"), "the modifier class has no styling");
+  ok(css.includes("--color-danger"), "the hazard box does not use the danger token");
+  // The accent must not be the only thing carrying the text's legibility.
+  // Anchor on the RULE, not the first mention -- the file's header
+  // comment names the class too, and slicing from there tested prose.
+  const at = css.indexOf(".xcard-block--hazard {");
+  ok(at > -1, "no .xcard-block--hazard rule block");
+  const rule = css.slice(at, css.indexOf("}", at));
+  ok(!/(^|[;{]\s*)color:\s*var\(--color-danger\)/.test(rule),
+     "the hazard BODY text is set in the accent colour; only the box should be rose");
 });
 
 console.log("\nTEST 6 - no P4 exposure via history");
@@ -243,7 +277,7 @@ check("10c. `load` renders only when there is no last time", () => {
   const i = card.indexOf("const loadBlock");
   ok(i > -1, "no loadBlock");
   const body = card.slice(i, card.indexOf(";", card.indexOf("section(", i)));
-  ok(body.includes("!lastTime"), "`load` is unconditional; their own band must win over the prescription");
+  ok(body.includes("!hasLast"), "`load` is unconditional; their own band must win over the prescription");
 });
 
 check("10d. no tab machinery survives", () => {

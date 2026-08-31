@@ -1,6 +1,25 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   31 Aug 2026 v12
+
+   v12 - CARD-3 device-test fixes.
+
+   .xcard-block--hazard gives "What to watch for" a rose-tinted box.
+   Graeme's call after the first device test: on DO it read as one more
+   grey section among several, and moving the hazards into view is not
+   the same as making them look unlike the instructions beneath them.
+
+   The rose comes from --color-danger, which now has a light-scheme
+   override in variables.css -- #FB7185 is about 2.6:1 on white and would
+   have failed AA the moment somebody used light mode, the same trap
+   --color-warning already carries a fix for. The tint and the rule are
+   decorative; the list text stays on the normal body colour so it is the
+   BOX that is rose, not the words, which keeps the contrast honest at
+   any scheme.
+
+   .xcard-last drops its own label. lastLine() self-labels with "Last:".
+
    31 Aug 2026 v11
 
    v11 - CARD-3. The tab styles are deleted, not left orphaned. Three
@@ -1368,17 +1387,45 @@
 
 /* Their own words from the last time they did this. Set apart from the
    surrounding prose because it is the one thing on DECIDE that is about
-   them rather than about the exercise. Never a trend, never a count. */
+   them rather than about the exercise. Never a trend, never a count.
+
+   The inner <p> comes from lastLine() with its own .slog__last class, so
+   there is nothing to style here beyond the container. */
 .xcard-last {
   padding: var(--space-3);
   border-radius: var(--radius-md, 8px);
   background: var(--color-surface-raised, rgba(255, 255, 255, 0.04));
 }
 
-.xcard-last__line {
-  margin: var(--space-1) 0 0 0;
+.xcard-last .slog__last {
+  margin: 0;
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed, 1.6);
+}
+
+/* HAZARDS. The one block on DO that must not read as ordinary prose.
+   Rose tint and rose rule; the list text keeps the body colour, so the
+   contrast does not depend on the accent being legible. */
+.xcard-block--hazard {
+  padding: var(--space-3);
+  border-left: 4px solid var(--color-danger);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-danger-light);
+}
+
+.xcard-block--hazard .exercise-section-label {
+  color: var(--color-danger);
+}
+
+/* The marker is decorative and carries no meaning the text does not. */
+.xcard-block--hazard .exercise-watchout-list li::marker {
+  color: var(--color-danger);
+}
+
+@media (prefers-contrast: more) {
+  .xcard-block--hazard {
+    border-left-width: 6px;
+  }
 }
 
 /* The one navigation the person performs by hand, so it keeps the 48px
