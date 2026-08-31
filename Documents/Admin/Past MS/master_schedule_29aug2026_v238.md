@@ -1,43 +1,9 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v239
+## 29 Aug 2026 v238
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_29aug2026_v238.md`. Remove v238 on upload.
+Supersedes `master_schedule_29aug2026_v237.md`. Remove v237 on upload.
 
-> ### 🔴 DATE ERROR — everything headed "29 Aug 2026" was written on the 31st
->
-> The date was taken from "29 AUGUST Saturday" in Graeme's app screenshot instead of from the clock. That is exactly what the verify-the-date-before-writing rule exists to prevent, and it was not followed.
->
-> **Affected, all reading 29 Aug 2026 and all actually written 31 Aug 2026:** `exercise-card.js` v1 · `workout.js` v13 · `prescribed-session.js` v6 · `gym-programme.js` v8 · `core-session.js` v9 · `display-prefs.js` v3 · `settings.js` v35 · `workout.css` v9 · `store.js` v59 · `checkin.js` v16 · `conditions.js` · `checkin.css` v1 · `verify-card1.mjs` · `verify-checkin2.mjs` · `sw.js` v407 and v408 · both blueprints · master schedule v234–v238 including five `Past MS` filenames.
->
-> **Decision, Graeme 31 Aug: not retro-corrected.** Rewriting twenty headers means touching every file again for no functional gain, breaking touch-once and risking fresh errors in files that are correct and deployed. This note is the correction. Everything from v239 is dated properly.
->
-> ---
->
-> ### 🟢 TIME-1 BUILT AND DEPLOYED 31 Aug — `alongside-v409`. 92/92 gates.
->
-> #### 🔴 The v237 entry was wrong and this corrects it
->
-> v237 recorded that "`holdSeconds`, the actual database field, is read only by `yoga-session.js` and `core-session.js`". Checking the data before building found something different, and the fix that entry implied would have been a bug.
->
-> **`duration` and `holdSeconds` are not two answers to one question.** Across the database: 473 exercises carry `duration` alone, 15 carry both, and **zero** carry `holdSeconds` alone. Of the 15, **14 "disagree"** — `bird-dog` holds 3 against a duration of 90, `pallof-press` 2 against 90, `plank` 30 against 60. They were never measuring the same thing. **`duration` is the total exercise time; `holdSeconds` is how long to hold each rep.**
->
-> Making `holdSeconds` canonical, as v237 implied, **would have turned a 90-second bird-dog into a 3-second one** — and it would have looked like a tidy-up. `exercise-timing.js` deliberately does not read the field at all, and a gate asserts it never will. `holdSeconds` is coaching detail and belongs on the card; that goes to CARD-2.
->
-> #### 🟢 The real fault, and the fix
->
-> Three views, three unrelated answers. `workout.js` read `exercise.duration`. `prescribed-session.js` and `gym-programme.js` parsed a duration out of the **prescription reps string** and read `duration` not at all — so a database exercise carrying a duration got a clock in one view and nothing in another. The two reps-string parsers had themselves drifted: **gym-programme's handled ranges like `30-45s` and prescribed-session's did not**, so the same prescription timed in one view and not the other.
->
-> `js/exercise-timing.js` v1 is now the single answer. **Precedence: the prescription wins over the database** — a physio writing `45s` for this person means 45 seconds for this person. Ranges resolve to the **upper** bound, because cutting somebody off at the lower bound ends the exercise while they are still doing it.
->
-> #### 🟢 Shipped
->
-> `js/exercise-timing.js` **v1** · `workout.js` **v14** · `prescribed-session.js` **v7** · `gym-programme.js` **v9** · `tools/verify-time1.mjs` — 14 checks, gate 92 · `sw.js` **v409**, alone in its own commit.
->
-> **Three duplicate `formatTime` copies retired** — the gate found two of them after the first pass claimed to be done. **Three reversals proven failing:** letting `holdSeconds` drive the clock, ignoring the prescription, and taking a range's lower bound.
->
-> #### 🟠 Untested on device. `alongside-v409` is live.
->
 > ### 🟢 CHECKIN-2a BUILT AND DEPLOYED 29 Aug — `alongside-v408`. 91/91 gates.
 >
 > The beta blocker is closed. A sore area can now be added mid-programme, so `bodyCaution` is no longer limited to what was declared at onboarding.
@@ -112,7 +78,7 @@ Supersedes `master_schedule_29aug2026_v238.md`. Remove v238 on upload.
 > |---|---|---|---|
 > | **CHECKIN-2a** | Add a sore area at check-in. **BUILT AND DEPLOYED 29 Aug**, `alongside-v408`. Schema decision reversed during build — see below | 🟢 Shipped, untested on device | 29 Aug |
 > | **CHECKIN-2b** | Condition resolution, quiet-run tracking, the noticing ask | 🔵 Spec complete | After 2a |
-> | **TIME-1** | One timer source, `js/exercise-timing.js`. **BUILT AND DEPLOYED 31 Aug**, `alongside-v409`. Premise corrected during build — `duration` is canonical, not `holdSeconds` | 🟢 Shipped, untested on device | 31 Aug |
+> | **TIME-1** | One timer source. `holdSeconds` canonical across all five views | 🟠 Needs spec | w/c 31 Aug |
 > | **CARD-2** | Three-layer card. Supersedes CARD-1 disclosure model; also fixes the hardcoded `running: false` | 🟠 Needs spec | w/c 31 Aug |
 >
 > ### 🟠 CARD-1 BUILD STARTED 29 Aug — steps 1–3 of 8. NOT DEPLOYED.
@@ -5299,4 +5265,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v239*
+*Build New Habits · Alongside: Move · Master Schedule · 29 Aug 2026 v238*
