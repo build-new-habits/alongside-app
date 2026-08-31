@@ -1,5 +1,7 @@
 # CARD-3 — Three-Page Exercise Flow
-## 31 Aug 2026 v1
+## 31 Aug 2026 v2
+
+v2 — two gaps found by Graeme reviewing the mockup: where the band is chosen (§4.1) and whether a rep-based exercise needs a clock (§5.5, now TIME-2).
 
 Build New Habits | Alongside: Move | Build blueprint. Spec only, no code written.
 
@@ -113,6 +115,16 @@ Gate assertion with a reversal.
 
 ---
 
+### 4.1 Where the band is chosen — decided, because the mockup was ambiguous
+
+The mockup shows "Blue band, 8 reps" under **last time** on page 1. That is the decision support: it tells the person what to reach for. **There is no band picker on page 1**, and that is deliberate.
+
+The band is recorded on page 3, in the log block, because until you have done a set you do not know what you actually used. A picker on page 1 would duplicate the page 3 field, eat the 4-control budget, and force a commitment before the information exists.
+
+**One field, captured once, shown back next time.** Page 1 remembers; page 3 records.
+
+---
+
 ## 5. Technical design
 
 ### 5.1 Preserve the button ids
@@ -148,6 +160,30 @@ Lives in the view, beside `currentExerciseIndex`, not in the store. It is epheme
 - `exercise-card.js` still does not read `exerciseHistory` (CARD-2 removed the P4 exposure; do not reintroduce it for "last time" — that comes from `lastLine`)
 - `exercise-timing.js` still does not read `holdSeconds` (TIME-1)
 - No view hardcodes `running: false`
+
+---
+
+### 5.5 🔴 TIME-2 — `duration` is doing two jobs and the label lies
+
+Found reviewing the mockup. Against the live data:
+
+| Exercise | `duration` | `reps` | `holdSeconds` |
+|---|---|---|---|
+| inchworm | 90 | *(none)* | *(none)* |
+| bird-dog | 90 | "8 each side" | 3 |
+| plank | 60 | null | 30 |
+
+Inchworm has no reps field at all — its "complete 8 reps" exists only inside the instructions prose. Bird-dog carries all three fields at once.
+
+**So `duration` means both "hold this position for this long" and "spend about this long doing reps", and the UI labels both "Hold".** Graeme's device screenshot read **"1:30 Hold"** on an exercise that is eight reps of walking your hands out to a plank. The number is a reasonable time budget; the word is wrong.
+
+TIME-1 unified *where the number comes from*. It did not establish *what kind of number it is*. That is TIME-2 and it is a separate row:
+
+- A structured way to tell a held exercise from a repped one. `reps` is unreliable — null on plank, absent on inchworm, populated on bird-dog
+- Correct labels: "Hold" only when it is genuinely a hold
+- A rep-based page 2 that offers a **plain Done** rather than a countdown, resolving §9.2
+
+**CARD-3 must not ship a page 2 that labels a rep budget as a hold.** Interim: say "About 1:30" where the exercise is not a genuine hold, and let TIME-2 do it properly.
 
 ---
 
@@ -204,7 +240,7 @@ Fixture fault check on each: does it reach the branch it claims to test? No nega
 ## 9. Open for Graeme
 
 1. **Does "make it easier" exist yet?** Page 1 lists it as an adjust control. Swap is SWAP-0 and shipped for cardio machines only; less/more time exists. "Easier" may be new scope — **discovery before it goes on the mockup as though it works.**
-2. **Reps-based page 2** needs a "done" path that is not a clock. Proposed: a plain "Done" under the rep target.
+2. ~~Reps-based page 2 needs a "done" path.~~ **Answered by §5.5.** Plain Done, and the label problem goes to TIME-2.
 3. **`why` and `load` behind one control on page 1** — or off the card entirely and into the library?
 
 ---
@@ -217,4 +253,4 @@ Fixture fault check on each: does it reach the branch it claims to test? No nega
 
 ---
 
-*Build New Habits · Alongside: Move · CARD-3 Blueprint · 31 Aug 2026 v1*
+*Build New Habits · Alongside: Move · CARD-3 Blueprint · 31 Aug 2026 v2*
