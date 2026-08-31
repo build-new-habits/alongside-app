@@ -1,5 +1,14 @@
 /**
  * store.js - Data persistence layer
+ * 29 Aug 2026 v59
+ *
+ * v59 - CHECKIN-2a. New `conditionMeta`, a parallel map holding condition
+ *   lifecycle. `conditions` is NOT reshaped: 25 readers across 15 files
+ *   treat it as an array of string ids, and a reader missed is a condition
+ *   that silently stops reaching a caution check. Dormant ids leave
+ *   `conditions` and stay in `conditionMeta`. addedAt is null for anything
+ *   already on disk and must stay null.
+ *
  * 22 Aug 2026 v58
  *   TARGET-DEAD. Top-level `targetWeight` REMOVED.
  *
@@ -622,6 +631,60 @@ export const store = {
     return MAP[v] || v;
   },
 
+  /**
+   * CHECKIN-2a. Condition lifecycle metadata.
+   *
+   * WHY THIS IS A PARALLEL MAP AND NOT A RESHAPED `conditions`. The
+   * blueprint specced `conditions` becoming an array of records. Building
+   * it found 25 readers across 15 files, every one of them treating it as
+   * an array of string ids -- session-builder, six session views, the
+   * check-in, onboarding, reflect, practices, the exercise index. Reshaping
+   * the field breaks all of them, and a reader missed is a condition that
+   * silently stops reaching a caution check. That is the worst possible
+   * failure for this feature.
+   *
+   * It is also the better design. `conditions` means "which conditions is
+   * this person currently carrying", which is exactly what those 25 sites
+   * want. Lifecycle -- when it arrived, how, whether it is still live -- is
+   * a separate concern with one reader. Keeping them apart leaves every
+   * existing call site correct and untouched.
+   *
+   * DORMANT CONDITIONS LEAVE `conditions` AND STAY IN `conditionMeta`.
+   * So `conditions` is always "active right now", which is what every
+   * reader already assumes. Reactivation pushes the id back.
+   *
+   * IDEMPOTENT. Runs on every load, not once behind a flag.
+   *
+   * addedAt is null for anything already on disk and MUST STAY NULL.
+   * Unknown history must never make a condition eligible for the
+   * CHECKIN-2b resolution ask -- inventing today as the start date would
+   * make every long-standing condition look brand new.
+   */
+  _migrateConditionMeta(meta, conditions) {
+    const out = (meta && typeof meta === "object" && !Array.isArray(meta)) ? { ...meta } : {};
+    for (const id of (Array.isArray(conditions) ? conditions : [])) {
+      if (typeof id !== "string") continue;
+      const m = out[id];
+      out[id] = {
+        addedAt:    (m && m.addedAt)    ?? null,
+        source:     (m && m.source)     ?? "onboarding",
+        status:     (m && m.status === "dormant") ? "dormant" : "active",
+        dormantAt:  (m && m.dormantAt)  ?? null,
+        lastSoreAt: (m && m.lastSoreAt) ?? null,
+        reportDays: (m && Number.isFinite(m.reportDays)) ? m.reportDays : 0,
+        quietRun:   (m && Number.isFinite(m.quietRun))   ? m.quietRun   : 0,
+        asks:       (m && Number.isFinite(m.asks))       ? m.asks       : 0
+      };
+    }
+    // Dormant records are kept even though their id has left `conditions`.
+    // Deleting them would lose the history and force a re-declaration.
+    for (const [id, m] of Object.entries(out)) {
+      if (!m || typeof m !== "object") { delete out[id]; continue; }
+      out[id].status = m.status === "dormant" ? "dormant" : (out[id].status || "active");
+    }
+    return out;
+  },
+
   mergeWithDefaults(saved) {
     const defaults = this.getDefaults();
     return {
@@ -630,6 +693,10 @@ export const store = {
 
       // AGE-1. Runs before the spread's ageBand would win.
       ageBand: saved.ageBand ? this._migrateAgeBand(saved.ageBand) : defaults.ageBand,
+
+      // CHECKIN-2a. `conditions` is deliberately NOT reshaped -- see
+      // _migrateConditionMeta. Lifecycle lives alongside it.
+      conditionMeta: this._migrateConditionMeta(saved.conditionMeta, saved.conditions),
 
       // ── ONBOARDING (top-level flags stay top-level) ───────────
       // v7: primaryTerritory, threadStartedAt, threadCompletedAt
@@ -1215,7 +1282,8 @@ export const store = {
       goals: [],
 
       // ── CONDITIONS ───────────────────────────────────────────
-      conditions: [],
+      conditions: [],             // ids, ACTIVE ONLY. 25 readers depend on this shape — do not reshape it.
+      conditionMeta: {},          // CHECKIN-2a: { [id]: { addedAt, source, status, dormantAt, lastSoreAt, reportDays, quietRun, asks } }. Dormant ids leave `conditions` and stay here. See Schema.md.
       conditionPainScores: {},
       conditionReflections: [],   // { conditionId, text, loggedAt } — NOT Journal. Deliberately distinct field/namespace so it can never inherit the Journal Privacy Rule by accident. Coach-readable by design.
       conditionFoldInLevel: null, // 'partial' | 'mostly' | 'all' | null — null = static-only, not folded into Cardio/Core/Strength sessions
@@ -1963,6 +2031,45 @@ export const store = {
     this.data.onboardingComplete = true;
     this.data.createdAt = this.data.createdAt || new Date().toISOString();
     this.save();
+  },
+
+  /**
+   * CHECKIN-2a. Add a sore area mid-programme.
+   *
+   * Before this, `conditions` was set at onboarding and never again, and
+   * it is the ONLY input to bodyCaution -- so an area that was not
+   * declared months earlier could be loaded all week with a silent card.
+   *
+   * The id must come from soreAreaOptions(). An id that resolves to no
+   * real affectsAreas value produces a slider that works, saves, and
+   * never fires a caution: a control that looks like it did something and
+   * did not. Callers pass ids from the picker; this guards the field.
+   *
+   * Reactivating a dormant area is the same call. The record keeps its
+   * history -- nobody re-declares anything.
+   */
+  addSoreArea(id) {
+    if (typeof id !== "string" || !id) return false;
+    const list = Array.isArray(this.data.conditions) ? this.data.conditions : [];
+    const meta = (this.data.conditionMeta && typeof this.data.conditionMeta === "object")
+      ? this.data.conditionMeta : {};
+    const today = new Date().toISOString().slice(0, 10);
+    const existing = meta[id];
+
+    if (!list.includes(id)) this.data.conditions = [...list, id];
+
+    this.data.conditionMeta = {
+      ...meta,
+      [id]: existing
+        ? { ...existing, status: "active", dormantAt: null }
+        : {
+            addedAt: today, source: "checkin", status: "active", dormantAt: null,
+            lastSoreAt: null, reportDays: 0, quietRun: 0, asks: 0
+          }
+    };
+    this.data.updatedAt = new Date().toISOString();
+    this.save();
+    return true;
   },
 
   updateConditionPainScores(painScores) {

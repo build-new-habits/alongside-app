@@ -92,6 +92,39 @@
 // CONDITIONS SHOWN TO USERS IN ONBOARDING / SETTINGS
 // ─────────────────────────────────────────────────────────────
 
+/**
+ * CHECKIN-2a. What a person can add to their check-in mid-programme.
+ *
+ * Derived from `zone` rather than hand-listed, so the picker cannot drift
+ * out of step with the catalogue as it grows. Everything musculoskeletal
+ * qualifies; `systemic` does not, because "something else sore today" is
+ * the wrong frame for anxiety, menopause or fibromyalgia -- those are not
+ * things that flare on a Tuesday and settle by Friday, and offering them
+ * here would invite somebody to declare a long-term condition through a
+ * door meant for a tweaked shoulder.
+ *
+ * PELVIC FLOOR IS THE EXPLICIT EXCEPTION (Graeme's call, 29 Aug). It sits
+ * in `systemic` in the catalogue but it is a genuinely reportable area
+ * that can be sore on a given day, and excluding it would be a silence
+ * that reads as squeamishness. It carries no special wording -- it is
+ * listed in the same neutral form as every other entry, which is the
+ * whole point.
+ *
+ * `other` and the severity pseudo-entries are excluded: an id that
+ * resolves to no real body area produces a slider that saves and silently
+ * never fires a caution.
+ */
+export const SORE_AREA_PICKER_EXCEPTIONS = ["pelvic-floor"];
+
+export function soreAreaOptions(alreadyActive = []) {
+  const taken = new Set(alreadyActive);
+  return CONDITIONS
+    .filter(c => c.zone !== "systemic" || SORE_AREA_PICKER_EXCEPTIONS.includes(c.id))
+    .filter(c => c.id !== "other")
+    .filter(c => !taken.has(c.id))
+    .map(c => ({ id: c.id, name: c.name, icon: c.icon }));
+}
+
 export const CONDITIONS = [
 
   // MUSCULOSKELETAL — LOWER BODY
