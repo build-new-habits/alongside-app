@@ -3,6 +3,14 @@
  *
  * 11 Aug 2026 v5
  *
+ * 31 Aug 2026 v7
+ *
+ * v7 - TIME-1. Timer resolves through js/exercise-timing.js. This view
+ *   parsed the prescription reps string and never read exercise.duration,
+ *   so a database exercise with a duration got no clock here at all. The
+ *   local parseHoldSeconds is retired; it had drifted from the one in
+ *   gym-programme.js, which handled ranges this one did not.
+ *
  * 29 Aug 2026 v6
  *
  * v6 - CARD-1. Card moves to the shared renderer, js/exercise-card.js.
@@ -83,6 +91,7 @@
 import { store } from "../store.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
+import { resolveTiming, formatTime } from "../exercise-timing.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
 import { mountSessionGuard, dismountSessionGuard } from "../session-guard.js";
 import { getActiveConditionIds, getConditionName } from "../data/conditions.js";
@@ -153,7 +162,10 @@ export function render() {
   const ex           = active[currentIndex];
   const isLast       = currentIndex >= active.length - 1;
   const progress     = (currentIndex / active.length) * 100;
-  const holdSecs     = parseHoldSeconds(ex.reps);
+  // TIME-1. Was parseHoldSeconds(ex.reps) only, so an exercise carrying a
+  // database `duration` got no clock here while getting one in workout.js.
+  const _timing      = resolveTiming(ex, ex.reps);
+  const holdSecs     = _timing.seconds;
   const hasTimer     = holdSecs !== null;
   const contraFlag   = _checkContraindication(ex);
 
@@ -313,20 +325,10 @@ function renderAlreadyDone() {
  *   "10"     -> null  (assume reps)
  *   "10 reps"-> null
  */
-function parseHoldSeconds(str) {
-  if (!str) return null;
-  const lower = str.toLowerCase().trim();
-
-  // Match patterns like "30s", "30 sec", "30 seconds"
-  const secMatch = lower.match(/^(\d+)\s*s(?:ec(?:onds?)?)?$/);
-  if (secMatch) return parseInt(secMatch[1]);
-
-  // Match "2 min", "2 minutes"
-  const minMatch = lower.match(/^(\d+)\s*min(?:utes?)?$/);
-  if (minMatch) return parseInt(minMatch[1]) * 60;
-
-  return null;
-}
+// TIME-1. parseHoldSeconds lived here and in gym-programme.js, and the two
+// had drifted -- gym-programme's handled ranges like "30-45s" and this one
+// did not, so the same prescription timed in one view and not the other.
+// Both are now js/exercise-timing.js.
 
 /**
  * Credits for completing an exercise at this index.
@@ -341,11 +343,9 @@ function creditsForIndex(index, total) {
   return index === total - 1 ? base + remainder : base;
 }
 
-function formatTime(seconds) {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-}
+// TIME-1. formatTime is now js/exercise-timing.js -- there were three
+// identical copies, and the shared one also floors null to 0:00 rather
+// than rendering "NaN:NaN".
 
 // -- Mount -----------------------------------------------------------------------
 
