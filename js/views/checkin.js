@@ -1,5 +1,14 @@
 /**
  * js/views/checkin.js
+ * 29 Aug 2026 v16
+ *
+ * v16 - CHECKIN-2a. "Something else sore today?" on the conditions
+ *   sheet. The sliders were fixed at whatever was declared at onboarding
+ *   and they are the ONLY input to bodyCaution, so an area that flared
+ *   later could be loaded all week with a silent card. Picker only --
+ *   never free text, because an id resolving to no real body area gives a
+ *   slider that saves and silently never fires a caution.
+ *
  * 18 Aug 2026 v15
  *
  * v15 - QUICK-3. Two faults on the brief check-in path, both found
@@ -246,7 +255,7 @@
 import { store }           from "../store.js";
 import { checkinData }     from "../data/checkin.js";
 import { resolveOpening }  from "../data/checkin-openings.js";
-import { CONDITIONS, getPainBand } from "../data/conditions.js";
+import { CONDITIONS, getPainBand, soreAreaOptions } from "../data/conditions.js";
 import { WORD_SETS, getQuadrant, detectSignalWord } from "../data/feelings.js";
 
 export function CheckinView(router) {
@@ -716,11 +725,64 @@ export function CheckinView(router) {
       `;
     }).join("");
 
+    // CHECKIN-2a. Before this, the sliders were fixed at whatever was
+    // declared at onboarding, and they are the ONLY input to bodyCaution --
+    // so a shoulder that flared on a Tuesday could be loaded all week with
+    // a silent card. It sits on this sheet rather than behind Settings
+    // because the moment somebody needs it is the moment they are already
+    // reporting.
+    //
+    // The wording avoids "condition" deliberately. Asking somebody to
+    // classify themselves before they can move a slider is a barrier, and
+    // most of what belongs here is a tweak rather than a diagnosis.
+    const _addable = soreAreaOptions(_conditions);
+    const addBlock = _addable.length ? `
+      <div class="ci-add-area">
+        <button type="button" class="ci-add-area__btn" id="ci-add-area-btn"
+                aria-expanded="false" aria-controls="ci-add-area-list">
+          Something else sore today?
+        </button>
+        <ul class="ci-add-area__list" id="ci-add-area-list" role="list" hidden>
+          ${_addable.map(o => `
+            <li>
+              <button type="button" class="ci-add-area__opt" data-area="${_esc(o.id)}">
+                <span aria-hidden="true">${o.icon || ""}</span>
+                <span>${_esc(o.name)}</span>
+              </button>
+            </li>`).join("")}
+        </ul>
+      </div>` : "";
+
     const panel = _buildPanel(`
-      ${rows}
+      <div id="ci-cond-rows">${rows}</div>
+      ${addBlock}
       <button class="btn btn-primary btn-large btn-full" id="ci-cond-confirm"
               style="margin-top:var(--space-4);" aria-label="Confirm pain levels">Next</button>
     `);
+
+    const addBtn = panel.querySelector("#ci-add-area-btn");
+    if (addBtn) {
+      const list = panel.querySelector("#ci-add-area-list");
+      addBtn.addEventListener("click", () => {
+        const open = addBtn.getAttribute("aria-expanded") === "true";
+        addBtn.setAttribute("aria-expanded", open ? "false" : "true");
+        if (open) list.setAttribute("hidden", ""); else list.removeAttribute("hidden");
+      });
+      panel.querySelectorAll(".ci-add-area__opt").forEach(opt => {
+        opt.addEventListener("click", () => {
+          const id = opt.dataset.area;
+          if (!store.addSoreArea(id)) return;
+          _conditions = store.get("conditions") || [];
+          _checkin.conditionLevels[id] = _checkin.conditionLevels[id] ?? 0;
+          // Re-render the sheet so the new slider appears in place, then
+          // move focus onto it -- the person asked for it, so it should be
+          // the thing under their hand, not something they must hunt for.
+          _showConditionsPanel();
+          const slider = document.getElementById(`ci-cond-slider-${id}`);
+          if (slider) slider.focus();
+        });
+      });
+    }
 
     panel.querySelectorAll(".ci-slider[data-condition]").forEach(slider => {
       slider.addEventListener("input", () => {
