@@ -1,16 +1,21 @@
 /**
- * sw.js — v407, 29 Aug 2026
- *
- * CARD-1. New js/exercise-card.js, precached. It is the shared exercise
- * card: one renderer for workout, core-session, prescribed-session and
- * gym-programme, replacing four copies that had already drifted apart.
- *
- * Omitting it from SHELL_URLS would have left every card-shaped view
- * importing a file the shell does not hold — the INF-CACHE failure again,
- * where 40 files were missing from the precache and nothing said so.
- */
-/**
  * sw.js - Alongside Service Worker
+ *
+ * 31 Aug 2026 v411
+ *
+ * v411 - CARD-3. No new files to precache. exercise-card.js is already
+ *   in SHELL_URLS; it changed shape from three tabs to three pages, and
+ *   the views now pass `page` and named slots instead of `running` and
+ *   layer slots. The bump exists to stop a stale shell serving the v2
+ *   card against views that speak v3 -- a card that renders a tablist
+ *   for a view expecting a page would put the hazard list back behind a
+ *   tab, which is the exact regression CARD-3 closes.
+ *
+ *   HEADER TIDIED. A CARD-1 note reading "v407, 29 Aug 2026" had been
+ *   prepended ABOVE this block rather than folded into it, so the first
+ *   thing anybody read at the top of this file was a version three
+ *   behind the one in CACHE_NAME. It is now in the history below, in
+ *   date order, where it belongs.
  *
  * 31 Aug 2026 v410
  *
@@ -34,7 +39,13 @@
  *
  * 29 Aug 2026 v407
  *
- * v407 - CARD-1. See the note at the top of this file.
+ * v407 - CARD-1. New js/exercise-card.js, precached. It is the shared
+ *   exercise card: one renderer for workout, core-session,
+ *   prescribed-session and gym-programme, replacing four copies that had
+ *   already drifted apart. Omitting it from SHELL_URLS would have left
+ *   every card-shaped view importing a file the shell does not hold --
+ *   the INF-CACHE failure again, where 40 files were missing from the
+ *   precache and nothing said so.
  *
  * 26 Aug 2026 v406
  * SWAP-0. Cache bump only -- js/data/exercises/index.js,
@@ -2852,7 +2863,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v410";
+const CACHE_NAME = "alongside-v411";
 
 const SHELL_URLS = [
 
