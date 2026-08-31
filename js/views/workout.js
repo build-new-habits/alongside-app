@@ -1,5 +1,13 @@
 /**
  * workout.js - Workout Execution View
+ * 31 Aug 2026 v14
+ *
+ * v14 - TIME-1. Timing resolves through js/exercise-timing.js rather than
+ *   reading exercise.duration directly. No behaviour change here -- this
+ *   view was already the one doing it right. It moves onto the shared
+ *   resolver so there is one answer to "does this need a clock" rather
+ *   than three.
+ *
  * 29 Aug 2026 v13
  *
  * v13 - CARD-1. The exercise card moves out of this file and into the
@@ -201,6 +209,7 @@
 import { store }         from "../store.js";
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
+import { resolveTiming, formatTime } from "../exercise-timing.js";
 import { renderLogBlock, attachLogEvents, scrollToTop } from "../session-log.js";
 import { selectMoment, recordMomentShown, dismissMoment } from "../data/grounding-moments.js";
 import { checkinData }   from "../data/checkin.js";
@@ -343,7 +352,7 @@ export function render() {
 
       <!-- Action buttons -->
       <div class="workout-actions">
-        ${exercise.duration ? `
+        ${resolveTiming(exercise).seconds ? `
           <button class="btn btn-large btn-full ${timerStarted ? "btn-secondary" : "btn-accent"}" id="timer-toggle-btn" aria-live="polite">
             ${!timerStarted ? "\u25B6 Start Timer" : (timerInterval ? "\u23F8 Pause" : "\u25B6 Resume")}
           </button>
@@ -399,12 +408,12 @@ function renderNoWorkout() {
 }
 
 function renderExerciseTarget(exercise) {
-  if (exercise.duration) {
+  if (resolveTiming(exercise).seconds) {
     const sets = exercise.sets || 1;
     return `
       <div class="timer-display">
         <div class="timer-circle">
-          <span class="timer-value" id="timer-display">${formatTime(timeRemaining || exercise.duration)}</span>
+          <span class="timer-value" id="timer-display">${formatTime(timeRemaining || resolveTiming(exercise).seconds)}</span>
           <span class="timer-label">${sets > 1 ? `Set 1 of ${sets}` : "Hold"}</span>
         </div>
       </div>
@@ -430,11 +439,9 @@ function renderExerciseTarget(exercise) {
   return "<p>Complete this exercise at your own pace.</p>";
 }
 
-function formatTime(seconds) {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-}
+// TIME-1. formatTime is now js/exercise-timing.js -- there were three
+// identical copies, and the shared one also floors null to 0:00 rather
+// than rendering "NaN:NaN".
 
 function formatRole(role) {
   const roles = {
@@ -502,8 +509,9 @@ export function onMount() {
 
   const exercise = workout.exercises[currentExerciseIndex];
 
-  if (exercise.duration) {
-    timeRemaining = exercise.duration;
+  const _t = resolveTiming(exercise).seconds;
+  if (_t) {
+    timeRemaining = _t;
     updateTimerDisplay();
   }
 

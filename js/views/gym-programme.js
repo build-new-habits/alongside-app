@@ -1,5 +1,10 @@
 /**
  * gym-programme.js
+ * 31 Aug 2026 v9
+ *
+ * v9 - TIME-1. Timer and time formatting resolve through
+ *   js/exercise-timing.js. Two local copies retired.
+ *
  * 29 Aug 2026 v8
  *
  * v8 - CARD-1. Card moves to the shared renderer, js/exercise-card.js.
@@ -288,6 +293,7 @@ import { store }                    from '../store.js';
 import { isPremium }                from '../auth.js';
 import { renderFeedbackControl, attachFeedbackEvents } from "../exercise-feedback.js";
 import { renderExerciseCard, attachCardEvents } from "../exercise-card.js";
+import { resolveTiming, formatTime as _fmtTime } from "../exercise-timing.js";
 // EMP/LOG-1: the note block moved to js/session-log.js so workout.js can
 // reach it too. progressionInvitation is still used by the block, but it
 // is imported there now, not here.
@@ -727,7 +733,7 @@ export function GymProgrammeView(router) {
     const exercise    = session.exercises[currentExerciseIndex];
     const isLast      = currentExerciseIndex >= session.exercises.length - 1;
     const progress    = (currentExerciseIndex / session.exercises.length) * 100;
-    const holdSecs    = parseHoldSeconds(exercise.reps);
+    const holdSecs    = resolveTiming(exercise, exercise.reps).seconds;
     const hasTimer    = holdSecs !== null;
     const caution     = exercise._cautionActive;
 
@@ -858,7 +864,7 @@ export function GymProgrammeView(router) {
 
   function attachExerciseEvents(container, session, stats, sessionType) {
     const exercise = session.exercises[currentExerciseIndex];
-    const holdSecs = parseHoldSeconds(exercise.reps);
+    const holdSecs = resolveTiming(exercise, exercise.reps).seconds;
 
     if (holdSecs) {
       timeRemaining = timeRemaining || holdSecs;
@@ -996,23 +1002,15 @@ export function GymProgrammeView(router) {
    * holds, "12" for rep counts) prescribed-session.js's parser already
    * handles correctly.
    */
-  function parseHoldSeconds(str) {
-    if (!str) return null;
-    const lower = String(str).toLowerCase().trim();
-    const secMatch = lower.match(/^(\d+)\s*s(?:ec(?:onds?)?)?$/);
-    if (secMatch) return parseInt(secMatch[1]);
-    const rangeMatch = lower.match(/^(\d+)-(\d+)\s*s$/);
-    if (rangeMatch) return parseInt(rangeMatch[2]);
-    const minMatch = lower.match(/^(\d+)\s*min(?:utes?)?$/);
-    if (minMatch) return parseInt(minMatch[1]) * 60;
-    return null;
-  }
+  // TIME-1. parseHoldSeconds and formatTime are now
+  // js/exercise-timing.js. This copy had a range branch the one in
+  // prescribed-session.js lacked, which is how the same prescription
+  // timed in one view and not the other.
 
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  }
+
+  const formatTime = _fmtTime;
+
+
 
   function renderNoSession(container, stats) {
     container.innerHTML = `
