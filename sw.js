@@ -12,6 +12,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v410
+ *
+ * v410 - CARD-2. No new files. exercise-card.js is already precached; it
+ *   changed shape from disclosures to three layers, so the bump is to
+ *   stop a stale shell serving v1 against views that now pass slots.
+ *
  * 31 Aug 2026 v409
  *
  * v409 - TIME-1. New js/exercise-timing.js, precached. One answer to
@@ -2846,7 +2852,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v409";
+const CACHE_NAME = "alongside-v410";
 
 const SHELL_URLS = [
 
