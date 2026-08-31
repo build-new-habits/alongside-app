@@ -1022,6 +1022,10 @@ export function GymProgrammeView(router) {
     if (!container.__gpPageBound) {
       container.__gpPageBound = true;
       container.addEventListener("xcard:page", ev => {
+        // Bound on the container rather than #app, but the same rule
+        // applies: only respond to this view's own cards.
+        const _pfx = (ev.detail && ev.detail.prefix) || "";
+        if (!_pfx.startsWith("gp-")) return;
         const to = ev.detail && ev.detail.page;
         if (to !== "decide" && to !== "do") return;
         currentCardPage = to;
