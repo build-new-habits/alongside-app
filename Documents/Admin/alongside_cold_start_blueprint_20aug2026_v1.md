@@ -49,7 +49,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | `Documents/Live State/Schema.md` | Store fields. **Must match `store.js`** |
 | `Documents/Business/` | Governing documents — see below |
 | `Documents/Archive/` | Stale, kept not deleted |
-| `tools/verify-*.mjs` | 90 gates |
+| `tools/verify-*.mjs` | 91 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order:**
@@ -68,11 +68,11 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 
 | | Version |
 |---|---|
-| `store.js` | v58 |
+| `store.js` | v59 |
 | `Schema.md` | v1.41 |
 | `sw.js` | **v407**, cache `alongside-v407` |
 | `router.js` | v22 · `my-programme.js` v8 · `today.js` v24 · `settings.js` v34 · `progress.js` v11 · `onboarding/thread.js` v13 |
-| Gates | **90, all green** — and genuinely green from any clone path |
+| Gates | **91, all green** — and genuinely green from any clone path |
 
 🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
 

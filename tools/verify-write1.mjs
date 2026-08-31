@@ -144,7 +144,27 @@ const BASELINE = new Set([
   'onboardingStep','age','sessionMode','mindfulPromptDepth','proposalBias',
   'activityPreferences','noticingPreferences','noticingProgress','safeguarding',
   'weeklyReview','waterLog','waterSettings','coachOffers','unwellMode',
-  'foodPrompts','practiceHistory'
+  'foodPrompts','practiceHistory',
+
+  // 'conditionMeta' -- ADDED 29 Aug 2026, CHECKIN-2a.
+  //
+  // Written by store.addSoreArea() and normalised by
+  // _migrateConditionMeta(). It has no reader yet because its reader IS
+  // CHECKIN-2b -- resolution, quiet-run tracking and the noticing ask.
+  //
+  // This is the proposalBias shape and I am not pretending otherwise.
+  // The mitigation is not this comment; it is the CHECKIN-2b row in the
+  // master schedule. A DATED PROMISE, not permission: if 2b has shipped
+  // and this line is still here, the baseline is lying. If 2b is
+  // abandoned, the field must be removed rather than left sitting.
+  //
+  // Considered and rejected: inventing a reader in soreAreaLoaded that
+  // skips conditions whose meta says dormant. That reads well and is
+  // wrong -- if `conditions` and `conditionMeta` ever disagree, the safe
+  // direction is for the caution to FIRE, not to be suppressed. A reader
+  // added only to satisfy a gate would have made the safety behaviour
+  // worse.
+  'conditionMeta'
 ]);
 
 const added = oneEnded.filter(k => !BASELINE.has(k));

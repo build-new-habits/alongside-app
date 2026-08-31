@@ -1,7 +1,7 @@
 # Alongside — Data Schema Reference
 ## 22 Aug 2026 v1.41
 
-**File:** `js/store.js` (confirmed live version: **v58, 22 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v59, 29 Aug 2026**)
 
 ---
 
@@ -545,7 +545,8 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 | `targetDate` | `string\|null` | `null` | ISO date |
 | `targetDescription` | `string` | `''` | Plain text goal note |
 | `goals` | `string[]` | `[]` | Goal IDs from `goals.js`. Drives exercise filter engine and `workoutGenerator.js`'s goal-aware bias. |
-| `conditions` | `string[]` | `[]` | Condition IDs from `conditions.js`. Base IDs only — phase variants derived at runtime. |
+| `conditions` | `string[]` | `[]` | Condition IDs from `conditions.js`. Base IDs only — phase variants derived at runtime. **29 Aug 2026 (CHECKIN-2a):** now also written mid-programme by `store.addSoreArea(id)`, not just at onboarding. **Holds ACTIVE ids only** — a retired area leaves this array and its record stays in `conditionMeta`. **Deliberately NOT reshaped into records.** 25 readers across 15 files treat this as an array of string ids, and a reader missed is a condition that silently stops reaching a caution check. Lifecycle lives in `conditionMeta`. |
+| `conditionMeta` | `object` | `{}` | **New 29 Aug 2026 (CHECKIN-2a).** Keyed by condition ID: `{ addedAt, source, status, dormantAt, lastSoreAt, reportDays, quietRun, asks }`. `addedAt` is `null` for anything that predates this field and **must stay null** — unknown history must never make a condition eligible for the CHECKIN-2b resolution ask, and inventing today's date would make every long-standing condition look brand new. `source` is `onboarding` or `checkin`. `status` is `active` or `dormant`; dormant records are kept, never deleted, so retirement loses no history and reactivation needs no re-declaration. `quietRun` counts **positively reported** low days only — a missed check-in resets it to 0, never pauses it. Migrated and normalised on every load by `store._migrateConditionMeta()`, which is idempotent. |
 | `conditionPainScores` | `object` | `{}` | Keyed by condition ID. Written at check-in submission. **04 Aug 2026:** values are now a genuine 0-10 continuous slider input (Pain Input Redesign) — previously only ever 4 representative discrete values (1/4/6/9) from a button UI. No shape change to the field itself; every consumer already used `>=`/`<` range comparisons, not exact-equality, so this needed no other schema or consumer changes. Band/label classification for display is now centralised in `conditions.js`'s `getPainBand()` — see that file. |
 | `conditionReflections` | `array` | `[]` | **New, 04 Aug 2026 (Home Nav Phase A).** `{ conditionId, text, loggedAt }`. Deliberately a separate namespace from `journalEntries` below — **not** subject to the Journal Privacy Rule, coach-readable by design. Decided explicitly to avoid it silently inheriting journal privacy behaviour by accident (see `alongside_blueprint_home-navigation-conditions_04aug2026_v1.md` §3). |
 | `conditionFoldInLevel` | `string\|null` | `null` | **New, 04 Aug 2026 (Home Nav Phase A).** `'partial'\|'mostly'\|'all'\|null`. Fold-in dial setting for the condition programme — whether/how much its exercises are woven into Cardio/Core/Strength sessions vs staying static-only in Mobility & Conditioning. `null` = static-only. |

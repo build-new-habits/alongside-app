@@ -241,7 +241,7 @@ No negative distance windows anywhere.
 ## 9. Open for Graeme
 
 1. **Quiet threshold ≤ 1 and 14 days.** Starting position. Ship and revisit after beta rather than agonising.
-2. **Does `pelvic-floor` go in the picker?** Real reportable area, needs wording care. My inclination is yes, with the same neutrality as every other entry.
+2. ~~Does `pelvic-floor` go in the picker?~~ **DECIDED 29 Aug: yes**, with the same neutral wording as every other entry.
 3. **Never-ask list goes to the health-professional reviewer** with the clinical pack. Not shipped on my judgement.
 
 ---
