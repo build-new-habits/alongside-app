@@ -1,6 +1,38 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 31 Aug 2026 v37
+ *   STRETCH-1. An eighth session type: Stretch.
+ *
+ *   Mobility already existed but its main work is ACTIVE range of motion
+ *   -- CARs, pilates, yoga-flow, rehab-control. `deep-stretch` appeared
+ *   in exactly one place in the whole file, as a cool-down. So somebody
+ *   who wanted twenty minutes of stretching had to pick Mobility and was
+ *   handed controlled articular rotations instead. Asked for by people
+ *   already using the app.
+ *
+ *   NO NEW CONTENT. Counted by running matchCategory over the live
+ *   database rather than assuming: static-stretch 30, deep-stretch 53,
+ *   glute-stretch 15, hamstring-stretch 9, hip-flexor-stretch 8,
+ *   thread-needle 7, supine-rotation 4, chest-stretch 3, lat-stretch 3.
+ *   Ample before condition and equipment filtering.
+ *
+ *   MAIN CATEGORY ORDER IS LOAD-BEARING. poolFor() takes one exercise
+ *   from each category in order and only then fills remaining slots from
+ *   the top of the list. The small, region-specific categories are
+ *   therefore listed FIRST, so a short session gets hamstrings, hips,
+ *   glutes and chest before the two large generic pools absorb what is
+ *   left. Reversed, a 15-minute stretch session would be five entries
+ *   deep in `deep-stretch` and all of them hip openers.
+ *
+ *   `joint-rotation` is NOT used here. It reads like a real category and
+ *   matches zero entries in the database -- checked before writing it in
+ *   rather than after wondering why a section was thin.
+ *
+ *   The warm-up categories are deliberately not empty. Stretching cold
+ *   is worse than not stretching, and the warm-up safety floor applies
+ *   to this type exactly as it does to the others.
+ *
  * 16 Aug 2026 v36
  *   SEVERE-1. The Gentle Care bypass, on both entry points. Rollback is
  *   one constant: SEVERE_BYPASS_ENABLED.
@@ -644,6 +676,22 @@ export const SESSION_TYPES = [
                          "thoracic-mobility", "ankle-mobility"],
     mainCategories:     ["hip-mobility", "thoracic-mobility", "ankle-mobility", "shoulder-mobility", "balance-work", "pilates", "yoga-flow", "rehab-control"],
     cooldownCategories: ["deep-stretch"]
+  },
+  {
+    id:          "stretch",
+    label:       "Stretch",
+    icon:        "\uD83E\uDDD8",
+    description: "Longer holds for hips, hamstrings, back and shoulders. No load.",
+    // Light warmth first. Stretching cold is worse than not stretching,
+    // and the warm-up floor applies here as everywhere else.
+    warmupCategories:   ["cat-cow", "cardio-warmup", "hip-mobility", "breathing-warmup"],
+    // Order matters -- see the v37 note. Small region-specific pools
+    // first so a short session spreads across the body; the two large
+    // generic pools last, to fill.
+    mainCategories:     ["hamstring-stretch", "hip-flexor-stretch", "glute-stretch",
+                         "chest-stretch", "lat-stretch", "thread-needle",
+                         "supine-rotation", "static-stretch", "deep-stretch"],
+    cooldownCategories: ["child-pose", "breathing-cool"]
   }
 ];
 
