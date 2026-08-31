@@ -1,45 +1,9 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v240
+## 31 Aug 2026 v239
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v239.md`. Remove v239 on upload.
+Supersedes `master_schedule_29aug2026_v238.md`. Remove v238 on upload.
 
-> ### 🟢 CARD-2 BUILT AND DEPLOYED 31 Aug — `alongside-v410`. 92/92 gates.
->
-> Graeme's cut, and it is better than CARD-1's. v1 sized sections by phase and familiarity and collapsed the rest; on a device that was still a wall, because the first encounter opened everything — the moment somebody is least able to take it in. Three layers cut by **when** the person needs something instead.
->
-> **Before** — why this helps, how heavy, how long to hold each rep. **During** — how to get there, what to watch for, more on form, the YouTube link. **After** — feedback, not-a-fan, the log block, notes, the grounding moment. Only one layer on screen, so six instructions is fine: that is the thing being done.
->
-> #### 🔴 What is pinned, and why it must stay that way
->
-> **The caution and one cue sit ABOVE the tablist, visible in all three layers.** Content behind a tab is *more* hidden than content behind a collapsed section, because you have to know the tab exists. `bodyCaution` renders whenever it fires, in every layer, always. Three gate assertions defend this and two were reversal-tested.
->
-> #### 🟢 The log block moved — Graeme's device-test finding, now fixed
->
-> `gym-programme.js` rendered `renderLogBlock` **above** the card, so band, reps and Save were the first thing on screen before a single rep had been done. It is an After thing that was sitting in the Before position. Now inside the After layer, with a gate asserting the ordering.
->
-> #### 🟢 `running: false` fixed
->
-> Hardcoded in `prescribed-session.js` and `gym-programme.js` on 29 Aug while both held live `timerStarted` state, so the phase half of CARD-1 was never wired there. Both now pass real state; `core-session` passes `!!timerInterval`. The **preview list keeps `running: false`**, which is correct — it genuinely is before the start. A gate now fails if either live-timer view hardcodes it again.
->
-> #### 🟢 P4 exposure removed rather than defended
->
-> CARD-1 read `exerciseHistory` to size the card and needed a gate to stop the count reaching the screen. With one layer on screen the density problem that model solved no longer exists, so **the familiarity model is gone and `exercise-card.js` no longer reads `exerciseHistory` at all.** Nothing to leak, rather than a leak that is guarded.
->
-> #### 🟢 `holdSeconds` lands where TIME-1 left it
->
-> Surfaced in Before as a line of text — "hold each one for about 3 seconds" — while `exercise-timing.js` still refuses to read it. Both halves gated in the same file.
->
-> #### 🟢 Shipped
->
-> `js/exercise-card.js` **v2** · `workout.js` **v15** · `prescribed-session.js` **v8** · `gym-programme.js` **v10** · `core-session.js` **v10** · `css/components/workout.css` **v10** · `tools/verify-card2.mjs` — 20 checks, **replaces `verify-card1.mjs`, which was deleted rather than left passing against a model that no longer exists** · `sw.js` **v410**, alone.
->
-> Real tablist: `role="tablist"`, roving `tabindex`, arrow/Home/End keys, panels hidden by attribute so the accessibility tree stays honest. The "always show full instructions" preference **flattens the tabs entirely** rather than opening one — somebody who asked for all of it should not be sent to three places to get it.
->
-> **Four reversals proven failing:** caution moved into a layer, familiarity read restored, log block back above the card, `running: false` re-hardcoded.
->
-> #### 🟠 Untested on device. Three views changed shape at once.
->
 > ### 🔴 DATE ERROR — everything headed "29 Aug 2026" was written on the 31st
 >
 > The date was taken from "29 AUGUST Saturday" in Graeme's app screenshot instead of from the clock. That is exactly what the verify-the-date-before-writing rule exists to prevent, and it was not followed.
@@ -149,7 +113,7 @@ Supersedes `master_schedule_31aug2026_v239.md`. Remove v239 on upload.
 > | **CHECKIN-2a** | Add a sore area at check-in. **BUILT AND DEPLOYED 29 Aug**, `alongside-v408`. Schema decision reversed during build — see below | 🟢 Shipped, untested on device | 29 Aug |
 > | **CHECKIN-2b** | Condition resolution, quiet-run tracking, the noticing ask | 🔵 Spec complete | After 2a |
 > | **TIME-1** | One timer source, `js/exercise-timing.js`. **BUILT AND DEPLOYED 31 Aug**, `alongside-v409`. Premise corrected during build — `duration` is canonical, not `holdSeconds` | 🟢 Shipped, untested on device | 31 Aug |
-> | **CARD-2** | Three-layer card. **BUILT AND DEPLOYED 31 Aug**, `alongside-v410`. Supersedes CARD-1's disclosure model; fixes `running: false` and the log block above the card | 🟢 Shipped, untested on device | 31 Aug |
+> | **CARD-2** | Three-layer card. Supersedes CARD-1 disclosure model; also fixes the hardcoded `running: false` | 🟠 Needs spec | w/c 31 Aug |
 >
 > ### 🟠 CARD-1 BUILD STARTED 29 Aug — steps 1–3 of 8. NOT DEPLOYED.
 >
@@ -5335,4 +5299,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v240*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v239*
