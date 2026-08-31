@@ -42,7 +42,11 @@ const check = (name, ok, detail = '') => {
 };
 
 const CEILINGS = { sedentary: 2, light: 3, returning: 3, moderate: 4 };
-const SESSION_TYPES = ['full', 'mobility', 'core', 'cardio', 'lower', 'upper', 'glute'];
+// Derived, not hardcoded. This was a fixed list of seven ids, so an
+// eighth session type would have inherited none of the ceiling or
+// starvation coverage below while this gate stayed green -- the same
+// drift the live-length check in verify-tiergh already guards against.
+const SESSION_TYPES = sb.SESSION_TYPES.map(t => t.id);
 
 // ── W2-1 ─────────────────────────────────────────────────────
 store.init();
