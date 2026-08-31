@@ -1,6 +1,13 @@
 /* ============================================
    WORKOUT STYLES
    css/components/workout.css
+   31 Aug 2026 v10
+
+   v10 - CARD-2. .xcard-tabs / .xcard-tab / .xcard-panel replace the v9
+   disclosure styles. The tab is a real tablist button, so it needs a
+   target size and a focus ring; panels use the [hidden] attribute rather
+   than a display class so the accessibility tree stays honest.
+
    29 Aug 2026 v9
 
    v9 - CARD-1. .xcard-* — the shared exercise card and its disclosures.
@@ -1304,7 +1311,8 @@
 
 
 /* ============================================
-   CARD-1 — shared exercise card
+   CARD-2 — three-layer exercise card
+   (supersedes the CARD-1 disclosure styles)
    ============================================ */
 
 .exercise-card {
@@ -1313,87 +1321,83 @@
   gap: var(--space-2);
 }
 
-/* The caution is the personalised safety line. It leads the card and it
-   has no control, at any familiarity level, in any phase. Styling it
-   distinctly is the point: it is not part of the run of static prose. */
+/* PINNED. Caution and the lead cue sit above the tabs and are visible in
+   every layer. Styled apart from the panel content on purpose: they are
+   not part of the run of prose, and they never move behind a tab. */
 .exercise-card .exercise-caution {
   margin: 0 0 var(--space-2) 0;
 }
 
-.xcard-section {
-  border-top: 1px solid var(--color-border-light, rgba(255, 255, 255, 0.12));
+.xcard-lead-cue {
+  margin: 0 0 var(--space-3) 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed, 1.6);
 }
 
-.xcard-section:first-of-type {
-  border-top: none;
-}
-
-.xcard-toggle {
+.xcard-tabs {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 48px;            /* WCAG 2.2 target size */
-  padding: var(--space-3) 0;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--color-border-light, rgba(255, 255, 255, 0.12));
+}
+
+.xcard-tab {
+  flex: 1 1 0;
+  min-height: 48px;              /* WCAG 2.2 target size */
+  padding: var(--space-2) var(--space-1);
   background: none;
   border: none;
+  border-bottom: 2px solid transparent;
   color: inherit;
   font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.xcard-toggle:focus-visible {
-  outline: 2px solid var(--color-primary, currentColor);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm, 4px);
-}
-
-.xcard-toggle-label {
   font-size: var(--text-sm);
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+.xcard-tab[aria-selected="true"] {
+  opacity: 1;
   font-weight: var(--font-bold, 700);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--color-primary, currentColor);
+  border-bottom-color: var(--color-primary, currentColor);
 }
 
-/* Decorative. The label and aria-expanded carry the meaning. */
-.xcard-toggle-chev {
-  flex: 0 0 auto;
-  width: 0.6em;
-  height: 0.6em;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: rotate(45deg);
-  opacity: 0.6;
-  transition: transform 150ms ease;
+.xcard-tab:focus-visible {
+  outline: 2px solid var(--color-primary, currentColor);
+  outline-offset: -2px;
 }
 
-.xcard-toggle[aria-expanded="true"] .xcard-toggle-chev {
-  transform: rotate(-135deg);
+.xcard-panel {
+  padding-top: var(--space-3);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .xcard-toggle-chev { transition: none; }
-}
-
-.xcard-section-body {
-  padding-bottom: var(--space-3);
-}
-
-/* [hidden] must win. A later display rule on a child class would
-   otherwise re-show a section the button says is closed. */
-.xcard-section-body[hidden] {
+/* [hidden] must win over any later display rule on a panel or its
+   children, or a tab could say closed while its content is on screen. */
+.xcard-panel[hidden] {
   display: none !important;
 }
 
-.xcard-lead-cue {
-  padding: var(--space-3) 0;
+/* The panel is focusable so keyboard users land in the content after
+   choosing a tab. It should not draw a ring when reached by mouse. */
+.xcard-panel:focus:not(:focus-visible) {
+  outline: none;
 }
 
-.xcard-lead-cue .exercise-cue {
+.xcard-block + .xcard-block {
+  margin-top: var(--space-4);
+}
+
+.xcard-hold,
+.xcard-empty {
   margin: 0;
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed, 1.6);
+}
+
+.xcard-empty {
+  opacity: 0.7;
+}
+
+/* Display preference "always show full instructions" flattens the tabs
+   entirely rather than opening one of them. */
+.exercise-card--flat .xcard-block + .xcard-block {
+  margin-top: var(--space-4);
 }
