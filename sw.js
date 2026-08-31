@@ -1,6 +1,16 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v412
+ *
+ * v412 - CARD-3 follow-up. Cross-view navigation bug. Every view binds
+ *   xcard:page on the shared #app root and none unbinds, so a handler
+ *   from a view visited earlier stays live: Back inside a core session
+ *   fired workout.js's handler too and navigated out of the session.
+ *   Each handler now ignores cards that are not its own, by the prefix
+ *   already carried in the event detail. Found on review before device
+ *   test, not by a gate -- assertion 11 is now that gate.
+ *
  * 31 Aug 2026 v411
  *
  * v411 - CARD-3. No new files to precache. exercise-card.js is already
@@ -2863,7 +2873,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v411";
+const CACHE_NAME = "alongside-v412";
 
 const SHELL_URLS = [
 
