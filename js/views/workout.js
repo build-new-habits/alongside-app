@@ -1,5 +1,10 @@
 /**
  * workout.js - Workout Execution View
+ * 31 Aug 2026 v15
+ *
+ * v15 - CARD-2. Three-layer card. Feedback control, grounding moment and
+ *   session notes move into the After layer.
+ *
  * 31 Aug 2026 v14
  *
  * v14 - TIME-1. Timing resolves through js/exercise-timing.js rather than
@@ -325,29 +330,28 @@ export function render() {
         <!-- CARD-1. One shared renderer. Caution first, hazards before the
              explanatory text, feedback last. Sections size themselves by
              phase and familiarity; nothing safety-bearing collapses. -->
-        ${renderExerciseCard(exercise, { idPrefix: `wo-${currentExerciseIndex}`, running: timerStarted })}
+        <!-- CARD-2. Three layers. Feedback, the grounding moment and the
+             session notes all belong to After, so they no longer sit
+             between the guidance and the controls. -->
+        ${renderExerciseCard(exercise, {
+          idPrefix: `wo-${currentExerciseIndex}`,
+          running:  timerStarted,
+          afterSlot: `
+            ${renderFeedbackControl(exercise)}
 
-        <!-- FEED-1. Two buttons, no "about right" -- silence already means
-             that, and a third option turns an optional aside into a
-             question on every exercise. Not a rating: no stars, no scale.
-             Two of the last five are needed before selection moves
-             anything, and nothing is ever displayed back. Now LAST, so it
-             no longer sits above the hazard list. -->
-        ${renderFeedbackControl(exercise)}
+            ${groundingMoment ? `
+              <aside class="gmoment" aria-label="Something to notice">
+                <p class="gmoment__text">${groundingMoment.text}</p>
+                <button class="gmoment__dismiss" id="gmoment-dismiss"
+                        aria-label="Do not show this one again">Not for me</button>
+              </aside>
+            ` : ""}
 
-        ${groundingMoment ? `
-          <aside class="gmoment" aria-label="Something to notice">
-            <p class="gmoment__text">${groundingMoment.text}</p>
-            <button class="gmoment__dismiss" id="gmoment-dismiss"
-                    aria-label="Do not show this one again">Not for me</button>
-          </aside>
-        ` : ""}
-
-        <!-- Session notes. LOG-1: this used to exist only in
-             gym-programme.js, so a coach-built session offered no way to
-             write anything down. Same block, same nine metrics, chosen
-             per equipment. Returns "" when switched off. -->
-        ${renderLogBlock(exercise, `wo-log-${currentExerciseIndex}`)}
+            <!-- Session notes. LOG-1: this used to exist only in
+                 gym-programme.js, so a coach-built session offered no way
+                 to write anything down. -->
+            ${renderLogBlock(exercise, `wo-log-${currentExerciseIndex}`)}`
+        })}
       </div>
 
       <!-- Action buttons -->

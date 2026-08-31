@@ -33,6 +33,14 @@
  *
  * 29 Aug 2026 v9
  *
+ * 31 Aug 2026 v10
+ *
+ * v10 - CARD-2. Three-layer card in the working view. YouTube into
+ *   During, feedback and the log block into After. `running` now reflects
+ *   real timer state rather than a hardcoded false. The preview list
+ *   keeps running:false, which is correct there -- it genuinely is before
+ *   the start.
+ *
  * v9 - CARD-1. Working view AND the pre-session preview list move to
  *   the shared renderer. Two renderers in one file is the drift the
  *   shared card exists to prevent; the preview is simply `running: false`. bodyCaution
@@ -514,7 +522,7 @@ function renderSessionOverview() {
             </button>
 
             <div class="gym-exercise-detail" id="core-ex-detail-${i}" hidden>
-              ${renderExerciseCard(ex, { idPrefix: `cs-pre-${i}`, running: false })}
+              ${renderExerciseCard(ex, { idPrefix: `cs-pre-${i}`, running: false })}  <!-- preview: genuinely pre-start, so Before is correct -->
             </div>
           </div>
         `).join("")}
@@ -634,24 +642,26 @@ function renderExercise() {
 
         <p class="exercise-description">${ex.description}</p>
 
-        ${renderExerciseCard(ex, { idPrefix: `cs-${ex.id}`, running: false })}
+        ${renderExerciseCard(ex, {
+          idPrefix: `cs-${ex.id}`,
+          running:  !!timerInterval,
+          duringSlot: `
+            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.youtube || (ex.name + " exercise form"))}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="youtube-link"
+               aria-label="Watch how to do ${ex.name} on YouTube (opens in new tab)">
+              <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
+              Watch how to do this
+            </a>`,
+          afterSlot: `
+            ${renderFeedbackControl(ex)}
 
-        <!-- FEED-1. Now LAST, so it no longer sits above the hazard list. -->
-        ${renderFeedbackControl(ex)}
-
-        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.youtube || (ex.name + " exercise form"))}"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="youtube-link"
-           aria-label="Watch how to do ${ex.name} on YouTube (opens in new tab)">
-          <span class="youtube-icon" aria-hidden="true">\u25B6\uFE0F</span>
-          Watch how to do this
-        </a>
-
-        <!-- LOG-3. Card-shaped view, so the shared block applies. Full
-             field set: core work is loaded and repped like any other
-             strength exercise, unlike yoga's gentle mode. -->
-        ${renderLogBlock(ex, `cs-log-${currentIndex}`)}
+            <!-- LOG-3. Card-shaped view, so the shared block applies. Full
+                 field set: core work is loaded and repped like any other
+                 strength exercise, unlike yoga's gentle mode. -->
+            ${renderLogBlock(ex, `cs-log-${currentIndex}`)}`
+        })}
 
       </div>
 
