@@ -1,27 +1,9 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v242
+## 31 Aug 2026 v241
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v241.md`. Remove v241 on upload.
+Supersedes `master_schedule_31aug2026_v240.md`. Remove v240 on upload.
 
-> ### 🔴 TIME-2 — `duration` is two different things and the UI labels both "Hold"
->
-> Found by Graeme reviewing the CARD-3 mockup: *"if doing 8 reps is a timer needed?"* Checked against live data — **inchworm** `duration: 90` with **no reps field at all** (its "8 reps" exists only inside the instructions prose); **bird-dog** `duration: 90`, `reps: "8 each side"` and `holdSeconds: 3` together; **plank** `duration: 60`, `reps: null`, `holdSeconds: 30`.
->
-> **`duration` means both "hold this long" and "spend about this long doing reps", and the timer labels both "Hold".** The device screenshot read **"1:30 Hold"** on eight reps of walking your hands out to a plank. The number is a fair time budget; the word is wrong.
->
-> **TIME-1 unified where the number comes from. It did not establish what kind of number it is.** `reps` cannot be the discriminator — null on plank, absent on inchworm, populated on bird-dog. Needs a structured held-vs-repped distinction, correct labels, and a plain **Done** path on rep-based exercises.
->
-> **🔴 CARD-3 must not ship a page 2 labelling a rep budget as a hold.** Interim: "About 1:30" where it is not a genuine hold.
->
-> #### 🟢 Band question answered — CARD-3 blueprint v2 §4.1
->
-> The mockup showed "Blue band, 8 reps" under last time and no way to choose today's band. **Deliberate, now written down: page 1 remembers, page 3 records.** A picker on page 1 would duplicate the log field, eat the 4-control budget, and force a commitment before the information exists — you do not know what band you used until you have used it.
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **TIME-2** | Held vs repped distinction, correct timer labels, plain Done on rep-based | 🟠 Needs spec | w/c 31 Aug |
->
 > ### 🔴 CARD-3 SPECCED 31 Aug — supersedes CARD-2 the same morning it shipped.
 >
 > `Documents/Admin/alongside_blueprint_CARD-3_31aug2026_v1.md`. **Spec only, no code.** Graeme device-tested `alongside-v410` and moved between exercises without ever opening During or After.
@@ -5395,4 +5377,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v242*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v241*
