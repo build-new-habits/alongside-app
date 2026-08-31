@@ -312,6 +312,8 @@
 
   --color-success:        #047857;
   --color-warning:        #92400E;   /* amber is unreadable on white; this is its usable form */
+  --color-danger:         #9F1239;   /* rose #FB7185 is ~2.6:1 on white; this is its usable form */
+  --color-danger-light:   rgba(159, 18, 57, 0.10);
 
   --color-border:         #64748B;   /* 4.76 on card -- above the 3:1 needed for boundaries */
   --color-border-light:   #CBD5E1;
