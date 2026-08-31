@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v414
+ *
+ * v414 - STRETCH-1. An eighth session type. No new files: session types
+ *   are data inside session-builder.js, which is already precached. The
+ *   bump is so a stale shell does not offer seven types while the rest
+ *   of the app knows about eight.
+ *
  * 31 Aug 2026 v413
  *
  * v413 - CARD-3 device-test fixes. lastLine() returns markup, not a
@@ -2881,7 +2888,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v413";
+const CACHE_NAME = "alongside-v414";
 
 const SHELL_URLS = [
 
