@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v413
+ *
+ * v413 - CARD-3 device-test fixes. lastLine() returns markup, not a
+ *   plain string, and its no-data case returns a populated paragraph
+ *   rather than "" -- so the card printed the tags on screen and treated
+ *   "no note yet" as data. Both fixed. The hazard list gets a rose box.
+ *   CSS and a token changed, so the shell must not serve the old ones.
+ *
  * 31 Aug 2026 v412
  *
  * v412 - CARD-3 follow-up. Cross-view navigation bug. Every view binds
@@ -2873,7 +2881,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v412";
+const CACHE_NAME = "alongside-v413";
 
 const SHELL_URLS = [
 
