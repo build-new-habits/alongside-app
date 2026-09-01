@@ -191,7 +191,7 @@
 
 import { store }                          from "../store.js";
 import { router }                         from "../router.js";
-import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection } from "../session-builder.js";
+import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, severeZoneToday } from "../session-builder.js";
 // R4, 20 Aug 2026. isPremium/lockedFeature are no longer used in this
 // file. Every step of the builder -- type, duration, allocation split,
 // location, build mode -- is now free. The import is REMOVED rather than
@@ -288,6 +288,35 @@ const EQUIPMENT_OPTIONS = [
 // ── Render ────────────────────────────────────────────────────────────────────
 
 export function render() {
+  // ── BYPASS-DOOR ────────────────────────────────────────────────────
+  //
+  // Ask the question before the work, not after it. The severe bypass has
+  // always fired inside buildSession() and buildSessionFromSelection(),
+  // which is correct and unchanged -- but it fired at the END. On device
+  // at pain 8: type, duration, split, equipment, hand-pick ten exercises,
+  // and then the Gentle Care card. The answer had been fixed before the
+  // first tap and the five minutes were spent for nothing.
+  //
+  // Worse than wasted time, it reads as the coach ignoring you. Somebody
+  // who asked for mostly-mobility and got breathing exercises reasonably
+  // concludes the coach got it wrong, rather than that it was listening.
+  //
+  // There is no override here on purpose. At 8 the answer is no session,
+  // so the alternative offered is leaving the builder, not building
+  // anyway. Adding a "build it regardless" escape would be a clinical
+  // loosening and is not mine to make.
+  if (phase !== "preview" || !builtSession?.gentleCare) {
+    const severeZone = severeZoneToday();
+    if (severeZone) {
+      builtSession = buildSession({
+        sessionType:  selectedType || "full",
+        durationMins: selectedDuration || 20
+      });
+      phase = "preview";
+      return renderPreview();
+    }
+  }
+
   if (phase === "type")       return renderTypePicker();
   if (phase === "location")   return renderLocationStep();
   if (phase === "duration")   return renderDurationPicker();
@@ -456,6 +485,32 @@ function renderDurationPicker() {
         <p class="coach-message-text">How long have you got today?</p>
       </div>
 
+      <!-- SPLIT-ORDER. The split used to render BELOW the durations.
+           Tapping a duration advances to the equipment step immediately,
+           so anybody reading top-down left the screen before reaching it
+           -- which is why "Mostly strength" appeared not to exist at all.
+           It is not a hidden feature, it was underneath the control that
+           navigates away. The choice that does not advance goes first. -->
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-2);">
+        How should today's time split across warm-up, work, and cool-down?
+      </p>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-5);"
+           role="group" aria-label="Choose session balance">
+        ${ALLOCATION_PRESETS.map(p => `
+          <button class="card sb-preset-btn ${selectedPreset === p.id ? 'sb-preset-btn--selected' : ''}"
+                  data-preset="${p.id}"
+                  style="display:block;text-align:left;width:100%;cursor:pointer;background:var(--color-surface);padding:var(--space-3) var(--space-4);
+                         border:2px solid ${selectedPreset === p.id ? 'var(--color-primary)' : 'transparent'};"
+                  aria-pressed="${selectedPreset === p.id}">
+            <span style="font-weight:var(--font-semibold);">${p.label}</span>
+            <span class="text-secondary" style="font-size:var(--text-sm);display:block;">${p.description}</span>
+          </button>
+        `).join("")}
+      </div>
+
+      <p class="text-sm text-muted" style="margin-bottom: var(--space-2);">
+        Then choose how long, and we'll get going.
+      </p>
       <div style="display:flex;flex-direction:column;gap:var(--space-3);"
            role="group" aria-label="Choose duration">
         ${DURATIONS.map(d => {
@@ -480,25 +535,10 @@ function renderDurationPicker() {
         }).join("")}
       </div>
 
-      <!-- R4, 20 Aug 2026. This block was wrapped in a tier-conditional
-           template expression. The warm-up/work/cool-down split is
-           self-direction and is now free, so it is unwrapped entirely
-           rather than left as a condition that always evaluates true. -->
-        <p class="text-sm text-muted" style="margin-top: var(--space-5); margin-bottom: var(--space-2);">
-          How should today's time split across warm-up, work, and cool-down?
-        </p>
-        <div style="display:flex;flex-direction:column;gap:var(--space-2);" role="group" aria-label="Choose session balance">
-          ${ALLOCATION_PRESETS.map(p => `
-            <button class="card sb-preset-btn ${selectedPreset === p.id ? 'sb-preset-btn--selected' : ''}"
-                    data-preset="${p.id}"
-                    style="display:block;text-align:left;width:100%;cursor:pointer;background:var(--color-surface);padding:var(--space-3) var(--space-4);
-                           border:2px solid ${selectedPreset === p.id ? 'var(--color-primary)' : 'transparent'};"
-                    aria-pressed="${selectedPreset === p.id}">
-              <span style="font-weight:var(--font-semibold);">${p.label}</span>
-              <span class="text-secondary" style="font-size:var(--text-sm);display:block;">${p.description}</span>
-            </button>
-          `).join("")}
-        </div>
+      <!-- R4, 20 Aug 2026. The split block was wrapped in a tier
+           conditional; it is free self-direction and was unwrapped.
+           SPLIT-ORDER, 31 Aug: it now renders ABOVE the durations, since
+           choosing a duration navigates away. -->
 
     </div>
   `;
@@ -816,6 +856,24 @@ function renderPreview() {
         <span class="workout-header-title">${builtSession.title}</span>
       </div>
 
+      ${builtSession.gentleCare ? `
+        <!-- BYPASS-RED. The coachLine below says this, but it says it in
+             body prose, and body prose is what people skim once they have
+             read a few of them. Somebody who asked for mostly-mobility and
+             skims past the explanation concludes the coach got the session
+             wrong. The number is stated outright, in the same rose
+             language the hazard list uses, so there is one visual grammar
+             for "this is not ordinary text". -->
+        <div class="sb-severe-banner" role="note">
+          <p class="sb-severe-banner__head">Your session has been changed</p>
+          <p class="sb-severe-banner__body">
+            You logged pain in your ${builtSession.severeZone || "body"} at 8 or above today.
+            At that level I do not build a training session. This is not the session you
+            asked for, and that is deliberate.
+          </p>
+        </div>
+      ` : ""}
+
       <div class="card card-coach" style="margin-bottom: var(--space-4);">
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
         <div>
@@ -889,7 +947,7 @@ function renderPreview() {
           Let's go
         </button>
         <button class="btn btn-ghost btn-full" id="sb-rebuild-btn">
-          Build a different one
+          ${builtSession.gentleCare ? "Back to Today" : "Build a different one"}
         </button>
       </div>
 
@@ -1022,6 +1080,12 @@ export function onMount() {
 
   // Back button
   document.getElementById("sb-back-btn")?.addEventListener("click", () => {
+    // Same trap as sb-rebuild-btn: any backward step re-enters the door.
+    if (builtSession?.gentleCare) {
+      resetState();
+      router.navigate("today");
+      return;
+    }
     if (phase === "type") {
       resetState();
       router.navigate("today");
@@ -1242,6 +1306,15 @@ export function onMount() {
 
   // Build a different one
   document.getElementById("sb-rebuild-btn")?.addEventListener("click", () => {
+    // BYPASS-DOOR. Returning to the type picker while the door is closed
+    // would land straight back on this card -- a soft trap with no way
+    // out. At pain 8 the honest exit is out of the builder entirely,
+    // which is what the button now says.
+    if (builtSession?.gentleCare) {
+      resetState();
+      router.navigate("today");
+      return;
+    }
     builtSession = null;
     phase        = "type";
     rerender();

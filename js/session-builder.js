@@ -1,6 +1,30 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 31 Aug 2026 v38
+ *   BYPASS-DOOR + STRETCH-1 warm-up correction.
+ *
+ *   severeZoneToday() is now EXPORTED. It was private so that every route
+ *   through buildSession() got the same answer, and that reasoning still
+ *   holds for the decision itself -- what changes is that the builder UI
+ *   needs to ASK the question before it starts, not discover the answer
+ *   after five minutes of work. Found on device: at pain 8 you could walk
+ *   the whole builder -- type, duration, split, equipment, hand-pick
+ *   every exercise -- and be handed the Gentle Care card at the end. The
+ *   decision had already been made before the first tap. Being told at
+ *   the door is kinder AND more honest than being told at the till.
+ *
+ *   The export does not move the decision. The bypass still fires inside
+ *   both build functions, exactly as before, so a route that skips the
+ *   door still gets caught. The door is an addition, not a replacement.
+ *
+ *   STRETCH-1 CORRECTION. Stretch is now excluded from the pulse-raiser
+ *   rule, alongside Cardio and Mobility. Shipped this morning it was not,
+ *   so a Stretch warm-up served Seated Punches and Seated Arm Cycling --
+ *   `cardio-warmup` is region-blind in the same way `activation` is, and
+ *   a stretch session does not want a pulse raiser reserving a slot. The
+ *   category is dropped from Stretch's warm-up for the same reason.
+ *
  * 31 Aug 2026 v37
  *   STRETCH-1. An eighth session type: Stretch.
  *
@@ -684,7 +708,10 @@ export const SESSION_TYPES = [
     description: "Longer holds for hips, hamstrings, back and shoulders. No load.",
     // Light warmth first. Stretching cold is worse than not stretching,
     // and the warm-up floor applies here as everywhere else.
-    warmupCategories:   ["cat-cow", "cardio-warmup", "hip-mobility", "breathing-warmup"],
+    // `cardio-warmup` was here on first ship and is deliberately gone:
+    // it is region-blind, and it served Seated Punches and Seated Arm
+    // Cycling into a stretch session. Gentle movement, not a pulse raiser.
+    warmupCategories:   ["cat-cow", "hip-mobility", "breathing-warmup", "thoracic-mobility"],
     // Order matters -- see the v37 note. Small region-specific pools
     // first so a short session spreads across the body; the two large
     // generic pools last, to fill.
@@ -923,6 +950,12 @@ function buildActiveConditionSet() {
 export function pulseRaiserDecision(sessionType) {
   if (sessionType === "cardio") {
     return { include: false, reason: null };   // the session is the warm-up
+  }
+  if (sessionType === "stretch") {
+    // Same reasoning as Mobility. A stretch session opens with gentle
+    // movement by design, and reserving a slot for a pulse raiser is what
+    // put Seated Punches in front of somebody who asked to stretch.
+    return { include: false, reason: null };
   }
   if (sessionType === "mobility") {
     return { include: false, reason: null };   // opens with breathing by design
@@ -1771,7 +1804,7 @@ const SEVERE_BYPASS_ENABLED = true;
  * answer -- the alternative is each view deciding for itself, which is
  * how a safety rule ends up living in one view of thirteen.
  */
-function severeZoneToday() {
+export function severeZoneToday() {
   const ids    = store.get("conditions") || [];
   const scores = store.get("conditionPainScores") || {};
 
