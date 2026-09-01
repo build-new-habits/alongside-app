@@ -961,7 +961,7 @@ export function onMount() {
     onExit:   () => { savePartialSession(); resetSession(); router.navigate("reflect"); }
   });
   document.getElementById("rs-back-btn")?.addEventListener("click", () => {
-    if (phase === "type")     { resetSession(); router.navigate("intention"); }
+    if (phase === "type")     { resetSession(); router.navigate("today"); }
     else if (phase === "duration") { phase = "type";     rerender(); }
     else if (phase === "overview") { phase = "duration"; rerender(); }
   });
@@ -1002,7 +1002,7 @@ export function onMount() {
 
   document.getElementById("rs-home-btn")?.addEventListener("click", () => {
     resetSession();
-    router.navigate("intention");
+    router.navigate("today");
   });
 
   document.getElementById("rs-resume-btn")?.addEventListener("click", resumeSession);

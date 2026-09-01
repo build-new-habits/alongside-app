@@ -1,5 +1,26 @@
 /**
  * router.js
+ * 31 Aug 2026 v23
+ *   BACK-STACK + intention.js retired.
+ *
+ *   BACK ONLY EVER WORKED ONCE. back() popped an entry and then called
+ *   navigate(), which pushed the view being LEFT straight back onto the
+ *   stack. The stack never unwound -- it oscillated between the last two
+ *   screens -- while the popstate handler kept adding browser entries.
+ *   Which press closed the app depended on how far the two had drifted
+ *   apart. Reported repeatedly as "back goes back one page, then it
+ *   kicks you out", which was an exact description of the mechanism.
+ *
+ *   navigate() now takes { fromBack }, and a navigation caused by going
+ *   back pushes nothing. Each press removes one step. At the bottom the
+ *   gesture is allowed through so the app closes from Today rather than
+ *   trapping somebody inside it.
+ *
+ *   The 'intention' route is REMOVED. It duplicated coach-reflection.js,
+ *   rendered its own <h1>Today</h1> while not being Today, and was the
+ *   landing place for every session exit. Flagged 19 Jul, raised four
+ *   more times since. The file is deleted, not orphaned.
+ *
  * 22 Aug 2026 v22
  *   THREAD-1a. New 'goal-review' route -- the hard conversation, which
  *   is entered from My Programme rather than opened over it. Back goes
@@ -185,7 +206,6 @@ const VIEW_NAMES = {
   'checkin-mini':      { path: './views/checkin-mini.js',     fn: 'CheckinMiniView'     },
   'coach-proposal':    { path: './views/coach-proposal.js',   fn: 'CoachProposalView'   },
   'home-threshold':    { path: './views/home-threshold.js',   fn: 'HomeThresholdView'   },
-  'intention':         { path: './views/intention.js',        fn: 'IntentionView'       },
   'reflect':           { path: './views/reflect.js',          fn: 'ReflectView'         },
 
   // ── Main views ─────────────────────────────────────────────────────────────
@@ -268,7 +288,7 @@ const hideNavViews = new Set([
 const NAV_MAP = {
   'today': 'today', 'checkin': 'today', 'checkin-mini': 'today',
   'coach-proposal': 'today',
-  'home-threshold': 'today', 'intention': 'today', 'reflect': 'today',
+  'home-threshold': 'today', 'reflect': 'today',
   'workout': 'today', 'gym-programme': 'today', 'morning-session': 'today',
   'core-session': 'today', 'yoga-session': 'today', 'walk-session': 'today',
   'running-session': 'today', 'cycle-session': 'today', 'swim-session': 'today',
@@ -314,13 +334,20 @@ export const router = {
     this._setupNavButtons();
   },
 
-  async navigate(viewName) {
+  async navigate(viewName, opts = {}) {
     if (!VIEW_NAMES[viewName]) {
       console.warn(`Router: unknown view "${viewName}" — falling back to today`);
       viewName = 'today';
     }
 
-    history.pushState({ view: viewName }, '', `#${viewName}`);
+    // BACK-STACK, 31 Aug 2026. `fromBack` marks a navigation that is
+    // itself the result of going back. Such a navigation must not push
+    // anything -- not onto the browser stack, not onto ours -- or the
+    // act of retreating adds a step, which is why back only ever worked
+    // once. See back() below.
+    if (!opts.fromBack) {
+      history.pushState({ view: viewName }, '', `#${viewName}`);
+    }
 
     // ONUNMOUNT-1. Tear the outgoing view down before mounting the next.
     //
@@ -342,7 +369,7 @@ export const router = {
       }
     }
 
-    if (this.currentView && this.currentView !== viewName) {
+    if (!opts.fromBack && this.currentView && this.currentView !== viewName) {
       this.history.push(this.currentView);
       if (this.history.length > 20) this.history.shift();
     }
@@ -352,8 +379,26 @@ export const router = {
   },
 
   back() {
+    // BACK-STACK, 31 Aug 2026. This popped one entry and then called
+    // navigate(), which pushed the view being LEFT straight back on. So
+    // the stack never unwound -- it oscillated between the last two
+    // screens, and once the browser's own entries ran out the app
+    // closed. Reported repeatedly as "back works once, then it kicks you
+    // out of the app". That description was exact.
+    //
+    // Going back is now a navigation that pushes nothing, so each press
+    // removes one step and the stack unwinds to the bottom.
     const prev = this.history.pop();
-    this.navigate(prev || 'today');
+    this.navigate(prev || 'today', { fromBack: true });
+  },
+
+  /**
+   * True when there is nowhere left to go back to. The app should close
+   * from the bottom of the stack rather than trap somebody inside it --
+   * a back gesture that never exits is its own bug.
+   */
+  canGoBack() {
+    return this.history.length > 0;
   },
 
   async _mountView(viewName) {
@@ -451,6 +496,14 @@ export const router = {
     history.pushState({ view: 'today' }, '', '#today');
     window.addEventListener('popstate', e => {
       if (e.state?.sessionGuard) return; // let session-guard.js handle its own state — 28 Jul 2026, fixes router.js silently overriding the back-gesture exit-guard card
+
+      // BACK-STACK. At the bottom of the stack, let the gesture do what
+      // the platform expects and leave. Re-pushing here unconditionally
+      // is what made the app feel like it closed at random: it kept
+      // adding browser entries while our own stack was oscillating, so
+      // which press exited depended on how the two had drifted apart.
+      if (!this.canGoBack() && this.currentView === 'today') return;
+
       const view = e.state?.view || 'today';
       history.pushState({ view }, '', `#${view}`);
       this.back();
