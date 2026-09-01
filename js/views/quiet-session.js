@@ -1067,7 +1067,7 @@ export function onMount() {
 
   document.querySelectorAll(".quiet-back-btn, #quiet-back-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      const returnRoute = store.get("quietReturnRoute") || "intention";
+      const returnRoute = store.get("quietReturnRoute") || "today";
       if (mode && mode !== "selector") {
         const launchedDirectly = store.get("quietLaunchedDirect") || false;
         if (launchedDirectly) {
@@ -1107,7 +1107,7 @@ export function onMount() {
   });
 
   document.getElementById("quiet-breathing-done-btn")?.addEventListener("click", () => {
-    const returnRoute = store.get("quietReturnRoute") || "intention";
+    const returnRoute = store.get("quietReturnRoute") || "today";
     cleanup();
     store.set("quietMode", null);
     store.set("quietReturnRoute", null);
@@ -1127,7 +1127,7 @@ export function onMount() {
   document.getElementById("quiet-journal-save-btn")?.addEventListener("click", saveJournalEntry);
 
   document.getElementById("quiet-journal-skip-btn")?.addEventListener("click", () => {
-    const returnRoute = store.get("quietReturnRoute") || "intention";
+    const returnRoute = store.get("quietReturnRoute") || "today";
     cleanup();
     store.set("quietMode", null);
     store.set("quietReturnRoute", null);

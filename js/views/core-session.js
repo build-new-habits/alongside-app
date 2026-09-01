@@ -1168,7 +1168,7 @@ export function onMount() {
   document.getElementById("cs-back-btn")?.addEventListener("click", () => {
     if (phase === "focus") {
       resetSession();
-      router.navigate("intention");
+      router.navigate("today");
     } else if (phase === "duration") {
       phase = "focus";
       rerender();
@@ -1334,6 +1334,6 @@ export function onMount() {
 
   document.getElementById("cs-home-btn")?.addEventListener("click", () => {
     resetSession();
-    router.navigate("intention");
+    router.navigate("today");
   });
 }

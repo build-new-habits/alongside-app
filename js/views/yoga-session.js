@@ -1072,7 +1072,7 @@ export function onMount() {
   }
 
   document.getElementById("ys-back-btn")?.addEventListener("click", () => {
-    if (phase === "focus")    { resetSession(); router.navigate("intention"); }
+    if (phase === "focus")    { resetSession(); router.navigate("today"); }
     else if (phase === "duration") { phase = "focus";    rerender(); }
     else if (phase === "overview") { phase = "duration"; rerender(); }
   });
@@ -1156,5 +1156,5 @@ export function onMount() {
   });
 
   document.getElementById("ys-reflect-btn")?.addEventListener("click", () => { resetSession(); router.navigate("reflect"); });
-  document.getElementById("ys-home-btn")?.addEventListener("click", () => { resetSession(); router.navigate("intention"); });
+  document.getElementById("ys-home-btn")?.addEventListener("click", () => { resetSession(); router.navigate("today"); });
 }

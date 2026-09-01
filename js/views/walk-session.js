@@ -624,7 +624,7 @@ export function onMount() {
   document.getElementById("ws-back-btn")?.addEventListener("click", () => {
     if (phase === "type") {
       resetSession();
-      router.navigate("intention");
+      router.navigate("today");
     } else if (phase === "duration") {
       phase = "type";
       rerender();
@@ -678,7 +678,7 @@ export function onMount() {
 
   document.getElementById("ws-home-btn")?.addEventListener("click", () => {
     resetSession();
-    router.navigate("intention");
+    router.navigate("today");
   });
 }
 

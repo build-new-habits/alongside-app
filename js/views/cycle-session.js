@@ -491,7 +491,7 @@ export function onMount() {
     onExit:   () => { savePartialSession(); resetSession(); router.navigate("reflect"); }
   });
   document.getElementById("cs-back-btn")?.addEventListener("click", () => {
-    if (phase === "ride-type") { resetSession(); router.navigate("intention"); }
+    if (phase === "ride-type") { resetSession(); router.navigate("today"); }
     else if (phase === "type")     { phase = "ride-type"; rerender(); }
     else if (phase === "duration") { phase = "type";      rerender(); }
     else if (phase === "overview") { phase = "duration";  rerender(); }
@@ -513,5 +513,5 @@ export function onMount() {
     creditsEarned += 10; activePrompt = null; rerender();
   });
   document.getElementById("cs-reflect-btn")?.addEventListener("click", () => { resetSession(); router.navigate("reflect"); });
-  document.getElementById("cs-home-btn")?.addEventListener("click", () => { resetSession(); router.navigate("intention"); });
+  document.getElementById("cs-home-btn")?.addEventListener("click", () => { resetSession(); router.navigate("today"); });
 }
