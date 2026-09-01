@@ -19,6 +19,7 @@
 import { EXERCISES } from "../js/data/exercises/index.js";
 import { matchCategory } from "../js/data/session-categories.js";
 import { SESSION_TYPES } from "../js/session-builder.js";
+import fs from "node:fs";
 
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
@@ -87,7 +88,78 @@ for (const type of SESSION_TYPES) {
   });
 }
 
-console.log("\nTEST 4 - a short session still spreads across the body");
+console.log("\nTEST 4 - the session is mostly stretching");
+
+check("4a. every main category returns actual stretches", () => {
+  // STRETCH-3. The counting mistake this catches: on first ship every
+  // category had CONTENT and none was checked for WHAT content.
+  // `glute-stretch` has 15 entries and they are Warrior II, Tree Pose,
+  // Bridge Pose -- standing balance work in a session called Stretch.
+  const OK_PATTERNS = new Set(["stretch", "hip-rotation", "spinal-rotation", "self-massage"]);
+  for (const c of stretch.mainCategories) {
+    const got = matchCategory(EXERCISES, c, "main");
+    const bad = got.filter(e => !OK_PATTERNS.has(e.movementPattern));
+    const ratio = bad.length / Math.max(1, got.length);
+    ok(ratio < 0.34,
+       `"${c}" is ${Math.round(ratio * 100)}% non-stretch movement patterns ` +
+       `(e.g. ${bad.slice(0, 3).map(e => e.name + " [" + e.movementPattern + "]").join(", ")}). ` +
+       `Having content is not the same as having the RIGHT content.`);
+  }
+});
+
+check("4b. no two main categories are near-duplicates", () => {
+  // static-stretch (30) was a subset of deep-stretch (53), identical for
+  // the first twelve. Listing both spent two ordered picks on one pool.
+  // The LAST main category is the designated fill pool and is a superset
+  // by design -- it supplies whatever the specific pools do not. Only the
+  // specific categories are compared against each other.
+  const specific = stretch.mainCategories.slice(0, -1);
+  const sets = specific.map(c => ({
+    c, ids: new Set(matchCategory(EXERCISES, c, "main").map(e => e.id))
+  }));
+  for (let i = 0; i < sets.length; i++) {
+    for (let j = i + 1; j < sets.length; j++) {
+      const a = sets[i], b = sets[j];
+      const small = a.ids.size <= b.ids.size ? a : b;
+      const large = a.ids.size <= b.ids.size ? b : a;
+      if (!small.ids.size) continue;
+      let shared = 0;
+      for (const id of small.ids) if (large.ids.has(id)) shared++;
+      ok(shared / small.ids.size < 0.8,
+         `"${small.c}" is ${Math.round(shared / small.ids.size * 100)}% inside "${large.c}" ` +
+         `-- two ordered picks spent on one pool`);
+    }
+  }
+});
+
+check("4c. stretch declares its own shape so the presets cannot invert it", () => {
+  const src = fs.readFileSync("js/session-builder.js", "utf8");
+  ok(/const TYPE_COUNTS\s*=/.test(src), "no per-type counts; the presets set the shape alone");
+  const at = src.indexOf("const TYPE_COUNTS");
+  const block = src.slice(at, src.indexOf("};", at));
+  ok(block.includes("stretch"), "stretch has no per-type counts");
+  // The work must outweigh the warm-up before any preset is applied.
+  const m = [...block.matchAll(/warmup:\s*(\d+),\s*main:\s*(\d+)/g)];
+  ok(m.length >= 4, "stretch does not define all four durations");
+  for (const row of m) {
+    ok(Number(row[2]) >= Number(row[1]) * 2,
+       `a stretch session with warmup ${row[1]} and main ${row[2]} is not mostly stretching`);
+  }
+  // BOTH build paths, counted rather than merely present: buildSession()
+  // and buildSessionFromSelection() each compute counts, and one of them
+  // reverting to EXERCISE_COUNT would leave the override half-applied --
+  // a hand-picked stretch session shaped differently from a generated
+  // one, for no reason anybody could see.
+  // Lookbehind excludes the DEFINITION. Counting it as a call site meant
+  // both real calls could be reverted and the assertion still passed --
+  // found by the reversal, which is the only thing that would have.
+  const wired = (src.match(/(?<!function )_baseCounts\(durationMins, sessionType\)/g) || []).length;
+  ok(wired >= 2,
+     `only ${wired} build path(s) use _baseCounts; both must, or per-type counts ` +
+     `apply to generated sessions and not hand-picked ones`);
+});
+
+console.log("\nTEST 5 - a short session still spreads across the body");
 
 check("4. 15 minutes reaches at least four distinct regions", () => {
   // Not a count of exercises -- a count of the categories a short

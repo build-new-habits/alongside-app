@@ -1,43 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v248
+## 31 Aug 2026 v247
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v247.md`. Remove v247 on upload.
-
-> ### 🟢 STRETCH-3 + PICKER-GROUP — DEPLOYED 31 Aug, `alongside-v418`. 96 gates.
->
-> #### 🔴 A Stretch session was mostly mobility drills. Three separate causes.
->
-> **1. The arithmetic.** 15 minutes on "Mostly mobility" gives warm-up 2 × 1.5 = 3 and main 3 × 0.7 = 2. Three mobility drills and two stretches, in a session called Stretch. **The allocation presets were written for strength sessions**, where "more warm-up and stretching, less load" means more stretching. On a Stretch session it means LESS, because the stretching *is* the load.
->
-> `TYPE_COUNTS` now lets a type declare its own base shape before any preset applies. Stretch at 15 min is warm-up 1 / main 5 / cool-down 1. Wired into **both** build paths — generated and hand-picked — so a session is not shaped differently depending on how it was made.
->
-> **2. The fill pool was 43% yoga poses.** `poolFor()` takes one exercise from each category in order, then fills the rest from the generic pool at the end. On first ship I chose `deep-stretch` (53) over `static-stretch` (30) because it was bigger — and never looked inside it. It contains Downward Dog, Warrior I, Warrior II. Since the fill supplies every slot the small specific pools do not, **those poses were most of a short session**. `static-stretch` is 30 entries and **0% non-stretch**. Smaller and correct beats larger and mixed.
->
-> **3. `glute-stretch` is not a stretch category.** It resolves to `hip-rotation` and `yoga-pose`: Warrior II, Chair Pose, Tree Pose, Half Moon, Warrior III, Bridge Pose. Dropped from Stretch. **The category definition itself is a content fault** — booked as CAT-GLUTE, not edited here, because Glute Focus and Mobility both depend on it and changing it under them is a different change.
->
-> Also dropped: `lat-stretch`, all 3 entries of which sit inside `thread-needle`. **The gate found that, not Claude** — the pools that were suspected got checked and the rest did not.
->
-> #### ⚠️ The counting mistake, recorded because it is general
->
-> On first ship every category was checked for **whether it had content** and none for **what content**. Fifteen entries is a reassuring number and says nothing about whether they are stretches. Gate assertion 4a now checks movement patterns, not counts, and 4b catches near-duplicate pools.
->
-> Three of the reversals initially failed to prove — one renamed a constant to a string that still contained the substring being searched for, one changed a single call site where the assertion only required presence, and **one counted the function DEFINITION as a call site, so both real calls could be deleted while the gate stayed green**. All corrected and re-proven. The reversal is the only thing that would have found the third.
->
-> #### 🟢 PICKER-GROUP
->
-> The type picker was a flat list of eight, so Stretch — appended last — read as the tail of the strength and cardio run. Now grouped: **Strength · Cardio · Mobility & Stretch**. `SESSION_TYPES` remains the single source of truth for what a type *is*; the grouping list only orders. **Any type not listed sweeps into "More"**, so adding a session type can never make it vanish from the picker — the same failure `verify-w2`'s hardcoded id list had.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **STRETCH-3** | Per-type counts, pure fill pool, bad categories dropped | 🟢 Shipped `alongside-v418`, untested on device | 31 Aug |
-> | **PICKER-GROUP** | Strength / Cardio / Mobility & Stretch, with a "More" sweep | 🟢 Shipped `alongside-v418` | 31 Aug |
-> | **CAT-GLUTE** | `glute-stretch` resolves to yoga poses and hip rotations, not glute stretches. Affects Glute Focus and Mobility, which both use it | 🟠 Content fault, not fixed | w/c 31 Aug |
-> | **PRESET-COPY** | "Mostly strength — less warm-up and stretching, more work" is nonsense on a Stretch session. The labels assume a strength context | 🟠 Copy fault | w/c 31 Aug |
-> | **ACTIVATION-SCOPE** | `activation` is region-blind — same root as the stretch faults: a category name that does not mean what it says | 🟠 Found, not fixed | w/c 31 Aug |
-
+Supersedes `master_schedule_31aug2026_v246.md`. Remove v246 on upload.
 
 > ### 🟢 RETIRE-INTENTION + BACK-STACK — DEPLOYED 31 Aug, `alongside-v417`. 96 gates.
 >
@@ -5673,4 +5638,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v248*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v247*
