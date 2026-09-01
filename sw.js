@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v416
+ *
+ * v416 - CHECKIN-EXIT. checkin-mini.js both exits now return to today
+ *   rather than intention. No new files.
+ *
  * 31 Aug 2026 v415
  *
  * v415 - BYPASS-DOOR, BYPASS-RED, SPLIT-ORDER, and a STRETCH-1
@@ -2895,7 +2900,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v415";
+const CACHE_NAME = "alongside-v416";
 
 const SHELL_URLS = [
 
