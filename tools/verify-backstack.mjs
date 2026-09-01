@@ -60,7 +60,11 @@ check("1c. nothing navigates to it", () => {
 });
 
 check("1d. the shell does not precache it and the CSS is gone", () => {
-  const sw = fs.readFileSync("sw.js", "utf8");
+  // Comments stripped: sw.js's own changelog RECORDS the removal, so it
+  // names the path in prose. Reading the file raw made the gate fail on
+  // the correct state -- caught by post-push verification, which is the
+  // only run that saw the header and the assertion together.
+  const sw = strip(fs.readFileSync("sw.js", "utf8"));
   ok(!sw.includes("views/intention.js"),
      "sw.js precaches a file that no longer exists -- offline install would fail");
   const css = fs.readFileSync("css/base/global.css", "utf8");
