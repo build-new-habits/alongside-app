@@ -479,7 +479,7 @@ export function onMount() {
     onExit:   () => { savePartialSession(); resetSession(); router.navigate("reflect"); }
   });
   document.getElementById("ss-back-btn")?.addEventListener("click", () => {
-    if (phase === "stroke")   { resetSession(); router.navigate("intention"); }
+    if (phase === "stroke")   { resetSession(); router.navigate("today"); }
     else if (phase === "type")     { phase = "stroke";   rerender(); }
     else if (phase === "duration") { phase = "type";     rerender(); }
     else if (phase === "overview") { phase = "duration"; rerender(); }
@@ -501,5 +501,5 @@ export function onMount() {
     creditsEarned += 10; activePrompt = null; rerender();
   });
   document.getElementById("ss-reflect-btn")?.addEventListener("click", () => { resetSession(); router.navigate("reflect"); });
-  document.getElementById("ss-home-btn")?.addEventListener("click", () => { resetSession(); router.navigate("intention"); });
+  document.getElementById("ss-home-btn")?.addEventListener("click", () => { resetSession(); router.navigate("today"); });
 }

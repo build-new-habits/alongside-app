@@ -1,43 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v247
+## 31 Aug 2026 v246
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v246.md`. Remove v246 on upload.
-
-> ### 🟢 RETIRE-INTENTION + BACK-STACK — DEPLOYED 31 Aug, `alongside-v417`. 96 gates.
->
-> #### ⚫ `intention.js` is DELETED. This item is closed and does not reopen.
->
-> Raised on 19 Jul in the file's own header, and four more times since. It duplicated `coach-reflection.js`, rendered its own `<h1>Today</h1>` while documenting itself as not being Today, and was the landing place for every session exit.
->
-> **Claude's error, recorded so it is not repeated:** this was treated as an open product decision across several sessions because two files existed and one might have had a purpose. No purpose was ever identified. Graeme asking *"haven't we retired this?"* five times was an instruction, not a question, and the evidence only ever pointed one way. **When a screen duplicates another, documents itself as not the daily surface, and is repeatedly reported as wrong, that is a defect to remove, not a decision to escalate.**
->
-> Removed everywhere in one pass: the file · the router route · the `NAV_MAP` entry · 14 `navigate("intention")` calls across `walk`, `running`, `yoga`, `swim`, `core-session`, `cycle` · 3 `quietReturnRoute` fallbacks · the `sw.js` precache entry · both dead `.intention-*` CSS blocks in `global.css` · the `index.html` comment. Every one of those now lands on **`today`**.
->
-> #### 🔴 BACK-STACK — back only ever worked once, and this is why
->
-> `back()` popped an entry and then called `navigate()`, **which pushed the view being left straight back on**. The stack never unwound — it oscillated between the last two screens — while the popstate handler kept adding browser entries underneath. Which press closed the app depended on how far the two stacks had drifted apart.
->
-> Graeme's description was exact: *"the back gesture goes back to the last page. But after that, it kicks you out the app."*
->
-> `navigate()` now takes `{ fromBack }`. A navigation caused by going back pushes nothing — not onto the browser stack, not onto ours — so each press removes one step and the stack unwinds to the bottom. `canGoBack()` added; at the bottom the gesture is allowed through so the app closes from Today rather than trapping somebody inside it.
->
-> **This was reported repeatedly alongside the intention problem and was never picked up as its own fault.** Both were the same complaint: the app does not take you where you came from.
->
-> #### 🟢 Gate
->
-> `verify-backstack.mjs`, 8 assertions, all reversal-proven — including resurrecting the deleted file, re-registering the route, re-adding the precache entry, and removing each of the three back-stack guards independently. **Assertion 3b is the one that keeps this shut: no navigation caused by going back may push to either stack.**
->
-> One assertion initially anchored on `_setupPopstate`'s CALL SITE rather than its definition, and so measured the wrong region of the file. Fixed before it was trusted.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **RETIRE-INTENTION** | Screen deleted, all 14 routes redirected, CSS and precache cleaned | ⚫ **CLOSED — does not reopen** | 31 Aug |
-> | **BACK-STACK** | Back unwinds the full stack; exits only from Today | 🟢 Shipped `alongside-v417` | 31 Aug |
-> | **EXIT-AUDIT** | Remaining exits across all session views. **Root cause removed** — the audit is now a sweep for stragglers rather than a design question | 🟠 Booked, much smaller now | w/c 31 Aug |
-
+Supersedes `master_schedule_31aug2026_v245.md`. Remove v245 on upload.
 
 > ### 🟢 CHECKIN-EXIT — DEPLOYED 31 Aug, `alongside-v416`. 95 gates.
 >
@@ -5638,4 +5603,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v247*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v246*
