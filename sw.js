@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v420
+ *
+ * v420 - STRETCH-DOOR. A Stretch card on the Mobility & Conditioning
+ *   landing screen. No new files.
+ *
  * 31 Aug 2026 v419
  *
  * v419 - SECTION-RULES. No new files; session-builder.js gains a
@@ -2919,7 +2924,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v419";
+const CACHE_NAME = "alongside-v420";
 
 const SHELL_URLS = [
 
