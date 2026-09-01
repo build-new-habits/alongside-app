@@ -1,61 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v245
+## 31 Aug 2026 v244
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v244.md`. Remove v244 on upload.
-
-> ### 🟢 BYPASS-DOOR · BYPASS-RED · SPLIT-ORDER — DEPLOYED 31 Aug, `alongside-v415`. 94 gates.
->
-> #### 🔴 BYPASS-DOOR — the severe bypass fired at the till, not the door
->
-> The bypass never failed. It fired correctly in `buildSession()` and `buildSessionFromSelection()`, every time — but at the **end**. At pain 8 Graeme walked the entire builder (type, duration, split, equipment, hand-picking exercises) and was handed the Gentle Care card. The decision had been made before the first tap.
->
-> Correct behaviour delivered at the wrong moment **reads as the coach ignoring you**. Somebody who asks for "mostly mobility" and receives breathing exercises reasonably concludes the coach got it wrong, rather than that it was listening.
->
-> `severeZoneToday()` is now exported and `render()` asks before the phase router. **The in-build bypass is unchanged and still fires in both functions** — the door is an addition, not a replacement, so any route skipping it is still caught (gate 1c).
->
-> **No override, deliberately.** At 8 the answer is no session, so the alternative offered is leaving the builder, not building anyway. A "build it regardless" escape would be a clinical loosening and is not Claude's to make. **Open for Graeme / the clinical pack: should such an escape exist at all?**
->
-> **The door created a trap and closing it was part of the work.** Both backward routes (`sb-rebuild-btn`, `sb-back-btn`) would have re-entered the door and landed straight back on the card with no way out. Both now exit to Today, and the button reads "Back to Today" rather than "Build a different one", which was a promise that could not be kept.
->
-> #### 🔴 BYPASS-RED — safety doing its work in skimmable prose
->
-> The Gentle Care card explained itself inside the coach's paragraph. Graeme, 31 Aug: *"It's too easy to skip that in the blurb and then assume the coach got the session wrong, especially as people might start assuming the writing because they've read this stuff before."*
->
-> A rose banner now states it outright: the session has been changed, the pain was logged at 8+, and this is not the session you asked for. Same visual grammar as `.xcard-block--hazard`, so there is **one language for "this is not ordinary text"** rather than a new treatment per surface. Body text keeps the normal colour — legibility must never depend on the accent.
->
-> `role="note"`, not `role="alert"`. Nothing has gone wrong and nothing is interrupting; an alert would frame a careful decision as an emergency.
->
-> #### 🔴 SPLIT-ORDER — "Mostly strength" was never missing
->
-> Tapping a duration sets `phase = "equipment"` immediately, and the split options rendered **below** the durations on the same screen. Anyone reading top-down left before reaching them. This is the whole explanation for the earlier "strength doesn't appear an option anywhere" — it was underneath the control that navigates away. The choice that does not advance now goes first.
->
-> #### 🟠 STRETCH-1 correction, same day as ship
->
-> Stretch's warm-up served Seated Punches and Seated Arm Cycling. `cardio-warmup` is region-blind in the same way `activation` is, and Stretch was not excluded from the pulse-raiser rule. Both fixed: `cardio-warmup` dropped, `thoracic-mobility` added, Stretch excluded alongside Cardio and Mobility.
->
-> #### 🟢 Answered from the code, not assumed
->
-> **Did the coach know the back was 8 when recommending?** Yes. `buildActiveConditionSet()` reads `conditions` + `conditionPainScores` and adds `back-acute` at 7+, filtering the pool. Same source `severeZoneToday()` reads, so the two agree. The problem was never that it did not know — it was *when* it said so.
->
-> #### 🟠 Gate discipline note
->
-> Three of the first reversal attempts were **bad tests, not passing code** — one mutated a guard to `if (false)` while leaving the call in place, one changed heading text instead of order, one had a stale anchor. Redone properly, all nine proven. **Known limit, recorded honestly: assertion 1b tests the door's POSITION, not its reachability. A door guarded by a constant-false condition would still pass.** Static analysis cannot see that; device test can.
->
-> #### 📋 Rows — open work, in recommended order
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **EXIT-AUDIT** | Every "exit" across all session views. Some land on Today's "it's been a while since you checked in" prompt, re-triggering a check-in already done. Needs its own session — 13 views | 🟠 Booked, not started | w/c 31 Aug |
-> | **ACTIVATION-SCOPE** | `activation` is region-blind: Lower Body warm-ups offer Shoulder CARs, Wrist CARs, Grip Strengthening. Same root as the Stretch fault fixed today. Needs a body-region axis on categories | 🟠 Found, not fixed | w/c 31 Aug |
-> | **PICKER-GROUP** | Session type picker is a flat list of eight; Stretch reads as the end of a strength/cardio run. Group as Strength / Cardio / Mobility & Stretch. Graeme: Stretch's natural home is Mobility | 🟠 Agreed, not built | w/c 31 Aug |
-> | **BUILD-PERISH** | A built session must survive until started. Bug, not a tier — fix free | 🟠 Needs fixing | Pre-beta |
-> | **SEVERE-ESCAPE** | Should a "build anyway" override exist at pain 8+? Clinical decision, not Claude's | 🔵 Question for the clinical pack | Gated on pack |
-> | **STRETCH-2** | Landmark + intensity capture. Schema-first — new store field | 🔵 Direction agreed, needs spec | Post-beta |
-> | **SERIES-1** | Saved built sessions, multi-week arcs, coach balance guidance. **Extends `activeProgramme`, does not create a second programme model** | 🔵 Model agreed, needs spec | Post-beta |
-> | **PRECACHE-IMPORT** | `precache-check.mjs` does not follow `@import`; permanent false red on `goal-review.css`. A failing gate people learn to ignore is worse than no gate | 🟠 Needs decision | Post-beta |
-> | **CARD-3 clipping** | YouTube link clipped behind the sticky action bar on DO; ghost "Start this one" text over the progress bar; house emoji overlaps "1 of 10" (pre-existing) | 🟠 Found on device | w/c 31 Aug |
-
+Supersedes `master_schedule_31aug2026_v243.md`. Remove v243 on upload.
 
 > ### 🟢 STRETCH-1 BUILT AND DEPLOYED 31 Aug — `alongside-v414`. 93 gates.
 >
@@ -5576,4 +5523,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v245*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v244*
