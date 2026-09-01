@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v415
+ *
+ * v415 - BYPASS-DOOR, BYPASS-RED, SPLIT-ORDER, and a STRETCH-1
+ *   correction. No new files. CSS changed (session-shared.css v6) and
+ *   the builder's render path changed, so a stale shell would keep
+ *   asking the severe question at the end instead of the door.
+ *
  * 31 Aug 2026 v414
  *
  * v414 - STRETCH-1. An eighth session type. No new files: session types
@@ -2888,7 +2895,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v414";
+const CACHE_NAME = "alongside-v415";
 
 const SHELL_URLS = [
 
