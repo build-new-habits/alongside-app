@@ -1,6 +1,28 @@
 /* ============================================================
    session-shared.css
    css/components/session-shared.css
+   31 Aug 2026 v6
+
+   v6 - BYPASS-RED. .sb-severe-banner. The Gentle Care card already
+        explained itself in the coach's prose, and prose is what people
+        skim once they have read a few of them. Somebody who asked for
+        mostly-mobility, skimmed the paragraph and got breathing exercises
+        concludes the coach got it wrong rather than that it was
+        listening.
+
+        Rose, matching .xcard-block--hazard, so there is ONE visual
+        grammar for "this is not ordinary text" rather than a new
+        treatment per surface. The body text keeps the normal colour for
+        the same reason it does there: legibility must not depend on the
+        accent being readable. --color-danger carries a light-scheme
+        override, added 31 Aug.
+
+        role="note", not role="alert". Nothing has gone wrong and nothing
+        is interrupting -- the session was changed deliberately and the
+        person is reading about it in their own time. An alert would
+        announce over whatever they were doing and would frame a careful
+        decision as an emergency.
+
    15 Aug 2026 v5
 
    v5 - SHARED-1. .sm-* replaces .cs-first-session / .cs-baseline /
@@ -343,3 +365,30 @@
 }
 
 .sm-baseline__actions { margin-top: var(--space-4); }
+
+/* ── BYPASS-RED ───────────────────────────────────────────────────────
+   The severe-pain banner on the Gentle Care card. See the v6 note. */
+.sb-severe-banner {
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  border-left: 4px solid var(--color-danger);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-danger-light);
+}
+
+.sb-severe-banner__head {
+  margin: 0 0 var(--space-2) 0;
+  font-weight: var(--font-bold, 700);
+  font-size: var(--text-base);
+  color: var(--color-danger);
+}
+
+.sb-severe-banner__body {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed, 1.6);
+}
+
+@media (prefers-contrast: more) {
+  .sb-severe-banner { border-left-width: 6px; }
+}
