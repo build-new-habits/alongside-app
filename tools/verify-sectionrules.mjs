@@ -183,6 +183,25 @@ check("5. types declaring nothing are untouched", () => {
   ok(unruled.length > 0, "every type is ruled; the opt-in claim is untested");
 });
 
+console.log("\nTEST 6 - Stretch is reachable from the right door");
+
+check("6. the Mobility & Conditioning door offers Stretch", () => {
+  // PICKER-GROUP grouped Stretch beside Mobility INSIDE the builder --
+  // but the builder is what the Cardio, Core & Strength door opens, so
+  // stretching was only reachable through the strength door. Grouping
+  // within the wrong room.
+  const mc = fs.readFileSync("js/views/mobility-conditioning.js", "utf8");
+  ok(mc.includes('id="mc-stretch"'), "no Stretch card on the Mobility & Conditioning door");
+  ok(mc.includes('sessionBuilderPreselect'),
+     "the Stretch card does not preselect a type, so it drops the person on the " +
+     "type picker they just answered by tapping it");
+  const at = mc.indexOf('"#mc-stretch"');
+  ok(at > -1, "the Stretch card is rendered but never wired");
+  const handler = mc.slice(at, at + 400);
+  ok(handler.includes('type: "stretch"'), "the card preselects the wrong type");
+  ok(handler.includes('router.navigate("session-builder")'), "the card goes nowhere");
+});
+
 console.log(fails === 0
   ? "\nSECTION-RULES: all assertions pass\n"
   : "\nSECTION-RULES: " + fails + " FAILED\n");

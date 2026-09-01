@@ -1,65 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v250
+## 31 Aug 2026 v249
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v249.md`. Remove v249 on upload.
-
-> ### 🟢 STRETCH-DOOR — DEPLOYED 31 Aug, `alongside-v420`. 97 gates.
->
-> #### 🔴 PICKER-GROUP fixed the grouping and not the problem
->
-> Stretch was grouped beside Mobility **inside the session builder** — but the builder is what the **Cardio, Core & Strength** door opens. The only route to a stretch session was through the strength door. Grouping within the wrong room. A "Stretch" card now sits on the **Mobility & Conditioning** landing screen and preselects the type via the existing `sessionBuilderPreselect` path, so the person lands on duration rather than a picker they answered by tapping.
->
-> **The lesson: check which door a screen sits behind before rearranging what is inside it.**
->
-> ---
->
-> ### 🔵 THE BEND-COMPETITIVE STRETCH PROGRAMME — scoped 31 Aug, not built
->
-> Graeme's ask: Move competes with Bend on **content depth and usability**, with Move's own design, instructions, exercise and programme names — no streaks, adaptive, **body-zone focused**, **one-off focused sessions free**, **developmental arc premium**.
->
-> #### 🟢 Body-zone selection is nearly free. The axis already exists.
->
-> `affectsAreas` is present on **551/551 entries across 22 values** — the same axis Bend's body-zone UI needs, and the one SECTION-RULES was built on today. **No schema change.** A zone picker is a small build on data already in the repo.
->
-> #### 🔴 The content is the gate, and here is the actual measurement
->
-> **53 stretch-pattern entries in the whole library.** Coverage per zone, stretches / total entries:
->
-> | Zone | Stretches | Zone | Stretches |
-> |---|---|---|---|
-> | hip | 14 | chest-pecs | 3 |
-> | shoulder | 12 | adductors | 4 |
-> | lower-back | 12 | **ankle-foot** | **0** |
-> | hip-flexor | 10 | **rotator-cuff** | **0** |
-> | hamstring | 9 | **pelvic-floor** | **0** |
-> | thoracic | 8 | wrist-elbow | 2 |
-> | glutes / quads | 7 / 7 | knee | 1 |
->
-> **There is no `neck` zone at all** — a headline zone in Bend, absorbed here into `shoulder` and `upper-back`. So the taxonomy has a gap as well as the content.
->
-> **Estimate: 120–150 stretch entries with 8–12 per headline zone** to be genuinely comparable. That is roughly **triple** the current stretch library, each entry needing hazards, cautions, contraindications, difficulty and zone tags. **This is authoring work, not build work**, and CONTENT-GAP-1's 16 entries are still outstanding ahead of it.
->
-> #### 🔵 The arc extends `activeProgramme`, and needs one new map
->
-> Goal → zone emphasis. Running needs hamstrings, calves, hip flexors. Getting up and down from the floor needs hips, ankles, thoracic. That map does not exist and is a **content decision with clinical weight**, not a coding one — it belongs with the physio review, not with Claude.
->
-> #### ⚫ The IP line, settled and not to be relitigated
->
-> The stretches themselves are nobody's property. Bend's routine names, sequences, hold prescriptions, descriptions and illustrations are theirs. Move writes its own. Bend is a **coverage reference** — which zones a library needs, what session lengths people expect — not a source.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **STRETCH-DOOR** | Stretch card on Mobility & Conditioning, preselecting the type | 🟢 Shipped `alongside-v420` | 31 Aug |
-> | **ZONE-1** | Body-zone stretch picker on `affectsAreas`. Small build, no schema change. **Gated on content, not code** | 🔵 Ready to build | Post-content |
-> | **CONTENT-STRETCH** | 120–150 entries, 8–12 per headline zone. Add a `neck` zone. **The real gate on everything else here** | 🔴 Authoring project, not booked to a week | Needs a plan |
-> | **ARC-ZONE-MAP** | Goal → zone emphasis (running → hamstrings/calves/hip flexors). Clinical weight — belongs with the physio review | 🔵 For the clinical pack | Gated on pack |
-> | **SERIES-1** | Saved sessions + multi-week arcs. Extends `activeProgramme` | 🔵 Post-beta | Post-beta |
-> | **UPPER-SCOPE** | `upper` warm-up has the mirror-image region fault, not yet ruled | 🟠 Next | w/c 31 Aug |
-> | **PRESET-COPY** | Allocation preset labels assume a strength context | 🟠 Copy fault | w/c 31 Aug |
-
+Supersedes `master_schedule_31aug2026_v248.md`. Remove v248 on upload.
 
 > ### 🟢 SECTION-RULES — DEPLOYED 31 Aug, `alongside-v419`. 97 gates.
 >
@@ -5773,4 +5716,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v250*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v249*
