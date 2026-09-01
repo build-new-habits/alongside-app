@@ -1,6 +1,53 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 31 Aug 2026 v40
+ *   SECTION-RULES. The fourth instance of one pattern, fixed as a
+ *   mechanism rather than a fourth patch.
+ *
+ *   W2-1 named this on 14 Aug: "a filter correct against a curated pool,
+ *   left in place after the pool became the whole database." CON-6 made
+ *   every section draw from all 551 entries. The CATEGORY NAMES were
+ *   written when each pool was hand-curated, so they still read as if
+ *   they carry intent, and they do not:
+ *
+ *     `activation`     -> region-blind. A Lower Body warm-up offers
+ *                         Shoulder CARs, Wrist CARs, Grip Strengthening.
+ *     `glute-stretch`  -> character-blind. Resolves to Warrior II, Tree
+ *                         Pose, Bridge Pose. Standing balance work.
+ *     `hip-mobility`   -> character-blind. 47 entries, 31 of them not
+ *                         stretches: Monster Walk, a banded glute
+ *                         strengthening drill, in a Stretch warm-up.
+ *
+ *   TWO AXES, NOT THREE BUGS. Region and character. Both already exist
+ *   in the data and neither needed a schema change:
+ *
+ *     `affectsAreas`    -- 22 values, present on 551/551. The region axis.
+ *     `movementPattern` -- 42 values, present on all. The character axis.
+ *
+ *   `contentType` was the obvious third candidate and is REJECTED: it is
+ *   missing on 188 of 551 entries, so filtering on it would silently drop
+ *   a third of the library while looking like it worked.
+ *
+ *   sectionRules is OPT-IN per type per section. A type that declares
+ *   nothing behaves exactly as before, so the six existing types are
+ *   untouched unless named here. Three forms:
+ *
+ *     allowPatterns   -- whitelist of movementPattern
+ *     denyPatterns    -- blacklist of movementPattern
+ *     excludeAreasOnly -- drop an exercise only when EVERY area it
+ *                        affects is inside the listed set
+ *
+ *   The third is deliberately narrow. A blunt "must include a leg area"
+ *   would have thrown out cat-cow and pelvic tilt, which belong in a
+ *   lower-body warm-up. Excluding only the exercises that are ENTIRELY
+ *   elsewhere removes Wrist CARs and keeps everything that touches both.
+ *
+ *   Starvation is the risk with any whitelist, and it is not guessed at:
+ *   verify-w2 already asserts no section is starved for any type at four
+ *   activity levels, and it derives its type list from SESSION_TYPES, so
+ *   it covers these rules automatically.
+ *
  * 31 Aug 2026 v39
  *   STRETCH-3. A Stretch session was mostly mobility drills.
  *
@@ -678,11 +725,62 @@ function _applyPreset(counts, presetId) {
   };
 }
 
+// ── SECTION-RULES vocabulary ──────────────────────────────────────────────────
+
+// Everything that is not a leg, hip, trunk or whole-body region. Used
+// only by excludeAreasOnly, so an exercise is dropped when ALL of its
+// areas fall in here -- Wrist CARs, Shoulder Packing, Grip Strengthening
+// -- and kept the moment it touches anything else.
+const UPPER_ONLY_AREAS = [
+  "shoulder", "upper-back", "chest-pecs", "triceps-biceps",
+  "rotator-cuff", "wrist-elbow",
+];
+
+// Calm, unloaded movement. A stretch session's warm-up should open
+// joints, not work them. Leg swings are legitimate before stretching but
+// share movementPattern hip-abduction with Monster Walk, and the pattern
+// axis cannot separate a swing from a banded walk -- so both are out.
+// Losing leg swings from a stretch warm-up is a smaller cost than
+// putting resistance-band strengthening in one.
+const STRETCH_WARMUP_PATTERNS = [
+  "stretch", "spinal-flexion-extension", "rotation", "spinal-rotation",
+  "hip-rotation", "joint-rotation", "breath", "breath-awareness",
+  "grounding", "self-massage",
+];
+
+// The held positions themselves. Matches the set verify-stretch1's
+// assertion 4a checks for, on purpose: the gate and the engine should
+// not hold two different opinions about what a stretch is.
+const STRETCH_MAIN_PATTERNS = [
+  "stretch", "hip-rotation", "spinal-rotation", "rotation", "self-massage",
+];
+
+/**
+ * Applies a session type's declared rules for one section. Returns the
+ * list unchanged when nothing is declared, which is every existing type.
+ */
+function _applySectionRules(list, rules) {
+  if (!rules) return list;
+  return list.filter(ex => {
+    const p = ex.movementPattern;
+    if (rules.allowPatterns && !rules.allowPatterns.includes(p)) return false;
+    if (rules.denyPatterns  &&  rules.denyPatterns.includes(p))  return false;
+    if (rules.excludeAreasOnly) {
+      const areas = ex.affectsAreas || [];
+      // No areas recorded means we cannot judge it, so it stays. Absent
+      // is not the same as wrong.
+      if (areas.length && areas.every(a => rules.excludeAreasOnly.includes(a))) return false;
+    }
+    return true;
+  });
+}
+
 // ── Session type definitions ──────────────────────────────────────────────────
 
 export const SESSION_TYPES = [
   {
     id:          "glute",
+    sectionRules: { warmup: { excludeAreasOnly: UPPER_ONLY_AREAS } },
     label:       "Glute Focus",
     icon:        "🍑",
     description: "Hip hinge, bridges, single-leg work. Built around glute activation.",
@@ -701,6 +799,11 @@ export const SESSION_TYPES = [
   },
   {
     id:          "lower",
+    // SECTION-RULES. Its warm-up categories include `activation`, which
+    // is region-blind, so this offered Shoulder CARs and Wrist CARs
+    // before a leg session. Only exercises that are ENTIRELY upper-body
+    // are dropped; cat-cow and pelvic tilt touch the spine and stay.
+    sectionRules: { warmup: { excludeAreasOnly: UPPER_ONLY_AREAS } },
     label:       "Lower Body",
     icon:        "🦵",
     description: "Squat, hinge, single-leg. Quads, hamstrings, glutes.",
@@ -750,6 +853,14 @@ export const SESSION_TYPES = [
   },
   {
     id:          "stretch",
+    // SECTION-RULES. The warm-up drew from `hip-mobility` (47 entries, 31
+    // of them not stretches) and served Monster Walk -- a banded glute
+    // strengthening drill -- before a stretch session. The main pool is
+    // held to the same definition of "a stretch" the gate uses.
+    sectionRules: {
+      warmup: { allowPatterns: STRETCH_WARMUP_PATTERNS },
+      main:   { allowPatterns: STRETCH_MAIN_PATTERNS },
+    },
     label:       "Stretch",
     icon:        "\uD83E\uDDD8",
     description: "Longer holds for hips, hamstrings, back and shoulders. No load.",
@@ -1315,7 +1426,7 @@ function _difficulty(ex) {
   return 10;
 }
 
-function _filterCandidates(categories, section, equipSet, conditionSet) {
+function _filterCandidates(categories, section, equipSet, conditionSet, sectionRules) {
   const ceiling = _difficultyCeiling();
   const prefs   = store.get("exercisePreferences") || {};
 
@@ -1325,7 +1436,7 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   // section was never really a property of an exercise, and storing it was
   // why the pool had to duplicate hip-mobility drills to use them in two
   // places.
-  const matched = [];
+  let matched = [];
   const seen = new Set();
   for (const category of categories) {
     for (const ex of matchCategory(EXERCISES, category, section)) {
@@ -1567,6 +1678,12 @@ function _filterCandidates(categories, section, equipSet, conditionSet) {
   const cooldownPool = section === "cooldown" ? matched.filter(withinCeiling) : null;
   const useCeilingOnCooldown = cooldownPool !== null && cooldownPool.length > 0;
 
+  // SECTION-RULES. Applied to `matched` before the per-section pools are
+  // read, so the ceiling relaxations below see the same list the caller
+  // will. Applying it after would have let a warm-up relax its ceiling
+  // against exercises the rules had already excluded.
+  matched = _applySectionRules(matched, sectionRules);
+
   return matched.filter(ex => {
     // ── C2, 13 Aug 2026 ──────────────────────────────────────────────
     // The rehabilitation library is not general content and was never
@@ -1724,7 +1841,7 @@ export function buildCandidatePools({ sessionType, durationMins, equipmentOverri
   const counts         = _applyPreset(baseCounts, preset);
 
   function poolFor(categories, section, count) {
-    const candidates = _filterCandidates(categories, section, equipSet, conditionSet);
+    const candidates = _filterCandidates(categories, section, equipSet, conditionSet, type.sectionRules?.[section]);
     const recommendedIds = new Set();
     for (const cat of categories) {
       if (recommendedIds.size >= count) break;
@@ -1774,7 +1891,7 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
   const idSet          = new Set(selectedIds || []);
 
   function chosenFrom(categories, section) {
-    return _filterCandidates(categories, section, equipSet, conditionSet)
+    return _filterCandidates(categories, section, equipSet, conditionSet, type.sectionRules?.[section])
       .filter(ex => idSet.has(ex.id));
   }
 
@@ -1785,7 +1902,7 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
   // Safety floor — never ship a session with zero warmup, regardless
   // of what was (or wasn't) selected.
   if (warmupExercises.length === 0) {
-    const fallback = _filterCandidates(type.warmupCategories, "warmup", equipSet, conditionSet)[0];
+    const fallback = _filterCandidates(type.warmupCategories, "warmup", equipSet, conditionSet, type.sectionRules?.warmup)[0];
     if (fallback) warmupExercises = [fallback];
   }
 
@@ -2018,7 +2135,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   function selectFromCategories(categories, section, count, alreadyChosen) {
     const chosen = alreadyChosen || new Set();
     const prefs  = store.get("exercisePreferences") || {};
-    const candidates = _filterCandidates(categories, section, equipSet, conditionSet)
+    const candidates = _filterCandidates(categories, section, equipSet, conditionSet, type.sectionRules?.[section])
       .filter(ex => !chosen.has(ex.id));
 
     // Prioritise variety across categories — one from each category first
