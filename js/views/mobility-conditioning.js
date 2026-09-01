@@ -1,6 +1,21 @@
 /**
  * mobility-conditioning.js - Mobility & Conditioning
  *
+ * 31 Aug 2026 v3
+ *
+ * v3 - STRETCH-DOOR. A "Stretch" card, where stretching actually belongs.
+ *
+ *   PICKER-GROUP put Stretch beside Mobility inside the session builder.
+ *   That was grouping within the wrong room: the builder is what the
+ *   CARDIO, CORE & STRENGTH door opens. The only route to a stretch
+ *   session was to tap the strength door first -- which is what Graeme
+ *   kept reporting, and what the grouping did not fix.
+ *
+ *   No new routing machinery. library.js already enters the builder via
+ *   store.set("sessionBuilderPreselect", { type }), which skips the type
+ *   picker. This card does the same with "stretch", so the person lands
+ *   on duration rather than on a question they answered by tapping.
+ *
  * 04 Aug 2026 v2
  *
  * v2 — Updated for conditionProgrammes.js v3's multi-condition
@@ -64,6 +79,15 @@ export function MobilityConditioningView(router) {
         </button>
 
         ${_renderProgrammeCard(tagged)}
+
+        <button class="mc-card" id="mc-stretch" aria-label="Stretch">
+          <span class="mc-card__icon" aria-hidden="true">\uD83E\uDD38</span>
+          <span class="mc-card__text">
+            <span class="mc-card__label">Stretch</span>
+            <span class="mc-card__sub">Held positions for hips, hamstrings, back and shoulders \u2014 no load</span>
+          </span>
+          <span class="mc-card__chev" aria-hidden="true">&#8250;</span>
+        </button>
 
         <button class="mc-card" id="mc-log-event" aria-label="Log an event">
           <span class="mc-card__icon" aria-hidden="true">\u2795</span>
@@ -148,6 +172,13 @@ export function MobilityConditioningView(router) {
 
     container.querySelector("#mc-start-session")?.addEventListener("click", () => {
       router.navigate("core-session");
+    });
+
+    // STRETCH-DOOR. Preselects the type so the builder opens on duration,
+    // not on a picker the person just answered by tapping this card.
+    container.querySelector("#mc-stretch")?.addEventListener("click", () => {
+      store.set("sessionBuilderPreselect", { type: "stretch" });
+      router.navigate("session-builder");
     });
 
     container.querySelector("#mc-log-event")?.addEventListener("click", () => {
