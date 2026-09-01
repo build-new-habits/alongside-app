@@ -1,6 +1,53 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 31 Aug 2026 v39
+ *   STRETCH-3. A Stretch session was mostly mobility drills.
+ *
+ *   THE ARITHMETIC, which is the whole story. 15 minutes on "Mostly
+ *   mobility" gives warmup 2 x 1.5 = 3 and main 3 x 0.7 = 2. Three
+ *   mobility drills and two stretches, in a session called Stretch.
+ *   The allocation presets were written for strength sessions, where
+ *   "more warm-up and stretching, less load" means more stretching. On a
+ *   Stretch session it means LESS, because the stretching is the load.
+ *
+ *   TYPE_COUNTS lets a session type state its own base shape. Stretch's
+ *   work IS the held positions, so its main is large and its warm-up is
+ *   small -- enough to not stretch cold, no more. On "Mostly mobility"
+ *   that now yields roughly 2 warm-up and 4 stretches instead of 3 and
+ *   2. The presets still apply on top and still mean something; they
+ *   just no longer invert the session.
+ *
+ *   TWO CATEGORY FAULTS, found by printing what the categories actually
+ *   return rather than counting them:
+ *
+ *   `glute-stretch` IS NOT A STRETCH CATEGORY. It resolves to
+ *   hip-rotation and yoga-pose -- Warrior II, Chair Pose, Tree Pose,
+ *   Half Moon, Warrior III, Bridge Pose. Standing balance work. Dropped
+ *   from Stretch; the category definition itself is a content fault and
+ *   is booked separately rather than edited here, because Glute Focus
+ *   and Mobility both rely on it and changing it under them is a
+ *   different change.
+ *
+  *   THE FILL POOL WAS THE REAL CULPRIT. `static-stretch` and
+ *   `deep-stretch` overlap heavily, so on first ship I kept the bigger
+ *   one -- 53 against 30 -- without looking inside it. `deep-stretch` is
+ *   43% yoga poses: Downward Dog, Warrior I, Warrior II. Since the fill
+ *   pool supplies every slot the small specific categories do not, those
+ *   poses were most of a short session. `static-stretch` is 30 entries
+ *   and 0% non-stretch, so it is the fill now. Smaller and correct beats
+ *   larger and mixed.
+ *
+ *   `lat-stretch` is also dropped: all 3 of its entries are inside
+ *   `thread-needle` (7), so it was a second pick on the same pool. The
+ *   gate found it, not me -- I had checked the pools I suspected and
+ *   stopped there.
+ *
+ *   The counting mistake worth remembering: yesterday I checked these
+ *   categories had CONTENT and never checked WHAT content. 15 entries is
+ *   a reassuring number and says nothing about whether they are
+ *   stretches.
+ *
  * 31 Aug 2026 v38
  *   BYPASS-DOOR + STRETCH-1 warm-up correction.
  *
@@ -715,9 +762,14 @@ export const SESSION_TYPES = [
     // Order matters -- see the v37 note. Small region-specific pools
     // first so a short session spreads across the body; the two large
     // generic pools last, to fill.
-    mainCategories:     ["hamstring-stretch", "hip-flexor-stretch", "glute-stretch",
-                         "chest-stretch", "lat-stretch", "thread-needle",
-                         "supine-rotation", "static-stretch", "deep-stretch"],
+    // STRETCH-3. `glute-stretch` removed: it resolves to hip-rotation and
+    // yoga-pose (Warrior II, Tree Pose, Bridge), which are standing
+    // balance work, not glute stretches. `static-stretch` removed as a
+    // near-duplicate subset of `deep-stretch`. Small specific pools
+    // first, the one generic pool last to fill -- see the v37 note.
+    mainCategories:     ["hamstring-stretch", "hip-flexor-stretch", "chest-stretch",
+                         "thread-needle", "supine-rotation",
+                         "static-stretch"],
     cooldownCategories: ["child-pose", "breathing-cool"]
   }
 ];
@@ -758,6 +810,27 @@ const EXERCISE_COUNT = {
   45: { warmup: 4, main: 7,   cooldown: 2 },
   60: { warmup: 5, main: 9,   cooldown: 3 }
 };
+
+// STRETCH-3. Per-type overrides of the base shape, applied BEFORE the
+// allocation preset. A session type whose work is not "load" needs to
+// say so, or the presets invert it -- see the v39 note.
+//
+// Stretch: the held positions ARE the session. The warm-up exists only
+// so nobody stretches cold, which takes one or two things, not three.
+const TYPE_COUNTS = {
+  stretch: {
+    15: { warmup: 1, main: 5,  cooldown: 1 },
+    30: { warmup: 2, main: 7,  cooldown: 2 },
+    45: { warmup: 2, main: 10, cooldown: 2 },
+    60: { warmup: 3, main: 12, cooldown: 3 }
+  }
+};
+
+function _baseCounts(durationMins, sessionType) {
+  const perType = TYPE_COUNTS[sessionType];
+  if (perType && perType[durationMins]) return perType[durationMins];
+  return EXERCISE_COUNT[durationMins];
+}
 
 // ── Coach line templates ───────────────────────────────────────────────────────
 
@@ -1647,7 +1720,7 @@ export function buildCandidatePools({ sessionType, durationMins, equipmentOverri
   const userEquipment = equipmentOverride || store.get("equipment") || [];
   const equipSet       = resolveEquipment(userEquipment);
   const conditionSet   = buildActiveConditionSet();
-  const baseCounts     = EXERCISE_COUNT[durationMins] || EXERCISE_COUNT[30];
+  const baseCounts     = _baseCounts(durationMins, sessionType) || EXERCISE_COUNT[30];
   const counts         = _applyPreset(baseCounts, preset);
 
   function poolFor(categories, section, count) {
@@ -1905,7 +1978,7 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   const userEquipment  = equipmentOverride || store.get("equipment") || [];
   const equipSet       = resolveEquipment(userEquipment);
   const conditionSet   = buildActiveConditionSet();
-  const counts         = _applyPreset(EXERCISE_COUNT[durationMins] || EXERCISE_COUNT[30], preset);
+  const counts         = _applyPreset(_baseCounts(durationMins, sessionType) || EXERCISE_COUNT[30], preset);
   const conditionNote  = buildConditionNote(sessionType);
 
   // ── Prescribed exercises injection ──────────────────────────────────────────

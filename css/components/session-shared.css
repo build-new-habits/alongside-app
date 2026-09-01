@@ -392,3 +392,17 @@
 @media (prefers-contrast: more) {
   .sb-severe-banner { border-left-width: 6px; }
 }
+
+/* ── PICKER-GROUP ─────────────────────────────────────────────────────
+   Section headings in the session-type picker. Quiet on purpose: they
+   are orientation, not content, and must not compete with the tiles
+   they introduce. */
+.sb-group-heading {
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: var(--font-bold, 700);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary, inherit);
+  opacity: 0.75;
+}

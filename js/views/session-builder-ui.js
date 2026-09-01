@@ -256,6 +256,18 @@ let preselectChecked   = false;     // guards the store-preselect read to run on
 // change if tier names ever move.
 
 // ── Duration options ──────────────────────────────────────────────────────────
+// PICKER-GROUP, 31 Aug 2026. Grouping only -- SESSION_TYPES stays the
+// single source of truth for what a type IS. Any type NOT listed here
+// still renders, under "More", so adding a session type can never make
+// it vanish from the picker. That failure mode -- a new type silently
+// absent because a second list was not updated -- is exactly what
+// verify-w2's hardcoded id list did.
+const TYPE_GROUPS = [
+  { label: "Strength",           ids: ["full", "upper", "lower", "glute", "core"] },
+  { label: "Cardio",             ids: ["cardio"] },
+  { label: "Mobility & Stretch", ids: ["mobility", "stretch"] },
+];
+
 const DURATIONS = [
   { mins: 15, label: "15 min", desc: "Quick and focused" },
   { mins: 30, label: "30 min", desc: "A proper session" },
@@ -403,6 +415,21 @@ function renderLocationStep() {
 // R4, 20 Aug 2026. The type picker no longer gates. Every SESSION_TYPES
 // entry is pressable on every tier. Choosing what you work on today is
 // self-direction, and self-direction is an accessibility feature.
+/**
+ * PICKER-GROUP. Groups by TYPE_GROUPS, then sweeps up anything not
+ * listed into "More". The sweep is the point: the grouping list must
+ * never be able to hide a session type that SESSION_TYPES defines.
+ */
+function _groupedTypes() {
+  const claimed = new Set(TYPE_GROUPS.flatMap(g => g.ids));
+  const groups  = TYPE_GROUPS
+    .map(g => ({ label: g.label, types: g.ids.map(id => SESSION_TYPES.find(t => t.id === id)).filter(Boolean) }))
+    .filter(g => g.types.length);
+  const rest = SESSION_TYPES.filter(t => !claimed.has(t.id));
+  if (rest.length) groups.push({ label: "More", types: rest });
+  return groups;
+}
+
 function renderTypePicker() {
   return `
     <div class="view session-builder-view">
@@ -421,9 +448,17 @@ function renderTypePicker() {
         </p>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: var(--space-3);"
-           role="group" aria-label="Choose session type">
-        ${SESSION_TYPES.map(t => {
+      <!-- PICKER-GROUP. Eight types in one flat list read as a single
+           undifferentiated run, so Stretch -- appended last -- looked
+           like the tail of the strength and cardio block. Graeme: its
+           natural home is with Mobility. Grouping also makes the picker
+           scannable: somebody who wants to move gently should not have
+           to read past five strength options to learn that is offered. -->
+      ${_groupedTypes().map(g => `
+        <h2 class="sb-group-heading">${g.label}</h2>
+        <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-5);"
+             role="group" aria-label="${g.label} sessions">
+        ${g.types.map(t => {
           const inner = `
               <span style="font-size:2rem;flex-shrink:0;line-height:1;" aria-hidden="true">${t.icon}</span>
               <div style="flex:1;min-width:0;">
@@ -446,7 +481,8 @@ function renderTypePicker() {
             </button>
           `;
         }).join("")}
-      </div>
+        </div>
+      `).join("")}
 
       <!-- R4, 20 Aug 2026. A free-tier footnote reading "All session
            types come with the Plan" stood here. Removed: every session
