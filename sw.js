@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v418
+ *
+ * v418 - STRETCH-3 + PICKER-GROUP. No new files. CSS changed and the
+ *   session-type picker is now grouped, so a stale shell would show the
+ *   old flat list and the old stretch pools.
+ *
  * 31 Aug 2026 v417
  *
  * v417 - RETIRE-INTENTION + BACK-STACK. js/views/intention.js is DELETED
@@ -2907,7 +2913,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v417";
+const CACHE_NAME = "alongside-v418";
 
 const SHELL_URLS = [
 
