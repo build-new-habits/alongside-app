@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v419
+ *
+ * v419 - SECTION-RULES. No new files; session-builder.js gains a
+ *   per-type, per-section filter. A stale shell would keep serving
+ *   Wrist CARs before a leg session and Monster Walk before a stretch.
+ *
  * 31 Aug 2026 v418
  *
  * v418 - STRETCH-3 + PICKER-GROUP. No new files. CSS changed and the
@@ -2913,7 +2919,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v418";
+const CACHE_NAME = "alongside-v419";
 
 const SHELL_URLS = [
 
