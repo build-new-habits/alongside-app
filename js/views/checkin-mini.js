@@ -1,6 +1,20 @@
 /**
  * checkin-mini.js - Abbreviated Return-Visit Check-In
  *
+ * 31 Aug 2026 v7
+ *   CHECKIN-EXIT. Both exits fell back to "intention" when no
+ *   pendingDoorRoute was set -- that is, whenever somebody updated their
+ *   check-in without being on the way to a door. intention.js documents
+ *   itself as a session-exit destination rather than the daily screen,
+ *   and prints its own <h1>Today</h1>, so the person cannot tell they
+ *   have been moved. Both now return to today.
+ *
+ *   NOT FIXED HERE, and larger: intention.js and coach-reflection.js are
+ *   two separately-built live screens serving the same purpose. Flagged
+ *   in intention.js's own v8 header on 19 Jul and fenced out of scope
+ *   then. Retiring one affects roughly eight session views that use it
+ *   as their home destination. Booked as DUPE-SCREENS.
+ *
  * 04 Aug 2026 v6
  *
  * v6 — Skip button now honours pendingDoorRoute too, not just
@@ -441,7 +455,15 @@ export function onMount() {
       store.set("pendingDoorRoute", null);
       router.navigate(pending);
     } else {
-      router.navigate("intention");
+      // CHECKIN-EXIT, 31 Aug 2026. Was "intention". Somebody who has only
+      // updated their check-in has not asked to go anywhere -- they want
+      // the app they were already using. intention.js is documented in
+      // its own header as a session-exit destination and NOT the
+      // daily-use screen, but it renders its own <h1>Today</h1>, so
+      // being sent there is indistinguishable from arriving home except
+      // that the screen is different. Graeme, 31 Aug: "I thought we had
+      // retired that."
+      router.navigate("today");
     }
   });
 
@@ -529,7 +551,9 @@ export function onMount() {
       store.set("pendingDoorRoute", null);
       router.navigate(pending);
     } else {
-      router.navigate("intention");
+      // CHECKIN-EXIT. See the note on the skip path above. Same reason:
+      // updating a check-in is not a request to be taken somewhere new.
+      router.navigate("today");
     }
   });
 }

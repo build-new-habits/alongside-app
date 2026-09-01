@@ -1,35 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v246
+## 31 Aug 2026 v245
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v245.md`. Remove v245 on upload.
-
-> ### 🟢 CHECKIN-EXIT — DEPLOYED 31 Aug, `alongside-v416`. 95 gates.
->
-> **Device-confirmed working first:** the bypass door fires before any choosing, the rose banner names the zone and the level, "Back to Today" exits cleanly, and a Stretch session at pain 8 builds with conservative loading and no Seated Punches. BYPASS-DOOR, BYPASS-RED, SPLIT-ORDER and the STRETCH-1 correction are all confirmed on device.
->
-> #### 🔴 Updating a check-in moved you to a screen that is not the daily one
->
-> `checkin-mini.js` has two exits. Both honour `pendingDoorRoute` when the person was on their way to a door — correct, and unchanged. Both fell back to **`intention`** when nothing was pending, which is every time somebody simply updated their check-in. Both now return to **`today`**.
->
-> **Why it was invisible:** `intention.js` renders its own `<h1>Today</h1>` and carries the bottom nav, so arriving there is indistinguishable from arriving home except that the screen is different. Graeme, 31 Aug: *"I thought we had retired that... All we've done is just update the check-in. We wanna use the app as normal."*
->
-> #### 🟠 DUPE-SCREENS — flagged 19 July, never resolved, still live
->
-> `intention.js`'s own v8 header records the finding verbatim: it and `coach-reflection.js` are *"two separately-built, still-live screens serving the same purpose"*, and intention is reached *"only as a session-exit destination... not from the bottom nav Today tab."* It was flagged and fenced out of scope then, and nothing has changed since.
->
-> **Not fixed today, deliberately.** Roughly eight session views (`walk`, `running`, `yoga`, `swim`, `cycle` and others) use `intention` as their home destination. Retiring it is a routing decision across all of them, and it is Graeme's call which of the two survives. **This is the root cause EXIT-AUDIT will keep hitting** — worth deciding before that session rather than during it.
->
-> 🟠 Related, unfixed: `intention.js` printing `<h1>Today</h1>` while not being Today is a labelling fault in its own right. Whichever screen survives should be the only one wearing that title.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **CHECKIN-EXIT** | Both checkin-mini exits return to `today`. Pending-door contract untouched | 🟢 Shipped `alongside-v416` | 31 Aug |
-> | **DUPE-SCREENS** | `intention.js` vs `coach-reflection.js` — two live screens, one purpose. Flagged 19 Jul. Decide which survives BEFORE EXIT-AUDIT | 🔴 Graeme's decision | Before EXIT-AUDIT |
-> | **PICKER-GROUP** | Stretch reads as the end of a strength/cardio run. Group as Strength / Cardio / Mobility & Stretch. Graeme confirmed 31 Aug he is waiting on this | 🟠 Agreed, not built | w/c 31 Aug |
-
+Supersedes `master_schedule_31aug2026_v244.md`. Remove v244 on upload.
 
 > ### 🟢 BYPASS-DOOR · BYPASS-RED · SPLIT-ORDER — DEPLOYED 31 Aug, `alongside-v415`. 94 gates.
 >
@@ -5603,4 +5576,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v246*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v245*
