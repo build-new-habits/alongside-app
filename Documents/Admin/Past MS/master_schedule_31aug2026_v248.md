@@ -1,51 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v249
+## 31 Aug 2026 v248
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v248.md`. Remove v248 on upload.
-
-> ### 🟢 SECTION-RULES — DEPLOYED 31 Aug, `alongside-v419`. 97 gates.
->
-> #### ⚫ ACTIVATION-SCOPE and CAT-GLUTE are CLOSED. Fixed as a mechanism, not a fourth patch.
->
-> **W2-1 named this pattern on 14 Aug and it was not recognised as general:** *"a filter correct against a curated pool, left in place after the pool became the whole database."* CON-6 made every section draw from all 551 entries. The **category names** were written when each pool was hand-curated, so they still read as though they carry intent — and they do not:
->
-> | Category | Blind to | Symptom on device |
-> |---|---|---|
-> | `activation` | region | Shoulder CARs, Wrist CARs, Grip Strengthening in a **Lower Body** warm-up |
-> | `glute-stretch` | character | Warrior II, Tree Pose, Bridge Pose as "glute stretches" |
-> | `hip-mobility` | character | **Monster Walk** — a banded glute strengthening drill — in a **Stretch** warm-up |
->
-> **Two axes, not three bugs.** Region and character. Both already existed in the data; **no schema change was needed**:
->
-> - `affectsAreas` — 22 values, present on **551/551**. The region axis.
-> - `movementPattern` — 42 values, present on all. The character axis.
-> - `contentType` was the obvious third candidate and is **rejected**: missing on **188 of 551**, so filtering on it would silently drop a third of the library while appearing to work.
->
-> **`sectionRules` is opt-in per type per section.** A type declaring nothing behaves exactly as before, so the six untouched types carry zero regression risk. Three forms: `allowPatterns`, `denyPatterns`, and `excludeAreasOnly`.
->
-> **`excludeAreasOnly` is deliberately narrow.** A blunt "must include a leg area" would have thrown out cat-cow and pelvic tilt, which belong in a lower-body warm-up. Dropping only exercises whose areas are *entirely* elsewhere removes Wrist CARs and keeps everything that touches both. Gate assertion 3a checks the rule is neither too loose nor too broad — both directions reversal-proven.
->
-> **The leg-swing trade, made explicitly.** Leg swings are legitimate before stretching but share `movementPattern: hip-abduction` with Monster Walk, and the pattern axis cannot separate a swing from a banded walk. Both are excluded. Losing leg swings from a stretch warm-up is a smaller cost than putting resistance-band strengthening in one. **Revisit if a load axis ever exists.**
->
-> **Starvation was the real risk and it is measured, not assumed.** `verify-w2` derives its type list from `SESSION_TYPES`, so it covered these rules automatically: a sedentary user at difficulty ceiling 2 still gets **26 stretch warm-up and 28 stretch main** candidates. Gate assertion 4 independently requires ≥6 in any ruled section before condition, equipment or difficulty filtering. **A starved section is worse than an impure one — it fails closed, with no session at all.**
->
-> #### 🟢 Gate
->
-> `verify-sectionrules.mjs`, 8 assertions, **all reversal-proven first time**. Assertion 2b is the one that matters: it counts call sites and requires every one to pass the rules through. **A rule wired into three of four paths is harder to find than one wired into none** — correct in generated sessions and not in hand-picked ones, with nothing on screen to say which.
->
-> One assertion initially counted **comment mentions** of `_filterCandidates` as call sites — reporting 12 where there are 4. Third time today a gate has read prose as code; comments are now stripped before anything is counted.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **SECTION-RULES** | Region and character filtering, opt-in per type/section | 🟢 Shipped `alongside-v419`, untested on device | 31 Aug |
-> | **ACTIVATION-SCOPE** | Closed by SECTION-RULES on `lower` and `glute` warm-ups | ⚫ **CLOSED** | 31 Aug |
-> | **CAT-GLUTE** | `glute-stretch` no longer reaches Stretch. **The category definition is still wrong** for Glute Focus and Mobility, which can now be fixed cheaply with a rule rather than by editing the shared category | 🟠 Contained, not corrected | Post-beta |
-> | **UPPER-SCOPE** | `upper` warm-up has the mirror-image fault and is NOT yet ruled — leg drills before an upper session. Deliberately left: the exclusion set is larger and wants checking, not guessing at 22:00 | 🟠 Next | w/c 31 Aug |
-> | **PRESET-COPY** | "Mostly strength — less warm-up and stretching, more work" is nonsense on a Stretch session | 🟠 Copy fault | w/c 31 Aug |
-
+Supersedes `master_schedule_31aug2026_v247.md`. Remove v247 on upload.
 
 > ### 🟢 STRETCH-3 + PICKER-GROUP — DEPLOYED 31 Aug, `alongside-v418`. 96 gates.
 >
@@ -5716,4 +5673,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v249*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v248*
