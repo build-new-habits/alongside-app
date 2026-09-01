@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v417
+ *
+ * v417 - RETIRE-INTENTION + BACK-STACK. js/views/intention.js is DELETED
+ *   and removed from SHELL_URLS. A stale shell would still hold the old
+ *   file and the old router, so this bump matters more than most: an
+ *   un-updated install would keep landing people on the retired screen.
+ *
  * 31 Aug 2026 v416
  *
  * v416 - CHECKIN-EXIT. checkin-mini.js both exits now return to today
@@ -2900,7 +2907,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v416";
+const CACHE_NAME = "alongside-v417";
 
 const SHELL_URLS = [
 
@@ -2982,7 +2989,6 @@ const SHELL_URLS = [
   "/alongside-app/js/views/mobility-conditioning.js",
   "/alongside-app/js/views/checkin.js",
   "/alongside-app/js/views/checkin-mini.js",
-  "/alongside-app/js/views/intention.js",
   "/alongside-app/js/views/coach-proposal.js",
   "/alongside-app/js/views/workout.js",
   "/alongside-app/js/views/workout-complete.js",
