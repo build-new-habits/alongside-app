@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v422
+ *
+ * v422 - ZONE-1. Body-zone stretch picker. store.js v61 (new field
+ *   sessionZoneFocus), a new builder phase, new CSS. No new files.
+ *
  * 31 Aug 2026 v421
  *
  * v421 - CHECKIN-GATE + BACK-DOOR. store.js v60, and the Stretch card
@@ -2930,7 +2935,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v421";
+const CACHE_NAME = "alongside-v422";
 
 const SHELL_URLS = [
 
