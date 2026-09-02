@@ -1,7 +1,15 @@
 # Alongside — Data Schema Reference
-## 22 Aug 2026 v1.41
+## 31 Aug 2026 v1.42
 
-**File:** `js/store.js` (confirmed live version: **v59, 29 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v60, 31 Aug 2026**)
+
+> **v1.42, 31 Aug 2026 — no field changed.** `store.js` v60 adds
+> `checkedInToday()`, a derived read over the existing
+> `lastCheckin.timestamp`. It stores nothing. It moved here from a private
+> helper in `today.js` because the Mobility & Conditioning door needed the
+> same test, and two definitions of "has this person checked in today" is
+> how two doors end up disagreeing about whether they have — one gating a
+> session on the answer and one not.
 
 ---
 
