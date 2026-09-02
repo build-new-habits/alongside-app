@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 02 Sep 2026 v425
+ *
+ * v425 - ARC-3 + SELECT-MERGE. Zone focus now leads selection in both
+ *   paths. No new files.
+ *
  * 31 Aug 2026 v424
  *
  * v424 - ARC-1 correction. The zone prefill read
@@ -2948,7 +2953,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v424";
+const CACHE_NAME = "alongside-v425";
 
 const SHELL_URLS = [
 
