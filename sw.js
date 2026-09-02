@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v421
+ *
+ * v421 - CHECKIN-GATE + BACK-DOOR. store.js v60, and the Stretch card
+ *   now gates on today's check-in. A stale shell would keep letting
+ *   somebody into a stretch session with no pain data at all.
+ *
  * 31 Aug 2026 v420
  *
  * v420 - STRETCH-DOOR. A Stretch card on the Mobility & Conditioning
@@ -2924,7 +2930,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v420";
+const CACHE_NAME = "alongside-v421";
 
 const SHELL_URLS = [
 
