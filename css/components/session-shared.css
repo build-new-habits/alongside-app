@@ -434,3 +434,12 @@
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
+
+/* ARC-1. What the arc has not reached yet. Quiet, and phrased about the
+   plan rather than the person — so it must not look like a warning. */
+.sb-zone-note {
+  margin: 0 0 var(--space-4) 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed, 1.6);
+  opacity: 0.75;
+}
