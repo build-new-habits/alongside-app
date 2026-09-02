@@ -25,6 +25,7 @@
  */
 import fs from "node:fs";
 import { STRETCH_GOAL_ZONES, zonesForGoal } from "../js/data/stretch-goal-zones.js";
+import { focusBudget, zoneMatcher, fillFocusedSlots } from "../js/session-builder.js";
 import { STRETCH_ZONES } from "../js/session-builder.js";
 import { GOAL_CATEGORIES } from "../js/data/goals.js";
 
@@ -212,6 +213,78 @@ check("5c. the goal leans the picker, it does not lock it", () => {
      "suggested zones are not written into the editable selection, so they cannot be " +
      "turned off -- a coach with a plan you are not allowed to change");
   ok(!body.includes("disabled"), "suggested zones are locked");
+});
+
+console.log("\nTEST 6 - ARC-3: the focus gets a declared share of the slots");
+
+check("6a. the budget is a majority, never all of them", () => {
+  // All of them would be a filter wearing a coach's voice: it would stop
+  // showing anybody anything they did not already know to ask for.
+  for (const n of [3, 4, 5, 7, 9]) {
+    const b = focusBudget(n);
+    ok(b > n / 2, `focusBudget(${n}) = ${b}; the focus must lead the section`);
+    ok(b <= n - 1, `focusBudget(${n}) = ${b}; at least one slot must stay for breadth`);
+  }
+  ok(focusBudget(0) === 0, "a section with no slots must claim none");
+});
+
+check("6b. no focus means no change at all", () => {
+  ok(zoneMatcher(null) === null && zoneMatcher([]) === null,
+     "an empty focus must yield no matcher, or unfocused sessions change shape");
+  const out = fillFocusedSlots({ candidates: [], categories: [], budget: 3,
+                                 matcher: null, taken: new Set(), pick: p => p[0] });
+  ok(out.length === 0, "a null matcher must claim no slots");
+});
+
+check("6c. the focused pass spreads across categories", () => {
+  // Otherwise a focused section is five variations of one stretch.
+  const cand = [
+    { id: "a1", category: "hamstring-stretch", affectsAreas: ["hamstring"] },
+    { id: "a2", category: "hamstring-stretch", affectsAreas: ["hamstring"] },
+    { id: "b1", category: "hip-flexor-stretch", affectsAreas: ["hip"] },
+  ];
+  const out = fillFocusedSlots({
+    candidates: cand, categories: ["hamstring-stretch", "hip-flexor-stretch"],
+    budget: 2, matcher: zoneMatcher(["hamstrings", "hips"]),
+    taken: new Set(), pick: p => p[0],
+  });
+  ok(out.length === 2, `expected 2 picks, got ${out.length}`);
+  ok(new Set(out.map(e => e.category)).size === 2,
+     "both picks came from one category; a focused section must still vary");
+});
+
+check("6d. the focused pass runs BEFORE one-per-category, in both paths", () => {
+  // This is the whole fault. Reordering within categories changed
+  // nothing because breadth claimed every seat first.
+  const sb = read("js/session-builder.js");
+  for (const [label, anchor] of [["poolFor", "function poolFor("],
+                                 ["selectFromCategories", "function selectFromCategories("]]) {
+    const at = sb.indexOf(anchor);
+    ok(at > -1, `no ${label}`);
+    // Slice to the function's END, not a fixed window.
+    // selectFromCategories is ~460 lines, so a 4000-character window
+    // stopped short of its loop and reported the pass missing when it
+    // was present. Fourth time today a window has measured the wrong
+    // region of a file.
+    const end     = sb.indexOf("return selected.slice(0, count);", at);
+    const stop    = end > -1 ? end : at + 6000;
+    const body    = sb.slice(at, Math.max(stop, at + 3000));
+    const focused = body.indexOf("fillFocusedSlots");
+    const breadth = body.indexOf("for (const cat of categories)");
+    ok(focused > -1, `${label} never claims focused slots -- zones cannot lead there`);
+    ok(breadth > -1, `${label} has no breadth pass`);
+    ok(focused < breadth,
+       `${label} runs one-per-category before the focused pass, so breadth takes every seat`);
+  }
+});
+
+check("6e. both paths use the SAME policy, not two copies", () => {
+  const sb = read("js/session-builder.js");
+  const defs = (sb.match(/function focusBudget|function zoneMatcher|function fillFocusedSlots/g) || []);
+  ok(defs.length === 3, `expected one definition each, found ${defs.length}`);
+  // Exclude the DEFINITION, whose destructured signature also matches.
+  const uses = (sb.match(/(?<!export function )fillFocusedSlots\(\{/g) || []).length;
+  ok(uses === 2, `${uses} call sites; both selection paths must use it or they diverge again`);
 });
 
 console.log(fails === 0
