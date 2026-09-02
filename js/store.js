@@ -1,5 +1,19 @@
 /**
  * store.js - Data persistence layer
+ * 31 Aug 2026 v61
+ *
+ * v61 - ZONE-1. `sessionZoneFocus`: an array of zone ids the person chose
+ *   for today's stretch session, or [] for "wherever you need it".
+ *
+ *   Stored rather than held in the view because the check-in gate can
+ *   route somebody out to checkin.js and back mid-flow, and a choice that
+ *   did not survive that would have to be asked for twice. Cleared when
+ *   the session is built, so it never silently shapes tomorrow.
+ *
+ *   NOT a preference and NOT a profile. Nothing reads it outside the
+ *   builder, nothing accumulates from it, and it says nothing about the
+ *   person -- only about the twenty minutes in front of them.
+ *
  * 31 Aug 2026 v60
  *
  * v60 - CHECKIN-GATE. checkedInToday() moved here from today.js, where it
@@ -1176,6 +1190,8 @@ export const store = {
 
       coachStyle: saved.coachStyle || 'nurturing',
 
+      sessionZoneFocus: Array.isArray(saved.sessionZoneFocus) ? saved.sessionZoneFocus : [],
+
       // ATHLETE-RETIRE, 18 Aug 2026. One-way migration, athlete ->
       // personal. NOT a cosmetic tidy: this line was
       // `saved.tier || 'free'` with no validation, so once "athlete"
@@ -1274,6 +1290,14 @@ export const store = {
       tier: 'free',
 
       fitnessLevel: null,
+
+      // ZONE-1, 31 Aug 2026. Body zones chosen for TODAY's stretch
+      // session, by id from STRETCH_ZONES. Not a preference and not a
+      // profile: nothing outside the builder reads it and nothing
+      // accumulates from it. Stored only because the check-in gate can
+      // route somebody out and back mid-flow, and a choice that did not
+      // survive that would have to be asked for twice.
+      sessionZoneFocus: [],
 
       // ── BODY AND TARGETS ─────────────────────────────────────
       // WEIGHT-1a: weight is CANONICAL KILOGRAMS.

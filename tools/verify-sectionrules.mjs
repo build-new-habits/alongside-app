@@ -24,7 +24,7 @@
 import fs from "node:fs";
 import { EXERCISES } from "../js/data/exercises/index.js";
 import { matchCategory } from "../js/data/session-categories.js";
-import { SESSION_TYPES } from "../js/session-builder.js";
+import { SESSION_TYPES, STRETCH_ZONES, zonesWithCoverage, zoneContentCount } from "../js/session-builder.js";
 
 let fails = 0;
 const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
@@ -256,6 +256,74 @@ check("7c. back returns to the door, not to a skipped screen", () => {
   const reset = typeBranch.indexOf("resetState()");
   ok(cap > -1 && reset > -1 && cap < reset,
      "entryDoor is read after resetState(), which nulls it -- the door is silently lost");
+});
+
+console.log("\nTEST 8 - ZONE-1: zones are offered only where content exists");
+
+check("8a. every offered zone clears the content floor", () => {
+  const offered = zonesWithCoverage();
+  ok(offered.length >= 5, `only ${offered.length} zones offered; the picker is not usable`);
+  for (const z of offered) {
+    ok(zoneContentCount(z) >= 6,
+       `"${z.label}" is offered with ${zoneContentCount(z)} stretches. Offering a thin ` +
+       `zone is worse than omitting it -- it promises a focus the library cannot honour.`);
+  }
+});
+
+check("8b. thin zones are hidden, not shipped thin", () => {
+  const offeredIds = new Set(zonesWithCoverage().map(z => z.id));
+  const thin = STRETCH_ZONES.filter(z => zoneContentCount(z) < 6);
+  for (const z of thin) {
+    ok(!offeredIds.has(z.id), `"${z.label}" is below the floor but still offered`);
+  }
+});
+
+check("8c. zone focus orders, it does not filter", () => {
+  const at = raw.indexOf("function _applyZoneFocus");
+  ok(at > -1, "no _applyZoneFocus");
+  const body = raw.slice(at, raw.indexOf("\n}", at));
+  ok(body.includes("hit.concat(rest)"),
+     "zone focus drops non-matching exercises. A hard filter over a library this size " +
+     "eventually returns an empty session; ordering degrades instead.");
+  ok(!/return\s+list\.filter/.test(body), "zone focus filters the list");
+});
+
+check("8d. only the main section narrows to the chosen zones", () => {
+  const at = src.indexOf("_applyZoneFocus(matched");
+  ok(at > -1, "zone focus is never applied");
+  const before = src.slice(Math.max(0, at - 200), at);
+  ok(before.includes('section === "main"'),
+     "zone focus is applied outside the main section -- a cool-down that narrowed to " +
+     "the worked zone would end the session on the tightest thing in it");
+});
+
+check("8d2. the field is a real default, not a method-object stray", () => {
+  // It first landed between two methods, where store.get() returns
+  // undefined and zone focus silently does nothing while every gate
+  // stays green. It must be in the defaults AND in the load merge, or it
+  // does not survive a reload -- which is the one thing it exists for.
+  const st = read("js/store.js");
+  const inDefaults = /fitnessLevel:\s*null,[\s\S]{0,600}sessionZoneFocus:\s*\[\]/.test(st);
+  ok(inDefaults, "sessionZoneFocus is not in the defaults object");
+  ok(/saved\.sessionZoneFocus/.test(st),
+     "sessionZoneFocus is not restored on load, so it cannot survive the check-in " +
+     "detour it exists to survive");
+});
+
+check("8e. only Stretch gains a step", () => {
+  const ui = read("js/views/session-builder-ui.js");
+  // Assert on the ADVANCE, not on a string that could exist anywhere.
+  // The reversal that set phase = "zones" unconditionally left the
+  // back-branch copy of this string in place and the gate stayed green.
+  // Anchor on the HANDLER, not the button markup 860 lines earlier which
+  // also contains this id.
+  const at = ui.indexOf('getElementById("sb-location-continue-btn")');
+  ok(at > -1, "no location continue handler");
+  const advance = ui.slice(at, at + 320);
+  ok(advance.includes('selectedType === "stretch"'),
+     "the forward advance is not gated on the stretch type, so every session type " +
+     "gains a step it did not have");
+  ok(ui.includes('phase === "zones"'), "the zone phase is never rendered");
 });
 
 console.log(fails === 0

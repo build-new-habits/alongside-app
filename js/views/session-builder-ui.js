@@ -191,7 +191,7 @@
 
 import { store }                          from "../store.js";
 import { router }                         from "../router.js";
-import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, severeZoneToday } from "../session-builder.js";
+import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, severeZoneToday, zonesWithCoverage } from "../session-builder.js";
 // R4, 20 Aug 2026. isPremium/lockedFeature are no longer used in this
 // file. Every step of the builder -- type, duration, allocation split,
 // location, build mode -- is now free. The import is REMOVED rather than
@@ -247,6 +247,7 @@ let selectedCandidateIds = new Set();
 let equipmentOverride = null;       // null = use store defaults; array = this-session override
 let builtSession       = null;
 let entryDoor          = null;      // BACK-DOOR: the door that preselected a type
+let selectedZones      = [];        // ZONE-1: body zones for a stretch session
 let preselectChecked   = false;     // guards the store-preselect read to run once per mount
 
 // ── Tier check ────────────────────────────────────────────────────────────────
@@ -332,6 +333,7 @@ export function render() {
 
   if (phase === "type")       return renderTypePicker();
   if (phase === "location")   return renderLocationStep();
+  if (phase === "zones")      return renderZonePicker();
   if (phase === "duration")   return renderDurationPicker();
   if (phase === "equipment")  return renderEquipmentCheck();
   if (phase === "buildmode")  return renderBuildModeStep();
@@ -504,6 +506,43 @@ function renderTypePicker() {
 // R4, 20 Aug 2026. Ungated, same reasoning as the type picker. The
 // person with forty minutes and the person with ten are both telling the
 // coach something true about today.
+/**
+ * ZONE-1. Offered only for Stretch, and only zones the library can
+ * actually fill -- zonesWithCoverage() counts live. Multi-select, and
+ * choosing nothing is a real answer, not a skipped step: "wherever you
+ * need it" is what most people want most days.
+ */
+function renderZonePicker() {
+  const zones = zonesWithCoverage();
+  return `
+    <div class="sb-view" role="main">
+      <div class="sb-header">
+        <button class="btn btn-ghost" id="sb-back-btn" aria-label="Go back">&larr; Back</button>
+        <span class="sb-header-title">Stretch</span>
+      </div>
+
+      <div class="card card-coach" style="margin-bottom: var(--space-5);">
+        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
+        <p class="coach-message-text">Anywhere you want me to focus? Pick as many as you like, or none.</p>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-5);"
+           role="group" aria-label="Choose body zones">
+        ${zones.map(z => `
+          <button class="sb-zone-chip ${selectedZones.includes(z.id) ? "sb-zone-chip--on" : ""}"
+                  data-zone="${z.id}"
+                  aria-pressed="${selectedZones.includes(z.id)}">
+            ${z.label}
+          </button>
+        `).join("")}
+      </div>
+
+      <button class="btn btn-primary btn-large btn-full" id="sb-zones-continue-btn">
+        ${selectedZones.length ? "Continue" : "Wherever you need it"}
+      </button>
+    </div>`;
+}
+
 function renderDurationPicker() {
   const type    = SESSION_TYPES.find(t => t.id === selectedType);
 
@@ -1069,6 +1108,7 @@ function resetState() {
   builtSession          = null;
   preselectChecked      = false;
   entryDoor             = null;
+  selectedZones         = [];
 }
 
 // ── Mount ─────────────────────────────────────────────────────────────────────
@@ -1148,6 +1188,18 @@ export function onMount() {
       phase = "type";
       rerender();
     } else if (phase === "duration") {
+      // ZONE-1. Back through the step that was actually shown.
+      phase = selectedType === "stretch" ? "zones" : "location";
+      rerender();
+    } else if (phase === "zones") {
+      // BACK-DOOR still applies: a preselected type skipped the picker,
+      // so backing out of the first shown step returns to the door.
+      if (entryDoor) {
+        const door = entryDoor;
+        resetState();
+        router.navigate(door);
+        return;
+      }
       phase = "location";
       rerender();
     } else if (phase === "equipment") {
@@ -1200,8 +1252,28 @@ export function onMount() {
       rerender();
     });
   });
-  document.getElementById("sb-location-continue-btn")?.addEventListener("click", () => {
+  // ZONE-1. Toggling is local; nothing is stored until Continue, so
+  // backing out of this step leaves no trace of a half-made choice.
+  document.querySelectorAll("[data-zone]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.zone;
+      selectedZones = selectedZones.includes(id)
+        ? selectedZones.filter(z => z !== id)
+        : selectedZones.concat(id);
+      rerender();
+    });
+  });
+
+  document.getElementById("sb-zones-continue-btn")?.addEventListener("click", () => {
+    store.set("sessionZoneFocus", selectedZones);
     phase = "duration";
+    rerender();
+  });
+
+  document.getElementById("sb-location-continue-btn")?.addEventListener("click", () => {
+    // ZONE-1. Only Stretch asks. Every other type goes straight on, so
+    // no existing flow gains a step.
+    phase = selectedType === "stretch" ? "zones" : "duration";
     rerender();
   });
 
