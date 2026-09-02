@@ -1,6 +1,52 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 02 Sep 2026 v42
+ *   ARC-3 + SELECT-MERGE. Zone focus now actually leads selection.
+ *
+ *   WHAT WAS WRONG. _applyZoneFocus reordered exercises WITHIN each
+ *   category's pool, but both selection paths take one exercise from
+ *   EACH category before filling anything -- so reordering inside a
+ *   category never changed which categories got a seat. With six main
+ *   categories and five slots, nearly every category got one whatever
+ *   the person asked for. A 5K runner who chose calves, hamstrings, hips
+ *   and glutes was handed a chest opener, a neck stretch and a lumbar
+ *   rotation. Found by tracing a real session, not by reading the code.
+ *
+ *   Depth is what a focus asks for. Breadth is what one-per-category
+ *   guarantees. They are in direct conflict, and previously breadth won
+ *   every time.
+ *
+ *   THE FIX IS A DECLARED BUDGET, not a reordering. focusBudget(count)
+ *   splits the slots explicitly: roughly 60%, never all of them, and
+ *   never fewer than one left for breadth once a section has three or
+ *   more slots. A focused session is mostly what you asked for and still
+ *   contains something you did not -- which is the whole argument for a
+ *   coach rather than a filter.
+ *
+ *   Three earlier attempts tried to fix this by sorting categories, then
+ *   by dropping zero-scoring categories, then by doing both on the
+ *   second path. Each CHANGED the output without FIXING it, because one
+ *   tangential match -- a single entry in supine-rotation that happens to
+ *   affect glutes -- is enough to win a category a guaranteed seat.
+ *   Those attempts were reverted rather than shipped. Ordering was the
+ *   wrong lever; the number of slots was the right one.
+ *
+ *   SELECT-MERGE. There are two selection paths: poolFor() serves "I'll
+ *   choose my own" and selectFromCategories() serves "suggest something
+ *   for me". Fixing only the first made them disagree -- the self-
+ *   directed path honoured zones while the coach-built path ignored
+ *   them, which is worse than neither working.
+ *
+ *   They are NOT merged into one function, deliberately. Their contracts
+ *   genuinely differ: poolFor returns every candidate flagged
+ *   `recommended`, selectFromCategories returns picks weighted by
+ *   preferences, continuity and randomness. Collapsing them would mean
+ *   rewriting both. What IS shared is the POLICY, and that is now one
+ *   definition -- focusBudget() and zoneMatcher() -- used identically by
+ *   both. The duplication that caused this fault was the policy, not the
+ *   plumbing.
+ *
  * 31 Aug 2026 v41
  *   ZONE-1. Choose the body zones a stretch session works.
  *
@@ -788,6 +834,68 @@ export function zoneContentCount(zone) {
  */
 export function zonesWithCoverage() {
   return STRETCH_ZONES.filter(z => zoneContentCount(z) >= MIN_ZONE_CONTENT);
+}
+
+// ── ARC-3: the shared selection policy ───────────────────────────────
+//
+// One definition, used by both selection paths. See the v42 note: the
+// duplication that produced the fault was this policy existing twice by
+// implication, not the two functions existing at all.
+
+/**
+ * How many of a section's slots belong to the chosen zones.
+ *
+ * Never all of them once there are three or more: a focused session that
+ * contained ONLY the zones asked for would be a filter wearing a coach's
+ * voice, and would quietly stop showing anybody anything they did not
+ * already know to ask for.
+ */
+export function focusBudget(count) {
+  if (!count || count <= 0) return 0;
+  if (count <= 2) return count;
+  return Math.min(count - 1, Math.ceil(count * 0.6));
+}
+
+/**
+ * A predicate for "does this exercise serve the chosen zones", built once
+ * so both paths cannot drift on what a match means.
+ */
+export function zoneMatcher(zoneIds) {
+  if (!zoneIds || !zoneIds.length) return null;
+  const areas = new Set(
+    STRETCH_ZONES.filter(z => zoneIds.includes(z.id)).flatMap(z => z.areas)
+  );
+  return ex => (ex.affectsAreas || []).some(a => areas.has(a));
+}
+
+/**
+ * Fills up to `budget` slots with zone-matching exercises, taking one per
+ * category per lap so a focused section still spreads across kinds of
+ * stretch rather than returning five variations of the same thing.
+ *
+ * `pick` is supplied by the caller because the two paths choose
+ * differently -- one deterministically for a stable candidate list, one
+ * weighted by preferences. The POLICY is shared; the choosing is not.
+ */
+export function fillFocusedSlots({ candidates, categories, budget, matcher, taken, pick }) {
+  const out = [];
+  if (!matcher || budget <= 0) return out;
+  const isTaken = ex => taken.has(ex.id) || out.some(o => o.id === ex.id);
+
+  let progressed = true;
+  while (out.length < budget && progressed) {
+    progressed = false;
+    for (const cat of categories) {
+      if (out.length >= budget) break;
+      const pool = candidates.filter(e => e.category === cat && matcher(e) && !isTaken(e));
+      if (!pool.length) continue;
+      const chosen = pick(pool);
+      if (!chosen) continue;
+      out.push(chosen);
+      progressed = true;
+    }
+  }
+  return out;
 }
 
 /**
@@ -1932,6 +2040,23 @@ export function buildCandidatePools({ sessionType, durationMins, equipmentOverri
   function poolFor(categories, section, count) {
     const candidates = _filterCandidates(categories, section, equipSet, conditionSet, type.sectionRules?.[section]);
     const recommendedIds = new Set();
+
+    // ARC-3. The focused slots are claimed BEFORE one-per-category, or
+    // breadth takes every seat and the focus never lands. Main only: a
+    // warm-up should not chase the zone, and a cool-down that did would
+    // end the session on the tightest thing in it.
+    if (section === "main") {
+      const matcher = zoneMatcher(store.get("sessionZoneFocus"));
+      const focused = fillFocusedSlots({
+        candidates, categories,
+        budget:  focusBudget(count),
+        matcher,
+        taken:   recommendedIds,
+        pick:    pool => pool[0],   // deterministic: a candidate list must be stable if shown twice
+      });
+      for (const ex of focused) recommendedIds.add(ex.id);
+    }
+
     for (const cat of categories) {
       if (recommendedIds.size >= count) break;
       const fromCat = candidates.find(e => e.category === cat && !recommendedIds.has(e.id));
@@ -2640,7 +2765,26 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
       return from[Math.floor(Math.random() * from.length)];
     }
 
-    // First pass: one from each category
+    // ARC-3. Same policy, same order of operations as poolFor(). The two
+    // paths must agree: one honouring zones while the other ignored them
+    // is worse than neither doing so, because it is invisible.
+    if (section === "main") {
+      const matcher = zoneMatcher(store.get("sessionZoneFocus"));
+      const focused = fillFocusedSlots({
+        candidates, categories,
+        budget:  focusBudget(count),
+        matcher,
+        taken:   chosen,
+        pick:    pickFrom,   // weighted by preferences and continuity, unlike poolFor
+      });
+      for (const ex of focused) {
+        selected.push(ex);
+        chosen.add(ex.id);
+        usedCategories.add(ex.category);
+      }
+    }
+
+    // Second pass: one from each category, for breadth
     for (const cat of categories) {
       if (selected.length >= count) break;
       const fromCat = candidates.filter(e => e.category === cat && !selected.includes(e));

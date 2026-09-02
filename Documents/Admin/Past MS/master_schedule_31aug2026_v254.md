@@ -1,59 +1,8 @@
 # Alongside: Move — Master Schedule
-## 02 Sep 2026 v255
+## 31 Aug 2026 v254
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v254.md`. Remove v254 on upload.
-
-> ### ⚠️ DATE CORRECTION — headers between v243 and v254 say "31 Aug 2026". Much of that work was done on 1–2 September.
->
-> This conversation ran across three days. Claude checked the clock once at the start and **copied 31 Aug forward into every file header afterwards** — the precise failure the session protocol warns about, and the second occurrence (the first dated ~20 files "29 Aug" on 31 Aug). Git timestamps are correct throughout; only the in-file headers and schedule versions are wrong.
->
-> **Recorded, not rewritten.** Same reasoning as `core-session.js`'s duplicate version chain: rewriting ~30 deployed file headers risks fresh errors for no functional gain. **Anything headed "31 Aug 2026" from v243 onward may have been written on 1 or 2 September.** From this entry forward, headers carry the verified date.
->
-> ---
->
-> ### 🟢 ARC-3 + SELECT-MERGE — DEPLOYED 2 Sep, `alongside-v425`. 98 gates.
->
-> #### 🔴 The fault: ordering was the wrong lever
->
-> `_applyZoneFocus` reordered exercises **within** each category, but both selection paths take one exercise from **each category** before filling anything — so reordering inside a category never changed which categories got a seat. With six main categories and five slots, nearly every category got one regardless of the focus.
->
-> **Depth is what a focus asks for. Breadth is what one-per-category guarantees.** Breadth won every time.
->
-> Three earlier attempts — sort categories by relevance, then drop zero-scoring categories, then repeat on the second path — each *changed* the output without *fixing* it, because one tangential match (a single `supine-rotation` entry affecting glutes) wins a category a guaranteed seat. **Those were reverted rather than shipped.**
->
-> #### 🟢 The fix: a declared slot budget
->
-> `focusBudget(count)` splits the slots explicitly — roughly 60%, **never all of them**, never fewer than one left for breadth once a section has three slots. A focused session is mostly what you asked for and still contains something you did not, which is the argument for a coach rather than a filter. Assertion 6a enforces both bounds; both directions reversal-proven.
->
-> **Traced result** — goal `run-5k`, lower back at 4, no equipment, 15 minutes. Every main slot now serves the chosen zones, and **both paths agree**:
->
-> | "Suggest for me" | "I'll choose" |
-> |---|---|
-> | Legs Up the Wall · Standing Quad Stretch · Supine Spinal Twist · Hamstring 90-90 · Seated Hip Flexor | Inchworm · Legs Up the Wall · Hip Flexor Stretch · Couch Stretch · Supine Spinal Twist |
->
-> Previously: `Seated Hip Flexor Stretch · Chest Opener · Seated Neck Side Stretch · Seated Lumbar Rotation`.
->
-> #### 🟢 SELECT-MERGE — the policy is merged, the functions are not
->
-> `poolFor()` and `selectFromCategories()` are **deliberately not collapsed into one function.** Their contracts genuinely differ: one returns every candidate flagged `recommended`, the other returns picks weighted by preferences, continuity and randomness. Merging them would mean rewriting both.
->
-> **What is now shared is the POLICY** — `focusBudget()`, `zoneMatcher()`, `fillFocusedSlots()` — one definition each, used identically by both. **The duplication that caused the fault was the policy, not the plumbing.** Assertion 6e requires exactly one definition and exactly two call sites, so they cannot drift apart again.
->
-> #### ⚠️ Gate discipline
->
-> 6d's window stopped short of a 460-line function and reported a pass missing when it was present; 6e counted the function's own destructured signature as a call site. **Fourth and fifth times today an assertion has measured the wrong region of a file.** Both corrected before trusting.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **ARC-3** | Zone focus leads selection via a declared slot budget | 🟢 Shipped `alongside-v425`, untested on device | 2 Sep |
-> | **SELECT-MERGE** | Selection policy shared; functions deliberately separate | 🟢 Shipped `alongside-v425` | 2 Sep |
-> | **PAT RENEWAL** | **Expires 5 September. Three days.** Only Graeme can do this | 🔴 **Blocking everything** | By 5 Sep |
-> | **ARC-2** | `stretchArc.active` is never set, so the uncovered-zone line cannot appear | 🔴 Next build | w/c 2 Sep |
-> | **CONTENT-STRETCH** | ~25–30 entries: Chest, Inner thigh, Wrists & arms. Physio review before shipping | 🔴 Authoring | w/c 2 Sep |
-
+Supersedes `master_schedule_31aug2026_v253.md`. Remove v253 on upload.
 
 > ### 🔴 ARC-1 IS NOT YET DOING WHAT IT CLAIMS. Found by tracing a real session.
 >
@@ -5995,4 +5944,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 02 Sep 2026 v255*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v254*
