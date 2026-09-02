@@ -1,50 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v254
+## 31 Aug 2026 v253
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v253.md`. Remove v253 on upload.
-
-> ### 🔴 ARC-1 IS NOT YET DOING WHAT IT CLAIMS. Found by tracing a real session.
->
-> Live state unchanged at `alongside-v424`, 98 gates. **An attempted fix was written, tested against a real traced session, failed to converge after three iterations, and was reverted rather than shipped half-tuned.** What follows is the diagnosis, which is the valuable part.
->
-> #### How it was found
->
-> Graeme asked for a walkthrough of the arc "backed by the reality of a coding trace". Running it for real — goal `run-5k`, sore lower back at 4, no equipment, 15 minutes — produced this main section:
->
-> `Seated Hip Flexor Stretch` · `Chest Opener` · `Seated Neck Side Stretch` · `Seated Lumbar Rotation`
->
-> **Three of four are zones the person did not choose.** Chosen zones were calves & ankles, hamstrings, hips, glutes.
->
-> #### 🔴 Fault 1 — `strategicGoal.primaryGoal` is a reader without a writer. FIXED, `alongside-v424`.
->
-> Nothing in the app has ever written that field. `zonesForGoal(null)` returned `[]` every time, so **the arc never leaned at all** and all 98 gates stayed green, because "returns nothing" is indistinguishable from "this person has no goal". The live field is `goals`, written in `onboarding/goals.js` and `settings.js`. Assertion 5d now requires the picker to read a field with a live writer, checked across the whole tree.
->
-> #### 🔴 Fault 2 — the category loop outvotes the zone focus. NOT FIXED.
->
-> `_applyZoneFocus` reorders exercises **within** each category's pool. But selection takes **one exercise from each category in order** before filling anything, so reordering inside a category never changes which categories get a seat. With 6 main categories and 5 slots, nearly every category gets one whatever the person asked for.
->
-> **Depth is what a focus asks for; breadth is what the loop guarantees.** They are in direct conflict and the loop wins.
->
-> #### 🔴 Fault 3 — there are TWO selection paths, and only one was being fixed.
->
-> `buildCandidatePools()` → `poolFor()` serves "I'll choose my own". `buildSession()` → `selectFromCategories()` serves "suggest something for me". **Both contain their own one-per-category loop.** The first attempt fixed only `poolFor`, so the self-directed path honoured zones while the coach-built path ignored them — verified: after that change `buildCandidatePools` correctly led with Hip Flexor Stretch, Inchworm and Couch Stretch, while `buildSession` still returned a chest opener.
->
-> **This is the pattern this codebase keeps producing** — four exercise cards, two `parseHoldSeconds`, two `checkedInToday`, and now two selection loops. Booked as **SELECT-MERGE**.
->
-> #### ⚠️ Why it was reverted rather than shipped
->
-> Three iterations — sort categories by zone relevance, then drop zero-scoring categories, then apply the same to the second path — each **changed** the output without **fixing** it. A tangential single match (one entry in `supine-rotation` affecting glutes) is enough to score a category above zero and win it a guaranteed seat. Tuning a selection algorithm by trial at the end of a long session is how a subtle, hard-to-find fault gets shipped. **The diagnosis is worth more than a half-fix.**
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **ARC-3** | Make zone focus actually lead selection. Needs a real design, not tuning: probably a slot budget (n slots to focused zones, m to breadth) rather than category ordering | 🔴 **Next. ARC-1 does not deliver its promise without it** | w/c 31 Aug |
-> | **SELECT-MERGE** | One selection loop, not two. `poolFor` and `selectFromCategories` must not diverge again | 🔴 Do with or before ARC-3 | w/c 31 Aug |
-> | **ARC-2** | Arc start/stop. `stretchArc.active` is never set, so the uncovered-zone line cannot appear | 🔴 Still required | w/c 31 Aug |
-> | **ARC-1** | Goal→zone map, coverage by date, picker prefill. **Prefill works; selection does not yet follow it** | 🟠 Partial — do not describe as working | 31 Aug |
-
+Supersedes `master_schedule_31aug2026_v252.md`. Remove v252 on upload.
 
 > ### 🟢 ARC-1 — DEPLOYED 31 Aug, `alongside-v423`. 98 gates. `store.js` v62 · `Schema.md` v1.44
 >
@@ -5944,4 +5902,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v254*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v253*
