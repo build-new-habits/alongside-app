@@ -522,7 +522,22 @@ function renderZonePicker() {
   // zones arrive pre-selected and every one can be turned off -- which is
   // the difference between a coach with a view and a coach with a plan
   // you are not allowed to change.
-  const goalId    = (store.get("strategicGoal") || {}).primaryGoal;
+  // ARC-1 CORRECTION, 31 Aug 2026. This read strategicGoal.primaryGoal,
+  // which NOTHING IN THE APP EVER WRITES -- a reader without a writer, so
+  // zonesForGoal(null) returned [] and the arc never leaned at all. The
+  // live field is `goals`, written at onboarding (onboarding/goals.js) and
+  // editable in settings. primaryGoal is kept as the first choice because
+  // workoutGenerator.js already prefers it and it may be written one day;
+  // goals[0] is the working fallback, the same order that file uses.
+  //
+  // Found by tracing the path rather than reading the code that calls it.
+  // Every gate passed while the feature was inert.
+  const goals     = store.get("goals") || [];
+  const goalId    = (store.get("strategicGoal") || {}).primaryGoal || goals[0] || null;
+
+  // A goal can name zones the library cannot fill yet (chest, for one),
+  // so the suggestion is always intersected with what is actually
+  // offerable rather than trusted whole.
   const suggested = zonesForGoal(goalId).filter(id => available.includes(id));
   if (!zonesPrefilled) {
     zonesPrefilled = true;
