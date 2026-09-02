@@ -1,5 +1,27 @@
 /**
  * store.js - Data persistence layer
+ * 31 Aug 2026 v62
+ *
+ * v62 - ARC-1. `stretchArc`, a top-level object.
+ *
+ *   NOT NESTED INSIDE activeProgramme, and that is a reversal of advice
+ *   Claude gave on 31 Aug ("do not build a second programme model").
+ *   That advice was about SERIES-1, which genuinely IS a session
+ *   sequence and belongs inside activeProgramme. This is not: it is a
+ *   coverage tracker with a goal attached, and it wears a similar word.
+ *
+ *   The deciding argument is lifecycle, not taxonomy. activeProgramme
+ *   holds ONE programme and is cleared when that programme completes.
+ *   Nested, a stretch arc would be silently wiped the day somebody
+ *   finished a strength programme -- two unrelated things ending
+ *   together because they shared a container.
+ *
+ *   zonesWorked is a DATE PER ZONE, not a count. "Shoulders last came up
+ *   on the 12th" is a fact about the plan. "You have done shoulders
+ *   three times" is a score, and this product does not keep score. The
+ *   date supports "we have not come to shoulders yet" without ever
+ *   putting a number on the person.
+ *
  * 31 Aug 2026 v61
  *
  * v61 - ZONE-1. `sessionZoneFocus`: an array of zone ids the person chose
@@ -1192,6 +1214,14 @@ export const store = {
 
       sessionZoneFocus: Array.isArray(saved.sessionZoneFocus) ? saved.sessionZoneFocus : [],
 
+      stretchArc: {
+        ...defaults.stretchArc,
+        ...(saved.stretchArc || {}),
+        zonesWorked: (saved.stretchArc && typeof saved.stretchArc.zonesWorked === "object"
+                      && saved.stretchArc.zonesWorked !== null)
+          ? saved.stretchArc.zonesWorked : {}
+      },
+
       // ATHLETE-RETIRE, 18 Aug 2026. One-way migration, athlete ->
       // personal. NOT a cosmetic tidy: this line was
       // `saved.tier || 'free'` with no validation, so once "athlete"
@@ -1707,6 +1737,21 @@ export const store = {
         missedSessions:           [],
         midProgrammeGlanceShown:  false,
         programmeReflectionShown: false
+      },
+
+      // ── STRETCH ARC (v62, 31 Aug 2026 — ARC-1) ───────────────
+      // A direction for stretching over weeks, not a schedule. There is
+      // no session list here on purpose: the arc shapes what a session
+      // leans towards, and never dictates that one is owed.
+      //
+      // zonesWorked maps zone id -> ISO date last worked. A date, never a
+      // count: "shoulders have not come up yet" is a fact about the plan,
+      // "you have done shoulders three times" is a score.
+      stretchArc: {
+        goalId:      null,   // id from data/goals.js
+        startedAt:   null,
+        zonesWorked: {},     // { [zoneId]: 'YYYY-MM-DD' }
+        active:      false
       },
 
       // ── PROGRESS LOG ─────────────────────────────────────────
@@ -2494,6 +2539,37 @@ export const store = {
    * @param {number} [dedupeWindowMs=10000]
    * @returns {object|null} the written entry, or null if rejected as a dupe
    */
+  /**
+   * ARC-1. Records that a zone was worked, as a DATE. Called when a
+   * stretch session is built, not when it is completed -- a session
+   * somebody started and abandoned still tells us the plan came here, and
+   * making coverage depend on finishing would quietly reintroduce
+   * completion pressure through the back door.
+   */
+  markZonesWorked(zoneIds) {
+    if (!Array.isArray(zoneIds) || !zoneIds.length) return;
+    const arc   = this.get("stretchArc") || {};
+    const today = new Date().toISOString().split("T")[0];
+    const worked = { ...(arc.zonesWorked || {}) };
+    for (const id of zoneIds) worked[id] = today;
+    this.set("stretchArc", { ...arc, zonesWorked: worked });
+  },
+
+  /**
+   * ARC-1. Zones the arc has not reached yet, oldest-first, so the coach
+   * can offer what has been missed rather than announce what has been
+   * done. Never surfaced as a count.
+   */
+  zonesNotRecentlyWorked(allZoneIds, limit = 3) {
+    const worked = (this.get("stretchArc") || {}).zonesWorked || {};
+    const never  = allZoneIds.filter(id => !worked[id]);
+    if (never.length) return never.slice(0, limit);
+    return allZoneIds
+      .slice()
+      .sort((a, b) => String(worked[a]).localeCompare(String(worked[b])))
+      .slice(0, limit);
+  },
+
   logActivity(entry, dedupeWindowMs = 10 * 1000) {
     if (!entry || !entry.type) {
       console.error('Store: logActivity called without a type', entry);
