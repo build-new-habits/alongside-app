@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v423
+ *
+ * v423 - ARC-1. New file js/data/stretch-goal-zones.js, precached.
+ *   store.js v62. Omitting the new file from SHELL_URLS would leave the
+ *   builder importing something the shell does not hold -- the INF-CACHE
+ *   failure again.
+ *
  * 31 Aug 2026 v422
  *
  * v422 - ZONE-1. Body-zone stretch picker. store.js v61 (new field
@@ -2935,7 +2942,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v422";
+const CACHE_NAME = "alongside-v423";
 
 const SHELL_URLS = [
 
@@ -3056,6 +3063,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/exercises/swimming_cycling.js",
   "/alongside-app/js/data/morning-programme.js",
   "/alongside-app/js/data/session-categories.js",
+  "/alongside-app/js/data/stretch-goal-zones.js",
   "/alongside-app/js/data/session-rationale.js",
   "/alongside-app/js/data/personal-reads.js",
   "/alongside-app/js/data/field-contract.js",
