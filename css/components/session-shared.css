@@ -406,3 +406,31 @@
   color: var(--color-text-secondary, inherit);
   opacity: 0.75;
 }
+
+/* ── ZONE-1 ───────────────────────────────────────────────────────────
+   Body-zone chips. Multi-select, so they must read as toggles rather
+   than as a list you pick one from -- hence the filled selected state
+   rather than a border change alone. */
+.sb-zone-chip {
+  min-height: 48px;                /* WCAG 2.2 target size */
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-xl, 999px);
+  border: 2px solid var(--color-border, currentColor);
+  background: var(--color-surface);
+  color: inherit;
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.sb-zone-chip--on {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-bg, #0b1622);
+  font-weight: var(--font-bold, 700);
+}
+
+.sb-zone-chip:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

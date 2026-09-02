@@ -1,7 +1,20 @@
 # Alongside — Data Schema Reference
-## 31 Aug 2026 v1.42
+## 31 Aug 2026 v1.43
 
-**File:** `js/store.js` (confirmed live version: **v60, 31 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v61, 31 Aug 2026**)
+
+> **v1.43, 31 Aug 2026 — ZONE-1.** New field `sessionZoneFocus`: `string[]`,
+> default `[]`. The body zones chosen for today's stretch session, by zone
+> id from `STRETCH_ZONES` in `session-builder.js`.
+>
+> **Stored, not held in the view,** because the check-in gate can route
+> somebody out to `checkin.js` and back mid-flow, and a choice that did not
+> survive that would have to be asked for twice.
+>
+> **Deliberately not a preference and not a profile.** Nothing outside the
+> builder reads it, nothing accumulates from it, and it says nothing about
+> the person — only about the twenty minutes in front of them. Cleared when
+> the session is built, so it never silently shapes tomorrow.
 
 > **v1.42, 31 Aug 2026 — no field changed.** `store.js` v60 adds
 > `checkedInToday()`, a derived read over the existing

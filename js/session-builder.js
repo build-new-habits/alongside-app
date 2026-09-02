@@ -1,6 +1,29 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 31 Aug 2026 v41
+ *   ZONE-1. Choose the body zones a stretch session works.
+ *
+ *   STRETCH_ZONES groups the 22 raw `affectsAreas` values into the 11
+ *   zones a person actually thinks in. "Neck & shoulders" is one thought;
+ *   `shoulder` and `rotator-cuff` are two tags.
+ *
+ *   ZONES ARE OFFERED ONLY WHERE THE CONTENT EXISTS. zonesWithCoverage()
+ *   counts live and hides anything below MIN_ZONE_CONTENT, so the picker
+ *   can never offer a zone that would return three exercises and repeat
+ *   two of them. Measured 31 Aug: 8 of 11 zones clear the floor; Chest
+ *   (3), Inner thigh (4) and Wrists & arms (2) do not, and are hidden
+ *   until the content lands rather than shipped thin.
+ *
+ *   That makes the picker a live coverage readout as well as a control.
+ *   A zone appearing is the signal that its content is done.
+ *
+ *   THE FILTER IS A PREFERENCE, NOT A GATE. Zone-matching exercises come
+ *   first; the rest still follow. A person who picks Hamstrings gets a
+ *   hamstring-led session, not four hamstring stretches and a short
+ *   session -- and never an empty one, which is what a hard filter over a
+ *   library this size would eventually produce.
+ *
  * 31 Aug 2026 v40
  *   SECTION-RULES. The fourth instance of one pattern, fixed as a
  *   mechanism rather than a fourth patch.
@@ -723,6 +746,65 @@ function _applyPreset(counts, presetId) {
     main:     Math.max(1, Math.round(counts.main     * preset.mainMult)),
     cooldown: Math.max(1, Math.round(counts.cooldown * preset.cooldownMult))
   };
+}
+
+// ── ZONE-1 ────────────────────────────────────────────────────────────────────
+
+// The 11 zones a person thinks in, mapped onto the raw affectsAreas tags.
+// Order is head-to-toe: a body map read top to bottom is easier to scan
+// than one ordered by how much content each zone happens to have.
+export const STRETCH_ZONES = [
+  { id: "neck-shoulders", label: "Neck & shoulders", areas: ["shoulder", "rotator-cuff"] },
+  { id: "upper-back",     label: "Upper back",       areas: ["upper-back", "thoracic"] },
+  { id: "chest",          label: "Chest",            areas: ["chest-pecs"] },
+  { id: "lower-back",     label: "Lower back",       areas: ["lower-back", "spine"] },
+  { id: "hips",           label: "Hips",             areas: ["hip", "hip-flexor", "piriformis"] },
+  { id: "glutes",         label: "Glutes",           areas: ["glutes", "it-band"] },
+  { id: "hamstrings",     label: "Hamstrings",       areas: ["hamstring"] },
+  { id: "quads",          label: "Quads",            areas: ["quadriceps", "knee"] },
+  { id: "inner-thigh",    label: "Inner thigh",      areas: ["adductors"] },
+  { id: "calves-ankles",  label: "Calves & ankles",  areas: ["calves", "ankle-foot", "achilles"] },
+  { id: "wrists-arms",    label: "Wrists & arms",    areas: ["wrist-elbow", "triceps-biceps", "biceps-triceps"] },
+];
+
+// Below this a zone cannot fill a session without repeating itself, so it
+// is not offered at all. Offering a thin zone is worse than omitting it:
+// it promises a focus the library cannot honour.
+const MIN_ZONE_CONTENT = 6;
+
+const _ZONE_PATTERNS = new Set(["stretch", "hip-rotation", "spinal-rotation",
+                                "rotation", "self-massage"]);
+
+export function zoneContentCount(zone) {
+  return EXERCISES.filter(e =>
+    _ZONE_PATTERNS.has(e.movementPattern) &&
+    (e.affectsAreas || []).some(a => zone.areas.includes(a))
+  ).length;
+}
+
+/**
+ * The zones worth offering today. Counted live rather than hardcoded, so
+ * a zone appears the moment its content lands and no list needs editing.
+ */
+export function zonesWithCoverage() {
+  return STRETCH_ZONES.filter(z => zoneContentCount(z) >= MIN_ZONE_CONTENT);
+}
+
+/**
+ * Reorders so chosen zones lead. Deliberately a sort, not a filter -- see
+ * the v41 note. Stable within each group, so the ordering the category
+ * loop produced is preserved underneath.
+ */
+function _applyZoneFocus(list, zoneIds) {
+  if (!zoneIds || !zoneIds.length) return list;
+  const areas = new Set(
+    STRETCH_ZONES.filter(z => zoneIds.includes(z.id)).flatMap(z => z.areas)
+  );
+  const hit = [], rest = [];
+  for (const ex of list) {
+    ((ex.affectsAreas || []).some(a => areas.has(a)) ? hit : rest).push(ex);
+  }
+  return hit.concat(rest);
 }
 
 // ── SECTION-RULES vocabulary ──────────────────────────────────────────────────
@@ -1683,6 +1765,13 @@ function _filterCandidates(categories, section, equipSet, conditionSet, sectionR
   // will. Applying it after would have let a warm-up relax its ceiling
   // against exercises the rules had already excluded.
   matched = _applySectionRules(matched, sectionRules);
+
+  // ZONE-1. Only the main section: a warm-up and a cool-down should not
+  // narrow to the zone being worked, and a cool-down that did would end
+  // the session on the tightest thing in it.
+  if (section === "main") {
+    matched = _applyZoneFocus(matched, store.get("sessionZoneFocus"));
+  }
 
   return matched.filter(ex => {
     // ── C2, 13 Aug 2026 ──────────────────────────────────────────────

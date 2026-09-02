@@ -1,55 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v252
+## 31 Aug 2026 v251
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v251.md`. Remove v251 on upload.
-
-> ### 🟢 ZONE-1 — DEPLOYED 31 Aug, `alongside-v422`. 97 gates. `store.js` v61 · `Schema.md` v1.43
->
-> #### ⚠️ The content gap was overstated. Corrected measurement.
->
-> v250 estimated **120–150 stretch entries** needed. That counted **raw `affectsAreas` values**, where `ankle-foot` reads 0 and `rotator-cuff` reads 0. Grouped into the **11 zones a person actually thinks in**, the picture is very different:
->
-> | Zone | Stretches | Zone | Stretches |
-> |---|---|---|---|
-> | Hips | 21 | Glutes | 10 |
-> | Lower back | 16 | Hamstrings | 9 |
-> | Neck & shoulders | 12 | Quads | 7 |
-> | Upper back | 11 | Calves & ankles | 6 |
-> | **Chest** | **3** | **Inner thigh** | **4** |
-> | **Wrists & arms** | **2** | | |
->
-> **8 of 11 zones already clear a usable floor of six.** The real gap is **25–30 entries across three zones**, not 120 across everything. **CONTENT-STRETCH is retargeted accordingly.**
->
-> #### 🟢 Zones are offered only where the content exists
->
-> `zonesWithCoverage()` counts live against `MIN_ZONE_CONTENT = 6` and hides anything below it, so the picker **can never offer a zone that would return three exercises and repeat two**. Chest, Inner thigh and Wrists & arms are hidden until their content lands.
->
-> **This makes the picker a live coverage readout as well as a control.** A zone appearing IS the signal that its content is done — no list to edit, no second place to update.
->
-> #### 🟢 The focus orders, it does not filter
->
-> Zone-matching exercises lead; the rest still follow. Someone choosing Hamstrings gets a hamstring-led session, not four hamstring stretches and a short one — **and never an empty session**, which is what a hard filter over a library this size eventually produces. Applied to `main` only: a cool-down that narrowed to the worked zone would end the session on the tightest thing in it.
->
-> Only Stretch gains the step. Every other type advances exactly as before.
->
-> #### 🔴 The schema gate caught a live fault, not paperwork
->
-> `sessionZoneFocus` first landed **between two methods** in `store.js` rather than in the defaults — where `store.get()` returns undefined, **zone focus silently does nothing, and every other gate stays green**. It also orphaned `capabilityProfile()`'s JSDoc from its function. Caught because the schema check reported **103 fields, unchanged**, when a field had supposedly been added. Now in the defaults *and* the load merge, since without the latter it cannot survive the check-in detour it exists to survive. Assertion 8d2 covers both, reversal-proven.
->
-> #### ⚠️ Two false-passing assertions, caught before shipping
->
-> 8a and 8b were written `async`. `check()` is synchronous, so an async assertion returns a promise that can never throw into it — **they would have passed whatever the code did**. Rewritten with a top-level import. Separately, 8e anchored on the location button's MARKUP rather than its handler, 860 lines apart.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **ZONE-1** | Body-zone stretch picker, coverage-gated | 🟢 Shipped `alongside-v422`, untested on device | 31 Aug |
-> | **CONTENT-STRETCH** | **Retargeted: ~25–30 entries across Chest, Inner thigh, Wrists & arms.** Each zone unhides itself when it clears 6. Physio review before shipping, as CONTENT-GAP-1 established | 🔴 Authoring, next | w/c 31 Aug |
-> | **ARC-1** | The developmental arc. Graeme 31 Aug: *"the arc is the most essential bit."* Extends `activeProgramme`; needs ARC-ZONE-MAP from the clinical reviewer | 🔵 Next build after content | w/c 31 Aug |
-> | **TEXT-1** | Reduce wording so the words used are powerful. Scoping only, after the arc | 🔵 Scope after ARC-1 | Post-arc |
-
+Supersedes `master_schedule_31aug2026_v250.md`. Remove v250 on upload.
 
 > ### 🟢 CHECKIN-GATE + BACK-DOOR — DEPLOYED 31 Aug, `alongside-v421`. 97 gates.
 >
@@ -5855,4 +5808,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v252*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v251*

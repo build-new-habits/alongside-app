@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 31 Aug 2026 v14
+## 31 Aug 2026 v15
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -68,9 +68,9 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 
 | | Version |
 |---|---|
-| `store.js` | v60 |
-| `Schema.md` | v1.42 |
-| `sw.js` | **v421**, cache `alongside-v421` |
+| `store.js` | v61 |
+| `Schema.md` | v1.43 |
+| `sw.js` | **v422**, cache `alongside-v422` |
 | `router.js` | v22 · `my-programme.js` v8 · `today.js` v24 · `settings.js` v34 · `progress.js` v11 · `onboarding/thread.js` v13 |
 | Gates | **97, all green** — and genuinely green from any clone path |
 
