@@ -1,43 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v251
+## 31 Aug 2026 v250
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v250.md`. Remove v250 on upload.
-
-> ### 🟢 CHECKIN-GATE + BACK-DOOR — DEPLOYED 31 Aug, `alongside-v421`. 97 gates.
->
-> Both faults introduced by STRETCH-DOOR the same evening. Both found on device by Graeme.
->
-> #### 🔴 CHECKIN-GATE — a stretch session could not know about a bad back
->
-> The **Cardio, Core & Strength** door carries `requiresCheckin: true`. **Mobility & Conditioning** carries `false` — correct for its other cards, wrong for the one added tonight, because that card opens the **same builder**. Entering Stretch through the Mobility door skipped the gate the identical screen enforces through the other one.
->
-> Consequence: **no pain or soreness data**. No `bodyCaution` fires, and `severeZoneToday()` has nothing to read — so BYPASS-DOOR, built this morning, would never trigger for a stretch session however bad the back was. **A safety mechanism disabled by a routing shortcut.**
->
-> `checkedInToday()` moved into `store.js` (v60) rather than being copied. It was private to `today.js`, and a second definition of "has this person checked in today" is how two doors end up disagreeing about whether they have — one gating a session on the answer and one not. `today.js` delegates.
->
-> **Schema.md → v1.42. No field changed** — `checkedInToday()` is a derived read over existing `lastCheckin.timestamp`. The schema gate caught the version drift, which is the gate doing exactly its job for a change that stored nothing.
->
-> #### 🔴 BACK-DOOR — back walked into a screen that was skipped forward
->
-> The preselect **skips the type picker** and lands on `location`. Backing out of `location` returned to that picker — showing Upper Body, Lower Body, Cardio and Core: **session types belonging to a door the person never opened**, on the way back from one they did.
->
-> `entryDoor` now records which door preselected, and both back branches return there. **The general rule: back must never enter a screen that was skipped forward.**
->
-> Caught in my own fix before shipping: the `type` branch read `entryDoor` **after** `resetState()` nulled it, so the door was silently lost and every exit fell through to `today`. Captured before the reset now, with an assertion on the ordering.
->
-> #### ⚠️ Gate discipline — four times in one day
->
-> Assertions in this file measured **comment prose instead of code** four separate times today: counting `_filterCandidates` mentions as call sites (12 vs 4), reading `sw.js`'s own changelog as a precache entry, a proximity window filled by an HTML comment, and anchoring on `if (phase === "location")` in the **phase router** 800 lines from the back handler it meant. **The code was correct every time.** `verify-sectionrules.mjs` now strips comments from every file it reads, and positional assertions anchor on the most specific string available, not the first match.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **CHECKIN-GATE** | Stretch card gates on check-in; `checkedInToday()` single definition in store v60 | 🟢 Shipped `alongside-v421` | 31 Aug |
-> | **BACK-DOOR** | Back returns to the entry door, never into a skipped screen | 🟢 Shipped `alongside-v421` | 31 Aug |
-> | **DOOR-CHECKIN-AUDIT** | Every door and card that reaches the builder should be checked against the same gate. Two entry points to one screen disagreed; there may be others | 🟠 **Booked — same class as the fault above** | w/c 31 Aug |
-
+Supersedes `master_schedule_31aug2026_v249.md`. Remove v249 on upload.
 
 > ### 🟢 STRETCH-DOOR — DEPLOYED 31 Aug, `alongside-v420`. 97 gates.
 >
@@ -5808,4 +5773,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v251*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v250*

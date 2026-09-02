@@ -1,5 +1,13 @@
 /**
  * store.js - Data persistence layer
+ * 31 Aug 2026 v60
+ *
+ * v60 - CHECKIN-GATE. checkedInToday() moved here from today.js, where it
+ *   was a private helper. The Mobility & Conditioning door now needs the
+ *   same test, and a second copy of "has this person checked in today" is
+ *   how two screens end up disagreeing about whether they have. today.js
+ *   delegates rather than keeping its own.
+ *
  * 29 Aug 2026 v59
  *
  * v59 - CHECKIN-2a. New `conditionMeta`, a parallel map holding condition
@@ -2631,6 +2639,18 @@ export const store = {
    *
    * @returns {{ impactSafe:boolean, floorSafe:boolean, balanceSafe:boolean, ceilingCap:number|null, asked:boolean }}
    */
+  /**
+   * CHECKIN-GATE. The single definition. A door that gates on today's
+   * check-in and a door that does not must at least be asking the same
+   * question.
+   */
+  checkedInToday() {
+    const last = this.get("lastCheckin.timestamp");
+    if (!last) return false;
+    return new Date(last).toISOString().split("T")[0]
+        === new Date().toISOString().split("T")[0];
+  },
+
   capabilityProfile() {
     const c = this.data.capability || {};
     const asked = c.askedAt !== null && c.askedAt !== undefined;

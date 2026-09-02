@@ -246,6 +246,7 @@ let candidatePools    = null;
 let selectedCandidateIds = new Set();
 let equipmentOverride = null;       // null = use store defaults; array = this-session override
 let builtSession       = null;
+let entryDoor          = null;      // BACK-DOOR: the door that preselected a type
 let preselectChecked   = false;     // guards the store-preselect read to run once per mount
 
 // ── Tier check ────────────────────────────────────────────────────────────────
@@ -1067,6 +1068,7 @@ function resetState() {
   equipmentOverride     = null;
   builtSession          = null;
   preselectChecked      = false;
+  entryDoor             = null;
 }
 
 // ── Mount ─────────────────────────────────────────────────────────────────────
@@ -1083,6 +1085,11 @@ export function onMount() {
     if (pre && pre.type && SESSION_TYPES.some(t => t.id === pre.type)) {
       store.set("sessionBuilderPreselect", null);
       selectedType = pre.type;
+      // BACK-DOOR, 31 Aug 2026. Records which door sent us. A preselect
+      // SKIPS the type picker, so backing out of the next screen must
+      // return to the door -- not walk forward into a screen the person
+      // never saw, showing session types from a door they did not open.
+      entryDoor = pre.returnTo || null;
 
       // TIER-B, 13 Aug 2026. The silent downgrade is gone. This line
       // used to read:
@@ -1123,9 +1130,21 @@ export function onMount() {
       return;
     }
     if (phase === "type") {
+      // Captured BEFORE resetState(), which nulls it. Read after, this
+      // always fell through to "today" and the door was silently lost.
+      const door = entryDoor || "today";
       resetState();
-      router.navigate("today");
+      router.navigate(door);
     } else if (phase === "location") {
+      // BACK-DOOR. When a door preselected the type, the picker was
+      // never shown -- so going back to it would present session types
+      // belonging to a different door. Return to the door instead.
+      if (entryDoor) {
+        const door = entryDoor;
+        resetState();
+        router.navigate(door);
+        return;
+      }
       phase = "type";
       rerender();
     } else if (phase === "duration") {

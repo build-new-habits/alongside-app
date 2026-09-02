@@ -31,6 +31,16 @@ const check = (n, fn) => { try { fn(); console.log("  PASS  " + n); }
   catch (e) { fails++; console.log("  FAIL  " + n + "\n        " + e.message); } };
 const ok = (c, m) => { if (!c) throw new Error(m); };
 
+// Every file read by this gate goes through strip(). Four times today a
+// proximity or counting assertion has measured comment prose instead of
+// code -- and the code was correct each time. Reading source as source
+// is not an optimisation, it is the assertion working at all.
+const strip = t => t
+  .replace(/\/\*[\s\S]*?\*\//g, "")
+  .replace(/^\s*\/\/.*$/gm, "")
+  .replace(/<!--[\s\S]*?-->/g, "");
+const read = p => strip(fs.readFileSync(p, "utf8"));
+
 const raw = fs.readFileSync("js/session-builder.js", "utf8");
 // Comments stripped for anything that COUNTS occurrences. This file
 // documents _filterCandidates() heavily, and counting prose as call
@@ -190,7 +200,7 @@ check("6. the Mobility & Conditioning door offers Stretch", () => {
   // but the builder is what the Cardio, Core & Strength door opens, so
   // stretching was only reachable through the strength door. Grouping
   // within the wrong room.
-  const mc = fs.readFileSync("js/views/mobility-conditioning.js", "utf8");
+  const mc = read("js/views/mobility-conditioning.js");
   ok(mc.includes('id="mc-stretch"'), "no Stretch card on the Mobility & Conditioning door");
   ok(mc.includes('sessionBuilderPreselect'),
      "the Stretch card does not preselect a type, so it drops the person on the " +
@@ -200,6 +210,52 @@ check("6. the Mobility & Conditioning door offers Stretch", () => {
   const handler = mc.slice(at, at + 400);
   ok(handler.includes('type: "stretch"'), "the card preselects the wrong type");
   ok(handler.includes('router.navigate("session-builder")'), "the card goes nowhere");
+});
+
+console.log("\nTEST 7 - the Stretch door gates on check-in and gives back a way out");
+
+check("7a. one definition of checked-in-today", () => {
+  const st = read("js/store.js");
+  ok(/checkedInToday\(\)\s*{/.test(st), "store.js has no checkedInToday()");
+  const today = read("js/views/today.js");
+  ok(!today.includes("lastCheckin.timestamp"),
+     "today.js still computes it itself. Two copies of 'has this person checked in " +
+     "today' is how two doors end up disagreeing about whether they have.");
+});
+
+check("7b. the Stretch card enforces the gate", () => {
+  const mc = read("js/views/mobility-conditioning.js");
+  const at = mc.indexOf('"#mc-stretch"');
+  const h = mc.slice(at, at + 1400);
+  ok(h.includes("store.checkedInToday()"),
+     "the Stretch card skips the check-in gate. The Cardio, Core & Strength door " +
+     "enforces it for the SAME builder -- without it there is no pain data, so no " +
+     "bodyCaution fires and the severe bypass has nothing to read.");
+  ok(h.includes('store.set("pendingDoorRoute", "session-builder")'),
+     "no pending route set, so the person would not arrive at the builder after " +
+     "checking in");
+  ok(h.includes('router.navigate("checkin")'), "the gate never sends anyone to check in");
+});
+
+check("7c. back returns to the door, not to a skipped screen", () => {
+  const ui = read("js/views/session-builder-ui.js");
+  ok(ui.includes("entryDoor"), "the builder does not record which door sent it");
+  ok(ui.includes("pre.returnTo"), "the preselect payload's door is never read");
+  // Anchor on the BACK HANDLER's branch, not the phase router at the top
+  // of render() -- which also matches this string and is 800 lines away.
+  const at = ui.indexOf('} else if (phase === "location") {');
+  ok(at > -1, "no location back branch");
+  const branch = ui.slice(at, at + 500);
+  ok(branch.includes("entryDoor"),
+     "backing out of the location step still returns to the type picker -- a screen " +
+     "the preselect skipped, showing session types from a door the person did not open");
+  // The door must be captured before resetState() nulls it.
+  const typeAt = ui.indexOf('if (phase === "type") {', at - 900);
+  const typeBranch = ui.slice(typeAt, typeAt + 400);
+  const cap = typeBranch.indexOf("entryDoor");
+  const reset = typeBranch.indexOf("resetState()");
+  ok(cap > -1 && reset > -1 && cap < reset,
+     "entryDoor is read after resetState(), which nulls it -- the door is silently lost");
 });
 
 console.log(fails === 0
