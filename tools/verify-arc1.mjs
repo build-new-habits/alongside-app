@@ -176,6 +176,32 @@ check("5b. nothing claims clinical backing to the user", () => {
   }
 });
 
+check("5d. the picker reads a field something actually writes", () => {
+  // strategicGoal.primaryGoal is a reader without a writer -- no code in
+  // the app sets it. Reading only that made the whole arc inert while
+  // every gate stayed green, because "returns []" is indistinguishable
+  // from "this person has no goal".
+  const ui = read("js/views/session-builder-ui.js");
+  const at = ui.indexOf("const goalId");
+  ok(at > -1, "the picker never resolves a goal");
+  const line = ui.slice(at, ui.indexOf(";", at));
+  ok(line.includes("goals[0]") || line.includes('get("goals")'),
+     "the picker resolves its goal only from strategicGoal.primaryGoal, which nothing " +
+     "writes. The live field is `goals`, set in onboarding/goals.js and settings.js.");
+
+  // And the writer must still exist.
+  // Checked across the whole tree, not two named files: moving the writer
+  // is fine, losing it is not. The two-file version passed when one was
+  // broken, because the other still matched.
+  const all = [];
+  const walk = d => { for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+    if (f.isDirectory()) walk(`${d}/${f.name}`); else if (f.name.endsWith(".js")) all.push(`${d}/${f.name}`); } };
+  walk("js");
+  const writers = all.filter(f => /\bset\(\s*['"]goals['"]\s*,/.test(read(f)));
+  ok(writers.length >= 1,
+     "nothing writes `goals` any more either -- the arc has lost its input again");
+});
+
 check("5c. the goal leans the picker, it does not lock it", () => {
   const ui = read("js/views/session-builder-ui.js");
   // Anchor on the CALL, not the import at the top of the file.
