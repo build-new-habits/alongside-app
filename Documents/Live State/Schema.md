@@ -1,7 +1,33 @@
 # Alongside — Data Schema Reference
-## 31 Aug 2026 v1.43
+## 31 Aug 2026 v1.44
 
-**File:** `js/store.js` (confirmed live version: **v61, 31 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v62, 31 Aug 2026**)
+
+> **v1.44, 31 Aug 2026 — ARC-1.** New top-level object `stretchArc`:
+>
+> | Key | Type | Default | Meaning |
+> |---|---|---|---|
+> | `goalId` | `string \| null` | `null` | Goal id from `data/goals.js` |
+> | `startedAt` | `string \| null` | `null` | ISO date the arc began |
+> | `zonesWorked` | `object` | `{}` | `{ [zoneId]: 'YYYY-MM-DD' }` — last date each zone was worked |
+> | `active` | `boolean` | `false` | Whether an arc is running |
+>
+> **`zonesWorked` holds a DATE PER ZONE, never a count.** "Shoulders last
+> came up on the 12th" is a fact about the plan. "You have done shoulders
+> three times" is a score, and this product does not keep score. The date
+> supports the coach saying *"we haven't come to shoulders yet"* without
+> ever putting a number on the person.
+>
+> **Deliberately NOT nested inside `activeProgramme`,** which reverses
+> advice given earlier the same day. That advice concerned SERIES-1, which
+> genuinely is a session sequence. The deciding argument here is lifecycle:
+> `activeProgramme` holds one programme and is cleared on completion, so a
+> nested arc would be wiped the day somebody finished an unrelated strength
+> programme.
+>
+> **There is no session list in this object, on purpose.** The arc shapes
+> what a session leans towards. It never dictates that a session is owed —
+> that would be a streak wearing a different coat.
 
 > **v1.43, 31 Aug 2026 — ZONE-1.** New field `sessionZoneFocus`: `string[]`,
 > default `[]`. The body zones chosen for today's stretch session, by zone

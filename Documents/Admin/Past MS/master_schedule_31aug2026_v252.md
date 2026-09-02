@@ -1,55 +1,8 @@
 # Alongside: Move — Master Schedule
-## 31 Aug 2026 v253
+## 31 Aug 2026 v252
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_31aug2026_v252.md`. Remove v252 on upload.
-
-> ### 🟢 ARC-1 — DEPLOYED 31 Aug, `alongside-v423`. 98 gates. `store.js` v62 · `Schema.md` v1.44
->
-> The developmental arc for stretching. Graeme, 31 Aug: *"the arc is the most essential bit."*
->
-> #### 🔵 Built on a mapping we wrote ourselves, deliberately
->
-> A brief went to a physiotherapist on 31 Aug asking exactly the goal→zone question. She has **asked not to be named in anything**, so whatever comes back is informal input, not clinical review — and cannot be cited as such anywhere. Graeme's call: build as though our plan is right, unstitch if it is wrong.
->
-> **`js/data/stretch-goal-zones.js` exists so it can be thrown away.** Data with no logic, 21 goals mapped, `provisional: true` in the data itself. Replacing it is one file edit and a version bump. Gate assertion 3 keeps it to **one definition and one consumer**, so that stays true.
->
-> #### 🟢 Why shipping our own guesses is safe here
->
-> **The map may only emphasise.** It reorders candidates, exactly as ZONE-1 does. It cannot unlock a contraindicated exercise, reach into a sore area, soften the pain-8 gate, or bypass the difficulty ceiling — every one of those filters runs *before* it. **The worst a wrong row can do is a less useful session, never an unsafe one.** Assertions 2a–2c enforce that, and 2c specifically asserts the safety filters run first — reversal-proven by swapping the order.
->
-> #### 🟢 Coverage without a score
->
-> `zonesWorked` stores **a date per zone, never a count**. "Shoulders last came up on the 12th" is a fact about the plan; "you have done shoulders three times" is a score. The coach surfaces **what has not come up yet**, never what was done — assertion 4b bans "you have done", "sessions so far", "streak" and "times" from that message outright.
->
-> **Coverage is recorded when a session is BUILT, not completed.** Depending on completion would reintroduce completion pressure through the back door, which is a streak wearing a different coat.
->
-> #### 🟢 The goal leans the picker; it never locks it
->
-> Suggested zones arrive pre-selected and every one can be switched off. Assertion 5c enforces that they are written into the editable selection rather than fixed — the difference between a coach with a view and a coach with a plan you are not allowed to change.
->
-> #### 🔴 Not nested in `activeProgramme` — a reversal of Claude's own advice, on the record
->
-> Claude advised earlier the same day: *"do not build a second programme model."* That concerned SERIES-1, which genuinely is a session sequence. This is a coverage tracker with a goal attached. **The deciding argument is lifecycle:** `activeProgramme` holds one programme and is cleared on completion, so a nested arc would be wiped the day somebody finished an unrelated strength programme.
->
-> #### ⚠️ Five of the mapping's goal ids were invented
->
-> `improve-cycling`, `improve-swimming`, `improve-flexibility`, `improve-balance`, `just-move-more` — none exist in `goals.js`. **These fail silently:** `zonesForGoal()` returns `[]` forever, the arc never leans, and nothing goes red. Caught by checking against the real vocabulary before wiring, and assertion 1a now enforces it permanently.
->
-> #### ⚠️ Gate honesty: an assertion narrowed rather than left crying wolf
->
-> Assertion 3's ambition was "no second file decides which zones suit which goal". Unenforceable by string search: zone ids **deliberately reuse anatomical tag names**, `cycling` is both a goal id and a sport, and `session-rationale.js` legitimately keys copy by goal. The broad version flagged **eleven innocent files**. Narrowed to the true, testable claim — one definer, one consumer. **A gate that cries wolf gets ignored, which is worse than no gate** (see PRECACHE-IMPORT, already living proof).
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **ARC-1** | Stretch arc: goal→zone emphasis, coverage by date, uncovered-zone surfacing | 🟢 Shipped `alongside-v423`, untested on device | 31 Aug |
-> | **ARC-ZONE-MAP** | Physio's answers replace `stretch-goal-zones.js`. **One file edit.** Rows flagged as most likely wrong: sleep-better, reduce-stress, feel-better, reduce-pain, injury-recovery | 🔵 Awaiting reply, not blocking | On reply |
-> | **ARC-2** | Arc start/stop UI. Currently `stretchArc.active` is never set true by any surface, so the uncovered-zone message cannot yet appear | 🔴 **Next — ARC-1 is inert without it** | w/c 31 Aug |
-> | **CONTENT-STRETCH** | ~25–30 entries: Chest, Inner thigh, Wrists & arms. Each zone unhides itself at 6 | 🔴 Authoring | w/c 31 Aug |
-> | **TEXT-1** | Reduce wording so the words used are powerful | 🔵 Scope after ARC-2 | Post-arc |
-
+Supersedes `master_schedule_31aug2026_v251.md`. Remove v251 on upload.
 
 > ### 🟢 ZONE-1 — DEPLOYED 31 Aug, `alongside-v422`. 97 gates. `store.js` v61 · `Schema.md` v1.43
 >
@@ -5902,4 +5855,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v253*
+*Build New Habits · Alongside: Move · Master Schedule · 31 Aug 2026 v252*

@@ -192,6 +192,7 @@
 import { store }                          from "../store.js";
 import { router }                         from "../router.js";
 import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, severeZoneToday, zonesWithCoverage } from "../session-builder.js";
+import { zonesForGoal, STRETCH_GOAL_ZONES } from "../data/stretch-goal-zones.js";
 // R4, 20 Aug 2026. isPremium/lockedFeature are no longer used in this
 // file. Every step of the builder -- type, duration, allocation split,
 // location, build mode -- is now free. The import is REMOVED rather than
@@ -248,6 +249,7 @@ let equipmentOverride = null;       // null = use store defaults; array = this-s
 let builtSession       = null;
 let entryDoor          = null;      // BACK-DOOR: the door that preselected a type
 let selectedZones      = [];        // ZONE-1: body zones for a stretch session
+let zonesPrefilled     = false;     // ARC-1: guards the goal prefill to once per flow
 let preselectChecked   = false;     // guards the store-preselect read to run once per mount
 
 // ── Tier check ────────────────────────────────────────────────────────────────
@@ -513,7 +515,31 @@ function renderTypePicker() {
  * need it" is what most people want most days.
  */
 function renderZonePicker() {
-  const zones = zonesWithCoverage();
+  const zones     = zonesWithCoverage();
+  const available = zones.map(z => z.id);
+
+  // ARC-1. The goal leans the picker, it does not decide it. Suggested
+  // zones arrive pre-selected and every one can be turned off -- which is
+  // the difference between a coach with a view and a coach with a plan
+  // you are not allowed to change.
+  const goalId    = (store.get("strategicGoal") || {}).primaryGoal;
+  const suggested = zonesForGoal(goalId).filter(id => available.includes(id));
+  if (!zonesPrefilled) {
+    zonesPrefilled = true;
+    if (suggested.length) selectedZones = suggested.slice();
+  }
+
+  // What the arc has not come to yet. A fact about the PLAN, never about
+  // the person: "shoulders have not come up" is not "you have skipped
+  // shoulders", and no number reaches the screen either way.
+  const arc     = store.get("stretchArc") || {};
+  const missing = arc.active
+    ? store.zonesNotRecentlyWorked(available, 2)
+        .filter(id => !selectedZones.includes(id))
+    : [];
+  const missingLabels = missing
+    .map(id => (zones.find(z => z.id === id) || {}).label)
+    .filter(Boolean);
   return `
     <div class="sb-view" role="main">
       <div class="sb-header">
@@ -523,8 +549,20 @@ function renderZonePicker() {
 
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
         <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p class="coach-message-text">Anywhere you want me to focus? Pick as many as you like, or none.</p>
+        <p class="coach-message-text">
+          ${suggested.length
+            ? "I've leaned these towards what you're working on. Change any of them."
+            : "Anywhere you want me to focus? Pick as many as you like, or none."}
+        </p>
       </div>
+
+      ${missingLabels.length ? `
+        <p class="sb-zone-note">
+          ${missingLabels.length === 1
+            ? `${missingLabels[0]} hasn't come up yet.`
+            : `${missingLabels.slice(0, -1).join(", ")} and ${missingLabels.slice(-1)} haven't come up yet.`}
+        </p>
+      ` : ""}
 
       <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-5);"
            role="group" aria-label="Choose body zones">
@@ -1109,6 +1147,7 @@ function resetState() {
   preselectChecked      = false;
   entryDoor             = null;
   selectedZones         = [];
+  zonesPrefilled        = false;
 }
 
 // ── Mount ─────────────────────────────────────────────────────────────────────
@@ -1266,6 +1305,10 @@ export function onMount() {
 
   document.getElementById("sb-zones-continue-btn")?.addEventListener("click", () => {
     store.set("sessionZoneFocus", selectedZones);
+    // ARC-1. Coverage is recorded when the session is BUILT, not when it
+    // is finished. Making it depend on finishing would reintroduce
+    // completion pressure through the back door.
+    store.markZonesWorked(selectedZones);
     phase = "duration";
     rerender();
   });
