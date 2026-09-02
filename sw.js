@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 31 Aug 2026 v424
+ *
+ * v424 - ARC-1 correction. The zone prefill read
+ *   strategicGoal.primaryGoal, which nothing in the app writes, so the
+ *   arc never leaned. Now reads `goals`. No new files.
+ *
  * 31 Aug 2026 v423
  *
  * v423 - ARC-1. New file js/data/stretch-goal-zones.js, precached.
@@ -2942,7 +2948,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v423";
+const CACHE_NAME = "alongside-v424";
 
 const SHELL_URLS = [
 
