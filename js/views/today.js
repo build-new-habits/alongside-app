@@ -482,9 +482,12 @@ export function TodayView(router) {
     });
   }
 
+  // CHECKIN-GATE, 31 Aug 2026. Delegates to store.checkedInToday(). The
+  // Mobility & Conditioning door needs the same test, and two copies of
+  // "has this person checked in today" is how two doors end up
+  // disagreeing about whether they have.
   function _checkedInToday() {
-    const lastCheckin = store.get('lastCheckin.timestamp');
-    return !!(lastCheckin && new Date(lastCheckin).toISOString().split('T')[0] === _todayString());
+    return store.checkedInToday();
   }
 
   function _routeToThreshold() {

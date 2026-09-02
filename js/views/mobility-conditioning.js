@@ -1,6 +1,15 @@
 /**
  * mobility-conditioning.js - Mobility & Conditioning
  *
+ * 31 Aug 2026 v4
+ *
+ * v4 - CHECKIN-GATE. The Stretch card gates on today's check-in exactly
+ *   as the Cardio, Core & Strength door does. Without it the builder had
+ *   no pain or soreness data, so a stretch session could not know about a
+ *   bad back: no bodyCaution, and nothing for the severe bypass to read.
+ *   The same screen was enforcing the gate through one door and skipping
+ *   it through the other.
+ *
  * 31 Aug 2026 v3
  *
  * v3 - STRETCH-DOOR. A "Stretch" card, where stretching actually belongs.
@@ -177,8 +186,24 @@ export function MobilityConditioningView(router) {
     // STRETCH-DOOR. Preselects the type so the builder opens on duration,
     // not on a picker the person just answered by tapping this card.
     container.querySelector("#mc-stretch")?.addEventListener("click", () => {
-      store.set("sessionBuilderPreselect", { type: "stretch" });
-      router.navigate("session-builder");
+      // CHECKIN-GATE, 31 Aug 2026. The Cardio, Core & Strength door
+      // carries requiresCheckin: true; this one carries false, because
+      // Mobility & Conditioning's other cards do not need it. But the
+      // builder does -- without today's check-in it cannot know about a
+      // bad back, so no bodyCaution fires and the severe bypass has
+      // nothing to read. Stretch entered through this door was skipping
+      // the gate the identical screen enforces through the other one.
+      //
+      // Same rule as today.js: only the day's FIRST check-in is a gate.
+      // returnTo records the door, so Back does not walk into the type
+      // picker this card exists to skip.
+      store.set("sessionBuilderPreselect", { type: "stretch", returnTo: "mobility-conditioning" });
+      if (store.checkedInToday()) {
+        router.navigate("session-builder");
+      } else {
+        store.set("pendingDoorRoute", "session-builder");
+        router.navigate("checkin");
+      }
     });
 
     container.querySelector("#mc-log-event")?.addEventListener("click", () => {
