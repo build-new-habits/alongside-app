@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 02 Sep 2026 v426
+ *
+ * v426 - STRETCH-FLOW, CUE-UNPIN, SORE-ZONE, BANNER-SCOPE. CSS changed
+ *   and the stretch path lost two screens, so a stale shell would keep
+ *   asking for equipment a stretch session never uses.
+ *
  * 02 Sep 2026 v425
  *
  * v425 - ARC-3 + SELECT-MERGE. Zone focus now leads selection in both
@@ -2953,7 +2959,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v425";
+const CACHE_NAME = "alongside-v426";
 
 const SHELL_URLS = [
 
