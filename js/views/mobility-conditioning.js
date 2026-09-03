@@ -1,6 +1,11 @@
 /**
  * mobility-conditioning.js - Mobility & Conditioning
  *
+ * 03 Sep 2026 v5
+ *
+ * v5 - ARC-2. A Stretch arc card above the one-off Stretch card. The arc
+ *   is the thing that spans weeks; the card below it is today.
+ *
  * 31 Aug 2026 v4
  *
  * v4 - CHECKIN-GATE. The Stretch card gates on today's check-in exactly
@@ -88,6 +93,15 @@ export function MobilityConditioningView(router) {
         </button>
 
         ${_renderProgrammeCard(tagged)}
+
+        <button class="mc-card" id="mc-arc" aria-label="Stretch arc">
+          <span class="mc-card__icon" aria-hidden="true">\uD83E\uDDED</span>
+          <span class="mc-card__text">
+            <span class="mc-card__label">Stretch arc</span>
+            <span class="mc-card__sub" id="mc-arc-sub">A direction for your stretching, held over weeks</span>
+          </span>
+          <span class="mc-card__chev" aria-hidden="true">&#8250;</span>
+        </button>
 
         <button class="mc-card" id="mc-stretch" aria-label="Stretch">
           <span class="mc-card__icon" aria-hidden="true">\uD83E\uDD38</span>
@@ -185,6 +199,10 @@ export function MobilityConditioningView(router) {
 
     // STRETCH-DOOR. Preselects the type so the builder opens on duration,
     // not on a picker the person just answered by tapping this card.
+    container.querySelector("#mc-arc")?.addEventListener("click", () => {
+      router.navigate("stretch-arc");
+    });
+
     container.querySelector("#mc-stretch")?.addEventListener("click", () => {
       // CHECKIN-GATE, 31 Aug 2026. The Cardio, Core & Strength door
       // carries requiresCheckin: true; this one carries false, because
