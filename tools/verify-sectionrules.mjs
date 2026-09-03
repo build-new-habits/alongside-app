@@ -326,6 +326,80 @@ check("8e. only Stretch gains a step", () => {
   ok(ui.includes('phase === "zones"'), "the zone phase is never rendered");
 });
 
+console.log("\nTEST 9 - STRETCH-FLOW: the path is as short as the session needs");
+
+check("9a. stretch skips equipment and build mode", () => {
+  const ui = read("js/views/session-builder-ui.js");
+  const at = ui.indexOf('selectedDuration = parseInt(');
+  ok(at > -1, "no duration handler");
+  const body = ui.slice(at, at + 900);
+  ok(body.includes('selectedType === "stretch"'),
+     "the duration step still routes stretch into the equipment check. Nothing in the " +
+     "stretch pools reads equipment, and build mode was the second 'how would you like " +
+     "this to go?' in as many minutes.");
+  ok(body.includes("_openRecommendedCandidates()"),
+     "stretch does not go straight to the recommended selection");
+});
+
+check("9b. the skipped screens share one definition", () => {
+  // The recommend branch and the stretch path must not grow two copies
+  // of "open the recommended candidate list" -- that duplication is what
+  // produced two selection loops.
+  const ui = read("js/views/session-builder-ui.js");
+  const defs = (ui.match(/function _openRecommendedCandidates/g) || []).length;
+  ok(defs === 1, `expected 1 definition, found ${defs}`);
+  const uses = (ui.match(/_openRecommendedCandidates\(\)/g) || []).length - defs;
+  ok(uses >= 2, `only ${uses} call site(s); the stretch path and the recommend branch must share it`);
+});
+
+check("9c. back does not walk into the skipped screens", () => {
+  const ui = read("js/views/session-builder-ui.js");
+  ok(/phase === "candidates" && selectedType === "stretch"/.test(ui),
+     "backing out of the candidate list would enter equipment or build mode -- screens " +
+     "the stretch path skipped forward");
+});
+
+console.log("\nTEST 10 - the cue is unpinned, the caution is not");
+
+check("10-cue. only the caution renders on every page", () => {
+  const card = read("js/exercise-card.js");
+  const at = card.indexOf("const pinned =");
+  ok(at > -1, "no pinned block");
+  const block = card.slice(at, card.indexOf("`;", at));
+  ok(block.includes("exercise-caution"), "the caution is no longer pinned -- it must be");
+  ok(!block.includes("xcard-lead-cue"),
+     "the coaching cue is still pinned, so the same paragraph appears on DECIDE, DO and " +
+     "NOTE. It is coaching, not safety.");
+  const dec = card.indexOf("const decide = [");
+  ok(card.slice(dec, card.indexOf("].join", dec)).includes("cueBlock"),
+     "the cue was unpinned but never placed on DECIDE, so it is now lost entirely");
+});
+
+console.log("\nTEST 11 - sore zones are marked, never decided for");
+
+check("11. the picker marks sore areas and explains them in text", () => {
+  const ui = read("js/views/session-builder-ui.js");
+  ok(ui.includes("soreZones"), "the picker does not know which areas were reported sore");
+  ok(ui.includes("sb-zone-chip--sore"), "sore chips are styled identically to the rest");
+  ok(!/soreZones\.has\([^)]*\)\s*\?\s*["']disabled/.test(ui),
+     "sore zones are disabled. Stretching a sore area is often the right call, and the " +
+     "exercises are condition-filtered underneath -- mark it, do not decide it.");
+  ok(ui.includes("sb-zone-note") && ui.includes("sore today"),
+     "nothing explains the marking in words, so the meaning depends on colour alone");
+});
+
+console.log("\nTEST 12 - the programme banner names a real programme");
+
+check("12. an ad-hoc session is not labelled Week 0", () => {
+  const gp = read("js/views/gym-programme.js");
+  const at = gp.indexOf("exercise-role-badge main");
+  ok(at > -1, "no programme badge");
+  const before = gp.slice(Math.max(0, at - 220), at);
+  ok(/currentWeek\)\s*>\s*0/.test(before),
+     "the badge renders unconditionally, so a one-off stretch announces itself as " +
+     "'Your programme - Week 0 - Session B' -- week 0 of nothing");
+});
+
 console.log(fails === 0
   ? "\nSECTION-RULES: all assertions pass\n"
   : "\nSECTION-RULES: " + fails + " FAILED\n");

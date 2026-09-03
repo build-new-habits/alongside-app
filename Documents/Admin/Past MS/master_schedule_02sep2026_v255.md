@@ -1,52 +1,8 @@
 # Alongside: Move — Master Schedule
-## 02 Sep 2026 v256
+## 02 Sep 2026 v255
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_02sep2026_v255.md`. Remove v255 on upload.
-
-> ### 🟢 STRETCH-FLOW · CUE-UNPIN · SORE-ZONE · BANNER-SCOPE — DEPLOYED 2 Sep, `alongside-v426`. 98 gates.
->
-> Six fixes from Graeme's device test, all found by walking the flow rather than reading it.
->
-> #### 🟢 The stretch path loses two screens
->
-> **Equipment**: nothing in the stretch pools reads it, and it was already answered at onboarding and implied by the location step. Graeme: *"I also question if it's relevant at all after setting up on onboarding and selecting home. It knows."* **Build mode**: it was the second "how would you like this to go?" in as many minutes, after the variety question inside check-in. Stretch now goes from duration straight to the recommended selection — which is what build mode defaulted to anyway. **The choice is not lost; it is made.**
->
-> Nine screens down to seven. The recommend branch and the stretch path **share one `_openRecommendedCandidates()`** rather than growing a second copy — the duplication that produced two selection loops and two `checkedInToday` definitions. Back from the candidate list returns to duration, honouring BACK-DOOR's rule: never enter a screen that was skipped forward.
->
-> 🟠 **Still open**: an "equipment changed?" link on the location step, so the answer can be corrected without a mandatory screen. Booked as EQUIP-LINK.
->
-> #### 🔴 CUE-UNPIN — a decision reversed, and CARD-3's gate rewritten to match
->
-> CARD-3 pinned the caution **and** the lead cue to all three pages. On device that meant *"this is exploration, not performance"* appeared on DECIDE, DO and NOTE — three screenshots in a row. Graeme: *"all these 2 relevant?"*
->
-> **The caution stays pinned; the reasoning is unchanged.** The cue moves to DECIDE. The argument for the change is that pinning both made the caution **less** likely to be read: repeating a coaching paragraph three times teaches people to skip the block that also carries the safety line.
->
-> `verify-card3.mjs` assertion 1a previously **required** the cue to be pinned. It now requires the opposite, plus a check that the cue landed on DECIDE rather than being lost. **Recorded as a reversal with its reasoning, not silently edited** — and it is a narrowing, not a weakening: the caution requirement gains an explicit "and nothing else".
->
-> #### 🟢 SORE-ZONE — the picker shows what the coach already knows
->
-> The app knew the lower back was sore and styled that chip identically to every other one. Sore zones are now marked, with a line naming them in words so **nothing depends on colour alone**.
->
-> **Marked, never disabled.** Stretching a sore area is often the right call, and the exercises are condition-filtered underneath. Assertion 11 explicitly fails if the chips are disabled.
->
-> #### 🔴 BANNER-SCOPE — "Week 0 of nothing"
->
-> `gym-programme.js` runs both a real programme and any one-off session, so a stretch built by hand through the Mobility door announced itself as **"Your programme · Week 0 · Session B"**. The badge now renders only when there is a genuine programme week to name.
->
-> 🟠 **Related, not fixed**: the same view shows "3 sets" and "HOW HEAVY — Bodyweight" on a spinal wave. Strength-session furniture in a stretch context. Booked as **STRENGTH-FURNITURE**.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **STRETCH-FLOW** · **CUE-UNPIN** · **SORE-ZONE** · **BANNER-SCOPE** | Six device-test fixes | 🟢 Shipped `alongside-v426` | 2 Sep |
-> | **ARC-2** | Arc start/stop. `stretchArc.active` is never set, so there is still no arc — Graeme, 2 Sep: *"Where's my arc?"* | 🔴 **Next** | w/c 2 Sep |
-> | **EQUIP-LINK** | "Kit changed?" link on the location step instead of a mandatory screen | 🟠 Agreed | w/c 2 Sep |
-> | **STRENGTH-FURNITURE** | "3 sets" and "How heavy" on stretches | 🟠 Found | w/c 2 Sep |
-> | **ZONE-WEIGHTING** | `affectsAreas` is unweighted, so Inchworm counts as a shoulder stretch. Persona trace: an autistic user asking for neck and shoulders got four leg stretches out of five | 🔴 Content-data fault | w/c 2 Sep |
-> | **PAT RENEWAL** | Friday | 🔴 Graeme | by 5 Sep |
-
+Supersedes `master_schedule_31aug2026_v254.md`. Remove v254 on upload.
 
 > ### ⚠️ DATE CORRECTION — headers between v243 and v254 say "31 Aug 2026". Much of that work was done on 1–2 September.
 >
@@ -6039,4 +5995,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 02 Sep 2026 v256*
+*Build New Habits · Alongside: Move · Master Schedule · 02 Sep 2026 v255*
