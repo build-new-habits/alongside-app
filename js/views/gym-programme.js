@@ -798,9 +798,18 @@ export function GymProgrammeView(router) {
 
         <!-- Exercise display -->
         <div class="exercise-display">
-          <div class="exercise-role-badge main" aria-label="${_esc(stats.programmeName || 'Gym programme')}">
-            \uD83C\uDFCB ${_esc(stats.programmeName || 'Your programme')} \u00B7 Week ${stats.currentWeek} \u00B7 Session ${sessionType}
-          </div>
+          <!-- BANNER-SCOPE, 02 Sep 2026. This view runs BOTH a real gym
+               programme and any one-off session built by hand, so an
+               ad-hoc stretch built through the Mobility door was
+               announcing itself as "Your programme - Week 0 - Session B".
+               Week 0 of nothing, session B of no sequence.
+               The badge now renders only when there is a genuine
+               programme week to name. -->
+          ${Number(stats.currentWeek) > 0 ? `
+            <div class="exercise-role-badge main" aria-label="${_esc(stats.programmeName || 'Gym programme')}">
+              \uD83C\uDFCB ${_esc(stats.programmeName || 'Your programme')} \u00B7 Week ${stats.currentWeek} \u00B7 Session ${sessionType}
+            </div>
+          ` : ""}
 
           <h1 class="exercise-name">${_esc(exercise.name)}</h1>
 

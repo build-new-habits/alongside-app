@@ -443,3 +443,26 @@
   line-height: var(--leading-relaxed, 1.6);
   opacity: 0.75;
 }
+
+/* The coach speaking, not a card. Graeme, 2 Sep: teal writing, a little
+   bigger, no border. A bordered box reads as a component; this is a
+   voice, and it should sit in the page like one. */
+.sb-coach-line {
+  margin: 0 0 var(--space-5) 0;
+  font-size: var(--text-lg, 1.125rem);
+  line-height: var(--leading-relaxed, 1.6);
+  color: var(--color-primary);
+}
+
+/* SORE-ZONE. Marked, never disabled — stretching a sore area is often
+   the right call, and the exercises are condition-filtered underneath.
+   The dot is decorative; the note below the chips carries the meaning,
+   so nothing depends on colour alone. */
+.sb-zone-chip--sore {
+  border-color: var(--color-danger);
+}
+
+.sb-zone-chip--sore.sb-zone-chip--on {
+  border-color: var(--color-danger);
+  background: var(--color-primary);
+}

@@ -141,6 +141,7 @@ export function renderExerciseCard(exercise, opts = {}) {
     : "";
 
   const decide = [
+    cueBlock,
     lastBlock,
     loadBlock,
     opts.adjustSlot || "",
@@ -167,9 +168,21 @@ export function renderExerciseCard(exercise, opts = {}) {
 
   const bodies = { decide, do: doBody, note: opts.noteSlot || "" };
 
+  // CUE-UNPIN, 02 Sep 2026. The CAUTION stays pinned to all three
+  // pages: a safety line you have navigated away from is more hidden
+  // than one that is collapsed, and that reasoning is unchanged.
+  //
+  // The lead cue does NOT. It is coaching, not safety, and pinning it
+  // meant the same paragraph -- "this is exploration, not performance"
+  // -- appeared on DECIDE, DO and NOTE. Graeme, 2 Sep, seeing it three
+  // times across three screenshots: "all these 2 relevant?" It belongs
+  // on DECIDE, where the decision it informs is being made.
   const pinned = `
-    ${caution ? `<p class="exercise-caution" role="note">${caution}</p>` : ""}
-    ${leadCue ? `<p class="exercise-cue xcard-lead-cue">${esc(leadCue)}</p>` : ""}`;
+    ${caution ? `<p class="exercise-caution" role="note">${caution}</p>` : ""}`;
+
+  const cueBlock = leadCue
+    ? `<p class="exercise-cue xcard-lead-cue">${esc(leadCue)}</p>`
+    : "";
 
   // "Show everything" flattens the pages rather than landing on one.
   // Somebody who has asked for all of it should not be walked through

@@ -63,12 +63,34 @@ function pageBranch(text, page) {
 
 console.log("\nTEST 1 - the caution is not page-scoped");
 
-check("1a. the pinned block carries the caution and the lead cue", () => {
+check("1a. the pinned block carries the caution, and ONLY the caution", () => {
+  // DECISION REVERSED, 02 Sep 2026 (Graeme). This assertion originally
+  // required the lead cue to be pinned alongside the caution. On device
+  // that meant the same paragraph -- "this is exploration, not
+  // performance" -- appeared on DECIDE, DO and NOTE, three screenshots
+  // in a row.
+  //
+  // The reasoning that pinned the CAUTION is unchanged and still holds:
+  // a safety line you have navigated away from is more hidden than one
+  // that is collapsed. The cue is coaching, not safety, and repeating it
+  // three times taught people to skip the block that also carries the
+  // caution -- so pinning both made the caution LESS likely to be read.
+  //
+  // This is a narrowing, not a weakening: the caution requirement is
+  // strengthened by an explicit "and nothing else".
   const pin = card.indexOf("const pinned =");
   ok(pin > -1, "no pinned block");
   const body = card.slice(pin, card.indexOf("`;", pin));
   ok(body.includes("exercise-caution"), "the caution is not pinned; it would sit on one page only");
-  ok(body.includes("xcard-lead-cue"), "the lead cue is not pinned");
+  ok(!body.includes("xcard-lead-cue"),
+     "the lead cue is pinned again, so it repeats on all three pages and dilutes the " +
+     "caution it sits beside");
+
+  // Unpinned must not mean lost.
+  const dec = card.indexOf("const decide = [");
+  ok(dec > -1, "no decide body");
+  ok(card.slice(dec, card.indexOf("].join", dec)).includes("cueBlock"),
+     "the cue was unpinned but never placed on DECIDE, so it is gone entirely");
 });
 
 check("1b. pinned content renders before the page body in both paths", () => {
