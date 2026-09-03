@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Sep 2026 v427
+ *
+ * v427 - ARC-2. New file js/views/stretch-arc.js, precached. Omitting it
+ *   would leave the Mobility door pointing at a route the shell does not
+ *   hold.
+ *
  * 02 Sep 2026 v426
  *
  * v426 - STRETCH-FLOW, CUE-UNPIN, SORE-ZONE, BANNER-SCOPE. CSS changed
@@ -2959,7 +2965,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v426";
+const CACHE_NAME = "alongside-v427";
 
 const SHELL_URLS = [
 
@@ -3039,6 +3045,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/today.js",
   "/alongside-app/js/views/conditions-update.js",
   "/alongside-app/js/views/mobility-conditioning.js",
+  "/alongside-app/js/views/stretch-arc.js",
   "/alongside-app/js/views/checkin.js",
   "/alongside-app/js/views/checkin-mini.js",
   "/alongside-app/js/views/coach-proposal.js",
