@@ -515,6 +515,7 @@ function renderTypePicker() {
  * need it" is what most people want most days.
  */
 function renderZonePicker() {
+  const p_soreNote = "sb-sore-note";
   const zones     = zonesWithCoverage();
   const available = zones.map(z => z.id);
 
@@ -547,6 +548,17 @@ function renderZonePicker() {
   // What the arc has not come to yet. A fact about the PLAN, never about
   // the person: "shoulders have not come up" is not "you have skipped
   // shoulders", and no number reaches the screen either way.
+  // SORE-ZONE, 02 Sep 2026. The app already knows which areas were
+  // reported sore at check-in, and was styling those chips identically
+  // to every other one. Marked, not disabled: stretching a sore area is
+  // often the right call, and the exercises themselves are already
+  // condition-filtered underneath. This tells the person what the coach
+  // knows; it does not decide for them.
+  const soreAreas = new Set(store.get("conditions") || []);
+  const soreZones = new Set(
+    zones.filter(z => z.areas.some(a => soreAreas.has(a))).map(z => z.id)
+  );
+
   const arc     = store.get("stretchArc") || {};
   const missing = arc.active
     ? store.zonesNotRecentlyWorked(available, 2)
@@ -562,14 +574,13 @@ function renderZonePicker() {
         <span class="sb-header-title">Stretch</span>
       </div>
 
-      <div class="card card-coach" style="margin-bottom: var(--space-5);">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p class="coach-message-text">
-          ${suggested.length
-            ? "I've leaned these towards what you're working on. Change any of them."
-            : "Anywhere you want me to focus? Pick as many as you like, or none."}
-        </p>
-      </div>
+      <!-- Graeme, 2 Sep: the coach prompt should be teal writing, a
+           little bigger, not boxed. It is a voice, not a card. -->
+      <p class="sb-coach-line">
+        ${suggested.length
+          ? "I've leaned these towards what you're working on. Change any of them."
+          : "Anywhere you want me to focus? Pick as many as you like, or none."}
+      </p>
 
       ${missingLabels.length ? `
         <p class="sb-zone-note">
@@ -582,13 +593,21 @@ function renderZonePicker() {
       <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-5);"
            role="group" aria-label="Choose body zones">
         ${zones.map(z => `
-          <button class="sb-zone-chip ${selectedZones.includes(z.id) ? "sb-zone-chip--on" : ""}"
+          <button class="sb-zone-chip ${selectedZones.includes(z.id) ? "sb-zone-chip--on" : ""} ${soreZones.has(z.id) ? "sb-zone-chip--sore" : ""}"
                   data-zone="${z.id}"
-                  aria-pressed="${selectedZones.includes(z.id)}">
-            ${z.label}
+                  aria-pressed="${selectedZones.includes(z.id)}"
+                  ${soreZones.has(z.id) ? `aria-describedby="${p_soreNote}"` : ""}>
+            ${z.label}${soreZones.has(z.id) ? ` <span aria-hidden="true">\u2022</span>` : ""}
           </button>
         `).join("")}
       </div>
+
+      ${soreZones.size ? `
+        <p class="sb-zone-note" id="${p_soreNote}">
+          You told me ${[...soreZones].map(id => (zones.find(z => z.id === id) || {}).label).filter(Boolean).join(" and ")}
+          ${soreZones.size === 1 ? "is" : "are"} sore today. Still fine to choose \u2014 I'll keep it gentle.
+        </p>
+      ` : ""}
 
       <button class="btn btn-primary btn-large btn-full" id="sb-zones-continue-btn">
         ${selectedZones.length ? "Continue" : "Wherever you need it"}
@@ -1245,6 +1264,12 @@ export function onMount() {
       // ZONE-1. Back through the step that was actually shown.
       phase = selectedType === "stretch" ? "zones" : "location";
       rerender();
+    } else if (phase === "candidates" && selectedType === "stretch") {
+      // STRETCH-FLOW. Equipment and build mode were skipped, so back
+      // must not walk into them -- the same rule BACK-DOOR established:
+      // never enter a screen that was skipped forward.
+      phase = "duration";
+      rerender();
     } else if (phase === "zones") {
       // BACK-DOOR still applies: a preselected type skipped the picker,
       // so backing out of the first shown step returns to the door.
@@ -1346,6 +1371,24 @@ export function onMount() {
       // the flat list is the very thing EQUIP-4 below identifies as
       // wrong. One path for everybody now.
       {
+        // STRETCH-FLOW, 02 Sep 2026. A stretch session needs no kit --
+        // nothing in its pools reads equipment -- and the build-mode
+        // question was the second "how would you like this to go?" in as
+        // many minutes, after the variety question inside check-in.
+        //
+        // Graeme, 2 Sep: "I'm not sure equipment is relevant. I also
+        // question if it's relevant at all after setting up on onboarding
+        // and selecting home. It knows."
+        //
+        // Two screens removed from a nine-screen path. Stretch goes
+        // straight to the recommended selection, which is what build mode
+        // defaulted to anyway -- the choice is not lost, it is made.
+        if (selectedType === "stretch") {
+          equipmentOverride = [];
+          buildMode = "recommend";
+          _openRecommendedCandidates();
+          return;
+        }
         phase = "equipment";
         // 05 Aug 2026 -- reads the location-scoped list, not the flat merged
         // `equipment` -- the actual fix for the "assumed home" bug.
@@ -1415,6 +1458,30 @@ export function onMount() {
     rerender();
   });
 
+  /**
+   * STRETCH-FLOW. The tail of the build-mode "recommend" branch, lifted
+   * out so the stretch path and the build-mode button share it rather
+   * than growing a second copy -- the duplication that produced two
+   * selection loops and two checkedInToday definitions.
+   */
+  function _openRecommendedCandidates() {
+    candidatePools = buildCandidatePools({
+      sessionType:       selectedType,
+      durationMins:      selectedDuration,
+      equipmentOverride: equipmentOverride,
+      preset:            selectedPreset
+    });
+    if (!candidatePools) { router.navigate("today"); return; }
+    selectedCandidateIds = new Set();
+    ["warmup", "main", "cooldown"].forEach(section => {
+      candidatePools[section].forEach(ex => {
+        if (ex.recommended) selectedCandidateIds.add(ex.id);
+      });
+    });
+    phase = "candidates";
+    rerender();
+  }
+
   // Build-mode selection (05 Aug 2026)
   document.querySelectorAll(".sb-buildmode-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -1429,6 +1496,13 @@ export function onMount() {
         triggerBuild();
         return;
       }
+      // "recommend" pre-checks the recommended:true items; "own" starts
+      // empty. The recommend path shares _openRecommendedCandidates()
+      // with the stretch flow so the two cannot drift.
+      if (buildMode === "recommend") {
+        _openRecommendedCandidates();
+        return;
+      }
       candidatePools = buildCandidatePools({
         sessionType:       selectedType,
         durationMins:      selectedDuration,
@@ -1439,15 +1513,7 @@ export function onMount() {
         router.navigate("today");
         return;
       }
-      // "recommend" pre-checks the recommended:true items; "own" starts empty.
       selectedCandidateIds = new Set();
-      if (buildMode === "recommend") {
-        ["warmup", "main", "cooldown"].forEach(section => {
-          candidatePools[section].forEach(ex => {
-            if (ex.recommended) selectedCandidateIds.add(ex.id);
-          });
-        });
-      }
       phase = "candidates";
       rerender();
     });
