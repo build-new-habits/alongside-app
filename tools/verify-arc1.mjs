@@ -117,11 +117,19 @@ check("3. the mapping has exactly one home", () => {
     !f.endsWith("stretch-goal-zones.js") && /function\s+zonesForGoal|STRETCH_GOAL_ZONES\s*=/.test(read(f)));
   ok(definers.length === 0, `a second file defines the mapping: ${definers.join(", ")}`);
 
-  const consumers = files.filter(f =>
-    !f.endsWith("stretch-goal-zones.js") && /from\s+["'][^"']*stretch-goal-zones\.js["']/.test(read(f)));
-  ok(consumers.length <= 1,
-     `${consumers.length} files import the map (${consumers.join(", ")}). Keep it to one, ` +
-     `or replacing it becomes a hunt rather than an edit.`);
+  // A CONSUMER COUNT WAS THE WRONG PROXY. It was one when written, and
+  // went red the moment the arc screen legitimately needed to show what
+  // a goal leans towards. More than one screen asking the question is
+  // fine; more than one screen ANSWERING it is not.
+  //
+  // What actually keeps replacement to a single edit is that nobody
+  // reaches past zonesForGoal() into the table itself. That is the
+  // property, so that is what is asserted.
+  const readers = files.filter(f =>
+    !f.endsWith("stretch-goal-zones.js") && /STRETCH_GOAL_ZONES\s*\.\s*goals/.test(read(f)));
+  ok(readers.length === 0,
+     `${readers.join(", ")} reads the mapping table directly instead of calling ` +
+     `zonesForGoal(). Replacing the map must stay one edit.`);
 });
 
 console.log("\nTEST 4 - the arc records dates, and never a score");

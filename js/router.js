@@ -1,5 +1,8 @@
 /**
  * router.js
+ * 03 Sep 2026 v24
+ *   ARC-2. New route 'stretch-arc' -> stretch-arc.js.
+ *
  * 31 Aug 2026 v23
  *   BACK-STACK + intention.js retired.
  *
@@ -249,6 +252,7 @@ const VIEW_NAMES = {
   'session-builder':   { path: './views/session-builder-ui.js',  fn: 'SessionBuilderView'  },
   'conditions-update': { path: './views/conditions-update.js',   fn: 'ConditionsUpdateView' },
   'mobility-conditioning': { path: './views/mobility-conditioning.js', fn: 'MobilityConditioningView' },
+  'stretch-arc':          { path: './views/stretch-arc.js',           fn: 'StretchArcView'          },
 
   // ── Session views ──────────────────────────────────────────────────────────
   'workout':            { path: './views/workout.js',           fn: 'WorkoutView'           },

@@ -1,49 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v257
+## 02 Sep 2026 v256
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_02sep2026_v256.md`. Remove v256 on upload.
-
-> ### 🟢 ARC-2 — DEPLOYED 3 Sep, `alongside-v427`. 99 gates. **The arc exists.**
->
-> Graeme, after testing the whole flow: *"Where's my arc?"* It was a fair question. ARC-1 built the machinery — goal-to-zone leaning, coverage by date, a line for what hasn't come up — and **nothing set `stretchArc.active`**, so none of it could appear. New view `js/views/stretch-arc.js`, reached from a card above Stretch on the Mobility & Conditioning door.
->
-> #### 🟢 What an arc is, and what it deliberately is not
->
-> A **direction held over weeks**. It knows what you're working towards, leans each session's zones towards it, and can say which parts of you haven't come up lately.
->
-> **No schedule. No session target. No end date.** Every one of those creates a state you can be behind on, and being behind is the thing this product exists not to do. An arc untouched for three weeks is an arc, not a failure — and the screen says nothing about it, because a plan is not owed anything.
->
-> #### 🟢 It counts nothing
->
-> Coverage shows **when**, never **how many**. *"Hips — 3 September"* is a fact about the plan; *"you've done hips four times"* is a score. Assertion 2a bans "times", "streak", "total", "you've done" from the screen outright. 2b bans relative time — *"3 days ago"* is a countdown, and a countdown is something to be behind on.
->
-> #### 🟢 Stopping is unpunished and unremarked
->
-> No confirmation, no summary of what you're giving up, no offer to pause instead. Each of those makes leaving feel like a failure. **`zonesWorked` survives stopping** and restarting keeps the original `startedAt` — coming back in a month doesn't begin from nothing. All three reversal-proven.
->
-> **Traced live**, not described: off state shows "Run a 5K" and the four zones it leans towards → Start sets `active: true` → a session marks hips and hamstrings → the screen lists them with dates → Stop leaves `active: false` with the coverage intact.
->
-> #### ⚠️ Two gate lessons, both worth keeping
->
-> **A banned-word list caught its own mitigation.** Assertion 2c flagged the word "owe" — inside *"Nothing owed here"*, the sentence assertion 4 **requires**, written precisely to stop a coverage list reading as a to-do list. A word list that catches the safeguard pushes the writer to delete the safeguard to get green. Rewritten as phrases.
->
-> **ARC-1's assertion 3 was measuring a proxy.** It capped consumers of the goal→zone map at one, and went red the moment the arc screen legitimately needed to ask what a goal leans towards. More than one screen *asking* is fine; more than one *answering* is not. It now asserts nobody reads `STRETCH_GOAL_ZONES.goals` directly instead of calling `zonesForGoal()` — the property that actually keeps replacement to one edit.
->
-> #### ⚠️ Date discipline, again
->
-> Today is **3 September**. Files written this morning were initially headed 2 Sep before the clock was re-checked. Corrected before commit. Third occurrence — the standing rule is now: **check the clock immediately before writing any header, every time, not once per session.**
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **ARC-2** | Stretch arc: start, stop, coverage by date, uncovered zones | 🟢 Shipped `alongside-v427`, untested on device | 3 Sep |
-> | **PAT RENEWAL** | **Expires Friday 5 Sep** | 🔴 Graeme | by 5 Sep |
-> | **ZONE-WEIGHTING** | `affectsAreas` unweighted: Inchworm counts as a shoulder stretch, so an ask for neck and shoulders returned four leg stretches out of five | 🔴 Content-data fault, next | w/c 3 Sep |
-> | **CONTENT-STRETCH** | ~25–30 entries: Chest, Inner thigh, Wrists & arms | 🔴 Authoring | w/c 3 Sep |
-> | **EQUIP-LINK** · **STRENGTH-FURNITURE** | Kit-changed link; "3 sets"/"How heavy" on stretches | 🟠 Booked | w/c 3 Sep |
-
+Supersedes `master_schedule_02sep2026_v255.md`. Remove v255 on upload.
 
 > ### 🟢 STRETCH-FLOW · CUE-UNPIN · SORE-ZONE · BANNER-SCOPE — DEPLOYED 2 Sep, `alongside-v426`. 98 gates.
 >
@@ -6080,4 +6039,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v257*
+*Build New Habits · Alongside: Move · Master Schedule · 02 Sep 2026 v256*
