@@ -367,3 +367,68 @@
   outline: 2px solid var(--color-primary);
   outline-offset: -2px;
 }
+
+/* ── LOBBY-1b: the arc on the lobby ───────────────────────────────────
+   The gold edge marks premium CAPABILITY. It is an edge, deliberately —
+   an addition around something whole, not a colour that makes the rest
+   of the screen look drained. Free must look finished, and this
+   audience has spent enough time being told it does not qualify. */
+.today-arc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  border: 2px solid var(--color-gold, #B8970A);
+  border-radius: var(--radius-lg, 12px);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.today-arc__label {
+  font-size: var(--text-sm);
+  color: var(--color-gold, #B8970A);
+}
+
+.today-arc__aim {
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--font-bold, 700);
+  line-height: var(--leading-tight, 1.3);
+}
+
+.today-arc__strands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Unlit is NOT unfinished. A strand nothing has touched yet is a
+   starting line, so it must read as quiet rather than as failed. */
+.today-arc__strand {
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-sm, 4px);
+  border: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+}
+
+.today-arc__strand--lit {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.today-arc__note,
+.today-arc__offer {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed, 1.6);
+  opacity: 0.85;
+}
+
+.today-arc:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

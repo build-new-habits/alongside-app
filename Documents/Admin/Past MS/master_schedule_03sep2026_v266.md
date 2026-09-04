@@ -1,54 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v267
+## 03 Sep 2026 v266
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v266.md`. Remove v266 on upload.
-
-> ### 🟢 LOBBY-1b — DEPLOYED 3 Sep, `alongside-v432`. 102 gates.
->
-> **The arc is now the first thing on Home**, and two live scoreboards are gone. Found by Graeme's device test, not by the gates.
->
-> #### 🔴 TWO PROHIBITED PATTERNS WERE LIVE ON DEVICE
->
-> **`"You said you would aim for 3 a week."`** on My Programme, and **`"3 of 5 this week"`** as a counter on Home. A count against a target is a number somebody can be behind on by Wednesday — the exact mechanic the psychological specification's prohibited-patterns list bans, and the one this product has spent three days removing everywhere else.
->
-> **The week counter was removed entirely rather than having its target dropped:** a bare count is still a score, and the lobby is where somebody arrives, not where they are marked. Session history stays in Progress, where looking it up is a choice.
->
-> 🟠 `strategicGoal.weeklySessionTarget` **stays in the store** — onboarding writes it and the generator reads it for sizing. **The display was the fault, not the field.**
->
-> 🟠 **Logged, not removed:** Home still says *"That's the 3 you said you'd aim for this week"* when a target is MET. It never fires when behind, so it is an acknowledgement rather than a target reminder — a different act. Flagged for a ruling rather than changed unilaterally.
->
-> #### 🔴 My Programme listed NINE goals
->
-> Feel better · build a consistent routine · lose weight · tone up · recover from an injury · prevent future injuries · improve flexibility · improve balance. **Exactly what Graeme predicted** on 3 Sep: *"I could basically put in all of it, and that's not a very suitable arc."*
->
-> The arc now wins when one exists: **one aim, up to three strands, and the person's own marker read back to them.** The old goal list still shows for anybody without an arc, so nothing disappears.
->
-> #### 🟢 The arc was three levels deep. It is now the top of Home.
->
-> It was Home → Mobility & Conditioning → a card between "My Conditions Programme" and "Stretch". **No place for the thing the business rests on.** The panel is reachable **without a check-in** (assertion 7b), carries the **gold edge** — an addition around something whole, never a colour that drains the rest — and shows strands **lit or unlit**.
->
-> **Day one has its own wording:** *"All of it still ahead of you. That's the whole point of today."* Assertion 7d fails without it, because an arc with nothing covered will otherwise read as empty when it is in fact a starting line.
->
-> **Unlit is not failed** (assertion 8): no fading toward disabled, no strike-through.
->
-> **With no arc, the panel is the offer**, and assertion 7e requires it **above** the reference rows — below Settings is where terms and privacy links live, so the eye files anything there as boilerplate. Graeme's observation, and he was right.
->
-> #### ⚠️ FOUR anchor faults in one gate, all mine
->
-> `_whatYoureAimingAt` matched its **call site** 40 lines before its definition · `arcPanel()` matched the function's **own definition** · the check-in test passed while one of **two branches** said `true` · and disabling the arc branch left `arc.aimId` visible **inside** it. **Seventh, eighth, ninth and tenth times this session an assertion has measured the wrong region of a file.** Every one was caught by reversal, none by review. **Standing rule: anchor on the most specific string available, and prove it in both directions.**
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **LOBBY-1b** | Arc on Home, scoreboards removed, My Programme shows the arc | 🟢 Shipped `alongside-v432`, untested on device | 3 Sep |
-> | **SUGGEST-1** | The coach's suggestion leading Home, before the check-in, with visible revision | 🔵 **Next** | w/c 3 Sep |
-> | **TARGET-MET-LINE** | Home's "that's the 3 you said you'd aim for" — keep or cut? | 🟠 Needs a ruling | w/c 3 Sep |
-> | **NAV-WELLBEING-DUP** | Wellbeing is both a reference row and a nav tab | 🟠 Logged | w/c 3 Sep |
-> | **BOTTOM-NAV-CLIP** | Text clipped behind the bottom nav on Today and My Programme | 🟠 Device-test finding | w/c 3 Sep |
-> | **PAT RENEWAL** | **Expires Fri 5 Sep** | 🔴 Graeme | by 5 Sep |
-
+Supersedes `master_schedule_03sep2026_v265.md`. Remove v265 on upload.
 
 > ### 🟢 ARC-3-SETUP — DEPLOYED 3 Sep, `alongside-v431`. 102 gates. `store.js` v63 · `Schema.md` v1.45
 >
@@ -6521,4 +6475,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v267*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v266*
