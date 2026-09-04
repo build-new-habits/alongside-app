@@ -367,14 +367,42 @@ export function TodayView(router) {
   // decides" keeps its existing distinct treatment — spans both grid
   // columns, dashed border, sits visually underneath the rest — not
   // counted as one of the "real" doors, exactly as before.
+  // ── THE LOBBY RULE (LOBBY-1a, 03 Sep 2026) ────────────────────────
+  //
+  // kind: 'session'   opens something you DO. Rendered as a tile.
+  // kind: 'reference' something you read, check or change. Rendered as
+  //                   a quiet row beneath.
+  //
+  // Home had seven tiles of equal visual weight, and Graeme could not
+  // navigate his own app: "I find the whole app overwhelming for choice
+  // and navigation." It got there one reasonable addition at a time,
+  // because nothing said what Home was FOR.
+  //
+  // This is the rule, and it is the answer to every future proposal for
+  // a new tile: anything that starts a session is a tile; everything
+  // else is a row. A door that cannot say which it is does not belong
+  // on Home at all.
+  //
+  // Wellbeing is a reference row despite opening practices, on the
+  // evidence already in this file: the NAV-6 note records that it
+  // duplicates the Noticing tab, and a thing reachable from every screen
+  // does not need a tile on the one screen where slots are scarce.
+  //
+  // This is the FIRST HALF of the lobby. The second half -- promoting
+  // the coach's suggestion to the top and moving the session tiles
+  // behind the check-in -- is not done here, because the suggestion is
+  // built by coach-proposal, which requires a check-in. Promoting it
+  // onto an ungated Home would mean either gating Home or showing a
+  // suggestion built on no data. The split is what makes the promotion
+  // possible, and it is a bigger change than this one.
   const HOME_DOORS = [
-    { id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder', requiresCheckin: true },
+    { kind: 'session', id: 'cardio-core-strength', label: 'Cardio, Core & Strength', icon: '\uD83D\uDCAA', route: 'session-builder', requiresCheckin: true },
     // R4, 20 Aug 2026. tier: 'personal' REMOVED. Choosing which session
     // you do today is self-direction, and self-direction is an
     // accessibility feature -- charging for it penalised the person who
     // most needs to override the default because the default hurts.
     // Revenue architecture section 3: free is today, the Plan is the arc.
-    { id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'mobility-conditioning', requiresCheckin: false },
+    { kind: 'session', id: 'mobility-conditioning', label: 'Mobility & Conditioning', icon: '\uD83E\uDDD8', route: 'mobility-conditioning', requiresCheckin: false },
     // NAV-3, 12 Aug 2026. Graeme, device pass part 4: "Yoga was not easy
     // to find... Can the yoga/pilates door be offered in multiple places
     // as well?"
@@ -392,7 +420,7 @@ export function TodayView(router) {
     // R4, 20 Aug 2026. tier: 'personal' REMOVED -- same reasoning as the
     // door above. NAV-3's finding stands: yoga was hard to find, and a
     // paywall on top of that was a second wall on the same door.
-    { id: 'yoga', label: 'Yoga & Pilates', icon: '\uD83E\uDDD8\u200D\u2640\uFE0F', route: 'yoga-session', requiresCheckin: false },
+    { kind: 'session', id: 'yoga', label: 'Yoga & Pilates', icon: '\uD83E\uDDD8\u200D\u2640\uFE0F', route: 'yoga-session', requiresCheckin: false },
     // TIER-F, 13 Aug 2026 -- RESOLVED. The flag below stood since
     // NAV-6. The door and the bottom-nav tab route to the same view;
     // the nav label is now "Wellbeing" too (index.html), so the two
@@ -414,8 +442,8 @@ export function TodayView(router) {
     //
     // The real question is whether these should share a name, and that is
     // Graeme's call, not a cleanup.
-    { id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing', requiresCheckin: false },
-    { id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'conditions-update', requiresCheckin: false },
+    { kind: 'reference', id: 'wellbeing', label: 'Wellbeing', icon: '\uD83C\uDF3F', route: 'noticing', requiresCheckin: false },
+    { kind: 'reference', id: 'conditions-update', label: 'Conditions Update', icon: '\uD83E\uDE79', route: 'conditions-update', requiresCheckin: false },
     // NAV-6, 12 Aug 2026. Progress tile REMOVED. Graeme: "why do we have
     // a progress tile when we have a tab? You're right about it looking
     // cluttered."
@@ -429,8 +457,8 @@ export function TodayView(router) {
     // and Home is where things go to become hard to find. A door that
     // already exists somewhere better is not a second door, it is
     // clutter.
-    { id: 'library', label: 'Library', icon: '\uD83D\uDCDA', route: 'library', requiresCheckin: false },
-    { id: 'unsure', label: 'Unsure? Coach decides', icon: '\uD83C\uDFAF', route: 'coach-proposal', requiresCheckin: true },
+    { kind: 'reference', id: 'library', label: 'Library', icon: '\uD83D\uDCDA', route: 'library', requiresCheckin: false },
+    { kind: 'session', id: 'unsure', label: 'Unsure? Coach decides', icon: '\uD83C\uDFAF', route: 'coach-proposal', requiresCheckin: true },
   ];
 
   function mount(container) {
@@ -638,7 +666,7 @@ export function TodayView(router) {
         </button>
 
         <div class="today-doors" role="group" aria-label="Choose how you want to move today">
-          ${HOME_DOORS.map(d => {
+          ${HOME_DOORS.filter(d => d.kind !== 'reference').map(d => {
             const inner = `
               <span class="today-door__icon" aria-hidden="true">${d.icon}</span>
               <span class="today-door__label">${_esc(d.label)}</span>
@@ -668,6 +696,20 @@ export function TodayView(router) {
             </button>
           `;
           }).join('')}
+        </div>
+
+        <div class="today-reference" role="group" aria-label="Reference and settings">
+          ${HOME_DOORS.filter(d => d.kind === 'reference').map(d => `
+            <button class="today-ref-row"
+                    data-route="${d.route}"
+                    data-door-id="${d.id}"
+                    data-requires-checkin="${d.requiresCheckin}"
+                    aria-label="${_esc(d.label)}">
+              <span class="today-ref-row__icon" aria-hidden="true">${d.icon}</span>
+              <span class="today-ref-row__label">${_esc(d.label)}</span>
+              <span class="today-ref-row__chevron" aria-hidden="true">\u203A</span>
+            </button>
+          `).join('')}
         </div>
 
         ${!_checkedInToday() ? `

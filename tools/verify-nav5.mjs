@@ -116,8 +116,17 @@ check("the index is not sticky", () => {
 console.log("\nTEST 6 - NAV-6: Home does not duplicate the bottom nav");
 check("no tile routes to a nav destination except the flagged one", () => {
   const home = fs.readFileSync("js/views/today.js", "utf8");
-  const tiles = [...home.matchAll(/\{ id: '[\w-]+', label: '([^']+)'[^}]*?route: '([\w-]+)'/g)]
-    .map(m => ({ label: m[1], route: m[2] }));
+  // LOBBY-1a added a leading `kind:` to every door, and this pattern
+  // assumed `id:` came first -- so it matched nothing and reported "no
+  // tiles found" rather than passing silently. That is the gate working:
+  // it noticed the shape changed instead of quietly measuring an empty
+  // set. The kind is now optional in the pattern and captured, because
+  // the duplication rule this test enforces applies to TILES, and
+  // reference rows are allowed to point at nav destinations -- being
+  // reachable two ways is only clutter when both look equally important.
+  const tiles = [...home.matchAll(/\{ (?:kind: '(\w+)', )?id: '[\w-]+', label: '([^']+)'[^}]*?route: '([\w-]+)'/g)]
+    .map(m => ({ kind: m[1] || 'session', label: m[2], route: m[3] }))
+    .filter(t => t.kind !== 'reference');
   ok(tiles.length > 0, "no tiles found - the regex has drifted from the markup");
   const nav = ["today", "progress", "noticing", "settings"];
   const dup = tiles.filter(t => nav.includes(t.route) && t.label !== "Wellbeing");
