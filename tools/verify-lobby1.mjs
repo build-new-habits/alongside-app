@@ -111,6 +111,108 @@ check("5. the coach's suggestion is a tile", () => {
      "the drop-in no longer requires a check-in, so the coach would suggest from no data");
 });
 
+console.log("\nTEST 6 - LOBBY-1b: no scoreboard on the first screen");
+
+check("6a. Home shows no session count and no weekly target", () => {
+  // Both were live on device: "3 of 5 this week" as a counter, and "You
+  // said you would aim for 3 a week" on My Programme. A count against a
+  // target is a thing somebody can be behind on by Wednesday, which is
+  // the mechanic the prohibited-patterns list bans.
+  ok(!today.includes("today-week-count__number"),
+     "the week counter is back on Home. A bare count is still a score, and the lobby is " +
+     "where somebody arrives, not where they are marked.");
+  const mp = strip(fs.readFileSync("js/views/my-programme.js", "utf8"));
+  ok(!/aim for \$\{[^}]*weeklySessionTarget/.test(mp),
+     "My Programme displays a weekly session target again");
+});
+
+console.log("\nTEST 7 - the arc is the first thing, and needs no check-in");
+
+check("7a. the arc panel is on Home", () => {
+  // "arcPanel()" matches the function's own DEFINITION, so the naive
+  // check passed with the call removed. Look for the call inside the
+  // template instead.
+  ok(/\$\{arcPanel\(\)\}/.test(today), "Home does not render the arc");
+  ok(/function arcPanel/.test(today), "no arc panel");
+});
+
+check("7b. it is reachable without checking in", () => {
+  const at = today.indexOf("function arcPanel");
+  const body = today.slice(at, today.indexOf("_programmeHint", at));
+  // The panel has TWO branches (offer and active). Asserting that
+  // "false" appears anywhere passed while one of them said "true", so
+  // assert the absence of "true" instead.
+  ok(!/data-requires-checkin="true"/.test(body),
+     "a branch of the arc panel requires a check-in. It is the thing somebody opens the " +
+     "app to see, and browsing must not pay the check-in cost.");
+  ok(/data-requires-checkin="false"/.test(body), "the arc panel sets no check-in flag");
+  ok(!/data-route="mobility-conditioning"/.test(body),
+     "the arc still routes through the Mobility door, which is where it was buried");
+});
+
+check("7c. it surfaces what has NOT come up, never what has", () => {
+  const at = today.indexOf("function arcPanel");
+  const body = today.slice(at, today.indexOf("_programmeHint", at));
+  for (const bad of ["you have done", "you've done", "sessions", "times", "streak", "% "]) {
+    ok(!body.toLowerCase().includes(bad),
+       `the arc panel says "${bad}" — that is a score, not a fact about the plan`);
+  }
+  ok(/come up yet/.test(body), "the panel never names what the plan has not reached");
+});
+
+check("7d. day one reads as a starting line, not an empty state", () => {
+  const at = today.indexOf("function arcPanel");
+  const body = today.slice(at, today.indexOf("_programmeHint", at));
+  ok(/still ahead of you/.test(body),
+     "an arc with nothing covered yet has no wording of its own, so it will read as empty. " +
+     "Day one is premium's richest moment: everything is still ahead.");
+});
+
+check("7e. the offer sits above the reference rows", () => {
+  const arcAt = today.indexOf("arcPanel()");
+  const refAt = today.indexOf("today-reference");
+  ok(arcAt > -1 && refAt > -1, "a marker is missing");
+  ok(arcAt < refAt,
+     "the arc offer renders below the reference rows. Below Settings is where terms and " +
+     "privacy links live, so the eye files it as boilerplate and skips it.");
+});
+
+console.log("\nTEST 8 - unlit is not failed");
+
+check("8. an untouched strand does not read as disabled", () => {
+  const css = fs.readFileSync("css/layouts/today.css", "utf8");
+  const at = css.indexOf(".today-arc__strand {");
+  ok(at > -1, "no strand styling");
+  const rule = css.slice(at, css.indexOf("}", at));
+  ok(!/opacity:\s*0?\.[0-5]/.test(rule),
+     "unlit strands are faded toward disabled. A strand nothing has touched yet is a " +
+     "starting line, not a failure.");
+  ok(!/text-decoration:\s*line-through/.test(rule), "unlit strands are struck through");
+});
+
+console.log("\nTEST 9 - My Programme shows the arc when there is one");
+
+check("9. the aim replaces the goal list", () => {
+  const mp = strip(fs.readFileSync("js/views/my-programme.js", "utf8"));
+  ok(mp.includes("aimById"), "My Programme cannot read the arc");
+  // Anchor on the DEFINITION, not the first mention. The bare name
+  // matched the call site 40 lines earlier and measured the wrong
+  // region of the file -- the seventh time this session an assertion
+  // has done that. Anchor on the most specific string available.
+  const at = mp.indexOf("function _whatYoureAimingAt");
+  ok(at > -1, "no _whatYoureAimingAt definition");
+  const body = mp.slice(at, at + 2600);
+  // Anchor on the CONDITION, not the field name: disabling the branch
+  // left arc.aimId visible inside it and the check still passed.
+  const aimAt  = body.indexOf("if (arc.aimId)");
+  const goalAt = body.indexOf("goals.map");
+  ok(aimAt > -1 && goalAt > -1, "a branch is missing");
+  ok(aimAt < goalAt,
+     "the old goal list is checked before the arc, so somebody with an arc still sees nine " +
+     "goals. On device this listed feel-better, lose weight, tone up, recover from injury " +
+     "and five more — a wishlist, not an aim.");
+});
+
 console.log(fails === 0
   ? "\nLOBBY-1a: all assertions pass\n"
   : "\nLOBBY-1a: " + fails + " FAILED\n");
