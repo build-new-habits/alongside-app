@@ -1,6 +1,43 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 03 Sep 2026 v43
+ *   ZONE-WEIGHTING. affectsAreas lists everything an exercise touches,
+ *   in no stated order, and every consumer treated all of it equally.
+ *
+ *   THE SYMPTOM. Inchworm is tagged ["hamstring", "hip-flexor",
+ *   "shoulder", "lower-back"], so it counted as a shoulder stretch. A
+ *   persona asking for neck and shoulders was handed four leg stretches
+ *   out of five, every one of them a legitimate "match".
+ *
+ *   THE DATA WAS ALREADY ORDERED AND NOTHING READ IT. Tested rather than
+ *   assumed: of 91 exercises whose NAME names a body part, 79% have that
+ *   part first in affectsAreas, and most of the rest are defensible
+ *   judgements -- Side-Lying Hip Abduction leads with glutes, which is
+ *   correct. So primacy exists in the content; the code discarded it.
+ *   This is a code fix, not a 551-entry authoring job.
+ *
+ *   RANK, DO NOT FILTER. Matching only the first two areas fixes
+ *   Inchworm and drops Neck & shoulders from 12 usable stretches to 5,
+ *   below the offering floor -- it would have removed Bend's headline
+ *   zone to fix a bug. So primary matches LEAD and incidental matches
+ *   still fill behind them. Same conclusion ARC-3 reached about
+ *   categories, for the same reason: a filter over a library this size
+ *   eventually returns nothing.
+ *
+ *   PRIMARY_DEPTH = 2, not 1. A stretch commonly has a genuine pair --
+ *   Hip Flexor Stretch is ["hip", "hip-flexor", ...] and both are the
+ *   point. Depth 1 would have made the second half of every such pair
+ *   incidental.
+ *
+ *   MIN_ZONE_CONTENT 6 -> 5, and now counted on PRIMARY matches only.
+ *   The floor exists so a zone can lead a session without repeating
+ *   itself, and the shortest stretch session has 5 main slots -- so 5 is
+ *   the number the floor was always reaching for. Counting primary-only
+ *   at 5 hides exactly the same three zones as counting everything at 6
+ *   (Chest, Inner thigh, Wrists & arms), so nothing offered today is
+ *   withdrawn -- what changes is that the offer is now honest.
+ *
  * 02 Sep 2026 v42
  *   ARC-3 + SELECT-MERGE. Zone focus now actually leads selection.
  *
@@ -813,18 +850,42 @@ export const STRETCH_ZONES = [
   { id: "wrists-arms",    label: "Wrists & arms",    areas: ["wrist-elbow", "triceps-biceps", "biceps-triceps"] },
 ];
 
-// Below this a zone cannot fill a session without repeating itself, so it
+// Below this a zone cannot lead a session without repeating itself, so it
 // is not offered at all. Offering a thin zone is worse than omitting it:
 // it promises a focus the library cannot honour.
-const MIN_ZONE_CONTENT = 6;
+//
+// 5 because the shortest stretch session has 5 main slots -- the number
+// this floor was always reaching for. Counted on PRIMARY matches only
+// (ZONE-WEIGHTING): a zone whose only matches are incidental cannot
+// honestly be offered as a focus.
+const MIN_ZONE_CONTENT = 5;
 
 const _ZONE_PATTERNS = new Set(["stretch", "hip-rotation", "spinal-rotation",
                                 "rotation", "self-massage"]);
 
+// ZONE-WEIGHTING. How far into affectsAreas still counts as "this is what
+// the exercise is for". See the v43 note: 2, because a stretch commonly
+// has a genuine pair and depth 1 would demote half of every one.
+const PRIMARY_DEPTH = 2;
+
+/** True when the zone is what this exercise is FOR, not merely something it touches. */
+function isPrimaryFor(ex, areas) {
+  return (ex.affectsAreas || []).slice(0, PRIMARY_DEPTH).some(a => areas.has(a));
+}
+
+/** True when the zone is touched at all, at any depth. */
+function isIncidentalFor(ex, areas) {
+  return (ex.affectsAreas || []).some(a => areas.has(a));
+}
+
+function _areaSet(zoneIds) {
+  return new Set(STRETCH_ZONES.filter(z => zoneIds.includes(z.id)).flatMap(z => z.areas));
+}
+
 export function zoneContentCount(zone) {
+  const areas = new Set(zone.areas);
   return EXERCISES.filter(e =>
-    _ZONE_PATTERNS.has(e.movementPattern) &&
-    (e.affectsAreas || []).some(a => zone.areas.includes(a))
+    _ZONE_PATTERNS.has(e.movementPattern) && isPrimaryFor(e, areas)
   ).length;
 }
 
@@ -862,10 +923,12 @@ export function focusBudget(count) {
  */
 export function zoneMatcher(zoneIds) {
   if (!zoneIds || !zoneIds.length) return null;
-  const areas = new Set(
-    STRETCH_ZONES.filter(z => zoneIds.includes(z.id)).flatMap(z => z.areas)
-  );
-  return ex => (ex.affectsAreas || []).some(a => areas.has(a));
+  const areas = _areaSet(zoneIds);
+  // Primary only. This is the predicate the focused slots are filled
+  // from, so those slots go to exercises the zone is actually FOR.
+  // Incidental matches are not excluded from the session -- they rank
+  // behind, via _applyZoneFocus.
+  return ex => isPrimaryFor(ex, areas);
 }
 
 /**
@@ -905,14 +968,17 @@ export function fillFocusedSlots({ candidates, categories, budget, matcher, take
  */
 function _applyZoneFocus(list, zoneIds) {
   if (!zoneIds || !zoneIds.length) return list;
-  const areas = new Set(
-    STRETCH_ZONES.filter(z => zoneIds.includes(z.id)).flatMap(z => z.areas)
-  );
-  const hit = [], rest = [];
+  const areas = _areaSet(zoneIds);
+  // Three bands, not two. Primary leads, incidental follows, everything
+  // else fills. Stable within each band, so an unfocused session is
+  // unchanged and a focused one degrades rather than empties.
+  const primary = [], incidental = [], rest = [];
   for (const ex of list) {
-    ((ex.affectsAreas || []).some(a => areas.has(a)) ? hit : rest).push(ex);
+    if (isPrimaryFor(ex, areas))         primary.push(ex);
+    else if (isIncidentalFor(ex, areas)) incidental.push(ex);
+    else                                 rest.push(ex);
   }
-  return hit.concat(rest);
+  return primary.concat(incidental, rest);
 }
 
 // ── SECTION-RULES vocabulary ──────────────────────────────────────────────────
