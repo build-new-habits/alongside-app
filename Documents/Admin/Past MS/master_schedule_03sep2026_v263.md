@@ -1,47 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v264
+## 03 Sep 2026 v263
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v263.md`. Remove v263 on upload.
-
-> ### 🟢 IN STEP v2 — specified from Graeme's own answers. v1 removed.
->
-> #### ⚫ THE CHAIN — Graeme's answer to "what does somebody come away with", which turned out to be the whole specification
->
-> 1. You turn up low, and a small adaptation still gets you somewhere. **You do not have to be at your best to do something worthwhile.**
-> 2. You recognise your own frictions and starting points — that you arrive somewhere **from** somewhere.
-> 3. You meet somebody else and register that they also arrived from somewhere, carrying a backstory you cannot see.
-> 4. Having been met with compassion yourself, you meet them with it.
-> 5. You transfer it to people you have no history with. **That is the empathy transfer.**
->
-> #### 🔴 STEP ONE IS THE APP ITSELF
->
-> **The coach meeting somebody where they are on a bad day IS the modelled experience.** In Step is not a wellbeing module bolted onto a movement app — **it is the app's own behaviour turned outward.** Everything Alongside does to a person, In Step invites them to do to someone else.
->
-> Which is why it **cannot be taught, only noticed**: we are not explaining empathy, we are pointing at something already done to them, repeatedly, by the coach. **No competitor can take this position, because none of them met the person where they were in the first place.**
->
-> #### 🟢 An invitation, not a course or a skill
->
-> Graeme's word and the right one — nothing to pass or fail. And **not a skill**: the temptation is to say In Step "develops skills", but knowledge-based routes are exactly what the research found did NOT predict connection. **Attention practised, not competence acquired.**
->
-> #### 🟢 Nature is a state of mind, not a location
->
-> Graeme: reflect on the cycle from a kitchen, or on a colleague from a desk. **Rain is not an obstacle — rain is some of it.** A street with one tree is the assumed setting, never countryside.
->
-> **The bees and the flies** — Graeme's example and the best teaching object in the programme. Bees pollinate and we admire them; flies break down dead material into the fertility growth depends on, and we do not admire them at all. **Noticing that a system depends on the parts you do not admire is the same move as noticing it about people** — and it makes the point without making an argument.
->
-> #### ⚫ NO POLITICAL FRAMING, EVER
->
-> Interdependence is recognisable across the political spectrum in people's own terms. **The moment content reads as coded for one side it stops being an invitation and becomes an argument, and loses precisely the people it might have reached.** The bees and the flies do the work without naming anybody. Recorded as a hard constraint.
->
-> #### 🟠 One open question
->
-> Does In Step end at **people in general** or at **one person**? "People" is easy to feel and changes nothing; a specific person somebody finds hard to understand is much harder and likelier to shift something. Step 5 implies the general, step 3 the particular. **Recommendation: the particular, reached late.**
->
-> #### 📋 Next
->
-> **Build resumes: ARC-3-SETUP + AIM-VOCAB.** In Step content authoring follows the arc, since strands are how it attaches.
-
+Supersedes `master_schedule_03sep2026_v262.md`. Remove v262 on upload.
 
 > ### 🟢 THREE DOCUMENTS — Intended Purpose Statement, In Step spec, task list
 >
@@ -6386,4 +6347,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v264*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v263*
