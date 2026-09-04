@@ -1,5 +1,18 @@
 /*
  * css/layouts/today.css
+ * 03 Sep 2026 v7
+ *   LOBBY-1a. .today-reference / .today-ref-row.
+ *
+ *   Home had seven tiles of equal weight. These are the three that are
+ *   not sessions -- Library, Conditions Update, Wellbeing -- demoted to
+ *   rows so the eye reaches the four that are.
+ *
+ *   Deliberately quiet, and deliberately NOT disabled-looking: these are
+ *   ordinary destinations somebody may well want. Quiet means lower
+ *   contrast on the label, not grey-on-grey. Rows keep the same 48px
+ *   target the tiles have -- demoting something visually must not demote
+ *   it for thumbs.
+ *
  * 17 Aug 2026 v6
  *   CHAP-1 step 6. .today-hinge__aside / __event / __input.
  *
@@ -303,4 +316,54 @@
   font-size: var(--text-sm);
   color: var(--color-text-muted);
   margin-top: var(--space-1);
+}
+
+/* ── LOBBY-1a ─────────────────────────────────────────────────────────
+   Reference and settings. See the v7 note. */
+.today-reference {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.today-ref-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 48px;              /* WCAG 2.2 target size — same as a tile */
+  padding: var(--space-3) var(--space-1);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.today-ref-row:last-child {
+  border-bottom: none;
+}
+
+.today-ref-row__icon {
+  font-size: var(--text-lg, 1.125rem);
+  flex: 0 0 auto;
+}
+
+.today-ref-row__label {
+  flex: 1 1 auto;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary, inherit);
+}
+
+.today-ref-row__chevron {
+  flex: 0 0 auto;
+  opacity: 0.5;
+}
+
+.today-ref-row:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
 }
