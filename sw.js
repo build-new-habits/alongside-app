@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Sep 2026 v430
+ *
+ * v430 - AIM-VOCAB. New file js/data/aims.js, precached. Data only, not
+ *   yet read by any view -- ARC-3-SETUP is what will consume it.
+ *
  * 03 Sep 2026 v429
  *
  * v429 - LOBBY-1a. No new files. Home splits its doors into session
@@ -2975,7 +2980,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v429";
+const CACHE_NAME = "alongside-v430";
 
 const SHELL_URLS = [
 
@@ -3097,6 +3102,7 @@ const SHELL_URLS = [
   "/alongside-app/js/data/exercises/swimming_cycling.js",
   "/alongside-app/js/data/morning-programme.js",
   "/alongside-app/js/data/session-categories.js",
+  "/alongside-app/js/data/aims.js",
   "/alongside-app/js/data/stretch-goal-zones.js",
   "/alongside-app/js/data/session-rationale.js",
   "/alongside-app/js/data/personal-reads.js",
