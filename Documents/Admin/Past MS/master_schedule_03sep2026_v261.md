@@ -1,64 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v262
+## 03 Sep 2026 v261
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v261.md`. Remove v261 on upload.
-
-> ### 🔵 SPEC v3 — free and premium are different verbs
->
-> `Documents/Admin/alongside_arc_and_structure_spec_03sep2026_v3.docx` (v2 removed). Still not built.
->
-> #### ⚫ THE DECISION THAT REORGANISES EVERYTHING
->
-> **Free and premium are not one screen with a panel missing.** Free is *"you decide, I'll handle it"*. Premium is *"I've been thinking about this, here's what I'd do."* Two coaching relationships — the drop-in and the athlete — not one with a feature gate across it.
->
-> **This dissolves the problem a lesser suggestion would create:** free cannot feel like diminished premium, because free is not given a suggestion at all. It is given something complete on its own terms. **It is also the honest arrangement** — the coach genuinely knows little about a free user between sessions, and a confident suggestion built on that would be the same lie the onboarding goals were.
->
-> **Structure is the free product.** Nobody holds the thread for a free user, so the territory must be legible: MOVE YOUR BODY / SETTLE YOUR MIND as **headings, not doors**, everything on one screen, plus a *"Not sure? I'll pick something"* fallback. The "coach weaves body and mind" argument only holds where there IS a coach doing the weaving — which is why premium hides the taxonomy and free shows it.
->
-> #### ⚫ SAFETY IS NEVER THE PAID TIER
->
-> Pain-8 bypass, body cautions, contraindication filtering, and anything touching crisis or safeguarding are free in both tiers, permanently. **"You pay for coaching" is defensible. "You pay for us to notice you are in trouble" is not.**
->
-> #### 🟢 The suggestion comes BEFORE the check-in
->
-> Graeme's reasoning: it lets somebody see what today holds without committing, lets them test whether it still understands them, and **turns the check-in into something consented to rather than a toll**. It must be honest about what it knows — *"I was thinking lower body — it's where all three strands start. Let's check in and I'll firm it up."* **Revision must be visible and explained.** A coach who revises openly is more trustworthy than one who was never wrong; a coach who silently swaps its answer is neither.
->
-> **The coach earns specificity over time and should say so.** The app already records not-a-fan, too-hard, too-easy and skips, and already uses them — that knowledge is simply invisible. Making it visible is a real day-thirty feature needing no new plumbing.
->
-> #### 🔴 A MIND STRAND MAY BE A STRAND OUTRIGHT
->
-> Not a hidden layer, not a warm-down garnish. For *"get off the floor without using my hands"*, **fear of falling is frequently the actual limiting factor**. Offering "confidence about getting down" as a thing to work ON is structural wholeness, and no competitor offers it.
->
-> ⚠️ **The spec records its own drift:** the worked table listed a mind strand for that aim, then the illustration used three physical strands and quietly dropped it. The model permitted the right answer; the example taught the wrong one. Every future aim must be checked for it.
->
-> #### 🟢 Day one is premium's richest moment, not its emptiest
->
-> The arc exists from setup, so nothing is covered yet and everything is ahead. **That is a starting line, not an empty state.** And the first premium experience is the coach asking the four questions — the arc is built WITH you, not pre-filled. That conversation is the thing worth paying for.
->
-> #### 🟢 Two rules that hold the structure
->
-> **THE DEPTH RULE:** from Home, at most one screen before somebody is moving, not counting the check-in. If a choice needs its own screen it belongs in Library. Kills doors-into-doors as a class.
->
-> **BROWSING IS NOT CHOOSING UNDER PRESSURE.** At 6am *"Cardio, Core & Strength or Mobility & Conditioning?"* is an interrogation; on a Sunday afternoon the same content is a pleasure. **Two escapes: "something else" for the decided, Library for the curious.** This also means the Mobility-vs-Wellbeing taxonomy argument no longer needs winning before ship — behind the curtain, untidiness costs almost nothing.
->
-> #### 🟢 FAULTLESS, defined so it can be held
->
-> Selection is deliberately randomised, so there is no single right answer to be 99% of. **Faultless means: every input the coach implies it used, it demonstrably used, and nothing it claims is unearned.** Testable — and exactly what the traces of 1–3 Sep caught three times. Each fault was the coach appearing to consider something it was not using, **which is why it read as glib**.
->
-> #### 📋 Build order REORDERED
->
-> | # | ID | Change |
-> |---|---|---|
-> | 1 | **ZONE-WEIGHTING** | 🟢 Shipped `alongside-v428` |
-> | 2 | **ARC-3-SETUP** + aim vocabulary | 🔵 **Moved ahead of the lobby.** The arc is what makes a suggestion worth leading with; promoting one the coach cannot reason well about would put our weakest thing on the most prominent surface |
-> | 3 | **LOBBY-1b** | 🔵 **Not a layout job** — `coach-proposal` requires a check-in, so the split is what MAKES the promotion possible |
-> | 4 | **GOALS-MIGRATE** | 🔵 Twelve sites, with the arc |
-> | 5 | **CONTENT-MIND** | 🔴 New. In Step and psychoeducational programmes, **free in both tiers**, authored to attach to strands. Needs Graeme first — In Step is his |
-> | 6 | **TIER-VISIBLE** + **EXPORT-1** | 🔵 After |
->
-> 🟠 **One legal question, not a document review:** does the mind content classify as making health claims? A yes/no that shapes wording once, cheap alongside work already commissioned. Wording and positioning otherwise do not need sign-off.
-
+Supersedes `master_schedule_03sep2026_v260.md`. Remove v260 on upload.
 
 > ### 🟢 LOBBY-1a — DEPLOYED 3 Sep, `alongside-v429`. 100 gates.
 >
@@ -6314,4 +6258,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v262*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v261*
