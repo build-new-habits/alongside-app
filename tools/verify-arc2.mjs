@@ -102,7 +102,10 @@ check("3a. no confirmation, no guilt", () => {
 
 check("3b. coverage survives stopping", () => {
   const handler = arc.slice(arc.indexOf('"#sa-stop-btn"'), arc.indexOf('"#sa-stop-btn"') + 700);
-  ok(handler.includes("...store.get(\"stretchArc\")") || handler.includes("...arc"),
+  // v63 renamed stretchArc -> arc. Matching on the SPREAD rather than
+  // the field name would have survived it; matching on the name did not.
+  // The property is unchanged: stopping must preserve what is there.
+  ok(/\.\.\.store\.get\(["']arc["']\)/.test(handler) || handler.includes("...arc"),
      "stopping replaces the whole object, discarding zonesWorked. Coming back in a month " +
      "should not start from nothing.");
   ok(!/zonesWorked:\s*\{\}/.test(handler), "stopping wipes the coverage dates");

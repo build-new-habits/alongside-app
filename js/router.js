@@ -1,5 +1,8 @@
 /**
  * router.js
+ * 03 Sep 2026 v25
+ *   ARC-3-SETUP. New route 'arc-setup' -> arc-setup.js.
+ *
  * 03 Sep 2026 v24
  *   ARC-2. New route 'stretch-arc' -> stretch-arc.js.
  *
@@ -253,6 +256,7 @@ const VIEW_NAMES = {
   'conditions-update': { path: './views/conditions-update.js',   fn: 'ConditionsUpdateView' },
   'mobility-conditioning': { path: './views/mobility-conditioning.js', fn: 'MobilityConditioningView' },
   'stretch-arc':          { path: './views/stretch-arc.js',           fn: 'StretchArcView'          },
+  'arc-setup':            { path: './views/arc-setup.js',             fn: 'ArcSetupView'            },
 
   // ── Session views ──────────────────────────────────────────────────────────
   'workout':            { path: './views/workout.js',           fn: 'WorkoutView'           },

@@ -1,5 +1,33 @@
 /**
  * store.js - Data persistence layer
+ * 03 Sep 2026 v63
+ *
+ * v63 - ARC-3-SETUP. `stretchArc` renamed to `arc`, and extended.
+ *
+ *   THE RENAME. The object no longer holds a stretch arc. It holds an
+ *   aim and up to three strands, and a strand may be a mind strand --
+ *   "confidence about getting down", "meeting people as they are". A
+ *   field called stretchArc holding that is the `activation` fault
+ *   again: a name that stopped describing its contents and misled every
+ *   reader afterwards.
+ *
+ *   Three files, five references, and no users exist. Cheap today,
+ *   expensive the moment somebody has data. Old keys are migrated on
+ *   read so a dev device with existing state does not lose its arc.
+ *
+ *   NEW FIELDS
+ *   - aimId       id from data/aims.js
+ *   - strands     up to AIMS.maxStrands strand ids
+ *   - marker      the person's own answer to "how would you know it was
+ *                 happening?" Free text, theirs, never parsed. It exists
+ *                 to be read back to them, not to be measured -- which
+ *                 is the whole reason it replaces "measurable".
+ *   - provenance  "self" | "assigned". Recorded now because retrofitting
+ *                 consent into a live feature is the expensive version,
+ *                 and an assigned arc that looks self-set is a consent
+ *                 problem rather than a feature. Nothing assigns yet.
+ *   - acceptedAt  when the person said the arc was theirs.
+ *
  * 31 Aug 2026 v62
  *
  * v62 - ARC-1. `stretchArc`, a top-level object.
@@ -1214,13 +1242,18 @@ export const store = {
 
       sessionZoneFocus: Array.isArray(saved.sessionZoneFocus) ? saved.sessionZoneFocus : [],
 
-      stretchArc: {
-        ...defaults.stretchArc,
-        ...(saved.stretchArc || {}),
-        zonesWorked: (saved.stretchArc && typeof saved.stretchArc.zonesWorked === "object"
-                      && saved.stretchArc.zonesWorked !== null)
-          ? saved.stretchArc.zonesWorked : {}
-      },
+      // v63: `stretchArc` became `arc`. Migrated on read so a device with
+      // existing state keeps its coverage dates rather than starting over.
+      arc: (() => {
+        const src = saved.arc || saved.stretchArc || {};
+        return {
+          ...defaults.arc,
+          ...src,
+          strands: Array.isArray(src.strands) ? src.strands.slice(0, 3) : [],
+          zonesWorked: (typeof src.zonesWorked === "object" && src.zonesWorked !== null)
+            ? src.zonesWorked : {}
+        };
+      })(),
 
       // ATHLETE-RETIRE, 18 Aug 2026. One-way migration, athlete ->
       // personal. NOT a cosmetic tidy: this line was
@@ -1747,9 +1780,14 @@ export const store = {
       // zonesWorked maps zone id -> ISO date last worked. A date, never a
       // count: "shoulders have not come up yet" is a fact about the plan,
       // "you have done shoulders three times" is a score.
-      stretchArc: {
-        goalId:      null,   // id from data/goals.js
+      arc: {
+        aimId:       null,   // id from data/aims.js
+        strands:     [],     // up to AIMS.maxStrands strand ids
+        marker:      "",     // the person's own words. Never parsed.
+        goalId:      null,   // legacy, from data/goals.js. Read only.
         startedAt:   null,
+        acceptedAt:  null,
+        provenance:  "self", // "self" | "assigned"
         zonesWorked: {},     // { [zoneId]: 'YYYY-MM-DD' }
         active:      false
       },
@@ -2548,11 +2586,11 @@ export const store = {
    */
   markZonesWorked(zoneIds) {
     if (!Array.isArray(zoneIds) || !zoneIds.length) return;
-    const arc   = this.get("stretchArc") || {};
+    const arc   = this.get("arc") || {};
     const today = new Date().toISOString().split("T")[0];
     const worked = { ...(arc.zonesWorked || {}) };
     for (const id of zoneIds) worked[id] = today;
-    this.set("stretchArc", { ...arc, zonesWorked: worked });
+    this.set("arc", { ...arc, zonesWorked: worked });
   },
 
   /**
@@ -2561,7 +2599,7 @@ export const store = {
    * done. Never surfaced as a count.
    */
   zonesNotRecentlyWorked(allZoneIds, limit = 3) {
-    const worked = (this.get("stretchArc") || {}).zonesWorked || {};
+    const worked = (this.get("arc") || {}).zonesWorked || {};
     const never  = allZoneIds.filter(id => !worked[id]);
     if (never.length) return never.slice(0, limit);
     return allZoneIds
