@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Sep 2026 v432
+ *
+ * v432 - LOBBY-1b. No new files. Home gains the arc and loses the week
+ *   counter; my-programme.js shows the arc; today.css gains the panel.
+ *
  * 03 Sep 2026 v431
  *
  * v431 - ARC-3-SETUP. New file js/views/arc-setup.js, precached.
@@ -2985,7 +2990,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v431";
+const CACHE_NAME = "alongside-v432";
 
 const SHELL_URLS = [
 
