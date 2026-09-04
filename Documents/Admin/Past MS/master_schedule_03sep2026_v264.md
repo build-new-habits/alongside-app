@@ -1,52 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v265
+## 03 Sep 2026 v264
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v264.md`. Remove v264 on upload.
-
-> ### 🟢 AIM-VOCAB — DEPLOYED 3 Sep, `alongside-v430`. 101 gates.
->
-> `js/data/aims.js`. **15 aims, 19 strands, 7 of them mind strands.** Data only — no view reads it yet; ARC-3-SETUP is what will consume it.
->
-> #### 🔴 IN STEP ALREADY EXISTS IN CODE, and it contradicts a decision made today
->
-> `js/data/in-step-scenarios.js`, built 9 Aug: **68 scenarios across four movements** — `solo`, `partner`, `floor`, `environment`. Two consequences:
->
-> **The open question from the In Step spec is already answered by the design.** "People in general or one person?" — `partner` and `floor` are exactly that distinction, already separated.
->
-> 🔴 **It is currently Personal tier, which contradicts today's decision** that In Step is free in both tiers with direction paid. **Live conflict, needs resolving** — not a new decision to make, an existing one to reconcile.
->
-> #### 🟢 Why the vocabulary exists at all
->
-> The old goals did nothing, and this file is shaped by *why*: they were **unactionable**, so nothing acted on them. An aim is now a **capability** — "get off the floor without using my hands" — never a metric, and **never carrying a date**.
->
-> **Free text cannot drive strands and is not attempted.** Aims are chosen; each carries its candidate strands. That is how a coach works — they know what feeds a sprint start and propose from it.
->
-> #### 🟢 Mind strands, enforced
->
-> **Every aim offers at least one**, and assertion 4a fails otherwise — this is the exact drift the arc spec recorded in itself, where the model permitted a mind strand and the illustration quietly used physical ones. 4b requires mind strands to be **at least a quarter** of the vocabulary, so they cannot thin out as aims are added. 4c requires each to name real In Step movements, and forbids a strand carrying both zones and movements — a strand that is both is two strands.
->
-> Two aims are **wholly mind-led** — *"Be better with the people around me"*, *"Be steadier in myself when things shift"* — and still carry body strands, because movement is how they are practised.
->
-> #### 🟢 The cap is real, not cosmetic
->
-> `maxStrands: 3`, and assertion 3 fails if any aim offers **only** three. **If an aim offers no more than the cap, the person is not choosing, they are accepting.**
->
-> #### ⚠️ Two faults caught by checking, not by review
->
-> **`calf-note-placeholder`** — a note-to-self left in an aim's strand list. It would have failed silently: strand dropped, arc leans less, nothing red. Same class as ARC-1's five invented goal ids.
->
-> **A substring list missed "Walk 10000 steps a day"** — caught by reversal, not by reading. The distinguishing feature is not the number ("Run 5K without stopping" is a capability that contains one) but the **rate**: a quantity per unit of time is a target you can be behind on by Wednesday. Assertion 2a now tests for rates, and was re-proven both ways including a false-positive check.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **AIM-VOCAB** | 15 aims, 19 strands, provisional and labelled as ours | 🟢 Shipped `alongside-v430` | 3 Sep |
-> | **ARC-3-SETUP** | The four questions, consuming aims.js | 🔵 **Next** | w/c 3 Sep |
-> | **INSTEP-TIER** | 🔴 In Step is Personal-tier in code, free in both per today's decision. Reconcile | 🔴 New conflict | w/c 3 Sep |
-> | **PAT RENEWAL** | **Expires Fri 5 Sep** | 🔴 Graeme | by 5 Sep |
-
+Supersedes `master_schedule_03sep2026_v263.md`. Remove v263 on upload.
 
 > ### 🟢 IN STEP v2 — specified from Graeme's own answers. v1 removed.
 >
@@ -6430,4 +6386,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v265*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v264*
