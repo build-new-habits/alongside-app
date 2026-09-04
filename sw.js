@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Sep 2026 v429
+ *
+ * v429 - LOBBY-1a. No new files. Home splits its doors into session
+ *   tiles and reference rows; today.css gains the row styling.
+ *
  * 03 Sep 2026 v428
  *
  * v428 - ZONE-WEIGHTING. No new files; session-builder.js only. A stale
@@ -2970,7 +2975,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v428";
+const CACHE_NAME = "alongside-v429";
 
 const SHELL_URLS = [
 
