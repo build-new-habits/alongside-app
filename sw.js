@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Sep 2026 v431
+ *
+ * v431 - ARC-3-SETUP. New file js/views/arc-setup.js, precached.
+ *   store.js v63: stretchArc renamed to arc and extended.
+ *
  * 03 Sep 2026 v430
  *
  * v430 - AIM-VOCAB. New file js/data/aims.js, precached. Data only, not
@@ -2980,7 +2985,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v430";
+const CACHE_NAME = "alongside-v431";
 
 const SHELL_URLS = [
 
@@ -3060,6 +3065,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/today.js",
   "/alongside-app/js/views/conditions-update.js",
   "/alongside-app/js/views/mobility-conditioning.js",
+  "/alongside-app/js/views/arc-setup.js",
   "/alongside-app/js/views/stretch-arc.js",
   "/alongside-app/js/views/checkin.js",
   "/alongside-app/js/views/checkin-mini.js",
