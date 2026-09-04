@@ -1,47 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v260
+## 03 Sep 2026 v259
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v259.md`. Remove v259 on upload.
-
-> ### 🟢 ZONE-WEIGHTING — DEPLOYED 3 Sep, `alongside-v428`. 99 gates.
->
-> #### 🔴 The fault: a zone meant "touches" when it should have meant "is for"
->
-> `affectsAreas` lists everything an exercise touches, in no stated order, and every consumer weighted it equally. Inchworm is `["hamstring","hip-flexor","shoulder","lower-back"]`, so **it counted as a shoulder stretch** — and the persona trace showed someone asking for neck and shoulders receiving **four leg stretches out of five**, every one a legitimate "match".
->
-> #### 🟢 The data was already ordered. Nothing read it.
->
-> Tested rather than assumed: of **91 exercises whose name names a body part, 79% lead with that part** in `affectsAreas`, and most exceptions are defensible judgements — Side-Lying Hip Abduction leads with glutes, which is right. **Primacy exists in the content; the code discarded it.** That turned a feared 551-entry authoring job into a code fix.
->
-> #### 🟢 Rank, do not filter — the third time this session
->
-> Matching only the leading areas fixes Inchworm and drops **Neck & shoulders from 12 usable stretches to 5**, below the offering floor. That would have removed Bend's headline zone in order to fix a bug. So **primary matches lead and incidental ones fill behind them** — three bands, nothing dropped. Same conclusion ARC-3 reached about categories, and SECTION-RULES about patterns.
->
-> `PRIMARY_DEPTH = 2`, not 1: a stretch commonly has a genuine pair (Hip Flexor Stretch is `["hip","hip-flexor"]`) and depth 1 would demote half of every one.
->
-> #### 🟢 The floor moved 6 → 5, and it is now principled rather than tuned
->
-> The floor exists so a zone can lead a session without repeating itself, and **the shortest stretch session has 5 main slots** — 5 is the number it was always reaching for. Counted on **primary matches only**. The trade was checked, not hoped for: primary-only at 5 hides **exactly the same three zones** as counting-everything at 6 (Chest, Inner thigh, Wrists & arms). **Nothing offered today is withdrawn; the offer is now honest.** Assertion 13e fails if a future edit breaks that.
->
-> #### 🟢 Traced result — the persona case that started this
->
-> Asked for neck & shoulders + upper back: **Doorway Chest Stretch · Seated Neck Side Stretch · Seated Chest Stretch**, all primary matches, plus one breadth slot. Previously four of five were legs.
->
-> #### ⚠️ Four older assertions encoded the previous design
->
-> `verify-sectionrules` 8a/8b hardcoded the literal floor of `6`; 8c and `verify-arc1` 2b both checked `hit.concat(rest)`. All four went red on correct code. **8a/8b now derive the floor from the source constant** — a gate that must be edited whenever a constant moves teaches people to edit gates. 8c and 2b updated to the three-band form; the property each guards is unchanged.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **ZONE-WEIGHTING** | Primary areas lead, incidental fill. Floor derived, not hardcoded | 🟢 Shipped `alongside-v428`, untested on device | 3 Sep |
-> | **PAT RENEWAL** | **Expires Fri 5 Sep** | 🔴 Graeme | by 5 Sep |
-> | **LOBBY-1** | Lobby and session space. Next build | 🔵 Specced | w/c 3 Sep |
-> | **ARC-3-SETUP** + **GOALS-MIGRATE** | Together — twelve sites | 🔵 Specced | w/c 3 Sep |
-> | **CONTENT-STRETCH** | ~25–30 entries: Chest, Inner thigh, Wrists & arms. **Now measured on primary content**, so the gap is real rather than an artefact of loose matching | 🔴 Authoring | w/c 3 Sep |
-
+Supersedes `master_schedule_03sep2026_v258.md`. Remove v258 on upload.
 
 > ### 🔵 SPEC v2 — the B2B question, decided
 >
@@ -6220,4 +6181,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v260*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v259*

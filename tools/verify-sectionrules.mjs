@@ -260,19 +260,28 @@ check("7c. back returns to the door, not to a skipped screen", () => {
 
 console.log("\nTEST 8 - ZONE-1: zones are offered only where content exists");
 
+// DERIVED, not hardcoded. These assertions previously carried a literal
+// 6 and went red when ZONE-WEIGHTING moved the floor to 5 for a
+// documented reason. A gate that has to be edited every time a tuned
+// constant moves teaches people to edit gates.
+const FLOOR = Number((raw.match(/const MIN_ZONE_CONTENT\s*=\s*(\d+)/) || [])[1]);
+
 check("8a. every offered zone clears the content floor", () => {
+  ok(Number.isFinite(FLOOR) && FLOOR >= 3,
+     "MIN_ZONE_CONTENT is missing or implausibly low; the floor is what stops a zone " +
+     "being offered that cannot fill a session");
   const offered = zonesWithCoverage();
   ok(offered.length >= 5, `only ${offered.length} zones offered; the picker is not usable`);
   for (const z of offered) {
-    ok(zoneContentCount(z) >= 6,
-       `"${z.label}" is offered with ${zoneContentCount(z)} stretches. Offering a thin ` +
+    ok(zoneContentCount(z) >= FLOOR,
+       `"${z.label}" is offered with ${zoneContentCount(z)} stretches, floor is ${FLOOR}. Offering a thin ` +
        `zone is worse than omitting it -- it promises a focus the library cannot honour.`);
   }
 });
 
 check("8b. thin zones are hidden, not shipped thin", () => {
   const offeredIds = new Set(zonesWithCoverage().map(z => z.id));
-  const thin = STRETCH_ZONES.filter(z => zoneContentCount(z) < 6);
+  const thin = STRETCH_ZONES.filter(z => zoneContentCount(z) < FLOOR);
   for (const z of thin) {
     ok(!offeredIds.has(z.id), `"${z.label}" is below the floor but still offered`);
   }
@@ -282,7 +291,9 @@ check("8c. zone focus orders, it does not filter", () => {
   const at = raw.indexOf("function _applyZoneFocus");
   ok(at > -1, "no _applyZoneFocus");
   const body = raw.slice(at, raw.indexOf("\n}", at));
-  ok(body.includes("hit.concat(rest)"),
+  // ZONE-WEIGHTING split the two bands into three (primary, incidental,
+  // rest). The property is unchanged: nothing is dropped.
+  ok(/primary\.concat\(incidental, rest\)/.test(body),
      "zone focus drops non-matching exercises. A hard filter over a library this size " +
      "eventually returns an empty session; ordering degrades instead.");
   ok(!/return\s+list\.filter/.test(body), "zone focus filters the list");
@@ -398,6 +409,62 @@ check("12. an ad-hoc session is not labelled Week 0", () => {
   ok(/currentWeek\)\s*>\s*0/.test(before),
      "the badge renders unconditionally, so a one-off stretch announces itself as " +
      "'Your programme - Week 0 - Session B' -- week 0 of nothing");
+});
+
+console.log("\nTEST 13 - ZONE-WEIGHTING: a zone means what an exercise is FOR");
+
+check("13a. only the leading areas count as primary", () => {
+  // affectsAreas lists everything an exercise touches. Inchworm is
+  // ["hamstring","hip-flexor","shoulder","lower-back"], so treating all
+  // of it equally made it a shoulder stretch -- and an ask for neck and
+  // shoulders returned four leg stretches out of five.
+  ok(/const PRIMARY_DEPTH\s*=\s*[12]\b/.test(raw),
+     "no PRIMARY_DEPTH, or it is deep enough to be meaningless");
+  ok(/function isPrimaryFor/.test(raw), "no primary predicate");
+  ok(/slice\(0,\s*PRIMARY_DEPTH\)/.test(raw),
+     "the primary predicate does not restrict itself to the leading areas");
+});
+
+check("13b. the focused slots go to primary matches", () => {
+  const at = raw.indexOf("export function zoneMatcher");
+  ok(at > -1, "no zoneMatcher");
+  const body = raw.slice(at, raw.indexOf("\n}", at));
+  ok(body.includes("isPrimaryFor"),
+     "zoneMatcher still matches on any area, so focused slots go to exercises the zone " +
+     "merely touches");
+});
+
+check("13c. incidental matches rank, they are not excluded", () => {
+  // Matching only primary would have dropped Neck & shoulders below the
+  // offering floor -- removing Bend's headline zone to fix a bug. Rank,
+  // do not filter: the same conclusion ARC-3 reached about categories.
+  const at = raw.indexOf("function _applyZoneFocus");
+  const body = raw.slice(at, raw.indexOf("\n}", at));
+  ok(body.includes("isIncidentalFor"), "incidental matches are not banded separately");
+  ok(/primary\.concat\(incidental, rest\)/.test(body),
+     "the three bands are not concatenated in order, so a focused session either loses " +
+     "its ordering or loses exercises");
+});
+
+check("13d. the offering floor counts primary content only", () => {
+  const at = raw.indexOf("export function zoneContentCount");
+  const body = raw.slice(at, raw.indexOf("\n}", at));
+  ok(body.includes("isPrimaryFor"),
+     "a zone can be offered on incidental matches alone, promising a focus the library " +
+     "cannot honour");
+});
+
+check("13e. no zone offered today is withdrawn by the change", () => {
+  // The floor moved 6 -> 5 precisely so that tightening the count does
+  // not remove zones that are genuinely serviceable. If a future edit
+  // breaks that trade, this fails.
+  const offered = zonesWithCoverage();
+  const labels = new Set(offered.map(z => z.label));
+  for (const must of ["Neck & shoulders", "Upper back", "Lower back", "Hips",
+                      "Glutes", "Hamstrings", "Quads", "Calves & ankles"]) {
+    ok(labels.has(must), `"${must}" is no longer offered. Tightening the match must not ` +
+       `withdraw a zone people can actually be given a session in.`);
+  }
 });
 
 console.log(fails === 0

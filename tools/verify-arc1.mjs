@@ -80,7 +80,13 @@ check("2b. zone focus still orders rather than filters", () => {
   const at = sb.indexOf("function _applyZoneFocus");
   ok(at > -1, "no _applyZoneFocus");
   const body = sb.slice(at, sb.indexOf("\n}", at));
-  ok(body.includes("hit.concat(rest)"), "zone focus now filters; a wrong map row would remove exercises");
+  // ZONE-WEIGHTING split two bands into three (primary, incidental,
+  // rest). The property this assertion guards is unchanged and is the
+  // reason a provisional, unreviewed goal map is safe to ship: a wrong
+  // row can only reorder, never remove.
+  ok(/primary\.concat\(incidental, rest\)/.test(body),
+     "zone focus now filters; a wrong map row would remove exercises rather than " +
+     "merely rank them, which is what makes the map safe while it is still our guess");
 });
 
 check("2c. the safety filters run before the map is consulted", () => {
