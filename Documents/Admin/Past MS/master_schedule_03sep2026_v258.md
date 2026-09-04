@@ -1,54 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v259
+## 03 Sep 2026 v258
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v258.md`. Remove v258 on upload.
-
-> ### 🔵 SPEC v2 — the B2B question, decided
->
-> `Documents/Admin/alongside_arc_and_structure_spec_03sep2026_v2.docx` (v1 removed). Still not built.
->
-> #### ⚫ DECIDED: the product stays B2C. Professionals recommend it; they do not administer it.
->
-> **This removes the payer/user conflict entirely.** The person pays, the professional benefits, and no incentive pulls against the person's interests — so every structural protection becomes easy rather than contested.
->
-> **A practitioner dashboard was considered and rejected.** It would make Build New Habits a data processor with accounts, auth, a caseload view and a compliance layer. More seriously: everything a payer asks for is adherence data — did they do it, how often, are they behind. **That is a streak shown to somebody else, wearing a clinical badge.**
->
-> #### ⚫ RULED OUT EXPLICITLY: employer-paid and insurer-paid versions
->
-> Under those the payer's interest becomes cost or attendance rather than the person's wellbeing, and every protection in the spec would be under sustained commercial pressure. **Recorded as a decision rather than left as an option to drift toward.**
->
-> #### 🟢 The referral asset is the export, not a login
->
-> The person walks into their appointment with a summary they chose to bring. No account, no procurement, no integration, no data-sharing agreement — which is what actually kills clinical software adoption. It is a document a patient hands over.
->
-> **What the professional gets** is the one thing they cannot get elsewhere: what happened between appointments, in the person's own words, on the day — rather than a six-week reconstruction shaped by wanting to seem like a good patient.
->
-> **What the person gets is being believed.** *"I told it my back was bad on the 3rd and again on the 11th"* is evidence. For people routinely dismissed in clinical rooms — women, chronic pain patients, neurodivergent adults, precisely this audience — that shifts the balance of the conversation. **Possibly the strongest single claim in the product.**
->
-> 🟠 **Do not compete on exercise assignment.** Physitrack and Rehab Guru own it and are already paid for. 🟠 **Treat referral as compounding credibility, not a channel** — recommendations are unattributable, so no strategy may depend on measuring them, and the free tier must not be designed around what makes a good export.
->
-> #### 🟢 EXPORT-1 — free is raw, Plan is shaped
->
-> **The boundary justifies itself without paywall reasoning: the free export is raw BECAUSE free has no arc to give it shape.** Nothing is withheld.
->
-> | Tier | Contains |
-> |---|---|
-> | Free | Check-in data and post-activity reflections. What was reported, and when |
-> | Plan | The same, plus the arc — aim, strands, what has been covered and what has not |
->
-> **Three absolutes:** the export is the person's, generated and shared by them, and stopping is never reported as an event · **the private journal is excluded, no professional exception, ever** — this is the pressure that would test that founding constraint · it **describes, never interprets**: *"reported lower back pain 7/10 on 3 and 11 September"* is a record, *"deteriorating"* is a clinical judgement. Same P4 rule as the coach, applied stricter because a professional may act on it.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **PAT RENEWAL** | GitHub token in `/mnt/project/`. **Expires Fri 5 Sep.** Sessions fail at the first step without it | 🔴 Graeme | by 5 Sep |
-> | **ZONE-WEIGHTING** | `affectsAreas` unweighted. Blocks everything visual | 🔴 Next build | w/c 3 Sep |
-> | **LOBBY-1** | Lobby and session space. Fixes the overwhelm | 🔵 Specced | w/c 3 Sep |
-> | **ARC-3-SETUP** + **GOALS-MIGRATE** | Together — the twelve sites losing copy need somewhere for it to go | 🔵 Specced | w/c 3 Sep |
-> | **EXPORT-1** | Own planning session, **after** the arc so the export follows it rather than shaping it. Wording rules before the template. Add to the Foot Anstey pack | 🔵 Needs a session | Post-arc |
-
+Supersedes `master_schedule_03sep2026_v257.md`. Remove v257 on upload.
 
 > ### 🔵 SPEC WRITTEN — the arc, and the shape of the app around it
 >
@@ -6181,4 +6135,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v259*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v258*
