@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Sep 2026 v433
+ *
+ * v433 - SITUATIONS. aims.js v2 (33 aims, 30 strands) and arc-setup
+ *   filtering. No new files.
+ *
  * 03 Sep 2026 v432
  *
  * v432 - LOBBY-1b. No new files. Home gains the arc and loses the week
@@ -2990,7 +2995,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v432";
+const CACHE_NAME = "alongside-v433";
 
 const SHELL_URLS = [
 
