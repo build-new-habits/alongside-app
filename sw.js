@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Sep 2026 v434
+ *
+ * v434 - LOBBY-1c. The split. No new files; today.js, coach-proposal.js
+ *   and today.css. A stale shell would keep the old Home entirely.
+ *
  * 03 Sep 2026 v433
  *
  * v433 - SITUATIONS. aims.js v2 (33 aims, 30 strands) and arc-setup
@@ -2995,7 +3000,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v433";
+const CACHE_NAME = "alongside-v434";
 
 const SHELL_URLS = [
 
