@@ -667,49 +667,34 @@ export function TodayView(router) {
              see verify-arc2's assertions on this. -->
         ${arcPanel()}
 
-        <button class="today-programme-row"
-                data-route="my-programme"
-                data-requires-checkin="false"
-                aria-label="My Programme — where you are going">
-          <span class="today-programme-row__text">
-            <span class="today-programme-row__label">My Programme</span>
-            ${programmeHint ? `<span class="today-programme-row__hint">${_esc(programmeHint)}</span>` : ''}
-          </span>
-          <span class="today-programme-row__chevron" aria-hidden="true">\u203A</span>
+        <!-- MY PROGRAMME ROW REMOVED, LOBBY-1c, 03 Sep 2026.
+             It read "Your goals and where you are up to" and sat
+             directly beneath the arc panel, which now says both of
+             those things with the actual aim in it. Two rows doing one
+             job, on the screen we are trying to simplify.
+             My Programme itself is unchanged and still reachable: the
+             arc panel routes there. What went is the second door. -->
+
+        <!-- LOBBY-1c. THE SPLIT.
+             Session tiles have moved behind the check-in. Home is a
+             lobby: the arc, an invitation, and the reference sections.
+             Somebody reading progress, browsing the library or changing
+             a setting is never asked how their back is on the way.
+
+             WHY THIS IS NOT A LAYOUT CHANGE. coach-proposal builds the
+             suggestion and requires a check-in, so the suggestion could
+             never be promoted onto an ungated Home -- that would have
+             meant gating Home, or suggesting from no data. The split is
+             what MAKES the suggestion promotable; the tiles follow it.
+
+             The invitation states the price of entry, so the check-in
+             is consented to rather than sprung. -->
+        <button class="btn btn-primary btn-large btn-full today-invite"
+                data-action="start-today"
+                aria-label="Start today. I'll ask how you're doing first">
+          Start today
         </button>
-
-        <div class="today-doors" role="group" aria-label="Choose how you want to move today">
-          ${HOME_DOORS.filter(d => d.kind !== 'reference').map(d => {
-            const inner = `
-              <span class="today-door__icon" aria-hidden="true">${d.icon}</span>
-              <span class="today-door__label">${_esc(d.label)}</span>
-            `;
-
-            // TIER-A. A <div> inside, never a <button>: lockedFeature()
-            // returns role="button" and nesting one interactive control
-            // in another is invalid. Same treatment as the type picker
-            // and the Library, deliberately -- a locked thing should
-            // look the same everywhere or it reads as a different kind
-            // of refusal each time.
-            if (d.tier && !isPremium()) {
-              return lockedFeature(
-                `<div class="today-door">${inner}</div>`,
-                d.tier,
-                _esc(d.label)
-              );
-            }
-
-            return `
-            <button class="today-door ${d.id === 'unsure' ? 'today-door--unsure' : ''}"
-                    data-route="${d.route}"
-                    data-door-id="${d.id}"
-                    data-requires-checkin="${d.requiresCheckin}"
-                    aria-label="${_esc(d.label)}">
-              ${inner}
-            </button>
-          `;
-          }).join('')}
-        </div>
+        <p class="today-invite__note">I'll ask how you're doing first</p>
 
         <div class="today-reference" role="group" aria-label="Reference and settings">
           ${HOME_DOORS.filter(d => d.kind === 'reference').map(d => `
@@ -725,17 +710,26 @@ export function TodayView(router) {
           `).join('')}
         </div>
 
-        ${!_checkedInToday() ? `
-          <button class="btn btn-ghost today-checkin-link" data-action="checkin"
-                  aria-label="Check in — helps every door adapt to how you're doing today">
-            Check in
-          </button>
-        ` : `
+        <!-- STRAY CHECK-IN LINKS REMOVED, LOBBY-1c, 03 Sep 2026.
+             They floated between the reference rows and the nav with
+             nothing around them, offering a second unexplained route
+             into the same gate the invitation now names properly. Two
+             doors to one place, one of them unlabelled.
+
+             "Update check-in" IS RESTORED BELOW, and its removal was a
+             real regression rather than a tidy-up. CHAP-2 caught it:
+             somebody who checked in this morning and feels worse by
+             evening had no way to say so without starting a session.
+
+             It also belongs here by our own rule -- it changes stored
+             information rather than starting a session, which makes it
+             reference, not a door. -->
+        ${_checkedInToday() ? `
           <button class="btn btn-ghost today-checkin-link" data-action="checkin-mini"
                   aria-label="Update your check-in — optional, only if how you're feeling has changed">
             Update check-in
           </button>
-        `}
+        ` : ''}
 
       </div>
     `;
@@ -744,6 +738,20 @@ export function TodayView(router) {
   }
 
   function attachEvents(container) {
+
+    // LOBBY-1c. The one way through to the session space. Routes via
+    // the check-in when one is owed and straight through when it is
+    // not — a second check-in in a day is a toll, not care.
+    container.querySelector('[data-action="start-today"]')
+      ?.addEventListener('click', () => {
+        if (_checkedInToday()) {
+          router.navigate('coach-proposal');
+        } else {
+          store.set('pendingDoorRoute', 'coach-proposal');
+          router.navigate('checkin');
+        }
+      });
+
     container.querySelectorAll('[data-route]').forEach(btn => {
       btn.addEventListener('click', () => {
         const route = btn.dataset.route;
