@@ -192,11 +192,17 @@ check('with all three ways out offered',
 // left this passing, because jsdom does not compute CSS and the nodes
 // are still there. Reversal testing caught it. Check they are present
 // AND visible AND actually clickable.
-const doorsGrid = atHingeHome.c.querySelector('.today-doors');
+// LOBBY-1c, 03 Sep 2026. Home no longer has a door grid -- session
+// tiles moved behind the check-in. The PROPERTY this guards is
+// unchanged and still matters: a hinge card must not block the way
+// through to moving. What it checks is now the invitation, which is
+// that way through.
+const doorsGrid = atHingeHome.c.querySelector('[data-action="start-today"]');
 const doorsHidden = !doorsGrid
   || doorsGrid.hasAttribute('hidden')
+  || doorsGrid.disabled
   || /display:\s*none|visibility:\s*hidden/.test(doorsGrid.getAttribute('style') || '');
-check('the doors still work underneath it',
+check('the way through still works underneath it',
   atHingeHome.c.querySelectorAll('[data-door-id]').length > 0 && !doorsHidden,
   'gym-programme blocked the session until an option was chosen');
 

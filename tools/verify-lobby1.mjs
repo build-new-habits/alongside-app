@@ -57,9 +57,12 @@ check("1b. both kinds are actually in use", () => {
 
 console.log("\nTEST 2 - the split is honoured when rendering");
 
-check("2. tiles and rows render from the tag, not a hardcoded list", () => {
-  ok(/HOME_DOORS\.filter\(d => d\.kind !== 'reference'\)/.test(today),
-     "the tile grid does not filter by kind, so reference doors still render as tiles");
+check("2. rows render from the tag, not a hardcoded list", () => {
+  // SUPERSEDED IN PART BY LOBBY-1c. This asserted that the TILE grid
+  // filtered by kind. There is no tile grid on Home any more -- session
+  // tiles moved behind the check-in, which is a stronger version of the
+  // same rule and is asserted by 10a. What remains is the reference
+  // half, which still has to read the tag rather than name doors.
   ok(/HOME_DOORS\.filter\(d => d\.kind === 'reference'\)/.test(today),
      "the reference rows do not filter by kind");
   ok(!/today-ref-row[\s\S]{0,400}?'library'/.test(today),
@@ -211,6 +214,69 @@ check("9. the aim replaces the goal list", () => {
      "the old goal list is checked before the arc, so somebody with an arc still sees nine " +
      "goals. On device this listed feel-better, lose weight, tone up, recover from injury " +
      "and five more — a wishlist, not an aim.");
+});
+
+console.log("\nTEST 10 - LOBBY-1c: the lobby holds no sessions");
+
+check("10a. session tiles have left Home", () => {
+  ok(!/class="today-doors"/.test(today),
+     "the session tile grid is still on Home. The lobby rule: anything that starts a " +
+     "movement session lives beyond the check-in.");
+  ok(!/today-programme-row"/.test(today),
+     "the My Programme row is back. It read \"your goals and where you are up to\" directly " +
+     "beneath the arc panel, which says both with the actual aim in it.");
+});
+
+check("10b. one invitation, and it names the price of entry", () => {
+  ok(/data-action="start-today"/.test(today), "there is no way into the session space");
+  // The aria-label carries the same words, so a bare text match passed
+  // with the visible note deleted. Anchor on the element.
+  ok(/class="today-invite__note"/.test(today),
+     "the check-in is not named beneath the invitation, so it is sprung rather than " +
+     "consented to");
+  // A SECOND ROUTE IN is what had to go. Updating a check-in already
+  // made is a different act and is kept -- CHAP-2 caught its removal as
+  // a real regression: checked in this morning, felt worse by evening.
+  ok(!/data-action="checkin"/.test(today),
+     'a second unexplained "Check in" route remains alongside the invitation, which is ' +
+     'two doors to one place with one of them unlabelled');
+  ok(/data-action="checkin-mini"/.test(today),
+     "there is no way to update a check-in without starting a session \u2014 the case of " +
+     "somebody who checked in this morning and feels worse by evening");
+});
+
+check("10c. the invitation routes through the check-in only when one is owed", () => {
+  const at = today.indexOf('[data-action="start-today"]');
+  ok(at > -1, "no invitation handler");
+  // Slice to the END OF THIS HANDLER, not a fixed window. 600
+  // characters ran past it into the next listener, which also calls
+  // _checkedInToday() -- so removing the branch here still passed.
+  // Eleventh time this session a window has measured the wrong region.
+  const close = today.indexOf("});", at);
+  const body  = today.slice(at, close > -1 ? close : at + 600);
+  ok(/if \(_checkedInToday\(\)\)/.test(body),
+     "the invitation does not branch on whether a check-in is owed, so it either always " +
+     "asks or never does");
+  ok(/coach-proposal/.test(body), "the invitation does not lead to the suggestion");
+  ok(/pendingDoorRoute/.test(body),
+     "the check-in does not know where to return to, so it strands the person");
+});
+
+console.log("\nTEST 11 - the session space keeps the escape");
+
+check("11. sessions are reachable, below the suggestion", () => {
+  const cp = strip(fs.readFileSync("js/views/coach-proposal.js", "utf8"));
+  // Count them: one button removed still leaves three, and the naive
+  // presence check passed.
+  const escapes = (cp.match(/data-else="/g) || []).length;
+  ok(escapes >= 4,
+     `${escapes} ways to pick your own. The session tiles left Home and must land here — ` +
+     `removing choice is not the same as hiding it.`);
+  const label = cp.indexOf("cp-else-label");
+  const start = cp.indexOf("cp-preview-start");
+  ok(label > -1, "no escape label");
+  ok(start === -1 || label > cp.indexOf("cp-acknowledgement"),
+     "the escape renders above the coach's suggestion, which makes it a menu again");
 });
 
 console.log(fails === 0
