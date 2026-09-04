@@ -522,3 +522,119 @@
   opacity: 0.7;
   white-space: nowrap;
 }
+
+/* ── ARC-3-SETUP ──────────────────────────────────────────────────────
+   One question per screen. The heading IS the question, so it carries
+   the weight rather than a label above a form. */
+.as-question {
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--text-2xl, 1.5rem);
+  line-height: var(--leading-tight, 1.25);
+}
+
+.as-question:focus-visible {
+  outline: none;   /* programmatic focus for screen readers, not a click target */
+}
+
+.as-help {
+  margin: 0 0 var(--space-5) 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed, 1.6);
+  opacity: 0.85;
+}
+
+.as-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.as-option {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.as-option--on {
+  border-color: var(--color-primary);
+}
+
+/* Disabled here means "you have chosen your three", not "you may not
+   have this". The cap is the reason, so it must not read as a lock. */
+.as-option[disabled] {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* A mind strand says so plainly. Somebody choosing three things to work
+   on should know one of them is not a movement before they pick it. */
+.as-kind {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--text-sm);
+  opacity: 0.7;
+}
+
+.as-count {
+  margin: 0 0 var(--space-4) 0;
+  font-size: var(--text-sm);
+  opacity: 0.75;
+}
+
+.as-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.as-input {
+  width: 100%;
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: var(--leading-relaxed, 1.6);
+}
+
+.as-input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.as-summary {
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-md, 8px);
+}
+
+.as-summary-aim {
+  margin: 0;
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--font-bold, 700);
+}
+
+.as-summary-strands {
+  margin: var(--space-2) 0 0 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed, 1.6);
+}
+
+.as-summary-marker {
+  margin: var(--space-3) 0 0 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed, 1.6);
+  opacity: 0.85;
+}

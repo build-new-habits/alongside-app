@@ -1,53 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v266
+## 03 Sep 2026 v265
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v265.md`. Remove v265 on upload.
-
-> ### 🟢 ARC-3-SETUP — DEPLOYED 3 Sep, `alongside-v431`. 102 gates. `store.js` v63 · `Schema.md` v1.45
->
-> **The four questions are on screen.** `js/views/arc-setup.js`, reached from the arc screen's Start.
->
-> #### 🔴 `stretchArc` renamed to `arc`
->
-> The object no longer holds a stretch arc — it holds an aim and up to three strands, and a strand may be a mind strand. **A field called `stretchArc` holding that is the `activation` fault again:** a name that stopped describing its contents and misled every reader afterwards. Three files, five references, no users. **Cheap today, expensive the moment anybody has data.** Old keys migrate on read so a dev device keeps its coverage.
->
-> #### 🟢 Decomposition, not SMART — and three deliberate replacements
->
-> | SMART | Becomes | Why |
-> |---|---|---|
-> | Specific | *What do you want to be able to do?* | A **capability**, never a metric |
-> | Measurable | *How would you know it was happening?* | **Free text, never parsed.** Measurement invites failure; noticing does not |
-> | Relevant | *Is this yours?* | An aim inherited from a doctor, a partner or an older self is the one that gets abandoned. Also the consent step for assigned arcs |
-> | Time-bound | **Deleted** | A date is a thing you fail on a Tuesday. Assertion 3 fails on any date in the flow |
->
-> #### 🟢 Being asked IS the premium experience
->
-> **The aim is never seeded from the person's old goals**, though it easily could be. Graeme, 3 Sep: upgrading should not reveal a pre-filled arc — it should be built with you. Assertion 2b fails if setup ever reads `goals`.
->
-> **An arc cannot start without an aim** (assertion 8): the arc screen routes to the questions instead. An arc without an aim is a coverage tracker, and skipping the conversation skips the product.
->
-> #### 🟢 Details the gates now hold
->
-> **One question per screen**, four separate steps — a form asking all four at once would read as an intake questionnaire, the exact register this product avoids. **Changing the aim clears the strands**, because strands belong to the aim that offered them. **The cap is read from the vocabulary**, not hardcoded, and the count is `aria-live` so a screen-reader user knows when they are full. **Mind strands are labelled "not a movement"** — somebody choosing three things to work on should know one of them is not a movement before they pick it. **`provenance: "self"` and `acceptedAt` are recorded at acceptance**, before anything can assign an arc, because retrofitting consent into a live feature is the expensive version.
->
-> #### ⚠️ Two gate lessons
->
-> **An assertion measured a listener rather than a control.** Deleting the skip button left its event handler behind, so `includes("as-skip-btn")` still matched. Now anchored on `id="as-skip-btn"` in the rendered markup. **Sixth time this session a check has measured the wrong region of a file.**
->
-> **`verify-arc2` caught the rename** — its assertion matched on the field name rather than the spread. Correct behaviour; updated, and the property it guards is unchanged.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **ARC-3-SETUP** | Four questions, aim + up to 3 strands, marker, acceptance | 🟢 Shipped `alongside-v431`, untested on device | 3 Sep |
-> | **SUGGEST-1** | The coach consuming the arc — provisional suggestion before check-in, visible revision | 🔵 **Next.** Nothing reads `arc.strands` yet | w/c 3 Sep |
-> | **LOBBY-1b** | The split. Not a layout job | 🔵 Specced | w/c 3 Sep |
-> | **GOALS-MIGRATE** | Twelve sites | 🔵 Specced | w/c 3 Sep |
-> | **INSTEP-TIER** | In Step is Personal-tier in code, free in both per today's decision | 🔴 Conflict | w/c 3 Sep |
-> | **PAT RENEWAL** | **Expires Fri 5 Sep** | 🔴 Graeme | by 5 Sep |
-
+Supersedes `master_schedule_03sep2026_v264.md`. Remove v264 on upload.
 
 > ### 🟢 AIM-VOCAB — DEPLOYED 3 Sep, `alongside-v430`. 101 gates.
 >
@@ -6475,4 +6430,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v266*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v265*

@@ -1,7 +1,27 @@
 # Alongside — Data Schema Reference
-## 31 Aug 2026 v1.44
+## 03 Sep 2026 v1.45
 
-**File:** `js/store.js` (confirmed live version: **v62, 31 Aug 2026**)
+**File:** `js/store.js` (confirmed live version: **v63, 03 Sep 2026**)
+
+> **v1.45, 03 Sep 2026 — ARC-3-SETUP.** `stretchArc` is renamed **`arc`** and extended.
+>
+> **Why renamed:** the object no longer holds a stretch arc. It holds an aim and up to three strands, and a strand may be a mind strand. A field called `stretchArc` holding that is the `activation` fault again — a name that stopped describing its contents and misled every reader afterwards. Three files, five references, no users; cheap now, expensive once anybody has data. Old keys migrate on read.
+>
+> | Key | Type | Default | Meaning |
+> |---|---|---|---|
+> | `aimId` | `string \| null` | `null` | Aim id from `data/aims.js` |
+> | `strands` | `string[]` | `[]` | Up to `AIMS.maxStrands` strand ids |
+> | `marker` | `string` | `""` | The person's own answer to "how would you know it was happening?" |
+> | `goalId` | `string \| null` | `null` | Legacy, read-only |
+> | `startedAt` | `string \| null` | `null` | ISO date the arc began |
+> | `acceptedAt` | `string \| null` | `null` | When the person confirmed the arc was theirs |
+> | `provenance` | `string` | `"self"` | `"self"` or `"assigned"` |
+> | `zonesWorked` | `object` | `{}` | `{ [zoneId]: 'YYYY-MM-DD' }` — a date per zone, never a count |
+> | `active` | `boolean` | `false` | Whether an arc is running |
+>
+> **`marker` is free text and is never parsed.** It exists to be read back to the person, not measured — which is the entire reason it replaces SMART's "measurable". Measurement invites failure; noticing does not.
+>
+> **`provenance` is recorded before anything can assign an arc.** Retrofitting consent into a live feature is the expensive version, and an assigned arc that looks self-set is a consent problem rather than a feature. See the arc specification §9.
 
 > **v1.44, 31 Aug 2026 — ARC-1.** New top-level object `stretchArc`:
 >
