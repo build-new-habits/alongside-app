@@ -42,7 +42,7 @@
  */
 
 import { store } from "../store.js";
-import { AIMS, STRANDS, aimById, strandsForAim } from "../data/aims.js";
+import { AIMS, STRANDS, aimById, strandsForAim, situationsFor, aimsFor } from "../data/aims.js";
 
 const esc = s => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -54,6 +54,7 @@ export function ArcSetupView(router) {
   let aimId   = null;
   let chosen  = [];
   let marker  = "";
+  let showAll = false;   // "none of these" -- the whole vocabulary, always one tap away
 
   function mount(container) { render(container); }
 
@@ -77,18 +78,42 @@ export function ArcSetupView(router) {
 
   // ── 1. The capability ────────────────────────────────────────────
   function stepAim() {
+    // SITUATIONS, 03 Sep 2026. v1 showed all fifteen aims to everybody,
+    // so a sprinter and a seventy-six-year-old got the same menu.
+    // Graeme: "if you're asking more than ten questions to anybody
+    // you're asking too many."
+    //
+    // What is shown is derived from what the app already knows -- age
+    // band, activity level, conditions, whether they are coming back
+    // from something. Nothing is asked again.
+    //
+    // NOTHING IS EVER REMOVED FOR AGE OR CONDITION. "None of these"
+    // opens the whole vocabulary, and it is present on every render.
+    // Deciding what somebody is allowed to want is the judgement this
+    // audience already gets everywhere else.
+    const shown = showAll ? AIMS.list : aimsFor(situationsFor(store), 8);
+
     return `
       <h1 class="as-question" tabindex="-1">What do you want to be able to do?</h1>
       <p class="as-help">
         Something you'd notice yourself doing. Not a number \u2014 a thing.
       </p>
       <div class="as-options" role="group" aria-label="Choose one">
-        ${AIMS.list.map(a => `
+        ${shown.map(a => `
           <button class="as-option ${aimId === a.id ? "as-option--on" : ""}"
                   data-aim="${a.id}" aria-pressed="${aimId === a.id}">
             ${esc(a.label)}
           </button>`).join("")}
       </div>
+
+      ${showAll ? `
+        <p class="as-count">Everything I can hold for you.</p>
+      ` : `
+        <button class="btn btn-ghost btn-full" id="as-all-btn">
+          None of these \u2014 show me everything
+        </button>
+      `}
+
       <button class="btn btn-primary btn-large btn-full" id="as-next-btn" ${aimId ? "" : "disabled"}>
         Continue
       </button>`;
@@ -167,6 +192,11 @@ export function ArcSetupView(router) {
     container.querySelector("#as-back-btn")?.addEventListener("click", () => {
       if (step > 1) { step -= 1; render(container); }
       else router.navigate("stretch-arc", { fromBack: true });
+    });
+
+    container.querySelector("#as-all-btn")?.addEventListener("click", () => {
+      showAll = true;
+      render(container);
     });
 
     container.querySelectorAll("[data-aim]").forEach(btn => {
