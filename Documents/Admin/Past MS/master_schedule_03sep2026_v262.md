@@ -1,41 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v263
+## 03 Sep 2026 v262
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v262.md`. Remove v262 on upload.
-
-> ### 🟢 THREE DOCUMENTS — Intended Purpose Statement, In Step spec, task list
->
-> `Documents/Business/alongside_intended_purpose_statement_03sep2026_v1.docx` · `Documents/Admin/alongside_instep_spec_03sep2026_v1.docx` · `Documents/Admin/alongside_task_list_03sep2026_v1.docx`
->
-> #### 🔴 REGULATORY POSITION — the intuitive instinct was inverted
->
-> Graeme's read was "assume yes to health claims, because over-caution is safe". **For medical device classification that is the dangerous answer.** A medical device requires UKCA marking, MHRA registration, technical documentation, post-market surveillance and an approved body above Class I — and **operating as an unregistered medical device is the offence**. Over-claiming assumes a burden the business cannot meet.
->
-> **The safe position is to be definitively OUTSIDE and stay there deliberately.** Under UK MDR 2002 intended purpose determines classification and **the manufacturer sets the intended purpose** — so this is designed, not discovered. It follows that it can also be lost by accident, through wording.
->
-> **The position already existed** in Terms of Service v2 §1 and the solicitor covering letter asks Natalie the exact question. What did not exist is one internal document to check wording against. It now does, with a do-not-write / write-instead table.
->
-> **Two features sit closest to the line:** condition filtering (a *safety exclusion*, not condition management — "we work around a sore back" is inside, "we help your back pain" is outside) and prescribed exercises (the app *stores and displays* what somebody else prescribed and must never appear to originate or validate it). **Both framings are load-bearing and must survive every rewrite.**
->
-> #### ⚠️ The mind content puts pressure on a boundary already written down
->
-> The psychological specification states *"Alongside is a fitness app, not a mental health app."* In Step presses on that sentence. **Resolved deliberately rather than drifted past:** our mind content develops **connection and empathy**; it does not treat distress. Its outcomes are nature connectedness, wellbeing and prosociality — not symptom reduction — **which is what the research it draws on actually measures, so the honest description and the safe description are the same description.**
->
-> #### 🟢 IN STEP has a real evidence base, and one finding reshapes the design
->
-> **Lumber, Richardson & Sheffield (2017, PLOS ONE 12(5): e0177186):** contact, emotion, meaning and compassion — the last **mediated by engagement with natural beauty** — predicted nature connection. A walking intervention built on those pathways significantly beat walking in nature alone. **That is In Step's structure, already validated**, and the pathway carrying empathy is *compassion* — so the nature-to-empathy route is the mechanism the research identifies, not an assertion we would be making.
->
-> **🔴 THE FINDING THAT SHAPES EVERYTHING: knowledge does not work.** Knowledge-based activities did not predict connection, and a global meta-analysis of 59 experimental studies found significant gains from nature contact and mindfulness practices but **no significant effect from environmental education**. **So In Step must not be a course.** Explaining empathy is the approach most likely to fail. Noticing, feeling and doing — which is what this app is already shaped for.
->
-> **Order is the programme:** compassion is reached *through* beauty, never asserted at the start. A programme that opened by asking somebody to think about other people would be doing the thing the research says fails.
->
-> 🟠 **Blocked on Graeme** — five questions in the spec, chiefly: what does In Step mean in your words, and what does somebody come away with (not a feeling — a different thing they do).
->
-> #### 📋 The task list is now a document
->
-> Two lists: **Graeme-only blocking work** (PAT by Friday, HMRC, ICO, A1.11 age wording, four signatures, domain switch before testers install, In Step answers, beta recruitment, clinical pack) and **build work in dependency order** (ARC-3-SETUP → AIM-VOCAB → GOALS-MIGRATE → LOBBY-1b → SUGGEST-1, with CONTENT-STRETCH parallel and RED-FLAG required before beta).
-
+Supersedes `master_schedule_03sep2026_v261.md`. Remove v261 on upload.
 
 > ### 🔵 SPEC v3 — free and premium are different verbs
 >
@@ -6347,4 +6314,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v263*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v262*
