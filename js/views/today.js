@@ -329,6 +329,7 @@
  */
 
 import { store }               from '../store.js';
+import { aimById, STRANDS }    from '../data/aims.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
 import { advanceWeekIfNeeded, isHingePending, chapterSuccessor, startChapter }
@@ -639,20 +640,32 @@ export function TodayView(router) {
           ${coachLine ? `<p class="today-coach-line" role="status">${_esc(coachLine)}</p>` : ''}
         </header>
 
-        ${sessionCount > 0 ? `
-          <div class="today-week-count"
-               role="status"
-               aria-label="${weeklyTarget
-                 ? `${sessionCount} of ${weeklyTarget} sessions this week`
-                 : `${sessionCount} ${sessionCount === 1 ? 'session' : 'sessions'} this week`}">
-            <span class="today-week-count__number">${sessionCount}</span>
-            <span class="today-week-count__label">${weeklyTarget
-              ? `of ${weeklyTarget} this week`
-              : 'this week'}</span>
-          </div>
-        ` : ''}
+        <!-- WEEK COUNTER REMOVED, LOBBY-1b, 03 Sep 2026.
+             It rendered "3 of 5 this week" on the first screen of the
+             app. A count against a target is a scoreboard, and a
+             scoreboard is a thing you can be behind on by Wednesday --
+             the mechanic the prohibited-patterns list bans and the one
+             this product has spent two days removing everywhere else.
+             It was live on device.
+
+             Removing it entirely rather than dropping the "of 5": a
+             bare count is still a score, and the lobby is where
+             somebody arrives, not where they are marked. Session
+             history remains in Progress, where looking it up is a
+             choice. -->
 
         ${_hingeCard()}
+
+        <!-- LOBBY-1b. THE ARC IS THE FIRST THING, and it is reachable
+             without a check-in. It was three levels deep on device --
+             Home, then Mobility & Conditioning, then a card between "My
+             Conditions Programme" and "Stretch" -- which is no place for
+             the thing the business rests on.
+
+             The panel says what the arc is FOR and what has not come up
+             yet. It never says what has been done, and never how much:
+             see verify-arc2's assertions on this. -->
+        ${arcPanel()}
 
         <button class="today-programme-row"
                 data-route="my-programme"
@@ -1129,6 +1142,72 @@ export function TodayView(router) {
                 aria-label="Tell me what you are working towards">Tell me</button>
       </p>
     `;
+  }
+
+  /**
+   * LOBBY-1b. The arc, on the lobby.
+   *
+   * Three states, and the day-one one matters most: an arc set up but
+   * with nothing covered yet is a STARTING LINE, not an empty state.
+   * Graeme, 3 Sep -- day one is premium's richest moment, because
+   * everything is still ahead. The wording has to carry that rather
+   * than apologise for having no history.
+   *
+   * With no arc at all, this is the offer, and it sits ABOVE the
+   * reference rows on purpose. Below Settings is where terms and
+   * privacy links live, so the eye files anything there as boilerplate
+   * and skips it -- Graeme's observation, and he was right.
+   */
+  function arcPanel() {
+    const arc = store.get('arc') || {};
+
+    if (!arc.active || !arc.aimId) {
+      return `
+        <button class="today-arc today-arc--offer"
+                data-route="arc-setup"
+                data-requires-checkin="false"
+                aria-label="Set up your arc">
+          <span class="today-arc__label">Your arc</span>
+          <span class="today-arc__offer">
+            Tell me what you want to be able to do, and I'll hold it and work
+            towards it with you.
+          </span>
+        </button>`;
+    }
+
+    const aim     = aimById(arc.aimId);
+    const worked  = arc.zonesWorked || {};
+    const strands = (arc.strands || []).map(id => ({
+      label: (STRANDS[id] || {}).label,
+      // A strand counts as touched when any zone it leans on has been
+      // worked. A date, never a count -- the strand is either lit or it
+      // is not, which is a fact about the plan rather than a score.
+      lit: ((STRANDS[id] || {}).zones || []).some(z => worked[z])
+    })).filter(x => x.label);
+
+    const notYet = strands.filter(x => !x.lit).map(x => x.label);
+
+    return `
+      <button class="today-arc today-arc--active"
+              data-route="stretch-arc"
+              data-requires-checkin="false"
+              aria-label="Your arc — ${_esc(aim ? aim.label : '')}">
+        <span class="today-arc__label">Your arc</span>
+        <span class="today-arc__aim">${_esc(aim ? aim.label : '')}</span>
+        ${strands.length ? `
+          <span class="today-arc__strands">
+            ${strands.map(x => `
+              <span class="today-arc__strand ${x.lit ? 'today-arc__strand--lit' : ''}">${_esc(x.label)}</span>
+            `).join('')}
+          </span>` : ''}
+        <span class="today-arc__note">${
+          notYet.length === strands.length && strands.length
+            ? "All of it still ahead of you. That's the whole point of today."
+            : notYet.length
+            ? `${_esc(notYet.join(' and '))} ${notYet.length === 1 ? "hasn't" : "haven't"} come up yet.`
+            : "Every strand has come up at least once."
+        }</span>
+      </button>`;
   }
 
   function _programmeHint() {

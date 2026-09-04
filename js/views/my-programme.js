@@ -174,6 +174,7 @@
 import { store }                from '../store.js';
 import { isPremium, lockedFeature } from '../auth.js';
 import { getProgramme }         from '../data/programmes.js';
+import { aimById, STRANDS } from "../data/aims.js";
 import { getGoalLabel }         from '../data/goals.js';
 import { advanceWeekIfNeeded }  from '../data/programmeEngine.js';
 import { evaluateGoalReview }   from '../data/goal-review.js';
@@ -421,6 +422,36 @@ export function MyProgrammeView(router) {
     const goals = store.get('goals') || [];
     const parts = [];
 
+    // LOBBY-1b, 03 Sep 2026. THE ARC WINS WHEN THERE IS ONE.
+    //
+    // On device this panel listed NINE goals -- feel better, build a
+    // routine, lose weight, tone up, recover from an injury, prevent
+    // future injuries, improve flexibility, improve balance. Exactly
+    // what Graeme predicted: "I could basically put in all of it, and
+    // that is not a very suitable arc." A list that long is not an aim,
+    // it is a wishlist, and the coach cannot act on any of it -- traced
+    // 3 Sep, two different goals gave sessions sharing 48% of their pool
+    // and identical coach words.
+    //
+    // One aim, up to three strands, the person's own marker read back.
+    // The old goals still show when no arc exists, so nothing vanishes
+    // for somebody who has not set one up.
+    const arc = store.get('arc') || {};
+    if (arc.aimId) {
+      const aim = aimById(arc.aimId);
+      if (aim) {
+        return `
+          <p class="my-programme-aim">${_esc(aim.label)}</p>
+          ${(arc.strands || []).length ? `
+            <ul class="my-programme-goals" aria-label="What feeds it">
+              ${(arc.strands || []).map(id => (STRANDS[id] || {}).label)
+                  .filter(Boolean)
+                  .map(l => `<li class="my-programme-goals__item">${_esc(l)}</li>`).join('')}
+            </ul>` : ''}
+          ${arc.marker ? `<p class="my-programme-marker">\u201C${_esc(arc.marker)}\u201D</p>` : ''}`;
+      }
+    }
+
     const named = sg.primaryGoal
       ? [getGoalLabel(sg.primaryGoal)]
       : goals.map(g => getGoalLabel(g)).filter(Boolean);
@@ -438,11 +469,16 @@ export function MyProgrammeView(router) {
     // nobody agreed to it. Showing an unagreed number here would put
     // persona 2.12 two short of something he never chose, on the one
     // screen that is meant to tell him where he stands.
-    if (sg.setAt && sg.weeklySessionTarget) {
-      parts.push(`<p class="my-programme-line">
-        You said you would aim for ${sg.weeklySessionTarget} a week.
-      </p>`);
-    }
+    // WEEKLY-TARGET REMOVED, 03 Sep 2026. This rendered "You said you
+    // would aim for 3 a week." on the screen that is becoming the arc.
+    //
+    // A weekly session target is a number somebody can be behind on by
+    // Wednesday. It is on the prohibited-patterns list in the
+    // psychological specification, and it was live on device.
+    //
+    // strategicGoal.weeklySessionTarget STAYS in the store: onboarding
+    // writes it and the programme generator reads it for sizing. The
+    // DISPLAY was the fault, not the field.
 
     // The event, and the ONLY countdown in this product.
     //
