@@ -28,7 +28,7 @@
  *   makes that drift fail a gate instead.
  */
 import fs from "node:fs";
-import { AIMS, STRANDS, aimById, strandsForAim, zonesForStrands, sessionTypesForStrands }
+import { AIMS, STRANDS, SITUATIONS, aimById, strandsForAim, zonesForStrands, sessionTypesForStrands, aimsFor }
   from "../js/data/aims.js";
 import { STRETCH_ZONES, SESSION_TYPES } from "../js/session-builder.js";
 
@@ -169,6 +169,75 @@ check("5a. it makes no safety decisions", () => {
 check("5b. it is flagged provisional", () => {
   ok(AIMS.provisional === true, "not flagged provisional");
   ok(/not clinically reviewed/i.test(AIMS.sourcedFrom), "sourcedFrom does not say it is unreviewed");
+});
+
+console.log("\nTEST 6 - situations: fewer aims, and the right ones");
+
+check("6a. every aim declares its situations, all real", () => {
+  const known = new Set(SITUATIONS);
+  for (const a of AIMS.list) {
+    ok(Array.isArray(a.situations) && a.situations.length,
+       `"${a.id}" declares no situations, so it can never be offered to anybody`);
+    for (const x of a.situations) ok(known.has(x), `"${a.id}" names unknown situation "${x}"`);
+  }
+});
+
+check("6b. nobody is ever shown the whole list by default", () => {
+  // No limit passed: the DEFAULT is what people actually get, and
+  // passing 8 in meant raising the default went undetected.
+  const shown = aimsFor(["everyday"]);
+  ok(shown.length <= 10,
+     `${shown.length} aims shown by default. Graeme, 3 Sep: "if you are asking more than ten ` +
+     `questions to anybody, you are asking too many."`);
+  ok(AIMS.list.length > shown.length,
+     "the vocabulary is no bigger than what is shown, so filtering does nothing");
+});
+
+check("6c. \"everyday\" does not score", () => {
+  // Counting it made it worth as much as "training", so a gym-four-
+  // times-a-week 25-year-old was offered "carry the shopping" while
+  // "lift heavier" never appeared. A fallback that ranks is not a
+  // fallback.
+  const trained = aimsFor(["everyday", "training"], 8).map(a => a.id);
+  ok(trained.includes("lift-heavier"),
+     `somebody training does not see "lift heavier". Shown: ${trained.join(", ")}`);
+  ok(!trained.includes("floor-unaided"),
+     "somebody training is offered getting off the floor unaided ahead of training aims");
+});
+
+check("6d. every aim is reachable by somebody", () => {
+  const reachable = new Set();
+  for (const sit of SITUATIONS) aimsFor([sit], 99).forEach(a => reachable.add(a.id));
+  const orphans = AIMS.list.filter(a => !reachable.has(a.id)).map(a => a.id);
+  ok(orphans.length === 0, `aims nobody can ever be shown: ${orphans.join(", ")}`);
+});
+
+check("6e. the whole vocabulary stays one tap away", () => {
+  const view = fs.readFileSync("js/views/arc-setup.js", "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  ok(/id="as-all-btn"/.test(view),
+     "there is no escape to the full list. Filtering without an escape is the app deciding " +
+     "what somebody is allowed to want.");
+  ok(/showAll \? AIMS\.list/.test(view), "the escape does not open the whole vocabulary");
+});
+
+check("6f. the personas the vocabulary was rewritten for are served", () => {
+  // Each of these is a real persona from the matrix. If a future edit
+  // stops serving one, this names them rather than failing abstractly.
+  const cases = [
+    ["2.1 Graeme: trains, injured, wants his sport back",
+     ["returning", "managing", "training", "sport"], "sport-without-flaring"],
+    ["2.5 post-cardiac beginner", ["returning", "managing", "starting"], "after-illness"],
+    ["2.10 frail 76, walks", ["later-life", "starting"], "keep-walking-far"],
+    ["2.12 blank slate", ["starting"], "just-start"],
+    ["2.15 gym-literate 20s", ["training"], "lift-heavier"],
+    ["2.16 time-poor parent", ["training"], "fit-it-in"],
+  ];
+  for (const [who, sits, wanted] of cases) {
+    const ids = aimsFor(sits, 8).map(a => a.id);
+    ok(ids.includes(wanted),
+       `${who} is not offered "${wanted}" in their first 8. Shown: ${ids.join(", ")}`);
+  }
 });
 
 console.log(fails === 0
