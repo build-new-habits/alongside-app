@@ -1,49 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v268
+## 03 Sep 2026 v267
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v267.md`. Remove v267 on upload.
-
-> ### 🟢 SITUATIONS — DEPLOYED 3 Sep, `alongside-v433`. `aims.js` v2: 33 aims, 30 strands, 11 of them mind strands.
->
-> #### 🔴 v1 SHOWED THE SAME FIFTEEN AIMS TO EVERYBODY
->
-> A ninety-year-old and a competitive sprinter got an identical menu including *"reach the top shelf without it being a whole thing"*. **That is the goals fault repeating one level up** — an unactionable list replaced with an unresponsive one.
->
-> **And Graeme was not in his own vocabulary.** Persona 2.1: 46, trains, herniated disc and hamstring, wants strength and core so football and tennis stop hurting. The closest v1 offered was *"carry the shopping without my back going"*. **Too long AND missing real people is the worst combination**, and it happened because v1 was written from four personas out of seventeen.
->
-> #### 🟢 Written against the whole persona matrix
->
-> Both 76-year-olds, the national-standard sprinter, the academy footballer, the post-cardiac beginner, the ADHD and autistic adults, the time-poor parent, and the blank-slate 30-year-old with nothing to personalise against. New aims include *"Get back to my sport without my back flaring up"*, *"Keep walking as far as I do now"* (persona 2.10 wants to KEEP something, which almost no fitness app offers), *"Lift heavier than I can now"*, *"Get faster"*, and *"Stop being so hard on myself about all this"*.
->
-> #### 🟢 Filtering, not just ranking
->
-> Graeme: *"if you're asking more than ten questions to anybody you're asking too many."* Ranking 33 aims still shows 33. Each aim declares its **situations**; situations are derived from data the app already holds — `ageBand`, `activityLevel`/`fitnessLevel`, `conditions`, `lifestyle.returningAfter`. **Nothing is asked again.** Default cap 8, and assertion 6b tests the DEFAULT rather than a limit passed in.
->
-> ⚫ **FILTERING NEVER REMOVES AN AIM FOR AGE OR CONDITION.** That is the app deciding what somebody is allowed to want, and this audience gets that judgement everywhere else already. **"None of these — show me everything"** is on every render, and assertions 6d and 6e require every aim to stay reachable.
->
-> #### ⚠️ Three faults the gates caught, not review
->
-> **"everyday" scored as highly as "training"**, so a gym-four-times-a-week 25-year-old was offered *"carry the shopping"* while *"lift heavier"* and *"get faster"* never appeared at all — they matched one situation each, the same as every universal aim, and lost on list order. **A fallback that ranks is not a fallback.**
->
-> **Four new aims lost their mind strand** while body strands were being written — `carry-shopping`, `lift-heavier`, `stronger-core`, `flexible-again`. **Exactly the drift assertion 4a was written for**, one file after the spec recorded itself doing the same thing.
->
-> **Persona 2.10's own aim ranked below eight others**, including getting off the floor unaided, which is not what he asked for. Fixed by tagging rather than reordering: somebody frail and lightly active IS starting.
->
-> #### 🟢 Assertion 6f names the personas
->
-> Six real personas, each with the aim that must appear in their first eight. If a future edit stops serving one, **the gate names them** rather than failing abstractly.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **SITUATIONS** | 33 aims, situation filtering, escape to full list | 🟢 Shipped `alongside-v433`, untested on device | 3 Sep |
-> | **LOBBY-1c** | 🔴 **Home still has the arc PLUS My Programme PLUS four tiles.** The arc was added and nothing removed — Graeme: "better but with a big hole". Session tiles must move behind the check-in, and My Programme is now redundant | 🔴 **Next** | w/c 3 Sep |
-> | **DESK-SIGNAL** | The "desk" situation has no stored field. Aims tagged desk also carry everyday so nobody loses them, and the tag starts working the day the field exists | 🟠 Logged | Post-beta |
-> | **NARROWING-Q** | 2.15 and 2.16 are indistinguishable on stored data — both "active". One question would separate build-capacity from fit-it-in | 🟠 Design | w/c 3 Sep |
-> | **PAT RENEWAL** | **Expires Fri 5 Sep** | 🔴 Graeme | by 5 Sep |
-
+Supersedes `master_schedule_03sep2026_v266.md`. Remove v266 on upload.
 
 > ### 🟢 LOBBY-1b — DEPLOYED 3 Sep, `alongside-v432`. 102 gates.
 >
@@ -6562,4 +6521,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v268*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v267*
