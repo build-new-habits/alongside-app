@@ -1,63 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v258
+## 03 Sep 2026 v257
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v257.md`. Remove v257 on upload.
-
-> ### 🔵 SPEC WRITTEN — the arc, and the shape of the app around it
->
-> `Documents/Admin/alongside_arc_and_structure_spec_03sep2026_v1.docx`. Not built. Nothing below is in the code.
->
-> #### 🔴 Three findings from tracing the running app, which drove the whole spec
->
-> **Onboarding goals do nothing.** Controlled for randomness first (same goal, five runs, five different sessions). Across twelve runs per goal, "get stronger" and "improve flexibility" share **48% of their exercise pool**, and the remainder is noise — unique to flexibility: Mountain Climbers, Hip Thrust. Unique to get-stronger: Ankle Alphabet, Seated Side Bend. **The coach's words are byte-identical across all goals including none.**
->
-> **The drop-in already exists and is mislabelled.** "Unsure? Coach decides" routes to `coach-proposal` with `requiresCheckin: true` — check in, coach looks at you, coach suggests. That is the athletics drop-in, presented as the eighth tile and named as a confession of indecision.
->
-> **Tier is stored and never shown.** `store.tier` (`free|personal|athlete`) is read by seven files and displayed nowhere. The only way to determine tier is a developer gesture on the version number.
->
-> #### 🟢 The structure: a lobby and a session space
->
-> **Home is a lobby** — the arc, an invitation, and the reference rows. **No check-in.** Somebody reading progress, browsing the library or changing a setting is never asked how their back is on the way. **Today is the session space**, reached through the invitation after checking in, led by the coach's suggestion.
->
-> **THE LOBBY RULE:** anything that starts a movement session lives beyond the check-in; everything else lives in the lobby. This is the answer to every future tile proposal — the eight-door Home was built one reasonable addition at a time.
->
-> Settings sits at the foot of the lobby, separated by a rule rather than grouped under "Admin" — that is system vocabulary, not the coach's.
->
-> #### 🟢 The arc: one aim, up to three strands
->
-> **The model is not SMART.** It is decomposition, from how a coach actually works: "improve your sprint start" becomes the start, the strength under it, the reactivity, and how you are at the line. Four questions in the coach's voice, no acronym. **No "by when", ever** — a date is a thing you fail on a Tuesday.
->
-> **Free text cannot drive strands and must not be attempted.** Aims come from an authored vocabulary, each carrying its candidate strands. **The authoring is the long pole**, and it is the physiotherapist's table one level deeper.
->
-> Strands are deliberately not all movement — "confidence about getting down", "pacing the load" — which connects the existing wellbeing content to something for the first time.
->
-> #### 🔴 Goals leaving onboarding is a MIGRATION, not a deletion
->
-> `store.goals` is read in **twelve places**, several of them coach copy. An empty array for every user silently rewrites first-fortnight copy — `today.js`'s orientation branch routes everyone to the "Unsure" line and the wellbeing branch dies entirely. All twelve sites listed in the spec. No users exist yet, so no data migration; **that will not be true again.**
->
-> #### 🟢 Gold marks capability, it does not gild the experience
->
-> Gold on the arc panel and one line inside Today. **Never on safety, the coach, or the daily session.** Grey-and-teal for free is rejected: greyed reads as disabled, and this audience has spent enough time being told they do not qualify. Free must look finished.
->
-> #### 🔵 Post-beta B2B — three decisions needed NOW
->
-> A practitioner assigning an arc is out of scope, but the arc must record **provenance** (self-set vs assigned), "is this yours?" becomes the **acceptance step**, and an assigned arc is **emphasis-only** — it cannot unlock a contraindicated exercise, reach into a sore area, or soften the pain-8 gate. Precedent exists: prescribed exercises are a professional's input that never overrides the safety floors.
->
-> #### 📋 Build order
->
-> | # | ID | Why in this position | Status |
-> |---|---|---|---|
-> | 1 | **ZONE-WEIGHTING** | `affectsAreas` unweighted — Inchworm counts as a shoulder stretch. Everything visual built on top will lie visibly | 🔴 First |
-> | 2 | **LOBBY-1** | Structure before content. Removes the eight-door Home and per-door check-in flags | 🔵 Specced |
-> | 3 | **ARC-3-SETUP** | Aim vocabulary is the long pole; ships provisional | 🔵 Specced |
-> | 4 | **GOALS-MIGRATE** | Twelve sites. With the arc, not before | 🔵 Specced |
-> | 5 | **TIER-VISIBLE** | Only meaningful once the arc panel exists to mark | 🔵 Specced |
->
-> #### 📋 Open questions in the spec
->
-> Invitation straight into check-in or via confirmation · where Yoga & Pilates and Community sit under the lobby rule · whether the four quick picks are the right four · how an aim is retired, given "achieved" needs a response that is not celebration-as-pressure.
-
+Supersedes `master_schedule_02sep2026_v256.md`. Remove v256 on upload.
 
 > ### 🟢 ARC-2 — DEPLOYED 3 Sep, `alongside-v427`. 99 gates. **The arc exists.**
 >
@@ -6135,4 +6080,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v258*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v257*
