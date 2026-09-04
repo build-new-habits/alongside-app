@@ -1,6 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 03 Sep 2026 v428
+ *
+ * v428 - ZONE-WEIGHTING. No new files; session-builder.js only. A stale
+ *   shell would keep treating an incidental area as a primary target.
+ *
  * 03 Sep 2026 v427
  *
  * v427 - ARC-2. New file js/views/stretch-arc.js, precached. Omitting it
@@ -2965,7 +2970,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v427";
+const CACHE_NAME = "alongside-v428";
 
 const SHELL_URLS = [
 
