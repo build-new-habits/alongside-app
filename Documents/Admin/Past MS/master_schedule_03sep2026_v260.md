@@ -1,46 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v261
+## 03 Sep 2026 v260
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v260.md`. Remove v260 on upload.
-
-> ### 🟢 LOBBY-1a — DEPLOYED 3 Sep, `alongside-v429`. 100 gates.
->
-> **The first half of the lobby.** Home's seven equal tiles become four session tiles and three quiet reference rows.
->
-> #### 🔴 Why only half, and this is the important part
->
-> The full split — promoting the coach's suggestion to the top and moving session tiles behind the check-in — **was scoped and deliberately not attempted in a two-hour window.** `today.js` is 1,160 lines with 11 check-in gates.
->
-> **A dependency found during scoping changes the spec's assumption:** the coach's suggestion is built by `coach-proposal`, which `requiresCheckin: true`. It cannot be promoted onto an ungated Home without either gating Home (wrong) or suggesting from no data (worse). **The split is not a presentation change that enables the promotion — it is the only thing that makes the promotion possible.** Recorded in the spec's terms so LOBBY-1b is not planned as a layout job.
->
-> Rushing it is how CARD-2 shipped and was superseded the same day.
->
-> #### 🟢 The rule is now in the code, not just the spec
->
-> Every door carries `kind: 'session' | 'reference'`. Sessions render as tiles, reference as rows, **both from the tag rather than a hardcoded list**. Assertion 1a fails if any door is untagged — because an untagged door falls through to whatever the renderer does by default, and Home drifts back to seven equal tiles the same afternoon somebody adds one.
->
-> **Wellbeing is a reference row on the evidence already in the file:** the NAV-6 note records that it duplicates the Noticing tab, and something reachable from every screen does not need a tile on the one screen where slots are scarce.
->
-> #### 🟢 Demotion that does not punish
->
-> Rows keep the **same 48px target** as tiles — demoting something visually must never demote it for thumbs. Assertion 4b fails if the label is faded toward disabled: these are ordinary destinations somebody may well want, and **this audience has spent enough time being told it does not qualify.** Routing and the check-in flag are carried unchanged, and assertion 3 fails if a row loses either — `attachEvents` binds on `[data-route]` and reads that attribute, so a row without it would silently bypass the gate.
->
-> **The drop-in stays a tile.** Assertion 5 fails if it is demoted: it is what somebody does when they turn up without a plan, and it is due promotion, not demotion.
->
-> #### ⚠️ `verify-nav5` caught the shape change
->
-> Its door pattern assumed `id:` came first and reported **"no tiles found — the regex has drifted from the markup"** rather than passing on an empty set. **That is a gate written to fail loudly when its subject changes**, and it is the pattern to copy. Updated to make `kind` optional and to exempt reference rows: the nav-duplication rule applies to tiles, because being reachable two ways is only clutter when both look equally important.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **LOBBY-1a** | Session tiles vs reference rows, enforced by tag | 🟢 Shipped `alongside-v429`, untested on device | 3 Sep |
-> | **LOBBY-1b** | The split: lobby with the arc, session space behind the check-in. **Not a layout job** — it is what makes the suggestion promotable | 🔵 Next, needs a proper window | w/c 3 Sep |
-> | **PAT RENEWAL** | **Expires Fri 5 Sep** | 🔴 Graeme | by 5 Sep |
-> | **ARC-3-SETUP** + **GOALS-MIGRATE** | Twelve sites, together | 🔵 Specced | w/c 3 Sep |
-
+Supersedes `master_schedule_03sep2026_v259.md`. Remove v259 on upload.
 
 > ### 🟢 ZONE-WEIGHTING — DEPLOYED 3 Sep, `alongside-v428`. 99 gates.
 >
@@ -6258,4 +6220,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v261*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v260*
