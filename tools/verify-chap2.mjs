@@ -101,30 +101,20 @@ const home = mountWith(TodayView, () => {});
 check('Home mounts without throwing', !home.threw, home.threw ? String(home.threw) : '');
 
 const row = el.querySelector('.today-programme-row');
-check('Home renders the My Programme row', !!row);
-check('the row is a real button with an accessible name',
-  !!row && row.tagName === 'BUTTON' && (row.getAttribute('aria-label') || '').length > 0);
-
-const grid = el.querySelector('.today-doors');
-check('the row sits ABOVE the six tiles',
-  !!row && !!grid && !!(row.compareDocumentPosition(grid) & dom.window.Node.DOCUMENT_POSITION_FOLLOWING),
-  'full width above the grid, not a seventh tile');
-check('and it is not styled as one of the tiles',
-  !!row && !row.classList.contains('today-door'),
-  'in the grid people tap it expecting a workout');
-
-// The claim that matters: tapping it actually goes somewhere.
-if (row) {
-  const before = home.navs.length;
-  row.click();
-  check('clicking the row navigates to my-programme',
-    home.navs.length === before + 1 && home.navs[home.navs.length - 1] === 'my-programme',
-    home.navs.join(',') || 'nothing happened');
-}
-
-// ─────────────────────────────────────────────────────────────────────
-// 3. The cog is gone, and Settings did not go with it
-// ─────────────────────────────────────────────────────────────────────
+// SUPERSEDED BY LOBBY-1c, 03 Sep 2026.
+//
+// Home has no My Programme row and no tile grid. The ARC PANEL took the
+// row's place and says the same thing with the actual aim in it, and the
+// session tiles moved behind the check-in.
+//
+// The rule these four assertions protected is intact and asserted
+// elsewhere: the route to "where am I going" must be full width, above
+// the fold, and not mistakable for a workout. That is now
+// verify-lobby1's 7a (the panel is on Home), 7e (it sits above the
+// reference rows) and 10a (no tile grid exists to be confused with).
+//
+// Recorded as a supersession rather than deleted, so the reasoning
+// survives for whoever wonders why Home stopped having a programme row.
 
 check('the cog is gone from Home', !el.querySelector('.today-settings-link'));
 check('and Settings is still reachable from the bottom nav',
@@ -135,8 +125,11 @@ check('and Settings is still reachable from the bottom nav',
 // and the gate caught me, which is the whole argument for running one
 // rather than reading it. The claim being defended is that NEITHER
 // branch is icon-only, so both are mounted.
-check('before checking in, the control says so in words',
-  /Check in/.test(el.innerHTML) && !/Update check-in/.test(el.innerHTML));
+// SUPERSEDED BY LOBBY-1c. The "Check in" control on the lobby was
+// replaced by the invitation, which names the price of entry in words
+// ("I'll ask how you're doing first"). verify-lobby1 10b asserts that.
+// "Update check-in" remains, and its own assertions below still apply.
+
 
 const checkedIn = mountWith(TodayView, () => {
   store.set('lastCheckin.timestamp', new Date().toISOString());

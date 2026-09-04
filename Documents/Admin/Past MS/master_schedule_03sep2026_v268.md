@@ -1,44 +1,8 @@
 # Alongside: Move — Master Schedule
-## 03 Sep 2026 v269
+## 03 Sep 2026 v268
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v268.md`. Remove v268 on upload.
-
-> ### 🟢 LOBBY-1c — DEPLOYED 3 Sep, `alongside-v434`. 102 gates. **The split is done.**
->
-> #### 🟢 Home is a lobby
->
-> Greeting · the arc · **one invitation** · reference rows. That is all. Gone from Home: the session tile grid, the My Programme row, and the stray check-in links.
->
-> **The My Programme row went because the arc panel replaced it.** It read *"your goals and where you are up to"* directly beneath a panel that now says both, with the actual aim in it. My Programme itself is unchanged and still reachable — what went was the second door to it.
->
-> **The invitation names the price of entry** — *"I'll ask how you're doing first"* — so the check-in is consented to rather than sprung, and it routes through the check-in only when one is owed. A second check-in in a day is a toll, not care.
->
-> #### 🟢 The session tiles landed somewhere
->
-> `coach-proposal` gains **"Or pick your own"**, below the suggestion and quieter than it: the coach leads, and choosing for yourself is one tap rather than a menu to get past. **Removing choice is not the same as hiding it**, and assertion 11 counts the escapes rather than merely checking one exists.
->
-> #### 🔴 A GATE CAUGHT A REAL REGRESSION, not a stale rule
->
-> Removing the check-in links took **"Update check-in"** with them, and `verify-chap2` named the case it broke: *somebody who checked in this morning and feels worse by evening* had no way to say so without starting a session. **Restored** — and it belongs on the lobby by our own rule, because it changes stored information rather than starting a session.
->
-> #### ⚠️ Three gates superseded, with reasoning rather than deletion
->
-> `verify-chap2`'s four My Programme assertions and its "Check in" wording assertion, and `verify-chap3`'s door-grid check. **The properties they guarded are intact and re-asserted elsewhere** — the route to "where am I going" is still full width, above the fold, and unmistakable for a workout (lobby1 7a/7e/10a), and a hinge card still cannot block the way through (chap3 now points at the invitation). Recorded as supersessions so the reasoning survives.
->
-> #### ⚠️ ELEVENTH anchor fault this session
->
-> A 600-character window ran past the invitation's handler into the next listener, which also calls `_checkedInToday()` — so deleting the branch still passed. Narrowed to the handler's own closing brace. Also this session: a bare text match satisfied by an `aria-label`, and a presence check satisfied by three of four buttons remaining. **Every one caught by reversal, none by review.**
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **LOBBY-1c** | The split: lobby and session space | 🟢 Shipped `alongside-v434`, untested on device | 3 Sep |
-> | **SUGGEST-1** | Provisional suggestion on the lobby BEFORE the check-in, with visible revision. The last piece of the mockup | 🔵 **Next** | w/c 3 Sep |
-> | **NARROWING-Q** | 2.15 and 2.16 are indistinguishable on stored data | 🟠 Design | w/c 3 Sep |
-> | **PAT RENEWAL** | **Expires Fri 5 Sep** | 🔴 Graeme | by 5 Sep |
-
+Supersedes `master_schedule_03sep2026_v267.md`. Remove v267 on upload.
 
 > ### 🟢 SITUATIONS — DEPLOYED 3 Sep, `alongside-v433`. `aims.js` v2: 33 aims, 30 strands, 11 of them mind strands.
 >
@@ -6598,4 +6562,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v269*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v268*

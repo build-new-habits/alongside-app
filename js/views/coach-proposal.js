@@ -693,10 +693,33 @@ export function CoachProposalView(router) {
              above, no door tap needed (Phase C, 04 Aug 2026) -->
         ${renderPreviewPanel()}
 
+        <!-- LOBBY-1c. THE SESSION SPACE'S ESCAPE.
+             Home lost its session tiles when it became a lobby, so this
+             is where they went. It is deliberately BELOW the suggestion
+             and quieter than it: the coach leads, and choosing for
+             yourself is one tap rather than a menu you must get past.
+
+             Two escapes exist, not one. This is for somebody who has
+             decided -- fast, short, four things. Library is for
+             somebody looking around. Collapsing them would trade a
+             front-door problem for a back-door one. -->
+        <p class="cp-else-label">Or pick your own</p>
+        <div class="cp-else" role="group" aria-label="Choose your own session">
+          <button class="cp-else__btn" data-else="session-builder">Strength &amp; cardio</button>
+          <button class="cp-else__btn" data-else="mobility-conditioning">Mobility &amp; stretch</button>
+          <button class="cp-else__btn" data-else="yoga-session">Yoga &amp; Pilates</button>
+          <button class="cp-else__btn" data-else="library">Something quieter</button>
+        </div>
+
       </div>
     `;
 
     attachEvents(container);
+    container.querySelectorAll('[data-else]').forEach(btn => {
+      // No check-in gate here: getting to this screen required one, so
+      // asking again would be the second toll in a minute.
+      btn.addEventListener('click', () => router.navigate(btn.dataset.else));
+    });
   }
 
   function attachSevereChoiceEvents(container) {

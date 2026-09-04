@@ -432,3 +432,47 @@
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
+
+/* LOBBY-1c. The invitation. One primary action on the lobby, with the
+   price of entry stated beneath it rather than sprung afterwards. */
+.today-invite {
+  margin-top: var(--space-2);
+}
+
+.today-invite__note {
+  margin: var(--space-2) 0 var(--space-5) 0;
+  font-size: var(--text-sm);
+  text-align: center;
+  opacity: 0.75;
+}
+
+/* The session space's escape. Quieter than the suggestion above it —
+   the coach leads, and this is one tap for somebody who has decided. */
+.cp-else-label {
+  margin: var(--space-5) 0 var(--space-2) 0;
+  font-size: var(--text-sm);
+  opacity: 0.75;
+}
+
+.cp-else {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.cp-else__btn {
+  min-height: 48px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.cp-else__btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
