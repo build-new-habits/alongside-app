@@ -1,5 +1,10 @@
 /**
  * js/views/stretch-arc.js
+ * 03 Sep 2026 v2
+ *
+ * v2 - ARC-3-SETUP. Start routes to the four questions when no aim has
+ *   been set. Shows the aim and strands once one has.
+ *
  * 03 Sep 2026 v1
  *
  * ARC-2. Starting and stopping a stretch arc.
@@ -40,6 +45,10 @@ import { store } from "../store.js";
 import { STRETCH_ZONES, zonesWithCoverage } from "../session-builder.js";
 import { zonesForGoal, STRETCH_GOAL_ZONES } from "../data/stretch-goal-zones.js";
 import { getGoalLabel } from "../data/goals.js";
+import { aimById, STRANDS } from "../data/aims.js";
+
+const aimLabel    = id => (aimById(id) || {}).label || "";
+const strandLabel = id => (STRANDS[id] || {}).label || "";
 
 const esc = s => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -59,7 +68,7 @@ export function StretchArcView(router) {
   function mount(container) { render(container); }
 
   function render(container) {
-    const arc      = store.get("stretchArc") || {};
+    const arc      = store.get("arc") || {};
     const goals    = store.get("goals") || [];
     const goalId   = arc.goalId || goals[0] || null;
     const available = zonesWithCoverage().map(z => z.id);
@@ -93,7 +102,16 @@ export function StretchArcView(router) {
           happens \u2014 it's a direction, not a commitment.
         </p>
 
-        ${goalId ? `
+        ${arc.aimId ? `
+          <div class="sa-panel">
+            <span class="exercise-section-label">What you're working towards</span>
+            <p class="sa-goal">${esc(aimLabel(arc.aimId))}</p>
+            ${(arc.strands || []).length ? `
+              <p class="sa-zones">${(arc.strands || []).map(strandLabel).filter(Boolean).join(" \u00B7 ")}</p>
+            ` : ""}
+            ${arc.marker ? `<p class="sa-note">\u201C${esc(arc.marker)}\u201D</p>` : ""}
+          </div>
+        ` : goalId ? `
           <div class="sa-panel">
             <span class="exercise-section-label">What I'd work towards</span>
             <p class="sa-goal">${esc(getGoalLabel(goalId))}</p>
@@ -165,7 +183,12 @@ export function StretchArcView(router) {
     });
 
     container.querySelector("#sa-start-btn")?.addEventListener("click", () => {
-      store.set("stretchArc", {
+      // ARC-3-SETUP. An arc without an aim is a coverage tracker. Send
+      // people through the four questions first -- being asked IS the
+      // premium experience, so it must not be skippable by anybody who
+      // has not already answered.
+      if (!arc.aimId) { router.navigate("arc-setup"); return; }
+      store.set("arc", {
         ...arc,
         goalId,
         active:    true,
@@ -184,7 +207,7 @@ export function StretchArcView(router) {
       //
       // zonesWorked survives on purpose: coming back in a month should
       // not start from nothing.
-      store.set("stretchArc", { ...store.get("stretchArc"), active: false });
+      store.set("arc", { ...store.get("arc"), active: false });
       render(container);
     });
 
