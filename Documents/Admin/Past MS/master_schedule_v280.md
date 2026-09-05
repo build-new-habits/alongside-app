@@ -1,40 +1,8 @@
 # Alongside: Move — Master Schedule
-## 05 Sep 2026 v281
+## 05 Sep 2026 v280
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v280.md`. Remove v280 on upload.
-
-> ### 🟢 SURFACE-TOKEN — CLOSED 05 Sep 2026. `alongside-v440`, 105 gates. New `tools/verify-surface.mjs`.
->
-> `--color-surface` was referenced **51 times across 15 files and defined nowhere.** 33 uses had no fallback, so those surfaces rendered with no background at all. Files: `css/base/variables.css` v4 → **v5**, `css/components/onboarding-thread.css` v5 → **v6**, `css/components/sheet-manager.css` v2 → **v3**, `sw.js` → **v440**.
->
-> #### 🔴 SECOND INSTANCE OF THE SAME FAULT — so the gate covers the class, not the case
->
-> `variables.css:74` already records `--color-bg-elevated` as *"was undefined, referenced 46+ times"* in August. Fixing the instance and not the class is how it happened twice. **`verify-surface.mjs` now fails any `--color-surface*` token that is referenced without a fallback and not defined**, and requires it in **all three schemes** — dark, light and high-contrast — because defining it for the default only breaks everyone who opted into SCHEME-1.
->
-> #### 🔴 A LIVE WCAG FAILURE FOUND WHILE FIXING SOMETHING ELSE
->
-> Eight of the 51 uses were `color:`, not `background:` — a background token doing a text job, in `onboarding-thread.css` (6) and `sheet-manager.css` (2).
->
-> | | dark | light | high-contrast |
-> |---|---|---|---|
-> | `#E8F4F4` (what shipped) | 13.01:1 | **1.07:1 FAIL** | 18.68:1 |
-> | naive fix, token = card grey | **1.41:1 FAIL** | — | — |
-> | `--color-text` (shipped v440) | 11.87:1 | 17.06:1 | 21.00:1 |
->
-> **The light column is not hypothetical.** Anyone who opted into the light scheme has had invisible onboarding chips and an invisible sheet-skip control. Live WCAG 1.4.3 failure, shipped, found only because the naive fix would have made the dark column fail too. `--color-text` adapts per scheme; a hardcoded near-white cannot.
->
-> ⚫ **`--color-surface-raised` left undefined ON PURPOSE.** Its single use supplies `rgba(255,255,255,0.04)` — a translucent overlay a solid alias would visibly change. Logged, not silently converted.
->
-> #### 🟠 THREE FIXTURE FAULTS IN THE GATE, ALL MINE, ALL CAUGHT BEFORE THE FIX
->
-> Scheme blocks anchored on `--color-bg-card`, which is **third** in each block, so the dark block ran past into the light scheme's background and printed **1.18:1 for a pair that is really 11.87:1**. Re-anchored on `--color-bg-deep`, which is first. · The gate went red on **its own documentation** — the new v6 header quotes the old line to explain the fix, and a raw-source scan cannot tell a fault from a description of one. Comments now stripped. · A blanket "no file is near-empty" reversal flagged `js/data/exercises.js`, a legitimate one-line re-export shim.
->
-> #### 🟢 Reversal: 4 deliberate breaks, 4 caught red
->
-> token undefined in dark · defined for dark only, missing from light · a background token used as text again · light-scheme text dropped to 1.07:1 — **and the gate reported exactly 1.07:1**, so the contrast maths is live rather than decorative.
->
-> ⚠️ **`verify-blueprint.mjs` caught the knock-on twice** — gate count 104→105 and cache `v439`→`v440` are recorded in the cold-start blueprint (now **v34**). Adding a gate or bumping the cache is never a one-file change.
+Supersedes `master_schedule_v279.md`. Remove v279 on upload.
 
 > ### 🟢 SESSION B1 — SHIPPED 05 Sep 2026. The gate moved before the thing it guards. `verify-swap1.mjs` v2, 138 assertions.
 >
@@ -6999,4 +6967,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v281*
+*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v280*
