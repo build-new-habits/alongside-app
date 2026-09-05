@@ -1,6 +1,54 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 05 Sep 2026 v13
+ *
+ * v13 - SWAP-1. THE ORDER IS INVERTED BACK. "Coach recommends, I'll
+ *   choose" showed the whole candidate list FIRST -- 188 entries for a
+ *   full-body thirty-minute session, not the ~90 the spec recorded --
+ *   and the built session afterwards. On device that is a wall.
+ *
+ *   The preview now leads and swapping sits behind it, one body area at
+ *   a time, opened by tapping the exercise you want to change.
+ *
+ *   THE FLAT PICKER IS GONE FROM THE DAILY FLOW, and with it "Build my
+ *   own", which was that list with nothing pre-ticked. Build mode drops
+ *   from three routes to two.
+ *
+ *   ATHLETE SELF-BUILD IS NOT DELETED, because it was never here.
+ *   Somebody authoring and saving their own routine is a separate
+ *   feature that does not yet exist; Graeme's daughter writes her
+ *   programme on paper and wants exactly that. Recorded in this file so
+ *   nobody later reads "we deleted build-your-own" and concludes the
+ *   athlete case died with it.
+ *
+ *   ALTERNATIVES COME ONLY FROM THE POOL THE SESSION WAS BUILT FROM.
+ *   Every condition, equipment, capability and clearance filter has
+ *   already run over those entries, so the sheet cannot reach past them
+ *   and cannot add a permission. buildCandidatePools() is called ONCE,
+ *   when the preview is built; a swap calls no builder at all.
+ *
+ *   SORE AREAS: marked above 0, unselectable at 7.
+ *
+ *   A TENSION IN THE SPEC, RESOLVED RATHER THAN PICKED. Section 6
+ *   assertion 6 says options are "never disabled for soreness"; section
+ *   7 decision 1 says 7 and above is unselectable. Both are honoured by
+ *   aria-disabled rather than the HTML disabled attribute: the option
+ *   keeps its 48px target, stays in the tab order, is announced as
+ *   unavailable, and carries its reason in words underneath. `disabled`
+ *   would remove it from the tab order entirely and make the
+ *   explanation unreachable -- the same fault WOW-4 fixed in v5.
+ *
+ *   THE PREVIEW IS NOT MARKED, only the swap sheet. Ringing exercises
+ *   the coach itself just chose invites "why did you pick it, then".
+ *
+ *   BACK FROM THE PREVIEW now returns to the step that was actually
+ *   shown -- build mode for a gym session, duration for stretch. It had
+ *   to change: the candidate screen was its back target and no longer
+ *   exists, so leaving it alone would have skipped two steps for
+ *   stretch. PICKER-EXIT (the separate "Build a different one" control)
+ *   is untouched and still open.
+ *
  * 20 Aug 2026 v12
  *
  * v12 - R4. EVERY STEP OF THIS BUILDER IS NOW FREE. The type picker,
@@ -192,6 +240,11 @@
 import { store }                          from "../store.js";
 import { router }                         from "../router.js";
 import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, severeZoneToday, zonesWithCoverage } from "../session-builder.js";
+// SWAP-1. The grouping, the soreness levels and the replacement all live
+// in the engine, so this file holds the words and none of the rules.
+import { swapAlternatives, swapExerciseInSession, soreScoresToday, soreLevelFor,
+         SWAP_GROUP_CAP, SORE_BLOCK_FLOOR }   from "../session-builder.js";
+import { getConditionName }                   from "../data/conditions.js";
 import { zonesForGoal, STRETCH_GOAL_ZONES } from "../data/stretch-goal-zones.js";
 // R4, 20 Aug 2026. isPremium/lockedFeature are no longer used in this
 // file. Every step of the builder -- type, duration, allocation split,
@@ -231,7 +284,7 @@ function formatDuration(seconds) {
   return rem === 30 ? `${whole}\u00BD min` : `${whole} min ${rem}s`;
 }
 
-let phase             = "type";      // "type" | "location" | "duration" | "equipment" | "buildmode" | "candidates" | "loading" | "preview"
+let phase             = "type";      // "type" | "location" | "zones" | "duration" | "equipment" | "buildmode" | "loading" | "preview"
 let selectedType      = null;
 let selectedLocation  = "home";      // "home" | "gym" -- never sticky, reset on resetState()
 let selectedDuration  = null;
@@ -242,9 +295,14 @@ let selectedDuration  = null;
 // every mount. Remembering it is not a feature, it is the absence of
 // an irritation.
 let selectedPreset    = _savedPreset();
-let buildMode         = null;        // "coach" | "recommend" | "own"
+let buildMode         = null;        // "coach" | "recommend"
+// SWAP-1. Kept in module state after the build so the swap sheet can read
+// the pool the session came from without calling any builder again.
 let candidatePools    = null;
-let selectedCandidateIds = new Set();
+let swapIndex         = null;       // flat index into builtSession.exercises, or null
+let swapGroupId       = null;       // which body-area group the sheet is showing
+let swapShowAll       = false;      // the escape: everything in this section
+let swapExpanded      = false;      // past SWAP_GROUP_CAP within one group
 let equipmentOverride = null;       // null = use store defaults; array = this-session override
 let builtSession       = null;
 let entryDoor          = null;      // BACK-DOOR: the door that preselected a type
@@ -339,9 +397,12 @@ export function render() {
   if (phase === "duration")   return renderDurationPicker();
   if (phase === "equipment")  return renderEquipmentCheck();
   if (phase === "buildmode")  return renderBuildModeStep();
-  if (phase === "candidates") return renderCandidatePicker();
   if (phase === "loading")    return renderLoading();
-  if (phase === "preview")    return renderPreview();
+  // SWAP-1. The sheet is a full screen over the preview rather than a
+  // phase of its own: it has no place in the forward flow, and adding a
+  // seventh phase would have put it on the back stack where it does not
+  // belong. Closing it is a state change, not a step backwards.
+  if (phase === "preview")    return swapIndex === null ? renderPreview() : renderSwapSheet();
   return renderTypePicker();
 }
 
@@ -882,6 +943,27 @@ function _buildModeOption(mode, title, blurb) {
 //
 // What survives from TIER-G is the layout argument: a screen with one
 // button on it is a question with one answer. It now has three.
+// SWAP-1, 05 Sep 2026. "Build my own" is REMOVED from this step. It was
+// the 188-item list with nothing pre-ticked, and that list is what this
+// build deletes; a route to a screen that no longer exists is not a
+// choice.
+//
+// IT IS NOT THE ATHLETE CASE. Authoring and saving your own routine is a
+// separate feature that has never been built — Graeme's daughter writes
+// her programme on paper and wants it. Nothing here touches that, and
+// this note exists so the deletion is not later read as its cancellation.
+//
+// The identical three routes on conditions-update.js are also untouched:
+// its "Build my own" goes to prescribed.js, which is transcribing what a
+// specialist told you. Same words, different act — the distinction v10
+// drew.
+//
+// WRITTEN AS A JS COMMENT, NOT AN HTML ONE. The first draft put this in
+// a <!-- --> block inside the template literal, where it SHIPPED INTO
+// THE MARKUP — and verify-arc1's 5b caught it, because that check
+// strips JS comments before scanning and an HTML comment survives.
+// Anything inside the template is delivered to the browser and is
+// judged as user-facing text, which is the correct standard.
 function renderBuildModeStep() {
   const type = SESSION_TYPES.find(t => t.id === selectedType);
   return `
@@ -907,12 +989,9 @@ function renderBuildModeStep() {
         </button>
         ${_buildModeOption(
           "recommend", "Coach recommends, I'll choose",
-          "I'll suggest a starting selection from a wider list — swap anything you like."
+          "I'll put a session together, and you can swap any of it for something else."
         )}
-        ${_buildModeOption(
-          "own", "Build my own",
-          "Pick everything yourself from what's available today."
-        )}
+
       </div>
 
       <!-- R4, 20 Aug 2026. A free-tier footnote reading "Choosing your
@@ -927,72 +1006,18 @@ function renderBuildModeStep() {
   `;
 }
 
-const CANDIDATE_SECTION_LABELS = { warmup: "Warm-up", main: "Main session", cooldown: "Cool-down" };
-
-// 05 Aug 2026 -- checkboxes per section, pre-checked for "recommends",
-// empty for "build your own" (buildMode controls the initial checked state
-// only -- both modes render from the identical candidatePools list).
-// Client-side guard: warmup can't be fully unchecked. session-builder.js's
-// buildSessionFromSelection() also enforces this server-side as a hard
-// floor -- belt and suspenders, not redundant, since the UI guard is about
-// good in-the-moment feedback and the server floor is about correctness
-// even if the UI guard is ever bypassed.
-function renderCandidatePicker() {
-  if (!candidatePools) return renderLoading();
-  const type = SESSION_TYPES.find(t => t.id === selectedType);
-  const heading = buildMode === "recommend" ? "Here's what I'd suggest — swap anything you like" : "Pick what you'd like to do today";
-
-  const renderSection = (key) => {
-    const items = candidatePools[key];
-    if (!items || items.length === 0) return "";
-    return `
-      <p class="sb-section-label text-xs text-muted" style="margin-top: var(--space-4);">${CANDIDATE_SECTION_LABELS[key]}</p>
-      <div style="display:flex;flex-direction:column;gap:var(--space-2);">
-        ${items.map(ex => {
-          const checked = selectedCandidateIds.has(ex.id);
-          return `
-            <label class="sb-candidate-label" data-candidate="${ex.id}" data-section="${key}"
-                   style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);
-                          background:var(--color-surface);border-radius:var(--radius-md,8px);cursor:pointer;
-                          border:2px solid ${checked ? "var(--color-primary)" : "transparent"};">
-              <input type="checkbox" class="sb-candidate-check" data-candidate="${ex.id}" data-section="${key}"
-                     ${checked ? "checked" : ""}
-                     style="width:20px;height:20px;accent-color:var(--color-primary);flex-shrink:0;cursor:pointer;"
-                     aria-label="${ex.name}">
-              <span>${ex.name}</span>
-            </label>
-          `;
-        }).join("")}
-      </div>
-    `;
-  };
-
-  return `
-    <div class="view session-builder-view">
-
-      <div class="workout-header">
-        <button class="btn btn-ghost" id="sb-back-btn" aria-label="Back">
-          &larr; Back
-        </button>
-        <span class="workout-header-title">${type?.label || "Build a session"}</span>
-      </div>
-
-      <div class="card card-coach" style="margin-bottom: var(--space-4);">
-        <img src="assets/images/logo-icon-128.png" alt="" class="coach-icon-small" aria-hidden="true">
-        <p class="coach-message-text">${heading}</p>
-      </div>
-
-      ${renderSection("warmup")}
-      ${renderSection("main")}
-      ${renderSection("cooldown")}
-
-      <button class="btn btn-primary btn-large btn-full" id="sb-candidate-build-btn" style="margin-top: var(--space-6);">
-        Build this session
-      </button>
-
-    </div>
-  `;
-}
+// SWAP-1, 05 Sep 2026. renderCandidatePicker() and
+// CANDIDATE_SECTION_LABELS are DELETED, not left unused.
+//
+// It rendered 188 checkboxes for a full-body thirty-minute session,
+// grouped only by warm-up / main / cool-down, BEFORE the session
+// existed. Graeme on device: the built session reads well and should
+// have come first, with swapping offered behind it.
+//
+// Deleted rather than kept behind a flag, for the same reason v12 gave
+// for the paywall import it removed: dead code that performs a
+// forbidden behaviour is a working example somebody copies, and it
+// leaves the gate unable to tell a live path from a dead one.
 
 function renderLoading() {
   const type = SESSION_TYPES.find(t => t.id === selectedType);
@@ -1011,20 +1036,81 @@ function renderLoading() {
   `;
 }
 
+// ── SWAP-1 helpers ───────────────────────────────────────────────────
+
+const SECTION_WORD = { warmup: "warm-up", main: "main session", cooldown: "cool-down" };
+
+/** Joins names the way a person says them. */
+function _andList(items) {
+  if (items.length <= 1) return items[0] || "";
+  return items.slice(0, -1).join(", ") + " and " + items[items.length - 1];
+}
+
+/**
+ * Whether this row can be swapped.
+ *
+ * Three separate refusals, all deliberate:
+ *   - PRESCRIBED work is a specialist's instruction, and this app's
+ *     standing rule is that the engine never removes or overrides it.
+ *   - A GENTLE CARE session is the coach declining to build a training
+ *     session at all. Offering to edit it would undo the point of it.
+ *   - ANYTHING NOT IN THE POOL cannot be swapped like for like, because
+ *     there is no pool to draw an alternative from. Rather than guess,
+ *     the affordance is simply absent.
+ */
+function _canSwap(ex) {
+  if (!ex || ex.isPrescribed) return false;
+  if (builtSession?.gentleCare) return false;
+  const pool = candidatePools?.[ex.section];
+  return Array.isArray(pool) && pool.some(p => p.id === ex.id);
+}
+
+function _previewRow(row, opts = {}) {
+  const { ex, i } = row;
+  const inner = `
+        <div class="sb-exercise-left">
+          <span class="sb-exercise-name">${ex.name}</span>
+          <span class="sb-exercise-meta text-xs text-muted">${_exerciseMeta(ex, opts)}</span>
+        </div>`;
+
+  if (!_canSwap(ex)) {
+    return `
+      <div class="sb-exercise-item" role="listitem">
+        ${inner}
+        ${ex.isPrescribed ? `
+          <span class="sb-exercise-note text-xs">Prescribed for you &mdash; I don't change these.</span>
+        ` : ""}
+      </div>`;
+  }
+
+  // A button, not a div with a listener. It has to be reachable by
+  // keyboard and announced as doing something, and the affordance word
+  // is aria-hidden because the accessible name already says it.
+  return `
+    <div role="listitem">
+      <button class="sb-exercise-item sb-exercise-item--swappable" data-swap-index="${i}"
+              aria-label="Change ${ex.name} for something else">
+        ${inner}
+        <span class="sb-swap-cue text-xs" aria-hidden="true">Change</span>
+      </button>
+    </div>`;
+}
+
 function renderPreview() {
   if (!builtSession) return renderLoading();
 
-  const type     = SESSION_TYPES.find(t => t.id === selectedType);
-  const warmup   = builtSession.exercises.filter(e => e.section === "warmup");
-  const main     = builtSession.exercises.filter(e => e.section === "main");
-  const cooldown = builtSession.exercises.filter(e => e.section === "cooldown");
+  const rows     = builtSession.exercises.map((ex, i) => ({ ex, i }));
+  const warmup   = rows.filter(r => r.ex.section === "warmup");
+  const main     = rows.filter(r => r.ex.section === "main");
+  const cooldown = rows.filter(r => r.ex.section === "cooldown");
+  const anySwappable = rows.some(r => _canSwap(r.ex));
 
   return `
     <div class="view session-builder-view">
 
       <div class="workout-header">
-        <button class="btn btn-ghost" id="sb-back-btn" aria-label="Build a different session">
-          &larr; Different session
+        <button class="btn btn-ghost" id="sb-back-btn" aria-label="Back">
+          &larr; Back
         </button>
         <span class="workout-header-title">${builtSession.title}</span>
       </div>
@@ -1066,51 +1152,31 @@ function renderPreview() {
         </div>
       </div>
 
+      ${anySwappable ? `
+        <!-- SWAP-1. Said once, in the coach's voice, rather than
+             repeated on every row. The rows carry their own accessible
+             names, so this is orientation, not instruction. -->
+        <p class="sb-zone-note">Tap anything you'd rather not do and I'll show you what else there is.</p>
+      ` : ""}
+
       <div class="sb-exercise-list" role="list">
 
         ${warmup.length > 0 ? `
           <p class="sb-section-label text-xs text-muted">Warm-up</p>
           ${builtSession.rationale?.sections?.warmup ? `<p class="sb-section-why coach-voice">${builtSession.rationale.sections.warmup}</p>` : ""}
-          ${warmup.map(ex => `
-            <div class="sb-exercise-item" role="listitem">
-              <div class="sb-exercise-left">
-                <span class="sb-exercise-name">${ex.name}</span>
-                <span class="sb-exercise-meta text-xs text-muted">
-                  ${_exerciseMeta(ex)}
-                </span>
-              </div>
-            </div>
-          `).join("")}
+          ${warmup.map(r => _previewRow(r)).join("")}
         ` : ""}
 
         ${main.length > 0 ? `
           <p class="sb-section-label text-xs text-muted" style="margin-top: var(--space-3);">Main session</p>
           ${builtSession.rationale?.sections?.main ? `<p class="sb-section-why coach-voice">${builtSession.rationale.sections.main}</p>` : ""}
-          ${main.map(ex => `
-            <div class="sb-exercise-item" role="listitem">
-              <div class="sb-exercise-left">
-                <span class="sb-exercise-name">${ex.name}</span>
-                <span class="sb-exercise-meta text-xs text-muted">
-                  ${_exerciseMeta(ex, { rest: true })}
-                </span>
-              </div>
-            </div>
-          `).join("")}
+          ${main.map(r => _previewRow(r, { rest: true })).join("")}
         ` : ""}
 
         ${cooldown.length > 0 ? `
           <p class="sb-section-label text-xs text-muted" style="margin-top: var(--space-3);">Cool-down</p>
           ${builtSession.rationale?.sections?.cooldown ? `<p class="sb-section-why coach-voice">${builtSession.rationale.sections.cooldown}</p>` : ""}
-          ${cooldown.map(ex => `
-            <div class="sb-exercise-item" role="listitem">
-              <div class="sb-exercise-left">
-                <span class="sb-exercise-name">${ex.name}</span>
-                <span class="sb-exercise-meta text-xs text-muted">
-                  ${_exerciseMeta(ex)}
-                </span>
-              </div>
-            </div>
-          `).join("")}
+          ${cooldown.map(r => _previewRow(r)).join("")}
         ` : ""}
 
       </div>
@@ -1124,6 +1190,130 @@ function renderPreview() {
         </button>
       </div>
 
+    </div>
+  `;
+}
+
+/**
+ * SWAP-1. The alternatives for one exercise, one body area at a time.
+ *
+ * Everything shown here comes from candidatePools -- the pool this
+ * session was built from -- so no builder runs, no filter is re-applied,
+ * and nothing can appear that the safety filters did not already pass.
+ */
+function renderSwapSheet() {
+  const current = builtSession?.exercises?.[swapIndex];
+  if (!current) { swapIndex = null; return renderPreview(); }
+
+  const section   = current.section;
+  const word      = SECTION_WORD[section] || "session";
+  const { groups, total, leadGroupId } = swapAlternatives({
+    pool:          candidatePools,
+    section,
+    current,
+    inSessionIds:  builtSession.exercises.map(e => e.id),
+  });
+
+  const header = `
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="sb-swap-close-btn" aria-label="Back to your session">
+          &larr; Back
+        </button>
+        <span class="workout-header-title">Instead of ${current.name}</span>
+      </div>`;
+
+  if (total === 0) {
+    return `
+      <div class="view session-builder-view">
+        ${header}
+        <p class="sb-coach-line">There's nothing else in today's ${word} I can offer you.</p>
+        <p class="sb-zone-note">
+          Everything else that would fit is either already in this session or ruled out by
+          what you've told me. Keeping ${current.name} is the honest answer today.
+        </p>
+      </div>`;
+  }
+
+  const scores = soreScoresToday();
+
+  // THE LEAD GROUP MAY BE EMPTY, and falling through to it blindly opened
+  // the sheet on nothing.
+  //
+  // Found by verify-swap1, not by reading this. Deep Squat Hold leads
+  // with Hips; on a persona with glutes at 7 every remaining hip
+  // candidate was already in the session, so `hips` had no group at all
+  // — while fifty-five alternatives sat in ten other groups. The sheet
+  // opened blank and looked like the empty state.
+  //
+  // The order of preference is: what the person last chose, then the
+  // tapped exercise's own area, then whatever is actually there. Only
+  // groups that EXIST are ever selected, so this cannot land on nothing
+  // while something remains.
+  const has      = id => groups.some(g => g.id === id);
+  const activeId = swapShowAll
+    ? null
+    : (has(swapGroupId) ? swapGroupId : (has(leadGroupId) ? leadGroupId : groups[0]?.id || null));
+  const active   = groups.find(g => g.id === activeId) || null;
+  const shown    = swapShowAll ? groups.flatMap(g => g.items) : (active?.items || []);
+  // The cap applies within a group only. "Everything in this section" is
+  // the escape, and an escape that was itself capped would not be one.
+  const capped   = (swapShowAll || swapExpanded) ? shown : shown.slice(0, SWAP_GROUP_CAP);
+
+  const option = ex => {
+    const sore    = soreLevelFor(ex, scores);
+    const blocked = sore.level === "blocked";
+    const marked  = sore.level !== "none";
+    const noteId  = `sb-swap-note-${ex.id}`;
+    const names   = sore.areas.map(a => (getConditionName(a) || a).toLowerCase());
+    const plural  = names.length > 1;
+    const reason  = blocked
+      ? `You told me your ${_andList(names)} ${plural ? "are" : "is"} at ${SORE_BLOCK_FLOOR} or above today. I'm not offering this one.`
+      : `This works your ${_andList(names)}, which you told me ${plural ? "are" : "is"} sore today. Still yours to choose.`;
+
+    // aria-disabled, NEVER the disabled attribute. See the v13 note: the
+    // option keeps its target size, stays in the tab order and is
+    // announced as unavailable, and the reason underneath is reachable.
+    return `
+      <button class="sb-swap-option${marked ? " sb-swap-option--sore" : ""}${blocked ? " sb-swap-option--blocked" : ""}"
+              data-swap-to="${ex.id}"
+              ${blocked ? `aria-disabled="true"` : ""}
+              ${marked ? `aria-describedby="${noteId}"` : ""}>
+        <span class="sb-swap-option-name">${ex.name}</span>
+        <span class="sb-swap-option-meta text-xs text-muted">${_exerciseMeta(ex)}</span>
+        ${marked ? `<span class="sb-swap-option-note text-xs" id="${noteId}">${reason}</span>` : ""}
+      </button>`;
+  };
+
+  return `
+    <div class="view session-builder-view">
+      ${header}
+
+      <p class="sb-coach-line">Something else for the ${word}?</p>
+
+      <div class="sb-swap-groups" role="group" aria-label="Choose a body area">
+        ${groups.map(g => {
+          const on = !swapShowAll && g.id === activeId;
+          return `
+          <button class="sb-zone-chip${on ? " sb-zone-chip--on" : ""}"
+                  data-swap-group="${g.id}" aria-pressed="${on}">
+            ${g.label} <span class="sb-swap-count">${g.items.length}</span>
+          </button>`;
+        }).join("")}
+        <button class="sb-zone-chip${swapShowAll ? " sb-zone-chip--on" : ""}"
+                id="sb-swap-all-btn" aria-pressed="${swapShowAll}">
+          Everything in this ${word} <span class="sb-swap-count">${total}</span>
+        </button>
+      </div>
+
+      <div class="sb-swap-list" role="list">
+        ${capped.map(ex => `<div role="listitem">${option(ex)}</div>`).join("")}
+      </div>
+
+      ${capped.length < shown.length ? `
+        <button class="btn btn-ghost btn-full" id="sb-swap-expand-btn">
+          Show all ${shown.length} in ${active ? active.label.toLowerCase() : "this group"}
+        </button>
+      ` : ""}
     </div>
   `;
 }
@@ -1158,23 +1348,61 @@ function triggerBuild() {
       return;
     }
 
+    // SWAP-1. The pool this session came from, captured once so the swap
+    // sheet has somewhere to read from.
+    //
+    // It is the SAME pool: buildSession() and buildCandidatePools() both
+    // go through _filterCandidates() with these identical arguments, so
+    // they differ in what they SELECT, not in what is available. Any
+    // exercise the two disagree about simply gets no swap affordance --
+    // _canSwap() checks membership rather than assuming it -- and
+    // verify-swap1 asserts the disagreement is empty today, so the day
+    // that changes it goes red rather than quiet.
+    //
+    // Not called again on a swap. A swap reads this; it builds nothing.
+    candidatePools = buildCandidatePools({
+      sessionType:       selectedType,
+      durationMins:      selectedDuration,
+      equipmentOverride: equipmentOverride,
+      preset:            selectedPreset
+    });
+
     phase = "preview";
     rerender();
   }, 1200);
 }
 
-// 05 Aug 2026 -- "coach recommends" / "build your own" path. Same loading
-// beat as triggerBuild() for consistency, then hands off to
-// buildSessionFromSelection() instead of buildSession().
-function triggerCandidateBuild() {
+/**
+ * SWAP-1. The "coach recommends" route. Was triggerCandidateBuild(),
+ * which built from whatever the person had ticked on a screen that no
+ * longer exists.
+ *
+ * The recommended set is what that screen pre-ticked, so the choice is
+ * not lost -- it is made, and then handed back one exercise at a time on
+ * the preview. Same loading beat as triggerBuild() for consistency.
+ */
+function triggerRecommendedBuild() {
   phase = "loading";
   rerender();
 
   setTimeout(() => {
+    candidatePools = buildCandidatePools({
+      sessionType:       selectedType,
+      durationMins:      selectedDuration,
+      equipmentOverride: equipmentOverride,
+      preset:            selectedPreset
+    });
+    if (!candidatePools) { router.navigate("today"); return; }
+
+    const recommendedIds = [];
+    ["warmup", "main", "cooldown"].forEach(section => {
+      candidatePools[section].forEach(ex => { if (ex.recommended) recommendedIds.push(ex.id); });
+    });
+
     builtSession = buildSessionFromSelection({
       sessionType:       selectedType,
       durationMins:      selectedDuration,
-      selectedIds:        Array.from(selectedCandidateIds),
+      selectedIds:       recommendedIds,
       equipmentOverride: equipmentOverride
     });
 
@@ -1186,6 +1414,32 @@ function triggerCandidateBuild() {
     phase = "preview";
     rerender();
   }, 1200);
+}
+
+/**
+ * SWAP-1. Writes the swapped session back over the stored one.
+ *
+ * generatedSession already exists and already carries this shape, so
+ * nothing is added to the schema. A swap is recorded by the session
+ * itself -- the same conclusion SWAP-0 reached when its first draft
+ * invented a swapLog and verify-write1 correctly failed it as a
+ * one-ended field.
+ *
+ * inputs.selectedIds is rewritten when it is there, because leaving it
+ * naming exercises no longer in the session would be a stored record
+ * that disagrees with itself.
+ */
+function persistBuiltSession() {
+  const record = store.get("generatedSession");
+  if (!record || !builtSession) return;
+  const next = { ...record, session: builtSession };
+  if (record.inputs && "selectedIds" in record.inputs) {
+    next.inputs = {
+      ...record.inputs,
+      selectedIds: builtSession.exercises.filter(e => !e.isPrescribed).map(e => e.id)
+    };
+  }
+  store.set("generatedSession", next);
 }
 
 function resetState() {
@@ -1200,7 +1454,10 @@ function resetState() {
   selectedPreset        = _savedPreset();
   buildMode             = null;
   candidatePools        = null;
-  selectedCandidateIds  = new Set();
+  swapIndex             = null;
+  swapGroupId           = null;
+  swapShowAll           = false;
+  swapExpanded          = false;
   equipmentOverride     = null;
   builtSession          = null;
   preselectChecked      = false;
@@ -1289,12 +1546,6 @@ export function onMount() {
       // ZONE-1. Back through the step that was actually shown.
       phase = selectedType === "stretch" ? "zones" : "location";
       rerender();
-    } else if (phase === "candidates" && selectedType === "stretch") {
-      // STRETCH-FLOW. Equipment and build mode were skipped, so back
-      // must not walk into them -- the same rule BACK-DOOR established:
-      // never enter a screen that was skipped forward.
-      phase = "duration";
-      rerender();
     } else if (phase === "zones") {
       // BACK-DOOR still applies: a preselected type skipped the picker,
       // so backing out of the first shown step returns to the door.
@@ -1312,11 +1563,21 @@ export function onMount() {
     } else if (phase === "buildmode") {
       phase = "equipment";
       rerender();
-    } else if (phase === "candidates") {
-      phase = "buildmode";
-      rerender();
     } else if (phase === "preview") {
-      resetState();
+      // SWAP-1. This used to resetState() back to the type picker, which
+      // was survivable while the candidate screen sat between build mode
+      // and the preview. With that screen gone, resetting would skip two
+      // steps for a stretch session -- so back now returns to the step
+      // that was ACTUALLY shown, which is the same rule BACK-DOOR and
+      // STRETCH-FLOW already established: never enter, or leap past, a
+      // screen the person did not see.
+      //
+      // PICKER-EXIT is a DIFFERENT control (sb-rebuild-btn, "Build a
+      // different one") and is deliberately untouched here. It is still
+      // open and still does not return where it started.
+      builtSession = null;
+      candidatePools = null;
+      phase = selectedType === "stretch" ? "duration" : "buildmode";
       rerender();
     } else {
       resetState();
@@ -1411,7 +1672,10 @@ export function onMount() {
         if (selectedType === "stretch") {
           equipmentOverride = [];
           buildMode = "recommend";
-          _openRecommendedCandidates();
+          // SWAP-1: straight to the built session now, not to a list of
+          // seventy-three. Two screens came off this path on 2 Sep and a
+          // third comes off here.
+          triggerRecommendedBuild();
           return;
         }
         phase = "equipment";
@@ -1483,31 +1747,12 @@ export function onMount() {
     rerender();
   });
 
-  /**
-   * STRETCH-FLOW. The tail of the build-mode "recommend" branch, lifted
-   * out so the stretch path and the build-mode button share it rather
-   * than growing a second copy -- the duplication that produced two
-   * selection loops and two checkedInToday definitions.
-   */
-  function _openRecommendedCandidates() {
-    candidatePools = buildCandidatePools({
-      sessionType:       selectedType,
-      durationMins:      selectedDuration,
-      equipmentOverride: equipmentOverride,
-      preset:            selectedPreset
-    });
-    if (!candidatePools) { router.navigate("today"); return; }
-    selectedCandidateIds = new Set();
-    ["warmup", "main", "cooldown"].forEach(section => {
-      candidatePools[section].forEach(ex => {
-        if (ex.recommended) selectedCandidateIds.add(ex.id);
-      });
-    });
-    phase = "candidates";
-    rerender();
-  }
+  // SWAP-1. _openRecommendedCandidates() is gone. It existed to open a
+  // screen that no longer exists, and its whole reason for being lifted
+  // out -- so the stretch path and the build-mode button could not drift
+  // -- is now served by triggerRecommendedBuild(), which both call.
 
-  // Build-mode selection (05 Aug 2026)
+  // Build-mode selection (05 Aug 2026)  // Build-mode selection (05 Aug 2026)
   document.querySelectorAll(".sb-buildmode-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       buildMode = btn.dataset.mode;
@@ -1517,61 +1762,84 @@ export function onMount() {
       // Its principle is unchanged and still applies elsewhere: route to
       // the door, never substitute silently.
 
-      if (buildMode === "coach") {
-        triggerBuild();
-        return;
-      }
-      // "recommend" pre-checks the recommended:true items; "own" starts
-      // empty. The recommend path shares _openRecommendedCandidates()
-      // with the stretch flow so the two cannot drift.
+      // SWAP-1. Two routes now, and the "own" branch that stood here is
+      // gone with the screen it opened. Anything unrecognised falls to
+      // the coach-built path rather than to a dead end -- the standing
+      // rule is route to the door, never leave somebody nowhere.
       if (buildMode === "recommend") {
-        _openRecommendedCandidates();
+        triggerRecommendedBuild();
         return;
       }
-      candidatePools = buildCandidatePools({
-        sessionType:       selectedType,
-        durationMins:      selectedDuration,
-        equipmentOverride: equipmentOverride,
-        preset:            selectedPreset
-      });
-      if (!candidatePools) {
-        router.navigate("today");
-        return;
-      }
-      selectedCandidateIds = new Set();
-      phase = "candidates";
+      triggerBuild();
+    });
+  });
+
+  // ── SWAP-1 ────────────────────────────────────────────────────────
+  //
+  // The candidate checkbox handlers and sb-candidate-build-btn are gone
+  // with the screen they served. The warm-up floor they enforced client-
+  // side is NOT lost: buildSessionFromSelection() holds it as a hard
+  // floor regardless, which is why it was written as belt and braces
+  // rather than as the only thing standing between a person and a
+  // session with no warm-up.
+
+  document.querySelectorAll("[data-swap-index]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      swapIndex    = Number(btn.dataset.swapIndex);
+      swapGroupId  = null;    // let the sheet lead with the tapped exercise's own area
+      swapShowAll  = false;
+      swapExpanded = false;
       rerender();
     });
   });
 
-  // Candidate checkbox toggles (05 Aug 2026) -- client-side guard: warmup
-  // can't be fully unchecked. session-builder.js enforces the same rule
-  // server-side as a hard floor regardless -- this is about good in-the-
-  // moment feedback, not the only thing standing between a user and a
-  // warmup-free session.
-  document.querySelectorAll(".sb-candidate-check").forEach(cb => {
-    cb.addEventListener("change", () => {
-      const id      = cb.dataset.candidate;
-      const section = cb.dataset.section;
+  document.getElementById("sb-swap-close-btn")?.addEventListener("click", () => {
+    swapIndex = null;
+    rerender();
+  });
 
-      if (section === "warmup" && !cb.checked) {
-        const stillChecked = Array.from(document.querySelectorAll('.sb-candidate-check[data-section="warmup"]:checked'));
-        if (stillChecked.length === 0) {
-          cb.checked = true; // revert -- at least one warmup item must stay selected
-          return;
-        }
-      }
-
-      const label = document.querySelector(`.sb-candidate-label[data-candidate="${id}"]`);
-      if (label) label.style.borderColor = cb.checked ? "var(--color-primary)" : "transparent";
-
-      if (cb.checked) selectedCandidateIds.add(id);
-      else             selectedCandidateIds.delete(id);
+  document.querySelectorAll("[data-swap-group]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      swapGroupId  = btn.dataset.swapGroup;
+      swapShowAll  = false;
+      swapExpanded = false;
+      rerender();
     });
   });
 
-  document.getElementById("sb-candidate-build-btn")?.addEventListener("click", () => {
-    triggerCandidateBuild();
+  document.getElementById("sb-swap-all-btn")?.addEventListener("click", () => {
+    swapShowAll  = !swapShowAll;
+    swapExpanded = false;
+    rerender();
+  });
+
+  document.getElementById("sb-swap-expand-btn")?.addEventListener("click", () => {
+    swapExpanded = true;
+    rerender();
+  });
+
+  document.querySelectorAll("[data-swap-to]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      // aria-disabled is not enforced by the browser, so it is enforced
+      // here. The option stays focusable and its reason stays readable;
+      // it simply does not act. A control that looks unavailable and
+      // then works anyway is worse than either.
+      if (btn.getAttribute("aria-disabled") === "true") return;
+
+      const target  = builtSession?.exercises?.[swapIndex];
+      if (!target) return;
+      // Read from the pool, never rebuild. This is the whole safety
+      // property: the replacement has already passed every filter the
+      // session itself passed, because it came out of the same pool.
+      const chosen = (candidatePools?.[target.section] || [])
+        .find(e => e.id === btn.dataset.swapTo);
+      if (!chosen) return;
+
+      builtSession = swapExerciseInSession(builtSession, swapIndex, chosen);
+      persistBuiltSession();
+      swapIndex = null;
+      rerender();
+    });
   });
 
   // Let's go
