@@ -467,6 +467,42 @@ check("13e. no zone offered today is withdrawn by the change", () => {
   }
 });
 
+console.log("\nTEST 14 - the coach marks only what it was told today");
+
+check("14a. sore zones come from today's check-in, not the standing list", () => {
+  const ui = read("js/views/session-builder-ui.js");
+  const at = ui.indexOf("const soreAreas");
+  ok(at > -1, "no sore-zone marking");
+  const body = ui.slice(Math.max(0, at - 300), at + 200);
+  ok(/conditionPainScores/.test(body),
+     "sore zones are read from `conditions`, the STANDING list of everything somebody " +
+     "lives with. On device that marked four zones when two were reported. It is the coach " +
+     "claiming an input it did not use.");
+  ok(!/new Set\(store\.get\("conditions"\)/.test(body),
+     "the standing conditions list is still the source");
+});
+
+check("14b. an arc cannot have covered anything before it started", () => {
+  const today = read("js/views/today.js");
+  const at = today.indexOf("lit:");
+  ok(at > -1, "strands are never lit");
+  const body = today.slice(at, at + 400);
+  ok(/arc\.startedAt/.test(body),
+     "strand coverage counts sessions from before the arc existed. On device a brand-new " +
+     "arc showed a strand already lit, which robs day one of the only thing that makes it " +
+     "worth seeing: everything still ahead.");
+});
+
+check("14c. the arc goes back where it came from", () => {
+  const arc = read("js/views/stretch-arc.js");
+  const at = arc.indexOf('"#sa-back-btn"');
+  ok(at > -1, "no back control");
+  const body = arc.slice(at, at + 400);
+  ok(/navigate\("today"/.test(body),
+     "the arc's Back still points at Mobility & Conditioning, where it lived before " +
+     "LOBBY-1b moved it to Home — so there is no way home except starting a session");
+});
+
 console.log(fails === 0
   ? "\nSECTION-RULES: all assertions pass\n"
   : "\nSECTION-RULES: " + fails + " FAILED\n");
