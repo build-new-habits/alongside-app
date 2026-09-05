@@ -1,43 +1,4 @@
 # Alongside: Move — Master Schedule
-## 05 Sep 2026 v272
-
-Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v271.md`. Remove v271 on upload.
-
-> ### 🟢 TIER-HOME — DEPLOYED 05 Sep 2026, `alongside-v436`. 102 gates.
->
-> **Free and Plan are now different screens.** Decided 3 Sep, unbuilt until now — Graeme's device test showed both tiers rendering an identical Home, **which is the one thing this design said it must never be.**
->
-> #### ⚫ Free is not Plan with a panel swapped
->
-> **Free:** *"What do you want to do today?"*, the picks grouped under **Move your body** and **Settle your mind**, and a *"Not sure? I'll pick something"* fallback. **Plan:** the arc, then the invitation.
->
-> **Free is not given a diminished suggestion — it is given something complete on its own terms.** That is also the honest arrangement: the coach genuinely knows little about a free user between sessions, so a confident suggestion built on that would be the same lie the onboarding goals were.
->
-> **STRUCTURE IS THE FREE PRODUCT.** Nobody holds the thread for a free user, so the territory must be legible to them. That is why the taxonomy is visible on free and hidden on Plan — the "coach weaves body and mind" argument only holds where there IS a coach doing the weaving.
->
-> #### 🔴 A rule narrowed, on the record
->
-> **LOBBY-1c asserted no session tiles on Home at all.** TIER-HOME reverses that for free, deliberately: with no coach holding the thread, **the picks ARE the product.** Assertion 10a now tests Plan's Home only, and still fails if tiles reappear there — the original property is unchanged where it applies.
->
-> #### 🟢 Details the gates hold
->
-> **Grouped by heading, not by door** — Graeme, 3 Sep: *"I'm worried we might have too many doors going into other doors."* Headings give the territory shape while everything stays on one screen, so the depth rule holds. **The fallback is honest**: *"I'll go on how you're doing today"*, not *"here's your plan"* — with no arc that is exactly what the coach has. It is the same route Plan's invitation takes, **named as an offer instead of a confession** (it spent months as the eighth tile, *"Unsure? Coach decides"*). **Wellbeing is de-duplicated on free**, since it is promoted into Settle your mind.
->
-> #### ⚠️ Three weak assertions, caught by reversal
->
-> Matching `today-group-label` **once** passed with a group deleted, because the other still matched — now counted. The fallback-wording test passed a rewritten note because **the button's aria-label carried the same words** — now anchored on the note itself. And `verify-css` caught `today-door--pick`, **a modifier introduced with no rule**, which renders as unstyled text and errors nowhere.
->
-> #### 📋 Rows
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **TIER-HOME** | Free and Plan Home are different screens | 🟢 Shipped `alongside-v436`, untested on device | 05 Sep 2026 |
-> | **SUGGEST-1** | Provisional suggestion before check-in, visible revision. **The last piece of the arc experience** | 🔵 Next | w/c 5 Sep |
-> | **GOALS-MIGRATE** · **INSTEP-TIER** · **NARROWING-Q** | See previous entries | 🔵 Queued | w/c 5 Sep |
-
----
-
 ## 05 Sep 2026 v271
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.

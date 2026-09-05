@@ -63,7 +63,9 @@ check("2. rows render from the tag, not a hardcoded list", () => {
   // tiles moved behind the check-in, which is a stronger version of the
   // same rule and is asserted by 10a. What remains is the reference
   // half, which still has to read the tag rather than name doors.
-  ok(/HOME_DOORS\.filter\(d => d\.kind === 'reference'\)/.test(today),
+  // The filter gained a tier clause for the Wellbeing de-duplication,
+  // so match the kind test rather than the whole expression.
+  ok(/HOME_DOORS\.filter\(d => d\.kind === 'reference'/.test(today),
      "the reference rows do not filter by kind");
   ok(!/today-ref-row[\s\S]{0,400}?'library'/.test(today),
      "the rows name specific doors instead of reading the tag");
@@ -218,13 +220,21 @@ check("9. the aim replaces the goal list", () => {
 
 console.log("\nTEST 10 - LOBBY-1c: the lobby holds no sessions");
 
-check("10a. session tiles have left Home", () => {
-  ok(!/class="today-doors"/.test(today),
-     "the session tile grid is still on Home. The lobby rule: anything that starts a " +
-     "movement session lives beyond the check-in.");
-  ok(!/today-programme-row"/.test(today),
-     "the My Programme row is back. It read \"your goals and where you are up to\" directly " +
-     "beneath the arc panel, which says both with the actual aim in it.");
+check("10a. session tiles have left PLAN's Home", () => {
+  // NARROWED, 05 Sep 2026. LOBBY-1c asserted no session tiles on Home
+  // at all. TIER-HOME reverses that for FREE, deliberately: a free user
+  // has no coach holding the thread, so the territory must be legible
+  // to them and the picks ARE the product. On Plan the coach holds it,
+  // and the tiles stay behind the check-in where LOBBY-1c put them.
+  //
+  // The original property is unchanged where it applies -- Plan's Home
+  // is still an arc and an invitation, nothing else.
+  const at = today.indexOf("${isPremium() ? arcPanel()");
+  ok(at > -1, "Home no longer branches on tier");
+  const planBlock = today.slice(at, today.indexOf("freeChooser()", at));
+  ok(!/today-doors/.test(planBlock),
+     "Plan's Home renders session tiles again. The suggestion is what leads there; the " +
+     "tiles live behind the check-in.");
 });
 
 check("10b. one invitation, and it names the price of entry", () => {
@@ -277,6 +287,65 @@ check("11. sessions are reachable, below the suggestion", () => {
   ok(label > -1, "no escape label");
   ok(start === -1 || label > cp.indexOf("cp-acknowledgement"),
      "the escape renders above the coach's suggestion, which makes it a menu again");
+});
+
+console.log("\nTEST 11 - TIER-HOME: free and Plan are different screens");
+
+check("11a. Home branches on tier at all", () => {
+  // Decided 3 Sep and unbuilt until 5 Sep: both tiers rendered an
+  // identical Home, which is the one thing the design said it must
+  // never be. Free is not Plan with a panel swapped.
+  ok(/isPremium\(\) \? arcPanel\(\)/.test(today),
+     "the arc panel renders on both tiers, so free is Plan with a panel swapped");
+  ok(/isPremium\(\) \? `[\s\S]{0,400}?today-invite[\s\S]{0,400}?` : freeChooser\(\)/.test(today),
+     "both tiers get the same call to action");
+});
+
+check("11b. free is given a question and the controls", () => {
+  ok(/function freeChooser/.test(today), "there is no free chooser");
+  const at = today.indexOf("function freeChooser");
+  const body = today.slice(at, today.indexOf("function arcPanel", at));
+  ok(/What do you want to do today\?/.test(body),
+     "free is never asked what it wants — which is the whole free product");
+  // BOTH groups, counted. Matching the class once passed with a group
+  // deleted, because the other one still matched.
+  const groups = (body.match(/today-group-label/g) || []).length;
+  ok(groups >= 2,
+     `${groups} group heading(s). The picks need both \u2014 structure IS the free product: ` +
+     `nobody holds the thread for a free user, so the territory has to be legible to them.`);
+});
+
+check("11c. free gets the coach-picks fallback, named as an offer", () => {
+  const at = today.indexOf("function freeChooser");
+  const body = today.slice(at, today.indexOf("function arcPanel", at));
+  ok(/today-unsure/.test(body), "free has no coach-picks fallback");
+  ok(!/Unsure\?\s*Coach decides/.test(body),
+     "the fallback is still named as a confession of indecision rather than an offer");
+  // Anchor on the NOTE the person reads, not anywhere in the block: the
+  // button's aria-label carries the same words, so a rewritten note
+  // still passed.
+  const note = (body.match(/today-invite__note">([^<]*)</) || [])[1] || "";
+  ok(/go on how you're doing today/.test(note),
+     "the fallback overstates what the coach knows. With no arc it genuinely is going on " +
+     "today only, and saying otherwise is the lie the onboarding goals were.");
+});
+
+check("11d. the offer is above the reference rows on free", () => {
+  const at   = today.indexOf("function freeChooser");
+  const body = today.slice(at, today.indexOf("function arcPanel", at));
+  ok(/arcPanel\(\)/.test(body),
+     "free never sees the arc offer, so the product is never mentioned to the people who " +
+     "might buy it");
+  const chooserAt = today.indexOf("freeChooser()");
+  const refAt     = today.indexOf("today-reference");
+  ok(chooserAt > -1 && refAt > -1 && chooserAt < refAt,
+     "the chooser renders below the reference rows");
+});
+
+check("11e. Wellbeing is not duplicated on free", () => {
+  ok(/!isPremium\(\) && d\.id === 'wellbeing'/.test(today),
+     "Wellbeing appears both as a free pick and as a reference row — the duplication this " +
+     "screen exists to remove");
 });
 
 console.log(fails === 0
