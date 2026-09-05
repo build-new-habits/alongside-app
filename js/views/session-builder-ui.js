@@ -559,7 +559,15 @@ function renderZonePicker() {
     zones.filter(z => z.areas.some(a => soreAreas.has(a))).map(z => z.id)
   );
 
-  const arc     = store.get("stretchArc") || {};
+  // ARC-RENAME REGRESSION, 04 Sep 2026. This read store.get("stretchArc")
+  // at HEAD, and that field stopped existing in store.js v63 -- it was
+  // renamed to `arc`. So the lookup returned {}, arc.active was falsy,
+  // and the "hasn't come up yet" line could never appear. Silent: no
+  // error, no red gate, just a feature quietly doing nothing.
+  //
+  // Caused by two edits to this file from clones either side of the
+  // rename. Assertion 5e now fails if the dead name comes back.
+  const arc     = store.get("arc") || {};
   const missing = arc.active
     ? store.zonesNotRecentlyWorked(available, 2)
         .filter(id => !selectedZones.includes(id))
