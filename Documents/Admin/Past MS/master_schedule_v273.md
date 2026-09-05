@@ -1,35 +1,4 @@
 # Alongside: Move — Master Schedule
-## 05 Sep 2026 v274
-
-Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v273.md`. Remove v273 on upload.
-
-> ### 🔵 SWAP-1 DECIDED AND SPECCED · SESSION HANDOFF WRITTEN
->
-> `Documents/Admin/alongside_swap1_spec_05sep2026_v2.docx` (v1 removed) · `Documents/Admin/alongside_session_start_05sep2026_v1.md`
->
-> #### ⚫ Four decisions, all closed
->
-> **1. Marked when sore, unselectable when safety-linked.** Above 0 is marked — hard red, contrast-checked, reason in words. **7 or above is unselectable**, and 7 is not a new number: it is where `getActiveConditionIds` already switches to acute-safe variants, so this is one threshold with two expressions rather than a third to keep in sync. Bands: none 0–2, mild 3–5, moderate 6–7, severe 8–10. **At 8 the picker is never reached** — Gentle Care fires first.
->
-> **2. The flat picker goes. Athlete self-build does NOT.** 🔴 Two different things, and conflating them would have been a real error — caught by Graeme, not by the spec. What is deleted is the ninety-item list in the DAILY flow. What survives is somebody authoring and saving their own routine: his daughter is a national-standard sprinter who writes her programme on paper and wants exactly that. **Recorded explicitly so nobody later reads "we deleted build-your-own" and concludes the athlete case died with it.**
->
-> **3. Like for like, one for one.** Trading a warm-up slot for a main one was considered and dropped: the SHAPE of a session is what duration and the split preset control, and a second mechanism arguing with them is how two selection loops happened.
->
-> **4. A swap replaces one exercise; nothing else moves.** Rebuilding would let the coach rebalance, but somebody would change one thing and watch four others shift — the "it decided for me" feeling this product exists to avoid. Revisit if real use suggests otherwise.
->
-> #### 🟢 The handoff exists so the next session does not restart
->
-> A lost response on 4 September cost a round trip: work was pushed, the reply never arrived, and the next session found commits it did not recognise. The handoff therefore requires **reading the commit log, not only the schedule** — the schedule is written at session close, so a lost response means it may never be written at all.
->
-> It also carries the standing lessons the code cannot: reversal-prove every assertion · anchor on the most specific string (ten assertions measured the wrong region this week) · rank, don't filter · watch for readers without writers · trace rather than reason.
->
-> #### 📋 Next session
->
-> **Build SWAP-1.** All four questions are decided; do not reopen them. Then VARIETY-Q, which likely resolves with it.
-
----
-
 ## 05 Sep 2026 v273
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
