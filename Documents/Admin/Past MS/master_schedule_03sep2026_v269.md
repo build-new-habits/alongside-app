@@ -1,33 +1,4 @@
 # Alongside: Move — Master Schedule
-## 04 Sep 2026 v270
-
-Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_03sep2026_v269.md`. Remove v269 on upload.
-
-> ### 🔴 ARC-RENAME REGRESSION — FIXED, `alongside-v435`. And a session-continuity lesson.
->
-> #### What happened
->
-> A build session completed LOBBY-1c and pushed it, but **the response never reached Graeme** — he saw a failure message and restarted. The next session had no record of doing the work, found commits in the repo it did not recognise, and stopped rather than writing over them. **Stopping was correct**, but it cost a round trip.
->
-> #### 🔴 The regression the collision left behind
->
-> `session-builder-ui.js` was reading `store.get("stretchArc")`. **That field stopped existing in `store.js` v63**, where it was renamed to `arc`. The read returned `{}`, `arc.active` was falsy, and the arc's *"hasn't come up yet"* line could never appear.
->
-> **Silent: no error, no red gate, the feature simply did nothing** — the same shape as the reader-without-a-writer that made ARC-1 inert. Two edits to one file from clones either side of a rename.
->
-> **Assertion 5e** now walks the whole tree and fails if any view reads `store.get("stretchArc")`. Reversal-proven.
->
-> #### ⚠️ Date discipline, fourth occurrence
->
-> Today is **4 September**. Headers written earlier in the session say 3 Sep. Git timestamps are correct. **The rule stands and is being broken: check the clock immediately before writing any header, every time.**
->
-> #### 📋 Standing lesson
->
-> **A pushed commit is ground truth even when the session that made it has no memory of it.** Session start already requires a fresh clone; it should also require reading the last few commit messages, not just the schedule — the schedule is written at session close and a lost response means it may never be.
-
----
-
 ## 03 Sep 2026 v269
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
