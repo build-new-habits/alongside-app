@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 05 Sep 2026 v438
+ *
+ * v438 - SWAP-1. The candidate picker is gone from the daily flow; the
+ *   preview leads and swaps sit behind it, by body area, from the pool
+ *   the session was built from. NO NEW FILES: session-builder.js v44,
+ *   session-builder-ui.js v13 and session-shared.css v7, all three
+ *   already precached. Cache bumped so the deleted picker cannot
+ *   survive on a stale install.
+ *
  * 05 Sep 2026 v437
  *
  * v437 - TRUTHFULNESS. Three fixes: sore zones read today's check-in
@@ -3018,7 +3027,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v437";
+const CACHE_NAME = "alongside-v438";
 
 const SHELL_URLS = [
 
