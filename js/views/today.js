@@ -665,7 +665,29 @@ export function TodayView(router) {
              The panel says what the arc is FOR and what has not come up
              yet. It never says what has been done, and never how much:
              see verify-arc2's assertions on this. -->
-        ${arcPanel()}
+        <!-- TIER-HOME, 05 Sep 2026. FREE AND PLAN ARE DIFFERENT VERBS.
+             Decided 3 Sep and not built until now: Home looked identical
+             on both tiers, which is the one thing this design said it
+             must never be.
+
+             Free is "you decide, I'll handle it" -- the question, the
+             groups, and a coach-picks fallback. Plan is "I've been
+             thinking, here's what I'd do" -- the arc, then the
+             invitation.
+
+             This is not one screen with a panel swapped. Free is not
+             given a diminished suggestion; it is given something
+             complete on its own terms, and that is also the honest
+             arrangement -- the coach genuinely knows little about a free
+             user between sessions, so a confident suggestion built on
+             that would be the same lie the onboarding goals were.
+
+             STRUCTURE IS THE FREE PRODUCT. Nobody holds the thread for a
+             free user, so the territory has to be legible to them. That
+             is why the taxonomy is visible here and hidden on Plan: the
+             "coach weaves body and mind" argument only holds where there
+             IS a coach doing the weaving. -->
+        ${isPremium() ? arcPanel() : ''}
 
         <!-- MY PROGRAMME ROW REMOVED, LOBBY-1c, 03 Sep 2026.
              It read "Your goals and where you are up to" and sat
@@ -689,15 +711,21 @@ export function TodayView(router) {
 
              The invitation states the price of entry, so the check-in
              is consented to rather than sprung. -->
-        <button class="btn btn-primary btn-large btn-full today-invite"
-                data-action="start-today"
-                aria-label="Start today. I'll ask how you're doing first">
-          Start today
-        </button>
-        <p class="today-invite__note">I'll ask how you're doing first</p>
+        ${isPremium() ? `
+          <button class="btn btn-primary btn-large btn-full today-invite"
+                  data-action="start-today"
+                  aria-label="Start today. I'll ask how you're doing first">
+            Start today
+          </button>
+          <p class="today-invite__note">I'll ask how you're doing first</p>
+        ` : freeChooser()}
 
         <div class="today-reference" role="group" aria-label="Reference and settings">
-          ${HOME_DOORS.filter(d => d.kind === 'reference').map(d => `
+          <!-- On free, Wellbeing is promoted into "Settle your mind"
+               above, so repeating it here would be the duplication this
+               screen exists to remove. On Plan it stays a reference row,
+               because Plan's Home has no picker to promote it into. -->
+          ${HOME_DOORS.filter(d => d.kind === 'reference' && !(!isPremium() && d.id === 'wellbeing')).map(d => `
             <button class="today-ref-row"
                     data-route="${d.route}"
                     data-door-id="${d.id}"
@@ -1166,6 +1194,64 @@ export function TodayView(router) {
    * privacy links live, so the eye files anything there as boilerplate
    * and skips it -- Graeme's observation, and he was right.
    */
+  /**
+   * TIER-HOME. The free Home: the coach asking, and the person choosing.
+   *
+   * GROUPED BY HEADING, NOT BY DOOR. Graeme, 3 Sep: "I'm worried we
+   * might have too many doors going into other doors." Headings give the
+   * territory shape -- somebody's mum can find mobility without knowing
+   * we filed it under anything -- while everything stays on one screen.
+   * The depth rule holds: at most one screen before you are moving.
+   *
+   * THE FALLBACK IS HONEST. "I'll go on how you're doing today" rather
+   * than "here's your plan", because with no arc that is exactly what
+   * the coach has. It is the same route Plan's invitation takes, named
+   * as an offer instead of a confession -- it used to be the eighth
+   * tile, labelled "Unsure? Coach decides".
+   *
+   * THE OFFER SITS ABOVE THE REFERENCE ROWS. Below Settings is where
+   * terms and privacy links live, so the eye files anything there as
+   * boilerplate and skips it.
+   */
+  function freeChooser() {
+    const move = HOME_DOORS.filter(d => d.kind === 'session' && d.id !== 'unsure');
+    const mind = HOME_DOORS.filter(d => d.id === 'wellbeing');
+
+    const tile = d => `
+      <button class="today-door today-door--pick"
+              data-route="${d.route}"
+              data-door-id="${d.id}"
+              data-requires-checkin="${d.requiresCheckin}"
+              aria-label="${_esc(d.label)}">
+        <span class="today-door__icon" aria-hidden="true">${d.icon}</span>
+        <span class="today-door__label">${_esc(d.label)}</span>
+      </button>`;
+
+    return `
+      <p class="today-chooser-q">What do you want to do today?</p>
+
+      <p class="today-group-label" id="today-group-body">Move your body</p>
+      <div class="today-doors" role="group" aria-labelledby="today-group-body">
+        ${move.map(tile).join('')}
+      </div>
+
+      ${mind.length ? `
+        <p class="today-group-label" id="today-group-mind">Settle your mind</p>
+        <div class="today-doors" role="group" aria-labelledby="today-group-mind">
+          ${mind.map(tile).join('')}
+        </div>
+      ` : ''}
+
+      <button class="btn btn-ghost btn-full today-unsure"
+              data-action="start-today"
+              aria-label="Not sure — I'll pick something, going on how you're doing today">
+        Not sure? I'll pick something
+      </button>
+      <p class="today-invite__note">I'll go on how you're doing today</p>
+
+      ${arcPanel()}`;
+  }
+
   function arcPanel() {
     const arc = store.get('arc') || {};
 
