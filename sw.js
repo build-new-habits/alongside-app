@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 05 Sep 2026 v437
+ *
+ * v437 - TRUTHFULNESS. Three fixes: sore zones read today's check-in
+ *   rather than the standing conditions list; arc coverage starts when
+ *   the arc does; the arc's Back returns to Home. No new files.
+ *
  * 05 Sep 2026 v436
  *
  * v436 - TIER-HOME. Free and Plan Home become different screens. No
@@ -3012,7 +3018,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v436";
+const CACHE_NAME = "alongside-v437";
 
 const SHELL_URLS = [
 
