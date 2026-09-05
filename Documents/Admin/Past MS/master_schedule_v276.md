@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 05 Sep 2026 v277
+## 05 Sep 2026 v276
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v276.md`. Remove v276 on upload.
+Supersedes `master_schedule_v275.md`. Remove v275 on upload.
 
 > ### ⚫ FIVE DECISIONS TAKEN, 05 Sep 2026 — Graeme accepted all five recommendations
 >
@@ -18,22 +18,6 @@ Supersedes `master_schedule_v276.md`. Remove v276 on upload.
 >
 > ⚠️ **BIGGER THAN A SCREEN DELETION.** `buildSessionFromSelection()` has exactly ONE live caller and `recommended` has exactly ONE reader — both the recommend route. Deleting it orphans an ~80-line exported builder containing the hard warm-up floor, and turns `recommended` into a field written and never read: the mirror of the reader-without-a-writer fault. This is a deliberate retirement needing its own gate, not a side effect. And it changes stretch behaviour for every user.
 >
-> #### 1b. AMENDED SAME DAY — RETIRE, DO NOT DELETE. Graeme, 05 Sep.
->
-> The screen goes. `buildSessionFromSelection()` and `recommended` **stay in the codebase**, out of the daily flow.
->
-> **Graeme's reason, which Claude did not have:** athlete self-build is coming and is not optional — somebody authoring their own routine across **stretch, mobility conditioning and exercise programmes**. Deleting a working selection-from-chosen-ids builder and the flag that feeds it would throw away the closest existing thing to that feature, weeks before it is needed.
->
-> ⚠️ **THE COST, NAMED RATHER THAN WAVED THROUGH.** `session-builder-ui.js` v12 argues the opposite in its own header: it deleted an unused paywall import rather than leaving it, because *"an unused paywall import is a working example somebody copies, and it leaves the gate unable to tell a live gate from a dead one."* Retiring reintroduces exactly that risk.
->
-> 🟢 **THE RESOLUTION: THE RETIREMENT IS ENFORCED, NOT HOPED.** A gate assertion holds `buildSessionFromSelection()` and `recommended` at **ZERO callers in the daily flow**. Retired becomes a fact the suite checks rather than a comment nobody reads. Three consequences, all wanted:
->
-> - A future session quietly rewiring either back into the daily flow goes RED.
-> - `recommended` stops being a writer-without-a-reader by accident and becomes one **on purpose, with a gate saying so** — the distinction the reader-without-a-writer failures have all turned on.
-> - When athlete self-build legitimately calls them, updating that gate is the deliberate moment to record why, rather than a silent rewiring nobody notices.
->
-> **Claude's caution and Graeme's answer, both recorded.** The v276 note warned that five-for-five agreement might be framing rather than argument. Graeme, 05 Sep: the agreement was reasoned from the athlete roadmap and from knowing these constraints are workable — knowledge Claude did not hold. **The process note stands (consequences should be surfaced before agreement, not after) and the conclusion it questioned does not need revising.**
-
 > #### 2. DUPE-SECTION: MAIN CLAIMS FIRST.
 >
 > Reframed: the fix is not "delete a copy", it is "once an id is taken, the next section skips it and picks its NEXT candidate" — so no section loses a slot. The only real question is claim order, and the evidence settles it: on an upper-body session at shoulder 7 the main pool held **9** candidates against warm-up's **39**. A warm-up taking a scarce main-eligible entry starves the constrained section; warm-up absorbs the loss easily.
@@ -6890,4 +6874,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v277*
+*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v276*
