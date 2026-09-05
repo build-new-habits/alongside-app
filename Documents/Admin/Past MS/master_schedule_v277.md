@@ -1,32 +1,8 @@
 # Alongside: Move — Master Schedule
-## 05 Sep 2026 v278
+## 05 Sep 2026 v277
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v277.md`. Remove v277 on upload.
-
-> ### 🟢 DUPE-SECTION — SHIPPED 05 Sep 2026. `alongside-v439`, 104 gates.
->
-> One exercise, one appearance. `session-builder.js` **v45**, gate `tools/verify-dupesection.mjs` **v1** (199 assertions).
->
-> **The fault, measured before the fix.** `buildSessionFromSelection()` filtered each section against the selected ids independently, so an exercise matching two sections' categories satisfied both and was placed twice.
->
-> | | entries | duplicates | distinct |
-> |---|---|---|---|
-> | stretch/60 | 28 | **13 (46%)** | 15 |
-> | mobility/60 | 24 | 11 | 13 |
-> | mobility/15 | 8 | 4 (Hip Flexor Stretch **three times**) | 4 |
->
-> **28 of 32 type × duration combinations affected.** Stretch and mobility worst — and STRETCH-FLOW hardcoded stretch onto this exact builder on 2 Sep, so the worst case in the app was also the one path reaching it automatically.
->
-> **`buildSession()` was clean: 0 of 256 builds.** It has carried `alreadyChosen` across all three sections since it was written, and says why at line 3157: *"a duplicate between warmup and main is just as wrong as one within a section."* **The rule was written, stated, and never applied to the second function** — the same shape as ARC-3. The fault was one policy living in two places, one of which only implied it.
->
-> **Nothing was lost.** Post-fix distinct counts equal pre-fix distinct counts exactly (15, 13, 4). The person was always doing 15 stretches; they were shown some of them three times and told it would take an hour. Gate assertion 9b proves no selected exercise was dropped.
->
-> **🟠 One correction to the ruling, on measurement.** Main-claims-first is applied to `buildSessionFromSelection()` ONLY. Measured over 280 builds with a constrained persona (shoulder 7, hip 6), reordering `buildSession()` moves main slot fill from **6.31 to 6.32** and never prevented a short session. Reordering it would change every coach-built session in the app for a hundredth of an exercise. Gate 6b-i holds that decision and demands the measurement be re-run if anyone changes it.
->
-> **Reversal proving: 8 deliberate breaks, 7 caught red.** The eighth — seeding `claimed` with prescribed ids — is **not independently reachable today** and the gate says so plainly rather than implying otherwise. One fixture was found vacuous mid-session (the warm-up floor tested on stretch/45, where warm-up candidate [0] simply was not one main had taken) and moved to glute/45, where it is. **Seventh recorded instance of a fixture not reaching the branch it named.**
->
-> **Also fixed:** the warm-up safety floor took candidate `[0]` unconditionally and could hand back an exercise main had already claimed — the floor creating the very fault the function now forbids.
+Supersedes `master_schedule_v276.md`. Remove v276 on upload.
 
 > ### ⚫ FIVE DECISIONS TAKEN, 05 Sep 2026 — Graeme accepted all five recommendations
 >
@@ -6914,4 +6890,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v278*
+*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v277*

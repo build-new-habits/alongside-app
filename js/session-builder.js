@@ -1,6 +1,20 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 05 Sep 2026 v45
+ *   DUPE-SECTION. One exercise, one appearance.
+ *   buildSessionFromSelection() filtered each section against the
+ *   selected ids INDEPENDENTLY, so an exercise matching two sections'
+ *   categories was placed twice. Measured before the fix: 28 of 32
+ *   type x duration combinations affected, worst stretch/60 at 13
+ *   duplicates in 28 entries, and mobility/15 showing Hip Flexor
+ *   Stretch three times in eight. buildSession() never had the fault
+ *   -- it has carried alreadyChosen across all three sections since it
+ *   was written. The rule was stated in one function and never applied
+ *   to the other. Main claims first HERE only; buildSession()'s order
+ *   is unchanged on measurement (6.31 vs 6.32 main slots over 280
+ *   constrained builds). Gate: tools/verify-dupesection.mjs.
+ *
  * 05 Sep 2026 v44
  *   SWAP-1 (engine half). The grouping vocabulary, the soreness levels
  *   and the one-for-one replacement. The UI half is in
@@ -2400,22 +2414,6 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
   const conditionSet   = buildActiveConditionSet();
   const idSet          = new Set(selectedIds || []);
 
-  function chosenFrom(categories, section) {
-    return _filterCandidates(categories, section, equipSet, conditionSet, type.sectionRules?.[section])
-      .filter(ex => idSet.has(ex.id));
-  }
-
-  let warmupExercises   = chosenFrom(type.warmupCategories,   "warmup");
-  const mainExercises     = chosenFrom(type.mainCategories,     "main");
-  const cooldownExercises = chosenFrom(type.cooldownCategories, "cooldown");
-
-  // Safety floor — never ship a session with zero warmup, regardless
-  // of what was (or wasn't) selected.
-  if (warmupExercises.length === 0) {
-    const fallback = _filterCandidates(type.warmupCategories, "warmup", equipSet, conditionSet, type.sectionRules?.warmup)[0];
-    if (fallback) warmupExercises = [fallback];
-  }
-
   const prescribed = (store.get("prescribedExercises") || [])
     .filter(ex => ex.active !== false)
     .map(ex => ({
@@ -2427,6 +2425,71 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
       youtube: null, equipment: [], contraindications: [], difficultyLevel: 1,
       isPrescribed: true, prescribedBy: ex.prescribedBy || null
     }));
+
+  // DUPE-SECTION, 05 Sep 2026. ONE EXERCISE, ONE APPEARANCE.
+  //
+  // Each section used to filter the selected ids INDEPENDENTLY, so an
+  // exercise matching two sections' categories satisfied both filters
+  // and was placed twice. Hip Flexor Stretch is a warm-up mobility
+  // entry AND a cool-down stretch; Inchworm is all three. Measured
+  // before the fix: 28 of 32 type x duration combinations affected,
+  // worst stretch/60 at 13 duplicates in 28 exercises, and mobility/15
+  // showing Hip Flexor Stretch three times in eight.
+  //
+  // This is NOT a new rule. buildSession() has carried `alreadyChosen`
+  // across all three sections since it was written, and says why:
+  // "a duplicate between warmup and main is just as wrong as one within
+  // a section." The rule was stated and never applied here. Same shape
+  // as ARC-3 -- the fault was one policy living in two places, one of
+  // which only implied it.
+  //
+  // `claimed` is seeded with prescribed ids so a specialist's
+  // instruction is never also shown as an engine pick.
+  const claimed = new Set(prescribed.map(ex => ex.id).filter(Boolean));
+
+  function chosenFrom(categories, section) {
+    const picked = _filterCandidates(categories, section, equipSet, conditionSet, type.sectionRules?.[section])
+      .filter(ex => idSet.has(ex.id) && !claimed.has(ex.id));
+    picked.forEach(ex => claimed.add(ex.id));
+    return picked;
+  }
+
+  // MAIN CLAIMS FIRST, and only here.
+  //
+  // Main is the constrained section: on an upper-body session at
+  // shoulder 7 the main pool held 9 candidates against warm-up's 39, so
+  // a warm-up taking a scarce main-eligible entry starves the section
+  // that matters most while warm-up absorbs the loss easily.
+  //
+  // buildSession()'s order is deliberately NOT changed to match.
+  // Measured 05 Sep 2026 over 280 builds with a constrained persona:
+  // warm-up-first fills 6.31 main slots on average, main-first fills
+  // 6.32, and neither ever produced a short session. Reordering there
+  // would change every coach-built session in the app for a hundredth
+  // of an exercise. verify-dupesection section 6b holds that decision.
+  //
+  // Nothing is lost by claiming in this order. Sections here take EVERY
+  // selected id that passes their filter and _trimToDuration() sets the
+  // final length, so dropping a second copy leaves the trim more room
+  // for the person's other picks rather than shortening the session.
+  const mainExercises     = chosenFrom(type.mainCategories,     "main");
+  let   warmupExercises   = chosenFrom(type.warmupCategories,   "warmup");
+  const cooldownExercises = chosenFrom(type.cooldownCategories, "cooldown");
+
+  // Safety floor — never ship a session with zero warmup, regardless
+  // of what was (or wasn't) selected.
+  //
+  // This used to take candidate [0] unconditionally, which could hand
+  // back an exercise main had already taken -- the floor creating the
+  // very duplicate the rest of this function now forbids.
+  if (warmupExercises.length === 0) {
+    const fallback = _filterCandidates(type.warmupCategories, "warmup", equipSet, conditionSet, type.sectionRules?.warmup)
+      .find(ex => !claimed.has(ex.id));
+    if (fallback) {
+      warmupExercises = [fallback];
+      claimed.add(fallback.id);
+    }
+  }
 
   // C4 trim. PRESCRIBED EXERCISES ARE NEVER TRIMMED and are never passed to
   // _trimToDuration() — this file's own rule is that "the engine never
