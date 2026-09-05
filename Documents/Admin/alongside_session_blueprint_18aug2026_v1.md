@@ -34,14 +34,14 @@ Ask Graeme only when you hit a genuine product or philosophy decision that secti
 
 ### Token
 
-Fine-grained GitHub PAT at `/mnt/project/Token_06_08_26_for_rapid_work_to_beta`.
+Fine-grained GitHub PAT at `/mnt/project/New_Token_-_End_4th_Oct`.
 
 **Expires 2026-09-05 07:56 UTC.** If the session is after that date, stop and tell Graeme — he must issue a new one before any push.
 
 Read it with whitespace stripped, then inject into the remote URL:
 
 ```bash
-TOKEN=$(head -1 /mnt/project/Token_06_08_26_for_rapid_work_to_beta | tr -d '\n\r ')
+TOKEN=$(head -1 /mnt/project/New_Token_-_End_4th_Oct | tr -d '\n\r ')
 git push "https://x-access-token:$TOKEN@github.com/build-new-habits/alongside-app.git" main
 ```
 

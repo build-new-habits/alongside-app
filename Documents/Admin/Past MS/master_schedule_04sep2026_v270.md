@@ -1,35 +1,4 @@
 # Alongside: Move — Master Schedule
-## 05 Sep 2026 v271
-
-Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_04sep2026_v270.md`. Remove v270 on upload.
-
-> ### 🟢 PAT ROTATED — the blocker is cleared
->
-> New token at `/mnt/project/New_Token_-_End_4th_Oct`, **valid to 4 October 2026**. Tested: clone succeeds, repo state confirmed at `alongside-v435`. The old token at `Token_06_08_26_for_rapid_work_to_beta` **expires today** and both session blueprints have been repointed, so a new session will not reach for the dead one.
->
-> #### ⚠️ Date discipline — fifth occurrence, and the cause is now clear
->
-> Today is **Saturday 5 September**. Headers written hours earlier say 3 and 4 September. The cause is not forgetting the rule: it is **checking the clock once and then reasoning forward from that answer** instead of re-checking. A session that runs across a day boundary will always drift this way.
->
-> **The rule is unchanged and is what should actually happen: read the clock immediately before writing any header, every time, including the second and third file in the same batch.**
->
-> #### 📋 Where the build stands
->
-> `alongside-v435` · 102 gates · `store.js` v63 · `Schema.md` v1.45 · schedule v271
->
-> | ID | Task | Status | Target |
-> |---|---|---|---|
-> | **LOBBY-1c** | Home is a lobby: arc, invitation, reference rows. Session tiles behind the check-in | 🟢 Shipped, awaiting Graeme's device test | 4 Sep |
-> | **SITUATIONS** | 33 aims filtered by stored signals, escape to the full list | 🟢 Shipped, awaiting device test | 3 Sep |
-> | **SUGGEST-1** | Provisional suggestion before the check-in, with visible revision. **The last piece of the arc experience** | 🔵 Next | w/c 5 Sep |
-> | **GOALS-MIGRATE** | Remove goals from onboarding; twelve read sites | 🔵 Specced | w/c 5 Sep |
-> | **INSTEP-TIER** | In Step is Personal-tier in code, free in both per the 3 Sep decision | 🔴 Conflict | w/c 5 Sep |
-> | **NARROWING-Q** | Personas 2.15 and 2.16 are indistinguishable on stored data | 🟠 Design | w/c 5 Sep |
-> | **HMRC · ICO · A1.11 · domain · beta recruitment** | See the task list document | 🔴 Graeme | w/c 5 Sep |
-
----
-
 ## 04 Sep 2026 v270
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.

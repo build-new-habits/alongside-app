@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 04 Sep 2026 v28
+## 05 Sep 2026 v29
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -23,12 +23,12 @@ Build New Habits | Everything a chat with no memory needs to pick this up and bu
 
 ## 2. Access — token, repo, verification
 
-**Token:** `/mnt/project/Token_06_08_26_for_rapid_work_to_beta`, first line, strip whitespace. GitHub fine-grained PAT, ~7-day expiry. If pushes 403, it has expired — ask Graeme, do not work around it.
+**Token:** `/mnt/project/New_Token_-_End_4th_Oct`, first line, strip whitespace. GitHub fine-grained PAT. **Expires 4 October 2026.** The previous token expired 5 September; if a path in this document no longer exists, Graeme has rotated it and the new file is in `/mnt/project/`. If pushes 403, it has expired — ask Graeme, do not work around it.
 
 **Repos:** `build-new-habits/alongside-app` (the app) and `build-new-habits/website`. GitHub Pages.
 
 ```bash
-TOKEN=$(head -1 /mnt/project/Token_06_08_26_for_rapid_work_to_beta | tr -d '\n\r ')
+TOKEN=$(head -1 /mnt/project/New_Token_-_End_4th_Oct | tr -d '\n\r ')
 git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/alongside-app.git repo
 ```
 
