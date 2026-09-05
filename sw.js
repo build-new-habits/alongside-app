@@ -1,7 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 05 Sep 2026 v438
+ * 05 Sep 2026 v439
+ *
+ * v439 - DUPE-SECTION. One exercise, one appearance. No new files:
+ *   session-builder.js v45 dedupes across sections in the
+ *   self-directed builder, which had been placing an exercise twice
+ *   in 28 of 32 type x duration combinations. Cache bump only.
  *
  * v438 - SWAP-1. The candidate picker is gone from the daily flow; the
  *   preview leads and swaps sit behind it, by body area, from the pool
@@ -3027,7 +3032,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v438";
+const CACHE_NAME = "alongside-v439";
 
 const SHELL_URLS = [
 
