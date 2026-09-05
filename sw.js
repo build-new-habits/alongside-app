@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 04 Sep 2026 v435
+ *
+ * v435 - ARC-RENAME regression fix. session-builder-ui.js was reading
+ *   store.get("stretchArc"), a field store.js v63 renamed to "arc". It
+ *   returned {} silently, so the arc's uncovered-zone line could never
+ *   appear. No new files.
+ *
  * 03 Sep 2026 v434
  *
  * v434 - LOBBY-1c. The split. No new files; today.js, coach-proposal.js
@@ -3000,7 +3007,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v434";
+const CACHE_NAME = "alongside-v435";
 
 const SHELL_URLS = [
 
