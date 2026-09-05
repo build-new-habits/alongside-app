@@ -1,7 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 04 Sep 2026 v435
+ * 05 Sep 2026 v436
+ *
+ * v436 - TIER-HOME. Free and Plan Home become different screens. No
+ *   new files; today.js and today.css only.
+ *
+ * 05 Sep 2026 v435
  *
  * v435 - ARC-RENAME regression fix. session-builder-ui.js was reading
  *   store.get("stretchArc"), a field store.js v63 renamed to "arc". It
@@ -3007,7 +3012,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v435";
+const CACHE_NAME = "alongside-v436";
 
 const SHELL_URLS = [
 
