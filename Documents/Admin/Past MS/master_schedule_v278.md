@@ -1,20 +1,8 @@
 # Alongside: Move — Master Schedule
-## 05 Sep 2026 v279
+## 05 Sep 2026 v278
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v278.md`. Remove v278 on upload.
-
-> ### 🟡 SESSION B — SPECIFIED, NOT STARTED. Blueprint `alongside_blueprint_sessionB_05sep2026_v1.md`.
->
-> 🔴 **A COUPLING THAT WOULD HAVE BROKEN SWAP-1 SILENTLY.** `candidatePools` is populated in exactly ONE place — `triggerRecommendedBuild()`. The swap sheet reads it for every alternative it offers. `triggerBuild()`, the coach route, never populates it.
->
-> Retiring the recommend route without further change ships a preview where **every swap is dead**, for every session type, for every user. **No existing gate catches this**, because all 121 SWAP-1 assertions reach the sheet through the recommend route — they would stay green while the feature was gone.
->
-> First task in Session B is therefore: populate `candidatePools` from `triggerBuild()`, prove swapping works from the coach route, and only then remove anything.
->
-> **Session B was not started rather than half-shipped.** It rewires the daily flow's only entry to the swap system, adds removal with a new floor, rewrites the empty state and closes SORE-LEGEND — more than Session A, which took most of a session and was smaller. Rushing a UI change on the path every user walks, without a reversal-proven gate, is the failure mode this project exists to avoid.
->
-> ⚠️ **Still live and unfixed:** every stretch session ignores `exercisePreferences` and returns the same picks every time. DUPE-SECTION fixed the repetition on that route; it did not make it vary. That ends when stretch moves to `buildSession()` in Session B.
+Supersedes `master_schedule_v277.md`. Remove v277 on upload.
 
 > ### 🟢 DUPE-SECTION — SHIPPED 05 Sep 2026. `alongside-v439`, 104 gates.
 >
@@ -6926,4 +6914,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v279*
+*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v278*
