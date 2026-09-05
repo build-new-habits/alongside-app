@@ -1276,7 +1276,17 @@ export function TodayView(router) {
       // A strand counts as touched when any zone it leans on has been
       // worked. A date, never a count -- the strand is either lit or it
       // is not, which is a fact about the plan rather than a score.
-      lit: ((STRANDS[id] || {}).zones || []).some(z => worked[z])
+      // ARC-COVERAGE, 05 Sep 2026. This counted ANY dated zone, including
+      // sessions done before the arc existed. On device a brand-new arc
+      // showed "A back that copes" already lit, because a stretch two
+      // days earlier had touched lower-back.
+      //
+      // An arc cannot have covered something before it started. Borrowing
+      // history it did not earn is the same dishonesty as the sore-zone
+      // marking, and it also robs day one of the thing that makes it
+      // worth seeing: everything still ahead.
+      lit: ((STRANDS[id] || {}).zones || [])
+             .some(z => worked[z] && (!arc.startedAt || worked[z] >= arc.startedAt))
     })).filter(x => x.label);
 
     const notYet = strands.filter(x => !x.lit).map(x => x.label);

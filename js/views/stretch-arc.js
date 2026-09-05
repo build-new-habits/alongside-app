@@ -179,7 +179,12 @@ export function StretchArcView(router) {
     }
 
     container.querySelector("#sa-back-btn")?.addEventListener("click", () => {
-      router.navigate("mobility-conditioning");
+      // ARC-BACK, 05 Sep 2026. This went to Mobility & Conditioning,
+      // which is where the arc USED to live. LOBBY-1b moved it to Home
+      // and this was left pointing at the old parent, so Back sent
+      // people somewhere they had not come from and there was no way
+      // home except starting a session.
+      router.navigate("today", { fromBack: true });
     });
 
     container.querySelector("#sa-start-btn")?.addEventListener("click", () => {
