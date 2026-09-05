@@ -217,6 +217,20 @@ check("5d. the picker reads a field something actually writes", () => {
      "nothing writes `goals` any more either -- the arc has lost its input again");
 });
 
+check("5e. no view reads a store field that no longer exists", () => {
+  // store.js v63 renamed stretchArc -> arc. A view left reading the old
+  // name gets {} back: no error, no red gate, the feature just quietly
+  // stops. That shipped, and it is the same silent-failure shape as the
+  // reader-without-a-writer in 5d.
+  const files = [];
+  const walk = d => { for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+    if (f.isDirectory()) walk(`${d}/${f.name}`); else if (f.name.endsWith(".js")) files.push(`${d}/${f.name}`); } };
+  walk("js");
+  const dead = files.filter(f => !f.endsWith("store.js") && /get\(["']stretchArc["']\)/.test(read(f)));
+  ok(dead.length === 0,
+     `${dead.join(", ")} still reads store.get("stretchArc"), which store.js v63 renamed to "arc"`);
+});
+
 check("5c. the goal leans the picker, it does not lock it", () => {
   const ui = read("js/views/session-builder-ui.js");
   // Anchor on the CALL, not the import at the top of the file.
