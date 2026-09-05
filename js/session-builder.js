@@ -1,6 +1,29 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 05 Sep 2026 v44
+ *   SWAP-1 (engine half). The grouping vocabulary, the soreness levels
+ *   and the one-for-one replacement. The UI half is in
+ *   js/views/session-builder-ui.js v13.
+ *
+ *   Three things worth carrying forward, all found by tracing the real
+ *   pools rather than reading the code:
+ *
+ *   1. The spec's "~90 exercises" is 188 for a full-body thirty-minute
+ *      session. Nobody had counted it.
+ *   2. Grouping by lead body area left FIFTEEN entries in no group,
+ *      and eleven of them sat in one full-body main section — tying for
+ *      the largest bucket on the screen. Two groups fix it; a tripwire
+ *      bucket the gate proves empty stops the same thing recurring
+ *      silently when content lands.
+ *   3. The 7 threshold is pinned to getActiveConditionIds BY BEHAVIOUR
+ *      in verify-swap1, not by a comment claiming they agree.
+ *
+ *   STRETCH_ZONES IS NOT TOUCHED. Extending it would have pushed a new
+ *   chip into the stretch zone picker through zonesWithCoverage() — a
+ *   second feature changed silently, which is the fault shape this build
+ *   keeps finding.
+ *
  * 03 Sep 2026 v43
  *   ZONE-WEIGHTING. affectsAreas lists everything an exercise touches,
  *   in no stated order, and every consumer treated all of it equally.
@@ -979,6 +1002,213 @@ function _applyZoneFocus(list, zoneIds) {
     else                                 rest.push(ex);
   }
   return primary.concat(incidental, rest);
+}
+
+// ── SWAP-1: the swap grouping vocabulary ─────────────────────────────
+//
+// 05 Sep 2026. The spec says grouping by lead body area is "exactly what
+// ZONE-WEIGHTING's primary-area work already computes". Traced against
+// the real pools rather than read, that is 94% true, and the missing 6%
+// was the whole problem: STRETCH_ZONES has no core zone, so fifteen
+// entries — Plank, Dead Bug, Pallof Press, the seated bracing set,
+// Jumping Jacks — belonged to no group at all. In a full-body
+// thirty-minute main section that is eleven of eighty-six, which TIES
+// FOR THE LARGEST BUCKET ON THE SCREEN. "Everything else" would have
+// been the biggest heading in the sheet.
+//
+// The same trace corrected the spec's other number. A full-body pool is
+// 188 entries (78 warm-up, 86 main, 24 cool-down), not the ~90 recorded.
+// The wall is twice as tall as anybody had written down.
+//
+// Two extra groups cover all fifteen, so no fallback bucket is needed.
+// One exists anyway — see NO_GROUP below — because a bucket that the
+// gate proves EMPTY is a tripwire, and trusting one afternoon's trace
+// forever is how content lands next month and quietly falls out of a
+// list.
+//
+// DERIVED FROM STRETCH_ZONES, NOT COPIED. A second hand-maintained copy
+// of the eleven zones is exactly the duplication ZONE-WEIGHTING, ARC-3
+// and STRETCH-FLOW each had to unpick. A zone added there appears here
+// the same day.
+//
+// AND STRETCH_ZONES IS NOT EXTENDED. Adding a core zone to it would push
+// a new chip into the stretch zone picker through zonesWithCoverage(),
+// changing a second feature silently — the exact shape of the faults
+// this build keeps finding by tracing rather than reading.
+const EXTRA_SWAP_GROUPS = [
+  { id: "core",       label: "Core & abdominals", areas: ["abdominals", "core", "pelvic-floor"] },
+  { id: "whole-body", label: "Whole body",        areas: ["full-body", "cardiovascular"] },
+];
+
+export const SWAP_GROUPS = STRETCH_ZONES.concat(EXTRA_SWAP_GROUPS);
+
+/** The tripwire bucket. Proven empty by verify-swap1 across every session type. */
+export const NO_GROUP = { id: "ungrouped", label: "Other movements" };
+
+/**
+ * The group an exercise LEADS with.
+ *
+ * Scans the exercise's own area order first, not the group list's, so an
+ * entry is filed under what it is most for. Bear Hug Carry is
+ * ["full-body", "abdominals", "upper-back"] and belongs under Whole body,
+ * not under Core, even though Core appears earlier in SWAP_GROUPS.
+ *
+ * PRIMARY_DEPTH, shared with isPrimaryFor(). One definition of "what this
+ * is for" in this file, not two.
+ */
+export function swapGroupFor(ex) {
+  for (const area of (ex?.affectsAreas || []).slice(0, PRIMARY_DEPTH)) {
+    const group = SWAP_GROUPS.find(g => g.areas.includes(area));
+    if (group) return group.id;
+  }
+  return NO_GROUP.id;
+}
+
+/** Past this many in one group, the sheet offers "show all" rather than scrolling. */
+export const SWAP_GROUP_CAP = 8;
+
+/**
+ * The alternatives for one exercise, grouped by the body area they lead
+ * with, drawn ONLY from the pool the session was already built from.
+ *
+ * That last clause is the safety property and it is why this takes a
+ * pool rather than building one: every condition, equipment, capability,
+ * clearance and section-rule filter has already run over these entries.
+ * A swap sheet cannot reach past the pool, so it cannot add a permission.
+ *
+ * RANK, DON'T FILTER — the fourth time this week. The group the tapped
+ * exercise leads with goes first, because that is the like-for-like
+ * answer; every other group keeps SWAP_GROUPS order behind it. Nothing
+ * is removed. A hard filter over a library this size eventually returns
+ * nothing.
+ */
+export function swapAlternatives({ pool, section, current, inSessionIds = [] }) {
+  const currentId = current?.id || null;
+  // Already in the session, so offering it would be a duplicate rather
+  // than a swap. The exercise being replaced is exempt from its own rule.
+  const taken = new Set((inSessionIds || []).filter(id => id !== currentId));
+  const items = (pool?.[section] || []).filter(ex => ex.id !== currentId && !taken.has(ex.id));
+
+  const byGroup = new Map();
+  for (const ex of items) {
+    const gid = swapGroupFor(ex);
+    if (!byGroup.has(gid)) byGroup.set(gid, []);
+    byGroup.get(gid).push(ex);
+  }
+
+  const ordered = SWAP_GROUPS
+    .filter(g => byGroup.has(g.id))
+    .map(g => ({ id: g.id, label: g.label, items: byGroup.get(g.id) }));
+  if (byGroup.has(NO_GROUP.id)) {
+    ordered.push({ id: NO_GROUP.id, label: NO_GROUP.label, items: byGroup.get(NO_GROUP.id) });
+  }
+
+  const leadGroupId = swapGroupFor(current);
+  const lead = ordered.filter(g => g.id === leadGroupId);
+  const rest = ordered.filter(g => g.id !== leadGroupId);
+
+  return { groups: lead.concat(rest), total: items.length, leadGroupId };
+}
+
+// ── SWAP-1: soreness ─────────────────────────────────────────────────
+//
+// MARKED above 0, UNSELECTABLE at 7. Graeme, 05 Sep, and it is better
+// than either option that was put to him.
+//
+// 7 IS NOT A NEW NUMBER. It is where getActiveConditionIds() already
+// switches somebody onto acute-safe exercise variants, so this is one
+// threshold with two expressions rather than a third rule to keep in
+// sync. verify-swap1 pins them together BY BEHAVIOUR — it runs
+// getActiveConditionIds at SORE_BLOCK_FLOOR - 1 and at SORE_BLOCK_FLOOR
+// and asserts the acute switch happens exactly here. A comment claiming
+// they agree would go stale; an executing assertion cannot.
+//
+// At 8 this code is never reached at all: severeZoneToday() fires the
+// Gentle Care bypass before a session exists to swap anything in.
+
+/** Anything named today is marked. The bar is low because marking restricts nothing. */
+export const SORE_MARK_FLOOR = 1;
+
+/** getActiveConditionIds()'s acute switch. Not an independent clinical judgement. */
+export const SORE_BLOCK_FLOOR = 7;
+
+/**
+ * What the person said is sore TODAY, keyed by condition id.
+ *
+ * conditionPainScores, NOT `conditions`. SORE-SOURCE, 05 Sep: reading
+ * the standing list of everything somebody lives with marked four zones
+ * when the person had named two — the coach claiming an input it had not
+ * used, which is the exact thing "faultless" was defined against.
+ *
+ * Condition ids and affectsAreas share a vocabulary for every
+ * musculoskeletal entry (hamstring, lower-back, shoulder, glutes...).
+ * The systemic conditions — anxiety, fibromyalgia, chronic-fatigue —
+ * match no area and correctly mark nothing here; they are handled by the
+ * condition filters that already ran over the pool.
+ */
+export function soreScoresToday() {
+  const scores = store.get("conditionPainScores") || {};
+  const out = {};
+  for (const id of Object.keys(scores)) {
+    const n = Number(scores[id]);
+    if (Number.isFinite(n) && n >= SORE_MARK_FLOOR) out[id] = n;
+  }
+  return out;
+}
+
+/**
+ * Whether an exercise touches something sore, and how badly.
+ *
+ * Returns the AREAS as well as the level, never a sentence: the words
+ * the person reads are the coach's and belong in the view. But the level
+ * can never be shown without them, which is what makes the mark carry a
+ * reason rather than depending on a colour.
+ *
+ * PRIMARY_DEPTH again. An exercise that merely brushes a sore area at
+ * depth four is not "for" it, and marking on that would ring half the
+ * sheet red and teach people to ignore the ring.
+ */
+export function soreLevelFor(ex, scores = {}) {
+  const areas = (ex?.affectsAreas || []).slice(0, PRIMARY_DEPTH).filter(a => scores[a] !== undefined);
+  if (!areas.length) return { level: "none", areas: [] };
+  const worst = Math.max(...areas.map(a => Number(scores[a])));
+  return { level: worst >= SORE_BLOCK_FLOOR ? "blocked" : "marked", areas };
+}
+
+/**
+ * Replaces ONE exercise. Nothing else moves.
+ *
+ * Decision 4, 05 Sep. Rebuilding around the change would let the coach
+ * rebalance, but somebody would alter one thing and watch four others
+ * shift — the "it decided for me" feeling this product exists to avoid.
+ *
+ * Pure: returns a new session and does not touch the one passed in, so
+ * the gate can assert "everything else is byte-identical" against the
+ * original rather than against a copy it made itself.
+ *
+ * PRESCRIBED EXERCISES ARE NOT SWAPPABLE. A specialist's instruction
+ * outranks a preference, and this file's standing rule is that the
+ * engine never removes or overrides prescribed work. The view does not
+ * offer the affordance; this refuses it anyway, because a safety rule
+ * honoured by one of two entry points is the shape of every
+ * reachability fault found this month.
+ */
+export function swapExerciseInSession(session, index, replacement) {
+  if (!session || !Array.isArray(session.exercises)) return session;
+  const target = session.exercises[index];
+  if (!target || !replacement) return session;
+  if (target.isPrescribed) return session;
+
+  // `recommended` is buildCandidatePools' presentation flag, not a
+  // property of the exercise. Carrying it into a session would put a
+  // second, staler opinion about what the coach suggested inside the
+  // session record.
+  const { recommended, ...clean } = replacement;
+  return {
+    ...session,
+    exercises: session.exercises.map((ex, i) =>
+      i === index ? { ...clean, section: target.section } : ex),
+  };
 }
 
 // ── SECTION-RULES vocabulary ──────────────────────────────────────────────────
