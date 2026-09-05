@@ -1,6 +1,12 @@
 /**
  * css/components/sheet-manager.css
- * 29 Jun 2026 v2
+ * 05 Sep 2026 v3
+ *
+ * v3 - SURFACE-TOKEN. Two `color: var(--color-surface, #E8F4F4)` uses
+ *      repointed to --color-text. A background token was doing a text
+ *      job and was already failing: #E8F4F4 on the light scheme's
+ *      #F8FAFC is 1.07:1, so .sheet-skip was invisible for anyone on
+ *      SCHEME-1. --color-text adapts per scheme (11.87 / 17.06 / 21.00).
  *
  * v2 — Found and fixed the REAL cause of the "cramped Continue button"
  *   bug, after four rounds of incorrect fixes in onboarding-additions.css
@@ -122,7 +128,7 @@
 .sheet-header__title {
   font-size: calc(1.1rem * var(--user-text-scale, 1));
   font-weight: 600;
-  color: var(--color-surface, #E8F4F4);
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -231,7 +237,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.sheet-skip:hover { color: var(--color-surface, #E8F4F4); }
+.sheet-skip:hover { color: var(--color-text); }
 
 .sheet-skip:focus-visible {
   outline: 3px solid var(--color-primary, #1B6B6B);

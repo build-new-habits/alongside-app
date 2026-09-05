@@ -1,5 +1,25 @@
 /* variables.css - Midnight Teal Design Tokens
-   12 Aug 2026 v4
+   05 Sep 2026 v5
+
+   v5 - SURFACE-TOKEN. --color-surface and --color-surface-2 defined in
+        all three schemes. They were referenced 51 times across 15 files
+        and defined nowhere; 33 of those uses had no fallback, so those
+        surfaces rendered with no background at all. This is the SECOND
+        instance of this exact fault -- see --color-bg-elevated below,
+        August. Aliased to the card tier because that is what the code
+        already meant: session-shared.css says so in prose, having used
+        --color-bg-card deliberately and logged the mismatch.
+
+        NOT aliased blindly. Eight uses in onboarding-thread.css were
+        `color:`, not `background:` -- a background token doing a text
+        job. Defining the token alone would have taken the onboarding
+        chips from 13.01:1 to 1.41:1. Those eight are repointed to
+        --color-text in the same change; tools/verify-surface.mjs now
+        refuses a surface token used as a foreground colour.
+
+        --color-surface-raised is left undefined ON PURPOSE: its single
+        use supplies rgba(255,255,255,0.04), a translucent overlay that a
+        solid alias would visibly change. Logged, not silently converted.
 
    v4 - SCHEME-1. Light and high-contrast schemes added as opt-in
    adaptations. Dark remains the default and the design intent; see the
@@ -71,6 +91,8 @@
   --color-bg: #1E293B;            /* Primary background */
   --color-bg-card: #334155;       /* Cards, elevated surfaces */
   --color-bg-hover: #3E4C63;      /* Hover states on cards */
+  --color-surface: #334155;       /* SURFACE-TOKEN, 05 Sep 2026 - alias of bg-card */
+  --color-surface-2: #3E4C63;     /* one step raised from surface */
   --color-bg-elevated: #3E4C63;   /* 04 Aug 2026 - was undefined, referenced 46+ times
                                       across 14 files with no fallback (confirmed via
                                       grep, not assumed) - meant every "elevated"
@@ -296,6 +318,8 @@
   --color-bg-card:        #FFFFFF;
   --color-bg-hover:       #E8EEF4;
   --color-bg-elevated:    #E8EEF4;
+  --color-surface:        #FFFFFF;
+  --color-surface-2:      #E8EEF4;
 
   --color-text:           #0F172A;   /* 17.85 on card, 15.27 on elevated */
   --color-text-secondary: #3D4C5F;   /*  8.76 on card,  7.49 on elevated */
@@ -329,6 +353,8 @@
   --color-bg-card:        #14202E;
   --color-bg-hover:       #1E2C3D;
   --color-bg-elevated:    #1E2C3D;
+  --color-surface:        #14202E;
+  --color-surface-2:      #1E2C3D;
 
   --color-text:           #FFFFFF;
   --color-text-secondary: #F1F5F9;
