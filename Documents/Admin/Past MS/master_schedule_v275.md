@@ -1,47 +1,8 @@
 # Alongside: Move — Master Schedule
-## 05 Sep 2026 v276
+## 05 Sep 2026 v275
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v275.md`. Remove v275 on upload.
-
-> ### ⚫ FIVE DECISIONS TAKEN, 05 Sep 2026 — Graeme accepted all five recommendations
->
-> Recorded WITH their consequences rather than as clean approvals, because two are larger than they were first described and the schedule should show what was known when the decision was made.
->
-> 🔴 **A caution on the process, recorded deliberately.** Five recommendations were put and five were accepted. That is either good argument or a framing that made disagreement awkward, and there is no way to tell from inside it. The two enlargements below were found by checking AFTER agreement, not before — which is the wrong order, and is noted so the next session puts consequences alongside recommendations rather than behind them.
->
-> #### 1. The build-mode screen is DELETED. `buildSession` survives; the deterministic route does not.
->
-> Not primarily a labelling problem. The two routes are not equally good and the worse one is currently the default for stretch. `buildSession` picks weighted by preferences, novelty and continuity; the recommend route picks `pool[0]` — and the comment at `session-builder.js:2351` says why: *"a candidate list must be stable if shown twice."* **Determinism existed FOR the list, and the list is gone.**
->
-> Consequence: STRETCH-FLOW hardcoded stretch onto that route on 2 Sep, so **every stretch session in the app currently ignores `exercisePreferences` ("not keen on this one") and returns the same session every time.** Nobody decided that; it fell out of two changes a day apart.
->
-> ⚠️ **BIGGER THAN A SCREEN DELETION.** `buildSessionFromSelection()` has exactly ONE live caller and `recommended` has exactly ONE reader — both the recommend route. Deleting it orphans an ~80-line exported builder containing the hard warm-up floor, and turns `recommended` into a field written and never read: the mirror of the reader-without-a-writer fault. This is a deliberate retirement needing its own gate, not a side effect. And it changes stretch behaviour for every user.
->
-> #### 2. DUPE-SECTION: MAIN CLAIMS FIRST.
->
-> Reframed: the fix is not "delete a copy", it is "once an id is taken, the next section skips it and picks its NEXT candidate" — so no section loses a slot. The only real question is claim order, and the evidence settles it: on an upper-body session at shoulder 7 the main pool held **9** candidates against warm-up's **39**. A warm-up taking a scarce main-eligible entry starves the constrained section; warm-up absorbs the loss easily.
->
-> #### 3 & 4. REMOVAL IS ALLOWED. The empty state does NOT offer a rebuild.
->
-> 🔴 **A reversal of something the build decided without a mandate.** SWAP-1's empty-state copy read *"Keeping it is the honest answer today"* — a product position stated as a description, written by Claude and never put to Graeme. Surfaced and overturned rather than quietly edited.
->
-> R4's argument for making self-direction free was that composing is how somebody whose body does not fit the default gets a session they can do. Telling that person their only option is to keep a movement they cannot do is the coach overriding them. Removal stays inside decision 4: it removes one thing, moves nothing else, rebuilds nothing.
->
-> ⚠️ **REMOVAL HAS NO FLOOR TODAY.** The warm-up floor lives inside `buildSessionFromSelection()` and runs at BUILD time only. Removal happens after, so it needs its own check — otherwise a person can empty the warm-up one tap at a time and reach precisely the state that floor exists to prevent.
->
-> No rebuild offer in the empty state: it contradicts decision 4 and would be a second mechanism firing in one unpredictable case.
->
-> #### 5. SORE-LEGEND closed in the stretch zone picker, bundled.
->
-> Same grammar as the swap sheet — reason in words per chip. Small, same file, not worth its own session.
->
-> #### 📋 Sequencing
->
-> **Session A — DUPE-SECTION alone.** Selection logic; changes what every session looks like; wants its own reversal-proven gate rather than sharing one.
->
-> **Session B — one declared UI bundle.** Retire the build-mode screen and with it `buildSessionFromSelection` and `recommended`; add removal with its own floor; rewrite the empty state; close SORE-LEGEND.
-
+Supersedes `master_schedule_v274.md`. Remove v274 on upload.
 
 > ### 🟢 SWAP-1 BUILT AND SHIPPED — the session leads, the swap sits behind it
 >
@@ -6874,4 +6835,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v276*
+*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v275*
