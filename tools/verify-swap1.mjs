@@ -1,8 +1,29 @@
 /**
  * tools/verify-swap1.mjs
- * 05 Sep 2026 v1
+ * 05 Sep 2026 v2
  *
  * SWAP-1 gate. The session, then the swap.
+ *
+ * ── v2, 05 Sep 2026. RE-POINTED AT THE COACH ROUTE ──────────────────
+ *
+ * v1 reached the preview by clicking "recommend". All 73 UI assertions
+ * below sat downstream of that one click. The recommend route is being
+ * retired and its screen deleted, so on the day that lands this gate
+ * would have thrown on click(undefined) -- loudly, which is something,
+ * but it would have left the live path with no gate at all while the
+ * daily flow was already changed.
+ *
+ * Re-pointed FIRST, before the thing it guards changes. Red before
+ * green, applied at the scale of a session.
+ *
+ * v2 also closes a claim the source was making on this gate's behalf.
+ * session-builder-ui.js:1358 states that "verify-swap1 asserts the
+ * disagreement is empty today, so the day that changes it goes red
+ * rather than quiet." IT DID NOT. No such assertion existed. The
+ * agreement between buildSession() and buildCandidatePools() was true
+ * and unguarded, and a comment claimed otherwise -- the same shape as
+ * ARC-3 and as every reader-without-a-writer fault: the rule written,
+ * stated, and never enforced. Section 0b enforces it.
  *
  * ── WHY IT IS BUILT THIS WAY ────────────────────────────────────────
  *
@@ -90,6 +111,60 @@ ok("SWAP_GROUPS is strictly larger than STRETCH_ZONES",
   SB.SWAP_GROUPS.length > SB.STRETCH_ZONES.length);
 reverses("STRETCH_ZONES was NOT quietly extended to match (the stretch picker is untouched)",
   () => SB.STRETCH_ZONES.length === SB.SWAP_GROUPS.length);
+
+// ── 0b. The two builders agree ──────────────────────────────────────
+//
+// THE ASSERTION THE SOURCE ALREADY CLAIMED WAS HERE.
+// session-builder-ui.js:1358 tells the reader this gate proves the
+// disagreement empty. Until v2 it did not.
+//
+// Why it is load-bearing: the swap sheet reads candidatePools, and
+// _canSwap() checks MEMBERSHIP. Any exercise buildSession() places that
+// buildCandidatePools() does not offer gets no swap affordance at all --
+// the row simply cannot be changed, silently, with no error and nothing
+// on screen to say so. Both go through _filterCandidates() with
+// identical arguments today, so they differ in what they SELECT, not in
+// what is available. The day a filter is added to one and not the other,
+// this goes red instead of swaps quietly dying one exercise at a time.
+console.log("\n0b. Every coach-built exercise is in the pool the swap sheet reads");
+{
+  const personas = [
+    ["clear",                        [],                        {}],
+    ["shoulder 7",                   [],                        { shoulders: 7 }],
+    ["glutes 7 + lower-back 3",      ["lower-back", "glutes"],  { glutes: 7, "lower-back": 3 }],
+  ];
+  let built = 0, absent = [];
+  for (const [, conds, scores] of personas) {
+    store.set("equipment", KIT);
+    store.set("conditions", conds);
+    store.set("conditionPainScores", scores);
+    for (const type of ["full", "lower", "upper", "stretch", "core", "cardio", "glute", "mobility"]) {
+      for (const mins of [15, 30, 45, 60]) {
+        const args = { sessionType: type, durationMins: mins, equipmentOverride: KIT, preset: "balanced" };
+        const s = SB.buildSession(args);
+        const pool = SB.buildCandidatePools(args);
+        if (!s || !pool) continue;
+        for (const ex of s.exercises) {
+          built++;
+          if (!(pool[ex.section] || []).some(c => c.id === ex.id)) absent.push(`${ex.name}[${type}/${mins}]`);
+        }
+      }
+    }
+  }
+  // Not a vacuous sweep: assert it actually looked at something.
+  ok(`${built} coach-built exercises examined across 3 personas x 8 types x 4 durations`, built > 900);
+  ok(`every one is offerable by the swap sheet (${absent.slice(0, 3).join(", ") || "none absent"})`,
+    absent.length === 0);
+  reverses("a planted absence IS detected (this check is armed, not decorative)",
+    () => {
+      const args = { sessionType: "full", durationMins: 30, equipmentOverride: KIT, preset: "balanced" };
+      const s = SB.buildSession(args), pool = SB.buildCandidatePools(args);
+      const ghost = { id: "__not-in-any-pool__", name: "Ghost", section: "main" };
+      return [...s.exercises, ghost].every(ex => (pool[ex.section] || []).some(c => c.id === ex.id));
+    });
+  store.set("conditions", []);
+  store.set("conditionPainScores", {});
+}
 
 // ── 1. The tripwire bucket is empty ─────────────────────────────────
 // The grouping was chosen from one afternoon's trace. This is what stops
@@ -270,8 +345,81 @@ ok("build mode offers two routes, not three", modes.length === 2);
 ok('"own" is gone from the daily flow', !modes.includes("own"));
 ok("coach and recommend both remain", modes.includes("coach") && modes.includes("recommend"));
 
-click($$(".sb-buildmode-btn").find(b => b.dataset.mode === "recommend"));
+// ── 7a. The route this gate drives ──────────────────────────────────
+//
+// The fixture must reach the branch it names -- seven recorded failures
+// of this in the project, two inside Session A alone. Proven two ways,
+// and which is which is stated rather than blurred.
+//
+// DETERMINISTIC: the button really carries data-mode="coach", and the
+// handler slice maps any non-"recommend" mode to triggerBuild(), whose
+// own slice calls buildSession() and assigns candidatePools.
+//
+// NEAR-DETERMINISTIC: the session produced is not the one the recommend
+// route would have produced. buildSessionFromSelection() takes pool[0]
+// and is deterministic; buildSession() weights by preference and
+// novelty and varies between runs. A collision would need 9 slots drawn
+// from 188 candidates to reproduce an exact ordering. Not impossible,
+// so it is NOT the primary proof and is not relied on alone.
+const coachBtn = $$(".sb-buildmode-btn").find(b => b.dataset.mode === "coach");
+ok("the coach button is present to be clicked", !!coachBtn);
+
+const modeHandler = slice(uiSrc,
+  'document.querySelectorAll(".sb-buildmode-btn").forEach(btn => {', "\n  });");
+ok("a non-recommend mode routes to triggerBuild()",
+  /buildMode === "recommend"/.test(modeHandler) && /triggerBuild\(\)/.test(modeHandler));
+reverses("the handler does NOT send the coach mode to the recommend builder",
+  () => /buildMode === "coach"[\s\S]{0,80}triggerRecommendedBuild\(\)/.test(modeHandler));
+
+const triggerBuildFn = slice(uiSrc, "function triggerBuild() {", "\n}");
+ok("triggerBuild() builds with buildSession()", triggerBuildFn.includes("buildSession({"));
+ok("triggerBuild() populates candidatePools -- the swap sheet's only source",
+  /candidatePools\s*=\s*buildCandidatePools\(/.test(triggerBuildFn));
+ok("it populates them BEFORE the preview is shown",
+  triggerBuildFn.indexOf("candidatePools") < triggerBuildFn.indexOf('phase = "preview"'));
+reverses("triggerBuild() is not secretly the selection builder",
+  () => triggerBuildFn.includes("buildSessionFromSelection("));
+
+click(coachBtn);
 await wait(1400);
+
+// ⚠️ BOTH BUILDERS WRITE store.generatedSession AS A SIDE EFFECT
+// (session-builder.js:2522 and :3329). Calling one here to compute a
+// comparison OVERWRITES the live preview -- which is exactly what the
+// first draft of this block did: it clobbered the session, then compared
+// that session to itself and reported them equal, and took two unrelated
+// assertions in sections 8 and 10 down with it. Eighth recorded instance
+// of a fixture not reaching the branch it named, and the first where the
+// gate's own setup was the thing that moved it.
+//
+// So: capture first, compare second, put the record back.
+const _sig = s => s.exercises.map(e => e.id).join(",");
+const _previewRecord = store.get("generatedSession");
+const _previewSig = _sig(_previewRecord.session);
+
+const _recPool = SB.buildCandidatePools({
+  sessionType: "full", durationMins: 30, equipmentOverride: KIT, preset: "balanced"
+});
+const _recIds = [];
+["warmup", "main", "cooldown"].forEach(s =>
+  _recPool[s].forEach(e => { if (e.recommended) _recIds.push(e.id); }));
+const _recSig = _sig(SB.buildSessionFromSelection({
+  sessionType: "full", durationMins: 30, selectedIds: _recIds, equipmentOverride: KIT
+}));
+ok("the recommend route is deterministic (so the comparison means something)",
+  _recSig === _sig(SB.buildSessionFromSelection({
+    sessionType: "full", durationMins: 30, selectedIds: _recIds, equipmentOverride: KIT
+  })));
+ok("[near-deterministic] the preview is NOT the recommend route's output",
+  _previewSig !== _recSig);
+ok("the preview signature was captured from a real session, not an empty one",
+  _previewSig.length > 20 && _previewRecord.session.exercises.length > 3);
+
+// Put back what the comparison displaced, or every assertion after this
+// point is reading the recommend route's session by accident.
+store.set("generatedSession", _previewRecord);
+ok("the live preview record is restored before anything else reads it",
+  _sig(store.get("generatedSession").session) === _previewSig);
 ok("the PREVIEW is what appears", !!$("#sb-go-btn"));
 ok("no candidate checkbox is rendered anywhere", $$(".sb-candidate-check").length === 0);
 ok("no candidate build button either", !$("#sb-candidate-build-btn"));
@@ -423,13 +571,39 @@ ok("no new store field was invented",
 // two sections, so its id can still be present after one instance is
 // swapped out. The invariant that matters either way is that
 // selectedIds names exactly what the session now contains.
-const recIds = (store.get("generatedSession").inputs.selectedIds || []).slice().sort();
-const sesIds = after.exercises.filter(e => !e.isPrescribed).map(e => e.id).sort();
-ok("inputs.selectedIds names exactly what the session now holds",
-  recIds.join() === sesIds.join());
-ok("the swapped-in exercise is named in the record", recIds.includes(after.exercises[mainIdx].id));
-reverses("the record was NOT left untouched (selectedIds really is rewritten)",
-  () => recIds.join() === built.exercises.filter(e => !e.isPrescribed).map(e => e.id).sort().join());
+// ── v2. WHAT CHANGED WHEN THIS GATE MOVED TO THE COACH ROUTE ────────
+//
+// buildSession() writes inputs WITHOUT selectedIds (session-builder.js
+// :3329); buildSessionFromSelection() writes it WITH (:2522). So on the
+// route every user actually walks, there is no selectedIds to rewrite.
+//
+// That is RIGHT, not a gap. selectedIds records what the person chose,
+// and on the coach route they chose nothing. Writing one would be the
+// stored record claiming an input that was never given -- the same
+// fault TRUTHFULNESS fixed, where the coach named inputs it had not
+// used. The gate now asserts the absence rather than the value.
+const _rec = store.get("generatedSession");
+ok("the coach route stores no selectedIds, because nothing was selected",
+  !("selectedIds" in (_rec.inputs || {})));
+ok("the stored record still agrees with itself after a swap",
+  _sig(_rec.session) === _sig(after));
+reverses("the record was NOT left holding the pre-swap session",
+  () => _sig(_rec.session) === _sig(built));
+
+// NOT PROVEN BEHAVIOURALLY, AND SAID SO RATHER THAN IMPLIED.
+// persistBuiltSession()'s selectedIds rewrite is guarded by
+// `"selectedIds" in record.inputs`, which is false on this route. The
+// branch is therefore unreachable from the daily flow and only a source
+// check is possible here. It is RETAINED deliberately -- athlete
+// self-build needs it -- and Session B2's retirement gate is where it
+// gets held to zero live callers on purpose.
+const _persist = slice(uiSrc, "function persistBuiltSession() {", "\n}");
+ok("[source only] the selectedIds rewrite still exists for the retained route",
+  /"selectedIds" in record\.inputs/.test(_persist) && /selectedIds:/.test(_persist));
+ok("[source only] and it is still guarded rather than written unconditionally",
+  _persist.indexOf('"selectedIds" in record.inputs') < _persist.indexOf("selectedIds:"));
+reverses("the slice is the function body, not an empty string",
+  () => _persist.length < 40);
 reverses("the comparison is real — the session did change",
   () => after.exercises[mainIdx].id === built.exercises[mainIdx].id);
 

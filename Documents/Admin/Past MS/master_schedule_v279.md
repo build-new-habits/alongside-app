@@ -1,57 +1,16 @@
 # Alongside: Move — Master Schedule
-## 05 Sep 2026 v280
+## 05 Sep 2026 v279
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v279.md`. Remove v279 on upload.
+Supersedes `master_schedule_v278.md`. Remove v278 on upload.
 
-> ### 🟢 SESSION B1 — SHIPPED 05 Sep 2026. The gate moved before the thing it guards. `verify-swap1.mjs` v2, 138 assertions.
+> ### 🟡 SESSION B — SPECIFIED, NOT STARTED. Blueprint `alongside_blueprint_sessionB_05sep2026_v1.md`.
 >
-> **No app source changed. `js/` is byte-identical. `sw.js` NOT bumped** — `tools/` has zero references in live service-worker code (sw.js:223 says so itself: build-time only). One file touched: `tools/verify-swap1.mjs`.
+> 🔴 **A COUPLING THAT WOULD HAVE BROKEN SWAP-1 SILENTLY.** `candidatePools` is populated in exactly ONE place — `triggerRecommendedBuild()`. The swap sheet reads it for every alternative it offers. `triggerBuild()`, the coach route, never populates it.
 >
-> #### 🔴 CORRECTION TO v279's HEADLINE. The coupling it described does not exist.
+> Retiring the recommend route without further change ships a preview where **every swap is dead**, for every session type, for every user. **No existing gate catches this**, because all 121 SWAP-1 assertions reach the sheet through the recommend route — they would stay green while the feature was gone.
 >
-> v279 stated `candidatePools` is "populated in exactly ONE place — `triggerRecommendedBuild()`", and made that the reason Session B was not started. **`triggerBuild()` populates it at `session-builder-ui.js:1363`, and has since SWAP-1 itself added it (commit `4e83077`).** The blueprint says it was verified against live `main`; it was not.
->
-> **Measured, not argued:** 0 of 1101 coach-built exercises absent from their own section pool, across 3 personas × 8 types × 4 durations. The measurement was reversal-proven before it was believed — a planted absence is detected. Swaps were never dead on the coach route.
->
-> #### 🟢 BUT THE ORDERING INSTINCT WAS RIGHT, FOR A DIFFERENT REASON — AND IT IS NOW MEASURED
->
-> All 73 UI assertions in verify-swap1 v1 reached the preview by clicking **the build-mode screen that Session B2 deletes**. The real hazard was never that swaps break; it is that **deleting the screen leaves the live path with no gate at all.**
->
-> **Proven by running both gates against the same deliberate break** (removing `candidatePools` from `triggerBuild()`, which kills every swap in the app):
->
-> | | result |
-> |---|---|
-> | verify-swap1 **v1** (recommend route) | **121 passed, 0 failed — GREEN with the feature dead** |
-> | verify-swap1 **v2** (coach route) | **RED**, four named failures, "0 rows" offering a swap |
->
-> This is the blueprint's feared scenario reproduced and caught. The gate was re-pointed **before** the flow changes, not after: red before green, applied at the scale of a session.
->
-> #### 🔴 A COMMENT CLAIMING A GATE THAT DID NOT EXIST — now it does
->
-> `session-builder-ui.js:1358` told every reader that *"verify-swap1 asserts the disagreement is empty today, so the day that changes it goes red rather than quiet."* **No such assertion existed.** The agreement between `buildSession()` and `buildCandidatePools()` was true and entirely unguarded. Same shape as ARC-3 and as every reader-without-a-writer fault: the rule written, stated, never enforced. **New section 0b enforces it** — and the source comment is now true without needing to be edited.
->
-> #### 🟠 EIGHTH RECORDED INSTANCE — and the first caused by the gate's own setup
->
-> **Both builders write `store.generatedSession` as a side effect** (`session-builder.js:2522` and `:3329`). The first draft of the route-comparison called one *after* the click, silently overwrote the live preview, compared that session to itself, reported them equal — and took two unrelated assertions in sections 8 and 10 down with it. Captured first, compared second, record restored; the restore is itself reversal-proven. **Any future gate calling a builder mid-run has the same trap waiting.**
->
-> #### ⚫ `selectedIds` — an absence that is correct, and said so
->
-> `buildSession()` writes `inputs` **without** `selectedIds`; `buildSessionFromSelection()` writes it **with**. On the coach route there is nothing to rewrite, and that is right: the person selected nothing, so writing one would be the stored record claiming an input never given — the fault TRUTHFULNESS fixed. The gate asserts the **absence**.
->
-> Consequence for B2: `persistBuiltSession()`'s `selectedIds` rewrite branch is **unreachable from the daily flow** once the recommend route is retired. Covered by source check only, and the gate says that plainly rather than implying behavioural proof — same convention as `_canSwap()`'s Gentle Care clause.
->
-> #### 🟢 Reversal: 5 deliberate breaks, 5 caught red
->
-> coach mode routed to the recommend builder · `triggerBuild()` no longer populating `candidatePools` · `buildCandidatePools` narrower than `buildSession` · the preview record not restored · `persistBuiltSession()` inventing `selectedIds`.
->
-> #### 📋 SESSION B2 — the remaining blueprint, unchanged in substance
->
-> Retire (do not delete) `buildSessionFromSelection` / `triggerRecommendedBuild` / `recommended` with a zero-live-callers assertion; delete the build-mode screen (⚠️ line ~1580 back-navigation must not point at a deleted phase); removal with its own floor; rewrite the empty state; SORE-LEGEND in the stretch zone picker.
->
-> ⚠️ **B2 must also update verify-swap1's click-through**: with the build-mode screen gone, `#sb-build-btn` goes straight to build and the three screen assertions (two routes / no "own" / coach and recommend remain) describe a screen that no longer exists.
->
-> 🟠 **The cost of splitting, named:** the stretch `exercisePreferences` fault stays live one session longer, with beta mid-September. Graeme took the split on that basis.
+> First task in Session B is therefore: populate `candidatePools` from `triggerBuild()`, prove swapping works from the coach route, and only then remove anything.
 >
 > **Session B was not started rather than half-shipped.** It rewires the daily flow's only entry to the swap system, adds removal with a new floor, rewrites the empty state and closes SORE-LEGEND — more than Session A, which took most of a session and was smaller. Rushing a UI change on the path every user walks, without a reversal-proven gate, is the failure mode this project exists to avoid.
 >
@@ -6967,4 +6926,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v280*
+*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v279*
