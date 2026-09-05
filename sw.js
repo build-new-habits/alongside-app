@@ -1,7 +1,22 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 05 Sep 2026 v439
+ * 05 Sep 2026 v440
+ *
+ * v440 - SURFACE-TOKEN. --color-surface was referenced 51 times across
+ *   15 files and defined nowhere; 33 uses had no fallback, so those
+ *   surfaces rendered with no background. Second instance of this exact
+ *   fault (--color-bg-elevated, August), so tools/verify-surface.mjs now
+ *   gates the class rather than the instance.
+ *
+ *   Eight uses were `color:`, not `background:` -- a background token
+ *   doing a text job. Defining the token alone would have taken the
+ *   onboarding chips to 1.41:1. They were ALSO already broken: 1.07:1 in
+ *   the light scheme, a live WCAG 1.4.3 failure found while fixing
+ *   something else. Repointed to --color-text, which adapts per scheme.
+ *
+ *   css/base/variables.css v4 -> v5. onboarding-thread.css v5 -> v6.
+ *   sheet-manager.css v2 -> v3. New tools/verify-surface.mjs. 105 gates.
  *
  * v439 - DUPE-SECTION. One exercise, one appearance. No new files:
  *   session-builder.js v45 dedupes across sections in the
@@ -3032,7 +3047,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v439";
+const CACHE_NAME = "alongside-v440";
 
 const SHELL_URLS = [
 
