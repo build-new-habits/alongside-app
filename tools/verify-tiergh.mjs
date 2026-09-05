@@ -219,9 +219,23 @@ await reachBuildMode('free');
 const freeModes  = [...el.querySelectorAll('.sb-buildmode-btn')];
 const freeLocked = [...el.querySelectorAll('.locked-feature-wrap')];
 
-check('9  R4: all three build modes are pressable on free',
-  freeModes.length === 3,
-  `found ${freeModes.length}: ${freeModes.map(b => b.dataset.mode).join(', ')}`);
+// SWAP-1, 05 Sep 2026. This asserted THREE modes. There are now two:
+// "Build my own" was deleted, and NOT for a tier reason — it opened the
+// 188-item candidate list, which that build removed from the daily flow
+// altogether.
+//
+// Rewritten to assert what R4 actually claims rather than a count that
+// happened to be true when it was written. R4's claim is that no build
+// route is withheld by tier. A hardcoded 3 made this gate go red on a
+// change that had nothing to do with tiers, which is the definition of
+// measuring the wrong thing.
+check('9  R4: every build mode offered is pressable on free',
+  freeModes.length > 0 && freeLocked.length === 0,
+  `found ${freeModes.length}: ${freeModes.map(b => b.dataset.mode).join(', ')}, ` +
+  `${freeLocked.length} locked`);
+check('9b SWAP-1: "own" is absent on free — and absent for everyone',
+  !freeModes.some(b => b.dataset.mode === 'own'),
+  'the flat candidate list is back in the daily flow');
 check('10 R4: and "coach builds it" is still one of them',
   freeModes.some(b => b.dataset.mode === 'coach'),
   'the coach-built route is the default and the product centre — it must ' +
@@ -279,9 +293,18 @@ check('12 R4: a free user is ASKED where they are, not guessed at',
 
 await reachBuildMode('personal');
 const paidModes = [...el.querySelectorAll('.sb-buildmode-btn')].map(b => b.dataset.mode);
-check('13 TIER-G: all three routes remain pressable on Personal',
-  paidModes.length === 3 &&
-  ['coach', 'recommend', 'own'].every(m => paidModes.includes(m)),
+// SWAP-1, 05 Sep 2026. Was "all three routes". PARITY is the property
+// TIER-G and R4 were both really about, and parity is now asserted
+// directly: free and Personal must see the SAME routes, whatever those
+// routes are. That cannot go stale when a route is added or removed for
+// a non-tier reason, and it fails the moment a tier hides one — which
+// is the only thing this check was ever for.
+check('13 TIER-G: Personal sees exactly the routes free sees',
+  paidModes.length === freeModes.length &&
+  freeModes.every(b => paidModes.includes(b.dataset.mode)),
+  `free: ${freeModes.map(b => b.dataset.mode).join(', ')} | personal: ${paidModes.join(', ')}`);
+check('13b and "coach builds it" is among them on both',
+  paidModes.includes('coach') && freeModes.some(b => b.dataset.mode === 'coach'),
   paidModes.join(', '));
 
 // R4: the SECOND route into the builder -- arriving from the Library

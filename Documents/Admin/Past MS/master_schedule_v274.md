@@ -1,77 +1,8 @@
 # Alongside: Move — Master Schedule
-## 05 Sep 2026 v275
+## 05 Sep 2026 v274
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v274.md`. Remove v274 on upload.
-
-> ### 🟢 SWAP-1 BUILT AND SHIPPED — the session leads, the swap sits behind it
->
-> `js/session-builder.js` v44 · `js/views/session-builder-ui.js` v13 · `css/components/session-shared.css` v7 · `tools/verify-swap1.mjs` v1 · `sw.js` v438
->
-> **103 gates.** verify-swap1 carries 121 assertions and runs the real view under jsdom with real clicks, rather than reading the source — because ten assertions this week measured the wrong region of a file and every one was caught by reversal rather than review.
->
-> #### ⚫ What it does
->
-> The preview leads. Tapping any exercise opens alternatives for the **same section**, grouped by the body area they lead with, drawn **only from the pool the session was built from** — so every condition, equipment, capability and clearance filter has already run and the sheet cannot reach past them. Swaps are like for like, one for one; nothing else moves. `buildCandidatePools()` is called once when the preview is built and never again on a swap.
->
-> Sore areas are **marked above 0** and **unselectable at 7**, with the reason in words. Build mode drops from three routes to two: the flat 188-item list is gone from the daily flow, and with it "Build my own", which was that list with nothing pre-ticked.
->
-> 🔴 **ATHLETE SELF-BUILD IS NOT DELETED, because it was never built.** Somebody authoring and saving their own routine is a separate future feature — Graeme's daughter writes her programme on paper and wants exactly that. Recorded here, in `session-builder-ui.js` v13 and in the spec, so nobody later reads "we deleted build-your-own" and concludes the athlete case died with it.
->
-> #### 🔴 Three corrections to the spec, all found by TRACING rather than reading
->
-> **1. The pool is 188, not ~90.** A full-body thirty-minute session offers 78 warm-up, 86 main and 24 cool-down candidates. Nobody had counted it. The wall was twice as tall as the spec recorded.
->
-> **2. Grouping by lead body area left FIFTEEN entries in no group.** The spec says it is "exactly what ZONE-WEIGHTING already computes"; traced, that is 94% true. `STRETCH_ZONES` has no core zone, so Plank, Dead Bug, Pallof Press, the seated bracing set and Jumping Jacks belonged nowhere — and eleven of them sat in a single full-body main section, **tying for the largest bucket on the screen**. "Everything else" would have been the biggest heading in the sheet.
->
-> Two groups fix it: **Core & abdominals** and **Whole body** (Graeme's naming, 05 Sep). Derived from `STRETCH_ZONES` by concatenation, never copied, so a zone added there appears here the same day — and `STRETCH_ZONES` itself is **not extended**, because adding a core zone to it would have pushed a new chip into the stretch zone picker through `zonesWithCoverage()`, changing a second feature silently.
->
-> A `NO_GROUP` tripwire bucket exists and the gate proves it EMPTY across 8 session types × 4 durations (3,900+ pool entries). One afternoon's trace is not trusted forever; the day content lands that no group covers, the gate goes red instead of the entry quietly vanishing.
->
-> **3. A tension inside the spec, resolved rather than picked.** Section 6 assertion 6 says options are "never disabled for soreness"; section 7 decision 1 says 7 and above is unselectable. Both hold via `aria-disabled` and never the HTML `disabled` attribute: the option keeps its 48px target, stays in the tab order, is announced as unavailable and carries its reason in words. `disabled` would remove it from the tab order and make the explanation unreachable — the fault WOW-4 fixed in v5.
->
-> #### 🟢 The gate found a bug in the build's own code
->
-> Tapping an exercise whose own body area had **no alternatives left** opened the sheet blank while fifty-five options sat in ten other groups. Deep Squat Hold leads with Hips; on a persona with glutes at 7 every remaining hip candidate was already in the session. Reading the code would never have shown it. The active group now falls back through: last chosen → the tapped exercise's own area → whatever actually has items.
->
-> #### ⚫ The 7 is pinned by behaviour, not by comment
->
-> `SORE_BLOCK_FLOOR` is `getActiveConditionIds()`'s acute switch. verify-swap1 **runs that function** at 6 and at 7 and asserts the switch happens exactly at our floor. A comment claiming they agree would go stale; an executing assertion cannot. At 8 the picker is never reached — `severeZoneToday()` fires Gentle Care first.
->
-> #### 🟢 Reversal: 21 deliberate breaks, 20 caught red
->
-> Dropping the Core group · reading the standing `conditions` list · moving the block floor off 7 · rebuilding the pool on every swap · using the HTML `disabled` attribute · letting a swap disturb other exercises · dropping the reason text · putting a candidate checkbox back · swapping prescribed work · reaching past the pool · removing the cap · removing the escape · reverting the empty-group fallback · not rewriting `selectedIds` · dropping `aria-describedby` · making swap rows divs.
->
-> **Two vacuous assertions were caught by that process and fixed.** The cap check ran against a group of two, so deleting the cap entirely left the gate green; it now finds the largest group, asserts it exceeds the cap, and opens it. And the soreness fixture used shoulder at 7, where the acute contraindication had already stripped most shoulder work out of the pool — so every "blocked option" assertion ran over an EMPTY array. **The fixture must actually reach the branch it claims to test: this is the sixth recorded instance.** glutes at 7 plus lower-back at 3 reaches both branches, and the gate now asserts both sets are non-empty.
->
-> **The one thing NOT proven:** `_canSwap()`'s Gentle Care clause is redundant today — the pool-membership check already refuses, so deleting it leaves the gate green. It is KEPT as defence in depth on SEVERE-1's reasoning, and the gate says plainly that it has not proved it rather than claiming otherwise.
->
-> #### ⚫ Knock-ons, all reconciled and re-reversed
->
-> **`verify-arc1` 5b was right.** A build note written as an `<!-- -->` comment inside a template literal **ships into the markup**, and that check strips JS comments but not HTML ones. Moved to a JS comment. Anything inside the template is delivered to the browser and judged as user-facing text, which is the correct standard.
->
-> **`verify-sectionrules` 9a/9b/9c and `verify-tiergh` 9/13** asserted superseded decisions. Rewritten to assert the property rather than the count — tiergh now checks **parity** (free and Personal see the same routes, whatever they are) instead of a hardcoded three, which is what R4 and TIER-G were always really about and cannot go stale when a route changes for a non-tier reason. Reasoning recorded in place, not deleted.
->
-> #### 🔴 NEW FAULT FOUND WHILE TRACING — DUPE-SECTION
->
-> **A twelve-exercise full-body session contains three duplicates.** Deep Squat Hold appears in warm-up **and** main; Seated Thoracic Rotation twice; Hip Flexor Stretch in warm-up and cool-down. `buildSessionFromSelection()` takes a flat `selectedIds` set and each section filters its own pool against it independently, so an exercise recommended in two section pools lands twice.
->
-> **Pre-existing** — the old candidate picker had the same defect, since its checkboxes shared one flat id Set across all three sections — but there is no list screen to notice it on any more. **Logged, not fixed: touch-once, and it changes what every session looks like, so it needs its own scoped session with its own reversal-proven gate.** Beta is ten days out and every tester will see this.
->
-> #### 🟠 Also logged, not fixed
->
-> **SURFACE-TOKEN.** `--color-surface` is **referenced 34 times with no fallback across 9 files and defined nowhere** — the same shape as the `--color-bg-elevated` fault of August, so every `.sb-candidate-label`, `.sb-zone-chip` and similar surface is currently rendering transparent. It matters to this build only because the spec promises a contrast-checked red, so the swap sheet anchors on `--color-bg-card` instead: `--color-danger` measures **3.85:1** there, which passes WCAG 2.2 AA 1.4.11 for a non-text boundary and **fails 1.4.3 for text** — so the ring is rose and the words are `--color-text`, never rose.
->
-> **`precache-check` is red on `css/layouts/goal-review.css`** (on disk, not precached — offline launch would fail). Pre-existing, confirmed against a clean checkout.
->
-> **Soreness bites harder than expected.** At shoulder 7 an upper-body main pool drops from 47 candidates to 9, and 7 of those are already in the session, so swapping offers almost nothing and the empty state fires. That is the safety filters working correctly, but it is worth knowing before a beta tester meets it.
->
-> #### 📋 Next session
->
-> **DUPE-SECTION first** — it is visible, it is in every session, and beta is close. Then VARIETY-Q, which the preview now makes answerable: "something like last time" can shape what gets built rather than being overridden by a list.
->
-> 🟡 **One decision waiting for Graeme.** With the flat list gone, "Coach builds it" and "Coach recommends, I'll choose" differ only in whether the picks are varied or deterministic — a difference that cannot be put into a button label. That is a screen asking a question with no explicable consequence, and section 5 of the SWAP-1 spec points at deleting it. Not taken here.
-
+Supersedes `master_schedule_v273.md`. Remove v273 on upload.
 
 > ### 🔵 SWAP-1 DECIDED AND SPECCED · SESSION HANDOFF WRITTEN
 >
@@ -126,12 +57,10 @@ Supersedes `master_schedule_v272.md`. Remove v272 on upload.
 >
 > | ID | Finding | Status |
 > |---|---|---|
-> | **SWAP-1** | The candidate picker showed **188** exercises (not ~90) in one flat list before the session existed. Now: preview leads, swaps offered by body area within the section, from the pool only. Sore areas **marked** not excluded — consistent with SORE-ZONE, and excluding them would remove most of the library from persona 2.1 on a bad day | 🟢 **SHIPPED 05 Sep** |
-> | **DUPE-SECTION** | 🆕 A full-body session contains **three duplicate exercises** — one entry occupying both warm-up and main. `buildSessionFromSelection()` filters each section against one flat id set. Pre-existing; found while tracing SWAP-1 | 🔴 **Next session** |
-> | **SURFACE-TOKEN** | 🆕 `--color-surface` undefined, 34 fallback-less references across 9 files. Those surfaces render transparent | 🟠 Logged |
-> | **VARIETY-Q** | The "something like last time / something different" question is asked at check-in and then overridden by handing over the full list. **The list is now gone**, so the answer can survive — it can shape what gets built | 🟡 Now answerable |
-> | **PICKER-EXIT** | "Build a different one" (`sb-rebuild-btn`) does not return where it started; it ends at Home. Deliberately untouched by SWAP-1 — but **back from the preview** was changed, because the candidate screen was its back target and no longer exists, so leaving it alone would have skipped two steps for stretch | 🟠 Logged |
-> | **SORE-LEGEND** | The red ring has no explanation of the colour. **Closed inside the swap sheet** — every marked option carries its reason in words via `aria-describedby`, so nothing there depends on colour. Still open for the stretch **zone picker**, which uses a bullet and one shared note | 🟡 Half closed |
+> | **SWAP-1** | The candidate picker shows ~90 exercises in one flat list. Should lead with the built session (which exists and reads well) and offer swaps **by category** — "something else for the warm-up", "swap the back work" — never the whole database. Sore zones should be excluded from swap options with a note, not silently present | 🔴 Needs a spec |
+> | **VARIETY-Q** | The "something like last time / something different" question is asked at check-in and then overridden by handing over the full list. The answer cannot survive that, so the question is decorative | 🟠 Design |
+> | **PICKER-EXIT** | "Build a different one" does not return where it started; it ends at Home | 🟠 Logged |
+> | **SORE-LEGEND** | The red ring has no explanation of the colour. Secondary to 14a — the marking was untrue before it was unexplained | 🟠 Logged |
 >
 > 🟢 **Graeme, 05 Sep 2026: "There is a clear difference now between the screens."** TIER-HOME confirmed on device.
 
@@ -6835,4 +6764,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v275*
+*Build New Habits · Alongside: Move · Master Schedule · 03 Sep 2026 v269*

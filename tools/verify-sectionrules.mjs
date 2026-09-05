@@ -348,7 +348,12 @@ check("9a. stretch skips equipment and build mode", () => {
      "the duration step still routes stretch into the equipment check. Nothing in the " +
      "stretch pools reads equipment, and build mode was the second 'how would you like " +
      "this to go?' in as many minutes.");
-  ok(body.includes("_openRecommendedCandidates()"),
+  // SUPERSEDED BY SWAP-1, 05 Sep 2026, and updated rather than deleted.
+  // The RULE is unchanged: stretch goes straight to the recommended
+  // selection without an equipment or build-mode question. What changed
+  // is where "straight to" lands — the recommended selection is now a
+  // built session, not a list of seventy-three to tick.
+  ok(body.includes("triggerRecommendedBuild()"),
      "stretch does not go straight to the recommended selection");
 });
 
@@ -356,17 +361,36 @@ check("9b. the skipped screens share one definition", () => {
   // The recommend branch and the stretch path must not grow two copies
   // of "open the recommended candidate list" -- that duplication is what
   // produced two selection loops.
+  // SWAP-1, 05 Sep 2026. _openRecommendedCandidates() is gone with the
+  // screen it opened; triggerRecommendedBuild() took over its job AND
+  // its reason for existing. The assertion is unchanged in substance —
+  // one definition, at least two callers — because the fault it guards
+  // against is the duplication itself, not the name.
   const ui = read("js/views/session-builder-ui.js");
-  const defs = (ui.match(/function _openRecommendedCandidates/g) || []).length;
+  const defs = (ui.match(/function triggerRecommendedBuild/g) || []).length;
   ok(defs === 1, `expected 1 definition, found ${defs}`);
-  const uses = (ui.match(/_openRecommendedCandidates\(\)/g) || []).length - defs;
+  const uses = (ui.match(/triggerRecommendedBuild\(\)/g) || []).length - defs;
   ok(uses >= 2, `only ${uses} call site(s); the stretch path and the recommend branch must share it`);
+  ok(!ui.includes("function _openRecommendedCandidates"),
+     "the old definition is back — two ways to open the recommended selection is the " +
+     "duplication this check exists to stop");
 });
 
 check("9c. back does not walk into the skipped screens", () => {
+  // SWAP-1, 05 Sep 2026. The candidate screen no longer exists, so there
+  // is nothing to back out OF it. The rule it protected is the one that
+  // matters and it now applies to the preview, which took its place in
+  // the flow: never walk backwards into a screen that was skipped
+  // forward. For stretch, that means back from the preview goes to
+  // duration, never to equipment or build mode.
   const ui = read("js/views/session-builder-ui.js");
-  ok(/phase === "candidates" && selectedType === "stretch"/.test(ui),
-     "backing out of the candidate list would enter equipment or build mode -- screens " +
+  ok(!/phase === "candidates"/.test(ui),
+     "the candidate phase is back; this check no longer describes the flow");
+  const at = ui.indexOf('} else if (phase === "preview") {');
+  ok(at > -1, "no preview branch in the back handler");
+  const body = ui.slice(at, at + 1200);
+  ok(body.includes('selectedType === "stretch" ? "duration"'),
+     "backing out of the preview would enter equipment or build mode -- screens " +
      "the stretch path skipped forward");
 });
 
