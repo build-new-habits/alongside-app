@@ -554,7 +554,24 @@ function renderZonePicker() {
   // often the right call, and the exercises themselves are already
   // condition-filtered underneath. This tells the person what the coach
   // knows; it does not decide for them.
-  const soreAreas = new Set(store.get("conditions") || []);
+  // SORE-SOURCE, 05 Sep 2026. This read `conditions` -- the STANDING
+  // list of everything somebody lives with -- and marked all of it as
+  // sore today. On device Graeme reported hip and lower back as mild at
+  // check-in and four zones came back ringed.
+  //
+  // That is the coach claiming an input it did not use, which is the
+  // exact thing "faultless" was defined against. Today's answers are in
+  // conditionPainScores, keyed by condition id, and nothing here was
+  // reading them.
+  //
+  // Threshold 1: anything the person named as present today. This marks
+  // rather than restricts, so the bar is deliberately low -- the
+  // protective filtering happens elsewhere and at higher thresholds
+  // (getActiveConditionIds at 7, severeZoneToday at 8).
+  const scores    = store.get("conditionPainScores") || {};
+  const soreAreas = new Set(
+    Object.keys(scores).filter(id => Number(scores[id]) > 0)
+  );
   const soreZones = new Set(
     zones.filter(z => z.areas.some(a => soreAreas.has(a))).map(z => z.id)
   );

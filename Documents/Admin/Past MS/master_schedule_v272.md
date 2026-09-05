@@ -1,40 +1,4 @@
 # Alongside: Move — Master Schedule
-## 05 Sep 2026 v273
-
-Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v272.md`. Remove v272 on upload.
-
-> ### 🔴 TRUTHFULNESS — three fixes, `alongside-v437`. 102 gates. Two of these were the coach claiming inputs it had not used.
->
-> #### 🔴 Sore zones were read from the STANDING conditions list
->
-> The zone picker marked everything in `conditions` — the permanent list of what somebody lives with — as sore **today**. On device Graeme reported hip and lower back as *mild* at check-in and **four zones came back ringed**.
->
-> Today's answers live in `conditionPainScores` and **nothing was reading them.** This is precisely the fault "faultless" was defined against: *every input the coach implies it used, it demonstrably used*. Now reads today's scores, threshold "named as present today" — it marks rather than restricts, so the bar is deliberately low; protective filtering happens elsewhere at 7 and 8.
->
-> #### 🔴 A brand-new arc showed a strand already lit
->
-> Strand coverage counted **any** dated zone, including sessions done before the arc existed. On device a fresh arc showed *"A back that copes"* lit because a stretch two days earlier had touched lower-back.
->
-> **An arc cannot have covered something before it started.** Borrowing unearned history is the same dishonesty as the sore marking, and it robs day one of the only thing that makes it worth seeing — everything still ahead.
->
-> #### 🟠 The arc's Back pointed at its old parent
->
-> It navigated to Mobility & Conditioning, where the arc lived before LOBBY-1b moved it to Home. **So there was no way back to Home except starting a session.**
->
-> #### 📋 Still open from the same device test
->
-> | ID | Finding | Status |
-> |---|---|---|
-> | **SWAP-1** | The candidate picker shows ~90 exercises in one flat list. Should lead with the built session (which exists and reads well) and offer swaps **by category** — "something else for the warm-up", "swap the back work" — never the whole database. Sore zones should be excluded from swap options with a note, not silently present | 🔴 Needs a spec |
-> | **VARIETY-Q** | The "something like last time / something different" question is asked at check-in and then overridden by handing over the full list. The answer cannot survive that, so the question is decorative | 🟠 Design |
-> | **PICKER-EXIT** | "Build a different one" does not return where it started; it ends at Home | 🟠 Logged |
-> | **SORE-LEGEND** | The red ring has no explanation of the colour. Secondary to 14a — the marking was untrue before it was unexplained | 🟠 Logged |
->
-> 🟢 **Graeme, 05 Sep 2026: "There is a clear difference now between the screens."** TIER-HOME confirmed on device.
-
----
-
 ## 05 Sep 2026 v272
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
