@@ -476,3 +476,35 @@
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
+
+/* ── TIER-HOME: the free chooser ──────────────────────────────────────
+   Headings, not doors. They give the territory shape without adding a
+   level — the depth rule holds: at most one screen before moving. */
+.today-chooser-q {
+  margin: var(--space-2) 0 var(--space-5) 0;
+  font-size: var(--text-lg, 1.125rem);
+  line-height: var(--leading-relaxed, 1.5);
+}
+
+.today-group-label {
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--text-sm);
+  letter-spacing: 0.02em;
+  opacity: 0.75;
+}
+
+.today-doors + .today-group-label {
+  margin-top: var(--space-5);
+}
+
+/* The coach-picks fallback. Quiet, but not hidden — it is the drop-in,
+   and it spent months as the eighth tile labelled "Unsure?". */
+.today-unsure {
+  margin-top: var(--space-5);
+}
+
+/* A pick on the free chooser. Same target and weight as a Plan tile —
+   free is not a smaller version of the screen, it is a different one. */
+.today-door--pick {
+  min-height: 48px;
+}
