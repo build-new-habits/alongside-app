@@ -1,6 +1,23 @@
 /**
  * conditions.js — Condition definitions for onboarding and check-in
  *
+ * 06 Sep 2026 v1.6
+ *   CR-1. `chronic-fatigue` split into `persistent-fatigue`, `me-cfs`
+ *   and `long-covid`. See the block comment at the GENERAL HEALTH entries.
+ *
+ *   SOURCE: written answers from a named physiotherapist, 06 Sep 2026,
+ *   on the nine-questions document. Stated precisely, because this file
+ *   has already had to correct itself once on exactly this point: she
+ *   declined the reviewer role and declined to be named. These are her
+ *   steers, NOT clinical sign-off, and nothing here is cleared. Her
+ *   position on ME/CFS is supported by NICE NG206 and the ME
+ *   Association's activity and exercise guidance, both of which she
+ *   cited. Two of the nine questions she did not answer at all.
+ *
+ *   EXCLUDED_CONDITIONS below is the only new rule. It does not decide
+ *   what is wrong with anybody; it records which conditions this app
+ *   declines to build sessions around.
+ *
  * 16 Aug 2026 v1.5
  *   HYPER-1. Clinical guidance, 16 Aug: hypermobility/EDS must strictly
  *   avoid end-range passive stretching.
@@ -152,7 +169,26 @@ export const CONDITIONS = [
   { id: 'abdominals',       name: 'Abdominals / Core',      icon: '🫁', area: 'upper',    hasPhase: false, zone: 'spine' },
 
   // GENERAL HEALTH
-  { id: 'chronic-fatigue',  name: 'Chronic fatigue / ME-CFS', icon: '😴', area: 'general', hasPhase: false, zone: 'systemic' },
+  // CR-1, 06 Sep 2026. `chronic-fatigue` was ONE id covering TWO
+  // populations, and a single decision was wrong for one of them.
+  // Split on the physiotherapist's steer of 06 Sep: persistent tiredness
+  // and ME/CFS are not the same thing, and long covid belongs with the
+  // second group, not the first.
+  //
+  // WHY THE SPLIT IS THE SAFE DIRECTION. Move's central mechanic is
+  // adapting today's session to how you feel today. For ME/CFS and long
+  // covid that mechanic is the hazard, not the feature -- post-exertional
+  // malaise is not load intolerance, and a session that feels fine can
+  // cost days. `me-cfs` and `long-covid` therefore route to an exclusion,
+  // not to a gentler session. `persistent-fatigue` keeps the adaptive
+  // model, which it is well suited to.
+  //
+  // NOT a screening tool. The app does not decide which of these a person
+  // has and must never try to. It offers three honest labels and takes
+  // the answer at face value.
+  { id: 'persistent-fatigue', name: 'Ongoing tiredness or low energy', icon: '😴', area: 'general', hasPhase: false, zone: 'systemic' },
+  { id: 'me-cfs',           name: 'ME / CFS', icon: '🔋', area: 'general', hasPhase: false, zone: 'systemic' },
+  { id: 'long-covid',       name: 'Long covid', icon: '🌫️', area: 'general', hasPhase: false, zone: 'systemic' },
   { id: 'anxiety',          name: 'Anxiety / Stress sensitivity', icon: '😰', area: 'general', hasPhase: false, zone: 'systemic' },
   { id: 'breathing',        name: 'Breathing / Asthma',     icon: '🌬️', area: 'general', hasPhase: false, zone: 'systemic' },
   { id: 'fibromyalgia',     name: 'Fibromyalgia',           icon: '⚡', area: 'general', hasPhase: false, zone: 'systemic' },
@@ -168,6 +204,37 @@ export const CONDITIONS = [
   // CATCH-ALL
   { id: 'other',            name: 'Something else',         icon: '❓', area: 'other',    hasPhase: false, zone: 'systemic' }
 ];
+
+// ─────────────────────────────────────────────────────────────
+// CR-1, 06 Sep 2026. THE CONDITIONS THIS APP DECLINES TO BUILD FOR.
+//
+// A statement about the product's limits, not a claim about the person.
+// The app adapts sessions to how you feel today; for these conditions
+// that mechanic is the hazard. It has no pacing or energy-envelope
+// model, and building one needs clinical input this product does not
+// have.
+//
+// The person keeps their account and everything not gated on this. It
+// is a scope statement about sessions, not an ejection.
+//
+// NOT PAYWALLED, and the check must never sit behind isPremium().
+export const EXCLUDED_CONDITIONS = new Set(['me-cfs', 'long-covid']);
+
+/**
+ * True when the person has declared a condition this app does not build
+ * sessions for. Reads declared conditions only -- never journal content,
+ * never inferred signal.
+ */
+export function hasExcludedCondition(conditions) {
+  if (!Array.isArray(conditions)) return false;
+  return conditions.some(id => EXCLUDED_CONDITIONS.has(id));
+}
+
+/** The declared excluded condition ids, for copy that names them. */
+export function getExcludedConditions(conditions) {
+  if (!Array.isArray(conditions)) return [];
+  return conditions.filter(id => EXCLUDED_CONDITIONS.has(id));
+}
 
 // ─────────────────────────────────────────────────────────────
 // PHASE-AWARE VARIANTS

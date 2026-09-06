@@ -1,7 +1,17 @@
 # Alongside — Data Schema Reference
-## 06 Sep 2026 v1.46
+## 06 Sep 2026 v1.47
 
-**File:** `js/store.js` (confirmed live version: **v63, 03 Sep 2026**)
+**File:** `js/store.js` (confirmed live version: **v64, 06 Sep 2026**)
+
+> **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
+>
+> **The migration is the contract, not the ids.** `store._migrateConditionIds()` maps `chronic-fatigue` → `persistent-fatigue` **only**, and must never map it to `me-cfs` or `long-covid`. The old id covered two populations and nobody who stored it was asked which they meant, so the migration maps to the *less* restrictive target: withdrawing the product from someone who never answered the question is a worse error than leaving them where they already were. Existing users are re-asked at their next conditions update. Gated by `tools/verify-clinical-response.mjs`.
+>
+> `conditionMeta` keys migrate alongside, via `store._migrateConditionMetaKeys()`, so `addedAt`, `reportDays` and `quietRun` survive the rename rather than being reset. Where both the old and new keys exist, the **new** one wins — it was written by a real answer where the migrated one is inferred.
+>
+> New in `conditions.js` v1.6: `EXCLUDED_CONDITIONS` (`me-cfs`, `long-covid`), with `hasExcludedCondition()` and `getExcludedConditions()`. Not a store field — a derived read over declared conditions. It reads declared conditions only, never journal content and never inferred signal, and it must never sit behind `isPremium()`.
+>
+> **Provenance:** written answers from a named physiotherapist, 06 Sep 2026, who declined the reviewer role and declined naming. Steers, not clinical sign-off.
 
 > **v1.46, 06 Sep 2026 — SKIP.** `exerciseFeedback` has ONE writer, and it is the explicit two-button control. The "Skip this one" button no longer writes to it. No field shape changed; the contract narrowed, which is the part a future session needs and the part the old entry got wrong.
 >
