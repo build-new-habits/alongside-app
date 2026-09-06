@@ -1,5 +1,12 @@
 /**
  * gym-programme.js
+ * 06 Sep 2026 v12
+ *
+ * v12 - SKIP. "Skip this one" no longer writes a difficulty reason to
+ *   exerciseFeedback. It writes no reason at all. The PT-12 argument for
+ *   it expired on 12 Aug when FEED-1 shipped the explicit control; see
+ *   the handler.
+ *
  * 31 Aug 2026 v11
  *
  * v11 - CARD-3. Three pages. The swap control moves from After to DECIDE,
@@ -995,20 +1002,36 @@ export function GymProgrammeView(router) {
     });
 
     document.getElementById('gp-skip-btn')?.addEventListener('click', () => {
-      // 11 Aug 2026 (PT-12) — a skip is a real signal the person gave, at
-      // the point of friction, with no new UI asked of them (locked
-      // principle P3: offer at friction, never teach in the abstract).
-      // It feeds applyFeedbackWeighting(), which has read exerciseFeedback
-      // since exercises/index.js v1.3 and has never once had data to read.
+      // SKIP, 06 Sep 2026. A skip records NO reason. Graeme's ruling.
       //
-      // Recorded as 'too-hard' rather than 'disliked' deliberately: the
-      // reader's contract is binary too-hard/too-easy, and the effect of a
-      // too-hard signal (deprioritise, programmeScore 0.5) is the right
-      // response to a skip either way. Nothing is said to the person about
-      // it — no "noted", no "we'll make that easier". The adjustment is
-      // silent, which is the whole point of it feeling like being known
-      // rather than being surveyed.
-      if (exercise?.id) store.logExerciseFeedback(exercise.id, 'too-hard');
+      // This used to call logExerciseFeedback(id, "too-hard"). Two things
+      // were wrong with that, and the second is the worse one.
+      //
+      // Skip is on the DECIDE page. It is pressed BEFORE the exercise is
+      // attempted, so the app was recording a judgement about difficulty
+      // that the person had not made and could not have made.
+      //
+      // And the signal is not inert. applyFeedbackWeighting() drops
+      // programmeScore to 0.5 on two of those entries in the last five.
+      // So skipping twice for any reason at all -- short on time, wrong
+      // room, changed their mind, someone at the door -- deprioritised
+      // that exercise exactly as if the person had twice pressed "That
+      // was too hard" on purpose. The evidence does not support the
+      // inference: reviews of exercise non-adherence give motivation,
+      // pain, poor health, fatigue, lack of time, competing priorities,
+      // weather and fear of injury. Difficulty barely features.
+      //
+      // PT-12's reasoning (11 Aug) was that nothing else wrote the field.
+      // True for one day. FEED-1 shipped the explicit two-button control
+      // on 12 Aug, in all four session runners, and that is now the sole
+      // writer -- the place where the person chose to say something.
+      //
+      // Nothing replaces this. No prompt, no "why did you skip?". A
+      // question at the point of friction is measurement pressure, which
+      // is the thing this product is built against. The skip is still
+      // recorded as a skip: activityLog.exerciseIds carries what was
+      // DONE, so a skipped exercise is absent from it -- a fact about
+      // what happened, carrying no claim about why.
       advanceOrFinish(container, session, stats, sessionType);
     });
 
