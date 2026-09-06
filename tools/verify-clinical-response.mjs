@@ -104,6 +104,7 @@ check("The exclusion check is not gated on tier", "Safety is never paywalled", (
 console.log("\nCR-1 \u2014 the migration, the part that must not be wrong");
 
 const { store: S } = await import("../js/store.js");
+const { CONDITIONS: C_ALL } = await import("../js/data/conditions.js");
 ok(S && typeof S.mergeWithDefaults === "function",
    "store.mergeWithDefaults is not reachable \u2014 this gate would pass vacuously");
 
@@ -359,6 +360,38 @@ check("The settings route shares one source of text", `${BP} \u00a72`, () => {
      "of this text, in CONDITION_CAVEATS");
   ok(/aria-live/.test(v),
      "the caveat region has no aria-live, so it appears silently for screen reader users");
+});
+
+console.log("\nACK-NAME \u2014 the coach does not speak in store ids");
+
+const OTD = await import("../js/data/onboarding-thread-data.js");
+
+check("A single condition renders its display name, not its id", "ACK-NAME, 06 Sep 2026", () => {
+  const ack = OTD.generateConditionsAck(["wrist-elbow"]);
+  ok(!/wrist-elbow/.test(ack),
+     `the raw store id is in the coach's mouth: ${JSON.stringify(ack.split("\n")[0])}`);
+  ok(/Wrist \/ Elbow/.test(ack), "the display name is not being used");
+});
+
+check("It holds for every defined condition, not just the sampled one", "ACK-NAME", () => {
+  // Only the interpolated clause is tested. The CR-3 caveat legitimately
+  // writes the word "hypermobility" as prose, and an earlier version of
+  // this assertion failed on that -- a false positive that would have
+  // pushed someone to weaken real copy to satisfy a gate.
+  const clause = ack => (ack.split("\n")[0].match(/work around (.+?) \u2014/) || [])[1] || "";
+  const bad = [];
+  for (const c of C_ALL) {
+    const named = clause(OTD.generateConditionsAck([c.id]));
+    if (named !== c.name) bad.push(`${c.id} -> ${JSON.stringify(named)}`);
+  }
+  ok(bad.length === 0,
+     `the acknowledgement does not name these by their display name: ${bad.join("; ")}`);
+});
+
+check("An unknown id degrades to itself, not to undefined", "ACK-NAME", () => {
+  const ack = OTD.generateConditionsAck(["not-a-real-condition"]);
+  ok(!/undefined/.test(ack),
+     "an unrecognised condition renders \"undefined\" in the coach line");
 });
 
 console.log("\nHYPER-1 regression \u2014 unchanged by this session");

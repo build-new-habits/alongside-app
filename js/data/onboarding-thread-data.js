@@ -1,5 +1,16 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 06 Sep 2026 v11
+ *   ACK-NAME. The single-condition acknowledgement rendered the raw store
+ *   id -- "I'll work around wrist-elbow" -- to every user declaring
+ *   exactly one condition, at the moment the coach claims to have
+ *   listened. Now getConditionName().
+ *
+ * 06 Sep 2026 v10
+ *   CR-1. CLEARANCE_RELEVANT_CONDITIONS and MOBILITY_RELEVANT_CONDITIONS
+ *   updated for the chronic-fatigue split. CR-3 added CONDITION_CAVEATS
+ *   and generateConditionCaveats().
+ *
  * 14 Aug 2026 v9
  *
  * v9 - AGE-1 (18+ bands, one vocabulary) and CARDIAC-1 (step 8a exercise
@@ -70,6 +81,8 @@
  *   generateSummary()       — summary bubble text for each sheet step
  *   FALLBACK_REFLECTION     — Beat 3 fallback for "I'd rather not say"
  */
+
+import { getConditionName } from "./conditions.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HARD BEFORE — chips and phrase map
@@ -1099,7 +1112,17 @@ export function generateConditionsAck(conditions) {
     return "Okay \u2014 no problem at all. If anything comes to mind later, you can add it in your settings and I'll adjust from there. I just wanted to ask.";
   }
   if (conditions.length === 1) {
-    return withCaveats(`Thank you for telling me. I'll work around ${conditions[0]} \u2014 you won't have to remind me.`);
+    // ACK-NAME, 06 Sep 2026. Was `${conditions[0]}`, which put the raw
+    // store id into the coach's mouth: "I'll work around wrist-elbow".
+    // Every user declaring exactly one condition saw it, at the precise
+    // moment the coach is claiming to have listened.
+    //
+    // getConditionName() rather than a second lookup here -- it already
+    // handles the -acute/-subacute phase suffixes, and it already falls
+    // back to the id for anything unrecognised, so a condition added
+    // without a definition degrades to the old behaviour instead of
+    // rendering "undefined".
+    return withCaveats(`Thank you for telling me. I'll work around ${getConditionName(conditions[0])} \u2014 you won't have to remind me.`);
   }
   if (conditions.length === 2) {
     return withCaveats(`Thank you for telling me. I'll work around both of those \u2014 you won't have to remind me.`);
