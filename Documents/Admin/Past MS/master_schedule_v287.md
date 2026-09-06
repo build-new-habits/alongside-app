@@ -1,64 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v288
+## 06 Sep 2026 v287
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v287.md`. Remove v287 on upload.
-
-> ### 📋 SESSION CLOSE 06 Sep 2026 (second session) — `alongside-v444`, **111 gates**, 116 of 116 checks green on a second independent fresh clone
->
-> Two items shipped: **CARD-TDZ** and **SKIP**. One red check on main cleared: **PRECACHE-RED**.
->
-> **The exercise card had been dead on main for three days and no one knew.** It was found only by trying to drive SKIP — the card crashed before `#gp-skip-btn` could render. That is the standing rule paying for itself: driving the schedule's item found a fault the schedule did not contain, exactly as ARC-DOOR did yesterday.
->
-> ⏳ **Unchanged and still awaiting Graeme:** the PAR-Q+ call for RED-FLAG; BETA-3 on the handset.
-
-> ### 🔴 CARD-TDZ — EVERY SESSION SCREEN IN THE APP WAS DEAD. Closed 06 Sep 2026, `alongside-v444`. `exercise-card.js` v3 → **v4**. New `tools/verify-card-tdz.mjs` (17 assertions).
->
-> `renderExerciseCard()` threw `ReferenceError: Cannot access 'cueBlock' before initialization` on **every call**. `const decide = [cueBlock, ...]` sat at line 144; `const cueBlock` was declared at 183. One function body, no branch between them, and `const` does not hoist.
->
-> Nothing catches the throw, so it propagated out through `renderCurrentExercise` → `renderSession` → `mount`. **Not a degraded card — a dead screen**, in all four session runners: `workout.js`, `gym-programme.js`, `core-session.js`, `prescribed-session.js`. Every workout in the app.
->
-> Introduced by **CUE-UNPIN (`71ae19d`, 3 Sep)**, which added the use and the declaration in the same commit and put the declaration below the use. **Live three days.**
->
-> #### 🔴 WHY 109 GATES AND `node --check` ALL PASSED
->
-> The only mention of `renderExerciseCard` anywhere in `tools/` was a regex over source text at `verify-core1.mjs:126`. **Not one gate CALLED it.** And a temporal dead zone is a runtime error, not a syntax error, so `node --check` passes cleanly on a file that cannot run.
->
-> **This is section 4b of the handoff one level up: source-slice assertions prove text, not behaviour.** No number of them would have caught this. The new gate executes the card across five option shapes rather than reading it.
->
-> ⚫ **The cheap wrong fix is pinned shut.** Hoisting `cueBlock` into `pinned` would fix the crash and silently restore the fault CUE-UNPIN closed on 2 Sep — the same coaching paragraph on DECIDE, DO and NOTE. Three assertions go red if anyone does it.
->
-> **Three deliberate breaks, three caught red**, re-run independently at audit: original declaration order (2 red, and the gate honestly declines to evaluate page-scope assertions when the card throws); lead cue hoisted into `pinned` (3 red); instructions above hazards on DO (1 red).
-
-> ### 🟢 SKIP — a skip is a skip, not a difficulty rating. Closed 06 Sep 2026, `alongside-v444`. Graeme's ruling, implemented as given.
->
-> "Skip this one" called `store.logExerciseFeedback(id, "too-hard")` on every press. **It now writes no reason at all.** Nothing replaces it — no prompt, no "why did you skip?". A question at the point of friction is measurement pressure.
->
-> **Skip is on the DECIDE page.** It is pressed *before* the exercise is attempted, so the app recorded a judgement about difficulty the person had not made and, not having done the exercise, could not have made.
->
-> And the signal was not inert: `applyFeedbackWeighting()` drops `programmeScore` to 0.5 on two such entries in the last five. **Skipping twice for any reason at all** — short on time, wrong room, someone at the door — deprioritised that exercise exactly as if the person had twice pressed "That was too hard" on purpose.
->
-> #### ⚫ PT-12'S REASONING EXPIRED ON 12 AUGUST, AND THE SCHEMA NEVER NOTICED
->
-> The write was added 11 Aug because `exerciseFeedback` was read by `applyFeedbackWeighting()` and written by nothing. **That was true for one day.** FEED-1 shipped the explicit two-button control on 12 Aug — imported, rendered and attached in all four session runners — and the justification lapsed while the code and the schema entry both stayed.
->
-> So the removal does **not** starve the reader. It leaves exactly one writer: the place where the person chose to say something. `Schema.md` v1.46 corrects an entry that named the incidental writer and omitted the real one. **No field shape changed** — the contract narrowed, `store.js` stays v63.
->
-> A skip is still recorded as a skip: `activityLog.exerciseIds` carries what was *done*, so a skipped exercise is absent from it. A fact about what happened, carrying no claim about why.
->
-> **Two deliberate breaks, both caught red** — and the second one is the lesson. Reinstating the `too-hard` write: 7 red. Unwiring the explicit control from `core-session.js`: **the first attempt stayed green at 22/22**, because it removed the import and left the call sites, and the assertion matches call shape. Removing the actual `renderFeedbackControl(ex)` call went red. **A ninth fixture-reach failure, committed during the audit itself.**
-
-> ### 🟠 PRECACHE-RED — a red check had been sitting on `main`. Closed 06 Sep 2026 in the `sw.js` v444 bump.
->
-> `tools/precache-check.mjs` failed reproducibly (3/3) on an untouched fresh clone: `css/layouts/goal-review.css` is on disk, `@import`ed by the precached `main.css`, and absent from `SHELL_URLS`. **Its ten sibling layout files were all listed; this one was the exception.**
->
-> `sw.js` v398 recorded that it needed no listing because `main.css` @imports it. **That reasoning is wrong.** An `@import` fires its own request, and the fetch handler falls back to the cached shell only for `mode === "navigate"`, so offline the request fails. It self-heals via the runtime `cache.put` on first online load — but **that window reopens on every cache bump**, because activate deletes the old cache and the new one holds only what is precached.
->
-> #### ⚫ WHY IT WENT UNNOTICED, AND THE PROCESS CHANGE
->
-> The standard gate loop is `tools/verify-*.mjs`. **`precache-check`, `schema-check`, `contrast-check`, `schedule-drift` and `audit-gate-proxies` all sit outside it.** The other four were green, so nothing surfaced.
->
-> > **STANDING RULE: the suite is 111 gates PLUS those five checks — 116.** A session that reports "gates green" from the `verify-*` loop alone has not run the suite.
+Supersedes `master_schedule_v286.md`. Remove v286 on upload.
 
 > ### 📋 SESSION CLOSE 06 Sep 2026 — handoff at `Documents/Admin/alongside_session_handoff_06sep2026_v1.md`
 >
@@ -2303,9 +2247,9 @@ Supersedes `master_schedule_03sep2026_v268.md`. Remove v268 on upload.
 >
 > ---
 >
-> ### 🟢 SKIP-MEANS-TOO-HARD — CLOSED 06 Sep 2026, `alongside-v444`, 111 gates. `gym-programme.js` v11 → **v12**, `Schema.md` v1.45 → **v1.46**. New `tools/verify-skip.mjs` (22 assertions). Original entry below, kept for the reasoning.
+> ### 🔴 SKIP-MEANS-TOO-HARD — live fault, found 26 Aug, NOT fixed. Graeme's call.
 >
-> `gym-programme.js:1011` — the line number in the original entry, 929, was stale (PT-12, 11 Aug):
+> `gym-programme.js:929` (PT-12, 11 Aug):
 >
 > ```js
 > if (exercise?.id) store.logExerciseFeedback(exercise.id, 'too-hard');
@@ -7161,4 +7105,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v288*
+*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v287*
