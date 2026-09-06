@@ -847,7 +847,7 @@ import { resolveEquipment, exerciseIsAvailable } from "./data/equipment-map.js";
 import { EXERCISES, isSessionLength } from "./data/exercises/index.js";
 import { matchCategory } from "./data/session-categories.js";
 import { buildRationale } from "./data/session-rationale.js";
-import { getZoneStatus, getPainBand, getCondition } from "./data/conditions.js";
+import { getZoneStatus, getPainBand, getCondition, getExcludedConditions } from "./data/conditions.js";
 import { focusOrderedCategories } from "./data/week-focus.js";
 
 // ── Allocation presets (05 Aug 2026) ──────────────────────────────────────────
@@ -2397,6 +2397,19 @@ export function buildCandidatePools({ sessionType, durationMins, equipmentOverri
  * warmup) holds even in "build your own" mode, it isn't optional.
  */
 export function buildSessionFromSelection({ sessionType, durationMins, selectedIds, equipmentOverride, ignoreSevere }) {
+  // CR-2. The self-directed route gets the same answer, and gets it
+  // first, for the same reason SEVERE-1 is on both entry points: a safety
+  // rule honoured by one of two routes is not a safety rule.
+  //
+  // DELIBERATELY NOT GATED ON ignoreSevere. Today's pain is a thing the
+  // person can reasonably overrule about themselves. Whether this app has
+  // a pacing model is not -- that is a fact about the product, and no
+  // answer the person gives can change it. There is no override.
+  {
+    const excluded = getExcludedConditions(store.get("conditions") || []);
+    if (excluded.length > 0) return outOfScopeSession(excluded, durationMins);
+  }
+
   // SEVERE-1. The self-directed route gets the same answer. Putting the
   // bypass only on buildSession() would have made it a safety rule that
   // one of two entry points honoured -- the exact shape of every
@@ -2655,7 +2668,87 @@ function gentleCareSession(zone, durationMins) {
   };
 }
 
+/**
+ * CR-2, 06 Sep 2026. THE OUT-OF-SCOPE CARD.
+ *
+ * Returned instead of a session when the person has declared a condition
+ * in EXCLUDED_CONDITIONS. It is not a gentler session and must never be
+ * mistaken for one.
+ *
+ * WHY THIS EXISTS. Move's whole method is adapting today's session to
+ * how you feel today. For ME/CFS and long covid that method is the
+ * hazard: post-exertional malaise is not load intolerance, so a session
+ * that feels manageable on the day can cost days afterwards. Pacing
+ * against an energy envelope is a different model, it needs clinical
+ * input this product does not have, and inventing it would be worse than
+ * declining.
+ *
+ * WHY IT RUNS BEFORE SEVERE-1, WHICH IS NOT AN ORDERING PREFERENCE.
+ * Gentle Care offers box breathing, a body scan AND a mindful walk. The
+ * walk is the problem. Handing an exertion suggestion, however small, to
+ * someone with post-exertional malaise is the exact failure this card
+ * exists to prevent, so this check must resolve before Gentle Care can
+ * be reached. Breathing and grounding stay: they are wellbeing, not
+ * exertion, and withdrawing them would be a punishment rather than a
+ * scope statement.
+ *
+ * THE COACH DOES NOT DIAGNOSE, and this card does not either. It names
+ * only what the person themselves declared, says what the app is doing
+ * and why, and points outward. It does not say what is wrong with them,
+ * does not assess severity, and does not tell them what they can manage.
+ *
+ * NOT PAYWALLED. The check sits ahead of every tier gate in this file.
+ *
+ * PROVENANCE. Follows written answers from a named physiotherapist,
+ * 06 Sep 2026, who declined the reviewer role and declined naming. Her
+ * position is consistent with NICE NG206 and the ME Association's
+ * activity and exercise guidance, both of which she cited. Steers, not
+ * clinical sign-off.
+ */
+function outOfScopeSession(declaredIds, durationMins) {
+  const pick = (id, category) =>
+    EXERCISES.find(e => e.id === id) ||
+    EXERCISES.find(e => e.category === category) ||
+    null;
+
+  // Breathing and grounding only. NO mindful-walk, and no other entry
+  // that asks the body for anything. See the block comment above.
+  const items = [
+    pick("box-breathing", "recovery"),
+    pick("body-scan-short", "mindfulness")
+  ].filter(Boolean).map(e => ({
+    ...e,
+    section: "warmup",
+    _outOfScope: true
+  }));
+
+  return {
+    id: "out-of-scope",
+    title: "This part isn't built for you yet",
+    subtitle: "",
+    duration: durationMins || 10,
+    outOfScope: true,
+    outOfScopeConditions: declaredIds,
+    coachLine:
+      "I'm not going to build you movement sessions, and I want to be straight with you " +
+      "about why.\n\nThe way I work is to look at how you are today and adjust from there. " +
+      "For what you've told me you're managing, that approach can do harm rather than " +
+      "good \u2014 doing what feels possible on the day is exactly how people end up paying " +
+      "for it later. Working safely needs pacing built around you by someone who knows " +
+      "your history, and I can't be that.\n\nSo I'm not going to guess. Breathing and " +
+      "grounding are still here whenever you want them, and everything else in the app " +
+      "is yours as normal.",
+    exercises: items,
+    rationale: []
+  };
+}
+
 export function buildSession({ sessionType, durationMins, equipmentOverride, preset, ignoreSevere }) {
+  // CR-2. Before SEVERE-1, and that order is load-bearing -- see
+  // outOfScopeSession(). Gentle Care offers a walk; this must resolve first.
+  const excluded = getExcludedConditions(store.get("conditions") || []);
+  if (excluded.length > 0) return outOfScopeSession(excluded, durationMins);
+
   // SEVERE-1. Before anything else, and before any pool is built.
   if (SEVERE_BYPASS_ENABLED && !ignoreSevere) {
     const zone = severeZoneToday();
