@@ -1,20 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v284
+## 06 Sep 2026 v283
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v283.md`. Remove v283 on upload.
-
-> ### 🔴 THREE OF THE NINE "OPEN DEFECTS" WERE STALE ENTRIES, NOT FAULTS — 06 Sep 2026
->
-> SURFACE-TOKEN (closed by a parallel session), PICKER-EXIT (fixed by BYPASS-DOOR, never reconciled) and now **INSTEP-TIER** (free since DOOR-1 on 12 Aug, already held by two gates). **A third of the list Graeme was told was outstanding was bookkeeping.**
->
-> INSTEP-TIER is the sharpest case: `in-step.js:45` records that a header wrongly saying "Personal tier" was corrected on **13 Aug**, and this schedule then re-recorded the same wrong claim as a 🔴 conflict on 3 Sep and again on 5 Sep. **The error was fixed in the code and reintroduced in the record, twice.**
->
-> **CONSEQUENCE, AND IT IS THE ANSWER TO "IS THE BUILD FINISHED":** the schedule cannot be used to judge completeness. It over-reports faults, and there is no reason to assume it does not also under-report them. **Only execution settles it.** This is now the standing argument for the persona trace, and for the rule below.
->
-> ⚫ **STANDING RULE, from three instances in one day: no item is reported to Graeme as open until it has been driven.** Reading the schedule is not evidence. Reading the code is not evidence. Executing it is.
->
-> Verified 06 Sep: free device renders 6,342 chars of real In Step content, no `lockedFeature()` wrapper, no paywall on the entry from `noticing.js:382`.
+Supersedes `master_schedule_v282.md`. Remove v282 on upload.
 
 > ### 🟢 TIER-VISIBLE — SHIPPED 06 Sep 2026. `alongside-v441`, 107 gates. New `tools/verify-tier-visible.mjs` (20 assertions). `settings.js` v35 → **v36**.
 >
@@ -394,7 +382,7 @@ Supersedes `master_schedule_v271.md`. Remove v271 on upload.
 > |---|---|---|---|
 > | **TIER-HOME** | Free and Plan Home are different screens | 🟢 Shipped `alongside-v436`, untested on device | 05 Sep 2026 |
 > | **SUGGEST-1** | Provisional suggestion before check-in, visible revision. **The last piece of the arc experience** | 🔵 Next | w/c 5 Sep |
-> | **GOALS-MIGRATE** · ~~**INSTEP-TIER**~~ · **NARROWING-Q** | See previous entries. INSTEP-TIER closed 06 Sep — nothing to do, the entry was stale | 🔵 Queued | w/c 5 Sep |
+> | **GOALS-MIGRATE** · **INSTEP-TIER** · **NARROWING-Q** | See previous entries | 🔵 Queued | w/c 5 Sep |
 
 ---
 
@@ -423,7 +411,7 @@ Supersedes `master_schedule_04sep2026_v270.md`. Remove v270 on upload.
 > | **SITUATIONS** | 33 aims filtered by stored signals, escape to the full list | 🟢 Shipped, awaiting device test | 3 Sep |
 > | **SUGGEST-1** | Provisional suggestion before the check-in, with visible revision. **The last piece of the arc experience** | 🔵 Next | w/c 5 Sep |
 > | **GOALS-MIGRATE** | Remove goals from onboarding; twelve read sites | 🔵 Specced | w/c 5 Sep |
-> | **INSTEP-TIER** | ~~In Step is Personal-tier in code~~ — **NOT TRUE SINCE DOOR-1, 12 Aug 2026.** Verified by execution 06 Sep: a free device renders 6,342 chars of real In Step content, no `lockedFeature()` wrapper, no paywall. Already held by `verify-decisions.mjs` and `verify-door1.mjs`. No conflict, no code change | 🟢 Closed | w/c 5 Sep |
+> | **INSTEP-TIER** | In Step is Personal-tier in code, free in both per the 3 Sep decision | 🔴 Conflict | w/c 5 Sep |
 > | **NARROWING-Q** | Personas 2.15 and 2.16 are indistinguishable on stored data | 🟠 Design | w/c 5 Sep |
 > | **HMRC · ICO · A1.11 · domain · beta recruitment** | See the task list document | 🔴 Graeme | w/c 5 Sep |
 
@@ -627,7 +615,7 @@ Supersedes `master_schedule_03sep2026_v268.md`. Remove v268 on upload.
 > | **SUGGEST-1** | The coach consuming the arc — provisional suggestion before check-in, visible revision | 🔵 **Next.** Nothing reads `arc.strands` yet | w/c 3 Sep |
 > | **LOBBY-1b** | The split. Not a layout job | 🔵 Specced | w/c 3 Sep |
 > | **GOALS-MIGRATE** | Twelve sites | 🔵 Specced | w/c 3 Sep |
-> | **INSTEP-TIER** | ~~In Step is Personal-tier in code~~ — **the code was already free when this was written.** The gating was removed on 12 Aug (DOOR-1) and `in-step.js:45` records a header that wrongly said "Personal tier" being corrected on 13 Aug (E3). This row repeated a documentation error that had already been fixed | 🟢 Closed 06 Sep | w/c 3 Sep |
+> | **INSTEP-TIER** | In Step is Personal-tier in code, free in both per today's decision | 🔴 Conflict | w/c 3 Sep |
 > | **PAT RENEWAL** | **Expires Fri 5 Sep** | 🔴 Graeme | by 5 Sep |
 
 
@@ -7057,4 +7045,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v284*
+*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v283*
