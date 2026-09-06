@@ -70,7 +70,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v64 |
 | `Schema.md` | v1.47 |
-| `sw.js` | **v449**, cache `alongside-v449` |
+| `sw.js` | **v450**, cache `alongside-v450` |
 | `router.js` | v22 · `my-programme.js` v8 · `today.js` v25 · `settings.js` v36 · `progress.js` v11 · `onboarding/thread.js` v13 |
 | Gates | **114, all green** — and genuinely green from any clone path |
 

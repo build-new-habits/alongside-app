@@ -1,5 +1,12 @@
 /**
  * js/data/onboarding-thread-data.js
+ * 06 Sep 2026 v12
+ *   CR-4a. General pre-start statement added to step 14 -- the only step
+ *   every person reaches. Adopts the physiotherapist's steer that the
+ *   advice is generic and a GP or exercise professional should be
+ *   consulted first. Does NOT adopt her further suggestion that this
+ *   should replace the red-flag screen; CR-4b stays deliberately unbuilt.
+ *
  * 06 Sep 2026 v11
  *   ACK-NAME. The single-condition acknowledgement rendered the raw store
  *   id -- "I'll work around wrist-elbow" -- to every user declaring
@@ -823,7 +830,27 @@ export const STEPS = {
     writesTo: 'onboarding.threadCompletedAt',
     beginButtonDelayMs: 600,
     beginButtonLabel: "Let's begin",
-    coach: "Right. I think that's everything I need.\n\nI know that was a lot of questions. But I wanted to do it properly — because what you've told me is actually going to change what I put in front of you. Not just today. Every time.\n\nI'm glad you're here, [name]. Let's see what we can do.",
+    // CR-4a, 06 Sep 2026. THE GENERAL PRE-START STATEMENT.
+    //
+    // The physiotherapist's steer was that the three red-flag screening
+    // questions cover only some red flags, and that a general "this is
+    // generic advice, see your GP or an exercise professional first"
+    // statement may serve better.
+    //
+    // ADOPTED HERE. What is NOT adopted is her further suggestion that
+    // the statement should REPLACE the screen -- see CR-4b, which is
+    // deliberately unbuilt and is not blocked by this.
+    //
+    // Step 14 because it is the only step every single person reaches,
+    // whatever they declared, and it is the last thing before the app
+    // begins suggesting movement. Putting it behind a condition would
+    // give it to exactly the people most likely to already know.
+    //
+    // Phrased as the coach naming its own limit rather than as a
+    // disclaimer. A wall of legal text at the end of a warm conversation
+    // reads as the product protecting itself, which is the opposite of
+    // what this is for -- and is the reading her own framing invited.
+    coach: "Right. I think that's everything I need.\n\nI know that was a lot of questions. But I wanted to do it properly — because what you've told me is actually going to change what I put in front of you. Not just today. Every time.\n\nOne last thing, and I'd rather say it plainly. What I suggest is general. It's built from what you've told me, but I can't see you move and I don't know your history the way a person could. Before starting anything new it's worth a word with your GP or someone qualified — particularly if you're managing something, or it's been a while. I'd rather say that now than have you assume I know more about you than I do.\n\nI'm glad you're here, [name]. Let's see what we can do.",
     // [name] replaced by thread.js using store.get('name').
   },
 };

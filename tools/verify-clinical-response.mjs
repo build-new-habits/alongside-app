@@ -105,6 +105,8 @@ console.log("\nCR-1 \u2014 the migration, the part that must not be wrong");
 
 const { store: S } = await import("../js/store.js");
 const { CONDITIONS: C_ALL } = await import("../js/data/conditions.js");
+const OTD = await import("../js/data/onboarding-thread-data.js");
+const OTD_STEPS = () => OTD.THREAD_STEPS || OTD.STEPS || OTD.default || {};
 ok(S && typeof S.mergeWithDefaults === "function",
    "store.mergeWithDefaults is not reachable \u2014 this gate would pass vacuously");
 
@@ -362,9 +364,98 @@ check("The settings route shares one source of text", `${BP} \u00a72`, () => {
      "the caveat region has no aria-live, so it appears silently for screen reader users");
 });
 
+console.log("\nCR-4a \u2014 the general pre-start statement");
+
+check("It is on the step every person reaches", `${BP} \u00a74`, () => {
+  const steps = OTD_STEPS();
+  const closing = steps["14"] || steps[14];
+  ok(closing, "step 14 not found \u2014 the closing step has moved");
+  ok(!closing.showIf,
+     "the closing step has acquired a showIf. The statement would then reach only some " +
+     "people, and the ones it skips are the ones least likely to already know");
+  ok(/GP or someone qualified/i.test(closing.coach),
+     "the pre-start statement is not in the closing coach message");
+  ok(/general/i.test(closing.coach),
+     "the statement does not say the advice is general, which is its whole substance");
+});
+
+check("It names the coach's limit rather than disclaiming", "coach voice", () => {
+  const steps = OTD_STEPS();
+  const closing = steps["14"] || steps[14];
+  ok(!/terms|liability|not responsible|at your own risk/i.test(closing.coach),
+     "the statement has drifted into legal register. A wall of disclaimer at the end of a " +
+     "warm conversation reads as the product protecting itself");
+});
+
+check("It does NOT claim to be the red-flag screen", `${BP} \u00a74`, () => {
+  const steps = OTD_STEPS();
+  const closing = steps["14"] || steps[14];
+  ok(!/A&E|\b111\b|\b999\b|symptoms require/i.test(closing.coach),
+     "the closing step has taken on urgency language. CR-4b is deliberately unbuilt, and a " +
+     "general statement quietly becoming a triage screen is the exact drift being avoided");
+});
+
+console.log("\nCR-5 \u2014 hurt-and-ache guidance on every exercise");
+
+const CARD = await import("../js/exercise-card.js");
+
+check("Both lines exist and are exported from one place", `${BP} \u00a72`, () => {
+  ok(Array.isArray(CARD.HURT_AND_ACHE) && CARD.HURT_AND_ACHE.length === 2,
+     "HURT_AND_ACHE is not a two-line exported constant");
+  const [during, after] = CARD.HURT_AND_ACHE;
+  ok(/hurts while you are doing it/i.test(during), "the during-exercise line is missing");
+  ok(/aching/i.test(after) && /normal/i.test(after),
+     "the aching-afterwards line does not set the expectation that it is normal");
+});
+
+check("It renders in the card body, not just in a variable", `${BP} \u00a72`, () => {
+  // FIXTURE SELF-CHECK. Prove page:"do" reaches doBody before asserting
+  // anything about its contents -- otherwise a missing block and a
+  // wrong page look identical from here.
+  const control = CARD.renderExerciseCard(
+    { id: "x", name: "Test", instructions: ["UNIQUEMARKER"], category: "strength" },
+    { page: "do" });
+  ok(/UNIQUEMARKER/.test(control),
+     "FIXTURE FAULT: page:\"do\" does not reach the DO body, so nothing below is trustworthy");
+
+  // page:"do" is required. The card is paged and defaults to "decide", so
+  // a fixture without it renders a body that never contained this block
+  // and the assertion would fail for the wrong reason.
+  const html = CARD.renderExerciseCard(
+    { id: "x", name: "Test", instructions: ["Do the thing"],
+      watchOut: ["Careful"], category: "strength" },
+    { page: "do" });
+  ok(typeof html === "string" && html.length > 0,
+     "renderExerciseCard did not return markup \u2014 this gate cannot see what a person sees");
+  ok(/If it hurts/.test(html), "the block is not in the rendered card");
+  ok(html.indexOf("Careful") < html.indexOf("If it hurts"),
+     "the generic block renders ABOVE the exercise-specific watchOut. Safety render order " +
+     "is non-negotiable: the hazard that belongs to THIS exercise comes first");
+});
+
+check("It is not gated on category", `${BP} \u00a72`, () => {
+  for (const category of ["strength", "rehabilitation", "cardio", "yoga", "mobility"]) {
+    const html = CARD.renderExerciseCard(
+      { id: "x", name: "Test", instructions: ["Do the thing"], category },
+      { page: "do" });
+    ok(/If it hurts/.test(html),
+       `the block is missing for category "${category}". Her steer was "always", and ` +
+       "someone in a strength session can hurt themselves too");
+  }
+});
+
+check("It does not diagnose or set an urgency tier", "SAFEGUARD-1 register", () => {
+  const all = CARD.HURT_AND_ACHE.join(" ");
+  ok(!/A&E|\b111\b|\b999\b|immediately|urgent/i.test(all),
+     "the block sets an urgency tier. That belongs to the red-flag screen, which is not built");
+  ok(/worth getting someone to look at it/.test(all),
+     "the escalation phrasing has drifted from SAFEGUARD-1. Eleven stop lines phrased eleven " +
+     "ways is how that fault started");
+});
+
 console.log("\nACK-NAME \u2014 the coach does not speak in store ids");
 
-const OTD = await import("../js/data/onboarding-thread-data.js");
+
 
 check("A single condition renders its display name, not its id", "ACK-NAME, 06 Sep 2026", () => {
   const ack = OTD.generateConditionsAck(["wrist-elbow"]);
