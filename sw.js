@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v441
+ * 06 Sep 2026 v442
+ *
+ * v442 - ARC-DOOR. today.js v25 gates arcPanel() by tier internally.
+ *   Free rendered the full arc through an ungated second call site; the
+ *   cache must turn over or free devices keep serving the leak.
  *
  * v441 - TIER-VISIBLE. settings.js v36 adds a visible "Your plan" line
  *   to Settings > Profile. The cache must turn over or devices keep
@@ -3052,7 +3056,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v441";
+const CACHE_NAME = "alongside-v442";
 
 const SHELL_URLS = [
 
