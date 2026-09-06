@@ -1456,7 +1456,7 @@ export const STRENGTH = [
     name: 'Broad Jump',
     youtube: 'broad jump exercise technique',
     category: 'strength',
-    movementPattern: 'hinge',
+    movementPattern: 'jump',
     equipment: [],
     equipmentOptional: [],
     affectsAreas: ['glutes', 'hamstring', 'calves', 'quadriceps'],
@@ -2816,7 +2816,7 @@ export const STRENGTH = [
     youtube: 'dumbbell reverse lunge exercise technique',
     category: 'strength',
     contentType: 'exercise',
-    movementPattern: 'squat',
+    movementPattern: 'lunge',
     equipment: ['dumbbell'],
     equipmentOptional: [],
     affectsAreas: ['quadriceps', 'glutes', 'hamstring'],
@@ -3072,8 +3072,15 @@ export const STRENGTH = [
     category: 'strength',
     contentType: 'exercise',
     movementPattern: 'carry',
-    equipment: [],
-    equipmentOptional: ['sandbag', 'dumbbell'],
+    // PATTERN-TAGS, 06 Sep 2026. This was equipment: [] with the kit named
+    // in equipmentOptional. Nothing in exercise selection reads
+    // equipmentOptional -- practices.js is its only reader anywhere -- so
+    // the entry was offered to somebody with no equipment at all, and a
+    // carry with nothing to carry is not an exercise. Dumbbell is required
+    // rather than sandbag because it is what this audience has and the
+    // original author already sanctioned it; sandbag stays as the swap.
+    equipment: ['dumbbell'],
+    equipmentOptional: ['sandbag'],
     affectsAreas: ['full-body', 'abdominals', 'upper-back'],
     contraindications: ['lower-back-acute'],
     energyRequired: 7,
@@ -3095,6 +3102,13 @@ export const STRENGTH = [
       'Holding your breath through the walk'
     ],
     load: 'Heavy enough that holding the position is work, light enough that your back stays flat.',
+    // PATTERN-TAGS, 06 Sep 2026. sets and reps added because this entry
+    // now declares a dumbbell and so counts as loaded, which is what the
+    // Exercise Entry Standard requires them for. They were missing all
+    // along; equipment: [] was hiding it from the validator.
+    sets: 3,
+    reps: '30 seconds',
+    rest: 60,
     credits: 70
   },
 
@@ -3329,6 +3343,377 @@ export const STRENGTH = [
       "Arms by your sides is an easier variation",
       "Breathe — do not hold your breath"
     ],
+  },
+
+  // ── CONTENT-GAP-1, 06 Sep 2026 ─────────────────────────────────────
+  //
+  // Nine entries closing the movement-pattern floor at difficulty 3 and
+  // above on common kit -- bodyweight, dumbbell, resistance band, bench.
+  //
+  // The floor is three per pattern. Below three the engine has no choice
+  // left to make and a twelve-week chapter repeats itself. Before these:
+  // pull 1, carry 1, anti-extension 2, anti-rotation 1,
+  // anti-lateral-flexion 1.
+  //
+  // Two further holes closed on the way, both logged 22 Aug and never
+  // scheduled: there was NO resistance-band strength entry above
+  // difficulty 2 anywhere in the library, and exactly one challenging
+  // pulling movement available to somebody training at home. Two band
+  // entries and a band row close both.
+  //
+  // Written to Documents/Live State/exercise_entry_standard.md v3.
+  // Load is effort, never kilos (locked principle P4). watchOut names the
+  // error and its correction, and pain is always a plain stop.
+
+  {
+    id: 'band-bent-over-row',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: "Band Bent-Over Row",
+    youtube: "resistance band bent over row technique",
+    category: 'strength',
+    movementPattern: 'pull',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'biceps-triceps', 'lower-back'],
+    contraindications: ['lower-back-acute', 'upper-back-acute', 'shoulder-acute'],
+    energyRequired: 5,
+    difficultyLevel: 3,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      "Stand on the middle of the band with both feet, feet hip-width apart",
+      "Take one end of the band in each hand and let your arms hang straight down",
+      "Hinge at the hips — push your backside back, not down — until your chest is about halfway to parallel with the floor",
+      "Pull both hands towards the bottom of your ribs, leading with your elbows",
+      "Lower under control until your arms are straight again"
+    ],
+    coaching: "Lead with your elbows rather than your hands, and you will feel this settle across your upper back instead of in your arms.",
+    why: "Pulling is the movement most home training misses, and it is the one that balances out all the pressing and sitting. You will notice it most in how your shoulders sit when you are standing still.",
+    watchOut: [
+      "Your back rounding as you hinge — stop where your back is still flat, even if your chest is barely past upright",
+      "The band pulling your shoulders up towards your ears; let them settle down and back before each pull",
+      "Feeling this mostly in your arms, which usually means the elbows are drifting out wide rather than back",
+      "Any sharp pain in the lower back: come up out of the hinge and leave this one for today"
+    ],
+    load: "Heavy enough that the last two reps are hard, light enough that your form does not change. A thicker band or a shorter grip both add resistance.",
+    sets: 3,
+    reps: "10",
+    rest: 60,
+    credits: 55
+  },
+
+  {
+    id: 'dumbbell-single-arm-row',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: "Single-Arm Dumbbell Row",
+    youtube: "single arm dumbbell row bench technique",
+    category: 'strength',
+    movementPattern: 'pull',
+    equipment: ['dumbbell', 'bench'],
+    equipmentOptional: [],
+    affectsAreas: ['upper-back', 'biceps-triceps', 'core'],
+    contraindications: ['lower-back-acute', 'upper-back-acute', 'shoulder-acute', 'wrist-elbow-acute'],
+    energyRequired: 5,
+    difficultyLevel: 3,
+    duration: 120,
+    perSide: true,
+    instructions: [
+      "Put your left knee and left hand on a bench so your back is flat and roughly parallel with the floor",
+      "Hold a dumbbell in your right hand, arm hanging straight down",
+      "Pull the dumbbell towards the bottom of your ribs, keeping your elbow close to your body",
+      "Lower it all the way down until your arm is straight",
+      "Complete all reps on one side, then swap"
+    ],
+    coaching: "Keep your shoulders level with each other the whole way through — the moment one shoulder rotates up towards the ceiling, your back has stopped doing the work.",
+    why: "Working one side at a time means the stronger side cannot quietly take over, which is how differences between your two sides get evened out rather than reinforced.",
+    watchOut: [
+      "Your body twisting as you pull — square your shoulders and use a lighter weight until they stay level",
+      "The elbow flaring out away from your side; it should travel close past your ribs",
+      "Rounding through the lower back once you tire, which is the point to end the set rather than push on",
+      "Any pain in the shoulder at the top of the pull: stop there and shorten the range next time"
+    ],
+    load: "Heavy enough that the last two reps are hard, light enough that your form does not change.",
+    sets: 3,
+    reps: "10 each side",
+    rest: 60,
+    credits: 60
+  },
+
+  {
+    id: 'dumbbell-front-rack-carry',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: "Front Rack Carry",
+    youtube: "dumbbell front rack carry technique",
+    category: 'strength',
+    movementPattern: 'carry',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['core', 'abdominals', 'upper-back', 'shoulder'],
+    contraindications: ['lower-back-acute', 'shoulder-acute', 'upper-back-acute'],
+    energyRequired: 6,
+    difficultyLevel: 3,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      "Hold a dumbbell in each hand and bring them up so they rest against the front of your shoulders",
+      "Stand tall with your elbows pointing forwards and down, not out to the sides",
+      "Brace your stomach as though you were about to be nudged",
+      "Walk slowly and evenly for the set distance or time, breathing normally",
+      "Lower the weights under control when you finish"
+    ],
+    coaching: "The work is in staying tall while something is trying to fold you forwards — if you can breathe steadily the whole way, you have got it right.",
+    why: "Carrying weight in front of you asks your whole middle to hold you upright while you walk, which is much closer to how you actually use your body than any exercise done lying down.",
+    watchOut: [
+      "Leaning back to balance the weight — bring the ribs down and let your stomach take it instead",
+      "Elbows dropping so the weights slide down your chest; reset them onto the shoulders and carry on",
+      "Holding your breath, which is common here — breathe shallowly but keep breathing",
+      "Any lower-back pain: put the weights down and finish the walk without them"
+    ],
+    load: "Heavy enough that staying tall takes attention, light enough that you never round forwards.",
+    sets: 3,
+    reps: "30 seconds",
+    rest: 60,
+    credits: 60
+  },
+
+  {
+    id: 'dumbbell-overhead-carry',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
+    name: "Waiter Walk",
+    youtube: "dumbbell overhead carry waiter walk technique",
+    category: 'strength',
+    movementPattern: 'carry',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['shoulder', 'core', 'abdominals', 'upper-back'],
+    contraindications: ['shoulder-acute', 'lower-back-acute', 'upper-back-acute', 'wrist-elbow-acute'],
+    energyRequired: 7,
+    difficultyLevel: 4,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      "Press one dumbbell overhead until your arm is straight, biceps close to your ear",
+      "Turn your palm to face forwards and lock your elbow gently straight",
+      "Brace your stomach and bring your ribs down so your back is not arching",
+      "Walk slowly for the set distance or time, keeping the weight directly above your shoulder",
+      "Lower under control, then repeat on the other side"
+    ],
+    coaching: "Look straight ahead rather than up at the weight — watching it makes people arch their back without realising, and the arch is the thing this exercise exists to stop.",
+    why: "Holding a weight overhead while you walk asks your shoulder to stay stable and your middle to stop your back arching at the same time, which is demanding in a way that looks like nothing from the outside.",
+    watchOut: [
+      "Your lower back arching as you walk — bring the ribs down and brace the stomach before you take the first step",
+      "The weight drifting forwards or behind your shoulder rather than stacked over it",
+      "Shrugging the shoulder up towards your ear; let it settle while the arm stays straight",
+      "Any shoulder pain, or the arm starting to shake badly: bring it down and stop the set there"
+    ],
+    load: "Lighter than you think. This is about control overhead, not weight, and the first side will tell you plenty.",
+    sets: 3,
+    reps: "20 seconds each side",
+    rest: 75,
+    credits: 65
+  },
+
+  {
+    id: 'plank-shoulder-tap',
+    position: 'floor',
+    impact: false,
+    balanceDemand: false,
+    name: "Plank Shoulder Tap",
+    youtube: "plank shoulder tap exercise technique",
+    category: 'strength',
+    movementPattern: 'anti-extension',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['abdominals', 'core', 'shoulder'],
+    contraindications: ['lower-back-acute', 'shoulder-acute', 'wrist-elbow-acute'],
+    energyRequired: 5,
+    difficultyLevel: 3,
+    duration: 90,
+    perSide: false,
+    instructions: [
+      "Set up in a press-up position with your hands under your shoulders and your feet a little wider than usual",
+      "Brace your stomach so your back is flat from your shoulders to your hips",
+      "Lift one hand and tap the opposite shoulder, then put it back down",
+      "Repeat with the other hand, moving slowly rather than quickly",
+      "Keep alternating for the set number of reps"
+    ],
+    coaching: "The wider you place your feet, the steadier this gets — if your hips are swinging, move your feet apart before you make the movement smaller.",
+    why: "Lifting a hand takes away a quarter of your support, so your middle has to work to stop your hips rolling. It is a plank that asks a question rather than one you simply endure.",
+    watchOut: [
+      "Your hips rocking side to side as you lift a hand — widen your feet and slow the tap right down",
+      "The lower back sagging towards the floor once you tire; that is the point to stop the set",
+      "Rushing, which turns it into a shoulder exercise rather than a middle one",
+      "Any wrist pain in this position: come down onto your forearms and hold a plank instead today"
+    ],
+    load: "Bodyweight. Progress by bringing your feet closer together, not by going faster.",
+    sets: 3,
+    reps: "8 each side",
+    rest: 60,
+    credits: 50
+  },
+
+  {
+    id: 'band-pallof-press-split-stance',
+    position: 'standing',
+    impact: false,
+    balanceDemand: true,
+    name: "Split-Stance Pallof Press",
+    youtube: "split stance pallof press band technique",
+    category: 'strength',
+    movementPattern: 'anti-rotation',
+    equipment: ['resistance-band'],
+    equipmentOptional: [],
+    affectsAreas: ['core', 'abdominals', 'hip'],
+    contraindications: ['lower-back-acute', 'shoulder-acute', 'hip-acute'],
+    energyRequired: 5,
+    difficultyLevel: 3,
+    duration: 120,
+    perSide: true,
+    instructions: [
+      "Anchor a band at roughly chest height and stand side-on to it",
+      "Take the end of the band in both hands and hold it against your breastbone",
+      "Step into a split stance — one foot forward, one back, both feet flat",
+      "Step away from the anchor until the band is pulling firmly",
+      "Press both hands straight out in front of you, hold for a moment, then bring them back to your chest"
+    ],
+    coaching: "The band is trying to twist you towards the anchor and your whole job is to refuse — nothing above your hips should move while your arms do.",
+    why: "Most middle work asks you to bend or curl. This asks you to stay exactly where you are while something pulls you sideways, which is what your middle mostly does in real life.",
+    watchOut: [
+      "Your shoulders rotating towards the anchor as you press — step closer to reduce the pull until they stay square",
+      "The front knee drifting inwards; keep it pointing the same way as your foot",
+      "Rushing the press and letting the band snap your hands back to your chest",
+      "Any lower-back pain: step in closer to take tension off, and stop if it stays"
+    ],
+    load: "Heavy enough that holding still takes real effort, light enough that nothing above your hips moves.",
+    sets: 3,
+    reps: "8 each side",
+    rest: 60,
+    credits: 55
+  },
+
+  {
+    id: 'plank-single-arm-reach',
+    position: 'floor',
+    impact: false,
+    balanceDemand: true,
+    name: "Plank Single-Arm Reach",
+    youtube: "plank single arm reach exercise technique",
+    category: 'strength',
+    movementPattern: 'anti-rotation',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['abdominals', 'core', 'shoulder', 'upper-back'],
+    contraindications: ['lower-back-acute', 'shoulder-acute', 'wrist-elbow-acute'],
+    energyRequired: 6,
+    difficultyLevel: 4,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      "Set up on your forearms and toes with your elbows under your shoulders and your feet wide",
+      "Brace your stomach so your body makes one flat line from shoulders to heels",
+      "Slide one arm forward along the floor until it is nearly straight in front of you",
+      "Hold for a moment with your hips completely still, then bring it back",
+      "Alternate sides for the set number of reps"
+    ],
+    coaching: "Push down firmly through the arm that stays on the floor — that is what stops your hips tipping, and it is the difference between this working and this wobbling.",
+    why: "Reaching away with one arm makes your body want to twist, and holding still against that is harder than any amount of extra plank time. It builds the kind of stability you notice when carrying something heavy in one hand.",
+    watchOut: [
+      "The hip on the reaching side lifting towards the ceiling — widen your feet and reach less far",
+      "Your back arching as the arm goes out; keep the ribs down and the stomach braced",
+      "Holding your breath through the reach, which is very common here",
+      "Any shoulder or lower-back pain: come down onto your knees and hold a plank there instead"
+    ],
+    load: "Bodyweight. Progress by holding the reach for longer, not by reaching further.",
+    sets: 3,
+    reps: "6 each side",
+    rest: 60,
+    credits: 55
+  },
+
+  {
+    id: 'side-plank-full',
+    position: 'floor',
+    impact: false,
+    balanceDemand: true,
+    name: "Side Plank",
+    youtube: "side plank exercise technique",
+    category: 'strength',
+    movementPattern: 'anti-lateral-flexion',
+    equipment: [],
+    equipmentOptional: [],
+    affectsAreas: ['core', 'abdominals', 'hip', 'shoulder'],
+    contraindications: ['shoulder-acute', 'lower-back-acute', 'hip-acute'],
+    energyRequired: 5,
+    difficultyLevel: 3,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      "Lie on your side with your elbow directly under your shoulder and your forearm flat on the floor",
+      "Stack your feet on top of each other, or put the top foot on the floor in front for a steadier base",
+      "Lift your hips until your body makes one straight line from head to feet",
+      "Hold, breathing normally, with your top shoulder stacked above the bottom one",
+      "Lower under control, then repeat on the other side"
+    ],
+    coaching: "Push the floor away through your bottom elbow rather than letting your shoulder sink into it — that one change turns this from a shoulder ache into a middle exercise.",
+    why: "The muscles down the side of your middle rarely get worked directly, and they are what stop you folding sideways when you carry a bag or lift a child onto one hip.",
+    watchOut: [
+      "Your hips sinking towards the floor as the hold goes on — end the set there rather than holding a dropped position",
+      "Rolling forwards or backwards; the top shoulder and hip should stay stacked over the bottom ones",
+      "The bottom shoulder sinking down towards your ear, which usually means you have stopped pushing through the elbow",
+      "Any shoulder pain in the supporting arm: come down and try this from your knees instead today"
+    ],
+    load: "Bodyweight. Progress by holding for longer, or by stacking the feet rather than staggering them.",
+    sets: 3,
+    reps: "20 seconds each side",
+    rest: 45,
+    credits: 50
+  },
+
+  {
+    id: 'dumbbell-suitcase-hold',
+    position: 'standing',
+    impact: false,
+    balanceDemand: false,
+    name: "Suitcase Hold",
+    youtube: "suitcase hold dumbbell anti lateral flexion",
+    category: 'strength',
+    movementPattern: 'anti-lateral-flexion',
+    equipment: ['dumbbell'],
+    equipmentOptional: [],
+    affectsAreas: ['core', 'abdominals', 'upper-back', 'shoulder'],
+    contraindications: ['lower-back-acute', 'shoulder-acute', 'upper-back-acute'],
+    energyRequired: 5,
+    difficultyLevel: 3,
+    duration: 90,
+    perSide: true,
+    instructions: [
+      "Stand tall with your feet hip-width apart and a dumbbell on the floor beside one foot",
+      "Bend your knees, take hold of it, and stand up with it hanging at your side like a suitcase",
+      "Let your arm hang straight, shoulders level, and stand still",
+      "Hold for the set time without leaning away from the weight",
+      "Put it down under control, then repeat on the other side"
+    ],
+    coaching: "Imagine somebody has put a hand on your free shoulder and is pushing down — you stay exactly level, and that resistance is the whole exercise.",
+    why: "Holding weight on one side only asks the opposite side of your middle to stop you tipping over. It is the quietest exercise here and one of the most useful, because it is exactly what carrying shopping asks of you.",
+    watchOut: [
+      "Leaning away from the weight to balance it — stand level and use a lighter dumbbell instead",
+      "The loaded shoulder dropping down towards the floor; keep both shoulders in line",
+      "Twisting slightly to face the weight rather than staying square",
+      "Any lower-back pain: put the weight down straight away and leave this one for today"
+    ],
+    load: "Heavy enough that staying level takes work, light enough that you never lean. Start lighter than you expect.",
+    sets: 3,
+    reps: "25 seconds each side",
+    rest: 60,
+    credits: 55
   }
 
 ];
