@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v444
+ * 06 Sep 2026 v445
+ *
+ * v445 - CR-1. chronic-fatigue split into persistent-fatigue, me-cfs and
+ *   long-covid. conditions.js v1.6, store.js v64 with a one-way
+ *   migration to persistent-fatigue only.
  *
  * v444 - CARD-TDZ and SKIP. exercise-card.js v4 and gym-programme.js v12.
  *   The bump matters more than most: every device on v443 or earlier is
