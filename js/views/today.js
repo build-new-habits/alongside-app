@@ -1,6 +1,50 @@
 /**
  * today.js
- * 06 Sep 2026 v25
+ * 06 Sep 2026 v26
+ *
+ * v26 - HOME-DOORS. THE SESSION TILES CAME BACK TO THE PLAN HOME.
+ *
+ *   LOBBY-1c (04 Sep, 21:31) deleted the door grid from Home and left
+ *   Plan with a single "Start today" button routing to coach-proposal.
+ *   The tiles were relocated into that screen as "Or pick your own" --
+ *   a row sitting underneath a panel that auto-opens at z-index 9999
+ *   and cannot be dismissed to reveal it. Present in the source,
+ *   unreachable on the device.
+ *
+ *   Graeme, 06 Sep, on device: "I wanted to stretch but I couldn't
+ *   find it." He could not. coach-proposal builds through
+ *   workoutGenerator.js, whose type list is three hardcoded names --
+ *   Strength Focus, Mobility & Recovery, Cardio Boost. Stretch is one
+ *   of session-builder.js's EIGHT session types and that engine is
+ *   never reached from there. The door was the only route to it.
+ *
+ *   WHAT CHANGED: freeChooser() is now chooser() and renders on BOTH
+ *   tiers. Nothing was added and nothing new was designed -- this is
+ *   the screen free has been running since LOBBY-1c, which was the
+ *   good one.
+ *
+ *   THE INVITATION IS NOT LOST. chooser() already ends with "Not sure?
+ *   I'll pick something", same data-action="start-today", same route.
+ *   It is now one option among the doors instead of the only one,
+ *   which is what it was before Friday.
+ *
+ *   ARC PLACEMENT IS UNCHANGED ON BOTH TIERS. The arc panel used to be
+ *   emitted twice on the free path -- once at the call site above,
+ *   once inside freeChooser(). Rendering the same chooser on Plan
+ *   would have duplicated it there too, so arcPanel() came out of the
+ *   chooser and each tier keeps its existing position: above on Plan,
+ *   below on free.
+ *
+ *   WELLBEING FILTERED ON BOTH. The reference row excluded Wellbeing
+ *   only on free, because only free promoted it into "Settle your
+ *   mind". Both tiers promote it now, so the exclusion applies to
+ *   both or Plan gets the row twice.
+ *
+ *   THE RULE THIS BREACHED, recorded because it is the point:
+ *   improvements extend what exists, they do not relocate it. Moving
+ *   something behind a new screen is a removal, and a removal is the
+ *   change however the commit is titled. LOBBY-1c's own message
+ *   argued it "is not a layout change". It was.
  *
  * v25 - ARC-DOOR. FREE COULD BUILD AND KEEP AN ARC.
  *
@@ -743,21 +787,14 @@ export function TodayView(router) {
 
              The invitation states the price of entry, so the check-in
              is consented to rather than sprung. -->
-        ${isPremium() ? `
-          <button class="btn btn-primary btn-large btn-full today-invite"
-                  data-action="start-today"
-                  aria-label="Start today. I'll ask how you're doing first">
-            Start today
-          </button>
-          <p class="today-invite__note">I'll ask how you're doing first</p>
-        ` : freeChooser()}
+        ${chooser()}${isPremium() ? '' : arcPanel()}
 
         <div class="today-reference" role="group" aria-label="Reference and settings">
           <!-- On free, Wellbeing is promoted into "Settle your mind"
                above, so repeating it here would be the duplication this
                screen exists to remove. On Plan it stays a reference row,
                because Plan's Home has no picker to promote it into. -->
-          ${HOME_DOORS.filter(d => d.kind === 'reference' && !(!isPremium() && d.id === 'wellbeing')).map(d => `
+          ${HOME_DOORS.filter(d => d.kind === 'reference' && d.id !== 'wellbeing').map(d => `
             <button class="today-ref-row"
                     data-route="${d.route}"
                     data-door-id="${d.id}"
@@ -1245,7 +1282,7 @@ export function TodayView(router) {
    * terms and privacy links live, so the eye files anything there as
    * boilerplate and skips it.
    */
-  function freeChooser() {
+  function chooser() {
     const move = HOME_DOORS.filter(d => d.kind === 'session' && d.id !== 'unsure');
     const mind = HOME_DOORS.filter(d => d.id === 'wellbeing');
 
@@ -1279,9 +1316,7 @@ export function TodayView(router) {
               aria-label="Not sure — I'll pick something, going on how you're doing today">
         Not sure? I'll pick something
       </button>
-      <p class="today-invite__note">I'll go on how you're doing today</p>
-
-      ${arcPanel()}`;
+      <p class="today-invite__note">I'll go on how you're doing today</p>`;
   }
 
   function arcPanel() {
