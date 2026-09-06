@@ -1,5 +1,13 @@
 /**
  * store.js - Data persistence layer
+ * 06 Sep 2026 v64
+ *
+ * v64 - CR-1. `chronic-fatigue` split into `persistent-fatigue`,
+ *   `me-cfs` and `long-covid` in conditions.js. One-way migration here
+ *   maps the old id to `persistent-fatigue` only, never to `me-cfs`.
+ *   Reasoning at _migrateConditionIds(). conditionMeta keys migrate with
+ *   it so lifecycle history is not orphaned.
+ *
  * 03 Sep 2026 v63
  *
  * v63 - ARC-3-SETUP. `stretchArc` renamed to `arc`, and extended.
@@ -732,6 +740,51 @@ export const store = {
    * CHECKIN-2b resolution ask -- inventing today as the start date would
    * make every long-standing condition look brand new.
    */
+  // CR-1, 06 Sep 2026. `chronic-fatigue` -> `persistent-fatigue`.
+  //
+  // ONE-WAY, AND DELIBERATELY THE LESS RESTRICTIVE OF THE TWO TARGETS.
+  // The old id covered both persistent tiredness and ME/CFS. Nobody who
+  // stored it was ever asked which they meant, so this migration cannot
+  // know. It maps everyone to `persistent-fatigue`, NEVER to `me-cfs`.
+  //
+  // WHY THAT DIRECTION. Migrating someone into an excluded state without
+  // asking would silently withdraw the product from a person who never
+  // agreed to the question -- worse than leaving them in the adaptive
+  // model they have been using. New users get the three-way choice at
+  // onboarding; existing users are re-asked at their next conditions
+  // update, where they answer for themselves. This is the only honest
+  // reading of a value that was never specific enough to act on.
+  _migrateConditionIds(conditions) {
+    if (!Array.isArray(conditions)) return conditions;
+    const MAP = { 'chronic-fatigue': 'persistent-fatigue' };
+    const out = [];
+    for (const id of conditions) {
+      if (typeof id !== "string") continue;
+      const mapped = MAP[id] || id;
+      if (!out.includes(mapped)) out.push(mapped);
+    }
+    return out;
+  },
+
+  /** Mirrors _migrateConditionIds across conditionMeta keys, so lifecycle
+   *  history survives the rename instead of being orphaned. */
+  _migrateConditionMetaKeys(meta) {
+    if (!meta || typeof meta !== "object" || Array.isArray(meta)) return meta;
+    const MAP = { 'chronic-fatigue': 'persistent-fatigue' };
+    const out = {};
+    for (const [id, m] of Object.entries(meta)) {
+      const mapped = MAP[id] || id;
+      // An existing record for the new id wins: it was written by a real
+      // answer, where the migrated one is inferred.
+      if (mapped in out) continue;
+      out[mapped] = m;
+    }
+    for (const [id, m] of Object.entries(meta)) {
+      if (!MAP[id] && id in out) out[id] = m;
+    }
+    return out;
+  },
+
   _migrateConditionMeta(meta, conditions) {
     const out = (meta && typeof meta === "object" && !Array.isArray(meta)) ? { ...meta } : {};
     for (const id of (Array.isArray(conditions) ? conditions : [])) {
@@ -766,9 +819,19 @@ export const store = {
       // AGE-1. Runs before the spread's ageBand would win.
       ageBand: saved.ageBand ? this._migrateAgeBand(saved.ageBand) : defaults.ageBand,
 
+      // CR-1. Runs before the spread's `conditions` would win. Shape is
+      // still not reshaped (CHECKIN-2a) -- only ids are renamed.
+      conditions: saved.conditions
+        ? this._migrateConditionIds(saved.conditions)
+        : defaults.conditions,
+
       // CHECKIN-2a. `conditions` is deliberately NOT reshaped -- see
       // _migrateConditionMeta. Lifecycle lives alongside it.
-      conditionMeta: this._migrateConditionMeta(saved.conditionMeta, saved.conditions),
+      // CR-1: keys are renamed first so history survives the split.
+      conditionMeta: this._migrateConditionMeta(
+        this._migrateConditionMetaKeys(saved.conditionMeta),
+        this._migrateConditionIds(saved.conditions)
+      ),
 
       // ── ONBOARDING (top-level flags stay top-level) ───────────
       // v7: primaryTerritory, threadStartedAt, threadCompletedAt

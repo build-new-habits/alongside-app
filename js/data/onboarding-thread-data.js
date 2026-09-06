@@ -203,12 +203,18 @@ export const LEG_POWER_CHIPS = [
 // thing without someone having said otherwise.
 const CLEARANCE_RELEVANT_CONDITIONS = new Set([
   'cardiovascular-condition', 'breathing', 'osteoporosis',
-  'chronic-fatigue', 'fibromyalgia', 'pelvic-floor',
+  // CR-1, 06 Sep 2026. `chronic-fatigue` split three ways. All three
+  // stay here: me-cfs and long-covid are excluded before a session is
+  // ever built, but the clearance question is asked earlier in the
+  // thread, and a set that silently stopped matching would be a live
+  // question quietly ceasing to fire.
+  'persistent-fatigue', 'me-cfs', 'long-covid', 'fibromyalgia', 'pelvic-floor',
 ]);
 
 const MOBILITY_RELEVANT_CONDITIONS = new Set([
   'hip', 'knee', 'ankle-foot', 'lower-back', 'sciatica', 'osteoporosis',
-  'hypermobility', 'fibromyalgia', 'chronic-fatigue', 'cardiovascular-condition',
+  'hypermobility', 'fibromyalgia', 'persistent-fatigue', 'me-cfs', 'long-covid',
+  'cardiovascular-condition',
   'calves', 'achilles', 'plantar-fasciitis', 'it-band', 'shin-splints',
 ]);
 
