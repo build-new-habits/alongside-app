@@ -1,7 +1,7 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
- * 05 Sep 2026 v13
+ * 06 Sep 2026 v14
  *
  * v13 - SWAP-1. THE ORDER IS INVERTED BACK. "Coach recommends, I'll
  *   choose" showed the whole candidate list FIRST -- 188 entries for a
@@ -1671,11 +1671,28 @@ export function onMount() {
         // defaulted to anyway -- the choice is not lost, it is made.
         if (selectedType === "stretch") {
           equipmentOverride = [];
-          buildMode = "recommend";
-          // SWAP-1: straight to the built session now, not to a list of
-          // seventy-three. Two screens came off this path on 2 Sep and a
-          // third comes off here.
-          triggerRecommendedBuild();
+          // STRETCH-VARY, 06 Sep 2026. This said buildMode = "recommend"
+          // and called triggerRecommendedBuild(). Nobody decided that --
+          // it fell out of STRETCH-FLOW (2 Sep) removing two screens and
+          // taking the build-mode DEFAULT with it, a day after SWAP-1
+          // made that default the deterministic builder.
+          //
+          // Measured cost, 06 Sep: buildSessionFromSelection() takes
+          // pool[0] and returned an IDENTICAL stretch session on every
+          // run of three. buildSession() varied on every run.
+          //
+          // And "not keen on this one" was being dropped. `avoid` is
+          // honoured by both routes through the shared _filterCandidates
+          // (session-builder.js:2270), but `less` is applied ONLY inside
+          // buildSession (:2768 and :3013). So a stretch user could mark
+          // something "less" and be handed it again, unchanged, forever.
+          // W2-7 fixed 'less' behaving like 'avoid'; this route never
+          // asked it in the first place.
+          //
+          // The two screens STRETCH-FLOW removed stay removed. Only the
+          // builder changes.
+          buildMode = "coach";
+          triggerBuild();
           return;
         }
         phase = "equipment";
