@@ -1,28 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v285
+## 06 Sep 2026 v284
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v284.md`. Remove v284 on upload.
-
-> ### 🔴 ARC-DOOR — A REAL TIER LEAK, SHIPPED AND LIVE. Closed 06 Sep 2026, `alongside-v442`, 108 gates. `today.js` v24 → **v25**. New `tools/verify-arc-door.mjs`.
->
-> **Free could build and keep an arc.** `arcPanel()` had TWO call sites. `today.js:~690` was gated behind `isPremium()`. The one inside `freeChooser()` was not, so a free user with `arc.active` true rendered the full `today-arc--active` panel — aim, strands, no lock wrapper. The offer card also routed to `arc-setup` with no tier check, so the whole path was open: **offer → setup → active arc → full panel.** "Free is today, the Plan is the arc" was breached at both ends.
->
-> #### 🔴 IT SURVIVED TWO INSPECTIONS ON THE SAME DAY, BOTH MINE
->
-> Graeme asked why free was showing him an arc. He was told the arc was **correctly gated** and his handset must be on the Plan. **That answer was wrong** — one call site was found and no second was looked for. **TIER-VISIBLE was then built on that wrong diagnosis.** It is still worth having; the diagnosis was still wrong.
->
-> It was checked a second time with a fixture setting `arc.aimId` but **not** `arc.active`. That lands on the OFFER branch, which is correct for free, and the check reported no leak. **The fixture had not reached the branch it named** — the same fault recorded three times already today, here concealing a live defect rather than a stale one.
->
-> ⚫ **Graeme was right and was told twice that he was not.** The standing rule — drive it, do not read it — was written this morning off three stale entries. Its real value turns out to be the opposite case: a fault the record did not know about.
->
-> #### 🟢 THE FIX, Graeme's option B
->
-> Free keeps the invitation, because it is the best upgrade door in the product — someone on Home who has felt the shape of the thing. It becomes a **door**, routed to `upgrade`, not a setup entrance. **The rule lives inside `arcPanel()`, not at the call sites**, so both are closed by one condition and any third caller inherits it. Patching only the site that was found is how this happened.
->
-> ⚫ Rejected: hiding the arc from free entirely (closes the leak and the door together); letting free set an aim while hiding the panel (an arc that exists and is never shown is the coach holding something it will not display — the fault TRUTHFULNESS fixed).
->
-> 🟢 Three deliberate breaks, three caught red: the original leak restored; the free door pointed back at `arc-setup`; the tier test inverted.
+Supersedes `master_schedule_v283.md`. Remove v283 on upload.
 
 > ### 🔴 THREE OF THE NINE "OPEN DEFECTS" WERE STALE ENTRIES, NOT FAULTS — 06 Sep 2026
 >
@@ -7077,4 +7057,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v285*
+*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v284*

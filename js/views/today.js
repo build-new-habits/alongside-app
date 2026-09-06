@@ -1,6 +1,38 @@
 /**
  * today.js
- * 22 Aug 2026 v24
+ * 06 Sep 2026 v25
+ *
+ * v25 - ARC-DOOR. FREE COULD BUILD AND KEEP AN ARC.
+ *
+ *   arcPanel() had TWO call sites. Line ~690 is gated behind
+ *   isPremium(). The one inside freeChooser() was not, so a free user
+ *   with arc.active true rendered the full today-arc--active panel with
+ *   no lock wrapper -- the paid product, on Home, free. The offer card
+ *   also routed to "arc-setup" with no tier check, so the whole path was
+ *   open: offer -> setup -> active arc -> full panel.
+ *
+ *   Graeme asked why free was showing him an arc. It was, and the first
+ *   answer he got -- that the arc was correctly gated and his handset
+ *   must be on the Plan -- was wrong. It was checked a second time with
+ *   a fixture that set aimId but NOT active, which lands on the offer
+ *   branch and looks clean. The leak only appears once the fixture
+ *   reaches the branch it names.
+ *
+ *   FIX, Graeme's option B, 06 Sep: free keeps the invitation, because
+ *   it is the best upgrade door in the product -- someone on Home who
+ *   has felt the shape of the thing. It becomes a DOOR, not a setup
+ *   entrance. The gate is inside arcPanel() rather than at the call
+ *   site, so BOTH call sites are closed by one rule and a third one
+ *   added later inherits it. Patching only the site that was found is
+ *   how this happened in the first place.
+ *
+ *   Not done: hiding the arc from free entirely (option A). That closes
+ *   the leak and the door together. Not done: letting free set an aim
+ *   while hiding the panel (option C) -- an arc that exists and is never
+ *   shown is the coach holding something it will not display, which is
+ *   the same fault TRUTHFULNESS fixed.
+ *
+ * v24
  *   R2-a. THE BOUNDARY CORRECTION. A dated target can only be recorded
  *   on the Plan.
  *
@@ -1254,6 +1286,29 @@ export function TodayView(router) {
 
   function arcPanel() {
     const arc = store.get('arc') || {};
+
+    // ARC-DOOR, 06 Sep 2026. THE TIER RULE LIVES HERE, NOT AT THE CALL
+    // SITES. There were two; only one was gated, and free rendered the
+    // full panel through the other. Anything that calls arcPanel() now
+    // inherits this, including call sites nobody has written yet.
+    //
+    // Free gets the invitation and nothing else. "Free is today, the
+    // Plan is the arc" -- so the door is honest and the arc is not
+    // behind it until there is a Plan. Routed to "upgrade", not
+    // "arc-setup": a free user must not be able to build one.
+    if (!isPremium()) {
+      return `
+        <button class="today-arc today-arc--offer"
+                data-route="upgrade"
+                data-requires-checkin="false"
+                aria-label="About the arc, part of the Plan">
+          <span class="today-arc__label">Your arc</span>
+          <span class="today-arc__offer">
+            Tell me what you want to be able to do, and I'll hold it and work
+            towards it with you.
+          </span>
+        </button>`;
+    }
 
     if (!arc.active || !arc.aimId) {
       return `
