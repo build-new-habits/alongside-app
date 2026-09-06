@@ -1,5 +1,14 @@
 /**
  * js/exercise-card.js
+ * 06 Sep 2026 v4
+ *
+ * v4 -- CARD-TDZ. `const cueBlock` was declared below the `decide` array
+ * that uses it, so renderExerciseCard() threw ReferenceError on every
+ * call and workout, gym-programme, core-session and prescribed-session
+ * all failed to mount. Declaration moved above its use; nothing else
+ * changed. Introduced by CUE-UNPIN (71ae19d, 3 Sep), live three days,
+ * invisible to 109 source-slice gates and to `node --check`.
+ *
  * 31 Aug 2026 v3
  *
  * CARD-3. Three PAGES, not three tabs.
@@ -140,6 +149,21 @@ export function renderExerciseCard(exercise, opts = {}) {
     ? `<p class="xcard-hold">Hold each one for about ${exercise.holdSeconds} second${exercise.holdSeconds === 1 ? "" : "s"}.</p>`
     : "";
 
+  // CARD-TDZ, 06 Sep 2026. This declaration lived 39 lines BELOW the
+  // `decide` array that consumes it, next to `pinned`, where CUE-UNPIN
+  // left it on 3 Sep. `const` does not hoist, so every single call to
+  // this function threw ReferenceError and every session screen in the
+  // app failed to mount. It is declared here, above its only use.
+  //
+  // It stays OUT of `pinned` deliberately. CUE-UNPIN's finding holds:
+  // the caution is safety and belongs on all three pages, the lead cue
+  // is coaching and belongs on DECIDE, where the decision it informs is
+  // being made. Moving it back up into `pinned` would fix the crash and
+  // silently restore the fault CUE-UNPIN closed.
+  const cueBlock = leadCue
+    ? `<p class="exercise-cue xcard-lead-cue">${esc(leadCue)}</p>`
+    : "";
+
   const decide = [
     cueBlock,
     lastBlock,
@@ -179,10 +203,6 @@ export function renderExerciseCard(exercise, opts = {}) {
   // on DECIDE, where the decision it informs is being made.
   const pinned = `
     ${caution ? `<p class="exercise-caution" role="note">${caution}</p>` : ""}`;
-
-  const cueBlock = leadCue
-    ? `<p class="exercise-cue xcard-lead-cue">${esc(leadCue)}</p>`
-    : "";
 
   // "Show everything" flattens the pages rather than landing on one.
   // Somebody who has asked for all of it should not be walked through
