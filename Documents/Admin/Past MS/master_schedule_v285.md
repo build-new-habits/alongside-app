@@ -1,26 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v286
+## 06 Sep 2026 v285
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v285.md`. Remove v285 on upload.
-
-> ### 🟢 STRETCH-VARY — SHIPPED 06 Sep 2026, `alongside-v443`, 109 gates. `session-builder-ui.js` v13 → **v14**. New `tools/verify-stretch-vary.mjs` (15 assertions).
->
-> **The last live fault on the build list is closed.** Every stretch session was built by `buildSessionFromSelection()`, which takes `pool[0]`. **Measured before: three consecutive builds returned an identical session. After: six builds, six distinct sessions.**
->
-> Nobody decided this. STRETCH-FLOW removed two screens on 2 Sep and took the build-mode **default** with it, one day after SWAP-1 made that default the deterministic builder. The two screens STRETCH-FLOW removed stay removed; only the builder changed.
->
-> #### ⚫ THE SCHEDULE OVERSTATED THIS ONE — corrected
->
-> It said stretch "ignores `exercisePreferences`". **`avoid` was always honoured**, on both routes, via the shared `_filterCandidates` (`session-builder.js:2270`). **`less` — "not keen on this one" — is applied only inside `buildSession`** (`:2768`, `:3013`). So the real fault was narrower and sharper: a stretch user could mark something "less" and be handed it again, unchanged, forever. W2-7 fixed `less` behaving like `avoid`; this route never asked it at all.
->
-> #### 🟠 FOUR FIXTURE ATTEMPTS, ALL LOOKING LIKE DEFECTS, NONE OF THEM DEFECTS
->
-> 1. Walked the ordinary screen sequence — stretch has a **zone picker** after location; never left it, reported "no session built". 2. Asked for a 20-minute duration; there is no 20 (15/30/45/60). 3. Assumed a clean module between builds — **state persists**, zones stay chosen and the module sits on the preview. It now returns via "Build a different one", the behaviour `verify-picker-exit.mjs` proved this morning. 4. Marked an exercise "avoid" taken from a **seventh** build outside the six measured — "it never comes back" proves nothing about one that was never coming. The reversal caught it.
->
-> **Four in one gate, on top of four earlier today.** This is no longer an occasional slip; it is the dominant failure mode of this project's testing, and every gate now carries explicit FIXTURE assertions rather than assuming reach.
->
-> ⚫ **One break correctly stayed green** — leaving `buildMode` set to `"recommend"`. Its only reader is the build-mode handler that stretch returns before reaching, so nothing observable changes. Held by a source assertion that says plainly it is not behavioural.
+Supersedes `master_schedule_v284.md`. Remove v284 on upload.
 
 > ### 🔴 ARC-DOOR — A REAL TIER LEAK, SHIPPED AND LIVE. Closed 06 Sep 2026, `alongside-v442`, 108 gates. `today.js` v24 → **v25**. New `tools/verify-arc-door.mjs`.
 >
@@ -7095,4 +7077,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v286*
+*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v285*
