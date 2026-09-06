@@ -1,8 +1,9 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v291
+## 06 Sep 2026 v292
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v290.md`. Remove v290 on upload.
+Supersedes `master_schedule_v291.md`. Remove v291 on upload.
+Both sessions independently produced a v291; this merges them. Neither block was overwritten.
 
 > ### 🔴 THE CLINICAL REVIEW CAME BACK, AND IT IS NOT SIGN-OFF. Merged into v289 from the CLINICAL-RESPONSE session, 06 Sep 2026.
 >
