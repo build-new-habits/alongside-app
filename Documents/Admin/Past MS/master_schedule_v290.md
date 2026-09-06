@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v291
+## 06 Sep 2026 v290
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v290.md`. Remove v290 on upload.
+Supersedes `master_schedule_v289.md`. Remove v289 on upload.
 
 > ### 🔴 THE CLINICAL REVIEW CAME BACK, AND IT IS NOT SIGN-OFF. Merged into v289 from the CLINICAL-RESPONSE session, 06 Sep 2026.
 >
@@ -62,48 +62,6 @@ Supersedes `master_schedule_v290.md`. Remove v290 on upload.
 > | Named clinical reviewer | **Declined.** Free routes not yet tried: Weston College sport/exercise science staff, university physio placements, ADHD UK / Autistica clinical advisers, Alex at Somerset Innovation Hub | 🟠 Graeme, not urgent |
 >
 > ---
-
-> ### 🟢 CONTENT-GAP-1 CLOSED and 🟢 PATTERN-TAGS SHIPPED — 06 Sep 2026, `alongside-v448`, **114 gates**. Nine entries authored, three wrong tags corrected, one shipped feature found green on a falsehood.
->
-> ⚠️ **Rebased onto CLINICAL-RESPONSE, not raced.** That session took `v447` for CR-3 while this content was being written; this is `v448` on top of it. Their v290 entry merged this session's v289 rather than overwriting it, and this entry does the same in return.
->
-> **Every pattern now clears the floor at three on common kit.** `audit-pattern-coverage.mjs` reports zero SHORT for the first time.
->
-> #### 🔴 THE TARGET OF 16 WAS WRONG, AND SO WAS THE 9 THAT REPLACED IT
->
-> The audit filtered `category === "strength"`. The builder does not. Driven on the real candidate pool: **43 rehabilitation entries reach a general full-body session**, all `generalPurpose: true`. The tool also listed ten `COMMON_KIT` tags of which **seven are not library vocabulary at all**. Both corrected in the tool, with the reasoning in the file, so the number is reproducible by anyone.
->
-> #### 🟢 PATTERN-TAGS — three entries described themselves wrongly. New `tools/verify-pattern-tags.mjs` (17 assertions), each fault reversal-proven individually.
->
-> | Entry | Was | Now |
-> |---|---|---|
-> | `functional-sandbag-carry` | `equipment: []` | `["dumbbell"]` — a carry that declared it needed nothing to carry. `equipmentOptional` named the kit, and **nothing in exercise selection reads that field**; `practices.js` is its only reader anywhere. `sets`/`reps` added — the entry now counts as loaded, and `equipment: []` had hidden their absence from the validator |
-> | `plyo-broad-jump` | `hinge` | `jump` |
-> | `dumbbell-reverse-lunge` | `squat` | `lunge` |
->
-> #### 🔴 A SHIPPED FEATURE WAS GREEN ON A DATA FAULT
->
-> `verify-chap4` asserts that a hinge/carry week focus tilts a session by at least 30%. **The sandbag fix alone turned it red**, isolated by reverting each fix in turn. Not a content hole: `chap4`'s fixture is a **no-equipment user**, and a person with nothing cannot carry anything. The carry half of that focus was reachable *only* through the false tag. Fixture now has dumbbells, and was reversal-proven afterwards by disabling `focusOrderedCategories()` — 30 vs 30, red. It still catches a broken focus; it was not made green.
->
-> #### 🟢 THE NINE ENTRIES — pull 2, carry 2, anti-extension 1, anti-rotation 2, anti-lateral-flexion 2
->
-> `band-bent-over-row` · `dumbbell-single-arm-row` · `dumbbell-front-rack-carry` · `dumbbell-overhead-carry` ("Waiter Walk") · `plank-shoulder-tap` · `band-pallof-press-split-stance` · `plank-single-arm-reach` · `side-plank-full` · `dumbbell-suitcase-hold`
->
-> Written to `exercise_entry_standard.md` v3. Load is effort, never kilos. Every `watchOut` names the error and its correction, and pain is a plain stop. Prose fields double-quoted per house rule; machine enums keep the file's single-quoted style. **Validator holds at its 96-error baseline — zero added.**
->
-> 🟢 **Two further holes closed, both logged 22 Aug and never scheduled:** there was **no resistance-band strength entry above difficulty 2 anywhere**, and exactly **one** challenging pull reachable without a gym.
->
-> #### 🟢 NEW `tools/verify-pattern-floor.mjs` (21 assertions) — the floor is asserted, not reported
->
-> `audit-pattern-coverage.mjs` has said since 18 Aug that the floor should be gated once content landed. It landed. Reversal-proven on five of the nine: neutralising any one drops its pattern below three and turns the gate red. It also **pins the `generalPurpose` rule in `session-builder.js`**, because this gate's population silently stops matching reality if that filter is ever changed.
->
-> #### ⚫ THREE THINGS CAUGHT BY THE SUITE OR BY DRIVING, NOT BY CONFIDENCE
->
-> - **`verify-dedupe` went red** on a duplicate name — the new "Overhead Carry" against `functional-carry-overhead`. Renamed "Waiter Walk".
-> - **A first jump guard matched the `plyo-` prefix** and flagged `plyo-med-ball-slam`, which is correctly tagged hinge — you hinge to slam. Guard narrowed to the movement word before it "fixed" a correct tag.
-> - **A first `COMMON_KIT` correction dropped `bodyweight`**, which `kitOf()` emits as the sentinel for `equipment: []`. That pushed all 355 bodyweight entries into gym-or-rare and made every pattern read SHORT. Caught by running it.
->
-> 🟡 **Left open deliberately:** `gym-renegade-row` is difficulty 6 and is the only anti-rotation at 3+ on common kit besides the two authored today. Counted, but a floor filled by a difficulty-6 entry is thin. Not a fault — a quality note for the next content pass. **w/c 7 Sep.**
 
 > ### 🟠 CONTENT-GAP-1 RE-MEASURED — the target of 16 does not survive being driven. Logged 06 Sep 2026, BEFORE the fixes, so it cannot be lost the way the original was.
 >
@@ -7291,4 +7249,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v291*
+*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v290*
