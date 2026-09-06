@@ -1,7 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v447
+ * 06 Sep 2026 v448
+ *
+ * v448 - PATTERN-TAGS and CONTENT-GAP-1. Nine new strength entries and
+ *   three corrected tags in js/data/exercises/strength.js. Content only:
+ *   no new files, so the precache list below is unchanged and this is a
+ *   cache bump so devices pick up the library. Rebased onto CR-3 rather
+ *   than racing it for v447.
  *
  * v447 - CR-3. Hypermobility caveat, shared by onboarding and the
  *   Settings conditions editor from one source of text.
@@ -3089,7 +3095,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v447";
+const CACHE_NAME = "alongside-v448";
 
 const SHELL_URLS = [
 
