@@ -1,34 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v283
+## 06 Sep 2026 v282
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v282.md`. Remove v282 on upload.
-
-> ### 🟢 TIER-VISIBLE — SHIPPED 06 Sep 2026. `alongside-v441`, 107 gates. New `tools/verify-tier-visible.mjs` (20 assertions). `settings.js` v35 → **v36**.
->
-> #### 🔴 THE TIER WAS INVISIBLE, AND THAT MEANS EVERY ON-DEVICE JUDGEMENT SO FAR IS SUSPECT
->
-> The tier was displayed in **one place only** — inside the developer panel, behind an undocumented triple-tap. A device could sit in the Plan with nothing on any screen saying so. That is why free appeared to show the arc on Graeme's handset on 06 Sep: it did not. The arc is correctly gated at `today.js:690`. The handset was on `personal` and nothing said so.
->
-> **The cost is contaminated evidence, not confusion.** A beta tester who switches once and forgets will report on "free" while being shown the Plan, and the feedback will read as valid. **This applies retroactively to every on-device judgement made before today, Graeme's included.**
->
-> **Fix: show it.** Knowing which plan you are on is legitimate product for a paying user, not a debug affordance — so it ships to everyone rather than hiding behind the same flag it exists to compensate for. It reads `isPremium()`, the same predicate that gates the arc, so it cannot drift from what the app actually gates on.
->
-> ⚫ **DEV_PANEL_ENABLED deliberately NOT flipped.** An earlier claim in this session — that the switcher "ships to every user who can find it" — **was wrong and is withdrawn.** The panel renders `hidden aria-hidden="true"` and needs a deliberate triple-tap that is documented nowhere in user-facing copy. The A1 decision of 13 Aug stands: it stays through beta because testers need it, and flips false before **public launch, January 2027**. Flipping it now would freeze every device in whatever tier it is already wrongly in and fix nothing.
->
-> #### 🟠 DEAD CODE CAUGHT BEFORE IT SHIPPED — by a break, not by review
->
-> The first implementation added a handler syncing the plan line when the dev switcher fires. **It could never run.** The plan line is on Settings > Profile; the switcher is on About > App; panels are exclusive, so `#settings-plan-line` is null at that moment — proven under jsdom, not assumed. Removed, and the gate now asserts the absence so it cannot be added back.
->
-> #### 🟠 TWO FIXTURE FAULTS, BOTH IN THIS GATE, BOTH RECORDED
->
-> Draft 1 mounted Settings and found no plan line — NAV-5 opens on a three-row index and renders no panel. Draft 2 opened About and found the dev **button** but not the version label, because the section opens on `about-story` and the gesture only renders on `about-app`. Tenth and eleventh recorded instances of a fixture appearing to reach a screen it had not.
->
-> #### 🟠 AND THE SAME SHELL MISTAKE, TWICE IN ONE DAY — caught the second time
->
-> `tail -n +2` stripped the `import { JSDOM }` line when assembling a gate from a draft, exactly as it did for `verify-picker-exit.mjs` hours earlier. The second time an `assert 'import { JSDOM }' in t` caught it **before** the draft was deleted. Assemble-then-assert, not assemble-then-hope.
->
-> 🟢 Four deliberate breaks, four caught red: hardcoding "Free"; reading a different predicate from the one gating the arc; re-adding the dead sync handler; rendering the line but hiding it.
+Supersedes `master_schedule_v281.md`. Remove v281 on upload.
 
 > ### 🟢 PICKER-EXIT — CLOSED 06 Sep 2026. `tools/verify-picker-exit.mjs`, 13 assertions, 106 gates. No app source changed; `sw.js` NOT bumped.
 >
@@ -7045,4 +7019,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v283*
+*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v282*
