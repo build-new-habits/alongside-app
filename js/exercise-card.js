@@ -1,6 +1,14 @@
 /**
  * js/exercise-card.js
- * 06 Sep 2026 v4
+ * 06 Sep 2026 v5
+ *
+ * v5 -- CR-5. HURT_AND_ACHE: what to do if it hurts during, and that
+ * aching afterwards is normal. On EVERY exercise, not just the 94
+ * rehabilitation entries -- the physiotherapist's word was "always", and
+ * the CLINICAL-RESPONSE blueprint's rehab-only scope was narrower than
+ * both the steer and the need. One shared constant rather than 551
+ * copies, rendered below the exercise-specific watchOut so the safety
+ * order in doBody is unchanged.
  *
  * v4 -- CARD-TDZ. `const cueBlock` was declared below the `decide` array
  * that uses it, so renderExerciseCard() threw ReferenceError on every
@@ -64,6 +72,31 @@
  * ids -- wo/ps/cs/gp. The card renders the page frame and the view fills
  * the slots. That is what keeps the blast radius survivable.
  */
+
+/**
+ * CR-5, 06 Sep 2026. The two lines that go on every exercise.
+ *
+ * Kept as one exported constant so there is a single place to change
+ * them, and so a gate can assert the text a person actually sees rather
+ * than that a variable exists somewhere.
+ *
+ * The escalation phrasing is lifted deliberately from SAFEGUARD-1 --
+ * "I can't give you medical support ... worth getting someone to look at
+ * it" -- because a second way of saying the same thing is how eleven stop
+ * lines phrased eleven ways happened in the first place.
+ *
+ * It names no condition and gives no timescale for seeking care. Naming a
+ * condition is a diagnosis, and urgency tiers belong to the red-flag
+ * screen, which is not built.
+ */
+export const HURT_AND_ACHE = [
+  "If something hurts while you are doing it \u2014 sharp, or building as you go \u2014 stop that movement. Discomfort that settles when you stop is usually fine to work near. Pain that grows is not.",
+  "Aching for a day or two afterwards is normal, especially if this is new to you. I can't give you medical support \u2014 if it is worse than when you started, or it is still there after a few days, it's worth getting someone to look at it."
+];
+
+const HURT_AND_ACHE_HTML =
+  `<ul class="exercise-section-list">${HURT_AND_ACHE.map(s => `<li>${s}</li>`).join("")}</ul>`;
+
 
 import { bodyCaution } from "./data/session-rationale.js";
 import { getDisplayPref } from "./display-prefs.js";
@@ -183,6 +216,28 @@ export function renderExerciseCard(exercise, opts = {}) {
     section("What to watch for",
       (exercise.watchOut && exercise.watchOut.length) ? list("exercise-watchout-list", exercise.watchOut) : "",
       "xcard-block--hazard"),
+    // CR-5, 06 Sep 2026. Two things the physiotherapist said should be on
+    // every exercise, and were on none: what to do if it hurts while you
+    // are doing it, and that aching afterwards is expected.
+    //
+    // ONE SHARED BLOCK, NOT 94 COPIES. rehabilitation.js v9 already made
+    // this argument about its load line and it holds here: a generic line
+    // that is ACCURATE is not the same fault as a generic line that
+    // teaches nothing. These two are true of every entry in the library,
+    // so duplicating them per-entry would add 551 strings and no meaning,
+    // and would guarantee they drift apart.
+    //
+    // ON EVERY EXERCISE, NOT JUST REHABILITATION. Her word was \"always\".
+    // The CLINICAL-RESPONSE blueprint scoped CR-5 to the 94 rehab entries;
+    // that was narrower than the steer and narrower than the need. Someone
+    // in a strength session can hurt themselves too, and category is not a
+    // reason to withhold it.
+    //
+    // It sits directly under watchOut and above the instructions, because
+    // the safety cluster is the point. It does NOT diagnose, and its
+    // escalation phrasing matches SAFEGUARD-1 exactly rather than
+    // inventing a third register.
+    section("If it hurts", HURT_AND_ACHE_HTML, "xcard-block--hazard"),
     section("How to get there",
       (exercise.instructions && exercise.instructions.length) ? list("exercise-section-list", exercise.instructions) : ""),
     section("More on form", restCues.length ? list("exercise-section-list", restCues) : ""),
