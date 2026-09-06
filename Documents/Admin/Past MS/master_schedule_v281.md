@@ -1,28 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v282
+## 05 Sep 2026 v281
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v281.md`. Remove v281 on upload.
-
-> ### 🟢 PICKER-EXIT — CLOSED 06 Sep 2026. `tools/verify-picker-exit.mjs`, 13 assertions, 106 gates. No app source changed; `sw.js` NOT bumped.
->
-> #### 🔴 THE DEFECT WAS THE RECORD, NOT THE CODE
->
-> The entry below said the button ends at Home. **BYPASS-DOOR fixed that and nobody reconciled the log.** Graeme was annoyed it had not been fixed; it had been, and the schedule kept telling him otherwise for weeks. Second bookkeeping-not-code item in two sessions — SURFACE-TOKEN's entry also understated the fault (34 refs across 9 files logged; 51 across 15 found).
->
-> **Consequence, and it is the argument for the persona trace:** the schedule is not currently trustworthy as a picture of what the app does. Two of nine "open defects" were already fixed. Judge the build by execution, not by the list.
->
-> #### 🟠 A GAP THE GATE ALMOST SHIPPED WITH
->
-> The button's **label** is set at `session-builder-ui.js:1189` by ternary; the **navigation** happens at `:1857`. The first draft asserted only the label, and stayed **green with the Gentle Care exit deleted outright.** It now spies on `router.navigate` and asserts where the person is actually sent. Found only because break 3 was run.
->
-> #### 🟠 A FALSE RESULT NEARLY REPORTED
->
-> Break 3's first attempt failed its own `assert t.count(old)==1` — that block appears **twice** in the file (`:1522` and `:1857`). The edit never applied, the gate ran against untouched code, and the shell printed "GREEN (missed)". The assert did its job; the wrapper around it did not. **Gate the report on the edit succeeding, not just the edit on the assert.**
->
-> ⚫ **Fixture note, now pinned by a reversal:** `shoulders` is a ZONE name, not a condition id. `conditions:["shoulders"]` at score 8 makes `severeZoneToday()` return null and quietly tests the ordinary path. Use `lower-back` at 8 → `spine`. Ninth recorded instance.
->
-> 🟢 Three deliberate breaks, three caught red: exit to Home instead of the picker (the fault as logged), landing on duration, and removing the Gentle Care exit.
+Supersedes `master_schedule_v280.md`. Remove v280 on upload.
 
 > ### 🟢 SURFACE-TOKEN — CLOSED 05 Sep 2026. `alongside-v440`, 105 gates. New `tools/verify-surface.mjs`.
 >
@@ -314,7 +294,7 @@ Supersedes `master_schedule_v272.md`. Remove v272 on upload.
 > | **DUPE-SECTION** | 🆕 A full-body session contains **three duplicate exercises** — one entry occupying both warm-up and main. `buildSessionFromSelection()` filters each section against one flat id set. Pre-existing; found while tracing SWAP-1 | 🔴 **Next session** |
 > | **SURFACE-TOKEN** | 🆕 `--color-surface` undefined, 34 fallback-less references across 9 files. Those surfaces render transparent | 🟠 Logged |
 > | **VARIETY-Q** | The "something like last time / something different" question is asked at check-in and then overridden by handing over the full list. **The list is now gone**, so the answer can survive — it can shape what gets built | 🟡 Now answerable |
-> | **PICKER-EXIT** | ~~"Build a different one" does not return where it started; it ends at Home~~ — **THIS WAS NEVER TRUE AFTER BYPASS-DOOR.** Driven under jsdom 06 Sep: normal route returns to the type picker (8 tiles); Gentle Care changes the label to "Back to Today" and exits deliberately, because offering the picker behind a closed door is a soft trap. Closed by `tools/verify-picker-exit.mjs`, 13 assertions | 🟢 Closed |
+> | **PICKER-EXIT** | "Build a different one" (`sb-rebuild-btn`) does not return where it started; it ends at Home. Deliberately untouched by SWAP-1 — but **back from the preview** was changed, because the candidate screen was its back target and no longer exists, so leaving it alone would have skipped two steps for stretch | 🟠 Logged |
 > | **SORE-LEGEND** | The red ring has no explanation of the colour. **Closed inside the swap sheet** — every marked option carries its reason in words via `aria-describedby`, so nothing there depends on colour. Still open for the stretch **zone picker**, which uses a bullet and one shared note | 🟡 Half closed |
 >
 > 🟢 **Graeme, 05 Sep 2026: "There is a clear difference now between the screens."** TIER-HOME confirmed on device.
@@ -7019,4 +6999,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v282*
+*Build New Habits · Alongside: Move · Master Schedule · 05 Sep 2026 v281*
