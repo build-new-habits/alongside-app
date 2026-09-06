@@ -137,7 +137,16 @@ check("7a. the arc panel is on Home", () => {
   // "arcPanel()" matches the function's own DEFINITION, so the naive
   // check passed with the call removed. Look for the call inside the
   // template instead.
-  ok(/\$\{arcPanel\(\)\}/.test(today), "Home does not render the arc");
+  // HOME-DOORS, 06 Sep 2026. The free branch used to end with a bare
+  // ${arcPanel()} inside the chooser. The chooser is shared now, so the
+  // arc moved out of it and each tier places it explicitly -- above on
+  // Plan, below on free. Both branches asserted separately: one regex
+  // over the whole file passed with a tier's arc deleted.
+  ok(/isPremium\(\) \? arcPanel\(\) : ''/.test(today),
+     "Plan's Home does not render the arc");
+  ok(/isPremium\(\) \? '' : arcPanel\(\)/.test(today),
+     "free's Home does not render the arc offer, so the product is never mentioned to " +
+     "the people who might buy it");
   ok(/function arcPanel/.test(today), "no arc panel");
 });
 
@@ -231,10 +240,17 @@ check("10a. session tiles have left PLAN's Home", () => {
   // is still an arc and an invitation, nothing else.
   const at = today.indexOf("${isPremium() ? arcPanel()");
   ok(at > -1, "Home no longer branches on tier");
-  const planBlock = today.slice(at, today.indexOf("freeChooser()", at));
-  ok(!/today-doors/.test(planBlock),
-     "Plan's Home renders session tiles again. The suggestion is what leads there; the " +
-     "tiles live behind the check-in.");
+  // HOME-DOORS, 06 Sep 2026. THIS ASSERTION IS INVERTED, deliberately.
+  // It used to require that Plan's Home had NO tiles. On device the
+  // tiles' only other home was a row underneath coach-proposal's
+  // auto-opening panel (fixed, inset 0, z-index 9999), which cannot be
+  // dismissed to reveal it -- so "relocated" meant "removed", and the
+  // stretch session became unreachable because coach-proposal builds
+  // through workoutGenerator.js, whose type list is three hardcoded
+  // names with no stretch in it.
+  ok(/\$\{chooser\(\)\}/.test(today), "Home does not render the chooser");
+  ok(!/isPremium\(\)[^\n]*\?[^\n]*chooser\(\)/.test(today),
+     "the chooser is still gated on tier, so one tier has no session doors");
 });
 
 check("10b. one invitation, and it names the price of entry", () => {
@@ -297,13 +313,19 @@ check("11a. Home branches on tier at all", () => {
   // never be. Free is not Plan with a panel swapped.
   ok(/isPremium\(\) \? arcPanel\(\)/.test(today),
      "the arc panel renders on both tiers, so free is Plan with a panel swapped");
-  ok(/isPremium\(\) \? `[\s\S]{0,400}?today-invite[\s\S]{0,400}?` : freeChooser\(\)/.test(today),
-     "both tiers get the same call to action");
+  // HOME-DOORS. The tiers no longer differ in their CALL TO ACTION --
+  // both get the doors, which is what Plan lost on 04 Sep. They differ
+  // in the arc: Plan leads with it, free is offered it beneath the
+  // doors. Asserted as two positions, not one branch.
+  const arcPlan = today.indexOf("isPremium() ? arcPanel() : ''");
+  const arcFree = today.indexOf("isPremium() ? '' : arcPanel()");
+  ok(arcPlan > -1 && arcFree > -1 && arcPlan < arcFree,
+     "the arc sits in the same place on both tiers, so free is Plan with a panel swapped");
 });
 
 check("11b. free is given a question and the controls", () => {
-  ok(/function freeChooser/.test(today), "there is no free chooser");
-  const at = today.indexOf("function freeChooser");
+  ok(/function chooser/.test(today), "there is no chooser");
+  const at = today.indexOf("function chooser");
   const body = today.slice(at, today.indexOf("function arcPanel", at));
   ok(/What do you want to do today\?/.test(body),
      "free is never asked what it wants — which is the whole free product");
@@ -316,7 +338,7 @@ check("11b. free is given a question and the controls", () => {
 });
 
 check("11c. free gets the coach-picks fallback, named as an offer", () => {
-  const at = today.indexOf("function freeChooser");
+  const at = today.indexOf("function chooser");
   const body = today.slice(at, today.indexOf("function arcPanel", at));
   ok(/today-unsure/.test(body), "free has no coach-picks fallback");
   ok(!/Unsure\?\s*Coach decides/.test(body),
@@ -331,21 +353,28 @@ check("11c. free gets the coach-picks fallback, named as an offer", () => {
 });
 
 check("11d. the offer is above the reference rows on free", () => {
-  const at   = today.indexOf("function freeChooser");
+  const at   = today.indexOf("function chooser");
   const body = today.slice(at, today.indexOf("function arcPanel", at));
-  ok(/arcPanel\(\)/.test(body),
-     "free never sees the arc offer, so the product is never mentioned to the people who " +
-     "might buy it");
-  const chooserAt = today.indexOf("freeChooser()");
+  // HOME-DOORS. arcPanel() left the chooser when the chooser became
+  // shared -- rendering it inside would have emitted the panel twice on
+  // Plan, which already calls it above. Free's offer is asserted at 7a.
+  ok(!/arcPanel\(\)/.test(body),
+     "the chooser still renders the arc itself, so Plan gets the panel twice");
+  const chooserAt = today.indexOf("${chooser()}");
   const refAt     = today.indexOf("today-reference");
   ok(chooserAt > -1 && refAt > -1 && chooserAt < refAt,
      "the chooser renders below the reference rows");
 });
 
-check("11e. Wellbeing is not duplicated on free", () => {
-  ok(/!isPremium\(\) && d\.id === 'wellbeing'/.test(today),
-     "Wellbeing appears both as a free pick and as a reference row — the duplication this " +
-     "screen exists to remove");
+check("11e. Wellbeing is not duplicated on either tier", () => {
+  // HOME-DOORS. The exclusion used to be free-only, because only free
+  // promoted Wellbeing into "Settle your mind". Both tiers promote it
+  // now, so the exclusion applies to both or Plan gets the row twice.
+  ok(/d\.id !== 'wellbeing'/.test(today),
+     "Wellbeing appears both as a pick and as a reference row \u2014 the duplication " +
+     "this screen exists to remove");
+  ok(!/!isPremium\(\) && d\.id === 'wellbeing'/.test(today),
+     "the exclusion is still gated on tier, so Plan renders Wellbeing twice");
 });
 
 console.log(fails === 0

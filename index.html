@@ -56,7 +56,16 @@
       position: fixed;
       top: calc(env(safe-area-inset-top, 0px) + 12px);
       right: calc(env(safe-area-inset-right, 0px) + 12px);
-      z-index: 100;
+      /* ESCAPE-Z, 06 Sep 2026. Was 100. coach-proposal's preview panel is
+         fixed, inset 0, and stacked far above this one. It auto-opens on
+         mount, so
+         the escape sat UNDERNEATH the one screen it most needed to escape
+         -- invisible and untappable. Graeme, on device: "I can't exit it
+         back to the home page." He could not.
+         10000 is deliberately one above the highest z-index in the app
+         rather than a large round number, so the next thing that outranks
+         this fails loudly at review instead of quietly on a handset. */
+      z-index: 10000;
       width: 44px;
       height: 44px;
       min-width: 44px;
