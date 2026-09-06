@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v442
+ * 06 Sep 2026 v443
+ *
+ * v443 - STRETCH-VARY. session-builder-ui.js v14 routes stretch to
+ *   triggerBuild(). Devices on an older cache keep getting the same
+ *   stretch session every time, which is the fault this closes.
  *
  * v442 - ARC-DOOR. today.js v25 gates arcPanel() by tier internally.
  *   Free rendered the full arc through an ungated second call site; the
@@ -3056,7 +3060,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v442";
+const CACHE_NAME = "alongside-v443";
 
 const SHELL_URLS = [
 
