@@ -1,18 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v287
+## 06 Sep 2026 v286
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v286.md`. Remove v286 on upload.
-
-> ### 📋 SESSION CLOSE 06 Sep 2026 — handoff at `Documents/Admin/alongside_session_handoff_06sep2026_v1.md`
->
-> Five items closed: PICKER-EXIT, TIER-VISIBLE, INSTEP-TIER, **ARC-DOOR**, STRETCH-VARY. `alongside-v443`, **109 gates**. `verify-sectionrules.mjs` v1 → v2.
->
-> **Two of the five were record corrections, one was a live tier leak the record did not know about.** The schedule over-reports faults and under-reports them. Standing rule now in force: **no item is reported as open until it has been driven.**
->
-> **Eight fixture-reach failures in one day.** Every gate written today carries explicit `FIXTURE REACHES...` assertions. The traps are listed in the handoff, section 5.
->
-> ⏳ **Awaiting Graeme:** the PAR-Q+ call for RED-FLAG; BETA-3 on the handset; and a look at Settings > Profile, which now states the tier.
+Supersedes `master_schedule_v285.md`. Remove v285 on upload.
 
 > ### 🟢 STRETCH-VARY — SHIPPED 06 Sep 2026, `alongside-v443`, 109 gates. `session-builder-ui.js` v13 → **v14**. New `tools/verify-stretch-vary.mjs` (15 assertions).
 >
@@ -7105,4 +7095,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v287*
+*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v286*
