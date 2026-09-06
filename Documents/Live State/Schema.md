@@ -1,8 +1,10 @@
 # Alongside — Data Schema Reference
-## 03 Sep 2026 v1.45
+## 06 Sep 2026 v1.46
 
 **File:** `js/store.js` (confirmed live version: **v63, 03 Sep 2026**)
 
+> **v1.46, 06 Sep 2026 — SKIP.** `exerciseFeedback` has ONE writer, and it is the explicit two-button control. The "Skip this one" button no longer writes to it. No field shape changed; the contract narrowed, which is the part a future session needs and the part the old entry got wrong.
+>
 > **v1.45, 03 Sep 2026 — ARC-3-SETUP.** `stretchArc` is renamed **`arc`** and extended.
 >
 > **Why renamed:** the object no longer holds a stretch arc. It holds an aim and up to three strands, and a strand may be a mind strand. A field called `stretchArc` holding that is the `activation` fault again — a name that stopped describing its contents and misled every reader afterwards. Three files, five references, no users; cheap now, expensive once anybody has data. Old keys migrate on read.
@@ -544,7 +546,13 @@ All data lives in a single JSON object under this key. `store.js` provides typed
 |-------|------|---------|-------|
 | `exerciseFeedback` | `array` | `[]` | `{ exerciseId, feedback: 'too-hard'\|'too-easy', at }[]`. Capped 200 |
 
-**Read since `exercises/index.js` v1.3, written by nothing until now** — `applyFeedbackWeighting()` always fell back to `[]`, so that weighting had never once run on real data. Writer: `store.logExerciseFeedback()`, called from `gym-programme.js`'s "Skip this one" (a signal already given, at the point of friction — locked principle P3). Binary, not a rating, matching the reader's contract.
+**SOLE WRITER: `js/exercise-feedback.js` (FEED-1)** — the explicit two-button control on the exercise card, present in all four session runners. `store.logExerciseFeedback()` is called from there and nowhere else. Binary, not a rating, matching `applyFeedbackWeighting()`'s contract.
+
+**What this entry said before, and why it was wrong.** It named `gym-programme.js`'s "Skip this one" as the writer, on the PT-12 reasoning of 11 Aug that nothing else wrote the field. That was true for one day. FEED-1 shipped on 12 Aug and this entry was never updated, so the schema recorded the incidental writer and omitted the real one.
+
+Two faults followed from it. A skip is offered on the DECIDE page, **before the exercise is attempted**, so the app recorded a difficulty judgement the person had not made and could not have made. And two skips for any reason at all — short on time, wrong room, changed their mind — dropped that exercise's `programmeScore` to 0.5, identically to two deliberate presses of "That was too hard". Removing the skip write does not starve the reader: it leaves the one writer where the person actually chose to say something.
+
+A skip is still recorded as a skip. `activityLog.exerciseIds` carries the exercises that were done, so a skipped one is absent from it — a fact about what happened, carrying no claim about why.
 
 ### `absence.returnCapturedAt` — **DECLARED, `store.js` v21, 11 Aug 2026**
 
