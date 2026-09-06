@@ -1,7 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 05 Sep 2026 v440
+ * 06 Sep 2026 v441
+ *
+ * v441 - TIER-VISIBLE. settings.js v36 adds a visible "Your plan" line
+ *   to Settings > Profile. The cache must turn over or devices keep
+ *   serving a Settings screen that cannot tell you which tier you are
+ *   in -- the precise fault this release closes.
  *
  * v440 - SURFACE-TOKEN. --color-surface was referenced 51 times across
  *   15 files and defined nowhere; 33 uses had no fallback, so those
