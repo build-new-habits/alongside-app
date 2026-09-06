@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v445
+ * 06 Sep 2026 v446
+ *
+ * v446 - CR-2. Out-of-scope card for me-cfs and long-covid, on both
+ *   session entry points, ahead of the SEVERE-1 Gentle Care bypass
+ *   because Gentle Care offers a walk. No override.
  *
  * v445 - CR-1. chronic-fatigue split into persistent-fatigue, me-cfs and
  *   long-covid. conditions.js v1.6, store.js v64 with a one-way
@@ -3082,7 +3086,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v445";
+const CACHE_NAME = "alongside-v446";
 
 const SHELL_URLS = [
 
