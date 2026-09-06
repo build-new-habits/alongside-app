@@ -1,7 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v448
+ * 06 Sep 2026 v449
+ *
+ * v449 - ACK-NAME. The single-condition onboarding acknowledgement no
+ *   longer renders the raw store id in the coach's line. Two sessions
+ *   both reached for v448; this is the later of the two, renumbered
+ *   rather than overwriting the other's entry.
  *
  * v448 - PATTERN-TAGS and CONTENT-GAP-1. Nine new strength entries and
  *   three corrected tags in js/data/exercises/strength.js. Content only:
@@ -3095,7 +3100,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v448";
+const CACHE_NAME = "alongside-v449";
 
 const SHELL_URLS = [
 
