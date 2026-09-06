@@ -1,67 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v290
+## 06 Sep 2026 v289
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v289.md`. Remove v289 on upload.
-
-> ### 🔴 THE CLINICAL REVIEW CAME BACK, AND IT IS NOT SIGN-OFF. Merged into v289 from the CLINICAL-RESPONSE session, 06 Sep 2026.
->
-> The nine-questions document was returned annotated by the physiotherapist. **Seven of nine
-> answered. Q3 (selection-rule order) and Q9 (home equipment gaps) were not answered at all** and
-> remain exactly as open as before the pack went out.
->
-> **She declined the reviewer role and declined to be named.** Her closing advice: the product
-> needs a medical or exercise professional to help develop it, and exercise advice should be
-> avoided for CFS, long covid, EDS and people with uncontrolled pain. Nothing from her may be
-> attributed as clinical clearance anywhere, in code comments or in documents. **PROVENANCE stays
-> open.** Most clinical guidance in this product is still AI-generated and unverified.
->
-> **Correction carried from v288/v289:** this document has quoted "the reviewing physiotherapist"
-> on post-exertional malaise. **That quote was AI-generated, not hers.** Her actual position
-> happens to agree, which is worth something, but the attribution was wrong and is retracted here.
->
-> **The pre-beta critical path has changed shape rather than cleared.** It read *clinical pack
-> sent → reviewer answers → red-flag screen built → beta*. RED-FLAG is still not buildable from
-> what came back — see the CR-4 row.
->
-> **Graeme's decision, taken 06 Sep: exclusion, not caveat.** Chosen because it is the only route
-> requiring no clinical judgement neither party has — a statement about the product's limits, not
-> a claim about the person. **Cost accepted knowingly:** hypermobility and hEDS are strongly
-> comorbid with ADHD, autism and chronic fatigue (see the ARC note at §"This is also the
-> hypermobility answer"), so this excludes real users the product was built for.
->
-> **Graeme also decided not to pursue a named reviewer on cost grounds.** Checked and recorded:
-> **there is no licence for a wellbeing app, so a named reviewer is not a licence condition.** The
-> only hard legal line is MHRA medical-device scope, which turns on *intended purpose and claims*,
-> not on capability — and if Move were a device the requirement would be UKCA marking and
-> technical documentation, not a reviewer. **Where the absence actually bites is commercial:**
-> referral-led acquisition through physios, social prescribing, occupational health and condition
-> charities means every one of those asks who reviewed it. That sits on Year 1 revenue. Also
-> relevant: PI insurance pricing, ASA substantiation of health claims, and negligence posture.
->
-> | ID | What | Status | Week |
-> |---|---|---|---|
-> | **CR-1** | `chronic-fatigue` split into `persistent-fatigue`, `me-cfs`, `long-covid`. One-way migration to `persistent-fatigue` **only**, never to `me-cfs` — migrating someone into an excluded state without asking would silently withdraw the product from a person who never answered the question. `conditionMeta` keys migrate with it. `store.js` v64, `conditions.js` v1.6, `Schema.md` v1.47 | 🟢 Shipped | w/c 31 Aug |
-> | **CR-2** | Out-of-scope card for `me-cfs` and `long-covid`, on **both** session entry points. Runs **before** the SEVERE-1 Gentle Care bypass — load-bearing, because Gentle Care offers a mindful walk and handing an exertion suggestion to someone with post-exertional malaise is the exact failure this prevents. **No `ignoreSevere` override:** today's pain is the person's to overrule about themselves; whether the app has a pacing model is not | 🟢 Shipped | w/c 31 Aug |
-> | **CR-3** | Hypermobility caveat. HYPER-1 withheld 30 of 551 exercises and said nothing — a silent decision about someone's body. One source of text, surfaced in onboarding **and** the Settings conditions editor, `aria-live`, cleared on deselect. Copy original: the EDS Society disclaimer is theirs and was used as register only. **fibromyalgia and osteoporosis deliberately get no caveat and are gated against getting one** | 🟢 Shipped | w/c 31 Aug |
-> | **CR-4** | RED-FLAG. Her steer was to replace the three screening questions with a general "this is generic, see your GP" statement. **Decision: adopt the statement, keep the screen.** Her framing was explicitly "to protect yourself", which is a different goal from protecting the user; replacing a cauda equina question with a disclaimer moves risk to the person least able to carry it. **But see MHRA-SCOPE — this is the one item a professional should overturn if they disagree** | 🟠 Re-scoped, not built | w/c 07 Sep |
-> | **CR-5** | Standing pattern on rehab entries: what to do if it hurts during, expect to ache after. Her direct steer, generic, low clinical risk | 🔵 Not started | w/c 07 Sep |
-> | **MHRA-SCOPE** | For Foot Anstey, with the pack already going: **does the red-flag screen's wording create a medical purpose Move does not otherwise have?** One source names "helping determine whether you need clinical attention" as a medical claim, and the screen currently says symptoms *require* evaluation. Costs nothing to ask; changes a great deal if the answer is yes | 🟠 Graeme | w/c 07 Sep |
->
-> **Still open, and NOT closed by any of the above:**
->
-> | Item | Position after her answers | Blocked on |
-> |---|---|---|
-> | Pain thresholds (the live 6/7/8 contradiction) | **Not answered.** She raised **baseline** instead: 1→6 is not the same event as 4→6. The app has no baseline field | Clinical input + a new field |
-> | Sleep modification | Agreed in principle, **refused to give a number**, said it needs evidence not instinct | Sourced evidence review |
-> | Selection-rule order (Q3) | **Not answered** | Clinical input |
-> | Home equipment gaps (Q9) | **Not answered.** Note this collides with CONTENT-GAP-1 above | Content work |
-> | fibromyalgia, osteoporosis | Still zero entries in any avoid/caution list | Clinical input |
-> | Progression | **Usable rules given:** RPE-based, 6–8 weeks for strength, progress when 10 reps feel easy, last reps near limit, ROM adapts faster, goal-dependent. Build capacity, not clinical input | 🔵 **Post-beta** |
-> | Photo or video per exercise | Her steer: always include one. 551 entries | Own stream, not pre-beta |
-> | Named clinical reviewer | **Declined.** Free routes not yet tried: Weston College sport/exercise science staff, university physio placements, ADHD UK / Autistica clinical advisers, Alex at Somerset Innovation Hub | 🟠 Graeme, not urgent |
->
-> ---
+Supersedes `master_schedule_v288.md`. Remove v288 on upload.
 
 > ### 🟠 CONTENT-GAP-1 RE-MEASURED — the target of 16 does not survive being driven. Logged 06 Sep 2026, BEFORE the fixes, so it cannot be lost the way the original was.
 >
@@ -2184,10 +2125,7 @@ Supersedes `master_schedule_03sep2026_v268.md`. Remove v268 on upload.
 > rehab entries, selection logic, pain thresholds (including the live 7-vs-8 contradiction),
 > sleep, ME/CFS, hypermobility, progression, and home-equipment additions. It was never
 > referenced here. It is the send-first document for that reviewer; the 16 Aug clinical pack
-> remains the full pack. ~~**Both are finished and neither has been sent.**~~ **SENT AND
-> RETURNED, 06 Sep 2026** — v4 of the nine-questions document came back annotated. Seven of nine
-> answered; see the CLINICAL-RESPONSE block at the top. The 16 Aug full pack remains unsent and
-> now has no reviewer to send it to.
+> remains the full pack. **Both are finished and neither has been sent.**
 >
 > #### 🟢 LEGAL-2 — four pre-beta compliance documents drafted 28 Aug, into `Documents/Business/`.
 >
@@ -2208,11 +2146,9 @@ Supersedes `master_schedule_03sep2026_v268.md`. Remove v268 on upload.
 >
 > #### 🔴 The pre-beta critical path, restated from the sweep so it is not lost in the detail:
 >
-> ~~**clinical pack sent → reviewer answers → red-flag screen built → beta.**~~ **SUPERSEDED
-> 06 Sep 2026 — see the CLINICAL-RESPONSE block at the top of this document.** The pack was sent,
-> the answers came back, and they did not clear this path: the reviewer declined the role, two of
-> nine questions were unanswered, and RED-FLAG was re-scoped rather than unblocked (CR-4). The
-> red-flag screen still has zero code. Beta is ~2.5 weeks out. Also on the clock:
+> **clinical pack sent → reviewer answers → red-flag screen built → beta.** The pack has been
+> finished and unsent since ~16 Aug; the red-flag screen is confirmed pre-beta with zero code and
+> cannot be written until the wording comes back. Beta is ~2.5 weeks out. Also on the clock:
 > **PAT token expires 5 Sep** (8 days); **domain decision** (app origin must be settled before
 > beta installs — 17 Aug session ended awaiting Namecheap and nothing has landed since);
 > **A1.11 age alignment** across ToS/business docs (blocks Foot Anstey);
@@ -7249,4 +7185,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v290*
+*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v289*
