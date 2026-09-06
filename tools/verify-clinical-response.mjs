@@ -24,6 +24,18 @@
 
 import fs from "node:fs";
 
+// GATE-PATH, 21 Aug 2026. jsdom resolved through Node rather than by
+// absolute path into one machine's node_modules. store.js writes to
+// localStorage on every set(), so the CR-2 checks cannot drive real state
+// without a DOM -- and driving real state is the whole point of them.
+import { createRequire as __cr } from "node:module";
+const __require = __cr(import.meta.url);
+const { JSDOM } = __require("jsdom");
+const dom = new JSDOM("<!doctype html>", { url: "https://x/" });
+globalThis.window = dom.window; globalThis.document = dom.window.document;
+Object.defineProperty(globalThis,"navigator",{value:dom.window.navigator,configurable:true,writable:true});
+Object.defineProperty(globalThis,"localStorage",{value:dom.window.localStorage,configurable:true,writable:true});
+
 const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, "")
                     .replace(/^\s*\/\/[^\n]*$/gm, "");
 const read = f => strip(fs.readFileSync(f, "utf8"));
@@ -151,6 +163,125 @@ check("conditionMeta history survives the rename", `${BP} \u00a72`, () => {
      "conditionMeta was carried but its counters were reset");
   ok(!out.conditionMeta["chronic-fatigue"],
      "the old conditionMeta key is still present alongside the new one");
+});
+
+console.log("\nCR-2 \u2014 the exclusion actually fires, on both routes");
+
+const sb = await import("../js/session-builder.js");
+
+// Drive real store state. A file-read assertion here would pass while the
+// branch was unreachable, which is the recorded recurring fault.
+const withConditions = (ids, fn, painScores) => {
+  localStorage.clear();
+  S.init();
+  S.set("tier", "personal");
+  S.set("fitnessLevel", "moderate");
+  S.set("goals", ["get-stronger"]);
+  S.set("onboardingComplete", true);
+  S.set("conditions", ids);
+  S.set("conditionPainScores", painScores || {});
+  return fn();
+};
+
+// FIXTURE SELF-CHECK. Every fixture must demonstrably reach the branch it
+// names; nine recorded instances of fixtures that did not make this a
+// standing check rather than a nicety. A control run proves the harness
+// builds a real session when nothing should stop it -- without this, every
+// "returns the out-of-scope card" assertion below could be passing on a
+// buildSession that returns null for an unrelated reason.
+{
+  const control = withConditions([], () =>
+    sb.buildSession({ sessionType: "full", durationMins: 30 }));
+  ok(control && control.outOfScope !== true && control.gentleCare !== true,
+     "HARNESS FAULT: the control fixture does not build an ordinary session, so no " +
+     "assertion in this section can be trusted");
+}
+
+check("me-cfs reaches the out-of-scope card, not a session", `${BP} \u00a73`, () => {
+  const s = withConditions(["me-cfs"], () =>
+    sb.buildSession({ sessionType: "full", durationMins: 30 }));
+  ok(s, "buildSession returned nothing at all");
+  ok(s.outOfScope === true,
+     `expected the out-of-scope card, got id="${s.id}". The condition is collected and ` +
+     "changes nothing \u2014 the exact fault conditions.js v1.5 documents");
+});
+
+check("long-covid reaches it too", `${BP} \u00a73`, () => {
+  const s = withConditions(["long-covid"], () =>
+    sb.buildSession({ sessionType: "full", durationMins: 30 }));
+  ok(s && s.outOfScope === true, `expected out-of-scope, got id="${s && s.id}"`);
+});
+
+check("The self-directed route is covered as well", `${BP} \u00a73`, () => {
+  const s = withConditions(["me-cfs"], () =>
+    sb.buildSessionFromSelection({ sessionType: "full", durationMins: 30,
+                                   selectedIds: ["clamshell"] }));
+  ok(s && s.outOfScope === true,
+     "buildSessionFromSelection built a session anyway \u2014 a safety rule honoured by " +
+     "one of two entry points is not a safety rule");
+});
+
+check("ignoreSevere does NOT override scope", `${BP} \u00a73`, () => {
+  for (const fn of ["buildSession", "buildSessionFromSelection"]) {
+    const s = withConditions(["me-cfs"], () =>
+      sb[fn]({ sessionType: "full", durationMins: 30,
+               selectedIds: ["clamshell"], ignoreSevere: true }));
+    ok(s && s.outOfScope === true,
+       `${fn} let ignoreSevere bypass the scope check. Today's pain is the person's to ` +
+       "overrule; whether this app has a pacing model is not");
+  }
+});
+
+check("The card offers NO exertion \u2014 no walk", `${BP} \u00a73`, () => {
+  const s = withConditions(["me-cfs"], () =>
+    sb.buildSession({ sessionType: "full", durationMins: 30 }));
+  const ids = (s.exercises || []).map(e => e.id);
+  ok(!ids.includes("mindful-walk"),
+     "the out-of-scope card offers a walk. Handing an exertion suggestion to someone " +
+     "with post-exertional malaise is the precise thing this card exists to prevent");
+  ok(ids.length > 0, "the card is empty \u2014 withdrawing everything is a punishment, not a scope statement");
+});
+
+check("Scope resolves BEFORE Gentle Care, not after", `${BP} \u00a73`, () => {
+  // The fixture must make Gentle Care genuinely reachable, or this passes
+  // vacuously. Control first: knee at 9 alone MUST return Gentle Care.
+  const control = withConditions(["knee"], () =>
+    sb.buildSession({ sessionType: "full", durationMins: 30 }), { knee: 9 });
+  ok(control && control.gentleCare === true,
+     "FIXTURE FAULT: severe pain does not reach Gentle Care, so the ordering assertion " +
+     "below would prove nothing");
+
+  const s = withConditions(["me-cfs", "knee"], () =>
+    sb.buildSession({ sessionType: "full", durationMins: 30 }), { knee: 9 });
+  ok(s.outOfScope === true && s.gentleCare !== true,
+     "Gentle Care won the race. It offers a mindful walk, so this ordering is not a " +
+     "preference \u2014 it is the whole point of the card");
+});
+
+check("persistent-fatigue still gets a real session", `${BP} \u00a71`, () => {
+  const s = withConditions(["persistent-fatigue"], () =>
+    sb.buildSession({ sessionType: "full", durationMins: 30 }));
+  ok(s, "buildSession returned nothing");
+  ok(s.outOfScope !== true,
+     "persistent-fatigue was swept into the exclusion. The split existed precisely so " +
+     "this group keeps the adaptive model that suits them");
+});
+
+check("No conditions at all still builds normally", `${BP} \u00a73`, () => {
+  const s = withConditions([], () =>
+    sb.buildSession({ sessionType: "full", durationMins: 30 }));
+  ok(s && s.outOfScope !== true, "the exclusion fires for people who declared nothing");
+});
+
+check("The out-of-scope card does not diagnose or instruct", "P4, coach voice", () => {
+  const s = withConditions(["me-cfs"], () =>
+    sb.buildSession({ sessionType: "full", durationMins: 30 }));
+  const line = s.coachLine || "";
+  ok(!/\byou have\b|\byour condition is\b|\bdiagnos/i.test(line),
+     "the card makes a claim about what is wrong with the person");
+  ok(!/\bmust\b|\bshould see\b|\bA&E\b|\b111\b/i.test(line),
+     "the card instructs the person to seek care. That is the red-flag screen's job, " +
+     "and this is not that screen");
 });
 
 console.log("\nHYPER-1 regression \u2014 unchanged by this session");
