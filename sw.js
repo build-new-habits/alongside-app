@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v450
+ * 06 Sep 2026 v451
+ *
+ * v451 - HOME-DOORS and ESCAPE-Z. The session doors return to the Plan
+ *   Home screen, and the escape hatch is raised above every modal in the
+ *   app so it can be tapped from the coach-proposal panel.
  *
  * v450 - CR-5 and CR-4a. Hurt-and-ache guidance on every exercise card;
  *   general pre-start statement on the closing onboarding step.
@@ -3103,7 +3107,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v450";
+const CACHE_NAME = "alongside-v451";
 
 const SHELL_URLS = [
 
