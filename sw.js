@@ -1,7 +1,25 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v443
+ * 06 Sep 2026 v444
+ *
+ * v444 - CARD-TDZ and SKIP. exercise-card.js v4 and gym-programme.js v12.
+ *   The bump matters more than most: every device on v443 or earlier is
+ *   running an exercise card that THROWS on every call, so workout,
+ *   gym-programme, core-session and prescribed-session all fail to
+ *   mount. Until this cache lands, the app has no working session
+ *   screen at all.
+ *
+ *   Also adds css/layouts/goal-review.css to the precache list below.
+ *   sw.js v398 claimed it did not need listing because main.css @imports
+ *   it and main.css is precached. That reasoning is wrong: an @import
+ *   fires its own request, and the fetch handler only falls back to the
+ *   cached shell for mode === "navigate", so offline the request simply
+ *   fails. Its ten sibling layout files were all listed; this one was
+ *   the exception, and tools/precache-check.mjs had been red on main
+ *   because of it. It self-heals via the runtime cache.put on the first
+ *   online load, but that window reopens on EVERY cache bump, which is
+ *   what made it worth a line rather than a comment.
  *
  * v443 - STRETCH-VARY. session-builder-ui.js v14 routes stretch to
  *   triggerBuild(). Devices on an older cache keep getting the same
@@ -3060,7 +3078,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v443";
+const CACHE_NAME = "alongside-v444";
 
 const SHELL_URLS = [
 
@@ -3077,6 +3095,7 @@ const SHELL_URLS = [
   "/alongside-app/css/layouts/library.css",
   "/alongside-app/css/layouts/mobility-conditioning.css",
   "/alongside-app/css/layouts/progress.css",
+  "/alongside-app/css/layouts/goal-review.css",
   "/alongside-app/css/components/session-guard.css",
   "/alongside-app/css/components/weekly-plan.css",
   "/alongside-app/css/components/breathing-session.css",
