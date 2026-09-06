@@ -284,6 +284,83 @@ check("The out-of-scope card does not diagnose or instruct", "P4, coach voice", 
      "and this is not that screen");
 });
 
+console.log("\nCR-3 \u2014 the hypermobility caveat");
+
+const otd = await import("../js/data/onboarding-thread-data.js");
+
+check("Declaring hypermobility produces a caveat", `${BP} \u00a72`, () => {
+  const c = otd.generateConditionCaveats(["hypermobility"]);
+  ok(c && c.length > 0,
+     "HYPER-1 withholds 30 stretches and says nothing. Silently deciding something " +
+     "about a person's body and not telling them is the fault, not the block");
+});
+
+check("It reaches the onboarding acknowledgement", `${BP} \u00a72`, () => {
+  const ack = otd.generateConditionsAck(["hypermobility"]);
+  const caveat = otd.generateConditionCaveats(["hypermobility"]);
+  ok(ack.includes(caveat),
+     "the caveat exists but the onboarding ack does not carry it \u2014 written and " +
+     "unreachable is the same as not written");
+});
+
+check("It survives alongside other conditions", `${BP} \u00a72`, () => {
+  for (const set of [["knee", "hypermobility"], ["hypermobility", "anxiety", "shoulder"]]) {
+    const ack = otd.generateConditionsAck(set);
+    ok(ack.includes("hypermobility") || ack.includes("stretches"),
+       `the caveat is dropped when hypermobility is declared with others: ${set.join(", ")}`);
+  }
+});
+
+check("No caveat for conditions that have none", `${BP} \u00a72`, () => {
+  ok(otd.generateConditionCaveats(["knee", "anxiety"]) === "",
+     "a caveat is being attached to conditions with no guidance behind it");
+  ok(otd.generateConditionCaveats([]) === "", "a caveat appears for nobody at all");
+  ok(otd.generateConditionCaveats(null) === "", "null input does not return an empty string");
+});
+
+check("fibromyalgia and osteoporosis get NO invented caveat", "conditions.js v1.5", () => {
+  for (const id of ["fibromyalgia", "osteoporosis"]) {
+    ok(otd.generateConditionCaveats([id]) === "",
+       `a caveat has been written for ${id}. There is no guidance to write one from, ` +
+       "and inventing it would be worse than the gap it fills");
+  }
+});
+
+check("The caveat does not diagnose or instruct", "P4, coach voice", () => {
+  const c = otd.generateConditionCaveats(["hypermobility"]);
+  ok(!/\byou have\b|\byour condition\b|\bdiagnos|\bsevere\b|\bmild\b/i.test(c),
+     "the caveat makes a claim about the person's body or grades their severity");
+  ok(!/\bmust\b|\byou need to see\b|\bA&E\b|\b111\b/i.test(c),
+     "the caveat instructs the person to seek care. It may name a limit; it may not " +
+     "issue a medical instruction");
+  // The limit is the half the steer actually asked for, so require BOTH
+  // halves: that the app is working from general guidance, and that
+  // someone who can see the person will do better.
+  ok(/general guidance|not from anything about you/i.test(c),
+     "the caveat does not say the app is working from general guidance rather than " +
+     "from anything about this person");
+  ok(/substitute|better than I can/i.test(c),
+     "the caveat does not point outward. Naming a limit without pointing anywhere is " +
+     "just a disclaimer");
+});
+
+check("The settings route shares one source of text", `${BP} \u00a72`, () => {
+  const v = read("js/views/onboarding/conditions.js");
+  // An import alone proves nothing -- the symbol can be imported and never
+  // called, which is exactly what an earlier version of this check missed.
+  // Require a CALL: at least one use beyond the import statement.
+  const uses = (v.match(/generateConditionCaveats\s*\(/g) || []).length;
+  ok(uses >= 2,
+     `generateConditionCaveats is called ${uses} time(s) in the conditions editor; ` +
+     "expected at least two (initial render and the toggle handler). Importing it and " +
+     "then hand-rolling the text is how a second copy starts drifting from this one");
+  ok(!/Stretches held back|hypermobile joints/.test(v),
+     "caveat copy has been written directly into the view. There must be one source " +
+     "of this text, in CONDITION_CAVEATS");
+  ok(/aria-live/.test(v),
+     "the caveat region has no aria-live, so it appears silently for screen reader users");
+});
+
 console.log("\nHYPER-1 regression \u2014 unchanged by this session");
 
 check("hypermobility still avoids stretch-pattern exercises", "conditions.js v1.5", () => {

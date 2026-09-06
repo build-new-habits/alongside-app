@@ -1030,17 +1030,81 @@ export function generateSummary(type, value, storeData) {
  * @param {string[]} conditions — array of human-readable condition names
  * @returns {string}
  */
+/**
+ * CR-3, 06 Sep 2026. CONDITION CAVEATS.
+ *
+ * Extra text appended to the conditions acknowledgement for conditions
+ * where the app changes something the person would otherwise notice and
+ * misread, or where its own competence has a stated edge.
+ *
+ * WHY HYPERMOBILITY GETS ONE. HYPER-1 removes every stretch-pattern
+ * exercise for anyone declaring it -- 30 of 551. Without a word, that
+ * reads as a library that has forgotten stretches exist. Worse, it is a
+ * silent decision made on the person's behalf about their own body.
+ *
+ * The caveat also carries the limit. The physiotherapist's steer of
+ * 06 Sep was that hypermobility and hEDS vary enormously and need
+ * individualised programmes, and that a generic app should say so rather
+ * than imply it has handled it. The block is deliberately blunt -- it
+ * catches mid-range stretches as well as end-range ones, because
+ * `movementPattern: 'stretch'` is the closest thing the data can express
+ * (conditions.js v1.5). Saying that out loud is more honest than a
+ * silent over-exclusion the person cannot see.
+ *
+ * WORDING IS ORIGINAL. The steer pointed at the Ehlers-Danlos Society's
+ * published disclaimer as an example of the register. That text is
+ * theirs; this is written fresh to the same purpose in the coach's own
+ * voice. Do not paste external copy in here.
+ *
+ * NOT A DIAGNOSIS AND NOT AN INSTRUCTION. It names what the app is doing
+ * and where its competence stops. It does not tell the person what is
+ * wrong with them, does not grade their severity, and does not tell them
+ * they must see anybody.
+ *
+ * The map is the extension point: fibromyalgia and osteoporosis are in
+ * the same "collected but changes nothing" state and get no entry here,
+ * because there is no guidance to write one from and inventing it would
+ * be worse than the gap.
+ */
+const CONDITION_CAVEATS = {
+  hypermobility:
+    "One more thing, since you mentioned hypermobility.\n\nI'm going to hold stretches " +
+    "back for you. With hypermobile joints, more range usually isn't the thing that " +
+    "helps \u2014 steadiness around the joint tends to matter more. I'd rather be careful " +
+    "here than clever, so I've left them out rather than picked through them.\n\nAnd I " +
+    "should be straight about my limits. Hypermobility looks different in everybody, and " +
+    "I'm working from general guidance, not from anything about you. If it affects you " +
+    "much, someone who can actually see how you move will do far better than I can. " +
+    "Nothing I suggest is a substitute for that.",
+};
+
+/**
+ * The caveat text for a set of declared conditions, or "" if none apply.
+ * Exported so the settings route can reuse it rather than growing its own
+ * copy -- two versions of a safety caveat is one version too many.
+ */
+export function generateConditionCaveats(conditions) {
+  if (!Array.isArray(conditions)) return "";
+  return conditions
+    .map(id => CONDITION_CAVEATS[id])
+    .filter(Boolean)
+    .join("\n\n");
+}
+
 export function generateConditionsAck(conditions) {
+  const caveats = generateConditionCaveats(conditions);
+  const withCaveats = base => (caveats ? `${base}\n\n${caveats}` : base);
+
   if (!conditions || conditions.length === 0) {
-    return "Okay — no problem at all. If anything comes to mind later, you can add it in your settings and I'll adjust from there. I just wanted to ask.";
+    return "Okay \u2014 no problem at all. If anything comes to mind later, you can add it in your settings and I'll adjust from there. I just wanted to ask.";
   }
   if (conditions.length === 1) {
-    return `Thank you for telling me. I'll work around ${conditions[0]} — you won't have to remind me.`;
+    return withCaveats(`Thank you for telling me. I'll work around ${conditions[0]} \u2014 you won't have to remind me.`);
   }
   if (conditions.length === 2) {
-    return `Thank you for telling me. I'll work around both of those — you won't have to remind me.`;
+    return withCaveats(`Thank you for telling me. I'll work around both of those \u2014 you won't have to remind me.`);
   }
-  return `Thank you for telling me. I'll work around all of those — you won't have to remind me.`;
+  return withCaveats(`Thank you for telling me. I'll work around all of those \u2014 you won't have to remind me.`);
 }
 
 /**

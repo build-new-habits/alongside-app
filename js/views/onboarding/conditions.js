@@ -9,6 +9,7 @@
 
 import { store } from "../../store.js";
 import { CONDITIONS } from "../../data/conditions.js";
+import { generateConditionCaveats } from "../../data/onboarding-thread-data.js";
 
 export const centered = false;
 
@@ -21,8 +22,17 @@ const AREA_GROUPS = [
   { area: "other",    label: "Other",         icon: "❓" }
 ];
 
+// CR-3. Text is interpolated into markup, so it is escaped at the point
+// of insertion rather than trusted for being ours today.
+function _esc(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
 export function render() {
-  const selected = store.get("conditions") || [];
+  const selected   = store.get("conditions") || [];
+  const caveatText = generateConditionCaveats(selected);
 
   return `
     <div class="onboarding-view">
@@ -79,6 +89,20 @@ export function render() {
         </p>
       </div>
 
+      <!-- CR-3, 06 Sep 2026. The caveat region.
+           This view is reached from Settings > Edit conditions as well as
+           from onboarding, so someone declaring hypermobility months later
+           gets the same words as someone declaring it on day one. The text
+           comes from generateConditionCaveats() rather than being written
+           again here: two versions of a safety caveat is one too many.
+           aria-live so it is announced when it appears rather than only
+           being findable by someone who happens to scroll back. -->
+      <div class="conditions-caveat"
+           id="conditions-caveat"
+           role="status"
+           aria-live="polite"
+           ${caveatText ? "" : "hidden"}>${_esc(caveatText)}</div>
+
       <div class="onboarding-actions">
         <button class="btn btn-primary btn-large btn-full"
                 onclick="saveConditions()"
@@ -98,6 +122,16 @@ window.toggleCondition = function(conditionId) {
     : [...conditions, conditionId];
 
   store.set("conditions", updated);
+
+  // CR-3. Keep the caveat in step with the selection, in both directions.
+  // Showing it on select and never clearing it on deselect would leave a
+  // warning attached to a condition the person has just removed.
+  const caveatEl = document.getElementById("conditions-caveat");
+  if (caveatEl) {
+    const text = generateConditionCaveats(updated);
+    caveatEl.textContent = text;
+    caveatEl.hidden = !text;
+  }
 
   // Update chip state
   const chip = document.querySelector(`[data-condition="${conditionId}"]`);
