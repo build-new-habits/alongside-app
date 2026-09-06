@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v446
+ * 06 Sep 2026 v447
+ *
+ * v447 - CR-3. Hypermobility caveat, shared by onboarding and the
+ *   Settings conditions editor from one source of text.
  *
  * v446 - CR-2. Out-of-scope card for me-cfs and long-covid, on both
  *   session entry points, ahead of the SEVERE-1 Gentle Care bypass
@@ -3086,7 +3089,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v446";
+const CACHE_NAME = "alongside-v447";
 
 const SHELL_URLS = [
 
