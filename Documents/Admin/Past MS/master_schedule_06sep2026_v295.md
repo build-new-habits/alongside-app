@@ -1,50 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v296
+## 06 Sep 2026 v295
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v295.md`. Remove v295 on upload.
-
-> ### 🟢 CLUB SPECIFIED — `Documents/Admin/alongside_spec_CLUB_06sep2026_v1.md`. Three decisions taken by Graeme, 06 Sep 2026.
->
-> 1. 🟢 **The twelve-week programme picker leaves onboarding entirely** and moves inside Guided class. Fixes the tier leak and the streak-shaped copy in one change to one screen.
-> 2. 🟢 **Quick build stays a room**, not a fast path inside Freestyle. They feel different in the hand and collapsing would bury the one most people use most days.
-> 3. 🟢 **Free keeps exactly what it has**, minus the programme picker. Free is the drop-in.
->
-> #### 🔴 THE DEPTH RULE IS NOT BROKEN, AND THIS IS THE LOAD-BEARING DECISION
->
-> Four rooms would break *"at most one screen before somebody is moving"* if a room were a screen you pass through. **It is not. Each room card carries today's answer inside it and tapping the answer starts the session.** A card reading "Guided class →" that lands on a list is a corridor; a card reading "Steady Legs, 28 minutes" that starts it is a door.
->
-> ⚫ **Acceptance test, applied per room:** if a room's resting state cannot answer *"what would I get right now"* without being asked, that room is a corridor and the count comes down. Every room therefore needs a specified resting state AND empty state.
->
-> #### 🔴 THE ROOMS DO NOT DIFFER BY COLOUR, deliberately
->
-> Colour already carries meaning here — `--color-scale-1..10` is energy, `--color-danger` is a sore zone, `--color-warning` is caution, `#B8970A` is the paid tier. **Spending colour on wayfinding would corrupt a semantic system that safety depends on.** Somebody learning that amber means "be careful with this" must not also learn it means "you are in the PT room."
->
-> **The rooms differ by form, density and typographic rhythm instead** — sequence, speech, authorship, assembly. Harder, and correct.
->
-> #### 🔴 Copy budget, from Graeme's *"very much less words"*
->
-> Room card title **2 words**. Card state line **6 words, live state never a description**. Inside a room before an action **12 words**. Coach speech in PT **25 words, the only sentence in the club**. **No room is ever explained on screen** — a description under a room name is the tell that the name failed.
->
-> 🟠 **Going in the same pass:** the `HIGHLY RECOMMENDED` gold banner and the `33 MIN · 7 EXERCISES` meta string. Both are template chrome and the middle-dot meta string is a named generic tell.
->
-> #### ⚠️ TWO-ENGINE IS NOW ITEM 1, NOT POST-BETA
->
-> **PT cannot be designed around a generator that knows three session types.** DURATION-STR is item 2 for the same reason: Quick build is a time-driven room and cannot be built on `calculateDuration()` returning NaN on 99 of 551 entries.
->
-> **Build order:** TWO-ENGINE → DURATION-STR → CLUB-SHELL → PLAN-PICKER-TIER → FREESTYLE (schema first) → QUICK-BUILD → CONSTRAINT-CLAIM → HATCH-OVERLAP → PROGRESS.
->
-> #### 🟡 Three reservations recorded rather than resolved
->
-> **"PT" carries gym baggage** for an audience failed by fitness culture. It stands as the working name and gets tested with beta testers — *a name argument settled from an armchair is how "Unsure? Coach decides" survived for months*. **Four cards is at the phone's ceiling.** **Guided class and PT could read as the same thing** to somebody who has used neither; the textures separate them, and it is the assumption most worth checking early on a handset.
-
-> ### 🟢 GRAEME'S STATUS, 06 Sep 2026 — three items moved without Claude
->
-> | Item | Was | Now |
-> |---|---|---|
-> | **HMRC sole trader registration** | Outstanding, blocking bank account and ICO wording | 🟢 **Approved, awaiting paperwork** |
-> | **PAR-Q+ / RED-FLAG** | Awaiting Graeme's call | 🟡 **Response in hand, held deliberately** pending CLUB — a conflict occurred and he is working it through |
-> | **Legal policies** | Documents drafted, awaiting signature | 🟠 **Now Graeme's active workstream** |
+Supersedes `master_schedule_v294.md`. Remove v294 on upload.
 
 > ### 🔴 BETA MOVES. GRAEME'S DECISION, 06 Sep 2026. The mid-September date is withdrawn and CLUB is now pre-beta scope.
 >
