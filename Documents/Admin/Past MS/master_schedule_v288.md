@@ -1,32 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v289
+## 06 Sep 2026 v288
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v288.md`. Remove v288 on upload.
-
-> ### 🟠 CONTENT-GAP-1 RE-MEASURED — the target of 16 does not survive being driven. Logged 06 Sep 2026, BEFORE the fixes, so it cannot be lost the way the original was.
->
-> ⚠️ **A parallel session is running CLINICAL-RESPONSE (CR-1 shipped, `alongside-v445`, `store.js` v64, `Schema.md` v1.47).** This block was written against v288 and touches no file that session touches. **Merge this entry rather than overwriting the document.**
->
-> **The audit tool measures the wrong population.** `audit-pattern-coverage.mjs` filters `category === "strength"`. The builder does not. Driven on the real candidate pool for a full-body session on common kit: **43 rehabilitation entries reach the general pool**, every one `generalPurpose: true`, and they include precisely the entries that fill these holes — `side-plank-modified`, `dead-bug-progression-2` and `-3`, `rehab-shoulder-y-t-w`. Counting what a person is actually offered gives **9**, not 16.
->
-> **A second point the audit hides:** its `COMMON_KIT` set lists ten tags, and **seven of them do not exist in the library vocabulary** — `none`, `bodyweight`, `mat`, `chair`, `towel`, `wall`, `step`. Only `bench`, `dumbbell` and `resistance-band` are real, plus `equipment: []`. The set reads far more permissive than it is.
->
-> **But 9 does not survive either, because three entries propping it up are faulty:**
->
-> | Fault | Effect |
-> |---|---|
-> | 🟠 **`functional-sandbag-carry` has `equipment: []`** (`strength.js`) — a sandbag carry tagged as needing no equipment | It is the **only** common-kit carry at difficulty 3+. Correct the tag and carry goes 1 → **0** |
-> | 🟠 **`plyo-broad-jump` is `movementPattern: "hinge"`** (`strength.js`) — it is a jump, and `jump` exists in the vocabulary | Inflates hinge, which currently reads "ok" at 6 |
-> | 🟠 **`dumbbell-reverse-lunge` is `movementPattern: "squat"`** (`strength.js`) — a reverse lunge is a lunge | Inflates squat, starves lunge. At difficulty 2 it does not move the floor, so it is a data fault rather than a gap fix |
->
-> 🟡 **Not a fault but a floor-quality problem:** `gym-renegade-row` (`gym.js`) is **difficulty 6** and is the only anti-rotation at 3+ on common kit. Counted by the audit, practically unreachable for this audience. A floor filled by a difficulty-6 entry is not filled.
->
-> #### ⚫ THE PRODUCT QUESTION UNDERNEATH — for Graeme, not for Claude
->
-> Even where a rehabilitation entry is `generalPurpose: true` and selection-correct, **the name still reads as rehab**: `dead-bug-progression-3`, `rehab-shoulder-y-t-w`, `side-plank-modified`. A person with no condition, served those in an ordinary strength session, meets the C2 finding one layer up — not "this is unsafe for me" but "this app thinks I am broken." Leaning on them to clear the floor is cheaper than authoring, and it is the reason 9 should not simply be written and closed.
->
-> **Route chosen (Graeme, 06 Sep): fix the three tagging faults, re-measure, author to the corrected number.** Expected to land near 12–13.
+Supersedes `master_schedule_v287.md`. Remove v287 on upload.
 
 > ### 📋 SESSION CLOSE 06 Sep 2026 (second session) — `alongside-v444`, **111 gates**, 116 of 116 checks green on a second independent fresh clone
 >
@@ -7185,4 +7161,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v289*
+*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v288*
