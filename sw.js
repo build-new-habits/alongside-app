@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v449
+ * 06 Sep 2026 v450
+ *
+ * v450 - CR-5 and CR-4a. Hurt-and-ache guidance on every exercise card;
+ *   general pre-start statement on the closing onboarding step.
  *
  * v449 - ACK-NAME. The single-condition onboarding acknowledgement no
  *   longer renders the raw store id in the coach's line. Two sessions
@@ -3100,7 +3103,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v449";
+const CACHE_NAME = "alongside-v450";
 
 const SHELL_URLS = [
 
