@@ -1,6 +1,35 @@
 /**
  * settings.js
- * 29 Aug 2026 v35
+ * 06 Sep 2026 v36
+ *
+ * v36 - TIER-VISIBLE. The tier a device is in was displayed in exactly
+ *   one place: inside the developer panel, which is hidden behind an
+ *   undocumented triple-tap. So a device could sit in the Plan with no
+ *   visible sign anywhere, and the person using it had no way to know.
+ *
+ *   That is how Graeme came to ask why free was showing him the arc on
+ *   06 Sep. It was not: his handset was on "personal" and nothing said
+ *   so. The arc is correctly gated at today.js:690.
+ *
+ *   The cost is not confusion, it is CONTAMINATED EVIDENCE. A beta
+ *   tester who switches once and forgets will report on "free" while
+ *   being shown the Plan, and their feedback will read as valid. The
+ *   same applies to every on-device judgement made so far.
+ *
+ *   FIX: show it. Knowing which plan you are on is legitimate product
+ *   for a paying user, not a debug affordance -- so this ships to
+ *   everyone rather than hiding behind the same flag it is meant to
+ *   compensate for.
+ *
+ *   It reads isPremium(), the SAME predicate that gates the arc, rather
+ *   than store.get("tier") directly. A second reading of the raw field
+ *   could drift from what the app actually gates on; this cannot.
+ *
+ *   Deliberately NOT done: flipping DEV_PANEL_ENABLED. That would freeze
+ *   every device in whatever tier it is already wrongly in, fix nothing,
+ *   and contradict the 13 Aug decision that testers need the switcher
+ *   during beta. The flip condition stays what A1 set it to: public
+ *   launch, January 2027.
  *
  * v35 - CARD-1. "Always show full instructions" added to the Display
  *   panel. Overrides every collapse in the exercise card. Sits with the
@@ -726,6 +755,16 @@ export function SettingsView(router) {
     return `
       <div class="settings-section">
         <h2 class="settings-section__heading">Your profile</h2>
+
+        <!-- TIER-VISIBLE, 06 Sep 2026. One sentence, not a label/value
+             pair: a screen reader announces "Your plan: Free" as a single
+             statement, where a fake <label> with no control would be
+             announced as an orphaned form field. -->
+        <div class="settings-field">
+          <p class="settings-section__sub" id="settings-plan-line">
+            Your plan: <strong>${isPremium() ? "the Plan" : "Free"}</strong>
+          </p>
+        </div>
 
         <div class="settings-field">
           <label class="settings-label" for="settings-name">Name</label>
@@ -2264,6 +2303,16 @@ export function SettingsView(router) {
         store.set('tier', tier);
         const tierLabel = container.querySelector('#dev-current-tier');
         if (tierLabel) tierLabel.textContent = tier;
+        // TIER-VISIBLE, 06 Sep 2026. NO SYNC OF #settings-plan-line HERE,
+        // ON PURPOSE. The first draft added one. It could never run: the
+        // plan line lives on the Profile panel, this switcher lives on
+        // About > App, and panels are exclusive -- querySelector returns
+        // null every time. Proven under jsdom, not assumed, and the gate
+        // asserts the absence so nobody adds it back.
+        //
+        // The line is correct because it re-reads isPremium() on the next
+        // render, which is what happens when the person navigates back to
+        // Profile. verify-tier-visible.mjs drives exactly that path.
         _showToast(`Tier set to: ${tier}`, container);
       });
     });
