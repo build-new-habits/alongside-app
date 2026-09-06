@@ -758,3 +758,32 @@
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
 }
+
+/* ── CR-3, 06 Sep 2026. Condition caveat ────────────────────────────────
+   Shown when a declared condition changes what the app will offer in a
+   way the person would otherwise notice and misread (today: only
+   hypermobility, where 30 stretches are withheld).
+
+   Deliberately NOT styled as a warning or an alert. It is not a hazard
+   notice and it is not about the person -- it is the coach saying what
+   it is doing and where its competence stops. Amber and red would read
+   as "something is wrong with you", which is the opposite of the point.
+
+   Contrast: --color-text on --color-surface-2 is the pairing checked by
+   tools/contrast-check.mjs; do not swap in a muted token here, since
+   this is body copy the person is meant to read, not a footnote. */
+.conditions-caveat {
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-accent, var(--color-text-secondary));
+  color: var(--color-text);
+  font-size: var(--text-sm);   /* NOT a raw rem: --user-text-scale must reach it */
+  line-height: 1.6;
+  white-space: pre-line;   /* the copy carries its own paragraph breaks */
+}
+
+.conditions-caveat[hidden] {
+  display: none;
+}
