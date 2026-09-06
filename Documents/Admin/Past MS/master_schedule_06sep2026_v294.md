@@ -1,71 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v295
+## 06 Sep 2026 v294
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v294.md`. Remove v294 on upload.
-
-> ### 🔴 BETA MOVES. GRAEME'S DECISION, 06 Sep 2026. The mid-September date is withdrawn and CLUB is now pre-beta scope.
->
-> **Graeme:** *"I want all of this now before beta. I'm prepared to let beta wait until this is right."*
->
-> **This is consistent with the standing principle, not a departure from it:** the app must be finished before any tester sees it — a delayed shortened beta is preferred over an early partial one. The decision is recorded here rather than argued with.
->
-> #### ⚫ The consequence, named at the point of decision rather than after
->
-> | Milestone | Was | Now |
-> |---|---|---|
-> | Beta | mid-September 2026 | **early-to-mid October 2026**, on the scope below |
-> | Soft launch | end November 2026 | **unchanged** — roughly six weeks of beta remain, which is enough |
-> | Full public launch | January 2027 | **unchanged** — externally confirmed with Alex as commercially significant |
->
-> **The buffer, not the launch, is what this spends.** January survives a three-to-four week beta slip. It does not survive two of them. **Anything after CLUB that wants to be pre-beta has to displace something already in it.**
->
-> ⚠️ **Three items in the pre-beta list do not depend on Claude and have not moved:** the PAR-Q+ call for RED-FLAG; the clinical pack sitting unsent with a health-professional reviewer; and HMRC sole trader registration. **A later beta does not help any of them — it lengthens the time they have been outstanding.**
-
-> ### 🟡 CLUB — THE PLAN IS THE FULL CLUB, NOT COMPLETE TRUST IN THE COACH. Specified 06 Sep 2026, not built.
->
-> **Graeme:** *"I think the plan was to give complete trust to the coach for arc, but that doesn't fully work. I think Plan is the full club."*
->
-> #### ⚫ Why this is a correction, and what proved it
->
-> LOBBY-1c was complete-trust taken to its conclusion — one button, the coach decides. It produced a screen Graeme could not use and could not leave. **The fault was collapsing two different questions into one.** The arc answers *where am I going*. The session answers *what do I fancy today*. The governing sentence already separates them — free is today, the Plan is the arc — and *"I might have some energy, what do I fancy"* is not indecision to be solved. It is the person turning up.
->
-> #### 🟢 The four rooms, sorted by how much the coach leads
->
-> Home's eight tiles sort by body part, which is a filing system. **The rooms sort by the coaching relationship, which is what this product actually is.**
->
-> | Room | The coach's part | What exists already |
-> |---|---|---|
-> | **Guided class** | Coach leads fully — courses and programmes | `programmes.js`, `programmeEngine.js`, chapters. Substantially built |
-> | **PT** | Coach guides you, at home, gym or outside | Pieces exist across `coach-proposal` and `session-builder`. **Requires TWO-ENGINE, which therefore moves into pre-beta scope** |
-> | **Freestyle** | You lead. Build your own, saved and remembered | **The only genuinely new build.** Already specced in principle: SWAP-1 recorded it explicitly when Graeme caught the conflation between deleting the flat picker and deleting self-authoring |
-> | **Quick build** | Coach hands you a frame to fill — time, location, equipment, preference, scaffolded structure | `session-builder`'s existing flow, close to this already |
->
-> **Progress in Plan remembers choices, preferences and patterns** across all four.
->
-> ⚫ **Watch: Freestyle and Quick build sit close together.** Authoring something you keep, versus generating a scaffold for today. A real distinction, but a person on Home has to feel it in a second.
->
-> 🟢 **The club framing is the strongest part and is Graeme's:** guided class, PT, your own programme, drop in. That is a leisure centre, and it is a warmer and more legible thing to be than an app. **It also gives free a clean position — free is the drop-in.**
->
-> #### 🔵 The free/Plan split stays visually different, which Graeme confirmed he liked
->
-> Free: the question and the tiles. Structure is the free product, because nobody holds the thread for a free user. Plan: the arc, then the rooms.
-
-> ### 🔴 PLAN-PICKER-TIER — THE ARC IS ALREADY BEING GIVEN AWAY, UNDER A DIFFERENT NAME. Found 06 Sep 2026.
->
-> `js/views/onboarding/plan-select.js` sits **inside onboarding with no tier check anywhere in the file**. It writes a twelve-week programme with a weekly frequency target. `programmeEngine.js` (49 references) and `workoutGenerator.js` then read `activeProgramme` **with no tier gate either** — so a free user gets chapter progression, week advancement and phase bias on their sessions.
->
-> **"Free is today, the Plan is the arc" is not true today.** ARC-DOOR closed a leak in the `arc` feature on 06 Sep while a second longitudinal system sat wide open beside it. **Same class as DATA-1b: one system fixed, its twin never checked.**
->
-> ⚠️ **Sequencing:** CLUB decides where this picker lives, since Guided class is its natural home. **Do not gate it in isolation and then move it — that is two changes to one screen.**
-
-> ### 🟠 COMMIT-COPY — two philosophy faults in front of every new user. Found 06 Sep 2026.
->
-> 🔴 **"3 sessions a week" is a frequency commitment**, asked of somebody who has not yet moved once. This product has no streaks by design, and **a weekly target is the same shape as a streak** — a number you can fall behind on. It is also set at the moment the coach knows least.
->
-> 🔴 **"Full commitment — for when you are ready to push"** is off-voice. Nurturing only, and this product does not push.
->
-> 🟡 Minor, same screen: all three options carry a **12w** badge, which makes the badge carry no information.
+Supersedes `master_schedule_v293.md`. Remove v293 on upload.
 
 > ### 🔑 STANDING RULE — IMPROVEMENTS EXTEND WHAT EXISTS. THEY DO NOT RELOCATE IT. Added 06 Sep 2026, and it applies to every session from here.
 >
