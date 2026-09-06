@@ -55,10 +55,17 @@ const PRIMARY = [
 ];
 
 // Free, or cheap and portable. The floor most people actually have.
-const COMMON_KIT = new Set([
-  'none', 'bodyweight', 'mat', 'chair', 'bench',
-  'dumbbell', 'resistance-band', 'towel', 'wall', 'step'
-]);
+// CORRECTED 06 Sep 2026. This set previously listed ten tags, and SEVEN
+// of them -- none, bodyweight, mat, chair, towel, wall, step -- do not
+// exist anywhere in the library vocabulary. The set read far more
+// permissive than it was. Only these three are real tags; bodyweight is
+// expressed as equipment: [], which kitOf() below already handles.
+// 'bodyweight' is NOT a library tag either, but kitOf() below emits it as
+// the sentinel for equipment: [], so it must stay in this set. Dropping it
+// with the other six pushed all 355 bodyweight entries into gym-or-rare
+// and made every pattern read SHORT. The six removed are genuinely fake:
+// none, mat, chair, towel, wall, step.
+const COMMON_KIT = new Set(['bodyweight', 'bench', 'dumbbell', 'resistance-band']);
 
 // Owned by the committed, not by the median.
 const ONE_STEP_UP = new Set(['kettlebell', 'pull-up-bar', 'stability-ball']);
@@ -79,7 +86,20 @@ const reach = ex => {
 // has no choice left to make.
 const FLOOR = 3;
 
-const strength = EXERCISES.filter(e => e.category === 'strength');
+// CORRECTED 06 Sep 2026. This filtered on category === 'strength' alone,
+// which is NOT the population a person is offered. Driven on the real
+// candidate pool for a full-body session: 43 rehabilitation entries reach
+// it, every one carrying generalPurpose: true, and session-builder.js
+// excludes a rehabilitation entry only where that flag is absent. Four of
+// those 43 sit at difficulty 3+ on common kit and fill holes this audit
+// was reporting as empty -- side-plank-modified, dead-bug-progression-2
+// and -3, rehab-shoulder-y-t-w.
+//
+// Counting strength alone reported a gap of 16. The true gap was 9. Six
+// weeks of authoring were scheduled against a number this line produced.
+const strength = EXERCISES.filter(e =>
+  e.category === 'strength' ||
+  (e.category === 'rehabilitation' && e.generalPurpose === true));
 
 console.log('MOVEMENT PATTERN COVERAGE — strength, difficulty 3 and above\n');
 console.log('pattern'.padEnd(24) + 'common  +1 step  gym/rare   total   floor');

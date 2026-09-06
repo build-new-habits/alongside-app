@@ -99,6 +99,15 @@ function mainPatternCount(focusKey, patterns, n = 30) {
     localStorage.clear(); store.init();
     store.set('tier','personal'); store.set('fitnessLevel','moderate');
     store.set('goals',['get-stronger']); store.set('onboardingComplete', true);
+    // PATTERN-TAGS, 06 Sep 2026. This fixture used the store default,
+    // equipment: [], and the carry half of the focus was reachable only
+    // because functional-sandbag-carry falsely declared it needed no
+    // equipment. A person with nothing cannot carry anything -- that is
+    // definitional, not a content hole -- so the assertion was passing on
+    // a data fault rather than on the feature working. Dumbbells make
+    // both halves of the focus genuinely reachable, which is the
+    // condition under which "does the focus tilt?" is a real question.
+    store.set('equipment', ['dumbbell']);
     if (focusKey) WF.setWeekFocus(focusKey);
     const s = buildSession({ sessionType: 'full', durationMins: 30 });
     tot += (s.exercises || [])
