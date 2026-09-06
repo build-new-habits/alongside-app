@@ -3078,7 +3078,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v444";
+const CACHE_NAME = "alongside-v445";
 
 const SHELL_URLS = [
 
