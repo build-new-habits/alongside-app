@@ -1,79 +1,9 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v294
+## 06 Sep 2026 v293
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v293.md`. Remove v293 on upload.
-
-> ### 🔑 STANDING RULE — IMPROVEMENTS EXTEND WHAT EXISTS. THEY DO NOT RELOCATE IT. Added 06 Sep 2026, and it applies to every session from here.
->
-> **If a change removes a route, a door or a control from where somebody already finds it, that removal IS the change.** It must be named as a removal and agreed before it ships, whatever else the change is called. **Moving something behind a new screen is a removal.**
->
-> **This is not a general principle. It is written from a specific failure.** LOBBY-1c (04 Sep, 21:31) deleted the session door grid from Home. Its own commit message contains the sentence *"WHY THIS IS NOT A LAYOUT CHANGE"*. It was a layout change, and the argument in the message is why nobody stopped it — the reasoning was sound, internally consistent, and describing a screen nobody had held in their hand.
->
-> **The tiles were not deleted; they were relocated** into `coach-proposal`'s "Or pick your own" row. That row sits underneath a panel which is `position: fixed; inset: 0; z-index: 9999`, auto-opens on mount, and cannot be dismissed to reveal what is beneath it. Present in the source. Unreachable on the handset. **Four days.**
->
-> **Graeme, 06 Sep:** *"When we improve work, we improve what's already there, not reporting something away to an entirely new experience. What I have now was weeks ago."* He was right, and the first answer he got — that nothing had been rolled back — was wrong.
->
-> ⚫ **The test to apply before shipping any layout change:** name every route that leaves the screen it was on. If the list is not empty, that is the change, and it needs agreeing on its own terms.
-
-> ### 📋 SESSION CLOSE 06 Sep 2026 (third session) — `alongside-v451`, **115 gates**, all green from a second independent fresh clone
->
-> **HOME-DOORS** and **ESCAPE-Z** shipped. `js/views/today.js` v25 → **v26**, `index.html`, `tools/verify-lobby1.mjs` repaired, new `tools/verify-homedoors.mjs` (19 assertions, driven under jsdom). Cold start blueprint v44 → **v45**. `sw.js` **v451**, cache `alongside-v451`.
->
-> ⚠️ **Found by Graeme on device, not by any gate.** Every one of `verify-lobby1`'s assertions passed throughout the four days this was live — they were asserting the relocation, correctly, against a decision that was wrong on a handset. **A gate that encodes a decision cannot catch a bad decision.** That is why the new gate is driven and why 10a was inverted with its reason recorded rather than deleted.
-
-> ### 🟢 HOME-DOORS — THE SESSION DOORS ARE BACK ON THE PLAN HOME. Closed 06 Sep 2026, `alongside-v451`.
->
-> **The state Graeme met:** Home on Plan was one button, "Start today", routing to the check-in and then to `coach-proposal`. No tiles. He could not find a stretch session and could not get back to Home.
->
-> #### 🔴 Why stretch was genuinely unreachable, not just hard to find
->
-> **This product has two session engines and the daily flow's doors decide which one you get.**
->
-> | | `session-builder.js` | `workoutGenerator.js` |
-> |---|---|---|
-> | Session types | **8** — Glute Focus, Upper Body, Lower Body, Full Body, Core, Cardio, Mobility, **Stretch** | **3**, hardcoded on one line — Strength Focus, Mobility & Recovery, Cardio Boost |
-> | `sessionVariety` (DIC-1) | 3 references | **0** |
-> | `exercisePreferences` (avoid/dislike) | 4 references | **0** |
-> | SECTION-RULES | present | **0** |
-> | DUPE-SECTION, SWAP-1, STRETCH-VARY | all here | **none** |
->
-> `coach-proposal.js` imports `workoutGenerator` and nothing else; `handlePreviewStart()` writes `store.generatedSession` straight from its option, so `session-builder-ui.js` never mounts and `candidatePools` — the swap system — is never built. **It also writes `inputs: option.inputs || {}`, and those options carry no `inputs`, so the record of what the coach used is empty.** That is the TRUTHFULNESS bar failing silently on the route every Plan user was funnelled through.
->
-> ⚫ **DATA-1b predicted this in August and the warning is now three-for-three:** *"This product has two session engines and they do not share their filters by default — any rule about what may be selected has to be checked in both, or placed where both must read it."* Every improvement since has gone into one engine and been verified against that engine.
->
-> #### 🟢 The fix, and what it deliberately did not do
->
-> `freeChooser()` is now `chooser()` and renders on **both** tiers. **Nothing new was designed.** This is the screen free has been running since LOBBY-1c, which was the good one — the eight tiles, two group headings, and the coach-picks fallback beneath them.
->
-> **The invitation is not lost.** `chooser()` already ends with "Not sure? I'll pick something" on the same `data-action="start-today"` route. It becomes one option among the doors instead of the only one, which is what it was before Friday. **Replacing the invitation in turn would have been the same mistake in the other direction.**
->
-> Two traps in sharing the chooser, both caught by reversal: `arcPanel()` had to come **out** of it or Plan would emit the panel twice (it already calls it above), and the Wellbeing reference-row exclusion had to widen to both tiers or Plan would render that row twice. Arc placement is unchanged on both — above on Plan, below on free.
->
-> #### 🟢 Reversal: eight deliberate breaks, eight caught red
->
-> the LOBBY-1c state restored · the Mobility & Conditioning door removed · the fallback dropped · the arc doubled · Wellbeing doubled · the hatch back under the modal · the hatch below the 44px minimum · **the Plan fixture set to the wrong tier**.
->
-> ⚠️ **Two faults in the gate itself, found before it was trusted.** The Wellbeing counter summed two filters over the same node and reported a duplicate that did not exist; the z-index reader matched the literal `z-index:9999` inside a comment written moments earlier and measured its own prose. **Both are the "assertion measured the wrong region" family — eleventh and twelfth recorded instances.**
-
-> ### 🟢 ESCAPE-Z — THE WAY OUT WAS UNDERNEATH THE THING IT ESCAPED. Closed 06 Sep 2026.
->
-> `#hidden-nav-home-btn` (`index.html`) was **`z-index: 100`**. `.cp-preview-panel` is **`z-index: 9999`** and auto-opens on mount. The escape hatch was therefore invisible and untappable on the one screen in the app with no other way out. Graeme: *"I can't exit it back to the home page."* He could not.
->
-> Now **10000**, which is deliberately **one above the highest z-index in the app** rather than a large round number, so the next thing that outranks it fails loudly at review instead of quietly on a handset. `verify-homedoors` measures every `z-index` in `index.html` and `css/` and asserts the hatch beats the maximum — **not a hardcoded 9999 that goes stale the first time something outranks it.**
->
-> The 44px minimum target is asserted alongside it (WCAG 2.2 AA, 2.5.8), because a fix that raised the hatch and shrank it would be cosmetic.
->
-> ⚠️ **Live on every screen, not just this one.** The hatch also renders **over** content at `rgba(15, 23, 42, 0.55)` on the exercise card and check-in — Graeme's screenshots show the house sitting on top of "1 of 6" with text bleeding through. **Raising it fixes reachability, not the overlap. Logged, not fixed.**
-
-> ### 🟠 STILL OPEN FROM THE SAME DEVICE PASS — queued behind the doors, not forgotten
->
-> | ID | What it is | Status |
-> |---|---|---|
-> | 🟠 **DURATION-STR** | `rest` is a string (`"0s"`, `"90s active"`) on **99 of 551 entries**, measured. `calculateDuration()` returns NaN for any session containing one — that is the "NAN MIN" on the proposal cards. **`applyDurationCap()` also fails both its NaN comparisons and returns untrimmed, so the person's declared available time has been silently ignored on those sessions** | Open, w/c 07 Sep |
-> | 🟠 **CONSTRAINT-CLAIM** | `coach-proposal.js:1383` says *"I've worked around that"* for the 6–6.9 pain band. Driven: at lower-back 6, `getExerciseSafetyTier(cat-cow, …)` returns **`safe`** — nothing was worked around. The exercise card then correctly says the exercise works that area. **The card is truthful; the proposal is the overclaim** | Open, w/c 07 Sep |
-> | 🟠 **HATCH-OVERLAP** | The escape hatch obscures content on the exercise card and check-in | Open, w/c 07 Sep |
-> | 🟠 **TWO-ENGINE** | `coach-proposal` still builds through `workoutGenerator`. **Not urgent now the doors are back** — it is reachable by choice and honestly labelled, rather than the only route. Session B2's rewiring, post-beta | Open, post-beta |
+Supersedes `master_schedule_v292.md`. Remove v292 on upload.
+Both sessions independently produced a v291; this merges them. Neither block was overwritten.
 
 > ### 🔴 THE CLINICAL REVIEW CAME BACK, AND IT IS NOT SIGN-OFF. Merged into v289 from the CLINICAL-RESPONSE session, 06 Sep 2026.
 >
