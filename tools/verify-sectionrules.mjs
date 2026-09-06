@@ -1,6 +1,6 @@
 /**
  * tools/verify-sectionrules.mjs
- * 31 Aug 2026 v1
+ * 06 Sep 2026 v2
  *
  * SECTION-RULES.
  *
@@ -340,7 +340,13 @@ check("8e. only Stretch gains a step", () => {
 console.log("\nTEST 9 - STRETCH-FLOW: the path is as short as the session needs");
 
 check("9a. stretch skips equipment and build mode", () => {
-  const ui = read("js/views/session-builder-ui.js");
+  // COMMENTS STRIPPED BEFORE SLICING. This window was 900 raw characters
+  // and the code it needed sat behind an explanatory comment block, so
+  // adding a comment to the source turned this check red without any
+  // behaviour changing. A window measured in characters of prose is not
+  // a window on the code.
+  const uiRaw = read("js/views/session-builder-ui.js");
+  const ui = uiRaw.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
   const at = ui.indexOf('selectedDuration = parseInt(');
   ok(at > -1, "no duration handler");
   const body = ui.slice(at, at + 900);
@@ -348,13 +354,32 @@ check("9a. stretch skips equipment and build mode", () => {
      "the duration step still routes stretch into the equipment check. Nothing in the " +
      "stretch pools reads equipment, and build mode was the second 'how would you like " +
      "this to go?' in as many minutes.");
-  // SUPERSEDED BY SWAP-1, 05 Sep 2026, and updated rather than deleted.
-  // The RULE is unchanged: stretch goes straight to the recommended
-  // selection without an equipment or build-mode question. What changed
-  // is where "straight to" lands — the recommended selection is now a
-  // built session, not a list of seventy-three to tick.
-  ok(body.includes("triggerRecommendedBuild()"),
-     "stretch does not go straight to the recommended selection");
+  // UPDATED AGAIN BY STRETCH-VARY, 06 Sep 2026. Updated, not deleted.
+  //
+  // The RULE has never changed: stretch goes straight to a built session
+  // without an equipment or build-mode question. What keeps changing is
+  // which builder it lands in, and that is exactly the thing that went
+  // wrong -- STRETCH-FLOW inherited the deterministic builder by
+  // accident because it inherited the build-mode DEFAULT.
+  //
+  // So the assertion now names the builder explicitly rather than
+  // accepting whatever the default happens to be, and asserts the
+  // skipped screens directly instead of inferring them.
+  ok(body.includes("triggerBuild()"),
+     "stretch does not go straight to a coach-built session");
+  ok(!body.includes("triggerRecommendedBuild()"),
+     "stretch is back on the deterministic builder: pool[0], the same session " +
+     "every time, and 'not keen on this one' silently dropped");
+  // NOT "equipment must not appear after the stretch branch" -- it
+  // legitimately does, as the NON-stretch path. That assertion was
+  // written, went red, and was wrong. What guarantees the skip is that
+  // the stretch branch RETURNS before reaching it.
+  const branch = body.slice(body.indexOf('selectedType === "stretch"'));
+  const retAt = branch.indexOf("return;");
+  const eqAt  = branch.indexOf('phase = "equipment"');
+  ok(retAt > -1 && (eqAt === -1 || retAt < eqAt),
+     "the stretch branch no longer returns before the equipment screen, so stretch " +
+     "will fall through into a kit question its pools never read");
 });
 
 check("9b. the skipped screens share one definition", () => {
@@ -369,8 +394,20 @@ check("9b. the skipped screens share one definition", () => {
   const ui = read("js/views/session-builder-ui.js");
   const defs = (ui.match(/function triggerRecommendedBuild/g) || []).length;
   ok(defs === 1, `expected 1 definition, found ${defs}`);
+  // STRETCH-VARY, 06 Sep 2026. This required TWO call sites, because the
+  // stretch path was one of them. Stretch has moved to triggerBuild(), so
+  // one caller remains: the recommend branch.
+  //
+  // The "two callers" clause was never the rule -- it was a symptom of
+  // the rule. What this check exists to stop is TWO DEFINITIONS of "open
+  // the recommended selection", which is what produced two selection
+  // loops. defs === 1 is that rule, stated directly.
+  //
+  // ⚠️ NOTE FOR SESSION B2: triggerRecommendedBuild() now has exactly ONE
+  // caller. That is the retirement precondition, reached here as a side
+  // effect rather than as the plan.
   const uses = (ui.match(/triggerRecommendedBuild\(\)/g) || []).length - defs;
-  ok(uses >= 2, `only ${uses} call site(s); the stretch path and the recommend branch must share it`);
+  ok(uses >= 1, `no call sites left; the recommend branch must still reach it`);
   ok(!ui.includes("function _openRecommendedCandidates"),
      "the old definition is back — two ways to open the recommended selection is the " +
      "duplication this check exists to stop");
