@@ -1,6 +1,24 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 06 Sep 2026 v15
+ *
+ * v15 - YOUR-OWN. "Save this one" on the preview, Plan only.
+ *
+ *   Two steps -- open the field, then confirm -- so a stray tap cannot
+ *   name and save a session in one go. The name is the person's own
+ *   words and an empty one is REJECTED, never quietly replaced with
+ *   "Session 3": a helpfully auto-named session takes back the one
+ *   thing this room is for.
+ *
+ *   Not offered on Gentle Care. That is a response to today, not a
+ *   session somebody would want again, and offering to keep it would
+ *   misread what it is.
+ *
+ *   isPremium is imported again. R4 removed it when TIER-G was reversed
+ *   -- composing is free, and stays free. This is a different question:
+ *   not whether you may build, but whether it is KEPT.
+ *
  * 06 Sep 2026 v14
  *
  * v13 - SWAP-1. THE ORDER IS INVERTED BACK. "Coach recommends, I'll
@@ -238,6 +256,16 @@
  */
 
 import { store }                          from "../store.js";
+// YOUR-OWN, 06 Sep 2026. Saving goes through the module rather than
+// store.set() here: three rules have to hold on every write -- the tier
+// check, the name check, and storing exercise IDS not objects -- and a
+// view that writes the array directly will get one right and miss
+// another.
+import { saveSession, savedSessionCount, NAME_MAX } from '../data/saved-sessions.js';
+// R4 removed this file's isPremium import when TIER-G was reversed --
+// composing is free. YOUR-OWN needs it back for a different question:
+// not whether you may build, but whether it is KEPT.
+import { isPremium } from '../auth.js';
 import { router }                         from "../router.js";
 import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, severeZoneToday, zonesWithCoverage } from "../session-builder.js";
 // SWAP-1. The grouping, the soreness levels and the replacement all live
@@ -1186,6 +1214,24 @@ function renderPreview() {
 
       </div>
 
+      <!-- YOUR-OWN. Offered only when there is something worth keeping:
+           Gentle Care is a response to today, not a session somebody
+           would want again, and offering to save it would misread what
+           it is. -->
+      ${!builtSession.gentleCare && isPremium() ? `
+        <div class="sb-save" id="sb-save-block">
+          <button class="btn btn-ghost btn-full" id="sb-save-open">Save this one</button>
+          <div class="sb-save__form hidden" id="sb-save-form">
+            <label class="sb-save__label" for="sb-save-name">What do you want to call it?</label>
+            <input class="sb-save__input" id="sb-save-name" type="text"
+                   autocomplete="off"
+                   placeholder="Tuesday legs">
+            <p class="sb-save__note" id="sb-save-note" role="status"></p>
+            <button class="btn btn-secondary btn-full" id="sb-save-confirm">Save it</button>
+          </div>
+        </div>
+      ` : ""}
+
       <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-6);">
         <button class="btn btn-primary btn-large btn-full" id="sb-go-btn">
           Let's go
@@ -1434,6 +1480,55 @@ function triggerRecommendedBuild() {
  * naming exercises no longer in the session would be a stored record
  * that disagrees with itself.
  */
+/**
+ * YOUR-OWN. Wires the save block. Called from the same place the other
+ * preview buttons are wired.
+ *
+ * TWO STEPS, not one. "Save this one" opens the field; "Save it"
+ * commits. A single button that saved on tap would name the session for
+ * the person, and the name is the whole point of this room.
+ *
+ * Feedback goes in a role="status" line rather than an alert: a person
+ * who has just typed a name should not have to dismiss something to see
+ * whether it worked.
+ */
+function wireSaveBlock(container) {
+  const open    = container.querySelector("#sb-save-open");
+  const form    = container.querySelector("#sb-save-form");
+  const input   = container.querySelector("#sb-save-name");
+  const confirm = container.querySelector("#sb-save-confirm");
+  const note    = container.querySelector("#sb-save-note");
+  if (!open || !form || !input || !confirm || !note) return;
+
+  // Set as a property rather than an attribute in the template: the cap
+  // then lives beside the code that enforces it, instead of being
+  // stated in two places that can drift.
+  input.maxLength = NAME_MAX;
+
+  open.addEventListener("click", () => {
+    form.classList.remove("hidden");
+    open.classList.add("hidden");
+    input.focus();
+  });
+
+  confirm.addEventListener("click", () => {
+    const result = saveSession(input.value, builtSession);
+    if (result.ok) {
+      note.textContent = `Saved. ${savedSessionCount()} of your own now.`;
+      form.classList.add("hidden");
+      return;
+    }
+    // Each reason gets its own words. "Something went wrong" would be
+    // the same message for a problem the person can fix and one they
+    // cannot.
+    note.textContent =
+      result.reason === "name"  ? "It needs a name first \u2014 anything you'll recognise." :
+      result.reason === "empty" ? "There is nothing in this one to save yet." :
+      result.reason === "tier"  ? "Keeping your own sessions is part of the Plan." :
+                                  "That didn't save. Try again in a moment.";
+  });
+}
+
 function persistBuiltSession() {
   const record = store.get("generatedSession");
   if (!record || !builtSession) return;
@@ -1878,6 +1973,12 @@ export function onMount() {
       rerender();
     });
   });
+
+  // YOUR-OWN. Wired here, alongside the other preview buttons, so it
+  // shares their re-wiring after every rerender -- a swap rebuilds this
+  // markup and a listener attached once would be gone after the first
+  // swap.
+  wireSaveBlock(document);
 
   // Let's go
   document.getElementById("sb-go-btn")?.addEventListener("click", () => {

@@ -1,7 +1,7 @@
 # Alongside — Data Schema Reference
-## 06 Sep 2026 v1.49
+## 06 Sep 2026 v1.50
 
-**File:** `js/store.js` (confirmed live version: **v64, 06 Sep 2026**)
+**File:** `js/store.js` (confirmed live version: **v65, 06 Sep 2026**)
 
 > **v1.47, 06 Sep 2026 — CR-1.** `conditions[]` gains three ids and loses one. `chronic-fatigue` is **retired**; `persistent-fatigue`, `me-cfs` and `long-covid` replace it. No field shape changed — `conditions` is still `string[]` and `conditionMeta` is still keyed by condition id.
 >
@@ -267,6 +267,33 @@ Now used by `today.js` (×4), `progress.js` (×2) and `reflect.js`'s `getSession
 **Two of those reads matter more than the count.** `_sessionCompletedToday()` drives *"You moved today — that's done"*, and `getSessionCount()` drives the empathy arc — so a session opened and abandoned both told somebody they had moved and advanced them toward a prompt meant to follow real experience.
 
 **Partials remain in `activityLog`.** A partial is a real record — it is how the app knows you started, and continuity reads it. It is simply not a session you did.
+
+### `savedSessions` — **NEW, YOUR-OWN, 06 Sep 2026**
+
+`Array<SavedSession>`, newest last. Defaults to `[]`.
+
+```
+{
+  id:           string,   // "own_" + ISO timestamp + 4 random chars
+  name:         string,   // THE PERSON'S OWN WORDS. Never generated.
+  sessionType:  string,   // one of session-builder.js's eight SESSION_TYPES ids
+  durationMins: number,
+  equipment:    string[], // the equipment answer in force when it was built
+  exerciseIds:  string[], // ids only, resolved against the library at start
+  createdAt:    string,   // ISO
+  lastUsedAt:   string|null
+}
+```
+
+**`exerciseIds`, not exercises.** Storing whole exercise objects would freeze a copy of the library inside somebody's saved session: a safety correction to an exercise, a changed contraindication, a fixed `rest` value would never reach it. **A saved session must pick up library fixes, or it becomes a private fork of the exercise database that no gate can see.** Ids are resolved at start, and any id no longer in the library is dropped with the session still starting.
+
+**`name` is the person's own words and is never generated.** This is the one room where they are the author; a helpfully auto-named session takes that back. Empty names are rejected at the writer, not silently replaced.
+
+**Tier.** Plan only, and the gate is `isPremium()` at both the writer and the reader. Free composes freely — R4, 20 Aug, reversed TIER-G on exactly that point: composing is how somebody whose body the default does not fit gets a session they can do. **What Plan buys is that it is kept**, not that it is allowed.
+
+**No count limit, no ordering by use, no "most popular".** The list is theirs in the order they made it.
+
+**Written by** `session-builder-ui.js` (save action). **Read by** `today.js` (the Your own room) and `session-builder-ui.js` (start a saved session). **Not read by the coach** — `chooseSessionType()` must not treat a saved session as a preference signal, because saving something is a decision about a session, not a statement about a person.
 
 ### `sessionBuilderPreselect.durationMins` — **NEW, CLUB-SHELL, 06 Sep 2026**
 
