@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v456
+ * 06 Sep 2026 v457
+ *
+ * v457 - QUICK-BUILD. The time chip now leads to a single scaffold
+ *   screen showing what the coach assumed, rather than six question
+ *   phases.
  *
  * v456 - YOUR-OWN. Sessions you build can be named and kept, and the
  *   Your own room lists them.
@@ -3126,7 +3130,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v456";
+const CACHE_NAME = "alongside-v457";
 
 const SHELL_URLS = [
 
