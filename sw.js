@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v463
+ * 06 Sep 2026 v464
+ *
+ * v464 - DEVICE-2. The orientation line names the right control on each
+ *   tier, and the empty Guided class card no longer promises a course.
  *
  * v463 - DEVICE-1. The orientation line names a room that exists, and
  *   the arc panel no longer claims full coverage of no strands.
@@ -3149,7 +3152,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v463";
+const CACHE_NAME = "alongside-v464";
 
 const SHELL_URLS = [
 
