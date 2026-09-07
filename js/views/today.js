@@ -1,5 +1,22 @@
 /**
  * today.js
+ * 06 Sep 2026 v32
+ *
+ * v32 - DEVICE-2. Task 2 of the device pass: the FREE home screen, read
+ *   beside Plan. Both faults found were made earlier the same day.
+ *
+ *   DEVICE-1 MOVED A FAULT INSTEAD OF CLOSING IT. It replaced "Unsure"
+ *   with "One to one" -- and One to one is a PLAN room. Free's coach
+ *   route is the "Not sure? I'll pick something" button beneath its
+ *   tiles. So free was told to use a door that is not on its screen,
+ *   which is the same defect one tier over, shipped within the hour,
+ *   because it was verified against one fixture. Named per tier now.
+ *
+ *   GUIDED-COPY CHANGED ONE BRANCH. The empty-state card still said "A
+ *   set course. Same shape each week." -- the exact claim that item
+ *   existed to remove. Its gate only ever mounted the with-programme
+ *   fixture, so it passed while half the room still promised a course.
+ *
  * 06 Sep 2026 v31
  *
  * v31 - DEVICE-1. Two claims found by reading the Plan home screen top
@@ -1265,7 +1282,16 @@ export function TodayView(router) {
         // this line calls genuine decision paralysis. The one person who
         // most needs pointing at a door was being pointed at a door that
         // is not on their screen.
-        return "If you'd rather not choose, One to one lets me decide today.";
+        // DEVICE-2, 06 Sep 2026. DEVICE-1 replaced "Unsure" with "One to
+        // one" -- and One to one is a PLAN room. Free's coach route is
+        // the "Not sure? I'll pick something" button beneath its tiles.
+        // So the fix moved the fault one tier over instead of removing
+        // it, within the hour, because it was verified on one fixture.
+        //
+        // Named per tier now, from the control actually on that screen.
+        return isPremium()
+          ? "If you'd rather not choose, One to one lets me decide today."
+          : "If you'd rather not choose, \u2018Not sure?\u2019 lets me decide today.";
       }
 
       // ── ORIENT-2 (15 Aug 2026, first-ninety-seconds audit) ──────────
@@ -1607,7 +1633,11 @@ export function TodayView(router) {
       // paid -- CLUB spec v2 3.5.
       : roomCard({
           id: 'guided', title: 'Guided class',
-          what: 'A set course. Same shape each week.',
+          // DEVICE-2. GUIDED-COPY changed the with-programme branch and
+          // left this one saying "A set course", which is the claim it
+          // existed to remove. Caught because test 8b only ever mounted
+          // the with-programme fixture.
+          what: 'A twelve-week shape. I fit your sessions to it.',
           option: 'Nothing chosen yet',
           facts: ['Twelve weeks', 'It shapes what I suggest, week by week',
                   'You can change or stop at any point'],
