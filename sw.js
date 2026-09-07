@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v454
+ * 06 Sep 2026 v455
+ *
+ * v455 - PLAN-PICKER-TIER. The twelve-week programme picker leaves
+ *   onboarding for the Guided class room, and the programme stops
+ *   shaping free users' sessions.
  *
  * v454 - CLUB-SHELL. The four rooms on the Plan home screen, added
  *   above the existing tiles rather than replacing them.
@@ -3119,7 +3123,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v454";
+const CACHE_NAME = "alongside-v455";
 
 const SHELL_URLS = [
 
