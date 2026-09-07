@@ -1,5 +1,15 @@
 <!-- index.html | 21 Jul 2026 v2 -->
 <!--
+  v3 — HATCH-OVERLAP, 06 Sep 2026. ESCAPE-Z raised the hatch above every
+  modal so it could be tapped; that fixed reachability and made the
+  overlap worse, because it now sits on top of whatever is in the
+  top-right corner. Graeme's screenshots show the house over "1 of 6"
+  with the text legible THROUGH a 55% background — both readable at
+  once, neither actually readable. Now opaque with a hairline, and the
+  corner is reserved by a gutter derived from the hatch's own size so
+  the two cannot drift. Applied to .workout-header and .ci-thread only;
+  the first draft named three selectors that exist nowhere in the app.
+
   v2 — Persistent nav escape-hatch icon added (navfix-proposalloop
     session). A single small Home icon, fixed top-right, shown only on
     hideNavViews screens (toggled by router.js v9's _mountView()) and
@@ -52,10 +62,27 @@
 
   <!-- Nav escape-hatch icon styling — self-contained, see v2 changelog above -->
   <style>
+    /* HATCH-OVERLAP, 06 Sep 2026. ESCAPE-Z raised the hatch above every
+       modal so it could be tapped. That fixed reachability and made the
+       overlap worse: it now sits on top of whatever is in the top-right
+       corner. Graeme's screenshots show the house over "1 of 6" on the
+       exercise card, with the text bleeding through a 55% background.
+
+       A fixed element is invisible to the layout, so the layout is told
+       about it. One variable, declared beside the rule that positions
+       the hatch, so the reserved space and the actual size cannot drift
+       apart -- which is how a magic 56px in one stylesheet stops
+       matching a 44px button in another. */
+    :root {
+      --escape-hatch-size:  44px;
+      --escape-hatch-inset: 12px;
+      --escape-hatch-gutter: calc(var(--escape-hatch-size) + (var(--escape-hatch-inset) * 2));
+    }
+
     .hidden-nav-escape {
       position: fixed;
-      top: calc(env(safe-area-inset-top, 0px) + 12px);
-      right: calc(env(safe-area-inset-right, 0px) + 12px);
+      top: calc(env(safe-area-inset-top, 0px) + var(--escape-hatch-inset));
+      right: calc(env(safe-area-inset-right, 0px) + var(--escape-hatch-inset));
       /* ESCAPE-Z, 06 Sep 2026. Was 100. coach-proposal's preview panel is
          fixed, inset 0, and stacked far above this one. It auto-opens on
          mount, so
@@ -66,8 +93,13 @@
          rather than a large round number, so the next thing that outranks
          this fails loudly at review instead of quietly on a handset. */
       z-index: 10000;
-      width: 44px;
-      height: 44px;
+      /* HATCH-OVERLAP. Driven from the same variable the gutter is
+         derived from, so the reserved space and the actual button
+         cannot disagree. min-* kept as literals: they are the WCAG
+         2.5.8 floor, not a size, and must not move if the variable
+         ever does. */
+      width: var(--escape-hatch-size);
+      height: var(--escape-hatch-size);
       min-width: 44px;
       min-height: 44px;
       display: flex;
@@ -75,7 +107,12 @@
       justify-content: center;
       border-radius: 50%;
       border: none;
-      background: rgba(15, 23, 42, 0.55);
+      /* HATCH-OVERLAP. Was rgba(15, 23, 42, 0.55). Content showed
+         THROUGH the button, so the house and "1 of 6" were legible at
+         once and neither could be read. Opaque, with a hairline so it
+         still reads as a control on a dark surface rather than a hole. */
+      background: #0F172A;
+      box-shadow: 0 0 0 1px rgba(226, 232, 240, 0.18);
       color: #fff;
       font-size: 20px;
       line-height: 1;
@@ -264,6 +301,30 @@
   >
     <span aria-hidden="true">🏠</span>
   </button>
+
+  <!-- HATCH-OVERLAP. The surfaces that put content in the top-right
+       corner. Listed explicitly rather than applied to every view: a
+       blanket rule would indent screens that have nothing there, and an
+       unexplained gutter down the whole app is a worse fault than the
+       one being fixed. -->
+  <style>
+    /* Ground-truthed against the markup, not guessed. The first draft
+       of this rule named .checkin-header, .cp-preview-panel__head and
+       .session-header -- three selectors that do not exist anywhere in
+       the app. The gutter would have been reserved on nothing at all
+       while the rule looked thorough. */
+    .workout-header {
+      padding-right: var(--escape-hatch-gutter);
+    }
+
+    /* The check-in is a message thread with no header: the hatch lands
+       on whichever bubble happens to be at the top. Padding the thread
+       keeps every bubble clear of the corner without moving the
+       conversation off-centre. */
+    .ci-thread {
+      padding-right: var(--escape-hatch-gutter);
+    }
+  </style>
 
   <script type="module" src="js/app.js"></script>
 </body>
