@@ -1186,7 +1186,17 @@ export function GymProgrammeView(router) {
     // Shared activityLog write path, same pattern as workout.js
     // v6/core-session.js v4/yoga-session.js v5.
     const nowIso = new Date().toISOString();
+    // TWO-ENGINE, 06 Sep 2026. sessionType recorded so the coach's
+    // choice chain can read what shape of session came up recently.
+    // Read from generatedSession rather than from a local, because this
+    // view renders sessions built by BOTH builders and only the stored
+    // record knows which type produced it. null when absent -- a
+    // prescribed or walk session has no session type and must not be
+    // given one, and Schema.md v1.48 defines null as "not a built
+    // session" rather than "unknown".
+    const _st = (store.get('generatedSession') || {}).session || {};
     const activityEntry = store.logActivity({
+      sessionType:    _st.sessionType || null,
       type:           'gym',
       date:           nowIso,
       completedAt:    nowIso,
@@ -1444,7 +1454,17 @@ export function GymProgrammeView(router) {
       : null;
     const nowIso = new Date().toISOString();
 
+    // TWO-ENGINE, 06 Sep 2026. sessionType recorded so the coach's
+    // choice chain can read what shape of session came up recently.
+    // Read from generatedSession rather than from a local, because this
+    // view renders sessions built by BOTH builders and only the stored
+    // record knows which type produced it. null when absent -- a
+    // prescribed or walk session has no session type and must not be
+    // given one, and Schema.md v1.48 defines null as "not a built
+    // session" rather than "unknown".
+    const _st = (store.get('generatedSession') || {}).session || {};
     const activityEntry = store.logActivity({
+      sessionType:    _st.sessionType || null,
       type:           'gym',
       date:           nowIso,
       completedAt:    nowIso,
