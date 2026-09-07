@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v459
+ * 06 Sep 2026 v460
+ *
+ * v460 - PROGRESS. Progress shows the shapes of session you have been
+ *   doing, from the session type recorded on every built session.
  *
  * v459 - HATCH-OVERLAP. The escape hatch is opaque and the top-right
  *   corner is reserved, so it no longer covers the exercise counter or
@@ -3137,7 +3140,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v459";
+const CACHE_NAME = "alongside-v460";
 
 const SHELL_URLS = [
 
