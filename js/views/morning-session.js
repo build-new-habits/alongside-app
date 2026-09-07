@@ -665,7 +665,7 @@ function renderExerciseCard(ex, session) {
       <div class="exercise-meta">
         ${ex.sets && ex.sets > 0 ? `<span class="meta-tag">${ex.sets} sets</span>` : ""}
         ${ex.reps ? `<span class="meta-tag">${ex.reps}</span>` : ""}
-        ${ex.rest && ex.rest !== "-" ? `<span class="meta-tag">${ex.rest} rest</span>` : ""}
+        ${Number(ex.rest) > 0 ? `<span class="meta-tag">${Number(ex.rest)}s${ex.restStyle === "active" ? " active" : ""} rest</span>` : ""}
       </div>
 
       <!-- Coach note -->

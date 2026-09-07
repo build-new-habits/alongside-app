@@ -273,6 +273,17 @@ export const FIELD_CONTRACT = {
   },
 
   // ── Session shaping ───────────────────────────────────────────────
+  "exercise.rest": {
+    values: [0, 15, 20, 30, 40, 45, 60, 75, 90, null],
+    writer: "js/data/exercises/*.js (library data)",
+    meaning: "Seconds of rest after the exercise. A NUMBER, never text. null means no rest is prescribed. Three formats coexisted until 06 Sep 2026 because this field had no contract: 99 entries as text ('45s', '90s active'), 32 as numbers, and session-builder.js writing 'As needed' on prescribed exercises. core-session.js and yoga-session.js both gated their rest timer on `rest > 0`, and '60s' > 0 is FALSE, so the in-session timer silently never started on any text entry. Units belong to the DISPLAY layer, not the value."
+  },
+  "exercise.restStyle": {
+    values: ["active", null],
+    writer: "js/data/exercises/*.js (library data)",
+    meaning: "'active' means keep moving through the rest rather than stopping. It was previously smuggled into the rest string as '90s active', so migrating rest to a number would have deleted it from four exercises. Coaching content, said in words on the card, never folded back into the number."
+  },
+
   "sessionVariety": {
     values: ["familiar", "balanced", "varied"],
     writer: "views/checkin.js:793",

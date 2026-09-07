@@ -830,7 +830,7 @@ export function GymProgrammeView(router) {
           <div class="exercise-meta">
             <span class="meta-tag">${exercise.sets || 3} sets</span>
             ${exercise.reps ? `<span class="meta-tag">${_esc(exercise.reps)}</span>` : ''}
-            ${exercise.rest ? `<span class="meta-tag">${_esc(exercise.rest)} rest</span>` : ''}
+            ${exercise.rest ? `<span class="meta-tag">${_esc(_restLabel(exercise))}</span>` : ''}
           </div>
 
           <!-- CARD-3. Three pages, one job each. Swap is an adjust
@@ -1499,7 +1499,26 @@ export function GymProgrammeView(router) {
 
   // ── Utilities ──────────────────────────────────────────────────────────────
 
-  function _esc(str) {
+  /**
+ * DURATION-STR, 06 Sep 2026. rest is seconds as a NUMBER now, so the raw
+ * value printed as "45 rest" with no unit. The text entries it replaced
+ * read correctly by accident ("90s active rest"), which is why nobody
+ * caught the numeric ones -- the broken half was the one that looked
+ * right.
+ *
+ * restStyle: "active" means keep moving through the rest rather than
+ * stopping. It is coaching content, not formatting, so it is said in
+ * words rather than smuggled back into the number.
+ */
+function _restLabel(ex) {
+  const secs = Number(ex.rest);
+  if (!Number.isFinite(secs) || secs <= 0) return "";
+  return ex.restStyle === "active"
+    ? `${secs}s active rest`
+    : `${secs}s rest`;
+}
+
+function _esc(str) {
     if (!str) return '';
     return String(str)
       .replace(/&/g, '&amp;')

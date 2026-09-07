@@ -845,11 +845,18 @@ function advancePose() {
     return;
   }
 
-  if (pose.rest > 0) {
+  // DURATION-STR, 06 Sep 2026. Was `pose.rest > 0`, and 99 of 551
+  // library entries carried rest as TEXT ("60s", "90s active").
+  // `"60s" > 0` is false, so the rest timer silently never started --
+  // no countdown, no prompt, straight on. The data is numeric now;
+  // this coerces as well, so a future non-numeric value means NO
+  // TIMER rather than a throw part-way through somebody's session.
+  const _rest = Number(pose.rest);
+  if (Number.isFinite(_rest) && _rest > 0) {
     phase         = "rest";
-    restRemaining = pose.rest;
+    restRemaining = _rest;
     rerender();
-    startRestTimer(pose.rest, () => { phase = "session"; rerender(); });
+    startRestTimer(_rest, () => { phase = "session"; rerender(); });
   } else {
     phase = "session";
     rerender();
