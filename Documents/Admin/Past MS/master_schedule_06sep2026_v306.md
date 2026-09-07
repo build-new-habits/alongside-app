@@ -1,49 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v307
+## 06 Sep 2026 v306
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v306.md`. Remove v306 on upload.
-
-> ### 🟢 QUICK-INPUTS SHIPPED — `alongside-v461`, **124 gates**, green from a second independent fresh clone. Claude's pre-beta list is now empty.
->
-> `session-builder.js` v45 → **v46**. `session-builder-ui.js` v16 → **v17**. Blueprint v54 → **v55**.
->
-> #### 🔴 A CORRECTION FIRST — v16's note was wrong
->
-> QUICK-BUILD recorded that **there was no seam** to carry the coach's consultation through, because `triggerBuild()` does not write `generatedSession`. **That was wrong.** `buildSession()` writes it itself and always has — it is `persistBuiltSession()`, the *swap* path, that only rewrites an existing record.
->
-> ⚫ **The wrong claim is kept in the file rather than quietly removed. "There is no seam" is exactly the kind of statement a later session inherits and designs around**, and a deleted mistake teaches nobody why the design went the way it did.
->
-> #### 🟢 The fix
->
-> `buildSession()` takes an **optional `inputs` merge**, for the case where the **coach** chose the type rather than the person. Quick build is that case: `chooseSessionType()` consults the class you are in, then what the arc says is thin, then what has not come up lately — **and none of it reached the record**, so Quick build had the same empty `inputs` TWO-ENGINE fixed on the One to one route.
->
-> 🔴 **MERGED UNDER, NOT OVER.** `sessionType`, `durationMins` and `equipment` are what `buildSession` *actually used*, and **a caller must not be able to overwrite the record of that with something it merely intended**. Driven: a caller passing `sessionType: "LIES"` and `durationMins: 999` gets neither.
->
-> 🔴 **PASSED ONLY IN QUICK MODE.** On every other path the person chose the type themselves, and **recording a consultation that did not happen is the same overclaim in the other direction** — CONSTRAINT-CLAIM, one item earlier, was exactly that fault.
->
-> #### 🟢 The gate asserted the opposite, and was inverted rather than deleted
->
-> `verify-quickbuild` test 5 asserted that the **unfinished state was labelled as unfinished**. It is finished now, so the block is inverted with the reason recorded — **the same treatment `verify-lobby1`'s 10a got.**
->
-> Driven end to end before the source assertions were trusted. Four deliberate breaks, four caught red.
-
-> ### 📋 CLAUDE'S PRE-BETA BUILD SCOPE IS COMPLETE
->
-> **CLUB 9 of 9, plus QUICK-INPUTS.** `alongside-v452` → **v461** in one day. Gates 115 → **124**. `store.js` v64 → v65, `Schema.md` v1.47 → v1.51.
->
-> | Remaining before beta | Owner |
-> |---|---|
-> 🟠 **PAR-Q+ / RED-FLAG** — response in hand, held | **Graeme** |
-> 🟠 **Clinical pack** — unsent, no reviewer engaged | **Graeme** |
-> 🟠 **Legal policies** — active workstream | **Graeme** |
-> 🟡 **HMRC** — approved, paperwork pending | **Graeme** |
-> 🟡 **Beta tester device pass** — Today view tone, card order, session framing | **Both** |
-> 🟡 **`DEV_PANEL_ENABLED`** — January checklist, not beta, per Graeme's 06 Sep decision | Claude |
->
-> ⚫ **The critical path is now entirely Graeme's, and a later beta does not help any of it** — it lengthens the time those four have been outstanding.
->
-> 🔵 **Recommended next:** a device pass. **Nine items shipped today and none of them has been seen on a real screen** — every one was proven by gates and jsdom, which is not the same thing as being used.
+Supersedes `master_schedule_v305.md`. Remove v305 on upload.
 
 > # 🟢 THE CLUB BUILD ORDER IS COMPLETE. 9 of 9. `alongside-v460`, **124 gates**, green from a second independent fresh clone.
 >
