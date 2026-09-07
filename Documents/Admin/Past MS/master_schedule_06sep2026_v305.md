@@ -1,63 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v306
+## 06 Sep 2026 v305
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v305.md`. Remove v305 on upload.
-
-> # 🟢 THE CLUB BUILD ORDER IS COMPLETE. 9 of 9. `alongside-v460`, **124 gates**, green from a second independent fresh clone.
->
-> | # | Item | Shipped |
-> |---|---|---|
-> | 1 | TWO-ENGINE | v452 |
-> | 2 | DURATION-STR | v453 |
-> | 3 | CLUB-SHELL | v454 |
-> | 4 | PLAN-PICKER-TIER | v455 |
-> | 5 | YOUR-OWN | v456 |
-> | 6 | QUICK-BUILD | v457 |
-> | 7 | CONSTRAINT-CLAIM | v458 |
-> | 8 | HATCH-OVERLAP | v459 |
-> | 9 | **PROGRESS** | **v460** |
->
-> **All nine specified in CLUB spec v2 on 06 Sep and built the same day.** Gate count 115 → **124**. `store.js` v64 → v65, `Schema.md` v1.47 → v1.51.
-
-> ### 🟢 PROGRESS SHIPPED — `progress.js` v11 → **v12**. Blueprint v53 → **v54**. New gate `tools/verify-progress-shapes.mjs`.
->
-> `renderActivitySummary()`'s breakdown counts `e.type` — the **activity** type: workout, walk, quiet — so it read *"Workout × 12"*, which says almost nothing about what somebody actually did. The **session** type has been on every built session since TWO-ENGINE, and until now **only `chooseSessionType()` read it**.
->
-> #### 🔴 The gate mostly protects the constraints, not the feature
->
-> | Constraint | What it forbids here |
-> |---|---|
-> | **Displays, never interprets (P4)** | No *"you have not done any mobility lately"*. **That is the app deciding a gap is a fault — and a gap is often the most sensible thing somebody did that month** |
-> | **No streaks, ever** | No consecutive count, no longest run, no "keep it going" |
-> | **No comparison** | Ordering by count is not ranking. Nothing is called most, least, top or best |
-> | **A list, not a chart** | A proportional bar invites comparison between rows and **makes the shortest one look like a failing**. The gate asserts there is no width interpolation |
->
-> #### 🟢 Two decisions worth keeping
->
-> **Entries predating TWO-ENGINE are SKIPPED, not bucketed as "Other".** A synthetic bucket grows with history the person cannot see the shape of, and **reads as a kind of session rather than an absence of a record**.
->
-> **Silent when there is nothing.** An empty state here would read as an unfinished task **on a screen somebody opened to look back**, not to be given something else to do.
->
-> #### ⚠️ One reversal break silently failed to apply
->
-> The gap-shaming break did not match, leaving assertion 3c unproven while the output looked identical to a clean run. Redone. ⚫ **An unapplied break and a passing gate produce the same output — the break must be confirmed to have landed, not just run.**
->
-> Eight deliberate breaks, eight caught red once all were applied.
-
-> ### 📋 WHAT REMAINS BEFORE BETA
->
-> | Item | Owner |
-> |---|---|
-> 🟠 **PAR-Q+ / RED-FLAG** — response in hand, held | **Graeme** |
-> 🟠 **Clinical pack** — unsent, no reviewer engaged | **Graeme** |
-> 🟠 **Legal policies** — active workstream | **Graeme** |
-> 🟡 **HMRC** — approved, paperwork pending | **Graeme** |
-> 🟠 **QUICK-INPUTS** — Quick build's coach line must not claim an input until this closes. Needs a seam that does not exist | Claude |
-> 🟡 **Beta tester device pass** — Today view tone, card order, session framing | Both |
-> 🟡 **`DEV_PANEL_ENABLED`** — January checklist, not beta, per Graeme's decision | Claude |
->
-> ⚫ **Claude's pre-beta build scope is met.** The critical path is now Graeme's, and a later beta does not help any of it — it lengthens the time those four have been outstanding.
+Supersedes `master_schedule_v304.md`. Remove v304 on upload.
 
 > ### 🟢 HATCH-OVERLAP SHIPPED — `alongside-v459`, **123 gates**, green from a second independent fresh clone. CLUB item 8 of 9 closed.
 >
