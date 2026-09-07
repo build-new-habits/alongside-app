@@ -1,5 +1,5 @@
 # Alongside: Move — Guided Class content programme
-## 06 Sep 2026 v1
+## 06 Sep 2026 v2
 
 Build New Habits | The room where somebody else already decided.
 
@@ -126,8 +126,19 @@ So: **a class declares which strands it serves. A twelve-week programme is a pat
 
 ## 11. Open, and needing Graeme
 
-🟡 **How many classes is the beta minimum?** §10 item 4 says one strand covered properly. **Which strand** is a product call — the most-reused one serves the most aims; the one closest to Graeme's own arc gets tested hardest.
+🟢 **RESOLVED, 06 Sep 2026. First strand set: Graeme's own arc, then expand outward.** *"Use my arc first then expand from there."* Gilly is testing it, so it gets the deepest scrutiny — worth more on a first pass than the widest coverage.
 
-🟡 **Does a class have a lighter version?** A generated session adapts to the check-in. **A class cannot — that is what makes it a class.** Either each class carries a gentler variant, which roughly doubles the writing, or a bad day routes the person to another room. **The second is cheaper and more honest; the first is kinder.** Not resolved here.
+🟢 **RESOLVED, 06 Sep 2026. BOTH, not either.** *"A lighter version with a bad day pointing somewhere else."*
+
+A generated session adapts to the check-in. **A class cannot — that is what makes it a class.** So there are two tiers of not pretending otherwise:
+
+| Day | Response |
+|---|---|
+| **Not great** | The class's **lighter variant**. You still get the class you came for |
+| **Genuinely should not** | **Routed out** of the room, to One to one or Quick build |
+
+🔵 **The threshold already exists.** `buildSession()` resolves `severeZoneToday()` before any pool is built and diverts to Gentle Care at 7+. **The class equivalent maps straight onto it** — below → lighter variant, at or above → route out. **One threshold, one place to check**, rather than a second clinical rule for classes to keep in step with the first.
+
+⚠️ **The lighter variant roughly doubles the writing.** Recorded so the volume is not a surprise once production starts.
 
 🟡 **Timeline.** This is weeks of writing, and it is the work most likely to eat a date. Currently placed **between beta and the November soft launch**, not before beta.

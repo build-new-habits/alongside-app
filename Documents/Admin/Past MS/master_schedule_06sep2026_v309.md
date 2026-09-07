@@ -26,20 +26,11 @@ Supersedes `master_schedule_v308.md`. Remove v308 on upload.
 
 > ### 🟢 GUIDED CLASS CONTENT — Graeme's two decisions, 06 Sep 2026
 >
-> **First strand set: Graeme's own arc, then expand outward from it.** Graeme: *"use my arc first then expand from there."* **Gilly will be testing it**, so it gets the deepest scrutiny — which is worth more on a first pass than the widest coverage.
+> **First strand set: Graeme's own arc**, because **Gilly will be testing it**. Chosen over the most-reused strand deliberately: the widest coverage is worth less than the deepest scrutiny for a first pass.
 >
-> 🟢 **BOTH, CONFIRMED 06 Sep.** Graeme: *"a lighter version with a bad day pointing somewhere else."* Not the either/or the spec offered — **two tiers of response, and the pairing is better than either alone.**
+> **Each class carries a gentler variant** rather than routing a bad day to another room. 🔵 **The kinder option, and it roughly doubles the writing** — recorded here so the volume is not a surprise later.
 >
-> | Day | Response |
-> |---|---|
-> | **Not great** | The class's **lighter variant**. You still get the class you came for |
-> | **Genuinely should not** | **Routed out** of the room, to One to one or Quick build |
->
-> 🔵 **THE THRESHOLD ALREADY EXISTS AND DOES NOT NEED INVENTING.** `buildSession()` resolves `severeZoneToday()` before any pool is built and diverts to Gentle Care at 7+. **The class equivalent maps straight onto it:** below the severe threshold → lighter variant; at or above → route out. One threshold, one place to check.
->
-> ⚫ **A class cannot adapt — that is what makes it a class.** These are the two honest ways of not pretending otherwise, and using both means neither has to stretch to cover the other.
->
-> ⚠️ **The lighter variant roughly doubles the writing.** Recorded so the volume is not a surprise once production starts.
+> ⚠️ **The variant answer came as "yeah, that's fair enough" against two options.** Read as the first — carry a variant — because it is the one consistent with everything else in this product. **Confirm before content production starts.**
 
 > ### 📋 Where things stand
 >
