@@ -257,3 +257,175 @@
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 }
+
+
+/* ── ARC-LED, 06 Sep 2026. Rooms as collapsed rows ───────────────────
+ *
+ * Home led with the coach's pick and four full cards, so the screen
+ * nominated a session before the person had said anything. The arc is
+ * what you land on now; these are ways in.
+ *
+ * NOTHING HERE IS SUGGESTED. No accent border on a room, no badge, no
+ * ordering by recommendation.
+ */
+.club-row {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.club-row:last-child {
+  border-bottom: none;
+}
+
+/* The whole head is the target, not a chevron somebody has to hit. */
+.club-row__head {
+  align-items: center;
+  background: none;
+  border: none;
+  color: inherit;
+  display: flex;
+  gap: var(--space-4);
+  min-height: 44px;
+  padding: var(--space-4) 0;
+  text-align: left;
+  width: 100%;
+}
+
+.club-row__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.club-row__title {
+  color: var(--color-text);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+/* SLOT 2. Permanent, on the CLOSED row. Not a first-run tooltip and not
+   something you open a room to discover. */
+.club-row__what {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+/* The deciding fact -- programme name, saved session, what it asks. */
+.club-row__summary {
+  color: var(--color-text);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.club-row__chev {
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+}
+
+.club-row__head[aria-expanded="true"] .club-row__chev {
+  transform: rotate(180deg);
+}
+
+.club-row__head:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.club-row__detail {
+  padding: 0 0 var(--space-5);
+}
+
+.club-row__facts {
+  list-style: none;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+}
+
+.club-row__facts li {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
+/* ── The arc block ───────────────────────────────────────────────────
+ *
+ * NO BAR, NO PERCENTAGE, NO COUNT. P4: displays, never interprets, and
+ * there are no streaks anywhere in this product. This shows COVERAGE,
+ * not completion -- which strands have come up, which have not.
+ *
+ * State is carried THREE ways: a mark, the words, and the surface.
+ * Colour alone cannot carry meaning (WCAG 1.4.1), and it is also the
+ * first thing to fail on a phone in daylight.
+ */
+.today-arc__heading {
+  color: var(--color-text);
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin: var(--space-5) 0 var(--space-3);
+  text-transform: uppercase;
+}
+
+.today-arc__strands {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.today-arc__strand {
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+}
+
+.today-arc__strand--lit {
+  background: var(--color-bg-card);
+  border-color: transparent;
+}
+
+.today-arc__strand-mark {
+  color: var(--color-text-secondary);
+}
+
+.today-arc__strand--lit .today-arc__strand-mark,
+.today-arc__strand--lit .today-arc__strand-label {
+  color: var(--color-text);
+}
+
+.today-arc__strand-label {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.today-arc__strand-state {
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  margin-left: auto;
+}
+
+/* ── Headings that read as headings ──────────────────────────────────
+ *
+ * Graeme, on device: "Move your body and Settle your mind are titles.
+ * They look like normal text." They did -- same size and colour as the
+ * secondary body copy, so they read as sentences rather than structure.
+ */
+.today-group-label {
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.today-chooser-sub {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  margin: var(--space-1) 0 var(--space-4);
+}

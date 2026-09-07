@@ -1,5 +1,44 @@
 /**
  * today.js
+ * 06 Sep 2026 v33
+ *
+ * v33 - ARC-LED. Home stops nominating a session.
+ *
+ *   It led with the coach's pick and four full cards, so the screen
+ *   chose before the person had said anything. That made the app the
+ *   one with the plan -- and it contradicted "free is today, the Plan
+ *   is the arc" on the Plan tier's own home screen.
+ *
+ *   The arc is what you land on now. The rooms are four COLLAPSED ROWS
+ *   beneath it, and you open one. NOTHING IS SUGGESTED: no badge, no
+ *   accent border on a room, no ordering by recommendation. The
+ *    slot is removed rather than left unused, so it cannot
+ *   quietly come back.
+ *
+ *   THE ARC SHOWS COVERAGE, NOT COMPLETION. No bar, no percentage, no
+ *   count -- P4, and there are no streaks anywhere in this product.
+ *   Strand state is carried THREE ways: a mark, the words "has come
+ *   up" or "not yet", and the surface. Colour alone cannot carry
+ *   meaning, and it is the first thing to fail on a phone in daylight.
+ *   The note now ends "Nothing is behind -- that's just where the arc
+ *   is", because without it two of three strands reading "not yet" is
+ *   read as being behind whatever the design intends.
+ *
+ *   THE FIRST DRAFT OF THIS LAYOUT REGRESSED SLOT 2. It moved "what
+ *   the room is" into the expanded detail and left only state on the
+ *   closed row -- so you had to open a room to learn what it was, which
+ *   is the "find out by doing" fault CLUB spec v2 3.1 reversed v1
+ *   over. verify-clubshell 3b caught it before it shipped.
+ *
+ *   THE DEPTH RULE HOLDS. Expanding a row is not a screen. Details are
+ *   rendered and hidden rather than built on tap, and there is no
+ *   rerender -- a rerender would rebuild the row under the finger that
+ *   tapped it and throw keyboard focus to the top of the screen.
+ *
+ *   HEADINGS READ AS HEADINGS. Graeme, on device: "Move your body and
+ *   Settle your mind are titles. They look like normal text." They
+ *   did -- same size and colour as the secondary body copy.
+ *
  * 06 Sep 2026 v32
  *
  * v32 - DEVICE-2. Task 2 of the device pass: the FREE home screen, read
@@ -980,6 +1019,25 @@ export function TodayView(router) {
     // LOBBY-1c. The one way through to the session space. Routes via
     // the check-in when one is owed and straight through when it is
     // not — a second check-in in a day is a toll, not care.
+    // ARC-LED, 06 Sep 2026. Rows open IN PLACE. No rerender: a rerender
+    // would rebuild the row under the finger that just tapped it and
+    // throw keyboard focus back to the top of the screen.
+    //
+    // aria-expanded moves with the hidden attribute. One without the
+    // other is the state being visible to sighted users and not to
+    // anybody else.
+    container.querySelectorAll('[data-room-toggle]').forEach(head => {
+      head.addEventListener('click', () => {
+        const detail = container.querySelector(
+          `#club-row-${head.dataset.roomToggle}-detail`);
+        if (!detail) return;
+        const opening = detail.hasAttribute('hidden');
+        if (opening) detail.removeAttribute('hidden');
+        else detail.setAttribute('hidden', '');
+        head.setAttribute('aria-expanded', String(opening));
+      });
+    });
+
     // CLUB-SHELL. The chip IS the answer to Quick build's one question,
     // so it must carry it -- asking again in the builder would tell
     // somebody their first answer was not heard.
@@ -1557,21 +1615,56 @@ export function TodayView(router) {
     return `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`;
   }
 
-  function roomCard({ id, title, what, option, facts, action, suggested }) {
+  /**
+   * ARC-LED, 06 Sep 2026. Rooms are COLLAPSED ROWS that open in place.
+   *
+   * WHAT CHANGED AND WHY. Home led with the coach's pick and four full
+   * cards, so the screen nominated a session before the person had said
+   * anything. That made the app the one with the plan. Graeme: the arc
+   * should be what you land on, with the rooms as ways in.
+   *
+   * "Free is today, the Plan is the arc" -- and the old layout
+   * contradicted it on the Plan tier's own home screen.
+   *
+   * NOTHING ON HOME IS SUGGESTED ANY MORE. No badge, no accent border on
+   * a room, no ordering by recommendation. The `suggested` slot is gone
+   * rather than left unused, so it cannot quietly come back.
+   *
+   * THE DEPTH RULE STILL HOLDS. Expanding a row is not a screen: no
+   * navigation, two taps to moving. Details are rendered and HIDDEN, not
+   * built on demand -- a row that assembles itself on tap is a row a
+   * screen reader has to be told about twice.
+   */
+  function roomRow({ id, title, what, summary, facts, action }) {
     return `
-      <section class="club-room ${suggested ? 'club-room--suggested' : ''}"
-               data-room-id="${id}"
-               aria-labelledby="club-room-${id}-name">
-        ${suggested ? '<p class="club-room__suggested">Suggested for today</p>' : ''}
-        <h3 class="club-room__name" id="club-room-${id}-name">${_esc(title)}</h3>
-        <p class="club-room__what">${_esc(what)}</p>
-        ${option ? `<p class="club-room__option">${_esc(option)}</p>` : ''}
-        ${facts && facts.length ? `
-          <ul class="club-room__facts">
-            ${facts.map(f => `<li>${_esc(f)}</li>`).join('')}
-          </ul>` : ''}
-        ${action}
-      </section>`;
+      <div class="club-row" data-room-id="${id}">
+        <button class="club-row__head"
+                type="button"
+                aria-expanded="false"
+                aria-controls="club-row-${id}-detail"
+                data-room-toggle="${id}">
+          <span class="club-row__text">
+            <span class="club-row__title">${_esc(title)}</span>
+            <!-- SLOT 2, AND IT STAYS ON THE CLOSED ROW. The first draft
+                 of this layout put "what the room is" inside the
+                 expanded detail and showed only state when closed --
+                 so you had to open a room to learn what it was. That is
+                 the "find out by doing" fault CLUB spec v2 3.1 reversed
+                 v1 over, reintroduced by a layout change. verify-
+                 clubshell 3b caught it. -->
+            <span class="club-row__what">${_esc(what)}</span>
+            ${summary ? `<span class="club-row__summary">${_esc(summary)}</span>` : ''}
+          </span>
+          <span class="club-row__chev" aria-hidden="true">\u25be</span>
+        </button>
+        <div class="club-row__detail" id="club-row-${id}-detail" hidden>
+          ${facts && facts.length ? `
+            <ul class="club-row__facts">
+              ${facts.map(f => `<li>${_esc(f)}</li>`).join('')}
+            </ul>` : ''}
+          ${action}
+        </div>
+      </div>`;
   }
 
   function clubRooms() {
@@ -1613,10 +1706,12 @@ export function TodayView(router) {
     const phase = progMeta ? getPhaseForWeek(progMeta, prog.currentWeek || 1) : null;
 
     const guided = progMeta
-      ? roomCard({
+      ? roomRow({
           id: 'guided', title: 'Guided class',
+          // The summary is what the row shows CLOSED, so it carries the
+          // one fact worth deciding on rather than the room's slogan.
           what: 'A twelve-week shape. I fit your sessions to it.',
-          option: progMeta.name,
+          summary: `${progMeta.name} \u00b7 ${prog.currentWeek || 1} week${(prog.currentWeek || 1) === 1 ? '' : 's'} in`,
           facts: [
             phase ? `${phase.label} \u2014 ${phase.description}` : 'A twelve-week shape',
             phase ? `Leaning ${phase.intensityBias}, towards ${_joinPlain(phase.focusBias)}` : '',
@@ -1631,14 +1726,10 @@ export function TodayView(router) {
         })
       // EMPTY STATE. An invitation, and it states the cost before it is
       // paid -- CLUB spec v2 3.5.
-      : roomCard({
+      : roomRow({
           id: 'guided', title: 'Guided class',
-          // DEVICE-2. GUIDED-COPY changed the with-programme branch and
-          // left this one saying "A set course", which is the claim it
-          // existed to remove. Caught because test 8b only ever mounted
-          // the with-programme fixture.
           what: 'A twelve-week shape. I fit your sessions to it.',
-          option: 'Nothing chosen yet',
+          summary: 'Nothing chosen yet',
           facts: ['Twelve weeks', 'It shapes what I suggest, week by week',
                   'You can change or stop at any point'],
           // PLAN-PICKER-TIER, 06 Sep 2026. goal-setup is
@@ -1650,11 +1741,12 @@ export function TodayView(router) {
                            data-requires-checkin="false">Choose a shape</button>`
         });
 
-    const pt = roomCard({
+    const pt = roomRow({
       id: 'pt', title: 'One to one',
       what: 'I pick it, around how you are today.',
-      option: 'Check in first',
-      facts: ['4 questions, about a minute', 'Then one session, suggested'],
+      summary: 'Check in first',
+      facts: ['4 questions, about a minute',
+              'Then one session, suggested'],
       action: `<button class="btn btn-primary btn-full club-room__go"
                        data-route="coach-proposal" data-door-id="pt"
                        data-requires-checkin="true">Check in</button>`
@@ -1667,10 +1759,10 @@ export function TodayView(router) {
     // tap; "More" makes you tap to find out.
     const saved = savedSessions();
     const own = saved.length
-      ? roomCard({
+      ? roomRow({
           id: 'own', title: 'Your own',
           what: 'Sessions you put together yourself.',
-          option: saved[0].name,
+          summary: saved[0].name,
           facts: [
             saved[0].durationMins ? `${saved[0].durationMins} minutes` : 'Your own length',
             `${(saved[0].exerciseIds || []).length} movements`,
@@ -1684,10 +1776,10 @@ export function TodayView(router) {
                              data-requires-checkin="false">Your other ${saved.length - 1} session${saved.length - 1 === 1 ? '' : 's'}</button>
                    ` : ''}`
         })
-      : roomCard({
+      : roomRow({
           id: 'own', title: 'Your own',
           what: 'Sessions you put together yourself.',
-          option: 'Nothing saved yet',
+          summary: 'Nothing saved yet',
           facts: ['You choose the type, length and kit', 'Save one and it stays here'],
           action: `<button class="btn btn-primary btn-full club-room__go"
                            data-route="session-builder" data-door-id="own"
@@ -1695,10 +1787,10 @@ export function TodayView(router) {
         });
 
     // The assumptions are shown BEFORE the chips, not discovered after.
-    const quick = roomCard({
+    const quick = roomRow({
       id: 'quick', title: 'Quick build',
       what: 'Tell me how long. I fill the rest in.',
-      option: 'How long have you got?',
+      summary: 'How long have you got?',
       facts: ['At home, no equipment', 'You can change the place and kit next'],
       action: `
         <div class="club-room__chips" role="group" aria-label="How long have you got?">
@@ -1711,6 +1803,7 @@ export function TodayView(router) {
 
     return `
       <p class="today-chooser-q">What do you want to do today?</p>
+      <p class="today-chooser-sub">Four ways in. Open any one to see what it would give you today.</p>
       <div class="club-rooms">${guided}${pt}${own}${quick}</div>
       <p class="today-group-label">Or go straight to</p>
       ${tileGrid()}`;
@@ -1827,26 +1920,31 @@ export function TodayView(router) {
         <span class="today-arc__label">Your arc</span>
         <span class="today-arc__aim">${_esc(aim ? aim.label : '')}</span>
         ${strands.length ? `
+          <span class="today-arc__heading">What it's made of</span>
           <span class="today-arc__strands">
             ${strands.map(x => `
-              <span class="today-arc__strand ${x.lit ? 'today-arc__strand--lit' : ''}">${_esc(x.label)}</span>
+              <span class="today-arc__strand ${x.lit ? 'today-arc__strand--lit' : ''}">
+                <span class="today-arc__strand-mark" aria-hidden="true">${x.lit ? '\u2713' : '\u2013'}</span>
+                <span class="today-arc__strand-label">${_esc(x.label)}</span>
+                <span class="today-arc__strand-state">${x.lit ? 'has come up' : 'not yet'}</span>
+              </span>
             `).join('')}
           </span>` : ''}
         <span class="today-arc__note">${
           notYet.length === strands.length && strands.length
             ? "All of it still ahead of you. That's the whole point of today."
             : notYet.length
-            ? `${_esc(notYet.join(' and '))} ${notYet.length === 1 ? "hasn't" : "haven't"} come up yet.`
+            // ARC-LED, 06 Sep 2026. The second sentence is load-bearing.
+            // Without it, two of three strands reading "not yet" is read
+            // as being BEHIND, whatever the design intends -- and this
+            // panel shows coverage, not completion. P4: displays, never
+            // interprets. No bar, no percentage, no count, ever.
+            ? `${_esc(notYet.join(' and '))} ${notYet.length === 1 ? "hasn't" : "haven't"} come up yet. Nothing is behind \u2014 that's just where the arc is.`
             // DEVICE-1, 06 Sep 2026. This branch is reached when notYet
             // is empty -- INCLUDING when there are no strands at all,
             // because zero of zero is zero. An arc with an aim but no
             // strands therefore announced complete coverage of nothing.
-            //
-            // Vacuously true and read as an achievement, which is the
-            // same class as every other claim corrected today: saying a
-            // thing happened when it did not. Silent instead: an arc
-            // with no strands has nothing to report, and reporting
-            // nothing is the honest form of that.
+            // Silent instead.
             : strands.length
             ? "Every strand has come up at least once."
             : ""
