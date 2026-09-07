@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v464
+ * 06 Sep 2026 v465
+ *
+ * v465 - ARC-LED. Home leads with the arc; the four rooms are collapsed
+ *   rows beneath it and nothing is suggested.
  *
  * v464 - DEVICE-2. The orientation line names the right control on each
  *   tier, and the empty Guided class card no longer promises a course.
@@ -3152,7 +3155,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v464";
+const CACHE_NAME = "alongside-v465";
 
 const SHELL_URLS = [
 
