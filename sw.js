@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v453
+ * 06 Sep 2026 v454
+ *
+ * v454 - CLUB-SHELL. The four rooms on the Plan home screen, added
+ *   above the existing tiles rather than replacing them.
  *
  * v453 - DURATION-STR. Exercise rest is seconds as a number across the
  *   whole library, and the in-session rest timers no longer fail
@@ -3116,7 +3119,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v453";
+const CACHE_NAME = "alongside-v454";
 
 const SHELL_URLS = [
 
