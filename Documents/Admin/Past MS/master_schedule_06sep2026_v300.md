@@ -1,59 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v301
+## 06 Sep 2026 v300
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v300.md`. Remove v300 on upload.
-
-> ### 🟢 PLAN-PICKER-TIER SHIPPED — `alongside-v455`, **119 gates**, green from a second independent fresh clone. CLUB item 4 of 9 closed.
->
-> `programmeEngine.js` v7 → **v8**. `plan-options.js` v1 → **v2**. `today.js`, `equipment.js`, `frequency.js` touched. Blueprint v48 → **v49**. New gate `tools/verify-planpicker.mjs`.
->
-> #### 🔴 IT WAS LIVE, and this corrects the earlier description of it
->
-> The picker was reached through `equipment.js`'s **standalone finish button** → `onboarding/frequency` → `onboarding/plan-select`. Not orphaned, not a dev path. **That is the screen Graeme met on 06 Sep** — asked to commit to twelve weeks and a weekly session target before he had moved once.
->
-> #### 🔴 The screen was the smaller half
->
-> `programmeEngine.js` (**49 `activeProgramme` references**) and `workoutGenerator.js` read the programme **with no tier check**, so a free user was getting chapter progression, week advancement and phase bias on their sessions. **"Free is today, the Plan is the arc" was not true.**
->
-> ⚫ **Same class as DATA-1b: ARC-DOOR closed a leak in `arc` the same week while its twin sat wide open beside it.**
->
-> #### 🟢 Gated at the READ, not at the 49 references
->
-> `plannedFocusToday()` and `getPhaseBias()` are the only two functions reaching session selection. **One place to check beats forty-nine places to remember**, and an existing free device stops being driven by its programme immediately, **with no migration**. `getPhaseBias()` returns the *same* neutral shape its no-programme branch already returned, so free gets the app's default rather than a second shape to keep in sync.
->
-> #### 🟢 The picker's new home
->
-> Guided class's empty state routes to `goal-setup` — `programme-select.js`, which calls `startChapter()` properly, rather than `plan-select.js` which wrote six `activeProgramme` fields directly. **Both onboarding routes retired, not deleted:** the file is the record of what new users were asked to commit to.
->
-> #### 🟢 COMMIT-COPY — fixed in the shared data, so it covers both pickers
->
-> | Was | Now | Why |
-> |---|---|---|
-> | *"3 sessions a week"* | *"aiming for 3 sessions a week"* | A bare number reads as a **target** — one you can fall behind on, **which is the shape of a streak** on a product that has none. Same number; quota became intention |
-> | *"Full commitment"* / *"For when you are ready to push"* | *"More often"* / *"Only if that suits you"* | **Nurturing only, permanently**, and this product does not push. "Commitment" frames the weekly number as a promise that can be broken |
-> | *"Highly Recommended"*, caps, gold band | *"Suggested for you"* | 🔵 **The recommendation SURVIVES, deliberately** — it reduces decision load, which this audience needs most. The caps and the band were the problem, not recommending |
->
-> #### ⚠️ Two gates went red on prose rather than behaviour
->
-> `verify-chooser1` failed on the weekly note. **Updated to match on the number, not the sentence** — the property it guards is that the number shown and the number written cannot drift apart, and matching prose would go red on a rewording while a wrong number went green.
->
-> `verify-planpicker`'s own first version greped raw source and **went red on its own comments** recording what the copy used to say. Comments stripped. ⚫ **A gate that cannot tell a string from a note about a string will either be silenced or will silence the history.**
->
-> Seven deliberate breaks, seven caught red.
-
-> ### 📋 CLUB build order — 4 of 9 closed
->
-> | # | Item | Status |
-> |---|---|---|
-> | 1–4 | TWO-ENGINE · DURATION-STR · CLUB-SHELL · PLAN-PICKER-TIER | 🟢 v452 · v453 · v454 · **v455** |
-> | 5 | **YOUR-OWN** | 🟠 **Next.** New store fields — **schema first** |
-> | 6 | **QUICK-BUILD** | 🟡 Shell exists; the room's own flow does not |
-> | 7 | **CONSTRAINT-CLAIM** | 🟠 |
-> | 8 | **HATCH-OVERLAP** | 🟠 |
-> | 9 | **PROGRESS** | 🟡 |
->
-> ⚠️ **Not Claude's:** PAR-Q+ (response in hand, held); clinical pack, unsent; HMRC (approved, paperwork pending); legal policies, Graeme's active workstream. `DEV_PANEL_ENABLED` on the **January** checklist per Graeme's decision.
+Supersedes `master_schedule_v299.md`. Remove v299 on upload.
 
 > ### 🟢 CLUB-SHELL SHIPPED — `alongside-v454`, **118 gates**, green from a second independent fresh clone. CLUB item 3 of 9 closed.
 >
