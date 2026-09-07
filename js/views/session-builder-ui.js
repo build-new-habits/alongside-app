@@ -1,6 +1,41 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 06 Sep 2026 v16
+ *
+ * v16 - QUICK-BUILD. The room's own screen. ONE screen, not six.
+ *
+ *   This file walks type, location, zones, duration, equipment,
+ *   buildmode before it builds anything. Right for somebody who came to
+ *   compose; wrong for a room whose card said "Tell me how long. I fill
+ *   the rest in". Answering one question and then being asked six is
+ *   the opposite of what was offered.
+ *
+ *   sessionBuilderPreselect.mode === "quick" enters renderQuickScaffold()
+ *   instead: the coach's chosen type, the length from the chip, the
+ *   place and the kit -- all shown, all changeable, one button. The
+ *   Home card promises "You can change the place and kit next", and
+ *   that has to be true on the VERY NEXT SCREEN or it was decoration.
+ *
+ *   THE TYPE IS NAMED AND CHANGEABLE. A coach that picks silently and
+ *   cannot be corrected is not handing you a frame, it is deciding for
+ *   you -- the thing the four rooms exist to stop.
+ *
+ *   ONE CHOOSER, NOT TWO. The type comes from chooseSessionType(), the
+ *   same chain One to one uses. A simpler local chooser would be a
+ *   second thing to keep in step, which is how the two ENGINES drifted
+ *   for three months.
+ *
+ *   EVERY CHANGE BUTTON DROPS INTO THE REAL STEP. An inline location
+ *   editor would be a second location picker to keep in step with the
+ *   first, and the real step knows things this screen does not.
+ *
+ *   NOT DONE, AND SAID SO: quickInputs holds what the chain consulted
+ *   and nothing reads it. triggerBuild() does not write
+ *   generatedSession -- only persistBuiltSession() does, on a swap --
+ *   so there is no seam to carry it through. QUICK-INPUTS in the master
+ *   schedule. Half-wiring it would look like the record is being kept.
+ *
  * 06 Sep 2026 v15
  *
  * v15 - YOUR-OWN. "Save this one" on the preview, Plan only.
@@ -266,6 +301,8 @@ import { saveSession, savedSessionCount, NAME_MAX } from '../data/saved-sessions
 // composing is free. YOUR-OWN needs it back for a different question:
 // not whether you may build, but whether it is KEPT.
 import { isPremium } from '../auth.js';
+// QUICK-BUILD. The SAME chain One to one uses, not a second simpler one.
+import { chooseSessionType } from '../data/session-choice.js';
 import { router }                         from "../router.js";
 import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, severeZoneToday, zonesWithCoverage } from "../session-builder.js";
 // SWAP-1. The grouping, the soreness levels and the replacement all live
@@ -316,6 +353,18 @@ let phase             = "type";      // "type" | "location" | "zones" | "duratio
 let selectedType      = null;
 let selectedLocation  = "home";      // "home" | "gym" -- never sticky, reset on resetState()
 let selectedDuration  = null;
+// QUICK-BUILD. quickMode is cleared by resetState() with the rest --
+// a mode that survived would turn one tap on Home into a permanent
+// change to how the builder behaves.
+let quickMode         = false;
+// QUICK-BUILD. quickInputs holds what chooseSessionType() consulted.
+// NOT YET WRITTEN ANYWHERE, and that is recorded rather than hidden:
+// triggerBuild() does not write generatedSession -- only
+// persistBuiltSession() does, on a swap -- so there is no existing seam
+// to carry it through. Logged as QUICK-INPUTS in the master schedule.
+// Half-wiring it would be worse than leaving it: a holder nothing reads
+// looks like the record is being kept.
+let quickInputs       = null;
 // D3, 13 Aug 2026. Seeded from the store rather than hardcoded, and
 // written back on every choice. Persona 2.15 trains four times a week
 // and wants "Mostly strength" every time; she was re-picking it from
@@ -422,6 +471,7 @@ export function render() {
   if (phase === "type")       return renderTypePicker();
   if (phase === "location")   return renderLocationStep();
   if (phase === "zones")      return renderZonePicker();
+  if (phase === "quick")      return renderQuickScaffold();
   if (phase === "duration")   return renderDurationPicker();
   if (phase === "equipment")  return renderEquipmentCheck();
   if (phase === "buildmode")  return renderBuildModeStep();
@@ -465,6 +515,79 @@ function _exerciseMeta(ex, opts = {}) {
     parts.push(`rest ${Number(ex.rest)}s${ex.restStyle === "active" ? " active" : ""}`);
   }
   return parts.join(" &nbsp; ");
+}
+
+/**
+ * QUICK-BUILD, 06 Sep 2026. The room's own screen. ONE screen, not six.
+ *
+ * The builder walks type, location, zones, duration, equipment,
+ * buildmode. That is right for somebody who came to compose. It is wrong
+ * for a room whose whole offer was "tell me how long and I fill the rest
+ * in" -- answering one question and then being asked six is the opposite
+ * of what the card said.
+ *
+ * SO EVERY ASSUMPTION IS SHOWN BEFORE THE BUILD, NOT DISCOVERED AFTER
+ * IT. The type the coach picked, the length from the chip, the place and
+ * the kit -- all on screen, all changeable, one button. The Home card
+ * already said "You can change the place and kit next"; this is that
+ * promise, and it has to be kept on the very next screen or it was
+ * decoration.
+ *
+ * THE TYPE IS NAMED AND CHANGEABLE. A coach that picks silently and
+ * cannot be corrected is not a coach handing you a frame, it is a coach
+ * deciding for you -- which is the thing the four rooms exist to stop.
+ */
+function renderQuickScaffold() {
+  const typeMeta = SESSION_TYPES.find(x => x.id === selectedType);
+  const kit = Array.isArray(store.get("equipment")) ? store.get("equipment") : [];
+  const kitLabel = kit.length === 0 || (kit.length === 1 && kit[0] === "none")
+    ? "Nothing needed"
+    : `${kit.length} thing${kit.length === 1 ? "" : "s"} you have`;
+
+  return `
+    <div class="view session-builder-view">
+
+      <div class="workout-header">
+        <button class="btn btn-ghost" id="sb-quick-back" aria-label="Back to Today">
+          &larr; Back
+        </button>
+        <span class="workout-header-title">Here's what I'd give you</span>
+      </div>
+
+      <p class="text-secondary">Change anything that isn't right.</p>
+
+      <ul class="sb-quick__list">
+        <li class="sb-quick__row">
+          <span class="sb-quick__label">Session</span>
+          <button class="btn btn-secondary sb-quick__change" id="sb-quick-type">
+            ${typeMeta ? typeMeta.label : "Full Body"}
+          </button>
+        </li>
+        <li class="sb-quick__row">
+          <span class="sb-quick__label">Length</span>
+          <button class="btn btn-secondary sb-quick__change" id="sb-quick-duration">
+            ${selectedDuration ? `${selectedDuration} min` : "You choose"}
+          </button>
+        </li>
+        <li class="sb-quick__row">
+          <span class="sb-quick__label">Where</span>
+          <button class="btn btn-secondary sb-quick__change" id="sb-quick-location">
+            ${selectedLocation === "gym" ? "At the gym" : "At home"}
+          </button>
+        </li>
+        <li class="sb-quick__row">
+          <span class="sb-quick__label">Kit</span>
+          <button class="btn btn-secondary sb-quick__change" id="sb-quick-equipment">
+            ${kitLabel}
+          </button>
+        </li>
+      </ul>
+
+      <button class="btn btn-primary btn-large btn-full" id="sb-quick-build">
+        Build it
+      </button>
+    </div>
+  `;
 }
 
 function renderLocationStep() {
@@ -1543,6 +1666,8 @@ function persistBuiltSession() {
 }
 
 function resetState() {
+  quickMode   = false;
+  quickInputs = null;
   phase                = "type";
   selectedType         = null;
   selectedLocation      = "home";
@@ -1587,6 +1712,22 @@ export function onMount() {
     if (pre && Number.isFinite(Number(pre.durationMins)) && Number(pre.durationMins) > 0) {
       selectedDuration = Number(pre.durationMins);
       entryDoor = pre.returnTo || entryDoor;
+      // QUICK-BUILD, 06 Sep 2026. The room's whole proposition is "tell
+      // me how long and I fill the rest in". Walking six question
+      // phases after answering one question is the opposite of what the
+      // card offered, so quick mode goes to a single scaffold screen.
+      //
+      // The coach picks the type, through the SAME chain One to one
+      // uses -- the class you are in, then what the arc says is thin,
+      // then what has not come up lately. A second, simpler chooser
+      // here would be a second thing to keep in step with that one.
+      if (pre.mode === "quick") {
+        quickMode = true;
+        const chosen = chooseSessionType();
+        selectedType = chosen.sessionType;
+        quickInputs  = { ...chosen.inputs, chosenType: chosen.sessionType, reason: chosen.reason };
+        phase = "quick";
+      }
       if (!pre.type) {
         store.set("sessionBuilderPreselect", null);
       }
@@ -1972,6 +2113,33 @@ export function onMount() {
       swapIndex = null;
       rerender();
     });
+  });
+
+  // ── QUICK-BUILD, 06 Sep 2026 ────────────────────────────────────────
+  // Each "change" button drops into the ONE existing step for that
+  // answer and comes back here. Reusing the real steps rather than
+  // building inline editors: a second location picker would be a second
+  // thing to keep in step with the first, and the location step already
+  // knows things this screen does not.
+  document.getElementById("sb-quick-build")?.addEventListener("click", () => {
+    triggerBuild();
+  });
+  document.getElementById("sb-quick-type")?.addEventListener("click", () => {
+    phase = "type"; rerender();
+  });
+  document.getElementById("sb-quick-duration")?.addEventListener("click", () => {
+    phase = "duration"; rerender();
+  });
+  document.getElementById("sb-quick-location")?.addEventListener("click", () => {
+    phase = "location"; rerender();
+  });
+  document.getElementById("sb-quick-equipment")?.addEventListener("click", () => {
+    phase = "equipment"; rerender();
+  });
+  // Back goes to the door that sent us, not one step into a flow the
+  // person never walked -- BACK-DOOR, 31 Aug.
+  document.getElementById("sb-quick-back")?.addEventListener("click", () => {
+    router.navigate(entryDoor || "today");
   });
 
   // YOUR-OWN. Wired here, alongside the other preview buttons, so it
