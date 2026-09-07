@@ -1,0 +1,133 @@
+# Alongside: Move — Guided Class content programme
+## 06 Sep 2026 v1
+
+Build New Habits | The room where somebody else already decided.
+
+Specification. No content exists yet. Production order at §9.
+
+---
+
+## 1. What is behind that door today
+
+**Nothing followable.** All eight entries in `programmes.js` have an empty `sessionSequence`. What a "programme" actually holds is four phases, each carrying a **bias** — `intensityBias: 'gentle'`, `focusBias: ['mobility','strength']` — plus a label, a coach message and milestones.
+
+So a class is a twelve-week *tuning of the generator*, not a course. **CLUB-SHELL's card copy — "A set course. Same shape each week" — is a promise the data cannot keep.** It was written against a room nobody had looked inside.
+
+Graeme, 06 Sep, on device: *"There is no Class content to follow. No programme."* There is not.
+
+🔴 **Immediate, independent of everything below:** the card copy must stop describing a course until one exists. See §10.
+
+---
+
+## 2. Why this room needs real content and cannot generate it
+
+Every other room generates. **A class is the one thing where somebody else already decided and you just turn up and follow.**
+
+That is a different psychological offer, not a different filter — no decisions, no configuring, be told. For a lot of this audience it is the easier one, and it is the reason the door feels empty: it promises the single thing the generator structurally cannot do.
+
+**A generated class is a contradiction.** A class is fixed, repeatable, and made by someone.
+
+---
+
+## 3. Scope: three formats, and the reason is safety not effort
+
+**Mindfulness · Yoga and Pilates · Stretching.** Circuits later; spinning not at all for now.
+
+🔴 **These are the three formats where being FIXED is safe.** A fixed spinning class is a hazard for somebody mid-flare. A fixed stretching sequence is not. **Dropping circuits is the format matching the audience, not a compromise on ambition.**
+
+🔵 They are also the three things mainstream fitness does worst for people it has already failed — so this is differentiating rather than a thinner version of a gym app.
+
+**Circuits, when they come**, draw on the equipment the person has recorded and stay a separate decision. Recorded here so the omission is deliberate rather than forgotten.
+
+---
+
+## 4. 🔴 SCRIPT FIRST. Screens are a rendering of the script, not a substitute for it.
+
+Beta is screen-guided. Voice follows, hopefully by launch.
+
+**Write the spoken script now and render it to screen.** If short screen cues are written first and voice added later, everything gets rewritten — **voice needs pacing, breath and silence, and it reads completely differently on the page.**
+
+🟢 **The beta content then IS the launch content, and the voice pass is production rather than a rewrite.** ElevenLabs is the intended route.
+
+⚫ **The screen renders the script's beats, not a summary of them.** A class that reads as a bullet list on screen and a flowing script in audio is two products.
+
+---
+
+## 5. 🔴 NO BEGINNER / INTERMEDIATE / ADVANCED
+
+Those label **the person**. This product does not rank people.
+
+*Advanced* is a fitness-culture word for an audience defined by having been failed by fitness culture. In practice many will pick *beginner* permanently, and some will overreach to prove something. **Both are failures of the label, not of the person.**
+
+🟢 **Label what the class ASKS OF YOU, and reuse the vocabulary that is already live:** `intensityBias` is **`gentle` / `moderate` / `challenging`** across `programmes.js` and the generator.
+
+⚫ **A parallel ladder would be a second vocabulary to keep in step with the first — DATA-1b, applied to content instead of code.**
+
+---
+
+## 6. 🔴 VISIBLE, NOT LOCKED
+
+The whole twelve weeks is visible from the start. **The coach says which one is next; nothing is withheld until a date.**
+
+Releasing one at a time is a gate on the person, and it is **streak-shaped**: miss a week and you are behind. It is also the fault CLUB spec v2 §3.1 reversed — *"find out by doing" is an implicit demand*, and for a neurodivergent user **knowing what is coming is the thing that lowers the barrier.**
+
+🟢 **Skipping costs nothing.** No "you missed one", no rescheduling, no catch-up. A course that punishes a skipped week is a streak with a syllabus.
+
+---
+
+## 7. The exit route already exists
+
+Graeme: *"if they don't wanna do yoga, then they can go, nah."*
+
+**No new selector is needed.** One to one, Your own and Quick build are all on Home, one tap away. What Guided class needs is only that **stepping out today costs nothing** — which is §6.
+
+⚫ **Building a second chooser here would be a corridor, and a second thing to keep in step with the four rooms.**
+
+---
+
+## 8. 🔴 THE MAPPING UNIT IS THE STRAND, NOT THE AIM
+
+Measured: **33 aims, 30 strands.** Strands are shared — `pacing`, `trusting-body`, `getting-going`, `self-kindness` recur across many aims.
+
+So: **a class declares which strands it serves. A twelve-week programme is a path through the strands the person's arc actually contains.** That makes 33 aims coverable without 33 programmes.
+
+**Map DOWNWARD from the arcs.** Starting from the content already to hand produces classes that fit the data model rather than classes somebody needs.
+
+### The 30 strands
+
+`hip-range` · `ankle-range` · `hamstring-range` · `upper-back-range` · `neck-shoulders` · `leg-strength` · `upper-strength` · `trunk-strength` · `hip-hinge` · `aerobic-base` · `balance` · `getting-going` · `confidence-floor` · `pacing` · `being-outside` · `winding-down` · `meeting-people` · `self-kindness` · `steadiness` · `trusting-body` · `not-overdoing` · `showing-up` · `at-home-in-body` · `power` · `sport-specific` · `load-tolerance` · `back-resilience` · `shoulder-health` · `keep-walking` · `gentle-capacity`
+
+⚫ **Not every strand needs a class.** `meeting-people`, `being-outside` and `sport-specific` are not served by a mat. Coverage is a decision per strand, recorded, not an obligation.
+
+---
+
+## 9. What already exists and must be extended, not replaced
+
+`js/data/practice-library.js` holds **4 groups and 28 standalone practices**, already carrying `position`, `impact` and `balanceDemand` — the fields the safety filter reads.
+
+🔴 **Improvements extend what exists. The class library is not a second content system beside this one.** A class is a *sequence* of practices with pacing and a script; the practices themselves should come from here, or the safety filtering has to be built twice.
+
+---
+
+## 10. Order
+
+| # | Item | Notes |
+|---|---|---|
+| 1 | 🔴 **GUIDED-COPY** | Card copy stops describing a course. *"A twelve-week shape. I adjust your sessions to fit it."* **Small, pre-beta, independent of all content work** |
+| 2 | **Strand coverage decision** | Which of the 30 get classes, which do not, recorded per strand with the reason |
+| 3 | **Class data contract** | `strands[]`, `intensityBias`, `format`, `durationMins`, `practiceIds[]`, `script[]`. **Schema before content** |
+| 4 | **One strand, properly** | Six to eight classes forming a real progression. **A library with three classes is worse than none** — it promises a category and delivers a sample |
+| 5 | **Programme assembly** | A path through an arc's strands |
+| 6 | **Screen renderer** | Renders the script's beats |
+| 7 | **Voice pass** | Production, not rewrite |
+| 8 | **Circuits** | Equipment-driven, separate decision |
+
+---
+
+## 11. Open, and needing Graeme
+
+🟡 **How many classes is the beta minimum?** §10 item 4 says one strand covered properly. **Which strand** is a product call — the most-reused one serves the most aims; the one closest to Graeme's own arc gets tested hardest.
+
+🟡 **Does a class have a lighter version?** A generated session adapts to the check-in. **A class cannot — that is what makes it a class.** Either each class carries a gentler variant, which roughly doubles the writing, or a bad day routes the person to another room. **The second is cheaper and more honest; the first is kinder.** Not resolved here.
+
+🟡 **Timeline.** This is weeks of writing, and it is the work most likely to eat a date. Currently placed **between beta and the November soft launch**, not before beta.

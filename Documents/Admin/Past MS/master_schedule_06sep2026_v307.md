@@ -1,53 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v308
+## 06 Sep 2026 v307
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v307.md`. Remove v307 on upload.
-
-> ### 🟡 GUIDED CLASS — CONTENT PROGRAMME SPECIFIED. `Documents/Admin/alongside_spec_guided_class_06sep2026_v1.md`. Agreed with Graeme 06 Sep 2026. **No content exists.**
->
-> #### 🔴 The door promises something that is not behind it
->
-> **All eight entries in `programmes.js` have an empty `sessionSequence`.** A "programme" is four phases each carrying a bias — `intensityBias`, `focusBias` — plus a label, a coach message and milestones. **A class is a twelve-week tuning of the generator, not a course.**
->
-> CLUB-SHELL's card copy — *"A set course. Same shape each week"* — **was written against a room nobody had looked inside.** Graeme, on device: *"There is no Class content to follow. No programme."*
->
-> 🟠 **GUIDED-COPY is pre-beta and independent of all content work:** the card must stop describing a course until one exists.
->
-> #### 🟢 Why this room cannot generate its way out
->
-> Every other room generates. **A class is the one thing where somebody else already decided and you just turn up and follow** — no decisions, no configuring, be told. **A generated class is a contradiction**, and that is precisely why the door feels empty.
->
-> #### 🔴 Scope: mindfulness, yoga and Pilates, stretching. Circuits later, spinning not at all.
->
-> **These are the three formats where being FIXED is safe.** A fixed spinning class is a hazard for somebody mid-flare; a fixed stretching sequence is not. **Dropping circuits is the format matching the audience, not a compromise.** They are also the three things mainstream fitness does worst for the people it has already failed.
->
-> #### 🔴 Four decisions taken
->
-> | Decision | Reason |
-> |---|---|
-> | **SCRIPT FIRST** — write the spoken script, render it to screen | Voice needs pacing, breath and silence and reads differently on the page. Screen cues written first get **entirely rewritten**. This way the beta content IS the launch content and the voice pass is production |
-> | **NO beginner / intermediate / advanced** | Those label **the person**, and this product does not rank people. *Advanced* is a fitness-culture word for an audience defined by having been failed by it. **Reuse `intensityBias`: `gentle` / `moderate` / `challenging`, already live** — a parallel ladder is DATA-1b applied to content |
-> | **VISIBLE, NOT LOCKED** | Releasing one at a time is a gate on the person and is **streak-shaped**. It is also the fault CLUB spec v2 §3.1 reversed: **knowing what is coming is what lowers the barrier**. Skipping costs nothing — *a course that punishes a skipped week is a streak with a syllabus* |
-> | **NO new exit selector** | The other three rooms are already one tap away on Home. A second chooser here would be a corridor |
->
-> #### 🔴 THE MAPPING UNIT IS THE STRAND, NOT THE AIM
->
-> Measured: **33 aims, 30 strands**, and strands are shared. **A class declares which strands it serves; a twelve-week programme is a path through the strands the person's arc contains.** That makes 33 aims coverable without 33 programmes.
->
-> **Map downward from the arcs.** Starting from content already to hand produces classes that fit the data model rather than classes somebody needs. ⚫ **Not every strand needs a class** — `meeting-people`, `being-outside` and `sport-specific` are not served by a mat, and coverage is a recorded decision per strand, not an obligation.
->
-> #### 🔴 Extend `practice-library.js`, do not build beside it
->
-> **4 groups and 28 standalone practices already exist**, carrying `position`, `impact` and `balanceDemand` — the fields the safety filter reads. **A class is a sequence of practices with pacing and a script.** A separate content system would mean building the safety filtering twice.
->
-> #### 🟡 Open, and needing Graeme
->
-> **Which strand goes first.** The most-reused serves the most aims; the one closest to Graeme's own arc gets tested hardest.
->
-> **Does a class have a lighter version?** A generated session adapts to the check-in; **a class cannot — that is what makes it a class.** Either each class carries a gentler variant, roughly doubling the writing, or a bad day routes to another room. **The second is cheaper and more honest; the first is kinder.**
->
-> ⚠️ **Placed between beta and the November soft launch, not before beta.** This is weeks of writing and it is the work most likely to eat a date.
+Supersedes `master_schedule_v306.md`. Remove v306 on upload.
 
 > ### 🟢 QUICK-INPUTS SHIPPED — `alongside-v461`, **124 gates**, green from a second independent fresh clone. Claude's pre-beta list is now empty.
 >
