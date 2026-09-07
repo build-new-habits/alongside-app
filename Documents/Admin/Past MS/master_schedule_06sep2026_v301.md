@@ -1,56 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v302
+## 06 Sep 2026 v301
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v301.md`. Remove v301 on upload.
-
-> ### 🟢 YOUR-OWN SHIPPED — `alongside-v456`, **120 gates**, green from a second independent fresh clone. CLUB item 5 of 9 closed.
->
-> `store.js` v64 → **v65**. `Schema.md` v1.49 → **v1.50**. `today.js` v27 → **v28**. `session-builder-ui.js` v14 → **v15**. New `js/data/saved-sessions.js`. Blueprint v49 → **v50**. New gate `tools/verify-yourown.mjs`.
->
-> **The room where the coach leads least and the person is the author.** The case on record is Graeme's daughter, a national-standard sprinter, writing her programme on paper — SWAP-1 caught the conflation between deleting the flat candidate picker and deleting self-authoring, and this is the part that was kept.
->
-> #### 🔴 IDS, NOT OBJECTS — the property this gate mostly exists for
->
-> Storing whole exercise objects would **freeze a copy of the library inside somebody's saved session**. A safety correction, a changed contraindication, a fixed `rest` value — none would ever reach it. **A saved session would become a private fork of the exercise database that no gate can see.**
->
-> Ids resolve against the live library at start. **An id that has since gone is dropped and the session still starts** — refusing would punish somebody for a library change they did not make.
->
-> #### 🔴 The name is the person's own words and is never generated
->
-> An empty name is **rejected**, not quietly replaced with "Session 3". **A helpfully auto-named session takes back the one thing this room is for.** Trimmed, capped at 60 — capped rather than rejected for length.
->
-> #### 🟢 Tier, checked at BOTH ends
->
-> **Free composes freely.** R4 (20 Aug) reversed TIER-G on exactly that point: *composing is how somebody whose body the default does not fit gets a session they can actually do.* **What the Plan buys is that it is KEPT.**
->
-> The **reader** is gated as well as the writer, or a downgraded account still reads a list it can no longer add to.
->
-> #### 🟢 Decisions worth keeping
->
-> - **Saving lives in a module, not `store.set()` at the call sites.** Three rules must hold on every write — tier, name, ids-not-objects — and a view will get one right and miss another. **That is how `exercisePreferences` and `todayIntensity` each ended up with a writer that disagreed with its reader.**
-> - **Not offered on Gentle Care.** That is a response to today, not a session somebody would want again, and offering to keep it would misread what it is.
-> - 🔴 **The coach does not read `savedSessions`.** Saving something says what you wanted once, **not what you are like**. The gate asserts `chooseSessionType()` never touches it.
-> - **Two-step save.** "Save this one" opens the field; "Save it" commits. A single button would name the session for the person.
-> - **The counted button:** *"Your other 2 sessions"*, never *"More"*. **A count tells you whether it is worth the tap; "More" makes you tap to find out.**
->
-> #### ⚠️ `verify-decl1` caught a template as an assignment
->
-> `maxlength="${NAME_MAX}"` read as an assignment to an undeclared identifier. Set as a **property in the wiring** instead — which also puts the cap beside the code that enforces it rather than stating it in two places that can drift.
->
-> Seven deliberate breaks, seven caught red.
-
-> ### 📋 CLUB build order — 5 of 9 closed
->
-> | # | Item | Status |
-> |---|---|---|
-> | 1–5 | TWO-ENGINE · DURATION-STR · CLUB-SHELL · PLAN-PICKER-TIER · YOUR-OWN | 🟢 v452 · v453 · v454 · v455 · **v456** |
-> | 6 | **QUICK-BUILD** | 🟠 **Next.** Shell exists; the room's own flow does not |
-> | 7 | **CONSTRAINT-CLAIM** | 🟠 |
-> | 8 | **HATCH-OVERLAP** | 🟠 |
-> | 9 | **PROGRESS** | 🟡 |
->
-> ⚠️ **Not Claude's:** PAR-Q+ (response in hand, held); clinical pack, unsent; HMRC (approved, paperwork pending); legal policies, Graeme's active workstream. `DEV_PANEL_ENABLED` on the **January** checklist.
+Supersedes `master_schedule_v300.md`. Remove v300 on upload.
 
 > ### 🟢 PLAN-PICKER-TIER SHIPPED — `alongside-v455`, **119 gates**, green from a second independent fresh clone. CLUB item 4 of 9 closed.
 >
