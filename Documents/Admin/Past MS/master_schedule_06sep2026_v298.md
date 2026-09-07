@@ -1,60 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v299
+## 06 Sep 2026 v298
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v298.md`. Remove v298 on upload.
-
-> ### 🟢 DURATION-STR SHIPPED — `alongside-v453`, **117 gates**, green from a second independent fresh clone. CLUB item 2 of 9 closed.
->
-> 🔴 **THE ITEM AS WRITTEN DESCRIBED A BUG THAT NO LONGER EXISTED.** `calculateDuration()` and `applyDurationCap()` live only inside `workoutGenerator.js`, reachable only through `generateWorkout()`, called only from `generateDailyOptions()` — which **TWO-ENGINE left with zero live callers the day before**. A session spent on it would have fixed unreachable code.
->
-> #### 🔴 The live fault underneath it
->
-> `core-session.js` and `yoga-session.js` both gated the in-session rest timer on `ex.rest > 0`. **`"60s" > 0` is `false`.** On any of the 99 text entries the countdown **silently never started** — no timer, no prompt, straight on to the next set, no error anywhere. **That lands hardest on the people relying on the app to hold their pacing.**
->
-> #### 🟢 What shipped
->
-> **99 entries migrated to numeric seconds** across `cardio.js`, `gym.js`, `seated.js`. Both timers now coerce via `Number.isFinite` rather than comparing raw, so a future non-numeric value means **no timer rather than a throw part-way through somebody's session**.
->
-> 🔵 **`"active"` was moved, not stripped.** *Keep moving through the rest rather than stopping* is coaching content, so it went to its own `restStyle` field and the card says it in words. Migrating naively would have deleted it from four exercises.
->
-> **Display fixed in the same pass.** The numeric entries printed as `"45 rest"` with no unit, while the text entries they replaced read correctly by accident — **the broken half was the one that looked right**, which is why nobody caught it.
->
-> #### 🟢 `verify-contract` found two the grep had missed
->
-> `rest` and `restStyle` are now declared in `field-contract.js`. **Three formats coexisted precisely because the field had no contract.** Declaring it immediately turned the contract gate red on two more comparisons against the old text form: `morning-session.js` against `"-"` and `session-builder-ui.js` against `"0s"`. **The second would have started printing `"rest 0"` on every zero-rest exercise** — a fault introduced by this very migration, caught by the gate rather than by a person.
->
-> Six deliberate breaks, six caught red.
-
-> ### 🟡 DEV_PANEL_ENABLED — GRAEME'S DECISION, 06 Sep 2026. It stays for beta.
->
-> **Graeme:** *"It's hidden and I doubt anyone knows about it. It's for testing purposes."*
->
-> **The factual position, so a later session does not re-raise it as a crisis or forget it entirely.** The panel is a **tier switcher only** — free ↔ Plan — behind a triple-tap on the version number. A1 (13 Aug) already removed the gesture from user-facing copy, which was the actual exposure. It is genuinely useful right now, since free and Plan diverge and testing both needs a switch.
->
-> ⚠️ **It must be false before PUBLIC launch, not before beta.** At that point it is a paid-tier bypass in shipped code. **Carried to the January launch checklist, not the beta one.**
-
-> ### 📋 CLUB build order — 2 of 9 closed
->
-> | # | Item | Status |
-> |---|---|---|
-> | 1 | **TWO-ENGINE** | 🟢 Shipped, `alongside-v452` |
-> | 2 | **DURATION-STR** | 🟢 **Shipped, `alongside-v453`** |
-> | 3 | **CLUB-SHELL** | 🟠 **Next.** Four cards, five slots, both tap targets |
-> | 4 | **PLAN-PICKER-TIER** | 🟡 |
-> | 5 | **YOUR-OWN** | 🟡 New store fields, schema first |
-> | 6 | **QUICK-BUILD** | 🟡 |
-> | 7 | **CONSTRAINT-CLAIM** | 🟠 |
-> | 8 | **HATCH-OVERLAP** | 🟠 |
-> | 9 | **PROGRESS** | 🟡 |
->
-> ⚠️ **Not Claude's, and not helped by a later beta:** PAR-Q+ (response in hand, held); the clinical pack, unsent; HMRC (approved, paperwork pending); legal policies, Graeme's active workstream.
-
-> ### ⚫ REPORTING FORMAT — Graeme's instruction, 06 Sep 2026
->
-> *"Most of the time I just need to know was it done yes or no? What's next?"*
->
-> **Done / next / blocking. No findings tour, no code, no debrief.** Two exceptions only: **a decision genuinely needed from Graeme**, and **something previously reported that turned out to be wrong** — both in a line or two. The detail belongs in this document and in commit messages, which is what they are for.
+Supersedes `master_schedule_v297.md`. Remove v297 on upload.
 
 > ### 🟢 TWO-ENGINE SHIPPED — `alongside-v452`, **116 gates**, all green from a second independent fresh clone. CLUB build order item 1 of 9 closed.
 >
