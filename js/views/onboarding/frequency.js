@@ -120,7 +120,9 @@ export function FrequencyView(router) {
     // Continue
     container.querySelector("[data-action='continue']")?.addEventListener("click", () => {
       store.set("strategicGoal.weeklySessionTarget", selected);
-      router.navigate("onboarding/plan-select");
+      // PLAN-PICKER-TIER. Retired route. Kept reachable only so a
+      // bookmarked or resumed session does not dead-end.
+      router.navigate("onboarding/complete");
     });
   }
 

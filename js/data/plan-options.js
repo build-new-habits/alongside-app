@@ -1,8 +1,27 @@
 /**
  * js/data/plan-options.js
- * 22 Aug 2026 v1
+ * 06 Sep 2026 v2
  *
- * CHOOSER-1. Shared plan-option building and card markup.
+ * v2 - COMMIT-COPY. Three phrases on the picker, all off-voice.
+ *
+ *   "3 sessions a week" -> "aiming for 3 sessions a week". A bare number
+ *   reads as a TARGET, which is a number you can fall behind on -- the
+ *   shape of a streak, on a product that has no streaks by design. The
+ *   number is unchanged; what changed is whether it is a quota or an
+ *   intention.
+ *
+ *   "Full commitment" / "For when you are ready to push" -> "More often"
+ *   / "More sessions, so things build a bit quicker. Only if that suits
+ *   you." The coach voice is Nurturing only, permanently, and this
+ *   product does not push. "Commitment" also frames the weekly number as
+ *   a promise that can be broken.
+ *
+ *   "Highly Recommended" -> "Suggested for you". THE RECOMMENDATION
+ *   SURVIVES, and that is deliberate: a clear recommendation reduces
+ *   decision load, which this audience needs most. The caps and the gold
+ *   band were the problem, not recommending.
+ *
+ * v1 - CHOOSER-1. Shared plan-option building and card markup.
  *
  * Extracted from onboarding/plan-select.js so that the post-onboarding
  * chooser (views/programme-select.js) can present exactly the same three
@@ -45,12 +64,21 @@ export function buildPlanOptions() {
 
   if (!best) return [];
 
-  const plural = (n) => `${n} session${n !== 1 ? "s" : ""} a week`;
+  // COMMIT-COPY, 06 Sep 2026. Was "3 sessions a week", which reads as a
+  // TARGET -- a number you can fall behind on, which is the shape of a
+  // streak on a product that has no streaks by design. "Aiming for"
+  // makes it an intention rather than a quota, and the number is the
+  // same number.
+  const plural = (n) => `aiming for ${n} session${n !== 1 ? "s" : ""} a week`;
 
   return [
     {
       programme:    best,
-      badge:        "Highly Recommended",
+      // COMMIT-COPY, 06 Sep 2026. Was "Highly Recommended", set in caps
+      // in a gold band. The banner was the problem; recommending was
+      // not -- a clear recommendation reduces decision load, which this
+      // audience needs most. Sentence case, said plainly.
+      badge:        "Suggested for you",
       variant:      "recommended",
       tagOverride:  null,
       noteOverride: null,
@@ -61,15 +89,20 @@ export function buildPlanOptions() {
       badge:        null,
       variant:      "gentle",
       tagOverride:  "Gentle start",
-      noteOverride: "Fewer sessions, more recovery time. The same destination, at your pace.",
+      noteOverride: "Fewer sessions, more room to recover. Same place, your pace.",
       weeklyNote:   plural(Math.max(1, weeklyTarget - 1)),
     },
     {
       programme:    best,
       badge:        null,
       variant:      "committed",
-      tagOverride:  "Full commitment",
-      noteOverride: "More sessions, faster progression. For when you are ready to push.",
+      // COMMIT-COPY. Was "Full commitment" / "For when you are ready to
+      // push". Off-voice on both counts: the coach voice is Nurturing
+      // only, permanently, and this product does not push. "Commitment"
+      // also frames a weekly number as a promise you can break, which is
+      // streak-shaped on a product that has no streaks by design.
+      tagOverride:  "More often",
+      noteOverride: "More sessions, so things build a bit quicker. Only if that suits you.",
       weeklyNote:   plural(Math.min(6, weeklyTarget + 1)),
     },
   ];
