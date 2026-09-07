@@ -136,7 +136,7 @@ export const SEATED = [
     perSide: false,
     sets: 3,
     reps: '10',
-    rest: '45s',
+    rest: 45,
     tempo: 'Three seconds pulling, three returning',
     instructions: [
       'Sit tall, both feet flat or footplates set, hands out in front at chest height',
@@ -176,7 +176,7 @@ export const SEATED = [
     perSide: false,
     sets: 3,
     reps: '10',
-    rest: '30s',
+    rest: 30,
     tempo: 'Hold three seconds',
     instructions: [
       'Sit tall with your arms relaxed at your sides',
@@ -215,7 +215,7 @@ export const SEATED = [
     perSide: false,
     sets: 3,
     reps: '8',
-    rest: '45s',
+    rest: 45,
     tempo: 'Four seconds down, two up',
     instructions: [
       'Sit toward the front of the chair, feet flat and hip-width apart if you can place them',
@@ -254,7 +254,7 @@ export const SEATED = [
     perSide: false,
     sets: 3,
     reps: '8',
-    rest: '45s',
+    rest: 45,
     tempo: 'Three seconds pressing',
     instructions: [
       'Sit tall with your hands on the arms of the chair, or flat on the seat beside your hips',
@@ -293,7 +293,7 @@ export const SEATED = [
     perSide: true,
     sets: 2,
     reps: '30 seconds',
-    rest: '15s',
+    rest: 15,
     tempo: 'Hold still',
     instructions: [
       'Sit toward the edge of the chair, turned slightly to the right so your left hip is near the corner',
@@ -332,7 +332,7 @@ export const SEATED = [
     perSide: false,
     sets: 2,
     reps: '5 breaths',
-    rest: '20s',
+    rest: 20,
     tempo: 'Slow, with the breath',
     instructions: [
       'Sit tall with your feet flat or supported and your hands resting in your lap',
@@ -375,7 +375,7 @@ export const SEATED = [
     perSide: false,
     sets: 1,
     tempo: 'Steady, continuous',
-    rest: '0s',
+    rest: 0,
     instructions: [
       'Sit tall with your back supported and your shoulders relaxed down',
       'Bring both hands up in front of your chest, elbows bent',
@@ -414,7 +414,7 @@ export const SEATED = [
     perSide: false,
     sets: 4,
     reps: '30 seconds',
-    rest: '30s',
+    rest: 30,
     instructions: [
       'Sit tall, away from the back of the chair if you can do so comfortably',
       'Bring both fists up in front of your chin, elbows tucked in',
@@ -453,7 +453,7 @@ export const SEATED = [
     perSide: false,
     sets: 1,
     tempo: 'Steady',
-    rest: '0s',
+    rest: 0,
     instructions: [
       'Sit tall with both feet flat on the floor',
       'Lift one knee as high as is comfortable, then lower it under control',
@@ -496,7 +496,7 @@ export const SEATED = [
     perSide: false,
     sets: 3,
     reps: '10',
-    rest: '60s',
+    rest: 60,
     tempo: '2-1-3',
     instructions: [
       'Sit tall with a dumbbell in each hand, held just above shoulder height',
@@ -536,7 +536,7 @@ export const SEATED = [
     perSide: false,
     sets: 3,
     reps: '12',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-3',
     instructions: [
       'Pass a band around the back of your chair at chest height, or anchor it behind you',
@@ -576,7 +576,7 @@ export const SEATED = [
     perSide: false,
     sets: 3,
     reps: '12',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-3',
     instructions: [
       'Sit tall with a light dumbbell in each hand, arms relaxed at your sides',
@@ -616,7 +616,7 @@ export const SEATED = [
     perSide: false,
     sets: 3,
     reps: '12',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-3',
     instructions: [
       'Sit tall with a dumbbell in each hand, arms hanging at your sides, palms facing forwards',
@@ -656,7 +656,7 @@ export const SEATED = [
     perSide: false,
     sets: 3,
     reps: '12',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-3',
     instructions: [
       'Sit tall holding one dumbbell in both hands, gripping around one end',
@@ -700,7 +700,7 @@ export const SEATED = [
     perSide: true,
     sets: 3,
     reps: '10 each side',
-    rest: '45s',
+    rest: 45,
     tempo: '2-2-2',
     instructions: [
       'Anchor a band at chest height to one side of you',
@@ -740,7 +740,7 @@ export const SEATED = [
     perSide: true,
     sets: 3,
     reps: '10 each side',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-2',
     instructions: [
       'Sit tall, away from the chair back if you can, feet flat on the floor',
@@ -780,7 +780,7 @@ export const SEATED = [
     perSide: true,
     sets: 3,
     reps: '10 each side',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-3',
     instructions: [
       'Sit tall with both feet flat and your hands resting lightly on the chair either side of you',
@@ -820,7 +820,7 @@ export const SEATED = [
     perSide: true,
     sets: 3,
     reps: '10 each side',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-2',
     instructions: [
       'Sit tall with both feet flat and your hands resting on your thighs',
@@ -869,7 +869,7 @@ SEATED.push(
     perSide: true,
     sets: 3,
     reps: '12 each side',
-    rest: '45s',
+    rest: 45,
     tempo: '2-2-3',
     instructions: [
       'Sit tall with both feet flat on the floor and your knees bent to roughly ninety degrees',
@@ -909,7 +909,7 @@ SEATED.push(
     perSide: false,
     sets: 3,
     reps: '15',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-2',
     instructions: [
       'Sit tall with a looped band around both legs, just above the knees',
@@ -956,7 +956,7 @@ SEATED.push(
     perSide: false,
     sets: 3,
     reps: '20',
-    rest: '30s',
+    rest: 30,
     tempo: '2-1-2',
     instructions: [
       'Sit tall with both feet flat on the floor',
@@ -996,7 +996,7 @@ SEATED.push(
     perSide: true,
     sets: 3,
     reps: '12 each side',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-3',
     instructions: [
       'Anchor a band in front of you at floor level and loop the other end around one ankle',
@@ -1046,7 +1046,7 @@ SEATED.push(
     perSide: false,
     sets: 3,
     reps: '8',
-    rest: '60s',
+    rest: 60,
     tempo: '3-1-3',
     instructions: [
       'Sit towards the front of a sturdy chair with both feet flat and slightly behind your knees',
@@ -1087,7 +1087,7 @@ SEATED.push(
     perSide: false,
     sets: 3,
     reps: '15',
-    rest: '45s',
+    rest: 45,
     tempo: '2-2-3',
     instructions: [
       'Stand behind a sturdy chair with both hands resting on the back of it',
@@ -1127,7 +1127,7 @@ SEATED.push(
     perSide: true,
     sets: 3,
     reps: '12 each side',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-3',
     instructions: [
       'Stand behind a sturdy chair with both hands resting on the back',
@@ -1167,7 +1167,7 @@ SEATED.push(
     perSide: false,
     sets: 1,
     tempo: 'Steady',
-    rest: '0s',
+    rest: 0,
     instructions: [
       'Stand behind a sturdy chair with one or both hands resting on the back',
       'Stand tall with your feet hip-width apart',
@@ -1212,7 +1212,7 @@ SEATED.push(
     affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3, difficultyLevel: 1, duration: 180,
-    perSide: false, sets: 3, reps: '15', rest: '45s', tempo: '2-1-3',
+    perSide: false, sets: 3, reps: '15', rest: 45, tempo: '2-1-3',
     instructions: [
       'Sit tall holding a band with both hands, arms straight out in front at chest height',
       'Set your hands about shoulder-width apart on the band',
@@ -1242,7 +1242,7 @@ SEATED.push(
     affectsAreas: ['upper-back', 'shoulder', 'rotator-cuff'],
     contraindications: ['shoulder-acute'],
     energyRequired: 3, difficultyLevel: 2, duration: 180,
-    perSide: false, sets: 3, reps: '12', rest: '45s', tempo: '2-1-3',
+    perSide: false, sets: 3, reps: '12', rest: 45, tempo: '2-1-3',
     instructions: [
       'Anchor a band at roughly face height in front of you',
       'Sit tall and hold an end in each hand, arms straight out',
@@ -1272,7 +1272,7 @@ SEATED.push(
     affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
     energyRequired: 4, difficultyLevel: 2, duration: 240,
-    perSide: false, sets: 3, reps: '12', rest: '60s', tempo: '2-1-3',
+    perSide: false, sets: 3, reps: '12', rest: 60, tempo: '2-1-3',
     instructions: [
       'Anchor a band above head height — a door frame, a hook, or a bar',
       'Sit tall beneath or just in front of it, holding an end in each hand, arms overhead',
@@ -1309,7 +1309,7 @@ SEATED.push(
     affectsAreas: ['rotator-cuff', 'shoulder'],
     contraindications: ['shoulder-acute'],
     energyRequired: 2, difficultyLevel: 1, duration: 180,
-    perSide: true, sets: 3, reps: '15 each side', rest: '30s', tempo: '2-1-3',
+    perSide: true, sets: 3, reps: '15 each side', rest: 30, tempo: '2-1-3',
     instructions: [
       'Anchor a band at elbow height beside you',
       'Sit side-on with the working arm furthest from the anchor',
@@ -1339,7 +1339,7 @@ SEATED.push(
     affectsAreas: ['shoulder', 'triceps-biceps', 'upper-back'],
     contraindications: ['shoulder-acute', 'lower-back-acute'],
     energyRequired: 4, difficultyLevel: 2, duration: 240,
-    perSide: false, sets: 3, reps: '12', rest: '60s', tempo: '2-1-3',
+    perSide: false, sets: 3, reps: '12', rest: 60, tempo: '2-1-3',
     instructions: [
       'Sit on the middle of a band, or anchor it low behind you',
       'Hold an end in each hand at shoulder height, palms facing forward',
@@ -1369,7 +1369,7 @@ SEATED.push(
     affectsAreas: ['abdominals', 'core', 'shoulder'],
     contraindications: ['lower-back-acute', 'shoulder-acute'],
     energyRequired: 4, difficultyLevel: 2, duration: 240,
-    perSide: true, sets: 3, reps: '10 each side', rest: '45s', tempo: '2-1-2',
+    perSide: true, sets: 3, reps: '10 each side', rest: 45, tempo: '2-1-2',
     instructions: [
       'Anchor a band high to one side of you',
       'Sit tall, side-on, holding the band in both hands up by that shoulder',
@@ -1399,7 +1399,7 @@ SEATED.push(
     affectsAreas: ['upper-back', 'shoulder'],
     contraindications: ['upper-back-acute', 'shoulder-acute'],
     energyRequired: 3, difficultyLevel: 1, duration: 180,
-    perSide: false, sets: 3, reps: '15', rest: '45s', tempo: '2-1-3',
+    perSide: false, sets: 3, reps: '15', rest: 45, tempo: '2-1-3',
     instructions: [
       'Sit tall with a dumbbell in each hand, arms hanging at your sides',
       'Let your shoulders relax fully down to start',
@@ -1429,7 +1429,7 @@ SEATED.push(
     affectsAreas: ['chest-pecs', 'shoulder', 'triceps-biceps'],
     contraindications: ['shoulder-acute', 'chest-pecs-acute'],
     energyRequired: 3, difficultyLevel: 1, duration: 180,
-    perSide: false, sets: 3, reps: '20 seconds', rest: '40s', tempo: 'Steady hold',
+    perSide: false, sets: 3, reps: '20 seconds', rest: 40, tempo: 'Steady hold',
     instructions: [
       'Sit tall and bring both palms together in front of your chest',
       'Press your hands into each other as hard as feels comfortable',
@@ -1464,7 +1464,7 @@ SEATED.push(
     equipment: [], equipmentOptional: [],
     affectsAreas: ['upper-back', 'shoulder'], contraindications: ['upper-back-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 120,
-    perSide: true, sets: 2, reps: '30 seconds each side', rest: '0s',
+    perSide: true, sets: 2, reps: '30 seconds each side', rest: 0,
     instructions: [
       'Sit tall with both shoulders relaxed down',
       'Let your right ear travel slowly towards your right shoulder',
@@ -1490,7 +1490,7 @@ SEATED.push(
     equipment: [], equipmentOptional: [],
     affectsAreas: ['chest-pecs', 'shoulder'], contraindications: ['shoulder-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 90,
-    perSide: false, sets: 2, reps: '30 seconds', rest: '15s',
+    perSide: false, sets: 2, reps: '30 seconds', rest: 15,
     instructions: [
       'Sit tall, away from the chair back if you can',
       'Reach both hands behind you and clasp them, or hold the sides of the chair',
@@ -1516,7 +1516,7 @@ SEATED.push(
     equipment: [], equipmentOptional: [],
     affectsAreas: ['upper-back', 'spine', 'shoulder'], contraindications: ['shoulder-acute', 'lower-back-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 120,
-    perSide: true, sets: 2, reps: '30 seconds each side', rest: '0s',
+    perSide: true, sets: 2, reps: '30 seconds each side', rest: 0,
     instructions: [
       'Sit tall with both hips firmly on the seat',
       'Reach your right arm up overhead',
@@ -1542,7 +1542,7 @@ SEATED.push(
     equipment: [], equipmentOptional: [],
     affectsAreas: ['wrist-elbow', 'triceps-biceps'], contraindications: ['wrist-elbow-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 120,
-    perSide: true, sets: 2, reps: '30 seconds each side', rest: '0s',
+    perSide: true, sets: 2, reps: '30 seconds each side', rest: 0,
     instructions: [
       'Sit tall and extend your right arm in front of you, palm facing down',
       'Use your left hand to draw the fingers gently back towards you',
@@ -1568,7 +1568,7 @@ SEATED.push(
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['abdominals', 'core', 'shoulder'], contraindications: ['lower-back-acute'],
     energyRequired: 4, difficultyLevel: 2, duration: 180,
-    perSide: true, sets: 3, reps: '20 seconds each side', rest: '40s',
+    perSide: true, sets: 3, reps: '20 seconds each side', rest: 40,
     instructions: [
       'Anchor a band at chest height to one side of you',
       'Sit tall, side-on, holding the band in both hands',
@@ -1594,7 +1594,7 @@ SEATED.push(
     equipment: [], equipmentOptional: ['dumbbell'],
     affectsAreas: ['abdominals', 'core', 'shoulder'], contraindications: ['lower-back-acute', 'shoulder-acute'],
     energyRequired: 3, difficultyLevel: 1, duration: 180,
-    perSide: true, sets: 3, reps: '10 each side', rest: '45s', tempo: '3-1-3',
+    perSide: true, sets: 3, reps: '10 each side', rest: 45, tempo: '3-1-3',
     instructions: [
       'Sit tall, away from the chair back if you can',
       'Brace your stomach as though bracing for a gentle prod',
@@ -1620,7 +1620,7 @@ SEATED.push(
     equipment: ['resistance-band'], equipmentOptional: [],
     affectsAreas: ['chest-pecs', 'shoulder'], contraindications: ['shoulder-acute', 'chest-pecs-acute'],
     energyRequired: 4, difficultyLevel: 2, duration: 180,
-    perSide: false, sets: 3, reps: '12', rest: '45s', tempo: '2-1-3',
+    perSide: false, sets: 3, reps: '12', rest: 45, tempo: '2-1-3',
     instructions: [
       'Pass a band around the back of your chair at chest height',
       'Sit tall holding an end in each hand, arms out wide with a soft bend at the elbow',
@@ -1647,7 +1647,7 @@ SEATED.push(
     affectsAreas: ['shoulder', 'upper-back', 'chest-pecs', 'triceps-biceps'],
     contraindications: ['shoulder-acute'],
     energyRequired: 6, difficultyLevel: 2, duration: 300,
-    perSide: false, sets: 5, reps: '30 seconds', rest: '30s',
+    perSide: false, sets: 5, reps: '30 seconds', rest: 30,
     instructions: [
       'Sit tall with your arms relaxed',
       'For thirty seconds, move your arms as fast as you comfortably can — punches, overhead reaches, wide circles, whatever suits',
@@ -1673,7 +1673,7 @@ SEATED.push(
     equipment: [], equipmentOptional: [],
     affectsAreas: ['shoulder', 'upper-back'], contraindications: [],
     energyRequired: 2, difficultyLevel: 1, duration: 180,
-    perSide: false, sets: 1, tempo: 'Slow and full', rest: '0s',
+    perSide: false, sets: 1, tempo: 'Slow and full', rest: 0,
     instructions: [
       'Sit tall with your arms relaxed at your sides',
       'Roll both shoulders slowly forwards in the biggest circle you can make',

@@ -430,7 +430,12 @@ function _exerciseMeta(ex, opts = {}) {
   const amount = ex.reps || formatDuration(ex.duration);
   if (amount) parts.push(amount);
   if (ex.tempo) parts.push(ex.tempo);
-  if (opts.rest && ex.rest && ex.rest !== "0s") parts.push(`rest ${ex.rest}`);
+  // DURATION-STR. Was `ex.rest !== "0s"`, which no longer excludes
+  // anything now that rest is a number -- 0 !== "0s" is true, so a
+  // zero-rest exercise would have started printing "rest 0".
+  if (opts.rest && Number(ex.rest) > 0) {
+    parts.push(`rest ${Number(ex.rest)}s${ex.restStyle === "active" ? " active" : ""}`);
+  }
   return parts.join(" &nbsp; ");
 }
 

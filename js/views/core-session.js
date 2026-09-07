@@ -945,11 +945,18 @@ function completeExercise() {
   }
 
   // Show rest card if rest > 0
-  if (ex.rest > 0) {
+  // DURATION-STR, 06 Sep 2026. Was `ex.rest > 0`, and 99 of 551
+  // library entries carried rest as TEXT ("60s", "90s active").
+  // `"60s" > 0` is false, so the rest timer silently never started --
+  // no countdown, no prompt, straight on. The data is numeric now;
+  // this coerces as well, so a future non-numeric value means NO
+  // TIMER rather than a throw part-way through somebody's session.
+  const _rest = Number(ex.rest);
+  if (Number.isFinite(_rest) && _rest > 0) {
     phase         = "rest";
-    restRemaining = ex.rest;
+    restRemaining = _rest;
     rerender();
-    startRestTimer(ex.rest, () => {
+    startRestTimer(_rest, () => {
       phase = "session";
       rerender();
     });
