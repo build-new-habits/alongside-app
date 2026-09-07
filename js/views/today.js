@@ -1438,8 +1438,12 @@ export function TodayView(router) {
           option: 'No class chosen yet',
           facts: ['12 weeks', 'You choose how many sessions a week',
                   'You can change or stop at any point'],
+          // PLAN-PICKER-TIER, 06 Sep 2026. goal-setup is
+          // programme-select.js, the chooser that calls startChapter()
+          // properly. plan-select.js wrote six activeProgramme fields
+          // directly and is now retired.
           action: `<button class="btn btn-primary btn-full club-room__go"
-                           data-route="my-programme" data-door-id="guided"
+                           data-route="goal-setup" data-door-id="guided"
                            data-requires-checkin="false">Pick a class</button>`
         });
 
