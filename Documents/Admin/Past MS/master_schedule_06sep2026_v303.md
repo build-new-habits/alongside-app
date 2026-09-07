@@ -1,49 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v304
+## 06 Sep 2026 v303
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v303.md`. Remove v303 on upload.
-
-> ### 🟢 CONSTRAINT-CLAIM SHIPPED — `alongside-v458`, **122 gates**, green from a second independent fresh clone. CLUB item 7 of 9 closed.
->
-> `coach-proposal.js` v22 → **v23**. Blueprint v51 → **v52**. New gate `tools/verify-constraintclaim.mjs`.
->
-> #### 🔴 The fault, driven rather than described
->
-> The moderate band (6–6.9) said **"I've worked around that"**. At lower-back 6, `getActiveConditionIds()` adds `lower-back-subacute` and `getExerciseSafetyTier(cat-cow, …)` returns **`safe`**. Nothing was worked around. **`caution` only appears at 7.**
->
-> And `session-rationale.js` then told the person **on the very next screen** that the exercise works that area. **Two screens, two answers, and the truthful one looked like the mistake.** Graeme met exactly that on 06 Sep.
->
-> #### 🟢 The repair
->
-> The subacute tier applies **care, not exclusion**, and whether it changes the pool depends on the exercise. The sentence now claims the thing that is always true — the condition was taken into account — and **hands the judgement back** rather than asserting an outcome the coach cannot see from where it stands.
->
-> ⚫ **FAULTLESS:** *"taken into account"* is demonstrable — the id is in the active list. *"Worked around"* was not.
->
-> #### 🔴 Three wrong repairs, each now held shut by an assertion
->
-> | Wrong repair | Why it is wrong |
-> |---|---|
-> | **Go silent at 6** | The person told the coach about it. **Silence reads as not having been heard.** The gate asserts the condition and score are still named |
-> | **Soften the severe sentence too** | At 7+ the acute tier **genuinely excludes**, so "kept things well clear" is earned. **Loosening it is a clinical decision, not a wording one** |
-> | **Silence the exercise card** | 🔴 **The card was the truthful half.** Resolving a contradiction from the honest end is the wrong repair, and the gate says so explicitly so a later session cannot do it |
->
-> #### 🟢 The gate re-drives its own premise
->
-> Test 0 measures that 6 and 7 still mean different things, rather than trusting the comment. **If subacute ever starts excluding, the wording is answering a question nobody is asking any more and this goes red** instead of quietly staying too cautious.
->
-> Five deliberate breaks, five caught red.
-
-> ### 📋 CLUB build order — 7 of 9 closed
->
-> | # | Item | Status |
-> |---|---|---|
-> | 1–7 | TWO-ENGINE · DURATION-STR · CLUB-SHELL · PLAN-PICKER-TIER · YOUR-OWN · QUICK-BUILD · CONSTRAINT-CLAIM | 🟢 v452 → **v458** |
-> | 8 | **HATCH-OVERLAP** | 🟠 **Next.** The escape hatch obscures content on the exercise card and check-in |
-> | 9 | **PROGRESS** | 🟡 Remembering across the rooms |
-> | + | **QUICK-INPUTS** | 🟠 Needs a seam that does not exist |
->
-> ⚠️ **Not Claude's:** PAR-Q+ (response in hand, held); clinical pack, unsent; HMRC (approved, paperwork pending); legal policies, Graeme's active workstream. `DEV_PANEL_ENABLED` on the **January** checklist.
+Supersedes `master_schedule_v302.md`. Remove v302 on upload.
 
 > ### 🟢 QUICK-BUILD SHIPPED — `alongside-v457`, **121 gates**, green from a second independent fresh clone. CLUB item 6 of 9 closed.
 >
