@@ -1,6 +1,59 @@
 /**
  * coach-proposal.js
- * 20 Aug 2026 v21
+ * 06 Sep 2026 v22
+ *
+ * v22 - TWO-ENGINE. THIS SCREEN NO LONGER RUNS THE OLD BUILDER.
+ *
+ *   For three months this file imported workoutGenerator.js and called
+ *   generateDailyOptions(). That engine's entire type vocabulary is one
+ *   line -- { strength: "Strength Focus", mobility: "Mobility &
+ *   Recovery", cardio: "Cardio Boost" } -- against session-builder.js's
+ *   EIGHT session types, and it read sessionVariety,
+ *   exercisePreferences and SECTION-RULES exactly ZERO times.
+ *
+ *   So every improvement made to selection since June was invisible on
+ *   the route Plan users were funnelled through, and STRETCH COULD NOT
+ *   BE PRODUCED HERE AT ALL. Graeme, 06 Sep, on device: "I wanted to
+ *   stretch but I couldn't find it." He could not.
+ *
+ *   DATA-1b predicted this in August: "this product has two session
+ *   engines and they do not share their filters by default -- any rule
+ *   about what may be selected has to be checked in both, or placed
+ *   where both must read it." Three-for-three by the time it was found.
+ *
+ *   ONE SUGGESTION, NOT THREE. The old engine produced three because it
+ *   had three focuses hardcoded, not because three was a decision. CLUB
+ *   spec v2 6.2 specifies one. _buildCoachSuggestion() still returns an
+ *   ARRAY of one, because every consumer here already speaks arrays and
+ *   CLUB-SHELL will collapse the presentation -- changing the shape and
+ *   the engine together would make an engine fault and a presentation
+ *   fault indistinguishable.
+ *
+ *   WHAT THE COACH SUGGESTS, and why, lives in data/session-choice.js:
+ *   the class you are in, then what the arc says is thin, then what has
+ *   not come up lately, then `full`. Severe pain is deliberately NOT in
+ *   that chain -- buildSession() resolves it before any pool is built,
+ *   and a second copy of a safety rule is the DATA-1b shape again.
+ *
+ *   `inputs` IS FINALLY NON-EMPTY. handlePreviewStart() has read
+ *   `option.inputs` since v8 and NEITHER engine ever produced the
+ *   field, so the record of what the coach used was {} for this route's
+ *   whole life while the coach line talked about the check-in and the
+ *   arc. FAULTLESS is "every input the coach implies it used, it
+ *   demonstrably used" -- that was unmeetable here until now.
+ *
+ *   THE NaN MINUTES ARE GONE, and not because DURATION-STR was fixed.
+ *   session-builder reports an honest RANGE ("25-35 mins"); the old
+ *   engine reported a single number from calculateDuration(), the
+ *   function that returns NaN on any of the 99 string-`rest` entries.
+ *   The card no longer appends " min", or it would read "25-35 mins
+ *   min". DURATION-STR REMAINS OPEN: applyDurationCap() still fails
+ *   both its NaN comparisons and returns untrimmed everywhere else.
+ *
+ *   AVAILABLE_TIME_WINDOW_MINUTES is still imported from
+ *   workoutGenerator.js. It is a CONSTANT, not engine behaviour -- the
+ *   window the check-in's time answer is interpreted through -- and
+ *   verify-twoengine asserts positively that it stays.
  *
  * v21 - REENTRY-2. Three changes, all on the return journey.
  *
@@ -398,7 +451,13 @@ import { getProgramme }      from '../data/programmes.js';
 import { detectBurnout }     from '../data/checkin.js';
 import { getPrimaryEngineGoal } from '../data/goals.js';
 import { getConditionName }  from '../data/conditions.js';
-import { workoutGenerator, AVAILABLE_TIME_WINDOW_MINUTES } from '../data/workoutGenerator.js';   // v9 — direct import, replaces window._workoutGenerator lookup. v12 — added AVAILABLE_TIME_WINDOW_MINUTES.
+// TWO-ENGINE, 06 Sep 2026. workoutGenerator.js is no longer imported
+// here. AVAILABLE_TIME_WINDOW_MINUTES is a CONSTANT, not engine
+// behaviour, and stays -- it is the window the check-in's time answer is
+// interpreted through and has nothing to do with which builder runs.
+import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/workoutGenerator.js';
+import { buildSession, buildCandidatePools } from '../session-builder.js';
+import { chooseSessionType, lineIsSupported } from '../data/session-choice.js';
 
 // DOOR_COPY, renderDoorFront(), renderBypassDoor(), handleDoorChoice(),
 // and _buildAcknowledgement() removed 04 Aug 2026 (Phase C, Home Nav &
@@ -795,10 +854,11 @@ export function CoachProposalView(router) {
               role="radio"
               aria-checked="${selected ? 'true' : 'false'}"
               data-option-id="${option.id}"
-              aria-label="${option.name}, about ${option.duration} minutes${isRecommended ? ', recommended' : ''}">
-        ${isRecommended ? '<span class="cp-preview-card__badge">Recommended</span>' : ''}
+              aria-label="${option.name}, ${option.duration}, ${option.exerciseCount} movements${isRecommended ? ', suggested for today' : ''}">
+        ${isRecommended ? '<span class="cp-preview-card__badge">Suggested for today</span>' : ''}
         <span class="cp-preview-card__name">${option.name}</span>
-        <span class="cp-preview-card__meta">${option.duration} min \u00b7 ${option.exerciseCount} exercises</span>
+        <span class="cp-preview-card__meta">${option.duration}</span>
+        <span class="cp-preview-card__meta">${option.exerciseCount} movements</span>
         <p class="cp-preview-card__why">${option.rationale}</p>
       </button>
     `;
@@ -880,10 +940,24 @@ export function CoachProposalView(router) {
       ackEl.focus();
     }
 
+    // TWO-ENGINE. inputs is finally non-empty on this route. It carried
+    // {} for its whole life -- handlePreviewStart has read
+    // `option.inputs` since v8 and NEITHER engine ever produced the
+    // field -- while the coach line talked about the check-in and the
+    // arc. FAULTLESS: every input the coach implies it used, it
+    // demonstrably used.
+    //
+    // _pools is stripped off the stored session rather than saved with
+    // it. It is a build-time artefact the swap sheet reads, not a fact
+    // about the session, and persisting it would put a full candidate
+    // pool into localStorage on every proposal.
+    const { _pools, ...session } = option;
+
     store.set('generatedSession', {
-      session: option,
-      builtAt: new Date().toISOString(),
-      inputs:  option.inputs || {}
+      session,
+      builtAt:        new Date().toISOString(),
+      inputs:         option.inputs || {},
+      candidatePools: _pools || null
     });
 
     const timingRules = getTimingRules({ difficultTopic: false });
@@ -1415,11 +1489,64 @@ export function CoachProposalView(router) {
       if (availTime) {
         store.set('availableTime', availTime);
       }
-      return workoutGenerator.generateDailyOptions();
+      return _buildCoachSuggestion();
     } catch (e) {
-      console.warn('coach-proposal: workoutGenerator unavailable, using fallbacks', e);
+      console.warn('coach-proposal: session build failed, using fallbacks', e);
       return _getFallbackOptions(energyScore, intensity);
     }
+  }
+
+  /**
+   * TWO-ENGINE, 06 Sep 2026. ONE suggestion, built by session-builder.js.
+   *
+   * Returns an array of one because every consumer on this screen -- the
+   * panel, the card renderer, the start handler -- already speaks arrays,
+   * and CLUB-SHELL will collapse the presentation. Changing the shape and
+   * the engine in the same commit would make an engine fault and a
+   * presentation fault indistinguishable.
+   *
+   * THREE OPTIONS WERE NOT KEPT. The old engine produced three because it
+   * had exactly three focuses hardcoded, not because three was a decision.
+   * CLUB spec v2 6.2 specifies one, so three-option plumbing here would be
+   * work with a known death date.
+   *
+   * candidatePools is built with IDENTICAL arguments to buildSession, the
+   * same as triggerBuild() in session-builder-ui.js. verify-swap1 asserts
+   * the two never disagree; passing different arguments would leave that
+   * gate green while every swap affordance silently vanished.
+   */
+  function _buildCoachSuggestion() {
+    const { sessionType, reason, inputs } = chooseSessionType();
+
+    const args = {
+      sessionType,
+      durationMins:      _getAvailableTimeMinutes(),
+      equipmentOverride: null,
+      preset:            store.get('sessionPreset') || null
+    };
+
+    const built = buildSession(args);
+    if (!built) return _getFallbackOptions(5, null);
+
+    // SEVERE-1 / CR-2. buildSession() may return Gentle Care or an
+    // out-of-scope session instead of the type it was handed, and when it
+    // does the type the chain chose is no longer what the person is being
+    // offered. Recording the requested type as though it were delivered
+    // would be the coach claiming a decision it did not get to make.
+    const delivered = built.id || sessionType;
+
+    return [{
+      id:            built.id || `coach-${sessionType}`,
+      name:          built.title,
+      subtitle:      built.subtitle || null,
+      duration:      built.duration,          // a RANGE string, see below
+      exerciseCount: (built.exercises || []).length,
+      exercises:     built.exercises || [],
+      rationale:     built.coachLine || built.rationale || '',
+      sessionType:   delivered,
+      inputs:        { ...inputs, chosenType: sessionType, reason },
+      _pools:        buildCandidatePools(args)
+    }];
   }
 
   function _getFallbackOptions(energyScore, intensity) {

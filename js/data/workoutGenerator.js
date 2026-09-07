@@ -536,6 +536,23 @@ export const workoutGenerator = {
   /**
    * Generate today's 3 workout options
    */
+  // ── RETIRED, TWO-ENGINE, 06 Sep 2026. NOT DELETED. ──────────────────
+  //
+  // Zero live callers. coach-proposal.js was the only one and now builds
+  // through session-builder.js. tools/verify-twoengine.mjs asserts the
+  // caller count stays zero, so this coming back goes red rather than
+  // quiet.
+  //
+  // WHY IT IS STILL HERE. Retire is not delete. This function is the
+  // record of what the coach route did for three months, and the three
+  // hardcoded focus names below are the whole reason stretch was
+  // unreachable on Plan -- session-builder.js has eight session types
+  // and this has three. Deleting it deletes the evidence.
+  //
+  // DO NOT REVIVE IT WITHOUT READING DATA-1b. This product had two
+  // session engines that did not share their filters, and every rule
+  // added to one had to be added to the other or checked in both. That
+  // is the fault this retirement exists to end.
   generateDailyOptions() {
     const profile     = this.getUserProfile();
     const checkin     = checkinData.getTodaysCheckin();

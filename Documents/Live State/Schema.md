@@ -1,5 +1,5 @@
 # Alongside — Data Schema Reference
-## 06 Sep 2026 v1.47
+## 06 Sep 2026 v1.48
 
 **File:** `js/store.js` (confirmed live version: **v64, 06 Sep 2026**)
 
@@ -267,6 +267,16 @@ Now used by `today.js` (×4), `progress.js` (×2) and `reflect.js`'s `getSession
 **Two of those reads matter more than the count.** `_sessionCompletedToday()` drives *"You moved today — that's done"*, and `getSessionCount()` drives the empathy arc — so a session opened and abandoned both told somebody they had moved and advanced them toward a prompt meant to follow real experience.
 
 **Partials remain in `activityLog`.** A partial is a real record — it is how the app knows you started, and continuity reads it. It is simply not a session you did.
+
+### `activityLog[].sessionType` — **NEW, TWO-ENGINE, 06 Sep 2026**
+
+`string | null`. One of `session-builder.js`'s eight `SESSION_TYPES` ids: `glute`, `upper`, `lower`, `full`, `core`, `cardio`, `mobility`, `stretch`. `null` on any entry that was not a built session (a walk, a breathing session, a prescribed session).
+
+**Why it exists.** The coach's suggestion chain needs to know what kind of session you last did, and until now nothing recorded it. `activityLog` entries carry `entry.type` — but that is the ACTIVITY type (`workout`, `walk`, `quiet`), not the session type, and reading one as the other is the field-confusion class that produced C1. `exerciseHistory` records which exercises, not which shape of session.
+
+**Written by** `store.logActivity()`, from the `sessionType` supplied by whichever builder produced the session. **Not back-filled** — every existing entry is `null`, so the chain that reads it must treat "no history" as its normal early state rather than an error. That is why the chain in `js/data/session-choice.js` falls through to the arc rather than terminating when this is empty.
+
+**Read by** `chooseSessionType()` and nothing else. **Never read by the coach to make a claim about a person** — it answers "what shape came up recently", not "what are you like".
 
 ### `exerciseFeedback` — **NOW WRITTEN** (FEED-1)
 
