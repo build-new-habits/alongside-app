@@ -1,5 +1,16 @@
 /**
  * programmeEngine.js
+ * 06 Sep 2026 v8
+ *
+ * v8 - PLAN-PICKER-TIER. plannedFocusToday() and getPhaseBias() are
+ *   gated on isPremium(). Both read activeProgramme with no tier check,
+ *   so a free user was getting chapter progression, week advancement and
+ *   phase bias on their sessions -- the paid product, under a different
+ *   name. Gated at the READ rather than at the 49 activeProgramme
+ *   references: these two are the only ones reaching session selection,
+ *   one place to check beats forty-nine to remember, and an existing
+ *   free device stops being driven by its programme with no migration.
+ *
  * 20 Aug 2026 v7
  *   REENTRY-2. Returning after a break no longer depends on having been
  *   ill. Graeme, 20 Aug: "If I've been away for 3 weeks for work I'm
@@ -85,6 +96,9 @@
  */
 
 import { store }          from '../store.js';
+// PLAN-PICKER-TIER, 06 Sep 2026. See plannedFocusToday() and
+// getPhaseBias() below for why the tier check lives at the read.
+import { isPremium }      from '../auth.js';
 import { getProgramme, getPhaseForWeek, getIntensityBiasForWeek, getFocusBiasForWeek } from './programmes.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -242,6 +256,13 @@ export function getCurrentPhaseMessage() {
  * @returns {{ intensityBias: string, focusBias: string[] }}
  */
 export function getPhaseBias() {
+  // PLAN-PICKER-TIER. Same reason as plannedFocusToday(). Returns the
+  // SAME neutral shape the no-programme branch below returns, so free
+  // gets the app's default behaviour rather than a special case -- a
+  // second shape here would be a second thing to keep in sync.
+  if (!isPremium()) {
+    return { intensityBias: 'moderate', focusBias: ['strength', 'mobility'] };
+  }
   const ap = store.get('activeProgramme');
   if (!ap?.programmeId) {
     return { intensityBias: 'moderate', focusBias: ['strength', 'mobility'] };
@@ -716,6 +737,22 @@ export function startChapter(programmeId, { keepHistory = false } = {}) {
  * @returns {'strength'|'mobility'|'cardio'|null}
  */
 export function plannedFocusToday() {
+  // PLAN-PICKER-TIER, 06 Sep 2026. THE TWELVE-WEEK PROGRAMME IS THE PAID
+  // PRODUCT AND WAS BEING GIVEN AWAY.
+  //
+  // plan-select.js sat in onboarding with no tier check anywhere in the
+  // file, and this function and getPhaseBias() read activeProgramme with
+  // no tier check either -- so a free user got chapter progression, week
+  // advancement and phase bias on their sessions. "Free is today, the
+  // Plan is the arc" was not true.
+  //
+  // GATED AT THE READ, not at the 49 activeProgramme references. These
+  // two functions are the only ones that reach session selection, and
+  // one place to check beats forty-nine places to remember. An existing
+  // free device that already has a programme therefore stops being
+  // driven by it immediately, without a migration.
+  if (!isPremium()) return null;
+
   // Array-checked, not truthy-checked. `|| []` accepts a STRING and
   // then seq.find() throws — and this runs inside the coach's proposal,
   // so one corrupted field would have taken the whole screen down rather

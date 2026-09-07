@@ -454,7 +454,15 @@ function wireFacilities() {
     if (_sheetDoneCallback) {
       _sheetDoneCallback();
     } else {
-      router.navigate("onboarding/frequency");
+      // PLAN-PICKER-TIER, 06 Sep 2026. Was onboarding/frequency, which
+      // led to onboarding/plan-select. That was the LIVE path outside a
+      // sheet, and it asked somebody who had not yet moved once to
+      // commit to a twelve-week programme and a weekly session target.
+      //
+      // The picker now lives in the Guided class room, where it is asked
+      // after there is something to go on. Both routes are RETIRED, not
+      // deleted -- verify-planpicker asserts zero live callers.
+      router.navigate("onboarding/complete");
     }
   });
 }

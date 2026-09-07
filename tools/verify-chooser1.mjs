@@ -165,7 +165,17 @@ console.log("\n4. The card's promise and the stored number cannot drift");
   cards[1].click();
   const shown = cards[1].querySelector(".plan-card__weekly").textContent.trim();
   container.querySelector("[data-action='confirm']").click();
-  ok("gentle card showed 3 sessions", shown.startsWith("3 session"), shown);
+  // COMMIT-COPY, 06 Sep 2026. The note reads "aiming for 3 sessions a
+  // week" now -- "3 sessions a week" reads as a TARGET, a number you can
+  // fall behind on, which is the shape of a streak on a product that has
+  // no streaks by design.
+  //
+  // The PROPERTY this guards is unchanged and is the whole point of the
+  // check: the number on the card and the number written to the store
+  // must not drift apart. Matched on the number rather than the
+  // sentence, so a future rewording does not go red while a wrong
+  // number goes green.
+  ok("gentle card showed 3 sessions", /\b3 session/.test(shown), shown);
   ok("gentle choice wrote 3", store.get("strategicGoal.weeklySessionTarget") === 3,
      String(store.get("strategicGoal.weeklySessionTarget")));
   ok("setAt was written", typeof store.get("strategicGoal.setAt") === "string");
