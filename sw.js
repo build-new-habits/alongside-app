@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v461
+ * 06 Sep 2026 v462
+ *
+ * v462 - GUIDED-COPY. The Guided class card describes the twelve-week
+ *   shape it actually has, instead of a course that does not exist yet.
  *
  * v461 - QUICK-INPUTS. Quick build records what the coach consulted
  *   when it chose the session type.
@@ -3143,7 +3146,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v461";
+const CACHE_NAME = "alongside-v462";
 
 const SHELL_URLS = [
 
