@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v458
+ * 06 Sep 2026 v459
+ *
+ * v459 - HATCH-OVERLAP. The escape hatch is opaque and the top-right
+ *   corner is reserved, so it no longer covers the exercise counter or
+ *   the check-in bubbles.
  *
  * v458 - CONSTRAINT-CLAIM. The coach no longer says it worked around a
  *   sore area when it did not.
@@ -3133,7 +3137,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v458";
+const CACHE_NAME = "alongside-v459";
 
 const SHELL_URLS = [
 
