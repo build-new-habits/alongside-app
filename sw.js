@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v455
+ * 06 Sep 2026 v456
+ *
+ * v456 - YOUR-OWN. Sessions you build can be named and kept, and the
+ *   Your own room lists them.
  *
  * v455 - PLAN-PICKER-TIER. The twelve-week programme picker leaves
  *   onboarding for the Guided class room, and the programme stops
@@ -3123,7 +3126,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v455";
+const CACHE_NAME = "alongside-v456";
 
 const SHELL_URLS = [
 
