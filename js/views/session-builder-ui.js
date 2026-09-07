@@ -1482,6 +1482,21 @@ export function onMount() {
   if (!preselectChecked && phase === "type") {
     preselectChecked = true;
     const pre = store.get("sessionBuilderPreselect");
+
+    // CLUB-SHELL, 06 Sep 2026. Quick build's chip answers "how long".
+    // Read and cleared on the same read-once pattern as `type` -- a
+    // preselect that persisted would silently pin every later build to a
+    // duration chosen days earlier. Read BEFORE the type branch below,
+    // because Quick build sends a duration with NO type and that branch
+    // returns early.
+    if (pre && Number.isFinite(Number(pre.durationMins)) && Number(pre.durationMins) > 0) {
+      selectedDuration = Number(pre.durationMins);
+      entryDoor = pre.returnTo || entryDoor;
+      if (!pre.type) {
+        store.set("sessionBuilderPreselect", null);
+      }
+    }
+
     if (pre && pre.type && SESSION_TYPES.some(t => t.id === pre.type)) {
       store.set("sessionBuilderPreselect", null);
       selectedType = pre.type;

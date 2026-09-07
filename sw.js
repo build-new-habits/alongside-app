@@ -3178,6 +3178,7 @@ const SHELL_URLS = [
 
   "/alongside-app/css/components/tier-gating.css",
   "/alongside-app/css/components/practices.css",
+  "/alongside-app/css/components/club-rooms.css",
 
   // Core JS
   "/alongside-app/js/app.js",
@@ -3258,6 +3259,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/practices.js",
   "/alongside-app/js/views/my-programme.js",
   "/alongside-app/js/session-builder.js",
+  "/alongside-app/js/data/session-choice.js",
   "/alongside-app/js/views/session-builder-ui.js",
   "/alongside-app/js/views/noticing.js",
   "/alongside-app/js/views/in-step.js",
