@@ -3267,6 +3267,7 @@ const SHELL_URLS = [
   "/alongside-app/js/views/my-programme.js",
   "/alongside-app/js/session-builder.js",
   "/alongside-app/js/data/session-choice.js",
+  "/alongside-app/js/data/saved-sessions.js",
   "/alongside-app/js/views/session-builder-ui.js",
   "/alongside-app/js/views/noticing.js",
   "/alongside-app/js/views/in-step.js",

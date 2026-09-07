@@ -127,3 +127,55 @@
     transition: none;
   }
 }
+
+/* ── YOUR-OWN, 06 Sep 2026. Saving a session from the builder preview ──
+ *
+ * Lives here rather than in a new file because it is the same room's
+ * grammar: a quiet secondary action that opens a field, not a primary
+ * one competing with "Let's go".
+ */
+.sb-save {
+  margin-top: var(--space-5);
+}
+
+.sb-save__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.sb-save__label {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.sb-save__input {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: var(--text-base);
+  min-height: 44px;
+  padding: var(--space-3);
+  width: 100%;
+}
+
+.sb-save__input:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* role="status", so it is announced. Empty until there is something to
+   say, and it says the specific thing rather than "something went
+   wrong" -- a problem the person can fix and one they cannot must not
+   share a message. */
+.sb-save__note:empty {
+  display: none;
+}
+
+.sb-save__note {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
