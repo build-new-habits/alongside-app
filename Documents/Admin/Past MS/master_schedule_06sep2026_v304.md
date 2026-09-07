@@ -1,50 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v305
+## 06 Sep 2026 v304
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v304.md`. Remove v304 on upload.
-
-> ### 🟢 HATCH-OVERLAP SHIPPED — `alongside-v459`, **123 gates**, green from a second independent fresh clone. CLUB item 8 of 9 closed.
->
-> `index.html` v2 → **v3**. Blueprint v52 → **v53**. New gate `tools/verify-hatchoverlap.mjs`.
->
-> #### 🔴 A fix that made its own side effect worse
->
-> **ESCAPE-Z raised the hatch to z-index 10000 so it could be tapped at all.** That fixed reachability and made the overlap worse — it now sits on top of whatever is in the top-right corner of every screen. Graeme's screenshots show the house over *"1 of 6"*, with the text legible **through** a 55% background: **both readable at once, neither actually readable.**
->
-> #### 🟢 Two halves, and one without the other leaves it broken
->
-> **Opaque**, with a hairline so it still reads as a control on a dark surface rather than a hole. And **the corner is reserved** — a fixed element is invisible to the layout, so the layout is told about it.
->
-> 🔵 **The gutter is DERIVED from `--escape-hatch-size`, and the button's width now comes from the same variable.** A hardcoded gutter stops matching the button the first time the button changes — **that is how a magic 56px in one stylesheet ends up against a 44px control in another.**
->
-> #### 🔴 The first draft reserved space on three selectors that do not exist
->
-> `.checkin-header`, `.cp-preview-panel__head`, `.session-header` — **none appear anywhere in the app**. The gutter would have been reserved on nothing while the rule looked thorough. Real ones: `.workout-header` and `.ci-thread`.
->
-> The gate now asserts **every selector carrying the gutter exists in a view**, and that no more than a handful carry it — **a blanket indent down the whole app is a worse fault than the overlap**.
->
-> #### ⚠️ The gate's own assertion hedged on the drift it exists to catch
->
-> `2c` accepted **either** the variable **or** the literal `44px`, so it passed while the button still hardcoded its size. Tightened to require the variable. ⚫ **An assertion with an OR in it is usually one half doing no work.**
->
-> #### 🟢 The fix cannot be undone by "solving" it the easy way
->
-> Reachability (z-index above the modals) and target size (WCAG 2.5.8, 44px) are **both asserted**, so the overlap cannot be fixed by lowering the hatch — restoring the trap ESCAPE-Z closed — or by shrinking it.
->
-> Seven deliberate breaks, seven caught red.
-
-> ### 📋 CLUB build order — 8 of 9 closed
->
-> | # | Item | Status |
-> |---|---|---|
-> | 1–8 | TWO-ENGINE · DURATION-STR · CLUB-SHELL · PLAN-PICKER-TIER · YOUR-OWN · QUICK-BUILD · CONSTRAINT-CLAIM · HATCH-OVERLAP | 🟢 v452 → **v459** |
-> | 9 | **PROGRESS** | 🟠 **Next, and last.** Remembering choices, preferences and patterns across the four rooms. **Displays, never interprets** — P4. **No streaks, ever.** No comparison to other people |
-> | + | **QUICK-INPUTS** | 🟠 Needs a seam that does not exist |
->
-> ⚠️ **Not Claude's:** PAR-Q+ (response in hand, held); clinical pack, unsent; HMRC (approved, paperwork pending); legal policies, Graeme's active workstream. `DEV_PANEL_ENABLED` on the **January** checklist.
->
-> ⚫ **After item 9 the CLUB build order is complete and beta scope is met.** The remaining pre-beta work is Graeme's, not Claude's.
+Supersedes `master_schedule_v303.md`. Remove v303 on upload.
 
 > ### 🟢 CONSTRAINT-CLAIM SHIPPED — `alongside-v458`, **122 gates**, green from a second independent fresh clone. CLUB item 7 of 9 closed.
 >
