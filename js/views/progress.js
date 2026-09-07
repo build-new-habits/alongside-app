@@ -1,6 +1,35 @@
 /**
  * progress.js
- * 22 Aug 2026 v11
+ * 06 Sep 2026 v12
+ *
+ * v12 - PROGRESS. The shapes of session, counted. CLUB item 9, the last.
+ *
+ *   renderActivitySummary()'s breakdown counts `e.type` -- the ACTIVITY
+ *   type: workout, walk, quiet -- so it read "Workout x 12", which says
+ *   almost nothing about what somebody actually did. The SESSION type
+ *   has been on every built session since TWO-ENGINE added
+ *   activityLog[].sessionType, and until now only chooseSessionType()
+ *   read it.
+ *
+ *   DISPLAYS, NEVER INTERPRETS (P4). It says what happened. It does not
+ *   say what that means, what is missing, or what to do about it. No
+ *   "you have not done any mobility lately" -- that is the app deciding
+ *   a gap is a fault, and a gap is often the most sensible thing
+ *   somebody did that month.
+ *
+ *   NO STREAK, and NO RANKING. Ordered by count because a list needs an
+ *   order; nothing is called most, least, top or best. A LIST, NOT A
+ *   CHART: a proportional bar invites comparison between the rows and
+ *   makes the shortest one look like a failing.
+ *
+ *   ENTRIES PREDATING TWO-ENGINE carry no sessionType and are SKIPPED,
+ *   not bucketed as "Other". A synthetic bucket grows with history the
+ *   person cannot see the shape of, and reads as a kind of session
+ *   rather than an absence of a record.
+ *
+ *   SILENT WHEN THERE IS NOTHING. An empty state here would read as an
+ *   unfinished task on a screen somebody opened to look back, not to be
+ *   given something else to do.
  *
  * v11 - WEIGHT-1b. The weight log, and the sustained-rate note.
  *
@@ -168,6 +197,10 @@
  */
 
 import { store }            from '../store.js';
+// PROGRESS, 06 Sep 2026. The eight session-type labels come from the
+// builder, not a private map here -- a second copy would drift the first
+// time one changed, which is what the retired getWorkoutName() did.
+import { SESSION_TYPES }    from '../session-builder.js';
 import { getProgressStats } from '../data/programmeEngine.js';
 import { getGoalLabel }     from '../data/goals.js';
 import { toKg, formatWeight, observedRateBreach } from '../data/weight-targets.js';
@@ -233,6 +266,7 @@ export function ProgressView(router) {
         <div class="progress-body">
           ${renderCoachNarrative(stats, tier, name)}
           ${renderActivitySummary(tier)}
+          ${renderSessionShapes(tier)}
           ${stats.hasActiveProgramme ? renderProgrammeProgress(stats) : ''}
           <!-- R4 / decision 7.2, 20 Aug 2026. Was:
                  tier === 'personal' ? renderExportBlock() : renderExportLocked()
@@ -495,6 +529,80 @@ export function ProgressView(router) {
         </div>` : ''}
       </section>
     `;
+  }
+
+  /**
+   * PROGRESS, 06 Sep 2026. The shapes of movement, counted.
+   *
+   * WHY THIS EXISTS. renderActivitySummary()'s breakdown counts
+   * `e.type` -- the ACTIVITY type: workout, walk, quiet. So it reads
+   * "Workout x 12", which says almost nothing. The SESSION type -- what
+   * shape of session it actually was -- has been recorded on every
+   * built session since TWO-ENGINE added activityLog[].sessionType, and
+   * until now only chooseSessionType() read it.
+   *
+   * DISPLAYS, NEVER INTERPRETS. P4. It says what happened. It does not
+   * say what that means, what is missing, or what to do about it. There
+   * is no "you have not done any mobility lately", because that is the
+   * app deciding a gap is a fault -- and a gap is often the most
+   * sensible thing somebody did that month.
+   *
+   * NO STREAK. No consecutive count, no longest run, no "keep it going".
+   * Permanent product constraint, not a preference.
+   *
+   * NO COMPARISON, to other people or to a past self. Ordered by count
+   * because a list needs an order, NOT ranked -- there is no "top" and
+   * nothing is called most or least.
+   *
+   * ENTRIES PREDATING TWO-ENGINE carry no sessionType and are skipped
+   * rather than bucketed as "other". A synthetic bucket would grow with
+   * history the person cannot see the shape of, and would look like a
+   * kind of session rather than an absence of a record.
+   */
+  function renderSessionShapes(tier) {
+    if (tier === 'free') return '';
+
+    const completed = store.completedSessions(store.get('activityLog'));
+    const cutoff    = _cutoffDate(activeWindow);
+    const recent    = completed.filter(e => {
+      const ts = e.completedAt || e.loggedAt || e.date;
+      return ts && new Date(ts) >= cutoff && e.sessionType;
+    });
+
+    // Silent when there is nothing to show. An empty state here would
+    // read as an unfinished task on a screen somebody opened to look
+    // back, not to be given something else to do.
+    if (recent.length === 0) return '';
+
+    const counts = {};
+    for (const e of recent) counts[e.sessionType] = (counts[e.sessionType] || 0) + 1;
+    const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+    return `
+      <section class="progress-shapes"
+               aria-label="Shapes of session in the last ${activeWindow} days">
+        <h3 class="progress-shapes__title">What you have been doing</h3>
+        <ul class="progress-shapes__list">
+          ${rows.map(([type, count]) => `
+            <li class="progress-shapes__row">
+              <span class="progress-shapes__name">${_esc(_shapeLabel(type))}</span>
+              <span class="progress-shapes__count">${count}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </section>
+    `;
+  }
+
+  /**
+   * The eight SESSION_TYPES labels, resolved from session-builder rather
+   * than a private map here. A second copy of these names would drift
+   * the first time one changed -- which is exactly what the retired
+   * getWorkoutName() did with its three.
+   */
+  function _shapeLabel(id) {
+    const t = SESSION_TYPES.find(x => x.id === id);
+    return t ? t.label : id;
   }
 
   // ── Programme progress ─────────────────────────────────────────────────────

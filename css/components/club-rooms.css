@@ -215,3 +215,45 @@
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
 }
+
+/* ── PROGRESS, 06 Sep 2026. The shapes of session, counted ────────────
+ *
+ * A list, not a chart. A bar chart invites comparison between the rows
+ * and makes the shortest one look like a failing -- and a gap is often
+ * the most sensible thing somebody did that month. Numbers sit right so
+ * they line up and can be read down without being ranked.
+ */
+.progress-shapes {
+  margin-top: var(--space-6);
+}
+
+.progress-shapes__title {
+  color: var(--color-text);
+  font-size: var(--text-base);
+  font-weight: 600;
+  margin: 0 0 var(--space-3);
+}
+
+.progress-shapes__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.progress-shapes__row {
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+}
+
+.progress-shapes__name {
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+
+.progress-shapes__count {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
