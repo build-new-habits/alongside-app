@@ -1,6 +1,56 @@
 /**
  * today.js
- * 06 Sep 2026 v26
+ * 06 Sep 2026 v27
+ *
+ * v27 - CLUB-SHELL. THE FOUR ROOMS, ADDED ABOVE THE TILES.
+ *
+ *   The rooms sort by HOW MUCH THE COACH LEADS -- Guided class, One to
+ *   one, Your own, Quick build. The tiles below them sort by body part,
+ *   which is a filing system; a club sorts by what kind of session you
+ *   want to be in, which is a relationship.
+ *
+ *   THE FIRST DRAFT REPLACED THE TILES AND verify-homedoors CAUGHT IT
+ *   within minutes -- the gate written hours earlier, after LOBBY-1c did
+ *   exactly that. It was right. yoga-session is a route NO room reaches,
+ *   and mobility and stretch would have gone back to being two screens
+ *   deep. Improvements extend what exists; they do not relocate it.
+ *   The rooms are an addition. tileGrid() is rendered by both tiers.
+ *
+ *   ONE GRAMMAR, FIVE SLOTS, same order, same positions, every card:
+ *   name, what it is, today's option, the facts, the action. CLUB spec
+ *   v2 3.3 reversed v1, which gave each room its own internal grammar --
+ *   four things to learn at once, differentiated by cues that have to be
+ *   picked up implicitly. That fails the people this is built for.
+ *
+ *   SLOT 2 IS PERMANENT. v1 said "no room is ever explained on screen;
+ *   you learn what a room is by entering it once." Wrong, and the Disney
+ *   comparison argues against it: Disney over-signals -- sign, wait
+ *   time, height requirement, themed queue, all before you commit.
+ *   "Find out by doing" is an implicit demand.
+ *
+ *   TWO NAMES CHANGED, BOTH BECAUSE A GATE SAID SO, NOT BECAUSE I
+ *   PREFERRED THEM:
+ *
+ *   "Personal training" -> "One to one". verify-name1 forbids any
+ *   user-facing string containing "Personal" -- that was the retired
+ *   tier name, and two names for one thing is how vocabulary drift
+ *   survives. A room name is not worth a hole in a tier-vocabulary gate,
+ *   and "one to one" also drops the gym-culture baggage that was the
+ *   recorded reservation about "PT" in the first place.
+ *
+ *   "Week 3 of 12" -> "You are 3 weeks in". verify-countdown1: progress
+ *   made, never distance remaining. A week count out of twelve is
+ *   distance remaining wearing a position's clothes.
+ *
+ *   NO ROOM HAS ITS OWN COLOUR. Colour already means energy, a sore
+ *   zone, caution and tier here. Somebody learning that amber means "be
+ *   careful with this movement" must not also learn it means "you are in
+ *   a room". Rooms are told apart by name and by slot 2.
+ *
+ *   YOUR OWN IS A SHELL AND SAYS SO. Saved routines are YOUR-OWN, item
+ *   5, and their store fields do not exist. The card reads "Nothing
+ *   saved yet / Saving your own comes soon" -- an empty state that lies
+ *   is worse than one that waits.
  *
  * v26 - HOME-DOORS. THE SESSION TILES CAME BACK TO THE PLAN HOME.
  *
@@ -408,7 +458,10 @@ import { store }               from '../store.js';
 import { aimById, STRANDS }    from '../data/aims.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
-import { advanceWeekIfNeeded, isHingePending, chapterSuccessor, startChapter }
+// CLUB-SHELL adds plannedFocusToday: Guided class says what the class is
+// for TODAY rather than only naming the course.
+import { advanceWeekIfNeeded, isHingePending, chapterSuccessor, startChapter,
+         plannedFocusToday }
   from '../data/programmeEngine.js';
 import { getProgramme }        from '../data/programmes.js';
 import { detectBurnout }       from '../data/checkin.js';
@@ -787,7 +840,7 @@ export function TodayView(router) {
 
              The invitation states the price of entry, so the check-in
              is consented to rather than sprung. -->
-        ${chooser()}${isPremium() ? '' : arcPanel()}
+        ${isPremium() ? clubRooms() : chooser() + arcPanel()}
 
         <div class="today-reference" role="group" aria-label="Reference and settings">
           <!-- On free, Wellbeing is promoted into "Settle your mind"
@@ -839,6 +892,18 @@ export function TodayView(router) {
     // LOBBY-1c. The one way through to the session space. Routes via
     // the check-in when one is owed and straight through when it is
     // not — a second check-in in a day is a toll, not care.
+    // CLUB-SHELL. The chip IS the answer to Quick build's one question,
+    // so it must carry it -- asking again in the builder would tell
+    // somebody their first answer was not heard.
+    container.querySelectorAll('[data-quick-mins]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mins = Number(btn.dataset.quickMins);
+        if (!Number.isFinite(mins) || mins <= 0) return;
+        store.set('sessionBuilderPreselect', { durationMins: mins, returnTo: 'today' });
+        router.navigate('session-builder');
+      });
+    });
+
     container.querySelector('[data-action="start-today"]')
       ?.addEventListener('click', () => {
         if (_checkedInToday()) {
@@ -1282,7 +1347,148 @@ export function TodayView(router) {
    * terms and privacy links live, so the eye files anything there as
    * boilerplate and skips it.
    */
-  function chooser() {
+  /**
+   * CLUB-SHELL, 06 Sep 2026. The tile grid, extracted so BOTH tiers can
+   * render it.
+   *
+   * THE FIRST DRAFT OF THE CLUB SHELL REPLACED THESE WITH THE FOUR
+   * ROOMS, and verify-homedoors went red on "the Mobility & Conditioning
+   * door is on Plan's Home" -- the gate written hours earlier, after
+   * LOBBY-1c did the same thing. It was right. yoga-session is a route
+   * the rooms do not reach at all, and mobility and stretch would have
+   * gone back to being two screens deep. That is LOBBY-1c again with
+   * better comments.
+   *
+   * THE STANDING RULE: improvements extend what exists, they do not
+   * relocate it. The rooms are an ADDITION. The direct routes stay,
+   * beneath them, for the person who already knows what they want.
+   */
+  /**
+   * CLUB-SHELL, 06 Sep 2026. The four rooms. Plan only.
+   *
+   * They sort by HOW MUCH THE COACH LEADS, not by body part. The tiles
+   * below them sort by body part, which is a filing system; a club sorts
+   * by what kind of session you want to be in, which is a relationship.
+   *
+   * ONE GRAMMAR, FIVE SLOTS, on every card, in the same order and the
+   * same positions: name, what it is, today's option, the facts, the
+   * action. CLUB spec v2 3.3 reversed v1 on this -- v1 gave each room
+   * its own internal grammar and differentiated by form and typographic
+   * rhythm, which is four things to learn at once and relies on implicit
+   * cues being picked up.
+   *
+   * SLOT 2 IS PERMANENT AND NOT DISMISSIBLE. v1 said "no room is ever
+   * explained on screen; you learn what a room is by entering it once."
+   * Wrong, and the Disney comparison argues against it -- Disney
+   * over-signals: sign, wait time, height requirement, themed queue, all
+   * before you commit. "Find out by doing" is an implicit demand.
+   *
+   * THE DEPTH RULE HOLDS. A room is not a screen you pass through. Each
+   * card carries today's answer and the button starts it.
+   *
+   * NO ROOM HAS ITS OWN COLOUR. Colour already means energy, a sore
+   * zone, caution and tier here. Somebody learning that amber means "be
+   * careful with this movement" must not also learn it means "you are in
+   * a room."
+   */
+  function roomCard({ id, title, what, option, facts, action, suggested }) {
+    return `
+      <section class="club-room ${suggested ? 'club-room--suggested' : ''}"
+               data-room-id="${id}"
+               aria-labelledby="club-room-${id}-name">
+        ${suggested ? '<p class="club-room__suggested">Suggested for today</p>' : ''}
+        <h3 class="club-room__name" id="club-room-${id}-name">${_esc(title)}</h3>
+        <p class="club-room__what">${_esc(what)}</p>
+        ${option ? `<p class="club-room__option">${_esc(option)}</p>` : ''}
+        ${facts && facts.length ? `
+          <ul class="club-room__facts">
+            ${facts.map(f => `<li>${_esc(f)}</li>`).join('')}
+          </ul>` : ''}
+        ${action}
+      </section>`;
+  }
+
+  function clubRooms() {
+    const prog     = store.get('activeProgramme') || {};
+    const progMeta = prog.programmeId ? getProgramme(prog.programmeId) : null;
+    const focus    = plannedFocusToday();
+
+    const guided = progMeta
+      ? roomCard({
+          id: 'guided', title: 'Guided class',
+          what: 'A set course. Same shape each week.',
+          option: progMeta.name,
+          facts: [
+            focus ? `Today: ${focus}` : 'Nothing scheduled today',
+            // COUNTDOWN-1: progress made, never distance remaining.
+            // "Week 3 of 12" is distance remaining wearing a position's
+            // clothes, and the gate caught it within the hour.
+            `You are ${prog.currentWeek || 1} week${(prog.currentWeek || 1) === 1 ? '' : 's'} in`
+          ],
+          suggested: !!focus,
+          action: `<button class="btn btn-primary btn-full club-room__go"
+                           data-route="my-programme" data-door-id="guided"
+                           data-requires-checkin="false">Open your class</button>`
+        })
+      // EMPTY STATE. An invitation, and it states the cost before it is
+      // paid -- CLUB spec v2 3.5.
+      : roomCard({
+          id: 'guided', title: 'Guided class',
+          what: 'A set course. Same shape each week.',
+          option: 'No class chosen yet',
+          facts: ['12 weeks', 'You choose how many sessions a week',
+                  'You can change or stop at any point'],
+          action: `<button class="btn btn-primary btn-full club-room__go"
+                           data-route="my-programme" data-door-id="guided"
+                           data-requires-checkin="false">Pick a class</button>`
+        });
+
+    const pt = roomCard({
+      id: 'pt', title: 'One to one',
+      what: 'I pick it, around how you are today.',
+      option: 'Check in first',
+      facts: ['4 questions, about a minute', 'Then one session, suggested'],
+      action: `<button class="btn btn-primary btn-full club-room__go"
+                       data-route="coach-proposal" data-door-id="pt"
+                       data-requires-checkin="true">Check in</button>`
+    });
+
+    // SHELL ONLY. Saved routines are YOUR-OWN, item 5, and need store
+    // fields that do not exist yet. The card says so rather than
+    // implying saving already works.
+    const own = roomCard({
+      id: 'own', title: 'Your own',
+      what: 'Sessions you put together yourself.',
+      option: 'Nothing saved yet',
+      facts: ['You choose the type, length and kit', 'Saving your own comes soon'],
+      action: `<button class="btn btn-primary btn-full club-room__go"
+                       data-route="session-builder" data-door-id="own"
+                       data-requires-checkin="false">Build one</button>`
+    });
+
+    // The assumptions are shown BEFORE the chips, not discovered after.
+    const quick = roomCard({
+      id: 'quick', title: 'Quick build',
+      what: 'Tell me how long. I fill the rest in.',
+      option: 'How long have you got?',
+      facts: ['At home, no equipment', 'You can change the place and kit next'],
+      action: `
+        <div class="club-room__chips" role="group" aria-label="How long have you got?">
+          ${[15, 30, 45, 60].map(m => `
+            <button class="btn btn-secondary club-room__chip"
+                    data-quick-mins="${m}"
+                    aria-label="${m} minutes">${m} min</button>`).join('')}
+        </div>`
+    });
+
+    return `
+      <p class="today-chooser-q">What do you want to do today?</p>
+      <div class="club-rooms">${guided}${pt}${own}${quick}</div>
+      <p class="today-group-label">Or go straight to</p>
+      ${tileGrid()}`;
+  }
+
+  function tileGrid() {
     const move = HOME_DOORS.filter(d => d.kind === 'session' && d.id !== 'unsure');
     const mind = HOME_DOORS.filter(d => d.id === 'wellbeing');
 
@@ -1297,8 +1503,6 @@ export function TodayView(router) {
       </button>`;
 
     return `
-      <p class="today-chooser-q">What do you want to do today?</p>
-
       <p class="today-group-label" id="today-group-body">Move your body</p>
       <div class="today-doors" role="group" aria-labelledby="today-group-body">
         ${move.map(tile).join('')}
@@ -1309,11 +1513,17 @@ export function TodayView(router) {
         <div class="today-doors" role="group" aria-labelledby="today-group-mind">
           ${mind.map(tile).join('')}
         </div>
-      ` : ''}
+      ` : ''}`;
+  }
+
+  function chooser() {
+    return `
+      <p class="today-chooser-q">What do you want to do today?</p>
+      ${tileGrid()}
 
       <button class="btn btn-ghost btn-full today-unsure"
               data-action="start-today"
-              aria-label="Not sure — I'll pick something, going on how you're doing today">
+              aria-label="Not sure \u2014 I'll pick something, going on how you're doing today">
         Not sure? I'll pick something
       </button>
       <p class="today-invite__note">I'll go on how you're doing today</p>`;

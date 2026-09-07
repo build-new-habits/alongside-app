@@ -144,7 +144,9 @@ check("7a. the arc panel is on Home", () => {
   // over the whole file passed with a tier's arc deleted.
   ok(/isPremium\(\) \? arcPanel\(\) : ''/.test(today),
      "Plan's Home does not render the arc");
-  ok(/isPremium\(\) \? '' : arcPanel\(\)/.test(today),
+  // CLUB-SHELL, 06 Sep 2026. Free's arc moved into the same ternary that
+  // chooses the chooser, because Plan now renders clubRooms() instead.
+  ok(/chooser\(\) \+ arcPanel\(\)/.test(today),
      "free's Home does not render the arc offer, so the product is never mentioned to " +
      "the people who might buy it");
   ok(/function arcPanel/.test(today), "no arc panel");
@@ -248,9 +250,17 @@ check("10a. session tiles have left PLAN's Home", () => {
   // stretch session became unreachable because coach-proposal builds
   // through workoutGenerator.js, whose type list is three hardcoded
   // names with no stretch in it.
-  ok(/\$\{chooser\(\)\}/.test(today), "Home does not render the chooser");
-  ok(!/isPremium\(\)[^\n]*\?[^\n]*chooser\(\)/.test(today),
-     "the chooser is still gated on tier, so one tier has no session doors");
+  // CLUB-SHELL, 06 Sep 2026. Plan renders clubRooms(), free renders
+  // chooser(), and BOTH render tileGrid(). The tiles are what LOBBY-1c
+  // removed and what verify-homedoors exists to protect; the rooms are
+  // an addition above them, not a replacement.
+  ok(/clubRooms\(\)/.test(today), "Plan's Home does not render the rooms");
+  ok(/function tileGrid/.test(today), "there is no tile grid");
+  const roomsAt = today.indexOf("function clubRooms");
+  const roomsBody = today.slice(roomsAt, today.indexOf("function tileGrid", roomsAt));
+  ok(/tileGrid\(\)/.test(roomsBody),
+     "the rooms do not render the tiles beneath them, so Plan loses the direct " +
+     "routes again - which is LOBBY-1c with better comments");
 });
 
 check("10b. one invitation, and it names the price of entry", () => {
@@ -318,7 +328,7 @@ check("11a. Home branches on tier at all", () => {
   // in the arc: Plan leads with it, free is offered it beneath the
   // doors. Asserted as two positions, not one branch.
   const arcPlan = today.indexOf("isPremium() ? arcPanel() : ''");
-  const arcFree = today.indexOf("isPremium() ? '' : arcPanel()");
+  const arcFree = today.indexOf("chooser() + arcPanel()");
   ok(arcPlan > -1 && arcFree > -1 && arcPlan < arcFree,
      "the arc sits in the same place on both tiers, so free is Plan with a panel swapped");
 });
@@ -329,9 +339,15 @@ check("11b. free is given a question and the controls", () => {
   const body = today.slice(at, today.indexOf("function arcPanel", at));
   ok(/What do you want to do today\?/.test(body),
      "free is never asked what it wants — which is the whole free product");
-  // BOTH groups, counted. Matching the class once passed with a group
-  // deleted, because the other one still matched.
-  const groups = (body.match(/today-group-label/g) || []).length;
+  // CLUB-SHELL, 06 Sep 2026. The group headings moved into tileGrid(),
+  // which BOTH tiers render -- the rooms are an addition on Plan, not a
+  // replacement. Asserted where they live AND asserted reachable from
+  // the chooser, so "the headings exist somewhere" cannot pass while
+  // free stops rendering them.
+  ok(/tileGrid\(\)/.test(body), "free's chooser no longer renders the tile grid");
+  const gridAt = today.indexOf("function tileGrid");
+  const grid = today.slice(gridAt, today.indexOf("function chooser", gridAt));
+  const groups = (grid.match(/today-group-label/g) || []).length;
   ok(groups >= 2,
      `${groups} group heading(s). The picks need both \u2014 structure IS the free product: ` +
      `nobody holds the thread for a free user, so the territory has to be legible to them.`);
@@ -360,9 +376,13 @@ check("11d. the offer is above the reference rows on free", () => {
   // Plan, which already calls it above. Free's offer is asserted at 7a.
   ok(!/arcPanel\(\)/.test(body),
      "the chooser still renders the arc itself, so Plan gets the panel twice");
-  const chooserAt = today.indexOf("${chooser()}");
-  const refAt     = today.indexOf("today-reference");
-  ok(chooserAt > -1 && refAt > -1 && chooserAt < refAt,
+  // CLUB-SHELL. The call site is now a tier ternary, so the literal
+  // "${chooser()}" no longer appears. Located by the ternary instead,
+  // and BOTH tiers checked -- finding one above the reference rows says
+  // nothing about the other.
+  const callAt = today.indexOf("isPremium() ? clubRooms() : chooser()");
+  const refAt  = today.indexOf("today-reference");
+  ok(callAt > -1 && refAt > -1 && callAt < refAt,
      "the chooser renders below the reference rows");
 });
 

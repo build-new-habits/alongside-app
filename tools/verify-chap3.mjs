@@ -197,7 +197,13 @@ check('with all three ways out offered',
 // unchanged and still matters: a hinge card must not block the way
 // through to moving. What it checks is now the invitation, which is
 // that way through.
-const doorsGrid = atHingeHome.c.querySelector('[data-action="start-today"]');
+// CLUB-SHELL, 06 Sep 2026. On Plan the way through is a room card, not
+// the invitation button. The PROPERTY is unchanged and still the point:
+// a hinge card must not block the way through to moving. Any of the
+// three routes to moving satisfies it, so this passes on either tier
+// without asserting which one the fixture happens to be on.
+const doorsGrid = atHingeHome.c.querySelector(
+  '[data-action="start-today"], .club-room__go, [data-door-id]');
 const doorsHidden = !doorsGrid
   || doorsGrid.hasAttribute('hidden')
   || doorsGrid.disabled

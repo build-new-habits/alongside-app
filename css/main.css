@@ -132,6 +132,7 @@
 @import 'components/upgrade-door.css';
 @import 'components/upgrade-page.css';
 @import 'components/practices.css';
+@import 'components/club-rooms.css';   /* CLUB-SHELL, 06 Sep 2026 */
 /* Content-gated — add when content sessions complete */
 /* D3:  @import 'components/home-threshold.css';       */
 /* D10: @import 'components/community-impact.css';     */
