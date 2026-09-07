@@ -192,6 +192,57 @@ ok("7a. Your own says saving is not here yet",
    "the card implies saved routines work. YOUR-OWN is item 5 and its store " +
    "fields do not exist - an empty state that lies is worse than one that waits");
 
+// ── 8. GUIDED-COPY ──────────────────────────────────────────────────────
+// The card described a course. All eight entries in programmes.js have
+// an EMPTY sessionSequence -- a programme is four phases carrying a
+// bias, not a set of sessions. The copy was written against a room
+// nobody had looked inside.
+console.log("\nTEST 8 - Guided class does not promise a course");
+
+const { PROGRAMMES } = await import(B + "data/programmes.js");
+const progs = Object.values(PROGRAMMES).filter(p => p && p.id);
+
+// The PREMISE, measured. If content ever lands, this goes red and the
+// copy can honestly say "course" again -- rather than the wording
+// staying cautious forever because nobody rechecked.
+ok("8a. no programme has any session content yet",
+   progs.every(p => (p.sessionSequence || []).length === 0),
+   "a programme now carries sessions. The card may describe a course again, " +
+   "and this assertion should be retired with the reason recorded");
+
+// home() clears storage and re-inits, so the programme has to be set
+// INSIDE the same fixture rather than before it -- setting it first and
+// calling home() would wipe it and measure the empty state instead.
+localStorage.clear();
+store.init();
+store.set("tier", "personal");
+store.set("activeProgramme", { programmeId: "beginner-fitness", currentWeek: 1 });
+const progContainer = document.createElement("div");
+document.body.appendChild(progContainer);
+TodayView({ navigate: () => {} }).mount(progContainer);
+const withProg = { c: progContainer };
+const guided = withProg.c.querySelector('[data-room-id="guided"]');
+const gText = guided ? guided.textContent.replace(/\s+/g, " ") : "";
+
+ok("8b. the card does not call itself a set course",
+   !/set course/i.test(gText),
+   gText.slice(0, 160));
+
+// "Nothing scheduled today" rendered EVERY day, because
+// plannedFocusToday() reads the empty sessionSequence. It described an
+// absence as though a schedule existed and today happened to be empty.
+ok("8c. and does not claim a schedule it does not have",
+   !/nothing scheduled/i.test(gText),
+   gText.slice(0, 160));
+
+ok("8d. it says what is actually there instead",
+   /twelve-week shape/i.test(gText),
+   gText.slice(0, 160));
+
+ok("8e. and the phase it names is real data",
+   /Foundation/.test(gText),
+   "the facts are not coming from getPhaseForWeek, so they are decoration again");
+
 console.log(fails === 0
   ? "\nCLUB-SHELL: all assertions pass\n"
   : `\nCLUB-SHELL: ${fails} FAILED\n`);
