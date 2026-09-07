@@ -179,3 +179,39 @@
   font-size: var(--text-sm);
   margin: 0;
 }
+
+/* ── QUICK-BUILD, 06 Sep 2026. The room's single scaffold screen ──────
+ *
+ * A list of what the coach assumed, each row changeable. Rows rather
+ * than cards: these are answers to review, not options to choose
+ * between, and card furniture would make four settled things look like
+ * four open questions.
+ */
+.sb-quick__list {
+  list-style: none;
+  margin: 0 0 var(--space-6);
+  padding: 0;
+}
+
+.sb-quick__row {
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  gap: var(--space-4);
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+}
+
+.sb-quick__label {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.sb-quick__change {
+  min-height: 44px;
+}
+
+.sb-quick__change:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
