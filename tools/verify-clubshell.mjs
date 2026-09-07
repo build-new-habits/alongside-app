@@ -224,9 +224,26 @@ const withProg = { c: progContainer };
 const guided = withProg.c.querySelector('[data-room-id="guided"]');
 const gText = guided ? guided.textContent.replace(/\s+/g, " ") : "";
 
-ok("8b. the card does not call itself a set course",
-   !/set course/i.test(gText),
-   gText.slice(0, 160));
+// DEVICE-2, 06 Sep 2026. This measured the WITH-PROGRAMME branch only,
+// so it passed while the empty state still said "A set course" -- the
+// exact claim GUIDED-COPY existed to remove. Asserted against the
+// SOURCE, which covers every branch, and against both rendered states.
+ok("8b. no branch of the card calls itself a set course",
+   // Comments stripped: the source now contains "set course" in the note
+   // recording what it USED to say, and a gate that cannot tell a string
+   // from a note about a string will either be silenced or silence the
+   // history. Third time today.
+   !/set course/i.test(today.split("\n").filter(l => !/^\s*(\*|\/\/|\/\*)/.test(l)).join("\n")),
+   "one branch still promises a course. GUIDED-COPY changed the branch that " +
+   "was on screen at the time and left the other");
+
+ok("8b-2. including the rendered with-programme state",
+   !/set course/i.test(gText), gText.slice(0, 160));
+
+const emptyGuided = home("personal").c.querySelector('[data-room-id="guided"]');
+ok("8b-3. and the rendered empty state",
+   !/set course/i.test(emptyGuided.textContent),
+   emptyGuided.textContent.replace(/\s+/g, " ").slice(0, 160));
 
 // "Nothing scheduled today" rendered EVERY day, because
 // plannedFocusToday() reads the empty sessionSequence. It described an
@@ -256,10 +273,22 @@ const code9 = todaySrc9.split("\n").filter(l => !/^\s*(\*|\/\/|\/\*)/.test(l)).j
 // rather than against the single word that happened to be wrong.
 const roomTitles = ["Guided class", "One to one", "Your own", "Quick build"];
 const orient = code9.slice(code9.indexOf("lets me decide today"));
-ok("9a. the orientation line names a room that exists",
+// DEVICE-2. DEVICE-1 replaced "Unsure" with "One to one" and this
+// passed -- but One to one is a PLAN room, and free's coach route is the
+// "Not sure?" button. The fix moved the fault one tier over. Both tiers
+// asserted now, from the control actually on each screen.
+ok("9a. the orientation line names a Plan room on Plan",
    roomTitles.some(r => code9.includes(`${r} lets me decide today`)),
    "it points at a door that is not on the screen - and it shows ONLY to " +
    "somebody with no goal set, the exact person who needs the pointer to work");
+
+ok("9a-2. and free's own control on free",
+   /Not sure\?[^"]*lets me decide today/.test(code9),
+   "free is told to use One to one, which is a Plan room and is not on its screen");
+
+ok("9a-3. and the line is chosen by tier, not written once for both",
+   /isPremium\(\)\s*\n?\s*\?\s*"If you'd rather not choose/.test(code9),
+   "one line for two different screens is how the fault moved rather than closed");
 
 ok("9b. and no longer says Unsure",
    !/\u201CUnsure\u201D|"Unsure"/.test(code9),
