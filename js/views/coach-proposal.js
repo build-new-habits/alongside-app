@@ -1,6 +1,30 @@
 /**
  * coach-proposal.js
- * 06 Sep 2026 v22
+ * 06 Sep 2026 v23
+ *
+ * v23 - CONSTRAINT-CLAIM. The coach claims only what it did.
+ *
+ *   The moderate band (6-6.9) said "I've worked around that". Driven at
+ *   lower-back 6: getActiveConditionIds() adds `lower-back-subacute`
+ *   and getExerciseSafetyTier(cat-cow, ...) returns SAFE. Nothing was
+ *   worked around; `caution` only appears at 7.
+ *
+ *   And session-rationale.js then told the person on the NEXT SCREEN
+ *   that the exercise works that area. Two screens, two answers, and
+ *   the truthful one looked like the mistake. Graeme met exactly that
+ *   on 06 Sep.
+ *
+ *   The subacute tier applies CARE, not exclusion, and whether it
+ *   changes the pool depends on the exercise. So the sentence now
+ *   claims the thing that is always true -- the condition was taken
+ *   into account -- and hands the judgement back instead of asserting
+ *   an outcome the coach cannot see from here.
+ *
+ *   NOT FIXED BY GOING SILENT AT 6. The person told the coach about it;
+ *   silence reads as not having been heard. And NOT by softening
+ *   severe: at 7+ the acute tier genuinely excludes, so that claim is
+ *   earned, and loosening it would be a clinical decision rather than a
+ *   wording one.
  *
  * v22 - TWO-ENGINE. THIS SCREEN NO LONGER RUNS THE OLD BUILDER.
  *
@@ -1454,7 +1478,30 @@ export function CoachProposalView(router) {
     if (moderateIds.length > 0) {
       const parts  = moderateIds.map(id => `${getConditionName(id)} (${painScores[id] || 6}/10)`);
       const plural = moderateIds.length > 1;
-      sentences.push(`Your check-in flagged ${_joinNames(parts)} today. I\'ve worked around ${plural ? 'those' : 'that'}.`);
+      // CONSTRAINT-CLAIM, 06 Sep 2026. WAS: "I've worked around that."
+      //
+      // Driven at lower-back 6: getActiveConditionIds() adds
+      // `lower-back-subacute`, and getExerciseSafetyTier(cat-cow, ...)
+      // returns SAFE. Nothing was worked around. `caution` only appears
+      // at 7. So the coach claimed an adaptation it had not made, and
+      // then session-rationale.js:521 correctly told the person on the
+      // very next screen that the exercise WORKS that area. Two screens,
+      // two answers, and the truthful one looked like the mistake.
+      //
+      // The subacute tier applies CARE, not exclusion, and whether it
+      // changes the pool at all depends on the exercise. So the sentence
+      // now claims the thing that is always true -- the condition was
+      // taken into account -- and hands the judgement back rather than
+      // asserting an outcome the coach cannot see from here.
+      //
+      // NOT narrowed to 7+ instead. Saying nothing at 6 would be worse:
+      // the person told the coach about it, and silence reads as not
+      // having been heard.
+      //
+      // FAULTLESS: every input the coach implies it used, it demonstrably
+      // used. "Taken into account" is demonstrable -- the id is in the
+      // active list. "Worked around" was not.
+      sentences.push(`Your check-in flagged ${_joinNames(parts)} today. I\'ve built this with ${plural ? 'those' : 'that'} in mind \u2014 go by how it feels, and ease off anything that pulls on ${plural ? 'them' : 'it'}.`);
     }
 
     if (mildIds.length > 0) {
