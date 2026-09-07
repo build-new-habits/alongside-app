@@ -1,6 +1,22 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 06 Sep 2026 v46
+ *
+ * v46 - QUICK-INPUTS. buildSession() takes an optional `inputs` merge,
+ *   for the case where the COACH chose the type rather than the person.
+ *
+ *   Quick build is that case. chooseSessionType() consults the class
+ *   you are in, then what the arc says is thin, then what has not come
+ *   up lately -- and none of it reached the stored record, so Quick
+ *   build had the same empty `inputs` TWO-ENGINE fixed on the One to
+ *   one route.
+ *
+ *   MERGED UNDER, not over. sessionType, durationMins and equipment are
+ *   what THIS function actually used, and a caller must not be able to
+ *   overwrite the record of that with something it merely intended.
+ *   Reversal-proven both ways round.
+ *
  * 05 Sep 2026 v45
  *   DUPE-SECTION. One exercise, one appearance.
  *   buildSessionFromSelection() filtered each section against the
@@ -2743,7 +2759,7 @@ function outOfScopeSession(declaredIds, durationMins) {
   };
 }
 
-export function buildSession({ sessionType, durationMins, equipmentOverride, preset, ignoreSevere }) {
+export function buildSession({ sessionType, durationMins, equipmentOverride, preset, ignoreSevere, inputs }) {
   // CR-2. Before SEVERE-1, and that order is load-bearing -- see
   // outOfScopeSession(). Gentle Care offers a walk; this must resolve first.
   const excluded = getExcludedConditions(store.get("conditions") || []);
@@ -3419,10 +3435,23 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
   session.rationale.adjusted = Boolean(pulseRaiser.reason) || _adjFlagged;
 
   // Store in store.js
+  // QUICK-INPUTS, 06 Sep 2026. `inputs` is an OPTIONAL merge, for a
+  // caller where the COACH chose the type rather than the person.
+  //
+  // Quick build is the case. chooseSessionType() consults the class you
+  // are in, then what the arc says is thin, then what has not come up
+  // lately -- and until now none of that reached the stored record, so
+  // Quick build had the same empty `inputs` that TWO-ENGINE fixed on
+  // the One to one route. FAULTLESS: every input the coach implies it
+  // used, it demonstrably used.
+  //
+  // MERGED UNDER, not over. sessionType, durationMins and equipment are
+  // what THIS function actually used, and a caller must not be able to
+  // overwrite the record of that with something it merely intended.
   store.set("generatedSession", {
     session,
     builtAt: new Date().toISOString(),
-    inputs:  { sessionType, durationMins, equipment: userEquipment }
+    inputs:  { ...(inputs || {}), sessionType, durationMins, equipment: userEquipment }
   });
 
   return session;
