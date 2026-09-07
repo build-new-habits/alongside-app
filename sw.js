@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v462
+ * 06 Sep 2026 v463
+ *
+ * v463 - DEVICE-1. The orientation line names a room that exists, and
+ *   the arc panel no longer claims full coverage of no strands.
  *
  * v462 - GUIDED-COPY. The Guided class card describes the twelve-week
  *   shape it actually has, instead of a course that does not exist yet.
@@ -3146,7 +3149,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v462";
+const CACHE_NAME = "alongside-v463";
 
 const SHELL_URLS = [
 
