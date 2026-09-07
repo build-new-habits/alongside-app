@@ -1,78 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v298
+## 06 Sep 2026 v297
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v297.md`. Remove v297 on upload.
-
-> ### 🟢 TWO-ENGINE SHIPPED — `alongside-v452`, **116 gates**, all green from a second independent fresh clone. CLUB build order item 1 of 9 closed.
->
-> `coach-proposal.js` v21 → **v22**. New `js/data/session-choice.js` **v1**. `gym-programme.js` and `workoutGenerator.js` touched. `Schema.md` v1.47 → **v1.48**. Cold start blueprint v45 → **v46**. New gate `tools/verify-twoengine.mjs`.
->
-> #### 🔴 What was actually wrong, measured rather than described
->
-> **The seam was one import and one call** — `coach-proposal.js:401` and `:1418`. Every other mention of `workoutGenerator` across `js/` was a comment. **The consequences were three months wide; the join was a single line.**
->
-> | | `session-builder.js` | `workoutGenerator.js` |
-> |---|---|---|
-> | Session types | **8**, including Stretch | **3**, hardcoded on one line |
-> | `sessionVariety` | 3 refs | **0** |
-> | `exercisePreferences` | 4 refs | **0** |
-> | SECTION-RULES | present | **0** |
->
-> **Every improvement to selection since June was invisible on the route Plan users were funnelled through**, and stretch could not be produced there at all. **DATA-1b predicted it in August and was three-for-three by the time it was found.**
->
-> #### 🟢 The suggestion chain — `js/data/session-choice.js`, confirmed by Graeme
->
-> 1. **The class you are in**, if you are in one — `plannedFocusToday()`. The arc leads when there is one
-> 2. **What the arc says is thin** — the aim's own strands, minus what has come up recently
-> 3. **What has not come up lately**, across all eight types
-> 4. **`full`**, which asks least of somebody the coach knows nothing about
->
-> 🔴 **Severe pain is deliberately NOT in the chain.** `buildSession()` resolves excluded conditions and `severeZoneToday()` before any pool is built. **A second copy of a safety rule is the DATA-1b shape again.** The gate reversal-proves the bypass still fires through the new chain rather than assuming it, and separately asserts the chain contains no severe check of its own.
->
-> #### 🔴 `inputs` IS FINALLY NON-EMPTY — FAULTLESS was unmeetable on this route until today
->
-> `handlePreviewStart()` has read `option.inputs` since v8 and **neither engine ever produced the field**, so the record of what the coach used was `{}` for this route's entire life **while the coach line talked about the check-in and the arc**. That is the glibness the 1–3 Sep traces caught three times, still live.
->
-> Every step now records what it consulted. `lineIsSupported()` rejects a claim about the arc when no arc was read, and about a class when none is running. **Absent means not consulted; present-but-empty means looked and found nothing. The coach may claim neither.**
->
-> #### 🟢 The NaN minutes are gone, and NOT because DURATION-STR was fixed
->
-> `session-builder` reports an honest **range** — `"25–35 mins"` across all eight types. `workoutGenerator` reported a single number from `calculateDuration()`, the function returning NaN on any of the 99 string-`rest` entries. **The good engine never claimed false precision, so the symptom was deleted by the rewiring.**
->
-> ⚠️ **DURATION-STR REMAINS OPEN and is still item 2.** Its real damage — `applyDurationCap()` failing both NaN comparisons and returning untrimmed, so a declared available time is silently ignored — survives everywhere `calculateDuration` is still used.
->
-> 🔵 **The range is kept for CLUB slot 4.** Honest bounds beat a fake-precise 33.
->
-> #### 🟢 One suggestion, not three
->
-> **The old engine produced three because it had three focuses hardcoded, not because three was a decision.** CLUB spec v2 §6.2 specifies one. The return is still an *array* of one, so that when CLUB-SHELL collapses the presentation an engine fault and a presentation fault stay distinguishable.
->
-> #### 🟢 Discipline held
->
-> **Schema before code:** `activityLog[].sessionType` declared in v1.48 before anything read it, and **written at both `gym-programme.js` completion sites** so it is not a sixth reader-without-writer. Not back-filled — every existing entry is `null`, so the chain treats "no history" as its normal early state.
->
-> **Swaps mirrored exactly:** one `args` object to both `buildSession` and `buildCandidatePools`, same as `triggerBuild()`. **Different arguments would have left `verify-swap1` green while every swap affordance silently vanished.**
->
-> **`generateDailyOptions` retired, not deleted**, with a zero-live-callers assertion. It is the record of what the route did for three months, and the three hardcoded focuses are the whole reason stretch was unreachable.
->
-> **Ten deliberate breaks, ten caught red:** old import restored · retired generator called again · swap pool built with different arguments · pool dropped before the store · chain stops recording inputs · coach allowed to claim an unread arc · a second severe check added · engine deleted instead of retired · field read but never written · field written but never declared.
-
-> ### 📋 CLUB build order — 1 of 9 closed
->
-> | # | Item | Status |
-> |---|---|---|
-> | 1 | **TWO-ENGINE** | 🟢 **Shipped, `alongside-v452`** |
-> | 2 | **DURATION-STR** | 🟠 Next. `applyDurationCap()` no-op on 99 of 551 entries |
-> | 3 | **CLUB-SHELL** | 🟡 Specified, not built |
-> | 4 | **PLAN-PICKER-TIER** | 🟡 |
-> | 5 | **YOUR-OWN** | 🟡 New store fields, schema first |
-> | 6 | **QUICK-BUILD** | 🟡 |
-> | 7 | **CONSTRAINT-CLAIM** | 🟠 |
-> | 8 | **HATCH-OVERLAP** | 🟠 |
-> | 9 | **PROGRESS** | 🟡 |
->
-> ⚠️ **Still outstanding and not in this list:** `DEV_PANEL_ENABLED = true` at `settings.js:463` — **must be fixed before any tester install**; PAR-Q+ (response in hand, held); the clinical pack, unsent; HMRC (approved, paperwork pending); legal policies, Graeme's active workstream.
+Supersedes `master_schedule_v296.md`. Remove v296 on upload.
 
 > ### 🟢 CLUB SPEC v2 — `Documents/Admin/alongside_spec_CLUB_06sep2026_v2.md`. Approved by Graeme on the mockup, 06 Sep 2026. v1 archived to `Documents/Archive/`.
 >
