@@ -1,5 +1,12 @@
 /**
  * today.js
+ * 06 Sep 2026 v29
+ *
+ * v29 - QUICK-BUILD. The time chip now asks for mode:"quick", which
+ *   sends the builder to its single scaffold screen rather than six
+ *   question phases. Without it the card's promise to fill the rest in
+ *   is followed immediately by six more questions.
+ *
  * 06 Sep 2026 v28
  *
  * v28 - YOUR-OWN. The Your own room stops being a shell.
@@ -941,7 +948,12 @@ export function TodayView(router) {
       btn.addEventListener('click', () => {
         const mins = Number(btn.dataset.quickMins);
         if (!Number.isFinite(mins) || mins <= 0) return;
-        store.set('sessionBuilderPreselect', { durationMins: mins, returnTo: 'today' });
+        // QUICK-BUILD. mode:'quick' sends the builder to its single
+        // scaffold screen rather than the six question phases. Without
+        // it the card's "tell me how long and I fill the rest in" is
+        // followed immediately by six more questions.
+        store.set('sessionBuilderPreselect',
+                  { durationMins: mins, mode: 'quick', returnTo: 'today' });
         router.navigate('session-builder');
       });
     });

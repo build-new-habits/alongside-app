@@ -1,5 +1,5 @@
 # Alongside — Data Schema Reference
-## 06 Sep 2026 v1.50
+## 06 Sep 2026 v1.51
 
 **File:** `js/store.js` (confirmed live version: **v65, 06 Sep 2026**)
 
@@ -267,6 +267,16 @@ Now used by `today.js` (×4), `progress.js` (×2) and `reflect.js`'s `getSession
 **Two of those reads matter more than the count.** `_sessionCompletedToday()` drives *"You moved today — that's done"*, and `getSessionCount()` drives the empathy arc — so a session opened and abandoned both told somebody they had moved and advanced them toward a prompt meant to follow real experience.
 
 **Partials remain in `activityLog`.** A partial is a real record — it is how the app knows you started, and continuity reads it. It is simply not a session you did.
+
+### `sessionBuilderPreselect.mode` — **NEW, QUICK-BUILD, 06 Sep 2026**
+
+`"quick" | null`. Extends the existing read-once-then-cleared `sessionBuilderPreselect` object.
+
+**Why it exists.** `session-builder-ui.js` walks six question phases — type, location, zones, duration, equipment, buildmode — before it builds anything. That is right for somebody who came to compose. It is wrong for Quick build, whose entire proposition is *tell me how long and I fill the rest in*: walking six screens after answering one question is the opposite of what the room offered.
+
+`"quick"` puts the builder into a **single scaffold screen** instead: the coach's chosen type, the duration from the chip, the place and the kit — all shown, all adjustable, one button. **The assumptions are visible before the build, not discovered after it.**
+
+**Not a tier field and not a preference.** It describes how this one entry was made, which is why it is cleared on read like the rest of the object. A `mode` that persisted would turn one tap on Home into a permanent change to how the builder behaves.
 
 ### `savedSessions` — **NEW, YOUR-OWN, 06 Sep 2026**
 
