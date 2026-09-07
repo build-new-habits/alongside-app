@@ -68,7 +68,7 @@ export const GYM = [
     perSide: false,
     sets: 8,
     reps: '1 minute hard, 90 seconds easy',
-    rest: '90s active',
+    rest: 90, restStyle: "active",
     instructions: [
       'Walk for five minutes to warm up, then bring the belt to an easy jog',
       'Run for one minute at a pace you could hold for about three minutes if you had to',
@@ -106,7 +106,7 @@ export const GYM = [
     perSide: false,
     sets: 1,
     reps: '30 minutes',
-    rest: '0s',
+    rest: 0,
     instructions: [
       'Walk flat for three minutes at a comfortable pace to start',
       'Raise the incline to somewhere between eight and twelve percent and settle into a strong walking pace',
@@ -144,7 +144,7 @@ export const GYM = [
     perSide: false,
     sets: 6,
     reps: '90 seconds hard, 90 seconds easy',
-    rest: '90s active',
+    rest: 90, restStyle: "active",
     instructions: [
       'Start with three minutes at an easy pace and light resistance to warm up',
       'Raise the resistance and work hard for ninety seconds, driving through the handles as well as the legs',
@@ -182,7 +182,7 @@ export const GYM = [
     perSide: false,
     sets: 1,
     reps: '20 minutes',
-    rest: '0s',
+    rest: 0,
     instructions: [
       'Step on and start slowly, finding the rhythm before you speed up',
       'Stand tall with your weight over the middle of your foot, not on your toes',
@@ -220,7 +220,7 @@ export const GYM = [
     perSide: false,
     sets: 6,
     reps: '45 seconds fast, 75 seconds easy',
-    rest: '75s active',
+    rest: 75, restStyle: "active",
     instructions: [
       'Climb easy for three minutes to warm up',
       'Raise the speed and climb hard for forty-five seconds, still taking full steps',
@@ -258,7 +258,7 @@ export const GYM = [
     perSide: false,
     sets: 8,
     reps: '30 seconds hard, 60 seconds easy',
-    rest: '60s active',
+    rest: 60, restStyle: "active",
     instructions: [
       'Stand facing the machine, feet hip-width apart, and reach up to take a handle in each hand',
       'Pull both handles down past your hips, hinging at the hips and using your stomach as much as your arms',
@@ -300,7 +300,7 @@ export const GYM = [
     perSide: false,
     sets: 6,
     reps: '20 metres',
-    rest: '60s',
+    rest: 60,
     instructions: [
       'Load the sled, take hold of the high handles, and lean into it with straight arms',
       'Set your body at an angle, chest forward, and drive it with your legs rather than your arms',
@@ -338,7 +338,7 @@ export const GYM = [
     perSide: false,
     sets: 6,
     reps: '30 seconds',
-    rest: '45s',
+    rest: 45,
     instructions: [
       'Take one rope end in each hand and step back until there is a slight slack',
       'Drop into a quarter squat with your chest up and your stomach braced',
@@ -376,7 +376,7 @@ export const GYM = [
     perSide: true,
     sets: 4,
     reps: '30 metres each side',
-    rest: '60s',
+    rest: 60,
     instructions: [
       'Stand a kettlebell beside one foot and pick it up with a straight back, as though lifting a suitcase',
       'Stand tall with the bell hanging at your side and your shoulders level',
@@ -414,7 +414,7 @@ export const GYM = [
     perSide: false,
     sets: 4,
     reps: '40 metres',
-    rest: '75s',
+    rest: 75,
     instructions: [
       'Set a kettlebell either side of you and pick both up with a flat back and braced stomach',
       'Stand tall, shoulders back and down, and let the weights hang',
@@ -459,7 +459,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '12',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-3',
     instructions: [
       'Set both cables to chest height and stand between the two towers',
@@ -499,7 +499,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '12',
-    rest: '60s',
+    rest: 60,
     tempo: '2-1-3',
     instructions: [
       'Sit at the machine with your feet on the platform and a slight bend in your knees',
@@ -538,7 +538,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '10',
-    rest: '60s',
+    rest: 60,
     tempo: '2-1-3',
     instructions: [
       'Set the thigh pad so your legs are held firmly and your feet are flat on the floor',
@@ -578,7 +578,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '12',
-    rest: '60s',
+    rest: 60,
     tempo: '3-1-2',
     instructions: [
       'Set a rope attachment at the lowest position on the cable',
@@ -618,7 +618,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '15',
-    rest: '30s',
+    rest: 30,
     tempo: '2-1-3',
     instructions: [
       'Set the cable high with a rope attachment and take one end in each hand',
@@ -657,7 +657,7 @@ GYM.push(
     perSide: true,
     sets: 3,
     reps: '12 each side',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-2',
     instructions: [
       'Set the cable high and stand side-on to the machine, feet a little wider than your hips',
@@ -696,7 +696,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '10',
-    rest: '90s',
+    rest: 90,
     tempo: '3-1-2',
     instructions: [
       'Sit with your back and hips flat against the pad and your feet shoulder-width on the platform',
@@ -736,7 +736,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '12',
-    rest: '60s',
+    rest: 60,
     tempo: '2-1-3',
     instructions: [
       'Adjust the seat so the handles sit level with the middle of your chest',
@@ -775,7 +775,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '12',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-3',
     instructions: [
       'Set the machine so the pad rests just above your heels, not on your calves',
@@ -823,7 +823,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '10',
-    rest: '75s',
+    rest: 75,
     tempo: '3-1-2',
     instructions: [
       'Set an adjustable bench to around forty-five degrees',
@@ -863,7 +863,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '10',
-    rest: '75s',
+    rest: 75,
     tempo: '2-1-3',
     instructions: [
       'Sit or stand tall with a dumbbell in each hand held in front of your shoulders, palms facing you',
@@ -902,7 +902,7 @@ GYM.push(
     perSide: true,
     sets: 3,
     reps: '8 each side',
-    rest: '75s',
+    rest: 75,
     tempo: '2-1-2',
     instructions: [
       'Set two dumbbells on the floor about shoulder-width apart',
@@ -949,7 +949,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '15',
-    rest: '45s',
+    rest: 45,
     tempo: '2-1-3',
     instructions: [
       'Set a rope attachment at the top of the cable and kneel facing the machine',
@@ -988,7 +988,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '10',
-    rest: '60s',
+    rest: 60,
     tempo: '2-1-3',
     instructions: [
       'Set a decline bench to a shallow angle and hook your feet securely',
@@ -1028,7 +1028,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '8',
-    rest: '75s',
+    rest: 75,
     tempo: '3-1-2',
     instructions: [
       'Kneel on a mat with the wheel on the floor directly beneath your shoulders',
@@ -1077,7 +1077,7 @@ GYM.push(
     perSide: true,
     sets: 3,
     reps: '8 each side',
-    rest: '60s',
+    rest: 60,
     tempo: 'Explosive',
     instructions: [
       'Stand side-on to a solid wall, about two feet away, holding the ball at chest height',
@@ -1116,7 +1116,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '10',
-    rest: '60s',
+    rest: 60,
     tempo: '3-1-2',
     instructions: [
       'Place the BOSU dome-side down and step onto the flat platform, feet shoulder-width apart',
@@ -1162,7 +1162,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '45 seconds',
-    rest: '45s',
+    rest: 45,
     instructions: [
       'Place the board near a wall or something solid you can touch if you need to',
       'Step on with both feet either side of the centre and find level',
@@ -1200,7 +1200,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '20 seconds',
-    rest: '60s',
+    rest: 60,
     tempo: 'Quick, light',
     instructions: [
       'Stand beside a low box with your feet together',
@@ -1240,7 +1240,7 @@ GYM.push(
     perSide: false,
     sets: 3,
     reps: '12',
-    rest: '60s',
+    rest: 60,
     tempo: '2-1-3',
     instructions: [
       'Take a handle in each hand and walk your feet forward until you are leaning back with arms straight',
@@ -1288,7 +1288,7 @@ GYM.push(
     perSide: true,
     sets: 3,
     reps: '10 each side',
-    rest: '45s',
+    rest: 45,
     tempo: '2-2-2',
     instructions: [
       'Set the cable to roughly chest height and stand side-on to the machine',
@@ -1331,7 +1331,7 @@ GYM.push(
     affectsAreas: ['ankle-foot', 'knee', 'hip', 'core'],
     contraindications: ['ankle-foot-acute', 'knee-acute'],
     energyRequired: 3, difficultyLevel: 4, duration: 180,
-    perSide: true, sets: 3, reps: '20 seconds each side', rest: '40s',
+    perSide: true, sets: 3, reps: '20 seconds each side', rest: 40,
     instructions: [
       'Set the board near a wall or worktop you can touch if you need to',
       'Step on with both feet and find level first',
@@ -1356,7 +1356,7 @@ GYM.push(
     affectsAreas: ['quadriceps', 'glutes', 'ankle-foot', 'core'],
     contraindications: ['knee-acute', 'ankle-foot-acute'],
     energyRequired: 5, difficultyLevel: 4, duration: 180,
-    perSide: false, sets: 3, reps: '10', rest: '60s', tempo: '3-1-3',
+    perSide: false, sets: 3, reps: '10', rest: 60, tempo: '3-1-3',
     instructions: [
       'Step onto the board with your feet about shoulder-width apart',
       'Find level and take a moment before you start',
@@ -1381,7 +1381,7 @@ GYM.push(
     affectsAreas: ['ankle-foot', 'calves', 'knee'],
     contraindications: ['ankle-foot-acute'],
     energyRequired: 2, difficultyLevel: 3, duration: 180,
-    perSide: false, sets: 3, reps: '30 seconds', rest: '30s',
+    perSide: false, sets: 3, reps: '30 seconds', rest: 30,
     instructions: [
       'Step onto the board with both feet, something steady within reach',
       'Tip the board slowly forward until the front edge touches down',
@@ -1406,7 +1406,7 @@ GYM.push(
     affectsAreas: ['quadriceps', 'glutes', 'hamstring'],
     contraindications: ['knee-acute', 'hip-acute'],
     energyRequired: 6, difficultyLevel: 3, duration: 240,
-    perSide: true, sets: 3, reps: '10 each side', rest: '60s', tempo: '2-1-3',
+    perSide: true, sets: 3, reps: '10 each side', rest: 60, tempo: '2-1-3',
     instructions: [
       'Stand facing a box at roughly knee height, a dumbbell in each hand',
       'Place your whole right foot on the box, not just the toes',
@@ -1431,7 +1431,7 @@ GYM.push(
     affectsAreas: ['quadriceps', 'glutes', 'calves', 'ankle-foot'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'achilles-acute', 'hip-acute'],
     energyRequired: 7, difficultyLevel: 5, duration: 180,
-    perSide: false, sets: 4, reps: '5', rest: '90s', tempo: 'Explosive up, controlled down',
+    perSide: false, sets: 4, reps: '5', rest: 90, tempo: 'Explosive up, controlled down',
     instructions: [
       'Stand a comfortable stride from a box you are confident you can clear easily',
       'Dip quickly at the hips and knees, swinging your arms back',
@@ -1457,7 +1457,7 @@ GYM.push(
     affectsAreas: ['calves', 'ankle-foot', 'quadriceps', 'shoulder'],
     contraindications: ['knee-acute', 'ankle-foot-acute', 'achilles-acute'],
     energyRequired: 7, difficultyLevel: 4, duration: 480,
-    perSide: false, sets: 6, reps: '40 seconds', rest: '40s',
+    perSide: false, sets: 6, reps: '40 seconds', rest: 40,
     instructions: [
       'Set the rope length by standing on the middle — the handles should reach your armpits',
       'Keep your elbows close to your ribs and turn the rope with your wrists',
@@ -1483,7 +1483,7 @@ GYM.push(
     affectsAreas: ['full-body', 'shoulder', 'abdominals', 'upper-back'],
     contraindications: ['shoulder-acute', 'lower-back-acute'],
     energyRequired: 6, difficultyLevel: 3, duration: 180,
-    perSide: false, sets: 4, reps: '6', rest: '60s', tempo: 'Explosive',
+    perSide: false, sets: 4, reps: '6', rest: 60, tempo: 'Explosive',
     instructions: [
       'Stand a couple of strides from a solid wall, holding the ball in both hands',
       'Take it overhead and slightly behind, letting your ribs stay down',
@@ -1508,7 +1508,7 @@ GYM.push(
     affectsAreas: ['quadriceps', 'glutes', 'shoulder', 'abdominals'],
     contraindications: ['knee-acute', 'shoulder-acute'],
     energyRequired: 6, difficultyLevel: 3, duration: 240,
-    perSide: false, sets: 3, reps: '12', rest: '60s', tempo: '2-1-2',
+    perSide: false, sets: 3, reps: '12', rest: 60, tempo: '2-1-2',
     instructions: [
       'Stand with feet shoulder-width apart, holding the ball at your chest',
       'Squat down as far as is comfortable, keeping your chest up',
@@ -1533,7 +1533,7 @@ GYM.push(
     affectsAreas: ['glutes', 'quadriceps', 'hip', 'ankle-foot'],
     contraindications: ['knee-acute', 'hip-acute'],
     energyRequired: 5, difficultyLevel: 2, duration: 240,
-    perSide: false, sets: 3, reps: '45 seconds', rest: '45s',
+    perSide: false, sets: 3, reps: '45 seconds', rest: 45,
     instructions: [
       'Stand side-on to a low step with it to your right',
       'Step your right foot up onto it, then bring the left up to meet it',
@@ -1573,7 +1573,7 @@ GYM.push(
     affectsAreas: ['upper-back', 'shoulder', 'triceps-biceps', 'abdominals'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 7, difficultyLevel: 6, duration: 240,
-    perSide: false, sets: 3, reps: '5', rest: '90s', tempo: '2-1-3',
+    perSide: false, sets: 3, reps: '5', rest: 90, tempo: '2-1-3',
     instructions: [
       'Take an overhand grip on the bar, hands a little wider than your shoulders',
       'Hang with your arms straight and your shoulders pulled down away from your ears',
@@ -1599,7 +1599,7 @@ GYM.push(
     affectsAreas: ['abdominals', 'core', 'hip-flexor', 'shoulder'],
     contraindications: ['shoulder-acute', 'lower-back-acute'],
     energyRequired: 6, difficultyLevel: 4, duration: 180,
-    perSide: false, sets: 3, reps: '10', rest: '60s', tempo: '2-1-3',
+    perSide: false, sets: 3, reps: '10', rest: 60, tempo: '2-1-3',
     instructions: [
       'Hang from the bar with straight arms and your shoulders pulled down',
       'Let your legs settle so you are not swinging',
@@ -1624,7 +1624,7 @@ GYM.push(
     affectsAreas: ['chest-pecs', 'triceps-biceps', 'shoulder'],
     contraindications: ['shoulder-acute', 'chest-pecs-acute', 'wrist-elbow-acute'],
     energyRequired: 7, difficultyLevel: 6, duration: 240,
-    perSide: false, sets: 3, reps: '6', rest: '90s', tempo: '3-1-2',
+    perSide: false, sets: 3, reps: '6', rest: 90, tempo: '3-1-2',
     instructions: [
       'Grip the bars and press up until your arms are straight, shoulders down',
       'Lean your chest forward very slightly and bend your knees behind you',
@@ -1650,7 +1650,7 @@ GYM.push(
     affectsAreas: ['hamstring', 'glutes', 'core'],
     contraindications: ['hamstring-acute', 'lower-back-acute'],
     energyRequired: 5, difficultyLevel: 4, duration: 180,
-    perSide: false, sets: 3, reps: '10', rest: '60s', tempo: '2-1-3',
+    perSide: false, sets: 3, reps: '10', rest: 60, tempo: '2-1-3',
     instructions: [
       'Lie on your back with both heels on top of the ball, arms out to the sides for stability',
       'Lift your hips so your body makes a straight line from shoulders to heels',
@@ -1675,7 +1675,7 @@ GYM.push(
     affectsAreas: ['abdominals', 'core'],
     contraindications: ['lower-back-acute'],
     energyRequired: 4, difficultyLevel: 3, duration: 180,
-    perSide: true, sets: 3, reps: '8 each side', rest: '45s', tempo: '3-1-3',
+    perSide: true, sets: 3, reps: '8 each side', rest: 45, tempo: '3-1-3',
     instructions: [
       'Lie on your back and hold the ball up between your hands and knees',
       'Press your hands into the ball and your knees into the ball at the same time',
@@ -1700,7 +1700,7 @@ GYM.push(
     affectsAreas: ['full-body', 'shoulder', 'abdominals', 'calves'],
     contraindications: ['shoulder-acute', 'wrist-elbow-acute'],
     energyRequired: 7, difficultyLevel: 4, duration: 600,
-    perSide: false, sets: 4, reps: '2 minutes', rest: '60s',
+    perSide: false, sets: 4, reps: '2 minutes', rest: 60,
     instructions: [
       'Wrap your hands and put gloves on before you touch the bag',
       'Stand a comfortable arm-length away, hands up by your chin',
@@ -1726,7 +1726,7 @@ GYM.push(
     affectsAreas: ['full-body', 'glutes', 'hamstring', 'shoulder', 'upper-back'],
     contraindications: ['lower-back-acute', 'shoulder-acute'],
     energyRequired: 8, difficultyLevel: 5, duration: 240,
-    perSide: false, sets: 4, reps: '6', rest: '90s', tempo: '2-0-2',
+    perSide: false, sets: 4, reps: '6', rest: 90, tempo: '2-0-2',
     instructions: [
       'Stand over the bag with your feet hip-width apart',
       'Hinge at the hips with a flat back and take a firm grip of the bag',
@@ -1752,7 +1752,7 @@ GYM.push(
     affectsAreas: ['shoulder', 'chest-pecs', 'abdominals', 'triceps-biceps'],
     contraindications: ['shoulder-acute', 'lower-back-acute'],
     energyRequired: 5, difficultyLevel: 3, duration: 240,
-    perSide: true, sets: 3, reps: '10 each side', rest: '60s', tempo: '2-1-3',
+    perSide: true, sets: 3, reps: '10 each side', rest: 60, tempo: '2-1-3',
     instructions: [
       'Set one end of a barbell in a landmine holder or wedged securely in a corner',
       'Stand facing it and hold the free end at shoulder height in one hand',
@@ -1777,7 +1777,7 @@ GYM.push(
     affectsAreas: ['hamstring', 'calves'],
     contraindications: ['hamstring-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 120,
-    perSide: true, sets: 2, reps: '30 seconds each side', rest: '0s',
+    perSide: true, sets: 2, reps: '30 seconds each side', rest: 0,
     instructions: [
       'Lie on your back with both knees bent and feet flat',
       'Loop a strap around the arch of one foot, holding an end in each hand',
@@ -1802,7 +1802,7 @@ GYM.push(
     affectsAreas: ['hamstring', 'lower-back', 'calves'],
     contraindications: ['lower-back-acute', 'hamstring-acute'],
     energyRequired: 1, difficultyLevel: 1, duration: 90,
-    perSide: false, sets: 2, reps: '45 seconds', rest: '15s',
+    perSide: false, sets: 2, reps: '45 seconds', rest: 15,
     instructions: [
       'Set two blocks on the floor about shoulder-width apart in front of you',
       'Stand with feet hip-width apart and a soft bend in both knees',
@@ -1827,7 +1827,7 @@ GYM.push(
     affectsAreas: ['glutes', 'hip'],
     contraindications: ['hip-acute'],
     energyRequired: 4, difficultyLevel: 2, duration: 180,
-    perSide: true, sets: 3, reps: '15 each side', rest: '45s', tempo: '2-1-3',
+    perSide: true, sets: 3, reps: '15 each side', rest: 45, tempo: '2-1-3',
     instructions: [
       'Fasten the weights around your ankles and lie on your side, legs stacked',
       'Rest your head on your lower arm and place the top hand on the floor for stability',
@@ -1852,7 +1852,7 @@ GYM.push(
     affectsAreas: ['glutes', 'quadriceps', 'calves', 'upper-back', 'abdominals'],
     contraindications: ['lower-back-acute', 'knee-acute'],
     energyRequired: 6, difficultyLevel: 2, duration: 1800,
-    perSide: false, sets: 1, reps: '30 minutes', rest: '0s',
+    perSide: false, sets: 1, reps: '30 minutes', rest: 0,
     instructions: [
       'Fit the vest snugly so it does not bounce as you walk',
       'Start with a few minutes unloaded or at a very light setting',

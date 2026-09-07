@@ -925,7 +925,7 @@ export const CARDIO = [
     perSide: false,
     sets: 1,
     tempo: 'Easy, conversational pace',
-    rest: '0s',
+    rest: 0,
     instructions: [
       'Set the saddle height so your leg is almost straight at the bottom of the pedal stroke, with a slight bend in the knee',
       'Set the resistance low — lower than feels like work',
@@ -962,7 +962,7 @@ export const CARDIO = [
     perSide: false,
     sets: 1,
     tempo: 'Brisk walk',
-    rest: '0s',
+    rest: 0,
     instructions: [
       'Start the belt slowly and step on before bringing it up to a brisk walking pace',
       'Set the incline flat, or at one or two percent if you want a little more',
@@ -999,7 +999,7 @@ export const CARDIO = [
     perSide: false,
     sets: 1,
     tempo: 'Easy, full range',
-    rest: '0s',
+    rest: 0,
     instructions: [
       'Step on with both feet in the centre of the pedals and take hold of the moving handles',
       'Set the resistance low, and start with a slow, full stride',
@@ -1036,7 +1036,7 @@ export const CARDIO = [
     perSide: false,
     sets: 1,
     tempo: 'Easy, technique-focused',
-    rest: '0s',
+    rest: 0,
     instructions: [
       'Sit on the machine, strap your feet in, and take hold of the handle with both hands',
       'Start with your shins upright and your arms straight, leaning very slightly forward',
