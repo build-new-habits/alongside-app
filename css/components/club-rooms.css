@@ -297,8 +297,11 @@
   gap: var(--space-1);
 }
 
+/* ARC-PLAIN. Teal, Graeme's call. It is the interactive colour and the
+   whole row IS a control, so it is doing the job it already does
+   everywhere else rather than being borrowed for decoration. */
 .club-row__title {
-  color: var(--color-text);
+  color: var(--color-primary);
   font-size: var(--text-base);
   font-weight: 600;
 }
@@ -375,38 +378,30 @@
   gap: var(--space-2);
 }
 
+/* ARC-PLAIN, 06 Sep 2026. No mark, no "not yet". Lit is full strength,
+   unlit is muted. Quieter, and the state is still stated in words by the
+   note directly below -- which is what keeps WCAG 1.4.1 satisfied.
+
+   LIT IS NOT TEAL, deliberately. Teal is the interactive colour across
+   this whole app -- buttons, links, the room titles below. Spending it
+   on "this strand has come up" would make one colour mean two things,
+   and the person learning that teal means "you can tap this" would also
+   be learning it means "done". Full-strength text against muted is the
+   contrast that does not collide with anything. */
 .today-arc__strand {
-  align-items: center;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  display: flex;
-  gap: var(--space-3);
+  color: var(--color-text-secondary);
+  display: block;
+  font-size: var(--text-sm);
   padding: var(--space-2) var(--space-3);
 }
 
 .today-arc__strand--lit {
   background: var(--color-bg-card);
   border-color: transparent;
-}
-
-.today-arc__strand-mark {
-  color: var(--color-text-secondary);
-}
-
-.today-arc__strand--lit .today-arc__strand-mark,
-.today-arc__strand--lit .today-arc__strand-label {
   color: var(--color-text);
-}
-
-.today-arc__strand-label {
-  color: var(--color-text-secondary);
-  font-size: var(--text-sm);
-}
-
-.today-arc__strand-state {
-  color: var(--color-text-secondary);
-  font-size: var(--text-xs);
-  margin-left: auto;
+  font-weight: 600;
 }
 
 /* ── Headings that read as headings ──────────────────────────────────
@@ -416,7 +411,7 @@
  * secondary body copy, so they read as sentences rather than structure.
  */
 .today-group-label {
-  color: var(--color-text);
+  color: var(--color-primary);
   font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.06em;

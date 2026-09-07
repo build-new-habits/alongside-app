@@ -355,10 +355,26 @@ ok("10e. the arc block has no progress bar or percentage",
    "the arc is showing completion. It shows COVERAGE - which strands have come " +
    "up and which have not - and a bar makes the unlit ones a shortfall");
 
-ok("10f. strand state is carried in words, not colour alone",
-   /has come up/.test(arcLed) && /not yet/.test(arcLed),
-   "colour alone cannot carry meaning (WCAG 1.4.1), and it is the first thing " +
-   "to fail on a phone in daylight");
+// ARC-PLAIN, 06 Sep 2026. The per-row mark and "not yet" label are
+// gone -- Graeme's call, and the screen is much quieter for it. WCAG
+// 1.4.1 is now carried by the NOTE, which names the strands that have
+// not come up in every state: all of them, some of them, none of them.
+// So this asserts the note rather than the rows, because the note is
+// what is doing the work. If the note ever stops naming them, state
+// becomes colour-only and this goes red.
+ok("10f. the note names which strands have not come up",
+   /_esc\(notYet\.join/.test(arcLed) && /All of it still ahead of you/.test(arcLed),
+   "state is carried by colour alone (WCAG 1.4.1), and colour is the first " +
+   "thing to fail on a phone in daylight");
+
+// One colour, one meaning. Teal is interactive across the whole app.
+const clubCss = fs.readFileSync("css/components/club-rooms.css", "utf8");
+const litRule = clubCss.slice(clubCss.indexOf(".today-arc__strand--lit"),
+                              clubCss.indexOf("}", clubCss.indexOf(".today-arc__strand--lit")));
+ok("10f-2. and a lit strand is not painted the interactive colour",
+   !/--color-primary/.test(litRule),
+   "teal means 'you can tap this' everywhere else in this app. Spending it on " +
+   "'this strand has come up' makes one colour mean two things");
 
 ok("10g. and 'not yet' is said not to mean behind",
    /Nothing is behind/.test(arcLed),
