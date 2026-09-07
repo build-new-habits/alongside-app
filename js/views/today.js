@@ -1,5 +1,23 @@
 /**
  * today.js
+ * 06 Sep 2026 v31
+ *
+ * v31 - DEVICE-1. Two claims found by reading the Plan home screen top
+ *   to bottom, the way a person meets it.
+ *
+ *   THE ORIENTATION LINE NAMED "Unsure", a door that has not existed
+ *   since CLUB-SHELL -- it was "Unsure? Coach decides", then the club
+ *   renamed it "One to one", and the line never followed. It shows only
+ *   to somebody with NO GOAL SET in their first sessions, the case this
+ *   line itself calls genuine decision paralysis. The one person who
+ *   most needs pointing at a door was pointed at one that is not there.
+ *
+ *   THE ARC PANEL SAID "Every strand has come up at least once" WHEN
+ *   THERE WERE NO STRANDS. That branch is reached whenever notYet is
+ *   empty, and zero of zero is zero -- so an arc with an aim but no
+ *   strands announced complete coverage of nothing. Vacuously true and
+ *   read as an achievement. Silent now.
+ *
  * 06 Sep 2026 v30
  *
  * v30 - GUIDED-COPY. The Guided class card stops promising a course.
@@ -1238,7 +1256,16 @@ export function TodayView(router) {
       if (goals.length === 0) {
         // Persona 2.12's case: no goal, genuine decision paralysis.
         // Naming the door that decides for you is the whole point of it.
-        return "If you'd rather not choose, \u201CUnsure\u201D lets me decide today.";
+        // DEVICE-1, 06 Sep 2026. Named "Unsure" -- a door that has not
+        // existed since CLUB-SHELL. It was "Unsure? Coach decides", then
+        // the club renamed it "One to one", and this line never followed.
+        //
+        // WORST POSSIBLE AUDIENCE FOR A STALE REFERENCE. It shows only to
+        // somebody with NO GOAL SET in their first sessions -- the case
+        // this line calls genuine decision paralysis. The one person who
+        // most needs pointing at a door was being pointed at a door that
+        // is not on their screen.
+        return "If you'd rather not choose, One to one lets me decide today.";
       }
 
       // ── ORIENT-2 (15 Aug 2026, first-ninety-seconds audit) ──────────
@@ -1780,7 +1807,19 @@ export function TodayView(router) {
             ? "All of it still ahead of you. That's the whole point of today."
             : notYet.length
             ? `${_esc(notYet.join(' and '))} ${notYet.length === 1 ? "hasn't" : "haven't"} come up yet.`
-            : "Every strand has come up at least once."
+            // DEVICE-1, 06 Sep 2026. This branch is reached when notYet
+            // is empty -- INCLUDING when there are no strands at all,
+            // because zero of zero is zero. An arc with an aim but no
+            // strands therefore announced complete coverage of nothing.
+            //
+            // Vacuously true and read as an achievement, which is the
+            // same class as every other claim corrected today: saying a
+            // thing happened when it did not. Silent instead: an arc
+            // with no strands has nothing to report, and reporting
+            // nothing is the honest form of that.
+            : strands.length
+            ? "Every strand has come up at least once."
+            : ""
         }</span>
       </button>`;
   }

@@ -243,6 +243,35 @@ ok("8e. and the phase it names is real data",
    /Foundation/.test(gText),
    "the facts are not coming from getPhaseForWeek, so they are decoration again");
 
+// ── 9. DEVICE-1 ─────────────────────────────────────────────────────────
+// Found by reading the screen top to bottom rather than by any gate.
+// Both are the same class: a sentence claiming something that is not so.
+console.log("\nTEST 9 - DEVICE-1: the screen does not name what is not there");
+
+const todaySrc9 = fs.readFileSync("js/views/today.js", "utf8");
+const code9 = todaySrc9.split("\n").filter(l => !/^\s*(\*|\/\/|\/\*)/.test(l)).join("\n");
+
+// The orientation line named "Unsure" -- a door renamed twice since.
+// Asserted against the ROOM NAMES so a third rename goes red here too,
+// rather than against the single word that happened to be wrong.
+const roomTitles = ["Guided class", "One to one", "Your own", "Quick build"];
+const orient = code9.slice(code9.indexOf("lets me decide today"));
+ok("9a. the orientation line names a room that exists",
+   roomTitles.some(r => code9.includes(`${r} lets me decide today`)),
+   "it points at a door that is not on the screen - and it shows ONLY to " +
+   "somebody with no goal set, the exact person who needs the pointer to work");
+
+ok("9b. and no longer says Unsure",
+   !/\u201CUnsure\u201D|"Unsure"/.test(code9),
+   "Unsure has not been a door since CLUB-SHELL");
+
+// "Every strand has come up at least once" was reached with ZERO
+// strands, because zero of zero is zero.
+ok("9c. full-coverage is only claimed when there are strands to cover",
+   /strands\.length\s*\n?\s*\?\s*"Every strand has come up at least once\."/.test(code9),
+   "an arc with no strands announces complete coverage of nothing - vacuously " +
+   "true, and read as an achievement");
+
 console.log(fails === 0
   ? "\nCLUB-SHELL: all assertions pass\n"
   : `\nCLUB-SHELL: ${fails} FAILED\n`);
