@@ -1,8 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v309
+## 06 Sep 2026 v310
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v308.md`. Remove v308 on upload.
+Supersedes `master_schedule_v309.md`. Remove v309 on upload.
 
 > ### 🟢 GUIDED-COPY SHIPPED — `alongside-v462`, **124 gates**, green from a second independent fresh clone.
 >
