@@ -1,7 +1,11 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v452
+ * 06 Sep 2026 v453
+ *
+ * v453 - DURATION-STR. Exercise rest is seconds as a number across the
+ *   whole library, and the in-session rest timers no longer fail
+ *   silently on a text value.
  *
  * v452 - TWO-ENGINE. The coach route builds through session-builder.js
  *   instead of workoutGenerator.js. Eight session types instead of
@@ -3112,7 +3116,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v452";
+const CACHE_NAME = "alongside-v453";
 
 const SHELL_URLS = [
 
