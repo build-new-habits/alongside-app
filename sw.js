@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v460
+ * 06 Sep 2026 v461
+ *
+ * v461 - QUICK-INPUTS. Quick build records what the coach consulted
+ *   when it chose the session type.
  *
  * v460 - PROGRESS. Progress shows the shapes of session you have been
  *   doing, from the session type recorded on every built session.
@@ -3140,7 +3143,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v460";
+const CACHE_NAME = "alongside-v461";
 
 const SHELL_URLS = [
 
