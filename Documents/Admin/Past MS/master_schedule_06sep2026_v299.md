@@ -1,66 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v300
+## 06 Sep 2026 v299
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v299.md`. Remove v299 on upload.
-
-> ### 🟢 CLUB-SHELL SHIPPED — `alongside-v454`, **118 gates**, green from a second independent fresh clone. CLUB item 3 of 9 closed.
->
-> `today.js` v26 → **v27**. New `css/components/club-rooms.css`. `session-builder-ui.js` touched. `Schema.md` v1.48 → **v1.49**. Blueprint v47 → **v48**. New gate `tools/verify-clubshell.mjs`.
->
-> #### 🔴 THE FIRST DRAFT DID LOBBY-1c AGAIN, AND THE GATE CAUGHT IT WITHIN MINUTES
->
-> The rooms initially **replaced** the eight tiles on Plan's Home. `verify-homedoors` — written hours earlier, after LOBBY-1c did exactly that — went red on *"the Mobility & Conditioning door is on Plan's Home"*. **It was right.** `yoga-session` is a route **no room reaches at all**, and mobility and stretch would have gone back to being two screens deep.
->
-> 🟢 **`tileGrid()` extracted; both tiers render it. The rooms sit above the tiles as an addition.** The standing rule held because a gate held it, not because anyone remembered.
->
-> #### 🟢 The four rooms — sorted by how much the coach leads
->
-> **Guided class · One to one · Your own · Quick build.** One grammar, five slots, same order and positions on every card: name · what it is · today's option · the facts · the action. **Slot 2 is permanent and not dismissible**, reversing v1's *"no room is ever explained on screen"*.
->
-> #### 🔴 THREE NAMES CHANGED BECAUSE GATES SAID SO, NOT BECAUSE CLAUDE PREFERRED THEM
->
-> | Was | Now | Gate, and why |
-> |---|---|---|
-> | **"Personal training"** | **"One to one"** | `verify-name1` forbids any user-facing string containing *"Personal"* — the **retired tier name**. Two names for one thing is how vocabulary drift survives, and a room name is not worth a hole in a tier-vocabulary gate. It also drops the gym-culture baggage that was the recorded reservation about "PT". ⚠️ **Graeme approved "Personal training" on the mockup and has been told this changed** |
-> | **"Week 3 of 12"** | **"You are 3 weeks in"** | `verify-countdown1`. **Progress made, never distance remaining** — a week count out of twelve is distance remaining wearing a position's clothes |
-> | `name:` on the room objects | `title:` | `verify-decisions` flagged them as inline exercise entries: `{ id, name }` is the exercise-database shape. **Renamed rather than widening the detector** — the detector is right that a view should not hold data shaped like the database |
->
-> #### 🟢 Quick build carries its own answer
->
-> New `sessionBuilderPreselect.durationMins`, declared in **Schema.md v1.49 before anything read it**, read once and cleared. **Asking the same question twice would tell somebody their first answer was not heard.**
->
-> #### 🟢 Your own is a shell and says so
->
-> *"Nothing saved yet / Saving your own comes soon."* Saved routines are **YOUR-OWN, item 5**, and their store fields do not exist. **An empty state that lies is worse than one that waits.**
->
-> #### ⚠️ THE GATE'S OWN HARNESS WAS WRONG FIRST
->
-> `verify-clubshell`'s first harness **reused one container**, so mounting free wiped the Plan render the later tests were still querying. Test 6 read free's DOM and reported no time chips on a card that renders four. Each mount now gets its own container, **and an assertion proves the isolation holds**.
->
-> ⚫ **Same class as a fixture that never reaches its branch: the assertion runs, and measures something other than what it names.** Thirteenth recorded instance.
->
-> Seven deliberate breaks, seven caught red — plus one weak break redone after it failed to go red (`durationMinsX` still contains `durationMins`).
->
-> #### 🟠 Found and fixed on the way past
->
-> `js/data/session-choice.js` was **never added to the service worker precache** when TWO-ENGINE created it. `precache-check` is one of the five gates **outside the standard loop**, which is why it stayed quiet for a day. **Offline launch would have failed.**
-
-> ### 📋 CLUB build order — 3 of 9 closed
->
-> | # | Item | Status |
-> |---|---|---|
-> | 1 | **TWO-ENGINE** | 🟢 `alongside-v452` |
-> | 2 | **DURATION-STR** | 🟢 `alongside-v453` |
-> | 3 | **CLUB-SHELL** | 🟢 **`alongside-v454`** |
-> | 4 | **PLAN-PICKER-TIER** | 🟠 **Next.** The picker moves from onboarding into Guided class |
-> | 5 | **YOUR-OWN** | 🟡 New store fields, schema first |
-> | 6 | **QUICK-BUILD** | 🟡 Shell exists; the room's own flow does not |
-> | 7 | **CONSTRAINT-CLAIM** | 🟠 |
-> | 8 | **HATCH-OVERLAP** | 🟠 |
-> | 9 | **PROGRESS** | 🟡 |
->
-> ⚠️ **Not Claude's:** PAR-Q+ (response in hand, held); clinical pack, unsent; HMRC (approved, paperwork pending); legal policies, Graeme's active workstream. `DEV_PANEL_ENABLED` carried to the **January** checklist per Graeme's 06 Sep decision, not the beta one.
+Supersedes `master_schedule_v298.md`. Remove v298 on upload.
 
 > ### 🟢 DURATION-STR SHIPPED — `alongside-v453`, **117 gates**, green from a second independent fresh clone. CLUB item 2 of 9 closed.
 >
