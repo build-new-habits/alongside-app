@@ -113,10 +113,21 @@ ok("2c. and Yoga & Pilates", planRoutes.includes("yoga-session"),
 // ── 3. ONE GRAMMAR ──────────────────────────────────────────────────────
 console.log("\nTEST 3 - every card has the same five slots, in the same order");
 
+// ARC-LED, 06 Sep 2026. Rooms are collapsed rows now, so the class
+// names changed. THE PROPERTY DID NOT: every room says what it is,
+// permanently, WITHOUT BEING OPENED.
+//
+// The first draft of that layout moved "what the room is" into the
+// expanded detail and left only state on the closed row -- so you had to
+// open a room to learn what it was, which is the "find out by doing"
+// fault CLUB spec v2 3.1 reversed v1 over. This assertion caught it.
+// Hence the closed-row scoping below: querying the whole row would pass
+// on a `what` line hidden inside the detail.
 for (const r of rooms) {
   const id = r.dataset.roomId;
-  const name  = r.querySelector(".club-room__name");
-  const what  = r.querySelector(".club-room__what");
+  const head  = r.querySelector(".club-row__head");
+  const name  = head && head.querySelector(".club-row__title");
+  const what  = head && head.querySelector(".club-row__what");
   const act   = r.querySelector(".club-room__go, .club-room__chip");
   ok(`3a. ${id}: has a name`, !!name && name.textContent.trim().length > 0);
   // SLOT 2 IS THE ONE v1 GOT WRONG. Permanent, not a first-run tooltip.
@@ -128,9 +139,10 @@ for (const r of rooms) {
 }
 
 const order = rooms.every(r => {
-  const kids = [...r.children].map(c => c.className.split(" ")[0]);
-  const n = kids.indexOf("club-room__name");
-  const w = kids.indexOf("club-room__what");
+  const kids = [...(r.querySelector(".club-row__text")?.children || [])]
+    .map(c => c.className.split(" ")[0]);
+  const n = kids.indexOf("club-row__title");
+  const w = kids.indexOf("club-row__what");
   return n > -1 && w > -1 && n < w;
 });
 ok("3d. and the name always comes before the description", order,
@@ -300,6 +312,58 @@ ok("9c. full-coverage is only claimed when there are strands to cover",
    /strands\.length\s*\n?\s*\?\s*"Every strand has come up at least once\."/.test(code9),
    "an arc with no strands announces complete coverage of nothing - vacuously " +
    "true, and read as an achievement");
+
+// ── 10. ARC-LED ─────────────────────────────────────────────────────────
+// Home led with the coach's pick and four full cards, so the screen
+// nominated a session before the person had said anything. That made the
+// app the one with the plan, and it contradicted "free is today, the
+// Plan is the arc" on the Plan tier's own home screen.
+console.log("\nTEST 10 - ARC-LED: Home does not nominate a session");
+
+const arcLed = fs.readFileSync("js/views/today.js", "utf8")
+  .split("\n").filter(l => !/^\s*(\*|\/\/|\/\*|<!--)/.test(l)).join("\n");
+
+ok("10a. no room carries a suggested flag",
+   !/suggested:/.test(arcLed),
+   "the slot is back. It was removed rather than left unused precisely so it " +
+   "could not quietly return");
+
+const planRooms = plan.c.querySelectorAll("[data-room-id]");
+ok("10b. and nothing on Home is badged as suggested",
+   ![...planRooms].some(r => /suggested for today/i.test(r.textContent)),
+   "Home is nominating a session again");
+
+// Rows open IN PLACE. The depth rule counts screens, not taps.
+ok("10c. every room row is collapsible",
+   [...planRooms].every(r => r.querySelector("[data-room-toggle]")),
+   "a room does not open in place, so it must be navigating");
+
+ok("10d. and starts closed, with aria-expanded agreeing",
+   [...planRooms].every(r => {
+     const head = r.querySelector("[data-room-toggle]");
+     const detail = r.querySelector(".club-row__detail");
+     return head.getAttribute("aria-expanded") === "false" && detail.hasAttribute("hidden");
+   }),
+   "aria-expanded and the hidden attribute disagree - the state is visible to " +
+   "sighted users and to nobody else");
+
+// The arc shows COVERAGE, not completion. No bar, no percentage, no
+// count. P4, and no streaks anywhere in this product.
+const arcSrc = arcLed.slice(arcLed.indexOf("function arcPanel"));
+ok("10e. the arc block has no progress bar or percentage",
+   !/width:\s*\$\{|%\`|percent|progress-bar/i.test(arcSrc.slice(0, 4000)),
+   "the arc is showing completion. It shows COVERAGE - which strands have come " +
+   "up and which have not - and a bar makes the unlit ones a shortfall");
+
+ok("10f. strand state is carried in words, not colour alone",
+   /has come up/.test(arcLed) && /not yet/.test(arcLed),
+   "colour alone cannot carry meaning (WCAG 1.4.1), and it is the first thing " +
+   "to fail on a phone in daylight");
+
+ok("10g. and 'not yet' is said not to mean behind",
+   /Nothing is behind/.test(arcLed),
+   "without that sentence, two of three strands reading 'not yet' is read as " +
+   "being behind, whatever the design intends");
 
 console.log(fails === 0
   ? "\nCLUB-SHELL: all assertions pass\n"
