@@ -1,6 +1,23 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 06 Sep 2026 v17
+ *
+ * v17 - QUICK-INPUTS. quickInputs now reaches the stored record.
+ *
+ *   Passed ONLY in quick mode. On every other path the person chose the
+ *   type themselves, and recording a consultation that did not happen
+ *   would be the same overclaim in the other direction --
+ *   CONSTRAINT-CLAIM, one item earlier, was exactly that fault.
+ *
+ *   CORRECTION TO v16. Its note said there was no seam to carry these
+ *   through, because triggerBuild() does not write generatedSession.
+ *   THAT WAS WRONG: buildSession() writes it itself and always has. It
+ *   is persistBuiltSession() -- the swap path -- that only rewrites an
+ *   existing record. The wrong claim is recorded rather than quietly
+ *   removed, because "there is no seam" is exactly the kind of thing a
+ *   later session inherits and designs around.
+ *
  * 06 Sep 2026 v16
  *
  * v16 - QUICK-BUILD. The room's own screen. ONE screen, not six.
@@ -357,13 +374,17 @@ let selectedDuration  = null;
 // a mode that survived would turn one tap on Home into a permanent
 // change to how the builder behaves.
 let quickMode         = false;
-// QUICK-BUILD. quickInputs holds what chooseSessionType() consulted.
-// NOT YET WRITTEN ANYWHERE, and that is recorded rather than hidden:
-// triggerBuild() does not write generatedSession -- only
-// persistBuiltSession() does, on a swap -- so there is no existing seam
-// to carry it through. Logged as QUICK-INPUTS in the master schedule.
-// Half-wiring it would be worse than leaving it: a holder nothing reads
-// looks like the record is being kept.
+// QUICK-BUILD. quickInputs holds what chooseSessionType() consulted:
+// the class you are in, what the arc says is thin, what has not come up
+// lately. QUICK-INPUTS, 06 Sep 2026, now carries it through to the
+// stored record via buildSession's optional `inputs` merge.
+//
+// The note that stood here said there was no seam to carry it. THAT WAS
+// WRONG. buildSession() writes generatedSession itself and always has;
+// it was persistBuiltSession() -- the swap path -- that only rewrites an
+// existing record. Left recorded because a claim that a seam does not
+// exist is exactly the kind of thing a later session inherits and
+// designs around.
 let quickInputs       = null;
 // D3, 13 Aug 2026. Seeded from the store rather than hardcoded, and
 // written back on every choice. Persona 2.15 trains four times a week
@@ -1514,7 +1535,12 @@ function triggerBuild() {
       sessionType:       selectedType,
       durationMins:      selectedDuration,
       equipmentOverride: equipmentOverride,
-      preset:            selectedPreset
+      preset:            selectedPreset,
+      // QUICK-INPUTS. Only in quick mode, where the COACH chose the
+      // type. On every other path the person chose it themselves, and
+      // recording a consultation that did not happen would be the same
+      // overclaim in the other direction.
+      inputs:            quickMode ? quickInputs : null
     });
 
     if (!builtSession) {

@@ -137,13 +137,32 @@ for (const phase of ["type", "duration", "location", "equipment"]) {
      `an inline editor was built for ${phase} instead of reusing the step`);
 }
 
-// ── 5. WHAT IS NOT DONE IS RECORDED, NOT HIDDEN ─────────────────────────
-console.log("\nTEST 5 - the unfinished part says so");
+// ── 5. THE COACH'S CONSULTATION REACHES THE RECORD ──────────────────────
+// QUICK-INPUTS, 06 Sep 2026. This block used to assert the OPPOSITE:
+// that the unfinished state was labelled as unfinished. It is finished
+// now, so the assertion is inverted rather than deleted -- the reason
+// it existed is the reason this one does.
+console.log("\nTEST 5 - what the coach consulted is written down");
 
-ok("5a. quickInputs is marked as not yet written",
-   /NOT YET WRITTEN ANYWHERE/.test(sbui),
-   "the holder for what the coach consulted exists with no note that nothing " +
-   "reads it. A half-wired FAULTLESS mechanism looks like the record is being kept");
+ok("5a. quick mode passes its inputs to buildSession",
+   /inputs:\s*quickMode \? quickInputs : null/.test(code),
+   "the coach chose the type and nothing recorded what it consulted - the same " +
+   "empty `inputs` TWO-ENGINE fixed on the One to one route");
+
+const sb = fs.readFileSync("js/session-builder.js", "utf8");
+ok("5b. and buildSession merges them into the stored record",
+   /inputs:\s*\{ \.\.\.\(inputs \|\| \{\}\), sessionType/.test(sb),
+   "buildSession ignores the inputs it was handed, so they are gathered and dropped");
+
+ok("5c. merged UNDER what the builder actually used, not over it",
+   /\.\.\.\(inputs \|\| \{\}\), sessionType, durationMins, equipment/.test(sb),
+   "a caller can overwrite the record of what the builder really used with " +
+   "something it merely intended");
+
+ok("5d. and ONLY in quick mode",
+   !/inputs:\s*quickInputs\b(?!.*quickMode)/.test(code),
+   "inputs are recorded on paths where the PERSON chose the type, which is the " +
+   "same overclaim in the other direction");
 
 const schema = fs.readFileSync("Documents/Live State/Schema.md", "utf8");
 ok("5b. and the mode field is declared", /sessionBuilderPreselect\.mode/.test(schema),
