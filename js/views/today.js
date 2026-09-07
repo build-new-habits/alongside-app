@@ -1,6 +1,34 @@
 /**
  * today.js
- * 06 Sep 2026 v29
+ * 06 Sep 2026 v30
+ *
+ * v30 - GUIDED-COPY. The Guided class card stops promising a course.
+ *
+ *   It said "A set course. Same shape each week." ALL EIGHT entries in
+ *   programmes.js have an EMPTY sessionSequence. A programme is four
+ *   phases each carrying a bias -- intensityBias, focusBias -- plus a
+ *   label and a coach message. A twelve-week TUNING OF THE GENERATOR,
+ *   not a course. The copy was written against a room nobody had looked
+ *   inside. Graeme, on device: "There is no Class content to follow. No
+ *   programme." There was not.
+ *
+ *   "Nothing scheduled today" was the same fault one layer down.
+ *   plannedFocusToday() reads that empty sessionSequence, so the line
+ *   rendered EVERY SINGLE DAY and the card could never be the suggested
+ *   one -- describing an absence as though a schedule existed and today
+ *   happened to be empty. The call and its import are gone from here;
+ *   the function is still used by session-choice.js's chain and becomes
+ *   real the moment classes exist.
+ *
+ *   The facts come from getPhaseForWeek() now: the phase label, what it
+ *   leans towards, how far in you are. Real data, and nothing claims a
+ *   session exists.
+ *
+ *   THE ROOM KEEPS ITS NAME. Real classes are specified --
+ *   Documents/Admin/alongside_spec_guided_class_06sep2026_v1.md, three
+ *   formats, strand-mapped, script-first -- and renaming now and back
+ *   later is churn. What had to stop was the DESCRIPTION promising
+ *   something behind the door.
  *
  * v29 - QUICK-BUILD. The time chip now asks for mode:"quick", which
  *   sends the builder to its single scaffold screen rather than six
@@ -477,12 +505,16 @@ import { store }               from '../store.js';
 import { aimById, STRANDS }    from '../data/aims.js';
 import { noticePlanJump, offerBriefPath } from '../data/pacing.js';
 import { isPremium, lockedFeature } from '../auth.js';
-// CLUB-SHELL adds plannedFocusToday: Guided class says what the class is
-// for TODAY rather than only naming the course.
-import { advanceWeekIfNeeded, isHingePending, chapterSuccessor, startChapter,
-         plannedFocusToday }
+// GUIDED-COPY, 06 Sep 2026. plannedFocusToday dropped from this import.
+// CLUB-SHELL added it so Guided class could say what the class was for
+// TODAY -- but it reads activeProgramme.sessionSequence, which is empty
+// for EVERY programme, so it returned null every time and drove nothing
+// but a permanent "Nothing scheduled today". Still exported, still used
+// by session-choice.js's chain, and it becomes real the moment classes
+// exist.
+import { advanceWeekIfNeeded, isHingePending, chapterSuccessor, startChapter }
   from '../data/programmeEngine.js';
-import { getProgramme }        from '../data/programmes.js';
+import { getProgramme, getPhaseForWeek } from '../data/programmes.js';
 import { savedSessions, resolveSavedSession, markSavedSessionUsed }
   from '../data/saved-sessions.js';
 import { detectBurnout }       from '../data/checkin.js';
@@ -1463,6 +1495,15 @@ export function TodayView(router) {
     return `${days} days ago`;
   }
 
+  /** "mobility and strength", not "mobility, strength". Two items read
+   *  as a phrase; a comma makes them look like a truncated list. */
+  function _joinPlain(list) {
+    const a = (list || []).filter(Boolean);
+    if (a.length === 0) return '';
+    if (a.length === 1) return a[0];
+    return `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`;
+  }
+
   function roomCard({ id, title, what, option, facts, action, suggested }) {
     return `
       <section class="club-room ${suggested ? 'club-room--suggested' : ''}"
@@ -1483,32 +1524,65 @@ export function TodayView(router) {
   function clubRooms() {
     const prog     = store.get('activeProgramme') || {};
     const progMeta = prog.programmeId ? getProgramme(prog.programmeId) : null;
-    const focus    = plannedFocusToday();
+    // GUIDED-COPY. plannedFocusToday() is no longer called here. It reads
+    // activeProgramme.sessionSequence, which is empty for every
+    // programme, so it returned null every time and the only thing it
+    // drove was a permanent "Nothing scheduled today".
+    //
+    // The import stays: session-choice.js's chain still calls it, and it
+    // becomes real the moment classes exist.
+
+    // GUIDED-COPY, 06 Sep 2026. THE CARD STOPS PROMISING A COURSE.
+    //
+    // It said "A set course. Same shape each week." All eight entries in
+    // programmes.js have an EMPTY sessionSequence. A programme is four
+    // phases each carrying a bias -- intensityBias, focusBias -- plus a
+    // label and a coach message. It is a twelve-week TUNING OF THE
+    // GENERATOR, not a course. The copy was written against a room
+    // nobody had looked inside. Graeme, on device: "There is no Class
+    // content to follow. No programme." There is not.
+    //
+    // "Nothing scheduled today" was the same fault one layer down.
+    // plannedFocusToday() reads activeProgramme.sessionSequence, which
+    // is empty for EVERY programme, so that line rendered every single
+    // day and the card could never be the suggested one. It described
+    // an absence as though a schedule existed and today happened to be
+    // empty.
+    //
+    // The facts now come from the phase, which is real data: its label,
+    // what it leans towards, how far in you are. Nothing here claims a
+    // session exists.
+    //
+    // THE ROOM KEEPS ITS NAME. Real classes are specified and coming --
+    // Documents/Admin/alongside_spec_guided_class_06sep2026_v1.md --
+    // and renaming now and back later is churn. What had to stop was
+    // the DESCRIPTION promising something behind the door.
+    const phase = progMeta ? getPhaseForWeek(progMeta, prog.currentWeek || 1) : null;
 
     const guided = progMeta
       ? roomCard({
           id: 'guided', title: 'Guided class',
-          what: 'A set course. Same shape each week.',
+          what: 'A twelve-week shape. I fit your sessions to it.',
           option: progMeta.name,
           facts: [
-            focus ? `Today: ${focus}` : 'Nothing scheduled today',
+            phase ? `${phase.label} \u2014 ${phase.description}` : 'A twelve-week shape',
+            phase ? `Leaning ${phase.intensityBias}, towards ${_joinPlain(phase.focusBias)}` : '',
             // COUNTDOWN-1: progress made, never distance remaining.
             // "Week 3 of 12" is distance remaining wearing a position's
             // clothes, and the gate caught it within the hour.
             `You are ${prog.currentWeek || 1} week${(prog.currentWeek || 1) === 1 ? '' : 's'} in`
-          ],
-          suggested: !!focus,
+          ].filter(Boolean),
           action: `<button class="btn btn-primary btn-full club-room__go"
                            data-route="my-programme" data-door-id="guided"
-                           data-requires-checkin="false">Open your class</button>`
+                           data-requires-checkin="false">See your shape</button>`
         })
       // EMPTY STATE. An invitation, and it states the cost before it is
       // paid -- CLUB spec v2 3.5.
       : roomCard({
           id: 'guided', title: 'Guided class',
           what: 'A set course. Same shape each week.',
-          option: 'No class chosen yet',
-          facts: ['12 weeks', 'You choose how many sessions a week',
+          option: 'Nothing chosen yet',
+          facts: ['Twelve weeks', 'It shapes what I suggest, week by week',
                   'You can change or stop at any point'],
           // PLAN-PICKER-TIER, 06 Sep 2026. goal-setup is
           // programme-select.js, the chooser that calls startChapter()
@@ -1516,7 +1590,7 @@ export function TodayView(router) {
           // directly and is now retired.
           action: `<button class="btn btn-primary btn-full club-room__go"
                            data-route="goal-setup" data-door-id="guided"
-                           data-requires-checkin="false">Pick a class</button>`
+                           data-requires-checkin="false">Choose a shape</button>`
         });
 
     const pt = roomCard({
