@@ -140,8 +140,13 @@ ok("2d. and the coach-proposal engine still does not, so the door matters",
 // ── 3. NOTHING WAS TRADED AWAY TO GET THEM BACK ─────────────────────────
 console.log("\nTEST 3 - the invitation survived, and nothing doubled");
 
+// CLUB-SHELL, 06 Sep 2026. On Plan the coach route is the Personal
+// training room rather than a ghost button, so either satisfies this.
+// What must NOT change is that a coach-picks route exists on Home at
+// all -- restoring the doors and then removing the soft option would be
+// the same mistake in the other direction.
 ok("3a. the coach-picks fallback is still offered on Plan",
-   !!plan.c.querySelector('[data-action="start-today"]'),
+   !!plan.c.querySelector('[data-action="start-today"], [data-route="coach-proposal"]'),
    "restoring the doors removed the invitation. It is meant to become one " +
    "option among them, not to be replaced in turn -- that would be the same " +
    "mistake in the other direction.");

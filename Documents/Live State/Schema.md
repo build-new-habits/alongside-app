@@ -1,5 +1,5 @@
 # Alongside — Data Schema Reference
-## 06 Sep 2026 v1.48
+## 06 Sep 2026 v1.49
 
 **File:** `js/store.js` (confirmed live version: **v64, 06 Sep 2026**)
 
@@ -267,6 +267,16 @@ Now used by `today.js` (×4), `progress.js` (×2) and `reflect.js`'s `getSession
 **Two of those reads matter more than the count.** `_sessionCompletedToday()` drives *"You moved today — that's done"*, and `getSessionCount()` drives the empathy arc — so a session opened and abandoned both told somebody they had moved and advanced them toward a prompt meant to follow real experience.
 
 **Partials remain in `activityLog`.** A partial is a real record — it is how the app knows you started, and continuity reads it. It is simply not a session you did.
+
+### `sessionBuilderPreselect.durationMins` — **NEW, CLUB-SHELL, 06 Sep 2026**
+
+`number | null`. Minutes. Extends the existing `sessionBuilderPreselect` object, which already carried `{ type, returnTo }` and is read-once-then-cleared by `session-builder-ui.js`.
+
+**Why it exists.** Quick build's whole question is *how long have you got*. Without this the time chip would be a label with nothing behind it, and the person would answer the same question twice — once on the card and again in the builder. **Asking twice is worse than not asking**: it tells somebody their first answer was not heard.
+
+**Written by** `today.js` Quick build chips. **Read once and cleared** by `session-builder-ui.js`, the same pattern as `type` — a preselect that persisted would silently pin every later build to a duration chosen days earlier.
+
+`null` means no duration was preselected and the builder asks, which is its normal behaviour.
 
 ### `activityLog[].sessionType` — **NEW, TWO-ENGINE, 06 Sep 2026**
 
