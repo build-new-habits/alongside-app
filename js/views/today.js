@@ -1,6 +1,18 @@
 /**
  * today.js
- * 06 Sep 2026 v27
+ * 06 Sep 2026 v28
+ *
+ * v28 - YOUR-OWN. The Your own room stops being a shell.
+ *
+ *   The newest saved session on the card, the rest behind a COUNTED
+ *   button -- "Your other 2 sessions", never "More". A count tells you
+ *   whether it is worth the tap; "More" makes you tap to find out.
+ *
+ *   Starting one resolves exerciseIds against the LIVE library, so a
+ *   saved session picks up safety corrections instead of carrying a
+ *   frozen copy of the database. An exercise that has since gone is
+ *   dropped and the session still starts -- refusing would punish
+ *   somebody for a library change they did not make.
  *
  * v27 - CLUB-SHELL. THE FOUR ROOMS, ADDED ABOVE THE TILES.
  *
@@ -464,6 +476,8 @@ import { advanceWeekIfNeeded, isHingePending, chapterSuccessor, startChapter,
          plannedFocusToday }
   from '../data/programmeEngine.js';
 import { getProgramme }        from '../data/programmes.js';
+import { savedSessions, resolveSavedSession, markSavedSessionUsed }
+  from '../data/saved-sessions.js';
 import { detectBurnout }       from '../data/checkin.js';
 import { proposeWeekFocus }    from '../data/week-focus.js';
 
@@ -895,6 +909,34 @@ export function TodayView(router) {
     // CLUB-SHELL. The chip IS the answer to Quick build's one question,
     // so it must carry it -- asking again in the builder would tell
     // somebody their first answer was not heard.
+    // YOUR-OWN. Ids are resolved against the LIVE library at start, so a
+    // saved session picks up safety corrections rather than carrying a
+    // frozen copy of the database. An exercise that has since gone is
+    // dropped and the session still starts -- refusing to start would
+    // punish somebody for a change they did not make.
+    container.querySelectorAll('[data-saved-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const rec = savedSessions().find(s => s.id === btn.dataset.savedId);
+        if (!rec) return;
+        const { exercises } = resolveSavedSession(rec);
+        if (!exercises.length) return;
+        markSavedSessionUsed(rec.id);
+        store.set('generatedSession', {
+          session: {
+            id:          rec.sessionType || 'own',
+            title:       rec.name,
+            duration:    rec.durationMins ? `${rec.durationMins} mins` : null,
+            exercises,
+            sessionType: rec.sessionType || null
+          },
+          builtAt: new Date().toISOString(),
+          inputs:  { savedSessionId: rec.id }
+        });
+        store.set('usingGeneratedSession', true);
+        router.navigate('gym-programme');
+      });
+    });
+
     container.querySelectorAll('[data-quick-mins]').forEach(btn => {
       btn.addEventListener('click', () => {
         const mins = Number(btn.dataset.quickMins);
@@ -1391,6 +1433,24 @@ export function TodayView(router) {
    * careful with this movement" must not also learn it means "you are in
    * a room."
    */
+  /**
+   * YOUR-OWN. "Last done 3 days ago", not a date.
+   *
+   * This is progress made, not distance remaining, so COUNTDOWN-1 is
+   * satisfied -- but it is worth saying why out loud, because a "days
+   * since" number is one small step from a "days until" one and the
+   * next person editing this card should know which side of that line
+   * it sits on.
+   */
+  function _daysAgoLabel(iso) {
+    const then = new Date(iso).getTime();
+    if (!Number.isFinite(then)) return 'recently';
+    const days = Math.floor((Date.now() - then) / 86400000);
+    if (days <= 0) return 'today';
+    if (days === 1) return 'yesterday';
+    return `${days} days ago`;
+  }
+
   function roomCard({ id, title, what, option, facts, action, suggested }) {
     return `
       <section class="club-room ${suggested ? 'club-room--suggested' : ''}"
@@ -1457,18 +1517,39 @@ export function TodayView(router) {
                        data-requires-checkin="true">Check in</button>`
     });
 
-    // SHELL ONLY. Saved routines are YOUR-OWN, item 5, and need store
-    // fields that do not exist yet. The card says so rather than
-    // implying saving already works.
-    const own = roomCard({
-      id: 'own', title: 'Your own',
-      what: 'Sessions you put together yourself.',
-      option: 'Nothing saved yet',
-      facts: ['You choose the type, length and kit', 'Saving your own comes soon'],
-      action: `<button class="btn btn-primary btn-full club-room__go"
-                       data-route="session-builder" data-door-id="own"
-                       data-requires-checkin="false">Build one</button>`
-    });
+    // YOUR-OWN, 06 Sep 2026. No longer a shell.
+    //
+    // ONE on the card, the rest behind a COUNTED button -- "Your other 2
+    // sessions", never "More". A count tells you whether it is worth the
+    // tap; "More" makes you tap to find out.
+    const saved = savedSessions();
+    const own = saved.length
+      ? roomCard({
+          id: 'own', title: 'Your own',
+          what: 'Sessions you put together yourself.',
+          option: saved[0].name,
+          facts: [
+            saved[0].durationMins ? `${saved[0].durationMins} minutes` : 'Your own length',
+            `${(saved[0].exerciseIds || []).length} movements`,
+            saved[0].lastUsedAt ? `Last done ${_daysAgoLabel(saved[0].lastUsedAt)}` : 'Not done yet'
+          ],
+          action: `<button class="btn btn-primary btn-full club-room__go"
+                           data-saved-id="${saved[0].id}">Start ${_esc(saved[0].name)}</button>
+                   ${saved.length > 1 ? `
+                     <button class="btn btn-secondary btn-full club-room__go"
+                             data-route="session-builder" data-door-id="own"
+                             data-requires-checkin="false">Your other ${saved.length - 1} session${saved.length - 1 === 1 ? '' : 's'}</button>
+                   ` : ''}`
+        })
+      : roomCard({
+          id: 'own', title: 'Your own',
+          what: 'Sessions you put together yourself.',
+          option: 'Nothing saved yet',
+          facts: ['You choose the type, length and kit', 'Save one and it stays here'],
+          action: `<button class="btn btn-primary btn-full club-room__go"
+                           data-route="session-builder" data-door-id="own"
+                           data-requires-checkin="false">Build your first</button>`
+        });
 
     // The assumptions are shown BEFORE the chips, not discovered after.
     const quick = roomCard({

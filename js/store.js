@@ -1,5 +1,15 @@
 /**
  * store.js - Data persistence layer
+ * 06 Sep 2026 v65
+ *
+ * v65 - YOUR-OWN. savedSessions added. Sessions the person built and
+ *   kept, in the order they made them. exerciseIds only, never whole
+ *   exercise objects: storing the objects would freeze a copy of the
+ *   library inside a saved session, so a safety correction, a changed
+ *   contraindication or a fixed rest value would never reach it.
+ *   Defended on rehydrate, because the Home screen reads it with
+ *   .filter and .map before anything renders.
+ *
  * 06 Sep 2026 v64
  *
  * v64 - CR-1. `chronic-fatigue` split into `persistent-fatigue`,
@@ -1166,6 +1176,11 @@ export const store = {
         ? { ...defaults.capability, ...saved.capability }
         : { ...defaults.capability },
 
+      // YOUR-OWN. Defended on rehydrate: this is read with .filter and
+      // .map on the Home screen, and a null or an object from a
+      // half-written localStorage would throw before anything renders.
+      savedSessions: Array.isArray(saved.savedSessions) ? saved.savedSessions : [],
+
       exercisePreferences: (saved.exercisePreferences && typeof saved.exercisePreferences === 'object')
         ? saved.exercisePreferences
         : {},
@@ -1763,6 +1778,14 @@ export const store = {
       // The coach still speaks first. Once, briefly. That is the line
       // this feature is not allowed to cross.
       sessionPace: 'full',   // 'full' | 'brief'
+
+      // YOUR-OWN, 06 Sep 2026. Sessions the person built and kept, in
+      // the order they made them. Schema.md v1.50 is the contract.
+      // exerciseIds only, never whole exercise objects -- storing the
+      // objects would freeze a copy of the library inside a saved
+      // session, so a safety correction, a changed contraindication or
+      // a fixed rest value would never reach it.
+      savedSessions: [],
 
 
       exercisePreferences: {}, // { [exerciseId]: { preference: 'avoid'|'less', setAt, source } } — per alongside_exercise_skip_dislike_spec_16may2026_v1.docx. Binary signal, not a rating (spec §6: "not a rating system... no stars, no thumbs, no scores"). First consumer: js/data/conditionProgrammes.js's candidate selection, 04 Aug 2026 — the full spec's in-session Skip flow (gym-programme.js/prescribed-session.js/core-session.js) remains separate future work.
