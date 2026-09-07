@@ -1,49 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v303
+## 06 Sep 2026 v302
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v302.md`. Remove v302 on upload.
-
-> ### 🟢 QUICK-BUILD SHIPPED — `alongside-v457`, **121 gates**, green from a second independent fresh clone. CLUB item 6 of 9 closed.
->
-> `session-builder-ui.js` v15 → **v16**. `today.js` v28 → **v29**. `Schema.md` v1.50 → **v1.51**. Blueprint v50 → **v51**. New gate `tools/verify-quickbuild.mjs`.
->
-> #### 🔴 The fault it fixes is a promise broken one screen later
->
-> The builder walks **six question phases** — type, location, zones, duration, equipment, buildmode — before it builds anything. Right for somebody who came to compose. **Wrong for a room whose card said *"Tell me how long. I fill the rest in"*.** Answering one question and then being asked six is the opposite of what was offered.
->
-> 🟢 `sessionBuilderPreselect.mode === "quick"` enters a **single scaffold screen**: the coach's chosen type, the length from the chip, the place and the kit — all shown, all changeable, one button. **The Home card promises "You can change the place and kit next", and that has to be true on the VERY NEXT SCREEN or it was decoration.**
->
-> #### 🟢 Decisions worth keeping
->
-> - 🔴 **The type is named and changeable.** A coach that picks silently and cannot be corrected is not handing you a frame, it is deciding for you — **the thing the four rooms exist to stop**.
-> - 🔴 **One chooser, not two.** The type comes from `chooseSessionType()`, the same chain One to one uses. **A simpler local chooser would be a second thing to keep in step — which is how the two engines drifted for three months.**
-> - **Every change button drops into the REAL step**, not an inline editor. A second location picker would be a second thing to keep in step, and the real step knows things this screen does not.
-> - **`quickMode` is cleared by `resetState()`.** A mode that survived would turn one tap on Home into a permanent change to how the builder behaves.
->
-> #### 🟠 QUICK-INPUTS — NOT DONE, and recorded rather than hidden
->
-> `quickInputs` holds what `chooseSessionType()` consulted **and nothing reads it**. `triggerBuild()` does not write `generatedSession` — only `persistBuiltSession()` does, on a swap — so **there is no existing seam to carry it through**.
->
-> ⚫ **Left unwired deliberately: a holder nothing reads would look like the FAULTLESS record was being kept.** The gate asserts the "NOT YET WRITTEN ANYWHERE" note stays, so removing the note goes red. **Quick build's coach line must not claim an input until this closes.**
->
-> #### ⚠️ `verify-css` caught three invented classes
->
-> `sb-step`, `sb-step__title`, `sb-step__lede` — written from scratch with no rules anywhere. **Fixed by reusing the wrapper the other five steps already use**, rather than writing three more rules for markup that already had a house pattern.
->
-> Seven deliberate breaks, seven caught red.
-
-> ### 📋 CLUB build order — 6 of 9 closed
->
-> | # | Item | Status |
-> |---|---|---|
-> | 1–6 | TWO-ENGINE · DURATION-STR · CLUB-SHELL · PLAN-PICKER-TIER · YOUR-OWN · QUICK-BUILD | 🟢 v452 → **v457** |
-> | 7 | **CONSTRAINT-CLAIM** | 🟠 **Next.** *"I've worked around that"* at pain 6, where nothing is |
-> | 8 | **HATCH-OVERLAP** | 🟠 |
-> | 9 | **PROGRESS** | 🟡 |
-> | + | **QUICK-INPUTS** | 🟠 **New, added by this session.** Needs a seam that does not exist |
->
-> ⚠️ **Not Claude's:** PAR-Q+ (response in hand, held); clinical pack, unsent; HMRC (approved, paperwork pending); legal policies, Graeme's active workstream. `DEV_PANEL_ENABLED` on the **January** checklist.
+Supersedes `master_schedule_v301.md`. Remove v301 on upload.
 
 > ### 🟢 YOUR-OWN SHIPPED — `alongside-v456`, **120 gates**, green from a second independent fresh clone. CLUB item 5 of 9 closed.
 >
