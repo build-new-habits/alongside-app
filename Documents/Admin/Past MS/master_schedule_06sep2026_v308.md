@@ -1,48 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v309
+## 06 Sep 2026 v308
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v308.md`. Remove v308 on upload.
-
-> ### 🟢 GUIDED-COPY SHIPPED — `alongside-v462`, **124 gates**, green from a second independent fresh clone.
->
-> `today.js` v29 → **v30**. `verify-clubshell` gains test 8. Blueprint v55 → **v56**.
->
-> #### 🔴 Two claims removed, both describing things that do not exist
->
-> **"A set course. Same shape each week."** All eight programmes have an empty `sessionSequence`. **Written against a room nobody had looked inside.**
->
-> **"Nothing scheduled today"** — the same fault one layer down. `plannedFocusToday()` reads that empty sequence, so the line rendered **every single day** and the card could never be the suggested one. **It described an absence as though a schedule existed and today happened to be empty.**
->
-> 🟢 The facts now come from `getPhaseForWeek()` — the phase label, what it leans towards, how far in you are. **Real data, and nothing claims a session exists.** The dead call and its import are gone from `today.js`; the function is still used by `session-choice.js`'s chain and becomes real the moment classes exist.
->
-> 🔵 **The room keeps its name.** Classes are specified and coming; renaming now and back later is churn. **What had to stop was the description promising something behind the door.**
->
-> #### 🟢 The gate measures the PREMISE, not just the wording
->
-> `8a` asserts no programme has session content yet. **If content ever lands, the gate goes red and the copy can honestly say "course" again** — rather than the wording staying cautious forever because nobody rechecked.
->
-> ⚠️ Its own first fixture set `activeProgramme` *before* calling `home()`, which clears storage and re-inits — **so it measured the empty state while claiming to measure a programme.** Fifteenth recorded instance of a fixture not reaching what it names. Three deliberate breaks, three caught red.
-
-> ### 🟢 GUIDED CLASS CONTENT — Graeme's two decisions, 06 Sep 2026
->
-> **First strand set: Graeme's own arc**, because **Gilly will be testing it**. Chosen over the most-reused strand deliberately: the widest coverage is worth less than the deepest scrutiny for a first pass.
->
-> **Each class carries a gentler variant** rather than routing a bad day to another room. 🔵 **The kinder option, and it roughly doubles the writing** — recorded here so the volume is not a surprise later.
->
-> ⚠️ **The variant answer came as "yeah, that's fair enough" against two options.** Read as the first — carry a variant — because it is the one consistent with everything else in this product. **Confirm before content production starts.**
-
-> ### 📋 Where things stand
->
-> **Claude's pre-beta build scope remains complete.** `alongside-v452` → **v462** today. Gates 115 → **124**.
->
-> | Remaining before beta | Owner |
-> |---|---|
-> 🟠 PAR-Q+ / RED-FLAG · clinical pack · legal policies · HMRC | **Graeme** |
-> 🟡 Beta tester device pass | **Both** |
-> 🟡 `DEV_PANEL_ENABLED` — January checklist | Claude |
->
-> 🟡 **Guided class content** — spec'd, between beta and the November soft launch.
+Supersedes `master_schedule_v307.md`. Remove v307 on upload.
 
 > ### 🟡 GUIDED CLASS — CONTENT PROGRAMME SPECIFIED. `Documents/Admin/alongside_spec_guided_class_06sep2026_v1.md`. Agreed with Graeme 06 Sep 2026. **No content exists.**
 >
