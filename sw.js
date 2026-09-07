@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v457
+ * 06 Sep 2026 v458
+ *
+ * v458 - CONSTRAINT-CLAIM. The coach no longer says it worked around a
+ *   sore area when it did not.
  *
  * v457 - QUICK-BUILD. The time chip now leads to a single scaffold
  *   screen showing what the coach assumed, rather than six question
@@ -3130,7 +3133,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v457";
+const CACHE_NAME = "alongside-v458";
 
 const SHELL_URLS = [
 
