@@ -1,7 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 06 Sep 2026 v451
+ * 06 Sep 2026 v452
+ *
+ * v452 - TWO-ENGINE. The coach route builds through session-builder.js
+ *   instead of workoutGenerator.js. Eight session types instead of
+ *   three, stretch reachable, and the person's variety and preference
+ *   settings finally read on the route the coach uses.
  *
  * v451 - HOME-DOORS and ESCAPE-Z. The session doors return to the Plan
  *   Home screen, and the escape hatch is raised above every modal in the
@@ -3107,7 +3112,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v451";
+const CACHE_NAME = "alongside-v452";
 
 const SHELL_URLS = [
 
