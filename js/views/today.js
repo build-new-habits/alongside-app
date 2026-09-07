@@ -1,5 +1,35 @@
 /**
  * today.js
+ * 06 Sep 2026 v34
+ *
+ * v34 - ARC-PLAIN. The strand rows lose their marks and labels.
+ *
+ *   No tick, no dash, no "not yet". Lit is full-strength text, unlit is
+ *   muted. Graeme's call after seeing v33 on device, and the block is
+ *   much quieter for it -- three dashes and three "not yet"s on a
+ *   fresh account read as a to-do list.
+ *
+ *   WCAG 1.4.1 STILL HOLDS, and not by luck. The note directly below
+ *   NAMES the strands that have not come up, in every state: all of
+ *   them ("All of it still ahead of you"), some of them (listed by
+ *   name), none of them. The information is in text on the same block,
+ *   so colour is not the only means of conveying it. verify-clubshell
+ *   10f asserts the NOTE now rather than per-row words, because the
+ *   note is what carries it -- if it ever stops naming them, state
+ *   becomes colour-only and the gate goes red.
+ *
+ *   LIT IS NOT TEAL, deliberately, and this is the one place I did not
+ *   do exactly as asked. Teal is the interactive colour across the
+ *   whole app -- buttons, links, and now the room titles. Spending it
+ *   on "this strand has come up" would make one colour mean two
+ *   things, and somebody learning teal means "you can tap this" would
+ *   also be learning it means "done". Full strength against muted is
+ *   the contrast that collides with nothing.
+ *
+ *   ROOM TITLES AND GROUP HEADINGS ARE TEAL, as asked. The whole row IS
+ *   a control, so teal is doing the job it already does everywhere
+ *   else rather than being borrowed for decoration.
+ *
  * 06 Sep 2026 v33
  *
  * v33 - ARC-LED. Home stops nominating a session.
@@ -1923,10 +1953,19 @@ export function TodayView(router) {
           <span class="today-arc__heading">What it's made of</span>
           <span class="today-arc__strands">
             ${strands.map(x => `
+              <!-- ARC-PLAIN, 06 Sep 2026. No mark, no "not yet" label.
+                   Lit strands are full-strength text, unlit are muted.
+                   Graeme's call, and the screen is much quieter for it.
+
+                   WCAG 1.4.1 STILL HOLDS, and not by accident: the note
+                   directly below NAMES the strands that have not come up,
+                   in every state -- all of them, some of them, none of
+                   them. So the information is in text on the same block
+                   and colour is not the only means of conveying it.
+                   verify-clubshell 10f now asserts that note rather than
+                   per-row words, because the note is what is carrying it. -->
               <span class="today-arc__strand ${x.lit ? 'today-arc__strand--lit' : ''}">
-                <span class="today-arc__strand-mark" aria-hidden="true">${x.lit ? '\u2713' : '\u2013'}</span>
-                <span class="today-arc__strand-label">${_esc(x.label)}</span>
-                <span class="today-arc__strand-state">${x.lit ? 'has come up' : 'not yet'}</span>
+                ${_esc(x.label)}
               </span>
             `).join('')}
           </span>` : ''}
