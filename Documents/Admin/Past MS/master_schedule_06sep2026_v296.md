@@ -1,50 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v297
+## 06 Sep 2026 v296
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v296.md`. Remove v296 on upload.
-
-> ### 🟢 CLUB SPEC v2 — `Documents/Admin/alongside_spec_CLUB_06sep2026_v2.md`. Approved by Graeme on the mockup, 06 Sep 2026. v1 archived to `Documents/Archive/`.
->
-> **v1 was reviewed against the needs of neurodivergent users and three of its decisions were reversed.** v1 is kept because the reversals are the useful part.
->
-> #### 🔴 REVERSAL 1 — "no room is ever explained on screen" was wrong
->
-> v1: *"You learn what a room is by entering it once."* **The Disney comparison argues against this.** Disney over-signals — sign, wait time, height requirement, themed queue, all before you commit. **The bins work because the signposting is relentless, not because the park withholds.** v1 used "granular detail" to justify removing information.
->
-> **"Find out by doing" is an implicit demand.** It spends executive function, it is a barrier under demand avoidance, and uncertainty about what is behind a door is a real obstacle for autistic users rather than a preference.
->
-> 🟢 **Every room carries a permanent one-line statement of what it is, in a fixed slot. Not a first-run tooltip. Not dismissible.**
->
-> #### 🔴 REVERSAL 2 — the copy budget measured the wrong thing
->
-> v1 turned *"very much less words"* into ceilings: 2 / 6 / 12 / 25 words. **Ambiguity costs more than words do.** Six words producing *"Steady Legs"* when the person needs the length, the place, the kit and the body area is withheld information dressed as restraint.
->
-> 🟢 **The rule is now: no sentence does work a fact could do. Prose gets cut. Facts stay.**
->
-> #### 🔴 REVERSAL 3 — four textures was four grammars to learn
->
-> v1 gave each room its own internal grammar (sequence, speech, authorship, assembly) and differentiated by form, density and typographic rhythm. **Differentiating by feel is exactly what fails people who do not read implicit signal.**
->
-> 🟢 **One grammar. Five slots, same order, same positions, on every room card:** name · what it is · today's option · the facts · the action. **Texture may reinforce inside a room. It may never be the only signal and may never move a slot.**
->
-> #### 🟢 Also changed on the same pass
->
-> | Change | Reason |
-> |---|---|
-> | **"PT" → "Personal training"** | v1 deferred this to testers. Wrong: *personal trainer* already carries fitness-culture baggage for an audience defined by being failed by fitness culture, and **an abbreviation makes it worse** |
-> | **"Freestyle" → "Your own"** | Freestyle is a swimming stroke and a vague promise |
-> | **Two tap targets, never one** | A single tap that launches is accidental activation plus commitment before knowing. Filled button starts; outline button previews **in place**, so the depth rule still holds. Both ≥44px |
-> | **The recommendation stays** | v1 removed it with the gold banner. **The banner was the problem; recommending was not** — a clear recommendation reduces decision load, which this audience needs most. Now a quiet accent line and a 2px border |
-> | **Facts stacked, one per line** | `28 MIN · 7 EXERCISES` scans as one blob and the middle-dot meta string is a named generic tell |
-> | **Every cost stated before it is paid** | Personal training names the check-in — four questions, about a minute — before you tap. Quick build shows the assumptions it has already made |
-> | **No entry animation** | v1's one orchestrated moment withdrawn. **A screen that assembles itself is a screen you cannot read while it moves** |
->
-> #### 🟡 Accepted and recorded
->
-> **The screen is taller, roughly one and a half phone screens.** Deliberate: a predictable scroll costs less than a hidden room, and fixed slot order means the same fact is in the same place on every card.
->
-> **Guided class and Personal training could still read as the same thing** to somebody who has used neither. Slot 2 separates them, which is stronger than v1's textures were. **The assumption most worth testing early on a handset.**
+Supersedes `master_schedule_v295.md`. Remove v295 on upload.
 
 > ### 🟢 CLUB SPECIFIED — `Documents/Admin/alongside_spec_CLUB_06sep2026_v1.md`. Three decisions taken by Graeme, 06 Sep 2026.
 >
