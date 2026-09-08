@@ -1,54 +1,8 @@
 # Alongside: Move — Master Schedule
-## 06 Sep 2026 v311
+## 06 Sep 2026 v310
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v310.md`. Remove v310 on upload.
-
-> # 📋 START HERE IF YOU ARE A NEW SESSION
->
-> **Live: `alongside-v466`, 124 gates, `store.js` v65, `Schema.md` v1.51, cold start blueprint v60.** Read that blueprint after this block.
->
-> **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep.
->
-> ### The three live workstreams, in the order Claude recommended
->
-> | # | What | State |
-> |---|---|---|
-> | 1 | 🟠 **Device pass, tasks 3–8** | **Recommended next.** Tasks 1–2 found **four defects in shipped code**, so expect more. Quick build scaffold · One to one through check-in · build-and-save · Your own with saved sessions · in-session card and rest timer · Progress |
-> | 2 | 🟡 **Class data contract** | Three classes written; **fix the contract against them before writing a fourth** |
-> | 3 | 🟡 **Class content** | Graeme's arc first, then expand. Six to eight more plus lighter variants |
-> | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
->
-> ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v310 — four items, `v463` → `v466`
->
-> | Item | What |
-> |---|---|
-> **DEVICE-1** `v463` | The orientation line named **"Unsure"**, a door renamed twice since. It shows ONLY to somebody with no goal set — **the one person who most needs the pointer to work.** Also: the arc panel claimed *"Every strand has come up at least once"* when there were **no strands** — zero of zero is zero |
-> **DEVICE-2** `v464` | 🔴 **DEVICE-1 moved the fault instead of closing it.** "One to one" is a **Plan** room; free's coach route is its "Not sure?" button. Fixed within the hour because it was verified on one fixture. Also: GUIDED-COPY changed one branch and left the empty state saying *"A set course"* |
-> **ARC-LED** `v465` | **Home stops nominating a session.** The arc is what you land on; the four rooms are collapsed rows. Nothing is suggested — the `suggested` slot is **removed**, not left unused |
-> **ARC-PLAIN** `v466` | Strands are plain text, lit or muted. No marks, no "not yet". **Room titles and group headings are teal.** Lit strands are deliberately **not** teal: teal means *interactive* everywhere else |
->
-> ⚫ **The recurring lesson across all four: a fix verified on one fixture is not verified.** DEVICE-1 → DEVICE-2 within the hour; GUIDED-COPY's gate mounted only the with-programme branch; ARC-LED's first draft regressed slot 2 and `verify-clubshell` 3b caught it before it shipped.
-
-> ### 🟢 GUIDED CLASS CONTENT — three classes written, `Documents/Admin/`
->
-> Spec is **v3** (`alongside_spec_guided_class_06sep2026_v1.md`). Classes are **v2, v1, v1**.
->
-> | Class | Strand | Format | What it strained |
-> |---|---|---|---|
-> **001 Ground** | `trusting-body` | stretch + mindfulness | Set the shape. `beats`, not `exercises` — half of it is silence and questions |
-> **002 Steady Round** | `trunk-strength` | bodyweight circuit | Added `rounds`, `roundRange`, `stopCue`. Proved `easierRouteId` ≠ `seatedAlternativeId` |
-> **003 Stopping Early** | `pacing` | mindfulness | `holdSeconds` confirmed **optional**. Added `reflectBeat` |
->
-> 🔴 **PACING, spec §4b — added after Graeme asked about video-style speed controls.** A single playback rate **silently rewrites the workload**: at 1.5x Class 002's 35-second plank becomes 23 seconds, a harder exercise; at 0.5x it becomes 70, the opposite of what somebody choosing *slower* asked for.
->
-> 🟢 **So a beat carries `speechSeconds` (scales) and `holdSeconds` (never scales).** Cheap now; retrofitting means revisiting every beat in every class to work out which number was which.
->
-> 🟢 **TAP-TO-ADVANCE IS THE DEFAULT**, not a timer. A speed control still assumes the class drives and the person keeps up — it only changes how fast. **Tap-to-advance means the person drives**, which is the same reason the clock went. Beta ships with only this. Speed control waits for audio, capped 0.75/1/1.25, labelled by effect.
->
-> ⚫ **Nothing is built for classes yet** — no beat renderer, no tap-to-advance, no two-duration split.
+Supersedes `master_schedule_v309.md`. Remove v309 on upload.
 
 > ### 🟢 GUIDED-COPY SHIPPED — `alongside-v462`, **124 gates**, green from a second independent fresh clone.
 >
