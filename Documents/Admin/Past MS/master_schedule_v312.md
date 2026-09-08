@@ -1,44 +1,25 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v313
+## 08 Sep 2026 v312
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v312.md`. Remove v312 on upload.
+Supersedes `master_schedule_v311.md`. Remove v311 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v468`, 126 gates, `store.js` v65, `Schema.md` v1.51, cold start blueprint v62.** Read that blueprint after this block.
+> **Live: `alongside-v467`, 124 gates, `store.js` v65, `Schema.md` v1.51, cold start blueprint v61.** Read that blueprint after this block.
 >
-> **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
+> **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 — `v467` on 08 Sep.**
 >
 > ### The three live workstreams, in the order Claude recommended
 >
 > | # | What | State |
 > |---|---|---|
-> | 1 | 🟠 **Device pass, tasks 5–8** | **Recommended next.** Tasks 1–4 found **ten defects in shipped code**, so expect more. ~~Quick build scaffold~~ · ~~One to one through check-in to proposal~~ **both done 08 Sep** · build-and-save · Your own with saved sessions · in-session card and rest timer · Progress |
+> | 1 | 🟠 **Device pass, tasks 4–8** | **Recommended next.** Tasks 1–3 found **seven defects in shipped code**, so expect more. ~~Quick build scaffold~~ **done 08 Sep** · One to one through check-in to proposal · build-and-save · Your own with saved sessions · in-session card and rest timer · Progress |
 > | 2 | 🟡 **Class data contract** | Three classes written; **fix the contract against them before writing a fourth** |
 > | 3 | 🟡 **Class content** | Graeme's arc first, then expand. Six to eight more plus lighter variants |
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
 > ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v312 — CHECKIN-3 + PROPOSAL-1/2, `v468`. Device pass task 4 of 8.
->
-> ⚫ **The whole One to one journey had never been executed.** No gate in the suite imported `CheckinView` or `CoachProposalView`. Home door → check-in conversation → proposal: the route the product's own card calls *"I pick it, around how you are today"*, unmounted by anything but a person.
->
-> | # | Defect | Fix |
-> |---|---|---|
-> **1** | 🔴 **The coach asked one question and opened the panel for another.** On the full path the mood bridge said *"Alright. How did you sleep?"* — and the **feeling word** panel opened. The sleep panel then arrived **in silence**, its bridge line spent one transition early. **A person answers a question they were not asked, and the coach never asks the one it wants** | `_sleepBridge()` carries the three sleep lines **unchanged** to the transition that opens the sleep panel, from **both** exits of the feeling word panel. The mood lines now ask what that panel asks, following `_energyBridge()`'s coach-asks-then-panel-repeats pattern |
-> **2** | The proposal printed **"1 movements"** — on the Short walk fallback, which has exactly one **every time it is offered** — and in its accessible name, built from the same unguarded interpolation | `_movementsLabel()` |
-> **3** | Generated options carry `duration` as a range **string**; fallbacks carry a bare **number**. Both printed raw, so one column read **"25–35 mins", "15", "20"** | `_durationLabel()`, normalised in the **renderer** — one renderer serving two shapes is where the shapes have to agree; fixing the builders leaves the next one free to send a third |
-> **4** | 🔴 **Start Session bounced through Home.** `closePreviewPanel()` navigated Home **unconditionally** and the start path calls it, so Start Session fired `navigate('today')` then `navigate('workout')` a second later. **Home mounted in between, and "Good. Let's go." was written into a container Home had already replaced** — the line confirming the choice, never seen by anybody | The v18 note names the callers that helper was written for: "Not today", backdrop, close. **Escape is the fourth.** All four are dismissals and **all four keep the Home navigation**. Only the start path opts out, because it is going somewhere itself |
->
-> 🔴 **CHECKIN-3 is QUICK-3, one path over.** v15 found these **same three lines** asking about sleep on the **brief** path on 18 Aug — *"the coach asked a question it had already decided not to ask"* — gave the brief path its own lines, and left the full path's three naming a panel that no longer came next. **Fixed on one branch; the other lay there three weeks.** `verify-quick3` could not see it because it only ever asked whether the words existed **somewhere in the file**. Now `v2`: assertions follow the question to `_sleepBridge()`, and **4b/4c are the invariant it was always reaching for** — asked on both exits, and `_moodBridge` no longer naming a panel that does not come next.
->
-> 🟢 **Two new gates, both mounting.** `verify-checkin3` walks the conversation and asserts on **what the coach said, in sequence** — a conversation is precisely what source text cannot check, because every line is in the file whether or not it is ever spoken, and in the right order or the wrong one. `verify-proposal1` walks the cards, Start Session and **all four dismissals**. Reversal-proven six ways, including the over-reach case: removing the Home navigation from **all** callers fails all four dismissal rows.
->
-> ⚠️ **Two faults in my own harnesses, caught before shipping.** The gate read a **stale closed panel** — `_closePanel` removes the node 350ms later and `querySelector` returns the **oldest** match — so four assertions reported on the energy panel while claiming to measure the sleep panel. **Caught only because the coach-bubble assertions beside them disagreed.** A positive control now stops an empty panel reading from satisfying a negative assertion. Separately I twice mistook harness faults for app faults (panels attach to `document.body`; the sore-area list is a correct `hidden` disclosure) — **checked both before claiming either.**
->
-> 🔵 **New coach lines, Graeme's to overrule.** The three mood → feeling-word bridge lines are new, written to the established pattern and passing `verify-voice`. The sleep lines were **moved verbatim**, not rewritten. The structural fix stands whatever the wording.
 
 > ### 🟢 SHIPPED SINCE v311 — QUICK-BUILD-2/3, `v467`. Device pass task 3 of 8.
 >
@@ -8214,4 +8195,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v313*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v312*
