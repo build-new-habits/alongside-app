@@ -1,5 +1,15 @@
 /**
  * tools/verify-quick3.mjs
+ * 08 Sep 2026 v2
+ *
+ * v2 - CHECKIN-3. Assertions 2 and 4 follow the sleep question to
+ *   _sleepBridge(). QUICK-3 fixed the BRIEF path's copy on 18 Aug and
+ *   left the FULL path's three lines still asking about sleep while the
+ *   feeling word panel opened next -- the same mismatch, one path over,
+ *   which this gate could not see because it only ever asked whether the
+ *   words existed in the file. 4b and 4c are new and are the invariant
+ *   it was always reaching for.
+ *
  * 18 Aug 2026 v1
  *
  * QUICK-3 — the brief check-in asked about sleep and then skipped it.
@@ -43,15 +53,42 @@ check('1  _moodBridge() exists and is readable',
 
 const body = bridge ? bridge[1] : '';
 const briefBranch = body.match(/if \(_briefPath\(\)\)\s*\{([\s\S]*?)\n    \}/);
-check('2  it branches on _briefPath() before any sleep line',
-  !!briefBranch && body.indexOf('_briefPath()') < body.indexOf('sleep'));
+// CHECKIN-3, 08 Sep 2026. _moodBridge() no longer contains a sleep line
+// at all -- on either path -- so "branches before any sleep line" is now
+// trivially true here and the real question is whether the brief branch
+// still comes first. Kept as the ordering check it was written to be.
+check('2  it branches on _briefPath() before its own full-path lines',
+  !!briefBranch && body.indexOf('_briefPath()') < body.lastIndexOf('return'));
 
 check('3  QUICK-3 (the actual fault): the brief lines ask nothing about sleep',
   !!briefBranch && !/sleep|last night/i.test(briefBranch[1]),
   briefBranch ? briefBranch[1].replace(/\s+/g, ' ').trim().slice(0, 90) : '');
 
-check('4  the full path still asks — this removed a mismatch, not a question',
-  /How did you sleep\?/.test(body) && /how was last night\?/.test(body));
+// CHECKIN-3, 08 Sep 2026. The sleep question MOVED; it was not dropped.
+// It lived in _moodBridge(), which on the full path opened the FEELING
+// WORD panel next -- so the coach asked about sleep and then asked
+// something else, and the sleep panel arrived in silence afterwards. The
+// three lines are unchanged, in _sleepBridge(), on the transition that
+// actually opens the sleep panel.
+//
+// This assertion follows them, and is stricter than it was: it is no
+// longer enough for the words to exist SOMEWHERE in the file. They must
+// be reached from both exits of the feeling word panel, which is the
+// invariant "this removed a mismatch, not a question" was always after.
+const sleepBridge = checkinSrc.match(/function _sleepBridge\(mood\)\s*\{([\s\S]*?)\n  \}/);
+check('4  the sleep question still exists — this moved it, it did not drop it',
+  !!sleepBridge &&
+  /How did you sleep\?/.test(sleepBridge[1]) &&
+  /how was last night\?/i.test(sleepBridge[1]));
+
+check('4b and it is asked on BOTH exits of the feeling word panel',
+  (checkinSrc.match(/_showCoachBubble\(_sleepBridge\(/g) || []).length === 2,
+  'skip and confirm both open the sleep panel; a line on one of them is ' +
+  'GUIDED-COPY, which fixed one branch of a card and left the other');
+
+check('4c and _moodBridge no longer names a panel that does not come next',
+  !/sleep|last night/i.test(body),
+  'the coach asks about sleep and the feeling word panel opens');
 
 // The missing beat. The full path's pause is the sleep panel's own
 // confirm button; the brief path had none, so the coach's question and

@@ -1,5 +1,35 @@
 /**
  * coach-proposal.js
+ * 08 Sep 2026 v24
+ *
+ * v24 - PROPOSAL-1/2. Device pass, task 4. Nothing had ever mounted
+ *   this view: no gate in the suite imported CoachProposalView, so the
+ *   screen that decides what somebody does today had been executed only
+ *   by people.
+ *
+ *   PROPOSAL-1, what the cards said. Two shapes reach
+ *   renderPreviewCard(): a generated option carries `duration` as a
+ *   range STRING, "25-35 mins", and a fallback carries a bare NUMBER.
+ *   Both printed raw, so the column read "25-35 mins", "15", "20" down
+ *   the same screen. The movements count was interpolated unguarded, so
+ *   the Short walk fallback -- exactly one movement, every time it is
+ *   offered -- read "1 movements", in its accessible name as well as on
+ *   the card. Normalised in the renderer, not the two builders: one
+ *   renderer serving two shapes is where the shapes have to agree, and
+ *   fixing the builders leaves the next one free to send a third.
+ *
+ *   PROPOSAL-2, where Start Session went. closePreviewPanel() navigated
+ *   to Home UNCONDITIONALLY and handlePreviewStart() calls it on the way
+ *   to STARTING a session, so Start Session fired navigate('today') and
+ *   navigate('workout') about a second apart. Home mounted in between,
+ *   and "Good. Let's go." was written into a container Home had already
+ *   replaced -- the line confirming the choice, never seen by anybody.
+ *   The v18 note names the callers that helper was written for: "Not
+ *   today", backdrop, close. Escape is the fourth. All four are
+ *   DISMISSALS and all four keep the Home navigation exactly where they
+ *   already find it; only the start path opts out, because it is going
+ *   somewhere itself.
+ *
  * 06 Sep 2026 v23
  *
  * v23 - CONSTRAINT-CLAIM. The coach claims only what it did.
@@ -871,18 +901,59 @@ export function CoachProposalView(router) {
     `;
   }
 
+  /**
+   * PROPOSAL-1, 08 Sep 2026. Two shapes reach this card and it printed
+   * both raw.
+   *
+   * A generated option carries `duration` as a RANGE STRING -- "25-35
+   * mins" -- built by buildSession(). A fallback option carries
+   * `durationMins`, a bare NUMBER, straight from _getFallbackOptions().
+   * Both land in `option.duration`, so the screen showed "25-35 mins"
+   * on the suggested card and "15" on the two beneath it, in the same
+   * column, on the same screen.
+   *
+   * Normalised HERE rather than in the two builders: one renderer serving
+   * two shapes is the place the shapes have to agree, and fixing the
+   * builders would leave the next builder free to send a third.
+   */
+  function _durationLabel(d) {
+    if (d === null || d === undefined || d === "") return "";
+    if (typeof d === "number") return `${d} mins`;
+    const s = String(d).trim();
+    // A string that is only digits is a number that has been through a
+    // template somewhere. Still a bare count to a reader.
+    return /^\d+$/.test(s) ? `${s} mins` : s;
+  }
+
+  /**
+   * PROPOSAL-1. "1 movements". Visible on the Short walk fallback, which
+   * has exactly one, every time it is offered -- and in its accessible
+   * name too, because the aria-label was built from the same unguarded
+   * interpolation.
+   */
+  function _movementsLabel(n) {
+    const c = Number(n);
+    if (!Number.isFinite(c)) return "";
+    return `${c} movement${c === 1 ? "" : "s"}`;
+  }
+
   function renderPreviewCard(option, isRecommended) {
     const selected = option.id === selectedOptionId;
+    // Computed once and used in both the visible text and the accessible
+    // name. Two separate expressions would be two things to keep in step,
+    // and WCAG 2.5.3 depends on them agreeing.
+    const durationText  = _durationLabel(option.duration);
+    const movementsText = _movementsLabel(option.exerciseCount);
     return `
       <button class="cp-preview-card ${selected ? 'cp-preview-card--selected' : ''} ${isRecommended ? 'cp-preview-card--recommended' : ''}"
               role="radio"
               aria-checked="${selected ? 'true' : 'false'}"
               data-option-id="${option.id}"
-              aria-label="${option.name}, ${option.duration}, ${option.exerciseCount} movements${isRecommended ? ', suggested for today' : ''}">
+              aria-label="${option.name}, ${durationText}, ${movementsText}${isRecommended ? ', suggested for today' : ''}">
         ${isRecommended ? '<span class="cp-preview-card__badge">Suggested for today</span>' : ''}
         <span class="cp-preview-card__name">${option.name}</span>
-        <span class="cp-preview-card__meta">${option.duration}</span>
-        <span class="cp-preview-card__meta">${option.exerciseCount} movements</span>
+        <span class="cp-preview-card__meta">${durationText}</span>
+        <span class="cp-preview-card__meta">${movementsText}</span>
         <p class="cp-preview-card__why">${option.rationale}</p>
       </button>
     `;
@@ -890,7 +961,27 @@ export function CoachProposalView(router) {
 
   // ── Preview panel close (v8; open handled directly in mount(), 04 Aug 2026) ──
 
-  function closePreviewPanel(container) {
+  /**
+   * PROPOSAL-2, 08 Sep 2026. This navigated to Home UNCONDITIONALLY,
+   * and handlePreviewStart() calls it on the way to STARTING a session.
+   *
+   * So choosing a session and pressing Start Session fired
+   * navigate('today') immediately and navigate('workout') about a second
+   * later. Home mounted in between -- a full view, reading the store and
+   * rendering every room -- and the acknowledgement "Good. Let's go."
+   * was written into a container Home had already replaced, so the one
+   * line confirming the choice was never seen by anybody.
+   *
+   * The v18 note names the callers this was written for: "Not today" /
+   * backdrop / close, plus Escape. All four are DISMISSALS, and the
+   * comment below says so in its own words -- "closing without a
+   * selection". Starting a session is not a dismissal; it was picked up
+   * by the shared helper.
+   *
+   * The Home navigation stays exactly where those four already find it.
+   * Only the start path opts out, because it is going somewhere itself.
+   */
+  function closePreviewPanel(container, { navigateHome = true } = {}) {
     // Phase C, 04 Aug 2026: this panel is now the only content on this
     // screen (no doors underneath to fall back to), so closing without
     // a selection navigates back to Home instead of leaving an empty
@@ -899,7 +990,7 @@ export function CoachProposalView(router) {
     previewOpen      = false;
     selectedOptionId = null;
     document.removeEventListener('keydown', _previewKeydown);
-    router.navigate('today');
+    if (navigateHome) router.navigate('today');
   }
 
   function _rerenderPanel(container) {
@@ -955,7 +1046,10 @@ export function CoachProposalView(router) {
     store.set('lastProposalType', 'door-1');
     store.set('lastProposalDate', new Date().toISOString());
 
-    closePreviewPanel(container);
+    // PROPOSAL-2. Tear the panel down, but do NOT bounce through Home --
+    // this path navigates itself, below, once the acknowledgement has
+    // had its moment.
+    closePreviewPanel(container, { navigateHome: false });
 
     const ackEl = container.querySelector('#cp-acknowledgement');
     if (ackEl) {
