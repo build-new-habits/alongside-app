@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v314
+## 08 Sep 2026 v313
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v313.md`. Remove v313 on upload.
+Supersedes `master_schedule_v312.md`. Remove v312 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v470`, 127 gates, `store.js` v65, `Schema.md` v1.52, cold start blueprint v65.** Read that blueprint after this block.
+> **Live: `alongside-v468`, 126 gates, `store.js` v65, `Schema.md` v1.51, cold start blueprint v62.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -20,27 +20,6 @@ Supersedes `master_schedule_v313.md`. Remove v313 on upload.
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
 > ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v313 — STUCK-1 (`v469`) and ROLE-1 (`v470`)
->
-> ⚠️ **The STUCK-1 session shipped `v469` and did not update this document.** Its record below was reconstructed from the commits. It also left the START HERE line above declaring `alongside-v468`, `126 gates`, `Schema.md v1.51` and blueprint v62 — all stale by one release, on the first line a new session reads. Corrected. **This is what the session-close rule is for, and `schedule-drift.mjs` cannot catch it: that gate compares this document's header to its own footer, not to the repo.** A live-state row in START HERE that disagrees with the files has no gate behind it at all. Logged as a candidate for `verify-blueprint`-style checking.
->
-> ⚫ **STUCK-1, `v469` — shipped by another session, recorded here because it never was.** Graeme could not leave the coach-proposal panel on his handset. `.cp-preview-panel__close` is `align-self: flex-end`; the escape hatch is `position: fixed`, top-right, `z-index: 10000`. They landed on each other and **neither worked** — the hatch covered the X, and the hatch's own tap fell through to the panel beneath. On the one screen in the app with no other way out. Root cause: HATCH-OVERLAP reserved that corner on `.workout-header` and `.ci-thread` and stopped; its first draft named `.cp-preview-panel__head`, which does not exist, and **when the gate caught that, the selector was dropped rather than the real one found.** The gate could assert every reserved gutter names a real class and could not assert the reverse. `verify-hatchoverlap` test 6 is that reverse check now. **Anything added to the top-right corner of any screen goes in that `corners` list.**
->
-> ⚫ **ROLE-1, `v470` — the card printed the word UNDEFINED.** Found by Graeme on a handset, not by the suite. **Every exercise in every coach-built session had no `role`** — ten of ten in a Glute Focus build, so the whole One to one route, every card.
->
-> | Where | What |
-> |---|---|
-> **Cause** | Both builders assemble from separately-built warm-up, main and cool-down arrays and then flatten them. The role was knowable at every call site and stamped at none |
-> **Why it showed** | `formatRole()` ended `roles[role] \|\| role` — a fallthrough that echoes its own input. A template literal stringifies `undefined`, and CSS uppercases it |
-> **How far it reached** | The visible badge, `class="exercise-role-badge undefined"`, **and** `aria-label="Exercise type: undefined"`. Shown *and* spoken |
-> **Schema first** | `Schema.md` v1.51 → **v1.52** documents `role` on `generatedSession.session.exercises` before any code writes it, and records that sessions cached before today carry none |
-> **Fix** | `session-builder.js` v46 → **v47**. `_withRole()` at **both** assembly points — the coach route and build-and-save/Your own. Spreads rather than mutates: these objects come from the shared library by reference, and stamping in place would write roles onto the library itself |
-> **Floor** | `workout.js` v16 → **v17**. `formatRole()` returns `""` for anything unrecognised, and the badge **element** is not emitted when there is no label — emptying its text alone leaves a styled pill announcing "Exercise type: ", a control with nothing in it |
->
-> 🔴 **Test 4 exists because reversal-testing found my own gate incomplete.** Reversal 3 — restoring the echoing fallthrough — first came back **green**. `undefined` is falsy, so the render guard alone suppressed the badge and the `formatRole` change was never independently proven. The case that separates them is a role the map does not know: a **non-empty internal token** like `"cardio-warmup"` — the exact shape already sitting in `category` on these same objects — which the old fallthrough echoes through and CSS uppercases into a badge. **Printing an internal id to a person is the same fault one step less obvious.** Seventeenth recorded instance of an assertion that could not fail.
->
-> 🟢 `verify-role1.mjs` **mounts the in-session card**, which nothing in the suite had ever done. Reversal-proven four ways: unstamping the coach builder fails 1a/1b and 2a–2d; unstamping the other builder fails **only** 1d; restoring the fallthrough fails 4a/4b.
 
 > ### 🟢 SHIPPED SINCE v312 — CHECKIN-3 + PROPOSAL-1/2, `v468`. Device pass task 4 of 8.
 >
@@ -8235,4 +8214,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v314*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v313*
