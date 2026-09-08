@@ -1,6 +1,17 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v470
+ *
+ * v470 - ROLE-1. session-builder.js v46 -> v47, workout.js v16 -> v17.
+ *   Both builders stamp `role` at assembly; the card no longer prints
+ *   the word UNDEFINED in its badge, class attribute or aria-label.
+ *   Both already precached; cache bump only.
+ *
+ *   NOTE FOR ANYONE READING A STALE SESSION: exercises inside a
+ *   `generatedSession` cached before this version carry no role. The
+ *   view suppresses the badge for those rather than printing anything.
+ *
  * 08 Sep 2026 v469
  *
  * v469 - STUCK-1. The coach-proposal panel's close button no longer
@@ -3179,7 +3190,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v469";
+const CACHE_NAME = "alongside-v470";
 
 const SHELL_URLS = [
 
