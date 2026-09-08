@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 06 Sep 2026 v60
+## 08 Sep 2026 v61
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -64,13 +64,13 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 
 ---
 
-## 4. Live state, 06 Sep 2026
+## 4. Live state, 08 Sep 2026
 
 | | Version |
 |---|---|
 | `store.js` | v65 |
 | `Schema.md` | v1.51 |
-| `sw.js` | **v466**, cache `alongside-v466` |
+| `sw.js` | **v467**, cache `alongside-v467` |
 | `router.js` | v22 · `my-programme.js` v8 · `today.js` v25 · `settings.js` v36 · `progress.js` v11 · `onboarding/thread.js` v13 |
 | Gates | **124, all green** — and genuinely green from any clone path |
 
@@ -201,7 +201,8 @@ Truth lives in `js/data/pricing.js`. `verify-price.mjs` enforces it.
 | Fault | Note |
 |---|---|
 | **Progression does not exist** | For any tier. `session-builder.js` builds week 10 like week 1 |
-| **43 of 77 gates are source-text only** | They cannot tell live code from dead |
+| **43 of 77 gates are source-text only** | They cannot tell live code from dead. **QUICK-BUILD, 08 Sep, is the worst case yet recorded:** `verify-quickbuild` v1 was green while the screen it names had never rendered for anybody, because every assertion about the builder was a `readFileSync` regex |
+| 🔴 **70 of 124 gates fail from any cwd but the repo root** | **Measured 08 Sep, not estimated.** `GATE-PATH` (21 Aug) closed the *clone path* problem -- hardcoded `/home/claude/repo`, now resolved from `import.meta.url`. It did NOT close **cwd** dependence: 53 gates still call `readFileSync("js/...")`, which resolves against `process.cwd()`. `cd` into the clone and all 124 are green; run them by full path from anywhere else and 70 go red. **Not a live fault** -- every session so far has run them from the repo root -- **but the trap it sets is the expensive one:** a session that runs the suite from `/home/claude` sees 70 red and reasonably concludes the app is broken. `verify-quickbuild` and `verify-equipment-sweep` are fixed; the other 51 are a scoped task |
 | ~~14 gates hardcode the clone path~~ | **Closed 21 Aug (GATE-PATH).** |
 | ~~1 module does not link~~ | **Closed 22 Aug (CHOOSER-1).** `verify-link.mjs` now reports 0 known-broken and guards the class permanently |
 | **Source text can contradict runtime** | `goals.js` declares `hasTarget`/`targetType`; the `flatMap` that builds the export drops them. Grep confirms the opposite of the truth. **Execute** |
@@ -213,6 +214,8 @@ Truth lives in `js/data/pricing.js`. `verify-price.mjs` enforces it.
 | Orphan fields | `goalHasTarget`, `targetType`, `chaptersDone.measuredLevelAtEnd`, `exerciseFeedback` — written or declared, read by nobody |
 | `checkin.js` orphan exports | `getWordObject`, `getCoachPostureForQuadrant`, `getOpeningModes` — no callers |
 | Changelog stale since March | Resume or retire — decision needed |
+| 🟠 **11 screens have no heading element at all** | `workout-header-title` is a `<span>` in 11 views and a heading in none, while the rest of the app uses 48 `<h1>` and 67 `<h2>`. WCAG 2.2 AA 1.3.1 and 2.4.6: the screen title exists in presentation only. **Found on the quick scaffold 08 Sep and deliberately not fixed there** — fixing one of eleven makes that screen the odd one out, and eleven screens is a change that needs agreeing on its own terms |
+| 🟡 **Quick build never passes through the zones step** | A quick build whose coach-chosen type is `stretch` leaves `selectedZones` empty, because the scaffold does not ask and the location step's zones branch is bypassed by the return leg. **Newly reachable on 08 Sep** — the scaffold had never rendered before then, so nothing regressed |
 
 **The orphan pattern is systematic**, not incidental: fields get written for a feature that is then deferred, and nothing tracks the orphan. **Before building anything, grep for whether it already exists.** On 20 Aug three specs were written against files that had not been opened — one described as unbuilt had shipped eight days earlier.
 

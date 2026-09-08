@@ -1,62 +1,25 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v312
+## 06 Sep 2026 v311
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v311.md`. Remove v311 on upload.
+Supersedes `master_schedule_v310.md`. Remove v310 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v467`, 124 gates, `store.js` v65, `Schema.md` v1.51, cold start blueprint v61.** Read that blueprint after this block.
+> **Live: `alongside-v466`, 124 gates, `store.js` v65, `Schema.md` v1.51, cold start blueprint v60.** Read that blueprint after this block.
 >
-> **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 — `v467` on 08 Sep.**
+> **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep.
 >
 > ### The three live workstreams, in the order Claude recommended
 >
 > | # | What | State |
 > |---|---|---|
-> | 1 | 🟠 **Device pass, tasks 4–8** | **Recommended next.** Tasks 1–3 found **seven defects in shipped code**, so expect more. ~~Quick build scaffold~~ **done 08 Sep** · One to one through check-in to proposal · build-and-save · Your own with saved sessions · in-session card and rest timer · Progress |
+> | 1 | 🟠 **Device pass, tasks 3–8** | **Recommended next.** Tasks 1–2 found **four defects in shipped code**, so expect more. Quick build scaffold · One to one through check-in · build-and-save · Your own with saved sessions · in-session card and rest timer · Progress |
 > | 2 | 🟡 **Class data contract** | Three classes written; **fix the contract against them before writing a fourth** |
 > | 3 | 🟡 **Class content** | Graeme's arc first, then expand. Six to eight more plus lighter variants |
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
 > ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v311 — QUICK-BUILD-2/3, `v467`. Device pass task 3 of 8.
->
-> ⚫ **The scaffold had never rendered for anybody.** Not "was wrong" — had never been on screen. `onMount()`'s quick branch set `phase = "quick"` and fell through; the router calls `render()` **before** `onMount()`, so the type picker was already up and nothing re-rendered it. **Tapping a time chip opened the eight-way "Tell me what you want to work on today"** — the exact screen QUICK-BUILD replaced — one screen after a card promising *"Tell me how long. I fill the rest in."*
->
-> | # | Defect | Fix |
-> |---|---|---|
-> **1** | The scaffold never rendered | `rerender(); return;` after the preselect clear. The `pre.type` branch has always ended that way; quick mode was the one entry that set a phase and trusted a render that had already happened |
-> **2** | 🔴 **No change button came back.** v16's own comment claimed each one *"drops into the ONE existing step and comes back here"*. Only the outbound leg was built, so correcting the place dropped you into the full six-question flow — where the duration picker asked *"How long have you got today?"* of somebody who had answered exactly that two taps earlier | `_quickReturn()` serves the four forward transitions **and** the back chain. No non-quick path changes |
-> **3** | The kit line read `store.get("equipment")` — the flat merged field `renderEquipmentCheck()` exists specifically **not** to read. At the gym it showed the **home** kit, and its count never matched the ticks behind its own button | `_resolvedEquipment()`: that step's resolution lifted out unchanged, so there is **one** answer to "what kit", not two |
-> **A11y** | Each row announced its **value alone** — *"Glute Focus, button"* — with the "Session" label carrying the meaning visually and nowhere else. WCAG 2.2 AA **1.3.1** and **2.4.6** | Rows built from one template with `aria-label="Session: Glute Focus. Change"`. **2.5.3 Label in Name** held by keeping the visible text inside the accessible name |
->
-> 🔴 **`verify-quickbuild` v1 was green through all three.** Tests 0–1 executed the Home chip; **2, 3 and 4 were `readFileSync` regexes** proving only that the file *contains* `renderQuickScaffold` and the string `phase === "quick"`. **Nothing mounted the receiving end.** This is the 43-of-77 problem in its worst recorded form: not a gate that missed a subtlety, a gate that certified a screen nobody could reach.
->
-> 🟢 **v2 adds tests 6–9, which MOUNT the builder** the way the router does — `render()` first, then `onMount()`, once, because that ordering *is* the defect. Reversal-proven three ways: removing the rerender fails 6b/6c/6d and 11 more; disabling `_quickReturn` fails seven of test 7 plus 8b; restoring the flat equipment read fails 8a/8b; dropping the aria-labels fails all eight of test 9, and a label breaking 2.5.3 fails **only** its own four rows.
->
-> ⚠️ **`7j` first passed for the wrong reason.** A throw inside the equipment step left the scaffold on screen, so *"came back"* read true having never left. It now captures reaching the step **before** the click. **Sixteenth recorded instance of a fixture not reaching what it names**, and the second in two sessions.
->
-> ⚠️ **My own refactor broke `verify-equipment-sweep`** (a dangling `savedEquip`) and the gate caught it — drift detection working, not a false alarm. `v2` → `v3`, LINK 4 follows the resolution to its new home and additionally asserts the step does not grow a second copy.
-
-> ### 🔴 THREE FINDINGS FROM TASK 3 — logged, NOT fixed, each needs its own scope
->
-> | Finding | Why not now |
-> |---|---|
-> 🔴 **70 of 124 gates fail from any cwd but the repo root** | **Measured, not estimated.** `GATE-PATH` (21 Aug) closed the *clone path* problem; it did **not** close **cwd** dependence — 53 gates still call `readFileSync("js/...")`, resolved against `process.cwd()`. `cd` into the clone and all 124 are green. **Not a live fault, but an expensive trap:** a session running the suite from `/home/claude` sees 70 red and concludes the app is broken. `verify-quickbuild` and `verify-equipment-sweep` fixed; **51 to go** |
-> 🔴 **`tools/schedule-drift.mjs` has been RED at HEAD and nobody heard it** | It is not a `verify-*.mjs` file, so it sits **outside the 124** that every session runs. The master schedule footer said **v291** while the header said v311 — twenty versions of drift, caught by a gate written for exactly that and never run. **Its own comment says "a check that cannot fire is worse than no check".** This one fires into an empty room. Footer corrected to v312 today; **the gate needs to join the suite** |
-> 🟠 **11 screens have no heading element at all** | `workout-header-title` is a `<span>` in 11 views and a heading in none, while the app uses 48 `<h1>` and 67 `<h2>` elsewhere. WCAG 2.2 AA **1.3.1** and **2.4.6**. Found on the quick scaffold and **deliberately not fixed there** — fixing one of eleven makes that screen the odd one out |
-> 🟡 **Quick build never passes through the zones step** | A quick build whose coach-chosen type is `stretch` leaves `selectedZones` empty. **Newly reachable on 08 Sep** — the scaffold had never rendered before, so nothing regressed |
-
-> ### 🔵 ONE DECISION FOR GRAEME — the coach's opening proposal
->
-> On a brand-new account with nothing set, `chooseSessionType()` returns **Glute Focus**, and that is what the scaffold proposes as the coach's first-ever suggestion. **Not a bug** — it is the chain doing what it does with an empty arc — **but the first proposal is the one that decides whether the coach seems to know what it is doing.**
->
-> | Option | |
-> |---|---|
-> **Leave it** | The chain is honest; a person can change it in one tap |
-> 🟢 **Define an empty-arc opener** | **Recommended.** Full Body is the obvious candidate: it is the only type that assumes nothing about what somebody wants to work on |
 
 > ### 🟢 SHIPPED SINCE v310 — four items, `v463` → `v466`
 >
@@ -8195,4 +8158,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v312*
+*Build New Habits · Alongside: Move · Master Schedule · 06 Sep 2026 v291*
