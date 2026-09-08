@@ -1,5 +1,28 @@
 /**
  * workout.js - Workout Execution View
+ * 08 Sep 2026 v17
+ *
+ * v17 - ROLE-1. The badge above the exercise name printed the word
+ *   UNDEFINED on every card of every coach-built session.
+ *
+ *   formatRole() ended `roles[role] || role`, which echoes its own input
+ *   when the lookup misses. For an absent role that input is undefined,
+ *   and a template literal stringifies it. A fallthrough that returns
+ *   what it was given cannot fail safely.
+ *
+ *   Two changes, and they are not the same change. formatRole() now
+ *   returns "" for anything it does not recognise, which is what stops an
+ *   internal token -- "cardio-warmup", the shape already sitting in
+ *   `category` on these objects -- being uppercased into a badge. And the
+ *   badge ELEMENT is not emitted at all when there is no label, because
+ *   emptying its text alone would leave a styled pill whose aria-label
+ *   reads "Exercise type: ": an announced control with nothing in it,
+ *   worse for a screen reader than no badge.
+ *
+ *   The real fix is the stamp in session-builder.js v47. This is the
+ *   floor underneath it, for sessions cached before today and for any
+ *   future builder that forgets.
+ *
  * 31 Aug 2026 v16
  *
  * v16 - CARD-3. Three pages, not three tabs. This is the view the page
@@ -340,7 +363,15 @@ export function render() {
 
       <!-- Exercise display -->
       <div class="exercise-display">
-        <div class="exercise-role-badge ${exercise.role}" aria-label="Exercise type: ${formatRole(exercise.role)}">${formatRole(exercise.role)}</div>
+        ${(() => {
+          // ROLE-1. No label means no element. Emptying the text alone
+          // would leave a styled pill with an aria-label reading
+          // "Exercise type: " -- an announced control with nothing in it,
+          // which is worse for a screen reader than the missing badge.
+          const roleLabel = formatRole(exercise.role);
+          if (!roleLabel) return "";
+          return `<div class="exercise-role-badge ${exercise.role}" aria-label="Exercise type: ${roleLabel}">${roleLabel}</div>`;
+        })()}
 
         <h1 class="exercise-name">${exercise.name}</h1>
 
@@ -501,6 +532,24 @@ function renderExerciseTarget(exercise) {
 // identical copies, and the shared one also floors null to 0:00 rather
 // than rendering "NaN:NaN".
 
+/**
+ * ROLE-1, 08 Sep 2026. Returns "" for anything it does not recognise.
+ *
+ * It used to end `roles[role] || role`, which passes the input straight
+ * through when the lookup misses. For an absent role that input is
+ * `undefined`, and a template literal stringifies it: the badge above
+ * every exercise name in every coach-built session read UNDEFINED, and
+ * the same expression fed `class="exercise-role-badge undefined"` and
+ * `aria-label="Exercise type: undefined"`, so it was spoken as well as
+ * shown.
+ *
+ * The stamp at assembly in session-builder.js is the real fix. This is
+ * the floor underneath it: sessions cached before today carry no role,
+ * and any future builder that forgets the stamp must produce an empty
+ * slot rather than a word no reader can make sense of. A fallthrough
+ * that echoes its own input cannot fail safely -- it will always print
+ * whatever it was given, which for a miss is the thing you least want.
+ */
 function formatRole(role) {
   const roles = {
     warmup:    "\uD83D\uDD25 Warm Up",
@@ -509,7 +558,7 @@ function formatRole(role) {
     finisher:  "\uD83C\uDFC1 Finisher",
     cooldown:  "\uD83E\uDDD8 Cool Down"
   };
-  return roles[role] || role;
+  return roles[role] || "";
 }
 
 export function onMount() {

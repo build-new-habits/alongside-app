@@ -1,6 +1,31 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 08 Sep 2026 v47
+ *
+ * v47 - ROLE-1. Both builders now stamp `role` onto every exercise at
+ *   assembly -- "warmup", "main" or "cooldown" -- where the grouping was
+ *   already known and had simply never been written down.
+ *
+ *   Every exercise in every coach-built session left here with `role`
+ *   undefined. Ten of ten in a Glute Focus build, so the whole One to one
+ *   route, every card. workout.js renders that field as the badge above
+ *   the exercise name, so the badge read UNDEFINED in caps -- and the
+ *   same expression fed class="exercise-role-badge undefined" and
+ *   aria-label="Exercise type: undefined". Shown and spoken.
+ *
+ *   Found by Graeme on a handset. Nothing in the suite had mounted the
+ *   in-session card.
+ *
+ *   _withRole() spreads rather than mutates: these objects come from the
+ *   shared library by reference, and stamping in place would write roles
+ *   onto the library itself, so the next session assembled from a
+ *   different grouping would inherit the last one's.
+ *
+ *   Both call sites, not one. buildSession() is the coach route;
+ *   buildSessionFromSelection() is build-and-save and Your own. The fault
+ *   was in both, and they are reversal-proven separately.
+ *
  * 06 Sep 2026 v46
  *
  * v46 - QUICK-INPUTS. buildSession() takes an optional `inputs` merge,
@@ -2412,6 +2437,32 @@ export function buildCandidatePools({ sessionType, durationMins, equipmentOverri
  * exercise is added automatically — the safety rule (never skip a
  * warmup) holds even in "build your own" mode, it isn't optional.
  */
+/**
+ * ROLE-1, 08 Sep 2026. Stamps the structural role onto each exercise at
+ * assembly, where the grouping is already known.
+ *
+ * Both builders below compose their output from separately-built warm-up,
+ * main and cool-down arrays and then flatten them. The role was therefore
+ * knowable at every call site and stamped at none, so every exercise in
+ * every coach-built session reached the views with `role` undefined --
+ * and workout.js renders exactly that field as the badge above the
+ * exercise name. `formatRole()` ended `roles[role] || role`, so an absent
+ * role fell through and printed the literal string "undefined",
+ * uppercased by CSS. On the visible badge, in the class attribute, and in
+ * the aria-label.
+ *
+ * Ten of ten exercises in a Glute Focus build, so not an edge case: the
+ * whole One to one route, every card, since the badge was added.
+ *
+ * Spreads rather than mutates. These objects come from the shared
+ * library and are handed out by reference; writing a role onto them in
+ * place would stamp the library itself, and the next session built from
+ * a different grouping would inherit last session's roles.
+ */
+function _withRole(list, role) {
+  return (list || []).map(ex => (ex && typeof ex === "object") ? { ...ex, role } : ex);
+}
+
 export function buildSessionFromSelection({ sessionType, durationMins, selectedIds, equipmentOverride, ignoreSevere }) {
   // CR-2. The self-directed route gets the same answer, and gets it
   // first, for the same reason SEVERE-1 is on both entry points: a safety
@@ -2527,7 +2578,15 @@ export function buildSessionFromSelection({ sessionType, durationMins, selectedI
   // (so the trim makes room for them by removing engine-chosen work
   // instead), then re-inserted in their original position.
   _trimToDuration(warmupExercises, [...prescribed], mainExercises, cooldownExercises, durationMins);
-  const allExercises = [...warmupExercises, ...prescribed, ...mainExercises, ...cooldownExercises];
+  // ROLE-1. Prescribed work is a specialist's instruction sitting in the
+  // main body of the session; "main" is what it is structurally, and the
+  // prescribed views badge it separately by their own route.
+  const allExercises = [
+    ..._withRole(warmupExercises,   "warmup"),
+    ..._withRole(prescribed,        "main"),
+    ..._withRole(mainExercises,     "main"),
+    ..._withRole(cooldownExercises, "cooldown")
+  ];
 
   const estMins = Math.round(allExercises.reduce((acc, ex) => {
     // C3 (12 Aug 2026) — see the note at the parallel call site below. This
@@ -3372,7 +3431,13 @@ export function buildSession({ sessionType, durationMins, equipmentOverride, pre
 
   // Calculate estimated duration
   _trimToDuration(warmupExercises, [], mainExercises, cooldownExercises, durationMins);
-  const allExercises = [...warmupExercises, ...mainExercises, ...cooldownExercises];
+  // ROLE-1. See _withRole above. This is the coach route -- One to one,
+  // quick build, the four doors -- and the one the screenshots came from.
+  const allExercises = [
+    ..._withRole(warmupExercises,   "warmup"),
+    ..._withRole(mainExercises,     "main"),
+    ..._withRole(cooldownExercises, "cooldown")
+  ];
 
   const estMins = Math.round(allExercises.reduce((acc, ex) => {
     // C3 (12 Aug 2026) — a duration-based exercise carries its own TOTAL

@@ -1,4 +1,21 @@
 # Alongside — Data Schema Reference
+## 08 Sep 2026 v1.52
+
+> **v1.52, 08 Sep 2026 — ROLE-1.** Exercise objects inside
+> `generatedSession.session.exercises` gain **`role`**: one of `"warmup"`,
+> `"main"` or `"cooldown"`. `buildSession()` and
+> `buildSessionFromSelection()` already assemble their exercises from
+> separately-built warm-up, main and cool-down arrays; the grouping was
+> known at assembly and simply never stamped onto the objects, so every
+> exercise in every coach-built session reached the views with `role`
+> **undefined**. `workout.js` renders that role as the badge above the
+> exercise name, and `formatRole()` ended `return roles[role] || role` —
+> so an absent role fell through and printed the literal string
+> **`undefined`**, uppercased by CSS, on every card of every One to one
+> session, in the visible badge, in the `class` attribute and in the
+> `aria-label`. No store field is added or renamed; this documents a
+> shape that stored sessions now carry.
+
 ## 06 Sep 2026 v1.51
 
 **File:** `js/store.js` (confirmed live version: **v65, 06 Sep 2026**)
@@ -781,7 +798,7 @@ Legal consent record. Restored after the PT-W1 store audit found it absent: `wel
 |-------|------|---------|-------|
 | `activityLog` | `array` | `[]` | Each entry: `{ id, date, type, durationMins, moodAfter, isEvent, eventName, completedAt, ... }`. Single write path since v10: `store.logActivity()`, with dedupe guard against same-type double-writes within 2 minutes. |
 | `currentActivityEntry` | `null` | `null` | **Under active investigation** — separate blueprint (`alongside_blueprint_coresession-integrity_30jul2026_v1.md`) is checking whether Core Session ever populates this field upstream. Out of scope for BUILD-4; do not resolve here. |
-| `generatedSession` (nested) | `object` | `{ session: null, builtAt: null, inputs: {} }` | The real "today's workout" mechanism — this is what replaced the old `todaysWorkouts`/`workoutsGeneratedAt` pattern (see corrections above). |
+| `generatedSession` (nested) | `object` | `{ session: null, builtAt: null, inputs: {} }` | The real "today's workout" mechanism — this is what replaced the old `todaysWorkouts`/`workoutsGeneratedAt` pattern (see corrections above). **v1.52:** each entry in `session.exercises` carries `role` — `"warmup"`, `"main"` or `"cooldown"` — stamped at assembly by `buildSession()` / `buildSessionFromSelection()`. Read by `workout.js` for the badge above the exercise name. Older sessions cached before 08 Sep 2026 have no `role`; the view suppresses the badge rather than printing anything when it is absent. |
 | `totalCredits` | `number` | `0` *(undocumented)* | **Resolved 03 Aug — live, 21 refs.** Running lifetime total, incremented at completion by every session-type view (walk/run/yoga/swim/core/cycle/gym/quiet/breathing/prescribed). Read by `workout-complete.js` for the completion screen. Confirmed genuinely distinct from `community.credits` (Section 18) — that's the separate Impact Credits mechanism (1–2 awarded per session depending on tier, via `awardCommunityCredit()`). Incidental finding: `community.credits` is written but has **no reader anywhere** — nothing displays it. Logged, not fixed. |
 | `lastWorkoutName` | `string\|null` | `null` *(undocumented)* | **Resolved 03 Aug — live, 12 refs.** Paired with `lastWorkoutCredits`; written by every session-completion view, read by `workout-complete.js`, cleared on exit. |
 | `lastWorkoutCredits` | `number` | `0` *(undocumented)* | **Resolved 03 Aug — live, 12 refs.** See `lastWorkoutName` above; written/read/cleared together at the same call sites. |
