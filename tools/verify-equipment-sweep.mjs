@@ -1,5 +1,15 @@
 /**
  * tools/verify-equipment-sweep.mjs
+ * 08 Sep 2026 v3
+ *
+ * v3 - QUICK-BUILD-3. LINK 4 follows the resolution logic to its new
+ *   home. It was scoped to the body of renderEquipmentCheck(); the
+ *   scope/fallback lines now live in _resolvedEquipment(), lifted out
+ *   so the quick scaffold and the equipment step give the same answer
+ *   about what kit a session is being built around. Nothing about the
+ *   logic changed -- only where it sits. This gate went red on the move,
+ *   which is the drift detection working, not a false alarm.
+ *
  * 21 Aug 2026 v2
  * GATE-PATH. Path resolution only -- no assertion changed.
  *
@@ -117,8 +127,22 @@ check("renderEquipmentCheck has the expected shape", () => {
                          sbSrc.indexOf("return `", sbSrc.indexOf("function renderEquipmentCheck")));
   ok(/const resolvedSaved = equipmentOverride \? null : resolveEquipment\(currentEquip\)/.test(fn),
      "replication no longer reflects the code");
-  ok(/const usingFallback = matching\.length === 0 && other\.length > 0;/.test(fn),
+  // The scope-and-fallback resolution moved into _resolvedEquipment() on
+  // 08 Sep so the quick scaffold could read the SAME answer instead of
+  // computing its own from the flat merged field. Followed rather than
+  // loosened: the assertion is still exact, it just names the function
+  // the line actually lives in now.
+  const res = sbSrc.slice(sbSrc.indexOf("function _resolvedEquipment"),
+                          sbSrc.indexOf("function renderEquipmentCheck"));
+  ok(res.length > 0, "_resolvedEquipment is gone - the resolution moved again");
+  ok(/const usingFallback = matching\.length === 0 && other\.length > 0;/.test(res),
      "fallback missing");
+  ok(/const matching  = selectedLocation === "gym" \? gymEquip : homeEquip;/.test(res),
+     "the scoped read is gone - this is the flat-merged-field bug returning");
+  // And renderEquipmentCheck must still GET its values from there, not
+  // quietly reintroduce a second copy.
+  ok(/_resolvedEquipment\(\)/.test(fn),
+     "the step computes its own again, so there are two answers to keep in step");
 });
 check("duration does NOT pre-seed the override", () => {
   const dur = sbSrc.slice(sbSrc.indexOf(".sb-duration-btn"), sbSrc.indexOf(".sb-preset-btn"));
