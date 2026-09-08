@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v467
+ *
+ * v467 - QUICK-BUILD-2/3. session-builder-ui.js v17 -> v18. The quick
+ *   scaffold had never rendered for anybody: onMount() set the phase and
+ *   nothing re-rendered, so a time chip opened the type picker. Change
+ *   buttons now return to the scaffold, and the kit line reads the
+ *   location-scoped list instead of the flat merged field. Row buttons
+ *   gain accessible names. Already precached; cache bump only.
+ *
  * 06 Sep 2026 v466
  *
  * v466 - ARC-PLAIN. Strand rows are plain text, lit or muted. Room
@@ -3158,7 +3167,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v466";
+const CACHE_NAME = "alongside-v467";
 
 const SHELL_URLS = [
 
