@@ -1,7 +1,10 @@
 /**
  * sw.js - Alongside Service Worker
  *
- * 08 Sep 2026 v468
+ * 08 Sep 2026 v469
+ *
+ * v469 - STUCK-1. The coach-proposal panel's close button no longer
+ *   sits underneath the escape hatch, so the screen can be left.
  *
  * v468 - CHECKIN-3 / PROPOSAL-1/2. checkin.js v16 -> v17,
  *   coach-proposal.js v23 -> v24. The One to one journey: the coach
@@ -3176,7 +3179,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v468";
+const CACHE_NAME = "alongside-v469";
 
 const SHELL_URLS = [
 
