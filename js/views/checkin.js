@@ -1,5 +1,37 @@
 /**
  * js/views/checkin.js
+ * 08 Sep 2026 v17
+ *
+ * v17 - CHECKIN-3. The coach asked one question and opened the panel
+ *   for a different one. Device pass, task 4.
+ *
+ *   On the FULL path _moodBridge() said "Alright. How did you sleep?"
+ *   and the panel that opened next was the FEELING WORD. The sleep panel
+ *   then arrived in silence, because its own bridge line had been spent
+ *   one transition too early. A person answered a question they had not
+ *   been asked, and the coach never asked the one it wanted.
+ *
+ *   THIS IS QUICK-3, ONE PATH OVER. v15 found these same three lines
+ *   asking about sleep on the BRIEF path -- "the coach asked a question
+ *   it had already decided not to ask" -- gave the brief path its own
+ *   lines, and left the full path's three still naming a panel that no
+ *   longer came next. Fixed on one branch; the other lay here three
+ *   weeks.
+ *
+ *   _sleepBridge() carries the three sleep lines UNCHANGED to the
+ *   transition that actually opens the sleep panel, from BOTH exits of
+ *   the feeling word panel -- skip and confirm. The full path's mood
+ *   lines now ask what the feeling word panel asks, following
+ *   _energyBridge()'s pattern of coach-asks-then-panel-repeats, and
+ *   leaving room for the skip that panel offers.
+ *
+ *   _PANEL_BEAT_MS on both, which is QUICK-3's own remedy for a coach
+ *   line and the panel answering it landing in the same instant.
+ *
+ *   NOTHING HAD EVER MOUNTED THIS VIEW. verify-checkin2 reads this file
+ *   as text; no gate imported CheckinView. verify-checkin3 walks the
+ *   conversation and asserts on what the coach SAID, in sequence.
+ *
  * 29 Aug 2026 v16
  *
  * v16 - CHECKIN-2a. "Something else sore today?" on the conditions
@@ -607,6 +639,11 @@ export function CheckinView(router) {
       _closePanel(panel);
       _fadePastBubbles();
       await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
+      // CHECKIN-3. The sleep panel used to open in silence here.
+      await _showCoachBubble(_sleepBridge(_checkin.mood));
+      // QUICK-3's remedy for exactly this shape: a coach line and the
+      // panel answering it must not land in the same instant.
+      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : _PANEL_BEAT_MS));
       _showSleepPanel();
     });
 
@@ -615,6 +652,9 @@ export function CheckinView(router) {
       _fadePastBubbles();
       await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : 400));
       _showUserBubble(_checkin.feelingWord);
+      // CHECKIN-3. Same line on the other branch of the same panel.
+      await _showCoachBubble(_sleepBridge(_checkin.mood));
+      await new Promise(r => setTimeout(r, REDUCED_MOTION ? 0 : _PANEL_BEAT_MS));
       _showSleepPanel();
     });
 
@@ -1185,12 +1225,42 @@ export function CheckinView(router) {
   // close, because on the brief path there genuinely is nothing more to
   // ask -- energy and mood are everything detectBurnout() and
   // todayIntensity read.
+  /**
+   * CHECKIN-3, 08 Sep 2026. The full path's three lines asked about
+   * SLEEP, and the panel that opened next was the feeling word. The
+   * coach asked a question and then asked a different one, and the
+   * sleep panel arrived afterwards in silence -- its own bridge line
+   * had been spent one panel too early.
+   *
+   * This is QUICK-3's fault, one path over. v15 found _moodBridge()
+   * asking about sleep on the BRIEF path, gave the brief path its own
+   * three lines, and left the full path's three still naming a panel
+   * that no longer came next. Verified on one branch.
+   *
+   * The established pattern here is that the coach ASKS and the panel
+   * then repeats the question -- _energyBridge() asks "How's your mood
+   * sitting alongside that?" and the mood panel says "How's your mood?".
+   * These follow it, and leave room for the skip the panel offers.
+   */
   function _moodBridge(mood) {
     if (_briefPath()) {
       if (mood >= 8) return "Good. That's enough for me to work with.";
       if (mood >= 5) return "Alright. I've got what I need.";
       return "Understood. I'll keep that in mind for today.";
     }
+    if (mood >= 8) return "Good. Is there a word for how that feels?";
+    if (mood >= 5) return "Alright. Is there a word for how you're feeling today?";
+    return "Understood. Is there a word for it, or not really?";
+  }
+
+  /**
+   * CHECKIN-3. The three sleep lines, unchanged, moved to the transition
+   * that actually opens the sleep panel. Both exits from the feeling
+   * word panel use it -- skip and confirm -- because a fix applied to
+   * one branch of a two-branch panel is the exact thing GUIDED-COPY did
+   * on 06 Sep and DEVICE-1 did an hour before DEVICE-2.
+   */
+  function _sleepBridge(mood) {
     if (mood >= 8) return "Good. And sleep — how was last night?";
     if (mood >= 5) return "Alright. How did you sleep?";
     return "Understood. Sleep affects everything — tell me about last night.";
