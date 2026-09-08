@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v468
+ *
+ * v468 - CHECKIN-3 / PROPOSAL-1/2. checkin.js v16 -> v17,
+ *   coach-proposal.js v23 -> v24. The One to one journey: the coach
+ *   asked about sleep and opened the feeling word panel; the proposal
+ *   printed "1 movements" and mixed bare numbers with range strings in
+ *   one column; and Start Session bounced through Home before reaching
+ *   the session. Both files already precached; cache bump only.
+ *
  * 08 Sep 2026 v467
  *
  * v467 - QUICK-BUILD-2/3. session-builder-ui.js v17 -> v18. The quick
@@ -3167,7 +3176,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v467";
+const CACHE_NAME = "alongside-v468";
 
 const SHELL_URLS = [
 
