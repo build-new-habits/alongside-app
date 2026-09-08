@@ -1,6 +1,52 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 08 Sep 2026 v18
+ *
+ * v18 - QUICK-BUILD-2/3. Three defects in the quick room, all found by
+ *   MOUNTING it. Device pass, task 3.
+ *
+ *   1. THE SCAFFOLD HAD NEVER RENDERED FOR ANYBODY. The quick branch in
+ *   onMount() set phase = "quick" and fell through. The router calls
+ *   render() BEFORE onMount(), so the type picker was already on screen
+ *   and nothing re-rendered it. Tapping a time chip landed on the
+ *   eight-way "Tell me what you want to work on today" -- the exact
+ *   screen QUICK-BUILD replaced -- one screen after a card promising
+ *   "Tell me how long. I fill the rest in". The pre.type branch has
+ *   always ended `rerender(); return;`; quick mode was the one entry
+ *   that set a phase and trusted a render that had already happened.
+ *
+ *   2. NO CHANGE BUTTON CAME BACK. v16's own comment said each one
+ *   "drops into the ONE existing step for that answer and comes back
+ *   here". Only the outbound leg existed. Correcting the place dropped
+ *   the person into the full six-question flow, where the duration
+ *   picker asked "How long have you got today?" of somebody who had
+ *   answered exactly that on a time chip two taps earlier. _quickReturn()
+ *   now serves the four forward transitions and the back chain. Nothing
+ *   changes on any non-quick path.
+ *
+ *   3. THE KIT LINE READ THE WRONG LIST. It used store.get("equipment"),
+ *   the flat merged field renderEquipmentCheck() exists specifically NOT
+ *   to read, so at the gym it showed the home kit and its count never
+ *   matched the ticks behind its own button. _resolvedEquipment() is
+ *   that step's own resolution lifted out unchanged, so there is one
+ *   answer to "what kit", not two.
+ *
+ *   ACCESSIBILITY. Each row announced its VALUE alone -- "Glute Focus,
+ *   button" -- with the "Session" label beside it carrying the meaning
+ *   visually and nowhere else. WCAG 2.2 AA 1.3.1 and 2.4.6. The rows are
+ *   built from one template now; four hand-written aria-labels would be
+ *   four things to keep in step with four values.
+ *
+ *   WHY v1 OF THE GATE WAS GREEN THROUGHOUT: tests 0-1 executed the Home
+ *   chip, and 2, 3 and 4 were readFileSync regexes proving only that the
+ *   file CONTAINS renderQuickScaffold and the string phase === "quick".
+ *   Nothing mounted the receiving end. Tests 6-9 mount it.
+ *
+ *   STILL OPEN, LOGGED NOT FIXED: a quick build of type "stretch" never
+ *   passes through the zones step, so selectedZones stays empty. It has
+ *   never been reachable before today, so nothing regressed.
+ *
  * 06 Sep 2026 v17
  *
  * v17 - QUICK-INPUTS. quickInputs now reaches the stored record.
@@ -560,8 +606,14 @@ function _exerciseMeta(ex, opts = {}) {
  */
 function renderQuickScaffold() {
   const typeMeta = SESSION_TYPES.find(x => x.id === selectedType);
-  const kit = Array.isArray(store.get("equipment")) ? store.get("equipment") : [];
-  const kitLabel = kit.length === 0 || (kit.length === 1 && kit[0] === "none")
+  // QUICK-BUILD-3, 08 Sep 2026. Was store.get("equipment") -- the flat
+  // merged list, read regardless of where the person said they were. At
+  // the gym it showed the home kit, and its count never matched the
+  // ticks sitting behind its own "Kit" button. Same resolver the
+  // equipment step uses, so the number here IS what is there.
+  const kit = (_resolvedEquipment().currentEquip || [])
+    .filter(id => id && id !== "none");
+  const kitLabel = kit.length === 0
     ? "Nothing needed"
     : `${kit.length} thing${kit.length === 1 ? "" : "s"} you have`;
 
@@ -577,31 +629,36 @@ function renderQuickScaffold() {
 
       <p class="text-secondary">Change anything that isn't right.</p>
 
-      <ul class="sb-quick__list">
+      <!--
+        QUICK-BUILD-3, 08 Sep 2026. Each row was a <span> label beside a
+        button whose only accessible name was its VALUE, so a screen
+        reader announced "Glute Focus, button" -- no indication of what
+        the value is, or that the button changes it. The "Session" label
+        beside it carried that meaning visually and nowhere else.
+
+        WCAG 2.2 AA: 1.3.1, the label/control relationship existed in
+        presentation only, and 2.4.6, a label that does not describe
+        purpose. The accessible name still CONTAINS the visible text, so
+        2.5.3 Label in Name holds and voice control still works.
+
+        Built from one row template rather than four copies: four hand-
+        written aria-labels are four things to keep in step with four
+        values, and they would drift on the first copy-paste.
+      -->
+      <ul class="sb-quick__list">      ${[
+        ["Session", "sb-quick-type",      typeMeta ? typeMeta.label : "Full Body"],
+        ["Length",  "sb-quick-duration",  selectedDuration ? `${selectedDuration} min` : "You choose"],
+        ["Where",   "sb-quick-location",  selectedLocation === "gym" ? "At the gym" : "At home"],
+        ["Kit",     "sb-quick-equipment", kitLabel]
+      ].map(([label, id, value]) => `
         <li class="sb-quick__row">
-          <span class="sb-quick__label">Session</span>
-          <button class="btn btn-secondary sb-quick__change" id="sb-quick-type">
-            ${typeMeta ? typeMeta.label : "Full Body"}
+          <span class="sb-quick__label">${label}</span>
+          <button class="btn btn-secondary sb-quick__change" id="${id}"
+                  aria-label="${label}: ${value}. Change">
+            ${value}
           </button>
-        </li>
-        <li class="sb-quick__row">
-          <span class="sb-quick__label">Length</span>
-          <button class="btn btn-secondary sb-quick__change" id="sb-quick-duration">
-            ${selectedDuration ? `${selectedDuration} min` : "You choose"}
-          </button>
-        </li>
-        <li class="sb-quick__row">
-          <span class="sb-quick__label">Where</span>
-          <button class="btn btn-secondary sb-quick__change" id="sb-quick-location">
-            ${selectedLocation === "gym" ? "At the gym" : "At home"}
-          </button>
-        </li>
-        <li class="sb-quick__row">
-          <span class="sb-quick__label">Kit</span>
-          <button class="btn btn-secondary sb-quick__change" id="sb-quick-equipment">
-            ${kitLabel}
-          </button>
-        </li>
+        </li>`).join("")
+      }
       </ul>
 
       <button class="btn btn-primary btn-large btn-full" id="sb-quick-build">
@@ -955,9 +1012,32 @@ function renderDurationPicker() {
   `;
 }
 
-function renderEquipmentCheck() {
+/**
+ * QUICK-BUILD-3, 08 Sep 2026. The one place that answers "what kit is
+ * this session being built around".
+ *
+ * Lifted out of renderEquipmentCheck() unchanged, because the quick
+ * scaffold needed the same answer and had been computing its own:
+ * `store.get("equipment")`, the flat merged field this very step exists
+ * NOT to use -- so the scaffold showed the home list while the person
+ * stood in the gym, and showed a count that did not match the ticks
+ * behind its own button.
+ *
+ * Two readings of "what kit" is exactly the drift this file keeps
+ * warning about, so there is now one.
+ */
+function _resolvedEquipment() {
   const homeEquip = store.get("homeEquipment") || [];
   const gymEquip  = store.get("gymEquipment")  || [];
+  const matching  = selectedLocation === "gym" ? gymEquip : homeEquip;
+  const other     = selectedLocation === "gym" ? homeEquip : gymEquip;
+  const usingFallback = matching.length === 0 && other.length > 0;
+  const savedEquip    = usingFallback ? other : matching;
+  return { matching, other, usingFallback, savedEquip,
+           currentEquip: equipmentOverride ?? savedEquip };
+}
+
+function renderEquipmentCheck() {
   // 05 Aug 2026 -- the actual location fix: reads the scoped list matching
   // today's answer, not the flat merged `equipment` (workoutGenerator.js's
   // problem, confirmed 04 Aug -- this is where it's fixed for the
@@ -981,12 +1061,7 @@ function renderEquipmentCheck() {
   //
   // Only when the matching scope is EMPTY. Somebody with both lists
   // saved still gets exactly the one they asked for.
-  const matching  = selectedLocation === "gym" ? gymEquip : homeEquip;
-  const other     = selectedLocation === "gym" ? homeEquip : gymEquip;
-  const usingFallback = matching.length === 0 && other.length > 0;
-  const savedEquip    = usingFallback ? other : matching;
-
-  const currentEquip = equipmentOverride ?? savedEquip;
+  const { matching, other, usingFallback, savedEquip, currentEquip } = _resolvedEquipment();
 
   // EQUIP-3, 12 Aug 2026. RESOLVE before comparing.
   //
@@ -1523,6 +1598,32 @@ function rerender() {
   }
 }
 
+/**
+ * QUICK-BUILD-2, 08 Sep 2026.
+ *
+ * In quick mode every step is a DETOUR from the scaffold, not a station
+ * on a route. The scaffold's own comment already said each change button
+ * "drops into the ONE existing step for that answer and comes back
+ * here". The outbound leg was built; the return leg never was, so
+ * correcting one assumption dropped the person into the full six-question
+ * flow -- and the duration picker then asked "How long have you got
+ * today?" of somebody who had answered exactly that on a time chip two
+ * taps earlier.
+ *
+ * Same rule the back chain below already states in its own words: never
+ * enter, or leap past, a screen the person did not see.
+ *
+ * Returns true when it has handled the transition, so each call site
+ * reads `if (_quickReturn()) return;` and the normal flow underneath is
+ * left exactly as it was for every non-quick path.
+ */
+function _quickReturn() {
+  if (!quickMode) return false;
+  phase = "quick";
+  rerender();
+  return true;
+}
+
 // ── Build and navigate ────────────────────────────────────────────────────────
 
 function triggerBuild() {
@@ -1757,6 +1858,29 @@ export function onMount() {
       if (!pre.type) {
         store.set("sessionBuilderPreselect", null);
       }
+
+      // QUICK-BUILD-2, 08 Sep 2026. The branch above set phase = "quick"
+      // and then fell through without re-rendering.
+      //
+      // The router calls render() BEFORE onMount(), so the type picker
+      // was already on screen by the time the phase changed. Nothing
+      // re-rendered it. THE SCAFFOLD HAS NEVER BEEN SEEN BY ANYBODY:
+      // tapping a time chip landed on the eight-way type picker asking
+      // "Tell me what you want to work on today" -- the exact screen
+      // QUICK-BUILD was written to replace, one screen after a card
+      // promising "Tell me how long. I fill the rest in".
+      //
+      // The pre.type branch below has always ended `rerender(); return;`
+      // for precisely this reason. Quick mode was the one entry that set
+      // a phase and trusted a render that had already happened.
+      //
+      // AFTER the clear above, never before. Returning early with the
+      // preselect still in the store would pin every later build to a
+      // duration tapped days ago -- the fault the comment above guards.
+      if (quickMode) {
+        rerender();
+        return;
+      }
     }
 
     if (pre && pre.type && SESSION_TYPES.some(t => t.id === pre.type)) {
@@ -1806,6 +1930,12 @@ export function onMount() {
       router.navigate("today");
       return;
     }
+    // QUICK-BUILD-2. Backing out of a detour returns to the scaffold.
+    // The chain below walks back through the compose flow's own steps --
+    // location to type, equipment to duration -- every one of which a
+    // quick user never saw. Backing out of the type picker would have
+    // landed on the door, silently abandoning the length they gave.
+    if (_quickReturn()) return;
     if (phase === "type") {
       // Captured BEFORE resetState(), which nulls it. Read after, this
       // always fell through to "today" and the door was silently lost.
@@ -1887,6 +2017,11 @@ export function onMount() {
       // R4, 20 Aug 2026. The free branch here set selectedDuration = 30
       // and jumped to equipment, because 30 minutes was "the free tier's
       // only length". It is not any more. One path for everybody.
+      //
+      // QUICK-BUILD-2. In quick mode the picker was opened to CORRECT the
+      // coach's type, so the answer goes back to the scaffold rather than
+      // walking on into a flow the person never chose to enter.
+      if (_quickReturn()) return;
       phase = "location";
       rerender();
     });
@@ -1922,6 +2057,9 @@ export function onMount() {
   });
 
   document.getElementById("sb-location-continue-btn")?.addEventListener("click", () => {
+    // QUICK-BUILD-2. Back to the scaffold: the place was the one thing
+    // being corrected.
+    if (_quickReturn()) return;
     // ZONE-1. Only Stretch asks. Every other type goes straight on, so
     // no existing flow gains a step.
     phase = selectedType === "stretch" ? "zones" : "duration";
@@ -1932,6 +2070,11 @@ export function onMount() {
   document.querySelectorAll(".sb-duration-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedDuration = parseInt(btn.dataset.mins);
+      // QUICK-BUILD-2. Placed BEFORE the stretch branch below, which
+      // builds the session there and then. In quick mode a length was
+      // already given on the time chip; this screen was opened to change
+      // it, and changing it must not also start the build.
+      if (_quickReturn()) return;
       // R4, 20 Aug 2026. The `else` that stood here forced
       // selectedDuration = 30, copied the flat saved equipment list into
       // the override and called triggerBuild() immediately -- so a free
@@ -2042,6 +2185,10 @@ export function onMount() {
       document.querySelectorAll(".sb-equipment-check:checked")
     ).map(c => c.dataset.equipment);
     equipmentOverride = checked;
+    // QUICK-BUILD-2. The ticks are kept, then back to the scaffold. The
+    // build-mode question belongs to the compose flow; quick build has
+    // one button and it is on the scaffold.
+    if (_quickReturn()) return;
     phase = "buildmode";
     rerender();
   });
