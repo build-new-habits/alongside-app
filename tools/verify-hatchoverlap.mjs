@@ -123,6 +123,36 @@ ok("4b. and still a 44px target",
    /min-width:\s*44px/.test(hatch) && /min-height:\s*44px/.test(hatch),
    "shrinking the hatch would solve the overlap by breaking WCAG 2.5.8");
 
+// ── 6. STUCK-1 ──────────────────────────────────────────────────────────
+// The hatch and the coach-proposal panel's close button both sat
+// top-right, on top of each other, and NEITHER worked. Graeme could not
+// leave the screen.
+//
+// Test 3 asserted that every gutter names a class that EXISTS. It could
+// not assert the reverse -- that every screen needing one has one -- so
+// dropping .cp-preview-panel__head instead of finding the real selector
+// passed silently. This is that reverse check, for every control that
+// parks itself in the top-right corner.
+console.log("\nTEST 6 - STUCK-1: nothing else lives in the hatch's corner");
+
+const corners = [
+  [".cp-preview-panel__close", "css/components/coach-proposal.css",
+   "the coach-proposal panel - the screen with no other way out"]
+];
+
+for (const [sel, file, why] of corners) {
+  const src = fs.readFileSync(file, "utf8");
+  const rule = src.slice(src.indexOf(sel + " {"),
+                         src.indexOf("}", src.indexOf(sel + " {")));
+  ok(`6a. ${sel} clears the hatch`,
+     /escape-hatch-gutter/.test(rule),
+     `${sel} sits under the escape hatch on ${why}. Both controls become ` +
+     `untappable and the screen cannot be left.`);
+  ok(`6b. ${sel} clears it by the hatch's OWN measurement`,
+     /var\(--escape-hatch-gutter\)/.test(rule),
+     "cleared by a literal, so it stops matching the first time the hatch changes size");
+}
+
 console.log(fails === 0
   ? "\nHATCH-OVERLAP: all assertions pass\n"
   : `\nHATCH-OVERLAP: ${fails} FAILED\n`);

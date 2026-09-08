@@ -209,8 +209,28 @@
   .cp-preview-panel__content { transition: none; }
 }
 
+/* STUCK-1, 06 Sep 2026. THE PANEL COULD NOT BE LEFT.
+ *
+ * This button is align-self: flex-end, so it sits top-right. The escape
+ * hatch is position: fixed, top-right, z-index 10000. They landed on top
+ * of each other and NEITHER worked -- the hatch covered the X, and the
+ * hatch's own tap went to the panel beneath it. Graeme, on device: "I
+ * can't clear cache and data and get out of the coach proposal. I'm
+ * genuinely stuck."
+ *
+ * HATCH-OVERLAP RESERVED THE CORNER ON .workout-header AND .ci-thread
+ * AND STOPPED THERE. Its first draft named .cp-preview-panel__head --
+ * which does not exist -- and when the gate caught that, I dropped the
+ * selector instead of finding the real one. The gate asserted that every
+ * gutter names a real class; it could not assert that every screen
+ * needing one has it.
+ *
+ * The X moves left by exactly the hatch's own gutter, so the two cannot
+ * overlap however either changes size.
+ */
 .cp-preview-panel__close {
   align-self: flex-end;
+  margin-right: var(--escape-hatch-gutter);
   background: transparent;
   border: none;
   color: var(--color-text-muted);
