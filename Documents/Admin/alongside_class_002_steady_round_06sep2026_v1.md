@@ -1,5 +1,5 @@
 # Alongside: Move — Class 002: Steady Round
-## 06 Sep 2026 v1
+## 06 Sep 2026 v2
 
 Build New Habits | Strand: **trunk strength**. Format: **bodyweight circuit**. Intensity: **gentle**.
 
@@ -246,6 +246,13 @@ easierRouteId   string?    // per movement, distinct from seatedAlternativeId
 ⚫ **`seatedAlternativeId` and `easierRouteId` are not the same field**, and Class 001 could not have shown that. Knees-down plank is not a seated version — it is the same movement, less of it. Collapsing them would have made "can't get to the floor" and "can't hold it long" the same problem.
 
 🟡 **One thing Class 001 had that this lacks: a noticing beat.** A circuit does not obviously want one. **Not adding it for symmetry** — if a third class wants one, the field is there.
+
+---
+
+## Pacing
+🔴 **This class is where speech and hold stop being the same thing** — spec §4b. The plank's 35 seconds is a `holdSeconds` and **must never scale**: at 1.5x it becomes 23 seconds, which is a harder exercise, and at 0.5x it becomes 70, which is the opposite of what somebody choosing *slower* asked for. Every other `⏸` here is `speechSeconds` and scales freely.
+
+🟢 **Tap-to-advance is the default.** The stop cues do the real work — *smoothness*, *before it gets ugly* — and they are the person's, not the clock's.
 
 ---
 
