@@ -1,5 +1,5 @@
 # Alongside: Move — Class 001: Ground
-## 06 Sep 2026 v1
+## 06 Sep 2026 v2
 
 Build New Habits | Strand: **trusting your body again**. Format: **stretch and mindfulness**. Intensity: **gentle**.
 
@@ -233,6 +233,13 @@ beats         [ { kind, screen, voice, holdSeconds, exerciseId?, practiceId?,
 ⚫ **`beats`, not `exercises`.** A class is not a list of movements — half of this one is silence and questions. **A schema shaped like a workout would have thrown away the parts that make it a class.**
 
 ⚫ **`seatedRoute` is a property of the whole class, not of each beat.** Somebody who cannot get to the floor needs to know that before they start, not to discover it beat by beat.
+
+---
+
+## Pacing
+🟡 **The `⏸` values in this script are `speechSeconds`, not `holdSeconds`** — spec §4b, added after this class was written. Every silence here is a gap between cues, so all of it scales. **Class 001 happens to contain no true holds**, which is why the distinction did not surface until Class 002.
+
+🟢 **Tap-to-advance is the default**, so these numbers are what the class *says* — "about thirty seconds" — rather than what it enforces. Nothing moves on until the person is ready.
 
 ---
 

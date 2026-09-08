@@ -1,5 +1,5 @@
 # Alongside: Move — Guided Class content programme
-## 06 Sep 2026 v2
+## 06 Sep 2026 v3
 
 Build New Habits | The room where somebody else already decided.
 
@@ -50,6 +50,56 @@ Beta is screen-guided. Voice follows, hopefully by launch.
 🟢 **The beta content then IS the launch content, and the voice pass is production rather than a rewrite.** ElevenLabs is the intended route.
 
 ⚫ **The screen renders the script's beats, not a summary of them.** A class that reads as a bullet list on screen and a flowing script in audio is two products.
+
+---
+
+## 4b. 🔴 HOW A CLASS IS PACED. The person drives, not the class.
+
+Added 06 Sep 2026 after Graeme asked whether video-style speed controls (0.5x … 2x) would solve the pace problem. **They solve a different one, and built the obvious way they break the class.**
+
+### Two different pace problems
+
+| | |
+|---|---|
+| **Structural pace** — solved in Class 002 | A clock and a rep count are ways of falling behind. Removed: no timer shown, no reps counted aloud, no round-two target, every movement ending on a **stated signal** rather than "when you can't do any more" |
+| **Delivery pace** — not yet solved | How fast the coach talks and how long the gaps are. **Processing speed varies enormously across this audience**, and a class currently sets one tempo and expects you to match it |
+
+### 🔴 A single playback rate silently rewrites the workload
+
+**Speed must scale the SPEECH, never the HOLDS.**
+
+At 1.5x, Class 002's 35-second plank becomes 23 seconds — a different and harder exercise. At 0.5x it becomes 70 seconds, which for the person who chose *slower* is exactly the wrong outcome. **One rate over a whole class changes the work in both directions, and neither is what the person asked for.**
+
+🟢 **So a beat carries TWO durations and only one of them scales:**
+
+```
+speechSeconds   number   // narration and the gaps between cues -- SCALES
+holdSeconds     number   // how long a position is held -- NEVER SCALES
+```
+
+⚫ **Cheap now, expensive later.** Retrofitting this once classes are written means revisiting every beat in every class to work out which number was which.
+
+### 🟢 THE DEFAULT IS TAP-TO-ADVANCE, NOT A TIMER
+
+Beta is screen-first, so there is no audio to speed up yet — **the immediate need is not a rate at all.**
+
+**Every beat waits.** The hold is still stated in words — *"about thirty seconds"* — and nothing moves on until the person taps.
+
+🔴 **This is a better answer than a speed control, and the reason is the same reason the clock went.** A speed control still assumes the class drives and the person keeps up; it only changes how fast they have to. **Tap-to-advance means the person drives.** For somebody with fatigue or slow processing, that is the difference between a class being usable and being another thing that got away from them.
+
+It is also consistent with everything else already decided: no clock, no rep count, the exit offered in the middle, sitting out counting as doing the round.
+
+| Mode | When |
+|---|---|
+| **Tap to advance** | **Default.** The class waits. Beta ships with only this |
+| **Timed** | An option, not the default. For somebody who wants it running by itself |
+| **Speed control** | **Only once there is audio to apply it to.** Scales `speechSeconds` only |
+
+### 🟡 If speed control ships, cap it and label it by effect
+
+**0.75 / 1 / 1.25**, not 0.5 to 2. Two-times exists for getting through content quickly, and **a class is not content to get through** — a 2x movement class is worse and slightly unsafe.
+
+**Label by effect, not multiplier.** *"More time between cues"* reads as a setting. *"0.5x"* reads as an admission.
 
 ---
 
