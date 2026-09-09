@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v317
+## 08 Sep 2026 v316
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v316.md`. Remove v316 on upload.
+Supersedes `master_schedule_v315.md`. Remove v315 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v473`, 130 gates, `store.js` v65, `Schema.md` v1.52, cold start blueprint v70.** Read that blueprint after this block.
+> **Live: `alongside-v472`, 129 gates, `store.js` v65, `Schema.md` v1.52, cold start blueprint v68.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -20,32 +20,6 @@ Supersedes `master_schedule_v316.md`. Remove v316 on upload.
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
 > ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v316 — TIMER-1, `v473`. Device pass task 7 of 8.
->
-> ⚫ **The countdown reaching zero changed the screen and said nothing.** CARD-3 calls it *"the one automatic forward move; every other transition is a tap"* — it moves the person from DO to NOTE. **Focus did not move. Both live regions on the page it lands on were empty. The only signal was `navigator.vibrate`, which Safari on iOS does not implement — so on an iPhone there was no signal of any kind.**
->
-> It changes the screen under somebody who, mid-exercise, is by definition not looking at it. **That is what a timer is for.** WCAG 2.2 AA **4.1.3 Status Messages**.
->
-> **Fix:** `role="status"`, plus a visible form (`workout.css` v13). A message only screen readers get is half a fix — the person who put the phone on the mat gets nothing either.
->
-> 🔴 **Only when the countdown did it.** `verify-timer1` test 2 asserts the **silence** when the person taps Done. They already know the exercise is over, and a live region that fires when nothing surprising happened trains people to ignore it. **A fix that announced on every arrival would pass test 1 and be worse than the defect.**
->
-> ⚠️ **My first version leaked, and the gate caught it.** `cleanupWorkout()` did not clear the flag, so finishing a countdown, leaving, and starting a **new** session announced a timer that never ran, about an exercise from a session already abandoned. Every other piece of ephemeral state on that view is cleared there.
->
-> ⚠️ **And one reversal lied to me.** Reversal 3 first reported all-pass because the patch had not applied — the string matched twice and the assertion threw, leaving the file untouched. Redone against a unique line, it fails 2a. **A reversal that does not apply is not a reversal, and it reads identically to a passing one.**
-
-> ### 🔴 TWO LOAD-FLAKY GATES, FIXED — including one that was not mine
->
-> | Gate | |
-> |---|---|
-> **`verify-checkin3` v1 → v2** | Flat 60ms wait. **Green five runs out of five on an idle box; TWELVE assertions red every time under load.** Mine, written 08 Sep |
-> **`verify-thread1` v1 → v2** | Flat 40ms wait. Green six of six alone, **red every time under load.** Pre-existing since 22 Aug |
-> **`verify-save1` v1 → v2** | Waited 1600ms for a build. Survived the load test, but it was the same bet, so it now waits for the preview to *arrive* |
->
-> 🔴 **This is the most dangerous shape a gate can take.** It passes when you run it on its own, fails inside the full suite, and reads as *"the suite being slow"*. **A gate whose result depends on how busy the machine is teaches people to re-run it until it agrees with them** — which converts a real failure into something you shrug at. Both now poll for stillness rather than betting on a clock.
->
-> 🟢 **All 18 timer-using gates swept under artificial load. All hold.**
 
 > ### 🟢 SHIPPED SINCE v315 — SAVE-1, `v472`. Device pass task 5 of 8.
 >
@@ -8314,4 +8288,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v317*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v316*
