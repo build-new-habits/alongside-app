@@ -1,5 +1,13 @@
 /**
  * router.js
+ * 08 Sep 2026 v26
+ *
+ * v26 - SAVED-1. 'saved-sessions' registered, mapped back to 'today'
+ *   because it is reached from the Your own room on Home -- the same
+ *   reason NAV-8 moved the Library there. A tab that disagrees with the
+ *   door somebody came through is the fault NAV-8 fixed and TIER-F made
+ *   visible the same day.
+ *
  * 03 Sep 2026 v25
  *   ARC-3-SETUP. New route 'arc-setup' -> arc-setup.js.
  *
@@ -223,6 +231,12 @@ const VIEW_NAMES = {
   'journal-entry':     { path: './views/journal-entry.js',    fn: 'JournalEntryView'    },
   'activity-log':      { path: './views/activity-log.js',     fn: 'ActivityLogView'     },
   'library':           { path: './views/library.js',          fn: 'LibraryView'         },
+  // SAVED-1, 08 Sep 2026. The Your own room counted saved sessions and
+  // hid all but the newest behind a button that opened the BUILDER --
+  // a screen for making a new one, reached by tapping a control that
+  // names the ones you already have. There was nowhere else for it to
+  // go: no list view existed and no route pointed at one.
+  'saved-sessions':    { path: './views/saved-sessions.js',  fn: 'SavedSessionsView'   },
   'my-programme':      { path: './views/my-programme.js',     fn: 'MyProgrammeView'     },
   // THREAD-1a. The hard conversation is ENTERED from My Programme's
   // invitation, never opened over the top of it.
@@ -319,6 +333,10 @@ const NAV_MAP = {
   // renaming that tab to "Wellbeing", so opening the exercise Library
   // now visibly highlighted "Wellbeing".
   'library': 'today',
+  // SAVED-1. Reached from the Your own room on Home, so it maps to Today
+  // for the same reason NAV-8 moved the Library there: the highlighted
+  // tab must agree with the door somebody came through.
+  'saved-sessions': 'today',
   // PRAC-1. Reached from the Library, which maps to Today. Mapping it
   // to Wellbeing would repeat the NAV-8 fault from the other side --
   // the tab would disagree with the door somebody came through.

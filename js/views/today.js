@@ -1,5 +1,14 @@
 /**
  * today.js
+ * 08 Sep 2026 v35
+ *
+ * v35 - SAVED-1. The Your own room's counted button pointed at the
+ *   BUILDER. "Your other 2 sessions" opened the screen for making a NEW
+ *   one, reached by tapping a control that names the ones you already
+ *   have -- and there was nowhere else for it to go, because no list
+ *   view existed and no route pointed at one. It now points at
+ *   'saved-sessions'. A count is a promise.
+ *
  * 06 Sep 2026 v34
  *
  * v34 - ARC-PLAIN. The strand rows lose their marks and labels.
@@ -1801,9 +1810,16 @@ export function TodayView(router) {
           action: `<button class="btn btn-primary btn-full club-room__go"
                            data-saved-id="${saved[0].id}">Start ${_esc(saved[0].name)}</button>
                    ${saved.length > 1 ? `
+                     <!-- SAVED-1, 08 Sep 2026. Was data-route="session-builder":
+                          a button naming sessions you already have, which
+                          opened the screen for making a new one. There was
+                          nowhere else for it to go until saved-sessions
+                          existed. A count is a promise, and this is where it
+                          is now kept. -->
                      <button class="btn btn-secondary btn-full club-room__go"
-                             data-route="session-builder" data-door-id="own"
-                             data-requires-checkin="false">Your other ${saved.length - 1} session${saved.length - 1 === 1 ? '' : 's'}</button>
+                             data-route="saved-sessions" data-door-id="own"
+                             data-requires-checkin="false"
+                             aria-label="Your other ${saved.length - 1} saved session${saved.length - 1 === 1 ? '' : 's'}. Opens the full list.">Your other ${saved.length - 1} session${saved.length - 1 === 1 ? '' : 's'}</button>
                    ` : ''}`
         })
       : roomRow({

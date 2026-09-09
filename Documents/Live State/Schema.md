@@ -1,5 +1,7 @@
 # Alongside — Data Schema Reference
-## 08 Sep 2026 v1.52
+## 08 Sep 2026 v1.53
+
+> **v1.53, 08 Sep 2026 — SAVED-1.** No field changes. `savedSessions` gains a third reader, `views/saved-sessions.js`, and the note below records that `deleteSavedSession()` remains uncalled by choice rather than by oversight.
 
 > **v1.52, 08 Sep 2026 — ROLE-1.** Exercise objects inside
 > `generatedSession.session.exercises` gain **`role`**: one of `"warmup"`,
@@ -320,7 +322,7 @@ Now used by `today.js` (×4), `progress.js` (×2) and `reflect.js`'s `getSession
 
 **No count limit, no ordering by use, no "most popular".** The list is theirs in the order they made it.
 
-**Written by** `session-builder-ui.js` (save action). **Read by** `today.js` (the Your own room) and `session-builder-ui.js` (start a saved session). **Not read by the coach** — `chooseSessionType()` must not treat a saved session as a preference signal, because saving something is a decision about a session, not a statement about a person.
+**Written by** `session-builder-ui.js` (save action). **Read by** `today.js` (the Your own room), `session-builder-ui.js` (start a saved session) and — **SAVED-1, 08 Sep 2026** — `views/saved-sessions.js`, the full list behind the room's counted button. `deleteSavedSession()` still has **no caller anywhere**: a list is its obvious home and it was deliberately left unwired, because adding a destructive control to somebody's own authored work is a product decision. **Not read by the coach** — `chooseSessionType()` must not treat a saved session as a preference signal, because saving something is a decision about a session, not a statement about a person.
 
 ### `sessionBuilderPreselect.durationMins` — **NEW, CLUB-SHELL, 06 Sep 2026**
 
