@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v320
+## 08 Sep 2026 v319
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v319.md`. Remove v319 on upload.
+Supersedes `master_schedule_v318.md`. Remove v318 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v476`, 131 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v75.** Read that blueprint after this block.
+> **Live: `alongside-v475`, 131 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v74.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -20,39 +20,6 @@ Supersedes `master_schedule_v319.md`. Remove v319 on upload.
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
 > ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v319 — LOCATION-1, `v476`. One to one asks where you are.
->
-> ⚫ **The room proposed kit you had no way of reaching.**
->
-> `buildSession()` has **no location parameter and never has** — location exists only as a selector for *which equipment list is used*. `coach-proposal.js` passed `equipmentOverride: null`, which falls back to the flat `equipment` field, and `onboarding/equipment.js` writes that field as **the union of home kit and gym kit**.
->
-> 🔴 **Measured**, with a resistance band at home and a rack at the gym: One to one proposed a **Barbell Back Squat** and a **Barbell Deadlift** to somebody who might be standing in their kitchen. **The default path for every One to one session**, not an edge case.
->
-> **`sessionLocation` already existed**, already had a writer (`checkin-mini.js` Step 4, *"Where are you now?"*), and was read by **nothing that builds a session**. A wire left hanging, not a feature to invent. Schema v1.55 → **v1.56** gives it the description it never had.
->
-> | | |
-> |---|---|
-> **`equipmentForLocation()`** | In `session-builder.js`, beside the thing that consumes it |
-> **`"outside"` is BODYWEIGHT** | Not the home list. `checkin-mini` has offered outside since it was written and nothing building a session had ever had to answer it. **Your dumbbells are not in the park** |
-> **`null` is HOME** | The safe direction: a session built for home can be done at a gym; one built for a gym cannot be done at home |
-> **The strip** | Where and Length, shown and changeable — the same row shape as the quick scaffold, because it is the same idea. Graeme: *"It works though. I can't change anything though if I wanted to."* |
-> **Rebuild on change** | And the selection is cleared: new options are new objects with new ids, so a retained one leaves Start enabled pointing at nothing |
-> **`h1`, not `h2`** | This screen had **no `h1` at all**; its outline began at `h2`. WCAG 2.2 AA 1.3.1 |
->
-> ⚫ **The comment at `_buildCoachSuggestion()` has long claimed these arguments match `triggerBuild()`'s. They did not** — the builder passes a location-scoped list and this passed `null`. Closed, not widened.
-
-> ### 🔴 MY GATE PASSED TWICE WITH THE DEFECT RESTORED
->
-> | Attempt | Why it passed anyway |
-> |---|---|
-> **1** | It asserted the **resolver**, not the wiring. Reverting the proposal to `equipmentOverride: null` left it entirely green |
-> **2** | It asserted *"no gym kit at home"* — and `chooseSessionType()` picked a hip session whose pool holds **no barbell work**. **The assertion was right and the fixture could not exercise it** |
-> **3 ✅** | Asserts at **outside**, where *any* equipment is a violation whichever type is chosen — the one location the assertion cannot be dodged by the luck of the draw. And it inspects the session the view **hands over**, not one it builds for itself |
->
-> 🔴 **Second time in two features I have written a gate that verifies a function while the screen calls a different one.** SAVED-2's test 7 had exactly this shape the same day. **A route-level assertion is not optional garnish on a unit-level one.**
->
-> 🟢 `verify-twoengine` v2: `1c` pinned the **exact import shape** and broke on a legitimate third name — asserted as intended now. All its reads were cwd-relative; fixed and confirmed green from another directory, **and confirmed the `1d` scan still walks 82 files rather than silently finding none.** One more of the 53 — **49 left.**
 
 > ### 🟢 SHIPPED SINCE v318 — SAVED-2, `v475`. Saved sessions are editable and deletable.
 >
@@ -8413,4 +8380,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v320*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v319*

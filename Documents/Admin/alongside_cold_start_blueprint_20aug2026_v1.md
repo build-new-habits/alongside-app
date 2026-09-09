@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 08 Sep 2026 v74
+## 08 Sep 2026 v75
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -70,7 +70,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 |---|---|
 | `store.js` | v65 |
 | `Schema.md` | v1.56 |
-| `sw.js` | **v475**, cache `alongside-v475` |
+| `sw.js` | **v476**, cache `alongside-v476` |
 | `router.js` | v22 · `my-programme.js` v8 · `today.js` v25 · `settings.js` v36 · `progress.js` v11 · `onboarding/thread.js` v13 |
 | Gates | **131, all green** — from the repo root. See the cwd row in §9 |
 
@@ -202,7 +202,7 @@ Truth lives in `js/data/pricing.js`. `verify-price.mjs` enforces it.
 |---|---|
 | **Progression does not exist** | For any tier. `session-builder.js` builds week 10 like week 1 |
 | **43 of 77 gates are source-text only** | They cannot tell live code from dead. **QUICK-BUILD, 08 Sep, is the worst case yet recorded:** `verify-quickbuild` v1 was green while the screen it names had never rendered for anybody, because every assertion about the builder was a `readFileSync` regex |
-| 🔴 **70 of 124 gates fail from any cwd but the repo root** | **Measured 08 Sep, not estimated.** `GATE-PATH` (21 Aug) closed the *clone path* problem -- hardcoded `/home/claude/repo`, now resolved from `import.meta.url`. It did NOT close **cwd** dependence: 53 gates still call `readFileSync("js/...")`, which resolves against `process.cwd()`. `cd` into the clone and all 124 are green; run them by full path from anywhere else and 70 go red. **Not a live fault** -- every session so far has run them from the repo root -- **but the trap it sets is the expensive one:** a session that runs the suite from `/home/claude` sees 70 red and reasonably concludes the app is broken. `verify-quickbuild` and `verify-equipment-sweep` are fixed; the other 51 are a scoped task |
+| 🔴 **70 of 124 gates fail from any cwd but the repo root** | **Measured 08 Sep, not estimated.** `GATE-PATH` (21 Aug) closed the *clone path* problem -- hardcoded `/home/claude/repo`, now resolved from `import.meta.url`. It did NOT close **cwd** dependence: 53 gates still call `readFileSync("js/...")`, which resolves against `process.cwd()`. `cd` into the clone and all 124 are green; run them by full path from anywhere else and 70 go red. **Not a live fault** -- every session so far has run them from the repo root -- **but the trap it sets is the expensive one:** a session that runs the suite from `/home/claude` sees 70 red and reasonably concludes the app is broken. `verify-quickbuild`, `verify-equipment-sweep`, `verify-progress-shapes` and `verify-twoengine` are fixed; the other 49 are a scoped task |
 | ~~14 gates hardcode the clone path~~ | **Closed 21 Aug (GATE-PATH).** |
 | ~~1 module does not link~~ | **Closed 22 Aug (CHOOSER-1).** `verify-link.mjs` now reports 0 known-broken and guards the class permanently |
 | **Source text can contradict runtime** | `goals.js` declares `hasTarget`/`targetType`; the `flatMap` that builds the export drops them. Grep confirms the opposite of the truth. **Execute** |
