@@ -1,5 +1,36 @@
 /**
  * workout.js - Workout Execution View
+ * 08 Sep 2026 v18
+ *
+ * v18 - TIMER-1. The one automatic move in a session now says so.
+ *   Device pass, task 7.
+ *
+ *   The countdown reaching zero moves the person from DO to NOTE. CARD-3
+ *   calls it "the one automatic forward move; every other transition is a
+ *   tap" -- and it announced nothing. Focus did not move, both live
+ *   regions on the page it lands on were empty, and the only signal was
+ *   navigator.vibrate, which Safari on iOS does not implement. On an
+ *   iPhone there was no signal of any kind.
+ *
+ *   It changes the screen under somebody who, mid-exercise, is by
+ *   definition not looking at it. That is what a timer is for.
+ *
+ *   WCAG 2.2 AA 4.1.3 Status Messages. role="status", and a visible form
+ *   in workout.css v13 -- a message only screen readers get is half a
+ *   fix, because the person who put the phone on the mat gets nothing
+ *   either.
+ *
+ *   ONLY when the countdown did it. Somebody who tapped Done already
+ *   knows the exercise is over, and a live region that fires when nothing
+ *   surprising happened trains people to ignore it. Announcing on every
+ *   arrival would be worse than the defect, so verify-timer1 test 2
+ *   asserts the silence.
+ *
+ *   cleanupWorkout() clears the flag. The first version did not, and the
+ *   gate caught it: finish a countdown, leave, start a NEW session, and
+ *   the first note page announced a timer that never ran, about an
+ *   exercise from a session already abandoned.
+ *
  * 08 Sep 2026 v17
  *
  * v17 - ROLE-1. The badge above the exercise name printed the word
@@ -289,6 +320,27 @@ let timerStarted = false; // Timer doesn't start until user taps Start
 // exercise they have not done. Reset on every exercise change.
 let currentCardPage = "decide";
 
+/**
+ * TIMER-1, 08 Sep 2026. True only when the COUNTDOWN moved the person to
+ * the note page, never when they tapped Done themselves.
+ *
+ * The clock running out is the one automatic forward move in the whole
+ * session (CARD-3 says so at the call site). It changes the screen under
+ * somebody who, mid-exercise, is by definition not looking at it -- and
+ * announced nothing. Focus did not move, and the only live regions on
+ * the page it lands on are empty. The single signal was
+ * navigator.vibrate, which Safari on iOS does not implement at all, so
+ * on an iPhone there was no signal of any kind.
+ *
+ * WCAG 2.2 AA 4.1.3 Status Messages: a change of content that tells the
+ * person something, given no focus and no role, cannot be presented by
+ * assistive technology.
+ *
+ * Only when the timer did it. Somebody who tapped "Done" already knows
+ * the exercise is over, and announcing it to them would be noise.
+ */
+let finishedByTimer = false;
+
 // 11 Aug 2026 — WOW-1 (PT-3). Session-level elapsed time. This view had no
 // session clock, so both logActivity() calls below wrote durationMins null
 // explicitly, and progress.js:138 summed them as 0. "workout" is the type
@@ -405,6 +457,16 @@ export function render() {
               Watch how to do this
             </a>`,
           noteSlot: `
+            <!-- TIMER-1. The announcement for the one automatic move.
+                 role="status" is polite: it waits for a gap rather than
+                 cutting across whatever is being read. It renders only
+                 when the countdown brought them here. -->
+            ${finishedByTimer ? `
+              <p class="xcard-timer-done" role="status">
+                That is the time up on ${exercise.name}.
+              </p>
+            ` : ""}
+
             <!-- Session notes. LOG-1: this used to exist only in
                  gym-programme.js, so a coach-built session offered no way
                  to write anything down. -->
@@ -697,6 +759,10 @@ export function onMount() {
       if (!_pfx.startsWith("wo-")) return;
       const to = ev.detail && ev.detail.page;
       if (to !== "decide" && to !== "do") return;
+      // TIMER-1. Any page move the person makes clears the notice, so
+      // going back to Do and returning does not re-announce a countdown
+      // that already finished.
+      finishedByTimer = false;
       currentCardPage = to;
       scrollToTop();
       router.navigate("workout");
@@ -792,6 +858,8 @@ function startTimer() {
       // CARD-3. The clock running out IS the end of the exercise, so
       // NOTE is where the person now is. This is the one automatic
       // forward move; every other transition is a tap.
+      // TIMER-1. Which is exactly why it has to say so.
+      finishedByTimer = true;
       currentCardPage = "note";
       router.navigate("workout");
     }
@@ -849,6 +917,7 @@ function resetTimer() {
   pauseTimer();
   timeRemaining = 0;
   timerStarted  = false;
+  finishedByTimer = false;   // TIMER-1. A new exercise inherits nothing.
   // CARD-3. A new exercise always starts on DECIDE. Both advance paths
   // (complete and skip) come through here, so this is the one place it
   // needs to happen.
@@ -961,6 +1030,13 @@ function cleanupWorkout() {
   timeRemaining = 0;
   timerStarted  = false;
   currentCardPage = "decide";   // CARD-3. Index resets here, so the page must too.
+  // TIMER-1. And so must this. Without it, finishing a countdown, leaving,
+  // and starting a NEW session showed "that is the time up on ..." on the
+  // first exercise the person reached the note page for -- announcing a
+  // timer that never ran, about an exercise from a session they left.
+  // Every other piece of ephemeral state on this view is cleared here;
+  // adding one and not adding it to this list is how the next one breaks.
+  finishedByTimer = false;
   // v3 — clears generatedSession back to its store.js default shape,
   // rather than setting the never-written activeWorkout to null.
   store.set("generatedSession", { session: null, builtAt: null, inputs: {} });
