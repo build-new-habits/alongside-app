@@ -1,6 +1,21 @@
 /**
  * js/views/saved-sessions.js
- * 08 Sep 2026 v1
+ * 08 Sep 2026 v2
+ *
+ * v2 - SAVED-1b. A session whose movements have ALL been retired offered
+ *   a Start button that did nothing. The handler ends
+ *   `if (!exercises.length) return;` -- a silent no-op -- and the warning
+ *   above it said the session "will start without them", so the copy
+ *   promised precisely what the button refused. A dead control with no
+ *   explanation is the shape STUCK-1 was. Found by mounting this view
+ *   with ids that resolve to nothing.
+ *
+ *   No button now, and a line that says why. The row stays: it is still
+ *   the person's session, and making it vanish answers a question they
+ *   did not ask.
+ *
+ *   The same silent return sits in today.js's copy of this handler, on
+ *   the Home room's featured session. Logged, not changed here.
  *
  * SAVED-1. The list the Your own room has been counting all along.
  *
@@ -105,8 +120,23 @@ function _agoLabel(iso) {
 }
 
 function _row(rec) {
-  const { missing } = resolveSavedSession(rec);
+  const { exercises, missing } = resolveSavedSession(rec);
   const count = Array.isArray(rec.exerciseIds) ? rec.exerciseIds.length : 0;
+
+  // SAVED-1b, 08 Sep 2026. EVERY movement gone is not the same as some.
+  //
+  // The start handler ends `if (!exercises.length) return;` -- a silent
+  // no-op. Tapping Start on a session whose movements have all been
+  // retired did NOTHING: no navigation, no message, nothing on screen.
+  // A dead control with no explanation, which is the shape STUCK-1 was.
+  //
+  // Worse, the warning above it said the session "will start without
+  // them", so the copy promised exactly what the button would not do.
+  //
+  // So: no Start button when there is nothing to start, and a line that
+  // says so plainly. The row stays -- the session is still the person's,
+  // and hiding it would answer a question they did not ask.
+  const runnable = exercises.length > 0;
 
   const facts = [
     rec.durationMins ? `${rec.durationMins} minutes` : null,
@@ -138,18 +168,26 @@ function _row(rec) {
       <ul class="club-room__facts">
         ${facts.map(f => `<li>${_esc(f)}</li>`).join('')}
       </ul>
-      ${missing > 0 ? `
+      ${!runnable ? `
+        <p class="ps-contra-flag" role="status">
+          None of the movements in this one are in the library any more,
+          so there is nothing left to start. It is still here, and still
+          yours — nothing has been deleted.
+        </p>
+      ` : missing > 0 ? `
         <p class="ps-contra-flag" role="status">
           ${missing} movement${missing === 1 ? '' : 's'} from this session
           ${missing === 1 ? 'is' : 'are'} no longer in the library, so it
           will start without ${missing === 1 ? 'it' : 'them'}.
         </p>
       ` : ''}
-      <button class="btn btn-primary btn-full club-room__go"
-              data-saved-id="${_esc(rec.id)}"
-              aria-label="${_esc(startLabel)}">
-        Start ${_esc(rec.name)}
-      </button>
+      ${runnable ? `
+        <button class="btn btn-primary btn-full club-room__go"
+                data-saved-id="${_esc(rec.id)}"
+                aria-label="${_esc(startLabel)}">
+          Start ${_esc(rec.name)}
+        </button>
+      ` : ''}
     </li>
   `;
 }
