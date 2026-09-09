@@ -1,5 +1,11 @@
 /**
  * club-rooms.css
+ * 08 Sep 2026 v2
+ *
+ * v2 - SAVED-2. .saved-row__actions, __confirm, __confirm-text and
+ *   __danger: the edit and delete controls on a saved session, and the
+ *   two-tap delete confirmation.
+ *
  * 06 Sep 2026 v1
  *
  * CLUB-SHELL. The four rooms on the Plan home screen.
@@ -423,4 +429,43 @@
   font-size: var(--text-sm);
   line-height: 1.5;
   margin: var(--space-1) 0 var(--space-4);
+}
+
+/* ── SAVED-2, 08 Sep 2026. Edit and delete on a saved session ─────────────
+   Graeme's decision: saved sessions should be editable and deletable.
+
+   Delete asks first, in two taps. The confirmation replaces the two
+   actions rather than appearing beside them, so the destructive choice
+   is never one tap away from the ordinary one in a list where every row
+   looks alike and nothing is recoverable. */
+.saved-row__actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.saved-row__actions .btn {
+  flex: 1;
+}
+
+.saved-row__confirm {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-left: 4px solid var(--color-danger);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-danger-light);
+}
+
+.saved-row__confirm-text {
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+  line-height: 1.5;
+}
+
+/* The destructive one is the QUIETER of the two. "Keep it" is the
+   ordinary choice and gets the solid button; deleting is available and
+   not encouraged. Colour is not the only signal -- the button text and
+   its accessible name both say delete, and both name the session. */
+.saved-row__danger {
+  color: var(--color-danger);
 }

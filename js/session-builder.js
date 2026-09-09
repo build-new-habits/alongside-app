@@ -1,6 +1,20 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 08 Sep 2026 v48
+ *
+ * v48 - SAVED-2. buildSessionFromSaved(): assembles a session from a
+ *   saved one KEEPING EVERY MOVEMENT, for the edit route.
+ *
+ *   buildSessionFromSelection() intersects the ids with the candidate
+ *   pool for the type, filtered by categories, equipment and conditions
+ *   as they are NOW. Round-tripping a saved session through it silently
+ *   dropped movements: four in, two back on a measured fixture, followed
+ *   by "Saved. Your changes are in."
+ *
+ *   Starting a saved session already keeps every movement, so editing
+ *   must not enforce a rule that starting does not.
+ *
  * 08 Sep 2026 v47
  *
  * v47 - ROLE-1. Both builders now stamp `role` onto every exercise at
@@ -2461,6 +2475,72 @@ export function buildCandidatePools({ sessionType, durationMins, equipmentOverri
  */
 function _withRole(list, role) {
   return (list || []).map(ex => (ex && typeof ex === "object") ? { ...ex, role } : ex);
+}
+
+/**
+ * SAVED-2, 08 Sep 2026. Assembles a session from a saved one, KEEPING
+ * EVERY MOVEMENT.
+ *
+ * ── WHY NOT buildSessionFromSelection() ─────────────────────────────
+ *
+ * That function intersects the chosen ids with the candidate pool for
+ * the session type, and the pool is filtered by categories, equipment
+ * and conditions AS THEY ARE NOW. Round-tripping a saved session through
+ * it silently drops anything that no longer matches: measured on a
+ * four-movement fixture, four went in and two came back -- and the save
+ * that followed reported "Saved. Your changes are in."
+ *
+ * Opening a session to change one thing and losing half of it, while
+ * being told it worked, is worse than not being able to edit at all.
+ *
+ * ── WHY KEEPING EVERYTHING IS RIGHT, NOT MERELY EASIER ──────────────
+ *
+ * STARTING a saved session already keeps every movement. today.js and
+ * views/saved-sessions.js both resolve the ids against the library and
+ * drop only what has genuinely gone, with no category, equipment or
+ * condition filter applied. Editing must not enforce a rule that
+ * starting does not: a movement good enough to hand somebody on Start
+ * cannot quietly vanish on Edit.
+ *
+ * If re-filtering saved sessions against current conditions is the right
+ * safety behaviour, it belongs on the START path where it would actually
+ * protect someone, argued on its own terms and applied to both. Adding
+ * it here alone would be the strictest possible rule in the least
+ * useful place.
+ *
+ * ── SECTIONS ────────────────────────────────────────────────────────
+ *
+ * Library exercises carry no `section` -- it is assigned at assembly by
+ * whichever of the type's three category lists claims it. Anything
+ * matching none goes to main: it is the person's own choice and has to
+ * live somewhere, and dropping it would be the same fault by another
+ * route.
+ */
+export function buildSessionFromSaved({ sessionType, durationMins, exercises, title }) {
+  const type = SESSION_TYPES.find(t => t.id === sessionType) || SESSION_TYPES[0];
+  const list = (exercises || []).filter(Boolean);
+  if (list.length === 0) return null;
+
+  const inList = (cats, ex) => Array.isArray(cats) && cats.includes(ex.category);
+
+  const warmup   = list.filter(ex => inList(type.warmupCategories, ex));
+  const cooldown = list.filter(ex => !warmup.includes(ex) && inList(type.cooldownCategories, ex));
+  const main     = list.filter(ex => !warmup.includes(ex) && !cooldown.includes(ex));
+
+  const allExercises = [
+    ..._withRole(warmup.map(ex => ({ ...ex, section: "warmup" })),     "warmup"),
+    ..._withRole(main.map(ex => ({ ...ex, section: "main" })),         "main"),
+    ..._withRole(cooldown.map(ex => ({ ...ex, section: "cooldown" })), "cooldown")
+  ];
+
+  return {
+    id:        `${sessionType || "own"}-${Date.now()}`,
+    title:     title || type.label,
+    subtitle:  durationMins ? `Yours — ${durationMins} mins` : "Yours",
+    duration:  durationMins ? `${durationMins} mins` : null,
+    coachLine: "This is the one you saved. Change anything you want to.",
+    exercises: allExercises
+  };
 }
 
 export function buildSessionFromSelection({ sessionType, durationMins, selectedIds, equipmentOverride, ignoreSevere }) {

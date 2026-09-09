@@ -1,6 +1,31 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 08 Sep 2026 v20
+ *
+ * v20 - SAVED-2. Editing a saved session. Graeme's decision: saved
+ *   sessions should be editable and deletable, as iterations.
+ *
+ *   A preselect of mode "edit" loads the record into the PREVIEW phase,
+ *   where the swap control already lets any movement be changed, and
+ *   points the save action at updateSavedSession(). No second editor:
+ *   that would be a second place a session's contents can change.
+ *
+ *   THREE THINGS THIS GOT WRONG FIRST, all caught before shipping:
+ *
+ *   1. The branch was inserted INSIDE the duration block, which opens on
+ *   pre.durationMins > 0. An edit preselect carries no duration, so it
+ *   never ran at all -- silently, landing on the type picker.
+ *
+ *   2. It loaded through buildSessionFromSelection(), which filters.
+ *   Four movements in, two back, and the save reported success.
+ *
+ *   3. candidatePools was never built, so _canSwap() answered false for
+ *   every row: every movement on screen and not one of them changeable.
+ *   Editing was a rename with extra steps. verify-saved1 test 9 caught
+ *   it by driving the ROUTE; test 7, which calls the assembler directly,
+ *   was green through all three.
+ *
  * 08 Sep 2026 v19
  *
  * v19 - SAVE-1. Saving worked and said nothing. Device pass, task 5.
@@ -391,7 +416,7 @@ import { store }                          from "../store.js";
 // check, the name check, and storing exercise IDS not objects -- and a
 // view that writes the array directly will get one right and miss
 // another.
-import { saveSession, savedSessionCount, NAME_MAX } from '../data/saved-sessions.js';
+import { saveSession, updateSavedSession, savedSessions, resolveSavedSession, savedSessionCount, NAME_MAX } from '../data/saved-sessions.js';
 // R4 removed this file's isPremium import when TIER-G was reversed --
 // composing is free. YOUR-OWN needs it back for a different question:
 // not whether you may build, but whether it is KEPT.
@@ -399,7 +424,7 @@ import { isPremium } from '../auth.js';
 // QUICK-BUILD. The SAME chain One to one uses, not a second simpler one.
 import { chooseSessionType } from '../data/session-choice.js';
 import { router }                         from "../router.js";
-import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, severeZoneToday, zonesWithCoverage } from "../session-builder.js";
+import { SESSION_TYPES, ALLOCATION_PRESETS, buildSession, buildCandidatePools, buildSessionFromSelection, buildSessionFromSaved, severeZoneToday, zonesWithCoverage } from "../session-builder.js";
 // SWAP-1. The grouping, the soreness levels and the replacement all live
 // in the engine, so this file holds the words and none of the rules.
 import { swapAlternatives, swapExerciseInSession, soreScoresToday, soreLevelFor,
@@ -472,6 +497,18 @@ let quickInputs       = null;
 // an irritation.
 let selectedPreset    = _savedPreset();
 let buildMode         = null;        // "coach" | "recommend"
+
+/**
+ * SAVED-2, 08 Sep 2026. The id of the saved session being EDITED, or
+ * null for an ordinary build.
+ *
+ * Editing reuses this screen rather than adding a second editor: the
+ * preview already lets any movement be swapped, so loading a saved
+ * session into it gives editing for free. A separate edit UI would be a
+ * second place a session's contents can change, and the two would drift
+ * the first time either moved.
+ */
+let editingSavedId    = null;
 // SWAP-1. Kept in module state after the build so the swap sheet can read
 // the pool the session came from without calling any builder again.
 let candidatePools    = null;
@@ -1471,9 +1508,16 @@ function renderPreview() {
            it is. -->
       ${!builtSession.gentleCare && isPremium() ? `
         <div class="sb-save" id="sb-save-block">
-          <button class="btn btn-ghost btn-full" id="sb-save-open">Save this one</button>
+          <!-- SAVED-2. The same block does both jobs, because they are the
+               same job: name it and keep it. Only the words and the
+               writer differ. -->
+          <button class="btn btn-ghost btn-full" id="sb-save-open">${
+            editingSavedId ? "Save your changes" : "Save this one"
+          }</button>
           <div class="sb-save__form hidden" id="sb-save-form">
-            <label class="sb-save__label" for="sb-save-name">What do you want to call it?</label>
+            <label class="sb-save__label" for="sb-save-name">${
+              editingSavedId ? "Name for this one" : "What do you want to call it?"
+            }</label>
             <input class="sb-save__input" id="sb-save-name" type="text"
                    autocomplete="off"
                    placeholder="Tuesday legs">
@@ -1811,6 +1855,15 @@ function wireSaveBlock(container) {
   // stated in two places that can drift.
   input.maxLength = NAME_MAX;
 
+  // SAVED-2. Set as a PROPERTY, never interpolated into the template.
+  // This is the person's own free text going back onto a screen, and
+  // this file has no escaping helper -- a name with a quote in it would
+  // break out of the attribute. Assigning .value sidesteps HTML parsing
+  // entirely, which is the safe form rather than the clever one.
+  if (editingSavedId && builtSession && !input.value) {
+    input.value = builtSession.title || "";
+  }
+
   open.addEventListener("click", () => {
     form.classList.remove("hidden");
     open.classList.add("hidden");
@@ -1818,9 +1871,22 @@ function wireSaveBlock(container) {
   });
 
   confirm.addEventListener("click", () => {
-    const result = saveSession(input.value, builtSession);
+    // SAVED-2. Editing OVERWRITES the record it came from. Graeme's
+    // decision -- "iterations" -- so there is no "Sunday legs v2" and no
+    // version history: a saved session is one thing that changes, which
+    // is what makes deleting it the only way to lose one.
+    const result = editingSavedId
+      ? updateSavedSession(editingSavedId, {
+          name:         input.value,
+          exerciseIds:  builtSession.exercises.filter(e => !e.isPrescribed).map(e => e.id),
+          durationMins: selectedDuration
+        })
+      : saveSession(input.value, builtSession);
+
     if (result.ok) {
-      note.textContent = `Saved. ${savedSessionCount()} of your own now.`;
+      note.textContent = editingSavedId
+        ? "Saved. Your changes are in."
+        : `Saved. ${savedSessionCount()} of your own now.`;
       form.classList.add("hidden");
       return;
     }
@@ -1831,6 +1897,7 @@ function wireSaveBlock(container) {
       result.reason === "name"  ? "It needs a name first \u2014 anything you'll recognise." :
       result.reason === "empty" ? "There is nothing in this one to save yet." :
       result.reason === "tier"  ? "Keeping your own sessions is part of the Plan." :
+      result.reason === "missing" ? "That one is no longer saved." :
                                   "That didn't save. Try again in a moment.";
   });
 }
@@ -1861,6 +1928,7 @@ function resetState() {
   // look correct while the behaviour stayed unchanged.
   selectedPreset        = _savedPreset();
   buildMode             = null;
+  editingSavedId        = null;   // SAVED-2. Cleared with everything else.
   candidatePools        = null;
   swapIndex             = null;
   swapGroupId           = null;
@@ -1885,6 +1953,77 @@ export function onMount() {
   if (!preselectChecked && phase === "type") {
     preselectChecked = true;
     const pre = store.get("sessionBuilderPreselect");
+
+      // SAVED-2, 08 Sep 2026. Editing an existing saved session.
+    //
+    // Loads the record into the PREVIEW phase, where the swap control
+    // already lets any movement be changed. Nothing new is built for
+    // editing beyond pointing the save action at updateSavedSession().
+    //
+    // Placed FIRST, right after the preselect is read, and returning
+    // early. An edit preselect is not a build request: it carries no
+    // type and no duration, so every branch below it is guarded on
+    // something it does not have. Sitting inside the duration branch --
+    // where this first went -- meant it never ran at all, silently,
+    // because that branch opens on `pre.durationMins > 0`.
+    if (pre && pre.mode === "edit" && pre.savedSessionId) {
+      const rec = savedSessions().find(sv => sv.id === pre.savedSessionId);
+      store.set("sessionBuilderPreselect", null);
+      if (!rec) {
+        // The session was deleted between tapping Edit and arriving.
+        // Going to the builder's first question would be a stranger
+        // response than going back where they came from.
+        router.navigate("saved-sessions");
+        return;
+      }
+      const { exercises } = resolveSavedSession(rec);
+      selectedType     = rec.sessionType || "full-body";
+      selectedDuration = rec.durationMins || 30;
+      editingSavedId   = rec.id;
+      // SAVED-2. buildSessionFromSaved, NOT buildSessionFromSelection.
+      //
+      // The latter intersects the ids with the candidate pool for this
+      // type, filtered by categories, equipment and conditions AS THEY
+      // ARE NOW, so a round trip silently dropped movements. Measured on
+      // a four-movement fixture: four in, two back -- followed by
+      // "Saved. Your changes are in."
+      //
+      // Starting a saved session already keeps every movement, so
+      // editing must not enforce a rule that starting does not.
+      builtSession = buildSessionFromSaved({
+        sessionType:  selectedType,
+        durationMins: selectedDuration,
+        exercises,
+        // Their own name for it. The one thing in this room they
+        // authored, and a rebuild must not quietly retitle it.
+        title: rec.name
+      });
+      if (!builtSession) { router.navigate("saved-sessions"); return; }
+
+      // SAVED-2. The swap control is the WHOLE reason editing reuses this
+      // screen, and _canSwap() answers false for every row until
+      // candidatePools is built -- it checks whether the exercise appears
+      // in the pool for its section. Without this the edit preview is
+      // read-only: you can rename it and save it, and change nothing.
+      //
+      // Caught by verify-saved1 test 9, which drives the route rather
+      // than calling the assembler. Test 7 was green throughout.
+      //
+      // Pools are for the SESSION TYPE, so the alternatives offered are
+      // the ones that belong in this session -- the saved movements
+      // themselves are kept regardless, by buildSessionFromSaved above.
+      candidatePools = buildCandidatePools({
+        sessionType:       selectedType,
+        durationMins:      selectedDuration,
+        equipmentOverride: null,
+        preset:            null
+      });
+
+      phase = "preview";
+      rerender();
+      return;
+    }
+
 
     // CLUB-SHELL, 06 Sep 2026. Quick build's chip answers "how long".
     // Read and cleared on the same read-once pattern as `type` -- a
