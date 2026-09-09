@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v475
+ *
+ * v475 - SAVED-2. Saved sessions can be edited and deleted.
+ *   session-builder.js v48, session-builder-ui.js v20,
+ *   views/saved-sessions.js v3, data/saved-sessions.js v2,
+ *   css/components/club-rooms.css v2. All already precached; cache bump
+ *   only.
+ *
  * 08 Sep 2026 v474
  *
  * v474 - PROGRESS-2. progress.js v12 -> v13. The shapes section heading
@@ -3224,7 +3232,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v474";
+const CACHE_NAME = "alongside-v475";
 
 const SHELL_URLS = [
 
