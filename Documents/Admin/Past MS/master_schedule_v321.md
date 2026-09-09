@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v322
+## 08 Sep 2026 v321
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v321.md`. Remove v321 on upload.
+Supersedes `master_schedule_v320.md`. Remove v320 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v478`, 132 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v78.** Read that blueprint after this block.
+> **Live: `alongside-v477`, 132 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v77.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -20,28 +20,6 @@ Supersedes `master_schedule_v321.md`. Remove v321 on upload.
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
 > ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v321 — A11Y-HEADER, `v478`. Eleven screens had no heading at all.
->
-> ⚫ **`.workout-header-title` was a `<span>` in 11 views and a heading in NONE**, while the rest of the app uses 48 `<h1>` and 67 `<h2>`. It is the screen's title — styled as one, positioned as one, read as one by anybody looking at it — and it existed **in presentation only**. 42 sites.
->
-> WCAG 2.2 AA **1.3.1**. Heading navigation is how a screen-reader user skims a page, and on these screens there was nothing to skim: **the quick build scaffold reported ZERO headings** the morning this was found.
->
-> **Checked before changing anything:** no screen template contains both a header title and an existing `h1`, so converting all 42 creates no second `h1` anywhere. Then verified by mounting — ten views, exactly one `h1` each, no skipped levels.
->
-> 🔴 **`session-shared.css` v8's `margin: 0` is load-bearing.** An `h1` carries a UA default of `0.67em` top and bottom where a `<span>` carries none, so **the element change alone would have pushed all 42 headers out of shape** inside their flex rows. Nothing moves.
->
-> 🟢 **`verify-headings` asserts the OUTLINE, not that a heading exists.** PROGRESS-2 was a screen *full* of headings whose levels were wrong — `h1 > h3 > h2` — and a count would have called it fine.
->
-> **Test 0 fails loudly if a view cannot be mounted.** This codebase has two view signatures, `View(router).mount(container)` and `View(container)`, and a harness knowing only the first reported two views as unmountable — **which reads exactly like a view with no headings and is nothing of the sort.**
->
-> **Test 3a is a source check kept deliberately beside the mounted ones.** These views render several phases and a mount reaches one; a span left on a phase no fixture reaches would pass every mounted assertion.
-
-> ### 🔴 A GATE THAT PASSED ON ITS OWN DOCUMENTATION
->
-> Test 3b checked for `margin: 0` inside the rule — and **the rule carries a comment explaining why `margin: 0` is load-bearing.** Deleting the declaration left the gate green, because the regex matched the comment.
->
-> **Found only by reversal testing, which is the one thing that could have found it.** Comments are stripped before matching now. *A gate that passes on its own documentation is worse than no gate: it reads as coverage.*
 
 > ### 🟢 SHIPPED SINCE v320 — OWN-1, `v477`. The Home card tells the truth.
 >
@@ -8453,4 +8431,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v322*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v321*
