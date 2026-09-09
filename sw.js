@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v477
+ *
+ * v477 - OWN-1. today.js v36, css/components/club-rooms.css v3. The
+ *   Your own card counts what is still in the library rather than what
+ *   was saved, and offers no Start button when there is nothing left to
+ *   start. Both already precached; cache bump only.
+ *
  * 08 Sep 2026 v476
  *
  * v476 - LOCATION-1. session-builder.js v49, coach-proposal.js v25,
@@ -3240,7 +3247,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v476";
+const CACHE_NAME = "alongside-v477";
 
 const SHELL_URLS = [
 
