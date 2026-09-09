@@ -1,5 +1,13 @@
 /**
  * tools/verify-thread1.mjs
+ * 08 Sep 2026 v2
+ *
+ * v2 - settle() waits for stillness instead of a flat 40ms. Green six
+ *   runs out of six on an idle box, red every time under load. Found
+ *   while hardening verify-checkin3, which had the same fault and the
+ *   same symptom: passing alone, failing inside the full-suite run --
+ *   the shape most likely to be waved away as the suite being slow.
+ *
  * 22 Aug 2026 v1
  *
  * THREAD-1a — the thread runner, the hard conversation, and the
@@ -65,7 +73,29 @@ const ok = (label, cond, detail = "") => {
 };
 const section = n => console.log(`\n${n}`);
 const wait = ms => new Promise(r => setTimeout(r, ms));
-const settle = () => wait(40);
+
+/**
+ * 08 Sep 2026. Was a flat wait(40).
+ *
+ * Green six runs out of six on an idle box, RED every time under load.
+ * Found while hardening verify-checkin3, which had the identical fault
+ * and the identical symptom: passing alone, failing inside a full-suite
+ * run, which is the shape most likely to be dismissed as "just the
+ * suite being slow".
+ *
+ * A gate whose result depends on how busy the machine is teaches people
+ * to re-run it until it agrees with them. Polls for stillness instead.
+ */
+const settle = async (maxMs = 4000) => {
+  let last = null, stable = 0;
+  for (let waited = 0; waited < maxMs; waited += 20) {
+    await wait(20);
+    const now = document.body.innerHTML.length;
+    stable = (now === last) ? stable + 1 : 0;
+    last = now;
+    if (stable >= 3) return;
+  }
+};
 const txt = el => (el.textContent || "").replace(/\s+/g, " ").trim();
 
 const { runThread, T } = await import(`${REPO}/js/views/thread-runner.js`);
