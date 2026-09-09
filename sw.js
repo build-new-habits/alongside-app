@@ -1,6 +1,12 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v478
+ *
+ * v478 - A11Y-HEADER. Eleven view files plus session-shared.css v8. The
+ *   screen title in every session view is a real heading now. All
+ *   already precached; cache bump only.
+ *
  * 08 Sep 2026 v477
  *
  * v477 - OWN-1. today.js v36, css/components/club-rooms.css v3. The
@@ -3247,7 +3253,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v477";
+const CACHE_NAME = "alongside-v478";
 
 const SHELL_URLS = [
 
