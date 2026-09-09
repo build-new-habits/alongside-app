@@ -1,5 +1,14 @@
 /**
  * yoga-session.js - Guided Yoga and Pilates Session
+ * 08 Sep 2026 v6
+ *
+ * v6 - A11Y-HEADER. The .workout-header-title span is an h1. It was a
+ *   span in 11 views and a heading in none, while the rest of the app
+ *   uses 48 h1 and 67 h2 -- the screen's title, styled and read as one,
+ *   existing in presentation only. WCAG 2.2 AA 1.3.1. Nothing moves:
+ *   session-shared.css v8 adds margin:0, which an h1 needs and a span
+ *   does not.
+ *
  * 12 Aug 2026 v5
  *
  * v5 - P5 / YOGA-1. Pose contraindications and watchOut now resolve from
@@ -468,7 +477,7 @@ function renderFocusSelector() {
     <div class="view core-session-view">
       <div class="workout-header">
         <button class="btn btn-ghost" id="ys-back-btn" aria-label="Exit">Exit</button>
-        <span class="workout-header-title">Yoga &amp; Pilates</span>
+        <h1 class="workout-header-title">Yoga &amp; Pilates</h1>
       </div>
 
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
@@ -505,7 +514,7 @@ function renderSessionOverview() {
         <button class="btn btn-ghost" id="ys-back-btn" aria-label="Back to duration">
           \u2190 Back
         </button>
-        <span class="workout-header-title">${focus?.label || "Yoga"} \u2014 ${selectedMins} min</span>
+        <h1 class="workout-header-title">${focus?.label || "Yoga"} \u2014 ${selectedMins} min</h1>
       </div>
 
       <div class="card card-coach" style="margin-bottom: var(--space-4);">
@@ -563,7 +572,7 @@ function renderDurationSelector() {
     <div class="view core-session-view">
       <div class="workout-header">
         <button class="btn btn-ghost" id="ys-back-btn" aria-label="Back">Back</button>
-        <span class="workout-header-title">${focus?.label || "Yoga"}</span>
+        <h1 class="workout-header-title">${focus?.label || "Yoga"}</h1>
       </div>
 
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
@@ -715,7 +724,7 @@ function renderRest() {
     <div class="view core-session-view">
       <div class="workout-header">
         <button class="btn btn-ghost" id="ys-exit-btn" aria-label="Exit">Exit</button>
-        <span class="workout-header-title">Rest</span>
+        <h1 class="workout-header-title">Rest</h1>
       </div>
 
       <div class="card" style="margin-top: var(--space-6); text-align: center; padding: var(--space-8);">

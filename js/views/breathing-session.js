@@ -1,6 +1,15 @@
 /**
  * js/views/breathing-session.js - Guided Breathing Session
  *
+ * 08 Sep 2026 v4
+ *
+ * v4 - A11Y-HEADER. The .workout-header-title span is an h1. It was a
+ *   span in 11 views and a heading in none, while the rest of the app
+ *   uses 48 h1 and 67 h2 -- the screen's title, styled and read as one,
+ *   existing in presentation only. WCAG 2.2 AA 1.3.1. Nothing moves:
+ *   session-shared.css v8 adds margin:0, which an h1 needs and a span
+ *   does not.
+ *
  * 15 Aug 2026 v3
  *
  * v3 - SHARED-1. Renders the end-of-session moments, so a first
@@ -312,7 +321,7 @@ function renderPicker() {
         <button class="btn btn-ghost" id="bs-back-btn" aria-label="Back to Noticing">
           ← Back
         </button>
-        <span class="workout-header-title">Breathing</span>
+        <h1 class="workout-header-title">Breathing</h1>
       </div>
 
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
@@ -351,7 +360,7 @@ function renderDuration() {
         <button class="btn btn-ghost" id="bs-back-btn" aria-label="Back to type picker">
           ← Back
         </button>
-        <span class="workout-header-title">${type?.label || "Breathing"}</span>
+        <h1 class="workout-header-title">${type?.label || "Breathing"}</h1>
       </div>
 
       <div class="card card-coach" style="margin-bottom: var(--space-5);">

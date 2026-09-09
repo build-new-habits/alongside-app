@@ -1,6 +1,15 @@
 /**
  * cycle-session.js - Guided Cycle Session
  *
+ * 08 Sep 2026 v4
+ *
+ * v4 - A11Y-HEADER. The .workout-header-title span is an h1. It was a
+ *   span in 11 views and a heading in none, while the rest of the app
+ *   uses 48 h1 and 67 h2 -- the screen's title, styled and read as one,
+ *   existing in presentation only. WCAG 2.2 AA 1.3.1. Nothing moves:
+ *   session-shared.css v8 adds margin:0, which an h1 needs and a span
+ *   does not.
+ *
  * 23 Jul 2026 v3
  *
  * CHANGELOG
@@ -130,7 +139,7 @@ function renderRideTypeSelector() {
     <div class="view walk-session-view">
       <div class="workout-header">
         <button class="btn btn-ghost" id="cs-back-btn" aria-label="Exit">Exit</button>
-        <span class="workout-header-title">Cycle</span>
+        <h1 class="workout-header-title">Cycle</h1>
       </div>
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
@@ -153,7 +162,7 @@ function renderSessionTypeSelector() {
     <div class="view walk-session-view">
       <div class="workout-header">
         <button class="btn btn-ghost" id="cs-back-btn" aria-label="Back">Back</button>
-        <span class="workout-header-title">Cycle</span>
+        <h1 class="workout-header-title">Cycle</h1>
       </div>
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
@@ -176,7 +185,7 @@ function renderDurationSelector() {
     <div class="view walk-session-view">
       <div class="workout-header">
         <button class="btn btn-ghost" id="cs-back-btn" aria-label="Back">Back</button>
-        <span class="workout-header-title">Cycle</span>
+        <h1 class="workout-header-title">Cycle</h1>
       </div>
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
@@ -200,7 +209,7 @@ function renderCycleOverview() {
     <div class="view walk-session-view">
       <div class="workout-header">
         <button class="btn btn-ghost" id="cs-back-btn" aria-label="Back">\u2190 Back</button>
-        <span class="workout-header-title">${ride?.label || "Cycle"} \u2014 ${selectedMins} min</span>
+        <h1 class="workout-header-title">${ride?.label || "Cycle"} \u2014 ${selectedMins} min</h1>
       </div>
       <div class="card card-coach" style="margin-bottom: var(--space-4);">
         <img src="assets/images/logo-icon-192.png" alt="" class="coach-icon-small" aria-hidden="true">
@@ -236,7 +245,7 @@ function renderCycling() {
     <div class="view walk-session-view">
       <div class="workout-header">
         <button class="btn btn-ghost" id="cs-exit-btn" aria-label="End session">Exit</button>
-        <span class="workout-header-title">${ride?.label || "Ride"} \u2014 ${stype?.label || ""}</span>
+        <h1 class="workout-header-title">${ride?.label || "Ride"} \u2014 ${stype?.label || ""}</h1>
       </div>
       <div class="workout-progress-bar" role="progressbar"
            aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100">

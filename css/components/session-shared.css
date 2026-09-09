@@ -1,6 +1,19 @@
 /* ============================================================
    session-shared.css
    css/components/session-shared.css
+   08 Sep 2026 v8
+
+   v8 - A11Y-HEADER. .workout-header-title is a real heading now, in all
+        11 views that use it -- it was a <span> in every one and a heading
+        in none, while the rest of the app uses 48 h1 and 67 h2. It is the
+        screen's title, styled as one and read as one, and it existed in
+        presentation only. WCAG 2.2 AA 1.3.1.
+
+        margin: 0 is load-bearing: an h1 carries a UA default of 0.67em
+        top and bottom and a span carries none, so the element change
+        alone would have pushed all 42 of these headers out of shape
+        inside their flex rows.
+
    05 Sep 2026 v7
 
    v7 - SWAP-1. The swap sheet, and the sore mark inside it.
@@ -86,6 +99,17 @@
    constraint and ran under the fixed icon. */
 
 .workout-header-title {
+  /* A11Y-HEADER, 08 Sep 2026. This was a <span> in 11 views and a heading
+     in none, while the rest of the app uses 48 h1 and 67 h2. It is the
+     screen's title, styled as one and read as one -- and it existed in
+     presentation only, so nobody navigating by heading could find it.
+     WCAG 2.2 AA 1.3.1.
+
+     margin: 0 is load-bearing. An h1 carries a UA default of 0.67em top
+     and bottom; a span carries none, so the element change alone would
+     have pushed every one of these headers out of shape inside its flex
+     row. Nothing moves visually. */
+  margin: 0;
   flex: 1 1 auto;
   min-width: 0;                    /* lets it shrink rather than overflow */
   padding-right: var(--space-6);   /* clears the fixed home icon */
