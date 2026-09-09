@@ -1,5 +1,10 @@
 /**
  * club-rooms.css
+ * 08 Sep 2026 v3
+ *
+ * v3 - OWN-1. .club-room__note: what stands in place of a Start button
+ *   on a saved session with nothing left to start.
+ *
  * 08 Sep 2026 v2
  *
  * v2 - SAVED-2. .saved-row__actions, __confirm, __confirm-text and
@@ -468,4 +473,23 @@
    its accessible name both say delete, and both name the session. */
 .saved-row__danger {
   color: var(--color-danger);
+}
+
+/* ── OWN-1, 08 Sep 2026 ──────────────────────────────────────────────────
+   Replaces the action button on a saved session whose movements have all
+   been retired from the library.
+
+   The button that stood here did nothing when tapped: the handler ends
+   `if (!exercises.length) return;`, a silent no-op. SAVED-1b fixed that
+   on the saved-sessions list and left this copy behind.
+
+   Styled as a fact, not a warning. Nothing has gone wrong that the person
+   did, and nothing of theirs has been deleted -- the session is still
+   listed and still theirs. Amber here would say otherwise, and the
+   design system reserves it for caution about a movement. */
+.club-room__note {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  margin: var(--space-2) 0 0;
 }

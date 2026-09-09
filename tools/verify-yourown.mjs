@@ -1,5 +1,17 @@
 /**
  * tools/verify-yourown.mjs
+ * 08 Sep 2026 v2
+ *
+ * v2 - OWN-1. Test 4b: the card counts what is THERE, not what was
+ *   saved; one movement is singular; and a session whose movements have
+ *   all gone offers no dead Start button.
+ *
+ *   All three were fixed elsewhere first and left standing here.
+ *   SAVED-1b fixed the dead button on the saved-sessions list the same
+ *   day; PROPOSAL-1 fixed the plural on the proposal card the same day.
+ *   Test 4 mounted this room and asserted only that a start button
+ *   EXISTS -- which was true throughout, and was the problem.
+ *
  * 06 Sep 2026 v1
  *
  * YOUR-OWN. Sessions the person built and kept.
@@ -40,6 +52,7 @@ const { isPremium } = await import(B + "auth.js");
 const SS            = await import(B + "data/saved-sessions.js");
 const SB            = await import(B + "session-builder.js");
 const { TodayView } = await import(B + "views/today.js");
+const EX            = await import(B + "data/exercises/index.js");
 
 let fails = 0;
 const ok = (name, cond, detail = "") => {
@@ -166,6 +179,76 @@ ok("4e. the rest are behind a COUNTED button",
    '"More" makes somebody tap to find out whether it was worth tapping');
 ok("4f. and the word More is not used for it",
    !/>\s*More\s*</.test(fullRoom.innerHTML));
+
+// ── 4b. THE CARD TELLS THE TRUTH ABOUT WHAT IS IN THE SESSION ───────────
+console.log("\nTEST 4b - the card counts what is THERE, not what was saved");
+
+// OWN-1, 08 Sep 2026. Three faults in this one block:
+//
+//   The count was exerciseIds.length -- what was SAVED, not what still
+//   exists. resolveSavedSession() has always returned `missing` and this
+//   caller dropped it, so the card could promise nine movements and hand
+//   over seven.
+//
+//   "1 movements" -- the same unguarded interpolation PROPOSAL-1 fixed on
+//   the proposal card the same day, in a second place.
+//
+//   And a session whose movements had ALL gone offered a Start button
+//   that did nothing: the handler ends `if (!exercises.length) return;`,
+//   a silent no-op. SAVED-1b fixed exactly this on the saved-sessions
+//   list and left this copy behind -- the branch-and-a-half pattern
+//   GUIDED-COPY and DEVICE-1 are both on record for.
+
+function ownRoomWith(sessions) {
+  seed();
+  store.set("savedSessions", sessions);
+  return home().querySelector('[data-room-id="own"]');
+}
+const day = "2026-09-01T10:00:00Z";
+const liveIds = EX.EXERCISES.slice(0, 3).map(e => e.id);
+
+const oneRoom = ownRoomWith([
+  { id: "one", name: "Just the one", sessionType: "glute", durationMins: 15,
+    exerciseIds: [liveIds[0]], createdAt: day, lastUsedAt: null }
+]);
+ok("4b-pc. positive control: the room rendered the session",
+   /Just the one/.test(oneRoom.textContent), "the room is empty");
+// No leading \b. Adjacent block elements concatenate in textContent --
+// "15 minutes" runs straight into "1 movement", so there is no word
+// boundary before the digit and \b1 never matches. Both of these
+// assertions first failed on that and the code was right throughout.
+ok("4b-a. one movement is singular",
+   /1 movement(?!s)/.test(oneRoom.textContent),
+   oneRoom.textContent.replace(/\s+/g, " ").slice(0, 140));
+
+const partRoom = ownRoomWith([
+  { id: "part", name: "Half gone", sessionType: "glute", durationMins: 30,
+    exerciseIds: [liveIds[0], "RETIRED-1", "RETIRED-2"], createdAt: day, lastUsedAt: null }
+]);
+ok("4b-b. the count is what STILL EXISTS, not what was saved",
+   /1 movement(?!s)/.test(partRoom.textContent) && !/3 movement/.test(partRoom.textContent),
+   `saved 3 ids, 1 resolves: ${partRoom.textContent.replace(/\s+/g, " ").slice(0, 140)}`);
+ok("4b-c. and the ones that have gone are said out loud",
+   /no longer in the library/.test(partRoom.textContent),
+   "the card promises movements it cannot hand over");
+ok("4b-d. it can still be started", !!partRoom.querySelector("[data-saved-id]"),
+   "some movements missing is not a reason to refuse - that would punish " +
+   "somebody for a change they did not make");
+
+const goneRoom = ownRoomWith([
+  { id: "gone", name: "Old favourite", sessionType: "glute", durationMins: 30,
+    exerciseIds: ["RETIRED-1", "RETIRED-2"], createdAt: day, lastUsedAt: null }
+]);
+ok("4b-pc2. positive control: the all-gone session is still on the card",
+   /Old favourite/.test(goneRoom.textContent),
+   "the row vanished - it is still the person's session");
+ok("4b-e. NO start button when there is nothing to start",
+   !goneRoom.querySelector("[data-saved-id]"),
+   "a button that does nothing when tapped, silently. This is the shape " +
+   "STUCK-1 was, and SAVED-1b already fixed it one file over");
+ok("4b-f. and it says why instead",
+   /nothing left to start/.test(goneRoom.textContent),
+   goneRoom.textContent.replace(/\s+/g, " ").slice(0, 160));
 
 // ── 5. THE COACH DOES NOT READ IT ───────────────────────────────────────
 console.log("\nTEST 5 - saving is a decision about a session, not about a person");
