@@ -1,6 +1,15 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v479
+ *
+ * v479 - CLASS-1. FIVE NEW FILES PRECACHED: js/data/class-contract.js
+ *   and the four under js/data/classes/. The guided class data contract
+ *   and the three written classes as data.
+ *
+ *   Caught by precache-check.mjs, which sits outside the verify-* suite.
+ *   Third time it has caught a new file the 133 gates could not.
+ *
  * 08 Sep 2026 v478
  *
  * v478 - A11Y-HEADER. Eleven view files plus session-shared.css v8. The
@@ -3253,7 +3262,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v478";
+const CACHE_NAME = "alongside-v479";
 
 const SHELL_URLS = [
 
@@ -3398,6 +3407,11 @@ const SHELL_URLS = [
   "/alongside-app/js/session-builder.js",
   "/alongside-app/js/data/session-choice.js",
   "/alongside-app/js/data/saved-sessions.js",
+  "/alongside-app/js/data/class-contract.js",
+  "/alongside-app/js/data/classes/index.js",
+  "/alongside-app/js/data/classes/class-ground-001.js",
+  "/alongside-app/js/data/classes/class-steady-round-002.js",
+  "/alongside-app/js/data/classes/class-stopping-early-003.js",
   "/alongside-app/js/views/saved-sessions.js",
   "/alongside-app/js/views/session-builder-ui.js",
   "/alongside-app/js/views/noticing.js",
