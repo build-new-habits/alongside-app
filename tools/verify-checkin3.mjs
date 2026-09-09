@@ -1,6 +1,17 @@
 /**
  * tools/verify-checkin3.mjs
- * 08 Sep 2026 v1
+ * 08 Sep 2026 v2
+ *
+ * v2 - The 60ms settle() is gone. It was a flat wait, and it was green
+ *   five runs out of five on an idle box while failing TWELVE assertions
+ *   every time inside a full-suite run. Reduced motion collapses the
+ *   animation delays to zero, but the beats are still awaited promises
+ *   and a busy event loop delivers them late.
+ *
+ *   A gate whose result depends on how busy the machine is teaches
+ *   people to re-run it until it agrees with them, which turns a real
+ *   failure into something you shrug at. It now polls until the thread
+ *   has been still for three consecutive samples.
  *
  * CHECKIN-3. The coach must ask the question the next panel answers.
  *
@@ -74,7 +85,30 @@ const ok = (name, cond, detail = "") => {
 };
 
 const main   = document.getElementById("main-content");
-const settle = () => new Promise(r => setTimeout(r, 60));
+/**
+ * Waits for the thread to STOP CHANGING, rather than for a fixed 60ms.
+ *
+ * The flat wait passed 5 runs out of 5 on an idle machine and failed
+ * every time under load -- 12 assertions red inside a full-suite run,
+ * green on its own. A gate that depends on how busy the box is trains
+ * people to re-run until it agrees with them, which is worse than no
+ * gate: it converts a real failure into something you shrug at.
+ *
+ * Reduced motion collapses the animation delays to zero, but the beats
+ * are still awaited promises, and a busy event loop delivers them late.
+ * So poll until the DOM has been still for three consecutive samples.
+ */
+const settle = async (maxMs = 4000) => {
+  let last = null, stable = 0;
+  for (let waited = 0; waited < maxMs; waited += 20) {
+    await new Promise(r => setTimeout(r, 20));
+    const now = document.body.innerHTML.length + "|" +
+                document.querySelectorAll(".ci-bubble, .ci-panel").length;
+    stable = (now === last) ? stable + 1 : 0;
+    last = now;
+    if (stable >= 3) return;
+  }
+};
 
 // Coach bubbles only. The panels repeat the question by design, so
 // asserting on all text would pass on the panel copy alone and never

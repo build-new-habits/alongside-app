@@ -1,6 +1,11 @@
 /**
  * tools/verify-save1.mjs
- * 08 Sep 2026 v1
+ * 08 Sep 2026 v2
+ *
+ * v2 - Waits for the preview to ARRIVE rather than for 1600ms, after
+ *   verify-checkin3's flat wait was found to be load-dependent the same
+ *   afternoon. This one survived the load test; it was the same bet and
+ *   is not worth keeping.
  *
  * SAVE-1. Saving tells you it worked.
  *
@@ -108,7 +113,20 @@ async function reachPreview({ tier = "personal" } = {}) {
   main.innerHTML = view.render();
   view.onMount();
   click("#sb-quick-build");
-  await new Promise(r => setTimeout(r, 1600));
+  // Wait for the PREVIEW to arrive, not for a number of milliseconds.
+  // verify-checkin3 shipped with a flat 60ms wait on 08 Sep: green five
+  // times out of five on an idle box, twelve assertions red inside a
+  // full-suite run. A gate whose result depends on how busy the machine
+  // is teaches people to re-run until it agrees with them.
+  await waitFor(() => !!$("#sb-go-btn"), 8000);
+}
+
+async function waitFor(pred, maxMs = 5000) {
+  for (let waited = 0; waited < maxMs; waited += 25) {
+    if (pred()) return true;
+    await new Promise(r => setTimeout(r, 25));
+  }
+  return pred();
 }
 
 // ── 0. THE SAVE BLOCK IS REACHABLE ──────────────────────────────────────
@@ -131,7 +149,7 @@ click("#sb-save-open");
 ok("1a. the form opens", visible($("#sb-save-name")));
 $("#sb-save-name").value = "Tuesday legs";
 click("#sb-save-confirm");
-await new Promise(r => setTimeout(r, 50));
+await waitFor(() => /saved/i.test(($("#sb-save-note") || {}).textContent || ""), 3000);
 
 ok("1b. it really saved",
    (store.get("savedSessions") || []).some(s => s.name === "Tuesday legs"),
@@ -167,7 +185,7 @@ await reachPreview();
 click("#sb-save-open");
 $("#sb-save-name").value = "   ";
 click("#sb-save-confirm");
-await new Promise(r => setTimeout(r, 50));
+await waitFor(() => !!(($("#sb-save-note") || {}).textContent || "").trim(), 3000);
 
 const errNote = $("#sb-save-note");
 ok("2a. nothing was saved",
