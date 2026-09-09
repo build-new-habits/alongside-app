@@ -1,6 +1,14 @@
 /**
  * tools/verify-progress-shapes.mjs
- * 06 Sep 2026 v1
+ * 08 Sep 2026 v2
+ *
+ * v2 - PROGRESS-2. Test 6 asserts the heading OUTLINE, not just that
+ *   headings exist. "What you have been doing" was an h3 among h2
+ *   siblings, giving h1 > h3 > h2: a section arriving as a subsection of
+ *   nothing, followed by one jumping back up a level. Checked on the
+ *   rendered page, because a heading level is only wrong relative to its
+ *   neighbours -- no amount of reading this file's source would show it.
+ *   Also fixed this gate's own cwd-relative readFileSync.
  *
  * PROGRESS. The shapes of session, counted. CLUB item 9.
  *
@@ -43,7 +51,9 @@ const { store }        = await import(B + "store.js");
 const { SESSION_TYPES } = await import(B + "session-builder.js");
 const { ProgressView }  = await import(B + "views/progress.js");
 
-const src = fs.readFileSync("js/views/progress.js", "utf8");
+// GATE-PATH. Was cwd-relative, so this gate read nothing from any
+// directory but the repo root.
+const src = fs.readFileSync(new URL("../js/views/progress.js", import.meta.url), "utf8");
 const shapes = src.slice(src.indexOf("function renderSessionShapes"),
                          src.indexOf("// ── Programme progress"));
 const shapesCode = shapes.split("\n").filter(l => !/^\s*(\*|\/\/|\/\*)/.test(l)).join("\n");
@@ -153,6 +163,44 @@ ok("5a. free does not get the section", !free.querySelector(".progress-shapes"))
 ok("5b. and the gate is on tier, checked in the function",
    /tier === 'free'/.test(shapesCode),
    "gated somewhere else, so a new caller would render it on free");
+
+// ── 6. THE HEADING OUTLINE ──────────────────────────────────────────────
+console.log("\nTEST 6 - the outline holds together for somebody navigating by heading");
+
+// "What you have been doing" was an h3 while its three siblings -- Your
+// weight, the programme block, Share your progress -- were all h2. The
+// outline read h1 > h3 > h2: the section arrived as a subsection of
+// nothing, and the next one jumped back UP a level.
+//
+// WCAG 2.2 AA 1.3.1. The heading level IS the structure for anyone not
+// seeing the layout, and heading navigation is how a screen-reader user
+// skims a page they opened to look back over.
+//
+// Asserted on the RENDERED outline rather than the source, because a
+// level is only wrong relative to its neighbours.
+
+const outline = view("personal", LOG);
+const heads = [...outline.querySelectorAll("h1,h2,h3,h4,h5,h6")]
+  .map(h => ({ level: Number(h.tagName[1]), text: (h.textContent || "").trim() }));
+
+ok("6pc. positive control: there are headings to check",
+   heads.length >= 2,
+   "nothing rendered with a heading, so 6a and 6b measure nothing");
+
+ok("6a. exactly one h1",
+   heads.filter(h => h.level === 1).length === 1,
+   `h1 count: ${heads.filter(h => h.level === 1).length}`);
+
+ok("6b. no level is skipped on the way down",
+   heads.every((h, i) => i === 0 || h.level <= heads[i - 1].level + 1),
+   `outline: ${heads.map(h => `h${h.level} ${h.text.slice(0, 24)}`).join(" > ")}`);
+
+const shapesHead = heads.find(h => /what you have been doing/i.test(h.text));
+ok("6c. the shapes section sits at the same level as its siblings",
+   !!shapesHead && shapesHead.level === 2,
+   shapesHead
+     ? `it is an h${shapesHead.level}; Share your progress and Your weight are h2`
+     : "the shapes heading is missing entirely");
 
 console.log(fails === 0
   ? "\nPROGRESS: all assertions pass\n"
