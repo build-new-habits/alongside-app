@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v321
+## 08 Sep 2026 v320
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v320.md`. Remove v320 on upload.
+Supersedes `master_schedule_v319.md`. Remove v319 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v477`, 131 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v76.** Read that blueprint after this block.
+> **Live: `alongside-v476`, 131 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v75.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -20,24 +20,6 @@ Supersedes `master_schedule_v320.md`. Remove v320 on upload.
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
 > ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v320 — OWN-1, `v477`. The Home card tells the truth.
->
-> ⚫ **Three faults in one block, every one of them already fixed somewhere else and left standing here.**
->
-> | # | What | Where it was already fixed |
-> |---|---|---|
-> **1** | The movement count was `exerciseIds.length` — **what was SAVED, not what still exists.** `resolveSavedSession()` has always returned `missing` and this caller dropped it, so the card could **promise nine movements and hand over seven** | The module's own comment warns against exactly this |
-> **2** | **"1 movements"** | `PROPOSAL-1` fixed the identical unguarded interpolation on the proposal card **the same day** |
-> **3** | A session whose movements had **all** gone offered a Start button that did **nothing** — `if (!exercises.length) return;`, a silent no-op | `SAVED-1b` fixed exactly this on the saved-sessions list **that morning**, and left this copy behind |
->
-> 🔴 **This is the branch-and-a-half pattern, for the third time in one day.** GUIDED-COPY changed one branch of a card and left the other; DEVICE-1 moved a fault one tier over and needed DEVICE-2 within the hour; SAVED-1b fixed a dead button in one file while its twin sat on the Home screen. **Fixing the instance you are looking at is not fixing the fault.**
->
-> 🔴 **`verify-yourown` test 4 has MOUNTED this room since 06 Sep** and asserted only that a start button **exists**. That was true throughout — and was the problem. Mounting is not enough on its own: **what you assert about what you mounted is the whole gate.**
->
-> **Some movements missing is still startable.** Refusing would punish somebody for a change they did not make. Only *all* gone removes the button, and the session stays on the card either way, because it is still theirs.
->
-> ⚠️ Two of my own assertions failed first and the code was right both times: `textContent` concatenates adjacent block elements, so *"15 minutes"* runs into *"1 movement"* and there is no word boundary for `\b1` to match.
 
 > ### 🟢 SHIPPED SINCE v319 — LOCATION-1, `v476`. One to one asks where you are.
 >
@@ -8431,4 +8413,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v321*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v320*
