@@ -6,7 +6,7 @@ Supersedes `master_schedule_v318.md`. Remove v318 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v475`, 130 gates, `store.js` v65, `Schema.md` v1.55, cold start blueprint v73.** Read that blueprint after this block.
+> **Live: `alongside-v475`, 131 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v74.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >

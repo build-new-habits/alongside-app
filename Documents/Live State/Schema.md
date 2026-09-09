@@ -1,4 +1,30 @@
 # Alongside — Data Schema Reference
+## 08 Sep 2026 v1.56
+
+> **v1.56, 08 Sep 2026 — LOCATION-1.** No new field. `sessionLocation`
+> gains the description it never had, and two readers.
+>
+> **What was wrong.** `buildSession()` has no location parameter at all:
+> location exists only as a selector for WHICH EQUIPMENT LIST is used.
+> `coach-proposal.js` passed `equipmentOverride: null`, which falls back
+> to the flat `equipment` field — and `onboarding/equipment.js` writes
+> that field as **the union of home kit and gym kit**.
+>
+> So One to one built every session against both lists at once. Measured
+> with a resistance band at home and a rack at the gym: it proposed a
+> **Barbell Back Squat** and a **Barbell Deadlift** to somebody who might
+> be standing in their kitchen. Not an edge case — the default path.
+>
+> `sessionLocation` already existed, already had a writer
+> (`checkin-mini.js` Step 4, "Where are you now?"), and was read by
+> nothing that builds a session. The wire was left hanging.
+>
+> **`"outside"` now means bodyweight**, not home kit. It is the third
+> option `checkin-mini` has always offered and the first time anything
+> building a session has had to answer it: your home dumbbells are not
+> in the park, and falling through to the home list would propose them
+> there.
+
 ## 08 Sep 2026 v1.55
 
 > **v1.55, 08 Sep 2026 — SAVED-2 (edit route).** `sessionBuilderPreselect`
@@ -947,7 +973,7 @@ There is no `stats` field, live or dormant, anywhere in `store.js`. Every `stats
 | `speechRate` | `number` | `0.9` | Text-to-speech. |
 | `activityPreferences` | `object` | `{}` | |
 | `movementIdentity` | `string[]` | `[]` | Migrated from `string\|null` in v8 (05 Jul) — existing single values are wrapped, not dropped, on merge. e.g. `['gym','running','walking']`, or `['mixed']` (mutually exclusive with named identities). |
-| `sessionLocation` | `string\|null` | `null` | |
+| `sessionLocation` | `string\|null` | `null` | **LOCATION-1, 08 Sep 2026.** `"home"`, `"gym"`, `"outside"` or `null`. Where the person is for THIS session. **The one constraint the coach cannot infer** (CLUB spec v2 §6.2), so it is asked rather than guessed, and remembered so it is asked once. Selects which equipment list a session is built against: `homeEquipment`, `gymEquipment`, or — for `"outside"` — none, because your home kit is not in the park. `null` is treated as `"home"` at the point of building: never propose a barbell to somebody who might be in a kitchen. **Written by** `checkin-mini.js` (Step 4) and `coach-proposal.js` (the changeable assumption on the proposal). **Read by** `coach-proposal.js` via `equipmentForLocation()`. |
 | `lastProposalType` | `string\|null` | `null` | |
 | `lastProposalDate` | `string\|null` | `null` | |
 | `createdAt` | `string\|null` | `null` | Set once, at `completeOnboarding()`. |

@@ -1,6 +1,19 @@
 /**
  * js/session-builder.js - Generative Session Engine
  *
+ * 08 Sep 2026 v49
+ *
+ * v49 - LOCATION-1. equipmentForLocation(): the one answer to "what kit
+ *   is available where this person is".
+ *
+ *   buildSession() has no location parameter and never has. Location
+ *   exists ONLY as a selector for which equipment list is used, which is
+ *   why this lives here, beside the thing that consumes it.
+ *
+ *   "outside" is bodyweight, not the home list. null is home, because a
+ *   session built for home can be done at a gym and one built for a gym
+ *   cannot be done at home.
+ *
  * 08 Sep 2026 v48
  *
  * v48 - SAVED-2. buildSessionFromSaved(): assembles a session from a
@@ -2516,6 +2529,57 @@ function _withRole(list, role) {
  * live somewhere, and dropping it would be the same fault by another
  * route.
  */
+/**
+ * LOCATION-1, 08 Sep 2026. The one answer to "what kit is available
+ * where this person is".
+ *
+ * buildSession() has no location parameter and never has. Location
+ * exists ONLY as a selector for which equipment list is used, which is
+ * why this belongs here, beside the thing that consumes it, rather than
+ * in whichever view happened to need it first.
+ *
+ * WHAT IT REPLACES. coach-proposal.js passed equipmentOverride: null,
+ * falling back to the flat `equipment` field -- and
+ * onboarding/equipment.js writes that field as the UNION of home and gym
+ * kit. So One to one built against both lists at once. Measured with a
+ * resistance band at home and a rack at the gym, it proposed a Barbell
+ * Back Squat and a Barbell Deadlift to somebody who might be standing in
+ * their kitchen.
+ *
+ * "OUTSIDE" IS BODYWEIGHT, not the home list. checkin-mini.js has
+ * offered outside since it was written and nothing that builds a session
+ * has ever had to answer it. Falling through to home would put your
+ * dumbbells in the park.
+ *
+ * NULL IS TREATED AS HOME. The safe direction: a session built for home
+ * can be done at a gym, and one built for a gym cannot be done at home.
+ *
+ * THE FALLBACK IS DELIBERATE AND ONLY BETWEEN HOME AND GYM. If the list
+ * for where you are is empty and the other has something, the other is
+ * used -- somebody who filled in one list and not the other gets a
+ * session with kit in it rather than an unexplained bodyweight one.
+ * Outside never falls back: empty there is a fact, not a gap.
+ */
+export function equipmentForLocation(location) {
+  const home = store.get("homeEquipment") || [];
+  const gym  = store.get("gymEquipment")  || [];
+
+  if (location === "outside") {
+    return { list: [], usingFallback: false, location: "outside" };
+  }
+
+  const where    = location === "gym" ? "gym" : "home";
+  const matching = where === "gym" ? gym : home;
+  const other    = where === "gym" ? home : gym;
+  const usingFallback = matching.length === 0 && other.length > 0;
+
+  return {
+    list: usingFallback ? other : matching,
+    usingFallback,
+    location: where
+  };
+}
+
 export function buildSessionFromSaved({ sessionType, durationMins, exercises, title }) {
   const type = SESSION_TYPES.find(t => t.id === sessionType) || SESSION_TYPES[0];
   const list = (exercises || []).filter(Boolean);

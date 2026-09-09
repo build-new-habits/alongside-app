@@ -1,5 +1,23 @@
 /**
  * tools/verify-twoengine.mjs
+ * 08 Sep 2026 v2
+ *
+ * v2 - Two fixes, neither about two-engine.
+ *
+ *   1c pinned the EXACT import shape,
+ *   /import\\s*\\{\\s*buildSession,\\s*buildCandidatePools\\s*\\}/, and broke
+ *   the moment LOCATION-1 imported a third name from the same module.
+ *   The intent is that this view builds through session-builder.js, not
+ *   workoutGenerator.js; it is not that the import list never grows.
+ *   Asserted as intended now: both names, from that module, however many
+ *   others sit beside them.
+ *
+ *   GATE-PATH: every read here was cwd-relative -- green from the repo
+ *   root and reading NOTHING from anywhere else. One _read helper
+ *   resolving from import.meta.url. Confirmed green from another
+ *   directory, and confirmed the 1d scan still walks 82 files rather
+ *   than silently finding none.
+ *
  * 06 Sep 2026 v1
  *
  * TWO-ENGINE. The coach route builds through session-builder.js.
@@ -39,7 +57,11 @@ const { store }        = await import(B + "store.js");
 const SB               = await import(B + "session-builder.js");
 const SC               = await import(B + "data/session-choice.js");
 
-const cp = fs.readFileSync("js/views/coach-proposal.js", "utf8");
+const _R = new URL("../", import.meta.url);
+// GATE-PATH. Every read in this file was cwd-relative: green from the
+// repo root, and reading nothing from anywhere else. One helper now.
+const _read = (rel) => fs.readFileSync(new URL(rel, _R), "utf8");
+const cp = _read("js/views/coach-proposal.js");
 const TYPE_IDS = SB.SESSION_TYPES.map(t => t.id);
 
 let fails = 0;
@@ -102,20 +124,31 @@ ok("1b. but AVAILABLE_TIME_WINDOW_MINUTES is still imported",
    /AVAILABLE_TIME_WINDOW_MINUTES\s*\}\s*from\s*'\.\.\/data\/workoutGenerator\.js'/.test(cp),
    "the time window constant was removed with the engine - it is not engine behaviour");
 
-ok("1c. buildSession and buildCandidatePools are imported",
-   /import\s*\{\s*buildSession,\s*buildCandidatePools\s*\}/.test(cp));
+// 08 Sep 2026. Was /import\s*\{\s*buildSession,\s*buildCandidatePools\s*\}/
+// -- an exact-shape match that broke the moment LOCATION-1 imported a
+// third name from the same module. The intent is that this view builds
+// through session-builder.js, not workoutGenerator.js; it is not that
+// the import list never grows. Asserted as intended: both names present,
+// from that module, however many others sit beside them.
+ok("1c. buildSession and buildCandidatePools are imported", (() => {
+  const line = (cp.match(/import\s*\{[^}]*\}\s*from\s*'\.\.\/session-builder\.js'/) || [""])[0];
+  return /\bbuildSession\b/.test(line) && /\bbuildCandidatePools\b/.test(line);
+})(), "neither name is imported from session-builder.js");
 
-const liveCallers = fs.readdirSync("js/views").map(f => `js/views/${f}`)
-  .concat(fs.readdirSync("js/data").map(f => `js/data/${f}`))
+// GATE-PATH. These were cwd-relative, so this gate scanned nothing from
+// any directory but the repo root.
+const _dir = (rel) => fs.readdirSync(new URL(rel, _R));
+const liveCallers = _dir("js/views").map(f => `js/views/${f}`)
+  .concat(_dir("js/data").map(f => `js/data/${f}`))
   .filter(f => f.endsWith(".js") && !f.endsWith("workoutGenerator.js"))
-  .filter(f => fs.readFileSync(f, "utf8")
+  .filter(f => _read(f)
     .split("\n")
     .some(l => /generateDailyOptions\s*\(/.test(l) && !/^\s*(\*|\/\/)/.test(l)));
 ok("1d. generateDailyOptions has zero live callers", liveCallers.length === 0,
    `still called from: ${liveCallers.join(", ")}`);
 
 ok("1e. and it was retired, not deleted",
-   /generateDailyOptions\(\)\s*\{/.test(fs.readFileSync("js/data/workoutGenerator.js", "utf8")),
+   /generateDailyOptions\(\)\s*\{/.test(_read("js/data/workoutGenerator.js")),
    "the function is gone. Retire is not delete - it is the record of what the " +
    "route did for three months, and the three hardcoded focuses are the reason " +
    "stretch was unreachable");
@@ -156,7 +189,7 @@ ok("3b. and a stretch session actually builds",
    !!stretch && (stretch.exercises || []).length > 0,
    "buildSession('stretch') produced nothing");
 
-const wg = fs.readFileSync("js/data/workoutGenerator.js", "utf8");
+const wg = _read("js/data/workoutGenerator.js");
 ok("3c. and the retired engine still cannot produce one, so this mattered",
    !/getWorkoutName[\s\S]{0,200}stretch/.test(wg),
    "workoutGenerator gained a stretch type - if deliberate, retire this " +
@@ -165,7 +198,7 @@ ok("3c. and the retired engine still cannot produce one, so this mattered",
 // ── 4. THE THREE THE OLD ENGINE READ ZERO TIMES ─────────────────────────
 console.log("\nTEST 4 - variety, preferences and section rules are live here");
 
-const sbSrc = fs.readFileSync("js/session-builder.js", "utf8");
+const sbSrc = _read("js/session-builder.js");
 for (const [label, needle] of [
   ["4a. sessionVariety",       "sessionVariety"],
   ["4b. exercisePreferences",  "exercisePreferences"],
@@ -240,7 +273,7 @@ ok("6e. and a claim about a class is rejected when no class is running",
 console.log("\nTEST 7 - severe pain still bypasses, through the new chain");
 
 ok("7a. the chain does NOT contain its own severe check",
-   !/severe/i.test(fs.readFileSync("js/data/session-choice.js", "utf8")
+   !/severe/i.test(_read("js/data/session-choice.js")
      .split("export function chooseSessionType")[1] || ""),
    "a second, weaker copy of a safety rule that buildSession already owns - " +
    "the DATA-1b failure mode exactly");
@@ -259,13 +292,13 @@ ok("7b. and a severe zone still diverts whatever the chain chose",
 // ── 8. SCHEMA BEFORE CODE ───────────────────────────────────────────────
 console.log("\nTEST 8 - the field the chain reads is declared");
 
-const schema = fs.readFileSync("Documents/Live State/Schema.md", "utf8");
+const schema = _read("Documents/Live State/Schema.md");
 ok("8a. activityLog[].sessionType is in Schema.md",
    /activityLog\[\]\.sessionType/.test(schema),
    "the chain reads a field the schema does not declare");
 
 ok("8b. and something actually writes it",
-   /sessionType:\s*_st\.sessionType/.test(fs.readFileSync("js/views/gym-programme.js", "utf8")),
+   /sessionType:\s*_st\.sessionType/.test(_read("js/views/gym-programme.js")),
    "declared and read but never written - the reader-without-writer class, " +
    "five of which have already been found in this store");
 
