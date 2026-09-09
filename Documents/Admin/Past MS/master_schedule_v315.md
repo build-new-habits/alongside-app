@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v316
+## 08 Sep 2026 v315
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v315.md`. Remove v315 on upload.
+Supersedes `master_schedule_v314.md`. Remove v314 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v472`, 129 gates, `store.js` v65, `Schema.md` v1.52, cold start blueprint v68.** Read that blueprint after this block.
+> **Live: `alongside-v471`, 128 gates, `store.js` v65, `Schema.md` v1.52, cold start blueprint v66.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -20,22 +20,6 @@ Supersedes `master_schedule_v315.md`. Remove v315 on upload.
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
 > ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v315 — SAVE-1, `v472`. Device pass task 5 of 8.
->
-> ⚫ **Saving worked the whole time and told the person nothing.**
->
-> The confirmation note sat **inside** the save form, between the input and the confirm button — and the success path hides that form. `.hidden` is `display: none !important`, so the instant a save succeeded the message it had just written was hidden along with everything else. The *"Save this one"* button had already been hidden when the form opened. **The whole block went blank.**
->
-> The session really was saved. Graeme, on a handset: *"I can't seem to be able to save my own series of sessions."* **He was right to think it was broken.** A feature that works silently cannot be told apart from one that does not work, and a person will reasonably conclude the second. This is the same report that produced SAVED-1 — two separate defects behind one sentence, and this was the half that made him doubt the save itself.
->
-> 🔴 **`role="status"` bought nothing.** A `display:none` element is out of the accessibility tree, so there was nothing to announce. **An aria-live region an ancestor can hide is not a live region.**
->
-> **Fix:** the note is a sibling of the form. It survives the form closing on success, and still sits below it on the error path, where the form stays open so the name can be corrected.
->
-> 🔴 **The assertion this nearly got gated with would have been useless.** The note itself **never** carried `.hidden` — its *parent* did. `!note.classList.contains("hidden")` would have passed throughout the entire life of the defect. `verify-save1` walks **ancestors** instead. Proven by reversal: putting the note back inside the form fails 1d and 1e, while **1c — the assertion that checks the words are right — goes on passing.** That gap is the whole lesson.
->
-> 🟢 Nothing in the suite had mounted the save block. `sb-save` appeared in **no gate**: YOUR-OWN shipped the entire feature on 06 Sep with source-text coverage only, which cannot see one element hiding another.
 
 > ### 🟢 SHIPPED SINCE v314 — SAVED-1 + SAVED-1b, `v471`. Device pass task 6 of 8.
 >
@@ -8288,4 +8272,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v316*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v315*
