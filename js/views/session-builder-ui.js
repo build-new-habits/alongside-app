@@ -1,6 +1,12 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 08 Sep 2026 v21
+ *
+ * v21 - A11Y-HEADER. The .workout-header-title span is an h1, with
+ *   the other ten views that carried it. session-shared.css v8 adds the
+ *   margin:0 an h1 needs and a span does not.
+ *
  * 08 Sep 2026 v20
  *
  * v20 - SAVED-2. Editing a saved session. Graeme's decision: saved
@@ -693,7 +699,7 @@ function renderQuickScaffold() {
         <button class="btn btn-ghost" id="sb-quick-back" aria-label="Back to Today">
           &larr; Back
         </button>
-        <span class="workout-header-title">Here's what I'd give you</span>
+        <h1 class="workout-header-title">Here's what I'd give you</h1>
       </div>
 
       <p class="text-secondary">Change anything that isn't right.</p>
@@ -746,7 +752,7 @@ function renderLocationStep() {
         <button class="btn btn-ghost" id="sb-back-btn" aria-label="Back to session type">
           &larr; Back
         </button>
-        <span class="workout-header-title">${type?.label || "Build a session"}</span>
+        <h1 class="workout-header-title">${type?.label || "Build a session"}</h1>
       </div>
 
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
@@ -807,7 +813,7 @@ function renderTypePicker() {
         <button class="btn btn-ghost" id="sb-back-btn" aria-label="Go back">
           &larr; Back
         </button>
-        <span class="workout-header-title">Build a session</span>
+        <h1 class="workout-header-title">Build a session</h1>
       </div>
 
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
@@ -1014,7 +1020,7 @@ function renderDurationPicker() {
         <button class="btn btn-ghost" id="sb-back-btn" aria-label="Back to session type">
           &larr; Back
         </button>
-        <span class="workout-header-title">${type?.label || "Build a session"}</span>
+        <h1 class="workout-header-title">${type?.label || "Build a session"}</h1>
       </div>
 
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
@@ -1162,7 +1168,7 @@ function renderEquipmentCheck() {
         <button class="btn btn-ghost" id="sb-back-btn" aria-label="Back to duration">
           &larr; Back
         </button>
-        <span class="workout-header-title">Equipment today</span>
+        <h1 class="workout-header-title">Equipment today</h1>
       </div>
 
       <div class="card card-coach" style="margin-bottom: var(--space-4);">
@@ -1294,7 +1300,7 @@ function renderBuildModeStep() {
         <button class="btn btn-ghost" id="sb-back-btn" aria-label="Back to equipment">
           &larr; Back
         </button>
-        <span class="workout-header-title">${type?.label || "Build a session"}</span>
+        <h1 class="workout-header-title">${type?.label || "Build a session"}</h1>
       </div>
 
       <div class="card card-coach" style="margin-bottom: var(--space-5);">
@@ -1433,7 +1439,7 @@ function renderPreview() {
         <button class="btn btn-ghost" id="sb-back-btn" aria-label="Back">
           &larr; Back
         </button>
-        <span class="workout-header-title">${builtSession.title}</span>
+        <h1 class="workout-header-title">${builtSession.title}</h1>
       </div>
 
       ${builtSession.gentleCare ? `
@@ -1589,7 +1595,7 @@ function renderSwapSheet() {
         <button class="btn btn-ghost" id="sb-swap-close-btn" aria-label="Back to your session">
           &larr; Back
         </button>
-        <span class="workout-header-title">Instead of ${current.name}</span>
+        <h1 class="workout-header-title">Instead of ${current.name}</h1>
       </div>`;
 
   if (total === 0) {

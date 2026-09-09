@@ -1,5 +1,5 @@
 # Alongside: Move — Cold Start Blueprint
-## 08 Sep 2026 v76
+## 08 Sep 2026 v77
 
 Build New Habits | Everything a chat with no memory needs to pick this up and build confidently.
 
@@ -49,7 +49,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | `Documents/Live State/Schema.md` | Store fields. **Must match `store.js`** |
 | `Documents/Business/` | Governing documents — see below |
 | `Documents/Archive/` | Stale, kept not deleted |
-| `tools/verify-*.mjs` | 131 gates |
+| `tools/verify-*.mjs` | 132 gates |
 | `js/` | Vanilla ES modules, no framework, no bundler |
 
 **Governing documents, in read order:**
@@ -72,7 +72,7 @@ git clone --depth 1 https://x-access-token:$TOKEN@github.com/build-new-habits/al
 | `Schema.md` | v1.56 |
 | `sw.js` | **v477**, cache `alongside-v477` |
 | `router.js` | v22 · `my-programme.js` v8 · `today.js` v25 · `settings.js` v36 · `progress.js` v11 · `onboarding/thread.js` v13 |
-| Gates | **131, all green** — from the repo root. See the cwd row in §9 |
+| Gates | **132, all green** — from the repo root. See the cwd row in §9 |
 
 🟢 **This table is now GATED.** `tools/verify-blueprint.mjs` compares every version above against the file that carries it and goes red on any drift, naming the row to change.
 
@@ -214,7 +214,7 @@ Truth lives in `js/data/pricing.js`. `verify-price.mjs` enforces it.
 | Orphan fields | `goalHasTarget`, `targetType`, `chaptersDone.measuredLevelAtEnd`, `exerciseFeedback` — written or declared, read by nobody |
 | `checkin.js` orphan exports | `getWordObject`, `getCoachPostureForQuadrant`, `getOpeningModes` — no callers |
 | Changelog stale since March | Resume or retire — decision needed |
-| 🟠 **11 screens have no heading element at all** | `workout-header-title` is a `<span>` in 11 views and a heading in none, while the rest of the app uses 48 `<h1>` and 67 `<h2>`. WCAG 2.2 AA 1.3.1 and 2.4.6: the screen title exists in presentation only. **Found on the quick scaffold 08 Sep and deliberately not fixed there** — fixing one of eleven makes that screen the odd one out, and eleven screens is a change that needs agreeing on its own terms |
+| ✅ ~~**11 screens have no heading element at all**~~ | **CLOSED 08 Sep, A11Y-HEADER.** All 42 sites across 11 views are real headings; `verify-headings` mounts each one and asserts the OUTLINE, not merely that a heading exists |
 | 🟡 **Quick build never passes through the zones step** | A quick build whose coach-chosen type is `stretch` leaves `selectedZones` empty, because the scaffold does not ask and the location step's zones branch is bypassed by the return leg. **Newly reachable on 08 Sep** — the scaffold had never rendered before then, so nothing regressed |
 
 **The orphan pattern is systematic**, not incidental: fields get written for a feature that is then deferred, and nothing tracks the orphan. **Before building anything, grep for whether it already exists.** On 20 Aug three specs were written against files that had not been opened — one described as unbuilt had shipped eight days earlier.
