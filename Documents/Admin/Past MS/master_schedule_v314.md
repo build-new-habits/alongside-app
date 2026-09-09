@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v315
+## 08 Sep 2026 v314
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v314.md`. Remove v314 on upload.
+Supersedes `master_schedule_v313.md`. Remove v313 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v471`, 128 gates, `store.js` v65, `Schema.md` v1.52, cold start blueprint v66.** Read that blueprint after this block.
+> **Live: `alongside-v470`, 127 gates, `store.js` v65, `Schema.md` v1.52, cold start blueprint v65.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -20,43 +20,6 @@ Supersedes `master_schedule_v314.md`. Remove v314 on upload.
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
 > ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v314 — SAVED-1 + SAVED-1b, `v471`. Device pass task 6 of 8.
->
-> ⚫ **Saved sessions now have a list of their own.** Graeme's call, asked and answered: *a list view of its own*, over expanding in place or just repointing the button.
->
-> **What was wrong.** YOUR-OWN (06 Sep) shipped saving from the build preview and showed the newest saved session on Home with the rest behind a counted button — *"Your other 2 sessions"* — carrying `data-route="session-builder"`. It opened the **builder**: a screen for making a new session, reached by tapping a control that names sessions you already have. And there was nowhere else for it to go. `savedSessions` was referenced in exactly one file. **A room that counts things it will not show you is worse than one that plainly does not have them, because the count is a promise.**
->
-> | | |
-> |---|---|
-> **New** | `js/views/saved-sessions.js`, route registered, counted button repointed |
-> **Start path** | Identical to today.js's — resolve ids against the LIVE library, mark used, hand over. One path, not two: a second copy would be a second thing to keep in step with a library that changes |
-> **Missing movements** | Said out loud. `resolveSavedSession()` has always returned `missing`; its only previous caller drops it on the floor |
-> **Tier** | Two different empty states, never one. `savedSessions()` returns `[]` for free by design (R4), so *"nothing saved yet"* to somebody who **cannot** save is a lie, and an upgrade pitch to somebody who simply has none answers a question they did not ask |
-> **A11y** | `h1` + `h2` per session so the list is navigable by heading, real list semantics, and each Start button's accessible name carries the same facts the eye gets. WCAG 2.2 AA 2.4.6 |
-> **Top-right corner** | Nothing placed there, per STUCK-1. If anything ever is, it goes in the `corners` list in `verify-hatchoverlap.mjs` |
->
-> 🔴 **SAVED-1b — a dead button, found by mounting the new view before shipping it.** A session whose movements have **all** been retired offered a Start that did **nothing**: no navigation, no message, no change on screen. The handler ends `if (!exercises.length) return;` — a silent no-op. **And the warning above it said the session "will start without them", so the copy promised exactly what the button refused.** A dead control with no explanation is the shape STUCK-1 was. No button now, and a line saying why; the row stays, because it is still the person's session.
->
-> 🔴 **`precache-check.mjs` caught the new view, and the 128 verify gates did not.** It sits **outside** the `verify-*` suite, like `schedule-drift`. A view that is routed to but never precached fails on offline launch — the one condition `sw.js` exists for. **Second time in two sessions that a live fault has been sitting in the five tools nobody runs by default.** Those five want folding into the standard run.
-
-> ### 🟠 LOGGED FROM THIS SESSION, NOT FIXED
->
-> | Finding | Why not here |
-> |---|---|
-> 🔴 **`today.js` has the same dead button** | The identical silent `if (!exercises.length) return;` on the Home room's featured saved session, shipped 06 Sep with YOUR-OWN. Same fault, on the **Home screen**. Its row is built through `roomRow()` and changing that shape is a Home-screen change that wants agreeing on its own terms |
-> 🟠 **`deleteSavedSession()` has no caller anywhere** | A list is its obvious home, and it is deliberately not wired up. Adding a destructive control to somebody's own authored work is a product decision. **Graeme's call — see below** |
-> 🟠 **`today.js` drops `missing`** | It destructures `{ exercises }` from `resolveSavedSession()` and discards the count, so the Home card can come back short without saying so. The module's own comment says that is the thing to avoid |
-
-> ### 🔵 DECISION FOR GRAEME — deleting a saved session
->
-> There is no way to remove one. `deleteSavedSession()` exists and is called from nowhere.
->
-> | Option | |
-> |---|---|
-> **Leave it** | Nothing can be lost by accident. The list grows forever |
-> 🟢 **Delete, with a confirm** | **Recommended.** It is the person's own authored work; being unable to tidy it is its own frustration. A confirm step and no bulk action |
-> **Archive rather than delete** | Softer, but adds a second state to every row for a problem nobody has reported yet |
 
 > ### 🟢 SHIPPED SINCE v313 — STUCK-1 (`v469`) and ROLE-1 (`v470`)
 >
@@ -8272,4 +8235,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v315*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v314*
