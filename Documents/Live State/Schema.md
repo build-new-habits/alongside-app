@@ -1,4 +1,40 @@
 # Alongside — Data Schema Reference
+## 08 Sep 2026 v1.55
+
+> **v1.55, 08 Sep 2026 — SAVED-2 (edit route).** `sessionBuilderPreselect`
+> gains `"edit"` as a third `mode` alongside `"quick"` and `null`, and a
+> companion key **`savedSessionId`** naming the record being edited.
+>
+> Editing reuses the builder's PREVIEW screen rather than adding a second
+> editor. That screen already lets any movement be swapped, so loading a
+> saved session into it gives editing for free — and the alternative, a
+> separate edit UI, would be a second place where a session's contents
+> can be changed, drifting from the first the moment either moved.
+>
+> Read-once-then-cleared like the rest of the object. A `mode` that
+> persisted would leave the builder permanently editing a session
+> somebody opened once.
+
+## 08 Sep 2026 v1.54
+
+> **v1.54, 08 Sep 2026 — SAVED-2.** Entries in `savedSessions[]` gain
+> **`updatedAt`**: an ISO string, or absent for a session never edited
+> since it was saved. Written by `updateSavedSession()` when a saved
+> session's name or movements change.
+>
+> `createdAt` keeps its meaning — when the session was first saved — and
+> remains what the list orders by, so **editing a session does not move
+> it to the top**. Somebody who edits the one they use most would
+> otherwise find the list reshuffling under them for no reason they
+> asked for.
+>
+> Records written before this version have no `updatedAt`; absent and
+> `null` mean the same thing here and the view treats them alike.
+>
+> Editing OVERWRITES. There is no version history and no "v2" record —
+> a saved session is one thing that changes, which is what makes
+> `deleteSavedSession()` the only way to lose one.
+
 ## 08 Sep 2026 v1.53
 
 > **v1.53, 08 Sep 2026 — SAVED-1.** No field changes. `savedSessions` gains a third reader, `views/saved-sessions.js`, and the note below records that `deleteSavedSession()` remains uncalled by choice rather than by oversight.
@@ -289,7 +325,9 @@ Now used by `today.js` (×4), `progress.js` (×2) and `reflect.js`'s `getSession
 
 ### `sessionBuilderPreselect.mode` — **NEW, QUICK-BUILD, 06 Sep 2026**
 
-`"quick" | null`. Extends the existing read-once-then-cleared `sessionBuilderPreselect` object.
+`"quick" | "edit" | null`. Extends the existing read-once-then-cleared `sessionBuilderPreselect` object.
+
+**SAVED-2, 08 Sep 2026 — `"edit"`.** Set with a companion key `savedSessionId`. Loads that saved session into the builder's **preview** phase, where the existing swap control already lets any movement be changed, and points the save action at `updateSavedSession()` instead of `saveSession()`. **No second editor**: a separate edit screen would be a second place a session's contents can be changed, and the two would drift the first time either moved.
 
 **Why it exists.** `session-builder-ui.js` walks six question phases — type, location, zones, duration, equipment, buildmode — before it builds anything. That is right for somebody who came to compose. It is wrong for Quick build, whose entire proposition is *tell me how long and I fill the rest in*: walking six screens after answering one question is the opposite of what the room offered.
 
@@ -309,8 +347,9 @@ Now used by `today.js` (×4), `progress.js` (×2) and `reflect.js`'s `getSession
   durationMins: number,
   equipment:    string[], // the equipment answer in force when it was built
   exerciseIds:  string[], // ids only, resolved against the library at start
-  createdAt:    string,   // ISO
-  lastUsedAt:   string|null
+  createdAt:    string,   // ISO. When first saved. The list still orders by this.
+  lastUsedAt:   string|null,
+  updatedAt:    string     // SAVED-2. ISO. ABSENT if never edited.
 }
 ```
 
@@ -322,7 +361,13 @@ Now used by `today.js` (×4), `progress.js` (×2) and `reflect.js`'s `getSession
 
 **No count limit, no ordering by use, no "most popular".** The list is theirs in the order they made it.
 
-**Written by** `session-builder-ui.js` (save action). **Read by** `today.js` (the Your own room), `session-builder-ui.js` (start a saved session) and — **SAVED-1, 08 Sep 2026** — `views/saved-sessions.js`, the full list behind the room's counted button. `deleteSavedSession()` still has **no caller anywhere**: a list is its obvious home and it was deliberately left unwired, because adding a destructive control to somebody's own authored work is a product decision. **Not read by the coach** — `chooseSessionType()` must not treat a saved session as a preference signal, because saving something is a decision about a session, not a statement about a person.
+**Written by** `session-builder-ui.js` (save action). **Read by** `today.js` (the Your own room), `session-builder-ui.js` (start a saved session) and — **SAVED-1, 08 Sep 2026** — `views/saved-sessions.js`, the full list behind the room's counted button. **SAVED-2, 08 Sep 2026: a saved session can now be edited and deleted**, both from that list, on Graeme's decision. `updateSavedSession()` writes a changed name or a changed set of `exerciseIds` back to the **same record** and stamps `updatedAt`.
+
+**Editing overwrites; there is no version history and no "v2" record.** A saved session is one thing that changes over time — which is precisely what makes `deleteSavedSession()` the only way to lose one, and why it asks first.
+
+**`createdAt` still orders the list, not `updatedAt`.** Otherwise editing the session you use most would keep shuffling it to the top, which is the list rearranging itself for a reason nobody asked for.
+
+**Not read by the coach** — `chooseSessionType()` must not treat a saved session as a preference signal, because saving something is a decision about a session, not a statement about a person.
 
 ### `sessionBuilderPreselect.durationMins` — **NEW, CLUB-SHELL, 06 Sep 2026**
 
