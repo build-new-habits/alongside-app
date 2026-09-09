@@ -1,6 +1,14 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v476
+ *
+ * v476 - LOCATION-1. session-builder.js v49, coach-proposal.js v25,
+ *   css/components/coach-proposal.css v9. One to one now builds against
+ *   the kit you have WHERE YOU ARE, instead of the union of your home
+ *   and gym lists, and shows that assumption with a way to change it.
+ *   All already precached; cache bump only.
+ *
  * 08 Sep 2026 v475
  *
  * v475 - SAVED-2. Saved sessions can be edited and deleted.
@@ -3232,7 +3240,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v475";
+const CACHE_NAME = "alongside-v476";
 
 const SHELL_URLS = [
 
