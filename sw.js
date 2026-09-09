@@ -1,6 +1,18 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v471
+ *
+ * v471 - SAVED-1 / SAVED-1b. NEW FILE PRECACHED:
+ *   js/views/saved-sessions.js. Saved sessions now have a list of their
+ *   own; the Your own room's counted button leads to it instead of to
+ *   the builder. today.js and router.js also changed.
+ *
+ *   The new view was caught by precache-check.mjs, not by the 128 verify
+ *   gates -- that tool sits OUTSIDE the verify-* suite. A view that is
+ *   routed to but not precached fails on offline launch, which is the
+ *   one condition this file exists for.
+ *
  * 08 Sep 2026 v470
  *
  * v470 - ROLE-1. session-builder.js v46 -> v47, workout.js v16 -> v17.
@@ -3190,7 +3202,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v470";
+const CACHE_NAME = "alongside-v471";
 
 const SHELL_URLS = [
 
@@ -3335,6 +3347,7 @@ const SHELL_URLS = [
   "/alongside-app/js/session-builder.js",
   "/alongside-app/js/data/session-choice.js",
   "/alongside-app/js/data/saved-sessions.js",
+  "/alongside-app/js/views/saved-sessions.js",
   "/alongside-app/js/views/session-builder-ui.js",
   "/alongside-app/js/views/noticing.js",
   "/alongside-app/js/views/in-step.js",
