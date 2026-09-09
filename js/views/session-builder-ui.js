@@ -1,6 +1,38 @@
 /**
  * js/views/session-builder-ui.js - Session Builder UI
  *
+ * 08 Sep 2026 v19
+ *
+ * v19 - SAVE-1. Saving worked and said nothing. Device pass, task 5.
+ *
+ *   The confirmation note sat INSIDE the save form, between the input
+ *   and the confirm button, and the success path hides that form. The
+ *   .hidden class is display:none !important, so the moment a save
+ *   succeeded the message it had just written was hidden with
+ *   everything else -- and the "Save this one" button had already been
+ *   hidden when the form opened. The whole block went blank.
+ *
+ *   The session really was saved. The person was told nothing.
+ *
+ *   That is what Graeme reported: "I can't seem to be able to save my
+ *   own series of sessions." The save was working the whole time; only
+ *   its evidence was missing. A feature that works silently cannot be
+ *   told apart from one that is broken, and a person will reasonably
+ *   conclude the second.
+ *
+ *   role="status" did not help either. A display:none element is out of
+ *   the accessibility tree, so there was nothing to announce. An
+ *   aria-live region an ancestor can hide is not a live region.
+ *
+ *   The note is now a sibling of the form, so it survives the form
+ *   closing on success and still sits below it on the error path, where
+ *   the form stays open so the name can be corrected.
+ *
+ *   verify-save1 checks visibility by walking ANCESTORS. The note itself
+ *   never carried .hidden -- its parent did -- so an assertion of the
+ *   obvious shape, !note.classList.contains("hidden"), would have passed
+ *   through the entire life of this defect.
+ *
  * 08 Sep 2026 v18
  *
  * v18 - QUICK-BUILD-2/3. Three defects in the quick room, all found by
@@ -1445,9 +1477,33 @@ function renderPreview() {
             <input class="sb-save__input" id="sb-save-name" type="text"
                    autocomplete="off"
                    placeholder="Tuesday legs">
-            <p class="sb-save__note" id="sb-save-note" role="status"></p>
             <button class="btn btn-secondary btn-full" id="sb-save-confirm">Save it</button>
           </div>
+          <!--
+            SAVE-1, 08 Sep 2026. The note lives OUTSIDE the form.
+
+            It used to sit between the input and the confirm button, and
+            the success path hides the form. The .hidden class is
+            display:none !important, so the moment the save succeeded the
+            confirmation it had just written was hidden along with
+            everything else -- and the "Save this one" button had already
+            been hidden when the form opened. The whole block went blank.
+
+            (No backticks in here. This comment is inside a template
+            literal, and a stray one closes it.)
+
+            The session really was saved. The person was told nothing.
+            Which is what Graeme reported on a handset: "I can't seem to
+            be able to save my own series of sessions."
+
+            role="status" made no difference either: a display:none
+            element is out of the accessibility tree, so there was
+            nothing to announce.
+
+            Out here it survives the form being hidden, and it still sits
+            below the form for the error case, where the form stays open.
+          -->
+          <p class="sb-save__note" id="sb-save-note" role="status"></p>
         </div>
       ` : ""}
 
