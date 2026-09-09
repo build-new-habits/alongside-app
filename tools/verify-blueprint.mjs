@@ -1,5 +1,23 @@
 /**
  * tools/verify-blueprint.mjs
+ * 08 Sep 2026 v2
+ *
+ * v2 - Also checks the MASTER SCHEDULE's "> **Live:" line against the
+ *   repo. That line is the first thing a new session reads -- before the
+ *   blueprint this gate was written for -- and it had no check behind it
+ *   at all. schedule-drift.mjs compares that document's header to its own
+ *   FOOTER, not to the repo, so the line could name any version and stay
+ *   green.
+ *
+ *   It drifted TWICE in one day. The STUCK-1 session left it naming a
+ *   release-old cache, gate count and schema. I recorded that as a gap
+ *   "logged as a candidate for verify-blueprint-style checking" -- and
+ *   then produced an instance of it myself within the hour, shipping
+ *   Schema v1.53 while that line still said v1.52. This check caught it
+ *   on its first run.
+ *
+ *   Twice in a day is not a lapse of attention. It is a missing gate.
+ *
  * 22 Aug 2026 v1
  *
  * BLUEPRINT-1 — the cold start blueprint may not lie about live state.
@@ -111,6 +129,59 @@ console.log("\nThe blueprint's live-state table vs the files themselves\n");
 {
   ok("the blueprint carries a DD Mon YYYY vN header",
      /^## \d{1,2} \w{3} \d{4} v\d+$/m.test(bp));
+}
+
+// ── The master schedule's START HERE live-state line ────────────────
+//
+// Added 08 Sep 2026. The schedule opens with a one-line summary of what
+// is live, and it is the FIRST line a new session reads -- before the
+// blueprint this gate was built for.
+//
+// It had no check behind it at all. schedule-drift.mjs compares that
+// document's header to its own FOOTER, not to the repo, so the line can
+// name any version it likes and stay green.
+//
+// It has now drifted twice in one day. The STUCK-1 session left it
+// naming a release-old cache, gate count and schema. I recorded that as
+// a gap "logged as a candidate for verify-blueprint-style checking",
+// and then produced an instance of it myself within the hour: schema
+// v1.53 shipped while that line still said v1.52.
+//
+// Twice in a day is not a lapse of attention, it is a missing gate.
+{
+  const SCHEDULE = "Documents/Admin/master_schedule.md";
+  const ms = read(SCHEDULE);
+  const line = (ms.match(/^> \*\*Live:.*$/m) || [null])[0];
+
+  ok("the master schedule states what is live", !!line,
+     `no "> **Live: ..." line found in ${SCHEDULE}`);
+
+  if (line) {
+    const swReal     = (read("sw.js").match(/const CACHE_NAME = "([^"]+)"/) || [])[1];
+    const schemaReal = (read("Documents/Live State/Schema.md")
+                          .match(/^## \d{1,2} \w{3} \d{4} (v[\d.]+)/m) || [])[1];
+    const storeReal  = (read("js/store.js").match(/\d{1,2} \w{3} \d{4} (v\d+)/) || [])[1];
+    const bpReal     = (bp.match(/^## \d{1,2} \w{3} \d{4} (v\d+)/m) || [])[1];
+    const gatesReal  = fs.readdirSync(path.join(REPO, "tools"))
+                         .filter(f => /^verify-.*\.mjs$/.test(f)).length;
+
+    const say = (re) => (line.match(re) || [])[1];
+
+    for (const [what, claimed, real] of [
+      ["cache",          say(/`(alongside-v\d+)`/),          swReal],
+      ["gate count",     say(/(\d+) gates/),                 String(gatesReal)],
+      ["store.js",       say(/`store\.js` (v\d+)/),          storeReal],
+      ["Schema.md",      say(/`Schema\.md` (v[\d.]+)/),      schemaReal],
+      ["blueprint",      say(/blueprint (v\d+)/),            bpReal]
+    ]) {
+      ok(`START HERE — ${what} agrees with the repo (${real})`,
+         claimed === real,
+         claimed === undefined
+           ? `the line does not state a ${what}`
+           : `the schedule says ${claimed}, the repo says ${real}. ` +
+             `Fix the "> **Live:" line in ${SCHEDULE}`);
+    }
+  }
 }
 
 console.log(`\n${"-".repeat(60)}`);
