@@ -126,6 +126,45 @@ ok("2b. and the intact one is NOT flagged",
    "every row is being warned, so the warning means nothing - " +
    "check the fixture ids are real library ids before believing this");
 
+// ── 2b. NOTHING LEFT TO START ───────────────────────────────────────────
+console.log("\nTEST 2b - a session whose movements have ALL gone offers no dead button");
+
+// Found 08 Sep by mounting this view with a fixture whose ids resolve to
+// nothing. The start handler ends `if (!exercises.length) return;` -- a
+// SILENT no-op. Tapping Start did nothing at all: no navigation, no
+// message, no change on screen. A dead control with no explanation is
+// the shape STUCK-1 was, and the warning above it made it worse by
+// promising the session "will start without them".
+//
+// The same silent return sits in today.js's copy of this handler, on the
+// Home room's featured session. Logged there, not fixed here.
+
+fixture({ saved: [
+  { id: "own_gone", name: "Old favourite", sessionType: "glute", durationMins: 30,
+    equipment: [], exerciseIds: ["THIS-ID-IS-GONE", "THIS-ONE-TOO"],
+    createdAt: new Date(now - 40 * 86400000).toISOString(), lastUsedAt: null }
+] });
+main.innerHTML = view.render();
+view.onMount();
+
+ok("2b-pc. positive control: the row rendered",
+   /Old favourite/.test(text()),
+   "the row is absent entirely - the assertions below measure nothing");
+ok("2b-a. no start button is offered",
+   !main.querySelector("[data-saved-id]"),
+   "a button is present that does nothing when tapped, silently");
+ok("2b-b. and the copy does not promise it will start",
+   !/will start without/.test(text()),
+   "the card says the session will start without the missing movements, " +
+   "which is exactly what the handler refuses to do");
+ok("2b-c. it says plainly why instead",
+   /nothing left to start/.test(text()),
+   text().slice(0, 200));
+ok("2b-d. and the session is still listed, not hidden",
+   /Old favourite/.test(text()) && /1 saved/.test(text()),
+   "the row was removed - it is still the person's session, and making " +
+   "it vanish answers a question they did not ask");
+
 // ── 3. THE COUNTED BUTTON REACHES IT ────────────────────────────────────
 console.log("\nTEST 3 - the Your own room's counted button leads here");
 
