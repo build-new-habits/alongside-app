@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v472
+ *
+ * v472 - SAVE-1. session-builder-ui.js v18 -> v19. The save
+ *   confirmation moved out of the form that hides it on success, so a
+ *   successful save is now visible and announceable instead of leaving
+ *   the block blank. Already precached; cache bump only.
+ *
  * 08 Sep 2026 v471
  *
  * v471 - SAVED-1 / SAVED-1b. NEW FILE PRECACHED:
@@ -3202,7 +3209,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v471";
+const CACHE_NAME = "alongside-v472";
 
 const SHELL_URLS = [
 
