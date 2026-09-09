@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v323
+## 08 Sep 2026 v322
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v322.md`. Remove v322 on upload.
+Supersedes `master_schedule_v321.md`. Remove v321 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v479`, 133 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v80.** Read that blueprint after this block.
+> **Live: `alongside-v478`, 133 gates, `store.js` v65, `Schema.md` v1.56, cold start blueprint v79.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -15,8 +15,7 @@ Supersedes `master_schedule_v322.md`. Remove v322 on upload.
 > | # | What | State |
 > |---|---|---|
 > | ✅ | ~~**Device pass**~~ | **COMPLETE, 8 of 8, 08 Sep.** 15 defects in shipped code, plus 6 more from Graeme's handset. See the tally below |
-> | ✅ | ~~**Class data contract**~~ | **FIXED 08 Sep, CLASS-1, `v479`.** All three classes are in as data and validating. See below |
-> | 1 | 🟡 **Class four onwards** | **Now unblocked.** The contract is fixed and gated; a fourth class can be written against it. ~~Recommended next, and the only Claude-side BUILD work left.~~ Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
+> | 1 | 🟡 **Class data contract** | **Recommended next, and the only Claude-side BUILD work left.** Three classes written (`alongside_class_001/002/003`); **fix the contract against them before a fourth is written.** Nothing is built for classes yet. Decisions already taken are further down this document: the mapping unit is the STRAND not the aim; extend `practice-library.js` rather than building beside it; PACING (spec §4b) |
 > | 2 | 🟡 **Class content** | **Graeme's.** His arc first, then expand — six to eight more plus lighter variants |
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
@@ -30,53 +29,6 @@ Supersedes `master_schedule_v322.md`. Remove v322 on upload.
 > 🟠 **49 gates read cwd-relative** | Green from the repo root, reading nothing from anywhere else. **A trap, not a live fault:** a session running the suite by full path from elsewhere sees ~70 red and concludes the app is broken. Four fixed so far, one at a time as each gate is opened |
 > 🟠 **The five tools outside the `verify-*` suite** | `schedule-drift`, `precache-check`, `schema-check`, `contrast-check`, `audit-gate-proxies`. **They have caught two live faults nobody would otherwise have seen** — a stale schedule and an unprecached view — because nothing runs them by default. Folding them into the standard run is a small change with a proven return |
 > 🟡 **Changelog stale since March** | Resume or retire — Graeme's call |
-
-> ### 🟢 SHIPPED SINCE v322 — CLASS-1, `v479`. The class contract is fixed, and the three classes are in.
->
-> ⚫ **Their own instruction, followed:** *"Fix it against these three before writing a fourth."* Class 001 proposed a shape from what it had used; 002 was written as a circuit and 003 as seated mindfulness precisely to strain it. **All three are now data, and all three validate.**
->
-> ### 🔴 Two corrections to their proposed schema — both found by checking, not reading
->
-> **1. `serves` and `touches` are separate fields, not a flat `strands` array.** Every card always distinguished *"Serves strand"* from *"Also touches"*, and the distinction is load-bearing: a programme is a path through the strands an arc contains. **Flattened, Stopping Early — which serves `pacing` and merely brushes `trusting-body` — would be offered to a trusting-body arc as though built for it.** `classesForStrand()` shows the difference and the gate asserts it.
->
-> **2. SECTIONS, not a flat list of beats.** Every class is written in numbered sections with stated durations, and flattening loses three things:
->
-> | | |
-> |---|---|
-> **The card's length becomes unverifiable** | Transcribed flat, Ground's pauses total **7.4 minutes against a card promising 15**. Nothing is wrong with the writing — the missing time is the speaking, and the sections account for it. **A duration nothing can check is a claim with nothing behind it** |
-> **The player cannot say where somebody is** | *"3 of 8"* needs sections. 25 beats is not something to show anybody |
-> **Class 002's rounds already need them** | Its round two repeats sections **by name**. As indices into a flat array, that range breaks silently the first time a line is inserted |
->
-> **Sections are timed in SECONDS, the class in minutes.** Class 002 opens with *"1 min 30"* — not expressible in whole minutes, and in decimal a float summed nine times against an integer. The check is `sum(seconds) === minutes * 60`, exactly.
->
-> ### 🟢 Safety is the library's, not a second copy
->
-> `classes/index.js` imports `getActiveConditionIds()` and `getExerciseSafetyTier()` — the same two `practice-library.js` uses and the same two the session builder uses — and **writes no rule of its own.** That is the *extend, do not build beside it* instruction. A second set of rules would drift from conditions data the first time either moved, and **the failure mode is a movement excluded from a built session and offered inside a class.**
->
-> 🔴 **An `avoid` movement WITHHOLDS the class rather than being dropped from it.** A practice is a single item; a class is fifteen minutes of structure and voice, and removing one movement from the middle leaves a script referring to something the person was never shown. **Withheld, not silently edited** — a class with a hole in it is worse than one not offered, because the person cannot see what is missing.
->
-> ⚫ **`sitOut` is deliberately NOT a safety route.** It means the person MAY choose to skip. Using it as the app's answer to an unsafe movement turns a considered exclusion into a shrug.
->
-> ### 🟢 The gate asserts PROSE, and that is the right tool
->
-> Four sentences are load-bearing and say so in their own documents. Each is the difference between the class working and doing the opposite of what it is for:
->
-> | Line | Why |
-> |---|---|
-> *"There might not be"* | A question that only accepts *yes, better* teaches people to report improvement — **and evidence you have coached is worth nothing** |
-> *"your body did all of it"* | A fact, not a compliment. Anything warmer takes the conclusion off the person |
-> *"one round for six weeks"* | The exit offered in the middle, out loud, **before anybody has to invent it** |
-> *"later in the week — not now"* | The honest form of the promise. Naming the delay is what makes the delay survivable |
->
-> Reversal-proven five ways: softening a line, drifting a section duration, flattening `serves` into `touches`, scaling a hold, and phrasing a stop cue as failure.
->
-> 🟢 **Every strand id and every exercise id checked against the live data — all of them exist.** One naming mismatch resolved: Class 003's prose says *"seated heel raise"*; the library id is `seated-heel-toe-raise`.
-
-> ### 🔵 ONE THING FOR GRAEME — Class 002's stated length
->
-> The card says **18 minutes**. Its nine sections, at the durations the document itself gives them, total **19**: `1m30 + 2 + 2 + 2 + 1m30 + 2 + 2 + 5 + 1`.
->
-> The data says 19 so that it validates. **Which number is wrong is a content decision, not mine** — either the card is a minute out, or a section is. Nothing else depends on it, and the contract will hold either answer.
 
 > ### 🟢 SHIPPED SINCE v321 — A11Y-HEADER, `v478`. Eleven screens had no heading at all.
 >
@@ -8510,4 +8462,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v323*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v322*
