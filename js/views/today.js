@@ -1,5 +1,30 @@
 /**
  * today.js
+ * 08 Sep 2026 v36
+ *
+ * v36 - OWN-1. Three faults in the Your own room's card, all of
+ *   them already fixed somewhere else and left standing here.
+ *
+ *   1. The movement count was exerciseIds.length -- what was SAVED, not
+ *   what still exists. resolveSavedSession() has always returned
+ *   `missing` and this caller dropped it, so the card could promise nine
+ *   movements and hand over seven. It now counts what resolves and says
+ *   out loud how many have gone.
+ *
+ *   2. "1 movements". The same unguarded interpolation PROPOSAL-1 fixed
+ *   on the proposal card the same day, in a second place.
+ *
+ *   3. A session whose movements had ALL gone offered a Start button
+ *   that did nothing -- the handler ends `if (!exercises.length)
+ *   return;`, a silent no-op. SAVED-1b fixed exactly this on the
+ *   saved-sessions list and left this copy behind. No button now, and a
+ *   line saying why; the session stays on the card, because it is still
+ *   the person's.
+ *
+ *   verify-yourown test 4 had mounted this room since 06 Sep and
+ *   asserted only that a start button EXISTS. That was true throughout,
+ *   and was the problem.
+ *
  * 08 Sep 2026 v35
  *
  * v35 - SAVED-1. The Your own room's counted button pointed at the
@@ -1797,6 +1822,27 @@ export function TodayView(router) {
     // sessions", never "More". A count tells you whether it is worth the
     // tap; "More" makes you tap to find out.
     const saved = savedSessions();
+    // OWN-1, 08 Sep 2026. Three faults in the facts and the action below.
+    //
+    // 1. The count was `exerciseIds.length` -- the count SAVED, not the
+    //    count that still exists. resolveSavedSession() has always
+    //    returned `missing` and this caller dropped it on the floor, so
+    //    the card could promise nine movements and hand over seven.
+    //
+    // 2. "1 movements". Same unguarded interpolation PROPOSAL-1 fixed on
+    //    the proposal card the same day, in a second place.
+    //
+    // 3. A session whose movements have ALL gone offered a Start button
+    //    that did nothing: the handler below ends
+    //    `if (!exercises.length) return;`, a silent no-op. SAVED-1b fixed
+    //    exactly this on the saved-sessions list and left the copy here,
+    //    which is the branch-and-a-half pattern GUIDED-COPY and DEVICE-1
+    //    are both on record for.
+    const top = saved[0] || null;
+    const topResolved = top ? resolveSavedSession(top) : { exercises: [], missing: 0 };
+    const topCount    = topResolved.exercises.length;
+    const topRunnable = topCount > 0;
+
     const own = saved.length
       ? roomRow({
           id: 'own', title: 'Your own',
@@ -1804,11 +1850,20 @@ export function TodayView(router) {
           summary: saved[0].name,
           facts: [
             saved[0].durationMins ? `${saved[0].durationMins} minutes` : 'Your own length',
-            `${(saved[0].exerciseIds || []).length} movements`,
-            saved[0].lastUsedAt ? `Last done ${_daysAgoLabel(saved[0].lastUsedAt)}` : 'Not done yet'
+            `${topCount} movement${topCount === 1 ? '' : 's'}`,
+            topResolved.missing > 0
+              ? `${topResolved.missing} no longer in the library`
+              : (saved[0].lastUsedAt ? `Last done ${_daysAgoLabel(saved[0].lastUsedAt)}` : 'Not done yet')
           ],
-          action: `<button class="btn btn-primary btn-full club-room__go"
-                           data-saved-id="${saved[0].id}">Start ${_esc(saved[0].name)}</button>
+          action: `${topRunnable ? `
+                     <button class="btn btn-primary btn-full club-room__go"
+                             data-saved-id="${saved[0].id}">Start ${_esc(saved[0].name)}</button>
+                   ` : `
+                     <p class="club-room__note" role="status">
+                       None of the movements in this one are in the library any
+                       more, so there is nothing left to start.
+                     </p>
+                   `}
                    ${saved.length > 1 ? `
                      <!-- SAVED-1, 08 Sep 2026. Was data-route="session-builder":
                           a button naming sessions you already have, which
