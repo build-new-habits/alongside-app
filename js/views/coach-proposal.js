@@ -1,5 +1,40 @@
 /**
  * coach-proposal.js
+ * 08 Sep 2026 v25
+ *
+ * v25 - LOCATION-1. One to one asked where you are, and let you say.
+ *
+ *   THE DEFECT. equipmentOverride was null here, which falls back to the
+ *   flat `equipment` field -- and onboarding/equipment.js writes that
+ *   field as the UNION of home kit and gym kit. So this room built every
+ *   session against both lists at once. Measured with a resistance band
+ *   at home and a rack at the gym: a BARBELL BACK SQUAT and a BARBELL
+ *   DEADLIFT proposed to somebody who might be standing in their
+ *   kitchen. The default path, not an edge case.
+ *
+ *   sessionLocation already existed, already had a writer
+ *   (checkin-mini.js Step 4, "Where are you now?"), and was read by
+ *   nothing that builds a session. A wire left hanging, not a new field.
+ *
+ *   THE COMMENT AT _buildCoachSuggestion() has long claimed these
+ *   arguments match triggerBuild()'s. They did not: the builder passes a
+ *   location-scoped list and this passed null. Closed, not widened.
+ *
+ *   AND A WAY TO SAY OTHERWISE. Graeme, on a handset: "It works though.
+ *   I can't change anything though if I wanted to." Quick build has
+ *   shown its assumptions with everything adjustable since QUICK-BUILD;
+ *   this room handed over a session and offered no way to alter its
+ *   length or where you are. Same row shape as the quick scaffold on
+ *   purpose -- it is the same idea, and a second visual language for it
+ *   would be a second thing to learn.
+ *
+ *   Changing one REBUILDS the options, and clears the selection: the new
+ *   options are new objects with new ids, so a retained selection would
+ *   leave Start enabled pointing at nothing.
+ *
+ *   h1, not h2. This screen had NO h1 at all -- its outline began at h2.
+ *   WCAG 2.2 AA 1.3.1.
+ *
  * 08 Sep 2026 v24
  *
  * v24 - PROPOSAL-1/2. Device pass, task 4. Nothing had ever mounted
@@ -510,7 +545,7 @@ import { getConditionName }  from '../data/conditions.js';
 // behaviour, and stays -- it is the window the check-in's time answer is
 // interpreted through and has nothing to do with which builder runs.
 import { AVAILABLE_TIME_WINDOW_MINUTES } from '../data/workoutGenerator.js';
-import { buildSession, buildCandidatePools } from '../session-builder.js';
+import { buildSession, buildCandidatePools, equipmentForLocation } from '../session-builder.js';
 import { chooseSessionType, lineIsSupported } from '../data/session-choice.js';
 
 // DOOR_COPY, renderDoorFront(), renderBypassDoor(), handleDoorChoice(),
@@ -879,10 +914,46 @@ export function CoachProposalView(router) {
             </div>
           ` : ''}
 
-          <h2 id="cp-preview-title" class="cp-preview-panel__title">Today\u2019s session</h2>
+          <!-- LOCATION-1. h1, not h2. This screen had NO h1 at all: its
+               outline began at h2, so somebody navigating by heading met
+               the page with no top level to orient from. WCAG 2.2 AA
+               1.3.1. Styling is on the class, so nothing moves. -->
+          <h1 id="cp-preview-title" class="cp-preview-panel__title">Today\u2019s session</h1>
           <p class="cp-preview-panel__sub">
             Adapted for your check-in \u2014 pick the one that feels right.
           </p>
+          <!--
+            LOCATION-1, 08 Sep 2026. What the coach assumed, and a way to
+            say otherwise.
+
+            Graeme, on a handset: "It works though. I can't change
+            anything though if I wanted to." Quick build has shown its
+            assumptions with everything adjustable since QUICK-BUILD; One
+            to one handed over a session and offered no way to alter its
+            length, where you are, or the kit.
+
+            Location matters most because it is the only one the coach
+            CANNOT infer (CLUB spec v2 6.2), and because getting it wrong
+            proposed a barbell to somebody in a kitchen.
+
+            Same row shape as the quick scaffold on purpose. It is the
+            same idea -- here is what I assumed, change it -- and a second
+            visual language for it would be a second thing to learn.
+          -->
+          <ul class="cp-assumptions">
+            ${[
+              ['Where',  'cp-loc',  _locationLabel(_currentLocation())],
+              ['Length', 'cp-time', `${_getAvailableTimeMinutes()} mins`]
+            ].map(([label, id, value]) => `
+              <li class="cp-assumptions__row">
+                <span class="cp-assumptions__label">${label}</span>
+                <button class="btn btn-secondary cp-assumptions__change" id="${id}"
+                        aria-label="${label}: ${value}. Change">
+                  ${value}
+                </button>
+              </li>`).join('')}
+          </ul>
+
           <div class="cp-preview-cards" role="radiogroup" aria-label="Choose today's session">
             ${currentPreviewOptions.map((opt, i) => renderPreviewCard(opt, i === 0)).join('')}
           </div>
@@ -1001,6 +1072,25 @@ export function CoachProposalView(router) {
     }
   }
 
+  /**
+   * LOCATION-1, 08 Sep 2026. An assumption changed, so the proposal is
+   * rebuilt against it.
+   *
+   * Showing "Where: Gym" above three options built for a living room
+   * would be worse than showing nothing: the strip would be describing a
+   * session that does not exist.
+   *
+   * selectedOptionId is cleared deliberately. The options are new
+   * objects with new ids, so a retained selection points at nothing while
+   * leaving Start enabled -- a button that looks ready and does nothing.
+   */
+  function _rebuildAndRerender(container) {
+    proposal              = buildProposal();
+    currentPreviewOptions = proposal.options;
+    selectedOptionId      = null;
+    _rerenderPanel(container);
+  }
+
   function _previewKeydown(e) {
     if (e.key !== 'Escape') return;
     const container = document.getElementById('main-content');
@@ -1028,6 +1118,27 @@ export function CoachProposalView(router) {
         selectedOptionId = card.dataset.optionId;
         _rerenderPanel(container);
       });
+    });
+
+    // LOCATION-1. Changing an assumption REBUILDS the options, because a
+    // proposal that no longer matches what it says it was built for is
+    // worse than one that never said. Cycling rather than opening a
+    // picker: three locations and four lengths, on a panel that already
+    // traps focus -- a second layer inside it would need its own trap and
+    // its own way out.
+    panel.querySelector('#cp-loc')?.addEventListener('click', () => {
+      const order = ['home', 'gym', 'outside'];
+      const next  = order[(order.indexOf(_currentLocation()) + 1) % order.length];
+      store.set('sessionLocation', next);
+      _rebuildAndRerender(container);
+    });
+
+    panel.querySelector('#cp-time')?.addEventListener('click', () => {
+      const cats = Object.keys(AVAILABLE_TIME_WINDOW_MINUTES);
+      const cur  = store.get('availableTime');
+      const i    = cats.indexOf(cur);
+      store.set('availableTime', cats[(i + 1) % cats.length]);
+      _rebuildAndRerender(container);
     });
 
     panel.querySelector('#cp-preview-start')?.addEventListener('click', () => {
@@ -1659,10 +1770,23 @@ export function CoachProposalView(router) {
   function _buildCoachSuggestion() {
     const { sessionType, reason, inputs } = chooseSessionType();
 
+    // LOCATION-1, 08 Sep 2026. equipmentOverride was null here, which
+    // falls back to the flat `equipment` field -- and
+    // onboarding/equipment.js writes that field as the UNION of home kit
+    // and gym kit. So this room built every session against both lists at
+    // once. Measured with a resistance band at home and a rack at the
+    // gym: a Barbell Back Squat and a Barbell Deadlift proposed to
+    // somebody who might be standing in their kitchen. The default path,
+    // not an edge case.
+    //
+    // The comment below has long said these arguments match
+    // triggerBuild()'s. They did not: the builder passes a
+    // location-scoped list and this passed null. This closes that gap
+    // rather than widening it.
     const args = {
       sessionType,
       durationMins:      _getAvailableTimeMinutes(),
-      equipmentOverride: null,
+      equipmentOverride: equipmentForLocation(_currentLocation()).list,
       preset:            store.get('sessionPreset') || null
     };
 
@@ -1799,6 +1923,36 @@ export function CoachProposalView(router) {
   function _getAvailableTimeMinutes() {
     const category = store.get('availableTime');
     return category ? (AVAILABLE_TIME_WINDOW_MINUTES[category] ?? 30) : 30;
+  }
+
+  /**
+   * LOCATION-1, 08 Sep 2026. Where the person is for this session.
+   *
+   * NULL BECOMES HOME, and the direction matters: a session built for
+   * home can be done at a gym, and one built for a gym cannot be done at
+   * home. Guessing the permissive way is how a barbell ended up being
+   * proposed to somebody in a kitchen.
+   *
+   * `sessionLocation` already existed and already had a writer --
+   * checkin-mini.js Step 4, "Where are you now?" -- and was read by
+   * nothing that builds a session. This is a wire that was left hanging,
+   * not a new field.
+   */
+  /**
+   * LOCATION-1. The words a person uses, not the store's ids.
+   * "Outside" carries its consequence in the strip itself -- with nothing
+   * to hand -- because outside is the one choice that changes what is
+   * possible rather than merely where it happens.
+   */
+  function _locationLabel(loc) {
+    return loc === 'gym'     ? 'At the gym'
+         : loc === 'outside' ? 'Outside, with nothing to hand'
+         :                     'At home';
+  }
+
+  function _currentLocation() {
+    const loc = store.get('sessionLocation');
+    return loc === 'gym' || loc === 'outside' ? loc : 'home';
   }
 
   // ── Public interface ───────────────────────────────────────────────────────
