@@ -1,12 +1,12 @@
 # Alongside: Move — Master Schedule
-## 08 Sep 2026 v319
+## 08 Sep 2026 v318
 
 Build New Habits | Single source of truth for all build, business, website, and content tasks.
-Supersedes `master_schedule_v318.md`. Remove v318 on upload.
+Supersedes `master_schedule_v317.md`. Remove v317 on upload.
 
 > # 📋 START HERE IF YOU ARE A NEW SESSION
 >
-> **Live: `alongside-v475`, 130 gates, `store.js` v65, `Schema.md` v1.55, cold start blueprint v73.** Read that blueprint after this block.
+> **Live: `alongside-v474`, 130 gates, `store.js` v65, `Schema.md` v1.55, cold start blueprint v72.** Read that blueprint after this block.
 >
 > **Claude's pre-beta BUILD scope is complete.** CLUB 9 of 9 plus QUICK-INPUTS, GUIDED-COPY, DEVICE-1, DEVICE-2, ARC-LED, ARC-PLAIN — `v452` → `v466` on 06 Sep. **QUICK-BUILD-2/3 `v467`, CHECKIN-3 and PROPOSAL-1/2 `v468` — 08 Sep.**
 >
@@ -20,38 +20,6 @@ Supersedes `master_schedule_v318.md`. Remove v318 on upload.
 > | + | 🟠 **RED-FLAG** | **No code at all.** Waits on Graeme's PAR-Q+ call |
 >
 > ⚫ **Classes cannot ship for beta; the device pass can.** That is why it is first.
-
-> ### 🟢 SHIPPED SINCE v318 — SAVED-2, `v475`. Saved sessions are editable and deletable.
->
-> ⚫ **Graeme's decision, asked and answered twice.** Not just rename — **changes to the session itself, as iterations** — and deletable.
->
-> **Editing reuses the builder's PREVIEW.** That screen already lets any movement be swapped, so loading a saved session into it gives editing for free. A separate edit UI would be a second place a session's contents can change, drifting from the first the moment either moved.
->
-> **Editing OVERWRITES.** No version history, no *"Sunday legs v2"*. A saved session is one thing that changes over time — which is precisely what makes deleting it the only way to lose one.
->
-> **Schema first, twice.** v1.53 → v1.54 for `updatedAt` and the overwrite decision; v1.54 → v1.55 for `"edit"` as a third `sessionBuilderPreselect` mode. Both before any code touched them.
->
-> 🔴 **THE ONE THAT MATTERED: editing was silently losing movements.** The first version loaded saved sessions through `buildSessionFromSelection()`, which intersects the ids with the candidate pool for the type — filtered by categories, equipment and conditions **as they are now**. Measured: **four movements in, two back**, and the save reported *"Saved. Your changes are in."* **Opening a session to change one thing, losing half of it, and being told it worked is worse than not being able to edit at all.**
->
-> `buildSessionFromSaved()` keeps every movement. **And keeping everything is the right answer, not the easy one:** STARTING a saved session already keeps every movement, with no filter applied. Editing must not enforce a rule starting does not. If re-filtering against current conditions is right, it belongs on the **start** path where it would actually protect somebody, argued on its own terms and applied to both.
->
-> **Delete asks first**, in two taps, and the confirmation **replaces** the ordinary actions rather than sitting beside them. Every control names the **session** in its accessible name — four rows of "Edit" and "Delete" are four identical announcements to somebody tabbing through, and one of them is destructive. Focus moves deliberately at each step; the `h1` carries `tabindex="-1"` or the post-delete move is a no-op.
-
-> ### 🔴 THREE THINGS I GOT WRONG BUILDING IT — all caught before shipping
->
-> | # | What | How it was caught |
-> |---|---|---|
-> **1** | The edit branch went **inside** the duration block, which opens on `pre.durationMins > 0`. An edit preselect carries no duration, so it **never ran at all** — silently, landing on the type picker | Walking the route |
-> **2** | The filtering builder, above | Checking the round trip rather than trusting that the screen looked right |
-> **3** | `candidatePools` was never built on the edit route, so `_canSwap()` answered false for every row: **every movement on screen and not one of them changeable.** Editing was a rename with extra steps | `verify-saved1` test 9 |
->
-> 🔴 **Test 7 calls the assembler; test 9 drives the ROUTE. That distinction is the whole lesson.** Reverting the route to the filtering builder left test 7 **entirely green**. *A gate that verifies a function while the screen calls a different one is the source-text problem wearing a fixture's clothes.*
->
-> ⚠️ **Two of my own assertions were wrong and were fixed rather than the code**: one compared against a saved id count when the fixture deliberately holds an id that is gone from the library, and one counted swap buttons as though they were rows — which would have called *"every movement shown, none changeable"* a pass.
->
-> ⚠️ **I also destroyed uncommitted work with `git checkout` during reversal testing** and had to rebuild `buildSessionFromSaved()` from scratch. Reversals are done against `/tmp` copies for exactly this reason; I had backups for two files and not the third. **Back up every file a reversal touches, not most of them.**
->
-> 🟢 `verify-css` caught four new classes with no rules. `club-rooms.css` v2.
 
 > ### 🟢 SHIPPED SINCE v317 — PROGRESS-2, `v474`. **DEVICE PASS COMPLETE, 8 of 8.**
 >
@@ -8380,4 +8348,4 @@ Graeme provided the fine-grained GitHub token directly in the PM chat so schedul
 
 ---
 
-*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v319*
+*Build New Habits · Alongside: Move · Master Schedule · 08 Sep 2026 v318*
