@@ -1,5 +1,25 @@
 /**
  * progress.js
+ * 08 Sep 2026 v13
+ *
+ * v13 - PROGRESS-2. "What you have been doing" is an h2, not an h3.
+ *
+ *   Its three siblings -- Your weight, the programme block, Share your
+ *   progress -- are all h2, so the rendered outline read h1 > h3 > h2.
+ *   Somebody navigating by heading met the section as a subsection of
+ *   nothing, then the next one jumping back UP a level.
+ *
+ *   WCAG 2.2 AA 1.3.1. The heading level IS the structure for anyone not
+ *   seeing the layout, and heading navigation is how a screen-reader user
+ *   skims a page they opened in order to look back.
+ *
+ *   Styling lives on the class, so nothing moves visually.
+ *
+ *   Device pass, task 8. The rest of this view came back clean: no
+ *   undefined, no unnamed controls, the free-tier absence of this section
+ *   is deliberate gating, and the two coach lines that appear to run
+ *   together are separate paragraphs.
+ *
  * 06 Sep 2026 v12
  *
  * v12 - PROGRESS. The shapes of session, counted. CLUB item 9, the last.
@@ -581,7 +601,16 @@ export function ProgressView(router) {
     return `
       <section class="progress-shapes"
                aria-label="Shapes of session in the last ${activeWindow} days">
-        <h3 class="progress-shapes__title">What you have been doing</h3>
+        <!-- PROGRESS-2, 08 Sep 2026. h2, not h3.
+             This section is a sibling of "Your weight", the programme
+             block and "Share your progress", all of which are h2. As an
+             h3 it produced the outline h1 > h3 > h2: somebody navigating
+             by heading met "What you have been doing" as a subsection of
+             nothing, and then "Share your progress" jumping back UP a
+             level. WCAG 2.2 AA 1.3.1 -- the heading level is what
+             carries the structure to anyone not seeing the layout.
+             Styling is on the class, so nothing moves visually. -->
+        <h2 class="progress-shapes__title">What you have been doing</h2>
         <ul class="progress-shapes__list">
           ${rows.map(([type, count]) => `
             <li class="progress-shapes__row">
