@@ -1,6 +1,13 @@
 /**
  * sw.js - Alongside Service Worker
  *
+ * 08 Sep 2026 v473
+ *
+ * v473 - TIMER-1. workout.js v17 -> v18, workout.css v12 -> v13. The
+ *   countdown reaching zero now announces itself instead of silently
+ *   changing the screen under somebody mid-exercise. Both already
+ *   precached; cache bump only.
+ *
  * 08 Sep 2026 v472
  *
  * v472 - SAVE-1. session-builder-ui.js v18 -> v19. The save
@@ -3209,7 +3216,7 @@ rather than only a buried bypass door. Added both.
  * sw.js must always be the LAST file deployed in any batch.
  */
 
-const CACHE_NAME = "alongside-v472";
+const CACHE_NAME = "alongside-v473";
 
 const SHELL_URLS = [
 
